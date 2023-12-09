@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { styles } from './app.styles';
 
 @Component({
   selector: 'app-root',
@@ -6,5 +7,5 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  title = 'ngx-vflow-demo';
+  protected styles = styles;
 }
