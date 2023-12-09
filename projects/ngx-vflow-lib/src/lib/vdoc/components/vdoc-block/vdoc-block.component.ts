@@ -1,7 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, ElementRef, HostBinding, Input, OnInit, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, HostBinding, Input, OnInit, Optional, SkipSelf, forwardRef, inject } from '@angular/core';
 import { BlockStyleSheet } from '../../interfaces/stylesheet.interface';
-import { TreeManagerService } from '../../services/tree-manager.service';
+import { VDocTreeBuilderService } from '../../services/vdoc-tree-builder.service';
+import { BlockViewModel } from '../../view-models/block.view-model';
+import { VDocViewComponent } from '../vdoc-view/vdoc-view.component';
 
 @Component({
   selector: '[vdoc-block]',
@@ -18,6 +20,7 @@ import { TreeManagerService } from '../../services/tree-manager.service';
   `,
   styleUrls: ['./vdoc-block.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: [{ provide: VDocViewComponent, useExisting: forwardRef(() => VDocBlockComponent) }]
 })
 export class VDocBlockComponent implements OnInit {
   @Input()
@@ -42,44 +45,40 @@ export class VDocBlockComponent implements OnInit {
   protected radiusX = 0
   protected fillColor = ''
 
-  protected marginBottom = 0
+  private treeManager: VDocTreeBuilderService = inject(VDocTreeBuilderService)
 
-  private get host() {
-    return this.hostRef.nativeElement
+  constructor(@SkipSelf() @Optional() private parent: VDocViewComponent) {
+    if (!this.parent) {
+      throw new Error(`vdoc-block must not be used outside of vdoc-root`);
+    }
   }
-
-  private hostRef: ElementRef<SVGGElement> = inject(ElementRef)
-  private treeManager: TreeManagerService = inject(TreeManagerService)
 
   ngOnInit(): void {
-    this.hostWidth = this.styleSheet.width
-    this.width = this.styleSheet.width
+    const model = this.createModel();
 
-    this.hostHeight = this.styleSheet.height
-    this.height = this.styleSheet.height
+    this.hostWidth = model.width
+    this.width = model.width
 
-    this.hostY = this.getElementY();
+    this.hostHeight = model.height
+    this.height = model.height
 
-    this.marginBottom = this.styleSheet.marginBottom
+    this.hostX = model.x
+    this.hostY = model.y
 
     this.fillColor = this.styleSheet.backgroundColor
-
     this.radiusX = this.styleSheet.borderRadius
-
-    this.treeManager.register(this.host, this)
   }
 
-  private getElementY() {
-    const prevSibling = this.host.previousSibling as Element | null;
+  createModel() {
+    const model = new BlockViewModel(this, this.styleSheet)
 
-    if (this.treeManager.has(prevSibling)) {
-      const prevComponent = this.treeManager.get(prevSibling)!;
+    // every vdoc-block must have parent (vdoc-root or other views)
+    const parent = this.treeManager.getByComponent(this.parent)
+    model.parent = parent;
+    parent.children.push(model)
 
-      return (
-        prevComponent.y + prevComponent.height + prevComponent.marginBottom
-      );
-    }
+    this.treeManager.register(model)
 
-    return 0;
+    return model
   }
 }
