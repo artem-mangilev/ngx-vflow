@@ -3,16 +3,13 @@ import { BlockStyleSheet } from '../../interfaces/stylesheet.interface';
 import { VDocTreeBuilderService } from '../../services/vdoc-tree-builder.service';
 import { BlockViewModel } from '../../view-models/block.view-model';
 import { VDocViewComponent } from '../vdoc-view/vdoc-view.component';
-import { retry } from 'rxjs';
 
 @Component({
-  selector: '[vdoc-block]',
+  selector: 'svg[vdoc-block]',
   template: `
     <svg:rect
       [attr.width]="width"
       [attr.height]="height"
-      [attr.x]="x"
-      [attr.y]="y"
       [attr.rx]="radiusX"
       [attr.fill]="fillColor"
     ></svg:rect>
@@ -54,8 +51,6 @@ export class VDocBlockComponent implements OnInit {
     return this.model.height
   }
 
-  protected x = 0
-  protected y = 0
   protected radiusX = 0
   protected fillColor = ''
 

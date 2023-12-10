@@ -5,7 +5,7 @@ import { RootViewModel } from '../../view-models/root.view-model';
 import { RootStyleSheet } from '../../interfaces/stylesheet.interface';
 
 @Component({
-  selector: '[vdoc-root]',
+  selector: 'svg[vdoc-root]',
   template: `<ng-content></ng-content>`,
   styleUrls: ['./vdoc-root.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
