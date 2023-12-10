@@ -4,5 +4,7 @@ export abstract class AnyViewModel {
   public parent: AnyViewModel | null = null;
   public children: AnyViewModel[] = [];
 
-  abstract component: VDocViewComponent;
+  public abstract component: VDocViewComponent;
+
+  public abstract calculateLayout(): void;
 }

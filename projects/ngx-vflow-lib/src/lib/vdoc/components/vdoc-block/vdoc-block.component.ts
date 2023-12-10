@@ -1,9 +1,9 @@
-import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, ElementRef, HostBinding, Input, OnInit, Optional, SkipSelf, forwardRef, inject } from '@angular/core';
 import { BlockStyleSheet } from '../../interfaces/stylesheet.interface';
 import { VDocTreeBuilderService } from '../../services/vdoc-tree-builder.service';
 import { BlockViewModel } from '../../view-models/block.view-model';
 import { VDocViewComponent } from '../vdoc-view/vdoc-view.component';
+import { retry } from 'rxjs';
 
 @Component({
   selector: '[vdoc-block]',
@@ -27,23 +27,39 @@ export class VDocBlockComponent implements OnInit {
   public styleSheet!: BlockStyleSheet
 
   @HostBinding('attr.width')
-  protected hostWidth = 0
+  protected get hostWidth() {
+    return this.model.width
+  }
 
   @HostBinding('attr.height')
-  protected hostHeight = 0
+  protected get hostHeight() {
+    return this.model.height
+  }
 
   @HostBinding('attr.x')
-  protected hostX = 0
+  protected get hostX() {
+    return this.model.x
+  }
 
   @HostBinding('attr.y')
-  protected hostY = 0
+  protected get hostY() {
+    return this.model.y
+  }
 
-  protected width = 0
-  protected height = 0
+  protected get width() {
+    return this.model.width
+  }
+
+  protected get height() {
+    return this.model.height
+  }
+
   protected x = 0
   protected y = 0
   protected radiusX = 0
   protected fillColor = ''
+
+  protected model!: BlockViewModel
 
   private treeManager: VDocTreeBuilderService = inject(VDocTreeBuilderService)
 
@@ -54,16 +70,7 @@ export class VDocBlockComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const model = this.createModel();
-
-    this.hostWidth = model.width
-    this.width = model.width
-
-    this.hostHeight = model.height
-    this.height = model.height
-
-    this.hostX = model.x
-    this.hostY = model.y
+    this.model = this.createModel();
 
     this.fillColor = this.styleSheet.backgroundColor
     this.radiusX = this.styleSheet.borderRadius

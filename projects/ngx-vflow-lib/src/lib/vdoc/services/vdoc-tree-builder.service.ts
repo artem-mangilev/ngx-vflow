@@ -7,16 +7,14 @@ import { RootViewModel } from '../view-models/root.view-model';
 // TODO probably should rename
 @Injectable()
 export class VDocTreeBuilderService {
-  private root: RootViewModel | null = null
+  public root: RootViewModel | null = null
 
   private componentMap = new Map<VDocViewComponent, AnyViewModel>()
 
   register(model: AnyViewModel) {
     this.componentMap.set(model.component, model);
 
-    if (model instanceof BlockViewModel) {
-      model.calculateLayout()
-    } else if (model instanceof RootViewModel) {
+    if (model instanceof RootViewModel) {
       this.root = model;
     }
   }

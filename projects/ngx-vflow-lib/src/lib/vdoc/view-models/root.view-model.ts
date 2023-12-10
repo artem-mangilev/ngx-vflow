@@ -7,4 +7,8 @@ export class RootViewModel extends AnyViewModel {
   ) {
     super()
   }
+
+  public calculateLayout(): void {
+    this.children.forEach(c => c.calculateLayout())
+  }
 }
