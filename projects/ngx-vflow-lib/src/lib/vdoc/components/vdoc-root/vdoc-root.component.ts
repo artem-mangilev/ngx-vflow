@@ -1,7 +1,8 @@
-import { AfterContentInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, forwardRef, inject } from '@angular/core';
+import { AfterContentInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, HostBinding, Input, OnInit, forwardRef, inject } from '@angular/core';
 import { VDocTreeBuilderService } from '../../services/vdoc-tree-builder.service';
 import { VDocViewComponent } from '../vdoc-view/vdoc-view.component';
 import { RootViewModel } from '../../view-models/root.view-model';
+import { RootStyleSheet } from '../../interfaces/stylesheet.interface';
 
 @Component({
   selector: '[vdoc-root]',
@@ -14,12 +15,27 @@ import { RootViewModel } from '../../view-models/root.view-model';
   ]
 })
 export class VDocRootComponent implements OnInit, AfterContentInit {
+  @Input()
+  public styleSheet!: RootStyleSheet
+
+  @HostBinding('attr.width')
+  protected get hostWidth() {
+    return this.model.width
+  }
+
+  @HostBinding('attr.height')
+  protected get hostHeight() {
+    return this.model.height
+  }
+
   private treeManager: VDocTreeBuilderService = inject(VDocTreeBuilderService)
   private cdr: ChangeDetectorRef = inject(ChangeDetectorRef)
 
+  private model!: RootViewModel
+
   ngOnInit(): void {
-    const model = new RootViewModel(this)
-    this.treeManager.register(model)
+    this.model = new RootViewModel(this, this.styleSheet)
+    this.treeManager.register(this.model)
   }
 
   ngAfterContentInit(): void {

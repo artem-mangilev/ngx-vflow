@@ -35,9 +35,10 @@ export class BlockViewModel extends AnyViewModel {
     }
   }
 
+  /**
+   * Set height for view
+   */
   private setHeight() {
-    if (!this.parent) return
-
     if (this.styleSheet.height) {
       // if styles has height, use it
 

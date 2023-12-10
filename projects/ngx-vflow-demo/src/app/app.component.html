@@ -1,7 +1,7 @@
 <h1>SVG</h1>
 
 <svg width="200" height="150">
-  <g vdoc-root>
+  <svg vdoc-root [styleSheet]="styles.root">
     <svg vdoc-block [styleSheet]="styles.container">
       <svg vdoc-block [styleSheet]="styles.innerContainer">
       </svg>
@@ -10,13 +10,13 @@
       <svg vdoc-block [styleSheet]="styles.innerContainer"></svg>
       <svg vdoc-block [styleSheet]="styles.innerContainer"></svg>
     </svg>
-  </g>
+  </svg>
 </svg>
 
 <h1>HTML</h1>
 
 <div class="container">
-  <div class="inner-container"><span>Test test test test</span></div>
+  <!-- <div class="inner-container"><span>Test test test test</span></div> -->
   <div class="inner-container"></div>
 </div>
 <div class="container">
