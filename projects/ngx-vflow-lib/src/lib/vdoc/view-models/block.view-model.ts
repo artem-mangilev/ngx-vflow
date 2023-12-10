@@ -3,18 +3,16 @@ import { BlockStyleSheet } from "../interfaces/stylesheet.interface";
 import { AnyViewModel } from "./any.view-model";
 
 export class BlockViewModel extends AnyViewModel {
-  public width = 0;
-  public height = 0;
-  public x = 0;
-  public y = 0;
+  public width = 0
+  public height = 0
+  public x = 0
+  public y = 0
 
   constructor(
     public readonly component: VDocBlockComponent,
     public readonly styleSheet: BlockStyleSheet
   ) {
     super();
-
-    this.width = this.styleSheet.width;
   }
 
   calculateLayout() {
@@ -23,9 +21,15 @@ export class BlockViewModel extends AnyViewModel {
 
     this.setPosition()
     this.setHeight()
+
+    this.setWidth()
+    // we need to set child's width by parent
+    // because parent's width which is use by child must be computed first (call before this comment)
+    this.children.filter(isBlock).forEach(b => b.setWidth())
   }
 
   private setPosition() {
+    // TODO maybe override parent in this class, because block always have parent
     if (!this.parent) return
 
     const prevSibling = this.parent.children[this.parent.children.indexOf(this) - 1]
@@ -58,4 +62,19 @@ export class BlockViewModel extends AnyViewModel {
       this.height = height
     }
   }
+
+  /**
+   * Set width for view
+   */
+  protected setWidth() {
+    if (this.styleSheet.width) {
+      this.width = this.styleSheet.width
+    } else {
+      this.width = this.parent?.width ?? 0
+    }
+  }
+}
+
+export function isBlock(model: AnyViewModel): model is BlockViewModel {
+  return model instanceof BlockViewModel
 }

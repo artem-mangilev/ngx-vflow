@@ -9,7 +9,7 @@ export interface RootStyleSheet extends
 
 export interface BlockStyleSheet extends
   StyleSheet,
-  WithWidth,
+  Partial<WithWidth>,
   Partial<WithHeight> {
   marginBottom: number
   backgroundColor: string

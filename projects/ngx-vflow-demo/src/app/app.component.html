@@ -1,15 +1,13 @@
 <h1>SVG</h1>
 
-<svg width="200" height="150">
-  <svg vdoc-root [styleSheet]="styles.root">
-    <svg vdoc-block [styleSheet]="styles.container">
-      <svg vdoc-block [styleSheet]="styles.innerContainer">
-      </svg>
+<svg vdoc-root [styleSheet]="styles.root">
+  <svg vdoc-block [styleSheet]="styles.container">
+    <svg vdoc-block [styleSheet]="styles.innerContainer">
     </svg>
-    <svg vdoc-block [styleSheet]="styles.container">
-      <svg vdoc-block [styleSheet]="styles.innerContainer"></svg>
-      <svg vdoc-block [styleSheet]="styles.innerContainer"></svg>
-    </svg>
+  </svg>
+  <svg vdoc-block [styleSheet]="styles.container">
+    <svg vdoc-block [styleSheet]="styles.innerContainer"></svg>
+    <svg vdoc-block [styleSheet]="styles.innerContainer"></svg>
   </svg>
 </svg>
 

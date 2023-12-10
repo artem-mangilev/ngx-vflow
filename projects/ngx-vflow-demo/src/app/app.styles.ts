@@ -6,8 +6,6 @@ export const styles = {
   } satisfies RootStyleSheet,
 
   container: {
-    width: 200,
-    height: 50,
     borderRadius: 5,
     backgroundColor: '#f2f2f2',
     marginBottom: 10
