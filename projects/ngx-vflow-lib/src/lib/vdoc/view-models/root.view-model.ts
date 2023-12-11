@@ -41,6 +41,7 @@ export class RootViewModel extends AnyViewModel {
         if (c instanceof BlockViewModel) {
           height += c.height
           height += c.styleSheet.marginBottom
+          height += c.styleSheet.marginTop
         }
       }
 

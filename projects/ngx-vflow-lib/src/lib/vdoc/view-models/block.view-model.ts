@@ -8,11 +8,15 @@ export class BlockViewModel extends AnyViewModel {
   public x = 0
   public y = 0
 
+  public readonly styleSheet: Required<BlockStyleSheet>;
+
   constructor(
     public readonly component: VDocBlockComponent,
-    public readonly styleSheet: BlockStyleSheet
+    styleSheet: BlockStyleSheet
   ) {
     super();
+
+    this.styleSheet = styleSheetWithDefaults(styleSheet)
   }
 
   calculateLayout() {
@@ -34,8 +38,11 @@ export class BlockViewModel extends AnyViewModel {
 
     const prevSibling = this.parent.children[this.parent.children.indexOf(this) - 1]
 
+    this.y += this.styleSheet.marginTop
+
+    // Current block rendered based on it's prev sibling
     if (prevSibling && prevSibling instanceof BlockViewModel) {
-      this.y = prevSibling.y + prevSibling.height + prevSibling.styleSheet.marginBottom
+      this.y += prevSibling.y + prevSibling.height + prevSibling.styleSheet.marginBottom
     }
   }
 
@@ -56,6 +63,7 @@ export class BlockViewModel extends AnyViewModel {
         if (c instanceof BlockViewModel) {
           height += c.height
           height += c.styleSheet.marginBottom
+          height += c.styleSheet.marginTop
         }
       }
 
@@ -70,6 +78,7 @@ export class BlockViewModel extends AnyViewModel {
     if (this.styleSheet.width) {
       this.width = this.styleSheet.width
     } else {
+      // TODO parent width will always be a number
       this.width = this.parent?.width ?? 0
     }
   }
@@ -77,4 +86,14 @@ export class BlockViewModel extends AnyViewModel {
 
 export function isBlock(model: AnyViewModel): model is BlockViewModel {
   return model instanceof BlockViewModel
+}
+
+function styleSheetWithDefaults(styles: BlockStyleSheet): Required<BlockStyleSheet> {
+  return {
+    width: styles.width ?? 0,
+    height: styles.height ?? 0,
+    marginBottom: styles.marginBottom ?? 0,
+    marginTop: styles.marginTop ?? 0,
+    ...styles
+  }
 }

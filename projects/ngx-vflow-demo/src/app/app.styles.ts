@@ -8,6 +8,7 @@ export const styles = {
   container: {
     borderRadius: 5,
     backgroundColor: '#f2f2f2',
+    marginTop: 5,
     marginBottom: 10
   } satisfies BlockStyleSheet,
 
@@ -16,6 +17,7 @@ export const styles = {
     height: 40,
     borderRadius: 5,
     backgroundColor: '#0000ff',
+    marginTop: 10,
     marginBottom: 10
   } satisfies BlockStyleSheet
 }
