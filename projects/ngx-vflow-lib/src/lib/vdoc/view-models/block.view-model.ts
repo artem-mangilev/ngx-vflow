@@ -39,11 +39,12 @@ export class BlockViewModel extends AnyViewModel {
     const prevSibling = this.parent.children[this.parent.children.indexOf(this) - 1]
 
     this.y += this.styleSheet.marginTop
-
     // Current block rendered based on it's prev sibling
     if (prevSibling && prevSibling instanceof BlockViewModel) {
       this.y += prevSibling.y + prevSibling.height + prevSibling.styleSheet.marginBottom
     }
+
+    this.x += this.styleSheet.marginLeft
   }
 
   /**
@@ -92,6 +93,7 @@ function styleSheetWithDefaults(styles: BlockStyleSheet): Required<BlockStyleShe
   return {
     width: styles.width ?? 0,
     height: styles.height ?? 0,
+    marginLeft: styles.marginLeft ?? 0,
     marginBottom: styles.marginBottom ?? 0,
     marginTop: styles.marginTop ?? 0,
     ...styles
