@@ -12,6 +12,7 @@ export interface BlockStyleSheet extends
   Partial<WithWidth>,
   Partial<WithHeight> {
   marginLeft?: number
+  marginRight?: number
   marginBottom?: number
   marginTop?: number
   backgroundColor: string

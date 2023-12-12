@@ -80,7 +80,9 @@ export class BlockViewModel extends AnyViewModel {
       this.width = this.styleSheet.width
     } else {
       // TODO parent width will always be a number
-      this.width = this.parent?.width ?? 0
+      const parentWidth = this.parent?.width ?? 0
+
+      this.width = parentWidth - this.styleSheet.marginLeft - this.styleSheet.marginRight
     }
   }
 }
@@ -94,6 +96,7 @@ function styleSheetWithDefaults(styles: BlockStyleSheet): Required<BlockStyleShe
     width: styles.width ?? 0,
     height: styles.height ?? 0,
     marginLeft: styles.marginLeft ?? 0,
+    marginRight: styles.marginRight ?? 0,
     marginBottom: styles.marginBottom ?? 0,
     marginTop: styles.marginTop ?? 0,
     ...styles

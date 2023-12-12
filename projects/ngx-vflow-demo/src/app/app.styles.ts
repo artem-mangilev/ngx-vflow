@@ -13,11 +13,11 @@ export const styles = {
   } satisfies BlockStyleSheet,
 
   innerContainer: {
-    width: 100,
     height: 40,
     borderRadius: 5,
     backgroundColor: '#0000ff',
     marginLeft: 5,
+    marginRight: 5,
     marginTop: 10,
     marginBottom: 10
   } satisfies BlockStyleSheet
