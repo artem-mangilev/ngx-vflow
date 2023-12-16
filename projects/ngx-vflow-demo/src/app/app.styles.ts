@@ -1,4 +1,4 @@
-import { BlockStyleSheet, RootStyleSheet } from "projects/ngx-vflow-lib/src/public-api";
+import { ContainerStyleSheet, RootStyleSheet } from "projects/ngx-vflow-lib/src/public-api";
 
 export const styles = {
   root: {
@@ -10,7 +10,7 @@ export const styles = {
     backgroundColor: '#f2f2f2',
     marginTop: 5,
     marginBottom: 10
-  } satisfies BlockStyleSheet,
+  } satisfies ContainerStyleSheet,
 
   innerContainer: {
     height: 40,
@@ -20,5 +20,11 @@ export const styles = {
     marginRight: 5,
     marginTop: 10,
     marginBottom: 10
-  } satisfies BlockStyleSheet
+  } satisfies ContainerStyleSheet,
+
+  deepestContainer: {
+    height: 20,
+    borderRadius: 5,
+    backgroundColor: '#00ff00',
+  } satisfies ContainerStyleSheet,
 }

@@ -1,23 +1,16 @@
 import { VDocBlockComponent } from "../components/vdoc-block/vdoc-block.component";
-import { BlockStyleSheet } from "../interfaces/stylesheet.interface";
+import { VDocViewComponent } from "../components/vdoc-view/vdoc-view.component";
+import { BlockStyleSheet, ContainerStyleSheet } from "../interfaces/stylesheet.interface";
 import { AnyViewModel } from "./any.view-model";
+import { HtmlViewModel } from "./html.view-model";
 
-export class BlockViewModel extends AnyViewModel {
+export abstract class BlockViewModel extends AnyViewModel {
   public width = 0
   public height = 0
   public x = 0
   public y = 0
 
-  public readonly styleSheet: Required<BlockStyleSheet>;
-
-  constructor(
-    public readonly component: VDocBlockComponent,
-    styleSheet: BlockStyleSheet
-  ) {
-    super();
-
-    this.styleSheet = styleSheetWithDefaults(styleSheet)
-  }
+  public abstract override styleSheet: Required<BlockStyleSheet>;
 
   calculateLayout() {
     // we need to know layout of children before we compute parent layout
@@ -25,14 +18,10 @@ export class BlockViewModel extends AnyViewModel {
 
     this.setPosition()
     this.setHeight()
-
     this.setWidth()
-    // we need to set child's width by parent
-    // because parent's width which is use by child must be computed first (call before this comment)
-    this.children.filter(isBlock).forEach(b => b.setWidth())
   }
 
-  private setPosition() {
+  protected setPosition() {
     // TODO maybe override parent in this class, because block always have parent
     if (!this.parent) return
 
@@ -50,7 +39,7 @@ export class BlockViewModel extends AnyViewModel {
   /**
    * Set height for view
    */
-  private setHeight() {
+  public setHeight() {
     if (this.styleSheet.height) {
       // if styles has height, use it
 
@@ -75,30 +64,51 @@ export class BlockViewModel extends AnyViewModel {
   /**
    * Set width for view
    */
-  protected setWidth() {
+  public setWidth() {
     if (this.styleSheet.width) {
       this.width = this.styleSheet.width
     } else {
-      // TODO parent width will always be a number
-      const parentWidth = this.parent?.width ?? 0
+      const chainFromRoot = flatToRoot(this)
 
-      this.width = parentWidth - this.styleSheet.marginLeft - this.styleSheet.marginRight
+      const [root] = chainFromRoot
+      let width = root.width;
+
+      chainFromRoot
+        .filter(isBlock)
+        .forEach(item => {
+          width = width - item.styleSheet.marginLeft - item.styleSheet.marginRight
+        })
+
+      this.width = width
     }
   }
 }
 
+/**
+ * Check if model is block (later block became abstract)
+ *
+ * @param model
+ * @returns
+ * @todo rename
+ */
 export function isBlock(model: AnyViewModel): model is BlockViewModel {
   return model instanceof BlockViewModel
 }
 
-function styleSheetWithDefaults(styles: BlockStyleSheet): Required<BlockStyleSheet> {
-  return {
-    width: styles.width ?? 0,
-    height: styles.height ?? 0,
-    marginLeft: styles.marginLeft ?? 0,
-    marginRight: styles.marginRight ?? 0,
-    marginBottom: styles.marginBottom ?? 0,
-    marginTop: styles.marginTop ?? 0,
-    ...styles
+/**
+ * Get array of path from root to startModel
+ *
+ * @param startModel model to start from
+ * @returns path array
+ */
+function flatToRoot(startModel: AnyViewModel): AnyViewModel[] {
+  const chain: AnyViewModel[] = []
+
+  let current: AnyViewModel | null = startModel
+  while (current) {
+    chain.push(current)
+    current = current.parent
   }
+
+  return chain.reverse();
 }

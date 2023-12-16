@@ -1,8 +1,9 @@
 import { ChangeDetectionStrategy, Component, ElementRef, HostBinding, Input, OnInit, Optional, SkipSelf, forwardRef, inject } from '@angular/core';
-import { BlockStyleSheet } from '../../interfaces/stylesheet.interface';
+import { ContainerStyleSheet } from '../../interfaces/stylesheet.interface';
 import { VDocTreeBuilderService } from '../../services/vdoc-tree-builder.service';
 import { BlockViewModel } from '../../view-models/block.view-model';
 import { VDocViewComponent } from '../vdoc-view/vdoc-view.component';
+import { ContainerViewModel } from '../../view-models/container.view-model';
 
 @Component({
   selector: 'svg[vdoc-block]',
@@ -21,7 +22,7 @@ import { VDocViewComponent } from '../vdoc-view/vdoc-view.component';
 })
 export class VDocBlockComponent implements OnInit {
   @Input()
-  public styleSheet!: BlockStyleSheet
+  public styleSheet!: ContainerStyleSheet
 
   @HostBinding('attr.width')
   protected get hostWidth() {
@@ -72,7 +73,7 @@ export class VDocBlockComponent implements OnInit {
   }
 
   createModel() {
-    const model = new BlockViewModel(this, this.styleSheet)
+    const model = new ContainerViewModel(this, this.styleSheet)
 
     // every vdoc-block must have parent (vdoc-root or other views)
     const parent = this.treeManager.getByComponent(this.parent)

@@ -1,23 +1,22 @@
-export interface StyleSheet {
+export interface StyleSheet { }
 
-}
+export interface BlockStyleSheet extends
+  StyleSheet,
+  Partial<WithWidth>,
+  Partial<WithHeight>,
+  Partial<WithMargin> { }
 
 export interface RootStyleSheet extends
   StyleSheet,
   WithWidth, // Root must have width
   Partial<WithHeight> { }
 
-export interface BlockStyleSheet extends
-  StyleSheet,
-  Partial<WithWidth>,
-  Partial<WithHeight> {
-  marginLeft?: number
-  marginRight?: number
-  marginBottom?: number
-  marginTop?: number
+export interface ContainerStyleSheet extends BlockStyleSheet {
   backgroundColor: string
   borderRadius: number
 }
+
+export interface HtmlStyleSheet extends BlockStyleSheet { }
 
 interface WithWidth {
   width: number
@@ -25,4 +24,11 @@ interface WithWidth {
 
 interface WithHeight {
   height: number
+}
+
+interface WithMargin {
+  marginLeft: number
+  marginRight: number
+  marginBottom: number
+  marginTop: number
 }
