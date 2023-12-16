@@ -3,6 +3,7 @@ import { VDocTreeBuilderService } from '../../services/vdoc-tree-builder.service
 import { VDocViewComponent } from '../vdoc-view/vdoc-view.component';
 import { RootViewModel } from '../../view-models/root.view-model';
 import { RootStyleSheet } from '../../interfaces/stylesheet.interface';
+import { AnyViewModel } from '../../view-models/any.view-model';
 
 @Component({
   selector: 'svg[vdoc-root]',
@@ -28,18 +29,25 @@ export class VDocRootComponent extends VDocViewComponent implements OnInit, Afte
     return this.model.height
   }
 
-  private treeManager: VDocTreeBuilderService = inject(VDocTreeBuilderService)
+  /**
+   * Root component doesn't have a parent
+   */
+  protected parent = null;
+
+  protected model!: RootViewModel
+
   private cdr: ChangeDetectorRef = inject(ChangeDetectorRef)
 
-  private model!: RootViewModel
-
   ngOnInit(): void {
-    this.model = new RootViewModel(this, this.styleSheet)
-    this.treeManager.register(this.model)
+    this.model = this.createModel()
   }
 
   ngAfterContentInit(): void {
     this.treeManager.root?.calculateLayout();
     this.cdr.markForCheck()
+  }
+
+  protected modelFactory(): RootViewModel {
+    return new RootViewModel(this, this.styleSheet);
   }
 }

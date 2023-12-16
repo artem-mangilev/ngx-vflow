@@ -3,6 +3,7 @@ import { VDocViewComponent } from '../vdoc-view/vdoc-view.component';
 import { HtmlStyleSheet } from '../../interfaces/stylesheet.interface';
 import { HtmlViewModel } from '../../view-models/html.view-model';
 import { VDocTreeBuilderService } from '../../services/vdoc-tree-builder.service';
+import { AnyViewModel } from '../../view-models/any.view-model';
 
 @Component({
   selector: 'foreignObject[vdoc-html]',
@@ -39,10 +40,9 @@ export class VDocHtmlComponent extends VDocViewComponent implements OnInit {
   protected model!: HtmlViewModel;
 
   private host: ElementRef<SVGForeignObjectElement> = inject(ElementRef)
-  private treeManager = inject(VDocTreeBuilderService)
 
   constructor(
-    @SkipSelf() @Optional() private parent: VDocViewComponent,
+    @SkipSelf() @Optional() protected parent: VDocViewComponent,
     private zone: NgZone
   ) {
     super()
@@ -61,16 +61,7 @@ export class VDocHtmlComponent extends VDocViewComponent implements OnInit {
     ro.observe(this.host.nativeElement.firstElementChild!)
   }
 
-  createModel() {
-    const model = new HtmlViewModel(this, this.styleSheet)
-
-    // every vdoc-block must have parent (vdoc-root or other views)
-    const parent = this.treeManager.getByComponent(this.parent)
-    model.parent = parent;
-    parent.children.push(model)
-
-    this.treeManager.register(model)
-
-    return model
+  protected modelFactory(): HtmlViewModel {
+    return new HtmlViewModel(this, this.styleSheet)
   }
 }

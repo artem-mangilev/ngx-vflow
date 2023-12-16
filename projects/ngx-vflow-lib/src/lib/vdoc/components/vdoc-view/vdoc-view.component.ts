@@ -1,4 +1,28 @@
-import { Directive } from "@angular/core";
+import { Directive, inject } from "@angular/core";
+import { AnyViewModel } from "../../view-models/any.view-model";
+import { VDocTreeBuilderService } from "../../services/vdoc-tree-builder.service";
 
 @Directive()
-export abstract class VDocViewComponent { }
+export abstract class VDocViewComponent {
+  protected abstract model: AnyViewModel
+
+  protected abstract parent: VDocViewComponent | null
+
+  protected abstract modelFactory(): AnyViewModel
+
+  protected treeManager: VDocTreeBuilderService = inject(VDocTreeBuilderService)
+
+  protected createModel<T extends AnyViewModel>(): T {
+    const model = this.modelFactory() as T
+
+    const parent = this.treeManager.getByComponent(this.parent!)
+    if (parent) {
+      model.parent = parent;
+      parent.children.push(model)
+    }
+
+    this.treeManager.register(model)
+
+    return model
+  }
+}

@@ -1,12 +1,12 @@
-import { VDocBlockComponent } from "../components/vdoc-block/vdoc-block.component";
+import { VDocViewComponent } from "../components/vdoc-view/vdoc-view.component";
 import { ContainerStyleSheet } from "../interfaces/stylesheet.interface";
-import { BlockViewModel, isBlock } from "./block.view-model";
+import { BlockViewModel } from "./block.view-model";
 
 export class ContainerViewModel extends BlockViewModel {
-  public readonly styleSheet: Required<ContainerStyleSheet>;
+  public styleSheet: Required<ContainerStyleSheet>;
 
   constructor(
-    public readonly component: VDocBlockComponent,
+    public component: VDocViewComponent,
     styleSheet: ContainerStyleSheet
   ) {
     super();

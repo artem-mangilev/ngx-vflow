@@ -4,6 +4,7 @@ import { VDocTreeBuilderService } from '../../services/vdoc-tree-builder.service
 import { BlockViewModel } from '../../view-models/block.view-model';
 import { VDocViewComponent } from '../vdoc-view/vdoc-view.component';
 import { ContainerViewModel } from '../../view-models/container.view-model';
+import { AnyViewModel } from '../../view-models/any.view-model';
 
 @Component({
   selector: 'svg[vdoc-block]',
@@ -58,9 +59,7 @@ export class VDocBlockComponent extends VDocViewComponent implements OnInit {
 
   protected model!: BlockViewModel
 
-  private treeManager: VDocTreeBuilderService = inject(VDocTreeBuilderService)
-
-  constructor(@SkipSelf() @Optional() private parent: VDocViewComponent) {
+  constructor(@SkipSelf() @Optional() protected parent: VDocViewComponent) {
     super()
 
     if (!this.parent) {
@@ -75,16 +74,7 @@ export class VDocBlockComponent extends VDocViewComponent implements OnInit {
     this.radiusX = this.styleSheet.borderRadius
   }
 
-  createModel() {
-    const model = new ContainerViewModel(this, this.styleSheet)
-
-    // every vdoc-block must have parent (vdoc-root or other views)
-    const parent = this.treeManager.getByComponent(this.parent)
-    model.parent = parent;
-    parent.children.push(model)
-
-    this.treeManager.register(model)
-
-    return model
+  protected modelFactory(): ContainerViewModel {
+    return new ContainerViewModel(this, this.styleSheet)
   }
 }
