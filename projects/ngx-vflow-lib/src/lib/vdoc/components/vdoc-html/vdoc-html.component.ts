@@ -1,14 +1,11 @@
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, HostBinding, Input, NO_ERRORS_SCHEMA, NgZone, OnInit, Optional, SkipSelf, forwardRef, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, HostBinding, Input, NgZone, OnInit, Optional, SkipSelf, forwardRef, inject } from '@angular/core';
 import { VDocViewComponent } from '../vdoc-view/vdoc-view.component';
 import { HtmlStyleSheet } from '../../interfaces/stylesheet.interface';
 import { HtmlViewModel } from '../../view-models/html.view-model';
-import { VDocTreeBuilderService } from '../../services/vdoc-tree-builder.service';
-import { AnyViewModel } from '../../view-models/any.view-model';
 
 @Component({
   selector: 'foreignObject[vdoc-html]',
   template: `<ng-content></ng-content>`,
-  styleUrls: ['./vdoc-html.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [{ provide: VDocViewComponent, useExisting: forwardRef(() => VDocHtmlComponent) }],
 })

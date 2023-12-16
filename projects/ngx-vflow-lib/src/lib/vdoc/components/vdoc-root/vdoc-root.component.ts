@@ -3,12 +3,10 @@ import { VDocTreeBuilderService } from '../../services/vdoc-tree-builder.service
 import { VDocViewComponent } from '../vdoc-view/vdoc-view.component';
 import { RootViewModel } from '../../view-models/root.view-model';
 import { RootStyleSheet } from '../../interfaces/stylesheet.interface';
-import { AnyViewModel } from '../../view-models/any.view-model';
 
 @Component({
   selector: 'svg[vdoc-root]',
   template: `<ng-content></ng-content>`,
-  styleUrls: ['./vdoc-root.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
     { provide: VDocViewComponent, useExisting: forwardRef(() => VDocRootComponent) },

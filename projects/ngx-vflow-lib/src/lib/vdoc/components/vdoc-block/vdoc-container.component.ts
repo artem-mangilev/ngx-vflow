@@ -1,13 +1,11 @@
 import { ChangeDetectionStrategy, Component, ElementRef, HostBinding, Input, OnInit, Optional, SkipSelf, forwardRef, inject } from '@angular/core';
 import { ContainerStyleSheet } from '../../interfaces/stylesheet.interface';
-import { VDocTreeBuilderService } from '../../services/vdoc-tree-builder.service';
 import { BlockViewModel } from '../../view-models/block.view-model';
 import { VDocViewComponent } from '../vdoc-view/vdoc-view.component';
 import { ContainerViewModel } from '../../view-models/container.view-model';
-import { AnyViewModel } from '../../view-models/any.view-model';
 
 @Component({
-  selector: 'svg[vdoc-block]',
+  selector: 'svg[vdoc-container]',
   template: `
     <svg:rect
         *ngLet="model.viewUpdate$ | async"
@@ -18,11 +16,10 @@ import { AnyViewModel } from '../../view-models/any.view-model';
     ></svg:rect>
     <ng-content></ng-content>
   `,
-  styleUrls: ['./vdoc-block.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [{ provide: VDocViewComponent, useExisting: forwardRef(() => VDocBlockComponent) }]
+  providers: [{ provide: VDocViewComponent, useExisting: forwardRef(() => VDocContainerComponent) }]
 })
-export class VDocBlockComponent extends VDocViewComponent implements OnInit {
+export class VDocContainerComponent extends VDocViewComponent implements OnInit {
   @Input()
   public styleSheet!: ContainerStyleSheet
 

@@ -1,16 +1,16 @@
 <h1>SVG</h1>
 
 <svg:svg vdoc-root [styleSheet]="styles.root">
-  <svg:svg vdoc-block [styleSheet]="styles.container">
-    <svg:svg vdoc-block [styleSheet]="styles.htmlContainer">
+  <svg:svg vdoc-container [styleSheet]="styles.container">
+    <svg:svg vdoc-container [styleSheet]="styles.htmlContainer">
       <svg:foreignObject vdoc-html>
         <div>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Voluptatum officia magni veritatis quod reiciendis, beatae voluptas debitis. Eveniet amet deleniti dolorum sed voluptates accusamus sint dicta possimus autem repellat? Quae.</div>
       </svg:foreignObject>
     </svg:svg>
   </svg:svg>
-  <svg:svg vdoc-block [styleSheet]="styles.container">
-    <svg:svg vdoc-block [styleSheet]="styles.emptyContainer"></svg:svg>
-    <svg:svg vdoc-block [styleSheet]="styles.emptyContainer"></svg:svg>
+  <svg:svg vdoc-container [styleSheet]="styles.container">
+    <svg:svg vdoc-container [styleSheet]="styles.emptyContainer"></svg:svg>
+    <svg:svg vdoc-container [styleSheet]="styles.emptyContainer"></svg:svg>
   </svg:svg>
 </svg:svg>
 
