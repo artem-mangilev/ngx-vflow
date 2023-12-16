@@ -9,10 +9,11 @@ import { ContainerViewModel } from '../../view-models/container.view-model';
   selector: 'svg[vdoc-block]',
   template: `
     <svg:rect
-      [attr.width]="width"
-      [attr.height]="height"
-      [attr.rx]="radiusX"
-      [attr.fill]="fillColor"
+        *ngLet="model.viewUpdate$ | async"
+        [attr.width]="width"
+        [attr.height]="height"
+        [attr.rx]="radiusX"
+        [attr.fill]="fillColor"
     ></svg:rect>
     <ng-content></ng-content>
   `,
@@ -20,7 +21,7 @@ import { ContainerViewModel } from '../../view-models/container.view-model';
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [{ provide: VDocViewComponent, useExisting: forwardRef(() => VDocBlockComponent) }]
 })
-export class VDocBlockComponent implements OnInit {
+export class VDocBlockComponent extends VDocViewComponent implements OnInit {
   @Input()
   public styleSheet!: ContainerStyleSheet
 
@@ -60,6 +61,8 @@ export class VDocBlockComponent implements OnInit {
   private treeManager: VDocTreeBuilderService = inject(VDocTreeBuilderService)
 
   constructor(@SkipSelf() @Optional() private parent: VDocViewComponent) {
+    super()
+
     if (!this.parent) {
       throw new Error(`vdoc-block must not be used outside of vdoc-root`);
     }

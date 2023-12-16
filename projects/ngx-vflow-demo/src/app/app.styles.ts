@@ -13,18 +13,12 @@ export const styles = {
   } satisfies ContainerStyleSheet,
 
   innerContainer: {
-    height: 40,
+    // height: 40,
     borderRadius: 5,
     backgroundColor: '#0000ff',
     marginLeft: 5,
     marginRight: 5,
     marginTop: 10,
     marginBottom: 10
-  } satisfies ContainerStyleSheet,
-
-  deepestContainer: {
-    height: 20,
-    borderRadius: 5,
-    backgroundColor: '#00ff00',
   } satisfies ContainerStyleSheet,
 }

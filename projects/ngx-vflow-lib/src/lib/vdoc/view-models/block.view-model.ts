@@ -1,8 +1,5 @@
-import { VDocBlockComponent } from "../components/vdoc-block/vdoc-block.component";
-import { VDocViewComponent } from "../components/vdoc-view/vdoc-view.component";
 import { BlockStyleSheet, ContainerStyleSheet } from "../interfaces/stylesheet.interface";
 import { AnyViewModel } from "./any.view-model";
-import { HtmlViewModel } from "./html.view-model";
 
 export abstract class BlockViewModel extends AnyViewModel {
   public width = 0
@@ -16,30 +13,43 @@ export abstract class BlockViewModel extends AnyViewModel {
     // we need to know layout of children before we compute parent layout
     this.children.forEach(c => c.calculateLayout())
 
-    this.setPosition()
-    this.setHeight()
-    this.setWidth()
+    this.calculatePosition()
+    this.calculateHeight()
+    this.calculateWidth()
+
+    this.updateView()
   }
 
-  protected setPosition() {
+  public setHeight(height: number) {
+    // TODO prob bad idea to mutate styleSheet instance
+    this.styleSheet.height = height;
+  }
+
+  protected calculatePosition() {
     // TODO maybe override parent in this class, because block always have parent
     if (!this.parent) return
 
     const prevSibling = this.parent.children[this.parent.children.indexOf(this) - 1]
 
-    this.y += this.styleSheet.marginTop
+    let x = 0
+    let y = 0
+
+    y += this.styleSheet.marginTop
     // Current block rendered based on it's prev sibling
     if (prevSibling && prevSibling instanceof BlockViewModel) {
-      this.y += prevSibling.y + prevSibling.height + prevSibling.styleSheet.marginBottom
+      y += prevSibling.y + prevSibling.height + prevSibling.styleSheet.marginBottom
     }
 
-    this.x += this.styleSheet.marginLeft
+    x += this.styleSheet.marginLeft
+
+    this.x = x
+    this.y = y
   }
 
   /**
    * Set height for view
    */
-  public setHeight() {
+  protected calculateHeight() {
     if (this.styleSheet.height) {
       // if styles has height, use it
 
@@ -64,7 +74,7 @@ export abstract class BlockViewModel extends AnyViewModel {
   /**
    * Set width for view
    */
-  public setWidth() {
+  protected calculateWidth() {
     if (this.styleSheet.width) {
       this.width = this.styleSheet.width
     } else {

@@ -14,7 +14,7 @@ import { RootStyleSheet } from '../../interfaces/stylesheet.interface';
     VDocTreeBuilderService
   ]
 })
-export class VDocRootComponent implements OnInit, AfterContentInit {
+export class VDocRootComponent extends VDocViewComponent implements OnInit, AfterContentInit {
   @Input()
   public styleSheet!: RootStyleSheet
 

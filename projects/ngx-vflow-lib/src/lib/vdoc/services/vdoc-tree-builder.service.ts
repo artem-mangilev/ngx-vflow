@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { BlockViewModel } from '../view-models/block.view-model';
 import { VDocViewComponent } from '../components/vdoc-view/vdoc-view.component';
 import { AnyViewModel } from '../view-models/any.view-model';
 import { RootViewModel } from '../view-models/root.view-model';
@@ -21,5 +20,12 @@ export class VDocTreeBuilderService {
 
   getByComponent(component: VDocViewComponent): AnyViewModel {
     return this.componentMap.get(component)!;
+  }
+
+  /**
+   * Recalculate layout starting from root
+   */
+  calculateLayout() {
+    this.root?.calculateLayout();
   }
 }

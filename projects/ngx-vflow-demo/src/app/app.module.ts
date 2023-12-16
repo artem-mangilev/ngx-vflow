@@ -15,6 +15,6 @@ import { VDocModule } from '../../../ngx-vflow-lib/src/public-api';
     VDocModule
   ],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
 export class AppModule { }
