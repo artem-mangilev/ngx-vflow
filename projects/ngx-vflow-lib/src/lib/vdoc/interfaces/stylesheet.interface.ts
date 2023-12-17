@@ -18,6 +18,8 @@ export interface ContainerStyleSheet extends BlockStyleSheet {
 
 export interface HtmlStyleSheet extends BlockStyleSheet { }
 
+export interface ImageStyleSheet extends BlockStyleSheet { }
+
 interface WithWidth {
   width: number
 }

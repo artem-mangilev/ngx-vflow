@@ -1,4 +1,4 @@
-import { ContainerStyleSheet, RootStyleSheet } from "projects/ngx-vflow-lib/src/public-api";
+import { ContainerStyleSheet, ImageStyleSheet, RootStyleSheet } from "projects/ngx-vflow-lib/src/public-api";
 
 export const styles = {
   root: {
@@ -12,7 +12,7 @@ export const styles = {
     marginBottom: 10
   } satisfies ContainerStyleSheet,
 
-  htmlContainer: {
+  resizableContainer: {
     // height: 40,
     borderRadius: 5,
     backgroundColor: '#0000ff',
@@ -31,4 +31,8 @@ export const styles = {
     marginTop: 10,
     marginBottom: 10
   } satisfies ContainerStyleSheet,
+
+  image: {
+    height: 40
+  } satisfies ImageStyleSheet
 }
