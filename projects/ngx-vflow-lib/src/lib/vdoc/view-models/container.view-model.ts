@@ -23,6 +23,9 @@ function styleSheetWithDefaults(styles: ContainerStyleSheet): Required<Container
     marginRight: styles.marginRight ?? 0,
     marginBottom: styles.marginBottom ?? 0,
     marginTop: styles.marginTop ?? 0,
+    borderColor: styles.borderColor ?? '',
+    borderWidth: styles.borderWidth ?? 0,
+    borderRadius: styles.borderRadius ?? 0,
     ...styles
   }
 }

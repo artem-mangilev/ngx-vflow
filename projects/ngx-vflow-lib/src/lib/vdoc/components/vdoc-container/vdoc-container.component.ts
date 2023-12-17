@@ -13,6 +13,8 @@ import { ContainerViewModel } from '../../view-models/container.view-model';
         [attr.height]="model.height"
         [attr.rx]="styleSheet.borderRadius"
         [attr.fill]="styleSheet.backgroundColor"
+        [attr.stroke]="styleSheet.borderColor"
+        [attr.stroke-width]="styleSheet.borderWidth"
     ></svg:rect>
     <ng-content></ng-content>
   `,
@@ -43,7 +45,7 @@ export class VDocContainerComponent extends VDocViewComponent implements OnInit 
     return this.model.y
   }
 
-  protected model!: BlockViewModel
+  protected model!: ContainerViewModel
 
   constructor(@SkipSelf() @Optional() protected parent: VDocViewComponent) {
     super()

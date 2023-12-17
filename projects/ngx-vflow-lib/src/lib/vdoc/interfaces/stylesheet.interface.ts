@@ -13,7 +13,9 @@ export interface RootStyleSheet extends
 
 export interface ContainerStyleSheet extends BlockStyleSheet {
   backgroundColor: string
-  borderRadius: number
+  borderColor?: string
+  borderRadius?: number
+  borderWidth?: number
 }
 
 export interface HtmlStyleSheet extends BlockStyleSheet { }
