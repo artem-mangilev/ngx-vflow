@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, ElementRef, HostBinding, Input, NgZone, OnInit, Optional, SkipSelf, forwardRef, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, HostBinding, Input, NgZone, OnDestroy, OnInit, Optional, SkipSelf, forwardRef, inject } from '@angular/core';
 import { VDocViewComponent } from '../vdoc-view/vdoc-view.component';
 import { HtmlStyleSheet } from '../../interfaces/stylesheet.interface';
 import { HtmlViewModel } from '../../view-models/html.view-model';
@@ -9,7 +9,7 @@ import { HtmlViewModel } from '../../view-models/html.view-model';
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [{ provide: VDocViewComponent, useExisting: forwardRef(() => VDocHtmlComponent) }],
 })
-export class VDocHtmlComponent extends VDocViewComponent implements OnInit {
+export class VDocHtmlComponent extends VDocViewComponent implements OnInit, OnDestroy {
   @Input()
   public styleSheet: HtmlStyleSheet = {}
 
@@ -33,10 +33,11 @@ export class VDocHtmlComponent extends VDocViewComponent implements OnInit {
     return this.model.y
   }
 
-
   protected model!: HtmlViewModel;
 
   private host: ElementRef<SVGForeignObjectElement> = inject(ElementRef)
+
+  private resizeObserver!: ResizeObserver;
 
   constructor(
     @SkipSelf() @Optional() protected parent: VDocViewComponent,
@@ -48,14 +49,20 @@ export class VDocHtmlComponent extends VDocViewComponent implements OnInit {
   ngOnInit(): void {
     this.model = this.createModel();
 
-    const ro = new ResizeObserver(([entry]) => {
+    this.resizeObserver = new ResizeObserver(([entry]) => {
       this.zone.run(() => {
         this.model.setHeight(entry.contentRect.height);
+
+        // TODO see how to avoid recalculation whole layout
         this.treeManager.calculateLayout();
       })
     })
 
-    ro.observe(this.host.nativeElement.firstElementChild!)
+    this.resizeObserver.observe(this.host.nativeElement.firstElementChild!)
+  }
+
+  ngOnDestroy(): void {
+    this.resizeObserver.disconnect()
   }
 
   protected modelFactory(): HtmlViewModel {

@@ -9,10 +9,10 @@ import { ContainerViewModel } from '../../view-models/container.view-model';
   template: `
     <svg:rect
         *ngLet="model.viewUpdate$ | async"
-        [attr.width]="width"
-        [attr.height]="height"
-        [attr.rx]="radiusX"
-        [attr.fill]="fillColor"
+        [attr.width]="model.width"
+        [attr.height]="model.height"
+        [attr.rx]="styleSheet.borderRadius"
+        [attr.fill]="styleSheet.backgroundColor"
     ></svg:rect>
     <ng-content></ng-content>
   `,
@@ -43,17 +43,6 @@ export class VDocContainerComponent extends VDocViewComponent implements OnInit 
     return this.model.y
   }
 
-  protected get width() {
-    return this.model.width
-  }
-
-  protected get height() {
-    return this.model.height
-  }
-
-  protected radiusX = 0
-  protected fillColor = ''
-
   protected model!: BlockViewModel
 
   constructor(@SkipSelf() @Optional() protected parent: VDocViewComponent) {
@@ -66,9 +55,6 @@ export class VDocContainerComponent extends VDocViewComponent implements OnInit 
 
   ngOnInit(): void {
     this.model = this.createModel();
-
-    this.fillColor = this.styleSheet.backgroundColor
-    this.radiusX = this.styleSheet.borderRadius
   }
 
   protected modelFactory(): ContainerViewModel {
