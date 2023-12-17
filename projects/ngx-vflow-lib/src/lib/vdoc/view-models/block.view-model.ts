@@ -108,15 +108,15 @@ export function isBlock(model: AnyViewModel): model is BlockViewModel {
 }
 
 /**
- * Get array of path from root to startModel
+ * Get array of nodes from root to targetModel
  *
- * @param startModel model to start from
- * @returns path array
+ * @param targetModel model to trace to
+ * @returns nodes array
  */
-function flatToRoot(startModel: AnyViewModel): AnyViewModel[] {
+function traceFromRoot(targetModel: AnyViewModel): AnyViewModel[] {
   const chain: AnyViewModel[] = []
 
-  let current: AnyViewModel | null = startModel
+  let current: AnyViewModel | null = targetModel
   while (current) {
     chain.push(current)
     current = current.parent
@@ -132,8 +132,9 @@ function flatToRoot(startModel: AnyViewModel): AnyViewModel[] {
  * @returns
  */
 function getModelWidth(model: AnyViewModel) {
-  const chainFromRoot = flatToRoot(model)
+  const chainFromRoot = traceFromRoot(model)
 
+  // TODO move this logic inside loop
   const [root] = chainFromRoot
   let width = root.width;
 
