@@ -13,9 +13,9 @@ export abstract class BlockViewModel extends AnyViewModel {
     // we need to know layout of children before we compute parent layout
     this.children.forEach(c => c.calculateLayout())
 
-    this.calculatePosition()
     this.calculateHeight()
     this.calculateWidth()
+    this.calculatePosition()
 
     this.updateView()
   }
@@ -29,18 +29,35 @@ export abstract class BlockViewModel extends AnyViewModel {
     // TODO maybe override parent in this class, because block always have parent
     if (!this.parent) return
 
-    const prevSibling = this.parent.children[this.parent.children.indexOf(this) - 1]
-
-    let x = 0
+    // Compute y
     let y = 0
-
     y += this.styleSheet.marginTop
     // Current block rendered based on it's prev sibling
+    const prevSibling = this.parent.children[this.parent.children.indexOf(this) - 1]
     if (prevSibling && prevSibling instanceof BlockViewModel) {
       y += prevSibling.y + prevSibling.height + prevSibling.styleSheet.marginBottom
     }
 
-    x += this.styleSheet.marginLeft
+    // Compute x
+    let x = 0
+    if (
+      // Both horizontal margins are auto
+      this.styleSheet.marginLeft === 'auto' &&
+      this.styleSheet.marginRight === 'auto'
+    ) {
+      const parentWidth = getModelWidth(this.parent!)
+
+      x = (parentWidth / 2) - (this.width / 2)
+    } else if (
+      // Both horizontal margins are absolute values
+      typeof this.styleSheet.marginLeft === 'number' &&
+      typeof this.styleSheet.marginRight === 'number'
+    ) {
+      x += this.styleSheet.marginLeft
+    } else {
+      // TODO unhandled
+      x = 0
+    }
 
     this.x = x
     this.y = y
@@ -75,22 +92,7 @@ export abstract class BlockViewModel extends AnyViewModel {
    * Set width for view
    */
   protected calculateWidth() {
-    if (this.styleSheet.width) {
-      this.width = this.styleSheet.width
-    } else {
-      const chainFromRoot = flatToRoot(this)
-
-      const [root] = chainFromRoot
-      let width = root.width;
-
-      chainFromRoot
-        .filter(isBlock)
-        .forEach(item => {
-          width = width - item.styleSheet.marginLeft - item.styleSheet.marginRight
-        })
-
-      this.width = width
-    }
+    this.width = getModelWidth(this)
   }
 }
 
@@ -121,6 +123,39 @@ function flatToRoot(startModel: AnyViewModel): AnyViewModel[] {
   }
 
   return chain.reverse();
+}
+
+/**
+ * Compute width for model based on its ancestors
+ *
+ * @param model
+ * @returns
+ */
+function getModelWidth(model: AnyViewModel) {
+  const chainFromRoot = flatToRoot(model)
+
+  const [root] = chainFromRoot
+  let width = root.width;
+
+  chainFromRoot
+    .filter(isBlock)
+    .forEach(item => {
+      // we know width either from styles
+      if (item.styleSheet.width) {
+        width = item.styleSheet.width
+      } else {
+        // or if styles has no width, we compute it from margins
+        if (typeof item.styleSheet.marginLeft === 'number') {
+          width -= item.styleSheet.marginLeft
+        }
+
+        if (typeof item.styleSheet.marginRight === 'number') {
+          width -= item.styleSheet.marginRight
+        }
+      }
+    })
+
+  return width
 }
 
 export function styleSheetWithDefaults(styles: BlockStyleSheet): Required<BlockStyleSheet> {

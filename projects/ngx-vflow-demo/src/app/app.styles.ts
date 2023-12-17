@@ -13,7 +13,23 @@ export const styles = {
   } satisfies ContainerStyleSheet,
 
   resizableContainer: {
-    // height: 40,
+    width: 80,
+    borderRadius: 5,
+    backgroundColor: '#0000ff',
+    marginLeft: 10,
+    // marginRight: 'auto',
+    marginTop: 10,
+    marginBottom: 10
+  } satisfies ContainerStyleSheet,
+
+  image: {
+    width: 40,
+    height: 40,
+    marginLeft: 'auto',
+    marginRight: 'auto'
+  } satisfies ImageStyleSheet,
+
+  htmlContainer: {
     borderRadius: 5,
     backgroundColor: '#0000ff',
     marginLeft: 5,
@@ -31,8 +47,4 @@ export const styles = {
     marginTop: 10,
     marginBottom: 10
   } satisfies ContainerStyleSheet,
-
-  image: {
-    height: 40
-  } satisfies ImageStyleSheet
 }

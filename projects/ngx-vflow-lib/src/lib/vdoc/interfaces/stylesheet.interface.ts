@@ -29,8 +29,8 @@ interface WithHeight {
 }
 
 interface WithMargin {
-  marginLeft: number
-  marginRight: number
+  marginLeft: number | 'auto'
+  marginRight: number | 'auto'
   marginBottom: number
   marginTop: number
 }
