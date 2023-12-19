@@ -9,8 +9,10 @@ import { ContainerViewModel } from '../../view-models/container.view-model';
   template: `
     <svg:rect
         *ngLet="model.viewUpdate$ | async"
-        [attr.width]="model.width"
-        [attr.height]="model.height"
+        [attr.width]="model.contentWidth"
+        [attr.height]="model.contentHeight"
+        [attr.x]="model.contentX"
+        [attr.y]="model.contentY"
         [attr.rx]="styleSheet.borderRadius"
         [attr.fill]="styleSheet.backgroundColor"
         [attr.stroke]="styleSheet.borderColor"
