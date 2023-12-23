@@ -44,12 +44,6 @@ export class VDocImageComponent extends VDocViewComponent implements OnInit {
 
   protected model!: ImageViewModel;
 
-  constructor(
-    @SkipSelf() @Optional() protected parent: VDocViewComponent,
-  ) {
-    super()
-  }
-
   ngOnInit(): void {
     this.model = this.createModel()
   }

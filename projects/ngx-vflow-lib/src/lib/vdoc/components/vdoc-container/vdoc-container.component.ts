@@ -49,7 +49,7 @@ export class VDocContainerComponent extends VDocViewComponent implements OnInit 
 
   protected model!: ContainerViewModel
 
-  constructor(@SkipSelf() @Optional() protected parent: VDocViewComponent) {
+  constructor() {
     super()
 
     if (!this.parent) {

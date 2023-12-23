@@ -6,11 +6,14 @@ import { VDocTreeBuilderService } from "../../services/vdoc-tree-builder.service
 export abstract class VDocViewComponent {
   protected abstract model: AnyViewModel
 
-  protected abstract parent: VDocViewComponent | null
-
   protected abstract modelFactory(): AnyViewModel
 
   protected treeManager: VDocTreeBuilderService = inject(VDocTreeBuilderService)
+
+  protected parent: VDocViewComponent | null = inject(VDocViewComponent, {
+    optional: true,
+    skipSelf: true
+  })
 
   protected createModel<T extends AnyViewModel>(): T {
     const model = this.modelFactory() as T

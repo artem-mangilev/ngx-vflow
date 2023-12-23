@@ -27,11 +27,6 @@ export class VDocRootComponent extends VDocViewComponent implements OnInit, Afte
     return this.model.height
   }
 
-  /**
-   * Root component doesn't have a parent
-   */
-  protected parent = null;
-
   protected model!: RootViewModel
 
   private cdr: ChangeDetectorRef = inject(ChangeDetectorRef)

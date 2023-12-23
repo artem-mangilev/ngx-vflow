@@ -39,10 +39,7 @@ export class VDocHtmlComponent extends VDocViewComponent implements OnInit, OnDe
 
   private resizeObserver!: ResizeObserver;
 
-  constructor(
-    @SkipSelf() @Optional() protected parent: VDocViewComponent,
-    private zone: NgZone
-  ) {
+  constructor(private zone: NgZone) {
     super()
   }
 

@@ -1,4 +1,4 @@
-import { Directive, HostBinding, Input, OnInit, Optional, SkipSelf, forwardRef } from "@angular/core";
+import { Directive, HostBinding, Input, OnInit, Optional, SkipSelf, forwardRef, inject } from "@angular/core";
 import { VDocViewComponent } from "../vdoc-view/vdoc-view.component";
 import { AnyViewModel } from "../../view-models/any.view-model";
 import { ComponentViewModel } from "../../view-models/component.view-model";
@@ -31,7 +31,7 @@ export class VDocComponent extends VDocViewComponent implements OnInit {
 
   protected model!: ComponentViewModel
 
-  constructor(@SkipSelf() @Optional() protected parent: VDocViewComponent) {
+  constructor() {
     super()
 
     if (!this.parent) {
