@@ -14,6 +14,7 @@ export class ContainerViewModel extends BlockViewModel {
   public contentX = 0
   public contentY = 0
   public borderColor = ''
+  public backgroundColor = ''
 
   public styleSheet: Required<ContainerStyleSheet>;
 
@@ -29,6 +30,7 @@ export class ContainerViewModel extends BlockViewModel {
     this.styleSheet = styleSheetWithDefaults(styleSheet)
 
     this.borderColor = this.styleSheet.borderColor
+    this.backgroundColor = this.styleSheet.backgroundColor
 
     this._subscription.add(
       this.registerPseudo().subscribe()
@@ -62,6 +64,7 @@ export class ContainerViewModel extends BlockViewModel {
   protected override calculatePosition(): void {
     super.calculatePosition()
 
+    // TODO explain this logic
     this.contentX = this.styleSheet.borderWidth / 2
     this.contentY = this.styleSheet.borderWidth / 2
   }
@@ -86,8 +89,13 @@ export class ContainerViewModel extends BlockViewModel {
       if (hoverStyles.borderColor) {
         this.borderColor = hoverStyles.borderColor
       }
+
+      if (hoverStyles.backgroundColor) {
+        this.backgroundColor = hoverStyles.backgroundColor
+      }
     } else {
       this.borderColor = this.styleSheet.borderColor
+      this.backgroundColor = this.styleSheet.backgroundColor
     }
   }
 }

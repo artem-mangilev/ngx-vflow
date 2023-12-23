@@ -15,7 +15,7 @@ import { provideComponent } from '../../utils/provide-component';
         [attr.x]="model.contentX"
         [attr.y]="model.contentY"
         [attr.rx]="styleSheet.borderRadius"
-        [attr.fill]="styleSheet.backgroundColor"
+        [attr.fill]="model.backgroundColor"
         [attr.stroke]="model.borderColor"
         [attr.stroke-width]="styleSheet.borderWidth"
     ></svg:rect>
