@@ -1,11 +1,10 @@
-import { Directive, HostBinding, Input, OnInit, Optional, SkipSelf, forwardRef, inject } from "@angular/core";
+import { Directive, HostBinding, Input, OnInit } from "@angular/core";
 import { VDocViewComponent } from "../vdoc-view/vdoc-view.component";
-import { AnyViewModel } from "../../view-models/any.view-model";
 import { ComponentViewModel } from "../../view-models/component.view-model";
 import { BlockStyleSheet } from "../../interfaces/stylesheet.interface";
 
 @Directive()
-export class VDocComponent extends VDocViewComponent implements OnInit {
+export class VDocComponent extends VDocViewComponent<ComponentViewModel> implements OnInit {
   @Input()
   public styleSheet: BlockStyleSheet = {}
 
@@ -29,8 +28,6 @@ export class VDocComponent extends VDocViewComponent implements OnInit {
     return this.model.y
   }
 
-  protected model!: ComponentViewModel
-
   constructor() {
     super()
 
@@ -39,11 +36,7 @@ export class VDocComponent extends VDocViewComponent implements OnInit {
     }
   }
 
-  ngOnInit(): void {
-    this.model = this.createModel();
-  }
-
-  protected modelFactory(): AnyViewModel {
+  protected modelFactory(): ComponentViewModel {
     return new ComponentViewModel(this, this.styleSheet)
   }
 }

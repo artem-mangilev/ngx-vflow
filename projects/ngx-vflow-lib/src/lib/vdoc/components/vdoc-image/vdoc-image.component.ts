@@ -15,7 +15,7 @@ import { ImageStyleSheet } from '../../interfaces/stylesheet.interface';
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [{ provide: VDocViewComponent, useExisting: forwardRef(() => VDocImageComponent) }],
 })
-export class VDocImageComponent extends VDocViewComponent implements OnInit {
+export class VDocImageComponent extends VDocViewComponent<ImageViewModel> implements OnInit {
   @Input()
   public styleSheet: ImageStyleSheet = {}
 
@@ -40,12 +40,6 @@ export class VDocImageComponent extends VDocViewComponent implements OnInit {
   @HostBinding('attr.y')
   protected get hostY() {
     return this.model.y
-  }
-
-  protected model!: ImageViewModel;
-
-  ngOnInit(): void {
-    this.model = this.createModel()
   }
 
   protected modelFactory(): ImageViewModel {

@@ -1,12 +1,10 @@
-import { Directive, inject } from "@angular/core";
+import { Directive, OnInit, inject } from "@angular/core";
 import { AnyViewModel } from "../../view-models/any.view-model";
 import { VDocTreeBuilderService } from "../../services/vdoc-tree-builder.service";
 
 @Directive()
-export abstract class VDocViewComponent {
-  protected abstract model: AnyViewModel
-
-  protected abstract modelFactory(): AnyViewModel
+export abstract class VDocViewComponent<T extends AnyViewModel = AnyViewModel> implements OnInit {
+  protected model!: T
 
   protected treeManager: VDocTreeBuilderService = inject(VDocTreeBuilderService)
 
@@ -15,8 +13,14 @@ export abstract class VDocViewComponent {
     skipSelf: true
   })
 
-  protected createModel<T extends AnyViewModel>(): T {
-    const model = this.modelFactory() as T
+  protected abstract modelFactory(): T
+
+  public ngOnInit(): void {
+    this.model = this.createModel();
+  }
+
+  protected createModel(): T {
+    const model = this.modelFactory()
 
     const parent = this.treeManager.getByComponent(this.parent!)
     if (parent) {

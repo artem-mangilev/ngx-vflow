@@ -23,7 +23,7 @@ import { ContainerViewModel } from '../../view-models/container.view-model';
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [{ provide: VDocViewComponent, useExisting: forwardRef(() => VDocContainerComponent) }]
 })
-export class VDocContainerComponent extends VDocViewComponent implements OnInit {
+export class VDocContainerComponent extends VDocViewComponent<ContainerViewModel> implements OnInit {
   @Input()
   public styleSheet!: ContainerStyleSheet
 
@@ -47,18 +47,12 @@ export class VDocContainerComponent extends VDocViewComponent implements OnInit 
     return this.model.y
   }
 
-  protected model!: ContainerViewModel
-
   constructor() {
     super()
 
     if (!this.parent) {
       throw new Error(`vdoc-block must not be used outside of vdoc-root`);
     }
-  }
-
-  ngOnInit(): void {
-    this.model = this.createModel();
   }
 
   protected modelFactory(): ContainerViewModel {

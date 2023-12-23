@@ -9,7 +9,7 @@ import { HtmlViewModel } from '../../view-models/html.view-model';
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [{ provide: VDocViewComponent, useExisting: forwardRef(() => VDocHtmlComponent) }],
 })
-export class VDocHtmlComponent extends VDocViewComponent implements OnInit, OnDestroy {
+export class VDocHtmlComponent extends VDocViewComponent<HtmlViewModel> implements OnInit, OnDestroy {
   @Input()
   public styleSheet: HtmlStyleSheet = {}
 
@@ -33,18 +33,13 @@ export class VDocHtmlComponent extends VDocViewComponent implements OnInit, OnDe
     return this.model.y
   }
 
-  protected model!: HtmlViewModel;
-
-  private host: ElementRef<SVGForeignObjectElement> = inject(ElementRef)
+  private host = inject<ElementRef<SVGForeignObjectElement>>(ElementRef)
+  private zone = inject(NgZone)
 
   private resizeObserver!: ResizeObserver;
 
-  constructor(private zone: NgZone) {
-    super()
-  }
-
-  ngOnInit(): void {
-    this.model = this.createModel();
+  public override ngOnInit(): void {
+    super.ngOnInit()
 
     this.resizeObserver = new ResizeObserver(([entry]) => {
       this.zone.run(() => {
@@ -58,7 +53,7 @@ export class VDocHtmlComponent extends VDocViewComponent implements OnInit, OnDe
     this.resizeObserver.observe(this.host.nativeElement.firstElementChild!)
   }
 
-  ngOnDestroy(): void {
+  public ngOnDestroy(): void {
     this.resizeObserver.disconnect()
   }
 

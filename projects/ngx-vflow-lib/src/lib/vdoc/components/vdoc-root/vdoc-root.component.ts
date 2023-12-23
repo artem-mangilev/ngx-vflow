@@ -13,7 +13,7 @@ import { RootStyleSheet } from '../../interfaces/stylesheet.interface';
     VDocTreeBuilderService
   ]
 })
-export class VDocRootComponent extends VDocViewComponent implements OnInit, AfterContentInit {
+export class VDocRootComponent extends VDocViewComponent<RootViewModel> implements OnInit, AfterContentInit {
   @Input()
   public styleSheet!: RootStyleSheet
 
@@ -27,13 +27,7 @@ export class VDocRootComponent extends VDocViewComponent implements OnInit, Afte
     return this.model.height
   }
 
-  protected model!: RootViewModel
-
   private cdr: ChangeDetectorRef = inject(ChangeDetectorRef)
-
-  ngOnInit(): void {
-    this.model = this.createModel()
-  }
 
   ngAfterContentInit(): void {
     this.treeManager.root?.calculateLayout();
