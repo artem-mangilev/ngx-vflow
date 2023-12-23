@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, ElementRef, HostBinding, HostListener, Input, OnInit, Optional, SkipSelf, forwardRef, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, HostBinding, HostListener, Input, OnDestroy, OnInit, Optional, SkipSelf, forwardRef, inject } from '@angular/core';
 import { ContainerStyleSheet } from '../../interfaces/stylesheet.interface';
 import { BlockViewModel } from '../../view-models/block.view-model';
 import { VDocViewComponent } from '../vdoc-view/vdoc-view.component';
@@ -24,7 +24,7 @@ import { provideComponent } from '../../utils/provide-component';
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [provideComponent(VDocContainerComponent)]
 })
-export class VDocContainerComponent extends VDocViewComponent<ContainerViewModel> implements OnInit {
+export class VDocContainerComponent extends VDocViewComponent<ContainerViewModel> implements OnInit, OnDestroy {
   @Input()
   public styleSheet!: ContainerStyleSheet
 
@@ -54,6 +54,10 @@ export class VDocContainerComponent extends VDocViewComponent<ContainerViewModel
     if (!this.parent) {
       throw new Error(`vdoc-block must not be used outside of vdoc-root`);
     }
+  }
+
+  public ngOnDestroy(): void {
+    this.model.destroy()
   }
 
   @HostListener('mouseover')

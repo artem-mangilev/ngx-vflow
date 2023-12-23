@@ -71,7 +71,7 @@ export class ContainerViewModel extends BlockViewModel {
       ? this._preudoEvent$
         .pipe(
           filter((event) => [PseudoEvent.hoverIn, PseudoEvent.hoverOut].includes(event)),
-          tap((event) => this.handleHover(event))
+          tap((event) => this.handleHover(event, this.styleSheet.onHover!))
         )
       : of(null)
 
@@ -81,18 +81,13 @@ export class ContainerViewModel extends BlockViewModel {
     )
   }
 
-  private handleHover(event: PseudoEvent) {
-    const hover = this.styleSheet.onHover
-
-    // TODO refactor nesting
-    if (hover) {
-      if (event === PseudoEvent.hoverIn) {
-        if (hover.borderColor) {
-          this.borderColor = hover.borderColor
-        }
-      } else {
-        this.borderColor = this.styleSheet.borderColor
+  private handleHover(event: PseudoEvent, hoverStyles: ContainerStyleSheet) {
+    if (event === PseudoEvent.hoverIn) {
+      if (hoverStyles.borderColor) {
+        this.borderColor = hoverStyles.borderColor
       }
+    } else {
+      this.borderColor = this.styleSheet.borderColor
     }
   }
 }
