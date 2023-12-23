@@ -12,10 +12,12 @@ export interface RootStyleSheet extends
   Partial<WithHeight> { }
 
 export interface ContainerStyleSheet extends BlockStyleSheet {
-  backgroundColor: string
+  backgroundColor?: string
   borderColor?: string
   borderRadius?: number
   borderWidth?: number
+
+  onHover?: ContainerStyleSheet | null
 }
 
 export interface HtmlStyleSheet extends BlockStyleSheet { }

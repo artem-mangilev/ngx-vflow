@@ -8,5 +8,9 @@ export const styles = {
     borderColor: '#000000',
     borderWidth: 2,
     backgroundColor: '#e74c3c',
+
+    onHover: {
+      borderColor: '#ff0000'
+    }
   } satisfies ContainerStyleSheet,
 }
