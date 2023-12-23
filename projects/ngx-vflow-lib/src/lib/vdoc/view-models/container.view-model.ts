@@ -5,8 +5,20 @@ import { BlockViewModel } from "./block.view-model";
 
 export enum PseudoEvent {
   hoverIn,
-  hoverOut
+  hoverOut,
+
+  focusIn,
+  focusOut,
 }
+
+// from lowest to highest
+enum PseudoStylePriority {
+  hover,
+  focus,
+  styleSheet,
+}
+
+type ElementStyleSheets = { [key in PseudoStylePriority]: ContainerStyleSheet | null }
 
 export class ContainerViewModel extends BlockViewModel {
   public contentHeight = 0
@@ -20,6 +32,22 @@ export class ContainerViewModel extends BlockViewModel {
 
   private _preudoEvent$ = new Subject<PseudoEvent>()
   private _subscription = new Subscription()
+
+  private _styleStateMachine = {
+    [PseudoStylePriority.focus]: {
+      fallbackStyle: PseudoStylePriority.styleSheet,
+      isSet: false
+    },
+    [PseudoStylePriority.hover]: {
+      fallbackStyle: PseudoStylePriority.focus,
+      isSet: false
+    },
+    [PseudoStylePriority.styleSheet]: {
+      fallbackStyle: PseudoStylePriority.styleSheet,
+      isSet: true
+    },
+
+  }
 
   constructor(
     public component: VDocViewComponent,
@@ -78,8 +106,15 @@ export class ContainerViewModel extends BlockViewModel {
         )
       : of(null)
 
+    const focusEvent$ = this.styleSheet.onFocus
+      ? this._preudoEvent$
+        .pipe(
+          filter((event) => [PseudoEvent.focusIn, PseudoEvent.focusOut].includes(event)),
+          tap((event) => this.handleFocus(event, this.styleSheet.onFocus!))
+        )
+      : of(null)
 
-    return merge(hoverEvent$).pipe(
+    return merge(hoverEvent$, focusEvent$).pipe(
       map(() => undefined)
     )
   }
@@ -93,10 +128,56 @@ export class ContainerViewModel extends BlockViewModel {
       if (hoverStyles.backgroundColor) {
         this.backgroundColor = hoverStyles.backgroundColor
       }
+
+      this._styleStateMachine[PseudoStylePriority.hover].isSet = true
     } else {
-      this.borderColor = this.styleSheet.borderColor
-      this.backgroundColor = this.styleSheet.backgroundColor
+      const fallbackStyles = this.getFallbackStyles(this.getElementStyles(), PseudoStylePriority.hover)
+
+      this.borderColor = fallbackStyles.borderColor!
+      this.backgroundColor = fallbackStyles.backgroundColor!
+
+      this._styleStateMachine[PseudoStylePriority.hover].isSet = true
     }
+  }
+
+  private handleFocus(event: PseudoEvent, focusStyles: ContainerStyleSheet) {
+    if (event === PseudoEvent.focusIn) {
+      if (focusStyles.borderColor) {
+        this.borderColor = focusStyles.borderColor
+      }
+
+      if (focusStyles.backgroundColor) {
+        this.backgroundColor = focusStyles.backgroundColor
+      }
+
+      this._styleStateMachine[PseudoStylePriority.focus].isSet = true
+    } else {
+      const fallbackStyles = this.getFallbackStyles(this.getElementStyles(), PseudoStylePriority.focus)
+
+      this.borderColor = fallbackStyles.borderColor!
+      this.backgroundColor = fallbackStyles.backgroundColor!
+
+      this._styleStateMachine[PseudoStylePriority.focus].isSet = false
+    }
+  }
+
+  private getElementStyles(): ElementStyleSheets {
+    return {
+      [PseudoStylePriority.styleSheet]: this.styleSheet,
+      [PseudoStylePriority.hover]: this.styleSheet.onHover,
+      [PseudoStylePriority.focus]: this.styleSheet.onFocus
+    }
+  }
+
+  private getFallbackStyles(elementStyles: ElementStyleSheets, currentStyles: PseudoStylePriority): ContainerStyleSheet {
+    const fallback = elementStyles[this._styleStateMachine[currentStyles].fallbackStyle]
+    const isSet = this._styleStateMachine[this._styleStateMachine[currentStyles].fallbackStyle].isSet
+
+    if (fallback && isSet) {
+      return fallback
+    }
+
+    return this.getFallbackStyles(elementStyles, this._styleStateMachine[currentStyles].fallbackStyle)
   }
 }
 
@@ -113,6 +194,7 @@ function styleSheetWithDefaults(styles: ContainerStyleSheet): Required<Container
     borderWidth: styles.borderWidth ?? 0,
     borderRadius: styles.borderRadius ?? 0,
     onHover: styles.onHover ?? null,
+    onFocus: styles.onFocus ?? null,
     ...styles
   }
 }

@@ -18,6 +18,7 @@ export interface ContainerStyleSheet extends BlockStyleSheet {
   borderWidth?: number
 
   onHover?: ContainerStyleSheet | null
+  onFocus?: ContainerStyleSheet | null
 }
 
 export interface HtmlStyleSheet extends BlockStyleSheet { }

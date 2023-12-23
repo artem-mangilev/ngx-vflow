@@ -9,6 +9,11 @@ export const styles = {
     borderWidth: 2,
     backgroundColor: '#e74c3c',
 
+    onFocus: {
+      borderColor: '#ff0000',
+      backgroundColor: '#ffff00'
+    },
+
     onHover: {
       borderColor: '#ff0000',
       backgroundColor: '#ffffff'

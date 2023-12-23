@@ -21,6 +21,11 @@ import { provideComponent } from '../../utils/provide-component';
     ></svg:rect>
     <ng-content></ng-content>
   `,
+  styles: [`
+    :host:focus {
+      outline: none
+    }
+  `],
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [provideComponent(VDocContainerComponent)]
 })
@@ -68,6 +73,16 @@ export class VDocContainerComponent extends VDocViewComponent<ContainerViewModel
   @HostListener('mouseout')
   protected onMouseOut() {
     this.model.triggerPseudoEvent(PseudoEvent.hoverOut)
+  }
+
+  @HostListener('focus')
+  protected onFocus() {
+    this.model.triggerPseudoEvent(PseudoEvent.focusIn)
+  }
+
+  @HostListener('blur')
+  protected onBlur() {
+    this.model.triggerPseudoEvent(PseudoEvent.focusOut)
   }
 
   protected modelFactory(): ContainerViewModel {
