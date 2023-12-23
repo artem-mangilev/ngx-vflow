@@ -1,49 +1,36 @@
 import { ContainerStyleSheet } from "../interfaces/stylesheet.interface";
 
 // from lowest to highest
-export enum PseudoStylePriority {
+export enum StylesPriority {
   hover,
   focus,
   styleSheet,
 }
 
-type ElementStyleSheets = { [key in PseudoStylePriority]: ContainerStyleSheet | null }
+type ElementStyleSheets = { [key in StylesPriority]: ContainerStyleSheet | null }
 
 export class StylePrioritizer {
-  private _styleStateMachine = {
-    [PseudoStylePriority.focus]: {
-      fallbackStyle: PseudoStylePriority.styleSheet,
-      isSet: false
-    },
-    [PseudoStylePriority.hover]: {
-      fallbackStyle: PseudoStylePriority.focus,
-      isSet: false
-    },
-    [PseudoStylePriority.styleSheet]: {
-      fallbackStyle: PseudoStylePriority.styleSheet,
-      isSet: true
-    }
-  }
+  private readonly _styleStateMachine = declareStyleStateMachine()
 
-  private _elementStyles: ElementStyleSheets
+  private readonly _elementStyles: ElementStyleSheets
 
   constructor(styleSheet: Required<ContainerStyleSheet>) {
     this._elementStyles = {
-      [PseudoStylePriority.styleSheet]: styleSheet,
-      [PseudoStylePriority.hover]: styleSheet.onHover,
-      [PseudoStylePriority.focus]: styleSheet.onFocus
+      [StylesPriority.styleSheet]: styleSheet,
+      [StylesPriority.hover]: styleSheet.onHover,
+      [StylesPriority.focus]: styleSheet.onFocus
     }
   }
 
-  public set(current: PseudoStylePriority) {
+  public set(current: StylesPriority) {
     this._styleStateMachine[current].isSet = true
   }
 
-  public unset(current: PseudoStylePriority) {
+  public unset(current: StylesPriority) {
     this._styleStateMachine[current].isSet = false
   }
 
-  public getFallback(current: PseudoStylePriority): ContainerStyleSheet {
+  public getFallback(current: StylesPriority): ContainerStyleSheet {
     const fallback = this._elementStyles[this._styleStateMachine[current].fallbackStyle]
     const isSet = this._styleStateMachine[this._styleStateMachine[current].fallbackStyle].isSet
 
@@ -52,5 +39,22 @@ export class StylePrioritizer {
     }
 
     return this.getFallback(this._styleStateMachine[current].fallbackStyle)
+  }
+}
+
+function declareStyleStateMachine() {
+  return {
+    [StylesPriority.focus]: {
+      fallbackStyle: StylesPriority.styleSheet,
+      isSet: false
+    },
+    [StylesPriority.hover]: {
+      fallbackStyle: StylesPriority.focus,
+      isSet: false
+    },
+    [StylesPriority.styleSheet]: {
+      fallbackStyle: StylesPriority.styleSheet,
+      isSet: true
+    }
   }
 }

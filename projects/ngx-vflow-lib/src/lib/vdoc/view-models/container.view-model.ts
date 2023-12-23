@@ -2,6 +2,7 @@ import { Observable, Subject, Subscriber, Subscription, filter, map, merge, of, 
 import { VDocViewComponent } from "../components/vdoc-view/vdoc-view.component";
 import { ContainerStyleSheet } from "../interfaces/stylesheet.interface";
 import { BlockViewModel } from "./block.view-model";
+import { StylePrioritizer, StylesPriority } from "../utils/style-prioritizer";
 
 export enum PseudoEvent {
   hoverIn,
@@ -10,15 +11,6 @@ export enum PseudoEvent {
   focusIn,
   focusOut,
 }
-
-// from lowest to highest
-enum PseudoStylePriority {
-  hover,
-  focus,
-  styleSheet,
-}
-
-type ElementStyleSheets = { [key in PseudoStylePriority]: ContainerStyleSheet | null }
 
 export class ContainerViewModel extends BlockViewModel {
   public contentHeight = 0
@@ -33,21 +25,7 @@ export class ContainerViewModel extends BlockViewModel {
   private _preudoEvent$ = new Subject<PseudoEvent>()
   private _subscription = new Subscription()
 
-  private _styleStateMachine = {
-    [PseudoStylePriority.focus]: {
-      fallbackStyle: PseudoStylePriority.styleSheet,
-      isSet: false
-    },
-    [PseudoStylePriority.hover]: {
-      fallbackStyle: PseudoStylePriority.focus,
-      isSet: false
-    },
-    [PseudoStylePriority.styleSheet]: {
-      fallbackStyle: PseudoStylePriority.styleSheet,
-      isSet: true
-    },
-
-  }
+  private _prioritizer: StylePrioritizer
 
   constructor(
     public component: VDocViewComponent,
@@ -56,6 +34,8 @@ export class ContainerViewModel extends BlockViewModel {
     super();
 
     this.styleSheet = styleSheetWithDefaults(styleSheet)
+
+    this._prioritizer = new StylePrioritizer(this.styleSheet)
 
     this.borderColor = this.styleSheet.borderColor
     this.backgroundColor = this.styleSheet.backgroundColor
@@ -129,14 +109,14 @@ export class ContainerViewModel extends BlockViewModel {
         this.backgroundColor = hoverStyles.backgroundColor
       }
 
-      this._styleStateMachine[PseudoStylePriority.hover].isSet = true
+      this._prioritizer.set(StylesPriority.hover)
     } else {
-      const fallbackStyles = this.getFallbackStyles(this.getElementStyles(), PseudoStylePriority.hover)
+      const fallbackStyles = this._prioritizer.getFallback(StylesPriority.hover)
 
       this.borderColor = fallbackStyles.borderColor!
       this.backgroundColor = fallbackStyles.backgroundColor!
 
-      this._styleStateMachine[PseudoStylePriority.hover].isSet = true
+      this._prioritizer.unset(StylesPriority.hover)
     }
   }
 
@@ -150,34 +130,15 @@ export class ContainerViewModel extends BlockViewModel {
         this.backgroundColor = focusStyles.backgroundColor
       }
 
-      this._styleStateMachine[PseudoStylePriority.focus].isSet = true
+      this._prioritizer.set(StylesPriority.focus)
     } else {
-      const fallbackStyles = this.getFallbackStyles(this.getElementStyles(), PseudoStylePriority.focus)
+      const fallbackStyles = this._prioritizer.getFallback(StylesPriority.focus)
 
       this.borderColor = fallbackStyles.borderColor!
       this.backgroundColor = fallbackStyles.backgroundColor!
 
-      this._styleStateMachine[PseudoStylePriority.focus].isSet = false
+      this._prioritizer.unset(StylesPriority.focus)
     }
-  }
-
-  private getElementStyles(): ElementStyleSheets {
-    return {
-      [PseudoStylePriority.styleSheet]: this.styleSheet,
-      [PseudoStylePriority.hover]: this.styleSheet.onHover,
-      [PseudoStylePriority.focus]: this.styleSheet.onFocus
-    }
-  }
-
-  private getFallbackStyles(elementStyles: ElementStyleSheets, currentStyles: PseudoStylePriority): ContainerStyleSheet {
-    const fallback = elementStyles[this._styleStateMachine[currentStyles].fallbackStyle]
-    const isSet = this._styleStateMachine[this._styleStateMachine[currentStyles].fallbackStyle].isSet
-
-    if (fallback && isSet) {
-      return fallback
-    }
-
-    return this.getFallbackStyles(elementStyles, this._styleStateMachine[currentStyles].fallbackStyle)
   }
 }
 
