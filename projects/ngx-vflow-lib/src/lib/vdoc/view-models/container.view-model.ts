@@ -2,7 +2,7 @@ import { Observable, Subject, Subscriber, Subscription, filter, map, merge, of, 
 import { VDocViewComponent } from "../components/vdoc-view/vdoc-view.component";
 import { ContainerStyleSheet } from "../interfaces/stylesheet.interface";
 import { BlockViewModel } from "./block.view-model";
-import { StylePrioritizer, StylesPriority } from "../utils/style-prioritizer";
+import { StylePrioritizer, StylesSource } from "../utils/style-prioritizer";
 
 export enum PseudoEvent {
   hoverIn,
@@ -109,14 +109,14 @@ export class ContainerViewModel extends BlockViewModel {
         this.backgroundColor = hoverStyles.backgroundColor
       }
 
-      this._prioritizer.set(StylesPriority.hover)
+      this._prioritizer.set(StylesSource.hover)
     } else {
-      const fallbackStyles = this._prioritizer.getFallback(StylesPriority.hover)
+      const fallbackStyles = this._prioritizer.getFallback(StylesSource.hover)
 
       this.borderColor = fallbackStyles.borderColor!
       this.backgroundColor = fallbackStyles.backgroundColor!
 
-      this._prioritizer.unset(StylesPriority.hover)
+      this._prioritizer.unset(StylesSource.hover)
     }
   }
 
@@ -130,14 +130,14 @@ export class ContainerViewModel extends BlockViewModel {
         this.backgroundColor = focusStyles.backgroundColor
       }
 
-      this._prioritizer.set(StylesPriority.focus)
+      this._prioritizer.set(StylesSource.focus)
     } else {
-      const fallbackStyles = this._prioritizer.getFallback(StylesPriority.focus)
+      const fallbackStyles = this._prioritizer.getFallback(StylesSource.focus)
 
       this.borderColor = fallbackStyles.borderColor!
       this.backgroundColor = fallbackStyles.backgroundColor!
 
-      this._prioritizer.unset(StylesPriority.focus)
+      this._prioritizer.unset(StylesSource.focus)
     }
   }
 }

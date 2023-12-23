@@ -1,13 +1,13 @@
 import { ContainerStyleSheet } from "../interfaces/stylesheet.interface";
 
 // from lowest to highest
-export enum StylesPriority {
+export enum StylesSource {
   hover,
   focus,
   styleSheet,
 }
 
-type ElementStyleSheets = { [key in StylesPriority]: ContainerStyleSheet | null }
+type ElementStyleSheets = { [key in StylesSource]: ContainerStyleSheet | null }
 
 export class StylePrioritizer {
   private readonly _styleStateMachine = declareStyleStateMachine()
@@ -16,21 +16,21 @@ export class StylePrioritizer {
 
   constructor(styleSheet: Required<ContainerStyleSheet>) {
     this._elementStyles = {
-      [StylesPriority.styleSheet]: styleSheet,
-      [StylesPriority.hover]: styleSheet.onHover,
-      [StylesPriority.focus]: styleSheet.onFocus
+      [StylesSource.styleSheet]: styleSheet,
+      [StylesSource.hover]: styleSheet.onHover,
+      [StylesSource.focus]: styleSheet.onFocus
     }
   }
 
-  public set(current: StylesPriority) {
+  public set(current: StylesSource) {
     this._styleStateMachine[current].isSet = true
   }
 
-  public unset(current: StylesPriority) {
+  public unset(current: StylesSource) {
     this._styleStateMachine[current].isSet = false
   }
 
-  public getFallback(current: StylesPriority): ContainerStyleSheet {
+  public getFallback(current: StylesSource): ContainerStyleSheet {
     const fallback = this._elementStyles[this._styleStateMachine[current].fallbackStyle]
     const isSet = this._styleStateMachine[this._styleStateMachine[current].fallbackStyle].isSet
 
@@ -44,16 +44,16 @@ export class StylePrioritizer {
 
 function declareStyleStateMachine() {
   return {
-    [StylesPriority.focus]: {
-      fallbackStyle: StylesPriority.styleSheet,
+    [StylesSource.focus]: {
+      fallbackStyle: StylesSource.styleSheet,
       isSet: false
     },
-    [StylesPriority.hover]: {
-      fallbackStyle: StylesPriority.focus,
+    [StylesSource.hover]: {
+      fallbackStyle: StylesSource.focus,
       isSet: false
     },
-    [StylesPriority.styleSheet]: {
-      fallbackStyle: StylesPriority.styleSheet,
+    [StylesSource.styleSheet]: {
+      fallbackStyle: StylesSource.styleSheet,
       isSet: true
     }
   }
