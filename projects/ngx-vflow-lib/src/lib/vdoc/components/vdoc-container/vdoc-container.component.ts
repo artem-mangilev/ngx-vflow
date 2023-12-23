@@ -3,6 +3,7 @@ import { ContainerStyleSheet } from '../../interfaces/stylesheet.interface';
 import { BlockViewModel } from '../../view-models/block.view-model';
 import { VDocViewComponent } from '../vdoc-view/vdoc-view.component';
 import { ContainerViewModel } from '../../view-models/container.view-model';
+import { provideComponent } from '../../utils/provide-component';
 
 @Component({
   selector: 'svg[vdoc-container]',
@@ -21,7 +22,7 @@ import { ContainerViewModel } from '../../view-models/container.view-model';
     <ng-content></ng-content>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [{ provide: VDocViewComponent, useExisting: forwardRef(() => VDocContainerComponent) }]
+  providers: [provideComponent(VDocContainerComponent)]
 })
 export class VDocContainerComponent extends VDocViewComponent<ContainerViewModel> implements OnInit {
   @Input()

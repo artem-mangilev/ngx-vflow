@@ -3,15 +3,13 @@ import { VDocTreeBuilderService } from '../../services/vdoc-tree-builder.service
 import { VDocViewComponent } from '../vdoc-view/vdoc-view.component';
 import { RootViewModel } from '../../view-models/root.view-model';
 import { RootStyleSheet } from '../../interfaces/stylesheet.interface';
+import { provideComponent } from '../../utils/provide-component';
 
 @Component({
   selector: 'svg[vdoc-root]',
   template: `<ng-content></ng-content>`,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [
-    { provide: VDocViewComponent, useExisting: forwardRef(() => VDocRootComponent) },
-    VDocTreeBuilderService
-  ]
+  providers: [provideComponent(VDocRootComponent), VDocTreeBuilderService]
 })
 export class VDocRootComponent extends VDocViewComponent<RootViewModel> implements OnInit, AfterContentInit {
   @Input()

@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, HostBinding, Input, OnInit, Optiona
 import { VDocViewComponent } from '../vdoc-view/vdoc-view.component';
 import { ImageViewModel } from '../../view-models/image.view-model';
 import { ImageStyleSheet } from '../../interfaces/stylesheet.interface';
+import { provideComponent } from '../../utils/provide-component';
 
 @Component({
   selector: 'svg[vdoc-image]',
@@ -13,7 +14,7 @@ import { ImageStyleSheet } from '../../interfaces/stylesheet.interface';
     ></svg:image>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [{ provide: VDocViewComponent, useExisting: forwardRef(() => VDocImageComponent) }],
+  providers: [provideComponent(VDocImageComponent)],
 })
 export class VDocImageComponent extends VDocViewComponent<ImageViewModel> implements OnInit {
   @Input()

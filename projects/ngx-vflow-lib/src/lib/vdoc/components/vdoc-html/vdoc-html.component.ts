@@ -2,12 +2,13 @@ import { ChangeDetectionStrategy, Component, ElementRef, HostBinding, Input, NgZ
 import { VDocViewComponent } from '../vdoc-view/vdoc-view.component';
 import { HtmlStyleSheet } from '../../interfaces/stylesheet.interface';
 import { HtmlViewModel } from '../../view-models/html.view-model';
+import { provideComponent } from '../../utils/provide-component';
 
 @Component({
   selector: 'foreignObject[vdoc-html]',
   template: `<ng-content></ng-content>`,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [{ provide: VDocViewComponent, useExisting: forwardRef(() => VDocHtmlComponent) }],
+  providers: [provideComponent(VDocHtmlComponent)],
 })
 export class VDocHtmlComponent extends VDocViewComponent<HtmlViewModel> implements OnInit, OnDestroy {
   @Input()
