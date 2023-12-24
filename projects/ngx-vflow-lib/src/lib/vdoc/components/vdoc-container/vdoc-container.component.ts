@@ -1,8 +1,8 @@
-import { ChangeDetectionStrategy, Component, ElementRef, HostBinding, Input, OnInit, Optional, SkipSelf, forwardRef, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, HostBinding, HostListener, Input, OnDestroy, OnInit, Optional, SkipSelf, forwardRef, inject } from '@angular/core';
 import { ContainerStyleSheet } from '../../interfaces/stylesheet.interface';
 import { BlockViewModel } from '../../view-models/block.view-model';
 import { VDocViewComponent } from '../vdoc-view/vdoc-view.component';
-import { ContainerViewModel } from '../../view-models/container.view-model';
+import { ContainerViewModel, PseudoEvent } from '../../view-models/container.view-model';
 import { provideComponent } from '../../utils/provide-component';
 
 @Component({
@@ -15,16 +15,21 @@ import { provideComponent } from '../../utils/provide-component';
         [attr.x]="model.contentX"
         [attr.y]="model.contentY"
         [attr.rx]="styleSheet.borderRadius"
-        [attr.fill]="styleSheet.backgroundColor"
-        [attr.stroke]="styleSheet.borderColor"
+        [attr.fill]="model.backgroundColor"
+        [attr.stroke]="model.borderColor"
         [attr.stroke-width]="styleSheet.borderWidth"
     ></svg:rect>
     <ng-content></ng-content>
   `,
+  styles: [`
+    :host:focus {
+      outline: none
+    }
+  `],
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [provideComponent(VDocContainerComponent)]
 })
-export class VDocContainerComponent extends VDocViewComponent<ContainerViewModel> implements OnInit {
+export class VDocContainerComponent extends VDocViewComponent<ContainerViewModel> implements OnInit, OnDestroy {
   @Input()
   public styleSheet!: ContainerStyleSheet
 
@@ -54,6 +59,30 @@ export class VDocContainerComponent extends VDocViewComponent<ContainerViewModel
     if (!this.parent) {
       throw new Error(`vdoc-block must not be used outside of vdoc-root`);
     }
+  }
+
+  public ngOnDestroy(): void {
+    this.model.destroy()
+  }
+
+  @HostListener('mouseover')
+  protected onMouseOver() {
+    this.model.triggerPseudoEvent(PseudoEvent.hoverIn)
+  }
+
+  @HostListener('mouseout')
+  protected onMouseOut() {
+    this.model.triggerPseudoEvent(PseudoEvent.hoverOut)
+  }
+
+  @HostListener('focus')
+  protected onFocus() {
+    this.model.triggerPseudoEvent(PseudoEvent.focusIn)
+  }
+
+  @HostListener('blur')
+  protected onBlur() {
+    this.model.triggerPseudoEvent(PseudoEvent.focusOut)
   }
 
   protected modelFactory(): ContainerViewModel {
