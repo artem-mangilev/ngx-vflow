@@ -4,7 +4,8 @@ export interface BlockStyleSheet extends
   StyleSheet,
   Partial<WithWidth>,
   Partial<WithHeight>,
-  Partial<WithMargin> { }
+  Partial<WithMargin>,
+  Partial<WithShadow> { }
 
 export interface RootStyleSheet extends
   StyleSheet,
@@ -38,4 +39,15 @@ interface WithMargin {
   marginRight: number | 'auto'
   marginBottom: number
   marginTop: number
+}
+
+interface WithShadow {
+  boxShadow?: Shadow | null
+}
+
+interface Shadow {
+  hOffset: number
+  vOffset: number
+  blur: number,
+  color: string
 }

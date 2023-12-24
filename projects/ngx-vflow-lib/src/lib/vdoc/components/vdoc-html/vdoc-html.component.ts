@@ -34,6 +34,11 @@ export class VDocHtmlComponent extends VDocViewComponent<HtmlViewModel> implemen
     return this.model.y
   }
 
+  @HostBinding('style.filter')
+  protected get filterStyle() {
+    return this.model.filter
+  }
+
   private host = inject<ElementRef<SVGForeignObjectElement>>(ElementRef)
   private zone = inject(NgZone)
 

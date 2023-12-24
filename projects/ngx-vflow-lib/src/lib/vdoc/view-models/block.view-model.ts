@@ -1,3 +1,4 @@
+import { VDocViewComponent } from "../components/vdoc-view/vdoc-view.component";
 import { BlockStyleSheet, ContainerStyleSheet } from "../interfaces/stylesheet.interface";
 import { AnyViewModel } from "./any.view-model";
 
@@ -6,6 +7,7 @@ export abstract class BlockViewModel extends AnyViewModel {
   public height = 0
   public x = 0
   public y = 0
+  public filter = ''
 
   public abstract override styleSheet: Required<BlockStyleSheet>;
 
@@ -16,6 +18,8 @@ export abstract class BlockViewModel extends AnyViewModel {
     this.calculateHeight()
     this.calculateWidth()
     this.calculatePosition()
+
+    this.calculateFilter()
 
     this.updateView()
   }
@@ -94,6 +98,14 @@ export abstract class BlockViewModel extends AnyViewModel {
   protected calculateWidth() {
     this.width = getModelWidth(this)
   }
+
+  protected calculateFilter() {
+    const shadow = this.styleSheet.boxShadow
+    if (shadow) {
+      const { hOffset, vOffset, blur, color } = shadow
+      this.filter = `drop-shadow(${hOffset}px ${vOffset}px ${blur}px ${color})`
+    }
+  }
 }
 
 /**
@@ -167,5 +179,6 @@ export function styleSheetWithDefaults(styles: BlockStyleSheet): Required<BlockS
     marginRight: styles.marginRight ?? 0,
     marginBottom: styles.marginBottom ?? 0,
     marginTop: styles.marginTop ?? 0,
+    boxShadow: styles.boxShadow ?? null,
   }
 }

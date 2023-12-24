@@ -53,6 +53,11 @@ export class VDocContainerComponent extends VDocViewComponent<ContainerViewModel
     return this.model.y
   }
 
+  @HostBinding('style.filter')
+  protected get filterStyle() {
+    return this.model.filter
+  }
+
   constructor() {
     super()
 

@@ -43,6 +43,11 @@ export class VDocImageComponent extends VDocViewComponent<ImageViewModel> implem
     return this.model.y
   }
 
+  @HostBinding('style.filter')
+  protected get filterStyle() {
+    return this.model.filter
+  }
+
   protected modelFactory(): ImageViewModel {
     return new ImageViewModel(this, this.styleSheet);
   }

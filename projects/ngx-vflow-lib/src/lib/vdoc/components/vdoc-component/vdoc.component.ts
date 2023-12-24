@@ -28,6 +28,11 @@ export class VDocComponent extends VDocViewComponent<ComponentViewModel> impleme
     return this.model.y
   }
 
+  @HostBinding('style.filter')
+  protected get filterStyle() {
+    return this.model.filter
+  }
+
   constructor() {
     super()
 
