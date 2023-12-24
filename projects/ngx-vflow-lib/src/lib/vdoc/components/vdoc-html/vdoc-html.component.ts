@@ -37,17 +37,18 @@ export class VDocHtmlComponent extends VDocViewComponent<HtmlViewModel> implemen
   private host = inject<ElementRef<SVGForeignObjectElement>>(ElementRef)
   private zone = inject(NgZone)
 
-  private resizeObserver!: ResizeObserver;
+  private resizeObserver!: ResizeObserver
 
   public override ngOnInit(): void {
     super.ngOnInit()
 
     this.resizeObserver = new ResizeObserver(([entry]) => {
       this.zone.run(() => {
-        this.model.setHeight(entry.contentRect.height);
+        const [box] = entry.borderBoxSize
+        this.model.setHeight(box.blockSize)
 
         // TODO see how to avoid recalculation whole layout
-        this.treeManager.calculateLayout();
+        this.treeManager.calculateLayout()
       })
     })
 

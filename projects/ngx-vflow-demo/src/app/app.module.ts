@@ -5,11 +5,13 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { VDocModule } from '../../../ngx-vflow-lib/src/public-api';
 import { ButtonComponent } from './components/button/button.component';
+import { FormComponent } from './components/form/form.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    ButtonComponent
+    ButtonComponent,
+    FormComponent
   ],
   imports: [
     BrowserModule,
