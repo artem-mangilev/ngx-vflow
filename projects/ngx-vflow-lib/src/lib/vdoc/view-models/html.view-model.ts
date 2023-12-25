@@ -1,5 +1,5 @@
 import { VDocViewComponent } from "../components/vdoc-view/vdoc-view.component";
-import { HtmlStyleSheet } from "../interfaces/stylesheet.interface";
+import { BlockStyleSheet, HtmlStyleSheet } from "../interfaces/stylesheet.interface";
 import { BlockViewModel } from "./block.view-model";
 import { styleSheetWithDefaults as blockStyleSheetWithDefaults } from "./block.view-model";
 
@@ -13,6 +13,10 @@ export class HtmlViewModel extends BlockViewModel {
     super()
 
     this.styleSheet = styleSheetWithDefaults(styleSheet);
+  }
+
+  protected applyStyles(styles: BlockStyleSheet): void {
+
   }
 }
 

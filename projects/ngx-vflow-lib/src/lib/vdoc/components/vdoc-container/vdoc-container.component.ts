@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, ElementRef, HostBinding, HostListener, Input, OnDestroy, OnInit, Optional, SkipSelf, forwardRef, inject } from '@angular/core';
 import { ContainerStyleSheet } from '../../interfaces/stylesheet.interface';
-import { BlockViewModel } from '../../view-models/block.view-model';
+import { BlockViewModel, BlockEvent } from '../../view-models/block.view-model';
 import { VDocViewComponent } from '../vdoc-view/vdoc-view.component';
-import { ContainerViewModel, PseudoEvent } from '../../view-models/container.view-model';
+import { ContainerViewModel } from '../../view-models/container.view-model';
 import { provideComponent } from '../../utils/provide-component';
 
 @Component({
@@ -72,22 +72,22 @@ export class VDocContainerComponent extends VDocViewComponent<ContainerViewModel
 
   @HostListener('mouseover')
   protected onMouseOver() {
-    this.model.triggerPseudoEvent(PseudoEvent.hoverIn)
+    this.model.triggerBlockEvent(BlockEvent.hoverIn)
   }
 
   @HostListener('mouseout')
   protected onMouseOut() {
-    this.model.triggerPseudoEvent(PseudoEvent.hoverOut)
+    this.model.triggerBlockEvent(BlockEvent.hoverOut)
   }
 
   @HostListener('focus')
   protected onFocus() {
-    this.model.triggerPseudoEvent(PseudoEvent.focusIn)
+    this.model.triggerBlockEvent(BlockEvent.focusIn)
   }
 
   @HostListener('blur')
   protected onBlur() {
-    this.model.triggerPseudoEvent(PseudoEvent.focusOut)
+    this.model.triggerBlockEvent(BlockEvent.focusOut)
   }
 
   protected modelFactory(): ContainerViewModel {

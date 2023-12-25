@@ -1,6 +1,15 @@
-import { VDocViewComponent } from "../components/vdoc-view/vdoc-view.component";
+import { Observable, Subject, filter, map, merge, of, tap } from "rxjs";
 import { BlockStyleSheet, ContainerStyleSheet } from "../interfaces/stylesheet.interface";
+import { StylePrioritizer, StylesSource } from "../utils/style-prioritizer";
 import { AnyViewModel } from "./any.view-model";
+
+export enum BlockEvent {
+  hoverIn,
+  hoverOut,
+
+  focusIn,
+  focusOut,
+}
 
 export abstract class BlockViewModel extends AnyViewModel {
   public width = 0
@@ -9,7 +18,24 @@ export abstract class BlockViewModel extends AnyViewModel {
   public y = 0
   public filter = ''
 
-  public abstract override styleSheet: Required<BlockStyleSheet>;
+  public abstract override styleSheet: Required<BlockStyleSheet>
+
+  private _blockEvent$ = new Subject<BlockEvent>()
+  private _prioritizer!: StylePrioritizer
+
+  protected init() {
+    this._prioritizer = new StylePrioritizer(this.styleSheet)
+
+    this._subscription.add(
+      this.registerEvents().subscribe()
+    )
+  }
+
+  protected abstract applyStyles(styles: BlockStyleSheet): void
+
+  public triggerBlockEvent(event: BlockEvent) {
+    this._blockEvent$.next(event)
+  }
 
   calculateLayout() {
     // we need to know layout of children before we compute parent layout
@@ -106,6 +132,42 @@ export abstract class BlockViewModel extends AnyViewModel {
       this.filter = `drop-shadow(${hOffset}px ${vOffset}px ${blur}px ${color})`
     }
   }
+
+  private registerEvents(): Observable<void> {
+    const hoverEvent$ = this.styleSheet.onHover
+      ? this._blockEvent$
+        .pipe(
+          filter((event) => [BlockEvent.hoverIn, BlockEvent.hoverOut].includes(event)),
+          tap((event) =>
+            this.toggleStyleSheet(StylesSource.hover, event === BlockEvent.hoverIn, this.styleSheet.onHover!)
+          )
+        )
+      : of(null)
+
+    const focusEvent$ = this.styleSheet.onFocus
+      ? this._blockEvent$
+        .pipe(
+          filter((event) => [BlockEvent.focusIn, BlockEvent.focusOut].includes(event)),
+          tap((event) =>
+            this.toggleStyleSheet(StylesSource.focus, event === BlockEvent.focusIn, this.styleSheet.onFocus!)
+          )
+        )
+      : of(null)
+
+    return merge(hoverEvent$, focusEvent$).pipe(
+      map(() => undefined)
+    )
+  }
+
+  private toggleStyleSheet(source: StylesSource, enable: boolean, styles: ContainerStyleSheet) {
+    if (enable) {
+      this.applyStyles(styles)
+      this._prioritizer.set(source)
+    } else {
+      this.applyStyles(this._prioritizer.getFallback(source))
+      this._prioritizer.unset(source)
+    }
+  }
 }
 
 /**
@@ -180,5 +242,7 @@ export function styleSheetWithDefaults(styles: BlockStyleSheet): Required<BlockS
     marginBottom: styles.marginBottom ?? 0,
     marginTop: styles.marginTop ?? 0,
     boxShadow: styles.boxShadow ?? null,
+    onHover: styles.onHover ?? null,
+    onFocus: styles.onFocus ?? null,
   }
 }

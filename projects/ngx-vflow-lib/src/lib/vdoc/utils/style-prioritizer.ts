@@ -1,4 +1,4 @@
-import { ContainerStyleSheet } from "../interfaces/stylesheet.interface";
+import { BlockStyleSheet } from "../interfaces/stylesheet.interface";
 
 export enum StylesSource {
   hover,
@@ -9,9 +9,9 @@ export enum StylesSource {
 export class StylePrioritizer {
   private readonly _styleStateMachine = declareStyleStateMachine()
 
-  private readonly _elementStyles: { [key in StylesSource]: ContainerStyleSheet | null }
+  private readonly _elementStyles: { [key in StylesSource]: BlockStyleSheet | null }
 
-  constructor(styleSheet: Required<ContainerStyleSheet>) {
+  constructor(styleSheet: Required<BlockStyleSheet>) {
     // Extract sub-stylesheets from main stylesheet
     this._elementStyles = {
       [StylesSource.styleSheet]: styleSheet,
@@ -44,7 +44,7 @@ export class StylePrioritizer {
    * @param current source of styles
    * @returns fallback stylesheet
    */
-  public getFallback(current: StylesSource): ContainerStyleSheet {
+  public getFallback(current: StylesSource): BlockStyleSheet {
     const fallbackSource = this._styleStateMachine[current].fallbackStyle
 
     const fallbackStyles = this._elementStyles[fallbackSource]

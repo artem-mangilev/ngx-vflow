@@ -5,7 +5,10 @@ export interface BlockStyleSheet extends
   Partial<WithWidth>,
   Partial<WithHeight>,
   Partial<WithMargin>,
-  Partial<WithShadow> { }
+  Partial<WithShadow> {
+  onHover?: this | null
+  onFocus?: this | null
+}
 
 export interface RootStyleSheet extends
   StyleSheet,
@@ -17,9 +20,6 @@ export interface ContainerStyleSheet extends BlockStyleSheet {
   borderColor?: string
   borderRadius?: number
   borderWidth?: number
-
-  onHover?: ContainerStyleSheet | null
-  onFocus?: ContainerStyleSheet | null
 }
 
 export interface HtmlStyleSheet extends BlockStyleSheet { }

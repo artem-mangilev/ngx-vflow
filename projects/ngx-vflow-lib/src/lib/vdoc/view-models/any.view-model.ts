@@ -1,9 +1,10 @@
-import { Subject } from "rxjs";
+import { Subject, Subscription } from "rxjs";
 import { VDocViewComponent } from "../components/vdoc-view/vdoc-view.component";
 import { StyleSheet } from '../interfaces/stylesheet.interface';
 
 export abstract class AnyViewModel {
-  private _viewUpdate$ = new Subject<void>();
+  protected _subscription = new Subscription()
+  private _viewUpdate$ = new Subject<void>()
 
   public parent: AnyViewModel | null = null
   public children: AnyViewModel[] = []
@@ -20,5 +21,9 @@ export abstract class AnyViewModel {
 
   public updateView(): void {
     this._viewUpdate$.next();
+  }
+
+  public destroy() {
+    this._subscription.unsubscribe()
   }
 }
