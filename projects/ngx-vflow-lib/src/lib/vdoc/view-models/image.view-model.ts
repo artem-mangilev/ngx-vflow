@@ -4,7 +4,7 @@ import { BlockViewModel } from "./block.view-model";
 import { styleSheetWithDefaults as blockStyleSheetWithDefaults } from "./block.view-model";
 
 export class ImageViewModel extends BlockViewModel {
-  public styleSheet: Required<ImageStyleSheet>;
+  public styleSheet: Required<ImageStyleSheet>
 
   constructor(
     public component: VDocViewComponent,
@@ -13,6 +13,10 @@ export class ImageViewModel extends BlockViewModel {
     super()
 
     this.styleSheet = styleSheetWithDefaults(styleSheet)
+  }
+
+  protected applyStyles(styles: BlockStyleSheet): void {
+
   }
 }
 
