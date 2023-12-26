@@ -17,7 +17,7 @@ import { provideComponent } from '../../utils/provide-component';
         [attr.rx]="model.borderRadius"
         [attr.fill]="model.backgroundColor"
         [attr.stroke]="model.borderColor"
-        [attr.stroke-width]="styleSheet.borderWidth"
+        [attr.stroke-width]="model.borderWidth"
     ></svg:rect>
     <ng-content></ng-content>
   `,

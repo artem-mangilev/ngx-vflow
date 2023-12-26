@@ -3,6 +3,8 @@ import { ContainerStyleSheet } from '../../../../../ngx-vflow-lib/src/public-api
 export const styles = {
   button: {
     borderRadius: 3,
+    borderWidth: 1,
+    borderColor: '#000000',
     backgroundColor: '#FF0073',
 
     boxShadow: {
@@ -13,8 +15,7 @@ export const styles = {
     },
 
     onHover: {
-      backgroundColor: '#FFFFFF',
-      borderRadius: 10,
+      borderWidth: 3,
     },
 
     onFocus: {

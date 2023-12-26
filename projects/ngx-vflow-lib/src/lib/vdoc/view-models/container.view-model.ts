@@ -11,6 +11,7 @@ export class ContainerViewModel extends BlockViewModel {
   public contentY = 0
   public borderRadius = 0
   public borderColor = ''
+  public borderWidth = 0
   public backgroundColor = ''
 
   public styleSheet: Required<ContainerStyleSheet>;
@@ -35,6 +36,12 @@ export class ContainerViewModel extends BlockViewModel {
 
     if (styles.borderRadius) {
       this.borderRadius = styles.borderRadius
+    }
+
+    if (styles.borderWidth) {
+      this.borderWidth = styles.borderWidth
+
+      // TODO respect parent container (now it overlaps parent container)
     }
 
     if (styles.backgroundColor) {
