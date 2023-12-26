@@ -5,6 +5,13 @@ export const styles = {
     borderRadius: 3,
     backgroundColor: '#FF0073',
 
+    boxShadow: {
+      hOffset: 3,
+      vOffset: 5,
+      blur: 3,
+      color: 'rgb(255 255 255 / 0.4)'
+    },
+
     onHover: {
       backgroundColor: '#FFFFFF'
     },

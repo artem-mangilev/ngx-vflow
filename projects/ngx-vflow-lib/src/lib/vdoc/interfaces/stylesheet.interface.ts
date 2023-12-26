@@ -45,7 +45,7 @@ interface WithShadow {
   boxShadow?: Shadow | null
 }
 
-interface Shadow {
+export interface Shadow {
   hOffset: number
   vOffset: number
   blur: number,

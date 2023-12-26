@@ -35,6 +35,10 @@ export class ContainerViewModel extends BlockViewModel {
     if (styles.backgroundColor) {
       this.backgroundColor = styles.backgroundColor
     }
+
+    if (styles.boxShadow) {
+      this.filter = this.getShadow(styles.boxShadow)
+    }
   }
 
   protected override calculateHeight(): void {

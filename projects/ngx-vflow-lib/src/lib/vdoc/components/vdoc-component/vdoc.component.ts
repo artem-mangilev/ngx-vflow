@@ -33,6 +33,9 @@ export class VDocComponent extends VDocViewComponent<ComponentViewModel> impleme
     return this.model.filter
   }
 
+  @HostBinding('style.overflow')
+  protected overflow = 'visible'
+
   constructor() {
     super()
 

@@ -12,12 +12,14 @@ export class HtmlViewModel extends BlockViewModel {
   ) {
     super()
 
-    this.styleSheet = styleSheetWithDefaults(styleSheet);
+    this.styleSheet = styleSheetWithDefaults(styleSheet)
+
+    this.applyStyles(this.styleSheet)
+
+    super.init()
   }
 
-  protected applyStyles(styles: BlockStyleSheet): void {
-
-  }
+  protected applyStyles(styles: HtmlStyleSheet) { }
 }
 
 function styleSheetWithDefaults(styles: HtmlStyleSheet): Required<HtmlStyleSheet> {

@@ -15,7 +15,7 @@ export const styles = {
       hOffset: 3,
       vOffset: 5,
       blur: 3,
-      color: 'rgb(0 0 0 / 0.4)'
+      color: 'rgb(255 0 0 / 0.4)'
     }
   } satisfies ContainerStyleSheet,
 }

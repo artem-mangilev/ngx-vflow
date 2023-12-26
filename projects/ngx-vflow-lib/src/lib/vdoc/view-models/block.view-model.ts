@@ -1,5 +1,5 @@
 import { Observable, Subject, filter, map, merge, of, tap } from "rxjs";
-import { BlockStyleSheet, ContainerStyleSheet } from "../interfaces/stylesheet.interface";
+import { BlockStyleSheet, ContainerStyleSheet, Shadow } from "../interfaces/stylesheet.interface";
 import { StylePrioritizer, StylesSource } from "../utils/style-prioritizer";
 import { AnyViewModel } from "./any.view-model";
 
@@ -44,8 +44,6 @@ export abstract class BlockViewModel extends AnyViewModel {
     this.calculateHeight()
     this.calculateWidth()
     this.calculatePosition()
-
-    this.calculateFilter()
 
     this.updateView()
   }
@@ -125,12 +123,16 @@ export abstract class BlockViewModel extends AnyViewModel {
     this.width = getModelWidth(this)
   }
 
-  protected calculateFilter() {
-    const shadow = this.styleSheet.boxShadow
-    if (shadow) {
-      const { hOffset, vOffset, blur, color } = shadow
-      this.filter = `drop-shadow(${hOffset}px ${vOffset}px ${blur}px ${color})`
-    }
+  /**
+   * get svg shadow
+   *
+   * @todo remove from this class
+   *
+   * @param shadow shadow data
+   * @returns svg shadow
+   */
+  protected getShadow({ hOffset, vOffset, blur, color }: Shadow) {
+    return `drop-shadow(${hOffset}px ${vOffset}px ${blur}px ${color})`
   }
 
   private registerEvents(): Observable<void> {

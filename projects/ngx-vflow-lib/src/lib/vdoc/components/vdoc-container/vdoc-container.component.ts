@@ -22,8 +22,12 @@ import { provideComponent } from '../../utils/provide-component';
     <ng-content></ng-content>
   `,
   styles: [`
+    :host {
+      overflow: visible;
+    }
+
     :host:focus {
-      outline: none
+      outline: none;
     }
   `],
   changeDetection: ChangeDetectionStrategy.OnPush,
