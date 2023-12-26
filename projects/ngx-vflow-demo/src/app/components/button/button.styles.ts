@@ -13,7 +13,8 @@ export const styles = {
     },
 
     onHover: {
-      backgroundColor: '#FFFFFF'
+      backgroundColor: '#FFFFFF',
+      borderRadius: 10,
     },
 
     onFocus: {

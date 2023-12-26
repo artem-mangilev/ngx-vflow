@@ -9,6 +9,7 @@ export class ContainerViewModel extends BlockViewModel {
   public contentWidth = 0
   public contentX = 0
   public contentY = 0
+  public borderRadius = 0
   public borderColor = ''
   public backgroundColor = ''
 
@@ -30,6 +31,10 @@ export class ContainerViewModel extends BlockViewModel {
   protected applyStyles(styles: ContainerStyleSheet): void {
     if (styles.borderColor) {
       this.borderColor = styles.borderColor
+    }
+
+    if (styles.borderRadius) {
+      this.borderRadius = styles.borderRadius
     }
 
     if (styles.backgroundColor) {

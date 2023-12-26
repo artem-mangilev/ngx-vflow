@@ -14,7 +14,7 @@ import { provideComponent } from '../../utils/provide-component';
         [attr.height]="model.contentHeight"
         [attr.x]="model.contentX"
         [attr.y]="model.contentY"
-        [attr.rx]="styleSheet.borderRadius"
+        [attr.rx]="model.borderRadius"
         [attr.fill]="model.backgroundColor"
         [attr.stroke]="model.borderColor"
         [attr.stroke-width]="styleSheet.borderWidth"
