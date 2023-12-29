@@ -5,7 +5,7 @@ import { ContainerStyleSheet, HtmlStyleSheet, VDocComponent, provideComponent } 
   selector: '[app-form]',
   template: `
     <svg:foreignObject vdoc-html [styleSheet]="styles.header">
-      <h3 class="header">Block title</h3>
+      <h3 class="header">Header</h3>
     </svg:foreignObject>
 
     <svg:foreignObject vdoc-html [styleSheet]="styles.controls">
@@ -77,7 +77,7 @@ export const styles = {
   } satisfies HtmlStyleSheet,
 
   header: {
-    marginBottom: 5,
+    // marginBottom: 5,
   } satisfies HtmlStyleSheet,
 
   button: {
