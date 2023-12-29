@@ -3,10 +3,16 @@ import { VDocViewComponent } from '../vdoc-view/vdoc-view.component';
 import { HtmlStyleSheet } from '../../interfaces/stylesheet.interface';
 import { HtmlViewModel } from '../../view-models/html.view-model';
 import { provideComponent } from '../../utils/provide-component';
+import { Subscription, tap } from 'rxjs';
+import { resizable } from '../../utils/resizable';
 
 @Component({
   selector: 'foreignObject[vdoc-html]',
-  template: `<ng-content></ng-content>`,
+  template: `
+    <ng-container *ngLet="model.viewUpdate$ | async">
+      <ng-content></ng-content>
+    </ng-container>
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [provideComponent(VDocHtmlComponent)],
 })
@@ -42,29 +48,37 @@ export class VDocHtmlComponent extends VDocViewComponent<HtmlViewModel> implemen
   private host = inject<ElementRef<SVGForeignObjectElement>>(ElementRef)
   private zone = inject(NgZone)
 
-  private resizeObserver!: ResizeObserver
+  private subscription = new Subscription()
 
   public override ngOnInit(): void {
     super.ngOnInit()
 
-    this.resizeObserver = new ResizeObserver(([entry]) => {
-      this.zone.run(() => {
-        const [box] = entry.borderBoxSize
-        this.model.setHeight(box.blockSize)
+    // TODO research how to remove this call
+    // this call avoids multiple emits of resizable and flickering of view
+    this.treeManager.calculateLayout()
 
-        // TODO see how to avoid recalculation whole layout
-        this.treeManager.calculateLayout()
-      })
-    })
+    const firstChild = this.host.nativeElement.firstElementChild!
+    this.subscription.add(
+      resizable(firstChild, this.zone)
+        .pipe(
+          tap((entry) => {
+            const [box] = entry.borderBoxSize
+            this.model.setHeight(box.blockSize)
 
-    this.resizeObserver.observe(this.host.nativeElement.firstElementChild!)
+            // TODO research how to avoid needless calls
+            this.treeManager.calculateLayout()
+          })
+        )
+        .subscribe()
+    )
   }
 
   public ngOnDestroy(): void {
-    this.resizeObserver.disconnect()
+    this.subscription.unsubscribe()
   }
 
   protected modelFactory(): HtmlViewModel {
     return new HtmlViewModel(this, this.styleSheet)
   }
 }
+

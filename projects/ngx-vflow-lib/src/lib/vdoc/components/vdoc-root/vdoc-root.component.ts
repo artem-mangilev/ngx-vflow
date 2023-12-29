@@ -1,4 +1,4 @@
-import { AfterContentInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, HostBinding, Input, OnInit, forwardRef, inject } from '@angular/core';
+import { AfterContentInit, AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, HostBinding, Input, NgZone, OnInit, forwardRef, inject } from '@angular/core';
 import { VDocTreeBuilderService } from '../../services/vdoc-tree-builder.service';
 import { VDocViewComponent } from '../vdoc-view/vdoc-view.component';
 import { RootViewModel } from '../../view-models/root.view-model';
@@ -7,11 +7,15 @@ import { provideComponent } from '../../utils/provide-component';
 
 @Component({
   selector: 'svg[vdoc-root]',
-  template: `<ng-content></ng-content>`,
+  template: `
+    <ng-container *ngLet="model.viewUpdate$ | async">
+      <ng-content></ng-content>
+    </ng-container>
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [provideComponent(VDocRootComponent), VDocTreeBuilderService]
+  providers: [provideComponent(VDocRootComponent), VDocTreeBuilderService],
 })
-export class VDocRootComponent extends VDocViewComponent<RootViewModel> implements OnInit, AfterContentInit {
+export class VDocRootComponent extends VDocViewComponent<RootViewModel> implements AfterContentInit {
   @Input()
   public styleSheet!: RootStyleSheet
 
@@ -25,11 +29,8 @@ export class VDocRootComponent extends VDocViewComponent<RootViewModel> implemen
     return this.model.height
   }
 
-  private cdr: ChangeDetectorRef = inject(ChangeDetectorRef)
-
   ngAfterContentInit(): void {
-    this.treeManager.root?.calculateLayout();
-    this.cdr.markForCheck()
+    this.treeManager.root?.calculateLayout()
   }
 
   protected modelFactory(): RootViewModel {

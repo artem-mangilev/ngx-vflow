@@ -4,8 +4,8 @@ import { AnyViewModel } from "./any.view-model";
 import { BlockViewModel } from "./block.view-model";
 
 export class RootViewModel extends AnyViewModel {
-  public width
-  public height = 0
+  public width!: number
+  public height!: number
 
   constructor(
     public readonly component: VDocRootComponent,
@@ -20,6 +20,8 @@ export class RootViewModel extends AnyViewModel {
     this.children.forEach(c => c.calculateLayout())
 
     this.setHeight()
+
+    this.updateView()
   }
 
   /**
