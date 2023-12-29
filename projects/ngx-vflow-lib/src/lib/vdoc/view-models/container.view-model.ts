@@ -1,6 +1,6 @@
 import { Observable, Subject, Subscriber, Subscription, filter, map, merge, of, tap } from "rxjs";
 import { VDocViewComponent } from "../components/vdoc-view/vdoc-view.component";
-import { BlockStyleSheet, ContainerStyleSheet } from "../interfaces/stylesheet.interface";
+import { BlockStyleSheet, ContainerStyleSheet, Shadow } from "../interfaces/stylesheet.interface";
 import { BlockViewModel } from "./block.view-model";
 import { styleSheetWithDefaults as blockStyleSheetWithDefaults } from "./block.view-model";
 
@@ -49,7 +49,7 @@ export class ContainerViewModel extends BlockViewModel {
     }
 
     if (styles.boxShadow) {
-      this.filter = this.getShadow(styles.boxShadow)
+      this.filter = styles.boxShadow
     }
   }
 

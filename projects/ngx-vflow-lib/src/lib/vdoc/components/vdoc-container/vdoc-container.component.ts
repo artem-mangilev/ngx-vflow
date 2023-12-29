@@ -8,6 +8,15 @@ import { provideComponent } from '../../utils/provide-component';
 @Component({
   selector: 'svg[vdoc-container]',
   template: `
+    <svg:filter *ngIf="model.filter" id="shadow" color-interpolation-filters="sRGB">
+      <feDropShadow
+        [attr.dx]="model.filter.hOffset"
+        [attr.dy]="model.filter.vOffset"
+        [attr.stdDeviation]="model.filter.blur"
+        [attr.flood-color]="model.filter.color"
+      />
+    </svg:filter>
+
     <svg:rect
         *ngLet="model.viewUpdate$ | async"
         [attr.width]="model.contentWidth"
@@ -18,6 +27,7 @@ import { provideComponent } from '../../utils/provide-component';
         [attr.fill]="model.backgroundColor"
         [attr.stroke]="model.borderColor"
         [attr.stroke-width]="model.borderWidth"
+        [style.filter]="'url(#shadow)'"
     ></svg:rect>
     <ng-content></ng-content>
   `,

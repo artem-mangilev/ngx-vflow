@@ -16,7 +16,8 @@ export abstract class BlockViewModel extends AnyViewModel {
   public height = 0
   public x = 0
   public y = 0
-  public filter = ''
+
+  public filter?: Shadow;
 
   public abstract override styleSheet: Required<BlockStyleSheet>
 

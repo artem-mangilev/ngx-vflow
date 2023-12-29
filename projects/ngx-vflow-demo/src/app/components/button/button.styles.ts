@@ -9,9 +9,9 @@ export const styles = {
 
     boxShadow: {
       hOffset: 3,
-      vOffset: 5,
-      blur: 3,
-      color: 'rgb(255 255 255 / 0.4)'
+      vOffset: 3,
+      blur: 1,
+      color: 'rgb(255 255 255)'
     },
 
     onHover: {
