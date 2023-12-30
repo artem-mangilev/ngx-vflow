@@ -1,3 +1,5 @@
+import { Shadow } from "../../shared/interfaces/filter.interface"
+
 export interface StyleSheet { }
 
 export interface BlockStyleSheet extends
@@ -43,11 +45,4 @@ interface WithMargin {
 
 interface WithShadow {
   boxShadow?: Shadow | null
-}
-
-export interface Shadow {
-  hOffset: number
-  vOffset: number
-  blur: number,
-  color: string
 }

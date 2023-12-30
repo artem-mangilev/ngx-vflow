@@ -8,9 +8,9 @@ export const styles = {
     backgroundColor: '#FF0073',
 
     boxShadow: {
-      hOffset: 3,
-      vOffset: 5,
-      blur: 3,
+      hOffset: 2,
+      vOffset: 2,
+      blur: 2,
       color: 'rgb(255 255 255 / 0.4)'
     },
 

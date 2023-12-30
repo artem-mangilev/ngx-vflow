@@ -1,6 +1,5 @@
-import { Observable, Subject, Subscriber, Subscription, filter, map, merge, of, tap } from "rxjs";
 import { VDocViewComponent } from "../components/vdoc-view/vdoc-view.component";
-import { BlockStyleSheet, ContainerStyleSheet } from "../interfaces/stylesheet.interface";
+import { ContainerStyleSheet } from "../interfaces/stylesheet.interface";
 import { BlockViewModel } from "./block.view-model";
 import { styleSheetWithDefaults as blockStyleSheetWithDefaults } from "./block.view-model";
 
@@ -48,9 +47,7 @@ export class ContainerViewModel extends BlockViewModel {
       this.backgroundColor = styles.backgroundColor
     }
 
-    if (styles.boxShadow) {
-      this.filter = this.getShadow(styles.boxShadow)
-    }
+    this.filter.set(styles.boxShadow ?? null)
   }
 
   protected override calculateHeight(): void {

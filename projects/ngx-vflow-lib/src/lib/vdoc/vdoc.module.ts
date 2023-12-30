@@ -5,6 +5,7 @@ import { VDocContainerComponent } from './components/vdoc-container/vdoc-contain
 import { VDocHtmlComponent } from './components/vdoc-html/vdoc-html.component';
 import { LetDirective } from './directives/let.directive';
 import { VDocImageComponent } from './components/vdoc-image/vdoc-image.component';
+import { FilterService } from '../shared/services/filter.service';
 
 const components = [
   VDocRootComponent,
@@ -19,6 +20,6 @@ const components = [
   ],
   exports: [...components],
   declarations: [...components, LetDirective],
-  providers: [],
+  providers: [FilterService],
 })
 export class VDocModule { }
