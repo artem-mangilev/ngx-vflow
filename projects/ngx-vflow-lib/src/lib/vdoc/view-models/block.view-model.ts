@@ -20,7 +20,7 @@ export abstract class BlockViewModel extends AnyViewModel {
   public y = 0
 
   // TODO provide some default value
-  public filter = signal<Shadow | undefined>(undefined);
+  public filter = signal<Shadow | null>(null);
 
   public abstract override styleSheet: Required<BlockStyleSheet>
 
