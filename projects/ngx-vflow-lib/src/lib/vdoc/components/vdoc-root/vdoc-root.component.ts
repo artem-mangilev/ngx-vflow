@@ -9,8 +9,13 @@ import { FilterService } from '../../../shared/services/filter.service';
 @Component({
   selector: 'svg[vdoc-root]',
   template: `
-    <svg:filter *ngFor="let shadow of filterService.shadows() | keyvalue" [id]="shadow.key" color-interpolation-filters="sRGB">
-      <feDropShadow
+    <!-- TODO move filter in new component -->
+    <svg:filter
+      *ngFor="let shadow of filterService.shadows() | keyvalue"
+      [id]="shadow.key"
+      color-interpolation-filters="sRGB"
+      filterUnits="userSpaceOnUse">
+      <svg:feDropShadow
         [attr.dx]="shadow.value.hOffset"
         [attr.dy]="shadow.value.vOffset"
         [attr.stdDeviation]="shadow.value.blur"
