@@ -4,10 +4,20 @@ import { VDocViewComponent } from '../vdoc-view/vdoc-view.component';
 import { RootViewModel } from '../../view-models/root.view-model';
 import { RootStyleSheet } from '../../interfaces/stylesheet.interface';
 import { provideComponent } from '../../utils/provide-component';
+import { FilterService } from '../../../shared/services/filter.service';
 
 @Component({
   selector: 'svg[vdoc-root]',
   template: `
+    <svg:filter *ngFor="let shadow of filterService.shadows() | keyvalue" [id]="shadow.key" color-interpolation-filters="sRGB">
+      <feDropShadow
+        [attr.dx]="shadow.value.hOffset"
+        [attr.dy]="shadow.value.vOffset"
+        [attr.stdDeviation]="shadow.value.blur"
+        [attr.flood-color]="shadow.value.color"
+      />
+    </svg:filter>
+
     <ng-container *ngLet="model.viewUpdate$ | async">
       <ng-content></ng-content>
     </ng-container>
@@ -28,6 +38,8 @@ export class VDocRootComponent extends VDocViewComponent<RootViewModel> implemen
   protected get hostHeight() {
     return this.model.height
   }
+
+  protected filterService = inject(FilterService)
 
   ngAfterContentInit(): void {
     this.treeManager.root?.calculateLayout()

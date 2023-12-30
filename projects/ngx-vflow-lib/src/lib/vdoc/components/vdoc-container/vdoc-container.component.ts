@@ -1,22 +1,14 @@
-import { ChangeDetectionStrategy, Component, ElementRef, HostBinding, HostListener, Input, OnDestroy, OnInit, Optional, SkipSelf, forwardRef, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, HostBinding, HostListener, Input, OnDestroy, OnInit, Optional, SkipSelf, computed, forwardRef, inject } from '@angular/core';
 import { ContainerStyleSheet } from '../../interfaces/stylesheet.interface';
 import { BlockViewModel, BlockEvent } from '../../view-models/block.view-model';
 import { VDocViewComponent } from '../vdoc-view/vdoc-view.component';
 import { ContainerViewModel } from '../../view-models/container.view-model';
 import { provideComponent } from '../../utils/provide-component';
+import { FilterService } from '../../../shared/services/filter.service';
 
 @Component({
   selector: 'svg[vdoc-container]',
   template: `
-    <svg:filter *ngIf="model.filter" id="shadow" color-interpolation-filters="sRGB">
-      <feDropShadow
-        [attr.dx]="model.filter.hOffset"
-        [attr.dy]="model.filter.vOffset"
-        [attr.stdDeviation]="model.filter.blur"
-        [attr.flood-color]="model.filter.color"
-      />
-    </svg:filter>
-
     <svg:rect
         *ngLet="model.viewUpdate$ | async"
         [attr.width]="model.contentWidth"
@@ -27,7 +19,7 @@ import { provideComponent } from '../../utils/provide-component';
         [attr.fill]="model.backgroundColor"
         [attr.stroke]="model.borderColor"
         [attr.stroke-width]="model.borderWidth"
-        [style.filter]="'url(#shadow)'"
+        [style.filter]="shadowUrl()"
     ></svg:rect>
     <ng-content></ng-content>
   `,
@@ -72,11 +64,31 @@ export class VDocContainerComponent extends VDocViewComponent<ContainerViewModel
     return this.model.filter
   }
 
+  protected shadowUrl = computed(() => {
+    if (this.styleSheet.boxShadow) {
+      const shadowIdSignal = this.filterService.getShadowId(this.styleSheet.boxShadow)
+
+      return `url(#${shadowIdSignal()})`
+    }
+
+    return null
+  })
+
+  protected filterService = inject(FilterService);
+
   constructor() {
     super()
 
     if (!this.parent) {
       throw new Error(`vdoc-block must not be used outside of vdoc-root`);
+    }
+  }
+
+  public override ngOnInit(): void {
+    super.ngOnInit()
+
+    if (this.styleSheet.boxShadow) {
+      this.filterService.addShadow(this.styleSheet.boxShadow)
     }
   }
 

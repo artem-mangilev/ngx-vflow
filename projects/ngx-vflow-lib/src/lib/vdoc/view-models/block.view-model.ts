@@ -1,7 +1,8 @@
 import { Observable, Subject, filter, map, merge, of, tap } from "rxjs";
-import { BlockStyleSheet, ContainerStyleSheet, Shadow } from "../interfaces/stylesheet.interface";
+import { BlockStyleSheet, ContainerStyleSheet } from "../interfaces/stylesheet.interface";
 import { StylePrioritizer, StylesSource } from "../utils/style-prioritizer";
 import { AnyViewModel } from "./any.view-model";
+import { Shadow } from "../../shared/interfaces/filter.interface";
 
 export enum BlockEvent {
   hoverIn,
