@@ -88,17 +88,7 @@ export class VDocContainerComponent extends VDocViewComponent<ContainerViewModel
   public override ngOnInit(): void {
     super.ngOnInit()
 
-    if (this.styleSheet.boxShadow) {
-      this.filterService.addShadow(this.styleSheet.boxShadow)
-    }
-
-    if (this.styleSheet.onHover?.boxShadow) {
-      this.filterService.addShadow(this.styleSheet.onHover?.boxShadow)
-    }
-
-    if (this.styleSheet.onFocus?.boxShadow) {
-      this.filterService.addShadow(this.styleSheet.onFocus?.boxShadow)
-    }
+    this.registerShadows()
   }
 
   public ngOnDestroy(): void {
@@ -127,5 +117,19 @@ export class VDocContainerComponent extends VDocViewComponent<ContainerViewModel
 
   protected modelFactory(): ContainerViewModel {
     return new ContainerViewModel(this, this.styleSheet)
+  }
+
+  private registerShadows() {
+    const shadows = [
+      this.styleSheet.boxShadow,
+      this.styleSheet.onHover?.boxShadow,
+      this.styleSheet.onFocus?.boxShadow,
+    ]
+
+    for (const shadow of shadows) {
+      if (shadow) {
+        this.filterService.addShadow(shadow)
+      }
+    }
   }
 }
