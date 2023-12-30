@@ -127,18 +127,6 @@ export abstract class BlockViewModel extends AnyViewModel {
     this.width = getModelWidth(this)
   }
 
-  /**
-   * get svg shadow
-   *
-   * @todo remove from this class
-   *
-   * @param shadow shadow data
-   * @returns svg shadow
-   */
-  protected getShadow({ hOffset, vOffset, blur, color }: Shadow) {
-    return `drop-shadow(${hOffset}px ${vOffset}px ${blur}px ${color})`
-  }
-
   private registerEvents(): Observable<void> {
     const hoverEvent$ = this.styleSheet.onHover
       ? this._blockEvent$
