@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, Component, ElementRef, HostBinding, HostListener, Input, OnDestroy, OnInit, Optional, SkipSelf, computed, forwardRef, inject } from '@angular/core';
-import { ContainerStyleSheet } from '../../interfaces/stylesheet.interface';
+import { ChangeDetectionStrategy, Component, ElementRef, HostBinding, HostListener, Input, OnDestroy, OnInit, Optional, SkipSelf, ViewChild, computed, forwardRef, inject } from '@angular/core';
+import { AnimationProperty, ContainerStyleSheet } from '../../interfaces/stylesheet.interface';
 import { BlockViewModel, BlockEvent } from '../../view-models/block.view-model';
 import { VDocViewComponent } from '../vdoc-view/vdoc-view.component';
 import { ContainerViewModel } from '../../view-models/container.view-model';
@@ -20,7 +20,40 @@ import { FilterService } from '../../../shared/services/filter.service';
         [attr.stroke]="model.borderColor"
         [attr.stroke-width]="model.borderWidth"
         [style.filter]="shadowUrl()"
-    ></svg:rect>
+    >
+      <svg:animate
+        *ngIf="styleSheet.animation as animation"
+        #animate
+        [attr.attributeName]="getAttrName(animation.property)"
+        [attr.from]="animation.from"
+        [attr.to]="animation.to"
+        [attr.dur]="animation.duration + 'ms'"
+        fill="freeze"
+        begin="indefinite"
+      ></svg:animate>
+
+      <svg:animate
+        *ngIf="styleSheet.onHover?.animation as animation"
+        #animate
+        [attr.attributeName]="getAttrName(animation.property)"
+        [attr.from]="animation.from"
+        [attr.to]="animation.to"
+        [attr.dur]="animation.duration + 'ms'"
+        fill="freeze"
+        begin="indefinite"
+      ></svg:animate>
+
+      <svg:animate
+        *ngIf="styleSheet.onFocus?.animation as animation"
+        #animate
+        [attr.attributeName]="getAttrName(animation.property)"
+        [attr.from]="animation.from"
+        [attr.to]="animation.to"
+        [attr.dur]="animation.duration + 'ms'"
+        fill="freeze"
+        begin="indefinite"
+      ></svg:animate>
+    </svg:rect>
     <ng-content></ng-content>
   `,
   styles: [`
@@ -64,6 +97,9 @@ export class VDocContainerComponent extends VDocViewComponent<ContainerViewModel
     return this.model.filter
   }
 
+  @ViewChild('animate')
+  private animateElementRef?: ElementRef<SVGAnimateElement>
+
   protected shadowUrl = computed(() => {
     const filter = this.model.filter()
     if (filter) {
@@ -98,6 +134,10 @@ export class VDocContainerComponent extends VDocViewComponent<ContainerViewModel
   @HostListener('mouseover')
   protected onMouseOver() {
     this.model.triggerBlockEvent(BlockEvent.hoverIn)
+
+    if (this.animateElementRef && this.styleSheet.onHover?.animation) {
+      this.animateElementRef.nativeElement.beginElement()
+    }
   }
 
   @HostListener('mouseout')
@@ -108,6 +148,10 @@ export class VDocContainerComponent extends VDocViewComponent<ContainerViewModel
   @HostListener('focus')
   protected onFocus() {
     this.model.triggerBlockEvent(BlockEvent.focusIn)
+
+    if (this.animateElementRef && this.styleSheet.onFocus?.animation) {
+      this.animateElementRef.nativeElement.beginElement()
+    }
   }
 
   @HostListener('blur')
@@ -117,6 +161,14 @@ export class VDocContainerComponent extends VDocViewComponent<ContainerViewModel
 
   protected modelFactory(): ContainerViewModel {
     return new ContainerViewModel(this, this.styleSheet)
+  }
+
+  protected getAttrName(property: AnimationProperty) {
+    const map: { [key in AnimationProperty]: string } = {
+      'borderRadius': 'rx'
+    }
+
+    return map[property]
   }
 
   private registerShadows() {

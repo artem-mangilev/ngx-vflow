@@ -21,7 +21,8 @@ export interface ContainerStyleSheet extends BlockStyleSheet {
   backgroundColor?: string
   borderColor?: string
   borderRadius?: number
-  borderWidth?: number
+  borderWidth?: number,
+  animation?: Animation | null
 }
 
 export interface HtmlStyleSheet extends BlockStyleSheet { }
@@ -46,3 +47,12 @@ interface WithMargin {
 interface WithShadow {
   boxShadow?: Shadow | null
 }
+
+interface Animation {
+  property: 'borderRadius'
+  from: number
+  to: number
+  duration: number
+}
+
+export type AnimationProperty = 'borderRadius'
