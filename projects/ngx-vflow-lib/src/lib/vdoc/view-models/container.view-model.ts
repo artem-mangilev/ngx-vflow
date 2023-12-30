@@ -48,7 +48,7 @@ export class ContainerViewModel extends BlockViewModel {
     }
 
     if (styles.boxShadow) {
-      this.filter = styles.boxShadow
+      this.filter.set(styles.boxShadow)
     }
   }
 

@@ -16,6 +16,13 @@ export const styles = {
 
     onHover: {
       borderWidth: 3,
+
+      boxShadow: {
+        hOffset: 3,
+        vOffset: 5,
+        blur: 3,
+        color: 'rgb(255 0 0 / 0.4)'
+      }
     },
 
     onFocus: {

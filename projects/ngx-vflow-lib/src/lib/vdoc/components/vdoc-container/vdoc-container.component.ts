@@ -65,8 +65,9 @@ export class VDocContainerComponent extends VDocViewComponent<ContainerViewModel
   }
 
   protected shadowUrl = computed(() => {
-    if (this.styleSheet.boxShadow) {
-      const shadowIdSignal = this.filterService.getShadowId(this.styleSheet.boxShadow)
+    const filter = this.model.filter()
+    if (filter) {
+      const shadowIdSignal = this.filterService.getShadowId(filter)
 
       return `url(#${shadowIdSignal()})`
     }
@@ -89,6 +90,14 @@ export class VDocContainerComponent extends VDocViewComponent<ContainerViewModel
 
     if (this.styleSheet.boxShadow) {
       this.filterService.addShadow(this.styleSheet.boxShadow)
+    }
+
+    if (this.styleSheet.onHover?.boxShadow) {
+      this.filterService.addShadow(this.styleSheet.onHover?.boxShadow)
+    }
+
+    if (this.styleSheet.onFocus?.boxShadow) {
+      this.filterService.addShadow(this.styleSheet.onFocus?.boxShadow)
     }
   }
 

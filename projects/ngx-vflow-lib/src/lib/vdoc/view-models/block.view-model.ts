@@ -3,6 +3,7 @@ import { BlockStyleSheet, ContainerStyleSheet } from "../interfaces/stylesheet.i
 import { StylePrioritizer, StylesSource } from "../utils/style-prioritizer";
 import { AnyViewModel } from "./any.view-model";
 import { Shadow } from "../../shared/interfaces/filter.interface";
+import { signal } from "@angular/core";
 
 export enum BlockEvent {
   hoverIn,
@@ -18,7 +19,8 @@ export abstract class BlockViewModel extends AnyViewModel {
   public x = 0
   public y = 0
 
-  public filter?: Shadow;
+  // TODO provide some default value
+  public filter = signal<Shadow | undefined>(undefined);
 
   public abstract override styleSheet: Required<BlockStyleSheet>
 
