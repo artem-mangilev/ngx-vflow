@@ -5,8 +5,8 @@ import { VDocViewComponent } from '../vdoc-view/vdoc-view.component';
 import { ContainerViewModel } from '../../view-models/container.view-model';
 import { provideComponent } from '../../utils/provide-component';
 import { FilterService } from '../../../shared/services/filter.service';
-import { AnimationComponent } from '../animation/animation.component';
 import { uuid } from '../../../shared/utils/uuid';
+import { AnimationGroupComponent } from '../animation-group/animation-group.component';
 
 @Component({
   selector: 'svg[vdoc-container]',
@@ -53,13 +53,13 @@ export class VDocContainerComponent extends VDocViewComponent<ContainerViewModel
   }
 
   @ViewChild('animation')
-  private animationComponent?: AnimationComponent
+  private animationComponent?: AnimationGroupComponent
 
   @ViewChild('hoverAnimation')
-  private hoverAnimationComponent?: AnimationComponent
+  private hoverAnimationComponent?: AnimationGroupComponent
 
   @ViewChild('focusAnimation')
-  private focusAnimationComponent?: AnimationComponent
+  private focusAnimationComponent?: AnimationGroupComponent
 
   protected shadowUrl = computed(() => {
     const filter = this.model.filter()
