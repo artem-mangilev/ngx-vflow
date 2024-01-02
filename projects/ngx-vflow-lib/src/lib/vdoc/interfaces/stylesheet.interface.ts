@@ -48,7 +48,7 @@ interface WithShadow {
   boxShadow?: Shadow | null
 }
 
-interface Animation {
+export interface Animation {
   property: 'borderRadius'
   from: number
   to: number

@@ -1,0 +1,36 @@
+<svg:rect
+  [id]="id"
+  *ngLet="model.viewUpdate$ | async"
+  [attr.width]="model.contentWidth"
+  [attr.height]="model.contentHeight"
+  [attr.x]="model.contentX"
+  [attr.y]="model.contentY"
+  [attr.rx]="model.borderRadius"
+  [attr.fill]="model.backgroundColor"
+  [attr.stroke]="model.borderColor"
+  [attr.stroke-width]="model.borderWidth"
+  [style.filter]="shadowUrl()"
+></svg:rect>
+
+<svg:g
+  #animation
+  *ngIf="styleSheet.animation as animation"
+  [id]="id"
+  [animation]="animation"
+></svg:g>
+
+<svg:g
+  #hoverAnimation
+  *ngIf="styleSheet.onHover?.animation as animation"
+  [id]="id"
+  [animation]="animation"
+></svg:g>
+
+<svg:g
+  #focusAnimation
+  *ngIf="styleSheet.onFocus?.animation as animation"
+  [id]="id"
+  [animation]="animation"
+></svg:g>
+
+<ng-content></ng-content>

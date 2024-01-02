@@ -6,12 +6,14 @@ import { VDocHtmlComponent } from './components/vdoc-html/vdoc-html.component';
 import { LetDirective } from './directives/let.directive';
 import { VDocImageComponent } from './components/vdoc-image/vdoc-image.component';
 import { FilterService } from '../shared/services/filter.service';
+import { AnimationComponent } from './components/animation/animation.component';
 
 const components = [
   VDocRootComponent,
   VDocContainerComponent,
   VDocHtmlComponent,
-  VDocImageComponent
+  VDocImageComponent,
+  AnimationComponent
 ]
 
 @NgModule({
