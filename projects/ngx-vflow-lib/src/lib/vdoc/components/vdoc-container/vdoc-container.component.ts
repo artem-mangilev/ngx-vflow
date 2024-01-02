@@ -98,14 +98,14 @@ export class VDocContainerComponent extends VDocViewComponent<ContainerViewModel
     this.model.destroy()
   }
 
-  @HostListener('mouseover')
+  @HostListener('mouseenter')
   protected onMouseOver() {
     this.model.triggerBlockEvent(BlockEvent.hoverIn)
 
     this.hoverAnimationComponent?.begin()
   }
 
-  @HostListener('mouseout')
+  @HostListener('mouseleave')
   protected onMouseOut() {
     this.model.triggerBlockEvent(BlockEvent.hoverOut)
 
