@@ -1,4 +1,5 @@
 import { Shadow } from "../../shared/interfaces/filter.interface"
+import { Animation } from './animation.interface'
 
 export interface StyleSheet { }
 
@@ -48,11 +49,3 @@ interface WithShadow {
   boxShadow?: Shadow | null
 }
 
-export interface Animation {
-  property: AnimationProperty
-  from: number
-  to: number
-  duration: number
-}
-
-export type AnimationProperty = 'borderRadius' | 'borderWidth'

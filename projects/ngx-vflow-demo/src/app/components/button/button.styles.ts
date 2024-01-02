@@ -5,12 +5,10 @@ export const styles = {
     height: 30,
     borderRadius: 1,
     borderWidth: 1,
-    borderColor: '#000000',
-    backgroundColor: '#FF0073',
+    borderColor: 'rgb(255, 255, 255)',
+    backgroundColor: 'rgb(255, 0, 115)',
 
     onHover: {
-      borderWidth: 3,
-
       animation: [
         {
           property: 'borderWidth',
@@ -23,7 +21,19 @@ export const styles = {
           from: 1,
           to: 3,
           duration: 200
-        }
+        },
+        {
+          property: 'borderColor',
+          from: 'rgb(255, 255, 255)',
+          to: 'rgb(255, 0, 115)',
+          duration: 200
+        },
+        {
+          property: 'backgroundColor',
+          from: 'rgb(255, 0, 115)',
+          to: 'rgb(0, 0, 0)',
+          duration: 200
+        },
       ],
     },
 

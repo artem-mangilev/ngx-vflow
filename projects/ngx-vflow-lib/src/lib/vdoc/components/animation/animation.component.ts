@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, ElementRef, HostBinding, Input, OnInit, ViewChild, inject } from '@angular/core';
-import { Animation, AnimationProperty } from '../../interfaces/stylesheet.interface';
+import { Animation, AnimationProperty } from '../../interfaces/animation.interface';
 
 @Component({
   selector: 'g[animation]',
@@ -58,7 +58,9 @@ export class AnimationComponent {
   }
 }
 
-const attrMap = {
+const attrMap: { [prop in AnimationProperty]: string } = {
   'borderRadius': 'rx',
-  'borderWidth': 'stroke-width'
+  'borderWidth': 'stroke-width',
+  'borderColor': 'stroke',
+  'backgroundColor': 'fill'
 }

@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, Input, OnInit, ViewChildren } from '@angular/core';
-import { Animation } from '../../interfaces/stylesheet.interface';
+import { Animation } from '../../interfaces/animation.interface';
 import { AnimationComponent } from '../animation/animation.component';
 
 @Component({
