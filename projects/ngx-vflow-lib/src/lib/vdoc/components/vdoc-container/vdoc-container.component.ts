@@ -91,7 +91,7 @@ export class VDocContainerComponent extends VDocViewComponent<ContainerViewModel
   }
 
   public ngAfterViewInit(): void {
-    this.animationComponent?.begin()
+    this.animationComponent?.begin({ reverseOnceComplete: true })
   }
 
   public ngOnDestroy(): void {
@@ -108,6 +108,8 @@ export class VDocContainerComponent extends VDocViewComponent<ContainerViewModel
   @HostListener('mouseout')
   protected onMouseOut() {
     this.model.triggerBlockEvent(BlockEvent.hoverOut)
+
+    this.hoverAnimationComponent?.reverse()
   }
 
   @HostListener('focus')
@@ -120,6 +122,8 @@ export class VDocContainerComponent extends VDocViewComponent<ContainerViewModel
   @HostListener('blur')
   protected onBlur() {
     this.model.triggerBlockEvent(BlockEvent.focusOut)
+
+    this.focusAnimationComponent?.reverse()
   }
 
   protected modelFactory(): ContainerViewModel {

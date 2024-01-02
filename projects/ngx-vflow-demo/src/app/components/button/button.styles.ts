@@ -8,41 +8,19 @@ export const styles = {
     borderColor: '#000000',
     backgroundColor: '#FF0073',
 
-    // animation: {
-    //   property: 'borderRadius',
-    //   from: 1,
-    //   to: 10,
-    //   duration: 1000
-    // },
-
     onHover: {
       borderWidth: 3,
-
-      // animation: {
-      //   property: 'borderRadius',
-      //   from: 1,
-      //   to: 10,
-      //   duration: 1000
-      // },
-
-
-      // boxShadow: {
-      //   hOffset: 2,
-      //   vOffset: 2,
-      //   blur: 2,
-      //   color: 'rgb(255 255 255 / 0.4)'
-      // },
-    },
-
-    onFocus: {
-      backgroundColor: '#00FFFF',
 
       animation: {
         property: 'borderRadius',
         from: 1,
         to: 10,
-        duration: 1000
+        duration: 200
       },
+    },
+
+    onFocus: {
+      backgroundColor: '#00FFFF',
     }
   } satisfies ContainerStyleSheet,
 }
