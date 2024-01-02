@@ -59,5 +59,6 @@ export class AnimationComponent {
 }
 
 const attrMap = {
-  'borderRadius': 'rx'
+  'borderRadius': 'rx',
+  'borderWidth': 'stroke-width'
 }

@@ -11,12 +11,20 @@ export const styles = {
     onHover: {
       borderWidth: 3,
 
-      animation: {
-        property: 'borderRadius',
-        from: 1,
-        to: 10,
-        duration: 200
-      },
+      animation: [
+        {
+          property: 'borderWidth',
+          from: 1,
+          to: 3,
+          duration: 200
+        },
+        {
+          property: 'borderRadius',
+          from: 1,
+          to: 3,
+          duration: 200
+        }
+      ],
     },
 
     onFocus: {
