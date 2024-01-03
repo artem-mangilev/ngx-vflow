@@ -8,19 +8,19 @@ export type AnimationProperty = Animation['property']
 
 export type AnimationFunction = 'linear' | 'ease' | 'ease-in' | 'ease-out' | 'ease-in-out'
 
-interface BorderRadiusAnimation extends WithNumberValues, WithDuration, WithAnimationFunction {
+interface BorderRadiusAnimation extends WithValuesOfType<number>, WithDuration, WithAnimationFunction {
   property: 'borderRadius'
 }
 
-interface BorderWidthAnimation extends WithNumberValues, WithDuration, WithAnimationFunction {
+interface BorderWidthAnimation extends WithValuesOfType<number>, WithDuration, WithAnimationFunction {
   property: 'borderWidth'
 }
 
-interface BorderColorAnimation extends WithStringValues, WithDuration, WithAnimationFunction {
+interface BorderColorAnimation extends WithValuesOfType<string>, WithDuration, WithAnimationFunction {
   property: 'borderColor'
 }
 
-interface BackgroundColorAnimation extends WithStringValues, WithDuration, WithAnimationFunction {
+interface BackgroundColorAnimation extends WithValuesOfType<string>, WithDuration, WithAnimationFunction {
   property: 'backgroundColor'
 }
 
@@ -28,14 +28,9 @@ interface WithDuration {
   duration: number
 }
 
-interface WithStringValues {
-  from: string
-  to: string
-}
-
-interface WithNumberValues {
-  from: number
-  to: number
+interface WithValuesOfType<T> {
+  from: T
+  to: T
 }
 
 interface WithAnimationFunction {
