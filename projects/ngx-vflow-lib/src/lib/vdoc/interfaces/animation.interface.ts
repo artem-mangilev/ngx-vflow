@@ -9,8 +9,9 @@ export type AnimationProperty = 'borderRadius' | 'borderWidth' | 'borderColor' |
 interface BorderRadiusAnimation {
   property: 'borderRadius'
   from: number
-  to: number,
+  to: number
   duration: number
+  animationFunction?: AnimationFunction
 }
 
 interface BorderWidthAnimation {
@@ -18,6 +19,7 @@ interface BorderWidthAnimation {
   from: number
   to: number,
   duration: number
+  animationFunction?: AnimationFunction
 }
 
 interface BorderColorAnimation {
@@ -25,6 +27,7 @@ interface BorderColorAnimation {
   from: string
   to: string,
   duration: number
+  animationFunction?: AnimationFunction
 }
 
 interface BackgroundColorAnimation {
@@ -32,4 +35,7 @@ interface BackgroundColorAnimation {
   from: string
   to: string,
   duration: number
+  animationFunction?: AnimationFunction
 }
+
+export type AnimationFunction = 'linear' | 'ease' | 'ease-in' | 'ease-out' | 'ease-in-out'

@@ -14,25 +14,29 @@ export const styles = {
           property: 'borderWidth',
           from: 1,
           to: 3,
-          duration: 200
+          duration: 200,
+          animationFunction: 'ease'
         },
         {
           property: 'borderRadius',
           from: 1,
           to: 3,
-          duration: 200
+          duration: 200,
+          animationFunction: 'ease'
         },
         {
           property: 'borderColor',
           from: 'rgb(255, 255, 255)',
           to: 'rgb(255, 0, 115)',
-          duration: 200
+          duration: 200,
+          animationFunction: 'ease'
         },
         {
           property: 'backgroundColor',
           from: 'rgb(255, 0, 115)',
           to: 'rgb(0, 0, 0)',
-          duration: 200
+          duration: 200,
+          animationFunction: 'ease'
         },
       ],
     },
