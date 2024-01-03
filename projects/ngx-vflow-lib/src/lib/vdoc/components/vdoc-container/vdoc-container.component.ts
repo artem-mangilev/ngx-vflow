@@ -1,28 +1,16 @@
-import { ChangeDetectionStrategy, Component, ElementRef, HostBinding, HostListener, Input, OnDestroy, OnInit, Optional, SkipSelf, computed, forwardRef, inject } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, HostBinding, HostListener, Input, OnDestroy, OnInit, Optional, SkipSelf, ViewChild, computed, forwardRef, inject } from '@angular/core';
 import { ContainerStyleSheet } from '../../interfaces/stylesheet.interface';
-import { BlockViewModel, BlockEvent } from '../../view-models/block.view-model';
+import { BlockEvent } from '../../view-models/block.view-model';
 import { VDocViewComponent } from '../vdoc-view/vdoc-view.component';
 import { ContainerViewModel } from '../../view-models/container.view-model';
 import { provideComponent } from '../../utils/provide-component';
 import { FilterService } from '../../../shared/services/filter.service';
+import { uuid } from '../../../shared/utils/uuid';
+import { AnimationGroupComponent } from '../animation-group/animation-group.component';
 
 @Component({
   selector: 'svg[vdoc-container]',
-  template: `
-    <svg:rect
-        *ngLet="model.viewUpdate$ | async"
-        [attr.width]="model.contentWidth"
-        [attr.height]="model.contentHeight"
-        [attr.x]="model.contentX"
-        [attr.y]="model.contentY"
-        [attr.rx]="model.borderRadius"
-        [attr.fill]="model.backgroundColor"
-        [attr.stroke]="model.borderColor"
-        [attr.stroke-width]="model.borderWidth"
-        [style.filter]="shadowUrl()"
-    ></svg:rect>
-    <ng-content></ng-content>
-  `,
+  templateUrl: './vdoc-container.component.html',
   styles: [`
     :host {
       overflow: visible;
@@ -35,7 +23,7 @@ import { FilterService } from '../../../shared/services/filter.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [provideComponent(VDocContainerComponent)]
 })
-export class VDocContainerComponent extends VDocViewComponent<ContainerViewModel> implements OnInit, OnDestroy {
+export class VDocContainerComponent extends VDocViewComponent<ContainerViewModel> implements OnInit, AfterViewInit, OnDestroy {
   @Input()
   public styleSheet!: ContainerStyleSheet
 
@@ -64,6 +52,15 @@ export class VDocContainerComponent extends VDocViewComponent<ContainerViewModel
     return this.model.filter
   }
 
+  @ViewChild('animation')
+  private animationComponent?: AnimationGroupComponent
+
+  @ViewChild('hoverAnimation')
+  private hoverAnimationComponent?: AnimationGroupComponent
+
+  @ViewChild('focusAnimation')
+  private focusAnimationComponent?: AnimationGroupComponent
+
   protected shadowUrl = computed(() => {
     const filter = this.model.filter()
     if (filter) {
@@ -74,6 +71,8 @@ export class VDocContainerComponent extends VDocViewComponent<ContainerViewModel
 
     return null
   })
+
+  protected id = uuid()
 
   protected filterService = inject(FilterService);
 
@@ -91,28 +90,40 @@ export class VDocContainerComponent extends VDocViewComponent<ContainerViewModel
     this.registerShadows()
   }
 
+  public ngAfterViewInit(): void {
+    this.animationComponent?.begin({ reverseOnceComplete: true })
+  }
+
   public ngOnDestroy(): void {
     this.model.destroy()
   }
 
-  @HostListener('mouseover')
+  @HostListener('mouseenter')
   protected onMouseOver() {
     this.model.triggerBlockEvent(BlockEvent.hoverIn)
+
+    this.hoverAnimationComponent?.begin()
   }
 
-  @HostListener('mouseout')
+  @HostListener('mouseleave')
   protected onMouseOut() {
     this.model.triggerBlockEvent(BlockEvent.hoverOut)
+
+    this.hoverAnimationComponent?.reverse()
   }
 
   @HostListener('focus')
   protected onFocus() {
     this.model.triggerBlockEvent(BlockEvent.focusIn)
+
+    this.focusAnimationComponent?.begin()
   }
 
   @HostListener('blur')
   protected onBlur() {
     this.model.triggerBlockEvent(BlockEvent.focusOut)
+
+    this.focusAnimationComponent?.reverse()
   }
 
   protected modelFactory(): ContainerViewModel {

@@ -2,24 +2,47 @@ import { ContainerStyleSheet } from '../../../../../ngx-vflow-lib/src/public-api
 
 export const styles = {
   button: {
-    borderRadius: 3,
+    height: 30,
+    borderRadius: 1,
     borderWidth: 1,
-    borderColor: '#000000',
-    backgroundColor: '#FF0073',
-
-    boxShadow: {
-      hOffset: 2,
-      vOffset: 2,
-      blur: 2,
-      color: 'rgb(255 255 255 / 0.4)'
-    },
+    borderColor: 'rgb(255, 255, 255)',
+    backgroundColor: 'rgb(255, 0, 115)',
 
     onHover: {
-      borderWidth: 3,
+      animation: [
+        {
+          property: 'borderWidth',
+          from: 1,
+          to: 3,
+          duration: 200,
+          animationFunction: 'ease'
+        },
+        {
+          property: 'borderRadius',
+          from: 1,
+          to: 3,
+          duration: 200,
+          animationFunction: 'ease'
+        },
+        {
+          property: 'borderColor',
+          from: 'rgb(255, 255, 255)',
+          to: 'rgb(255, 0, 115)',
+          duration: 200,
+          animationFunction: 'ease'
+        },
+        {
+          property: 'backgroundColor',
+          from: 'rgb(255, 0, 115)',
+          to: 'rgb(0, 0, 0)',
+          duration: 200,
+          animationFunction: 'ease'
+        },
+      ],
     },
 
     onFocus: {
-      backgroundColor: '#00FFFF'
+      backgroundColor: '#00FFFF',
     }
   } satisfies ContainerStyleSheet,
 }

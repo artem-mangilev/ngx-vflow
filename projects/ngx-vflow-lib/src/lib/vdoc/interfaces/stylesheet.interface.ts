@@ -1,4 +1,5 @@
 import { Shadow } from "../../shared/interfaces/filter.interface"
+import { Animation } from './animation.interface'
 
 export interface StyleSheet { }
 
@@ -21,7 +22,8 @@ export interface ContainerStyleSheet extends BlockStyleSheet {
   backgroundColor?: string
   borderColor?: string
   borderRadius?: number
-  borderWidth?: number
+  borderWidth?: number,
+  animation?: Animation | Animation[] | null
 }
 
 export interface HtmlStyleSheet extends BlockStyleSheet { }
@@ -46,3 +48,4 @@ interface WithMargin {
 interface WithShadow {
   boxShadow?: Shadow | null
 }
+
