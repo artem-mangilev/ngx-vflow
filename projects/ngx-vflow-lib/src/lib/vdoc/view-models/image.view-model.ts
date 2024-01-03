@@ -15,9 +15,7 @@ export class ImageViewModel extends BlockViewModel {
     this.styleSheet = styleSheetWithDefaults(styleSheet)
   }
 
-  protected applyStyles(styles: BlockStyleSheet): void {
-
-  }
+  public applyStyles(styles: BlockStyleSheet): void { }
 }
 
 function styleSheetWithDefaults(styles: ImageStyleSheet): Required<ImageStyleSheet> {

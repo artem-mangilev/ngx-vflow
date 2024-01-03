@@ -19,7 +19,7 @@ export class HtmlViewModel extends BlockViewModel {
     super.init()
   }
 
-  protected applyStyles(styles: HtmlStyleSheet) { }
+  public applyStyles(styles: HtmlStyleSheet) { }
 }
 
 function styleSheetWithDefaults(styles: HtmlStyleSheet): Required<HtmlStyleSheet> {

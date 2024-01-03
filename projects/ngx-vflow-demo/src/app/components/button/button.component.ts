@@ -5,8 +5,8 @@ import { VDocComponent, provideComponent } from '../../../../../ngx-vflow-lib/sr
 @Component({
   selector: '[app-button]',
   template: `
-    <svg:svg vdoc-container [styleSheet]="styles.button">
-      <svg:foreignObject vdoc-html>
+    <svg:svg vdoc-container [class.active]="active" [styleSheet]="styles.button">
+      <svg:foreignObject vdoc-html (click)="onClick()">
         <div class="button-content">{{ text }}</div>
       </svg:foreignObject>
     </svg:svg>
@@ -30,4 +30,10 @@ export class ButtonComponent extends VDocComponent {
   public text = ''
 
   protected styles = styles
+
+  protected active = true
+
+  protected onClick() {
+    this.active = !this.active
+  }
 }

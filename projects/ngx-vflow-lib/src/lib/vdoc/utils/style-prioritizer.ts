@@ -4,6 +4,7 @@ export enum StylesSource {
   hover,
   focus,
   styleSheet,
+  dynanic
 }
 
 export class StylePrioritizer {
@@ -16,8 +17,13 @@ export class StylePrioritizer {
     this._elementStyles = {
       [StylesSource.styleSheet]: styleSheet,
       [StylesSource.hover]: styleSheet.onHover,
-      [StylesSource.focus]: styleSheet.onFocus
+      [StylesSource.focus]: styleSheet.onFocus,
+      [StylesSource.dynanic]: null
     }
+  }
+
+  public setDynamicStyle(style: BlockStyleSheet | null) {
+    this._elementStyles[StylesSource.dynanic] = style
   }
 
   /**
@@ -73,10 +79,14 @@ function declareStyleStateMachine() {
       fallbackStyle: StylesSource.focus,
       isSet: false
     },
+    [StylesSource.dynanic]: {
+      fallbackStyle: StylesSource.styleSheet,
+      isSet: false
+    },
     [StylesSource.styleSheet]: {
       fallbackStyle: StylesSource.styleSheet,
       // it's always activated
       isSet: true
-    }
+    },
   }
 }

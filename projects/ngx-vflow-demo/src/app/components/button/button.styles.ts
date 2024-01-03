@@ -8,41 +8,47 @@ export const styles = {
     borderColor: 'rgb(255, 255, 255)',
     backgroundColor: 'rgb(255, 0, 115)',
 
-    onHover: {
-      animation: [
-        {
-          property: 'borderWidth',
-          from: 1,
-          to: 3,
-          duration: 200,
-          animationFunction: 'ease'
-        },
-        {
-          property: 'borderRadius',
-          from: 1,
-          to: 3,
-          duration: 200,
-          animationFunction: 'ease'
-        },
-        {
-          property: 'borderColor',
-          from: 'rgb(255, 255, 255)',
-          to: 'rgb(255, 0, 115)',
-          duration: 200,
-          animationFunction: 'ease'
-        },
-        {
-          property: 'backgroundColor',
-          from: 'rgb(255, 0, 115)',
-          to: 'rgb(0, 0, 0)',
-          duration: 200,
-          animationFunction: 'ease'
-        },
-      ],
-    },
+    // onHover: {
+    //   animation: [
+    //     {
+    //       property: 'borderWidth',
+    //       from: 1,
+    //       to: 3,
+    //       duration: 200,
+    //       animationFunction: 'ease'
+    //     },
+    //     {
+    //       property: 'borderRadius',
+    //       from: 1,
+    //       to: 3,
+    //       duration: 200,
+    //       animationFunction: 'ease'
+    //     },
+    //     {
+    //       property: 'borderColor',
+    //       from: 'rgb(255, 255, 255)',
+    //       to: 'rgb(255, 0, 115)',
+    //       duration: 200,
+    //       animationFunction: 'ease'
+    //     },
+    //     {
+    //       property: 'backgroundColor',
+    //       from: 'rgb(255, 0, 115)',
+    //       to: 'rgb(0, 0, 0)',
+    //       duration: 200,
+    //       animationFunction: 'ease'
+    //     },
+    //   ],
+    // },
 
-    onFocus: {
-      backgroundColor: '#00FFFF',
-    }
+    // onFocus: {
+    //   backgroundColor: '#00FFFF',
+    // },
+
+    onClass: [
+      ['active', {
+        borderColor: 'rgb(0, 0, 0)',
+      }]
+    ]
   } satisfies ContainerStyleSheet,
 }

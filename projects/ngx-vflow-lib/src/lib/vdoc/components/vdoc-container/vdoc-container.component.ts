@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, HostBinding, HostListener, Input, OnDestroy, OnInit, Optional, SkipSelf, ViewChild, computed, forwardRef, inject } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, HostBinding, HostListener, Input, OnChanges, OnDestroy, OnInit, Optional, SimpleChanges, SkipSelf, ViewChild, computed, forwardRef, inject } from '@angular/core';
 import { ContainerStyleSheet } from '../../interfaces/stylesheet.interface';
 import { BlockEvent } from '../../view-models/block.view-model';
 import { VDocViewComponent } from '../vdoc-view/vdoc-view.component';
@@ -7,6 +7,8 @@ import { provideComponent } from '../../utils/provide-component';
 import { FilterService } from '../../../shared/services/filter.service';
 import { uuid } from '../../../shared/utils/uuid';
 import { AnimationGroupComponent } from '../animation-group/animation-group.component';
+import { classChange } from '../../utils/class-change';
+import { tap } from 'rxjs';
 
 @Component({
   selector: 'svg[vdoc-container]',
@@ -76,6 +78,8 @@ export class VDocContainerComponent extends VDocViewComponent<ContainerViewModel
 
   protected filterService = inject(FilterService);
 
+  private hostRef = inject<ElementRef<Element>>(ElementRef)
+
   constructor() {
     super()
 
@@ -92,6 +96,23 @@ export class VDocContainerComponent extends VDocViewComponent<ContainerViewModel
 
   public ngAfterViewInit(): void {
     this.animationComponent?.begin({ reverseOnceComplete: true })
+
+    classChange(this.hostRef.nativeElement).pipe(
+      tap((classList: string[]) => {
+        for (const [className] of this.styleSheet.onClass!) {
+          // first matched class has higher priority
+          if (classList.includes(className)) {
+            this.model.triggerBlockEvent(BlockEvent.dynamicStyleAdded, className)
+
+            return
+          }
+        }
+
+        // if there are no added classes, notify that class deleted
+        this.model.triggerBlockEvent(BlockEvent.dynamicStyleDeleted)
+
+      })
+    ).subscribe()
   }
 
   public ngOnDestroy(): void {

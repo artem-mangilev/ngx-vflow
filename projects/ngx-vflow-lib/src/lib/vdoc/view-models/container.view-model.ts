@@ -28,7 +28,7 @@ export class ContainerViewModel extends BlockViewModel {
     super.init()
   }
 
-  protected applyStyles(styles: ContainerStyleSheet): void {
+  public applyStyles(styles: ContainerStyleSheet): void {
     if (styles.borderColor) {
       this.borderColor = styles.borderColor
     }
@@ -48,6 +48,8 @@ export class ContainerViewModel extends BlockViewModel {
     }
 
     this.filter.set(styles.boxShadow ?? null)
+
+    this.updateView()
   }
 
   protected override calculateHeight(): void {
@@ -82,7 +84,7 @@ function styleSheetWithDefaults(styles: ContainerStyleSheet): Required<Container
     borderColor: styles.borderColor ?? '',
     borderWidth: styles.borderWidth ?? 0,
     borderRadius: styles.borderRadius ?? 0,
-    animation: styles.animation ?? null
+    animation: styles.animation ?? null,
   }
 }
 

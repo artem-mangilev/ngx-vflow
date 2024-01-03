@@ -11,6 +11,8 @@ export interface BlockStyleSheet extends
   Partial<WithShadow> {
   onHover?: this | null
   onFocus?: this | null
+  // 0 field is className
+  onClass?: [string, this][]
 }
 
 export interface RootStyleSheet extends

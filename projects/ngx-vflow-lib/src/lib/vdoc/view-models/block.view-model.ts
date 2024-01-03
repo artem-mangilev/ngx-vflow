@@ -11,7 +11,12 @@ export enum BlockEvent {
 
   focusIn,
   focusOut,
+
+  dynamicStyleAdded,
+  dynamicStyleDeleted
 }
+
+type BlockEventData = { event: BlockEvent, payload?: unknown }
 
 export abstract class BlockViewModel extends AnyViewModel {
   public width = 0
@@ -24,7 +29,7 @@ export abstract class BlockViewModel extends AnyViewModel {
 
   public abstract override styleSheet: Required<BlockStyleSheet>
 
-  private _blockEvent$ = new Subject<BlockEvent>()
+  private _blockEvent$ = new Subject<BlockEventData>()
   private _prioritizer!: StylePrioritizer
 
   protected init() {
@@ -35,10 +40,10 @@ export abstract class BlockViewModel extends AnyViewModel {
     )
   }
 
-  protected abstract applyStyles(styles: BlockStyleSheet): void
+  public abstract applyStyles(styles: BlockStyleSheet): void
 
-  public triggerBlockEvent(event: BlockEvent) {
-    this._blockEvent$.next(event)
+  public triggerBlockEvent(event: BlockEvent, payload?: unknown) {
+    this._blockEvent$.next({ event, payload })
   }
 
   calculateLayout() {
@@ -128,11 +133,27 @@ export abstract class BlockViewModel extends AnyViewModel {
   }
 
   private registerEvents(): Observable<void> {
+    const dynamicStyleEvent$ = this._blockEvent$
+      .pipe(
+        filter(({ event }) => [BlockEvent.dynamicStyleAdded, BlockEvent.dynamicStyleDeleted].includes(event)),
+        tap(({ event, payload }) => {
+          if (event === BlockEvent.dynamicStyleAdded) {
+            const activeDynamicStyles = this.styleSheet.onClass.find(([className]) => className === payload)![1]
+
+            this._prioritizer.setDynamicStyle(activeDynamicStyles)
+            this.toggleStyleSheet(StylesSource.dynanic, true, activeDynamicStyles)
+          } else {
+            this._prioritizer.setDynamicStyle(null)
+            this.toggleStyleSheet(StylesSource.dynanic, false, null)
+          }
+        })
+      )
+
     const hoverEvent$ = this.styleSheet.onHover
       ? this._blockEvent$
         .pipe(
-          filter((event) => [BlockEvent.hoverIn, BlockEvent.hoverOut].includes(event)),
-          tap((event) =>
+          filter(({ event }) => [BlockEvent.hoverIn, BlockEvent.hoverOut].includes(event)),
+          tap(({ event }) =>
             this.toggleStyleSheet(StylesSource.hover, event === BlockEvent.hoverIn, this.styleSheet.onHover!)
           )
         )
@@ -141,20 +162,20 @@ export abstract class BlockViewModel extends AnyViewModel {
     const focusEvent$ = this.styleSheet.onFocus
       ? this._blockEvent$
         .pipe(
-          filter((event) => [BlockEvent.focusIn, BlockEvent.focusOut].includes(event)),
-          tap((event) =>
+          filter(({ event }) => [BlockEvent.focusIn, BlockEvent.focusOut].includes(event)),
+          tap(({ event }) =>
             this.toggleStyleSheet(StylesSource.focus, event === BlockEvent.focusIn, this.styleSheet.onFocus!)
           )
         )
       : of(null)
 
-    return merge(hoverEvent$, focusEvent$).pipe(
+    return merge(hoverEvent$, focusEvent$, dynamicStyleEvent$).pipe(
       map(() => undefined)
     )
   }
 
-  private toggleStyleSheet(source: StylesSource, enable: boolean, styles: ContainerStyleSheet) {
-    if (enable) {
+  private toggleStyleSheet(source: StylesSource, enable: boolean, styles: ContainerStyleSheet | null) {
+    if (enable && styles) {
       this.applyStyles(styles)
       this._prioritizer.set(source)
     } else {
@@ -238,5 +259,6 @@ export function styleSheetWithDefaults(styles: BlockStyleSheet): Required<BlockS
     boxShadow: styles.boxShadow ?? null,
     onHover: styles.onHover ?? null,
     onFocus: styles.onFocus ?? null,
+    onClass: styles.onClass ?? []
   }
 }
