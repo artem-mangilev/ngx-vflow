@@ -12,11 +12,11 @@ export const styles = {
     backgroundColor: '#1E1E1E',
     marginTop: signal(5),
     marginBottom: signal(10),
-    boxShadow: {
+    boxShadow: signal({
       hOffset: 3,
       vOffset: 5,
       blur: 3,
       color: 'rgb(255 0 0 / 0.4)'
-    }
+    })
   } satisfies ContainerStyleSheet,
 }

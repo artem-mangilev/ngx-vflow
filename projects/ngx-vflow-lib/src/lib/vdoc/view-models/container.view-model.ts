@@ -47,7 +47,7 @@ export class ContainerViewModel extends BlockViewModel {
       this.backgroundColor = styles.backgroundColor
     }
 
-    this.filter.set(styles.boxShadow ?? null)
+    this.filter.set(styles.boxShadow ? styles.boxShadow() : null)
 
     this.updateView()
   }

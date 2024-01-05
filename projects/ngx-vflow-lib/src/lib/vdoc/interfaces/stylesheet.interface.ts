@@ -49,6 +49,6 @@ interface WithMargin {
 }
 
 interface WithShadow {
-  boxShadow?: Shadow | null
+  boxShadow?: Signal<Shadow | null>
 }
 

@@ -159,8 +159,8 @@ export class VDocContainerComponent extends VDocViewComponent<ContainerViewModel
     ]
 
     for (const shadow of shadows) {
-      if (shadow) {
-        this.filterService.addShadow(shadow)
+      if (shadow && shadow()) {
+        this.filterService.addShadow(shadow()!)
       }
     }
   }
