@@ -1,14 +1,22 @@
-import { signal } from "@angular/core";
+import { computed, signal } from "@angular/core";
 import { VDocViewComponent } from "../components/vdoc-view/vdoc-view.component";
 import { ContainerStyleSheet } from "../interfaces/stylesheet.interface";
 import { BlockViewModel } from "./block.view-model";
 import { styleSheetWithDefaults as blockStyleSheetWithDefaults } from "./block.view-model";
 
 export class ContainerViewModel extends BlockViewModel {
-  public contentHeight = 0
-  public contentWidth = 0
-  public contentX = 0
-  public contentY = 0
+  // rect height is increased by borderWidth if it applied, so we need decrease
+  // it by this value in order to fit into parent element
+  public contentHeight = computed(() => this.height() - this.styleSheet.borderWidth())
+
+  // rect width is increased by borderWidth if it applied, so we need decrease
+  // it back by this value in order to fit into parent element
+  public contentWidth = computed(() => this.width() - this.styleSheet.borderWidth())
+
+  // TODO explain this logic, may lead to bugs
+  public contentX = computed(() => this.styleSheet.borderWidth() / 2)
+  public contentY = computed(() => this.styleSheet.borderWidth() / 2)
+
   public borderRadius = signal(0)
   public borderColor = signal('')
   public borderWidth = signal(0)
@@ -49,32 +57,6 @@ export class ContainerViewModel extends BlockViewModel {
     }
 
     this.filter.set(styles.boxShadow ? styles.boxShadow() : null)
-
-    this.updateView()
-  }
-
-  protected override calculateHeight(): void {
-    super.calculateHeight()
-
-    // rect height is increased by borderWidth if it applied, so we need decrease
-    // it by this value in order to fit into parent element
-    this.contentHeight = this.height() - this.styleSheet.borderWidth()
-  }
-
-  protected override calculateWidth(): void {
-    super.calculateWidth()
-
-    // rect width is increased by borderWidth if it applied, so we need decrease
-    // it back by this value in order to fit into parent element
-    this.contentWidth = this.width() - this.styleSheet.borderWidth()
-  }
-
-  protected override calculatePosition(): void {
-    super.calculatePosition()
-
-    // TODO explain this logic
-    this.contentX = this.styleSheet.borderWidth() / 2
-    this.contentY = this.styleSheet.borderWidth() / 2
   }
 }
 

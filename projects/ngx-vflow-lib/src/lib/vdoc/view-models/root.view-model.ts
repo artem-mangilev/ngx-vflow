@@ -24,8 +24,6 @@ export class RootViewModel extends AnyViewModel {
 
     this.setWidth()
     this.setHeight()
-
-    this.updateView()
   }
 
   private setWidth() {

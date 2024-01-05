@@ -5,12 +5,9 @@ import { Signal } from "@angular/core";
 
 export abstract class AnyViewModel {
   protected _subscription = new Subscription()
-  private _viewUpdate$ = new Subject<void>()
 
   public parent: AnyViewModel | null = null
   public children: AnyViewModel[] = []
-
-  public viewUpdate$ = this._viewUpdate$.asObservable();
 
   public abstract width: Signal<number>
   public abstract height: Signal<number>
@@ -20,9 +17,6 @@ export abstract class AnyViewModel {
 
   public abstract calculateLayout(): void
 
-  public updateView(): void {
-    this._viewUpdate$.next();
-  }
 
   public destroy() {
     this._subscription.unsubscribe()

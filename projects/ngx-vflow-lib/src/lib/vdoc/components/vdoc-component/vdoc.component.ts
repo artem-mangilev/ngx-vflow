@@ -20,17 +20,17 @@ export class VDocComponent extends VDocViewComponent<ComponentViewModel> impleme
 
   @HostBinding('attr.x')
   protected get hostX() {
-    return this.model.x
+    return this.model.x()
   }
 
   @HostBinding('attr.y')
   protected get hostY() {
-    return this.model.y
+    return this.model.y()
   }
 
   @HostBinding('style.filter')
   protected get filterStyle() {
-    return this.model.filter
+    return this.model.filter()
   }
 
   @HostBinding('style.overflow')

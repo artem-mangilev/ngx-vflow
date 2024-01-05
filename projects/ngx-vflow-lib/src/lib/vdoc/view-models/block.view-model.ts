@@ -21,8 +21,8 @@ type BlockEventData = { event: BlockEvent, payload?: unknown }
 export abstract class BlockViewModel extends AnyViewModel {
   public width = signal(0)
   public height = signal(0)
-  public x = 0
-  public y = 0
+  public x = signal(0)
+  public y = signal(0)
 
   // TODO provide some default value
   public filter = signal<Shadow | null>(null);
@@ -53,8 +53,6 @@ export abstract class BlockViewModel extends AnyViewModel {
     this.calculateHeight()
     this.calculateWidth()
     this.calculatePosition()
-
-    this.updateView()
   }
 
   public setHeight(height: number) {
@@ -72,7 +70,7 @@ export abstract class BlockViewModel extends AnyViewModel {
     // Current block rendered based on it's prev sibling
     const prevSibling = this.parent.children[this.parent.children.indexOf(this) - 1]
     if (prevSibling && prevSibling instanceof BlockViewModel) {
-      y += prevSibling.y + prevSibling.height() + prevSibling.styleSheet.marginBottom()
+      y += prevSibling.y() + prevSibling.height() + prevSibling.styleSheet.marginBottom()
     }
 
     // Compute x
@@ -96,8 +94,8 @@ export abstract class BlockViewModel extends AnyViewModel {
       x = 0
     }
 
-    this.x = x
-    this.y = y
+    this.x.set(x)
+    this.y.set(y)
   }
 
   /**

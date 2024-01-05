@@ -9,9 +9,7 @@ import { resizable } from '../../utils/resizable';
 @Component({
   selector: 'foreignObject[vdoc-html]',
   template: `
-    <ng-container *ngLet="model.viewUpdate$ | async">
-      <ng-content></ng-content>
-    </ng-container>
+    <ng-content></ng-content>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [provideComponent(VDocHtmlComponent)],
@@ -32,17 +30,17 @@ export class VDocHtmlComponent extends VDocViewComponent<HtmlViewModel> implemen
 
   @HostBinding('attr.x')
   protected get hostX() {
-    return this.model.x
+    return this.model.x()
   }
 
   @HostBinding('attr.y')
   protected get hostY() {
-    return this.model.y
+    return this.model.y()
   }
 
   @HostBinding('style.filter')
   protected get filterStyle() {
-    return this.model.filter
+    return this.model.filter()
   }
 
   private host = inject<ElementRef<SVGForeignObjectElement>>(ElementRef)

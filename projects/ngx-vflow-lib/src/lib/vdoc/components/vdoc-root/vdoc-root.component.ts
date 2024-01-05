@@ -23,9 +23,7 @@ import { FilterService } from '../../../shared/services/filter.service';
       />
     </svg:filter>
 
-    <ng-container *ngLet="model.viewUpdate$ | async">
-      <ng-content></ng-content>
-    </ng-container>
+    <ng-content></ng-content>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [provideComponent(VDocRootComponent), VDocTreeBuilderService],

@@ -35,17 +35,17 @@ export class VDocImageComponent extends VDocViewComponent<ImageViewModel> implem
 
   @HostBinding('attr.x')
   protected get hostX() {
-    return this.model.x
+    return this.model.x()
   }
 
   @HostBinding('attr.y')
   protected get hostY() {
-    return this.model.y
+    return this.model.y()
   }
 
   @HostBinding('style.filter')
   protected get filterStyle() {
-    return this.model.filter
+    return this.model.filter()
   }
 
   protected modelFactory(): ImageViewModel {
