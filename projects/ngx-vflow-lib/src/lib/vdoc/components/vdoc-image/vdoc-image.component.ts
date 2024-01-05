@@ -10,7 +10,7 @@ import { provideComponent } from '../../utils/provide-component';
     <svg:image
       [attr.href]="src"
       [attr.width]="model.width()"
-      [attr.height]="model.height"
+      [attr.height]="model.height()"
     ></svg:image>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -30,7 +30,7 @@ export class VDocImageComponent extends VDocViewComponent<ImageViewModel> implem
 
   @HostBinding('attr.height')
   protected get hostHeight() {
-    return this.model.height
+    return this.model.height()
   }
 
   @HostBinding('attr.x')

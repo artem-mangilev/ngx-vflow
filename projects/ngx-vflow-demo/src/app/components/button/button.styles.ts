@@ -1,8 +1,9 @@
+import { signal } from '@angular/core'
 import { ContainerStyleSheet } from '../../../../../ngx-vflow-lib/src/public-api'
 
 export const styles = {
   button: {
-    height: 30,
+    height: signal(30),
     borderRadius: 1,
     borderWidth: 1,
     borderColor: 'rgb(255, 255, 255)',

@@ -41,7 +41,7 @@ export class VDocRootComponent extends VDocViewComponent<RootViewModel> implemen
 
   @HostBinding('attr.height')
   protected get hostHeight() {
-    return this.model.height
+    return this.model.height()
   }
 
   protected filterService = inject(FilterService)

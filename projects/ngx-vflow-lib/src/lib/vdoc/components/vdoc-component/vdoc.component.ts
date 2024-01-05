@@ -15,7 +15,7 @@ export class VDocComponent extends VDocViewComponent<ComponentViewModel> impleme
 
   @HostBinding('attr.height')
   protected get hostHeight() {
-    return this.model.height
+    return this.model.height()
   }
 
   @HostBinding('attr.x')

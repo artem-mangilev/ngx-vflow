@@ -3,7 +3,7 @@ import { BlockStyleSheet, ContainerStyleSheet } from "../interfaces/stylesheet.i
 import { StylePrioritizer, StylesSource } from "../utils/style-prioritizer";
 import { AnyViewModel } from "./any.view-model";
 import { Shadow } from "../../shared/interfaces/filter.interface";
-import { signal } from "@angular/core";
+import { WritableSignal, signal } from "@angular/core";
 
 export enum BlockEvent {
   hoverIn,
@@ -20,7 +20,7 @@ type BlockEventData = { event: BlockEvent, payload?: unknown }
 
 export abstract class BlockViewModel extends AnyViewModel {
   public width = signal(0)
-  public height = 0
+  public height = signal(0)
   public x = 0
   public y = 0
 
@@ -59,7 +59,7 @@ export abstract class BlockViewModel extends AnyViewModel {
 
   public setHeight(height: number) {
     // TODO prob bad idea to mutate styleSheet instance
-    this.styleSheet.height = height;
+    (this.styleSheet.height as WritableSignal<number>).set(height);
   }
 
   protected calculatePosition() {
@@ -72,7 +72,7 @@ export abstract class BlockViewModel extends AnyViewModel {
     // Current block rendered based on it's prev sibling
     const prevSibling = this.parent.children[this.parent.children.indexOf(this) - 1]
     if (prevSibling && prevSibling instanceof BlockViewModel) {
-      y += prevSibling.y + prevSibling.height + prevSibling.styleSheet.marginBottom
+      y += prevSibling.y + prevSibling.height() + prevSibling.styleSheet.marginBottom
     }
 
     // Compute x
@@ -104,10 +104,11 @@ export abstract class BlockViewModel extends AnyViewModel {
    * Set height for view
    */
   protected calculateHeight() {
-    if (this.styleSheet.height) {
+    // TODO truthy value
+    if (this.styleSheet.height()) {
       // if styles has height, use it
 
-      this.height = this.styleSheet.height
+      this.height.set(this.styleSheet.height())
     } else {
       // otherwise compute height based on children
 
@@ -115,13 +116,13 @@ export abstract class BlockViewModel extends AnyViewModel {
 
       for (const c of this.children) {
         if (c instanceof BlockViewModel) {
-          height += c.height
+          height += c.height()
           height += c.styleSheet.marginBottom
           height += c.styleSheet.marginTop
         }
       }
 
-      this.height = height
+      this.height.set(height)
     }
   }
 
@@ -252,7 +253,7 @@ function getModelWidth(model: AnyViewModel) {
 export function styleSheetWithDefaults(styles: BlockStyleSheet): Required<BlockStyleSheet> {
   return {
     width: styles.width ?? signal(0),
-    height: styles.height ?? 0,
+    height: styles.height ?? signal(0),
     marginLeft: styles.marginLeft ?? 0,
     marginRight: styles.marginRight ?? 0,
     marginBottom: styles.marginBottom ?? 0,

@@ -13,7 +13,7 @@ export abstract class AnyViewModel {
   public viewUpdate$ = this._viewUpdate$.asObservable();
 
   public abstract width: Signal<number>
-  public abstract height: number
+  public abstract height: Signal<number>
 
   public abstract component: VDocViewComponent
   public abstract styleSheet: StyleSheet;

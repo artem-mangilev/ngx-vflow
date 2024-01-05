@@ -38,7 +38,7 @@ interface WithWidth {
 }
 
 interface WithHeight {
-  height: number
+  height: Signal<number>
 }
 
 interface WithMargin {

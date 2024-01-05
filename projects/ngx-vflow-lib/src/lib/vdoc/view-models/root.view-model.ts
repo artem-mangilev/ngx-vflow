@@ -1,28 +1,35 @@
-import { Signal } from "@angular/core";
+import { Signal, signal } from "@angular/core";
 import { RootStyleSheet } from "../../../public-api";
 import { VDocRootComponent } from "../components/vdoc-root/vdoc-root.component";
 import { AnyViewModel } from "./any.view-model";
 import { BlockViewModel } from "./block.view-model";
 
 export class RootViewModel extends AnyViewModel {
-  public width: Signal<number>
-  public height!: number
+  public width = signal(0)
+  public height = signal(0)
+
+  public readonly styleSheet: Required<RootStyleSheet>;
 
   constructor(
     public readonly component: VDocRootComponent,
-    public readonly styleSheet: RootStyleSheet
+    styleSheet: RootStyleSheet
   ) {
     super()
 
-    this.width = styleSheet.width
+    this.styleSheet = styleSheetWithDefaults(styleSheet)
   }
 
   public calculateLayout(): void {
     this.children.forEach(c => c.calculateLayout())
 
+    this.setWidth()
     this.setHeight()
 
     this.updateView()
+  }
+
+  private setWidth() {
+    this.width.set(this.styleSheet.width())
   }
 
   /**
@@ -31,10 +38,10 @@ export class RootViewModel extends AnyViewModel {
    * @todo copy-paste from block.view-model
    */
   private setHeight() {
-    if (this.styleSheet.height) {
+    if (this.styleSheet.height()) {
       // if styles has height, use it
 
-      this.height = this.styleSheet.height
+      this.height.set(this.styleSheet.height())
     } else {
       // otherwise compute height based on children
 
@@ -42,13 +49,19 @@ export class RootViewModel extends AnyViewModel {
 
       for (const c of this.children) {
         if (c instanceof BlockViewModel) {
-          height += c.height
+          height += c.height()
           height += c.styleSheet.marginBottom
           height += c.styleSheet.marginTop
         }
       }
 
-      this.height = height
+      this.height.set(height)
     }
+  }
+}
+export function styleSheetWithDefaults(styles: RootStyleSheet): Required<RootStyleSheet> {
+  return {
+    width: styles.width ?? signal(0),
+    height: styles.height ?? signal(0)
   }
 }
