@@ -15,21 +15,21 @@
   #animation
   *ngIf="styleSheet.animation as animation"
   [id]="id"
-  [animationGroup]="animation"
+  [animationGroup]="animation()"
 ></svg:g>
 
 <svg:g
   #hoverAnimation
   *ngIf="styleSheet.onHover?.animation as animation"
   [id]="id"
-  [animationGroup]="animation"
+  [animationGroup]="animation()"
 ></svg:g>
 
 <svg:g
   #focusAnimation
   *ngIf="styleSheet.onFocus?.animation as animation"
   [id]="id"
-  [animationGroup]="animation"
+  [animationGroup]="animation()"
 ></svg:g>
 
 <ng-content></ng-content>

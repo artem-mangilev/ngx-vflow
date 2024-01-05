@@ -67,7 +67,7 @@ function styleSheetWithDefaults(styles: ContainerStyleSheet): Required<Container
     borderColor: styles.borderColor ?? signal(''),
     borderWidth: styles.borderWidth ?? signal(0),
     borderRadius: styles.borderRadius ?? signal(0),
-    animation: styles.animation ?? null,
+    animation: styles.animation ?? signal([]),
   }
 }
 
