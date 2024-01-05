@@ -42,10 +42,10 @@ interface WithHeight {
 }
 
 interface WithMargin {
-  marginLeft: number | 'auto'
-  marginRight: number | 'auto'
-  marginBottom: number
-  marginTop: number
+  marginLeft: Signal<number | 'auto'>
+  marginRight: Signal<number | 'auto'>
+  marginBottom: Signal<number>
+  marginTop: Signal<number>
 }
 
 interface WithShadow {

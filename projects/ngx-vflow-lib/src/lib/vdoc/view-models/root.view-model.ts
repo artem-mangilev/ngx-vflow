@@ -50,8 +50,8 @@ export class RootViewModel extends AnyViewModel {
       for (const c of this.children) {
         if (c instanceof BlockViewModel) {
           height += c.height()
-          height += c.styleSheet.marginBottom
-          height += c.styleSheet.marginTop
+          height += c.styleSheet.marginBottom()
+          height += c.styleSheet.marginTop()
         }
       }
 

@@ -10,8 +10,8 @@ export const styles = {
     width: signal(180),
     borderRadius: 5,
     backgroundColor: '#1E1E1E',
-    marginTop: 5,
-    marginBottom: 10,
+    marginTop: signal(5),
+    marginBottom: signal(10),
     boxShadow: {
       hOffset: 3,
       vOffset: 5,

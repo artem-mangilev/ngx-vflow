@@ -68,29 +68,29 @@ export abstract class BlockViewModel extends AnyViewModel {
 
     // Compute y
     let y = 0
-    y += this.styleSheet.marginTop
+    y += this.styleSheet.marginTop()
     // Current block rendered based on it's prev sibling
     const prevSibling = this.parent.children[this.parent.children.indexOf(this) - 1]
     if (prevSibling && prevSibling instanceof BlockViewModel) {
-      y += prevSibling.y + prevSibling.height() + prevSibling.styleSheet.marginBottom
+      y += prevSibling.y + prevSibling.height() + prevSibling.styleSheet.marginBottom()
     }
 
     // Compute x
     let x = 0
     if (
       // Both horizontal margins are auto
-      this.styleSheet.marginLeft === 'auto' &&
-      this.styleSheet.marginRight === 'auto'
+      this.styleSheet.marginLeft() === 'auto' &&
+      this.styleSheet.marginRight() === 'auto'
     ) {
       const parentWidth = getModelWidth(this.parent!)
 
       x = (parentWidth / 2) - (this.width() / 2)
     } else if (
       // Both horizontal margins are absolute values
-      typeof this.styleSheet.marginLeft === 'number' &&
-      typeof this.styleSheet.marginRight === 'number'
+      typeof this.styleSheet.marginLeft() === 'number' &&
+      typeof this.styleSheet.marginRight() === 'number'
     ) {
-      x += this.styleSheet.marginLeft
+      x += this.styleSheet.marginLeft() as number
     } else {
       // TODO unhandled
       x = 0
@@ -117,8 +117,8 @@ export abstract class BlockViewModel extends AnyViewModel {
       for (const c of this.children) {
         if (c instanceof BlockViewModel) {
           height += c.height()
-          height += c.styleSheet.marginBottom
-          height += c.styleSheet.marginTop
+          height += c.styleSheet.marginBottom()
+          height += c.styleSheet.marginTop()
         }
       }
 
@@ -237,12 +237,12 @@ function getModelWidth(model: AnyViewModel) {
         width = item.styleSheet.width()
       } else {
         // or if styles has no width, we compute it from margins
-        if (typeof item.styleSheet.marginLeft === 'number') {
-          width -= item.styleSheet.marginLeft
+        if (typeof item.styleSheet.marginLeft() === 'number') {
+          width -= item.styleSheet.marginLeft() as number
         }
 
-        if (typeof item.styleSheet.marginRight === 'number') {
-          width -= item.styleSheet.marginRight
+        if (typeof item.styleSheet.marginRight() === 'number') {
+          width -= item.styleSheet.marginRight() as number
         }
       }
     })
@@ -254,10 +254,10 @@ export function styleSheetWithDefaults(styles: BlockStyleSheet): Required<BlockS
   return {
     width: styles.width ?? signal(0),
     height: styles.height ?? signal(0),
-    marginLeft: styles.marginLeft ?? 0,
-    marginRight: styles.marginRight ?? 0,
-    marginBottom: styles.marginBottom ?? 0,
-    marginTop: styles.marginTop ?? 0,
+    marginLeft: styles.marginLeft ?? signal(0),
+    marginRight: styles.marginRight ?? signal(0),
+    marginBottom: styles.marginBottom ?? signal(0),
+    marginTop: styles.marginTop ?? signal(0),
     boxShadow: styles.boxShadow ?? null,
     onHover: styles.onHover ?? null,
     onFocus: styles.onFocus ?? null,
