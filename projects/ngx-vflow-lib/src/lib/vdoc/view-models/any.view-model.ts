@@ -1,6 +1,7 @@
 import { Subject, Subscription } from "rxjs";
 import { VDocViewComponent } from "../components/vdoc-view/vdoc-view.component";
 import { StyleSheet } from '../interfaces/stylesheet.interface';
+import { Signal } from "@angular/core";
 
 export abstract class AnyViewModel {
   protected _subscription = new Subscription()
@@ -11,7 +12,7 @@ export abstract class AnyViewModel {
 
   public viewUpdate$ = this._viewUpdate$.asObservable();
 
-  public abstract width: number
+  public abstract width: Signal<number>
   public abstract height: number
 
   public abstract component: VDocViewComponent

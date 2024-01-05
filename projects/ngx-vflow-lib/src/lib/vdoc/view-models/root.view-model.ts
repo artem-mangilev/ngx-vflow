@@ -1,10 +1,11 @@
+import { Signal } from "@angular/core";
 import { RootStyleSheet } from "../../../public-api";
 import { VDocRootComponent } from "../components/vdoc-root/vdoc-root.component";
 import { AnyViewModel } from "./any.view-model";
 import { BlockViewModel } from "./block.view-model";
 
 export class RootViewModel extends AnyViewModel {
-  public width!: number
+  public width: Signal<number>
   public height!: number
 
   constructor(

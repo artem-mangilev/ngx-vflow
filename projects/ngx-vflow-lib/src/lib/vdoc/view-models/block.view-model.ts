@@ -19,7 +19,7 @@ export enum BlockEvent {
 type BlockEventData = { event: BlockEvent, payload?: unknown }
 
 export abstract class BlockViewModel extends AnyViewModel {
-  public width = 0
+  public width = signal(0)
   public height = 0
   public x = 0
   public y = 0
@@ -84,7 +84,7 @@ export abstract class BlockViewModel extends AnyViewModel {
     ) {
       const parentWidth = getModelWidth(this.parent!)
 
-      x = (parentWidth / 2) - (this.width / 2)
+      x = (parentWidth / 2) - (this.width() / 2)
     } else if (
       // Both horizontal margins are absolute values
       typeof this.styleSheet.marginLeft === 'number' &&
@@ -129,7 +129,7 @@ export abstract class BlockViewModel extends AnyViewModel {
    * Set width for view
    */
   protected calculateWidth() {
-    this.width = getModelWidth(this)
+    this.width.set(getModelWidth(this))
   }
 
   private registerEvents(): Observable<void> {
@@ -225,14 +225,15 @@ function getModelWidth(model: AnyViewModel) {
 
   // TODO move this logic inside loop
   const [root] = chainFromRoot
-  let width = root.width;
+  let width = root.width();
 
   chainFromRoot
     .filter(isBlock)
     .forEach(item => {
       // we know width either from styles
-      if (item.styleSheet.width) {
-        width = item.styleSheet.width
+      // TODO truthy value
+      if (item.styleSheet.width()) {
+        width = item.styleSheet.width()
       } else {
         // or if styles has no width, we compute it from margins
         if (typeof item.styleSheet.marginLeft === 'number') {
@@ -250,7 +251,7 @@ function getModelWidth(model: AnyViewModel) {
 
 export function styleSheetWithDefaults(styles: BlockStyleSheet): Required<BlockStyleSheet> {
   return {
-    width: styles.width ?? 0,
+    width: styles.width ?? signal(0),
     height: styles.height ?? 0,
     marginLeft: styles.marginLeft ?? 0,
     marginRight: styles.marginRight ?? 0,

@@ -9,7 +9,7 @@ import { provideComponent } from '../../utils/provide-component';
   template: `
     <svg:image
       [attr.href]="src"
-      [attr.width]="model.width"
+      [attr.width]="model.width()"
       [attr.height]="model.height"
     ></svg:image>
   `,
@@ -25,7 +25,7 @@ export class VDocImageComponent extends VDocViewComponent<ImageViewModel> implem
 
   @HostBinding('attr.width')
   protected get hostWidth() {
-    return this.model.width
+    return this.model.width()
   }
 
   @HostBinding('attr.height')

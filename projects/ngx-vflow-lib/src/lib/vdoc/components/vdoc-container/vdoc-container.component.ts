@@ -31,7 +31,7 @@ export class VDocContainerComponent extends VDocViewComponent<ContainerViewModel
 
   @HostBinding('attr.width')
   protected get hostWidth() {
-    return this.model.width
+    return this.model.width()
   }
 
   @HostBinding('attr.height')
@@ -97,22 +97,22 @@ export class VDocContainerComponent extends VDocViewComponent<ContainerViewModel
   public ngAfterViewInit(): void {
     this.animationComponent?.begin({ reverseOnceComplete: true })
 
-    classChange(this.hostRef.nativeElement).pipe(
-      tap((classList: string[]) => {
-        for (const [className] of this.styleSheet.onClass!) {
-          // first matched class has higher priority
-          if (classList.includes(className)) {
-            this.model.triggerBlockEvent(BlockEvent.dynamicStyleAdded, className)
+    // classChange(this.hostRef.nativeElement).pipe(
+    //   tap((classList: string[]) => {
+    //     for (const [className] of this.styleSheet.onClass!) {
+    //       // first matched class has higher priority
+    //       if (classList.includes(className)) {
+    //         this.model.triggerBlockEvent(BlockEvent.dynamicStyleAdded, className)
 
-            return
-          }
-        }
+    //         return
+    //       }
+    //     }
 
-        // if there are no added classes, notify that class deleted
-        this.model.triggerBlockEvent(BlockEvent.dynamicStyleDeleted)
+    //     // if there are no added classes, notify that class deleted
+    //     this.model.triggerBlockEvent(BlockEvent.dynamicStyleDeleted)
 
-      })
-    ).subscribe()
+    //   })
+    // ).subscribe()
   }
 
   public ngOnDestroy(): void {

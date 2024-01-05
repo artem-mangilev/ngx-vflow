@@ -65,7 +65,7 @@ export class ContainerViewModel extends BlockViewModel {
 
     // rect width is increased by borderWidth if it applied, so we need decrease
     // it back by this value in order to fit into parent element
-    this.contentWidth = this.width - this.styleSheet.borderWidth
+    this.contentWidth = this.width() - this.styleSheet.borderWidth
   }
 
   protected override calculatePosition(): void {

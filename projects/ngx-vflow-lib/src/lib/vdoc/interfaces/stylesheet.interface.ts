@@ -1,3 +1,4 @@
+import { Signal } from "@angular/core"
 import { Shadow } from "../../shared/interfaces/filter.interface"
 import { Animation } from './animation.interface'
 
@@ -33,7 +34,7 @@ export interface HtmlStyleSheet extends BlockStyleSheet { }
 export interface ImageStyleSheet extends BlockStyleSheet { }
 
 interface WithWidth {
-  width: number
+  width: Signal<number>
 }
 
 interface WithHeight {
