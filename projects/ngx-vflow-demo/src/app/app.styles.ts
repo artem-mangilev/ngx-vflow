@@ -8,8 +8,8 @@ export const styles = {
 
   container: {
     width: signal(180),
-    borderRadius: 5,
-    backgroundColor: '#1E1E1E',
+    borderRadius: signal(5),
+    backgroundColor: signal('#1E1E1E'),
     marginTop: signal(5),
     marginBottom: signal(10),
     boxShadow: signal({

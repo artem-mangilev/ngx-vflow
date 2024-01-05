@@ -80,7 +80,7 @@ function declareStyleStateMachine() {
       isSet: false
     },
     [StylesSource.dynanic]: {
-      fallbackStyle: StylesSource.styleSheet,
+      fallbackStyle: StylesSource.hover,
       isSet: false
     },
     [StylesSource.styleSheet]: {

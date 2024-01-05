@@ -22,10 +22,10 @@ export interface RootStyleSheet extends
   Partial<WithHeight> { }
 
 export interface ContainerStyleSheet extends BlockStyleSheet {
-  backgroundColor?: string
-  borderColor?: string
-  borderRadius?: number
-  borderWidth?: number,
+  backgroundColor?: Signal<string>
+  borderColor?: Signal<string>
+  borderRadius?: Signal<number>
+  borderWidth?: Signal<number>,
   animation?: Animation | Animation[] | null
 }
 

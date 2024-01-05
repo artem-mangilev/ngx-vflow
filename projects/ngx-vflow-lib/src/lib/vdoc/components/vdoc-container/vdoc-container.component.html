@@ -5,10 +5,10 @@
   [attr.height]="model.contentHeight"
   [attr.x]="model.contentX"
   [attr.y]="model.contentY"
-  [attr.rx]="model.borderRadius"
-  [attr.fill]="model.backgroundColor"
-  [attr.stroke]="model.borderColor"
-  [attr.stroke-width]="model.borderWidth"
+  [attr.rx]="model.borderRadius()"
+  [attr.fill]="model.backgroundColor()"
+  [attr.stroke]="model.borderColor()"
+  [attr.stroke-width]="model.borderWidth()"
   [style.filter]="shadowUrl()"
 ></svg:rect>
 

@@ -4,10 +4,10 @@ import { ContainerStyleSheet } from '../../../../../ngx-vflow-lib/src/public-api
 export const styles = {
   button: {
     height: signal(30),
-    borderRadius: 1,
-    borderWidth: 1,
-    borderColor: 'rgb(255, 255, 255)',
-    backgroundColor: 'rgb(255, 0, 115)',
+    borderRadius: signal(1),
+    borderWidth: signal(1),
+    borderColor: signal('rgb(255, 255, 255)'),
+    backgroundColor: signal('rgb(255, 0, 115)'),
 
     // onHover: {
     //   animation: [
@@ -48,7 +48,7 @@ export const styles = {
 
     onClass: [
       ['active', {
-        borderColor: 'rgb(0, 0, 0)',
+        borderColor: signal('rgb(0, 0, 0)'),
       }]
     ]
   } satisfies ContainerStyleSheet,
