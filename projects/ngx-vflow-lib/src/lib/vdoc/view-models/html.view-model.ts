@@ -15,8 +15,6 @@ export class HtmlViewModel extends BlockViewModel {
     this.styleSheet = styleSheetWithDefaults(styleSheet)
 
     this.applyStyles(this.styleSheet)
-
-    super.init()
   }
 
   public applyStyles(styles: HtmlStyleSheet) { }

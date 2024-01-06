@@ -39,8 +39,6 @@ export class ContainerViewModel extends BlockViewModel {
     this.backgroundColor = this.styleSheet.backgroundColor
 
     this.applyStyles(this.styleSheet)
-
-    super.init()
   }
 
   public applyStyles(styles: ContainerStyleSheet): void {
@@ -55,7 +53,7 @@ function styleSheetWithDefaults(styles: ContainerStyleSheet): Required<Container
     borderColor: styles.borderColor ?? signal(''),
     borderWidth: styles.borderWidth ?? signal(0),
     borderRadius: styles.borderRadius ?? signal(0),
-    animation: styles.animation ?? signal([]),
+    animation: styles.animation ?? {},
   }
 }
 

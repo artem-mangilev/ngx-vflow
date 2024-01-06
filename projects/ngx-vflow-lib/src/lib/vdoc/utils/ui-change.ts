@@ -1,9 +1,15 @@
-import { Observable, combineLatest, fromEvent, map, merge, startWith } from "rxjs";
+import { Observable, combineLatest, fromEvent, map, merge, share, shareReplay, startWith } from "rxjs";
 
 export interface UISnapshot {
   classes: Set<string>
 }
 
+/**
+ * observable with all target's changes we need to track
+ *
+ * @param target
+ * @returns
+ */
 export function uiChange$(target: Element): Observable<UISnapshot> {
   return combineLatest([
     classChange$(target),
@@ -14,7 +20,8 @@ export function uiChange$(target: Element): Observable<UISnapshot> {
         return {
           classes: new Set([...classSet, ...hoverSet])
         }
-      })
+      }),
+      shareReplay(1)
     )
 }
 
@@ -24,9 +31,8 @@ const classChange$ = (target: Element) => new Observable<Set<string>>((subscribe
       const isClass = mutation.type === 'attributes' && mutation.attributeName === 'class'
 
       if (isClass) {
-        const classList = Array.from(target.classList)
-        const set = new Set(classList)
-        subscriber.next(set)
+        const classes = new Set(Array.from(target.classList))
+        subscriber.next(classes)
       }
     }
   });

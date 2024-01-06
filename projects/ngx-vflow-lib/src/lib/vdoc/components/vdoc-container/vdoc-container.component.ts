@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, HostBinding, HostListener, Input, OnChanges, OnDestroy, OnInit, Optional, SimpleChanges, SkipSelf, ViewChild, computed, forwardRef, inject } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, HostBinding, HostListener, Input, OnChanges, OnDestroy, OnInit, Optional, QueryList, SimpleChanges, SkipSelf, ViewChild, ViewChildren, computed, forwardRef, inject, runInInjectionContext } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ContainerStyleSheet } from '../../interfaces/stylesheet.interface';
 import { BlockEvent } from '../../view-models/block.view-model';
@@ -8,8 +8,8 @@ import { provideComponent } from '../../utils/provide-component';
 import { FilterService } from '../../../shared/services/filter.service';
 import { uuid } from '../../../shared/utils/uuid';
 import { AnimationGroupComponent } from '../animation-group/animation-group.component';
-import { uiChange$ } from '../../utils/class-change';
-import { tap } from 'rxjs';
+import { uiChange$ } from '../../utils/ui-change';
+import { merge, of, pairwise, switchMap, tap } from 'rxjs';
 
 @Component({
   selector: 'svg[vdoc-container]',
@@ -52,14 +52,8 @@ export class VDocContainerComponent extends VDocViewComponent<ContainerViewModel
     return this.model.filter()
   }
 
-  @ViewChild('animation')
-  private animationComponent?: AnimationGroupComponent
-
-  @ViewChild('hoverAnimation')
-  private hoverAnimationComponent?: AnimationGroupComponent
-
-  @ViewChild('focusAnimation')
-  private focusAnimationComponent?: AnimationGroupComponent
+  @ViewChildren('animation')
+  private animationComponentList!: QueryList<AnimationGroupComponent>
 
   protected shadowUrl = computed(() => {
     const filter = this.model.filter()
@@ -93,46 +87,40 @@ export class VDocContainerComponent extends VDocViewComponent<ContainerViewModel
   }
 
   public ngAfterViewInit(): void {
-    this.animationComponent?.begin({ reverseOnceComplete: true })
+    // handle prop changes
+    this.subscription.add(
+      uiChange$(this.hostRef.nativeElement)
+        .pipe(
+          tap((snapshot) => this.uiSnapshot.set(snapshot))
+        )
+        .subscribe()
+    )
 
-    uiChange$(this.hostRef.nativeElement)
-      .pipe(
-        tap((snapshot) => this.uiSnapshot.set(snapshot)),
-        takeUntilDestroyed()
-      )
-      .subscribe()
+    // to prevent O(n^2) traverse
+    const animationsBySelector = animationGroupHash(this.animationComponentList.toArray())
+    // handle animations
+    this.subscription.add(
+      uiChange$(this.hostRef.nativeElement)
+        .pipe(
+          pairwise(),
+          tap(([oldSnapshot, newSnapshot]) => {
+            // compare new shot and old. if old has no selector that appears in new then we should start animations
+            newSnapshot.classes.forEach(c => {
+              if (!oldSnapshot.classes.has(c)) animationsBySelector[c]?.begin()
+            })
+
+            // on the other hand we check if class is dissapear compared to old snapshot, so it's a sign to run back animation
+            oldSnapshot.classes.forEach(c => {
+              if (!newSnapshot.classes.has(c)) animationsBySelector[c]?.reverse()
+            })
+          }),
+        )
+        .subscribe()
+    )
   }
 
   public ngOnDestroy(): void {
     this.model.destroy()
-  }
-
-  @HostListener('mouseenter')
-  protected onMouseOver() {
-    this.model.triggerBlockEvent(BlockEvent.hoverIn)
-
-    this.hoverAnimationComponent?.begin()
-  }
-
-  @HostListener('mouseleave')
-  protected onMouseOut() {
-    this.model.triggerBlockEvent(BlockEvent.hoverOut)
-
-    this.hoverAnimationComponent?.reverse()
-  }
-
-  @HostListener('focus')
-  protected onFocus() {
-    this.model.triggerBlockEvent(BlockEvent.focusIn)
-
-    this.focusAnimationComponent?.begin()
-  }
-
-  @HostListener('blur')
-  protected onBlur() {
-    this.model.triggerBlockEvent(BlockEvent.focusOut)
-
-    this.focusAnimationComponent?.reverse()
   }
 
   protected modelFactory(): ContainerViewModel {
@@ -156,4 +144,14 @@ export class VDocContainerComponent extends VDocViewComponent<ContainerViewModel
       }
     }
   }
+}
+
+// TODO create general solution in utils
+function animationGroupHash(groups: AnimationGroupComponent[]) {
+  let animationsBySelector: { [selector: string]: AnimationGroupComponent } = {}
+  for (const g of groups) {
+    animationsBySelector[g.selector] = g
+  }
+
+  return animationsBySelector
 }

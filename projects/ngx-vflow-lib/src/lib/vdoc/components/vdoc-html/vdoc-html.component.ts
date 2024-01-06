@@ -14,7 +14,7 @@ import { resizable } from '../../utils/resizable';
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [provideComponent(VDocHtmlComponent)],
 })
-export class VDocHtmlComponent extends VDocViewComponent<HtmlViewModel, HtmlStyleSheet> implements OnInit, OnDestroy {
+export class VDocHtmlComponent extends VDocViewComponent<HtmlViewModel, HtmlStyleSheet> implements OnInit {
   @HostBinding('attr.width')
   protected get hostWidth() {
     return this.model.width()
@@ -43,8 +43,6 @@ export class VDocHtmlComponent extends VDocViewComponent<HtmlViewModel, HtmlStyl
   private host = inject<ElementRef<SVGForeignObjectElement>>(ElementRef)
   private zone = inject(NgZone)
 
-  private subscription = new Subscription()
-
   public override ngOnInit(): void {
     super.ngOnInit()
 
@@ -66,10 +64,6 @@ export class VDocHtmlComponent extends VDocViewComponent<HtmlViewModel, HtmlStyl
         )
         .subscribe()
     )
-  }
-
-  public ngOnDestroy(): void {
-    this.subscription.unsubscribe()
   }
 
   protected modelFactory(): HtmlViewModel {

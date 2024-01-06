@@ -26,7 +26,8 @@ export interface ContainerStyleSheet extends BlockStyleSheet {
   borderColor?: Signal<string>
   borderRadius?: Signal<number>
   borderWidth?: Signal<number>,
-  animation?: Signal<Animation | Animation[]>
+
+  animation?: { [selector: string]: Animation | Animation[] }
 }
 
 export interface HtmlStyleSheet extends BlockStyleSheet { }

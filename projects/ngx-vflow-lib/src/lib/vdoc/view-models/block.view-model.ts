@@ -1,6 +1,5 @@
-import { Observable, Subject, filter, map, merge, of, tap } from "rxjs";
-import { BlockStyleSheet, ContainerStyleSheet } from "../interfaces/stylesheet.interface";
-import { StylePrioritizer, StylesSource } from "../utils/style-prioritizer";
+import { Subject } from "rxjs";
+import { BlockStyleSheet } from "../interfaces/stylesheet.interface";
 import { AnyViewModel } from "./any.view-model";
 import { Shadow } from "../../shared/interfaces/filter.interface";
 import { WritableSignal, signal } from "@angular/core";
@@ -30,15 +29,6 @@ export abstract class BlockViewModel extends AnyViewModel {
   public abstract override styleSheet: Required<BlockStyleSheet>
 
   private _blockEvent$ = new Subject<BlockEventData>()
-  private _prioritizer!: StylePrioritizer
-
-  protected init() {
-    this._prioritizer = new StylePrioritizer(this.styleSheet)
-
-    this._subscription.add(
-      this.registerEvents().subscribe()
-    )
-  }
 
   public abstract applyStyles(styles: BlockStyleSheet): void
 
@@ -129,58 +119,6 @@ export abstract class BlockViewModel extends AnyViewModel {
    */
   protected calculateWidth() {
     this.width.set(getModelWidth(this))
-  }
-
-  private registerEvents(): Observable<void> {
-    const dynamicStyleEvent$ = this._blockEvent$
-      .pipe(
-        filter(({ event }) => [BlockEvent.dynamicStyleAdded, BlockEvent.dynamicStyleDeleted].includes(event)),
-        tap(({ event, payload }) => {
-          if (event === BlockEvent.dynamicStyleAdded) {
-            const activeDynamicStyles = this.styleSheet.onClass.find(([className]) => className === payload)![1]
-
-            this._prioritizer.setDynamicStyle(activeDynamicStyles)
-            this.toggleStyleSheet(StylesSource.dynanic, true, activeDynamicStyles)
-          } else {
-            this._prioritizer.setDynamicStyle(null)
-            this.toggleStyleSheet(StylesSource.dynanic, false, null)
-          }
-        })
-      )
-
-    const hoverEvent$ = this.styleSheet.onHover
-      ? this._blockEvent$
-        .pipe(
-          filter(({ event }) => [BlockEvent.hoverIn, BlockEvent.hoverOut].includes(event)),
-          tap(({ event }) =>
-            this.toggleStyleSheet(StylesSource.hover, event === BlockEvent.hoverIn, this.styleSheet.onHover!)
-          )
-        )
-      : of(null)
-
-    const focusEvent$ = this.styleSheet.onFocus
-      ? this._blockEvent$
-        .pipe(
-          filter(({ event }) => [BlockEvent.focusIn, BlockEvent.focusOut].includes(event)),
-          tap(({ event }) =>
-            this.toggleStyleSheet(StylesSource.focus, event === BlockEvent.focusIn, this.styleSheet.onFocus!)
-          )
-        )
-      : of(null)
-
-    return merge(hoverEvent$, focusEvent$, dynamicStyleEvent$).pipe(
-      map(() => undefined)
-    )
-  }
-
-  private toggleStyleSheet(source: StylesSource, enable: boolean, styles: ContainerStyleSheet | null) {
-    if (enable && styles) {
-      this.applyStyles(styles)
-      this._prioritizer.set(source)
-    } else {
-      this.applyStyles(this._prioritizer.getFallback(source))
-      this._prioritizer.unset(source)
-    }
   }
 }
 

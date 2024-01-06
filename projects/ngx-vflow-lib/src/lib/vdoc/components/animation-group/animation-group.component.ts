@@ -20,6 +20,10 @@ export class AnimationGroupComponent {
   @Input()
   public id!: string;
 
+  // TODO it's a hack for external usage
+  @Input()
+  public selector!: string
+
   @ViewChildren(AnimationComponent)
   protected animationComponents!: AnimationComponent[];
 
