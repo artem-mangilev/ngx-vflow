@@ -6,7 +6,7 @@ import { StyleSheet } from '../../interfaces/stylesheet.interface'
 @Directive()
 export abstract class VDocViewComponent<T extends AnyViewModel = AnyViewModel, U extends StyleSheet = StyleSheet> implements OnInit {
   @Input('styleSheet')
-  public styleSheetFunction!: () => U
+  public styleSheetFunction?: () => U
 
   protected model!: T
 
@@ -21,8 +21,10 @@ export abstract class VDocViewComponent<T extends AnyViewModel = AnyViewModel, U
 
   protected abstract modelFactory(): T
 
+  protected abstract defaultStyleSheet(): U
+
   public ngOnInit(): void {
-    this.styleSheet = this.styleSheetFunction()
+    this.styleSheet = this.styleSheetFunction ? this.styleSheetFunction() : this.defaultStyleSheet()
     this.model = this.createModel();
   }
 

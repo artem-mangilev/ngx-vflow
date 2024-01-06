@@ -1,4 +1,4 @@
-import { AfterContentInit, AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, HostBinding, Input, NgZone, OnInit, forwardRef, inject } from '@angular/core';
+import { AfterContentInit, AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, HostBinding, Input, NgZone, OnInit, forwardRef, inject, signal } from '@angular/core';
 import { VDocTreeBuilderService } from '../../services/vdoc-tree-builder.service';
 import { VDocViewComponent } from '../vdoc-view/vdoc-view.component';
 import { RootViewModel } from '../../view-models/root.view-model';
@@ -47,5 +47,9 @@ export class VDocRootComponent extends VDocViewComponent<RootViewModel, RootStyl
 
   protected modelFactory(): RootViewModel {
     return new RootViewModel(this, this.styleSheet);
+  }
+
+  protected defaultStyleSheet(): RootStyleSheet {
+    return { width: signal(200) }
   }
 }

@@ -75,5 +75,9 @@ export class VDocHtmlComponent extends VDocViewComponent<HtmlViewModel, HtmlStyl
   protected modelFactory(): HtmlViewModel {
     return new HtmlViewModel(this, this.styleSheet)
   }
+
+  protected defaultStyleSheet(): HtmlStyleSheet {
+    return {}
+  }
 }
 

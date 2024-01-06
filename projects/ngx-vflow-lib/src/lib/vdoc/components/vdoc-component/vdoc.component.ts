@@ -44,4 +44,8 @@ export class VDocComponent extends VDocViewComponent<ComponentViewModel, BlockSt
   protected modelFactory(): ComponentViewModel {
     return new ComponentViewModel(this, this.styleSheet)
   }
+
+  protected defaultStyleSheet(): BlockStyleSheet {
+    return {}
+  }
 }

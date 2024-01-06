@@ -146,6 +146,10 @@ export class VDocContainerComponent extends VDocViewComponent<ContainerViewModel
     return new ContainerViewModel(this, this.styleSheet)
   }
 
+  protected defaultStyleSheet(): ContainerStyleSheet {
+    return {}
+  }
+
   private registerShadows() {
     const shadows = [
       this.styleSheet.boxShadow,

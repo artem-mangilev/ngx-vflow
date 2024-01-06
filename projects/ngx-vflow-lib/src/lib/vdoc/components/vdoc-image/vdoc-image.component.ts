@@ -48,4 +48,8 @@ export class VDocImageComponent extends VDocViewComponent<ImageViewModel, ImageS
   protected modelFactory(): ImageViewModel {
     return new ImageViewModel(this, this.styleSheet);
   }
+
+  protected defaultStyleSheet(): ImageStyleSheet {
+    return {}
+  }
 }
