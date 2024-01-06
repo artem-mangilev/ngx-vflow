@@ -9,8 +9,6 @@ export const styles = {
     borderWidth: signal(1),
 
     borderColor: computed(() => {
-      console.log('border')
-
       if (snapshot().classes.has('active') && snapshot().classes.has(':hover')) {
         return 'rgb(255, 255, 0)'
       } else if (snapshot().classes.has('active')) {
@@ -24,7 +22,6 @@ export const styles = {
       snapshot().classes.has(':hover') ? 'rgb(0, 0, 0)' : 'rgb(255, 0, 115)'
     ),
 
-    // TODO fix animatios
     animation: {
       ':hover': [
         {

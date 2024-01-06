@@ -27,6 +27,7 @@ export interface ContainerStyleSheet extends BlockStyleSheet {
   borderRadius?: Signal<number>
   borderWidth?: Signal<number>,
 
+  // it's not a signal, because animation is statically defined and run on selector match
   animation?: { [selector: string]: Animation | Animation[] }
 }
 
