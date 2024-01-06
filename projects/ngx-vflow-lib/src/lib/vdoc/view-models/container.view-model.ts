@@ -1,4 +1,4 @@
-import { computed, signal } from "@angular/core";
+import { Signal, computed, signal } from "@angular/core";
 import { VDocViewComponent } from "../components/vdoc-view/vdoc-view.component";
 import { ContainerStyleSheet } from "../interfaces/stylesheet.interface";
 import { BlockViewModel } from "./block.view-model";
@@ -17,10 +17,10 @@ export class ContainerViewModel extends BlockViewModel {
   public contentX = computed(() => this.styleSheet.borderWidth() / 2)
   public contentY = computed(() => this.styleSheet.borderWidth() / 2)
 
-  public borderRadius = signal(0)
-  public borderColor = signal('')
-  public borderWidth = signal(0)
-  public backgroundColor = signal('')
+  public borderRadius: Signal<number>
+  public borderWidth: Signal<number>
+  public borderColor: Signal<string>
+  public backgroundColor: Signal<string>
 
   public styleSheet: Required<ContainerStyleSheet>;
 
@@ -32,30 +32,18 @@ export class ContainerViewModel extends BlockViewModel {
 
     this.styleSheet = styleSheetWithDefaults(styleSheet)
 
+    // TODO check if I could move it outside constuctor (as computed)
+    this.borderColor = this.styleSheet.borderColor
+    this.borderRadius = this.styleSheet.borderRadius
+    this.borderWidth = this.styleSheet.borderWidth
+    this.backgroundColor = this.styleSheet.backgroundColor
+
     this.applyStyles(this.styleSheet)
 
     super.init()
   }
 
   public applyStyles(styles: ContainerStyleSheet): void {
-    if (styles.borderColor?.()) {
-      this.borderColor.set(styles.borderColor())
-    }
-
-    if (styles.borderRadius?.()) {
-      this.borderRadius.set(styles.borderRadius())
-    }
-
-    if (styles.borderWidth?.()) {
-      this.borderWidth.set(styles.borderWidth())
-
-      // TODO respect parent container (now it overlaps parent container)
-    }
-
-    if (styles.backgroundColor?.()) {
-      this.backgroundColor.set(styles.backgroundColor())
-    }
-
     this.filter.set(styles.boxShadow ? styles.boxShadow() : null)
   }
 }

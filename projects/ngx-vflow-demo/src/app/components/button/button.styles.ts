@@ -1,51 +1,55 @@
-import { signal } from '@angular/core'
+import { Signal, computed, signal } from '@angular/core'
 import { ContainerStyleSheet } from '../../../../../ngx-vflow-lib/src/public-api'
+import { UISnapshot } from 'projects/ngx-vflow-lib/src/lib/vdoc/utils/class-change'
 
 export const styles = {
-  button: () => ({
+  button: (snapshot: Signal<UISnapshot>) => ({
     height: signal(30),
-    borderRadius: signal(1),
+    borderRadius: computed(() => snapshot().classes.has(':hover') ? 5 : 1),
     borderWidth: signal(1),
-    borderColor: signal('rgb(255, 255, 255)'),
-    backgroundColor: signal('rgb(255, 0, 115)'),
+    borderColor: computed(() =>
+      snapshot().classes.has('active') ? 'rgb(255, 255, 255)' : 'rgb(0, 255, 255)'
+    ),
+    backgroundColor: computed(() =>
+      snapshot().classes.has(':hover') ? 'rgb(0, 0, 0)' : 'rgb(255, 0, 115)'
+    ),
 
-    onHover: {
-      animation: signal([
-        {
-          property: 'borderWidth',
-          from: 1,
-          to: 3,
-          duration: 200,
-          animationFunction: 'ease'
-        },
-        {
-          property: 'borderRadius',
-          from: 1,
-          to: 3,
-          duration: 200,
-          animationFunction: 'ease'
-        },
-        {
-          property: 'borderColor',
-          from: 'rgb(255, 255, 255)',
-          to: 'rgb(255, 0, 115)',
-          duration: 200,
-          animationFunction: 'ease'
-        },
-        {
-          property: 'backgroundColor',
-          from: 'rgb(255, 0, 115)',
-          to: 'rgb(0, 0, 0)',
-          duration: 200,
-          animationFunction: 'ease'
-        },
-      ]),
-    },
+    // TODO fix animatios
+    animation: computed(() => {
+      if (snapshot().classes.has(':hover')) {
+        return [
+          {
+            property: 'borderWidth',
+            from: 1,
+            to: 3,
+            duration: 200,
+            animationFunction: 'ease'
+          },
+          {
+            property: 'borderRadius',
+            from: 1,
+            to: 3,
+            duration: 200,
+            animationFunction: 'ease'
+          },
+          {
+            property: 'borderColor',
+            from: 'rgb(255, 255, 255)',
+            to: 'rgb(255, 0, 115)',
+            duration: 200,
+            animationFunction: 'ease'
+          },
+          {
+            property: 'backgroundColor',
+            from: 'rgb(255, 0, 115)',
+            to: 'rgb(0, 0, 0)',
+            duration: 200,
+            animationFunction: 'ease'
+          },
+        ]
+      }
 
-    onClass: [
-      ['active', {
-        borderColor: signal('rgb(0, 0, 0)'),
-      }]
-    ]
+      return []
+    })
   } satisfies ContainerStyleSheet),
 }
