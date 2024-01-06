@@ -16,10 +16,7 @@ import { provideComponent } from '../../utils/provide-component';
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [provideComponent(VDocImageComponent)],
 })
-export class VDocImageComponent extends VDocViewComponent<ImageViewModel> implements OnInit {
-  @Input()
-  public styleSheet: ImageStyleSheet = {}
-
+export class VDocImageComponent extends VDocViewComponent<ImageViewModel, ImageStyleSheet> implements OnInit {
   @Input()
   public src: string = ''
 

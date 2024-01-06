@@ -70,19 +70,19 @@ export class FormComponent extends VDocComponent {
 }
 
 export const styles = {
-  controls: {
+  controls: () => ({
     marginLeft: signal(10),
     marginRight: signal(10),
     marginBottom: signal(10)
-  } satisfies HtmlStyleSheet,
+  } satisfies HtmlStyleSheet),
 
-  header: {
+  header: () => ({
     // marginBottom: 5,
-  } satisfies HtmlStyleSheet,
+  } satisfies HtmlStyleSheet),
 
-  button: {
+  button: () => ({
     marginLeft: signal(10),
     marginRight: signal(10),
     marginBottom: signal(10)
-  } satisfies ContainerStyleSheet
+  })
 }

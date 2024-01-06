@@ -2,11 +2,11 @@ import { signal } from "@angular/core";
 import { ContainerStyleSheet, RootStyleSheet } from "projects/ngx-vflow-lib/src/public-api";
 
 export const styles = {
-  root: {
+  root: () => ({
     width: signal(200)
-  } satisfies RootStyleSheet,
+  } satisfies RootStyleSheet),
 
-  container: {
+  container: () => ({
     width: signal(180),
     borderRadius: signal(5),
     backgroundColor: signal('#1E1E1E'),
@@ -18,5 +18,5 @@ export const styles = {
       blur: 3,
       color: 'rgb(255 0 0 / 0.4)'
     })
-  } satisfies ContainerStyleSheet,
+  } satisfies ContainerStyleSheet),
 }

@@ -14,10 +14,7 @@ import { resizable } from '../../utils/resizable';
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [provideComponent(VDocHtmlComponent)],
 })
-export class VDocHtmlComponent extends VDocViewComponent<HtmlViewModel> implements OnInit, OnDestroy {
-  @Input()
-  public styleSheet: HtmlStyleSheet = {}
-
+export class VDocHtmlComponent extends VDocViewComponent<HtmlViewModel, HtmlStyleSheet> implements OnInit, OnDestroy {
   @HostBinding('attr.width')
   protected get hostWidth() {
     return this.model.width()

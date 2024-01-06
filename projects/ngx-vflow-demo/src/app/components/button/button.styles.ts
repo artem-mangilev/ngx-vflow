@@ -2,7 +2,7 @@ import { signal } from '@angular/core'
 import { ContainerStyleSheet } from '../../../../../ngx-vflow-lib/src/public-api'
 
 export const styles = {
-  button: {
+  button: () => ({
     height: signal(30),
     borderRadius: signal(1),
     borderWidth: signal(1),
@@ -42,14 +42,10 @@ export const styles = {
       ]),
     },
 
-    // onFocus: {
-    //   backgroundColor: '#00FFFF',
-    // },
-
     onClass: [
       ['active', {
         borderColor: signal('rgb(0, 0, 0)'),
       }]
     ]
-  } satisfies ContainerStyleSheet,
+  } satisfies ContainerStyleSheet),
 }

@@ -1,13 +1,10 @@
 import { Directive, HostBinding, Input, OnInit } from "@angular/core";
 import { VDocViewComponent } from "../vdoc-view/vdoc-view.component";
 import { ComponentViewModel } from "../../view-models/component.view-model";
-import { BlockStyleSheet } from "../../interfaces/stylesheet.interface";
+import { BlockStyleSheet, StyleSheet } from "../../interfaces/stylesheet.interface";
 
 @Directive()
-export class VDocComponent extends VDocViewComponent<ComponentViewModel> implements OnInit {
-  @Input()
-  public styleSheet: BlockStyleSheet = {}
-
+export class VDocComponent extends VDocViewComponent<ComponentViewModel, BlockStyleSheet> implements OnInit {
   @HostBinding('attr.width')
   protected get hostWidth() {
     return this.model.width()

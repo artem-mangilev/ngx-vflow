@@ -1,9 +1,13 @@
-import { Directive, OnInit, inject } from "@angular/core";
+import { Directive, Input, OnInit, inject } from "@angular/core";
 import { AnyViewModel } from "../../view-models/any.view-model";
 import { VDocTreeBuilderService } from "../../services/vdoc-tree-builder.service";
+import { StyleSheet } from '../../interfaces/stylesheet.interface'
 
 @Directive()
-export abstract class VDocViewComponent<T extends AnyViewModel = AnyViewModel> implements OnInit {
+export abstract class VDocViewComponent<T extends AnyViewModel = AnyViewModel, U extends StyleSheet = StyleSheet> implements OnInit {
+  @Input('styleSheet')
+  public styleSheetFunction!: () => U
+
   protected model!: T
 
   protected treeManager: VDocTreeBuilderService = inject(VDocTreeBuilderService)
@@ -13,9 +17,12 @@ export abstract class VDocViewComponent<T extends AnyViewModel = AnyViewModel> i
     skipSelf: true
   })
 
+  protected styleSheet!: U
+
   protected abstract modelFactory(): T
 
   public ngOnInit(): void {
+    this.styleSheet = this.styleSheetFunction()
     this.model = this.createModel();
   }
 

@@ -7,8 +7,6 @@ import { provideComponent } from '../../utils/provide-component';
 import { FilterService } from '../../../shared/services/filter.service';
 import { uuid } from '../../../shared/utils/uuid';
 import { AnimationGroupComponent } from '../animation-group/animation-group.component';
-import { classChange } from '../../utils/class-change';
-import { tap } from 'rxjs';
 
 @Component({
   selector: 'svg[vdoc-container]',
@@ -25,10 +23,7 @@ import { tap } from 'rxjs';
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [provideComponent(VDocContainerComponent)]
 })
-export class VDocContainerComponent extends VDocViewComponent<ContainerViewModel> implements OnInit, AfterViewInit, OnDestroy {
-  @Input()
-  public styleSheet!: ContainerStyleSheet
-
+export class VDocContainerComponent extends VDocViewComponent<ContainerViewModel, ContainerStyleSheet> implements OnInit, AfterViewInit, OnDestroy {
   @HostBinding('attr.width')
   protected get hostWidth() {
     return this.model.width()

@@ -28,10 +28,7 @@ import { FilterService } from '../../../shared/services/filter.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [provideComponent(VDocRootComponent), VDocTreeBuilderService],
 })
-export class VDocRootComponent extends VDocViewComponent<RootViewModel> implements AfterContentInit {
-  @Input()
-  public styleSheet!: RootStyleSheet
-
+export class VDocRootComponent extends VDocViewComponent<RootViewModel, RootStyleSheet> implements AfterContentInit {
   @HostBinding('attr.width')
   protected get hostWidth() {
     return this.model.width()
