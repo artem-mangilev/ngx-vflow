@@ -2,7 +2,7 @@ import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, HostBind
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { ContainerStyleSheet } from '../../interfaces/stylesheet.interface';
 import { VDocViewComponent } from '../vdoc-view/vdoc-view.component';
-import { ContainerViewModel } from '../../view-models/container.view-model';
+import { ContainerViewModel } from './container.view-model';
 import { provideComponent } from '../../utils/provide-component';
 import { FilterService } from '../../../shared/services/filter.service';
 import { uuid } from '../../../shared/utils/uuid';

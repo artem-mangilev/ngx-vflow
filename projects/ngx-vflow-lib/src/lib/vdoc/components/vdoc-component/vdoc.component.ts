@@ -1,6 +1,6 @@
 import { Directive, HostBinding, Input, OnInit } from "@angular/core";
 import { VDocViewComponent } from "../vdoc-view/vdoc-view.component";
-import { ComponentViewModel } from "../../view-models/component.view-model";
+import { ComponentViewModel } from "./component.view-model";
 import { BlockStyleSheet, StyleSheet } from "../../interfaces/stylesheet.interface";
 
 @Directive()

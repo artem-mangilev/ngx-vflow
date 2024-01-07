@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, HostBinding, Input, OnInit, Optional, SkipSelf, forwardRef } from '@angular/core';
 import { VDocViewComponent } from '../vdoc-view/vdoc-view.component';
-import { ImageViewModel } from '../../view-models/image.view-model';
+import { ImageViewModel } from './image.view-model';
 import { ImageStyleSheet } from '../../interfaces/stylesheet.interface';
 import { provideComponent } from '../../utils/provide-component';
 

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { VDocViewComponent } from '../components/vdoc-view/vdoc-view.component';
 import { AnyViewModel } from '../view-models/any.view-model';
-import { RootViewModel } from '../view-models/root.view-model';
+import { RootViewModel } from '../components/vdoc-root/root.view-model';
 
 // TODO probably should rename
 @Injectable()

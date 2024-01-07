@@ -1,7 +1,7 @@
 import { AfterContentInit, AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, HostBinding, Input, NgZone, OnInit, forwardRef, inject, signal } from '@angular/core';
 import { VDocTreeBuilderService } from '../../services/vdoc-tree-builder.service';
 import { VDocViewComponent } from '../vdoc-view/vdoc-view.component';
-import { RootViewModel } from '../../view-models/root.view-model';
+import { RootViewModel } from './root.view-model';
 import { RootStyleSheet } from '../../interfaces/stylesheet.interface';
 import { provideComponent } from '../../utils/provide-component';
 import { FilterService } from '../../../shared/services/filter.service';

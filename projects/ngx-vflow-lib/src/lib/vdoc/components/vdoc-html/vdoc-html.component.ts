@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, ElementRef, HostBinding, Input, NgZone, OnDestroy, OnInit, Optional, SkipSelf, forwardRef, inject } from '@angular/core';
 import { VDocViewComponent } from '../vdoc-view/vdoc-view.component';
 import { HtmlStyleSheet } from '../../interfaces/stylesheet.interface';
-import { HtmlViewModel } from '../../view-models/html.view-model';
+import { HtmlViewModel } from './html.view-model';
 import { provideComponent } from '../../utils/provide-component';
 import { Subscription, tap } from 'rxjs';
 import { resizable } from '../../utils/resizable';

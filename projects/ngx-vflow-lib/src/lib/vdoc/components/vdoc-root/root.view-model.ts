@@ -1,7 +1,7 @@
 import { Signal, signal } from "@angular/core";
-import { RootStyleSheet } from "../../../public-api";
-import { AnyViewModel } from "./any.view-model";
-import { BlockViewModel } from "./block.view-model";
+import { RootStyleSheet } from "../../../../public-api";
+import { AnyViewModel } from "../../view-models/any.view-model";
+import { BlockViewModel } from "../../view-models/block.view-model";
 
 export class RootViewModel extends AnyViewModel {
   public width = signal(0)

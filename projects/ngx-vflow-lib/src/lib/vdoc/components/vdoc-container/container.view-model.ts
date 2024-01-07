@@ -1,8 +1,8 @@
 import { Signal, ViewContainerRef, computed, effect, inject, signal } from "@angular/core";
-import { VDocViewComponent } from "../components/vdoc-view/vdoc-view.component";
-import { ContainerStyleSheet } from "../interfaces/stylesheet.interface";
-import { BlockViewModel } from "./block.view-model";
-import { styleSheetWithDefaults as blockStyleSheetWithDefaults } from "./block.view-model";
+import { VDocViewComponent } from "../vdoc-view/vdoc-view.component";
+import { ContainerStyleSheet } from "../../interfaces/stylesheet.interface";
+import { BlockViewModel } from "../../view-models/block.view-model";
+import { styleSheetWithDefaults as blockStyleSheetWithDefaults } from "../../view-models/block.view-model";
 
 export class ContainerViewModel extends BlockViewModel {
   // rect height is increased by borderWidth if it applied, so we need decrease
