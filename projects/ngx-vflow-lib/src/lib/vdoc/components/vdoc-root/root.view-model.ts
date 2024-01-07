@@ -1,10 +1,10 @@
-import { Signal, signal } from "@angular/core";
+import { Signal, computed, signal } from "@angular/core";
 import { RootStyleSheet } from "../../../../public-api";
 import { AnyViewModel } from "../../view-models/any.view-model";
 import { BlockViewModel } from "../../view-models/block.view-model";
 
 export class RootViewModel extends AnyViewModel {
-  public width = signal(0)
+  public width = computed(() => this.styleSheet.width())
   public height = signal(0)
 
   public readonly styleSheet: Required<RootStyleSheet>
@@ -18,13 +18,9 @@ export class RootViewModel extends AnyViewModel {
   public calculateLayout(): void {
     this.children.forEach(c => c.calculateLayout())
 
-    this.setWidth()
     this.setHeight()
   }
 
-  private setWidth() {
-    this.width.set(this.styleSheet.width())
-  }
 
   /**
    * Set height fot root view

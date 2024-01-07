@@ -57,9 +57,7 @@ export class VDocContainerComponent extends VDocViewComponent<ContainerViewModel
   protected shadowUrl = computed(() => {
     const filter = this.model.filter()
     if (filter) {
-      const shadowIdSignal = this.filterService.getShadowId(filter)
-
-      return `url(#${shadowIdSignal()})`
+      return `url(#${this.filterService.getShadowId(filter)})`
     }
 
     return null

@@ -39,11 +39,9 @@ export class FilterService {
   }
 
   getShadowId(shadow: Shadow) {
-    return computed(() => {
-      const hash = shadowHash(shadow)
+    const hash = shadowHash(shadow)
 
-      return this.shadows().has(hash) ? hash : null
-    })
+    return this.shadows().has(hash) ? hash : null
   }
 }
 
