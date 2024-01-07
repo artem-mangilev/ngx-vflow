@@ -9,12 +9,7 @@ export interface BlockStyleSheet extends
   Partial<WithWidth>,
   Partial<WithHeight>,
   Partial<WithMargin>,
-  Partial<WithShadow> {
-  onHover?: this | null
-  onFocus?: this | null
-  // 0 field is className
-  onClass?: [string, this][]
-}
+  Partial<WithShadow> { }
 
 export interface RootStyleSheet extends
   StyleSheet,

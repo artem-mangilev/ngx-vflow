@@ -83,7 +83,7 @@ export class VDocContainerComponent extends VDocViewComponent<ContainerViewModel
   public override ngOnInit(): void {
     super.ngOnInit()
 
-    this.registerShadows()
+    this.registerShadow()
   }
 
   public ngAfterViewInit(): void {
@@ -131,17 +131,10 @@ export class VDocContainerComponent extends VDocViewComponent<ContainerViewModel
     return {}
   }
 
-  private registerShadows() {
-    const shadows = [
-      this.styleSheet.boxShadow,
-      this.styleSheet.onHover?.boxShadow,
-      this.styleSheet.onFocus?.boxShadow,
-    ]
-
-    for (const shadow of shadows) {
-      if (shadow && shadow()) {
-        this.filterService.addShadow(shadow()!)
-      }
+  private registerShadow() {
+    const shadow = this.styleSheet.boxShadow
+    if (shadow && shadow()) {
+      this.filterService.addShadow(shadow()!)
     }
   }
 }

@@ -195,8 +195,5 @@ export function styleSheetWithDefaults(styles: BlockStyleSheet): Required<BlockS
     marginBottom: styles.marginBottom ?? signal(0),
     marginTop: styles.marginTop ?? signal(0),
     boxShadow: styles.boxShadow ?? signal(null),
-    onHover: styles.onHover ?? null,
-    onFocus: styles.onFocus ?? null,
-    onClass: styles.onClass ?? []
   }
 }
