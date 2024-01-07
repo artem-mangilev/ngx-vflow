@@ -1,10 +1,22 @@
-import { Directive, OnInit, inject } from "@angular/core";
+import { ChangeDetectorRef, Directive, Injector, Input, OnInit, Signal, ViewRef, inject, runInInjectionContext, signal } from "@angular/core";
 import { AnyViewModel } from "../../view-models/any.view-model";
 import { VDocTreeBuilderService } from "../../services/vdoc-tree-builder.service";
+import { StyleSheet } from '../../interfaces/stylesheet.interface'
+import { Subscription } from "rxjs";
+import { UISnapshot } from "../../interfaces/ui-snapshot.interface";
 
 @Directive()
-export abstract class VDocViewComponent<T extends AnyViewModel = AnyViewModel> implements OnInit {
+export abstract class VDocViewComponent<T extends AnyViewModel = AnyViewModel, U extends StyleSheet = StyleSheet> implements OnInit {
+  @Input('styleSheet')
+  public styleSheetFunction?: (snapshot: Signal<UISnapshot>) => U
+
   protected model!: T
+
+  protected styleSheet!: U
+
+  protected uiSnapshot = signal<UISnapshot>({ classes: new Set() })
+
+  protected subscription = new Subscription()
 
   protected treeManager: VDocTreeBuilderService = inject(VDocTreeBuilderService)
 
@@ -13,10 +25,24 @@ export abstract class VDocViewComponent<T extends AnyViewModel = AnyViewModel> i
     skipSelf: true
   })
 
+  protected viewRef = inject(ChangeDetectorRef) as ViewRef
+
+  protected injector = inject(Injector)
+
   protected abstract modelFactory(): T
 
+  protected abstract defaultStyleSheet(): U
+
   public ngOnInit(): void {
-    this.model = this.createModel();
+    this.styleSheet = this.styleSheetFunction
+      ? this.styleSheetFunction(this.uiSnapshot)
+      : this.defaultStyleSheet()
+
+    runInInjectionContext(this.injector, () => {
+      this.model = this.createModel()
+    })
+
+    this.viewRef.onDestroy(() => this.subscription.unsubscribe())
   }
 
   protected createModel(): T {

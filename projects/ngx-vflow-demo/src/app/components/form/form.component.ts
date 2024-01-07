@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, signal } from '@angular/core';
 import { ContainerStyleSheet, HtmlStyleSheet, VDocComponent, provideComponent } from 'projects/ngx-vflow-lib/src/public-api';
 
 @Component({
@@ -70,19 +70,19 @@ export class FormComponent extends VDocComponent {
 }
 
 export const styles = {
-  controls: {
-    marginLeft: 10,
-    marginRight: 10,
-    marginBottom: 10
-  } satisfies HtmlStyleSheet,
+  controls: () => ({
+    marginLeft: signal(10),
+    marginRight: signal(10),
+    marginBottom: signal(10)
+  } satisfies HtmlStyleSheet),
 
-  header: {
+  header: () => ({
     // marginBottom: 5,
-  } satisfies HtmlStyleSheet,
+  } satisfies HtmlStyleSheet),
 
-  button: {
-    marginLeft: 10,
-    marginRight: 10,
-    marginBottom: 10
-  } satisfies ContainerStyleSheet
+  button: () => ({
+    marginLeft: signal(10),
+    marginRight: signal(10),
+    marginBottom: signal(10)
+  })
 }

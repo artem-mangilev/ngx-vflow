@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, ElementRef, HostBinding, Input, NgZone, OnDestroy, OnInit, Optional, SkipSelf, forwardRef, inject } from '@angular/core';
 import { VDocViewComponent } from '../vdoc-view/vdoc-view.component';
 import { HtmlStyleSheet } from '../../interfaces/stylesheet.interface';
-import { HtmlViewModel } from '../../view-models/html.view-model';
+import { HtmlViewModel } from './html.view-model';
 import { provideComponent } from '../../utils/provide-component';
 import { Subscription, tap } from 'rxjs';
 import { resizable } from '../../utils/resizable';
@@ -9,46 +9,39 @@ import { resizable } from '../../utils/resizable';
 @Component({
   selector: 'foreignObject[vdoc-html]',
   template: `
-    <ng-container *ngLet="model.viewUpdate$ | async">
-      <ng-content></ng-content>
-    </ng-container>
+    <ng-content></ng-content>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [provideComponent(VDocHtmlComponent)],
 })
-export class VDocHtmlComponent extends VDocViewComponent<HtmlViewModel> implements OnInit, OnDestroy {
-  @Input()
-  public styleSheet: HtmlStyleSheet = {}
-
+export class VDocHtmlComponent extends VDocViewComponent<HtmlViewModel, HtmlStyleSheet> implements OnInit {
   @HostBinding('attr.width')
   protected get hostWidth() {
-    return this.model.width
+    return this.model.width()
   }
 
   @HostBinding('attr.height')
   protected get hostHeight() {
-    return this.model.height
+    return this.model.height()
   }
 
   @HostBinding('attr.x')
   protected get hostX() {
-    return this.model.x
+    return this.model.x()
   }
 
   @HostBinding('attr.y')
   protected get hostY() {
-    return this.model.y
+    return this.model.y()
   }
 
   @HostBinding('style.filter')
   protected get filterStyle() {
-    return this.model.filter
+    return this.model.filter()
   }
 
   private host = inject<ElementRef<SVGForeignObjectElement>>(ElementRef)
   private zone = inject(NgZone)
-
-  private subscription = new Subscription()
 
   public override ngOnInit(): void {
     super.ngOnInit()
@@ -73,12 +66,12 @@ export class VDocHtmlComponent extends VDocViewComponent<HtmlViewModel> implemen
     )
   }
 
-  public ngOnDestroy(): void {
-    this.subscription.unsubscribe()
+  protected modelFactory(): HtmlViewModel {
+    return new HtmlViewModel(this.styleSheet)
   }
 
-  protected modelFactory(): HtmlViewModel {
-    return new HtmlViewModel(this, this.styleSheet)
+  protected defaultStyleSheet(): HtmlStyleSheet {
+    return {}
   }
 }
 
