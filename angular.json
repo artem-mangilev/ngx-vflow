@@ -48,7 +48,7 @@
       "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:browser",
+          "builder": "@ng-doc/builder:browser",
           "options": {
             "outputPath": "dist/ngx-vflow-demo",
             "index": "projects/ngx-vflow-demo/src/index.html",
@@ -60,10 +60,26 @@
             "inlineStyleLanguage": "scss",
             "assets": [
               "projects/ngx-vflow-demo/src/favicon.ico",
-              "projects/ngx-vflow-demo/src/assets"
+              "projects/ngx-vflow-demo/src/assets",
+              {
+                "glob": "**/*",
+                "input": "node_modules/@ng-doc/ui-kit/assets",
+                "output": "assets/ng-doc/ui-kit"
+              },
+              {
+                "glob": "**/*",
+                "input": "node_modules/@ng-doc/app/assets",
+                "output": "assets/ng-doc/app"
+              },
+              {
+                "glob": "**/*",
+                "input": ".ng-doc/ngx-vflow-demo/assets",
+                "output": "assets/ng-doc"
+              }
             ],
             "styles": [
-              "projects/ngx-vflow-demo/src/styles.scss"
+              "projects/ngx-vflow-demo/src/styles.scss",
+              "node_modules/@ng-doc/app/styles/global.css"
             ],
             "scripts": []
           },
@@ -95,7 +111,7 @@
           "defaultConfiguration": "production"
         },
         "serve": {
-          "builder": "@angular-devkit/build-angular:dev-server",
+          "builder": "@ng-doc/builder:dev-server",
           "configurations": {
             "production": {
               "browserTarget": "ngx-vflow-demo:build:production"
