@@ -15,6 +15,4 @@ export class ComponentViewModel extends BlockViewModel {
 
     this.styleSheet = blockStyleSheetWithDefaults(styleSheet)
   }
-
-  public applyStyles(styles: BlockStyleSheet): void { }
 }

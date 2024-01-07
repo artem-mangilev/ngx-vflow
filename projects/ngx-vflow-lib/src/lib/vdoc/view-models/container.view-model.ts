@@ -1,8 +1,9 @@
-import { Signal, computed, signal } from "@angular/core";
+import { Signal, ViewContainerRef, computed, effect, inject, signal } from "@angular/core";
 import { VDocViewComponent } from "../components/vdoc-view/vdoc-view.component";
 import { ContainerStyleSheet } from "../interfaces/stylesheet.interface";
 import { BlockViewModel } from "./block.view-model";
 import { styleSheetWithDefaults as blockStyleSheetWithDefaults } from "./block.view-model";
+import { FilterService } from "../../shared/services/filter.service";
 
 export class ContainerViewModel extends BlockViewModel {
   // rect height is increased by borderWidth if it applied, so we need decrease
@@ -22,11 +23,11 @@ export class ContainerViewModel extends BlockViewModel {
   public borderColor: Signal<string>
   public backgroundColor: Signal<string>
 
-  public styleSheet: Required<ContainerStyleSheet>;
+  public styleSheet: Required<ContainerStyleSheet>
 
   constructor(
     public component: VDocViewComponent,
-    styleSheet: ContainerStyleSheet
+    styleSheet: ContainerStyleSheet,
   ) {
     super();
 
@@ -37,12 +38,7 @@ export class ContainerViewModel extends BlockViewModel {
     this.borderRadius = this.styleSheet.borderRadius
     this.borderWidth = this.styleSheet.borderWidth
     this.backgroundColor = this.styleSheet.backgroundColor
-
-    this.applyStyles(this.styleSheet)
-  }
-
-  public applyStyles(styles: ContainerStyleSheet): void {
-    this.filter.set(styles.boxShadow ? styles.boxShadow() : null)
+    this.filter = this.styleSheet.boxShadow
   }
 }
 

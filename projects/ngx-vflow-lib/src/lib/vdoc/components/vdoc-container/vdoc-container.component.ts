@@ -1,5 +1,5 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, HostBinding, HostListener, Input, OnChanges, OnDestroy, OnInit, Optional, QueryList, SimpleChanges, SkipSelf, ViewChild, ViewChildren, computed, forwardRef, inject, runInInjectionContext } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, HostBinding, HostListener, Injector, Input, OnChanges, OnDestroy, OnInit, Optional, QueryList, SimpleChanges, SkipSelf, ViewChild, ViewChildren, computed, forwardRef, inject, runInInjectionContext } from '@angular/core';
+import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { ContainerStyleSheet } from '../../interfaces/stylesheet.interface';
 import { BlockEvent } from '../../view-models/block.view-model';
 import { VDocViewComponent } from '../vdoc-view/vdoc-view.component';
@@ -132,10 +132,24 @@ export class VDocContainerComponent extends VDocViewComponent<ContainerViewModel
   }
 
   private registerShadow() {
-    const shadow = this.styleSheet.boxShadow
-    if (shadow && shadow()) {
-      this.filterService.addShadow(shadow()!)
-    }
+    // TODO try to create decorator for runInInjectionContext
+    runInInjectionContext(this.injector, () =>
+      toObservable(this.model.filter)
+        .pipe(
+          pairwise(),
+          tap(([oldShadow, newShadow]) => {
+            if (newShadow && !oldShadow) {
+              this.filterService.addShadow(newShadow)
+            }
+
+            if (!newShadow && oldShadow) {
+              this.filterService.deleteShadow(oldShadow)
+            }
+          }),
+          takeUntilDestroyed()
+        )
+        .subscribe()
+    )
   }
 }
 

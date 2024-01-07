@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Directive, Input, OnInit, Signal, ViewRef, inject, signal } from "@angular/core";
+import { ChangeDetectorRef, Directive, Injector, Input, OnInit, Signal, ViewRef, inject, runInInjectionContext, signal } from "@angular/core";
 import { AnyViewModel } from "../../view-models/any.view-model";
 import { VDocTreeBuilderService } from "../../services/vdoc-tree-builder.service";
 import { StyleSheet } from '../../interfaces/stylesheet.interface'
@@ -12,6 +12,12 @@ export abstract class VDocViewComponent<T extends AnyViewModel = AnyViewModel, U
 
   protected model!: T
 
+  protected styleSheet!: U
+
+  protected uiSnapshot = signal<UISnapshot>({ classes: new Set() })
+
+  protected subscription = new Subscription()
+
   protected treeManager: VDocTreeBuilderService = inject(VDocTreeBuilderService)
 
   protected parent: VDocViewComponent | null = inject(VDocViewComponent, {
@@ -19,13 +25,9 @@ export abstract class VDocViewComponent<T extends AnyViewModel = AnyViewModel, U
     skipSelf: true
   })
 
-  protected styleSheet!: U
-
-  protected uiSnapshot = signal<UISnapshot>({ classes: new Set() })
-
-  protected subscription = new Subscription()
-
   protected viewRef = inject(ChangeDetectorRef) as ViewRef
+
+  protected injector = inject(Injector)
 
   protected abstract modelFactory(): T
 
@@ -36,7 +38,9 @@ export abstract class VDocViewComponent<T extends AnyViewModel = AnyViewModel, U
       ? this.styleSheetFunction(this.uiSnapshot)
       : this.defaultStyleSheet()
 
-    this.model = this.createModel();
+    runInInjectionContext(this.injector, () => {
+      this.model = this.createModel()
+    })
 
     this.viewRef.onDestroy(() => this.subscription.unsubscribe())
   }

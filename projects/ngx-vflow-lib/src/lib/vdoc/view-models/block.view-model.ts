@@ -2,7 +2,7 @@ import { Subject } from "rxjs";
 import { BlockStyleSheet } from "../interfaces/stylesheet.interface";
 import { AnyViewModel } from "./any.view-model";
 import { Shadow } from "../../shared/interfaces/filter.interface";
-import { WritableSignal, signal } from "@angular/core";
+import { Signal, WritableSignal, signal } from "@angular/core";
 
 export enum BlockEvent {
   hoverIn,
@@ -24,13 +24,11 @@ export abstract class BlockViewModel extends AnyViewModel {
   public y = signal(0)
 
   // TODO provide some default value
-  public filter = signal<Shadow | null>(null);
+  public filter = signal<Shadow | null>(null).asReadonly()
 
   public abstract override styleSheet: Required<BlockStyleSheet>
 
   private _blockEvent$ = new Subject<BlockEventData>()
-
-  public abstract applyStyles(styles: BlockStyleSheet): void
 
   public triggerBlockEvent(event: BlockEvent, payload?: unknown) {
     this._blockEvent$.next({ event, payload })
