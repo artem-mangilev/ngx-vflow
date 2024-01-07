@@ -31,8 +31,6 @@ export class ContainerViewModel extends BlockViewModel {
     super();
 
     this.styleSheet = styleSheetWithDefaults(styleSheet)
-
-    this.filter = this.styleSheet.boxShadow
   }
 }
 

@@ -2,7 +2,7 @@ import { Subject } from "rxjs";
 import { BlockStyleSheet } from "../interfaces/stylesheet.interface";
 import { AnyViewModel } from "./any.view-model";
 import { Shadow } from "../../shared/interfaces/filter.interface";
-import { Signal, WritableSignal, signal } from "@angular/core";
+import { Signal, WritableSignal, computed, signal } from "@angular/core";
 
 export abstract class BlockViewModel extends AnyViewModel {
   public width = signal(0)
@@ -10,8 +10,7 @@ export abstract class BlockViewModel extends AnyViewModel {
   public x = signal(0)
   public y = signal(0)
 
-  // TODO provide some default value
-  public filter = signal<Shadow | null>(null).asReadonly()
+  public filter = computed(() => this.styleSheet.boxShadow())
 
   public abstract override styleSheet: Required<BlockStyleSheet>
 
