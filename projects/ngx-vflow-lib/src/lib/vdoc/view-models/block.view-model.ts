@@ -4,19 +4,6 @@ import { AnyViewModel } from "./any.view-model";
 import { Shadow } from "../../shared/interfaces/filter.interface";
 import { Signal, WritableSignal, signal } from "@angular/core";
 
-export enum BlockEvent {
-  hoverIn,
-  hoverOut,
-
-  focusIn,
-  focusOut,
-
-  dynamicStyleAdded,
-  dynamicStyleDeleted
-}
-
-type BlockEventData = { event: BlockEvent, payload?: unknown }
-
 export abstract class BlockViewModel extends AnyViewModel {
   public width = signal(0)
   public height = signal(0)
@@ -27,12 +14,6 @@ export abstract class BlockViewModel extends AnyViewModel {
   public filter = signal<Shadow | null>(null).asReadonly()
 
   public abstract override styleSheet: Required<BlockStyleSheet>
-
-  private _blockEvent$ = new Subject<BlockEventData>()
-
-  public triggerBlockEvent(event: BlockEvent, payload?: unknown) {
-    this._blockEvent$.next({ event, payload })
-  }
 
   calculateLayout() {
     // we need to know layout of children before we compute parent layout

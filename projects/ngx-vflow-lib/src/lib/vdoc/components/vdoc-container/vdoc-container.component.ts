@@ -1,7 +1,6 @@
 import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, HostBinding, HostListener, Injector, Input, OnChanges, OnDestroy, OnInit, Optional, QueryList, SimpleChanges, SkipSelf, ViewChild, ViewChildren, computed, forwardRef, inject, runInInjectionContext } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { ContainerStyleSheet } from '../../interfaces/stylesheet.interface';
-import { BlockEvent } from '../../view-models/block.view-model';
 import { VDocViewComponent } from '../vdoc-view/vdoc-view.component';
 import { ContainerViewModel } from '../../view-models/container.view-model';
 import { provideComponent } from '../../utils/provide-component';
