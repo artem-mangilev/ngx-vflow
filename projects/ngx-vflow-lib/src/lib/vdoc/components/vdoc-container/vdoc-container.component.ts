@@ -7,8 +7,8 @@ import { provideComponent } from '../../utils/provide-component';
 import { FilterService } from '../../../shared/services/filter.service';
 import { uuid } from '../../../shared/utils/uuid';
 import { AnimationGroupComponent } from '../animation-group/animation-group.component';
-import { uiChange$ } from '../../utils/ui-change';
-import { merge, of, pairwise, switchMap, tap } from 'rxjs';
+import { uiChanges$ } from '../../utils/ui-changes';
+import { pairwise, tap } from 'rxjs';
 
 @Component({
   selector: 'svg[vdoc-container]',
@@ -84,20 +84,24 @@ export class VDocContainerComponent extends VDocViewComponent<ContainerViewModel
   }
 
   public ngAfterViewInit(): void {
+    const changes$ = uiChanges$(this.hostRef.nativeElement)
+
     // handle prop changes
-    this.subscription.add(
-      uiChange$(this.hostRef.nativeElement)
+    runInInjectionContext(this.injector, () =>
+      changes$
         .pipe(
-          tap((snapshot) => this.uiSnapshot.set(snapshot))
+          tap((snapshot) => this.uiSnapshot.set(snapshot)),
+          takeUntilDestroyed()
         )
         .subscribe()
     )
 
     // to prevent O(n^2) traverse
     const animationsBySelector = animationGroupHash(this.animationComponentList.toArray())
+
     // handle animations
-    this.subscription.add(
-      uiChange$(this.hostRef.nativeElement)
+    runInInjectionContext(this.injector, () =>
+      changes$
         .pipe(
           pairwise(),
           tap(([oldSnapshot, newSnapshot]) => {
@@ -111,6 +115,7 @@ export class VDocContainerComponent extends VDocViewComponent<ContainerViewModel
               if (!newSnapshot.classes.has(c)) animationsBySelector[c]?.reverse()
             })
           }),
+          takeUntilDestroyed()
         )
         .subscribe()
     )

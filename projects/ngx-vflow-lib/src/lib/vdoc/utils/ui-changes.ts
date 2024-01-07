@@ -7,7 +7,7 @@ import { UISnapshot } from "../interfaces/ui-snapshot.interface";
  * @param target
  * @returns
  */
-export function uiChange$(target: Element): Observable<UISnapshot> {
+export function uiChanges$(target: Element): Observable<UISnapshot> {
   return combineLatest([
     classChange$(target),
     hover$(target)
