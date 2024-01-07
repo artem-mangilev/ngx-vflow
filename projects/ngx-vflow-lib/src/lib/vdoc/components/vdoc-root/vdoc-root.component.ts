@@ -1,4 +1,4 @@
-import { AfterContentInit, AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, HostBinding, Input, NgZone, OnInit, forwardRef, inject, signal } from '@angular/core';
+import { AfterContentInit, AfterViewChecked, AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, HostBinding, Input, NgZone, OnInit, forwardRef, inject, signal } from '@angular/core';
 import { VDocTreeBuilderService } from '../../services/vdoc-tree-builder.service';
 import { VDocViewComponent } from '../vdoc-view/vdoc-view.component';
 import { RootViewModel } from './root.view-model';
@@ -28,7 +28,7 @@ import { FilterService } from '../../../shared/services/filter.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [provideComponent(VDocRootComponent), VDocTreeBuilderService],
 })
-export class VDocRootComponent extends VDocViewComponent<RootViewModel, RootStyleSheet> implements AfterContentInit {
+export class VDocRootComponent extends VDocViewComponent<RootViewModel, RootStyleSheet> implements AfterContentInit, AfterViewChecked {
   @HostBinding('attr.width')
   protected get hostWidth() {
     return this.model.width()
@@ -41,8 +41,15 @@ export class VDocRootComponent extends VDocViewComponent<RootViewModel, RootStyl
 
   protected filterService = inject(FilterService)
 
-  ngAfterContentInit(): void {
+  public ngAfterContentInit(): void {
     this.treeManager.root?.calculateLayout()
+  }
+
+  /**
+   * @todo research how to remove this manual cdr call
+   */
+  public ngAfterViewChecked(): void {
+    this.viewRef.detectChanges()
   }
 
   protected modelFactory(): RootViewModel {
