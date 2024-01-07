@@ -22,6 +22,19 @@ export const styles = {
       snapshot().classes.has(':hover') ? 'rgb(0, 0, 0)' : 'rgb(255, 0, 115)'
     ),
 
+    boxShadow: computed(() => {
+      if (snapshot().classes.has(':hover')) {
+        return {
+          hOffset: 3,
+          vOffset: 5,
+          blur: 3,
+          color: 'rgb(255 0 0 / 0.4)'
+        }
+      }
+
+      return null
+    }),
+
     animation: {
       ':hover': [
         {

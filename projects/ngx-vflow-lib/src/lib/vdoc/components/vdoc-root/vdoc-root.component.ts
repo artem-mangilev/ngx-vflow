@@ -11,7 +11,7 @@ import { FilterService } from '../../../shared/services/filter.service';
   template: `
     <!-- TODO move filter in new component -->
     <svg:filter
-      *ngFor="let shadow of filterService.shadows() | keyvalue"
+      *ngFor="let shadow of filterService.shadows() | keyvalue; trackBy: trackByShadowHash"
       [id]="shadow.key"
       color-interpolation-filters="sRGB"
       filterUnits="userSpaceOnUse">
@@ -51,5 +51,9 @@ export class VDocRootComponent extends VDocViewComponent<RootViewModel, RootStyl
 
   protected defaultStyleSheet(): RootStyleSheet {
     return { width: signal(200) }
+  }
+
+  protected trackByShadowHash(_: number, { key }: { key: number }) {
+    return key
   }
 }

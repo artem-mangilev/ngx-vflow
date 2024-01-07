@@ -6,15 +6,33 @@ import { hashCode } from '../utils/hash';
 export class FilterService {
   public readonly shadows = signal(new Map<number, Shadow>())
 
+  /**
+   * map of shadows to number of its usages in format [hashOfShadow, countOfShadowUsages]
+   */
+  private refs = new Map<number, number>()
+
   addShadow(shadow: Shadow) {
-    this.shadows.update((shadows) =>
-      shadows.set(shadowHash(shadow), shadow)
-    )
+    this.shadows.update((shadows) => {
+      const hash = shadowHash(shadow)
+
+      // increase ref count for this shadow
+      this.refs.set(hash, (this.refs.get(hash) ?? 0) + 1)
+
+      return shadows.set(hash, shadow)
+    })
   }
 
   deleteShadow(shadow: Shadow) {
     this.shadows.update((shadows) => {
-      shadows.delete(shadowHash(shadow));
+      const hash = shadowHash(shadow)
+
+      // decrease ref count for this shadow
+      this.refs.set(hash, (this.refs.get(hash) ?? 0) - 1)
+
+      // if there are no refs, delete this shadow
+      if (this.refs.get(hash)! <= 0) {
+        shadows.delete(hash)
+      }
 
       return shadows
     })
