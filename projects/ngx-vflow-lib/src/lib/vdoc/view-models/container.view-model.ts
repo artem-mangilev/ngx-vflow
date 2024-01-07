@@ -3,7 +3,6 @@ import { VDocViewComponent } from "../components/vdoc-view/vdoc-view.component";
 import { ContainerStyleSheet } from "../interfaces/stylesheet.interface";
 import { BlockViewModel } from "./block.view-model";
 import { styleSheetWithDefaults as blockStyleSheetWithDefaults } from "./block.view-model";
-import { FilterService } from "../../shared/services/filter.service";
 
 export class ContainerViewModel extends BlockViewModel {
   // rect height is increased by borderWidth if it applied, so we need decrease
@@ -18,10 +17,10 @@ export class ContainerViewModel extends BlockViewModel {
   public contentX = computed(() => this.styleSheet.borderWidth() / 2)
   public contentY = computed(() => this.styleSheet.borderWidth() / 2)
 
-  public borderRadius: Signal<number>
-  public borderWidth: Signal<number>
-  public borderColor: Signal<string>
-  public backgroundColor: Signal<string>
+  public borderRadius = computed(() => this.styleSheet.borderRadius())
+  public borderWidth = computed(() => this.styleSheet.borderWidth())
+  public borderColor = computed(() => this.styleSheet.borderColor())
+  public backgroundColor = computed(() => this.styleSheet.backgroundColor())
 
   public styleSheet: Required<ContainerStyleSheet>
 
@@ -33,11 +32,6 @@ export class ContainerViewModel extends BlockViewModel {
 
     this.styleSheet = styleSheetWithDefaults(styleSheet)
 
-    // TODO check if I could move it outside constuctor (as computed)
-    this.borderColor = this.styleSheet.borderColor
-    this.borderRadius = this.styleSheet.borderRadius
-    this.borderWidth = this.styleSheet.borderWidth
-    this.backgroundColor = this.styleSheet.backgroundColor
     this.filter = this.styleSheet.boxShadow
   }
 }
