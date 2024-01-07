@@ -46,7 +46,7 @@ export class VDocRootComponent extends VDocViewComponent<RootViewModel, RootStyl
   }
 
   protected modelFactory(): RootViewModel {
-    return new RootViewModel(this, this.styleSheet);
+    return new RootViewModel(this.styleSheet)
   }
 
   protected defaultStyleSheet(): RootStyleSheet {

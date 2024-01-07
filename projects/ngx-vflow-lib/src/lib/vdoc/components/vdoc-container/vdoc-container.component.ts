@@ -123,7 +123,7 @@ export class VDocContainerComponent extends VDocViewComponent<ContainerViewModel
   }
 
   protected modelFactory(): ContainerViewModel {
-    return new ContainerViewModel(this, this.styleSheet)
+    return new ContainerViewModel(this.styleSheet)
   }
 
   protected defaultStyleSheet(): ContainerStyleSheet {

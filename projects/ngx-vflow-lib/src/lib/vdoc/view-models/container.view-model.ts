@@ -24,11 +24,8 @@ export class ContainerViewModel extends BlockViewModel {
 
   public styleSheet: Required<ContainerStyleSheet>
 
-  constructor(
-    public component: VDocViewComponent,
-    styleSheet: ContainerStyleSheet,
-  ) {
-    super();
+  constructor(styleSheet: ContainerStyleSheet) {
+    super()
 
     this.styleSheet = styleSheetWithDefaults(styleSheet)
   }

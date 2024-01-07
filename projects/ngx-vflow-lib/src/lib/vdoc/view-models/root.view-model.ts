@@ -1,6 +1,5 @@
 import { Signal, signal } from "@angular/core";
 import { RootStyleSheet } from "../../../public-api";
-import { VDocRootComponent } from "../components/vdoc-root/vdoc-root.component";
 import { AnyViewModel } from "./any.view-model";
 import { BlockViewModel } from "./block.view-model";
 
@@ -8,12 +7,9 @@ export class RootViewModel extends AnyViewModel {
   public width = signal(0)
   public height = signal(0)
 
-  public readonly styleSheet: Required<RootStyleSheet>;
+  public readonly styleSheet: Required<RootStyleSheet>
 
-  constructor(
-    public readonly component: VDocRootComponent,
-    styleSheet: RootStyleSheet
-  ) {
+  constructor(styleSheet: RootStyleSheet) {
     super()
 
     this.styleSheet = styleSheetWithDefaults(styleSheet)

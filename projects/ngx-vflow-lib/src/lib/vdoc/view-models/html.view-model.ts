@@ -6,10 +6,7 @@ import { styleSheetWithDefaults as blockStyleSheetWithDefaults } from "./block.v
 export class HtmlViewModel extends BlockViewModel {
   public styleSheet: Required<HtmlStyleSheet>
 
-  constructor(
-    public component: VDocViewComponent,
-    styleSheet: HtmlStyleSheet,
-  ) {
+  constructor(styleSheet: HtmlStyleSheet) {
     super()
 
     this.styleSheet = styleSheetWithDefaults(styleSheet)
