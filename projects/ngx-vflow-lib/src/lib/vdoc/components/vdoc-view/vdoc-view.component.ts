@@ -2,8 +2,8 @@ import { ChangeDetectorRef, Directive, Injector, Input, OnInit, Signal, ViewRef,
 import { AnyViewModel } from "../../view-models/any.view-model";
 import { VDocTreeBuilderService } from "../../services/vdoc-tree-builder.service";
 import { StyleSheet } from '../../interfaces/stylesheet.interface'
-import { UISnapshot } from "../../utils/ui-change";
 import { Subscription } from "rxjs";
+import { UISnapshot } from "../../interfaces/ui-snapshot.interface";
 
 @Directive()
 export abstract class VDocViewComponent<T extends AnyViewModel = AnyViewModel, U extends StyleSheet = StyleSheet> implements OnInit {

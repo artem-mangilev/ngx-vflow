@@ -1,8 +1,5 @@
 import { Observable, combineLatest, fromEvent, map, merge, share, shareReplay, startWith } from "rxjs";
-
-export interface UISnapshot {
-  classes: Set<string>
-}
+import { UISnapshot } from "../interfaces/ui-snapshot.interface";
 
 /**
  * observable with all target's changes we need to track

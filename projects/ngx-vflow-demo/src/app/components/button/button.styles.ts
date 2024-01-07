@@ -1,6 +1,5 @@
 import { Signal, computed, signal } from '@angular/core'
-import { ContainerStyleSheet } from '../../../../../ngx-vflow-lib/src/public-api'
-import { UISnapshot } from 'projects/ngx-vflow-lib/src/lib/vdoc/utils/ui-change'
+import { ContainerStyleSheet, UISnapshot } from '../../../../../ngx-vflow-lib/src/public-api'
 
 export const styles = {
   button: (snapshot: Signal<UISnapshot>) => ({
@@ -23,7 +22,7 @@ export const styles = {
     ),
 
     boxShadow: computed(() => {
-      if (snapshot().classes.has(':hover')) {
+      if (snapshot().classes.has('active')) {
         return {
           hOffset: 3,
           vOffset: 5,
