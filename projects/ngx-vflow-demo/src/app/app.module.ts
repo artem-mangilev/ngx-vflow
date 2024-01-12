@@ -1,6 +1,6 @@
 import { NgDocRootComponent, NgDocNavbarComponent, NgDocSidebarComponent, provideNgDocApp, provideSearchEngine, NgDocDefaultSearchEngine, providePageSkeleton, NG_DOC_DEFAULT_PAGE_SKELETON, provideMainPageProcessor, NG_DOC_DEFAULT_PAGE_PROCESSORS } from "@ng-doc/app";
 import { NG_DOC_ROUTING, provideNgDocContext } from "@ng-doc/generated";
-import { RouterModule } from "@angular/router";
+import { RouterModule, provideRouter } from "@angular/router";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
@@ -38,7 +38,14 @@ import { HttpClientModule } from "@angular/common/http";
     provideNgDocApp(),
     provideSearchEngine(NgDocDefaultSearchEngine),
     providePageSkeleton(NG_DOC_DEFAULT_PAGE_SKELETON),
-    provideMainPageProcessor(NG_DOC_DEFAULT_PAGE_PROCESSORS)
+    provideMainPageProcessor(NG_DOC_DEFAULT_PAGE_PROCESSORS),
+    provideRouter([
+      {
+        path: '**',
+        redirectTo: 'getting-started/what-is-ngx-vflow',
+        pathMatch: 'full',
+      }
+    ])
   ],
   bootstrap: [AppComponent],
 })
