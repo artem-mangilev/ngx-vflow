@@ -1,7 +1,7 @@
 import { NgDocRootComponent, NgDocNavbarComponent, NgDocSidebarComponent, provideNgDocApp, provideSearchEngine, NgDocDefaultSearchEngine, providePageSkeleton, NG_DOC_DEFAULT_PAGE_SKELETON, provideMainPageProcessor, NG_DOC_DEFAULT_PAGE_PROCESSORS } from "@ng-doc/app";
 import { NG_DOC_ROUTING, provideNgDocContext } from "@ng-doc/generated";
-import { RouterModule, provideRouter } from "@angular/router";
-import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
+import { provideRouter, withInMemoryScrolling } from "@angular/router";
+import { provideAnimations } from "@angular/platform-browser/animations";
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
@@ -10,7 +10,7 @@ import { AppComponent } from './app.component';
 import { VDocModule } from '../../../ngx-vflow-lib/src/public-api';
 import { ButtonComponent } from './components/button/button.component';
 import { FormComponent } from './components/form/form.component';
-import { HttpClientModule } from "@angular/common/http";
+import { HttpClientModule, provideHttpClient, withFetch, withInterceptorsFromDi } from "@angular/common/http";
 
 @NgModule({
   declarations: [
@@ -22,30 +22,32 @@ import { HttpClientModule } from "@angular/common/http";
     BrowserModule,
     AppRoutingModule,
     VDocModule,
-    BrowserAnimationsModule,
-    RouterModule.forRoot(NG_DOC_ROUTING, {
-      scrollPositionRestoration: 'enabled',
-      anchorScrolling: 'enabled',
-      scrollOffset: [0, 70]
-    }),
     NgDocRootComponent,
     NgDocNavbarComponent,
     NgDocSidebarComponent,
-    HttpClientModule
   ],
   providers: [
     provideNgDocContext(),
-    provideNgDocApp(),
+    provideNgDocApp({ defaultThemeId: 'auto' }),
     provideSearchEngine(NgDocDefaultSearchEngine),
     providePageSkeleton(NG_DOC_DEFAULT_PAGE_SKELETON),
     provideMainPageProcessor(NG_DOC_DEFAULT_PAGE_PROCESSORS),
-    provideRouter([
-      {
-        path: '**',
-        redirectTo: 'getting-started/what-is-ngx-vflow',
-        pathMatch: 'full',
-      }
-    ])
+    provideAnimations(),
+    provideHttpClient(),
+    provideRouter(
+      [
+        ...NG_DOC_ROUTING,
+        {
+          path: '**',
+          redirectTo: 'getting-started/what-is-ngx-vflow',
+          pathMatch: 'full',
+        },
+      ],
+      withInMemoryScrolling({
+        scrollPositionRestoration: 'enabled',
+        anchorScrolling: 'enabled',
+      }),
+    ),
   ],
   bootstrap: [AppComponent],
 })
