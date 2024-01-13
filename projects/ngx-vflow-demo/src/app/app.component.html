@@ -1,7 +1,9 @@
-<h1>SVG</h1>
-
-<svg:svg vdoc-root [styleSheet]="styles.root">
-  <svg:svg vdoc-container [styleSheet]="styles.container">
-    <svg:svg app-form></svg:svg>
-  </svg:svg>
-</svg:svg>
+<ng-doc-root>
+	<ng-doc-navbar [leftContent]="leftContent">
+		<ng-template #leftContent>
+			<h3 style="margin: 0">NgxVflow</h3>
+		</ng-template>
+	</ng-doc-navbar>
+	<ng-doc-sidebar></ng-doc-sidebar>
+	<router-outlet></router-outlet>
+</ng-doc-root>
