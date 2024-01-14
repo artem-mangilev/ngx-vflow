@@ -1,0 +1,24 @@
+<svg:svg
+  #flow
+  [style.backgroundColor]="background"
+  [attr.width]="view[0]"
+  [attr.height]="view[1]"
+>
+
+  <!-- Nodes -->
+  <svg:g>
+    <svg:g
+      *ngFor="let node of nodes"
+      (mousedown)="onDragStart(node, $event)"
+    >
+      <svg:rect
+        *ngIf="node.type === 'default'"
+        width="50"
+        height="50"
+        [attr.x]="node.position.x"
+        [attr.y]="node.position.y"
+      />
+    </svg:g>
+  </svg:g>
+
+</svg:svg>
