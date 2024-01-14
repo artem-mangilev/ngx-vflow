@@ -9,7 +9,7 @@ import { ContainerStyleSheet, ContainerStyleSheetFn, RootStyleSheet, RootStyleSh
   imports: [VDocModule]
 })
 export class VdocDemoComponent {
-  protected styles = styles
+  protected styles = { root, container }
 }
 
 const root: RootStyleSheetFn = () => ({
@@ -34,8 +34,3 @@ const container: ContainerStyleSheetFn = (snapshot) => ({
     return null
   })
 })
-
-const styles = {
-  root,
-  container
-}
