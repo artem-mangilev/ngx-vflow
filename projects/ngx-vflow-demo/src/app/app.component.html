@@ -5,5 +5,8 @@
 		</ng-template>
 	</ng-doc-navbar>
 	<ng-doc-sidebar></ng-doc-sidebar>
-	<router-outlet></router-outlet>
+
+  <div [@routingAnimation]="getRouteAnimationData()">
+    <router-outlet></router-outlet>
+  </div>
 </ng-doc-root>
