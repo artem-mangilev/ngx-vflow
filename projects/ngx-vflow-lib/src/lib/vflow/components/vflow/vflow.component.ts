@@ -8,8 +8,15 @@ import { Point } from '../../interfaces/point.interface';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class VflowComponent {
+  /**
+   * Size for flow view
+   *
+   * accepts
+   * - absolute size in format [width, height] or
+   * - 'auto' to compute size based on parent element size
+   */
   @Input()
-  public view: [number, number] = [400, 400]
+  public view: [number, number] | 'auto' = [400, 400]
 
   @Input()
   public nodes: Node[] = []
@@ -22,6 +29,22 @@ export class VflowComponent {
 
   @ContentChild('nodeTemplate')
   protected nodeTemplate!: TemplateRef<any>
+
+  protected get flowWidth() {
+    if (this.view === 'auto') {
+      return '100%'
+    }
+
+    return this.view[0]
+  }
+
+  protected get flowHeight() {
+    if (this.view === 'auto') {
+      return '100%'
+    }
+
+    return this.view[1]
+  }
 
   private draggingNode: Node | null = null
   private draggingNodeOffset: Point = { x: 0, y: 0 }
