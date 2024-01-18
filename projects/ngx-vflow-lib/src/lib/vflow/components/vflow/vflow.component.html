@@ -1,5 +1,6 @@
 <svg:svg
   #flow
+  draggableContext
   [style.backgroundColor]="background"
   [attr.width]="flowWidth"
   [attr.height]="flowHeight"
@@ -8,26 +9,11 @@
   <!-- Nodes -->
   <svg:g>
     <svg:g
-      *ngFor="let node of nodes"
-      (mousedown)="onDragStart(node, $event)"
-    >
-      <svg:rect
-        *ngIf="node.type === 'default'"
-        width="50"
-        height="50"
-        [attr.x]="node.position.x"
-        [attr.y]="node.position.y"
+      *ngFor="let node of nodes; trackBy: trackById"
+      [node]="node"
+      [nodeTemplate]="nodeTemplate"
+      (mousedown)="draggableContext.onDragStart(node, $event)"
       />
-
-      <svg:svg
-        *ngIf="node.type === 'custom'"
-        [attr.x]="node.position.x"
-        [attr.y]="node.position.y"
-      >
-        <ng-container *ngTemplateOutlet="nodeTemplate; context: { $implicit: node }"></ng-container>
-      </svg:svg>
-
-    </svg:g>
   </svg:g>
 
 </svg:svg>
