@@ -1,11 +1,21 @@
-import { Directive, EventEmitter, HostListener, Output } from '@angular/core';
+import { Directive, ElementRef, EventEmitter, HostListener, Output, inject } from '@angular/core';
+
+export interface ZoomEvent {
+  direction: 'in' | 'out'
+  mousePosition: { x: number; y: number }
+}
 
 @Directive({ selector: 'svg[mapController]' })
 export class MapControllerDirective {
   @Output()
   public movement = new EventEmitter<{ x: number, y: number }>()
 
+  @Output()
+  public zoom = new EventEmitter<ZoomEvent>()
+
   private isDragging = false
+
+  protected hostRef = inject<ElementRef<SVGSVGElement>>(ElementRef)
 
   @HostListener('mousedown')
   protected onMouseDown() {
@@ -25,5 +35,23 @@ export class MapControllerDirective {
   @HostListener('document:mouseup')
   protected onMouseUp() {
     this.isDragging = false
+  }
+
+  @HostListener('wheel', ['$event'])
+  protected onWheel(event: WheelEvent) {
+    if (event.deltaY < 0) {
+      this.zoom.emit({ direction: 'in', mousePosition: this.getMousePosition(event) })
+    } else if (event.deltaY > 0) {
+      this.zoom.emit({ direction: 'out', mousePosition: this.getMousePosition(event) })
+    }
+  }
+
+  private getMousePosition(event: WheelEvent) {
+    const CTM = this.hostRef.nativeElement.getScreenCTM()
+
+    return {
+      x: (event.clientX - CTM!.e) / CTM!.a,
+      y: (event.clientY - CTM!.f) / CTM!.d
+    };
   }
 }

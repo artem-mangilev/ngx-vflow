@@ -3,6 +3,7 @@
   draggableContext
   mapController
   (movement)="mapContext.pan($event.x, $event.y)"
+  (zoom)="mapContext.zoom($event)"
   [style.backgroundColor]="background"
   [attr.width]="flowWidth"
   [attr.height]="flowHeight"
