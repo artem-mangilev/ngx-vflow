@@ -1,0 +1,19 @@
+<svg:svg
+  #flow
+  draggableContext
+  [style.backgroundColor]="background"
+  [attr.width]="flowWidth"
+  [attr.height]="flowHeight"
+>
+
+  <!-- Nodes -->
+  <svg:g>
+    <svg:g
+      *ngFor="let node of nodes; trackBy: trackById"
+      [node]="node"
+      [nodeTemplate]="nodeTemplate"
+      (mousedown)="draggableContext.onDragStart(node, $event)"
+      />
+  </svg:g>
+
+</svg:svg>
