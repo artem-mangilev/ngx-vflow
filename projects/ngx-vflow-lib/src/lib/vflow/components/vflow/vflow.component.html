@@ -1,13 +1,15 @@
 <svg:svg
   #flow
   draggableContext
+  mapController
+  (movement)="mapContext.pan($event.x, $event.y)"
   [style.backgroundColor]="background"
   [attr.width]="flowWidth"
   [attr.height]="flowHeight"
 >
+  <svg:g mapContext>
 
-  <!-- Nodes -->
-  <svg:g>
+    <!-- Nodes -->
     <svg:g
       *ngFor="let node of nodes; trackBy: trackById"
       [node]="node"

@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ContentChild, El
 import { Node } from '../../interfaces/node.interface';
 import { Point } from '../../interfaces/point.interface';
 import { DraggableContextDirective } from '../../directives/draggable-context.directive';
+import { MapContextDirective } from '../../directives/map-context.directive';
 
 @Component({
   selector: 'vflow',
@@ -27,6 +28,9 @@ export class VflowComponent {
 
   @ViewChild(DraggableContextDirective)
   protected draggableContext!: DraggableContextDirective
+
+  @ViewChild(MapContextDirective)
+  protected mapContext!: MapContextDirective
 
   @ContentChild('nodeTemplate')
   protected nodeTemplate!: TemplateRef<any>

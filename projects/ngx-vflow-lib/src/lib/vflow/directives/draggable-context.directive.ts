@@ -10,6 +10,9 @@ export class DraggableContextDirective {
   private draggingNodeOffset: Point = { x: 0, y: 0 }
 
   public onDragStart(node: Node, event: Event) {
+    // Not propagate in order to ignore listening from map controller
+    event.stopPropagation()
+
     this.draggingNode = node
 
     this.draggingNodeOffset = this.getMousePosition(event as MouseEvent)
@@ -21,6 +24,7 @@ export class DraggableContextDirective {
   protected onDrag(event: Event) {
     if (this.draggingNode) {
       event.preventDefault()
+
       const position = this.getMousePosition(event as MouseEvent)
 
       // TODO do not update model's value

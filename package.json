@@ -24,6 +24,7 @@
     "@ng-doc/core": "16.17.0",
     "@ng-doc/ui-kit": "16.17.0",
     "rxjs": "~7.8.0",
+    "transformation-matrix": "^2.15.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.13.0"
   },
