@@ -1,12 +1,11 @@
-import { Directive, ElementRef, EventEmitter, HostListener, Output, inject } from '@angular/core';
+import { Directive, ElementRef, EventEmitter, HostListener, OnInit, Output, inject } from '@angular/core';
+import { zoom, D3ZoomEvent } from 'd3-zoom';
+import { select } from 'd3-selection'
 
-export interface ZoomEvent {
-  direction: 'in' | 'out'
-  mousePosition: { x: number; y: number }
-}
+export type ZoomEvent = D3ZoomEvent<SVGSVGElement, unknown>
 
 @Directive({ selector: 'svg[mapController]' })
-export class MapControllerDirective {
+export class MapControllerDirective implements OnInit {
   @Output()
   public movement = new EventEmitter<{ x: number, y: number }>()
 
@@ -16,6 +15,13 @@ export class MapControllerDirective {
   private isDragging = false
 
   protected hostRef = inject<ElementRef<SVGSVGElement>>(ElementRef)
+
+  public ngOnInit(): void {
+    const zoomBehavior = zoom<SVGSVGElement, unknown>()
+      .on('zoom', (e) => this.zoom.emit(e))
+
+    select(this.hostRef.nativeElement).call(zoomBehavior)
+  }
 
   @HostListener('mousedown')
   protected onMouseDown() {
@@ -35,15 +41,6 @@ export class MapControllerDirective {
   @HostListener('document:mouseup')
   protected onMouseUp() {
     this.isDragging = false
-  }
-
-  @HostListener('wheel', ['$event'])
-  protected onWheel(event: WheelEvent) {
-    if (event.deltaY < 0) {
-      this.zoom.emit({ direction: 'in', mousePosition: this.getMousePosition(event) })
-    } else if (event.deltaY > 0) {
-      this.zoom.emit({ direction: 'out', mousePosition: this.getMousePosition(event) })
-    }
   }
 
   private getMousePosition(event: WheelEvent) {
