@@ -1,6 +1,5 @@
 <svg:svg
   #flow
-  draggableContext
   mapController
   (zoom)="mapContext.zoom($event)"
   [style.backgroundColor]="background"
@@ -12,10 +11,11 @@
     <!-- Nodes -->
     <svg:g
       *ngFor="let node of nodes; trackBy: trackById"
-      [node]="node"
+      node
+      [nodeModel]="node"
       [nodeTemplate]="nodeTemplate"
-      (mousedown)="draggableContext.onDragStart(node, $event)"
       />
+
   </svg:g>
 
 </svg:svg>

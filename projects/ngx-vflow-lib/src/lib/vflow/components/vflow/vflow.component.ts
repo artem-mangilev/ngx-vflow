@@ -1,13 +1,14 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ContentChild, ElementRef, HostListener, Input, OnInit, TemplateRef, ViewChild, inject } from '@angular/core';
 import { Node } from '../../interfaces/node.interface';
-import { Point } from '../../interfaces/point.interface';
-import { DraggableContextDirective } from '../../directives/draggable-context.directive';
 import { MapContextDirective } from '../../directives/map-context.directive';
+import { DraggableService } from '../../services/draggable.service';
+import { NodeModel } from '../../models/node.model';
 
 @Component({
   selector: 'vflow',
   templateUrl: './vflow.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: [DraggableService]
 })
 export class VflowComponent {
   /**
@@ -20,14 +21,11 @@ export class VflowComponent {
   @Input()
   public view: [number, number] | 'auto' = [400, 400]
 
-  @Input()
-  public nodes: Node[] = []
+  @Input({ transform: (nodes: Node[]) => nodes.map(n => new NodeModel(n)) })
+  public nodes: NodeModel[] = []
 
   @Input()
   public background: string = '#FFFFFF'
-
-  @ViewChild(DraggableContextDirective)
-  protected draggableContext!: DraggableContextDirective
 
   @ViewChild(MapContextDirective)
   protected mapContext!: MapContextDirective
@@ -45,6 +43,6 @@ export class VflowComponent {
 
   protected cdr = inject(ChangeDetectorRef)
 
-  protected trackById = (idx: number, node: Node) => node.id
+  protected trackById = (idx: number, { node }: NodeModel) => node.id
 }
 

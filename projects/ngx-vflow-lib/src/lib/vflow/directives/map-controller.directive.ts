@@ -12,8 +12,6 @@ export class MapControllerDirective implements OnInit {
   @Output()
   public zoom = new EventEmitter<ZoomEvent>()
 
-  private isDragging = false
-
   protected hostRef = inject<ElementRef<SVGSVGElement>>(ElementRef)
 
   public ngOnInit(): void {
@@ -23,32 +21,4 @@ export class MapControllerDirective implements OnInit {
     select(this.hostRef.nativeElement).call(zoomBehavior)
   }
 
-  @HostListener('mousedown')
-  protected onMouseDown() {
-    this.isDragging = true
-  }
-
-  @HostListener('mousemove', ['$event'])
-  protected onMouseMove(event: MouseEvent) {
-    if (this.isDragging) {
-      this.movement.emit({ x: event.movementX, y: event.movementY })
-    }
-  }
-
-  /**
-   * TODO use global token for document events
-   */
-  @HostListener('document:mouseup')
-  protected onMouseUp() {
-    this.isDragging = false
-  }
-
-  private getMousePosition(event: WheelEvent) {
-    const CTM = this.hostRef.nativeElement.getScreenCTM()
-
-    return {
-      x: (event.clientX - CTM!.e) / CTM!.a,
-      y: (event.clientY - CTM!.f) / CTM!.d
-    };
-  }
 }
