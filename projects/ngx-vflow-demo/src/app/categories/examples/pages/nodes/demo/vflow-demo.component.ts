@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, Component, OnInit, computed, signal } from '@angular/core';
-import { ContainerStyleSheetFn, Node, RootStyleSheetFn, VDocModule, VflowModule, hasClasses, uuid } from 'projects/ngx-vflow-lib/src/public-api';
+import { AfterViewInit, ChangeDetectionStrategy, Component, Injector, OnInit, ViewChild, computed, effect, inject, runInInjectionContext, signal } from '@angular/core';
+import { ContainerStyleSheetFn, Node, RootStyleSheetFn, VDocModule, VflowComponent, VflowModule, hasClasses, uuid } from 'projects/ngx-vflow-lib/src/public-api';
 
 @Component({
   templateUrl: './vflow-demo.component.html',

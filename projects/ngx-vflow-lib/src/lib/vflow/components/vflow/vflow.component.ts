@@ -1,16 +1,20 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ContentChild, ElementRef, HostListener, Input, OnInit, TemplateRef, ViewChild, inject } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ContentChild, ElementRef, HostListener, Input, OnInit, TemplateRef, ViewChild, inject, signal } from '@angular/core';
 import { Node } from '../../interfaces/node.interface';
 import { MapContextDirective } from '../../directives/map-context.directive';
 import { DraggableService } from '../../services/draggable.service';
 import { NodeModel } from '../../models/node.model';
+import { ZoomService } from '../../services/zoom.service';
+import { toObservable } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'vflow',
   templateUrl: './vflow.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [DraggableService]
+  providers: [DraggableService, ZoomService]
 })
 export class VflowComponent {
+  protected zoomService = inject(ZoomService)
+
   /**
    * Size for flow view
    *
@@ -20,6 +24,21 @@ export class VflowComponent {
    */
   @Input()
   public view: [number, number] | 'auto' = [400, 400]
+
+  @Input()
+  public minZoom = 0.5
+
+  @Input()
+  public maxZoom = 3
+
+  @Input()
+  public set zoom(value: number) {
+    this.zoomService.zoom.set(value)
+  }
+
+  public readonly zoomSignal = this.zoomService.zoom
+
+  public readonly zoom$ = toObservable(this.zoomService.zoom)
 
   @Input({ transform: (nodes: Node[]) => nodes.map(n => new NodeModel(n)) })
   public nodes: NodeModel[] = []
@@ -41,8 +60,7 @@ export class VflowComponent {
     return this.view === 'auto' ? '100%' : this.view[1]
   }
 
-  protected cdr = inject(ChangeDetectorRef)
-
   protected trackById = (idx: number, { node }: NodeModel) => node.id
+
 }
 

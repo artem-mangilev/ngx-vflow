@@ -1,12 +1,16 @@
 <svg:svg
+  class="root-svg"
   #flow
   mapController
-  (zoom)="mapContext.zoom($event)"
   [style.backgroundColor]="background"
   [attr.width]="flowWidth"
   [attr.height]="flowHeight"
 >
-  <svg:g mapContext>
+  <svg:g
+    mapContext
+    [minZoom]="minZoom"
+    [maxZoom]="maxZoom"
+  >
 
     <!-- Nodes -->
     <svg:g
