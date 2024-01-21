@@ -1,5 +1,4 @@
-import { Directive, ElementRef, HostBinding, Injector, Input, OnInit, effect, inject, runInInjectionContext } from '@angular/core';
-// import { compose, identity, scale, toSVG, translate } from 'transformation-matrix';
+import { Directive, ElementRef, Injector, Input, OnInit, effect, inject, runInInjectionContext } from '@angular/core';
 import { select } from 'd3-selection';
 import { D3ZoomEvent, ZoomBehavior, zoom } from 'd3-zoom';
 import { ZoomService } from '../services/zoom.service';
@@ -40,13 +39,18 @@ export class MapContextDirective implements OnInit {
     this.rootSvgSelection.call(zoomBehavior)
 
     runInInjectionContext(this.injector,
-      () => this.manualZoomChangeEffect(zoomBehavior)
+      () => {
+        this.manualZoomChangeEffect(zoomBehavior)
+        this.manualPanChangeEffect(zoomBehavior)
+      }
     )
   }
 
-  private handleZoom = (event: ZoomEvent) => {
-    this.zoomService.zoom.set(event.transform.k)
-    this.zoomableSelection.attr('transform', event.transform.toString())
+  private handleZoom = ({ transform }: ZoomEvent) => {
+    // update public signal for user to read
+    this.zoomService.zoomPan.set({ zoom: transform.k, x: transform.x, y: transform.y })
+
+    this.zoomableSelection.attr('transform', transform.toString())
   }
 
   /**
@@ -62,5 +66,15 @@ export class MapContextDirective implements OnInit {
       // TODO: research how to avoid writing to signal from effect
       // this may lead to bugs
     }, { allowSignalWrites: true })
+  }
+
+  private manualPanChangeEffect(behavior: ZoomBehavior<SVGSVGElement, unknown>) {
+    effect(() => {
+      this.rootSvgSelection.call(behavior.translateTo, this.zoomService.pan().x, this.zoomService.pan().y)
+
+      // TODO: research how to avoid writing to signal from effect
+      // this may lead to bugs
+    }, { allowSignalWrites: true })
+
   }
 }

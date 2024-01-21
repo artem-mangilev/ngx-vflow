@@ -36,9 +36,9 @@ export class VflowComponent {
     this.zoomService.zoom.set(value)
   }
 
-  public readonly zoomSignal = this.zoomService.zoom
+  public readonly zoomPanSignal = this.zoomService.zoomPan
 
-  public readonly zoom$ = toObservable(this.zoomService.zoom)
+  public readonly zoomPan$ = toObservable(this.zoomService.zoomPan)
 
   @Input({ transform: (nodes: Node[]) => nodes.map(n => new NodeModel(n)) })
   public nodes: NodeModel[] = []
@@ -60,7 +60,16 @@ export class VflowComponent {
     return this.view === 'auto' ? '100%' : this.view[1]
   }
 
-  protected trackById = (idx: number, { node }: NodeModel) => node.id
+  public zoomTo(value: number) {
+    this.zoomService.zoom.set(value)
+  }
 
+  public panTo(x: number, y: number) {
+    this.zoomService.pan.set({ x, y })
+  }
+
+  protected trackById(idx: number, { node }: NodeModel) {
+    return node.id
+  }
 }
 
