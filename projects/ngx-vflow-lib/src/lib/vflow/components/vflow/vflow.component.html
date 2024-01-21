@@ -1,19 +1,25 @@
 <svg:svg
+  class="root-svg"
   #flow
-  draggableContext
+  mapController
   [style.backgroundColor]="background"
   [attr.width]="flowWidth"
   [attr.height]="flowHeight"
 >
+  <svg:g
+    mapContext
+    [minZoom]="minZoom"
+    [maxZoom]="maxZoom"
+  >
 
-  <!-- Nodes -->
-  <svg:g>
+    <!-- Nodes -->
     <svg:g
       *ngFor="let node of nodes; trackBy: trackById"
-      [node]="node"
+      node
+      [nodeModel]="node"
       [nodeTemplate]="nodeTemplate"
-      (mousedown)="draggableContext.onDragStart(node, $event)"
       />
+
   </svg:g>
 
 </svg:svg>

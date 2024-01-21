@@ -1,16 +1,16 @@
 <svg:rect
-  *ngIf="node.type === 'default'"
+  *ngIf="nodeModel.node.type === 'default'"
   width="50"
   height="50"
-  [attr.x]="node.position.x"
-  [attr.y]="node.position.y"
+  [attr.x]="nodeModel.position().x"
+  [attr.y]="nodeModel.position().y"
 />
 
 <svg:svg
-  *ngIf="node.type === 'custom'"
-  [attr.x]="node.position.x"
-  [attr.y]="node.position.y"
+  *ngIf="nodeModel.node.type === 'custom'"
+  [attr.x]="nodeModel.position().x"
+  [attr.y]="nodeModel.position().y"
 >
-  <ng-container *ngTemplateOutlet="nodeTemplate; context: { $implicit: node }"></ng-container>
+  <ng-container *ngTemplateOutlet="nodeTemplate; context: { $implicit: nodeModel.node }"></ng-container>
 </svg:svg>
 

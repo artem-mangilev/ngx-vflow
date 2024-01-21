@@ -1,14 +1,20 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ContentChild, ElementRef, HostListener, Input, OnInit, TemplateRef, ViewChild, inject } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ContentChild, ElementRef, HostListener, Input, OnInit, TemplateRef, ViewChild, inject, signal } from '@angular/core';
 import { Node } from '../../interfaces/node.interface';
-import { Point } from '../../interfaces/point.interface';
-import { DraggableContextDirective } from '../../directives/draggable-context.directive';
+import { MapContextDirective } from '../../directives/map-context.directive';
+import { DraggableService } from '../../services/draggable.service';
+import { NodeModel } from '../../models/node.model';
+import { ZoomService } from '../../services/zoom.service';
+import { toObservable } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'vflow',
   templateUrl: './vflow.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: [DraggableService, ZoomService]
 })
 export class VflowComponent {
+  protected zoomService = inject(ZoomService)
+
   /**
    * Size for flow view
    *
@@ -20,13 +26,28 @@ export class VflowComponent {
   public view: [number, number] | 'auto' = [400, 400]
 
   @Input()
-  public nodes: Node[] = []
+  public minZoom = 0.5
+
+  @Input()
+  public maxZoom = 3
+
+  @Input()
+  public set zoom(value: number) {
+    this.zoomService.zoom.set(value)
+  }
+
+  public readonly zoomPanSignal = this.zoomService.zoomPan
+
+  public readonly zoomPan$ = toObservable(this.zoomService.zoomPan)
+
+  @Input({ transform: (nodes: Node[]) => nodes.map(n => new NodeModel(n)) })
+  public nodes: NodeModel[] = []
 
   @Input()
   public background: string = '#FFFFFF'
 
-  @ViewChild(DraggableContextDirective)
-  protected draggableContext!: DraggableContextDirective
+  @ViewChild(MapContextDirective)
+  protected mapContext!: MapContextDirective
 
   @ContentChild('nodeTemplate')
   protected nodeTemplate!: TemplateRef<any>
@@ -39,8 +60,16 @@ export class VflowComponent {
     return this.view === 'auto' ? '100%' : this.view[1]
   }
 
-  protected cdr = inject(ChangeDetectorRef)
+  public zoomTo(value: number) {
+    this.zoomService.zoom.set(value)
+  }
 
-  protected trackById = (idx: number, node: Node) => node.id
+  public panTo(x: number, y: number) {
+    this.zoomService.pan.set({ x, y })
+  }
+
+  protected trackById(idx: number, { node }: NodeModel) {
+    return node.id
+  }
 }
 
