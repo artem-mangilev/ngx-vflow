@@ -1,14 +1,15 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, Injector, OnInit, ViewChild, computed, effect, inject, runInInjectionContext, signal } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, Input, ViewChild, computed, signal } from '@angular/core';
 import { ContainerStyleSheetFn, Node, RootStyleSheetFn, VDocModule, VflowComponent, VflowModule, hasClasses, uuid } from 'projects/ngx-vflow-lib/src/public-api';
 
 @Component({
+  selector: 'demo',
   templateUrl: './vflow-demo.component.html',
   styleUrls: ['./vflow-demo.styles.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
   imports: [VflowModule, VDocModule]
 })
-export class VflowDemoComponent implements AfterViewInit {
+export class VflowDemoComponent {
   public nodes: Node[] = [
     {
       id: uuid(),
@@ -24,16 +25,13 @@ export class VflowDemoComponent implements AfterViewInit {
 
   public styles = { root, container }
 
+  @Input()
+  public set zoom(value: number) {
+    this.flow.zoomTo(value)
+  }
+
   @ViewChild('vflow')
   public flow!: VflowComponent
-
-  public ngAfterViewInit(): void {
-    // this.flow.panTo(0, 0)
-
-    // this.flow.zoomPan$.subscribe(val => {
-    //   console.log(val)
-    // })
-  }
 }
 
 const root: RootStyleSheetFn = () => ({

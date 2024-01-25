@@ -1,3 +1,3 @@
 # {{ NgDocPage.title }}
 
-{{ NgDocActions.demo("VflowDemoComponent") }}
+{{ NgDocActions.playground("DemoPlayground") }}

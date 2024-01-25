@@ -6,7 +6,12 @@ const TestPage: NgDocPage = {
   title: `Nodes`,
   mdFile: './index.md',
   category: ExamplesCategory,
-  demos: { VflowDemoComponent }
+  playgrounds: {
+    DemoPlayground: {
+      target: VflowDemoComponent,
+      template: `<ng-doc-selector></ng-doc-selector>`,
+    }
+  }
 };
 
 export default TestPage;
