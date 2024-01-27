@@ -20,6 +20,13 @@
       [nodeTemplate]="nodeTemplate"
       />
 
+    <!-- Edges  -->
+    <svg:g
+      *ngFor="let edge of edges"
+      edge
+      [edgeModel]="edge"
+    />
+
   </svg:g>
 
 </svg:svg>

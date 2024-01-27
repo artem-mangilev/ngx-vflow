@@ -1,10 +1,12 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ContentChild, ElementRef, HostListener, Input, OnInit, TemplateRef, ViewChild, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ContentChild, ElementRef, HostListener, Input, OnChanges, OnInit, SimpleChanges, TemplateRef, ViewChild, inject, signal } from '@angular/core';
 import { Node } from '../../interfaces/node.interface';
 import { MapContextDirective } from '../../directives/map-context.directive';
 import { DraggableService } from '../../services/draggable.service';
 import { NodeModel } from '../../models/node.model';
 import { ZoomService } from '../../services/zoom.service';
 import { toObservable } from '@angular/core/rxjs-interop';
+import { Edge } from '../../interfaces/edge.interface';
+import { EdgeModel } from '../../models/edge.model';
 
 @Component({
   selector: 'vflow',
@@ -12,7 +14,7 @@ import { toObservable } from '@angular/core/rxjs-interop';
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [DraggableService, ZoomService]
 })
-export class VflowComponent {
+export class VflowComponent implements OnChanges {
   protected zoomService = inject(ZoomService)
 
   /**
@@ -36,12 +38,11 @@ export class VflowComponent {
     this.zoomService.zoom.set(value)
   }
 
-  public readonly zoomPanSignal = this.zoomService.zoomPan
-
-  public readonly zoomPan$ = toObservable(this.zoomService.zoomPan)
-
   @Input({ transform: (nodes: Node[]) => nodes.map(n => new NodeModel(n)) })
   public nodes: NodeModel[] = []
+
+  @Input({ transform: (edges: Edge[]) => edges.map(e => new EdgeModel(e)) })
+  public edges: EdgeModel[] = []
 
   @Input()
   public background: string = '#FFFFFF'
@@ -52,6 +53,10 @@ export class VflowComponent {
   @ContentChild('nodeTemplate')
   protected nodeTemplate!: TemplateRef<any>
 
+  public readonly zoomPanSignal = this.zoomService.zoomPan
+
+  public readonly zoomPan$ = toObservable(this.zoomService.zoomPan)
+
   protected get flowWidth() {
     return this.view === 'auto' ? '100%' : this.view[0]
   }
@@ -60,6 +65,9 @@ export class VflowComponent {
     return this.view === 'auto' ? '100%' : this.view[1]
   }
 
+  public ngOnChanges(changes: SimpleChanges): void {
+    if (changes['edges']) addNodesToEdges(this.nodes, this.edges)
+  }
   public zoomTo(value: number) {
     this.zoomService.zoom.set(value)
   }
@@ -73,3 +81,15 @@ export class VflowComponent {
   }
 }
 
+function addNodesToEdges(nodes: NodeModel[], edges: EdgeModel[]) {
+  const nodesById = nodes.reduce((acc, n) => {
+    acc[n.node.id] = n
+
+    return acc
+  }, {} as { [nodeId: string]: NodeModel })
+
+  edges.forEach(e => {
+    e.source = nodesById[e.edge.source]
+    e.target = nodesById[e.edge.target]
+  })
+}

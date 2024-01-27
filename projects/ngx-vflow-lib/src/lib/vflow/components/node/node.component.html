@@ -1,16 +1,31 @@
 <svg:rect
   *ngIf="nodeModel.node.type === 'default'"
+  #nodeContent
   width="50"
   height="50"
-  [attr.x]="nodeModel.position().x"
-  [attr.y]="nodeModel.position().y"
 />
 
 <svg:svg
   *ngIf="nodeModel.node.type === 'custom'"
-  [attr.x]="nodeModel.position().x"
-  [attr.y]="nodeModel.position().y"
+  #nodeContent
 >
   <ng-container *ngTemplateOutlet="nodeTemplate; context: { $implicit: nodeModel.node }"></ng-container>
 </svg:svg>
 
+<svg:circle
+  [attr.cx]="nodeModel.sourcePoint().x"
+  [attr.cy]="nodeModel.sourcePoint().y"
+  r="5"
+  stroke="white"
+  stroke-width="3"
+  fill="red"
+/>
+
+<svg:circle
+  [attr.cx]="nodeModel.targetPoint().x"
+  [attr.cy]="nodeModel.targetPoint().y"
+  r="5"
+  stroke="white"
+  stroke-width="3"
+  fill="red"
+/>

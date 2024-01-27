@@ -3,10 +3,12 @@ import { NgModule } from '@angular/core';
 import { VflowComponent } from './components/vflow/vflow.component';
 import { NodeComponent } from './components/node/node.component';
 import { MapContextDirective } from './directives/map-context.directive';
+import { EdgeComponent } from './components/edge/edge.component';
 
 const components = [
   VflowComponent,
-  NodeComponent
+  NodeComponent,
+  EdgeComponent
 ]
 
 const directives = [

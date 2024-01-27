@@ -15,12 +15,12 @@ export class DraggableService {
 
     const dragBehavior = drag()
       .on('start', (event: DragEvent) => {
-        deltaX = model.position().x - event.x
-        deltaY = model.position().y - event.y
+        deltaX = model.point().x - event.x
+        deltaY = model.point().y - event.y
       })
 
       .on('drag', (event: DragEvent) => {
-        model.position.set(
+        model.point.set(
           { x: event.x + deltaX, y: event.y + deltaY }
         )
       })

@@ -12,12 +12,12 @@ export class VflowDemoComponent implements AfterViewInit {
   public nodes: Node[] = [
     {
       id: uuid(),
-      position: { x: 10, y: 10 },
+      point: { x: 10, y: 10 },
       type: 'custom',
     },
     {
       id: uuid(),
-      position: { x: 100, y: 100 },
+      point: { x: 100, y: 100 },
       type: 'custom'
     },
   ]
