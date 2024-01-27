@@ -18,7 +18,7 @@ export function bezierPath(
   }
 
   if (sourcePosition === Position.bottom && targetPosition === Position.top) {
-    return bezierPathBtt(source, target)
+    return bezierPathTtb(source, target)
   }
 
   if (sourcePosition === Position.top && targetPosition === Position.bottom) {
@@ -132,6 +132,32 @@ function bezierPathRtl(source: Point, target: Point) {
 function bezierPathBtt(source: Point, target: Point) {
   const path = d3Path()
 
+  path.moveTo(source.x, source.y)
+
+  if (source.y < target.y) {
+    const distance = target.y - source.y
+
+    // TODO: probably need to make this configurable
+    const curvature = .25
+    // thanks colleagues from react/svelte world
+    // https://github.com/xyflow/xyflow/blob/f0117939bae934447fa7f232081f937169ee23b5/packages/system/src/utils/edges/bezier-edge.ts#L56
+    const controlOffset = curvature * 25 * Math.sqrt(distance)
+
+    const firstControlX = source.x
+    const firstControlY = source.y - controlOffset
+
+    const secondControlX = target.x
+    const secondControlY = target.y + controlOffset
+
+    path.bezierCurveTo(
+      firstControlX, firstControlY,
+      secondControlX, secondControlY,
+      target.x, target.y
+    )
+
+    return path.toString()
+  }
+
   const middleY = (source.y + target.y) / 2
 
   const firstControlX = source.x
@@ -140,7 +166,55 @@ function bezierPathBtt(source: Point, target: Point) {
   const secondControlX = target.x
   const secondControlY = middleY
 
+  path.bezierCurveTo(
+    firstControlX, firstControlY,
+    secondControlX, secondControlY,
+    target.x, target.y
+  )
+
+  return path.toString()
+}
+
+/**
+ * Top to bottom
+ */
+function bezierPathTtb(source: Point, target: Point) {
+  const path = d3Path()
+
   path.moveTo(source.x, source.y)
+
+  if (source.y > target.y) {
+    const distance = source.y - target.y
+
+    // TODO: probably need to make this configurable
+    const curvature = .25
+    // thanks colleagues from react/svelte world
+    // https://github.com/xyflow/xyflow/blob/f0117939bae934447fa7f232081f937169ee23b5/packages/system/src/utils/edges/bezier-edge.ts#L56
+    const controlOffset = curvature * 25 * Math.sqrt(distance)
+
+    const firstControlX = source.x
+    const firstControlY = source.y + controlOffset
+
+    const secondControlX = target.x
+    const secondControlY = target.y - controlOffset
+
+    path.bezierCurveTo(
+      firstControlX, firstControlY,
+      secondControlX, secondControlY,
+      target.x, target.y
+    )
+
+    return path.toString()
+  }
+
+  const middleY = (source.y + target.y) / 2
+
+  const firstControlX = source.x
+  const firstControlY = middleY
+
+  const secondControlX = target.x
+  const secondControlY = middleY
+
   path.bezierCurveTo(
     firstControlX, firstControlY,
     secondControlX, secondControlY,

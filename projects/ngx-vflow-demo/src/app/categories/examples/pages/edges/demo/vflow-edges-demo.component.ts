@@ -16,11 +16,16 @@ export class VflowEdgesDemoComponent {
       id: uuid(),
       point: { x: 10, y: 10 },
       type: 'default',
+      sourcePosition: Position.bottom,
+      targetPosition: Position.top
+
     },
     {
       id: uuid(),
       point: { x: 100, y: 100 },
       type: 'default',
+      sourcePosition: Position.bottom,
+      targetPosition: Position.top
     },
   ]
 
