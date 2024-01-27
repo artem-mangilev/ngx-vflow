@@ -2,7 +2,6 @@ import { Position } from "../../enums/position.enum";
 import { Point } from "../../interfaces/point.interface";
 import { path as d3Path } from 'd3-path'
 
-// TODO check for vertical view and opposite direction of current
 export function bezierPath(
   source: Point,
   target: Point,
@@ -25,7 +24,7 @@ export function bezierPath(
     return bezierPathBtt(source, target)
   }
 
-  return bezierPathLtr(source, target)
+  throw new Error('Unhandled combination of sourcePosition and targetPosition')
 }
 
 /**

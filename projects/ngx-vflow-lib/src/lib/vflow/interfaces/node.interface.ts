@@ -5,7 +5,9 @@ export interface Node<T = unknown> {
   id: string
   point: Point,
   type: 'default' | 'custom'
-  data?: T,
+  data?: T
+
+  // TODO: decide if this should be applied globally (now we can't handle different combos on different nodes)
   sourcePosition?: Position
   targetPosition?: Position
 }
