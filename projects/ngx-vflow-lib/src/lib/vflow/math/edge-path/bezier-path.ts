@@ -10,7 +10,7 @@ export function bezierPath(
   targetPosition: Position
 ) {
   if (sourcePosition === Position.left && targetPosition === Position.right) {
-    return bezierPathLtr(source, target)
+    return bezierPathRtl(source, target)
   }
 
   if (sourcePosition === Position.right && targetPosition === Position.left) {
@@ -29,7 +29,7 @@ export function bezierPath(
 }
 
 /**
- * Left-to-right
+ * Left-to-right direction
  */
 function bezierPathLtr(source: Point, target: Point) {
   const path = d3Path()
@@ -49,6 +49,55 @@ function bezierPathLtr(source: Point, target: Point) {
     const firstControlY = source.y
 
     const secondControlX = target.x - controlOffset
+    const secondControlY = target.y
+
+    path.bezierCurveTo(
+      firstControlX, firstControlY,
+      secondControlX, secondControlY,
+      target.x, target.y
+    )
+
+    return path.toString()
+  }
+
+  const middleX = (source.x + target.x) / 2
+
+  const firstControlX = middleX
+  const firstControlY = source.y
+
+  const secondControlX = middleX
+  const secondControlY = target.y
+
+  path.bezierCurveTo(
+    firstControlX, firstControlY,
+    secondControlX, secondControlY,
+    target.x, target.y
+  )
+
+  return path.toString()
+}
+
+/**
+ * Right-to-left direction
+ */
+function bezierPathRtl(source: Point, target: Point) {
+  const path = d3Path()
+
+  path.moveTo(source.x, source.y)
+
+  if (source.x < target.x) {
+    const distance = target.x - source.x
+
+    // TODO: probably need to make this configurable
+    const curvature = .25
+    // thanks colleagues from react/svelte world
+    // https://github.com/xyflow/xyflow/blob/f0117939bae934447fa7f232081f937169ee23b5/packages/system/src/utils/edges/bezier-edge.ts#L56
+    const controlOffset = curvature * 25 * Math.sqrt(distance)
+
+    const firstControlX = source.x - controlOffset
+    const firstControlY = source.y
+
+    const secondControlX = target.x + controlOffset
     const secondControlY = target.y
 
     path.bezierCurveTo(
