@@ -5,12 +5,12 @@
   height="50"
 />
 
-<svg:svg
+<!-- <svg:svg
   *ngIf="nodeModel.node.type === 'custom'"
   #nodeContent
 >
   <ng-container *ngTemplateOutlet="nodeTemplate; context: { $implicit: nodeModel.node }"></ng-container>
-</svg:svg>
+</svg:svg> -->
 
 <svg:circle
   [attr.cx]="nodeModel.sourcePoint().x"

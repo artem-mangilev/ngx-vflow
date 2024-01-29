@@ -8,17 +8,17 @@ import { ContainerStyleSheetFn, Node, RootStyleSheetFn, VDocModule, VflowCompone
   standalone: true,
   imports: [VflowModule, VDocModule]
 })
-export class VflowDemoComponent implements AfterViewInit {
+export class VflowDemoComponent {
   public nodes: Node[] = [
     {
       id: uuid(),
       point: { x: 10, y: 10 },
-      type: 'custom',
+      type: 'default',
     },
     {
       id: uuid(),
       point: { x: 100, y: 100 },
-      type: 'custom'
+      type: 'default'
     },
   ]
 
@@ -26,14 +26,6 @@ export class VflowDemoComponent implements AfterViewInit {
 
   @ViewChild('vflow')
   public flow!: VflowComponent
-
-  public ngAfterViewInit(): void {
-    // this.flow.panTo(0, 0)
-
-    // this.flow.zoomPan$.subscribe(val => {
-    //   console.log(val)
-    // })
-  }
 }
 
 const root: RootStyleSheetFn = () => ({
