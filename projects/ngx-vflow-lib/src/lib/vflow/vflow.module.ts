@@ -4,6 +4,7 @@ import { VflowComponent } from './components/vflow/vflow.component';
 import { NodeComponent } from './components/node/node.component';
 import { MapContextDirective } from './directives/map-context.directive';
 import { EdgeComponent } from './components/edge/edge.component';
+import { NodeHtmlTemplateDirective } from './directives/node-html.template.directive';
 
 const components = [
   VflowComponent,
@@ -13,11 +14,15 @@ const components = [
 
 const directives = [
   MapContextDirective,
+  NodeHtmlTemplateDirective
 ]
 
 @NgModule({
   imports: [CommonModule],
-  exports: [VflowComponent],
+  exports: [
+    VflowComponent,
+    NodeHtmlTemplateDirective
+  ],
   declarations: [...components, ...directives],
   providers: [],
 })

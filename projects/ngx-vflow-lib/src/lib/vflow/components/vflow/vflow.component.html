@@ -17,8 +17,8 @@
       *ngFor="let node of nodes; trackBy: trackById"
       node
       [nodeModel]="node"
-      [nodeTemplate]="nodeTemplate"
-      />
+      [nodeHtmlTemplate]="nodeHtmlDirective.templateRef"
+    />
 
     <!-- Edges  -->
     <svg:g

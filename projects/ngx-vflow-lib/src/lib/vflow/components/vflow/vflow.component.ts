@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ContentChild, ElementRef, HostListener, Input, OnChanges, OnInit, SimpleChanges, TemplateRef, ViewChild, inject, signal } from '@angular/core';
+import { AfterContentChecked, AfterContentInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ContentChild, ElementRef, HostListener, Input, OnChanges, OnInit, SimpleChanges, TemplateRef, ViewChild, inject, signal } from '@angular/core';
 import { Node } from '../../interfaces/node.interface';
 import { MapContextDirective } from '../../directives/map-context.directive';
 import { DraggableService } from '../../services/draggable.service';
@@ -7,6 +7,7 @@ import { ZoomService } from '../../services/zoom.service';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { Edge } from '../../interfaces/edge.interface';
 import { EdgeModel } from '../../models/edge.model';
+import { NodeHtmlTemplateDirective } from '../../directives/node-html.template.directive';
 
 @Component({
   selector: 'vflow',
@@ -50,8 +51,8 @@ export class VflowComponent implements OnChanges {
   @ViewChild(MapContextDirective)
   protected mapContext!: MapContextDirective
 
-  @ContentChild('nodeTemplate')
-  protected nodeTemplate!: TemplateRef<any>
+  @ContentChild(NodeHtmlTemplateDirective)
+  protected nodeHtmlDirective!: NodeHtmlTemplateDirective
 
   public readonly zoomPanSignal = this.zoomService.zoomPan
 
@@ -68,6 +69,7 @@ export class VflowComponent implements OnChanges {
   public ngOnChanges(changes: SimpleChanges): void {
     if (changes['edges']) addNodesToEdges(this.nodes, this.edges)
   }
+
   public zoomTo(value: number) {
     this.zoomService.zoom.set(value)
   }

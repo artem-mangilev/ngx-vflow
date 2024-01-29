@@ -1,20 +1,29 @@
-import { AfterContentInit, AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, HostBinding, Input, OnDestroy, OnInit, TemplateRef, ViewChild, inject } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, HostBinding, Input, NgZone, OnDestroy, OnInit, TemplateRef, ViewChild, inject } from '@angular/core';
 import { DraggableService } from '../../services/draggable.service';
 import { NodeModel } from '../../models/node.model';
 
 @Component({
   selector: 'g[node]',
   templateUrl: './node.component.html',
+  styles: [`
+    .wrapper {
+      width: max-content;
+    }
+  `],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input()
   public nodeModel!: NodeModel
 
   @Input()
-  public nodeTemplate!: TemplateRef<any>
+  public nodeHtmlTemplate!: TemplateRef<any>
 
   @ViewChild('nodeContent')
   public nodeContentRef!: ElementRef<SVGGraphicsElement>
+
+  @ViewChild('htmlWrapper')
+  public htmlWrapperRef!: ElementRef<HTMLDivElement>
 
   // TODO: may lead to perf issues
   @HostBinding('attr.transform')
@@ -30,13 +39,26 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   public ngAfterViewInit(): void {
-    // TODO: remove microtask
-    queueMicrotask(() => {
-      const box = this.nodeContentRef.nativeElement.getBBox()
+    // TODO remove microtask
 
-      this.nodeModel.width.set(box.width)
-      this.nodeModel.height.set(box.height)
-    })
+    if (this.nodeModel.node.type === 'default') {
+      queueMicrotask(() => {
+        const box = this.nodeContentRef.nativeElement.getBBox()
+
+        this.nodeModel.width.set(box.width)
+        this.nodeModel.height.set(box.height)
+      })
+    }
+
+    if (this.nodeModel.node.type === 'html-template') {
+      queueMicrotask(() => {
+        const { width, height } = this.htmlWrapperRef.nativeElement.getBoundingClientRect()
+
+        this.nodeModel.width.set(width)
+        this.nodeModel.height.set(height)
+
+      })
+    }
   }
 
   public ngOnDestroy(): void {

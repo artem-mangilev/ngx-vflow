@@ -5,12 +5,17 @@
   height="50"
 />
 
-<!-- <svg:svg
-  *ngIf="nodeModel.node.type === 'custom'"
-  #nodeContent
+<svg:foreignObject
+  *ngIf="nodeModel.node.type === 'html-template'"
+  [attr.width]="nodeModel.width()"
+  [attr.height]="nodeModel.height()"
 >
-  <ng-container *ngTemplateOutlet="nodeTemplate; context: { $implicit: nodeModel.node }"></ng-container>
-</svg:svg> -->
+  <div #htmlWrapper class="wrapper">
+    <ng-container
+      *ngTemplateOutlet="nodeHtmlTemplate; context: { $implicit: nodeModel.node }"
+    />
+  </div>
+</svg:foreignObject>
 
 <svg:circle
   [attr.cx]="nodeModel.sourcePoint().x"

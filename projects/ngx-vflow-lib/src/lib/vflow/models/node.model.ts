@@ -6,20 +6,26 @@ export class NodeModel {
   public point = signal({ x: 0, y: 0 })
 
   public sourcePoint = computed(() => {
+    const width = this.width()
+    const height = this.height()
+
     switch (this.sourcePosition) {
-      case Position.left: return { x: 0, y: this.height() / 2 }
-      case Position.right: return { x: this.width(), y: this.height() / 2 }
-      case Position.top: return { x: this.width() / 2, y: 0 }
-      case Position.bottom: return { x: this.width() / 2, y: this.height() }
+      case Position.left: return { x: 0, y: height / 2 }
+      case Position.right: return { x: width, y: height / 2 }
+      case Position.top: return { x: width / 2, y: 0 }
+      case Position.bottom: return { x: width / 2, y: height }
     }
   })
 
   public targetPoint = computed(() => {
+    const width = this.width()
+    const height = this.height()
+
     switch (this.targetPosition) {
-      case Position.left: return { x: 0, y: this.height() / 2 }
-      case Position.right: return { x: this.width(), y: this.height() / 2 }
-      case Position.top: return { x: this.width() / 2, y: 0 }
-      case Position.bottom: return { x: this.width() / 2, y: this.height() }
+      case Position.left: return { x: 0, y: height / 2 }
+      case Position.right: return { x: width, y: height / 2 }
+      case Position.top: return { x: width / 2, y: 0 }
+      case Position.bottom: return { x: width / 2, y: height }
     }
   })
 
