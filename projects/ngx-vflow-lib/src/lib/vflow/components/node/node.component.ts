@@ -17,7 +17,7 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
   public nodeModel!: NodeModel
 
   @Input()
-  public nodeHtmlTemplate!: TemplateRef<any>
+  public nodeHtmlTemplate?: TemplateRef<any>
 
   @ViewChild('nodeContent')
   public nodeContentRef!: ElementRef<SVGGraphicsElement>

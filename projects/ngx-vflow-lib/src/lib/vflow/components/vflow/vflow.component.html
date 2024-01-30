@@ -17,7 +17,7 @@
       *ngFor="let node of nodes; trackBy: trackById"
       node
       [nodeModel]="node"
-      [nodeHtmlTemplate]="nodeHtmlDirective.templateRef"
+      [nodeHtmlTemplate]="nodeHtmlDirective?.templateRef"
     />
 
     <!-- Edges  -->

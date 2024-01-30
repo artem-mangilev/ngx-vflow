@@ -52,7 +52,7 @@ export class VflowComponent implements OnChanges {
   protected mapContext!: MapContextDirective
 
   @ContentChild(NodeHtmlTemplateDirective)
-  protected nodeHtmlDirective!: NodeHtmlTemplateDirective
+  protected nodeHtmlDirective?: NodeHtmlTemplateDirective
 
   public readonly zoomPanSignal = this.zoomService.zoomPan
 

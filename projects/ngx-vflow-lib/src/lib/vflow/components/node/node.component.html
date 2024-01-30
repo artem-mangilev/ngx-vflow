@@ -6,7 +6,7 @@
 />
 
 <svg:foreignObject
-  *ngIf="nodeModel.node.type === 'html-template'"
+  *ngIf="nodeModel.node.type === 'html-template' && nodeHtmlTemplate"
   [attr.width]="nodeModel.width()"
   [attr.height]="nodeModel.height()"
 >
