@@ -16,16 +16,22 @@ export class VflowEdgesDemoComponent {
       id: uuid(),
       point: { x: 10, y: 10 },
       type: 'html-template',
-      sourcePosition: Position.bottom,
-      targetPosition: Position.top
-
+      // sourcePosition: Position.bottom,
+      // targetPosition: Position.top
     },
     {
       id: uuid(),
       point: { x: 100, y: 100 },
       type: 'html-template',
-      sourcePosition: Position.bottom,
-      targetPosition: Position.top
+      // sourcePosition: Position.bottom,
+      // targetPosition: Position.top
+    },
+    {
+      id: uuid(),
+      point: { x: 150, y: 150 },
+      type: 'html-template',
+      // sourcePosition: Position.bottom,
+      // targetPosition: Position.top
     },
   ]
 
@@ -34,6 +40,17 @@ export class VflowEdgesDemoComponent {
       id: uuid(),
       source: this.nodes[0].id,
       target: this.nodes[1].id,
-    }
+      type: 'straight',
+      edgeLabel: {
+        center: {
+          type: 'html-template'
+        }
+      }
+    },
+    // {
+    //   id: uuid(),
+    //   source: this.nodes[1].id,
+    //   target: this.nodes[2].id,
+    // },
   ]
 }

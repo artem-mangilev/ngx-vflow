@@ -25,6 +25,7 @@
       *ngFor="let edge of edges"
       edge
       [edgeModel]="edge"
+      [edgeLabelHtmlTemplate]="edgeLabelHtmlDirective?.templateRef"
     />
 
   </svg:g>

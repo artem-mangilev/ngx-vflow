@@ -1,1 +1,11 @@
-<svg:path [attr.d]="path()" stroke="black" fill="none">
+<svg:path [attr.d]="path()" stroke="black" fill="none" />
+
+<ng-container *ngIf="edgeModel.edge.edgeLabel?.center as label">
+
+  <svg:foreignObject *ngIf="label.type === 'html-template' && edgeLabelHtmlTemplate" width="20" height="20">
+    <ng-container
+      *ngTemplateOutlet="edgeLabelHtmlTemplate; context: { $implicit: edgeModel.edge }"
+    />
+  </svg:foreignObject>
+
+</ng-container>

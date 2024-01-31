@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Input, OnInit, computed } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnInit, TemplateRef, computed } from '@angular/core';
 import { EdgeModel } from '../../models/edge.model';
 import { bezierPath } from '../../math/edge-path/bezier-path';
 import { straightPath } from '../../math/edge-path/straigh-path';
@@ -11,6 +11,9 @@ import { straightPath } from '../../math/edge-path/straigh-path';
 export class EdgeComponent {
   @Input()
   public edgeModel!: EdgeModel
+
+  @Input()
+  public edgeLabelHtmlTemplate?: TemplateRef<any>
 
   public path = computed(() => {
     const source = {
@@ -33,5 +36,4 @@ export class EdgeComponent {
         )
     }
   })
-
 }
