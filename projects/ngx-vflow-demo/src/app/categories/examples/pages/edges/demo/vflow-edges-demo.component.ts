@@ -41,7 +41,7 @@ export class VflowEdgesDemoComponent {
       source: this.nodes[0].id,
       target: this.nodes[1].id,
       type: 'straight',
-      edgeLabel: {
+      edgeLabels: {
         center: {
           type: 'html-template'
         }
