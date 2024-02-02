@@ -5,6 +5,7 @@ import { EdgeLabelModel } from "./edge-label.model";
 import { NodeModel } from "./node.model";
 import { straightPath } from "../math/edge-path/straigh-path";
 import { bezierPath } from "../math/edge-path/bezier-path";
+import { UsingPoints } from "../types/using-points.type";
 
 export class EdgeModel {
   public source!: NodeModel
@@ -24,16 +25,20 @@ export class EdgeModel {
 
     switch (this.type) {
       case 'straight':
-        return straightPath(source, target)
+        return straightPath(source, target, this.usingPoints)
       case 'bezier':
-        return bezierPath(source, target,
+        return bezierPath(
+          source, target,
           this.source.sourcePosition,
-          this.target.targetPosition
+          this.target.targetPosition,
+          this.usingPoints
         )
     }
   })
 
   public edgeLabels: { [position in EdgeLabelPosition]?: EdgeLabelModel } = {}
+
+  private usingPoints: UsingPoints
 
   constructor(public edge: Edge) {
     this.type = edge.type ?? 'bezier'
@@ -41,5 +46,7 @@ export class EdgeModel {
     if (edge.edgeLabels?.start) this.edgeLabels.start = new EdgeLabelModel(edge.edgeLabels.start)
     if (edge.edgeLabels?.center) this.edgeLabels.center = new EdgeLabelModel(edge.edgeLabels.center)
     if (edge.edgeLabels?.end) this.edgeLabels.end = new EdgeLabelModel(edge.edgeLabels.end)
+
+    this.usingPoints = [!!this.edgeLabels.start, !!this.edgeLabels.center, !!this.edgeLabels.end]
   }
 }

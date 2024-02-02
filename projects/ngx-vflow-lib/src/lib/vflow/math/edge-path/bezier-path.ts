@@ -2,27 +2,29 @@ import { Position } from "../../enums/position.enum";
 import { PathData } from "../../interfaces/path-data.interface";
 import { Point } from "../../interfaces/point.interface";
 import { Path, path as d3Path } from 'd3-path'
+import { UsingPoints } from "../../types/using-points.type";
 
 export function bezierPath(
   source: Point,
   target: Point,
   sourcePosition: Position,
-  targetPosition: Position
+  targetPosition: Position,
+  usingPoints: UsingPoints
 ): PathData {
   if (sourcePosition === Position.left && targetPosition === Position.right) {
-    return bezierPathRtl(source, target)
+    return bezierPathRtl(source, target, usingPoints)
   }
 
   if (sourcePosition === Position.right && targetPosition === Position.left) {
-    return bezierPathLtr(source, target)
+    return bezierPathLtr(source, target, usingPoints)
   }
 
   if (sourcePosition === Position.bottom && targetPosition === Position.top) {
-    return bezierPathTtb(source, target)
+    return bezierPathTtb(source, target, usingPoints)
   }
 
   if (sourcePosition === Position.top && targetPosition === Position.bottom) {
-    return bezierPathBtt(source, target)
+    return bezierPathBtt(source, target, usingPoints)
   }
 
   throw new Error('Unhandled combination of sourcePosition and targetPosition')
@@ -31,7 +33,7 @@ export function bezierPath(
 /**
  * Left-to-right direction
  */
-function bezierPathLtr(source: Point, target: Point): PathData {
+function bezierPathLtr(source: Point, target: Point, usingPoints: UsingPoints): PathData {
   const path = d3Path()
 
   path.moveTo(source.x, source.y)
@@ -63,13 +65,13 @@ function bezierPathLtr(source: Point, target: Point): PathData {
     target.x, target.y
   )
 
-  return getPathData(path, source, target, firstControl, secondControl)
+  return getPathData(path, source, target, firstControl, secondControl, usingPoints)
 }
 
 /**
  * Right-to-left direction
  */
-function bezierPathRtl(source: Point, target: Point): PathData {
+function bezierPathRtl(source: Point, target: Point, usingPoints: UsingPoints): PathData {
   const path = d3Path()
 
   path.moveTo(source.x, source.y)
@@ -100,13 +102,14 @@ function bezierPathRtl(source: Point, target: Point): PathData {
     secondControl.x, secondControl.y,
     target.x, target.y
   )
-  return getPathData(path, source, target, firstControl, secondControl)
+
+  return getPathData(path, source, target, firstControl, secondControl, usingPoints)
 }
 
 /**
  * Bottom-to-top
  */
-function bezierPathBtt(source: Point, target: Point): PathData {
+function bezierPathBtt(source: Point, target: Point, usingPoints: UsingPoints): PathData {
   const path = d3Path()
 
   path.moveTo(source.x, source.y)
@@ -137,13 +140,14 @@ function bezierPathBtt(source: Point, target: Point): PathData {
     secondControl.x, secondControl.y,
     target.x, target.y
   )
-  return getPathData(path, source, target, firstControl, secondControl)
+
+  return getPathData(path, source, target, firstControl, secondControl, usingPoints)
 }
 
 /**
  * Top to bottom
  */
-function bezierPathTtb(source: Point, target: Point): PathData {
+function bezierPathTtb(source: Point, target: Point, usingPoints: UsingPoints): PathData {
   const path = d3Path()
 
   path.moveTo(source.x, source.y)
@@ -174,16 +178,28 @@ function bezierPathTtb(source: Point, target: Point): PathData {
     secondControl.x, secondControl.y,
     target.x, target.y
   )
-  return getPathData(path, source, target, firstControl, secondControl)
+
+  return getPathData(path, source, target, firstControl, secondControl, usingPoints)
 }
 
-function getPathData(path: Path, source: Point, target: Point, firstControl: Point, secondControl: Point): PathData {
+function getPathData(
+  path: Path,
+  source: Point,
+  target: Point,
+  firstControl: Point,
+  secondControl: Point,
+  usingPoints: UsingPoints
+): PathData {
+  const [start, center, end] = usingPoints
+
+  const nullPoint = { x: 0, y: 0 }
+
   return {
     path: path.toString(),
     points: {
-      start: getPointOnBezier(source, target, firstControl, secondControl, .10),
-      center: getPointOnBezier(source, target, firstControl, secondControl, .50),
-      end: getPointOnBezier(source, target, firstControl, secondControl, .90),
+      start: start ? getPointOnBezier(source, target, firstControl, secondControl, .10) : nullPoint,
+      center: center ? getPointOnBezier(source, target, firstControl, secondControl, .50) : nullPoint,
+      end: end ? getPointOnBezier(source, target, firstControl, secondControl, .90) : nullPoint,
     }
   }
 }
