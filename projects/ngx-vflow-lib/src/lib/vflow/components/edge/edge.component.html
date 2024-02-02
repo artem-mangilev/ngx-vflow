@@ -3,7 +3,7 @@
 <ng-container *ngIf="edgeModel.edgeLabels?.start as label">
   <svg:g edgeLabel
     [model]="label"
-    [point]="edgeModel.path().startPoint"
+    [point]="edgeModel.path().points.start"
     [edgeModel]="edgeModel"
     [htmlTemplate]="edgeLabelHtmlTemplate"
   />
@@ -12,7 +12,7 @@
 <ng-container *ngIf="edgeModel.edgeLabels?.center as label">
   <svg:g edgeLabel
     [model]="label"
-    [point]="edgeModel.path().centerPoint"
+    [point]="edgeModel.path().points.center"
     [edgeModel]="edgeModel"
     [htmlTemplate]="edgeLabelHtmlTemplate"
   />
@@ -21,7 +21,7 @@
 <ng-container *ngIf="edgeModel.edgeLabels?.end as label">
   <svg:g edgeLabel
     [model]="label"
-    [point]="edgeModel.path().endPoint"
+    [point]="edgeModel.path().points.end"
     [edgeModel]="edgeModel"
     [htmlTemplate]="edgeLabelHtmlTemplate"
   />

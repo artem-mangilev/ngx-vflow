@@ -1,9 +1,7 @@
+import { EdgeLabelPosition } from "./edge-label.interface";
 import { Point } from "./point.interface";
 
-// TODO: refactor point names
 export interface PathData {
   path: string;
-  startPoint: Point
-  centerPoint: Point
-  endPoint: Point
+  points: { [key in EdgeLabelPosition]: Point }
 }

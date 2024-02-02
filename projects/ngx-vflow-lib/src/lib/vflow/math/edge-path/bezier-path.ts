@@ -177,12 +177,14 @@ function bezierPathTtb(source: Point, target: Point): PathData {
   return getPathData(path, source, target, firstControl, secondControl)
 }
 
-function getPathData(path: Path, source: Point, target: Point, firstControl: Point, secondControl: Point) {
+function getPathData(path: Path, source: Point, target: Point, firstControl: Point, secondControl: Point): PathData {
   return {
     path: path.toString(),
-    startPoint: getPointOnBezier(source, target, firstControl, secondControl, .10),
-    centerPoint: getPointOnBezier(source, target, firstControl, secondControl, .50),
-    endPoint: getPointOnBezier(source, target, firstControl, secondControl, .90),
+    points: {
+      start: getPointOnBezier(source, target, firstControl, secondControl, .10),
+      center: getPointOnBezier(source, target, firstControl, secondControl, .50),
+      end: getPointOnBezier(source, target, firstControl, secondControl, .90),
+    }
   }
 }
 

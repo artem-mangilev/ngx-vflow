@@ -11,12 +11,11 @@ export function straightPath(source: Point, target: Point): PathData {
 
   return {
     path: path.toString(),
-    startPoint: getPointByRatio(source, target, .15),
-    centerPoint: {
-      x: (source.x + target.x) / 2,
-      y: (source.y + target.y) / 2
-    },
-    endPoint: getPointByRatio(source, target, .85)
+    points: {
+      start: getPointByRatio(source, target, .15),
+      center: getPointByRatio(source, target, .50),
+      end: getPointByRatio(source, target, .85),
+    }
   }
 }
 
