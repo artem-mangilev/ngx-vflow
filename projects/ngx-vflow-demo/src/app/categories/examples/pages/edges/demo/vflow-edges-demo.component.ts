@@ -42,9 +42,15 @@ export class VflowEdgesDemoComponent {
       target: this.nodes[1].id,
       type: 'straight',
       edgeLabels: {
+        start: {
+          type: 'html-template'
+        },
         center: {
           type: 'html-template'
-        }
+        },
+        end: {
+          type: 'html-template'
+        },
       }
     },
     // {

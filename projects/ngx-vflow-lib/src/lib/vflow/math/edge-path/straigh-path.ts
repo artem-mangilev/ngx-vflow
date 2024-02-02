@@ -1,11 +1,15 @@
 import { Point } from "../../interfaces/point.interface";
 import { path as d3Path } from 'd3-path'
 
+// TODO: refactor point names
 interface PathData {
   path: string;
+  startPoint: Point
   centerPoint: Point
+  endPoint: Point
 }
 
+// TODO: we should not compute not used points on path
 export function straightPath(source: Point, target: Point): PathData {
   const path = d3Path()
 
@@ -14,10 +18,18 @@ export function straightPath(source: Point, target: Point): PathData {
 
   return {
     path: path.toString(),
+    startPoint: getPointByRatio(source, target, .15),
     centerPoint: {
       x: (source.x + target.x) / 2,
       y: (source.y + target.y) / 2
-    }
+    },
+    endPoint: getPointByRatio(source, target, .85)
   }
+}
 
+function getPointByRatio(source: Point, target: Point, ratio: number) {
+  return {
+    x: source.x + (target.x - source.x) * ratio,
+    y: source.y + (target.y - source.y) * ratio,
+  }
 }

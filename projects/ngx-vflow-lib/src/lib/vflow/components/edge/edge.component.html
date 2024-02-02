@@ -1,9 +1,27 @@
 <svg:path [attr.d]="edgeModel.path().path" stroke="black" fill="none" />
 
+<ng-container *ngIf="edgeModel.edgeLabels?.start as label">
+  <svg:g edgeLabel
+    [model]="label"
+    [point]="edgeModel.path().startPoint"
+    [edgeModel]="edgeModel"
+    [htmlTemplate]="edgeLabelHtmlTemplate"
+  />
+</ng-container>
+
 <ng-container *ngIf="edgeModel.edgeLabels?.center as label">
   <svg:g edgeLabel
     [model]="label"
     [point]="edgeModel.path().centerPoint"
+    [edgeModel]="edgeModel"
+    [htmlTemplate]="edgeLabelHtmlTemplate"
+  />
+</ng-container>
+
+<ng-container *ngIf="edgeModel.edgeLabels?.end as label">
+  <svg:g edgeLabel
+    [model]="label"
+    [point]="edgeModel.path().endPoint"
     [edgeModel]="edgeModel"
     [htmlTemplate]="edgeLabelHtmlTemplate"
   />
