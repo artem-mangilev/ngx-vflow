@@ -1,4 +1,5 @@
 import { Position } from "../../enums/position.enum";
+import { PathData } from "../../interfaces/path-data.interface";
 import { Point } from "../../interfaces/point.interface";
 import { path as d3Path } from 'd3-path'
 
@@ -7,7 +8,7 @@ export function bezierPath(
   target: Point,
   sourcePosition: Position,
   targetPosition: Position
-) {
+): PathData {
   if (sourcePosition === Position.left && targetPosition === Position.right) {
     return bezierPathRtl(source, target)
   }
@@ -30,7 +31,7 @@ export function bezierPath(
 /**
  * Left-to-right direction
  */
-function bezierPathLtr(source: Point, target: Point) {
+function bezierPathLtr(source: Point, target: Point): PathData {
   const path = d3Path()
 
   path.moveTo(source.x, source.y)
@@ -56,7 +57,30 @@ function bezierPathLtr(source: Point, target: Point) {
       target.x, target.y
     )
 
-    return path.toString()
+    return {
+      path: path.toString(),
+      startPoint: getPointOnBezier(
+        source,
+        target,
+        { x: firstControlX, y: firstControlY },
+        { x: secondControlX, y: secondControlY },
+        .10
+      ),
+      centerPoint: getPointOnBezier(
+        source,
+        target,
+        { x: firstControlX, y: firstControlY },
+        { x: secondControlX, y: secondControlY },
+        .50
+      ),
+      endPoint: getPointOnBezier(
+        source,
+        target,
+        { x: firstControlX, y: firstControlY },
+        { x: secondControlX, y: secondControlY },
+        .90
+      ),
+    }
   }
 
   const middleX = (source.x + target.x) / 2
@@ -73,13 +97,36 @@ function bezierPathLtr(source: Point, target: Point) {
     target.x, target.y
   )
 
-  return path.toString()
+  return {
+    path: path.toString(),
+    startPoint: getPointOnBezier(
+      source,
+      target,
+      { x: firstControlX, y: firstControlY },
+      { x: secondControlX, y: secondControlY },
+      .10
+    ),
+    centerPoint: getPointOnBezier(
+      source,
+      target,
+      { x: firstControlX, y: firstControlY },
+      { x: secondControlX, y: secondControlY },
+      .50
+    ),
+    endPoint: getPointOnBezier(
+      source,
+      target,
+      { x: firstControlX, y: firstControlY },
+      { x: secondControlX, y: secondControlY },
+      .90
+    ),
+  }
 }
 
 /**
  * Right-to-left direction
  */
-function bezierPathRtl(source: Point, target: Point) {
+function bezierPathRtl(source: Point, target: Point): PathData {
   const path = d3Path()
 
   path.moveTo(source.x, source.y)
@@ -105,7 +152,30 @@ function bezierPathRtl(source: Point, target: Point) {
       target.x, target.y
     )
 
-    return path.toString()
+    return {
+      path: path.toString(),
+      startPoint: getPointOnBezier(
+        source,
+        target,
+        { x: firstControlX, y: firstControlY },
+        { x: secondControlX, y: secondControlY },
+        .10
+      ),
+      centerPoint: getPointOnBezier(
+        source,
+        target,
+        { x: firstControlX, y: firstControlY },
+        { x: secondControlX, y: secondControlY },
+        .50
+      ),
+      endPoint: getPointOnBezier(
+        source,
+        target,
+        { x: firstControlX, y: firstControlY },
+        { x: secondControlX, y: secondControlY },
+        .90
+      ),
+    }
   }
 
   const middleX = (source.x + target.x) / 2
@@ -122,13 +192,36 @@ function bezierPathRtl(source: Point, target: Point) {
     target.x, target.y
   )
 
-  return path.toString()
+  return {
+    path: path.toString(),
+    startPoint: getPointOnBezier(
+      source,
+      target,
+      { x: firstControlX, y: firstControlY },
+      { x: secondControlX, y: secondControlY },
+      .10
+    ),
+    centerPoint: getPointOnBezier(
+      source,
+      target,
+      { x: firstControlX, y: firstControlY },
+      { x: secondControlX, y: secondControlY },
+      .50
+    ),
+    endPoint: getPointOnBezier(
+      source,
+      target,
+      { x: firstControlX, y: firstControlY },
+      { x: secondControlX, y: secondControlY },
+      .90
+    ),
+  }
 }
 
 /**
  * Bottom-to-top
  */
-function bezierPathBtt(source: Point, target: Point) {
+function bezierPathBtt(source: Point, target: Point): PathData {
   const path = d3Path()
 
   path.moveTo(source.x, source.y)
@@ -154,7 +247,30 @@ function bezierPathBtt(source: Point, target: Point) {
       target.x, target.y
     )
 
-    return path.toString()
+    return {
+      path: path.toString(),
+      startPoint: getPointOnBezier(
+        source,
+        target,
+        { x: firstControlX, y: firstControlY },
+        { x: secondControlX, y: secondControlY },
+        .10
+      ),
+      centerPoint: getPointOnBezier(
+        source,
+        target,
+        { x: firstControlX, y: firstControlY },
+        { x: secondControlX, y: secondControlY },
+        .50
+      ),
+      endPoint: getPointOnBezier(
+        source,
+        target,
+        { x: firstControlX, y: firstControlY },
+        { x: secondControlX, y: secondControlY },
+        .90
+      ),
+    }
   }
 
   const middleY = (source.y + target.y) / 2
@@ -171,13 +287,36 @@ function bezierPathBtt(source: Point, target: Point) {
     target.x, target.y
   )
 
-  return path.toString()
+  return {
+    path: path.toString(),
+    startPoint: getPointOnBezier(
+      source,
+      target,
+      { x: firstControlX, y: firstControlY },
+      { x: secondControlX, y: secondControlY },
+      .10
+    ),
+    centerPoint: getPointOnBezier(
+      source,
+      target,
+      { x: firstControlX, y: firstControlY },
+      { x: secondControlX, y: secondControlY },
+      .50
+    ),
+    endPoint: getPointOnBezier(
+      source,
+      target,
+      { x: firstControlX, y: firstControlY },
+      { x: secondControlX, y: secondControlY },
+      .90
+    ),
+  }
 }
 
 /**
  * Top to bottom
  */
-function bezierPathTtb(source: Point, target: Point) {
+function bezierPathTtb(source: Point, target: Point): PathData {
   const path = d3Path()
 
   path.moveTo(source.x, source.y)
@@ -203,7 +342,30 @@ function bezierPathTtb(source: Point, target: Point) {
       target.x, target.y
     )
 
-    return path.toString()
+    return {
+      path: path.toString(),
+      startPoint: getPointOnBezier(
+        source,
+        target,
+        { x: firstControlX, y: firstControlY },
+        { x: secondControlX, y: secondControlY },
+        .10
+      ),
+      centerPoint: getPointOnBezier(
+        source,
+        target,
+        { x: firstControlX, y: firstControlY },
+        { x: secondControlX, y: secondControlY },
+        .50
+      ),
+      endPoint: getPointOnBezier(
+        source,
+        target,
+        { x: firstControlX, y: firstControlY },
+        { x: secondControlX, y: secondControlY },
+        .90
+      ),
+    }
   }
 
   const middleY = (source.y + target.y) / 2
@@ -220,6 +382,61 @@ function bezierPathTtb(source: Point, target: Point) {
     target.x, target.y
   )
 
-  return path.toString()
+  return {
+    path: path.toString(),
+    startPoint: getPointOnBezier(
+      source,
+      target,
+      { x: firstControlX, y: firstControlY },
+      { x: secondControlX, y: secondControlY },
+      .10
+    ),
+    centerPoint: getPointOnBezier(
+      source,
+      target,
+      { x: firstControlX, y: firstControlY },
+      { x: secondControlX, y: secondControlY },
+      .50
+    ),
+    endPoint: getPointOnBezier(
+      source,
+      target,
+      { x: firstControlX, y: firstControlY },
+      { x: secondControlX, y: secondControlY },
+      .90
+    ),
+  }
 }
 
+/**
+ * Get point on bezier curve by ratio
+ */
+function getPointOnBezier(
+  sourcePoint: Point,
+  targetPoint: Point,
+  controlPoint1: Point,
+  controlPoint2: Point,
+  ratio: number
+): Point {
+  const fromSourceToFirstControl: Point = getPointOnLine(sourcePoint, controlPoint1, ratio);
+  const fromFirstControlToSecond: Point = getPointOnLine(controlPoint1, controlPoint2, ratio);
+  const fromSecondControlToTarget: Point = getPointOnLine(controlPoint2, targetPoint, ratio);
+
+  return getPointOnLine(
+    getPointOnLine(fromSourceToFirstControl, fromFirstControlToSecond, ratio),
+    getPointOnLine(fromFirstControlToSecond, fromSecondControlToTarget, ratio),
+    ratio
+  );
+}
+
+/**
+* Get point on line
+*
+* https://math.stackexchange.com/questions/563566/how-do-i-find-the-middle1-2-1-3-1-4-etc-of-a-line
+*/
+function getPointOnLine(start: Point, end: Point, ratio: number): Point {
+  return {
+    x: ((1 - ratio) * start.x) + ((ratio) * end.x),
+    y: ((1 - ratio) * start.y) + (ratio * end.y),
+  };
+}

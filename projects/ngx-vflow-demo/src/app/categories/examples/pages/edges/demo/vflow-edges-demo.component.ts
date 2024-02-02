@@ -40,7 +40,7 @@ export class VflowEdgesDemoComponent {
       id: uuid(),
       source: this.nodes[0].id,
       target: this.nodes[1].id,
-      type: 'straight',
+      type: 'bezier',
       edgeLabels: {
         start: {
           type: 'html-template'

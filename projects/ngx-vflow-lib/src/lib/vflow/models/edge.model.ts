@@ -4,6 +4,7 @@ import { Edge, EdgeType } from "../interfaces/edge.interface";
 import { EdgeLabelModel } from "./edge-label.model";
 import { NodeModel } from "./node.model";
 import { straightPath } from "../math/edge-path/straigh-path";
+import { bezierPath } from "../math/edge-path/bezier-path";
 
 export class EdgeModel {
   public source!: NodeModel
@@ -21,18 +22,15 @@ export class EdgeModel {
       y: this.target.point().y + this.target.targetPoint().y
     }
 
-    return straightPath(source, target)
-
-    // TODO: fix
-    // switch (this.edgeModel.type) {
-    //   case 'straight':
-    //     return straightPath(source, target)
-    //   case 'bezier':
-    //     return bezierPath(source, target,
-    //       this.edgeModel.source.sourcePosition,
-    //       this.edgeModel.target.targetPosition
-    //     )
-    // }
+    switch (this.type) {
+      case 'straight':
+        return straightPath(source, target)
+      case 'bezier':
+        return bezierPath(source, target,
+          this.source.sourcePosition,
+          this.target.targetPosition
+        )
+    }
   })
 
   public edgeLabels: { [position in EdgeLabelPosition]?: EdgeLabelModel } = {}

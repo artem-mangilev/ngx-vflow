@@ -1,13 +1,6 @@
+import { PathData } from "../../interfaces/path-data.interface";
 import { Point } from "../../interfaces/point.interface";
 import { path as d3Path } from 'd3-path'
-
-// TODO: refactor point names
-interface PathData {
-  path: string;
-  startPoint: Point
-  centerPoint: Point
-  endPoint: Point
-}
 
 // TODO: we should not compute not used points on path
 export function straightPath(source: Point, target: Point): PathData {
