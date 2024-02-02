@@ -1,7 +1,7 @@
 import { Position } from "../../enums/position.enum";
 import { PathData } from "../../interfaces/path-data.interface";
 import { Point } from "../../interfaces/point.interface";
-import { path as d3Path } from 'd3-path'
+import { Path, path as d3Path } from 'd3-path'
 
 export function bezierPath(
   source: Point,
@@ -45,82 +45,28 @@ function bezierPathLtr(source: Point, target: Point): PathData {
     // https://github.com/xyflow/xyflow/blob/f0117939bae934447fa7f232081f937169ee23b5/packages/system/src/utils/edges/bezier-edge.ts#L56
     const controlOffset = curvature * 25 * Math.sqrt(distance)
 
-    const firstControlX = source.x + controlOffset
-    const firstControlY = source.y
-
-    const secondControlX = target.x - controlOffset
-    const secondControlY = target.y
+    const firstControl = { x: source.x + controlOffset, y: source.y }
+    const secondControl = { x: target.x - controlOffset, y: target.y }
 
     path.bezierCurveTo(
-      firstControlX, firstControlY,
-      secondControlX, secondControlY,
+      firstControl.x, firstControl.y,
+      secondControl.x, secondControl.y,
       target.x, target.y
     )
-
-    return {
-      path: path.toString(),
-      startPoint: getPointOnBezier(
-        source,
-        target,
-        { x: firstControlX, y: firstControlY },
-        { x: secondControlX, y: secondControlY },
-        .10
-      ),
-      centerPoint: getPointOnBezier(
-        source,
-        target,
-        { x: firstControlX, y: firstControlY },
-        { x: secondControlX, y: secondControlY },
-        .50
-      ),
-      endPoint: getPointOnBezier(
-        source,
-        target,
-        { x: firstControlX, y: firstControlY },
-        { x: secondControlX, y: secondControlY },
-        .90
-      ),
-    }
+    return getPathData(path, source, target, firstControl, secondControl)
   }
 
   const middleX = (source.x + target.x) / 2
-
-  const firstControlX = middleX
-  const firstControlY = source.y
-
-  const secondControlX = middleX
-  const secondControlY = target.y
+  const firstControl = { x: middleX, y: source.y }
+  const secondControl = { x: middleX, y: target.y }
 
   path.bezierCurveTo(
-    firstControlX, firstControlY,
-    secondControlX, secondControlY,
+    firstControl.x, firstControl.y,
+    secondControl.x, secondControl.y,
     target.x, target.y
   )
 
-  return {
-    path: path.toString(),
-    startPoint: getPointOnBezier(
-      source,
-      target,
-      { x: firstControlX, y: firstControlY },
-      { x: secondControlX, y: secondControlY },
-      .10
-    ),
-    centerPoint: getPointOnBezier(
-      source,
-      target,
-      { x: firstControlX, y: firstControlY },
-      { x: secondControlX, y: secondControlY },
-      .50
-    ),
-    endPoint: getPointOnBezier(
-      source,
-      target,
-      { x: firstControlX, y: firstControlY },
-      { x: secondControlX, y: secondControlY },
-      .90
-    ),
-  }
+  return getPathData(path, source, target, firstControl, secondControl)
 }
 
 /**
@@ -140,82 +86,28 @@ function bezierPathRtl(source: Point, target: Point): PathData {
     // https://github.com/xyflow/xyflow/blob/f0117939bae934447fa7f232081f937169ee23b5/packages/system/src/utils/edges/bezier-edge.ts#L56
     const controlOffset = curvature * 25 * Math.sqrt(distance)
 
-    const firstControlX = source.x - controlOffset
-    const firstControlY = source.y
-
-    const secondControlX = target.x + controlOffset
-    const secondControlY = target.y
+    const firstControl = { x: source.x - controlOffset, y: source.y }
+    const secondControl = { x: target.x + controlOffset, y: target.y }
 
     path.bezierCurveTo(
-      firstControlX, firstControlY,
-      secondControlX, secondControlY,
+      firstControl.x, firstControl.y,
+      secondControl.x, secondControl.y,
       target.x, target.y
     )
-
-    return {
-      path: path.toString(),
-      startPoint: getPointOnBezier(
-        source,
-        target,
-        { x: firstControlX, y: firstControlY },
-        { x: secondControlX, y: secondControlY },
-        .10
-      ),
-      centerPoint: getPointOnBezier(
-        source,
-        target,
-        { x: firstControlX, y: firstControlY },
-        { x: secondControlX, y: secondControlY },
-        .50
-      ),
-      endPoint: getPointOnBezier(
-        source,
-        target,
-        { x: firstControlX, y: firstControlY },
-        { x: secondControlX, y: secondControlY },
-        .90
-      ),
-    }
+    return getPathData(path, source, target, firstControl, secondControl)
   }
 
   const middleX = (source.x + target.x) / 2
 
-  const firstControlX = middleX
-  const firstControlY = source.y
-
-  const secondControlX = middleX
-  const secondControlY = target.y
+  const firstControl = { x: middleX, y: source.y }
+  const secondControl = { x: middleX, y: target.y }
 
   path.bezierCurveTo(
-    firstControlX, firstControlY,
-    secondControlX, secondControlY,
+    firstControl.x, firstControl.y,
+    secondControl.x, secondControl.y,
     target.x, target.y
   )
-
-  return {
-    path: path.toString(),
-    startPoint: getPointOnBezier(
-      source,
-      target,
-      { x: firstControlX, y: firstControlY },
-      { x: secondControlX, y: secondControlY },
-      .10
-    ),
-    centerPoint: getPointOnBezier(
-      source,
-      target,
-      { x: firstControlX, y: firstControlY },
-      { x: secondControlX, y: secondControlY },
-      .50
-    ),
-    endPoint: getPointOnBezier(
-      source,
-      target,
-      { x: firstControlX, y: firstControlY },
-      { x: secondControlX, y: secondControlY },
-      .90
-    ),
-  }
+  return getPathData(path, source, target, firstControl, secondControl)
 }
 
 /**
@@ -235,82 +127,28 @@ function bezierPathBtt(source: Point, target: Point): PathData {
     // https://github.com/xyflow/xyflow/blob/f0117939bae934447fa7f232081f937169ee23b5/packages/system/src/utils/edges/bezier-edge.ts#L56
     const controlOffset = curvature * 25 * Math.sqrt(distance)
 
-    const firstControlX = source.x
-    const firstControlY = source.y - controlOffset
-
-    const secondControlX = target.x
-    const secondControlY = target.y + controlOffset
+    const firstControl = { x: source.x, y: source.y - controlOffset }
+    const secondControl = { x: target.x, y: target.y + controlOffset }
 
     path.bezierCurveTo(
-      firstControlX, firstControlY,
-      secondControlX, secondControlY,
+      firstControl.x, firstControl.y,
+      secondControl.x, secondControl.y,
       target.x, target.y
     )
-
-    return {
-      path: path.toString(),
-      startPoint: getPointOnBezier(
-        source,
-        target,
-        { x: firstControlX, y: firstControlY },
-        { x: secondControlX, y: secondControlY },
-        .10
-      ),
-      centerPoint: getPointOnBezier(
-        source,
-        target,
-        { x: firstControlX, y: firstControlY },
-        { x: secondControlX, y: secondControlY },
-        .50
-      ),
-      endPoint: getPointOnBezier(
-        source,
-        target,
-        { x: firstControlX, y: firstControlY },
-        { x: secondControlX, y: secondControlY },
-        .90
-      ),
-    }
+    return getPathData(path, source, target, firstControl, secondControl)
   }
 
   const middleY = (source.y + target.y) / 2
 
-  const firstControlX = source.x
-  const firstControlY = middleY
-
-  const secondControlX = target.x
-  const secondControlY = middleY
+  const firstControl = { x: source.x, y: middleY }
+  const secondControl = { x: target.x, y: middleY }
 
   path.bezierCurveTo(
-    firstControlX, firstControlY,
-    secondControlX, secondControlY,
+    firstControl.x, firstControl.y,
+    secondControl.x, secondControl.y,
     target.x, target.y
   )
-
-  return {
-    path: path.toString(),
-    startPoint: getPointOnBezier(
-      source,
-      target,
-      { x: firstControlX, y: firstControlY },
-      { x: secondControlX, y: secondControlY },
-      .10
-    ),
-    centerPoint: getPointOnBezier(
-      source,
-      target,
-      { x: firstControlX, y: firstControlY },
-      { x: secondControlX, y: secondControlY },
-      .50
-    ),
-    endPoint: getPointOnBezier(
-      source,
-      target,
-      { x: firstControlX, y: firstControlY },
-      { x: secondControlX, y: secondControlY },
-      .90
-    ),
-  }
+  return getPathData(path, source, target, firstControl, secondControl)
 }
 
 /**
@@ -330,81 +168,36 @@ function bezierPathTtb(source: Point, target: Point): PathData {
     // https://github.com/xyflow/xyflow/blob/f0117939bae934447fa7f232081f937169ee23b5/packages/system/src/utils/edges/bezier-edge.ts#L56
     const controlOffset = curvature * 25 * Math.sqrt(distance)
 
-    const firstControlX = source.x
-    const firstControlY = source.y + controlOffset
-
-    const secondControlX = target.x
-    const secondControlY = target.y - controlOffset
+    const firstControl = { x: source.x, y: source.y + controlOffset }
+    const secondControl = { x: target.x, y: target.y - controlOffset }
 
     path.bezierCurveTo(
-      firstControlX, firstControlY,
-      secondControlX, secondControlY,
+      firstControl.x, firstControl.y,
+      secondControl.x, secondControl.y,
       target.x, target.y
     )
-
-    return {
-      path: path.toString(),
-      startPoint: getPointOnBezier(
-        source,
-        target,
-        { x: firstControlX, y: firstControlY },
-        { x: secondControlX, y: secondControlY },
-        .10
-      ),
-      centerPoint: getPointOnBezier(
-        source,
-        target,
-        { x: firstControlX, y: firstControlY },
-        { x: secondControlX, y: secondControlY },
-        .50
-      ),
-      endPoint: getPointOnBezier(
-        source,
-        target,
-        { x: firstControlX, y: firstControlY },
-        { x: secondControlX, y: secondControlY },
-        .90
-      ),
-    }
+    return getPathData(path, source, target, firstControl, secondControl)
   }
 
   const middleY = (source.y + target.y) / 2
 
-  const firstControlX = source.x
-  const firstControlY = middleY
-
-  const secondControlX = target.x
-  const secondControlY = middleY
+  const firstControl = { x: source.x, y: middleY }
+  const secondControl = { x: target.x, y: middleY }
 
   path.bezierCurveTo(
-    firstControlX, firstControlY,
-    secondControlX, secondControlY,
+    firstControl.x, firstControl.y,
+    secondControl.x, secondControl.y,
     target.x, target.y
   )
+  return getPathData(path, source, target, firstControl, secondControl)
+}
 
+function getPathData(path: Path, source: Point, target: Point, firstControl: Point, secondControl: Point) {
   return {
     path: path.toString(),
-    startPoint: getPointOnBezier(
-      source,
-      target,
-      { x: firstControlX, y: firstControlY },
-      { x: secondControlX, y: secondControlY },
-      .10
-    ),
-    centerPoint: getPointOnBezier(
-      source,
-      target,
-      { x: firstControlX, y: firstControlY },
-      { x: secondControlX, y: secondControlY },
-      .50
-    ),
-    endPoint: getPointOnBezier(
-      source,
-      target,
-      { x: firstControlX, y: firstControlY },
-      { x: secondControlX, y: secondControlY },
-      .90
-    ),
+    startPoint: getPointOnBezier(source, target, firstControl, secondControl, .10),
+    centerPoint: getPointOnBezier(source, target, firstControl, secondControl, .50),
+    endPoint: getPointOnBezier(source, target, firstControl, secondControl, .90),
   }
 }
 
