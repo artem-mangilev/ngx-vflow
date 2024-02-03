@@ -5,6 +5,8 @@ import { Position } from '../enums/position.enum'
 export class NodeModel {
   public point = signal({ x: 0, y: 0 })
 
+  public pointTransform = computed(() => `translate(${this.point().x}, ${this.point().y})`)
+
   public sourcePoint = computed(() => {
     const width = this.width()
     const height = this.height()

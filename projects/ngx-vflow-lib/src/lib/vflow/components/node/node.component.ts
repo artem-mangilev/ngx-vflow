@@ -25,12 +25,6 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('htmlWrapper')
   public htmlWrapperRef!: ElementRef<HTMLDivElement>
 
-  // TODO: may lead to perf issues
-  @HostBinding('attr.transform')
-  public get transform() {
-    return `translate(${this.nodeModel.point().x}, ${this.nodeModel.point().y})`
-  }
-
   private draggableService = inject(DraggableService)
   private hostRef = inject<ElementRef<SVGElement>>(ElementRef)
 

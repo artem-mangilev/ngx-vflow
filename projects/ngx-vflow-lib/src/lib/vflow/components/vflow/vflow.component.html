@@ -18,6 +18,7 @@
       node
       [nodeModel]="node"
       [nodeHtmlTemplate]="nodeHtmlDirective?.templateRef"
+      [attr.transform]="node.pointTransform()"
     />
 
     <!-- Edges  -->

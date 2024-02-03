@@ -58,10 +58,10 @@ export class VflowEdgesDemoComponent {
         // },
       }
     },
-    // {
-    //   id: uuid(),
-    //   source: this.nodes[1].id,
-    //   target: this.nodes[2].id,
-    // },
+    {
+      id: uuid(),
+      source: this.nodes[0].id,
+      target: this.nodes[2].id,
+    },
   ]
 }
