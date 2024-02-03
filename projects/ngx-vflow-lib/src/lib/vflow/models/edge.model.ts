@@ -30,8 +30,8 @@ export class EdgeModel {
       case 'bezier':
         return bezierPath(
           source, target,
-          this.source.sourcePosition,
-          this.target.targetPosition,
+          this.source.sourcePosition(),
+          this.target.targetPosition(),
           this.usingPoints
         )
     }

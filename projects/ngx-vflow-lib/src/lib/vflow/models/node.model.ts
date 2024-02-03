@@ -1,6 +1,7 @@
-import { computed, signal } from '@angular/core'
+import { Injector, computed, inject, signal } from '@angular/core'
 import { Node } from '../interfaces/node.interface'
 import { Position } from '../types/position.type'
+import { FlowModel } from './flow.model'
 
 export class NodeModel {
   public point = signal({ x: 0, y: 0 })
@@ -11,7 +12,7 @@ export class NodeModel {
     const width = this.width()
     const height = this.height()
 
-    switch (this.sourcePosition) {
+    switch (this.sourcePosition()) {
       case 'left': return { x: 0, y: height / 2 }
       case 'right': return { x: width, y: height / 2 }
       case 'top': return { x: width / 2, y: 0 }
@@ -23,7 +24,7 @@ export class NodeModel {
     const width = this.width()
     const height = this.height()
 
-    switch (this.targetPosition) {
+    switch (this.targetPosition()) {
       case 'left': return { x: 0, y: height / 2 }
       case 'right': return { x: width, y: height / 2 }
       case 'top': return { x: width / 2, y: 0 }
@@ -34,15 +35,24 @@ export class NodeModel {
   public width = signal(0)
   public height = signal(0)
 
-  public sourcePosition: Position
-  public targetPosition: Position
+  // Now source and handle positions derived from parent flow
+  public sourcePosition = computed(() => this.flow.handlePositions().source)
+  public targetPosition = computed(() => this.flow.handlePositions().target)
+
+  private flow!: FlowModel
 
   constructor(
     public node: Node
   ) {
     this.point.set(node.point)
+  }
 
-    this.sourcePosition = node.sourcePosition ?? 'right'
-    this.targetPosition = node.targetPosition ?? 'left'
+  /**
+   * Bind parent flow model to node
+   *
+   * @param flow parent flow
+   */
+  public bindFlow(flow: FlowModel) {
+    this.flow = flow
   }
 }
