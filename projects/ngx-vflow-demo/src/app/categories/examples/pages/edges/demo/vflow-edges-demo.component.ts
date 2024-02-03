@@ -40,17 +40,22 @@ export class VflowEdgesDemoComponent {
       id: uuid(),
       source: this.nodes[0].id,
       target: this.nodes[1].id,
-      type: 'bezier',
+      data: {
+        title: 'edge title'
+      },
       edgeLabels: {
-        start: {
-          type: 'html-template'
-        },
+        // start: {
+        //   type: 'html-template'
+        // },
         center: {
-          type: 'html-template'
+          type: 'html-template',
+          data: {
+            title: 'center label title'
+          }
         },
-        end: {
-          type: 'html-template'
-        },
+        // end: {
+        //   type: 'html-template'
+        // },
       }
     },
     // {

@@ -57,4 +57,13 @@ export class EdgeLabelComponent {
       this.model.height.set(height)
     })
   }
+
+  protected getLabelContext() {
+    return {
+      $implicit: {
+        edge: this.edgeModel.edge,
+        label: this.model.edgeLabel
+      }
+    }
+  }
 }

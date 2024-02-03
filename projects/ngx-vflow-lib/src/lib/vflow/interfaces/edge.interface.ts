@@ -2,10 +2,11 @@ import { EdgeLabel, EdgeLabelPosition } from "./edge-label.interface"
 
 export type EdgeType = 'straight' | 'bezier'
 
-export interface Edge {
+export interface Edge<T = unknown> {
   id: string
   source: string
   target: string
-  type?: EdgeType,
+  type?: EdgeType
+  data?: T
   edgeLabels?: { [position in EdgeLabelPosition]?: EdgeLabel }
 }

@@ -7,7 +7,7 @@
 >
   <div #edgeLabelWrapper class="edge-label-wrapper">
     <ng-container
-      *ngTemplateOutlet="htmlTemplate; context: { $implicit: edgeModel.edge }"
+      *ngTemplateOutlet="htmlTemplate; context: getLabelContext()"
     />
   </div>
 </svg:foreignObject>
