@@ -1,0 +1,22 @@
+<vflow [nodes]="nodes" [edges]="edges" [view]="[500, 500]" [zoom]="1">
+  <ng-template nodeHtml>
+    <div style="background-color: black;">Hello world</div>
+  </ng-template>
+
+  <ng-template edge let-context>
+    <svg:path
+      [attr.d]="context.path()"
+      stroke="red"
+      stroke-width="3"
+      fill="none"
+    />
+  </ng-template>
+
+  <ng-template edgeLabelHtml let-context>
+    <div style="background-color: black;">
+      Edge: {{ context.edge.data.title }}
+      <br>
+      Label: {{ context.label.data.title }}
+    </div>
+  </ng-template>
+</vflow>

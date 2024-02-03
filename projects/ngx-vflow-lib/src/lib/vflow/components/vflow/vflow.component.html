@@ -17,8 +17,18 @@
       *ngFor="let node of nodes; trackBy: trackById"
       node
       [nodeModel]="node"
-      [nodeTemplate]="nodeTemplate"
-      />
+      [nodeHtmlTemplate]="nodeHtmlDirective?.templateRef"
+      [attr.transform]="node.pointTransform()"
+    />
+
+    <!-- Edges  -->
+    <svg:g
+      *ngFor="let edge of edges"
+      edge
+      [model]="edge"
+      [edgeTemplate]="edgeTemplateDirective?.templateRef"
+      [edgeLabelHtmlTemplate]="edgeLabelHtmlDirective?.templateRef"
+    />
 
   </svg:g>
 
