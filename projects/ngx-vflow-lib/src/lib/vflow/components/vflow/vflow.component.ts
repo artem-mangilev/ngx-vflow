@@ -1,4 +1,4 @@
-import { AfterContentChecked, AfterContentInit, AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ContentChild, ElementRef, HostListener, Input, OnChanges, OnInit, SimpleChanges, TemplateRef, ViewChild, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ContentChild, Input, OnChanges, SimpleChanges, ViewChild, inject } from '@angular/core';
 import { Node } from '../../interfaces/node.interface';
 import { MapContextDirective } from '../../directives/map-context.directive';
 import { DraggableService } from '../../services/draggable.service';
@@ -7,8 +7,7 @@ import { ZoomService } from '../../services/zoom.service';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { Edge } from '../../interfaces/edge.interface';
 import { EdgeModel } from '../../models/edge.model';
-import { NodeHtmlTemplateDirective } from '../../directives/node-html.template.directive';
-import { EdgeLabelHtmlTemplateDirective } from '../../directives/edge-label-html.template.directive';
+import { EdgeLabelHtmlTemplateDirective, EdgeTemplateDirective, NodeHtmlTemplateDirective } from '../../directives/template.directive';
 
 @Component({
   selector: 'vflow',
@@ -52,11 +51,16 @@ export class VflowComponent implements OnChanges {
   @ViewChild(MapContextDirective)
   protected mapContext!: MapContextDirective
 
+  // #region TEMPLATES
   @ContentChild(NodeHtmlTemplateDirective)
   protected nodeHtmlDirective?: NodeHtmlTemplateDirective
 
+  @ContentChild(EdgeTemplateDirective)
+  protected edgeTemplateDirective?: EdgeTemplateDirective
+
   @ContentChild(EdgeLabelHtmlTemplateDirective)
   protected edgeLabelHtmlDirective?: EdgeLabelHtmlTemplateDirective
+  // #endregion
 
   public readonly zoomPanSignal = this.zoomService.zoomPan
 

@@ -1,6 +1,6 @@
 import { computed } from "@angular/core";
 import { EdgeLabelPosition } from "../interfaces/edge-label.interface";
-import { Edge, EdgeCurve } from "../interfaces/edge.interface";
+import { Edge, EdgeCurve, EdgeType } from "../interfaces/edge.interface";
 import { EdgeLabelModel } from "./edge-label.model";
 import { NodeModel } from "./node.model";
 import { straightPath } from "../math/edge-path/straigh-path";
@@ -11,6 +11,7 @@ export class EdgeModel {
   public source!: NodeModel
   public target!: NodeModel
   public curve: EdgeCurve
+  public type: EdgeType
 
   public path = computed(() => {
     const source = {
@@ -41,6 +42,7 @@ export class EdgeModel {
   private usingPoints: UsingPoints
 
   constructor(public edge: Edge) {
+    this.type = edge.type ?? 'default'
     this.curve = edge.curve ?? 'bezier'
 
     if (edge.edgeLabels?.start) this.edgeLabels.start = new EdgeLabelModel(edge.edgeLabels.start)

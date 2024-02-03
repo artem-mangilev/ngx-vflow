@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Input, TemplateRef } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, TemplateRef, computed } from '@angular/core';
 import { EdgeModel } from '../../models/edge.model';
 
 @Component({
@@ -8,8 +8,20 @@ import { EdgeModel } from '../../models/edge.model';
 })
 export class EdgeComponent {
   @Input()
-  public edgeModel!: EdgeModel
+  public model!: EdgeModel
+
+  @Input()
+  public edgeTemplate?: TemplateRef<any>
 
   @Input()
   public edgeLabelHtmlTemplate?: TemplateRef<any>
+
+  public getContext() {
+    return {
+      $implicit: {
+        edge: this.model.edge,
+        path: computed(() => this.model.path().path)
+      }
+    }
+  }
 }

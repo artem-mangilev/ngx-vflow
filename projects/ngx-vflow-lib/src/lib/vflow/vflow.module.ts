@@ -4,9 +4,8 @@ import { VflowComponent } from './components/vflow/vflow.component';
 import { NodeComponent } from './components/node/node.component';
 import { MapContextDirective } from './directives/map-context.directive';
 import { EdgeComponent } from './components/edge/edge.component';
-import { NodeHtmlTemplateDirective } from './directives/node-html.template.directive';
-import { EdgeLabelHtmlTemplateDirective } from './directives/edge-label-html.template.directive';
 import { EdgeLabelComponent } from './components/edge-label/edge-label.component';
+import { EdgeLabelHtmlTemplateDirective, EdgeTemplateDirective, NodeHtmlTemplateDirective } from './directives/template.directive';
 
 const components = [
   VflowComponent,
@@ -18,7 +17,8 @@ const components = [
 const directives = [
   MapContextDirective,
   NodeHtmlTemplateDirective,
-  EdgeLabelHtmlTemplateDirective
+  EdgeLabelHtmlTemplateDirective,
+  EdgeTemplateDirective,
 ]
 
 @NgModule({
@@ -26,9 +26,9 @@ const directives = [
   exports: [
     VflowComponent,
     NodeHtmlTemplateDirective,
-    EdgeLabelHtmlTemplateDirective
+    EdgeLabelHtmlTemplateDirective,
+    EdgeTemplateDirective,
   ],
   declarations: [...components, ...directives],
-  providers: [],
 })
 export class VflowModule { }

@@ -3,6 +3,15 @@
     <div style="background-color: black;">Hello world</div>
   </ng-template>
 
+  <ng-template edge let-context>
+    <svg:path
+      [attr.d]="context.path()"
+      stroke="black"
+      stroke-width="3"
+      fill="none"
+    />
+  </ng-template>
+
   <ng-template edgeLabelHtml let-context>
     <div style="background-color: black;">
       Edge: {{ context.edge.data.title }}
