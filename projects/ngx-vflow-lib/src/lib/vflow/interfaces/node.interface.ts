@@ -1,4 +1,4 @@
-import { Position } from "../enums/position.enum"
+import { Position } from "../types/position.type"
 import { Point } from "./point.interface"
 
 export interface Node<T = unknown> {
@@ -6,8 +6,4 @@ export interface Node<T = unknown> {
   point: Point,
   type: 'default' | 'html-template'
   data?: T
-
-  // TODO: decide if this should be applied globally (now we can't handle different combos on different nodes)
-  sourcePosition?: Position
-  targetPosition?: Position
 }

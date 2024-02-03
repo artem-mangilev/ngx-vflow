@@ -8,6 +8,9 @@ import { toObservable } from '@angular/core/rxjs-interop';
 import { Edge } from '../../interfaces/edge.interface';
 import { EdgeModel } from '../../models/edge.model';
 import { EdgeLabelHtmlTemplateDirective, EdgeTemplateDirective, NodeHtmlTemplateDirective } from '../../directives/template.directive';
+import { HandlePositions } from '../../interfaces/handle-positions.interface';
+import { addNodesToEdges } from '../../utils/add-nodes-to-edges';
+import { FlowModel } from '../../models/flow.model';
 
 @Component({
   selector: 'vflow',
@@ -16,7 +19,11 @@ import { EdgeLabelHtmlTemplateDirective, EdgeTemplateDirective, NodeHtmlTemplate
   providers: [DraggableService, ZoomService]
 })
 export class VflowComponent implements OnChanges {
+  // #region DI
   protected zoomService = inject(ZoomService)
+  // #endregion
+
+  // #region SETTINGS
 
   /**
    * Size for flow view
@@ -26,7 +33,9 @@ export class VflowComponent implements OnChanges {
    * - 'auto' to compute size based on parent element size
    */
   @Input()
-  public view: [number, number] | 'auto' = [400, 400]
+  public set view(view: [number, number] | 'auto') {
+    this.flowModel.view.set(view)
+  }
 
   @Input()
   public minZoom = 0.5
@@ -39,17 +48,23 @@ export class VflowComponent implements OnChanges {
     this.zoomService.zoom.set(value)
   }
 
-  @Input({ transform: (nodes: Node[]) => nodes.map(n => new NodeModel(n)) })
-  public nodes: NodeModel[] = []
-
-  @Input({ transform: (edges: Edge[]) => edges.map(e => new EdgeModel(e)) })
-  public edges: EdgeModel[] = []
+  @Input()
+  public set handlePositions(handlePositions: HandlePositions) {
+    this.flowModel.handlePositions.set(handlePositions)
+  }
 
   @Input()
   public background: string = '#FFFFFF'
 
-  @ViewChild(MapContextDirective)
-  protected mapContext!: MapContextDirective
+  // #endregion
+
+  // #region MAIN_DATA
+  @Input({ required: true, transform: (nodes: Node[]) => nodes.map(n => new NodeModel(n)) })
+  public nodes: NodeModel[] = []
+
+  @Input({ transform: (edges: Edge[]) => edges.map(e => new EdgeModel(e)) })
+  public edges: EdgeModel[] = []
+  // #endregion
 
   // #region TEMPLATES
   @ContentChild(NodeHtmlTemplateDirective)
@@ -62,19 +77,18 @@ export class VflowComponent implements OnChanges {
   protected edgeLabelHtmlDirective?: EdgeLabelHtmlTemplateDirective
   // #endregion
 
+  @ViewChild(MapContextDirective)
+  protected mapContext!: MapContextDirective
+
+  // TODO: probably better to make it injectable
+  protected flowModel = new FlowModel()
+
   public readonly zoomPanSignal = this.zoomService.zoomPan
 
   public readonly zoomPan$ = toObservable(this.zoomService.zoomPan)
 
-  protected get flowWidth() {
-    return this.view === 'auto' ? '100%' : this.view[0]
-  }
-
-  protected get flowHeight() {
-    return this.view === 'auto' ? '100%' : this.view[1]
-  }
-
   public ngOnChanges(changes: SimpleChanges): void {
+    if (changes['nodes']) bindFlowToNodes(this.flowModel, this.nodes)
     if (changes['edges']) addNodesToEdges(this.nodes, this.edges)
   }
 
@@ -91,15 +105,6 @@ export class VflowComponent implements OnChanges {
   }
 }
 
-function addNodesToEdges(nodes: NodeModel[], edges: EdgeModel[]) {
-  const nodesById = nodes.reduce((acc, n) => {
-    acc[n.node.id] = n
-
-    return acc
-  }, {} as { [nodeId: string]: NodeModel })
-
-  edges.forEach(e => {
-    e.source = nodesById[e.edge.source]
-    e.target = nodesById[e.edge.target]
-  })
+function bindFlowToNodes(flow: FlowModel, nodes: NodeModel[]) {
+  nodes.forEach(n => n.bindFlow(flow))
 }

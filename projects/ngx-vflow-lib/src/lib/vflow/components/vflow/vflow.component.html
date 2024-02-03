@@ -3,8 +3,8 @@
   #flow
   mapController
   [style.backgroundColor]="background"
-  [attr.width]="flowWidth"
-  [attr.height]="flowHeight"
+  [attr.width]="flowModel.flowWidth()"
+  [attr.height]="flowModel.flowHeight()"
 >
   <svg:g
     mapContext
