@@ -33,7 +33,9 @@ export class VflowComponent implements OnChanges {
    * - 'auto' to compute size based on parent element size
    */
   @Input()
-  public view: [number, number] | 'auto' = [400, 400]
+  public set view(view: [number, number] | 'auto') {
+    this.flowModel.view.set(view)
+  }
 
   @Input()
   public minZoom = 0.5
@@ -79,19 +81,11 @@ export class VflowComponent implements OnChanges {
   protected mapContext!: MapContextDirective
 
   // TODO: probably better to make it injectable
-  private flowModel = new FlowModel()
+  protected flowModel = new FlowModel()
 
   public readonly zoomPanSignal = this.zoomService.zoomPan
 
   public readonly zoomPan$ = toObservable(this.zoomService.zoomPan)
-
-  protected get flowWidth() {
-    return this.view === 'auto' ? '100%' : this.view[0]
-  }
-
-  protected get flowHeight() {
-    return this.view === 'auto' ? '100%' : this.view[1]
-  }
 
   public ngOnChanges(changes: SimpleChanges): void {
     if (changes['nodes']) bindFlowToNodes(this.flowModel, this.nodes)
