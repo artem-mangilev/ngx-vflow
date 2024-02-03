@@ -1,8 +1,9 @@
-import { Position } from "../../enums/position.enum";
+
 import { PathData } from "../../interfaces/path-data.interface";
 import { Point } from "../../interfaces/point.interface";
 import { Path, path as d3Path } from 'd3-path'
 import { UsingPoints } from "../../types/using-points.type";
+import { Position } from "../../types/position.type";
 
 export function bezierPath(
   source: Point,
@@ -11,19 +12,19 @@ export function bezierPath(
   targetPosition: Position,
   usingPoints: UsingPoints
 ): PathData {
-  if (sourcePosition === Position.left && targetPosition === Position.right) {
+  if (sourcePosition === 'left' && targetPosition === 'right') {
     return bezierPathRtl(source, target, usingPoints)
   }
 
-  if (sourcePosition === Position.right && targetPosition === Position.left) {
+  if (sourcePosition === 'right' && targetPosition === 'left') {
     return bezierPathLtr(source, target, usingPoints)
   }
 
-  if (sourcePosition === Position.bottom && targetPosition === Position.top) {
+  if (sourcePosition === 'bottom' && targetPosition === 'top') {
     return bezierPathTtb(source, target, usingPoints)
   }
 
-  if (sourcePosition === Position.top && targetPosition === Position.bottom) {
+  if (sourcePosition === 'top' && targetPosition === 'bottom') {
     return bezierPathBtt(source, target, usingPoints)
   }
 

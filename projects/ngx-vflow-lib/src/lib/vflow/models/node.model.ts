@@ -1,6 +1,6 @@
 import { computed, signal } from '@angular/core'
 import { Node } from '../interfaces/node.interface'
-import { Position } from '../enums/position.enum'
+import { Position } from '../types/position.type'
 
 export class NodeModel {
   public point = signal({ x: 0, y: 0 })
@@ -12,10 +12,10 @@ export class NodeModel {
     const height = this.height()
 
     switch (this.sourcePosition) {
-      case Position.left: return { x: 0, y: height / 2 }
-      case Position.right: return { x: width, y: height / 2 }
-      case Position.top: return { x: width / 2, y: 0 }
-      case Position.bottom: return { x: width / 2, y: height }
+      case 'left': return { x: 0, y: height / 2 }
+      case 'right': return { x: width, y: height / 2 }
+      case 'top': return { x: width / 2, y: 0 }
+      case 'bottom': return { x: width / 2, y: height }
     }
   })
 
@@ -24,10 +24,10 @@ export class NodeModel {
     const height = this.height()
 
     switch (this.targetPosition) {
-      case Position.left: return { x: 0, y: height / 2 }
-      case Position.right: return { x: width, y: height / 2 }
-      case Position.top: return { x: width / 2, y: 0 }
-      case Position.bottom: return { x: width / 2, y: height }
+      case 'left': return { x: 0, y: height / 2 }
+      case 'right': return { x: width, y: height / 2 }
+      case 'top': return { x: width / 2, y: 0 }
+      case 'bottom': return { x: width / 2, y: height }
     }
   })
 
@@ -42,7 +42,7 @@ export class NodeModel {
   ) {
     this.point.set(node.point)
 
-    this.sourcePosition = node.sourcePosition ?? Position.right
-    this.targetPosition = node.targetPosition ?? Position.left
+    this.sourcePosition = node.sourcePosition ?? 'right'
+    this.targetPosition = node.targetPosition ?? 'left'
   }
 }

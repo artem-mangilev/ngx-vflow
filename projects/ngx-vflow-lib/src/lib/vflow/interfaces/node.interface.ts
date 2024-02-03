@@ -1,4 +1,4 @@
-import { Position } from "../enums/position.enum"
+import { Position } from "../types/position.type"
 import { Point } from "./point.interface"
 
 export interface Node<T = unknown> {

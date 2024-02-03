@@ -15,22 +15,16 @@ export class VflowEdgesDemoComponent {
       id: uuid(),
       point: { x: 10, y: 10 },
       type: 'html-template',
-      // sourcePosition: Position.bottom,
-      // targetPosition: Position.top
     },
     {
       id: uuid(),
       point: { x: 100, y: 100 },
       type: 'html-template',
-      // sourcePosition: Position.bottom,
-      // targetPosition: Position.top
     },
     {
       id: uuid(),
       point: { x: 150, y: 150 },
       type: 'html-template',
-      // sourcePosition: Position.bottom,
-      // targetPosition: Position.top
     },
   ]
 
