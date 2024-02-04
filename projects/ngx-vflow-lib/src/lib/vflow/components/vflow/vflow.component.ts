@@ -11,6 +11,7 @@ import { EdgeLabelHtmlTemplateDirective, EdgeTemplateDirective, NodeHtmlTemplate
 import { HandlePositions } from '../../interfaces/handle-positions.interface';
 import { addNodesToEdges } from '../../utils/add-nodes-to-edges';
 import { FlowModel } from '../../models/flow.model';
+import { skip } from 'rxjs';
 
 @Component({
   selector: 'vflow',
@@ -44,11 +45,6 @@ export class VflowComponent implements OnChanges {
   public maxZoom = 3
 
   @Input()
-  public set zoom(value: number) {
-    this.zoomService.zoom.set(value)
-  }
-
-  @Input()
   public set handlePositions(handlePositions: HandlePositions) {
     this.flowModel.handlePositions.set(handlePositions)
   }
@@ -58,7 +54,7 @@ export class VflowComponent implements OnChanges {
 
   // #endregion
 
-  // #region MAIN_DATA
+  // #region MAIN_INPUTS
   @Input({ required: true, transform: (nodes: Node[]) => nodes.map(n => new NodeModel(n)) })
   public nodes: NodeModel[] = []
 
@@ -77,28 +73,35 @@ export class VflowComponent implements OnChanges {
   protected edgeLabelHtmlDirective?: EdgeLabelHtmlTemplateDirective
   // #endregion
 
+  // #region DIRECTIVES
   @ViewChild(MapContextDirective)
   protected mapContext!: MapContextDirective
+  // #endregion
+
+  // #region SIGNAL_API
+  public readonly viewport = this.zoomService.readableViewport.asReadonly()
+  // #endregion
+
+  // #region RX_API
+  public readonly viewportChanges$ = toObservable(this.zoomService.readableViewport)
+    .pipe(skip(1)) // skip default value that set by signal
+  // #endregion
 
   // TODO: probably better to make it injectable
   protected flowModel = new FlowModel()
 
-  public readonly zoomPanSignal = this.zoomService.zoomPan
-
-  public readonly zoomPan$ = toObservable(this.zoomService.zoomPan)
-
+  // #region ANGULAR_HOOKS
   public ngOnChanges(changes: SimpleChanges): void {
     if (changes['nodes']) bindFlowToNodes(this.flowModel, this.nodes)
     if (changes['edges']) addNodesToEdges(this.nodes, this.edges)
   }
+  // #endregion
 
-  public zoomTo(value: number) {
-    this.zoomService.zoom.set(value)
+  // #region COMPONENT_API
+  public viewportTo(viewport: { x: number, y: number, zoom: number }) {
+    this.zoomService.writableViewport.set(viewport)
   }
-
-  public panTo(x: number, y: number) {
-    this.zoomService.pan.set({ x, y })
-  }
+  // #endregion
 
   protected trackById(idx: number, { node }: NodeModel) {
     return node.id

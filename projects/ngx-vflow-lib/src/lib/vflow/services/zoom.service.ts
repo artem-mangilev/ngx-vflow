@@ -1,15 +1,23 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, Signal, WritableSignal, signal } from '@angular/core';
+
+export interface ViewportState {
+  x: number
+  y: number
+  zoom: number
+}
 
 @Injectable()
 export class ZoomService {
   /**
-   * Private signals for internal usage
+   * Internal signal that accepts value from user by lib api
+   * When this signal changes, lib sets new view state and update readableViewport signal
    */
-  public readonly zoom = signal(1)
-  public readonly pan = signal({ x: 0, y: 0 })
+  public readonly writableViewport: WritableSignal<ViewportState> = signal({ zoom: 1, x: 0, y: 0 })
 
   /**
-   * Public signal with zoom & pan state
+   * Public signal with viewport state. User can directly read from this signal. It's updated by:
+   * - user events on flow
+   * - writableViewport signal
    */
-  public readonly zoomPan = signal({ zoom: 1, x: 0, y: 0 })
+  public readonly readableViewport: WritableSignal<ViewportState> = signal({ zoom: 1, x: 0, y: 0 })
 }
