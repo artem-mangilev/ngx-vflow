@@ -3,7 +3,7 @@ import { Node } from '../../interfaces/node.interface';
 import { MapContextDirective } from '../../directives/map-context.directive';
 import { DraggableService } from '../../services/draggable.service';
 import { NodeModel } from '../../models/node.model';
-import { ZoomService } from '../../services/zoom.service';
+import { ViewportState, ZoomService } from '../../services/zoom.service';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { Edge } from '../../interfaces/edge.interface';
 import { EdgeModel } from '../../models/edge.model';
@@ -97,8 +97,8 @@ export class VflowComponent implements OnChanges {
   }
   // #endregion
 
-  // #region COMPONENT_API
-  public viewportTo(viewport: { x: number, y: number, zoom: number }) {
+  // #region METHODS_API
+  public viewportTo(viewport: ViewportState) {
     this.zoomService.writableViewport.set(viewport)
   }
   // #endregion

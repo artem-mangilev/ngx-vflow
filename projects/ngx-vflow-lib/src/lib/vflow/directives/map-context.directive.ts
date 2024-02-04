@@ -38,11 +38,7 @@ export class MapContextDirective implements OnInit {
 
     this.rootSvgSelection.call(zoomBehavior)
 
-    runInInjectionContext(this.injector,
-      () => {
-        this.manualViewportChangeEffect(zoomBehavior)
-      }
-    )
+    runInInjectionContext(this.injector, () => this.manualViewportChangeEffect(zoomBehavior))
   }
 
   private handleZoom = ({ transform }: ZoomEvent) => {
