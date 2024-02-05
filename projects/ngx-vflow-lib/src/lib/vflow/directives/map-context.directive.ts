@@ -1,7 +1,8 @@
 import { Directive, ElementRef, Injector, Input, OnInit, effect, inject, runInInjectionContext } from '@angular/core';
 import { select } from 'd3-selection';
-import { D3ZoomEvent, ZoomBehavior, zoom, zoomIdentity } from 'd3-zoom';
-import { ZoomService } from '../services/zoom.service';
+import { D3ZoomEvent, ZoomBehavior, zoom, zoomIdentity, zoomTransform } from 'd3-zoom';
+import { ViewportService } from '../services/viewport.service';
+import { isDefined } from '../utils/is-defined';
 
 type ZoomEvent = D3ZoomEvent<SVGSVGElement, unknown>
 
@@ -25,7 +26,7 @@ export class MapContextDirective implements OnInit {
   }
 
   protected hostRef = inject<ElementRef<SVGGElement>>(ElementRef)
-  protected zoomService = inject(ZoomService)
+  protected viewportService = inject(ViewportService)
   protected injector = inject(Injector)
 
   protected rootSvgSelection = select(this.rootSvgElement)
@@ -43,7 +44,7 @@ export class MapContextDirective implements OnInit {
 
   private handleZoom = ({ transform }: ZoomEvent) => {
     // update public signal for user to read
-    this.zoomService.readableViewport.set({ zoom: transform.k, x: transform.x, y: transform.y })
+    this.viewportService.readableViewport.set({ zoom: transform.k, x: transform.x, y: transform.y })
 
     this.zoomableSelection.attr('transform', transform.toString())
   }
@@ -58,14 +59,35 @@ export class MapContextDirective implements OnInit {
     effect(() => {
       // TODO: this hack fixes wrong node scaling (handle positions not matched with content size)
       setTimeout(() => {
-        const viewport = this.zoomService.writableViewport()
+        const viewport = this.viewportService.writableViewport()
 
-        this.rootSvgSelection.call(behavior.transform,
-          zoomIdentity.translate(viewport.x, viewport.y).scale(viewport.zoom)
-        )
+        // If only zoom provided
+        if (isDefined(viewport.zoom) && (!isDefined(viewport.x) && !isDefined(viewport.y))) {
+          this.rootSvgSelection.call(behavior.scaleTo, viewport.zoom)
+
+          return
+        }
+
+        // If only pan provided
+        if ((isDefined(viewport.x) && isDefined(viewport.y)) && !isDefined(viewport.zoom)) {
+          this.rootSvgSelection.call(behavior.translateTo, viewport.x, viewport.y)
+
+          return
+        }
+
+        // If whole viewort state provided
+        if (isDefined(viewport.x) && isDefined(viewport.y) && isDefined(viewport.zoom)) {
+          this.rootSvgSelection.call(behavior.transform,
+            zoomIdentity.translate(viewport.x, viewport.y).scale(viewport.zoom)
+          )
+
+          return
+        }
       });
 
       // TODO: under the hood this effect triggers handleZoom, so error throws without this flag
     }, { allowSignalWrites: true })
   }
+
+
 }

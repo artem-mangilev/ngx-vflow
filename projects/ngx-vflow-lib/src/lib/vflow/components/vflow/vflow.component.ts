@@ -3,7 +3,7 @@ import { Node } from '../../interfaces/node.interface';
 import { MapContextDirective } from '../../directives/map-context.directive';
 import { DraggableService } from '../../services/draggable.service';
 import { NodeModel } from '../../models/node.model';
-import { ViewportState, ZoomService } from '../../services/zoom.service';
+import { ViewportState, ViewportService } from '../../services/viewport.service';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { Edge } from '../../interfaces/edge.interface';
 import { EdgeModel } from '../../models/edge.model';
@@ -12,16 +12,17 @@ import { HandlePositions } from '../../interfaces/handle-positions.interface';
 import { addNodesToEdges } from '../../utils/add-nodes-to-edges';
 import { FlowModel } from '../../models/flow.model';
 import { skip } from 'rxjs';
+import { Point } from '../../interfaces/point.interface';
 
 @Component({
   selector: 'vflow',
   templateUrl: './vflow.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [DraggableService, ZoomService]
+  providers: [DraggableService, ViewportService]
 })
 export class VflowComponent implements OnChanges {
   // #region DI
-  protected zoomService = inject(ZoomService)
+  protected viewportService = inject(ViewportService)
   // #endregion
 
   // #region SETTINGS
@@ -79,11 +80,11 @@ export class VflowComponent implements OnChanges {
   // #endregion
 
   // #region SIGNAL_API
-  public readonly viewport = this.zoomService.readableViewport.asReadonly()
+  public readonly viewport = this.viewportService.readableViewport.asReadonly()
   // #endregion
 
   // #region RX_API
-  public readonly viewportChanges$ = toObservable(this.zoomService.readableViewport)
+  public readonly viewportChanges$ = toObservable(this.viewportService.readableViewport)
     .pipe(skip(1)) // skip default value that set by signal
   // #endregion
 
@@ -99,7 +100,15 @@ export class VflowComponent implements OnChanges {
 
   // #region METHODS_API
   public viewportTo(viewport: ViewportState) {
-    this.zoomService.writableViewport.set(viewport)
+    this.viewportService.writableViewport.set(viewport)
+  }
+
+  public zoomTo(zoom: number) {
+    this.viewportService.writableViewport.set({ zoom })
+  }
+
+  public panTo(point: Point) {
+    this.viewportService.writableViewport.set(point)
   }
   // #endregion
 

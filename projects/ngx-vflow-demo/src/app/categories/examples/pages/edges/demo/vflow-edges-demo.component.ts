@@ -67,10 +67,12 @@ export class VflowEdgesDemoComponent implements AfterViewInit {
       console.log(changes)
     })
 
-    this.flow.viewportTo({
-      zoom: 2,
-      x: 0,
-      y: 0
-    })
+    // this.flow.viewportTo({
+    //   zoom: 0.4,
+    //   x: 0,
+    //   y: 0
+    // })
+
+    // this.flow.panTo({ x: 50, y: 50 })
   }
 }
