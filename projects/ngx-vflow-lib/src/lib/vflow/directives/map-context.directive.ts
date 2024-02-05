@@ -3,11 +3,12 @@ import { select } from 'd3-selection';
 import { D3ZoomEvent, ZoomBehavior, zoom, zoomIdentity, zoomTransform } from 'd3-zoom';
 import { ViewportService } from '../services/viewport.service';
 import { isDefined } from '../utils/is-defined';
+import { InjectionContext, WithInjectorDirective } from '../decorators/run-in-injection-context.decorator';
 
 type ZoomEvent = D3ZoomEvent<SVGSVGElement, unknown>
 
 @Directive({ selector: 'g[mapContext]' })
-export class MapContextDirective implements OnInit {
+export class MapContextDirective extends WithInjectorDirective implements OnInit {
   @Input()
   public minZoom!: number
 
@@ -27,11 +28,11 @@ export class MapContextDirective implements OnInit {
 
   protected hostRef = inject<ElementRef<SVGGElement>>(ElementRef)
   protected viewportService = inject(ViewportService)
-  protected injector = inject(Injector)
 
   protected rootSvgSelection = select(this.rootSvgElement)
   protected zoomableSelection = select(this.zoomableElement)
 
+  @InjectionContext
   public ngOnInit(): void {
     const zoomBehavior = zoom<SVGSVGElement, unknown>()
       .scaleExtent([this.minZoom, this.maxZoom])
@@ -39,7 +40,7 @@ export class MapContextDirective implements OnInit {
 
     this.rootSvgSelection.call(zoomBehavior)
 
-    runInInjectionContext(this.injector, () => this.manualViewportChangeEffect(zoomBehavior))
+    this.manualViewportChangeEffect(zoomBehavior)
   }
 
   private handleZoom = ({ transform }: ZoomEvent) => {
