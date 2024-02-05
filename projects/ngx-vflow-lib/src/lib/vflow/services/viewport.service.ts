@@ -1,9 +1,6 @@
 import { Injectable, Signal, WritableSignal, signal } from '@angular/core';
 import { Point } from '../interfaces/point.interface';
-
-export interface ViewportState extends Point {
-  zoom: number
-}
+import { ViewportState, WritableViewport } from '../interfaces/viewport.interface';
 
 @Injectable()
 export class ViewportService {
@@ -18,7 +15,10 @@ export class ViewportService {
    * Internal signal that accepts value from user by lib api
    * When this signal changes, lib sets new view state and update readableViewport signal
    */
-  public readonly writableViewport: WritableSignal<Partial<ViewportState>> = signal(ViewportService.getDefaultViewport())
+  public readonly writableViewport: WritableSignal<WritableViewport> = signal({
+    changeType: 'initial',
+    state: ViewportService.getDefaultViewport()
+  })
 
   /**
    * Public signal with viewport state. User can directly read from this signal. It's updated by:

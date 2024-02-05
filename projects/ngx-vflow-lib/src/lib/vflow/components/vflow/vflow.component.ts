@@ -3,7 +3,7 @@ import { Node } from '../../interfaces/node.interface';
 import { MapContextDirective } from '../../directives/map-context.directive';
 import { DraggableService } from '../../services/draggable.service';
 import { NodeModel } from '../../models/node.model';
-import { ViewportState, ViewportService } from '../../services/viewport.service';
+import { ViewportService } from '../../services/viewport.service';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { Edge } from '../../interfaces/edge.interface';
 import { EdgeModel } from '../../models/edge.model';
@@ -13,6 +13,7 @@ import { addNodesToEdges } from '../../utils/add-nodes-to-edges';
 import { FlowModel } from '../../models/flow.model';
 import { skip } from 'rxjs';
 import { Point } from '../../interfaces/point.interface';
+import { ViewportState } from '../../interfaces/viewport.interface';
 
 @Component({
   selector: 'vflow',
@@ -100,15 +101,15 @@ export class VflowComponent implements OnChanges {
 
   // #region METHODS_API
   public viewportTo(viewport: ViewportState) {
-    this.viewportService.writableViewport.set(viewport)
+    this.viewportService.writableViewport.set({ changeType: 'absolute', state: viewport })
   }
 
   public zoomTo(zoom: number) {
-    this.viewportService.writableViewport.set({ zoom })
+    this.viewportService.writableViewport.set({ changeType: 'absolute', state: { zoom } })
   }
 
   public panTo(point: Point) {
-    this.viewportService.writableViewport.set(point)
+    this.viewportService.writableViewport.set({ changeType: 'absolute', state: point })
   }
   // #endregion
 

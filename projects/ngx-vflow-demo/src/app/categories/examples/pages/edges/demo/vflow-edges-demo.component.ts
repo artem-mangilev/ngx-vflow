@@ -73,6 +73,6 @@ export class VflowEdgesDemoComponent implements AfterViewInit {
     //   y: 0
     // })
 
-    // this.flow.panTo({ x: 50, y: 50 })
+    this.flow.panTo({ x: 50, y: 50 })
   }
 }

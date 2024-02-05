@@ -60,25 +60,30 @@ export class MapContextDirective implements OnInit {
       // TODO: this hack fixes wrong node scaling (handle positions not matched with content size)
       setTimeout(() => {
         const viewport = this.viewportService.writableViewport()
+        const state = viewport.state
+
+        if (viewport.changeType === 'initial') {
+          return
+        }
 
         // If only zoom provided
-        if (isDefined(viewport.zoom) && (!isDefined(viewport.x) && !isDefined(viewport.y))) {
-          this.rootSvgSelection.call(behavior.scaleTo, viewport.zoom)
+        if (isDefined(state.zoom) && (!isDefined(state.x) && !isDefined(state.y))) {
+          this.rootSvgSelection.call(behavior.scaleTo, state.zoom)
 
           return
         }
 
         // If only pan provided
-        if ((isDefined(viewport.x) && isDefined(viewport.y)) && !isDefined(viewport.zoom)) {
-          this.rootSvgSelection.call(behavior.translateTo, viewport.x, viewport.y)
+        if ((isDefined(state.x) && isDefined(state.y)) && !isDefined(state.zoom)) {
+          this.rootSvgSelection.call(behavior.translateTo, state.x, state.y)
 
           return
         }
 
         // If whole viewort state provided
-        if (isDefined(viewport.x) && isDefined(viewport.y) && isDefined(viewport.zoom)) {
+        if (isDefined(state.x) && isDefined(state.y) && isDefined(state.zoom)) {
           this.rootSvgSelection.call(behavior.transform,
-            zoomIdentity.translate(viewport.x, viewport.y).scale(viewport.zoom)
+            zoomIdentity.translate(state.x, state.y).scale(state.zoom)
           )
 
           return
