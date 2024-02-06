@@ -3,12 +3,11 @@ import { select } from 'd3-selection';
 import { D3ZoomEvent, ZoomBehavior, zoom, zoomIdentity, zoomTransform } from 'd3-zoom';
 import { ViewportService } from '../services/viewport.service';
 import { isDefined } from '../utils/is-defined';
-import { InjectionContext, WithInjectorDirective } from '../decorators/run-in-injection-context.decorator';
 
 type ZoomEvent = D3ZoomEvent<SVGSVGElement, unknown>
 
 @Directive({ selector: 'g[mapContext]' })
-export class MapContextDirective extends WithInjectorDirective implements OnInit {
+export class MapContextDirective implements OnInit {
   @Input()
   public minZoom!: number
 
