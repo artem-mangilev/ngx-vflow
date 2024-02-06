@@ -32,15 +32,48 @@ export class MapContextDirective extends WithInjectorDirective implements OnInit
   protected rootSvgSelection = select(this.rootSvgElement)
   protected zoomableSelection = select(this.zoomableElement)
 
-  @InjectionContext
+  // under the hood this effect triggers handleZoom, so error throws without this flag
+  // TODO: hack with timer fixes wrong node scaling (handle positions not matched with content size)
+  protected manualViewportChangeEffect = effect(() => setTimeout(() => {
+    const viewport = this.viewportService.writableViewport()
+    const state = viewport.state
+
+    if (viewport.changeType === 'initial') {
+      return
+    }
+
+    // If only zoom provided
+    if (isDefined(state.zoom) && (!isDefined(state.x) && !isDefined(state.y))) {
+      this.rootSvgSelection.call(this.zoomBehavior.scaleTo, state.zoom)
+
+      return
+    }
+
+    // If only pan provided
+    if ((isDefined(state.x) && isDefined(state.y)) && !isDefined(state.zoom)) {
+      this.rootSvgSelection.call(this.zoomBehavior.translateTo, state.x, state.y)
+
+      return
+    }
+
+    // If whole viewort state provided
+    if (isDefined(state.x) && isDefined(state.y) && isDefined(state.zoom)) {
+      this.rootSvgSelection.call(this.zoomBehavior.transform,
+        zoomIdentity.translate(state.x, state.y).scale(state.zoom)
+      )
+
+      return
+    }
+  }), { allowSignalWrites: true })
+
+  protected zoomBehavior!: ZoomBehavior<SVGSVGElement, unknown>;
+
   public ngOnInit(): void {
-    const zoomBehavior = zoom<SVGSVGElement, unknown>()
+    this.zoomBehavior = zoom<SVGSVGElement, unknown>()
       .scaleExtent([this.minZoom, this.maxZoom])
       .on('zoom', this.handleZoom)
 
-    this.rootSvgSelection.call(zoomBehavior)
-
-    this.manualViewportChangeEffect(zoomBehavior)
+    this.rootSvgSelection.call(this.zoomBehavior)
   }
 
   private handleZoom = ({ transform }: ZoomEvent) => {
@@ -49,51 +82,4 @@ export class MapContextDirective extends WithInjectorDirective implements OnInit
 
     this.zoomableSelection.attr('transform', transform.toString())
   }
-
-  /**
-   * Rescale if zoom signal was changed
-   *
-   * @param behavior zoom behavior
-   */
-  private manualViewportChangeEffect(behavior: ZoomBehavior<SVGSVGElement, unknown>) {
-    // update zoom in d3 on each manual zoom zoom change
-    effect(() => {
-      // TODO: this hack fixes wrong node scaling (handle positions not matched with content size)
-      setTimeout(() => {
-        const viewport = this.viewportService.writableViewport()
-        const state = viewport.state
-
-        if (viewport.changeType === 'initial') {
-          return
-        }
-
-        // If only zoom provided
-        if (isDefined(state.zoom) && (!isDefined(state.x) && !isDefined(state.y))) {
-          this.rootSvgSelection.call(behavior.scaleTo, state.zoom)
-
-          return
-        }
-
-        // If only pan provided
-        if ((isDefined(state.x) && isDefined(state.y)) && !isDefined(state.zoom)) {
-          this.rootSvgSelection.call(behavior.translateTo, state.x, state.y)
-
-          return
-        }
-
-        // If whole viewort state provided
-        if (isDefined(state.x) && isDefined(state.y) && isDefined(state.zoom)) {
-          this.rootSvgSelection.call(behavior.transform,
-            zoomIdentity.translate(state.x, state.y).scale(state.zoom)
-          )
-
-          return
-        }
-      });
-
-      // TODO: under the hood this effect triggers handleZoom, so error throws without this flag
-    }, { allowSignalWrites: true })
-  }
-
-
 }
