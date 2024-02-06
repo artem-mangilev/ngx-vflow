@@ -1,6 +1,6 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ViewChild } from '@angular/core';
 import { Edge } from 'projects/ngx-vflow-lib/src/lib/vflow/interfaces/edge.interface';
-import { Node, VDocModule, VflowModule, uuid } from 'projects/ngx-vflow-lib/src/public-api';
+import { Node, VDocModule, VflowComponent, VflowModule, uuid } from 'projects/ngx-vflow-lib/src/public-api';
 
 @Component({
   templateUrl: './vflow-edges-demo.component.html',
@@ -9,7 +9,7 @@ import { Node, VDocModule, VflowModule, uuid } from 'projects/ngx-vflow-lib/src/
   standalone: true,
   imports: [VflowModule, VDocModule]
 })
-export class VflowEdgesDemoComponent {
+export class VflowEdgesDemoComponent implements AfterViewInit {
   public nodes: Node[] = [
     {
       id: uuid(),
@@ -58,4 +58,21 @@ export class VflowEdgesDemoComponent {
       target: this.nodes[2].id,
     },
   ]
+
+  @ViewChild('flow')
+  public flow!: VflowComponent
+
+  public ngAfterViewInit(): void {
+    this.flow.viewportChanges$.subscribe((changes) => {
+      console.log(changes)
+    })
+
+    // this.flow.viewportTo({
+    //   zoom: 0.4,
+    //   x: 0,
+    //   y: 0
+    // })
+
+    this.flow.panTo({ x: 50, y: 50 })
+  }
 }
