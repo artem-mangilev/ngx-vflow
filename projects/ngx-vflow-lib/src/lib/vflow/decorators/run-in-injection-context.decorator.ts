@@ -4,17 +4,11 @@ export function InjectionContext(target: any, key: string, descriptor: PropertyD
   const originalMethod = descriptor.value;
 
   descriptor.value = function (...args: any[]) {
-    let result
-
     if (this instanceof WithInjectorDirective) {
-      runInInjectionContext(this.injector, () => {
-        result = originalMethod.apply(this, args);
-      })
+      return runInInjectionContext(this.injector, () => originalMethod.apply(this, args))
     } else {
       throw new Error('Class that contains decorated method must extends WithInjectorDirective class')
     }
-
-    return result;
   };
 
   // Return the modified descriptor
