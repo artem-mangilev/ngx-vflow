@@ -18,6 +18,7 @@ import { ViewportState } from '../../interfaces/viewport.interface';
 @Component({
   selector: 'vflow',
   templateUrl: './vflow.component.html',
+  styleUrls: ['./vflow.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [DraggableService, ViewportService]
 })
