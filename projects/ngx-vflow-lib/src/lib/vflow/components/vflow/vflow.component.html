@@ -1,7 +1,7 @@
 <svg:svg
   class="root-svg"
   #flow
-  mapController
+  rootController
   [style.backgroundColor]="background"
   [attr.width]="flowModel.flowWidth()"
   [attr.height]="flowModel.flowHeight()"
@@ -14,7 +14,7 @@
 
     <!-- Nodes -->
     <svg:g
-      *ngFor="let node of nodes; trackBy: trackById"
+      *ngFor="let node of nodes; trackBy: trackNodes"
       node
       [nodeModel]="node"
       [nodeHtmlTemplate]="nodeHtmlDirective?.templateRef"
@@ -23,12 +23,15 @@
 
     <!-- Edges  -->
     <svg:g
-      *ngFor="let edge of edges"
+      *ngFor="let edge of edges; trackBy: trackEdges"
       edge
       [model]="edge"
       [edgeTemplate]="edgeTemplateDirective?.templateRef"
       [edgeLabelHtmlTemplate]="edgeLabelHtmlDirective?.templateRef"
     />
+
+    <!-- Connection -->
+    <svg:g connection />
 
   </svg:g>
 

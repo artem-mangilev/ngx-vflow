@@ -6,15 +6,19 @@ import { MapContextDirective } from './directives/map-context.directive';
 import { EdgeComponent } from './components/edge/edge.component';
 import { EdgeLabelComponent } from './components/edge-label/edge-label.component';
 import { EdgeLabelHtmlTemplateDirective, EdgeTemplateDirective, NodeHtmlTemplateDirective } from './directives/template.directive';
+import { ConnectionComponent } from './components/connection/connection.component';
+import { RootControllerDirective } from './directives/root-controller.directive';
 
 const components = [
   VflowComponent,
   NodeComponent,
   EdgeComponent,
-  EdgeLabelComponent
+  EdgeLabelComponent,
+  ConnectionComponent
 ]
 
 const directives = [
+  RootControllerDirective,
   MapContextDirective,
   NodeHtmlTemplateDirective,
   EdgeLabelHtmlTemplateDirective,

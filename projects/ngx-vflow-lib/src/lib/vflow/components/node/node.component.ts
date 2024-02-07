@@ -1,6 +1,7 @@
 import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, HostBinding, Input, NgZone, OnDestroy, OnInit, TemplateRef, ViewChild, inject } from '@angular/core';
 import { DraggableService } from '../../services/draggable.service';
 import { NodeModel } from '../../models/node.model';
+import { FlowStatusService } from '../../services/flow-status.service';
 
 @Component({
   selector: 'g[node]',
@@ -26,6 +27,7 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
   public htmlWrapperRef!: ElementRef<HTMLDivElement>
 
   private draggableService = inject(DraggableService)
+  private flowStatusService = inject(FlowStatusService)
   private hostRef = inject<ElementRef<SVGElement>>(ElementRef)
 
   public ngOnInit() {
@@ -57,5 +59,24 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   public ngOnDestroy(): void {
     this.draggableService.destroy(this.hostRef.nativeElement)
+  }
+
+  protected startConnection(event: MouseEvent) {
+    // ignore drag by stopping propagation
+    event.stopPropagation()
+
+    this.flowStatusService.setConnectionStartStatus(this.nodeModel)
+
+    console.log(this.flowStatusService.status())
+  }
+
+  protected endConnection() {
+    const status = this.flowStatusService.status()
+
+    if (status.state === 'connection-start') {
+      this.flowStatusService.setConnectionEndStatus(status.payload.sourceNode, this.nodeModel)
+    }
+
+    console.log(this.flowStatusService.status())
   }
 }

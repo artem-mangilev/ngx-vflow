@@ -14,13 +14,18 @@ import { FlowModel } from '../../models/flow.model';
 import { skip } from 'rxjs';
 import { Point } from '../../interfaces/point.interface';
 import { ViewportState } from '../../interfaces/viewport.interface';
+import { FlowStatusService } from '../../services/flow-status.service';
 
 @Component({
   selector: 'vflow',
   templateUrl: './vflow.component.html',
   styleUrls: ['./vflow.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [DraggableService, ViewportService]
+  providers: [
+    DraggableService,
+    ViewportService,
+    FlowStatusService
+  ]
 })
 export class VflowComponent implements OnChanges {
   // #region DI
@@ -114,8 +119,12 @@ export class VflowComponent implements OnChanges {
   }
   // #endregion
 
-  protected trackById(idx: number, { node }: NodeModel) {
+  protected trackNodes(idx: number, { node }: NodeModel) {
     return node.id
+  }
+
+  protected trackEdges(idx: number, { edge }: EdgeModel) {
+    return edge.id
   }
 }
 

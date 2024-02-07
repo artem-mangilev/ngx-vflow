@@ -24,6 +24,7 @@
   stroke="white"
   stroke-width="3"
   fill="red"
+  (mousedown)="startConnection($event)"
 />
 
 <svg:circle
@@ -33,4 +34,5 @@
   stroke="white"
   stroke-width="3"
   fill="red"
+  (mouseup)="endConnection()"
 />

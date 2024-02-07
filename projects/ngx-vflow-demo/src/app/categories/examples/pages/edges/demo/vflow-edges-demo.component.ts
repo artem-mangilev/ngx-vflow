@@ -63,9 +63,9 @@ export class VflowEdgesDemoComponent implements AfterViewInit {
   public flow!: VflowComponent
 
   public ngAfterViewInit(): void {
-    this.flow.viewportChanges$.subscribe((changes) => {
-      console.log(changes)
-    })
+    // this.flow.viewportChanges$.subscribe((changes) => {
+    //   console.log(changes)
+    // })
 
     // this.flow.viewportTo({
     //   zoom: 0.4,
@@ -73,6 +73,6 @@ export class VflowEdgesDemoComponent implements AfterViewInit {
     //   y: 0
     // })
 
-    this.flow.panTo({ x: 50, y: 50 })
+    // this.flow.panTo({ x: 50, y: 50 })
   }
 }
