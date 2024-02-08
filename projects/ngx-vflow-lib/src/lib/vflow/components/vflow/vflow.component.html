@@ -1,13 +1,15 @@
 <svg:svg
+  rootSvgRef
+  rootSvgContext
   class="root-svg"
   #flow
-  rootController
   [style.backgroundColor]="background"
   [attr.width]="flowModel.flowWidth()"
   [attr.height]="flowModel.flowHeight()"
 >
   <svg:g
     mapContext
+    spacePointContext
     [minZoom]="minZoom"
     [maxZoom]="maxZoom"
   >

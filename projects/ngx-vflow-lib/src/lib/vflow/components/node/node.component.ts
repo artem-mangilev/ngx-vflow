@@ -66,8 +66,6 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
     event.stopPropagation()
 
     this.flowStatusService.setConnectionStartStatus(this.nodeModel)
-
-    console.log(this.flowStatusService.status())
   }
 
   protected endConnection() {
@@ -76,7 +74,5 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
     if (status.state === 'connection-start') {
       this.flowStatusService.setConnectionEndStatus(status.payload.sourceNode, this.nodeModel)
     }
-
-    console.log(this.flowStatusService.status())
   }
 }

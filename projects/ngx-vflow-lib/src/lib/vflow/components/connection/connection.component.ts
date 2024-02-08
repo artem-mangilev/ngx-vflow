@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { FlowStatusConnectionStart, FlowStatusService } from '../../services/flow-status.service';
 import { straightPath } from '../../math/edge-path/straigh-path';
-import { RootControllerDirective } from '../../directives/root-controller.directive';
+import { SpacePointContextDirective } from '../../directives/space-point-context.directive';
 
 @Component({
   selector: 'g[connection]',
@@ -17,16 +17,16 @@ import { RootControllerDirective } from '../../directives/root-controller.direct
 })
 export class ConnectionComponent {
   private flowStatusService = inject(FlowStatusService)
-  private rootController = inject(RootControllerDirective)
+  private spacePointContext = inject(SpacePointContextDirective)
 
   protected path = computed(() => {
     const status = this.flowStatusService.status()
-    const targetPoint = this.rootController.svgSpacePoint()
+    const targetPoint = this.spacePointContext.svgSpacePoint()
 
     if (status.state === 'connection-start') {
-      const sourcePoint = status.payload.sourceNode.sourcePoint()
+      const sourcePoint = status.payload.sourceNode.sourcePointAbsolute()
 
-      return straightPath(sourcePoint, targetPoint, [false, false, false]).path
+      return straightPath(sourcePoint, targetPoint).path
     }
 
     return null

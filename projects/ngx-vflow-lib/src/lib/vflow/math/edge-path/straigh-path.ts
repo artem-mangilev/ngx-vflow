@@ -4,7 +4,7 @@ import { path as d3Path } from 'd3-path'
 import { UsingPoints } from "../../types/using-points.type";
 
 // TODO: we should not compute not used points on path
-export function straightPath(source: Point, target: Point, usingPoints: UsingPoints): PathData {
+export function straightPath(source: Point, target: Point, usingPoints: UsingPoints = [false, false, false]): PathData {
   const [start, center, end] = usingPoints
   const nullPoint = { x: 0, y: 0 }
 

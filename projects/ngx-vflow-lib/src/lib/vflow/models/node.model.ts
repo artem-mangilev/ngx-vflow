@@ -32,6 +32,13 @@ export class NodeModel {
     }
   })
 
+  public sourcePointAbsolute = computed(() => {
+    return {
+      x: this.point().x + this.sourcePoint().x,
+      y: this.point().y + this.sourcePoint().y
+    }
+  })
+
   public width = signal(0)
   public height = signal(0)
 
