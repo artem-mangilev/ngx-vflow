@@ -9,7 +9,7 @@ export class SpacePointContextDirective {
   /**
    * Signal with current mouse position in svg space
    */
-  public svgSpacePoint: Signal<Point> = computed(() => {
+  public svgCurrentSpacePoint: Signal<Point> = computed(() => {
     const movement = this.mouseMovement()
 
     if (movement) {

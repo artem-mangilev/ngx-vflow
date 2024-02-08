@@ -6,12 +6,7 @@ import { SpacePointContextDirective } from '../../directives/space-point-context
 @Component({
   selector: 'g[connection]',
   template: `
-    <svg:path
-      *ngIf="path()"
-      [attr.d]="path()"
-      stroke="black"
-      fill="none"
-    />
+    <svg:path *ngIf="path() as path" [attr.d]="path" stroke="black" fill="none" />
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -21,10 +16,10 @@ export class ConnectionComponent {
 
   protected path = computed(() => {
     const status = this.flowStatusService.status()
-    const targetPoint = this.spacePointContext.svgSpacePoint()
 
     if (status.state === 'connection-start') {
       const sourcePoint = status.payload.sourceNode.sourcePointAbsolute()
+      const targetPoint = this.spacePointContext.svgCurrentSpacePoint()
 
       return straightPath(sourcePoint, targetPoint).path
     }
