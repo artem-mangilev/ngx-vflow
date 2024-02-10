@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, ContentChild, Input, OnChanges, SimpleChanges, ViewChild, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ContentChild, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild, inject } from '@angular/core';
 import { Node } from '../../interfaces/node.interface';
 import { MapContextDirective } from '../../directives/map-context.directive';
 import { DraggableService } from '../../services/draggable.service';
@@ -15,6 +15,12 @@ import { skip } from 'rxjs';
 import { Point } from '../../interfaces/point.interface';
 import { ViewportState } from '../../interfaces/viewport.interface';
 import { FlowStatusService } from '../../services/flow-status.service';
+import { ConnectionControllerDirective } from '../../directives/connection-controller.directive';
+
+const connectionControllerHostDirective = {
+  directive: ConnectionControllerDirective,
+  outputs: ['onConnect']
+}
 
 @Component({
   selector: 'vflow',
@@ -25,7 +31,8 @@ import { FlowStatusService } from '../../services/flow-status.service';
     DraggableService,
     ViewportService,
     FlowStatusService
-  ]
+  ],
+  hostDirectives: [connectionControllerHostDirective]
 })
 export class VflowComponent implements OnChanges {
   // #region DI

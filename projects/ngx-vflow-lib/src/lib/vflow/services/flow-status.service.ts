@@ -42,3 +42,18 @@ export class FlowStatusService {
     this.status.set({ state: 'connection-end', payload: { sourceNode, targetNode } })
   }
 }
+
+/**
+ * Batch status changes together to call them one after another
+ *
+ * @param changes list of set[FlowStatus.state]Status() calls
+ */
+export function batchStatusChanges(...changes: Function[]) {
+  if (changes.length) {
+    const [firstChange, ...restChanges] = changes
+    // first change is sync
+    firstChange()
+    // without timer, subscribed effects/comuted signals only get latest value
+    restChanges.forEach(change => setTimeout(() => change()))
+  }
+}

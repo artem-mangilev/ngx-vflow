@@ -1,4 +1,5 @@
 import { AfterViewInit, ChangeDetectionStrategy, Component, ViewChild } from '@angular/core';
+import { Connection } from 'projects/ngx-vflow-lib/src/lib/vflow/interfaces/connection.interface';
 import { Edge } from 'projects/ngx-vflow-lib/src/lib/vflow/interfaces/edge.interface';
 import { Node, VDocModule, VflowComponent, VflowModule, uuid } from 'projects/ngx-vflow-lib/src/public-api';
 
@@ -74,5 +75,9 @@ export class VflowEdgesDemoComponent implements AfterViewInit {
     // })
 
     // this.flow.panTo({ x: 50, y: 50 })
+  }
+
+  public handleConnect(connection: Connection) {
+    console.log(connection)
   }
 }

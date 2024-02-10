@@ -1,7 +1,7 @@
 import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, HostBinding, Input, NgZone, OnDestroy, OnInit, TemplateRef, ViewChild, inject } from '@angular/core';
 import { DraggableService } from '../../services/draggable.service';
 import { NodeModel } from '../../models/node.model';
-import { FlowStatusService } from '../../services/flow-status.service';
+import { FlowStatusService, batchStatusChanges } from '../../services/flow-status.service';
 
 @Component({
   selector: 'g[node]',
@@ -72,7 +72,15 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
     const status = this.flowStatusService.status()
 
     if (status.state === 'connection-start') {
-      this.flowStatusService.setConnectionEndStatus(status.payload.sourceNode, this.nodeModel)
+      const sourceNode = status.payload.sourceNode
+      const targetNode = this.nodeModel
+
+      batchStatusChanges(
+        // call to create connection
+        () => this.flowStatusService.setConnectionEndStatus(sourceNode, targetNode),
+        // when connection created, we need go back to idle status
+        () => this.flowStatusService.setIdleStatus()
+      )
     }
   }
 }

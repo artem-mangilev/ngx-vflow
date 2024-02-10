@@ -26,7 +26,7 @@ const directives = [
   EdgeLabelHtmlTemplateDirective,
   EdgeTemplateDirective,
   RootSvgReferenceDirective,
-  RootSvgContextDirective
+  RootSvgContextDirective,
 ]
 
 @NgModule({
