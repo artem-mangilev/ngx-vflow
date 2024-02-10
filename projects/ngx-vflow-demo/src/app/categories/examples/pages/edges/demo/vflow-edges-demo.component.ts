@@ -53,11 +53,11 @@ export class VflowEdgesDemoComponent implements AfterViewInit {
         // },
       }
     },
-    {
-      id: uuid(),
-      source: this.nodes[0].id,
-      target: this.nodes[2].id,
-    },
+    // {
+    //   id: uuid(),
+    //   source: this.nodes[0].id,
+    //   target: this.nodes[2].id,
+    // },
   ]
 
   @ViewChild('flow')
@@ -78,6 +78,6 @@ export class VflowEdgesDemoComponent implements AfterViewInit {
   }
 
   public handleConnect(connection: Connection) {
-    console.log(connection)
+    connection.convertToEdge()
   }
 }

@@ -16,6 +16,7 @@ import { Point } from '../../interfaces/point.interface';
 import { ViewportState } from '../../interfaces/viewport.interface';
 import { FlowStatusService } from '../../services/flow-status.service';
 import { ConnectionControllerDirective } from '../../directives/connection-controller.directive';
+import { FlowEntitiesService } from '../../services/flow-entities.service';
 
 const connectionControllerHostDirective = {
   directive: ConnectionControllerDirective,
@@ -30,13 +31,15 @@ const connectionControllerHostDirective = {
   providers: [
     DraggableService,
     ViewportService,
-    FlowStatusService
+    FlowStatusService,
+    FlowEntitiesService
   ],
   hostDirectives: [connectionControllerHostDirective]
 })
 export class VflowComponent implements OnChanges {
   // #region DI
   protected viewportService = inject(ViewportService)
+  protected flowEntitiesService = inject(FlowEntitiesService)
   // #endregion
 
   // #region SETTINGS
@@ -71,10 +74,13 @@ export class VflowComponent implements OnChanges {
 
   // #region MAIN_INPUTS
   @Input({ required: true, transform: (nodes: Node[]) => nodes.map(n => new NodeModel(n)) })
-  public nodes: NodeModel[] = []
+  public set nodes(nodes: NodeModel[]) { this.flowEntitiesService.nodes.set(nodes) }
+  public get nodes() { return this.flowEntitiesService.nodes() }
 
   @Input({ transform: (edges: Edge[]) => edges.map(e => new EdgeModel(e)) })
-  public edges: EdgeModel[] = []
+  public set edges(edges: EdgeModel[]) { this.flowEntitiesService.edges.set(edges) }
+  public get edges() { return this.flowEntitiesService.edges() }
+
   // #endregion
 
   // #region TEMPLATES
