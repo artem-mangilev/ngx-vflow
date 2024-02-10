@@ -17,6 +17,8 @@ import { ViewportState } from '../../interfaces/viewport.interface';
 import { FlowStatusService } from '../../services/flow-status.service';
 import { ConnectionControllerDirective } from '../../directives/connection-controller.directive';
 import { FlowEntitiesService } from '../../services/flow-entities.service';
+import { ConnectionSettings } from '../../interfaces/connection-settings.interface';
+import { ConnectionModel } from '../../models/connection.model';
 
 const connectionControllerHostDirective = {
   directive: ConnectionControllerDirective,
@@ -70,6 +72,8 @@ export class VflowComponent implements OnChanges {
   @Input()
   public background: string = '#FFFFFF'
 
+  @Input({ transform: (settings: ConnectionSettings) => new ConnectionModel(settings) })
+  public connection: ConnectionModel = new ConnectionModel({})
   // #endregion
 
   // #region MAIN_INPUTS

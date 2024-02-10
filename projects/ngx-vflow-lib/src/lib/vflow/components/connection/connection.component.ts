@@ -1,7 +1,10 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, computed, inject } from '@angular/core';
 import { FlowStatusConnectionStart, FlowStatusService } from '../../services/flow-status.service';
 import { straightPath } from '../../math/edge-path/straigh-path';
 import { SpacePointContextDirective } from '../../directives/space-point-context.directive';
+import { ConnectionSettings } from '../../interfaces/connection-settings.interface';
+import { ConnectionModel } from '../../models/connection.model';
+import { bezierPath } from '../../math/edge-path/bezier-path';
 
 @Component({
   selector: 'g[connection]',
@@ -11,6 +14,9 @@ import { SpacePointContextDirective } from '../../directives/space-point-context
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ConnectionComponent {
+  @Input({ required: true })
+  public model!: ConnectionModel
+
   private flowStatusService = inject(FlowStatusService)
   private spacePointContext = inject(SpacePointContextDirective)
 
@@ -18,10 +24,17 @@ export class ConnectionComponent {
     const status = this.flowStatusService.status()
 
     if (status.state === 'connection-start') {
-      const sourcePoint = status.payload.sourceNode.sourcePointAbsolute()
+      const sourceNode = status.payload.sourceNode
+      const sourcePoint = sourceNode.sourcePointAbsolute()
       const targetPoint = this.spacePointContext.svgCurrentSpacePoint()
 
-      return straightPath(sourcePoint, targetPoint).path
+      switch (this.model.curve) {
+        case 'straight': return straightPath(sourcePoint, targetPoint).path
+        case 'bezier': return bezierPath(
+          sourcePoint, targetPoint,
+          sourceNode.sourcePosition(), sourceNode.targetPosition()
+        ).path
+      }
     }
 
     return null
