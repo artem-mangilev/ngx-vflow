@@ -33,7 +33,11 @@
     />
 
     <!-- Connection -->
-    <svg:g connection [model]="connection"/>
+    <svg:g
+      connection
+      [model]="connection"
+      [template]="connectionTemplateDirective?.templateRef"
+    />
 
   </svg:g>
 

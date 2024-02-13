@@ -7,7 +7,7 @@ import { ViewportService } from '../../services/viewport.service';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { Edge } from '../../interfaces/edge.interface';
 import { EdgeModel } from '../../models/edge.model';
-import { EdgeLabelHtmlTemplateDirective, EdgeTemplateDirective, NodeHtmlTemplateDirective } from '../../directives/template.directive';
+import { ConnectionTemplateDirective, EdgeLabelHtmlTemplateDirective, EdgeTemplateDirective, NodeHtmlTemplateDirective } from '../../directives/template.directive';
 import { HandlePositions } from '../../interfaces/handle-positions.interface';
 import { addNodesToEdges } from '../../utils/add-nodes-to-edges';
 import { FlowModel } from '../../models/flow.model';
@@ -96,6 +96,9 @@ export class VflowComponent implements OnChanges {
 
   @ContentChild(EdgeLabelHtmlTemplateDirective)
   protected edgeLabelHtmlDirective?: EdgeLabelHtmlTemplateDirective
+
+  @ContentChild(ConnectionTemplateDirective)
+  protected connectionTemplateDirective?: ConnectionTemplateDirective
   // #endregion
 
   // #region DIRECTIVES

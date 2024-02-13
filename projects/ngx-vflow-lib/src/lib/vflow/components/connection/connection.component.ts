@@ -1,21 +1,29 @@
-import { ChangeDetectionStrategy, Component, Input, computed, inject } from '@angular/core';
-import { FlowStatusConnectionStart, FlowStatusService } from '../../services/flow-status.service';
+import { ChangeDetectionStrategy, Component, Input, TemplateRef, computed, inject } from '@angular/core';
+import { FlowStatusService } from '../../services/flow-status.service';
 import { straightPath } from '../../math/edge-path/straigh-path';
 import { SpacePointContextDirective } from '../../directives/space-point-context.directive';
-import { ConnectionSettings } from '../../interfaces/connection-settings.interface';
 import { ConnectionModel } from '../../models/connection.model';
 import { bezierPath } from '../../math/edge-path/bezier-path';
 
 @Component({
   selector: 'g[connection]',
   template: `
-    <svg:path *ngIf="path() as path" [attr.d]="path" stroke="black" fill="none" />
+    <ng-container *ngIf="model.type === 'default'">
+      <svg:path *ngIf="path() as path" [attr.d]="path" stroke="black" fill="none" />
+    </ng-container>
+
+    <ng-container *ngIf="model.type === 'template' && template">
+      <ng-container *ngTemplateOutlet="template; context: getContext()" />
+    </ng-container>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ConnectionComponent {
   @Input({ required: true })
   public model!: ConnectionModel
+
+  @Input()
+  public template?: TemplateRef<any>
 
   private flowStatusService = inject(FlowStatusService)
   private spacePointContext = inject(SpacePointContextDirective)
@@ -39,4 +47,12 @@ export class ConnectionComponent {
 
     return null
   })
+
+  protected getContext() {
+    return {
+      $implicit: {
+        path: this.path
+      }
+    }
+  }
 }

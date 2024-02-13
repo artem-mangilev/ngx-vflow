@@ -31,28 +31,6 @@ export class VflowEdgesDemoComponent implements AfterViewInit {
 
   public edges: Edge[] = [
     createEdge(this.nodes[0].id, this.nodes[1].id)
-    // {
-    //   id: uuid(),
-    //   source: this.nodes[0].id,
-    //   target: this.nodes[1].id,
-    //   type: 'template',
-    //   data: {
-    //     title: 'edge title'
-    //   },
-    //   edgeLabels: {
-    //     center: {
-    //       type: 'html-template',
-    //       data: {
-    //         title: 'center label title'
-    //       }
-    //     },
-    //   }
-    // },
-    // {
-    //   id: uuid(),
-    //   source: this.nodes[0].id,
-    //   target: this.nodes[2].id,
-    // },
   ]
 
   @ViewChild('flow')
