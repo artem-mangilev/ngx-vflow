@@ -12,5 +12,5 @@ export interface Connection {
   /**
    * Convert this connection to edge and add to the edges list
    */
-  convertToEdge(edge?: PartialEdge): void
+  toEdge(edge?: PartialEdge): void
 }

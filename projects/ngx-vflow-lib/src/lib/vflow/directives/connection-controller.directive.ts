@@ -32,7 +32,7 @@ export class ConnectionControllerDirective {
       const convertToEdge = (edge?: PartialEdge) =>
         this.convertToEdge(sourceModel, targetModel, edge)
 
-      this.onConnect.emit({ source, target, convertToEdge })
+      this.onConnect.emit({ source, target, toEdge: convertToEdge })
     }
 
     // writing occurs in convertToEdge method
