@@ -1,5 +1,6 @@
 import { AfterViewInit, ChangeDetectionStrategy, Component, ViewChild } from '@angular/core';
-import { Connection, PartialEdge } from 'projects/ngx-vflow-lib/src/lib/vflow/interfaces/connection.interface';
+import { ConnectionSettings } from 'projects/ngx-vflow-lib/src/lib/vflow/interfaces/connection-settings.interface';
+import { Connection, PartialEdge, ValidConnection } from 'projects/ngx-vflow-lib/src/lib/vflow/interfaces/connection.interface';
 import { Edge } from 'projects/ngx-vflow-lib/src/lib/vflow/interfaces/edge.interface';
 import { Node, VDocModule, VflowComponent, VflowModule, uuid } from 'projects/ngx-vflow-lib/src/public-api';
 
@@ -33,12 +34,18 @@ export class VflowEdgesDemoComponent implements AfterViewInit {
     createEdge(this.nodes[0].id, this.nodes[1].id)
   ]
 
+  public connectionSettings: ConnectionSettings = {
+    validator: () => {
+      return true
+    }
+  }
+
   @ViewChild('flow')
   public flow!: VflowComponent
 
   public ngAfterViewInit(): void { }
 
-  public handleConnect(connection: Connection) {
+  public handleConnect(connection: ValidConnection) {
     connection.toEdge(createEdge(connection.source.id, connection.target.id))
   }
 }

@@ -8,7 +8,9 @@ export type PartialEdge = PartialBy<Edge, 'source' | 'target'>
 export interface Connection {
   source: Node
   target: Node
+}
 
+export interface ValidConnection extends Connection {
   /**
    * Convert this connection to edge and add to the edges list
    */

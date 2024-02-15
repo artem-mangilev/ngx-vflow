@@ -1,5 +1,5 @@
 import { Directive, EventEmitter, Output, effect, inject } from '@angular/core';
-import { Connection, PartialEdge } from '../interfaces/connection.interface';
+import { Connection, PartialEdge, ValidConnection } from '../interfaces/connection.interface';
 import { FlowStatusService } from '../services/flow-status.service';
 import { VflowComponent } from '../components/vflow/vflow.component';
 import { Edge } from '../interfaces/edge.interface';
@@ -15,7 +15,7 @@ import { uuid } from '../../../public-api';
 })
 export class ConnectionControllerDirective {
   @Output()
-  public onConnect = new EventEmitter<Connection>()
+  public onConnect = new EventEmitter<ValidConnection>()
 
   private statusService = inject(FlowStatusService)
   private flowEntitiesService = inject(FlowEntitiesService)
@@ -32,7 +32,11 @@ export class ConnectionControllerDirective {
       const convertToEdge = (edge?: PartialEdge) =>
         this.convertToEdge(sourceModel, targetModel, edge)
 
-      this.onConnect.emit({ source, target, toEdge: convertToEdge })
+      const connection = this.flowEntitiesService.connection()
+
+      if (connection.validator({ source, target })) {
+        this.onConnect.emit({ source, target, toEdge: convertToEdge })
+      }
     }
 
     // writing occurs in convertToEdge method

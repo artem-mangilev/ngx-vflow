@@ -73,7 +73,8 @@ export class VflowComponent implements OnChanges {
   public background: string = '#FFFFFF'
 
   @Input({ transform: (settings: ConnectionSettings) => new ConnectionModel(settings) })
-  public connection: ConnectionModel = new ConnectionModel({})
+  public set connection(connection: ConnectionModel) { this.flowEntitiesService.connection.set(connection) }
+  public get connection() { return this.flowEntitiesService.connection() }
   // #endregion
 
   // #region MAIN_INPUTS
