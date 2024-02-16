@@ -1,9 +1,8 @@
 import { Injector, computed, inject, signal } from '@angular/core'
 import { Node } from '../interfaces/node.interface'
-import { Position } from '../types/position.type'
 import { FlowModel } from './flow.model'
 
-export class NodeModel {
+export class NodeModel<T = unknown> {
   public point = signal({ x: 0, y: 0 })
 
   public pointTransform = computed(() => `translate(${this.point().x}, ${this.point().y})`)
@@ -49,7 +48,7 @@ export class NodeModel {
   private flow!: FlowModel
 
   constructor(
-    public node: Node
+    public node: Node<T>
   ) {
     this.point.set(node.point)
   }

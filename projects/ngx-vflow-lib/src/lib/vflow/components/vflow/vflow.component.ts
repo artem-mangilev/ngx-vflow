@@ -128,16 +128,20 @@ export class VflowComponent implements OnChanges {
   // #endregion
 
   // #region METHODS_API
-  public viewportTo(viewport: ViewportState) {
+  public viewportTo(viewport: ViewportState): void {
     this.viewportService.writableViewport.set({ changeType: 'absolute', state: viewport })
   }
 
-  public zoomTo(zoom: number) {
+  public zoomTo(zoom: number): void {
     this.viewportService.writableViewport.set({ changeType: 'absolute', state: { zoom } })
   }
 
-  public panTo(point: Point) {
+  public panTo(point: Point): void {
     this.viewportService.writableViewport.set({ changeType: 'absolute', state: point })
+  }
+
+  public getNode<T = unknown>(id: string): Node<T> | undefined {
+    return this.flowEntitiesService.getNode<T>(id)?.node
   }
   // #endregion
 

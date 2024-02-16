@@ -46,6 +46,9 @@ export class VflowEdgesDemoComponent implements AfterViewInit {
   public ngAfterViewInit(): void { }
 
   public handleConnect(connection: Connection) {
+    console.log(this.flow.getNode(connection.source))
+    console.log(this.flow.getNode(connection.target))
+
     this.edges = [...this.edges, createEdge(connection.source, connection.target)]
   }
 }

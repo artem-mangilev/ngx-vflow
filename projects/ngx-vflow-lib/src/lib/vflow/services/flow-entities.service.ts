@@ -10,4 +10,8 @@ export class FlowEntitiesService {
   public readonly edges = signal<EdgeModel[]>([])
 
   public readonly connection = signal<ConnectionModel>(new ConnectionModel({}))
+
+  public getNode<T>(id: string) {
+    return this.nodes().find(({ node }) => node.id === id) as NodeModel<T> | undefined
+  }
 }
