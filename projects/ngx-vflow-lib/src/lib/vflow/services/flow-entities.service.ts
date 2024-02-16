@@ -10,8 +10,4 @@ export class FlowEntitiesService {
   public readonly edges = signal<EdgeModel[]>([])
 
   public readonly connection = signal<ConnectionModel>(new ConnectionModel({}))
-
-  public addEdge(newEdge: EdgeModel) {
-    this.edges.update((edges) => [...edges, newEdge])
-  }
 }

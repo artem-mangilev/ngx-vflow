@@ -82,6 +82,7 @@ export class VflowComponent implements OnChanges {
   public set nodes(nodes: NodeModel[]) { this.flowEntitiesService.nodes.set(nodes) }
   public get nodes() { return this.flowEntitiesService.nodes() }
 
+  // TODO: write some logic to keep old models when references inside Edge[] list not changed compared to prev input trigger
   @Input({ transform: (edges: Edge[]) => edges.map(e => new EdgeModel(e)) })
   public set edges(edges: EdgeModel[]) { this.flowEntitiesService.edges.set(edges) }
   public get edges() { return this.flowEntitiesService.edges() }
