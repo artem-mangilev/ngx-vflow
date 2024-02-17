@@ -48,7 +48,8 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
 
     if (this.nodeModel.node.type === 'html-template') {
       queueMicrotask(() => {
-        const { width, height } = this.htmlWrapperRef.nativeElement.getBoundingClientRect()
+        const width = this.htmlWrapperRef.nativeElement.clientWidth
+        const height = this.htmlWrapperRef.nativeElement.clientHeight
 
         this.nodeModel.width.set(width)
         this.nodeModel.height.set(height)

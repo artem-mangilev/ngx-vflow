@@ -51,7 +51,8 @@ export class EdgeLabelComponent implements AfterViewInit {
 
   public ngAfterViewInit(): void {
     queueMicrotask(() => {
-      const { width, height } = this.edgeLabelWrapperRef.nativeElement.getBoundingClientRect()
+      const width = this.edgeLabelWrapperRef.nativeElement.clientWidth
+      const height = this.edgeLabelWrapperRef.nativeElement.clientHeight
 
       this.model.width.set(width)
       this.model.height.set(height)
