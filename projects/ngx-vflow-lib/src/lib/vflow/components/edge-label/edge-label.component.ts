@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, ElementRef, Input, OnChanges, OnInit, SimpleChanges, TemplateRef, ViewChild, computed, signal } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Input, OnChanges, OnInit, SimpleChanges, TemplateRef, ViewChild, computed, signal } from '@angular/core';
 import { EdgeLabelModel } from '../../models/edge-label.model';
 import { EdgeModel } from '../../models/edge.model';
 import { Point } from '../../interfaces/point.interface';
@@ -13,7 +13,7 @@ import { Point } from '../../interfaces/point.interface';
   `],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class EdgeLabelComponent implements OnChanges {
+export class EdgeLabelComponent implements AfterViewInit {
   // TODO: too many inputs
   @Input()
   public model!: EdgeLabelModel
@@ -49,16 +49,13 @@ export class EdgeLabelComponent implements OnChanges {
 
   private pointSignal = signal({ x: 0, y: 0 })
 
-  public ngOnChanges(changes: SimpleChanges): void {
-    if (changes['model']) {
-      // TODO: when new edge is created, this code also called for old edges which wasnt changed
-      queueMicrotask(() => {
-        const { width, height } = this.edgeLabelWrapperRef.nativeElement.getBoundingClientRect()
+  public ngAfterViewInit(): void {
+    queueMicrotask(() => {
+      const { width, height } = this.edgeLabelWrapperRef.nativeElement.getBoundingClientRect()
 
-        this.model.width.set(width)
-        this.model.height.set(height)
-      })
-    }
+      this.model.width.set(width)
+      this.model.height.set(height)
+    })
   }
 
   protected getLabelContext() {

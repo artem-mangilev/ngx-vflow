@@ -19,6 +19,7 @@ import { ConnectionControllerDirective } from '../../directives/connection-contr
 import { FlowEntitiesService } from '../../services/flow-entities.service';
 import { ConnectionSettings } from '../../interfaces/connection-settings.interface';
 import { ConnectionModel } from '../../models/connection.model';
+import { ReferenceKeeper } from '../../utils/reference-keeper';
 
 const connectionControllerHostDirective = {
   directive: ConnectionControllerDirective,
@@ -78,15 +79,21 @@ export class VflowComponent implements OnChanges {
   // #endregion
 
   // #region MAIN_INPUTS
-  @Input({ required: true, transform: (nodes: Node[]) => nodes.map(n => new NodeModel(n)) })
-  public set nodes(nodes: NodeModel[]) { this.flowEntitiesService.nodes.set(nodes) }
-  public get nodes() { return this.flowEntitiesService.nodes() }
+  @Input({ required: true })
+  public set nodes(newNodes: Node[]) {
+    const newModels = ReferenceKeeper.nodes(newNodes, this.flowEntitiesService.nodes())
+    this.flowEntitiesService.nodes.set(newModels)
+  }
 
-  // TODO: write some logic to keep old models when references inside Edge[] list not changed compared to prev input trigger
-  @Input({ transform: (edges: Edge[]) => edges.map(e => new EdgeModel(e)) })
-  public set edges(edges: EdgeModel[]) { this.flowEntitiesService.edges.set(edges) }
-  public get edges() { return this.flowEntitiesService.edges() }
+  public get nodeModels() { return this.flowEntitiesService.nodes() }
 
+  @Input()
+  public set edges(newEdges: Edge[]) {
+    const newModels = ReferenceKeeper.edges(newEdges, this.flowEntitiesService.edges())
+    this.flowEntitiesService.edges.set(newModels)
+  }
+
+  public get edgeModels() { return this.flowEntitiesService.edges() }
   // #endregion
 
   // #region TEMPLATES
@@ -122,8 +129,8 @@ export class VflowComponent implements OnChanges {
 
   // #region ANGULAR_HOOKS
   public ngOnChanges(changes: SimpleChanges): void {
-    if (changes['nodes']) bindFlowToNodes(this.flowModel, this.nodes)
-    if (changes['edges']) addNodesToEdges(this.nodes, this.edges)
+    if (changes['nodes']) bindFlowToNodes(this.flowModel, this.nodeModels)
+    addNodesToEdges(this.nodeModels, this.edgeModels)
   }
   // #endregion
 
@@ -157,3 +164,4 @@ export class VflowComponent implements OnChanges {
 function bindFlowToNodes(flow: FlowModel, nodes: NodeModel[]) {
   nodes.forEach(n => n.bindFlow(flow))
 }
+

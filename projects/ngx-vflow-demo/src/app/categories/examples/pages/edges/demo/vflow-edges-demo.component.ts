@@ -51,6 +51,14 @@ export class VflowEdgesDemoComponent implements AfterViewInit {
 
     this.edges = [...this.edges, createEdge(connection.source, connection.target)]
   }
+
+  public addNode() {
+    this.nodes = [...this.nodes, {
+      id: uuid(),
+      point: { x: 200, y: 200 },
+      type: 'html-template'
+    }]
+  }
 }
 
 function createEdge(source: string, target: string): Edge {

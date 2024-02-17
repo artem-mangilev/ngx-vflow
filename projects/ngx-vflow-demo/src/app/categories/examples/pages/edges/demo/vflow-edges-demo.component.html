@@ -1,3 +1,5 @@
+<button (click)="addNode()">Add node</button>
+
 <vflow #flow [nodes]="nodes" [edges]="edges" [view]="[500, 500]" [connection]="connectionSettings" (onConnect)="handleConnect($event)">
   <ng-template nodeHtml>
     <div style="background-color: black;">Hello world</div>
