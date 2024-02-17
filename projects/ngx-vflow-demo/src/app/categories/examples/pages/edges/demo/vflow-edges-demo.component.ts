@@ -35,7 +35,7 @@ export class VflowEdgesDemoComponent implements AfterViewInit {
   ]
 
   public connectionSettings: ConnectionSettings = {
-    validator: () => {
+    validator: (connection: Connection) => {
       return true
     }
   }

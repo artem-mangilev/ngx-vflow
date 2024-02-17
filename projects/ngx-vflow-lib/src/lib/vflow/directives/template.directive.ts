@@ -19,3 +19,8 @@ export class EdgeLabelHtmlTemplateDirective {
 export class NodeHtmlTemplateDirective {
   public templateRef = inject(TemplateRef)
 }
+
+@Directive({ selector: 'ng-template[handle]' })
+export class HandleTemplateDirective {
+  public templateRef = inject(TemplateRef)
+}

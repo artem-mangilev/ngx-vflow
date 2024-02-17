@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, ContentChild, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild, inject } from '@angular/core';
+import { AfterContentInit, ChangeDetectionStrategy, Component, ContentChild, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild, inject } from '@angular/core';
 import { Node } from '../../interfaces/node.interface';
 import { MapContextDirective } from '../../directives/map-context.directive';
 import { DraggableService } from '../../services/draggable.service';
@@ -7,7 +7,7 @@ import { ViewportService } from '../../services/viewport.service';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { Edge } from '../../interfaces/edge.interface';
 import { EdgeModel } from '../../models/edge.model';
-import { ConnectionTemplateDirective, EdgeLabelHtmlTemplateDirective, EdgeTemplateDirective, NodeHtmlTemplateDirective } from '../../directives/template.directive';
+import { ConnectionTemplateDirective, EdgeLabelHtmlTemplateDirective, EdgeTemplateDirective, HandleTemplateDirective, NodeHtmlTemplateDirective } from '../../directives/template.directive';
 import { HandlePositions } from '../../interfaces/handle-positions.interface';
 import { addNodesToEdges } from '../../utils/add-nodes-to-edges';
 import { FlowModel } from '../../models/flow.model';
@@ -108,6 +108,9 @@ export class VflowComponent implements OnChanges {
 
   @ContentChild(ConnectionTemplateDirective)
   protected connectionTemplateDirective?: ConnectionTemplateDirective
+
+  @ContentChild(HandleTemplateDirective)
+  protected handleTemplateDirective?: HandleTemplateDirective
   // #endregion
 
   // #region DIRECTIVES

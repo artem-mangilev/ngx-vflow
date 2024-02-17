@@ -1,7 +1,8 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, HostBinding, Input, NgZone, OnDestroy, OnInit, TemplateRef, ViewChild, inject } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, HostBinding, Input, NgZone, OnDestroy, OnInit, TemplateRef, ViewChild, computed, inject } from '@angular/core';
 import { DraggableService } from '../../services/draggable.service';
 import { NodeModel } from '../../models/node.model';
 import { FlowStatusService, batchStatusChanges } from '../../services/flow-status.service';
+import { computeMsgId } from '@angular/compiler';
 
 @Component({
   selector: 'g[node]',
@@ -20,11 +21,21 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input()
   public nodeHtmlTemplate?: TemplateRef<any>
 
+  @Input()
+  public handleTemplate?: TemplateRef<any>
+
   @ViewChild('nodeContent')
   public nodeContentRef!: ElementRef<SVGGraphicsElement>
 
   @ViewChild('htmlWrapper')
   public htmlWrapperRef!: ElementRef<HTMLDivElement>
+
+  protected sourcePointTransform = computed(() =>
+    `translate(${this.nodeModel.sourcePoint().x}, ${this.nodeModel.sourcePoint().y})`
+  )
+  protected targetPointTransform = computed(() =>
+    `translate(${this.nodeModel.targetPoint().x}, ${this.nodeModel.targetPoint().y})`
+  )
 
   private draggableService = inject(DraggableService)
   private flowStatusService = inject(FlowStatusService)

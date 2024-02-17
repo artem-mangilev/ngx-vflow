@@ -17,22 +17,42 @@
   </div>
 </svg:foreignObject>
 
-<svg:circle
-  [attr.cx]="nodeModel.sourcePoint().x"
-  [attr.cy]="nodeModel.sourcePoint().y"
-  r="5"
-  stroke="white"
-  stroke-width="3"
-  fill="red"
-  (mousedown)="startConnection($event)"
-/>
+<ng-container *ngIf="handleTemplate">
+  <svg:g
+    [attr.transform]="sourcePointTransform()"
+    (mousedown)="startConnection($event)"
+  >
+    <ng-container *ngTemplateOutlet="handleTemplate" />
+  </svg:g>
 
-<svg:circle
-  [attr.cx]="nodeModel.targetPoint().x"
-  [attr.cy]="nodeModel.targetPoint().y"
-  r="5"
-  stroke="white"
-  stroke-width="3"
-  fill="red"
-  (mouseup)="endConnection()"
-/>
+  <svg:g
+    [attr.transform]="targetPointTransform()"
+    (mouseup)="endConnection()"
+  >
+    <ng-container *ngTemplateOutlet="handleTemplate" />
+  </svg:g>
+</ng-container>
+
+<ng-container *ngIf="!handleTemplate">
+  <svg:circle
+    [attr.cx]="nodeModel.sourcePoint().x"
+    [attr.cy]="nodeModel.sourcePoint().y"
+    r="5"
+    stroke="white"
+    stroke-width="3"
+    fill="red"
+    (mousedown)="startConnection($event)"
+  />
+
+  <svg:circle
+    [attr.cx]="nodeModel.targetPoint().x"
+    [attr.cy]="nodeModel.targetPoint().y"
+    r="5"
+    stroke="white"
+    stroke-width="3"
+    fill="red"
+    (mouseup)="endConnection()"
+  />
+</ng-container>
+
+

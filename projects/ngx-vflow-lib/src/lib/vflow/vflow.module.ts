@@ -5,7 +5,7 @@ import { NodeComponent } from './components/node/node.component';
 import { MapContextDirective } from './directives/map-context.directive';
 import { EdgeComponent } from './components/edge/edge.component';
 import { EdgeLabelComponent } from './components/edge-label/edge-label.component';
-import { ConnectionTemplateDirective, EdgeLabelHtmlTemplateDirective, EdgeTemplateDirective, NodeHtmlTemplateDirective } from './directives/template.directive';
+import { ConnectionTemplateDirective, EdgeLabelHtmlTemplateDirective, EdgeTemplateDirective, HandleTemplateDirective, NodeHtmlTemplateDirective } from './directives/template.directive';
 import { ConnectionComponent } from './components/connection/connection.component';
 import { SpacePointContextDirective } from './directives/space-point-context.directive';
 import { RootSvgReferenceDirective } from './directives/reference.directive';
@@ -24,21 +24,22 @@ const directives = [
   MapContextDirective,
   RootSvgReferenceDirective,
   RootSvgContextDirective,
-  // TEMPLATES
+]
+
+const templateDirectives = [
   NodeHtmlTemplateDirective,
   EdgeLabelHtmlTemplateDirective,
   EdgeTemplateDirective,
   ConnectionTemplateDirective,
+  HandleTemplateDirective
 ]
 
 @NgModule({
   imports: [CommonModule],
   exports: [
     VflowComponent,
-    NodeHtmlTemplateDirective,
-    EdgeLabelHtmlTemplateDirective,
-    EdgeTemplateDirective,
+    ...templateDirectives
   ],
-  declarations: [...components, ...directives],
+  declarations: [...components, ...directives, ...templateDirectives],
 })
 export class VflowModule { }
