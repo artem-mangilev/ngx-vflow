@@ -130,6 +130,8 @@ export class VflowComponent implements OnChanges {
   // TODO: probably better to make it injectable
   protected flowModel = new FlowModel()
 
+  protected markers = this.flowEntitiesService.markers
+
   // #region ANGULAR_HOOKS
   public ngOnChanges(changes: SimpleChanges): void {
     if (changes['nodes']) bindFlowToNodes(this.flowModel, this.nodeModels)

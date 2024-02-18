@@ -10,13 +10,15 @@ import { ConnectionComponent } from './components/connection/connection.componen
 import { SpacePointContextDirective } from './directives/space-point-context.directive';
 import { RootSvgReferenceDirective } from './directives/reference.directive';
 import { RootSvgContextDirective } from './directives/root-svg-context.directive';
+import { EdgeMarkerComponent } from './components/edge-marker/edge-marker.component';
 
 const components = [
   VflowComponent,
   NodeComponent,
   EdgeComponent,
   EdgeLabelComponent,
-  ConnectionComponent
+  ConnectionComponent,
+  EdgeMarkerComponent
 ]
 
 const directives = [

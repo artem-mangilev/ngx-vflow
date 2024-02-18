@@ -14,6 +14,15 @@
     />
   </ng-template>
 
+  <ng-template connection let-context>
+    <svg:path
+      [attr.d]="context.path()"
+      stroke="red"
+      stroke-width="3"
+      fill="none"
+    />
+  </ng-template>
+
   <ng-template edgeLabelHtml let-context>
     <div style="background-color: black;">
       Edge: {{ context.edge.data.title }}

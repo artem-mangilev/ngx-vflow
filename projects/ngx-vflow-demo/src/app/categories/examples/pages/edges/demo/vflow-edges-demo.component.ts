@@ -31,10 +31,11 @@ export class VflowEdgesDemoComponent implements AfterViewInit {
   ]
 
   public edges: Edge[] = [
-    // createEdge(this.nodes[0].id, this.nodes[1].id)
+    createEdge(this.nodes[0].id, this.nodes[1].id)
   ]
 
   public connectionSettings: ConnectionSettings = {
+    type: 'template',
     validator: (connection: Connection) => {
       if (connection.source === '1' && connection.target === '2') {
         return true
@@ -74,7 +75,7 @@ function createEdge(source: string, target: string): Edge {
     id: uuid(),
     source,
     target,
-    type: 'template',
+    type: 'default',
     data: {
       title: 'edge title'
     },
@@ -85,6 +86,13 @@ function createEdge(source: string, target: string): Edge {
           title: 'center label title'
         }
       },
+    },
+    markers: {
+      end: {
+        width: 10,
+        height: 10,
+        color: '#00FF00'
+      }
     }
   }
 }

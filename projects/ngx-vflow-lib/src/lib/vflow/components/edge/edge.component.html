@@ -1,6 +1,8 @@
 <svg:path
   *ngIf="model.type === 'default'"
   [attr.d]="model.path().path"
+  [attr.marker-start]="markerStartUrl()"
+  [attr.marker-end]="markerEndUrl()"
   stroke="black"
   fill="none"
 />

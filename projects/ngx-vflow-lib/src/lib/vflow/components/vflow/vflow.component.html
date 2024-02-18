@@ -7,6 +7,13 @@
   [attr.width]="flowModel.flowWidth()"
   [attr.height]="flowModel.flowHeight()"
 >
+  <defs>
+    <marker edgeMarker
+      [id]="marker.key" [marker]="marker.value"
+      *ngFor="let marker of markers() | keyvalue"
+    />
+  </defs>
+
   <svg:g
     mapContext
     spacePointContext
