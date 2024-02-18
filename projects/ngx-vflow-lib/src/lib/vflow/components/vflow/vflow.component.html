@@ -13,15 +13,11 @@
     [minZoom]="minZoom"
     [maxZoom]="maxZoom"
   >
-
-    <!-- Nodes -->
+    <!-- Connection -->
     <svg:g
-      *ngFor="let model of nodeModels; trackBy: trackNodes"
-      node
-      [nodeModel]="model"
-      [nodeHtmlTemplate]="nodeHtmlDirective?.templateRef"
-      [handleTemplate]="handleTemplateDirective?.templateRef"
-      [attr.transform]="model.pointTransform()"
+      connection
+      [model]="connection"
+      [template]="connectionTemplateDirective?.templateRef"
     />
 
     <!-- Edges  -->
@@ -33,13 +29,15 @@
       [edgeLabelHtmlTemplate]="edgeLabelHtmlDirective?.templateRef"
     />
 
-    <!-- Connection -->
+    <!-- Nodes -->
     <svg:g
-      connection
-      [model]="connection"
-      [template]="connectionTemplateDirective?.templateRef"
+      *ngFor="let model of nodeModels; trackBy: trackNodes"
+      node
+      [nodeModel]="model"
+      [nodeHtmlTemplate]="nodeHtmlDirective?.templateRef"
+      [handleTemplate]="handleTemplateDirective?.templateRef"
+      [attr.transform]="model.pointTransform()"
     />
-
   </svg:g>
 
 </svg:svg>

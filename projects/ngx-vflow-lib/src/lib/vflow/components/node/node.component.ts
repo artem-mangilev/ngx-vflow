@@ -1,8 +1,10 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, HostBinding, Input, NgZone, OnDestroy, OnInit, TemplateRef, ViewChild, computed, inject } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, HostBinding, Input, NgZone, OnDestroy, OnInit, TemplateRef, ViewChild, computed, inject, signal } from '@angular/core';
 import { DraggableService } from '../../services/draggable.service';
 import { NodeModel } from '../../models/node.model';
 import { FlowStatusService, batchStatusChanges } from '../../services/flow-status.service';
-import { computeMsgId } from '@angular/compiler';
+import { FlowEntitiesService } from '../../services/flow-entities.service';
+
+export type HandleState = 'valid' | 'invalid' | 'idle'
 
 @Component({
   selector: 'g[node]',
@@ -30,16 +32,16 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('htmlWrapper')
   public htmlWrapperRef!: ElementRef<HTMLDivElement>
 
-  protected sourcePointTransform = computed(() =>
-    `translate(${this.nodeModel.sourcePoint().x}, ${this.nodeModel.sourcePoint().y})`
-  )
-  protected targetPointTransform = computed(() =>
-    `translate(${this.nodeModel.targetPoint().x}, ${this.nodeModel.targetPoint().y})`
-  )
-
   private draggableService = inject(DraggableService)
   private flowStatusService = inject(FlowStatusService)
+  private flowEntitiesService = inject(FlowEntitiesService)
   private hostRef = inject<ElementRef<SVGElement>>(ElementRef)
+
+  private sourceHanldeState = signal<HandleState>('idle')
+  private targetHandleState = signal<HandleState>('idle')
+
+  private sourceHanldeStateReadonly = this.sourceHanldeState.asReadonly()
+  private targetHanldeStateReadonly = this.targetHandleState.asReadonly()
 
   public ngOnInit() {
     this.draggableService.makeDraggable(this.hostRef.nativeElement, this.nodeModel)
@@ -96,10 +98,36 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  protected validateTargetHandle() {
+    const status = this.flowStatusService.status()
+
+    if (status.state === 'connection-start') {
+      const source = status.payload.sourceNode.node.id
+      const target = this.nodeModel.node.id
+
+      const valid = this.flowEntitiesService.connection().validator({ source, target })
+      this.targetHandleState.set(valid ? 'valid' : 'invalid')
+    }
+  }
+
+  protected resetValidateTargetHandle() {
+    this.targetHandleState.set('idle')
+  }
+
   protected getHandleContext(type: 'source' | 'target') {
+    if (type === 'source') {
+      return {
+        $implicit: {
+          point: this.nodeModel.sourcePoint,
+          state: this.sourceHanldeStateReadonly
+        }
+      }
+    }
+
     return {
       $implicit: {
-        point: type === 'source' ? this.nodeModel.sourcePoint : this.nodeModel.targetPoint
+        point: this.nodeModel.targetPoint,
+        state: this.targetHanldeStateReadonly
       }
     }
   }

@@ -22,7 +22,11 @@
     <ng-container *ngTemplateOutlet="handleTemplate; context: getHandleContext('source')" />
   </svg:g>
 
-  <svg:g (mouseup)="endConnection()">
+  <svg:g
+    (mouseup)="endConnection(); resetValidateTargetHandle()"
+    (mouseover)="validateTargetHandle()"
+    (mouseout)="resetValidateTargetHandle()"
+  >
     <ng-container *ngTemplateOutlet="handleTemplate; context: getHandleContext('target')" />
   </svg:g>
 </ng-container>

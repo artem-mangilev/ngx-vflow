@@ -24,11 +24,13 @@
 
   <ng-template handle let-context>
     <svg:rect
+      class="handle"
+      [class.handle_valid]="context.state() === 'valid'"
+      [class.handle_invalid]="context.state() === 'invalid'"
       [attr.x]="context.point().x - 5"
       [attr.y]="context.point().y - 5"
       width="10"
       height="10"
-      fill="red"
     />
   </ng-template>
 </vflow>

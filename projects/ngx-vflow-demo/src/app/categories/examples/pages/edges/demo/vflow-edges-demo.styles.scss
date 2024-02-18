@@ -6,3 +6,15 @@
   align-items: center;
   justify-content: center;
 }
+
+.handle {
+  fill: gray;
+
+  &_valid {
+    fill: green;
+  }
+
+  &_invalid {
+    fill: red;
+  }
+}

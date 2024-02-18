@@ -14,28 +14,36 @@ import { Node, VDocModule, VflowComponent, VflowModule, uuid } from 'projects/ng
 export class VflowEdgesDemoComponent implements AfterViewInit {
   public nodes: Node[] = [
     {
-      id: uuid(),
+      id: '1',
       point: { x: 10, y: 10 },
       type: 'html-template',
     },
     {
-      id: uuid(),
+      id: '2',
       point: { x: 100, y: 100 },
       type: 'html-template',
     },
     {
-      id: uuid(),
+      id: '3',
       point: { x: 150, y: 150 },
       type: 'html-template',
     },
   ]
 
   public edges: Edge[] = [
-    createEdge(this.nodes[0].id, this.nodes[1].id)
+    // createEdge(this.nodes[0].id, this.nodes[1].id)
   ]
 
   public connectionSettings: ConnectionSettings = {
     validator: (connection: Connection) => {
+      if (connection.source === '1' && connection.target === '2') {
+        return true
+      }
+
+      if (connection.source === '1' && connection.target === '3') {
+        return false
+      }
+
       return true
     }
   }
