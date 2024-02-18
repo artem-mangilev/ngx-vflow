@@ -22,18 +22,13 @@
     </div>
   </ng-template>
 
-  <ng-template handle>
+  <ng-template handle let-context>
     <svg:rect
+      [attr.x]="context.point().x - 5"
+      [attr.y]="context.point().y - 5"
       width="10"
       height="10"
       fill="red"
     />
-
-    <!-- <svg:circle
-      r="5"
-      stroke="white"
-      stroke-width="3"
-      fill="red"
-    /> -->
   </ng-template>
 </vflow>

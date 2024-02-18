@@ -18,18 +18,12 @@
 </svg:foreignObject>
 
 <ng-container *ngIf="handleTemplate">
-  <svg:g
-    [attr.transform]="sourcePointTransform()"
-    (mousedown)="startConnection($event)"
-  >
-    <ng-container *ngTemplateOutlet="handleTemplate" />
+  <svg:g (mousedown)="startConnection($event)">
+    <ng-container *ngTemplateOutlet="handleTemplate; context: getHandleContext('source')" />
   </svg:g>
 
-  <svg:g
-    [attr.transform]="targetPointTransform()"
-    (mouseup)="endConnection()"
-  >
-    <ng-container *ngTemplateOutlet="handleTemplate" />
+  <svg:g (mouseup)="endConnection()">
+    <ng-container *ngTemplateOutlet="handleTemplate; context: getHandleContext('target')" />
   </svg:g>
 </ng-container>
 

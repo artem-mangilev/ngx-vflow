@@ -95,4 +95,12 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
       )
     }
   }
+
+  protected getHandleContext(type: 'source' | 'target') {
+    return {
+      $implicit: {
+        point: type === 'source' ? this.nodeModel.sourcePoint : this.nodeModel.targetPoint
+      }
+    }
+  }
 }
