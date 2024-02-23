@@ -32,6 +32,9 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('htmlWrapper')
   public htmlWrapperRef!: ElementRef<HTMLDivElement>
 
+  @ViewChild('sourceHandle')
+  public sourceHandleRef!: ElementRef<SVGGElement | SVGCircleElement>
+
   @ViewChild('targetHandle')
   public targetHandleRef!: ElementRef<SVGGElement | SVGCircleElement>
 
@@ -73,10 +76,13 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     queueMicrotask(() => {
-      const box = this.targetHandleRef.nativeElement.getBBox({ stroke: true })
+      const sourceBox = this.sourceHandleRef.nativeElement.getBBox({ stroke: true })
+      this.nodeModel.sourceHandleWidth.set(sourceBox.width)
+      this.nodeModel.sourceHandleHeight.set(sourceBox.height)
 
-      this.nodeModel.targetHandleWidth.set(box.width)
-      this.nodeModel.targetHandleHeight.set(box.height)
+      const targetBox = this.targetHandleRef.nativeElement.getBBox({ stroke: true })
+      this.nodeModel.targetHandleWidth.set(targetBox.width)
+      this.nodeModel.targetHandleHeight.set(targetBox.height)
     })
   }
 
@@ -128,7 +134,8 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
     if (type === 'source') {
       return {
         $implicit: {
-          point: this.nodeModel.sourcePoint,
+          point: this.nodeModel.sourceOffset,
+          alignedPoint: this.nodeModel.sourceOffsetAligned,
           state: this.sourceHanldeStateReadonly
         }
       }
@@ -136,7 +143,8 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
 
     return {
       $implicit: {
-        point: this.nodeModel.targetPoint,
+        point: this.nodeModel.targetOffset,
+        alignedPoint: this.nodeModel.targetOffsetAligned,
         state: this.targetHanldeStateReadonly
       }
     }

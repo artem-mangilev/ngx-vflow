@@ -5,9 +5,12 @@ import { FlowModel } from './flow.model'
 export class NodeModel<T = unknown> {
   public point = signal({ x: 0, y: 0 })
 
+  public width = signal(0)
+  public height = signal(0)
+
   public pointTransform = computed(() => `translate(${this.point().x}, ${this.point().y})`)
 
-  public sourcePoint = computed(() => {
+  public sourceOffset = computed(() => {
     const width = this.width()
     const height = this.height()
 
@@ -19,7 +22,7 @@ export class NodeModel<T = unknown> {
     }
   })
 
-  public targetPoint = computed(() => {
+  public targetOffset = computed(() => {
     const width = this.width()
     const height = this.height()
 
@@ -33,24 +36,24 @@ export class NodeModel<T = unknown> {
 
   public sourcePointAbsolute = computed(() => {
     return {
-      x: this.point().x + this.sourcePoint().x,
-      y: this.point().y + this.sourcePoint().y
+      x: this.point().x + this.sourceOffset().x,
+      y: this.point().y + this.sourceOffset().y
     }
   })
 
   public targetPointAbsolute = computed(() => {
     return {
-      x: this.point().x + this.targetPoint().x + this.targetHandleOffset().x,
-      y: this.point().y + this.targetPoint().y + this.targetHandleOffset().y
+      x: this.point().x + this.targetOffset().x + this.targetHandleOffset().x,
+      y: this.point().y + this.targetOffset().y + this.targetHandleOffset().y
     }
   })
-
-  public width = signal(0)
-  public height = signal(0)
 
   // Now source and handle positions derived from parent flow
   public sourcePosition = computed(() => this.flow.handlePositions().source)
   public targetPosition = computed(() => this.flow.handlePositions().target)
+
+  public sourceHandleWidth = signal(0)
+  public sourceHandleHeight = signal(0)
 
   public targetHandleWidth = signal(0)
   public targetHandleHeight = signal(0)
@@ -61,6 +64,20 @@ export class NodeModel<T = unknown> {
       case 'right': return { x: this.targetHandleWidth() / 2, y: 0 }
       case 'top': return { x: 0, y: -(this.targetHandleHeight() / 2) }
       case 'bottom': return { x: 0, y: this.targetHandleHeight() / 2 }
+    }
+  })
+
+  public sourceOffsetAligned = computed(() => {
+    return {
+      x: this.sourceOffset().x - (this.sourceHandleWidth() / 2),
+      y: this.sourceOffset().y - (this.sourceHandleHeight() / 2),
+    }
+  })
+
+  public targetOffsetAligned = computed(() => {
+    return {
+      x: this.targetOffset().x - (this.targetHandleWidth() / 2),
+      y: this.targetOffset().y - (this.targetHandleHeight() / 2),
     }
   })
 
