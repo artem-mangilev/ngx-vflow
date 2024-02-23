@@ -14,15 +14,8 @@ export class EdgeModel {
   public type: EdgeType
 
   public path = computed(() => {
-    const source = {
-      x: this.source.point().x + this.source.sourcePoint().x,
-      y: this.source.point().y + this.source.sourcePoint().y
-    }
-
-    const target = {
-      x: this.target.point().x + this.target.targetPoint().x,
-      y: this.target.point().y + this.target.targetPoint().y
-    }
+    const source = this.source.sourcePointAbsolute()
+    const target = this.target.targetPointAbsolute()
 
     switch (this.curve) {
       case 'straight':

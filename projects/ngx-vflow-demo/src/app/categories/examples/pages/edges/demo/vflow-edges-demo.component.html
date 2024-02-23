@@ -1,6 +1,13 @@
 <button (click)="addNode()">Add node</button>
 
-<vflow #flow [nodes]="nodes" [edges]="edges" [view]="[500, 500]" [connection]="connectionSettings" (onConnect)="handleConnect($event)">
+<vflow
+  #flow
+  [nodes]="nodes"
+  [edges]="edges"
+  [view]="[500, 500]"
+  [connection]="connectionSettings"
+  [handlePositions]="{ source: 'left', target: 'right' }"
+  (onConnect)="handleConnect($event)">
   <ng-template nodeHtml>
     <div style="background-color: black;">Hello world</div>
   </ng-template>
@@ -31,7 +38,7 @@
     </div>
   </ng-template>
 
-  <ng-template handle let-context>
+  <!-- <ng-template handle let-context>
     <svg:rect
       class="handle"
       [class.handle_valid]="context.state() === 'valid'"
@@ -41,5 +48,5 @@
       width="10"
       height="10"
     />
-  </ng-template>
+  </ng-template> -->
 </vflow>

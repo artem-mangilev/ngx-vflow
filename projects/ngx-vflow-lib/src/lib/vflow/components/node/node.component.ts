@@ -32,6 +32,9 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('htmlWrapper')
   public htmlWrapperRef!: ElementRef<HTMLDivElement>
 
+  @ViewChild('targetHandle')
+  public targetHandleRef!: ElementRef<SVGGElement | SVGCircleElement>
+
   private draggableService = inject(DraggableService)
   private flowStatusService = inject(FlowStatusService)
   private flowEntitiesService = inject(FlowEntitiesService)
@@ -66,9 +69,15 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
 
         this.nodeModel.width.set(width)
         this.nodeModel.height.set(height)
-
       })
     }
+
+    queueMicrotask(() => {
+      const box = this.targetHandleRef.nativeElement.getBBox({ stroke: true })
+
+      this.nodeModel.targetHandleWidth.set(box.width)
+      this.nodeModel.targetHandleHeight.set(box.height)
+    })
   }
 
   public ngOnDestroy(): void {
@@ -115,6 +124,7 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   protected getHandleContext(type: 'source' | 'target') {
+    // TODO provide point with shift to middle
     if (type === 'source') {
       return {
         $implicit: {

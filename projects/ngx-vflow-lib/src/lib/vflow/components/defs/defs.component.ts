@@ -13,6 +13,7 @@ import { Marker } from '../../interfaces/marker.interface';
       markerUnits="strokeWidth"
       refX="0"
       refY="0"
+      orient="auto-start-reverse"
     >
       <polyline
         [style.stroke]="marker.value.color ?? 'rgb(177, 177, 183)'"
