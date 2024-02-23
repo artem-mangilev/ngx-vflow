@@ -7,13 +7,21 @@ import { Marker } from '../../interfaces/marker.interface';
     <svg:marker
       *ngFor="let marker of markers | keyvalue"
       [attr.id]="marker.key"
-      markerWidth="12.5"
-      markerHeight="12.5"
+      [attr.markerWidth]="marker.value.width ?? 12.5"
+      [attr.markerHeight]="marker.value.height ?? 12.5"
       viewBox="-10 -10 20 20"
       markerUnits="strokeWidth"
       refX="0"
-      refY="0">
-      <polyline stroke-linecap="round" stroke-linejoin="round" points="-5,-4 1,0 -5,4 -5,-4" style="stroke: rgb(177, 177, 183); fill: rgb(177, 177, 183); stroke-width: 1;"/>
+      refY="0"
+    >
+      <polyline
+        [style.stroke]="marker.value.color ?? 'rgb(177, 177, 183)'"
+        [style.fill]="marker.value.color ?? 'rgb(177, 177, 183)'"
+        style="stroke-width: 1;"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        points="-5,-4 1,0 -5,4 -5,-4"
+      />
     </svg:marker>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush
