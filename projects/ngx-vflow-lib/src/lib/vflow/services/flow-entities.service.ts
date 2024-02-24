@@ -28,6 +28,12 @@ export class FlowEntitiesService {
       }
     })
 
+    const connectionMarker = this.connection().connection.marker
+    if (connectionMarker) {
+      const hash = hashCode(JSON.stringify(connectionMarker))
+      markersMap.set(hash, connectionMarker)
+    }
+
     return markersMap
   })
 

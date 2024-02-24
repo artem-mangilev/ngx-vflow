@@ -35,7 +35,7 @@ export class VflowEdgesDemoComponent implements AfterViewInit {
   ]
 
   public connectionSettings: ConnectionSettings = {
-    type: 'template',
+    type: 'default',
     validator: (connection: Connection) => {
       if (connection.source === '1' && connection.target === '2') {
         return true
@@ -46,7 +46,12 @@ export class VflowEdgesDemoComponent implements AfterViewInit {
       }
 
       return true
-    }
+    },
+    marker: {
+      width: 20,
+      height: 20,
+      color: '#00FF00',
+    },
   }
 
   @ViewChild('flow')

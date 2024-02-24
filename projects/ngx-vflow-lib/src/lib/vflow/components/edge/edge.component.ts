@@ -33,6 +33,7 @@ export class EdgeComponent {
     return {
       $implicit: {
         edge: this.model.edge,
+        // TODO create signal outside context
         path: computed(() => this.model.path().path)
       }
     }
