@@ -47,6 +47,7 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
   private flowEntitiesService = inject(FlowEntitiesService)
   private hostRef = inject<ElementRef<SVGElement>>(ElementRef)
 
+  // disabled for configuration for now
   protected readonly magretRadius = 20
 
   protected showMagnet = computed(() =>
