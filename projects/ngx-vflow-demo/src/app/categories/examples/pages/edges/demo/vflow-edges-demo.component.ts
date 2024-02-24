@@ -94,8 +94,9 @@ function createEdge(source: string, target: string): Edge {
         color: '#00FF00',
       },
       end: {
-        width: 20,
-        height: 20,
+        type: 'arrow',
+        width: 30,
+        height: 30,
         color: '#00FF00'
       }
     }
