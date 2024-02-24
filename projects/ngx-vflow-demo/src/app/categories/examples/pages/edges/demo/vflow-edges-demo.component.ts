@@ -31,7 +31,7 @@ export class VflowEdgesDemoComponent implements AfterViewInit {
   ]
 
   public edges: Edge[] = [
-    createEdge(this.nodes[0].id, this.nodes[1].id)
+    // createEdge(this.nodes[0].id, this.nodes[1].id)
   ]
 
   public connectionSettings: ConnectionSettings = {

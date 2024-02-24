@@ -22,12 +22,7 @@
     <ng-container *ngTemplateOutlet="handleTemplate; context: getHandleContext('source')" />
   </svg:g>
 
-  <svg:g
-    #targetHandle
-    (mouseup)="endConnection(); resetValidateTargetHandle()"
-    (mouseover)="validateTargetHandle()"
-    (mouseout)="resetValidateTargetHandle()"
-  >
+  <svg:g #targetHandle>
     <ng-container *ngTemplateOutlet="handleTemplate; context: getHandleContext('target')" />
   </svg:g>
 </ng-container>
@@ -54,5 +49,16 @@
     (mouseup)="endConnection()"
   />
 </ng-container>
+
+<svg:circle
+  *ngIf="showMagnet()"
+  class="magnet"
+  [attr.r]="magretRadius"
+  [attr.cx]="nodeModel.targetOffset().x"
+  [attr.cy]="nodeModel.targetOffset().y"
+  (mouseup)="endConnection(); resetValidateTargetHandle()"
+  (mouseover)="validateTargetHandle()"
+  (mouseout)="resetValidateTargetHandle()"
+/>
 
 

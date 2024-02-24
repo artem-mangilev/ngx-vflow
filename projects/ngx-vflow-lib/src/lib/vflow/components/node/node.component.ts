@@ -13,6 +13,10 @@ export type HandleState = 'valid' | 'invalid' | 'idle'
     .wrapper {
       width: max-content;
     }
+
+    .magnet {
+      opacity: 0;
+    }
   `],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -42,6 +46,13 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
   private flowStatusService = inject(FlowStatusService)
   private flowEntitiesService = inject(FlowEntitiesService)
   private hostRef = inject<ElementRef<SVGElement>>(ElementRef)
+
+  protected readonly magretRadius = 20
+
+  protected showMagnet = computed(() =>
+    this.flowStatusService.status().state === 'connection-start' ||
+    this.flowStatusService.status().state === 'connection-validation'
+  )
 
   private sourceHanldeState = signal<HandleState>('idle')
   private targetHandleState = signal<HandleState>('idle')
@@ -100,7 +111,7 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
   protected endConnection() {
     const status = this.flowStatusService.status()
 
-    if (status.state === 'connection-start') {
+    if (status.state === 'connection-validation') {
       const sourceNode = status.payload.sourceNode
       const targetNode = this.nodeModel
 
@@ -117,16 +128,30 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
     const status = this.flowStatusService.status()
 
     if (status.state === 'connection-start') {
-      const source = status.payload.sourceNode.node.id
-      const target = this.nodeModel.node.id
+      const sourceNode = status.payload.sourceNode
+      const targetNode = this.nodeModel
+
+      const source = sourceNode.node.id
+      const target = targetNode.node.id
 
       const valid = this.flowEntitiesService.connection().validator({ source, target })
       this.targetHandleState.set(valid ? 'valid' : 'invalid')
+
+      this.flowStatusService.setConnectionValidationStatus(sourceNode, targetNode, valid)
     }
   }
 
+  /**
+   * TODO srp
+   */
   protected resetValidateTargetHandle() {
     this.targetHandleState.set('idle')
+
+    // drop back to start status
+    const status = this.flowStatusService.status()
+    if (status.state === 'connection-validation') {
+      this.flowStatusService.setConnectionStartStatus(status.payload.sourceNode)
+    }
   }
 
   protected getHandleContext(type: 'source' | 'target') {

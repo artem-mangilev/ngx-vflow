@@ -13,6 +13,15 @@ export interface FlowStatusConnectionStart {
   }
 }
 
+export interface FlowStatusConnectionValidation {
+  state: 'connection-validation',
+  payload: {
+    sourceNode: NodeModel
+    targetNode: NodeModel
+    valid: boolean
+  }
+}
+
 export interface FlowStatusConnectionEnd {
   state: 'connection-end',
   payload: {
@@ -24,6 +33,7 @@ export interface FlowStatusConnectionEnd {
 export type FlowStatus =
   FlowStatusIdle |
   FlowStatusConnectionStart |
+  FlowStatusConnectionValidation |
   FlowStatusConnectionEnd
 
 @Injectable()
@@ -36,6 +46,10 @@ export class FlowStatusService {
 
   public setConnectionStartStatus(sourceNode: NodeModel) {
     this.status.set({ state: 'connection-start', payload: { sourceNode } })
+  }
+
+  public setConnectionValidationStatus(sourceNode: NodeModel, targetNode: NodeModel, valid: boolean) {
+    this.status.set({ state: 'connection-validation', payload: { sourceNode, targetNode, valid } })
   }
 
   public setConnectionEndStatus(sourceNode: NodeModel, targetNode: NodeModel) {

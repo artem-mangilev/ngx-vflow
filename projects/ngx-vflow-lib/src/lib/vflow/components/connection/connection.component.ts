@@ -52,6 +52,23 @@ export class ConnectionComponent {
       }
     }
 
+    if (status.state === 'connection-validation') {
+      const sourcePoint = status.payload.sourceNode.sourcePointAbsolute()
+      // ignore magnet if validation failed
+      const targetPoint = status.payload.valid
+        ? status.payload.targetNode.targetPointAbsolute()
+        : this.spacePointContext.svgCurrentSpacePoint()
+
+      switch (this.model.curve) {
+        case 'straight': return straightPath(sourcePoint, targetPoint).path
+        case 'bezier': return bezierPath(
+          sourcePoint, targetPoint,
+          status.payload.sourceNode.sourcePosition(),
+          status.payload.sourceNode.targetPosition()
+        ).path
+      }
+    }
+
     return null
   })
 
