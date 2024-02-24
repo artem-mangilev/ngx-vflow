@@ -88,6 +88,11 @@ function createEdge(source: string, target: string): Edge {
       },
     },
     markers: {
+      start: {
+        width: 20,
+        height: 20,
+        color: '#00FF00',
+      },
       end: {
         width: 20,
         height: 20,

@@ -9,11 +9,11 @@ import { Marker } from '../../interfaces/marker.interface';
       [attr.id]="marker.key"
       [attr.markerWidth]="marker.value.width ?? 12.5"
       [attr.markerHeight]="marker.value.height ?? 12.5"
+      [attr.orient]="marker.value.orient ?? 'auto-start-reverse'"
       viewBox="-10 -10 20 20"
       markerUnits="strokeWidth"
       refX="0"
       refY="0"
-      orient="auto-start-reverse"
     >
       <polyline
         [style.stroke]="marker.value.color ?? 'rgb(177, 177, 183)'"

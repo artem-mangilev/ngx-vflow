@@ -36,8 +36,8 @@ export class NodeModel<T = unknown> {
 
   public sourcePointAbsolute = computed(() => {
     return {
-      x: this.point().x + this.sourceOffset().x,
-      y: this.point().y + this.sourceOffset().y
+      x: this.point().x + this.sourceOffset().x + this.sourceHandleOffset().x,
+      y: this.point().y + this.sourceOffset().y + this.sourceHandleOffset().y
     }
   })
 
@@ -57,6 +57,15 @@ export class NodeModel<T = unknown> {
 
   public targetHandleWidth = signal(0)
   public targetHandleHeight = signal(0)
+
+  public sourceHandleOffset = computed(() => {
+    switch (this.sourcePosition()) {
+      case 'left': return { x: -(this.sourceHandleWidth() / 2), y: 0 }
+      case 'right': return { x: this.sourceHandleWidth() / 2, y: 0 }
+      case 'top': return { x: 0, y: -(this.sourceHandleWidth() / 2) }
+      case 'bottom': return { x: 0, y: this.sourceHandleWidth() / 2 }
+    }
+  })
 
   public targetHandleOffset = computed(() => {
     switch (this.targetPosition()) {
