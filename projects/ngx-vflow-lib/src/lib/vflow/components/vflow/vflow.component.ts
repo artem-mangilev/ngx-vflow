@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, ContentChild, Input, OnChanges, SimpleChanges, ViewChild, inject } from '@angular/core';
+import { AfterContentInit, ChangeDetectionStrategy, Component, ContentChild, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild, inject } from '@angular/core';
 import { Node } from '../../interfaces/node.interface';
 import { MapContextDirective } from '../../directives/map-context.directive';
 import { DraggableService } from '../../services/draggable.service';
@@ -7,24 +7,42 @@ import { ViewportService } from '../../services/viewport.service';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { Edge } from '../../interfaces/edge.interface';
 import { EdgeModel } from '../../models/edge.model';
-import { EdgeLabelHtmlTemplateDirective, EdgeTemplateDirective, NodeHtmlTemplateDirective } from '../../directives/template.directive';
+import { ConnectionTemplateDirective, EdgeLabelHtmlTemplateDirective, EdgeTemplateDirective, HandleTemplateDirective, NodeHtmlTemplateDirective } from '../../directives/template.directive';
 import { HandlePositions } from '../../interfaces/handle-positions.interface';
 import { addNodesToEdges } from '../../utils/add-nodes-to-edges';
 import { FlowModel } from '../../models/flow.model';
 import { skip } from 'rxjs';
 import { Point } from '../../interfaces/point.interface';
 import { ViewportState } from '../../interfaces/viewport.interface';
+import { FlowStatusService } from '../../services/flow-status.service';
+import { ConnectionControllerDirective } from '../../directives/connection-controller.directive';
+import { FlowEntitiesService } from '../../services/flow-entities.service';
+import { ConnectionSettings } from '../../interfaces/connection-settings.interface';
+import { ConnectionModel } from '../../models/connection.model';
+import { ReferenceKeeper } from '../../utils/reference-keeper';
+
+const connectionControllerHostDirective = {
+  directive: ConnectionControllerDirective,
+  outputs: ['onConnect']
+}
 
 @Component({
   selector: 'vflow',
   templateUrl: './vflow.component.html',
   styleUrls: ['./vflow.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [DraggableService, ViewportService]
+  providers: [
+    DraggableService,
+    ViewportService,
+    FlowStatusService,
+    FlowEntitiesService
+  ],
+  hostDirectives: [connectionControllerHostDirective]
 })
 export class VflowComponent implements OnChanges {
   // #region DI
   protected viewportService = inject(ViewportService)
+  protected flowEntitiesService = inject(FlowEntitiesService)
   // #endregion
 
   // #region SETTINGS
@@ -55,14 +73,27 @@ export class VflowComponent implements OnChanges {
   @Input()
   public background: string = '#FFFFFF'
 
+  @Input({ transform: (settings: ConnectionSettings) => new ConnectionModel(settings) })
+  public set connection(connection: ConnectionModel) { this.flowEntitiesService.connection.set(connection) }
+  public get connection() { return this.flowEntitiesService.connection() }
   // #endregion
 
   // #region MAIN_INPUTS
-  @Input({ required: true, transform: (nodes: Node[]) => nodes.map(n => new NodeModel(n)) })
-  public nodes: NodeModel[] = []
+  @Input({ required: true })
+  public set nodes(newNodes: Node[]) {
+    const newModels = ReferenceKeeper.nodes(newNodes, this.flowEntitiesService.nodes())
+    this.flowEntitiesService.nodes.set(newModels)
+  }
 
-  @Input({ transform: (edges: Edge[]) => edges.map(e => new EdgeModel(e)) })
-  public edges: EdgeModel[] = []
+  public get nodeModels() { return this.flowEntitiesService.nodes() }
+
+  @Input()
+  public set edges(newEdges: Edge[]) {
+    const newModels = ReferenceKeeper.edges(newEdges, this.flowEntitiesService.edges())
+    this.flowEntitiesService.edges.set(newModels)
+  }
+
+  public get edgeModels() { return this.flowEntitiesService.edges() }
   // #endregion
 
   // #region TEMPLATES
@@ -74,6 +105,12 @@ export class VflowComponent implements OnChanges {
 
   @ContentChild(EdgeLabelHtmlTemplateDirective)
   protected edgeLabelHtmlDirective?: EdgeLabelHtmlTemplateDirective
+
+  @ContentChild(ConnectionTemplateDirective)
+  protected connectionTemplateDirective?: ConnectionTemplateDirective
+
+  @ContentChild(HandleTemplateDirective)
+  protected handleTemplateDirective?: HandleTemplateDirective
   // #endregion
 
   // #region DIRECTIVES
@@ -93,32 +130,43 @@ export class VflowComponent implements OnChanges {
   // TODO: probably better to make it injectable
   protected flowModel = new FlowModel()
 
+  protected markers = this.flowEntitiesService.markers
+
   // #region ANGULAR_HOOKS
   public ngOnChanges(changes: SimpleChanges): void {
-    if (changes['nodes']) bindFlowToNodes(this.flowModel, this.nodes)
-    if (changes['edges']) addNodesToEdges(this.nodes, this.edges)
+    if (changes['nodes']) bindFlowToNodes(this.flowModel, this.nodeModels)
+    addNodesToEdges(this.nodeModels, this.edgeModels)
   }
   // #endregion
 
   // #region METHODS_API
-  public viewportTo(viewport: ViewportState) {
+  public viewportTo(viewport: ViewportState): void {
     this.viewportService.writableViewport.set({ changeType: 'absolute', state: viewport })
   }
 
-  public zoomTo(zoom: number) {
+  public zoomTo(zoom: number): void {
     this.viewportService.writableViewport.set({ changeType: 'absolute', state: { zoom } })
   }
 
-  public panTo(point: Point) {
+  public panTo(point: Point): void {
     this.viewportService.writableViewport.set({ changeType: 'absolute', state: point })
+  }
+
+  public getNode<T = unknown>(id: string): Node<T> | undefined {
+    return this.flowEntitiesService.getNode<T>(id)?.node
   }
   // #endregion
 
-  protected trackById(idx: number, { node }: NodeModel) {
+  protected trackNodes(idx: number, { node }: NodeModel) {
     return node.id
+  }
+
+  protected trackEdges(idx: number, { edge }: EdgeModel) {
+    return edge.id
   }
 }
 
 function bindFlowToNodes(flow: FlowModel, nodes: NodeModel[]) {
   nodes.forEach(n => n.bindFlow(flow))
 }
+

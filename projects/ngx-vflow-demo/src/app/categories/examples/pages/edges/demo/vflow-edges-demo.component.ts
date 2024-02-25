@@ -1,4 +1,6 @@
 import { AfterViewInit, ChangeDetectionStrategy, Component, ViewChild } from '@angular/core';
+import { ConnectionSettings } from 'projects/ngx-vflow-lib/src/lib/vflow/interfaces/connection-settings.interface';
+import { Connection } from 'projects/ngx-vflow-lib/src/lib/vflow/interfaces/connection.interface';
 import { Edge } from 'projects/ngx-vflow-lib/src/lib/vflow/interfaces/edge.interface';
 import { Node, VDocModule, VflowComponent, VflowModule, uuid } from 'projects/ngx-vflow-lib/src/public-api';
 
@@ -12,67 +14,96 @@ import { Node, VDocModule, VflowComponent, VflowModule, uuid } from 'projects/ng
 export class VflowEdgesDemoComponent implements AfterViewInit {
   public nodes: Node[] = [
     {
-      id: uuid(),
+      id: '1',
       point: { x: 10, y: 10 },
       type: 'html-template',
     },
     {
-      id: uuid(),
+      id: '2',
       point: { x: 100, y: 100 },
       type: 'html-template',
     },
     {
-      id: uuid(),
+      id: '3',
       point: { x: 150, y: 150 },
       type: 'html-template',
     },
   ]
 
   public edges: Edge[] = [
-    {
-      id: uuid(),
-      source: this.nodes[0].id,
-      target: this.nodes[1].id,
-      type: 'template',
-      data: {
-        title: 'edge title'
-      },
-      edgeLabels: {
-        // start: {
-        //   type: 'html-template'
-        // },
-        center: {
-          type: 'html-template',
-          data: {
-            title: 'center label title'
-          }
-        },
-        // end: {
-        //   type: 'html-template'
-        // },
-      }
-    },
-    {
-      id: uuid(),
-      source: this.nodes[0].id,
-      target: this.nodes[2].id,
-    },
+    // createEdge(this.nodes[0].id, this.nodes[1].id)
   ]
+
+  public connectionSettings: ConnectionSettings = {
+    type: 'template',
+    validator: (connection: Connection) => {
+      if (connection.source === '1' && connection.target === '2') {
+        return true
+      }
+
+      if (connection.source === '1' && connection.target === '3') {
+        return false
+      }
+
+      return true
+    },
+    marker: {
+      width: 20,
+      height: 20,
+      color: '#00FF00',
+    },
+  }
 
   @ViewChild('flow')
   public flow!: VflowComponent
 
-  public ngAfterViewInit(): void {
-    this.flow.viewportChanges$.subscribe((changes) => {
-      console.log(changes)
-    })
+  public ngAfterViewInit(): void { }
 
-    // this.flow.viewportTo({
-    //   zoom: 0.4,
-    //   x: 0,
-    //   y: 0
-    // })
+  public handleConnect(connection: Connection) {
+    console.log(this.flow.getNode(connection.source))
+    console.log(this.flow.getNode(connection.target))
 
-    this.flow.panTo({ x: 50, y: 50 })
+    this.edges = [...this.edges, createEdge(connection.source, connection.target)]
+  }
+
+  public addNode() {
+    this.nodes = [...this.nodes, {
+      id: uuid(),
+      point: { x: 200, y: 200 },
+      type: 'html-template'
+    }]
+  }
+}
+
+function createEdge(source: string, target: string): Edge {
+  return {
+    id: uuid(),
+    source,
+    target,
+    type: 'default',
+    data: {
+      title: 'edge title'
+    },
+    edgeLabels: {
+      center: {
+        type: 'html-template',
+        data: {
+          title: 'center label title'
+        }
+      },
+    },
+    markers: {
+      start: {
+        width: 20,
+        height: 20,
+        color: '#00FF00',
+      },
+      end: {
+        type: 'arrow',
+        width: 30,
+        height: 30,
+        color: '#00FF00'
+      }
+    }
   }
 }

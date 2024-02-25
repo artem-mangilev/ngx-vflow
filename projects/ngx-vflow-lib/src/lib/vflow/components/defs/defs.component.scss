@@ -1,0 +1,15 @@
+.marker {
+  &__arrow {
+    &_default {
+      stroke-width: 1px;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+
+    &_closed {
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+  }
+}

@@ -3,6 +3,7 @@ import { select } from 'd3-selection';
 import { D3ZoomEvent, ZoomBehavior, zoom, zoomIdentity, zoomTransform } from 'd3-zoom';
 import { ViewportService } from '../services/viewport.service';
 import { isDefined } from '../utils/is-defined';
+import { RootSvgReferenceDirective } from './reference.directive';
 
 type ZoomEvent = D3ZoomEvent<SVGSVGElement, unknown>
 
@@ -14,22 +15,12 @@ export class MapContextDirective implements OnInit {
   @Input()
   public maxZoom!: number
 
-  private get zoomableElement() {
-    return this.hostRef.nativeElement
-  }
-
-  /**
-   * TODO: find more type-safe way
-   */
-  private get rootSvgElement() {
-    return this.zoomableElement.parentElement as Element as SVGSVGElement
-  }
-
-  protected hostRef = inject<ElementRef<SVGGElement>>(ElementRef)
+  protected rootSvg = inject(RootSvgReferenceDirective).element
+  protected host = inject<ElementRef<SVGGElement>>(ElementRef).nativeElement
   protected viewportService = inject(ViewportService)
 
-  protected rootSvgSelection = select(this.rootSvgElement)
-  protected zoomableSelection = select(this.zoomableElement)
+  protected rootSvgSelection = select(this.rootSvg)
+  protected zoomableSelection = select(this.host)
 
   // under the hood this effect triggers handleZoom, so error throws without this flag
   // TODO: hack with timer fixes wrong node scaling (handle positions not matched with content size)

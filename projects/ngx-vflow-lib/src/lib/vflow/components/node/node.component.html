@@ -7,8 +7,8 @@
 
 <svg:foreignObject
   *ngIf="nodeModel.node.type === 'html-template' && nodeHtmlTemplate"
-  [attr.width]="nodeModel.width()"
-  [attr.height]="nodeModel.height()"
+  [attr.width]="nodeModel.size().width"
+  [attr.height]="nodeModel.size().height"
 >
   <div #htmlWrapper class="wrapper">
     <ng-container
@@ -17,20 +17,48 @@
   </div>
 </svg:foreignObject>
 
-<svg:circle
-  [attr.cx]="nodeModel.sourcePoint().x"
-  [attr.cy]="nodeModel.sourcePoint().y"
-  r="5"
-  stroke="white"
-  stroke-width="3"
-  fill="red"
-/>
+<ng-container *ngIf="handleTemplate">
+  <svg:g #sourceHandle (mousedown)="startConnection($event)">
+    <ng-container *ngTemplateOutlet="handleTemplate; context: getHandleContext('source')" />
+  </svg:g>
+
+  <svg:g #targetHandle>
+    <ng-container *ngTemplateOutlet="handleTemplate; context: getHandleContext('target')" />
+  </svg:g>
+</ng-container>
+
+<ng-container *ngIf="!handleTemplate">
+  <svg:circle
+    #sourceHandle
+    [attr.cx]="nodeModel.sourceOffset().x"
+    [attr.cy]="nodeModel.sourceOffset().y"
+    r="5"
+    stroke="white"
+    stroke-width="3"
+    fill="red"
+    (mousedown)="startConnection($event)"
+  />
+
+  <svg:circle
+    #targetHandle
+    [attr.cx]="nodeModel.targetOffset().x"
+    [attr.cy]="nodeModel.targetOffset().y"
+    r="5"
+    stroke="white"
+    fill="red"
+    (mouseup)="endConnection()"
+  />
+</ng-container>
 
 <svg:circle
-  [attr.cx]="nodeModel.targetPoint().x"
-  [attr.cy]="nodeModel.targetPoint().y"
-  r="5"
-  stroke="white"
-  stroke-width="3"
-  fill="red"
+  *ngIf="showMagnet()"
+  class="magnet"
+  [attr.r]="nodeModel.magnetRadius"
+  [attr.cx]="nodeModel.targetOffset().x"
+  [attr.cy]="nodeModel.targetOffset().y"
+  (mouseup)="endConnection(); resetValidateTargetHandle()"
+  (mouseover)="validateTargetHandle()"
+  (mouseout)="resetValidateTargetHandle()"
 />
+
+

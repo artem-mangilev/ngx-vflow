@@ -1,6 +1,6 @@
 import { computed } from "@angular/core";
 import { EdgeLabelPosition } from "../interfaces/edge-label.interface";
-import { Edge, EdgeCurve, EdgeType } from "../interfaces/edge.interface";
+import { Edge, Curve, EdgeType } from "../interfaces/edge.interface";
 import { EdgeLabelModel } from "./edge-label.model";
 import { NodeModel } from "./node.model";
 import { straightPath } from "../math/edge-path/straigh-path";
@@ -10,19 +10,12 @@ import { UsingPoints } from "../types/using-points.type";
 export class EdgeModel {
   public source!: NodeModel
   public target!: NodeModel
-  public curve: EdgeCurve
+  public curve: Curve
   public type: EdgeType
 
   public path = computed(() => {
-    const source = {
-      x: this.source.point().x + this.source.sourcePoint().x,
-      y: this.source.point().y + this.source.sourcePoint().y
-    }
-
-    const target = {
-      x: this.target.point().x + this.target.targetPoint().x,
-      y: this.target.point().y + this.target.targetPoint().y
-    }
+    const source = this.source.sourcePointAbsolute()
+    const target = this.target.targetPointAbsolute()
 
     switch (this.curve) {
       case 'straight':

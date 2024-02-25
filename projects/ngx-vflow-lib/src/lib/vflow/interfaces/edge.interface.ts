@@ -1,14 +1,18 @@
+import { Connection } from "./connection.interface"
 import { EdgeLabel, EdgeLabelPosition } from "./edge-label.interface"
+import { Marker } from "./marker.interface"
 
 export type EdgeType = 'default' | 'template'
-export type EdgeCurve = 'straight' | 'bezier'
+export type Curve = 'straight' | 'bezier'
 
-export interface Edge<T = unknown> {
+export interface Edge<T = unknown> extends Connection {
   id: string
-  source: string
-  target: string
   type?: EdgeType
-  curve?: EdgeCurve
+  curve?: Curve
   data?: T
   edgeLabels?: { [position in EdgeLabelPosition]?: EdgeLabel }
+  markers?: {
+    start?: Marker
+    end?: Marker
+  }
 }
