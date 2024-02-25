@@ -38,8 +38,7 @@ export class EdgeLabelComponent implements AfterViewInit {
   protected edgeLabelPoint = computed(() => {
     const point = this.pointSignal()
 
-    const width = this.model.width()
-    const height = this.model.height()
+    const { width, height } = this.model.size()
 
     return {
       x: point.x - (width / 2),
@@ -54,8 +53,7 @@ export class EdgeLabelComponent implements AfterViewInit {
       const width = this.edgeLabelWrapperRef.nativeElement.clientWidth
       const height = this.edgeLabelWrapperRef.nativeElement.clientHeight
 
-      this.model.width.set(width)
-      this.model.height.set(height)
+      this.model.size.set({ width, height })
     })
   }
 

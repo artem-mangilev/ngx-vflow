@@ -67,10 +67,9 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
 
     if (this.nodeModel.node.type === 'default') {
       queueMicrotask(() => {
-        const box = this.nodeContentRef.nativeElement.getBBox()
+        const { width, height } = this.nodeContentRef.nativeElement.getBBox()
 
-        this.nodeModel.width.set(box.width)
-        this.nodeModel.height.set(box.height)
+        this.nodeModel.size.set({ width, height })
       })
     }
 
@@ -79,19 +78,16 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
         const width = this.htmlWrapperRef.nativeElement.clientWidth
         const height = this.htmlWrapperRef.nativeElement.clientHeight
 
-        this.nodeModel.width.set(width)
-        this.nodeModel.height.set(height)
+        this.nodeModel.size.set({ width, height })
       })
     }
 
     queueMicrotask(() => {
       const sourceBox = this.sourceHandleRef.nativeElement.getBBox({ stroke: true })
-      this.nodeModel.sourceHandleWidth.set(sourceBox.width)
-      this.nodeModel.sourceHandleHeight.set(sourceBox.height)
+      this.nodeModel.sourceHandleSize.set({ width: sourceBox.width, height: sourceBox.height })
 
       const targetBox = this.targetHandleRef.nativeElement.getBBox({ stroke: true })
-      this.nodeModel.targetHandleWidth.set(targetBox.width)
-      this.nodeModel.targetHandleHeight.set(targetBox.height)
+      this.nodeModel.targetHandleSize.set({ width: targetBox.width, height: targetBox.height })
     })
   }
 

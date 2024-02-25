@@ -7,8 +7,8 @@
 
 <svg:foreignObject
   *ngIf="nodeModel.node.type === 'html-template' && nodeHtmlTemplate"
-  [attr.width]="nodeModel.width()"
-  [attr.height]="nodeModel.height()"
+  [attr.width]="nodeModel.size().width"
+  [attr.height]="nodeModel.size().height"
 >
   <div #htmlWrapper class="wrapper">
     <ng-container
