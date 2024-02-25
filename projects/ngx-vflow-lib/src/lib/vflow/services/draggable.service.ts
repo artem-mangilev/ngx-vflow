@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { select } from 'd3-selection';
 import { D3DragEvent, drag } from 'd3-drag';
 import { NodeModel } from '../models/node.model';
+import { round } from '../utils/round';
 
 type DragEvent = D3DragEvent<Element, unknown, unknown>
 
@@ -21,7 +22,10 @@ export class DraggableService {
 
       .on('drag', (event: DragEvent) => {
         model.point.set(
-          { x: event.x + deltaX, y: event.y + deltaY }
+          {
+            x: round(event.x + deltaX),
+            y: round(event.y + deltaY)
+          }
         )
       })
 
