@@ -90,6 +90,9 @@ export class NodeModel<T = unknown> {
     }
   })
 
+  // disabled for configuration for now
+  public readonly magnetRadius = 20
+
   private flow!: FlowModel
 
   constructor(

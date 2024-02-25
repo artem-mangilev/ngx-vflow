@@ -53,7 +53,7 @@
 <svg:circle
   *ngIf="showMagnet()"
   class="magnet"
-  [attr.r]="magretRadius"
+  [attr.r]="nodeModel.magnetRadius"
   [attr.cx]="nodeModel.targetOffset().x"
   [attr.cy]="nodeModel.targetOffset().y"
   (mouseup)="endConnection(); resetValidateTargetHandle()"

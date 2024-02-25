@@ -47,9 +47,6 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
   private flowEntitiesService = inject(FlowEntitiesService)
   private hostRef = inject<ElementRef<SVGElement>>(ElementRef)
 
-  // disabled for configuration for now
-  protected readonly magretRadius = 20
-
   protected showMagnet = computed(() =>
     this.flowStatusService.status().state === 'connection-start' ||
     this.flowStatusService.status().state === 'connection-validation'
@@ -125,6 +122,9 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  /**
+   * TODO srp
+   */
   protected validateTargetHandle() {
     const status = this.flowStatusService.status()
 
@@ -156,7 +156,6 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   protected getHandleContext(type: 'source' | 'target') {
-    // TODO provide point with shift to middle
     if (type === 'source') {
       return {
         $implicit: {
