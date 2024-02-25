@@ -9,6 +9,11 @@ import { Point } from '../../interfaces/point.interface';
   styles: [`
     .edge-label-wrapper {
       width: max-content;
+
+      // this is a fix for bug in chrome, for some reason if the div fully matches the size
+      // of foreignObject there are occurs some visual artifacts around this div
+      margin-top: 1px;
+      margin-left: 1px;
     }
   `],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -50,8 +55,12 @@ export class EdgeLabelComponent implements AfterViewInit {
 
   public ngAfterViewInit(): void {
     queueMicrotask(() => {
-      const width = this.edgeLabelWrapperRef.nativeElement.clientWidth
-      const height = this.edgeLabelWrapperRef.nativeElement.clientHeight
+      // this is a fix for visual artifact in chrome that for some reason adresses only for edge label.
+      // the bug reproduces if edgeLabelWrapperRef size fully matched the size of parent foreignObject
+      const MAGIC_VALUE_TO_FIX_GLITCH_IN_CHROME = 2
+
+      const width = this.edgeLabelWrapperRef.nativeElement.clientWidth + MAGIC_VALUE_TO_FIX_GLITCH_IN_CHROME
+      const height = this.edgeLabelWrapperRef.nativeElement.clientHeight + MAGIC_VALUE_TO_FIX_GLITCH_IN_CHROME
 
       this.model.size.set({ width, height })
     })
