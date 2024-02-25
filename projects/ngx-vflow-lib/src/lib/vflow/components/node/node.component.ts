@@ -9,15 +9,7 @@ export type HandleState = 'valid' | 'invalid' | 'idle'
 @Component({
   selector: 'g[node]',
   templateUrl: './node.component.html',
-  styles: [`
-    .wrapper {
-      width: max-content;
-    }
-
-    .magnet {
-      opacity: 0;
-    }
-  `],
+  styleUrls: ['./node.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {

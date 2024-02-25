@@ -14,39 +14,13 @@ export class VflowDemoComponent {
       id: uuid(),
       point: { x: 10, y: 10 },
       type: 'default',
+      text: '1'
     },
     {
       id: uuid(),
       point: { x: 100, y: 100 },
-      type: 'default'
+      type: 'default',
+      text: '2'
     },
   ]
-
-  public styles = { root, container }
-
-  @ViewChild('vflow')
-  public flow!: VflowComponent
 }
-
-const root: RootStyleSheetFn = () => ({
-  width: signal(200)
-})
-
-const container: ContainerStyleSheetFn = (snapshot) => ({
-  width: signal(180),
-  borderRadius: signal(5),
-  backgroundColor: signal('rgb(30 30 30)'),
-  marginBottom: signal(10),
-  boxShadow: computed(() => {
-    if (hasClasses(snapshot(), ':hover')) {
-      return {
-        hOffset: 3,
-        vOffset: 5,
-        blur: 3,
-        color: 'rgb(255 0 0 / 0.4)'
-      }
-    }
-
-    return null
-  })
-})

@@ -1,9 +1,11 @@
-<svg:rect
+<svg:foreignObject
   *ngIf="nodeModel.node.type === 'default'"
   #nodeContent
-  width="50"
+  width="100"
   height="50"
-/>
+>
+  <div class="default-node" [innerHTML]="nodeModel.node.text ?? ''"></div>
+</svg:foreignObject>
 
 <svg:foreignObject
   *ngIf="nodeModel.node.type === 'html-template' && nodeHtmlTemplate"
