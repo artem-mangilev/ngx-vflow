@@ -64,25 +64,19 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   public ngAfterViewInit(): void {
     // TODO remove microtask
-
-    if (this.nodeModel.node.type === 'default') {
-      queueMicrotask(() => {
+    queueMicrotask(() => {
+      if (this.nodeModel.node.type === 'default') {
         const { width, height } = this.nodeContentRef.nativeElement.getBBox()
-
         this.nodeModel.size.set({ width, height })
-      })
-    }
+      }
 
-    if (this.nodeModel.node.type === 'html-template') {
-      queueMicrotask(() => {
+      if (this.nodeModel.node.type === 'html-template') {
         const width = this.htmlWrapperRef.nativeElement.clientWidth
         const height = this.htmlWrapperRef.nativeElement.clientHeight
 
         this.nodeModel.size.set({ width, height })
-      })
-    }
+      }
 
-    queueMicrotask(() => {
       const sourceBox = this.sourceHandleRef.nativeElement.getBBox({ stroke: true })
       this.nodeModel.sourceHandleSize.set({ width: sourceBox.width, height: sourceBox.height })
 
