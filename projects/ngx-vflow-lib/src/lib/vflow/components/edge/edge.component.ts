@@ -29,6 +29,8 @@ export class EdgeComponent {
     return marker ? `url(#${hashCode(JSON.stringify(marker))})` : ''
   })
 
+  protected readonly defaultColor = 'rgb(177, 177, 183)'
+
   public getContext() {
     return {
       $implicit: {

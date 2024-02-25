@@ -5,4 +5,5 @@ export interface Marker {
   color?: string
   orient?: string
   markerUnits?: 'userSpaceOnUse' | 'strokeWidth'
+  strokeWidth?: number
 }

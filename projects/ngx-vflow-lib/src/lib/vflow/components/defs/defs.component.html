@@ -1,8 +1,8 @@
 <svg:marker
   *ngFor="let marker of markers | keyvalue"
   [attr.id]="marker.key"
-  [attr.markerWidth]="marker.value.width ?? 12.5"
-  [attr.markerHeight]="marker.value.height ?? 12.5"
+  [attr.markerWidth]="marker.value.width ?? 16.5"
+  [attr.markerHeight]="marker.value.height ?? 16.5"
   [attr.orient]="marker.value.orient ?? 'auto-start-reverse'"
   viewBox="-10 -10 20 20"
   [attr.markerUnits]="marker.value.markerUnits ?? 'userSpaceOnUse'"
@@ -13,6 +13,7 @@
     *ngIf="marker.value.type === 'arrow-closed' || !marker.value.type"
     class="marker__arrow_closed"
     [style.stroke]="marker.value.color ?? defaultColor"
+    [style.stroke-width]="marker.value.strokeWidth ?? 2"
     [style.fill]="marker.value.color ?? defaultColor"
     points="-5,-4 1,0 -5,4 -5,-4"
   />
@@ -21,6 +22,7 @@
     *ngIf="marker.value.type === 'arrow'"
     class="marker__arrow_default"
     [style.stroke]="marker.value.color ?? defaultColor"
+    [style.stroke-width]="marker.value.strokeWidth ?? 2"
     points="-5,-4 0,0 -5,4"
   />
 </svg:marker>

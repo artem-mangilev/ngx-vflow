@@ -14,8 +14,9 @@ import { hashCode } from '../../../shared/utils/hash';
         *ngIf="path() as path"
         [attr.d]="path"
         [attr.marker-end]="markerUrl()"
-        stroke="black"
+        [attr.stroke]="defaultColor"
         fill="none"
+        stroke-width="2"
       />
     </ng-container>
 
@@ -81,6 +82,8 @@ export class ConnectionComponent {
 
     return ''
   })
+
+  protected readonly defaultColor = 'rgb(177, 177, 183)'
 
   protected getContext() {
     return {
