@@ -36,8 +36,8 @@
     [attr.cy]="nodeModel.sourceOffset().y"
     r="5"
     stroke="white"
-    stroke-width="3"
-    fill="red"
+    stroke-width="2"
+    fill="black"
     (mousedown)="startConnection($event)"
   />
 
@@ -47,7 +47,8 @@
     [attr.cy]="nodeModel.targetOffset().y"
     r="5"
     stroke="white"
-    fill="red"
+    stroke-width="2"
+    fill="black"
     (mouseup)="endConnection()"
   />
 </ng-container>
