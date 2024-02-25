@@ -31,7 +31,5 @@ export class ConnectionControllerDirective {
         this.onConnect.emit({ source, target })
       }
     }
-
-    // writing occurs in convertToEdge method
-  }, { allowSignalWrites: true })
+  })
 }
