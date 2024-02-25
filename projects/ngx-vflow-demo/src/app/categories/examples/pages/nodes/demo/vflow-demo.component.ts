@@ -32,6 +32,9 @@ export class VflowDemoComponent {
       source: '1',
       target: '2',
       markers: {
+        start: {
+          type: 'arrow-closed',
+        },
         end: {
           type: 'arrow'
         }

@@ -34,9 +34,9 @@
     #sourceHandle
     [attr.cx]="nodeModel.sourceOffset().x"
     [attr.cy]="nodeModel.sourceOffset().y"
+    [attr.stroke-width]="defaultHandleStrokeWidth"
     r="5"
     stroke="white"
-    stroke-width="2"
     fill="black"
     (mousedown)="startConnection($event)"
   />
@@ -45,9 +45,9 @@
     #targetHandle
     [attr.cx]="nodeModel.targetOffset().x"
     [attr.cy]="nodeModel.targetOffset().y"
+    [attr.stroke-width]="defaultHandleStrokeWidth"
     r="5"
     stroke="white"
-    stroke-width="2"
     fill="black"
     (mouseup)="endConnection()"
   />
