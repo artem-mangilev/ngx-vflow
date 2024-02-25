@@ -5,7 +5,7 @@
   [attr.markerHeight]="marker.value.height ?? 12.5"
   [attr.orient]="marker.value.orient ?? 'auto-start-reverse'"
   viewBox="-10 -10 20 20"
-  markerUnits="strokeWidth"
+  [attr.markerUnits]="marker.value.markerUnits ?? 'userSpaceOnUse'"
   refX="0"
   refY="0"
 >
