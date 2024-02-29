@@ -5,6 +5,11 @@ import { Path, path as d3Path } from 'd3-path'
 import { UsingPoints } from "../../types/using-points.type";
 import { Position } from "../../types/position.type";
 
+    let operantSourceX = 0
+    let operantSourceY = 0
+    let operantTargetX = 0
+    let operantTargetY = 0
+
 export function bezierPath(
   source: Point,
   target: Point,
@@ -12,29 +17,39 @@ export function bezierPath(
   targetPosition: Position,
   usingPoints: UsingPoints
 ): PathData {
-  if (sourcePosition === 'left' && targetPosition === 'right') {
-    return bezierPathRtl(source, target, usingPoints)
-  }
 
-  if (sourcePosition === 'right' && targetPosition === 'left') {
-    return bezierPathLtr(source, target, usingPoints)
-  }
+    switch(sourcePosition) {
+        case "top": operantSourceY = 1;
+        break;
+        case "bottom": operantSourceY = -1;
+        break;
+        case "right": operantSourceX = -1;
+        break;
+        case "left": operantSourceX = 1;
+        break;
+    }
 
-  if (sourcePosition === 'bottom' && targetPosition === 'top') {
-    return bezierPathTtb(source, target, usingPoints)
-  }
+        switch(targetPosition) {
+        case "top": operantTargetY = -1;
+        break;
+        case "bottom": operantTargetY = 1;
+        break;
+        case "right": operantTargetX = 1;
+        break;
+        case "left": operantTargetX = -1;
+        break;
+    }
 
-  if (sourcePosition === 'top' && targetPosition === 'bottom') {
-    return bezierPathBtt(source, target, usingPoints)
-  }
+    return bezierPathTo(source, target, usingPoints)
 
   throw new Error('Unhandled combination of sourcePosition and targetPosition')
 }
 
 /**
- * Left-to-right direction
+ * Bezier curve construction function
  */
-function bezierPathLtr(source: Point, target: Point, usingPoints: UsingPoints): PathData {
+
+function bezierPathTo(source: Point, target: Point, usingPoints: UsingPoints): PathData {
   const path = d3Path()
 
   path.moveTo(source.x, source.y)
@@ -42,137 +57,17 @@ function bezierPathLtr(source: Point, target: Point, usingPoints: UsingPoints): 
   let firstControl: Point
   let secondControl: Point
 
-  if (source.x > target.x) {
-    const distance = source.x - target.x
+    const distanceSource = (source.x - target.x) * Math.abs(operantSourceX) + (source.y - target.y) * Math.abs(operantSourceY)
+    const distanceTarget = (source.x - target.x) * Math.abs(operantTargetX) + (source.y - target.y) * Math.abs(operantTargetY)
 
     // TODO: probably need to make this configurable
     const curvature = .25
     // thanks colleagues from react/svelte world
     // https://github.com/xyflow/xyflow/blob/f0117939bae934447fa7f232081f937169ee23b5/packages/system/src/utils/edges/bezier-edge.ts#L56
-    const controlOffset = curvature * 25 * Math.sqrt(distance)
+    const controlOffset = curvature * 25 * Math.sqrt(Math.abs(distanceSource))
 
-    firstControl = { x: source.x + controlOffset, y: source.y }
-    secondControl = { x: target.x - controlOffset, y: target.y }
-  } else {
-    const middleX = (source.x + target.x) / 2
-
-    firstControl = { x: middleX, y: source.y }
-    secondControl = { x: middleX, y: target.y }
-  }
-
-  path.bezierCurveTo(
-    firstControl.x, firstControl.y,
-    secondControl.x, secondControl.y,
-    target.x, target.y
-  )
-
-  return getPathData(path, source, target, firstControl, secondControl, usingPoints)
-}
-
-/**
- * Right-to-left direction
- */
-function bezierPathRtl(source: Point, target: Point, usingPoints: UsingPoints): PathData {
-  const path = d3Path()
-
-  path.moveTo(source.x, source.y)
-
-  let firstControl: Point
-  let secondControl: Point
-
-  if (source.x < target.x) {
-    const distance = target.x - source.x
-
-    // TODO: probably need to make this configurable
-    const curvature = .25
-    // thanks colleagues from react/svelte world
-    // https://github.com/xyflow/xyflow/blob/f0117939bae934447fa7f232081f937169ee23b5/packages/system/src/utils/edges/bezier-edge.ts#L56
-    const controlOffset = curvature * 25 * Math.sqrt(distance)
-
-    firstControl = { x: source.x - controlOffset, y: source.y }
-    secondControl = { x: target.x + controlOffset, y: target.y }
-  } else {
-    const middleX = (source.x + target.x) / 2
-
-    firstControl = { x: middleX, y: source.y }
-    secondControl = { x: middleX, y: target.y }
-  }
-
-  path.bezierCurveTo(
-    firstControl.x, firstControl.y,
-    secondControl.x, secondControl.y,
-    target.x, target.y
-  )
-
-  return getPathData(path, source, target, firstControl, secondControl, usingPoints)
-}
-
-/**
- * Bottom-to-top
- */
-function bezierPathBtt(source: Point, target: Point, usingPoints: UsingPoints): PathData {
-  const path = d3Path()
-
-  path.moveTo(source.x, source.y)
-
-  let firstControl: Point
-  let secondControl: Point
-
-  if (source.y < target.y) {
-    const distance = target.y - source.y
-
-    // TODO: probably need to make this configurable
-    const curvature = .25
-    // thanks colleagues from react/svelte world
-    // https://github.com/xyflow/xyflow/blob/f0117939bae934447fa7f232081f937169ee23b5/packages/system/src/utils/edges/bezier-edge.ts#L56
-    const controlOffset = curvature * 25 * Math.sqrt(distance)
-
-    firstControl = { x: source.x, y: source.y - controlOffset }
-    secondControl = { x: target.x, y: target.y + controlOffset }
-  } else {
-    const middleY = (source.y + target.y) / 2
-
-    firstControl = { x: source.x, y: middleY }
-    secondControl = { x: target.x, y: middleY }
-  }
-
-  path.bezierCurveTo(
-    firstControl.x, firstControl.y,
-    secondControl.x, secondControl.y,
-    target.x, target.y
-  )
-
-  return getPathData(path, source, target, firstControl, secondControl, usingPoints)
-}
-
-/**
- * Top to bottom
- */
-function bezierPathTtb(source: Point, target: Point, usingPoints: UsingPoints): PathData {
-  const path = d3Path()
-
-  path.moveTo(source.x, source.y)
-
-  let firstControl: Point
-  let secondControl: Point
-
-  if (source.y > target.y) {
-    const distance = source.y - target.y
-
-    // TODO: probably need to make this configurable
-    const curvature = .25
-    // thanks colleagues from react/svelte world
-    // https://github.com/xyflow/xyflow/blob/f0117939bae934447fa7f232081f937169ee23b5/packages/system/src/utils/edges/bezier-edge.ts#L56
-    const controlOffset = curvature * 25 * Math.sqrt(distance)
-
-    firstControl = { x: source.x, y: source.y + controlOffset }
-    secondControl = { x: target.x, y: target.y - controlOffset }
-  } else {
-    const middleY = (source.y + target.y) / 2
-
-    firstControl = { x: source.x, y: middleY }
-    secondControl = { x: target.x, y: middleY }
-  }
+    firstControl = { x: source.x - operantSourceX * controlOffset, y: source.y - operantSourceY * controlOffset }
+    secondControl = { x: target.x + operantTargetX * controlOffset, y: target.y + operantTargetY * controlOffset }
 
   path.bezierCurveTo(
     firstControl.x, firstControl.y,
