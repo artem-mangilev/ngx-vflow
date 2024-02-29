@@ -1,35 +1,45 @@
 <svg:svg
+  rootSvgRef
+  rootSvgContext
   class="root-svg"
   #flow
-  mapController
   [style.backgroundColor]="background"
   [attr.width]="flowModel.flowWidth()"
   [attr.height]="flowModel.flowHeight()"
 >
+  <defs [markers]="markers()" flowDefs />
+
   <svg:g
     mapContext
+    spacePointContext
     [minZoom]="minZoom"
     [maxZoom]="maxZoom"
   >
-
-    <!-- Nodes -->
+    <!-- Connection -->
     <svg:g
-      *ngFor="let node of nodes; trackBy: trackById"
-      node
-      [nodeModel]="node"
-      [nodeHtmlTemplate]="nodeHtmlDirective?.templateRef"
-      [attr.transform]="node.pointTransform()"
+      connection
+      [model]="connection"
+      [template]="connectionTemplateDirective?.templateRef"
     />
 
     <!-- Edges  -->
     <svg:g
-      *ngFor="let edge of edges"
+      *ngFor="let model of edgeModels; trackBy: trackEdges"
       edge
-      [model]="edge"
+      [model]="model"
       [edgeTemplate]="edgeTemplateDirective?.templateRef"
       [edgeLabelHtmlTemplate]="edgeLabelHtmlDirective?.templateRef"
     />
 
+    <!-- Nodes -->
+    <svg:g
+      *ngFor="let model of nodeModels; trackBy: trackNodes"
+      node
+      [nodeModel]="model"
+      [nodeHtmlTemplate]="nodeHtmlDirective?.templateRef"
+      [handleTemplate]="handleTemplateDirective?.templateRef"
+      [attr.transform]="model.pointTransform()"
+    />
   </svg:g>
 
 </svg:svg>

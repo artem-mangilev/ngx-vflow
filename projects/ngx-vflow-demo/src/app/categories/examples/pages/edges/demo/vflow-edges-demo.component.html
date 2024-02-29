@@ -1,22 +1,22 @@
-<vflow
-       #flow
-       [nodes]="nodes"
-       [edges]="edges"
-       [view]="[500, 500]"
-       [handlePositions]="{ source: 'left', target: 'right'}">
-    <ng-template nodeHtml>
-        <div style="background-color: black;">Hello world</div>
-    </ng-template>
-    <ng-template edge let-context>
-        <svg:path
-                  [attr.d]="context.path()"
-                  stroke="red"
-                  stroke-width="3"
-                  fill="none" />
-    </ng-template>
-    <ng-template edgeLabelHtml let-context>
-        <div style="background-color: black;"> Edge: {{ context.edge.data.title }} <br> Label:
-            {{context.label.data.title }} </div>
-    </ng-template>
+<vflow #flow [nodes]="nodes" [edges]="edges" [view]="[500, 500]">
+  <ng-template nodeHtml>
+    <div style="background-color: black;">Hello world</div>
+  </ng-template>
+
+  <ng-template edge let-context>
+    <svg:path
+      [attr.d]="context.path()"
+      stroke="red"
+      stroke-width="3"
+      fill="none"
+    />
+  </ng-template>
+
+  <ng-template edgeLabelHtml let-context>
+    <div style="background-color: black;">
+      Edge: {{ context.edge.data.title }}
+      <br>
+      Label: {{ context.label.data.title }}
+    </div>
+  </ng-template>
 </vflow>
-<!-- [connection]="connectionSettings", (onConnect)="handleConnect($event)" -->

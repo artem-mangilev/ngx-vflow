@@ -15,7 +15,7 @@ export function bezierPath(
   target: Point,
   sourcePosition: Position,
   targetPosition: Position,
-  usingPoints: UsingPoints
+  usingPoints: UsingPoints = [false, false, false]
 ): PathData {
 
     switch(sourcePosition) {
