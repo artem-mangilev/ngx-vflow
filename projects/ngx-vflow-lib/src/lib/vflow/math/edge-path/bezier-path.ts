@@ -5,11 +5,6 @@ import { Path, path as d3Path } from 'd3-path'
 import { UsingPoints } from "../../types/using-points.type";
 import { Position } from "../../types/position.type";
 
-    let operantSourceX = 0
-    let operantSourceY = 0
-    let operantTargetX = 0
-    let operantTargetY = 0
-
 export function bezierPath(
   source: Point,
   target: Point,
@@ -18,38 +13,6 @@ export function bezierPath(
   usingPoints: UsingPoints = [false, false, false]
 ): PathData {
 
-    switch(sourcePosition) {
-        case "top": operantSourceY = 1;
-        break;
-        case "bottom": operantSourceY = -1;
-        break;
-        case "right": operantSourceX = -1;
-        break;
-        case "left": operantSourceX = 1;
-        break;
-    }
-
-        switch(targetPosition) {
-        case "top": operantTargetY = -1;
-        break;
-        case "bottom": operantTargetY = 1;
-        break;
-        case "right": operantTargetX = 1;
-        break;
-        case "left": operantTargetX = -1;
-        break;
-    }
-
-    return bezierPathTo(source, target, usingPoints)
-
-  throw new Error('Unhandled combination of sourcePosition and targetPosition')
-}
-
-/**
- * Bezier curve construction function
- */
-
-function bezierPathTo(source: Point, target: Point, usingPoints: UsingPoints): PathData {
   const path = d3Path()
 
   path.moveTo(source.x, source.y)
@@ -57,25 +20,48 @@ function bezierPathTo(source: Point, target: Point, usingPoints: UsingPoints): P
   let firstControl: Point
   let secondControl: Point
 
-    const distanceSource = (source.x - target.x) * Math.abs(operantSourceX) + (source.y - target.y) * Math.abs(operantSourceY)
-    const distanceTarget = (source.x - target.x) * Math.abs(operantTargetX) + (source.y - target.y) * Math.abs(operantTargetY)
+    firstControl = {x: source.x, y: source.y}
+    secondControl = {x: target.x, y: target.y}
 
+    function calcContrPoint (
+    point: Point,
+    pointPosition: Position
+    ) {
+
+    let factorPoint = { x: 0, y : 0 }
+
+    switch(pointPosition) {
+        case "top": factorPoint.y = 1;
+        break;
+        case "bottom": factorPoint.y = -1;
+        break;
+        case "right": factorPoint.x = 1;
+        break;
+        case "left": factorPoint.x = -1;
+        break;
+    }
+
+    const distance = (source.x - target.x) * Math.abs(factorPoint.x) + (source.y - target.y) * Math.abs(factorPoint.y)
     // TODO: probably need to make this configurable
     const curvature = .25
     // thanks colleagues from react/svelte world
     // https://github.com/xyflow/xyflow/blob/f0117939bae934447fa7f232081f937169ee23b5/packages/system/src/utils/edges/bezier-edge.ts#L56
-    const controlOffset = curvature * 25 * Math.sqrt(Math.abs(distanceSource))
+    const controlOffset = curvature * 25 * Math.sqrt(Math.abs(distance))
 
-    firstControl = { x: source.x - operantSourceX * controlOffset, y: source.y - operantSourceY * controlOffset }
-    secondControl = { x: target.x + operantTargetX * controlOffset, y: target.y + operantTargetY * controlOffset }
+    return { x: point.x + factorPoint.x * controlOffset, y: point.y - factorPoint.y * controlOffset }
+    }
+
+    firstControl = calcContrPoint(source , sourcePosition)
+    secondControl = calcContrPoint(target, targetPosition)
 
   path.bezierCurveTo(
     firstControl.x, firstControl.y,
     secondControl.x, secondControl.y,
     target.x, target.y
   )
-
   return getPathData(path, source, target, firstControl, secondControl, usingPoints)
+
+  throw new Error('Unhandled combination of sourcePosition and targetPosition')
 }
 
 function getPathData(
