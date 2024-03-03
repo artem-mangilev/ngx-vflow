@@ -1,0 +1,21 @@
+.wrapper {
+  width: max-content;
+}
+
+.magnet {
+  opacity: 0;
+}
+
+.default-node {
+  max-width: 100px;
+  max-height: 100px;
+  width: 100px;
+  height: 50px;
+  border: 2px solid black;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: black;
+  background-color: white;
+}

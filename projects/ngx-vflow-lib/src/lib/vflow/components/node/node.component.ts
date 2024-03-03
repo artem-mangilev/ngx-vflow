@@ -9,15 +9,7 @@ export type HandleState = 'valid' | 'invalid' | 'idle'
 @Component({
   selector: 'g[node]',
   templateUrl: './node.component.html',
-  styles: [`
-    .wrapper {
-      width: max-content;
-    }
-
-    .magnet {
-      opacity: 0;
-    }
-  `],
+  styleUrls: ['./node.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
@@ -52,6 +44,8 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
     this.flowStatusService.status().state === 'connection-validation'
   )
 
+  protected readonly defaultHandleStrokeWidth = 2;
+
   private sourceHanldeState = signal<HandleState>('idle')
   private targetHandleState = signal<HandleState>('idle')
 
@@ -77,11 +71,8 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
         this.nodeModel.size.set({ width, height })
       }
 
-      const sourceBox = this.sourceHandleRef.nativeElement.getBBox({ stroke: true })
-      this.nodeModel.sourceHandleSize.set({ width: sourceBox.width, height: sourceBox.height })
-
-      const targetBox = this.targetHandleRef.nativeElement.getBBox({ stroke: true })
-      this.nodeModel.targetHandleSize.set({ width: targetBox.width, height: targetBox.height })
+      this.setSourceHandleSize()
+      this.setTargetHandleSize()
     })
   }
 
@@ -163,5 +154,26 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
         state: this.targetHanldeStateReadonly
       }
     }
+  }
+
+  private setSourceHandleSize() {
+    // if handle template provided, we don't know its stroke so it's 0
+    const strokeWidth = this.handleTemplate ? 0 : (2 * this.defaultHandleStrokeWidth);
+
+    const sourceBox = this.sourceHandleRef.nativeElement.getBBox({ stroke: true })
+    this.nodeModel.sourceHandleSize.set({
+      width: sourceBox.width + strokeWidth,
+      height: sourceBox.height + strokeWidth
+    })
+  }
+
+  private setTargetHandleSize() {
+    const strokeWidth = this.handleTemplate ? 0 : (2 * this.defaultHandleStrokeWidth);
+
+    const targetBox = this.targetHandleRef.nativeElement.getBBox({ stroke: true })
+    this.nodeModel.targetHandleSize.set({
+      width: targetBox.width + strokeWidth,
+      height: targetBox.height + strokeWidth
+    })
   }
 }
