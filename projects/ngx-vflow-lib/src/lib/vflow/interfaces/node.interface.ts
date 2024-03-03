@@ -1,12 +1,14 @@
 import { Point } from "./point.interface"
 
-export type Node<T = unknown> = {
+export type Node<T = unknown> = SharedNode & (
+  DefaultNode |
+  HtmlTemplateNode<T>
+)
+interface SharedNode {
   id: string
   point: Point
-} & (
-    DefaultNode |
-    HtmlTemplateNode<T>
-  )
+  draggable?: boolean
+}
 
 interface DefaultNode {
   type: 'default'

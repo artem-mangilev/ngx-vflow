@@ -1,6 +1,7 @@
 import { Injector, computed, inject, signal } from '@angular/core'
 import { Node } from '../interfaces/node.interface'
 import { FlowModel } from './flow.model'
+import { isDefined } from '../utils/is-defined'
 
 export class NodeModel<T = unknown> {
   public point = signal({ x: 0, y: 0 })
@@ -84,6 +85,8 @@ export class NodeModel<T = unknown> {
     }
   })
 
+  public draggable = true
+
   // disabled for configuration for now
   public readonly magnetRadius = 20
 
@@ -93,6 +96,8 @@ export class NodeModel<T = unknown> {
     public node: Node<T>
   ) {
     this.point.set(node.point)
+
+    if (isDefined(node.draggable)) this.draggable = node.draggable
   }
 
   /**
