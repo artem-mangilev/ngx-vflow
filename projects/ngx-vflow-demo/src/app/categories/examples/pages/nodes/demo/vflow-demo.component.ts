@@ -16,7 +16,8 @@ export class VflowDemoComponent {
       id: '1',
       point: { x: 10, y: 10 },
       type: 'default',
-      text: '1'
+      text: '1',
+      draggable: false
     },
     {
       id: '2',

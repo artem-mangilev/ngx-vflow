@@ -53,7 +53,7 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
   private targetHanldeStateReadonly = this.targetHandleState.asReadonly()
 
   public ngOnInit() {
-    this.draggableService.makeDraggable(this.hostRef.nativeElement, this.nodeModel)
+    this.draggableService.toggleDraggable(this.hostRef.nativeElement, this.nodeModel)
   }
 
   public ngAfterViewInit(): void {

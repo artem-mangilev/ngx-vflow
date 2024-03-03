@@ -8,13 +8,43 @@ type DragEvent = D3DragEvent<Element, unknown, unknown>
 
 @Injectable()
 export class DraggableService {
-  public makeDraggable(element: Element, model: NodeModel) {
+  /**
+   * Enable or disable draggable behavior for element.
+   * model contains draggable flag which declares if draggable should be enabled or not
+   *
+   * @param element target element for toggling draggable
+   * @param model model with data for this element
+   */
+  public toggleDraggable(element: Element, model: NodeModel) {
     const d3Element = select(element)
 
+    const behavior = model.draggable
+      ? this.getDragBehavior(model)
+      : this.getIgnoreDragBehavior()
+
+    d3Element.call(behavior)
+  }
+
+  /**
+   * TODO: not shure if this work, need to check
+   *
+   * @param element
+   */
+  public destroy(element: Element) {
+    select(element).on('.drag', null)
+  }
+
+  /**
+   * Node drag behavior. Updated node's coordinate according to dragging
+   *
+   * @param model
+   * @returns
+   */
+  private getDragBehavior(model: NodeModel) {
     let deltaX: number
     let deltaY: number
 
-    const dragBehavior = drag()
+    return drag()
       .on('start', (event: DragEvent) => {
         deltaX = model.point().x - event.x
         deltaY = model.point().y - event.y
@@ -28,16 +58,16 @@ export class DraggableService {
           }
         )
       })
-
-    d3Element.call(dragBehavior)
   }
 
   /**
-   * TODO: not shure if this work, need to check
-   *
-   * @param element
+   * Specify ignoring drag behavior. It's responsible for not moving the map when user tries to drag node
+   * with disabled drag behavior
    */
-  public destroy(element: Element) {
-    select(element).on('.drag', null)
+  private getIgnoreDragBehavior() {
+    return drag()
+      .on('drag', (event: DragEvent) => {
+        (event.sourceEvent as Event).stopPropagation()
+      })
   }
 }
