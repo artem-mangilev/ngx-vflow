@@ -1,20 +1,26 @@
-import { Injectable, Signal, computed, effect, inject, signal } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Point } from '../interfaces/point.interface';
 import { FlowEntitiesService } from './flow-entities.service';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { map, merge, of, switchMap } from 'rxjs';
+import { filter, map, merge, of, pairwise, switchMap } from 'rxjs';
 
-export type NodeChange = { id: string } & NodePositionChange
+export type NodeChange = { id: string } & NodePositionChange & NodeAddChange & NodeRemoveChange
 
 interface NodePositionChange {
   type: 'position'
   point: Point
 }
 
+interface NodeAddChange {
+  type: 'add'
+}
+
+interface NodeRemoveChange {
+  type: 'remove'
+}
+
 @Injectable()
 export class NodesChangeService {
-  public readonly changes = computed(() => this.nodesPositionChange())
-
   protected entitiesService = inject(FlowEntitiesService)
 
   protected nodesPositionChange$ = toObservable(this.entitiesService.nodes)
@@ -32,5 +38,31 @@ export class NodesChangeService {
       ])
     )
 
-  protected nodesPositionChange = toSignal(this.nodesPositionChange$)
+  protected nodeAddChange$ = toObservable(this.entitiesService.nodes)
+    .pipe(
+      pairwise(),
+      filter(([oldList, newList]) => newList.length > oldList.length),
+      map(([oldList, newList]) => newList.filter(node => !oldList.includes(node))),
+      map((nodes) =>
+        nodes.map(node => ({ type: 'add', id: node.node.id }))
+      )
+    )
+
+  protected nodeRemoveChange$ = toObservable(this.entitiesService.nodes)
+    .pipe(
+      pairwise(),
+      filter(([oldList, newList]) => oldList.length > newList.length),
+      map(([oldList, newList]) => oldList.filter(node => !newList.includes(node))),
+      map((nodes) =>
+        nodes.map(node => ({ type: 'remove', id: node.node.id }))
+      )
+    )
+
+  protected allChanges$ = merge(
+    this.nodesPositionChange$,
+    this.nodeAddChange$,
+    this.nodeRemoveChange$
+  )
+
+  public readonly changes = toSignal(this.allChanges$)
 }

@@ -73,4 +73,8 @@ export class VflowDemoComponent implements OnInit {
       type: 'default'
     }]
   }
+
+  public removeNode() {
+    this.nodes = this.nodes.filter(n => n.id !== '1')
+  }
 }
