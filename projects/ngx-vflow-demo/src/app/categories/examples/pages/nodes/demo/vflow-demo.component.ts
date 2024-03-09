@@ -1,7 +1,7 @@
 import { AfterViewInit, ChangeDetectionStrategy, Component, Injector, OnInit, ViewChild, computed, effect, inject, runInInjectionContext, signal } from '@angular/core';
 import { Connection } from 'projects/ngx-vflow-lib/src/lib/vflow/interfaces/connection.interface';
 import { Edge } from 'projects/ngx-vflow-lib/src/lib/vflow/interfaces/edge.interface';
-import { ContainerStyleSheetFn, Node, RootStyleSheetFn, VDocModule, VflowComponent, VflowModule, hasClasses, uuid } from 'projects/ngx-vflow-lib/src/public-api';
+import { ContainerStyleSheetFn, Node, RootStyleSheetFn, VDocModule, VflowComponent, VflowModule, nodesAction, hasClasses, uuid, edgesAction } from 'projects/ngx-vflow-lib/src/public-api';
 import { tap } from 'rxjs';
 
 @Component({
@@ -48,7 +48,7 @@ export class VflowDemoComponent implements OnInit {
   ]
 
   public handleConnect(connection: Connection) {
-    this.edges = [...this.edges, {
+    this.edges = edgesAction(this.edges, this.vflow).add({
       id: uuid(),
       source: connection.source,
       target: connection.target,
@@ -57,7 +57,7 @@ export class VflowDemoComponent implements OnInit {
           type: 'arrow'
         }
       }
-    }]
+    })
   }
 
   ngOnInit(): void {
@@ -67,14 +67,14 @@ export class VflowDemoComponent implements OnInit {
   }
 
   public addNode() {
-    this.nodes = [...this.nodes, {
+    this.nodes = nodesAction(this.nodes).add({
       id: uuid(),
       point: { x: 200, y: 200 },
       type: 'default'
-    }]
+    })
   }
 
   public removeNode() {
-    this.nodes = this.nodes.filter(n => n.id !== '1')
+    this.nodes = nodesAction(this.nodes).remove('1')
   }
 }

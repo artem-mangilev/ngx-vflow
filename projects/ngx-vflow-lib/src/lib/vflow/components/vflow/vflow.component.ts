@@ -1,4 +1,4 @@
-import { AfterContentInit, ChangeDetectionStrategy, Component, ContentChild, EventEmitter, Injector, Input, OnChanges, Output, SimpleChanges, ViewChild, inject, runInInjectionContext } from '@angular/core';
+import { AfterContentInit, ChangeDetectionStrategy, Component, ContentChild, EventEmitter, Injector, Input, OnChanges, Output, SimpleChanges, ViewChild, computed, inject, runInInjectionContext } from '@angular/core';
 import { Node } from '../../interfaces/node.interface';
 import { MapContextDirective } from '../../directives/map-context.directive';
 import { DraggableService } from '../../services/draggable.service';
@@ -41,7 +41,7 @@ const connectionControllerHostDirective = {
   ],
   hostDirectives: [connectionControllerHostDirective]
 })
-export class VflowComponent implements OnChanges {
+export class VflowComponent {
   // #region DI
   protected viewportService = inject(ViewportService)
   protected flowEntitiesService = inject(FlowEntitiesService)
@@ -89,6 +89,9 @@ export class VflowComponent implements OnChanges {
       () => ReferenceKeeper.nodes(newNodes, this.flowEntitiesService.nodes())
     )
 
+    // TODO better to solve this by DI
+    bindFlowToNodes(this.flowModel, newModels)
+
     this.flowEntitiesService.nodes.set(newModels)
   }
 
@@ -97,10 +100,14 @@ export class VflowComponent implements OnChanges {
   @Input()
   public set edges(newEdges: Edge[]) {
     const newModels = ReferenceKeeper.edges(newEdges, this.flowEntitiesService.edges())
+
+    // quick and dirty binding nodes to edges
+    addNodesToEdges(this.nodeModels, newModels)
+
     this.flowEntitiesService.edges.set(newModels)
   }
 
-  public get edgeModels() { return this.flowEntitiesService.edges() }
+  public get edgeModels() { return this.flowEntitiesService.validEdges() }
   // #endregion
 
   // #region TEMPLATES
@@ -128,6 +135,17 @@ export class VflowComponent implements OnChanges {
   // #region SIGNAL_API
   public readonly viewport = this.viewportService.readableViewport.asReadonly()
   public readonly nodesChange = this.nodesChangeService.changes
+
+  /**
+   * List of detached edges
+   *
+   * !!! For internal usage
+   *
+   * @internal
+   */
+  public readonly detachedEdges = computed(() =>
+    this.flowEntitiesService.detachedEdges().map(model => model.edge)
+  )
   // #endregion
 
   // #region RX_API
@@ -142,13 +160,6 @@ export class VflowComponent implements OnChanges {
   protected flowModel = new FlowModel()
 
   protected markers = this.flowEntitiesService.markers
-
-  // #region ANGULAR_HOOKS
-  public ngOnChanges(changes: SimpleChanges): void {
-    if (changes['nodes']) bindFlowToNodes(this.flowModel, this.nodeModels)
-    addNodesToEdges(this.nodeModels, this.edgeModels)
-  }
-  // #endregion
 
   // #region METHODS_API
   public viewportTo(viewport: ViewportState): void {

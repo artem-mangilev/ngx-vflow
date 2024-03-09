@@ -12,6 +12,8 @@ export * from './lib/vflow/interfaces/node.interface';
 export * from './lib/vdoc/utils/provide-component';
 export * from './lib/vdoc/utils/ui-snapshot';
 export * from './lib/shared/utils/uuid';
+export * from './lib/vflow/utils/nodes-action';
+export * from './lib/vflow/utils/edges-action';
 
 // Components
 export * from './lib/vdoc/components/vdoc-component/vdoc.component';
