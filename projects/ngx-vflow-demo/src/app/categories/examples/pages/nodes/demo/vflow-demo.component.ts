@@ -2,6 +2,7 @@ import { AfterViewInit, ChangeDetectionStrategy, Component, Injector, OnInit, Vi
 import { Connection } from 'projects/ngx-vflow-lib/src/lib/vflow/interfaces/connection.interface';
 import { Edge } from 'projects/ngx-vflow-lib/src/lib/vflow/interfaces/edge.interface';
 import { ContainerStyleSheetFn, Node, RootStyleSheetFn, VDocModule, VflowComponent, VflowModule, hasClasses, uuid } from 'projects/ngx-vflow-lib/src/public-api';
+import { tap } from 'rxjs';
 
 @Component({
   templateUrl: './vflow-demo.component.html',
@@ -10,7 +11,10 @@ import { ContainerStyleSheetFn, Node, RootStyleSheetFn, VDocModule, VflowCompone
   standalone: true,
   imports: [VflowModule, VDocModule]
 })
-export class VflowDemoComponent {
+export class VflowDemoComponent implements OnInit {
+  @ViewChild('vflow', { static: true })
+  public vflow!: VflowComponent
+
   public nodes: Node[] = [
     {
       id: '1',
@@ -53,6 +57,20 @@ export class VflowDemoComponent {
           type: 'arrow'
         }
       }
+    }]
+  }
+
+  ngOnInit(): void {
+    this.vflow.nodesChange$.pipe(
+      tap((changes) => console.log(changes))
+    ).subscribe()
+  }
+
+  public addNode() {
+    this.nodes = [...this.nodes, {
+      id: uuid(),
+      point: { x: 200, y: 200 },
+      type: 'default'
     }]
   }
 }

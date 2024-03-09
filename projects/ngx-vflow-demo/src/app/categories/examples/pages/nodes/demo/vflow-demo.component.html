@@ -1,1 +1,3 @@
+<button (click)="addNode()">Add node</button>
+
 <vflow #vflow [nodes]="nodes" [edges]="edges" [view]="[500, 500]" (onConnect)="handleConnect($event)"></vflow>

@@ -1,4 +1,4 @@
-import { AfterContentInit, ChangeDetectionStrategy, Component, ContentChild, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild, inject } from '@angular/core';
+import { AfterContentInit, ChangeDetectionStrategy, Component, ContentChild, EventEmitter, Injector, Input, OnChanges, Output, SimpleChanges, ViewChild, inject, runInInjectionContext } from '@angular/core';
 import { Node } from '../../interfaces/node.interface';
 import { MapContextDirective } from '../../directives/map-context.directive';
 import { DraggableService } from '../../services/draggable.service';
@@ -20,6 +20,7 @@ import { FlowEntitiesService } from '../../services/flow-entities.service';
 import { ConnectionSettings } from '../../interfaces/connection-settings.interface';
 import { ConnectionModel } from '../../models/connection.model';
 import { ReferenceKeeper } from '../../utils/reference-keeper';
+import { NodesChangeService } from '../../services/node-changes.service';
 
 const connectionControllerHostDirective = {
   directive: ConnectionControllerDirective,
@@ -35,7 +36,8 @@ const connectionControllerHostDirective = {
     DraggableService,
     ViewportService,
     FlowStatusService,
-    FlowEntitiesService
+    FlowEntitiesService,
+    NodesChangeService
   ],
   hostDirectives: [connectionControllerHostDirective]
 })
@@ -43,6 +45,8 @@ export class VflowComponent implements OnChanges {
   // #region DI
   protected viewportService = inject(ViewportService)
   protected flowEntitiesService = inject(FlowEntitiesService)
+  protected nodesChangeService = inject(NodesChangeService)
+  protected injector = inject(Injector)
   // #endregion
 
   // #region SETTINGS
@@ -81,7 +85,10 @@ export class VflowComponent implements OnChanges {
   // #region MAIN_INPUTS
   @Input({ required: true })
   public set nodes(newNodes: Node[]) {
-    const newModels = ReferenceKeeper.nodes(newNodes, this.flowEntitiesService.nodes())
+    const newModels = runInInjectionContext(this.injector,
+      () => ReferenceKeeper.nodes(newNodes, this.flowEntitiesService.nodes())
+    )
+
     this.flowEntitiesService.nodes.set(newModels)
   }
 
@@ -120,11 +127,15 @@ export class VflowComponent implements OnChanges {
 
   // #region SIGNAL_API
   public readonly viewport = this.viewportService.readableViewport.asReadonly()
+  public readonly nodesChange = this.nodesChangeService.changes
   // #endregion
 
   // #region RX_API
   public readonly viewportChanges$ = toObservable(this.viewportService.readableViewport)
     .pipe(skip(1)) // skip default value that set by signal
+
+  public readonly nodesChange$ = toObservable(this.nodesChangeService.changes)
+    .pipe(skip(1))
   // #endregion
 
   // TODO: probably better to make it injectable
