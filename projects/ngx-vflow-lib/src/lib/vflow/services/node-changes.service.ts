@@ -1,23 +1,9 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, Signal, inject } from '@angular/core';
 import { Point } from '../interfaces/point.interface';
 import { FlowEntitiesService } from './flow-entities.service';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { filter, map, merge, of, pairwise, switchMap } from 'rxjs';
-
-export type NodeChange = { id: string } & NodePositionChange & NodeAddChange & NodeRemoveChange
-
-interface NodePositionChange {
-  type: 'position'
-  point: Point
-}
-
-interface NodeAddChange {
-  type: 'add'
-}
-
-interface NodeRemoveChange {
-  type: 'remove'
-}
+import { Observable, filter, map, merge, of, pairwise, switchMap } from 'rxjs';
+import { NodeChange } from '../types/node-change.type';
 
 @Injectable()
 export class NodesChangeService {
@@ -36,7 +22,7 @@ export class NodesChangeService {
       map(changedNode => [
         { type: 'position', id: changedNode.node.id, point: changedNode.point() }
       ])
-    )
+    ) satisfies Observable<NodeChange[]>
 
   protected nodeAddChange$ = toObservable(this.entitiesService.nodes)
     .pipe(
@@ -46,7 +32,7 @@ export class NodesChangeService {
       map((nodes) =>
         nodes.map(node => ({ type: 'add', id: node.node.id }))
       )
-    )
+    ) satisfies Observable<NodeChange[]>
 
   protected nodeRemoveChange$ = toObservable(this.entitiesService.nodes)
     .pipe(
@@ -56,7 +42,7 @@ export class NodesChangeService {
       map((nodes) =>
         nodes.map(node => ({ type: 'remove', id: node.node.id }))
       )
-    )
+    ) satisfies Observable<NodeChange[]>
 
   protected allChanges$ = merge(
     this.nodesPositionChange$,
@@ -64,5 +50,5 @@ export class NodesChangeService {
     this.nodeRemoveChange$
   )
 
-  public readonly changes = toSignal(this.allChanges$)
+  public readonly changes = toSignal(this.allChanges$, { initialValue: [] }) satisfies Signal<NodeChange[]>
 }
