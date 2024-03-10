@@ -1,7 +1,7 @@
 import { VflowComponent } from "../components/vflow/vflow.component";
 import { Edge } from "../interfaces/edge.interface";
 
-export function edgesAction(list: Edge[], flow?: VflowComponent) {
+export function edgesOperation(list: Edge[], flow?: VflowComponent) {
   return {
     add: (...newEdges: Edge[]) => {
       if (flow) {

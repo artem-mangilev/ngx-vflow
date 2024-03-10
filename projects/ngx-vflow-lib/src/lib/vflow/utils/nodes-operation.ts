@@ -1,6 +1,6 @@
 import { Node } from "../interfaces/node.interface";
 
-export function nodesAction(list: Node[]) {
+export function nodesOperation(list: Node[]) {
   return {
     add: (...newNodes: Node[]) => [...list, ...newNodes],
 
