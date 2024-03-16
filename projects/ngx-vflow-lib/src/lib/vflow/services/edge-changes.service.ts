@@ -1,6 +1,6 @@
 import { Injectable, computed, inject, untracked } from '@angular/core';
 import { FlowEntitiesService } from './flow-entities.service';
-import { Observable, distinctUntilChanged, filter, map, merge, pairwise, skip } from 'rxjs';
+import { Observable, animationFrameScheduler, asapScheduler, asyncScheduler, distinctUntilChanged, filter, map, merge, observeOn, pairwise, queueScheduler, skip, tap } from 'rxjs';
 import { toObservable } from '@angular/core/rxjs-interop';
 
 export type EdgeChange = { id: string } & (EdgeDetachedChange | EdgeRemoveChange)
@@ -26,8 +26,7 @@ export class EdgeChangesService {
       )
     })
   ).pipe(
-    // ignore empty list
-    filter((edges) => !!edges.length),
+    filter(edges => !!edges.length),
     // do not emit if the same detached list was generated
     distinctUntilChanged((prev, current) => {
       const prevAsString = prev.map(edge => edge.edge.id).sort().join('')
@@ -43,12 +42,11 @@ export class EdgeChangesService {
 
   protected edgeRemoveChange$ = toObservable(this.entitiesService.edges)
     .pipe(
-      // ignore empty list
-      // filter((edges) => !!edges.length),
       pairwise(),
       map(([oldList, newList]) => {
         return oldList.filter(edge => !newList.includes(edge))
       }),
+      filter(edges => !!edges.length),
       map((edges) =>
         edges.map(({ edge }) => ({ type: 'remove', id: edge.id }))
       )
@@ -58,4 +56,11 @@ export class EdgeChangesService {
     this.edgeDetachedChange$,
     this.edgeRemoveChange$
   )
+    .pipe(
+      // this fixes the case when user gets 'deteched' changes
+      // and tries to delete these edges inside stream
+      // angular may ignore this change because [edges] input changed
+      // right after [nodes] input change
+      observeOn(asyncScheduler),
+    )
 }

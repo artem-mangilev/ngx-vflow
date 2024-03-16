@@ -70,7 +70,7 @@ export class VflowDemoComponent implements OnInit {
 
     this.vflow.edgesChange$
       .pipe(
-        filter((changes) => !!changes.length && changes.every(change => change.type === 'detached')),
+        filter((changes) => changes.every(change => change.type === 'detached')),
         map((changes) => changes.map(change => change.id)),
         tap((changesIds) => {
           console.log('detached changes');
@@ -84,7 +84,7 @@ export class VflowDemoComponent implements OnInit {
 
     this.vflow.edgesChange$
       .pipe(
-        filter((changes) => !!changes.length && changes.every(change => change.type === 'remove')),
+        filter((changes) => changes.every(change => change.type === 'remove')),
         tap((changes) => {
           console.log('removed changes');
           console.log(changes)
@@ -106,23 +106,5 @@ export class VflowDemoComponent implements OnInit {
 
   public removeEdge() {
     this.edges.update(edges => edges.filter(e => e.id !== '1'))
-  }
-
-  public onEdgesChange(changes: EdgeChange[]) {
-    if (!!changes.length && changes.every(change => change.type === 'detached')) {
-      const changesIds = changes.map(change => change.id)
-
-      console.log('detached changes');
-      console.log(changesIds)
-
-      this.edges.update(edges => {
-        return edges.filter(e => !changesIds.includes(e.id))
-      })
-    }
-
-    if (!!changes.length && changes.every(change => change.type === 'remove')) {
-      console.log('removed changes');
-      console.log(changes)
-    }
   }
 }
