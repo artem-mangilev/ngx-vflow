@@ -1,4 +1,5 @@
 <button (click)="addNode()">Add node</button>
 <button (click)="removeNode()">Remove node</button>
+<button (click)="removeEdge()">Remove edge</button>
 
-<vflow #vflow [nodes]="nodes" [edges]="edges" [view]="[500, 500]" (onConnect)="handleConnect($event)"></vflow>
+<vflow #vflow [nodes]="nodes" [edges]="edges()" [view]="[500, 500]" (onConnect)="handleConnect($event)" />

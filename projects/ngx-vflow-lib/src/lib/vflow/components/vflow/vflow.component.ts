@@ -1,10 +1,10 @@
-import { AfterContentInit, ChangeDetectionStrategy, Component, ContentChild, EventEmitter, Injector, Input, OnChanges, Output, SimpleChanges, ViewChild, computed, inject, runInInjectionContext } from '@angular/core';
+import { AfterContentInit, ChangeDetectionStrategy, Component, ContentChild, EventEmitter, Injector, Input, OnChanges, Output, Signal, SimpleChanges, ViewChild, computed, effect, inject, runInInjectionContext } from '@angular/core';
 import { Node } from '../../interfaces/node.interface';
 import { MapContextDirective } from '../../directives/map-context.directive';
 import { DraggableService } from '../../services/draggable.service';
 import { NodeModel } from '../../models/node.model';
 import { ViewportService } from '../../services/viewport.service';
-import { toObservable } from '@angular/core/rxjs-interop';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { Edge } from '../../interfaces/edge.interface';
 import { EdgeModel } from '../../models/edge.model';
 import { ConnectionTemplateDirective, EdgeLabelHtmlTemplateDirective, EdgeTemplateDirective, HandleTemplateDirective, NodeHtmlTemplateDirective } from '../../directives/template.directive';
@@ -21,6 +21,7 @@ import { ConnectionSettings } from '../../interfaces/connection-settings.interfa
 import { ConnectionModel } from '../../models/connection.model';
 import { ReferenceKeeper } from '../../utils/reference-keeper';
 import { NodesChangeService } from '../../services/node-changes.service';
+import { EdgeChange, EdgeChangesService } from '../../services/edge-changes.service';
 
 const connectionControllerHostDirective = {
   directive: ConnectionControllerDirective,
@@ -37,7 +38,8 @@ const connectionControllerHostDirective = {
     ViewportService,
     FlowStatusService,
     FlowEntitiesService,
-    NodesChangeService
+    NodesChangeService,
+    EdgeChangesService
   ],
   hostDirectives: [connectionControllerHostDirective]
 })
@@ -46,6 +48,7 @@ export class VflowComponent {
   protected viewportService = inject(ViewportService)
   protected flowEntitiesService = inject(FlowEntitiesService)
   protected nodesChangeService = inject(NodesChangeService)
+  protected edgesChangeService = inject(EdgeChangesService)
   protected injector = inject(Injector)
   // #endregion
 
@@ -135,17 +138,8 @@ export class VflowComponent {
   // #region SIGNAL_API
   public readonly viewport = this.viewportService.readableViewport.asReadonly()
   public readonly nodesChange = this.nodesChangeService.changes
-
-  /**
-   * List of detached edges
-   *
-   * !!! For internal usage
-   *
-   * @internal
-   */
-  public readonly detachedEdges = computed(() =>
-    this.flowEntitiesService.detachedEdges().map(model => model.edge)
-  )
+  public readonly edgesChange: Signal<EdgeChange[]> =
+    toSignal(this.edgesChangeService.changes$, { initialValue: [] })
   // #endregion
 
   // #region RX_API
@@ -154,6 +148,8 @@ export class VflowComponent {
 
   public readonly nodesChange$ = toObservable(this.nodesChangeService.changes)
     .pipe(skip(1))
+
+  public readonly edgesChange$ = this.edgesChangeService.changes$
   // #endregion
 
   // TODO: probably better to make it injectable

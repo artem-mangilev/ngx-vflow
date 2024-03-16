@@ -1,8 +1,9 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, Injector, OnInit, ViewChild, computed, effect, inject, runInInjectionContext, signal } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, Injector, NgZone, OnInit, Signal, ViewChild, WritableSignal, computed, effect, inject, runInInjectionContext, signal } from '@angular/core';
 import { Connection } from 'projects/ngx-vflow-lib/src/lib/vflow/interfaces/connection.interface';
 import { Edge } from 'projects/ngx-vflow-lib/src/lib/vflow/interfaces/edge.interface';
+import { EdgeChange } from 'projects/ngx-vflow-lib/src/lib/vflow/services/edge-changes.service';
 import { ContainerStyleSheetFn, Node, RootStyleSheetFn, VDocModule, VflowComponent, VflowModule, nodesOperation, hasClasses, uuid, edgesOperation } from 'projects/ngx-vflow-lib/src/public-api';
-import { tap } from 'rxjs';
+import { filter, map, tap, timer } from 'rxjs';
 
 @Component({
   templateUrl: './vflow-demo.component.html',
@@ -31,9 +32,9 @@ export class VflowDemoComponent implements OnInit {
     },
   ]
 
-  public edges: Edge[] = [
+  public edges: WritableSignal<Edge[]> = signal([
     {
-      id: uuid(),
+      id: '1',
       source: '1',
       target: '2',
       markers: {
@@ -45,27 +46,50 @@ export class VflowDemoComponent implements OnInit {
         }
       }
     }
-  ]
+  ])
 
   public handleConnect(connection: Connection) {
-    const operation = edgesOperation(this.edges, this.vflow)
-
-    this.edges = operation.add({
-      id: uuid(),
-      source: connection.source,
-      target: connection.target,
-      markers: {
-        end: {
-          type: 'arrow'
+    this.edges.update((edges) => {
+      return [...edges, {
+        id: '1',
+        source: connection.source,
+        target: connection.target,
+        markers: {
+          end: {
+            type: 'arrow'
+          }
         }
-      }
+      }]
     })
   }
 
   ngOnInit(): void {
-    this.vflow.nodesChange$.pipe(
-      tap((changes) => console.log(changes))
-    ).subscribe()
+    // this.vflow.nodesChange$.pipe(
+    //   tap((changes) => console.log(changes))
+    // ).subscribe()
+
+    this.vflow.edgesChange$
+      .pipe(
+        filter((changes) => !!changes.length && changes.every(change => change.type === 'detached')),
+        map((changes) => changes.map(change => change.id)),
+        tap((changesIds) => {
+          console.log('detached changes');
+          console.log(changesIds)
+
+          this.edges.update(edges => {
+            return edges.filter(e => !changesIds.includes(e.id))
+          })
+        })
+      ).subscribe()
+
+    this.vflow.edgesChange$
+      .pipe(
+        filter((changes) => !!changes.length && changes.every(change => change.type === 'remove')),
+        tap((changes) => {
+          console.log('removed changes');
+          console.log(changes)
+        })
+      ).subscribe()
   }
 
   public addNode() {
@@ -78,5 +102,27 @@ export class VflowDemoComponent implements OnInit {
 
   public removeNode() {
     this.nodes = nodesOperation(this.nodes).remove('1')
+  }
+
+  public removeEdge() {
+    this.edges.update(edges => edges.filter(e => e.id !== '1'))
+  }
+
+  public onEdgesChange(changes: EdgeChange[]) {
+    if (!!changes.length && changes.every(change => change.type === 'detached')) {
+      const changesIds = changes.map(change => change.id)
+
+      console.log('detached changes');
+      console.log(changesIds)
+
+      this.edges.update(edges => {
+        return edges.filter(e => !changesIds.includes(e.id))
+      })
+    }
+
+    if (!!changes.length && changes.every(change => change.type === 'remove')) {
+      console.log('removed changes');
+      console.log(changes)
+    }
   }
 }

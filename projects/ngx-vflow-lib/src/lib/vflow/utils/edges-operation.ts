@@ -2,12 +2,21 @@ import { VflowComponent } from "../components/vflow/vflow.component";
 import { Edge } from "../interfaces/edge.interface";
 
 export function edgesOperation(list: Edge[], flow?: VflowComponent) {
+  const clearInvalid = () => {
+    // if (flow) {
+    //   console.log(flow.detachedEdges())
+
+    //   return list.filter(e => !flow.detachedEdges().includes(e))
+    // }
+
+    return list
+  }
+
   return {
     add: (...newEdges: Edge[]) => {
       if (flow) {
         return [
-          // filter out detached edges
-          ...list.filter(e => !flow.detachedEdges().includes(e)),
+          ...clearInvalid(),
           ...newEdges
         ]
       }
@@ -17,13 +26,12 @@ export function edgesOperation(list: Edge[], flow?: VflowComponent) {
 
     remove: (...ids: string[]) => {
       if (flow) {
-        return list
-          // filter out detached edges
-          .filter(e => !flow.detachedEdges().includes(e))
-          .filter(e => !ids.includes(e.id))
+        return clearInvalid().filter(e => !ids.includes(e.id))
       }
 
       return list.filter((edge) => !ids.includes(edge.id))
-    }
+    },
+
+    clearInvalid
   }
 }

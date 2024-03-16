@@ -1,5 +1,4 @@
 import { Injectable, Signal, inject } from '@angular/core';
-import { Point } from '../interfaces/point.interface';
 import { FlowEntitiesService } from './flow-entities.service';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { Observable, filter, map, merge, of, pairwise, switchMap } from 'rxjs';
@@ -50,5 +49,7 @@ export class NodesChangeService {
     this.nodeRemoveChange$
   )
 
-  public readonly changes = toSignal(this.allChanges$, { initialValue: [] }) satisfies Signal<NodeChange[]>
+  public readonly changes = toSignal(this.allChanges$, {
+    initialValue: []
+  }) satisfies Signal<NodeChange[]>
 }
