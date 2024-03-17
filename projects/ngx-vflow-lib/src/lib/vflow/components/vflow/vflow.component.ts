@@ -1,10 +1,10 @@
-import { AfterContentInit, ChangeDetectionStrategy, Component, ContentChild, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild, inject } from '@angular/core';
+import { AfterContentInit, ChangeDetectionStrategy, Component, ContentChild, EventEmitter, Injector, Input, OnChanges, Output, Signal, SimpleChanges, ViewChild, computed, effect, inject, runInInjectionContext } from '@angular/core';
 import { Node } from '../../interfaces/node.interface';
 import { MapContextDirective } from '../../directives/map-context.directive';
 import { DraggableService } from '../../services/draggable.service';
 import { NodeModel } from '../../models/node.model';
 import { ViewportService } from '../../services/viewport.service';
-import { toObservable } from '@angular/core/rxjs-interop';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { Edge } from '../../interfaces/edge.interface';
 import { EdgeModel } from '../../models/edge.model';
 import { ConnectionTemplateDirective, EdgeLabelHtmlTemplateDirective, EdgeTemplateDirective, HandleTemplateDirective, NodeHtmlTemplateDirective } from '../../directives/template.directive';
@@ -20,10 +20,20 @@ import { FlowEntitiesService } from '../../services/flow-entities.service';
 import { ConnectionSettings } from '../../interfaces/connection-settings.interface';
 import { ConnectionModel } from '../../models/connection.model';
 import { ReferenceKeeper } from '../../utils/reference-keeper';
+import { NodesChangeService } from '../../services/node-changes.service';
+import { EdgeChangesService } from '../../services/edge-changes.service';
+import { NodeChange } from '../../types/node-change.type';
+import { ChangesControllerDirective } from '../../directives/changes-controller.directive';
+import { EdgeChange } from '../../types/edge-change.type';
 
 const connectionControllerHostDirective = {
   directive: ConnectionControllerDirective,
   outputs: ['onConnect']
+}
+
+const changesControllerHostDirective = {
+  directive: ChangesControllerDirective,
+  outputs: ['onNodesChange', 'onEdgesChange']
 }
 
 @Component({
@@ -35,14 +45,22 @@ const connectionControllerHostDirective = {
     DraggableService,
     ViewportService,
     FlowStatusService,
-    FlowEntitiesService
+    FlowEntitiesService,
+    NodesChangeService,
+    EdgeChangesService
   ],
-  hostDirectives: [connectionControllerHostDirective]
+  hostDirectives: [
+    connectionControllerHostDirective,
+    changesControllerHostDirective
+  ]
 })
-export class VflowComponent implements OnChanges {
+export class VflowComponent {
   // #region DI
   protected viewportService = inject(ViewportService)
   protected flowEntitiesService = inject(FlowEntitiesService)
+  protected nodesChangeService = inject(NodesChangeService)
+  protected edgesChangeService = inject(EdgeChangesService)
+  protected injector = inject(Injector)
   // #endregion
 
   // #region SETTINGS
@@ -81,7 +99,16 @@ export class VflowComponent implements OnChanges {
   // #region MAIN_INPUTS
   @Input({ required: true })
   public set nodes(newNodes: Node[]) {
-    const newModels = ReferenceKeeper.nodes(newNodes, this.flowEntitiesService.nodes())
+    const newModels = runInInjectionContext(this.injector,
+      () => ReferenceKeeper.nodes(newNodes, this.flowEntitiesService.nodes())
+    )
+
+    // TODO better to solve this by DI
+    bindFlowToNodes(this.flowModel, newModels)
+
+    // quick and dirty binding nodes to edges
+    addNodesToEdges(newModels, this.flowEntitiesService.edges())
+
     this.flowEntitiesService.nodes.set(newModels)
   }
 
@@ -90,10 +117,14 @@ export class VflowComponent implements OnChanges {
   @Input()
   public set edges(newEdges: Edge[]) {
     const newModels = ReferenceKeeper.edges(newEdges, this.flowEntitiesService.edges())
+
+    // quick and dirty binding nodes to edges
+    addNodesToEdges(this.nodeModels, newModels)
+
     this.flowEntitiesService.edges.set(newModels)
   }
 
-  public get edgeModels() { return this.flowEntitiesService.edges() }
+  public get edgeModels() { return this.flowEntitiesService.validEdges() }
   // #endregion
 
   // #region TEMPLATES
@@ -120,24 +151,27 @@ export class VflowComponent implements OnChanges {
 
   // #region SIGNAL_API
   public readonly viewport = this.viewportService.readableViewport.asReadonly()
+
+  public readonly nodesChange =
+    toSignal(this.nodesChangeService.changes$, { initialValue: [] as NodeChange[] })
+
+  public readonly edgesChange =
+    toSignal(this.edgesChangeService.changes$, { initialValue: [] as EdgeChange[] })
   // #endregion
 
   // #region RX_API
   public readonly viewportChanges$ = toObservable(this.viewportService.readableViewport)
     .pipe(skip(1)) // skip default value that set by signal
+
+  public readonly nodesChange$ = this.nodesChangeService.changes$
+
+  public readonly edgesChange$ = this.edgesChangeService.changes$
   // #endregion
 
   // TODO: probably better to make it injectable
   protected flowModel = new FlowModel()
 
   protected markers = this.flowEntitiesService.markers
-
-  // #region ANGULAR_HOOKS
-  public ngOnChanges(changes: SimpleChanges): void {
-    if (changes['nodes']) bindFlowToNodes(this.flowModel, this.nodeModels)
-    addNodesToEdges(this.nodeModels, this.edgeModels)
-  }
-  // #endregion
 
   // #region METHODS_API
   public viewportTo(viewport: ViewportState): void {

@@ -31,5 +31,5 @@ export class ConnectionControllerDirective {
         this.onConnect.emit({ source, target })
       }
     }
-  })
+  }, { allowSignalWrites: true })
 }

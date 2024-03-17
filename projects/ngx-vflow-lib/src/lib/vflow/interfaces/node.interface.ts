@@ -1,9 +1,21 @@
-import { Position } from "../types/position.type"
 import { Point } from "./point.interface"
 
-export interface Node<T = unknown> {
+export type Node<T = unknown> = SharedNode & (
+  DefaultNode |
+  HtmlTemplateNode<T>
+)
+interface SharedNode {
   id: string
-  point: Point,
-  type: 'default' | 'html-template'
+  point: Point
+  draggable?: boolean
+}
+
+interface DefaultNode {
+  type: 'default'
+  text?: string
+}
+
+interface HtmlTemplateNode<T = unknown> {
+  type: 'html-template'
   data?: T
 }

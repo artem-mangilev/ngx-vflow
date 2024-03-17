@@ -1,9 +1,11 @@
-<svg:rect
+<svg:foreignObject
   *ngIf="nodeModel.node.type === 'default'"
   #nodeContent
-  width="50"
+  width="100"
   height="50"
-/>
+>
+  <div class="default-node" [innerHTML]="nodeModel.node.text ?? ''"></div>
+</svg:foreignObject>
 
 <svg:foreignObject
   *ngIf="nodeModel.node.type === 'html-template' && nodeHtmlTemplate"
@@ -32,10 +34,10 @@
     #sourceHandle
     [attr.cx]="nodeModel.sourceOffset().x"
     [attr.cy]="nodeModel.sourceOffset().y"
+    [attr.stroke-width]="defaultHandleStrokeWidth"
     r="5"
     stroke="white"
-    stroke-width="3"
-    fill="red"
+    fill="black"
     (mousedown)="startConnection($event)"
   />
 
@@ -43,9 +45,10 @@
     #targetHandle
     [attr.cx]="nodeModel.targetOffset().x"
     [attr.cy]="nodeModel.targetOffset().y"
+    [attr.stroke-width]="defaultHandleStrokeWidth"
     r="5"
     stroke="white"
-    fill="red"
+    fill="black"
     (mouseup)="endConnection()"
   />
 </ng-container>
