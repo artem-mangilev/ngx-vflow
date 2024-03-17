@@ -96,6 +96,9 @@ export class VflowComponent {
     // TODO better to solve this by DI
     bindFlowToNodes(this.flowModel, newModels)
 
+    // quick and dirty binding nodes to edges
+    addNodesToEdges(newModels, this.flowEntitiesService.edges())
+
     this.flowEntitiesService.nodes.set(newModels)
   }
 
