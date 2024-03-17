@@ -22,6 +22,7 @@ import { ConnectionModel } from '../../models/connection.model';
 import { ReferenceKeeper } from '../../utils/reference-keeper';
 import { NodesChangeService } from '../../services/node-changes.service';
 import { EdgeChange, EdgeChangesService } from '../../services/edge-changes.service';
+import { NodeChange } from '../../types/node-change.type';
 
 const connectionControllerHostDirective = {
   directive: ConnectionControllerDirective,
@@ -137,17 +138,19 @@ export class VflowComponent {
 
   // #region SIGNAL_API
   public readonly viewport = this.viewportService.readableViewport.asReadonly()
-  public readonly nodesChange = this.nodesChangeService.changes
-  public readonly edgesChange: Signal<EdgeChange[]> =
-    toSignal(this.edgesChangeService.changes$, { initialValue: [] })
+
+  public readonly nodesChange =
+    toSignal(this.nodesChangeService.changes$, { initialValue: [] as NodeChange[] })
+
+  public readonly edgesChange =
+    toSignal(this.edgesChangeService.changes$, { initialValue: [] as EdgeChange[] })
   // #endregion
 
   // #region RX_API
   public readonly viewportChanges$ = toObservable(this.viewportService.readableViewport)
     .pipe(skip(1)) // skip default value that set by signal
 
-  public readonly nodesChange$ = toObservable(this.nodesChangeService.changes)
-    .pipe(skip(1))
+  public readonly nodesChange$ = this.nodesChangeService.changes$
 
   public readonly edgesChange$ = this.edgesChangeService.changes$
   // #endregion

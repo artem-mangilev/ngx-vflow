@@ -64,32 +64,32 @@ export class VflowDemoComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // this.vflow.nodesChange$.pipe(
-    //   tap((changes) => console.log(changes))
-    // ).subscribe()
+    this.vflow.nodesChange$.pipe(
+      tap((changes) => console.log(changes))
+    ).subscribe()
 
-    this.vflow.edgesChange$
-      .pipe(
-        filter((changes) => changes.every(change => change.type === 'detached')),
-        map((changes) => changes.map(change => change.id)),
-        tap((changesIds) => {
-          console.log('detached changes');
-          console.log(changesIds)
+    // this.vflow.edgesChange$
+    //   .pipe(
+    //     filter((changes) => changes.every(change => change.type === 'detached')),
+    //     map((changes) => changes.map(change => change.id)),
+    //     tap((changesIds) => {
+    //       console.log('detached changes');
+    //       console.log(changesIds)
 
-          this.edges.update(edges => {
-            return edges.filter(e => !changesIds.includes(e.id))
-          })
-        })
-      ).subscribe()
+    //       this.edges.update(edges => {
+    //         return edges.filter(e => !changesIds.includes(e.id))
+    //       })
+    //     })
+    //   ).subscribe()
 
-    this.vflow.edgesChange$
-      .pipe(
-        filter((changes) => changes.every(change => change.type === 'remove')),
-        tap((changes) => {
-          console.log('removed changes');
-          console.log(changes)
-        })
-      ).subscribe()
+    // this.vflow.edgesChange$
+    //   .pipe(
+    //     filter((changes) => changes.every(change => change.type === 'remove')),
+    //     tap((changes) => {
+    //       console.log('removed changes');
+    //       console.log(changes)
+    //     })
+    //   ).subscribe()
   }
 
   public addNode() {

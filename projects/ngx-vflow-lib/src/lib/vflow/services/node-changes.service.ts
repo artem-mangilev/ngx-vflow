@@ -43,13 +43,9 @@ export class NodesChangeService {
       )
     ) satisfies Observable<NodeChange[]>
 
-  protected allChanges$ = merge(
+  public readonly changes$: Observable<NodeChange[]> = merge(
     this.nodesPositionChange$,
     this.nodeAddChange$,
     this.nodeRemoveChange$
   )
-
-  public readonly changes = toSignal(this.allChanges$, {
-    initialValue: []
-  }) satisfies Signal<NodeChange[]>
 }
