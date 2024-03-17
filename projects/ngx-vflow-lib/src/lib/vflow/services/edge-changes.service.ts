@@ -3,10 +3,14 @@ import { FlowEntitiesService } from './flow-entities.service';
 import { Observable, animationFrameScheduler, asapScheduler, asyncScheduler, distinctUntilChanged, filter, map, merge, observeOn, pairwise, queueScheduler, skip, tap } from 'rxjs';
 import { toObservable } from '@angular/core/rxjs-interop';
 
-export type EdgeChange = { id: string } & (EdgeDetachedChange | EdgeRemoveChange)
+export type EdgeChange = { id: string } & (EdgeDetachedChange | EdgeAddChange | EdgeRemoveChange)
 
 interface EdgeDetachedChange {
   type: 'detached'
+}
+
+interface EdgeAddChange {
+  type: 'add'
 }
 
 interface EdgeRemoveChange {
@@ -34,6 +38,20 @@ export class EdgeChangesService {
     )
   ) satisfies Observable<EdgeChange[]>
 
+  protected edgeAddChange$ = toObservable(this.entitiesService.edges)
+    .pipe(
+      // skip what user set with input initially
+      skip(1),
+      pairwise(),
+      map(([oldList, newList]) => {
+        return newList.filter(edge => !oldList.includes(edge))
+      }),
+      filter(edges => !!edges.length),
+      map((edges) =>
+        edges.map(({ edge }) => ({ type: 'add', id: edge.id }))
+      )
+    ) satisfies Observable<EdgeChange[]>
+
   protected edgeRemoveChange$ = toObservable(this.entitiesService.edges)
     .pipe(
       pairwise(),
@@ -48,6 +66,7 @@ export class EdgeChangesService {
 
   public readonly changes$: Observable<EdgeChange[]> = merge(
     this.edgeDetachedChange$,
+    this.edgeAddChange$,
     this.edgeRemoveChange$
   )
     .pipe(

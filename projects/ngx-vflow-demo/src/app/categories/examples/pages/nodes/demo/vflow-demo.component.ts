@@ -38,7 +38,7 @@ export class VflowDemoComponent implements OnInit {
   public handleConnect(connection: Connection) {
     this.edges.update((edges) => {
       return [...edges, {
-        id: '1',
+        id: uuid(),
         source: connection.source,
         target: connection.target,
         markers: {
@@ -133,18 +133,20 @@ export class VflowDemoComponent implements OnInit {
   }
 
   public handleEdgesChange(changes: EdgeChange[]) {
-    if (changes.every(change => change.type === 'detached')) {
-      const changesIds = changes.map(c => c.id)
+    // if (changes.every(change => change.type === 'detached')) {
+    //   const changesIds = changes.map(c => c.id)
 
-      this.edges.update(edges => {
-        return edges.filter(e => !changesIds.includes(e.id))
-      })
+    //   this.edges.update(edges => {
+    //     return edges.filter(e => !changesIds.includes(e.id))
+    //   })
 
-      console.log('remove detached');
-    }
+    //   console.log('remove detached');
+    // }
 
-    if (changes.every(change => change.type === 'remove')) {
-      console.log('removed');
-    }
+    // if (changes.every(change => change.type === 'remove')) {
+    //   console.log('removed');
+    // }
+
+    console.log(changes)
   }
 }
