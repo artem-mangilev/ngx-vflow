@@ -1,21 +1,8 @@
 import { Injectable, computed, inject, untracked } from '@angular/core';
 import { FlowEntitiesService } from './flow-entities.service';
-import { Observable, animationFrameScheduler, asapScheduler, asyncScheduler, distinctUntilChanged, filter, map, merge, observeOn, pairwise, queueScheduler, skip, tap } from 'rxjs';
+import { Observable, asyncScheduler, filter, map, merge, observeOn, pairwise, skip } from 'rxjs';
 import { toObservable } from '@angular/core/rxjs-interop';
-
-export type EdgeChange = { id: string } & (EdgeDetachedChange | EdgeAddChange | EdgeRemoveChange)
-
-interface EdgeDetachedChange {
-  type: 'detached'
-}
-
-interface EdgeAddChange {
-  type: 'add'
-}
-
-interface EdgeRemoveChange {
-  type: 'remove'
-}
+import { EdgeChange } from '../types/edge-change.type';
 
 @Injectable()
 export class EdgeChangesService {

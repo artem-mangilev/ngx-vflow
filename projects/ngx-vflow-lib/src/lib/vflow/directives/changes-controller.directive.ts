@@ -1,9 +1,10 @@
 import { Directive, EventEmitter, Output, effect, inject } from '@angular/core';
 import { NodeChange } from '../types/node-change.type';
-import { EdgeChange, EdgeChangesService } from '../services/edge-changes.service';
+import { EdgeChangesService } from '../services/edge-changes.service';
 import { NodesChangeService } from '../services/node-changes.service';
 import { tap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { EdgeChange } from '../types/edge-change.type';
 
 @Directive({
   selector: '[changesController]',

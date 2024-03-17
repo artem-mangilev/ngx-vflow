@@ -21,9 +21,10 @@ import { ConnectionSettings } from '../../interfaces/connection-settings.interfa
 import { ConnectionModel } from '../../models/connection.model';
 import { ReferenceKeeper } from '../../utils/reference-keeper';
 import { NodesChangeService } from '../../services/node-changes.service';
-import { EdgeChange, EdgeChangesService } from '../../services/edge-changes.service';
+import { EdgeChangesService } from '../../services/edge-changes.service';
 import { NodeChange } from '../../types/node-change.type';
 import { ChangesControllerDirective } from '../../directives/changes-controller.directive';
+import { EdgeChange } from '../../types/edge-change.type';
 
 const connectionControllerHostDirective = {
   directive: ConnectionControllerDirective,

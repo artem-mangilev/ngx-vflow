@@ -8,6 +8,10 @@ export * from './lib/vdoc/interfaces/ui-snapshot.interface';
 export * from './lib/vdoc/interfaces/style-function.interface';
 export * from './lib/vflow/interfaces/node.interface';
 
+// Types
+export * from './lib/vflow/types/node-change.type'
+export * from './lib/vflow/types/edge-change.type'
+
 // Utils
 export * from './lib/vdoc/utils/provide-component';
 export * from './lib/vdoc/utils/ui-snapshot';

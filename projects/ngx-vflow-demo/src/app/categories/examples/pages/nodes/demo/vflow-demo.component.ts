@@ -1,8 +1,7 @@
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, Injector, NgZone, OnInit, Signal, ViewChild, WritableSignal, computed, effect, inject, runInInjectionContext, signal } from '@angular/core';
 import { Connection } from 'projects/ngx-vflow-lib/src/lib/vflow/interfaces/connection.interface';
 import { Edge } from 'projects/ngx-vflow-lib/src/lib/vflow/interfaces/edge.interface';
-import { EdgeChange } from 'projects/ngx-vflow-lib/src/lib/vflow/services/edge-changes.service';
-import { ContainerStyleSheetFn, Node, RootStyleSheetFn, VDocModule, VflowComponent, VflowModule, hasClasses, uuid } from 'projects/ngx-vflow-lib/src/public-api';
+import { ContainerStyleSheetFn, EdgeChange, Node, RootStyleSheetFn, VDocModule, VflowComponent, VflowModule, hasClasses, uuid } from 'projects/ngx-vflow-lib/src/public-api';
 
 @Component({
   templateUrl: './vflow-demo.component.html',
