@@ -23,10 +23,16 @@ import { ReferenceKeeper } from '../../utils/reference-keeper';
 import { NodesChangeService } from '../../services/node-changes.service';
 import { EdgeChange, EdgeChangesService } from '../../services/edge-changes.service';
 import { NodeChange } from '../../types/node-change.type';
+import { ChangesControllerDirective } from '../../directives/changes-controller.directive';
 
 const connectionControllerHostDirective = {
   directive: ConnectionControllerDirective,
   outputs: ['onConnect']
+}
+
+const changesControllerHostDirective = {
+  directive: ChangesControllerDirective,
+  outputs: ['onNodesChange', 'onEdgesChange']
 }
 
 @Component({
@@ -42,7 +48,10 @@ const connectionControllerHostDirective = {
     NodesChangeService,
     EdgeChangesService
   ],
-  hostDirectives: [connectionControllerHostDirective]
+  hostDirectives: [
+    connectionControllerHostDirective,
+    changesControllerHostDirective
+  ]
 })
 export class VflowComponent {
   // #region DI
