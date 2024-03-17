@@ -20,21 +20,15 @@ export class EdgeChangesService {
   protected edgeDetachedChange$ = toObservable(
     computed(() => {
       const nodes = this.entitiesService.nodes()
+      const edges = untracked(this.entitiesService.edges)
 
-      return untracked(this.entitiesService.edges).filter(({ source, target }) =>
+      return edges.filter(({ source, target }) =>
         !nodes.includes(source) || !nodes.includes(target)
       )
     })
   ).pipe(
+    // TODO check why there are 2 emits from single call inside computed
     filter(edges => !!edges.length),
-    // do not emit if the same detached list was generated
-    distinctUntilChanged((prev, current) => {
-      const prevAsString = prev.map(edge => edge.edge.id).sort().join('')
-      const currentAsString = current.map(edge => edge.edge.id).sort().join('')
-
-      return prevAsString === currentAsString
-
-    }),
     map((edges) =>
       edges.map(({ edge }) => ({ type: 'detached', id: edge.id }))
     )

@@ -7,7 +7,10 @@ import { hashCode } from '../../shared/utils/hash';
 
 @Injectable()
 export class FlowEntitiesService {
-  public readonly nodes = signal<NodeModel[]>([])
+  public readonly nodes = signal<NodeModel[]>([], {
+    // empty arrays considered equal, other arrays may not be equal
+    equal: (a, b) => !a.length && !b.length ? true : a === b
+  })
 
   public readonly edges = signal<EdgeModel[]>([])
 
@@ -41,15 +44,6 @@ export class FlowEntitiesService {
     const nodes = this.nodes()
 
     return this.edges().filter(e => nodes.includes(e.source) && nodes.includes(e.target))
-  })
-
-  // TODO see if I could infer invalid edges from valid
-  public readonly detachedEdges = computed(() => {
-    const nodes = this.nodes()
-
-    return untracked(this.edges).filter(({ source, target }) =>
-      !nodes.includes(source) || !nodes.includes(target)
-    )
   })
 
   public getNode<T>(id: string) {

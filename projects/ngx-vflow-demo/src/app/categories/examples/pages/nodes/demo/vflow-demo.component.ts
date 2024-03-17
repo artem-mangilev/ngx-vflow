@@ -3,7 +3,6 @@ import { Connection } from 'projects/ngx-vflow-lib/src/lib/vflow/interfaces/conn
 import { Edge } from 'projects/ngx-vflow-lib/src/lib/vflow/interfaces/edge.interface';
 import { EdgeChange } from 'projects/ngx-vflow-lib/src/lib/vflow/services/edge-changes.service';
 import { ContainerStyleSheetFn, Node, RootStyleSheetFn, VDocModule, VflowComponent, VflowModule, hasClasses, uuid } from 'projects/ngx-vflow-lib/src/public-api';
-import { filter, map, tap, timer } from 'rxjs';
 
 @Component({
   templateUrl: './vflow-demo.component.html',
@@ -16,21 +15,7 @@ export class VflowDemoComponent implements OnInit {
   @ViewChild('vflow', { static: true })
   public vflow!: VflowComponent
 
-  public nodes: Node[] = [
-    {
-      id: '1',
-      point: { x: 10, y: 10 },
-      type: 'default',
-      text: '1',
-      draggable: false
-    },
-    {
-      id: '2',
-      point: { x: 100, y: 100 },
-      type: 'default',
-      text: '2'
-    },
-  ]
+  public nodes: Node[] = []
 
   public edges: WritableSignal<Edge[]> = signal([
     {
@@ -48,6 +33,8 @@ export class VflowDemoComponent implements OnInit {
     }
   ])
 
+  protected cd = inject(ChangeDetectorRef)
+
   public handleConnect(connection: Connection) {
     this.edges.update((edges) => {
       return [...edges, {
@@ -64,9 +51,45 @@ export class VflowDemoComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.vflow.nodesChange$.pipe(
-      tap((changes) => console.log(changes))
-    ).subscribe()
+    setTimeout(() => {
+      this.nodes = [
+        {
+          id: '1',
+          point: { x: 10, y: 10 },
+          type: 'default',
+          text: '1',
+          draggable: false
+        },
+        {
+          id: '2',
+          point: { x: 100, y: 100 },
+          type: 'default',
+          text: '2'
+        },
+      ]
+
+      this.cd.markForCheck()
+    }, 5000);
+
+    // this.nodes = [
+    //   {
+    //     id: '1',
+    //     point: { x: 10, y: 10 },
+    //     type: 'default',
+    //     text: '1',
+    //     draggable: false
+    //   },
+    //   {
+    //     id: '2',
+    //     point: { x: 100, y: 100 },
+    //     type: 'default',
+    //     text: '2'
+    //   },
+    // ]
+
+    // this.vflow.nodesChange$.pipe(
+    //   tap((changes) => console.log(changes))
+    // ).subscribe()
 
     // this.vflow.edgesChange$
     //   .pipe(
@@ -107,5 +130,21 @@ export class VflowDemoComponent implements OnInit {
 
   public removeEdge() {
     this.edges.update(edges => edges.filter(e => e.id !== '1'))
+  }
+
+  public handleEdgesChange(changes: EdgeChange[]) {
+    if (changes.every(change => change.type === 'detached')) {
+      const changesIds = changes.map(c => c.id)
+
+      this.edges.update(edges => {
+        return edges.filter(e => !changesIds.includes(e.id))
+      })
+
+      console.log('remove detached');
+    }
+
+    if (changes.every(change => change.type === 'remove')) {
+      console.log('removed');
+    }
   }
 }
