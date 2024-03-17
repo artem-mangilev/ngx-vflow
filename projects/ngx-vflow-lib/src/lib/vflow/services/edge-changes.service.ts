@@ -27,8 +27,6 @@ export class EdgeChangesService {
 
   protected edgeAddChange$ = toObservable(this.entitiesService.edges)
     .pipe(
-      // skip what user set with input initially
-      skip(1),
       pairwise(),
       map(([oldList, newList]) => {
         return newList.filter(edge => !oldList.includes(edge))

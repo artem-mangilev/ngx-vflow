@@ -31,10 +31,11 @@ export class NodesChangeService {
 
   protected nodeAddChange$ = toObservable(this.entitiesService.nodes)
     .pipe(
-      skip(1),
       pairwise(),
-      filter(([oldList, newList]) => newList.length > oldList.length),
-      map(([oldList, newList]) => newList.filter(node => !oldList.includes(node))),
+      map(([oldList, newList]) =>
+        newList.filter(node => !oldList.includes(node))
+      ),
+      filter((nodes) => !!nodes.length),
       map((nodes) =>
         nodes.map(node => ({ type: 'add', id: node.node.id }))
       )
@@ -43,8 +44,10 @@ export class NodesChangeService {
   protected nodeRemoveChange$ = toObservable(this.entitiesService.nodes)
     .pipe(
       pairwise(),
-      filter(([oldList, newList]) => oldList.length > newList.length),
-      map(([oldList, newList]) => oldList.filter(node => !newList.includes(node))),
+      map(([oldList, newList]) =>
+        oldList.filter(node => !newList.includes(node))
+      ),
+      filter((nodes) => !!nodes.length),
       map((nodes) =>
         nodes.map(node => ({ type: 'remove', id: node.node.id }))
       )
