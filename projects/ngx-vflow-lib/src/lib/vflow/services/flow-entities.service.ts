@@ -12,7 +12,10 @@ export class FlowEntitiesService {
     equal: (a, b) => !a.length && !b.length ? true : a === b
   })
 
-  public readonly edges = signal<EdgeModel[]>([])
+  public readonly edges = signal<EdgeModel[]>([], {
+    // empty arrays considered equal, other arrays may not be equal
+    equal: (a, b) => !a.length && !b.length ? true : a === b
+  })
 
   public readonly connection = signal<ConnectionModel>(new ConnectionModel({}))
 
