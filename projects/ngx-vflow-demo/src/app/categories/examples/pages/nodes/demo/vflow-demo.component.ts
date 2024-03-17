@@ -2,7 +2,7 @@ import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, I
 import { Connection } from 'projects/ngx-vflow-lib/src/lib/vflow/interfaces/connection.interface';
 import { Edge } from 'projects/ngx-vflow-lib/src/lib/vflow/interfaces/edge.interface';
 import { EdgeChange } from 'projects/ngx-vflow-lib/src/lib/vflow/services/edge-changes.service';
-import { ContainerStyleSheetFn, Node, RootStyleSheetFn, VDocModule, VflowComponent, VflowModule, nodesOperation, hasClasses, uuid, edgesOperation } from 'projects/ngx-vflow-lib/src/public-api';
+import { ContainerStyleSheetFn, Node, RootStyleSheetFn, VDocModule, VflowComponent, VflowModule, hasClasses, uuid } from 'projects/ngx-vflow-lib/src/public-api';
 import { filter, map, tap, timer } from 'rxjs';
 
 @Component({
@@ -93,15 +93,16 @@ export class VflowDemoComponent implements OnInit {
   }
 
   public addNode() {
-    this.nodes = nodesOperation(this.nodes).add({
+    this.nodes = [...this.nodes, {
       id: uuid(),
       point: { x: 200, y: 200 },
       type: 'default'
-    })
+
+    }]
   }
 
   public removeNode() {
-    this.nodes = nodesOperation(this.nodes).remove('1')
+    this.nodes = this.nodes.filter(n => n.id !== '1')
   }
 
   public removeEdge() {
