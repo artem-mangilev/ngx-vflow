@@ -1,14 +1,14 @@
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, Injector, NgZone, OnInit, Signal, ViewChild, WritableSignal, computed, effect, inject, runInInjectionContext, signal } from '@angular/core';
 import { Connection } from 'projects/ngx-vflow-lib/src/lib/vflow/interfaces/connection.interface';
 import { Edge } from 'projects/ngx-vflow-lib/src/lib/vflow/interfaces/edge.interface';
-import { ContainerStyleSheetFn, EdgeChange, Node, NodeChange, RootStyleSheetFn, VDocModule, VflowComponent, VflowModule, hasClasses, uuid } from 'projects/ngx-vflow-lib/src/public-api';
+import { EdgeChange, Node, NodeChange, VflowComponent, VflowModule, uuid } from 'projects/ngx-vflow-lib/src/public-api';
 
 @Component({
   templateUrl: './vflow-demo.component.html',
   styleUrls: ['./vflow-demo.styles.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [VflowModule, VDocModule]
+  imports: [VflowModule]
 })
 export class VflowDemoComponent implements OnInit {
   @ViewChild('vflow', { static: true })

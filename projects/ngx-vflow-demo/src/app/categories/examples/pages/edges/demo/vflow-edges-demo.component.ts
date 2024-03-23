@@ -2,14 +2,14 @@ import { AfterViewInit, ChangeDetectionStrategy, Component, ViewChild } from '@a
 import { ConnectionSettings } from 'projects/ngx-vflow-lib/src/lib/vflow/interfaces/connection-settings.interface';
 import { Connection } from 'projects/ngx-vflow-lib/src/lib/vflow/interfaces/connection.interface';
 import { Edge } from 'projects/ngx-vflow-lib/src/lib/vflow/interfaces/edge.interface';
-import { Node, VDocModule, VflowComponent, VflowModule, uuid } from 'projects/ngx-vflow-lib/src/public-api';
+import { Node, VflowComponent, VflowModule, uuid } from 'projects/ngx-vflow-lib/src/public-api';
 
 @Component({
   templateUrl: './vflow-edges-demo.component.html',
   styleUrls: ['./vflow-edges-demo.styles.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [VflowModule, VDocModule]
+  imports: [VflowModule]
 })
 export class VflowEdgesDemoComponent implements AfterViewInit {
   public nodes: Node[] = [
