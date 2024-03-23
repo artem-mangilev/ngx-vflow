@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, Input, TemplateRef, computed } from '@angular/core';
 import { EdgeModel } from '../../models/edge.model';
-import { hashCode } from '../../../shared/utils/hash';
+import { hashCode } from '../../utils/hash';
 
 @Component({
   selector: 'g[edge]',

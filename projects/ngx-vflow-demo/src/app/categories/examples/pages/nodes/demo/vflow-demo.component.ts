@@ -1,7 +1,5 @@
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, Injector, NgZone, OnInit, Signal, ViewChild, WritableSignal, computed, effect, inject, runInInjectionContext, signal } from '@angular/core';
-import { Connection } from 'projects/ngx-vflow-lib/src/lib/vflow/interfaces/connection.interface';
-import { Edge } from 'projects/ngx-vflow-lib/src/lib/vflow/interfaces/edge.interface';
-import { EdgeChange, Node, NodeChange, VflowComponent, VflowModule, uuid } from 'projects/ngx-vflow-lib/src/public-api';
+import { Connection, Edge, EdgeChange, Node, NodeChange, VflowComponent, VflowModule } from 'projects/ngx-vflow-lib/src/public-api';
 
 @Component({
   templateUrl: './vflow-demo.component.html',
@@ -51,7 +49,7 @@ export class VflowDemoComponent implements OnInit {
   public handleConnect(connection: Connection) {
     this.edges.update((edges) => {
       return [...edges, {
-        id: uuid(),
+        id: crypto.randomUUID(),
         source: connection.source,
         target: connection.target,
         markers: {
@@ -130,7 +128,7 @@ export class VflowDemoComponent implements OnInit {
 
   public addNode() {
     this.nodes = [...this.nodes, {
-      id: uuid(),
+      id: crypto.randomUUID(),
       point: { x: 200, y: 200 },
       type: 'default'
 

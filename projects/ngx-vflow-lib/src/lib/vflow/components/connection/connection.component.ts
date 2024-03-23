@@ -4,7 +4,7 @@ import { straightPath } from '../../math/edge-path/straigh-path';
 import { SpacePointContextDirective } from '../../directives/space-point-context.directive';
 import { ConnectionModel } from '../../models/connection.model';
 import { bezierPath } from '../../math/edge-path/bezier-path';
-import { hashCode } from '../../../shared/utils/hash';
+import { hashCode } from '../../utils/hash';
 
 @Component({
   selector: 'g[connection]',

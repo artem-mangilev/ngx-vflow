@@ -3,7 +3,7 @@ import { NodeModel } from '../models/node.model';
 import { EdgeModel } from '../models/edge.model';
 import { ConnectionModel } from '../models/connection.model';
 import { Marker } from '../interfaces/marker.interface';
-import { hashCode } from '../../shared/utils/hash';
+import { hashCode } from '../utils/hash';
 
 @Injectable()
 export class FlowEntitiesService {
