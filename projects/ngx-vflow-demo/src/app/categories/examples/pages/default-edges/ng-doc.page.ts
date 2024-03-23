@@ -1,12 +1,13 @@
 import { NgDocPage } from '@ng-doc/core';
 import ExamplesCategory from '../../ng-doc.category'
-import { VflowEdgesDemoComponent } from './demo/vflow-edges-demo.component';
+import { DefaultEdgesDemoComponent } from './demo/default-edges-demo.component';
 
 const TestPage: NgDocPage = {
-  title: `Edges`,
+  title: `Default edges`,
   mdFile: './index.md',
   category: ExamplesCategory,
-  demos: { VflowEdgesDemoComponent }
+  demos: { DefaultEdgesDemoComponent },
+  order: 2
 };
 
 export default TestPage;
