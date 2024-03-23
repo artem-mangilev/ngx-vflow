@@ -3,6 +3,7 @@ import { Point } from '../../interfaces/point.interface';
 import { Path, path as d3Path } from 'd3-path';
 import { UsingPoints } from '../../types/using-points.type';
 import { Position } from '../../types/position.type';
+import { getPointOnLineByRatio } from '../point-on-line-by-ratio';
 
 export function bezierPath(
   source: Point,
@@ -126,37 +127,25 @@ function getPointOnBezier(
   controlPoint2: Point,
   ratio: number
 ): Point {
-  const fromSourceToFirstControl: Point = getPointOnLine(
+  const fromSourceToFirstControl: Point = getPointOnLineByRatio(
     sourcePoint,
     controlPoint1,
     ratio
   );
-  const fromFirstControlToSecond: Point = getPointOnLine(
+  const fromFirstControlToSecond: Point = getPointOnLineByRatio(
     controlPoint1,
     controlPoint2,
     ratio
   );
-  const fromSecondControlToTarget: Point = getPointOnLine(
+  const fromSecondControlToTarget: Point = getPointOnLineByRatio(
     controlPoint2,
     targetPoint,
     ratio
   );
 
-  return getPointOnLine(
-    getPointOnLine(fromSourceToFirstControl, fromFirstControlToSecond, ratio),
-    getPointOnLine(fromFirstControlToSecond, fromSecondControlToTarget, ratio),
+  return getPointOnLineByRatio(
+    getPointOnLineByRatio(fromSourceToFirstControl, fromFirstControlToSecond, ratio),
+    getPointOnLineByRatio(fromFirstControlToSecond, fromSecondControlToTarget, ratio),
     ratio
   );
-}
-
-/**
- * Get point on line
- *
- * https://math.stackexchange.com/questions/563566/how-do-i-find-the-middle1-2-1-3-1-4-etc-of-a-line
- */
-function getPointOnLine(start: Point, end: Point, ratio: number): Point {
-  return {
-    x: (1 - ratio) * start.x + ratio * end.x,
-    y: (1 - ratio) * start.y + ratio * end.y,
-  };
 }
