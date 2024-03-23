@@ -1,9 +1,8 @@
-
-import { PathData } from "../../interfaces/path-data.interface";
-import { Point } from "../../interfaces/point.interface";
-import { Path, path as d3Path } from 'd3-path'
-import { UsingPoints } from "../../types/using-points.type";
-import { Position } from "../../types/position.type";
+import { PathData } from '../../interfaces/path-data.interface';
+import { Point } from '../../interfaces/point.interface';
+import { Path, path as d3Path } from 'd3-path';
+import { UsingPoints } from '../../types/using-points.type';
+import { Position } from '../../types/position.type';
 
 export function bezierPath(
   source: Point,
@@ -12,175 +11,79 @@ export function bezierPath(
   targetPosition: Position,
   usingPoints: UsingPoints = [false, false, false]
 ): PathData {
-  if (sourcePosition === 'left' && targetPosition === 'right') {
-    return bezierPathRtl(source, target, usingPoints)
-  }
+  const path = d3Path();
 
-  if (sourcePosition === 'right' && targetPosition === 'left') {
-    return bezierPathLtr(source, target, usingPoints)
-  }
+  path.moveTo(source.x, source.y);
 
-  if (sourcePosition === 'bottom' && targetPosition === 'top') {
-    return bezierPathTtb(source, target, usingPoints)
-  }
+  let distance = { x: source.x - target.x, y: source.y - target.y };
 
-  if (sourcePosition === 'top' && targetPosition === 'bottom') {
-    return bezierPathBtt(source, target, usingPoints)
-  }
+  const firstControl = calcControlPoint(source, sourcePosition, distance);
+  const secondControl = calcControlPoint(target, targetPosition, distance);
 
-  throw new Error('Unhandled combination of sourcePosition and targetPosition')
+  path.bezierCurveTo(
+    firstControl.x,
+    firstControl.y,
+    secondControl.x,
+    secondControl.y,
+    target.x,
+    target.y
+  );
+  return getPathData(
+    path,
+    source,
+    target,
+    firstControl,
+    secondControl,
+    usingPoints
+  );
 }
 
 /**
- * Left-to-right direction
+ * Calculate control point based on provided point
+ *
+ * @param point relative this point control point is gonna be computed (the source or the target)
+ * @param pointPosition position of {point} on block
+ * @param distance Transmits the distance between the source and the target as x and y coordinates
+ * @returns
  */
-function bezierPathLtr(source: Point, target: Point, usingPoints: UsingPoints): PathData {
-  const path = d3Path()
 
-  path.moveTo(source.x, source.y)
+function calcControlPoint(
+  point: Point,
+  pointPosition: Position,
+  distance: Point
+) {
+  let factorPoint = { x: 0, y: 0 };
 
-  let firstControl: Point
-  let secondControl: Point
-
-  if (source.x > target.x) {
-    const distance = source.x - target.x
-
-    // TODO: probably need to make this configurable
-    const curvature = .25
-    // thanks colleagues from react/svelte world
-    // https://github.com/xyflow/xyflow/blob/f0117939bae934447fa7f232081f937169ee23b5/packages/system/src/utils/edges/bezier-edge.ts#L56
-    const controlOffset = curvature * 25 * Math.sqrt(distance)
-
-    firstControl = { x: source.x + controlOffset, y: source.y }
-    secondControl = { x: target.x - controlOffset, y: target.y }
-  } else {
-    const middleX = (source.x + target.x) / 2
-
-    firstControl = { x: middleX, y: source.y }
-    secondControl = { x: middleX, y: target.y }
+  switch (pointPosition) {
+    case 'top':
+      factorPoint.y = 1;
+      break;
+    case 'bottom':
+      factorPoint.y = -1;
+      break;
+    case 'right':
+      factorPoint.x = 1;
+      break;
+    case 'left':
+      factorPoint.x = -1;
+      break;
   }
 
-  path.bezierCurveTo(
-    firstControl.x, firstControl.y,
-    secondControl.x, secondControl.y,
-    target.x, target.y
-  )
+  distance = {
+    x: distance.x * Math.abs(factorPoint.x),
+    y: distance.y * Math.abs(factorPoint.y),
+  };
+  // TODO: probably need to make this configurable
+  const curvature = 0.25;
+  // thanks colleagues from react/svelte world
+  // https://github.com/xyflow/xyflow/blob/f0117939bae934447fa7f232081f937169ee23b5/packages/system/src/utils/edges/bezier-edge.ts#L56
+  const controlOffset =
+    curvature * 25 * Math.sqrt(Math.abs(distance.x + distance.y));
 
-  return getPathData(path, source, target, firstControl, secondControl, usingPoints)
-}
-
-/**
- * Right-to-left direction
- */
-function bezierPathRtl(source: Point, target: Point, usingPoints: UsingPoints): PathData {
-  const path = d3Path()
-
-  path.moveTo(source.x, source.y)
-
-  let firstControl: Point
-  let secondControl: Point
-
-  if (source.x < target.x) {
-    const distance = target.x - source.x
-
-    // TODO: probably need to make this configurable
-    const curvature = .25
-    // thanks colleagues from react/svelte world
-    // https://github.com/xyflow/xyflow/blob/f0117939bae934447fa7f232081f937169ee23b5/packages/system/src/utils/edges/bezier-edge.ts#L56
-    const controlOffset = curvature * 25 * Math.sqrt(distance)
-
-    firstControl = { x: source.x - controlOffset, y: source.y }
-    secondControl = { x: target.x + controlOffset, y: target.y }
-  } else {
-    const middleX = (source.x + target.x) / 2
-
-    firstControl = { x: middleX, y: source.y }
-    secondControl = { x: middleX, y: target.y }
-  }
-
-  path.bezierCurveTo(
-    firstControl.x, firstControl.y,
-    secondControl.x, secondControl.y,
-    target.x, target.y
-  )
-
-  return getPathData(path, source, target, firstControl, secondControl, usingPoints)
-}
-
-/**
- * Bottom-to-top
- */
-function bezierPathBtt(source: Point, target: Point, usingPoints: UsingPoints): PathData {
-  const path = d3Path()
-
-  path.moveTo(source.x, source.y)
-
-  let firstControl: Point
-  let secondControl: Point
-
-  if (source.y < target.y) {
-    const distance = target.y - source.y
-
-    // TODO: probably need to make this configurable
-    const curvature = .25
-    // thanks colleagues from react/svelte world
-    // https://github.com/xyflow/xyflow/blob/f0117939bae934447fa7f232081f937169ee23b5/packages/system/src/utils/edges/bezier-edge.ts#L56
-    const controlOffset = curvature * 25 * Math.sqrt(distance)
-
-    firstControl = { x: source.x, y: source.y - controlOffset }
-    secondControl = { x: target.x, y: target.y + controlOffset }
-  } else {
-    const middleY = (source.y + target.y) / 2
-
-    firstControl = { x: source.x, y: middleY }
-    secondControl = { x: target.x, y: middleY }
-  }
-
-  path.bezierCurveTo(
-    firstControl.x, firstControl.y,
-    secondControl.x, secondControl.y,
-    target.x, target.y
-  )
-
-  return getPathData(path, source, target, firstControl, secondControl, usingPoints)
-}
-
-/**
- * Top to bottom
- */
-function bezierPathTtb(source: Point, target: Point, usingPoints: UsingPoints): PathData {
-  const path = d3Path()
-
-  path.moveTo(source.x, source.y)
-
-  let firstControl: Point
-  let secondControl: Point
-
-  if (source.y > target.y) {
-    const distance = source.y - target.y
-
-    // TODO: probably need to make this configurable
-    const curvature = .25
-    // thanks colleagues from react/svelte world
-    // https://github.com/xyflow/xyflow/blob/f0117939bae934447fa7f232081f937169ee23b5/packages/system/src/utils/edges/bezier-edge.ts#L56
-    const controlOffset = curvature * 25 * Math.sqrt(distance)
-
-    firstControl = { x: source.x, y: source.y + controlOffset }
-    secondControl = { x: target.x, y: target.y - controlOffset }
-  } else {
-    const middleY = (source.y + target.y) / 2
-
-    firstControl = { x: source.x, y: middleY }
-    secondControl = { x: target.x, y: middleY }
-  }
-
-  path.bezierCurveTo(
-    firstControl.x, firstControl.y,
-    secondControl.x, secondControl.y,
-    target.x, target.y
-  )
-
-  return getPathData(path, source, target, firstControl, secondControl, usingPoints)
+  return {
+    x: point.x + factorPoint.x * controlOffset,
+    y: point.y - factorPoint.y * controlOffset,
+  };
 }
 
 function getPathData(
@@ -191,18 +94,24 @@ function getPathData(
   secondControl: Point,
   usingPoints: UsingPoints
 ): PathData {
-  const [start, center, end] = usingPoints
+  const [start, center, end] = usingPoints;
 
-  const nullPoint = { x: 0, y: 0 }
+  const nullPoint = { x: 0, y: 0 };
 
   return {
     path: path.toString(),
     points: {
-      start: start ? getPointOnBezier(source, target, firstControl, secondControl, .10) : nullPoint,
-      center: center ? getPointOnBezier(source, target, firstControl, secondControl, .50) : nullPoint,
-      end: end ? getPointOnBezier(source, target, firstControl, secondControl, .90) : nullPoint,
-    }
-  }
+      start: start
+        ? getPointOnBezier(source, target, firstControl, secondControl, 0.1)
+        : nullPoint,
+      center: center
+        ? getPointOnBezier(source, target, firstControl, secondControl, 0.5)
+        : nullPoint,
+      end: end
+        ? getPointOnBezier(source, target, firstControl, secondControl, 0.9)
+        : nullPoint,
+    },
+  };
 }
 
 /**
@@ -215,9 +124,21 @@ function getPointOnBezier(
   controlPoint2: Point,
   ratio: number
 ): Point {
-  const fromSourceToFirstControl: Point = getPointOnLine(sourcePoint, controlPoint1, ratio);
-  const fromFirstControlToSecond: Point = getPointOnLine(controlPoint1, controlPoint2, ratio);
-  const fromSecondControlToTarget: Point = getPointOnLine(controlPoint2, targetPoint, ratio);
+  const fromSourceToFirstControl: Point = getPointOnLine(
+    sourcePoint,
+    controlPoint1,
+    ratio
+  );
+  const fromFirstControlToSecond: Point = getPointOnLine(
+    controlPoint1,
+    controlPoint2,
+    ratio
+  );
+  const fromSecondControlToTarget: Point = getPointOnLine(
+    controlPoint2,
+    targetPoint,
+    ratio
+  );
 
   return getPointOnLine(
     getPointOnLine(fromSourceToFirstControl, fromFirstControlToSecond, ratio),
@@ -227,13 +148,13 @@ function getPointOnBezier(
 }
 
 /**
-* Get point on line
-*
-* https://math.stackexchange.com/questions/563566/how-do-i-find-the-middle1-2-1-3-1-4-etc-of-a-line
-*/
+ * Get point on line
+ *
+ * https://math.stackexchange.com/questions/563566/how-do-i-find-the-middle1-2-1-3-1-4-etc-of-a-line
+ */
 function getPointOnLine(start: Point, end: Point, ratio: number): Point {
   return {
-    x: ((1 - ratio) * start.x) + ((ratio) * end.x),
-    y: ((1 - ratio) * start.y) + (ratio * end.y),
+    x: (1 - ratio) * start.x + ratio * end.x,
+    y: (1 - ratio) * start.y + ratio * end.y,
   };
 }
