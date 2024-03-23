@@ -1,12 +1,13 @@
 import { NgDocPage } from '@ng-doc/core';
 import ExamplesCategory from '../../ng-doc.category'
-import { VflowDemoComponent } from './demo/vflow-demo.component'
+import { DefaultNodesDemoComponent } from './demo/default-nodes-demo.component';
 
 const TestPage: NgDocPage = {
-  title: `Nodes`,
+  title: `Default nodes`,
   mdFile: './index.md',
   category: ExamplesCategory,
-  demos: { VflowDemoComponent }
+  demos: { DefaultNodesDemoComponent },
+  order: 1
 };
 
 export default TestPage;
