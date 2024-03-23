@@ -15,10 +15,10 @@ export function bezierPath(
 
   path.moveTo(source.x, source.y);
 
-  let distance = { x: source.x - target.x, y: source.y - target.y };
+  const distanceVector = { x: source.x - target.x, y: source.y - target.y };
 
-  const firstControl = calcControlPoint(source, sourcePosition, distance);
-  const secondControl = calcControlPoint(target, targetPosition, distance);
+  const firstControl = calcControlPoint(source, sourcePosition, distanceVector);
+  const secondControl = calcControlPoint(target, targetPosition, distanceVector);
 
   path.bezierCurveTo(
     firstControl.x,
@@ -28,6 +28,7 @@ export function bezierPath(
     target.x,
     target.y
   );
+
   return getPathData(
     path,
     source,
@@ -43,16 +44,15 @@ export function bezierPath(
  *
  * @param point relative this point control point is gonna be computed (the source or the target)
  * @param pointPosition position of {point} on block
- * @param distance Transmits the distance between the source and the target as x and y coordinates
- * @returns
+ * @param distanceVector transmits the distance between the source and the target as x and y coordinates
  */
 
 function calcControlPoint(
   point: Point,
   pointPosition: Position,
-  distance: Point
+  distanceVector: Point
 ) {
-  let factorPoint = { x: 0, y: 0 };
+  const factorPoint = { x: 0, y: 0 };
 
   switch (pointPosition) {
     case 'top':
@@ -69,16 +69,18 @@ function calcControlPoint(
       break;
   }
 
-  distance = {
-    x: distance.x * Math.abs(factorPoint.x),
-    y: distance.y * Math.abs(factorPoint.y),
+  // TODO: explain name
+  const fullDistanceVector = {
+    x: distanceVector.x * Math.abs(factorPoint.x),
+    y: distanceVector.y * Math.abs(factorPoint.y),
   };
+
   // TODO: probably need to make this configurable
   const curvature = 0.25;
   // thanks colleagues from react/svelte world
   // https://github.com/xyflow/xyflow/blob/f0117939bae934447fa7f232081f937169ee23b5/packages/system/src/utils/edges/bezier-edge.ts#L56
   const controlOffset =
-    curvature * 25 * Math.sqrt(Math.abs(distance.x + distance.y));
+    curvature * 25 * Math.sqrt(Math.abs(fullDistanceVector.x + fullDistanceVector.y));
 
   return {
     x: point.x + factorPoint.x * controlOffset,
