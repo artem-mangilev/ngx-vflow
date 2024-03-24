@@ -1,8 +1,9 @@
 import { Directive, TemplateRef, inject } from '@angular/core';
+import { EdgeContext } from '../interfaces/template-context.interface';
 
 @Directive({ selector: 'ng-template[edge]' })
 export class EdgeTemplateDirective {
-  public templateRef = inject(TemplateRef)
+  public templateRef = inject<TemplateRef<EdgeContext>>(TemplateRef)
 }
 
 @Directive({ selector: 'ng-template[connection]' })

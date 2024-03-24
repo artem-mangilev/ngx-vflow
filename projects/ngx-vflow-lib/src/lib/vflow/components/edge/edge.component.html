@@ -9,7 +9,7 @@
 />
 
 <ng-container *ngIf="model.type === 'template' && edgeTemplate">
-  <ng-container *ngTemplateOutlet="edgeTemplate; context: getContext()"></ng-container>
+  <ng-container *ngTemplateOutlet="edgeTemplate; context: edgeContext"></ng-container>
 </ng-container>
 
 <ng-container *ngIf="model.edgeLabels?.start as label">
