@@ -20,3 +20,8 @@ export * from './lib/vflow/types/position.type';
 
 // Components
 export * from './lib/vflow/components/vflow/vflow.component';
+
+// Directives
+export * from './lib/vflow/directives/template.directive';
+export * from './lib/vflow/directives/connection-controller.directive';
+export * from './lib/vflow/directives/changes-controller.directive';

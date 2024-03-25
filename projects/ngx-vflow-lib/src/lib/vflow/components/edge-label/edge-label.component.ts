@@ -10,8 +10,10 @@ import { Point } from '../../interfaces/point.interface';
     .edge-label-wrapper {
       width: max-content;
 
-      // this is a fix for bug in chrome, for some reason if the div fully matches the size
-      // of foreignObject there are occurs some visual artifacts around this div
+      /*
+        this is a fix for bug in chrome, for some reason if the div fully matches the size
+        of foreignObject there are occurs some visual artifacts around this div
+       */
       margin-top: 1px;
       margin-left: 1px;
     }
