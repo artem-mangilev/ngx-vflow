@@ -1,18 +1,19 @@
-import { ChangeDetectionStrategy, Component, Input, TemplateRef, computed } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnInit, Signal, TemplateRef, computed } from '@angular/core';
 import { EdgeModel } from '../../models/edge.model';
 import { hashCode } from '../../utils/hash';
+import { EdgeContext } from '../../interfaces/template-context.interface';
 
 @Component({
   selector: 'g[edge]',
   templateUrl: './edge.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class EdgeComponent {
+export class EdgeComponent implements OnInit {
   @Input()
   public model!: EdgeModel
 
   @Input()
-  public edgeTemplate?: TemplateRef<any>
+  public edgeTemplate?: TemplateRef<EdgeContext>
 
   @Input()
   public edgeLabelHtmlTemplate?: TemplateRef<any>
@@ -31,12 +32,16 @@ export class EdgeComponent {
 
   protected readonly defaultColor = 'rgb(177, 177, 183)'
 
-  public getContext() {
-    return {
+  protected edgeContext!: EdgeContext
+
+  public ngOnInit(): void {
+    this.edgeContext = {
       $implicit: {
+        // TODO: check if edge could change
         edge: this.model.edge,
-        // TODO create signal outside context
-        path: computed(() => this.model.path().path)
+        path: computed(() => this.model.path().path),
+        markerStart: this.markerStartUrl,
+        markerEnd: this.markerEndUrl
       }
     }
   }

@@ -14,7 +14,7 @@
 >
   <div #htmlWrapper class="wrapper">
     <ng-container
-      *ngTemplateOutlet="nodeHtmlTemplate; context: { $implicit: nodeModel.node }"
+      *ngTemplateOutlet="nodeHtmlTemplate; context: { $implicit: { node: nodeModel.node }  }"
     />
   </div>
 </svg:foreignObject>
