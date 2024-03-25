@@ -1,6 +1,6 @@
 {
   "name": "ngx-vflow",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "license": "MIT",
   "scripts": {
     "publish:major": "npm version major && ng build ngx-vflow-lib && cd ../../dist/ngx-vflow-lib && npm publish",
