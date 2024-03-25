@@ -12,7 +12,11 @@
     "@angular/core": "^16.2.0 || 17.x"
   },
   "dependencies": {
-    "tslib": "^2.3.0"
+    "tslib": "^2.3.0",
+    "d3-drag": "^3.0.0",
+    "d3-path": "^3.1.0",
+    "d3-selection": "^3.0.0",
+    "d3-zoom": "^3.0.0"
   },
   "sideEffects": false
 }
