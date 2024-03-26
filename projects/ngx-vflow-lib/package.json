@@ -1,7 +1,16 @@
 {
   "name": "ngx-vflow",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "license": "MIT",
+  "homepage": "https://github.com/artem-mangilev/ngx-vflow#readme",
+  "author": "Artem Mangilev",
+  "keywords": [
+    "angular",
+    "node-based UI",
+    "graph",
+    "diagram",
+    "workflow"
+  ],
   "scripts": {
     "publish:major": "npm version major && ng build ngx-vflow-lib && cd ../../dist/ngx-vflow-lib && npm publish",
     "publish:minor": "npm version minor && ng build ngx-vflow-lib && cd ../../dist/ngx-vflow-lib && npm publish",
