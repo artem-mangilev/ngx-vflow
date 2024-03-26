@@ -58,7 +58,7 @@ export class DefaultEdgesDemoComponent {
 
 The code above renders to this:
 
-<img width="396" alt="image" src="https://github.com/artem-mangilev/ngx-vflow/assets/53087914/2148dc87-9e9a-40c5-94ce-5b375a4ac97a">
+<img width="398" alt="image" src="https://github.com/artem-mangilev/ngx-vflow/assets/53087914/2a1b778a-2bfa-4176-9d50-065fdb1f1dec">
 
 For more complex example you may see the documentation: https://www.ngx-vflow.org/
 
