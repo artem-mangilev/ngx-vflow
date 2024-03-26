@@ -56,11 +56,11 @@ const changesControllerHostDirective = {
 })
 export class VflowComponent {
   // #region DI
-  protected viewportService = inject(ViewportService)
-  protected flowEntitiesService = inject(FlowEntitiesService)
-  protected nodesChangeService = inject(NodesChangeService)
-  protected edgesChangeService = inject(EdgeChangesService)
-  protected injector = inject(Injector)
+  private viewportService = inject(ViewportService)
+  private flowEntitiesService = inject(FlowEntitiesService)
+  private nodesChangeService = inject(NodesChangeService)
+  private edgesChangeService = inject(EdgeChangesService)
+  private injector = inject(Injector)
   // #endregion
 
   // #region SETTINGS
@@ -92,7 +92,7 @@ export class VflowComponent {
   /**
    * Object that controls flow direction.
    *
-   * @example if you want to archieve right to left direction
+   * For example, if you want to archieve right to left direction
    * then you need to pass these positions { source: 'left', target: 'right' }
    *
    * ! Be carefult using this field, it may depricate in future releases !
@@ -111,7 +111,7 @@ export class VflowComponent {
   /**
    * Settings for connection (it renders when user tries to create edge between nodes)
    *
-   * @see `ConnectionSettings`
+   * You need to pass `ConnectionSettings` in this input.
    */
   @Input({ transform: (settings: ConnectionSettings) => new ConnectionModel(settings) })
   public set connection(connection: ConnectionModel) { this.flowEntitiesService.connection.set(connection) }
@@ -121,7 +121,7 @@ export class VflowComponent {
 
   // #region MAIN_INPUTS
   /**
-   * Data for rendered nodes
+   * Nodes to render
    */
   @Input({ required: true })
   public set nodes(newNodes: Node[]) {
@@ -138,13 +138,10 @@ export class VflowComponent {
     this.flowEntitiesService.nodes.set(newModels)
   }
 
-  /**
-   * @internal
-   */
   protected get nodeModels() { return this.flowEntitiesService.nodes() }
 
   /**
-   * Data for rendered edges
+   * Edges to render
    */
   @Input()
   public set edges(newEdges: Edge[]) {

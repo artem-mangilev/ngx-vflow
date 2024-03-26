@@ -14,9 +14,15 @@ export class ChangesControllerDirective {
   protected nodesChangeService = inject(NodesChangeService)
   protected edgesChangeService = inject(EdgeChangesService)
 
+  /**
+   * Watch nodes change
+   */
   @Output()
   public onNodesChange = new EventEmitter<NodeChange[]>()
 
+  /**
+   * Watch nodes change
+   */
   @Output()
   public onEdgesChange = new EventEmitter<EdgeChange[]>()
 
