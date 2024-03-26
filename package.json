@@ -7,7 +7,7 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "gh-pages": "ng build ngx-vflow-demo --base-href \"ngx-vflow\" && npx angular-cli-ghpages --dir=dist/ngx-vflow-demo"
+    "gh-pages": "ng build ngx-vflow-demo && npx angular-cli-ghpages --cname=www.ngx-vflow.org --dir=dist/ngx-vflow-demo"
   },
   "private": true,
   "dependencies": {
