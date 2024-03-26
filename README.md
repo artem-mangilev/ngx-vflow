@@ -1,27 +1,71 @@
 # ngx-vflow
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 16.2.0.
+ngx-vflow is an Angular library for creating node-based applications. It aims to assist you in building anything from a static diagram to a visual editor. You can utilize the default design or apply your own by customizing everything using familiar technologies.
 
-## Development server
+## Installation
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+```
+npm i ngx-vflow --save
+```
 
-## Code scaffolding
+## Basic Example
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+The following code describes 3 nodes and creates 2 edges between them.
 
-## Build
+```ts
+@Component({
+  template: `<vflow [nodes]="nodes" [edges]="edges" />`,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: true,
+  imports: [VflowModule]
+})
+export class DefaultEdgesDemoComponent {
+  public nodes: Node[] = [
+    {
+      id: '1',
+      point: { x: 10, y: 200 },
+      type: 'default',
+      text: '1'
+    },
+    {
+      id: '2',
+      point: { x: 200, y: 100 },
+      type: 'default',
+      text: '2'
+    },
+    {
+      id: '3',
+      point: { x: 200, y: 300 },
+      type: 'default',
+      text: '3'
+    },
+  ]
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+  public edges: Edge[] = [
+    {
+      id: '1 -> 2',
+      source: '1',
+      target: '2'
+    },
+    {
+      id: '1 -> 3',
+      source: '1',
+      target: '3'
+    },
+  ]
+}
+```
 
-## Running unit tests
+The code above renders to this:
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+<img width="400" alt="image" src="https://github.com/artem-mangilev/ngx-vflow/assets/53087914/d9a920d8-5114-489a-acb4-031239fcdf35">
 
-## Running end-to-end tests
+For more complex example you may see the documentation: https://www.ngx-vflow.org/
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+## API
 
-## Further help
+`vflow` component API is described here: https://www.ngx-vflow.org/api/ngx-vflow/classes/VflowComponent
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+## License 
+
+MIT
