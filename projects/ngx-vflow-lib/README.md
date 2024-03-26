@@ -1,24 +1,76 @@
 # ngx-vflow
 
-This library was generated with [Angular CLI](https://github.com/angular/angular-cli) version 16.2.0.
+ngx-vflow is an Angular library for creating node-based applications. It aims to assist you in building anything from a static diagram to a visual editor. You can utilize the default design or apply your own by customizing everything using familiar technologies.
 
-## Code scaffolding
+## Installation
 
-Run `ng generate component component-name --project ngx-vflow-lib` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module --project ngx-vflow-lib`.
-> Note: Don't forget to add `--project ngx-vflow-lib` or else it will be added to the default project in your `angular.json` file. 
+```
+npm i ngx-vflow --save
+```
 
-## Build
+## Basic Example
 
-Run `ng build ngx-vflow-lib` to build the project. The build artifacts will be stored in the `dist/` directory.
+The following code describes 3 nodes and creates 2 edges between them.
 
-## Publishing
+```ts
+@Component({
+  template: `<vflow [nodes]="nodes" [edges]="edges" />`,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: true,
+  imports: [VflowModule]
+})
+export class DefaultEdgesDemoComponent {
+  public nodes: Node[] = [
+    {
+      id: '1',
+      point: { x: 10, y: 200 },
+      type: 'default',
+      text: '1'
+    },
+    {
+      id: '2',
+      point: { x: 200, y: 100 },
+      type: 'default',
+      text: '2'
+    },
+    {
+      id: '3',
+      point: { x: 200, y: 300 },
+      type: 'default',
+      text: '3'
+    },
+  ]
 
-After building your library with `ng build ngx-vflow-lib`, go to the dist folder `cd dist/ngx-vflow-lib` and run `npm publish`.
+  public edges: Edge[] = [
+    {
+      id: '1 -> 2',
+      source: '1',
+      target: '2'
+    },
+    {
+      id: '1 -> 3',
+      source: '1',
+      target: '3'
+    },
+  ]
+}
+```
 
-## Running unit tests
+The code above renders to this:
 
-Run `ng test ngx-vflow-lib` to execute the unit tests via [Karma](https://karma-runner.github.io).
+<img width="400" alt="image" src="https://github.com/artem-mangilev/ngx-vflow/assets/53087914/d9a920d8-5114-489a-acb4-031239fcdf35">
 
-## Further help
+For more complex example you may see the documentation: https://www.ngx-vflow.org/
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+## API
+
+`vflow` component API is described here: https://www.ngx-vflow.org/api/ngx-vflow/classes/VflowComponent
+
+Host directives for `vflow` that you may find helpful:
+
+- https://www.ngx-vflow.org/api/ngx-vflow/classes/ConnectionControllerDirective
+- https://www.ngx-vflow.org/api/ngx-vflow/classes/ChangesControllerDirective
+
+## License 
+
+MIT
