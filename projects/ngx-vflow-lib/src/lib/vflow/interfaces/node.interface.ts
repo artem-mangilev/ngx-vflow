@@ -4,18 +4,18 @@ export type Node<T = unknown> = SharedNode & (
   DefaultNode |
   HtmlTemplateNode<T>
 )
-interface SharedNode {
+export interface SharedNode {
   id: string
   point: Point
   draggable?: boolean
 }
 
-interface DefaultNode {
+export interface DefaultNode {
   type: 'default'
   text?: string
 }
 
-interface HtmlTemplateNode<T = unknown> {
+export interface HtmlTemplateNode<T = unknown> {
   type: 'html-template'
   data?: T
 }
