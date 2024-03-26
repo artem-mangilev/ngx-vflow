@@ -66,6 +66,11 @@ For more complex example you may see the documentation: https://www.ngx-vflow.or
 
 `vflow` component API is described here: https://www.ngx-vflow.org/api/ngx-vflow/classes/VflowComponent
 
+Host directives for `vflow` that you may find helpful:
+
+- https://www.ngx-vflow.org/api/ngx-vflow/classes/ConnectionControllerDirective
+- https://www.ngx-vflow.org/api/ngx-vflow/classes/ChangesControllerDirective
+
 ## License 
 
 MIT
