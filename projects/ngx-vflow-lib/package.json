@@ -1,6 +1,6 @@
 {
   "name": "ngx-vflow",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "license": "MIT",
   "homepage": "https://github.com/artem-mangilev/ngx-vflow#readme",
   "author": "Artem Mangilev",
@@ -11,6 +11,10 @@
     "diagram",
     "workflow"
   ],
+  "repository": {
+    "url": "https://github.com/artem-mangilev/ngx-vflow",
+    "type": "git"
+  },
   "scripts": {
     "publish:major": "npm version major && ng build ngx-vflow-lib && cd ../../dist/ngx-vflow-lib && npm publish",
     "publish:minor": "npm version minor && ng build ngx-vflow-lib && cd ../../dist/ngx-vflow-lib && npm publish",
