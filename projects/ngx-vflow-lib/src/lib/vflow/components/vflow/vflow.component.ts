@@ -77,26 +77,52 @@ export class VflowComponent {
     this.flowModel.view.set(view)
   }
 
+  /**
+   * Minimum zoom value
+   */
   @Input()
   public minZoom = 0.5
 
+  /**
+   * Maximum zoom value
+   */
   @Input()
   public maxZoom = 3
 
+  /**
+   * Object that controls flow direction.
+   *
+   * @example if you want to archieve right to left direction
+   * then you need to pass these positions { source: 'left', target: 'right' }
+   *
+   * ! Be carefult using this field, it may depricate in future releases !
+   */
   @Input()
   public set handlePositions(handlePositions: HandlePositions) {
     this.flowModel.handlePositions.set(handlePositions)
   }
 
+  /**
+   * Background color for flow
+   */
   @Input()
   public background: string = '#FFFFFF'
 
+  /**
+   * Settings for connection (it renders when user tries to create edge between nodes)
+   *
+   * @see `ConnectionSettings`
+   */
   @Input({ transform: (settings: ConnectionSettings) => new ConnectionModel(settings) })
   public set connection(connection: ConnectionModel) { this.flowEntitiesService.connection.set(connection) }
+
   public get connection() { return this.flowEntitiesService.connection() }
   // #endregion
 
   // #region MAIN_INPUTS
+  /**
+   * Data for rendered nodes
+   */
   @Input({ required: true })
   public set nodes(newNodes: Node[]) {
     const newModels = runInInjectionContext(this.injector,
@@ -112,8 +138,14 @@ export class VflowComponent {
     this.flowEntitiesService.nodes.set(newModels)
   }
 
-  public get nodeModels() { return this.flowEntitiesService.nodes() }
+  /**
+   * @internal
+   */
+  protected get nodeModels() { return this.flowEntitiesService.nodes() }
 
+  /**
+   * Data for rendered edges
+   */
   @Input()
   public set edges(newEdges: Edge[]) {
     const newModels = ReferenceKeeper.edges(newEdges, this.flowEntitiesService.edges())
@@ -124,7 +156,7 @@ export class VflowComponent {
     this.flowEntitiesService.edges.set(newModels)
   }
 
-  public get edgeModels() { return this.flowEntitiesService.validEdges() }
+  protected get edgeModels() { return this.flowEntitiesService.validEdges() }
   // #endregion
 
   // #region TEMPLATES
@@ -150,21 +182,39 @@ export class VflowComponent {
   // #endregion
 
   // #region SIGNAL_API
+  /**
+   * Signal for reading viewport change
+   */
   public readonly viewport = this.viewportService.readableViewport.asReadonly()
 
+  /**
+   * Signal for reading nodes change
+   */
   public readonly nodesChange =
     toSignal(this.nodesChangeService.changes$, { initialValue: [] as NodeChange[] })
 
+  /**
+   * Signal to reading edges change
+   */
   public readonly edgesChange =
     toSignal(this.edgesChangeService.changes$, { initialValue: [] as EdgeChange[] })
   // #endregion
 
   // #region RX_API
-  public readonly viewportChanges$ = toObservable(this.viewportService.readableViewport)
+  /**
+   * Observable with viewport change
+   */
+  public readonly viewportChange$ = toObservable(this.viewportService.readableViewport)
     .pipe(skip(1)) // skip default value that set by signal
 
+  /**
+   * Observable with nodes change
+   */
   public readonly nodesChange$ = this.nodesChangeService.changes$
 
+  /**
+   * Observable with nodes change
+   */
   public readonly edgesChange$ = this.edgesChangeService.changes$
   // #endregion
 
@@ -174,18 +224,38 @@ export class VflowComponent {
   protected markers = this.flowEntitiesService.markers
 
   // #region METHODS_API
+  /**
+   * Change viewport to specified state
+   *
+   * @param viewport viewport state
+   */
   public viewportTo(viewport: ViewportState): void {
     this.viewportService.writableViewport.set({ changeType: 'absolute', state: viewport })
   }
 
+  /**
+   * Change zoom
+   *
+   * @param zoom zoom value
+   */
   public zoomTo(zoom: number): void {
     this.viewportService.writableViewport.set({ changeType: 'absolute', state: { zoom } })
   }
 
+  /**
+   * Move to specified coordinate
+   *
+   * @param point point where to move
+   */
   public panTo(point: Point): void {
     this.viewportService.writableViewport.set({ changeType: 'absolute', state: point })
   }
 
+  /**
+   * Get node by id
+   *
+   * @param id node id
+   */
   public getNode<T = unknown>(id: string): Node<T> | undefined {
     return this.flowEntitiesService.getNode<T>(id)?.node
   }

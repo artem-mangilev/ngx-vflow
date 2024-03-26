@@ -30,7 +30,8 @@
     "lib": [
       "ES2022",
       "dom"
-    ]
+    ],
+    "stripInternal": true
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
