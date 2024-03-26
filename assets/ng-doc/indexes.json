@@ -2,30 +2,6 @@
   {
     "breadcrumbs": [
       "Getting Started",
-      "Principles"
-    ],
-    "pageType": "guide",
-    "title": "Principles",
-    "section": "Principles",
-    "route": "/getting-started/principles",
-    "fragment": "principles",
-    "content": "This page contains a list of general principles that impact feature implementation. No hidden mutations of your data. For example, the library does not modify any of the Node or Edge objects you pass in as inputs. Instead, it creates internal models around these entities and operates on them. Any changes to the passed entities can be observed with events.This principle also implies that you are responsible for managing invalid data. For instance, if you delete a node, edges corresponding to this node will not be deleted automatically. However, the library will notify you about detached edges so that you can easily delete them."
-  },
-  {
-    "breadcrumbs": [
-      "Getting Started",
-      "Roadmap"
-    ],
-    "pageType": "guide",
-    "title": "Roadmap",
-    "section": "Roadmap",
-    "route": "/getting-started/roadmap",
-    "fragment": "roadmap",
-    "content": "This is a roadmap for ngx-vflow: allow more than 2 handles on node, and further handles API improvementssubflowsmore customization to default nodesimprove consistency across browsers (mainly appeals to Safari)improve documentationmore curvesselection mechanism, allow to select one or many nodesplugin systemminimapUI controls for flowsupport for layout engines (Dagree, etc.)more complex background (patterns)z-index emulation for selected entities, it's a bit hard for SVG-based renderermore events for different actionsmodal system for context menuHTML-based renderer as alternative to current SVG-based rendererExperimental canvas/webgl renderer for insane performance"
-  },
-  {
-    "breadcrumbs": [
-      "Getting Started",
       "What is ngx-vflow"
     ],
     "pageType": "guide",
@@ -49,51 +25,15 @@
   },
   {
     "breadcrumbs": [
-      "Examples",
-      "Choose direction"
+      "Getting Started",
+      "Roadmap"
     ],
     "pageType": "guide",
-    "title": "Choose direction",
-    "section": "Choose direction",
-    "route": "/examples/choose-direction",
-    "fragment": "choose-direction",
-    "content": "This API may depricate in future releases"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Choose direction"
-    ],
-    "pageType": "guide",
-    "title": "Choose direction",
-    "section": "Choose direction",
-    "route": "/examples/choose-direction",
-    "fragment": "choose-direction",
-    "content": "You can apply global setting for all handles with [handlePositions] input where you set on which side source and target handles should be placed, you can select."
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Choose direction"
-    ],
-    "pageType": "guide",
-    "title": "Choose direction",
-    "section": "Right to left direction",
-    "route": "/examples/choose-direction",
-    "fragment": "right-to-left-direction",
-    "content": "To archive this direction, you pass { source: 'left', target: 'right' } to [handlePositions]."
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Choose direction"
-    ],
-    "pageType": "guide",
-    "title": "Choose direction",
-    "section": "Top to bottom direction",
-    "route": "/examples/choose-direction",
-    "fragment": "top-to-bottom-direction",
-    "content": "To archive this direction, you pass { source: 'bottom', target: 'top' } to [handlePositions]."
+    "title": "Roadmap",
+    "section": "Roadmap",
+    "route": "/getting-started/roadmap",
+    "fragment": "roadmap",
+    "content": "This is a roadmap for ngx-vflow: allow more than 2 handles on node, and further handles API improvementssubflowsmore customization to default nodesimprove consistency across browsers (mainly appeals to Safari)improve documentationmore curvesselection mechanism, allow to select one or many nodesplugin systemminimapUI controls for flowsupport for layout engines (Dagree, etc.)more complex background (patterns)z-index emulation for selected entities, it's a bit hard for SVG-based renderermore events for different actionsmodal system for context menuHTML-based renderer as alternative to current SVG-based rendererExperimental canvas/webgl renderer for insane performance"
   },
   {
     "breadcrumbs": [
@@ -106,6 +46,18 @@
     "route": "/examples/connection-validation",
     "fragment": "connection-validation",
     "content": "ngx-vflow supports realtime sync validation of connections. Validation performs on user attempt to create new edge. By default, every connection is valid, but you can provide ConnectionSettings with validatior callback where you specify validation logic. For example, in this case validation passes only connection from 1 to 2 node. If validator returns false, (onConnect) even won't be called because there is no valid connection."
+  },
+  {
+    "breadcrumbs": [
+      "Getting Started",
+      "Principles"
+    ],
+    "pageType": "guide",
+    "title": "Principles",
+    "section": "Principles",
+    "route": "/getting-started/principles",
+    "fragment": "principles",
+    "content": "This page contains a list of general principles that impact feature implementation. No hidden mutations of your data. For example, the library does not modify any of the Node or Edge objects you pass in as inputs. Instead, it creates internal models around these entities and operates on them. Any changes to the passed entities can be observed with events.This principle also implies that you are responsible for managing invalid data. For instance, if you delete a node, edges corresponding to this node will not be deleted automatically. However, the library will notify you about detached edges so that you can easily delete them."
   },
   {
     "breadcrumbs": [
@@ -482,6 +434,114 @@
   {
     "breadcrumbs": [
       "Examples",
+      "Choose direction"
+    ],
+    "pageType": "guide",
+    "title": "Choose direction",
+    "section": "Choose direction",
+    "route": "/examples/choose-direction",
+    "fragment": "choose-direction",
+    "content": "This API may depricate in future releases"
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Choose direction"
+    ],
+    "pageType": "guide",
+    "title": "Choose direction",
+    "section": "Choose direction",
+    "route": "/examples/choose-direction",
+    "fragment": "choose-direction",
+    "content": "You can apply global setting for all handles with [handlePositions] input where you set on which side source and target handles should be placed, you can select."
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Choose direction"
+    ],
+    "pageType": "guide",
+    "title": "Choose direction",
+    "section": "Right to left direction",
+    "route": "/examples/choose-direction",
+    "fragment": "right-to-left-direction",
+    "content": "To archive this direction, you pass { source: 'left', target: 'right' } to [handlePositions]."
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Choose direction"
+    ],
+    "pageType": "guide",
+    "title": "Choose direction",
+    "section": "Top to bottom direction",
+    "route": "/examples/choose-direction",
+    "fragment": "top-to-bottom-direction",
+    "content": "To archive this direction, you pass { source: 'bottom', target: 'top' } to [handlePositions]."
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Default nodes"
+    ],
+    "pageType": "guide",
+    "title": "Default nodes",
+    "section": "Default nodes",
+    "route": "/examples/default-nodes",
+    "fragment": "default-nodes",
+    "content": "To get started, you just need to provide nodes array to vflow component."
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Labels"
+    ],
+    "pageType": "guide",
+    "title": "Labels",
+    "section": "Labels",
+    "route": "/examples/labels",
+    "fragment": "labels",
+    "content": "You can attach labels to edges by providing edgeLabels property to needed Edges. There's 3 slots available for lables on edge: start, center, end. Label is only of a html-template type, so you have to provide "
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Labels"
+    ],
+    "pageType": "guide",
+    "title": "Labels",
+    "section": "Labels",
+    "route": "/examples/labels",
+    "fragment": "labels",
+    "content": " inside vflow."
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Labels"
+    ],
+    "pageType": "guide",
+    "title": "Labels",
+    "section": "Context",
+    "route": "/examples/labels",
+    "fragment": "context",
+    "content": "You may access some data for label through let-ctx according to this interface."
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Markers"
+    ],
+    "pageType": "guide",
+    "title": "Markers",
+    "section": "Markers",
+    "route": "/examples/markers",
+    "fragment": "markers",
+    "content": "You could create markers for both edges and connections. For edges you could spicify start and end markers for corresponding parts of edge. Marker is now only two type's - arrow and arrow-closed. For connections you couls only specify end marker by marker property in ConnectionSettings."
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
       "Default connection"
     ],
     "pageType": "guide",
@@ -842,54 +902,6 @@
   {
     "breadcrumbs": [
       "Examples",
-      "Default edges"
-    ],
-    "pageType": "guide",
-    "title": "Default edges",
-    "section": "Default edges",
-    "route": "/examples/default-edges",
-    "fragment": "default-edges",
-    "content": "You can link nodes by edges. All you need to do is to create another Edge[] array and pass to vflow component. Each edge contains id of source and target nodes, also edge must have it's own id."
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Default nodes"
-    ],
-    "pageType": "guide",
-    "title": "Default nodes",
-    "section": "Default nodes",
-    "route": "/examples/default-nodes",
-    "fragment": "default-nodes",
-    "content": "To get started, you just need to provide nodes array to vflow component."
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Draggables"
-    ],
-    "pageType": "guide",
-    "title": "Draggables",
-    "section": "Draggables",
-    "route": "/examples/draggables",
-    "fragment": "draggables",
-    "content": "On some nodes you can disable draggable behavior."
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Markers"
-    ],
-    "pageType": "guide",
-    "title": "Markers",
-    "section": "Markers",
-    "route": "/examples/markers",
-    "fragment": "markers",
-    "content": "You could create markers for both edges and connections. For edges you could spicify start and end markers for corresponding parts of edge. Marker is now only two type's - arrow and arrow-closed. For connections you couls only specify end marker by marker property in ConnectionSettings."
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
       "View size"
     ],
     "pageType": "guide",
@@ -914,38 +926,26 @@
   {
     "breadcrumbs": [
       "Examples",
-      "Labels"
+      "Default edges"
     ],
     "pageType": "guide",
-    "title": "Labels",
-    "section": "Labels",
-    "route": "/examples/labels",
-    "fragment": "labels",
-    "content": "You can attach labels to edges by providing edgeLabels property to needed Edges. There's 3 slots available for lables on edge: start, center, end. Label is only of a html-template type, so you have to provide "
+    "title": "Default edges",
+    "section": "Default edges",
+    "route": "/examples/default-edges",
+    "fragment": "default-edges",
+    "content": "You can link nodes by edges. All you need to do is to create another Edge[] array and pass to vflow component. Each edge contains id of source and target nodes, also edge must have it's own id."
   },
   {
     "breadcrumbs": [
       "Examples",
-      "Labels"
+      "Draggables"
     ],
     "pageType": "guide",
-    "title": "Labels",
-    "section": "Labels",
-    "route": "/examples/labels",
-    "fragment": "labels",
-    "content": " inside vflow."
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Labels"
-    ],
-    "pageType": "guide",
-    "title": "Labels",
-    "section": "Context",
-    "route": "/examples/labels",
-    "fragment": "context",
-    "content": "You may access some data for label through let-ctx according to this interface."
+    "title": "Draggables",
+    "section": "Draggables",
+    "route": "/examples/draggables",
+    "fragment": "draggables",
+    "content": "On some nodes you can disable draggable behavior."
   },
   {
     "breadcrumbs": [
@@ -1375,7 +1375,7 @@
     "section": "Accessors",
     "route": "/api/ngx-vflow/classes/VflowComponent",
     "fragment": "accessors",
-    "content": "Settings for connection (it renders when user tries to create edge between nodes)"
+    "content": "Settings for connection (it renders when user tries to create edge between nodes) You need to pass ConnectionSettings in this input."
   },
   {
     "breadcrumbs": [
@@ -1388,7 +1388,7 @@
     "section": "Accessors",
     "route": "/api/ngx-vflow/classes/VflowComponent",
     "fragment": "accessors",
-    "content": "Data for rendered edges"
+    "content": "Edges to render"
   },
   {
     "breadcrumbs": [
@@ -1401,7 +1401,7 @@
     "section": "Accessors",
     "route": "/api/ngx-vflow/classes/VflowComponent",
     "fragment": "accessors",
-    "content": "Object that controls flow direction."
+    "content": "Object that controls flow direction. For example, if you want to archieve right to left direction then you need to pass these positions { source: 'left', target: 'right' } ! Be carefult using this field, it may depricate in future releases !"
   },
   {
     "breadcrumbs": [
@@ -1414,7 +1414,7 @@
     "section": "Accessors",
     "route": "/api/ngx-vflow/classes/VflowComponent",
     "fragment": "accessors",
-    "content": "Data for rendered nodes"
+    "content": "Nodes to render"
   },
   {
     "breadcrumbs": [
@@ -1609,6 +1609,19 @@
     "breadcrumbs": [
       "API",
       "ngx-vflow",
+      "ConnectionControllerDirective"
+    ],
+    "pageType": "api",
+    "title": "ConnectionControllerDirective",
+    "section": "Properties",
+    "route": "/api/ngx-vflow/classes/ConnectionControllerDirective",
+    "fragment": "properties",
+    "content": "This event fires when user tries to create new Edge. Connection is an entity that contains data about source and target nodes. Also it's important to note, that this event only fires when connection is valid by validator function in ConnectionSettings, by default without passing the validator every connection concidered valid."
+  },
+  {
+    "breadcrumbs": [
+      "API",
+      "ngx-vflow",
       "ChangesControllerDirective"
     ],
     "pageType": "api",
@@ -1616,5 +1629,31 @@
     "section": "ChangesControllerDirective",
     "route": "/api/ngx-vflow/classes/ChangesControllerDirective",
     "fragment": "changescontrollerdirective"
+  },
+  {
+    "breadcrumbs": [
+      "API",
+      "ngx-vflow",
+      "ChangesControllerDirective"
+    ],
+    "pageType": "api",
+    "title": "ChangesControllerDirective",
+    "section": "Properties",
+    "route": "/api/ngx-vflow/classes/ChangesControllerDirective",
+    "fragment": "properties",
+    "content": "Watch nodes change"
+  },
+  {
+    "breadcrumbs": [
+      "API",
+      "ngx-vflow",
+      "ChangesControllerDirective"
+    ],
+    "pageType": "api",
+    "title": "ChangesControllerDirective",
+    "section": "Properties",
+    "route": "/api/ngx-vflow/classes/ChangesControllerDirective",
+    "fragment": "properties",
+    "content": "Watch nodes change"
   }
 ]
