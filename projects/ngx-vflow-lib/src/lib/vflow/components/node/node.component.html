@@ -14,7 +14,9 @@
 >
   <div #htmlWrapper class="wrapper">
     <ng-container
-      *ngTemplateOutlet="nodeHtmlTemplate; context: { $implicit: { node: nodeModel.node }  }"
+      [ngTemplateOutlet]="nodeHtmlTemplate"
+      [ngTemplateOutletContext]="{ $implicit: { node: nodeModel.node } }"
+      [ngTemplateOutletInjector]="injector"
     />
   </div>
 </svg:foreignObject>
@@ -28,6 +30,23 @@
     <ng-container *ngTemplateOutlet="handleTemplate; context: getHandleContext('target')" />
   </svg:g>
 </ng-container> -->
+
+<ng-container *ngIf="nodeModel.node.type === 'html-template'">
+
+  <svg:circle
+    *ngFor="let handle of nodeModel.handles()"
+    #sourceHandle
+    [attr.cx]="handle.offset().x"
+    [attr.cy]="handle.offset().y"
+    [attr.stroke-width]="defaultHandleStrokeWidth"
+    r="5"
+    stroke="white"
+    fill="black"
+    (mousedown)="handle.rawHandle.type === 'source' ? startConnection($event) : null"
+    (mouseup)="handle.rawHandle.type === 'target' ? endConnection() : null"
+  />
+
+</ng-container>
 
 <ng-container *ngIf="nodeModel.node.type === 'default'">
   <svg:circle

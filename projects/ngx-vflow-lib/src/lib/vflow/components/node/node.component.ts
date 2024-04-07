@@ -1,8 +1,9 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, HostBinding, Input, NgZone, OnDestroy, OnInit, TemplateRef, ViewChild, computed, inject, signal } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, HostBinding, Injector, Input, NgZone, OnDestroy, OnInit, TemplateRef, ViewChild, computed, effect, inject, runInInjectionContext, signal } from '@angular/core';
 import { DraggableService } from '../../services/draggable.service';
 import { NodeModel } from '../../models/node.model';
 import { FlowStatusService, batchStatusChanges } from '../../services/flow-status.service';
 import { FlowEntitiesService } from '../../services/flow-entities.service';
+import { HandleService } from '../../services/handle.service';
 
 export type HandleState = 'valid' | 'invalid' | 'idle'
 
@@ -10,9 +11,13 @@ export type HandleState = 'valid' | 'invalid' | 'idle'
   selector: 'g[node]',
   templateUrl: './node.component.html',
   styleUrls: ['./node.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: [HandleService]
 })
 export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
+  protected handleService = inject(HandleService)
+  protected injector = inject(Injector)
+
   @Input()
   public nodeModel!: NodeModel
 
@@ -44,7 +49,7 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
     this.flowStatusService.status().state === 'connection-validation'
   )
 
-  protected readonly defaultHandleStrokeWidth = 2;
+  protected readonly defaultHandleStrokeWidth = 2
 
   private sourceHanldeState = signal<HandleState>('idle')
   private targetHandleState = signal<HandleState>('idle')
@@ -53,6 +58,13 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
   private targetHanldeStateReadonly = this.targetHandleState.asReadonly()
 
   public ngOnInit() {
+    runInInjectionContext(this.injector, () => {
+      effect(
+        () => this.nodeModel.rawHandles.set(this.handleService.handles()),
+        { allowSignalWrites: true }
+      )
+    })
+
     this.draggableService.toggleDraggable(this.hostRef.nativeElement, this.nodeModel)
   }
 

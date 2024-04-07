@@ -3,6 +3,8 @@ import { Node } from '../interfaces/node.interface'
 import { FlowModel } from './flow.model'
 import { isDefined } from '../utils/is-defined'
 import { toObservable } from '@angular/core/rxjs-interop'
+import { NodeHandle } from '../services/handle.service'
+import { HandleModel } from './handle.model'
 
 export class NodeModel<T = unknown> {
   public point = signal({ x: 0, y: 0 })
@@ -87,6 +89,12 @@ export class NodeModel<T = unknown> {
       y: this.targetOffset().y - (this.targetHandleSize().height / 2),
     }
   })
+
+  public handles = computed(
+    () => this.rawHandles().map((handle => new HandleModel(handle, this)))
+  )
+
+  public rawHandles = signal<NodeHandle[]>([])
 
   public draggable = true
 
