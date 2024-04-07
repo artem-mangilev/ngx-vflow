@@ -95,7 +95,7 @@ export class VflowComponent {
    * For example, if you want to archieve right to left direction
    * then you need to pass these positions { source: 'left', target: 'right' }
    *
-   * ! Be carefult using this field, it may depricate in future releases !
+   * @deprecated
    */
   @Input()
   public set handlePositions(handlePositions: HandlePositions) {

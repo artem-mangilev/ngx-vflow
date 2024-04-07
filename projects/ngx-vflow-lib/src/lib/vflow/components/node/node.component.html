@@ -19,7 +19,7 @@
   </div>
 </svg:foreignObject>
 
-<ng-container *ngIf="handleTemplate">
+<!-- <ng-container *ngIf="handleTemplate">
   <svg:g #sourceHandle (mousedown)="startConnection($event)">
     <ng-container *ngTemplateOutlet="handleTemplate; context: getHandleContext('source')" />
   </svg:g>
@@ -27,9 +27,9 @@
   <svg:g #targetHandle>
     <ng-container *ngTemplateOutlet="handleTemplate; context: getHandleContext('target')" />
   </svg:g>
-</ng-container>
+</ng-container> -->
 
-<ng-container *ngIf="!handleTemplate">
+<ng-container *ngIf="nodeModel.node.type === 'default'">
   <svg:circle
     #sourceHandle
     [attr.cx]="nodeModel.sourceOffset().x"

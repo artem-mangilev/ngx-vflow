@@ -62,6 +62,9 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
       if (this.nodeModel.node.type === 'default') {
         const { width, height } = this.nodeContentRef.nativeElement.getBBox()
         this.nodeModel.size.set({ width, height })
+
+        this.setSourceHandleSize()
+        this.setTargetHandleSize()
       }
 
       if (this.nodeModel.node.type === 'html-template') {
@@ -70,9 +73,6 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
 
         this.nodeModel.size.set({ width, height })
       }
-
-      this.setSourceHandleSize()
-      this.setTargetHandleSize()
     })
   }
 
@@ -156,9 +156,11 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  /**
+   * TODO: only works for default node type
+   */
   private setSourceHandleSize() {
-    // if handle template provided, we don't know its stroke so it's 0
-    const strokeWidth = this.handleTemplate ? 0 : (2 * this.defaultHandleStrokeWidth);
+    const strokeWidth = 2 * this.defaultHandleStrokeWidth;
 
     const sourceBox = this.sourceHandleRef.nativeElement.getBBox({ stroke: true })
     this.nodeModel.sourceHandleSize.set({
@@ -167,8 +169,11 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
     })
   }
 
+  /**
+   * TODO: only works for default node type
+   */
   private setTargetHandleSize() {
-    const strokeWidth = this.handleTemplate ? 0 : (2 * this.defaultHandleStrokeWidth);
+    const strokeWidth = 2 * this.defaultHandleStrokeWidth;
 
     const targetBox = this.targetHandleRef.nativeElement.getBBox({ stroke: true })
     this.nodeModel.targetHandleSize.set({
