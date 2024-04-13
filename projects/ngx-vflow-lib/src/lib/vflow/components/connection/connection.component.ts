@@ -5,6 +5,7 @@ import { SpacePointContextDirective } from '../../directives/space-point-context
 import { ConnectionModel } from '../../models/connection.model';
 import { bezierPath } from '../../math/edge-path/bezier-path';
 import { hashCode } from '../../utils/hash';
+import { Position } from '../../types/position.type';
 
 @Component({
   selector: 'g[connection]',
@@ -40,32 +41,41 @@ export class ConnectionComponent {
     const status = this.flowStatusService.status()
 
     if (status.state === 'connection-start') {
-      const sourceNode = status.payload.sourceNode
-      const sourcePoint = sourceNode.sourcePointAbsolute()
+      const sourceHandle = status.payload.sourceHandle
+      const sourcePoint = sourceHandle.pointAbsolute()
+      const sourcePosition = sourceHandle.rawHandle.position
+
       const targetPoint = this.spacePointContext.svgCurrentSpacePoint()
+      const targetPosition = getOppositePostion(sourceHandle.rawHandle.position)
 
       switch (this.model.curve) {
         case 'straight': return straightPath(sourcePoint, targetPoint).path
         case 'bezier': return bezierPath(
           sourcePoint, targetPoint,
-          sourceNode.sourcePosition(), sourceNode.targetPosition()
+          sourcePosition, targetPosition
         ).path
       }
     }
 
     if (status.state === 'connection-validation') {
-      const sourcePoint = status.payload.sourceNode.sourcePointAbsolute()
+      const sourceHandle = status.payload.sourceHandle
+      const sourcePoint = sourceHandle.pointAbsolute()
+      const sourcePosition = sourceHandle.rawHandle.position
+
+      const targetHandle = status.payload.targetHandle
       // ignore magnet if validation failed
       const targetPoint = status.payload.valid
-        ? status.payload.targetNode.targetPointAbsolute()
+        ? targetHandle.pointAbsolute()
         : this.spacePointContext.svgCurrentSpacePoint()
+      const targetPosition = status.payload.valid
+        ? targetHandle.rawHandle.position
+        : getOppositePostion(sourceHandle.rawHandle.position)
 
       switch (this.model.curve) {
         case 'straight': return straightPath(sourcePoint, targetPoint).path
         case 'bezier': return bezierPath(
           sourcePoint, targetPoint,
-          status.payload.sourceNode.sourcePosition(),
-          status.payload.sourceNode.targetPosition()
+          sourcePosition, targetPosition
         ).path
       }
     }
@@ -92,5 +102,18 @@ export class ConnectionComponent {
         marker: this.markerUrl
       }
     }
+  }
+}
+
+function getOppositePostion(position: Position): Position {
+  switch (position) {
+    case 'top':
+      return 'bottom'
+    case 'bottom':
+      return 'top'
+    case 'left':
+      return 'right'
+    case 'right':
+      return 'left'
   }
 }

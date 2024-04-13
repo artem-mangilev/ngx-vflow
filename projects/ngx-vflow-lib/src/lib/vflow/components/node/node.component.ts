@@ -4,6 +4,7 @@ import { NodeModel } from '../../models/node.model';
 import { FlowStatusService, batchStatusChanges } from '../../services/flow-status.service';
 import { FlowEntitiesService } from '../../services/flow-entities.service';
 import { HandleService } from '../../services/handle.service';
+import { HandleModel } from '../../models/handle.model';
 
 export type HandleState = 'valid' | 'invalid' | 'idle'
 
@@ -75,8 +76,8 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
         const { width, height } = this.nodeContentRef.nativeElement.getBBox()
         this.nodeModel.size.set({ width, height })
 
-        this.setSourceHandleSize()
-        this.setTargetHandleSize()
+        // this.setSourceHandleSize()
+        // this.setTargetHandleSize()
       }
 
       if (this.nodeModel.node.type === 'html-template') {
@@ -92,11 +93,11 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
     this.draggableService.destroy(this.hostRef.nativeElement)
   }
 
-  protected startConnection(event: MouseEvent) {
+  protected startConnection(event: MouseEvent, handle: HandleModel) {
     // ignore drag by stopping propagation
     event.stopPropagation()
 
-    this.flowStatusService.setConnectionStartStatus(this.nodeModel)
+    this.flowStatusService.setConnectionStartStatus(this.nodeModel, handle)
   }
 
   protected endConnection() {
@@ -105,10 +106,12 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
     if (status.state === 'connection-validation') {
       const sourceNode = status.payload.sourceNode
       const targetNode = this.nodeModel
+      const sourceHandle = status.payload.sourceHandle
+      const targetHandle = status.payload.targetHandle
 
       batchStatusChanges(
         // call to create connection
-        () => this.flowStatusService.setConnectionEndStatus(sourceNode, targetNode),
+        () => this.flowStatusService.setConnectionEndStatus(sourceNode, targetNode, sourceHandle, targetHandle),
         // when connection created, we need go back to idle status
         () => this.flowStatusService.setIdleStatus()
       )
@@ -118,20 +121,26 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
   /**
    * TODO srp
    */
-  protected validateTargetHandle() {
+  protected validateTargetHandle(targetHandle: HandleModel) {
     const status = this.flowStatusService.status()
 
     if (status.state === 'connection-start') {
       const sourceNode = status.payload.sourceNode
-      const targetNode = this.nodeModel
-
+      const sourceHandle = status.payload.sourceHandle
       const source = sourceNode.node.id
+
+      const targetNode = this.nodeModel
       const target = targetNode.node.id
 
-      const valid = this.flowEntitiesService.connection().validator({ source, target })
+      const valid = this.flowEntitiesService.connection().validator({
+        source,
+        target,
+        sourceHandle: sourceHandle.rawHandle.id,
+        targetHandle: targetHandle.rawHandle.id
+      })
       this.targetHandleState.set(valid ? 'valid' : 'invalid')
 
-      this.flowStatusService.setConnectionValidationStatus(sourceNode, targetNode, valid)
+      this.flowStatusService.setConnectionValidationStatus(valid, sourceNode, targetNode, sourceHandle, targetHandle)
     }
   }
 
@@ -144,7 +153,7 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
     // drop back to start status
     const status = this.flowStatusService.status()
     if (status.state === 'connection-validation') {
-      this.flowStatusService.setConnectionStartStatus(status.payload.sourceNode)
+      this.flowStatusService.setConnectionStartStatus(status.payload.sourceNode, status.payload.sourceHandle)
     }
   }
 

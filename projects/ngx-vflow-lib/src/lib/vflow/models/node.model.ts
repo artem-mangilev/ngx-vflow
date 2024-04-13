@@ -91,7 +91,33 @@ export class NodeModel<T = unknown> {
   })
 
   public handles = computed(
-    () => this.rawHandles().map((handle => new HandleModel(handle, this)))
+    () => {
+      if (this.node.type === 'html-template') {
+        return this.rawHandles().map((handle => new HandleModel(handle, this)))
+      }
+
+      return [
+        new HandleModel(
+          {
+            position: this.sourcePosition(),
+            type: 'source',
+            parentPosition: signal({ x: 0, y: 0 }),
+            parentSize: signal(this.size())
+          },
+          this
+        ),
+        new HandleModel(
+          {
+            position: this.targetPosition(),
+            type: 'target',
+            parentPosition: signal({ x: 0, y: 0 }),
+            parentSize: signal(this.size())
+          },
+          this
+        ),
+
+      ]
+    }
   )
 
   public rawHandles = signal<NodeHandle[]>([])
