@@ -10,12 +10,21 @@ export class HandleComponent implements OnInit {
   private handleService = inject(HandleService)
   private element = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement
 
+  /**
+   * At what side of node this component should be placed
+   */
   @Input({ required: true })
   public position!: Position
 
+  /**
+   * Source or target
+   */
   @Input({ required: true })
   public type!: 'source' | 'target'
 
+  /**
+   * Should be used if node has more than one source/target
+   */
   @Input()
   public id?: string
 
