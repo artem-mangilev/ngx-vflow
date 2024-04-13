@@ -1,6 +1,8 @@
-# ngx-vflow
+<img width="1305" alt="image" src="https://github.com/artem-mangilev/ngx-vflow/assets/53087914/5cbd3669-10a5-4ecb-9a1f-c9ae4eb5fb5a">
 
-ngx-vflow is an Angular library for creating node-based applications. It aims to assist you in building anything from a static diagram to a visual editor. You can utilize the default design or apply your own by customizing everything using familiar technologies.
+---
+
+`ngx-vflow` is an Angular library for creating node-based applications. It aims to assist you in building anything from a static diagram to a visual editor. You can utilize the default design or apply your own by customizing everything using familiar technologies.
 
 ## Installation
 
