@@ -11,6 +11,7 @@ import { SpacePointContextDirective } from './directives/space-point-context.dir
 import { RootSvgReferenceDirective } from './directives/reference.directive';
 import { RootSvgContextDirective } from './directives/root-svg-context.directive';
 import { DefsComponent } from './components/defs/defs.component';
+import { HandleComponent } from './components/handle/handle.component';
 
 const components = [
   VflowComponent,
@@ -18,6 +19,7 @@ const components = [
   EdgeComponent,
   EdgeLabelComponent,
   ConnectionComponent,
+  HandleComponent,
   DefsComponent
 ]
 
@@ -40,6 +42,7 @@ const templateDirectives = [
   imports: [CommonModule],
   exports: [
     VflowComponent,
+    HandleComponent,
     ...templateDirectives
   ],
   declarations: [...components, ...directives, ...templateDirectives],

@@ -14,54 +14,35 @@
 >
   <div #htmlWrapper class="wrapper">
     <ng-container
-      *ngTemplateOutlet="nodeHtmlTemplate; context: { $implicit: { node: nodeModel.node }  }"
+      [ngTemplateOutlet]="nodeHtmlTemplate"
+      [ngTemplateOutletContext]="{ $implicit: { node: nodeModel.node } }"
+      [ngTemplateOutletInjector]="injector"
     />
   </div>
 </svg:foreignObject>
 
-<ng-container *ngIf="handleTemplate">
-  <svg:g #sourceHandle (mousedown)="startConnection($event)">
-    <ng-container *ngTemplateOutlet="handleTemplate; context: getHandleContext('source')" />
-  </svg:g>
-
-  <svg:g #targetHandle>
-    <ng-container *ngTemplateOutlet="handleTemplate; context: getHandleContext('target')" />
-  </svg:g>
-</ng-container>
-
-<ng-container *ngIf="!handleTemplate">
+<ng-container *ngFor="let handle of nodeModel.handles()">
   <svg:circle
     #sourceHandle
-    [attr.cx]="nodeModel.sourceOffset().x"
-    [attr.cy]="nodeModel.sourceOffset().y"
-    [attr.stroke-width]="defaultHandleStrokeWidth"
+    [attr.cx]="handle.offset().x"
+    [attr.cy]="handle.offset().y"
+    [attr.stroke-width]="handle.strokeWidth"
     r="5"
     stroke="white"
     fill="black"
-    (mousedown)="startConnection($event)"
+    (mousedown)="handle.rawHandle.type === 'source' ? startConnection($event, handle) : null"
+    (mouseup)="handle.rawHandle.type === 'target' ? endConnection() : null"
   />
 
   <svg:circle
-    #targetHandle
-    [attr.cx]="nodeModel.targetOffset().x"
-    [attr.cy]="nodeModel.targetOffset().y"
-    [attr.stroke-width]="defaultHandleStrokeWidth"
-    r="5"
-    stroke="white"
-    fill="black"
-    (mouseup)="endConnection()"
+    *ngIf="handle.rawHandle.type === 'target' && showMagnet()"
+    class="magnet"
+    [attr.r]="nodeModel.magnetRadius"
+    [attr.cx]="handle.offset().x"
+    [attr.cy]="handle.offset().y"
+    (mouseup)="endConnection(); resetValidateTargetHandle()"
+    (mouseover)="validateTargetHandle(handle)"
+    (mouseout)="resetValidateTargetHandle()"
   />
 </ng-container>
-
-<svg:circle
-  *ngIf="showMagnet()"
-  class="magnet"
-  [attr.r]="nodeModel.magnetRadius"
-  [attr.cx]="nodeModel.targetOffset().x"
-  [attr.cy]="nodeModel.targetOffset().y"
-  (mouseup)="endConnection(); resetValidateTargetHandle()"
-  (mouseover)="validateTargetHandle()"
-  (mouseout)="resetValidateTargetHandle()"
-/>
-
 

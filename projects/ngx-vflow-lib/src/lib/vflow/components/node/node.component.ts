@@ -1,8 +1,10 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, HostBinding, Input, NgZone, OnDestroy, OnInit, TemplateRef, ViewChild, computed, inject, signal } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, HostBinding, Injector, Input, NgZone, OnDestroy, OnInit, TemplateRef, ViewChild, computed, effect, inject, runInInjectionContext, signal } from '@angular/core';
 import { DraggableService } from '../../services/draggable.service';
 import { NodeModel } from '../../models/node.model';
 import { FlowStatusService, batchStatusChanges } from '../../services/flow-status.service';
 import { FlowEntitiesService } from '../../services/flow-entities.service';
+import { HandleService } from '../../services/handle.service';
+import { HandleModel } from '../../models/handle.model';
 
 export type HandleState = 'valid' | 'invalid' | 'idle'
 
@@ -10,29 +12,24 @@ export type HandleState = 'valid' | 'invalid' | 'idle'
   selector: 'g[node]',
   templateUrl: './node.component.html',
   styleUrls: ['./node.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: [HandleService]
 })
 export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
+  protected handleService = inject(HandleService)
+  protected injector = inject(Injector)
+
   @Input()
   public nodeModel!: NodeModel
 
   @Input()
   public nodeHtmlTemplate?: TemplateRef<any>
 
-  @Input()
-  public handleTemplate?: TemplateRef<any>
-
   @ViewChild('nodeContent')
   public nodeContentRef!: ElementRef<SVGGraphicsElement>
 
   @ViewChild('htmlWrapper')
   public htmlWrapperRef!: ElementRef<HTMLDivElement>
-
-  @ViewChild('sourceHandle')
-  public sourceHandleRef!: ElementRef<SVGGElement | SVGCircleElement>
-
-  @ViewChild('targetHandle')
-  public targetHandleRef!: ElementRef<SVGGElement | SVGCircleElement>
 
   private draggableService = inject(DraggableService)
   private flowStatusService = inject(FlowStatusService)
@@ -44,15 +41,17 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
     this.flowStatusService.status().state === 'connection-validation'
   )
 
-  protected readonly defaultHandleStrokeWidth = 2;
-
   private sourceHanldeState = signal<HandleState>('idle')
   private targetHandleState = signal<HandleState>('idle')
 
-  private sourceHanldeStateReadonly = this.sourceHanldeState.asReadonly()
-  private targetHanldeStateReadonly = this.targetHandleState.asReadonly()
-
   public ngOnInit() {
+    runInInjectionContext(this.injector, () => {
+      effect(
+        () => this.nodeModel.rawHandles.set(this.handleService.handles()),
+        { allowSignalWrites: true }
+      )
+    })
+
     this.draggableService.toggleDraggable(this.hostRef.nativeElement, this.nodeModel)
   }
 
@@ -70,9 +69,6 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
 
         this.nodeModel.size.set({ width, height })
       }
-
-      this.setSourceHandleSize()
-      this.setTargetHandleSize()
     })
   }
 
@@ -80,11 +76,11 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
     this.draggableService.destroy(this.hostRef.nativeElement)
   }
 
-  protected startConnection(event: MouseEvent) {
+  protected startConnection(event: MouseEvent, handle: HandleModel) {
     // ignore drag by stopping propagation
     event.stopPropagation()
 
-    this.flowStatusService.setConnectionStartStatus(this.nodeModel)
+    this.flowStatusService.setConnectionStartStatus(this.nodeModel, handle)
   }
 
   protected endConnection() {
@@ -93,10 +89,12 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
     if (status.state === 'connection-validation') {
       const sourceNode = status.payload.sourceNode
       const targetNode = this.nodeModel
+      const sourceHandle = status.payload.sourceHandle
+      const targetHandle = status.payload.targetHandle
 
       batchStatusChanges(
         // call to create connection
-        () => this.flowStatusService.setConnectionEndStatus(sourceNode, targetNode),
+        () => this.flowStatusService.setConnectionEndStatus(sourceNode, targetNode, sourceHandle, targetHandle),
         // when connection created, we need go back to idle status
         () => this.flowStatusService.setIdleStatus()
       )
@@ -106,20 +104,26 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
   /**
    * TODO srp
    */
-  protected validateTargetHandle() {
+  protected validateTargetHandle(targetHandle: HandleModel) {
     const status = this.flowStatusService.status()
 
     if (status.state === 'connection-start') {
       const sourceNode = status.payload.sourceNode
-      const targetNode = this.nodeModel
-
+      const sourceHandle = status.payload.sourceHandle
       const source = sourceNode.node.id
+
+      const targetNode = this.nodeModel
       const target = targetNode.node.id
 
-      const valid = this.flowEntitiesService.connection().validator({ source, target })
+      const valid = this.flowEntitiesService.connection().validator({
+        source,
+        target,
+        sourceHandle: sourceHandle.rawHandle.id,
+        targetHandle: targetHandle.rawHandle.id
+      })
       this.targetHandleState.set(valid ? 'valid' : 'invalid')
 
-      this.flowStatusService.setConnectionValidationStatus(sourceNode, targetNode, valid)
+      this.flowStatusService.setConnectionValidationStatus(valid, sourceNode, targetNode, sourceHandle, targetHandle)
     }
   }
 
@@ -132,48 +136,27 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
     // drop back to start status
     const status = this.flowStatusService.status()
     if (status.state === 'connection-validation') {
-      this.flowStatusService.setConnectionStartStatus(status.payload.sourceNode)
+      this.flowStatusService.setConnectionStartStatus(status.payload.sourceNode, status.payload.sourceHandle)
     }
   }
 
-  protected getHandleContext(type: 'source' | 'target') {
-    if (type === 'source') {
-      return {
-        $implicit: {
-          point: this.nodeModel.sourceOffset,
-          alignedPoint: this.nodeModel.sourceOffsetAligned,
-          state: this.sourceHanldeStateReadonly
-        }
-      }
-    }
+  // protected getHandleContext(type: 'source' | 'target') {
+  //   if (type === 'source') {
+  //     return {
+  //       $implicit: {
+  //         point: this.nodeModel.sourceOffset,
+  //         alignedPoint: this.nodeModel.sourceOffsetAligned,
+  //         state: this.sourceHanldeStateReadonly
+  //       }
+  //     }
+  //   }
 
-    return {
-      $implicit: {
-        point: this.nodeModel.targetOffset,
-        alignedPoint: this.nodeModel.targetOffsetAligned,
-        state: this.targetHanldeStateReadonly
-      }
-    }
-  }
-
-  private setSourceHandleSize() {
-    // if handle template provided, we don't know its stroke so it's 0
-    const strokeWidth = this.handleTemplate ? 0 : (2 * this.defaultHandleStrokeWidth);
-
-    const sourceBox = this.sourceHandleRef.nativeElement.getBBox({ stroke: true })
-    this.nodeModel.sourceHandleSize.set({
-      width: sourceBox.width + strokeWidth,
-      height: sourceBox.height + strokeWidth
-    })
-  }
-
-  private setTargetHandleSize() {
-    const strokeWidth = this.handleTemplate ? 0 : (2 * this.defaultHandleStrokeWidth);
-
-    const targetBox = this.targetHandleRef.nativeElement.getBBox({ stroke: true })
-    this.nodeModel.targetHandleSize.set({
-      width: targetBox.width + strokeWidth,
-      height: targetBox.height + strokeWidth
-    })
-  }
+  //   return {
+  //     $implicit: {
+  //       point: this.nodeModel.targetOffset,
+  //       alignedPoint: this.nodeModel.targetOffsetAligned,
+  //       state: this.targetHanldeStateReadonly
+  //     }
+  //   }
+  // }
 }

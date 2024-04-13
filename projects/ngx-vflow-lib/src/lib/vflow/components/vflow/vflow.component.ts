@@ -7,7 +7,7 @@ import { ViewportService } from '../../services/viewport.service';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { Edge } from '../../interfaces/edge.interface';
 import { EdgeModel } from '../../models/edge.model';
-import { ConnectionTemplateDirective, EdgeLabelHtmlTemplateDirective, EdgeTemplateDirective, HandleTemplateDirective, NodeHtmlTemplateDirective } from '../../directives/template.directive';
+import { ConnectionTemplateDirective, EdgeLabelHtmlTemplateDirective, EdgeTemplateDirective, NodeHtmlTemplateDirective } from '../../directives/template.directive';
 import { HandlePositions } from '../../interfaces/handle-positions.interface';
 import { addNodesToEdges } from '../../utils/add-nodes-to-edges';
 import { FlowModel } from '../../models/flow.model';
@@ -95,7 +95,7 @@ export class VflowComponent {
    * For example, if you want to archieve right to left direction
    * then you need to pass these positions { source: 'left', target: 'right' }
    *
-   * ! Be carefult using this field, it may depricate in future releases !
+   * @deprecated
    */
   @Input()
   public set handlePositions(handlePositions: HandlePositions) {
@@ -168,9 +168,6 @@ export class VflowComponent {
 
   @ContentChild(ConnectionTemplateDirective)
   protected connectionTemplateDirective?: ConnectionTemplateDirective
-
-  @ContentChild(HandleTemplateDirective)
-  protected handleTemplateDirective?: HandleTemplateDirective
   // #endregion
 
   // #region DIRECTIVES
