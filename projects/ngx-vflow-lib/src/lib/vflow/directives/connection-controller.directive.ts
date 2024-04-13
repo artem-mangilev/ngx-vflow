@@ -33,10 +33,13 @@ export class ConnectionControllerDirective {
       const source = sourceModel.node.id
       const target = targetModel.node.id
 
+      const sourceHandle = status.payload.sourceHandle.rawHandle.id
+      const targetHandle = status.payload.targetHandle.rawHandle.id
+
       const connection = this.flowEntitiesService.connection()
 
-      if (connection.validator({ source, target })) {
-        this.onConnect.emit({ source, target })
+      if (connection.validator({ source, target, sourceHandle, targetHandle })) {
+        this.onConnect.emit({ source, target, sourceHandle, targetHandle })
       }
     }
   }, { allowSignalWrites: true })
