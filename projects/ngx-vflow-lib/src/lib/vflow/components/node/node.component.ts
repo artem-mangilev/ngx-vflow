@@ -50,13 +50,8 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
     this.flowStatusService.status().state === 'connection-validation'
   )
 
-  protected readonly defaultHandleStrokeWidth = 2
-
   private sourceHanldeState = signal<HandleState>('idle')
   private targetHandleState = signal<HandleState>('idle')
-
-  private sourceHanldeStateReadonly = this.sourceHanldeState.asReadonly()
-  private targetHanldeStateReadonly = this.targetHandleState.asReadonly()
 
   public ngOnInit() {
     runInInjectionContext(this.injector, () => {
@@ -75,9 +70,6 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
       if (this.nodeModel.node.type === 'default') {
         const { width, height } = this.nodeContentRef.nativeElement.getBBox()
         this.nodeModel.size.set({ width, height })
-
-        // this.setSourceHandleSize()
-        // this.setTargetHandleSize()
       }
 
       if (this.nodeModel.node.type === 'html-template') {
@@ -157,49 +149,23 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  protected getHandleContext(type: 'source' | 'target') {
-    if (type === 'source') {
-      return {
-        $implicit: {
-          point: this.nodeModel.sourceOffset,
-          alignedPoint: this.nodeModel.sourceOffsetAligned,
-          state: this.sourceHanldeStateReadonly
-        }
-      }
-    }
+  // protected getHandleContext(type: 'source' | 'target') {
+  //   if (type === 'source') {
+  //     return {
+  //       $implicit: {
+  //         point: this.nodeModel.sourceOffset,
+  //         alignedPoint: this.nodeModel.sourceOffsetAligned,
+  //         state: this.sourceHanldeStateReadonly
+  //       }
+  //     }
+  //   }
 
-    return {
-      $implicit: {
-        point: this.nodeModel.targetOffset,
-        alignedPoint: this.nodeModel.targetOffsetAligned,
-        state: this.targetHanldeStateReadonly
-      }
-    }
-  }
-
-  /**
-   * TODO: only works for default node type
-   */
-  private setSourceHandleSize() {
-    const strokeWidth = 2 * this.defaultHandleStrokeWidth;
-
-    const sourceBox = this.sourceHandleRef.nativeElement.getBBox({ stroke: true })
-    this.nodeModel.sourceHandleSize.set({
-      width: sourceBox.width + strokeWidth,
-      height: sourceBox.height + strokeWidth
-    })
-  }
-
-  /**
-   * TODO: only works for default node type
-   */
-  private setTargetHandleSize() {
-    const strokeWidth = 2 * this.defaultHandleStrokeWidth;
-
-    const targetBox = this.targetHandleRef.nativeElement.getBBox({ stroke: true })
-    this.nodeModel.targetHandleSize.set({
-      width: targetBox.width + strokeWidth,
-      height: targetBox.height + strokeWidth
-    })
-  }
+  //   return {
+  //     $implicit: {
+  //       point: this.nodeModel.targetOffset,
+  //       alignedPoint: this.nodeModel.targetOffsetAligned,
+  //       state: this.targetHanldeStateReadonly
+  //     }
+  //   }
+  // }
 }
