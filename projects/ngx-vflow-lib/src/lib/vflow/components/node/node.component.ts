@@ -25,20 +25,11 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input()
   public nodeHtmlTemplate?: TemplateRef<any>
 
-  @Input()
-  public handleTemplate?: TemplateRef<any>
-
   @ViewChild('nodeContent')
   public nodeContentRef!: ElementRef<SVGGraphicsElement>
 
   @ViewChild('htmlWrapper')
   public htmlWrapperRef!: ElementRef<HTMLDivElement>
-
-  @ViewChild('sourceHandle')
-  public sourceHandleRef!: ElementRef<SVGGElement | SVGCircleElement>
-
-  @ViewChild('targetHandle')
-  public targetHandleRef!: ElementRef<SVGGElement | SVGCircleElement>
 
   private draggableService = inject(DraggableService)
   private flowStatusService = inject(FlowStatusService)
