@@ -33,19 +33,18 @@ export class HandleComponent implements OnInit, OnDestroy {
 
   public ngOnInit() {
     queueMicrotask(() => {
-      const rect = this.parentRect()
+      const { width, height, x, y } = this.parentRect()
 
       this.model = new HandleModel(
         {
           position: this.position,
           type: this.type,
           id: this.id,
-          parentPosition: { x: rect.x, y: rect.y },
-          parentSize: { width: rect.width, height: rect.height }
+          parentPosition: { x, y },
+          parentSize: { width, height }
         },
         this.handleService.node()!
       )
-
 
       this.handleService.createHandle(this.model)
     })
@@ -56,18 +55,14 @@ export class HandleComponent implements OnInit, OnDestroy {
   }
 
   private parentRect() {
-    // we assume there is only one foreignObject that wraps node
-    const fo = this.element.closest('foreignObject')
     const parent = this.element.parentElement!
 
-    const foRect = fo!.getBoundingClientRect()
-    const parentRect = parent.getBoundingClientRect()
-
     return {
-      x: parentRect.left - foRect.left,
-      y: parentRect.top - foRect.top,
-      width: parentRect.width,
-      height: parentRect.height
+      x: parent.offsetLeft,
+      y: parent.offsetTop,
+      width: parent.clientWidth,
+      height: parent.clientHeight
     }
   }
 }
+
