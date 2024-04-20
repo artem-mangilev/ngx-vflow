@@ -1,9 +1,8 @@
-import { Injector, computed, inject, signal } from '@angular/core'
+import { computed, signal } from '@angular/core'
 import { Node } from '../interfaces/node.interface'
 import { FlowModel } from './flow.model'
 import { isDefined } from '../utils/is-defined'
 import { toObservable } from '@angular/core/rxjs-interop'
-import { NodeHandle } from '../services/handle.service'
 import { HandleModel } from './handle.model'
 
 export class NodeModel<T = unknown> {
@@ -22,7 +21,7 @@ export class NodeModel<T = unknown> {
   public handles = computed(
     () => {
       if (this.node.type === 'html-template') {
-        return this.rawHandles().map((handle => new HandleModel(handle, this)))
+        return this.rawHandles()
       }
 
       return [
@@ -30,8 +29,8 @@ export class NodeModel<T = unknown> {
           {
             position: this.sourcePosition(),
             type: 'source',
-            parentPosition: signal({ x: 0, y: 0 }),
-            parentSize: signal(this.size())
+            parentPosition: { x: 0, y: 0 },
+            parentSize: this.size()
           },
           this
         ),
@@ -39,8 +38,8 @@ export class NodeModel<T = unknown> {
           {
             position: this.targetPosition(),
             type: 'target',
-            parentPosition: signal({ x: 0, y: 0 }),
-            parentSize: signal(this.size())
+            parentPosition: { x: 0, y: 0 },
+            parentSize: this.size()
           },
           this
         ),
@@ -49,7 +48,7 @@ export class NodeModel<T = unknown> {
     }
   )
 
-  public rawHandles = signal<NodeHandle[]>([])
+  public rawHandles = signal<HandleModel[]>([])
 
   public draggable = true
 
