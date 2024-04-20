@@ -28,4 +28,6 @@
 	--ng-doc-api-tag-color: var(--ng-doc-base-0);
 	--ng-doc-guide-tag-background: #faab00;
 	--ng-doc-guide-tag-color: var(--ng-doc-base-0);
+
+  --ng-doc-code-background: #1b272c
 }
