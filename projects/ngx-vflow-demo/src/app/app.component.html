@@ -1,5 +1,5 @@
 <ng-doc-root>
-	<ng-doc-navbar [leftContent]="leftContent">
+	<ng-doc-navbar [leftContent]="leftContent" [rightContent]="rightContent">
 		<ng-template #leftContent>
       <div class="logo-container">
         <a href="https://github.com/artem-mangilev/ngx-vflow">
@@ -7,6 +7,19 @@
         </a>
         <h3 class="logo-text">ngx-vflow</h3>
       </div>
+		</ng-template>
+
+    <ng-template #rightContent>
+			<div class="ng-doc-header-controls">
+				<a
+					href="https://github.com/artem-mangilev/ngx-vflow"
+					ng-doc-button-icon
+					ngDocTooltip="Repository on GitHub"
+					size="large"
+					target="_blank">
+					<ng-doc-icon [size]="24" customIcon="github"></ng-doc-icon>
+				</a>
+			</div>
 		</ng-template>
 	</ng-doc-navbar>
 	<ng-doc-sidebar></ng-doc-sidebar>
