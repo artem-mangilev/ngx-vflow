@@ -26,10 +26,11 @@ export class HandleService {
 
   public destroyHandle(handleToDestoy: HandleModel) {
     const node = this.node()
+    // TODO: microtask
     if (node) {
-      node.rawHandles.update(
+      queueMicrotask(() => node.rawHandles.update(
         handles => handles.filter(handle => handle !== handleToDestoy)
-      )
+      ));
     }
   }
 }
