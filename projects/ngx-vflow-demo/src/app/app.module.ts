@@ -1,4 +1,4 @@
-import { NgDocRootComponent, NgDocNavbarComponent, NgDocSidebarComponent, provideNgDocApp, provideSearchEngine, NgDocDefaultSearchEngine, providePageSkeleton, NG_DOC_DEFAULT_PAGE_SKELETON, provideMainPageProcessor, NG_DOC_DEFAULT_PAGE_PROCESSORS } from "@ng-doc/app";
+import { NG_DOC_DEFAULT_THEME_ID, NgDocRootComponent, NgDocNavbarComponent, NgDocSidebarComponent, provideNgDocApp, provideSearchEngine, NgDocDefaultSearchEngine, providePageSkeleton, NG_DOC_DEFAULT_PAGE_SKELETON, provideMainPageProcessor, NG_DOC_DEFAULT_PAGE_PROCESSORS, NG_DOC_THEME } from "@ng-doc/app";
 import { NG_DOC_ROUTING, provideNgDocContext } from "@ng-doc/generated";
 import { provideRouter, withInMemoryScrolling } from "@angular/router";
 import { provideAnimations } from "@angular/platform-browser/animations";
@@ -23,8 +23,16 @@ import { provideHttpClient } from "@angular/common/http";
     NgDocSidebarComponent,
   ],
   providers: [
+    provideNgDocApp({
+      defaultThemeId: 'vflow-theme-dark',
+      themes: [
+        {
+          id: 'vflow-theme-dark',
+          path: 'assets/themes/vflow-theme-dark.css'
+        }
+      ]
+    }),
     provideNgDocContext(),
-    provideNgDocApp({ defaultThemeId: 'auto' }),
     provideSearchEngine(NgDocDefaultSearchEngine),
     providePageSkeleton(NG_DOC_DEFAULT_PAGE_SKELETON),
     provideMainPageProcessor(NG_DOC_DEFAULT_PAGE_PROCESSORS),
