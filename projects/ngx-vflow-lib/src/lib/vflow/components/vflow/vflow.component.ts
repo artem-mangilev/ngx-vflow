@@ -145,7 +145,9 @@ export class VflowComponent {
    */
   @Input()
   public set edges(newEdges: Edge[]) {
-    const newModels = ReferenceKeeper.edges(newEdges, this.flowEntitiesService.edges())
+    const newModels = runInInjectionContext(this.injector,
+      () => ReferenceKeeper.edges(newEdges, this.flowEntitiesService.edges())
+    )
 
     // quick and dirty binding nodes to edges
     addNodesToEdges(this.nodeModels, newModels)
