@@ -1,12 +1,13 @@
-import { AfterContentInit, AfterViewInit, Component, ElementRef, Input, OnInit, inject, signal } from '@angular/core';
+import { Component, ElementRef, Input, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { Position } from '../../types/position.type';
 import { HandleService } from '../../services/handle.service';
+import { HandleModel } from '../../models/handle.model';
 
 @Component({
   selector: 'handle',
   templateUrl: './handle.component.html'
 })
-export class HandleComponent implements OnInit {
+export class HandleComponent implements OnInit, OnDestroy {
   private handleService = inject(HandleService)
   private element = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement
 
@@ -28,34 +29,40 @@ export class HandleComponent implements OnInit {
   @Input()
   public id?: string
 
+  public model!: HandleModel
+
   public ngOnInit() {
     queueMicrotask(() => {
-      const rect = this.parentRect()
+      const { width, height, x, y } = this.parentRect()
 
-      this.handleService.createHandle({
-        position: this.position,
-        type: this.type,
-        id: this.id,
-        parentPosition: signal({ x: rect.x, y: rect.y }),
-        parentSize: signal({ width: rect.width, height: rect.height })
-      })
+      this.model = new HandleModel(
+        {
+          position: this.position,
+          type: this.type,
+          id: this.id,
+          parentPosition: { x, y },
+          parentSize: { width, height }
+        },
+        this.handleService.node()!
+      )
+
+      this.handleService.createHandle(this.model)
     })
   }
 
+  public ngOnDestroy(): void {
+    this.handleService.destroyHandle(this.model)
+  }
 
   private parentRect() {
-    // we assume there is only one foreignObject that wraps node
-    const fo = this.element.closest('foreignObject')
     const parent = this.element.parentElement!
 
-    const foRect = fo!.getBoundingClientRect()
-    const parentRect = parent.getBoundingClientRect()
-
     return {
-      x: parentRect.left - foRect.left,
-      y: parentRect.top - foRect.top,
-      width: parentRect.width,
-      height: parentRect.height
+      x: parent.offsetLeft,
+      y: parent.offsetTop,
+      width: parent.clientWidth,
+      height: parent.clientHeight
     }
   }
 }
+

@@ -13,18 +13,18 @@ export class HandleModel {
     switch (this.rawHandle.position) {
       case 'left': return {
         x: 0,
-        y: this.rawHandle.parentPosition().y + (this.rawHandle.parentSize().height / 2)
+        y: this.parentPosition().y + (this.parentSize().height / 2)
       }
       case 'right': return {
         x: this.parentNode.size().width,
-        y: this.rawHandle.parentPosition().y + (this.rawHandle.parentSize().height / 2)
+        y: this.parentPosition().y + (this.parentSize().height / 2)
       }
       case 'top': return {
-        x: this.rawHandle.parentPosition().x + (this.rawHandle.parentSize().width / 2),
+        x: this.parentPosition().x + (this.parentSize().width / 2),
         y: 0
       }
       case 'bottom': return {
-        x: this.rawHandle.parentPosition().x + this.rawHandle.parentSize().width / 2,
+        x: this.parentPosition().x + this.parentSize().width / 2,
         y: this.parentNode.size().height
       }
     }
@@ -46,6 +46,8 @@ export class HandleModel {
     }
   })
 
+  public parentSize = signal(this.rawHandle.parentSize)
+  public parentPosition = signal(this.rawHandle.parentPosition)
 
   constructor(
     public rawHandle: NodeHandle,

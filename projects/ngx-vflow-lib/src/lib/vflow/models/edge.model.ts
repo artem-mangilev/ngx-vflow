@@ -8,12 +8,42 @@ import { bezierPath } from "../math/edge-path/bezier-path";
 import { UsingPoints } from "../types/using-points.type";
 import { Point } from "../interfaces/point.interface";
 import { HandleModel } from "./handle.model";
+import { toObservable } from "@angular/core/rxjs-interop";
 
 export class EdgeModel {
   public source!: NodeModel
   public target!: NodeModel
   public curve: Curve
   public type: EdgeType
+
+  public detached = computed(() => {
+    if (!this.source || !this.target) {
+      return true
+    }
+
+    let existsSourceHandle = false
+    let existsTargetHandle = false
+
+    if (this.edge.sourceHandle) {
+      existsSourceHandle = !!this.source.handles()
+        .find(handle => handle.rawHandle.id === this.edge.sourceHandle)
+    } else {
+      existsSourceHandle = !!this.source.handles()
+        .find(handle => handle.rawHandle.type === 'source')
+    }
+
+    if (this.edge.targetHandle) {
+      existsTargetHandle = !!this.target.handles()
+        .find(handle => handle.rawHandle.id === this.edge.targetHandle)
+    } else {
+      existsTargetHandle = !!this.target.handles()
+        .find(handle => handle.rawHandle.type === 'target')
+    }
+
+    return !existsSourceHandle || !existsTargetHandle
+  })
+
+  public detached$ = toObservable(this.detached)
 
   public path = computed(() => {
     let source: HandleModel | undefined

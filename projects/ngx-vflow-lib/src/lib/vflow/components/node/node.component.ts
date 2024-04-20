@@ -45,12 +45,7 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
   private targetHandleState = signal<HandleState>('idle')
 
   public ngOnInit() {
-    runInInjectionContext(this.injector, () => {
-      effect(
-        () => this.nodeModel.rawHandles.set(this.handleService.handles()),
-        { allowSignalWrites: true }
-      )
-    })
+    this.handleService.node.set(this.nodeModel);
 
     this.draggableService.toggleDraggable(this.hostRef.nativeElement, this.nodeModel)
   }

@@ -1,5 +1,8 @@
 export type EdgeChange = EdgeDetachedChange | EdgeAddChange | EdgeRemoveChange
 
+/**
+ * @experimental
+ */
 export interface EdgeDetachedChange extends EdgeChangeShared {
   type: 'detached'
 }

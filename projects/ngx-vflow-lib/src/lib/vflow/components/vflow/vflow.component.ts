@@ -145,7 +145,9 @@ export class VflowComponent {
    */
   @Input()
   public set edges(newEdges: Edge[]) {
-    const newModels = ReferenceKeeper.edges(newEdges, this.flowEntitiesService.edges())
+    const newModels = runInInjectionContext(this.injector,
+      () => ReferenceKeeper.edges(newEdges, this.flowEntitiesService.edges())
+    )
 
     // quick and dirty binding nodes to edges
     addNodesToEdges(this.nodeModels, newModels)
@@ -252,6 +254,13 @@ export class VflowComponent {
    */
   public getNode<T = unknown>(id: string): Node<T> | undefined {
     return this.flowEntitiesService.getNode<T>(id)?.node
+  }
+
+  /**
+   * Sync method to get detached edges
+   */
+  public getDetachedEdges(): Edge[] {
+    return this.flowEntitiesService.getDetachedEdges().map(e => e.edge)
   }
   // #endregion
 
