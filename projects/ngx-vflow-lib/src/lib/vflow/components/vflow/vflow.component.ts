@@ -255,6 +255,13 @@ export class VflowComponent {
   public getNode<T = unknown>(id: string): Node<T> | undefined {
     return this.flowEntitiesService.getNode<T>(id)?.node
   }
+
+  /**
+   * Sync method to get detached edges
+   */
+  public getDetachedEdges(): Edge[] {
+    return this.flowEntitiesService.getDetachedEdges().map(e => e.edge)
+  }
   // #endregion
 
   protected trackNodes(idx: number, { node }: NodeModel) {

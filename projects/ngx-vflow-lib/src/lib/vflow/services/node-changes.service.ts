@@ -1,7 +1,7 @@
 import { Injectable, Signal, inject } from '@angular/core';
 import { FlowEntitiesService } from './flow-entities.service';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { Observable, filter, map, merge, of, pairwise, skip, switchMap } from 'rxjs';
+import { Observable, asyncScheduler, filter, map, merge, observeOn, of, pairwise, skip, switchMap } from 'rxjs';
 import { NodeChange } from '../types/node-change.type';
 
 @Injectable()
@@ -57,5 +57,9 @@ export class NodesChangeService {
     this.nodesPositionChange$,
     this.nodeAddChange$,
     this.nodeRemoveChange$
+  ).pipe(
+    // this fixes a bug when on fire node event change,
+    // you can't get valid list of detached edges
+    observeOn(asyncScheduler),
   )
 }
