@@ -18,37 +18,9 @@ export class NodeModel<T = unknown> {
   public sourcePosition = computed(() => this.flow.handlePositions().source)
   public targetPosition = computed(() => this.flow.handlePositions().target)
 
-  public handles = computed(
-    () => {
-      if (this.node.type === 'html-template') {
-        return this.rawHandles()
-      }
+  public handles = signal<HandleModel[]>([])
 
-      return [
-        new HandleModel(
-          {
-            position: this.sourcePosition(),
-            type: 'source',
-            parentPosition: { x: 0, y: 0 },
-            parentSize: this.size()
-          },
-          this
-        ),
-        new HandleModel(
-          {
-            position: this.targetPosition(),
-            type: 'target',
-            parentPosition: { x: 0, y: 0 },
-            parentSize: this.size()
-          },
-          this
-        ),
-
-      ]
-    }
-  )
-
-  public rawHandles = signal<HandleModel[]>([])
+  public handles$ = toObservable(this.handles)
 
   public draggable = true
 

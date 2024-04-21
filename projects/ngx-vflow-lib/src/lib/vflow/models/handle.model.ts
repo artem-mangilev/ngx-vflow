@@ -1,6 +1,8 @@
 import { computed, signal } from "@angular/core";
 import { NodeHandle } from "../services/handle.service";
 import { NodeModel } from "./node.model";
+import { Subject, map } from "rxjs";
+import { toSignal } from "@angular/core/rxjs-interop";
 export class HandleModel {
   public readonly strokeWidth = 2
 
@@ -46,11 +48,40 @@ export class HandleModel {
     }
   })
 
-  public parentSize = signal(this.rawHandle.parentSize)
-  public parentPosition = signal(this.rawHandle.parentPosition)
+  private updateParentSizeAndPosition$ = new Subject<void>()
+
+  public parentSize = toSignal(
+    this.updateParentSizeAndPosition$.pipe(
+      map(() => ({
+        width: this.parentReference.clientWidth,
+        height: this.parentReference.clientHeight
+      }))
+    ),
+    {
+      initialValue: { width: 0, height: 0 }
+    }
+  )
+
+  public parentPosition = toSignal(
+    this.updateParentSizeAndPosition$.pipe(
+      map(() => ({
+        x: this.parentReference.offsetLeft,
+        y: this.parentReference.offsetTop
+      }))
+    ),
+    {
+      initialValue: { x: 0, y: 0 }
+    }
+  )
+
+  public parentReference = this.rawHandle.parentReference!
 
   constructor(
     public rawHandle: NodeHandle,
     private parentNode: NodeModel
   ) { }
+
+  public updateParent() {
+    this.updateParentSizeAndPosition$.next()
+  }
 }

@@ -5,6 +5,10 @@ import { FlowStatusService, batchStatusChanges } from '../../services/flow-statu
 import { FlowEntitiesService } from '../../services/flow-entities.service';
 import { HandleService } from '../../services/handle.service';
 import { HandleModel } from '../../models/handle.model';
+import { resizable } from '../../utils/resizable';
+import { Subscription, map, switchMap, tap } from 'rxjs';
+import { toObservable } from '@angular/core/rxjs-interop';
+import { InjectionContext, WithInjectorDirective } from '../../decorators/run-in-injection-context.decorator';
 
 export type HandleState = 'valid' | 'invalid' | 'idle'
 
@@ -15,9 +19,9 @@ export type HandleState = 'valid' | 'invalid' | 'idle'
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [HandleService]
 })
-export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
+export class NodeComponent extends WithInjectorDirective implements OnInit, AfterViewInit, OnDestroy {
   protected handleService = inject(HandleService)
-  protected injector = inject(Injector)
+  protected zone = inject(NgZone)
 
   @Input()
   public nodeModel!: NodeModel
@@ -44,15 +48,29 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
   private sourceHanldeState = signal<HandleState>('idle')
   private targetHandleState = signal<HandleState>('idle')
 
+  private subscription = new Subscription()
+
   public ngOnInit() {
     this.handleService.node.set(this.nodeModel);
 
     this.draggableService.toggleDraggable(this.hostRef.nativeElement, this.nodeModel)
+
+    this.subscription.add(
+      this.nodeModel.handles$.pipe(
+        switchMap((handles) =>
+          resizable(handles.map(h => h.parentReference!), this.zone)
+            .pipe(map(() => handles))
+        ),
+        tap((handles) => handles.forEach(h => h.updateParent()))
+      ).subscribe()
+    )
   }
 
   public ngAfterViewInit(): void {
     // TODO remove microtask
     queueMicrotask(() => {
+      this.setInitialHandles()
+
       if (this.nodeModel.node.type === 'default') {
         const { width, height } = this.nodeContentRef.nativeElement.getBBox()
         this.nodeModel.size.set({ width, height })
@@ -69,6 +87,7 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   public ngOnDestroy(): void {
     this.draggableService.destroy(this.hostRef.nativeElement)
+    this.subscription.unsubscribe()
   }
 
   protected startConnection(event: MouseEvent, handle: HandleModel) {
@@ -132,6 +151,33 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
     const status = this.flowStatusService.status()
     if (status.state === 'connection-validation') {
       this.flowStatusService.setConnectionStartStatus(status.payload.sourceNode, status.payload.sourceHandle)
+    }
+  }
+
+  @InjectionContext
+  private setInitialHandles() {
+    if (this.nodeModel.node.type === 'default') {
+      this.handleService.createHandle(
+        new HandleModel(
+          {
+            position: this.nodeModel.sourcePosition(),
+            type: 'source',
+            parentReference: this.htmlWrapperRef.nativeElement
+          },
+          this.nodeModel
+        ),
+      )
+
+      this.handleService.createHandle(
+        new HandleModel(
+          {
+            position: this.nodeModel.targetPosition(),
+            type: 'target',
+            parentReference: this.htmlWrapperRef.nativeElement
+          },
+          this.nodeModel
+        ),
+      )
     }
   }
 

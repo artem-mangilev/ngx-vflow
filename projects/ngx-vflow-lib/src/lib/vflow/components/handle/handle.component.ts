@@ -1,13 +1,14 @@
-import { Component, ElementRef, Input, OnDestroy, OnInit, inject, signal } from '@angular/core';
+import { Component, ElementRef, Injector, Input, NgZone, OnDestroy, OnInit, inject, runInInjectionContext, signal } from '@angular/core';
 import { Position } from '../../types/position.type';
 import { HandleService } from '../../services/handle.service';
 import { HandleModel } from '../../models/handle.model';
+import { InjectionContext, WithInjectorDirective } from '../../decorators/run-in-injection-context.decorator';
 
 @Component({
   selector: 'handle',
   templateUrl: './handle.component.html'
 })
-export class HandleComponent implements OnInit, OnDestroy {
+export class HandleComponent extends WithInjectorDirective implements OnInit, OnDestroy {
   private handleService = inject(HandleService)
   private element = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement
 
@@ -31,38 +32,25 @@ export class HandleComponent implements OnInit, OnDestroy {
 
   public model!: HandleModel
 
+  @InjectionContext
   public ngOnInit() {
-    queueMicrotask(() => {
-      const { width, height, x, y } = this.parentRect()
+    this.model = new HandleModel(
+      {
+        position: this.position,
+        type: this.type,
+        id: this.id,
+        parentReference: this.element.parentElement!
+      },
+      this.handleService.node()!
+    )
 
-      this.model = new HandleModel(
-        {
-          position: this.position,
-          type: this.type,
-          id: this.id,
-          parentPosition: { x, y },
-          parentSize: { width, height }
-        },
-        this.handleService.node()!
-      )
+    this.handleService.createHandle(this.model)
 
-      this.handleService.createHandle(this.model)
-    })
+    queueMicrotask(() => this.model.updateParent())
   }
 
   public ngOnDestroy(): void {
     this.handleService.destroyHandle(this.model)
-  }
-
-  private parentRect() {
-    const parent = this.element.parentElement!
-
-    return {
-      x: parent.offsetLeft,
-      y: parent.offsetTop,
-      width: parent.clientWidth,
-      height: parent.clientHeight
-    }
   }
 }
 

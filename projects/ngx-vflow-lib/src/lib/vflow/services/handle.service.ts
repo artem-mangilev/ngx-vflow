@@ -8,9 +8,8 @@ import { HandleModel } from '../models/handle.model';
 export interface NodeHandle {
   position: Position
   type: HandleType
-  parentPosition: Point
-  parentSize: { width: number, height: number }
   id?: string
+  parentReference?: HTMLElement
 }
 
 @Injectable()
@@ -20,7 +19,7 @@ export class HandleService {
   public createHandle(newHandle: HandleModel) {
     const node = this.node()
     if (node) {
-      node.rawHandles.update(handles => [...handles, newHandle])
+      node.handles.update(handles => [...handles, newHandle])
     }
   }
 
@@ -28,7 +27,7 @@ export class HandleService {
     const node = this.node()
     // TODO: microtask
     if (node) {
-      queueMicrotask(() => node.rawHandles.update(
+      queueMicrotask(() => node.handles.update(
         handles => handles.filter(handle => handle !== handleToDestoy)
       ));
     }
