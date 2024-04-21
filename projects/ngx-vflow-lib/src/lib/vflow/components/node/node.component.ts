@@ -6,7 +6,7 @@ import { FlowEntitiesService } from '../../services/flow-entities.service';
 import { HandleService } from '../../services/handle.service';
 import { HandleModel } from '../../models/handle.model';
 import { resizable } from '../../utils/resizable';
-import { Subscription, map, switchMap, tap } from 'rxjs';
+import { Subscription, map, startWith, switchMap, tap } from 'rxjs';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { InjectionContext, WithInjectorDirective } from '../../decorators/run-in-injection-context.decorator';
 
@@ -55,15 +55,17 @@ export class NodeComponent extends WithInjectorDirective implements OnInit, Afte
 
     this.draggableService.toggleDraggable(this.hostRef.nativeElement, this.nodeModel)
 
-    this.subscription.add(
-      this.nodeModel.handles$.pipe(
+    const sub = this.nodeModel.handles$
+      .pipe(
         switchMap((handles) =>
           resizable(handles.map(h => h.parentReference!), this.zone)
             .pipe(map(() => handles))
         ),
         tap((handles) => handles.forEach(h => h.updateParent()))
-      ).subscribe()
-    )
+      )
+      .subscribe()
+
+    this.subscription.add(sub)
   }
 
   public ngAfterViewInit(): void {
@@ -77,10 +79,18 @@ export class NodeComponent extends WithInjectorDirective implements OnInit, Afte
       }
 
       if (this.nodeModel.node.type === 'html-template') {
-        const width = this.htmlWrapperRef.nativeElement.clientWidth
-        const height = this.htmlWrapperRef.nativeElement.clientHeight
+        const sub = resizable([this.htmlWrapperRef.nativeElement], this.zone)
+          .pipe(
+            startWith(null),
+            tap(() => {
+              const width = this.htmlWrapperRef.nativeElement.clientWidth
+              const height = this.htmlWrapperRef.nativeElement.clientHeight
 
-        this.nodeModel.size.set({ width, height })
+              this.nodeModel.size.set({ width, height })
+            })
+          ).subscribe()
+
+        this.subscription.add(sub)
       }
     })
   }
