@@ -53,8 +53,8 @@ export class HandleModel {
   public parentSize = toSignal(
     this.updateParentSizeAndPosition$.pipe(
       map(() => ({
-        width: this.parentReference.clientWidth,
-        height: this.parentReference.clientHeight
+        width: this.parentReference.offsetWidth,
+        height: this.parentReference.offsetHeight
       }))
     ),
     {
