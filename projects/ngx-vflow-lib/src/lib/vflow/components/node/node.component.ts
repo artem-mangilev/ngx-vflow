@@ -7,8 +7,8 @@ import { HandleService } from '../../services/handle.service';
 import { HandleModel } from '../../models/handle.model';
 import { resizable } from '../../utils/resizable';
 import { Subscription, map, startWith, switchMap, tap } from 'rxjs';
-import { toObservable } from '@angular/core/rxjs-interop';
 import { InjectionContext, WithInjectorDirective } from '../../decorators/run-in-injection-context.decorator';
+import { Microtask } from '../../decorators/microtask.decorator';
 
 export type HandleState = 'valid' | 'invalid' | 'idle'
 
@@ -68,31 +68,29 @@ export class NodeComponent extends WithInjectorDirective implements OnInit, Afte
     this.subscription.add(sub)
   }
 
+  @Microtask
   public ngAfterViewInit(): void {
-    // TODO remove microtask
-    queueMicrotask(() => {
-      this.setInitialHandles()
+    this.setInitialHandles()
 
-      if (this.nodeModel.node.type === 'default') {
-        const { width, height } = this.nodeContentRef.nativeElement.getBBox()
-        this.nodeModel.size.set({ width, height })
-      }
+    if (this.nodeModel.node.type === 'default') {
+      const { width, height } = this.nodeContentRef.nativeElement.getBBox()
+      this.nodeModel.size.set({ width, height })
+    }
 
-      if (this.nodeModel.node.type === 'html-template') {
-        const sub = resizable([this.htmlWrapperRef.nativeElement], this.zone)
-          .pipe(
-            startWith(null),
-            tap(() => {
-              const width = this.htmlWrapperRef.nativeElement.clientWidth
-              const height = this.htmlWrapperRef.nativeElement.clientHeight
+    if (this.nodeModel.node.type === 'html-template') {
+      const sub = resizable([this.htmlWrapperRef.nativeElement], this.zone)
+        .pipe(
+          startWith(null),
+          tap(() => {
+            const width = this.htmlWrapperRef.nativeElement.clientWidth
+            const height = this.htmlWrapperRef.nativeElement.clientHeight
 
-              this.nodeModel.size.set({ width, height })
-            })
-          ).subscribe()
+            this.nodeModel.size.set({ width, height })
+          })
+        ).subscribe()
 
-        this.subscription.add(sub)
-      }
-    })
+      this.subscription.add(sub)
+    }
   }
 
   public ngOnDestroy(): void {

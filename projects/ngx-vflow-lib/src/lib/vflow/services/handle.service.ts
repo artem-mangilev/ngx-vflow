@@ -4,6 +4,7 @@ import { HandleType } from '../types/handle-type.type';
 import { Point } from '../interfaces/point.interface';
 import { NodeModel } from '../models/node.model';
 import { HandleModel } from '../models/handle.model';
+import { Microtask } from '../decorators/microtask.decorator';
 
 export interface NodeHandle {
   position: Position
@@ -25,11 +26,10 @@ export class HandleService {
 
   public destroyHandle(handleToDestoy: HandleModel) {
     const node = this.node()
-    // TODO: microtask
     if (node) {
-      queueMicrotask(() => node.handles.update(
+      node.handles.update(
         handles => handles.filter(handle => handle !== handleToDestoy)
-      ));
+      )
     }
   }
 }
