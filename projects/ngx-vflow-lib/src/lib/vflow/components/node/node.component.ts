@@ -45,9 +45,6 @@ export class NodeComponent extends WithInjectorDirective implements OnInit, Afte
     this.flowStatusService.status().state === 'connection-validation'
   )
 
-  private sourceHanldeState = signal<HandleState>('idle')
-  private targetHandleState = signal<HandleState>('idle')
-
   private subscription = new Subscription()
 
   public ngOnInit() {
@@ -143,7 +140,8 @@ export class NodeComponent extends WithInjectorDirective implements OnInit, Afte
         sourceHandle: sourceHandle.rawHandle.id,
         targetHandle: targetHandle.rawHandle.id
       })
-      this.targetHandleState.set(valid ? 'valid' : 'invalid')
+
+      targetHandle.state.set(valid ? 'valid' : 'invalid')
 
       this.flowStatusService.setConnectionValidationStatus(valid, sourceNode, targetNode, sourceHandle, targetHandle)
     }
@@ -152,8 +150,8 @@ export class NodeComponent extends WithInjectorDirective implements OnInit, Afte
   /**
    * TODO srp
    */
-  protected resetValidateTargetHandle() {
-    this.targetHandleState.set('idle')
+  protected resetValidateTargetHandle(targetHandle: HandleModel) {
+    targetHandle.state.set('idle')
 
     // drop back to start status
     const status = this.flowStatusService.status()

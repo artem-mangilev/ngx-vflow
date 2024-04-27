@@ -3,6 +3,9 @@ import { NodeHandle } from "../services/handle.service";
 import { NodeModel } from "./node.model";
 import { Subject, map } from "rxjs";
 import { toSignal } from "@angular/core/rxjs-interop";
+
+export type HandleState = 'valid' | 'invalid' | 'idle'
+
 export class HandleModel {
   public readonly strokeWidth = 2
 
@@ -52,6 +55,8 @@ export class HandleModel {
     }
   })
 
+  public state = signal<HandleState>('idle')
+
   private updateParentSizeAndPosition$ = new Subject<void>()
 
   public parentSize = toSignal(
@@ -84,7 +89,8 @@ export class HandleModel {
 
   public templateContext = {
     $implicit: {
-      point: this.offset
+      point: this.offset,
+      state: this.state
     }
   }
 
