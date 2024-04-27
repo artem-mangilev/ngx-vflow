@@ -14,8 +14,8 @@ export class HandleSizeControllerDirective implements AfterViewInit {
 
     const stroke = getChildStrokeWidth(element)
     this.handleModel.size.set({
-      width: rect.width + (2 * stroke),
-      height: rect.height + (2 * stroke)
+      width: rect.width + stroke,
+      height: rect.height + stroke
     })
   }
 }
