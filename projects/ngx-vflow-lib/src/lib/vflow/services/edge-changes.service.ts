@@ -21,7 +21,7 @@ export class EdgeChangesService {
         const edges = untracked(this.entitiesService.edges)
 
         return edges.filter(({ source, target }) =>
-          !nodes.includes(source) || !nodes.includes(target)
+          !nodes.includes(source()!) || !nodes.includes(target()!)
         )
       })
     ),

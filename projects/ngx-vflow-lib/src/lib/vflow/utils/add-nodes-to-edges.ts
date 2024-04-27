@@ -9,7 +9,7 @@ export function addNodesToEdges(nodes: NodeModel[], edges: EdgeModel[]) {
   }, {} as { [nodeId: string]: NodeModel })
 
   edges.forEach(e => {
-    e.source = nodesById[e.edge.source]
-    e.target = nodesById[e.edge.target]
+    e.source.set(nodesById[e.edge.source])
+    e.target.set(nodesById[e.edge.target])
   })
 }
