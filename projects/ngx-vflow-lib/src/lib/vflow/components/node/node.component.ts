@@ -188,24 +188,4 @@ export class NodeComponent extends WithInjectorDirective implements OnInit, Afte
       )
     }
   }
-
-  // protected getHandleContext(type: 'source' | 'target') {
-  //   if (type === 'source') {
-  //     return {
-  //       $implicit: {
-  //         point: this.nodeModel.sourceOffset,
-  //         alignedPoint: this.nodeModel.sourceOffsetAligned,
-  //         state: this.sourceHanldeStateReadonly
-  //       }
-  //     }
-  //   }
-
-  //   return {
-  //     $implicit: {
-  //       point: this.nodeModel.targetOffset,
-  //       alignedPoint: this.nodeModel.targetOffsetAligned,
-  //       state: this.targetHanldeStateReadonly
-  //     }
-  //   }
-  // }
 }
