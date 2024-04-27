@@ -4,7 +4,7 @@
   width="100"
   height="50"
 >
-  <div class="default-node" [innerHTML]="nodeModel.node.text ?? ''"></div>
+  <div #htmlWrapper class="default-node" [innerHTML]="nodeModel.node.text ?? ''"></div>
 </svg:foreignObject>
 
 <svg:foreignObject
@@ -23,7 +23,7 @@
 
 <ng-container *ngFor="let handle of nodeModel.handles()">
   <svg:circle
-    #sourceHandle
+    *ngIf="!handle.template"
     [attr.cx]="handle.offset().x"
     [attr.cy]="handle.offset().y"
     [attr.stroke-width]="handle.strokeWidth"
@@ -34,15 +34,24 @@
     (mouseup)="handle.rawHandle.type === 'target' ? endConnection() : null"
   />
 
+  <svg:g
+    *ngIf="handle.template"
+    [handleSizeController]="handle"
+    (mousedown)="handle.rawHandle.type === 'source' ? startConnection($event, handle) : null"
+    (mouseup)="handle.rawHandle.type === 'target' ? endConnection() : null"
+  >
+    <ng-container *ngTemplateOutlet="handle.template; context: handle.templateContext" />
+  </svg:g>
+
   <svg:circle
     *ngIf="handle.rawHandle.type === 'target' && showMagnet()"
     class="magnet"
     [attr.r]="nodeModel.magnetRadius"
     [attr.cx]="handle.offset().x"
     [attr.cy]="handle.offset().y"
-    (mouseup)="endConnection(); resetValidateTargetHandle()"
+    (mouseup)="endConnection(); resetValidateTargetHandle(handle)"
     (mouseover)="validateTargetHandle(handle)"
-    (mouseout)="resetValidateTargetHandle()"
+    (mouseout)="resetValidateTargetHandle(handle)"
   />
 </ng-container>
 

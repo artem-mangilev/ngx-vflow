@@ -46,7 +46,7 @@ export class FlowEntitiesService {
   public readonly validEdges = computed(() => {
     const nodes = this.nodes()
 
-    return this.edges().filter(e => nodes.includes(e.source) && nodes.includes(e.target))
+    return this.edges().filter(e => nodes.includes(e.source()!) && nodes.includes(e.target()!))
   })
 
   public getNode<T>(id: string) {

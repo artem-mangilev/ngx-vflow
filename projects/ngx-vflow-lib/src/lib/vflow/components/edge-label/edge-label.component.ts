@@ -2,6 +2,7 @@ import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Input, O
 import { EdgeLabelModel } from '../../models/edge-label.model';
 import { EdgeModel } from '../../models/edge.model';
 import { Point } from '../../interfaces/point.interface';
+import { Microtask } from '../../decorators/microtask.decorator';
 
 @Component({
   selector: 'g[edgeLabel]',
@@ -55,17 +56,17 @@ export class EdgeLabelComponent implements AfterViewInit {
 
   private pointSignal = signal({ x: 0, y: 0 })
 
+  @Microtask
   public ngAfterViewInit(): void {
-    queueMicrotask(() => {
-      // this is a fix for visual artifact in chrome that for some reason adresses only for edge label.
-      // the bug reproduces if edgeLabelWrapperRef size fully matched the size of parent foreignObject
-      const MAGIC_VALUE_TO_FIX_GLITCH_IN_CHROME = 2
+    // this is a fix for visual artifact in chrome that for some reason adresses only for edge label.
+    // the bug reproduces if edgeLabelWrapperRef size fully matched the size of parent foreignObject
+    const MAGIC_VALUE_TO_FIX_GLITCH_IN_CHROME = 2
 
-      const width = this.edgeLabelWrapperRef.nativeElement.clientWidth + MAGIC_VALUE_TO_FIX_GLITCH_IN_CHROME
-      const height = this.edgeLabelWrapperRef.nativeElement.clientHeight + MAGIC_VALUE_TO_FIX_GLITCH_IN_CHROME
+    const width = this.edgeLabelWrapperRef.nativeElement.clientWidth + MAGIC_VALUE_TO_FIX_GLITCH_IN_CHROME
+    const height = this.edgeLabelWrapperRef.nativeElement.clientHeight + MAGIC_VALUE_TO_FIX_GLITCH_IN_CHROME
 
-      this.model.size.set({ width, height })
-    })
+    this.model.size.set({ width, height })
+
   }
 
   protected getLabelContext() {

@@ -1,4 +1,4 @@
-import { computed } from "@angular/core";
+import { computed, signal } from "@angular/core";
 import { EdgeLabelPosition } from "../interfaces/edge-label.interface";
 import { Edge, Curve, EdgeType } from "../interfaces/edge.interface";
 import { EdgeLabelModel } from "./edge-label.model";
@@ -6,18 +6,20 @@ import { NodeModel } from "./node.model";
 import { straightPath } from "../math/edge-path/straigh-path";
 import { bezierPath } from "../math/edge-path/bezier-path";
 import { UsingPoints } from "../types/using-points.type";
-import { Point } from "../interfaces/point.interface";
 import { HandleModel } from "./handle.model";
 import { toObservable } from "@angular/core/rxjs-interop";
 
 export class EdgeModel {
-  public source!: NodeModel
-  public target!: NodeModel
+  public source = signal<NodeModel | undefined>(undefined)
+  public target = signal<NodeModel | undefined>(undefined)
   public curve: Curve
   public type: EdgeType
 
   public detached = computed(() => {
-    if (!this.source || !this.target) {
+    const source = this.source()
+    const target = this.target()
+
+    if (!source || !target) {
       return true
     }
 
@@ -25,18 +27,18 @@ export class EdgeModel {
     let existsTargetHandle = false
 
     if (this.edge.sourceHandle) {
-      existsSourceHandle = !!this.source.handles()
+      existsSourceHandle = !!source.handles()
         .find(handle => handle.rawHandle.id === this.edge.sourceHandle)
     } else {
-      existsSourceHandle = !!this.source.handles()
+      existsSourceHandle = !!source.handles()
         .find(handle => handle.rawHandle.type === 'source')
     }
 
     if (this.edge.targetHandle) {
-      existsTargetHandle = !!this.target.handles()
+      existsTargetHandle = !!target.handles()
         .find(handle => handle.rawHandle.id === this.edge.targetHandle)
     } else {
-      existsTargetHandle = !!this.target.handles()
+      existsTargetHandle = !!target.handles()
         .find(handle => handle.rawHandle.type === 'target')
     }
 
@@ -48,19 +50,19 @@ export class EdgeModel {
   public path = computed(() => {
     let source: HandleModel | undefined
     if (this.edge.sourceHandle) {
-      source = this.source.handles()
+      source = this.source()?.handles()
         .find(handle => handle.rawHandle.id === this.edge.sourceHandle)
     } else {
-      source = this.source.handles()
+      source = this.source()?.handles()
         .find(handle => handle.rawHandle.type === 'source')
     }
 
     let target: HandleModel | undefined
     if (this.edge.targetHandle) {
-      target = this.target.handles()
+      target = this.target()?.handles()
         .find(handle => handle.rawHandle.id === this.edge.targetHandle)
     } else {
-      target = this.target.handles()
+      target = this.target()?.handles()
         .find(handle => handle.rawHandle.type === 'target')
     }
 

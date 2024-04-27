@@ -1,10 +1,14 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, HostBinding, Injector, Input, NgZone, OnDestroy, OnInit, TemplateRef, ViewChild, computed, effect, inject, runInInjectionContext, signal } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, HostBinding, Injector, Input, NgZone, OnDestroy, OnInit, QueryList, TemplateRef, ViewChild, ViewChildren, computed, effect, inject, runInInjectionContext, signal } from '@angular/core';
 import { DraggableService } from '../../services/draggable.service';
 import { NodeModel } from '../../models/node.model';
 import { FlowStatusService, batchStatusChanges } from '../../services/flow-status.service';
 import { FlowEntitiesService } from '../../services/flow-entities.service';
 import { HandleService } from '../../services/handle.service';
 import { HandleModel } from '../../models/handle.model';
+import { resizable } from '../../utils/resizable';
+import { Subscription, map, startWith, switchMap, tap } from 'rxjs';
+import { InjectionContext, WithInjectorDirective } from '../../decorators/run-in-injection-context.decorator';
+import { Microtask } from '../../decorators/microtask.decorator';
 
 export type HandleState = 'valid' | 'invalid' | 'idle'
 
@@ -15,9 +19,9 @@ export type HandleState = 'valid' | 'invalid' | 'idle'
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [HandleService]
 })
-export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
+export class NodeComponent extends WithInjectorDirective implements OnInit, AfterViewInit, OnDestroy {
   protected handleService = inject(HandleService)
-  protected injector = inject(Injector)
+  protected zone = inject(NgZone)
 
   @Input()
   public nodeModel!: NodeModel
@@ -41,34 +45,54 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
     this.flowStatusService.status().state === 'connection-validation'
   )
 
-  private sourceHanldeState = signal<HandleState>('idle')
-  private targetHandleState = signal<HandleState>('idle')
+  private subscription = new Subscription()
 
   public ngOnInit() {
     this.handleService.node.set(this.nodeModel);
 
     this.draggableService.toggleDraggable(this.hostRef.nativeElement, this.nodeModel)
+
+    const sub = this.nodeModel.handles$
+      .pipe(
+        switchMap((handles) =>
+          resizable(handles.map(h => h.parentReference!), this.zone)
+            .pipe(map(() => handles))
+        ),
+        tap((handles) => handles.forEach(h => h.updateParent()))
+      )
+      .subscribe()
+
+    this.subscription.add(sub)
   }
 
+  @Microtask
   public ngAfterViewInit(): void {
-    // TODO remove microtask
-    queueMicrotask(() => {
-      if (this.nodeModel.node.type === 'default') {
-        const { width, height } = this.nodeContentRef.nativeElement.getBBox()
-        this.nodeModel.size.set({ width, height })
-      }
+    this.setInitialHandles()
 
-      if (this.nodeModel.node.type === 'html-template') {
-        const width = this.htmlWrapperRef.nativeElement.clientWidth
-        const height = this.htmlWrapperRef.nativeElement.clientHeight
+    if (this.nodeModel.node.type === 'default') {
+      const { width, height } = this.nodeContentRef.nativeElement.getBBox()
+      this.nodeModel.size.set({ width, height })
+    }
 
-        this.nodeModel.size.set({ width, height })
-      }
-    })
+    if (this.nodeModel.node.type === 'html-template') {
+      const sub = resizable([this.htmlWrapperRef.nativeElement], this.zone)
+        .pipe(
+          startWith(null),
+          tap(() => {
+            const width = this.htmlWrapperRef.nativeElement.clientWidth
+            const height = this.htmlWrapperRef.nativeElement.clientHeight
+
+            this.nodeModel.size.set({ width, height })
+          })
+        ).subscribe()
+
+      this.subscription.add(sub)
+    }
   }
 
   public ngOnDestroy(): void {
     this.draggableService.destroy(this.hostRef.nativeElement)
+    this.subscription.unsubscribe()
   }
 
   protected startConnection(event: MouseEvent, handle: HandleModel) {
@@ -116,7 +140,8 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
         sourceHandle: sourceHandle.rawHandle.id,
         targetHandle: targetHandle.rawHandle.id
       })
-      this.targetHandleState.set(valid ? 'valid' : 'invalid')
+
+      targetHandle.state.set(valid ? 'valid' : 'invalid')
 
       this.flowStatusService.setConnectionValidationStatus(valid, sourceNode, targetNode, sourceHandle, targetHandle)
     }
@@ -125,8 +150,8 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
   /**
    * TODO srp
    */
-  protected resetValidateTargetHandle() {
-    this.targetHandleState.set('idle')
+  protected resetValidateTargetHandle(targetHandle: HandleModel) {
+    targetHandle.state.set('idle')
 
     // drop back to start status
     const status = this.flowStatusService.status()
@@ -135,23 +160,30 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  // protected getHandleContext(type: 'source' | 'target') {
-  //   if (type === 'source') {
-  //     return {
-  //       $implicit: {
-  //         point: this.nodeModel.sourceOffset,
-  //         alignedPoint: this.nodeModel.sourceOffsetAligned,
-  //         state: this.sourceHanldeStateReadonly
-  //       }
-  //     }
-  //   }
+  @InjectionContext
+  private setInitialHandles() {
+    if (this.nodeModel.node.type === 'default') {
+      this.handleService.createHandle(
+        new HandleModel(
+          {
+            position: this.nodeModel.sourcePosition(),
+            type: 'source',
+            parentReference: this.htmlWrapperRef.nativeElement
+          },
+          this.nodeModel
+        ),
+      )
 
-  //   return {
-  //     $implicit: {
-  //       point: this.nodeModel.targetOffset,
-  //       alignedPoint: this.nodeModel.targetOffsetAligned,
-  //       state: this.targetHanldeStateReadonly
-  //     }
-  //   }
-  // }
+      this.handleService.createHandle(
+        new HandleModel(
+          {
+            position: this.nodeModel.targetPosition(),
+            type: 'target',
+            parentReference: this.htmlWrapperRef.nativeElement
+          },
+          this.nodeModel
+        ),
+      )
+    }
+  }
 }
