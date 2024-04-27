@@ -1,4 +1,4 @@
-<vflow [nodes]="nodes" [edges]="edges" (onConnect)="createEdge($event)">
+<vflow [nodes]="nodes" [edges]="edges" (onConnect)="createEdge($event)" [connection]="connectionSettings">
   <ng-template nodeHtml let-ctx>
     <ng-container *ngIf="ctx.node.data.type === 'output'">
       <div class="custom-node">
@@ -51,6 +51,8 @@
     ry="1"
     [attr.x]="ctx.point().x - 5"
     [attr.y]="ctx.point().y - 5"
-    fill="#ffffff"
+    [class.handle_idle]="ctx.state() === 'idle'"
+    [class.handle_valid]="ctx.state() === 'valid'"
+    [class.handle_invalid]="ctx.state() === 'invalid'"
   />
 </ng-template>

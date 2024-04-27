@@ -16,3 +16,17 @@
   border-radius: 5px;
   text-align: center;
 }
+
+.handle {
+  &_idle {
+    fill: #fff;
+  }
+
+  &_valid {
+    fill: green;
+  }
+
+  &_invalid {
+    fill: red;
+  }
+}

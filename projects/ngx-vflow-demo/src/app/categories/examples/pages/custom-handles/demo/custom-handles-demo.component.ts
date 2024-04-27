@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { Edge, Node, VflowModule, Connection } from 'projects/ngx-vflow-lib/src/public-api';
+import { Edge, Node, VflowModule, Connection, ConnectionSettings } from 'projects/ngx-vflow-lib/src/public-api';
 
 @Component({
   templateUrl: './custom-handles-demo.component.html',
@@ -34,6 +34,12 @@ export class CustomHandlesDemoComponent {
   ]
 
   public edges: Edge[] = []
+
+  public connectionSettings: ConnectionSettings = {
+    validator: (connection) => {
+      return connection.target === '2' && connection.targetHandle === 'input1';
+    }
+  }
 
   public createEdge({ source, target, sourceHandle, targetHandle }: Connection) {
     this.edges = [...this.edges, {
