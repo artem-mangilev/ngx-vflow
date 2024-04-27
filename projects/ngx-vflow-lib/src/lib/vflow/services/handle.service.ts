@@ -1,4 +1,4 @@
-import { Injectable, Signal, signal } from '@angular/core';
+import { Injectable, Signal, TemplateRef, signal } from '@angular/core';
 import { Position } from '../types/position.type';
 import { HandleType } from '../types/handle-type.type';
 import { Point } from '../interfaces/point.interface';
@@ -11,6 +11,7 @@ export interface NodeHandle {
   type: HandleType
   id?: string
   parentReference?: HTMLElement
+  template?: TemplateRef<any>
 }
 
 @Injectable()

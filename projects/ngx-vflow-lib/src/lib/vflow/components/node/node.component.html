@@ -23,7 +23,7 @@
 
 <ng-container *ngFor="let handle of nodeModel.handles()">
   <svg:circle
-    #sourceHandle
+    *ngIf="!handle.template"
     [attr.cx]="handle.offset().x"
     [attr.cy]="handle.offset().y"
     [attr.stroke-width]="handle.strokeWidth"
@@ -33,6 +33,15 @@
     (mousedown)="handle.rawHandle.type === 'source' ? startConnection($event, handle) : null"
     (mouseup)="handle.rawHandle.type === 'target' ? endConnection() : null"
   />
+
+  <svg:g
+    *ngIf="handle.template"
+    [handleSizeController]="handle"
+    (mousedown)="handle.rawHandle.type === 'source' ? startConnection($event, handle) : null"
+    (mouseup)="handle.rawHandle.type === 'target' ? endConnection() : null"
+  >
+    <ng-container *ngTemplateOutlet="handle.template; context: handle.templateContext" />
+  </svg:g>
 
   <svg:circle
     *ngIf="handle.rawHandle.type === 'target' && showMagnet()"

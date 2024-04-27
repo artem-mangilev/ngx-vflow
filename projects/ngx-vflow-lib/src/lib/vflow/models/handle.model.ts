@@ -6,6 +6,10 @@ import { toSignal } from "@angular/core/rxjs-interop";
 export class HandleModel {
   public readonly strokeWidth = 2
 
+  /**
+   * Pre-computed size for default handle, changed dynamically
+   * for custom handles
+   */
   public size = signal({
     width: 10 + (2 * this.strokeWidth),
     height: 10 + (2 * this.strokeWidth)
@@ -75,6 +79,14 @@ export class HandleModel {
   )
 
   public parentReference = this.rawHandle.parentReference!
+
+  public template = this.rawHandle.template
+
+  public templateContext = {
+    $implicit: {
+      point: this.offset
+    }
+  }
 
   constructor(
     public rawHandle: NodeHandle,

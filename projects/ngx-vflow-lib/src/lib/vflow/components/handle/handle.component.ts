@@ -1,4 +1,4 @@
-import { Component, ElementRef, Injector, Input, NgZone, OnDestroy, OnInit, inject, runInInjectionContext, signal } from '@angular/core';
+import { Component, ElementRef, Injector, Input, NgZone, OnDestroy, OnInit, TemplateRef, inject, runInInjectionContext, signal } from '@angular/core';
 import { Position } from '../../types/position.type';
 import { HandleService } from '../../services/handle.service';
 import { HandleModel } from '../../models/handle.model';
@@ -30,6 +30,9 @@ export class HandleComponent extends WithInjectorDirective implements OnInit, On
   @Input()
   public id?: string
 
+  @Input()
+  public template?: TemplateRef<any>
+
   public model!: HandleModel
 
   @InjectionContext
@@ -39,7 +42,8 @@ export class HandleComponent extends WithInjectorDirective implements OnInit, On
         position: this.position,
         type: this.type,
         id: this.id,
-        parentReference: this.element.parentElement!
+        parentReference: this.element.parentElement!,
+        template: this.template
       },
       this.handleService.node()!
     )
