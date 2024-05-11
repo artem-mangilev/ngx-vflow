@@ -138,7 +138,7 @@ export class VflowComponent {
     this.flowEntitiesService.nodes.set(newModels)
   }
 
-  protected get nodeModels() { return this.flowEntitiesService.nodes() }
+  protected nodeModels = computed(() => this.flowEntitiesService.nodes())
 
   /**
    * Edges to render
@@ -150,12 +150,12 @@ export class VflowComponent {
     )
 
     // quick and dirty binding nodes to edges
-    addNodesToEdges(this.nodeModels, newModels)
+    addNodesToEdges(this.nodeModels(), newModels)
 
     this.flowEntitiesService.edges.set(newModels)
   }
 
-  protected get edgeModels() { return this.flowEntitiesService.validEdges() }
+  protected edgeModels = computed(() => this.flowEntitiesService.validEdges())
   // #endregion
 
   // #region TEMPLATES

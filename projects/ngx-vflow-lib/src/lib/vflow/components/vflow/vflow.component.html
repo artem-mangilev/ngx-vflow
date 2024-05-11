@@ -24,7 +24,7 @@
 
     <!-- Edges  -->
     <svg:g
-      *ngFor="let model of edgeModels; trackBy: trackEdges"
+      *ngFor="let model of edgeModels(); trackBy: trackEdges"
       edge
       [model]="model"
       [edgeTemplate]="edgeTemplateDirective?.templateRef"
@@ -33,7 +33,7 @@
 
     <!-- Nodes -->
     <svg:g
-      *ngFor="let model of nodeModels; trackBy: trackNodes"
+      *ngFor="let model of nodeModels(); trackBy: trackNodes"
       node
       [nodeModel]="model"
       [nodeHtmlTemplate]="nodeHtmlDirective?.templateRef"
