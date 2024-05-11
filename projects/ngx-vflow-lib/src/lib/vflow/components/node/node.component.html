@@ -24,7 +24,7 @@
   <div #htmlWrapper class="wrapper">
     <ng-container
       [ngTemplateOutlet]="nodeHtmlTemplate"
-      [ngTemplateOutletContext]="{ $implicit: { node: nodeModel.node } }"
+      [ngTemplateOutletContext]="{ $implicit: { node: nodeModel.node, selected: nodeModel.selected } }"
       [ngTemplateOutletInjector]="injector"
     />
   </div>
