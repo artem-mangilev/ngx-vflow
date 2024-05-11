@@ -3,6 +3,7 @@
   #nodeContent
   width="100"
   height="50"
+  (mousedown)="pullNode()"
 >
   <div #htmlWrapper class="default-node" [innerHTML]="nodeModel.node.text ?? ''"></div>
 </svg:foreignObject>
@@ -11,6 +12,7 @@
   *ngIf="nodeModel.node.type === 'html-template' && nodeHtmlTemplate"
   [attr.width]="nodeModel.size().width"
   [attr.height]="nodeModel.size().height"
+  (mousedown)="pullNode()"
 >
   <div #htmlWrapper class="wrapper">
     <ng-container

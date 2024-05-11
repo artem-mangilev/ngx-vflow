@@ -25,6 +25,7 @@ import { EdgeChangesService } from '../../services/edge-changes.service';
 import { NodeChange } from '../../types/node-change.type';
 import { ChangesControllerDirective } from '../../directives/changes-controller.directive';
 import { EdgeChange } from '../../types/edge-change.type';
+import { NodeRenderingService } from '../../services/node-rendering.service';
 
 const connectionControllerHostDirective = {
   directive: ConnectionControllerDirective,
@@ -47,7 +48,8 @@ const changesControllerHostDirective = {
     FlowStatusService,
     FlowEntitiesService,
     NodesChangeService,
-    EdgeChangesService
+    EdgeChangesService,
+    NodeRenderingService
   ],
   hostDirectives: [
     connectionControllerHostDirective,
@@ -60,6 +62,7 @@ export class VflowComponent {
   private flowEntitiesService = inject(FlowEntitiesService)
   private nodesChangeService = inject(NodesChangeService)
   private edgesChangeService = inject(EdgeChangesService)
+  private nodeRenderingService = inject(NodeRenderingService)
   private injector = inject(Injector)
   // #endregion
 
@@ -138,7 +141,7 @@ export class VflowComponent {
     this.flowEntitiesService.nodes.set(newModels)
   }
 
-  protected nodeModels = computed(() => this.flowEntitiesService.nodes())
+  protected nodeModels = computed(() => this.nodeRenderingService.nodes())
 
   /**
    * Edges to render

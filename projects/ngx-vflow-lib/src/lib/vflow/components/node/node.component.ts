@@ -9,6 +9,7 @@ import { resizable } from '../../utils/resizable';
 import { Subscription, map, startWith, switchMap, tap } from 'rxjs';
 import { InjectionContext, WithInjectorDirective } from '../../decorators/run-in-injection-context.decorator';
 import { Microtask } from '../../decorators/microtask.decorator';
+import { NodeRenderingService } from '../../services/node-rendering.service';
 
 export type HandleState = 'valid' | 'invalid' | 'idle'
 
@@ -38,6 +39,7 @@ export class NodeComponent extends WithInjectorDirective implements OnInit, Afte
   private draggableService = inject(DraggableService)
   private flowStatusService = inject(FlowStatusService)
   private flowEntitiesService = inject(FlowEntitiesService)
+  private nodeRenderingService = inject(NodeRenderingService)
   private hostRef = inject<ElementRef<SVGElement>>(ElementRef)
 
   protected showMagnet = computed(() =>
@@ -158,6 +160,10 @@ export class NodeComponent extends WithInjectorDirective implements OnInit, Afte
     if (status.state === 'connection-validation') {
       this.flowStatusService.setConnectionStartStatus(status.payload.sourceNode, status.payload.sourceHandle)
     }
+  }
+
+  protected pullNode() {
+    this.nodeRenderingService.pullNode(this.nodeModel)
   }
 
   @InjectionContext

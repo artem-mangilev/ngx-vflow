@@ -12,6 +12,8 @@ export class NodeModel<T = unknown> {
 
   public size = signal({ width: 0, height: 0 })
 
+  public renderOrder = signal(0)
+
   public pointTransform = computed(() => `translate(${this.point().x}, ${this.point().y})`)
 
   // Now source and handle positions derived from parent flow
