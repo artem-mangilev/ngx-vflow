@@ -162,8 +162,9 @@ export class NodeComponent extends WithInjectorDirective implements OnInit, Afte
     }
   }
 
-  protected pullNode() {
+  protected selectNode() {
     this.nodeRenderingService.pullNode(this.nodeModel)
+    this.flowEntitiesService.select(this.nodeModel)
   }
 
   @InjectionContext

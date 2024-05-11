@@ -1,18 +1,25 @@
 <svg:foreignObject
   *ngIf="nodeModel.node.type === 'default'"
+  class="selectable"
   #nodeContent
   width="100"
   height="50"
-  (mousedown)="pullNode()"
+  (mousedown)="selectNode()"
 >
-  <div #htmlWrapper class="default-node" [innerHTML]="nodeModel.node.text ?? ''"></div>
+  <div
+    #htmlWrapper
+    class="default-node"
+    [class.default-node_selected]="nodeModel.selected()"
+    [innerHTML]="nodeModel.node.text ?? ''"
+  ></div>
 </svg:foreignObject>
 
 <svg:foreignObject
   *ngIf="nodeModel.node.type === 'html-template' && nodeHtmlTemplate"
+  class="selectable"
   [attr.width]="nodeModel.size().width"
   [attr.height]="nodeModel.size().height"
-  (mousedown)="pullNode()"
+  (mousedown)="selectNode()"
 >
   <div #htmlWrapper class="wrapper">
     <ng-container
