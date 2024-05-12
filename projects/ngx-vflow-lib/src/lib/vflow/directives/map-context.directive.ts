@@ -6,16 +6,13 @@ import { ViewportService } from '../services/viewport.service';
 import { isDefined } from '../utils/is-defined';
 import { RootSvgReferenceDirective } from './reference.directive';
 import { FlowEntitiesService } from '../services/flow-entities.service';
-import { BehaviorSubject, Subject, combineLatest, filter, map, pairwise, switchMap, tap } from 'rxjs';
 import { ViewportState } from '../interfaces/viewport.interface';
-import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { SelectionService } from '../services/selection.service';
 
 type ZoomEvent = D3ZoomEvent<SVGSVGElement, unknown>
 
 @Directive({ selector: 'g[mapContext]' })
 export class MapContextDirective implements OnInit {
-  private static delta = 6
-
   @Input()
   public minZoom!: number
 
@@ -24,60 +21,11 @@ export class MapContextDirective implements OnInit {
 
   protected rootSvg = inject(RootSvgReferenceDirective).element
   protected host = inject<ElementRef<SVGGElement>>(ElementRef).nativeElement
+  protected selectionService = inject(SelectionService)
   protected viewportService = inject(ViewportService)
-  protected flowEntitiesService = inject(FlowEntitiesService)
 
   protected rootSvgSelection = select(this.rootSvg)
   protected zoomableSelection = select(this.host)
-
-  protected viewportStart$ = new BehaviorSubject<ViewportState>(
-    this.viewportService.readableViewport()
-  )
-  protected viewportEnd$ = new BehaviorSubject<ViewportState>(
-    this.viewportService.readableViewport()
-  )
-
-  protected panStart = toSignal(
-    this.viewportStart$.pipe(
-      pairwise(),
-      filter(([prevState, currentState]) => {
-        // pass only pan changes
-        return prevState.zoom === currentState.zoom
-      }),
-      map(([, currentState]) => currentState),
-    )
-  )
-
-  protected panEnd = toSignal(
-    this.viewportEnd$.pipe(
-      pairwise(),
-      filter(([prevState, currentState]) => {
-        // pass only pan changes
-        return prevState.zoom === currentState.zoom
-      }),
-      map(([, currentState]) => currentState),
-    )
-  )
-
-  protected resetSelection = effect(() => {
-    const panStart = untracked(this.panStart)
-    const panEnd = this.panEnd()
-
-    if (panStart && panEnd) {
-      const delta = MapContextDirective.delta
-
-      const diffX = Math.abs(panEnd.x - panStart.x)
-      const diffY = Math.abs(panEnd.y - panStart.y)
-
-      // click (not drag)
-      if (diffX < delta && diffY < delta) {
-        this.flowEntitiesService.select(null)
-      }
-    }
-
-    // TODO: allowSignalWrites
-  }, { allowSignalWrites: true })
-
 
   // under the hood this effect triggers handleZoom, so error throws without this flag
   // TODO: hack with timer fixes wrong node scaling (handle positions not matched with content size)
@@ -119,7 +67,7 @@ export class MapContextDirective implements OnInit {
     this.zoomBehavior = zoom<SVGSVGElement, unknown>()
       .scaleExtent([this.minZoom, this.maxZoom])
       .on('start', (event: ZoomEvent) => this.onD3zoomStart(event))
-      .on('zoom', this.handleZoom)
+      .on('zoom', (event: ZoomEvent) => this.handleZoom(event))
       .on('end', (event: ZoomEvent) => this.onD3zoomEnd(event))
 
     this.rootSvgSelection.call(this.zoomBehavior)
@@ -133,11 +81,11 @@ export class MapContextDirective implements OnInit {
   }
 
   private onD3zoomStart({ transform }: ZoomEvent) {
-    this.viewportStart$.next(mapTransformToViewportState(transform))
+    this.selectionService.setViewpostStart(mapTransformToViewportState(transform))
   }
 
   private onD3zoomEnd({ transform }: ZoomEvent) {
-    this.viewportEnd$.next(mapTransformToViewportState(transform))
+    this.selectionService.setViewportEnd(mapTransformToViewportState(transform))
   }
 }
 

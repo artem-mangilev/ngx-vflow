@@ -26,6 +26,7 @@ import { NodeChange } from '../../types/node-change.type';
 import { ChangesControllerDirective } from '../../directives/changes-controller.directive';
 import { EdgeChange } from '../../types/edge-change.type';
 import { NodeRenderingService } from '../../services/node-rendering.service';
+import { SelectionService } from '../../services/selection.service';
 
 const connectionControllerHostDirective = {
   directive: ConnectionControllerDirective,
@@ -49,7 +50,8 @@ const changesControllerHostDirective = {
     FlowEntitiesService,
     NodesChangeService,
     EdgeChangesService,
-    NodeRenderingService
+    NodeRenderingService,
+    SelectionService
   ],
   hostDirectives: [
     connectionControllerHostDirective,
