@@ -1,6 +1,10 @@
 import { Point } from "../interfaces/point.interface"
 
-export type NodeChange = NodePositionChange | NodeAddChange | NodeRemoveChange
+export type NodeChange =
+  NodePositionChange |
+  NodeAddChange |
+  NodeRemoveChange |
+  NodeSelectedChange
 
 export interface NodePositionChange extends NodeChangeShared {
   type: 'position'
@@ -13,6 +17,11 @@ export interface NodeAddChange extends NodeChangeShared {
 
 export interface NodeRemoveChange extends NodeChangeShared {
   type: 'remove'
+}
+
+export interface NodeSelectedChange extends NodeChangeShared {
+  type: 'select'
+  selected: boolean
 }
 
 interface NodeChangeShared {

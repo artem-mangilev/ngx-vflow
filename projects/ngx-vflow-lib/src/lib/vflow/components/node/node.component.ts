@@ -7,8 +7,11 @@ import { HandleService } from '../../services/handle.service';
 import { HandleModel } from '../../models/handle.model';
 import { resizable } from '../../utils/resizable';
 import { Subscription, map, startWith, switchMap, tap } from 'rxjs';
-import { InjectionContext, WithInjectorDirective } from '../../decorators/run-in-injection-context.decorator';
+import { InjectionContext, WithInjector } from '../../decorators/run-in-injection-context.decorator';
 import { Microtask } from '../../decorators/microtask.decorator';
+import { NodeRenderingService } from '../../services/node-rendering.service';
+import { FlowSettingsService } from '../../services/flow-settings.service';
+import { SelectionService } from '../../services/selection.service';
 
 export type HandleState = 'valid' | 'invalid' | 'idle'
 
@@ -19,7 +22,8 @@ export type HandleState = 'valid' | 'invalid' | 'idle'
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [HandleService]
 })
-export class NodeComponent extends WithInjectorDirective implements OnInit, AfterViewInit, OnDestroy {
+export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInjector {
+  public injector = inject(Injector)
   protected handleService = inject(HandleService)
   protected zone = inject(NgZone)
 
@@ -38,6 +42,9 @@ export class NodeComponent extends WithInjectorDirective implements OnInit, Afte
   private draggableService = inject(DraggableService)
   private flowStatusService = inject(FlowStatusService)
   private flowEntitiesService = inject(FlowEntitiesService)
+  private nodeRenderingService = inject(NodeRenderingService)
+  private flowSettingsService = inject(FlowSettingsService)
+  private selectionService = inject(SelectionService)
   private hostRef = inject<ElementRef<SVGElement>>(ElementRef)
 
   protected showMagnet = computed(() =>
@@ -157,6 +164,21 @@ export class NodeComponent extends WithInjectorDirective implements OnInit, Afte
     const status = this.flowStatusService.status()
     if (status.state === 'connection-validation') {
       this.flowStatusService.setConnectionStartStatus(status.payload.sourceNode, status.payload.sourceHandle)
+    }
+  }
+
+  protected onNodeMouseDown() {
+    this.pullNode()
+    this.selectNode()
+  }
+
+  private pullNode() {
+    this.nodeRenderingService.pullNode(this.nodeModel)
+  }
+
+  private selectNode() {
+    if (this.flowSettingsService.entitiesSelectable()) {
+      this.selectionService.select(this.nodeModel)
     }
   }
 
