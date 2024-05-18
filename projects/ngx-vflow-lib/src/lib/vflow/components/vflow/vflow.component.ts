@@ -10,7 +10,6 @@ import { EdgeModel } from '../../models/edge.model';
 import { ConnectionTemplateDirective, EdgeLabelHtmlTemplateDirective, EdgeTemplateDirective, NodeHtmlTemplateDirective } from '../../directives/template.directive';
 import { HandlePositions } from '../../interfaces/handle-positions.interface';
 import { addNodesToEdges } from '../../utils/add-nodes-to-edges';
-import { FlowModel } from '../../models/flow.model';
 import { skip } from 'rxjs';
 import { Point } from '../../interfaces/point.interface';
 import { ViewportState } from '../../interfaces/viewport.interface';
@@ -82,7 +81,7 @@ export class VflowComponent {
    */
   @Input()
   public set view(view: [number, number] | 'auto') {
-    this.flowModel.view.set(view)
+    this.flowSettingsService.view.set(view)
   }
 
   /**
@@ -107,7 +106,7 @@ export class VflowComponent {
    */
   @Input()
   public set handlePositions(handlePositions: HandlePositions) {
-    this.flowModel.handlePositions.set(handlePositions)
+    this.flowSettingsService.handlePositions.set(handlePositions)
   }
 
   /**
@@ -144,9 +143,6 @@ export class VflowComponent {
     const newModels = runInInjectionContext(this.injector,
       () => ReferenceKeeper.nodes(newNodes, this.flowEntitiesService.nodes())
     )
-
-    // TODO better to solve this by DI
-    bindFlowToNodes(this.flowModel, newModels)
 
     // quick and dirty binding nodes to edges
     addNodesToEdges(newModels, this.flowEntitiesService.edges())
@@ -230,8 +226,8 @@ export class VflowComponent {
   public readonly edgesChange$ = this.edgesChangeService.changes$
   // #endregion
 
-  // TODO: probably better to make it injectable
-  protected flowModel = new FlowModel()
+  protected flowWidth = this.flowSettingsService.flowWidth
+  protected flowHeight = this.flowSettingsService.flowHeight
 
   protected markers = this.flowEntitiesService.markers
 
@@ -289,7 +285,4 @@ export class VflowComponent {
   }
 }
 
-function bindFlowToNodes(flow: FlowModel, nodes: NodeModel[]) {
-  nodes.forEach(n => n.bindFlow(flow))
-}
 
