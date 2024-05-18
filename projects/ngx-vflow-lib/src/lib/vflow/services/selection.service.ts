@@ -2,6 +2,7 @@ import { Injectable, effect, inject, signal, untracked } from '@angular/core';
 import { ViewportState } from '../interfaces/viewport.interface';
 import { ViewportService } from './viewport.service';
 import { FlowEntitiesService } from './flow-entities.service';
+import { FlowEntity } from '../interfaces/flow-entity.interface';
 
 @Injectable()
 export class SelectionService {
@@ -29,7 +30,7 @@ export class SelectionService {
 
       // click (not drag)
       if (diffX < delta && diffY < delta) {
-        this.flowEntitiesService.select(null)
+        this.select(null)
       }
     }
 
@@ -42,5 +43,17 @@ export class SelectionService {
 
   public setViewportEnd(state: ViewportState) {
     this.viewportEnd.set(state)
+  }
+
+  public select(entity: FlowEntity | null) {
+    // undo select for previously selected nodes
+    this.flowEntitiesService.entities()
+      .filter(n => n.selected)
+      .forEach(n => n.selected.set(false))
+
+    if (entity) {
+      // select passed entity
+      entity.selected.set(true)
+    }
   }
 }

@@ -52,16 +52,6 @@ export class FlowEntitiesService {
 
   public entities: Signal<FlowEntity[]> = computed(() => [...this.nodes()])
 
-  public select(entity: FlowEntity | null) {
-    // undo select for previously selected nodes
-    this.entities().filter(n => n.selected).forEach(n => n.selected.set(false))
-
-    if (entity) {
-      // select passed entity
-      entity.selected.set(true)
-    }
-  }
-
   public getNode<T>(id: string) {
     return this.nodes().find(({ node }) => node.id === id) as NodeModel<T> | undefined
   }

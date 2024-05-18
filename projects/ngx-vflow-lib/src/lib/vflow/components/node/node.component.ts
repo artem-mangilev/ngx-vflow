@@ -11,6 +11,7 @@ import { InjectionContext, WithInjector } from '../../decorators/run-in-injectio
 import { Microtask } from '../../decorators/microtask.decorator';
 import { NodeRenderingService } from '../../services/node-rendering.service';
 import { FlowSettingsService } from '../../services/flow-settings.service';
+import { SelectionService } from '../../services/selection.service';
 
 export type HandleState = 'valid' | 'invalid' | 'idle'
 
@@ -43,6 +44,7 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInje
   private flowEntitiesService = inject(FlowEntitiesService)
   private nodeRenderingService = inject(NodeRenderingService)
   private flowSettingsService = inject(FlowSettingsService)
+  private selectionService = inject(SelectionService)
   private hostRef = inject<ElementRef<SVGElement>>(ElementRef)
 
   protected showMagnet = computed(() =>
@@ -176,7 +178,7 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInje
 
   private selectNode() {
     if (this.flowSettingsService.entitiesSelectable()) {
-      this.flowEntitiesService.select(this.nodeModel)
+      this.selectionService.select(this.nodeModel)
     }
   }
 
