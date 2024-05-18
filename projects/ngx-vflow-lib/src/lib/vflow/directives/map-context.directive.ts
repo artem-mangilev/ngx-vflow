@@ -1,11 +1,9 @@
-import { Directive, ElementRef, Injector, Input, OnInit, effect, inject, runInInjectionContext, untracked } from '@angular/core';
+import { Directive, ElementRef, Input, OnInit, effect, inject } from '@angular/core';
 import { select } from 'd3-selection';
-import { D3ZoomEvent, ZoomBehavior, ZoomTransform, zoom, zoomIdentity, zoomTransform } from 'd3-zoom';
-import * as d3 from 'd3-selection'
+import { D3ZoomEvent, ZoomBehavior, ZoomTransform, zoom, zoomIdentity } from 'd3-zoom';
 import { ViewportService } from '../services/viewport.service';
 import { isDefined } from '../utils/is-defined';
 import { RootSvgReferenceDirective } from './reference.directive';
-import { FlowEntitiesService } from '../services/flow-entities.service';
 import { ViewportState } from '../interfaces/viewport.interface';
 import { SelectionService } from '../services/selection.service';
 
@@ -83,7 +81,7 @@ export class MapContextDirective implements OnInit {
   }
 
   private onD3zoomStart({ transform }: ZoomEvent) {
-    this.selectionService.setViewpostStart(mapTransformToViewportState(transform))
+    this.selectionService.setViewportStart(mapTransformToViewportState(transform))
   }
 
   private onD3zoomEnd({ transform }: ZoomEvent) {
@@ -91,4 +89,5 @@ export class MapContextDirective implements OnInit {
   }
 }
 
-const mapTransformToViewportState = (transform: ZoomTransform): ViewportState => ({ zoom: transform.k, x: transform.x, y: transform.y })
+const mapTransformToViewportState = (transform: ZoomTransform): ViewportState =>
+  ({ zoom: transform.k, x: transform.x, y: transform.y })
