@@ -1,9 +1,6 @@
 import { Injectable, WritableSignal, computed, signal } from '@angular/core';
 import { HandlePositions } from '../interfaces/handle-positions.interface';
 
-/**
- * TODO: move props from flow.model to here
- */
 @Injectable()
 export class FlowSettingsService {
   public entitiesSelectable = signal(true)
