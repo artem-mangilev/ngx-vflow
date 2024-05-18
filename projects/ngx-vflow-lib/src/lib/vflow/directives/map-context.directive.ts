@@ -70,7 +70,9 @@ export class MapContextDirective implements OnInit {
       .on('zoom', (event: ZoomEvent) => this.handleZoom(event))
       .on('end', (event: ZoomEvent) => this.onD3zoomEnd(event))
 
-    this.rootSvgSelection.call(this.zoomBehavior)
+    this.rootSvgSelection
+      .call(this.zoomBehavior)
+      .on('dblclick.zoom', null)
   }
 
   private handleZoom = ({ transform }: ZoomEvent) => {
