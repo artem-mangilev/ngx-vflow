@@ -10,6 +10,7 @@ import { Subscription, map, startWith, switchMap, tap } from 'rxjs';
 import { InjectionContext, WithInjectorDirective } from '../../decorators/run-in-injection-context.decorator';
 import { Microtask } from '../../decorators/microtask.decorator';
 import { NodeRenderingService } from '../../services/node-rendering.service';
+import { FlowSettingsService } from '../../services/flow-settings.service';
 
 export type HandleState = 'valid' | 'invalid' | 'idle'
 
@@ -40,6 +41,7 @@ export class NodeComponent extends WithInjectorDirective implements OnInit, Afte
   private flowStatusService = inject(FlowStatusService)
   private flowEntitiesService = inject(FlowEntitiesService)
   private nodeRenderingService = inject(NodeRenderingService)
+  private flowSettingsService = inject(FlowSettingsService)
   private hostRef = inject<ElementRef<SVGElement>>(ElementRef)
 
   protected showMagnet = computed(() =>
@@ -162,9 +164,19 @@ export class NodeComponent extends WithInjectorDirective implements OnInit, Afte
     }
   }
 
-  protected selectNode() {
+  protected onNodeMouseDown() {
+    this.pullNode()
+    this.selectNode()
+  }
+
+  private pullNode() {
     this.nodeRenderingService.pullNode(this.nodeModel)
-    this.flowEntitiesService.select(this.nodeModel)
+  }
+
+  private selectNode() {
+    if (this.flowSettingsService.entitiesSelectable()) {
+      this.flowEntitiesService.select(this.nodeModel)
+    }
   }
 
   @InjectionContext

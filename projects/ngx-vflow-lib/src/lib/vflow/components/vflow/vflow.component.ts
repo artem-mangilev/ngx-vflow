@@ -27,6 +27,7 @@ import { ChangesControllerDirective } from '../../directives/changes-controller.
 import { EdgeChange } from '../../types/edge-change.type';
 import { NodeRenderingService } from '../../services/node-rendering.service';
 import { SelectionService } from '../../services/selection.service';
+import { FlowSettingsService } from '../../services/flow-settings.service';
 
 const connectionControllerHostDirective = {
   directive: ConnectionControllerDirective,
@@ -51,7 +52,8 @@ const changesControllerHostDirective = {
     NodesChangeService,
     EdgeChangesService,
     NodeRenderingService,
-    SelectionService
+    SelectionService,
+    FlowSettingsService
   ],
   hostDirectives: [
     connectionControllerHostDirective,
@@ -65,6 +67,7 @@ export class VflowComponent {
   private nodesChangeService = inject(NodesChangeService)
   private edgesChangeService = inject(EdgeChangesService)
   private nodeRenderingService = inject(NodeRenderingService)
+  private flowSettingsService = inject(FlowSettingsService)
   private injector = inject(Injector)
   // #endregion
 
@@ -112,6 +115,14 @@ export class VflowComponent {
    */
   @Input()
   public background: string = '#FFFFFF'
+
+  /**
+   * Global rule if you can or can't select entities
+   */
+  @Input()
+  public set entitiesSelectable(value: boolean) {
+    this.flowSettingsService.entitiesSelectable.set(value)
+  }
 
   /**
    * Settings for connection (it renders when user tries to create edge between nodes)
