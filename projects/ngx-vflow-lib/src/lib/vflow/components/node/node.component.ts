@@ -7,7 +7,7 @@ import { HandleService } from '../../services/handle.service';
 import { HandleModel } from '../../models/handle.model';
 import { resizable } from '../../utils/resizable';
 import { Subscription, map, startWith, switchMap, tap } from 'rxjs';
-import { InjectionContext, WithInjectorDirective } from '../../decorators/run-in-injection-context.decorator';
+import { InjectionContext, WithInjector } from '../../decorators/run-in-injection-context.decorator';
 import { Microtask } from '../../decorators/microtask.decorator';
 import { NodeRenderingService } from '../../services/node-rendering.service';
 import { FlowSettingsService } from '../../services/flow-settings.service';
@@ -21,7 +21,8 @@ export type HandleState = 'valid' | 'invalid' | 'idle'
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [HandleService]
 })
-export class NodeComponent extends WithInjectorDirective implements OnInit, AfterViewInit, OnDestroy {
+export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInjector {
+  public injector = inject(Injector)
   protected handleService = inject(HandleService)
   protected zone = inject(NgZone)
 

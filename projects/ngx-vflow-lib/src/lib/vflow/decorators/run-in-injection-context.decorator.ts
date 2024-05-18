@@ -4,7 +4,7 @@ export function InjectionContext(target: any, key: string, descriptor: PropertyD
   const originalMethod = descriptor.value;
 
   descriptor.value = function (...args: any[]) {
-    if (this instanceof WithInjectorDirective) {
+    if (implementsWithInjector(this)) {
       return runInInjectionContext(this.injector, () => originalMethod.apply(this, args))
     } else {
       throw new Error('Class that contains decorated method must extends WithInjectorDirective class')
@@ -15,7 +15,10 @@ export function InjectionContext(target: any, key: string, descriptor: PropertyD
   return descriptor;
 }
 
-@Directive()
-export abstract class WithInjectorDirective {
-  public readonly injector = inject(Injector)
+export interface WithInjector {
+  injector: Injector
+}
+
+const implementsWithInjector = (instance: {}): instance is WithInjector => {
+  return 'injector' in instance && 'get' in (instance.injector as Injector);
 }
