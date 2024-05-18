@@ -50,7 +50,10 @@ export class FlowEntitiesService {
     return this.edges().filter(e => nodes.includes(e.source()!) && nodes.includes(e.target()!))
   })
 
-  public entities: Signal<FlowEntity[]> = computed(() => [...this.nodes()])
+  public entities: Signal<FlowEntity[]> = computed(() => [
+    ...this.nodes(),
+    ...this.edges()
+  ])
 
   public getNode<T>(id: string) {
     return this.nodes().find(({ node }) => node.id === id) as NodeModel<T> | undefined

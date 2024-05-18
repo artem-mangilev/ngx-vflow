@@ -1,0 +1,8 @@
+.edge {
+  fill: none;
+  stroke-width: 2;
+
+  &_selected {
+    stroke-width: 3;
+  }
+}
