@@ -1,7 +1,7 @@
-import { Injectable, Signal, inject } from '@angular/core';
+import { Injectable, Signal, computed, inject } from '@angular/core';
 import { FlowEntitiesService } from './flow-entities.service';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { Observable, asyncScheduler, filter, map, merge, observeOn, of, pairwise, skip, switchMap } from 'rxjs';
+import { Observable, asyncScheduler, distinctUntilChanged, filter, map, merge, observeOn, of, pairwise, skip, switchMap } from 'rxjs';
 import { NodeChange } from '../types/node-change.type';
 
 @Injectable()
@@ -53,10 +53,29 @@ export class NodesChangeService {
       )
     ) satisfies Observable<NodeChange[]>
 
+  protected nodeSelectedChange$ = toObservable(this.entitiesService.nodes)
+    .pipe(
+      switchMap((nodes) =>
+        merge(
+          ...nodes.map(node =>
+            node.selected$.pipe(
+              distinctUntilChanged(),
+              skip(1),
+              map(() => node),
+            )
+          )
+        )
+      ),
+      map((changedNode) => [
+        { type: 'select', id: changedNode.node.id, selected: changedNode.selected() }
+      ])
+    ) satisfies Observable<NodeChange[]>
+
   public readonly changes$: Observable<NodeChange[]> = merge(
     this.nodesPositionChange$,
     this.nodeAddChange$,
-    this.nodeRemoveChange$
+    this.nodeRemoveChange$,
+    this.nodeSelectedChange$
   ).pipe(
     // this fixes a bug when on fire node event change,
     // you can't get valid list of detached edges

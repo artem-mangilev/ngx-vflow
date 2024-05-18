@@ -16,7 +16,9 @@ export class NodeModel<T = unknown> implements FlowEntity {
   public size = signal({ width: 0, height: 0 })
 
   public renderOrder = signal(0)
+
   public selected = signal(false)
+  public selected$ = toObservable(this.selected)
 
   public pointTransform = computed(() => `translate(${this.point().x}, ${this.point().y})`)
 
