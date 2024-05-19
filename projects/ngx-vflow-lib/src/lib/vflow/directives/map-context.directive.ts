@@ -5,7 +5,7 @@ import { ViewportService } from '../services/viewport.service';
 import { isDefined } from '../utils/is-defined';
 import { RootSvgReferenceDirective } from './reference.directive';
 import { ViewportState } from '../interfaces/viewport.interface';
-import { SelectionService } from '../services/selection.service';
+import { SelectionService, ViewportForSelection } from '../services/selection.service';
 
 type ZoomEvent = D3ZoomEvent<SVGSVGElement, unknown>
 
@@ -24,6 +24,8 @@ export class MapContextDirective implements OnInit {
 
   protected rootSvgSelection = select(this.rootSvg)
   protected zoomableSelection = select(this.host)
+
+  protected viewportForSelection: Partial<ViewportForSelection> = {}
 
   // under the hood this effect triggers handleZoom, so error throws without this flag
   // TODO: hack with timer fixes wrong node scaling (handle positions not matched with content size)
@@ -81,13 +83,31 @@ export class MapContextDirective implements OnInit {
   }
 
   private onD3zoomStart({ transform }: ZoomEvent) {
-    this.selectionService.setViewportStart(mapTransformToViewportState(transform))
+    this.viewportForSelection = {
+      start: mapTransformToViewportState(transform)
+    }
   }
 
-  private onD3zoomEnd({ transform }: ZoomEvent) {
-    this.selectionService.setViewportEnd(mapTransformToViewportState(transform))
+  private onD3zoomEnd({ transform, sourceEvent }: ZoomEvent) {
+    this.viewportForSelection = {
+      ...this.viewportForSelection,
+      end: mapTransformToViewportState(transform),
+      target: evTarget(sourceEvent)
+    }
+
+    this.selectionService.setViewport(
+      this.viewportForSelection as ViewportForSelection
+    )
   }
 }
 
 const mapTransformToViewportState = (transform: ZoomTransform): ViewportState =>
   ({ zoom: transform.k, x: transform.x, y: transform.y })
+
+const evTarget = (anyEvent: any): Element | undefined => {
+  if (anyEvent instanceof Event && anyEvent.target instanceof Element) {
+    return anyEvent.target
+  }
+
+  return undefined;
+}
