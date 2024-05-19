@@ -5,12 +5,16 @@
   [attr.marker-start]="markerStartUrl()"
   [attr.marker-end]="markerEndUrl()"
   [attr.stroke]="defaultColor"
-  class="edge selectable"
+  class="edge"
   [class.edge_selected]="model.selected()"
 />
 
 <ng-container *ngIf="model.type === 'template' && edgeTemplate">
-  <ng-container *ngTemplateOutlet="edgeTemplate; context: edgeContext"></ng-container>
+  <ng-container
+    [ngTemplateOutlet]="edgeTemplate"
+    [ngTemplateOutletContext]="edgeContext"
+    [ngTemplateOutletInjector]="injector"
+  ></ng-container>
 </ng-container>
 
 <ng-container *ngIf="model.edgeLabels?.start as label">

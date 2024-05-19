@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Input, OnInit, Signal, TemplateRef, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Injector, Input, OnInit, Signal, TemplateRef, computed, inject } from '@angular/core';
 import { EdgeModel } from '../../models/edge.model';
 import { hashCode } from '../../utils/hash';
 import { EdgeContext } from '../../interfaces/template-context.interface';
@@ -8,9 +8,13 @@ import { SelectionService } from '../../services/selection.service';
   selector: 'g[edge]',
   templateUrl: './edge.component.html',
   styleUrls: ['./edge.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    'class': 'selectable'
+  }
 })
 export class EdgeComponent implements OnInit {
+  protected injector = inject(Injector)
   private selectionService = inject(SelectionService)
 
   @Input()

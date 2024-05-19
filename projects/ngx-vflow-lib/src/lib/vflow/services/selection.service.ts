@@ -21,17 +21,17 @@ export class SelectionService {
   protected viewport$ = new Subject<ViewportForSelection>()
 
   protected resetSelection = this.viewport$.pipe(
-    tap((viewport) => {
-      if (viewport.start && viewport.end) {
+    tap(({ start, end, target }) => {
+      if (start && end) {
         const delta = SelectionService.delta
 
-        const diffX = Math.abs(viewport.end.x - viewport.start.x)
-        const diffY = Math.abs(viewport.end.y - viewport.start.y)
+        const diffX = Math.abs(end.x - start.x)
+        const diffY = Math.abs(end.y - start.y)
 
         // click (not drag)
         const isClick = diffX < delta && diffY < delta
         // do not reset if event chain contains selectable elems
-        const isNotSelectable = !viewport.target.closest('.selectable')
+        const isNotSelectable = !target.closest('.selectable')
 
         if (isClick && isNotSelectable) {
           this.select(null)
