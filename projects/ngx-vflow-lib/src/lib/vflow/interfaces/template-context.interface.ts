@@ -7,5 +7,6 @@ export interface EdgeContext {
     path: Signal<string>
     markerStart: Signal<string>
     markerEnd: Signal<string>
+    selected: Signal<boolean>
   }
 }

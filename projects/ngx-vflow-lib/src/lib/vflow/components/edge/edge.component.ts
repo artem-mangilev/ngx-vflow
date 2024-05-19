@@ -49,7 +49,8 @@ export class EdgeComponent implements OnInit {
         edge: this.model.edge,
         path: computed(() => this.model.path().path),
         markerStart: this.markerStartUrl,
-        markerEnd: this.markerEndUrl
+        markerEnd: this.markerEndUrl,
+        selected: this.model.selected.asReadonly()
       }
     }
   }
