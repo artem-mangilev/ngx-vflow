@@ -4,7 +4,7 @@
   #nodeContent
   width="100"
   height="50"
-  (mousedown)="onNodeMouseDown()"
+  (mousedown)="pullNode(); selectNode()"
 >
   <div
     #htmlWrapper
@@ -19,7 +19,7 @@
   class="selectable"
   [attr.width]="nodeModel.size().width"
   [attr.height]="nodeModel.size().height"
-  (mousedown)="onNodeMouseDown()"
+  (mousedown)="pullNode()"
 >
   <div #htmlWrapper class="wrapper">
     <ng-container

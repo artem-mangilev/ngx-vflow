@@ -167,16 +167,11 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInje
     }
   }
 
-  protected onNodeMouseDown() {
-    this.pullNode()
-    this.selectNode()
-  }
-
-  private pullNode() {
+  protected pullNode() {
     this.nodeRenderingService.pullNode(this.nodeModel)
   }
 
-  private selectNode() {
+  protected selectNode() {
     if (this.flowSettingsService.entitiesSelectable()) {
       this.selectionService.select(this.nodeModel)
     }
