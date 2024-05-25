@@ -26,3 +26,4 @@ export * from './lib/vflow/components/handle/handle.component';
 export * from './lib/vflow/directives/template.directive';
 export * from './lib/vflow/directives/connection-controller.directive';
 export * from './lib/vflow/directives/changes-controller.directive';
+export * from './lib/vflow/directives/selectable.directive';
