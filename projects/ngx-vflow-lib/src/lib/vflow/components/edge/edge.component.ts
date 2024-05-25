@@ -38,8 +38,6 @@ export class EdgeComponent implements OnInit {
     return marker ? `url(#${hashCode(JSON.stringify(marker))})` : ''
   })
 
-  protected readonly defaultColor = 'rgb(177, 177, 183)'
-
   protected edgeContext!: EdgeContext
 
   public ngOnInit(): void {

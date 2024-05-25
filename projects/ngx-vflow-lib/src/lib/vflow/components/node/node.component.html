@@ -33,12 +33,10 @@
 <ng-container *ngFor="let handle of nodeModel.handles()">
   <svg:circle
     *ngIf="!handle.template"
+    class="default-handle"
     [attr.cx]="handle.offset().x"
     [attr.cy]="handle.offset().y"
     [attr.stroke-width]="handle.strokeWidth"
-    r="5"
-    stroke="white"
-    fill="black"
     (mousedown)="handle.rawHandle.type === 'source' ? startConnection($event, handle) : null"
     (mouseup)="handle.rawHandle.type === 'target' ? endConnection() : null"
   />

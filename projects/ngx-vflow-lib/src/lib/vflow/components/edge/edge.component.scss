@@ -1,8 +1,10 @@
 .edge {
   fill: none;
   stroke-width: 2;
+  stroke: rgb(177, 177, 183);
 
   &_selected {
-    stroke-width: 3;
+    stroke-width: 2.5;
+    stroke: #0f4c75;
   }
 }
