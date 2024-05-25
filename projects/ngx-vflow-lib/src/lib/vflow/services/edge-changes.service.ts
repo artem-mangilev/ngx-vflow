@@ -69,10 +69,29 @@ export class EdgeChangesService {
       )
     ) satisfies Observable<EdgeChange[]>
 
+  protected edgeSelectChange$ = toObservable(this.entitiesService.edges)
+    .pipe(
+      switchMap((edges) =>
+        merge(
+          ...edges.map(edge =>
+            edge.selected$.pipe(
+              distinctUntilChanged(),
+              skip(1),
+              map(() => edge),
+            )
+          )
+        )
+      ),
+      map((changedEdge) => [
+        { type: 'select', id: changedEdge.edge.id, selected: changedEdge.selected() }
+      ])
+    ) satisfies Observable<EdgeChange[]>
+
   public readonly changes$: Observable<EdgeChange[]> = merge(
     this.edgeDetachedChange$,
     this.edgeAddChange$,
-    this.edgeRemoveChange$
+    this.edgeRemoveChange$,
+    this.edgeSelectChange$
   )
     .pipe(
       // this fixes the case when user gets 'deteched' changes

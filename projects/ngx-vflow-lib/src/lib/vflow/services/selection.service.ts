@@ -3,46 +3,47 @@ import { ViewportState } from '../interfaces/viewport.interface';
 import { ViewportService } from './viewport.service';
 import { FlowEntitiesService } from './flow-entities.service';
 import { FlowEntity } from '../interfaces/flow-entity.interface';
+import { Subject, tap } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+
+export interface ViewportForSelection {
+  start: ViewportState
+  end: ViewportState
+  target: Element
+}
 
 @Injectable()
 export class SelectionService {
   private static delta = 6
 
-  private viewportService = inject(ViewportService)
   private flowEntitiesService = inject(FlowEntitiesService)
 
-  protected viewportStart = signal<ViewportState>(
-    this.viewportService.readableViewport()
-  )
-  protected viewportEnd = signal<ViewportState>(
-    this.viewportService.readableViewport()
-  )
+  protected viewport$ = new Subject<ViewportForSelection>()
 
-  protected resetSelection = effect(() => {
-    const viewportStart = untracked(this.viewportStart)
-    const viewportEnd = this.viewportEnd()
+  protected resetSelection = this.viewport$.pipe(
+    tap(({ start, end, target }) => {
+      if (start && end) {
+        const delta = SelectionService.delta
 
-    if (viewportStart && viewportEnd) {
-      const delta = SelectionService.delta
+        const diffX = Math.abs(end.x - start.x)
+        const diffY = Math.abs(end.y - start.y)
 
-      const diffX = Math.abs(viewportEnd.x - viewportStart.x)
-      const diffY = Math.abs(viewportEnd.y - viewportStart.y)
+        // click (not drag)
+        const isClick = diffX < delta && diffY < delta
+        // do not reset if event chain contains selectable elems
+        const isNotSelectable = !target.closest('.selectable')
 
-      // click (not drag)
-      if (diffX < delta && diffY < delta) {
-        this.select(null)
+        if (isClick && isNotSelectable) {
+          this.select(null)
+        }
       }
-    }
+    }),
+    takeUntilDestroyed()
+  ).subscribe()
 
-    // TODO: allowSignalWrites
-  }, { allowSignalWrites: true })
 
-  public setViewportStart(state: ViewportState) {
-    this.viewportStart.set(state)
-  }
-
-  public setViewportEnd(state: ViewportState) {
-    this.viewportEnd.set(state)
+  public setViewport(viewport: ViewportForSelection) {
+    this.viewport$.next(viewport)
   }
 
   public select(entity: FlowEntity | null) {

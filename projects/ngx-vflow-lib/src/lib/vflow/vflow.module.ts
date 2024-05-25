@@ -13,6 +13,7 @@ import { RootSvgContextDirective } from './directives/root-svg-context.directive
 import { DefsComponent } from './components/defs/defs.component';
 import { HandleComponent } from './components/handle/handle.component';
 import { HandleSizeControllerDirective } from './directives/handle-size-controller.directive';
+import { SelectableDirective } from './directives/selectable.directive';
 
 const components = [
   VflowComponent,
@@ -29,7 +30,8 @@ const directives = [
   MapContextDirective,
   RootSvgReferenceDirective,
   RootSvgContextDirective,
-  HandleSizeControllerDirective
+  HandleSizeControllerDirective,
+  SelectableDirective
 ]
 
 const templateDirectives = [
@@ -45,6 +47,7 @@ const templateDirectives = [
   exports: [
     VflowComponent,
     HandleComponent,
+    SelectableDirective,
     ...templateDirectives
   ],
   declarations: [...components, ...directives, ...templateDirectives],

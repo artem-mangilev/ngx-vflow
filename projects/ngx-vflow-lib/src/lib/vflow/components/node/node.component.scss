@@ -11,7 +11,7 @@
   max-height: 100px;
   width: 100px;
   height: 50px;
-  border: 1.5px solid black;
+  border: 1.5px solid #1b262c;
   border-radius: 5px;
   display: flex;
   align-items: center;
@@ -22,4 +22,10 @@
   &_selected {
     border-width: 2px;
   }
+}
+
+.default-handle {
+  stroke: #fff;
+  fill: #1b262c;
+  r: 5;
 }

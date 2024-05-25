@@ -1,4 +1,8 @@
-export type EdgeChange = EdgeDetachedChange | EdgeAddChange | EdgeRemoveChange
+export type EdgeChange =
+  EdgeDetachedChange |
+  EdgeAddChange |
+  EdgeRemoveChange |
+  EdgeSelectChange
 
 /**
  * @experimental
@@ -13,6 +17,11 @@ export interface EdgeAddChange extends EdgeChangeShared {
 
 export interface EdgeRemoveChange extends EdgeChangeShared {
   type: 'remove'
+}
+
+export interface EdgeSelectChange extends EdgeChangeShared {
+  type: 'select',
+  selected: boolean
 }
 
 interface EdgeChangeShared {
