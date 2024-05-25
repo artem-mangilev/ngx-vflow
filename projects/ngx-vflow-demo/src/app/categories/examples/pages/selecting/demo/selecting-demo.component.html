@@ -1,0 +1,19 @@
+<vflow [nodes]="nodes" [edges]="edges" [entitiesSelectable]="false">
+  <ng-template nodeHtml let-ctx>
+    <div class="custom-node" [class.custom-node_selected]="ctx.selected()">
+      <button class="custom-node__button" selectable>Select here</button>
+
+      <handle type="source" position="right" />
+    </div>
+  </ng-template>
+
+  <ng-template edge let-ctx>
+    <svg:path
+      selectable
+      [attr.d]="ctx.path()"
+      [attr.stroke]="ctx.selected() ? '#0f4c75' : '#bbe1fa'"
+      fill="none"
+      stroke-width="2"
+    />
+  </ng-template>
+</vflow>`
