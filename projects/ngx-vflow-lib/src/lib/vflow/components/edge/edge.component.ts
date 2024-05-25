@@ -3,6 +3,7 @@ import { EdgeModel } from '../../models/edge.model';
 import { hashCode } from '../../utils/hash';
 import { EdgeContext } from '../../interfaces/template-context.interface';
 import { SelectionService } from '../../services/selection.service';
+import { FlowSettingsService } from '../../services/flow-settings.service';
 
 @Component({
   selector: 'g[edge]',
@@ -16,6 +17,7 @@ import { SelectionService } from '../../services/selection.service';
 export class EdgeComponent implements OnInit {
   protected injector = inject(Injector)
   private selectionService = inject(SelectionService)
+  private flowSettingsService = inject(FlowSettingsService)
 
   @Input()
   public model!: EdgeModel
@@ -54,6 +56,8 @@ export class EdgeComponent implements OnInit {
   }
 
   public onEdgeMouseDown() {
-    this.selectionService.select(this.model)
+    if (this.flowSettingsService.entitiesSelectable()) {
+      this.selectionService.select(this.model)
+    }
   }
 }
