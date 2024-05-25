@@ -37,6 +37,7 @@
     [attr.cx]="handle.offset().x"
     [attr.cy]="handle.offset().y"
     [attr.stroke-width]="handle.strokeWidth"
+    r="5"
     (mousedown)="handle.rawHandle.type === 'source' ? startConnection($event, handle) : null"
     (mouseup)="handle.rawHandle.type === 'target' ? endConnection() : null"
   />
