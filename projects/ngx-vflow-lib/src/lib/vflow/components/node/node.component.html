@@ -1,21 +1,30 @@
 <svg:foreignObject
   *ngIf="nodeModel.node.type === 'default'"
+  class="selectable"
   #nodeContent
   width="100"
   height="50"
+  (mousedown)="pullNode(); selectNode()"
 >
-  <div #htmlWrapper class="default-node" [innerHTML]="nodeModel.node.text ?? ''"></div>
+  <div
+    #htmlWrapper
+    class="default-node"
+    [class.default-node_selected]="nodeModel.selected()"
+    [innerHTML]="nodeModel.node.text ?? ''"
+  ></div>
 </svg:foreignObject>
 
 <svg:foreignObject
   *ngIf="nodeModel.node.type === 'html-template' && nodeHtmlTemplate"
+  class="selectable"
   [attr.width]="nodeModel.size().width"
   [attr.height]="nodeModel.size().height"
+  (mousedown)="pullNode()"
 >
   <div #htmlWrapper class="wrapper">
     <ng-container
       [ngTemplateOutlet]="nodeHtmlTemplate"
-      [ngTemplateOutletContext]="{ $implicit: { node: nodeModel.node } }"
+      [ngTemplateOutletContext]="{ $implicit: { node: nodeModel.node, selected: nodeModel.selected } }"
       [ngTemplateOutletInjector]="injector"
     />
   </div>
@@ -24,12 +33,11 @@
 <ng-container *ngFor="let handle of nodeModel.handles()">
   <svg:circle
     *ngIf="!handle.template"
+    class="default-handle"
     [attr.cx]="handle.offset().x"
     [attr.cy]="handle.offset().y"
     [attr.stroke-width]="handle.strokeWidth"
     r="5"
-    stroke="white"
-    fill="black"
     (mousedown)="handle.rawHandle.type === 'source' ? startConnection($event, handle) : null"
     (mouseup)="handle.rawHandle.type === 'target' ? endConnection() : null"
   />

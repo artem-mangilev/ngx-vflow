@@ -2,13 +2,14 @@ import { Component, ElementRef, Injector, Input, NgZone, OnDestroy, OnInit, Temp
 import { Position } from '../../types/position.type';
 import { HandleService } from '../../services/handle.service';
 import { HandleModel } from '../../models/handle.model';
-import { InjectionContext, WithInjectorDirective } from '../../decorators/run-in-injection-context.decorator';
+import { InjectionContext, WithInjector } from '../../decorators/run-in-injection-context.decorator';
 
 @Component({
   selector: 'handle',
   templateUrl: './handle.component.html'
 })
-export class HandleComponent extends WithInjectorDirective implements OnInit, OnDestroy {
+export class HandleComponent implements OnInit, OnDestroy, WithInjector {
+  public injector = inject(Injector);
   private handleService = inject(HandleService)
   private element = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement
 

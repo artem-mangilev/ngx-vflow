@@ -1,4 +1,4 @@
-import { computed, signal } from "@angular/core";
+import { WritableSignal, computed, signal } from "@angular/core";
 import { EdgeLabelPosition } from "../interfaces/edge-label.interface";
 import { Edge, Curve, EdgeType } from "../interfaces/edge.interface";
 import { EdgeLabelModel } from "./edge-label.model";
@@ -8,12 +8,16 @@ import { bezierPath } from "../math/edge-path/bezier-path";
 import { UsingPoints } from "../types/using-points.type";
 import { HandleModel } from "./handle.model";
 import { toObservable } from "@angular/core/rxjs-interop";
+import { FlowEntity } from "../interfaces/flow-entity.interface";
 
-export class EdgeModel {
+export class EdgeModel implements FlowEntity {
   public source = signal<NodeModel | undefined>(undefined)
   public target = signal<NodeModel | undefined>(undefined)
   public curve: Curve
   public type: EdgeType
+
+  public selected = signal(false);
+  public selected$ = toObservable(this.selected);
 
   public detached = computed(() => {
     const source = this.source()

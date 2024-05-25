@@ -10,7 +10,6 @@ import { EdgeModel } from '../../models/edge.model';
 import { ConnectionTemplateDirective, EdgeLabelHtmlTemplateDirective, EdgeTemplateDirective, NodeHtmlTemplateDirective } from '../../directives/template.directive';
 import { HandlePositions } from '../../interfaces/handle-positions.interface';
 import { addNodesToEdges } from '../../utils/add-nodes-to-edges';
-import { FlowModel } from '../../models/flow.model';
 import { skip } from 'rxjs';
 import { Point } from '../../interfaces/point.interface';
 import { ViewportState } from '../../interfaces/viewport.interface';
@@ -25,6 +24,9 @@ import { EdgeChangesService } from '../../services/edge-changes.service';
 import { NodeChange } from '../../types/node-change.type';
 import { ChangesControllerDirective } from '../../directives/changes-controller.directive';
 import { EdgeChange } from '../../types/edge-change.type';
+import { NodeRenderingService } from '../../services/node-rendering.service';
+import { SelectionService } from '../../services/selection.service';
+import { FlowSettingsService } from '../../services/flow-settings.service';
 
 const connectionControllerHostDirective = {
   directive: ConnectionControllerDirective,
@@ -47,7 +49,10 @@ const changesControllerHostDirective = {
     FlowStatusService,
     FlowEntitiesService,
     NodesChangeService,
-    EdgeChangesService
+    EdgeChangesService,
+    NodeRenderingService,
+    SelectionService,
+    FlowSettingsService
   ],
   hostDirectives: [
     connectionControllerHostDirective,
@@ -60,6 +65,8 @@ export class VflowComponent {
   private flowEntitiesService = inject(FlowEntitiesService)
   private nodesChangeService = inject(NodesChangeService)
   private edgesChangeService = inject(EdgeChangesService)
+  private nodeRenderingService = inject(NodeRenderingService)
+  private flowSettingsService = inject(FlowSettingsService)
   private injector = inject(Injector)
   // #endregion
 
@@ -74,7 +81,7 @@ export class VflowComponent {
    */
   @Input()
   public set view(view: [number, number] | 'auto') {
-    this.flowModel.view.set(view)
+    this.flowSettingsService.view.set(view)
   }
 
   /**
@@ -99,7 +106,7 @@ export class VflowComponent {
    */
   @Input()
   public set handlePositions(handlePositions: HandlePositions) {
-    this.flowModel.handlePositions.set(handlePositions)
+    this.flowSettingsService.handlePositions.set(handlePositions)
   }
 
   /**
@@ -107,6 +114,14 @@ export class VflowComponent {
    */
   @Input()
   public background: string = '#FFFFFF'
+
+  /**
+   * Global rule if you can or can't select entities
+   */
+  @Input()
+  public set entitiesSelectable(value: boolean) {
+    this.flowSettingsService.entitiesSelectable.set(value)
+  }
 
   /**
    * Settings for connection (it renders when user tries to create edge between nodes)
@@ -129,16 +144,13 @@ export class VflowComponent {
       () => ReferenceKeeper.nodes(newNodes, this.flowEntitiesService.nodes())
     )
 
-    // TODO better to solve this by DI
-    bindFlowToNodes(this.flowModel, newModels)
-
     // quick and dirty binding nodes to edges
     addNodesToEdges(newModels, this.flowEntitiesService.edges())
 
     this.flowEntitiesService.nodes.set(newModels)
   }
 
-  protected get nodeModels() { return this.flowEntitiesService.nodes() }
+  protected nodeModels = computed(() => this.nodeRenderingService.nodes())
 
   /**
    * Edges to render
@@ -150,12 +162,12 @@ export class VflowComponent {
     )
 
     // quick and dirty binding nodes to edges
-    addNodesToEdges(this.nodeModels, newModels)
+    addNodesToEdges(this.nodeModels(), newModels)
 
     this.flowEntitiesService.edges.set(newModels)
   }
 
-  protected get edgeModels() { return this.flowEntitiesService.validEdges() }
+  protected edgeModels = computed(() => this.flowEntitiesService.validEdges())
   // #endregion
 
   // #region TEMPLATES
@@ -214,8 +226,8 @@ export class VflowComponent {
   public readonly edgesChange$ = this.edgesChangeService.changes$
   // #endregion
 
-  // TODO: probably better to make it injectable
-  protected flowModel = new FlowModel()
+  protected flowWidth = this.flowSettingsService.flowWidth
+  protected flowHeight = this.flowSettingsService.flowHeight
 
   protected markers = this.flowEntitiesService.markers
 
@@ -273,7 +285,4 @@ export class VflowComponent {
   }
 }
 
-function bindFlowToNodes(flow: FlowModel, nodes: NodeModel[]) {
-  nodes.forEach(n => n.bindFlow(flow))
-}
 

@@ -1,7 +1,10 @@
-import { Signal, WritableSignal, computed, signal } from "@angular/core";
-import { HandlePositions } from "../interfaces/handle-positions.interface";
+import { Injectable, WritableSignal, computed, signal } from '@angular/core';
+import { HandlePositions } from '../interfaces/handle-positions.interface';
 
-export class FlowModel {
+@Injectable()
+export class FlowSettingsService {
+  public entitiesSelectable = signal(true)
+
   /**
    * Global setting with handle positions. Nodes derive this value
    *
@@ -17,4 +20,5 @@ export class FlowModel {
   public flowWidth = computed(() => this.view() === 'auto' ? '100%' : this.view()[0])
 
   public flowHeight = computed(() => this.view() === 'auto' ? '100%' : this.view()[1])
+
 }
