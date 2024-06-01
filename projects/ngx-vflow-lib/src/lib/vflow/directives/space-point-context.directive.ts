@@ -1,6 +1,6 @@
 import { Directive, ElementRef, Signal, computed, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { fromEvent, map, startWith } from 'rxjs';
+import { fromEvent, map, merge, startWith, tap } from 'rxjs';
 import { RootSvgReferenceDirective } from './reference.directive';
 import { Point } from '../interfaces/point.interface';
 
@@ -22,10 +22,16 @@ export class SpacePointContextDirective {
   private rootSvg = inject(RootSvgReferenceDirective).element
   private host = inject<ElementRef<SVGGElement>>(ElementRef).nativeElement
 
-  private mouseMovement = toSignal(
+  public mouseMovement$ = merge(
     fromEvent<MouseEvent>(this.rootSvg, 'mousemove').pipe(
       map(event => ({ x: event.clientX, y: event.clientY })),
     ),
-    { initialValue: { x: 0, y: 0 } }
+    fromEvent<TouchEvent>(this.rootSvg, 'touchmove').pipe(
+      tap((event) => event.preventDefault()),
+      map(({ touches }) => touches[0]),
+      map(touch => ({ x: touch.clientX, y: touch.clientY })),
+    ),
   )
+
+  public mouseMovement = toSignal(this.mouseMovement$, { initialValue: { x: 0, y: 0 } })
 }

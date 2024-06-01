@@ -13,7 +13,6 @@ export class SelectableDirective {
   private parentEdge = inject(EdgeComponent, { optional: true })
   private parentNode = inject(NodeComponent, { optional: true })
 
-
   @HostListener('mousedown')
   protected onMousedown() {
     const entity = this.entity()

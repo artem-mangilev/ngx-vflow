@@ -102,7 +102,7 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInje
     this.subscription.unsubscribe()
   }
 
-  protected startConnection(event: MouseEvent, handle: HandleModel) {
+  protected startConnection(event: Event, handle: HandleModel) {
     // ignore drag by stopping propagation
     event.stopPropagation()
 
