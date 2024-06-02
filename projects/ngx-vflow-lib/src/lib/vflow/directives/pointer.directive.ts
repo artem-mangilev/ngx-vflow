@@ -43,6 +43,7 @@ export class PointerDirective {
 
   private wasPointerOver = false;
 
+  // TODO check if i could avoid global touch end
   touchEnd = this.pointerMovementDirective.touchEnd$
     .pipe(
       tap(({ x, y, originalEvent }) => {
@@ -59,6 +60,7 @@ export class PointerDirective {
   touchOverOut = this.pointerMovementDirective.touchMovement$
     .pipe(
       tap(({ x, y, originalEvent }) => {
+        // TODO Performance
         const touchedElement = document.elementFromPoint(x, y)
 
         if (touchedElement === this.hostElement) {
