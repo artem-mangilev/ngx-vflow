@@ -15,6 +15,7 @@ import { HandleComponent } from './components/handle/handle.component';
 import { HandleSizeControllerDirective } from './directives/handle-size-controller.directive';
 import { SelectableDirective } from './directives/selectable.directive';
 import { PointerDirective } from './directives/pointer.directive';
+import { RootPointerDirective } from './directives/root-pointer.directive';
 
 const components = [
   VflowComponent,
@@ -33,7 +34,8 @@ const directives = [
   RootSvgContextDirective,
   HandleSizeControllerDirective,
   SelectableDirective,
-  PointerDirective
+  PointerDirective,
+  RootPointerDirective
 ]
 
 const templateDirectives = [
