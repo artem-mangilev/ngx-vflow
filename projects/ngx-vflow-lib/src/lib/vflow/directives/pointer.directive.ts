@@ -9,10 +9,10 @@ export class PointerDirective {
   protected pointerMovementDirective = inject(RootPointerDirective)
 
   @Output()
-  protected pointerOver = new EventEmitter()
+  protected pointerOver = new EventEmitter<Event>()
 
   @Output()
-  protected pointerOut = new EventEmitter()
+  protected pointerOut = new EventEmitter<Event>()
 
   @Output()
   protected pointerStart = new EventEmitter<Event>()
@@ -45,14 +45,11 @@ export class PointerDirective {
 
   touchEnd = this.pointerMovementDirective.touchEnd$
     .pipe(
-      tap((event) => {
-        const touchEndElement = document.elementFromPoint(
-          event.changedTouches[0].clientX,
-          event.changedTouches[0].clientY
-        )
+      tap(({ x, y, originalEvent }) => {
+        const touchEndElement = document.elementFromPoint(x, y)
 
         if (touchEndElement === this.hostElement) {
-          this.pointerEnd.emit(event)
+          this.pointerEnd.emit(originalEvent)
         }
       }),
       takeUntilDestroyed()
@@ -61,16 +58,16 @@ export class PointerDirective {
 
   touchOverOut = this.pointerMovementDirective.touchMovement$
     .pipe(
-      tap((point) => {
-        const touchedElement = document.elementFromPoint(point.x, point.y)
+      tap(({ x, y, originalEvent }) => {
+        const touchedElement = document.elementFromPoint(x, y)
 
         if (touchedElement === this.hostElement) {
-          this.pointerOver.emit()
+          this.pointerOver.emit(originalEvent)
           this.wasPointerOver = true;
         } else {
           // should not emit before pointerOver
           if (this.wasPointerOver) {
-            this.pointerOut.emit()
+            this.pointerOut.emit(originalEvent)
           }
 
           this.wasPointerOver = false;

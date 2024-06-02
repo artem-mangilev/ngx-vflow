@@ -17,13 +17,19 @@ export class RootPointerDirective {
   public touchMovement$ = fromEvent<TouchEvent>(this.host, 'touchmove').pipe(
     tap((event) => event.preventDefault()),
     map((event) => ({
-      x: event.touches[0]?.clientX,
-      y: event.touches[0]?.clientY,
+      x: event.touches[0]?.clientX ?? 0,
+      y: event.touches[0]?.clientY ?? 0,
       originalEvent: event
     })),
   ) satisfies Observable<Point>;
 
-  public touchEnd$ = fromEvent<TouchEvent>(this.host, 'touchend')
+  public touchEnd$ = fromEvent<TouchEvent>(this.host, 'touchend').pipe(
+    map((event) => ({
+      x: event.changedTouches[0]?.clientX ?? 0,
+      y: event.changedTouches[0]?.clientY ?? 0,
+      originalEvent: event
+    }))
+  ) satisfies Observable<Point>
 
   public pointerMovement$ = merge(
     this.mouseMovement$,
