@@ -35,7 +35,34 @@ const connectionControllerHostDirective = {
 
 const changesControllerHostDirective = {
   directive: ChangesControllerDirective,
-  outputs: ['onNodesChange', 'onEdgesChange']
+  outputs: [
+    'onNodesChange',
+    'onNodesChange.position',
+    'onNodesChange.position.single',
+    'onNodesChange.position.many',
+    'onNodesChange.add',
+    'onNodesChange.add.single',
+    'onNodesChange.add.many',
+    'onNodesChange.remove',
+    'onNodesChange.remove.single',
+    'onNodesChange.remove.many',
+    'onNodesChange.select',
+    'onNodesChange.select.single',
+    'onNodesChange.select.many',
+    'onEdgesChange',
+    'onEdgesChange.detached',
+    'onEdgesChange.detached.single',
+    'onEdgesChange.detached.many',
+    'onEdgesChange.add',
+    'onEdgesChange.add.single',
+    'onEdgesChange.add.many',
+    'onEdgesChange.remove',
+    'onEdgesChange.remove.single',
+    'onEdgesChange.remove.many',
+    'onEdgesChange.select',
+    'onEdgesChange.select.single',
+    'onEdgesChange.select.many',
+  ]
 }
 
 @Component({
