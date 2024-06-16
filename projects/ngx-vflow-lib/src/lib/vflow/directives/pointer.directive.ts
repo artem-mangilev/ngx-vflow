@@ -48,7 +48,7 @@ export class PointerDirective {
   private wasPointerOver = false;
 
   // TODO check if i could avoid global touch end
-  touchEnd = this.pointerMovementDirective.touchEnd$
+  protected touchEnd = this.pointerMovementDirective.touchEnd$
     .pipe(
       filter(({ target }) => target === this.hostElement),
       tap(({ originalEvent }) => this.pointerEnd.emit(originalEvent)),
@@ -56,22 +56,27 @@ export class PointerDirective {
     )
     .subscribe()
 
-  touchOverOut = this.pointerMovementDirective.touchMovement$
+  protected touchOverOut = this.pointerMovementDirective.touchMovement$
     .pipe(
       tap(({ target, originalEvent }) => {
-        if (target === this.hostElement) {
-          this.pointerOver.emit(originalEvent)
-          this.wasPointerOver = true;
-        } else {
-          // should not emit before pointerOver
-          if (this.wasPointerOver) {
-            this.pointerOut.emit(originalEvent)
-          }
-
-          this.wasPointerOver = false;
-        }
+        this.handleTouchOverAndOut(target, originalEvent)
       }),
       takeUntilDestroyed()
     )
     .subscribe()
+
+  // TODO: dirty imperative implementation
+  private handleTouchOverAndOut(target: Element | null, event: TouchEvent) {
+    if (target === this.hostElement) {
+      this.pointerOver.emit(event)
+      this.wasPointerOver = true;
+    } else {
+      // should not emit before pointerOver
+      if (this.wasPointerOver) {
+        this.pointerOut.emit(event)
+      }
+
+      this.wasPointerOver = false;
+    }
+  }
 }
