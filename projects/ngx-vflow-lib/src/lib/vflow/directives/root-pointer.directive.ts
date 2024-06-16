@@ -1,5 +1,5 @@
 import { Directive, ElementRef, inject } from '@angular/core';
-import { Observable, Subject, fromEvent, map, merge, share, skip, tap } from 'rxjs';
+import { Observable, Subject, animationFrameScheduler, fromEvent, map, merge, observeOn, share, skip, tap } from 'rxjs';
 import { Point } from '../interfaces/point.interface';
 
 @Directive({ selector: 'svg[rootPointer]' })
@@ -15,6 +15,7 @@ export class RootPointerDirective {
       y: event.clientY,
       originalEvent: event
     })),
+    observeOn(animationFrameScheduler),
     share()
   ) satisfies Observable<Point>;
 
@@ -30,6 +31,7 @@ export class RootPointerDirective {
 
       return { x, y, target, originalEvent }
     }),
+    observeOn(animationFrameScheduler),
     share()
   ) satisfies Observable<Point>;
 
