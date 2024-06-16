@@ -1,9 +1,9 @@
 import { Directive, Output, inject } from '@angular/core';
-import { NodeChange } from '../types/node-change.type';
+import { NodeAddChange, NodeChange, NodePositionChange, NodeRemoveChange, NodeSelectedChange } from '../types/node-change.type';
 import { EdgeChangesService } from '../services/edge-changes.service';
 import { NodesChangeService } from '../services/node-changes.service';
 import { Observable, filter, map } from 'rxjs';
-import { EdgeChange } from '../types/edge-change.type';
+import { EdgeAddChange, EdgeChange, EdgeDetachedChange, EdgeRemoveChange, EdgeSelectChange } from '../types/edge-change.type';
 
 @Directive({
   selector: '[changesController]',
@@ -129,16 +129,16 @@ export class ChangesControllerDirective {
     this.edgeChangesOfType('select')
   )
 
-  private nodeChangesOfType(type: NodeChange['type']) {
+  private nodeChangesOfType<T extends NodeChange['type']>(type: T) {
     return this.nodesChangeService.changes$.pipe(
-      map(changes => changes.filter(c => c.type === type)),
+      map(changes => changes.filter((c): c is NodeChangeMap[T] => c.type === type)),
       filter(changes => !!changes.length)
     )
   }
 
-  private edgeChangesOfType(type: EdgeChange['type']) {
-    return this.nodesChangeService.changes$.pipe(
-      map(changes => changes.filter(c => c.type === type)),
+  private edgeChangesOfType<T extends EdgeChange['type']>(type: T) {
+    return this.edgesChangeService.changes$.pipe(
+      map(changes => changes.filter((c): c is EdgeChangeMap[T] => c.type === type)),
       filter(changes => !!changes.length)
     )
   }
@@ -155,4 +155,19 @@ export class ChangesControllerDirective {
       filter(changes => changes.length > 1),
     )
   }
+}
+
+// TODO: do not write this types manually
+type NodeChangeMap = {
+  position: NodePositionChange,
+  add: NodeAddChange,
+  remove: NodeRemoveChange,
+  select: NodeSelectedChange
+}
+
+type EdgeChangeMap = {
+  detached: EdgeDetachedChange,
+  add: EdgeAddChange,
+  remove: EdgeRemoveChange,
+  select: EdgeSelectChange
 }

@@ -248,7 +248,7 @@ export class VflowComponent {
   public readonly nodesChange$ = this.nodesChangeService.changes$
 
   /**
-   * Observable with nodes change
+   * Observable with edges change
    */
   public readonly edgesChange$ = this.edgesChangeService.changes$
   // #endregion
