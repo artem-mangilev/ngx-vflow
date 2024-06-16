@@ -23,20 +23,24 @@ export class RootPointerDirective {
     fromEvent<TouchEvent>(this.host, 'touchmove')
   ).pipe(
     tap((event) => event.preventDefault()),
-    map((event) => ({
-      x: event.touches[0]?.clientX ?? 0,
-      y: event.touches[0]?.clientY ?? 0,
-      originalEvent: event
-    })),
+    map((originalEvent) => {
+      const x = originalEvent.touches[0]?.clientX ?? 0
+      const y = originalEvent.touches[0]?.clientY ?? 0
+      const target = document.elementFromPoint(x, y)
+
+      return { x, y, target, originalEvent }
+    }),
     share()
   ) satisfies Observable<Point>;
 
   public touchEnd$ = fromEvent<TouchEvent>(this.host, 'touchend').pipe(
-    map((event) => ({
-      x: event.changedTouches[0]?.clientX ?? 0,
-      y: event.changedTouches[0]?.clientY ?? 0,
-      originalEvent: event
-    })),
+    map((originalEvent) => {
+      const x = originalEvent.changedTouches[0]?.clientX ?? 0
+      const y = originalEvent.changedTouches[0]?.clientY ?? 0
+      const target = document.elementFromPoint(x, y)
+
+      return { x, y, target, originalEvent }
+    }),
     share()
   ) satisfies Observable<Point>
 

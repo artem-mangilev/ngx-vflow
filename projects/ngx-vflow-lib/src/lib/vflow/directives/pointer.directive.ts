@@ -1,5 +1,5 @@
 import { Directive, ElementRef, EventEmitter, HostListener, Output, effect, inject } from '@angular/core';
-import { tap } from 'rxjs';
+import { filter, tap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RootPointerDirective } from './root-pointer.directive';
 
@@ -50,24 +50,16 @@ export class PointerDirective {
   // TODO check if i could avoid global touch end
   touchEnd = this.pointerMovementDirective.touchEnd$
     .pipe(
-      tap(({ x, y, originalEvent }) => {
-        const touchEndElement = document.elementFromPoint(x, y)
-
-        if (touchEndElement === this.hostElement) {
-          this.pointerEnd.emit(originalEvent)
-        }
-      }),
+      filter(({ target }) => target === this.hostElement),
+      tap(({ originalEvent }) => this.pointerEnd.emit(originalEvent)),
       takeUntilDestroyed()
     )
     .subscribe()
 
   touchOverOut = this.pointerMovementDirective.touchMovement$
     .pipe(
-      tap(({ x, y, originalEvent }) => {
-        // TODO Performance
-        const touchedElement = document.elementFromPoint(x, y)
-
-        if (touchedElement === this.hostElement) {
+      tap(({ target, originalEvent }) => {
+        if (target === this.hostElement) {
           this.pointerOver.emit(originalEvent)
           this.wasPointerOver = true;
         } else {
