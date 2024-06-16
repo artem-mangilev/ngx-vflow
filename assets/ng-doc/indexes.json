@@ -14,18 +14,6 @@
   {
     "breadcrumbs": [
       "Getting Started",
-      "Roadmap"
-    ],
-    "pageType": "guide",
-    "title": "Roadmap",
-    "section": "Roadmap",
-    "route": "/getting-started/roadmap",
-    "fragment": "roadmap",
-    "content": "This is a roadmap for ngx-vflow: allow more than 2 handles on node, and further handles API improvementssubflowsmore customization to default nodesimprove consistency across browsers (mainly appeals to Safari)improve documentationmore curvesselection mechanism, allow to select one or many nodesplugin systemminimapUI controls for flowsupport for layout engines (Dagree, etc.)more complex background (patterns)z-index emulation for selected entities, it's a bit hard for SVG-based renderermore events for different actionsmodal system for context menuHTML-based renderer as alternative to current SVG-based rendererExperimental canvas/webgl renderer for insane performance"
-  },
-  {
-    "breadcrumbs": [
-      "Getting Started",
       "What is ngx-vflow"
     ],
     "pageType": "guide",
@@ -46,6 +34,18 @@
     "route": "/getting-started/what-is-ngx-vflow",
     "fragment": "main-features",
     "content": "Easy to use: Just describe your flow with a simple API; all of the heavy lifting, such as dragging, zooming, and curve math, is handled by the library for you. Customizable: There is a default design for basic usage, and you can also customize nodes with good old HTML and CSS. Other entities such as edges, connection lines, and handles are also customizable, but it will require a little SVG knowledge. Great performance: Angular signals are the heart and soul of ngx-vflow, which are performant by default, so you shouldn't worry about performance even with large flows."
+  },
+  {
+    "breadcrumbs": [
+      "Getting Started",
+      "Roadmap"
+    ],
+    "pageType": "guide",
+    "title": "Roadmap",
+    "section": "Roadmap",
+    "route": "/getting-started/roadmap",
+    "fragment": "roadmap",
+    "content": "This is a roadmap for ngx-vflow: allow more than 2 handles on node, and further handles API improvementssubflowsmore customization to default nodesimprove consistency across browsers (mainly appeals to Safari)improve documentationmore curvesselection mechanism, allow to select one or many nodesplugin systemminimapUI controls for flowsupport for layout engines (Dagree, etc.)more complex background (patterns)z-index emulation for selected entities, it's a bit hard for SVG-based renderermore events for different actionsmodal system for context menuHTML-based renderer as alternative to current SVG-based rendererExperimental canvas/webgl renderer for insane performance"
   },
   {
     "breadcrumbs": [
@@ -98,14 +98,14 @@
   {
     "breadcrumbs": [
       "Examples",
-      "Connection validation"
+      "Custom background"
     ],
     "pageType": "guide",
-    "title": "Connection validation",
-    "section": "Connection validation",
-    "route": "/examples/connection-validation",
-    "fragment": "connection-validation",
-    "content": "ngx-vflow supports realtime sync validation of connections. Validation performs on user attempt to create new edge. By default, every connection is valid, but you can provide ConnectionSettings with validatior callback where you specify validation logic. For example, in this case validation passes only connection from 1 to 2 node. If validator returns false, (onConnect) even won't be called because there is no valid connection."
+    "title": "Custom background",
+    "section": "Custom background",
+    "route": "/examples/custom-background",
+    "fragment": "custom-background",
+    "content": "You're able to select background color for your flow. Now it limits to only color, but later it will be possible to set more complex backgrounds. To select color just pass it in [background] input."
   },
   {
     "breadcrumbs": [
@@ -118,18 +118,6 @@
     "route": "/examples/curves",
     "fragment": "curves",
     "content": "It's possible to set curve for both edges and connection."
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom background"
-    ],
-    "pageType": "guide",
-    "title": "Custom background",
-    "section": "Custom background",
-    "route": "/examples/custom-background",
-    "fragment": "custom-background",
-    "content": "You're able to select background color for your flow. Now it limits to only color, but later it will be possible to set more complex backgrounds. To select color just pass it in [background] input."
   },
   {
     "breadcrumbs": [
@@ -482,6 +470,18 @@
   {
     "breadcrumbs": [
       "Examples",
+      "Connection validation"
+    ],
+    "pageType": "guide",
+    "title": "Connection validation",
+    "section": "Connection validation",
+    "route": "/examples/connection-validation",
+    "fragment": "connection-validation",
+    "content": "ngx-vflow supports realtime sync validation of connections. Validation performs on user attempt to create new edge. By default, every connection is valid, but you can provide ConnectionSettings with validatior callback where you specify validation logic. For example, in this case validation passes only connection from 1 to 2 node. If validator returns false, (onConnect) even won't be called because there is no valid connection."
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
       "Custom handles"
     ],
     "pageType": "guide",
@@ -514,6 +514,174 @@
     "route": "/examples/custom-handles",
     "fragment": "custom-handles",
     "content": "Custom handles are not positioned automatically, but the library provides useful template context property to position your handle.Custom handles knows if validation of ConnectionSettings.validator() failed or succeed, so you can use state() signal in let-ctx to add some behavior based on validation result. Refer to this interface for let-ctx when crafting your handle template:"
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Default connection"
+    ],
+    "pageType": "guide",
+    "title": "Default connection",
+    "section": "Default connection",
+    "route": "/examples/default-connection",
+    "fragment": "default-connection",
+    "content": "Edges are not creating automatically. Basically, these steps needs to be performed to create new edge:"
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Default connection"
+    ],
+    "pageType": "guide",
+    "title": "Default connection",
+    "section": "Default connection",
+    "route": "/examples/default-connection",
+    "fragment": "default-connection",
+    "content": "Create handler to "
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Default connection"
+    ],
+    "pageType": "guide",
+    "title": "Default connection",
+    "section": "Default connection",
+    "route": "/examples/default-connection",
+    "fragment": "default-connection",
+    "content": "(onConnect)"
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Default connection"
+    ],
+    "pageType": "guide",
+    "title": "Default connection",
+    "section": "Default connection",
+    "route": "/examples/default-connection",
+    "fragment": "default-connection",
+    "content": " event This handler accepts "
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Default connection"
+    ],
+    "pageType": "guide",
+    "title": "Default connection",
+    "section": "Default connection",
+    "route": "/examples/default-connection",
+    "fragment": "default-connection",
+    "content": "Connection"
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Default connection"
+    ],
+    "pageType": "guide",
+    "title": "Default connection",
+    "section": "Default connection",
+    "route": "/examples/default-connection",
+    "fragment": "default-connection",
+    "content": " argument. "
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Default connection"
+    ],
+    "pageType": "guide",
+    "title": "Default connection",
+    "section": "Default connection",
+    "route": "/examples/default-connection",
+    "fragment": "default-connection",
+    "content": "Connection"
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Default connection"
+    ],
+    "pageType": "guide",
+    "title": "Default connection",
+    "section": "Default connection",
+    "route": "/examples/default-connection",
+    "fragment": "default-connection",
+    "content": " is like "
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Default connection"
+    ],
+    "pageType": "guide",
+    "title": "Default connection",
+    "section": "Default connection",
+    "route": "/examples/default-connection",
+    "fragment": "default-connection",
+    "content": "Edge"
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Default connection"
+    ],
+    "pageType": "guide",
+    "title": "Default connection",
+    "section": "Default connection",
+    "route": "/examples/default-connection",
+    "fragment": "default-connection",
+    "content": ", but it doesn't exists in flow, you need to \"convert\" it to new "
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Default connection"
+    ],
+    "pageType": "guide",
+    "title": "Default connection",
+    "section": "Default connection",
+    "route": "/examples/default-connection",
+    "fragment": "default-connection",
+    "content": "Edge"
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Default connection"
+    ],
+    "pageType": "guide",
+    "title": "Default connection",
+    "section": "Default connection",
+    "route": "/examples/default-connection",
+    "fragment": "default-connection",
+    "content": "Edge[]"
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Default connection"
+    ],
+    "pageType": "guide",
+    "title": "Default connection",
+    "section": "Default connection",
+    "route": "/examples/default-connection",
+    "fragment": "default-connection",
+    "content": " list updated with new edge that was created from "
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Default connection"
+    ],
+    "pageType": "guide",
+    "title": "Default connection",
+    "section": "Default connection",
+    "route": "/examples/default-connection",
+    "fragment": "default-connection",
+    "content": "Connection"
   },
   {
     "breadcrumbs": [
@@ -710,174 +878,6 @@
   {
     "breadcrumbs": [
       "Examples",
-      "Default connection"
-    ],
-    "pageType": "guide",
-    "title": "Default connection",
-    "section": "Default connection",
-    "route": "/examples/default-connection",
-    "fragment": "default-connection",
-    "content": "Edges are not creating automatically. Basically, these steps needs to be performed to create new edge:"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Default connection"
-    ],
-    "pageType": "guide",
-    "title": "Default connection",
-    "section": "Default connection",
-    "route": "/examples/default-connection",
-    "fragment": "default-connection",
-    "content": "Create handler to "
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Default connection"
-    ],
-    "pageType": "guide",
-    "title": "Default connection",
-    "section": "Default connection",
-    "route": "/examples/default-connection",
-    "fragment": "default-connection",
-    "content": "(onConnect)"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Default connection"
-    ],
-    "pageType": "guide",
-    "title": "Default connection",
-    "section": "Default connection",
-    "route": "/examples/default-connection",
-    "fragment": "default-connection",
-    "content": " event This handler accepts "
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Default connection"
-    ],
-    "pageType": "guide",
-    "title": "Default connection",
-    "section": "Default connection",
-    "route": "/examples/default-connection",
-    "fragment": "default-connection",
-    "content": "Connection"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Default connection"
-    ],
-    "pageType": "guide",
-    "title": "Default connection",
-    "section": "Default connection",
-    "route": "/examples/default-connection",
-    "fragment": "default-connection",
-    "content": " argument. "
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Default connection"
-    ],
-    "pageType": "guide",
-    "title": "Default connection",
-    "section": "Default connection",
-    "route": "/examples/default-connection",
-    "fragment": "default-connection",
-    "content": "Connection"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Default connection"
-    ],
-    "pageType": "guide",
-    "title": "Default connection",
-    "section": "Default connection",
-    "route": "/examples/default-connection",
-    "fragment": "default-connection",
-    "content": " is like "
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Default connection"
-    ],
-    "pageType": "guide",
-    "title": "Default connection",
-    "section": "Default connection",
-    "route": "/examples/default-connection",
-    "fragment": "default-connection",
-    "content": "Edge"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Default connection"
-    ],
-    "pageType": "guide",
-    "title": "Default connection",
-    "section": "Default connection",
-    "route": "/examples/default-connection",
-    "fragment": "default-connection",
-    "content": ", but it doesn't exists in flow, you need to \"convert\" it to new "
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Default connection"
-    ],
-    "pageType": "guide",
-    "title": "Default connection",
-    "section": "Default connection",
-    "route": "/examples/default-connection",
-    "fragment": "default-connection",
-    "content": "Edge"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Default connection"
-    ],
-    "pageType": "guide",
-    "title": "Default connection",
-    "section": "Default connection",
-    "route": "/examples/default-connection",
-    "fragment": "default-connection",
-    "content": "Edge[]"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Default connection"
-    ],
-    "pageType": "guide",
-    "title": "Default connection",
-    "section": "Default connection",
-    "route": "/examples/default-connection",
-    "fragment": "default-connection",
-    "content": " list updated with new edge that was created from "
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Default connection"
-    ],
-    "pageType": "guide",
-    "title": "Default connection",
-    "section": "Default connection",
-    "route": "/examples/default-connection",
-    "fragment": "default-connection",
-    "content": "Connection"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
       "Default edges"
     ],
     "pageType": "guide",
@@ -902,6 +902,54 @@
   {
     "breadcrumbs": [
       "Examples",
+      "Handling changes"
+    ],
+    "pageType": "guide",
+    "title": "Handling changes",
+    "section": "Handling changes",
+    "route": "/examples/handling-changes",
+    "fragment": "handling-changes",
+    "content": "You can observe changes in the toasts. It's also better to see this page in desktop"
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Handling changes"
+    ],
+    "pageType": "guide",
+    "title": "Handling changes",
+    "section": "Handling changes",
+    "route": "/examples/handling-changes",
+    "fragment": "handling-changes",
+    "content": "You can observe a lot of changes of nodes and edges. Types of NodeChanges: position - new node position (after drag and drop)add - when node was createdremove - when node was removedselect - when node was selected (also triggers for unselected nodes) Types of EdgeChanges: add - when edge was createdremove - when edge was removedselect - when edge was selected (also triggers for unselected edges)detached - when edge became invisible due to unexistance of source or target node. It will help you to delete such edges from edges list There are a couple ways to receive these changes:"
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Handling changes"
+    ],
+    "pageType": "guide",
+    "title": "Handling changes",
+    "section": "From (onNodesChange) and (onEdgesChange) outputs",
+    "route": "/examples/handling-changes",
+    "fragment": "from-onnodeschange-and-onedgeschange-outputs",
+    "content": "This is a way to get every possible change. Changes came as non empty arrays: (onNodesChange) emits NodeChange[](onEdgesChange) emits EdgeChange[]"
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Handling changes"
+    ],
+    "pageType": "guide",
+    "title": "Handling changes",
+    "section": "From filtered outputs",
+    "route": "/examples/handling-changes",
+    "fragment": "from-filtered-outputs",
+    "content": "For your convenience there is a filtering scheme for changes based on (onNodesChange) and (onEdgesChange) events: (onNodesChange.[NodeChangeType]) - a list of node changes of certain type(onNodesChange.[EdgeChangeType]) - a list of edge changes of certain type(onNodesChange.[NodeChangeType].[Count]) - a list (many) of or single (single) node change of certain type(onEdgesChange.[EdgeChangeType].[Count]) - a list (many) of or single (single) edge change of certain type Where: List of all possible filter outputs:"
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
       "Draggables"
     ],
     "pageType": "guide",
@@ -910,6 +958,30 @@
     "route": "/examples/draggables",
     "fragment": "draggables",
     "content": "On some nodes you can disable draggable behavior."
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Markers"
+    ],
+    "pageType": "guide",
+    "title": "Markers",
+    "section": "Markers",
+    "route": "/examples/markers",
+    "fragment": "markers",
+    "content": "You could create markers for both edges and connections. For edges you could spicify start and end markers for corresponding parts of edge. Marker is now only two type's - arrow and arrow-closed. For connections you couls only specify end marker by marker property in ConnectionSettings."
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Multiple connection points"
+    ],
+    "pageType": "guide",
+    "title": "Multiple connection points",
+    "section": "Multiple connection points",
+    "route": "/examples/multiple-connection-points",
+    "fragment": "multiple-connection-points",
+    "content": "Custom components opens an ability to control handles and their positions. All you need to do is take HandleComponent from library and put in some place of your custom node. This component automatically computes its position based on parent element position."
   },
   {
     "breadcrumbs": [
@@ -946,30 +1018,6 @@
     "route": "/examples/labels",
     "fragment": "context",
     "content": "You may access some data for label through let-ctx according to this interface."
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Markers"
-    ],
-    "pageType": "guide",
-    "title": "Markers",
-    "section": "Markers",
-    "route": "/examples/markers",
-    "fragment": "markers",
-    "content": "You could create markers for both edges and connections. For edges you could spicify start and end markers for corresponding parts of edge. Marker is now only two type's - arrow and arrow-closed. For connections you couls only specify end marker by marker property in ConnectionSettings."
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Multiple connection points"
-    ],
-    "pageType": "guide",
-    "title": "Multiple connection points",
-    "section": "Multiple connection points",
-    "route": "/examples/multiple-connection-points",
-    "fragment": "multiple-connection-points",
-    "content": "Custom components opens an ability to control handles and their positions. All you need to do is take HandleComponent from library and put in some place of your custom node. This component automatically computes its position based on parent element position."
   },
   {
     "breadcrumbs": [
@@ -1488,7 +1536,7 @@
     "section": "Properties",
     "route": "/api/ngx-vflow/classes/VflowComponent",
     "fragment": "properties",
-    "content": "Observable with nodes change"
+    "content": "Observable with edges change"
   },
   {
     "breadcrumbs": [
@@ -1922,7 +1970,7 @@
     "section": "Properties",
     "route": "/api/ngx-vflow/classes/ChangesControllerDirective",
     "fragment": "properties",
-    "content": "Watch nodes change"
+    "content": "Watch edges change"
   },
   {
     "breadcrumbs": [
