@@ -10,6 +10,7 @@ import { AppComponent } from './app.component';
 import { VflowModule } from '../../../ngx-vflow-lib/src/public-api';
 import { provideHttpClient } from "@angular/common/http";
 import { NgDocButtonIconComponent, NgDocIconComponent, NgDocTooltipDirective } from "@ng-doc/ui-kit";
+import { HotToastModule } from "@ngneat/hot-toast";
 
 @NgModule({
   declarations: [
@@ -25,7 +26,10 @@ import { NgDocButtonIconComponent, NgDocIconComponent, NgDocTooltipDirective } f
     NgDocThemeToggleComponent,
     NgDocIconComponent,
     NgDocButtonIconComponent,
-    NgDocTooltipDirective
+    NgDocTooltipDirective,
+    HotToastModule.forRoot({
+      position: 'top-right'
+    })
   ],
   providers: [
     provideNgDocApp({
@@ -56,6 +60,7 @@ import { NgDocButtonIconComponent, NgDocIconComponent, NgDocTooltipDirective } f
         anchorScrolling: 'enabled',
       }),
     ),
+
   ],
   bootstrap: [AppComponent],
 })

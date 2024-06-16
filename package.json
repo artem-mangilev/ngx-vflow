@@ -24,6 +24,8 @@
     "@ng-doc/builder": "~16.17.0",
     "@ng-doc/core": "~16.17.0",
     "@ng-doc/ui-kit": "~16.17.0",
+    "@ngneat/hot-toast": "^6.1.0",
+    "@ngneat/overview": "^5.1.1",
     "d3-drag": "^3.0.0",
     "d3-path": "^3.1.0",
     "d3-selection": "^3.0.0",
