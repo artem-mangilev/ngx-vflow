@@ -1,16 +1,24 @@
 import { Directive, ElementRef, Signal, computed, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { fromEvent, map, startWith } from 'rxjs';
 import { RootSvgReferenceDirective } from './reference.directive';
 import { Point } from '../interfaces/point.interface';
+import { RootPointerDirective } from './root-pointer.directive';
 
 @Directive({ selector: 'g[spacePointContext]' })
 export class SpacePointContextDirective {
+  private pointerMovementDirective = inject(RootPointerDirective)
+  private rootSvg = inject(RootSvgReferenceDirective).element
+  private host = inject<ElementRef<SVGGElement>>(ElementRef).nativeElement
+
   /**
    * Signal with current mouse position in svg space
    */
   public svgCurrentSpacePoint: Signal<Point> = computed(() => {
-    const movement = this.mouseMovement()
+    const movement = this.pointerMovement()
+
+    if (!movement) {
+      return { x: 0, y: 0 }
+    }
 
     const point = this.rootSvg.createSVGPoint()
     point.x = movement.x
@@ -19,13 +27,7 @@ export class SpacePointContextDirective {
     return point.matrixTransform(this.host.getScreenCTM()!.inverse())
   })
 
-  private rootSvg = inject(RootSvgReferenceDirective).element
-  private host = inject<ElementRef<SVGGElement>>(ElementRef).nativeElement
-
-  private mouseMovement = toSignal(
-    fromEvent<MouseEvent>(this.rootSvg, 'mousemove').pipe(
-      map(event => ({ x: event.clientX, y: event.clientY })),
-    ),
-    { initialValue: { x: 0, y: 0 } }
+  public pointerMovement = toSignal(
+    this.pointerMovementDirective.pointerMovement$,
   )
 }
