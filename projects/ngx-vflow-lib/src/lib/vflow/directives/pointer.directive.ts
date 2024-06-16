@@ -24,6 +24,10 @@ export class PointerDirective {
   @HostListener('touchstart', ['$event'])
   protected onPointerStart(event: Event) {
     this.pointerStart.emit(event)
+
+    if (event instanceof TouchEvent) {
+      this.pointerMovementDirective.setInitialTouch(event);
+    }
   }
 
   @HostListener('mouseup', ['$event'])

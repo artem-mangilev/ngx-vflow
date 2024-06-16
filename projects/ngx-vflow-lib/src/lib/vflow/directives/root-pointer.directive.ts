@@ -1,11 +1,14 @@
 import { Directive, ElementRef, inject } from '@angular/core';
-import { Observable, fromEvent, map, merge, share, tap } from 'rxjs';
+import { Observable, Subject, fromEvent, map, merge, share, skip, tap } from 'rxjs';
 import { Point } from '../interfaces/point.interface';
 
 @Directive({ selector: 'svg[rootPointer]' })
 export class RootPointerDirective {
   private host = inject<ElementRef<SVGSVGElement>>(ElementRef).nativeElement
 
+  private initialTouch$ = new Subject<TouchEvent>()
+
+  // TODO: do not emit if mouse not down
   public mouseMovement$ = fromEvent<MouseEvent>(this.host, 'mousemove').pipe(
     map(event => ({
       x: event.clientX,
@@ -15,7 +18,10 @@ export class RootPointerDirective {
     share()
   ) satisfies Observable<Point>;
 
-  public touchMovement$ = fromEvent<TouchEvent>(this.host, 'touchmove').pipe(
+  public touchMovement$ = merge(
+    this.initialTouch$,
+    fromEvent<TouchEvent>(this.host, 'touchmove')
+  ).pipe(
     tap((event) => event.preventDefault()),
     map((event) => ({
       x: event.touches[0]?.clientX ?? 0,
@@ -38,5 +44,11 @@ export class RootPointerDirective {
     this.mouseMovement$,
     this.touchMovement$
   )
-
+  /**
+   * We should know when user started a touch in order to not
+   * show old touch position when connection creation is started
+   */
+  public setInitialTouch(event: TouchEvent) {
+    this.initialTouch$.next(event)
+  }
 }
