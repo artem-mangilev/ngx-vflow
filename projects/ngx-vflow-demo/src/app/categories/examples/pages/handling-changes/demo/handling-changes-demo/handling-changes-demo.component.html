@@ -1,0 +1,13 @@
+<vflow
+  [nodes]="nodes"
+  [edges]="edges"
+  (onConnect)="createEdge($event)"
+  (onNodesChange)="handleNodeChanges($event)"
+  (onEdgesChange)="handleEdgeChanges($event)"
+/>
+
+<ng-template #toast let-ctx>
+  <h3>{{ ctx.data.title }}</h3>
+
+  <pre>{{ ctx.data.json }}</pre>
+</ng-template>
