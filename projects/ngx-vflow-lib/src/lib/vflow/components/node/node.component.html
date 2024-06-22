@@ -2,14 +2,18 @@
   *ngIf="nodeModel.node.type === 'default'"
   class="selectable"
   #nodeContent
-  width="100"
-  height="50"
+  [attr.width]="nodeModel.size().width"
+  [attr.height]="nodeModel.size().height"
   (mousedown)="pullNode(); selectNode()"
 >
   <div
     #htmlWrapper
     class="default-node"
     [class.default-node_selected]="nodeModel.selected()"
+    [style.width]="styleWidth()"
+    [style.height]="styleHeight()"
+    [style.max-width]="styleWidth()"
+    [style.max-height]="styleHeight()"
     [innerHTML]="nodeModel.node.text ?? ''"
   ></div>
 </svg:foreignObject>
@@ -62,4 +66,3 @@
     (pointerOut)="resetValidateTargetHandle(handle)"
   />
 </ng-container>
-

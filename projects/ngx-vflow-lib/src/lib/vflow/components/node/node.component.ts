@@ -24,8 +24,15 @@ export type HandleState = 'valid' | 'invalid' | 'idle'
 })
 export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInjector {
   public injector = inject(Injector)
-  protected handleService = inject(HandleService)
-  protected zone = inject(NgZone)
+  private handleService = inject(HandleService)
+  private zone = inject(NgZone)
+  private draggableService = inject(DraggableService)
+  private flowStatusService = inject(FlowStatusService)
+  private flowEntitiesService = inject(FlowEntitiesService)
+  private nodeRenderingService = inject(NodeRenderingService)
+  private flowSettingsService = inject(FlowSettingsService)
+  private selectionService = inject(SelectionService)
+  private hostRef = inject<ElementRef<SVGElement>>(ElementRef)
 
   @Input()
   public nodeModel!: NodeModel
@@ -39,18 +46,15 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInje
   @ViewChild('htmlWrapper')
   public htmlWrapperRef!: ElementRef<HTMLDivElement>
 
-  private draggableService = inject(DraggableService)
-  private flowStatusService = inject(FlowStatusService)
-  private flowEntitiesService = inject(FlowEntitiesService)
-  private nodeRenderingService = inject(NodeRenderingService)
-  private flowSettingsService = inject(FlowSettingsService)
-  private selectionService = inject(SelectionService)
-  private hostRef = inject<ElementRef<SVGElement>>(ElementRef)
 
   protected showMagnet = computed(() =>
     this.flowStatusService.status().state === 'connection-start' ||
     this.flowStatusService.status().state === 'connection-validation'
   )
+
+  protected styleWidth = computed(() => `${this.nodeModel.size().width}px`)
+
+  protected styleHeight = computed(() => `${this.nodeModel.size().height}px`)
 
   private subscription = new Subscription()
 
@@ -77,8 +81,10 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInje
     this.setInitialHandles()
 
     if (this.nodeModel.node.type === 'default') {
-      const { width, height } = this.nodeContentRef.nativeElement.getBBox()
-      this.nodeModel.size.set({ width, height })
+      this.nodeModel.size.set({
+        width: this.nodeModel.node.width ?? NodeModel.defaultTypeSize.width,
+        height: this.nodeModel.node.height ?? NodeModel.defaultTypeSize.height
+      })
     }
 
     if (this.nodeModel.node.type === 'html-template') {

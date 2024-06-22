@@ -9,6 +9,11 @@ import { BehaviorSubject, animationFrameScheduler, observeOn } from 'rxjs'
 import { Point } from '../interfaces/point.interface'
 
 export class NodeModel<T = unknown> implements FlowEntity {
+  public static defaultTypeSize = {
+    width: 100,
+    height: 50
+  }
+
   private flowSettingsService = inject(FlowSettingsService)
 
   private internalPoint$ = new BehaviorSubject({ x: 0, y: 0 })

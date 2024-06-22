@@ -13,6 +13,8 @@ export interface SharedNode {
 export interface DefaultNode {
   type: 'default'
   text?: string
+  width?: number
+  height?: number
 }
 
 export interface HtmlTemplateNode<T = unknown> {
