@@ -1,4 +1,4 @@
-import { computed, inject, signal } from '@angular/core'
+import { Type, computed, inject, signal } from '@angular/core'
 import { Node } from '../interfaces/node.interface'
 import { isDefined } from '../utils/is-defined'
 import { toObservable, toSignal } from '@angular/core/rxjs-interop'
@@ -7,6 +7,7 @@ import { FlowEntity } from '../interfaces/flow-entity.interface'
 import { FlowSettingsService } from '../services/flow-settings.service'
 import { BehaviorSubject, animationFrameScheduler, observeOn } from 'rxjs'
 import { Point } from '../interfaces/point.interface'
+import { CustomNodeComponent } from '../public-components/custom-node.component'
 
 export class NodeModel<T = unknown> implements FlowEntity {
   public static defaultTypeSize = {
@@ -49,6 +50,15 @@ export class NodeModel<T = unknown> implements FlowEntity {
 
   // disabled for configuration for now
   public readonly magnetRadius = 20
+
+  public isComponentType = CustomNodeComponent.isPrototypeOf(this.node.type)
+
+  public componentTypeInputs = computed(() => {
+    return {
+      node: this.node,
+      _selected: this.selected()
+    }
+  })
 
   constructor(
     public node: Node<T>

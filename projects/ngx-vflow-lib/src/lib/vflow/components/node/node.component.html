@@ -34,6 +34,22 @@
   </div>
 </svg:foreignObject>
 
+<svg:foreignObject
+  *ngIf="nodeModel.isComponentType"
+  class="selectable"
+  [attr.width]="nodeModel.size().width"
+  [attr.height]="nodeModel.size().height"
+  (mousedown)="pullNode()"
+>
+  <div #htmlWrapper class="wrapper">
+    <ng-container
+      [ngComponentOutlet]="$any(nodeModel.node.type)"
+      [ngComponentOutletInputs]="nodeModel.componentTypeInputs()"
+      [ngComponentOutletInjector]="injector"
+    />
+  </div>
+</svg:foreignObject>
+
 <ng-container *ngFor="let handle of nodeModel.handles()">
   <svg:circle
     *ngIf="!handle.template"

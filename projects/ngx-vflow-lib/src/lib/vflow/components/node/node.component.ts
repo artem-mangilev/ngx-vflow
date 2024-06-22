@@ -46,7 +46,6 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInje
   @ViewChild('htmlWrapper')
   public htmlWrapperRef!: ElementRef<HTMLDivElement>
 
-
   protected showMagnet = computed(() =>
     this.flowStatusService.status().state === 'connection-start' ||
     this.flowStatusService.status().state === 'connection-validation'
@@ -87,7 +86,7 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInje
       })
     }
 
-    if (this.nodeModel.node.type === 'html-template') {
+    if (this.nodeModel.node.type === 'html-template' || this.nodeModel.isComponentType) {
       const sub = resizable([this.htmlWrapperRef.nativeElement], this.zone)
         .pipe(
           startWith(null),
