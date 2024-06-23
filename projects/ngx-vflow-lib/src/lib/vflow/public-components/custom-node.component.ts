@@ -10,6 +10,9 @@ export abstract class CustomNodeComponent<T = unknown> implements OnInit {
 
   protected destroyRef = inject(DestroyRef)
 
+  /**
+   * Reference to node bound to this component
+   */
   @Input()
   public node!: SharedNode & ComponentNode<T>
 
@@ -18,6 +21,9 @@ export abstract class CustomNodeComponent<T = unknown> implements OnInit {
     this.selected.set(value)
   }
 
+  /**
+   * Signal with selected state of node
+   */
   public selected = signal(false)
 
   public ngOnInit(): void {

@@ -34,7 +34,7 @@ It's limitations
 How to create component node:
 
 1. Create a regular angular standalone component
-2. Extend with `CustomNodeComponent`, otherwise it won't work!
+2. Extend with `CustomNodeComponent` (please see the reference of this base component to get an idea of what fields you could use in your custom component node), otherwise it won't work!
 3. Pass your data interface to generic of `CustomNodeComponent` to use in component. This `data` comes from `Node` definition
 4. Use your new component in `type` field of `Node`. Library will render your node for you
 
