@@ -27,6 +27,7 @@ import { EdgeChange } from '../../types/edge-change.type';
 import { NodeRenderingService } from '../../services/node-rendering.service';
 import { SelectionService } from '../../services/selection.service';
 import { FlowSettingsService } from '../../services/flow-settings.service';
+import { ComponentEventBusService } from '../../services/component-event-bus.service';
 
 const connectionControllerHostDirective = {
   directive: ConnectionControllerDirective,
@@ -79,7 +80,8 @@ const changesControllerHostDirective = {
     EdgeChangesService,
     NodeRenderingService,
     SelectionService,
-    FlowSettingsService
+    FlowSettingsService,
+    ComponentEventBusService
   ],
   hostDirectives: [
     connectionControllerHostDirective,
@@ -94,6 +96,7 @@ export class VflowComponent {
   private edgesChangeService = inject(EdgeChangesService)
   private nodeRenderingService = inject(NodeRenderingService)
   private flowSettingsService = inject(FlowSettingsService)
+  private componentEventBusService = inject(ComponentEventBusService)
   private injector = inject(Injector)
   // #endregion
 
@@ -195,6 +198,16 @@ export class VflowComponent {
   }
 
   protected edgeModels = computed(() => this.flowEntitiesService.validEdges())
+  // #endregion
+
+  // #region OUTPUTS
+  /**
+   * Event that accumulates all custom node events
+   *
+   * @experimental
+   */
+  @Output()
+  public onComponentNodeEvent = this.componentEventBusService.event$
   // #endregion
 
   // #region TEMPLATES
