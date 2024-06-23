@@ -207,7 +207,7 @@ export class VflowComponent {
    * @experimental
    */
   @Output()
-  public onComponentNodeEvent = this.componentEventBusService.event$
+  public onComponentNodeEvent = this.componentEventBusService.event$ as any // TODO: research how to remove as any
   // #endregion
 
   // #region TEMPLATES
