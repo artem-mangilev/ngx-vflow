@@ -1,12 +1,12 @@
 # {{ NgDocPage.title }}
 
 > **Info**
-> You can observe changes in the toasts. It's also better to see this page in desktop
+> You can observe changes in the toasts.  For a better experience, view this page on desktop
 
-You can observe a lot of changes of nodes and edges.
+You can observe various changes in nodes and edges.
 
 Types of `NodeChange`s:
-- `position` - new node position (after drag and drop)
+- `position` - new node position after drag and drop
 - `add` - when node was created
 - `remove` - when node was removed
 - `select` - when node was selected (also triggers for unselected nodes)
@@ -15,10 +15,9 @@ Types of `EdgeChange`s:
 - `add` - when edge was created
 - `remove` - when edge was removed
 - `select` - when edge was selected (also triggers for unselected edges)
-- `detached` - when edge became invisible due to unexistance of source or target node. It will help you
-to delete such edges from edges list
+- `detached` - when edge became invisible due to the absence of the source or target node. Use this to delete such edges from the edges list
 
-There are a couple ways to receive these changes:
+There are a several ways to receive these changes:
 
 ## From (onNodesChange) and (onEdgesChange) outputs
 
@@ -30,12 +29,12 @@ This is a way to get every possible change. Changes came as non empty arrays:
 
 ## From filtered outputs
 
-For your convenience there is a filtering scheme for changes based on `(onNodesChange)` and `(onEdgesChange)` events:
+For your convenience, here is the filtering scheme for changes based on the `(onNodesChange)` and `(onEdgesChange)` events:
 
-- `(onNodesChange.[NodeChangeType])` - a list of node changes of certain type
-- `(onNodesChange.[EdgeChangeType])` - a list of edge changes of certain type
-- `(onNodesChange.[NodeChangeType].[Count])` - a list (`many`) of or single (`single`) node change of certain type
-- `(onEdgesChange.[EdgeChangeType].[Count])` - a list (`many`) of or single (`single`) edge change of certain type
+- `(onNodesChange.[NodeChangeType])` - a list of node changes of a certain type
+- `(onNodesChange.[EdgeChangeType])` - a list of edge changes of a certain type
+- `(onNodesChange.[NodeChangeType].[Count])` - a list (`many`) or single (`single`) node change of a certain type
+- `(onEdgesChange.[EdgeChangeType].[Count])` - a list (`many`) or single (`single`) edge change of a certain type
 
 Where: 
 

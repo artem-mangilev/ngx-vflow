@@ -1,5 +1,5 @@
 # {{ NgDocPage.title }}
 
-On some nodes you can disable `draggable` behavior.
+You can disable `draggable` behavior on certain nodes.
 
 {{ NgDocActions.demo("DraggablesDemoComponent", { expanded: true }) }}

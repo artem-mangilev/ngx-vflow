@@ -5,8 +5,8 @@ You can pass a `[template]` to `HandleComponent` with custom handle.
 > **Info**
 > I't important to note that template must be made with SVG. 
 
-- Custom handles are not positioned automatically, but the library provides useful template context property to position your handle.
-- Custom handles knows if validation of `ConnectionSettings.validator()` failed or succeed, so you can use `state()` signal in `let-ctx` to add some behavior based on validation result.
+- Custom handles are not positioned automatically, but the library provides a useful template context property to position your handle.
+- Custom handles know if validation of `ConnectionSettings.validator()` has failed or succeeded, so you can use `state()` signal in `let-ctx` to add some behavior based on validation result.
 
 Refer to this interface for `let-ctx` when crafting your handle template:
 

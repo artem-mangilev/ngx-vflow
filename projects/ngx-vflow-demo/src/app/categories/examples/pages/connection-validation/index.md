@@ -1,7 +1,7 @@
 # {{ NgDocPage.title }}
 
-`ngx-vflow` supports realtime sync validation of connections. Validation performs on user attempt to create new edge. By default, every connection is valid, but you can provide `ConnectionSettings` with `validatior` callback where you specify validation logic.
+`ngx-vflow` supports real-time synchronous validation of connections. Validation occurs when a user attempts to create a new edge. By default, every connection is valid, but you can provide a `ConnectionSettings` with a `validatior` callback where you specify the validation logic.
 
-For example, in this case validation passes only connection from 1 to 2 node. If `validator` returns `false`, `(onConnect)` even won't be called because there is no valid connection.
+For example, in this case, validation only passes connections from node 1 to node 2. If the `validator` returns `false`, the `(onConnect)` event won't be triggered because there is no valid connection.
 
 {{ NgDocActions.demo("ConnectionValidationDemoComponent", { expanded: true }) }}

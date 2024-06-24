@@ -1,15 +1,15 @@
 # {{ NgDocPage.title }}
 
 > **Warning**
-> Be careful with CSS rules applied to node content; custom nodes are implemented with SVG's `foreignObject` element, and Safari has issues with some CSS rules inside `foreignObject`. Therefore, please check this browser when applying complex styling.
+> Be careful with CSS rules applied to node content. Custom nodes are implemented with SVG's `foreignObject` element, and Safari has issues with some CSS rules inside `foreignObject`. Therefore, please check this browser when applying complex styling.
 
-This is where things became a lot more interesting. You can create custom nodes with HTML and CSS.
+This is where things become a lot more interesting. You can create custom nodes with HTML and CSS.
 
 ## Template nodes
 
-You can create nodes custom nodes with `ng-template`
+You can create custom nodes with `ng-template`
 
-Do the following steps to archieve this:
+Follow these steps to achieve this:
 
 1. Set `type` of node to `html-template`
 2. Provide `ng-template` with `nodeHtml` selector inside `vflow`
@@ -22,14 +22,14 @@ Do the following steps to archieve this:
 
 Another approach is to render nodes from components.
 
-It's benefits:
+Its benefits:
 
 - type-safe node data access
-- good for complex flows with a lot of different node types
+- good for complex flows with many different node types
 
-It's limitations
+Its limitations
 
-- it's harder to manage events because such nodes rendered dynamically
+- it's harder to manage events because such nodes are rendered dynamically
 
 How to create component node:
 
@@ -45,7 +45,7 @@ How to create component node:
 > **Warning**
 > This is an experimental API
 
-There is a `(onComponentNodeEvent)` event on `VflowComponent`, how it works
+There is a `(onComponentNodeEvent)` event on `VflowComponent`. Here is how it works:
 
 1. It accumulates every `EventEmitter` of every component node of your flow
 2. It emits on every emit of those emitters
