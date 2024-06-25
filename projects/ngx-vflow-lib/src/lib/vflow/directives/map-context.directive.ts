@@ -28,8 +28,7 @@ export class MapContextDirective implements OnInit {
   protected viewportForSelection: Partial<ViewportForSelection> = {}
 
   // under the hood this effect triggers handleZoom, so error throws without this flag
-  // TODO: hack with timer fixes wrong node scaling (handle positions not matched with content size)
-  protected manualViewportChangeEffect = effect(() => setTimeout(() => {
+  protected manualViewportChangeEffect = effect(() => {
     const viewport = this.viewportService.writableViewport()
     const state = viewport.state
 
@@ -59,7 +58,7 @@ export class MapContextDirective implements OnInit {
 
       return
     }
-  }), { allowSignalWrites: true })
+  }, { allowSignalWrites: true })
 
   protected zoomBehavior!: ZoomBehavior<SVGSVGElement, unknown>;
 
