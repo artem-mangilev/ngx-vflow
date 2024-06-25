@@ -1,4 +1,4 @@
-import { Directive, ElementRef, Input, OnInit, effect, inject } from '@angular/core';
+import { Directive, ElementRef, Input, OnInit, effect, inject, untracked } from '@angular/core';
 import { select } from 'd3-selection';
 import { D3ZoomEvent, ZoomBehavior, ZoomTransform, zoom, zoomIdentity } from 'd3-zoom';
 import { ViewportService } from '../services/viewport.service';
@@ -45,7 +45,9 @@ export class MapContextDirective implements OnInit {
 
     // If only pan provided
     if ((isDefined(state.x) && isDefined(state.y)) && !isDefined(state.zoom)) {
-      this.rootSvgSelection.call(this.zoomBehavior.translateTo, state.x, state.y)
+      // add inverse to point to match with d3 internals
+      // (otherwise handleZoom function will get flipped transform)
+      this.rootSvgSelection.call(this.zoomBehavior.translateTo, -state.x, -state.y, [0, 0])
 
       return
     }

@@ -1,6 +1,5 @@
 import { Injectable, effect, inject, signal, untracked } from '@angular/core';
 import { ViewportState } from '../interfaces/viewport.interface';
-import { ViewportService } from './viewport.service';
 import { FlowEntitiesService } from './flow-entities.service';
 import { FlowEntity } from '../interfaces/flow-entity.interface';
 import { Subject, tap } from 'rxjs';
@@ -9,7 +8,10 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 export interface ViewportForSelection {
   start: ViewportState
   end: ViewportState
-  target: Element
+  /**
+   * Target may not exist if viewport change made programmatically
+   */
+  target?: Element
 }
 
 @Injectable()
@@ -22,7 +24,7 @@ export class SelectionService {
 
   protected resetSelection = this.viewport$.pipe(
     tap(({ start, end, target }) => {
-      if (start && end) {
+      if (start && end && target) {
         const delta = SelectionService.delta
 
         const diffX = Math.abs(end.x - start.x)
