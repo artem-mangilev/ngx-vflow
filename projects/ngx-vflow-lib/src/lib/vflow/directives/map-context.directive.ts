@@ -45,9 +45,12 @@ export class MapContextDirective implements OnInit {
 
     // If only pan provided
     if ((isDefined(state.x) && isDefined(state.y)) && !isDefined(state.zoom)) {
-      // add inverse to point to match with d3 internals
-      // (otherwise handleZoom function will get flipped transform)
-      this.rootSvgSelection.call(this.zoomBehavior.translateTo, -state.x, -state.y, [0, 0])
+      // remain same zoom value
+      const zoom = untracked(this.viewportService.readableViewport).zoom
+
+      this.rootSvgSelection.call(this.zoomBehavior.transform,
+        zoomIdentity.translate(state.x, state.y).scale(zoom)
+      )
 
       return
     }
