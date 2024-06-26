@@ -1,6 +1,6 @@
 # {{ NgDocPage.title }}
 
-You can attach labels to edges by providing `edgeLabels` property to needed `Edge`s. There's 3 slots available for lables on edge: `start`, `center`, `end`. Label is only of a `html-template` type, so you have to provide `<ng-template edgeLabelHtml>` inside `vflow`.
+You can attach labels to edges by providing the `edgeLabels` property to the needed `Edge`s. There are three slots available for labels on an edge: `start`, `center`, `end`. The label is only of the `html-template` type, so you have to provide `<ng-template edgeLabelHtml>` inside `vflow`.
 
 ## Context
 

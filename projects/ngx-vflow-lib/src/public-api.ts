@@ -12,6 +12,7 @@ export * from './lib/vflow/interfaces/connection-settings.interface';
 export * from './lib/vflow/interfaces/handle-positions.interface';
 export * from './lib/vflow/interfaces/marker.interface';
 export { ViewportState } from './lib/vflow/interfaces/viewport.interface';
+export * from './lib/vflow/interfaces/component-node-event.interface';
 
 // Types
 export * from './lib/vflow/types/node-change.type';
@@ -21,6 +22,7 @@ export * from './lib/vflow/types/position.type';
 // Components
 export * from './lib/vflow/components/vflow/vflow.component';
 export * from './lib/vflow/components/handle/handle.component';
+export * from './lib/vflow/public-components/custom-node.component';
 
 // Directives
 export * from './lib/vflow/directives/template.directive';

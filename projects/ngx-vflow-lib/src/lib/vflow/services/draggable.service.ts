@@ -51,7 +51,7 @@ export class DraggableService {
       })
 
       .on('drag', (event: DragEvent) => {
-        model.point.set(
+        model.setPoint(
           {
             x: round(event.x + deltaX),
             y: round(event.y + deltaY)

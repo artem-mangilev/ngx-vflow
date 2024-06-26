@@ -1,4 +1,4 @@
-import { Directive, ElementRef, Input, OnInit, effect, inject } from '@angular/core';
+import { Directive, ElementRef, Input, OnInit, effect, inject, untracked } from '@angular/core';
 import { select } from 'd3-selection';
 import { D3ZoomEvent, ZoomBehavior, ZoomTransform, zoom, zoomIdentity } from 'd3-zoom';
 import { ViewportService } from '../services/viewport.service';
@@ -28,8 +28,7 @@ export class MapContextDirective implements OnInit {
   protected viewportForSelection: Partial<ViewportForSelection> = {}
 
   // under the hood this effect triggers handleZoom, so error throws without this flag
-  // TODO: hack with timer fixes wrong node scaling (handle positions not matched with content size)
-  protected manualViewportChangeEffect = effect(() => setTimeout(() => {
+  protected manualViewportChangeEffect = effect(() => {
     const viewport = this.viewportService.writableViewport()
     const state = viewport.state
 
@@ -46,7 +45,12 @@ export class MapContextDirective implements OnInit {
 
     // If only pan provided
     if ((isDefined(state.x) && isDefined(state.y)) && !isDefined(state.zoom)) {
-      this.rootSvgSelection.call(this.zoomBehavior.translateTo, state.x, state.y)
+      // remain same zoom value
+      const zoom = untracked(this.viewportService.readableViewport).zoom
+
+      this.rootSvgSelection.call(this.zoomBehavior.transform,
+        zoomIdentity.translate(state.x, state.y).scale(zoom)
+      )
 
       return
     }
@@ -59,7 +63,7 @@ export class MapContextDirective implements OnInit {
 
       return
     }
-  }), { allowSignalWrites: true })
+  }, { allowSignalWrites: true })
 
   protected zoomBehavior!: ZoomBehavior<SVGSVGElement, unknown>;
 

@@ -1,12 +1,14 @@
 import { NgIf } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { Node, VflowModule } from 'projects/ngx-vflow-lib/src/public-api';
+import { Edge, Node, VflowModule } from 'projects/ngx-vflow-lib/src/public-api';
 
 @Component({
-  template: `<vflow [nodes]="nodes">
+  template: `<vflow [nodes]="nodes" [edges]="edges">
     <ng-template nodeHtml let-ctx>
       <div class="custom-node" [class.custom-node_selected]="ctx.selected()">
         {{ ctx.node.data.text }}
+
+        <handle type="source" position="right"/>
       </div>
     </ng-template>
   </vflow>`,
@@ -50,5 +52,13 @@ export class CustomNodesDemoComponent {
       type: 'default',
       text: 'Default'
     },
+  ]
+
+  public edges: Edge[] = [
+    {
+      id: '1 -> 2',
+      source: '1',
+      target: '2'
+    }
   ]
 }
