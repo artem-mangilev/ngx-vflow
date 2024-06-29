@@ -1,6 +1,18 @@
 [
   {
     "breadcrumbs": [
+      "Workshops",
+      "Delete selected"
+    ],
+    "pageType": "guide",
+    "title": "Delete selected",
+    "section": "Delete selected",
+    "route": "/workshops/delete-selected",
+    "fragment": "delete-selected",
+    "content": "This workshop will show you how to implement deletion of nodes and edges."
+  },
+  {
+    "breadcrumbs": [
       "Getting Started",
       "Principles"
     ],
@@ -45,19 +57,7 @@
     "section": "Main features",
     "route": "/getting-started/what-is-ngx-vflow",
     "fragment": "main-features",
-    "content": "Easy to use: Just describe your flow with a simple API; all of the heavy lifting, such as dragging, zooming, and curve math, is handled by the library for you. Customizable: There is a default design for basic usage, and you can also customize nodes with good old HTML and CSS. Other entities such as edges, connection lines, and handles are also customizable, but it will require a little SVG knowledge. Great performance: Angular signals are the heart and soul of ngx-vflow, which are performant by default, so you shouldn't worry about performance even with large flows."
-  },
-  {
-    "breadcrumbs": [
-      "Workshops",
-      "Delete selected"
-    ],
-    "pageType": "guide",
-    "title": "Delete selected",
-    "section": "Delete selected",
-    "route": "/workshops/delete-selected",
-    "fragment": "delete-selected",
-    "content": "This workshop will show you how to implement deletion of nodes and edges."
+    "content": "Easy to use: Just describe your flow with a simple API; all of the heavy lifting, such as dragging, zooming, and curve math, is handled by the library for you. Customizable: There is a default design for basic usage, and you can also customize nodes with good old HTML and CSS. Other entities such as edges, connection lines, and handles are also customizable, but it will require a little SVG knowledge. Great performance: Angular signals are the heart and soul of ngx-vflow, which are performant by default, so you shouldn't worry about performance even with large flows. Zoneless: Does not require zone.js"
   },
   {
     "breadcrumbs": [
@@ -129,7 +129,31 @@
     "section": "Custom background",
     "route": "/examples/custom-background",
     "fragment": "custom-background",
-    "content": "You're able to select background color for your flow. Currently, it is limited to selecting a color, but in the future, it will be possible to set more complex backgrounds. To select a color, simply pass it to the [background] input."
+    "content": "You're able to select background for your flow."
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Custom background"
+    ],
+    "pageType": "guide",
+    "title": "Custom background",
+    "section": "Solid color",
+    "route": "/examples/custom-background",
+    "fragment": "solid-color",
+    "content": "To select a color, simply pass a color string it to the [background] input."
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Custom background"
+    ],
+    "pageType": "guide",
+    "title": "Custom background",
+    "section": "Dots pattern",
+    "route": "/examples/custom-background",
+    "fragment": "dots-pattern",
+    "content": "To make dots pattern, pass an object to the [background] input according to DotsBackground interface"
   },
   {
     "breadcrumbs": [
@@ -142,6 +166,246 @@
     "route": "/examples/curves",
     "fragment": "curves",
     "content": "It's possible to set curve for both the edges and connection."
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Default edges"
+    ],
+    "pageType": "guide",
+    "title": "Default edges",
+    "section": "Default edges",
+    "route": "/examples/default-edges",
+    "fragment": "default-edges",
+    "content": "You can link nodes with edges. All you need to do is to create another Edge[] array and pass it to the vflow component. Each edge contains the id of the source and target nodes, and each edge must have its own id."
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Default connection"
+    ],
+    "pageType": "guide",
+    "title": "Default connection",
+    "section": "Default connection",
+    "route": "/examples/default-connection",
+    "fragment": "default-connection",
+    "content": "Edges are not creating automatically. To create a new edge, follow these steps:"
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Default connection"
+    ],
+    "pageType": "guide",
+    "title": "Default connection",
+    "section": "Default connection",
+    "route": "/examples/default-connection",
+    "fragment": "default-connection",
+    "content": "Create handler to the "
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Default connection"
+    ],
+    "pageType": "guide",
+    "title": "Default connection",
+    "section": "Default connection",
+    "route": "/examples/default-connection",
+    "fragment": "default-connection",
+    "content": "(onConnect)"
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Default connection"
+    ],
+    "pageType": "guide",
+    "title": "Default connection",
+    "section": "Default connection",
+    "route": "/examples/default-connection",
+    "fragment": "default-connection",
+    "content": " event This handler accepts a "
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Default connection"
+    ],
+    "pageType": "guide",
+    "title": "Default connection",
+    "section": "Default connection",
+    "route": "/examples/default-connection",
+    "fragment": "default-connection",
+    "content": "Connection"
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Default connection"
+    ],
+    "pageType": "guide",
+    "title": "Default connection",
+    "section": "Default connection",
+    "route": "/examples/default-connection",
+    "fragment": "default-connection",
+    "content": " argument. "
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Default connection"
+    ],
+    "pageType": "guide",
+    "title": "Default connection",
+    "section": "Default connection",
+    "route": "/examples/default-connection",
+    "fragment": "default-connection",
+    "content": "Connection"
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Default connection"
+    ],
+    "pageType": "guide",
+    "title": "Default connection",
+    "section": "Default connection",
+    "route": "/examples/default-connection",
+    "fragment": "default-connection",
+    "content": " is similar to an "
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Default connection"
+    ],
+    "pageType": "guide",
+    "title": "Default connection",
+    "section": "Default connection",
+    "route": "/examples/default-connection",
+    "fragment": "default-connection",
+    "content": "Edge"
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Default connection"
+    ],
+    "pageType": "guide",
+    "title": "Default connection",
+    "section": "Default connection",
+    "route": "/examples/default-connection",
+    "fragment": "default-connection",
+    "content": ", but it doesn't exists in the flow, you need to \"convert\" it into a new "
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Default connection"
+    ],
+    "pageType": "guide",
+    "title": "Default connection",
+    "section": "Default connection",
+    "route": "/examples/default-connection",
+    "fragment": "default-connection",
+    "content": "Edge"
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Default connection"
+    ],
+    "pageType": "guide",
+    "title": "Default connection",
+    "section": "Default connection",
+    "route": "/examples/default-connection",
+    "fragment": "default-connection",
+    "content": "Update the "
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Default connection"
+    ],
+    "pageType": "guide",
+    "title": "Default connection",
+    "section": "Default connection",
+    "route": "/examples/default-connection",
+    "fragment": "default-connection",
+    "content": "Edge[]"
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Default connection"
+    ],
+    "pageType": "guide",
+    "title": "Default connection",
+    "section": "Default connection",
+    "route": "/examples/default-connection",
+    "fragment": "default-connection",
+    "content": " list with the new edge that was created from the "
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Default connection"
+    ],
+    "pageType": "guide",
+    "title": "Default connection",
+    "section": "Default connection",
+    "route": "/examples/default-connection",
+    "fragment": "default-connection",
+    "content": "Connection"
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Default connection"
+    ],
+    "pageType": "guide",
+    "title": "Default connection",
+    "section": "Default connection",
+    "route": "/examples/default-connection",
+    "fragment": "default-connection",
+    "content": "."
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Custom handles"
+    ],
+    "pageType": "guide",
+    "title": "Custom handles",
+    "section": "Custom handles",
+    "route": "/examples/custom-handles",
+    "fragment": "custom-handles",
+    "content": "You can pass a [template] to HandleComponent with custom handle."
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Custom handles"
+    ],
+    "pageType": "guide",
+    "title": "Custom handles",
+    "section": "Custom handles",
+    "route": "/examples/custom-handles",
+    "fragment": "custom-handles",
+    "content": "I't important to note that template must be made with SVG."
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Custom handles"
+    ],
+    "pageType": "guide",
+    "title": "Custom handles",
+    "section": "Custom handles",
+    "route": "/examples/custom-handles",
+    "fragment": "custom-handles",
+    "content": "Custom handles are not positioned automatically, but the library provides a useful template context property to position your handle.Custom handles know if validation of ConnectionSettings.validator() has failed or succeeded, so you can use state() signal in let-ctx to add some behavior based on validation result. Refer to this interface for let-ctx when crafting your handle template:"
   },
   {
     "breadcrumbs": [
@@ -494,38 +758,14 @@
   {
     "breadcrumbs": [
       "Examples",
-      "Custom handles"
+      "Draggables"
     ],
     "pageType": "guide",
-    "title": "Custom handles",
-    "section": "Custom handles",
-    "route": "/examples/custom-handles",
-    "fragment": "custom-handles",
-    "content": "You can pass a [template] to HandleComponent with custom handle."
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom handles"
-    ],
-    "pageType": "guide",
-    "title": "Custom handles",
-    "section": "Custom handles",
-    "route": "/examples/custom-handles",
-    "fragment": "custom-handles",
-    "content": "I't important to note that template must be made with SVG."
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom handles"
-    ],
-    "pageType": "guide",
-    "title": "Custom handles",
-    "section": "Custom handles",
-    "route": "/examples/custom-handles",
-    "fragment": "custom-handles",
-    "content": "Custom handles are not positioned automatically, but the library provides a useful template context property to position your handle.Custom handles know if validation of ConnectionSettings.validator() has failed or succeeded, so you can use state() signal in let-ctx to add some behavior based on validation result. Refer to this interface for let-ctx when crafting your handle template:"
+    "title": "Draggables",
+    "section": "Draggables",
+    "route": "/examples/draggables",
+    "fragment": "draggables",
+    "content": "You can disable draggable behavior on certain nodes."
   },
   {
     "breadcrumbs": [
@@ -974,206 +1214,50 @@
   {
     "breadcrumbs": [
       "Examples",
-      "Default connection"
+      "Labels"
     ],
     "pageType": "guide",
-    "title": "Default connection",
-    "section": "Default connection",
-    "route": "/examples/default-connection",
-    "fragment": "default-connection",
-    "content": "Edges are not creating automatically. To create a new edge, follow these steps:"
+    "title": "Labels",
+    "section": "Labels",
+    "route": "/examples/labels",
+    "fragment": "labels",
+    "content": "You can attach labels to edges by providing the edgeLabels property to the needed Edges. There are three slots available for labels on an edge: start, center, end. The label is only of the html-template type, so you have to provide "
   },
   {
     "breadcrumbs": [
       "Examples",
-      "Default connection"
+      "Labels"
     ],
     "pageType": "guide",
-    "title": "Default connection",
-    "section": "Default connection",
-    "route": "/examples/default-connection",
-    "fragment": "default-connection",
-    "content": "Create handler to the "
+    "title": "Labels",
+    "section": "Labels",
+    "route": "/examples/labels",
+    "fragment": "labels",
+    "content": " inside vflow."
   },
   {
     "breadcrumbs": [
       "Examples",
-      "Default connection"
+      "Labels"
     ],
     "pageType": "guide",
-    "title": "Default connection",
-    "section": "Default connection",
-    "route": "/examples/default-connection",
-    "fragment": "default-connection",
-    "content": "(onConnect)"
+    "title": "Labels",
+    "section": "Context",
+    "route": "/examples/labels",
+    "fragment": "context",
+    "content": "You may access some data for label through let-ctx according to this interface."
   },
   {
     "breadcrumbs": [
       "Examples",
-      "Default connection"
+      "Markers"
     ],
     "pageType": "guide",
-    "title": "Default connection",
-    "section": "Default connection",
-    "route": "/examples/default-connection",
-    "fragment": "default-connection",
-    "content": " event This handler accepts a "
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Default connection"
-    ],
-    "pageType": "guide",
-    "title": "Default connection",
-    "section": "Default connection",
-    "route": "/examples/default-connection",
-    "fragment": "default-connection",
-    "content": "Connection"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Default connection"
-    ],
-    "pageType": "guide",
-    "title": "Default connection",
-    "section": "Default connection",
-    "route": "/examples/default-connection",
-    "fragment": "default-connection",
-    "content": " argument. "
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Default connection"
-    ],
-    "pageType": "guide",
-    "title": "Default connection",
-    "section": "Default connection",
-    "route": "/examples/default-connection",
-    "fragment": "default-connection",
-    "content": "Connection"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Default connection"
-    ],
-    "pageType": "guide",
-    "title": "Default connection",
-    "section": "Default connection",
-    "route": "/examples/default-connection",
-    "fragment": "default-connection",
-    "content": " is similar to an "
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Default connection"
-    ],
-    "pageType": "guide",
-    "title": "Default connection",
-    "section": "Default connection",
-    "route": "/examples/default-connection",
-    "fragment": "default-connection",
-    "content": "Edge"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Default connection"
-    ],
-    "pageType": "guide",
-    "title": "Default connection",
-    "section": "Default connection",
-    "route": "/examples/default-connection",
-    "fragment": "default-connection",
-    "content": ", but it doesn't exists in the flow, you need to \"convert\" it into a new "
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Default connection"
-    ],
-    "pageType": "guide",
-    "title": "Default connection",
-    "section": "Default connection",
-    "route": "/examples/default-connection",
-    "fragment": "default-connection",
-    "content": "Edge"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Default connection"
-    ],
-    "pageType": "guide",
-    "title": "Default connection",
-    "section": "Default connection",
-    "route": "/examples/default-connection",
-    "fragment": "default-connection",
-    "content": "Update the "
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Default connection"
-    ],
-    "pageType": "guide",
-    "title": "Default connection",
-    "section": "Default connection",
-    "route": "/examples/default-connection",
-    "fragment": "default-connection",
-    "content": "Edge[]"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Default connection"
-    ],
-    "pageType": "guide",
-    "title": "Default connection",
-    "section": "Default connection",
-    "route": "/examples/default-connection",
-    "fragment": "default-connection",
-    "content": " list with the new edge that was created from the "
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Default connection"
-    ],
-    "pageType": "guide",
-    "title": "Default connection",
-    "section": "Default connection",
-    "route": "/examples/default-connection",
-    "fragment": "default-connection",
-    "content": "Connection"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Default connection"
-    ],
-    "pageType": "guide",
-    "title": "Default connection",
-    "section": "Default connection",
-    "route": "/examples/default-connection",
-    "fragment": "default-connection",
-    "content": "."
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Default nodes"
-    ],
-    "pageType": "guide",
-    "title": "Default nodes",
-    "section": "Default nodes",
-    "route": "/examples/default-nodes",
-    "fragment": "default-nodes",
-    "content": "To get started, you just need to provide nodes array to vflow component."
+    "title": "Markers",
+    "section": "Markers",
+    "route": "/examples/markers",
+    "fragment": "markers",
+    "content": "You can create markers for both edges and connections. Edges: Specify start and end markers for corresponding parts of the edge. Currently, markers are limited to two types: arrow and arrow-closed.Connections: You can specify an end marker using the marker property in ConnectionSettings."
   },
   {
     "breadcrumbs": [
@@ -1226,42 +1310,6 @@
   {
     "breadcrumbs": [
       "Examples",
-      "Markers"
-    ],
-    "pageType": "guide",
-    "title": "Markers",
-    "section": "Markers",
-    "route": "/examples/markers",
-    "fragment": "markers",
-    "content": "You can create markers for both edges and connections. Edges: Specify start and end markers for corresponding parts of the edge. Currently, markers are limited to two types: arrow and arrow-closed.Connections: You can specify an end marker using the marker property in ConnectionSettings."
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Default edges"
-    ],
-    "pageType": "guide",
-    "title": "Default edges",
-    "section": "Default edges",
-    "route": "/examples/default-edges",
-    "fragment": "default-edges",
-    "content": "You can link nodes with edges. All you need to do is to create another Edge[] array and pass it to the vflow component. Each edge contains the id of the source and target nodes, and each edge must have its own id."
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Draggables"
-    ],
-    "pageType": "guide",
-    "title": "Draggables",
-    "section": "Draggables",
-    "route": "/examples/draggables",
-    "fragment": "draggables",
-    "content": "You can disable draggable behavior on certain nodes."
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
       "Multiple connection points"
     ],
     "pageType": "guide",
@@ -1270,6 +1318,18 @@
     "route": "/examples/multiple-connection-points",
     "fragment": "multiple-connection-points",
     "content": "Custom components provide the ability to control handles and their positions. All you need to do is take HandleComponent from library and place it somewhere in your custom node. This component automatically computes its position based on parent element's position."
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Default nodes"
+    ],
+    "pageType": "guide",
+    "title": "Default nodes",
+    "section": "Default nodes",
+    "route": "/examples/default-nodes",
+    "fragment": "default-nodes",
+    "content": "To get started, you just need to provide nodes array to vflow component."
   },
   {
     "breadcrumbs": [
@@ -1378,42 +1438,6 @@
     "route": "/examples/view-size",
     "fragment": "fixed-size",
     "content": "vflow can take fixed space if you pass [view]=\"[600, 600]\" input, where first item of array is width (in pixels), and the second is height (in pixels)."
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Labels"
-    ],
-    "pageType": "guide",
-    "title": "Labels",
-    "section": "Labels",
-    "route": "/examples/labels",
-    "fragment": "labels",
-    "content": "You can attach labels to edges by providing the edgeLabels property to the needed Edges. There are three slots available for labels on an edge: start, center, end. The label is only of the html-template type, so you have to provide "
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Labels"
-    ],
-    "pageType": "guide",
-    "title": "Labels",
-    "section": "Labels",
-    "route": "/examples/labels",
-    "fragment": "labels",
-    "content": " inside vflow."
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Labels"
-    ],
-    "pageType": "guide",
-    "title": "Labels",
-    "section": "Context",
-    "route": "/examples/labels",
-    "fragment": "context",
-    "content": "You may access some data for label through let-ctx according to this interface."
   },
   {
     "breadcrumbs": [
@@ -1804,6 +1828,94 @@
     "breadcrumbs": [
       "API",
       "ngx-vflow",
+      "Background"
+    ],
+    "pageType": "api",
+    "title": "Background",
+    "section": "Background",
+    "route": "/api/ngx-vflow/type-aliases/Background",
+    "fragment": "background"
+  },
+  {
+    "breadcrumbs": [
+      "API",
+      "ngx-vflow",
+      "ColorBackground"
+    ],
+    "pageType": "api",
+    "title": "ColorBackground",
+    "section": "ColorBackground",
+    "route": "/api/ngx-vflow/interfaces/ColorBackground",
+    "fragment": "colorbackground"
+  },
+  {
+    "breadcrumbs": [
+      "API",
+      "ngx-vflow",
+      "DotsBackground"
+    ],
+    "pageType": "api",
+    "title": "DotsBackground",
+    "section": "DotsBackground",
+    "route": "/api/ngx-vflow/interfaces/DotsBackground",
+    "fragment": "dotsbackground"
+  },
+  {
+    "breadcrumbs": [
+      "API",
+      "ngx-vflow",
+      "DotsBackground"
+    ],
+    "pageType": "api",
+    "title": "DotsBackground",
+    "section": "Properties",
+    "route": "/api/ngx-vflow/interfaces/DotsBackground",
+    "fragment": "properties",
+    "content": "Color behind tha dot pattern"
+  },
+  {
+    "breadcrumbs": [
+      "API",
+      "ngx-vflow",
+      "DotsBackground"
+    ],
+    "pageType": "api",
+    "title": "DotsBackground",
+    "section": "Properties",
+    "route": "/api/ngx-vflow/interfaces/DotsBackground",
+    "fragment": "properties",
+    "content": "Color of the dot"
+  },
+  {
+    "breadcrumbs": [
+      "API",
+      "ngx-vflow",
+      "DotsBackground"
+    ],
+    "pageType": "api",
+    "title": "DotsBackground",
+    "section": "Properties",
+    "route": "/api/ngx-vflow/interfaces/DotsBackground",
+    "fragment": "properties",
+    "content": "Gap between dots"
+  },
+  {
+    "breadcrumbs": [
+      "API",
+      "ngx-vflow",
+      "DotsBackground"
+    ],
+    "pageType": "api",
+    "title": "DotsBackground",
+    "section": "Properties",
+    "route": "/api/ngx-vflow/interfaces/DotsBackground",
+    "fragment": "properties",
+    "content": "Diameter of the dot"
+  },
+  {
+    "breadcrumbs": [
+      "API",
+      "ngx-vflow",
       "VflowComponent"
     ],
     "pageType": "api",
@@ -1823,7 +1935,7 @@
     "section": "Properties",
     "route": "/api/ngx-vflow/classes/VflowComponent",
     "fragment": "properties",
-    "content": "Background color for flow"
+    "content": "Background for flow"
   },
   {
     "breadcrumbs": [
