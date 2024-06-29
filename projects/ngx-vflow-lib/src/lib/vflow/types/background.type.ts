@@ -1,11 +1,11 @@
 export type Background = ColorBackground | DotsBackground
 
-interface ColorBackground {
+export interface ColorBackground {
   type: 'solid'
   color: string
 }
 
-interface DotsBackground {
+export interface DotsBackground {
   type: 'dots'
   gap?: number
   color?: string

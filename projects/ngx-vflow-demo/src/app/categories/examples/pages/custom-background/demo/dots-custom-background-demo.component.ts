@@ -2,12 +2,16 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { Edge, Node, VflowModule } from 'projects/ngx-vflow-lib/src/public-api';
 
 @Component({
-  template: `<vflow [nodes]="nodes" [edges]="edges" background="#bbe1fa" />`,
+  template: `<vflow
+    [nodes]="nodes"
+    [edges]="edges"
+    [background]="{ type: 'dots' }"
+  />`,
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
   imports: [VflowModule]
 })
-export class CustomBackgroundDemoComponent {
+export class DotsCustomBackgroundDemoComponent {
   public nodes: Node[] = [
     {
       id: '1',

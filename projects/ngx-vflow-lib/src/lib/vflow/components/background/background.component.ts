@@ -6,6 +6,7 @@ import { RootSvgReferenceDirective } from '../../directives/reference.directive'
 const defaultBg = '#fff'
 const defaultGap = 20
 const defaultDotSize = 2
+const defaultDotColor = 'rgb(177, 177, 183)'
 
 @Component({
   selector: 'g[background]',
@@ -38,6 +39,8 @@ export class BackgroundComponent {
 
   protected y = computed(() => this.viewportService.readableViewport().y % this.scaledGap())
 
+  protected patternColor = computed(() => this.backgroundSignal().color ?? defaultDotColor)
+
   protected patternSize = computed(() => {
     const background = this.backgroundSignal()
 
@@ -57,14 +60,14 @@ export class BackgroundComponent {
       }
 
       if (background.type === 'solid') {
-        this.rootSvg.style.backgroundColor = background.color ?? defaultBg
+        this.rootSvg.style.backgroundColor = background.color
       }
     })
   }
 }
 
-function transform(background: Background | string) {
+function transform(background: Background | string): Background {
   return typeof background === 'string'
-    ? { type: 'color', color: background }
+    ? { type: 'solid', color: background }
     : background
 }
