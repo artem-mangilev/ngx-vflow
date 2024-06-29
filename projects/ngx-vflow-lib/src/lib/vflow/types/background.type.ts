@@ -7,8 +7,23 @@ export interface ColorBackground {
 
 export interface DotsBackground {
   type: 'dots'
+  /**
+   * Gap between dots
+   */
   gap?: number
+
+  /**
+   * Color of the dot
+   */
   color?: string
+
+  /**
+   * Diameter of the dot
+   */
   size?: number
+
+  /**
+   * Color behind tha dot pattern
+   */
   backgroundColor?: string
 }
