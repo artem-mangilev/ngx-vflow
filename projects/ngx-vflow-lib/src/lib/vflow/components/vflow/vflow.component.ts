@@ -28,6 +28,7 @@ import { NodeRenderingService } from '../../services/node-rendering.service';
 import { SelectionService } from '../../services/selection.service';
 import { FlowSettingsService } from '../../services/flow-settings.service';
 import { ComponentEventBusService } from '../../services/component-event-bus.service';
+import { Background } from '../../interfaces/background.interface';
 
 const connectionControllerHostDirective = {
   directive: ConnectionControllerDirective,
@@ -140,10 +141,10 @@ export class VflowComponent {
   }
 
   /**
-   * Background color for flow
+   * Background for flow
    */
   @Input()
-  public background: string = '#FFFFFF'
+  public background: Background | string = '#fff'
 
   /**
    * Global rule if you can or can't select entities

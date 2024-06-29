@@ -16,6 +16,7 @@ import { HandleSizeControllerDirective } from './directives/handle-size-controll
 import { SelectableDirective } from './directives/selectable.directive';
 import { PointerDirective } from './directives/pointer.directive';
 import { RootPointerDirective } from './directives/root-pointer.directive';
+import { BackgroundComponent } from './components/background/background.component';
 
 const components = [
   VflowComponent,
@@ -24,7 +25,8 @@ const components = [
   EdgeLabelComponent,
   ConnectionComponent,
   HandleComponent,
-  DefsComponent
+  DefsComponent,
+  BackgroundComponent
 ]
 
 const directives = [
