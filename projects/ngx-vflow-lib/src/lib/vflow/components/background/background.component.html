@@ -1,0 +1,25 @@
+<ng-container *ngIf="backgroundSignal().type === 'dots'">
+  <svg:pattern
+    [attr.id]="patternId"
+    [attr.x]="x()"
+    [attr.y]="y()"
+    [attr.width]="scaledGap()"
+    [attr.height]="scaledGap()"
+    patternUnits="userSpaceOnUse"
+  >
+    <svg:circle
+      [attr.cx]="patternSize()"
+      [attr.cy]="patternSize()"
+      [attr.r]="patternSize()"
+      [attr.fill]="patternColor()"
+    />
+  </svg:pattern>
+
+  <svg:rect
+    x="0"
+    y="0"
+    width="100%"
+    height="100%"
+    [attr.fill]="patternUrl"
+  />
+</ng-container>

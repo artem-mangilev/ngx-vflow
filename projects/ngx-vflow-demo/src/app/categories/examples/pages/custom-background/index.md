@@ -1,5 +1,15 @@
 # {{ NgDocPage.title }}
 
-You're able to select background color for your flow. Currently, it is limited to selecting a color, but in the future, it will be possible to set more complex backgrounds. To select a color, simply pass it to the `[background]` input.
+You're able to select background for your flow.
+
+## Solid color
+
+To select a color, simply pass a color string it to the `[background]` input.
 
 {{ NgDocActions.demo("CustomBackgroundDemoComponent", { expanded: true }) }}
+
+## Dots pattern
+
+To make dots pattern, pass an object to the `[background]` input according to `DotsBackground` interface
+
+{{ NgDocActions.demo("DotsCustomBackgroundDemoComponent", { expanded: true }) }}

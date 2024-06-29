@@ -15,6 +15,8 @@
 
 **Great performance:** Angular signals are the heart and soul of `ngx-vflow`, which are performant by default, so you shouldn't worry about performance even with large flows.
 
+**Zoneless:** [Does not require `zone.js`](https://stackblitz.com/edit/stackblitz-starters-qhu6im?file=src%2Fmain.ts)
+
 
 
 

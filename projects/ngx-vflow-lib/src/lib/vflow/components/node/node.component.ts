@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, HostBinding, Injector, Input, NgZone, OnDestroy, OnInit, QueryList, TemplateRef, ViewChild, ViewChildren, computed, effect, inject, runInInjectionContext, signal } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Injector, Input, OnDestroy, OnInit, TemplateRef, ViewChild, ViewChildren, computed, effect, inject, runInInjectionContext, signal } from '@angular/core';
 import { DraggableService } from '../../services/draggable.service';
 import { NodeModel } from '../../models/node.model';
 import { FlowStatusService, batchStatusChanges } from '../../services/flow-status.service';
@@ -25,7 +25,6 @@ export type HandleState = 'valid' | 'invalid' | 'idle'
 export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInjector {
   public injector = inject(Injector)
   private handleService = inject(HandleService)
-  private zone = inject(NgZone)
   private draggableService = inject(DraggableService)
   private flowStatusService = inject(FlowStatusService)
   private flowEntitiesService = inject(FlowEntitiesService)
@@ -65,7 +64,7 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInje
     const sub = this.nodeModel.handles$
       .pipe(
         switchMap((handles) =>
-          resizable(handles.map(h => h.parentReference!), this.zone)
+          resizable(handles.map(h => h.parentReference!))
             .pipe(map(() => handles))
         ),
         tap((handles) => handles.forEach(h => h.updateParent()))
@@ -87,7 +86,7 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInje
     }
 
     if (this.nodeModel.node.type === 'html-template' || this.nodeModel.isComponentType) {
-      const sub = resizable([this.htmlWrapperRef.nativeElement], this.zone)
+      const sub = resizable([this.htmlWrapperRef.nativeElement])
         .pipe(
           startWith(null),
           tap(() => {

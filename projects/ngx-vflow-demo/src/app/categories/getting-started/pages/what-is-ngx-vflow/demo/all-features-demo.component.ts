@@ -3,7 +3,14 @@ import { ChangeDetectionStrategy, Component, WritableSignal, signal } from "@ang
 import { VflowModule, Node, Edge, CustomNodeComponent, Connection, ComponentNode, SharedNode, DefaultNode, ConnectionSettings } from "projects/ngx-vflow-lib/src/public-api"
 
 @Component({
-  template: `<vflow [nodes]="nodes" [edges]="edges" [connection]="connection" view="auto" (onConnect)="handleConnect($event)">
+  template: `<vflow
+    [nodes]="nodes"
+    [edges]="edges"
+    [connection]="connection"
+    [background]="{ type: 'dots' }"
+    view="auto"
+    (onConnect)="handleConnect($event)"
+  >
     <ng-template edge let-ctx>
       <svg:path
         [attr.d]="ctx.path()"
