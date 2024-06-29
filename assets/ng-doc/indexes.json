@@ -1,6 +1,54 @@
 [
   {
     "breadcrumbs": [
+      "Getting Started",
+      "Principles"
+    ],
+    "pageType": "guide",
+    "title": "Principles",
+    "section": "Principles",
+    "route": "/getting-started/principles",
+    "fragment": "principles",
+    "content": "This page contains a list of general principles that impact feature implementation. No hidden mutations of your data. For example, the library does not modify any of the Node or Edge objects you pass in as inputs. Instead, it creates internal models around these entities and operates on them. Any changes to the passed entities can be observed through events.This principle also implies that you are responsible for managing invalid data. For instance, if you delete a node, the edges corresponding to this node will not be deleted automatically. However, the library will notify you about detached edges so that you can easily delete them."
+  },
+  {
+    "breadcrumbs": [
+      "Getting Started",
+      "Roadmap"
+    ],
+    "pageType": "guide",
+    "title": "Roadmap",
+    "section": "Roadmap",
+    "route": "/getting-started/roadmap",
+    "fragment": "roadmap",
+    "content": "This is a roadmap for ngx-vflow: subflowsmore customization to default nodesimprove consistency across browsers (mainly appeals to Safari)improve documentationmore curvesplugin systemminimapnode rotation/resizingUI controls for flowsupport for layout engines (Dagree, etc.)more complex background (patterns)more events for different actionsmodal system for context menuHTML-based renderer as alternative to current SVG-based rendererExperimental canvas/webgl renderer for insane performance"
+  },
+  {
+    "breadcrumbs": [
+      "Getting Started",
+      "What is ngx-vflow"
+    ],
+    "pageType": "guide",
+    "title": "What is ngx-vflow",
+    "section": "What is ngx-vflow",
+    "route": "/getting-started/what-is-ngx-vflow",
+    "fragment": "what-is-ngx-vflow",
+    "content": "ngx-vflow is an Angular library for creating node-based applications. It aims to assist you in building anything from a static diagram to a visual editor. You can utilize the default design or apply your own by customizing everything using familiar technologies."
+  },
+  {
+    "breadcrumbs": [
+      "Getting Started",
+      "What is ngx-vflow"
+    ],
+    "pageType": "guide",
+    "title": "What is ngx-vflow",
+    "section": "Main features",
+    "route": "/getting-started/what-is-ngx-vflow",
+    "fragment": "main-features",
+    "content": "Easy to use: Just describe your flow with a simple API; all of the heavy lifting, such as dragging, zooming, and curve math, is handled by the library for you. Customizable: There is a default design for basic usage, and you can also customize nodes with good old HTML and CSS. Other entities such as edges, connection lines, and handles are also customizable, but it will require a little SVG knowledge. Great performance: Angular signals are the heart and soul of ngx-vflow, which are performant by default, so you shouldn't worry about performance even with large flows."
+  },
+  {
+    "breadcrumbs": [
       "Workshops",
       "Delete selected"
     ],
@@ -10,18 +58,6 @@
     "route": "/workshops/delete-selected",
     "fragment": "delete-selected",
     "content": "This workshop will show you how to implement deletion of nodes and edges."
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Curves"
-    ],
-    "pageType": "guide",
-    "title": "Curves",
-    "section": "Curves",
-    "route": "/examples/curves",
-    "fragment": "curves",
-    "content": "It's possible to set curve for both the edges and connection."
   },
   {
     "breadcrumbs": [
@@ -94,6 +130,366 @@
     "route": "/examples/custom-background",
     "fragment": "custom-background",
     "content": "You're able to select background color for your flow. Currently, it is limited to selecting a color, but in the future, it will be possible to set more complex backgrounds. To select a color, simply pass it to the [background] input."
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Curves"
+    ],
+    "pageType": "guide",
+    "title": "Curves",
+    "section": "Curves",
+    "route": "/examples/curves",
+    "fragment": "curves",
+    "content": "It's possible to set curve for both the edges and connection."
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/examples/custom-edges",
+    "fragment": "custom-edges",
+    "content": "You can customize your edges. To achieve this, follow these steps:"
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/examples/custom-edges",
+    "fragment": "custom-edges",
+    "content": "Change the edge type to "
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/examples/custom-edges",
+    "fragment": "custom-edges",
+    "content": "template"
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/examples/custom-edges",
+    "fragment": "custom-edges",
+    "content": "Create an "
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/examples/custom-edges",
+    "fragment": "custom-edges",
+    "content": "ng-template"
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/examples/custom-edges",
+    "fragment": "custom-edges",
+    "content": " with the "
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/examples/custom-edges",
+    "fragment": "custom-edges",
+    "content": "edge"
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/examples/custom-edges",
+    "fragment": "custom-edges",
+    "content": " selector inside "
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/examples/custom-edges",
+    "fragment": "custom-edges",
+    "content": "vflow"
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/examples/custom-edges",
+    "fragment": "custom-edges",
+    "content": "Create an SVG path which you will customize In the "
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/examples/custom-edges",
+    "fragment": "custom-edges",
+    "content": "ng-template"
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/examples/custom-edges",
+    "fragment": "custom-edges",
+    "content": ", the library provides "
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/examples/custom-edges",
+    "fragment": "custom-edges",
+    "content": "let-ctx"
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/examples/custom-edges",
+    "fragment": "custom-edges",
+    "content": " with important data for you, such as the "
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/examples/custom-edges",
+    "fragment": "custom-edges",
+    "content": "path"
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/examples/custom-edges",
+    "fragment": "custom-edges",
+    "content": " signal with current path. Additionally, the "
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/examples/custom-edges",
+    "fragment": "custom-edges",
+    "content": "edge"
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/examples/custom-edges",
+    "fragment": "custom-edges",
+    "content": " field contains current edge from one the "
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/examples/custom-edges",
+    "fragment": "custom-edges",
+    "content": "[edges]"
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/examples/custom-edges",
+    "fragment": "custom-edges",
+    "content": ", from which you can retrieve custom "
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/examples/custom-edges",
+    "fragment": "custom-edges",
+    "content": "data"
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/examples/custom-edges",
+    "fragment": "custom-edges",
+    "content": ". Furthermore, you can access "
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/examples/custom-edges",
+    "fragment": "custom-edges",
+    "content": "markerStart"
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/examples/custom-edges",
+    "fragment": "custom-edges",
+    "content": " and "
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/examples/custom-edges",
+    "fragment": "custom-edges",
+    "content": "markerEnd"
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/examples/custom-edges",
+    "fragment": "custom-edges",
+    "content": " signals with markers for current "
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/examples/custom-edges",
+    "fragment": "custom-edges",
+    "content": "edge"
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/examples/custom-edges",
+    "fragment": "custom-edges",
+    "content": "."
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Context",
+    "route": "/examples/custom-edges",
+    "fragment": "context",
+    "content": "It's tricky to infer type for let-ctx, so here is an interface with available fields for this context."
   },
   {
     "breadcrumbs": [
@@ -578,378 +974,6 @@
   {
     "breadcrumbs": [
       "Examples",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/examples/custom-edges",
-    "fragment": "custom-edges",
-    "content": "You can customize your edges. To achieve this, follow these steps:"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/examples/custom-edges",
-    "fragment": "custom-edges",
-    "content": "Change the edge type to "
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/examples/custom-edges",
-    "fragment": "custom-edges",
-    "content": "template"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/examples/custom-edges",
-    "fragment": "custom-edges",
-    "content": "Create an "
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/examples/custom-edges",
-    "fragment": "custom-edges",
-    "content": "ng-template"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/examples/custom-edges",
-    "fragment": "custom-edges",
-    "content": " with the "
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/examples/custom-edges",
-    "fragment": "custom-edges",
-    "content": "edge"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/examples/custom-edges",
-    "fragment": "custom-edges",
-    "content": " selector inside "
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/examples/custom-edges",
-    "fragment": "custom-edges",
-    "content": "vflow"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/examples/custom-edges",
-    "fragment": "custom-edges",
-    "content": "Create an SVG path which you will customize In the "
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/examples/custom-edges",
-    "fragment": "custom-edges",
-    "content": "ng-template"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/examples/custom-edges",
-    "fragment": "custom-edges",
-    "content": ", the library provides "
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/examples/custom-edges",
-    "fragment": "custom-edges",
-    "content": "let-ctx"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/examples/custom-edges",
-    "fragment": "custom-edges",
-    "content": " with important data for you, such as the "
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/examples/custom-edges",
-    "fragment": "custom-edges",
-    "content": "path"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/examples/custom-edges",
-    "fragment": "custom-edges",
-    "content": " signal with current path. Additionally, the "
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/examples/custom-edges",
-    "fragment": "custom-edges",
-    "content": "edge"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/examples/custom-edges",
-    "fragment": "custom-edges",
-    "content": " field contains current edge from one the "
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/examples/custom-edges",
-    "fragment": "custom-edges",
-    "content": "[edges]"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/examples/custom-edges",
-    "fragment": "custom-edges",
-    "content": ", from which you can retrieve custom "
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/examples/custom-edges",
-    "fragment": "custom-edges",
-    "content": "data"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/examples/custom-edges",
-    "fragment": "custom-edges",
-    "content": ". Furthermore, you can access "
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/examples/custom-edges",
-    "fragment": "custom-edges",
-    "content": "markerStart"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/examples/custom-edges",
-    "fragment": "custom-edges",
-    "content": " and "
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/examples/custom-edges",
-    "fragment": "custom-edges",
-    "content": "markerEnd"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/examples/custom-edges",
-    "fragment": "custom-edges",
-    "content": " signals with markers for current "
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/examples/custom-edges",
-    "fragment": "custom-edges",
-    "content": "edge"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/examples/custom-edges",
-    "fragment": "custom-edges",
-    "content": "."
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Context",
-    "route": "/examples/custom-edges",
-    "fragment": "context",
-    "content": "It's tricky to infer type for let-ctx, so here is an interface with available fields for this context."
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Default edges"
-    ],
-    "pageType": "guide",
-    "title": "Default edges",
-    "section": "Default edges",
-    "route": "/examples/default-edges",
-    "fragment": "default-edges",
-    "content": "You can link nodes with edges. All you need to do is to create another Edge[] array and pass it to the vflow component. Each edge contains the id of the source and target nodes, and each edge must have its own id."
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Draggables"
-    ],
-    "pageType": "guide",
-    "title": "Draggables",
-    "section": "Draggables",
-    "route": "/examples/draggables",
-    "fragment": "draggables",
-    "content": "You can disable draggable behavior on certain nodes."
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
       "Default connection"
     ],
     "pageType": "guide",
@@ -1142,6 +1166,18 @@
   {
     "breadcrumbs": [
       "Examples",
+      "Default nodes"
+    ],
+    "pageType": "guide",
+    "title": "Default nodes",
+    "section": "Default nodes",
+    "route": "/examples/default-nodes",
+    "fragment": "default-nodes",
+    "content": "To get started, you just need to provide nodes array to vflow component."
+  },
+  {
+    "breadcrumbs": [
+      "Examples",
       "Handling changes"
     ],
     "pageType": "guide",
@@ -1190,18 +1226,6 @@
   {
     "breadcrumbs": [
       "Examples",
-      "Default nodes"
-    ],
-    "pageType": "guide",
-    "title": "Default nodes",
-    "section": "Default nodes",
-    "route": "/examples/default-nodes",
-    "fragment": "default-nodes",
-    "content": "To get started, you just need to provide nodes array to vflow component."
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
       "Markers"
     ],
     "pageType": "guide",
@@ -1214,38 +1238,38 @@
   {
     "breadcrumbs": [
       "Examples",
-      "Labels"
+      "Default edges"
     ],
     "pageType": "guide",
-    "title": "Labels",
-    "section": "Labels",
-    "route": "/examples/labels",
-    "fragment": "labels",
-    "content": "You can attach labels to edges by providing the edgeLabels property to the needed Edges. There are three slots available for labels on an edge: start, center, end. The label is only of the html-template type, so you have to provide "
+    "title": "Default edges",
+    "section": "Default edges",
+    "route": "/examples/default-edges",
+    "fragment": "default-edges",
+    "content": "You can link nodes with edges. All you need to do is to create another Edge[] array and pass it to the vflow component. Each edge contains the id of the source and target nodes, and each edge must have its own id."
   },
   {
     "breadcrumbs": [
       "Examples",
-      "Labels"
+      "Draggables"
     ],
     "pageType": "guide",
-    "title": "Labels",
-    "section": "Labels",
-    "route": "/examples/labels",
-    "fragment": "labels",
-    "content": " inside vflow."
+    "title": "Draggables",
+    "section": "Draggables",
+    "route": "/examples/draggables",
+    "fragment": "draggables",
+    "content": "You can disable draggable behavior on certain nodes."
   },
   {
     "breadcrumbs": [
       "Examples",
-      "Labels"
+      "Multiple connection points"
     ],
     "pageType": "guide",
-    "title": "Labels",
-    "section": "Context",
-    "route": "/examples/labels",
-    "fragment": "context",
-    "content": "You may access some data for label through let-ctx according to this interface."
+    "title": "Multiple connection points",
+    "section": "Multiple connection points",
+    "route": "/examples/multiple-connection-points",
+    "fragment": "multiple-connection-points",
+    "content": "Custom components provide the ability to control handles and their positions. All you need to do is take HandleComponent from library and place it somewhere in your custom node. This component automatically computes its position based on parent element's position."
   },
   {
     "breadcrumbs": [
@@ -1334,18 +1358,6 @@
   {
     "breadcrumbs": [
       "Examples",
-      "Multiple connection points"
-    ],
-    "pageType": "guide",
-    "title": "Multiple connection points",
-    "section": "Multiple connection points",
-    "route": "/examples/multiple-connection-points",
-    "fragment": "multiple-connection-points",
-    "content": "Custom components provide the ability to control handles and their positions. All you need to do is take HandleComponent from library and place it somewhere in your custom node. This component automatically computes its position based on parent element's position."
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
       "View size"
     ],
     "pageType": "guide",
@@ -1369,51 +1381,39 @@
   },
   {
     "breadcrumbs": [
-      "Getting Started",
-      "Principles"
+      "Examples",
+      "Labels"
     ],
     "pageType": "guide",
-    "title": "Principles",
-    "section": "Principles",
-    "route": "/getting-started/principles",
-    "fragment": "principles",
-    "content": "This page contains a list of general principles that impact feature implementation. No hidden mutations of your data. For example, the library does not modify any of the Node or Edge objects you pass in as inputs. Instead, it creates internal models around these entities and operates on them. Any changes to the passed entities can be observed through events.This principle also implies that you are responsible for managing invalid data. For instance, if you delete a node, the edges corresponding to this node will not be deleted automatically. However, the library will notify you about detached edges so that you can easily delete them."
+    "title": "Labels",
+    "section": "Labels",
+    "route": "/examples/labels",
+    "fragment": "labels",
+    "content": "You can attach labels to edges by providing the edgeLabels property to the needed Edges. There are three slots available for labels on an edge: start, center, end. The label is only of the html-template type, so you have to provide "
   },
   {
     "breadcrumbs": [
-      "Getting Started",
-      "What is ngx-vflow"
+      "Examples",
+      "Labels"
     ],
     "pageType": "guide",
-    "title": "What is ngx-vflow",
-    "section": "What is ngx-vflow",
-    "route": "/getting-started/what-is-ngx-vflow",
-    "fragment": "what-is-ngx-vflow",
-    "content": "ngx-vflow is an Angular library for creating node-based applications. It aims to assist you in building anything from a static diagram to a visual editor. You can utilize the default design or apply your own by customizing everything using familiar technologies."
+    "title": "Labels",
+    "section": "Labels",
+    "route": "/examples/labels",
+    "fragment": "labels",
+    "content": " inside vflow."
   },
   {
     "breadcrumbs": [
-      "Getting Started",
-      "What is ngx-vflow"
+      "Examples",
+      "Labels"
     ],
     "pageType": "guide",
-    "title": "What is ngx-vflow",
-    "section": "Main features",
-    "route": "/getting-started/what-is-ngx-vflow",
-    "fragment": "main-features",
-    "content": "Easy to use: Just describe your flow with a simple API; all of the heavy lifting, such as dragging, zooming, and curve math, is handled by the library for you. Customizable: There is a default design for basic usage, and you can also customize nodes with good old HTML and CSS. Other entities such as edges, connection lines, and handles are also customizable, but it will require a little SVG knowledge. Great performance: Angular signals are the heart and soul of ngx-vflow, which are performant by default, so you shouldn't worry about performance even with large flows."
-  },
-  {
-    "breadcrumbs": [
-      "Getting Started",
-      "Roadmap"
-    ],
-    "pageType": "guide",
-    "title": "Roadmap",
-    "section": "Roadmap",
-    "route": "/getting-started/roadmap",
-    "fragment": "roadmap",
-    "content": "This is a roadmap for ngx-vflow: subflowsmore customization to default nodesimprove consistency across browsers (mainly appeals to Safari)improve documentationmore curvesplugin systemminimapnode rotation/resizingUI controls for flowsupport for layout engines (Dagree, etc.)more complex background (patterns)more events for different actionsmodal system for context menuHTML-based renderer as alternative to current SVG-based rendererExperimental canvas/webgl renderer for insane performance"
+    "title": "Labels",
+    "section": "Context",
+    "route": "/examples/labels",
+    "fragment": "context",
+    "content": "You may access some data for label through let-ctx according to this interface."
   },
   {
     "breadcrumbs": [
