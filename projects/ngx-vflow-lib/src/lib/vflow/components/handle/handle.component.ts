@@ -1,4 +1,4 @@
-import { Component, ElementRef, Injector, Input, NgZone, OnDestroy, OnInit, TemplateRef, inject, runInInjectionContext, signal } from '@angular/core';
+import { Component, ElementRef, Injector, Input, OnDestroy, OnInit, TemplateRef, inject, runInInjectionContext, signal } from '@angular/core';
 import { Position } from '../../types/position.type';
 import { HandleService } from '../../services/handle.service';
 import { HandleModel } from '../../models/handle.model';
