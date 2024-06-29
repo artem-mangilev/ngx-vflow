@@ -1,5 +1,5 @@
 import { Component, Input, computed, effect, inject, signal } from '@angular/core';
-import { Background } from '../../interfaces/background.interface';
+import { Background } from '../../types/background.type';
 import { ViewportService } from '../../services/viewport.service';
 import { RootSvgReferenceDirective } from '../../directives/reference.directive';
 

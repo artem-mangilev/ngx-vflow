@@ -28,7 +28,7 @@ import { NodeRenderingService } from '../../services/node-rendering.service';
 import { SelectionService } from '../../services/selection.service';
 import { FlowSettingsService } from '../../services/flow-settings.service';
 import { ComponentEventBusService } from '../../services/component-event-bus.service';
-import { Background } from '../../interfaces/background.interface';
+import { Background } from '../../types/background.type';
 
 const connectionControllerHostDirective = {
   directive: ConnectionControllerDirective,
