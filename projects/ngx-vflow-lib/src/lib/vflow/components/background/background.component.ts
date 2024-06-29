@@ -2,6 +2,7 @@ import { Component, Input, computed, effect, inject, signal } from '@angular/cor
 import { Background } from '../../types/background.type';
 import { ViewportService } from '../../services/viewport.service';
 import { RootSvgReferenceDirective } from '../../directives/reference.directive';
+import { id } from '../../utils/id';
 
 const defaultBg = '#fff'
 const defaultGap = 20
@@ -50,6 +51,11 @@ export class BackgroundComponent {
 
     return 0
   })
+
+  // Without ID there will be pattern collision for several flows on the page
+  // Later pattern ID may be exposed to API
+  protected patternId = id();
+  protected patternUrl = `url(#${this.patternId})`
 
   constructor() {
     effect(() => {
