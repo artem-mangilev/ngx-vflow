@@ -84,7 +84,7 @@ export class ConnectionComponent {
   })
 
   protected markerUrl = computed(() => {
-    const marker = this.model.connection.marker
+    const marker = this.model.settings.marker
 
     if (marker) {
       return `url(#${hashCode(JSON.stringify(marker))})`
