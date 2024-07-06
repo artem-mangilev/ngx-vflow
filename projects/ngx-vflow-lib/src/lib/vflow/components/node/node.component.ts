@@ -54,6 +54,10 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInje
 
   protected styleHeight = computed(() => `${this.nodeModel.size().height}px`)
 
+  protected isStrictMode = computed(() =>
+    this.flowEntitiesService.connection().mode === 'strict'
+  )
+
   private subscription = new Subscription()
 
   public ngOnInit() {
@@ -107,27 +111,18 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInje
   }
 
   protected startConnection(event: Event, handle: HandleModel) {
-    // ignore drag by stopping propagation
-    event.stopPropagation()
-
-    this.flowStatusService.setConnectionStartStatus(this.nodeModel, handle)
+    if (this.isStrictMode()) {
+      this.startStrictConnection(event, handle)
+    } else {
+      this.startLooseConnection(event, handle)
+    }
   }
 
-  protected endConnection() {
-    const status = this.flowStatusService.status()
-
-    if (status.state === 'connection-validation') {
-      const sourceNode = status.payload.sourceNode
-      const targetNode = this.nodeModel
-      const sourceHandle = status.payload.sourceHandle
-      const targetHandle = status.payload.targetHandle
-
-      batchStatusChanges(
-        // call to create connection
-        () => this.flowStatusService.setConnectionEndStatus(sourceNode, targetNode, sourceHandle, targetHandle),
-        // when connection created, we need go back to idle status
-        () => this.flowStatusService.setIdleStatus()
-      )
+  protected endConnection(handle: HandleModel) {
+    if (this.isStrictMode()) {
+      this.endStrictConnection(handle)
+    } else {
+      this.endLooseConnection(handle)
     }
   }
 
@@ -154,7 +149,11 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInje
 
       targetHandle.state.set(valid ? 'valid' : 'invalid')
 
-      this.flowStatusService.setConnectionValidationStatus(valid, sourceNode, targetNode, sourceHandle, targetHandle)
+      this.flowStatusService.setConnectionValidationStatus(
+        valid,
+        sourceNode, targetNode,
+        sourceHandle, targetHandle
+      )
     }
   }
 
@@ -167,7 +166,10 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInje
     // drop back to start status
     const status = this.flowStatusService.status()
     if (status.state === 'connection-validation') {
-      this.flowStatusService.setConnectionStartStatus(status.payload.sourceNode, status.payload.sourceHandle)
+      this.flowStatusService.setConnectionStartStatus(
+        status.payload.sourceNode,
+        status.payload.sourceHandle
+      )
     }
   }
 
@@ -204,6 +206,73 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInje
           },
           this.nodeModel
         ),
+      )
+    }
+  }
+
+  private startStrictConnection(event: Event, handle: HandleModel) {
+    // ignore drag by stopping propagation
+    event.stopPropagation()
+
+    this.flowStatusService.setConnectionStartStatus(this.nodeModel, handle)
+  }
+
+  private endStrictConnection(handle: HandleModel) {
+    const status = this.flowStatusService.status()
+
+    if (status.state === 'connection-validation') {
+      let sourceNode
+      let targetNode
+
+      let sourceHandle
+      let targetHandle
+
+      if (status.payload.sourceHandle.rawHandle.type === 'source') {
+        sourceNode = status.payload.sourceNode
+        sourceHandle = status.payload.sourceHandle
+      } else {
+        sourceNode = this.nodeModel
+        sourceHandle = status.payload.targetHandle
+      }
+
+      if (status.payload.targetHandle.rawHandle.type === 'target') {
+        targetNode = this.nodeModel
+        targetHandle = status.payload.targetHandle
+      } else {
+        targetNode = status.payload.sourceNode
+        targetHandle = status.payload.sourceHandle
+      }
+
+      batchStatusChanges(
+        // call to create connection
+        () => this.flowStatusService.setConnectionEndStatus(sourceNode!, targetNode!, sourceHandle!, targetHandle!),
+        // when connection created, we need go back to idle status
+        () => this.flowStatusService.setIdleStatus()
+      )
+    }
+  }
+
+  private startLooseConnection(event: Event, handle: HandleModel) {
+    // ignore drag by stopping propagation
+    event.stopPropagation()
+
+    this.flowStatusService.setConnectionStartStatus(this.nodeModel, handle)
+  }
+
+  private endLooseConnection(handle: HandleModel) {
+    const status = this.flowStatusService.status()
+
+    if (status.state === 'connection-validation') {
+      const sourceNode = status.payload.sourceNode
+      const targetNode = this.nodeModel
+      const sourceHandle = status.payload.sourceHandle
+      const targetHandle = status.payload.targetHandle
+
+      batchStatusChanges(
+        // call to create connection
+        () => this.flowStatusService.setConnectionEndStatus(sourceNode, targetNode, sourceHandle, targetHandle),
+        // when connection created, we need go back to idle status
+        () => this.flowStatusService.setIdleStatus()
       )
     }
   }
