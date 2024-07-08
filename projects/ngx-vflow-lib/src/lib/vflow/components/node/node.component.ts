@@ -113,11 +113,10 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInje
   }
 
   protected startConnection(event: Event, handle: HandleModel) {
-    if (this.isStrictMode()) {
-      this.startStrictConnection(event, handle)
-    } else {
-      this.startLooseConnection(event, handle)
-    }
+    // ignore drag by stopping propagation
+    event.stopPropagation()
+
+    this.connectionController.startConnection(handle)
   }
 
   protected validateConnection(handle: HandleModel) {
@@ -129,11 +128,7 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInje
   }
 
   protected endConnection(handle: HandleModel) {
-    if (this.isStrictMode()) {
-      this.endStrictConnection(handle)
-    } else {
-      this.endLooseConnection(handle)
-    }
+    this.connectionController.endConnection(handle)
   }
 
   protected pullNode() {
@@ -172,19 +167,4 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInje
       )
     }
   }
-
-  private startStrictConnection(event: Event, handle: HandleModel) {
-    // ignore drag by stopping propagation
-    event.stopPropagation()
-
-    this.connectionController.startConnection(handle)
-  }
-
-  private endStrictConnection(handle: HandleModel) {
-    this.connectionController.endConnection()
-  }
-
-  private startLooseConnection(event: Event, handle: HandleModel) { }
-
-  private endLooseConnection(handle: HandleModel) { }
 }

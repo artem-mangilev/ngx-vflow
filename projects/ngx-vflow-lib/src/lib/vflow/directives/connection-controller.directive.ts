@@ -1,4 +1,4 @@
-import { Directive, EventEmitter, Output, effect, inject } from '@angular/core';
+import { Directive, EventEmitter, Output, computed, effect, inject } from '@angular/core';
 import { Connection } from '../interfaces/connection.interface';
 import { FlowStatusService, batchStatusChanges } from '../services/flow-status.service';
 
@@ -29,12 +29,24 @@ export class ConnectionControllerDirective {
     const status = this.statusService.status()
 
     if (status.state === 'connection-end') {
-      const { source, target, sourceHandle, targetHandle } = adjustDirection({
-        source: status.payload.source,
-        sourceHandle: status.payload.sourceHandle,
-        target: status.payload.target,
-        targetHandle: status.payload.targetHandle
-      })
+      let source = status.payload.source
+      let target = status.payload.target
+      let sourceHandle = status.payload.sourceHandle
+      let targetHandle = status.payload.targetHandle
+
+      if (this.isStrictMode()) {
+        const adjusted = adjustDirection({
+          source: status.payload.source,
+          sourceHandle: status.payload.sourceHandle,
+          target: status.payload.target,
+          targetHandle: status.payload.targetHandle
+        })
+
+        source = adjusted.source
+        target = adjusted.target
+        sourceHandle = adjusted.sourceHandle
+        targetHandle = adjusted.targetHandle
+      }
 
       const sourceId = source.node.id
       const targetId = target.node.id
@@ -54,6 +66,10 @@ export class ConnectionControllerDirective {
     }
   }, { allowSignalWrites: true })
 
+  protected isStrictMode = computed(() =>
+    this.flowEntitiesService.connection().mode === 'strict'
+  )
+
   public startConnection(handle: HandleModel) {
     this.statusService.setConnectionStartStatus(handle.parentNode, handle)
   }
@@ -62,13 +78,25 @@ export class ConnectionControllerDirective {
     const status = this.statusService.status()
 
     if (status.state === 'connection-start') {
-      // swap direction (if needed) according to actual source and target
-      const { source, target, sourceHandle, targetHandle } = adjustDirection({
-        source: status.payload.source,
-        sourceHandle: status.payload.sourceHandle,
-        target: handle.parentNode,
-        targetHandle: handle
-      })
+      let source = status.payload.source
+      let target = handle.parentNode
+      let sourceHandle = status.payload.sourceHandle
+      let targetHandle = handle
+
+      if (this.isStrictMode()) {
+        // swap direction (if needed) according to actual source and target of strict mode
+        const adjusted = adjustDirection({
+          source: status.payload.source,
+          sourceHandle: status.payload.sourceHandle,
+          target: handle.parentNode,
+          targetHandle: handle
+        })
+
+        source = adjusted.source
+        target = adjusted.target
+        sourceHandle = adjusted.sourceHandle
+        targetHandle = adjusted.targetHandle
+      }
 
       const valid = this.flowEntitiesService.connection().validator({
         source: source.node.id,
@@ -104,7 +132,7 @@ export class ConnectionControllerDirective {
     }
   }
 
-  public endConnection() {
+  public endConnection(handle: HandleModel) {
     const status = this.statusService.status()
 
     if (status.state === 'connection-validation') {

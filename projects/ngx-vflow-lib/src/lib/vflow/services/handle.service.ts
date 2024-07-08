@@ -1,10 +1,8 @@
 import { Injectable, Signal, TemplateRef, signal } from '@angular/core';
 import { Position } from '../types/position.type';
 import { HandleType } from '../types/handle-type.type';
-import { Point } from '../interfaces/point.interface';
 import { NodeModel } from '../models/node.model';
 import { HandleModel } from '../models/handle.model';
-import { Microtask } from '../decorators/microtask.decorator';
 
 export interface NodeHandle {
   position: Position
