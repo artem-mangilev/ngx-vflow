@@ -1,7 +1,7 @@
 import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Injector, Input, OnDestroy, OnInit, TemplateRef, ViewChild, ViewChildren, computed, effect, inject, runInInjectionContext, signal } from '@angular/core';
 import { DraggableService } from '../../services/draggable.service';
 import { NodeModel } from '../../models/node.model';
-import { FlowStatusService, batchStatusChanges } from '../../services/flow-status.service';
+import { FlowStatusService } from '../../services/flow-status.service';
 import { FlowEntitiesService } from '../../services/flow-entities.service';
 import { HandleService } from '../../services/handle.service';
 import { HandleModel } from '../../models/handle.model';
@@ -12,6 +12,7 @@ import { Microtask } from '../../decorators/microtask.decorator';
 import { NodeRenderingService } from '../../services/node-rendering.service';
 import { FlowSettingsService } from '../../services/flow-settings.service';
 import { SelectionService } from '../../services/selection.service';
+import { ConnectionControllerDirective } from '../../directives/connection-controller.directive';
 
 export type HandleState = 'valid' | 'invalid' | 'idle'
 
@@ -32,6 +33,7 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInje
   private flowSettingsService = inject(FlowSettingsService)
   private selectionService = inject(SelectionService)
   private hostRef = inject<ElementRef<SVGElement>>(ElementRef)
+  private connectionController = inject(ConnectionControllerDirective)
 
   @Input()
   public nodeModel!: NodeModel
@@ -118,58 +120,19 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInje
     }
   }
 
+  protected validateConnection(handle: HandleModel) {
+    this.connectionController.validateConnection(handle)
+  }
+
+  protected resetValidateConnection(targetHandle: HandleModel) {
+    this.connectionController.resetValidateConnection(targetHandle)
+  }
+
   protected endConnection(handle: HandleModel) {
     if (this.isStrictMode()) {
       this.endStrictConnection(handle)
     } else {
       this.endLooseConnection(handle)
-    }
-  }
-
-  /**
-   * TODO srp
-   */
-  protected validateTargetHandle(targetHandle: HandleModel) {
-    const status = this.flowStatusService.status()
-
-    if (status.state === 'connection-start') {
-      const sourceNode = status.payload.sourceNode
-      const sourceHandle = status.payload.sourceHandle
-      const source = sourceNode.node.id
-
-      const targetNode = this.nodeModel
-      const target = targetNode.node.id
-
-      const valid = this.flowEntitiesService.connection().validator({
-        source,
-        target,
-        sourceHandle: sourceHandle.rawHandle.id,
-        targetHandle: targetHandle.rawHandle.id
-      })
-
-      targetHandle.state.set(valid ? 'valid' : 'invalid')
-
-      this.flowStatusService.setConnectionValidationStatus(
-        valid,
-        sourceNode, targetNode,
-        sourceHandle, targetHandle
-      )
-    }
-  }
-
-  /**
-   * TODO srp
-   */
-  protected resetValidateTargetHandle(targetHandle: HandleModel) {
-    targetHandle.state.set('idle')
-
-    // drop back to start status
-    const status = this.flowStatusService.status()
-    if (status.state === 'connection-validation') {
-      this.flowStatusService.setConnectionStartStatus(
-        status.payload.sourceNode,
-        status.payload.sourceHandle
-      )
     }
   }
 
@@ -214,66 +177,14 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInje
     // ignore drag by stopping propagation
     event.stopPropagation()
 
-    this.flowStatusService.setConnectionStartStatus(this.nodeModel, handle)
+    this.connectionController.startConnection(handle)
   }
 
   private endStrictConnection(handle: HandleModel) {
-    const status = this.flowStatusService.status()
-
-    if (status.state === 'connection-validation') {
-      let sourceNode
-      let targetNode
-
-      let sourceHandle
-      let targetHandle
-
-      if (status.payload.sourceHandle.rawHandle.type === 'source') {
-        sourceNode = status.payload.sourceNode
-        sourceHandle = status.payload.sourceHandle
-      } else {
-        sourceNode = this.nodeModel
-        sourceHandle = status.payload.targetHandle
-      }
-
-      if (status.payload.targetHandle.rawHandle.type === 'target') {
-        targetNode = this.nodeModel
-        targetHandle = status.payload.targetHandle
-      } else {
-        targetNode = status.payload.sourceNode
-        targetHandle = status.payload.sourceHandle
-      }
-
-      batchStatusChanges(
-        // call to create connection
-        () => this.flowStatusService.setConnectionEndStatus(sourceNode!, targetNode!, sourceHandle!, targetHandle!),
-        // when connection created, we need go back to idle status
-        () => this.flowStatusService.setIdleStatus()
-      )
-    }
+    this.connectionController.endConnection()
   }
 
-  private startLooseConnection(event: Event, handle: HandleModel) {
-    // ignore drag by stopping propagation
-    event.stopPropagation()
+  private startLooseConnection(event: Event, handle: HandleModel) { }
 
-    this.flowStatusService.setConnectionStartStatus(this.nodeModel, handle)
-  }
-
-  private endLooseConnection(handle: HandleModel) {
-    const status = this.flowStatusService.status()
-
-    if (status.state === 'connection-validation') {
-      const sourceNode = status.payload.sourceNode
-      const targetNode = this.nodeModel
-      const sourceHandle = status.payload.sourceHandle
-      const targetHandle = status.payload.targetHandle
-
-      batchStatusChanges(
-        // call to create connection
-        () => this.flowStatusService.setConnectionEndStatus(sourceNode, targetNode, sourceHandle, targetHandle),
-        // when connection created, we need go back to idle status
-        () => this.flowStatusService.setIdleStatus()
-      )
-    }
-  }
+  private endLooseConnection(handle: HandleModel) { }
 }

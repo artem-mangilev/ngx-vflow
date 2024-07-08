@@ -77,8 +77,8 @@
     [attr.r]="nodeModel.magnetRadius"
     [attr.cx]="handle.offset().x"
     [attr.cy]="handle.offset().y"
-    (pointerEnd)="endConnection(handle); resetValidateTargetHandle(handle)"
-    (pointerOver)="validateTargetHandle(handle)"
-    (pointerOut)="resetValidateTargetHandle(handle)"
+    (pointerEnd)="endConnection(handle); resetValidateConnection(handle)"
+    (pointerOver)="validateConnection(handle)"
+    (pointerOut)="resetValidateConnection(handle)"
   />
 </ng-container>
