@@ -2,7 +2,6 @@ import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Injector
 import { DraggableService } from '../../services/draggable.service';
 import { NodeModel } from '../../models/node.model';
 import { FlowStatusService } from '../../services/flow-status.service';
-import { FlowEntitiesService } from '../../services/flow-entities.service';
 import { HandleService } from '../../services/handle.service';
 import { HandleModel } from '../../models/handle.model';
 import { resizable } from '../../utils/resizable';
@@ -28,7 +27,6 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInje
   private handleService = inject(HandleService)
   private draggableService = inject(DraggableService)
   private flowStatusService = inject(FlowStatusService)
-  private flowEntitiesService = inject(FlowEntitiesService)
   private nodeRenderingService = inject(NodeRenderingService)
   private flowSettingsService = inject(FlowSettingsService)
   private selectionService = inject(SelectionService)
@@ -55,10 +53,6 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInje
   protected styleWidth = computed(() => `${this.nodeModel.size().width}px`)
 
   protected styleHeight = computed(() => `${this.nodeModel.size().height}px`)
-
-  protected isStrictMode = computed(() =>
-    this.flowEntitiesService.connection().mode === 'strict'
-  )
 
   private subscription = new Subscription()
 

@@ -52,8 +52,6 @@ export class LooseConnectionDemoComponent {
         }
       }
     }]
-
-    console.log(this.edges)
   }
 }
 
