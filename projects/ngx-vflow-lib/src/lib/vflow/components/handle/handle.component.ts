@@ -1,4 +1,4 @@
-import { Component, ElementRef, Injector, Input, OnDestroy, OnInit, TemplateRef, inject, runInInjectionContext, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, Injector, Input, OnDestroy, OnInit, TemplateRef, inject, runInInjectionContext, signal } from '@angular/core';
 import { Position } from '../../types/position.type';
 import { HandleService } from '../../services/handle.service';
 import { HandleModel } from '../../models/handle.model';
@@ -6,7 +6,8 @@ import { InjectionContext, WithInjector } from '../../decorators/run-in-injectio
 
 @Component({
   selector: 'handle',
-  templateUrl: './handle.component.html'
+  templateUrl: './handle.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class HandleComponent implements OnInit, OnDestroy, WithInjector {
   public injector = inject(Injector);
@@ -51,7 +52,7 @@ export class HandleComponent implements OnInit, OnDestroy, WithInjector {
 
     this.handleService.createHandle(this.model)
 
-    queueMicrotask(() => this.model.updateParent())
+    requestAnimationFrame(() => this.model.updateParent())
   }
 
   public ngOnDestroy(): void {
