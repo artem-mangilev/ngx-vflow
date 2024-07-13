@@ -52,7 +52,7 @@ export class HandleComponent implements OnInit, OnDestroy, WithInjector {
 
     this.handleService.createHandle(this.model)
 
-    queueMicrotask(() => this.model.updateParent())
+    requestAnimationFrame(() => this.model.updateParent())
   }
 
   public ngOnDestroy(): void {

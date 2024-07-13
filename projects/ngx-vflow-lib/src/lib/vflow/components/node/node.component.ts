@@ -1,17 +1,18 @@
-import { AfterViewInit, ApplicationRef, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Injector, Input, OnDestroy, OnInit, TemplateRef, ViewChild, ViewChildren, computed, effect, inject, runInInjectionContext, signal } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Injector, Input, OnDestroy, OnInit, TemplateRef, ViewChild, computed, inject } from '@angular/core';
 import { DraggableService } from '../../services/draggable.service';
 import { NodeModel } from '../../models/node.model';
 import { FlowStatusService } from '../../services/flow-status.service';
 import { HandleService } from '../../services/handle.service';
 import { HandleModel } from '../../models/handle.model';
 import { resizable } from '../../utils/resizable';
-import { Subscription, map, startWith, switchMap, tap } from 'rxjs';
+import { map, startWith, switchMap, tap } from 'rxjs';
 import { InjectionContext, WithInjector } from '../../decorators/run-in-injection-context.decorator';
 import { Microtask } from '../../decorators/microtask.decorator';
 import { NodeRenderingService } from '../../services/node-rendering.service';
 import { FlowSettingsService } from '../../services/flow-settings.service';
 import { SelectionService } from '../../services/selection.service';
 import { ConnectionControllerDirective } from '../../directives/connection-controller.directive';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 export type HandleState = 'valid' | 'invalid' | 'idle'
 
@@ -54,27 +55,28 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInje
 
   protected styleHeight = computed(() => `${this.nodeModel.size().height}px`)
 
-  private subscription = new Subscription()
-
+  @InjectionContext
   public ngOnInit() {
     this.handleService.node.set(this.nodeModel);
 
     this.draggableService.toggleDraggable(this.hostRef.nativeElement, this.nodeModel)
 
-    const sub = this.nodeModel.handles$
+    this.nodeModel.handles$
       .pipe(
         switchMap((handles) =>
-          resizable(handles.map(h => h.parentReference!))
-            .pipe(map(() => handles))
+          resizable(handles.map(h => h.parentReference!)).pipe(map(() => handles))
         ),
-        tap((handles) => handles.forEach(h => h.updateParent()))
+        tap((handles) => {
+          // TODO (performance) inspect how to avoid calls of this when flow initially rendered
+          handles.forEach(h => h.updateParent())
+        }),
+        takeUntilDestroyed()
       )
       .subscribe()
-
-    this.subscription.add(sub)
   }
 
-  @Microtask
+  @Microtask // TODO (performance) check if we need microtask here
+  @InjectionContext
   public ngAfterViewInit(): void {
     if (this.nodeModel.node.type === 'default') {
       this.nodeModel.size.set({
@@ -84,7 +86,7 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInje
     }
 
     if (this.nodeModel.node.type === 'html-template' || this.nodeModel.isComponentType) {
-      const sub = resizable([this.htmlWrapperRef.nativeElement])
+      resizable([this.htmlWrapperRef.nativeElement])
         .pipe(
           startWith(null),
           tap(() => {
@@ -92,16 +94,14 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInje
             const height = this.htmlWrapperRef.nativeElement.clientHeight
 
             this.nodeModel.size.set({ width, height })
-          })
+          }),
+          takeUntilDestroyed()
         ).subscribe()
-
-      this.subscription.add(sub)
     }
   }
 
   public ngOnDestroy(): void {
     this.draggableService.destroy(this.hostRef.nativeElement)
-    this.subscription.unsubscribe()
   }
 
   protected startConnection(event: Event, handle: HandleModel) {
