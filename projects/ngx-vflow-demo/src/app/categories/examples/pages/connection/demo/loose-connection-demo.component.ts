@@ -1,0 +1,90 @@
+import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { Connection, ConnectionSettings, CustomNodeComponent, Edge, Node, VflowComponent, VflowModule } from 'projects/ngx-vflow-lib/src/public-api';
+
+@Component({
+  template: `
+    <vflow
+      [nodes]="nodes"
+      [edges]="edges"
+      [connection]="connection"
+      (onConnect)="createEdge($event)"
+    />
+  `,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: true,
+  imports: [VflowModule]
+})
+export class LooseConnectionDemoComponent {
+  public nodes: Node[] = [
+    {
+      id: '1',
+      point: { x: 100, y: 100 },
+      type: LooseConnectionNode,
+      data: {
+        text: 'Node 1'
+      }
+    },
+    {
+      id: '2',
+      point: { x: 200, y: 200 },
+      type: LooseConnectionNode,
+      data: {
+        text: 'Node 2'
+      }
+    },
+  ]
+
+  public edges: Edge[] = []
+
+  public connection: ConnectionSettings = {
+    mode: 'loose'
+  }
+
+  public createEdge(connection: Connection) {
+    const { source, target, sourceHandle, targetHandle } = connection
+
+    this.edges = [...this.edges, {
+      id: `${source}${sourceHandle} -> ${target}${targetHandle}`,
+      ...connection,
+      markers: {
+        end: {
+          type: 'arrow-closed'
+        }
+      }
+    }]
+
+    console.log(this.edges)
+  }
+}
+
+interface LooseConnectionNodeData {
+  text: string;
+}
+
+@Component({
+  template: `<div class="node">
+    {{ node.data?.text }}
+
+    <handle type="source" position="top" id="a" />
+    <handle type="source" position="right" id="b" />
+    <handle type="source" position="bottom" id="c" />
+    <handle type="source" position="left" id="d" />
+  </div>`,
+  styles: [`
+    .node {
+      width: 100px;
+      height: 50px;
+      border: 1.5px solid #1b262c;
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: black;
+      background-color: white;
+    }
+  `],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: true,
+  imports: [VflowModule]
+})
+export class LooseConnectionNode extends CustomNodeComponent<LooseConnectionNodeData> { }
