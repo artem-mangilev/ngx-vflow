@@ -11,8 +11,8 @@
 />
 
 <ng-template #toast let-ctx>
-  <h3>{{ ctx.data.title }}</h3>
+  <h3>{{ toastData?.title }}</h3>
 
-  <pre>{{ ctx.data.json }}</pre>
+  <pre>{{ toastData?.json }}</pre>
 </ng-template>
 

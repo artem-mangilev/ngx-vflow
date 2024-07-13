@@ -1,6 +1,5 @@
-import { NgIf } from '@angular/common';
 import { ChangeDetectionStrategy, Component, EventEmitter, OnInit, Output, inject } from '@angular/core';
-import { HotToastService } from '@ngneat/hot-toast';
+import { NgDocNotifyService } from '@ng-doc/ui-kit';
 import { ComponentNodeEvent, CustomNodeComponent, Edge, Node, VflowModule } from 'projects/ngx-vflow-lib/src/public-api';
 
 @Component({
@@ -10,7 +9,7 @@ import { ComponentNodeEvent, CustomNodeComponent, Edge, Node, VflowModule } from
   imports: [VflowModule]
 })
 export class CustomComponentNodesDemoComponent {
-  private toast = inject(HotToastService);
+  private notifyService = inject(NgDocNotifyService)
 
   public nodes: Node[] = [
     {
@@ -42,11 +41,11 @@ export class CustomComponentNodesDemoComponent {
   // Type-safe!
   handleComponentEvent(event: ComponentNodeEvent<[RedSquareNodeComponent, BlueSquareNodeComponent]>) {
     if (event.eventName === 'redSquareEvent') {
-      this.toast.info(event.eventPayload)
+      this.notifyService.notify(event.eventPayload)
     }
 
     if (event.eventName === 'blueSquareEvent') {
-      this.toast.info(`${event.eventPayload.x + event.eventPayload.y}`)
+      this.notifyService.notify(`${event.eventPayload.x + event.eventPayload.y}`)
     }
   }
 }

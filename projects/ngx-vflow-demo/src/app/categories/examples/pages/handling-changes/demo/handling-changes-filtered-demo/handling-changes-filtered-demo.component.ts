@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, TemplateRef, ViewChild, inject } from '@angular/core';
-import { HotToastModule, HotToastService, provideHotToastConfig } from '@ngneat/hot-toast';
+import { NgDocNotifyService } from '@ng-doc/ui-kit';
 import { Connection, Edge, EdgeChange, Node, NodeAddChange, NodeChange, NodePositionChange, NodeSelectedChange, VflowModule } from 'projects/ngx-vflow-lib/src/public-api';
 
 @Component({
@@ -9,10 +9,10 @@ import { Connection, Edge, EdgeChange, Node, NodeAddChange, NodeChange, NodePosi
   imports: [VflowModule],
 })
 export class HandlingChangesFilteredDemoComponent {
-  private toast = inject(HotToastService);
+  private notifyService = inject(NgDocNotifyService)
 
   @ViewChild('toast')
-  public toastTemplate!: TemplateRef<unknown>;
+  public toastTemplate!: TemplateRef<{}>;
 
   public nodes: Node[] = [
     {
@@ -31,6 +31,8 @@ export class HandlingChangesFilteredDemoComponent {
 
   public edges: Edge[] = []
 
+  public toastData: any = {}
+
   public createEdge({ source, target }: Connection) {
     this.edges = [...this.edges, {
       id: `${source} -> ${target}`,
@@ -40,39 +42,39 @@ export class HandlingChangesFilteredDemoComponent {
   }
 
   public handleNodePositionChange(change: NodePositionChange) {
-    this.toast.info(this.toastTemplate, {
-      data: {
-        title: '(onNodesChange.position.single)',
-        json: JSON.stringify(change, null, 2)
-      },
-    })
+    this.toastData = {
+      title: '(onNodesChange.position.single)',
+      json: JSON.stringify(change, null, 2)
+    }
+
+    this.notifyService.notify(this.toastTemplate)
   }
 
   public handleNodeSelectChange(change: NodeSelectedChange) {
-    this.toast.info(this.toastTemplate, {
-      data: {
-        title: '(onNodesChange.select.single)',
-        json: JSON.stringify(change, null, 2)
-      },
-    })
+    this.toastData = {
+      title: '(onNodesChange.select.single)',
+      json: JSON.stringify(change, null, 2)
+    }
+
+    this.notifyService.notify(this.toastTemplate)
   }
 
   public handleNodesAddChange(changes: NodeAddChange[]) {
-    this.toast.info(this.toastTemplate, {
-      data: {
-        title: '(onNodesChange.add.many)',
-        json: JSON.stringify(changes, null, 2)
-      },
-    })
+    this.toastData = {
+      title: '(onNodesChange.add.many)',
+      json: JSON.stringify(changes, null, 2)
+    }
+
+    this.notifyService.notify(this.toastTemplate)
   }
 
   public handleEdgesAddChange(changes: EdgeChange[]) {
-    this.toast.info(this.toastTemplate, {
-      data: {
-        title: '(onEdgesChange.add)',
-        json: JSON.stringify(changes, null, 2)
-      },
-    })
+    this.toastData = {
+      title: '(onEdgesChange.add)',
+      json: JSON.stringify(changes, null, 2)
+    }
+
+    this.notifyService.notify(this.toastTemplate)
   }
 
   public addNodes() {
