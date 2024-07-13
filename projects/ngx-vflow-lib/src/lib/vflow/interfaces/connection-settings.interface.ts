@@ -1,3 +1,4 @@
+import { ConnectionMode } from "../types/connection-mode.type";
 import { Connection } from "./connection.interface";
 import { Curve, EdgeType } from "./edge.interface";
 import { Marker } from "./marker.interface";
@@ -9,5 +10,6 @@ export interface ConnectionSettings {
   type?: EdgeType
   validator?: ConnectionValidatorFn
   marker?: Marker
+  mode?: ConnectionMode
 }
 

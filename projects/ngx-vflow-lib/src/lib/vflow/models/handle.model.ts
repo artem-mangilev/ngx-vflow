@@ -96,7 +96,7 @@ export class HandleModel {
 
   constructor(
     public rawHandle: NodeHandle,
-    private parentNode: NodeModel
+    public parentNode: NodeModel
   ) { }
 
   public updateParent() {

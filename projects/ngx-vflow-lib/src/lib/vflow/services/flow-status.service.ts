@@ -1,6 +1,7 @@
 import { Injectable, signal } from '@angular/core';
 import { NodeModel } from '../models/node.model';
 import { HandleModel } from '../models/handle.model';
+import { ConnectionInternal } from '../interfaces/connection.internal.interface';
 
 export interface FlowStatusIdle {
   state: 'idle',
@@ -9,31 +10,19 @@ export interface FlowStatusIdle {
 
 export interface FlowStatusConnectionStart {
   state: 'connection-start',
-  payload: {
-    sourceNode: NodeModel
-    sourceHandle: HandleModel
-  }
+  payload: Omit<ConnectionInternal, 'target' | 'targetHandle'>
 }
 
 export interface FlowStatusConnectionValidation {
   state: 'connection-validation',
-  payload: {
-    sourceNode: NodeModel
-    targetNode: NodeModel
-    sourceHandle: HandleModel
-    targetHandle: HandleModel
+  payload: ConnectionInternal & {
     valid: boolean
   }
 }
 
 export interface FlowStatusConnectionEnd {
   state: 'connection-end',
-  payload: {
-    sourceNode: NodeModel
-    targetNode: NodeModel
-    sourceHandle: HandleModel,
-    targetHandle: HandleModel
-  }
+  payload: ConnectionInternal
 }
 
 export type FlowStatus =
@@ -50,22 +39,22 @@ export class FlowStatusService {
     this.status.set({ state: 'idle', payload: null })
   }
 
-  public setConnectionStartStatus(sourceNode: NodeModel, sourceHandle: HandleModel) {
-    this.status.set({ state: 'connection-start', payload: { sourceNode, sourceHandle } })
+  public setConnectionStartStatus(source: NodeModel, sourceHandle: HandleModel) {
+    this.status.set({ state: 'connection-start', payload: { source, sourceHandle } })
   }
 
   public setConnectionValidationStatus(
     valid: boolean,
-    sourceNode: NodeModel,
-    targetNode: NodeModel,
+    source: NodeModel,
+    target: NodeModel,
     sourceHandle: HandleModel,
     targetHandle: HandleModel
   ) {
-    this.status.set({ state: 'connection-validation', payload: { sourceNode, targetNode, sourceHandle, targetHandle, valid } })
+    this.status.set({ state: 'connection-validation', payload: { source, target, sourceHandle, targetHandle, valid } })
   }
 
-  public setConnectionEndStatus(sourceNode: NodeModel, targetNode: NodeModel, sourceHandle: HandleModel, targetHandle: HandleModel) {
-    this.status.set({ state: 'connection-end', payload: { sourceNode, targetNode, sourceHandle, targetHandle } })
+  public setConnectionEndStatus(source: NodeModel, target: NodeModel, sourceHandle: HandleModel, targetHandle: HandleModel) {
+    this.status.set({ state: 'connection-end', payload: { source, target, sourceHandle, targetHandle } })
   }
 }
 

@@ -19,6 +19,7 @@ export * from './lib/vflow/types/node-change.type';
 export * from './lib/vflow/types/edge-change.type';
 export * from './lib/vflow/types/position.type';
 export * from './lib/vflow/types/background.type';
+export * from './lib/vflow/types/connection-mode.type';
 
 // Components
 export * from './lib/vflow/components/vflow/vflow.component';
