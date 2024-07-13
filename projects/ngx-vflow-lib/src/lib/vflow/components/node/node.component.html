@@ -15,8 +15,10 @@
     [style.max-width]="styleWidth()"
     [style.max-height]="styleHeight()"
   >
-    <handle type="source" position="left" />
-    <handle type="target" position="right" />
+    <div [outerHTML]="nodeModel.node.text ?? ''"></div>
+
+    <handle type="source" [position]="nodeModel.sourcePosition()" />
+    <handle type="target" [position]="nodeModel.targetPosition()" />
   </div>
 </svg:foreignObject>
 
