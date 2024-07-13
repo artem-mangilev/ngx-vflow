@@ -14,8 +14,10 @@
     [style.height]="styleHeight()"
     [style.max-width]="styleWidth()"
     [style.max-height]="styleHeight()"
-    [innerHTML]="nodeModel.node.text ?? ''"
-  ></div>
+  >
+    <handle type="source" position="left" />
+    <handle type="target" position="right" />
+  </div>
 </svg:foreignObject>
 
 <svg:foreignObject

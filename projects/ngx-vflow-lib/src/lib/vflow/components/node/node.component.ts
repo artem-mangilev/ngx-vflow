@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Injector, Input, OnDestroy, OnInit, TemplateRef, ViewChild, ViewChildren, computed, effect, inject, runInInjectionContext, signal } from '@angular/core';
+import { AfterViewInit, ApplicationRef, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Injector, Input, OnDestroy, OnInit, TemplateRef, ViewChild, ViewChildren, computed, effect, inject, runInInjectionContext, signal } from '@angular/core';
 import { DraggableService } from '../../services/draggable.service';
 import { NodeModel } from '../../models/node.model';
 import { FlowStatusService } from '../../services/flow-status.service';
@@ -76,8 +76,6 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInje
 
   @Microtask
   public ngAfterViewInit(): void {
-    this.setInitialHandles()
-
     if (this.nodeModel.node.type === 'default') {
       this.nodeModel.size.set({
         width: this.nodeModel.node.width ?? NodeModel.defaultTypeSize.width,
@@ -132,33 +130,6 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInje
   protected selectNode() {
     if (this.flowSettingsService.entitiesSelectable()) {
       this.selectionService.select(this.nodeModel)
-    }
-  }
-
-  @InjectionContext
-  private setInitialHandles() {
-    if (this.nodeModel.node.type === 'default') {
-      this.handleService.createHandle(
-        new HandleModel(
-          {
-            position: this.nodeModel.sourcePosition(),
-            type: 'source',
-            parentReference: this.htmlWrapperRef.nativeElement
-          },
-          this.nodeModel
-        ),
-      )
-
-      this.handleService.createHandle(
-        new HandleModel(
-          {
-            position: this.nodeModel.targetPosition(),
-            type: 'target',
-            parentReference: this.htmlWrapperRef.nativeElement
-          },
-          this.nodeModel
-        ),
-      )
     }
   }
 }
