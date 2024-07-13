@@ -1,0 +1,43 @@
+:host {
+  display: flex;
+}
+
+.sidebar {
+  padding: 10px;
+  height: 400px;
+  background-color: #3282b8;
+}
+
+.custom-node {
+  width: 150px;
+  height: 100px;
+  background: #bbe1fa;
+  border: 1px solid gray;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &__button {
+    border: 0;
+    outline: 0;
+    cursor: pointer;
+    color: white;
+    background-color: #1b262c;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 4px 8px;
+    display: inline-block;
+    min-height: 28px;
+  }
+
+  &_draggable {
+    width: 100px;
+    height: 75px;
+  }
+
+  &_selected {
+    border-color: #1b262c;
+  }
+}
