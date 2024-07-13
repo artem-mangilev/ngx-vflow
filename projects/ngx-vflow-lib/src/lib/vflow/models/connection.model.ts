@@ -12,22 +12,27 @@ export class ConnectionModel {
   constructor(public settings: ConnectionSettings) {
     this.curve = settings.curve ?? 'bezier'
     this.type = settings.type ?? 'default'
-
     this.mode = settings.mode ?? 'strict'
 
-    const validatorsToRun = getValidators(settings)
+    const validatorsToRun = this.getValidators(settings)
     this.validator = (connection) => validatorsToRun.every((v) => v(connection))
   }
-}
 
-/**
- * get user-defined validator and internal validators
- */
-function getValidators(settings: ConnectionSettings) {
-  return [
-    notSelfValidator,
-    ...(settings.validator ? [settings.validator] : [])
-  ]
+  private getValidators(settings: ConnectionSettings) {
+    const validators = []
+
+    validators.push(notSelfValidator)
+
+    if (this.mode === 'loose') {
+      validators.push(hasSourceAndTargetHandleValidator)
+    }
+
+    if (settings.validator) {
+      validators.push(settings.validator)
+    }
+
+    return validators;
+  }
 }
 
 /**
@@ -35,4 +40,8 @@ function getValidators(settings: ConnectionSettings) {
  */
 const notSelfValidator = (connection: Connection) => {
   return connection.source !== connection.target
+}
+
+const hasSourceAndTargetHandleValidator = (connection: Connection) => {
+  return connection.sourceHandle !== undefined && connection.targetHandle !== undefined
 }
