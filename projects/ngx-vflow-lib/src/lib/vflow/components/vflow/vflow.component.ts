@@ -29,6 +29,7 @@ import { SelectionService } from '../../services/selection.service';
 import { FlowSettingsService } from '../../services/flow-settings.service';
 import { ComponentEventBusService } from '../../services/component-event-bus.service';
 import { Background } from '../../types/background.type';
+import { SpacePointContextDirective } from '../../directives/space-point-context.directive';
 
 const connectionControllerHostDirective = {
   directive: ConnectionControllerDirective,
@@ -228,6 +229,9 @@ export class VflowComponent {
   // #region DIRECTIVES
   @ViewChild(MapContextDirective)
   protected mapContext!: MapContextDirective
+
+  @ViewChild(SpacePointContextDirective)
+  protected spacePointContext!: SpacePointContextDirective
   // #endregion
 
   // #region SIGNAL_API
@@ -314,6 +318,13 @@ export class VflowComponent {
    */
   public getDetachedEdges(): Edge[] {
     return this.flowEntitiesService.getDetachedEdges().map(e => e.edge)
+  }
+
+  /**
+   * Convert point received from document to point on the flow
+   */
+  public documentPointToFlowPoint(point: Point): Point {
+    return this.spacePointContext.documentPointToFlowPoint(point)
   }
   // #endregion
 
