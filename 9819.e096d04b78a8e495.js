@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkngx_vflow_demo=self.webpackChunkngx_vflow_demo||[]).push([[9819],{9819:(e,l,t)=>{t.r(l),t.d(l,{default:()=>d});const d=[{path:"",redirectTo:"delete-selected",pathMatch:"full"},{path:"",title:"Workshops",children:[{path:"delete-selected",loadChildren:()=>Promise.all([t.e(7134),t.e(5535),t.e(7760)]).then(t.bind(t,7760))}]}]}}]);
