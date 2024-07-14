@@ -10,7 +10,6 @@ import { AppComponent } from './app.component';
 import { VflowModule } from '../../../ngx-vflow-lib/src/public-api';
 import { provideHttpClient } from "@angular/common/http";
 import { NgDocButtonIconComponent, NgDocIconComponent, NgDocTooltipDirective } from "@ng-doc/ui-kit";
-import { HotToastModule } from "@ngneat/hot-toast";
 
 @NgModule({
   declarations: [
@@ -27,9 +26,6 @@ import { HotToastModule } from "@ngneat/hot-toast";
     NgDocIconComponent,
     NgDocButtonIconComponent,
     NgDocTooltipDirective,
-    HotToastModule.forRoot({
-      position: 'top-right'
-    })
   ],
   providers: [
     provideNgDocApp({

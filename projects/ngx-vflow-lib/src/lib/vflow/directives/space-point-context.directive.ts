@@ -20,14 +20,21 @@ export class SpacePointContextDirective {
       return { x: 0, y: 0 }
     }
 
-    const point = this.rootSvg.createSVGPoint()
-    point.x = movement.x
-    point.y = movement.y
-
-    return point.matrixTransform(this.host.getScreenCTM()!.inverse())
+    return this.documentPointToFlowPoint({
+      x: movement.x,
+      y: movement.y
+    })
   })
 
   public pointerMovement = toSignal(
     this.pointerMovementDirective.pointerMovement$,
   )
+
+  public documentPointToFlowPoint(documentPoint: Point) {
+    const point = this.rootSvg.createSVGPoint()
+    point.x = documentPoint.x
+    point.y = documentPoint.y
+
+    return point.matrixTransform(this.host.getScreenCTM()!.inverse())
+  }
 }

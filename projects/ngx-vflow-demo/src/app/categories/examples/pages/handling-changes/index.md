@@ -1,7 +1,7 @@
 # {{ NgDocPage.title }}
 
 > **Info**
-> You can observe changes in the toasts.  For a better experience, view this page on desktop
+> You can observe changes in the toasts.
 
 You can observe various changes in nodes and edges.
 

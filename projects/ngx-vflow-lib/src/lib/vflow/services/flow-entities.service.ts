@@ -35,7 +35,7 @@ export class FlowEntitiesService {
       }
     })
 
-    const connectionMarker = this.connection().connection.marker
+    const connectionMarker = this.connection().settings.marker
     if (connectionMarker) {
       const hash = hashCode(JSON.stringify(connectionMarker))
       markersMap.set(hash, connectionMarker)

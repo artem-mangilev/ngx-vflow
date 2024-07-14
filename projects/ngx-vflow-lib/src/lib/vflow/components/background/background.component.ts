@@ -1,4 +1,4 @@
-import { Component, Input, computed, effect, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, computed, effect, inject, signal } from '@angular/core';
 import { Background } from '../../types/background.type';
 import { ViewportService } from '../../services/viewport.service';
 import { RootSvgReferenceDirective } from '../../directives/reference.directive';
@@ -11,7 +11,8 @@ const defaultDotColor = 'rgb(177, 177, 183)'
 
 @Component({
   selector: 'g[background]',
-  templateUrl: './background.component.html'
+  templateUrl: './background.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class BackgroundComponent {
   private viewportService = inject(ViewportService)

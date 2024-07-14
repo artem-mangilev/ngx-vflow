@@ -14,8 +14,12 @@
     [style.height]="styleHeight()"
     [style.max-width]="styleWidth()"
     [style.max-height]="styleHeight()"
-    [innerHTML]="nodeModel.node.text ?? ''"
-  ></div>
+  >
+    <div [outerHTML]="nodeModel.node.text ?? ''"></div>
+
+    <handle type="source" [position]="nodeModel.sourcePosition()" />
+    <handle type="target" [position]="nodeModel.targetPosition()" />
+  </div>
 </svg:foreignObject>
 
 <svg:foreignObject
@@ -58,27 +62,27 @@
     [attr.cy]="handle.offset().y"
     [attr.stroke-width]="handle.strokeWidth"
     r="5"
-    (pointerStart)="handle.rawHandle.type === 'source' ? startConnection($event, handle) : null"
-    (pointerEnd)="handle.rawHandle.type === 'target' ? endConnection() : null"
+    (pointerStart)="startConnection($event, handle)"
+    (pointerEnd)="endConnection(handle)"
   />
 
   <svg:g
     *ngIf="handle.template"
     [handleSizeController]="handle"
-    (pointerStart)="handle.rawHandle.type === 'source' ? startConnection($event, handle) : null"
-    (pointerEnd)="handle.rawHandle.type === 'target' ? endConnection() : null"
+    (pointerStart)="startConnection($event, handle)"
+    (pointerEnd)="endConnection(handle)"
   >
     <ng-container *ngTemplateOutlet="handle.template; context: handle.templateContext" />
   </svg:g>
 
   <svg:circle
-    *ngIf="handle.rawHandle.type === 'target' && showMagnet()"
+    *ngIf="showMagnet()"
     class="magnet"
     [attr.r]="nodeModel.magnetRadius"
     [attr.cx]="handle.offset().x"
     [attr.cy]="handle.offset().y"
-    (pointerEnd)="endConnection(); resetValidateTargetHandle(handle)"
-    (pointerOver)="validateTargetHandle(handle)"
-    (pointerOut)="resetValidateTargetHandle(handle)"
+    (pointerEnd)="endConnection(handle); resetValidateConnection(handle)"
+    (pointerOver)="validateConnection(handle)"
+    (pointerOut)="resetValidateConnection(handle)"
   />
 </ng-container>

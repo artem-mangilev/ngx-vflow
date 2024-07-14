@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, TemplateRef, ViewChild, inject } from '@angular/core';
-import { HotToastService } from '@ngneat/hot-toast';
+import { NgDocNotifyService } from '@ng-doc/ui-kit';
 import { Connection, Edge, EdgeChange, Node, NodeChange, VflowModule } from 'projects/ngx-vflow-lib/src/public-api';
 
 @Component({
@@ -9,10 +9,10 @@ import { Connection, Edge, EdgeChange, Node, NodeChange, VflowModule } from 'pro
   imports: [VflowModule],
 })
 export class HandlingChangesDemoComponent {
-  private toast = inject(HotToastService);
+  private notifyService = inject(NgDocNotifyService)
 
   @ViewChild('toast')
-  public toastTemplate!: TemplateRef<unknown>;
+  public toastTemplate!: TemplateRef<{}>;
 
   public nodes: Node[] = [
     {
@@ -31,6 +31,8 @@ export class HandlingChangesDemoComponent {
 
   public edges: Edge[] = []
 
+  public toastData: any = {}
+
   public createEdge({ source, target }: Connection) {
     this.edges = [...this.edges, {
       id: `${source} -> ${target}`,
@@ -40,20 +42,20 @@ export class HandlingChangesDemoComponent {
   }
 
   public handleNodeChanges(changes: NodeChange[]) {
-    this.toast.info(this.toastTemplate, {
-      data: {
-        title: '(onNodesChange)',
-        json: JSON.stringify(changes, null, 2)
-      },
-    })
+    this.toastData = {
+      title: '(onNodesChange)',
+      json: JSON.stringify(changes, null, 2)
+    }
+
+    this.notifyService.notify(this.toastTemplate)
   }
 
   public handleEdgeChanges(changes: EdgeChange[]) {
-    this.toast.info(this.toastTemplate, {
-      data: {
-        title: '(onEdgesChange)',
-        json: JSON.stringify(changes, null, 2)
-      },
-    })
+    this.toastData = {
+      title: '(onEdgesChange)',
+      json: JSON.stringify(changes, null, 2)
+    }
+
+    this.notifyService.notify(this.toastTemplate)
   }
 }
