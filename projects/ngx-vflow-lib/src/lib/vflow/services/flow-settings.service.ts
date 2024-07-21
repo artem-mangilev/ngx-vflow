@@ -21,4 +21,7 @@ export class FlowSettingsService {
 
   public flowHeight = computed(() => this.view() === 'auto' ? '100%' : this.view()[1])
 
+  public minZoom = signal(0.5)
+
+  public maxZoom = signal(3)
 }

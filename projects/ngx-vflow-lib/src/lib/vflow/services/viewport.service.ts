@@ -1,9 +1,16 @@
-import { Injectable, Signal, WritableSignal, signal } from '@angular/core';
+import { Injectable, Signal, WritableSignal, inject, signal } from '@angular/core';
 import { Point } from '../interfaces/point.interface';
 import { ViewportState, WritableViewport } from '../interfaces/viewport.interface';
+import { getNodesBounds } from '../utils/nodes';
+import { FlowEntitiesService } from './flow-entities.service';
+import { getViewportForBounds } from '../utils/viewport';
+import { FlowSettingsService } from './flow-settings.service';
 
 @Injectable()
 export class ViewportService {
+  private entitiesService = inject(FlowEntitiesService)
+  private flowSettingsService = inject(FlowSettingsService)
+
   /**
    * The default value used by d3, just copy it here
    *
@@ -28,4 +35,19 @@ export class ViewportService {
   public readonly readableViewport: WritableSignal<ViewportState> = signal(ViewportService.getDefaultViewport())
 
   // TODO: add writableViewportWithConstraints (to apply min zoom/max zoom values)
+
+  public fitView() {
+    const bounds = getNodesBounds(this.entitiesService.nodes())
+
+    const state = getViewportForBounds(
+      bounds,
+      this.flowSettingsService.flowWidth() as number, // TODO fix
+      this.flowSettingsService.flowHeight() as number, // TODO
+      this.flowSettingsService.minZoom(),
+      this.flowSettingsService.maxZoom(),
+      0.1
+    )
+
+    this.writableViewport.set({ changeType: 'absolute', state })
+  }
 }

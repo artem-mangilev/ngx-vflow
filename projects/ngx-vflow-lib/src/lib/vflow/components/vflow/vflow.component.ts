@@ -120,13 +120,17 @@ export class VflowComponent {
    * Minimum zoom value
    */
   @Input()
-  public minZoom = 0.5
+  public set minZoom(value: number) {
+    this.flowSettingsService.minZoom.set(value)
+  }
 
   /**
    * Maximum zoom value
    */
   @Input()
-  public maxZoom = 3
+  public set maxZoom(value: number) {
+    this.flowSettingsService.maxZoom.set(value)
+  }
 
   /**
    * Object that controls flow direction.
@@ -302,6 +306,10 @@ export class VflowComponent {
    */
   public panTo(point: Point): void {
     this.viewportService.writableViewport.set({ changeType: 'absolute', state: point })
+  }
+
+  public fitView() {
+    this.viewportService.fitView()
   }
 
   /**

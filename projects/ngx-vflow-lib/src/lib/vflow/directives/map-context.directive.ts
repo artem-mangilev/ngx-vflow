@@ -6,21 +6,17 @@ import { isDefined } from '../utils/is-defined';
 import { RootSvgReferenceDirective } from './reference.directive';
 import { ViewportState } from '../interfaces/viewport.interface';
 import { SelectionService, ViewportForSelection } from '../services/selection.service';
+import { FlowSettingsService } from '../services/flow-settings.service';
 
 type ZoomEvent = D3ZoomEvent<SVGSVGElement, unknown>
 
 @Directive({ selector: 'g[mapContext]' })
 export class MapContextDirective implements OnInit {
-  @Input()
-  public minZoom!: number
-
-  @Input()
-  public maxZoom!: number
-
   protected rootSvg = inject(RootSvgReferenceDirective).element
   protected host = inject<ElementRef<SVGGElement>>(ElementRef).nativeElement
   protected selectionService = inject(SelectionService)
   protected viewportService = inject(ViewportService)
+  protected flowSettingsService = inject(FlowSettingsService);
 
   protected rootSvgSelection = select(this.rootSvg)
   protected zoomableSelection = select(this.host)
@@ -69,7 +65,7 @@ export class MapContextDirective implements OnInit {
 
   public ngOnInit(): void {
     this.zoomBehavior = zoom<SVGSVGElement, unknown>()
-      .scaleExtent([this.minZoom, this.maxZoom])
+      .scaleExtent([this.flowSettingsService.minZoom(), this.flowSettingsService.maxZoom()])
       .on('start', (event: ZoomEvent) => this.onD3zoomStart(event))
       .on('zoom', (event: ZoomEvent) => this.handleZoom(event))
       .on('end', (event: ZoomEvent) => this.onD3zoomEnd(event))
