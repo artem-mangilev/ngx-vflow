@@ -30,6 +30,7 @@ import { FlowSettingsService } from '../../services/flow-settings.service';
 import { ComponentEventBusService } from '../../services/component-event-bus.service';
 import { Background } from '../../types/background.type';
 import { SpacePointContextDirective } from '../../directives/space-point-context.directive';
+import { FitViewOptions } from '../../interfaces/fit-view-options.interface';
 
 const connectionControllerHostDirective = {
   directive: ConnectionControllerDirective,
@@ -120,13 +121,17 @@ export class VflowComponent {
    * Minimum zoom value
    */
   @Input()
-  public minZoom = 0.5
+  public set minZoom(value: number) {
+    this.flowSettingsService.minZoom.set(value)
+  }
 
   /**
    * Maximum zoom value
    */
   @Input()
-  public maxZoom = 3
+  public set maxZoom(value: number) {
+    this.flowSettingsService.maxZoom.set(value)
+  }
 
   /**
    * Object that controls flow direction.
@@ -271,9 +276,6 @@ export class VflowComponent {
   public readonly edgesChange$ = this.edgesChangeService.changes$
   // #endregion
 
-  protected flowWidth = this.flowSettingsService.flowWidth
-  protected flowHeight = this.flowSettingsService.flowHeight
-
   protected markers = this.flowEntitiesService.markers
 
   // #region METHODS_API
@@ -283,7 +285,7 @@ export class VflowComponent {
    * @param viewport viewport state
    */
   public viewportTo(viewport: ViewportState): void {
-    this.viewportService.writableViewport.set({ changeType: 'absolute', state: viewport })
+    this.viewportService.writableViewport.set({ changeType: 'absolute', state: viewport, duration: 0 })
   }
 
   /**
@@ -292,7 +294,7 @@ export class VflowComponent {
    * @param zoom zoom value
    */
   public zoomTo(zoom: number): void {
-    this.viewportService.writableViewport.set({ changeType: 'absolute', state: { zoom } })
+    this.viewportService.writableViewport.set({ changeType: 'absolute', state: { zoom }, duration: 0 })
   }
 
   /**
@@ -301,7 +303,11 @@ export class VflowComponent {
    * @param point point where to move
    */
   public panTo(point: Point): void {
-    this.viewportService.writableViewport.set({ changeType: 'absolute', state: point })
+    this.viewportService.writableViewport.set({ changeType: 'absolute', state: point, duration: 0 })
+  }
+
+  public fitView(options?: FitViewOptions) {
+    this.viewportService.fitView(options)
   }
 
   /**
