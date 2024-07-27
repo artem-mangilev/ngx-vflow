@@ -6,6 +6,7 @@ import { FlowEntitiesService } from './flow-entities.service';
 import { getViewportForBounds } from '../utils/viewport';
 import { FlowSettingsService } from './flow-settings.service';
 import { FitViewOptions } from '../interfaces/fit-view-options.interface';
+import { NodeModel } from '../models/node.model';
 
 @Injectable()
 export class ViewportService {
@@ -38,9 +39,17 @@ export class ViewportService {
 
   // TODO: add writableViewportWithConstraints (to apply min zoom/max zoom values)
 
-  public fitView(options: FitViewOptions = { padding: .1, duration: 0 }) {
+  public fitView(options: FitViewOptions = { padding: .1, duration: 0, nodes: [] }) {
+    const nodes = !options.nodes?.length
+      // If nodes option not passed or the list is empty, then get fit the whole view
+      ? this.entitiesService.nodes()
+      // Otherwise fit to specific nodes
+      : options.nodes
+        .map(nodeId => this.entitiesService.nodes().find(({ node }) => node.id === nodeId))
+        .filter((node): node is NodeModel => !!node)
+
     const state = getViewportForBounds(
-      getNodesBounds(this.entitiesService.nodes()),
+      getNodesBounds(nodes),
       this.flowSettingsService.computedFlowWidth(),
       this.flowSettingsService.computedFlowHeight(),
       this.flowSettingsService.minZoom(),
