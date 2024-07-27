@@ -18,6 +18,9 @@ export class WorkflowBuilderDemoComponent implements OnInit {
       id: crypto.randomUUID(),
       point: { x: 0, y: 0 },
       type: 'html-template',
+      data: {
+        color: randomHex()
+      }
     }
   ]
 
@@ -30,11 +33,15 @@ export class WorkflowBuilderDemoComponent implements OnInit {
   onNodeClick(node: Node) {
     const newNodeId = crypto.randomUUID()
 
-    this.nodes.push({
+    this.nodes = [...this.nodes, {
       id: newNodeId,
       point: { x: 0, y: 0 },
       type: 'html-template',
-    })
+      draggable: false,
+      data: {
+        color: randomHex()
+      }
+    }]
 
     this.edges = [...this.edges, {
       source: node.id,
@@ -44,15 +51,21 @@ export class WorkflowBuilderDemoComponent implements OnInit {
 
     this.layout()
 
+    // To wait when the flow rendered
     setTimeout(() => {
       this.vflow.fitView({ duration: 750 })
     });
   }
 
   private layout() {
-    const graph = new DirectedGraph()
+    const graph = new DirectedGraph({
+      layout: {
+        margin_x: 75
+      }
+    })
 
     const vertices = new Map<string, VertexRef>()
+    const nodes = new Map<string, Node>()
 
     this.nodes.forEach(n => {
       const v = graph.new_vertex({
@@ -68,13 +81,13 @@ export class WorkflowBuilderDemoComponent implements OnInit {
       })
 
       vertices.set(n.id, v)
+      nodes.set(n.id, n)
     })
 
     this.edges.forEach(e => {
       graph.new_edge(
         vertices.get(e.source)!,
         vertices.get(e.target)!,
-
       )
     })
 
@@ -82,17 +95,30 @@ export class WorkflowBuilderDemoComponent implements OnInit {
 
     this.nodes = layout.nodes.map(n => {
       return {
+        ...nodes.get(n.id)!,
         id: n.id,
         point: {
           x: n.x,
           y: n.y
         },
-        type: 'html-template'
       }
     })
 
     graph.free()
   }
+}
+
+function randomHex() {
+  const hexValues = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 'A', 'B', 'C', 'D', 'E', 'F'];
+
+  let hex = '#';
+
+  for (let i = 0; i < 6; i++) {
+    const index = Math.floor(Math.random() * hexValues.length)
+    hex += hexValues[index];
+  }
+
+  return hex
 }
 
 declare module '@vizdom/vizdom-ts-esm' {
