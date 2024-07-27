@@ -17,9 +17,15 @@ export class FlowSettingsService {
    */
   public view: WritableSignal<[number, number] | 'auto'> = signal([400, 400])
 
-  public flowWidth = computed(() => this.view() === 'auto' ? '100%' : this.view()[0])
+  /**
+   * Set based on view property. May change if view is 'auto'
+   */
+  public computedFlowWidth = signal(0)
 
-  public flowHeight = computed(() => this.view() === 'auto' ? '100%' : this.view()[1])
+  /**
+   * Set based on view property. May change if view is 'auto'
+   */
+  public computedFlowHeight = signal(0)
 
   public minZoom = signal(0.5)
 

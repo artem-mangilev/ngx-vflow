@@ -17,6 +17,7 @@ import { SelectableDirective } from './directives/selectable.directive';
 import { PointerDirective } from './directives/pointer.directive';
 import { RootPointerDirective } from './directives/root-pointer.directive';
 import { BackgroundComponent } from './components/background/background.component';
+import { FlowSizeControllerDirective } from './directives/flow-size-controller.directive';
 
 const components = [
   VflowComponent,
@@ -37,7 +38,8 @@ const directives = [
   HandleSizeControllerDirective,
   SelectableDirective,
   PointerDirective,
-  RootPointerDirective
+  RootPointerDirective,
+  FlowSizeControllerDirective
 ]
 
 const templateDirectives = [

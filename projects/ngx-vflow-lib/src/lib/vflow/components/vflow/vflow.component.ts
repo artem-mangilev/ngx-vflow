@@ -275,9 +275,6 @@ export class VflowComponent {
   public readonly edgesChange$ = this.edgesChangeService.changes$
   // #endregion
 
-  protected flowWidth = this.flowSettingsService.flowWidth
-  protected flowHeight = this.flowSettingsService.flowHeight
-
   protected markers = this.flowEntitiesService.markers
 
   // #region METHODS_API

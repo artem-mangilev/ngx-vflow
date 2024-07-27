@@ -37,12 +37,10 @@ export class ViewportService {
   // TODO: add writableViewportWithConstraints (to apply min zoom/max zoom values)
 
   public fitView() {
-    const bounds = getNodesBounds(this.entitiesService.nodes())
-
     const state = getViewportForBounds(
-      bounds,
-      this.flowSettingsService.flowWidth() as number, // TODO fix
-      this.flowSettingsService.flowHeight() as number, // TODO
+      getNodesBounds(this.entitiesService.nodes()),
+      this.flowSettingsService.computedFlowWidth(),
+      this.flowSettingsService.computedFlowHeight(),
       this.flowSettingsService.minZoom(),
       this.flowSettingsService.maxZoom(),
       0.1
