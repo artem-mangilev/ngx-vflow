@@ -20,7 +20,8 @@ export class WorkflowBuilderDemoComponent implements OnInit {
       type: 'html-template',
       data: {
         color: randomHex()
-      }
+      },
+      draggable: false
     }
   ]
 
