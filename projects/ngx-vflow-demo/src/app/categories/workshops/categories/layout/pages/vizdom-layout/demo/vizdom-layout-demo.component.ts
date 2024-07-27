@@ -54,7 +54,10 @@ export class VizdomLayoutDemoComponent implements OnInit {
   }
 
   protected fitView() {
-    this.vflow.fitView({ duration: 750 })
+    // do not fit when there is initial node
+    if (this.nodes.length > 1) {
+      this.vflow.fitView({ duration: 750 })
+    }
   }
 
   private layout() {
