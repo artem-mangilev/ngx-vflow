@@ -1,0 +1,8 @@
+<vflow [nodes]="nodes" [edges]="edges">
+  <ng-template nodeHtml let-ctx>
+    <div (click)="onNodeClick(ctx.node)" class="custom-node">
+      <handle type="source" position="bottom" />
+      <handle type="target" position="top" />
+    </div>
+  </ng-template>
+</vflow>`
