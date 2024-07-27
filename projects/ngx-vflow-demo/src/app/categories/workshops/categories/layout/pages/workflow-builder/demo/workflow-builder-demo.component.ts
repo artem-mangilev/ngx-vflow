@@ -51,11 +51,10 @@ export class WorkflowBuilderDemoComponent implements OnInit {
     }]
 
     this.layout()
+  }
 
-    // To wait when the flow rendered
-    setTimeout(() => {
-      this.vflow.fitView({ duration: 750 })
-    });
+  protected fitView() {
+    this.vflow.fitView({ duration: 750 })
   }
 
   private layout() {
