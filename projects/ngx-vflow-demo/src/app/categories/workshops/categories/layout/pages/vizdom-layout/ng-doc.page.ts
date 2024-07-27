@@ -1,12 +1,12 @@
 import { NgDocPage } from '@ng-doc/core';
-import { WorkflowBuilderDemoComponent } from './demo/workflow-builder-demo.component';
+import { VizdomLayoutDemoComponent } from './demo/vizdom-layout-demo.component';
 import LayoutCategory from '../../ng-doc.category';
 
 const TestPage: NgDocPage = {
-  title: `Workflow builder`,
+  title: `Vizdom layout`,
   mdFile: './index.md',
   category: LayoutCategory,
-  demos: { WorkflowBuilderDemoComponent },
+  demos: { VizdomLayoutDemoComponent },
   order: 2
 };
 

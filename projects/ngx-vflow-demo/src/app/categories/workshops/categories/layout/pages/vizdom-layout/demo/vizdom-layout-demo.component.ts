@@ -3,13 +3,13 @@ import { DirectedGraph, VertexRef } from '@vizdom/vizdom-ts-esm';
 import { Edge, Node, VflowComponent, VflowModule } from 'projects/ngx-vflow-lib/src/public-api';
 
 @Component({
-  templateUrl: './workflow-builder-demo.component.html',
-  styleUrls: ['./workflow-builder-demo.component.scss'],
+  templateUrl: './vizdom-layout-demo.component.html',
+  styleUrls: ['./vizdom-layout-demo.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
   imports: [VflowModule]
 })
-export class WorkflowBuilderDemoComponent implements OnInit {
+export class VizdomLayoutDemoComponent implements OnInit {
   @ViewChild(VflowComponent)
   vflow!: VflowComponent
 
