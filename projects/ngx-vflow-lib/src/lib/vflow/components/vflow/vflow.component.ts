@@ -30,6 +30,7 @@ import { FlowSettingsService } from '../../services/flow-settings.service';
 import { ComponentEventBusService } from '../../services/component-event-bus.service';
 import { Background } from '../../types/background.type';
 import { SpacePointContextDirective } from '../../directives/space-point-context.directive';
+import { FitViewOptions } from '../../interfaces/fit-view-options.interface';
 
 const connectionControllerHostDirective = {
   directive: ConnectionControllerDirective,
@@ -284,7 +285,7 @@ export class VflowComponent {
    * @param viewport viewport state
    */
   public viewportTo(viewport: ViewportState): void {
-    this.viewportService.writableViewport.set({ changeType: 'absolute', state: viewport })
+    this.viewportService.writableViewport.set({ changeType: 'absolute', state: viewport, duration: 0 })
   }
 
   /**
@@ -293,7 +294,7 @@ export class VflowComponent {
    * @param zoom zoom value
    */
   public zoomTo(zoom: number): void {
-    this.viewportService.writableViewport.set({ changeType: 'absolute', state: { zoom } })
+    this.viewportService.writableViewport.set({ changeType: 'absolute', state: { zoom }, duration: 0 })
   }
 
   /**
@@ -302,11 +303,11 @@ export class VflowComponent {
    * @param point point where to move
    */
   public panTo(point: Point): void {
-    this.viewportService.writableViewport.set({ changeType: 'absolute', state: point })
+    this.viewportService.writableViewport.set({ changeType: 'absolute', state: point, duration: 0 })
   }
 
-  public fitView() {
-    this.viewportService.fitView()
+  public fitView(options?: FitViewOptions) {
+    this.viewportService.fitView(options)
   }
 
   /**

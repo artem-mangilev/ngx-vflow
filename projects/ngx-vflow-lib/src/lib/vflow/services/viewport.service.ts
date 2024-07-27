@@ -5,6 +5,7 @@ import { getNodesBounds } from '../utils/nodes';
 import { FlowEntitiesService } from './flow-entities.service';
 import { getViewportForBounds } from '../utils/viewport';
 import { FlowSettingsService } from './flow-settings.service';
+import { FitViewOptions } from '../interfaces/fit-view-options.interface';
 
 @Injectable()
 export class ViewportService {
@@ -24,7 +25,8 @@ export class ViewportService {
    */
   public readonly writableViewport: WritableSignal<WritableViewport> = signal({
     changeType: 'initial',
-    state: ViewportService.getDefaultViewport()
+    state: ViewportService.getDefaultViewport(),
+    duration: 0
   })
 
   /**
@@ -36,16 +38,18 @@ export class ViewportService {
 
   // TODO: add writableViewportWithConstraints (to apply min zoom/max zoom values)
 
-  public fitView() {
+  public fitView(options: FitViewOptions = { padding: .1, duration: 0 }) {
     const state = getViewportForBounds(
       getNodesBounds(this.entitiesService.nodes()),
       this.flowSettingsService.computedFlowWidth(),
       this.flowSettingsService.computedFlowHeight(),
       this.flowSettingsService.minZoom(),
       this.flowSettingsService.maxZoom(),
-      0.1
+      options.padding ?? .1
     )
 
-    this.writableViewport.set({ changeType: 'absolute', state })
+    const duration = options.duration ?? 0
+
+    this.writableViewport.set({ changeType: 'absolute', state, duration })
   }
 }

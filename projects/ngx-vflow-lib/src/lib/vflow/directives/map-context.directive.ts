@@ -8,8 +8,6 @@ import { ViewportState } from '../interfaces/viewport.interface';
 import { SelectionService, ViewportForSelection } from '../services/selection.service';
 import { FlowSettingsService } from '../services/flow-settings.service';
 
-type ZoomEvent = D3ZoomEvent<SVGSVGElement, unknown>
-
 @Directive({ selector: 'g[mapContext]' })
 export class MapContextDirective implements OnInit {
   protected rootSvg = inject(RootSvgReferenceDirective).element
@@ -34,7 +32,9 @@ export class MapContextDirective implements OnInit {
 
     // If only zoom provided
     if (isDefined(state.zoom) && (!isDefined(state.x) && !isDefined(state.y))) {
-      this.rootSvgSelection.call(this.zoomBehavior.scaleTo, state.zoom)
+      this.rootSvgSelection
+        .transition().duration(viewport.duration)
+        .call(this.zoomBehavior.scaleTo, state.zoom)
 
       return
     }
@@ -44,18 +44,24 @@ export class MapContextDirective implements OnInit {
       // remain same zoom value
       const zoom = untracked(this.viewportService.readableViewport).zoom
 
-      this.rootSvgSelection.call(this.zoomBehavior.transform,
-        zoomIdentity.translate(state.x, state.y).scale(zoom)
-      )
+      this.rootSvgSelection
+        .transition().duration(viewport.duration)
+        .call(
+          this.zoomBehavior.transform,
+          zoomIdentity.translate(state.x, state.y).scale(zoom)
+        )
 
       return
     }
 
     // If whole viewort state provided
     if (isDefined(state.x) && isDefined(state.y) && isDefined(state.zoom)) {
-      this.rootSvgSelection.call(this.zoomBehavior.transform,
-        zoomIdentity.translate(state.x, state.y).scale(state.zoom)
-      )
+      this.rootSvgSelection
+        .transition().duration(viewport.duration)
+        .call(
+          this.zoomBehavior.transform,
+          zoomIdentity.translate(state.x, state.y).scale(state.zoom),
+        )
 
       return
     }
@@ -111,3 +117,12 @@ const evTarget = (anyEvent: any): Element | undefined => {
 
   return undefined;
 }
+
+declare module 'd3-selection' {
+  interface Selection<GElement extends BaseType, Datum, PElement extends BaseType, PDatum> {
+    transition(): Selection<GElement, Datum, PElement, PDatum>
+    duration(duration: number): Selection<GElement, Datum, PElement, PDatum>
+  }
+}
+
+type ZoomEvent = D3ZoomEvent<SVGSVGElement, unknown>
