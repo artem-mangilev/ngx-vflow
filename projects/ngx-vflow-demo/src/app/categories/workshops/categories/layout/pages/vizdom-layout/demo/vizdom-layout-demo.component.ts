@@ -13,28 +13,31 @@ export class VizdomLayoutDemoComponent implements OnInit {
   @ViewChild(VflowComponent)
   vflow!: VflowComponent
 
-  public nodes: Node[] = [
-    {
-      id: crypto.randomUUID(),
-      point: { x: 0, y: 0 },
-      type: 'html-template',
-      data: {
-        color: randomHex()
-      },
-      draggable: false
-    }
-  ]
+  public nodes: Node[] = []
 
   public edges: Edge[] = []
 
   ngOnInit(): void {
-    this.layout()
+    // default layout with one node
+    this.layout(
+      [
+        {
+          id: crypto.randomUUID(),
+          point: { x: 0, y: 0 },
+          type: 'html-template',
+          data: {
+            color: randomHex()
+          },
+          draggable: false
+        }
+      ]
+    )
   }
 
   onNodeClick(node: Node) {
     const newNodeId = crypto.randomUUID()
 
-    this.nodes = [...this.nodes, {
+    const nodes: Node[] = [...this.nodes, {
       id: newNodeId,
       point: { x: 0, y: 0 },
       type: 'html-template',
@@ -44,13 +47,13 @@ export class VizdomLayoutDemoComponent implements OnInit {
       }
     }]
 
-    this.edges = [...this.edges, {
+    const edges: Edge[] = [...this.edges, {
       source: node.id,
       target: newNodeId,
       id: `${node.id} -> ${newNodeId}`
     }]
 
-    this.layout()
+    this.layout(nodes, edges)
   }
 
   protected fitView() {
@@ -60,18 +63,24 @@ export class VizdomLayoutDemoComponent implements OnInit {
     }
   }
 
-  private layout() {
+  /**
+   * Method that responsible to layout and render passed nodes and edges
+   */
+  private layout(nodesToLayout: Node[], edgesToLayout: Edge[] = []) {
     const graph = new DirectedGraph({
       layout: {
         margin_x: 75
       }
     })
 
+    // DirectedGraph not provide VErtexRef ids so we need to store it somewhere
+    // for later access
     const vertices = new Map<string, VertexRef>()
     const nodes = new Map<string, Node>()
 
-    this.nodes.forEach(n => {
+    nodesToLayout.forEach(n => {
       const v = graph.new_vertex({
+        // For now we only can use static sized nodes
         layout: {
           shape_w: 150,
           shape_h: 100
@@ -87,15 +96,17 @@ export class VizdomLayoutDemoComponent implements OnInit {
       nodes.set(n.id, n)
     })
 
-    this.edges.forEach(e => {
+    edgesToLayout.forEach(e => {
       graph.new_edge(
         vertices.get(e.source)!,
         vertices.get(e.target)!,
       )
     })
 
+    // Compute layout with vizdom internal algorythm
     const layout = graph.layout().to_json().to_obj()
 
+    // Render nodes and edges based on this layout
     this.nodes = layout.nodes.map(n => {
       return {
         ...nodes.get(n.id)!,
@@ -106,7 +117,9 @@ export class VizdomLayoutDemoComponent implements OnInit {
         },
       }
     })
+    this.edges = edgesToLayout
 
+    // Free the rust memory
     graph.free()
   }
 }
@@ -124,6 +137,7 @@ function randomHex() {
   return hex
 }
 
+// For some reason vizdom has no these types so we declare them
 declare module '@vizdom/vizdom-ts-esm' {
   type FontSize = any;
   type PenWidth = any;
