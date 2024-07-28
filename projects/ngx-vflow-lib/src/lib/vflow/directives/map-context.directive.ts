@@ -6,21 +6,15 @@ import { isDefined } from '../utils/is-defined';
 import { RootSvgReferenceDirective } from './reference.directive';
 import { ViewportState } from '../interfaces/viewport.interface';
 import { SelectionService, ViewportForSelection } from '../services/selection.service';
-
-type ZoomEvent = D3ZoomEvent<SVGSVGElement, unknown>
+import { FlowSettingsService } from '../services/flow-settings.service';
 
 @Directive({ selector: 'g[mapContext]' })
 export class MapContextDirective implements OnInit {
-  @Input()
-  public minZoom!: number
-
-  @Input()
-  public maxZoom!: number
-
   protected rootSvg = inject(RootSvgReferenceDirective).element
   protected host = inject<ElementRef<SVGGElement>>(ElementRef).nativeElement
   protected selectionService = inject(SelectionService)
   protected viewportService = inject(ViewportService)
+  protected flowSettingsService = inject(FlowSettingsService);
 
   protected rootSvgSelection = select(this.rootSvg)
   protected zoomableSelection = select(this.host)
@@ -38,7 +32,9 @@ export class MapContextDirective implements OnInit {
 
     // If only zoom provided
     if (isDefined(state.zoom) && (!isDefined(state.x) && !isDefined(state.y))) {
-      this.rootSvgSelection.call(this.zoomBehavior.scaleTo, state.zoom)
+      this.rootSvgSelection
+        .transition().duration(viewport.duration)
+        .call(this.zoomBehavior.scaleTo, state.zoom)
 
       return
     }
@@ -48,18 +44,24 @@ export class MapContextDirective implements OnInit {
       // remain same zoom value
       const zoom = untracked(this.viewportService.readableViewport).zoom
 
-      this.rootSvgSelection.call(this.zoomBehavior.transform,
-        zoomIdentity.translate(state.x, state.y).scale(zoom)
-      )
+      this.rootSvgSelection
+        .transition().duration(viewport.duration)
+        .call(
+          this.zoomBehavior.transform,
+          zoomIdentity.translate(state.x, state.y).scale(zoom)
+        )
 
       return
     }
 
     // If whole viewort state provided
     if (isDefined(state.x) && isDefined(state.y) && isDefined(state.zoom)) {
-      this.rootSvgSelection.call(this.zoomBehavior.transform,
-        zoomIdentity.translate(state.x, state.y).scale(state.zoom)
-      )
+      this.rootSvgSelection
+        .transition().duration(viewport.duration)
+        .call(
+          this.zoomBehavior.transform,
+          zoomIdentity.translate(state.x, state.y).scale(state.zoom),
+        )
 
       return
     }
@@ -69,7 +71,7 @@ export class MapContextDirective implements OnInit {
 
   public ngOnInit(): void {
     this.zoomBehavior = zoom<SVGSVGElement, unknown>()
-      .scaleExtent([this.minZoom, this.maxZoom])
+      .scaleExtent([this.flowSettingsService.minZoom(), this.flowSettingsService.maxZoom()])
       .on('start', (event: ZoomEvent) => this.onD3zoomStart(event))
       .on('zoom', (event: ZoomEvent) => this.handleZoom(event))
       .on('end', (event: ZoomEvent) => this.onD3zoomEnd(event))
@@ -115,3 +117,12 @@ const evTarget = (anyEvent: any): Element | undefined => {
 
   return undefined;
 }
+
+declare module 'd3-selection' {
+  interface Selection<GElement extends BaseType, Datum, PElement extends BaseType, PDatum> {
+    transition(): Selection<GElement, Datum, PElement, PDatum>
+    duration(duration: number): Selection<GElement, Datum, PElement, PDatum>
+  }
+}
+
+type ZoomEvent = D3ZoomEvent<SVGSVGElement, unknown>

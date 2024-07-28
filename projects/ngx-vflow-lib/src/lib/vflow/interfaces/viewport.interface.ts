@@ -8,4 +8,5 @@ export interface ViewportState extends Point {
 export interface WritableViewport {
   changeType: ViewportChangeType
   state: Partial<ViewportState>
+  duration: number
 }
