@@ -40,13 +40,7 @@ export class ViewportService {
   // TODO: add writableViewportWithConstraints (to apply min zoom/max zoom values)
 
   public fitView(options: FitViewOptions = { padding: .1, duration: 0, nodes: [] }) {
-    const nodes = !options.nodes?.length
-      // If nodes option not passed or the list is empty, then get fit the whole view
-      ? this.entitiesService.nodes()
-      // Otherwise fit to specific nodes
-      : options.nodes
-        .map(nodeId => this.entitiesService.nodes().find(({ node }) => node.id === nodeId))
-        .filter((node): node is NodeModel => !!node)
+    const nodes = this.getBoundsNodes(options.nodes ?? [])
 
     const state = getViewportForBounds(
       getNodesBounds(nodes),
@@ -60,5 +54,15 @@ export class ViewportService {
     const duration = options.duration ?? 0
 
     this.writableViewport.set({ changeType: 'absolute', state, duration })
+  }
+
+  private getBoundsNodes(nodeIds: string[]) {
+    return !nodeIds?.length
+      // If nodes option not passed or the list is empty, then get fit the whole view
+      ? this.entitiesService.nodes()
+      // Otherwise fit to specific nodes
+      : nodeIds
+        .map(nodeId => this.entitiesService.nodes().find(({ node }) => node.id === nodeId))
+        .filter((node): node is NodeModel => !!node)
   }
 }
