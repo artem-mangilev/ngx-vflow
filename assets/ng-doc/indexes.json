@@ -1,1410 +1,6 @@
 [
   {
     "breadcrumbs": [
-      "Examples",
-      "Choose direction"
-    ],
-    "pageType": "guide",
-    "title": "Choose direction",
-    "section": "Choose direction",
-    "route": "/examples/choose-direction",
-    "fragment": "choose-direction",
-    "content": "This API may depricate in future releases"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Choose direction"
-    ],
-    "pageType": "guide",
-    "title": "Choose direction",
-    "section": "Choose direction",
-    "route": "/examples/choose-direction",
-    "fragment": "choose-direction",
-    "content": "You can apply global setting for all handles with [handlePositions] input where you set on which side source and target handles should be placed, you can select."
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Choose direction"
-    ],
-    "pageType": "guide",
-    "title": "Choose direction",
-    "section": "Right to left direction",
-    "route": "/examples/choose-direction",
-    "fragment": "right-to-left-direction",
-    "content": "To archive this direction, you pass { source: 'left', target: 'right' } to [handlePositions]."
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Choose direction"
-    ],
-    "pageType": "guide",
-    "title": "Choose direction",
-    "section": "Top to bottom direction",
-    "route": "/examples/choose-direction",
-    "fragment": "top-to-bottom-direction",
-    "content": "To archive this direction, you pass { source: 'bottom', target: 'top' } to [handlePositions]."
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Curves"
-    ],
-    "pageType": "guide",
-    "title": "Curves",
-    "section": "Curves",
-    "route": "/examples/curves",
-    "fragment": "curves",
-    "content": "It's possible to set curve for both the edges and connection."
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Connection"
-    ],
-    "pageType": "guide",
-    "title": "Connection",
-    "section": "Connection",
-    "route": "/examples/connection",
-    "fragment": "connection",
-    "content": "Edges are not creating automatically. To create a new edge, follow these steps:"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Connection"
-    ],
-    "pageType": "guide",
-    "title": "Connection",
-    "section": "Connection",
-    "route": "/examples/connection",
-    "fragment": "connection",
-    "content": "Create handler to the "
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Connection"
-    ],
-    "pageType": "guide",
-    "title": "Connection",
-    "section": "Connection",
-    "route": "/examples/connection",
-    "fragment": "connection",
-    "content": "(onConnect)"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Connection"
-    ],
-    "pageType": "guide",
-    "title": "Connection",
-    "section": "Connection",
-    "route": "/examples/connection",
-    "fragment": "connection",
-    "content": " event This handler accepts a "
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Connection"
-    ],
-    "pageType": "guide",
-    "title": "Connection",
-    "section": "Connection",
-    "route": "/examples/connection",
-    "fragment": "connection",
-    "content": "Connection"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Connection"
-    ],
-    "pageType": "guide",
-    "title": "Connection",
-    "section": "Connection",
-    "route": "/examples/connection",
-    "fragment": "connection",
-    "content": " argument. "
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Connection"
-    ],
-    "pageType": "guide",
-    "title": "Connection",
-    "section": "Connection",
-    "route": "/examples/connection",
-    "fragment": "connection",
-    "content": "Connection"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Connection"
-    ],
-    "pageType": "guide",
-    "title": "Connection",
-    "section": "Connection",
-    "route": "/examples/connection",
-    "fragment": "connection",
-    "content": " is similar to an "
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Connection"
-    ],
-    "pageType": "guide",
-    "title": "Connection",
-    "section": "Connection",
-    "route": "/examples/connection",
-    "fragment": "connection",
-    "content": "Edge"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Connection"
-    ],
-    "pageType": "guide",
-    "title": "Connection",
-    "section": "Connection",
-    "route": "/examples/connection",
-    "fragment": "connection",
-    "content": ", but it doesn't exists in the flow, you need to \"convert\" it into a new "
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Connection"
-    ],
-    "pageType": "guide",
-    "title": "Connection",
-    "section": "Connection",
-    "route": "/examples/connection",
-    "fragment": "connection",
-    "content": "Edge"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Connection"
-    ],
-    "pageType": "guide",
-    "title": "Connection",
-    "section": "Connection",
-    "route": "/examples/connection",
-    "fragment": "connection",
-    "content": "Update the "
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Connection"
-    ],
-    "pageType": "guide",
-    "title": "Connection",
-    "section": "Connection",
-    "route": "/examples/connection",
-    "fragment": "connection",
-    "content": "Edge[]"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Connection"
-    ],
-    "pageType": "guide",
-    "title": "Connection",
-    "section": "Connection",
-    "route": "/examples/connection",
-    "fragment": "connection",
-    "content": " list with the new edge that was created from the "
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Connection"
-    ],
-    "pageType": "guide",
-    "title": "Connection",
-    "section": "Connection",
-    "route": "/examples/connection",
-    "fragment": "connection",
-    "content": "Connection"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Connection"
-    ],
-    "pageType": "guide",
-    "title": "Connection",
-    "section": "Connection",
-    "route": "/examples/connection",
-    "fragment": "connection",
-    "content": "."
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Connection"
-    ],
-    "pageType": "guide",
-    "title": "Connection",
-    "section": "Strict connections",
-    "route": "/examples/connection",
-    "fragment": "strict-connections",
-    "content": "In the default 'strict' mode of ConnectionSettings, edges are created from connections with strict adherence to the source and target types of the HandleComponent. This means connections can only be established in one direction based on these properties."
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Connection"
-    ],
-    "pageType": "guide",
-    "title": "Connection",
-    "section": "Loose connections",
-    "route": "/examples/connection",
-    "fragment": "loose-connections",
-    "content": "This is the 'loose' mode of ConnectionSettings, where the flow ignores the handle type and allows any handle to connect with any other handle. In this mode, an id must be provided for the HandleComponent to function correctly."
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Connection validation"
-    ],
-    "pageType": "guide",
-    "title": "Connection validation",
-    "section": "Connection validation",
-    "route": "/examples/connection-validation",
-    "fragment": "connection-validation",
-    "content": "ngx-vflow supports real-time synchronous validation of connections. Validation occurs when a user attempts to create a new edge. By default, every connection is valid, but you can provide a ConnectionSettings with a validatior callback where you specify the validation logic. For example, in this case, validation only passes connections from node 1 to node 2. If the validator returns false, the (onConnect) event won't be triggered because there is no valid connection."
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Custom nodes",
-    "route": "/examples/custom-nodes",
-    "fragment": "custom-nodes",
-    "content": "Be careful with CSS rules applied to node content. Custom nodes are implemented with SVG's foreignObject element, and Safari has issues with some CSS rules inside foreignObject. Therefore, please check this browser when applying complex styling."
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Custom nodes",
-    "route": "/examples/custom-nodes",
-    "fragment": "custom-nodes",
-    "content": "This is where things become a lot more interesting. You can create custom nodes with HTML and CSS."
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Template nodes",
-    "route": "/examples/custom-nodes",
-    "fragment": "template-nodes",
-    "content": "You can create custom nodes with ng-template Follow these steps to achieve this:"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Template nodes",
-    "route": "/examples/custom-nodes",
-    "fragment": "template-nodes",
-    "content": "Set "
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Template nodes",
-    "route": "/examples/custom-nodes",
-    "fragment": "template-nodes",
-    "content": "type"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Template nodes",
-    "route": "/examples/custom-nodes",
-    "fragment": "template-nodes",
-    "content": " of node to "
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Template nodes",
-    "route": "/examples/custom-nodes",
-    "fragment": "template-nodes",
-    "content": "html-template"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Template nodes",
-    "route": "/examples/custom-nodes",
-    "fragment": "template-nodes",
-    "content": "Provide "
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Template nodes",
-    "route": "/examples/custom-nodes",
-    "fragment": "template-nodes",
-    "content": "ng-template"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Template nodes",
-    "route": "/examples/custom-nodes",
-    "fragment": "template-nodes",
-    "content": " with "
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Template nodes",
-    "route": "/examples/custom-nodes",
-    "fragment": "template-nodes",
-    "content": "nodeHtml"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Template nodes",
-    "route": "/examples/custom-nodes",
-    "fragment": "template-nodes",
-    "content": " selector inside "
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Template nodes",
-    "route": "/examples/custom-nodes",
-    "fragment": "template-nodes",
-    "content": "vflow"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Template nodes",
-    "route": "/examples/custom-nodes",
-    "fragment": "template-nodes",
-    "content": "Write your HTML inside this template You can also pass any data with "
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Template nodes",
-    "route": "/examples/custom-nodes",
-    "fragment": "template-nodes",
-    "content": "data"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Template nodes",
-    "route": "/examples/custom-nodes",
-    "fragment": "template-nodes",
-    "content": " field on node, and then get it inside "
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Template nodes",
-    "route": "/examples/custom-nodes",
-    "fragment": "template-nodes",
-    "content": "ng-template"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Component nodes",
-    "route": "/examples/custom-nodes",
-    "fragment": "component-nodes",
-    "content": "Another approach is to render nodes from components. Its benefits: type-safe node data accessgood for complex flows with many different node types Its limitations it's harder to manage events because such nodes are rendered dynamically How to create component node:"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Component nodes",
-    "route": "/examples/custom-nodes",
-    "fragment": "component-nodes",
-    "content": "Create a regular angular standalone component Extend with "
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Component nodes",
-    "route": "/examples/custom-nodes",
-    "fragment": "component-nodes",
-    "content": "CustomNodeComponent"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Component nodes",
-    "route": "/examples/custom-nodes",
-    "fragment": "component-nodes",
-    "content": " (please see the reference of this base component to get an idea of what fields you could use in your custom component node), otherwise it won't work! Pass your data interface to generic of "
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Component nodes",
-    "route": "/examples/custom-nodes",
-    "fragment": "component-nodes",
-    "content": "CustomNodeComponent"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Component nodes",
-    "route": "/examples/custom-nodes",
-    "fragment": "component-nodes",
-    "content": " to use in component. This "
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Component nodes",
-    "route": "/examples/custom-nodes",
-    "fragment": "component-nodes",
-    "content": "data"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Component nodes",
-    "route": "/examples/custom-nodes",
-    "fragment": "component-nodes",
-    "content": " comes from "
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Component nodes",
-    "route": "/examples/custom-nodes",
-    "fragment": "component-nodes",
-    "content": "Node"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Component nodes",
-    "route": "/examples/custom-nodes",
-    "fragment": "component-nodes",
-    "content": " definition Use your new component in "
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Component nodes",
-    "route": "/examples/custom-nodes",
-    "fragment": "component-nodes",
-    "content": "type"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Component nodes",
-    "route": "/examples/custom-nodes",
-    "fragment": "component-nodes",
-    "content": " field of "
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Component nodes",
-    "route": "/examples/custom-nodes",
-    "fragment": "component-nodes",
-    "content": "Node"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Component nodes",
-    "route": "/examples/custom-nodes",
-    "fragment": "component-nodes",
-    "content": ". Library will render your node for you"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Handling events",
-    "route": "/examples/custom-nodes",
-    "fragment": "handling-events",
-    "content": "This is an experimental API"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Handling events",
-    "route": "/examples/custom-nodes",
-    "fragment": "handling-events",
-    "content": "There is a (onComponentNodeEvent) event on VflowComponent. Here is how it works:"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Handling events",
-    "route": "/examples/custom-nodes",
-    "fragment": "handling-events",
-    "content": "It accumulates every "
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Handling events",
-    "route": "/examples/custom-nodes",
-    "fragment": "handling-events",
-    "content": "EventEmitter"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Handling events",
-    "route": "/examples/custom-nodes",
-    "fragment": "handling-events",
-    "content": " of every component node of your flow It emits on every emit of those emitters"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Handling events",
-    "route": "/examples/custom-nodes",
-    "fragment": "handling-events",
-    "content": "The shape of this accumulator-event contains following useful info: The Library also includes ComponentNodeEvent helper type to get type-safe event, where you just need to pass an array of your custom components in generic, and this type will infer proper types for eventName and eventPayload:"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/examples/custom-edges",
-    "fragment": "custom-edges",
-    "content": "You can customize your edges. To achieve this, follow these steps:"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/examples/custom-edges",
-    "fragment": "custom-edges",
-    "content": "Change the edge type to "
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/examples/custom-edges",
-    "fragment": "custom-edges",
-    "content": "template"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/examples/custom-edges",
-    "fragment": "custom-edges",
-    "content": "Create an "
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/examples/custom-edges",
-    "fragment": "custom-edges",
-    "content": "ng-template"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/examples/custom-edges",
-    "fragment": "custom-edges",
-    "content": " with the "
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/examples/custom-edges",
-    "fragment": "custom-edges",
-    "content": "edge"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/examples/custom-edges",
-    "fragment": "custom-edges",
-    "content": " selector inside "
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/examples/custom-edges",
-    "fragment": "custom-edges",
-    "content": "vflow"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/examples/custom-edges",
-    "fragment": "custom-edges",
-    "content": "Create an SVG path which you will customize In the "
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/examples/custom-edges",
-    "fragment": "custom-edges",
-    "content": "ng-template"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/examples/custom-edges",
-    "fragment": "custom-edges",
-    "content": ", the library provides "
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/examples/custom-edges",
-    "fragment": "custom-edges",
-    "content": "let-ctx"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/examples/custom-edges",
-    "fragment": "custom-edges",
-    "content": " with important data for you, such as the "
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/examples/custom-edges",
-    "fragment": "custom-edges",
-    "content": "path"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/examples/custom-edges",
-    "fragment": "custom-edges",
-    "content": " signal with current path. Additionally, the "
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/examples/custom-edges",
-    "fragment": "custom-edges",
-    "content": "edge"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/examples/custom-edges",
-    "fragment": "custom-edges",
-    "content": " field contains current edge from one the "
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/examples/custom-edges",
-    "fragment": "custom-edges",
-    "content": "[edges]"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/examples/custom-edges",
-    "fragment": "custom-edges",
-    "content": ", from which you can retrieve custom "
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/examples/custom-edges",
-    "fragment": "custom-edges",
-    "content": "data"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/examples/custom-edges",
-    "fragment": "custom-edges",
-    "content": ". Furthermore, you can access "
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/examples/custom-edges",
-    "fragment": "custom-edges",
-    "content": "markerStart"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/examples/custom-edges",
-    "fragment": "custom-edges",
-    "content": " and "
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/examples/custom-edges",
-    "fragment": "custom-edges",
-    "content": "markerEnd"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/examples/custom-edges",
-    "fragment": "custom-edges",
-    "content": " signals with markers for current "
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/examples/custom-edges",
-    "fragment": "custom-edges",
-    "content": "edge"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/examples/custom-edges",
-    "fragment": "custom-edges",
-    "content": "."
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Context",
-    "route": "/examples/custom-edges",
-    "fragment": "context",
-    "content": "It's tricky to infer type for let-ctx, so here is an interface with available fields for this context."
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom handles"
-    ],
-    "pageType": "guide",
-    "title": "Custom handles",
-    "section": "Custom handles",
-    "route": "/examples/custom-handles",
-    "fragment": "custom-handles",
-    "content": "You can pass a [template] to HandleComponent with custom handle."
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom handles"
-    ],
-    "pageType": "guide",
-    "title": "Custom handles",
-    "section": "Custom handles",
-    "route": "/examples/custom-handles",
-    "fragment": "custom-handles",
-    "content": "I't important to note that template must be made with SVG."
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom handles"
-    ],
-    "pageType": "guide",
-    "title": "Custom handles",
-    "section": "Custom handles",
-    "route": "/examples/custom-handles",
-    "fragment": "custom-handles",
-    "content": "Custom handles are not positioned automatically, but the library provides a useful template context property to position your handle.Custom handles know if validation of ConnectionSettings.validator() has failed or succeeded, so you can use state() signal in let-ctx to add some behavior based on validation result. Refer to this interface for let-ctx when crafting your handle template:"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom background"
-    ],
-    "pageType": "guide",
-    "title": "Custom background",
-    "section": "Custom background",
-    "route": "/examples/custom-background",
-    "fragment": "custom-background",
-    "content": "You're able to select background for your flow."
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom background"
-    ],
-    "pageType": "guide",
-    "title": "Custom background",
-    "section": "Solid color",
-    "route": "/examples/custom-background",
-    "fragment": "solid-color",
-    "content": "To select a color, simply pass a color string it to the [background] input."
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Custom background"
-    ],
-    "pageType": "guide",
-    "title": "Custom background",
-    "section": "Dots pattern",
-    "route": "/examples/custom-background",
-    "fragment": "dots-pattern",
-    "content": "To make dots pattern, pass an object to the [background] input according to DotsBackground interface"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Default nodes"
-    ],
-    "pageType": "guide",
-    "title": "Default nodes",
-    "section": "Default nodes",
-    "route": "/examples/default-nodes",
-    "fragment": "default-nodes",
-    "content": "To get started, you just need to provide nodes array to vflow component."
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Handling changes"
-    ],
-    "pageType": "guide",
-    "title": "Handling changes",
-    "section": "Handling changes",
-    "route": "/examples/handling-changes",
-    "fragment": "handling-changes",
-    "content": "You can observe changes in the toasts."
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Handling changes"
-    ],
-    "pageType": "guide",
-    "title": "Handling changes",
-    "section": "Handling changes",
-    "route": "/examples/handling-changes",
-    "fragment": "handling-changes",
-    "content": "You can observe various changes in nodes and edges. Types of NodeChanges: position - new node position after drag and dropadd - when node was createdremove - when node was removedselect - when node was selected (also triggers for unselected nodes) Types of EdgeChanges: add - when edge was createdremove - when edge was removedselect - when edge was selected (also triggers for unselected edges)detached - when edge became invisible due to the absence of the source or target node. Use this to delete such edges from the edges list There are a several ways to receive these changes:"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Handling changes"
-    ],
-    "pageType": "guide",
-    "title": "Handling changes",
-    "section": "From (onNodesChange) and (onEdgesChange) outputs",
-    "route": "/examples/handling-changes",
-    "fragment": "from-onnodeschange-and-onedgeschange-outputs",
-    "content": "This is a way to get every possible change. Changes came as non empty arrays: (onNodesChange) emits NodeChange[](onEdgesChange) emits EdgeChange[]"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Handling changes"
-    ],
-    "pageType": "guide",
-    "title": "Handling changes",
-    "section": "From filtered outputs",
-    "route": "/examples/handling-changes",
-    "fragment": "from-filtered-outputs",
-    "content": "For your convenience, here is the filtering scheme for changes based on the (onNodesChange) and (onEdgesChange) events: (onNodesChange.[NodeChangeType]) - a list of node changes of a certain type(onNodesChange.[EdgeChangeType]) - a list of edge changes of a certain type(onNodesChange.[NodeChangeType].[Count]) - a list (many) or single (single) node change of a certain type(onEdgesChange.[EdgeChangeType].[Count]) - a list (many) or single (single) edge change of a certain type Where: List of all possible filter outputs:"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Default edges"
-    ],
-    "pageType": "guide",
-    "title": "Default edges",
-    "section": "Default edges",
-    "route": "/examples/default-edges",
-    "fragment": "default-edges",
-    "content": "You can link nodes with edges. All you need to do is to create another Edge[] array and pass it to the vflow component. Each edge contains the id of the source and target nodes, and each edge must have its own id."
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Labels"
-    ],
-    "pageType": "guide",
-    "title": "Labels",
-    "section": "Labels",
-    "route": "/examples/labels",
-    "fragment": "labels",
-    "content": "You can attach labels to edges by providing the edgeLabels property to the needed Edges. There are three slots available for labels on an edge: start, center, end. The label is only of the html-template type, so you have to provide "
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Labels"
-    ],
-    "pageType": "guide",
-    "title": "Labels",
-    "section": "Labels",
-    "route": "/examples/labels",
-    "fragment": "labels",
-    "content": " inside vflow."
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Labels"
-    ],
-    "pageType": "guide",
-    "title": "Labels",
-    "section": "Context",
-    "route": "/examples/labels",
-    "fragment": "context",
-    "content": "You may access some data for label through let-ctx according to this interface."
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Markers"
-    ],
-    "pageType": "guide",
-    "title": "Markers",
-    "section": "Markers",
-    "route": "/examples/markers",
-    "fragment": "markers",
-    "content": "You can create markers for both edges and connections. Edges: Specify start and end markers for corresponding parts of the edge. Currently, markers are limited to two types: arrow and arrow-closed.Connections: You can specify an end marker using the marker property in ConnectionSettings."
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Draggables"
-    ],
-    "pageType": "guide",
-    "title": "Draggables",
-    "section": "Draggables",
-    "route": "/examples/draggables",
-    "fragment": "draggables",
-    "content": "You can disable draggable behavior on certain nodes."
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Multiple connection points"
-    ],
-    "pageType": "guide",
-    "title": "Multiple connection points",
-    "section": "Multiple connection points",
-    "route": "/examples/multiple-connection-points",
-    "fragment": "multiple-connection-points",
-    "content": "Custom components provide the ability to control handles and their positions. All you need to do is take HandleComponent from library and place it somewhere in your custom node. This component automatically computes its position based on parent element's position."
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Selecting"
-    ],
-    "pageType": "guide",
-    "title": "Selecting",
-    "section": "Selecting",
-    "route": "/examples/selecting",
-    "fragment": "selecting",
-    "content": "Nodes and edges can be selected!"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Selecting"
-    ],
-    "pageType": "guide",
-    "title": "Selecting",
-    "section": "Selecting",
-    "route": "/examples/selecting",
-    "fragment": "selecting",
-    "content": "Default nodes and edges are selectable by default; just click and see that one is selected. Custom nodes and edges are not selectable by default, you need to mark the element that triggers selection with the "
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Selecting"
-    ],
-    "pageType": "guide",
-    "title": "Selecting",
-    "section": "Selecting",
-    "route": "/examples/selecting",
-    "fragment": "selecting",
-    "content": "selectable"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Selecting"
-    ],
-    "pageType": "guide",
-    "title": "Selecting",
-    "section": "Selecting",
-    "route": "/examples/selecting",
-    "fragment": "selecting",
-    "content": " directive."
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Selecting"
-    ],
-    "pageType": "guide",
-    "title": "Selecting",
-    "section": "Selecting",
-    "route": "/examples/selecting",
-    "fragment": "selecting",
-    "content": "Both custom nodes and edges have the selected() signal in their template context for applying styles based on this state."
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Selecting"
-    ],
-    "pageType": "guide",
-    "title": "Selecting",
-    "section": "Disable selecting",
-    "route": "/examples/selecting",
-    "fragment": "disable-selecting",
-    "content": "You can pass [entitiesSelectable]=\"false\" to "
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "Selecting"
-    ],
-    "pageType": "guide",
-    "title": "Selecting",
-    "section": "Disable selecting",
-    "route": "/examples/selecting",
-    "fragment": "disable-selecting",
-    "content": " if you want disable selecting for whole flow."
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "View size"
-    ],
-    "pageType": "guide",
-    "title": "View size",
-    "section": "Auto size",
-    "route": "/examples/view-size",
-    "fragment": "auto-size",
-    "content": "vflow automatically fits it container if you pass view=\"auto\" input"
-  },
-  {
-    "breadcrumbs": [
-      "Examples",
-      "View size"
-    ],
-    "pageType": "guide",
-    "title": "View size",
-    "section": "Fixed size",
-    "route": "/examples/view-size",
-    "fragment": "fixed-size",
-    "content": "vflow can take fixed space if you pass [view]=\"[600, 600]\" input, where first item of array is width (in pixels), and the second is height (in pixels)."
-  },
-  {
-    "breadcrumbs": [
       "Workshops",
       "Delete selected"
     ],
@@ -1429,15 +25,1407 @@
   },
   {
     "breadcrumbs": [
-      "Getting Started",
-      "Roadmap"
+      "Features",
+      "Connection"
     ],
     "pageType": "guide",
-    "title": "Roadmap",
-    "section": "Roadmap",
-    "route": "/getting-started/roadmap",
-    "fragment": "roadmap",
-    "content": "This is a roadmap for ngx-vflow: subflowsmore customization to default nodesimprove consistency across browsers (mainly appeals to Safari)improve documentationmore curvesplugin systemminimapnode rotation/resizingUI controls for flowsupport for layout engines (Dagree, etc.)more complex background (patterns)more events for different actionsmodal system for context menuHTML-based renderer as alternative to current SVG-based rendererExperimental canvas/webgl renderer for insane performance"
+    "title": "Connection",
+    "section": "Connection",
+    "route": "/features/connection",
+    "fragment": "connection",
+    "content": "Edges are not creating automatically. To create a new edge, follow these steps:"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Connection"
+    ],
+    "pageType": "guide",
+    "title": "Connection",
+    "section": "Connection",
+    "route": "/features/connection",
+    "fragment": "connection",
+    "content": "Create handler to the "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Connection"
+    ],
+    "pageType": "guide",
+    "title": "Connection",
+    "section": "Connection",
+    "route": "/features/connection",
+    "fragment": "connection",
+    "content": "(onConnect)"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Connection"
+    ],
+    "pageType": "guide",
+    "title": "Connection",
+    "section": "Connection",
+    "route": "/features/connection",
+    "fragment": "connection",
+    "content": " event This handler accepts a "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Connection"
+    ],
+    "pageType": "guide",
+    "title": "Connection",
+    "section": "Connection",
+    "route": "/features/connection",
+    "fragment": "connection",
+    "content": "Connection"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Connection"
+    ],
+    "pageType": "guide",
+    "title": "Connection",
+    "section": "Connection",
+    "route": "/features/connection",
+    "fragment": "connection",
+    "content": " argument. "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Connection"
+    ],
+    "pageType": "guide",
+    "title": "Connection",
+    "section": "Connection",
+    "route": "/features/connection",
+    "fragment": "connection",
+    "content": "Connection"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Connection"
+    ],
+    "pageType": "guide",
+    "title": "Connection",
+    "section": "Connection",
+    "route": "/features/connection",
+    "fragment": "connection",
+    "content": " is similar to an "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Connection"
+    ],
+    "pageType": "guide",
+    "title": "Connection",
+    "section": "Connection",
+    "route": "/features/connection",
+    "fragment": "connection",
+    "content": "Edge"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Connection"
+    ],
+    "pageType": "guide",
+    "title": "Connection",
+    "section": "Connection",
+    "route": "/features/connection",
+    "fragment": "connection",
+    "content": ", but it doesn't exists in the flow, you need to \"convert\" it into a new "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Connection"
+    ],
+    "pageType": "guide",
+    "title": "Connection",
+    "section": "Connection",
+    "route": "/features/connection",
+    "fragment": "connection",
+    "content": "Edge"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Connection"
+    ],
+    "pageType": "guide",
+    "title": "Connection",
+    "section": "Connection",
+    "route": "/features/connection",
+    "fragment": "connection",
+    "content": "Update the "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Connection"
+    ],
+    "pageType": "guide",
+    "title": "Connection",
+    "section": "Connection",
+    "route": "/features/connection",
+    "fragment": "connection",
+    "content": "Edge[]"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Connection"
+    ],
+    "pageType": "guide",
+    "title": "Connection",
+    "section": "Connection",
+    "route": "/features/connection",
+    "fragment": "connection",
+    "content": " list with the new edge that was created from the "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Connection"
+    ],
+    "pageType": "guide",
+    "title": "Connection",
+    "section": "Connection",
+    "route": "/features/connection",
+    "fragment": "connection",
+    "content": "Connection"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Connection"
+    ],
+    "pageType": "guide",
+    "title": "Connection",
+    "section": "Connection",
+    "route": "/features/connection",
+    "fragment": "connection",
+    "content": "."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Connection"
+    ],
+    "pageType": "guide",
+    "title": "Connection",
+    "section": "Strict connections",
+    "route": "/features/connection",
+    "fragment": "strict-connections",
+    "content": "In the default 'strict' mode of ConnectionSettings, edges are created from connections with strict adherence to the source and target types of the HandleComponent. This means connections can only be established in one direction based on these properties."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Connection"
+    ],
+    "pageType": "guide",
+    "title": "Connection",
+    "section": "Loose connections",
+    "route": "/features/connection",
+    "fragment": "loose-connections",
+    "content": "This is the 'loose' mode of ConnectionSettings, where the flow ignores the handle type and allows any handle to connect with any other handle. In this mode, an id must be provided for the HandleComponent to function correctly."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Curves"
+    ],
+    "pageType": "guide",
+    "title": "Curves",
+    "section": "Curves",
+    "route": "/features/curves",
+    "fragment": "curves",
+    "content": "It's possible to set curve for both the edges and connection."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Connection validation"
+    ],
+    "pageType": "guide",
+    "title": "Connection validation",
+    "section": "Connection validation",
+    "route": "/features/connection-validation",
+    "fragment": "connection-validation",
+    "content": "ngx-vflow supports real-time synchronous validation of connections. Validation occurs when a user attempts to create a new edge. By default, every connection is valid, but you can provide a ConnectionSettings with a validatior callback where you specify the validation logic. For example, in this case, validation only passes connections from node 1 to node 2. If the validator returns false, the (onConnect) event won't be triggered because there is no valid connection."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Choose direction"
+    ],
+    "pageType": "guide",
+    "title": "Choose direction",
+    "section": "Choose direction",
+    "route": "/features/choose-direction",
+    "fragment": "choose-direction",
+    "content": "This API may depricate in future releases"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Choose direction"
+    ],
+    "pageType": "guide",
+    "title": "Choose direction",
+    "section": "Choose direction",
+    "route": "/features/choose-direction",
+    "fragment": "choose-direction",
+    "content": "You can apply global setting for all handles with [handlePositions] input where you set on which side source and target handles should be placed, you can select."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Choose direction"
+    ],
+    "pageType": "guide",
+    "title": "Choose direction",
+    "section": "Right to left direction",
+    "route": "/features/choose-direction",
+    "fragment": "right-to-left-direction",
+    "content": "To archive this direction, you pass { source: 'left', target: 'right' } to [handlePositions]."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Choose direction"
+    ],
+    "pageType": "guide",
+    "title": "Choose direction",
+    "section": "Top to bottom direction",
+    "route": "/features/choose-direction",
+    "fragment": "top-to-bottom-direction",
+    "content": "To archive this direction, you pass { source: 'bottom', target: 'top' } to [handlePositions]."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom background"
+    ],
+    "pageType": "guide",
+    "title": "Custom background",
+    "section": "Custom background",
+    "route": "/features/custom-background",
+    "fragment": "custom-background",
+    "content": "You're able to select background for your flow."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom background"
+    ],
+    "pageType": "guide",
+    "title": "Custom background",
+    "section": "Solid color",
+    "route": "/features/custom-background",
+    "fragment": "solid-color",
+    "content": "To select a color, simply pass a color string it to the [background] input."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom background"
+    ],
+    "pageType": "guide",
+    "title": "Custom background",
+    "section": "Dots pattern",
+    "route": "/features/custom-background",
+    "fragment": "dots-pattern",
+    "content": "To make dots pattern, pass an object to the [background] input according to DotsBackground interface"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Default nodes"
+    ],
+    "pageType": "guide",
+    "title": "Default nodes",
+    "section": "Default nodes",
+    "route": "/features/default-nodes",
+    "fragment": "default-nodes",
+    "content": "To get started, you just need to provide nodes array to vflow component."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom handles"
+    ],
+    "pageType": "guide",
+    "title": "Custom handles",
+    "section": "Custom handles",
+    "route": "/features/custom-handles",
+    "fragment": "custom-handles",
+    "content": "You can pass a [template] to HandleComponent with custom handle."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom handles"
+    ],
+    "pageType": "guide",
+    "title": "Custom handles",
+    "section": "Custom handles",
+    "route": "/features/custom-handles",
+    "fragment": "custom-handles",
+    "content": "I't important to note that template must be made with SVG."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom handles"
+    ],
+    "pageType": "guide",
+    "title": "Custom handles",
+    "section": "Custom handles",
+    "route": "/features/custom-handles",
+    "fragment": "custom-handles",
+    "content": "Custom handles are not positioned automatically, but the library provides a useful template context property to position your handle.Custom handles know if validation of ConnectionSettings.validator() has failed or succeeded, so you can use state() signal in let-ctx to add some behavior based on validation result. Refer to this interface for let-ctx when crafting your handle template:"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/custom-edges",
+    "fragment": "custom-edges",
+    "content": "You can customize your edges. To achieve this, follow these steps:"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/custom-edges",
+    "fragment": "custom-edges",
+    "content": "Change the edge type to "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/custom-edges",
+    "fragment": "custom-edges",
+    "content": "template"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/custom-edges",
+    "fragment": "custom-edges",
+    "content": "Create an "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/custom-edges",
+    "fragment": "custom-edges",
+    "content": "ng-template"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/custom-edges",
+    "fragment": "custom-edges",
+    "content": " with the "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/custom-edges",
+    "fragment": "custom-edges",
+    "content": "edge"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/custom-edges",
+    "fragment": "custom-edges",
+    "content": " selector inside "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/custom-edges",
+    "fragment": "custom-edges",
+    "content": "vflow"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/custom-edges",
+    "fragment": "custom-edges",
+    "content": "Create an SVG path which you will customize In the "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/custom-edges",
+    "fragment": "custom-edges",
+    "content": "ng-template"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/custom-edges",
+    "fragment": "custom-edges",
+    "content": ", the library provides "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/custom-edges",
+    "fragment": "custom-edges",
+    "content": "let-ctx"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/custom-edges",
+    "fragment": "custom-edges",
+    "content": " with important data for you, such as the "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/custom-edges",
+    "fragment": "custom-edges",
+    "content": "path"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/custom-edges",
+    "fragment": "custom-edges",
+    "content": " signal with current path. Additionally, the "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/custom-edges",
+    "fragment": "custom-edges",
+    "content": "edge"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/custom-edges",
+    "fragment": "custom-edges",
+    "content": " field contains current edge from one the "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/custom-edges",
+    "fragment": "custom-edges",
+    "content": "[edges]"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/custom-edges",
+    "fragment": "custom-edges",
+    "content": ", from which you can retrieve custom "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/custom-edges",
+    "fragment": "custom-edges",
+    "content": "data"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/custom-edges",
+    "fragment": "custom-edges",
+    "content": ". Furthermore, you can access "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/custom-edges",
+    "fragment": "custom-edges",
+    "content": "markerStart"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/custom-edges",
+    "fragment": "custom-edges",
+    "content": " and "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/custom-edges",
+    "fragment": "custom-edges",
+    "content": "markerEnd"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/custom-edges",
+    "fragment": "custom-edges",
+    "content": " signals with markers for current "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/custom-edges",
+    "fragment": "custom-edges",
+    "content": "edge"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/custom-edges",
+    "fragment": "custom-edges",
+    "content": "."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Context",
+    "route": "/features/custom-edges",
+    "fragment": "context",
+    "content": "It's tricky to infer type for let-ctx, so here is an interface with available fields for this context."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Default edges"
+    ],
+    "pageType": "guide",
+    "title": "Default edges",
+    "section": "Default edges",
+    "route": "/features/default-edges",
+    "fragment": "default-edges",
+    "content": "You can link nodes with edges. All you need to do is to create another Edge[] array and pass it to the vflow component. Each edge contains the id of the source and target nodes, and each edge must have its own id."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Draggables"
+    ],
+    "pageType": "guide",
+    "title": "Draggables",
+    "section": "Draggables",
+    "route": "/features/draggables",
+    "fragment": "draggables",
+    "content": "You can disable draggable behavior on certain nodes."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Handling changes"
+    ],
+    "pageType": "guide",
+    "title": "Handling changes",
+    "section": "Handling changes",
+    "route": "/features/handling-changes",
+    "fragment": "handling-changes",
+    "content": "You can observe changes in the toasts."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Handling changes"
+    ],
+    "pageType": "guide",
+    "title": "Handling changes",
+    "section": "Handling changes",
+    "route": "/features/handling-changes",
+    "fragment": "handling-changes",
+    "content": "You can observe various changes in nodes and edges. Types of NodeChanges: position - new node position after drag and dropadd - when node was createdremove - when node was removedselect - when node was selected (also triggers for unselected nodes) Types of EdgeChanges: add - when edge was createdremove - when edge was removedselect - when edge was selected (also triggers for unselected edges)detached - when edge became invisible due to the absence of the source or target node. Use this to delete such edges from the edges list There are a several ways to receive these changes:"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Handling changes"
+    ],
+    "pageType": "guide",
+    "title": "Handling changes",
+    "section": "From (onNodesChange) and (onEdgesChange) outputs",
+    "route": "/features/handling-changes",
+    "fragment": "from-onnodeschange-and-onedgeschange-outputs",
+    "content": "This is a way to get every possible change. Changes came as non empty arrays: (onNodesChange) emits NodeChange[](onEdgesChange) emits EdgeChange[]"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Handling changes"
+    ],
+    "pageType": "guide",
+    "title": "Handling changes",
+    "section": "From filtered outputs",
+    "route": "/features/handling-changes",
+    "fragment": "from-filtered-outputs",
+    "content": "For your convenience, here is the filtering scheme for changes based on the (onNodesChange) and (onEdgesChange) events: (onNodesChange.[NodeChangeType]) - a list of node changes of a certain type(onNodesChange.[EdgeChangeType]) - a list of edge changes of a certain type(onNodesChange.[NodeChangeType].[Count]) - a list (many) or single (single) node change of a certain type(onEdgesChange.[EdgeChangeType].[Count]) - a list (many) or single (single) edge change of a certain type Where: List of all possible filter outputs:"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Labels"
+    ],
+    "pageType": "guide",
+    "title": "Labels",
+    "section": "Labels",
+    "route": "/features/labels",
+    "fragment": "labels",
+    "content": "You can attach labels to edges by providing the edgeLabels property to the needed Edges. There are three slots available for labels on an edge: start, center, end. The label is only of the html-template type, so you have to provide "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Labels"
+    ],
+    "pageType": "guide",
+    "title": "Labels",
+    "section": "Labels",
+    "route": "/features/labels",
+    "fragment": "labels",
+    "content": " inside vflow."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Labels"
+    ],
+    "pageType": "guide",
+    "title": "Labels",
+    "section": "Context",
+    "route": "/features/labels",
+    "fragment": "context",
+    "content": "You may access some data for label through let-ctx according to this interface."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Custom nodes",
+    "route": "/features/custom-nodes",
+    "fragment": "custom-nodes",
+    "content": "Be careful with CSS rules applied to node content. Custom nodes are implemented with SVG's foreignObject element, and Safari has issues with some CSS rules inside foreignObject. Therefore, please check this browser when applying complex styling."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Custom nodes",
+    "route": "/features/custom-nodes",
+    "fragment": "custom-nodes",
+    "content": "This is where things become a lot more interesting. You can create custom nodes with HTML and CSS."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Template nodes",
+    "route": "/features/custom-nodes",
+    "fragment": "template-nodes",
+    "content": "You can create custom nodes with ng-template Follow these steps to achieve this:"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Template nodes",
+    "route": "/features/custom-nodes",
+    "fragment": "template-nodes",
+    "content": "Set "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Template nodes",
+    "route": "/features/custom-nodes",
+    "fragment": "template-nodes",
+    "content": "type"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Template nodes",
+    "route": "/features/custom-nodes",
+    "fragment": "template-nodes",
+    "content": " of node to "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Template nodes",
+    "route": "/features/custom-nodes",
+    "fragment": "template-nodes",
+    "content": "html-template"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Template nodes",
+    "route": "/features/custom-nodes",
+    "fragment": "template-nodes",
+    "content": "Provide "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Template nodes",
+    "route": "/features/custom-nodes",
+    "fragment": "template-nodes",
+    "content": "ng-template"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Template nodes",
+    "route": "/features/custom-nodes",
+    "fragment": "template-nodes",
+    "content": " with "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Template nodes",
+    "route": "/features/custom-nodes",
+    "fragment": "template-nodes",
+    "content": "nodeHtml"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Template nodes",
+    "route": "/features/custom-nodes",
+    "fragment": "template-nodes",
+    "content": " selector inside "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Template nodes",
+    "route": "/features/custom-nodes",
+    "fragment": "template-nodes",
+    "content": "vflow"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Template nodes",
+    "route": "/features/custom-nodes",
+    "fragment": "template-nodes",
+    "content": "Write your HTML inside this template You can also pass any data with "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Template nodes",
+    "route": "/features/custom-nodes",
+    "fragment": "template-nodes",
+    "content": "data"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Template nodes",
+    "route": "/features/custom-nodes",
+    "fragment": "template-nodes",
+    "content": " field on node, and then get it inside "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Template nodes",
+    "route": "/features/custom-nodes",
+    "fragment": "template-nodes",
+    "content": "ng-template"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Component nodes",
+    "route": "/features/custom-nodes",
+    "fragment": "component-nodes",
+    "content": "Another approach is to render nodes from components. Its benefits: type-safe node data accessgood for complex flows with many different node types Its limitations it's harder to manage events because such nodes are rendered dynamically How to create component node:"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Component nodes",
+    "route": "/features/custom-nodes",
+    "fragment": "component-nodes",
+    "content": "Create a regular angular standalone component Extend with "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Component nodes",
+    "route": "/features/custom-nodes",
+    "fragment": "component-nodes",
+    "content": "CustomNodeComponent"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Component nodes",
+    "route": "/features/custom-nodes",
+    "fragment": "component-nodes",
+    "content": " (please see the reference of this base component to get an idea of what fields you could use in your custom component node), otherwise it won't work! Pass your data interface to generic of "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Component nodes",
+    "route": "/features/custom-nodes",
+    "fragment": "component-nodes",
+    "content": "CustomNodeComponent"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Component nodes",
+    "route": "/features/custom-nodes",
+    "fragment": "component-nodes",
+    "content": " to use in component. This "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Component nodes",
+    "route": "/features/custom-nodes",
+    "fragment": "component-nodes",
+    "content": "data"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Component nodes",
+    "route": "/features/custom-nodes",
+    "fragment": "component-nodes",
+    "content": " comes from "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Component nodes",
+    "route": "/features/custom-nodes",
+    "fragment": "component-nodes",
+    "content": "Node"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Component nodes",
+    "route": "/features/custom-nodes",
+    "fragment": "component-nodes",
+    "content": " definition Use your new component in "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Component nodes",
+    "route": "/features/custom-nodes",
+    "fragment": "component-nodes",
+    "content": "type"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Component nodes",
+    "route": "/features/custom-nodes",
+    "fragment": "component-nodes",
+    "content": " field of "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Component nodes",
+    "route": "/features/custom-nodes",
+    "fragment": "component-nodes",
+    "content": "Node"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Component nodes",
+    "route": "/features/custom-nodes",
+    "fragment": "component-nodes",
+    "content": ". Library will render your node for you"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Handling events",
+    "route": "/features/custom-nodes",
+    "fragment": "handling-events",
+    "content": "This is an experimental API"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Handling events",
+    "route": "/features/custom-nodes",
+    "fragment": "handling-events",
+    "content": "There is a (onComponentNodeEvent) event on VflowComponent. Here is how it works:"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Handling events",
+    "route": "/features/custom-nodes",
+    "fragment": "handling-events",
+    "content": "It accumulates every "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Handling events",
+    "route": "/features/custom-nodes",
+    "fragment": "handling-events",
+    "content": "EventEmitter"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Handling events",
+    "route": "/features/custom-nodes",
+    "fragment": "handling-events",
+    "content": " of every component node of your flow It emits on every emit of those emitters"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Handling events",
+    "route": "/features/custom-nodes",
+    "fragment": "handling-events",
+    "content": "The shape of this accumulator-event contains following useful info: The Library also includes ComponentNodeEvent helper type to get type-safe event, where you just need to pass an array of your custom components in generic, and this type will infer proper types for eventName and eventPayload:"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Markers"
+    ],
+    "pageType": "guide",
+    "title": "Markers",
+    "section": "Markers",
+    "route": "/features/markers",
+    "fragment": "markers",
+    "content": "You can create markers for both edges and connections. Edges: Specify start and end markers for corresponding parts of the edge. Currently, markers are limited to two types: arrow and arrow-closed.Connections: You can specify an end marker using the marker property in ConnectionSettings."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Selecting"
+    ],
+    "pageType": "guide",
+    "title": "Selecting",
+    "section": "Selecting",
+    "route": "/features/selecting",
+    "fragment": "selecting",
+    "content": "Nodes and edges can be selected!"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Selecting"
+    ],
+    "pageType": "guide",
+    "title": "Selecting",
+    "section": "Selecting",
+    "route": "/features/selecting",
+    "fragment": "selecting",
+    "content": "Default nodes and edges are selectable by default; just click and see that one is selected. Custom nodes and edges are not selectable by default, you need to mark the element that triggers selection with the "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Selecting"
+    ],
+    "pageType": "guide",
+    "title": "Selecting",
+    "section": "Selecting",
+    "route": "/features/selecting",
+    "fragment": "selecting",
+    "content": "selectable"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Selecting"
+    ],
+    "pageType": "guide",
+    "title": "Selecting",
+    "section": "Selecting",
+    "route": "/features/selecting",
+    "fragment": "selecting",
+    "content": " directive."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Selecting"
+    ],
+    "pageType": "guide",
+    "title": "Selecting",
+    "section": "Selecting",
+    "route": "/features/selecting",
+    "fragment": "selecting",
+    "content": "Both custom nodes and edges have the selected() signal in their template context for applying styles based on this state."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Selecting"
+    ],
+    "pageType": "guide",
+    "title": "Selecting",
+    "section": "Disable selecting",
+    "route": "/features/selecting",
+    "fragment": "disable-selecting",
+    "content": "You can pass [entitiesSelectable]=\"false\" to "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Selecting"
+    ],
+    "pageType": "guide",
+    "title": "Selecting",
+    "section": "Disable selecting",
+    "route": "/features/selecting",
+    "fragment": "disable-selecting",
+    "content": " if you want disable selecting for whole flow."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Multiple connection points"
+    ],
+    "pageType": "guide",
+    "title": "Multiple connection points",
+    "section": "Multiple connection points",
+    "route": "/features/multiple-connection-points",
+    "fragment": "multiple-connection-points",
+    "content": "Custom components provide the ability to control handles and their positions. All you need to do is take HandleComponent from library and place it somewhere in your custom node. This component automatically computes its position based on parent element's position."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "View size"
+    ],
+    "pageType": "guide",
+    "title": "View size",
+    "section": "Auto size",
+    "route": "/features/view-size",
+    "fragment": "auto-size",
+    "content": "vflow automatically fits it container if you pass view=\"auto\" input"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "View size"
+    ],
+    "pageType": "guide",
+    "title": "View size",
+    "section": "Fixed size",
+    "route": "/features/view-size",
+    "fragment": "fixed-size",
+    "content": "vflow can take fixed space if you pass [view]=\"[600, 600]\" input, where first item of array is width (in pixels), and the second is height (in pixels)."
   },
   {
     "breadcrumbs": [
@@ -1450,6 +1438,18 @@
     "route": "/getting-started/principles",
     "fragment": "principles",
     "content": "This page contains a list of general principles that impact feature implementation. No hidden mutations of your data. For example, the library does not modify any of the Node or Edge objects you pass in as inputs. Instead, it creates internal models around these entities and operates on them. Any changes to the passed entities can be observed through events.This principle also implies that you are responsible for managing invalid data. For instance, if you delete a node, the edges corresponding to this node will not be deleted automatically. However, the library will notify you about detached edges so that you can easily delete them."
+  },
+  {
+    "breadcrumbs": [
+      "Getting Started",
+      "Roadmap"
+    ],
+    "pageType": "guide",
+    "title": "Roadmap",
+    "section": "Roadmap",
+    "route": "/getting-started/roadmap",
+    "fragment": "roadmap",
+    "content": "This is a roadmap for ngx-vflow: subflowsmore customization to default nodesimprove consistency across browsers (mainly appeals to Safari)improve documentationmore curvesplugin systemminimapnode rotation/resizingUI controls for flowsupport for layout engines (Dagree, etc.)more complex background (patterns)more events for different actionsmodal system for context menuHTML-based renderer as alternative to current SVG-based rendererExperimental canvas/webgl renderer for insane performance"
   },
   {
     "breadcrumbs": [
@@ -1474,6 +1474,19 @@
     "route": "/getting-started/what-is-ngx-vflow",
     "fragment": "main-features",
     "content": "Easy to use: Just describe your flow with a simple API; all of the heavy lifting, such as dragging, zooming, and curve math, is handled by the library for you. Customizable: There is a default design for basic usage, and you can also customize nodes with good old HTML and CSS. Other entities such as edges, connection lines, and handles are also customizable, but it will require a little SVG knowledge. Great performance: Angular signals are the heart and soul of ngx-vflow, which are performant by default, so you shouldn't worry about performance even with large flows. Zoneless: Does not require zone.js"
+  },
+  {
+    "breadcrumbs": [
+      "Workshops",
+      "Layout",
+      "Vizdom layout"
+    ],
+    "pageType": "guide",
+    "title": "Vizdom layout",
+    "section": "Vizdom layout",
+    "route": "/workshops/layout/vizdom-layout",
+    "fragment": "vizdom-layout",
+    "content": "This is an example of using the vizdom library for computing layout."
   },
   {
     "breadcrumbs": [
@@ -1727,6 +1740,57 @@
     "section": "AnyComponentNodeEvent",
     "route": "/api/ngx-vflow/type-aliases/AnyComponentNodeEvent",
     "fragment": "anycomponentnodeevent"
+  },
+  {
+    "breadcrumbs": [
+      "API",
+      "ngx-vflow",
+      "FitViewOptions"
+    ],
+    "pageType": "api",
+    "title": "FitViewOptions",
+    "section": "FitViewOptions",
+    "route": "/api/ngx-vflow/interfaces/FitViewOptions",
+    "fragment": "fitviewoptions"
+  },
+  {
+    "breadcrumbs": [
+      "API",
+      "ngx-vflow",
+      "FitViewOptions"
+    ],
+    "pageType": "api",
+    "title": "FitViewOptions",
+    "section": "Properties",
+    "route": "/api/ngx-vflow/interfaces/FitViewOptions",
+    "fragment": "properties",
+    "content": "Duration of animated transition to new viewport"
+  },
+  {
+    "breadcrumbs": [
+      "API",
+      "ngx-vflow",
+      "FitViewOptions"
+    ],
+    "pageType": "api",
+    "title": "FitViewOptions",
+    "section": "Properties",
+    "route": "/api/ngx-vflow/interfaces/FitViewOptions",
+    "fragment": "properties",
+    "content": "Nodes that should be visible after fitView. The whole flow will be visible if not passed or passed an empty array"
+  },
+  {
+    "breadcrumbs": [
+      "API",
+      "ngx-vflow",
+      "FitViewOptions"
+    ],
+    "pageType": "api",
+    "title": "FitViewOptions",
+    "section": "Properties",
+    "route": "/api/ngx-vflow/interfaces/FitViewOptions",
+    "fragment": "properties",
+    "content": "Padding for viewport"
   },
   {
     "breadcrumbs": [
@@ -2022,32 +2086,6 @@
     "section": "Properties",
     "route": "/api/ngx-vflow/classes/VflowComponent",
     "fragment": "properties",
-    "content": "Maximum zoom value"
-  },
-  {
-    "breadcrumbs": [
-      "API",
-      "ngx-vflow",
-      "VflowComponent"
-    ],
-    "pageType": "api",
-    "title": "VflowComponent",
-    "section": "Properties",
-    "route": "/api/ngx-vflow/classes/VflowComponent",
-    "fragment": "properties",
-    "content": "Minimum zoom value"
-  },
-  {
-    "breadcrumbs": [
-      "API",
-      "ngx-vflow",
-      "VflowComponent"
-    ],
-    "pageType": "api",
-    "title": "VflowComponent",
-    "section": "Properties",
-    "route": "/api/ngx-vflow/classes/VflowComponent",
-    "fragment": "properties",
     "content": "Signal for reading nodes change"
   },
   {
@@ -2153,6 +2191,32 @@
     "route": "/api/ngx-vflow/classes/VflowComponent",
     "fragment": "accessors",
     "content": "Object that controls flow direction. For example, if you want to archieve right to left direction then you need to pass these positions { source: 'left', target: 'right' }"
+  },
+  {
+    "breadcrumbs": [
+      "API",
+      "ngx-vflow",
+      "VflowComponent"
+    ],
+    "pageType": "api",
+    "title": "VflowComponent",
+    "section": "Accessors",
+    "route": "/api/ngx-vflow/classes/VflowComponent",
+    "fragment": "accessors",
+    "content": "Maximum zoom value"
+  },
+  {
+    "breadcrumbs": [
+      "API",
+      "ngx-vflow",
+      "VflowComponent"
+    ],
+    "pageType": "api",
+    "title": "VflowComponent",
+    "section": "Accessors",
+    "route": "/api/ngx-vflow/classes/VflowComponent",
+    "fragment": "accessors",
+    "content": "Minimum zoom value"
   },
   {
     "breadcrumbs": [

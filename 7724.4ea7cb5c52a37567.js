@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkngx_vflow_demo=self.webpackChunkngx_vflow_demo||[]).push([[7724],{7724:(d,l,t)=>{t.r(l),t.d(l,{default:()=>o});const o=[{path:"",redirectTo:"vizdom-layout",pathMatch:"full"},{path:"",title:"Layout",children:[{path:"vizdom-layout",loadChildren:()=>Promise.all([t.e(7134),t.e(5535),t.e(8592),t.e(1901)]).then(t.bind(t,1901))}]}]}}]);
