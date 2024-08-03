@@ -1,6 +1,6 @@
 import { publishFacade } from "@angular/compiler"
 import { ChangeDetectionStrategy, Component, WritableSignal, signal } from "@angular/core"
-import { VflowModule, Node, Edge, CustomNodeComponent, Connection, ComponentNode, SharedNode, DefaultNode, ConnectionSettings } from "projects/ngx-vflow-lib/src/public-api"
+import { VflowModule, Node, Edge, CustomNodeComponent, Connection, ComponentNode, DefaultNode, ConnectionSettings } from "projects/ngx-vflow-lib/src/public-api"
 
 @Component({
   template: `<vflow
@@ -169,11 +169,11 @@ export class AllFeaturesDemoComponent {
   }
 }
 
-function isComponentNode<T>(n: Node<T>): n is SharedNode & ComponentNode<T> {
+function isComponentNode<T>(n: Node<T>): n is ComponentNode<T> {
   return CustomNodeComponent.isPrototypeOf(n.type)
 }
 
-function isDefaultNode(n: Node): n is SharedNode & DefaultNode {
+function isDefaultNode(n: Node): n is DefaultNode {
   return n.type === 'default'
 }
 

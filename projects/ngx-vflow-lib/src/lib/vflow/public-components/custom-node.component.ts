@@ -1,5 +1,5 @@
 import { DestroyRef, Directive, EventEmitter, Input, OnInit, inject, signal } from "@angular/core"
-import { ComponentNode, SharedNode } from '../interfaces/node.interface';
+import { ComponentNode } from '../interfaces/node.interface';
 import { ComponentEventBusService } from "../services/component-event-bus.service";
 import { merge, tap } from "rxjs";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
@@ -14,7 +14,7 @@ export abstract class CustomNodeComponent<T = unknown> implements OnInit {
    * Reference to node bound to this component
    */
   @Input()
-  public node!: SharedNode & ComponentNode<T>
+  public node!: ComponentNode<T>
 
   @Input()
   public set _selected(value: boolean) {
