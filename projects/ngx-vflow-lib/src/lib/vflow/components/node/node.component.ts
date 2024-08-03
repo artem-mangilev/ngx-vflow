@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Injector, Input, OnDestroy, OnInit, TemplateRef, ViewChild, computed, inject } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Injector, Input, OnDestroy, OnInit, TemplateRef, ViewChild, computed, effect, inject } from '@angular/core';
 import { DraggableService } from '../../services/draggable.service';
 import { NodeModel } from '../../models/node.model';
 import { FlowStatusService } from '../../services/flow-status.service';
@@ -13,6 +13,7 @@ import { FlowSettingsService } from '../../services/flow-settings.service';
 import { SelectionService } from '../../services/selection.service';
 import { ConnectionControllerDirective } from '../../directives/connection-controller.directive';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { isDynamicNode } from '../../interfaces/node.interface';
 
 export type HandleState = 'valid' | 'invalid' | 'idle'
 
@@ -79,10 +80,21 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInje
   @InjectionContext
   public ngAfterViewInit(): void {
     if (this.nodeModel.node.type === 'default') {
-      this.nodeModel.size.set({
-        width: this.nodeModel.node.width ?? NodeModel.defaultTypeSize.width,
-        height: this.nodeModel.node.height ?? NodeModel.defaultTypeSize.height
-      })
+      const node = this.nodeModel.node
+      if (isDynamicNode(node)) {
+        // TODO bad
+        effect(() => {
+          this.nodeModel.size.set({
+            width: node.width?.() ?? NodeModel.defaultTypeSize.width,
+            height: node.width?.() ?? NodeModel.defaultTypeSize.height,
+          })
+        }, { allowSignalWrites: true })
+      } else {
+        this.nodeModel.size.set({
+          width: node.width ?? NodeModel.defaultTypeSize.width,
+          height: node.height ?? NodeModel.defaultTypeSize.height
+        })
+      }
     }
 
     if (this.nodeModel.node.type === 'html-template' || this.nodeModel.isComponentType) {

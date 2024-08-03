@@ -15,7 +15,7 @@
     [style.max-width]="styleWidth()"
     [style.max-height]="styleHeight()"
   >
-    <div [outerHTML]="nodeModel.node.text ?? ''"></div>
+    <div [outerHTML]="nodeModel.text()"></div>
 
     <handle type="source" [position]="nodeModel.sourcePosition()" />
     <handle type="target" [position]="nodeModel.targetPosition()" />

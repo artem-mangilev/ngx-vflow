@@ -1,5 +1,5 @@
-import { Type, computed, inject, signal } from '@angular/core'
-import { Node } from '../interfaces/node.interface'
+import { Signal, Type, computed, effect, inject, signal } from '@angular/core'
+import { DynamicNode, Node, isDynamicNode } from '../interfaces/node.interface'
 import { isDefined } from '../utils/is-defined'
 import { toObservable, toSignal } from '@angular/core/rxjs-interop'
 import { HandleModel } from './handle.model'
@@ -51,8 +51,13 @@ export class NodeModel<T = unknown> implements FlowEntity {
   // disabled for configuration for now
   public readonly magnetRadius = 20
 
+  // TODO: not sure if we need to statically store it
   public isComponentType = CustomNodeComponent.isPrototypeOf(this.node.type)
 
+  // Default node specific thing
+  public text = this.createTextSignal()
+
+  // Component node specific thing
   public componentTypeInputs = computed(() => {
     return {
       node: this.node,
@@ -61,14 +66,35 @@ export class NodeModel<T = unknown> implements FlowEntity {
   })
 
   constructor(
-    public node: Node<T>
+    public node: Node<T> | DynamicNode<T>
   ) {
-    this.setPoint(node.point)
+    if (isDynamicNode(node)) {
+      effect(() => this.setPoint(node.point()))
+    } else {
+      this.setPoint(node.point)
+    }
 
-    if (isDefined(node.draggable)) this.draggable = node.draggable
+    // TODO: make reactive
+    if (isDefined(node.draggable)) {
+      this.draggable = isDynamicNode(node) ? node.draggable() : node.draggable
+    }
   }
 
   public setPoint(point: Point) {
     this.internalPoint$.next(point);
+  }
+
+  private createTextSignal(): Signal<string> {
+    const node = this.node
+
+    if (node.type === 'default') {
+      if (isDynamicNode(node)) {
+        return node.text ?? signal('')
+      } else {
+        return signal(node.text ?? '')
+      }
+    }
+
+    return signal('')
   }
 }
