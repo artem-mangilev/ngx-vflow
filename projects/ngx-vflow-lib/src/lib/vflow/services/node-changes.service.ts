@@ -1,8 +1,12 @@
-import { Injectable, Signal, computed, inject } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { FlowEntitiesService } from './flow-entities.service';
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { Observable, animationFrameScheduler, asyncScheduler, distinctUntilChanged, filter, map, merge, observeOn, of, pairwise, skip, switchMap } from 'rxjs';
+import { toObservable, } from '@angular/core/rxjs-interop';
+import { Observable, asyncScheduler, distinctUntilChanged, filter, map, merge, observeOn, pairwise, skip, switchMap } from 'rxjs';
 import { NodeChange } from '../types/node-change.type';
+
+// this delay fixes the cases when change triggered
+// but the flow not yet fylly re-rendered
+const DELAY_FOR_SCHEDULER = 25
 
 @Injectable()
 export class NodesChangeService {
@@ -79,6 +83,6 @@ export class NodesChangeService {
   ).pipe(
     // this fixes a bug when on fire node event change,
     // you can't get valid list of detached edges
-    observeOn(animationFrameScheduler),
+    observeOn(asyncScheduler, DELAY_FOR_SCHEDULER),
   )
 }

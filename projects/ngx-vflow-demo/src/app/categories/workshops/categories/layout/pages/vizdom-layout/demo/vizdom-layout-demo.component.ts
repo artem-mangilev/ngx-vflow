@@ -118,9 +118,6 @@ export class VizdomLayoutDemoComponent implements OnInit {
       }
     })
     this.edges = edgesToLayout
-
-    // Free the rust memory
-    graph.free()
   }
 }
 
@@ -135,10 +132,4 @@ function randomHex() {
   }
 
   return hex
-}
-
-// For some reason vizdom has no these types so we declare them
-declare module '@vizdom/vizdom-ts-esm' {
-  type FontSize = any;
-  type PenWidth = any;
 }
