@@ -5,7 +5,7 @@ import { toObservable, toSignal } from '@angular/core/rxjs-interop'
 import { HandleModel } from './handle.model'
 import { FlowEntity } from '../interfaces/flow-entity.interface'
 import { FlowSettingsService } from '../services/flow-settings.service'
-import { BehaviorSubject, animationFrameScheduler, observeOn } from 'rxjs'
+import { BehaviorSubject, animationFrameScheduler, observeOn, skip, startWith, tap } from 'rxjs'
 import { Point } from '../interfaces/point.interface'
 import { CustomNodeComponent } from '../public-components/custom-node.component'
 
@@ -17,14 +17,14 @@ export class NodeModel<T = unknown> implements FlowEntity {
 
   private flowSettingsService = inject(FlowSettingsService)
 
-  private internalPoint$ = new BehaviorSubject({ x: 0, y: 0 })
+  private internalPoint = this.createInternalPointSignal()
 
-  private throttledPoint$ = this.internalPoint$.pipe(
+  private throttledPoint$ = toObservable(this.internalPoint).pipe(
     observeOn(animationFrameScheduler)
   )
 
   public point = toSignal(this.throttledPoint$, {
-    initialValue: this.internalPoint$.getValue()
+    initialValue: this.internalPoint()
   })
 
   public point$ = this.throttledPoint$;
@@ -68,12 +68,6 @@ export class NodeModel<T = unknown> implements FlowEntity {
   constructor(
     public node: Node<T> | DynamicNode<T>
   ) {
-    if (isDynamicNode(node)) {
-      effect(() => this.setPoint(node.point()))
-    } else {
-      this.setPoint(node.point)
-    }
-
     // TODO: make reactive
     if (isDefined(node.draggable)) {
       this.draggable = isDynamicNode(node) ? node.draggable() : node.draggable
@@ -81,7 +75,7 @@ export class NodeModel<T = unknown> implements FlowEntity {
   }
 
   public setPoint(point: Point) {
-    this.internalPoint$.next(point);
+    this.internalPoint.set(point);
   }
 
   private createTextSignal(): Signal<string> {
@@ -96,5 +90,11 @@ export class NodeModel<T = unknown> implements FlowEntity {
     }
 
     return signal('')
+  }
+
+  private createInternalPointSignal() {
+    return isDynamicNode(this.node)
+      ? this.node.point
+      : signal({ x: this.node.point.x, y: this.node.point.y })
   }
 }
