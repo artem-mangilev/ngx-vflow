@@ -5,15 +5,13 @@ import { toObservable, toSignal } from '@angular/core/rxjs-interop'
 import { HandleModel } from './handle.model'
 import { FlowEntity } from '../interfaces/flow-entity.interface'
 import { FlowSettingsService } from '../services/flow-settings.service'
-import { BehaviorSubject, animationFrameScheduler, observeOn, skip, startWith, tap } from 'rxjs'
+import { animationFrameScheduler, observeOn, } from 'rxjs'
 import { Point } from '../interfaces/point.interface'
 import { CustomNodeComponent } from '../public-components/custom-node.component'
 
 export class NodeModel<T = unknown> implements FlowEntity {
-  public static defaultTypeSize = {
-    width: 100,
-    height: 50
-  }
+  private static defaultWidth = 100
+  private static defaultHeight = 50
 
   private flowSettingsService = inject(FlowSettingsService)
 
@@ -76,6 +74,29 @@ export class NodeModel<T = unknown> implements FlowEntity {
 
   public setPoint(point: Point) {
     this.internalPoint.set(point);
+  }
+
+  /**
+   * TODO find the way to implement this better
+   */
+  public linkDefaultNodeSizeWithModelSize() {
+    const node = this.node
+
+    if (node.type === 'default') {
+      if (isDynamicNode(node)) {
+        effect(() => {
+          this.size.set({
+            width: node.width?.() ?? NodeModel.defaultWidth,
+            height: node.height?.() ?? NodeModel.defaultHeight,
+          })
+        }, { allowSignalWrites: true })
+      } else {
+        this.size.set({
+          width: node.width ?? NodeModel.defaultWidth,
+          height: node.height ?? NodeModel.defaultHeight
+        })
+      }
+    }
   }
 
   private createTextSignal(): Signal<string> {

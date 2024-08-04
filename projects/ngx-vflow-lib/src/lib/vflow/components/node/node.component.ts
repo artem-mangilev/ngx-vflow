@@ -79,23 +79,7 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInje
   @Microtask // TODO (performance) check if we need microtask here
   @InjectionContext
   public ngAfterViewInit(): void {
-    if (this.nodeModel.node.type === 'default') {
-      const node = this.nodeModel.node
-      if (isDynamicNode(node)) {
-        // TODO bad
-        effect(() => {
-          this.nodeModel.size.set({
-            width: node.width?.() ?? NodeModel.defaultTypeSize.width,
-            height: node.width?.() ?? NodeModel.defaultTypeSize.height,
-          })
-        }, { allowSignalWrites: true })
-      } else {
-        this.nodeModel.size.set({
-          width: node.width ?? NodeModel.defaultTypeSize.width,
-          height: node.height ?? NodeModel.defaultTypeSize.height
-        })
-      }
-    }
+    this.nodeModel.linkDefaultNodeSizeWithModelSize()
 
     if (this.nodeModel.node.type === 'html-template' || this.nodeModel.isComponentType) {
       resizable([this.htmlWrapperRef.nativeElement])
