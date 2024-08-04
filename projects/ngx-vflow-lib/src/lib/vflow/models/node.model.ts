@@ -44,7 +44,7 @@ export class NodeModel<T = unknown> implements FlowEntity {
 
   public handles$ = toObservable(this.handles)
 
-  public draggable = true
+  public draggable = signal(true)
 
   // disabled for configuration for now
   public readonly magnetRadius = 20
@@ -66,9 +66,12 @@ export class NodeModel<T = unknown> implements FlowEntity {
   constructor(
     public node: Node<T> | DynamicNode<T>
   ) {
-    // TODO: make reactive
     if (isDefined(node.draggable)) {
-      this.draggable = isDynamicNode(node) ? node.draggable() : node.draggable
+      if (isDynamicNode(node)) {
+        this.draggable = node.draggable
+      } else {
+        this.draggable.set(node.draggable)
+      }
     }
   }
 

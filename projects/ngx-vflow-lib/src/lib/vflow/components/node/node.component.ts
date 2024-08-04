@@ -60,7 +60,13 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInje
   public ngOnInit() {
     this.handleService.node.set(this.nodeModel);
 
-    this.draggableService.toggleDraggable(this.hostRef.nativeElement, this.nodeModel)
+    effect(() => {
+      if (this.nodeModel.draggable()) {
+        this.draggableService.enable(this.hostRef.nativeElement, this.nodeModel)
+      } else {
+        this.draggableService.disable(this.hostRef.nativeElement)
+      }
+    })
 
     this.nodeModel.handles$
       .pipe(
