@@ -69,3 +69,10 @@ export function isComponentNode(node: Node | DynamicNode) {
   return CustomNodeComponent.isPrototypeOf(node.type) ||
     CustomDynamicNodeComponent.isPrototypeOf(node.type)
 }
+
+export function isTemplateNode<T>(node: Node): node is ComponentNode<T>
+export function isTemplateNode<T>(node: DynamicNode): node is ComponentDynamicNode<T>
+export function isTemplateNode(node: Node | DynamicNode) {
+  return node.type === 'html-template'
+}
+
