@@ -62,3 +62,10 @@ export interface ComponentDynamicNode<T = unknown> extends SharedDynamicNode {
 export function isDynamicNode(node: Node | DynamicNode): node is DynamicNode {
   return typeof node.point === 'function'
 }
+
+export function isComponentNode<T>(node: Node): node is ComponentNode<T>
+export function isComponentNode<T>(node: DynamicNode): node is ComponentDynamicNode<T>
+export function isComponentNode(node: Node | DynamicNode) {
+  return CustomNodeComponent.isPrototypeOf(node.type) ||
+    CustomDynamicNodeComponent.isPrototypeOf(node.type)
+}
