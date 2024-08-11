@@ -226,19 +226,19 @@ interface ComplexCustomNodeData {
 @Component({
   template: `<div class="node">
     <div class="control-wrapper">
-      <input class="input" [value]="node.data?.id?.one()">
+      <input class="input" [value]="data()?.id?.one()">
 
       <handle type="target" position="left" id="one" [template]="squareHandleTemplate" />
     </div>
 
     <div class="control-wrapper">
-      <input class="input" [value]="node.data?.id?.two()">
+      <input class="input" [value]="data()?.id?.two()">
 
       <handle type="target" position="left" id="two" [template]="squareHandleTemplate"  />
     </div>
 
     <div class="control-wrapper control-wrapper_last">
-      <input class="input"  [value]="node.data?.id?.three()">
+      <input class="input"  [value]="data()?.id?.three()">
 
       <handle type="target" position="left" id="three" [template]="squareHandleTemplate" />
     </div>

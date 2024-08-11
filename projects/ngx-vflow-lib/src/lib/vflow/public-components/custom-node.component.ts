@@ -26,7 +26,13 @@ export abstract class CustomNodeComponent<T = unknown> implements OnInit {
    */
   public selected = signal(false)
 
+  public data = signal<T | undefined>(undefined)
+
   public ngOnInit(): void {
+    if (this.node.data) {
+      this.data.set(this.node.data)
+    }
+
     this.trackEvents()
   }
 

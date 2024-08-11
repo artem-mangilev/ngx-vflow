@@ -59,7 +59,7 @@ interface RedSquareData {
 @Component({
   template: `
     <div class="red-square" (click)="onClick()">
-      {{ node.data?.redSquareText }}
+      {{ data()?.redSquareText }}
 
       <handle type="source" position="right"/>
     </div>
@@ -98,7 +98,7 @@ interface BlueSquareData {
 @Component({
   template: `
     <div class="blue-square" (click)="onClick()">
-      {{ node.data?.blueSquareText }}
+      {{ data()?.blueSquareText }}
 
       <handle type="target" position="left"/>
     </div>
