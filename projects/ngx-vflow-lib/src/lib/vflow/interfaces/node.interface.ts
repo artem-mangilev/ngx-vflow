@@ -1,6 +1,7 @@
 import { Type, WritableSignal } from "@angular/core"
 import { Point } from "./point.interface"
 import { CustomNodeComponent } from "../public-components/custom-node.component"
+import { CustomDynamicNodeComponent } from "../public-components/custom-dynamic-node.component"
 
 export type Node<T = unknown> =
   DefaultNode |
@@ -54,7 +55,7 @@ export interface ComponentNode<T = unknown> extends SharedNode {
 }
 
 export interface ComponentDynamicNode<T = unknown> extends SharedDynamicNode {
-  type: Type<CustomNodeComponent<T>>
+  type: Type<CustomDynamicNodeComponent<T>>
   data?: WritableSignal<T>
 }
 

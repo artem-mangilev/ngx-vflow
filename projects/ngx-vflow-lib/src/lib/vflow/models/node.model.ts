@@ -8,6 +8,7 @@ import { FlowSettingsService } from '../services/flow-settings.service'
 import { animationFrameScheduler, observeOn, } from 'rxjs'
 import { Point } from '../interfaces/point.interface'
 import { CustomNodeComponent } from '../public-components/custom-node.component'
+import { CustomDynamicNodeComponent } from '../public-components/custom-dynamic-node.component'
 
 export class NodeModel<T = unknown> implements FlowEntity {
   private static defaultWidth = 100
@@ -50,7 +51,9 @@ export class NodeModel<T = unknown> implements FlowEntity {
   public readonly magnetRadius = 20
 
   // TODO: not sure if we need to statically store it
-  public isComponentType = CustomNodeComponent.isPrototypeOf(this.node.type)
+  public isComponentType =
+    CustomNodeComponent.isPrototypeOf(this.node.type) ||
+    CustomDynamicNodeComponent.isPrototypeOf(this.node.type)
 
   // Default node specific thing
   public text = this.createTextSignal()
