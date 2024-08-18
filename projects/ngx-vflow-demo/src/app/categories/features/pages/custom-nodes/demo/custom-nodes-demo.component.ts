@@ -1,11 +1,10 @@
-import { NgIf } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnInit, signal } from '@angular/core';
-import { DynamicNode, Edge, isTemplateNode, Node, VflowModule } from 'projects/ngx-vflow-lib/src/public-api';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { DynamicNode, Edge, VflowModule } from 'projects/ngx-vflow-lib/src/public-api';
 
 @Component({
   template: `<vflow [nodes]="nodes" [edges]="edges">
     <ng-template nodeHtml let-ctx>
-      <div class="custom-node" [class.custom-node_selected]="ctx.selected()">
+      <div class="custom-node" selectable [class.custom-node_selected]="ctx.selected()">
         {{ ctx.node.data().text }}
 
         <handle type="source" position="right"/>
@@ -26,7 +25,7 @@ import { DynamicNode, Edge, isTemplateNode, Node, VflowModule } from 'projects/n
         padding-right: 5px;
 
         &_selected {
-          border: 2px solid red;
+          border: 2px solid gray;
         }
       }
     `
