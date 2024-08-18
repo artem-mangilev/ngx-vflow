@@ -63,21 +63,26 @@ export function isDynamicNode(node: Node | DynamicNode): node is DynamicNode {
   return typeof node.point === 'function'
 }
 
-export function isComponentNode<T>(node: Node): node is ComponentNode<T>
-export function isComponentNode<T>(node: DynamicNode): node is ComponentDynamicNode<T>
-export function isComponentNode(node: Node | DynamicNode) {
-  return CustomNodeComponent.isPrototypeOf(node.type) ||
-    CustomDynamicNodeComponent.isPrototypeOf(node.type)
+export function isComponentStaticNode<T>(node: Node): node is ComponentNode<T> {
+  return CustomNodeComponent.isPrototypeOf(node.type)
 }
 
-export function isTemplateNode<T>(node: Node): node is HtmlTemplateNode<T>
-export function isTemplateNode<T>(node: DynamicNode): node is HtmlTemplateDynamicNode<T>
-export function isTemplateNode(node: Node | DynamicNode) {
+export function isComponentDynamicNode<T>(node: DynamicNode): node is ComponentDynamicNode<T> {
+  return CustomDynamicNodeComponent.isPrototypeOf(node.type)
+}
+
+export function isTemplateStaticNode<T>(node: Node): node is HtmlTemplateNode<T> {
   return node.type === 'html-template'
 }
 
-export function isDefaultNode(node: Node): node is DefaultNode
-export function isDefaultNode(node: DynamicNode): node is DefaultDynamicNode
-export function isDefaultNode(node: Node | DynamicNode) {
+export function isTemplateDynamicNode<T>(node: DynamicNode): node is HtmlTemplateDynamicNode<T> {
+  return node.type === 'html-template'
+}
+
+export function isDefaultStaticNode(node: Node): node is DefaultNode {
+  return node.type === 'default'
+}
+
+export function isDefaultDynamicNode(node: DynamicNode): node is DefaultDynamicNode {
   return node.type === 'default'
 }
