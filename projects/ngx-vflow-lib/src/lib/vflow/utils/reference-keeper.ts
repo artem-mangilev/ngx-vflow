@@ -1,5 +1,5 @@
 import { NodeModel } from "../models/node.model";
-import { Node } from '../interfaces/node.interface';
+import { DynamicNode, Node } from '../interfaces/node.interface';
 import { EdgeModel } from "../models/edge.model";
 import { Edge } from "../interfaces/edge.interface";
 
@@ -7,8 +7,8 @@ export class ReferenceKeeper {
   /**
    * Create new models for new node references and keep old models for old node references
    */
-  public static nodes(newNodes: Node[], oldNodeModels: NodeModel[]) {
-    const oldNodesMap: Map<Node, NodeModel> = new Map()
+  public static nodes(newNodes: Node[] | DynamicNode[], oldNodeModels: NodeModel[]) {
+    const oldNodesMap: Map<Node | DynamicNode, NodeModel> = new Map()
     oldNodeModels.forEach(model => oldNodesMap.set(model.node, model))
 
     return newNodes.map(newNode => {

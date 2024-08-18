@@ -1,6 +1,5 @@
-import { publishFacade } from "@angular/compiler"
 import { ChangeDetectionStrategy, Component, WritableSignal, signal } from "@angular/core"
-import { VflowModule, Node, Edge, CustomNodeComponent, Connection, ComponentNode, SharedNode, DefaultNode, ConnectionSettings } from "projects/ngx-vflow-lib/src/public-api"
+import { VflowModule, Node, Edge, CustomNodeComponent, Connection, ConnectionSettings, isComponentStaticNode, isDefaultStaticNode } from "projects/ngx-vflow-lib/src/public-api"
 
 @Component({
   template: `<vflow
@@ -117,12 +116,11 @@ export class AllFeaturesDemoComponent {
   handleConnect(connection: Connection) {
     if (connection.target === '4') {
       const data = this.nodes
-        .filter(isComponentNode)
-        .find(n => n.id === '4')
-        ?.data as ComplexCustomNodeData
+        .filter(isComponentStaticNode)
+        .find(n => n.id === '4')?.data as ComplexCustomNodeData
 
       const sourceNode = this.nodes
-        .filter(isDefaultNode)
+        .filter(isDefaultStaticNode)
         .find(n => n.id === connection.source)
 
       if (sourceNode) {
@@ -167,14 +165,6 @@ export class AllFeaturesDemoComponent {
   public deleteEdge(edge: Edge) {
     this.edges = this.edges.filter(e => e !== edge)
   }
-}
-
-function isComponentNode<T>(n: Node<T>): n is SharedNode & ComponentNode<T> {
-  return CustomNodeComponent.isPrototypeOf(n.type)
-}
-
-function isDefaultNode(n: Node): n is SharedNode & DefaultNode {
-  return n.type === 'default'
 }
 
 function randomHex() {
@@ -226,19 +216,19 @@ interface ComplexCustomNodeData {
 @Component({
   template: `<div class="node">
     <div class="control-wrapper">
-      <input class="input" [value]="node.data?.id?.one()">
+      <input class="input" [value]="data()?.id?.one()">
 
       <handle type="target" position="left" id="one" [template]="squareHandleTemplate" />
     </div>
 
     <div class="control-wrapper">
-      <input class="input" [value]="node.data?.id?.two()">
+      <input class="input" [value]="data()?.id?.two()">
 
       <handle type="target" position="left" id="two" [template]="squareHandleTemplate"  />
     </div>
 
     <div class="control-wrapper control-wrapper_last">
-      <input class="input"  [value]="node.data?.id?.three()">
+      <input class="input"  [value]="data()?.id?.three()">
 
       <handle type="target" position="left" id="three" [template]="squareHandleTemplate" />
     </div>

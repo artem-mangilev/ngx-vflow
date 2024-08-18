@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Injector, Input, OnDestroy, OnInit, TemplateRef, ViewChild, computed, inject } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Injector, Input, OnDestroy, OnInit, TemplateRef, ViewChild, computed, effect, inject } from '@angular/core';
 import { DraggableService } from '../../services/draggable.service';
 import { NodeModel } from '../../models/node.model';
 import { FlowStatusService } from '../../services/flow-status.service';
@@ -13,6 +13,7 @@ import { FlowSettingsService } from '../../services/flow-settings.service';
 import { SelectionService } from '../../services/selection.service';
 import { ConnectionControllerDirective } from '../../directives/connection-controller.directive';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { isDynamicNode } from '../../interfaces/node.interface';
 
 export type HandleState = 'valid' | 'invalid' | 'idle'
 
@@ -59,7 +60,13 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInje
   public ngOnInit() {
     this.handleService.node.set(this.nodeModel);
 
-    this.draggableService.toggleDraggable(this.hostRef.nativeElement, this.nodeModel)
+    effect(() => {
+      if (this.nodeModel.draggable()) {
+        this.draggableService.enable(this.hostRef.nativeElement, this.nodeModel)
+      } else {
+        this.draggableService.disable(this.hostRef.nativeElement)
+      }
+    })
 
     this.nodeModel.handles$
       .pipe(
@@ -78,12 +85,7 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInje
   @Microtask // TODO (performance) check if we need microtask here
   @InjectionContext
   public ngAfterViewInit(): void {
-    if (this.nodeModel.node.type === 'default') {
-      this.nodeModel.size.set({
-        width: this.nodeModel.node.width ?? NodeModel.defaultTypeSize.width,
-        height: this.nodeModel.node.height ?? NodeModel.defaultTypeSize.height
-      })
-    }
+    this.nodeModel.linkDefaultNodeSizeWithModelSize()
 
     if (this.nodeModel.node.type === 'html-template' || this.nodeModel.isComponentType) {
       resizable([this.htmlWrapperRef.nativeElement])

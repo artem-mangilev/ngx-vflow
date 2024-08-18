@@ -1,5 +1,5 @@
 import { AfterContentInit, ChangeDetectionStrategy, Component, ContentChild, EventEmitter, Injector, Input, OnChanges, Output, Signal, SimpleChanges, ViewChild, computed, effect, inject, runInInjectionContext } from '@angular/core';
-import { Node } from '../../interfaces/node.interface';
+import { DynamicNode, Node } from '../../interfaces/node.interface';
 import { MapContextDirective } from '../../directives/map-context.directive';
 import { DraggableService } from '../../services/draggable.service';
 import { NodeModel } from '../../models/node.model';
@@ -176,7 +176,7 @@ export class VflowComponent {
    * Nodes to render
    */
   @Input({ required: true })
-  public set nodes(newNodes: Node[]) {
+  public set nodes(newNodes: Node[] | DynamicNode[]) {
     const newModels = runInInjectionContext(this.injector,
       () => ReferenceKeeper.nodes(newNodes, this.flowEntitiesService.nodes())
     )
@@ -315,7 +315,7 @@ export class VflowComponent {
    *
    * @param id node id
    */
-  public getNode<T = unknown>(id: string): Node<T> | undefined {
+  public getNode<T = unknown>(id: string): Node<T> | DynamicNode<T> | undefined {
     return this.flowEntitiesService.getNode<T>(id)?.node
   }
 
