@@ -39,3 +39,7 @@ updatePosition() {
 ...
 
 ```
+
+## See also
+
+- `*WorkshopsLayoutForce`
