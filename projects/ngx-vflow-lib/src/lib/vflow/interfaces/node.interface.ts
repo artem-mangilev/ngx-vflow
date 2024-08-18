@@ -59,7 +59,11 @@ export interface ComponentDynamicNode<T = unknown> extends SharedDynamicNode {
   data?: WritableSignal<T>
 }
 
-export function isDynamicNode(node: Node | DynamicNode): node is DynamicNode {
+export function isStaticNode<T>(node: Node | DynamicNode): node is Node<T> {
+  return typeof node.point !== 'function'
+}
+
+export function isDynamicNode<T>(node: Node | DynamicNode): node is DynamicNode<T> {
   return typeof node.point === 'function'
 }
 
