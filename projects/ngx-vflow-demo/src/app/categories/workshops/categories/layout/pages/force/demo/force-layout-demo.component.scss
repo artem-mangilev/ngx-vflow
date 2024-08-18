@@ -8,3 +8,13 @@
   align-items: center;
   justify-content: center;
 }
+
+.slider {
+  position: absolute;
+  display: flex;
+  padding: 4px;
+  gap: 4px;
+
+  background-color: #2e414c;
+  border-bottom-right-radius: 6px;
+}
