@@ -131,6 +131,10 @@ export class ForceLayoutDemoComponent {
 
     this.linkForce.distance(distance)
     this.simulation.alpha(.5).restart()
+
+    setTimeout(() => {
+      this.vflow.fitView({ duration: 500 })
+    }, 250);
   }
 }
 
@@ -146,4 +150,3 @@ function randomHex() {
 
   return hex
 }
-
