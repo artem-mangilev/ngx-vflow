@@ -4,7 +4,7 @@ import WorkshopsCategory from '../../ng-doc.category';
 const LayoutCategory: NgDocCategory = {
   title: 'Layout',
   order: 2,
-  category: WorkshopsCategory
+  category: WorkshopsCategory,
 };
 
 export default LayoutCategory;

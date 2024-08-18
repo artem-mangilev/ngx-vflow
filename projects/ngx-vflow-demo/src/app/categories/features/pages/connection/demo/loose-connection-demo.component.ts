@@ -61,7 +61,7 @@ interface LooseConnectionNodeData {
 
 @Component({
   template: `<div class="node">
-    {{ node.data?.text }}
+    {{ data()?.text }}
 
     <handle type="source" position="top" id="a" />
     <handle type="source" position="right" id="b" />

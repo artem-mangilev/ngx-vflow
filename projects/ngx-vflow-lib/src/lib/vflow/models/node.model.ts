@@ -1,30 +1,29 @@
-import { Type, computed, inject, signal } from '@angular/core'
-import { Node } from '../interfaces/node.interface'
+import { Signal, Type, computed, effect, inject, signal } from '@angular/core'
+import { DynamicNode, Node, isDynamicNode } from '../interfaces/node.interface'
 import { isDefined } from '../utils/is-defined'
 import { toObservable, toSignal } from '@angular/core/rxjs-interop'
 import { HandleModel } from './handle.model'
 import { FlowEntity } from '../interfaces/flow-entity.interface'
 import { FlowSettingsService } from '../services/flow-settings.service'
-import { BehaviorSubject, animationFrameScheduler, observeOn } from 'rxjs'
+import { animationFrameScheduler, observeOn, } from 'rxjs'
 import { Point } from '../interfaces/point.interface'
 import { CustomNodeComponent } from '../public-components/custom-node.component'
+import { CustomDynamicNodeComponent } from '../public-components/custom-dynamic-node.component'
 
 export class NodeModel<T = unknown> implements FlowEntity {
-  public static defaultTypeSize = {
-    width: 100,
-    height: 50
-  }
+  private static defaultWidth = 100
+  private static defaultHeight = 50
 
   private flowSettingsService = inject(FlowSettingsService)
 
-  private internalPoint$ = new BehaviorSubject({ x: 0, y: 0 })
+  private internalPoint = this.createInternalPointSignal()
 
-  private throttledPoint$ = this.internalPoint$.pipe(
+  private throttledPoint$ = toObservable(this.internalPoint).pipe(
     observeOn(animationFrameScheduler)
   )
 
   public point = toSignal(this.throttledPoint$, {
-    initialValue: this.internalPoint$.getValue()
+    initialValue: this.internalPoint()
   })
 
   public point$ = this.throttledPoint$;
@@ -46,13 +45,20 @@ export class NodeModel<T = unknown> implements FlowEntity {
 
   public handles$ = toObservable(this.handles)
 
-  public draggable = true
+  public draggable = signal(true)
 
   // disabled for configuration for now
   public readonly magnetRadius = 20
 
-  public isComponentType = CustomNodeComponent.isPrototypeOf(this.node.type)
+  // TODO: not sure if we need to statically store it
+  public isComponentType =
+    CustomNodeComponent.isPrototypeOf(this.node.type) ||
+    CustomDynamicNodeComponent.isPrototypeOf(this.node.type)
 
+  // Default node specific thing
+  public text = this.createTextSignal()
+
+  // Component node specific thing
   public componentTypeInputs = computed(() => {
     return {
       node: this.node,
@@ -61,14 +67,61 @@ export class NodeModel<T = unknown> implements FlowEntity {
   })
 
   constructor(
-    public node: Node<T>
+    public node: Node<T> | DynamicNode<T>
   ) {
-    this.setPoint(node.point)
-
-    if (isDefined(node.draggable)) this.draggable = node.draggable
+    if (isDefined(node.draggable)) {
+      if (isDynamicNode(node)) {
+        this.draggable = node.draggable
+      } else {
+        this.draggable.set(node.draggable)
+      }
+    }
   }
 
   public setPoint(point: Point) {
-    this.internalPoint$.next(point);
+    this.internalPoint.set(point);
+  }
+
+  /**
+   * TODO find the way to implement this better
+   */
+  public linkDefaultNodeSizeWithModelSize() {
+    const node = this.node
+
+    if (node.type === 'default') {
+      if (isDynamicNode(node)) {
+        effect(() => {
+          this.size.set({
+            width: node.width?.() ?? NodeModel.defaultWidth,
+            height: node.height?.() ?? NodeModel.defaultHeight,
+          })
+        }, { allowSignalWrites: true })
+      } else {
+        this.size.set({
+          width: node.width ?? NodeModel.defaultWidth,
+          height: node.height ?? NodeModel.defaultHeight
+        })
+      }
+    }
+  }
+
+  private createTextSignal(): Signal<string> {
+    const node = this.node
+
+    if (node.type === 'default') {
+      if (isDynamicNode(node)) {
+        return node.text ?? signal('')
+      } else {
+        return signal(node.text ?? '')
+      }
+    }
+
+    return signal('')
+  }
+
+  private createInternalPointSignal() {
+    return isDynamicNode(this.node)
+      ? this.node.point
+      : signal({ x: this.node.point.x, y: this.node.point.y })
   }
 }

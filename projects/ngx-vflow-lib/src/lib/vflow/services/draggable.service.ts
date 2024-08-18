@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, effect } from '@angular/core';
 import { select } from 'd3-selection';
 import { D3DragEvent, drag } from 'd3-drag';
 import { NodeModel } from '../models/node.model';
@@ -9,20 +9,27 @@ type DragEvent = D3DragEvent<Element, unknown, unknown>
 @Injectable()
 export class DraggableService {
   /**
-   * Enable or disable draggable behavior for element.
-   * model contains draggable flag which declares if draggable should be enabled or not
+   * Enable draggable behavior for element.
    *
    * @param element target element for toggling draggable
    * @param model model with data for this element
    */
-  public toggleDraggable(element: Element, model: NodeModel) {
+  public enable(element: Element, model: NodeModel) {
     const d3Element = select(element)
 
-    const behavior = model.draggable
-      ? this.getDragBehavior(model)
-      : this.getIgnoreDragBehavior()
+    d3Element.call(this.getDragBehavior(model))
+  }
 
-    d3Element.call(behavior)
+  /**
+   * Disable draggable behavior for element.
+   *
+   * @param element target element for toggling draggable
+   * @param model model with data for this element
+   */
+  public disable(element: Element) {
+    const d3Element = select(element)
+
+    d3Element.call(this.getIgnoreDragBehavior())
   }
 
   /**

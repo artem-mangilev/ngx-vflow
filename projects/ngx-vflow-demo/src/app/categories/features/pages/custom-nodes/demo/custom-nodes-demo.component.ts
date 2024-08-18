@@ -1,12 +1,11 @@
-import { NgIf } from '@angular/common';
-import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { Edge, Node, VflowModule } from 'projects/ngx-vflow-lib/src/public-api';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { DynamicNode, Edge, VflowModule } from 'projects/ngx-vflow-lib/src/public-api';
 
 @Component({
   template: `<vflow [nodes]="nodes" [edges]="edges">
     <ng-template nodeHtml let-ctx>
-      <div class="custom-node" [class.custom-node_selected]="ctx.selected()">
-        {{ ctx.node.data.text }}
+      <div class="custom-node" selectable [class.custom-node_selected]="ctx.selected()">
+        {{ ctx.node.data().text }}
 
         <handle type="source" position="right"/>
       </div>
@@ -36,21 +35,21 @@ import { Edge, Node, VflowModule } from 'projects/ngx-vflow-lib/src/public-api';
   imports: [VflowModule]
 })
 export class CustomNodesDemoComponent {
-  public nodes: Node[] = [
+  public nodes: DynamicNode[] = [
     {
       id: '1',
-      point: { x: 100, y: 100 },
+      point: signal({ x: 100, y: 100 }),
       type: 'html-template',
-      data: {
+      data: signal({
         customType: 'gradient',
         text: 'I am a nice custom node with gradient'
-      }
+      })
     },
     {
       id: '2',
-      point: { x: 250, y: 250 },
+      point: signal({ x: 250, y: 250 }),
       type: 'default',
-      text: 'Default'
+      text: signal('Default')
     },
   ]
 
