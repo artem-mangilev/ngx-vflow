@@ -35,7 +35,7 @@ import { DynamicNode, Edge, isTemplateNode, Node, VflowModule } from 'projects/n
   standalone: true,
   imports: [VflowModule]
 })
-export class CustomNodesDemoComponent implements OnInit {
+export class CustomNodesDemoComponent {
   public nodes: DynamicNode[] = [
     {
       id: '1',
@@ -61,14 +61,4 @@ export class CustomNodesDemoComponent implements OnInit {
       target: '2'
     }
   ]
-
-  ngOnInit(): void {
-    setTimeout(() => {
-      const node = this.nodes[0]
-
-      if (isTemplateNode<{ customType: string, text: string }>(node) && node.data) {
-        node.data.set({ ...node.data(), text: 'hello' })
-      }
-    }, 2000)
-  }
 }
