@@ -61,6 +61,8 @@
 <svg:rect
   *ngIf="nodeModel.node.type === 'default-group'"
   class="default-group-node"
+  rx="5"
+  ry="5"
   [class.default-group-node_selected]="nodeModel.selected()"
   [attr.width]="nodeModel.size().width"
   [attr.height]="nodeModel.size().height"
