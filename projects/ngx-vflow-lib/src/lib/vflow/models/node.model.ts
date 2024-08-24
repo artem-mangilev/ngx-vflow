@@ -38,20 +38,18 @@ export class NodeModel<T = unknown> implements FlowEntity {
   public selected$ = toObservable(this.selected)
 
   public globalPoint = computed(() => {
-    // TODO check with multiple layers
-    const parentId = this.parentId()
-    if (parentId) {
-      const parent = this.entitiesService.nodes().find(n => n.node.id === parentId)
+    let parent = this.parent()
+    let x = this.point().x
+    let y = this.point().y
 
-      if (parent) {
-        const x = parent.point().x + this.point().x
-        const y = parent.point().y + this.point().y
+    while (parent !== null) {
+      x += parent.point().x
+      y += parent.point().y
 
-        return { x, y }
-      }
+      parent = parent.parent()
     }
 
-    return this.point()
+    return { x, y }
   })
 
   public pointTransform = computed(() =>
@@ -88,6 +86,10 @@ export class NodeModel<T = unknown> implements FlowEntity {
   })
 
   public parentId = signal<string | null>(null)
+
+  public parent: Signal<NodeModel | null> = computed(() =>
+    this.entitiesService.nodes().find(n => n.node.id === this.parentId()) ?? null
+  )
 
   constructor(
     public node: Node<T> | DynamicNode<T>
