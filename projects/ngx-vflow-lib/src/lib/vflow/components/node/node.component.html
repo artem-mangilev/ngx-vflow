@@ -1,3 +1,4 @@
+<!-- Default node -->
 <svg:foreignObject
   *ngIf="nodeModel.node.type === 'default'"
   class="selectable"
@@ -22,6 +23,7 @@
   </div>
 </svg:foreignObject>
 
+<!-- Template node -->
 <svg:foreignObject
   *ngIf="nodeModel.node.type === 'html-template' && nodeHtmlTemplate"
   class="selectable"
@@ -38,6 +40,7 @@
   </div>
 </svg:foreignObject>
 
+<!-- Component node -->
 <svg:foreignObject
   *ngIf="nodeModel.isComponentType"
   class="selectable"
@@ -54,6 +57,15 @@
   </div>
 </svg:foreignObject>
 
+<!-- Default group node -->
+<svg:rect
+  *ngIf="nodeModel.node.type === 'default-group'"
+  class="default-group-node"
+  [attr.width]="nodeModel.size().width"
+  [attr.height]="nodeModel.size().height"
+/>
+
+<!-- Handles -->
 <ng-container *ngFor="let handle of nodeModel.handles()">
   <svg:circle
     *ngIf="!handle.template"

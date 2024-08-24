@@ -20,6 +20,17 @@
   }
 }
 
+.default-group-node {
+  stroke: #1b262c;
+  stroke-width: 1.5px;
+  fill: #1b262c;
+  fill-opacity: 0.05;
+  rx: 5;
+  ry: 5;
+
+  // TODO selected
+}
+
 .default-handle {
   stroke: #fff;
   fill: #1b262c;

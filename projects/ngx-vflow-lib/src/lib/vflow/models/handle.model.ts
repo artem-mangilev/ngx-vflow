@@ -50,8 +50,8 @@ export class HandleModel {
 
   public pointAbsolute = computed(() => {
     return {
-      x: this.parentNode.point().x + this.offset().x + this.sizeOffset().x,
-      y: this.parentNode.point().y + this.offset().y + this.sizeOffset().y,
+      x: this.parentNode.globalPoint().x + this.offset().x + this.sizeOffset().x,
+      y: this.parentNode.globalPoint().y + this.offset().y + this.sizeOffset().y,
     }
   })
 

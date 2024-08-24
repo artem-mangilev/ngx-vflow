@@ -9,12 +9,14 @@ import { animationFrameScheduler, observeOn, } from 'rxjs'
 import { Point } from '../interfaces/point.interface'
 import { CustomNodeComponent } from '../public-components/custom-node.component'
 import { CustomDynamicNodeComponent } from '../public-components/custom-dynamic-node.component'
+import { FlowEntitiesService } from '../services/flow-entities.service'
 
 export class NodeModel<T = unknown> implements FlowEntity {
   private static defaultWidth = 100
   private static defaultHeight = 50
 
   private flowSettingsService = inject(FlowSettingsService)
+  private entitiesService = inject(FlowEntitiesService);
 
   private internalPoint = this.createInternalPointSignal()
 
@@ -35,7 +37,26 @@ export class NodeModel<T = unknown> implements FlowEntity {
   public selected = signal(false)
   public selected$ = toObservable(this.selected)
 
-  public pointTransform = computed(() => `translate(${this.point().x}, ${this.point().y})`)
+  public globalPoint = computed(() => {
+    // TODO check with multiple layers
+    const parentId = this.parentId()
+    if (parentId) {
+      const parent = this.entitiesService.nodes().find(n => n.node.id === parentId)
+
+      if (parent) {
+        const x = parent.point().x + this.point().x
+        const y = parent.point().y + this.point().y
+
+        return { x, y }
+      }
+    }
+
+    return this.point()
+  })
+
+  public pointTransform = computed(() =>
+    `translate(${this.globalPoint().x}, ${this.globalPoint().y})`
+  )
 
   // Now source and handle positions derived from parent flow
   public sourcePosition = computed(() => this.flowSettingsService.handlePositions().source)
@@ -66,6 +87,8 @@ export class NodeModel<T = unknown> implements FlowEntity {
     }
   })
 
+  private parentId = signal<string | null>(null)
+
   constructor(
     public node: Node<T> | DynamicNode<T>
   ) {
@@ -74,6 +97,14 @@ export class NodeModel<T = unknown> implements FlowEntity {
         this.draggable = node.draggable
       } else {
         this.draggable.set(node.draggable)
+      }
+    }
+
+    if (isDefined(node.parentId)) {
+      if (isDynamicNode(node)) {
+        this.parentId = node.parentId
+      } else {
+        this.parentId.set(node.parentId)
       }
     }
   }
@@ -88,7 +119,7 @@ export class NodeModel<T = unknown> implements FlowEntity {
   public linkDefaultNodeSizeWithModelSize() {
     const node = this.node
 
-    if (node.type === 'default') {
+    if (node.type === 'default' || node.type === 'default-group') {
       if (isDynamicNode(node)) {
         effect(() => {
           this.size.set({

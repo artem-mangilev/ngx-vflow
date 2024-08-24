@@ -6,7 +6,8 @@ import { CustomDynamicNodeComponent } from "../public-components/custom-dynamic-
 export type Node<T = unknown> =
   DefaultNode |
   HtmlTemplateNode<T> |
-  ComponentNode<T>
+  ComponentNode<T> |
+  DefaultGroupNode
 
 export type DynamicNode<T = unknown> =
   DefaultDynamicNode |
@@ -17,12 +18,14 @@ export interface SharedNode {
   id: string
   point: Point
   draggable?: boolean
+  parentId?: string
 }
 
 export interface SharedDynamicNode {
   id: string;
   point: WritableSignal<Point>
   draggable?: WritableSignal<boolean>
+  parentId?: WritableSignal<string>
 }
 
 export interface DefaultNode extends SharedNode {
@@ -47,6 +50,18 @@ export interface HtmlTemplateNode<T = unknown> extends SharedNode {
 export interface HtmlTemplateDynamicNode<T = unknown> extends SharedDynamicNode {
   type: 'html-template'
   data?: WritableSignal<T>
+}
+
+export interface DefaultGroupNode extends SharedNode {
+  type: 'default-group'
+  width: number
+  height: number
+}
+
+export interface DefaultDynamicGroupNode extends SharedDynamicNode {
+  type: 'default-group'
+  width: WritableSignal<number>
+  height: WritableSignal<number>
 }
 
 export interface ComponentNode<T = unknown> extends SharedNode {

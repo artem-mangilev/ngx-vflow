@@ -13,7 +13,6 @@ import { FlowSettingsService } from '../../services/flow-settings.service';
 import { SelectionService } from '../../services/selection.service';
 import { ConnectionControllerDirective } from '../../directives/connection-controller.directive';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { isDynamicNode } from '../../interfaces/node.interface';
 
 export type HandleState = 'valid' | 'invalid' | 'idle'
 
