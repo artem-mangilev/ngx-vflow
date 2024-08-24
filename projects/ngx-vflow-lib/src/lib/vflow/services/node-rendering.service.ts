@@ -12,18 +12,16 @@ export class NodeRenderingService {
   })
 
   public pullNode(node: NodeModel) {
+    // TODO do not pull when the node is already on top
     const maxOrder = Math.max(
       ...this.flowEntitiesService.nodes().map((n) => n.renderOrder())
     )
 
     // pull node
-    const newOrder = maxOrder + 1
-    node.renderOrder.set(newOrder)
+    node.renderOrder.set(maxOrder + 1)
 
-    // TODO check multiple levels
-    // pull node's children
     this.flowEntitiesService.nodes()
       .filter(n => n.parentId() === node.node.id)
-      .forEach((c, i) => c.renderOrder.set(newOrder + i + 1))
+      .forEach(n => this.pullNode(n))
   }
 }

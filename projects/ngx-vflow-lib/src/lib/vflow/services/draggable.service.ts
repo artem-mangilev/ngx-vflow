@@ -66,13 +66,7 @@ export class DraggableService {
           y: round(event.y + deltaY)
         }
 
-        // TODO performance
-        const parent = model.parentId()
-          ? this.entitiesService
-            .nodes()
-            .find(n => n.node.id === model.parentId())
-          : null
-
+        const parent = model.parent()
         // keep node in bounds of parent
         if (parent) {
           point.x = Math.min(parent.size().width - model.size().width, point.x)
