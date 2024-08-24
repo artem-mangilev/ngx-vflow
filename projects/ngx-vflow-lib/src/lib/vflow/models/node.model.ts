@@ -85,11 +85,11 @@ export class NodeModel<T = unknown> implements FlowEntity {
     }
   })
 
-  public parentId = signal<string | null>(null)
-
-  public parent: Signal<NodeModel | null> = computed(() =>
+  public parent = computed(() =>
     this.entitiesService.nodes().find(n => n.node.id === this.parentId()) ?? null
   )
+
+  private parentId = signal<string | null>(null)
 
   constructor(
     public node: Node<T> | DynamicNode<T>

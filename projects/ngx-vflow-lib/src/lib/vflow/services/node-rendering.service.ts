@@ -20,8 +20,9 @@ export class NodeRenderingService {
     // pull node
     node.renderOrder.set(maxOrder + 1)
 
-    this.flowEntitiesService.nodes()
-      .filter(n => n.parentId() === node.node.id)
+    this.flowEntitiesService
+      .nodes()
+      .filter(n => n.parent() === node)
       .forEach(n => this.pullNode(n))
   }
 }

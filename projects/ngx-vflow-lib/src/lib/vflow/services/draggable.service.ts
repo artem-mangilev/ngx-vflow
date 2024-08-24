@@ -3,14 +3,11 @@ import { select } from 'd3-selection';
 import { D3DragEvent, drag } from 'd3-drag';
 import { NodeModel } from '../models/node.model';
 import { round } from '../utils/round';
-import { FlowEntitiesService } from './flow-entities.service';
 
 type DragEvent = D3DragEvent<Element, unknown, unknown>
 
 @Injectable()
 export class DraggableService {
-  private entitiesService = inject(FlowEntitiesService)
-
   /**
    * Enable draggable behavior for element.
    *
