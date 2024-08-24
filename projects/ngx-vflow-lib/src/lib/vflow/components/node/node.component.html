@@ -61,8 +61,10 @@
 <svg:rect
   *ngIf="nodeModel.node.type === 'default-group'"
   class="default-group-node"
+  [class.default-group-node_selected]="nodeModel.selected()"
   [attr.width]="nodeModel.size().width"
   [attr.height]="nodeModel.size().height"
+  (mousedown)="pullNode(); selectNode()"
 />
 
 <!-- Handles -->

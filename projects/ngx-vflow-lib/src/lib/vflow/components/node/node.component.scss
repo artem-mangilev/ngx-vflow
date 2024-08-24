@@ -28,7 +28,9 @@
   rx: 5;
   ry: 5;
 
-  // TODO selected
+  &_selected {
+    stroke-width: 2px;
+  }
 }
 
 .default-handle {
