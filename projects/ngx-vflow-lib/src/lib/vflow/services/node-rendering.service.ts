@@ -16,6 +16,14 @@ export class NodeRenderingService {
       ...this.flowEntitiesService.nodes().map((n) => n.renderOrder())
     )
 
-    node.renderOrder.set(maxOrder + 1)
+    // pull node
+    const newOrder = maxOrder + 1
+    node.renderOrder.set(newOrder)
+
+    // TODO check multiple levels
+    // pull node's children
+    this.flowEntitiesService.nodes()
+      .filter(n => n.parentId() === node.node.id)
+      .forEach((c, i) => c.renderOrder.set(newOrder + i + 1))
   }
 }

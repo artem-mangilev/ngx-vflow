@@ -87,7 +87,7 @@ export class NodeModel<T = unknown> implements FlowEntity {
     }
   })
 
-  private parentId = signal<string | null>(null)
+  public parentId = signal<string | null>(null)
 
   constructor(
     public node: Node<T> | DynamicNode<T>
