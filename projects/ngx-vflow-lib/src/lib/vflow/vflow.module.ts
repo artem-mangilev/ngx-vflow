@@ -5,7 +5,7 @@ import { NodeComponent } from './components/node/node.component';
 import { MapContextDirective } from './directives/map-context.directive';
 import { EdgeComponent } from './components/edge/edge.component';
 import { EdgeLabelComponent } from './components/edge-label/edge-label.component';
-import { ConnectionTemplateDirective, EdgeLabelHtmlTemplateDirective, EdgeTemplateDirective, HandleTemplateDirective, NodeHtmlTemplateDirective } from './directives/template.directive';
+import { ConnectionTemplateDirective, EdgeLabelHtmlTemplateDirective, EdgeTemplateDirective, GroupNodeTemplateDirective, HandleTemplateDirective, NodeHtmlTemplateDirective } from './directives/template.directive';
 import { ConnectionComponent } from './components/connection/connection.component';
 import { SpacePointContextDirective } from './directives/space-point-context.directive';
 import { RootSvgReferenceDirective } from './directives/reference.directive';
@@ -44,6 +44,7 @@ const directives = [
 
 const templateDirectives = [
   NodeHtmlTemplateDirective,
+  GroupNodeTemplateDirective,
   EdgeLabelHtmlTemplateDirective,
   EdgeTemplateDirective,
   ConnectionTemplateDirective,

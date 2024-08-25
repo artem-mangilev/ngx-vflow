@@ -7,13 +7,15 @@ export type Node<T = unknown> =
   DefaultNode |
   HtmlTemplateNode<T> |
   ComponentNode<T> |
-  DefaultGroupNode
+  DefaultGroupNode |
+  TemplateGroupNode<T>
 
 export type DynamicNode<T = unknown> =
   DefaultDynamicNode |
   HtmlTemplateDynamicNode<T> |
   ComponentDynamicNode<T> |
-  DefaultDynamicGroupNode
+  DefaultDynamicGroupNode |
+  TemplateDynamicGroupNode<T>
 
 export interface SharedNode {
   id: string
@@ -65,6 +67,20 @@ export interface DefaultDynamicGroupNode extends SharedDynamicNode {
   width: WritableSignal<number>
   height: WritableSignal<number>
   color?: WritableSignal<string>
+}
+
+export interface TemplateGroupNode<T> extends SharedNode {
+  type: 'template-group'
+  width: number
+  height: number
+  data?: T
+}
+
+export interface TemplateDynamicGroupNode<T> extends SharedDynamicNode {
+  type: 'template-group'
+  width: WritableSignal<number>
+  height: WritableSignal<number>
+  data?: WritableSignal<T>
 }
 
 export interface ComponentNode<T = unknown> extends SharedNode {

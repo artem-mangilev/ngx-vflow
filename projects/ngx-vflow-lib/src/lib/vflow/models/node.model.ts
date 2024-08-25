@@ -132,19 +132,23 @@ export class NodeModel<T = unknown> implements FlowEntity {
   public linkDefaultNodeSizeWithModelSize() {
     const node = this.node
 
-    if (node.type === 'default' || node.type === 'default-group') {
-      if (isDynamicNode(node)) {
-        effect(() => {
+    switch (node.type) {
+      case 'default':
+      case 'default-group':
+      case 'template-group': {
+        if (isDynamicNode(node)) {
+          effect(() => {
+            this.size.set({
+              width: node.width?.() ?? NodeModel.defaultWidth,
+              height: node.height?.() ?? NodeModel.defaultHeight,
+            })
+          }, { allowSignalWrites: true })
+        } else {
           this.size.set({
-            width: node.width?.() ?? NodeModel.defaultWidth,
-            height: node.height?.() ?? NodeModel.defaultHeight,
+            width: node.width ?? NodeModel.defaultWidth,
+            height: node.height ?? NodeModel.defaultHeight
           })
-        }, { allowSignalWrites: true })
-      } else {
-        this.size.set({
-          width: node.width ?? NodeModel.defaultWidth,
-          height: node.height ?? NodeModel.defaultHeight
-        })
+        }
       }
     }
   }

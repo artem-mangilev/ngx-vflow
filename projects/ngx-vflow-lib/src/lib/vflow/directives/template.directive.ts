@@ -21,6 +21,11 @@ export class NodeHtmlTemplateDirective {
   public templateRef = inject(TemplateRef)
 }
 
+@Directive({ selector: 'ng-template[groupNode]' })
+export class GroupNodeTemplateDirective {
+  public templateRef = inject(TemplateRef)
+}
+
 @Directive({ selector: 'ng-template[handle]' })
 export class HandleTemplateDirective {
   public templateRef = inject(TemplateRef)

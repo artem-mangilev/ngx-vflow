@@ -38,7 +38,10 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInje
   public nodeModel!: NodeModel
 
   @Input()
-  public nodeHtmlTemplate?: TemplateRef<any>
+  public nodeTemplate?: TemplateRef<any>
+
+  @Input()
+  public groupNodeTemplate?: TemplateRef<any>
 
   @ViewChild('nodeContent')
   public nodeContentRef!: ElementRef<SVGGraphicsElement>

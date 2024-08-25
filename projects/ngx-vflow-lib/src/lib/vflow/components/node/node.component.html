@@ -25,7 +25,7 @@
 
 <!-- Template node -->
 <svg:foreignObject
-  *ngIf="nodeModel.node.type === 'html-template' && nodeHtmlTemplate"
+  *ngIf="nodeModel.node.type === 'html-template' && nodeTemplate"
   class="selectable"
   [attr.width]="nodeModel.size().width"
   [attr.height]="nodeModel.size().height"
@@ -33,7 +33,7 @@
 >
   <div #htmlWrapper class="wrapper">
     <ng-container
-      [ngTemplateOutlet]="nodeHtmlTemplate"
+      [ngTemplateOutlet]="nodeTemplate"
       [ngTemplateOutletContext]="{ $implicit: { node: nodeModel.node, selected: nodeModel.selected } }"
       [ngTemplateOutletInjector]="injector"
     />
@@ -70,6 +70,17 @@
   [style.fill]="nodeModel.color()"
   (mousedown)="pullNode(); selectNode()"
 />
+
+<svg:g
+  *ngIf="nodeModel.node.type === 'template-group' && groupNodeTemplate"
+  (mousedown)="pullNode()"
+>
+  <ng-container
+    [ngTemplateOutlet]="groupNodeTemplate"
+    [ngTemplateOutletContext]="{ $implicit: { node: nodeModel.node, selected: nodeModel.selected } }"
+    [ngTemplateOutletInjector]="injector"
+  />
+</svg:g>
 
 <!-- Handles -->
 <ng-container *ngFor="let handle of nodeModel.handles()">

@@ -7,7 +7,7 @@ import { ViewportService } from '../../services/viewport.service';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { Edge } from '../../interfaces/edge.interface';
 import { EdgeModel } from '../../models/edge.model';
-import { ConnectionTemplateDirective, EdgeLabelHtmlTemplateDirective, EdgeTemplateDirective, NodeHtmlTemplateDirective } from '../../directives/template.directive';
+import { ConnectionTemplateDirective, EdgeLabelHtmlTemplateDirective, EdgeTemplateDirective, GroupNodeTemplateDirective, NodeHtmlTemplateDirective } from '../../directives/template.directive';
 import { HandlePositions } from '../../interfaces/handle-positions.interface';
 import { addNodesToEdges } from '../../utils/add-nodes-to-edges';
 import { skip } from 'rxjs';
@@ -219,7 +219,10 @@ export class VflowComponent {
 
   // #region TEMPLATES
   @ContentChild(NodeHtmlTemplateDirective)
-  protected nodeHtmlDirective?: NodeHtmlTemplateDirective
+  protected nodeTemplateDirective?: NodeHtmlTemplateDirective
+
+  @ContentChild(GroupNodeTemplateDirective)
+  protected groupNodeTemplateDirective?: GroupNodeTemplateDirective
 
   @ContentChild(EdgeTemplateDirective)
   protected edgeTemplateDirective?: EdgeTemplateDirective
