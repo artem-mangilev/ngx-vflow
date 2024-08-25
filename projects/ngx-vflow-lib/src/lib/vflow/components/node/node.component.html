@@ -73,6 +73,7 @@
 
 <svg:g
   *ngIf="nodeModel.node.type === 'template-group' && groupNodeTemplate"
+  class="selectable"
   (mousedown)="pullNode()"
 >
   <ng-container
