@@ -66,6 +66,8 @@
   [class.default-group-node_selected]="nodeModel.selected()"
   [attr.width]="nodeModel.size().width"
   [attr.height]="nodeModel.size().height"
+  [style.stroke]="nodeModel.color()"
+  [style.fill]="nodeModel.color()"
   (mousedown)="pullNode(); selectNode()"
 />
 

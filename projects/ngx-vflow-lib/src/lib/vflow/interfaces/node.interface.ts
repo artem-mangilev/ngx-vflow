@@ -12,7 +12,8 @@ export type Node<T = unknown> =
 export type DynamicNode<T = unknown> =
   DefaultDynamicNode |
   HtmlTemplateDynamicNode<T> |
-  ComponentDynamicNode<T>
+  ComponentDynamicNode<T> |
+  DefaultDynamicGroupNode
 
 export interface SharedNode {
   id: string
@@ -56,12 +57,14 @@ export interface DefaultGroupNode extends SharedNode {
   type: 'default-group'
   width: number
   height: number
+  color?: string
 }
 
 export interface DefaultDynamicGroupNode extends SharedDynamicNode {
   type: 'default-group'
   width: WritableSignal<number>
   height: WritableSignal<number>
+  color?: WritableSignal<string>
 }
 
 export interface ComponentNode<T = unknown> extends SharedNode {
@@ -104,4 +107,12 @@ export function isDefaultStaticNode(node: Node): node is DefaultNode {
 
 export function isDefaultDynamicNode(node: DynamicNode): node is DefaultDynamicNode {
   return node.type === 'default'
+}
+
+export function isDefaultStaticGroupNode(node: Node): node is DefaultGroupNode {
+  return node.type === 'default-group'
+}
+
+export function isDefaultDynamicGroupNode(node: DynamicNode): node is DefaultDynamicGroupNode {
+  return node.type === 'default-group'
 }

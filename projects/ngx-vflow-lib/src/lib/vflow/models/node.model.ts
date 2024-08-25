@@ -1,4 +1,4 @@
-import { Signal, Type, computed, effect, inject, signal } from '@angular/core'
+import { Signal, computed, effect, inject, signal } from '@angular/core'
 import { DynamicNode, Node, isDynamicNode } from '../interfaces/node.interface'
 import { isDefined } from '../utils/is-defined'
 import { toObservable, toSignal } from '@angular/core/rxjs-interop'
@@ -14,6 +14,7 @@ import { FlowEntitiesService } from '../services/flow-entities.service'
 export class NodeModel<T = unknown> implements FlowEntity {
   private static defaultWidth = 100
   private static defaultHeight = 50
+  private static defaultColor = '#1b262c'
 
   private flowSettingsService = inject(FlowSettingsService)
   private entitiesService = inject(FlowEntitiesService);
@@ -89,6 +90,8 @@ export class NodeModel<T = unknown> implements FlowEntity {
     this.entitiesService.nodes().find(n => n.node.id === this.parentId()) ?? null
   )
 
+  public color = signal(NodeModel.defaultColor)
+
   private parentId = signal<string | null>(null)
 
   constructor(
@@ -107,6 +110,14 @@ export class NodeModel<T = unknown> implements FlowEntity {
         this.parentId = node.parentId
       } else {
         this.parentId.set(node.parentId)
+      }
+    }
+
+    if (node.type === 'default-group' && node.color) {
+      if (isDynamicNode(node)) {
+        this.color = node.color
+      } else {
+        this.color.set(node.color)
       }
     }
   }
