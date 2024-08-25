@@ -132,3 +132,11 @@ export function isDefaultStaticGroupNode(node: Node): node is DefaultGroupNode {
 export function isDefaultDynamicGroupNode(node: DynamicNode): node is DefaultDynamicGroupNode {
   return node.type === 'default-group'
 }
+
+export function isTemplateStaticGroupNode<T>(node: Node): node is TemplateGroupNode<T> {
+  return node.type === 'template-group'
+}
+
+export function isTemplateDynamicGroupNode<T>(node: DynamicNode): node is TemplateDynamicGroupNode<T> {
+  return node.type === 'template-group'
+}
