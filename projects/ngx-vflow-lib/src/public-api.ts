@@ -14,6 +14,7 @@ export * from './lib/vflow/interfaces/marker.interface';
 export { ViewportState } from './lib/vflow/interfaces/viewport.interface';
 export * from './lib/vflow/interfaces/component-node-event.interface';
 export * from './lib/vflow/interfaces/fit-view-options.interface';
+export * from './lib/vflow/interfaces/optimization.interface';
 
 // Types
 export * from './lib/vflow/types/node-change.type';

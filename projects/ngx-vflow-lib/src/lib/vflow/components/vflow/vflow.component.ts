@@ -31,6 +31,7 @@ import { ComponentEventBusService } from '../../services/component-event-bus.ser
 import { Background } from '../../types/background.type';
 import { SpacePointContextDirective } from '../../directives/space-point-context.directive';
 import { FitViewOptions } from '../../interfaces/fit-view-options.interface';
+import { Optimization } from '../../interfaces/optimization.interface';
 
 const connectionControllerHostDirective = {
   directive: ConnectionControllerDirective,
@@ -151,6 +152,11 @@ export class VflowComponent implements OnInit {
    */
   @Input()
   public background: Background | string = '#fff'
+
+  @Input()
+  public optimization: Optimization = {
+    computeLayersOnInit: true
+  }
 
   /**
    * Global rule if you can or can't select entities
@@ -350,15 +356,17 @@ export class VflowComponent implements OnInit {
   }
 
   private setInitialNodesOrder() {
-    this.nodeModels().forEach(model => {
-      switch (model.node.type) {
-        case 'default-group':
-        case 'template-group': {
-          this.nodeRenderingService.pullNode(model)
+    if (this.optimization.computeLayersOnInit) {
+
+      this.nodeModels().forEach(model => {
+        switch (model.node.type) {
+          case 'default-group':
+          case 'template-group': {
+            this.nodeRenderingService.pullNode(model)
+          }
         }
-      }
-    })
+      })
+    }
   }
 }
-
 
