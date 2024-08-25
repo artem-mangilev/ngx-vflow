@@ -61,10 +61,7 @@ export class HandleModel {
 
   public parentSize = toSignal(
     this.updateParentSizeAndPosition$.pipe(
-      map(() => ({
-        width: this.parentReference.offsetWidth,
-        height: this.parentReference.offsetHeight
-      }))
+      map(() => this.getParentSize())
     ),
     {
       initialValue: { width: 0, height: 0 }
@@ -74,8 +71,12 @@ export class HandleModel {
   public parentPosition = toSignal(
     this.updateParentSizeAndPosition$.pipe(
       map(() => ({
-        x: this.parentReference.offsetLeft,
-        y: this.parentReference.offsetTop
+        x: this.parentReference instanceof HTMLElement
+          ? this.parentReference.offsetLeft
+          : 0, // for now just 0 for group nodes
+        y: this.parentReference instanceof HTMLElement
+          ? this.parentReference.offsetTop
+          : 0 // for now just 0 for group nodes
       }))
     ),
     {
@@ -101,5 +102,18 @@ export class HandleModel {
 
   public updateParent() {
     this.updateParentSizeAndPosition$.next()
+  }
+
+  private getParentSize(): { width: number, height: number } {
+    if (this.parentReference instanceof HTMLElement) {
+      return {
+        width: this.parentReference.offsetWidth,
+        height: this.parentReference.offsetHeight
+      }
+    } else if (this.parentReference instanceof SVGGraphicsElement) {
+      return this.parentReference.getBBox()
+    }
+
+    return { width: 0, height: 0 }
   }
 }
