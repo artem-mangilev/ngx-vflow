@@ -1,4 +1,4 @@
-import { AfterContentInit, ChangeDetectionStrategy, Component, ContentChild, EventEmitter, Injector, Input, OnChanges, Output, Signal, SimpleChanges, ViewChild, computed, effect, inject, runInInjectionContext } from '@angular/core';
+import { AfterContentInit, ChangeDetectionStrategy, Component, ContentChild, EventEmitter, Injector, Input, OnChanges, OnInit, Output, Signal, SimpleChanges, ViewChild, computed, effect, inject, runInInjectionContext } from '@angular/core';
 import { DynamicNode, Node } from '../../interfaces/node.interface';
 import { MapContextDirective } from '../../directives/map-context.directive';
 import { DraggableService } from '../../services/draggable.service';
@@ -91,7 +91,7 @@ const changesControllerHostDirective = {
     changesControllerHostDirective
   ]
 })
-export class VflowComponent {
+export class VflowComponent implements OnInit {
   // #region DI
   private viewportService = inject(ViewportService)
   private flowEntitiesService = inject(FlowEntitiesService)
@@ -281,6 +281,10 @@ export class VflowComponent {
 
   protected markers = this.flowEntitiesService.markers
 
+  public ngOnInit(): void {
+    this.setInitialNodesOrder()
+  }
+
   // #region METHODS_API
   /**
    * Change viewport to specified state
@@ -343,6 +347,17 @@ export class VflowComponent {
 
   protected trackEdges(idx: number, { edge }: EdgeModel) {
     return edge
+  }
+
+  private setInitialNodesOrder() {
+    this.nodeModels().forEach(model => {
+      switch (model.node.type) {
+        case 'default-group':
+        case 'template-group': {
+          this.nodeRenderingService.pullNode(model)
+        }
+      }
+    })
   }
 }
 
