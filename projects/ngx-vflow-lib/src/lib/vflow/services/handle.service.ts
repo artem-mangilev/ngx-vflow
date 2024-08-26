@@ -3,12 +3,13 @@ import { Position } from '../types/position.type';
 import { HandleType } from '../types/handle-type.type';
 import { NodeModel } from '../models/node.model';
 import { HandleModel } from '../models/handle.model';
+import { Microtask } from '../decorators/microtask.decorator';
 
 export interface NodeHandle {
   position: Position
   type: HandleType
   id?: string
-  parentReference?: HTMLElement
+  parentReference?: Element
   template?: TemplateRef<any>
 }
 
@@ -16,6 +17,7 @@ export interface NodeHandle {
 export class HandleService {
   public readonly node = signal<NodeModel | null>(null)
 
+  @Microtask // TODO fixes rendering of handle for group node
   public createHandle(newHandle: HandleModel) {
     const node = this.node()
     if (node) {

@@ -1,4 +1,4 @@
-import { Injectable, effect } from '@angular/core';
+import { Injectable, effect, inject } from '@angular/core';
 import { select } from 'd3-selection';
 import { D3DragEvent, drag } from 'd3-drag';
 import { NodeModel } from '../models/node.model';
@@ -58,12 +58,22 @@ export class DraggableService {
       })
 
       .on('drag', (event: DragEvent) => {
-        model.setPoint(
-          {
-            x: round(event.x + deltaX),
-            y: round(event.y + deltaY)
-          }
-        )
+        let point = {
+          x: round(event.x + deltaX),
+          y: round(event.y + deltaY)
+        }
+
+        const parent = model.parent()
+        // keep node in bounds of parent
+        if (parent) {
+          point.x = Math.min(parent.size().width - model.size().width, point.x)
+          point.x = Math.max(0, point.x)
+
+          point.y = Math.min(parent.size().height - model.size().height, point.y)
+          point.y = Math.max(0, point.y)
+        }
+
+        model.setPoint(point)
       })
   }
 

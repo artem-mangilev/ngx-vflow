@@ -6,23 +6,29 @@ import { CustomDynamicNodeComponent } from "../public-components/custom-dynamic-
 export type Node<T = unknown> =
   DefaultNode |
   HtmlTemplateNode<T> |
-  ComponentNode<T>
+  ComponentNode<T> |
+  DefaultGroupNode |
+  TemplateGroupNode<T>
 
 export type DynamicNode<T = unknown> =
   DefaultDynamicNode |
   HtmlTemplateDynamicNode<T> |
-  ComponentDynamicNode<T>
+  ComponentDynamicNode<T> |
+  DefaultDynamicGroupNode |
+  TemplateDynamicGroupNode<T>
 
 export interface SharedNode {
   id: string
   point: Point
   draggable?: boolean
+  parentId?: string | null
 }
 
 export interface SharedDynamicNode {
   id: string;
   point: WritableSignal<Point>
   draggable?: WritableSignal<boolean>
+  parentId?: WritableSignal<string | null>
 }
 
 export interface DefaultNode extends SharedNode {
@@ -46,6 +52,34 @@ export interface HtmlTemplateNode<T = unknown> extends SharedNode {
 
 export interface HtmlTemplateDynamicNode<T = unknown> extends SharedDynamicNode {
   type: 'html-template'
+  data?: WritableSignal<T>
+}
+
+export interface DefaultGroupNode extends SharedNode {
+  type: 'default-group'
+  width: number
+  height: number
+  color?: string
+}
+
+export interface DefaultDynamicGroupNode extends SharedDynamicNode {
+  type: 'default-group'
+  width: WritableSignal<number>
+  height: WritableSignal<number>
+  color?: WritableSignal<string>
+}
+
+export interface TemplateGroupNode<T> extends SharedNode {
+  type: 'template-group'
+  width: number
+  height: number
+  data?: T
+}
+
+export interface TemplateDynamicGroupNode<T> extends SharedDynamicNode {
+  type: 'template-group'
+  width: WritableSignal<number>
+  height: WritableSignal<number>
   data?: WritableSignal<T>
 }
 
@@ -89,4 +123,20 @@ export function isDefaultStaticNode(node: Node): node is DefaultNode {
 
 export function isDefaultDynamicNode(node: DynamicNode): node is DefaultDynamicNode {
   return node.type === 'default'
+}
+
+export function isDefaultStaticGroupNode(node: Node): node is DefaultGroupNode {
+  return node.type === 'default-group'
+}
+
+export function isDefaultDynamicGroupNode(node: DynamicNode): node is DefaultDynamicGroupNode {
+  return node.type === 'default-group'
+}
+
+export function isTemplateStaticGroupNode<T>(node: Node): node is TemplateGroupNode<T> {
+  return node.type === 'template-group'
+}
+
+export function isTemplateDynamicGroupNode<T>(node: DynamicNode): node is TemplateDynamicGroupNode<T> {
+  return node.type === 'template-group'
 }

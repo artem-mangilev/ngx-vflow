@@ -1,4 +1,4 @@
-import { AfterContentInit, ChangeDetectionStrategy, Component, ContentChild, EventEmitter, Injector, Input, OnChanges, Output, Signal, SimpleChanges, ViewChild, computed, effect, inject, runInInjectionContext } from '@angular/core';
+import { AfterContentInit, ChangeDetectionStrategy, Component, ContentChild, EventEmitter, Injector, Input, OnChanges, OnInit, Output, Signal, SimpleChanges, ViewChild, computed, effect, inject, runInInjectionContext } from '@angular/core';
 import { DynamicNode, Node } from '../../interfaces/node.interface';
 import { MapContextDirective } from '../../directives/map-context.directive';
 import { DraggableService } from '../../services/draggable.service';
@@ -7,7 +7,7 @@ import { ViewportService } from '../../services/viewport.service';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { Edge } from '../../interfaces/edge.interface';
 import { EdgeModel } from '../../models/edge.model';
-import { ConnectionTemplateDirective, EdgeLabelHtmlTemplateDirective, EdgeTemplateDirective, NodeHtmlTemplateDirective } from '../../directives/template.directive';
+import { ConnectionTemplateDirective, EdgeLabelHtmlTemplateDirective, EdgeTemplateDirective, GroupNodeTemplateDirective, NodeHtmlTemplateDirective } from '../../directives/template.directive';
 import { HandlePositions } from '../../interfaces/handle-positions.interface';
 import { addNodesToEdges } from '../../utils/add-nodes-to-edges';
 import { skip } from 'rxjs';
@@ -31,6 +31,7 @@ import { ComponentEventBusService } from '../../services/component-event-bus.ser
 import { Background } from '../../types/background.type';
 import { SpacePointContextDirective } from '../../directives/space-point-context.directive';
 import { FitViewOptions } from '../../interfaces/fit-view-options.interface';
+import { Optimization } from '../../interfaces/optimization.interface';
 
 const connectionControllerHostDirective = {
   directive: ConnectionControllerDirective,
@@ -91,7 +92,7 @@ const changesControllerHostDirective = {
     changesControllerHostDirective
   ]
 })
-export class VflowComponent {
+export class VflowComponent implements OnInit {
   // #region DI
   private viewportService = inject(ViewportService)
   private flowEntitiesService = inject(FlowEntitiesService)
@@ -151,6 +152,11 @@ export class VflowComponent {
    */
   @Input()
   public background: Background | string = '#fff'
+
+  @Input()
+  public optimization: Optimization = {
+    computeLayersOnInit: true
+  }
 
   /**
    * Global rule if you can or can't select entities
@@ -219,7 +225,10 @@ export class VflowComponent {
 
   // #region TEMPLATES
   @ContentChild(NodeHtmlTemplateDirective)
-  protected nodeHtmlDirective?: NodeHtmlTemplateDirective
+  protected nodeTemplateDirective?: NodeHtmlTemplateDirective
+
+  @ContentChild(GroupNodeTemplateDirective)
+  protected groupNodeTemplateDirective?: GroupNodeTemplateDirective
 
   @ContentChild(EdgeTemplateDirective)
   protected edgeTemplateDirective?: EdgeTemplateDirective
@@ -277,6 +286,10 @@ export class VflowComponent {
   // #endregion
 
   protected markers = this.flowEntitiesService.markers
+
+  public ngOnInit(): void {
+    this.setInitialNodesOrder()
+  }
 
   // #region METHODS_API
   /**
@@ -341,6 +354,19 @@ export class VflowComponent {
   protected trackEdges(idx: number, { edge }: EdgeModel) {
     return edge
   }
-}
 
+  private setInitialNodesOrder() {
+    if (this.optimization.computeLayersOnInit) {
+
+      this.nodeModels().forEach(model => {
+        switch (model.node.type) {
+          case 'default-group':
+          case 'template-group': {
+            this.nodeRenderingService.pullNode(model)
+          }
+        }
+      })
+    }
+  }
+}
 

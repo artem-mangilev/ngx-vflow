@@ -13,7 +13,6 @@ import { FlowSettingsService } from '../../services/flow-settings.service';
 import { SelectionService } from '../../services/selection.service';
 import { ConnectionControllerDirective } from '../../directives/connection-controller.directive';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { isDynamicNode } from '../../interfaces/node.interface';
 
 export type HandleState = 'valid' | 'invalid' | 'idle'
 
@@ -39,7 +38,10 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInje
   public nodeModel!: NodeModel
 
   @Input()
-  public nodeHtmlTemplate?: TemplateRef<any>
+  public nodeTemplate?: TemplateRef<any>
+
+  @Input()
+  public groupNodeTemplate?: TemplateRef<any>
 
   @ViewChild('nodeContent')
   public nodeContentRef!: ElementRef<SVGGraphicsElement>

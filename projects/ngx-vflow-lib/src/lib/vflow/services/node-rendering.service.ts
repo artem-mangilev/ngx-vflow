@@ -11,11 +11,20 @@ export class NodeRenderingService {
       .sort((aNode, bNode) => aNode.renderOrder() - bNode.renderOrder())
   })
 
-  public pullNode(node: NodeModel) {
-    const maxOrder = Math.max(
+  private maxOrder = computed(() => {
+    return Math.max(
       ...this.flowEntitiesService.nodes().map((n) => n.renderOrder())
     )
+  })
 
-    node.renderOrder.set(maxOrder + 1)
+  public pullNode(node: NodeModel) {
+    // TODO do not pull when the node is already on top
+    // pull node
+    node.renderOrder.set(this.maxOrder() + 1)
+    // pull children
+    this.flowEntitiesService
+      .nodes()
+      .filter(n => n.parent() === node)
+      .forEach(n => this.pullNode(n))
   }
 }

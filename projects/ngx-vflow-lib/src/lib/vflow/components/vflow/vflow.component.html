@@ -35,7 +35,8 @@
       *ngFor="let model of nodeModels(); trackBy: trackNodes"
       node
       [nodeModel]="model"
-      [nodeHtmlTemplate]="nodeHtmlDirective?.templateRef"
+      [nodeTemplate]="nodeTemplateDirective?.templateRef"
+      [groupNodeTemplate]="groupNodeTemplateDirective?.templateRef"
       [attr.transform]="model.pointTransform()"
     />
   </svg:g>

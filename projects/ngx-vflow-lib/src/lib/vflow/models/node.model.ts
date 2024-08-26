@@ -1,4 +1,4 @@
-import { Signal, Type, computed, effect, inject, signal } from '@angular/core'
+import { Signal, computed, effect, inject, signal } from '@angular/core'
 import { DynamicNode, Node, isDynamicNode } from '../interfaces/node.interface'
 import { isDefined } from '../utils/is-defined'
 import { toObservable, toSignal } from '@angular/core/rxjs-interop'
@@ -9,12 +9,15 @@ import { animationFrameScheduler, observeOn, } from 'rxjs'
 import { Point } from '../interfaces/point.interface'
 import { CustomNodeComponent } from '../public-components/custom-node.component'
 import { CustomDynamicNodeComponent } from '../public-components/custom-dynamic-node.component'
+import { FlowEntitiesService } from '../services/flow-entities.service'
 
 export class NodeModel<T = unknown> implements FlowEntity {
   private static defaultWidth = 100
   private static defaultHeight = 50
+  private static defaultColor = '#1b262c'
 
   private flowSettingsService = inject(FlowSettingsService)
+  private entitiesService = inject(FlowEntitiesService);
 
   private internalPoint = this.createInternalPointSignal()
 
@@ -35,7 +38,24 @@ export class NodeModel<T = unknown> implements FlowEntity {
   public selected = signal(false)
   public selected$ = toObservable(this.selected)
 
-  public pointTransform = computed(() => `translate(${this.point().x}, ${this.point().y})`)
+  public globalPoint = computed(() => {
+    let parent = this.parent()
+    let x = this.point().x
+    let y = this.point().y
+
+    while (parent !== null) {
+      x += parent.point().x
+      y += parent.point().y
+
+      parent = parent.parent()
+    }
+
+    return { x, y }
+  })
+
+  public pointTransform = computed(() =>
+    `translate(${this.globalPoint().x}, ${this.globalPoint().y})`
+  )
 
   // Now source and handle positions derived from parent flow
   public sourcePosition = computed(() => this.flowSettingsService.handlePositions().source)
@@ -66,6 +86,14 @@ export class NodeModel<T = unknown> implements FlowEntity {
     }
   })
 
+  public parent = computed(() =>
+    this.entitiesService.nodes().find(n => n.node.id === this.parentId()) ?? null
+  )
+
+  public color = signal(NodeModel.defaultColor)
+
+  private parentId = signal<string | null>(null)
+
   constructor(
     public node: Node<T> | DynamicNode<T>
   ) {
@@ -74,6 +102,22 @@ export class NodeModel<T = unknown> implements FlowEntity {
         this.draggable = node.draggable
       } else {
         this.draggable.set(node.draggable)
+      }
+    }
+
+    if (isDefined(node.parentId)) {
+      if (isDynamicNode(node)) {
+        this.parentId = node.parentId
+      } else {
+        this.parentId.set(node.parentId)
+      }
+    }
+
+    if (node.type === 'default-group' && node.color) {
+      if (isDynamicNode(node)) {
+        this.color = node.color
+      } else {
+        this.color.set(node.color)
       }
     }
   }
@@ -88,19 +132,23 @@ export class NodeModel<T = unknown> implements FlowEntity {
   public linkDefaultNodeSizeWithModelSize() {
     const node = this.node
 
-    if (node.type === 'default') {
-      if (isDynamicNode(node)) {
-        effect(() => {
+    switch (node.type) {
+      case 'default':
+      case 'default-group':
+      case 'template-group': {
+        if (isDynamicNode(node)) {
+          effect(() => {
+            this.size.set({
+              width: node.width?.() ?? NodeModel.defaultWidth,
+              height: node.height?.() ?? NodeModel.defaultHeight,
+            })
+          }, { allowSignalWrites: true })
+        } else {
           this.size.set({
-            width: node.width?.() ?? NodeModel.defaultWidth,
-            height: node.height?.() ?? NodeModel.defaultHeight,
+            width: node.width ?? NodeModel.defaultWidth,
+            height: node.height ?? NodeModel.defaultHeight
           })
-        }, { allowSignalWrites: true })
-      } else {
-        this.size.set({
-          width: node.width ?? NodeModel.defaultWidth,
-          height: node.height ?? NodeModel.defaultHeight
-        })
+        }
       }
     }
   }
