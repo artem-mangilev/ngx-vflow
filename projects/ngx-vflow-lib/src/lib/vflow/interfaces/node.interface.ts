@@ -21,14 +21,14 @@ export interface SharedNode {
   id: string
   point: Point
   draggable?: boolean
-  parentId?: string
+  parentId?: string | null
 }
 
 export interface SharedDynamicNode {
   id: string;
   point: WritableSignal<Point>
   draggable?: WritableSignal<boolean>
-  parentId?: WritableSignal<string>
+  parentId?: WritableSignal<string | null>
 }
 
 export interface DefaultNode extends SharedNode {
