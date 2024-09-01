@@ -71,6 +71,7 @@
   (mousedown)="pullNode(); selectNode()"
 />
 
+<!-- Template group node  -->
 <svg:g
   *ngIf="nodeModel.node.type === 'template-group' && groupNodeTemplate"
   class="selectable"
@@ -82,6 +83,11 @@
     [ngTemplateOutletInjector]="injector"
   />
 </svg:g>
+
+<!-- Resizer -->
+<ng-container *ngIf="nodeModel.resizable()">
+  <ng-template *ngTemplateOutlet="nodeModel.resizerTemplate()"></ng-template>
+</ng-container>
 
 <!-- Handles -->
 <ng-container *ngFor="let handle of nodeModel.handles()">

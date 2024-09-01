@@ -1,4 +1,4 @@
-import { Signal, computed, effect, inject, signal } from '@angular/core'
+import { Signal, TemplateRef, computed, effect, inject, signal } from '@angular/core'
 import { DynamicNode, Node, isDynamicNode } from '../interfaces/node.interface'
 import { isDefined } from '../utils/is-defined'
 import { toObservable, toSignal } from '@angular/core/rxjs-interop'
@@ -91,6 +91,9 @@ export class NodeModel<T = unknown> implements FlowEntity {
   )
 
   public color = signal(NodeModel.defaultColor)
+
+  public resizable = signal(false)
+  public resizerTemplate = signal<TemplateRef<unknown> | null>(null)
 
   private parentId = signal<string | null>(null)
 

@@ -18,6 +18,7 @@ import { PointerDirective } from './directives/pointer.directive';
 import { RootPointerDirective } from './directives/root-pointer.directive';
 import { BackgroundComponent } from './components/background/background.component';
 import { FlowSizeControllerDirective } from './directives/flow-size-controller.directive';
+import { ResizableComponent } from './public-components/resizable/resizable.component';
 
 const components = [
   VflowComponent,
@@ -27,7 +28,8 @@ const components = [
   ConnectionComponent,
   HandleComponent,
   DefsComponent,
-  BackgroundComponent
+  BackgroundComponent,
+  ResizableComponent,
 ]
 
 const directives = [
@@ -39,7 +41,7 @@ const directives = [
   SelectableDirective,
   PointerDirective,
   RootPointerDirective,
-  FlowSizeControllerDirective
+  FlowSizeControllerDirective,
 ]
 
 const templateDirectives = [
@@ -56,6 +58,7 @@ const templateDirectives = [
   exports: [
     VflowComponent,
     HandleComponent,
+    ResizableComponent,
     SelectableDirective,
     ...templateDirectives
   ],
