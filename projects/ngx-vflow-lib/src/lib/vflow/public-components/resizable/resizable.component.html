@@ -2,14 +2,16 @@
   <svg:g>
     <!-- top line -->
     <svg:line
+      #topLine
       x1="0"
       y1="0"
       [attr.x2]="model.size().width"
       y2="0"
       stroke="black"
       stroke-width="2"
+      (mousedown)="startResize('top', $event)"
     />
-    <!-- Right line -->
+    <!-- Left line -->
     <svg:line
       x1="0"
       y1="0"
@@ -17,6 +19,7 @@
       [attr.y2]="model.size().height"
       stroke="black"
       stroke-width="2"
+      (mousedown)="startResize('left', $event)"
     />
     <!-- Bottom line -->
     <svg:line
@@ -26,6 +29,7 @@
       [attr.y2]="model.size().height"
       stroke="black"
       stroke-width="2"
+      (mousedown)="startResize('bottom', $event)"
     />
     <!-- Right line -->
     <svg:line
@@ -35,6 +39,7 @@
       [attr.y2]="model.size().height"
       stroke="black"
       stroke-width="2"
+      (mousedown)="startResize('right', $event)"
     />
   </svg:g>
 </ng-template>
