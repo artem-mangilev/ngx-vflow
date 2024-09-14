@@ -31,7 +31,11 @@
   [attr.height]="nodeModel.size().height"
   (mousedown)="pullNode()"
 >
-  <div #htmlWrapper class="wrapper">
+  <div
+    #htmlWrapper
+    [style.width]="wrapperWidth()"
+    [style.height]="wrapperHeight()"
+  >
     <ng-container
       [ngTemplateOutlet]="nodeTemplate"
       [ngTemplateOutletContext]="{ $implicit: { node: nodeModel.node, selected: nodeModel.selected } }"
@@ -48,7 +52,11 @@
   [attr.height]="nodeModel.size().height"
   (mousedown)="pullNode()"
 >
-  <div #htmlWrapper class="wrapper">
+  <div
+    #htmlWrapper
+    [style.width]="wrapperWidth()"
+    [style.height]="wrapperHeight()"
+  >
     <ng-container
       [ngComponentOutlet]="$any(nodeModel.node.type)"
       [ngComponentOutletInputs]="nodeModel.componentTypeInputs()"

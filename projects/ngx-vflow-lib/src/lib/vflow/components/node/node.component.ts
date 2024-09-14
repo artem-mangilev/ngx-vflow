@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Injector, Input, OnDestroy, OnInit, TemplateRef, ViewChild, computed, effect, inject } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Injector, Input, OnDestroy, OnInit, TemplateRef, ViewChild, computed, effect, inject, signal } from '@angular/core';
 import { DraggableService } from '../../services/draggable.service';
 import { NodeModel } from '../../models/node.model';
 import { FlowStatusService } from '../../services/flow-status.service';
@@ -55,8 +55,12 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInje
   )
 
   protected styleWidth = computed(() => `${this.nodeModel.size().width}px`)
-
   protected styleHeight = computed(() => `${this.nodeModel.size().height}px`)
+
+  protected wrapperWidth = computed(() => this.rendered() ? this.styleWidth() : 'max-content')
+  protected wrapperHeight = computed(() => this.rendered() ? this.styleHeight() : 'max-content')
+
+  protected rendered = signal(false)
 
   @InjectionContext
   public ngOnInit() {
@@ -87,6 +91,8 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInje
   @Microtask // TODO (performance) check if we need microtask here
   @InjectionContext
   public ngAfterViewInit(): void {
+    this.rendered.set(true)
+
     this.nodeModel.linkDefaultNodeSizeWithModelSize()
 
     if (this.nodeModel.node.type === 'html-template' || this.nodeModel.isComponentType) {
