@@ -58,15 +58,6 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInje
   protected styleWidth = computed(() => `${this.nodeModel.size().width}px`)
   protected styleHeight = computed(() => `${this.nodeModel.size().height}px`)
 
-  // When the size is 0, it means that we wait for child content to be rendered,
-  // so we keep max-content for it
-  protected wrapperWidth = computed(() =>
-    this.nodeModel.size().width === 0 ? 'max-content' : this.styleWidth()
-  )
-  protected wrapperHeight = computed(() =>
-    this.nodeModel.size().height === 0 ? 'max-content' : this.styleHeight()
-  )
-
   @InjectionContext
   public ngOnInit() {
     this.handleService.node.set(this.nodeModel);

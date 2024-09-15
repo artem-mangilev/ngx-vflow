@@ -33,8 +33,7 @@
 >
   <div
     #htmlWrapper
-    [style.width]="wrapperWidth()"
-    [style.height]="wrapperHeight()"
+    class="wrapper"
   >
     <ng-container
       [ngTemplateOutlet]="nodeTemplate"
@@ -54,8 +53,7 @@
 >
   <div
     #htmlWrapper
-    [style.width]="wrapperWidth()"
-    [style.height]="wrapperHeight()"
+    class="wrapper"
   >
     <ng-container
       [ngComponentOutlet]="$any(nodeModel.node.type)"

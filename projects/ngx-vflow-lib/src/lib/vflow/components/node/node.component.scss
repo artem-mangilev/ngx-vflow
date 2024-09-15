@@ -2,6 +2,11 @@
   opacity: 0;
 }
 
+.wrapper {
+  min-width: max-content;
+  min-height: max-content;
+}
+
 .default-node {
   border: 1.5px solid #1b262c;
   border-radius: 5px;
