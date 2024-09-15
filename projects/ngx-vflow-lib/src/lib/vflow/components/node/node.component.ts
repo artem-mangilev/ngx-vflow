@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Injector, Input, OnDestroy, OnInit, TemplateRef, ViewChild, computed, effect, inject, signal } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Injector, Input, NgZone, OnDestroy, OnInit, TemplateRef, ViewChild, computed, effect, inject, signal } from '@angular/core';
 import { DraggableService } from '../../services/draggable.service';
 import { NodeModel } from '../../models/node.model';
 import { FlowStatusService } from '../../services/flow-status.service';
@@ -33,6 +33,7 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInje
   private selectionService = inject(SelectionService)
   private hostRef = inject<ElementRef<SVGElement>>(ElementRef)
   private connectionController = inject(ConnectionControllerDirective)
+  private zone = inject(NgZone)
 
   @Input()
   public nodeModel!: NodeModel
@@ -57,10 +58,14 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInje
   protected styleWidth = computed(() => `${this.nodeModel.size().width}px`)
   protected styleHeight = computed(() => `${this.nodeModel.size().height}px`)
 
-  protected wrapperWidth = computed(() => this.rendered() ? this.styleWidth() : 'max-content')
-  protected wrapperHeight = computed(() => this.rendered() ? this.styleHeight() : 'max-content')
-
-  protected rendered = signal(false)
+  // When the size is 0, it means that we wait for child content to be rendered,
+  // so we keep max-content for it
+  protected wrapperWidth = computed(() =>
+    this.nodeModel.size().width === 0 ? 'max-content' : this.styleWidth()
+  )
+  protected wrapperHeight = computed(() =>
+    this.nodeModel.size().height === 0 ? 'max-content' : this.styleHeight()
+  )
 
   @InjectionContext
   public ngOnInit() {
@@ -77,7 +82,8 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInje
     this.nodeModel.handles$
       .pipe(
         switchMap((handles) =>
-          resizable(handles.map(h => h.parentReference!)).pipe(map(() => handles))
+          resizable(handles.map(h => h.parentReference!), this.zone)
+            .pipe(map(() => handles))
         ),
         tap((handles) => {
           // TODO (performance) inspect how to avoid calls of this when flow initially rendered
@@ -88,15 +94,12 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInje
       .subscribe()
   }
 
-  @Microtask // TODO (performance) check if we need microtask here
   @InjectionContext
   public ngAfterViewInit(): void {
-    this.rendered.set(true)
-
     this.nodeModel.linkDefaultNodeSizeWithModelSize()
 
     if (this.nodeModel.node.type === 'html-template' || this.nodeModel.isComponentType) {
-      resizable([this.htmlWrapperRef.nativeElement])
+      resizable([this.htmlWrapperRef.nativeElement], this.zone)
         .pipe(
           startWith(null),
           tap(() => {
