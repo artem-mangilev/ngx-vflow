@@ -3,8 +3,7 @@
 }
 
 .wrapper {
-  min-width: max-content;
-  min-height: max-content;
+  display: table-cell;
 }
 
 .default-node {
