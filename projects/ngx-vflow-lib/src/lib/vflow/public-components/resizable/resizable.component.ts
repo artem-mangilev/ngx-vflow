@@ -62,37 +62,49 @@ export class ResizableComponent implements OnInit {
 
     switch (this.resizeSide) {
       case 'left':
-        this.model.setPoint({
-          x: this.model.point().x + offsetX,
-          y: this.model.point().y
-        }, false)
+        if (this.model.size().width - offsetX > 0) {
 
-        this.model.size.update(({ height, width }) =>
-          ({ height, width: width - offsetX })
-        )
+          this.model.setPoint({
+            x: this.model.point().x + offsetX,
+            y: this.model.point().y
+          }, false)
+
+          this.model.size.update(({ height, width }) =>
+            ({ height, width: width - offsetX })
+          )
+        }
 
         return
       case 'right':
-        this.model.size.update(({ height, width }) =>
-          ({ height, width: width + offsetX })
-        )
+        if (this.model.size().width + offsetX > 0) {
+
+          this.model.size.update(({ height, width }) =>
+            ({ height, width: width + offsetX })
+          )
+        }
 
         return
       case 'top':
-        this.model.setPoint({
-          x: this.model.point().x,
-          y: this.model.point().y + offsetY
-        }, false)
+        if (this.model.size().height - offsetY > 0) {
 
-        this.model.size.update(({ height, width }) =>
-          ({ width, height: height - offsetY })
-        )
+          this.model.setPoint({
+            x: this.model.point().x,
+            y: this.model.point().y + offsetY
+          }, false)
+
+          this.model.size.update(({ height, width }) =>
+            ({ width, height: height - offsetY })
+          )
+        }
 
         return
       case 'bottom':
-        this.model.size.update(({ height, width }) =>
-          ({ width, height: height + offsetY })
-        )
+        if (this.model.size().height + offsetY > 0) {
+
+          this.model.size.update(({ height, width }) =>
+            ({ width, height: height + offsetY })
+          )
+        }
 
         return
     }
