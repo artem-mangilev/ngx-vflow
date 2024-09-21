@@ -27,6 +27,7 @@ export class ResizableComponent implements OnInit {
 
   private zoom = computed(() => this.viewportService.readableViewport().zoom ?? 0)
 
+  // TODO: allow reszie beside the flow
   protected resizeOnGlobalMouseMove = this.rootPointer.mouseMovement$
     .pipe(
       filter(() => this.resizeSide !== null),
@@ -35,7 +36,7 @@ export class ResizableComponent implements OnInit {
     )
     .subscribe()
 
-  protected endResizeOnGlobalMouseUp = this.rootPointer.mouseUp$
+  protected endResizeOnGlobalMouseUp = this.rootPointer.documentMouseUp$
     .pipe(
       tap(() => this.endResize()),
       takeUntilDestroyed()

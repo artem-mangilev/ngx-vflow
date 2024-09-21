@@ -67,6 +67,8 @@ export class RootPointerDirective {
     share()
   ) satisfies Observable<Point>
 
+  public documentMouseUp$ = fromEvent<MouseEvent>(document, 'mouseup')
+
   /**
    * We should know when user started a touch in order to not
    * show old touch position when connection creation is started
