@@ -1,4 +1,4 @@
-import { AfterContentInit, AfterViewInit, Component, computed, ElementRef, inject, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, computed, ElementRef, inject, Input, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { NodeComponent } from '../../components/node/node.component';
 import { RootPointerDirective } from '../../directives/root-pointer.directive';
 import { filter, map, tap } from 'rxjs';
@@ -18,6 +18,15 @@ export class ResizableComponent implements OnInit, AfterViewInit {
   private rootPointer = inject(RootPointerDirective)
   private viewportService = inject(ViewportService)
   private hostRef = inject<ElementRef<Element>>(ElementRef)
+
+  @Input()
+  public set resizable(value: boolean | '') {
+    if (typeof value === 'boolean') {
+      this.model.resizable.set(value)
+    } else {
+      this.model.resizable.set(true)
+    }
+  }
 
   @ViewChild('resizer', { static: true })
   private resizer!: TemplateRef<unknown>
@@ -51,7 +60,6 @@ export class ResizableComponent implements OnInit, AfterViewInit {
     .subscribe()
 
   public ngOnInit(): void {
-    this.model.resizable.set(true)
     this.model.resizerTemplate.set(this.resizer)
   }
 
