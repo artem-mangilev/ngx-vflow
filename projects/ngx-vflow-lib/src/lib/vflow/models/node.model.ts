@@ -99,6 +99,7 @@ export class NodeModel<T = unknown> implements FlowEntity {
   public color = signal(NodeModel.defaultColor)
 
   public resizable = signal(false)
+  public resizing = signal(false)
   public resizerTemplate = signal<TemplateRef<unknown> | null>(null)
 
   private parentId = signal<string | null>(null)

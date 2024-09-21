@@ -5,7 +5,7 @@ import { FlowStatusService } from '../../services/flow-status.service';
 import { HandleService } from '../../services/handle.service';
 import { HandleModel } from '../../models/handle.model';
 import { resizable } from '../../utils/resizable';
-import { map, startWith, switchMap, tap } from 'rxjs';
+import { filter, first, map, startWith, switchMap, tap } from 'rxjs';
 import { InjectionContext, WithInjector } from '../../decorators/run-in-injection-context.decorator';
 import { Microtask } from '../../decorators/microtask.decorator';
 import { NodeRenderingService } from '../../services/node-rendering.service';
@@ -93,6 +93,7 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInje
       resizable([this.htmlWrapperRef.nativeElement], this.zone)
         .pipe(
           startWith(null),
+          filter(() => !this.nodeModel.resizing()),
           tap(() => {
             const width = this.htmlWrapperRef.nativeElement.clientWidth
             const height = this.htmlWrapperRef.nativeElement.clientHeight

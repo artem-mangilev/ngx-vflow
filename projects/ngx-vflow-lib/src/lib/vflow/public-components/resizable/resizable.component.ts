@@ -4,6 +4,7 @@ import { RootPointerDirective } from '../../directives/root-pointer.directive';
 import { filter, map, tap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ViewportService } from '../../services/viewport.service';
+import { round } from '../../utils/round';
 
 type Side = 'top' | 'right' | 'bottom' | 'left'
 
@@ -52,40 +53,45 @@ export class ResizableComponent implements OnInit {
     event.stopPropagation()
 
     this.resizeSide = side
+    this.model.resizing.set(true);
   }
 
   protected resize({ movementX, movementY }: MouseEvent) {
+    const offsetX = round(movementX / this.zoom())
+    const offsetY = round(movementY / this.zoom())
+
     switch (this.resizeSide) {
       case 'left':
         this.model.setPoint({
-          x: this.model.point().x + (movementX / this.zoom()),
+          x: this.model.point().x + offsetX,
           y: this.model.point().y
         }, false)
 
         this.model.size.update(({ height, width }) =>
-          ({ height, width: width - (movementX / this.zoom()) })
+          ({ height, width: width - offsetX })
         )
 
         return
       case 'right':
         this.model.size.update(({ height, width }) =>
-          ({ height, width: width + (movementX / this.zoom()) })
+          ({ height, width: width + offsetX })
         )
+
         return
       case 'top':
         this.model.setPoint({
           x: this.model.point().x,
-          y: this.model.point().y + (movementY / this.zoom())
+          y: this.model.point().y + offsetY
         }, false)
 
         this.model.size.update(({ height, width }) =>
-          ({ width, height: height - (movementY / this.zoom()) })
+          ({ width, height: height - offsetY })
         )
 
         return
       case 'bottom':
         this.model.size.update(({ height, width }) =>
-          ({ width, height: height + (movementY / this.zoom()) })
+          ({ width, height: height + offsetY })
         )
 
         return
@@ -94,5 +100,6 @@ export class ResizableComponent implements OnInit {
 
   protected endResize() {
     this.resizeSide = null
+    this.model.resizing.set(false)
   }
 }
