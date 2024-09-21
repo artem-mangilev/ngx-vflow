@@ -1,10 +1,11 @@
-import { Component, computed, ElementRef, inject, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { AfterContentInit, AfterViewInit, Component, computed, ElementRef, inject, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { NodeComponent } from '../../components/node/node.component';
 import { RootPointerDirective } from '../../directives/root-pointer.directive';
 import { filter, map, tap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ViewportService } from '../../services/viewport.service';
 import { round } from '../../utils/round';
+import { Microtask } from '../../decorators/microtask.decorator';
 
 type Side = 'top' | 'right' | 'bottom' | 'left'
 
@@ -12,13 +13,15 @@ type Side = 'top' | 'right' | 'bottom' | 'left'
   selector: '[resizable]',
   templateUrl: './resizable.component.html'
 })
-export class ResizableComponent implements OnInit {
+export class ResizableComponent implements OnInit, AfterViewInit {
   private parentNode = inject(NodeComponent)
   private rootPointer = inject(RootPointerDirective)
   private viewportService = inject(ViewportService)
+  private hostRef = inject<ElementRef<Element>>(ElementRef)
 
   @ViewChild('resizer', { static: true })
   private resizer!: TemplateRef<unknown>
+
 
   protected get model() {
     return this.parentNode.nodeModel
@@ -27,6 +30,9 @@ export class ResizableComponent implements OnInit {
   private resizeSide: Side | null = null
 
   private zoom = computed(() => this.viewportService.readableViewport().zoom ?? 0)
+
+  private minWidth = 0
+  private minHeight = 0
 
   // TODO: allow reszie beside the flow
   protected resizeOnGlobalMouseMove = this.rootPointer.mouseMovement$
@@ -49,6 +55,12 @@ export class ResizableComponent implements OnInit {
     this.model.resizerTemplate.set(this.resizer)
   }
 
+  @Microtask
+  public ngAfterViewInit() {
+    this.minWidth = +getComputedStyle(this.hostRef.nativeElement).minWidth.replace('px', '') || 0
+    this.minHeight = +getComputedStyle(this.hostRef.nativeElement).minHeight.replace('px', '') || 0
+  }
+
   protected startResize(side: Side, event: Event) {
     event.stopPropagation()
 
@@ -62,7 +74,7 @@ export class ResizableComponent implements OnInit {
 
     switch (this.resizeSide) {
       case 'left':
-        if (this.model.size().width - offsetX > 0) {
+        if (this.model.size().width - offsetX > this.minWidth) {
 
           this.model.setPoint({
             x: this.model.point().x + offsetX,
@@ -76,7 +88,7 @@ export class ResizableComponent implements OnInit {
 
         return
       case 'right':
-        if (this.model.size().width + offsetX > 0) {
+        if (this.model.size().width + offsetX > this.minWidth) {
 
           this.model.size.update(({ height, width }) =>
             ({ height, width: width + offsetX })
@@ -85,7 +97,7 @@ export class ResizableComponent implements OnInit {
 
         return
       case 'top':
-        if (this.model.size().height - offsetY > 0) {
+        if (this.model.size().height - offsetY > this.minHeight) {
 
           this.model.setPoint({
             x: this.model.point().x,
@@ -99,7 +111,7 @@ export class ResizableComponent implements OnInit {
 
         return
       case 'bottom':
-        if (this.model.size().height + offsetY > 0) {
+        if (this.model.size().height + offsetY > this.minHeight) {
 
           this.model.size.update(({ height, width }) =>
             ({ width, height: height + offsetY })
