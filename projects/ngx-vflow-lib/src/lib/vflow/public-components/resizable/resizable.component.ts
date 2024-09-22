@@ -90,7 +90,7 @@ export class ResizableComponent implements OnInit, AfterViewInit {
 
     switch (this.resizeSide) {
       case 'left':
-        if (this.model.size().width - offsetX > this.minWidth) {
+        if (this.model.size().width - offsetX >= this.minWidth) {
 
           this.model.setPoint({
             x: this.model.point().x + offsetX,
@@ -104,7 +104,7 @@ export class ResizableComponent implements OnInit, AfterViewInit {
 
         return
       case 'right':
-        if (this.model.size().width + offsetX > this.minWidth) {
+        if (this.model.size().width + offsetX >= this.minWidth) {
 
           this.model.size.update(({ height, width }) =>
             ({ height, width: width + offsetX })
@@ -113,7 +113,7 @@ export class ResizableComponent implements OnInit, AfterViewInit {
 
         return
       case 'top':
-        if (this.model.size().height - offsetY > this.minHeight) {
+        if (this.model.size().height - offsetY >= this.minHeight) {
 
           this.model.setPoint({
             x: this.model.point().x,
@@ -127,7 +127,7 @@ export class ResizableComponent implements OnInit, AfterViewInit {
 
         return
       case 'bottom':
-        if (this.model.size().height + offsetY > this.minHeight) {
+        if (this.model.size().height + offsetY >= this.minHeight) {
 
           this.model.size.update(({ height, width }) =>
             ({ width, height: height + offsetY })
@@ -138,8 +138,8 @@ export class ResizableComponent implements OnInit, AfterViewInit {
 
       case 'top-left':
         if (
-          this.model.size().height - offsetY > this.minHeight &&
-          this.model.size().width - offsetX > this.minWidth
+          this.model.size().height - offsetY >= this.minHeight &&
+          this.model.size().width - offsetX >= this.minWidth
         ) {
 
           this.model.setPoint({
@@ -156,8 +156,8 @@ export class ResizableComponent implements OnInit, AfterViewInit {
 
       case 'top-right':
         if (
-          this.model.size().height - offsetY > this.minHeight &&
-          this.model.size().width + offsetX > this.minWidth
+          this.model.size().height - offsetY >= this.minHeight &&
+          this.model.size().width + offsetX >= this.minWidth
         ) {
 
           this.model.setPoint({
@@ -174,8 +174,8 @@ export class ResizableComponent implements OnInit, AfterViewInit {
 
       case 'bottom-left':
         if (
-          this.model.size().height + offsetY > this.minHeight &&
-          this.model.size().width - offsetX > this.minWidth
+          this.model.size().height + offsetY >= this.minHeight &&
+          this.model.size().width - offsetX >= this.minWidth
         ) {
 
           this.model.setPoint({
@@ -192,8 +192,8 @@ export class ResizableComponent implements OnInit, AfterViewInit {
 
       case 'bottom-right':
         if (
-          this.model.size().height + offsetY > this.minHeight &&
-          this.model.size().width + offsetX > this.minWidth
+          this.model.size().height + offsetY >= this.minHeight &&
+          this.model.size().width + offsetX >= this.minWidth
         ) {
 
           this.model.size.update(({ height, width }) =>
