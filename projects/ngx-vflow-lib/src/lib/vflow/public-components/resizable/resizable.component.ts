@@ -100,8 +100,8 @@ export class ResizableComponent implements OnInit, AfterViewInit {
         x = Math.max(x, this.getMinX())
         x = Math.min(x, this.getMaxX())
 
-        // TODO
-        if (x === this.getMinX()) {
+        // TODO this fixes increasing width when current node hits the parent
+        if (x === this.getMinX() || x === this.getMaxX()) {
           return
         }
 
@@ -132,7 +132,7 @@ export class ResizableComponent implements OnInit, AfterViewInit {
         y = Math.max(y, this.getMinY())
         y = Math.min(y, this.getMaxY())
 
-        if (y === 0) {
+        if (y === this.getMinY() || y === this.getMaxY()) {
           return
         }
 
@@ -167,7 +167,10 @@ export class ResizableComponent implements OnInit, AfterViewInit {
         y = Math.max(y, this.getMinY())
         y = Math.min(y, this.getMaxY())
 
-        if (x === 0 || y === 0) {
+        if (
+          x === this.getMinX() || y === this.getMinY() ||
+          x === this.getMaxX() || y === this.getMaxY()
+        ) {
           return
         }
 
@@ -193,7 +196,7 @@ export class ResizableComponent implements OnInit, AfterViewInit {
         y = Math.max(y, this.getMinY())
         y = Math.min(y, this.getMaxY())
 
-        if (y === 0 || y === this.getMaxY()) {
+        if (y === this.getMinX() || y === this.getMaxY()) {
           return
         }
 
@@ -222,7 +225,7 @@ export class ResizableComponent implements OnInit, AfterViewInit {
         x = Math.max(x, this.getMinX())
         x = Math.min(x, this.getMaxX())
 
-        if (x === 0) {
+        if (x === this.getMinX() || x === this.getMaxX()) {
           return
         }
 
@@ -305,22 +308,10 @@ export class ResizableComponent implements OnInit, AfterViewInit {
   }
 
   private getMaxX() {
-    const parent = this.model.parent()
-
-    if (parent) {
-      return this.initialSize.width + this.initialPoint.x
-    }
-
-    return (this.model.size().width - this.minWidth) + this.initialPoint.x
+    return (this.model.size().width - this.minWidth) + this.model.point().x
   }
 
   private getMaxY() {
-    const parent = this.model.parent()
-
-    if (parent) {
-      return this.initialSize.height + this.initialPoint.y
-    }
-
-    return (this.model.size().height - this.minHeight) + this.initialPoint.y
+    return (this.model.size().height - this.minHeight) + this.model.point().y
   }
 }
