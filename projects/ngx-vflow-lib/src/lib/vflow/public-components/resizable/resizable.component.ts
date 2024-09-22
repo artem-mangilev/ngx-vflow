@@ -7,7 +7,7 @@ import { ViewportService } from '../../services/viewport.service';
 import { round } from '../../utils/round';
 import { Microtask } from '../../decorators/microtask.decorator';
 
-type Side = 'top' | 'right' | 'bottom' | 'left'
+type Side = 'top' | 'right' | 'bottom' | 'left' | 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left';
 
 @Component({
   selector: '[resizable]',
@@ -123,6 +123,73 @@ export class ResizableComponent implements OnInit, AfterViewInit {
 
           this.model.size.update(({ height, width }) =>
             ({ width, height: height + offsetY })
+          )
+        }
+
+        return
+
+      case 'top-left':
+        if (
+          this.model.size().height - offsetY > this.minHeight &&
+          this.model.size().width - offsetX > this.minWidth
+        ) {
+
+          this.model.setPoint({
+            x: this.model.point().x + offsetX,
+            y: this.model.point().y + offsetY
+          }, false)
+
+          this.model.size.update(({ height, width }) =>
+            ({ height: height - offsetY, width: width - offsetX })
+          )
+        }
+
+        return
+
+      case 'top-right':
+        if (
+          this.model.size().height - offsetY > this.minHeight &&
+          this.model.size().width + offsetX > this.minWidth
+        ) {
+
+          this.model.setPoint({
+            x: this.model.point().x,
+            y: this.model.point().y + offsetY
+          }, false)
+
+          this.model.size.update(({ height, width }) =>
+            ({ height: height - offsetY, width: width + offsetX })
+          )
+        }
+
+        return
+
+      case 'bottom-left':
+        if (
+          this.model.size().height + offsetY > this.minHeight &&
+          this.model.size().width - offsetX > this.minWidth
+        ) {
+
+          this.model.setPoint({
+            x: this.model.point().x + offsetX,
+            y: this.model.point().y
+          }, false)
+
+          this.model.size.update(({ height, width }) =>
+            ({ height: height + offsetY, width: width - offsetX })
+          )
+        }
+
+        return
+
+      case 'bottom-right':
+        if (
+          this.model.size().height + offsetY > this.minHeight &&
+          this.model.size().width + offsetX > this.minWidth
+        ) {
+
+          this.model.size.update(({ height, width }) =>
+            ({ height: height + offsetY, width: width + offsetX })
           )
         }
 

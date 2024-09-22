@@ -41,6 +41,42 @@
       stroke-width="2"
       (mousedown)="startResize('right', $event)"
     />
+
+    <!-- Top Left -->
+    <svg:circle
+      cx="0"
+      cy="0"
+      r="5"
+      fill="black"
+      (mousedown)="startResize('top-left', $event)"
+    />
+
+    <!-- Top right -->
+    <svg:circle
+      [attr.cx]="model.size().width"
+      cy="0"
+      r="5"
+      fill="black"
+      (mousedown)="startResize('top-right', $event)"
+    />
+
+    <!-- Bottom left -->
+    <svg:circle
+      cx="0"
+      [attr.cy]="model.size().height"
+      r="5"
+      fill="black"
+      (mousedown)="startResize('bottom-left', $event)"
+    />
+
+    <!-- Bottom right -->
+    <svg:circle
+      [attr.cx]="model.size().width"
+      [attr.cy]="model.size().height"
+      r="5"
+      fill="black"
+      (mousedown)="startResize('bottom-right', $event)"
+    />
   </svg:g>
 </ng-template>
 
