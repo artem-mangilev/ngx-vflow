@@ -51,6 +51,8 @@ export class ResizableComponent implements OnInit, AfterViewInit {
 
   private minWidth = 0
   private minHeight = 0
+  private initialSize = { width: 0, height: 0 }
+  private initialPoint = { x: 0, y: 0 }
 
   // TODO: allow reszie beside the flow
   protected resizeOnGlobalMouseMove = this.rootPointer.mouseMovement$
@@ -83,6 +85,9 @@ export class ResizableComponent implements OnInit, AfterViewInit {
 
     this.resizeSide = side
     this.model.resizing.set(true);
+
+    this.initialSize = this.model.size()
+    this.initialPoint = this.model.point()
   }
 
   protected resize({ movementX, movementY }: MouseEvent) {
@@ -91,123 +96,191 @@ export class ResizableComponent implements OnInit, AfterViewInit {
 
     switch (this.resizeSide) {
       case 'left':
-        if (this.model.size().width - offsetX >= this.minWidth) {
+        let x = this.model.point().x + offsetX
+        x = Math.max(x, 0)
+        x = Math.min(x, this.initialSize.width + this.initialPoint.x)
 
-          this.model.setPoint({
-            x: this.model.point().x + offsetX,
-            y: this.model.point().y
-          }, false)
-
-          this.model.size.update(({ height, width }) =>
-            ({ height, width: width - offsetX })
-          )
+        if (x === 0) {
+          return
         }
+
+        this.model.setPoint({ x, y: this.model.point().y }, false)
+
+        this.model.size.update(({ height, width }) => {
+          width -= offsetX
+          width = Math.max(width, this.minWidth)
+          width = Math.min(width, this.getMaxWidth())
+
+          console.log(width)
+
+          return { height, width: width }
+        })
 
         return
       case 'right':
-        if (this.model.size().width + offsetX >= this.minWidth) {
+        this.model.size.update(({ height, width }) => {
+          width += offsetX
+          width = Math.max(width, this.minWidth)
+          width = Math.min(width, this.getMaxWidth())
 
-          this.model.size.update(({ height, width }) =>
-            ({ height, width: width + offsetX })
-          )
-        }
+          return { height, width }
+        })
 
         return
       case 'top':
-        if (this.model.size().height - offsetY >= this.minHeight) {
+        let y = this.model.point().y + offsetY
+        y = Math.max(y, 0)
+        y = Math.min(y, this.initialSize.height + this.initialPoint.y)
 
-          this.model.setPoint({
-            x: this.model.point().x,
-            y: this.model.point().y + offsetY
-          }, false)
-
-          this.model.size.update(({ height, width }) =>
-            ({ width, height: height - offsetY })
-          )
+        if (y === 0) {
+          return
         }
+
+        this.model.setPoint({ x: this.model.point().x, y }, false)
+
+        this.model.size.update(({ height, width }) => {
+          height -= offsetY
+          height = Math.max(height, this.minHeight)
+          height = Math.min(height, this.getMaxHeight())
+
+          return { width, height: height }
+        })
 
         return
       case 'bottom':
-        if (this.model.size().height + offsetY >= this.minHeight) {
+        this.model.size.update(({ height, width }) => {
+          height += offsetY
+          height = Math.max(height, this.minHeight)
+          height = Math.min(height, this.getMaxHeight())
 
-          this.model.size.update(({ height, width }) =>
-            ({ width, height: height + offsetY })
-          )
-        }
-
-        return
-
-      case 'top-left':
-        if (
-          this.model.size().height - offsetY >= this.minHeight &&
-          this.model.size().width - offsetX >= this.minWidth
-        ) {
-
-          this.model.setPoint({
-            x: this.model.point().x + offsetX,
-            y: this.model.point().y + offsetY
-          }, false)
-
-          this.model.size.update(({ height, width }) =>
-            ({ height: height - offsetY, width: width - offsetX })
-          )
-        }
+          return { width, height }
+        })
 
         return
 
-      case 'top-right':
-        if (
-          this.model.size().height - offsetY >= this.minHeight &&
-          this.model.size().width + offsetX >= this.minWidth
-        ) {
+      case 'top-left': {
+        let x = this.model.point().x + offsetX
+        x = Math.max(x, 0)
+        x = Math.min(x, this.initialSize.width + this.initialPoint.x)
 
-          this.model.setPoint({
-            x: this.model.point().x,
-            y: this.model.point().y + offsetY
-          }, false)
+        let y = this.model.point().y + offsetY
+        y = Math.max(y, 0)
+        y = Math.min(y, this.initialSize.height + this.initialPoint.y)
 
-          this.model.size.update(({ height, width }) =>
-            ({ height: height - offsetY, width: width + offsetX })
-          )
+        if (x === 0 || y === 0) {
+          return
         }
 
+        this.model.setPoint({ x, y }, false)
+
+        this.model.size.update(({ height, width }) => {
+          width -= offsetX
+          width = Math.max(width, this.minWidth)
+          width = Math.min(width, this.getMaxWidth())
+
+          height -= offsetY
+          height = Math.max(height, this.minHeight)
+          height = Math.min(height, this.getMaxHeight())
+
+          return { height, width }
+        })
+
         return
+      }
 
-      case 'bottom-left':
-        if (
-          this.model.size().height + offsetY >= this.minHeight &&
-          this.model.size().width - offsetX >= this.minWidth
-        ) {
+      case 'top-right': {
+        let y = this.model.point().y + offsetY
+        y = Math.max(y, 0)
+        y = Math.min(y, this.initialSize.height + this.initialPoint.y)
 
-          this.model.setPoint({
-            x: this.model.point().x + offsetX,
-            y: this.model.point().y
-          }, false)
-
-          this.model.size.update(({ height, width }) =>
-            ({ height: height + offsetY, width: width - offsetX })
-          )
+        if (y === 0 || y === this.initialSize.height + this.initialPoint.y) {
+          return
         }
 
+        this.model.setPoint({
+          x: this.model.point().x,
+          y: this.model.point().y + offsetY
+        }, false)
+
+        this.model.size.update(({ height, width }) => {
+          width += offsetX
+          width = Math.max(width, this.minWidth)
+          width = Math.min(width, this.getMaxWidth())
+
+          height -= offsetY
+          height = Math.max(height, this.minHeight)
+          height = Math.min(height, this.getMaxHeight())
+
+          return { height, width }
+        })
+
         return
+      }
 
-      case 'bottom-right':
-        if (
-          this.model.size().height + offsetY >= this.minHeight &&
-          this.model.size().width + offsetX >= this.minWidth
-        ) {
+      case 'bottom-left': {
+        let x = this.model.point().x + offsetX
+        x = Math.max(x, 0)
+        x = Math.min(x, this.initialSize.width + this.initialPoint.x)
 
-          this.model.size.update(({ height, width }) =>
-            ({ height: height + offsetY, width: width + offsetX })
-          )
+        if (x === 0) {
+          return
         }
 
+        this.model.setPoint({ x, y: this.model.point().y }, false)
+
+        this.model.size.update(({ height, width }) => {
+          width -= offsetX
+          width = Math.max(width, this.minWidth)
+          width = Math.min(width, this.getMaxWidth())
+
+          height += offsetY
+          height = Math.max(height, this.minHeight)
+          height = Math.min(height, this.getMaxHeight())
+
+          return { height, width }
+        })
+
         return
+      }
+
+      case 'bottom-right': {
+        this.model.size.update(({ height, width }) => {
+          width += offsetX
+          width = Math.max(width, this.minWidth)
+          width = Math.min(width, this.getMaxWidth())
+
+          height += offsetY
+          height = Math.max(height, this.minHeight)
+          height = Math.min(height, this.getMaxHeight())
+
+          return { height, width }
+        })
+      }
     }
   }
 
   protected endResize() {
     this.resizeSide = null
     this.model.resizing.set(false)
+  }
+
+  private getMaxWidth() {
+    const parent = this.model.parent()
+
+    if (parent) {
+      return parent.size().width - this.model.point().x
+    }
+
+    return Infinity
+  }
+
+  private getMaxHeight() {
+    const parent = this.model.parent()
+
+    if (parent) {
+      return parent.size().height - this.model.point().y
+    }
+
+    return Infinity
   }
 }
