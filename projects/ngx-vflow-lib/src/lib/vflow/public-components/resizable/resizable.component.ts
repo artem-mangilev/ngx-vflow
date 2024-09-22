@@ -28,6 +28,8 @@ export class ResizableComponent implements OnInit, AfterViewInit {
     }
   }
 
+  public resizerColor = '#2e414c'
+
   @ViewChild('resizer', { static: true })
   private resizer!: TemplateRef<unknown>
 

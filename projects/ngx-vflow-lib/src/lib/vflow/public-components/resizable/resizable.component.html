@@ -7,7 +7,7 @@
       y1="0"
       [attr.x2]="model.size().width - 4"
       y2="0"
-      stroke="black"
+      [attr.stroke]="resizerColor"
       stroke-width="2"
       (mousedown)="startResize('top', $event)"
     />
@@ -17,7 +17,7 @@
       y1="4"
       x2="0"
       [attr.y2]="model.size().height - 4"
-      stroke="black"
+      [attr.stroke]="resizerColor"
       stroke-width="2"
       (mousedown)="startResize('left', $event)"
     />
@@ -27,7 +27,7 @@
       [attr.y1]="model.size().height"
       [attr.x2]="model.size().width - 4"
       [attr.y2]="model.size().height"
-      stroke="black"
+      [attr.stroke]="resizerColor"
       stroke-width="2"
       (mousedown)="startResize('bottom', $event)"
     />
@@ -37,7 +37,7 @@
       y1="4"
       [attr.x2]="model.size().width"
       [attr.y2]="model.size().height - 4"
-      stroke="black"
+      [attr.stroke]="resizerColor"
       stroke-width="2"
       (mousedown)="startResize('right', $event)"
     />
@@ -48,7 +48,7 @@
       y="-3"
       width="6"
       height="6"
-      fill="black"
+      [attr.fill]="resizerColor"
       (mousedown)="startResize('top-left', $event)"
     />
 
@@ -58,7 +58,7 @@
       y="-3"
       width="6"
       height="6"
-      fill="black"
+      [attr.fill]="resizerColor"
       (mousedown)="startResize('top-right', $event)"
     />
 
@@ -68,7 +68,7 @@
       [attr.y]="model.size().height - 3"
       width="6"
       height="6"
-      fill="black"
+      [attr.fill]="resizerColor"
       (mousedown)="startResize('bottom-left', $event)"
     />
 
@@ -78,7 +78,7 @@
       [attr.y]="model.size().height - 3"
       width="6"
       height="6"
-      fill="black"
+      [attr.fill]="resizerColor"
       (mousedown)="startResize('bottom-right', $event)"
     />
   </svg:g>
