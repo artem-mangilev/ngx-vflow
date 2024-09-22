@@ -39,6 +39,9 @@ export class NodeModel<T = unknown> implements FlowEntity {
 
   public size = signal({ width: 0, height: 0 })
 
+  public width = computed(() => this.size().width)
+  public height = computed(() => this.size().height)
+
   public renderOrder = signal(0)
 
   public selected = signal(false)

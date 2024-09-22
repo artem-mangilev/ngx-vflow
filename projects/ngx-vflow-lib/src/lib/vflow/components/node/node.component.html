@@ -89,7 +89,7 @@
 >
   <ng-container
     [ngTemplateOutlet]="groupNodeTemplate"
-    [ngTemplateOutletContext]="{ $implicit: { node: nodeModel.node, selected: nodeModel.selected } }"
+    [ngTemplateOutletContext]="{ $implicit: { node: nodeModel.node, selected: nodeModel.selected, width: nodeModel.width, height: nodeModel.height } }"
     [ngTemplateOutletInjector]="injector"
   />
 </svg:g>
