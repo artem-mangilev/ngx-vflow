@@ -6,6 +6,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ViewportService } from '../../services/viewport.service';
 import { round } from '../../utils/round';
 import { Microtask } from '../../decorators/microtask.decorator';
+import { getNodesBounds } from '../../utils/nodes';
 
 type Side = 'top' | 'right' | 'bottom' | 'left' | 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left';
 
@@ -51,8 +52,6 @@ export class ResizableComponent implements OnInit, AfterViewInit {
 
   private minWidth = 0
   private minHeight = 0
-  private initialSize = { width: 0, height: 0 }
-  private initialPoint = { x: 0, y: 0 }
 
   // TODO: allow reszie beside the flow
   protected resizeOnGlobalMouseMove = this.rootPointer.mouseMovement$
@@ -85,9 +84,6 @@ export class ResizableComponent implements OnInit, AfterViewInit {
 
     this.resizeSide = side
     this.model.resizing.set(true);
-
-    this.initialSize = this.model.size()
-    this.initialPoint = this.model.point()
   }
 
   protected resize({ movementX, movementY }: MouseEvent) {
@@ -99,6 +95,7 @@ export class ResizableComponent implements OnInit, AfterViewInit {
         let x = this.model.point().x + offsetX
         x = Math.max(x, this.getMinX())
         x = Math.min(x, this.getMaxX())
+
 
         // TODO this fixes increasing width when current node hits the parent
         if (x === this.getMinX() || x === this.getMaxX()) {
@@ -113,6 +110,14 @@ export class ResizableComponent implements OnInit, AfterViewInit {
           width = Math.max(width, this.minWidth)
           width = Math.min(width, this.getMaxWidth())
 
+          let bound = 0
+          if (this.model.children()) {
+            const bounds = getNodesBounds(this.model.children())
+            bound = bounds.x + bounds.width
+          }
+
+          width = Math.max(width, bound)
+
           return { height, width: width }
         })
 
@@ -122,6 +127,9 @@ export class ResizableComponent implements OnInit, AfterViewInit {
           width += offsetX
           width = Math.max(width, this.minWidth)
           width = Math.min(width, this.getMaxWidth())
+
+          const bounds = getNodesBounds(this.model.children())
+          width = Math.max(width, bounds.x + bounds.width)
 
           return { height, width }
         })
@@ -152,6 +160,9 @@ export class ResizableComponent implements OnInit, AfterViewInit {
           height += offsetY
           height = Math.max(height, this.minHeight)
           height = Math.min(height, this.getMaxHeight())
+
+          const bounds = getNodesBounds(this.model.children())
+          height = Math.max(height, bounds.y + bounds.height)
 
           return { width, height }
         })
@@ -240,6 +251,9 @@ export class ResizableComponent implements OnInit, AfterViewInit {
           height = Math.max(height, this.minHeight)
           height = Math.min(height, this.getMaxHeight())
 
+          const bounds = getNodesBounds(this.model.children())
+          height = Math.max(height, bounds.y + bounds.height)
+
           return { height, width }
         })
 
@@ -248,13 +262,18 @@ export class ResizableComponent implements OnInit, AfterViewInit {
 
       case 'bottom-right': {
         this.model.size.update(({ height, width }) => {
+          const bounds = getNodesBounds(this.model.children())
+
           width += offsetX
           width = Math.max(width, this.minWidth)
           width = Math.min(width, this.getMaxWidth())
+          width = Math.max(width, bounds.x + bounds.width)
+
 
           height += offsetY
           height = Math.max(height, this.minHeight)
           height = Math.min(height, this.getMaxHeight())
+          height = Math.max(height, bounds.y + bounds.height)
 
           return { height, width }
         })
@@ -308,10 +327,26 @@ export class ResizableComponent implements OnInit, AfterViewInit {
   }
 
   private getMaxX() {
+    if (this.model.children()) {
+      const bounds = getNodesBounds(this.model.children())
+
+      return this.model.point().x + (bounds.x + bounds.width) >= this.model.point().x + this.model.size().width
+        ? this.model.point().x
+        : (this.model.size().width - this.minWidth) + this.model.point().x
+    }
+
     return (this.model.size().width - this.minWidth) + this.model.point().x
   }
 
   private getMaxY() {
+    if (this.model.children()) {
+      const bounds = getNodesBounds(this.model.children())
+
+      return this.model.point().y + (bounds.y + bounds.height) >= this.model.point().y + this.model.size().height
+        ? this.model.point().y
+        : (this.model.size().height - this.minHeight) + this.model.point().y
+    }
+
     return (this.model.size().height - this.minHeight) + this.model.point().y
   }
 }

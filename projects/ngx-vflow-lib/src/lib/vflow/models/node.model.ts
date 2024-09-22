@@ -99,6 +99,10 @@ export class NodeModel<T = unknown> implements FlowEntity {
     this.entitiesService.nodes().find(n => n.node.id === this.parentId()) ?? null
   )
 
+  public children = computed(() =>
+    this.entitiesService.nodes().filter(n => n.parentId() === this.node.id)
+  )
+
   public color = signal(NodeModel.defaultColor)
 
   public resizable = signal(false)
