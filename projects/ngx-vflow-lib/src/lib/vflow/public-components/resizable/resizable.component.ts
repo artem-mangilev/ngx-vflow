@@ -97,10 +97,11 @@ export class ResizableComponent implements OnInit, AfterViewInit {
     switch (this.resizeSide) {
       case 'left':
         let x = this.model.point().x + offsetX
-        x = Math.max(x, 0)
-        x = Math.min(x, this.initialSize.width + this.initialPoint.x)
+        x = Math.max(x, this.getMinX())
+        x = Math.min(x, this.getMaxX())
 
-        if (x === 0) {
+        // TODO
+        if (x === this.getMinX()) {
           return
         }
 
@@ -108,10 +109,9 @@ export class ResizableComponent implements OnInit, AfterViewInit {
 
         this.model.size.update(({ height, width }) => {
           width -= offsetX
+
           width = Math.max(width, this.minWidth)
           width = Math.min(width, this.getMaxWidth())
-
-          console.log(width)
 
           return { height, width: width }
         })
@@ -129,8 +129,8 @@ export class ResizableComponent implements OnInit, AfterViewInit {
         return
       case 'top':
         let y = this.model.point().y + offsetY
-        y = Math.max(y, 0)
-        y = Math.min(y, this.initialSize.height + this.initialPoint.y)
+        y = Math.max(y, this.getMinY())
+        y = Math.min(y, this.getMaxY())
 
         if (y === 0) {
           return
@@ -160,12 +160,12 @@ export class ResizableComponent implements OnInit, AfterViewInit {
 
       case 'top-left': {
         let x = this.model.point().x + offsetX
-        x = Math.max(x, 0)
-        x = Math.min(x, this.initialSize.width + this.initialPoint.x)
+        x = Math.max(x, this.getMinX())
+        x = Math.min(x, this.getMaxX())
 
         let y = this.model.point().y + offsetY
-        y = Math.max(y, 0)
-        y = Math.min(y, this.initialSize.height + this.initialPoint.y)
+        y = Math.max(y, this.getMinY())
+        y = Math.min(y, this.getMaxY())
 
         if (x === 0 || y === 0) {
           return
@@ -190,10 +190,10 @@ export class ResizableComponent implements OnInit, AfterViewInit {
 
       case 'top-right': {
         let y = this.model.point().y + offsetY
-        y = Math.max(y, 0)
-        y = Math.min(y, this.initialSize.height + this.initialPoint.y)
+        y = Math.max(y, this.getMinY())
+        y = Math.min(y, this.getMaxY())
 
-        if (y === 0 || y === this.initialSize.height + this.initialPoint.y) {
+        if (y === 0 || y === this.getMaxY()) {
           return
         }
 
@@ -219,8 +219,8 @@ export class ResizableComponent implements OnInit, AfterViewInit {
 
       case 'bottom-left': {
         let x = this.model.point().x + offsetX
-        x = Math.max(x, 0)
-        x = Math.min(x, this.initialSize.width + this.initialPoint.x)
+        x = Math.max(x, this.getMinX())
+        x = Math.min(x, this.getMaxX())
 
         if (x === 0) {
           return
@@ -282,5 +282,45 @@ export class ResizableComponent implements OnInit, AfterViewInit {
     }
 
     return Infinity
+  }
+
+  private getMinX() {
+    const parent = this.model.parent()
+
+    if (parent) {
+      return 0
+    }
+
+    return -Infinity
+  }
+
+  private getMinY() {
+    const parent = this.model.parent()
+
+    if (parent) {
+      return 0
+    }
+
+    return -Infinity
+  }
+
+  private getMaxX() {
+    const parent = this.model.parent()
+
+    if (parent) {
+      return this.initialSize.width + this.initialPoint.x
+    }
+
+    return (this.model.size().width - this.minWidth) + this.initialPoint.x
+  }
+
+  private getMaxY() {
+    const parent = this.model.parent()
+
+    if (parent) {
+      return this.initialSize.height + this.initialPoint.y
+    }
+
+    return (this.model.size().height - this.minHeight) + this.initialPoint.y
   }
 }
