@@ -31,13 +31,18 @@ export class ResizableComponent implements OnInit, AfterViewInit {
   @Input()
   public resizerColor = '#2e414c'
 
+  @Input()
+  public gap = 1.5;
+
   @ViewChild('resizer', { static: true })
   private resizer!: TemplateRef<unknown>
-
 
   protected get model() {
     return this.parentNode.nodeModel
   }
+
+  protected lineGap = 3
+  protected handleSize = 6
 
   private resizeSide: Side | null = null
 
