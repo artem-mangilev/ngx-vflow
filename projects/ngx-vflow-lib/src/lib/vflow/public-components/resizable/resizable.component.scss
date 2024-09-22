@@ -1,0 +1,31 @@
+.top {
+  cursor: n-resize;
+}
+
+.left {
+  cursor: w-resize;
+}
+
+.right {
+  cursor: e-resize;
+}
+
+.bottom {
+  cursor: s-resize;
+}
+
+.top-left {
+  cursor: nw-resize;
+}
+
+.top-right {
+  cursor: ne-resize;
+}
+
+.bottom-left {
+  cursor: sw-resize;
+}
+
+.bottom-right {
+  cursor: se-resize;
+}

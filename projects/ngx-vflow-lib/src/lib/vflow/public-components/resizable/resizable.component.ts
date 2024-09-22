@@ -11,7 +11,8 @@ type Side = 'top' | 'right' | 'bottom' | 'left' | 'top-right' | 'top-left' | 'bo
 
 @Component({
   selector: '[resizable]',
-  templateUrl: './resizable.component.html'
+  templateUrl: './resizable.component.html',
+  styleUrls: ['./resizable.component.scss']
 })
 export class ResizableComponent implements OnInit, AfterViewInit {
   private parentNode = inject(NodeComponent)
