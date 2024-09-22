@@ -3,9 +3,9 @@
     <!-- top line -->
     <svg:line
       #topLine
-      x1="0"
+      x1="4"
       y1="0"
-      [attr.x2]="model.size().width"
+      [attr.x2]="model.size().width - 4"
       y2="0"
       stroke="black"
       stroke-width="2"
@@ -14,18 +14,18 @@
     <!-- Left line -->
     <svg:line
       x1="0"
-      y1="0"
+      y1="4"
       x2="0"
-      [attr.y2]="model.size().height"
+      [attr.y2]="model.size().height - 4"
       stroke="black"
       stroke-width="2"
       (mousedown)="startResize('left', $event)"
     />
     <!-- Bottom line -->
     <svg:line
-      x1="0"
+      x1="4"
       [attr.y1]="model.size().height"
-      [attr.x2]="model.size().width"
+      [attr.x2]="model.size().width - 4"
       [attr.y2]="model.size().height"
       stroke="black"
       stroke-width="2"
@@ -34,46 +34,50 @@
     <!-- Right line -->
     <svg:line
       [attr.x1]="model.size().width"
-      y1="0"
+      y1="4"
       [attr.x2]="model.size().width"
-      [attr.y2]="model.size().height"
+      [attr.y2]="model.size().height - 4"
       stroke="black"
       stroke-width="2"
       (mousedown)="startResize('right', $event)"
     />
 
     <!-- Top Left -->
-    <svg:circle
-      cx="0"
-      cy="0"
-      r="5"
+    <svg:rect
+      x="-3"
+      y="-3"
+      width="6"
+      height="6"
       fill="black"
       (mousedown)="startResize('top-left', $event)"
     />
 
     <!-- Top right -->
-    <svg:circle
-      [attr.cx]="model.size().width"
-      cy="0"
-      r="5"
+    <svg:rect
+      [attr.x]="model.size().width - 3"
+      y="-3"
+      width="6"
+      height="6"
       fill="black"
       (mousedown)="startResize('top-right', $event)"
     />
 
     <!-- Bottom left -->
-    <svg:circle
-      cx="0"
-      [attr.cy]="model.size().height"
-      r="5"
+    <svg:rect
+      x="-3"
+      [attr.y]="model.size().height - 3"
+      width="6"
+      height="6"
       fill="black"
       (mousedown)="startResize('bottom-left', $event)"
     />
 
     <!-- Bottom right -->
-    <svg:circle
-      [attr.cx]="model.size().width"
-      [attr.cy]="model.size().height"
-      r="5"
+    <svg:rect
+      [attr.x]="model.size().width - 3"
+      [attr.y]="model.size().height - 3"
+      width="6"
+      height="6"
       fill="black"
       (mousedown)="startResize('bottom-right', $event)"
     />
