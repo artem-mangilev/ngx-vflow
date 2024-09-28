@@ -93,6 +93,7 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInje
       resizable([this.htmlWrapperRef.nativeElement], this.zone)
         .pipe(
           startWith(null),
+          tap(() => this.nodeModel.handles().forEach(h => h.updateParent())),
           filter(() => !this.nodeModel.resizing()),
           tap(() => {
             const width = this.htmlWrapperRef.nativeElement.clientWidth
