@@ -1,6 +1,8 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, OnInit, Output, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
 import { NgDocNotifyService } from '@ng-doc/ui-kit';
-import { ComponentNodeEvent, CustomNodeComponent, Edge, Node, VflowModule } from 'projects/ngx-vflow-lib/src/public-api';
+import { ComponentNodeEvent, Edge, Node, VflowModule } from 'projects/ngx-vflow-lib/src/public-api';
+import { BlueSquareNodeComponent, BlueSquareData } from './components/blue-square-node.component';
+import { RedSquareNodeComponent, RedSquareData } from './components/red-square-node.component';
 
 @Component({
   template: `<vflow [nodes]="nodes" [edges]="edges" (onComponentNodeEvent)="handleComponentEvent($event)" />`,
@@ -50,80 +52,4 @@ export class CustomComponentNodesDemoComponent {
   }
 }
 
-// --- Description of red square component node
 
-interface RedSquareData {
-  redSquareText: string
-}
-
-@Component({
-  template: `
-    <div class="red-square" (click)="onClick()">
-      {{ data()?.redSquareText }}
-
-      <handle type="source" position="right"/>
-    </div>
-  `,
-  styles: [`
-    .red-square {
-      width: 100px;
-      height: 100px;
-      background-color: #DE3163;
-      border-radius: 5px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding-left: 5px;
-      padding-right: 5px;
-    }
-  `],
-  standalone: true,
-  imports: [VflowModule]
-})
-export class RedSquareNodeComponent extends CustomNodeComponent<RedSquareData> {
-  @Output()
-  redSquareEvent = new EventEmitter<string>()
-
-  onClick() {
-    this.redSquareEvent.emit('Click from red square')
-  }
-}
-
-// --- Description of blue square component node
-
-interface BlueSquareData {
-  blueSquareText: string
-}
-
-@Component({
-  template: `
-    <div class="blue-square" (click)="onClick()">
-      {{ data()?.blueSquareText }}
-
-      <handle type="target" position="left"/>
-    </div>
-  `,
-  styles: [`
-    .blue-square {
-      width: 100px;
-      height: 100px;
-      background-color: #0096FF;
-      border-radius: 5px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding-left: 5px;
-      padding-right: 5px;
-    }
-  `],
-  standalone: true,
-  imports: [VflowModule]
-})
-export class BlueSquareNodeComponent extends CustomNodeComponent<BlueSquareData> {
-  @Output()
-  blueSquareEvent = new EventEmitter<{ x: number, y: number }>()
-
-  onClick() {
-    this.blueSquareEvent.emit({ x: 5, y: 5 })
-  }
-}
