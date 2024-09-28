@@ -9,7 +9,7 @@
       [attr.y2]="-gap"
       [attr.stroke]="resizerColor"
       stroke-width="2"
-      (mousedown)="startResize('top', $event)"
+      (pointerStart)="startResize('top', $event)"
     />
     <!-- Left line -->
     <svg:line
@@ -20,7 +20,7 @@
       [attr.y2]="model.size().height - lineGap"
       [attr.stroke]="resizerColor"
       stroke-width="2"
-      (mousedown)="startResize('left', $event)"
+      (pointerStart)="startResize('left', $event)"
     />
     <!-- Bottom line -->
     <svg:line
@@ -31,7 +31,7 @@
       [attr.y2]="model.size().height + gap"
       [attr.stroke]="resizerColor"
       stroke-width="2"
-      (mousedown)="startResize('bottom', $event)"
+      (pointerStart)="startResize('bottom', $event)"
     />
     <!-- Right line -->
     <svg:line
@@ -42,7 +42,7 @@
       [attr.y2]="model.size().height - lineGap"
       [attr.stroke]="resizerColor"
       stroke-width="2"
-      (mousedown)="startResize('right', $event)"
+      (pointerStart)="startResize('right', $event)"
     />
 
     <!-- Top Left -->
@@ -53,7 +53,7 @@
       [attr.width]="handleSize"
       [attr.height]="handleSize"
       [attr.fill]="resizerColor"
-      (mousedown)="startResize('top-left', $event)"
+      (pointerStart)="startResize('top-left', $event)"
     />
 
     <!-- Top right -->
@@ -64,7 +64,7 @@
       [attr.width]="handleSize"
       [attr.height]="handleSize"
       [attr.fill]="resizerColor"
-      (mousedown)="startResize('top-right', $event)"
+      (pointerStart)="startResize('top-right', $event)"
     />
 
     <!-- Bottom left -->
@@ -75,7 +75,7 @@
       [attr.width]="handleSize"
       [attr.height]="handleSize"
       [attr.fill]="resizerColor"
-      (mousedown)="startResize('bottom-left', $event)"
+      (pointerStart)="startResize('bottom-left', $event)"
     />
 
     <!-- Bottom right -->
@@ -86,7 +86,7 @@
       [attr.width]="handleSize"
       [attr.height]="handleSize"
       [attr.fill]="resizerColor"
-      (mousedown)="startResize('bottom-right', $event)"
+      (pointerStart)="startResize('bottom-right', $event)"
     />
   </svg:g>
 </ng-template>

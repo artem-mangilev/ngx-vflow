@@ -54,15 +54,15 @@ export class ResizableComponent implements OnInit, AfterViewInit {
   private minHeight = 0
 
   // TODO: allow reszie beside the flow
-  protected resizeOnGlobalMouseMove = this.rootPointer.mouseMovement$
+  protected resizeOnGlobalMouseMove = this.rootPointer.pointerMovement$
     .pipe(
       filter(() => this.resizeSide !== null),
-      tap((event) => this.resize(event.originalEvent)),
+      tap((event) => this.resize(event)),
       takeUntilDestroyed()
     )
     .subscribe()
 
-  protected endResizeOnGlobalMouseUp = this.rootPointer.documentMouseUp$
+  protected endResizeOnGlobalMouseUp = this.rootPointer.documentPointerEnd$
     .pipe(
       tap(() => this.endResize()),
       takeUntilDestroyed()
@@ -86,7 +86,7 @@ export class ResizableComponent implements OnInit, AfterViewInit {
     this.model.resizing.set(true);
   }
 
-  protected resize({ movementX, movementY }: MouseEvent) {
+  protected resize({ movementX, movementY }: { movementX: number, movementY: number }) {
     const offsetX = round(movementX / this.zoom())
     const offsetY = round(movementY / this.zoom())
 

@@ -8,6 +8,8 @@ export class RootPointerDirective {
 
   private initialTouch$ = new Subject<TouchEvent>()
 
+  private prevTouchEvent: TouchEvent | null = null
+
   // TODO: do not emit if mouse not down
   public mouseMovement$ = fromEvent<MouseEvent>(this.host, 'mousemove').pipe(
     map(event => ({
@@ -30,12 +32,18 @@ export class RootPointerDirective {
     map((originalEvent) => {
       const x = originalEvent.touches[0]?.clientX ?? 0
       const y = originalEvent.touches[0]?.clientY ?? 0
-      const movementX = 0
-      const movementY = 0
+      const movementX = this.prevTouchEvent
+        ? originalEvent.touches[0].pageX - this.prevTouchEvent.touches[0].pageX
+        : 0
+      const movementY = this.prevTouchEvent
+        ? originalEvent.touches[0].pageY - this.prevTouchEvent.touches[0].pageY
+        : 0
+
       const target = document.elementFromPoint(x, y)
 
       return { x, y, movementX, movementY, target, originalEvent }
     }),
+    tap((event) => this.prevTouchEvent = event.originalEvent),
     observeOn(animationFrameScheduler),
     share()
   ) satisfies Observable<Point>;
@@ -53,6 +61,7 @@ export class RootPointerDirective {
 
       return { x, y, target, originalEvent }
     }),
+    tap(() => this.prevTouchEvent = null),
     share()
   ) satisfies Observable<Point>
 
@@ -67,7 +76,13 @@ export class RootPointerDirective {
     share()
   ) satisfies Observable<Point>
 
-  public documentMouseUp$ = fromEvent<MouseEvent>(document, 'mouseup')
+  public documentPointerEnd$ = merge(
+    fromEvent(document, 'mouseup'),
+    fromEvent(document, 'touchend')
+  ).pipe(
+    share()
+  )
+
 
   /**
    * We should know when user started a touch in order to not
