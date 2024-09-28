@@ -38,6 +38,7 @@ export class NodeModel<T = unknown> implements FlowEntity {
   public point$ = this.throttledPoint$;
 
   public size = signal({ width: 0, height: 0 })
+  public size$ = toObservable(this.size)
 
   public width = computed(() => this.size().width)
   public height = computed(() => this.size().height)
