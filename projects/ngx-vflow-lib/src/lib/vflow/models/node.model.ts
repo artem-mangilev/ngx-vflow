@@ -138,6 +138,14 @@ export class NodeModel<T = unknown> implements FlowEntity {
         this.color.set(node.color)
       }
     }
+
+    if (node.type === 'default-group' && node.resizable) {
+      if (isDynamicNode(node)) {
+        this.resizable = node.resizable
+      } else {
+        this.resizable.set(node.resizable)
+      }
+    }
   }
 
   public setPoint(point: Point, throttle: boolean) {

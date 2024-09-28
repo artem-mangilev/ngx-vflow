@@ -64,6 +64,7 @@ export interface DefaultGroupNode extends SharedNode {
   width: number
   height: number
   color?: string
+  resizable?: boolean
 }
 
 export interface DefaultDynamicGroupNode extends SharedDynamicNode {
@@ -71,6 +72,7 @@ export interface DefaultDynamicGroupNode extends SharedDynamicNode {
   width: WritableSignal<number>
   height: WritableSignal<number>
   color?: WritableSignal<string>
+  resizable?: WritableSignal<boolean>
 }
 
 export interface TemplateGroupNode<T> extends SharedNode {

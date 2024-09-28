@@ -70,6 +70,9 @@
 <!-- Default group node -->
 <svg:rect
   *ngIf="nodeModel.node.type === 'default-group'"
+  [resizable]="nodeModel.resizable()"
+  [gap]="3"
+  [resizerColor]="nodeModel.color()"
   class="default-group-node"
   rx="5"
   ry="5"
