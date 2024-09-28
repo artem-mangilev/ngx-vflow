@@ -318,26 +318,30 @@ export class ResizableComponent implements OnInit, AfterViewInit {
   }
 
   private getMaxX() {
-    if (this.model.children()) {
-      const bounds = getNodesBounds(this.model.children())
+    const x = this.model.point().x
+    const width = this.model.size().width
+    const children = this.model.children()
 
-      return this.model.point().x + (bounds.x + bounds.width) >= this.model.point().x + this.model.size().width
-        ? this.model.point().x
-        : (this.model.size().width - this.minWidth) + this.model.point().x
+    if (children) {
+      const bounds = getNodesBounds(children)
+
+      return x + (bounds.x + bounds.width) >= x + width ? x : (width - this.minWidth) + x
     }
 
-    return (this.model.size().width - this.minWidth) + this.model.point().x
+    return (width - this.minWidth) + x
   }
 
   private getMaxY() {
-    if (this.model.children()) {
-      const bounds = getNodesBounds(this.model.children())
+    const y = this.model.point().y
+    const height = this.model.size().height
+    const children = this.model.children()
 
-      return this.model.point().y + (bounds.y + bounds.height) >= this.model.point().y + this.model.size().height
-        ? this.model.point().y
-        : (this.model.size().height - this.minHeight) + this.model.point().y
+    if (children) {
+      const bounds = getNodesBounds(children)
+
+      return y + (bounds.y + bounds.height) >= y + height ? y : (height - this.minHeight) + y
     }
 
-    return (this.model.size().height - this.minHeight) + this.model.point().y
+    return (height - this.minHeight) + y
   }
 }
