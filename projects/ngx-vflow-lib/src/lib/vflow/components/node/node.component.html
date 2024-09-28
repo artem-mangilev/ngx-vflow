@@ -95,8 +95,10 @@
 </svg:g>
 
 <!-- Resizer -->
-<ng-container *ngIf="nodeModel.resizable()">
-  <ng-template *ngTemplateOutlet="nodeModel.resizerTemplate()"></ng-template>
+<ng-container *ngIf="nodeModel.resizerTemplate() as template">
+  <ng-container *ngIf="nodeModel.resizable()">
+    <ng-template [ngTemplateOutlet]="template" />
+  </ng-container>
 </ng-container>
 
 <!-- Handles -->
