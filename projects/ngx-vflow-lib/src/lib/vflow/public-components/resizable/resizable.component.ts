@@ -96,7 +96,6 @@ export class ResizableComponent implements OnInit, AfterViewInit {
         x = Math.max(x, this.getMinX())
         x = Math.min(x, this.getMaxX())
 
-
         // TODO this fixes increasing width when current node hits the parent
         if (x === this.getMinX() || x === this.getMaxX()) {
           return
@@ -106,17 +105,8 @@ export class ResizableComponent implements OnInit, AfterViewInit {
 
         this.model.size.update(({ height, width }) => {
           width -= offsetX
-
           width = Math.max(width, this.minWidth)
           width = Math.min(width, this.getMaxWidth())
-
-          let bound = 0
-          if (this.model.children()) {
-            const bounds = getNodesBounds(this.model.children())
-            bound = bounds.x + bounds.width
-          }
-
-          width = Math.max(width, bound)
 
           return { height, width: width }
         })
@@ -151,7 +141,7 @@ export class ResizableComponent implements OnInit, AfterViewInit {
           height = Math.max(height, this.minHeight)
           height = Math.min(height, this.getMaxHeight())
 
-          return { width, height: height }
+          return { width, height }
         })
 
         return
@@ -211,15 +201,16 @@ export class ResizableComponent implements OnInit, AfterViewInit {
           return
         }
 
-        this.model.setPoint({
-          x: this.model.point().x,
-          y: this.model.point().y + offsetY
-        }, false)
+        this.model.setPoint({ x: this.model.point().x, y }, false)
 
         this.model.size.update(({ height, width }) => {
+          const bounds = getNodesBounds(this.model.children())
+
           width += offsetX
           width = Math.max(width, this.minWidth)
           width = Math.min(width, this.getMaxWidth())
+          width = Math.max(width, bounds.x + bounds.width)
+
 
           height -= offsetY
           height = Math.max(height, this.minHeight)
