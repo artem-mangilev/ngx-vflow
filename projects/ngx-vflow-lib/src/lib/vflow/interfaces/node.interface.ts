@@ -48,11 +48,15 @@ export interface DefaultDynamicNode extends SharedDynamicNode {
 export interface HtmlTemplateNode<T = unknown> extends SharedNode {
   type: 'html-template'
   data?: T
+  width?: number
+  height?: number
 }
 
 export interface HtmlTemplateDynamicNode<T = unknown> extends SharedDynamicNode {
   type: 'html-template'
   data?: WritableSignal<T>
+  width?: WritableSignal<number>
+  height?: WritableSignal<number>
 }
 
 export interface DefaultGroupNode extends SharedNode {
@@ -86,11 +90,15 @@ export interface TemplateDynamicGroupNode<T> extends SharedDynamicNode {
 export interface ComponentNode<T = unknown> extends SharedNode {
   type: Type<CustomNodeComponent<T>>
   data?: T
+  width?: number
+  height?: number
 }
 
 export interface ComponentDynamicNode<T = unknown> extends SharedDynamicNode {
   type: Type<CustomDynamicNodeComponent<T>>
   data?: WritableSignal<T>
+  width?: WritableSignal<number>
+  height?: WritableSignal<number>
 }
 
 export function isStaticNode<T>(node: Node | DynamicNode): node is Node<T> {

@@ -173,6 +173,23 @@ export class NodeModel<T = unknown> implements FlowEntity {
         }
       }
     }
+
+    if (node.type === 'html-template' || this.isComponentType) {
+      if (isDynamicNode(node)) {
+        effect(() => {
+          if (node.width && node.height) {
+            this.size.set({
+              width: node.width(),
+              height: node.height(),
+            })
+          }
+        }, { allowSignalWrites: true })
+      } else {
+        if (node.width && node.height) {
+          this.size.set({ width: node.width, height: node.height })
+        }
+      }
+    }
   }
 
   private createTextSignal(): Signal<string> {
