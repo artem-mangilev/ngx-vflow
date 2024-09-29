@@ -37,7 +37,12 @@ The algorithm is almost the same as for `template-group` nodes:
 
 {{ NgDocActions.demo("TemplateNodeResizerDemoComponent", { expanded: true }) }}
 
+## Resize event
+
+You may want to perform some actions on resize. To do this, simply add handler to the `(onNodesChange.size)` output of the `<vflow />` component.
+
 ## See also
 
 - `*FeaturesSubflows`
 - `*FeaturesCustomNodes`
+- `*FeaturesHandlingChanges`
