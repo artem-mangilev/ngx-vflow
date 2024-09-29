@@ -33,6 +33,23 @@ export class NodesChangeService {
       ])
     ) satisfies Observable<NodeChange[]>
 
+  protected nodeSizeChange$ = toObservable(this.entitiesService.nodes)
+    .pipe(
+      switchMap((nodes) =>
+        merge(
+          ...nodes.map(node =>
+            node.size$.pipe(
+              skip(1),
+              map(() => node)
+            )
+          )
+        )
+      ),
+      map(changedNode => [
+        { type: 'size', id: changedNode.node.id, size: changedNode.size() }
+      ])
+    ) satisfies Observable<NodeChange[]>
+
   protected nodeAddChange$ = toObservable(this.entitiesService.nodes)
     .pipe(
       pairwise(),
@@ -77,6 +94,7 @@ export class NodesChangeService {
 
   public readonly changes$: Observable<NodeChange[]> = merge(
     this.nodesPositionChange$,
+    this.nodeSizeChange$,
     this.nodeAddChange$,
     this.nodeRemoveChange$,
     this.nodeSelectedChange$

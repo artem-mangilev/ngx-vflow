@@ -2,6 +2,7 @@ import { Point } from "../interfaces/point.interface"
 
 export type NodeChange =
   NodePositionChange |
+  NodeSizeChange |
   NodeAddChange |
   NodeRemoveChange |
   NodeSelectedChange
@@ -9,6 +10,11 @@ export type NodeChange =
 export interface NodePositionChange extends NodeChangeShared {
   type: 'position'
   point: Point
+}
+
+export interface NodeSizeChange extends NodeChangeShared {
+  type: 'size'
+  size: { width: number, height: number }
 }
 
 export interface NodeAddChange extends NodeChangeShared {

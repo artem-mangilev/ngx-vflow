@@ -1,16 +1,17 @@
-import { Signal, computed, effect, inject, signal } from '@angular/core'
+import { Signal, TemplateRef, computed, effect, inject, signal } from '@angular/core'
 import { DynamicNode, Node, isDynamicNode } from '../interfaces/node.interface'
 import { isDefined } from '../utils/is-defined'
 import { toObservable, toSignal } from '@angular/core/rxjs-interop'
 import { HandleModel } from './handle.model'
 import { FlowEntity } from '../interfaces/flow-entity.interface'
 import { FlowSettingsService } from '../services/flow-settings.service'
-import { animationFrameScheduler, observeOn, } from 'rxjs'
+import { animationFrameScheduler, merge, observeOn, Subject, } from 'rxjs'
 import { Point } from '../interfaces/point.interface'
 import { CustomNodeComponent } from '../public-components/custom-node.component'
 import { CustomDynamicNodeComponent } from '../public-components/custom-dynamic-node.component'
 import { FlowEntitiesService } from '../services/flow-entities.service'
 
+// TODO bad naming around points
 export class NodeModel<T = unknown> implements FlowEntity {
   private static defaultWidth = 100
   private static defaultHeight = 50
@@ -25,13 +26,22 @@ export class NodeModel<T = unknown> implements FlowEntity {
     observeOn(animationFrameScheduler)
   )
 
-  public point = toSignal(this.throttledPoint$, {
-    initialValue: this.internalPoint()
-  })
+  private notThrottledPoint$ = new Subject<Point>()
+
+  public point = toSignal(
+    merge(this.throttledPoint$, this.notThrottledPoint$),
+    {
+      initialValue: this.internalPoint()
+    }
+  )
 
   public point$ = this.throttledPoint$;
 
   public size = signal({ width: 0, height: 0 })
+  public size$ = toObservable(this.size)
+
+  public width = computed(() => this.size().width)
+  public height = computed(() => this.size().height)
 
   public renderOrder = signal(0)
 
@@ -90,7 +100,15 @@ export class NodeModel<T = unknown> implements FlowEntity {
     this.entitiesService.nodes().find(n => n.node.id === this.parentId()) ?? null
   )
 
+  public children = computed(() =>
+    this.entitiesService.nodes().filter(n => n.parentId() === this.node.id)
+  )
+
   public color = signal(NodeModel.defaultColor)
+
+  public resizable = signal(false)
+  public resizing = signal(false)
+  public resizerTemplate = signal<TemplateRef<unknown> | null>(null)
 
   private parentId = signal<string | null>(null)
 
@@ -120,10 +138,22 @@ export class NodeModel<T = unknown> implements FlowEntity {
         this.color.set(node.color)
       }
     }
+
+    if (node.type === 'default-group' && node.resizable) {
+      if (isDynamicNode(node)) {
+        this.resizable = node.resizable
+      } else {
+        this.resizable.set(node.resizable)
+      }
+    }
   }
 
-  public setPoint(point: Point) {
-    this.internalPoint.set(point);
+  public setPoint(point: Point, throttle: boolean) {
+    if (throttle) {
+      this.internalPoint.set(point);
+    } else {
+      this.notThrottledPoint$.next(point)
+    }
   }
 
   /**
@@ -148,6 +178,23 @@ export class NodeModel<T = unknown> implements FlowEntity {
             width: node.width ?? NodeModel.defaultWidth,
             height: node.height ?? NodeModel.defaultHeight
           })
+        }
+      }
+    }
+
+    if (node.type === 'html-template' || this.isComponentType) {
+      if (isDynamicNode(node)) {
+        effect(() => {
+          if (node.width && node.height) {
+            this.size.set({
+              width: node.width(),
+              height: node.height(),
+            })
+          }
+        }, { allowSignalWrites: true })
+      } else {
+        if (node.width && node.height) {
+          this.size.set({ width: node.width, height: node.height })
         }
       }
     }

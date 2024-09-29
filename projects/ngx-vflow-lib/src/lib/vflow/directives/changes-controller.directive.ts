@@ -1,5 +1,5 @@
 import { Directive, Output, inject } from '@angular/core';
-import { NodeAddChange, NodeChange, NodePositionChange, NodeRemoveChange, NodeSelectedChange } from '../types/node-change.type';
+import { NodeAddChange, NodeChange, NodePositionChange, NodeRemoveChange, NodeSelectedChange, NodeSizeChange } from '../types/node-change.type';
 import { EdgeChangesService } from '../services/edge-changes.service';
 import { NodesChangeService } from '../services/node-changes.service';
 import { Observable, filter, map } from 'rxjs';
@@ -30,6 +30,19 @@ export class ChangesControllerDirective {
   @Output('onNodesChange.position.many')
   public onNodesChangePositionMany = this.manyChanges(
     this.nodeChangesOfType('position')
+  )
+
+  @Output('onNodesChange.size')
+  public onNodesChangeSize = this.nodeChangesOfType('size')
+
+  @Output('onNodesChange.size.single')
+  public onNodesChangeSizeSingle = this.singleChange(
+    this.nodeChangesOfType('size')
+  )
+
+  @Output('onNodesChange.size.many')
+  public onNodesChangeSizeMany = this.manyChanges(
+    this.nodeChangesOfType('size')
   )
 
   @Output('onNodesChange.add')
@@ -160,6 +173,7 @@ export class ChangesControllerDirective {
 // TODO: do not write this types manually
 type NodeChangeMap = {
   position: NodePositionChange,
+  size: NodeSizeChange,
   add: NodeAddChange,
   remove: NodeRemoveChange,
   select: NodeSelectedChange

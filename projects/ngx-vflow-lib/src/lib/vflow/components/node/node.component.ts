@@ -1,18 +1,18 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Injector, Input, OnDestroy, OnInit, TemplateRef, ViewChild, computed, effect, inject } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Injector, Input, NgZone, OnDestroy, OnInit, TemplateRef, ViewChild, computed, effect, inject } from '@angular/core';
 import { DraggableService } from '../../services/draggable.service';
 import { NodeModel } from '../../models/node.model';
 import { FlowStatusService } from '../../services/flow-status.service';
 import { HandleService } from '../../services/handle.service';
 import { HandleModel } from '../../models/handle.model';
 import { resizable } from '../../utils/resizable';
-import { map, startWith, switchMap, tap } from 'rxjs';
+import { filter, first, map, startWith, switchMap, tap } from 'rxjs';
 import { InjectionContext, WithInjector } from '../../decorators/run-in-injection-context.decorator';
-import { Microtask } from '../../decorators/microtask.decorator';
 import { NodeRenderingService } from '../../services/node-rendering.service';
 import { FlowSettingsService } from '../../services/flow-settings.service';
 import { SelectionService } from '../../services/selection.service';
 import { ConnectionControllerDirective } from '../../directives/connection-controller.directive';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { NodeAccessorService } from '../../services/node-accessor.service';
 
 export type HandleState = 'valid' | 'invalid' | 'idle'
 
@@ -21,7 +21,7 @@ export type HandleState = 'valid' | 'invalid' | 'idle'
   templateUrl: './node.component.html',
   styleUrls: ['./node.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [HandleService]
+  providers: [HandleService, NodeAccessorService]
 })
 export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInjector {
   public injector = inject(Injector)
@@ -33,6 +33,8 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInje
   private selectionService = inject(SelectionService)
   private hostRef = inject<ElementRef<SVGElement>>(ElementRef)
   private connectionController = inject(ConnectionControllerDirective)
+  private nodeAccessor = inject(NodeAccessorService);
+  private zone = inject(NgZone)
 
   @Input()
   public nodeModel!: NodeModel
@@ -55,11 +57,12 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInje
   )
 
   protected styleWidth = computed(() => `${this.nodeModel.size().width}px`)
-
   protected styleHeight = computed(() => `${this.nodeModel.size().height}px`)
 
   @InjectionContext
   public ngOnInit() {
+    this.nodeAccessor.model.set(this.nodeModel);
+
     this.handleService.node.set(this.nodeModel);
 
     effect(() => {
@@ -73,7 +76,8 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInje
     this.nodeModel.handles$
       .pipe(
         switchMap((handles) =>
-          resizable(handles.map(h => h.parentReference!)).pipe(map(() => handles))
+          resizable(handles.map(h => h.parentReference!), this.zone)
+            .pipe(map(() => handles))
         ),
         tap((handles) => {
           // TODO (performance) inspect how to avoid calls of this when flow initially rendered
@@ -84,15 +88,16 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInje
       .subscribe()
   }
 
-  @Microtask // TODO (performance) check if we need microtask here
   @InjectionContext
   public ngAfterViewInit(): void {
     this.nodeModel.linkDefaultNodeSizeWithModelSize()
 
     if (this.nodeModel.node.type === 'html-template' || this.nodeModel.isComponentType) {
-      resizable([this.htmlWrapperRef.nativeElement])
+      resizable([this.htmlWrapperRef.nativeElement], this.zone)
         .pipe(
           startWith(null),
+          tap(() => this.nodeModel.handles().forEach(h => h.updateParent())),
+          filter(() => !this.nodeModel.resizing()),
           tap(() => {
             const width = this.htmlWrapperRef.nativeElement.clientWidth
             const height = this.htmlWrapperRef.nativeElement.clientHeight

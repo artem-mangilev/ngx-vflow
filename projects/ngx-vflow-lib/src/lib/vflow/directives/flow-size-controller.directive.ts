@@ -1,4 +1,4 @@
-import { Directive, ElementRef, HostBinding, effect, inject } from '@angular/core';
+import { Directive, ElementRef, HostBinding, NgZone, effect, inject } from '@angular/core';
 import { resizable } from '../utils/resizable';
 import { tap } from 'rxjs';
 import { FlowSettingsService } from '../services/flow-settings.service';
@@ -23,7 +23,7 @@ export class FlowSizeControllerDirective {
       this.flowHeight = view === 'auto' ? '100%' : view[1]
     })
 
-    resizable([this.host.nativeElement]).pipe(
+    resizable([this.host.nativeElement], inject(NgZone)).pipe(
       tap(([entry]) => {
         this.flowSettingsService.computedFlowWidth.set(entry.contentRect.width)
         this.flowSettingsService.computedFlowHeight.set(entry.contentRect.height)

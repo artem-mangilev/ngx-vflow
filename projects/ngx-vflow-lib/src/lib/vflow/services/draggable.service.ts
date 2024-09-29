@@ -73,7 +73,7 @@ export class DraggableService {
           point.y = Math.max(0, point.y)
         }
 
-        model.setPoint(point)
+        model.setPoint(point, true)
       })
   }
 

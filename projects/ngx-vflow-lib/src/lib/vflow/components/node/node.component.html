@@ -31,7 +31,12 @@
   [attr.height]="nodeModel.size().height"
   (mousedown)="pullNode()"
 >
-  <div #htmlWrapper class="wrapper">
+  <div
+    #htmlWrapper
+    class="wrapper"
+    [style.width]="styleWidth()"
+    [style.height]="styleHeight()"
+  >
     <ng-container
       [ngTemplateOutlet]="nodeTemplate"
       [ngTemplateOutletContext]="{ $implicit: { node: nodeModel.node, selected: nodeModel.selected } }"
@@ -48,7 +53,12 @@
   [attr.height]="nodeModel.size().height"
   (mousedown)="pullNode()"
 >
-  <div #htmlWrapper class="wrapper">
+  <div
+    #htmlWrapper
+    class="wrapper"
+    [style.width]="styleWidth()"
+    [style.height]="styleHeight()"
+  >
     <ng-container
       [ngComponentOutlet]="$any(nodeModel.node.type)"
       [ngComponentOutletInputs]="nodeModel.componentTypeInputs()"
@@ -60,6 +70,9 @@
 <!-- Default group node -->
 <svg:rect
   *ngIf="nodeModel.node.type === 'default-group'"
+  [resizable]="nodeModel.resizable()"
+  [gap]="3"
+  [resizerColor]="nodeModel.color()"
   class="default-group-node"
   rx="5"
   ry="5"
@@ -71,6 +84,7 @@
   (mousedown)="pullNode(); selectNode()"
 />
 
+<!-- Template group node  -->
 <svg:g
   *ngIf="nodeModel.node.type === 'template-group' && groupNodeTemplate"
   class="selectable"
@@ -78,10 +92,17 @@
 >
   <ng-container
     [ngTemplateOutlet]="groupNodeTemplate"
-    [ngTemplateOutletContext]="{ $implicit: { node: nodeModel.node, selected: nodeModel.selected } }"
+    [ngTemplateOutletContext]="{ $implicit: { node: nodeModel.node, selected: nodeModel.selected, width: nodeModel.width, height: nodeModel.height } }"
     [ngTemplateOutletInjector]="injector"
   />
 </svg:g>
+
+<!-- Resizer -->
+<ng-container *ngIf="nodeModel.resizerTemplate() as template">
+  <ng-container *ngIf="nodeModel.resizable()">
+    <ng-template [ngTemplateOutlet]="template" />
+  </ng-container>
+</ng-container>
 
 <!-- Handles -->
 <ng-container *ngFor="let handle of nodeModel.handles()">

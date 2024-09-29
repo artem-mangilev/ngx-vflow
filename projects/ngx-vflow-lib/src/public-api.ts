@@ -28,6 +28,7 @@ export * from './lib/vflow/components/vflow/vflow.component';
 export * from './lib/vflow/components/handle/handle.component';
 export * from './lib/vflow/public-components/custom-node.component';
 export * from './lib/vflow/public-components/custom-dynamic-node.component';
+export * from './lib/vflow/public-components/resizable/resizable.component';
 
 // Directives
 export * from './lib/vflow/directives/template.directive';

@@ -7,6 +7,7 @@ You can observe various changes in nodes and edges.
 
 Types of `NodeChange`s:
 - `position` - new node position after drag and drop
+- `size` - new node size
 - `add` - when node was created
 - `remove` - when node was removed
 - `select` - when node was selected (also triggers for unselected nodes)
@@ -56,6 +57,9 @@ List of all possible filter outputs:
 'onNodesChange.position',
 'onNodesChange.position.single',
 'onNodesChange.position.many',
+'onNodesChange.size',
+'onNodesChange.size.single',
+'onNodesChange.size.many',
 'onNodesChange.add',
 'onNodesChange.add.single',
 'onNodesChange.add.many',
