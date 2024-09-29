@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Injector, Input, NgZone, OnDestroy, OnInit, TemplateRef, ViewChild, computed, effect, inject, signal } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Injector, Input, NgZone, OnDestroy, OnInit, TemplateRef, ViewChild, computed, effect, inject } from '@angular/core';
 import { DraggableService } from '../../services/draggable.service';
 import { NodeModel } from '../../models/node.model';
 import { FlowStatusService } from '../../services/flow-status.service';
@@ -7,12 +7,12 @@ import { HandleModel } from '../../models/handle.model';
 import { resizable } from '../../utils/resizable';
 import { filter, first, map, startWith, switchMap, tap } from 'rxjs';
 import { InjectionContext, WithInjector } from '../../decorators/run-in-injection-context.decorator';
-import { Microtask } from '../../decorators/microtask.decorator';
 import { NodeRenderingService } from '../../services/node-rendering.service';
 import { FlowSettingsService } from '../../services/flow-settings.service';
 import { SelectionService } from '../../services/selection.service';
 import { ConnectionControllerDirective } from '../../directives/connection-controller.directive';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { NodeAccessorService } from '../../services/node-accessor.service';
 
 export type HandleState = 'valid' | 'invalid' | 'idle'
 
@@ -21,7 +21,7 @@ export type HandleState = 'valid' | 'invalid' | 'idle'
   templateUrl: './node.component.html',
   styleUrls: ['./node.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [HandleService]
+  providers: [HandleService, NodeAccessorService]
 })
 export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInjector {
   public injector = inject(Injector)
@@ -33,6 +33,7 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInje
   private selectionService = inject(SelectionService)
   private hostRef = inject<ElementRef<SVGElement>>(ElementRef)
   private connectionController = inject(ConnectionControllerDirective)
+  private nodeAccessor = inject(NodeAccessorService);
   private zone = inject(NgZone)
 
   @Input()
@@ -60,6 +61,8 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInje
 
   @InjectionContext
   public ngOnInit() {
+    this.nodeAccessor.model.set(this.nodeModel);
+
     this.handleService.node.set(this.nodeModel);
 
     effect(() => {

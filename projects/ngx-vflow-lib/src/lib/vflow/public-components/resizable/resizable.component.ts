@@ -1,12 +1,12 @@
 import { AfterViewInit, Component, computed, ElementRef, inject, Input, OnInit, TemplateRef, ViewChild } from '@angular/core';
-import { NodeComponent } from '../../components/node/node.component';
 import { RootPointerDirective } from '../../directives/root-pointer.directive';
-import { filter, map, tap } from 'rxjs';
+import { filter, tap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ViewportService } from '../../services/viewport.service';
 import { round } from '../../utils/round';
 import { Microtask } from '../../decorators/microtask.decorator';
 import { getNodesBounds } from '../../utils/nodes';
+import { NodeAccessorService } from '../../services/node-accessor.service';
 
 type Side = 'top' | 'right' | 'bottom' | 'left' | 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left';
 
@@ -16,7 +16,7 @@ type Side = 'top' | 'right' | 'bottom' | 'left' | 'top-right' | 'top-left' | 'bo
   styleUrls: ['./resizable.component.scss']
 })
 export class ResizableComponent implements OnInit, AfterViewInit {
-  private parentNode = inject(NodeComponent)
+  private nodeAccessor = inject(NodeAccessorService)
   private rootPointer = inject(RootPointerDirective)
   private viewportService = inject(ViewportService)
   private hostRef = inject<ElementRef<Element>>(ElementRef)
@@ -40,7 +40,7 @@ export class ResizableComponent implements OnInit, AfterViewInit {
   private resizer!: TemplateRef<unknown>
 
   protected get model() {
-    return this.parentNode.nodeModel
+    return this.nodeAccessor.model()!
   }
 
   protected lineGap = 3
