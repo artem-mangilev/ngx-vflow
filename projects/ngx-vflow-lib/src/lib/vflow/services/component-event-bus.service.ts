@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
-import { AnyComponentNodeEvent, ComponentNodeEvent } from '../interfaces/component-node-event.interface';
-import { CustomNodeComponent } from '../public-components/custom-node.component';
+import { AnyComponentNodeEvent } from '../interfaces/component-node-event.interface';
 
 @Injectable()
 export class ComponentEventBusService {

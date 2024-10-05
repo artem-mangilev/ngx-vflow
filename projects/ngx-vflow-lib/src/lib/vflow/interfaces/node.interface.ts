@@ -1,7 +1,7 @@
 import { Type, WritableSignal } from "@angular/core"
 import { Point } from "./point.interface"
-import { CustomNodeComponent } from "../public-components/custom-node.component"
-import { CustomDynamicNodeComponent } from "../public-components/custom-dynamic-node.component"
+import { CustomNodeComponent } from "../public-components/custom-node/custom-node.component"
+import { CustomDynamicNodeComponent } from "../public-components/custom-dynamic-node/custom-dynamic-node.component"
 
 export type Node<T = unknown> =
   DefaultNode |

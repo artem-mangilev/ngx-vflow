@@ -7,8 +7,8 @@ import { FlowEntity } from '../interfaces/flow-entity.interface'
 import { FlowSettingsService } from '../services/flow-settings.service'
 import { animationFrameScheduler, merge, observeOn, Subject, } from 'rxjs'
 import { Point } from '../interfaces/point.interface'
-import { CustomNodeComponent } from '../public-components/custom-node.component'
-import { CustomDynamicNodeComponent } from '../public-components/custom-dynamic-node.component'
+import { CustomNodeComponent } from '../public-components/custom-node/custom-node.component'
+import { CustomDynamicNodeComponent } from '../public-components/custom-dynamic-node/custom-dynamic-node.component'
 import { FlowEntitiesService } from '../services/flow-entities.service'
 
 // TODO bad naming around points
