@@ -4,6 +4,7 @@ import { FlowEntitiesService } from './flow-entities.service';
 import { FlowEntity } from '../interfaces/flow-entity.interface';
 import { Subject, tap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { KeyCodeActionsService } from './key-code-actions.service';
 
 export interface ViewportForSelection {
   start: ViewportState
@@ -19,6 +20,7 @@ export class SelectionService {
   private static delta = 6
 
   private flowEntitiesService = inject(FlowEntitiesService)
+  private keyCodeActionsService = inject(KeyCodeActionsService);
 
   protected viewport$ = new Subject<ViewportForSelection>()
 
@@ -49,10 +51,18 @@ export class SelectionService {
   }
 
   public select(entity: FlowEntity | null) {
-    // undo select for previously selected nodes
-    this.flowEntitiesService.entities()
-      .filter(n => n.selected)
-      .forEach(n => n.selected.set(false))
+    // ? May be not a responsibility of this method
+    // if entity already selected - do nothing
+    if (entity?.selected()) {
+      return
+    }
+
+    if (!this.keyCodeActionsService.isActive('multiSelection')) {
+      // undo select for previously selected nodes
+      this.flowEntitiesService.entities()
+        .filter(n => n.selected)
+        .forEach(n => n.selected.set(false))
+    }
 
     if (entity) {
       // select passed entity
