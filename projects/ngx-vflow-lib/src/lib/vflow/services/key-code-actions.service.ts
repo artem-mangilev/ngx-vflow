@@ -15,7 +15,6 @@ export class KeyCodeActionsService {
 
   constructor() {
     toObservable(this.actions).pipe(
-      tap(() => console.log('actions updated')),
       switchMap(() =>
         merge(
           fromEvent<KeyboardEvent>(document, 'keydown').pipe(
@@ -24,7 +23,6 @@ export class KeyCodeActionsService {
                 const keyCodes = this.actions()[action as KeyboardAction] ?? [];
 
                 if (keyCodes.includes(event.key)) {
-                  console.log('Meta key pressed');
                   this.actionsActive[action as KeyboardAction] = true;
                 }
               }
@@ -37,7 +35,6 @@ export class KeyCodeActionsService {
                 const keyCodes = this.actions()[action as KeyboardAction] ?? [];
 
                 if (keyCodes.includes(event.key)) {
-                  console.log('Meta key released');
                   this.actionsActive[action as KeyboardAction] = false;
                 }
               }
