@@ -45,6 +45,8 @@ export class NodeModel<T = unknown> implements FlowEntity {
 
   public renderOrder = signal(0)
 
+  public selectable = signal(false)
+
   public selected = signal(false)
   public selected$ = toObservable(this.selected)
 
@@ -145,6 +147,10 @@ export class NodeModel<T = unknown> implements FlowEntity {
       } else {
         this.resizable.set(node.resizable)
       }
+    }
+
+    if (node.type === 'default') {
+      this.selectable.set(true)
     }
   }
 

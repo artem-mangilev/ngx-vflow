@@ -29,7 +29,7 @@
   class="selectable"
   [attr.width]="nodeModel.size().width"
   [attr.height]="nodeModel.size().height"
-  (mousedown)="pullNode()"
+  (mousedown)="pullNode(); resetSelectionIfNotSelectable()"
 >
   <div
     #htmlWrapper
@@ -51,7 +51,7 @@
   class="selectable"
   [attr.width]="nodeModel.size().width"
   [attr.height]="nodeModel.size().height"
-  (mousedown)="pullNode()"
+  (mousedown)="pullNode(); resetSelectionIfNotSelectable()"
 >
   <div
     #htmlWrapper

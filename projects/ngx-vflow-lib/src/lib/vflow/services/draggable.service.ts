@@ -52,29 +52,27 @@ export class DraggableService {
    * @returns
    */
   private getDragBehavior(model: NodeModel) {
-    let selectedNodes: NodeModel[] = []
+    let dragNodes: NodeModel[] = []
     let initialPositions: Point[] = []
 
     return drag()
       .on('start', (event: DragEvent) => {
-        selectedNodes = this.entitiesService
+        // current node or selected nodes
+        dragNodes = this.entitiesService
           .nodes()
-          .filter(node => node.selected() && node.draggable())
+          .filter(node => node === model || node.selected())
 
-
-        initialPositions = selectedNodes.map(node => ({
+        initialPositions = dragNodes.map(node => ({
           x: node.point().x - event.x,
           y: node.point().y - event.y
         }))
       })
 
       .on('drag', (event: DragEvent) => {
-        initialPositions.forEach((initialPosition, index) => {
-          const model = selectedNodes[index]
-
+        dragNodes.forEach((model, index) => {
           let point = {
-            x: round(event.x + initialPosition.x),
-            y: round(event.y + initialPosition.y)
+            x: round(event.x + initialPositions[index].x),
+            y: round(event.y + initialPositions[index].y)
           }
 
           moveNode(model, point)
