@@ -2,11 +2,14 @@ import { Injectable, signal, WritableSignal } from '@angular/core';
 import { KeyboardAction, KeyCodeActions } from '../types/keyboard-action.type';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { fromEvent, merge, switchMap, tap } from 'rxjs';
+import { getOS } from '../utils/get-os';
 
 @Injectable()
 export class KeyCodeActionsService {
   private actions: WritableSignal<KeyCodeActions> = signal({
-    multiSelection: ['Meta']
+    multiSelection: [
+      getOS() === 'macos' ? 'Meta' : 'Control'
+    ]
   });
 
   private actionsActive: Record<KeyboardAction, boolean> = {
