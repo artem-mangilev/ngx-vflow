@@ -21,6 +21,7 @@ export class SelectableDirective {
   }
 
   @HostListener('mousedown')
+  @HostListener('touchstart')
   protected onMousedown() {
     const entity = this.entity()
     if (entity && this.flowSettingsService.entitiesSelectable()) {

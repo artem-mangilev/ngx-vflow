@@ -5,7 +5,7 @@
   #nodeContent
   [attr.width]="nodeModel.size().width"
   [attr.height]="nodeModel.size().height"
-  (mousedown)="pullNode(); selectNode()"
+  (pointerStart)="pullNode(); selectNode()"
 >
   <div
     #htmlWrapper
@@ -29,7 +29,7 @@
   class="selectable"
   [attr.width]="nodeModel.size().width"
   [attr.height]="nodeModel.size().height"
-  (mousedown)="pullNode(); resetSelectionIfNotSelectable()"
+  (pointerStart)="pullNode(); resetSelectionIfNotSelectable()"
 >
   <div
     #htmlWrapper
@@ -51,7 +51,7 @@
   class="selectable"
   [attr.width]="nodeModel.size().width"
   [attr.height]="nodeModel.size().height"
-  (mousedown)="pullNode(); resetSelectionIfNotSelectable()"
+  (pointerStart)="pullNode(); resetSelectionIfNotSelectable()"
 >
   <div
     #htmlWrapper
@@ -81,14 +81,14 @@
   [attr.height]="nodeModel.size().height"
   [style.stroke]="nodeModel.color()"
   [style.fill]="nodeModel.color()"
-  (mousedown)="pullNode(); selectNode()"
+  (pointerStart)="pullNode(); selectNode()"
 />
 
 <!-- Template group node  -->
 <svg:g
   *ngIf="nodeModel.node.type === 'template-group' && groupNodeTemplate"
   class="selectable"
-  (mousedown)="pullNode()"
+  (pointerStart)="pullNode(); resetSelectionIfNotSelectable()"
 >
   <ng-container
     [ngTemplateOutlet]="groupNodeTemplate"
