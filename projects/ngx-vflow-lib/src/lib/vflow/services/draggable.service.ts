@@ -57,10 +57,10 @@ export class DraggableService {
 
     return drag()
       .on('start', (event: DragEvent) => {
-        // current node or selected nodes
+        // current node or selected+draggable nodes
         dragNodes = this.entitiesService
           .nodes()
-          .filter(node => node === model || node.selected())
+          .filter(node => node === model || (node.selected() && node.draggable()))
 
         initialPositions = dragNodes.map(node => ({
           x: node.point().x - event.x,
