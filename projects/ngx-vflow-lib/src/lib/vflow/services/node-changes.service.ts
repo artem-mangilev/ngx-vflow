@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { FlowEntitiesService } from './flow-entities.service';
 import { toObservable, } from '@angular/core/rxjs-interop';
-import { Observable, asyncScheduler, distinctUntilChanged, filter, map, merge, observeOn, pairwise, skip, switchMap } from 'rxjs';
+import { Observable, asyncScheduler, distinctUntilChanged, filter, map, merge, observeOn, pairwise, skip, switchMap, tap } from 'rxjs';
 import { NodeChange } from '../types/node-change.type';
 
 // this delay fixes the cases when change triggered
@@ -26,11 +26,11 @@ export class NodesChangeService {
           )
         )
       ),
-      // For now it's a single node, later this list will also be filled
-      // with child node position changes
-      map(changedNode => [
-        { type: 'position', id: changedNode.node.id, point: changedNode.point() }
-      ])
+      map((changedNode) => {
+        return this.entitiesService.nodes()
+          .filter(node => node === changedNode || node.selected())
+          .map(node => ({ type: 'position', id: node.node.id, point: node.point() }))
+      })
     ) satisfies Observable<NodeChange[]>
 
   protected nodeSizeChange$ = toObservable(this.entitiesService.nodes)
