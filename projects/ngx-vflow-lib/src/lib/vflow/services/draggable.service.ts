@@ -57,10 +57,7 @@ export class DraggableService {
 
     return drag()
       .on('start', (event: DragEvent) => {
-        // current node or selected+draggable nodes
-        dragNodes = this.entitiesService
-          .nodes()
-          .filter(node => node === model || (node.selected() && node.draggable()))
+        dragNodes = this.getDragNodes(model)
 
         initialPositions = dragNodes.map(node => ({
           x: node.point().x - event.x,
@@ -89,6 +86,16 @@ export class DraggableService {
       .on('drag', (event: DragEvent) => {
         (event.sourceEvent as Event).stopPropagation()
       })
+  }
+
+  private getDragNodes(model: NodeModel) {
+    return model.selected()
+      ? this.entitiesService
+        .nodes()
+        // selected draggable nodes (with current node)
+        .filter(node => node.selected() && node.draggable())
+      // we only can move current node if it's not selected
+      : [model]
   }
 }
 
