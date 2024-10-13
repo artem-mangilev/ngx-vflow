@@ -7,6 +7,8 @@ import { round } from '../../utils/round';
 import { Microtask } from '../../decorators/microtask.decorator';
 import { getNodesBounds } from '../../utils/nodes';
 import { NodeAccessorService } from '../../services/node-accessor.service';
+import { NodeModel } from '../../models/node.model';
+import { Rect } from '../../interfaces/rect';
 
 type Side = 'top' | 'right' | 'bottom' | 'left' | 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left';
 
@@ -86,262 +88,126 @@ export class ResizableComponent implements OnInit, AfterViewInit {
     this.model.resizing.set(true);
   }
 
-  protected resize({ movementX, movementY }: { movementX: number, movementY: number }) {
-    const offsetX = round(movementX / this.zoom())
-    const offsetY = round(movementY / this.zoom())
+  protected resize(event: { movementX: number, movementY: number }) {
+    if (!this.resizeSide) return;
 
-    switch (this.resizeSide) {
-      case 'left':
-        let x = this.model.point().x + offsetX
-        x = Math.max(x, this.getMinX())
-        x = Math.min(x, this.getMaxX())
+    const offset = calcOffset(event.movementX, event.movementY, this.zoom())
+    const { x, y, width, height } = constrainRect(
+      applyResize(this.resizeSide, this.model, offset),
+      this.model,
+      this.resizeSide,
+      this.minWidth,
+      this.minHeight
+    )
 
-        // TODO this fixes increasing width when current node hits the parent
-        if (x === this.getMinX() || x === this.getMaxX()) {
-          return
-        }
-
-        this.model.setPoint({ x, y: this.model.point().y }, false)
-
-        this.model.size.update(({ height, width }) => {
-          width -= offsetX
-          width = Math.max(width, this.minWidth)
-          width = Math.min(width, this.getMaxWidth())
-
-          return { height, width: width }
-        })
-
-        return
-      case 'right':
-        this.model.size.update(({ height, width }) => {
-          width += offsetX
-          width = Math.max(width, this.minWidth)
-          width = Math.min(width, this.getMaxWidth())
-
-          const bounds = getNodesBounds(this.model.children())
-          width = Math.max(width, bounds.x + bounds.width)
-
-          return { height, width }
-        })
-
-        return
-      case 'top':
-        let y = this.model.point().y + offsetY
-        y = Math.max(y, this.getMinY())
-        y = Math.min(y, this.getMaxY())
-
-        if (y === this.getMinY() || y === this.getMaxY()) {
-          return
-        }
-
-        this.model.setPoint({ x: this.model.point().x, y }, false)
-
-        this.model.size.update(({ height, width }) => {
-          height -= offsetY
-          height = Math.max(height, this.minHeight)
-          height = Math.min(height, this.getMaxHeight())
-
-          return { width, height }
-        })
-
-        return
-      case 'bottom':
-        this.model.size.update(({ height, width }) => {
-          height += offsetY
-          height = Math.max(height, this.minHeight)
-          height = Math.min(height, this.getMaxHeight())
-
-          const bounds = getNodesBounds(this.model.children())
-          height = Math.max(height, bounds.y + bounds.height)
-
-          return { width, height }
-        })
-
-        return
-
-      case 'top-left': {
-        let x = this.model.point().x + offsetX
-        x = Math.max(x, this.getMinX())
-        x = Math.min(x, this.getMaxX())
-
-        let y = this.model.point().y + offsetY
-        y = Math.max(y, this.getMinY())
-        y = Math.min(y, this.getMaxY())
-
-        if (
-          x === this.getMinX() || y === this.getMinY() ||
-          x === this.getMaxX() || y === this.getMaxY()
-        ) {
-          return
-        }
-
-        this.model.setPoint({ x, y }, false)
-
-        this.model.size.update(({ height, width }) => {
-          width -= offsetX
-          width = Math.max(width, this.minWidth)
-          width = Math.min(width, this.getMaxWidth())
-
-          height -= offsetY
-          height = Math.max(height, this.minHeight)
-          height = Math.min(height, this.getMaxHeight())
-
-          return { height, width }
-        })
-
-        return
-      }
-
-      case 'top-right': {
-        let y = this.model.point().y + offsetY
-        y = Math.max(y, this.getMinY())
-        y = Math.min(y, this.getMaxY())
-
-        if (y === this.getMinX() || y === this.getMaxY()) {
-          return
-        }
-
-        this.model.setPoint({ x: this.model.point().x, y }, false)
-
-        this.model.size.update(({ height, width }) => {
-          const bounds = getNodesBounds(this.model.children())
-
-          width += offsetX
-          width = Math.max(width, this.minWidth)
-          width = Math.min(width, this.getMaxWidth())
-          width = Math.max(width, bounds.x + bounds.width)
-
-
-          height -= offsetY
-          height = Math.max(height, this.minHeight)
-          height = Math.min(height, this.getMaxHeight())
-
-          return { height, width }
-        })
-
-        return
-      }
-
-      case 'bottom-left': {
-        let x = this.model.point().x + offsetX
-        x = Math.max(x, this.getMinX())
-        x = Math.min(x, this.getMaxX())
-
-        if (x === this.getMinX() || x === this.getMaxX()) {
-          return
-        }
-
-        this.model.setPoint({ x, y: this.model.point().y }, false)
-
-        this.model.size.update(({ height, width }) => {
-          width -= offsetX
-          width = Math.max(width, this.minWidth)
-          width = Math.min(width, this.getMaxWidth())
-
-          height += offsetY
-          height = Math.max(height, this.minHeight)
-          height = Math.min(height, this.getMaxHeight())
-
-          const bounds = getNodesBounds(this.model.children())
-          height = Math.max(height, bounds.y + bounds.height)
-
-          return { height, width }
-        })
-
-        return
-      }
-
-      case 'bottom-right': {
-        this.model.size.update(({ height, width }) => {
-          const bounds = getNodesBounds(this.model.children())
-
-          width += offsetX
-          width = Math.max(width, this.minWidth)
-          width = Math.min(width, this.getMaxWidth())
-          width = Math.max(width, bounds.x + bounds.width)
-
-
-          height += offsetY
-          height = Math.max(height, this.minHeight)
-          height = Math.min(height, this.getMaxHeight())
-          height = Math.max(height, bounds.y + bounds.height)
-
-          return { height, width }
-        })
-      }
-    }
+    this.model.setPoint({ x, y }, false)
+    this.model.size.set({ width, height })
   }
 
   protected endResize() {
     this.resizeSide = null
     this.model.resizing.set(false)
   }
+}
 
-  private getMaxWidth() {
-    const parent = this.model.parent()
+function calcOffset(movementX: number, movementY: number, zoom: number) {
+  return {
+    offsetX: round(movementX / zoom),
+    offsetY: round(movementY / zoom)
+  };
+}
 
-    if (parent) {
-      return parent.size().width - this.model.point().x
+function applyResize(
+  side: Side,
+  model: NodeModel,
+  offset: { offsetX: number, offsetY: number }
+): Rect {
+  const { offsetX, offsetY } = offset
+  const { x, y } = model.point()
+  const { width, height } = model.size()
+
+  // Handle each case of resizing (top, bottom, left, right, corners)
+  switch (side) {
+    case 'left':
+      return { x: x + offsetX, y, width: width - offsetX, height }
+    case 'right':
+      return { x, y, width: width + offsetX, height }
+    case 'top':
+      return { x, y: y + offsetY, width, height: height - offsetY }
+    case 'bottom':
+      return { x, y, width, height: height + offsetY }
+    case 'top-left':
+      return { x: x + offsetX, y: y + offsetY, width: width - offsetX, height: height - offsetY }
+    case 'top-right':
+      return { x, y: y + offsetY, width: width + offsetX, height: height - offsetY }
+    case 'bottom-left':
+      return { x: x + offsetX, y, width: width - offsetX, height: height + offsetY }
+    case 'bottom-right':
+      return { x, y, width: width + offsetX, height: height + offsetY }
+  }
+}
+
+function constrainRect(
+  rect: Rect,
+  model: NodeModel,
+  side: Side,
+  minWidth: number,
+  minHeight: number
+) {
+  let { x, y, width, height } = rect
+
+  // 1. Prevent negative dimensions
+  width = Math.max(width, 0)
+  height = Math.max(height, 0)
+
+  // 2. Apply minimum size constraints
+  width = Math.max(minWidth, width)
+  height = Math.max(minHeight, height)
+
+  const parent = model.parent()
+  // 3. Apply maximum size constraints based on parent size (if exists)
+  if (parent) {
+    x = Math.max(x, 0); // Left boundary of the parent
+    y = Math.max(y, 0); // Top boundary of the parent
+
+    if (x === 0) {
+      width = model.point().x + model.size().width
     }
 
-    return Infinity
-  }
-
-  private getMaxHeight() {
-    const parent = this.model.parent()
-
-    if (parent) {
-      return parent.size().height - this.model.point().y
+    if (y === 0) {
+      height = model.point().y + model.size().height
     }
 
-    return Infinity
+    width = Math.min(width, parent.size().width - model.point().x)
+    height = Math.min(height, parent.size().height - model.point().y)
   }
 
-  private getMinX() {
-    const parent = this.model.parent()
-
-    if (parent) {
-      return 0
+  const bounds = getNodesBounds(model.children())
+  // 4. Apply child node constraints (if children exist)
+  if (bounds) {
+    if (side.includes('left')) {
+      x = Math.min(x, (model.point().x + model.size().width) - (bounds.x + bounds.width))
+      width = Math.max(width, bounds.x + bounds.width)
     }
 
-    return -Infinity
-  }
-
-  private getMinY() {
-    const parent = this.model.parent()
-
-    if (parent) {
-      return 0
+    if (side.includes('right')) {
+      width = Math.max(width, bounds.x + bounds.width)
     }
 
-    return -Infinity
-  }
-
-  private getMaxX() {
-    const x = this.model.point().x
-    const width = this.model.size().width
-    const children = this.model.children()
-
-    if (children) {
-      const bounds = getNodesBounds(children)
-
-      return x + (bounds.x + bounds.width) >= x + width ? x : (width - this.minWidth) + x
+    if (side.includes('bottom')) {
+      height = Math.max(height, bounds.y + bounds.height)
     }
 
-    return (width - this.minWidth) + x
-  }
-
-  private getMaxY() {
-    const y = this.model.point().y
-    const height = this.model.size().height
-    const children = this.model.children()
-
-    if (children) {
-      const bounds = getNodesBounds(children)
-
-      return y + (bounds.y + bounds.height) >= y + height ? y : (height - this.minHeight) + y
+    if (side.includes('top')) {
+      y = Math.min(y, (model.point().y + model.size().height) - (bounds.y + bounds.height))
+      height = Math.max(height, bounds.y + bounds.height)
     }
-
-    return (height - this.minHeight) + y
   }
+
+  return {
+    x,
+    y,
+    width,
+    height
+  };
 }
