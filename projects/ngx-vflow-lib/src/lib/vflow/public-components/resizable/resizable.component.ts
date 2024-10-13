@@ -90,18 +90,18 @@ export class ResizableComponent implements OnInit, AfterViewInit {
 
   protected resize(event: { movementX: number, movementY: number }) {
     if (!this.resizeSide) return;
-    const offset = calcOffset(event.movementX, event.movementY, this.zoom());
 
+    const offset = calcOffset(event.movementX, event.movementY, this.zoom())
     const { x, y, width, height } = constrainRect(
       applyResize(this.resizeSide, this.model, offset),
       this.model,
       this.resizeSide,
       this.minWidth,
       this.minHeight
-    );
+    )
 
-    this.model.setPoint({ x, y }, false);
-    this.model.size.set({ width, height });
+    this.model.setPoint({ x, y }, false)
+    this.model.size.set({ width, height })
   }
 
   protected endResize() {
@@ -122,28 +122,28 @@ function applyResize(
   model: NodeModel,
   offset: { offsetX: number, offsetY: number }
 ): Rect {
-  const { offsetX, offsetY } = offset;
-  const { x, y } = model.point();
-  const { width, height } = model.size();
+  const { offsetX, offsetY } = offset
+  const { x, y } = model.point()
+  const { width, height } = model.size()
 
   // Handle each case of resizing (top, bottom, left, right, corners)
   switch (side) {
     case 'left':
-      return { x: x + offsetX, y, width: width - offsetX, height };
+      return { x: x + offsetX, y, width: width - offsetX, height }
     case 'right':
-      return { x, y, width: width + offsetX, height };
+      return { x, y, width: width + offsetX, height }
     case 'top':
-      return { x, y: y + offsetY, width, height: height - offsetY };
+      return { x, y: y + offsetY, width, height: height - offsetY }
     case 'bottom':
-      return { x, y, width, height: height + offsetY };
+      return { x, y, width, height: height + offsetY }
     case 'top-left':
-      return { x: x + offsetX, y: y + offsetY, width: width - offsetX, height: height - offsetY };
+      return { x: x + offsetX, y: y + offsetY, width: width - offsetX, height: height - offsetY }
     case 'top-right':
-      return { x, y: y + offsetY, width: width + offsetX, height: height - offsetY };
+      return { x, y: y + offsetY, width: width + offsetX, height: height - offsetY }
     case 'bottom-left':
-      return { x: x + offsetX, y, width: width - offsetX, height: height + offsetY };
+      return { x: x + offsetX, y, width: width - offsetX, height: height + offsetY }
     case 'bottom-right':
-      return { x, y, width: width + offsetX, height: height + offsetY };
+      return { x, y, width: width + offsetX, height: height + offsetY }
   }
 }
 
@@ -154,28 +154,32 @@ function constrainRect(
   minWidth: number,
   minHeight: number
 ) {
-  const parent = model.parent();
-  const bounds = getNodesBounds(model.children());
-  let { width, height } = rect;
+  const parent = model.parent()
+  const bounds = getNodesBounds(model.children())
+  let { x, y, width, height } = rect
 
   // 1. Prevent negative dimensions
-  width = Math.max(width, 0);
-  height = Math.max(height, 0);
+  width = Math.max(width, 0)
+  height = Math.max(height, 0)
 
   // 2. Apply minimum size constraints
-  width = Math.max(minWidth, width);
-  height = Math.max(minHeight, height);
+  width = Math.max(minWidth, width)
+  height = Math.max(minHeight, height)
 
   // 3. Apply maximum size constraints based on parent size (if exists)
   if (parent) {
-    width = Math.min(width, parent.size().width - model.point().x);
-    height = Math.min(height, parent.size().height - model.point().y);
+    x = Math.max(x, 0); // Left boundary of the parent
+    y = Math.max(y, 0); // Top boundary of the parent
+
+    width = Math.min(width, parent.size().width - model.point().x)
+    height = Math.min(height, parent.size().height - model.point().y)
   }
 
   // 4. Apply child node constraints (if children exist)
   if (bounds) {
     if (side.includes('left')) {
-      width = Math.max(width, bounds.x + bounds.width);
+      x = Math.min(x, (model.point().x + model.size().width) - (bounds.x + bounds.width))
+      width = Math.max(width, bounds.x + bounds.width)
     }
 
     if (side.includes('right')) {
@@ -187,13 +191,14 @@ function constrainRect(
     }
 
     if (side.includes('top')) {
+      y = Math.min(y, (model.point().y + model.size().height) - (bounds.y + bounds.height))
       height = Math.max(height, bounds.y + bounds.height)
     }
   }
 
   return {
-    x: rect.x,
-    y: rect.y,
+    x,
+    y,
     width,
     height
   };
