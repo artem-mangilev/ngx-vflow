@@ -154,8 +154,6 @@ function constrainRect(
   minWidth: number,
   minHeight: number
 ) {
-  const parent = model.parent()
-  const bounds = getNodesBounds(model.children())
   let { x, y, width, height } = rect
 
   // 1. Prevent negative dimensions
@@ -166,15 +164,25 @@ function constrainRect(
   width = Math.max(minWidth, width)
   height = Math.max(minHeight, height)
 
+  const parent = model.parent()
   // 3. Apply maximum size constraints based on parent size (if exists)
   if (parent) {
     x = Math.max(x, 0); // Left boundary of the parent
     y = Math.max(y, 0); // Top boundary of the parent
 
+    if (x === 0) {
+      width = model.point().x + model.size().width
+    }
+
+    if (y === 0) {
+      height = model.point().y + model.size().height
+    }
+
     width = Math.min(width, parent.size().width - model.point().x)
     height = Math.min(height, parent.size().height - model.point().y)
   }
 
+  const bounds = getNodesBounds(model.children())
   // 4. Apply child node constraints (if children exist)
   if (bounds) {
     if (side.includes('left')) {
