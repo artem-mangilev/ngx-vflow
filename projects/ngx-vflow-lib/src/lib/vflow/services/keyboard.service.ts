@@ -1,12 +1,12 @@
 import { Injectable, signal, WritableSignal } from '@angular/core';
-import { KeyboardAction, KeyCodeActions } from '../types/keyboard-action.type';
+import { KeyboardAction, KeyboardShortcuts } from '../types/keyboard-action.type';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { fromEvent, merge, switchMap, tap } from 'rxjs';
 import { getOS } from '../utils/get-os';
 
 @Injectable()
-export class KeyCodeActionsService {
-  private actions: WritableSignal<KeyCodeActions> = signal({
+export class KeyboardService {
+  private actions: WritableSignal<KeyboardShortcuts> = signal({
     multiSelection: [
       getOS() === 'macos' ? 'Meta' : 'Control'
     ]
@@ -49,11 +49,11 @@ export class KeyCodeActionsService {
     ).subscribe();
   }
 
-  public setActions(newActions: KeyCodeActions) {
+  public setShortcuts(newActions: KeyboardShortcuts) {
     this.actions.update((actions) => ({ ...actions, ...newActions }));
   }
 
-  public isActive(action: KeyboardAction) {
+  public isActiveAction(action: KeyboardAction) {
     return this.actionsActive[action]
   }
 }

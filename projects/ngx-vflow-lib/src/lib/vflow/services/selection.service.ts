@@ -4,7 +4,7 @@ import { FlowEntitiesService } from './flow-entities.service';
 import { FlowEntity } from '../interfaces/flow-entity.interface';
 import { Subject, tap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { KeyCodeActionsService } from './key-code-actions.service';
+import { KeyboardService } from './keyboard.service';
 
 export interface ViewportForSelection {
   start: ViewportState
@@ -20,7 +20,7 @@ export class SelectionService {
   private static delta = 6
 
   private flowEntitiesService = inject(FlowEntitiesService)
-  private keyCodeActionsService = inject(KeyCodeActionsService);
+  private keyboardService = inject(KeyboardService);
 
   protected viewport$ = new Subject<ViewportForSelection>()
 
@@ -57,7 +57,7 @@ export class SelectionService {
       return
     }
 
-    if (!this.keyCodeActionsService.isActive('multiSelection')) {
+    if (!this.keyboardService.isActiveAction('multiSelection')) {
       // undo select for previously selected nodes
       this.flowEntitiesService.entities()
         .filter(n => n.selected)

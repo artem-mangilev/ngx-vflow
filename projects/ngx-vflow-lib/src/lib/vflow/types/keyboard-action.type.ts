@@ -1,3 +1,3 @@
 export type KeyboardAction = 'multiSelection'
 
-export type KeyCodeActions = Record<KeyboardAction, null | string[]>;
+export type KeyboardShortcuts = Record<KeyboardAction, null | string[]>;
