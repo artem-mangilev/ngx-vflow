@@ -141,10 +141,4 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInje
       this.selectionService.select(this.nodeModel)
     }
   }
-
-  protected resetSelectionIfNotSelectable() {
-    if (!this.nodeModel.selectable()) {
-      this.selectionService.select(null);
-    }
-  }
 }
