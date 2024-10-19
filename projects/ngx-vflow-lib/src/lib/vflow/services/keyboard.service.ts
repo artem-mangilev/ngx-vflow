@@ -8,7 +8,8 @@ import { getOS } from '../utils/get-os';
 export class KeyboardService {
   private actions: WritableSignal<KeyboardShortcuts> = signal({
     multiSelection: [
-      getOS() === 'macos' ? 'Meta' : 'Control'
+      getOS() === 'macos' ? 'MetaLeft' : 'ControlLeft',
+      getOS() === 'macos' ? 'MetaRight' : 'ControlRight',
     ]
   });
 
@@ -25,7 +26,7 @@ export class KeyboardService {
               for (const action in this.actions()) {
                 const keyCodes = this.actions()[action as KeyboardAction] ?? [];
 
-                if (keyCodes.includes(event.key)) {
+                if (keyCodes.includes(event.code)) {
                   this.actionsActive[action as KeyboardAction] = true;
                 }
               }
@@ -37,7 +38,7 @@ export class KeyboardService {
               for (const action in this.actions()) {
                 const keyCodes = this.actions()[action as KeyboardAction] ?? [];
 
-                if (keyCodes.includes(event.key)) {
+                if (keyCodes.includes(event.code)) {
                   this.actionsActive[action as KeyboardAction] = false;
                 }
               }
