@@ -11,4 +11,4 @@ Nodes and edges can be selected!
 
 You can pass `[entitiesSelectable]="false"` to `<vflow />` if you want disable selecting for whole flow.
 
-{{ NgDocActions.demo("SelectingDemoComponent", { expanded: true }) }}
+{{ NgDocActions.demoPane("SelectingDemoComponent") }}

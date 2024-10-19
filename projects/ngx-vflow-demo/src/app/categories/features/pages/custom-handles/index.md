@@ -26,4 +26,4 @@ interface HandleTemplateImplicitContext {
 }
 ```
 
-{{ NgDocActions.demo("CustomHandlesDemoComponent", { expanded: true }) }}
+{{ NgDocActions.demoPane("CustomHandlesDemoComponent") }}

@@ -2,7 +2,13 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { KeyboardShortcuts, Node, VflowModule } from 'projects/ngx-vflow-lib/src/public-api';
 
 @Component({
-  template: `<vflow [nodes]="nodes" [keyboardShortcuts]="shortcuts" />`,
+  template: `<vflow view="auto" [nodes]="nodes" [keyboardShortcuts]="shortcuts" />`,
+  styles: [`
+    :host {
+      width: 100%;
+      height: 100%;
+    }
+  `],
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
   imports: [VflowModule]

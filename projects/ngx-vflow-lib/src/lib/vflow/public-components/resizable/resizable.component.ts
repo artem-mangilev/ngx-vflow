@@ -26,7 +26,6 @@ export class ResizableComponent implements OnInit, AfterViewInit {
   private spacePointContext = inject(SpacePointContextDirective)
   private hostRef = inject<ElementRef<Element>>(ElementRef)
 
-
   @Input()
   public set resizable(value: boolean | '') {
     if (typeof value === 'boolean') {

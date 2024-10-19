@@ -6,7 +6,7 @@ You might want to resize your node. This functionality works with nearly all typ
 
 To resize a default group, simply pass the `resizable` flag to a `Node` (or `DynamicNode`) of type `default-group`.
 
-{{ NgDocActions.demo("DefaultGroupResizerDemoComponent", { expanded: true }) }}
+{{ NgDocActions.demoPane("DefaultGroupResizerDemoComponent") }}
 
 ## Resize template group
 
@@ -19,7 +19,7 @@ This provides a way to have more control over the resizer:
 - The resizer respects the `min-width` and `min-height` CSS properties of the resizable node.
 - Optionally, you can customize the `[resizerColor]` and the `[gap]` between the node and the resizer, with more customization options coming in the future."
 
-{{ NgDocActions.demo("TemplateGroupResizerDemoComponent", { expanded: true }) }}
+{{ NgDocActions.demoPane("TemplateGroupResizerDemoComponent") }}
 
 ## Resize a template/component regular node
 
@@ -35,7 +35,7 @@ The algorithm is almost the same as for `template-group` nodes:
 
 - Optionally, you can customize the `[resizerColor]` and the `[gap]` between the node and the resizer, with more customization options coming in the future.
 
-{{ NgDocActions.demo("TemplateNodeResizerDemoComponent", { expanded: true }) }}
+{{ NgDocActions.demoPane("TemplateNodeResizerDemoComponent") }}
 
 ## Resize event
 

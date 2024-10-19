@@ -19,4 +19,4 @@ To customize the keyboard shortcuts for specific actions, pass a `[keyboardShort
 
 In the following example, the default combination for `multiSelection` is replaced with `['ShiftLeft', 'ShiftRight']`.
 
-{{ NgDocActions.demo("KeyboardShortcutsDemoComponent", { expanded: true }) }}
+{{ NgDocActions.demoPane("KeyboardShortcutsDemoComponent") }}

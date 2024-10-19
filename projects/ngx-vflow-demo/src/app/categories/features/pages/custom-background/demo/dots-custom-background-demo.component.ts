@@ -3,10 +3,17 @@ import { Edge, Node, VflowModule } from 'projects/ngx-vflow-lib/src/public-api';
 
 @Component({
   template: `<vflow
+    view="auto"
     [nodes]="nodes"
     [edges]="edges"
     [background]="{ type: 'dots' }"
   />`,
+  styles: [`
+    :host {
+      width: 100%;
+      height: 100%;
+    }
+  `],
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
   imports: [VflowModule]

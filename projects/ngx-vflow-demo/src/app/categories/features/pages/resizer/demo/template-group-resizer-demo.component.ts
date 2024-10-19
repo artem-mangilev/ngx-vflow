@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { Edge, Node, VflowModule } from 'projects/ngx-vflow-lib/src/public-api';
 
 @Component({
-  template: `<vflow [nodes]="nodes">
+  template: `<vflow view="auto" [nodes]="nodes">
     <ng-template groupNode let-ctx>
       <svg:rect
         [resizable]="ctx.selected()"
@@ -19,6 +19,12 @@ import { Edge, Node, VflowModule } from 'projects/ngx-vflow-lib/src/public-api';
       </svg:rect>
     </ng-template>
   </vflow>`,
+  styles: [`
+    :host {
+      width: 100%;
+      height: 100%;
+    }
+  `],
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
   imports: [VflowModule]

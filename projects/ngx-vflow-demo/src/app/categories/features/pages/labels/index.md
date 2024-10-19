@@ -17,4 +17,4 @@ interface EdgeLabelContext {
 
 ## Example
 
-{{ NgDocActions.demo("LabelsDemoComponent", { expanded: true }) }}
+{{ NgDocActions.demoPane("LabelsDemoComponent") }}

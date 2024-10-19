@@ -2,9 +2,15 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { Connection, Edge, Node, VflowModule } from 'projects/ngx-vflow-lib/src/public-api';
 
 @Component({
-  template: `<vflow [nodes]="nodes" [edges]="edges"
+  template: `<vflow view="auto" [nodes]="nodes" [edges]="edges"
     (onConnect)="createEdge($event)"/>
   `,
+  styles: [`
+    :host {
+      width: 100%;
+      height: 100%;
+    }
+  `],
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
   imports: [VflowModule]

@@ -5,7 +5,13 @@ import { BlueSquareNodeComponent, BlueSquareData } from './components/blue-squar
 import { RedSquareNodeComponent, RedSquareData } from './components/red-square-node.component';
 
 @Component({
-  template: `<vflow [nodes]="nodes" [edges]="edges" (onComponentNodeEvent)="handleComponentEvent($event)" />`,
+  template: `<vflow view="auto" [nodes]="nodes" [edges]="edges" (onComponentNodeEvent)="handleComponentEvent($event)" />`,
+  styles: [`
+    :host {
+      width: 100%;
+      height: 100%;
+    }
+  `],
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
   imports: [VflowModule]
