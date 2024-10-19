@@ -14,6 +14,7 @@ export class SelectableDirective {
   private parentNode = inject(NodeComponent, { optional: true })
 
   @HostListener('mousedown')
+  @HostListener('touchstart')
   protected onMousedown() {
     const entity = this.entity()
     if (entity && this.flowSettingsService.entitiesSelectable()) {

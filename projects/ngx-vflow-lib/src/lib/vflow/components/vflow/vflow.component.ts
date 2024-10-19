@@ -32,6 +32,8 @@ import { Background } from '../../types/background.type';
 import { SpacePointContextDirective } from '../../directives/space-point-context.directive';
 import { FitViewOptions } from '../../interfaces/fit-view-options.interface';
 import { Optimization } from '../../interfaces/optimization.interface';
+import { KeyboardShortcuts } from '../../types/keyboard-action.type';
+import { KeyboardService } from '../../services/keyboard.service';
 
 const connectionControllerHostDirective = {
   directive: ConnectionControllerDirective,
@@ -88,7 +90,8 @@ const changesControllerHostDirective = {
     NodeRenderingService,
     SelectionService,
     FlowSettingsService,
-    ComponentEventBusService
+    ComponentEventBusService,
+    KeyboardService
   ],
   hostDirectives: [
     connectionControllerHostDirective,
@@ -104,6 +107,7 @@ export class VflowComponent implements OnInit {
   private nodeRenderingService = inject(NodeRenderingService)
   private flowSettingsService = inject(FlowSettingsService)
   private componentEventBusService = inject(ComponentEventBusService)
+  private keyboardService = inject(KeyboardService)
   private injector = inject(Injector)
   // #endregion
 
@@ -167,6 +171,11 @@ export class VflowComponent implements OnInit {
   @Input()
   public set entitiesSelectable(value: boolean) {
     this.flowSettingsService.entitiesSelectable.set(value)
+  }
+
+  @Input()
+  public set keyboardShortcuts(value: KeyboardShortcuts) {
+    this.keyboardService.setShortcuts(value)
   }
 
   /**

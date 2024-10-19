@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { Edge, Node, VflowModule } from 'projects/ngx-vflow-lib/src/public-api';
+import { KeyboardShortcuts, Node, VflowModule } from 'projects/ngx-vflow-lib/src/public-api';
 
 @Component({
-  template: `<vflow view="auto" [nodes]="nodes" [edges]="edges" />`,
+  template: `<vflow view="auto" [nodes]="nodes" [keyboardShortcuts]="shortcuts" />`,
   styles: [`
     :host {
       width: 100%;
@@ -13,7 +13,11 @@ import { Edge, Node, VflowModule } from 'projects/ngx-vflow-lib/src/public-api';
   standalone: true,
   imports: [VflowModule]
 })
-export class DefaultGroupResizerDemoComponent {
+export class KeyboardShortcutsDemoComponent {
+  public shortcuts: KeyboardShortcuts = {
+    multiSelection: ['ShiftLeft', 'ShiftRight']
+  }
+
   public nodes: Node[] = [
     {
       id: '1',
@@ -24,26 +28,16 @@ export class DefaultGroupResizerDemoComponent {
     },
     {
       id: '2',
-      point: { x: 90, y: 80 },
+      point: { x: 200, y: 200 },
       type: 'default',
-      text: `<strong>2</strong>`,
-      parentId: '3'
+      text: `<strong>2</strong>`
     },
     {
       id: '3',
       point: { x: 10, y: 10 },
       type: 'default-group',
-      width: 250,
-      height: 250,
-      resizable: true
+      width: 150,
+      height: 150,
     },
-  ]
-
-  public edges: Edge[] = [
-    {
-      source: '1',
-      target: '2',
-      id: '1 -> 2'
-    }
   ]
 }

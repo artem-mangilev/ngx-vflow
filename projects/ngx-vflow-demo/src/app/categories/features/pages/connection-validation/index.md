@@ -4,4 +4,4 @@
 
 For example, in this case, validation only passes connections from node 1 to node 2. If the `validator` returns `false`, the `(onConnect)` event won't be triggered because there is no valid connection.
 
-{{ NgDocActions.demo("ConnectionValidationDemoComponent", { expanded: true }) }}
+{{ NgDocActions.demoPane("ConnectionValidationDemoComponent") }}

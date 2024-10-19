@@ -1,4 +1,4 @@
-<vflow [nodes]="nodes" [edges]="edges">
+<vflow view="auto" [nodes]="nodes" [edges]="edges">
   <ng-template nodeHtml let-ctx>
     <div class="custom-node" [class.custom-node_selected]="ctx.selected()">
       <button class="custom-node__button" selectable>Select here</button>

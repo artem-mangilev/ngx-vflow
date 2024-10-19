@@ -16,7 +16,7 @@ Follow these steps to achieve this:
 3. Write your HTML inside this template
 4. You can also pass any data with `data` field on node, and then get it inside `ng-template`
 
-{{ NgDocActions.demo("CustomNodesDemoComponent", { expanded: true }) }}
+{{ NgDocActions.demoPane("CustomNodesDemoComponent") }}
 
 ## Component nodes
 
@@ -38,7 +38,7 @@ How to create component node:
 3. Pass your data interface to generic of `CustomNodeComponent` to use in component. This `data` comes from `Node` definition
 4. Use your new component in `type` field of `Node`. Library will render your node for you
 
-{{ NgDocActions.demo("CustomComponentNodesDemoComponent", { expanded: true }) }}
+{{ NgDocActions.demoPane("CustomComponentNodesDemoComponent") }}
 
 ### Handling events
 

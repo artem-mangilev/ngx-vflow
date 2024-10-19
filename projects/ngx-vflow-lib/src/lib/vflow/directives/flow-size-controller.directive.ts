@@ -1,28 +1,33 @@
-import { Directive, ElementRef, HostBinding, NgZone, effect, inject } from '@angular/core';
+import { Directive, ElementRef, NgZone, Signal, WritableSignal, computed, effect, inject, signal } from '@angular/core';
 import { resizable } from '../utils/resizable';
 import { tap } from 'rxjs';
 import { FlowSettingsService } from '../services/flow-settings.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-@Directive({ selector: 'svg[flowSizeController]' })
+@Directive({
+  selector: 'svg[flowSizeController]',
+  host: {
+    '[attr.width]': 'flowWidth()',
+    '[attr.height]': 'flowHeight()'
+  }
+})
 export class FlowSizeControllerDirective {
   private host = inject<ElementRef<SVGSVGElement>>(ElementRef)
   private flowSettingsService = inject(FlowSettingsService)
 
-  @HostBinding('attr.width')
-  public flowWidth: string | number = 0
+  public flowWidth: Signal<string | number> = computed(() => {
+    const view = this.flowSettingsService.view()
 
-  @HostBinding('attr.height')
-  public flowHeight: string | number = 0
+    return view === 'auto' ? '100%' : view[0]
+  })
+
+  public flowHeight: Signal<string | number> = computed(() => {
+    const view = this.flowSettingsService.view()
+
+    return view === 'auto' ? '100%' : view[1]
+  })
 
   constructor() {
-    effect(() => {
-      const view = this.flowSettingsService.view()
-
-      this.flowWidth = view === 'auto' ? '100%' : view[0]
-      this.flowHeight = view === 'auto' ? '100%' : view[1]
-    })
-
     resizable([this.host.nativeElement], inject(NgZone)).pipe(
       tap(([entry]) => {
         this.flowSettingsService.computedFlowWidth.set(entry.contentRect.width)

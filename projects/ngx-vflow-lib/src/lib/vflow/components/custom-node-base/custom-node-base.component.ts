@@ -1,12 +1,12 @@
 import { DestroyRef, Directive, EventEmitter, Input, OnInit, inject, signal } from "@angular/core"
-import { merge, tap } from "rxjs";
+import { merge, of, tap } from "rxjs";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { ComponentEventBusService } from "../../services/component-event-bus.service";
 import { ComponentDynamicNode, ComponentNode } from "../../interfaces/node.interface";
 
 @Directive()
 export abstract class CustomNodeBaseComponent<T = unknown> implements OnInit {
-  private eventBus = inject(ComponentEventBusService)
+  private eventBus = inject(ComponentEventBusService, { optional: true })
 
   protected destroyRef = inject(DestroyRef)
 
@@ -28,7 +28,11 @@ export abstract class CustomNodeBaseComponent<T = unknown> implements OnInit {
   public data = signal<T | undefined>(undefined)
 
   public ngOnInit(): void {
-    this.trackEvents().pipe(takeUntilDestroyed(this.destroyRef)).subscribe()
+    if (this.eventBus) {
+      this.trackEvents()
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe()
+    }
   }
 
   private trackEvents() {
@@ -47,7 +51,7 @@ export abstract class CustomNodeBaseComponent<T = unknown> implements OnInit {
       ...Array.from(emitters.keys()).map(emitter =>
         emitter.pipe(
           tap((event) => {
-            this.eventBus.pushEvent({
+            this.eventBus!.pushEvent({
               nodeId: this.node.id,
               eventName: emitters.get(emitter)!,
               eventPayload: event

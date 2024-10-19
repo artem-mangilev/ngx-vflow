@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { Edge, Node, VflowModule } from 'projects/ngx-vflow-lib/src/public-api';
 
 @Component({
-  template: `<vflow [nodes]="nodes" [edges]="edges">
+  template: `<vflow view="auto" [nodes]="nodes" [edges]="edges">
     <ng-template edgeLabelHtml let-ctx>
       <div
         class="label"
@@ -11,6 +11,11 @@ import { Edge, Node, VflowModule } from 'projects/ngx-vflow-lib/src/public-api';
     </ng-template>
   </vflow>`,
   styles: [`
+    :host {
+      width: 100%;
+      height: 100%;
+    }
+
     .label {
       width: 60px;
       height: 25px;

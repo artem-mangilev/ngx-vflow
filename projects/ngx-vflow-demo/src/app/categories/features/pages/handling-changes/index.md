@@ -26,7 +26,7 @@ This is a way to get every possible change. Changes came as non empty arrays:
 - `(onNodesChange)` emits `NodeChange[]` 
 - `(onEdgesChange)` emits `EdgeChange[]`
 
-{{ NgDocActions.demo("HandlingChangesDemoComponent", { expanded: false }) }}
+{{ NgDocActions.demoPane("HandlingChangesDemoComponent") }}
 
 ## From filtered outputs
 
@@ -49,7 +49,7 @@ type EdgeChangeType = 'detached' | 'add' | 'remove' | 'select'
 type Count = 'single' | 'many'
 ```
 
-{{ NgDocActions.demo("HandlingChangesFilteredDemoComponent", { expanded: false }) }}
+{{ NgDocActions.demoPane("HandlingChangesFilteredDemoComponent") }}
 
 List of all possible filter outputs:
 

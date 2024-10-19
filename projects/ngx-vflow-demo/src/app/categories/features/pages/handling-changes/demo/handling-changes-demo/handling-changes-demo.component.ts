@@ -4,6 +4,12 @@ import { Connection, Edge, EdgeChange, Node, NodeChange, VflowModule } from 'pro
 
 @Component({
   templateUrl: './handling-changes-demo.component.html',
+  styles: [`
+    :host {
+      width: 100%;
+      height: 100%;
+    }
+  `],
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
   imports: [VflowModule],

@@ -3,11 +3,15 @@ import { select } from 'd3-selection';
 import { D3DragEvent, drag } from 'd3-drag';
 import { NodeModel } from '../models/node.model';
 import { round } from '../utils/round';
+import { FlowEntitiesService } from './flow-entities.service';
+import { Point } from '../interfaces/point.interface';
 
 type DragEvent = D3DragEvent<Element, unknown, unknown>
 
 @Injectable()
 export class DraggableService {
+  private entitiesService = inject(FlowEntitiesService);
+
   /**
    * Enable draggable behavior for element.
    *
@@ -48,32 +52,28 @@ export class DraggableService {
    * @returns
    */
   private getDragBehavior(model: NodeModel) {
-    let deltaX: number
-    let deltaY: number
+    let dragNodes: NodeModel[] = []
+    let initialPositions: Point[] = []
 
     return drag()
       .on('start', (event: DragEvent) => {
-        deltaX = model.point().x - event.x
-        deltaY = model.point().y - event.y
+        dragNodes = this.getDragNodes(model)
+
+        initialPositions = dragNodes.map(node => ({
+          x: node.point().x - event.x,
+          y: node.point().y - event.y
+        }))
       })
 
       .on('drag', (event: DragEvent) => {
-        let point = {
-          x: round(event.x + deltaX),
-          y: round(event.y + deltaY)
-        }
+        dragNodes.forEach((model, index) => {
+          let point = {
+            x: round(event.x + initialPositions[index].x),
+            y: round(event.y + initialPositions[index].y)
+          }
 
-        const parent = model.parent()
-        // keep node in bounds of parent
-        if (parent) {
-          point.x = Math.min(parent.size().width - model.size().width, point.x)
-          point.x = Math.max(0, point.x)
-
-          point.y = Math.min(parent.size().height - model.size().height, point.y)
-          point.y = Math.max(0, point.y)
-        }
-
-        model.setPoint(point, true)
+          moveNode(model, point)
+        })
       })
   }
 
@@ -87,4 +87,28 @@ export class DraggableService {
         (event.sourceEvent as Event).stopPropagation()
       })
   }
+
+  private getDragNodes(model: NodeModel) {
+    return model.selected()
+      ? this.entitiesService
+        .nodes()
+        // selected draggable nodes (with current node)
+        .filter(node => node.selected() && node.draggable())
+      // we only can move current node if it's not selected
+      : [model]
+  }
+}
+
+function moveNode(model: NodeModel, point: Point) {
+  const parent = model.parent()
+  // keep node in bounds of parent
+  if (parent) {
+    point.x = Math.min(parent.size().width - model.size().width, point.x)
+    point.x = Math.max(0, point.x)
+
+    point.y = Math.min(parent.size().height - model.size().height, point.y)
+    point.y = Math.max(0, point.y)
+  }
+
+  model.setPoint(point, true)
 }

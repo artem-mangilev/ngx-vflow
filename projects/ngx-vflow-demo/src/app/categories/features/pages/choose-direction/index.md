@@ -9,10 +9,10 @@ You can apply global setting for all handles with `[handlePositions]` input wher
 
 To archive this direction, you pass `{ source: 'left', target: 'right' }` to `[handlePositions]`.
 
-{{ NgDocActions.demo("HandlePositionsRtlDemoComponent", { expanded: false }) }}
+{{ NgDocActions.demoPane("HandlePositionsRtlDemoComponent") }}
 
 ## Top to bottom direction
 
 To archive this direction, you pass `{ source: 'bottom', target: 'top' }` to `[handlePositions]`.
 
-{{ NgDocActions.demo("HandlePositionsTtbDemoComponent", { expanded: false }) }}
+{{ NgDocActions.demoPane("HandlePositionsTtbDemoComponent") }}

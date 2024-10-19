@@ -2,6 +2,15 @@ import { Directive, ElementRef, inject } from '@angular/core';
 import { Observable, Subject, animationFrameScheduler, fromEvent, map, merge, observeOn, share, skip, tap } from 'rxjs';
 import { Point } from '../interfaces/point.interface';
 
+export interface PointerEvent {
+  x: number
+  y: number
+  movementX: number
+  movementY: number
+  target: Element | null
+  originalEvent: MouseEvent | TouchEvent
+}
+
 @Directive({ selector: 'svg[rootPointer]' })
 export class RootPointerDirective {
   private host = inject<ElementRef<SVGSVGElement>>(ElementRef).nativeElement
@@ -17,7 +26,7 @@ export class RootPointerDirective {
       y: event.clientY,
       movementX: event.movementX,
       movementY: event.movementY,
-      target: event.target,
+      target: event.target as Element | null,
       originalEvent: event
     })),
     observeOn(animationFrameScheduler),
@@ -48,7 +57,7 @@ export class RootPointerDirective {
     share()
   ) satisfies Observable<Point>;
 
-  public pointerMovement$ = merge(
+  public pointerMovement$: Observable<PointerEvent> = merge(
     this.mouseMovement$,
     this.touchMovement$
   )

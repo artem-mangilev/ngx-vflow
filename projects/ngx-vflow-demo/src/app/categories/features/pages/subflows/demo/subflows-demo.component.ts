@@ -2,14 +2,14 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { Edge, Node, VflowModule } from 'projects/ngx-vflow-lib/src/public-api';
 
 @Component({
-  template: `<vflow [nodes]="nodes" [edges]="edges">
+  template: `<vflow view="auto" [nodes]="nodes" [edges]="edges">
     <ng-template groupNode let-ctx>
       <svg:rect
         selectable
         rx="5"
         ry="5"
-        [attr.width]="ctx.node.width"
-        [attr.height]="ctx.node.height"
+        [attr.width]="ctx.width()"
+        [attr.height]="ctx.height()"
         [style.stroke]="'red'"
         [style.fill]="'red'"
         [style.fill-opacity]="0.05"
@@ -19,6 +19,12 @@ import { Edge, Node, VflowModule } from 'projects/ngx-vflow-lib/src/public-api';
       </svg:rect>
     </ng-template>
   </vflow>`,
+  styles: [`
+    :host {
+      width: 100%;
+      height: 100%;
+    }
+  `],
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
   imports: [VflowModule]
@@ -45,7 +51,7 @@ export class SubflowsDemoComponent {
       point: { x: 10, y: 10 },
       type: 'default-group',
       width: 250,
-      height: 250
+      height: 250,
     },
     {
       id: '4',

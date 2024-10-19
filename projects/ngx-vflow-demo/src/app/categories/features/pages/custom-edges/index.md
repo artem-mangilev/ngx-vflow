@@ -22,4 +22,4 @@ export interface EdgeContext {
 
 ## Example
 
-{{ NgDocActions.demo("CustomEdgesDemoComponent", { expanded: true }) }}
+{{ NgDocActions.demoPane("CustomEdgesDemoComponent") }}

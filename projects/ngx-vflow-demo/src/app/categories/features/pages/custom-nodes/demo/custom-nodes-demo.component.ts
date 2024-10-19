@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { DynamicNode, Edge, VflowModule } from 'projects/ngx-vflow-lib/src/public-api';
 
 @Component({
-  template: `<vflow [nodes]="nodes" [edges]="edges">
+  template: `<vflow view="auto" [nodes]="nodes" [edges]="edges">
     <ng-template nodeHtml let-ctx>
       <div class="custom-node" selectable [class.custom-node_selected]="ctx.selected()">
         {{ ctx.node.data().text }}
@@ -13,6 +13,11 @@ import { DynamicNode, Edge, VflowModule } from 'projects/ngx-vflow-lib/src/publi
   </vflow>`,
   styles: [
     `
+      :host {
+        width: 100%;
+        height: 100%;
+      }
+
       .custom-node {
         width: 150px;
         height: 100px;

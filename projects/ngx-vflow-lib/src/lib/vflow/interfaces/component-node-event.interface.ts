@@ -1,6 +1,6 @@
 import { EventEmitter } from "@angular/core";
-import { CustomNodeComponent } from "../public-components/custom-node.component";
-import { CustomDynamicNodeComponent } from "../public-components/custom-dynamic-node.component";
+import { CustomNodeComponent } from "../public-components/custom-node/custom-node.component";
+import { CustomDynamicNodeComponent } from "../public-components/custom-dynamic-node/custom-dynamic-node.component";
 
 type EventInfo<T> = T extends EventEmitter<infer U> ? U : never;
 

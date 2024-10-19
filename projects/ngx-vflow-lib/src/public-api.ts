@@ -22,12 +22,13 @@ export * from './lib/vflow/types/edge-change.type';
 export * from './lib/vflow/types/position.type';
 export * from './lib/vflow/types/background.type';
 export * from './lib/vflow/types/connection-mode.type';
+export * from './lib/vflow/types/keyboard-action.type';
 
 // Components
 export * from './lib/vflow/components/vflow/vflow.component';
 export * from './lib/vflow/components/handle/handle.component';
-export * from './lib/vflow/public-components/custom-node.component';
-export * from './lib/vflow/public-components/custom-dynamic-node.component';
+export * from './lib/vflow/public-components/custom-node/custom-node.component';
+export * from './lib/vflow/public-components/custom-dynamic-node/custom-dynamic-node.component';
 export * from './lib/vflow/public-components/resizable/resizable.component';
 
 // Directives

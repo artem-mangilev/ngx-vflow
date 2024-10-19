@@ -4,7 +4,7 @@ import { Edge, Node, VflowModule, Connection } from 'projects/ngx-vflow-lib/src/
 
 @Component({
   template: `
-    <vflow [nodes]="nodes" [edges]="edges">
+    <vflow view="auto" [nodes]="nodes" [edges]="edges">
       <ng-template nodeHtml let-ctx>
         <ng-container *ngIf="ctx.node.data.type === 'output'">
           <div resizable class="custom-node">
@@ -37,6 +37,11 @@ import { Edge, Node, VflowModule, Connection } from 'projects/ngx-vflow-lib/src/
     </vflow>
   `,
   styles: [`
+    :host {
+      width: 100%;
+      height: 100%;
+    }
+
     .custom-node {
       min-width: 150px;
       min-height: 100px;
