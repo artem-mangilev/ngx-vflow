@@ -16,8 +16,6 @@ export class EdgeModel implements FlowEntity {
   public curve: Curve
   public type: EdgeType
 
-  public selectable = signal(true);
-
   public selected = signal(false);
   public selected$ = toObservable(this.selected);
 

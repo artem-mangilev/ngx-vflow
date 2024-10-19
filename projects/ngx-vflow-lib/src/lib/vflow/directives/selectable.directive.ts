@@ -13,13 +13,6 @@ export class SelectableDirective {
   private parentEdge = inject(EdgeComponent, { optional: true })
   private parentNode = inject(NodeComponent, { optional: true })
 
-  constructor() {
-    const entity = this.entity()
-    if (entity) {
-      entity.selectable.set(true)
-    }
-  }
-
   @HostListener('mousedown')
   @HostListener('touchstart')
   protected onMousedown() {
