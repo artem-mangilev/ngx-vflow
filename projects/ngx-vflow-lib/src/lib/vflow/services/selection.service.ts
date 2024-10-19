@@ -59,9 +59,7 @@ export class SelectionService {
 
     if (!this.keyboardService.isActiveAction('multiSelection')) {
       // undo select for previously selected nodes
-      this.flowEntitiesService.entities()
-        .filter(n => n.selected)
-        .forEach(n => n.selected.set(false))
+      this.flowEntitiesService.entities().forEach(n => n.selected.set(false))
     }
 
     if (entity) {
