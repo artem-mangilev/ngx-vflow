@@ -9,6 +9,8 @@ import { getNodesBounds } from '../../utils/nodes';
 import { NodeAccessorService } from '../../services/node-accessor.service';
 import { NodeModel } from '../../models/node.model';
 import { Rect } from '../../interfaces/rect';
+import { PointerEvent } from '../../directives/root-pointer.directive';
+import { SpacePointContextDirective } from '../../directives/space-point-context.directive';
 
 type Side = 'top' | 'right' | 'bottom' | 'left' | 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left';
 
@@ -21,7 +23,9 @@ export class ResizableComponent implements OnInit, AfterViewInit {
   private nodeAccessor = inject(NodeAccessorService)
   private rootPointer = inject(RootPointerDirective)
   private viewportService = inject(ViewportService)
+  private spacePointContext = inject(SpacePointContextDirective)
   private hostRef = inject<ElementRef<Element>>(ElementRef)
+
 
   @Input()
   public set resizable(value: boolean | '') {
@@ -59,6 +63,7 @@ export class ResizableComponent implements OnInit, AfterViewInit {
   protected resizeOnGlobalMouseMove = this.rootPointer.pointerMovement$
     .pipe(
       filter(() => this.resizeSide !== null),
+      filter((event) => event.movementX !== 0 || event.movementY !== 0),
       tap((event) => this.resize(event)),
       takeUntilDestroyed()
     )
@@ -83,13 +88,13 @@ export class ResizableComponent implements OnInit, AfterViewInit {
 
   protected startResize(side: Side, event: Event) {
     event.stopPropagation()
-
     this.resizeSide = side
-    this.model.resizing.set(true);
+    this.model.resizing.set(true)
   }
 
-  protected resize(event: { movementX: number, movementY: number }) {
+  protected resize(event: PointerEvent) {
     if (!this.resizeSide) return;
+    if (this.isResizeConstrained(event)) return;
 
     const offset = calcOffset(event.movementX, event.movementY, this.zoom())
     const { x, y, width, height } = constrainRect(
@@ -107,6 +112,52 @@ export class ResizableComponent implements OnInit, AfterViewInit {
   protected endResize() {
     this.resizeSide = null
     this.model.resizing.set(false)
+  }
+
+  private isResizeConstrained({ x, y, movementX, movementY }: PointerEvent): boolean {
+    const flowPoint = this.spacePointContext.documentPointToFlowPoint({ x, y })
+
+    if (this.resizeSide?.includes('right')) {
+      if (movementX > 0 && flowPoint.x < (this.model.point().x + this.model.size().width)) {
+        return true
+      }
+
+      if (movementX < 0 && flowPoint.x > this.model.point().x + this.model.size().width) {
+        return true
+      }
+    }
+
+    if (this.resizeSide?.includes('left')) {
+      if (movementX < 0 && flowPoint.x > this.model.point().x) {
+        return true
+      }
+
+      if (movementX > 0 && flowPoint.x < this.model.point().x) {
+        return true
+      }
+    }
+
+    if (this.resizeSide?.includes('bottom')) {
+      if (movementY > 0 && flowPoint.y < (this.model.point().y + this.model.size().height)) {
+        return true
+      }
+
+      if (movementY < 0 && flowPoint.y > this.model.point().y + this.model.size().height) {
+        return true
+      }
+    }
+
+    if (this.resizeSide?.includes('top')) {
+      if (movementY < 0 && flowPoint.y > this.model.point().y) {
+        return true
+      }
+
+      if (movementY > 0 && flowPoint.y < this.model.point().y) {
+        return true
+      }
+    }
+
+    return false
   }
 }
 
@@ -163,6 +214,10 @@ function constrainRect(
   // 2. Apply minimum size constraints
   width = Math.max(minWidth, width)
   height = Math.max(minHeight, height)
+
+  // Apply left/top constraints based on minimum size
+  x = Math.min(x, model.point().x + model.size().width - minWidth)
+  y = Math.min(y, model.point().y + model.size().height - minHeight)
 
   const parent = model.parent()
   // 3. Apply maximum size constraints based on parent size (if exists)
