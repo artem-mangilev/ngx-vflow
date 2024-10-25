@@ -1,12 +1,12 @@
 <ng-template #minimap>
   <svg:clipPath [attr.id]="clipPathId()">
-    <svg:rect width="100" height="100" />
+    <svg:rect [attr.width]="minimapWidth()" [attr.height]="minimapHeight()" />
   </svg:clipPath>
 
   <svg:g [attr.clip-path]="clipPathUrl()">
-    <svg:rect width="100" height="100" class="minimap-bg" />
+    <svg:rect [attr.width]="minimapWidth()" [attr.height]="minimapHeight()" class="minimap-bg" />
 
-    <svg:g transform="translate(20, 20) scale(0.2)">
+    <svg:g [attr.transform]="minimapTransform()">
       <svg:foreignObject
         *ngFor="let model of entitiesService.nodes(); trackBy: trackNodes"
         [attr.transform]="model.pointTransform()"
