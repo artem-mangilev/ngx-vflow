@@ -16,20 +16,45 @@ import { ViewportService } from '../../services/viewport.service';
 export class MinimapComponent implements OnInit {
   protected entitiesService = inject(FlowEntitiesService)
   protected flowSettingsService = inject(FlowSettingsService)
+  protected viewportService = inject(ViewportService)
 
   @ViewChild('minimap', { static: true })
   private minimap!: TemplateRef<unknown>
 
+  private readonly minimapScale = 0.2
+
   protected clipPathId = signal(id())
   protected clipPathUrl = computed(() => `url(#${this.clipPathId()})`)
 
-  protected minimapWidth = computed(() => this.flowSettingsService.computedFlowWidth() * 0.2)
-  protected minimapHeight = computed(() => this.flowSettingsService.computedFlowHeight() * 0.2)
+  protected minimapWidth = computed(() => this.flowSettingsService.computedFlowWidth() * this.minimapScale)
+  protected minimapHeight = computed(() => this.flowSettingsService.computedFlowHeight() * this.minimapScale)
 
-  protected minimapTransform = computed(() => {
+  protected viewportWidth = computed(() => {
+    const width = this.flowSettingsService.computedFlowWidth()
+    const zoom = this.viewportService.readableViewport().zoom
+
+    return (width / zoom) * this.minimapScale
+  });
+  protected viewportHeight = computed(() => {
+    const height = this.flowSettingsService.computedFlowHeight()
+    const zoom = this.viewportService.readableViewport().zoom
+
+    return (height / zoom) * this.minimapScale
+  });
+
+  protected viewportTransform = computed(() => {
+    const viewport = this.viewportService.readableViewport();
+    const scale = 1 / viewport.zoom
+    const x = -(viewport.x * this.minimapScale) * scale
+    const y = -(viewport.y * this.minimapScale) * scale
+
+    return `translate(${x}, ${y}) scale(${scale})`;
+  });
+
+  protected boundsViewport = computed(() => {
     const nodes = this.entitiesService.nodes()
 
-    const state = getViewportForBounds(
+    return getViewportForBounds(
       getNodesBounds(nodes),
       this.flowSettingsService.computedFlowWidth(),
       this.flowSettingsService.computedFlowHeight(),
@@ -38,7 +63,10 @@ export class MinimapComponent implements OnInit {
       0
     )
 
-    return `translate(${state.x * 0.2}, ${state.y * 0.2}) scale(${state.zoom * 0.2})`
+  })
+
+  protected minimapTransform = computed(() => {
+    return `scale(${this.minimapScale})`
   })
 
   public ngOnInit(): void {

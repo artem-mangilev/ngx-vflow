@@ -6,6 +6,13 @@
   <svg:g [attr.clip-path]="clipPathUrl()">
     <svg:rect [attr.width]="minimapWidth()" [attr.height]="minimapHeight()" class="minimap-bg" />
 
+    <svg:rect
+      class="viewport-rect"
+      [attr.transform]="viewportTransform()"
+      [attr.width]="minimapWidth()"
+      [attr.height]="minimapHeight()"
+    />
+
     <svg:g [attr.transform]="minimapTransform()">
       <svg:foreignObject
         *ngFor="let model of entitiesService.nodes(); trackBy: trackNodes"
