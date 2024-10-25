@@ -6,20 +6,6 @@
   display: table-cell;
 }
 
-.default-node {
-  border: 1.5px solid #1b262c;
-  border-radius: 5px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: black;
-  background-color: white;
-
-  &_selected {
-    border-width: 2px;
-  }
-}
-
 .default-group-node {
   stroke-width: 1.5px;
   fill-opacity: 0.05;

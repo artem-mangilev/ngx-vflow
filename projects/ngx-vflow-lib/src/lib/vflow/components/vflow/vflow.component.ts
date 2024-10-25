@@ -299,6 +299,8 @@ export class VflowComponent implements OnInit {
 
   protected markers = this.flowEntitiesService.markers
 
+  protected minimap = this.flowEntitiesService.minimap
+
   public ngOnInit(): void {
     this.setInitialNodesOrder()
   }
