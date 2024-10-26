@@ -48,8 +48,9 @@ export class MinimapComponent implements OnInit {
     const x = -(viewport.x * this.minimapScale) * scale
     const y = -(viewport.y * this.minimapScale) * scale
 
-    return `translate(${x}, ${y}) scale(${scale})`;
+    return `translate(${x / this.minimapScale}, ${y / this.minimapScale}) scale(${scale / this.minimapScale})`;
   });
+
 
   protected boundsViewport = computed(() => {
     const nodes = this.entitiesService.nodes()
@@ -66,7 +67,9 @@ export class MinimapComponent implements OnInit {
   })
 
   protected minimapTransform = computed(() => {
-    return `scale(${this.minimapScale})`
+    const vport = this.boundsViewport()
+
+    return `translate(${vport.x * this.minimapScale} ${vport.y * this.minimapScale}) scale(${vport.zoom * this.minimapScale})`
   })
 
   public ngOnInit(): void {
