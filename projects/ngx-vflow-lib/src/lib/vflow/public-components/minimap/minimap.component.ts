@@ -1,4 +1,4 @@
-import { Component, computed, inject, OnInit, signal, TemplateRef, ViewChild } from '@angular/core';
+import { Component, computed, inject, Input, OnInit, signal, TemplateRef, ViewChild } from '@angular/core';
 import { FlowEntitiesService } from '../../services/flow-entities.service';
 import { MinimapModel } from '../../models/minimap.model';
 import { NodeModel } from '../../models/node.model';
@@ -7,6 +7,8 @@ import { FlowSettingsService } from '../../services/flow-settings.service';
 import { getViewportForBounds } from '../../utils/viewport';
 import { getNodesBounds } from '../../utils/nodes';
 import { ViewportService } from '../../services/viewport.service';
+
+type MinimapPosition = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'
 
 @Component({
   selector: 'minimap',
@@ -18,10 +20,40 @@ export class MinimapComponent implements OnInit {
   protected flowSettingsService = inject(FlowSettingsService)
   protected viewportService = inject(ViewportService)
 
+  @Input()
+  public set position(value: MinimapPosition) {
+    this.minimapPosition.set(value)
+  }
+
   @ViewChild('minimap', { static: true })
   private minimap!: TemplateRef<unknown>
 
+  private readonly minimapOffset = 10
   private readonly minimapScale = 0.2
+
+  protected minimapPosition = signal<MinimapPosition>('bottom-right')
+
+  protected minimapPoint = computed(() => {
+    switch (this.minimapPosition()) {
+      case 'top-left':
+        return { x: this.minimapOffset, y: this.minimapOffset }
+      case 'top-right':
+        return {
+          x: this.flowSettingsService.computedFlowWidth() - this.minimapWidth() - this.minimapOffset,
+          y: this.minimapOffset
+        }
+      case 'bottom-left':
+        return {
+          x: this.minimapOffset,
+          y: this.flowSettingsService.computedFlowHeight() - this.minimapHeight() - this.minimapOffset
+        }
+      case 'bottom-right':
+        return {
+          x: this.flowSettingsService.computedFlowWidth() - this.minimapWidth() - this.minimapOffset,
+          y: this.flowSettingsService.computedFlowHeight() - this.minimapHeight() - this.minimapOffset
+        }
+    }
+  })
 
   protected clipPathId = signal(id())
   protected clipPathUrl = computed(() => `url(#${this.clipPathId()})`)
