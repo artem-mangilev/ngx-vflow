@@ -97,8 +97,8 @@ export class MinimapComponent implements OnInit {
       getNodesBounds(nodes),
       this.flowSettingsService.computedFlowWidth(),
       this.flowSettingsService.computedFlowHeight(),
-      this.flowSettingsService.minZoom(),
-      this.flowSettingsService.maxZoom(),
+      -Infinity,
+      1.5,
       0
     )
 
