@@ -2,7 +2,6 @@ import { Component, computed, inject, Input, OnInit, signal, TemplateRef, ViewCh
 import { FlowEntitiesService } from '../../services/flow-entities.service';
 import { MinimapModel } from '../../models/minimap.model';
 import { NodeModel } from '../../models/node.model';
-import { id } from '../../utils/id';
 import { FlowSettingsService } from '../../services/flow-settings.service';
 import { getViewportForBounds } from '../../utils/viewport';
 import { getNodesBounds } from '../../utils/nodes';
@@ -54,9 +53,6 @@ export class MinimapComponent implements OnInit {
         }
     }
   })
-
-  protected clipPathId = signal(id())
-  protected clipPathUrl = computed(() => `url(#${this.clipPathId()})`)
 
   protected minimapWidth = computed(() =>
     this.flowSettingsService.computedFlowWidth() * this.minimapScale
