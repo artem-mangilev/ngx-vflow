@@ -1,4 +1,4 @@
-import { Injectable, WritableSignal, computed, signal } from '@angular/core';
+import { Injectable, TemplateRef, WritableSignal, computed, signal } from '@angular/core';
 import { HandlePositions } from '../interfaces/handle-positions.interface';
 
 @Injectable()
@@ -30,4 +30,7 @@ export class FlowSettingsService {
   public minZoom = signal(0.5)
 
   public maxZoom = signal(3)
+
+  public nodeTemplate = signal<TemplateRef<unknown> | null>(null)
+  public groupNodeTemplate = signal<TemplateRef<unknown> | null>(null)
 }

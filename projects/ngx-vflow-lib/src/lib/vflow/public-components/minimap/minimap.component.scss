@@ -5,3 +5,12 @@
 .viewport-rect {
   fill: rgba(0, 0, 0, 0.2);
 }
+
+.default-group-node {
+  stroke-width: 1.5px;
+  fill-opacity: 0.05;
+
+  &_selected {
+    stroke-width: 2px;
+  }
+}

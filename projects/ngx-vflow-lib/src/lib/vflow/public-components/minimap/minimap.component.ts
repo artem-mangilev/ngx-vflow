@@ -1,4 +1,4 @@
-import { Component, computed, inject, Input, OnInit, signal, TemplateRef, ViewChild } from '@angular/core';
+import { Component, computed, inject, Injector, Input, OnInit, signal, TemplateRef, ViewChild } from '@angular/core';
 import { FlowEntitiesService } from '../../services/flow-entities.service';
 import { MinimapModel } from '../../models/minimap.model';
 import { NodeModel } from '../../models/node.model';
@@ -18,6 +18,7 @@ export class MinimapComponent implements OnInit {
   protected entitiesService = inject(FlowEntitiesService)
   protected flowSettingsService = inject(FlowSettingsService)
   protected viewportService = inject(ViewportService)
+  protected injector = inject(Injector)
 
   @Input()
   public set position(value: MinimapPosition) {
@@ -29,6 +30,9 @@ export class MinimapComponent implements OnInit {
 
   private readonly minimapOffset = 10
   private readonly minimapScale = 0.2
+
+  protected nodeTemplate = this.flowSettingsService.nodeTemplate
+  protected groupNodeTemplate = this.flowSettingsService.groupNodeTemplate
 
   protected minimapPosition = signal<MinimapPosition>('bottom-right')
 

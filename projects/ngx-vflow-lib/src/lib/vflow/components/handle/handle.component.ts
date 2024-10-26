@@ -11,7 +11,7 @@ import { InjectionContext, WithInjector } from '../../decorators/run-in-injectio
 })
 export class HandleComponent implements OnInit, OnDestroy, WithInjector {
   public injector = inject(Injector);
-  private handleService = inject(HandleService)
+  private handleService = inject(HandleService, { optional: true })
   private element = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement
 
   /**
@@ -39,6 +39,8 @@ export class HandleComponent implements OnInit, OnDestroy, WithInjector {
 
   @InjectionContext
   public ngOnInit() {
+    if (!this.handleService) return
+
     this.model = new HandleModel(
       {
         position: this.position,
@@ -56,7 +58,7 @@ export class HandleComponent implements OnInit, OnDestroy, WithInjector {
   }
 
   public ngOnDestroy(): void {
-    this.handleService.destroyHandle(this.model)
+    this.handleService?.destroyHandle(this.model)
   }
 }
 
