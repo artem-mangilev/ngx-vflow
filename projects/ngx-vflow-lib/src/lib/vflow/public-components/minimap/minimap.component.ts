@@ -26,8 +26,12 @@ export class MinimapComponent implements OnInit {
   protected clipPathId = signal(id())
   protected clipPathUrl = computed(() => `url(#${this.clipPathId()})`)
 
-  protected minimapWidth = computed(() => this.flowSettingsService.computedFlowWidth() * this.minimapScale)
-  protected minimapHeight = computed(() => this.flowSettingsService.computedFlowHeight() * this.minimapScale)
+  protected minimapWidth = computed(() =>
+    this.flowSettingsService.computedFlowWidth() * this.minimapScale
+  )
+  protected minimapHeight = computed(() =>
+    this.flowSettingsService.computedFlowHeight() * this.minimapScale
+  )
 
   protected viewportWidth = computed(() => {
     const width = this.flowSettingsService.computedFlowWidth()
@@ -44,11 +48,17 @@ export class MinimapComponent implements OnInit {
 
   protected viewportTransform = computed(() => {
     const viewport = this.viewportService.readableViewport();
-    const scale = 1 / viewport.zoom
-    const x = -(viewport.x * this.minimapScale) * scale
-    const y = -(viewport.y * this.minimapScale) * scale
+    let scale = 1 / viewport.zoom
 
-    return `translate(${x / this.minimapScale}, ${y / this.minimapScale}) scale(${scale / this.minimapScale})`;
+    let x = -(viewport.x * this.minimapScale) * scale
+    x /= this.minimapScale
+
+    let y = -(viewport.y * this.minimapScale) * scale
+    y /= this.minimapScale
+
+    scale /= this.minimapScale
+
+    return `translate(${x}, ${y}) scale(${scale})`;
   });
 
 
@@ -69,7 +79,11 @@ export class MinimapComponent implements OnInit {
   protected minimapTransform = computed(() => {
     const vport = this.boundsViewport()
 
-    return `translate(${vport.x * this.minimapScale} ${vport.y * this.minimapScale}) scale(${vport.zoom * this.minimapScale})`
+    const x = vport.x * this.minimapScale
+    const y = vport.y * this.minimapScale
+    const scale = vport.zoom * this.minimapScale
+
+    return `translate(${x} ${y}) scale(${scale})`
   })
 
   public ngOnInit(): void {
