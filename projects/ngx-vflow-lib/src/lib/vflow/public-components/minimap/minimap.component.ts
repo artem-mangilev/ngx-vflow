@@ -7,30 +7,42 @@ import { getViewportForBounds } from '../../utils/viewport';
 import { getNodesBounds } from '../../utils/nodes';
 import { ViewportService } from '../../services/viewport.service';
 
-type MinimapPosition = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'
+export type MiniMapPosition = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'
 
 @Component({
-  selector: 'minimap',
+  selector: 'mini-map',
   templateUrl: './minimap.component.html',
   styleUrls: [`./minimap.component.scss`]
 })
-export class MinimapComponent implements OnInit {
+export class MiniMapComponent implements OnInit {
   protected entitiesService = inject(FlowEntitiesService)
   protected flowSettingsService = inject(FlowSettingsService)
   protected viewportService = inject(ViewportService)
   protected injector = inject(Injector)
 
+  /**
+   * The corner of the flow where to render a mini-map
+   */
   @Input()
-  public set position(value: MinimapPosition) {
+  public set position(value: MiniMapPosition) {
     this.minimapPosition.set(value)
   }
 
+  /**
+   * The color outside the viewport (invisible area)
+   */
   @Input()
   public maskColor = `rgba(215, 215, 215, 0.6)`
 
+  /**
+   * The minimap stroke color
+   */
   @Input()
   public strokeColor = `rgb(200, 200, 200)`
 
+  /**
+   * Make a minimap bigger on hover
+   */
   @Input()
   public set scaleOnHover(value: boolean) {
     this.scaleOnHoverSignal.set(value)
@@ -51,7 +63,7 @@ export class MinimapComponent implements OnInit {
 
   protected viewportColor = computed(() => this.flowSettingsService.background().color ?? '#fff')
 
-  protected minimapPosition = signal<MinimapPosition>('bottom-right')
+  protected minimapPosition = signal<MiniMapPosition>('bottom-right')
 
   protected scaleOnHoverSignal = signal(false)
   protected hovered = signal(false)

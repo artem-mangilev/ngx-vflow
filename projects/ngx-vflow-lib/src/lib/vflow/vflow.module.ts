@@ -19,7 +19,7 @@ import { RootPointerDirective } from './directives/root-pointer.directive';
 import { BackgroundComponent } from './components/background/background.component';
 import { FlowSizeControllerDirective } from './directives/flow-size-controller.directive';
 import { ResizableComponent } from './public-components/resizable/resizable.component';
-import { MinimapComponent } from './public-components/minimap/minimap.component';
+import { MiniMapComponent } from './public-components/minimap/minimap.component';
 import { DefaultNodeComponent } from './components/default-node/default-node.component';
 
 const components = [
@@ -33,7 +33,7 @@ const components = [
   DefsComponent,
   BackgroundComponent,
   ResizableComponent,
-  MinimapComponent
+  MiniMapComponent
 ]
 
 const directives = [
@@ -64,7 +64,7 @@ const templateDirectives = [
     HandleComponent,
     ResizableComponent,
     SelectableDirective,
-    MinimapComponent,
+    MiniMapComponent,
     ...templateDirectives
   ],
   declarations: [...components, ...directives, ...templateDirectives],
