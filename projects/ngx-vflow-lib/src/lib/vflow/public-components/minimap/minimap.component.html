@@ -1,15 +1,28 @@
 <ng-template #minimap>
+  <svg:rect
+    [attr.x]="minimapPoint().x"
+    [attr.y]="minimapPoint().y"
+    [attr.width]="minimapWidth()"
+    [attr.height]="minimapHeight()"
+    [attr.stroke]="strokeColor"
+    fill="none"
+  />
+
   <svg:svg
     [attr.x]="minimapPoint().x"
     [attr.y]="minimapPoint().y"
     [attr.width]="minimapWidth()"
     [attr.height]="minimapHeight()"
   >
-    <svg:rect [attr.width]="minimapWidth()" [attr.height]="minimapHeight()" class="minimap-bg" />
+    <svg:rect
+      [attr.width]="minimapWidth()"
+      [attr.height]="minimapHeight()"
+      [attr.fill]="maskColor"
+    />
 
     <svg:g [attr.transform]="minimapTransform()">
       <svg:rect
-        class="viewport-rect"
+        [attr.fill]="viewportColor()"
         [attr.transform]="viewportTransform()"
         [attr.width]="minimapWidth()"
         [attr.height]="minimapHeight()"

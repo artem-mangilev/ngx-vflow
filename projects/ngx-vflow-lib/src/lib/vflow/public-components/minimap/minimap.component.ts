@@ -25,11 +25,19 @@ export class MinimapComponent implements OnInit {
     this.minimapPosition.set(value)
   }
 
+  @Input()
+  public maskColor = `rgba(215, 215, 215, 0.6)`
+
+  @Input()
+  public strokeColor = `rgb(200, 200, 200)`
+
   @ViewChild('minimap', { static: true })
   private minimap!: TemplateRef<unknown>
 
   private readonly minimapOffset = 10
   private readonly minimapScale = 0.2
+
+  protected viewportColor = computed(() => this.flowSettingsService.background().color ?? '#fff')
 
   protected minimapPosition = signal<MinimapPosition>('bottom-right')
 
@@ -61,19 +69,6 @@ export class MinimapComponent implements OnInit {
   protected minimapHeight = computed(() =>
     this.flowSettingsService.computedFlowHeight() * this.minimapScale
   )
-
-  protected viewportWidth = computed(() => {
-    const width = this.flowSettingsService.computedFlowWidth()
-    const zoom = this.viewportService.readableViewport().zoom
-
-    return (width / zoom) * this.minimapScale
-  });
-  protected viewportHeight = computed(() => {
-    const height = this.flowSettingsService.computedFlowHeight()
-    const zoom = this.viewportService.readableViewport().zoom
-
-    return (height / zoom) * this.minimapScale
-  });
 
   protected viewportTransform = computed(() => {
     const viewport = this.viewportService.readableViewport();

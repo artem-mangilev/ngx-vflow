@@ -1,8 +1,8 @@
-import { ChangeDetectionStrategy, Component, Input, computed, effect, inject, signal } from '@angular/core';
-import { Background } from '../../types/background.type';
+import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
 import { ViewportService } from '../../services/viewport.service';
 import { RootSvgReferenceDirective } from '../../directives/reference.directive';
 import { id } from '../../utils/id';
+import { FlowSettingsService } from '../../services/flow-settings.service';
 
 const defaultBg = '#fff'
 const defaultGap = 20
@@ -17,13 +17,9 @@ const defaultDotColor = 'rgb(177, 177, 183)'
 export class BackgroundComponent {
   private viewportService = inject(ViewportService)
   private rootSvg = inject(RootSvgReferenceDirective).element
+  private settingsService = inject(FlowSettingsService);
 
-  @Input({ required: true, transform })
-  set background(value: Background) {
-    this.backgroundSignal.set(value)
-  }
-
-  protected backgroundSignal = signal<Background>({ type: 'solid', color: defaultBg })
+  protected backgroundSignal = this.settingsService.background
 
   protected scaledGap = computed(() => {
     const background = this.backgroundSignal()
@@ -71,10 +67,4 @@ export class BackgroundComponent {
       }
     })
   }
-}
-
-function transform(background: Background | string): Background {
-  return typeof background === 'string'
-    ? { type: 'solid', color: background }
-    : background
 }
