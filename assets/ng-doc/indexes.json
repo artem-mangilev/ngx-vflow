@@ -2,54 +2,6 @@
   {
     "breadcrumbs": [
       "Features",
-      "Choose direction"
-    ],
-    "pageType": "guide",
-    "title": "Choose direction",
-    "section": "Choose direction",
-    "route": "/features/choose-direction",
-    "fragment": "choose-direction",
-    "content": "This API may depricate in future releases"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Choose direction"
-    ],
-    "pageType": "guide",
-    "title": "Choose direction",
-    "section": "Choose direction",
-    "route": "/features/choose-direction",
-    "fragment": "choose-direction",
-    "content": "You can apply global setting for all handles with [handlePositions] input where you set on which side source and target handles should be placed, you can select."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Choose direction"
-    ],
-    "pageType": "guide",
-    "title": "Choose direction",
-    "section": "Right to left direction",
-    "route": "/features/choose-direction",
-    "fragment": "right-to-left-direction",
-    "content": "To archive this direction, you pass { source: 'left', target: 'right' } to [handlePositions]."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Choose direction"
-    ],
-    "pageType": "guide",
-    "title": "Choose direction",
-    "section": "Top to bottom direction",
-    "route": "/features/choose-direction",
-    "fragment": "top-to-bottom-direction",
-    "content": "To archive this direction, you pass { source: 'bottom', target: 'top' } to [handlePositions]."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
       "Connection"
     ],
     "pageType": "guide",
@@ -266,6 +218,54 @@
   {
     "breadcrumbs": [
       "Features",
+      "Choose direction"
+    ],
+    "pageType": "guide",
+    "title": "Choose direction",
+    "section": "Choose direction",
+    "route": "/features/choose-direction",
+    "fragment": "choose-direction",
+    "content": "This API may depricate in future releases"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Choose direction"
+    ],
+    "pageType": "guide",
+    "title": "Choose direction",
+    "section": "Choose direction",
+    "route": "/features/choose-direction",
+    "fragment": "choose-direction",
+    "content": "You can apply global setting for all handles with [handlePositions] input where you set on which side source and target handles should be placed, you can select."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Choose direction"
+    ],
+    "pageType": "guide",
+    "title": "Choose direction",
+    "section": "Right to left direction",
+    "route": "/features/choose-direction",
+    "fragment": "right-to-left-direction",
+    "content": "To archive this direction, you pass { source: 'left', target: 'right' } to [handlePositions]."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Choose direction"
+    ],
+    "pageType": "guide",
+    "title": "Choose direction",
+    "section": "Top to bottom direction",
+    "route": "/features/choose-direction",
+    "fragment": "top-to-bottom-direction",
+    "content": "To archive this direction, you pass { source: 'bottom', target: 'top' } to [handlePositions]."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
       "Connection validation"
     ],
     "pageType": "guide",
@@ -274,6 +274,18 @@
     "route": "/features/connection-validation",
     "fragment": "connection-validation",
     "content": "ngx-vflow supports real-time synchronous validation of connections. Validation occurs when a user attempts to create a new edge. By default, every connection is valid, but you can provide a ConnectionSettings with a validatior callback where you specify the validation logic. For example, in this case, validation only passes connections from node 1 to node 2. If the validator returns false, the (onConnect) event won't be triggered because there is no valid connection."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Curves"
+    ],
+    "pageType": "guide",
+    "title": "Curves",
+    "section": "Curves",
+    "route": "/features/curves",
+    "fragment": "curves",
+    "content": "It's possible to set curve for both the edges and connection."
   },
   {
     "breadcrumbs": [
@@ -310,18 +322,6 @@
     "route": "/features/custom-background",
     "fragment": "dots-pattern",
     "content": "To make dots pattern, pass an object to the [background] input according to DotsBackground interface"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Curves"
-    ],
-    "pageType": "guide",
-    "title": "Curves",
-    "section": "Curves",
-    "route": "/features/curves",
-    "fragment": "curves",
-    "content": "It's possible to set curve for both the edges and connection."
   },
   {
     "breadcrumbs": [
@@ -1178,14 +1178,50 @@
   {
     "breadcrumbs": [
       "Features",
-      "Draggables"
+      "Labels"
     ],
     "pageType": "guide",
-    "title": "Draggables",
-    "section": "Draggables",
-    "route": "/features/draggables",
-    "fragment": "draggables",
-    "content": "You can disable draggable behavior on certain nodes."
+    "title": "Labels",
+    "section": "Labels",
+    "route": "/features/labels",
+    "fragment": "labels",
+    "content": "You can attach labels to edges by providing the edgeLabels property to the needed Edges. There are three slots available for labels on an edge: start, center, end. The label is only of the html-template type, so you have to provide "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Labels"
+    ],
+    "pageType": "guide",
+    "title": "Labels",
+    "section": "Labels",
+    "route": "/features/labels",
+    "fragment": "labels",
+    "content": " inside vflow."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Labels"
+    ],
+    "pageType": "guide",
+    "title": "Labels",
+    "section": "Context",
+    "route": "/features/labels",
+    "fragment": "context",
+    "content": "You may access some data for label through let-ctx according to this interface."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Markers"
+    ],
+    "pageType": "guide",
+    "title": "Markers",
+    "section": "Markers",
+    "route": "/features/markers",
+    "fragment": "markers",
+    "content": "You can create markers for both edges and connections. Edges: Specify start and end markers for corresponding parts of the edge. Currently, markers are limited to two types: arrow and arrow-closed.Connections: You can specify an end marker using the marker property in ConnectionSettings."
   },
   {
     "breadcrumbs": [
@@ -1238,38 +1274,14 @@
   {
     "breadcrumbs": [
       "Features",
-      "Labels"
+      "Multiple connection points"
     ],
     "pageType": "guide",
-    "title": "Labels",
-    "section": "Labels",
-    "route": "/features/labels",
-    "fragment": "labels",
-    "content": "You can attach labels to edges by providing the edgeLabels property to the needed Edges. There are three slots available for labels on an edge: start, center, end. The label is only of the html-template type, so you have to provide "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Labels"
-    ],
-    "pageType": "guide",
-    "title": "Labels",
-    "section": "Labels",
-    "route": "/features/labels",
-    "fragment": "labels",
-    "content": " inside vflow."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Labels"
-    ],
-    "pageType": "guide",
-    "title": "Labels",
-    "section": "Context",
-    "route": "/features/labels",
-    "fragment": "context",
-    "content": "You may access some data for label through let-ctx according to this interface."
+    "title": "Multiple connection points",
+    "section": "Multiple connection points",
+    "route": "/features/multiple-connection-points",
+    "fragment": "multiple-connection-points",
+    "content": "Custom components provide the ability to control handles and their positions. All you need to do is take HandleComponent from library and place it somewhere in your custom node. This component automatically computes its position based on parent element's position."
   },
   {
     "breadcrumbs": [
@@ -1370,66 +1382,6 @@
   {
     "breadcrumbs": [
       "Features",
-      "Markers"
-    ],
-    "pageType": "guide",
-    "title": "Markers",
-    "section": "Markers",
-    "route": "/features/markers",
-    "fragment": "markers",
-    "content": "You can create markers for both edges and connections. Edges: Specify start and end markers for corresponding parts of the edge. Currently, markers are limited to two types: arrow and arrow-closed.Connections: You can specify an end marker using the marker property in ConnectionSettings."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Multiple connection points"
-    ],
-    "pageType": "guide",
-    "title": "Multiple connection points",
-    "section": "Multiple connection points",
-    "route": "/features/multiple-connection-points",
-    "fragment": "multiple-connection-points",
-    "content": "Custom components provide the ability to control handles and their positions. All you need to do is take HandleComponent from library and place it somewhere in your custom node. This component automatically computes its position based on parent element's position."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Subflows"
-    ],
-    "pageType": "guide",
-    "title": "Subflows",
-    "section": "Subflows",
-    "route": "/features/subflows",
-    "fragment": "subflows",
-    "content": "A subflow is a node that can contain child nodes. Key things about subflows: To create a subflow, you need to use a default-group or template-group type on Node or DynamicNode.To associate a node with a subflow, set the parentId to the ID of the subflow.Nodes within a subflow have coordinates relative to that subflow.A subflow is itself a node, so it can act as a source or a target (this functionality is available only for template-group subflows).Use the groupNode directive on an ng-template to define your custom subflow. While a custom subflow can theoretically be any SVG structure, it's recommended to use the "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Subflows"
-    ],
-    "pageType": "guide",
-    "title": "Subflows",
-    "section": "Subflows",
-    "route": "/features/subflows",
-    "fragment": "subflows",
-    "content": " element."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Subflows"
-    ],
-    "pageType": "guide",
-    "title": "Subflows",
-    "section": "See also",
-    "route": "/features/subflows",
-    "fragment": "see-also",
-    "content": "DefaultGroupNodeTemplateGroupNodeDefaultDynamicGroupNodeTemplateDynamicGroupNode"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
       "View size"
     ],
     "pageType": "guide",
@@ -1450,6 +1402,18 @@
     "route": "/features/view-size",
     "fragment": "fixed-size",
     "content": "vflow can take fixed space if you pass [view]=\"[600, 600]\" input, where first item of array is width (in pixels), and the second is height (in pixels)."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Draggables"
+    ],
+    "pageType": "guide",
+    "title": "Draggables",
+    "section": "Draggables",
+    "route": "/features/draggables",
+    "fragment": "draggables",
+    "content": "You can disable draggable behavior on certain nodes."
   },
   {
     "breadcrumbs": [
@@ -1550,6 +1514,90 @@
   {
     "breadcrumbs": [
       "Features",
+      "Subflows"
+    ],
+    "pageType": "guide",
+    "title": "Subflows",
+    "section": "Subflows",
+    "route": "/features/subflows",
+    "fragment": "subflows",
+    "content": "A subflow is a node that can contain child nodes. Key things about subflows: To create a subflow, you need to use a default-group or template-group type on Node or DynamicNode.To associate a node with a subflow, set the parentId to the ID of the subflow.Nodes within a subflow have coordinates relative to that subflow.A subflow is itself a node, so it can act as a source or a target (this functionality is available only for template-group subflows).Use the groupNode directive on an ng-template to define your custom subflow. While a custom subflow can theoretically be any SVG structure, it's recommended to use the "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Subflows"
+    ],
+    "pageType": "guide",
+    "title": "Subflows",
+    "section": "Subflows",
+    "route": "/features/subflows",
+    "fragment": "subflows",
+    "content": " element."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Subflows"
+    ],
+    "pageType": "guide",
+    "title": "Subflows",
+    "section": "See also",
+    "route": "/features/subflows",
+    "fragment": "see-also",
+    "content": "DefaultGroupNodeTemplateGroupNodeDefaultDynamicGroupNodeTemplateDynamicGroupNode"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Minimap"
+    ],
+    "pageType": "guide",
+    "title": "Minimap",
+    "section": "Minimap",
+    "route": "/features/subflows copy",
+    "fragment": "minimap",
+    "content": "The library includes a minimap that offers an overview of the entire flow. To enable it, simply add a "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Minimap"
+    ],
+    "pageType": "guide",
+    "title": "Minimap",
+    "section": "Minimap",
+    "route": "/features/subflows copy",
+    "fragment": "minimap",
+    "content": " component as a direct child of "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Minimap"
+    ],
+    "pageType": "guide",
+    "title": "Minimap",
+    "section": "Minimap",
+    "route": "/features/subflows copy",
+    "fragment": "minimap",
+    "content": ". For customization options, see the available inputs in MiniMapComponent."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Minimap"
+    ],
+    "pageType": "guide",
+    "title": "Minimap",
+    "section": "Minimap",
+    "route": "/features/subflows copy",
+    "fragment": "minimap",
+    "content": "Planned enhancements for the minimap: Develop an API to customize mini-node appearance (e.g., color, stroke)Enable panning and zooming within the minimapRender mini-nodes to visually match main nodes, using a simplified DOM structure to optimize performance"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
       "Selecting"
     ],
     "pageType": "guide",
@@ -1646,6 +1694,30 @@
   {
     "breadcrumbs": [
       "Getting Started",
+      "What is ngx-vflow"
+    ],
+    "pageType": "guide",
+    "title": "What is ngx-vflow",
+    "section": "What is ngx-vflow",
+    "route": "/getting-started/what-is-ngx-vflow",
+    "fragment": "what-is-ngx-vflow",
+    "content": "ngx-vflow is an Angular library for creating node-based applications. It aims to assist you in building anything from a static diagram to a visual editor. You can utilize the default design or apply your own by customizing everything using familiar technologies."
+  },
+  {
+    "breadcrumbs": [
+      "Getting Started",
+      "What is ngx-vflow"
+    ],
+    "pageType": "guide",
+    "title": "What is ngx-vflow",
+    "section": "Main features",
+    "route": "/getting-started/what-is-ngx-vflow",
+    "fragment": "main-features",
+    "content": "Easy to use: Just describe your flow with a simple API; all of the heavy lifting, such as dragging, zooming, and curve math, is handled by the library for you. Customizable: There is a default design for basic usage, and you can also customize nodes with good old HTML and CSS. Other entities such as edges, connection lines, and handles are also customizable, but it will require a little SVG knowledge. Great performance: Angular signals are the heart and soul of ngx-vflow, which are performant by default, so you shouldn't worry about performance even with large flows. Zoneless: Does not require zone.js"
+  },
+  {
+    "breadcrumbs": [
+      "Getting Started",
       "How node sizing works"
     ],
     "pageType": "guide",
@@ -1666,6 +1738,18 @@
     "route": "/getting-started/how-node-sizing-works",
     "fragment": "how-node-sizing-works",
     "content": " element, which enables HTML to be rendered inside SVG. The diagram below illustrates how this element interacts with its content."
+  },
+  {
+    "breadcrumbs": [
+      "Getting Started",
+      "Roadmap"
+    ],
+    "pageType": "guide",
+    "title": "Roadmap",
+    "section": "Roadmap",
+    "route": "/getting-started/roadmap",
+    "fragment": "roadmap",
+    "content": "This is a roadmap for ngx-vflow: improve consistency across browsers (mainly appeals to Safari)improve documentationmore curvescustom SVG shapesmultiselect nodesfloating edgesplugin systemminimapnode rotationUI controls for flowsupport for more layout engines (Dagree, etc.)more complex background (patterns)modal system for context menulazy loading nodes based on current viewport (decrease initial bundle)HTML-based renderer as alternative to current SVG-based rendererExperimental canvas/webgl renderer for insane performance"
   },
   {
     "breadcrumbs": [
@@ -1738,42 +1822,6 @@
     "route": "/workshops/delete-selected",
     "fragment": "delete-selected",
     "content": "This workshop will show you how to implement deletion of nodes and edges."
-  },
-  {
-    "breadcrumbs": [
-      "Getting Started",
-      "What is ngx-vflow"
-    ],
-    "pageType": "guide",
-    "title": "What is ngx-vflow",
-    "section": "What is ngx-vflow",
-    "route": "/getting-started/what-is-ngx-vflow",
-    "fragment": "what-is-ngx-vflow",
-    "content": "ngx-vflow is an Angular library for creating node-based applications. It aims to assist you in building anything from a static diagram to a visual editor. You can utilize the default design or apply your own by customizing everything using familiar technologies."
-  },
-  {
-    "breadcrumbs": [
-      "Getting Started",
-      "What is ngx-vflow"
-    ],
-    "pageType": "guide",
-    "title": "What is ngx-vflow",
-    "section": "Main features",
-    "route": "/getting-started/what-is-ngx-vflow",
-    "fragment": "main-features",
-    "content": "Easy to use: Just describe your flow with a simple API; all of the heavy lifting, such as dragging, zooming, and curve math, is handled by the library for you. Customizable: There is a default design for basic usage, and you can also customize nodes with good old HTML and CSS. Other entities such as edges, connection lines, and handles are also customizable, but it will require a little SVG knowledge. Great performance: Angular signals are the heart and soul of ngx-vflow, which are performant by default, so you shouldn't worry about performance even with large flows. Zoneless: Does not require zone.js"
-  },
-  {
-    "breadcrumbs": [
-      "Getting Started",
-      "Roadmap"
-    ],
-    "pageType": "guide",
-    "title": "Roadmap",
-    "section": "Roadmap",
-    "route": "/getting-started/roadmap",
-    "fragment": "roadmap",
-    "content": "This is a roadmap for ngx-vflow: improve consistency across browsers (mainly appeals to Safari)improve documentationmore curvescustom SVG shapesmultiselect nodesfloating edgesplugin systemminimapnode rotationUI controls for flowsupport for more layout engines (Dagree, etc.)more complex background (patterns)modal system for context menulazy loading nodes based on current viewport (decrease initial bundle)HTML-based renderer as alternative to current SVG-based rendererExperimental canvas/webgl renderer for insane performance"
   },
   {
     "breadcrumbs": [
@@ -2672,19 +2720,6 @@
     "section": "Properties",
     "route": "/api/ngx-vflow/classes/VflowComponent",
     "fragment": "properties",
-    "content": "Background for flow"
-  },
-  {
-    "breadcrumbs": [
-      "API",
-      "ngx-vflow",
-      "VflowComponent"
-    ],
-    "pageType": "api",
-    "title": "VflowComponent",
-    "section": "Properties",
-    "route": "/api/ngx-vflow/classes/VflowComponent",
-    "fragment": "properties",
     "content": "Signal to reading edges change"
   },
   {
@@ -2764,6 +2799,19 @@
     "route": "/api/ngx-vflow/classes/VflowComponent",
     "fragment": "properties",
     "content": "Observable with viewport change"
+  },
+  {
+    "breadcrumbs": [
+      "API",
+      "ngx-vflow",
+      "VflowComponent"
+    ],
+    "pageType": "api",
+    "title": "VflowComponent",
+    "section": "Accessors",
+    "route": "/api/ngx-vflow/classes/VflowComponent",
+    "fragment": "accessors",
+    "content": "Background for flow"
   },
   {
     "breadcrumbs": [
@@ -3137,6 +3185,82 @@
     "section": "ResizableComponent",
     "route": "/api/ngx-vflow/classes/ResizableComponent",
     "fragment": "resizablecomponent"
+  },
+  {
+    "breadcrumbs": [
+      "API",
+      "ngx-vflow",
+      "MiniMapPosition"
+    ],
+    "pageType": "api",
+    "title": "MiniMapPosition",
+    "section": "MiniMapPosition",
+    "route": "/api/ngx-vflow/type-aliases/MiniMapPosition",
+    "fragment": "minimapposition"
+  },
+  {
+    "breadcrumbs": [
+      "API",
+      "ngx-vflow",
+      "MiniMapComponent"
+    ],
+    "pageType": "api",
+    "title": "MiniMapComponent",
+    "section": "MiniMapComponent",
+    "route": "/api/ngx-vflow/classes/MiniMapComponent",
+    "fragment": "minimapcomponent"
+  },
+  {
+    "breadcrumbs": [
+      "API",
+      "ngx-vflow",
+      "MiniMapComponent"
+    ],
+    "pageType": "api",
+    "title": "MiniMapComponent",
+    "section": "Properties",
+    "route": "/api/ngx-vflow/classes/MiniMapComponent",
+    "fragment": "properties",
+    "content": "The color outside the viewport (invisible area)"
+  },
+  {
+    "breadcrumbs": [
+      "API",
+      "ngx-vflow",
+      "MiniMapComponent"
+    ],
+    "pageType": "api",
+    "title": "MiniMapComponent",
+    "section": "Properties",
+    "route": "/api/ngx-vflow/classes/MiniMapComponent",
+    "fragment": "properties",
+    "content": "The minimap stroke color"
+  },
+  {
+    "breadcrumbs": [
+      "API",
+      "ngx-vflow",
+      "MiniMapComponent"
+    ],
+    "pageType": "api",
+    "title": "MiniMapComponent",
+    "section": "Accessors",
+    "route": "/api/ngx-vflow/classes/MiniMapComponent",
+    "fragment": "accessors",
+    "content": "The corner of the flow where to render a mini-map"
+  },
+  {
+    "breadcrumbs": [
+      "API",
+      "ngx-vflow",
+      "MiniMapComponent"
+    ],
+    "pageType": "api",
+    "title": "MiniMapComponent",
+    "section": "Accessors",
+    "route": "/api/ngx-vflow/classes/MiniMapComponent",
+    "fragment": "accessors",
+    "content": "Make a minimap bigger on hover"
   },
   {
     "breadcrumbs": [
