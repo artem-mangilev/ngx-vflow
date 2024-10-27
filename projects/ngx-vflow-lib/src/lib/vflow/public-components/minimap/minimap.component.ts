@@ -31,15 +31,30 @@ export class MinimapComponent implements OnInit {
   @Input()
   public strokeColor = `rgb(200, 200, 200)`
 
+  @Input()
+  public set scaleOnHover(value: boolean) {
+    this.scaleOnHoverSignal.set(value)
+  }
+
   @ViewChild('minimap', { static: true })
   private minimap!: TemplateRef<unknown>
 
   private readonly minimapOffset = 10
-  private readonly minimapScale = 0.2
+
+  private readonly minimapScale = computed(() => {
+    if (this.scaleOnHoverSignal()) {
+      return this.hovered() ? 0.4 : 0.2
+    }
+
+    return 0.2
+  })
 
   protected viewportColor = computed(() => this.flowSettingsService.background().color ?? '#fff')
 
   protected minimapPosition = signal<MinimapPosition>('bottom-right')
+
+  protected scaleOnHoverSignal = signal(false)
+  protected hovered = signal(false)
 
   protected minimapPoint = computed(() => {
     switch (this.minimapPosition()) {
@@ -64,23 +79,23 @@ export class MinimapComponent implements OnInit {
   })
 
   protected minimapWidth = computed(() =>
-    this.flowSettingsService.computedFlowWidth() * this.minimapScale
+    this.flowSettingsService.computedFlowWidth() * this.minimapScale()
   )
   protected minimapHeight = computed(() =>
-    this.flowSettingsService.computedFlowHeight() * this.minimapScale
+    this.flowSettingsService.computedFlowHeight() * this.minimapScale()
   )
 
   protected viewportTransform = computed(() => {
     const viewport = this.viewportService.readableViewport();
     let scale = 1 / viewport.zoom
 
-    let x = -(viewport.x * this.minimapScale) * scale
-    x /= this.minimapScale
+    let x = -(viewport.x * this.minimapScale()) * scale
+    x /= this.minimapScale()
 
-    let y = -(viewport.y * this.minimapScale) * scale
-    y /= this.minimapScale
+    let y = -(viewport.y * this.minimapScale()) * scale
+    y /= this.minimapScale()
 
-    scale /= this.minimapScale
+    scale /= this.minimapScale()
 
     return `translate(${x}, ${y}) scale(${scale})`;
   });
@@ -103,9 +118,9 @@ export class MinimapComponent implements OnInit {
   protected minimapTransform = computed(() => {
     const vport = this.boundsViewport()
 
-    const x = vport.x * this.minimapScale
-    const y = vport.y * this.minimapScale
-    const scale = vport.zoom * this.minimapScale
+    const x = vport.x * this.minimapScale()
+    const y = vport.y * this.minimapScale()
+    const scale = vport.zoom * this.minimapScale()
 
     return `translate(${x} ${y}) scale(${scale})`
   })

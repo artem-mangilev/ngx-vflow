@@ -13,6 +13,8 @@
     [attr.y]="minimapPoint().y"
     [attr.width]="minimapWidth()"
     [attr.height]="minimapHeight()"
+    (mouseover)="hovered.set(true)"
+    (mouseleave)="hovered.set(false)"
   >
     <svg:rect
       [attr.width]="minimapWidth()"
