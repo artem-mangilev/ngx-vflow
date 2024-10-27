@@ -30,7 +30,4 @@ export class FlowSettingsService {
   public minZoom = signal(0.5)
 
   public maxZoom = signal(3)
-
-  public nodeTemplate = signal<TemplateRef<unknown> | null>(null)
-  public groupNodeTemplate = signal<TemplateRef<unknown> | null>(null)
 }

@@ -98,7 +98,7 @@ const changesControllerHostDirective = {
     changesControllerHostDirective
   ]
 })
-export class VflowComponent implements OnInit, AfterContentInit {
+export class VflowComponent implements OnInit {
   // #region DI
   private viewportService = inject(ViewportService)
   private flowEntitiesService = inject(FlowEntitiesService)
@@ -303,11 +303,6 @@ export class VflowComponent implements OnInit, AfterContentInit {
 
   public ngOnInit(): void {
     this.setInitialNodesOrder()
-  }
-
-  public ngAfterContentInit(): void {
-    this.flowSettingsService.nodeTemplate.set(this.nodeTemplateDirective?.templateRef ?? null)
-    this.flowSettingsService.groupNodeTemplate.set(this.groupNodeTemplateDirective?.templateRef ?? null)
   }
 
   // #region METHODS_API

@@ -31,9 +31,6 @@ export class MinimapComponent implements OnInit {
   private readonly minimapOffset = 10
   private readonly minimapScale = 0.2
 
-  protected nodeTemplate = this.flowSettingsService.nodeTemplate
-  protected groupNodeTemplate = this.flowSettingsService.groupNodeTemplate
-
   protected minimapPosition = signal<MinimapPosition>('bottom-right')
 
   protected minimapPoint = computed(() => {

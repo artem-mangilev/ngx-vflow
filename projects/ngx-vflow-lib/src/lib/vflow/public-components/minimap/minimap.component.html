@@ -19,7 +19,7 @@
         *ngFor="let model of entitiesService.nodes(); trackBy: trackNodes"
       >
         <svg:foreignObject
-          *ngIf="model.node.type === 'default'"
+          *ngIf="model.node.type === 'default' || model.node.type === 'html-template' || model.isComponentType"
           [attr.transform]="model.pointTransform()"
           [attr.width]="model.size().width"
           [attr.height]="model.size().height"
@@ -33,47 +33,10 @@
           >
             <div [outerHTML]="model.text()"></div>
           </default-node>
-
-        </svg:foreignObject>
-
-        <svg:foreignObject
-          *ngIf="model.node.type === 'html-template'"
-          [attr.transform]="model.pointTransform()"
-          [attr.width]="model.size().width"
-          [attr.height]="model.size().height"
-        >
-          <div
-            [style.width.px]="model.size().width"
-            [style.height.px]="model.size().width"
-          >
-          <ng-container
-            [ngTemplateOutlet]="nodeTemplate()"
-            [ngTemplateOutletContext]="{ $implicit: { node: model.node, selected: model.selected } }"
-            [ngTemplateOutletInjector]="injector"
-          />
-        </div>
-        </svg:foreignObject>
-
-        <svg:foreignObject
-          *ngIf="model.isComponentType"
-          [attr.transform]="model.pointTransform()"
-          [attr.width]="model.size().width"
-          [attr.height]="model.size().height"
-        >
-          <div
-            [style.width.px]="model.size().width"
-            [style.height.px]="model.size().height"
-          >
-            <ng-container
-              [ngComponentOutlet]="$any(model.node.type)"
-              [ngComponentOutletInputs]="model.componentTypeInputs()"
-              [ngComponentOutletInjector]="injector"
-            />
-          </div>
         </svg:foreignObject>
 
         <svg:rect
-          *ngIf="model.node.type === 'default-group'"
+          *ngIf="model.node.type === 'default-group' || model.node.type === 'template-group'"
           class="default-group-node"
           rx="5"
           ry="5"
@@ -84,17 +47,6 @@
           [style.stroke]="model.color()"
           [style.fill]="model.color()"
         />
-
-        <svg:g
-          *ngIf="model.node.type === 'template-group' && groupNodeTemplate()"
-          [attr.transform]="model.pointTransform()"
-        >
-          <ng-container
-            [ngTemplateOutlet]="groupNodeTemplate()"
-            [ngTemplateOutletContext]="{ $implicit: { node: model.node, selected: model.selected, width: model.width, height: model.height } }"
-            [ngTemplateOutletInjector]="injector"
-          />
-        </svg:g>
 
       </ng-container>
     </svg:g>
