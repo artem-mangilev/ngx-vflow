@@ -63,9 +63,6 @@ export class MiniMapComponent implements OnInit {
 
   protected viewportColor = computed(() => this.flowSettingsService.background().color ?? '#fff')
 
-  protected minimapPosition = signal<MiniMapPosition>('bottom-right')
-
-  protected scaleOnHoverSignal = signal(false)
   protected hovered = signal(false)
 
   protected minimapPoint = computed(() => {
@@ -136,6 +133,10 @@ export class MiniMapComponent implements OnInit {
 
     return `translate(${x} ${y}) scale(${scale})`
   })
+
+  private minimapPosition = signal<MiniMapPosition>('bottom-right')
+
+  private scaleOnHoverSignal = signal(false)
 
   public ngOnInit(): void {
     const model = new MinimapModel()
