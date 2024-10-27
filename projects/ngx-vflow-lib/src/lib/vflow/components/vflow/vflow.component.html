@@ -8,7 +8,7 @@
 >
   <defs [markers]="markers()" flowDefs />
 
-  <g [background]="background"/>
+  <g background />
 
   <svg:g
     mapContext
@@ -41,4 +41,8 @@
     />
   </svg:g>
 
+  <!-- Minimap -->
+  <ng-container *ngIf="minimap() as minimap">
+    <ng-container [ngTemplateOutlet]="minimap.template()" />
+  </ng-container>
 </svg:svg>

@@ -1,5 +1,6 @@
-import { Injectable, WritableSignal, computed, signal } from '@angular/core';
+import { Injectable, WritableSignal, signal } from '@angular/core';
 import { HandlePositions } from '../interfaces/handle-positions.interface';
+import { Background } from '../types/background.type';
 
 @Injectable()
 export class FlowSettingsService {
@@ -30,4 +31,6 @@ export class FlowSettingsService {
   public minZoom = signal(0.5)
 
   public maxZoom = signal(3)
+
+  public background = signal<Background>({ type: 'solid', color: '#fff' })
 }

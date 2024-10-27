@@ -1,0 +1,69 @@
+<ng-template #minimap>
+  <svg:rect
+    [attr.x]="minimapPoint().x"
+    [attr.y]="minimapPoint().y"
+    [attr.width]="minimapWidth()"
+    [attr.height]="minimapHeight()"
+    [attr.stroke]="strokeColor"
+    fill="none"
+  />
+
+  <svg:svg
+    [attr.x]="minimapPoint().x"
+    [attr.y]="minimapPoint().y"
+    [attr.width]="minimapWidth()"
+    [attr.height]="minimapHeight()"
+    (mouseover)="hovered.set(true)"
+    (mouseleave)="hovered.set(false)"
+  >
+    <svg:rect
+      [attr.width]="minimapWidth()"
+      [attr.height]="minimapHeight()"
+      [attr.fill]="maskColor"
+    />
+
+    <svg:g [attr.transform]="minimapTransform()">
+      <svg:rect
+        [attr.fill]="viewportColor()"
+        [attr.transform]="viewportTransform()"
+        [attr.width]="minimapWidth()"
+        [attr.height]="minimapHeight()"
+      />
+
+      <ng-container
+        *ngFor="let model of entitiesService.nodes(); trackBy: trackNodes"
+      >
+        <svg:foreignObject
+          *ngIf="model.node.type === 'default' || model.node.type === 'html-template' || model.isComponentType"
+          [attr.transform]="model.pointTransform()"
+          [attr.width]="model.size().width"
+          [attr.height]="model.size().height"
+        >
+          <default-node
+            [selected]="model.selected()"
+            [style.width.px]="model.size().width"
+            [style.height.px]="model.size().height"
+            [style.max-width.px]="model.size().width"
+            [style.max-height.px]="model.size().height"
+          >
+            <div [outerHTML]="model.text()"></div>
+          </default-node>
+        </svg:foreignObject>
+
+        <svg:rect
+          *ngIf="model.node.type === 'default-group' || model.node.type === 'template-group'"
+          class="default-group-node"
+          rx="5"
+          ry="5"
+          [attr.transform]="model.pointTransform()"
+          [class.default-group-node_selected]="model.selected()"
+          [attr.width]="model.size().width"
+          [attr.height]="model.size().height"
+          [style.stroke]="model.color()"
+          [style.fill]="model.color()"
+        />
+
+      </ng-container>
+    </svg:g>
+  </svg:svg>
+</ng-template>

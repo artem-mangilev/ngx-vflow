@@ -7,10 +7,9 @@
   [attr.height]="nodeModel.size().height"
   (pointerStart)="pullNode(); selectNode()"
 >
-  <div
+  <default-node
     #htmlWrapper
-    class="default-node"
-    [class.default-node_selected]="nodeModel.selected()"
+    [selected]="nodeModel.selected()"
     [style.width]="styleWidth()"
     [style.height]="styleHeight()"
     [style.max-width]="styleWidth()"
@@ -20,7 +19,7 @@
 
     <handle type="source" [position]="nodeModel.sourcePosition()" />
     <handle type="target" [position]="nodeModel.targetPosition()" />
-  </div>
+  </default-node>
 </svg:foreignObject>
 
 <!-- Template node -->

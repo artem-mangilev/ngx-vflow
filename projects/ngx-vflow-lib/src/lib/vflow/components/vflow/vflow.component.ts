@@ -34,6 +34,7 @@ import { FitViewOptions } from '../../interfaces/fit-view-options.interface';
 import { Optimization } from '../../interfaces/optimization.interface';
 import { KeyboardShortcuts } from '../../types/keyboard-action.type';
 import { KeyboardService } from '../../services/keyboard.service';
+import { transformBackground } from '../../utils/transform-background';
 
 const connectionControllerHostDirective = {
   directive: ConnectionControllerDirective,
@@ -158,7 +159,9 @@ export class VflowComponent implements OnInit {
    * Background for flow
    */
   @Input()
-  public background: Background | string = '#fff'
+  public set background(value: Background | string) {
+    this.flowSettingsService.background.set(transformBackground(value))
+  }
 
   @Input()
   public optimization: Optimization = {
@@ -298,6 +301,8 @@ export class VflowComponent implements OnInit {
   // #endregion
 
   protected markers = this.flowEntitiesService.markers
+
+  protected minimap = this.flowEntitiesService.minimap
 
   public ngOnInit(): void {
     this.setInitialNodesOrder()

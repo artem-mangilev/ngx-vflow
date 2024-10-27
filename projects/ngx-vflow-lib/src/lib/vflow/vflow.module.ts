@@ -19,10 +19,13 @@ import { RootPointerDirective } from './directives/root-pointer.directive';
 import { BackgroundComponent } from './components/background/background.component';
 import { FlowSizeControllerDirective } from './directives/flow-size-controller.directive';
 import { ResizableComponent } from './public-components/resizable/resizable.component';
+import { MiniMapComponent } from './public-components/minimap/minimap.component';
+import { DefaultNodeComponent } from './components/default-node/default-node.component';
 
 const components = [
   VflowComponent,
   NodeComponent,
+  DefaultNodeComponent,
   EdgeComponent,
   EdgeLabelComponent,
   ConnectionComponent,
@@ -30,6 +33,7 @@ const components = [
   DefsComponent,
   BackgroundComponent,
   ResizableComponent,
+  MiniMapComponent
 ]
 
 const directives = [
@@ -60,6 +64,7 @@ const templateDirectives = [
     HandleComponent,
     ResizableComponent,
     SelectableDirective,
+    MiniMapComponent,
     ...templateDirectives
   ],
   declarations: [...components, ...directives, ...templateDirectives],

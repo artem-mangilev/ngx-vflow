@@ -1,0 +1,13 @@
+:host {
+  border: 1.5px solid #1b262c;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: black;
+  background-color: white;
+}
+
+:host(.selected) {
+  border-width: 2px;
+}
