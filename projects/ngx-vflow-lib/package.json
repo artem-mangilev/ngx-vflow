@@ -25,11 +25,9 @@
     "@angular/common": "^16.2.0 || 17.x || 18.x",
     "@angular/core": "^16.2.0 || 17.x || 18.x",
     "d3-drag": "^3.0.0",
-    "d3-path": "^3.1.0",
     "d3-selection": "^3.0.0",
     "d3-zoom": "^3.0.0",
     "@types/d3-drag": "^3.0.7",
-    "@types/d3-path": "^3.0.2",
     "@types/d3-selection": "^3.0.10",
     "@types/d3-zoom": "^3.0.8"
   },

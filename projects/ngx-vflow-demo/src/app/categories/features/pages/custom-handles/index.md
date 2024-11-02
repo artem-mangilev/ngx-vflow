@@ -23,6 +23,11 @@ interface HandleTemplateImplicitContext {
    * You can use it do apply some styles based on state
    */
   state: Signal<'valid' | 'invalid' | 'idle'>
+
+  /**
+   * The parent node of this handle
+   */
+  node: Node | DynamicNode
 }
 ```
 

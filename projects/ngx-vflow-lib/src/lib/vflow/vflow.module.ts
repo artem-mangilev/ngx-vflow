@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { KeyValuePipe, NgComponentOutlet, NgFor, NgIf, NgTemplateOutlet } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { VflowComponent } from './components/vflow/vflow.component';
 import { NodeComponent } from './components/node/node.component';
@@ -58,7 +58,7 @@ const templateDirectives = [
 ]
 
 @NgModule({
-  imports: [CommonModule],
+  imports: [NgIf, NgFor, NgTemplateOutlet, NgComponentOutlet, KeyValuePipe],
   exports: [
     VflowComponent,
     HandleComponent,
