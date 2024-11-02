@@ -1,27 +1,51 @@
 [
   {
     "breadcrumbs": [
-      "Workshops",
-      "Delete selected"
+      "Features",
+      "Choose direction"
     ],
     "pageType": "guide",
-    "title": "Delete selected",
-    "section": "Delete selected",
-    "route": "/workshops/delete-selected",
-    "fragment": "delete-selected",
-    "content": "This workshop will show you how to implement deletion of nodes and edges."
+    "title": "Choose direction",
+    "section": "Choose direction",
+    "route": "/features/choose-direction",
+    "fragment": "choose-direction",
+    "content": "This API may depricate in future releases"
   },
   {
     "breadcrumbs": [
-      "Workshops",
-      "Drag and drop nodes"
+      "Features",
+      "Choose direction"
     ],
     "pageType": "guide",
-    "title": "Drag and drop nodes",
-    "section": "Drag and drop nodes",
-    "route": "/workshops/drag-and-drop-nodes",
-    "fragment": "drag-and-drop-nodes",
-    "content": "This workshop will show you how to implement dynamic node creation with basic drag and drop implementation. This implementation uses documentPointToFlowPoint() method of VflowComponent that translates document coordinate to vflow coordinate."
+    "title": "Choose direction",
+    "section": "Choose direction",
+    "route": "/features/choose-direction",
+    "fragment": "choose-direction",
+    "content": "You can apply global setting for all handles with [handlePositions] input where you set on which side source and target handles should be placed, you can select."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Choose direction"
+    ],
+    "pageType": "guide",
+    "title": "Choose direction",
+    "section": "Right to left direction",
+    "route": "/features/choose-direction",
+    "fragment": "right-to-left-direction",
+    "content": "To archive this direction, you pass { source: 'left', target: 'right' } to [handlePositions]."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Choose direction"
+    ],
+    "pageType": "guide",
+    "title": "Choose direction",
+    "section": "Top to bottom direction",
+    "route": "/features/choose-direction",
+    "fragment": "top-to-bottom-direction",
+    "content": "To archive this direction, you pass { source: 'bottom', target: 'top' } to [handlePositions]."
   },
   {
     "breadcrumbs": [
@@ -250,6 +274,54 @@
     "route": "/features/connection-validation",
     "fragment": "connection-validation",
     "content": "ngx-vflow supports real-time synchronous validation of connections. Validation occurs when a user attempts to create a new edge. By default, every connection is valid, but you can provide a ConnectionSettings with a validatior callback where you specify the validation logic. For example, in this case, validation only passes connections from node 1 to node 2. If the validator returns false, the (onConnect) event won't be triggered because there is no valid connection."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Curves"
+    ],
+    "pageType": "guide",
+    "title": "Curves",
+    "section": "Curves",
+    "route": "/features/curves",
+    "fragment": "curves",
+    "content": "It's possible to set curve for both the edges and connection."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom background"
+    ],
+    "pageType": "guide",
+    "title": "Custom background",
+    "section": "Custom background",
+    "route": "/features/custom-background",
+    "fragment": "custom-background",
+    "content": "You're able to select background for your flow."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom background"
+    ],
+    "pageType": "guide",
+    "title": "Custom background",
+    "section": "Solid color",
+    "route": "/features/custom-background",
+    "fragment": "solid-color",
+    "content": "To select a color, simply pass a color string it to the [background] input."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom background"
+    ],
+    "pageType": "guide",
+    "title": "Custom background",
+    "section": "Dots pattern",
+    "route": "/features/custom-background",
+    "fragment": "dots-pattern",
+    "content": "To make dots pattern, pass an object to the [background] input according to DotsBackground interface"
   },
   {
     "breadcrumbs": [
@@ -602,90 +674,6 @@
   {
     "breadcrumbs": [
       "Features",
-      "Choose direction"
-    ],
-    "pageType": "guide",
-    "title": "Choose direction",
-    "section": "Choose direction",
-    "route": "/features/choose-direction",
-    "fragment": "choose-direction",
-    "content": "This API may depricate in future releases"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Choose direction"
-    ],
-    "pageType": "guide",
-    "title": "Choose direction",
-    "section": "Choose direction",
-    "route": "/features/choose-direction",
-    "fragment": "choose-direction",
-    "content": "You can apply global setting for all handles with [handlePositions] input where you set on which side source and target handles should be placed, you can select."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Choose direction"
-    ],
-    "pageType": "guide",
-    "title": "Choose direction",
-    "section": "Right to left direction",
-    "route": "/features/choose-direction",
-    "fragment": "right-to-left-direction",
-    "content": "To archive this direction, you pass { source: 'left', target: 'right' } to [handlePositions]."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Choose direction"
-    ],
-    "pageType": "guide",
-    "title": "Choose direction",
-    "section": "Top to bottom direction",
-    "route": "/features/choose-direction",
-    "fragment": "top-to-bottom-direction",
-    "content": "To archive this direction, you pass { source: 'bottom', target: 'top' } to [handlePositions]."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Custom background"
-    ],
-    "pageType": "guide",
-    "title": "Custom background",
-    "section": "Custom background",
-    "route": "/features/custom-background",
-    "fragment": "custom-background",
-    "content": "You're able to select background for your flow."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Custom background"
-    ],
-    "pageType": "guide",
-    "title": "Custom background",
-    "section": "Solid color",
-    "route": "/features/custom-background",
-    "fragment": "solid-color",
-    "content": "To select a color, simply pass a color string it to the [background] input."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Custom background"
-    ],
-    "pageType": "guide",
-    "title": "Custom background",
-    "section": "Dots pattern",
-    "route": "/features/custom-background",
-    "fragment": "dots-pattern",
-    "content": "To make dots pattern, pass an object to the [background] input according to DotsBackground interface"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
       "Custom handles"
     ],
     "pageType": "guide",
@@ -718,18 +706,6 @@
     "route": "/features/custom-handles",
     "fragment": "custom-handles",
     "content": "Custom handles are not positioned automatically, but the library provides a useful template context property to position your handle.Custom handles know if validation of ConnectionSettings.validator() has failed or succeeded, so you can use state() signal in let-ctx to add some behavior based on validation result. Refer to this interface for let-ctx when crafting your handle template:"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Default edges"
-    ],
-    "pageType": "guide",
-    "title": "Default edges",
-    "section": "Default edges",
-    "route": "/features/default-edges",
-    "fragment": "default-edges",
-    "content": "You can link nodes with edges. All you need to do is to create another Edge[] array and pass it to the vflow component. Each edge contains the id of the source and target nodes, and each edge must have its own id."
   },
   {
     "breadcrumbs": [
@@ -1178,6 +1154,18 @@
   {
     "breadcrumbs": [
       "Features",
+      "Default edges"
+    ],
+    "pageType": "guide",
+    "title": "Default edges",
+    "section": "Default edges",
+    "route": "/features/default-edges",
+    "fragment": "default-edges",
+    "content": "You can link nodes with edges. All you need to do is to create another Edge[] array and pass it to the vflow component. Each edge contains the id of the source and target nodes, and each edge must have its own id."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
       "Default nodes"
     ],
     "pageType": "guide",
@@ -1186,18 +1174,6 @@
     "route": "/features/default-nodes",
     "fragment": "default-nodes",
     "content": "To get started, you just need to provide nodes array to vflow component."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Curves"
-    ],
-    "pageType": "guide",
-    "title": "Curves",
-    "section": "Curves",
-    "route": "/features/curves",
-    "fragment": "curves",
-    "content": "It's possible to set curve for both the edges and connection."
   },
   {
     "breadcrumbs": [
@@ -1262,6 +1238,150 @@
   {
     "breadcrumbs": [
       "Features",
+      "Keyboard shortcuts"
+    ],
+    "pageType": "guide",
+    "title": "Keyboard shortcuts",
+    "section": "Keyboard shortcuts",
+    "route": "/features/keyboard-shortcuts",
+    "fragment": "keyboard-shortcuts",
+    "content": "You can use keyboard shortcuts to perform additional actions."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Keyboard shortcuts"
+    ],
+    "pageType": "guide",
+    "title": "Keyboard shortcuts",
+    "section": "Defaults",
+    "route": "/features/keyboard-shortcuts",
+    "fragment": "defaults",
+    "content": "Action Default key"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Keyboard shortcuts"
+    ],
+    "pageType": "guide",
+    "title": "Keyboard shortcuts",
+    "section": "Defaults",
+    "route": "/features/keyboard-shortcuts",
+    "fragment": "defaults",
+    "content": "Node multi selection"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Keyboard shortcuts"
+    ],
+    "pageType": "guide",
+    "title": "Keyboard shortcuts",
+    "section": "Defaults",
+    "route": "/features/keyboard-shortcuts",
+    "fragment": "defaults",
+    "content": "CMD"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Keyboard shortcuts"
+    ],
+    "pageType": "guide",
+    "title": "Keyboard shortcuts",
+    "section": "Defaults",
+    "route": "/features/keyboard-shortcuts",
+    "fragment": "defaults",
+    "content": " (Mac) or "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Keyboard shortcuts"
+    ],
+    "pageType": "guide",
+    "title": "Keyboard shortcuts",
+    "section": "Defaults",
+    "route": "/features/keyboard-shortcuts",
+    "fragment": "defaults",
+    "content": "CTRL"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Keyboard shortcuts"
+    ],
+    "pageType": "guide",
+    "title": "Keyboard shortcuts",
+    "section": "Defaults",
+    "route": "/features/keyboard-shortcuts",
+    "fragment": "defaults",
+    "content": " (Other systems)"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Keyboard shortcuts"
+    ],
+    "pageType": "guide",
+    "title": "Keyboard shortcuts",
+    "section": "Customization",
+    "route": "/features/keyboard-shortcuts",
+    "fragment": "customization",
+    "content": "To customize the keyboard shortcuts for specific actions, pass a [keyboardShortcuts] input object to the VflowComponent with the following KeyboardShortcuts interface. Here are some key details: The passed object will be merged with the default key combinations.To disable a specific action, pass null for that action.If you want to trigger an action with multiple keys, pass an array of keys. Note: this is not a key combination. For example, if you pass ['ShiftLeft', 'ControlLeft'], the action will be triggered by either ShiftLeft or ControlLeft, but not by pressing both together (ShiftLeft+ControlLeft).You can find the list of available key codes here. In the following example, the default combination for multiSelection is replaced with ['ShiftLeft', 'ShiftRight']."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Labels"
+    ],
+    "pageType": "guide",
+    "title": "Labels",
+    "section": "Labels",
+    "route": "/features/labels",
+    "fragment": "labels",
+    "content": "You can attach labels to edges by providing the edgeLabels property to the needed Edges. There are three slots available for labels on an edge: start, center, end. The label is only of the html-template type, so you have to provide "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Labels"
+    ],
+    "pageType": "guide",
+    "title": "Labels",
+    "section": "Labels",
+    "route": "/features/labels",
+    "fragment": "labels",
+    "content": " inside vflow."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Labels"
+    ],
+    "pageType": "guide",
+    "title": "Labels",
+    "section": "Context",
+    "route": "/features/labels",
+    "fragment": "context",
+    "content": "You may access some data for label through let-ctx according to this interface."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Markers"
+    ],
+    "pageType": "guide",
+    "title": "Markers",
+    "section": "Markers",
+    "route": "/features/markers",
+    "fragment": "markers",
+    "content": "You can create markers for both edges and connections. Edges: Specify start and end markers for corresponding parts of the edge. Currently, markers are limited to two types: arrow and arrow-closed.Connections: You can specify an end marker using the marker property in ConnectionSettings."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
       "Minimap"
     ],
     "pageType": "guide",
@@ -1310,14 +1430,14 @@
   {
     "breadcrumbs": [
       "Features",
-      "Markers"
+      "Multiple connection points"
     ],
     "pageType": "guide",
-    "title": "Markers",
-    "section": "Markers",
-    "route": "/features/markers",
-    "fragment": "markers",
-    "content": "You can create markers for both edges and connections. Edges: Specify start and end markers for corresponding parts of the edge. Currently, markers are limited to two types: arrow and arrow-closed.Connections: You can specify an end marker using the marker property in ConnectionSettings."
+    "title": "Multiple connection points",
+    "section": "Multiple connection points",
+    "route": "/features/multiple-connection-points",
+    "fragment": "multiple-connection-points",
+    "content": "Custom components provide the ability to control handles and their positions. All you need to do is take HandleComponent from library and place it somewhere in your custom node. This component automatically computes its position based on parent element's position."
   },
   {
     "breadcrumbs": [
@@ -1454,6 +1574,30 @@
   {
     "breadcrumbs": [
       "Features",
+      "View size"
+    ],
+    "pageType": "guide",
+    "title": "View size",
+    "section": "Auto size",
+    "route": "/features/view-size",
+    "fragment": "auto-size",
+    "content": "vflow automatically fits it container if you pass view=\"auto\" input"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "View size"
+    ],
+    "pageType": "guide",
+    "title": "View size",
+    "section": "Fixed size",
+    "route": "/features/view-size",
+    "fragment": "fixed-size",
+    "content": "vflow can take fixed space if you pass [view]=\"[600, 600]\" input, where first item of array is width (in pixels), and the second is height (in pixels)."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
       "Selecting"
     ],
     "pageType": "guide",
@@ -1537,234 +1681,6 @@
   },
   {
     "breadcrumbs": [
-      "Features",
-      "Labels"
-    ],
-    "pageType": "guide",
-    "title": "Labels",
-    "section": "Labels",
-    "route": "/features/labels",
-    "fragment": "labels",
-    "content": "You can attach labels to edges by providing the edgeLabels property to the needed Edges. There are three slots available for labels on an edge: start, center, end. The label is only of the html-template type, so you have to provide "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Labels"
-    ],
-    "pageType": "guide",
-    "title": "Labels",
-    "section": "Labels",
-    "route": "/features/labels",
-    "fragment": "labels",
-    "content": " inside vflow."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Labels"
-    ],
-    "pageType": "guide",
-    "title": "Labels",
-    "section": "Context",
-    "route": "/features/labels",
-    "fragment": "context",
-    "content": "You may access some data for label through let-ctx according to this interface."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Keyboard shortcuts"
-    ],
-    "pageType": "guide",
-    "title": "Keyboard shortcuts",
-    "section": "Keyboard shortcuts",
-    "route": "/features/keyboard-shortcuts",
-    "fragment": "keyboard-shortcuts",
-    "content": "You can use keyboard shortcuts to perform additional actions."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Keyboard shortcuts"
-    ],
-    "pageType": "guide",
-    "title": "Keyboard shortcuts",
-    "section": "Defaults",
-    "route": "/features/keyboard-shortcuts",
-    "fragment": "defaults",
-    "content": "Action Default key"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Keyboard shortcuts"
-    ],
-    "pageType": "guide",
-    "title": "Keyboard shortcuts",
-    "section": "Defaults",
-    "route": "/features/keyboard-shortcuts",
-    "fragment": "defaults",
-    "content": "Node multi selection"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Keyboard shortcuts"
-    ],
-    "pageType": "guide",
-    "title": "Keyboard shortcuts",
-    "section": "Defaults",
-    "route": "/features/keyboard-shortcuts",
-    "fragment": "defaults",
-    "content": "CMD"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Keyboard shortcuts"
-    ],
-    "pageType": "guide",
-    "title": "Keyboard shortcuts",
-    "section": "Defaults",
-    "route": "/features/keyboard-shortcuts",
-    "fragment": "defaults",
-    "content": " (Mac) or "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Keyboard shortcuts"
-    ],
-    "pageType": "guide",
-    "title": "Keyboard shortcuts",
-    "section": "Defaults",
-    "route": "/features/keyboard-shortcuts",
-    "fragment": "defaults",
-    "content": "CTRL"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Keyboard shortcuts"
-    ],
-    "pageType": "guide",
-    "title": "Keyboard shortcuts",
-    "section": "Defaults",
-    "route": "/features/keyboard-shortcuts",
-    "fragment": "defaults",
-    "content": " (Other systems)"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Keyboard shortcuts"
-    ],
-    "pageType": "guide",
-    "title": "Keyboard shortcuts",
-    "section": "Customization",
-    "route": "/features/keyboard-shortcuts",
-    "fragment": "customization",
-    "content": "To customize the keyboard shortcuts for specific actions, pass a [keyboardShortcuts] input object to the VflowComponent with the following KeyboardShortcuts interface. Here are some key details: The passed object will be merged with the default key combinations.To disable a specific action, pass null for that action.If you want to trigger an action with multiple keys, pass an array of keys. Note: this is not a key combination. For example, if you pass ['ShiftLeft', 'ControlLeft'], the action will be triggered by either ShiftLeft or ControlLeft, but not by pressing both together (ShiftLeft+ControlLeft).You can find the list of available key codes here. In the following example, the default combination for multiSelection is replaced with ['ShiftLeft', 'ShiftRight']."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "View size"
-    ],
-    "pageType": "guide",
-    "title": "View size",
-    "section": "Auto size",
-    "route": "/features/view-size",
-    "fragment": "auto-size",
-    "content": "vflow automatically fits it container if you pass view=\"auto\" input"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "View size"
-    ],
-    "pageType": "guide",
-    "title": "View size",
-    "section": "Fixed size",
-    "route": "/features/view-size",
-    "fragment": "fixed-size",
-    "content": "vflow can take fixed space if you pass [view]=\"[600, 600]\" input, where first item of array is width (in pixels), and the second is height (in pixels)."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Multiple connection points"
-    ],
-    "pageType": "guide",
-    "title": "Multiple connection points",
-    "section": "Multiple connection points",
-    "route": "/features/multiple-connection-points",
-    "fragment": "multiple-connection-points",
-    "content": "Custom components provide the ability to control handles and their positions. All you need to do is take HandleComponent from library and place it somewhere in your custom node. This component automatically computes its position based on parent element's position."
-  },
-  {
-    "breadcrumbs": [
-      "Getting Started",
-      "Principles"
-    ],
-    "pageType": "guide",
-    "title": "Principles",
-    "section": "Principles",
-    "route": "/getting-started/principles",
-    "fragment": "principles",
-    "content": "This page contains a list of general principles that impact feature implementation. No hidden mutations of your data. For example, the library does not modify any of the Node or Edge objects you pass in as inputs. Instead, it creates internal models around these entities and operates on them. Any changes to the passed entities can be observed through events.This principle also implies that you are responsible for managing invalid data. For instance, if you delete a node, the edges corresponding to this node will not be deleted automatically. However, the library will notify you about detached edges so that you can easily delete them."
-  },
-  {
-    "breadcrumbs": [
-      "Getting Started",
-      "How node sizing works"
-    ],
-    "pageType": "guide",
-    "title": "How node sizing works",
-    "section": "How node sizing works",
-    "route": "/getting-started/how-node-sizing-works",
-    "fragment": "how-node-sizing-works",
-    "content": "This topic needs some clarification due to the design decisions behind the library. The library renders the flow by combining two technologies: SVG, which is responsible for rendering curves, managing zoom, pan, and other tasks that SVG handles well.HTML (with CSS), which is used to create the content for the nodes, allowing front-end engineers to design dynamic and visually appealing UIs more easily than with SVG. The link between these two technologies is the "
-  },
-  {
-    "breadcrumbs": [
-      "Getting Started",
-      "How node sizing works"
-    ],
-    "pageType": "guide",
-    "title": "How node sizing works",
-    "section": "How node sizing works",
-    "route": "/getting-started/how-node-sizing-works",
-    "fragment": "how-node-sizing-works",
-    "content": " element, which enables HTML to be rendered inside SVG. The diagram below illustrates how this element interacts with its content."
-  },
-  {
-    "breadcrumbs": [
-      "Getting Started",
-      "What is ngx-vflow"
-    ],
-    "pageType": "guide",
-    "title": "What is ngx-vflow",
-    "section": "What is ngx-vflow",
-    "route": "/getting-started/what-is-ngx-vflow",
-    "fragment": "what-is-ngx-vflow",
-    "content": "ngx-vflow is an Angular library for creating node-based applications. It aims to assist you in building anything from a static diagram to a visual editor. You can utilize the default design or apply your own by customizing everything using familiar technologies."
-  },
-  {
-    "breadcrumbs": [
-      "Getting Started",
-      "What is ngx-vflow"
-    ],
-    "pageType": "guide",
-    "title": "What is ngx-vflow",
-    "section": "Main features",
-    "route": "/getting-started/what-is-ngx-vflow",
-    "fragment": "main-features",
-    "content": "Easy to use: Just describe your flow with a simple API; all of the heavy lifting, such as dragging, zooming, and curve math, is handled by the library for you. Customizable: There is a default design for basic usage, and you can also customize nodes with good old HTML and CSS. Other entities such as edges, connection lines, and handles are also customizable, but it will require a little SVG knowledge. Great performance: Angular signals are the heart and soul of ngx-vflow, which are performant by default, so you shouldn't worry about performance even with large flows. Zoneless: Does not require zone.js"
-  },
-  {
-    "breadcrumbs": [
       "Getting Started",
       "Dynamic vs Static nodes"
     ],
@@ -1826,6 +1742,42 @@
   {
     "breadcrumbs": [
       "Getting Started",
+      "How node sizing works"
+    ],
+    "pageType": "guide",
+    "title": "How node sizing works",
+    "section": "How node sizing works",
+    "route": "/getting-started/how-node-sizing-works",
+    "fragment": "how-node-sizing-works",
+    "content": "This topic needs some clarification due to the design decisions behind the library. The library renders the flow by combining two technologies: SVG, which is responsible for rendering curves, managing zoom, pan, and other tasks that SVG handles well.HTML (with CSS), which is used to create the content for the nodes, allowing front-end engineers to design dynamic and visually appealing UIs more easily than with SVG. The link between these two technologies is the "
+  },
+  {
+    "breadcrumbs": [
+      "Getting Started",
+      "How node sizing works"
+    ],
+    "pageType": "guide",
+    "title": "How node sizing works",
+    "section": "How node sizing works",
+    "route": "/getting-started/how-node-sizing-works",
+    "fragment": "how-node-sizing-works",
+    "content": " element, which enables HTML to be rendered inside SVG. The diagram below illustrates how this element interacts with its content."
+  },
+  {
+    "breadcrumbs": [
+      "Getting Started",
+      "Principles"
+    ],
+    "pageType": "guide",
+    "title": "Principles",
+    "section": "Principles",
+    "route": "/getting-started/principles",
+    "fragment": "principles",
+    "content": "This page contains a list of general principles that impact feature implementation. No hidden mutations of your data. For example, the library does not modify any of the Node or Edge objects you pass in as inputs. Instead, it creates internal models around these entities and operates on them. Any changes to the passed entities can be observed through events.This principle also implies that you are responsible for managing invalid data. For instance, if you delete a node, the edges corresponding to this node will not be deleted automatically. However, the library will notify you about detached edges so that you can easily delete them."
+  },
+  {
+    "breadcrumbs": [
+      "Getting Started",
       "Roadmap"
     ],
     "pageType": "guide",
@@ -1834,6 +1786,54 @@
     "route": "/getting-started/roadmap",
     "fragment": "roadmap",
     "content": "This is a roadmap for ngx-vflow: improve consistency across browsers (mainly appeals to Safari)improve documentationmore curvescustom SVG shapesmultiselect nodesfloating edgesplugin systemminimapnode rotationUI controls for flowsupport for more layout engines (Dagree, etc.)more complex background (patterns)modal system for context menulazy loading nodes based on current viewport (decrease initial bundle)HTML-based renderer as alternative to current SVG-based rendererExperimental canvas/webgl renderer for insane performance"
+  },
+  {
+    "breadcrumbs": [
+      "Getting Started",
+      "What is ngx-vflow"
+    ],
+    "pageType": "guide",
+    "title": "What is ngx-vflow",
+    "section": "What is ngx-vflow",
+    "route": "/getting-started/what-is-ngx-vflow",
+    "fragment": "what-is-ngx-vflow",
+    "content": "ngx-vflow is an Angular library for creating node-based applications. It aims to assist you in building anything from a static diagram to a visual editor. You can utilize the default design or apply your own by customizing everything using familiar technologies."
+  },
+  {
+    "breadcrumbs": [
+      "Getting Started",
+      "What is ngx-vflow"
+    ],
+    "pageType": "guide",
+    "title": "What is ngx-vflow",
+    "section": "Main features",
+    "route": "/getting-started/what-is-ngx-vflow",
+    "fragment": "main-features",
+    "content": "Easy to use: Just describe your flow with a simple API; all of the heavy lifting, such as dragging, zooming, and curve math, is handled by the library for you. Customizable: There is a default design for basic usage, and you can also customize nodes with good old HTML and CSS. Other entities such as edges, connection lines, and handles are also customizable, but it will require a little SVG knowledge. Great performance: Angular signals are the heart and soul of ngx-vflow, which are performant by default, so you shouldn't worry about performance even with large flows. Zoneless: Does not require zone.js"
+  },
+  {
+    "breadcrumbs": [
+      "Workshops",
+      "Delete selected"
+    ],
+    "pageType": "guide",
+    "title": "Delete selected",
+    "section": "Delete selected",
+    "route": "/workshops/delete-selected",
+    "fragment": "delete-selected",
+    "content": "This workshop will show you how to implement deletion of nodes and edges."
+  },
+  {
+    "breadcrumbs": [
+      "Workshops",
+      "Drag and drop nodes"
+    ],
+    "pageType": "guide",
+    "title": "Drag and drop nodes",
+    "section": "Drag and drop nodes",
+    "route": "/workshops/drag-and-drop-nodes",
+    "fragment": "drag-and-drop-nodes",
+    "content": "This workshop will show you how to implement dynamic node creation with basic drag and drop implementation. This implementation uses documentPointToFlowPoint() method of VflowComponent that translates document coordinate to vflow coordinate."
   },
   {
     "breadcrumbs": [
