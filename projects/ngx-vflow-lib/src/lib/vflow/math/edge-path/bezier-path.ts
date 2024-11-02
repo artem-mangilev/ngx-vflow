@@ -1,6 +1,5 @@
 import { PathData } from '../../interfaces/path-data.interface';
 import { Point } from '../../interfaces/point.interface';
-import { Path, path as d3Path } from 'd3-path';
 import { UsingPoints } from '../../types/using-points.type';
 import { Position } from '../../types/position.type';
 import { getPointOnLineByRatio } from '../point-on-line-by-ratio';
@@ -12,30 +11,20 @@ export function bezierPath(
   targetPosition: Position,
   usingPoints: UsingPoints = [false, false, false]
 ): PathData {
-  const path = d3Path();
-
-  path.moveTo(source.x, source.y);
-
   const distanceVector = { x: source.x - target.x, y: source.y - target.y };
 
-  const firstControl = calcControlPoint(source, sourcePosition, distanceVector);
-  const secondControl = calcControlPoint(target, targetPosition, distanceVector);
+  const sourceControl = calcControlPoint(source, sourcePosition, distanceVector);
+  const targetControl = calcControlPoint(target, targetPosition, distanceVector);
 
-  path.bezierCurveTo(
-    firstControl.x,
-    firstControl.y,
-    secondControl.x,
-    secondControl.y,
-    target.x,
-    target.y
-  );
+  const path =
+    `M${source.x},${source.y} C${sourceControl.x},${sourceControl.y} ${targetControl.x},${targetControl.y} ${target.x},${target.y}`
 
   return getPathData(
     path,
     source,
     target,
-    firstControl,
-    secondControl,
+    sourceControl,
+    targetControl,
     usingPoints
   );
 }
@@ -90,11 +79,11 @@ function calcControlPoint(
 }
 
 function getPathData(
-  path: Path,
+  path: string,
   source: Point,
   target: Point,
-  firstControl: Point,
-  secondControl: Point,
+  sourceControl: Point,
+  targetControl: Point,
   usingPoints: UsingPoints
 ): PathData {
   const [start, center, end] = usingPoints;
@@ -102,16 +91,16 @@ function getPathData(
   const nullPoint = { x: 0, y: 0 };
 
   return {
-    path: path.toString(),
+    path,
     points: {
       start: start
-        ? getPointOnBezier(source, target, firstControl, secondControl, 0.1)
+        ? getPointOnBezier(source, target, sourceControl, targetControl, 0.1)
         : nullPoint,
       center: center
-        ? getPointOnBezier(source, target, firstControl, secondControl, 0.5)
+        ? getPointOnBezier(source, target, sourceControl, targetControl, 0.5)
         : nullPoint,
       end: end
-        ? getPointOnBezier(source, target, firstControl, secondControl, 0.9)
+        ? getPointOnBezier(source, target, sourceControl, targetControl, 0.9)
         : nullPoint,
     },
   };
@@ -123,22 +112,22 @@ function getPathData(
 function getPointOnBezier(
   sourcePoint: Point,
   targetPoint: Point,
-  controlPoint1: Point,
-  controlPoint2: Point,
+  sourceControl: Point,
+  targetControl: Point,
   ratio: number
 ): Point {
   const fromSourceToFirstControl: Point = getPointOnLineByRatio(
     sourcePoint,
-    controlPoint1,
+    sourceControl,
     ratio
   );
   const fromFirstControlToSecond: Point = getPointOnLineByRatio(
-    controlPoint1,
-    controlPoint2,
+    sourceControl,
+    targetControl,
     ratio
   );
   const fromSecondControlToTarget: Point = getPointOnLineByRatio(
-    controlPoint2,
+    targetControl,
     targetPoint,
     ratio
   );
