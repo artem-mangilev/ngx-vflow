@@ -46,3 +46,10 @@
     <ng-container [ngTemplateOutlet]="minimap.template()" />
   </ng-container>
 </svg:svg>
+
+<!-- Toolbars -->
+<div>
+  <div *ngFor="let toolbar of toolbars()">
+    <ng-container [ngTemplateOutlet]="toolbar.template()" />
+  </div>
+</div>
