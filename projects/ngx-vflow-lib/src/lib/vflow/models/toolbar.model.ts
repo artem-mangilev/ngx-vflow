@@ -4,8 +4,7 @@ import { NodeModel } from "./node.model";
 import { ViewportService } from "../services/viewport.service";
 
 export class ToolbarModel {
-  public visible = signal(false)
-  public position = signal<Position>('right')
+  public position = signal<Position>('top')
   public template = signal<TemplateRef<unknown> | null>(null)
 
   public offset = signal(10)
@@ -37,7 +36,7 @@ export class ToolbarModel {
 
   public transform = computed(() => `translate(${this.point().x}, ${this.point().y})`)
 
-  public size = signal({ width: 50, height: 50 })
+  public size = signal({ width: 0, height: 0 })
 
   constructor(public node: NodeModel) { }
 }

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, ElementRef, inject, Input, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, inject, Input, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { Directive } from '@angular/core';
 import { Position } from '../../types/position.type';
 import { ToolbarModel } from '../../models/toolbar.model';
@@ -24,11 +24,6 @@ import { NodeAccessorService } from '../../services/node-accessor.service';
 export class NodeToolbarComponent implements OnInit, OnDestroy {
   private overlaysService = inject(OverlaysService);
   private nodeService = inject(NodeAccessorService)
-
-  @Input()
-  public set visible(value: boolean) {
-    this.model.visible.set(value);
-  };
 
   @Input()
   public set position(value: Position) {
