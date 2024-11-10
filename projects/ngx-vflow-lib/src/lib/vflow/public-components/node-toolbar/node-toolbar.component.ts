@@ -3,6 +3,7 @@ import { Position } from '../../types/position.type';
 import { ToolbarTemplateDirective } from '../../directives/template.directive';
 import { ToolbarModel } from '../../models/toolbar.model';
 import { OverlaysService } from '../../services/overlays.service';
+import { NodeAccessorService } from '../../services/node-accessor.service';
 
 @Component({
   selector: 'node-toolbar',
@@ -11,6 +12,7 @@ import { OverlaysService } from '../../services/overlays.service';
 })
 export class NodeToolbarComponent implements AfterContentInit, OnDestroy {
   private overlaysService = inject(OverlaysService);
+  private nodeService = inject(NodeAccessorService)
 
   @Input()
   public set visible(value: boolean) {
@@ -25,7 +27,7 @@ export class NodeToolbarComponent implements AfterContentInit, OnDestroy {
   @ContentChild(ToolbarTemplateDirective)
   public toolbarContentTemplate!: ToolbarTemplateDirective
 
-  public model = new ToolbarModel()
+  public model = new ToolbarModel(this.nodeService.model()!)
 
   public ngAfterContentInit(): void {
     if (this.toolbarContentTemplate.templateRef) {
