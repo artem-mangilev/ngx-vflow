@@ -1,4 +1,4 @@
-import { AfterContentInit, ChangeDetectionStrategy, Component, ContentChild, inject, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterContentInit, ChangeDetectionStrategy, Component, ContentChild, inject, Input, OnDestroy } from '@angular/core';
 import { Position } from '../../types/position.type';
 import { ToolbarTemplateDirective } from '../../directives/template.directive';
 import { ToolbarModel } from '../../models/toolbar.model';

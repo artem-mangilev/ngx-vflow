@@ -136,3 +136,16 @@
     (pointerOut)="resetValidateConnection(handle)"
   />
 </ng-container>
+
+<!-- Toolbar -->
+<ng-container *ngIf="toolbar() as toolbar">
+  <svg:foreignObject
+    *ngIf="toolbar.visible()"
+    [attr.width]="toolbar.size().width"
+    [attr.height]="toolbar.size().height"
+    [attr.transform]="toolbar.transform()"
+  >
+    <ng-container [ngTemplateOutlet]="toolbar.template()" />
+  </svg:foreignObject>
+</ng-container>
+

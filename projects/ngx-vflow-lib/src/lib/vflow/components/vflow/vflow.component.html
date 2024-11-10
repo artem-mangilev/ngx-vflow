@@ -45,18 +45,5 @@
   <ng-container *ngIf="minimap() as minimap">
     <ng-container [ngTemplateOutlet]="minimap.template()" />
   </ng-container>
-
-  <!-- Toolbars -->
-  <svg:g>
-    <svg:foreignObject
-      *ngFor="let toolbar of toolbars()"
-      [attr.width]="toolbar.size().width"
-      [attr.height]="toolbar.size().height"
-      [attr.x]="toolbar.point().x"
-      [attr.y]="toolbar.point().y"
-    >
-      <ng-container [ngTemplateOutlet]="toolbar.template()" />
-    </svg:foreignObject>
-  </svg:g>
 </svg:svg>
 

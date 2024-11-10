@@ -1,11 +1,20 @@
 import { computed, Injectable, signal } from '@angular/core';
 import { ToolbarModel } from '../models/toolbar.model';
+import { NodeModel } from '../models/node.model';
 
 @Injectable()
 export class OverlaysService {
-  public toolbars = signal<ToolbarModel[]>([]);
+  private toolbars = signal<ToolbarModel[]>([]);
 
-  public visibleToolbars = computed(() => this.toolbars().filter(t => t.visible()));
+  public nodeToolbars = computed(() => {
+    const map = new Map<NodeModel, ToolbarModel>()
+
+    this.toolbars().forEach((toolbar) => {
+      map.set(toolbar.node, toolbar)
+    })
+
+    return map
+  })
 
   public addToolbar(toolbar: ToolbarModel): void {
     this.toolbars.update((toolbars) => [...toolbars, toolbar]);

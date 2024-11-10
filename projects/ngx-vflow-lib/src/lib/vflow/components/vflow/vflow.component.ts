@@ -111,7 +111,6 @@ export class VflowComponent implements OnInit {
   private flowSettingsService = inject(FlowSettingsService)
   private componentEventBusService = inject(ComponentEventBusService)
   private keyboardService = inject(KeyboardService)
-  private overlaysService = inject(OverlaysService)
   private injector = inject(Injector)
   // #endregion
 
@@ -306,8 +305,6 @@ export class VflowComponent implements OnInit {
   protected markers = this.flowEntitiesService.markers
 
   protected minimap = this.flowEntitiesService.minimap
-
-  protected toolbars = this.overlaysService.visibleToolbars
 
   public ngOnInit(): void {
     this.setInitialNodesOrder()
