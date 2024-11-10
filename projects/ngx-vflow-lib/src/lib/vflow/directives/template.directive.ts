@@ -30,8 +30,3 @@ export class GroupNodeTemplateDirective {
 export class HandleTemplateDirective {
   public templateRef = inject(TemplateRef)
 }
-
-@Directive({ selector: 'ng-template[toolbar]' })
-export class ToolbarTemplateDirective {
-  public templateRef = inject(TemplateRef)
-}

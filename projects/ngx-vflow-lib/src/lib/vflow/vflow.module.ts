@@ -5,7 +5,7 @@ import { NodeComponent } from './components/node/node.component';
 import { MapContextDirective } from './directives/map-context.directive';
 import { EdgeComponent } from './components/edge/edge.component';
 import { EdgeLabelComponent } from './components/edge-label/edge-label.component';
-import { ConnectionTemplateDirective, EdgeLabelHtmlTemplateDirective, EdgeTemplateDirective, GroupNodeTemplateDirective, HandleTemplateDirective, NodeHtmlTemplateDirective, ToolbarTemplateDirective } from './directives/template.directive';
+import { ConnectionTemplateDirective, EdgeLabelHtmlTemplateDirective, EdgeTemplateDirective, GroupNodeTemplateDirective, HandleTemplateDirective, NodeHtmlTemplateDirective } from './directives/template.directive';
 import { ConnectionComponent } from './components/connection/connection.component';
 import { SpacePointContextDirective } from './directives/space-point-context.directive';
 import { RootSvgReferenceDirective } from './directives/reference.directive';
@@ -21,7 +21,7 @@ import { FlowSizeControllerDirective } from './directives/flow-size-controller.d
 import { ResizableComponent } from './public-components/resizable/resizable.component';
 import { MiniMapComponent } from './public-components/minimap/minimap.component';
 import { DefaultNodeComponent } from './components/default-node/default-node.component';
-import { NodeToolbarComponent } from './public-components/node-toolbar/node-toolbar.component';
+import { NodeToolbarComponent, NodeToolbarWrapperDirective } from './public-components/node-toolbar/node-toolbar.component';
 
 const components = [
   VflowComponent,
@@ -48,6 +48,7 @@ const directives = [
   PointerDirective,
   RootPointerDirective,
   FlowSizeControllerDirective,
+  NodeToolbarWrapperDirective
 ]
 
 const templateDirectives = [
@@ -56,8 +57,7 @@ const templateDirectives = [
   EdgeLabelHtmlTemplateDirective,
   EdgeTemplateDirective,
   ConnectionTemplateDirective,
-  HandleTemplateDirective,
-  ToolbarTemplateDirective
+  HandleTemplateDirective
 ]
 
 @NgModule({

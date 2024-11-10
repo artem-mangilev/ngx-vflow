@@ -4,8 +4,6 @@ import { NodeModel } from "./node.model";
 import { ViewportService } from "../services/viewport.service";
 
 export class ToolbarModel {
-  private viewportService = inject(ViewportService)
-
   public visible = signal(false)
   public position = signal<Position>('right')
   public template = signal<TemplateRef<unknown> | null>(null)
