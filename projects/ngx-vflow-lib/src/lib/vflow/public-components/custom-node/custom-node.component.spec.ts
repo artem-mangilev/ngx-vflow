@@ -1,6 +1,7 @@
 import { Component } from "@angular/core";
 import { CustomNodeComponent } from "./custom-node.component";
 import { TestBed, ComponentFixture } from '@angular/core/testing';
+import { provideCustomNodeMocks } from "../../testing-utils/provide-custom-node-mocks";
 
 @Component({
   standalone: true,
@@ -15,6 +16,7 @@ describe(('TestCustomNodeComponent'), () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [TestCustomNodeComponent],
+      providers: [provideCustomNodeMocks()]
     });
 
     fixture = TestBed.createComponent(TestCustomNodeComponent);

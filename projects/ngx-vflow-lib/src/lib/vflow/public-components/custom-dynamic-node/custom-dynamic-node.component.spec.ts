@@ -1,6 +1,8 @@
 import { Component } from "@angular/core";
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { CustomDynamicNodeComponent } from "./custom-dynamic-node.component";
+import { provideCustomNodeMocks } from "../../testing-utils/provide-custom-node-mocks";
+import { VflowModule } from "../../vflow.module";
 
 @Component({
   standalone: true,
@@ -15,6 +17,7 @@ describe(('TestCustomDynamicNodeComponent'), () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [TestCustomDynamicNodeComponent],
+      providers: [provideCustomNodeMocks()]
     });
 
     fixture = TestBed.createComponent(TestCustomDynamicNodeComponent);
