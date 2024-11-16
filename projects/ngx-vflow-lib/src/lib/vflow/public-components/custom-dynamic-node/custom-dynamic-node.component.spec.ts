@@ -6,7 +6,10 @@ import { VflowModule } from "../../vflow.module";
 
 @Component({
   standalone: true,
-  template: ``,
+  template: `<div resizable selectable>
+    <handle />
+  </div>`,
+  imports: [VflowModule]
 })
 class TestCustomDynamicNodeComponent extends CustomDynamicNodeComponent { }
 

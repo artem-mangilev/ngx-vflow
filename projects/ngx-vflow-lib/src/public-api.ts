@@ -37,3 +37,6 @@ export * from './lib/vflow/directives/template.directive';
 export * from './lib/vflow/directives/connection-controller.directive';
 export * from './lib/vflow/directives/changes-controller.directive';
 export * from './lib/vflow/directives/selectable.directive';
+
+// Testing
+export * from './lib/vflow/testing-utils/provide-custom-node-mocks';
