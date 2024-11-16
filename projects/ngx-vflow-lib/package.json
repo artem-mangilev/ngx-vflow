@@ -16,10 +16,10 @@
     "type": "git"
   },
   "scripts": {
-    "publish:major": "npm version major && ng build ngx-vflow-lib && cd ../../dist/ngx-vflow-lib && npm publish",
-    "publish:minor": "npm version minor && ng build ngx-vflow-lib && cd ../../dist/ngx-vflow-lib && npm publish",
-    "publish:preminor": "npm version preminor && ng build ngx-vflow-lib && cd ../../dist/ngx-vflow-lib && npm publish",
-    "publish:patch": "npm version patch && ng build ngx-vflow-lib && cd ../../dist/ngx-vflow-lib && npm publish"
+    "publish:major": "ng test && npm version major && ng build ngx-vflow-lib && cd ../../dist/ngx-vflow-lib && npm publish",
+    "publish:minor": "ng test && npm version minor && ng build ngx-vflow-lib && cd ../../dist/ngx-vflow-lib && npm publish",
+    "publish:preminor": "ng test && npm version preminor && ng build ngx-vflow-lib && cd ../../dist/ngx-vflow-lib && npm publish",
+    "publish:patch": "ng test && npm version patch && ng build ngx-vflow-lib && cd ../../dist/ngx-vflow-lib && npm publish"
   },
   "peerDependencies": {
     "@angular/common": "^16.2.0 || 17.x || 18.x",
