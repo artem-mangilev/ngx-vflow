@@ -56,6 +56,15 @@ export class DraggableService {
     let initialPositions: Point[] = []
 
     return drag()
+      .filter((event: Event) => {
+        // TODO potential bug with deep nested elements of drag element
+
+        if (model.dragHandles().length) {
+          return model.dragHandles().includes(event.target as Element)
+        }
+
+        return true
+      })
       .on('start', (event: DragEvent) => {
         dragNodes = this.getDragNodes(model)
 
