@@ -22,7 +22,10 @@ export type HandleState = 'valid' | 'invalid' | 'idle'
   templateUrl: './node.component.html',
   styleUrls: ['./node.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [HandleService, NodeAccessorService]
+  providers: [HandleService, NodeAccessorService],
+  host: {
+    'class': 'vflow-node',
+  }
 })
 export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInjector {
   public injector = inject(Injector)
