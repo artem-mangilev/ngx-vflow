@@ -6,7 +6,7 @@ import { ComponentDynamicNode, ComponentNode } from "../../interfaces/node.inter
 
 @Directive()
 export abstract class CustomNodeBaseComponent<T = unknown> implements OnInit {
-  private eventBus = inject(ComponentEventBusService, { optional: true })
+  private eventBus = inject(ComponentEventBusService)
 
   protected destroyRef = inject(DestroyRef)
 
@@ -28,11 +28,9 @@ export abstract class CustomNodeBaseComponent<T = unknown> implements OnInit {
   public data = signal<T | undefined>(undefined)
 
   public ngOnInit(): void {
-    if (this.eventBus) {
-      this.trackEvents()
-        .pipe(takeUntilDestroyed(this.destroyRef))
-        .subscribe()
-    }
+    this.trackEvents()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe()
   }
 
   private trackEvents() {
@@ -51,7 +49,7 @@ export abstract class CustomNodeBaseComponent<T = unknown> implements OnInit {
       ...Array.from(emitters.keys()).map(emitter =>
         emitter.pipe(
           tap((event) => {
-            this.eventBus!.pushEvent({
+            this.eventBus.pushEvent({
               nodeId: this.node.id,
               eventName: emitters.get(emitter)!,
               eventPayload: event

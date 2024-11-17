@@ -31,9 +31,14 @@ export * from './lib/vflow/public-components/custom-node/custom-node.component';
 export * from './lib/vflow/public-components/custom-dynamic-node/custom-dynamic-node.component';
 export * from './lib/vflow/public-components/resizable/resizable.component';
 export * from './lib/vflow/public-components/minimap/minimap.component'
+export * from './lib/vflow/public-components/node-toolbar/node-toolbar.component'
 
 // Directives
 export * from './lib/vflow/directives/template.directive';
 export * from './lib/vflow/directives/connection-controller.directive';
 export * from './lib/vflow/directives/changes-controller.directive';
 export * from './lib/vflow/directives/selectable.directive';
+export * from './lib/vflow/directives/drag-handle.directive';
+
+// Testing
+export * from './lib/vflow/testing-utils/provide-custom-node-mocks';

@@ -21,6 +21,8 @@ import { FlowSizeControllerDirective } from './directives/flow-size-controller.d
 import { ResizableComponent } from './public-components/resizable/resizable.component';
 import { MiniMapComponent } from './public-components/minimap/minimap.component';
 import { DefaultNodeComponent } from './components/default-node/default-node.component';
+import { NodeToolbarComponent, NodeToolbarWrapperDirective } from './public-components/node-toolbar/node-toolbar.component';
+import { DragHandleDirective } from './directives/drag-handle.directive';
 
 const components = [
   VflowComponent,
@@ -33,7 +35,8 @@ const components = [
   DefsComponent,
   BackgroundComponent,
   ResizableComponent,
-  MiniMapComponent
+  MiniMapComponent,
+  NodeToolbarComponent
 ]
 
 const directives = [
@@ -43,9 +46,11 @@ const directives = [
   RootSvgContextDirective,
   HandleSizeControllerDirective,
   SelectableDirective,
+  DragHandleDirective,
   PointerDirective,
   RootPointerDirective,
   FlowSizeControllerDirective,
+  NodeToolbarWrapperDirective
 ]
 
 const templateDirectives = [
@@ -65,6 +70,8 @@ const templateDirectives = [
     ResizableComponent,
     SelectableDirective,
     MiniMapComponent,
+    NodeToolbarComponent,
+    DragHandleDirective,
     ...templateDirectives
   ],
   declarations: [...components, ...directives, ...templateDirectives],

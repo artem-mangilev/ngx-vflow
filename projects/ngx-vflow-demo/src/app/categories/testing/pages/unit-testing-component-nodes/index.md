@@ -1,14 +1,11 @@
-import { Component } from "@angular/core";
-import { CustomNodeComponent } from "./custom-node.component";
-import { TestBed, ComponentFixture } from '@angular/core/testing';
-import { provideCustomNodeMocks } from "../../testing-utils/provide-custom-node-mocks";
-import { VflowModule } from "../../vflow.module";
+# {{ NgDocPage.title }}
 
+To simplify writing isolated tests for component nodes, you can use the `provideCustomNodeMocks` function. This helps prevent dependency injection (DI) errors that occur when a node is used outside the scope of the `VflowComponent`.
+
+```ts
 @Component({
   standalone: true,
-  template: `<div resizable selectable dragHandle>
-    <handle />
-  </div>`,
+  template: `<div resizable><handle /></div>`,
   imports: [VflowModule]
 })
 class TestCustomNodeComponent extends CustomNodeComponent { }
@@ -32,3 +29,4 @@ describe(('TestCustomNodeComponent'), () => {
     expect(component).toBeTruthy();
   });
 })
+```

@@ -19,9 +19,8 @@ export class DraggableService {
    * @param model model with data for this element
    */
   public enable(element: Element, model: NodeModel) {
-    const d3Element = select(element)
-
-    d3Element.call(this.getDragBehavior(model))
+    select(element)
+      .call(this.getDragBehavior(model))
   }
 
   /**
@@ -31,9 +30,8 @@ export class DraggableService {
    * @param model model with data for this element
    */
   public disable(element: Element) {
-    const d3Element = select(element)
-
-    d3Element.call(this.getIgnoreDragBehavior())
+    select(element)
+      .call(drag().on('drag', null))
   }
 
   /**
@@ -55,7 +53,17 @@ export class DraggableService {
     let dragNodes: NodeModel[] = []
     let initialPositions: Point[] = []
 
+    const filterCondition = (event: Event) => {
+      // if there is at least one drag handle, we should check if we are dragging it
+      if (model.dragHandlesCount()) {
+        return !!(event.target as Element).closest('.vflow-drag-handle')
+      }
+
+      return true
+    }
+
     return drag()
+      .filter(filterCondition)
       .on('start', (event: DragEvent) => {
         dragNodes = this.getDragNodes(model)
 
@@ -77,17 +85,6 @@ export class DraggableService {
       })
   }
 
-  /**
-   * Specify ignoring drag behavior. It's responsible for not moving the map when user tries to drag node
-   * with disabled drag behavior
-   */
-  private getIgnoreDragBehavior() {
-    return drag()
-      .on('drag', (event: DragEvent) => {
-        (event.sourceEvent as Event).stopPropagation()
-      })
-  }
-
   private getDragNodes(model: NodeModel) {
     return model.selected()
       ? this.entitiesService
@@ -97,6 +94,8 @@ export class DraggableService {
       // we only can move current node if it's not selected
       : [model]
   }
+
+
 }
 
 function moveNode(model: NodeModel, point: Point) {

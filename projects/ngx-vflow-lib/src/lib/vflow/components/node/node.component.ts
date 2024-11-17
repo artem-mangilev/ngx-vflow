@@ -13,6 +13,7 @@ import { SelectionService } from '../../services/selection.service';
 import { ConnectionControllerDirective } from '../../directives/connection-controller.directive';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NodeAccessorService } from '../../services/node-accessor.service';
+import { OverlaysService } from '../../services/overlays.service';
 
 export type HandleState = 'valid' | 'invalid' | 'idle'
 
@@ -21,7 +22,10 @@ export type HandleState = 'valid' | 'invalid' | 'idle'
   templateUrl: './node.component.html',
   styleUrls: ['./node.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [HandleService, NodeAccessorService]
+  providers: [HandleService, NodeAccessorService],
+  host: {
+    'class': 'vflow-node',
+  }
 })
 export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInjector {
   public injector = inject(Injector)
@@ -33,7 +37,8 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInje
   private selectionService = inject(SelectionService)
   private hostRef = inject<ElementRef<SVGElement>>(ElementRef)
   private connectionController = inject(ConnectionControllerDirective)
-  private nodeAccessor = inject(NodeAccessorService);
+  private nodeAccessor = inject(NodeAccessorService)
+  private overlaysService = inject(OverlaysService)
   private zone = inject(NgZone)
 
   @Input()
@@ -58,6 +63,8 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInje
 
   protected styleWidth = computed(() => `${this.nodeModel.size().width}px`)
   protected styleHeight = computed(() => `${this.nodeModel.size().height}px`)
+
+  protected toolbar = computed(() => this.overlaysService.nodeToolbars().get(this.nodeModel))
 
   @InjectionContext
   public ngOnInit() {

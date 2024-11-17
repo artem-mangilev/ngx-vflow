@@ -35,6 +35,7 @@ import { Optimization } from '../../interfaces/optimization.interface';
 import { KeyboardShortcuts } from '../../types/keyboard-action.type';
 import { KeyboardService } from '../../services/keyboard.service';
 import { transformBackground } from '../../utils/transform-background';
+import { OverlaysService } from '../../services/overlays.service';
 
 const connectionControllerHostDirective = {
   directive: ConnectionControllerDirective,
@@ -92,7 +93,8 @@ const changesControllerHostDirective = {
     SelectionService,
     FlowSettingsService,
     ComponentEventBusService,
-    KeyboardService
+    KeyboardService,
+    OverlaysService
   ],
   hostDirectives: [
     connectionControllerHostDirective,

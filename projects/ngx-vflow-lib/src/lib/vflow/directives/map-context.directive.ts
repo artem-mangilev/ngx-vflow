@@ -72,9 +72,10 @@ export class MapContextDirective implements OnInit {
   public ngOnInit(): void {
     this.zoomBehavior = zoom<SVGSVGElement, unknown>()
       .scaleExtent([this.flowSettingsService.minZoom(), this.flowSettingsService.maxZoom()])
-      .on('start', (event: ZoomEvent) => this.onD3zoomStart(event))
-      .on('zoom', (event: ZoomEvent) => this.handleZoom(event))
-      .on('end', (event: ZoomEvent) => this.onD3zoomEnd(event))
+      .filter(this.filterCondition)
+      .on('start', this.handleZoomStart)
+      .on('zoom', this.handleZoom)
+      .on('end', this.handleZoomEnd)
 
     this.rootSvgSelection
       .call(this.zoomBehavior)
@@ -88,13 +89,13 @@ export class MapContextDirective implements OnInit {
     this.zoomableSelection.attr('transform', transform.toString())
   }
 
-  private onD3zoomStart({ transform }: ZoomEvent) {
+  private handleZoomStart = ({ transform }: ZoomEvent) => {
     this.viewportForSelection = {
       start: mapTransformToViewportState(transform)
     }
   }
 
-  private onD3zoomEnd({ transform, sourceEvent }: ZoomEvent) {
+  private handleZoomEnd = ({ transform, sourceEvent }: ZoomEvent) => {
     this.viewportForSelection = {
       ...this.viewportForSelection,
       end: mapTransformToViewportState(transform),
@@ -104,6 +105,14 @@ export class MapContextDirective implements OnInit {
     this.selectionService.setViewport(
       this.viewportForSelection as ViewportForSelection
     )
+  }
+
+  private filterCondition = (event: Event) => {
+    if (event.type === 'mousedown' || event.type === 'touchstart') {
+      return (event.target as Element).closest('.vflow-node') === null
+    }
+
+    return true
   }
 }
 
