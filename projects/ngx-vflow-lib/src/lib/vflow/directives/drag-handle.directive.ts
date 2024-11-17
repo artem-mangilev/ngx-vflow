@@ -1,9 +1,13 @@
 import { DestroyRef, Directive, ElementRef, inject } from '@angular/core';
 import { NodeAccessorService } from '../services/node-accessor.service';
 
-@Directive({ selector: '[dragHandle]' })
+@Directive({
+  selector: '[dragHandle]',
+  host: {
+    'class': 'vflow-drag-handle'
+  }
+})
 export class DragHandleDirective {
-  private handleElement = inject<ElementRef<Element>>(ElementRef).nativeElement
   private nodeAccessor = inject(NodeAccessorService)
 
   private get model() {
@@ -11,14 +15,10 @@ export class DragHandleDirective {
   }
 
   constructor() {
-    this.model.dragHandles.update(
-      elements => [...elements, this.handleElement]
-    )
+    this.model.dragHandlesCount.update((count) => count + 1)
 
     inject(DestroyRef).onDestroy(() => {
-      this.model.dragHandles.update(
-        elements => elements.filter(element => element !== this.handleElement)
-      )
+      this.model.dragHandlesCount.update(count => count - 1)
     })
   }
 }

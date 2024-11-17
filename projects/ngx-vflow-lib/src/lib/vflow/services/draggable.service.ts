@@ -55,16 +55,17 @@ export class DraggableService {
     let dragNodes: NodeModel[] = []
     let initialPositions: Point[] = []
 
+    const filterCondition = (event: Event) => {
+      // if there is at least one drag handle, we should check if we are dragging it
+      if (model.dragHandlesCount()) {
+        return !!(event.target as Element).closest('.vflow-drag-handle')
+      }
+
+      return true
+    }
+
     return drag()
-      .filter((event: Event) => {
-        // TODO potential bug with deep nested elements of drag element
-
-        if (model.dragHandles().length) {
-          return model.dragHandles().includes(event.target as Element)
-        }
-
-        return true
-      })
+      .filter(filterCondition)
       .on('start', (event: DragEvent) => {
         dragNodes = this.getDragNodes(model)
 
@@ -106,6 +107,8 @@ export class DraggableService {
       // we only can move current node if it's not selected
       : [model]
   }
+
+
 }
 
 function moveNode(model: NodeModel, point: Point) {

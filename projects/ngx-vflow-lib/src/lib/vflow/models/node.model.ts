@@ -77,7 +77,7 @@ export class NodeModel<T = unknown> implements FlowEntity {
 
   public draggable = signal(true)
 
-  public dragHandles = signal<Element[]>([])
+  public dragHandlesCount = signal(0)
 
   // disabled for configuration for now
   public readonly magnetRadius = 20
