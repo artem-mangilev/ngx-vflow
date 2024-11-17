@@ -6,7 +6,7 @@ import { VflowModule } from "../../vflow.module";
 
 @Component({
   standalone: true,
-  template: `<div resizable selectable>
+  template: `<div resizable selectable dragHandle>
     <handle />
   </div>`,
   imports: [VflowModule]
