@@ -19,9 +19,8 @@ export class DraggableService {
    * @param model model with data for this element
    */
   public enable(element: Element, model: NodeModel) {
-    const d3Element = select(element)
-
-    d3Element.call(this.getDragBehavior(model))
+    select(element)
+      .call(this.getDragBehavior(model))
   }
 
   /**
@@ -31,9 +30,8 @@ export class DraggableService {
    * @param model model with data for this element
    */
   public disable(element: Element) {
-    const d3Element = select(element)
-
-    d3Element.call(this.getIgnoreDragBehavior())
+    select(element)
+      .call(drag().on('drag', null))
   }
 
   /**
@@ -84,17 +82,6 @@ export class DraggableService {
 
           moveNode(model, point)
         })
-      })
-  }
-
-  /**
-   * Specify ignoring drag behavior. It's responsible for not moving the map when user tries to drag node
-   * with disabled drag behavior
-   */
-  private getIgnoreDragBehavior() {
-    return drag()
-      .on('drag', (event: DragEvent) => {
-        (event.sourceEvent as Event).stopPropagation()
       })
   }
 
