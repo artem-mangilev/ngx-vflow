@@ -1,4 +1,4 @@
-export type Background = ColorBackground | DotsBackground
+export type Background = ColorBackground | DotsBackground | ImageBackground
 
 export interface ColorBackground {
   type: 'solid'
@@ -26,4 +26,9 @@ export interface DotsBackground {
    * Color behind tha dot pattern
    */
   backgroundColor?: string
+}
+
+export interface ImageBackground {
+  type: 'image'
+  src: string
 }

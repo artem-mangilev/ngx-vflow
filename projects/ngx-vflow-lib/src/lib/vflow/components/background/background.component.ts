@@ -37,7 +37,15 @@ export class BackgroundComponent {
 
   protected y = computed(() => this.viewportService.readableViewport().y % this.scaledGap())
 
-  protected patternColor = computed(() => this.backgroundSignal().color ?? defaultDotColor)
+  protected patternColor = computed(() => {
+    const bg = this.backgroundSignal()
+
+    if (bg.type === 'dots') {
+      return bg.color ?? defaultDotColor
+    }
+
+    return defaultDotColor
+  })
 
   protected patternSize = computed(() => {
     const background = this.backgroundSignal()
