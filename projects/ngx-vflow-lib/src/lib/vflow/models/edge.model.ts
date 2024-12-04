@@ -99,6 +99,13 @@ export class EdgeModel implements FlowEntity {
           source.rawHandle.position,
           target.rawHandle.position,
         )
+      case 'step':
+        return smoothStepPath(
+          source.pointAbsolute(), target.pointAbsolute(),
+          source.rawHandle.position,
+          target.rawHandle.position,
+          0
+        )
     }
   })
 

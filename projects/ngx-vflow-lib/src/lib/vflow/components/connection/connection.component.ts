@@ -59,6 +59,11 @@ export class ConnectionComponent {
           sourcePoint, targetPoint,
           sourcePosition, targetPosition,
         ).path
+        case 'step': return smoothStepPath(
+          sourcePoint, targetPoint,
+          sourcePosition, targetPosition,
+          0
+        ).path
       }
     }
 
@@ -85,6 +90,11 @@ export class ConnectionComponent {
         case 'smooth-step': return smoothStepPath(
           sourcePoint, targetPoint,
           sourcePosition, targetPosition,
+        ).path
+        case 'step': return smoothStepPath(
+          sourcePoint, targetPoint,
+          sourcePosition, targetPosition,
+          0
         ).path
       }
     }
