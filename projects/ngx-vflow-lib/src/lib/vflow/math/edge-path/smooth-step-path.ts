@@ -50,7 +50,7 @@ function getPoints({
   target: Point;
   targetPosition: Position;
   offset: number;
-}): [Point[], number, number, number, number] {
+}): [Point[], number, number] {
   const sourceDir = handleDirections[sourcePosition];
   const targetDir = handleDirections[targetPosition];
   const sourceGapped: Point = { x: source.x + sourceDir.x * offset, y: source.y + sourceDir.y * offset };
@@ -68,12 +68,10 @@ function getPoints({
   const sourceGapOffset = { x: 0, y: 0 };
   const targetGapOffset = { x: 0, y: 0 };
 
-  const [defaultCenterX, defaultCenterY, defaultOffsetX, defaultOffsetY] = getEdgeCenter(source, target);
+  const [defaultCenterX, defaultCenterY] = getEdgeCenter(source, target);
 
   // opposite handle positions, default case
   if (sourceDir[dirAccessor] * targetDir[dirAccessor] === -1) {
-    // centerX = center.x ?? defaultCenterX;
-    // centerY = center.y ?? defaultCenterY;
     centerX = defaultCenterX;
     centerY = defaultCenterY;
     //    --->
@@ -159,7 +157,7 @@ function getPoints({
     target,
   ];
 
-  return [pathPoints, centerX, centerY, defaultOffsetX, defaultOffsetY];
+  return [pathPoints, centerX, centerY];
 }
 
 function getBend(a: Point, b: Point, c: Point, size: number): string {
@@ -183,24 +181,19 @@ function getBend(a: Point, b: Point, c: Point, size: number): string {
   return `L ${x},${y + bendSize * yDir}Q ${x},${y} ${x + bendSize * xDir},${y}`;
 }
 
-/**
- * TODO: check offset purpose
- * TODO: check center purpose
-*/
 export function smoothStepPath(
   source: Point,
   target: Point,
   sourcePosition: Position,
   targetPosition: Position,
-  offset: number,
-  borderRadius: number = 20
+  borderRadius: number = 5
 ): PathData {
-  const [points, labelX, labelY, offsetX, offsetY] = getPoints({
+  const [points, labelX, labelY] = getPoints({
     source,
     sourcePosition,
     target,
     targetPosition,
-    offset,
+    offset: 20
   });
 
   const path = points.reduce<string>((res, p, i) => {
@@ -220,9 +213,10 @@ export function smoothStepPath(
   return {
     path,
     points: {
-      start: { x: 0, y: 0 },
+      // TODO start and end points temporary unavailable for this path
+      start: { x: labelX, y: labelY },
       center: { x: labelX, y: labelY },
-      end: { x: 0, y: 0 },
+      end: { x: labelX, y: labelY },
     }
   }
 }

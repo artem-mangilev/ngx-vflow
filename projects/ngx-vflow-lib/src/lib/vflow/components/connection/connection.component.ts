@@ -6,6 +6,7 @@ import { ConnectionModel } from '../../models/connection.model';
 import { bezierPath } from '../../math/edge-path/bezier-path';
 import { hashCode } from '../../utils/hash';
 import { Position } from '../../types/position.type';
+import { smoothStepPath } from '../../math/edge-path/smooth-step-path';
 
 @Component({
   selector: 'g[connection]',
@@ -54,6 +55,10 @@ export class ConnectionComponent {
           sourcePoint, targetPoint,
           sourcePosition, targetPosition
         ).path
+        case 'smooth-step': return smoothStepPath(
+          sourcePoint, targetPoint,
+          sourcePosition, targetPosition,
+        ).path
       }
     }
 
@@ -76,6 +81,10 @@ export class ConnectionComponent {
         case 'bezier': return bezierPath(
           sourcePoint, targetPoint,
           sourcePosition, targetPosition
+        ).path
+        case 'smooth-step': return smoothStepPath(
+          sourcePoint, targetPoint,
+          sourcePosition, targetPosition,
         ).path
       }
     }

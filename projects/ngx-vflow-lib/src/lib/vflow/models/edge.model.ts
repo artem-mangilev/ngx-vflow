@@ -98,7 +98,6 @@ export class EdgeModel implements FlowEntity {
           source.pointAbsolute(), target.pointAbsolute(),
           source.rawHandle.position,
           target.rawHandle.position,
-          20
         )
     }
   })
