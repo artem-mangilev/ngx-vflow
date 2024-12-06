@@ -23,3 +23,28 @@
     [attr.fill]="patternUrl"
   />
 </ng-container>
+
+<ng-container *ngIf="backgroundSignal().type === 'image'">
+  <svg:pattern
+    [attr.id]="patternId"
+    [attr.x]="imageX()"
+    [attr.y]="imageY()"
+    [attr.width]="scaledImageWidth()"
+    [attr.height]="scaledImageHeight()"
+    patternUnits="userSpaceOnUse"
+  >
+    <svg:image
+      [attr.href]="bgImageSrc()"
+      [attr.width]="scaledImageWidth()"
+      [attr.height]="scaledImageHeight()"
+    />
+  </svg:pattern>
+
+  <svg:rect
+    x="0"
+    y="0"
+    width="100%"
+    height="100%"
+    [attr.fill]="patternUrl"
+  />
+</ng-container>

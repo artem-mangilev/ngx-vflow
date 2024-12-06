@@ -31,4 +31,6 @@ export interface DotsBackground {
 export interface ImageBackground {
   type: 'image'
   src: string
+  fixed?: boolean
+  scale?: number
 }
