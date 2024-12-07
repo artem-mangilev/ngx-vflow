@@ -17,21 +17,27 @@ export class CurvesDemoComponent {
   public nodes: Node[] = [
     {
       id: '1',
-      point: { x: 10, y: 200 },
+      point: { x: 30, y: 100 },
       type: 'default',
       text: '1'
     },
     {
       id: '2',
-      point: { x: 200, y: 100 },
+      point: { x: 220, y: 0 },
       type: 'default',
       text: '2'
     },
     {
       id: '3',
-      point: { x: 200, y: 300 },
+      point: { x: 220, y: 200 },
       type: 'default',
       text: '3'
+    },
+    {
+      id: '4',
+      point: { x: 30, y: 300 },
+      type: 'default',
+      text: '4'
     },
   ]
 
@@ -48,10 +54,16 @@ export class CurvesDemoComponent {
       target: '3',
       curve: 'straight'
     },
+    {
+      id: '1 -> 4',
+      source: '1',
+      target: '4',
+      curve: 'smooth-step'
+    },
   ]
 
   public connectionSettings: ConnectionSettings = {
-    curve: 'straight'
+    curve: 'smooth-step'
   }
 }
 

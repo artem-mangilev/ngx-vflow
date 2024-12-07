@@ -13,3 +13,9 @@ To select a color, simply pass a color string it to the `[background]` input.
 To make dots pattern, pass an object to the `[background]` input according to `DotsBackground` interface
 
 {{ NgDocActions.demoPane("DotsCustomBackgroundDemoComponent") }}
+
+## Image background
+
+To make an image background, pass an object to the `[background]` input according to `ImageBackground` interface
+
+{{ NgDocActions.demoPane("ImageCustomBackgroundDemoComponent") }}

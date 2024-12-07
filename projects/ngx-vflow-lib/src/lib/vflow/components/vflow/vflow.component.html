@@ -21,24 +21,56 @@
       [template]="connectionTemplateDirective?.templateRef"
     />
 
-    <!-- Edges  -->
-    <svg:g
-      *ngFor="let model of edgeModels(); trackBy: trackEdges"
-      edge
-      [model]="model"
-      [edgeTemplate]="edgeTemplateDirective?.templateRef"
-      [edgeLabelHtmlTemplate]="edgeLabelHtmlDirective?.templateRef"
-    />
+    <ng-container *ngIf="optimization.detachedGroupsLayer">
+      <!-- Groups -->
+      <svg:g
+        *ngFor="let model of groups(); trackBy: trackNodes"
+        node
+        [nodeModel]="model"
+        [groupNodeTemplate]="groupNodeTemplateDirective?.templateRef"
+        [attr.transform]="model.pointTransform()"
+      />
 
-    <!-- Nodes -->
-    <svg:g
-      *ngFor="let model of nodeModels(); trackBy: trackNodes"
-      node
-      [nodeModel]="model"
-      [nodeTemplate]="nodeTemplateDirective?.templateRef"
-      [groupNodeTemplate]="groupNodeTemplateDirective?.templateRef"
-      [attr.transform]="model.pointTransform()"
-    />
+      <!-- Edges  -->
+      <svg:g
+        *ngFor="let model of edgeModels(); trackBy: trackEdges"
+        edge
+        [model]="model"
+        [edgeTemplate]="edgeTemplateDirective?.templateRef"
+        [edgeLabelHtmlTemplate]="edgeLabelHtmlDirective?.templateRef"
+      />
+
+      <!-- Nodes -->
+      <svg:g
+        *ngFor="let model of nonGroups(); trackBy: trackNodes"
+        node
+        [nodeModel]="model"
+        [nodeTemplate]="nodeTemplateDirective?.templateRef"
+        [attr.transform]="model.pointTransform()"
+      />
+    </ng-container>
+
+    <ng-container *ngIf="!optimization.detachedGroupsLayer">
+      <!-- Edges  -->
+      <svg:g
+        *ngFor="let model of edgeModels(); trackBy: trackEdges"
+        edge
+        [model]="model"
+        [edgeTemplate]="edgeTemplateDirective?.templateRef"
+        [edgeLabelHtmlTemplate]="edgeLabelHtmlDirective?.templateRef"
+      />
+
+      <!-- Nodes -->
+      <svg:g
+        *ngFor="let model of nodeModels(); trackBy: trackNodes"
+        node
+        [nodeModel]="model"
+        [nodeTemplate]="nodeTemplateDirective?.templateRef"
+        [groupNodeTemplate]="groupNodeTemplateDirective?.templateRef"
+        [attr.transform]="model.pointTransform()"
+      />
+    </ng-container>
+
   </svg:g>
 
   <!-- Minimap -->

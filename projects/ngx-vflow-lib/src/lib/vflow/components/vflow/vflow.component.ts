@@ -167,7 +167,8 @@ export class VflowComponent implements OnInit {
 
   @Input()
   public optimization: Optimization = {
-    computeLayersOnInit: true
+    computeLayersOnInit: true,
+    detachedGroupsLayer: false
   }
 
   /**
@@ -211,6 +212,8 @@ export class VflowComponent implements OnInit {
   }
 
   protected nodeModels = computed(() => this.nodeRenderingService.nodes())
+  protected groups = computed(() => this.nodeRenderingService.groups())
+  protected nonGroups = computed(() => this.nodeRenderingService.nonGroups())
 
   /**
    * Edges to render

@@ -61,7 +61,15 @@ export class MiniMapComponent implements OnInit {
     return 0.2
   })
 
-  protected viewportColor = computed(() => this.flowSettingsService.background().color ?? '#fff')
+  protected viewportColor = computed(() => {
+    const bg = this.flowSettingsService.background()
+
+    if (bg.type === 'dots' || bg.type === 'solid') {
+      return bg.color ?? '#fff'
+    }
+
+    return '#fff'
+  })
 
   protected hovered = signal(false)
 

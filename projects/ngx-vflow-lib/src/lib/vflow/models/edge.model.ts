@@ -9,6 +9,7 @@ import { UsingPoints } from "../types/using-points.type";
 import { HandleModel } from "./handle.model";
 import { toObservable } from "@angular/core/rxjs-interop";
 import { FlowEntity } from "../interfaces/flow-entity.interface";
+import { smoothStepPath } from "../math/edge-path/smooth-step-path";
 
 export class EdgeModel implements FlowEntity {
   public source = signal<NodeModel | undefined>(undefined)
@@ -91,6 +92,19 @@ export class EdgeModel implements FlowEntity {
           source.rawHandle.position,
           target.rawHandle.position,
           this.usingPoints
+        )
+      case 'smooth-step':
+        return smoothStepPath(
+          source.pointAbsolute(), target.pointAbsolute(),
+          source.rawHandle.position,
+          target.rawHandle.position,
+        )
+      case 'step':
+        return smoothStepPath(
+          source.pointAbsolute(), target.pointAbsolute(),
+          source.rawHandle.position,
+          target.rawHandle.position,
+          0
         )
     }
   })
