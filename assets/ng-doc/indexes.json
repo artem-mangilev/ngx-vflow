@@ -1,27 +1,15 @@
 [
   {
     "breadcrumbs": [
-      "Workshops",
-      "Delete selected"
+      "Getting Started",
+      "Roadmap"
     ],
     "pageType": "guide",
-    "title": "Delete selected",
-    "section": "Delete selected",
-    "route": "/workshops/delete-selected",
-    "fragment": "delete-selected",
-    "content": "This workshop will show you how to implement deletion of nodes and edges."
-  },
-  {
-    "breadcrumbs": [
-      "Workshops",
-      "Drag and drop nodes"
-    ],
-    "pageType": "guide",
-    "title": "Drag and drop nodes",
-    "section": "Drag and drop nodes",
-    "route": "/workshops/drag-and-drop-nodes",
-    "fragment": "drag-and-drop-nodes",
-    "content": "This workshop will show you how to implement dynamic node creation with basic drag and drop implementation. This implementation uses documentPointToFlowPoint() method of VflowComponent that translates document coordinate to vflow coordinate."
+    "title": "Roadmap",
+    "section": "Roadmap",
+    "route": "/getting-started/roadmap",
+    "fragment": "roadmap",
+    "content": "This is a roadmap for ngx-vflow: improve consistency across browsers (mainly appeals to Safari)improve documentationmore curvescustom SVG shapesmultiselect nodesfloating edgesplugin systemminimapnode rotationUI controls for flowsupport for more layout engines (Dagree, etc.)more complex background (patterns)modal system for context menulazy loading nodes based on current viewport (decrease initial bundle)HTML-based renderer as alternative to current SVG-based rendererExperimental canvas/webgl renderer for insane performance"
   },
   {
     "breadcrumbs": [
@@ -110,14 +98,38 @@
   {
     "breadcrumbs": [
       "Getting Started",
-      "Roadmap"
+      "Principles"
     ],
     "pageType": "guide",
-    "title": "Roadmap",
-    "section": "Roadmap",
-    "route": "/getting-started/roadmap",
-    "fragment": "roadmap",
-    "content": "This is a roadmap for ngx-vflow: improve consistency across browsers (mainly appeals to Safari)improve documentationmore curvescustom SVG shapesmultiselect nodesfloating edgesplugin systemminimapnode rotationUI controls for flowsupport for more layout engines (Dagree, etc.)more complex background (patterns)modal system for context menulazy loading nodes based on current viewport (decrease initial bundle)HTML-based renderer as alternative to current SVG-based rendererExperimental canvas/webgl renderer for insane performance"
+    "title": "Principles",
+    "section": "Principles",
+    "route": "/getting-started/principles",
+    "fragment": "principles",
+    "content": "This page contains a list of general principles that impact feature implementation. No hidden mutations of your data. For example, the library does not modify any of the Node or Edge objects you pass in as inputs. Instead, it creates internal models around these entities and operates on them. Any changes to the passed entities can be observed through events.This principle also implies that you are responsible for managing invalid data. For instance, if you delete a node, the edges corresponding to this node will not be deleted automatically. However, the library will notify you about detached edges so that you can easily delete them."
+  },
+  {
+    "breadcrumbs": [
+      "Getting Started",
+      "How node sizing works"
+    ],
+    "pageType": "guide",
+    "title": "How node sizing works",
+    "section": "How node sizing works",
+    "route": "/getting-started/how-node-sizing-works",
+    "fragment": "how-node-sizing-works",
+    "content": "This topic needs some clarification due to the design decisions behind the library. The library renders the flow by combining two technologies: SVG, which is responsible for rendering curves, managing zoom, pan, and other tasks that SVG handles well.HTML (with CSS), which is used to create the content for the nodes, allowing front-end engineers to design dynamic and visually appealing UIs more easily than with SVG. The link between these two technologies is the "
+  },
+  {
+    "breadcrumbs": [
+      "Getting Started",
+      "How node sizing works"
+    ],
+    "pageType": "guide",
+    "title": "How node sizing works",
+    "section": "How node sizing works",
+    "route": "/getting-started/how-node-sizing-works",
+    "fragment": "how-node-sizing-works",
+    "content": " element, which enables HTML to be rendered inside SVG. The diagram below illustrates how this element interacts with its content."
   },
   {
     "breadcrumbs": [
@@ -166,66 +178,6 @@
     "route": "/features/choose-direction",
     "fragment": "top-to-bottom-direction",
     "content": "To archive this direction, you pass { source: 'bottom', target: 'top' } to [handlePositions]."
-  },
-  {
-    "breadcrumbs": [
-      "Getting Started",
-      "Principles"
-    ],
-    "pageType": "guide",
-    "title": "Principles",
-    "section": "Principles",
-    "route": "/getting-started/principles",
-    "fragment": "principles",
-    "content": "This page contains a list of general principles that impact feature implementation. No hidden mutations of your data. For example, the library does not modify any of the Node or Edge objects you pass in as inputs. Instead, it creates internal models around these entities and operates on them. Any changes to the passed entities can be observed through events.This principle also implies that you are responsible for managing invalid data. For instance, if you delete a node, the edges corresponding to this node will not be deleted automatically. However, the library will notify you about detached edges so that you can easily delete them."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Custom background"
-    ],
-    "pageType": "guide",
-    "title": "Custom background",
-    "section": "Custom background",
-    "route": "/features/custom-background",
-    "fragment": "custom-background",
-    "content": "You're able to select background for your flow."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Custom background"
-    ],
-    "pageType": "guide",
-    "title": "Custom background",
-    "section": "Solid color",
-    "route": "/features/custom-background",
-    "fragment": "solid-color",
-    "content": "To select a color, simply pass a color string it to the [background] input."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Custom background"
-    ],
-    "pageType": "guide",
-    "title": "Custom background",
-    "section": "Dots pattern",
-    "route": "/features/custom-background",
-    "fragment": "dots-pattern",
-    "content": "To make dots pattern, pass an object to the [background] input according to DotsBackground interface"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Connection validation"
-    ],
-    "pageType": "guide",
-    "title": "Connection validation",
-    "section": "Connection validation",
-    "route": "/features/connection-validation",
-    "fragment": "connection-validation",
-    "content": "ngx-vflow supports real-time synchronous validation of connections. Validation occurs when a user attempts to create a new edge. By default, every connection is valid, but you can provide a ConnectionSettings with a validatior callback where you specify the validation logic. For example, in this case, validation only passes connections from node 1 to node 2. If the validator returns false, the (onConnect) event won't be triggered because there is no valid connection."
   },
   {
     "breadcrumbs": [
@@ -453,7 +405,19 @@
     "section": "Curves",
     "route": "/features/curves",
     "fragment": "curves",
-    "content": "It's possible to set curve for both the edges and connection."
+    "content": "It's possible to set Curve for both the edges and connection."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Connection validation"
+    ],
+    "pageType": "guide",
+    "title": "Connection validation",
+    "section": "Connection validation",
+    "route": "/features/connection-validation",
+    "fragment": "connection-validation",
+    "content": "ngx-vflow supports real-time synchronous validation of connections. Validation occurs when a user attempts to create a new edge. By default, every connection is valid, but you can provide a ConnectionSettings with a validatior callback where you specify the validation logic. For example, in this case, validation only passes connections from node 1 to node 2. If the validator returns false, the (onConnect) event won't be triggered because there is no valid connection."
   },
   {
     "breadcrumbs": [
@@ -805,30 +769,6 @@
   },
   {
     "breadcrumbs": [
-      "Getting Started",
-      "How node sizing works"
-    ],
-    "pageType": "guide",
-    "title": "How node sizing works",
-    "section": "How node sizing works",
-    "route": "/getting-started/how-node-sizing-works",
-    "fragment": "how-node-sizing-works",
-    "content": "This topic needs some clarification due to the design decisions behind the library. The library renders the flow by combining two technologies: SVG, which is responsible for rendering curves, managing zoom, pan, and other tasks that SVG handles well.HTML (with CSS), which is used to create the content for the nodes, allowing front-end engineers to design dynamic and visually appealing UIs more easily than with SVG. The link between these two technologies is the "
-  },
-  {
-    "breadcrumbs": [
-      "Getting Started",
-      "How node sizing works"
-    ],
-    "pageType": "guide",
-    "title": "How node sizing works",
-    "section": "How node sizing works",
-    "route": "/getting-started/how-node-sizing-works",
-    "fragment": "how-node-sizing-works",
-    "content": " element, which enables HTML to be rendered inside SVG. The diagram below illustrates how this element interacts with its content."
-  },
-  {
-    "breadcrumbs": [
       "Features",
       "Custom handles"
     ],
@@ -874,6 +814,582 @@
     "route": "/features/default-edges",
     "fragment": "default-edges",
     "content": "You can link nodes with edges. All you need to do is to create another Edge[] array and pass it to the vflow component. Each edge contains the id of the source and target nodes, and each edge must have its own id."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Handling changes"
+    ],
+    "pageType": "guide",
+    "title": "Handling changes",
+    "section": "Handling changes",
+    "route": "/features/handling-changes",
+    "fragment": "handling-changes",
+    "content": "You can observe changes in the toasts."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Handling changes"
+    ],
+    "pageType": "guide",
+    "title": "Handling changes",
+    "section": "Handling changes",
+    "route": "/features/handling-changes",
+    "fragment": "handling-changes",
+    "content": "You can observe various changes in nodes and edges. Types of NodeChanges: position - new node position after drag and dropsize - new node sizeadd - when node was createdremove - when node was removedselect - when node was selected (also triggers for unselected nodes) Types of EdgeChanges: add - when edge was createdremove - when edge was removedselect - when edge was selected (also triggers for unselected edges)detached - when edge became invisible due to the absence of the source or target node. Use this to delete such edges from the edges list There are a several ways to receive these changes:"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Handling changes"
+    ],
+    "pageType": "guide",
+    "title": "Handling changes",
+    "section": "From (onNodesChange) and (onEdgesChange) outputs",
+    "route": "/features/handling-changes",
+    "fragment": "from-onnodeschange-and-onedgeschange-outputs",
+    "content": "This is a way to get every possible change. Changes came as non empty arrays: (onNodesChange) emits NodeChange[](onEdgesChange) emits EdgeChange[]"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Handling changes"
+    ],
+    "pageType": "guide",
+    "title": "Handling changes",
+    "section": "From filtered outputs",
+    "route": "/features/handling-changes",
+    "fragment": "from-filtered-outputs",
+    "content": "For your convenience, here is the filtering scheme for changes based on the (onNodesChange) and (onEdgesChange) events: (onNodesChange.[NodeChangeType]) - a list of node changes of a certain type(onNodesChange.[EdgeChangeType]) - a list of edge changes of a certain type(onNodesChange.[NodeChangeType].[Count]) - a list (many) or single (single) node change of a certain type(onEdgesChange.[EdgeChangeType].[Count]) - a list (many) or single (single) edge change of a certain type Where: List of all possible filter outputs:"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Draggables"
+    ],
+    "pageType": "guide",
+    "title": "Draggables",
+    "section": "Disabling",
+    "route": "/features/draggables",
+    "fragment": "disabling",
+    "content": "You can disable draggable behavior on certain Node or DynamicNode by passing false."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Draggables"
+    ],
+    "pageType": "guide",
+    "title": "Draggables",
+    "section": "Drag handle",
+    "route": "/features/draggables",
+    "fragment": "drag-handle",
+    "content": "You can restrict dragging to a specific part of node, by adding dragHandle directive to this element. It's important to note that if a node contains at least one dragHandle, it can only be dragged from those specific areas where dragHandle was added. Otherwise, the entire node can be dragged, provided the draggable property is set to true."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom background"
+    ],
+    "pageType": "guide",
+    "title": "Custom background",
+    "section": "Custom background",
+    "route": "/features/custom-background",
+    "fragment": "custom-background",
+    "content": "You're able to select background for your flow."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom background"
+    ],
+    "pageType": "guide",
+    "title": "Custom background",
+    "section": "Solid color",
+    "route": "/features/custom-background",
+    "fragment": "solid-color",
+    "content": "To select a color, simply pass a color string it to the [background] input."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom background"
+    ],
+    "pageType": "guide",
+    "title": "Custom background",
+    "section": "Dots pattern",
+    "route": "/features/custom-background",
+    "fragment": "dots-pattern",
+    "content": "To make dots pattern, pass an object to the [background] input according to DotsBackground interface"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom background"
+    ],
+    "pageType": "guide",
+    "title": "Custom background",
+    "section": "Image background",
+    "route": "/features/custom-background",
+    "fragment": "image-background",
+    "content": "To make an image background, pass an object to the [background] input according to ImageBackground interface"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Default nodes"
+    ],
+    "pageType": "guide",
+    "title": "Default nodes",
+    "section": "Default nodes",
+    "route": "/features/default-nodes",
+    "fragment": "default-nodes",
+    "content": "To get started, you just need to provide nodes array to vflow component."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Labels"
+    ],
+    "pageType": "guide",
+    "title": "Labels",
+    "section": "Labels",
+    "route": "/features/labels",
+    "fragment": "labels",
+    "content": "You can attach labels to edges by providing the edgeLabels property to the needed Edges. There are three slots available for labels on an edge: start, center, end. The label is only of the html-template type, so you have to provide "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Labels"
+    ],
+    "pageType": "guide",
+    "title": "Labels",
+    "section": "Labels",
+    "route": "/features/labels",
+    "fragment": "labels",
+    "content": " inside vflow."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Labels"
+    ],
+    "pageType": "guide",
+    "title": "Labels",
+    "section": "Context",
+    "route": "/features/labels",
+    "fragment": "context",
+    "content": "You may access some data for label through let-ctx according to this interface."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Keyboard shortcuts"
+    ],
+    "pageType": "guide",
+    "title": "Keyboard shortcuts",
+    "section": "Keyboard shortcuts",
+    "route": "/features/keyboard-shortcuts",
+    "fragment": "keyboard-shortcuts",
+    "content": "You can use keyboard shortcuts to perform additional actions."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Keyboard shortcuts"
+    ],
+    "pageType": "guide",
+    "title": "Keyboard shortcuts",
+    "section": "Defaults",
+    "route": "/features/keyboard-shortcuts",
+    "fragment": "defaults",
+    "content": "Action Default key"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Keyboard shortcuts"
+    ],
+    "pageType": "guide",
+    "title": "Keyboard shortcuts",
+    "section": "Defaults",
+    "route": "/features/keyboard-shortcuts",
+    "fragment": "defaults",
+    "content": "Node multi selection"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Keyboard shortcuts"
+    ],
+    "pageType": "guide",
+    "title": "Keyboard shortcuts",
+    "section": "Defaults",
+    "route": "/features/keyboard-shortcuts",
+    "fragment": "defaults",
+    "content": "CMD"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Keyboard shortcuts"
+    ],
+    "pageType": "guide",
+    "title": "Keyboard shortcuts",
+    "section": "Defaults",
+    "route": "/features/keyboard-shortcuts",
+    "fragment": "defaults",
+    "content": " (Mac) or "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Keyboard shortcuts"
+    ],
+    "pageType": "guide",
+    "title": "Keyboard shortcuts",
+    "section": "Defaults",
+    "route": "/features/keyboard-shortcuts",
+    "fragment": "defaults",
+    "content": "CTRL"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Keyboard shortcuts"
+    ],
+    "pageType": "guide",
+    "title": "Keyboard shortcuts",
+    "section": "Defaults",
+    "route": "/features/keyboard-shortcuts",
+    "fragment": "defaults",
+    "content": " (Other systems)"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Keyboard shortcuts"
+    ],
+    "pageType": "guide",
+    "title": "Keyboard shortcuts",
+    "section": "Customization",
+    "route": "/features/keyboard-shortcuts",
+    "fragment": "customization",
+    "content": "To customize the keyboard shortcuts for specific actions, pass a [keyboardShortcuts] input object to the VflowComponent with the following KeyboardShortcuts interface. Here are some key details: The passed object will be merged with the default key combinations.To disable a specific action, pass null for that action.If you want to trigger an action with multiple keys, pass an array of keys. Note: this is not a key combination. For example, if you pass ['ShiftLeft', 'ControlLeft'], the action will be triggered by either ShiftLeft or ControlLeft, but not by pressing both together (ShiftLeft+ControlLeft).You can find the list of available key codes here. In the following example, the default combination for multiSelection is replaced with ['ShiftLeft', 'ShiftRight']."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Minimap"
+    ],
+    "pageType": "guide",
+    "title": "Minimap",
+    "section": "Minimap",
+    "route": "/features/minimap",
+    "fragment": "minimap",
+    "content": "The library includes a minimap that offers an overview of the entire flow. To enable it, simply add a "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Minimap"
+    ],
+    "pageType": "guide",
+    "title": "Minimap",
+    "section": "Minimap",
+    "route": "/features/minimap",
+    "fragment": "minimap",
+    "content": " component as a direct child of "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Minimap"
+    ],
+    "pageType": "guide",
+    "title": "Minimap",
+    "section": "Minimap",
+    "route": "/features/minimap",
+    "fragment": "minimap",
+    "content": ". For customization options, see the available inputs in MiniMapComponent."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Minimap"
+    ],
+    "pageType": "guide",
+    "title": "Minimap",
+    "section": "Minimap",
+    "route": "/features/minimap",
+    "fragment": "minimap",
+    "content": "Planned enhancements for the minimap: Develop an API to customize mini-node appearance (e.g., color, stroke)Enable panning and zooming within the minimapRender mini-nodes to visually match main nodes, using a simplified DOM structure to optimize performance"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Markers"
+    ],
+    "pageType": "guide",
+    "title": "Markers",
+    "section": "Markers",
+    "route": "/features/markers",
+    "fragment": "markers",
+    "content": "You can create markers for both edges and connections. Edges: Specify start and end markers for corresponding parts of the edge. Currently, markers are limited to two types: arrow and arrow-closed.Connections: You can specify an end marker using the marker property in ConnectionSettings."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Selecting"
+    ],
+    "pageType": "guide",
+    "title": "Selecting",
+    "section": "Selecting",
+    "route": "/features/selecting",
+    "fragment": "selecting",
+    "content": "Nodes and edges can be selected!"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Selecting"
+    ],
+    "pageType": "guide",
+    "title": "Selecting",
+    "section": "Selecting",
+    "route": "/features/selecting",
+    "fragment": "selecting",
+    "content": "Default nodes and edges are selectable by default; just click and see that one is selected. Custom nodes and edges are not selectable by default, you need to mark the element that triggers selection with the "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Selecting"
+    ],
+    "pageType": "guide",
+    "title": "Selecting",
+    "section": "Selecting",
+    "route": "/features/selecting",
+    "fragment": "selecting",
+    "content": "selectable"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Selecting"
+    ],
+    "pageType": "guide",
+    "title": "Selecting",
+    "section": "Selecting",
+    "route": "/features/selecting",
+    "fragment": "selecting",
+    "content": " directive."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Selecting"
+    ],
+    "pageType": "guide",
+    "title": "Selecting",
+    "section": "Selecting",
+    "route": "/features/selecting",
+    "fragment": "selecting",
+    "content": "Both custom nodes and edges have the selected() signal in their template context for applying styles based on this state."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Selecting"
+    ],
+    "pageType": "guide",
+    "title": "Selecting",
+    "section": "Disable selecting",
+    "route": "/features/selecting",
+    "fragment": "disable-selecting",
+    "content": "You can pass [entitiesSelectable]=\"false\" to "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Selecting"
+    ],
+    "pageType": "guide",
+    "title": "Selecting",
+    "section": "Disable selecting",
+    "route": "/features/selecting",
+    "fragment": "disable-selecting",
+    "content": " if you want disable selecting for whole flow."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Resizer"
+    ],
+    "pageType": "guide",
+    "title": "Resizer",
+    "section": "Resizer",
+    "route": "/features/resizer",
+    "fragment": "resizer",
+    "content": "You might want to resize your node. This functionality works with nearly all types of nodes."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Resizer"
+    ],
+    "pageType": "guide",
+    "title": "Resizer",
+    "section": "Resize default group",
+    "route": "/features/resizer",
+    "fragment": "resize-default-group",
+    "content": "To resize a default group, simply pass the resizable flag to a Node (or DynamicNode) of type default-group."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Resizer"
+    ],
+    "pageType": "guide",
+    "title": "Resizer",
+    "section": "Resize template group",
+    "route": "/features/resizer",
+    "fragment": "resize-template-group",
+    "content": "This provides a way to have more control over the resizer: Create a template-group node.If you want the resizer to appear consistently, add the resizable directive to the SVG element (likely a "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Resizer"
+    ],
+    "pageType": "guide",
+    "title": "Resizer",
+    "section": "Resize template group",
+    "route": "/features/resizer",
+    "fragment": "resize-template-group",
+    "content": ") representing your group.If you want the resizer to appear conditionally, apply the directive as [resizable]=\"yourCondition\". You can bind the visibility of the resizer to the node’s selection state (see the code below for an example).Important: Use the ctx.width() and ctx.height() signals from the context, not ctx.node.width and ctx.node.height. The latter properties are not reactive, so the node won’t update its size based on the resizer.The resizer respects the min-width and min-height CSS properties of the resizable node.Optionally, you can customize the [resizerColor] and the [gap] between the node and the resizer, with more customization options coming in the future.\""
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Resizer"
+    ],
+    "pageType": "guide",
+    "title": "Resizer",
+    "section": "Resize a template/component regular node",
+    "route": "/features/resizer",
+    "fragment": "resize-a-templatecomponent-regular-node",
+    "content": "The algorithm is almost the same as for template-group nodes: Create a node of type html-template or CustomNodeComponent (CustomDynamicNodeComponent).If you want the resizer to always appear, add the resizable directive to the top-level element of your custom node (ideally, a wrapper for the entire node content).If you want the resizer to appear conditionally, apply the directive as [resizable]=\"yourCondition\". Binding the visibility of the resizer to the node’s selection state can be useful.The resizer respects the min-width and min-height CSS properties of the element where the directive is applied.It's up to you to adjust the CSS of your custom node to ensure it renders correctly during resizing. The library only modifies the container size.Optionally, you can customize the [resizerColor] and the [gap] between the node and the resizer, with more customization options coming in the future."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Resizer"
+    ],
+    "pageType": "guide",
+    "title": "Resizer",
+    "section": "Resize event",
+    "route": "/features/resizer",
+    "fragment": "resize-event",
+    "content": "You may want to perform some actions on resize. To do this, simply add handler to the (onNodesChange.size) output of the "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Resizer"
+    ],
+    "pageType": "guide",
+    "title": "Resizer",
+    "section": "Resize event",
+    "route": "/features/resizer",
+    "fragment": "resize-event",
+    "content": " component."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Resizer"
+    ],
+    "pageType": "guide",
+    "title": "Resizer",
+    "section": "See also",
+    "route": "/features/resizer",
+    "fragment": "see-also",
+    "content": "SubflowsCustom nodesHandling changes"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "View size"
+    ],
+    "pageType": "guide",
+    "title": "View size",
+    "section": "Auto size",
+    "route": "/features/view-size",
+    "fragment": "auto-size",
+    "content": "vflow automatically fits it container if you pass view=\"auto\" input"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "View size"
+    ],
+    "pageType": "guide",
+    "title": "View size",
+    "section": "Fixed size",
+    "route": "/features/view-size",
+    "fragment": "fixed-size",
+    "content": "vflow can take fixed space if you pass [view]=\"[600, 600]\" input, where first item of array is width (in pixels), and the second is height (in pixels)."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Node toolbar"
+    ],
+    "pageType": "guide",
+    "title": "Node toolbar",
+    "section": "Node toolbar",
+    "route": "/features/node-toolbar",
+    "fragment": "node-toolbar",
+    "content": "You can add a NodeToolbarComponent to your node. The content of this component is automatically positioned near one side of the node, based on the value of the position input."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Subflows"
+    ],
+    "pageType": "guide",
+    "title": "Subflows",
+    "section": "Subflows",
+    "route": "/features/subflows",
+    "fragment": "subflows",
+    "content": "A subflow is a node that can contain child nodes. Key things about subflows: To create a subflow, you need to use a default-group or template-group type on Node or DynamicNode.To associate a node with a subflow, set the parentId to the ID of the subflow.Nodes within a subflow have coordinates relative to that subflow.A subflow is itself a node, so it can act as a source or a target (this functionality is available only for template-group subflows).Use the groupNode directive on an ng-template to define your custom subflow. While a custom subflow can theoretically be any SVG structure, it's recommended to use the "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Subflows"
+    ],
+    "pageType": "guide",
+    "title": "Subflows",
+    "section": "Subflows",
+    "route": "/features/subflows",
+    "fragment": "subflows",
+    "content": " element."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Subflows"
+    ],
+    "pageType": "guide",
+    "title": "Subflows",
+    "section": "See also",
+    "route": "/features/subflows",
+    "fragment": "see-also",
+    "content": "DefaultGroupNodeTemplateGroupNodeDefaultDynamicGroupNodeTemplateDynamicGroupNode"
   },
   {
     "breadcrumbs": [
@@ -1322,534 +1838,6 @@
   {
     "breadcrumbs": [
       "Features",
-      "Markers"
-    ],
-    "pageType": "guide",
-    "title": "Markers",
-    "section": "Markers",
-    "route": "/features/markers",
-    "fragment": "markers",
-    "content": "You can create markers for both edges and connections. Edges: Specify start and end markers for corresponding parts of the edge. Currently, markers are limited to two types: arrow and arrow-closed.Connections: You can specify an end marker using the marker property in ConnectionSettings."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Keyboard shortcuts"
-    ],
-    "pageType": "guide",
-    "title": "Keyboard shortcuts",
-    "section": "Keyboard shortcuts",
-    "route": "/features/keyboard-shortcuts",
-    "fragment": "keyboard-shortcuts",
-    "content": "You can use keyboard shortcuts to perform additional actions."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Keyboard shortcuts"
-    ],
-    "pageType": "guide",
-    "title": "Keyboard shortcuts",
-    "section": "Defaults",
-    "route": "/features/keyboard-shortcuts",
-    "fragment": "defaults",
-    "content": "Action Default key"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Keyboard shortcuts"
-    ],
-    "pageType": "guide",
-    "title": "Keyboard shortcuts",
-    "section": "Defaults",
-    "route": "/features/keyboard-shortcuts",
-    "fragment": "defaults",
-    "content": "Node multi selection"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Keyboard shortcuts"
-    ],
-    "pageType": "guide",
-    "title": "Keyboard shortcuts",
-    "section": "Defaults",
-    "route": "/features/keyboard-shortcuts",
-    "fragment": "defaults",
-    "content": "CMD"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Keyboard shortcuts"
-    ],
-    "pageType": "guide",
-    "title": "Keyboard shortcuts",
-    "section": "Defaults",
-    "route": "/features/keyboard-shortcuts",
-    "fragment": "defaults",
-    "content": " (Mac) or "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Keyboard shortcuts"
-    ],
-    "pageType": "guide",
-    "title": "Keyboard shortcuts",
-    "section": "Defaults",
-    "route": "/features/keyboard-shortcuts",
-    "fragment": "defaults",
-    "content": "CTRL"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Keyboard shortcuts"
-    ],
-    "pageType": "guide",
-    "title": "Keyboard shortcuts",
-    "section": "Defaults",
-    "route": "/features/keyboard-shortcuts",
-    "fragment": "defaults",
-    "content": " (Other systems)"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Keyboard shortcuts"
-    ],
-    "pageType": "guide",
-    "title": "Keyboard shortcuts",
-    "section": "Customization",
-    "route": "/features/keyboard-shortcuts",
-    "fragment": "customization",
-    "content": "To customize the keyboard shortcuts for specific actions, pass a [keyboardShortcuts] input object to the VflowComponent with the following KeyboardShortcuts interface. Here are some key details: The passed object will be merged with the default key combinations.To disable a specific action, pass null for that action.If you want to trigger an action with multiple keys, pass an array of keys. Note: this is not a key combination. For example, if you pass ['ShiftLeft', 'ControlLeft'], the action will be triggered by either ShiftLeft or ControlLeft, but not by pressing both together (ShiftLeft+ControlLeft).You can find the list of available key codes here. In the following example, the default combination for multiSelection is replaced with ['ShiftLeft', 'ShiftRight']."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Draggables"
-    ],
-    "pageType": "guide",
-    "title": "Draggables",
-    "section": "Disabling",
-    "route": "/features/draggables",
-    "fragment": "disabling",
-    "content": "You can disable draggable behavior on certain Node or DynamicNode by passing false."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Draggables"
-    ],
-    "pageType": "guide",
-    "title": "Draggables",
-    "section": "Drag handle",
-    "route": "/features/draggables",
-    "fragment": "drag-handle",
-    "content": "You can restrict dragging to a specific part of node, by adding dragHandle directive to this element. It's important to note that if a node contains at least one dragHandle, it can only be dragged from those specific areas where dragHandle was added. Otherwise, the entire node can be dragged, provided the draggable property is set to true."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Minimap"
-    ],
-    "pageType": "guide",
-    "title": "Minimap",
-    "section": "Minimap",
-    "route": "/features/minimap",
-    "fragment": "minimap",
-    "content": "The library includes a minimap that offers an overview of the entire flow. To enable it, simply add a "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Minimap"
-    ],
-    "pageType": "guide",
-    "title": "Minimap",
-    "section": "Minimap",
-    "route": "/features/minimap",
-    "fragment": "minimap",
-    "content": " component as a direct child of "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Minimap"
-    ],
-    "pageType": "guide",
-    "title": "Minimap",
-    "section": "Minimap",
-    "route": "/features/minimap",
-    "fragment": "minimap",
-    "content": ". For customization options, see the available inputs in MiniMapComponent."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Minimap"
-    ],
-    "pageType": "guide",
-    "title": "Minimap",
-    "section": "Minimap",
-    "route": "/features/minimap",
-    "fragment": "minimap",
-    "content": "Planned enhancements for the minimap: Develop an API to customize mini-node appearance (e.g., color, stroke)Enable panning and zooming within the minimapRender mini-nodes to visually match main nodes, using a simplified DOM structure to optimize performance"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Node toolbar"
-    ],
-    "pageType": "guide",
-    "title": "Node toolbar",
-    "section": "Node toolbar",
-    "route": "/features/node-toolbar",
-    "fragment": "node-toolbar",
-    "content": "You can add a NodeToolbarComponent to your node. The content of this component is automatically positioned near one side of the node, based on the value of the position input."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Labels"
-    ],
-    "pageType": "guide",
-    "title": "Labels",
-    "section": "Labels",
-    "route": "/features/labels",
-    "fragment": "labels",
-    "content": "You can attach labels to edges by providing the edgeLabels property to the needed Edges. There are three slots available for labels on an edge: start, center, end. The label is only of the html-template type, so you have to provide "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Labels"
-    ],
-    "pageType": "guide",
-    "title": "Labels",
-    "section": "Labels",
-    "route": "/features/labels",
-    "fragment": "labels",
-    "content": " inside vflow."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Labels"
-    ],
-    "pageType": "guide",
-    "title": "Labels",
-    "section": "Context",
-    "route": "/features/labels",
-    "fragment": "context",
-    "content": "You may access some data for label through let-ctx according to this interface."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Handling changes"
-    ],
-    "pageType": "guide",
-    "title": "Handling changes",
-    "section": "Handling changes",
-    "route": "/features/handling-changes",
-    "fragment": "handling-changes",
-    "content": "You can observe changes in the toasts."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Handling changes"
-    ],
-    "pageType": "guide",
-    "title": "Handling changes",
-    "section": "Handling changes",
-    "route": "/features/handling-changes",
-    "fragment": "handling-changes",
-    "content": "You can observe various changes in nodes and edges. Types of NodeChanges: position - new node position after drag and dropsize - new node sizeadd - when node was createdremove - when node was removedselect - when node was selected (also triggers for unselected nodes) Types of EdgeChanges: add - when edge was createdremove - when edge was removedselect - when edge was selected (also triggers for unselected edges)detached - when edge became invisible due to the absence of the source or target node. Use this to delete such edges from the edges list There are a several ways to receive these changes:"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Handling changes"
-    ],
-    "pageType": "guide",
-    "title": "Handling changes",
-    "section": "From (onNodesChange) and (onEdgesChange) outputs",
-    "route": "/features/handling-changes",
-    "fragment": "from-onnodeschange-and-onedgeschange-outputs",
-    "content": "This is a way to get every possible change. Changes came as non empty arrays: (onNodesChange) emits NodeChange[](onEdgesChange) emits EdgeChange[]"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Handling changes"
-    ],
-    "pageType": "guide",
-    "title": "Handling changes",
-    "section": "From filtered outputs",
-    "route": "/features/handling-changes",
-    "fragment": "from-filtered-outputs",
-    "content": "For your convenience, here is the filtering scheme for changes based on the (onNodesChange) and (onEdgesChange) events: (onNodesChange.[NodeChangeType]) - a list of node changes of a certain type(onNodesChange.[EdgeChangeType]) - a list of edge changes of a certain type(onNodesChange.[NodeChangeType].[Count]) - a list (many) or single (single) node change of a certain type(onEdgesChange.[EdgeChangeType].[Count]) - a list (many) or single (single) edge change of a certain type Where: List of all possible filter outputs:"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Selecting"
-    ],
-    "pageType": "guide",
-    "title": "Selecting",
-    "section": "Selecting",
-    "route": "/features/selecting",
-    "fragment": "selecting",
-    "content": "Nodes and edges can be selected!"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Selecting"
-    ],
-    "pageType": "guide",
-    "title": "Selecting",
-    "section": "Selecting",
-    "route": "/features/selecting",
-    "fragment": "selecting",
-    "content": "Default nodes and edges are selectable by default; just click and see that one is selected. Custom nodes and edges are not selectable by default, you need to mark the element that triggers selection with the "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Selecting"
-    ],
-    "pageType": "guide",
-    "title": "Selecting",
-    "section": "Selecting",
-    "route": "/features/selecting",
-    "fragment": "selecting",
-    "content": "selectable"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Selecting"
-    ],
-    "pageType": "guide",
-    "title": "Selecting",
-    "section": "Selecting",
-    "route": "/features/selecting",
-    "fragment": "selecting",
-    "content": " directive."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Selecting"
-    ],
-    "pageType": "guide",
-    "title": "Selecting",
-    "section": "Selecting",
-    "route": "/features/selecting",
-    "fragment": "selecting",
-    "content": "Both custom nodes and edges have the selected() signal in their template context for applying styles based on this state."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Selecting"
-    ],
-    "pageType": "guide",
-    "title": "Selecting",
-    "section": "Disable selecting",
-    "route": "/features/selecting",
-    "fragment": "disable-selecting",
-    "content": "You can pass [entitiesSelectable]=\"false\" to "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Selecting"
-    ],
-    "pageType": "guide",
-    "title": "Selecting",
-    "section": "Disable selecting",
-    "route": "/features/selecting",
-    "fragment": "disable-selecting",
-    "content": " if you want disable selecting for whole flow."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "View size"
-    ],
-    "pageType": "guide",
-    "title": "View size",
-    "section": "Auto size",
-    "route": "/features/view-size",
-    "fragment": "auto-size",
-    "content": "vflow automatically fits it container if you pass view=\"auto\" input"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "View size"
-    ],
-    "pageType": "guide",
-    "title": "View size",
-    "section": "Fixed size",
-    "route": "/features/view-size",
-    "fragment": "fixed-size",
-    "content": "vflow can take fixed space if you pass [view]=\"[600, 600]\" input, where first item of array is width (in pixels), and the second is height (in pixels)."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Resizer"
-    ],
-    "pageType": "guide",
-    "title": "Resizer",
-    "section": "Resizer",
-    "route": "/features/resizer",
-    "fragment": "resizer",
-    "content": "You might want to resize your node. This functionality works with nearly all types of nodes."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Resizer"
-    ],
-    "pageType": "guide",
-    "title": "Resizer",
-    "section": "Resize default group",
-    "route": "/features/resizer",
-    "fragment": "resize-default-group",
-    "content": "To resize a default group, simply pass the resizable flag to a Node (or DynamicNode) of type default-group."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Resizer"
-    ],
-    "pageType": "guide",
-    "title": "Resizer",
-    "section": "Resize template group",
-    "route": "/features/resizer",
-    "fragment": "resize-template-group",
-    "content": "This provides a way to have more control over the resizer: Create a template-group node.If you want the resizer to appear consistently, add the resizable directive to the SVG element (likely a "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Resizer"
-    ],
-    "pageType": "guide",
-    "title": "Resizer",
-    "section": "Resize template group",
-    "route": "/features/resizer",
-    "fragment": "resize-template-group",
-    "content": ") representing your group.If you want the resizer to appear conditionally, apply the directive as [resizable]=\"yourCondition\". You can bind the visibility of the resizer to the node’s selection state (see the code below for an example).Important: Use the ctx.width() and ctx.height() signals from the context, not ctx.node.width and ctx.node.height. The latter properties are not reactive, so the node won’t update its size based on the resizer.The resizer respects the min-width and min-height CSS properties of the resizable node.Optionally, you can customize the [resizerColor] and the [gap] between the node and the resizer, with more customization options coming in the future.\""
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Resizer"
-    ],
-    "pageType": "guide",
-    "title": "Resizer",
-    "section": "Resize a template/component regular node",
-    "route": "/features/resizer",
-    "fragment": "resize-a-templatecomponent-regular-node",
-    "content": "The algorithm is almost the same as for template-group nodes: Create a node of type html-template or CustomNodeComponent (CustomDynamicNodeComponent).If you want the resizer to always appear, add the resizable directive to the top-level element of your custom node (ideally, a wrapper for the entire node content).If you want the resizer to appear conditionally, apply the directive as [resizable]=\"yourCondition\". Binding the visibility of the resizer to the node’s selection state can be useful.The resizer respects the min-width and min-height CSS properties of the element where the directive is applied.It's up to you to adjust the CSS of your custom node to ensure it renders correctly during resizing. The library only modifies the container size.Optionally, you can customize the [resizerColor] and the [gap] between the node and the resizer, with more customization options coming in the future."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Resizer"
-    ],
-    "pageType": "guide",
-    "title": "Resizer",
-    "section": "Resize event",
-    "route": "/features/resizer",
-    "fragment": "resize-event",
-    "content": "You may want to perform some actions on resize. To do this, simply add handler to the (onNodesChange.size) output of the "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Resizer"
-    ],
-    "pageType": "guide",
-    "title": "Resizer",
-    "section": "Resize event",
-    "route": "/features/resizer",
-    "fragment": "resize-event",
-    "content": " component."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Resizer"
-    ],
-    "pageType": "guide",
-    "title": "Resizer",
-    "section": "See also",
-    "route": "/features/resizer",
-    "fragment": "see-also",
-    "content": "SubflowsCustom nodesHandling changes"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Subflows"
-    ],
-    "pageType": "guide",
-    "title": "Subflows",
-    "section": "Subflows",
-    "route": "/features/subflows",
-    "fragment": "subflows",
-    "content": "A subflow is a node that can contain child nodes. Key things about subflows: To create a subflow, you need to use a default-group or template-group type on Node or DynamicNode.To associate a node with a subflow, set the parentId to the ID of the subflow.Nodes within a subflow have coordinates relative to that subflow.A subflow is itself a node, so it can act as a source or a target (this functionality is available only for template-group subflows).Use the groupNode directive on an ng-template to define your custom subflow. While a custom subflow can theoretically be any SVG structure, it's recommended to use the "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Subflows"
-    ],
-    "pageType": "guide",
-    "title": "Subflows",
-    "section": "Subflows",
-    "route": "/features/subflows",
-    "fragment": "subflows",
-    "content": " element."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Subflows"
-    ],
-    "pageType": "guide",
-    "title": "Subflows",
-    "section": "See also",
-    "route": "/features/subflows",
-    "fragment": "see-also",
-    "content": "DefaultGroupNodeTemplateGroupNodeDefaultDynamicGroupNodeTemplateDynamicGroupNode"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Default nodes"
-    ],
-    "pageType": "guide",
-    "title": "Default nodes",
-    "section": "Default nodes",
-    "route": "/features/default-nodes",
-    "fragment": "default-nodes",
-    "content": "To get started, you just need to provide nodes array to vflow component."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
       "Multiple connection points"
     ],
     "pageType": "guide",
@@ -1874,15 +1862,26 @@
   {
     "breadcrumbs": [
       "Workshops",
-      "Layout",
-      "Vizdom layout"
+      "Drag and drop nodes"
     ],
     "pageType": "guide",
-    "title": "Vizdom layout",
-    "section": "Vizdom layout",
-    "route": "/workshops/layout/vizdom-layout",
-    "fragment": "vizdom-layout",
-    "content": "This is an example of using the vizdom library for computing layout."
+    "title": "Drag and drop nodes",
+    "section": "Drag and drop nodes",
+    "route": "/workshops/drag-and-drop-nodes",
+    "fragment": "drag-and-drop-nodes",
+    "content": "This workshop will show you how to implement dynamic node creation with basic drag and drop implementation. This implementation uses documentPointToFlowPoint() method of VflowComponent that translates document coordinate to vflow coordinate."
+  },
+  {
+    "breadcrumbs": [
+      "Workshops",
+      "Delete selected"
+    ],
+    "pageType": "guide",
+    "title": "Delete selected",
+    "section": "Delete selected",
+    "route": "/workshops/delete-selected",
+    "fragment": "delete-selected",
+    "content": "This workshop will show you how to implement deletion of nodes and edges."
   },
   {
     "breadcrumbs": [
@@ -1896,6 +1895,19 @@
     "route": "/workshops/layout/force",
     "fragment": "d3-force",
     "content": "This is a simple example of using the d3-force layout package."
+  },
+  {
+    "breadcrumbs": [
+      "Workshops",
+      "Layout",
+      "Vizdom layout"
+    ],
+    "pageType": "guide",
+    "title": "Vizdom layout",
+    "section": "Vizdom layout",
+    "route": "/workshops/layout/vizdom-layout",
+    "fragment": "vizdom-layout",
+    "content": "This is an example of using the vizdom library for computing layout."
   },
   {
     "breadcrumbs": [
@@ -2469,6 +2481,32 @@
     "breadcrumbs": [
       "API",
       "ngx-vflow",
+      "Optimization"
+    ],
+    "pageType": "api",
+    "title": "Optimization",
+    "section": "Properties",
+    "route": "/api/ngx-vflow/interfaces/Optimization",
+    "fragment": "properties",
+    "content": "If true, compute the right nodes order by z-axis inside groups on initial render. true"
+  },
+  {
+    "breadcrumbs": [
+      "API",
+      "ngx-vflow",
+      "Optimization"
+    ],
+    "pageType": "api",
+    "title": "Optimization",
+    "section": "Properties",
+    "route": "/api/ngx-vflow/interfaces/Optimization",
+    "fragment": "properties",
+    "content": "If true, the layer with groups will be placed behind the edges layer. This approach fixes the issue when you can't select an edge inside group. false"
+  },
+  {
+    "breadcrumbs": [
+      "API",
+      "ngx-vflow",
       "NodeChange"
     ],
     "pageType": "api",
@@ -2696,6 +2734,70 @@
     "route": "/api/ngx-vflow/interfaces/DotsBackground",
     "fragment": "properties",
     "content": "Diameter of the dot"
+  },
+  {
+    "breadcrumbs": [
+      "API",
+      "ngx-vflow",
+      "ImageBackground"
+    ],
+    "pageType": "api",
+    "title": "ImageBackground",
+    "section": "ImageBackground",
+    "route": "/api/ngx-vflow/interfaces/ImageBackground",
+    "fragment": "imagebackground"
+  },
+  {
+    "breadcrumbs": [
+      "API",
+      "ngx-vflow",
+      "ImageBackground"
+    ],
+    "pageType": "api",
+    "title": "ImageBackground",
+    "section": "Properties",
+    "route": "/api/ngx-vflow/interfaces/ImageBackground",
+    "fragment": "properties",
+    "content": "If true, image will be fixed on the background (not moving with the flow, zoom also doesn't affect it)"
+  },
+  {
+    "breadcrumbs": [
+      "API",
+      "ngx-vflow",
+      "ImageBackground"
+    ],
+    "pageType": "api",
+    "title": "ImageBackground",
+    "section": "Properties",
+    "route": "/api/ngx-vflow/interfaces/ImageBackground",
+    "fragment": "properties",
+    "content": "If true, image will be repeated"
+  },
+  {
+    "breadcrumbs": [
+      "API",
+      "ngx-vflow",
+      "ImageBackground"
+    ],
+    "pageType": "api",
+    "title": "ImageBackground",
+    "section": "Properties",
+    "route": "/api/ngx-vflow/interfaces/ImageBackground",
+    "fragment": "properties",
+    "content": "Scale relative to natural image size. For example, if image is 100x100 and scale is 0.5, it will be rendered as 50x50"
+  },
+  {
+    "breadcrumbs": [
+      "API",
+      "ngx-vflow",
+      "ImageBackground"
+    ],
+    "pageType": "api",
+    "title": "ImageBackground",
+    "section": "Properties",
+    "route": "/api/ngx-vflow/interfaces/ImageBackground",
+    "fragment": "properties",
+    "content": "Path to image. Passes as a href to this element: https://developer.mozilla.org/en-US/docs/Web/SVG/Element/image"
   },
   {
     "breadcrumbs": [
