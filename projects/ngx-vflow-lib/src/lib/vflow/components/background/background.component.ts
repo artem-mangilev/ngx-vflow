@@ -11,6 +11,7 @@ const defaultGap = 20
 const defaultDotSize = 2
 const defaultDotColor = 'rgb(177, 177, 183)'
 const defaultImageScale = 0.1
+const defaultRepeated = true
 
 @Component({
   selector: 'g[background]',
@@ -104,6 +105,10 @@ export class BackgroundComponent {
     const background = this.backgroundSignal()
 
     if (background.type === 'image') {
+      if (!background.repeated) {
+        return background.fixed ? 0 : this.viewportService.readableViewport().x
+      }
+
       return background.fixed
         ? 0
         : this.viewportService.readableViewport().x % this.scaledImageWidth()
@@ -116,6 +121,10 @@ export class BackgroundComponent {
     const background = this.backgroundSignal()
 
     if (background.type === 'image') {
+      if (!background.repeated) {
+        return background.fixed ? 0 : this.viewportService.readableViewport().y
+      }
+
       return background.fixed
         ? 0
         : this.viewportService.readableViewport().y % this.scaledImageHeight()
@@ -123,6 +132,12 @@ export class BackgroundComponent {
 
     return 0
   });
+
+  protected repeated = computed(() => {
+    const background = this.backgroundSignal()
+
+    return background.type === 'image' && (background.repeated ?? defaultRepeated)
+  })
 
   // Without ID there will be pattern collision for several flows on the page
   // Later pattern ID may be exposed to API

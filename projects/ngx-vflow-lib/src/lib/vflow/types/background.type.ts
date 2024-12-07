@@ -30,7 +30,27 @@ export interface DotsBackground {
 
 export interface ImageBackground {
   type: 'image'
+  /**
+   * Path to image. Passes as a href to this element:
+   *
+   * https://developer.mozilla.org/en-US/docs/Web/SVG/Element/image
+   */
   src: string
+
+  /**
+   * If true, image will be fixed on the background (not moving with the flow, zoom also doesn't affect it)
+   */
   fixed?: boolean
+
+  /**
+   * If true, image will be repeated
+   */
+  repeated?: boolean
+
+  /**
+   * Scale relative to natural image size.
+   *
+   * For example, if image is 100x100 and scale is 0.5, it will be rendered as 50x50
+   */
   scale?: number
 }
