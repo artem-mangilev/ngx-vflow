@@ -105,7 +105,7 @@ export class BackgroundComponent {
     const background = this.backgroundSignal()
 
     if (background.type === 'image') {
-      if (!background.repeated) {
+      if (!background.repeat) {
         return background.fixed ? 0 : this.viewportService.readableViewport().x
       }
 
@@ -121,7 +121,7 @@ export class BackgroundComponent {
     const background = this.backgroundSignal()
 
     if (background.type === 'image') {
-      if (!background.repeated) {
+      if (!background.repeat) {
         return background.fixed ? 0 : this.viewportService.readableViewport().y
       }
 
@@ -136,7 +136,7 @@ export class BackgroundComponent {
   protected repeated = computed(() => {
     const background = this.backgroundSignal()
 
-    return background.type === 'image' && (background.repeated ?? defaultRepeated)
+    return background.type === 'image' && (background.repeat ?? defaultRepeated)
   })
 
   // Without ID there will be pattern collision for several flows on the page

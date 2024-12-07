@@ -45,7 +45,7 @@ export interface ImageBackground {
   /**
    * If true, image will be repeated
    */
-  repeated?: boolean
+  repeat?: boolean
 
   /**
    * Scale relative to natural image size.
