@@ -3,6 +3,7 @@ export interface Optimization {
    * If true, compute the right nodes order by z-axis inside groups on initial render.
    *
    * @default true
+   * @deprecated
    */
   computeLayersOnInit: boolean
 
