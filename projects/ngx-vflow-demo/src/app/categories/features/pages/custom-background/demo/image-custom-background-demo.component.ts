@@ -6,7 +6,7 @@ import { Edge, Node, VflowModule } from 'projects/ngx-vflow-lib/src/public-api';
     view="auto"
     [nodes]="nodes"
     [edges]="edges"
-    [background]="{ type: 'image', src: 'assets/logo.svg', scale: 0.05 }"
+    [background]="{ type: 'image', src: 'assets/logo.svg', scale: 0.05, repeat: false }"
   />`,
   styles: [`
     :host {
