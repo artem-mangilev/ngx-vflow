@@ -22,68 +22,61 @@
       />
 
     @if (optimization.detachedGroupsLayer) {
-      <ng-container>
-        <!-- Groups -->
-        @for (model of groups(); track trackNodes($index, model)) {
-          <svg:g
-            node
-            [nodeModel]="model"
-            [groupNodeTemplate]="groupNodeTemplateDirective?.templateRef"
-            [attr.transform]="model.pointTransform()"
-            />
-        }
-        <!-- Edges  -->
-        @for (model of edgeModels(); track trackEdges($index, model)) {
-          <svg:g
-            edge
-            [model]="model"
-            [edgeTemplate]="edgeTemplateDirective?.templateRef"
-            [edgeLabelHtmlTemplate]="edgeLabelHtmlDirective?.templateRef"
-            />
-        }
-        <!-- Nodes -->
-        @for (model of nonGroups(); track trackNodes($index, model)) {
-          <svg:g
-            node
-            [nodeModel]="model"
-            [nodeTemplate]="nodeTemplateDirective?.templateRef"
-            [attr.transform]="model.pointTransform()"
-            />
-        }
-      </ng-container>
+      <!-- Groups -->
+      @for (model of groups(); track trackNodes($index, model)) {
+        <svg:g
+          node
+          [nodeModel]="model"
+          [groupNodeTemplate]="groupNodeTemplateDirective?.templateRef"
+          [attr.transform]="model.pointTransform()"
+          />
+      }
+      <!-- Edges  -->
+      @for (model of edgeModels(); track trackEdges($index, model)) {
+        <svg:g
+          edge
+          [model]="model"
+          [edgeTemplate]="edgeTemplateDirective?.templateRef"
+          [edgeLabelHtmlTemplate]="edgeLabelHtmlDirective?.templateRef"
+          />
+      }
+      <!-- Nodes -->
+      @for (model of nonGroups(); track trackNodes($index, model)) {
+        <svg:g
+          node
+          [nodeModel]="model"
+          [nodeTemplate]="nodeTemplateDirective?.templateRef"
+          [attr.transform]="model.pointTransform()"
+          />
+      }
     }
 
     @if (!optimization.detachedGroupsLayer) {
-      <ng-container>
-        <!-- Edges  -->
-        @for (model of edgeModels(); track trackEdges($index, model)) {
-          <svg:g
-            edge
-            [model]="model"
-            [edgeTemplate]="edgeTemplateDirective?.templateRef"
-            [edgeLabelHtmlTemplate]="edgeLabelHtmlDirective?.templateRef"
-            />
-        }
-        <!-- Nodes -->
-        @for (model of nodeModels(); track trackNodes($index, model)) {
-          <svg:g
-            node
-            [nodeModel]="model"
-            [nodeTemplate]="nodeTemplateDirective?.templateRef"
-            [groupNodeTemplate]="groupNodeTemplateDirective?.templateRef"
-            [attr.transform]="model.pointTransform()"
-            />
-        }
-      </ng-container>
+      <!-- Edges  -->
+      @for (model of edgeModels(); track trackEdges($index, model)) {
+        <svg:g
+          edge
+          [model]="model"
+          [edgeTemplate]="edgeTemplateDirective?.templateRef"
+          [edgeLabelHtmlTemplate]="edgeLabelHtmlDirective?.templateRef"
+          />
+      }
+      <!-- Nodes -->
+      @for (model of nodeModels(); track trackNodes($index, model)) {
+        <svg:g
+          node
+          [nodeModel]="model"
+          [nodeTemplate]="nodeTemplateDirective?.templateRef"
+          [groupNodeTemplate]="groupNodeTemplateDirective?.templateRef"
+          [attr.transform]="model.pointTransform()"
+          />
+      }
     }
+  </svg:g>
 
-    </svg:g>
-
-    <!-- Minimap -->
-    @if (minimap(); as minimap) {
-      <ng-container>
-        <ng-container [ngTemplateOutlet]="minimap.template()" />
-      </ng-container>
-    }
-    </svg:svg>
+  <!-- Minimap -->
+  @if (minimap(); as minimap) {
+    <ng-container [ngTemplateOutlet]="minimap.template()" />
+  }
+</svg:svg>
 

@@ -16,139 +16,142 @@
       [style.max-height]="styleHeight()"
       >
       <div [outerHTML]="nodeModel.text()"></div>
+
       <handle type="source" [position]="nodeModel.sourcePosition()" />
       <handle type="target" [position]="nodeModel.targetPosition()" />
     </default-node>
-    </svg:foreignObject>
+  </svg:foreignObject>
+}
+
+<!-- Template node -->
+@if (nodeModel.node.type === 'html-template' && nodeTemplate) {
+  <svg:foreignObject
+    class="selectable"
+    [attr.width]="nodeModel.size().width"
+    [attr.height]="nodeModel.size().height"
+    (pointerStart)="pullNode()"
+    >
+    <div
+      #htmlWrapper
+      class="wrapper"
+      [style.width]="styleWidth()"
+      [style.height]="styleHeight()"
+      >
+      <ng-container
+        [ngTemplateOutlet]="nodeTemplate"
+        [ngTemplateOutletContext]="{ $implicit: { node: nodeModel.node, selected: nodeModel.selected } }"
+        [ngTemplateOutletInjector]="injector"
+        />
+    </div>
+  </svg:foreignObject>
+}
+
+<!-- Component node -->
+@if (nodeModel.isComponentType) {
+  <svg:foreignObject
+    class="selectable"
+    [attr.width]="nodeModel.size().width"
+    [attr.height]="nodeModel.size().height"
+    (pointerStart)="pullNode()"
+    >
+    <div
+      #htmlWrapper
+      class="wrapper"
+      [style.width]="styleWidth()"
+      [style.height]="styleHeight()"
+      >
+      <ng-container
+        [ngComponentOutlet]="$any(nodeModel.node.type)"
+        [ngComponentOutletInputs]="nodeModel.componentTypeInputs()"
+        [ngComponentOutletInjector]="injector"
+        />
+    </div>
+  </svg:foreignObject>
+}
+
+<!-- Default group node -->
+@if (nodeModel.node.type === 'default-group') {
+  <svg:rect
+    [resizable]="nodeModel.resizable()"
+    [gap]="3"
+    [resizerColor]="nodeModel.color()"
+    class="default-group-node"
+    rx="5"
+    ry="5"
+    [class.default-group-node_selected]="nodeModel.selected()"
+    [attr.width]="nodeModel.size().width"
+    [attr.height]="nodeModel.size().height"
+    [style.stroke]="nodeModel.color()"
+    [style.fill]="nodeModel.color()"
+    (pointerStart)="pullNode(); selectNode()"
+    />
+}
+
+<!-- Template group node  -->
+@if (nodeModel.node.type === 'template-group' && groupNodeTemplate) {
+  <svg:g
+    class="selectable"
+    (pointerStart)="pullNode()"
+    >
+    <ng-container
+      [ngTemplateOutlet]="groupNodeTemplate"
+      [ngTemplateOutletContext]="{ $implicit: { node: nodeModel.node, selected: nodeModel.selected, width: nodeModel.width, height: nodeModel.height } }"
+      [ngTemplateOutletInjector]="injector"
+      />
+  </svg:g>
+}
+
+<!-- Resizer -->
+@if (nodeModel.resizerTemplate(); as template) {
+  @if (nodeModel.resizable()) {
+    <ng-template [ngTemplateOutlet]="template" />
+  }
+}
+
+<!-- Handles -->
+@for (handle of nodeModel.handles(); track handle) {
+  @if (!handle.template) {
+    <svg:circle
+      class="default-handle"
+      [attr.cx]="handle.offset().x"
+      [attr.cy]="handle.offset().y"
+      [attr.stroke-width]="handle.strokeWidth"
+      r="5"
+      (pointerStart)="startConnection($event, handle)"
+      (pointerEnd)="endConnection(handle)"
+      />
   }
 
-  <!-- Template node -->
-  @if (nodeModel.node.type === 'html-template' && nodeTemplate) {
-    <svg:foreignObject
-      class="selectable"
-      [attr.width]="nodeModel.size().width"
-      [attr.height]="nodeModel.size().height"
-      (pointerStart)="pullNode()"
+  @if (handle.template) {
+    <svg:g
+      [handleSizeController]="handle"
+      (pointerStart)="startConnection($event, handle)"
+      (pointerEnd)="endConnection(handle)"
       >
-      <div
-        #htmlWrapper
-        class="wrapper"
-        [style.width]="styleWidth()"
-        [style.height]="styleHeight()"
-        >
-        <ng-container
-          [ngTemplateOutlet]="nodeTemplate"
-          [ngTemplateOutletContext]="{ $implicit: { node: nodeModel.node, selected: nodeModel.selected } }"
-          [ngTemplateOutletInjector]="injector"
-          />
-      </div>
-      </svg:foreignObject>
-    }
+      <ng-container *ngTemplateOutlet="handle.template; context: handle.templateContext" />
+    </svg:g>
+  }
 
-    <!-- Component node -->
-    @if (nodeModel.isComponentType) {
-      <svg:foreignObject
-        class="selectable"
-        [attr.width]="nodeModel.size().width"
-        [attr.height]="nodeModel.size().height"
-        (pointerStart)="pullNode()"
-        >
-        <div
-          #htmlWrapper
-          class="wrapper"
-          [style.width]="styleWidth()"
-          [style.height]="styleHeight()"
-          >
-          <ng-container
-            [ngComponentOutlet]="$any(nodeModel.node.type)"
-            [ngComponentOutletInputs]="nodeModel.componentTypeInputs()"
-            [ngComponentOutletInjector]="injector"
-            />
-        </div>
-        </svg:foreignObject>
-      }
+  @if (showMagnet()) {
+    <svg:circle
+      class="magnet"
+      [attr.r]="nodeModel.magnetRadius"
+      [attr.cx]="handle.offset().x"
+      [attr.cy]="handle.offset().y"
+      (pointerEnd)="endConnection(handle); resetValidateConnection(handle)"
+      (pointerOver)="validateConnection(handle)"
+      (pointerOut)="resetValidateConnection(handle)"
+      />
+  }
+}
 
-      <!-- Default group node -->
-      @if (nodeModel.node.type === 'default-group') {
-        <svg:rect
-          [resizable]="nodeModel.resizable()"
-          [gap]="3"
-          [resizerColor]="nodeModel.color()"
-          class="default-group-node"
-          rx="5"
-          ry="5"
-          [class.default-group-node_selected]="nodeModel.selected()"
-          [attr.width]="nodeModel.size().width"
-          [attr.height]="nodeModel.size().height"
-          [style.stroke]="nodeModel.color()"
-          [style.fill]="nodeModel.color()"
-          (pointerStart)="pullNode(); selectNode()"
-          />
-      }
-
-      <!-- Template group node  -->
-      @if (nodeModel.node.type === 'template-group' && groupNodeTemplate) {
-        <svg:g
-          class="selectable"
-          (pointerStart)="pullNode()"
-          >
-          <ng-container
-            [ngTemplateOutlet]="groupNodeTemplate"
-            [ngTemplateOutletContext]="{ $implicit: { node: nodeModel.node, selected: nodeModel.selected, width: nodeModel.width, height: nodeModel.height } }"
-            [ngTemplateOutletInjector]="injector"
-            />
-          </svg:g>
-        }
-
-        <!-- Resizer -->
-        @if (nodeModel.resizerTemplate(); as template) {
-          @if (nodeModel.resizable()) {
-            <ng-template [ngTemplateOutlet]="template" />
-          }
-        }
-
-        <!-- Handles -->
-        @for (handle of nodeModel.handles(); track handle) {
-          @if (!handle.template) {
-            <svg:circle
-              class="default-handle"
-              [attr.cx]="handle.offset().x"
-              [attr.cy]="handle.offset().y"
-              [attr.stroke-width]="handle.strokeWidth"
-              r="5"
-              (pointerStart)="startConnection($event, handle)"
-              (pointerEnd)="endConnection(handle)"
-              />
-          }
-          @if (handle.template) {
-            <svg:g
-              [handleSizeController]="handle"
-              (pointerStart)="startConnection($event, handle)"
-              (pointerEnd)="endConnection(handle)"
-              >
-              <ng-container *ngTemplateOutlet="handle.template; context: handle.templateContext" />
-              </svg:g>
-            }
-            @if (showMagnet()) {
-              <svg:circle
-                class="magnet"
-                [attr.r]="nodeModel.magnetRadius"
-                [attr.cx]="handle.offset().x"
-                [attr.cy]="handle.offset().y"
-                (pointerEnd)="endConnection(handle); resetValidateConnection(handle)"
-                (pointerOver)="validateConnection(handle)"
-                (pointerOut)="resetValidateConnection(handle)"
-                />
-            }
-          }
-
-          <!-- Toolbar -->
-          @if (toolbar(); as toolbar) {
-            <svg:foreignObject
-              [attr.width]="toolbar.size().width"
-              [attr.height]="toolbar.size().height"
-              [attr.transform]="toolbar.transform()"
-              >
-              <ng-container [ngTemplateOutlet]="toolbar.template()" />
-              </svg:foreignObject>
-            }
+<!-- Toolbar -->
+@if (toolbar(); as toolbar) {
+  <svg:foreignObject
+    [attr.width]="toolbar.size().width"
+    [attr.height]="toolbar.size().height"
+    [attr.transform]="toolbar.transform()"
+    >
+    <ng-container [ngTemplateOutlet]="toolbar.template()" />
+  </svg:foreignObject>
+}

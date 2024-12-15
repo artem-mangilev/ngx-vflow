@@ -9,6 +9,7 @@
     refX="0"
     refY="0"
     >
+
     @if (marker.value.type === 'arrow-closed' || !marker.value.type) {
       <polyline
         class="marker__arrow_closed"
@@ -18,6 +19,7 @@
         points="-5,-4 1,0 -5,4 -5,-4"
         />
     }
+
     @if (marker.value.type === 'arrow') {
       <polyline
         class="marker__arrow_default"
@@ -26,5 +28,5 @@
         points="-5,-4 0,0 -5,4"
         />
     }
-    </svg:marker>
-  }
+  </svg:marker>
+}
