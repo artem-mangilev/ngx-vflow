@@ -48,11 +48,11 @@
       "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@ng-doc/builder:browser",
+          "builder": "@ng-doc/builder:application",
           "options": {
             "outputPath": "dist/ngx-vflow-demo",
             "index": "projects/ngx-vflow-demo/src/index.html",
-            "main": "projects/ngx-vflow-demo/src/main.ts",
+            "browser": "projects/ngx-vflow-demo/src/main.ts",
             "polyfills": [
               "zone.js"
             ],
@@ -73,7 +73,7 @@
               },
               {
                 "glob": "**/*",
-                "input": ".ng-doc/ngx-vflow-demo/assets",
+                "input": "ng-doc/ngx-vflow-demo/assets",
                 "output": "assets/ng-doc"
               }
             ],
@@ -101,9 +101,7 @@
               "outputHashing": "all"
             },
             "development": {
-              "buildOptimizer": false,
               "optimization": false,
-              "vendorChunk": true,
               "extractLicenses": false,
               "sourceMap": true,
               "namedChunks": true
@@ -115,10 +113,10 @@
           "builder": "@ng-doc/builder:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "ngx-vflow-demo:build:production"
+              "buildTarget": "ngx-vflow-demo:build:production"
             },
             "development": {
-              "browserTarget": "ngx-vflow-demo:build:development"
+              "buildTarget": "ngx-vflow-demo:build:development"
             }
           },
           "defaultConfiguration": "development"

@@ -16,8 +16,8 @@
       "ngx-vflow-lib": [
         "dist/ngx-vflow-lib"
       ],
-      "@ng-doc/generated": [".ng-doc/ngx-vflow-demo/index.ts"],
-      "@ng-doc/generated/*": [".ng-doc/ngx-vflow-demo/*"]
+      "@ng-doc/generated": ["ng-doc/ngx-vflow-demo/index.ts"],
+      "@ng-doc/generated/*": ["ng-doc/ngx-vflow-demo/*"]
     },
     "declaration": false,
     "downlevelIteration": true,
