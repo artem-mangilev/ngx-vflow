@@ -11,21 +11,22 @@ import { smoothStepPath } from '../../math/edge-path/smooth-step-path';
 @Component({
   selector: 'g[connection]',
   template: `
-    <ng-container *ngIf="model.type === 'default'">
-      <svg:path
-        *ngIf="path() as path"
-        [attr.d]="path"
-        [attr.marker-end]="markerUrl()"
-        [attr.stroke]="defaultColor"
-        fill="none"
-        stroke-width="2"
-      />
-    </ng-container>
-
-    <ng-container *ngIf="model.type === 'template' && template">
+    @if (model.type === 'default') {
+      @if (path(); as path) {
+        <svg:path
+          [attr.d]="path"
+          [attr.marker-end]="markerUrl()"
+          [attr.stroke]="defaultColor"
+          fill="none"
+          stroke-width="2"
+          />
+      }
+    }
+    
+    @if (model.type === 'template' && template) {
       <ng-container *ngTemplateOutlet="template; context: getContext()" />
-    </ng-container>
-  `,
+    }
+    `,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ConnectionComponent {
