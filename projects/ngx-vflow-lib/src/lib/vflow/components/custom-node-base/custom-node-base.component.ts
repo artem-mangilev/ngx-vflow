@@ -27,15 +27,10 @@ export abstract class CustomNodeBaseComponent<T = unknown> implements OnInit {
    */
   protected node!: ComponentNode | ComponentDynamicNode;
 
-  @Input()
-  public set _selected(value: boolean) {
-    this.selected.set(value);
-  }
-
   /**
    * Signal with selected state of node
    */
-  public selected = signal(false);
+  public selected = input(false);
 
   public data = signal<T | undefined>(undefined);
 

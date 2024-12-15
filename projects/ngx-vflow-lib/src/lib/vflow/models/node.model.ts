@@ -94,7 +94,7 @@ export class NodeModel<T = unknown> implements FlowEntity {
   public componentTypeInputs = computed(() => {
     return {
       node: this.node,
-      _selected: this.selected()
+      selected: this.selected()
     }
   })
 
