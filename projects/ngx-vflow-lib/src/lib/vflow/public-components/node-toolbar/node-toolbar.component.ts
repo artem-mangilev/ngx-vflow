@@ -8,8 +8,8 @@ import {
   OnDestroy,
   OnInit,
   TemplateRef,
-  ViewChild,
   input,
+  viewChild,
 } from '@angular/core';
 import { Directive } from '@angular/core';
 import { Position } from '../../types/position.type';
@@ -44,13 +44,12 @@ export class NodeToolbarComponent implements OnInit, OnDestroy {
     this.model.position.set(value);
   }
 
-  @ViewChild('toolbar', { static: true })
-  public toolbarContentTemplate!: TemplateRef<unknown>;
+  public toolbarContentTemplate = viewChild.required<TemplateRef<unknown>>('toolbar');
 
   protected model = new ToolbarModel(this.nodeService.model()!);
 
   public ngOnInit(): void {
-    this.model.template.set(this.toolbarContentTemplate);
+    this.model.template.set(this.toolbarContentTemplate());
 
     this.overlaysService.addToolbar(this.model);
   }

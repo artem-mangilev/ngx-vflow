@@ -7,8 +7,8 @@ import {
   OnInit,
   signal,
   TemplateRef,
-  ViewChild,
   input,
+  viewChild,
 } from '@angular/core';
 import { FlowEntitiesService } from '../../services/flow-entities.service';
 import { MinimapModel } from '../../models/minimap.model';
@@ -61,8 +61,7 @@ export class MiniMapComponent implements OnInit {
     this.scaleOnHoverSignal.set(value);
   }
 
-  @ViewChild('minimap', { static: true })
-  private minimap!: TemplateRef<unknown>;
+  private minimap = viewChild.required<TemplateRef<unknown>>('minimap');
 
   private readonly minimapOffset = 10;
 
@@ -171,7 +170,7 @@ export class MiniMapComponent implements OnInit {
 
   public ngOnInit(): void {
     const model = new MinimapModel();
-    model.template.set(this.minimap);
+    model.template.set(this.minimap());
 
     this.entitiesService.minimap.set(model);
   }

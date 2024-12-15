@@ -7,8 +7,8 @@ import {
   Input,
   OnInit,
   TemplateRef,
-  ViewChild,
   input,
+  viewChild,
 } from '@angular/core';
 import { RootPointerDirective } from '../../directives/root-pointer.directive';
 import { filter, tap } from 'rxjs';
@@ -58,8 +58,7 @@ export class ResizableComponent implements OnInit, AfterViewInit {
 
   public gap = input(1.5);
 
-  @ViewChild('resizer', { static: true })
-  private resizer!: TemplateRef<unknown>;
+  private resizer = viewChild.required<TemplateRef<unknown>>('resizer');
 
   protected get model() {
     return this.nodeAccessor.model()!;
@@ -95,7 +94,7 @@ export class ResizableComponent implements OnInit, AfterViewInit {
     .subscribe();
 
   public ngOnInit(): void {
-    this.model.resizerTemplate.set(this.resizer);
+    this.model.resizerTemplate.set(this.resizer());
   }
 
   @Microtask

@@ -8,11 +8,11 @@ import {
   OnDestroy,
   OnInit,
   TemplateRef,
-  ViewChild,
   computed,
   effect,
   inject,
   input,
+  viewChild,
 } from '@angular/core';
 import { DraggableService } from '../../services/draggable.service';
 import { NodeModel } from '../../models/node.model';
@@ -66,11 +66,10 @@ export class NodeComponent
 
   public groupNodeTemplate = input<TemplateRef<any>>();
 
-  @ViewChild('nodeContent')
-  public nodeContentRef!: ElementRef<SVGGraphicsElement>;
+  public nodeContentRef =
+    viewChild<ElementRef<SVGGraphicsElement>>('nodeContent');
 
-  @ViewChild('htmlWrapper')
-  public htmlWrapperRef!: ElementRef<HTMLDivElement>;
+  public htmlWrapperRef = viewChild.required<ElementRef<HTMLDivElement>>('htmlWrapper');
 
   protected showMagnet = computed(
     () =>
@@ -127,7 +126,7 @@ export class NodeComponent
       this.nodeModel().node.type === 'html-template' ||
       this.nodeModel().isComponentType
     ) {
-      resizable([this.htmlWrapperRef.nativeElement], this.zone)
+      resizable([this.htmlWrapperRef().nativeElement], this.zone)
         .pipe(
           startWith(null),
           tap(() =>
@@ -137,8 +136,8 @@ export class NodeComponent
           ),
           filter(() => !this.nodeModel().resizing()),
           tap(() => {
-            const width = this.htmlWrapperRef.nativeElement.clientWidth;
-            const height = this.htmlWrapperRef.nativeElement.clientHeight;
+            const width = this.htmlWrapperRef().nativeElement.clientWidth;
+            const height = this.htmlWrapperRef().nativeElement.clientHeight;
 
             this.nodeModel().size.set({ width, height });
           }),

@@ -5,10 +5,10 @@ import {
   ElementRef,
   Input,
   TemplateRef,
-  ViewChild,
   computed,
   signal,
   input,
+  viewChild,
 } from '@angular/core';
 import { EdgeLabelModel } from '../../models/edge-label.model';
 import { EdgeModel } from '../../models/edge.model';
@@ -47,8 +47,8 @@ export class EdgeLabelComponent implements AfterViewInit {
 
   public htmlTemplate = input<TemplateRef<any>>();
 
-  @ViewChild('edgeLabelWrapper')
-  public edgeLabelWrapperRef!: ElementRef<HTMLDivElement>;
+  public edgeLabelWrapperRef =
+    viewChild.required<ElementRef<HTMLDivElement>>('edgeLabelWrapper');
 
   /**
    * Centered point of label
@@ -75,10 +75,10 @@ export class EdgeLabelComponent implements AfterViewInit {
     const MAGIC_VALUE_TO_FIX_GLITCH_IN_CHROME = 2;
 
     const width =
-      this.edgeLabelWrapperRef.nativeElement.clientWidth +
+      this.edgeLabelWrapperRef().nativeElement.clientWidth +
       MAGIC_VALUE_TO_FIX_GLITCH_IN_CHROME;
     const height =
-      this.edgeLabelWrapperRef.nativeElement.clientHeight +
+      this.edgeLabelWrapperRef().nativeElement.clientHeight +
       MAGIC_VALUE_TO_FIX_GLITCH_IN_CHROME;
 
     this.model().size.set({ width, height });

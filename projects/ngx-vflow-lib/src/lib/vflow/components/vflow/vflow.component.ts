@@ -1,16 +1,16 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  ContentChild,
   Injector,
   Input,
   OnInit,
-  ViewChild,
   computed,
   inject,
   runInInjectionContext,
   input,
   output,
+  contentChild,
+  viewChild,
 } from '@angular/core';
 import { DynamicNode, Node } from '../../interfaces/node.interface';
 import { MapContextDirective } from '../../directives/map-context.directive';
@@ -273,28 +273,27 @@ export class VflowComponent implements OnInit {
   // #endregion
 
   // #region TEMPLATES
-  @ContentChild(NodeHtmlTemplateDirective)
-  protected nodeTemplateDirective?: NodeHtmlTemplateDirective;
+  protected nodeTemplateDirective = contentChild(NodeHtmlTemplateDirective);
 
-  @ContentChild(GroupNodeTemplateDirective)
-  protected groupNodeTemplateDirective?: GroupNodeTemplateDirective;
+  protected groupNodeTemplateDirective = contentChild(
+    GroupNodeTemplateDirective,
+  );
 
-  @ContentChild(EdgeTemplateDirective)
-  protected edgeTemplateDirective?: EdgeTemplateDirective;
+  protected edgeTemplateDirective = contentChild(EdgeTemplateDirective);
 
-  @ContentChild(EdgeLabelHtmlTemplateDirective)
-  protected edgeLabelHtmlDirective?: EdgeLabelHtmlTemplateDirective;
+  protected edgeLabelHtmlDirective = contentChild(
+    EdgeLabelHtmlTemplateDirective,
+  );
 
-  @ContentChild(ConnectionTemplateDirective)
-  protected connectionTemplateDirective?: ConnectionTemplateDirective;
+  protected connectionTemplateDirective = contentChild(
+    ConnectionTemplateDirective,
+  );
   // #endregion
 
   // #region DIRECTIVES
-  @ViewChild(MapContextDirective)
-  protected mapContext!: MapContextDirective;
+  protected mapContext = viewChild(MapContextDirective);
 
-  @ViewChild(SpacePointContextDirective)
-  protected spacePointContext!: SpacePointContextDirective;
+  protected spacePointContext = viewChild.required(SpacePointContextDirective);
   // #endregion
 
   // #region SIGNAL_API
@@ -411,7 +410,7 @@ export class VflowComponent implements OnInit {
    * Convert point received from document to point on the flow
    */
   public documentPointToFlowPoint(point: Point): Point {
-    return this.spacePointContext.documentPointToFlowPoint(point);
+    return this.spacePointContext().documentPointToFlowPoint(point);
   }
   // #endregion
 

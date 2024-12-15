@@ -15,7 +15,7 @@
     <svg:g
       connection
       [model]="connection"
-      [template]="connectionTemplateDirective?.templateRef"
+      [template]="connectionTemplateDirective()?.templateRef"
     />
 
     @if (optimization().detachedGroupsLayer) {
@@ -24,7 +24,7 @@
         <svg:g
           node
           [nodeModel]="model"
-          [groupNodeTemplate]="groupNodeTemplateDirective?.templateRef"
+          [groupNodeTemplate]="groupNodeTemplateDirective()?.templateRef"
           [attr.transform]="model.pointTransform()"
         />
       }
@@ -33,8 +33,8 @@
         <svg:g
           edge
           [model]="model"
-          [edgeTemplate]="edgeTemplateDirective?.templateRef"
-          [edgeLabelHtmlTemplate]="edgeLabelHtmlDirective?.templateRef"
+          [edgeTemplate]="edgeTemplateDirective()?.templateRef"
+          [edgeLabelHtmlTemplate]="edgeLabelHtmlDirective()?.templateRef"
         />
       }
       <!-- Nodes -->
@@ -42,7 +42,7 @@
         <svg:g
           node
           [nodeModel]="model"
-          [nodeTemplate]="nodeTemplateDirective?.templateRef"
+          [nodeTemplate]="nodeTemplateDirective()?.templateRef"
           [attr.transform]="model.pointTransform()"
         />
       }
@@ -54,8 +54,8 @@
         <svg:g
           edge
           [model]="model"
-          [edgeTemplate]="edgeTemplateDirective?.templateRef"
-          [edgeLabelHtmlTemplate]="edgeLabelHtmlDirective?.templateRef"
+          [edgeTemplate]="edgeTemplateDirective()?.templateRef"
+          [edgeLabelHtmlTemplate]="edgeLabelHtmlDirective()?.templateRef"
         />
       }
       <!-- Nodes -->
@@ -63,8 +63,8 @@
         <svg:g
           node
           [nodeModel]="model"
-          [nodeTemplate]="nodeTemplateDirective?.templateRef"
-          [groupNodeTemplate]="groupNodeTemplateDirective?.templateRef"
+          [nodeTemplate]="nodeTemplateDirective()?.templateRef"
+          [groupNodeTemplate]="groupNodeTemplateDirective()?.templateRef"
           [attr.transform]="model.pointTransform()"
         />
       }
