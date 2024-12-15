@@ -9,6 +9,7 @@ import {
   TemplateRef,
   input,
   viewChild,
+  effect,
 } from '@angular/core';
 import { RootPointerDirective } from '../../directives/root-pointer.directive';
 import { filter, tap } from 'rxjs';
@@ -45,14 +46,7 @@ export class ResizableComponent implements OnInit, AfterViewInit {
   private spacePointContext = inject(SpacePointContextDirective);
   private hostRef = inject<ElementRef<Element>>(ElementRef);
 
-  @Input()
-  public set resizable(value: boolean | '') {
-    if (typeof value === 'boolean') {
-      this.model.resizable.set(value);
-    } else {
-      this.model.resizable.set(true);
-    }
-  }
+  public resizable = input<boolean | ''>();
 
   public resizerColor = input('#2e414c');
 
@@ -92,6 +86,21 @@ export class ResizableComponent implements OnInit, AfterViewInit {
       takeUntilDestroyed(),
     )
     .subscribe();
+
+  constructor() {
+    effect(
+      () => {
+        const resizable = this.resizable();
+
+        if (typeof resizable === 'boolean') {
+          this.model.resizable.set(resizable);
+        } else {
+          this.model.resizable.set(true);
+        }
+      },
+      { allowSignalWrites: true }
+    );
+  }
 
   public ngOnInit(): void {
     this.model.resizerTemplate.set(this.resizer());

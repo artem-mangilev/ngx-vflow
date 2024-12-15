@@ -10,6 +10,7 @@ import {
   TemplateRef,
   input,
   viewChild,
+  effect,
 } from '@angular/core';
 import { Directive } from '@angular/core';
 import { Position } from '../../types/position.type';
@@ -39,14 +40,18 @@ export class NodeToolbarComponent implements OnInit, OnDestroy {
   private overlaysService = inject(OverlaysService);
   private nodeService = inject(NodeAccessorService);
 
-  @Input()
-  public set position(value: Position) {
-    this.model.position.set(value);
-  }
+  public position = input<Position>('top');
 
   public toolbarContentTemplate = viewChild.required<TemplateRef<unknown>>('toolbar');
 
   protected model = new ToolbarModel(this.nodeService.model()!);
+
+  constructor() {
+    effect(
+      () => this.model.position.set(this.position()),
+      { allowSignalWrites: true }
+    );
+  }
 
   public ngOnInit(): void {
     this.model.template.set(this.toolbarContentTemplate());

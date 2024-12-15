@@ -40,10 +40,7 @@ export class EdgeLabelComponent implements AfterViewInit {
 
   public edgeModel = input.required<EdgeModel>();
 
-  @Input()
-  public set point(point: Point) {
-    this.pointSignal.set(point);
-  }
+  public point = input({ x: 0, y: 0 });
 
   public htmlTemplate = input<TemplateRef<any>>();
 
@@ -56,7 +53,7 @@ export class EdgeLabelComponent implements AfterViewInit {
    * TODO: maybe put it into EdgeLabelModel
    */
   protected edgeLabelPoint = computed(() => {
-    const point = this.pointSignal();
+    const point = this.point();
 
     const { width, height } = this.model().size();
 
@@ -65,8 +62,6 @@ export class EdgeLabelComponent implements AfterViewInit {
       y: point.y - height / 2,
     };
   });
-
-  private pointSignal = signal({ x: 0, y: 0 });
 
   @Microtask
   public ngAfterViewInit(): void {

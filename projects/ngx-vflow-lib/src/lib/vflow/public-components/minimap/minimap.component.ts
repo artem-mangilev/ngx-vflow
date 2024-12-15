@@ -36,14 +36,6 @@ export class MiniMapComponent implements OnInit {
   protected injector = inject(Injector);
 
   /**
-   * The corner of the flow where to render a mini-map
-   */
-  @Input()
-  public set position(value: MiniMapPosition) {
-    this.minimapPosition.set(value);
-  }
-
-  /**
    * The color outside the viewport (invisible area)
    */
   public maskColor = input(`rgba(215, 215, 215, 0.6)`);
@@ -54,19 +46,21 @@ export class MiniMapComponent implements OnInit {
   public strokeColor = input(`rgb(200, 200, 200)`);
 
   /**
+   * The corner of the flow where to render a mini-map
+   */
+  public position = input<MiniMapPosition>('bottom-right');
+
+  /**
    * Make a minimap bigger on hover
    */
-  @Input()
-  public set scaleOnHover(value: boolean) {
-    this.scaleOnHoverSignal.set(value);
-  }
+  public scaleOnHover = input(false);
 
   private minimap = viewChild.required<TemplateRef<unknown>>('minimap');
 
   private readonly minimapOffset = 10;
 
   private readonly minimapScale = computed(() => {
-    if (this.scaleOnHoverSignal()) {
+    if (this.scaleOnHover()) {
       return this.hovered() ? 0.4 : 0.2;
     }
 
@@ -86,7 +80,7 @@ export class MiniMapComponent implements OnInit {
   protected hovered = signal(false);
 
   protected minimapPoint = computed(() => {
-    switch (this.minimapPosition()) {
+    switch (this.position()) {
       case 'top-left':
         return { x: this.minimapOffset, y: this.minimapOffset };
       case 'top-right':
@@ -163,10 +157,6 @@ export class MiniMapComponent implements OnInit {
 
     return `translate(${x} ${y}) scale(${scale})`;
   });
-
-  private minimapPosition = signal<MiniMapPosition>('bottom-right');
-
-  private scaleOnHoverSignal = signal(false);
 
   public ngOnInit(): void {
     const model = new MinimapModel();
