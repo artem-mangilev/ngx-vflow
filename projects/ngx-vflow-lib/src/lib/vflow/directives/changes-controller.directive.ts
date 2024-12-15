@@ -1,187 +1,219 @@
-import { Directive, Output, inject } from '@angular/core';
-import { NodeAddChange, NodeChange, NodePositionChange, NodeRemoveChange, NodeSelectedChange, NodeSizeChange } from '../types/node-change.type';
+import { Directive, inject, output } from '@angular/core';
+import {
+  NodeAddChange,
+  NodeChange,
+  NodePositionChange,
+  NodeRemoveChange,
+  NodeSelectedChange,
+  NodeSizeChange,
+} from '../types/node-change.type';
 import { EdgeChangesService } from '../services/edge-changes.service';
 import { NodesChangeService } from '../services/node-changes.service';
 import { Observable, filter, map } from 'rxjs';
-import { EdgeAddChange, EdgeChange, EdgeDetachedChange, EdgeRemoveChange, EdgeSelectChange } from '../types/edge-change.type';
+import {
+  EdgeAddChange,
+  EdgeChange,
+  EdgeDetachedChange,
+  EdgeRemoveChange,
+  EdgeSelectChange,
+} from '../types/edge-change.type';
+import { outputFromObservable } from '@angular/core/rxjs-interop';
 
 @Directive({
   selector: '[changesController]',
-  standalone: true
+  standalone: true,
 })
 export class ChangesControllerDirective {
-  protected nodesChangeService = inject(NodesChangeService)
-  protected edgesChangeService = inject(EdgeChangesService)
+  protected nodesChangeService = inject(NodesChangeService);
+  protected edgesChangeService = inject(EdgeChangesService);
 
   /**
    * Watch nodes change
    */
-  @Output()
-  public onNodesChange = this.nodesChangeService.changes$
+  public onNodesChange = outputFromObservable(this.nodesChangeService.changes$);
 
-  @Output('onNodesChange.position')
-  public onNodesChangePosition = this.nodeChangesOfType('position')
+  public onNodesChangePosition = outputFromObservable(
+    this.nodeChangesOfType('position'),
+    { alias: 'onNodesChange.position' },
+  );
 
-  @Output('onNodesChange.position.single')
-  public onNodesChangePositionSignle = this.singleChange(
-    this.nodeChangesOfType('position')
-  )
+  public onNodesChangePositionSignle = outputFromObservable(
+    this.singleChange(this.nodeChangesOfType('position')),
+    { alias: 'onNodesChange.position.single' },
+  );
 
-  @Output('onNodesChange.position.many')
-  public onNodesChangePositionMany = this.manyChanges(
-    this.nodeChangesOfType('position')
-  )
+  public onNodesChangePositionMany = outputFromObservable(
+    this.manyChanges(this.nodeChangesOfType('position')),
+    { alias: 'onNodesChange.position.many' },
+  );
 
-  @Output('onNodesChange.size')
-  public onNodesChangeSize = this.nodeChangesOfType('size')
+  public onNodesChangeSize = outputFromObservable(
+    this.nodeChangesOfType('size'),
+    { alias: 'onNodesChange.size' },
+  );
 
-  @Output('onNodesChange.size.single')
-  public onNodesChangeSizeSingle = this.singleChange(
-    this.nodeChangesOfType('size')
-  )
+  public onNodesChangeSizeSingle = outputFromObservable(
+    this.singleChange(this.nodeChangesOfType('size')),
+    { alias: 'onNodesChange.size.single' },
+  );
 
-  @Output('onNodesChange.size.many')
-  public onNodesChangeSizeMany = this.manyChanges(
-    this.nodeChangesOfType('size')
-  )
+  public onNodesChangeSizeMany = outputFromObservable(
+    this.manyChanges(this.nodeChangesOfType('size')),
+    { alias: 'onNodesChange.size.many' },
+  );
 
-  @Output('onNodesChange.add')
-  public onNodesChangeAdd = this.nodeChangesOfType('add')
+  public onNodesChangeAdd = outputFromObservable(
+    this.nodeChangesOfType('add'),
+    { alias: 'onNodesChange.add' },
+  );
 
-  @Output('onNodesChange.add.single')
-  public onNodesChangeAddSingle = this.singleChange(
-    this.nodeChangesOfType('add')
-  )
+  public onNodesChangeAddSingle = outputFromObservable(
+    this.singleChange(this.nodeChangesOfType('add')),
+    { alias: 'onNodesChange.add.single' },
+  );
 
-  @Output('onNodesChange.add.many')
-  public onNodesChangeAddMany = this.manyChanges(
-    this.nodeChangesOfType('add')
-  )
+  public onNodesChangeAddMany = outputFromObservable(
+    this.manyChanges(this.nodeChangesOfType('add')),
+    { alias: 'onNodesChange.add.many' },
+  );
 
-  @Output('onNodesChange.remove')
-  public onNodesChangeRemove = this.nodeChangesOfType('remove')
+  public onNodesChangeRemove = outputFromObservable(
+    this.nodeChangesOfType('remove'),
+    { alias: 'onNodesChange.remove' },
+  );
 
-  @Output('onNodesChange.remove.single')
-  public onNodesChangeRemoveSingle = this.singleChange(
-    this.nodeChangesOfType('remove')
-  )
+  public onNodesChangeRemoveSingle = outputFromObservable(
+    this.singleChange(this.nodeChangesOfType('remove')),
+    { alias: 'onNodesChange.remove.single' },
+  );
 
-  @Output('onNodesChange.remove.many')
-  public onNodesChangeRemoveMany = this.manyChanges(
-    this.nodeChangesOfType('remove')
-  )
+  public onNodesChangeRemoveMany = outputFromObservable(
+    this.manyChanges(this.nodeChangesOfType('remove')),
+    { alias: 'onNodesChange.remove.many' },
+  );
 
-  @Output('onNodesChange.select')
-  public onNodesChangeSelect = this.nodeChangesOfType('select')
+  public onNodesChangeSelect = outputFromObservable(
+    this.nodeChangesOfType('select'),
+    { alias: 'onNodesChange.select' },
+  );
 
-  @Output('onNodesChange.select.single')
-  public onNodesChangeSelectSingle = this.singleChange(
-    this.nodeChangesOfType('select')
-  )
+  public onNodesChangeSelectSingle = outputFromObservable(
+    this.singleChange(this.nodeChangesOfType('select')),
+    { alias: 'onNodesChange.select.single' },
+  );
 
-  @Output('onNodesChange.select.many')
-  public onNodesChangeSelectMany = this.manyChanges(
-    this.nodeChangesOfType('select')
-  )
+  public onNodesChangeSelectMany = outputFromObservable(
+    this.manyChanges(this.nodeChangesOfType('select')),
+    { alias: 'onNodesChange.select.many' },
+  );
 
   /**
    * Watch edges change
    */
-  @Output()
-  public onEdgesChange = this.edgesChangeService.changes$
+  public onEdgesChange = outputFromObservable(this.edgesChangeService.changes$);
 
-  @Output('onEdgesChange.detached')
-  public onNodesChangeDetached = this.edgeChangesOfType('detached')
+  public onNodesChangeDetached = outputFromObservable(
+    this.edgeChangesOfType('detached'),
+    { alias: 'onEdgesChange.detached' },
+  );
 
-  @Output('onEdgesChange.detached.single')
-  public onNodesChangeDetachedSingle = this.singleChange(
-    this.edgeChangesOfType('detached')
-  )
+  public onNodesChangeDetachedSingle = outputFromObservable(
+    this.singleChange(this.edgeChangesOfType('detached')),
+    { alias: 'onEdgesChange.detached.single' },
+  );
 
-  @Output('onEdgesChange.detached.many')
-  public onNodesChangeDetachedMany = this.manyChanges(
-    this.edgeChangesOfType('detached')
-  )
+  public onNodesChangeDetachedMany = outputFromObservable(
+    this.manyChanges(this.edgeChangesOfType('detached')),
+    { alias: 'onEdgesChange.detached.many' },
+  );
 
-  @Output('onEdgesChange.add')
-  public onEdgesChangeAdd = this.edgeChangesOfType('add')
+  public onEdgesChangeAdd = outputFromObservable(
+    this.edgeChangesOfType('add'),
+    { alias: 'onEdgesChange.add' },
+  );
 
-  @Output('onEdgesChange.add.single')
-  public onEdgeChangeAddSingle = this.singleChange(
-    this.edgeChangesOfType('add')
-  )
+  public onEdgeChangeAddSingle = outputFromObservable(
+    this.singleChange(this.edgeChangesOfType('add')),
+    { alias: 'onEdgesChange.add.single' },
+  );
 
-  @Output('onEdgesChange.add.many')
-  public onEdgeChangeAddMany = this.manyChanges(
-    this.edgeChangesOfType('add')
-  )
+  public onEdgeChangeAddMany = outputFromObservable(
+    this.manyChanges(this.edgeChangesOfType('add')),
+    { alias: 'onEdgesChange.add.many' },
+  );
 
-  @Output('onEdgesChange.remove')
-  public onEdgeChangeRemove = this.edgeChangesOfType('remove')
+  public onEdgeChangeRemove = outputFromObservable(
+    this.edgeChangesOfType('remove'),
+    { alias: 'onEdgesChange.remove' },
+  );
 
-  @Output('onEdgesChange.remove.single')
-  public onEdgeChangeRemoveSingle = this.singleChange(
-    this.edgeChangesOfType('remove')
-  )
+  public onEdgeChangeRemoveSingle = outputFromObservable(
+    this.singleChange(this.edgeChangesOfType('remove')),
+    { alias: 'onEdgesChange.remove.single' },
+  );
 
-  @Output('onEdgesChange.remove.many')
-  public onEdgeChangeRemoveMany = this.manyChanges(
-    this.edgeChangesOfType('remove')
-  )
+  public onEdgeChangeRemoveMany = outputFromObservable(
+    this.manyChanges(this.edgeChangesOfType('remove')),
+    { alias: 'onEdgesChange.remove.many' },
+  );
 
-  @Output('onEdgesChange.select')
-  public onEdgeChangeSelect = this.edgeChangesOfType('select')
+  public onEdgeChangeSelect = outputFromObservable(
+    this.edgeChangesOfType('select'),
+    { alias: 'onEdgesChange.select' },
+  );
 
-  @Output('onEdgesChange.select.single')
-  public onEdgeChangeSelectSingle = this.singleChange(
-    this.edgeChangesOfType('select')
-  )
+  public onEdgeChangeSelectSingle = outputFromObservable(
+    this.singleChange(this.edgeChangesOfType('select')),
+    { alias: 'onEdgesChange.select.single' },
+  );
 
-  @Output('onEdgesChange.select.many')
-  public onEdgeChangeSelectMany = this.manyChanges(
-    this.edgeChangesOfType('select')
-  )
+  public onEdgeChangeSelectMany = outputFromObservable(
+    this.manyChanges(this.edgeChangesOfType('select')),
+    { alias: 'onEdgesChange.select.many' },
+  );
 
   private nodeChangesOfType<T extends NodeChange['type']>(type: T) {
     return this.nodesChangeService.changes$.pipe(
-      map(changes => changes.filter((c): c is NodeChangeMap[T] => c.type === type)),
-      filter(changes => !!changes.length)
-    )
+      map((changes) =>
+        changes.filter((c): c is NodeChangeMap[T] => c.type === type),
+      ),
+      filter((changes) => !!changes.length),
+    );
   }
 
   private edgeChangesOfType<T extends EdgeChange['type']>(type: T) {
     return this.edgesChangeService.changes$.pipe(
-      map(changes => changes.filter((c): c is EdgeChangeMap[T] => c.type === type)),
-      filter(changes => !!changes.length)
-    )
+      map((changes) =>
+        changes.filter((c): c is EdgeChangeMap[T] => c.type === type),
+      ),
+      filter((changes) => !!changes.length),
+    );
   }
 
   private singleChange<T>(changes$: Observable<T[]>) {
     return changes$.pipe(
-      filter(changes => changes.length === 1),
-      map(([first]) => first)
-    )
+      filter((changes) => changes.length === 1),
+      map(([first]) => first),
+    );
   }
 
   private manyChanges<T>(changes$: Observable<T[]>) {
-    return changes$.pipe(
-      filter(changes => changes.length > 1),
-    )
+    return changes$.pipe(filter((changes) => changes.length > 1));
   }
 }
 
 // TODO: do not write this types manually
 type NodeChangeMap = {
-  position: NodePositionChange,
-  size: NodeSizeChange,
-  add: NodeAddChange,
-  remove: NodeRemoveChange,
-  select: NodeSelectedChange
-}
+  position: NodePositionChange;
+  size: NodeSizeChange;
+  add: NodeAddChange;
+  remove: NodeRemoveChange;
+  select: NodeSelectedChange;
+};
 
 type EdgeChangeMap = {
-  detached: EdgeDetachedChange,
-  add: EdgeAddChange,
-  remove: EdgeRemoveChange,
-  select: EdgeSelectChange
-}
+  detached: EdgeDetachedChange;
+  add: EdgeAddChange;
+  remove: EdgeRemoveChange;
+  select: EdgeSelectChange;
+};

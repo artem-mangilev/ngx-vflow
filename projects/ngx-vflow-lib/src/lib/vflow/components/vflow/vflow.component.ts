@@ -5,19 +5,23 @@ import {
   Injector,
   Input,
   OnInit,
-  Output,
   ViewChild,
   computed,
   inject,
   runInInjectionContext,
   input,
+  output,
 } from '@angular/core';
 import { DynamicNode, Node } from '../../interfaces/node.interface';
 import { MapContextDirective } from '../../directives/map-context.directive';
 import { DraggableService } from '../../services/draggable.service';
 import { NodeModel } from '../../models/node.model';
 import { ViewportService } from '../../services/viewport.service';
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import {
+  toObservable,
+  toSignal,
+  outputFromObservable,
+} from '@angular/core/rxjs-interop';
 import { Edge } from '../../interfaces/edge.interface';
 import { EdgeModel } from '../../models/edge.model';
 import {
@@ -263,8 +267,9 @@ export class VflowComponent implements OnInit {
    *
    * @experimental
    */
-  @Output()
-  public onComponentNodeEvent = this.componentEventBusService.event$ as any; // TODO: research how to remove as any
+  public onComponentNodeEvent = outputFromObservable(
+    this.componentEventBusService.event$ as any,
+  ); // TODO: research how to remove as any
   // #endregion
 
   // #region TEMPLATES
