@@ -126,7 +126,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "ngx-vflow-demo:build"
+            "buildTarget": "ngx-vflow-demo:build"
           }
         },
         "test": {
