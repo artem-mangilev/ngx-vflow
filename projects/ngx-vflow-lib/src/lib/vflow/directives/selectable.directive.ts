@@ -24,9 +24,9 @@ export class SelectableDirective {
 
   private entity(): FlowEntity | null {
     if (this.parentNode) {
-      return this.parentNode.nodeModel
+      return this.parentNode.nodeModel()
     } else if (this.parentEdge) {
-      return this.parentEdge.model
+      return this.parentEdge.model()
     }
 
     return null

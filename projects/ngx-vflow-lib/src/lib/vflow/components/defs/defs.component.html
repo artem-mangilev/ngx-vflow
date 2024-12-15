@@ -1,4 +1,4 @@
-@for (marker of markers | keyvalue; track marker) {
+@for (marker of markers() | keyvalue; track marker) {
   <svg:marker
     [attr.id]="marker.key"
     [attr.markerWidth]="marker.value.width ?? 16.5"
@@ -8,25 +8,24 @@
     [attr.markerUnits]="marker.value.markerUnits ?? 'userSpaceOnUse'"
     refX="0"
     refY="0"
-    >
-
-    @if (marker.value.type === 'arrow-closed' || !marker.value.type) {
+  >
+    @if (marker.value.type === "arrow-closed" || !marker.value.type) {
       <polyline
         class="marker__arrow_closed"
         [style.stroke]="marker.value.color ?? defaultColor"
         [style.stroke-width]="marker.value.strokeWidth ?? 2"
         [style.fill]="marker.value.color ?? defaultColor"
         points="-5,-4 1,0 -5,4 -5,-4"
-        />
+      />
     }
 
-    @if (marker.value.type === 'arrow') {
+    @if (marker.value.type === "arrow") {
       <polyline
         class="marker__arrow_default"
         [style.stroke]="marker.value.color ?? defaultColor"
         [style.stroke-width]="marker.value.strokeWidth ?? 2"
         points="-5,-4 0,0 -5,4"
-        />
+      />
     }
   </svg:marker>
 }

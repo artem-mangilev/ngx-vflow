@@ -1,4 +1,15 @@
-import { Component, computed, inject, Injector, Input, OnInit, signal, TemplateRef, ViewChild } from '@angular/core';
+import {
+  Component,
+  computed,
+  inject,
+  Injector,
+  Input,
+  OnInit,
+  signal,
+  TemplateRef,
+  ViewChild,
+  input,
+} from '@angular/core';
 import { FlowEntitiesService } from '../../services/flow-entities.service';
 import { MinimapModel } from '../../models/minimap.model';
 import { NodeModel } from '../../models/node.model';
@@ -7,119 +18,132 @@ import { getViewportForBounds } from '../../utils/viewport';
 import { getNodesBounds } from '../../utils/nodes';
 import { ViewportService } from '../../services/viewport.service';
 
-export type MiniMapPosition = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'
+export type MiniMapPosition =
+  | 'top-left'
+  | 'top-right'
+  | 'bottom-left'
+  | 'bottom-right';
 
 @Component({
   selector: 'mini-map',
   templateUrl: './minimap.component.html',
-  styleUrls: [`./minimap.component.scss`]
+  styleUrls: [`./minimap.component.scss`],
 })
 export class MiniMapComponent implements OnInit {
-  protected entitiesService = inject(FlowEntitiesService)
-  protected flowSettingsService = inject(FlowSettingsService)
-  protected viewportService = inject(ViewportService)
-  protected injector = inject(Injector)
+  protected entitiesService = inject(FlowEntitiesService);
+  protected flowSettingsService = inject(FlowSettingsService);
+  protected viewportService = inject(ViewportService);
+  protected injector = inject(Injector);
 
   /**
    * The corner of the flow where to render a mini-map
    */
   @Input()
   public set position(value: MiniMapPosition) {
-    this.minimapPosition.set(value)
+    this.minimapPosition.set(value);
   }
 
   /**
    * The color outside the viewport (invisible area)
    */
-  @Input()
-  public maskColor = `rgba(215, 215, 215, 0.6)`
+  public maskColor = input(`rgba(215, 215, 215, 0.6)`);
 
   /**
    * The minimap stroke color
    */
-  @Input()
-  public strokeColor = `rgb(200, 200, 200)`
+  public strokeColor = input(`rgb(200, 200, 200)`);
 
   /**
    * Make a minimap bigger on hover
    */
   @Input()
   public set scaleOnHover(value: boolean) {
-    this.scaleOnHoverSignal.set(value)
+    this.scaleOnHoverSignal.set(value);
   }
 
   @ViewChild('minimap', { static: true })
-  private minimap!: TemplateRef<unknown>
+  private minimap!: TemplateRef<unknown>;
 
-  private readonly minimapOffset = 10
+  private readonly minimapOffset = 10;
 
   private readonly minimapScale = computed(() => {
     if (this.scaleOnHoverSignal()) {
-      return this.hovered() ? 0.4 : 0.2
+      return this.hovered() ? 0.4 : 0.2;
     }
 
-    return 0.2
-  })
+    return 0.2;
+  });
 
   protected viewportColor = computed(() => {
-    const bg = this.flowSettingsService.background()
+    const bg = this.flowSettingsService.background();
 
     if (bg.type === 'dots' || bg.type === 'solid') {
-      return bg.color ?? '#fff'
+      return bg.color ?? '#fff';
     }
 
-    return '#fff'
-  })
+    return '#fff';
+  });
 
-  protected hovered = signal(false)
+  protected hovered = signal(false);
 
   protected minimapPoint = computed(() => {
     switch (this.minimapPosition()) {
       case 'top-left':
-        return { x: this.minimapOffset, y: this.minimapOffset }
+        return { x: this.minimapOffset, y: this.minimapOffset };
       case 'top-right':
         return {
-          x: this.flowSettingsService.computedFlowWidth() - this.minimapWidth() - this.minimapOffset,
-          y: this.minimapOffset
-        }
+          x:
+            this.flowSettingsService.computedFlowWidth() -
+            this.minimapWidth() -
+            this.minimapOffset,
+          y: this.minimapOffset,
+        };
       case 'bottom-left':
         return {
           x: this.minimapOffset,
-          y: this.flowSettingsService.computedFlowHeight() - this.minimapHeight() - this.minimapOffset
-        }
+          y:
+            this.flowSettingsService.computedFlowHeight() -
+            this.minimapHeight() -
+            this.minimapOffset,
+        };
       case 'bottom-right':
         return {
-          x: this.flowSettingsService.computedFlowWidth() - this.minimapWidth() - this.minimapOffset,
-          y: this.flowSettingsService.computedFlowHeight() - this.minimapHeight() - this.minimapOffset
-        }
+          x:
+            this.flowSettingsService.computedFlowWidth() -
+            this.minimapWidth() -
+            this.minimapOffset,
+          y:
+            this.flowSettingsService.computedFlowHeight() -
+            this.minimapHeight() -
+            this.minimapOffset,
+        };
     }
-  })
+  });
 
-  protected minimapWidth = computed(() =>
-    this.flowSettingsService.computedFlowWidth() * this.minimapScale()
-  )
-  protected minimapHeight = computed(() =>
-    this.flowSettingsService.computedFlowHeight() * this.minimapScale()
-  )
+  protected minimapWidth = computed(
+    () => this.flowSettingsService.computedFlowWidth() * this.minimapScale(),
+  );
+  protected minimapHeight = computed(
+    () => this.flowSettingsService.computedFlowHeight() * this.minimapScale(),
+  );
 
   protected viewportTransform = computed(() => {
     const viewport = this.viewportService.readableViewport();
-    let scale = 1 / viewport.zoom
+    let scale = 1 / viewport.zoom;
 
-    let x = -(viewport.x * this.minimapScale()) * scale
-    x /= this.minimapScale()
+    let x = -(viewport.x * this.minimapScale()) * scale;
+    x /= this.minimapScale();
 
-    let y = -(viewport.y * this.minimapScale()) * scale
-    y /= this.minimapScale()
+    let y = -(viewport.y * this.minimapScale()) * scale;
+    y /= this.minimapScale();
 
-    scale /= this.minimapScale()
+    scale /= this.minimapScale();
 
     return `translate(${x}, ${y}) scale(${scale})`;
   });
 
-
   protected boundsViewport = computed(() => {
-    const nodes = this.entitiesService.nodes()
+    const nodes = this.entitiesService.nodes();
 
     return getViewportForBounds(
       getNodesBounds(nodes),
@@ -127,33 +151,32 @@ export class MiniMapComponent implements OnInit {
       this.flowSettingsService.computedFlowHeight(),
       -Infinity,
       1.5,
-      0
-    )
-
-  })
+      0,
+    );
+  });
 
   protected minimapTransform = computed(() => {
-    const vport = this.boundsViewport()
+    const vport = this.boundsViewport();
 
-    const x = vport.x * this.minimapScale()
-    const y = vport.y * this.minimapScale()
-    const scale = vport.zoom * this.minimapScale()
+    const x = vport.x * this.minimapScale();
+    const y = vport.y * this.minimapScale();
+    const scale = vport.zoom * this.minimapScale();
 
-    return `translate(${x} ${y}) scale(${scale})`
-  })
+    return `translate(${x} ${y}) scale(${scale})`;
+  });
 
-  private minimapPosition = signal<MiniMapPosition>('bottom-right')
+  private minimapPosition = signal<MiniMapPosition>('bottom-right');
 
-  private scaleOnHoverSignal = signal(false)
+  private scaleOnHoverSignal = signal(false);
 
   public ngOnInit(): void {
-    const model = new MinimapModel()
-    model.template.set(this.minimap)
+    const model = new MinimapModel();
+    model.template.set(this.minimap);
 
-    this.entitiesService.minimap.set(model)
+    this.entitiesService.minimap.set(model);
   }
 
   protected trackNodes(idx: number, { node }: NodeModel) {
-    return node
+    return node;
   }
 }

@@ -4,21 +4,21 @@
     <svg:line
       class="top"
       [attr.x1]="lineGap"
-      [attr.y1]="-gap"
+      [attr.y1]="-gap()"
       [attr.x2]="model.size().width - lineGap"
-      [attr.y2]="-gap"
-      [attr.stroke]="resizerColor"
+      [attr.y2]="-gap()"
+      [attr.stroke]="resizerColor()"
       stroke-width="2"
       (pointerStart)="startResize('top', $event)"
     />
     <!-- Left line -->
     <svg:line
       class="left"
-      [attr.x1]="-gap"
+      [attr.x1]="-gap()"
       [attr.y1]="lineGap"
-      [attr.x2]="-gap"
+      [attr.x2]="-gap()"
       [attr.y2]="model.size().height - lineGap"
-      [attr.stroke]="resizerColor"
+      [attr.stroke]="resizerColor()"
       stroke-width="2"
       (pointerStart)="startResize('left', $event)"
     />
@@ -26,21 +26,21 @@
     <svg:line
       class="bottom"
       [attr.x1]="lineGap"
-      [attr.y1]="model.size().height + gap"
+      [attr.y1]="model.size().height + gap()"
       [attr.x2]="model.size().width - lineGap"
-      [attr.y2]="model.size().height + gap"
-      [attr.stroke]="resizerColor"
+      [attr.y2]="model.size().height + gap()"
+      [attr.stroke]="resizerColor()"
       stroke-width="2"
       (pointerStart)="startResize('bottom', $event)"
     />
     <!-- Right line -->
     <svg:line
       class="right"
-      [attr.x1]="model.size().width + gap"
+      [attr.x1]="model.size().width + gap()"
       [attr.y1]="lineGap"
-      [attr.x2]="model.size().width + gap"
+      [attr.x2]="model.size().width + gap()"
       [attr.y2]="model.size().height - lineGap"
-      [attr.stroke]="resizerColor"
+      [attr.stroke]="resizerColor()"
       stroke-width="2"
       (pointerStart)="startResize('right', $event)"
     />
@@ -48,44 +48,44 @@
     <!-- Top Left -->
     <svg:rect
       class="top-left"
-      [attr.x]="-(handleSize / 2) - gap"
-      [attr.y]="-(handleSize / 2) - gap"
+      [attr.x]="-(handleSize / 2) - gap()"
+      [attr.y]="-(handleSize / 2) - gap()"
       [attr.width]="handleSize"
       [attr.height]="handleSize"
-      [attr.fill]="resizerColor"
+      [attr.fill]="resizerColor()"
       (pointerStart)="startResize('top-left', $event)"
     />
 
     <!-- Top right -->
     <svg:rect
       class="top-right"
-      [attr.x]="model.size().width - (handleSize / 2) + gap"
-      [attr.y]="-(handleSize / 2) - gap"
+      [attr.x]="model.size().width - handleSize / 2 + gap()"
+      [attr.y]="-(handleSize / 2) - gap()"
       [attr.width]="handleSize"
       [attr.height]="handleSize"
-      [attr.fill]="resizerColor"
+      [attr.fill]="resizerColor()"
       (pointerStart)="startResize('top-right', $event)"
     />
 
     <!-- Bottom left -->
     <svg:rect
       class="bottom-left"
-      [attr.x]="-(handleSize / 2) - gap"
-      [attr.y]="model.size().height - (handleSize / 2) + gap"
+      [attr.x]="-(handleSize / 2) - gap()"
+      [attr.y]="model.size().height - handleSize / 2 + gap()"
       [attr.width]="handleSize"
       [attr.height]="handleSize"
-      [attr.fill]="resizerColor"
+      [attr.fill]="resizerColor()"
       (pointerStart)="startResize('bottom-left', $event)"
     />
 
     <!-- Bottom right -->
     <svg:rect
       class="bottom-right"
-      [attr.x]="model.size().width - (handleSize / 2) + gap"
-      [attr.y]="model.size().height - (handleSize / 2) + gap"
+      [attr.x]="model.size().width - handleSize / 2 + gap()"
+      [attr.y]="model.size().height - handleSize / 2 + gap()"
       [attr.width]="handleSize"
       [attr.height]="handleSize"
-      [attr.fill]="resizerColor"
+      [attr.fill]="resizerColor()"
       (pointerStart)="startResize('bottom-right', $event)"
     />
   </svg:g>
