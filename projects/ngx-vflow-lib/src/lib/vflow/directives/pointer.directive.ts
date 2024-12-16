@@ -3,6 +3,7 @@ import {
   ElementRef,
   EventEmitter,
   HostListener,
+  Output,
   effect,
   inject,
   output,
@@ -23,10 +24,10 @@ export class PointerDirective {
   protected pointerOut = output<Event>();
 
   /**
-   * @todo there is bug, when using output(),
-   * the Angular may somehow ignore the event.
+   * @todo the Angular may somehow ignore the event.
+   * reproduced here: https://www.ngx-vflow.org/workshops/layout/vizdom-layout
    */
-  protected pointerStart = new EventEmitter<Event>();
+  protected pointerStart = output<Event>();
 
   protected pointerEnd = output<Event>();
 
