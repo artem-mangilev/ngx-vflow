@@ -7,25 +7,19 @@ import {
   inject,
   signal,
   input,
+  InputSignal,
 } from '@angular/core';
-import { merge, of, tap } from 'rxjs';
+import { merge, tap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ComponentEventBusService } from '../../services/component-event-bus.service';
-import {
-  ComponentDynamicNode,
-  ComponentNode,
-} from '../../interfaces/node.interface';
+import { NodeAccessorService } from '../../services/node-accessor.service';
 
 @Directive()
-export abstract class CustomNodeBaseComponent<T = unknown> implements OnInit {
+export abstract class CustomNodeBaseComponent<T = any> implements OnInit {
   private eventBus = inject(ComponentEventBusService);
+  private nodeService = inject(NodeAccessorService)
 
   protected destroyRef = inject(DestroyRef);
-
-  /**
-   * Reference to node bound to this component
-   */
-  protected node!: ComponentNode | ComponentDynamicNode;
 
   /**
    * Signal with selected state of node
@@ -55,7 +49,7 @@ export abstract class CustomNodeBaseComponent<T = unknown> implements OnInit {
         emitter.pipe(
           tap((event) => {
             this.eventBus.pushEvent({
-              nodeId: this.node.id,
+              nodeId: this.nodeService.model()?.node.id ?? '',
               eventName: emitters.get(emitter)!,
               eventPayload: event,
             });
