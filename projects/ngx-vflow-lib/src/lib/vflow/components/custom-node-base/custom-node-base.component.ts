@@ -7,9 +7,9 @@ import {
   inject,
   signal,
   input,
-  InputSignal,
+  OutputEmitterRef,
 } from '@angular/core';
-import { merge, tap } from 'rxjs';
+import { merge, Observable, tap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ComponentEventBusService } from '../../services/component-event-bus.service';
 import { NodeAccessorService } from '../../services/node-accessor.service';
@@ -35,22 +35,26 @@ export abstract class CustomNodeBaseComponent<T = any> implements OnInit {
   private trackEvents() {
     const props = Object.getOwnPropertyNames(this);
 
-    const emitters = new Map<EventEmitter<unknown>, string>();
+    const emittersOrRefs = new Map<Observable<unknown>, string>();
     for (const prop of props) {
       const field = (this as Record<string, unknown>)[prop];
 
       if (field instanceof EventEmitter) {
-        emitters.set(field, prop);
+        emittersOrRefs.set(field, prop);
+      }
+
+      if (field instanceof OutputEmitterRef) {
+        emittersOrRefs.set(outputRefToObservable(field), prop);
       }
     }
 
     return merge(
-      ...Array.from(emitters.keys()).map((emitter) =>
+      ...Array.from(emittersOrRefs.keys()).map((emitter) =>
         emitter.pipe(
           tap((event) => {
             this.eventBus.pushEvent({
               nodeId: this.nodeService.model()?.node.id ?? '',
-              eventName: emitters.get(emitter)!,
+              eventName: emittersOrRefs.get(emitter)!,
               eventPayload: event,
             });
           }),
@@ -58,4 +62,16 @@ export abstract class CustomNodeBaseComponent<T = any> implements OnInit {
       ),
     );
   }
+}
+
+function outputRefToObservable(ref: OutputEmitterRef<unknown>) {
+  return new Observable((subscriber) => {
+    const subscription = ref.subscribe((value) => {
+      subscriber.next(value);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  });
 }
