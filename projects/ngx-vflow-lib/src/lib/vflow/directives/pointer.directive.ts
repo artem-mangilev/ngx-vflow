@@ -1,6 +1,7 @@
 import {
   Directive,
   ElementRef,
+  EventEmitter,
   HostListener,
   effect,
   inject,
@@ -21,7 +22,11 @@ export class PointerDirective {
 
   protected pointerOut = output<Event>();
 
-  protected pointerStart = output<Event>();
+  /**
+   * @todo there is bug, when using output(),
+   * the Angular may somehow ignore the event.
+   */
+  protected pointerStart = new EventEmitter<Event>();
 
   protected pointerEnd = output<Event>();
 
