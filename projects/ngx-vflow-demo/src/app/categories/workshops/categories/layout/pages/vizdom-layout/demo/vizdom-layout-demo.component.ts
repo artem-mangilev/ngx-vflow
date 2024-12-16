@@ -72,6 +72,7 @@ export class VizdomLayoutDemoComponent implements OnInit {
         source: node.id,
         target: newNodeId,
         id: `${node.id} -> ${newNodeId}`,
+        curve: 'smooth-step'
       },
     ];
 
