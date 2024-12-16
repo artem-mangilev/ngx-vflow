@@ -1,8 +1,8 @@
 <vflow
   view="auto"
   [minZoom]="0.1"
-  [nodes]="nodes"
-  [edges]="edges"
+  [nodes]="nodes()"
+  [edges]="edges()"
   (onNodesChange.add)="fitView()"
 >
   <ng-template nodeHtml let-ctx>
@@ -16,5 +16,5 @@
       <handle type="source" position="bottom" />
       <handle type="target" position="top" />
     </div>
-  </ng-template> </vflow
->`
+  </ng-template>
+</vflow>

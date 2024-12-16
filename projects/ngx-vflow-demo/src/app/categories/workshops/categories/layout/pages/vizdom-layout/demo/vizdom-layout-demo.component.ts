@@ -2,9 +2,12 @@ import {
   ChangeDetectionStrategy,
   Component,
   OnInit,
+  signal,
+  Signal,
   viewChild,
+  WritableSignal,
 } from '@angular/core';
-import { DirectedGraph, VertexRef } from '@vizdom/vizdom-ts-esm';
+import init, { DirectedGraph, VertexRef } from '@vizdom/vizdom-ts-web';
 import {
   Edge,
   Node,
@@ -15,18 +18,24 @@ import {
 @Component({
   templateUrl: './vizdom-layout-demo.component.html',
   styleUrls: ['./vizdom-layout-demo.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  changeDetection: ChangeDetectionStrategy.Default,
   standalone: true,
   imports: [VflowModule],
 })
 export class VizdomLayoutDemoComponent implements OnInit {
-  vflow = viewChild(VflowComponent);
+  public vflow = viewChild.required(VflowComponent);
 
-  public nodes: Node[] = [];
+  public nodes: WritableSignal<Node[]> = signal([]);
 
-  public edges: Edge[] = [];
+  public edges: WritableSignal<Edge[]> = signal([]);
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
+    try {
+      await init('assets/vizdom/vizdom_ts_bg.wasm');
+    } catch (error) {
+      console.error('Failed to initialize WebAssembly:', error);
+    }
+
     // default layout with one node
     this.layout([
       {
@@ -45,7 +54,7 @@ export class VizdomLayoutDemoComponent implements OnInit {
     const newNodeId = crypto.randomUUID();
 
     const nodes: Node[] = [
-      ...this.nodes,
+      ...this.nodes(),
       {
         id: newNodeId,
         point: { x: 0, y: 0 },
@@ -58,7 +67,7 @@ export class VizdomLayoutDemoComponent implements OnInit {
     ];
 
     const edges: Edge[] = [
-      ...this.edges,
+      ...this.edges(),
       {
         source: node.id,
         target: newNodeId,
@@ -71,7 +80,7 @@ export class VizdomLayoutDemoComponent implements OnInit {
 
   protected fitView() {
     // do not fit when there is initial node
-    if (this.nodes.length > 1) {
+    if (this.nodes().length > 1) {
       this.vflow().fitView({ duration: 750 });
     }
   }
@@ -120,17 +129,20 @@ export class VizdomLayoutDemoComponent implements OnInit {
     const layout = graph.layout().to_json().to_obj();
 
     // Render nodes and edges based on this layout
-    this.nodes = layout.nodes.map((n) => {
-      return {
-        ...nodes.get(n.id)!,
-        id: n.id,
-        point: {
-          x: n.x,
-          y: n.y,
-        },
-      };
-    });
-    this.edges = edgesToLayout;
+    this.nodes.set(
+      layout.nodes.map((n) => {
+        return {
+          ...nodes.get(n.id)!,
+          id: n.id,
+          point: {
+            x: n.x,
+            y: n.y,
+          },
+        };
+      })
+    );
+
+    this.edges.set(edgesToLayout);
   }
 }
 
