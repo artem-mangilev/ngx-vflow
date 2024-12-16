@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { Edge, Node, VflowModule, Connection } from 'projects/ngx-vflow-lib/src/public-api';
 
@@ -6,36 +6,34 @@ import { Edge, Node, VflowModule, Connection } from 'projects/ngx-vflow-lib/src/
   template: `
     <vflow view="auto" [nodes]="nodes" [edges]="edges">
       <ng-template nodeHtml let-ctx>
-        <ng-container *ngIf="ctx.node.data.type === 'output'">
+        @if (ctx.node.data.type === 'output') {
           <div resizable class="custom-node">
             <div class="data-block">
               Output 1
               <handle position="right" type="source" [id]="ctx.node.data.output1"/>
             </div>
-
             <div class="data-block">
               Output 2
               <handle position="right" type="source" [id]="ctx.node.data.output2"/>
             </div>
           </div>
-        </ng-container>
-
-        <ng-container *ngIf="ctx.node.data.type === 'input'">
+        }
+    
+        @if (ctx.node.data.type === 'input') {
           <div resizable class="custom-node">
             <div class="data-block">
               Input 1
               <handle position="left" type="target" [id]="ctx.node.data.input1"/>
             </div>
-
             <div class="data-block">
               Input 2
               <handle position="left" type="target" [id]="ctx.node.data.input2"/>
             </div>
           </div>
-        </ng-container>
+        }
       </ng-template>
     </vflow>
-  `,
+    `,
   styles: [`
     :host {
       width: 100%;
@@ -66,7 +64,7 @@ import { Edge, Node, VflowModule, Connection } from 'projects/ngx-vflow-lib/src/
   `],
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [VflowModule, CommonModule]
+  imports: [VflowModule]
 })
 export class TemplateNodeResizerDemoComponent {
   public nodes: Node[] = [

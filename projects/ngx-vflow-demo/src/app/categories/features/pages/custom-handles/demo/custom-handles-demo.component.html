@@ -1,32 +1,30 @@
 <vflow view="auto" [nodes]="nodes" [edges]="edges" (onConnect)="createEdge($event)" [connection]="connectionSettings">
   <ng-template nodeHtml let-ctx>
-    <ng-container *ngIf="ctx.node.data.type === 'output'">
+    @if (ctx.node.data.type === 'output') {
       <div class="custom-node">
         <div class="data-block">
           Output 1
           <handle position="right" type="source" [id]="ctx.node.data.output1" [template]="handleTemplate"/>
         </div>
-
         <div class="data-block">
           Output 2
           <handle position="right" type="source" [id]="ctx.node.data.output2" [template]="handleTemplate"/>
         </div>
       </div>
-    </ng-container>
+    }
 
-    <ng-container *ngIf="ctx.node.data.type === 'input'">
+    @if (ctx.node.data.type === 'input') {
       <div class="custom-node">
         <div class="data-block">
           Input 1
           <handle position="left" type="target" [id]="ctx.node.data.input1" [template]="squareHandleTemplate"/>
         </div>
-
         <div class="data-block">
           Input 2
           <handle position="left" type="target" [id]="ctx.node.data.input2" [template]="squareHandleTemplate"/>
         </div>
       </div>
-    </ng-container>
+    }
   </ng-template>
 </vflow>
 
@@ -38,7 +36,7 @@
     stroke="black"
     r="6"
     fill="#1b262c"
-  />
+    />
 </ng-template>
 
 <ng-template #squareHandleTemplate let-ctx>
@@ -54,5 +52,5 @@
     [class.handle_idle]="ctx.state() === 'idle'"
     [class.handle_valid]="ctx.state() === 'valid'"
     [class.handle_invalid]="ctx.state() === 'invalid'"
-  />
+    />
 </ng-template>
