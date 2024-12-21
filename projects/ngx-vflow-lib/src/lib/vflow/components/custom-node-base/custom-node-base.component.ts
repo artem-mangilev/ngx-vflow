@@ -24,7 +24,7 @@ export abstract class CustomNodeBaseComponent<T = any> implements OnInit {
   /**
    * Signal with selected state of node
    */
-  public selected = input(false);
+  public selected = this.nodeService.model()!.selected;
 
   public data = signal<T | undefined>(undefined);
 

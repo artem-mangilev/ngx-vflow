@@ -64,7 +64,7 @@
     >
       <ng-container
         [ngComponentOutlet]="$any(nodeModel().node.type)"
-        [ngComponentOutletInputs]="nodeModel().componentTypeInputs()"
+        [ngComponentOutletInputs]="nodeModel().componentTypeInputs"
         [ngComponentOutletInjector]="injector"
       />
     </div>

@@ -91,12 +91,9 @@ export class NodeModel<T = unknown> implements FlowEntity {
   public text = this.createTextSignal()
 
   // Component node specific thing
-  public componentTypeInputs = computed(() => {
-    return {
-      node: this.node,
-      selected: this.selected()
-    }
-  })
+  public componentTypeInputs = {
+    node: this.node,
+  }
 
   public parent = computed(() =>
     this.entitiesService.nodes().find(n => n.node.id === this.parentId()) ?? null
