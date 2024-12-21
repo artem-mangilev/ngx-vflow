@@ -1,0 +1,1 @@
+import"./chunk-P2VZOJAX.js";var t=[{path:"",redirectTo:"vizdom-layout",pathMatch:"full"},{path:"",title:"Layout",children:[{path:"vizdom-layout",loadChildren:()=>import("./chunk-6BAP6HYG.js")},{path:"force",loadChildren:()=>import("./chunk-P3GNDZJX.js")}]}],o=t;export{o as default};

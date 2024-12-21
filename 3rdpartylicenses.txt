@@ -429,12 +429,12 @@ TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF
 THIS SOFTWARE.
 
 --------------------------------------------------------------------------------
-Package: @angular/core
+Package: @ng-doc/app
 License: "MIT"
 
 
 --------------------------------------------------------------------------------
-Package: @ng-doc/app
+Package: @angular/core
 License: "MIT"
 
 
