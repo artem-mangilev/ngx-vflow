@@ -12,7 +12,7 @@ import {
   EdgeChange,
   Node,
   NodeChange,
-  VflowModule,
+  Vflow,
 } from 'projects/ngx-vflow-lib/src/public-api';
 
 @Component({
@@ -27,7 +27,7 @@ import {
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [VflowModule],
+  imports: [Vflow],
 })
 export class HandlingChangesDemoComponent {
   private notifyService = inject(NgDocNotifyService);

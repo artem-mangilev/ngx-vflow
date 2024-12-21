@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { Connection, ConnectionSettings, Edge, Node, VflowModule } from 'projects/ngx-vflow-lib/src/public-api';
+import { Connection, ConnectionSettings, Edge, Node, Vflow } from 'projects/ngx-vflow-lib/src/public-api';
 
 @Component({
   template: `<vflow view="auto" [nodes]="nodes" [edges]="edges"
@@ -14,7 +14,7 @@ import { Connection, ConnectionSettings, Edge, Node, VflowModule } from 'project
   `],
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [VflowModule]
+  imports: [Vflow]
 })
 export class MarkersDemoComponent {
   public nodes: Node[] = [

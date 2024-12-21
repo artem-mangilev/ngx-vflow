@@ -1,5 +1,5 @@
 import { Component, Output, EventEmitter } from "@angular/core";
-import { VflowModule, CustomNodeComponent } from "projects/ngx-vflow-lib/src/public-api";
+import { Vflow, CustomNodeComponent } from "projects/ngx-vflow-lib/src/public-api";
 
 // --- Description of red square component node
 export interface RedSquareData {
@@ -28,7 +28,7 @@ export interface RedSquareData {
     }
   `],
   standalone: true,
-  imports: [VflowModule]
+  imports: [Vflow]
 })
 export class RedSquareNodeComponent extends CustomNodeComponent<RedSquareData> {
   @Output()

@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { KeyboardShortcuts, Node, VflowModule } from 'projects/ngx-vflow-lib/src/public-api';
+import { KeyboardShortcuts, Node, Vflow } from 'projects/ngx-vflow-lib/src/public-api';
 
 @Component({
   template: `<vflow view="auto" [nodes]="nodes" [keyboardShortcuts]="shortcuts" />`,
@@ -11,7 +11,7 @@ import { KeyboardShortcuts, Node, VflowModule } from 'projects/ngx-vflow-lib/src
   `],
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [VflowModule]
+  imports: [Vflow]
 })
 export class KeyboardShortcutsDemoComponent {
   public shortcuts: KeyboardShortcuts = {

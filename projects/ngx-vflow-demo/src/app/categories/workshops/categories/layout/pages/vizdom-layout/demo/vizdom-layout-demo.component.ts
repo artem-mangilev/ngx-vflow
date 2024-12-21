@@ -12,7 +12,7 @@ import {
   Edge,
   Node,
   VflowComponent,
-  VflowModule,
+  Vflow,
 } from 'projects/ngx-vflow-lib/src/public-api';
 
 @Component({
@@ -20,7 +20,7 @@ import {
   styleUrls: ['./vizdom-layout-demo.component.scss'],
   changeDetection: ChangeDetectionStrategy.Default,
   standalone: true,
-  imports: [VflowModule],
+  imports: [Vflow],
 })
 export class VizdomLayoutDemoComponent implements OnInit {
   public vflow = viewChild.required(VflowComponent);

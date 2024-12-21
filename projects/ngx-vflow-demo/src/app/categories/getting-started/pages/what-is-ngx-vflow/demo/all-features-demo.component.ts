@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, signal } from "@angular/core"
-import { VflowModule, Node, Edge, Connection, ConnectionSettings, isComponentStaticNode, isDefaultStaticNode } from "projects/ngx-vflow-lib/src/public-api"
+import { Vflow, Node, Edge, Connection, ConnectionSettings, isComponentStaticNode, isDefaultStaticNode } from "projects/ngx-vflow-lib/src/public-api"
 import { ComplexCustomNodeComponent, ComplexCustomNodeData } from "./components/complex-custom-node.component"
 import { SimpleCustomNodeComponent } from "./components/simple-custom-node.component"
 
@@ -45,7 +45,7 @@ import { SimpleCustomNodeComponent } from "./components/simple-custom-node.compo
   `],
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [VflowModule]
+  imports: [Vflow]
 })
 export class AllFeaturesDemoComponent {
   public nodes: Node[] = [

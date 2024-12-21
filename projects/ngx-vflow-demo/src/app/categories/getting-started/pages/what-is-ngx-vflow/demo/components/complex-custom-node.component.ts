@@ -1,5 +1,5 @@
 import { Component, WritableSignal } from "@angular/core";
-import { VflowModule, CustomNodeComponent } from "projects/ngx-vflow-lib/src/public-api";
+import { Vflow, CustomNodeComponent } from "projects/ngx-vflow-lib/src/public-api";
 
 export interface ComplexCustomNodeData {
   id: {
@@ -84,6 +84,6 @@ export interface ComplexCustomNodeData {
     }
   `],
   standalone: true,
-  imports: [VflowModule]
+  imports: [Vflow]
 })
 export class ComplexCustomNodeComponent extends CustomNodeComponent<ComplexCustomNodeData> { }

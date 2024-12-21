@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { Connection, Edge, Node, VflowModule } from 'projects/ngx-vflow-lib/src/public-api';
+import { Connection, Edge, Node, Vflow } from 'projects/ngx-vflow-lib/src/public-api';
 
 @Component({
   template: `<vflow view="auto" [nodes]="nodes" [edges]="edges"
@@ -13,7 +13,7 @@ import { Connection, Edge, Node, VflowModule } from 'projects/ngx-vflow-lib/src/
   `],
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [VflowModule]
+  imports: [Vflow]
 })
 export class DefaultConnectionDemoComponent {
   public nodes: Node[] = [

@@ -19,7 +19,7 @@ The following code describes 3 nodes and creates 2 edges between them.
   template: `<vflow [nodes]="nodes" [edges]="edges" />`,
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [VflowModule]
+  imports: [Vflow]
 })
 export class DefaultEdgesDemoComponent {
   public nodes: Node[] = [

@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { Edge, Node, VflowModule } from 'projects/ngx-vflow-lib/src/public-api';
+import { Edge, Node, Vflow } from 'projects/ngx-vflow-lib/src/public-api';
 
 @Component({
   template: `<vflow view="auto" [nodes]="nodes" [edges]="edges">
@@ -29,7 +29,7 @@ import { Edge, Node, VflowModule } from 'projects/ngx-vflow-lib/src/public-api';
   `],
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [VflowModule]
+  imports: [Vflow]
 })
 export class MinimapDemoComponent {
   public nodes: Node[] = [

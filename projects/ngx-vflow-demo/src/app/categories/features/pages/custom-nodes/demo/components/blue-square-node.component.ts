@@ -1,5 +1,5 @@
 import { Component, Output, EventEmitter, output } from "@angular/core";
-import { VflowModule, CustomNodeComponent } from "projects/ngx-vflow-lib/src/public-api";
+import { Vflow, CustomNodeComponent } from "projects/ngx-vflow-lib/src/public-api";
 
 // --- Description of blue square component node
 export interface BlueSquareData {
@@ -28,7 +28,7 @@ export interface BlueSquareData {
     }
   `],
   standalone: true,
-  imports: [VflowModule]
+  imports: [Vflow]
 })
 export class BlueSquareNodeComponent extends CustomNodeComponent<BlueSquareData> {
   blueSquareEvent = output<{ x: number; y: number; }>();

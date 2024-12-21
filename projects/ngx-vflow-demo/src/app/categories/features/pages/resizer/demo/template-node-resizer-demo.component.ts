@@ -1,6 +1,6 @@
 
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { Edge, Node, VflowModule, Connection } from 'projects/ngx-vflow-lib/src/public-api';
+import { Edge, Node, Vflow, Connection } from 'projects/ngx-vflow-lib/src/public-api';
 
 @Component({
   template: `
@@ -18,7 +18,7 @@ import { Edge, Node, VflowModule, Connection } from 'projects/ngx-vflow-lib/src/
             </div>
           </div>
         }
-    
+
         @if (ctx.node.data.type === 'input') {
           <div resizable class="custom-node">
             <div class="data-block">
@@ -64,7 +64,7 @@ import { Edge, Node, VflowModule, Connection } from 'projects/ngx-vflow-lib/src/
   `],
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [VflowModule]
+  imports: [Vflow]
 })
 export class TemplateNodeResizerDemoComponent {
   public nodes: Node[] = [

@@ -7,7 +7,7 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { VflowModule } from '../../../ngx-vflow-lib/src/public-api';
+import { Vflow } from '../../../ngx-vflow-lib/src/public-api';
 import { provideHttpClient } from "@angular/common/http";
 import { NgDocButtonIconComponent, NgDocIconComponent, NgDocTooltipDirective } from "@ng-doc/ui-kit";
 
@@ -18,7 +18,7 @@ import { NgDocButtonIconComponent, NgDocIconComponent, NgDocTooltipDirective } f
   imports: [
     BrowserModule,
     AppRoutingModule,
-    VflowModule,
+    Vflow,
     NgDocRootComponent,
     NgDocNavbarComponent,
     NgDocSidebarComponent,

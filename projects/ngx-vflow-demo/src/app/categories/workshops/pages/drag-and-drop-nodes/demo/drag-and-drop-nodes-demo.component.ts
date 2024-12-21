@@ -5,7 +5,7 @@ import {
   Edge,
   Node,
   VflowComponent,
-  VflowModule,
+  Vflow,
 } from 'projects/ngx-vflow-lib/src/public-api';
 
 @Component({
@@ -13,7 +13,7 @@ import {
   styleUrls: ['./drag-and-drop-nodes-demo.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [VflowModule, DndModule],
+  imports: [Vflow, DndModule],
 })
 export class DragAndDropNodesDemoComponent {
   public vflow = viewChild.required(VflowComponent);

@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
 import { NgDocNotifyService } from '@ng-doc/ui-kit';
-import { ComponentNodeEvent, Edge, Node, VflowModule } from 'projects/ngx-vflow-lib/src/public-api';
+import { ComponentNodeEvent, Edge, Node, Vflow } from 'projects/ngx-vflow-lib/src/public-api';
 import { BlueSquareNodeComponent, BlueSquareData } from './components/blue-square-node.component';
 import { RedSquareNodeComponent, RedSquareData } from './components/red-square-node.component';
 
@@ -14,7 +14,7 @@ import { RedSquareNodeComponent, RedSquareData } from './components/red-square-n
   `],
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [VflowModule]
+  imports: [Vflow]
 })
 export class CustomComponentNodesDemoComponent {
   private notifyService = inject(NgDocNotifyService)

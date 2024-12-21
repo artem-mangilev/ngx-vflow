@@ -9,7 +9,7 @@ import {
   DynamicNode,
   Edge,
   VflowComponent,
-  VflowModule,
+  Vflow,
 } from 'projects/ngx-vflow-lib/src/public-api';
 
 @Component({
@@ -17,7 +17,7 @@ import {
   styleUrls: ['./force-layout-demo.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [VflowModule],
+  imports: [Vflow],
 })
 export class ForceLayoutDemoComponent {
   vflow = viewChild.required(VflowComponent);
