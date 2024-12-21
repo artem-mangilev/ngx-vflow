@@ -1,5 +1,6 @@
 // Modules
 export * from './lib/vflow/vflow.module';
+export * from './lib/vflow/vflow';
 
 // Interfaces
 export * from './lib/vflow/interfaces/node.interface';
