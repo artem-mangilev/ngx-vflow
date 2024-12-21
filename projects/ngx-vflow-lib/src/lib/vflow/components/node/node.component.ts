@@ -14,6 +14,7 @@ import {
   input,
   viewChild,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DraggableService } from '../../services/draggable.service';
 import { NodeModel } from '../../models/node.model';
 import { FlowStatusService } from '../../services/flow-status.service';
@@ -29,15 +30,15 @@ import { NodeRenderingService } from '../../services/node-rendering.service';
 import { FlowSettingsService } from '../../services/flow-settings.service';
 import { SelectionService } from '../../services/selection.service';
 import { ConnectionControllerDirective } from '../../directives/connection-controller.directive';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NodeAccessorService } from '../../services/node-accessor.service';
 import { OverlaysService } from '../../services/overlays.service';
 import { HandleSizeControllerDirective } from '../../directives/handle-size-controller.directive';
-import { ResizableComponent } from '../../public-components/resizable/resizable.component';
 import { NgTemplateOutlet, NgComponentOutlet } from '@angular/common';
-import { HandleComponent } from '../handle/handle.component';
 import { DefaultNodeComponent } from '../default-node/default-node.component';
 import { PointerDirective } from '../../directives/pointer.directive';
+// public components that uses in default node (loaded by defer)
+import { ResizableComponent } from '../../public-components/resizable/resizable.component';
+import { HandleComponent } from '../../public-components/handle/handle.component';
 
 export type HandleState = 'valid' | 'invalid' | 'idle';
 
