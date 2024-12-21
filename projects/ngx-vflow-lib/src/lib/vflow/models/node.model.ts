@@ -67,10 +67,6 @@ export class NodeModel<T = unknown> implements FlowEntity {
     `translate(${this.globalPoint().x}, ${this.globalPoint().y})`
   )
 
-  // Now source and handle positions derived from parent flow
-  public sourcePosition = computed(() => this.flowSettingsService.handlePositions().source)
-  public targetPosition = computed(() => this.flowSettingsService.handlePositions().target)
-
   public handles = signal<HandleModel[]>([])
 
   public handles$ = toObservable(this.handles)

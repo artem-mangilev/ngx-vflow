@@ -17,8 +17,8 @@
     >
       <div [outerHTML]="nodeModel().text()"></div>
 
-      <handle type="source" [position]="nodeModel().sourcePosition()" />
-      <handle type="target" [position]="nodeModel().targetPosition()" />
+      <handle type="source" position="right"/>
+      <handle type="target" position="left" />
     </default-node>
   </svg:foreignObject>
 }

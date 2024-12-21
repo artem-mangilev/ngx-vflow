@@ -31,7 +31,6 @@ import {
   GroupNodeTemplateDirective,
   NodeHtmlTemplateDirective,
 } from '../../directives/template.directive';
-import { HandlePositions } from '../../interfaces/handle-positions.interface';
 import { addNodesToEdges } from '../../utils/add-nodes-to-edges';
 import { skip } from 'rxjs';
 import { Point } from '../../interfaces/point.interface';
@@ -165,19 +164,6 @@ export class VflowComponent implements OnInit {
   @Input()
   public set maxZoom(value: number) {
     this.flowSettingsService.maxZoom.set(value);
-  }
-
-  /**
-   * Object that controls flow direction.
-   *
-   * For example, if you want to archieve right to left direction
-   * then you need to pass these positions { source: 'left', target: 'right' }
-   *
-   * @deprecated
-   */
-  @Input()
-  public set handlePositions(handlePositions: HandlePositions) {
-    this.flowSettingsService.handlePositions.set(handlePositions);
   }
 
   /**

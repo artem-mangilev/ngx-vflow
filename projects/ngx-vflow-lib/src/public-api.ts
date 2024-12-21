@@ -9,7 +9,6 @@ export * from './lib/vflow/interfaces/edge-label.interface';
 export * from './lib/vflow/interfaces/connection.interface';
 export * from './lib/vflow/interfaces/connection.interface';
 export * from './lib/vflow/interfaces/connection-settings.interface';
-export * from './lib/vflow/interfaces/handle-positions.interface';
 export * from './lib/vflow/interfaces/marker.interface';
 export { ViewportState } from './lib/vflow/interfaces/viewport.interface';
 export * from './lib/vflow/interfaces/component-node-event.interface';
