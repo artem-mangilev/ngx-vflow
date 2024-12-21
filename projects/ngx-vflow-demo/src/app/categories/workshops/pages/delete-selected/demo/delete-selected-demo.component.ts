@@ -1,12 +1,12 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { Edge, Node, VflowModule } from 'projects/ngx-vflow-lib/src/public-api';
+import { Edge, Node, Vflow } from 'projects/ngx-vflow-lib/src/public-api';
 
 @Component({
   templateUrl: './delete-selected-demo.component.html',
   styleUrls: ['./delete-selected-demo.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [VflowModule]
+  imports: [Vflow]
 })
 export class DeleteSelectedDemoComponent {
   public nodes: Node[] = [

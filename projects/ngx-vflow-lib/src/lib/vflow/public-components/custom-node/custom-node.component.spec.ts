@@ -2,14 +2,14 @@ import { Component } from "@angular/core";
 import { CustomNodeComponent } from "./custom-node.component";
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { provideCustomNodeMocks } from "../../testing-utils/provide-custom-node-mocks";
-import { VflowModule } from "../../vflow.module";
+import { Vflow } from "../../vflow";
 
 @Component({
   standalone: true,
   template: `<div resizable selectable dragHandle>
     <handle />
   </div>`,
-  imports: [VflowModule]
+  imports: [Vflow]
 })
 class TestCustomNodeComponent extends CustomNodeComponent { }
 

@@ -1,18 +1,9 @@
 import { Injectable, WritableSignal, signal } from '@angular/core';
-import { HandlePositions } from '../interfaces/handle-positions.interface';
 import { Background } from '../types/background.type';
 
 @Injectable()
 export class FlowSettingsService {
   public entitiesSelectable = signal(true)
-
-  /**
-   * Global setting with handle positions. Nodes derive this value
-   *
-   * @deprecated
-   */
-  public handlePositions: WritableSignal<HandlePositions> = signal({ source: 'right', target: 'left' })
-
   /**
    * @see {VflowComponent.view}
    */

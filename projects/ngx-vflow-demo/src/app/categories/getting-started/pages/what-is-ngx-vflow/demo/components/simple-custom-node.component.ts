@@ -1,5 +1,5 @@
 import { Component } from "@angular/core";
-import { CustomNodeComponent, VflowModule } from "projects/ngx-vflow-lib/src/public-api";
+import { CustomNodeComponent, Vflow } from "projects/ngx-vflow-lib/src/public-api";
 
 @Component({
   template: `<div class="node">
@@ -22,6 +22,6 @@ import { CustomNodeComponent, VflowModule } from "projects/ngx-vflow-lib/src/pub
     }
   `],
   standalone: true,
-  imports: [VflowModule]
+  imports: [Vflow]
 })
 export class SimpleCustomNodeComponent extends CustomNodeComponent { }

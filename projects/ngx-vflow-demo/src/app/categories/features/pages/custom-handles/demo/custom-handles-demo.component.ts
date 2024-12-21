@@ -1,13 +1,13 @@
-import { CommonModule } from '@angular/common';
+
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { Edge, Node, VflowModule, Connection, ConnectionSettings } from 'projects/ngx-vflow-lib/src/public-api';
+import { Edge, Node, Vflow, Connection, ConnectionSettings } from 'projects/ngx-vflow-lib/src/public-api';
 
 @Component({
   templateUrl: './custom-handles-demo.component.html',
   styleUrls: ['./custom-handles-demo.styles.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [VflowModule, CommonModule]
+  imports: [Vflow]
 })
 export class CustomHandlesDemoComponent {
   public nodes: Node[] = [

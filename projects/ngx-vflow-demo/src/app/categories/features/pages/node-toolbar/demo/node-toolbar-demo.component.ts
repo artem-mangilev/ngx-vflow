@@ -1,13 +1,13 @@
-import { CommonModule } from '@angular/common';
+
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { Edge, Node, VflowModule } from 'projects/ngx-vflow-lib/src/public-api';
+import { Edge, Node, Vflow } from 'projects/ngx-vflow-lib/src/public-api';
 
 @Component({
   templateUrl: './node-toolbar-demo.component.html',
   styleUrls: ['./node-toolbar-demo.styles.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [VflowModule, CommonModule]
+  imports: [Vflow]
 })
 export class NodeToolbarDemoComponent {
   public nodes: Node[] = [

@@ -6,7 +6,10 @@ import { FlowEntity } from '../interfaces/flow-entity.interface';
 import { NodeComponent } from '../components/node/node.component';
 import { FlowSettingsService } from '../services/flow-settings.service';
 
-@Directive({ selector: '[selectable]' })
+@Directive({
+  standalone: true,
+  selector: '[selectable]',
+})
 export class SelectableDirective {
   private flowSettingsService = inject(FlowSettingsService)
   private selectionService = inject(SelectionService)
@@ -24,9 +27,9 @@ export class SelectableDirective {
 
   private entity(): FlowEntity | null {
     if (this.parentNode) {
-      return this.parentNode.nodeModel
+      return this.parentNode.nodeModel()
     } else if (this.parentEdge) {
-      return this.parentEdge.model
+      return this.parentEdge.model()
     }
 
     return null

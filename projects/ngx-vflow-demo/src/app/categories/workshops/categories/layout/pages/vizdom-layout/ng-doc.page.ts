@@ -1,6 +1,6 @@
 import { NgDocPage } from '@ng-doc/core';
-import { VizdomLayoutDemoComponent } from './demo/vizdom-layout-demo.component';
 import LayoutCategory from '../../ng-doc.category';
+import { VizdomLayoutDemoComponent } from './demo/vizdom-layout-demo.component';
 
 const TestPage: NgDocPage = {
   title: `Vizdom layout`,

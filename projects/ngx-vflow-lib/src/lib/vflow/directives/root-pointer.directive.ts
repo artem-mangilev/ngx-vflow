@@ -11,7 +11,10 @@ export interface PointerEvent {
   originalEvent: MouseEvent | TouchEvent
 }
 
-@Directive({ selector: 'svg[rootPointer]' })
+@Directive({
+  standalone: true,
+  selector: 'svg[rootPointer]',
+})
 export class RootPointerDirective {
   private host = inject<ElementRef<SVGSVGElement>>(ElementRef).nativeElement
 

@@ -1,13 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { Edge, Node, VflowModule, Connection } from 'projects/ngx-vflow-lib/src/public-api';
+import { Edge, Node, Vflow, Connection } from 'projects/ngx-vflow-lib/src/public-api';
 
 @Component({
   templateUrl: './multiple-connection-points-demo.component.html',
   styleUrls: ['./multiple-connection-points-demo.styles.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [VflowModule, CommonModule]
+  imports: [Vflow, CommonModule]
 })
 export class MultipleConnectionPointsDemoComponent {
   public nodes: Node[] = [

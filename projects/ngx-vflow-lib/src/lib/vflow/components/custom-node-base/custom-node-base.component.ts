@@ -1,62 +1,77 @@
-import { DestroyRef, Directive, EventEmitter, Input, OnInit, inject, signal } from "@angular/core"
-import { merge, of, tap } from "rxjs";
-import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
-import { ComponentEventBusService } from "../../services/component-event-bus.service";
-import { ComponentDynamicNode, ComponentNode } from "../../interfaces/node.interface";
+import {
+  DestroyRef,
+  Directive,
+  EventEmitter,
+  Input,
+  OnInit,
+  inject,
+  signal,
+  input,
+  OutputEmitterRef,
+} from '@angular/core';
+import { merge, Observable, tap } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ComponentEventBusService } from '../../services/component-event-bus.service';
+import { NodeAccessorService } from '../../services/node-accessor.service';
 
 @Directive()
-export abstract class CustomNodeBaseComponent<T = unknown> implements OnInit {
-  private eventBus = inject(ComponentEventBusService)
+export abstract class CustomNodeBaseComponent<T = any> implements OnInit {
+  private eventBus = inject(ComponentEventBusService);
+  private nodeService = inject(NodeAccessorService)
 
-  protected destroyRef = inject(DestroyRef)
-
-  /**
-   * Reference to node bound to this component
-   */
-  protected node!: ComponentNode | ComponentDynamicNode
-
-  @Input()
-  public set _selected(value: boolean) {
-    this.selected.set(value)
-  }
+  protected destroyRef = inject(DestroyRef);
 
   /**
    * Signal with selected state of node
    */
-  public selected = signal(false)
+  public selected = this.nodeService.model()!.selected;
 
-  public data = signal<T | undefined>(undefined)
+  public data = signal<T | undefined>(undefined);
 
   public ngOnInit(): void {
-    this.trackEvents()
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe()
+    this.trackEvents().pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
   }
 
   private trackEvents() {
-    const props = Object.getOwnPropertyNames(this)
+    const props = Object.getOwnPropertyNames(this);
 
-    const emitters = new Map<EventEmitter<unknown>, string>()
+    const emittersOrRefs = new Map<Observable<unknown>, string>();
     for (const prop of props) {
-      const field = (this as Record<string, unknown>)[prop]
+      const field = (this as Record<string, unknown>)[prop];
 
       if (field instanceof EventEmitter) {
-        emitters.set(field, prop)
+        emittersOrRefs.set(field, prop);
+      }
+
+      if (field instanceof OutputEmitterRef) {
+        emittersOrRefs.set(outputRefToObservable(field), prop);
       }
     }
 
     return merge(
-      ...Array.from(emitters.keys()).map(emitter =>
+      ...Array.from(emittersOrRefs.keys()).map((emitter) =>
         emitter.pipe(
           tap((event) => {
             this.eventBus.pushEvent({
-              nodeId: this.node.id,
-              eventName: emitters.get(emitter)!,
-              eventPayload: event
-            })
-          }))
-      )
-    )
-  };
+              nodeId: this.nodeService.model()?.node.id ?? '',
+              eventName: emittersOrRefs.get(emitter)!,
+              eventPayload: event,
+            });
+          }),
+        ),
+      ),
+    );
+  }
 }
 
+function outputRefToObservable(ref: OutputEmitterRef<unknown>) {
+  return new Observable((subscriber) => {
+    const subscription = ref.subscribe((value) => {
+      subscriber.next(value);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  });
+}

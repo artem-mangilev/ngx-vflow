@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { Connection, ConnectionSettings, CustomNodeComponent, Edge, Node, VflowComponent, VflowModule } from 'projects/ngx-vflow-lib/src/public-api';
+import { Connection, ConnectionSettings, CustomNodeComponent, Edge, Node, VflowComponent, Vflow } from 'projects/ngx-vflow-lib/src/public-api';
 
 @Component({
   template: `
@@ -19,7 +19,7 @@ import { Connection, ConnectionSettings, CustomNodeComponent, Edge, Node, VflowC
   `],
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [VflowModule]
+  imports: [Vflow]
 })
 export class LooseConnectionDemoComponent {
   public nodes: Node[] = [
@@ -90,6 +90,6 @@ interface LooseConnectionNodeData {
   `],
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [VflowModule]
+  imports: [Vflow]
 })
 export class LooseConnectionNode extends CustomNodeComponent<LooseConnectionNodeData> { }

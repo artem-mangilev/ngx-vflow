@@ -3,14 +3,14 @@ import { Point } from "./point.interface"
 import { CustomNodeComponent } from "../public-components/custom-node/custom-node.component"
 import { CustomDynamicNodeComponent } from "../public-components/custom-dynamic-node/custom-dynamic-node.component"
 
-export type Node<T = unknown> =
+export type Node<T = any> =
   DefaultNode |
   HtmlTemplateNode<T> |
   ComponentNode<T> |
   DefaultGroupNode |
   TemplateGroupNode<T>
 
-export type DynamicNode<T = unknown> =
+export type DynamicNode<T = any> =
   DefaultDynamicNode |
   HtmlTemplateDynamicNode<T> |
   ComponentDynamicNode<T> |
@@ -45,14 +45,14 @@ export interface DefaultDynamicNode extends SharedDynamicNode {
   height?: WritableSignal<number>
 }
 
-export interface HtmlTemplateNode<T = unknown> extends SharedNode {
+export interface HtmlTemplateNode<T = any> extends SharedNode {
   type: 'html-template'
   data?: T
   width?: number
   height?: number
 }
 
-export interface HtmlTemplateDynamicNode<T = unknown> extends SharedDynamicNode {
+export interface HtmlTemplateDynamicNode<T = any> extends SharedDynamicNode {
   type: 'html-template'
   data?: WritableSignal<T>
   width?: WritableSignal<number>
@@ -89,41 +89,41 @@ export interface TemplateDynamicGroupNode<T> extends SharedDynamicNode {
   data?: WritableSignal<T>
 }
 
-export interface ComponentNode<T = unknown> extends SharedNode {
+export interface ComponentNode<T = any> extends SharedNode {
   type: Type<CustomNodeComponent<T>>
   data?: T
   width?: number
   height?: number
 }
 
-export interface ComponentDynamicNode<T = unknown> extends SharedDynamicNode {
+export interface ComponentDynamicNode<T = any> extends SharedDynamicNode {
   type: Type<CustomDynamicNodeComponent<T>>
   data?: WritableSignal<T>
   width?: WritableSignal<number>
   height?: WritableSignal<number>
 }
 
-export function isStaticNode<T>(node: Node | DynamicNode): node is Node<T> {
+export function isStaticNode<T>(node: Node<T> | DynamicNode<T>): node is Node<T> {
   return typeof node.point !== 'function'
 }
 
-export function isDynamicNode<T>(node: Node | DynamicNode): node is DynamicNode<T> {
+export function isDynamicNode<T>(node: Node<T> | DynamicNode<T>): node is DynamicNode<T> {
   return typeof node.point === 'function'
 }
 
-export function isComponentStaticNode<T>(node: Node): node is ComponentNode<T> {
+export function isComponentStaticNode<T>(node: Node<T>): node is ComponentNode<T> {
   return CustomNodeComponent.isPrototypeOf(node.type)
 }
 
-export function isComponentDynamicNode<T>(node: DynamicNode): node is ComponentDynamicNode<T> {
+export function isComponentDynamicNode<T>(node: DynamicNode<T>): node is ComponentDynamicNode<T> {
   return CustomDynamicNodeComponent.isPrototypeOf(node.type)
 }
 
-export function isTemplateStaticNode<T>(node: Node): node is HtmlTemplateNode<T> {
+export function isTemplateStaticNode<T>(node: Node<T>): node is HtmlTemplateNode<T> {
   return node.type === 'html-template'
 }
 
-export function isTemplateDynamicNode<T>(node: DynamicNode): node is HtmlTemplateDynamicNode<T> {
+export function isTemplateDynamicNode<T>(node: DynamicNode<T>): node is HtmlTemplateDynamicNode<T> {
   return node.type === 'html-template'
 }
 
@@ -143,10 +143,10 @@ export function isDefaultDynamicGroupNode(node: DynamicNode): node is DefaultDyn
   return node.type === 'default-group'
 }
 
-export function isTemplateStaticGroupNode<T>(node: Node): node is TemplateGroupNode<T> {
+export function isTemplateStaticGroupNode<T>(node: Node<T>): node is TemplateGroupNode<T> {
   return node.type === 'template-group'
 }
 
-export function isTemplateDynamicGroupNode<T>(node: DynamicNode): node is TemplateDynamicGroupNode<T> {
+export function isTemplateDynamicGroupNode<T>(node: DynamicNode<T>): node is TemplateDynamicGroupNode<T> {
   return node.type === 'template-group'
 }

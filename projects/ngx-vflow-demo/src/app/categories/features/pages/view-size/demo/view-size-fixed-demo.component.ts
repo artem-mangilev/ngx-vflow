@@ -1,11 +1,11 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { Edge, Node, VflowModule } from 'projects/ngx-vflow-lib/src/public-api';
+import { Edge, Node, Vflow } from 'projects/ngx-vflow-lib/src/public-api';
 
 @Component({
   template: `<vflow [nodes]="nodes" [edges]="edges" [view]="[600, 600]" />`,
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [VflowModule]
+  imports: [Vflow]
 })
 export class ViewSizeFixedDemoComponent {
   public nodes: Node[] = [

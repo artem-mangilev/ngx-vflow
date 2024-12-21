@@ -14,9 +14,10 @@ const defaultImageScale = 0.1
 const defaultRepeated = true
 
 @Component({
+  standalone: true,
   selector: 'g[background]',
   templateUrl: './background.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BackgroundComponent {
   private viewportService = inject(ViewportService)

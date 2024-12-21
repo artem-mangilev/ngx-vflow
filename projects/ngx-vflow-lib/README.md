@@ -10,6 +10,13 @@
 npm i ngx-vflow --save
 ```
 
+## Version Compatibility
+
+| ngx-vlow | Angular   |
+|----------|-----------|
+| v0.x     | v16.2.0+  |
+| v1.x     | v17.3.12+ |
+
 ## Basic Example
 
 The following code describes 3 nodes and creates 2 edges between them.
@@ -19,7 +26,7 @@ The following code describes 3 nodes and creates 2 edges between them.
   template: `<vflow [nodes]="nodes" [edges]="edges" />`,
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [VflowModule]
+  imports: [Vflow]
 })
 export class DefaultEdgesDemoComponent {
   public nodes: Node[] = [

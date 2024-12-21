@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import { DynamicNode, Edge, VflowModule } from 'projects/ngx-vflow-lib/src/public-api';
+import { DynamicNode, Edge, Vflow } from 'projects/ngx-vflow-lib/src/public-api';
 
 @Component({
   template: `<vflow view="auto" [nodes]="nodes" [edges]="edges">
@@ -37,7 +37,7 @@ import { DynamicNode, Edge, VflowModule } from 'projects/ngx-vflow-lib/src/publi
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [VflowModule]
+  imports: [Vflow]
 })
 export class CustomNodesDemoComponent {
   public nodes: DynamicNode[] = [

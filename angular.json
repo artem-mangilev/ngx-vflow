@@ -48,11 +48,11 @@
       "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@ng-doc/builder:browser",
+          "builder": "@ng-doc/builder:application",
           "options": {
             "outputPath": "dist/ngx-vflow-demo",
             "index": "projects/ngx-vflow-demo/src/index.html",
-            "main": "projects/ngx-vflow-demo/src/main.ts",
+            "browser": "projects/ngx-vflow-demo/src/main.ts",
             "polyfills": [
               "zone.js"
             ],
@@ -73,8 +73,13 @@
               },
               {
                 "glob": "**/*",
-                "input": ".ng-doc/ngx-vflow-demo/assets",
+                "input": "ng-doc/ngx-vflow-demo/assets",
                 "output": "assets/ng-doc"
+              },
+              {
+                "glob": "**/*.wasm",
+                "input": "node_modules/@vizdom/vizdom-ts-web/",
+                "output": "assets/vizdom"
               }
             ],
             "styles": [
@@ -101,9 +106,7 @@
               "outputHashing": "all"
             },
             "development": {
-              "buildOptimizer": false,
               "optimization": false,
-              "vendorChunk": true,
               "extractLicenses": false,
               "sourceMap": true,
               "namedChunks": true
@@ -115,10 +118,10 @@
           "builder": "@ng-doc/builder:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "ngx-vflow-demo:build:production"
+              "buildTarget": "ngx-vflow-demo:build:production"
             },
             "development": {
-              "browserTarget": "ngx-vflow-demo:build:development"
+              "buildTarget": "ngx-vflow-demo:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -126,7 +129,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "ngx-vflow-demo:build"
+            "buildTarget": "ngx-vflow-demo:build"
           }
         },
         "test": {
@@ -140,7 +143,12 @@
             "inlineStyleLanguage": "scss",
             "assets": [
               "projects/ngx-vflow-demo/src/favicon.ico",
-              "projects/ngx-vflow-demo/src/assets"
+              "projects/ngx-vflow-demo/src/assets",
+              {
+                "glob": "**/*.wasm",
+                "input": "node_modules/@vizdom/vizdom-ts-web/",
+                "output": "assets/vizdom"
+              }
             ],
             "styles": [
               "projects/ngx-vflow-demo/src/styles.scss"

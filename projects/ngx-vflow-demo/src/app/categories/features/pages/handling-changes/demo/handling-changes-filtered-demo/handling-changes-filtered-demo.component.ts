@@ -1,24 +1,41 @@
-import { ChangeDetectionStrategy, Component, TemplateRef, ViewChild, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  TemplateRef,
+  inject,
+  viewChild,
+} from '@angular/core';
 import { NgDocNotifyService } from '@ng-doc/ui-kit';
-import { Connection, Edge, EdgeChange, Node, NodeAddChange, NodeChange, NodePositionChange, NodeSelectedChange, VflowModule } from 'projects/ngx-vflow-lib/src/public-api';
+import {
+  Connection,
+  Edge,
+  EdgeChange,
+  Node,
+  NodeAddChange,
+  NodeChange,
+  NodePositionChange,
+  NodeSelectedChange,
+  Vflow,
+} from 'projects/ngx-vflow-lib/src/public-api';
 
 @Component({
   templateUrl: './handling-changes-filtered-demo.component.html',
-  styles: [`
-    :host {
-      width: 100%;
-      height: 100%;
-    }
-  `],
+  styles: [
+    `
+      :host {
+        width: 100%;
+        height: 100%;
+      }
+    `,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [VflowModule],
+  imports: [Vflow],
 })
 export class HandlingChangesFilteredDemoComponent {
-  private notifyService = inject(NgDocNotifyService)
+  private notifyService = inject(NgDocNotifyService);
 
-  @ViewChild('toast')
-  public toastTemplate!: TemplateRef<{}>;
+  public toastTemplate = viewChild<TemplateRef<{}>>('toast');
 
   public nodes: Node[] = [
     {
@@ -31,72 +48,76 @@ export class HandlingChangesFilteredDemoComponent {
       id: '2',
       point: { x: 200, y: 200 },
       type: 'default',
-      text: `2`
+      text: `2`,
     },
-  ]
+  ];
 
-  public edges: Edge[] = []
+  public edges: Edge[] = [];
 
-  public toastData: any = {}
+  public toastData: any = {};
 
   public createEdge({ source, target }: Connection) {
-    this.edges = [...this.edges, {
-      id: `${source} -> ${target}`,
-      source,
-      target
-    }]
+    this.edges = [
+      ...this.edges,
+      {
+        id: `${source} -> ${target}`,
+        source,
+        target,
+      },
+    ];
   }
 
   public handleNodePositionChange(change: NodePositionChange) {
     this.toastData = {
       title: '(onNodesChange.position.single)',
-      json: JSON.stringify(change, null, 2)
-    }
+      json: JSON.stringify(change, null, 2),
+    };
 
-    this.notifyService.notify(this.toastTemplate)
+    this.notifyService.notify(this.toastTemplate());
   }
 
   public handleNodeSelectChange(change: NodeSelectedChange) {
     this.toastData = {
       title: '(onNodesChange.select.single)',
-      json: JSON.stringify(change, null, 2)
-    }
+      json: JSON.stringify(change, null, 2),
+    };
 
-    this.notifyService.notify(this.toastTemplate)
+    this.notifyService.notify(this.toastTemplate());
   }
 
   public handleNodesAddChange(changes: NodeAddChange[]) {
     this.toastData = {
       title: '(onNodesChange.add.many)',
-      json: JSON.stringify(changes, null, 2)
-    }
+      json: JSON.stringify(changes, null, 2),
+    };
 
-    this.notifyService.notify(this.toastTemplate)
+    this.notifyService.notify(this.toastTemplate());
   }
 
   public handleEdgesAddChange(changes: EdgeChange[]) {
     this.toastData = {
       title: '(onEdgesChange.add)',
-      json: JSON.stringify(changes, null, 2)
-    }
+      json: JSON.stringify(changes, null, 2),
+    };
 
-    this.notifyService.notify(this.toastTemplate)
+    this.notifyService.notify(this.toastTemplate());
   }
 
   public addNodes() {
-    this.nodes = [...this.nodes,
-    {
-      id: crypto.randomUUID(),
-      point: { x: 0, y: 0 },
-      type: 'default',
-      text: `random`,
-    },
-    {
-      id: crypto.randomUUID(),
-      point: { x: 300, y: 300 },
-      type: 'default',
-      text: `random`
-    },
-    ]
+    this.nodes = [
+      ...this.nodes,
+      {
+        id: crypto.randomUUID(),
+        point: { x: 0, y: 0 },
+        type: 'default',
+        text: `random`,
+      },
+      {
+        id: crypto.randomUUID(),
+        point: { x: 300, y: 300 },
+        type: 'default',
+        text: `random`,
+      },
+    ];
   }
 }

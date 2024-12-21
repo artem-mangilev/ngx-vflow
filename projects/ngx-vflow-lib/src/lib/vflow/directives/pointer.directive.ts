@@ -1,29 +1,41 @@
-import { Directive, ElementRef, EventEmitter, HostListener, Output, effect, inject } from '@angular/core';
+import {
+  Directive,
+  ElementRef,
+  EventEmitter,
+  HostListener,
+  Output,
+  effect,
+  inject,
+  output,
+} from '@angular/core';
 import { filter, tap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RootPointerDirective } from './root-pointer.directive';
 
-@Directive({ selector: '[pointerStart], [pointerEnd], [pointerOver], [pointerOut]' })
+@Directive({
+  standalone: true,
+  selector: '[pointerStart], [pointerEnd], [pointerOver], [pointerOut]',
+})
 export class PointerDirective {
-  protected hostElement = inject<ElementRef<Element>>(ElementRef).nativeElement
-  protected pointerMovementDirective = inject(RootPointerDirective)
+  protected hostElement = inject<ElementRef<Element>>(ElementRef).nativeElement;
+  protected pointerMovementDirective = inject(RootPointerDirective);
 
-  @Output()
-  protected pointerOver = new EventEmitter<Event>()
+  protected pointerOver = output<Event>();
 
-  @Output()
-  protected pointerOut = new EventEmitter<Event>()
+  protected pointerOut = output<Event>();
 
-  @Output()
-  protected pointerStart = new EventEmitter<Event>()
+  /**
+   * @todo the Angular may somehow ignore the event.
+   * reproduced here: https://www.ngx-vflow.org/workshops/layout/vizdom-layout
+   */
+  protected pointerStart = output<Event>();
 
-  @Output()
-  protected pointerEnd = new EventEmitter<Event>()
+  protected pointerEnd = output<Event>();
 
   @HostListener('mousedown', ['$event'])
   @HostListener('touchstart', ['$event'])
   protected onPointerStart(event: Event) {
-    this.pointerStart.emit(event)
+    this.pointerStart.emit(event);
 
     if (event instanceof TouchEvent) {
       this.pointerMovementDirective.setInitialTouch(event);
@@ -32,17 +44,17 @@ export class PointerDirective {
 
   @HostListener('mouseup', ['$event'])
   protected onPointerEnd(event: Event) {
-    this.pointerEnd.emit(event)
+    this.pointerEnd.emit(event);
   }
 
   @HostListener('mouseover', ['$event'])
   protected onMouseOver(event: Event) {
-    this.pointerOver.emit(event)
+    this.pointerOver.emit(event);
   }
 
   @HostListener('mouseout', ['$event'])
   protected onMouseOut(event: Event) {
-    this.pointerOut.emit(event)
+    this.pointerOut.emit(event);
   }
 
   private wasPointerOver = false;
@@ -52,28 +64,28 @@ export class PointerDirective {
     .pipe(
       filter(({ target }) => target === this.hostElement),
       tap(({ originalEvent }) => this.pointerEnd.emit(originalEvent)),
-      takeUntilDestroyed()
+      takeUntilDestroyed(),
     )
-    .subscribe()
+    .subscribe();
 
   protected touchOverOut = this.pointerMovementDirective.touchMovement$
     .pipe(
       tap(({ target, originalEvent }) => {
-        this.handleTouchOverAndOut(target, originalEvent)
+        this.handleTouchOverAndOut(target, originalEvent);
       }),
-      takeUntilDestroyed()
+      takeUntilDestroyed(),
     )
-    .subscribe()
+    .subscribe();
 
   // TODO: dirty imperative implementation
   private handleTouchOverAndOut(target: Element | null, event: TouchEvent) {
     if (target === this.hostElement) {
-      this.pointerOver.emit(event)
+      this.pointerOver.emit(event);
       this.wasPointerOver = true;
     } else {
       // should not emit before pointerOver
       if (this.wasPointerOver) {
-        this.pointerOut.emit(event)
+        this.pointerOut.emit(event);
       }
 
       this.wasPointerOver = false;

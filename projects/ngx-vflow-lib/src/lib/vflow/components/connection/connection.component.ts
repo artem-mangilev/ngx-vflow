@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, Input, TemplateRef, computed, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  TemplateRef,
+  computed,
+  inject,
+  input,
+} from '@angular/core';
 import { FlowStatusService } from '../../services/flow-status.service';
 import { straightPath } from '../../math/edge-path/straigh-path';
 import { SpacePointContextDirective } from '../../directives/space-point-context.directive';
@@ -7,132 +14,158 @@ import { bezierPath } from '../../math/edge-path/bezier-path';
 import { hashCode } from '../../utils/hash';
 import { Position } from '../../types/position.type';
 import { smoothStepPath } from '../../math/edge-path/smooth-step-path';
+import { NgTemplateOutlet } from '@angular/common';
 
 @Component({
+  standalone: true,
   selector: 'g[connection]',
   template: `
-    <ng-container *ngIf="model.type === 'default'">
-      <svg:path
-        *ngIf="path() as path"
-        [attr.d]="path"
-        [attr.marker-end]="markerUrl()"
-        [attr.stroke]="defaultColor"
-        fill="none"
-        stroke-width="2"
-      />
-    </ng-container>
+    @if (model().type === 'default') {
+      @if (path(); as path) {
+        <svg:path
+          [attr.d]="path"
+          [attr.marker-end]="markerUrl()"
+          [attr.stroke]="defaultColor"
+          fill="none"
+          stroke-width="2"
+        />
+      }
+    }
 
-    <ng-container *ngIf="model.type === 'template' && template">
-      <ng-container *ngTemplateOutlet="template; context: getContext()" />
-    </ng-container>
+    @if (model().type === 'template') {
+      @if (template(); as template) {
+        <ng-container *ngTemplateOutlet="template; context: getContext()" />
+      }
+    }
   `,
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [NgTemplateOutlet],
 })
 export class ConnectionComponent {
-  @Input({ required: true })
-  public model!: ConnectionModel
+  public model = input.required<ConnectionModel>();
 
-  @Input()
-  public template?: TemplateRef<any>
+  public template = input<TemplateRef<any>>();
 
-  private flowStatusService = inject(FlowStatusService)
-  private spacePointContext = inject(SpacePointContextDirective)
+  private flowStatusService = inject(FlowStatusService);
+  private spacePointContext = inject(SpacePointContextDirective);
 
   protected path = computed(() => {
-    const status = this.flowStatusService.status()
+    const status = this.flowStatusService.status();
 
     if (status.state === 'connection-start') {
-      const sourceHandle = status.payload.sourceHandle
-      const sourcePoint = sourceHandle.pointAbsolute()
-      const sourcePosition = sourceHandle.rawHandle.position
+      const sourceHandle = status.payload.sourceHandle;
+      const sourcePoint = sourceHandle.pointAbsolute();
+      const sourcePosition = sourceHandle.rawHandle.position;
 
-      const targetPoint = this.spacePointContext.svgCurrentSpacePoint()
-      const targetPosition = getOppositePostion(sourceHandle.rawHandle.position)
+      const targetPoint = this.spacePointContext.svgCurrentSpacePoint();
+      const targetPosition = getOppositePostion(
+        sourceHandle.rawHandle.position,
+      );
 
-      switch (this.model.curve) {
-        case 'straight': return straightPath(sourcePoint, targetPoint).path
-        case 'bezier': return bezierPath(
-          sourcePoint, targetPoint,
-          sourcePosition, targetPosition
-        ).path
-        case 'smooth-step': return smoothStepPath(
-          sourcePoint, targetPoint,
-          sourcePosition, targetPosition,
-        ).path
-        case 'step': return smoothStepPath(
-          sourcePoint, targetPoint,
-          sourcePosition, targetPosition,
-          0
-        ).path
+      switch (this.model().curve) {
+        case 'straight':
+          return straightPath(sourcePoint, targetPoint).path;
+        case 'bezier':
+          return bezierPath(
+            sourcePoint,
+            targetPoint,
+            sourcePosition,
+            targetPosition,
+          ).path;
+        case 'smooth-step':
+          return smoothStepPath(
+            sourcePoint,
+            targetPoint,
+            sourcePosition,
+            targetPosition,
+          ).path;
+        case 'step':
+          return smoothStepPath(
+            sourcePoint,
+            targetPoint,
+            sourcePosition,
+            targetPosition,
+            0,
+          ).path;
       }
     }
 
     if (status.state === 'connection-validation') {
-      const sourceHandle = status.payload.sourceHandle
-      const sourcePoint = sourceHandle.pointAbsolute()
-      const sourcePosition = sourceHandle.rawHandle.position
+      const sourceHandle = status.payload.sourceHandle;
+      const sourcePoint = sourceHandle.pointAbsolute();
+      const sourcePosition = sourceHandle.rawHandle.position;
 
-      const targetHandle = status.payload.targetHandle
+      const targetHandle = status.payload.targetHandle;
       // ignore magnet if validation failed
       const targetPoint = status.payload.valid
         ? targetHandle.pointAbsolute()
-        : this.spacePointContext.svgCurrentSpacePoint()
+        : this.spacePointContext.svgCurrentSpacePoint();
       const targetPosition = status.payload.valid
         ? targetHandle.rawHandle.position
-        : getOppositePostion(sourceHandle.rawHandle.position)
+        : getOppositePostion(sourceHandle.rawHandle.position);
 
-      switch (this.model.curve) {
-        case 'straight': return straightPath(sourcePoint, targetPoint).path
-        case 'bezier': return bezierPath(
-          sourcePoint, targetPoint,
-          sourcePosition, targetPosition
-        ).path
-        case 'smooth-step': return smoothStepPath(
-          sourcePoint, targetPoint,
-          sourcePosition, targetPosition,
-        ).path
-        case 'step': return smoothStepPath(
-          sourcePoint, targetPoint,
-          sourcePosition, targetPosition,
-          0
-        ).path
+      switch (this.model().curve) {
+        case 'straight':
+          return straightPath(sourcePoint, targetPoint).path;
+        case 'bezier':
+          return bezierPath(
+            sourcePoint,
+            targetPoint,
+            sourcePosition,
+            targetPosition,
+          ).path;
+        case 'smooth-step':
+          return smoothStepPath(
+            sourcePoint,
+            targetPoint,
+            sourcePosition,
+            targetPosition,
+          ).path;
+        case 'step':
+          return smoothStepPath(
+            sourcePoint,
+            targetPoint,
+            sourcePosition,
+            targetPosition,
+            0,
+          ).path;
       }
     }
 
-    return null
-  })
+    return null;
+  });
 
   protected markerUrl = computed(() => {
-    const marker = this.model.settings.marker
+    const marker = this.model().settings.marker;
 
     if (marker) {
-      return `url(#${hashCode(JSON.stringify(marker))})`
+      return `url(#${hashCode(JSON.stringify(marker))})`;
     }
 
-    return ''
-  })
+    return '';
+  });
 
-  protected readonly defaultColor = 'rgb(177, 177, 183)'
+  protected readonly defaultColor = 'rgb(177, 177, 183)';
 
   protected getContext() {
     return {
       $implicit: {
         path: this.path,
-        marker: this.markerUrl
-      }
-    }
+        marker: this.markerUrl,
+      },
+    };
   }
 }
 
 function getOppositePostion(position: Position): Position {
   switch (position) {
     case 'top':
-      return 'bottom'
+      return 'bottom';
     case 'bottom':
-      return 'top'
+      return 'top';
     case 'left':
-      return 'right'
+      return 'right';
     case 'right':
-      return 'left'
+      return 'left';
   }
 }

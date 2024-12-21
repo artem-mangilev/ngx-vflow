@@ -6,7 +6,7 @@ To simplify writing isolated tests for component nodes, you can use the `provide
 @Component({
   standalone: true,
   template: `<div resizable><handle /></div>`,
-  imports: [VflowModule]
+  imports: [Vflow]
 })
 class TestCustomNodeComponent extends CustomNodeComponent { }
 

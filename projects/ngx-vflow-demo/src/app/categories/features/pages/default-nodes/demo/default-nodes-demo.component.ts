@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { Node, VflowModule } from 'projects/ngx-vflow-lib/src/public-api';
+import { Node, Vflow } from 'projects/ngx-vflow-lib/src/public-api';
 
 @Component({
   template: `<vflow view="auto" [nodes]="nodes" />`,
@@ -11,7 +11,7 @@ import { Node, VflowModule } from 'projects/ngx-vflow-lib/src/public-api';
   `],
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [VflowModule]
+  imports: [Vflow]
 })
 export class DefaultNodesDemoComponent {
   public nodes: Node[] = [

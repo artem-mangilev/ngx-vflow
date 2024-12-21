@@ -1,5 +1,5 @@
-// Modules
-export * from './lib/vflow/vflow.module';
+// Standalone Util
+export * from './lib/vflow/vflow';
 
 // Interfaces
 export * from './lib/vflow/interfaces/node.interface';
@@ -9,7 +9,6 @@ export * from './lib/vflow/interfaces/edge-label.interface';
 export * from './lib/vflow/interfaces/connection.interface';
 export * from './lib/vflow/interfaces/connection.interface';
 export * from './lib/vflow/interfaces/connection-settings.interface';
-export * from './lib/vflow/interfaces/handle-positions.interface';
 export * from './lib/vflow/interfaces/marker.interface';
 export { ViewportState } from './lib/vflow/interfaces/viewport.interface';
 export * from './lib/vflow/interfaces/component-node-event.interface';
@@ -26,7 +25,7 @@ export * from './lib/vflow/types/keyboard-action.type';
 
 // Components
 export * from './lib/vflow/components/vflow/vflow.component';
-export * from './lib/vflow/components/handle/handle.component';
+export * from './lib/vflow/public-components/handle/handle.component';
 export * from './lib/vflow/public-components/custom-node/custom-node.component';
 export * from './lib/vflow/public-components/custom-dynamic-node/custom-dynamic-node.component';
 export * from './lib/vflow/public-components/resizable/resizable.component';
