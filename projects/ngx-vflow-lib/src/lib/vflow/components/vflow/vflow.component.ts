@@ -200,7 +200,6 @@ export class VflowComponent implements OnInit {
   }
 
   public optimization = input<Optimization>({
-    computeLayersOnInit: true,
     detachedGroupsLayer: false,
   });
 
@@ -434,15 +433,13 @@ export class VflowComponent implements OnInit {
   }
 
   private setInitialNodesOrder() {
-    if (this.optimization().computeLayersOnInit) {
-      this.nodeModels().forEach((model) => {
-        switch (model.node.type) {
-          case 'default-group':
-          case 'template-group': {
-            this.nodeRenderingService.pullNode(model);
-          }
+    this.nodeModels().forEach((model) => {
+      switch (model.node.type) {
+        case 'default-group':
+        case 'template-group': {
+          this.nodeRenderingService.pullNode(model);
         }
-      });
-    }
+      }
+    });
   }
 }
