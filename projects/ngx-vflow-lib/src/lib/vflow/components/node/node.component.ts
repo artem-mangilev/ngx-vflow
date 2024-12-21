@@ -36,6 +36,8 @@ import { HandleSizeControllerDirective } from '../../directives/handle-size-cont
 import { NgTemplateOutlet, NgComponentOutlet } from '@angular/common';
 import { DefaultNodeComponent } from '../default-node/default-node.component';
 import { PointerDirective } from '../../directives/pointer.directive';
+
+// TODO: fix loading of these by @defer (should work in Angular 18+)
 // public components that uses in default node (loaded by defer)
 import { ResizableComponent } from '../../public-components/resizable/resizable.component';
 import { HandleComponent } from '../../public-components/handle/handle.component';
