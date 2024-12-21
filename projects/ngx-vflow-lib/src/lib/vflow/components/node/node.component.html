@@ -3,7 +3,6 @@
   @defer {
     <svg:foreignObject
       class="selectable"
-      #nodeContent
       [attr.width]="nodeModel().size().width"
       [attr.height]="nodeModel().size().height"
       (pointerStart)="pullNode(); selectNode()"

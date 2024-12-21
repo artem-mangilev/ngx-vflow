@@ -83,9 +83,6 @@ export class NodeComponent
 
   public groupNodeTemplate = input<TemplateRef<any>>();
 
-  public nodeContentRef =
-    viewChild<ElementRef<SVGGraphicsElement>>('nodeContent');
-
   public htmlWrapperRef = viewChild.required<ElementRef<HTMLDivElement>>('htmlWrapper');
 
   protected showMagnet = computed(
