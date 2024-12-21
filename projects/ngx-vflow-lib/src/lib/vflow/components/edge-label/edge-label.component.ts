@@ -3,19 +3,18 @@ import {
   ChangeDetectionStrategy,
   Component,
   ElementRef,
-  Input,
   TemplateRef,
   computed,
-  signal,
   input,
   viewChild,
 } from '@angular/core';
 import { EdgeLabelModel } from '../../models/edge-label.model';
 import { EdgeModel } from '../../models/edge.model';
-import { Point } from '../../interfaces/point.interface';
 import { Microtask } from '../../decorators/microtask.decorator';
+import { NgTemplateOutlet } from '@angular/common';
 
 @Component({
+  standalone: true,
   selector: 'g[edgeLabel]',
   templateUrl: './edge-label.component.html',
   styles: [
@@ -33,6 +32,7 @@ import { Microtask } from '../../decorators/microtask.decorator';
     `,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [NgTemplateOutlet],
 })
 export class EdgeLabelComponent implements AfterViewInit {
   // TODO: too many inputs

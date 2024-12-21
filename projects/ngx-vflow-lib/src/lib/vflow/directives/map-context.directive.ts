@@ -8,7 +8,10 @@ import { ViewportState } from '../interfaces/viewport.interface';
 import { SelectionService, ViewportForSelection } from '../services/selection.service';
 import { FlowSettingsService } from '../services/flow-settings.service';
 
-@Directive({ selector: 'g[mapContext]' })
+@Directive({
+  standalone: true,
+  selector: 'g[mapContext]',
+})
 export class MapContextDirective implements OnInit {
   protected rootSvg = inject(RootSvgReferenceDirective).element
   protected host = inject<ElementRef<SVGGElement>>(ElementRef).nativeElement

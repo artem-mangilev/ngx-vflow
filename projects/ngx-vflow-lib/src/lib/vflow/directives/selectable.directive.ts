@@ -6,7 +6,10 @@ import { FlowEntity } from '../interfaces/flow-entity.interface';
 import { NodeComponent } from '../components/node/node.component';
 import { FlowSettingsService } from '../services/flow-settings.service';
 
-@Directive({ selector: '[selectable]' })
+@Directive({
+  standalone: true,
+  selector: '[selectable]',
+})
 export class SelectableDirective {
   private flowSettingsService = inject(FlowSettingsService)
   private selectionService = inject(SelectionService)

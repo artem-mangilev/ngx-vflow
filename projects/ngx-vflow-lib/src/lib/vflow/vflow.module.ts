@@ -1,4 +1,3 @@
-import { KeyValuePipe, NgComponentOutlet, NgFor, NgIf, NgTemplateOutlet } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { VflowComponent } from './components/vflow/vflow.component';
 import { NodeComponent } from './components/node/node.component';
@@ -63,7 +62,7 @@ const templateDirectives = [
 ]
 
 @NgModule({
-  imports: [NgIf, NgFor, NgTemplateOutlet, NgComponentOutlet, KeyValuePipe],
+  imports: [...components, ...directives, ...templateDirectives],
   exports: [
     VflowComponent,
     HandleComponent,
@@ -74,6 +73,5 @@ const templateDirectives = [
     DragHandleDirective,
     ...templateDirectives
   ],
-  declarations: [...components, ...directives, ...templateDirectives],
 })
 export class VflowModule { }

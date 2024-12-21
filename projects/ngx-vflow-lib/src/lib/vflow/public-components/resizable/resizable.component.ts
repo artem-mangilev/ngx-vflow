@@ -23,6 +23,7 @@ import { NodeModel } from '../../models/node.model';
 import { Rect } from '../../interfaces/rect';
 import { PointerEvent } from '../../directives/root-pointer.directive';
 import { SpacePointContextDirective } from '../../directives/space-point-context.directive';
+import { PointerDirective } from '../../directives/pointer.directive';
 
 type Side =
   | 'top'
@@ -35,9 +36,11 @@ type Side =
   | 'bottom-left';
 
 @Component({
+  standalone: true,
   selector: '[resizable]',
   templateUrl: './resizable.component.html',
   styleUrls: ['./resizable.component.scss'],
+  imports: [PointerDirective],
 })
 export class ResizableComponent implements OnInit, AfterViewInit {
   private nodeAccessor = inject(NodeAccessorService);

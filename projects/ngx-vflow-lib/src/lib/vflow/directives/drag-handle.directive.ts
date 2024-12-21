@@ -2,10 +2,11 @@ import { DestroyRef, Directive, ElementRef, inject } from '@angular/core';
 import { NodeAccessorService } from '../services/node-accessor.service';
 
 @Directive({
+  standalone: true,
   selector: '[dragHandle]',
   host: {
     'class': 'vflow-drag-handle'
-  }
+  },
 })
 export class DragHandleDirective {
   private nodeAccessor = inject(NodeAccessorService)

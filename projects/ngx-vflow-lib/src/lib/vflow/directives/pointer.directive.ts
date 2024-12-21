@@ -13,6 +13,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RootPointerDirective } from './root-pointer.directive';
 
 @Directive({
+  standalone: true,
   selector: '[pointerStart], [pointerEnd], [pointerOver], [pointerOut]',
 })
 export class PointerDirective {

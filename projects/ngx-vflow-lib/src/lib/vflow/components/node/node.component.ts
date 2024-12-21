@@ -32,10 +32,17 @@ import { ConnectionControllerDirective } from '../../directives/connection-contr
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NodeAccessorService } from '../../services/node-accessor.service';
 import { OverlaysService } from '../../services/overlays.service';
+import { HandleSizeControllerDirective } from '../../directives/handle-size-controller.directive';
+import { ResizableComponent } from '../../public-components/resizable/resizable.component';
+import { NgTemplateOutlet, NgComponentOutlet } from '@angular/common';
+import { HandleComponent } from '../handle/handle.component';
+import { DefaultNodeComponent } from '../default-node/default-node.component';
+import { PointerDirective } from '../../directives/pointer.directive';
 
 export type HandleState = 'valid' | 'invalid' | 'idle';
 
 @Component({
+  standalone: true,
   selector: 'g[node]',
   templateUrl: './node.component.html',
   styleUrls: ['./node.component.scss'],
@@ -44,6 +51,15 @@ export type HandleState = 'valid' | 'invalid' | 'idle';
   host: {
     class: 'vflow-node',
   },
+  imports: [
+    PointerDirective,
+    DefaultNodeComponent,
+    HandleComponent,
+    NgTemplateOutlet,
+    NgComponentOutlet,
+    ResizableComponent,
+    HandleSizeControllerDirective,
+  ],
 })
 export class NodeComponent
   implements OnInit, AfterViewInit, OnDestroy, WithInjector {

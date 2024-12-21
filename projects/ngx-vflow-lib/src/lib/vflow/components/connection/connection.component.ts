@@ -14,10 +14,11 @@ import { bezierPath } from '../../math/edge-path/bezier-path';
 import { hashCode } from '../../utils/hash';
 import { Position } from '../../types/position.type';
 import { smoothStepPath } from '../../math/edge-path/smooth-step-path';
+import { NgTemplateOutlet } from '@angular/common';
 
 @Component({
+  standalone: true,
   selector: 'g[connection]',
-
   template: `
     @if (model().type === 'default') {
       @if (path(); as path) {
@@ -38,6 +39,7 @@ import { smoothStepPath } from '../../math/edge-path/smooth-step-path';
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [NgTemplateOutlet],
 })
 export class ConnectionComponent {
   public model = input.required<ConnectionModel>();

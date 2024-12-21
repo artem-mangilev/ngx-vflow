@@ -1,17 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  ElementRef,
-  inject,
-  Input,
-  OnDestroy,
-  OnInit,
-  TemplateRef,
-  input,
-  viewChild,
-  effect,
-} from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, inject, Input, OnDestroy, OnInit, TemplateRef, input, viewChild, effect, forwardRef } from '@angular/core';
 import { Directive } from '@angular/core';
 import { Position } from '../../types/position.type';
 import { ToolbarModel } from '../../models/toolbar.model';
@@ -19,6 +6,7 @@ import { OverlaysService } from '../../services/overlays.service';
 import { NodeAccessorService } from '../../services/node-accessor.service';
 
 @Component({
+  standalone: true,
   selector: 'node-toolbar',
   template: `
     <ng-template #toolbar>
@@ -35,6 +23,7 @@ import { NodeAccessorService } from '../../services/node-accessor.service';
     `,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [forwardRef(() => NodeToolbarWrapperDirective)],
 })
 export class NodeToolbarComponent implements OnInit, OnDestroy {
   private overlaysService = inject(OverlaysService);
@@ -64,7 +53,10 @@ export class NodeToolbarComponent implements OnInit, OnDestroy {
   }
 }
 
-@Directive({ selector: '[nodeToolbarWrapper]' })
+@Directive({
+  selector: '[nodeToolbarWrapper]',
+  standalone: true
+})
 export class NodeToolbarWrapperDirective implements OnInit {
   private element = inject<ElementRef<HTMLElement>>(ElementRef);
 

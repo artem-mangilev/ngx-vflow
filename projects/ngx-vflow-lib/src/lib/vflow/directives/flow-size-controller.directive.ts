@@ -5,11 +5,12 @@ import { FlowSettingsService } from '../services/flow-settings.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Directive({
+  standalone: true,
   selector: 'svg[flowSizeController]',
   host: {
     '[attr.width]': 'flowWidth()',
     '[attr.height]': 'flowHeight()'
-  }
+  },
 })
 export class FlowSizeControllerDirective {
   private host = inject<ElementRef<SVGSVGElement>>(ElementRef)

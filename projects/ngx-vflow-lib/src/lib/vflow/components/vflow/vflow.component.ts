@@ -58,6 +58,16 @@ import { KeyboardShortcuts } from '../../types/keyboard-action.type';
 import { KeyboardService } from '../../services/keyboard.service';
 import { transformBackground } from '../../utils/transform-background';
 import { OverlaysService } from '../../services/overlays.service';
+import { NgTemplateOutlet } from '@angular/common';
+import { EdgeComponent } from '../edge/edge.component';
+import { NodeComponent } from '../node/node.component';
+import { ConnectionComponent } from '../connection/connection.component';
+import { BackgroundComponent } from '../background/background.component';
+import { DefsComponent } from '../defs/defs.component';
+import { FlowSizeControllerDirective } from '../../directives/flow-size-controller.directive';
+import { RootPointerDirective } from '../../directives/root-pointer.directive';
+import { RootSvgContextDirective } from '../../directives/root-svg-context.directive';
+import { RootSvgReferenceDirective } from '../../directives/reference.directive';
 
 const connectionControllerHostDirective = {
   directive: ConnectionControllerDirective,
@@ -100,6 +110,7 @@ const changesControllerHostDirective = {
 };
 
 @Component({
+  standalone: true,
   selector: 'vflow',
   templateUrl: './vflow.component.html',
   styleUrls: ['./vflow.component.scss'],
@@ -121,6 +132,20 @@ const changesControllerHostDirective = {
   hostDirectives: [
     connectionControllerHostDirective,
     changesControllerHostDirective,
+  ],
+  imports: [
+    RootSvgReferenceDirective,
+    RootSvgContextDirective,
+    RootPointerDirective,
+    FlowSizeControllerDirective,
+    DefsComponent,
+    BackgroundComponent,
+    MapContextDirective,
+    SpacePointContextDirective,
+    ConnectionComponent,
+    NodeComponent,
+    EdgeComponent,
+    NgTemplateOutlet,
   ],
 })
 export class VflowComponent implements OnInit {

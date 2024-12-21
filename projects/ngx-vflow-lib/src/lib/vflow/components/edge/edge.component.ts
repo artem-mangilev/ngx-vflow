@@ -13,8 +13,11 @@ import { hashCode } from '../../utils/hash';
 import { EdgeContext } from '../../interfaces/template-context.interface';
 import { SelectionService } from '../../services/selection.service';
 import { FlowSettingsService } from '../../services/flow-settings.service';
+import { EdgeLabelComponent } from '../edge-label/edge-label.component';
+import { NgTemplateOutlet } from '@angular/common';
 
 @Component({
+  standalone: true,
   selector: 'g[edge]',
   templateUrl: './edge.component.html',
   styleUrls: ['./edge.component.scss'],
@@ -22,6 +25,7 @@ import { FlowSettingsService } from '../../services/flow-settings.service';
   host: {
     class: 'selectable',
   },
+  imports: [NgTemplateOutlet, EdgeLabelComponent],
 })
 export class EdgeComponent implements OnInit {
   protected injector = inject(Injector);

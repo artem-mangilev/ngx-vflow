@@ -17,6 +17,7 @@ import { FlowSettingsService } from '../../services/flow-settings.service';
 import { getViewportForBounds } from '../../utils/viewport';
 import { getNodesBounds } from '../../utils/nodes';
 import { ViewportService } from '../../services/viewport.service';
+import { DefaultNodeComponent } from '../../components/default-node/default-node.component';
 
 export type MiniMapPosition =
   | 'top-left'
@@ -25,9 +26,11 @@ export type MiniMapPosition =
   | 'bottom-right';
 
 @Component({
+  standalone: true,
   selector: 'mini-map',
   templateUrl: './minimap.component.html',
   styleUrls: [`./minimap.component.scss`],
+  imports: [DefaultNodeComponent],
 })
 export class MiniMapComponent implements OnInit {
   protected entitiesService = inject(FlowEntitiesService);

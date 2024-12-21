@@ -7,7 +7,10 @@ import {
 } from '@angular/core';
 import { HandleModel } from '../models/handle.model';
 
-@Directive({ selector: '[handleSizeController]' })
+@Directive({
+  standalone: true,
+  selector: '[handleSizeController]',
+})
 export class HandleSizeControllerDirective implements AfterViewInit {
   public handleModel = input.required<HandleModel>({
     alias: 'handleSizeController',

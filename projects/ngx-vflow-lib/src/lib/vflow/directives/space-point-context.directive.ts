@@ -4,7 +4,10 @@ import { RootSvgReferenceDirective } from './reference.directive';
 import { Point } from '../interfaces/point.interface';
 import { RootPointerDirective } from './root-pointer.directive';
 
-@Directive({ selector: 'g[spacePointContext]' })
+@Directive({
+  standalone: true,
+  selector: 'g[spacePointContext]',
+})
 export class SpacePointContextDirective {
   private pointerMovementDirective = inject(RootPointerDirective)
   private rootSvg = inject(RootSvgReferenceDirective).element

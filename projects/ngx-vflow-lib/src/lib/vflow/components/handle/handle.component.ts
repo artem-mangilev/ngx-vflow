@@ -18,6 +18,7 @@ import {
 } from '../../decorators/run-in-injection-context.decorator';
 
 @Component({
+  standalone: true,
   selector: 'handle',
   templateUrl: './handle.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
