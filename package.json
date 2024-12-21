@@ -7,7 +7,7 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "gh-pages": "ng build ngx-vflow-demo && npx angular-cli-ghpages --cname=www.ngx-vflow.org --dir=dist/ngx-vflow-demo"
+    "gh-pages": "ng build ngx-vflow-demo && ng deploy --cname=www.ngx-vflow.org --dir=dist/ngx-vflow-demo/browser"
   },
   "private": true,
   "dependencies": {
@@ -44,7 +44,7 @@
     "@types/d3-selection": "^3.0.10",
     "@types/d3-zoom": "^3.0.8",
     "@types/jasmine": "~4.3.0",
-    "angular-cli-ghpages": "^1.0.7",
+    "angular-cli-ghpages": "^2.0.3",
     "jasmine-core": "~4.6.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.2.0",

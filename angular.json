@@ -155,6 +155,12 @@
             ],
             "scripts": []
           }
+        },
+        "deploy": {
+          "builder": "angular-cli-ghpages:deploy",
+          "options": {
+            "buildTarget": "ngx-vflow-demo:build:production"
+          }
         }
       }
     }
