@@ -22,4 +22,4 @@ export const Vflow = [
   EdgeTemplateDirective,
   ConnectionTemplateDirective,
   HandleTemplateDirective
-]
+] as const;
