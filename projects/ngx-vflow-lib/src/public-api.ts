@@ -1,5 +1,4 @@
-// Modules
-export * from './lib/vflow/vflow.module';
+// Standalone Util
 export * from './lib/vflow/vflow';
 
 // Interfaces
