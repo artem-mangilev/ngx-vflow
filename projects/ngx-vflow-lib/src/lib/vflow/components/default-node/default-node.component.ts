@@ -5,7 +5,7 @@ import { Component, input } from '@angular/core';
   templateUrl: './default-node.component.html',
   styleUrls: [`./default-node.component.scss`],
   host: {
-    '[class.selected]': 'selected',
+    '[class.selected]': 'selected()',
   },
 })
 export class DefaultNodeComponent {
