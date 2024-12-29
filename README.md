@@ -1,4 +1,4 @@
-[![Discord](https://img.shields.io/badge/discord-ngx--vflow-5865F2?logo=discord&logoColor=white)](https://discord.gg/nMn9YPRGSY) [![License](https://img.shields.io/badge/license-MIT-007EC7.svg)](LICENSE)
+[![Discord](https://img.shields.io/badge/discord-ngx--vflow-5865F2?logo=discord&logoColor=white)](https://discord.gg/F6u2ZrMf) [![License](https://img.shields.io/badge/license-MIT-007EC7.svg)](LICENSE)
 
 <img width="1305" alt="image" src="https://github.com/artem-mangilev/ngx-vflow/assets/53087914/5cbd3669-10a5-4ecb-9a1f-c9ae4eb5fb5a">
 
