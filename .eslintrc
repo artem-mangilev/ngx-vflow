@@ -28,7 +28,8 @@
       "extends": ["plugin:@angular-eslint/template/recommended"],
       "rules": {
         "@angular-eslint/template/prefer-control-flow": "error",
-        "@angular-eslint/template/attributes-order": "error"
+        "@angular-eslint/template/attributes-order": "error",
+        "@angular-eslint/template/prefer-self-closing-tags": "warn"
       }
     },
     {
