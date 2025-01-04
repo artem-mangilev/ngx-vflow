@@ -15,8 +15,7 @@ import { Edge, Node, Vflow } from 'projects/ngx-vflow-lib/src/public-api';
         [style.stroke-width]="ctx.selected() ? 3 : 1"
         [attr.width]="ctx.width()"
         [attr.height]="ctx.height()"
-      >
-      </svg:rect>
+      />
     </ng-template>
   </vflow>`,
   styles: [`
