@@ -277,7 +277,7 @@ export class VflowComponent implements OnInit {
    *
    * @experimental
    */
-  public onComponentNodeEvent = outputFromObservable<any>(
+  public readonly onComponentNodeEvent = outputFromObservable<any>(
     this.componentEventBusService.event$,
   ); // TODO: research how to remove any
   // #endregion

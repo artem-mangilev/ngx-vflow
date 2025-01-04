@@ -33,7 +33,7 @@ export interface RedSquareData {
 })
 export class RedSquareNodeComponent extends CustomNodeComponent<RedSquareData> {
   @Output()
-  redSquareEvent = new EventEmitter<string>();
+  readonly redSquareEvent = new EventEmitter<string>();
 
   onClick() {
     this.redSquareEvent.emit('Click from red square');

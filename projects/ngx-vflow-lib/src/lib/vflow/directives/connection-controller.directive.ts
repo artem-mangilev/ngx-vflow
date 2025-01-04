@@ -25,7 +25,7 @@ export class ConnectionControllerDirective {
    * @todo add connect event and deprecate onConnect
    */
   // eslint-disable-next-line @angular-eslint/no-output-on-prefix
-  public onConnect = output<Connection>();
+  public readonly onConnect = output<Connection>();
 
   private statusService = inject(FlowStatusService);
   private flowEntitiesService = inject(FlowEntitiesService);

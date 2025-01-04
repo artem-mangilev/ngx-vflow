@@ -32,7 +32,7 @@ export interface BlueSquareData {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BlueSquareNodeComponent extends CustomNodeComponent<BlueSquareData> {
-  blueSquareEvent = output<{ x: number; y: number; }>();
+  readonly blueSquareEvent = output<{ x: number; y: number; }>();
 
   onClick() {
     this.blueSquareEvent.emit({ x: 5, y: 5 });
