@@ -27,7 +27,8 @@
       "files": ["*.component.html"],
       "extends": ["plugin:@angular-eslint/template/recommended"],
       "rules": {
-        "max-len": ["error", { "code": 140 }]
+        "@angular-eslint/template/prefer-control-flow": "error",
+        "@angular-eslint/template/attributes-order": "error"
       }
     },
     {
