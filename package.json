@@ -46,8 +46,11 @@
     "@types/d3-zoom": "^3.0.8",
     "@types/jasmine": "~4.3.0",
     "angular-cli-ghpages": "^2.0.3",
-    "angular-eslint": "19.0.2",
-    "eslint": "^9.16.0",
+    "@angular-eslint/eslint-plugin": "19.0.0",
+    "@angular-eslint/eslint-plugin-template": "19.0.0",
+    "@angular-eslint/template-parser": "19.0.0",
+    "@angular-eslint/builder": "19.0.0",
+    "eslint": "8.57.0",
     "jasmine-core": "~4.6.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.2.0",
@@ -56,6 +59,8 @@
     "karma-jasmine-html-reporter": "~2.1.0",
     "ng-packagr": "^17.3.0",
     "typescript": "~5.4.5",
-    "typescript-eslint": "8.18.0"
+    "@typescript-eslint/eslint-plugin": "7.16.0",
+    "@typescript-eslint/parser": "7.16.0",
+    "@typescript-eslint/utils": "7.16.0"
   }
 }

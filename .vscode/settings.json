@@ -1,4 +1,5 @@
 {
+  "eslint.enable": true,
   "eslint.validate": [
     "javascript", "typescript", "html"
   ],

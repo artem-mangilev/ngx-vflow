@@ -5,11 +5,11 @@
       "files": ["*.ts"],
       "parserOptions": {
         "project": [
-          "tsconfig.*?.json",
+          "tsconfig.*?.json"
         ],
         "createDefaultProgram": true
       },
-      "extends": ["plugin:@angular-eslint/recommended"],
+      "extends": ["plugin:@angular-eslint/recommended"]
     },
     {
       "files": ["*.component.html"],
