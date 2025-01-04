@@ -73,12 +73,12 @@
 <!-- Default group node -->
 @if (nodeModel().node.type === "default-group") {
   <svg:rect
-    [resizable]="nodeModel().resizable()"
-    [gap]="3"
-    [resizerColor]="nodeModel().color()"
     class="default-group-node"
     rx="5"
     ry="5"
+    [resizable]="nodeModel().resizable()"
+    [gap]="3"
+    [resizerColor]="nodeModel().color()"
     [class.default-group-node_selected]="nodeModel().selected()"
     [attr.width]="nodeModel().size().width"
     [attr.height]="nodeModel().size().height"
@@ -118,10 +118,10 @@
   @if (!handle.template) {
     <svg:circle
       class="default-handle"
+      r="5"
       [attr.cx]="handle.offset().x"
       [attr.cy]="handle.offset().y"
       [attr.stroke-width]="handle.strokeWidth"
-      r="5"
       (pointerStart)="startConnection($event, handle)"
       (pointerEnd)="endConnection(handle)"
     />

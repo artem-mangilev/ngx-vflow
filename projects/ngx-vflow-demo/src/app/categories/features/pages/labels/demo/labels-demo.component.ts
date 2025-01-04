@@ -3,7 +3,7 @@ import { Edge, Node, Vflow } from 'projects/ngx-vflow-lib/src/public-api';
 
 @Component({
   template: `<vflow view="auto" [nodes]="nodes" [edges]="edges">
-    <ng-template edgeLabelHtml let-ctx>
+    <ng-template let-ctx edgeLabelHtml>
       <div
         class="label"
         [style.background-color]="ctx.label.data.color"

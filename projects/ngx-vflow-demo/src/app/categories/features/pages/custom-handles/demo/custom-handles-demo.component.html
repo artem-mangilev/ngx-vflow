@@ -1,5 +1,5 @@
-<vflow view="auto" [nodes]="nodes" [edges]="edges" (onConnect)="createEdge($event)" [connection]="connectionSettings">
-  <ng-template nodeHtml let-ctx>
+<vflow view="auto" [nodes]="nodes" [edges]="edges" [connection]="connectionSettings" (onConnect)="createEdge($event)">
+  <ng-template let-ctx nodeHtml>
     @if (ctx.node.data.type === 'output') {
       <div class="custom-node">
         <div class="data-block">
@@ -30,12 +30,12 @@
 
 <ng-template #handleTemplate let-ctx>
   <svg:circle
-    [attr.cx]="ctx.point().x"
-    [attr.cy]="ctx.point().y"
     stroke-width="1"
     stroke="black"
     r="6"
     fill="#1b262c"
+    [attr.cx]="ctx.point().x"
+    [attr.cy]="ctx.point().y"
     />
 </ng-template>
 

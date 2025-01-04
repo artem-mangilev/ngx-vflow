@@ -1,11 +1,11 @@
 @if (model().type === "default") {
   <svg:path
-    (mousedown)="onEdgeMouseDown()"
+    class="edge"
     [attr.d]="model().path().path"
     [attr.marker-start]="markerStartUrl()"
     [attr.marker-end]="markerEndUrl()"
-    class="edge"
     [class.edge_selected]="model().selected()"
+    (mousedown)="onEdgeMouseDown()"
   />
 }
 

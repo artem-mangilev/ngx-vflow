@@ -11,8 +11,8 @@
 </label>
 
 <vflow view="auto" [nodes]="nodes" [edges]="edges">
-  <ng-template nodeHtml let-ctx>
-    <div [style.background-color]="ctx.node.data()" class="custom-node">
+  <ng-template let-ctx nodeHtml>
+    <div class="custom-node" [style.background-color]="ctx.node.data()">
       {{ ctx.node.data() }}
 
       <handle type="source" position="bottom" />

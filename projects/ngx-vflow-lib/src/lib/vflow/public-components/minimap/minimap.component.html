@@ -1,11 +1,11 @@
 <ng-template #minimap>
   <svg:rect
+    fill="none"
     [attr.x]="minimapPoint().x"
     [attr.y]="minimapPoint().y"
     [attr.width]="minimapWidth()"
     [attr.height]="minimapHeight()"
     [attr.stroke]="strokeColor()"
-    fill="none"
   />
 
   <svg:svg

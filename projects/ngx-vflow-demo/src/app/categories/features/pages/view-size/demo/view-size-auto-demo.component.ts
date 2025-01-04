@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { Edge, Node, Vflow } from 'projects/ngx-vflow-lib/src/public-api';
 
 @Component({
-  template: `<vflow [nodes]="nodes" [edges]="edges" view="auto" />`,
+  template: `<vflow view="auto" [nodes]="nodes" [edges]="edges" />`,
   styles: [`
     :host {
       width: 100vw;

@@ -1,5 +1,5 @@
 <vflow view="auto" [nodes]="nodes" [edges]="edges" (onConnect)="createEdge($event)">
-  <ng-template nodeHtml let-ctx>
+  <ng-template let-ctx nodeHtml>
     @if (ctx.node.data.type === 'output') {
       <div class="custom-node">
         <div class="data-block">

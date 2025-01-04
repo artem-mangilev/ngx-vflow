@@ -3,7 +3,7 @@ import { DynamicNode, Edge, Vflow } from 'projects/ngx-vflow-lib/src/public-api'
 
 @Component({
   template: `<vflow view="auto" [nodes]="nodes" [edges]="edges">
-    <ng-template nodeHtml let-ctx>
+    <ng-template let-ctx nodeHtml>
       <div class="custom-node" selectable [class.custom-node_selected]="ctx.selected()">
         {{ ctx.node.data().text }}
 

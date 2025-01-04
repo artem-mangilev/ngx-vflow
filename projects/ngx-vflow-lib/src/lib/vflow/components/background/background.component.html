@@ -1,11 +1,11 @@
 @if (backgroundSignal().type === 'dots') {
   <svg:pattern
+    patternUnits="userSpaceOnUse"
     [attr.id]="patternId"
     [attr.x]="x()"
     [attr.y]="y()"
     [attr.width]="scaledGap()"
     [attr.height]="scaledGap()"
-    patternUnits="userSpaceOnUse"
     >
     <svg:circle
       [attr.cx]="patternSize()"
@@ -27,12 +27,12 @@
 @if (backgroundSignal().type === 'image') {
   @if (repeated()) {
     <svg:pattern
+      patternUnits="userSpaceOnUse"
       [attr.id]="patternId"
       [attr.x]="imageX()"
       [attr.y]="imageY()"
       [attr.width]="scaledImageWidth()"
       [attr.height]="scaledImageHeight()"
-      patternUnits="userSpaceOnUse"
       >
       <svg:image
         [attr.href]="bgImageSrc()"

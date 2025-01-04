@@ -5,24 +5,24 @@ import { SimpleCustomNodeComponent } from "./components/simple-custom-node.compo
 
 @Component({
   template: `<vflow
+    view="auto"
     [nodes]="nodes"
     [edges]="edges"
     [connection]="connection"
     [background]="{ type: 'dots' }"
-    view="auto"
     (onConnect)="handleConnect($event)"
   >
-    <ng-template edge let-ctx>
+    <ng-template let-ctx edge>
       <svg:path
+        fill="none"
         [attr.d]="ctx.path()"
         [attr.stroke-width]="4"
         [attr.stroke]="ctx.edge.data.color"
         [attr.marker-end]="ctx.markerEnd()"
-        fill="none"
       />
     </ng-template>
 
-    <ng-template edgeLabelHtml let-ctx>
+    <ng-template let-ctx edgeLabelHtml>
       <div
         class="label"
         [style.background-color]="ctx.label.data.color"

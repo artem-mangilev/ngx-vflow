@@ -23,11 +23,11 @@ import { NgTemplateOutlet } from '@angular/common';
     @if (model().type === 'default') {
       @if (path(); as path) {
         <svg:path
+          fill="none"
+          stroke-width="2"
           [attr.d]="path"
           [attr.marker-end]="markerUrl()"
           [attr.stroke]="defaultColor"
-          fill="none"
-          stroke-width="2"
         />
       }
     }

@@ -3,13 +3,13 @@ import { Edge, Node, Vflow } from 'projects/ngx-vflow-lib/src/public-api';
 
 @Component({
   template: `<vflow view="auto" [nodes]="nodes" [edges]="edges">
-    <ng-template edge let-ctx>
+    <ng-template let-ctx edge>
       <svg:path
+        fill="none"
         [attr.d]="ctx.path()"
         [attr.stroke-width]="ctx.edge.data.strokeWidth"
         [attr.stroke]="ctx.edge.data.color"
         [attr.marker-end]="ctx.markerEnd()"
-        fill="none"
       />
     </ng-template>
   </vflow>`,

@@ -3,45 +3,45 @@
     <!-- top line -->
     <svg:line
       class="top"
+      stroke-width="2"
       [attr.x1]="lineGap"
       [attr.y1]="-gap()"
       [attr.x2]="model.size().width - lineGap"
       [attr.y2]="-gap()"
       [attr.stroke]="resizerColor()"
-      stroke-width="2"
       (pointerStart)="startResize('top', $event)"
     />
     <!-- Left line -->
     <svg:line
       class="left"
+      stroke-width="2"
       [attr.x1]="-gap()"
       [attr.y1]="lineGap"
       [attr.x2]="-gap()"
       [attr.y2]="model.size().height - lineGap"
       [attr.stroke]="resizerColor()"
-      stroke-width="2"
       (pointerStart)="startResize('left', $event)"
     />
     <!-- Bottom line -->
     <svg:line
       class="bottom"
+      stroke-width="2"
       [attr.x1]="lineGap"
       [attr.y1]="model.size().height + gap()"
       [attr.x2]="model.size().width - lineGap"
       [attr.y2]="model.size().height + gap()"
       [attr.stroke]="resizerColor()"
-      stroke-width="2"
       (pointerStart)="startResize('bottom', $event)"
     />
     <!-- Right line -->
     <svg:line
       class="right"
+      stroke-width="2"
       [attr.x1]="model.size().width + gap()"
       [attr.y1]="lineGap"
       [attr.x2]="model.size().width + gap()"
       [attr.y2]="model.size().height - lineGap"
       [attr.stroke]="resizerColor()"
-      stroke-width="2"
       (pointerStart)="startResize('right', $event)"
     />
 

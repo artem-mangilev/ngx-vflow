@@ -5,7 +5,7 @@ import { Edge, Node, Vflow, Connection } from 'projects/ngx-vflow-lib/src/public
 @Component({
   template: `
     <vflow view="auto" [nodes]="nodes" [edges]="edges">
-      <ng-template nodeHtml let-ctx>
+      <ng-template let-ctx nodeHtml>
         @if (ctx.node.data.type === 'output') {
           <div resizable class="custom-node">
             <div class="data-block">
