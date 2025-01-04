@@ -7,7 +7,8 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "gh-pages": "ng build ngx-vflow-demo && ng deploy --cname=www.ngx-vflow.org --dir=dist/ngx-vflow-demo/browser"
+    "gh-pages": "ng build ngx-vflow-demo && ng deploy --cname=www.ngx-vflow.org --dir=dist/ngx-vflow-demo/browser",
+    "lint": "ng lint"
   },
   "private": true,
   "dependencies": {
@@ -45,6 +46,8 @@
     "@types/d3-zoom": "^3.0.8",
     "@types/jasmine": "~4.3.0",
     "angular-cli-ghpages": "^2.0.3",
+    "angular-eslint": "19.0.2",
+    "eslint": "^9.16.0",
     "jasmine-core": "~4.6.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.2.0",
@@ -52,6 +55,7 @@
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
     "ng-packagr": "^17.3.0",
-    "typescript": "~5.4.5"
+    "typescript": "~5.4.5",
+    "typescript-eslint": "8.18.0"
   }
 }
