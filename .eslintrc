@@ -13,7 +13,14 @@
         "plugin:@angular-eslint/recommended"
       ],
       "rules": {
-        "@angular-eslint/prefer-on-push-component-change-detection": ["error"]
+        "@angular-eslint/prefer-on-push-component-change-detection": ["error"],
+        // TODO add rule for vflow prefix
+        "@angular-eslint/component-selector": "off",
+        // TODO add rule for vflow prefix
+        "@angular-eslint/directive-selector": "off",
+        "@angular-eslint/prefer-standalone": "error",
+        "@angular-eslint/prefer-output-readonly": "warn",
+        "@angular-eslint/no-duplicates-in-metadata-arrays": "warn"
       }
     },
     {
