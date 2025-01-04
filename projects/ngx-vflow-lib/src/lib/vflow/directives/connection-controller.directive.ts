@@ -21,7 +21,10 @@ export class ConnectionControllerDirective {
    *
    * Also it's important to note, that this event only fires when connection is valid by validator function in `ConnectionSettings`,
    * by default without passing the validator every connection concidered valid.
+   *
+   * @todo add connect event and deprecate onConnect
    */
+  // eslint-disable-next-line @angular-eslint/no-output-on-prefix
   public onConnect = output<Connection>();
 
   private statusService = inject(FlowStatusService);

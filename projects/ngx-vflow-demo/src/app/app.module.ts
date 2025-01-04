@@ -18,7 +18,7 @@ import { NgDocButtonIconComponent, NgDocIconComponent, NgDocTooltipDirective } f
   imports: [
     BrowserModule,
     AppRoutingModule,
-    Vflow,
+    ...Vflow,
     NgDocRootComponent,
     NgDocNavbarComponent,
     NgDocSidebarComponent,

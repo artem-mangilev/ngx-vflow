@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { Connection, ConnectionSettings, CustomNodeComponent, Edge, Node, VflowComponent, Vflow } from 'projects/ngx-vflow-lib/src/public-api';
+import { Connection, ConnectionSettings, CustomNodeComponent, Edge, Node, Vflow } from 'projects/ngx-vflow-lib/src/public-api';
 
 @Component({
   template: `
@@ -26,7 +26,7 @@ export class LooseConnectionDemoComponent {
     {
       id: '1',
       point: { x: 100, y: 100 },
-      type: LooseConnectionNode,
+      type: LooseConnectionNodeComponent,
       data: {
         text: 'Node 1'
       }
@@ -34,7 +34,7 @@ export class LooseConnectionDemoComponent {
     {
       id: '2',
       point: { x: 200, y: 200 },
-      type: LooseConnectionNode,
+      type: LooseConnectionNodeComponent,
       data: {
         text: 'Node 2'
       }
@@ -92,4 +92,4 @@ interface LooseConnectionNodeData {
   standalone: true,
   imports: [Vflow]
 })
-export class LooseConnectionNode extends CustomNodeComponent<LooseConnectionNodeData> { }
+export class LooseConnectionNodeComponent extends CustomNodeComponent<LooseConnectionNodeData> { }
