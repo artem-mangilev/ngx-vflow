@@ -1,4 +1,4 @@
-import { Component } from "@angular/core";
+import { ChangeDetectionStrategy, Component } from "@angular/core";
 import { CustomNodeComponent, Vflow } from "projects/ngx-vflow-lib/src/public-api";
 
 @Component({
@@ -22,6 +22,7 @@ import { CustomNodeComponent, Vflow } from "projects/ngx-vflow-lib/src/public-ap
     }
   `],
   standalone: true,
-  imports: [Vflow]
+  imports: [Vflow],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SimpleCustomNodeComponent extends CustomNodeComponent { }

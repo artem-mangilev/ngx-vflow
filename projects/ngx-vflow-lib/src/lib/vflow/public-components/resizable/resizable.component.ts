@@ -10,6 +10,7 @@ import {
   input,
   viewChild,
   effect,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import { RootPointerDirective } from '../../directives/root-pointer.directive';
 import { filter, tap } from 'rxjs';
@@ -41,6 +42,7 @@ type Side =
   templateUrl: './resizable.component.html',
   styleUrls: ['./resizable.component.scss'],
   imports: [PointerDirective],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ResizableComponent implements OnInit, AfterViewInit {
   private nodeAccessor = inject(NodeAccessorService);

@@ -18,7 +18,7 @@ import {
 @Component({
   templateUrl: './vizdom-layout-demo.component.html',
   styleUrls: ['./vizdom-layout-demo.component.scss'],
-  changeDetection: ChangeDetectionStrategy.Default,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
   imports: [Vflow],
 })

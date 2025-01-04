@@ -9,6 +9,7 @@ import {
   TemplateRef,
   input,
   viewChild,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import { FlowEntitiesService } from '../../services/flow-entities.service';
 import { MinimapModel } from '../../models/minimap.model';
@@ -31,6 +32,7 @@ export type MiniMapPosition =
   templateUrl: './minimap.component.html',
   styleUrls: [`./minimap.component.scss`],
   imports: [DefaultNodeComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MiniMapComponent implements OnInit {
   protected entitiesService = inject(FlowEntitiesService);

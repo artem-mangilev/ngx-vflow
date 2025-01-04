@@ -9,7 +9,12 @@
         ],
         "createDefaultProgram": true
       },
-      "extends": ["plugin:@angular-eslint/recommended"]
+      "extends": [
+        "plugin:@angular-eslint/recommended"
+      ],
+      "rules": {
+        "@angular-eslint/prefer-on-push-component-change-detection": ["error"]
+      }
     },
     {
       "files": ["*.component.html"],

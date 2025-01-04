@@ -1,4 +1,4 @@
-import { Component } from "@angular/core";
+import { ChangeDetectionStrategy, Component } from "@angular/core";
 import { CustomNodeComponent } from "./custom-node.component";
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { provideCustomNodeMocks } from "../../testing-utils/provide-custom-node-mocks";
@@ -9,7 +9,8 @@ import { Vflow } from "../../vflow";
   template: `<div resizable selectable dragHandle>
     <handle />
   </div>`,
-  imports: [Vflow]
+  imports: [Vflow],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 class TestCustomNodeComponent extends CustomNodeComponent { }
 

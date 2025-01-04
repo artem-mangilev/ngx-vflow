@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter, output } from "@angular/core";
+import { Component, output, ChangeDetectionStrategy } from "@angular/core";
 import { Vflow, CustomNodeComponent } from "projects/ngx-vflow-lib/src/public-api";
 
 // --- Description of blue square component node
@@ -28,7 +28,8 @@ export interface BlueSquareData {
     }
   `],
   standalone: true,
-  imports: [Vflow]
+  imports: [Vflow],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BlueSquareNodeComponent extends CustomNodeComponent<BlueSquareData> {
   blueSquareEvent = output<{ x: number; y: number; }>();

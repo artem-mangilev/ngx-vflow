@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter } from "@angular/core";
+import { Component, Output, EventEmitter, ChangeDetectionStrategy } from "@angular/core";
 import { Vflow, CustomNodeComponent } from "projects/ngx-vflow-lib/src/public-api";
 
 // --- Description of red square component node
@@ -28,7 +28,8 @@ export interface RedSquareData {
     }
   `],
   standalone: true,
-  imports: [Vflow]
+  imports: [Vflow],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RedSquareNodeComponent extends CustomNodeComponent<RedSquareData> {
   @Output()

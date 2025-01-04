@@ -1,4 +1,4 @@
-import { Component, WritableSignal } from "@angular/core";
+import { ChangeDetectionStrategy, Component, WritableSignal } from "@angular/core";
 import { Vflow, CustomNodeComponent } from "projects/ngx-vflow-lib/src/public-api";
 
 export interface ComplexCustomNodeData {
@@ -84,6 +84,7 @@ export interface ComplexCustomNodeData {
     }
   `],
   standalone: true,
-  imports: [Vflow]
+  imports: [Vflow],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ComplexCustomNodeComponent extends CustomNodeComponent<ComplexCustomNodeData> { }
