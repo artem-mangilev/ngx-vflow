@@ -1,4 +1,4 @@
-import { Directive, ElementRef, Input, OnInit, effect, inject, untracked } from '@angular/core';
+import { Directive, ElementRef, OnInit, effect, inject, untracked } from '@angular/core';
 import { select } from 'd3-selection';
 import { D3ZoomEvent, ZoomBehavior, ZoomTransform, zoom, zoomIdentity } from 'd3-zoom';
 import { ViewportService } from '../services/viewport.service';

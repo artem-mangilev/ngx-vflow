@@ -1,6 +1,6 @@
 
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { Edge, Node, Vflow, Connection } from 'projects/ngx-vflow-lib/src/public-api';
+import { Edge, Node, Vflow } from 'projects/ngx-vflow-lib/src/public-api';
 
 @Component({
   template: `

@@ -4,7 +4,6 @@ import {
   computed,
   ElementRef,
   inject,
-  Input,
   OnInit,
   TemplateRef,
   input,

@@ -1,4 +1,4 @@
-import { Directive, inject, output } from '@angular/core';
+import { Directive, inject } from '@angular/core';
 import {
   NodeAddChange,
   NodeChange,

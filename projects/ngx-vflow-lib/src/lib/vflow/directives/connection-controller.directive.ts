@@ -144,7 +144,7 @@ export class ConnectionControllerDirective {
     }
   }
 
-  public endConnection(handle: HandleModel) {
+  public endConnection() {
     const status = this.statusService.status();
 
     if (status.state === 'connection-validation') {

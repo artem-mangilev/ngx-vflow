@@ -12,7 +12,6 @@ import {
   EdgeChange,
   Node,
   NodeAddChange,
-  NodeChange,
   NodePositionChange,
   NodeSelectedChange,
   Vflow,
@@ -35,7 +34,7 @@ import {
 export class HandlingChangesFilteredDemoComponent {
   private notifyService = inject(NgDocNotifyService);
 
-  public toastTemplate = viewChild<TemplateRef<{}>>('toast');
+  public toastTemplate = viewChild<TemplateRef<object>>('toast');
 
   public nodes: Node[] = [
     {

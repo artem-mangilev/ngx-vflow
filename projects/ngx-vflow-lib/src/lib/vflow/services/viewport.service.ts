@@ -1,5 +1,4 @@
-import { Injectable, Signal, WritableSignal, inject, signal } from '@angular/core';
-import { Point } from '../interfaces/point.interface';
+import { Injectable, WritableSignal, inject, signal } from '@angular/core';
 import { ViewportState, WritableViewport } from '../interfaces/viewport.interface';
 import { getNodesBounds } from '../utils/nodes';
 import { FlowEntitiesService } from './flow-entities.service';

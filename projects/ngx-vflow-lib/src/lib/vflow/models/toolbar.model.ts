@@ -1,7 +1,6 @@
-import { computed, inject, signal, TemplateRef } from "@angular/core";
+import { computed, signal, TemplateRef } from "@angular/core";
 import { Position } from "../types/position.type";
 import { NodeModel } from "./node.model";
-import { ViewportService } from "../services/viewport.service";
 
 export class ToolbarModel {
   public position = signal<Position>('top')

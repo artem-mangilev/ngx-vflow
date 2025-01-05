@@ -1,4 +1,4 @@
-import { Directive, ElementRef, NgZone, Signal, WritableSignal, computed, effect, inject, signal } from '@angular/core';
+import { Directive, ElementRef, NgZone, Signal, computed, inject } from '@angular/core';
 import { resizable } from '../utils/resizable';
 import { tap } from 'rxjs';
 import { FlowSettingsService } from '../services/flow-settings.service';

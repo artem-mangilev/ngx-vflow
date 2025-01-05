@@ -1,5 +1,5 @@
 import { Signal, TemplateRef, computed, effect, inject, signal } from '@angular/core'
-import { DynamicNode, Node, isDynamicNode } from '../interfaces/node.interface'
+import { DynamicNode, Node, isComponentDynamicNode, isComponentStaticNode, isDynamicNode } from '../interfaces/node.interface'
 import { isDefined } from '../utils/is-defined'
 import { toObservable, toSignal } from '@angular/core/rxjs-interop'
 import { HandleModel } from './handle.model'
@@ -7,8 +7,6 @@ import { FlowEntity } from '../interfaces/flow-entity.interface'
 import { FlowSettingsService } from '../services/flow-settings.service'
 import { animationFrameScheduler, merge, observeOn, Subject, } from 'rxjs'
 import { Point } from '../interfaces/point.interface'
-import { CustomNodeComponent } from '../public-components/custom-node/custom-node.component'
-import { CustomDynamicNodeComponent } from '../public-components/custom-dynamic-node/custom-dynamic-node.component'
 import { FlowEntitiesService } from '../services/flow-entities.service'
 
 // TODO bad naming around points
@@ -79,9 +77,7 @@ export class NodeModel<T = unknown> implements FlowEntity {
   public readonly magnetRadius = 20
 
   // TODO: not sure if we need to statically store it
-  public isComponentType =
-    CustomNodeComponent.isPrototypeOf(this.node.type) ||
-    CustomDynamicNodeComponent.isPrototypeOf(this.node.type)
+  public isComponentType = isComponentStaticNode(this.node as Node) || isComponentDynamicNode(this.node as DynamicNode)
 
   // Default node specific thing
   public text = this.createTextSignal()

@@ -2,11 +2,9 @@ import {
   DestroyRef,
   Directive,
   EventEmitter,
-  Input,
   OnInit,
   inject,
   signal,
-  input,
   OutputEmitterRef,
 } from '@angular/core';
 import { merge, Observable, tap } from 'rxjs';

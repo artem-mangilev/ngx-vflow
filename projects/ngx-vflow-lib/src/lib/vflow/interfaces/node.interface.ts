@@ -112,11 +112,11 @@ export function isDynamicNode<T>(node: Node<T> | DynamicNode<T>): node is Dynami
 }
 
 export function isComponentStaticNode<T>(node: Node<T>): node is ComponentNode<T> {
-  return CustomNodeComponent.isPrototypeOf(node.type)
+  return Object.prototype.isPrototypeOf.call(CustomNodeComponent, node.type)
 }
 
 export function isComponentDynamicNode<T>(node: DynamicNode<T>): node is ComponentDynamicNode<T> {
-  return CustomDynamicNodeComponent.isPrototypeOf(node.type)
+  return Object.prototype.isPrototypeOf.call(CustomDynamicNodeComponent, node.type)
 }
 
 export function isTemplateStaticNode<T>(node: Node<T>): node is HtmlTemplateNode<T> {

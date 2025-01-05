@@ -3,7 +3,7 @@ import { Observable } from "rxjs";
 
 export function resizable(elems: Element[], zone: NgZone) {
   return new Observable<ResizeObserverEntry[]>((subscriber) => {
-    let ro = new ResizeObserver((entries) => {
+    const ro = new ResizeObserver((entries) => {
       zone.run(() => subscriber.next(entries))
     });
 

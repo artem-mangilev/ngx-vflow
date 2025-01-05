@@ -122,7 +122,7 @@ export class ForceLayoutDemoComponent {
 
   private linkForce = d3
     .forceLink(this.edges.map((e) => ({ source: e.source, target: e.target })))
-    // @ts-ignore
+    // @ts-expect-error id may not exist
     .id((d) => d.id)
     .distance(50);
 

@@ -182,8 +182,8 @@ export class NodeComponent
     this.connectionController.resetValidateConnection(targetHandle);
   }
 
-  protected endConnection(handle: HandleModel) {
-    this.connectionController.endConnection(handle);
+  protected endConnection() {
+    this.connectionController.endConnection();
   }
 
   protected pullNode() {

@@ -32,7 +32,7 @@ import {
 export class HandlingChangesDemoComponent {
   private notifyService = inject(NgDocNotifyService);
 
-  public toastTemplate = viewChild<TemplateRef<{}>>('toast');
+  public toastTemplate = viewChild<TemplateRef<object>>('toast');
 
   public nodes: Node[] = [
     {

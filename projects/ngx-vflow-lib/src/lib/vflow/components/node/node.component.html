@@ -123,7 +123,7 @@
       [attr.cy]="handle.offset().y"
       [attr.stroke-width]="handle.strokeWidth"
       (pointerStart)="startConnection($event, handle)"
-      (pointerEnd)="endConnection(handle)"
+      (pointerEnd)="endConnection()"
     />
   }
 
@@ -131,7 +131,7 @@
     <svg:g
       [handleSizeController]="handle"
       (pointerStart)="startConnection($event, handle)"
-      (pointerEnd)="endConnection(handle)"
+      (pointerEnd)="endConnection()"
     >
       <ng-container
         *ngTemplateOutlet="handle.template; context: handle.templateContext"
@@ -145,7 +145,7 @@
       [attr.r]="nodeModel().magnetRadius"
       [attr.cx]="handle.offset().x"
       [attr.cy]="handle.offset().y"
-      (pointerEnd)="endConnection(handle); resetValidateConnection(handle)"
+      (pointerEnd)="endConnection(); resetValidateConnection(handle)"
       (pointerOver)="validateConnection(handle)"
       (pointerOut)="resetValidateConnection(handle)"
     />

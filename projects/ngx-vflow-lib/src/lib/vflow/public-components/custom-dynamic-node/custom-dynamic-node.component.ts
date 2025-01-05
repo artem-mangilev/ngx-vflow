@@ -1,4 +1,4 @@
-import { Directive, input, Input, OnInit } from "@angular/core"
+import { Directive, input, OnInit } from "@angular/core"
 import { ComponentDynamicNode } from '../../interfaces/node.interface';
 import { CustomNodeBaseComponent } from "../../components/custom-node-base/custom-node-base.component";
 

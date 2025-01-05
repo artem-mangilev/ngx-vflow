@@ -1,4 +1,4 @@
-import { DestroyRef, Directive, ElementRef, inject } from '@angular/core';
+import { DestroyRef, Directive, inject } from '@angular/core';
 import { NodeAccessorService } from '../services/node-accessor.service';
 
 @Directive({

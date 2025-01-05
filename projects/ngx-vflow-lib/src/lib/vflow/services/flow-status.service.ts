@@ -63,7 +63,7 @@ export class FlowStatusService {
  *
  * @param changes list of set[FlowStatus.state]Status() calls
  */
-export function batchStatusChanges(...changes: Function[]) {
+export function batchStatusChanges(...changes: (() => void)[]) {
   if (changes.length) {
     const [firstChange, ...restChanges] = changes
     // first change is sync

@@ -1,4 +1,4 @@
-import { Directive, Injector, inject, runInInjectionContext } from "@angular/core";
+import { Injector, runInInjectionContext } from "@angular/core";
 
 export function InjectionContext(target: any, key: string, descriptor: PropertyDescriptor) {
   const originalMethod = descriptor.value;
@@ -19,6 +19,6 @@ export interface WithInjector {
   injector: Injector
 }
 
-const implementsWithInjector = (instance: {}): instance is WithInjector => {
+const implementsWithInjector = (instance: object): instance is WithInjector => {
   return 'injector' in instance && 'get' in (instance.injector as Injector);
 }

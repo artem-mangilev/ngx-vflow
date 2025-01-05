@@ -1,4 +1,4 @@
-import { Injectable, Signal, TemplateRef, signal } from '@angular/core';
+import { Injectable, TemplateRef, signal } from '@angular/core';
 import { Position } from '../types/position.type';
 import { HandleType } from '../types/handle-type.type';
 import { NodeModel } from '../models/node.model';

@@ -3,7 +3,6 @@ import {
   computed,
   inject,
   Injector,
-  Input,
   OnInit,
   signal,
   TemplateRef,

@@ -8,7 +8,6 @@ import {
   inject,
   runInInjectionContext,
   input,
-  output,
   contentChild,
   viewChild,
 } from '@angular/core';

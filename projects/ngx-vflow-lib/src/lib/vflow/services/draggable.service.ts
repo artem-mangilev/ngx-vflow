@@ -1,4 +1,4 @@
-import { Injectable, effect, inject } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { select } from 'd3-selection';
 import { D3DragEvent, drag } from 'd3-drag';
 import { NodeModel } from '../models/node.model';
@@ -75,7 +75,7 @@ export class DraggableService {
 
       .on('drag', (event: DragEvent) => {
         dragNodes.forEach((model, index) => {
-          let point = {
+          const point = {
             x: round(event.x + initialPositions[index].x),
             y: round(event.y + initialPositions[index].y)
           }

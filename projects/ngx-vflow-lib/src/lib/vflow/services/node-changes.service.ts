@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { FlowEntitiesService } from './flow-entities.service';
 import { toObservable, } from '@angular/core/rxjs-interop';
-import { Observable, asyncScheduler, distinctUntilChanged, filter, map, merge, observeOn, pairwise, skip, switchMap, tap } from 'rxjs';
+import { Observable, asyncScheduler, distinctUntilChanged, filter, map, merge, observeOn, pairwise, skip, switchMap } from 'rxjs';
 import { NodeChange } from '../types/node-change.type';
 
 // this delay fixes the cases when change triggered

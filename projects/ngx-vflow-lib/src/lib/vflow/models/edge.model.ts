@@ -1,4 +1,4 @@
-import { WritableSignal, computed, signal } from "@angular/core";
+import { computed, signal } from "@angular/core";
 import { EdgeLabelPosition } from "../interfaces/edge-label.interface";
 import { Edge, Curve, EdgeType } from "../interfaces/edge.interface";
 import { EdgeLabelModel } from "./edge-label.model";
