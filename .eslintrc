@@ -24,6 +24,13 @@
       }
     },
     {
+      "files": ["*.ts"],
+      "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
+      "rules": {
+        "@typescript-eslint/no-explicit-any": "off"
+      }
+    },
+    {
       "files": ["*.component.html"],
       "extends": ["plugin:@angular-eslint/template/recommended"],
       "rules": {
@@ -34,7 +41,7 @@
     },
     {
       "files": ["*.component.ts"],
-      "extends": ["plugin:@angular-eslint/template/process-inline-templates"]
+      "extends": ["plugin:@angular-eslint/template/process-inline-templates"],
     }
   ]
 }
