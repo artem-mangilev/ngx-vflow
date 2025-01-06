@@ -10,7 +10,10 @@
         "createDefaultProgram": true
       },
       "extends": [
-        "plugin:@angular-eslint/recommended"
+        "plugin:@angular-eslint/recommended",
+        "eslint:recommended",
+        "plugin:@typescript-eslint/recommended",
+        "plugin:prettier/recommended"
       ],
       "rules": {
         "@angular-eslint/prefer-on-push-component-change-detection": ["error"],
@@ -20,17 +23,8 @@
         "@angular-eslint/directive-selector": "off",
         "@angular-eslint/prefer-standalone": "error",
         "@angular-eslint/prefer-output-readonly": "warn",
-        "@angular-eslint/no-duplicates-in-metadata-arrays": "warn"
-      }
-    },
-    {
-      "files": ["*.ts"],
-      "extends": [
-        "eslint:recommended",
-        "plugin:@typescript-eslint/recommended",
-        "plugin:prettier/recommended"
-      ],
-      "rules": {
+        "@angular-eslint/no-duplicates-in-metadata-arrays": "warn",
+        
         "@typescript-eslint/no-explicit-any": "off"
       }
     },

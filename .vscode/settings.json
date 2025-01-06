@@ -3,5 +3,8 @@
   "eslint.validate": ["javascript", "typescript", "html"],
   "eslint.options": {
     "extensions": [".js", ".ts", "html"]
-  }
+  },
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "always",
+  },
 }
