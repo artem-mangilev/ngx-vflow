@@ -1,0 +1,7 @@
+{
+  "editorconfig": true,
+  "singleQuote": false,
+  "trailingComma": "all",
+  "semi": true,
+  "bracketSameLine": true
+}
