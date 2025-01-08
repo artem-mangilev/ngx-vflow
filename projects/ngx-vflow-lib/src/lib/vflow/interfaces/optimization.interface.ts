@@ -5,5 +5,5 @@ export interface Optimization {
    *
    * @default false
    */
-  detachedGroupsLayer: boolean
+  detachedGroupsLayer: boolean;
 }

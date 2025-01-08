@@ -1,5 +1,5 @@
 import { NgDocPage } from '@ng-doc/core';
-import GettingStartedCategory from '../../ng-doc.category'
+import GettingStartedCategory from '../../ng-doc.category';
 
 const Page: NgDocPage = {
   title: `Migrations`,

@@ -4,12 +4,12 @@ import {
   computed,
   ElementRef,
   inject,
-  Input,
   OnInit,
   TemplateRef,
   input,
   viewChild,
   effect,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import { RootPointerDirective } from '../../directives/root-pointer.directive';
 import { filter, tap } from 'rxjs';
@@ -25,15 +25,7 @@ import { PointerEvent } from '../../directives/root-pointer.directive';
 import { SpacePointContextDirective } from '../../directives/space-point-context.directive';
 import { PointerDirective } from '../../directives/pointer.directive';
 
-type Side =
-  | 'top'
-  | 'right'
-  | 'bottom'
-  | 'left'
-  | 'top-right'
-  | 'top-left'
-  | 'bottom-right'
-  | 'bottom-left';
+type Side = 'top' | 'right' | 'bottom' | 'left' | 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left';
 
 @Component({
   standalone: true,
@@ -41,6 +33,7 @@ type Side =
   templateUrl: './resizable.component.html',
   styleUrls: ['./resizable.component.scss'],
   imports: [PointerDirective],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ResizableComponent implements OnInit, AfterViewInit {
   private nodeAccessor = inject(NodeAccessorService);
@@ -66,9 +59,7 @@ export class ResizableComponent implements OnInit, AfterViewInit {
 
   private resizeSide: Side | null = null;
 
-  private zoom = computed(
-    () => this.viewportService.readableViewport().zoom ?? 0,
-  );
+  private zoom = computed(() => this.viewportService.readableViewport().zoom ?? 0);
 
   private minWidth = 0;
   private minHeight = 0;
@@ -101,7 +92,7 @@ export class ResizableComponent implements OnInit, AfterViewInit {
           this.model.resizable.set(true);
         }
       },
-      { allowSignalWrites: true }
+      { allowSignalWrites: true },
     );
   }
 
@@ -111,16 +102,8 @@ export class ResizableComponent implements OnInit, AfterViewInit {
 
   @Microtask
   public ngAfterViewInit() {
-    this.minWidth =
-      +getComputedStyle(this.hostRef.nativeElement).minWidth.replace(
-        'px',
-        '',
-      ) || 0;
-    this.minHeight =
-      +getComputedStyle(this.hostRef.nativeElement).minHeight.replace(
-        'px',
-        '',
-      ) || 0;
+    this.minWidth = +getComputedStyle(this.hostRef.nativeElement).minWidth.replace('px', '') || 0;
+    this.minHeight = +getComputedStyle(this.hostRef.nativeElement).minHeight.replace('px', '') || 0;
   }
 
   protected startResize(side: Side, event: Event) {
@@ -151,26 +134,15 @@ export class ResizableComponent implements OnInit, AfterViewInit {
     this.model.resizing.set(false);
   }
 
-  private isResizeConstrained({
-    x,
-    y,
-    movementX,
-    movementY,
-  }: PointerEvent): boolean {
+  private isResizeConstrained({ x, y, movementX, movementY }: PointerEvent): boolean {
     const flowPoint = this.spacePointContext.documentPointToFlowPoint({ x, y });
 
     if (this.resizeSide?.includes('right')) {
-      if (
-        movementX > 0 &&
-        flowPoint.x < this.model.point().x + this.model.size().width
-      ) {
+      if (movementX > 0 && flowPoint.x < this.model.point().x + this.model.size().width) {
         return true;
       }
 
-      if (
-        movementX < 0 &&
-        flowPoint.x > this.model.point().x + this.model.size().width
-      ) {
+      if (movementX < 0 && flowPoint.x > this.model.point().x + this.model.size().width) {
         return true;
       }
     }
@@ -186,17 +158,11 @@ export class ResizableComponent implements OnInit, AfterViewInit {
     }
 
     if (this.resizeSide?.includes('bottom')) {
-      if (
-        movementY > 0 &&
-        flowPoint.y < this.model.point().y + this.model.size().height
-      ) {
+      if (movementY > 0 && flowPoint.y < this.model.point().y + this.model.size().height) {
         return true;
       }
 
-      if (
-        movementY < 0 &&
-        flowPoint.y > this.model.point().y + this.model.size().height
-      ) {
+      if (movementY < 0 && flowPoint.y > this.model.point().y + this.model.size().height) {
         return true;
       }
     }
@@ -222,11 +188,7 @@ function calcOffset(movementX: number, movementY: number, zoom: number) {
   };
 }
 
-function applyResize(
-  side: Side,
-  model: NodeModel,
-  offset: { offsetX: number; offsetY: number },
-): Rect {
+function applyResize(side: Side, model: NodeModel, offset: { offsetX: number; offsetY: number }): Rect {
   const { offsetX, offsetY } = offset;
   const { x, y } = model.point();
   const { width, height } = model.size();
@@ -267,13 +229,7 @@ function applyResize(
   }
 }
 
-function constrainRect(
-  rect: Rect,
-  model: NodeModel,
-  side: Side,
-  minWidth: number,
-  minHeight: number,
-) {
+function constrainRect(rect: Rect, model: NodeModel, side: Side, minWidth: number, minHeight: number) {
   let { x, y, width, height } = rect;
 
   // 1. Prevent negative dimensions
@@ -310,10 +266,7 @@ function constrainRect(
   // 4. Apply child node constraints (if children exist)
   if (bounds) {
     if (side.includes('left')) {
-      x = Math.min(
-        x,
-        model.point().x + model.size().width - (bounds.x + bounds.width),
-      );
+      x = Math.min(x, model.point().x + model.size().width - (bounds.x + bounds.width));
       width = Math.max(width, bounds.x + bounds.width);
     }
 
@@ -326,10 +279,7 @@ function constrainRect(
     }
 
     if (side.includes('top')) {
-      y = Math.min(
-        y,
-        model.point().y + model.size().height - (bounds.y + bounds.height),
-      );
+      y = Math.min(y, model.point().y + model.size().height - (bounds.y + bounds.height));
       height = Math.max(height, bounds.y + bounds.height);
     }
   }

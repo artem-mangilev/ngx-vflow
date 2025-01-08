@@ -1,5 +1,5 @@
 import { NgDocPage } from '@ng-doc/core';
-import ExamplesCategory from '../../ng-doc.category'
+import ExamplesCategory from '../../ng-doc.category';
 import { CustomBackgroundDemoComponent } from './demo/custom-background-demo.component';
 import { DotsCustomBackgroundDemoComponent } from './demo/dots-custom-background-demo.component';
 import { ImageCustomBackgroundDemoComponent } from './demo/image-custom-background-demo.component';
@@ -11,9 +11,9 @@ const TestPage: NgDocPage = {
   demos: {
     CustomBackgroundDemoComponent,
     DotsCustomBackgroundDemoComponent,
-    ImageCustomBackgroundDemoComponent
+    ImageCustomBackgroundDemoComponent,
   },
-  order: 11
+  order: 11,
 };
 
 export default TestPage;

@@ -1,8 +1,8 @@
-import { signal } from "@angular/core"
-import { EdgeLabel } from "../interfaces/edge-label.interface"
+import { signal } from '@angular/core';
+import { EdgeLabel } from '../interfaces/edge-label.interface';
 
 export class EdgeLabelModel {
-  public size = signal({ width: 0, height: 0 })
+  public size = signal({ width: 0, height: 0 });
 
-  constructor(public edgeLabel: EdgeLabel) { }
+  constructor(public edgeLabel: EdgeLabel) {}
 }

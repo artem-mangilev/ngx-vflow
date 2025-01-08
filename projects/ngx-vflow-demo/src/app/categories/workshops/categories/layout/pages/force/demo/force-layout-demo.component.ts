@@ -1,16 +1,6 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  signal,
-  viewChild,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal, viewChild } from '@angular/core';
 import * as d3 from 'd3-force';
-import {
-  DynamicNode,
-  Edge,
-  VflowComponent,
-  Vflow,
-} from 'projects/ngx-vflow-lib/src/public-api';
+import { DynamicNode, Edge, VflowComponent, Vflow } from 'projects/ngx-vflow-lib/src/public-api';
 
 @Component({
   templateUrl: './force-layout-demo.component.html',
@@ -122,7 +112,7 @@ export class ForceLayoutDemoComponent {
 
   private linkForce = d3
     .forceLink(this.edges.map((e) => ({ source: e.source, target: e.target })))
-    // @ts-ignore
+    // @ts-expect-error id may not exist
     .id((d) => d.id)
     .distance(50);
 
@@ -149,24 +139,7 @@ export class ForceLayoutDemoComponent {
 }
 
 function randomHex() {
-  const hexValues = [
-    0,
-    1,
-    2,
-    3,
-    4,
-    5,
-    6,
-    7,
-    8,
-    9,
-    'A',
-    'B',
-    'C',
-    'D',
-    'E',
-    'F',
-  ];
+  const hexValues = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 'A', 'B', 'C', 'D', 'E', 'F'];
 
   let hex = '#';
 

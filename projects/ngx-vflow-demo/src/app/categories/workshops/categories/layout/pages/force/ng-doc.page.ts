@@ -8,7 +8,7 @@ const Page: NgDocPage = {
   category: LayoutCategory,
   demos: { ForceLayoutDemoComponent },
   keyword: 'WorkshopsLayoutForce',
-  order: 2
+  order: 2,
 };
 
 export default Page;

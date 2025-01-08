@@ -1,7 +1,7 @@
-import { EdgeLabelPosition } from "./edge-label.interface";
-import { Point } from "./point.interface";
+import { EdgeLabelPosition } from './edge-label.interface';
+import { Point } from './point.interface';
 
 export interface PathData {
   path: string;
-  points: { [key in EdgeLabelPosition]: Point }
+  points: { [key in EdgeLabelPosition]: Point };
 }

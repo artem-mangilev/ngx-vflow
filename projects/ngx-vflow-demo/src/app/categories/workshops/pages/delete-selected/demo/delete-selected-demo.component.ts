@@ -6,7 +6,7 @@ import { Edge, Node, Vflow } from 'projects/ngx-vflow-lib/src/public-api';
   styleUrls: ['./delete-selected-demo.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [Vflow]
+  imports: [Vflow],
 })
 export class DeleteSelectedDemoComponent {
   public nodes: Node[] = [
@@ -25,28 +25,28 @@ export class DeleteSelectedDemoComponent {
       point: { x: 290, y: 300 },
       type: 'html-template',
     },
-  ]
+  ];
 
   public edges: Edge[] = [
     {
       id: '1 -> 2',
       source: '1',
       target: '2',
-      type: 'template'
+      type: 'template',
     },
     {
       id: '1 -> 3',
       source: '1',
       target: '3',
-      type: 'template'
+      type: 'template',
     },
-  ]
+  ];
 
   public deleteNode(node: Node) {
-    this.nodes = this.nodes.filter(n => n.id !== node.id)
+    this.nodes = this.nodes.filter((n) => n.id !== node.id);
   }
 
   public deleteEdge(edge: Edge) {
-    this.edges = this.edges.filter(e => e.id !== edge.id)
+    this.edges = this.edges.filter((e) => e.id !== edge.id);
   }
 }

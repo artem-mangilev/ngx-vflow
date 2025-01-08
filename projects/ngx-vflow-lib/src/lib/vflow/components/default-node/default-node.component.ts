@@ -1,4 +1,4 @@
-import { Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 
 @Component({
   standalone: true,
@@ -8,6 +8,7 @@ import { Component, input } from '@angular/core';
   host: {
     '[class.selected]': 'selected()',
   },
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DefaultNodeComponent {
   public selected = input(false);

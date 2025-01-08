@@ -7,7 +7,7 @@ import { Edge, Node, Vflow, Connection } from 'projects/ngx-vflow-lib/src/public
   styleUrls: ['./multiple-connection-points-demo.styles.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [Vflow, CommonModule]
+  imports: [Vflow, CommonModule],
 })
 export class MultipleConnectionPointsDemoComponent {
   public nodes: Node[] = [
@@ -18,8 +18,8 @@ export class MultipleConnectionPointsDemoComponent {
       data: {
         type: 'output',
         output1: 'output1',
-        output2: 'output2'
-      }
+        output2: 'output2',
+      },
     },
     {
       id: '2',
@@ -28,10 +28,10 @@ export class MultipleConnectionPointsDemoComponent {
       data: {
         type: 'input',
         input1: 'input1',
-        input2: 'input2'
-      }
+        input2: 'input2',
+      },
     },
-  ]
+  ];
 
   public edges: Edge[] = [
     {
@@ -46,17 +46,20 @@ export class MultipleConnectionPointsDemoComponent {
       source: '1',
       target: '2',
       sourceHandle: 'output2',
-      targetHandle: 'input2'
+      targetHandle: 'input2',
     },
-  ]
+  ];
 
   public createEdge({ source, target, sourceHandle, targetHandle }: Connection) {
-    this.edges = [...this.edges, {
-      id: `${source} -> ${target}${sourceHandle ?? ''}${targetHandle ?? ''}`,
-      source,
-      target,
-      sourceHandle,
-      targetHandle
-    }]
+    this.edges = [
+      ...this.edges,
+      {
+        id: `${source} -> ${target}${sourceHandle ?? ''}${targetHandle ?? ''}`,
+        source,
+        target,
+        sourceHandle,
+        targetHandle,
+      },
+    ];
   }
 }

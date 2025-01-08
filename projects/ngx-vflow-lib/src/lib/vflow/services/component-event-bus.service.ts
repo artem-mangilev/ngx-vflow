@@ -4,11 +4,11 @@ import { AnyComponentNodeEvent } from '../interfaces/component-node-event.interf
 
 @Injectable()
 export class ComponentEventBusService {
-  private _event$ = new Subject<AnyComponentNodeEvent>()
+  private _event$ = new Subject<AnyComponentNodeEvent>();
 
-  public event$ = this._event$.asObservable()
+  public event$ = this._event$.asObservable();
 
   public pushEvent(event: AnyComponentNodeEvent) {
-    this._event$.next(event)
+    this._event$.next(event);
   }
 }

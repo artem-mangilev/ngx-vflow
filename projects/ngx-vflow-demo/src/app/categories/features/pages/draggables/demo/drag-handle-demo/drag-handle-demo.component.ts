@@ -6,7 +6,7 @@ import { Edge, Node, Vflow } from 'projects/ngx-vflow-lib/src/public-api';
   styleUrls: ['./drag-handle-demo.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [Vflow]
+  imports: [Vflow],
 })
 export class DragHandleDemoComponent {
   public nodes: Node[] = [
@@ -25,20 +25,20 @@ export class DragHandleDemoComponent {
       point: { x: 290, y: 300 },
       type: 'html-template',
     },
-  ]
+  ];
 
   public edges: Edge[] = [
     {
       id: '1 -> 2',
       source: '1',
       target: '2',
-      type: 'default'
+      type: 'default',
     },
     {
       id: '1 -> 3',
       source: '1',
       target: '3',
-      type: 'default'
+      type: 'default',
     },
-  ]
+  ];
 }

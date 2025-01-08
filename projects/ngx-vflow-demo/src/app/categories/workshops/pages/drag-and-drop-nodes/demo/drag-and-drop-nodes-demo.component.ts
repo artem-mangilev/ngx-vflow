@@ -1,12 +1,6 @@
 import { ChangeDetectionStrategy, Component, viewChild } from '@angular/core';
 import { DndDropEvent, DndModule } from 'ngx-drag-drop';
-import {
-  Connection,
-  Edge,
-  Node,
-  VflowComponent,
-  Vflow,
-} from 'projects/ngx-vflow-lib/src/public-api';
+import { Connection, Edge, Node, VflowComponent, Vflow } from 'projects/ngx-vflow-lib/src/public-api';
 
 @Component({
   templateUrl: './drag-and-drop-nodes-demo.component.html',

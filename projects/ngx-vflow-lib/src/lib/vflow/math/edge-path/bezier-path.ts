@@ -9,24 +9,16 @@ export function bezierPath(
   target: Point,
   sourcePosition: Position,
   targetPosition: Position,
-  usingPoints: UsingPoints = [false, false, false]
+  usingPoints: UsingPoints = [false, false, false],
 ): PathData {
   const distanceVector = { x: source.x - target.x, y: source.y - target.y };
 
   const sourceControl = calcControlPoint(source, sourcePosition, distanceVector);
   const targetControl = calcControlPoint(target, targetPosition, distanceVector);
 
-  const path =
-    `M${source.x},${source.y} C${sourceControl.x},${sourceControl.y} ${targetControl.x},${targetControl.y} ${target.x},${target.y}`
+  const path = `M${source.x},${source.y} C${sourceControl.x},${sourceControl.y} ${targetControl.x},${targetControl.y} ${target.x},${target.y}`;
 
-  return getPathData(
-    path,
-    source,
-    target,
-    sourceControl,
-    targetControl,
-    usingPoints
-  );
+  return getPathData(path, source, target, sourceControl, targetControl, usingPoints);
 }
 
 /**
@@ -37,11 +29,7 @@ export function bezierPath(
  * @param distanceVector transmits the distance between the source and the target as x and y coordinates
  */
 
-function calcControlPoint(
-  point: Point,
-  pointPosition: Position,
-  distanceVector: Point
-) {
+function calcControlPoint(point: Point, pointPosition: Position, distanceVector: Point) {
   const factorPoint = { x: 0, y: 0 };
 
   switch (pointPosition) {
@@ -69,8 +57,7 @@ function calcControlPoint(
   const curvature = 0.25;
   // thanks colleagues from react/svelte world
   // https://github.com/xyflow/xyflow/blob/f0117939bae934447fa7f232081f937169ee23b5/packages/system/src/utils/edges/bezier-edge.ts#L56
-  const controlOffset =
-    curvature * 25 * Math.sqrt(Math.abs(fullDistanceVector.x + fullDistanceVector.y));
+  const controlOffset = curvature * 25 * Math.sqrt(Math.abs(fullDistanceVector.x + fullDistanceVector.y));
 
   return {
     x: point.x + factorPoint.x * controlOffset,
@@ -84,7 +71,7 @@ function getPathData(
   target: Point,
   sourceControl: Point,
   targetControl: Point,
-  usingPoints: UsingPoints
+  usingPoints: UsingPoints,
 ): PathData {
   const [start, center, end] = usingPoints;
 
@@ -93,15 +80,9 @@ function getPathData(
   return {
     path,
     points: {
-      start: start
-        ? getPointOnBezier(source, target, sourceControl, targetControl, 0.1)
-        : nullPoint,
-      center: center
-        ? getPointOnBezier(source, target, sourceControl, targetControl, 0.5)
-        : nullPoint,
-      end: end
-        ? getPointOnBezier(source, target, sourceControl, targetControl, 0.9)
-        : nullPoint,
+      start: start ? getPointOnBezier(source, target, sourceControl, targetControl, 0.1) : nullPoint,
+      center: center ? getPointOnBezier(source, target, sourceControl, targetControl, 0.5) : nullPoint,
+      end: end ? getPointOnBezier(source, target, sourceControl, targetControl, 0.9) : nullPoint,
     },
   };
 }
@@ -114,27 +95,15 @@ function getPointOnBezier(
   targetPoint: Point,
   sourceControl: Point,
   targetControl: Point,
-  ratio: number
+  ratio: number,
 ): Point {
-  const fromSourceToFirstControl: Point = getPointOnLineByRatio(
-    sourcePoint,
-    sourceControl,
-    ratio
-  );
-  const fromFirstControlToSecond: Point = getPointOnLineByRatio(
-    sourceControl,
-    targetControl,
-    ratio
-  );
-  const fromSecondControlToTarget: Point = getPointOnLineByRatio(
-    targetControl,
-    targetPoint,
-    ratio
-  );
+  const fromSourceToFirstControl: Point = getPointOnLineByRatio(sourcePoint, sourceControl, ratio);
+  const fromFirstControlToSecond: Point = getPointOnLineByRatio(sourceControl, targetControl, ratio);
+  const fromSecondControlToTarget: Point = getPointOnLineByRatio(targetControl, targetPoint, ratio);
 
   return getPointOnLineByRatio(
     getPointOnLineByRatio(fromSourceToFirstControl, fromFirstControlToSecond, ratio),
     getPointOnLineByRatio(fromFirstControlToSecond, fromSecondControlToTarget, ratio),
-    ratio
+    ratio,
   );
 }

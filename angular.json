@@ -33,6 +33,15 @@
               "zone.js/testing"
             ]
           }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "projects/ngx-vflow-lib/src/**/*.ts",
+              "projects/ngx-vflow-lib/src/**/*.component.html"
+            ]
+          }
         }
       }
     },
@@ -160,6 +169,15 @@
           "builder": "angular-cli-ghpages:deploy",
           "options": {
             "buildTarget": "ngx-vflow-demo:build:production"
+          }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "projects/ngx-vflow-demo/src/**/*.ts",
+              "projects/ngx-vflow-demo/src/**/*.component.html"
+            ]
           }
         }
       }

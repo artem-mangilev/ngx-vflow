@@ -1,5 +1,5 @@
 import { NgDocPage } from '@ng-doc/core';
-import ExamplesCategory from '../../ng-doc.category'
+import ExamplesCategory from '../../ng-doc.category';
 import { DefaultNodesDemoComponent } from './demo/default-nodes-demo.component';
 
 const TestPage: NgDocPage = {
@@ -7,7 +7,7 @@ const TestPage: NgDocPage = {
   mdFile: './index.md',
   category: ExamplesCategory,
   demos: { DefaultNodesDemoComponent },
-  order: 1
+  order: 1,
 };
 
 export default TestPage;

@@ -54,10 +54,10 @@ The shape of this accumulator-event contains following useful info:
 
 ```ts
 export type AnyComponentNodeEvent = {
-  nodeId: string // Id of node where event occurs
-  eventName: string
-  eventPayload: unknown
-}
+  nodeId: string; // Id of node where event occurs
+  eventName: string;
+  eventPayload: unknown;
+};
 ```
 
 The Library also includes `ComponentNodeEvent` helper type to get type-safe event, where you just need to pass an array of your custom components in generic, and this type will infer proper types for `eventName` and `eventPayload`:

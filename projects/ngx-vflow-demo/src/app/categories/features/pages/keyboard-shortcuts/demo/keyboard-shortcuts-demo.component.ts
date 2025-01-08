@@ -3,20 +3,22 @@ import { KeyboardShortcuts, Node, Vflow } from 'projects/ngx-vflow-lib/src/publi
 
 @Component({
   template: `<vflow view="auto" [nodes]="nodes" [keyboardShortcuts]="shortcuts" />`,
-  styles: [`
-    :host {
-      width: 100%;
-      height: 100%;
-    }
-  `],
+  styles: [
+    `
+      :host {
+        width: 100%;
+        height: 100%;
+      }
+    `,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [Vflow]
+  imports: [Vflow],
 })
 export class KeyboardShortcutsDemoComponent {
   public shortcuts: KeyboardShortcuts = {
-    multiSelection: ['ShiftLeft', 'ShiftRight']
-  }
+    multiSelection: ['ShiftLeft', 'ShiftRight'],
+  };
 
   public nodes: Node[] = [
     {
@@ -24,13 +26,13 @@ export class KeyboardShortcutsDemoComponent {
       point: { x: 10, y: 10 },
       type: 'default',
       text: `1`,
-      parentId: '3'
+      parentId: '3',
     },
     {
       id: '2',
       point: { x: 200, y: 200 },
       type: 'default',
-      text: `<strong>2</strong>`
+      text: `<strong>2</strong>`,
     },
     {
       id: '3',
@@ -39,5 +41,5 @@ export class KeyboardShortcutsDemoComponent {
       width: 150,
       height: 150,
     },
-  ]
+  ];
 }

@@ -13,7 +13,7 @@ npm i ngx-vflow --save
 ## Version Compatibility
 
 | ngx-vlow | Angular   |
-|----------|-----------|
+| -------- | --------- |
 | v0.x     | v16.2.0+  |
 | v1.x     | v17.3.12+ |
 
@@ -26,7 +26,7 @@ The following code describes 3 nodes and creates 2 edges between them.
   template: `<vflow [nodes]="nodes" [edges]="edges" />`,
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [Vflow]
+  imports: [Vflow],
 })
 export class DefaultEdgesDemoComponent {
   public nodes: Node[] = [
@@ -34,34 +34,34 @@ export class DefaultEdgesDemoComponent {
       id: '1',
       point: { x: 10, y: 200 },
       type: 'default',
-      text: '1'
+      text: '1',
     },
     {
       id: '2',
       point: { x: 200, y: 100 },
       type: 'default',
-      text: '2'
+      text: '2',
     },
     {
       id: '3',
       point: { x: 200, y: 300 },
       type: 'default',
-      text: '3'
+      text: '3',
     },
-  ]
+  ];
 
   public edges: Edge[] = [
     {
       id: '1 -> 2',
       source: '1',
-      target: '2'
+      target: '2',
     },
     {
       id: '1 -> 3',
       source: '1',
-      target: '3'
+      target: '3',
     },
-  ]
+  ];
 }
 ```
 
@@ -80,6 +80,6 @@ Host directives for `vflow` that you may find helpful:
 - https://www.ngx-vflow.org/api/ngx-vflow/classes/ConnectionControllerDirective
 - https://www.ngx-vflow.org/api/ngx-vflow/classes/ChangesControllerDirective
 
-## License 
+## License
 
 MIT

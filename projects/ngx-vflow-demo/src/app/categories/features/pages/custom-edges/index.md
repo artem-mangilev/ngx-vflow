@@ -13,10 +13,10 @@ It's tricky to infer type for `let-ctx`, so here is an interface with available 
 
 ```ts
 export interface EdgeContext {
-  edge: Edge
-  path: Signal<string>
-  markerStart: Signal<string>
-  markerEnd: Signal<string>
+  edge: Edge;
+  path: Signal<string>;
+  markerStart: Signal<string>;
+  markerEnd: Signal<string>;
 }
 ```
 

@@ -3,15 +3,17 @@ import { Node, Vflow } from 'projects/ngx-vflow-lib/src/public-api';
 
 @Component({
   template: `<vflow view="auto" [nodes]="nodes" />`,
-  styles: [`
-    :host {
-      width: 100%;
-      height: 100%;
-    }
-  `],
+  styles: [
+    `
+      :host {
+        width: 100%;
+        height: 100%;
+      }
+    `,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [Vflow]
+  imports: [Vflow],
 })
 export class DefaultNodesDemoComponent {
   public nodes: Node[] = [
@@ -26,7 +28,7 @@ export class DefaultNodesDemoComponent {
       point: { x: 200, y: 200 },
       type: 'default',
       // it's possible to pass html in this field
-      text: `<strong>2</strong>`
+      text: `<strong>2</strong>`,
     },
-  ]
+  ];
 }

@@ -10,44 +10,46 @@ export class KeyboardService {
     multiSelection: [
       getOS() === 'macos' ? 'MetaLeft' : 'ControlLeft',
       getOS() === 'macos' ? 'MetaRight' : 'ControlRight',
-    ]
+    ],
   });
 
   private actionsActive: Record<KeyboardAction, boolean> = {
-    multiSelection: false
+    multiSelection: false,
   };
 
   constructor() {
-    toObservable(this.actions).pipe(
-      switchMap(() =>
-        merge(
-          fromEvent<KeyboardEvent>(document, 'keydown').pipe(
-            tap(event => {
-              for (const action in this.actions()) {
-                const keyCodes = this.actions()[action as KeyboardAction] ?? [];
+    toObservable(this.actions)
+      .pipe(
+        switchMap(() =>
+          merge(
+            fromEvent<KeyboardEvent>(document, 'keydown').pipe(
+              tap((event) => {
+                for (const action in this.actions()) {
+                  const keyCodes = this.actions()[action as KeyboardAction] ?? [];
 
-                if (keyCodes.includes(event.code)) {
-                  this.actionsActive[action as KeyboardAction] = true;
+                  if (keyCodes.includes(event.code)) {
+                    this.actionsActive[action as KeyboardAction] = true;
+                  }
                 }
-              }
-            })
+              }),
+            ),
+
+            fromEvent<KeyboardEvent>(document, 'keyup').pipe(
+              tap((event) => {
+                for (const action in this.actions()) {
+                  const keyCodes = this.actions()[action as KeyboardAction] ?? [];
+
+                  if (keyCodes.includes(event.code)) {
+                    this.actionsActive[action as KeyboardAction] = false;
+                  }
+                }
+              }),
+            ),
           ),
-
-          fromEvent<KeyboardEvent>(document, 'keyup').pipe(
-            tap(event => {
-              for (const action in this.actions()) {
-                const keyCodes = this.actions()[action as KeyboardAction] ?? [];
-
-                if (keyCodes.includes(event.code)) {
-                  this.actionsActive[action as KeyboardAction] = false;
-                }
-              }
-            })
-          )
-        )
-      ),
-      takeUntilDestroyed()
-    ).subscribe();
+        ),
+        takeUntilDestroyed(),
+      )
+      .subscribe();
   }
 
   public setShortcuts(newActions: KeyboardShortcuts) {
@@ -55,6 +57,6 @@ export class KeyboardService {
   }
 
   public isActiveAction(action: KeyboardAction) {
-    return this.actionsActive[action]
+    return this.actionsActive[action];
   }
 }

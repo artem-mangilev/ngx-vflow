@@ -8,6 +8,4 @@ Planned enhancements for the minimap:
 - Enable panning and zooming within the minimap
 - Render mini-nodes to visually match main nodes, using a simplified DOM structure to optimize performance
 
-
 {{ NgDocActions.demoPane("MinimapDemoComponent") }}
-

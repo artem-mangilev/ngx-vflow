@@ -1,31 +1,28 @@
 @for (marker of markers() | keyvalue; track marker) {
   <svg:marker
+    viewBox="-10 -10 20 20"
+    refX="0"
+    refY="0"
     [attr.id]="marker.key"
     [attr.markerWidth]="marker.value.width ?? 16.5"
     [attr.markerHeight]="marker.value.height ?? 16.5"
     [attr.orient]="marker.value.orient ?? 'auto-start-reverse'"
-    viewBox="-10 -10 20 20"
-    [attr.markerUnits]="marker.value.markerUnits ?? 'userSpaceOnUse'"
-    refX="0"
-    refY="0"
-  >
-    @if (marker.value.type === "arrow-closed" || !marker.value.type) {
+    [attr.markerUnits]="marker.value.markerUnits ?? 'userSpaceOnUse'">
+    @if (marker.value.type === 'arrow-closed' || !marker.value.type) {
       <polyline
         class="marker__arrow_closed"
+        points="-5,-4 1,0 -5,4 -5,-4"
         [style.stroke]="marker.value.color ?? defaultColor"
         [style.stroke-width]="marker.value.strokeWidth ?? 2"
-        [style.fill]="marker.value.color ?? defaultColor"
-        points="-5,-4 1,0 -5,4 -5,-4"
-      />
+        [style.fill]="marker.value.color ?? defaultColor" />
     }
 
-    @if (marker.value.type === "arrow") {
+    @if (marker.value.type === 'arrow') {
       <polyline
         class="marker__arrow_default"
-        [style.stroke]="marker.value.color ?? defaultColor"
-        [style.stroke-width]="marker.value.strokeWidth ?? 2"
         points="-5,-4 0,0 -5,4"
-      />
+        [style.stroke]="marker.value.color ?? defaultColor"
+        [style.stroke-width]="marker.value.strokeWidth ?? 2" />
     }
   </svg:marker>
 }

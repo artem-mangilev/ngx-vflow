@@ -6,10 +6,10 @@ const Api: NgDocApi = {
     {
       name: 'ngx-vflow',
       route: 'ngx-vflow',
-      include: 'projects/ngx-vflow-lib/src/public-api.ts'
-    }
+      include: 'projects/ngx-vflow-lib/src/public-api.ts',
+    },
   ],
-  order: 3
+  order: 3,
 };
 
 export default Api;

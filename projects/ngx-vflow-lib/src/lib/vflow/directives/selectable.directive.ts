@@ -11,27 +11,27 @@ import { FlowSettingsService } from '../services/flow-settings.service';
   selector: '[selectable]',
 })
 export class SelectableDirective {
-  private flowSettingsService = inject(FlowSettingsService)
-  private selectionService = inject(SelectionService)
-  private parentEdge = inject(EdgeComponent, { optional: true })
-  private parentNode = inject(NodeComponent, { optional: true })
+  private flowSettingsService = inject(FlowSettingsService);
+  private selectionService = inject(SelectionService);
+  private parentEdge = inject(EdgeComponent, { optional: true });
+  private parentNode = inject(NodeComponent, { optional: true });
 
   @HostListener('mousedown')
   @HostListener('touchstart')
   protected onMousedown() {
-    const entity = this.entity()
+    const entity = this.entity();
     if (entity && this.flowSettingsService.entitiesSelectable()) {
-      this.selectionService.select(entity)
+      this.selectionService.select(entity);
     }
   }
 
   private entity(): FlowEntity | null {
     if (this.parentNode) {
-      return this.parentNode.nodeModel()
+      return this.parentNode.nodeModel();
     } else if (this.parentEdge) {
-      return this.parentEdge.model()
+      return this.parentEdge.model();
     }
 
-    return null
+    return null;
   }
 }

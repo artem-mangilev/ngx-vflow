@@ -1,4 +1,4 @@
-import { ConnectionInternal } from "../interfaces/connection.internal.interface";
+import { ConnectionInternal } from '../interfaces/connection.internal.interface';
 
 /**
  * This function contains a hack-y behavior.
@@ -10,23 +10,23 @@ import { ConnectionInternal } from "../interfaces/connection.internal.interface"
  * exactly what we need for strict connection type
  */
 export function adjustDirection(connection: ConnectionInternal): ConnectionInternal {
-  const result = {} as ConnectionInternal
+  const result = {} as ConnectionInternal;
 
   if (connection.sourceHandle.rawHandle.type === 'source') {
-    result.source = connection.source
-    result.sourceHandle = connection.sourceHandle
+    result.source = connection.source;
+    result.sourceHandle = connection.sourceHandle;
   } else {
-    result.source = connection.target
-    result.sourceHandle = connection.targetHandle
+    result.source = connection.target;
+    result.sourceHandle = connection.targetHandle;
   }
 
   if (connection.targetHandle.rawHandle.type === 'target') {
-    result.target = connection.target
-    result.targetHandle = connection.targetHandle
+    result.target = connection.target;
+    result.targetHandle = connection.targetHandle;
   } else {
-    result.target = connection.source
-    result.targetHandle = connection.sourceHandle
+    result.target = connection.source;
+    result.targetHandle = connection.sourceHandle;
   }
 
-  return result
+  return result;
 }
