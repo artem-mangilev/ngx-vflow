@@ -16,6 +16,7 @@
     "type": "git"
   },
   "scripts": {
+    "build": "ng build",
     "publish:major": "npm version major && ng build ngx-vflow-lib && cd ../../dist/ngx-vflow-lib && npm publish",
     "publish:minor": "npm version minor && ng build ngx-vflow-lib && cd ../../dist/ngx-vflow-lib && npm publish",
     "publish:preminor": "npm version preminor && ng build ngx-vflow-lib && cd ../../dist/ngx-vflow-lib && npm publish",
