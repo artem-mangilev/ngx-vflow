@@ -1,22 +1,11 @@
-<svg:svg
-  #flow
-  rootSvgRef
-  rootSvgContext
-  rootPointer
-  flowSizeController
-  class="root-svg"
->
+<svg:svg #flow rootSvgRef rootSvgContext rootPointer flowSizeController class="root-svg">
   <defs flowDefs [markers]="markers()" />
 
   <g background />
 
   <svg:g mapContext spacePointContext>
     <!-- Connection -->
-    <svg:g
-      connection
-      [model]="connection"
-      [template]="connectionTemplateDirective()?.templateRef"
-    />
+    <svg:g connection [model]="connection" [template]="connectionTemplateDirective()?.templateRef" />
 
     @if (optimization().detachedGroupsLayer) {
       <!-- Groups -->
@@ -25,8 +14,7 @@
           node
           [nodeModel]="model"
           [groupNodeTemplate]="groupNodeTemplateDirective()?.templateRef"
-          [attr.transform]="model.pointTransform()"
-        />
+          [attr.transform]="model.pointTransform()" />
       }
       <!-- Edges  -->
       @for (model of edgeModels(); track trackEdges($index, model)) {
@@ -34,8 +22,7 @@
           edge
           [model]="model"
           [edgeTemplate]="edgeTemplateDirective()?.templateRef"
-          [edgeLabelHtmlTemplate]="edgeLabelHtmlDirective()?.templateRef"
-        />
+          [edgeLabelHtmlTemplate]="edgeLabelHtmlDirective()?.templateRef" />
       }
       <!-- Nodes -->
       @for (model of nonGroups(); track trackNodes($index, model)) {
@@ -43,8 +30,7 @@
           node
           [nodeModel]="model"
           [nodeTemplate]="nodeTemplateDirective()?.templateRef"
-          [attr.transform]="model.pointTransform()"
-        />
+          [attr.transform]="model.pointTransform()" />
       }
     }
 
@@ -55,8 +41,7 @@
           edge
           [model]="model"
           [edgeTemplate]="edgeTemplateDirective()?.templateRef"
-          [edgeLabelHtmlTemplate]="edgeLabelHtmlDirective()?.templateRef"
-        />
+          [edgeLabelHtmlTemplate]="edgeLabelHtmlDirective()?.templateRef" />
       }
       <!-- Nodes -->
       @for (model of nodeModels(); track trackNodes($index, model)) {
@@ -65,8 +50,7 @@
           [nodeModel]="model"
           [nodeTemplate]="nodeTemplateDirective()?.templateRef"
           [groupNodeTemplate]="groupNodeTemplateDirective()?.templateRef"
-          [attr.transform]="model.pointTransform()"
-        />
+          [attr.transform]="model.pointTransform()" />
       }
     }
   </svg:g>

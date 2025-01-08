@@ -6,18 +6,18 @@ To simplify writing isolated tests for component nodes, you can use the `provide
 @Component({
   standalone: true,
   template: `<div resizable><handle /></div>`,
-  imports: [Vflow]
+  imports: [Vflow],
 })
-class TestCustomNodeComponent extends CustomNodeComponent { }
+class TestCustomNodeComponent extends CustomNodeComponent {}
 
-describe(('TestCustomNodeComponent'), () => {
+describe('TestCustomNodeComponent', () => {
   let component: TestCustomNodeComponent;
   let fixture: ComponentFixture<TestCustomNodeComponent>;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [TestCustomNodeComponent],
-      providers: [provideCustomNodeMocks()]
+      providers: [provideCustomNodeMocks()],
     });
 
     fixture = TestBed.createComponent(TestCustomNodeComponent);
@@ -28,5 +28,5 @@ describe(('TestCustomNodeComponent'), () => {
     // should create without DI errors
     expect(component).toBeTruthy();
   });
-})
+});
 ```

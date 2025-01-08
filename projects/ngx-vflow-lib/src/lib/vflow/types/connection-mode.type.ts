@@ -1,1 +1,1 @@
-export type ConnectionMode = 'loose' | 'strict'
+export type ConnectionMode = 'loose' | 'strict';

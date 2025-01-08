@@ -6,6 +6,5 @@ import { NodeModel } from '../models/node.model';
  */
 @Injectable()
 export class NodeAccessorService {
-  public model = signal<NodeModel | null>(null)
-
+  public model = signal<NodeModel | null>(null);
 }

@@ -5,35 +5,32 @@ import { isGroupNode } from '../utils/is-group-node';
 
 @Injectable()
 export class NodeRenderingService {
-  private flowEntitiesService = inject(FlowEntitiesService)
+  private flowEntitiesService = inject(FlowEntitiesService);
 
   public readonly nodes = computed(() => {
-    return this.flowEntitiesService.nodes()
-      .sort((aNode, bNode) => aNode.renderOrder() - bNode.renderOrder())
-  })
+    return this.flowEntitiesService.nodes().sort((aNode, bNode) => aNode.renderOrder() - bNode.renderOrder());
+  });
 
   public readonly groups = computed(() => {
-    return this.nodes().filter(n => isGroupNode(n))
+    return this.nodes().filter((n) => isGroupNode(n));
   });
 
   public readonly nonGroups = computed(() => {
-    return this.nodes().filter(n => !isGroupNode(n))
+    return this.nodes().filter((n) => !isGroupNode(n));
   });
 
   private maxOrder = computed(() => {
-    return Math.max(
-      ...this.flowEntitiesService.nodes().map((n) => n.renderOrder())
-    )
-  })
+    return Math.max(...this.flowEntitiesService.nodes().map((n) => n.renderOrder()));
+  });
 
   public pullNode(node: NodeModel) {
     // TODO do not pull when the node is already on top
     // pull node
-    node.renderOrder.set(this.maxOrder() + 1)
+    node.renderOrder.set(this.maxOrder() + 1);
     // pull children
     this.flowEntitiesService
       .nodes()
-      .filter(n => n.parent() === node)
-      .forEach(n => this.pullNode(n))
+      .filter((n) => n.parent() === node)
+      .forEach((n) => this.pullNode(n));
   }
 }

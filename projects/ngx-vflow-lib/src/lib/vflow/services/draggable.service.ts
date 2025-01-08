@@ -6,7 +6,7 @@ import { round } from '../utils/round';
 import { FlowEntitiesService } from './flow-entities.service';
 import { Point } from '../interfaces/point.interface';
 
-type DragEvent = D3DragEvent<Element, unknown, unknown>
+type DragEvent = D3DragEvent<Element, unknown, unknown>;
 
 @Injectable()
 export class DraggableService {
@@ -19,8 +19,7 @@ export class DraggableService {
    * @param model model with data for this element
    */
   public enable(element: Element, model: NodeModel) {
-    select(element)
-      .call(this.getDragBehavior(model))
+    select(element).call(this.getDragBehavior(model));
   }
 
   /**
@@ -30,8 +29,7 @@ export class DraggableService {
    * @param model model with data for this element
    */
   public disable(element: Element) {
-    select(element)
-      .call(drag().on('drag', null))
+    select(element).call(drag().on('drag', null));
   }
 
   /**
@@ -40,7 +38,7 @@ export class DraggableService {
    * @param element
    */
   public destroy(element: Element) {
-    select(element).on('.drag', null)
+    select(element).on('.drag', null);
   }
 
   /**
@@ -50,64 +48,62 @@ export class DraggableService {
    * @returns
    */
   private getDragBehavior(model: NodeModel) {
-    let dragNodes: NodeModel[] = []
-    let initialPositions: Point[] = []
+    let dragNodes: NodeModel[] = [];
+    let initialPositions: Point[] = [];
 
     const filterCondition = (event: Event) => {
       // if there is at least one drag handle, we should check if we are dragging it
       if (model.dragHandlesCount()) {
-        return !!(event.target as Element).closest('.vflow-drag-handle')
+        return !!(event.target as Element).closest('.vflow-drag-handle');
       }
 
-      return true
-    }
+      return true;
+    };
 
     return drag()
       .filter(filterCondition)
       .on('start', (event: DragEvent) => {
-        dragNodes = this.getDragNodes(model)
+        dragNodes = this.getDragNodes(model);
 
-        initialPositions = dragNodes.map(node => ({
+        initialPositions = dragNodes.map((node) => ({
           x: node.point().x - event.x,
-          y: node.point().y - event.y
-        }))
+          y: node.point().y - event.y,
+        }));
       })
 
       .on('drag', (event: DragEvent) => {
         dragNodes.forEach((model, index) => {
           const point = {
             x: round(event.x + initialPositions[index].x),
-            y: round(event.y + initialPositions[index].y)
-          }
+            y: round(event.y + initialPositions[index].y),
+          };
 
-          moveNode(model, point)
-        })
-      })
+          moveNode(model, point);
+        });
+      });
   }
 
   private getDragNodes(model: NodeModel) {
     return model.selected()
       ? this.entitiesService
-        .nodes()
-        // selected draggable nodes (with current node)
-        .filter(node => node.selected() && node.draggable())
-      // we only can move current node if it's not selected
-      : [model]
+          .nodes()
+          // selected draggable nodes (with current node)
+          .filter((node) => node.selected() && node.draggable())
+      : // we only can move current node if it's not selected
+        [model];
   }
-
-
 }
 
 function moveNode(model: NodeModel, point: Point) {
-  const parent = model.parent()
+  const parent = model.parent();
   // keep node in bounds of parent
   if (parent) {
-    point.x = Math.min(parent.size().width - model.size().width, point.x)
-    point.x = Math.max(0, point.x)
+    point.x = Math.min(parent.size().width - model.size().width, point.x);
+    point.x = Math.max(0, point.x);
 
-    point.y = Math.min(parent.size().height - model.size().height, point.y)
-    point.y = Math.max(0, point.y)
+    point.y = Math.min(parent.size().height - model.size().height, point.y);
+    point.y = Math.max(0, point.y);
   }
 
-  model.setPoint(point, true)
+  model.setPoint(point, true);
 }

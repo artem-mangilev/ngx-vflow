@@ -3,8 +3,8 @@ export function Microtask(target: any, key: string, descriptor: TypedPropertyDes
 
   descriptor.value = function (...args: any[]) {
     queueMicrotask(() => {
-      originalMethod?.apply(this, args)
-    })
+      originalMethod?.apply(this, args);
+    });
   };
 
   // Return the modified descriptor

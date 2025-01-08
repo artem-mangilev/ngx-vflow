@@ -1,5 +1,5 @@
-import { signal, TemplateRef } from "@angular/core";
+import { signal, TemplateRef } from '@angular/core';
 
 export class MinimapModel {
-  public template = signal<TemplateRef<unknown> | null>(null)
+  public template = signal<TemplateRef<unknown> | null>(null);
 }

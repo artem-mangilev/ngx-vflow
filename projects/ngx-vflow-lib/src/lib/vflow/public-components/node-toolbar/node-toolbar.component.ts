@@ -1,4 +1,16 @@
-import { ChangeDetectionStrategy, Component, ElementRef, inject, OnDestroy, OnInit, TemplateRef, input, viewChild, effect, forwardRef } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  inject,
+  OnDestroy,
+  OnInit,
+  TemplateRef,
+  input,
+  viewChild,
+  effect,
+  forwardRef,
+} from '@angular/core';
 import { Directive } from '@angular/core';
 import { Position } from '../../types/position.type';
 import { ToolbarModel } from '../../models/toolbar.model';
@@ -36,10 +48,7 @@ export class NodeToolbarComponent implements OnInit, OnDestroy {
   protected model = new ToolbarModel(this.nodeService.model()!);
 
   constructor() {
-    effect(
-      () => this.model.position.set(this.position()),
-      { allowSignalWrites: true }
-    );
+    effect(() => this.model.position.set(this.position()), { allowSignalWrites: true });
   }
 
   public ngOnInit(): void {
@@ -55,7 +64,7 @@ export class NodeToolbarComponent implements OnInit, OnDestroy {
 
 @Directive({
   selector: '[nodeToolbarWrapper]',
-  standalone: true
+  standalone: true,
 })
 export class NodeToolbarWrapperDirective implements OnInit {
   private element = inject<ElementRef<HTMLElement>>(ElementRef);

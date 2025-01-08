@@ -22,10 +22,7 @@ import { HandleService } from '../../services/handle.service';
 import { HandleModel } from '../../models/handle.model';
 import { resizable } from '../../utils/resizable';
 import { filter, map, startWith, switchMap, tap } from 'rxjs';
-import {
-  InjectionContext,
-  WithInjector,
-} from '../../decorators/run-in-injection-context.decorator';
+import { InjectionContext, WithInjector } from '../../decorators/run-in-injection-context.decorator';
 import { NodeRenderingService } from '../../services/node-rendering.service';
 import { FlowSettingsService } from '../../services/flow-settings.service';
 import { SelectionService } from '../../services/selection.service';
@@ -64,8 +61,7 @@ export type HandleState = 'valid' | 'invalid' | 'idle';
     HandleSizeControllerDirective,
   ],
 })
-export class NodeComponent
-  implements OnInit, AfterViewInit, OnDestroy, WithInjector {
+export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInjector {
   public injector = inject(Injector);
   private handleService = inject(HandleService);
   private draggableService = inject(DraggableService);
@@ -96,9 +92,7 @@ export class NodeComponent
   protected styleWidth = computed(() => `${this.nodeModel().size().width}px`);
   protected styleHeight = computed(() => `${this.nodeModel().size().height}px`);
 
-  protected toolbar = computed(() =>
-    this.overlaysService.nodeToolbars().get(this.nodeModel()),
-  );
+  protected toolbar = computed(() => this.overlaysService.nodeToolbars().get(this.nodeModel()));
 
   @InjectionContext
   public ngOnInit() {
@@ -108,10 +102,7 @@ export class NodeComponent
 
     effect(() => {
       if (this.nodeModel().draggable()) {
-        this.draggableService.enable(
-          this.hostRef.nativeElement,
-          this.nodeModel(),
-        );
+        this.draggableService.enable(this.hostRef.nativeElement, this.nodeModel());
       } else {
         this.draggableService.disable(this.hostRef.nativeElement);
       }
@@ -138,10 +129,7 @@ export class NodeComponent
   public ngAfterViewInit(): void {
     this.nodeModel().linkDefaultNodeSizeWithModelSize();
 
-    if (
-      this.nodeModel().node.type === 'html-template' ||
-      this.nodeModel().isComponentType
-    ) {
+    if (this.nodeModel().node.type === 'html-template' || this.nodeModel().isComponentType) {
       resizable([this.htmlWrapperRef().nativeElement], this.zone)
         .pipe(
           startWith(null),

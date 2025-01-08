@@ -14,19 +14,20 @@ import { Node, Vflow } from 'projects/ngx-vflow-lib/src/public-api';
         [resizable]="ctx.selected()"
         [style.stroke-width]="ctx.selected() ? 3 : 1"
         [attr.width]="ctx.width()"
-        [attr.height]="ctx.height()"
-      />
+        [attr.height]="ctx.height()" />
     </ng-template>
   </vflow>`,
-  styles: [`
-    :host {
-      width: 100%;
-      height: 100%;
-    }
-  `],
+  styles: [
+    `
+      :host {
+        width: 100%;
+        height: 100%;
+      }
+    `,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [Vflow]
+  imports: [Vflow],
 })
 export class TemplateGroupResizerDemoComponent {
   public nodes: Node[] = [
@@ -42,7 +43,7 @@ export class TemplateGroupResizerDemoComponent {
       point: { x: 10, y: 10 },
       type: 'default',
       text: `6`,
-      parentId: '5'
+      parentId: '5',
     },
-  ]
+  ];
 }

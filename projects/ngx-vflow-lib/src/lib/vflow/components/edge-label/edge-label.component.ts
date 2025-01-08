@@ -44,8 +44,7 @@ export class EdgeLabelComponent implements AfterViewInit {
 
   public htmlTemplate = input<TemplateRef<any>>();
 
-  public edgeLabelWrapperRef =
-    viewChild.required<ElementRef<HTMLDivElement>>('edgeLabelWrapper');
+  public edgeLabelWrapperRef = viewChild.required<ElementRef<HTMLDivElement>>('edgeLabelWrapper');
 
   /**
    * Centered point of label
@@ -69,12 +68,8 @@ export class EdgeLabelComponent implements AfterViewInit {
     // the bug reproduces if edgeLabelWrapperRef size fully matched the size of parent foreignObject
     const MAGIC_VALUE_TO_FIX_GLITCH_IN_CHROME = 2;
 
-    const width =
-      this.edgeLabelWrapperRef().nativeElement.clientWidth +
-      MAGIC_VALUE_TO_FIX_GLITCH_IN_CHROME;
-    const height =
-      this.edgeLabelWrapperRef().nativeElement.clientHeight +
-      MAGIC_VALUE_TO_FIX_GLITCH_IN_CHROME;
+    const width = this.edgeLabelWrapperRef().nativeElement.clientWidth + MAGIC_VALUE_TO_FIX_GLITCH_IN_CHROME;
+    const height = this.edgeLabelWrapperRef().nativeElement.clientHeight + MAGIC_VALUE_TO_FIX_GLITCH_IN_CHROME;
 
     this.model().size.set({ width, height });
   }

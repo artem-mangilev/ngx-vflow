@@ -8,8 +8,7 @@
   (onNodesChange.position.single)="handleNodePositionChange($event)"
   (onNodesChange.select.single)="handleNodeSelectChange($event)"
   (onNodesChange.add.many)="handleNodesAddChange($event)"
-  (onEdgesChange.add)="handleEdgesAddChange($event)"
-/>
+  (onEdgesChange.add)="handleEdgesAddChange($event)" />
 
 <ng-template #toast let-ctx>
   <h3>{{ toastData?.title }}</h3>

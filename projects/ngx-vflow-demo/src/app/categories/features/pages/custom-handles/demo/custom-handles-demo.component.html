@@ -4,11 +4,11 @@
       <div class="custom-node">
         <div class="data-block">
           Output 1
-          <handle position="right" type="source" [id]="ctx.node.data.output1" [template]="handleTemplate"/>
+          <handle position="right" type="source" [id]="ctx.node.data.output1" [template]="handleTemplate" />
         </div>
         <div class="data-block">
           Output 2
-          <handle position="right" type="source" [id]="ctx.node.data.output2" [template]="handleTemplate"/>
+          <handle position="right" type="source" [id]="ctx.node.data.output2" [template]="handleTemplate" />
         </div>
       </div>
     }
@@ -17,11 +17,11 @@
       <div class="custom-node">
         <div class="data-block">
           Input 1
-          <handle position="left" type="target" [id]="ctx.node.data.input1" [template]="squareHandleTemplate"/>
+          <handle position="left" type="target" [id]="ctx.node.data.input1" [template]="squareHandleTemplate" />
         </div>
         <div class="data-block">
           Input 2
-          <handle position="left" type="target" [id]="ctx.node.data.input2" [template]="squareHandleTemplate"/>
+          <handle position="left" type="target" [id]="ctx.node.data.input2" [template]="squareHandleTemplate" />
         </div>
       </div>
     }
@@ -35,8 +35,7 @@
     r="6"
     fill="#1b262c"
     [attr.cx]="ctx.point().x"
-    [attr.cy]="ctx.point().y"
-    />
+    [attr.cy]="ctx.point().y" />
 </ng-template>
 
 <ng-template #squareHandleTemplate let-ctx>
@@ -51,6 +50,5 @@
     [attr.y]="ctx.point().y - 5"
     [class.handle_idle]="ctx.state() === 'idle'"
     [class.handle_valid]="ctx.state() === 'valid'"
-    [class.handle_invalid]="ctx.state() === 'invalid'"
-    />
+    [class.handle_invalid]="ctx.state() === 'invalid'" />
 </ng-template>

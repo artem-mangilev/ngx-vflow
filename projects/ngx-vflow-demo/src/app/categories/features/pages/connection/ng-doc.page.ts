@@ -8,7 +8,7 @@ const TestPage: NgDocPage = {
   mdFile: './index.md',
   category: ExamplesCategory,
   demos: { DefaultConnectionDemoComponent, LooseConnectionDemoComponent },
-  order: 3
+  order: 3,
 };
 
 export default TestPage;

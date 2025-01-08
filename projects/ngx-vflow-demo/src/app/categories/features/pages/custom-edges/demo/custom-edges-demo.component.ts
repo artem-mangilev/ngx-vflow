@@ -9,19 +9,20 @@ import { Edge, Node, Vflow } from 'projects/ngx-vflow-lib/src/public-api';
         [attr.d]="ctx.path()"
         [attr.stroke-width]="ctx.edge.data.strokeWidth"
         [attr.stroke]="ctx.edge.data.color"
-        [attr.marker-end]="ctx.markerEnd()"
-      />
+        [attr.marker-end]="ctx.markerEnd()" />
     </ng-template>
   </vflow>`,
-  styles: [`
-    :host {
-      width: 100%;
-      height: 100%;
-    }
-  `],
+  styles: [
+    `
+      :host {
+        width: 100%;
+        height: 100%;
+      }
+    `,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [Vflow]
+  imports: [Vflow],
 })
 export class CustomEdgesDemoComponent {
   public nodes: Node[] = [
@@ -29,21 +30,21 @@ export class CustomEdgesDemoComponent {
       id: '1',
       point: { x: 10, y: 200 },
       type: 'default',
-      text: '1'
+      text: '1',
     },
     {
       id: '2',
       point: { x: 200, y: 100 },
       type: 'default',
-      text: '2'
+      text: '2',
     },
     {
       id: '3',
       point: { x: 200, y: 300 },
       type: 'default',
-      text: '3'
+      text: '3',
     },
-  ]
+  ];
 
   public edges: Edge[] = [
     {
@@ -53,16 +54,16 @@ export class CustomEdgesDemoComponent {
       type: 'template',
       data: {
         strokeWidth: 4,
-        color: '#ffeeaa'
+        color: '#ffeeaa',
       },
       markers: {
         end: {
           type: 'arrow-closed',
           width: 30,
           height: 30,
-          color: '#ffeeaa'
-        }
-      }
+          color: '#ffeeaa',
+        },
+      },
     },
     {
       id: '1 -> 3',
@@ -71,9 +72,8 @@ export class CustomEdgesDemoComponent {
       type: 'template',
       data: {
         strokeWidth: 2,
-        color: '#ec586e'
-      }
+        color: '#ec586e',
+      },
     },
-  ]
+  ];
 }
-

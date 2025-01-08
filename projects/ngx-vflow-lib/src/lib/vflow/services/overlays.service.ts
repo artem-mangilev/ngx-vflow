@@ -8,14 +8,14 @@ export class OverlaysService {
   private toolbars = signal<ToolbarModel[]>([]);
 
   public nodeToolbars = computed(() => {
-    const map = new Map<NodeModel, ToolbarModel>()
+    const map = new Map<NodeModel, ToolbarModel>();
 
     this.toolbars().forEach((toolbar) => {
-      map.set(toolbar.node, toolbar)
-    })
+      map.set(toolbar.node, toolbar);
+    });
 
-    return map
-  })
+    return map;
+  });
 
   @Microtask
   public addToolbar(toolbar: ToolbarModel): void {
@@ -24,6 +24,6 @@ export class OverlaysService {
 
   @Microtask
   public removeToolbar(toolbar: ToolbarModel): void {
-    this.toolbars.update((toolbars) => toolbars.filter(t => t !== toolbar));
+    this.toolbars.update((toolbars) => toolbars.filter((t) => t !== toolbar));
   }
 }

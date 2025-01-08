@@ -26,6 +26,7 @@ This provides a way to have more control over the resizer:
 The algorithm is almost the same as for `template-group` nodes:
 
 - Create a node of type `html-template` or `CustomNodeComponent` (`CustomDynamicNodeComponent`).
+
   - If you want the resizer to always appear, add the `resizable` directive to the top-level element of your custom node (ideally, a wrapper for the entire node content).
   - If you want the resizer to appear conditionally, apply the directive as `[resizable]="yourCondition"`. Binding the visibility of the resizer to the node’s selection state can be useful.
 

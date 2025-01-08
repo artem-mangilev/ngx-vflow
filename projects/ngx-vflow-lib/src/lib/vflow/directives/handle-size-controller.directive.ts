@@ -1,10 +1,4 @@
-import {
-  AfterViewInit,
-  Directive,
-  ElementRef,
-  inject,
-  input,
-} from '@angular/core';
+import { AfterViewInit, Directive, ElementRef, inject, input } from '@angular/core';
 import { HandleModel } from '../models/handle.model';
 
 @Directive({

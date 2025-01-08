@@ -4,8 +4,7 @@
   [edges]="edges"
   (onConnect)="createEdge($event)"
   (onNodesChange)="handleNodeChanges($event)"
-  (onEdgesChange)="handleEdgeChanges($event)"
-/>
+  (onEdgesChange)="handleEdgeChanges($event)" />
 
 <ng-template #toast>
   <h3>{{ toastData?.title }}</h3>

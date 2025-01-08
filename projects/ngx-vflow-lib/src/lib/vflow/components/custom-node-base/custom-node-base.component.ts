@@ -1,12 +1,4 @@
-import {
-  DestroyRef,
-  Directive,
-  EventEmitter,
-  OnInit,
-  inject,
-  signal,
-  OutputEmitterRef,
-} from '@angular/core';
+import { DestroyRef, Directive, EventEmitter, OnInit, inject, signal, OutputEmitterRef } from '@angular/core';
 import { merge, Observable, tap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ComponentEventBusService } from '../../services/component-event-bus.service';
@@ -15,7 +7,7 @@ import { NodeAccessorService } from '../../services/node-accessor.service';
 @Directive()
 export abstract class CustomNodeBaseComponent<T = any> implements OnInit {
   private eventBus = inject(ComponentEventBusService);
-  private nodeService = inject(NodeAccessorService)
+  private nodeService = inject(NodeAccessorService);
 
   protected destroyRef = inject(DestroyRef);
 

@@ -7,7 +7,7 @@ import { DynamicNode, Edge, Vflow } from 'projects/ngx-vflow-lib/src/public-api'
       <div class="custom-node" selectable [class.custom-node_selected]="ctx.selected()">
         {{ ctx.node.data().text }}
 
-        <handle type="source" position="right"/>
+        <handle type="source" position="right" />
       </div>
     </ng-template>
   </vflow>`,
@@ -33,11 +33,11 @@ import { DynamicNode, Edge, Vflow } from 'projects/ngx-vflow-lib/src/public-api'
           border: 2px solid gray;
         }
       }
-    `
+    `,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [Vflow]
+  imports: [Vflow],
 })
 export class CustomNodesDemoComponent {
   public nodes: DynamicNode[] = [
@@ -47,22 +47,22 @@ export class CustomNodesDemoComponent {
       type: 'html-template',
       data: signal({
         customType: 'gradient',
-        text: 'I am a nice custom node with gradient'
-      })
+        text: 'I am a nice custom node with gradient',
+      }),
     },
     {
       id: '2',
       point: signal({ x: 250, y: 250 }),
       type: 'default',
-      text: signal('Default')
+      text: signal('Default'),
     },
-  ]
+  ];
 
   public edges: Edge[] = [
     {
       id: '1 -> 2',
       source: '1',
-      target: '2'
-    }
-  ]
+      target: '2',
+    },
+  ];
 }

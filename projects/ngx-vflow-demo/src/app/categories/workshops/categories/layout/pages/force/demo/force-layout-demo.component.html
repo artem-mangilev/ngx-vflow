@@ -1,13 +1,6 @@
 <label class="slider">
   <span>Distance</span>
-  <input
-    type="range"
-    min="0"
-    step="1"
-    max="200"
-    value="50"
-    (input)="onDistanceChange($event)"
-  />
+  <input type="range" min="0" step="1" max="200" value="50" (input)="onDistanceChange($event)" />
 </label>
 
 <vflow view="auto" [nodes]="nodes" [edges]="edges">

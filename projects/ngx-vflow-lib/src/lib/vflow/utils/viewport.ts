@@ -1,5 +1,5 @@
-import { Rect } from "../interfaces/rect";
-import { ViewportState } from "../interfaces/viewport.interface";
+import { Rect } from '../interfaces/rect';
+import { ViewportState } from '../interfaces/viewport.interface';
 
 export function getViewportForBounds(
   bounds: Rect,
@@ -7,7 +7,7 @@ export function getViewportForBounds(
   height: number,
   minZoom: number,
   maxZoom: number,
-  padding: number
+  padding: number,
 ): ViewportState {
   const xZoom = width / (bounds.width * (1 + padding));
   const yZoom = height / (bounds.height * (1 + padding));
@@ -19,9 +19,8 @@ export function getViewportForBounds(
   const y = height / 2 - boundsCenterY * clampedZoom;
 
   return { x, y, zoom: clampedZoom };
-
 }
 
 export function clamp(value: number, min = 0, max = 1): number {
-  return Math.min(Math.max(value, min), max)
+  return Math.min(Math.max(value, min), max);
 }

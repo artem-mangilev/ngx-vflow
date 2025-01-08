@@ -5,7 +5,7 @@ import { Edge, Node, Vflow } from 'projects/ngx-vflow-lib/src/public-api';
   template: `<vflow [nodes]="nodes" [edges]="edges" [view]="[600, 600]" />`,
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [Vflow]
+  imports: [Vflow],
 })
 export class ViewSizeFixedDemoComponent {
   public nodes: Node[] = [
@@ -13,33 +13,32 @@ export class ViewSizeFixedDemoComponent {
       id: '1',
       point: { x: 10, y: 200 },
       type: 'default',
-      text: '1'
+      text: '1',
     },
     {
       id: '2',
       point: { x: 200, y: 100 },
       type: 'default',
-      text: '2'
+      text: '2',
     },
     {
       id: '3',
       point: { x: 200, y: 300 },
       type: 'default',
-      text: '3'
+      text: '3',
     },
-  ]
+  ];
 
   public edges: Edge[] = [
     {
       id: '1 -> 2',
       source: '1',
-      target: '2'
+      target: '2',
     },
     {
       id: '1 -> 3',
       source: '1',
-      target: '3'
+      target: '3',
     },
-  ]
+  ];
 }
-

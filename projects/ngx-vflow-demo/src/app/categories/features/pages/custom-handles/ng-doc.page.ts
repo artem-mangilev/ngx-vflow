@@ -1,5 +1,5 @@
 import { NgDocPage } from '@ng-doc/core';
-import ExamplesCategory from '../../ng-doc.category'
+import ExamplesCategory from '../../ng-doc.category';
 import { CustomHandlesDemoComponent } from './demo/custom-handles-demo.component';
 
 const TestPage: NgDocPage = {
@@ -7,7 +7,7 @@ const TestPage: NgDocPage = {
   mdFile: './index.md',
   category: ExamplesCategory,
   demos: { CustomHandlesDemoComponent },
-  order: 2
+  order: 2,
 };
 
 export default TestPage;

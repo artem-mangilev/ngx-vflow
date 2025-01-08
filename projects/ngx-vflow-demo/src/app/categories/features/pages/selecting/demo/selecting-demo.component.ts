@@ -6,7 +6,7 @@ import { Edge, Node, Vflow } from 'projects/ngx-vflow-lib/src/public-api';
   styleUrls: ['./selecting-demo.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [Vflow]
+  imports: [Vflow],
 })
 export class SelectingDemoComponent {
   public nodes: Node[] = [
@@ -19,27 +19,27 @@ export class SelectingDemoComponent {
       id: '2',
       point: { x: 290, y: 50 },
       type: 'default',
-      text: 'Selectable'
+      text: 'Selectable',
     },
     {
       id: '3',
       point: { x: 290, y: 300 },
       type: 'default',
-      text: 'Selectable'
+      text: 'Selectable',
     },
-  ]
+  ];
 
   public edges: Edge[] = [
     {
       id: '1 -> 2',
       source: '1',
-      target: '2'
+      target: '2',
     },
     {
       id: '1 -> 3',
       source: '1',
       target: '3',
-      type: 'template'
+      type: 'template',
     },
-  ]
+  ];
 }

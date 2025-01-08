@@ -1,18 +1,6 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  OnInit,
-  signal,
-  viewChild,
-  WritableSignal,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, signal, viewChild, WritableSignal } from '@angular/core';
 import init, { DirectedGraph, VertexRef } from '@vizdom/vizdom-ts-web';
-import {
-  Edge,
-  Node,
-  VflowComponent,
-  Vflow,
-} from 'projects/ngx-vflow-lib/src/public-api';
+import { Edge, Node, VflowComponent, Vflow } from 'projects/ngx-vflow-lib/src/public-api';
 
 @Component({
   templateUrl: './vizdom-layout-demo.component.html',
@@ -71,7 +59,7 @@ export class VizdomLayoutDemoComponent implements OnInit {
         source: node.id,
         target: newNodeId,
         id: `${node.id} -> ${newNodeId}`,
-        curve: 'smooth-step'
+        curve: 'smooth-step',
       },
     ];
 
@@ -139,7 +127,7 @@ export class VizdomLayoutDemoComponent implements OnInit {
             y: n.y,
           },
         };
-      })
+      }),
     );
 
     this.edges.set(edgesToLayout);
@@ -147,24 +135,7 @@ export class VizdomLayoutDemoComponent implements OnInit {
 }
 
 function randomHex() {
-  const hexValues = [
-    0,
-    1,
-    2,
-    3,
-    4,
-    5,
-    6,
-    7,
-    8,
-    9,
-    'A',
-    'B',
-    'C',
-    'D',
-    'E',
-    'F',
-  ];
+  const hexValues = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 'A', 'B', 'C', 'D', 'E', 'F'];
 
   let hex = '#';
 
