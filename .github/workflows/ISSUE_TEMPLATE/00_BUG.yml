@@ -1,0 +1,47 @@
+name: Bug report
+description: File a bug report
+title: 'Bug: '
+labels: ['bug', 'triage']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report!
+  - type: dropdown
+    attributes:
+      label: Project
+      description: What project is it about?
+      multiple: false
+      options:
+        - ngx-vflow
+      default: 0
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Also tell us, what did you expect to happen?
+      placeholder: Tell us what you see!
+      value: 'A wild bug happened! 🐞'
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: What version of the library are you running?
+    validations:
+      required: true
+  - type: textarea
+    id: minimal-reproduction
+    attributes:
+      label: Minimal reproduction
+      description: Please provide minimal code that reproduces the bug
+      render: typescript
+  - type: checkboxes
+    id: coc
+    attributes:
+      label: Code of Conduct
+      description: By submitting this issue, you agree to follow the [Code of Conduct](https://github.com/davidlj95/ngx/blob/main/CODE_OF_CONDUCT.md)
+      options:
+        - label: I agree to follow this project's Code of Conduct
+          required: true
