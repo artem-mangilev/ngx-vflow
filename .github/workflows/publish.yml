@@ -4,10 +4,13 @@ on:
   push:
     branches:
       - main
+    paths:
+      - projects/ngx-vflow-lib
+
   workflow_dispatch: # Allow manual triggering
 
 env:
-  NODE_VERSION: "20.9.0" # Node.js version
+  NODE_VERSION: '20.9.0' # Node.js version
 
 jobs:
   release-and-publish:
@@ -23,7 +26,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: "npm"
+          cache: 'npm'
 
       # Step 3: Install dependencies
       - name: Install Dependencies
@@ -56,7 +59,7 @@ jobs:
         uses: actions/create-release@v1
         with:
           tag_name: v${{ steps.semantic-release.outputs.newReleaseVersion }}
-          release_name: "Release v${{ steps.semantic-release.outputs.newReleaseVersion }}"
+          release_name: 'Release v${{ steps.semantic-release.outputs.newReleaseVersion }}'
           body: |
             Release notes are available on GitHub.
             Check the CHANGELOG.md file for details.
