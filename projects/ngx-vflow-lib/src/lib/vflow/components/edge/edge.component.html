@@ -1,21 +1,19 @@
-@if (model().type === "default") {
+@if (model().type === 'default') {
   <svg:path
-    (mousedown)="onEdgeMouseDown()"
+    class="edge"
     [attr.d]="model().path().path"
     [attr.marker-start]="markerStartUrl()"
     [attr.marker-end]="markerEndUrl()"
-    class="edge"
     [class.edge_selected]="model().selected()"
-  />
+    (mousedown)="onEdgeMouseDown()" />
 }
 
-@if (model().type === "template" && edgeTemplate()) {
+@if (model().type === 'template' && edgeTemplate()) {
   @if (edgeTemplate(); as edgeTemplate) {
     <ng-container
       [ngTemplateOutlet]="edgeTemplate"
       [ngTemplateOutletContext]="edgeContext"
-      [ngTemplateOutletInjector]="injector"
-    />
+      [ngTemplateOutletInjector]="injector" />
   }
 }
 
@@ -25,8 +23,7 @@
     [model]="label"
     [point]="model().path().points.start"
     [edgeModel]="model()"
-    [htmlTemplate]="edgeLabelHtmlTemplate()"
-  />
+    [htmlTemplate]="edgeLabelHtmlTemplate()" />
 }
 
 @if (model().edgeLabels.center; as label) {
@@ -35,8 +32,7 @@
     [model]="label"
     [point]="model().path().points.center"
     [edgeModel]="model()"
-    [htmlTemplate]="edgeLabelHtmlTemplate()"
-  />
+    [htmlTemplate]="edgeLabelHtmlTemplate()" />
 }
 
 @if (model().edgeLabels.end; as label) {
@@ -45,6 +41,5 @@
     [model]="label"
     [point]="model().path().points.end"
     [edgeModel]="model()"
-    [htmlTemplate]="edgeLabelHtmlTemplate()"
-  />
+    [htmlTemplate]="edgeLabelHtmlTemplate()" />
 }

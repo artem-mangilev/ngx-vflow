@@ -1,15 +1,14 @@
-import { ConnectionMode } from "../types/connection-mode.type";
-import { Connection } from "./connection.interface";
-import { Curve, EdgeType } from "./edge.interface";
-import { Marker } from "./marker.interface";
+import { ConnectionMode } from '../types/connection-mode.type';
+import { Connection } from './connection.interface';
+import { Curve, EdgeType } from './edge.interface';
+import { Marker } from './marker.interface';
 
-export type ConnectionValidatorFn = (connection: Connection) => boolean
+export type ConnectionValidatorFn = (connection: Connection) => boolean;
 
 export interface ConnectionSettings {
-  curve?: Curve
-  type?: EdgeType
-  validator?: ConnectionValidatorFn
-  marker?: Marker
-  mode?: ConnectionMode
+  curve?: Curve;
+  type?: EdgeType;
+  validator?: ConnectionValidatorFn;
+  marker?: Marker;
+  mode?: ConnectionMode;
 }
-

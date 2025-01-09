@@ -1,26 +1,27 @@
-import { Component } from "@angular/core";
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { TestBed, ComponentFixture } from '@angular/core/testing';
-import { CustomDynamicNodeComponent } from "./custom-dynamic-node.component";
-import { provideCustomNodeMocks } from "../../testing-utils/provide-custom-node-mocks";
-import { Vflow } from "../../vflow";
+import { CustomDynamicNodeComponent } from './custom-dynamic-node.component';
+import { provideCustomNodeMocks } from '../../testing-utils/provide-custom-node-mocks';
+import { Vflow } from '../../vflow';
 
 @Component({
   standalone: true,
   template: `<div resizable selectable dragHandle>
     <handle />
   </div>`,
-  imports: [Vflow]
+  imports: [Vflow],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-class TestCustomDynamicNodeComponent extends CustomDynamicNodeComponent { }
+class TestCustomDynamicNodeComponent extends CustomDynamicNodeComponent {}
 
-describe(('TestCustomDynamicNodeComponent'), () => {
+describe('TestCustomDynamicNodeComponent', () => {
   let component: TestCustomDynamicNodeComponent;
   let fixture: ComponentFixture<TestCustomDynamicNodeComponent>;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [TestCustomDynamicNodeComponent],
-      providers: [provideCustomNodeMocks()]
+      providers: [provideCustomNodeMocks()],
     });
 
     fixture = TestBed.createComponent(TestCustomDynamicNodeComponent);
@@ -31,4 +32,4 @@ describe(('TestCustomDynamicNodeComponent'), () => {
     // should create without DI errors
     expect(component).toBeTruthy();
   });
-})
+});

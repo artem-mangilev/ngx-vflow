@@ -3,12 +3,12 @@ import {
   computed,
   inject,
   Injector,
-  Input,
   OnInit,
   signal,
   TemplateRef,
   input,
   viewChild,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import { FlowEntitiesService } from '../../services/flow-entities.service';
 import { MinimapModel } from '../../models/minimap.model';
@@ -19,11 +19,7 @@ import { getNodesBounds } from '../../utils/nodes';
 import { ViewportService } from '../../services/viewport.service';
 import { DefaultNodeComponent } from '../../components/default-node/default-node.component';
 
-export type MiniMapPosition =
-  | 'top-left'
-  | 'top-right'
-  | 'bottom-left'
-  | 'bottom-right';
+export type MiniMapPosition = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
 
 @Component({
   standalone: true,
@@ -31,6 +27,7 @@ export type MiniMapPosition =
   templateUrl: './minimap.component.html',
   styleUrls: [`./minimap.component.scss`],
   imports: [DefaultNodeComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MiniMapComponent implements OnInit {
   protected entitiesService = inject(FlowEntitiesService);
@@ -88,40 +85,24 @@ export class MiniMapComponent implements OnInit {
         return { x: this.minimapOffset, y: this.minimapOffset };
       case 'top-right':
         return {
-          x:
-            this.flowSettingsService.computedFlowWidth() -
-            this.minimapWidth() -
-            this.minimapOffset,
+          x: this.flowSettingsService.computedFlowWidth() - this.minimapWidth() - this.minimapOffset,
           y: this.minimapOffset,
         };
       case 'bottom-left':
         return {
           x: this.minimapOffset,
-          y:
-            this.flowSettingsService.computedFlowHeight() -
-            this.minimapHeight() -
-            this.minimapOffset,
+          y: this.flowSettingsService.computedFlowHeight() - this.minimapHeight() - this.minimapOffset,
         };
       case 'bottom-right':
         return {
-          x:
-            this.flowSettingsService.computedFlowWidth() -
-            this.minimapWidth() -
-            this.minimapOffset,
-          y:
-            this.flowSettingsService.computedFlowHeight() -
-            this.minimapHeight() -
-            this.minimapOffset,
+          x: this.flowSettingsService.computedFlowWidth() - this.minimapWidth() - this.minimapOffset,
+          y: this.flowSettingsService.computedFlowHeight() - this.minimapHeight() - this.minimapOffset,
         };
     }
   });
 
-  protected minimapWidth = computed(
-    () => this.flowSettingsService.computedFlowWidth() * this.minimapScale(),
-  );
-  protected minimapHeight = computed(
-    () => this.flowSettingsService.computedFlowHeight() * this.minimapScale(),
-  );
+  protected minimapWidth = computed(() => this.flowSettingsService.computedFlowWidth() * this.minimapScale());
+  protected minimapHeight = computed(() => this.flowSettingsService.computedFlowHeight() * this.minimapScale());
 
   protected viewportTransform = computed(() => {
     const viewport = this.viewportService.readableViewport();

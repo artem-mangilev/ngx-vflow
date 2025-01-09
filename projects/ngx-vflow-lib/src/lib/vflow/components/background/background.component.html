@@ -1,53 +1,34 @@
 @if (backgroundSignal().type === 'dots') {
   <svg:pattern
+    patternUnits="userSpaceOnUse"
     [attr.id]="patternId"
     [attr.x]="x()"
     [attr.y]="y()"
     [attr.width]="scaledGap()"
-    [attr.height]="scaledGap()"
-    patternUnits="userSpaceOnUse"
-    >
+    [attr.height]="scaledGap()">
     <svg:circle
       [attr.cx]="patternSize()"
       [attr.cy]="patternSize()"
       [attr.r]="patternSize()"
-      [attr.fill]="patternColor()"
-      />
+      [attr.fill]="patternColor()" />
   </svg:pattern>
 
-  <svg:rect
-    x="0"
-    y="0"
-    width="100%"
-    height="100%"
-    [attr.fill]="patternUrl"
-    />
+  <svg:rect x="0" y="0" width="100%" height="100%" [attr.fill]="patternUrl" />
 }
 
 @if (backgroundSignal().type === 'image') {
   @if (repeated()) {
     <svg:pattern
+      patternUnits="userSpaceOnUse"
       [attr.id]="patternId"
       [attr.x]="imageX()"
       [attr.y]="imageY()"
       [attr.width]="scaledImageWidth()"
-      [attr.height]="scaledImageHeight()"
-      patternUnits="userSpaceOnUse"
-      >
-      <svg:image
-        [attr.href]="bgImageSrc()"
-        [attr.width]="scaledImageWidth()"
-        [attr.height]="scaledImageHeight()"
-        />
+      [attr.height]="scaledImageHeight()">
+      <svg:image [attr.href]="bgImageSrc()" [attr.width]="scaledImageWidth()" [attr.height]="scaledImageHeight()" />
     </svg:pattern>
 
-    <svg:rect
-      x="0"
-      y="0"
-      width="100%"
-      height="100%"
-      [attr.fill]="patternUrl"
-      />
+    <svg:rect x="0" y="0" width="100%" height="100%" [attr.fill]="patternUrl" />
   }
 
   @if (!repeated()) {
@@ -56,7 +37,6 @@
       [attr.y]="imageY()"
       [attr.width]="scaledImageWidth()"
       [attr.height]="scaledImageHeight()"
-      [attr.href]="bgImageSrc()"
-      />
+      [attr.href]="bgImageSrc()" />
   }
 }

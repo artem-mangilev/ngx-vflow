@@ -1,13 +1,4 @@
-import {
-  Directive,
-  ElementRef,
-  EventEmitter,
-  HostListener,
-  Output,
-  effect,
-  inject,
-  output,
-} from '@angular/core';
+import { Directive, ElementRef, HostListener, inject, output } from '@angular/core';
 import { filter, tap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RootPointerDirective } from './root-pointer.directive';
@@ -20,17 +11,17 @@ export class PointerDirective {
   protected hostElement = inject<ElementRef<Element>>(ElementRef).nativeElement;
   protected pointerMovementDirective = inject(RootPointerDirective);
 
-  protected pointerOver = output<Event>();
+  protected readonly pointerOver = output<Event>();
 
-  protected pointerOut = output<Event>();
+  protected readonly pointerOut = output<Event>();
 
   /**
    * @todo the Angular may somehow ignore the event.
    * reproduced here: https://www.ngx-vflow.org/workshops/layout/vizdom-layout
    */
-  protected pointerStart = output<Event>();
+  protected readonly pointerStart = output<Event>();
 
-  protected pointerEnd = output<Event>();
+  protected readonly pointerEnd = output<Event>();
 
   @HostListener('mousedown', ['$event'])
   @HostListener('touchstart', ['$event'])

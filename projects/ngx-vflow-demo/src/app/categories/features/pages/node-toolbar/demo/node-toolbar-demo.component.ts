@@ -1,4 +1,3 @@
-
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { Edge, Node, Vflow } from 'projects/ngx-vflow-lib/src/public-api';
 
@@ -7,7 +6,7 @@ import { Edge, Node, Vflow } from 'projects/ngx-vflow-lib/src/public-api';
   styleUrls: ['./node-toolbar-demo.styles.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [Vflow]
+  imports: [Vflow],
 })
 export class NodeToolbarDemoComponent {
   public nodes: Node[] = [
@@ -18,8 +17,8 @@ export class NodeToolbarDemoComponent {
       data: {
         type: 'output',
         output1: 'output1',
-        output2: 'output2'
-      }
+        output2: 'output2',
+      },
     },
     {
       id: '2',
@@ -28,10 +27,10 @@ export class NodeToolbarDemoComponent {
       data: {
         type: 'input',
         input1: 'input1',
-        input2: 'input2'
-      }
+        input2: 'input2',
+      },
     },
-  ]
+  ];
 
   public edges: Edge[] = [
     {
@@ -46,11 +45,11 @@ export class NodeToolbarDemoComponent {
       source: '1',
       target: '2',
       sourceHandle: 'output2',
-      targetHandle: 'input2'
+      targetHandle: 'input2',
     },
-  ]
+  ];
 
   public deleteNode(node: Node) {
-    this.nodes = this.nodes.filter(n => n.id !== node.id)
+    this.nodes = this.nodes.filter((n) => n.id !== node.id);
   }
 }

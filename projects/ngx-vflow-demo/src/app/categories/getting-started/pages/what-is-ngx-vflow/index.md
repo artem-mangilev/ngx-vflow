@@ -4,7 +4,6 @@
 
 {{ NgDocActions.demoPane("AllFeaturesDemoComponent") }}
 
-
 `ngx-vflow` is an Angular library for creating node-based applications. It aims to assist you in building anything from a static diagram to a visual editor. You can utilize the default design or apply your own by customizing everything using familiar technologies.
 
 ## Main features
@@ -16,10 +15,3 @@
 **Great performance:** Angular signals are the heart and soul of `ngx-vflow`, which are performant by default, so you shouldn't worry about performance even with large flows.
 
 **Zoneless:** [Does not require `zone.js`](https://stackblitz.com/edit/stackblitz-starters-qhu6im?file=src%2Fmain.ts)
-
-
-
-
-
-
-

@@ -1,9 +1,6 @@
 import { Directive, computed, effect, inject, output } from '@angular/core';
 import { Connection } from '../interfaces/connection.interface';
-import {
-  FlowStatusService,
-  batchStatusChanges,
-} from '../services/flow-status.service';
+import { FlowStatusService, batchStatusChanges } from '../services/flow-status.service';
 
 import { FlowEntitiesService } from '../services/flow-entities.service';
 import { HandleModel } from '../models/handle.model';
@@ -21,8 +18,11 @@ export class ConnectionControllerDirective {
    *
    * Also it's important to note, that this event only fires when connection is valid by validator function in `ConnectionSettings`,
    * by default without passing the validator every connection concidered valid.
+   *
+   * @todo add connect event and deprecate onConnect
    */
-  public onConnect = output<Connection>();
+  // eslint-disable-next-line @angular-eslint/no-output-on-prefix
+  public readonly onConnect = output<Connection>();
 
   private statusService = inject(FlowStatusService);
   private flowEntitiesService = inject(FlowEntitiesService);
@@ -73,9 +73,7 @@ export class ConnectionControllerDirective {
     { allowSignalWrites: true },
   );
 
-  protected isStrictMode = computed(
-    () => this.flowEntitiesService.connection().mode === 'strict',
-  );
+  protected isStrictMode = computed(() => this.flowEntitiesService.connection().mode === 'strict');
 
   public startConnection(handle: HandleModel) {
     this.statusService.setConnectionStartStatus(handle.parentNode, handle);
@@ -134,14 +132,11 @@ export class ConnectionControllerDirective {
     // drop back to start status
     const status = this.statusService.status();
     if (status.state === 'connection-validation') {
-      this.statusService.setConnectionStartStatus(
-        status.payload.source,
-        status.payload.sourceHandle,
-      );
+      this.statusService.setConnectionStartStatus(status.payload.source, status.payload.sourceHandle);
     }
   }
 
-  public endConnection(handle: HandleModel) {
+  public endConnection() {
     const status = this.statusService.status();
 
     if (status.state === 'connection-validation') {
@@ -152,13 +147,7 @@ export class ConnectionControllerDirective {
 
       batchStatusChanges(
         // call to create connection
-        () =>
-          this.statusService.setConnectionEndStatus(
-            source!,
-            target!,
-            sourceHandle!,
-            targetHandle!,
-          ),
+        () => this.statusService.setConnectionEndStatus(source!, target!, sourceHandle!, targetHandle!),
         // when connection created, we need go back to idle status
         () => this.statusService.setIdleStatus(),
       );

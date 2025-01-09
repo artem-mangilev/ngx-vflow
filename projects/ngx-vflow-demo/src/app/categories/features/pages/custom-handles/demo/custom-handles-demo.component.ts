@@ -1,4 +1,3 @@
-
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { Edge, Node, Vflow, Connection, ConnectionSettings } from 'projects/ngx-vflow-lib/src/public-api';
 
@@ -7,7 +6,7 @@ import { Edge, Node, Vflow, Connection, ConnectionSettings } from 'projects/ngx-
   styleUrls: ['./custom-handles-demo.styles.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [Vflow]
+  imports: [Vflow],
 })
 export class CustomHandlesDemoComponent {
   public nodes: Node[] = [
@@ -18,8 +17,8 @@ export class CustomHandlesDemoComponent {
       data: {
         type: 'output',
         output1: 'output1',
-        output2: 'output2'
-      }
+        output2: 'output2',
+      },
     },
     {
       id: '2',
@@ -28,30 +27,33 @@ export class CustomHandlesDemoComponent {
       data: {
         type: 'input',
         input1: 'input1',
-        input2: 'input2'
-      }
+        input2: 'input2',
+      },
     },
-  ]
+  ];
 
-  public edges: Edge[] = []
+  public edges: Edge[] = [];
 
   public connectionSettings: ConnectionSettings = {
     validator: (connection) => {
       return connection.target === '2' && connection.targetHandle === 'input1';
-    }
-  }
+    },
+  };
 
   public createEdge({ source, target, sourceHandle, targetHandle }: Connection) {
-    this.edges = [...this.edges, {
-      id: `${source} -> ${target}${sourceHandle ?? ''}${targetHandle ?? ''}`,
-      markers: {
-        start: { type: 'arrow-closed' },
-        end: { type: 'arrow-closed' }
+    this.edges = [
+      ...this.edges,
+      {
+        id: `${source} -> ${target}${sourceHandle ?? ''}${targetHandle ?? ''}`,
+        markers: {
+          start: { type: 'arrow-closed' },
+          end: { type: 'arrow-closed' },
+        },
+        source,
+        target,
+        sourceHandle,
+        targetHandle,
       },
-      source,
-      target,
-      sourceHandle,
-      targetHandle
-    }]
+    ];
   }
 }

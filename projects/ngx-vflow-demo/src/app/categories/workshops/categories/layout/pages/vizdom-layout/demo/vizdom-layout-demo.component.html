@@ -1,16 +1,6 @@
-<vflow
-  view="auto"
-  [minZoom]="0.1"
-  [nodes]="nodes()"
-  [edges]="edges()"
-  (onNodesChange.add)="fitView()"
->
-  <ng-template nodeHtml let-ctx>
-    <div
-      (click)="onNodeClick(ctx.node)"
-      [style.background-color]="ctx.node.data.color"
-      class="custom-node"
-    >
+<vflow view="auto" [minZoom]="0.1" [nodes]="nodes()" [edges]="edges()" (onNodesChange.add)="fitView()">
+  <ng-template let-ctx nodeHtml>
+    <div class="custom-node" [style.background-color]="ctx.node.data.color" (click)="onNodeClick(ctx.node)">
       {{ ctx.node.data.color }}
 
       <handle type="source" position="bottom" />

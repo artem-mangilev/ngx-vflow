@@ -1,24 +1,34 @@
-import { NG_DOC_DEFAULT_THEME_ID, NgDocRootComponent, NgDocNavbarComponent, NgDocSidebarComponent, provideNgDocApp, provideSearchEngine, NgDocDefaultSearchEngine, providePageSkeleton, NG_DOC_DEFAULT_PAGE_SKELETON, provideMainPageProcessor, NG_DOC_DEFAULT_PAGE_PROCESSORS, NG_DOC_THEME, NgDocThemeToggleComponent } from "@ng-doc/app";
-import { NG_DOC_ROUTING, provideNgDocContext } from "@ng-doc/generated";
-import { provideRouter, withInMemoryScrolling } from "@angular/router";
-import { provideAnimations } from "@angular/platform-browser/animations";
+import {
+  NgDocRootComponent,
+  NgDocNavbarComponent,
+  NgDocSidebarComponent,
+  provideNgDocApp,
+  provideSearchEngine,
+  NgDocDefaultSearchEngine,
+  providePageSkeleton,
+  NG_DOC_DEFAULT_PAGE_SKELETON,
+  provideMainPageProcessor,
+  NG_DOC_DEFAULT_PAGE_PROCESSORS,
+  NgDocThemeToggleComponent,
+} from '@ng-doc/app';
+import { NG_DOC_ROUTING, provideNgDocContext } from '@ng-doc/generated';
+import { provideRouter, withInMemoryScrolling } from '@angular/router';
+import { provideAnimations } from '@angular/platform-browser/animations';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { Vflow } from '../../../ngx-vflow-lib/src/public-api';
-import { provideHttpClient } from "@angular/common/http";
-import { NgDocButtonIconComponent, NgDocIconComponent, NgDocTooltipDirective } from "@ng-doc/ui-kit";
+import { provideHttpClient } from '@angular/common/http';
+import { NgDocButtonIconComponent, NgDocIconComponent, NgDocTooltipDirective } from '@ng-doc/ui-kit';
 
 @NgModule({
-  declarations: [
-    AppComponent,
-  ],
+  declarations: [AppComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,
-    Vflow,
+    ...Vflow,
     NgDocRootComponent,
     NgDocNavbarComponent,
     NgDocSidebarComponent,
@@ -32,9 +42,9 @@ import { NgDocButtonIconComponent, NgDocIconComponent, NgDocTooltipDirective } f
       themes: [
         {
           id: 'vflow-theme-dark',
-          path: 'assets/themes/vflow-theme-dark.css'
-        }
-      ]
+          path: 'assets/themes/vflow-theme-dark.css',
+        },
+      ],
     }),
     provideNgDocContext(),
     provideSearchEngine(NgDocDefaultSearchEngine),
@@ -56,8 +66,7 @@ import { NgDocButtonIconComponent, NgDocIconComponent, NgDocTooltipDirective } f
         anchorScrolling: 'enabled',
       }),
     ),
-
   ],
   bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

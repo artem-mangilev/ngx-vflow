@@ -186,14 +186,14 @@ export function smoothStepPath(
   target: Point,
   sourcePosition: Position,
   targetPosition: Position,
-  borderRadius: number = 5
+  borderRadius: number = 5,
 ): PathData {
   const [points, labelX, labelY] = getPoints({
     source,
     sourcePosition,
     target,
     targetPosition,
-    offset: 20
+    offset: 20,
   });
 
   const path = points.reduce<string>((res, p, i) => {
@@ -217,6 +217,6 @@ export function smoothStepPath(
       start: { x: labelX, y: labelY },
       center: { x: labelX, y: labelY },
       end: { x: labelX, y: labelY },
-    }
-  }
+    },
+  };
 }

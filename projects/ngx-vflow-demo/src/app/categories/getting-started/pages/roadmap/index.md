@@ -10,8 +10,6 @@ This is a roadmap for `ngx-vflow`:
 - UI controls for flow
 - support for more layout engines (Dagree, etc.)
 - modal system for context menu
-- lazy loading nodes based on current viewport (decrease initial bundle) 
+- lazy loading nodes based on current viewport (decrease initial bundle)
 - HTML-based renderer as alternative to current SVG-based renderer
 - Experimental canvas/webgl renderer for insane performance
-
-

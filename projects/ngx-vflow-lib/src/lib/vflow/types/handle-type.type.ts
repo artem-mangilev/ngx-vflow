@@ -1,1 +1,1 @@
-export type HandleType = 'source' | 'target'
+export type HandleType = 'source' | 'target';

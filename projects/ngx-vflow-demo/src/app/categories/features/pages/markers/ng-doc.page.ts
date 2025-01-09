@@ -7,7 +7,7 @@ const TestPage: NgDocPage = {
   mdFile: './index.md',
   category: ExamplesCategory,
   demos: { MarkersDemoComponent },
-  order: 5
+  order: 5,
 };
 
 export default TestPage;

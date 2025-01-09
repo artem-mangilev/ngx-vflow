@@ -1,19 +1,6 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  TemplateRef,
-  inject,
-  viewChild,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, TemplateRef, inject, viewChild } from '@angular/core';
 import { NgDocNotifyService } from '@ng-doc/ui-kit';
-import {
-  Connection,
-  Edge,
-  EdgeChange,
-  Node,
-  NodeChange,
-  Vflow,
-} from 'projects/ngx-vflow-lib/src/public-api';
+import { Connection, Edge, EdgeChange, Node, NodeChange, Vflow } from 'projects/ngx-vflow-lib/src/public-api';
 
 @Component({
   templateUrl: './handling-changes-demo.component.html',
@@ -32,7 +19,7 @@ import {
 export class HandlingChangesDemoComponent {
   private notifyService = inject(NgDocNotifyService);
 
-  public toastTemplate = viewChild<TemplateRef<{}>>('toast');
+  public toastTemplate = viewChild<TemplateRef<object>>('toast');
 
   public nodes: Node[] = [
     {

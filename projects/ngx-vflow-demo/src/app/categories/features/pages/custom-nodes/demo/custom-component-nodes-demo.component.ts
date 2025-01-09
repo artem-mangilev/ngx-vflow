@@ -1,23 +1,29 @@
-import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { NgDocNotifyService } from '@ng-doc/ui-kit';
 import { ComponentNodeEvent, Edge, Node, Vflow } from 'projects/ngx-vflow-lib/src/public-api';
 import { BlueSquareNodeComponent, BlueSquareData } from './components/blue-square-node.component';
 import { RedSquareNodeComponent, RedSquareData } from './components/red-square-node.component';
 
 @Component({
-  template: `<vflow view="auto" [nodes]="nodes" [edges]="edges" (onComponentNodeEvent)="handleComponentEvent($event)" />`,
-  styles: [`
-    :host {
-      width: 100%;
-      height: 100%;
-    }
-  `],
+  template: `<vflow
+    view="auto"
+    [nodes]="nodes"
+    [edges]="edges"
+    (onComponentNodeEvent)="handleComponentEvent($event)" />`,
+  styles: [
+    `
+      :host {
+        width: 100%;
+        height: 100%;
+      }
+    `,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [Vflow]
+  imports: [Vflow],
 })
 export class CustomComponentNodesDemoComponent {
-  private notifyService = inject(NgDocNotifyService)
+  private notifyService = inject(NgDocNotifyService);
 
   public nodes: Node[] = [
     {
@@ -26,7 +32,7 @@ export class CustomComponentNodesDemoComponent {
       type: RedSquareNodeComponent,
       data: {
         redSquareText: 'Red',
-      } satisfies RedSquareData
+      } satisfies RedSquareData,
     },
     {
       id: '2',
@@ -34,28 +40,26 @@ export class CustomComponentNodesDemoComponent {
       type: BlueSquareNodeComponent,
       data: {
         blueSquareText: 'Blue',
-      } satisfies BlueSquareData
+      } satisfies BlueSquareData,
     },
-  ]
+  ];
 
   public edges: Edge[] = [
     {
       id: '1 -> 2',
       source: '1',
-      target: '2'
-    }
-  ]
+      target: '2',
+    },
+  ];
 
   // Type-safe!
   handleComponentEvent(event: ComponentNodeEvent<[RedSquareNodeComponent, BlueSquareNodeComponent]>) {
     if (event.eventName === 'redSquareEvent') {
-      this.notifyService.notify(event.eventPayload)
+      this.notifyService.notify(event.eventPayload);
     }
 
     if (event.eventName === 'blueSquareEvent') {
-      this.notifyService.notify(`${event.eventPayload.x + event.eventPayload.y}`)
+      this.notifyService.notify(`${event.eventPayload.x + event.eventPayload.y}`);
     }
   }
 }
-
-

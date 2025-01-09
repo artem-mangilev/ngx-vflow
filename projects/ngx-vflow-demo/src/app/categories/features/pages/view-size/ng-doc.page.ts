@@ -1,5 +1,5 @@
 import { NgDocPage } from '@ng-doc/core';
-import ExamplesCategory from '../../ng-doc.category'
+import ExamplesCategory from '../../ng-doc.category';
 import { ViewSizeAutoDemoComponent } from './demo/view-size-auto-demo.component';
 import { ViewSizeFixedDemoComponent } from './demo/view-size-fixed-demo.component';
 
@@ -20,7 +20,7 @@ const TestPage: NgDocPage = {
       },
     ],
   },
-  order: 2
+  order: 2,
 };
 
 export default TestPage;

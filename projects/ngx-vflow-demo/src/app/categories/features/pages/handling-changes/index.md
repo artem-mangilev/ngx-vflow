@@ -6,6 +6,7 @@
 You can observe various changes in nodes and edges.
 
 Types of `NodeChange`s:
+
 - `position` - new node position after drag and drop
 - `size` - new node size
 - `add` - when node was created
@@ -13,6 +14,7 @@ Types of `NodeChange`s:
 - `select` - when node was selected (also triggers for unselected nodes)
 
 Types of `EdgeChange`s:
+
 - `add` - when edge was created
 - `remove` - when edge was removed
 - `select` - when edge was selected (also triggers for unselected edges)
@@ -23,7 +25,8 @@ There are a several ways to receive these changes:
 ## From (onNodesChange) and (onEdgesChange) outputs
 
 This is a way to get every possible change. Changes came as non empty arrays:
-- `(onNodesChange)` emits `NodeChange[]` 
+
+- `(onNodesChange)` emits `NodeChange[]`
 - `(onEdgesChange)` emits `EdgeChange[]`
 
 {{ NgDocActions.demoPane("HandlingChangesDemoComponent") }}
@@ -37,16 +40,16 @@ For your convenience, here is the filtering scheme for changes based on the `(on
 - `(onNodesChange.[NodeChangeType].[Count])` - a list (`many`) or single (`single`) node change of a certain type
 - `(onEdgesChange.[EdgeChangeType].[Count])` - a list (`many`) or single (`single`) edge change of a certain type
 
-Where: 
+Where:
 
 ```ts
-type NodeChangeType = 'position' | 'add' | 'remove' | 'select'
+type NodeChangeType = 'position' | 'add' | 'remove' | 'select';
 
-type EdgeChangeType = 'detached' | 'add' | 'remove' | 'select'
+type EdgeChangeType = 'detached' | 'add' | 'remove' | 'select';
 
 // single - when there is only one change of this type (for example if you drag and drop some node, it's consireder as single change)
 // many - when there is more than one change of this type (for example if you deleted several nodes at the same time)
-type Count = 'single' | 'many'
+type Count = 'single' | 'many';
 ```
 
 {{ NgDocActions.demoPane("HandlingChangesFilteredDemoComponent") }}
@@ -104,5 +107,3 @@ List of all possible filter outputs:
   ...
 }
 ```
-
-

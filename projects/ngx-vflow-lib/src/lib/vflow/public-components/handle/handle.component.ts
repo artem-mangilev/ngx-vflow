@@ -12,10 +12,7 @@ import {
 import { Position } from '../../types/position.type';
 import { HandleService } from '../../services/handle.service';
 import { HandleModel } from '../../models/handle.model';
-import {
-  InjectionContext,
-  WithInjector,
-} from '../../decorators/run-in-injection-context.decorator';
+import { InjectionContext, WithInjector } from '../../decorators/run-in-injection-context.decorator';
 
 @Component({
   standalone: true,
@@ -68,9 +65,7 @@ export class HandleComponent implements OnInit, WithInjector {
 
       requestAnimationFrame(() => this.model.updateParent());
 
-      this.destroyRef.onDestroy(() =>
-        this.handleService.destroyHandle(this.model),
-      );
+      this.destroyRef.onDestroy(() => this.handleService.destroyHandle(this.model));
     }
   }
 }

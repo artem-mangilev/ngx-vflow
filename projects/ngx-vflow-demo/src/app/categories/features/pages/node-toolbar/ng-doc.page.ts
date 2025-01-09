@@ -1,5 +1,5 @@
 import { NgDocPage } from '@ng-doc/core';
-import ExamplesCategory from '../../ng-doc.category'
+import ExamplesCategory from '../../ng-doc.category';
 import { NodeToolbarDemoComponent } from './demo/node-toolbar-demo.component';
 
 const TestPage: NgDocPage = {

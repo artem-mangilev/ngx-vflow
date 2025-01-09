@@ -8,7 +8,6 @@ import {
   inject,
   runInInjectionContext,
   input,
-  output,
   contentChild,
   viewChild,
 } from '@angular/core';
@@ -17,11 +16,7 @@ import { MapContextDirective } from '../../directives/map-context.directive';
 import { DraggableService } from '../../services/draggable.service';
 import { NodeModel } from '../../models/node.model';
 import { ViewportService } from '../../services/viewport.service';
-import {
-  toObservable,
-  toSignal,
-  outputFromObservable,
-} from '@angular/core/rxjs-interop';
+import { toObservable, toSignal, outputFromObservable } from '@angular/core/rxjs-interop';
 import { Edge } from '../../interfaces/edge.interface';
 import { EdgeModel } from '../../models/edge.model';
 import {
@@ -129,10 +124,7 @@ const changesControllerHostDirective = {
     KeyboardService,
     OverlaysService,
   ],
-  hostDirectives: [
-    connectionControllerHostDirective,
-    changesControllerHostDirective,
-  ],
+  hostDirectives: [connectionControllerHostDirective, changesControllerHostDirective],
   imports: [
     RootSvgReferenceDirective,
     RootSvgContextDirective,
@@ -277,27 +269,19 @@ export class VflowComponent implements OnInit {
    *
    * @experimental
    */
-  public onComponentNodeEvent = outputFromObservable<any>(
-    this.componentEventBusService.event$,
-  ); // TODO: research how to remove any
+  public readonly onComponentNodeEvent = outputFromObservable<any>(this.componentEventBusService.event$); // TODO: research how to remove any
   // #endregion
 
   // #region TEMPLATES
   protected nodeTemplateDirective = contentChild(NodeHtmlTemplateDirective);
 
-  protected groupNodeTemplateDirective = contentChild(
-    GroupNodeTemplateDirective,
-  );
+  protected groupNodeTemplateDirective = contentChild(GroupNodeTemplateDirective);
 
   protected edgeTemplateDirective = contentChild(EdgeTemplateDirective);
 
-  protected edgeLabelHtmlDirective = contentChild(
-    EdgeLabelHtmlTemplateDirective,
-  );
+  protected edgeLabelHtmlDirective = contentChild(EdgeLabelHtmlTemplateDirective);
 
-  protected connectionTemplateDirective = contentChild(
-    ConnectionTemplateDirective,
-  );
+  protected connectionTemplateDirective = contentChild(ConnectionTemplateDirective);
   // #endregion
 
   // #region DIRECTIVES
@@ -331,9 +315,7 @@ export class VflowComponent implements OnInit {
   /**
    * Observable with viewport change
    */
-  public readonly viewportChange$ = toObservable(
-    this.viewportService.readableViewport,
-  ).pipe(skip(1)); // skip default value that set by signal
+  public readonly viewportChange$ = toObservable(this.viewportService.readableViewport).pipe(skip(1)); // skip default value that set by signal
 
   /**
    * Observable with nodes change
@@ -403,9 +385,7 @@ export class VflowComponent implements OnInit {
    *
    * @param id node id
    */
-  public getNode<T = unknown>(
-    id: string,
-  ): Node<T> | DynamicNode<T> | undefined {
+  public getNode<T = unknown>(id: string): Node<T> | DynamicNode<T> | undefined {
     return this.flowEntitiesService.getNode<T>(id)?.node;
   }
 

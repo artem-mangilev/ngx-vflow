@@ -9,7 +9,7 @@ const TestPage: NgDocPage = {
   category: ExamplesCategory,
   keyword: `FeaturesHandlingChanges`,
   demos: { HandlingChangesDemoComponent, HandlingChangesFilteredDemoComponent },
-  order: 3
+  order: 3,
 };
 
 export default TestPage;

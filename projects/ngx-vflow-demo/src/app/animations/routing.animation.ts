@@ -24,4 +24,4 @@ export const routingAnimation = () =>
         query('@*', animateChild(), { optional: true }),
       ]),
     ]),
-  ])
+  ]);

@@ -1,11 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  TemplateRef,
-  computed,
-  inject,
-  input,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, TemplateRef, computed, inject, input } from '@angular/core';
 import { FlowStatusService } from '../../services/flow-status.service';
 import { straightPath } from '../../math/edge-path/straigh-path';
 import { SpacePointContextDirective } from '../../directives/space-point-context.directive';
@@ -23,12 +16,11 @@ import { NgTemplateOutlet } from '@angular/common';
     @if (model().type === 'default') {
       @if (path(); as path) {
         <svg:path
-          [attr.d]="path"
-          [attr.marker-end]="markerUrl()"
-          [attr.stroke]="defaultColor"
           fill="none"
           stroke-width="2"
-        />
+          [attr.d]="path"
+          [attr.marker-end]="markerUrl()"
+          [attr.stroke]="defaultColor" />
       }
     }
 
@@ -58,35 +50,17 @@ export class ConnectionComponent {
       const sourcePosition = sourceHandle.rawHandle.position;
 
       const targetPoint = this.spacePointContext.svgCurrentSpacePoint();
-      const targetPosition = getOppositePostion(
-        sourceHandle.rawHandle.position,
-      );
+      const targetPosition = getOppositePostion(sourceHandle.rawHandle.position);
 
       switch (this.model().curve) {
         case 'straight':
           return straightPath(sourcePoint, targetPoint).path;
         case 'bezier':
-          return bezierPath(
-            sourcePoint,
-            targetPoint,
-            sourcePosition,
-            targetPosition,
-          ).path;
+          return bezierPath(sourcePoint, targetPoint, sourcePosition, targetPosition).path;
         case 'smooth-step':
-          return smoothStepPath(
-            sourcePoint,
-            targetPoint,
-            sourcePosition,
-            targetPosition,
-          ).path;
+          return smoothStepPath(sourcePoint, targetPoint, sourcePosition, targetPosition).path;
         case 'step':
-          return smoothStepPath(
-            sourcePoint,
-            targetPoint,
-            sourcePosition,
-            targetPosition,
-            0,
-          ).path;
+          return smoothStepPath(sourcePoint, targetPoint, sourcePosition, targetPosition, 0).path;
       }
     }
 
@@ -108,27 +82,11 @@ export class ConnectionComponent {
         case 'straight':
           return straightPath(sourcePoint, targetPoint).path;
         case 'bezier':
-          return bezierPath(
-            sourcePoint,
-            targetPoint,
-            sourcePosition,
-            targetPosition,
-          ).path;
+          return bezierPath(sourcePoint, targetPoint, sourcePosition, targetPosition).path;
         case 'smooth-step':
-          return smoothStepPath(
-            sourcePoint,
-            targetPoint,
-            sourcePosition,
-            targetPosition,
-          ).path;
+          return smoothStepPath(sourcePoint, targetPoint, sourcePosition, targetPosition).path;
         case 'step':
-          return smoothStepPath(
-            sourcePoint,
-            targetPoint,
-            sourcePosition,
-            targetPosition,
-            0,
-          ).path;
+          return smoothStepPath(sourcePoint, targetPoint, sourcePosition, targetPosition, 0).path;
       }
     }
 
