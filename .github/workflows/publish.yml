@@ -1,0 +1,67 @@
+name: Release and Publish Angular Library
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - projects/ngx-vflow-lib
+
+  workflow_dispatch: # Allow manual triggering
+
+env:
+  NODE_VERSION: '20.9.0' # Node.js version
+
+jobs:
+  release-and-publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the repository
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      # Step 2: Set up Node.js environment
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      # Step 3: Install dependencies
+      - name: Install Dependencies
+        run: npm ci
+
+      # Step 4: Analyze version and publish using Semantic Release
+      - name: Run Semantic Release
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx semantic-release
+
+      # Step 5: Build the Angular library
+      - name: Build Angular Library
+        run: |
+          cd projects/ngx-vflow-lib
+          npm run build
+
+      # Step 6: Publish the package to NPM
+      - name: Publish to NPM
+        if: success() # Run only if the build succeeds
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          cd dist/ngx-vflow-lib
+          npm publish --access public
+
+      # Step 7: Generate Release Notes and GitHub Release
+      - name: Generate GitHub Release
+        uses: actions/create-release@v1
+        with:
+          tag_name: v${{ steps.semantic-release.outputs.newReleaseVersion }}
+          release_name: 'Release v${{ steps.semantic-release.outputs.newReleaseVersion }}'
+          body: |
+            Release notes are available on GitHub.
+            Check the CHANGELOG.md file for details.
+          draft: false
+          prerelease: false

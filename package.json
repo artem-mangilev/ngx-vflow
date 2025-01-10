@@ -47,6 +47,11 @@
     "@angular/compiler-cli": "^17.3.12",
     "@commitlint/cli": "^19.6.1",
     "@commitlint/config-conventional": "^19.6.0",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/commit-analyzer": "^13.0.1",
+    "@semantic-release/github": "^11.0.1",
+    "@semantic-release/npm": "^12.0.1",
+    "@semantic-release/release-notes-generator": "^14.0.3",
     "@playwright/test": "^1.49.1",
     "@types/d3-drag": "^3.0.7",
     "@types/d3-force": "^3.0.10",
@@ -60,6 +65,7 @@
     "angular-cli-ghpages": "^2.0.3",
     "eslint": "8.57.0",
     "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-html": "^8.1.2",
     "husky": "^9.1.7",
     "jasmine-core": "~4.6.0",
     "karma": "~6.4.0",
@@ -70,15 +76,7 @@
     "lint-staged": "^15.3.0",
     "ng-packagr": "^17.3.0",
     "prettier": "^3.4.2",
+    "semantic-release": "^24.2.1",
     "typescript": "~5.4.5"
-  },
-  "lint-staged": {
-    "*.{html,js,ts}": [
-      "eslint --fix",
-      "prettier --write"
-    ],
-    "*.{css,scss,json,md}": [
-      "prettier --write"
-    ]
   }
 }
