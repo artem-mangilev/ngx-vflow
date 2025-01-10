@@ -78,14 +78,5 @@
     "prettier": "^3.4.2",
     "semantic-release": "^24.2.1",
     "typescript": "~5.4.5"
-  },
-  "lint-staged": {
-    "*.{html,js,ts}": [
-      "eslint --fix",
-      "prettier --write"
-    ],
-    "*.{css,scss,json,md}": [
-      "prettier --write"
-    ]
   }
 }
