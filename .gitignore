@@ -44,3 +44,9 @@ Thumbs.db
 
 # NgDoc files
 /ng-doc
+
+# Playwright files
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
