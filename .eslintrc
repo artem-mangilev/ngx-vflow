@@ -1,6 +1,5 @@
 {
   "root": true,
-  "plugins": ["html"],
   "overrides": [
     {
       "files": ["*.ts"],
