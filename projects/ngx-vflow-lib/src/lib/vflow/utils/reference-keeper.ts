@@ -20,7 +20,7 @@ export class ReferenceKeeper {
   /**
    * Create new models for new edge references and keep old models for old edge references
    */
-  public static edges(newEdges: Edge[], oldEdgeModels: EdgeModel[]) {
+  public static edges(newEdges: Edge[], oldEdgeModels: EdgeModel[]): EdgeModel[] {
     const oldEdgesMap: Map<Edge, EdgeModel> = new Map();
     oldEdgeModels.forEach((model) => oldEdgesMap.set(model.edge, model));
 
