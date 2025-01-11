@@ -41,6 +41,7 @@
       {
         "pkgRoot": "dist/ngx-vflow-lib"
       }
-    ]
+    ],
+    "@semantic-release/github"
   ]
 }
