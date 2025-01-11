@@ -44,15 +44,3 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           GITHUB_TOKEN: ${{ github.token }}
         run: npx semantic-release
-
-      # Step 7: Generate Release Notes and GitHub Release
-      # - name: Generate GitHub Release
-      #   uses: actions/create-release@v1
-      #   with:
-      #     tag_name: v${{ steps.semantic-release.outputs.newReleaseVersion }}
-      #     release_name: 'Release v${{ steps.semantic-release.outputs.newReleaseVersion }}'
-      #     body: |
-      #       Release notes are available on GitHub.
-      #       Check the CHANGELOG.md file for details.
-      #     draft: false
-      #     prerelease: false
