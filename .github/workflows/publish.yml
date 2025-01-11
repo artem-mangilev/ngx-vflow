@@ -36,7 +36,7 @@ jobs:
       - name: Run Semantic Release
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.SEMANTIC_RELEASE }}
+          GITHUB_TOKEN: ${{ github.token }}
         run: npx semantic-release
 
       # Step 5: Build the Angular library
