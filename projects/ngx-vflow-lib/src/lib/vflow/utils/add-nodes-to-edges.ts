@@ -1,7 +1,7 @@
 import { EdgeModel } from '../models/edge.model';
 import { NodeModel } from '../models/node.model';
 
-export function addNodesToEdges(nodes: NodeModel[], edges: EdgeModel[]) {
+export function addNodesToEdges(nodes: NodeModel[], edges: EdgeModel[]): void {
   const nodesById = nodes.reduce(
     (acc, n) => {
       acc[n.node.id] = n;
