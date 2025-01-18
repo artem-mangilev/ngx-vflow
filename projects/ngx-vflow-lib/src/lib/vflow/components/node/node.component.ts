@@ -70,10 +70,12 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInje
   private flowSettingsService = inject(FlowSettingsService);
   private selectionService = inject(SelectionService);
   private hostRef = inject<ElementRef<SVGElement>>(ElementRef);
-  private connectionController = inject(ConnectionControllerDirective);
   private nodeAccessor = inject(NodeAccessorService);
   private overlaysService = inject(OverlaysService);
   private zone = inject(NgZone);
+
+  // TODO remove dependency from this directive
+  private connectionController = inject(ConnectionControllerDirective, { optional: true });
 
   public nodeModel = input.required<NodeModel>();
 
@@ -159,19 +161,19 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInje
     // ignore drag by stopping propagation
     event.stopPropagation();
 
-    this.connectionController.startConnection(handle);
+    this.connectionController?.startConnection(handle);
   }
 
   protected validateConnection(handle: HandleModel) {
-    this.connectionController.validateConnection(handle);
+    this.connectionController?.validateConnection(handle);
   }
 
   protected resetValidateConnection(targetHandle: HandleModel) {
-    this.connectionController.resetValidateConnection(targetHandle);
+    this.connectionController?.resetValidateConnection(targetHandle);
   }
 
   protected endConnection() {
-    this.connectionController.endConnection();
+    this.connectionController?.endConnection();
   }
 
   protected pullNode() {

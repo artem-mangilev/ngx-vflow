@@ -13,6 +13,7 @@ import { MiniMapComponent } from './public-components/minimap/minimap.component'
 import { NodeToolbarComponent } from './public-components/node-toolbar/node-toolbar.component';
 import { ResizableComponent } from './public-components/resizable/resizable.component';
 import { HandleComponent } from './public-components/handle/handle.component';
+import { ConnectionControllerDirective } from './directives/connection-controller.directive';
 
 export const Vflow = [
   VflowComponent,
@@ -22,6 +23,7 @@ export const Vflow = [
   MiniMapComponent,
   NodeToolbarComponent,
   DragHandleDirective,
+  ConnectionControllerDirective,
 
   NodeHtmlTemplateDirective,
   GroupNodeTemplateDirective,

@@ -31,7 +31,6 @@ import { skip } from 'rxjs';
 import { Point } from '../../interfaces/point.interface';
 import { ViewportState } from '../../interfaces/viewport.interface';
 import { FlowStatusService } from '../../services/flow-status.service';
-import { ConnectionControllerDirective } from '../../directives/connection-controller.directive';
 import { FlowEntitiesService } from '../../services/flow-entities.service';
 import { ConnectionSettings } from '../../interfaces/connection-settings.interface';
 import { ConnectionModel } from '../../models/connection.model';
@@ -63,11 +62,6 @@ import { FlowSizeControllerDirective } from '../../directives/flow-size-controll
 import { RootPointerDirective } from '../../directives/root-pointer.directive';
 import { RootSvgContextDirective } from '../../directives/root-svg-context.directive';
 import { RootSvgReferenceDirective } from '../../directives/reference.directive';
-
-const connectionControllerHostDirective = {
-  directive: ConnectionControllerDirective,
-  outputs: ['onConnect'],
-};
 
 const changesControllerHostDirective = {
   directive: ChangesControllerDirective,
@@ -124,7 +118,7 @@ const changesControllerHostDirective = {
     KeyboardService,
     OverlaysService,
   ],
-  hostDirectives: [connectionControllerHostDirective, changesControllerHostDirective],
+  hostDirectives: [changesControllerHostDirective],
   imports: [
     RootSvgReferenceDirective,
     RootSvgContextDirective,
