@@ -1,16 +1,21 @@
-import { Directive, computed, effect, inject, output } from '@angular/core';
+import { Directive, computed, inject } from '@angular/core';
 import { Connection } from '../interfaces/connection.interface';
-import { FlowStatusService, batchStatusChanges } from '../services/flow-status.service';
+import { FlowStatusConnectionEnd, FlowStatusService } from '../services/flow-status.service';
 
 import { FlowEntitiesService } from '../services/flow-entities.service';
 import { HandleModel } from '../models/handle.model';
 import { adjustDirection } from '../utils/adjust-direction';
+import { outputFromObservable, toObservable } from '@angular/core/rxjs-interop';
+import { filter, map, tap } from 'rxjs';
 
 @Directive({
-  selector: '[connectionController]',
+  selector: '[onConnect]',
   standalone: true,
 })
 export class ConnectionControllerDirective {
+  private statusService = inject(FlowStatusService);
+  private flowEntitiesService = inject(FlowEntitiesService);
+
   /**
    * This event fires when user tries to create new Edge.
    *
@@ -22,16 +27,10 @@ export class ConnectionControllerDirective {
    * @todo add connect event and deprecate onConnect
    */
   // eslint-disable-next-line @angular-eslint/no-output-on-prefix
-  public readonly onConnect = output<Connection>();
-
-  private statusService = inject(FlowStatusService);
-  private flowEntitiesService = inject(FlowEntitiesService);
-
-  protected connectEffect = effect(
-    () => {
-      const status = this.statusService.status();
-
-      if (status.state === 'connection-end') {
+  public readonly onConnect = outputFromObservable<Connection>(
+    toObservable(this.statusService.status).pipe(
+      filter((status): status is FlowStatusConnectionEnd => status.state === 'connection-end'),
+      map((status) => {
         let source = status.payload.source;
         let target = status.payload.target;
         let sourceHandle = status.payload.sourceHandle;
@@ -57,20 +56,16 @@ export class ConnectionControllerDirective {
         const sourceHandleId = sourceHandle.rawHandle.id;
         const targetHandleId = targetHandle.rawHandle.id;
 
-        const connectionModel = this.flowEntitiesService.connection();
-        const connection = {
+        return {
           source: sourceId,
           target: targetId,
           sourceHandle: sourceHandleId,
           targetHandle: targetHandleId,
         };
-
-        if (connectionModel.validator(connection)) {
-          this.onConnect.emit(connection);
-        }
-      }
-    },
-    { allowSignalWrites: true },
+      }),
+      tap(() => this.statusService.setIdleStatus()),
+      filter((connection) => this.flowEntitiesService.connection().validator(connection)),
+    ),
   );
 
   protected isStrictMode = computed(() => this.flowEntitiesService.connection().mode === 'strict');
@@ -145,12 +140,7 @@ export class ConnectionControllerDirective {
       const target = status.payload.target;
       const targetHandle = status.payload.targetHandle;
 
-      batchStatusChanges(
-        // call to create connection
-        () => this.statusService.setConnectionEndStatus(source!, target!, sourceHandle!, targetHandle!),
-        // when connection created, we need go back to idle status
-        () => this.statusService.setIdleStatus(),
-      );
+      this.statusService.setConnectionEndStatus(source, target, sourceHandle, targetHandle);
     }
   }
 }
