@@ -1,4 +1,4 @@
-name: Release and Publish Angular Library
+name: release
 
 on:
   push:
