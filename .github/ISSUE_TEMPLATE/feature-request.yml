@@ -1,0 +1,32 @@
+name: 'Feature Request'
+description: Suggest a feature
+title: '[Feature] '
+labels: 'enhancement'
+assignees: artem-mangilev
+
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      placeholder: |
+        A description of what the problem is.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed-solution
+    attributes:
+      label: Proposed solution
+      placeholder: |
+        A description of what you want to happen.
+        What is the expected behavior?
+    validations:
+      required: true
+
+  - type: textarea
+    id: other-libraries
+    attributes:
+      label: Is it implemented in other libraries?
+      placeholder: |
+        A screenshot and/or link to the implementation in another library.
