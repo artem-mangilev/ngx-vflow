@@ -21,3 +21,6 @@ jobs:
 
       - name: Lint
         run: npx ng lint
+
+      - name: Prettier Check
+        run: npx prettier . --check
