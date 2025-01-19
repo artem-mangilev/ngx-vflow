@@ -1,0 +1,61 @@
+name: 'Bug Report'
+description: Report a bug
+title: '[Bug] '
+labels: 'Type: Bug'
+assignees: artem-mangilev
+
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      placeholder: |
+        What is the current behavior?
+        What is the expected behavior?
+    validations:
+      required: true
+
+  - type: textarea
+    id: sandbox-link
+    attributes:
+      label: Sandbox link with a reproduction of the bug (StackBlitz, CodeSandbox, etc.)
+
+  - type: textarea
+    id: exception-or-error
+    attributes:
+      label: Please provide the exception or error you saw
+      render: true
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: OS
+      options:
+        - Unix (Linux, macOS, etc.)
+        - Windows
+        - iOS, Android, etc.
+        - Something else
+    validations:
+      required: true
+
+  - type: dropdown
+    id: browser
+    attributes:
+      label: Browser
+      options:
+        - Chrome
+        - Firefox
+        - Safari
+        - Edge
+        - IE
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: other
+    attributes:
+      label: Anything else?
+      placeholder: |
+        Please provide any additional information that may be helpful in understanding the issue.
+        If you have a screenshot, attach it here.
