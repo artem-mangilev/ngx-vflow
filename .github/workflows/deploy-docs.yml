@@ -27,7 +27,7 @@ jobs:
       - name: Deploy Documentation
         run: |
           npx ng build ngx-vflow-demo
-          npx ng deploy --cname=www.ngx-vflow.org --dir=dist/ngx-vflow-demo/browser
+          npx ng deploy --cname=www.ngx-vflow.org --dir=dist/ngx-vflow-demo/browser --name="Artem Mangilev" --email="artmnglv@gmail.com"
         env:
           CI: true
           GH_TOKEN: ${{ github.token }}
