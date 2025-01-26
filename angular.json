@@ -106,8 +106,23 @@
               ],
               "outputHashing": "all"
             },
+            "hybrid": {
+              "tsConfig": "projects/ngx-vflow-demo/tsconfig.hybrid.json",
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "4mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "2kb",
+                  "maximumError": "4kb"
+                }
+              ],
+              "outputHashing": "all"
+            },
             "development": {
-              "tsConfig": "projects/ngx-vflow-demo/tsconfig.app.json",
               "optimization": false,
               "extractLicenses": false,
               "sourceMap": true,
@@ -121,6 +136,9 @@
           "configurations": {
             "production": {
               "buildTarget": "ngx-vflow-demo:build:production"
+            },
+            "hybrid": {
+              "buildTarget": "ngx-vflow-demo:build:hybrid"
             },
             "development": {
               "buildTarget": "ngx-vflow-demo:build:development"
