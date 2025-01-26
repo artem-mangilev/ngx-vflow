@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { NgDocNotifyService } from '@ng-doc/ui-kit';
-import { ComponentNodeEvent, Edge, Node, Vflow } from 'projects/ngx-vflow-lib/src/public-api';
+import { ComponentNodeEvent, Edge, Node, Vflow } from 'ngx-vflow';
 import { BlueSquareNodeComponent, BlueSquareData } from './components/blue-square-node.component';
 import { RedSquareNodeComponent, RedSquareData } from './components/red-square-node.component';
 

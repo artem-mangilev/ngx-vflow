@@ -106,6 +106,13 @@
               ],
               "outputHashing": "all"
             },
+            "hybrid": {
+              "tsConfig": "projects/ngx-vflow-demo/tsconfig.hybrid.json",
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "namedChunks": true
+            },
             "development": {
               "optimization": false,
               "extractLicenses": false,
@@ -120,6 +127,9 @@
           "configurations": {
             "production": {
               "buildTarget": "ngx-vflow-demo:build:production"
+            },
+            "hybrid": {
+              "buildTarget": "ngx-vflow-demo:build:hybrid"
             },
             "development": {
               "buildTarget": "ngx-vflow-demo:build:development"

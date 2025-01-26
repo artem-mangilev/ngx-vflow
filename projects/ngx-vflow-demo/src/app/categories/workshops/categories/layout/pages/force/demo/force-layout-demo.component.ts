@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, signal, viewChild } from '@angular/core';
 import * as d3 from 'd3-force';
-import { DynamicNode, Edge, VflowComponent, Vflow } from 'projects/ngx-vflow-lib/src/public-api';
+import { DynamicNode, Edge, VflowComponent, Vflow } from 'ngx-vflow';
 
 @Component({
   templateUrl: './force-layout-demo.component.html',

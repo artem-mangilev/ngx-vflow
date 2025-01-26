@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnInit, signal, viewChild, WritableSignal } from '@angular/core';
 import init, { DirectedGraph, VertexRef } from '@vizdom/vizdom-ts-web';
-import { Edge, Node, VflowComponent, Vflow } from 'projects/ngx-vflow-lib/src/public-api';
+import { Edge, Node, VflowComponent, Vflow } from 'ngx-vflow';
 
 @Component({
   templateUrl: './vizdom-layout-demo.component.html',

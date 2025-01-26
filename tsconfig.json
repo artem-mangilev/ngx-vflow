@@ -11,11 +11,6 @@
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "sourceMap": true,
-    "paths": {
-      "@ng-doc/generated": ["ng-doc/ngx-vflow-demo/index.ts"],
-      "@ng-doc/generated/*": ["ng-doc/ngx-vflow-demo/*"],
-      "ngx-vflow-lib": ["dist/ngx-vflow-lib"]
-    },
     "declaration": false,
     "downlevelIteration": true,
     "experimentalDecorators": true,
@@ -26,7 +21,12 @@
     "useDefineForClassFields": false,
     "lib": ["ES2022", "dom"],
     "stripInternal": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "paths": {
+      "@ng-doc/generated": ["ng-doc/ngx-vflow-demo/index.ts"],
+      "@ng-doc/generated/*": ["ng-doc/ngx-vflow-demo/*"],
+      "ngx-vflow": ["projects/ngx-vflow-lib/src/public-api"]
+    }
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,

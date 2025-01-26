@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, TemplateRef, inject, viewChild } from '@angular/core';
 import { NgDocNotifyService } from '@ng-doc/ui-kit';
-import { Connection, Edge, EdgeChange, Node, NodeChange, Vflow } from 'projects/ngx-vflow-lib/src/public-api';
+import { Connection, Edge, EdgeChange, Node, NodeChange, Vflow } from 'ngx-vflow';
 
 @Component({
   templateUrl: './handling-changes-demo.component.html',

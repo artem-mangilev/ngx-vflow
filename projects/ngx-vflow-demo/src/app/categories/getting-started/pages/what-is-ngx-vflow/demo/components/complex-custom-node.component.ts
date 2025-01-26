@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, WritableSignal } from '@angular/core';
-import { Vflow, CustomNodeComponent } from 'projects/ngx-vflow-lib/src/public-api';
+import { Vflow, CustomNodeComponent } from 'ngx-vflow';
 
 export interface ComplexCustomNodeData {
   id: {

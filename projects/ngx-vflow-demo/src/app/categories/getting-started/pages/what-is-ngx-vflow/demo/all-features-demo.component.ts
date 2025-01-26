@@ -7,7 +7,7 @@ import {
   ConnectionSettings,
   isComponentStaticNode,
   isDefaultStaticNode,
-} from 'projects/ngx-vflow-lib/src/public-api';
+} from 'ngx-vflow';
 import { ComplexCustomNodeComponent, ComplexCustomNodeData } from './components/complex-custom-node.component';
 import { SimpleCustomNodeComponent } from './components/simple-custom-node.component';
 
