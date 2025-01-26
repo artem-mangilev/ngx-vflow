@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import { DynamicNode, Edge, Vflow } from 'projects/ngx-vflow-lib/src/public-api';
+import { DynamicNode, Edge, Vflow } from 'ngx-vflow';
 
 @Component({
   template: `<vflow view="auto" [nodes]="nodes" [edges]="edges">

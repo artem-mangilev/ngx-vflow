@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { Edge, Node, Vflow, Connection } from 'projects/ngx-vflow-lib/src/public-api';
+import { Edge, Node, Vflow, Connection } from 'ngx-vflow';
 
 @Component({
   templateUrl: './multiple-connection-points-demo.component.html',

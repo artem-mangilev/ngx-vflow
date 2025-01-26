@@ -1,5 +1,5 @@
 import { Component, output, ChangeDetectionStrategy } from '@angular/core';
-import { Vflow, CustomNodeComponent } from 'projects/ngx-vflow-lib/src/public-api';
+import { Vflow, CustomNodeComponent } from 'ngx-vflow';
 
 // --- Description of blue square component node
 export interface BlueSquareData {

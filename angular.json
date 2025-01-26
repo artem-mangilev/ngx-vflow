@@ -107,6 +107,7 @@
               "outputHashing": "all"
             },
             "development": {
+              "tsConfig": "projects/ngx-vflow-demo/tsconfig.app.json",
               "optimization": false,
               "extractLicenses": false,
               "sourceMap": true,

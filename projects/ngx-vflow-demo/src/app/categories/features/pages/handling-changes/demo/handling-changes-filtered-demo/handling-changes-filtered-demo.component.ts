@@ -9,7 +9,7 @@ import {
   NodePositionChange,
   NodeSelectedChange,
   Vflow,
-} from 'projects/ngx-vflow-lib/src/public-api';
+} from 'ngx-vflow';
 
 @Component({
   templateUrl: './handling-changes-filtered-demo.component.html',

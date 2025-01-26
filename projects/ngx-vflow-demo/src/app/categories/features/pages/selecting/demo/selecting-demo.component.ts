@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { Edge, Node, Vflow } from 'projects/ngx-vflow-lib/src/public-api';
+import { Edge, Node, Vflow } from 'ngx-vflow';
 
 @Component({
   templateUrl: './selecting-demo.component.html',

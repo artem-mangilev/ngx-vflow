@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { Edge, Node, Vflow, Connection, ConnectionSettings } from 'projects/ngx-vflow-lib/src/public-api';
+import { Edge, Node, Vflow, Connection, ConnectionSettings } from 'ngx-vflow';
 
 @Component({
   templateUrl: './custom-handles-demo.component.html',

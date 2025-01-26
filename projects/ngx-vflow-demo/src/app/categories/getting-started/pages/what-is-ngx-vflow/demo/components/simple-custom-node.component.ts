@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { CustomNodeComponent, Vflow } from 'projects/ngx-vflow-lib/src/public-api';
+import { CustomNodeComponent, Vflow } from 'ngx-vflow';
 
 @Component({
   template: `<div class="node">
