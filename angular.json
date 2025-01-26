@@ -108,19 +108,10 @@
             },
             "hybrid": {
               "tsConfig": "projects/ngx-vflow-demo/tsconfig.hybrid.json",
-              "budgets": [
-                {
-                  "type": "initial",
-                  "maximumWarning": "2mb",
-                  "maximumError": "4mb"
-                },
-                {
-                  "type": "anyComponentStyle",
-                  "maximumWarning": "2kb",
-                  "maximumError": "4kb"
-                }
-              ],
-              "outputHashing": "all"
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "namedChunks": true
             },
             "development": {
               "optimization": false,
