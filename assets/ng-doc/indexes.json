@@ -2,6 +2,462 @@
   {
     "breadcrumbs": [
       "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Custom nodes",
+    "route": "/features/custom-nodes",
+    "fragment": "custom-nodes",
+    "content": "Be careful with CSS rules applied to node content. Custom nodes are implemented with SVG's foreignObject element, and Safari has issues with some CSS rules inside foreignObject. Therefore, please check this browser when applying complex styling."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Custom nodes",
+    "route": "/features/custom-nodes",
+    "fragment": "custom-nodes",
+    "content": "This is where things become a lot more interesting. You can create custom nodes with HTML and CSS."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Template nodes",
+    "route": "/features/custom-nodes",
+    "fragment": "template-nodes",
+    "content": "You can create custom nodes with ng-template Follow these steps to achieve this:"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Template nodes",
+    "route": "/features/custom-nodes",
+    "fragment": "template-nodes",
+    "content": "Set "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Template nodes",
+    "route": "/features/custom-nodes",
+    "fragment": "template-nodes",
+    "content": "type"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Template nodes",
+    "route": "/features/custom-nodes",
+    "fragment": "template-nodes",
+    "content": " of node to "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Template nodes",
+    "route": "/features/custom-nodes",
+    "fragment": "template-nodes",
+    "content": "html-template"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Template nodes",
+    "route": "/features/custom-nodes",
+    "fragment": "template-nodes",
+    "content": "Provide "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Template nodes",
+    "route": "/features/custom-nodes",
+    "fragment": "template-nodes",
+    "content": "ng-template"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Template nodes",
+    "route": "/features/custom-nodes",
+    "fragment": "template-nodes",
+    "content": " with "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Template nodes",
+    "route": "/features/custom-nodes",
+    "fragment": "template-nodes",
+    "content": "nodeHtml"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Template nodes",
+    "route": "/features/custom-nodes",
+    "fragment": "template-nodes",
+    "content": " selector inside "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Template nodes",
+    "route": "/features/custom-nodes",
+    "fragment": "template-nodes",
+    "content": "vflow"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Template nodes",
+    "route": "/features/custom-nodes",
+    "fragment": "template-nodes",
+    "content": "Write your HTML inside this template You can also pass any data with "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Template nodes",
+    "route": "/features/custom-nodes",
+    "fragment": "template-nodes",
+    "content": "data"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Template nodes",
+    "route": "/features/custom-nodes",
+    "fragment": "template-nodes",
+    "content": " field on node, and then get it inside "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Template nodes",
+    "route": "/features/custom-nodes",
+    "fragment": "template-nodes",
+    "content": "ng-template"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Component nodes",
+    "route": "/features/custom-nodes",
+    "fragment": "component-nodes",
+    "content": "Another approach is to render nodes from components. Its benefits: type-safe node data accessgood for complex flows with many different node types Its limitations it's harder to manage events because such nodes are rendered dynamically How to create component node:"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Component nodes",
+    "route": "/features/custom-nodes",
+    "fragment": "component-nodes",
+    "content": "Create a regular angular standalone component Extend with "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Component nodes",
+    "route": "/features/custom-nodes",
+    "fragment": "component-nodes",
+    "content": "CustomNodeComponent"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Component nodes",
+    "route": "/features/custom-nodes",
+    "fragment": "component-nodes",
+    "content": " (please see the reference of this base component to get an idea of what fields you could use in your custom component node), otherwise it won't work! Pass your data interface to generic of "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Component nodes",
+    "route": "/features/custom-nodes",
+    "fragment": "component-nodes",
+    "content": "CustomNodeComponent"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Component nodes",
+    "route": "/features/custom-nodes",
+    "fragment": "component-nodes",
+    "content": " to use in component. This "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Component nodes",
+    "route": "/features/custom-nodes",
+    "fragment": "component-nodes",
+    "content": "data"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Component nodes",
+    "route": "/features/custom-nodes",
+    "fragment": "component-nodes",
+    "content": " comes from "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Component nodes",
+    "route": "/features/custom-nodes",
+    "fragment": "component-nodes",
+    "content": "Node"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Component nodes",
+    "route": "/features/custom-nodes",
+    "fragment": "component-nodes",
+    "content": " definition Use your new component in "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Component nodes",
+    "route": "/features/custom-nodes",
+    "fragment": "component-nodes",
+    "content": "type"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Component nodes",
+    "route": "/features/custom-nodes",
+    "fragment": "component-nodes",
+    "content": " field of "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Component nodes",
+    "route": "/features/custom-nodes",
+    "fragment": "component-nodes",
+    "content": "Node"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Component nodes",
+    "route": "/features/custom-nodes",
+    "fragment": "component-nodes",
+    "content": ". Library will render your node for you"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Handling events",
+    "route": "/features/custom-nodes",
+    "fragment": "handling-events",
+    "content": "This is an experimental API"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Handling events",
+    "route": "/features/custom-nodes",
+    "fragment": "handling-events",
+    "content": "There is a (onComponentNodeEvent) event on VflowComponent. Here is how it works:"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Handling events",
+    "route": "/features/custom-nodes",
+    "fragment": "handling-events",
+    "content": "It accumulates every "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Handling events",
+    "route": "/features/custom-nodes",
+    "fragment": "handling-events",
+    "content": "EventEmitter"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Handling events",
+    "route": "/features/custom-nodes",
+    "fragment": "handling-events",
+    "content": " of every component node of your flow It emits on every emit of those emitters"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Handling events",
+    "route": "/features/custom-nodes",
+    "fragment": "handling-events",
+    "content": "The shape of this accumulator-event contains following useful info: The Library also includes ComponentNodeEvent helper type to get type-safe event, where you just need to pass an array of your custom components in generic, and this type will infer proper types for eventName and eventPayload:"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Default edges"
+    ],
+    "pageType": "guide",
+    "title": "Default edges",
+    "section": "Default edges",
+    "route": "/features/default-edges",
+    "fragment": "default-edges",
+    "content": "You can link nodes with edges. All you need to do is to create another Edge[] array and pass it to the vflow component. Each edge contains the id of the source and target nodes, and each edge must have its own id."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
       "Connection"
     ],
     "pageType": "guide",
@@ -634,498 +1090,6 @@
     "route": "/features/custom-edges",
     "fragment": "context",
     "content": "It's tricky to infer type for let-ctx, so here is an interface with available fields for this context."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Custom nodes",
-    "route": "/features/custom-nodes",
-    "fragment": "custom-nodes",
-    "content": "Be careful with CSS rules applied to node content. Custom nodes are implemented with SVG's foreignObject element, and Safari has issues with some CSS rules inside foreignObject. Therefore, please check this browser when applying complex styling."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Custom nodes",
-    "route": "/features/custom-nodes",
-    "fragment": "custom-nodes",
-    "content": "This is where things become a lot more interesting. You can create custom nodes with HTML and CSS."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Template nodes",
-    "route": "/features/custom-nodes",
-    "fragment": "template-nodes",
-    "content": "You can create custom nodes with ng-template Follow these steps to achieve this:"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Template nodes",
-    "route": "/features/custom-nodes",
-    "fragment": "template-nodes",
-    "content": "Set "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Template nodes",
-    "route": "/features/custom-nodes",
-    "fragment": "template-nodes",
-    "content": "type"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Template nodes",
-    "route": "/features/custom-nodes",
-    "fragment": "template-nodes",
-    "content": " of node to "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Template nodes",
-    "route": "/features/custom-nodes",
-    "fragment": "template-nodes",
-    "content": "html-template"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Template nodes",
-    "route": "/features/custom-nodes",
-    "fragment": "template-nodes",
-    "content": "Provide "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Template nodes",
-    "route": "/features/custom-nodes",
-    "fragment": "template-nodes",
-    "content": "ng-template"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Template nodes",
-    "route": "/features/custom-nodes",
-    "fragment": "template-nodes",
-    "content": " with "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Template nodes",
-    "route": "/features/custom-nodes",
-    "fragment": "template-nodes",
-    "content": "nodeHtml"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Template nodes",
-    "route": "/features/custom-nodes",
-    "fragment": "template-nodes",
-    "content": " selector inside "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Template nodes",
-    "route": "/features/custom-nodes",
-    "fragment": "template-nodes",
-    "content": "vflow"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Template nodes",
-    "route": "/features/custom-nodes",
-    "fragment": "template-nodes",
-    "content": "Write your HTML inside this template You can also pass any data with "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Template nodes",
-    "route": "/features/custom-nodes",
-    "fragment": "template-nodes",
-    "content": "data"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Template nodes",
-    "route": "/features/custom-nodes",
-    "fragment": "template-nodes",
-    "content": " field on node, and then get it inside "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Template nodes",
-    "route": "/features/custom-nodes",
-    "fragment": "template-nodes",
-    "content": "ng-template"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Component nodes",
-    "route": "/features/custom-nodes",
-    "fragment": "component-nodes",
-    "content": "Another approach is to render nodes from components. Its benefits: type-safe node data accessgood for complex flows with many different node types Its limitations it's harder to manage events because such nodes are rendered dynamically How to create component node:"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Component nodes",
-    "route": "/features/custom-nodes",
-    "fragment": "component-nodes",
-    "content": "Create a regular angular standalone component Extend with "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Component nodes",
-    "route": "/features/custom-nodes",
-    "fragment": "component-nodes",
-    "content": "CustomNodeComponent"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Component nodes",
-    "route": "/features/custom-nodes",
-    "fragment": "component-nodes",
-    "content": " (please see the reference of this base component to get an idea of what fields you could use in your custom component node), otherwise it won't work! Pass your data interface to generic of "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Component nodes",
-    "route": "/features/custom-nodes",
-    "fragment": "component-nodes",
-    "content": "CustomNodeComponent"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Component nodes",
-    "route": "/features/custom-nodes",
-    "fragment": "component-nodes",
-    "content": " to use in component. This "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Component nodes",
-    "route": "/features/custom-nodes",
-    "fragment": "component-nodes",
-    "content": "data"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Component nodes",
-    "route": "/features/custom-nodes",
-    "fragment": "component-nodes",
-    "content": " comes from "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Component nodes",
-    "route": "/features/custom-nodes",
-    "fragment": "component-nodes",
-    "content": "Node"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Component nodes",
-    "route": "/features/custom-nodes",
-    "fragment": "component-nodes",
-    "content": " definition Use your new component in "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Component nodes",
-    "route": "/features/custom-nodes",
-    "fragment": "component-nodes",
-    "content": "type"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Component nodes",
-    "route": "/features/custom-nodes",
-    "fragment": "component-nodes",
-    "content": " field of "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Component nodes",
-    "route": "/features/custom-nodes",
-    "fragment": "component-nodes",
-    "content": "Node"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Component nodes",
-    "route": "/features/custom-nodes",
-    "fragment": "component-nodes",
-    "content": ". Library will render your node for you"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Handling events",
-    "route": "/features/custom-nodes",
-    "fragment": "handling-events",
-    "content": "This is an experimental API"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Handling events",
-    "route": "/features/custom-nodes",
-    "fragment": "handling-events",
-    "content": "There is a (onComponentNodeEvent) event on VflowComponent. Here is how it works:"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Handling events",
-    "route": "/features/custom-nodes",
-    "fragment": "handling-events",
-    "content": "It accumulates every "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Handling events",
-    "route": "/features/custom-nodes",
-    "fragment": "handling-events",
-    "content": "EventEmitter"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Handling events",
-    "route": "/features/custom-nodes",
-    "fragment": "handling-events",
-    "content": " of every component node of your flow It emits on every emit of those emitters"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Handling events",
-    "route": "/features/custom-nodes",
-    "fragment": "handling-events",
-    "content": "The shape of this accumulator-event contains following useful info: The Library also includes ComponentNodeEvent helper type to get type-safe event, where you just need to pass an array of your custom components in generic, and this type will infer proper types for eventName and eventPayload:"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Custom handles"
-    ],
-    "pageType": "guide",
-    "title": "Custom handles",
-    "section": "Custom handles",
-    "route": "/features/custom-handles",
-    "fragment": "custom-handles",
-    "content": "You can pass a [template] to HandleComponent with custom handle."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Custom handles"
-    ],
-    "pageType": "guide",
-    "title": "Custom handles",
-    "section": "Custom handles",
-    "route": "/features/custom-handles",
-    "fragment": "custom-handles",
-    "content": "I't important to note that template must be made with SVG."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Custom handles"
-    ],
-    "pageType": "guide",
-    "title": "Custom handles",
-    "section": "Custom handles",
-    "route": "/features/custom-handles",
-    "fragment": "custom-handles",
-    "content": "Custom handles are not positioned automatically, but the library provides a useful template context property to position your handle.Custom handles know if validation of ConnectionSettings.validator() has failed or succeeded, so you can use state() signal in let-ctx to add some behavior based on validation result. Refer to this interface for let-ctx when crafting your handle template:"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Default edges"
-    ],
-    "pageType": "guide",
-    "title": "Default edges",
-    "section": "Default edges",
-    "route": "/features/default-edges",
-    "fragment": "default-edges",
-    "content": "You can link nodes with edges. All you need to do is to create another Edge[] array and pass it to the vflow component. Each edge contains the id of the source and target nodes, and each edge must have its own id."
   },
   {
     "breadcrumbs": [
@@ -1849,16 +1813,39 @@
   },
   {
     "breadcrumbs": [
-      "Workshops",
-      "Layout",
-      "D3 Force"
+      "Features",
+      "Custom handles"
     ],
     "pageType": "guide",
-    "title": "D3 Force",
-    "section": "D3 Force",
-    "route": "/workshops/layout/force",
-    "fragment": "d3-force",
-    "content": "This is a simple example of using the d3-force layout package."
+    "title": "Custom handles",
+    "section": "Custom handles",
+    "route": "/features/custom-handles",
+    "fragment": "custom-handles",
+    "content": "You can pass a [template] to HandleComponent with custom handle."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom handles"
+    ],
+    "pageType": "guide",
+    "title": "Custom handles",
+    "section": "Custom handles",
+    "route": "/features/custom-handles",
+    "fragment": "custom-handles",
+    "content": "I't important to note that template must be made with SVG."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom handles"
+    ],
+    "pageType": "guide",
+    "title": "Custom handles",
+    "section": "Custom handles",
+    "route": "/features/custom-handles",
+    "fragment": "custom-handles",
+    "content": "Custom handles are not positioned automatically, but the library provides a useful template context property to position your handle.Custom handles know if validation of ConnectionSettings.validator() has failed or succeeded, so you can use state() signal in let-ctx to add some behavior based on validation result. Refer to this interface for let-ctx when crafting your handle template:"
   },
   {
     "breadcrumbs": [
@@ -1872,6 +1859,19 @@
     "route": "/workshops/layout/vizdom-layout",
     "fragment": "vizdom-layout",
     "content": "This is an example of using the vizdom library for computing layout."
+  },
+  {
+    "breadcrumbs": [
+      "Workshops",
+      "Layout",
+      "D3 Force"
+    ],
+    "pageType": "guide",
+    "title": "D3 Force",
+    "section": "D3 Force",
+    "route": "/workshops/layout/force",
+    "fragment": "d3-force",
+    "content": "This is a simple example of using the d3-force layout package."
   },
   {
     "breadcrumbs": [
