@@ -18,32 +18,59 @@ export class HandleModel {
     height: 10 + 2 * this.strokeWidth,
   });
 
-  public offset = computed(() => {
+  public pointAbsolute = computed(() => {
+    return {
+      x: this.parentNode.globalPoint().x + this.hostOffset().x + this.sizeOffset().x,
+      y: this.parentNode.globalPoint().y + this.hostOffset().y + this.sizeOffset().y,
+    };
+  });
+
+  public state = signal<HandleState>('idle');
+
+  private updateHostSizeAndPosition$ = new Subject<void>();
+
+  private hostSize = toSignal(this.updateHostSizeAndPosition$.pipe(map(() => this.getHostSize())), {
+    initialValue: { width: 0, height: 0 },
+  });
+
+  private hostPosition = toSignal(
+    this.updateHostSizeAndPosition$.pipe(
+      map(() => ({
+        x: this.hostReference instanceof HTMLElement ? this.hostReference.offsetLeft : 0, // for now just 0 for group nodes
+        y: this.hostReference instanceof HTMLElement ? this.hostReference.offsetTop : 0, // for now just 0 for group nodes
+      })),
+    ),
+    {
+      initialValue: { x: 0, y: 0 },
+    },
+  );
+
+  public hostOffset = computed(() => {
     switch (this.rawHandle.position) {
       case 'left':
         return {
           x: 0,
-          y: this.parentPosition().y + this.parentSize().height / 2,
+          y: this.hostPosition().y + this.hostSize().height / 2,
         };
       case 'right':
         return {
           x: this.parentNode.size().width,
-          y: this.parentPosition().y + this.parentSize().height / 2,
+          y: this.hostPosition().y + this.hostSize().height / 2,
         };
       case 'top':
         return {
-          x: this.parentPosition().x + this.parentSize().width / 2,
+          x: this.hostPosition().x + this.hostSize().width / 2,
           y: 0,
         };
       case 'bottom':
         return {
-          x: this.parentPosition().x + this.parentSize().width / 2,
+          x: this.hostPosition().x + this.hostSize().width / 2,
           y: this.parentNode.size().height,
         };
     }
   });
 
-  public sizeOffset = computed(() => {
+  private sizeOffset = computed(() => {
     switch (this.rawHandle.position) {
       case 'left':
         return { x: -(this.size().width / 2), y: 0 };
@@ -56,40 +83,13 @@ export class HandleModel {
     }
   });
 
-  public pointAbsolute = computed(() => {
-    return {
-      x: this.parentNode.globalPoint().x + this.offset().x + this.sizeOffset().x,
-      y: this.parentNode.globalPoint().y + this.offset().y + this.sizeOffset().y,
-    };
-  });
-
-  public state = signal<HandleState>('idle');
-
-  private updateParentSizeAndPosition$ = new Subject<void>();
-
-  public parentSize = toSignal(this.updateParentSizeAndPosition$.pipe(map(() => this.getParentSize())), {
-    initialValue: { width: 0, height: 0 },
-  });
-
-  public parentPosition = toSignal(
-    this.updateParentSizeAndPosition$.pipe(
-      map(() => ({
-        x: this.parentReference instanceof HTMLElement ? this.parentReference.offsetLeft : 0, // for now just 0 for group nodes
-        y: this.parentReference instanceof HTMLElement ? this.parentReference.offsetTop : 0, // for now just 0 for group nodes
-      })),
-    ),
-    {
-      initialValue: { x: 0, y: 0 },
-    },
-  );
-
-  public parentReference = this.rawHandle.parentReference!;
+  public hostReference = this.rawHandle.hostReference!;
 
   public template = this.rawHandle.template;
 
   public templateContext = {
     $implicit: {
-      point: this.offset,
+      point: this.hostOffset,
       state: this.state,
       node: this.parentNode.node,
     },
@@ -100,18 +100,18 @@ export class HandleModel {
     public parentNode: NodeModel,
   ) {}
 
-  public updateParent() {
-    this.updateParentSizeAndPosition$.next();
+  public updateHost() {
+    this.updateHostSizeAndPosition$.next();
   }
 
-  private getParentSize(): { width: number; height: number } {
-    if (this.parentReference instanceof HTMLElement) {
+  private getHostSize(): { width: number; height: number } {
+    if (this.hostReference instanceof HTMLElement) {
       return {
-        width: this.parentReference.offsetWidth,
-        height: this.parentReference.offsetHeight,
+        width: this.hostReference.offsetWidth,
+        height: this.hostReference.offsetHeight,
       };
-    } else if (this.parentReference instanceof SVGGraphicsElement) {
-      return this.parentReference.getBBox();
+    } else if (this.hostReference instanceof SVGGraphicsElement) {
+      return this.hostReference.getBBox();
     }
 
     return { width: 0, height: 0 };

@@ -101,8 +101,8 @@
     <svg:circle
       class="default-handle"
       r="5"
-      [attr.cx]="handle.offset().x"
-      [attr.cy]="handle.offset().y"
+      [attr.cx]="handle.hostOffset().x"
+      [attr.cy]="handle.hostOffset().y"
       [attr.stroke-width]="handle.strokeWidth"
       (pointerStart)="startConnection($event, handle)"
       (pointerEnd)="endConnection()" />
@@ -121,8 +121,8 @@
     <svg:circle
       class="magnet"
       [attr.r]="nodeModel().magnetRadius"
-      [attr.cx]="handle.offset().x"
-      [attr.cy]="handle.offset().y"
+      [attr.cx]="handle.hostOffset().x"
+      [attr.cy]="handle.hostOffset().y"
       (pointerEnd)="endConnection(); resetValidateConnection(handle)"
       (pointerOver)="validateConnection(handle)"
       (pointerOut)="resetValidateConnection(handle)" />

@@ -114,13 +114,13 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInje
       .handles$.pipe(
         switchMap((handles) =>
           resizable(
-            handles.map((h) => h.parentReference!),
+            handles.map((h) => h.hostReference!),
             this.zone,
           ).pipe(map(() => handles)),
         ),
         tap((handles) => {
           // TODO (performance) inspect how to avoid calls of this when flow initially rendered
-          handles.forEach((h) => h.updateParent());
+          handles.forEach((h) => h.updateHost());
         }),
         takeUntilDestroyed(),
       )
@@ -138,7 +138,7 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInje
           tap(() =>
             this.nodeModel()
               .handles()
-              .forEach((h) => h.updateParent()),
+              .forEach((h) => h.updateHost()),
           ),
           filter(() => !this.nodeModel().resizing()),
           tap(() => {
