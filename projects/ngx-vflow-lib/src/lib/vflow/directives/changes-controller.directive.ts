@@ -36,11 +36,17 @@ export class ChangesControllerDirective {
     alias: 'onNodesChange.position',
   });
 
+  /**
+   * @deprecated use `onNodesChange.position` instead
+   */
   public readonly onNodesChangePositionSignle = outputFromObservable(
     this.singleChange(this.nodeChangesOfType('position')),
     { alias: 'onNodesChange.position.single' },
   );
 
+  /**
+   * @deprecated use `onNodesChange.position` instead
+   */
   public readonly onNodesChangePositionMany = outputFromObservable(
     this.manyChanges(this.nodeChangesOfType('position')),
     { alias: 'onNodesChange.position.many' },
@@ -50,10 +56,16 @@ export class ChangesControllerDirective {
     alias: 'onNodesChange.size',
   });
 
+  /**
+   * @deprecated use `onNodesChange.size` instead
+   */
   public readonly onNodesChangeSizeSingle = outputFromObservable(this.singleChange(this.nodeChangesOfType('size')), {
     alias: 'onNodesChange.size.single',
   });
 
+  /**
+   * @deprecated use `onNodesChange.size` instead
+   */
   public readonly onNodesChangeSizeMany = outputFromObservable(this.manyChanges(this.nodeChangesOfType('size')), {
     alias: 'onNodesChange.size.many',
   });
@@ -62,10 +74,16 @@ export class ChangesControllerDirective {
     alias: 'onNodesChange.add',
   });
 
+  /**
+   * @deprecated use `onNodesChange.add` instead
+   */
   public readonly onNodesChangeAddSingle = outputFromObservable(this.singleChange(this.nodeChangesOfType('add')), {
     alias: 'onNodesChange.add.single',
   });
 
+  /**
+   * @deprecated use `onNodesChange.add` instead
+   */
   public readonly onNodesChangeAddMany = outputFromObservable(this.manyChanges(this.nodeChangesOfType('add')), {
     alias: 'onNodesChange.add.many',
   });
@@ -74,11 +92,17 @@ export class ChangesControllerDirective {
     alias: 'onNodesChange.remove',
   });
 
+  /**
+   * @deprecated use `onNodesChange.remove` instead
+   */
   public readonly onNodesChangeRemoveSingle = outputFromObservable(
     this.singleChange(this.nodeChangesOfType('remove')),
     { alias: 'onNodesChange.remove.single' },
   );
 
+  /**
+   * @deprecated use `onNodesChange.remove` instead
+   */
   public readonly onNodesChangeRemoveMany = outputFromObservable(this.manyChanges(this.nodeChangesOfType('remove')), {
     alias: 'onNodesChange.remove.many',
   });
@@ -87,11 +111,17 @@ export class ChangesControllerDirective {
     alias: 'onNodesChange.select',
   });
 
+  /**
+   * @deprecated use `onNodesChange.select` instead
+   */
   public readonly onNodesChangeSelectSingle = outputFromObservable(
     this.singleChange(this.nodeChangesOfType('select')),
     { alias: 'onNodesChange.select.single' },
   );
 
+  /**
+   * @deprecated use `onNodesChange.select` instead
+   */
   public readonly onNodesChangeSelectMany = outputFromObservable(this.manyChanges(this.nodeChangesOfType('select')), {
     alias: 'onNodesChange.select.many',
   });
@@ -105,11 +135,17 @@ export class ChangesControllerDirective {
     alias: 'onEdgesChange.detached',
   });
 
+  /**
+   * @deprecated use `onEdgesChange.detached` instead
+   */
   public readonly onNodesChangeDetachedSingle = outputFromObservable(
     this.singleChange(this.edgeChangesOfType('detached')),
     { alias: 'onEdgesChange.detached.single' },
   );
 
+  /**
+   * @deprecated use `onEdgesChange.detached` instead
+   */
   public readonly onNodesChangeDetachedMany = outputFromObservable(
     this.manyChanges(this.edgeChangesOfType('detached')),
     { alias: 'onEdgesChange.detached.many' },
@@ -119,10 +155,16 @@ export class ChangesControllerDirective {
     alias: 'onEdgesChange.add',
   });
 
+  /**
+   * @deprecated use `onEdgesChange.add` instead
+   */
   public readonly onEdgeChangeAddSingle = outputFromObservable(this.singleChange(this.edgeChangesOfType('add')), {
     alias: 'onEdgesChange.add.single',
   });
 
+  /**
+   * @deprecated use `onEdgesChange.add` instead
+   */
   public readonly onEdgeChangeAddMany = outputFromObservable(this.manyChanges(this.edgeChangesOfType('add')), {
     alias: 'onEdgesChange.add.many',
   });
@@ -131,10 +173,16 @@ export class ChangesControllerDirective {
     alias: 'onEdgesChange.remove',
   });
 
+  /**
+   * @deprecated use `onEdgesChange.remove` instead
+   */
   public readonly onEdgeChangeRemoveSingle = outputFromObservable(this.singleChange(this.edgeChangesOfType('remove')), {
     alias: 'onEdgesChange.remove.single',
   });
 
+  /**
+   * @deprecated use `onEdgesChange.remove` instead
+   */
   public readonly onEdgeChangeRemoveMany = outputFromObservable(this.manyChanges(this.edgeChangesOfType('remove')), {
     alias: 'onEdgesChange.remove.many',
   });
@@ -143,10 +191,16 @@ export class ChangesControllerDirective {
     alias: 'onEdgesChange.select',
   });
 
+  /**
+   * @deprecated use `onEdgesChange.select` instead
+   */
   public readonly onEdgeChangeSelectSingle = outputFromObservable(this.singleChange(this.edgeChangesOfType('select')), {
     alias: 'onEdgesChange.select.single',
   });
 
+  /**
+   * @deprecated use `onEdgesChange.select` instead
+   */
   public readonly onEdgeChangeSelectMany = outputFromObservable(this.manyChanges(this.edgeChangesOfType('select')), {
     alias: 'onEdgesChange.select.many',
   });
