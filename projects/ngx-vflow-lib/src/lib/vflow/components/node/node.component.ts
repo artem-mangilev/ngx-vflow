@@ -91,9 +91,6 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInje
       this.flowStatusService.status().state === 'connection-validation',
   );
 
-  protected styleWidth = computed(() => `${this.nodeModel().size().width}px`);
-  protected styleHeight = computed(() => `${this.nodeModel().size().height}px`);
-
   protected toolbar = computed(() => this.overlaysService.nodeToolbars().get(this.nodeModel()));
 
   @InjectionContext

@@ -8,10 +8,10 @@
     <default-node
       #htmlWrapper
       [selected]="nodeModel().selected()"
-      [style.width]="styleWidth()"
-      [style.height]="styleHeight()"
-      [style.max-width]="styleWidth()"
-      [style.max-height]="styleHeight()">
+      [style.width]="nodeModel().styleWidth()"
+      [style.height]="nodeModel().styleHeight()"
+      [style.max-width]="nodeModel().styleWidth()"
+      [style.max-height]="nodeModel().styleHeight()">
       <div [outerHTML]="nodeModel().text()"></div>
 
       <handle type="source" position="right" />
@@ -27,7 +27,11 @@
     [attr.width]="nodeModel().size().width"
     [attr.height]="nodeModel().size().height"
     (pointerStart)="pullNode()">
-    <div #htmlWrapper class="wrapper" [style.width]="styleWidth()" [style.height]="styleHeight()">
+    <div
+      #htmlWrapper
+      class="wrapper"
+      [style.width]="nodeModel().styleWidth()"
+      [style.height]="nodeModel().styleHeight()">
       <ng-container
         [ngTemplateOutlet]="nodeTemplate() ?? null"
         [ngTemplateOutletContext]="{
@@ -45,7 +49,11 @@
     [attr.width]="nodeModel().size().width"
     [attr.height]="nodeModel().size().height"
     (pointerStart)="pullNode()">
-    <div #htmlWrapper class="wrapper" [style.width]="styleWidth()" [style.height]="styleHeight()">
+    <div
+      #htmlWrapper
+      class="wrapper"
+      [style.width]="nodeModel().styleWidth()"
+      [style.height]="nodeModel().styleHeight()">
       <ng-container
         [ngComponentOutlet]="$any(nodeModel().node.type)"
         [ngComponentOutletInputs]="nodeModel().componentTypeInputs"

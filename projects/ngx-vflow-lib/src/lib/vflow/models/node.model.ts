@@ -29,6 +29,9 @@ export class NodeModel<T = unknown> implements FlowEntity {
   public width = computed(() => this.size().width);
   public height = computed(() => this.size().height);
 
+  public styleWidth = computed(() => `${this.size().width}px`);
+  public styleHeight = computed(() => `${this.size().height}px`);
+
   public renderOrder = signal(0);
 
   public selected = signal(false);
