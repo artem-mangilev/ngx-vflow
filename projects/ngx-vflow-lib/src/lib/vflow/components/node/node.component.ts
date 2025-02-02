@@ -77,7 +77,7 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInje
   // TODO remove dependency from this directive
   private connectionController = inject(ConnectionControllerDirective, { optional: true });
 
-  public nodeModel = input.required<NodeModel>();
+  public model = input.required<NodeModel>();
 
   public nodeTemplate = input<TemplateRef<any>>();
 
@@ -91,23 +91,23 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInje
       this.flowStatusService.status().state === 'connection-validation',
   );
 
-  protected toolbar = computed(() => this.overlaysService.nodeToolbars().get(this.nodeModel()));
+  protected toolbar = computed(() => this.overlaysService.nodeToolbars().get(this.model()));
 
   @InjectionContext
   public ngOnInit() {
-    this.nodeAccessor.model.set(this.nodeModel());
+    this.nodeAccessor.model.set(this.model());
 
-    this.handleService.node.set(this.nodeModel());
+    this.handleService.node.set(this.model());
 
     effect(() => {
-      if (this.nodeModel().draggable()) {
-        this.draggableService.enable(this.hostRef.nativeElement, this.nodeModel());
+      if (this.model().draggable()) {
+        this.draggableService.enable(this.hostRef.nativeElement, this.model());
       } else {
         this.draggableService.disable(this.hostRef.nativeElement);
       }
     });
 
-    this.nodeModel()
+    this.model()
       .handles$.pipe(
         switchMap((handles) =>
           resizable(
@@ -126,23 +126,23 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInje
 
   @InjectionContext
   public ngAfterViewInit(): void {
-    this.nodeModel().linkDefaultNodeSizeWithModelSize();
+    this.model().linkDefaultNodeSizeWithModelSize();
 
-    if (this.nodeModel().node.type === 'html-template' || this.nodeModel().isComponentType) {
+    if (this.model().node.type === 'html-template' || this.model().isComponentType) {
       resizable([this.htmlWrapperRef().nativeElement], this.zone)
         .pipe(
           startWith(null),
           tap(() =>
-            this.nodeModel()
+            this.model()
               .handles()
               .forEach((h) => h.updateHost()),
           ),
-          filter(() => !this.nodeModel().resizing()),
+          filter(() => !this.model().resizing()),
           tap(() => {
             const width = this.htmlWrapperRef().nativeElement.clientWidth;
             const height = this.htmlWrapperRef().nativeElement.clientHeight;
 
-            this.nodeModel().size.set({ width, height });
+            this.model().size.set({ width, height });
           }),
           takeUntilDestroyed(),
         )
@@ -174,12 +174,12 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInje
   }
 
   protected pullNode() {
-    this.nodeRenderingService.pullNode(this.nodeModel());
+    this.nodeRenderingService.pullNode(this.model());
   }
 
   protected selectNode() {
     if (this.flowSettingsService.entitiesSelectable()) {
-      this.selectionService.select(this.nodeModel());
+      this.selectionService.select(this.model());
     }
   }
 }
