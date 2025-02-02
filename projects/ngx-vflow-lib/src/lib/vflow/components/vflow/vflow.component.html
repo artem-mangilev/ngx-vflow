@@ -12,7 +12,7 @@
       @for (model of groups(); track trackNodes($index, model)) {
         <svg:g
           node
-          [nodeModel]="model"
+          [model]="model"
           [groupNodeTemplate]="groupNodeTemplateDirective()?.templateRef"
           [attr.transform]="model.pointTransform()" />
       }
@@ -28,7 +28,7 @@
       @for (model of nonGroups(); track trackNodes($index, model)) {
         <svg:g
           node
-          [nodeModel]="model"
+          [model]="model"
           [nodeTemplate]="nodeTemplateDirective()?.templateRef"
           [attr.transform]="model.pointTransform()" />
       }
@@ -47,7 +47,7 @@
       @for (model of nodeModels(); track trackNodes($index, model)) {
         <svg:g
           node
-          [nodeModel]="model"
+          [model]="model"
           [nodeTemplate]="nodeTemplateDirective()?.templateRef"
           [groupNodeTemplate]="groupNodeTemplateDirective()?.templateRef"
           [attr.transform]="model.pointTransform()" />

@@ -55,7 +55,7 @@ export class HandleComponent implements OnInit, WithInjector {
           position: this.position(),
           type: this.type(),
           id: this.id(),
-          parentReference: this.element.parentElement!,
+          hostReference: this.element.parentElement!,
           template: this.template(),
         },
         node,
@@ -63,7 +63,7 @@ export class HandleComponent implements OnInit, WithInjector {
 
       this.handleService.createHandle(this.model);
 
-      requestAnimationFrame(() => this.model.updateParent());
+      requestAnimationFrame(() => this.model.updateHost());
 
       this.destroyRef.onDestroy(() => this.handleService.destroyHandle(this.model));
     }

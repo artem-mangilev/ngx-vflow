@@ -105,5 +105,5 @@ function moveNode(model: NodeModel, point: Point) {
     point.y = Math.max(0, point.y);
   }
 
-  model.setPoint(point, true);
+  model.setPoint(point);
 }

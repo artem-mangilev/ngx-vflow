@@ -9,7 +9,7 @@ export interface NodeHandle {
   position: Position;
   type: HandleType;
   id?: string;
-  parentReference?: Element;
+  hostReference?: Element;
   template?: TemplateRef<any>;
 }
 

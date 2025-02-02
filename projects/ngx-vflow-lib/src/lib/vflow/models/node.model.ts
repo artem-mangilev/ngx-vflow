@@ -7,40 +7,30 @@ import {
   isDynamicNode,
 } from '../interfaces/node.interface';
 import { isDefined } from '../utils/is-defined';
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { toObservable } from '@angular/core/rxjs-interop';
 import { HandleModel } from './handle.model';
 import { FlowEntity } from '../interfaces/flow-entity.interface';
-import { FlowSettingsService } from '../services/flow-settings.service';
-import { animationFrameScheduler, merge, observeOn, Subject } from 'rxjs';
 import { Point } from '../interfaces/point.interface';
 import { FlowEntitiesService } from '../services/flow-entities.service';
 
-// TODO bad naming around points
 export class NodeModel<T = unknown> implements FlowEntity {
   private static defaultWidth = 100;
   private static defaultHeight = 50;
   private static defaultColor = '#1b262c';
 
-  private flowSettingsService = inject(FlowSettingsService);
   private entitiesService = inject(FlowEntitiesService);
 
-  private internalPoint = this.createInternalPointSignal();
-
-  private throttledPoint$ = toObservable(this.internalPoint).pipe(observeOn(animationFrameScheduler));
-
-  private notThrottledPoint$ = new Subject<Point>();
-
-  public point = toSignal(merge(this.throttledPoint$, this.notThrottledPoint$), {
-    initialValue: this.internalPoint(),
-  });
-
-  public point$ = this.throttledPoint$;
+  public point = this.createInternalPointSignal();
+  public point$ = toObservable(this.point);
 
   public size = signal({ width: 0, height: 0 });
   public size$ = toObservable(this.size);
 
   public width = computed(() => this.size().width);
   public height = computed(() => this.size().height);
+
+  public styleWidth = computed(() => `${this.size().width}px`);
+  public styleHeight = computed(() => `${this.size().height}px`);
 
   public renderOrder = signal(0);
 
@@ -65,7 +55,6 @@ export class NodeModel<T = unknown> implements FlowEntity {
   public pointTransform = computed(() => `translate(${this.globalPoint().x}, ${this.globalPoint().y})`);
 
   public handles = signal<HandleModel[]>([]);
-
   public handles$ = toObservable(this.handles);
 
   public draggable = signal(true);
@@ -132,12 +121,8 @@ export class NodeModel<T = unknown> implements FlowEntity {
     }
   }
 
-  public setPoint(point: Point, throttle: boolean) {
-    if (throttle) {
-      this.internalPoint.set(point);
-    } else {
-      this.notThrottledPoint$.next(point);
-    }
+  public setPoint(point: Point) {
+    this.point.set(point);
   }
 
   /**
