@@ -7,6 +7,7 @@
     (pointerStart)="pullNode(); selectNode()">
     <default-node
       #htmlWrapper
+      nodeHandlesController
       [selected]="model().selected()"
       [style.width]="model().styleWidth()"
       [style.height]="model().styleHeight()"
@@ -27,7 +28,12 @@
     [attr.width]="model().size().width"
     [attr.height]="model().size().height"
     (pointerStart)="pullNode()">
-    <div #htmlWrapper class="wrapper" [style.width]="model().styleWidth()" [style.height]="model().styleHeight()">
+    <div
+      #htmlWrapper
+      nodeHandlesController
+      class="wrapper"
+      [style.width]="model().styleWidth()"
+      [style.height]="model().styleHeight()">
       <ng-container
         [ngTemplateOutlet]="nodeTemplate() ?? null"
         [ngTemplateOutletContext]="{
@@ -45,7 +51,12 @@
     [attr.width]="model().size().width"
     [attr.height]="model().size().height"
     (pointerStart)="pullNode()">
-    <div #htmlWrapper class="wrapper" [style.width]="model().styleWidth()" [style.height]="model().styleHeight()">
+    <div
+      #htmlWrapper
+      nodeHandlesController
+      class="wrapper"
+      [style.width]="model().styleWidth()"
+      [style.height]="model().styleHeight()">
       <ng-container
         [ngComponentOutlet]="$any(model().node.type)"
         [ngComponentOutletInputs]="model().componentTypeInputs"
@@ -73,7 +84,7 @@
 
 <!-- Template group node  -->
 @if (model().node.type === 'template-group' && groupNodeTemplate()) {
-  <svg:g class="selectable" (pointerStart)="pullNode()">
+  <svg:g class="selectable" nodeHandlesController (pointerStart)="pullNode()">
     <ng-container
       [ngTemplateOutlet]="groupNodeTemplate() ?? null"
       [ngTemplateOutletContext]="{

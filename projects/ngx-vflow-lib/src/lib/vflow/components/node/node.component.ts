@@ -60,8 +60,8 @@ export type HandleState = 'valid' | 'invalid' | 'idle';
     NgComponentOutlet,
     ResizableComponent,
     HandleSizeControllerDirective,
+    NodeHandlesControllerDirective,
   ],
-  hostDirectives: [NodeHandlesControllerDirective],
 })
 export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInjector {
   public injector = inject(Injector);
@@ -121,11 +121,6 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInje
       resizable([this.htmlWrapperRef().nativeElement], this.zone)
         .pipe(
           startWith(null),
-          tap(() =>
-            this.model()
-              .handles()
-              .forEach((h) => h.updateHost()),
-          ),
           filter(() => !this.model().resizing()),
           tap(() => {
             const width = this.htmlWrapperRef().nativeElement.clientWidth;
