@@ -21,7 +21,7 @@ import { FlowStatusService } from '../../services/flow-status.service';
 import { HandleService } from '../../services/handle.service';
 import { HandleModel } from '../../models/handle.model';
 import { resizable } from '../../utils/resizable';
-import { filter, map, startWith, switchMap, tap } from 'rxjs';
+import { filter, startWith, tap } from 'rxjs';
 import { InjectionContext, WithInjector } from '../../decorators/run-in-injection-context.decorator';
 import { NodeRenderingService } from '../../services/node-rendering.service';
 import { FlowSettingsService } from '../../services/flow-settings.service';
@@ -38,6 +38,7 @@ import { PointerDirective } from '../../directives/pointer.directive';
 // public components that uses in default node (loaded by defer)
 import { ResizableComponent } from '../../public-components/resizable/resizable.component';
 import { HandleComponent } from '../../public-components/handle/handle.component';
+import { NodeHandlesControllerDirective } from '../../directives/node-handles-controller.directive';
 
 export type HandleState = 'valid' | 'invalid' | 'idle';
 
@@ -60,6 +61,7 @@ export type HandleState = 'valid' | 'invalid' | 'idle';
     ResizableComponent,
     HandleSizeControllerDirective,
   ],
+  hostDirectives: [NodeHandlesControllerDirective],
 })
 export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInjector {
   public injector = inject(Injector);
@@ -93,41 +95,28 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInje
 
   protected toolbar = computed(() => this.overlaysService.nodeToolbars().get(this.model()));
 
-  @InjectionContext
   public ngOnInit() {
     this.nodeAccessor.model.set(this.model());
 
     this.handleService.node.set(this.model());
 
-    effect(() => {
-      if (this.model().draggable()) {
-        this.draggableService.enable(this.hostRef.nativeElement, this.model());
-      } else {
-        this.draggableService.disable(this.hostRef.nativeElement);
-      }
-    });
-
-    this.model()
-      .handles$.pipe(
-        switchMap((handles) =>
-          resizable(
-            handles.map((h) => h.hostReference!),
-            this.zone,
-          ).pipe(map(() => handles)),
-        ),
-        tap((handles) => {
-          // TODO (performance) inspect how to avoid calls of this when flow initially rendered
-          handles.forEach((h) => h.updateHost());
-        }),
-        takeUntilDestroyed(),
-      )
-      .subscribe();
+    effect(
+      () => {
+        if (this.model().draggable()) {
+          this.draggableService.enable(this.hostRef.nativeElement, this.model());
+        } else {
+          this.draggableService.disable(this.hostRef.nativeElement);
+        }
+      },
+      { injector: this.injector },
+    );
   }
 
   @InjectionContext
   public ngAfterViewInit(): void {
     this.model().linkDefaultNodeSizeWithModelSize();
 
+    // TODO: move to directive?
     if (this.model().node.type === 'html-template' || this.model().isComponentType) {
       resizable([this.htmlWrapperRef().nativeElement], this.zone)
         .pipe(
