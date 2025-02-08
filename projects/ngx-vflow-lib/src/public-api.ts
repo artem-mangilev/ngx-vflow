@@ -41,3 +41,4 @@ export * from './lib/vflow/directives/drag-handle.directive';
 
 // Testing
 export * from './lib/vflow/testing-utils/provide-custom-node-mocks';
+export * from './lib/vflow/testing-utils/component-mocks/vflow-mock.component';
