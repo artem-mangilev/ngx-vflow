@@ -6,7 +6,6 @@
     [attr.height]="model().size().height"
     (pointerStart)="pullNode(); selectNode()">
     <default-node
-      #htmlWrapper
       nodeHandlesController
       [selected]="model().selected()"
       [style.width]="model().styleWidth()"
@@ -29,8 +28,8 @@
     [attr.height]="model().size().height"
     (pointerStart)="pullNode()">
     <div
-      #htmlWrapper
       nodeHandlesController
+      nodeResizeController
       class="wrapper"
       [style.width]="model().styleWidth()"
       [style.height]="model().styleHeight()">
@@ -52,8 +51,8 @@
     [attr.height]="model().size().height"
     (pointerStart)="pullNode()">
     <div
-      #htmlWrapper
       nodeHandlesController
+      nodeResizeController
       class="wrapper"
       [style.width]="model().styleWidth()"
       [style.height]="model().styleHeight()">

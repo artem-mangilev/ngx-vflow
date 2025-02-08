@@ -4,7 +4,6 @@ import {
   Component,
   ElementRef,
   Injector,
-  NgZone,
   OnDestroy,
   OnInit,
   TemplateRef,
@@ -12,17 +11,12 @@ import {
   effect,
   inject,
   input,
-  viewChild,
 } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DraggableService } from '../../services/draggable.service';
 import { NodeModel } from '../../models/node.model';
 import { FlowStatusService } from '../../services/flow-status.service';
 import { HandleService } from '../../services/handle.service';
 import { HandleModel } from '../../models/handle.model';
-import { resizable } from '../../utils/resizable';
-import { filter, startWith, tap } from 'rxjs';
-import { InjectionContext, WithInjector } from '../../decorators/run-in-injection-context.decorator';
 import { NodeRenderingService } from '../../services/node-rendering.service';
 import { FlowSettingsService } from '../../services/flow-settings.service';
 import { SelectionService } from '../../services/selection.service';
@@ -39,6 +33,7 @@ import { PointerDirective } from '../../directives/pointer.directive';
 import { ResizableComponent } from '../../public-components/resizable/resizable.component';
 import { HandleComponent } from '../../public-components/handle/handle.component';
 import { NodeHandlesControllerDirective } from '../../directives/node-handles-controller.directive';
+import { NodeResizeControllerDirective } from '../../directives/node-resize-controller.directive';
 
 export type HandleState = 'valid' | 'invalid' | 'idle';
 
@@ -61,10 +56,11 @@ export type HandleState = 'valid' | 'invalid' | 'idle';
     ResizableComponent,
     HandleSizeControllerDirective,
     NodeHandlesControllerDirective,
+    NodeResizeControllerDirective,
   ],
 })
-export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInjector {
-  public injector = inject(Injector);
+export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
+  protected injector = inject(Injector);
   private handleService = inject(HandleService);
   private draggableService = inject(DraggableService);
   private flowStatusService = inject(FlowStatusService);
@@ -74,7 +70,6 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInje
   private hostRef = inject<ElementRef<SVGElement>>(ElementRef);
   private nodeAccessor = inject(NodeAccessorService);
   private overlaysService = inject(OverlaysService);
-  private zone = inject(NgZone);
 
   // TODO remove dependency from this directive
   private connectionController = inject(ConnectionControllerDirective, { optional: true });
@@ -84,8 +79,6 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInje
   public nodeTemplate = input<TemplateRef<any>>();
 
   public groupNodeTemplate = input<TemplateRef<any>>();
-
-  public htmlWrapperRef = viewChild.required<ElementRef<HTMLDivElement>>('htmlWrapper');
 
   protected showMagnet = computed(
     () =>
@@ -112,26 +105,8 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy, WithInje
     );
   }
 
-  @InjectionContext
   public ngAfterViewInit(): void {
     this.model().linkDefaultNodeSizeWithModelSize();
-
-    // TODO: move to directive?
-    if (this.model().node.type === 'html-template' || this.model().isComponentType) {
-      resizable([this.htmlWrapperRef().nativeElement], this.zone)
-        .pipe(
-          startWith(null),
-          filter(() => !this.model().resizing()),
-          tap(() => {
-            const width = this.htmlWrapperRef().nativeElement.clientWidth;
-            const height = this.htmlWrapperRef().nativeElement.clientHeight;
-
-            this.model().size.set({ width, height });
-          }),
-          takeUntilDestroyed(),
-        )
-        .subscribe();
-    }
   }
 
   public ngOnDestroy(): void {
