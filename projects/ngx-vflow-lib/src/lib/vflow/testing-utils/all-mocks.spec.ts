@@ -1,24 +1,11 @@
 import { ChangeDetectionStrategy, Component, viewChild } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { VflowMockComponent } from './component-mocks/vflow-mock.component';
-import { MiniMapMockComponent } from './component-mocks/minimap-mock.component';
-import { NodeToolbarMockComponent } from './component-mocks/node-toolbar-mock.component';
-import { SelectableMockDirective } from './directive-mocks/selectable-mock.directive';
-import { ConnectionControllerMockDirective } from './directive-mocks/connection-controller-mock.directive';
-import {
-  ConnectionTemplateMockDirective,
-  EdgeLabelHtmlTemplateMockDirective,
-  EdgeTemplateMockDirective,
-  GroupNodeTemplateMockDirective,
-  NodeHtmlTemplateMockDirective,
-} from './directive-mocks/template-mock.directive';
 import { VflowComponent } from '../components/vflow/vflow.component';
 import { Vflow } from '../vflow';
 import { Node } from '../interfaces/node.interface';
-import { ResizableMockComponent } from './component-mocks/resizable-mock.component';
-import { HandleMockComponent } from './component-mocks/handle-mock.component';
 import { Edge } from '../interfaces/edge.interface';
 import { ConnectionSettings } from '../interfaces/connection-settings.interface';
+import { VflowMocks } from './vflow-mocks';
 
 @Component({
   template: `
@@ -182,20 +169,7 @@ describe('VflowMockComponent', () => {
           imports: [Vflow],
         },
         add: {
-          imports: [
-            VflowMockComponent,
-            MiniMapMockComponent,
-            ResizableMockComponent,
-            HandleMockComponent,
-            NodeToolbarMockComponent,
-            SelectableMockDirective,
-            ConnectionControllerMockDirective,
-            NodeHtmlTemplateMockDirective,
-            GroupNodeTemplateMockDirective,
-            EdgeTemplateMockDirective,
-            EdgeLabelHtmlTemplateMockDirective,
-            ConnectionTemplateMockDirective,
-          ],
+          imports: [VflowMocks],
         },
       })
       .compileComponents();
