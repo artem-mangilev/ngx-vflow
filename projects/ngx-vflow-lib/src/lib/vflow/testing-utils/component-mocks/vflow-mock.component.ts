@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, input, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, contentChild, input, output, signal, WritableSignal } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
 import { Node, DynamicNode } from '../../interfaces/node.interface';
 import { Edge } from '../../interfaces/edge.interface';
 import { Point } from '../../interfaces/point.interface';
@@ -11,12 +12,106 @@ import { NodeChange } from '../../types/node-change.type';
 import { EdgeChange } from '../../types/edge-change.type';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { FitViewOptions } from '../../interfaces/fit-view-options.interface';
-
+import {
+  ConnectionTemplateMockDirective,
+  EdgeLabelHtmlTemplateMockDirective,
+  EdgeTemplateMockDirective,
+  GroupNodeTemplateMockDirective,
+  NodeHtmlTemplateMockDirective,
+} from '../directive-mocks/template-mock.directive';
 @Component({
   selector: 'vflow',
-  template: '<ng-content />',
+  template: `
+    <ng-content />
+
+    @for (node of nodes(); track $index) {
+      @if (node.type === 'html-template') {
+        <ng-component
+          [ngTemplateOutlet]="nodeTemplateDirective()?.templateRef ?? null"
+          [ngTemplateOutletContext]="{
+            $implicit: {
+              node: node,
+              selected: createSignal(false),
+            },
+          }" />
+      }
+
+      @if (node.type === 'template-group') {
+        <ng-component
+          [ngTemplateOutlet]="groupNodeTemplateDirective()?.templateRef ?? null"
+          [ngTemplateOutletContext]="{
+            $implicit: {
+              node: node,
+              selected: createSignal(false),
+              width: createSignal(node.width),
+              height: createSignal(node.height),
+            },
+          }" />
+      }
+    }
+
+    @for (edge of edges(); track $index) {
+      @if (edge.type === 'template') {
+        <ng-component
+          [ngTemplateOutlet]="edgeTemplateDirective()?.templateRef ?? null"
+          [ngTemplateOutletContext]="{
+            $implicit: {
+              edge: edge,
+              selected: createSignal(false),
+              path: createSignal(''),
+              markerStart: createSignal(''),
+              markerEnd: createSignal(''),
+            },
+          }" />
+
+        @if (edge.edgeLabels?.start) {
+          <ng-component
+            [ngTemplateOutlet]="edgeLabelHtmlDirective()?.templateRef ?? null"
+            [ngTemplateOutletContext]="{
+              $implicit: {
+                edge: edge,
+              },
+            }" />
+        }
+
+        @if (edge.edgeLabels?.center) {
+          <ng-component
+            [ngTemplateOutlet]="edgeLabelHtmlDirective()?.templateRef ?? null"
+            [ngTemplateOutletContext]="{
+              $implicit: {
+                edge: edge,
+                label: edge.edgeLabels?.center,
+              },
+            }" />
+        }
+
+        @if (edge.edgeLabels?.end) {
+          <ng-component
+            [ngTemplateOutlet]="edgeLabelHtmlDirective()?.templateRef ?? null"
+            [ngTemplateOutletContext]="{
+              $implicit: {
+                edge: edge,
+                label: edge.edgeLabels?.end,
+              },
+            }" />
+        }
+      }
+    }
+
+    @if (connection()?.type === 'template') {
+      <ng-component
+        [ngTemplateOutlet]="connectionTemplateDirective()?.templateRef ?? null"
+        [ngTemplateOutletContext]="{
+          $implicit: {
+            path: createSignal(''),
+            marker: createSignal(''),
+          },
+        }" />
+    }
+  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
+  imports: [NgTemplateOutlet],
 })
 export class VflowMockComponent {
   public readonly nodes = input.required<Node[] | DynamicNode[]>();
@@ -37,6 +132,16 @@ export class VflowMockComponent {
 
   // eslint-disable-next-line @angular-eslint/no-output-on-prefix
   public readonly onComponentNodeEvent = output<any>();
+
+  protected nodeTemplateDirective = contentChild(NodeHtmlTemplateMockDirective);
+
+  protected groupNodeTemplateDirective = contentChild(GroupNodeTemplateMockDirective);
+
+  protected edgeTemplateDirective = contentChild(EdgeTemplateMockDirective);
+
+  protected edgeLabelHtmlDirective = contentChild(EdgeLabelHtmlTemplateMockDirective);
+
+  protected connectionTemplateDirective = contentChild(ConnectionTemplateMockDirective);
 
   public viewport = signal<ViewportState>({
     x: 0,
@@ -73,10 +178,14 @@ export class VflowMockComponent {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public getNode<T = unknown>(id: string): Node<T> | DynamicNode<T> | undefined {
-    return undefined;
+    return this.nodes().find((node) => node.id === id);
   }
 
   public getDetachedEdges(): Edge[] {
     return [];
+  }
+
+  protected createSignal<T>(value: T): WritableSignal<T> {
+    return signal(value);
   }
 }
