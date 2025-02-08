@@ -1,7 +1,9 @@
 import { ChangeDetectionStrategy, Component, viewChild } from '@angular/core';
-import { Vflow, VflowComponent } from 'ngx-vflow';
+import { HandleMockComponent, ResizableMockComponent, Vflow, VflowComponent } from 'ngx-vflow';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { VflowMockComponent } from '../../testing-utils/component-mocks/vflow-mock.component';
+import { MiniMapMockComponent } from './minimap-mock.component';
+import { NodeToolbarMockComponent } from './node-toolbar-mock.component';
 
 @Component({
   template: `
@@ -17,7 +19,25 @@ import { VflowMockComponent } from '../../testing-utils/component-mocks/vflow-mo
       [entitiesSelectable]="true"
       [keyboardShortcuts]="{ multiSelection: null }"
       [connection]="{}"
-      (onComponentNodeEvent)="(null)" />
+      (onComponentNodeEvent)="(null)">
+      <div resizable [resizerColor]="'#2e414c'" [gap]="1.5">
+        <handle [position]="'left'" [type]="'source'" [id]="'1'" [template]="handleTemplate" />
+
+        <ng-template #handleTemplate>
+          <div>Handle Template</div>
+        </ng-template>
+
+        <node-toolbar position="left">
+          <button>Delete</button>
+        </node-toolbar>
+      </div>
+
+      <mini-map
+        [maskColor]="'rgba(215, 215, 215, 0.6)'"
+        [strokeColor]="'rgb(200, 200, 200)'"
+        [position]="'bottom-right'"
+        [scaleOnHover]="true" />
+    </vflow>
   `,
   standalone: true,
   imports: [Vflow],
@@ -84,7 +104,13 @@ describe('VflowMockComponent', () => {
           imports: [Vflow],
         },
         add: {
-          imports: [VflowMockComponent],
+          imports: [
+            VflowMockComponent,
+            MiniMapMockComponent,
+            ResizableMockComponent,
+            HandleMockComponent,
+            NodeToolbarMockComponent,
+          ],
         },
       })
       .compileComponents();
