@@ -125,8 +125,9 @@ export class ResizableComponent implements OnInit, AfterViewInit {
       this.minHeight,
     );
 
-    this.model.setPoint({ x, y }, false);
-    this.model.size.set({ width, height });
+    this.model.setPoint({ x, y });
+    this.model.width.set(width);
+    this.model.height.set(height);
   }
 
   protected endResize() {

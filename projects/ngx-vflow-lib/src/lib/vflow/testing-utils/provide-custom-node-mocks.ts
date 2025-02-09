@@ -23,6 +23,15 @@ export function provideCustomNodeMocks(): Provider[] {
       },
     },
     {
+      provide: NodeAccessorService,
+      useFactory: () => ({
+        model: signal(mockModel()),
+      }),
+    },
+    FlowEntitiesService,
+
+    // TODO: mocks below should be removed after the major release
+    {
       provide: HandleService,
       useFactory: () => ({
         node: signal(mockModel()),
@@ -51,19 +60,12 @@ export function provideCustomNodeMocks(): Provider[] {
       },
     },
     {
-      provide: NodeAccessorService,
-      useFactory: () => ({
-        model: signal(mockModel()),
-      }),
-    },
-    {
       provide: SelectionService,
       useValue: {
         select: () => {},
       },
     },
     FlowSettingsService,
-    FlowEntitiesService,
     ViewportService,
   ];
 }

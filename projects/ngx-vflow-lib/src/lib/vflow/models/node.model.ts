@@ -1,4 +1,4 @@
-import { Signal, TemplateRef, computed, effect, inject, signal } from '@angular/core';
+import { Signal, TemplateRef, computed, inject, signal } from '@angular/core';
 import {
   DynamicNode,
   Node,
@@ -7,40 +7,39 @@ import {
   isDynamicNode,
 } from '../interfaces/node.interface';
 import { isDefined } from '../utils/is-defined';
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { toObservable } from '@angular/core/rxjs-interop';
 import { HandleModel } from './handle.model';
 import { FlowEntity } from '../interfaces/flow-entity.interface';
-import { FlowSettingsService } from '../services/flow-settings.service';
-import { animationFrameScheduler, merge, observeOn, Subject } from 'rxjs';
 import { Point } from '../interfaces/point.interface';
 import { FlowEntitiesService } from '../services/flow-entities.service';
 
-// TODO bad naming around points
 export class NodeModel<T = unknown> implements FlowEntity {
   private static defaultWidth = 100;
   private static defaultHeight = 50;
   private static defaultColor = '#1b262c';
 
-  private flowSettingsService = inject(FlowSettingsService);
   private entitiesService = inject(FlowEntitiesService);
 
-  private internalPoint = this.createInternalPointSignal();
+  public point = this.createInternalPointSignal();
+  public point$ = toObservable(this.point);
 
-  private throttledPoint$ = toObservable(this.internalPoint).pipe(observeOn(animationFrameScheduler));
+  public width = this.createWidthSignal(NodeModel.defaultWidth);
+  public width$ = toObservable(this.width);
 
-  private notThrottledPoint$ = new Subject<Point>();
+  public height = this.createHeightSignal(NodeModel.defaultHeight);
+  public height$ = toObservable(this.height);
 
-  public point = toSignal(merge(this.throttledPoint$, this.notThrottledPoint$), {
-    initialValue: this.internalPoint(),
-  });
-
-  public point$ = this.throttledPoint$;
-
-  public size = signal({ width: 0, height: 0 });
+  /**
+   * @deprecated use width or height signals
+   */
+  public size = computed(() => ({ width: this.width(), height: this.height() }));
+  /**
+   * @deprecated use width$ or height$
+   */
   public size$ = toObservable(this.size);
 
-  public width = computed(() => this.size().width);
-  public height = computed(() => this.size().height);
+  public styleWidth = computed(() => `${this.width()}px`);
+  public styleHeight = computed(() => `${this.height()}px`);
 
   public renderOrder = signal(0);
 
@@ -65,7 +64,6 @@ export class NodeModel<T = unknown> implements FlowEntity {
   public pointTransform = computed(() => `translate(${this.globalPoint().x}, ${this.globalPoint().y})`);
 
   public handles = signal<HandleModel[]>([]);
-
   public handles$ = toObservable(this.handles);
 
   public draggable = signal(true);
@@ -132,62 +130,8 @@ export class NodeModel<T = unknown> implements FlowEntity {
     }
   }
 
-  public setPoint(point: Point, throttle: boolean) {
-    if (throttle) {
-      this.internalPoint.set(point);
-    } else {
-      this.notThrottledPoint$.next(point);
-    }
-  }
-
-  /**
-   * TODO find the way to implement this better
-   */
-  public linkDefaultNodeSizeWithModelSize() {
-    const node = this.node;
-
-    switch (node.type) {
-      case 'default':
-      case 'default-group':
-      case 'template-group': {
-        if (isDynamicNode(node)) {
-          effect(
-            () => {
-              this.size.set({
-                width: node.width?.() ?? NodeModel.defaultWidth,
-                height: node.height?.() ?? NodeModel.defaultHeight,
-              });
-            },
-            { allowSignalWrites: true },
-          );
-        } else {
-          this.size.set({
-            width: node.width ?? NodeModel.defaultWidth,
-            height: node.height ?? NodeModel.defaultHeight,
-          });
-        }
-      }
-    }
-
-    if (node.type === 'html-template' || this.isComponentType) {
-      if (isDynamicNode(node)) {
-        effect(
-          () => {
-            if (node.width && node.height) {
-              this.size.set({
-                width: node.width(),
-                height: node.height(),
-              });
-            }
-          },
-          { allowSignalWrites: true },
-        );
-      } else {
-        if (node.width && node.height) {
-          this.size.set({ width: node.width, height: node.height });
-        }
-      }
-    }
+  public setPoint(point: Point) {
+    this.point.set(point);
   }
 
   private createTextSignal(): Signal<string> {
@@ -206,5 +150,17 @@ export class NodeModel<T = unknown> implements FlowEntity {
 
   private createInternalPointSignal() {
     return isDynamicNode(this.node) ? this.node.point : signal({ x: this.node.point.x, y: this.node.point.y });
+  }
+
+  private createWidthSignal(defaultValue: number) {
+    return isDynamicNode(this.node)
+      ? (this.node.width ?? signal(defaultValue))
+      : signal(this.node.width ?? defaultValue);
+  }
+
+  private createHeightSignal(defaultValue: number) {
+    return isDynamicNode(this.node)
+      ? (this.node.height ?? signal(defaultValue))
+      : signal(this.node.height ?? defaultValue);
   }
 }

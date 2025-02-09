@@ -41,3 +41,13 @@ export * from './lib/vflow/directives/drag-handle.directive';
 
 // Testing
 export * from './lib/vflow/testing-utils/provide-custom-node-mocks';
+export * from './lib/vflow/testing-utils/component-mocks/vflow-mock.component';
+export * from './lib/vflow/testing-utils/component-mocks/handle-mock.component';
+export * from './lib/vflow/testing-utils/component-mocks/resizable-mock.component';
+export * from './lib/vflow/testing-utils/component-mocks/minimap-mock.component';
+export * from './lib/vflow/testing-utils/component-mocks/node-toolbar-mock.component';
+export * from './lib/vflow/testing-utils/directive-mocks/connection-controller-mock.directive';
+export * from './lib/vflow/testing-utils/directive-mocks/drag-handle-mock.directive';
+export * from './lib/vflow/testing-utils/directive-mocks/selectable-mock.directive';
+export * from './lib/vflow/testing-utils/directive-mocks/template-mock.directive';
+export * from './lib/vflow/testing-utils/vflow-mocks';
