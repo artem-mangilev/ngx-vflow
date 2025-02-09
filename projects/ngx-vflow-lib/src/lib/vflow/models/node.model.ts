@@ -1,4 +1,4 @@
-import { Signal, TemplateRef, computed, effect, inject, signal } from '@angular/core';
+import { Signal, TemplateRef, computed, inject, signal } from '@angular/core';
 import {
   DynamicNode,
   Node,
@@ -23,14 +23,23 @@ export class NodeModel<T = unknown> implements FlowEntity {
   public point = this.createInternalPointSignal();
   public point$ = toObservable(this.point);
 
-  public size = signal({ width: 0, height: 0 });
+  public width = this.createWidthSignal(NodeModel.defaultWidth);
+  public width$ = toObservable(this.width);
+
+  public height = this.createHeightSignal(NodeModel.defaultHeight);
+  public height$ = toObservable(this.height);
+
+  /**
+   * @deprecated use width or height signals
+   */
+  public size = computed(() => ({ width: this.width(), height: this.height() }));
+  /**
+   * @deprecated use width$ or height$
+   */
   public size$ = toObservable(this.size);
 
-  public width = computed(() => this.size().width);
-  public height = computed(() => this.size().height);
-
-  public styleWidth = computed(() => `${this.size().width}px`);
-  public styleHeight = computed(() => `${this.size().height}px`);
+  public styleWidth = computed(() => `${this.width()}px`);
+  public styleHeight = computed(() => `${this.height()}px`);
 
   public renderOrder = signal(0);
 
@@ -125,56 +134,6 @@ export class NodeModel<T = unknown> implements FlowEntity {
     this.point.set(point);
   }
 
-  /**
-   * TODO find the way to implement this better
-   */
-  public linkDefaultNodeSizeWithModelSize() {
-    const node = this.node;
-
-    switch (node.type) {
-      case 'default':
-      case 'default-group':
-      case 'template-group': {
-        if (isDynamicNode(node)) {
-          effect(
-            () => {
-              this.size.set({
-                width: node.width?.() ?? NodeModel.defaultWidth,
-                height: node.height?.() ?? NodeModel.defaultHeight,
-              });
-            },
-            { allowSignalWrites: true },
-          );
-        } else {
-          this.size.set({
-            width: node.width ?? NodeModel.defaultWidth,
-            height: node.height ?? NodeModel.defaultHeight,
-          });
-        }
-      }
-    }
-
-    if (node.type === 'html-template' || this.isComponentType) {
-      if (isDynamicNode(node)) {
-        effect(
-          () => {
-            if (node.width && node.height) {
-              this.size.set({
-                width: node.width(),
-                height: node.height(),
-              });
-            }
-          },
-          { allowSignalWrites: true },
-        );
-      } else {
-        if (node.width && node.height) {
-          this.size.set({ width: node.width, height: node.height });
-        }
-      }
-    }
-  }
-
   private createTextSignal(): Signal<string> {
     const node = this.node;
 
@@ -191,5 +150,17 @@ export class NodeModel<T = unknown> implements FlowEntity {
 
   private createInternalPointSignal() {
     return isDynamicNode(this.node) ? this.node.point : signal({ x: this.node.point.x, y: this.node.point.y });
+  }
+
+  private createWidthSignal(defaultValue: number) {
+    return isDynamicNode(this.node)
+      ? (this.node.width ?? signal(defaultValue))
+      : signal(this.node.width ?? defaultValue);
+  }
+
+  private createHeightSignal(defaultValue: number) {
+    return isDynamicNode(this.node)
+      ? (this.node.height ?? signal(defaultValue))
+      : signal(this.node.height ?? defaultValue);
   }
 }

@@ -25,7 +25,8 @@ export class NodeResizeControllerDirective implements OnInit {
           const width = this.hostElementRef.nativeElement.clientWidth;
           const height = this.hostElementRef.nativeElement.clientHeight;
 
-          model.size.set({ width, height });
+          model.width.set(width);
+          model.height.set(height);
         }),
         takeUntilDestroyed(this.destroyRef),
       )

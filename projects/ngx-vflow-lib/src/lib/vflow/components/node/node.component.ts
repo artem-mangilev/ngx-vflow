@@ -1,5 +1,4 @@
 import {
-  AfterViewInit,
   ChangeDetectionStrategy,
   Component,
   ElementRef,
@@ -59,7 +58,7 @@ export type HandleState = 'valid' | 'invalid' | 'idle';
     NodeResizeControllerDirective,
   ],
 })
-export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
+export class NodeComponent implements OnInit, OnDestroy {
   protected injector = inject(Injector);
   private handleService = inject(HandleService);
   private draggableService = inject(DraggableService);
@@ -103,10 +102,6 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
       },
       { injector: this.injector },
     );
-  }
-
-  public ngAfterViewInit(): void {
-    this.model().linkDefaultNodeSizeWithModelSize();
   }
 
   public ngOnDestroy(): void {
