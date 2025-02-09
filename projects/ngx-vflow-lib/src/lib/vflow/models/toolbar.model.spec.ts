@@ -44,7 +44,8 @@ describe('ToolbarModel', () => {
     model.size.set({ width: 10, height: 10 });
     model.offset.set(10);
 
-    model.node.size.set({ width: 100, height: 100 });
+    model.node.width.set(100);
+    model.node.height.set(100);
 
     expect(model.point()).toEqual({ x: 45, y: 110 });
   });
