@@ -45,14 +45,16 @@ describe('HandleModel', () => {
 
   it('should provide its absolute point', () => {
     model.size.set({ width: 0, height: 0 });
-    model.parentNode.size.set({ width: nodeWidth, height: nodeHeight });
+    model.parentNode.width.set(nodeWidth);
+    model.parentNode.height.set(nodeHeight);
 
     expect(model.pointAbsolute()).toEqual({ x: 25, y: 20 });
   });
 
   it('should provide offset relative to host element', () => {
     model.size.set({ width: 0, height: 0 });
-    model.parentNode.size.set({ width: nodeWidth, height: nodeHeight });
+    model.parentNode.width.set(nodeWidth);
+    model.parentNode.height.set(nodeHeight);
 
     expect(model.hostOffset()).toEqual({ x: 10, y: 5 });
   });
