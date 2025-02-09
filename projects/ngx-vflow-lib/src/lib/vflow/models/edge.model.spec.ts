@@ -30,6 +30,8 @@ describe('EdgeModel', () => {
             type: 'default',
             text: 'test',
             point: { x: 15, y: 15 },
+            width: 0,
+            height: 0,
           }),
       ),
     );
@@ -41,6 +43,8 @@ describe('EdgeModel', () => {
             type: 'default',
             text: 'test',
             point: { x: 15, y: 15 },
+            width: 0,
+            height: 0,
           }),
       ),
     );
