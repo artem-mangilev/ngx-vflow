@@ -3,6 +3,7 @@ import { CustomNodeComponent } from './custom-node.component';
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { provideCustomNodeMocks } from '../../testing-utils/provide-custom-node-mocks';
 import { Vflow } from '../../vflow';
+import { VflowMocks } from '../../testing-utils/vflow-mocks';
 
 @Component({
   standalone: true,
@@ -22,7 +23,16 @@ describe('TestCustomNodeComponent', () => {
     TestBed.configureTestingModule({
       imports: [TestCustomNodeComponent],
       providers: [provideCustomNodeMocks()],
-    });
+    })
+      .overrideComponent(TestCustomNodeComponent, {
+        remove: {
+          imports: [Vflow],
+        },
+        add: {
+          imports: [VflowMocks],
+        },
+      })
+      .compileComponents();
 
     fixture = TestBed.createComponent(TestCustomNodeComponent);
     component = fixture.componentInstance;
