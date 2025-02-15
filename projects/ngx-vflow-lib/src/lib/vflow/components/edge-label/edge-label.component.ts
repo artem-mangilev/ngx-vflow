@@ -17,6 +17,7 @@ import { NgTemplateOutlet } from '@angular/common';
 import { resizable } from '../../utils/resizable';
 import { startWith, tap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { MAGIC_NUMBER_TO_FIX_GLITCH_IN_CHROME } from '../../constants/magic-number-to-fix-glitch-in-chrome.constant';
 
 @Component({
   standalone: true,
@@ -71,16 +72,12 @@ export class EdgeLabelComponent implements AfterViewInit {
   });
 
   public ngAfterViewInit(): void {
-    // this is a fix for visual artifact in chrome that for some reason adresses only for edge label.
-    // the bug reproduces if edgeLabelWrapperRef size fully matched the size of parent foreignObject
-    const MAGIC_VALUE_TO_FIX_GLITCH_IN_CHROME = 2;
-
     resizable([this.edgeLabelWrapperRef().nativeElement], this.zone)
       .pipe(
         startWith(null),
         tap(() => {
-          const width = this.edgeLabelWrapperRef().nativeElement.clientWidth + MAGIC_VALUE_TO_FIX_GLITCH_IN_CHROME;
-          const height = this.edgeLabelWrapperRef().nativeElement.clientHeight + MAGIC_VALUE_TO_FIX_GLITCH_IN_CHROME;
+          const width = this.edgeLabelWrapperRef().nativeElement.clientWidth + MAGIC_NUMBER_TO_FIX_GLITCH_IN_CHROME;
+          const height = this.edgeLabelWrapperRef().nativeElement.clientHeight + MAGIC_NUMBER_TO_FIX_GLITCH_IN_CHROME;
 
           this.model().size.set({ width, height });
         }),

@@ -12,6 +12,7 @@ import { HandleModel } from './handle.model';
 import { FlowEntity } from '../interfaces/flow-entity.interface';
 import { Point } from '../interfaces/point.interface';
 import { FlowEntitiesService } from '../services/flow-entities.service';
+import { MAGIC_NUMBER_TO_FIX_GLITCH_IN_CHROME } from '../constants/magic-number-to-fix-glitch-in-chrome.constant';
 
 export class NodeModel<T = unknown> implements FlowEntity {
   private static defaultWidth = 100;
@@ -40,6 +41,9 @@ export class NodeModel<T = unknown> implements FlowEntity {
 
   public styleWidth = computed(() => `${this.width()}px`);
   public styleHeight = computed(() => `${this.height()}px`);
+
+  public foWidth = computed(() => this.width() + MAGIC_NUMBER_TO_FIX_GLITCH_IN_CHROME);
+  public foHeight = computed(() => this.height() + MAGIC_NUMBER_TO_FIX_GLITCH_IN_CHROME);
 
   public renderOrder = signal(0);
 
