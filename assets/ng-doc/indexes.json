@@ -1,15 +1,15 @@
 [
   {
     "breadcrumbs": [
-      "Features",
-      "Curves"
+      "Testing",
+      "Unit testing component nodes"
     ],
     "pageType": "guide",
-    "title": "Curves",
-    "section": "Curves",
-    "route": "/features/curves",
-    "fragment": "curves",
-    "content": "It's possible to set Curve for both the edges and connection."
+    "title": "Unit testing component nodes",
+    "section": "Unit testing component nodes",
+    "route": "/testing/unit-testing-component-nodes",
+    "fragment": "unit-testing-component-nodes",
+    "content": "To simplify writing isolated tests for component nodes, you can use the provideCustomNodeMocks function. This helps prevent dependency injection (DI) errors that occur when a node is used outside the scope of the VflowComponent."
   },
   {
     "breadcrumbs": [
@@ -238,6 +238,66 @@
     "route": "/features/connection-validation",
     "fragment": "connection-validation",
     "content": "ngx-vflow supports real-time synchronous validation of connections. Validation occurs when a user attempts to create a new edge. By default, every connection is valid, but you can provide a ConnectionSettings with a validatior callback where you specify the validation logic. For example, in this case, validation only passes connections from node 1 to node 2. If the validator returns false, the (onConnect) event won't be triggered because there is no valid connection."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Curves"
+    ],
+    "pageType": "guide",
+    "title": "Curves",
+    "section": "Curves",
+    "route": "/features/curves",
+    "fragment": "curves",
+    "content": "It's possible to set Curve for both the edges and connection."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom background"
+    ],
+    "pageType": "guide",
+    "title": "Custom background",
+    "section": "Custom background",
+    "route": "/features/custom-background",
+    "fragment": "custom-background",
+    "content": "You're able to select background for your flow."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom background"
+    ],
+    "pageType": "guide",
+    "title": "Custom background",
+    "section": "Solid color",
+    "route": "/features/custom-background",
+    "fragment": "solid-color",
+    "content": "To select a color, simply pass a color string it to the [background] input."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom background"
+    ],
+    "pageType": "guide",
+    "title": "Custom background",
+    "section": "Dots pattern",
+    "route": "/features/custom-background",
+    "fragment": "dots-pattern",
+    "content": "To make dots pattern, pass an object to the [background] input according to DotsBackground interface"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom background"
+    ],
+    "pageType": "guide",
+    "title": "Custom background",
+    "section": "Image background",
+    "route": "/features/custom-background",
+    "fragment": "image-background",
+    "content": "To make an image background, pass an object to the [background] input according to ImageBackground interface"
   },
   {
     "breadcrumbs": [
@@ -590,50 +650,38 @@
   {
     "breadcrumbs": [
       "Features",
-      "Custom background"
+      "Custom handles"
     ],
     "pageType": "guide",
-    "title": "Custom background",
-    "section": "Custom background",
-    "route": "/features/custom-background",
-    "fragment": "custom-background",
-    "content": "You're able to select background for your flow."
+    "title": "Custom handles",
+    "section": "Custom handles",
+    "route": "/features/custom-handles",
+    "fragment": "custom-handles",
+    "content": "You can pass a [template] to HandleComponent with custom handle."
   },
   {
     "breadcrumbs": [
       "Features",
-      "Custom background"
+      "Custom handles"
     ],
     "pageType": "guide",
-    "title": "Custom background",
-    "section": "Solid color",
-    "route": "/features/custom-background",
-    "fragment": "solid-color",
-    "content": "To select a color, simply pass a color string it to the [background] input."
+    "title": "Custom handles",
+    "section": "Custom handles",
+    "route": "/features/custom-handles",
+    "fragment": "custom-handles",
+    "content": "I't important to note that template must be made with SVG."
   },
   {
     "breadcrumbs": [
       "Features",
-      "Custom background"
+      "Custom handles"
     ],
     "pageType": "guide",
-    "title": "Custom background",
-    "section": "Dots pattern",
-    "route": "/features/custom-background",
-    "fragment": "dots-pattern",
-    "content": "To make dots pattern, pass an object to the [background] input according to DotsBackground interface"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Custom background"
-    ],
-    "pageType": "guide",
-    "title": "Custom background",
-    "section": "Image background",
-    "route": "/features/custom-background",
-    "fragment": "image-background",
-    "content": "To make an image background, pass an object to the [background] input according to ImageBackground interface"
+    "title": "Custom handles",
+    "section": "Custom handles",
+    "route": "/features/custom-handles",
+    "fragment": "custom-handles",
+    "content": "Custom handles are not positioned automatically, but the library provides a useful template context property to position your handle.Custom handles know if validation of ConnectionSettings.validator() has failed or succeeded, so you can use state() signal in let-ctx to add some behavior based on validation result. Refer to this interface for let-ctx when crafting your handle template:"
   },
   {
     "breadcrumbs": [
@@ -1082,38 +1130,26 @@
   {
     "breadcrumbs": [
       "Features",
-      "Custom handles"
+      "Default edges"
     ],
     "pageType": "guide",
-    "title": "Custom handles",
-    "section": "Custom handles",
-    "route": "/features/custom-handles",
-    "fragment": "custom-handles",
-    "content": "You can pass a [template] to HandleComponent with custom handle."
+    "title": "Default edges",
+    "section": "Default edges",
+    "route": "/features/default-edges",
+    "fragment": "default-edges",
+    "content": "You can link nodes with edges. All you need to do is to create another Edge[] array and pass it to the vflow component. Each edge contains the id of the source and target nodes, and each edge must have its own id."
   },
   {
     "breadcrumbs": [
       "Features",
-      "Custom handles"
+      "Default nodes"
     ],
     "pageType": "guide",
-    "title": "Custom handles",
-    "section": "Custom handles",
-    "route": "/features/custom-handles",
-    "fragment": "custom-handles",
-    "content": "I't important to note that template must be made with SVG."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Custom handles"
-    ],
-    "pageType": "guide",
-    "title": "Custom handles",
-    "section": "Custom handles",
-    "route": "/features/custom-handles",
-    "fragment": "custom-handles",
-    "content": "Custom handles are not positioned automatically, but the library provides a useful template context property to position your handle.Custom handles know if validation of ConnectionSettings.validator() has failed or succeeded, so you can use state() signal in let-ctx to add some behavior based on validation result. Refer to this interface for let-ctx when crafting your handle template:"
+    "title": "Default nodes",
+    "section": "Default nodes",
+    "route": "/features/default-nodes",
+    "fragment": "default-nodes",
+    "content": "To get started, you just need to provide nodes array to vflow component."
   },
   {
     "breadcrumbs": [
@@ -1138,18 +1174,6 @@
     "route": "/features/draggables",
     "fragment": "drag-handle",
     "content": "You can restrict dragging to a specific part of node, by adding dragHandle directive to this element. It's important to note that if a node contains at least one dragHandle, it can only be dragged from those specific areas where dragHandle was added. Otherwise, the entire node can be dragged, provided the draggable property is set to true."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Default nodes"
-    ],
-    "pageType": "guide",
-    "title": "Default nodes",
-    "section": "Default nodes",
-    "route": "/features/default-nodes",
-    "fragment": "default-nodes",
-    "content": "To get started, you just need to provide nodes array to vflow component."
   },
   {
     "breadcrumbs": [
@@ -1394,18 +1418,6 @@
   {
     "breadcrumbs": [
       "Features",
-      "Node toolbar"
-    ],
-    "pageType": "guide",
-    "title": "Node toolbar",
-    "section": "Node toolbar",
-    "route": "/features/node-toolbar",
-    "fragment": "node-toolbar",
-    "content": "You can add a NodeToolbarComponent to your node. The content of this component is automatically positioned near one side of the node, based on the value of the position input."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
       "Multiple connection points"
     ],
     "pageType": "guide",
@@ -1418,86 +1430,14 @@
   {
     "breadcrumbs": [
       "Features",
-      "Selecting"
+      "Node toolbar"
     ],
     "pageType": "guide",
-    "title": "Selecting",
-    "section": "Selecting",
-    "route": "/features/selecting",
-    "fragment": "selecting",
-    "content": "Nodes and edges can be selected!"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Selecting"
-    ],
-    "pageType": "guide",
-    "title": "Selecting",
-    "section": "Selecting",
-    "route": "/features/selecting",
-    "fragment": "selecting",
-    "content": "Default nodes and edges are selectable by default; just click and see that one is selected. Custom nodes and edges are not selectable by default, you need to mark the element that triggers selection with the "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Selecting"
-    ],
-    "pageType": "guide",
-    "title": "Selecting",
-    "section": "Selecting",
-    "route": "/features/selecting",
-    "fragment": "selecting",
-    "content": "selectable"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Selecting"
-    ],
-    "pageType": "guide",
-    "title": "Selecting",
-    "section": "Selecting",
-    "route": "/features/selecting",
-    "fragment": "selecting",
-    "content": " directive."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Selecting"
-    ],
-    "pageType": "guide",
-    "title": "Selecting",
-    "section": "Selecting",
-    "route": "/features/selecting",
-    "fragment": "selecting",
-    "content": "Both custom nodes and edges have the selected() signal in their template context for applying styles based on this state."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Selecting"
-    ],
-    "pageType": "guide",
-    "title": "Selecting",
-    "section": "Disable selecting",
-    "route": "/features/selecting",
-    "fragment": "disable-selecting",
-    "content": "You can pass [entitiesSelectable]=\"false\" to "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Selecting"
-    ],
-    "pageType": "guide",
-    "title": "Selecting",
-    "section": "Disable selecting",
-    "route": "/features/selecting",
-    "fragment": "disable-selecting",
-    "content": " if you want disable selecting for whole flow."
+    "title": "Node toolbar",
+    "section": "Node toolbar",
+    "route": "/features/node-toolbar",
+    "fragment": "node-toolbar",
+    "content": "You can add a NodeToolbarComponent to your node. The content of this component is automatically positioned near one side of the node, based on the value of the position input."
   },
   {
     "breadcrumbs": [
@@ -1598,6 +1538,90 @@
   {
     "breadcrumbs": [
       "Features",
+      "Selecting"
+    ],
+    "pageType": "guide",
+    "title": "Selecting",
+    "section": "Selecting",
+    "route": "/features/selecting",
+    "fragment": "selecting",
+    "content": "Nodes and edges can be selected!"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Selecting"
+    ],
+    "pageType": "guide",
+    "title": "Selecting",
+    "section": "Selecting",
+    "route": "/features/selecting",
+    "fragment": "selecting",
+    "content": "Default nodes and edges are selectable by default; just click and see that one is selected. Custom nodes and edges are not selectable by default, you need to mark the element that triggers selection with the "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Selecting"
+    ],
+    "pageType": "guide",
+    "title": "Selecting",
+    "section": "Selecting",
+    "route": "/features/selecting",
+    "fragment": "selecting",
+    "content": "selectable"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Selecting"
+    ],
+    "pageType": "guide",
+    "title": "Selecting",
+    "section": "Selecting",
+    "route": "/features/selecting",
+    "fragment": "selecting",
+    "content": " directive."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Selecting"
+    ],
+    "pageType": "guide",
+    "title": "Selecting",
+    "section": "Selecting",
+    "route": "/features/selecting",
+    "fragment": "selecting",
+    "content": "Both custom nodes and edges have the selected() signal in their template context for applying styles based on this state."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Selecting"
+    ],
+    "pageType": "guide",
+    "title": "Selecting",
+    "section": "Disable selecting",
+    "route": "/features/selecting",
+    "fragment": "disable-selecting",
+    "content": "You can pass [entitiesSelectable]=\"false\" to "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Selecting"
+    ],
+    "pageType": "guide",
+    "title": "Selecting",
+    "section": "Disable selecting",
+    "route": "/features/selecting",
+    "fragment": "disable-selecting",
+    "content": " if you want disable selecting for whole flow."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
       "Subflows"
     ],
     "pageType": "guide",
@@ -1654,18 +1678,6 @@
     "route": "/features/view-size",
     "fragment": "fixed-size",
     "content": "vflow can take fixed space if you pass [view]=\"[600, 600]\" input, where first item of array is width (in pixels), and the second is height (in pixels)."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Default edges"
-    ],
-    "pageType": "guide",
-    "title": "Default edges",
-    "section": "Default edges",
-    "route": "/features/default-edges",
-    "fragment": "default-edges",
-    "content": "You can link nodes with edges. All you need to do is to create another Edge[] array and pass it to the vflow component. Each edge contains the id of the source and target nodes, and each edge must have its own id."
   },
   {
     "breadcrumbs": [
@@ -1730,18 +1742,6 @@
   {
     "breadcrumbs": [
       "Getting Started",
-      "Migrations"
-    ],
-    "pageType": "guide",
-    "title": "Migrations",
-    "section": "Migration to >= v1.0",
-    "route": "/getting-started/migration",
-    "fragment": "migration-to--v10",
-    "content": "remove imports of VflowModule and use Vflow instead (Vflow contains all public standalone components and directives).for standalone components, simply add Vflow to the imports array.for modules, you need to spread ...Vflow into the imports array; otherwise, you will get a type error.remove usage of the computeLayersOnInit setting from the Optimization interface.remove usage of the handlePositions input in the VflowComponent.for classes extending CustomNodeComponent and CustomDynamicNodeComponent:replace this.node to this.node() due to signal input internal migration."
-  },
-  {
-    "breadcrumbs": [
-      "Getting Started",
       "How node sizing works"
     ],
     "pageType": "guide",
@@ -1762,6 +1762,18 @@
     "route": "/getting-started/how-node-sizing-works",
     "fragment": "how-node-sizing-works",
     "content": " element, which enables HTML to be rendered inside SVG. The diagram below illustrates how this element interacts with its content."
+  },
+  {
+    "breadcrumbs": [
+      "Getting Started",
+      "Migrations"
+    ],
+    "pageType": "guide",
+    "title": "Migrations",
+    "section": "Migration to >= v1.0",
+    "route": "/getting-started/migration",
+    "fragment": "migration-to--v10",
+    "content": "remove imports of VflowModule and use Vflow instead (Vflow contains all public standalone components and directives).for standalone components, simply add Vflow to the imports array.for modules, you need to spread ...Vflow into the imports array; otherwise, you will get a type error.remove usage of the computeLayersOnInit setting from the Optimization interface.remove usage of the handlePositions input in the VflowComponent.for classes extending CustomNodeComponent and CustomDynamicNodeComponent:replace this.node to this.node() due to signal input internal migration."
   },
   {
     "breadcrumbs": [
@@ -1813,18 +1825,6 @@
   },
   {
     "breadcrumbs": [
-      "Testing",
-      "Unit testing component nodes"
-    ],
-    "pageType": "guide",
-    "title": "Unit testing component nodes",
-    "section": "Unit testing component nodes",
-    "route": "/testing/unit-testing-component-nodes",
-    "fragment": "unit-testing-component-nodes",
-    "content": "To simplify writing isolated tests for component nodes, you can use the provideCustomNodeMocks function. This helps prevent dependency injection (DI) errors that occur when a node is used outside the scope of the VflowComponent."
-  },
-  {
-    "breadcrumbs": [
       "Workshops",
       "Delete selected"
     ],
@@ -1851,19 +1851,6 @@
     "breadcrumbs": [
       "Workshops",
       "Layout",
-      "Vizdom layout"
-    ],
-    "pageType": "guide",
-    "title": "Vizdom layout",
-    "section": "Vizdom layout",
-    "route": "/workshops/layout/vizdom-layout",
-    "fragment": "vizdom-layout",
-    "content": "This is an example of using the vizdom library for computing layout."
-  },
-  {
-    "breadcrumbs": [
-      "Workshops",
-      "Layout",
       "D3 Force"
     ],
     "pageType": "guide",
@@ -1872,6 +1859,19 @@
     "route": "/workshops/layout/force",
     "fragment": "d3-force",
     "content": "This is a simple example of using the d3-force layout package."
+  },
+  {
+    "breadcrumbs": [
+      "Workshops",
+      "Layout",
+      "Vizdom layout"
+    ],
+    "pageType": "guide",
+    "title": "Vizdom layout",
+    "section": "Vizdom layout",
+    "route": "/workshops/layout/vizdom-layout",
+    "fragment": "vizdom-layout",
+    "content": "This is an example of using the vizdom library for computing layout."
   },
   {
     "breadcrumbs": [
