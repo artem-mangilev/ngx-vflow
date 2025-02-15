@@ -2,8 +2,8 @@
 @if (model().node.type === 'default') {
   <svg:foreignObject
     class="selectable"
-    [attr.width]="model().size().width"
-    [attr.height]="model().size().height"
+    [attr.width]="model().foWidth()"
+    [attr.height]="model().foHeight()"
     (pointerStart)="pullNode(); selectNode()">
     <default-node
       nodeHandlesController
@@ -24,8 +24,8 @@
 @if (model().node.type === 'html-template' && nodeTemplate()) {
   <svg:foreignObject
     class="selectable"
-    [attr.width]="model().size().width"
-    [attr.height]="model().size().height"
+    [attr.width]="model().foWidth()"
+    [attr.height]="model().foHeight()"
     (pointerStart)="pullNode()">
     <div
       nodeHandlesController
@@ -47,8 +47,8 @@
 @if (model().isComponentType) {
   <svg:foreignObject
     class="selectable"
-    [attr.width]="model().size().width"
-    [attr.height]="model().size().height"
+    [attr.width]="model().foWidth()"
+    [attr.height]="model().foHeight()"
     (pointerStart)="pullNode()">
     <div
       nodeHandlesController
