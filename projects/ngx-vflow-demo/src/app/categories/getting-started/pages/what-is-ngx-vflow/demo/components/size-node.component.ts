@@ -22,7 +22,7 @@ import { FlowStoreService } from '../services/flow-store.service';
       :host {
         display: block;
         width: 150px;
-        height: 75px;
+        height: 100px;
         border: 1.5px solid #1b262c;
         padding: 10px;
         border-radius: 5px;
@@ -31,7 +31,7 @@ import { FlowStoreService } from '../services/flow-store.service';
       }
 
       .bottom-label {
-        margin-top: 5px;
+        margin-top: 25px;
       }
     `,
   ],

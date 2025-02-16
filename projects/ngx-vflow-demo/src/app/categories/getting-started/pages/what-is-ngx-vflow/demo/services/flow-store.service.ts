@@ -115,8 +115,12 @@ export class FlowStoreService {
           type: 'html-template',
           data: {
             type: 'delete',
-            text: '×',
           },
+        },
+      },
+      markers: {
+        end: {
+          type: 'arrow-closed',
         },
       },
     },
@@ -130,8 +134,12 @@ export class FlowStoreService {
           type: 'html-template',
           data: {
             type: 'delete',
-            text: '×',
           },
+        },
+      },
+      markers: {
+        end: {
+          type: 'arrow-closed',
         },
       },
     },
@@ -145,8 +153,12 @@ export class FlowStoreService {
           type: 'html-template',
           data: {
             type: 'delete',
-            text: '×',
           },
+        },
+      },
+      markers: {
+        end: {
+          type: 'arrow-closed',
         },
       },
     },
@@ -160,8 +172,12 @@ export class FlowStoreService {
           type: 'html-template',
           data: {
             type: 'delete',
-            text: '×',
           },
+        },
+      },
+      markers: {
+        end: {
+          type: 'arrow-closed',
         },
       },
     },

@@ -23,11 +23,11 @@ import { FlowStoreService } from './services/flow-store.service';
 
     <ng-template let-ctx edgeLabelHtml>
       @if (ctx.label.data.type === 'text') {
-        <div class="label">{{ ctx.label.data.text }}</div>
+        <div class="label-text">{{ ctx.label.data.text }}</div>
       }
 
       @if (ctx.label.data.type === 'delete') {
-        <div class="label" (click)="deleteEdge(ctx.edge)">{{ ctx.label.data.text }}</div>
+        <div class="label-delete" (click)="deleteEdge(ctx.edge)">×</div>
       }
     </ng-template>
   </vflow>`,
@@ -39,13 +39,24 @@ import { FlowStoreService } from './services/flow-store.service';
         height: 700px;
       }
 
-      .label {
+      .label-text {
         height: 25px;
         background-color: #122c26;
         border-radius: 5px;
         text-align: center;
         padding-left: 5px;
         padding-right: 5px;
+      }
+
+      .label-delete {
+        width: 25px;
+        height: 25px;
+        background-color: rgb(177, 177, 183);
+        border-radius: 5px;
+        text-align: center;
+        padding-left: 5px;
+        padding-right: 5px;
+        border-radius: 50%;
       }
 
       .animated-edge {
