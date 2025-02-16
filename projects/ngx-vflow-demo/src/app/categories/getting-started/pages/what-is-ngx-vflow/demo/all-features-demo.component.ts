@@ -1,186 +1,120 @@
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import {
-  Vflow,
-  Node,
-  Edge,
-  Connection,
-  ConnectionSettings,
-  isComponentStaticNode,
-  isDefaultStaticNode,
-} from 'ngx-vflow';
-import { ComplexCustomNodeComponent, ComplexCustomNodeData } from './components/complex-custom-node.component';
-import { SimpleCustomNodeComponent } from './components/simple-custom-node.component';
+import { AfterViewInit, ChangeDetectionStrategy, Component, inject, viewChild } from '@angular/core';
+import { Vflow, Connection, VflowComponent, Edge } from 'ngx-vflow';
+import { FlowStoreService } from './services/flow-store.service';
 
 @Component({
   template: `<vflow
     view="auto"
-    [nodes]="nodes"
-    [edges]="edges"
-    [connection]="connection"
+    [nodes]="store.nodes()"
+    [edges]="store.edges()"
     [background]="{ type: 'dots' }"
-    (onConnect)="handleConnect($event)">
+    (onConnect)="createEdge($event)">
     <ng-template let-ctx edge>
-      <svg:path
-        fill="none"
-        [attr.d]="ctx.path()"
-        [attr.stroke-width]="4"
-        [attr.stroke]="ctx.edge.data.color"
-        [attr.marker-end]="ctx.markerEnd()" />
+      @if (ctx.edge.data?.type === 'animated') {
+        <svg:path
+          class="animated-edge"
+          fill="none"
+          [attr.d]="ctx.path()"
+          [attr.stroke-width]="2"
+          [attr.stroke]="'black'"
+          [attr.marker-end]="ctx.markerEnd()" />
+      }
     </ng-template>
 
     <ng-template let-ctx edgeLabelHtml>
-      <div class="label" [style.background-color]="ctx.label.data.color" (click)="deleteEdge(ctx.edge)">Delete</div>
+      @if (ctx.label.data.type === 'text') {
+        <div class="label-text">{{ ctx.label.data.text }}</div>
+      }
+
+      @if (ctx.label.data.type === 'delete') {
+        <div class="label-delete" (click)="deleteEdge(ctx.edge)">×</div>
+      }
     </ng-template>
+
+    <mini-map />
   </vflow>`,
   styles: [
     `
       :host {
+        display: block;
         width: 100%;
-        height: 100%;
+        height: 700px;
       }
 
-      .label {
-        width: 60px;
+      .label-text {
         height: 25px;
         background-color: #122c26;
         border-radius: 5px;
         text-align: center;
+        padding-left: 5px;
+        padding-right: 5px;
+      }
+
+      .label-delete {
+        width: 25px;
+        height: 25px;
+        background-color: rgb(177, 177, 183);
+        border-radius: 5px;
+        text-align: center;
+        padding-left: 5px;
+        padding-right: 5px;
+        border-radius: 50%;
+      }
+
+      .animated-edge {
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-dasharray: 10; /* Matches the length of the path */
+        stroke-dashoffset: 200; /* Initially offset */
+        animation: move-white-stroke 4s linear infinite;
+      }
+
+      @keyframes move-white-stroke {
+        to {
+          stroke-dashoffset: 0; /* Move the stroke along the path */
+        }
       }
     `,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
   imports: [Vflow],
+  providers: [FlowStoreService],
 })
-export class AllFeaturesDemoComponent {
-  public nodes: Node[] = [
-    {
-      id: '1',
-      point: { x: 10, y: 200 },
-      type: 'default',
-      text: 'Default',
-    },
-    {
-      id: '2',
-      point: { x: 200, y: 10 },
-      type: 'default',
-      text: `Resized`,
-      width: 100,
-      height: 100,
-    },
-    {
-      id: '3',
-      point: { x: 200, y: 270 },
-      type: SimpleCustomNodeComponent,
-      draggable: false,
-    },
-    {
-      id: '4',
-      point: { x: 600, y: 150 },
-      type: ComplexCustomNodeComponent,
-      data: {
-        id: {
-          one: signal(''),
-          two: signal(''),
-          three: signal(''),
-        },
-      },
-    },
-  ];
+export class AllFeaturesDemoComponent implements AfterViewInit {
+  protected store = inject(FlowStoreService);
 
-  public edges: Edge[] = [
-    {
-      id: '1 -> 2',
-      source: '1',
-      target: '2',
-      markers: { end: { type: 'arrow-closed' } },
-    },
-    {
-      id: '1 -> 3',
-      source: '1',
-      target: '3',
-      curve: 'straight',
-      markers: { end: { type: 'arrow' } },
-    },
-    {
-      id: '3 -> 4-three',
-      source: '3',
-      target: '4',
-      targetHandle: 'three',
-    },
-  ];
+  protected vflow = viewChild.required(VflowComponent);
 
-  public connection: ConnectionSettings = {
-    validator(connection) {
-      if (connection.source === '3') {
-        return false;
-      }
+  ngAfterViewInit(): void {
+    this.vflow().viewportTo({ x: 0, y: 322, zoom: 0.5 });
+  }
 
-      return true;
-    },
-  };
+  createEdge(connection: Connection) {
+    const id = `${connection.source}${connection.sourceHandle ?? ''}-${connection.target}${connection.targetHandle ?? ''}`;
 
-  handleConnect(connection: Connection) {
-    if (connection.target === '4') {
-      const data = this.nodes.filter(isComponentStaticNode).find((n) => n.id === '4')?.data as ComplexCustomNodeData;
-
-      const sourceNode = this.nodes.filter(isDefaultStaticNode).find((n) => n.id === connection.source);
-
-      if (sourceNode) {
-        if (connection.targetHandle === 'one') {
-          data.id.one.set(sourceNode.text ?? '');
-        }
-        if (connection.targetHandle === 'two') {
-          data.id.two.set(sourceNode.text ?? '');
-        }
-        if (connection.targetHandle === 'three') {
-          data.id.three.set(sourceNode.text ?? '');
-        }
-      }
-    }
-
-    const color = randomHex();
-    this.edges = [
-      ...this.edges,
-      {
-        id: crypto.randomUUID(),
-        type: 'template',
-        data: {
-          color,
-        },
-        markers: {
-          end: {
-            type: 'arrow-closed',
-            width: 30,
-            height: 30,
-            color,
+    this.store.edges.update((edges) => {
+      return [
+        ...edges,
+        {
+          id,
+          edgeLabels: {
+            center: {
+              type: 'html-template',
+              data: {
+                type: 'delete',
+              },
+            },
           },
+          ...connection,
         },
-        edgeLabels: {
-          center: {
-            type: 'html-template',
-            data: { color },
-          },
-        },
-        ...connection,
-      },
-    ];
+      ];
+    });
   }
 
-  public deleteEdge(edge: Edge) {
-    this.edges = this.edges.filter((e) => e !== edge);
+  deleteEdge(edgeToDelete: Edge) {
+    this.store.edges.update((edges) => {
+      return edges.filter((edge) => edge !== edgeToDelete);
+    });
   }
-}
-
-function randomHex() {
-  const hexValues = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 'A', 'B', 'C', 'D', 'E', 'F'];
-
-  let hex = '#';
-
-  for (let i = 0; i < 6; i++) {
-    const index = Math.floor(Math.random() * hexValues.length);
-    hex += hexValues[index];
-  }
-
-  return hex;
 }

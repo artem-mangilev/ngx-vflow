@@ -1,25 +1,24 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { CustomNodeComponent, Vflow } from 'ngx-vflow';
+import { CustomDynamicNodeComponent, Vflow } from 'ngx-vflow';
 
 @Component({
   template: `<div class="node">
-    Custom node!
+    Input Node
 
-    <handle type="target" position="top" />
-    <handle type="source" position="bottom" />
+    <handle type="target" position="left" />
   </div>`,
   styles: [
     `
       .node {
         width: 150px;
         height: 100px;
-        background: #bbe1fa;
-        border: 1px solid gray;
+        border: 1.5px solid #1b262c;
         border-radius: 5px;
         display: flex;
         align-items: center;
         justify-content: center;
         color: black;
+        background-color: white;
       }
     `,
   ],
@@ -27,4 +26,4 @@ import { CustomNodeComponent, Vflow } from 'ngx-vflow';
   imports: [Vflow],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class SimpleCustomNodeComponent extends CustomNodeComponent {}
+export class OnlyInputNodeComponent extends CustomDynamicNodeComponent {}
