@@ -70,6 +70,7 @@ export class FlowStoreService {
         center: {
           type: 'html-template',
           data: {
+            type: 'text',
             text: 'Smooth Step Edge',
           },
         },
@@ -85,6 +86,7 @@ export class FlowStoreService {
         center: {
           type: 'html-template',
           data: {
+            type: 'text',
             text: 'Animated Edge',
           },
         },
@@ -108,24 +110,60 @@ export class FlowStoreService {
       source: '6',
       target: '7',
       targetHandle: 'width',
+      edgeLabels: {
+        center: {
+          type: 'html-template',
+          data: {
+            type: 'delete',
+            text: '×',
+          },
+        },
+      },
     },
     {
       id: '6 -> 7height',
       source: '6',
       target: '7',
       targetHandle: 'height',
+      edgeLabels: {
+        center: {
+          type: 'html-template',
+          data: {
+            type: 'delete',
+            text: '×',
+          },
+        },
+      },
     },
     {
       id: '6 -> 8x',
       source: '6',
       target: '8',
       targetHandle: 'x',
+      edgeLabels: {
+        center: {
+          type: 'html-template',
+          data: {
+            type: 'delete',
+            text: '×',
+          },
+        },
+      },
     },
     {
       id: '6 -> 8y',
       source: '6',
       target: '8',
       targetHandle: 'y',
+      edgeLabels: {
+        center: {
+          type: 'html-template',
+          data: {
+            type: 'delete',
+            text: '×',
+          },
+        },
+      },
     },
   ] as Edge[]);
 }

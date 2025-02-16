@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { Vflow, Connection } from 'ngx-vflow';
+import { AfterViewInit, ChangeDetectionStrategy, Component, inject, viewChild } from '@angular/core';
+import { Vflow, Connection, VflowComponent, Edge } from 'ngx-vflow';
 import { FlowStoreService } from './services/flow-store.service';
 
 @Component({
@@ -22,7 +22,13 @@ import { FlowStoreService } from './services/flow-store.service';
     </ng-template>
 
     <ng-template let-ctx edgeLabelHtml>
-      <div class="label">{{ ctx.label.data.text }}</div>
+      @if (ctx.label.data.type === 'text') {
+        <div class="label">{{ ctx.label.data.text }}</div>
+      }
+
+      @if (ctx.label.data.type === 'delete') {
+        <div class="label" (click)="deleteEdge(ctx.edge)">{{ ctx.label.data.text }}</div>
+      }
     </ng-template>
   </vflow>`,
   styles: [
@@ -62,14 +68,43 @@ import { FlowStoreService } from './services/flow-store.service';
   imports: [Vflow],
   providers: [FlowStoreService],
 })
-export class AllFeaturesDemoComponent {
+export class AllFeaturesDemoComponent implements AfterViewInit {
   protected store = inject(FlowStoreService);
+
+  protected vflow = viewChild.required(VflowComponent);
+
+  ngAfterViewInit(): void {
+    setTimeout(() => {
+      this.vflow().fitView();
+    });
+  }
 
   createEdge(connection: Connection) {
     const id = `${connection.source}${connection.sourceHandle ?? ''}-${connection.target}${connection.targetHandle ?? ''}`;
 
     this.store.edges.update((edges) => {
-      return [...edges, { id, ...connection }];
+      return [
+        ...edges,
+        {
+          id,
+          edgeLabels: {
+            center: {
+              type: 'html-template',
+              data: {
+                type: 'delete',
+                text: '×',
+              },
+            },
+          },
+          ...connection,
+        },
+      ];
+    });
+  }
+
+  deleteEdge(edgeToDelete: Edge) {
+    this.store.edges.update((edges) => {
+      return edges.filter((edge) => edge !== edgeToDelete);
     });
   }
 }

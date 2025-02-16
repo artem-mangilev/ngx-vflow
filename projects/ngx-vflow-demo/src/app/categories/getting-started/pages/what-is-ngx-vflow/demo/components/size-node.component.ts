@@ -11,7 +11,7 @@ import { FlowStoreService } from '../services/flow-store.service';
       <handle position="left" type="target" id="width" />
     </div>
 
-    <div>
+    <div class="bottom-label">
       height: {{ connectedNodeHeight() }}
 
       <handle position="left" type="target" id="height" />
@@ -22,11 +22,16 @@ import { FlowStoreService } from '../services/flow-store.service';
       :host {
         display: block;
         width: 150px;
-        height: 100px;
+        height: 75px;
         border: 1.5px solid #1b262c;
+        padding: 10px;
         border-radius: 5px;
         color: black;
         background-color: white;
+      }
+
+      .bottom-label {
+        margin-top: 5px;
       }
     `,
   ],
