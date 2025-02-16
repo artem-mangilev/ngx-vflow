@@ -4,6 +4,7 @@ import { OnlyInputNodeComponent } from '../components/only-input-node.component'
 import { ToolbarNodeComponent } from '../components/toolbar-node.component';
 import { ResizableNodeComponent } from '../components/resizable-node.component';
 import { SizeNodeComponent } from '../components/size-node.component';
+import { PositionNodeComponent } from '../components/position-node.component';
 
 @Injectable()
 export class FlowStoreService {
@@ -51,6 +52,11 @@ export class FlowStoreService {
       id: '7',
       point: signal({ x: 1332, y: -188 }),
       type: SizeNodeComponent,
+    },
+    {
+      id: '8',
+      point: signal({ x: 1332, y: 200 }),
+      type: PositionNodeComponent,
     },
   ] as DynamicNode[]);
 
@@ -108,6 +114,18 @@ export class FlowStoreService {
       source: '6',
       target: '7',
       targetHandle: 'height',
+    },
+    {
+      id: '6 -> 8x',
+      source: '6',
+      target: '8',
+      targetHandle: 'x',
+    },
+    {
+      id: '6 -> 8y',
+      source: '6',
+      target: '8',
+      targetHandle: 'y',
     },
   ] as Edge[]);
 }

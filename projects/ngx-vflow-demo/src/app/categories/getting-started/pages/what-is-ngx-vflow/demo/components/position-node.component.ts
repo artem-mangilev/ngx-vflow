@@ -6,15 +6,15 @@ import { FlowStoreService } from '../services/flow-store.service';
   standalone: true,
   template: `
     <div>
-      width: {{ connectedNodeWidth() }}
+      X: {{ connectedNodeX() }}
 
-      <handle position="left" type="target" id="width" />
+      <handle position="left" type="target" id="x" />
     </div>
 
     <div>
-      height: {{ connectedNodeHeight() }}
+      Y: {{ connectedNodeY() }}
 
-      <handle position="left" type="target" id="height" />
+      <handle position="left" type="target" id="y" />
     </div>
   `,
   styles: [
@@ -33,22 +33,20 @@ import { FlowStoreService } from '../services/flow-store.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [Vflow],
 })
-export class SizeNodeComponent extends CustomDynamicNodeComponent {
+export class PositionNodeComponent extends CustomDynamicNodeComponent {
   public store = inject(FlowStoreService);
 
-  public connectedNodeWidth = computed(() => {
-    const edge =
-      this.store.edges().find((edge) => edge.target === this.node().id && edge.targetHandle === 'width') ?? null;
+  public connectedNodeX = computed(() => {
+    const edge = this.store.edges().find((edge) => edge.target === this.node().id && edge.targetHandle === 'x') ?? null;
     const sourceNode = edge ? this.store.nodes().find((node) => node.id === edge?.source) : null;
 
-    return Math.floor(sourceNode?.width?.() ?? 0);
+    return Math.floor(sourceNode?.point().x ?? 0);
   });
 
-  public connectedNodeHeight = computed(() => {
-    const edge =
-      this.store.edges().find((edge) => edge.target === this.node().id && edge.targetHandle === 'height') ?? null;
+  public connectedNodeY = computed(() => {
+    const edge = this.store.edges().find((edge) => edge.target === this.node().id && edge.targetHandle === 'y') ?? null;
     const sourceNode = edge ? this.store.nodes().find((node) => node.id === edge?.source) : null;
 
-    return Math.floor(sourceNode?.height?.() ?? 0);
+    return Math.floor(sourceNode?.point().y ?? 0);
   });
 }
