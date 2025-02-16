@@ -18,7 +18,7 @@ export class FlowStoreService {
     },
     {
       id: '2',
-      point: signal({ x: 252, y: 130 }),
+      point: signal({ x: 252, y: 200 }),
       type: 'default',
       text: signal('<i>I can show styled text</i>'),
       width: signal(200),
@@ -30,7 +30,7 @@ export class FlowStoreService {
     },
     {
       id: '4',
-      point: signal({ x: 465, y: -92 }),
+      point: signal({ x: 465, y: -90 }),
       type: 'default-group',
       width: signal(500),
       height: signal(200),
@@ -50,7 +50,7 @@ export class FlowStoreService {
     },
     {
       id: '7',
-      point: signal({ x: 1332, y: -188 }),
+      point: signal({ x: 1332, y: -181 }),
       type: SizeNodeComponent,
     },
     {

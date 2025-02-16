@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { CustomDynamicNodeComponent, HandleComponent, NodeToolbarComponent } from 'ngx-vflow';
 
-const emojis = ['🚀', '🔥', '✨'];
+const emojis = ['🌞', '💡', '💻'];
 
 @Component({
   standalone: true,

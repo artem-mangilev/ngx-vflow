@@ -30,6 +30,8 @@ import { FlowStoreService } from './services/flow-store.service';
         <div class="label-delete" (click)="deleteEdge(ctx.edge)">×</div>
       }
     </ng-template>
+
+    <mini-map />
   </vflow>`,
   styles: [
     `
@@ -85,9 +87,7 @@ export class AllFeaturesDemoComponent implements AfterViewInit {
   protected vflow = viewChild.required(VflowComponent);
 
   ngAfterViewInit(): void {
-    setTimeout(() => {
-      this.vflow().fitView();
-    });
+    this.vflow().viewportTo({ x: 0, y: 322, zoom: 0.5 });
   }
 
   createEdge(connection: Connection) {
@@ -103,7 +103,6 @@ export class AllFeaturesDemoComponent implements AfterViewInit {
               type: 'html-template',
               data: {
                 type: 'delete',
-                text: '×',
               },
             },
           },
