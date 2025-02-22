@@ -1,9 +1,9 @@
 export type EdgeLabelType = 'default' | 'html-template';
 export type EdgeLabelPosition = 'start' | 'center' | 'end';
 
-export type EdgeLabel<T = unknown> = TextEdgeLabel | HtmlTemplateEdgeLabel<T>;
+export type EdgeLabel<T = unknown> = DefaultEdgeLabel | HtmlTemplateEdgeLabel<T>;
 
-interface TextEdgeLabel {
+interface DefaultEdgeLabel {
   type: 'default';
   text: string;
   style?: Partial<CSSStyleDeclaration>;
