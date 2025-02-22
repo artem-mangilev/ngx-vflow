@@ -5,12 +5,14 @@ import { NodeModel } from '../models/node.model';
 import { round } from '../utils/round';
 import { FlowEntitiesService } from './flow-entities.service';
 import { Point } from '../interfaces/point.interface';
+import { FlowSettingsService } from './flow-settings.service';
 
 type DragEvent = D3DragEvent<Element, unknown, unknown>;
 
 @Injectable()
 export class DraggableService {
   private entitiesService = inject(FlowEntitiesService);
+  private settingsService = inject(FlowSettingsService);
 
   /**
    * Enable draggable behavior for element.
@@ -78,7 +80,7 @@ export class DraggableService {
             y: round(event.y + initialPositions[index].y),
           };
 
-          moveNode(model, point);
+          this.moveNode(model, point);
         });
       });
   }
@@ -92,18 +94,38 @@ export class DraggableService {
       : // we only can move current node if it's not selected
         [model];
   }
-}
 
-function moveNode(model: NodeModel, point: Point) {
-  const parent = model.parent();
-  // keep node in bounds of parent
-  if (parent) {
-    point.x = Math.min(parent.size().width - model.size().width, point.x);
-    point.x = Math.max(0, point.x);
+  private moveNode(model: NodeModel, point: Point) {
+    point = this.alignToGrid(point);
 
-    point.y = Math.min(parent.size().height - model.size().height, point.y);
-    point.y = Math.max(0, point.y);
+    const parent = model.parent();
+    // keep node in bounds of parent
+    if (parent) {
+      point.x = Math.min(parent.width() - model.width(), point.x);
+      point.x = Math.max(0, point.x);
+
+      point.y = Math.min(parent.height() - model.height(), point.y);
+      point.y = Math.max(0, point.y);
+    }
+
+    model.setPoint(point);
   }
 
-  model.setPoint(point);
+  private alignToGrid(point: Point) {
+    const [snapX, snapY] = this.settingsService.snapGrid();
+
+    if (snapX > 1) {
+      point.x = align(point.x, snapX);
+    }
+
+    if (snapY > 1) {
+      point.y = align(point.y, snapY);
+    }
+
+    return point;
+  }
+}
+
+function align(num: number, constant: number): number {
+  return Math.ceil(num / constant) * constant;
 }
