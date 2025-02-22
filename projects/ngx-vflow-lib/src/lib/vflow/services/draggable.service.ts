@@ -95,6 +95,9 @@ export class DraggableService {
         [model];
   }
 
+  /**
+   * @todo make it unit testable
+   */
   private moveNode(model: NodeModel, point: Point) {
     point = this.alignToGrid(point);
 
@@ -111,6 +114,9 @@ export class DraggableService {
     model.setPoint(point);
   }
 
+  /**
+   * @todo make it unit testable
+   */
   private alignToGrid(point: Point) {
     const [snapX, snapY] = this.settingsService.snapGrid();
 
