@@ -67,8 +67,13 @@ export class LabelsDemoComponent {
       target: '3',
       edgeLabels: {
         center: {
-          type: 'html-template',
-          data: { color: '#8b599a' },
+          type: 'default',
+          text: 'Some Text',
+          style: {
+            color: 'black',
+            lineHeight: '80%',
+            borderRadius: '5px',
+          },
         },
       },
     },
