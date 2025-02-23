@@ -1,7 +1,19 @@
-export type EdgeLabelType = 'html-template';
+/**
+ * @deprecated not used anymore internally
+ */
+export type EdgeLabelType = 'default' | 'html-template';
+
 export type EdgeLabelPosition = 'start' | 'center' | 'end';
 
-export interface EdgeLabel<T = unknown> {
-  type: EdgeLabelType;
+export type EdgeLabel<T = unknown> = DefaultEdgeLabel | HtmlTemplateEdgeLabel<T>;
+
+export interface DefaultEdgeLabel {
+  type: 'default';
+  text: string;
+  style?: Partial<CSSStyleDeclaration>;
+}
+
+export interface HtmlTemplateEdgeLabel<T = unknown> {
+  type: 'html-template';
   data?: T;
 }

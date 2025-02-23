@@ -24,4 +24,6 @@ export class FlowSettingsService {
   public maxZoom = signal(3);
 
   public background = signal<Background>({ type: 'solid', color: '#fff' });
+
+  public snapGrid = signal<[number, number]>([1, 1]);
 }

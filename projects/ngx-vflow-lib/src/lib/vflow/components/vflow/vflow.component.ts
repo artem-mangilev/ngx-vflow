@@ -217,6 +217,14 @@ export class VflowComponent implements OnInit {
   public get connection() {
     return this.flowEntitiesService.connection();
   }
+
+  /**
+   * Snap grid for node movement. Passes as [x, y]
+   */
+  @Input()
+  public set snapGrid(value: [number, number]) {
+    this.flowSettingsService.snapGrid.set(value);
+  }
   // #endregion
 
   // #region MAIN_INPUTS

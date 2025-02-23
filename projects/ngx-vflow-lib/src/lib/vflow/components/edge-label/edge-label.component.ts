@@ -18,6 +18,7 @@ import { resizable } from '../../utils/resizable';
 import { startWith, tap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MAGIC_NUMBER_TO_FIX_GLITCH_IN_CHROME } from '../../constants/magic-number-to-fix-glitch-in-chrome.constant';
+import { FlowSettingsService } from '../../services/flow-settings.service';
 
 @Component({
   standalone: true,
@@ -43,6 +44,7 @@ import { MAGIC_NUMBER_TO_FIX_GLITCH_IN_CHROME } from '../../constants/magic-numb
 export class EdgeLabelComponent implements AfterViewInit {
   private zone = inject(NgZone);
   private destroyRef = inject(DestroyRef);
+  private settingsService = inject(FlowSettingsService);
 
   // TODO: too many inputs
   public model = input.required<EdgeLabelModel>();
@@ -53,7 +55,7 @@ export class EdgeLabelComponent implements AfterViewInit {
 
   public htmlTemplate = input<TemplateRef<any>>();
 
-  public edgeLabelWrapperRef = viewChild.required<ElementRef<HTMLDivElement>>('edgeLabelWrapper');
+  public edgeLabelWrapperRef = viewChild.required<ElementRef<Element>>('edgeLabelWrapper');
 
   /**
    * Centered point of label
@@ -71,13 +73,39 @@ export class EdgeLabelComponent implements AfterViewInit {
     };
   });
 
+  protected edgeLabelStyle = computed(() => {
+    const label = this.model().edgeLabel;
+
+    if (label.type === 'default' && label.style) {
+      const flowBackground = this.settingsService.background();
+
+      let color = 'transparent';
+
+      if (flowBackground.type === 'dots') {
+        color = flowBackground.backgroundColor ?? '#fff';
+      }
+
+      if (flowBackground.type === 'solid') {
+        color = flowBackground.color;
+      }
+
+      label.style.backgroundColor = label.style.backgroundColor ?? color;
+
+      return label.style;
+    }
+
+    return null;
+  });
+
   public ngAfterViewInit(): void {
-    resizable([this.edgeLabelWrapperRef().nativeElement], this.zone)
+    const labelElement = this.edgeLabelWrapperRef().nativeElement;
+
+    resizable([labelElement], this.zone)
       .pipe(
         startWith(null),
         tap(() => {
-          const width = this.edgeLabelWrapperRef().nativeElement.clientWidth + MAGIC_NUMBER_TO_FIX_GLITCH_IN_CHROME;
-          const height = this.edgeLabelWrapperRef().nativeElement.clientHeight + MAGIC_NUMBER_TO_FIX_GLITCH_IN_CHROME;
+          const width = labelElement.clientWidth + MAGIC_NUMBER_TO_FIX_GLITCH_IN_CHROME;
+          const height = labelElement.clientHeight + MAGIC_NUMBER_TO_FIX_GLITCH_IN_CHROME;
 
           this.model().size.set({ width, height });
         }),
