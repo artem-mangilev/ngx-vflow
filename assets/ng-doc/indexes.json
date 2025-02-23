@@ -1,150 +1,6 @@
 [
   {
     "breadcrumbs": [
-      "Getting Started",
-      "Dynamic vs Static nodes"
-    ],
-    "pageType": "guide",
-    "title": "Dynamic vs Static nodes",
-    "section": "Dynamic vs Static nodes",
-    "route": "/getting-started/dynamic-vs-static-nodes",
-    "fragment": "dynamic-vs-static-nodes",
-    "content": "You can't mix Node and DynamicNode in a single array so you have to choose what you want to use"
-  },
-  {
-    "breadcrumbs": [
-      "Getting Started",
-      "Dynamic vs Static nodes"
-    ],
-    "pageType": "guide",
-    "title": "Dynamic vs Static nodes",
-    "section": "Dynamic vs Static nodes",
-    "route": "/getting-started/dynamic-vs-static-nodes",
-    "fragment": "dynamic-vs-static-nodes",
-    "content": "For more complex scenarios, you might need to have a fine-grained control on specific nodes. In such cases, you can use DynamicNode, which is essentially a Node with properties with same names but with a WritableSignal type. This offers the following benefits: Granular updates to specific nodes with efficient rendering (only the affected node is re-rendered).Access to the updated state of a node directly (without listening events). For instance, if a point changes due to drag-and-drop, the node's point() signal will reflect the new position.Additional benefits of signals, such as executing actions within an effect when a dynamic property changes."
-  },
-  {
-    "breadcrumbs": [
-      "Getting Started",
-      "Dynamic vs Static nodes"
-    ],
-    "pageType": "guide",
-    "title": "Dynamic vs Static nodes",
-    "section": "Dynamic vs Static nodes",
-    "route": "/getting-started/dynamic-vs-static-nodes",
-    "fragment": "dynamic-vs-static-nodes",
-    "content": "Not all properties of DynamicNode are WritableSignal, for instance an id must be static, so it remains of a regular string type"
-  },
-  {
-    "breadcrumbs": [
-      "Getting Started",
-      "Dynamic vs Static nodes"
-    ],
-    "pageType": "guide",
-    "title": "Dynamic vs Static nodes",
-    "section": "Code example",
-    "route": "/getting-started/dynamic-vs-static-nodes",
-    "fragment": "code-example",
-    "content": "If you want to change a node's position programmatically, you would:"
-  },
-  {
-    "breadcrumbs": [
-      "Getting Started",
-      "Dynamic vs Static nodes"
-    ],
-    "pageType": "guide",
-    "title": "Dynamic vs Static nodes",
-    "section": "See also",
-    "route": "/getting-started/dynamic-vs-static-nodes",
-    "fragment": "see-also",
-    "content": "D3 Force"
-  },
-  {
-    "breadcrumbs": [
-      "Getting Started",
-      "How node sizing works"
-    ],
-    "pageType": "guide",
-    "title": "How node sizing works",
-    "section": "How node sizing works",
-    "route": "/getting-started/how-node-sizing-works",
-    "fragment": "how-node-sizing-works",
-    "content": "This topic needs some clarification due to the design decisions behind the library. The library renders the flow by combining two technologies: SVG, which is responsible for rendering curves, managing zoom, pan, and other tasks that SVG handles well.HTML (with CSS), which is used to create the content for the nodes, allowing front-end engineers to design dynamic and visually appealing UIs more easily than with SVG. The link between these two technologies is the "
-  },
-  {
-    "breadcrumbs": [
-      "Getting Started",
-      "How node sizing works"
-    ],
-    "pageType": "guide",
-    "title": "How node sizing works",
-    "section": "How node sizing works",
-    "route": "/getting-started/how-node-sizing-works",
-    "fragment": "how-node-sizing-works",
-    "content": " element, which enables HTML to be rendered inside SVG. The diagram below illustrates how this element interacts with its content."
-  },
-  {
-    "breadcrumbs": [
-      "Getting Started",
-      "Migrations"
-    ],
-    "pageType": "guide",
-    "title": "Migrations",
-    "section": "Migration to >= v1.0",
-    "route": "/getting-started/migration",
-    "fragment": "migration-to--v10",
-    "content": "remove imports of VflowModule and use Vflow instead (Vflow contains all public standalone components and directives).for standalone components, simply add Vflow to the imports array.for modules, you need to spread ...Vflow into the imports array; otherwise, you will get a type error.remove usage of the computeLayersOnInit setting from the Optimization interface.remove usage of the handlePositions input in the VflowComponent.for classes extending CustomNodeComponent and CustomDynamicNodeComponent:replace this.node to this.node() due to signal input internal migration."
-  },
-  {
-    "breadcrumbs": [
-      "Getting Started",
-      "Principles"
-    ],
-    "pageType": "guide",
-    "title": "Principles",
-    "section": "Principles",
-    "route": "/getting-started/principles",
-    "fragment": "principles",
-    "content": "This page contains a list of general principles that impact feature implementation. No hidden mutations of your data. For example, the library does not modify any of the Node or Edge objects you pass in as inputs. Instead, it creates internal models around these entities and operates on them. Any changes to the passed entities can be observed through events.This principle also implies that you are responsible for managing invalid data. For instance, if you delete a node, the edges corresponding to this node will not be deleted automatically. However, the library will notify you about detached edges so that you can easily delete them."
-  },
-  {
-    "breadcrumbs": [
-      "Getting Started",
-      "What is ngx-vflow"
-    ],
-    "pageType": "guide",
-    "title": "What is ngx-vflow",
-    "section": "What is ngx-vflow",
-    "route": "/getting-started/what-is-ngx-vflow",
-    "fragment": "what-is-ngx-vflow",
-    "content": "ngx-vflow is an Angular library for creating node-based applications. It aims to assist you in building anything from a static diagram to a visual editor. You can utilize the default design or apply your own by customizing everything using familiar technologies."
-  },
-  {
-    "breadcrumbs": [
-      "Getting Started",
-      "What is ngx-vflow"
-    ],
-    "pageType": "guide",
-    "title": "What is ngx-vflow",
-    "section": "Main features",
-    "route": "/getting-started/what-is-ngx-vflow",
-    "fragment": "main-features",
-    "content": "Easy to use: Just describe your flow with a simple API; all of the heavy lifting, such as dragging, zooming, and curve math, is handled by the library for you. Customizable: There is a default design for basic usage, and you can also customize nodes with good old HTML and CSS. Other entities such as edges, connection lines, and handles are also customizable, but it will require a little SVG knowledge. Great performance: Angular signals are the heart and soul of ngx-vflow, which are performant by default, so you shouldn't worry about performance even with large flows. Zoneless: Does not require zone.js"
-  },
-  {
-    "breadcrumbs": [
-      "Getting Started",
-      "Roadmap"
-    ],
-    "pageType": "guide",
-    "title": "Roadmap",
-    "section": "Roadmap",
-    "route": "/getting-started/roadmap",
-    "fragment": "roadmap",
-    "content": "This is a roadmap for ngx-vflow: improve consistency across browsers (mainly appeals to Safari)custom SVG shapesfloating edgesplugin systemnode rotationUI controls for flowsupport for more layout engines (Dagree, etc.)modal system for context menulazy loading nodes based on current viewport (decrease initial bundle)HTML-based renderer as alternative to current SVG-based rendererExperimental canvas/webgl renderer for insane performance"
-  },
-  {
-    "breadcrumbs": [
       "Features",
       "Connection"
     ],
@@ -358,18 +214,6 @@
     "route": "/features/connection",
     "fragment": "loose-connections",
     "content": "This is the 'loose' mode of ConnectionSettings, where the flow ignores the handle type and allows any handle to connect with any other handle. In this mode, an id must be provided for the HandleComponent to function correctly."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Curves"
-    ],
-    "pageType": "guide",
-    "title": "Curves",
-    "section": "Curves",
-    "route": "/features/curves",
-    "fragment": "curves",
-    "content": "It's possible to set Curve for both the edges and connection."
   },
   {
     "breadcrumbs": [
@@ -778,6 +622,18 @@
     "route": "/features/custom-edges",
     "fragment": "context",
     "content": "It's tricky to infer type for let-ctx, so here is an interface with available fields for this context."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Curves"
+    ],
+    "pageType": "guide",
+    "title": "Curves",
+    "section": "Curves",
+    "route": "/features/curves",
+    "fragment": "curves",
+    "content": "It's possible to set Curve for both the edges and connection."
   },
   {
     "breadcrumbs": [
@@ -1358,54 +1214,6 @@
   {
     "breadcrumbs": [
       "Features",
-      "Labels"
-    ],
-    "pageType": "guide",
-    "title": "Labels",
-    "section": "Labels",
-    "route": "/features/labels",
-    "fragment": "labels",
-    "content": "You can attach labels to edges by providing the edgeLabels property to the needed Edges. There are three slots available for labels on an edge: start, center, end. The label is only of the html-template type, so you have to provide "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Labels"
-    ],
-    "pageType": "guide",
-    "title": "Labels",
-    "section": "Labels",
-    "route": "/features/labels",
-    "fragment": "labels",
-    "content": " inside vflow."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Labels"
-    ],
-    "pageType": "guide",
-    "title": "Labels",
-    "section": "Context",
-    "route": "/features/labels",
-    "fragment": "context",
-    "content": "You may access some data for label through let-ctx according to this interface."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Markers"
-    ],
-    "pageType": "guide",
-    "title": "Markers",
-    "section": "Markers",
-    "route": "/features/markers",
-    "fragment": "markers",
-    "content": "You can create markers for both edges and connections. Edges: Specify start and end markers for corresponding parts of the edge. Currently, markers are limited to two types: arrow and arrow-closed.Connections: You can specify an end marker using the marker property in ConnectionSettings."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
       "Keyboard shortcuts"
     ],
     "pageType": "guide",
@@ -1502,14 +1310,74 @@
   {
     "breadcrumbs": [
       "Features",
-      "Multiple connection points"
+      "Labels"
     ],
     "pageType": "guide",
-    "title": "Multiple connection points",
-    "section": "Multiple connection points",
-    "route": "/features/multiple-connection-points",
-    "fragment": "multiple-connection-points",
-    "content": "Custom components provide the ability to control handles and their positions. All you need to do is take HandleComponent from library and place it somewhere in your custom node. This component automatically computes its position based on parent element's position."
+    "title": "Labels",
+    "section": "Labels",
+    "route": "/features/labels",
+    "fragment": "labels",
+    "content": "You can attach labels to edges by providing the edgeLabels property to the Edges. There are three slots available for labels on an edge: start, center, and end. There are several ways a label can appear on an edge."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Labels"
+    ],
+    "pageType": "guide",
+    "title": "Labels",
+    "section": "Default",
+    "route": "/features/labels",
+    "fragment": "default",
+    "content": "This method renders simple static text on the edge. To achieve this, you need to: Pass the default type to EdgeLabel.Set the text.Optionally add the style, which supports any CSS property."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Labels"
+    ],
+    "pageType": "guide",
+    "title": "Labels",
+    "section": "HTML Template",
+    "route": "/features/labels",
+    "fragment": "html-template",
+    "content": "This method renders complex HTML on the edge. To achieve this, you need to: Pass the html-template type to EdgeLabel.Provide the "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Labels"
+    ],
+    "pageType": "guide",
+    "title": "Labels",
+    "section": "HTML Template",
+    "route": "/features/labels",
+    "fragment": "html-template",
+    "content": " inside vflow.Optionally pass any data that will be accessible in the template context."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Labels"
+    ],
+    "pageType": "guide",
+    "title": "Labels",
+    "section": "Context",
+    "route": "/features/labels",
+    "fragment": "context",
+    "content": "You may access some data for label through let-ctx according to this interface."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Markers"
+    ],
+    "pageType": "guide",
+    "title": "Markers",
+    "section": "Markers",
+    "route": "/features/markers",
+    "fragment": "markers",
+    "content": "You can create markers for both edges and connections. Edges: Specify start and end markers for corresponding parts of the edge. Currently, markers are limited to two types: arrow and arrow-closed.Connections: You can specify an end marker using the marker property in ConnectionSettings."
   },
   {
     "breadcrumbs": [
@@ -1558,6 +1426,18 @@
     "route": "/features/minimap",
     "fragment": "minimap",
     "content": "Planned enhancements for the minimap: Develop an API to customize mini-node appearance (e.g., color, stroke)Enable panning and zooming within the minimapRender mini-nodes to visually match main nodes, using a simplified DOM structure to optimize performance"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Multiple connection points"
+    ],
+    "pageType": "guide",
+    "title": "Multiple connection points",
+    "section": "Multiple connection points",
+    "route": "/features/multiple-connection-points",
+    "fragment": "multiple-connection-points",
+    "content": "Custom components provide the ability to control handles and their positions. All you need to do is take HandleComponent from library and place it somewhere in your custom node. This component automatically computes its position based on parent element's position."
   },
   {
     "breadcrumbs": [
@@ -1754,6 +1634,18 @@
   {
     "breadcrumbs": [
       "Features",
+      "Snap to Grid"
+    ],
+    "pageType": "guide",
+    "title": "Snap to Grid",
+    "section": "Snap to Grid",
+    "route": "/features/snap-to-grid",
+    "fragment": "snap-to-grid",
+    "content": "You can snap nodes to the grid by passing the snapGrid input to the VflowComponent"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
       "Subflows"
     ],
     "pageType": "guide",
@@ -1813,15 +1705,147 @@
   },
   {
     "breadcrumbs": [
-      "Workshops",
-      "Delete selected"
+      "Getting Started",
+      "Dynamic vs Static nodes"
     ],
     "pageType": "guide",
-    "title": "Delete selected",
-    "section": "Delete selected",
-    "route": "/workshops/delete-selected",
-    "fragment": "delete-selected",
-    "content": "This workshop will show you how to implement deletion of nodes and edges."
+    "title": "Dynamic vs Static nodes",
+    "section": "Dynamic vs Static nodes",
+    "route": "/getting-started/dynamic-vs-static-nodes",
+    "fragment": "dynamic-vs-static-nodes",
+    "content": "You can't mix Node and DynamicNode in a single array so you have to choose what you want to use"
+  },
+  {
+    "breadcrumbs": [
+      "Getting Started",
+      "Dynamic vs Static nodes"
+    ],
+    "pageType": "guide",
+    "title": "Dynamic vs Static nodes",
+    "section": "Dynamic vs Static nodes",
+    "route": "/getting-started/dynamic-vs-static-nodes",
+    "fragment": "dynamic-vs-static-nodes",
+    "content": "For more complex scenarios, you might need to have a fine-grained control on specific nodes. In such cases, you can use DynamicNode, which is essentially a Node with properties with same names but with a WritableSignal type. This offers the following benefits: Granular updates to specific nodes with efficient rendering (only the affected node is re-rendered).Access to the updated state of a node directly (without listening events). For instance, if a point changes due to drag-and-drop, the node's point() signal will reflect the new position.Additional benefits of signals, such as executing actions within an effect when a dynamic property changes."
+  },
+  {
+    "breadcrumbs": [
+      "Getting Started",
+      "Dynamic vs Static nodes"
+    ],
+    "pageType": "guide",
+    "title": "Dynamic vs Static nodes",
+    "section": "Dynamic vs Static nodes",
+    "route": "/getting-started/dynamic-vs-static-nodes",
+    "fragment": "dynamic-vs-static-nodes",
+    "content": "Not all properties of DynamicNode are WritableSignal, for instance an id must be static, so it remains of a regular string type"
+  },
+  {
+    "breadcrumbs": [
+      "Getting Started",
+      "Dynamic vs Static nodes"
+    ],
+    "pageType": "guide",
+    "title": "Dynamic vs Static nodes",
+    "section": "Code example",
+    "route": "/getting-started/dynamic-vs-static-nodes",
+    "fragment": "code-example",
+    "content": "If you want to change a node's position programmatically, you would:"
+  },
+  {
+    "breadcrumbs": [
+      "Getting Started",
+      "Dynamic vs Static nodes"
+    ],
+    "pageType": "guide",
+    "title": "Dynamic vs Static nodes",
+    "section": "See also",
+    "route": "/getting-started/dynamic-vs-static-nodes",
+    "fragment": "see-also",
+    "content": "D3 Force"
+  },
+  {
+    "breadcrumbs": [
+      "Getting Started",
+      "How node sizing works"
+    ],
+    "pageType": "guide",
+    "title": "How node sizing works",
+    "section": "How node sizing works",
+    "route": "/getting-started/how-node-sizing-works",
+    "fragment": "how-node-sizing-works",
+    "content": "This topic needs some clarification due to the design decisions behind the library. The library renders the flow by combining two technologies: SVG, which is responsible for rendering curves, managing zoom, pan, and other tasks that SVG handles well.HTML (with CSS), which is used to create the content for the nodes, allowing front-end engineers to design dynamic and visually appealing UIs more easily than with SVG. The link between these two technologies is the "
+  },
+  {
+    "breadcrumbs": [
+      "Getting Started",
+      "How node sizing works"
+    ],
+    "pageType": "guide",
+    "title": "How node sizing works",
+    "section": "How node sizing works",
+    "route": "/getting-started/how-node-sizing-works",
+    "fragment": "how-node-sizing-works",
+    "content": " element, which enables HTML to be rendered inside SVG. The diagram below illustrates how this element interacts with its content."
+  },
+  {
+    "breadcrumbs": [
+      "Getting Started",
+      "Migrations"
+    ],
+    "pageType": "guide",
+    "title": "Migrations",
+    "section": "Migration to >= v1.0",
+    "route": "/getting-started/migration",
+    "fragment": "migration-to--v10",
+    "content": "remove imports of VflowModule and use Vflow instead (Vflow contains all public standalone components and directives).for standalone components, simply add Vflow to the imports array.for modules, you need to spread ...Vflow into the imports array; otherwise, you will get a type error.remove usage of the computeLayersOnInit setting from the Optimization interface.remove usage of the handlePositions input in the VflowComponent.for classes extending CustomNodeComponent and CustomDynamicNodeComponent:replace this.node to this.node() due to signal input internal migration."
+  },
+  {
+    "breadcrumbs": [
+      "Getting Started",
+      "Principles"
+    ],
+    "pageType": "guide",
+    "title": "Principles",
+    "section": "Principles",
+    "route": "/getting-started/principles",
+    "fragment": "principles",
+    "content": "This page contains a list of general principles that impact feature implementation. No hidden mutations of your data. For example, the library does not modify any of the Node or Edge objects you pass in as inputs. Instead, it creates internal models around these entities and operates on them. Any changes to the passed entities can be observed through events.This principle also implies that you are responsible for managing invalid data. For instance, if you delete a node, the edges corresponding to this node will not be deleted automatically. However, the library will notify you about detached edges so that you can easily delete them."
+  },
+  {
+    "breadcrumbs": [
+      "Getting Started",
+      "Roadmap"
+    ],
+    "pageType": "guide",
+    "title": "Roadmap",
+    "section": "Roadmap",
+    "route": "/getting-started/roadmap",
+    "fragment": "roadmap",
+    "content": "This is a roadmap for ngx-vflow: improve consistency across browsers (mainly appeals to Safari)custom SVG shapesfloating edgesplugin systemnode rotationUI controls for flowsupport for more layout engines (Dagree, etc.)modal system for context menulazy loading nodes based on current viewport (decrease initial bundle)HTML-based renderer as alternative to current SVG-based rendererExperimental canvas/webgl renderer for insane performance"
+  },
+  {
+    "breadcrumbs": [
+      "Getting Started",
+      "What is ngx-vflow"
+    ],
+    "pageType": "guide",
+    "title": "What is ngx-vflow",
+    "section": "What is ngx-vflow",
+    "route": "/getting-started/what-is-ngx-vflow",
+    "fragment": "what-is-ngx-vflow",
+    "content": "ngx-vflow is an Angular library for creating node-based applications. It aims to assist you in building anything from a static diagram to a visual editor. You can utilize the default design or apply your own by customizing everything using familiar technologies."
+  },
+  {
+    "breadcrumbs": [
+      "Getting Started",
+      "What is ngx-vflow"
+    ],
+    "pageType": "guide",
+    "title": "What is ngx-vflow",
+    "section": "Main features",
+    "route": "/getting-started/what-is-ngx-vflow",
+    "fragment": "main-features",
+    "content": "Easy to use: Just describe your flow with a simple API; all of the heavy lifting, such as dragging, zooming, and curve math, is handled by the library for you. Customizable: There is a default design for basic usage, and you can also customize nodes with good old HTML and CSS. Other entities such as edges, connection lines, and handles are also customizable, but it will require a little SVG knowledge. Great performance: Angular signals are the heart and soul of ngx-vflow, which are performant by default, so you shouldn't worry about performance even with large flows. Zoneless: Does not require zone.js"
   },
   {
     "breadcrumbs": [
@@ -1834,6 +1858,18 @@
     "route": "/testing/unit-testing-component-nodes",
     "fragment": "unit-testing-component-nodes",
     "content": "To simplify writing isolated tests for component nodes, you can use the provideCustomNodeMocks function. This helps prevent dependency injection (DI) errors that occur when a node is used outside the scope of the VflowComponent."
+  },
+  {
+    "breadcrumbs": [
+      "Workshops",
+      "Delete selected"
+    ],
+    "pageType": "guide",
+    "title": "Delete selected",
+    "section": "Delete selected",
+    "route": "/workshops/delete-selected",
+    "fragment": "delete-selected",
+    "content": "This workshop will show you how to implement deletion of nodes and edges."
   },
   {
     "breadcrumbs": [
@@ -2290,8 +2326,32 @@
     "pageType": "api",
     "title": "EdgeLabel",
     "section": "EdgeLabel",
-    "route": "/api/ngx-vflow/interfaces/EdgeLabel",
+    "route": "/api/ngx-vflow/type-aliases/EdgeLabel",
     "fragment": "edgelabel"
+  },
+  {
+    "breadcrumbs": [
+      "API",
+      "ngx-vflow",
+      "DefaultEdgeLabel"
+    ],
+    "pageType": "api",
+    "title": "DefaultEdgeLabel",
+    "section": "DefaultEdgeLabel",
+    "route": "/api/ngx-vflow/interfaces/DefaultEdgeLabel",
+    "fragment": "defaultedgelabel"
+  },
+  {
+    "breadcrumbs": [
+      "API",
+      "ngx-vflow",
+      "HtmlTemplateEdgeLabel"
+    ],
+    "pageType": "api",
+    "title": "HtmlTemplateEdgeLabel",
+    "section": "HtmlTemplateEdgeLabel",
+    "route": "/api/ngx-vflow/interfaces/HtmlTemplateEdgeLabel",
+    "fragment": "htmltemplateedgelabel"
   },
   {
     "breadcrumbs": [
@@ -2967,6 +3027,19 @@
     "route": "/api/ngx-vflow/classes/VflowComponent",
     "fragment": "accessors",
     "content": "Nodes to render"
+  },
+  {
+    "breadcrumbs": [
+      "API",
+      "ngx-vflow",
+      "VflowComponent"
+    ],
+    "pageType": "api",
+    "title": "VflowComponent",
+    "section": "Accessors",
+    "route": "/api/ngx-vflow/classes/VflowComponent",
+    "fragment": "accessors",
+    "content": "Snap grid for node movement. Passes as [x, y]"
   },
   {
     "breadcrumbs": [
