@@ -2,6 +2,7 @@ import { Directive, ElementRef, HostListener, inject, output } from '@angular/co
 import { filter, tap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RootPointerDirective } from './root-pointer.directive';
+import { isTouchEvent } from '../utils/event';
 
 @Directive({
   standalone: true,
@@ -28,7 +29,7 @@ export class PointerDirective {
   protected onPointerStart(event: Event) {
     this.pointerStart.emit(event);
 
-    if (event instanceof TouchEvent) {
+    if (isTouchEvent(event)) {
       this.pointerMovementDirective.setInitialTouch(event);
     }
   }
