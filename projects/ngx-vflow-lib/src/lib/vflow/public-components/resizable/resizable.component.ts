@@ -114,16 +114,12 @@ export class ResizableComponent implements OnInit, AfterViewInit {
 
   protected resize(event: PointerEvent) {
     if (!this.resizeSide) return;
-    if (this.isResizeConstrained(event)) return;
 
     const offset = calcOffset(event.movementX, event.movementY, this.zoom());
-    const { x, y, width, height } = constrainRect(
-      applyResize(this.resizeSide, this.model, offset),
-      this.model,
-      this.resizeSide,
-      this.minWidth,
-      this.minHeight,
-    );
+
+    const resized = applyResize(this.resizeSide, this.model, offset, this.getDistanceToEdge(event));
+
+    const { x, y, width, height } = constrainRect(resized, this.model, this.resizeSide, this.minWidth, this.minHeight);
 
     this.model.setPoint({ x, y });
     this.model.width.set(width);
@@ -135,50 +131,18 @@ export class ResizableComponent implements OnInit, AfterViewInit {
     this.model.resizing.set(false);
   }
 
-  private isResizeConstrained({ x, y, movementX, movementY }: PointerEvent): boolean {
-    const flowPoint = this.spacePointContext.documentPointToFlowPoint({ x, y });
+  private getDistanceToEdge(event: PointerEvent): number {
+    const flowPoint = this.spacePointContext.documentPointToFlowPoint({ x: event.x, y: event.y });
+    const { x } = this.model.globalPoint();
+    const { width } = this.model.size();
+    const distanceToEdge = {
+      // left: Math.abs(flowPoint.x - x),
+      right: flowPoint.x - (x + width),
+      // top: Math.abs(flowPoint.y - y),
+      // bottom: Math.abs(flowPoint.y - (y + height)),
+    };
 
-    if (this.resizeSide?.includes('right')) {
-      if (movementX > 0 && flowPoint.x < this.model.point().x + this.model.size().width) {
-        return true;
-      }
-
-      if (movementX < 0 && flowPoint.x > this.model.point().x + this.model.size().width) {
-        return true;
-      }
-    }
-
-    if (this.resizeSide?.includes('left')) {
-      if (movementX < 0 && flowPoint.x > this.model.point().x) {
-        return true;
-      }
-
-      if (movementX > 0 && flowPoint.x < this.model.point().x) {
-        return true;
-      }
-    }
-
-    if (this.resizeSide?.includes('bottom')) {
-      if (movementY > 0 && flowPoint.y < this.model.point().y + this.model.size().height) {
-        return true;
-      }
-
-      if (movementY < 0 && flowPoint.y > this.model.point().y + this.model.size().height) {
-        return true;
-      }
-    }
-
-    if (this.resizeSide?.includes('top')) {
-      if (movementY < 0 && flowPoint.y > this.model.point().y) {
-        return true;
-      }
-
-      if (movementY > 0 && flowPoint.y < this.model.point().y) {
-        return true;
-      }
-    }
-
-    return false;
+    return Math.min(...Object.values(distanceToEdge));
   }
 }
 
@@ -189,7 +153,12 @@ function calcOffset(movementX: number, movementY: number, zoom: number) {
   };
 }
 
-function applyResize(side: Side, model: NodeModel, offset: { offsetX: number; offsetY: number }): Rect {
+function applyResize(
+  side: Side,
+  model: NodeModel,
+  offset: { offsetX: number; offsetY: number },
+  distanceToCursor: number,
+): Rect {
   const { offsetX, offsetY } = offset;
   const { x, y } = model.point();
   const { width, height } = model.size();
@@ -199,7 +168,7 @@ function applyResize(side: Side, model: NodeModel, offset: { offsetX: number; of
     case 'left':
       return { x: x + offsetX, y, width: width - offsetX, height };
     case 'right':
-      return { x, y, width: width + offsetX, height };
+      return { x, y, width: width + offsetX + distanceToCursor, height };
     case 'top':
       return { x, y: y + offsetY, width, height: height - offsetY };
     case 'bottom':
