@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnInit, signal, viewChild, WritableSignal } from '@angular/core';
-import init, { DirectedGraph, VertexRef } from '@vizdom/vizdom-ts-web';
-import { Edge, Node, VflowComponent, Vflow } from 'ngx-vflow';
+import init, { DirectedGraph, VertexWeakRef } from '@vizdom/vizdom-ts-web';
+import { Edge, Node, Vflow, VflowComponent } from 'ngx-vflow';
 
 @Component({
   templateUrl: './vizdom-layout-demo.component.html',
@@ -83,9 +83,9 @@ export class VizdomLayoutDemoComponent implements OnInit {
       },
     });
 
-    // DirectedGraph not provide VErtexRef ids so we need to store it somewhere
+    // DirectedGraph not provide VertexWeakRef ids so we need to store it somewhere
     // for later access
-    const vertices = new Map<string, VertexRef>();
+    const vertices = new Map<string, VertexWeakRef>();
     const nodes = new Map<string, Node>();
 
     nodesToLayout.forEach((n) => {
@@ -120,8 +120,8 @@ export class VizdomLayoutDemoComponent implements OnInit {
     this.nodes.set(
       layout.nodes.map((n) => {
         return {
-          ...nodes.get(n.id)!,
-          id: n.id,
+          ...nodes.get(n.id!)!,
+          id: n.id!,
           point: {
             x: n.x,
             y: n.y,
