@@ -24,13 +24,17 @@ export class NodeRenderingService {
   });
 
   public pullNode(node: NodeModel) {
-    // TODO do not pull when the node is already on top
+    const isAlreadyOnTop = node.renderOrder() !== 0 && this.maxOrder() === node.renderOrder();
+
+    // TODO: does not work for group nodes
+    if (isAlreadyOnTop) {
+      return;
+    }
+
     // pull node
     node.renderOrder.set(this.maxOrder() + 1);
+
     // pull children
-    this.flowEntitiesService
-      .nodes()
-      .filter((n) => n.parent() === node)
-      .forEach((n) => this.pullNode(n));
+    node.children().forEach((n) => this.pullNode(n));
   }
 }
