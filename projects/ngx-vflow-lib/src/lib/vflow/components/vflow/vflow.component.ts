@@ -225,6 +225,14 @@ export class VflowComponent implements OnInit {
   public set snapGrid(value: [number, number]) {
     this.flowSettingsService.snapGrid.set(value);
   }
+
+  /**
+   * Raizing z-index for selected node
+   */
+  @Input()
+  public set elevateNodesOnSelect(value: boolean) {
+    this.flowSettingsService.elevateNodesOnSelect.set(value);
+  }
   // #endregion
 
   // #region MAIN_INPUTS

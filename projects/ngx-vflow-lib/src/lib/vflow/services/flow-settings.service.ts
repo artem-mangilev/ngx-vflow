@@ -4,6 +4,9 @@ import { Background } from '../types/background.type';
 @Injectable()
 export class FlowSettingsService {
   public entitiesSelectable = signal(true);
+
+  public elevateNodesOnSelect = signal(true);
+
   /**
    * @see {VflowComponent.view}
    */

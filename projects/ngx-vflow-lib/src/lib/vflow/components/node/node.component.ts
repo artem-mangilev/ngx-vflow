@@ -128,7 +128,9 @@ export class NodeComponent implements OnInit, OnDestroy {
   }
 
   protected pullNode() {
-    this.nodeRenderingService.pullNode(this.model());
+    if (this.flowSettingsService.elevateNodesOnSelect()) {
+      this.nodeRenderingService.pullNode(this.model());
+    }
   }
 
   protected selectNode() {
