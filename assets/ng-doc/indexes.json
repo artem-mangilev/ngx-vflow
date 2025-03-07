@@ -1214,78 +1214,6 @@
   {
     "breadcrumbs": [
       "Features",
-      "Labels"
-    ],
-    "pageType": "guide",
-    "title": "Labels",
-    "section": "Labels",
-    "route": "/features/labels",
-    "fragment": "labels",
-    "content": "You can attach labels to edges by providing the edgeLabels property to the Edges. There are three slots available for labels on an edge: start, center, and end. There are several ways a label can appear on an edge."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Labels"
-    ],
-    "pageType": "guide",
-    "title": "Labels",
-    "section": "Default",
-    "route": "/features/labels",
-    "fragment": "default",
-    "content": "This method renders simple static text on the edge. To achieve this, you need to: Pass the default type to EdgeLabel.Set the text.Optionally add the style, which supports any CSS property."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Labels"
-    ],
-    "pageType": "guide",
-    "title": "Labels",
-    "section": "HTML Template",
-    "route": "/features/labels",
-    "fragment": "html-template",
-    "content": "This method renders complex HTML on the edge. To achieve this, you need to: Pass the html-template type to EdgeLabel.Provide the "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Labels"
-    ],
-    "pageType": "guide",
-    "title": "Labels",
-    "section": "HTML Template",
-    "route": "/features/labels",
-    "fragment": "html-template",
-    "content": " inside vflow.Optionally pass any data that will be accessible in the template context."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Labels"
-    ],
-    "pageType": "guide",
-    "title": "Labels",
-    "section": "Context",
-    "route": "/features/labels",
-    "fragment": "context",
-    "content": "You may access some data for label through let-ctx according to this interface."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Markers"
-    ],
-    "pageType": "guide",
-    "title": "Markers",
-    "section": "Markers",
-    "route": "/features/markers",
-    "fragment": "markers",
-    "content": "You can create markers for both edges and connections. Edges: Specify start and end markers for corresponding parts of the edge. Currently, markers are limited to two types: arrow and arrow-closed.Connections: You can specify an end marker using the marker property in ConnectionSettings."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
       "Keyboard shortcuts"
     ],
     "pageType": "guide",
@@ -1378,6 +1306,78 @@
     "route": "/features/keyboard-shortcuts",
     "fragment": "customization",
     "content": "To customize the keyboard shortcuts for specific actions, pass a [keyboardShortcuts] input object to the VflowComponent with the following KeyboardShortcuts interface. Here are some key details: The passed object will be merged with the default key combinations.To disable a specific action, pass null for that action.If you want to trigger an action with multiple keys, pass an array of keys. Note: this is not a key combination. For example, if you pass ['ShiftLeft', 'ControlLeft'], the action will be triggered by either ShiftLeft or ControlLeft, but not by pressing both together (ShiftLeft+ControlLeft).You can find the list of available key codes here. In the following example, the default combination for multiSelection is replaced with ['ShiftLeft', 'ShiftRight']."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Labels"
+    ],
+    "pageType": "guide",
+    "title": "Labels",
+    "section": "Labels",
+    "route": "/features/labels",
+    "fragment": "labels",
+    "content": "You can attach labels to edges by providing the edgeLabels property to the Edges. There are three slots available for labels on an edge: start, center, and end. There are several ways a label can appear on an edge."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Labels"
+    ],
+    "pageType": "guide",
+    "title": "Labels",
+    "section": "Default",
+    "route": "/features/labels",
+    "fragment": "default",
+    "content": "This method renders simple static text on the edge. To achieve this, you need to: Pass the default type to EdgeLabel.Set the text.Optionally add the style, which supports any CSS property."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Labels"
+    ],
+    "pageType": "guide",
+    "title": "Labels",
+    "section": "HTML Template",
+    "route": "/features/labels",
+    "fragment": "html-template",
+    "content": "This method renders complex HTML on the edge. To achieve this, you need to: Pass the html-template type to EdgeLabel.Provide the "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Labels"
+    ],
+    "pageType": "guide",
+    "title": "Labels",
+    "section": "HTML Template",
+    "route": "/features/labels",
+    "fragment": "html-template",
+    "content": " inside vflow.Optionally pass any data that will be accessible in the template context."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Labels"
+    ],
+    "pageType": "guide",
+    "title": "Labels",
+    "section": "Context",
+    "route": "/features/labels",
+    "fragment": "context",
+    "content": "You may access some data for label through let-ctx according to this interface."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Markers"
+    ],
+    "pageType": "guide",
+    "title": "Markers",
+    "section": "Markers",
+    "route": "/features/markers",
+    "fragment": "markers",
+    "content": "You can create markers for both edges and connections. Edges: Specify start and end markers for corresponding parts of the edge. Currently, markers are limited to two types: arrow and arrow-closed.Connections: You can specify an end marker using the marker property in ConnectionSettings."
   },
   {
     "breadcrumbs": [
@@ -2975,6 +2975,19 @@
     "route": "/api/ngx-vflow/classes/VflowComponent",
     "fragment": "accessors",
     "content": "Edges to render"
+  },
+  {
+    "breadcrumbs": [
+      "API",
+      "ngx-vflow",
+      "VflowComponent"
+    ],
+    "pageType": "api",
+    "title": "VflowComponent",
+    "section": "Accessors",
+    "route": "/api/ngx-vflow/classes/VflowComponent",
+    "fragment": "accessors",
+    "content": "Raizing z-index for selected node"
   },
   {
     "breadcrumbs": [
