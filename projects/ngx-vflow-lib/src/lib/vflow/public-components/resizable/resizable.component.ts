@@ -240,8 +240,8 @@ function constrainRect(rect: Rect, model: NodeModel, side: Side, minWidth: numbe
     }
 
     // Allow right/bottom resizing without being blocked
-    width = Math.min(width, parentWidth - modelX);
-    height = Math.min(height, parentHeight - modelY);
+    width = Math.min(width, parentWidth - x);
+    height = Math.min(height, parentHeight - y);
   }
 
   const bounds = getNodesBounds(model.children());
