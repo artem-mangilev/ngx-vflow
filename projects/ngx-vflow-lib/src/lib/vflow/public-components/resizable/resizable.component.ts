@@ -27,6 +27,13 @@ import { PointerDirective } from '../../directives/pointer.directive';
 
 type Side = 'top' | 'right' | 'bottom' | 'left' | 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left';
 
+interface DistanceToEdge {
+  left: number;
+  right: number;
+  top: number;
+  bottom: number;
+}
+
 @Component({
   standalone: true,
   selector: '[resizable]',
@@ -131,18 +138,16 @@ export class ResizableComponent implements OnInit, AfterViewInit {
     this.model.resizing.set(false);
   }
 
-  private getDistanceToEdge(event: PointerEvent): number {
+  private getDistanceToEdge(event: PointerEvent): DistanceToEdge {
     const flowPoint = this.spacePointContext.documentPointToFlowPoint({ x: event.x, y: event.y });
-    const { x } = this.model.globalPoint();
-    const { width } = this.model.size();
-    const distanceToEdge = {
-      // left: Math.abs(flowPoint.x - x),
-      right: flowPoint.x - (x + width),
-      // top: Math.abs(flowPoint.y - y),
-      // bottom: Math.abs(flowPoint.y - (y + height)),
-    };
+    const { x, y } = this.model.globalPoint();
 
-    return Math.min(...Object.values(distanceToEdge));
+    return {
+      left: flowPoint.x - x,
+      right: flowPoint.x - (x + this.model.width()),
+      top: flowPoint.y - y,
+      bottom: flowPoint.y - (y + this.model.height()),
+    };
   }
 }
 
@@ -157,7 +162,7 @@ function applyResize(
   side: Side,
   model: NodeModel,
   offset: { offsetX: number; offsetY: number },
-  distanceToCursor: number,
+  distanceToEdge: DistanceToEdge,
 ): Rect {
   const { offsetX, offsetY } = offset;
   const { x, y } = model.point();
@@ -166,36 +171,36 @@ function applyResize(
   // Handle each case of resizing (top, bottom, left, right, corners)
   switch (side) {
     case 'left':
-      return { x: x + offsetX, y, width: width - offsetX, height };
+      return { x: x + offsetX + distanceToEdge.left, y, width: width - offsetX - distanceToEdge.left, height };
     case 'right':
-      return { x, y, width: width + offsetX + distanceToCursor, height };
+      return { x, y, width: width + offsetX + distanceToEdge.right, height };
     case 'top':
-      return { x, y: y + offsetY, width, height: height - offsetY };
+      return { x, y: y + offsetY + distanceToEdge.top, width, height: height - offsetY - distanceToEdge.top };
     case 'bottom':
-      return { x, y, width, height: height + offsetY };
+      return { x, y, width, height: height + offsetY + distanceToEdge.bottom };
     case 'top-left':
       return {
-        x: x + offsetX,
-        y: y + offsetY,
-        width: width - offsetX,
-        height: height - offsetY,
+        x: x + offsetX + distanceToEdge.left,
+        y: y + offsetY + distanceToEdge.top,
+        width: width - offsetX - distanceToEdge.left,
+        height: height - offsetY - distanceToEdge.top,
       };
     case 'top-right':
       return {
         x,
-        y: y + offsetY,
-        width: width + offsetX,
-        height: height - offsetY,
+        y: y + offsetY + distanceToEdge.top,
+        width: width + offsetX + distanceToEdge.right,
+        height: height - offsetY - distanceToEdge.top,
       };
     case 'bottom-left':
       return {
-        x: x + offsetX,
+        x: x + offsetX + distanceToEdge.left,
         y,
-        width: width - offsetX,
-        height: height + offsetY,
+        width: width - offsetX - distanceToEdge.left,
+        height: height + offsetY + distanceToEdge.bottom,
       };
     case 'bottom-right':
-      return { x, y, width: width + offsetX, height: height + offsetY };
+      return { x, y, width: width + offsetX + distanceToEdge.right, height: height + offsetY + distanceToEdge.bottom };
   }
 }
 
