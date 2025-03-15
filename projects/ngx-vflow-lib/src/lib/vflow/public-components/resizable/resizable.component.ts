@@ -222,19 +222,25 @@ function constrainRect(rect: Rect, model: NodeModel, side: Side, minWidth: numbe
   const parent = model.parent();
   // 3. Apply maximum size constraints based on parent size (if exists)
   if (parent) {
-    x = Math.max(x, 0); // Left boundary of the parent
-    y = Math.max(y, 0); // Top boundary of the parent
+    const parentWidth = parent.size().width;
+    const parentHeight = parent.size().height;
+    const modelX = model.point().x;
+    const modelY = model.point().y;
 
-    if (x === 0) {
-      width = model.point().x + model.size().width;
+    x = Math.max(x, 0);
+    y = Math.max(y, 0);
+
+    // Stop resizing when hitting left or top boundary
+    if (side.includes('left') && x === 0) {
+      width = Math.min(width, modelX + model.size().width);
+    }
+    if (side.includes('top') && y === 0) {
+      height = Math.min(height, modelY + model.size().height);
     }
 
-    if (y === 0) {
-      height = model.point().y + model.size().height;
-    }
-
-    width = Math.min(width, parent.size().width - model.point().x);
-    height = Math.min(height, parent.size().height - model.point().y);
+    // Allow right/bottom resizing without being blocked
+    width = Math.min(width, parentWidth - modelX);
+    height = Math.min(height, parentHeight - modelY);
   }
 
   const bounds = getNodesBounds(model.children());
