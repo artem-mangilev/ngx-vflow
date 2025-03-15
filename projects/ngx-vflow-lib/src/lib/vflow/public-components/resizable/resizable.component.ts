@@ -27,6 +27,13 @@ import { PointerDirective } from '../../directives/pointer.directive';
 
 type Side = 'top' | 'right' | 'bottom' | 'left' | 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left';
 
+interface DistanceToEdge {
+  left: number;
+  right: number;
+  top: number;
+  bottom: number;
+}
+
 @Component({
   standalone: true,
   selector: '[resizable]',
@@ -114,16 +121,12 @@ export class ResizableComponent implements OnInit, AfterViewInit {
 
   protected resize(event: PointerEvent) {
     if (!this.resizeSide) return;
-    if (this.isResizeConstrained(event)) return;
 
     const offset = calcOffset(event.movementX, event.movementY, this.zoom());
-    const { x, y, width, height } = constrainRect(
-      applyResize(this.resizeSide, this.model, offset),
-      this.model,
-      this.resizeSide,
-      this.minWidth,
-      this.minHeight,
-    );
+
+    const resized = applyResize(this.resizeSide, this.model, offset, this.getDistanceToEdge(event));
+
+    const { x, y, width, height } = constrainRect(resized, this.model, this.resizeSide, this.minWidth, this.minHeight);
 
     this.model.setPoint({ x, y });
     this.model.width.set(width);
@@ -135,50 +138,16 @@ export class ResizableComponent implements OnInit, AfterViewInit {
     this.model.resizing.set(false);
   }
 
-  private isResizeConstrained({ x, y, movementX, movementY }: PointerEvent): boolean {
-    const flowPoint = this.spacePointContext.documentPointToFlowPoint({ x, y });
+  private getDistanceToEdge(event: PointerEvent): DistanceToEdge {
+    const flowPoint = this.spacePointContext.documentPointToFlowPoint({ x: event.x, y: event.y });
+    const { x, y } = this.model.globalPoint();
 
-    if (this.resizeSide?.includes('right')) {
-      if (movementX > 0 && flowPoint.x < this.model.point().x + this.model.size().width) {
-        return true;
-      }
-
-      if (movementX < 0 && flowPoint.x > this.model.point().x + this.model.size().width) {
-        return true;
-      }
-    }
-
-    if (this.resizeSide?.includes('left')) {
-      if (movementX < 0 && flowPoint.x > this.model.point().x) {
-        return true;
-      }
-
-      if (movementX > 0 && flowPoint.x < this.model.point().x) {
-        return true;
-      }
-    }
-
-    if (this.resizeSide?.includes('bottom')) {
-      if (movementY > 0 && flowPoint.y < this.model.point().y + this.model.size().height) {
-        return true;
-      }
-
-      if (movementY < 0 && flowPoint.y > this.model.point().y + this.model.size().height) {
-        return true;
-      }
-    }
-
-    if (this.resizeSide?.includes('top')) {
-      if (movementY < 0 && flowPoint.y > this.model.point().y) {
-        return true;
-      }
-
-      if (movementY > 0 && flowPoint.y < this.model.point().y) {
-        return true;
-      }
-    }
-
-    return false;
+    return {
+      left: flowPoint.x - x,
+      right: flowPoint.x - (x + this.model.width()),
+      top: flowPoint.y - y,
+      bottom: flowPoint.y - (y + this.model.height()),
+    };
   }
 }
 
@@ -189,44 +158,50 @@ function calcOffset(movementX: number, movementY: number, zoom: number) {
   };
 }
 
-function applyResize(side: Side, model: NodeModel, offset: { offsetX: number; offsetY: number }): Rect {
+function applyResize(
+  side: Side,
+  model: NodeModel,
+  offset: { offsetX: number; offsetY: number },
+  distanceToEdge: DistanceToEdge,
+): Rect {
   const { offsetX, offsetY } = offset;
   const { x, y } = model.point();
-  const { width, height } = model.size();
+  const width = model.width();
+  const height = model.height();
 
   // Handle each case of resizing (top, bottom, left, right, corners)
   switch (side) {
     case 'left':
-      return { x: x + offsetX, y, width: width - offsetX, height };
+      return { x: x + offsetX + distanceToEdge.left, y, width: width - offsetX - distanceToEdge.left, height };
     case 'right':
-      return { x, y, width: width + offsetX, height };
+      return { x, y, width: width + offsetX + distanceToEdge.right, height };
     case 'top':
-      return { x, y: y + offsetY, width, height: height - offsetY };
+      return { x, y: y + offsetY + distanceToEdge.top, width, height: height - offsetY - distanceToEdge.top };
     case 'bottom':
-      return { x, y, width, height: height + offsetY };
+      return { x, y, width, height: height + offsetY + distanceToEdge.bottom };
     case 'top-left':
       return {
-        x: x + offsetX,
-        y: y + offsetY,
-        width: width - offsetX,
-        height: height - offsetY,
+        x: x + offsetX + distanceToEdge.left,
+        y: y + offsetY + distanceToEdge.top,
+        width: width - offsetX - distanceToEdge.left,
+        height: height - offsetY - distanceToEdge.top,
       };
     case 'top-right':
       return {
         x,
-        y: y + offsetY,
-        width: width + offsetX,
-        height: height - offsetY,
+        y: y + offsetY + distanceToEdge.top,
+        width: width + offsetX + distanceToEdge.right,
+        height: height - offsetY - distanceToEdge.top,
       };
     case 'bottom-left':
       return {
-        x: x + offsetX,
+        x: x + offsetX + distanceToEdge.left,
         y,
-        width: width - offsetX,
-        height: height + offsetY,
+        width: width - offsetX - distanceToEdge.left,
+        height: height + offsetY + distanceToEdge.bottom,
       };
     case 'bottom-right':
-      return { x, y, width: width + offsetX, height: height + offsetY };
+      return { x, y, width: width + offsetX + distanceToEdge.right, height: height + offsetY + distanceToEdge.bottom };
   }
 }
 
@@ -242,32 +217,38 @@ function constrainRect(rect: Rect, model: NodeModel, side: Side, minWidth: numbe
   height = Math.max(minHeight, height);
 
   // Apply left/top constraints based on minimum size
-  x = Math.min(x, model.point().x + model.size().width - minWidth);
-  y = Math.min(y, model.point().y + model.size().height - minHeight);
+  x = Math.min(x, model.point().x + model.width() - minWidth);
+  y = Math.min(y, model.point().y + model.height() - minHeight);
 
   const parent = model.parent();
   // 3. Apply maximum size constraints based on parent size (if exists)
   if (parent) {
-    x = Math.max(x, 0); // Left boundary of the parent
-    y = Math.max(y, 0); // Top boundary of the parent
+    const parentWidth = parent.width();
+    const parentHeight = parent.height();
+    const modelX = model.point().x;
+    const modelY = model.point().y;
 
-    if (x === 0) {
-      width = model.point().x + model.size().width;
+    x = Math.max(x, 0);
+    y = Math.max(y, 0);
+
+    // Stop resizing when hitting left or top boundary
+    if (side.includes('left') && x === 0) {
+      width = Math.min(width, modelX + model.width());
+    }
+    if (side.includes('top') && y === 0) {
+      height = Math.min(height, modelY + model.height());
     }
 
-    if (y === 0) {
-      height = model.point().y + model.size().height;
-    }
-
-    width = Math.min(width, parent.size().width - model.point().x);
-    height = Math.min(height, parent.size().height - model.point().y);
+    // Allow right/bottom resizing without being blocked
+    width = Math.min(width, parentWidth - x);
+    height = Math.min(height, parentHeight - y);
   }
 
   const bounds = getNodesBounds(model.children());
   // 4. Apply child node constraints (if children exist)
   if (bounds) {
     if (side.includes('left')) {
-      x = Math.min(x, model.point().x + model.size().width - (bounds.x + bounds.width));
+      x = Math.min(x, model.point().x + model.width() - (bounds.x + bounds.width));
       width = Math.max(width, bounds.x + bounds.width);
     }
 
@@ -280,7 +261,7 @@ function constrainRect(rect: Rect, model: NodeModel, side: Side, minWidth: numbe
     }
 
     if (side.includes('top')) {
-      y = Math.min(y, model.point().y + model.size().height - (bounds.y + bounds.height));
+      y = Math.min(y, model.point().y + model.height() - (bounds.y + bounds.height));
       height = Math.max(height, bounds.y + bounds.height);
     }
   }

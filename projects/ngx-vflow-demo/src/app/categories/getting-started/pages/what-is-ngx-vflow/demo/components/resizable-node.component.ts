@@ -3,11 +3,18 @@ import { CustomDynamicNodeComponent, Vflow } from 'ngx-vflow';
 
 @Component({
   standalone: true,
-  template: ` <div class="resizable" selectable [resizable]="selected()">Resizable Node</div>
+  template: ` <div class="resizable" selectable [resizable]="selected()">
+    Resizable Node
+
     <handle type="target" position="left" />
-    <handle type="source" position="right" />`,
+    <handle type="source" position="right" />
+  </div>`,
   styles: [
     `
+      :host {
+        display: contents;
+      }
+
       .resizable {
         min-width: 150px;
         min-height: 100px;
