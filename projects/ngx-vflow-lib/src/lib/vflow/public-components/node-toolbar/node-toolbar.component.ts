@@ -43,7 +43,7 @@ export class NodeToolbarComponent implements OnInit, OnDestroy {
 
   public position = input<Position>('top');
 
-  public toolbarContentTemplate = viewChild.required<TemplateRef<unknown>>('toolbar');
+  protected toolbarContentTemplate = viewChild.required<TemplateRef<unknown>>('toolbar');
 
   protected model = new ToolbarModel(this.nodeService.model()!);
 

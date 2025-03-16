@@ -1,10 +1,19 @@
 import { Directive, TemplateRef, inject } from '@angular/core';
+import {
+  ConnectionTemplateDirective,
+  EdgeLabelHtmlTemplateDirective,
+  EdgeTemplateDirective,
+  GroupNodeTemplateDirective,
+  HandleTemplateDirective,
+  NodeHtmlTemplateDirective,
+} from '../../directives/template.directive';
+import { AsInterface } from '../types';
 
 @Directive({
   standalone: true,
   selector: 'ng-template[edge]',
 })
-export class EdgeTemplateMockDirective {
+export class EdgeTemplateMockDirective implements AsInterface<EdgeTemplateDirective> {
   public templateRef = inject(TemplateRef);
 }
 
@@ -12,7 +21,7 @@ export class EdgeTemplateMockDirective {
   standalone: true,
   selector: 'ng-template[connection]',
 })
-export class ConnectionTemplateMockDirective {
+export class ConnectionTemplateMockDirective implements AsInterface<ConnectionTemplateDirective> {
   public templateRef = inject(TemplateRef);
 }
 
@@ -20,7 +29,7 @@ export class ConnectionTemplateMockDirective {
   standalone: true,
   selector: 'ng-template[edgeLabelHtml]',
 })
-export class EdgeLabelHtmlTemplateMockDirective {
+export class EdgeLabelHtmlTemplateMockDirective implements AsInterface<EdgeLabelHtmlTemplateDirective> {
   public templateRef = inject(TemplateRef);
 }
 
@@ -28,7 +37,7 @@ export class EdgeLabelHtmlTemplateMockDirective {
   standalone: true,
   selector: 'ng-template[nodeHtml]',
 })
-export class NodeHtmlTemplateMockDirective {
+export class NodeHtmlTemplateMockDirective implements AsInterface<NodeHtmlTemplateDirective> {
   public templateRef = inject(TemplateRef);
 }
 
@@ -36,7 +45,7 @@ export class NodeHtmlTemplateMockDirective {
   standalone: true,
   selector: 'ng-template[groupNode]',
 })
-export class GroupNodeTemplateMockDirective {
+export class GroupNodeTemplateMockDirective implements AsInterface<GroupNodeTemplateDirective> {
   public templateRef = inject(TemplateRef);
 }
 
@@ -44,6 +53,6 @@ export class GroupNodeTemplateMockDirective {
   standalone: true,
   selector: 'ng-template[handle]',
 })
-export class HandleTemplateMockDirective {
+export class HandleTemplateMockDirective implements AsInterface<HandleTemplateDirective> {
   public templateRef = inject(TemplateRef);
 }

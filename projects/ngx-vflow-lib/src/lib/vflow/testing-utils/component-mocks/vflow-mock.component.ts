@@ -1,4 +1,14 @@
-import { ChangeDetectionStrategy, Component, contentChild, input, output, signal, WritableSignal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  contentChild,
+  Input,
+  input,
+  output,
+  signal,
+  WritableSignal,
+  OnInit,
+} from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
 import { Node, DynamicNode } from '../../interfaces/node.interface';
 import { Edge } from '../../interfaces/edge.interface';
@@ -19,12 +29,16 @@ import {
   GroupNodeTemplateMockDirective,
   NodeHtmlTemplateMockDirective,
 } from '../directive-mocks/template-mock.directive';
+import { VflowComponent } from '../../components/vflow/vflow.component';
+import { ConnectionModel } from '../../models/connection.model';
+import { AsInterface } from '../types';
+
 @Component({
   selector: 'vflow',
   template: `
     <ng-content />
 
-    @for (node of nodes(); track $index) {
+    @for (node of nodes; track $index) {
       @if (node.type === 'html-template') {
         <ng-component
           [ngTemplateOutlet]="nodeTemplateDirective()?.templateRef ?? null"
@@ -50,7 +64,7 @@ import {
       }
     }
 
-    @for (edge of edges(); track $index) {
+    @for (edge of edges; track $index) {
       @if (edge.type === 'template') {
         <ng-component
           [ngTemplateOutlet]="edgeTemplateDirective()?.templateRef ?? null"
@@ -98,7 +112,7 @@ import {
       }
     }
 
-    @if (connection()?.type === 'template') {
+    @if (connection.type === 'template') {
       <ng-component
         [ngTemplateOutlet]="connectionTemplateDirective()?.templateRef ?? null"
         [ngTemplateOutletContext]="{
@@ -113,22 +127,47 @@ import {
   standalone: true,
   imports: [NgTemplateOutlet],
 })
-export class VflowMockComponent {
-  public readonly nodes = input.required<Node[] | DynamicNode[]>();
-  public readonly edges = input.required<Edge[]>();
+export class VflowMockComponent implements AsInterface<VflowComponent>, OnInit {
+  @Input({ required: true })
+  public readonly nodes!: Node[] | DynamicNode[];
 
-  public readonly view = input<[number, number] | 'auto'>([400, 400]);
-  public readonly minZoom = input(0.5);
-  public readonly maxZoom = input(3);
-  public readonly background = input<Background | string>('#fff');
+  @Input()
+  public readonly edges!: Edge[];
+
+  @Input()
+  public readonly view: [number, number] | 'auto' = [400, 400];
+
+  @Input()
+  public readonly minZoom = 0.5;
+
+  @Input()
+  public readonly maxZoom = 3;
+
+  @Input()
+  public readonly background: Background | string = '#fff';
+
   public readonly optimization = input<Optimization>({
     detachedGroupsLayer: false,
   });
-  public readonly entitiesSelectable = input(true);
-  public readonly keyboardShortcuts = input<KeyboardShortcuts>({
+
+  @Input()
+  public readonly entitiesSelectable = true;
+
+  @Input()
+  public readonly keyboardShortcuts: KeyboardShortcuts = {
     multiSelection: null,
-  });
-  public readonly connection = input<ConnectionSettings>();
+  };
+
+  @Input({
+    transform: (settings: ConnectionSettings) => new ConnectionModel(settings),
+  })
+  public readonly connection: ConnectionModel = new ConnectionModel({});
+
+  @Input()
+  public readonly snapGrid!: [number, number];
+
+  @Input()
+  public elevateNodesOnSelect!: boolean;
 
   // eslint-disable-next-line @angular-eslint/no-output-on-prefix
   public readonly onComponentNodeEvent = output<any>();
@@ -157,6 +196,9 @@ export class VflowMockComponent {
   public nodesChange$ = toObservable(this.nodesChange);
   public edgesChange$ = toObservable(this.edgesChange);
 
+  // eslint-disable-next-line @angular-eslint/no-empty-lifecycle-method
+  public ngOnInit() {}
+
   public viewportTo(viewport: ViewportState): void {
     this.viewport.set(viewport);
   }
@@ -176,9 +218,8 @@ export class VflowMockComponent {
     return point;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public getNode<T = unknown>(id: string): Node<T> | DynamicNode<T> | undefined {
-    return this.nodes().find((node) => node.id === id);
+    return this.nodes.find((node) => node.id === id);
   }
 
   public getDetachedEdges(): Edge[] {

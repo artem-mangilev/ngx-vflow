@@ -1,4 +1,6 @@
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, OnInit, AfterViewInit } from '@angular/core';
+import { ResizableComponent } from '../../public-components/resizable/resizable.component';
+import { AsInterface } from '../types';
 
 @Component({
   selector: '[resizable]',
@@ -6,8 +8,14 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ResizableMockComponent {
+export class ResizableMockComponent implements AsInterface<ResizableComponent>, OnInit, AfterViewInit {
   public resizable = input<boolean | ''>();
   public resizerColor = input('#2e414c');
   public gap = input(1.5);
+
+  // eslint-disable-next-line @angular-eslint/no-empty-lifecycle-method
+  public ngOnInit() {}
+
+  // eslint-disable-next-line @angular-eslint/no-empty-lifecycle-method
+  public ngAfterViewInit() {}
 }

@@ -8,11 +8,11 @@ import {
   TemplateRef,
   inject,
   input,
+  runInInjectionContext,
 } from '@angular/core';
 import { Position } from '../../types/position.type';
 import { HandleService } from '../../services/handle.service';
 import { HandleModel } from '../../models/handle.model';
-import { InjectionContext, WithInjector } from '../../decorators/run-in-injection-context.decorator';
 
 @Component({
   standalone: true,
@@ -20,8 +20,8 @@ import { InjectionContext, WithInjector } from '../../decorators/run-in-injectio
   templateUrl: './handle.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class HandleComponent implements OnInit, WithInjector {
-  public injector = inject(Injector);
+export class HandleComponent implements OnInit {
+  private injector = inject(Injector);
   private handleService = inject(HandleService);
   private element = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
   private destroyRef = inject(DestroyRef);
@@ -43,29 +43,28 @@ export class HandleComponent implements OnInit, WithInjector {
 
   public template = input<TemplateRef<any>>();
 
-  public model!: HandleModel;
-
-  @InjectionContext
   public ngOnInit() {
-    const node = this.handleService.node();
+    runInInjectionContext(this.injector, () => {
+      const node = this.handleService.node();
 
-    if (node) {
-      this.model = new HandleModel(
-        {
-          position: this.position(),
-          type: this.type(),
-          id: this.id(),
-          hostReference: this.element.parentElement!,
-          template: this.template(),
-        },
-        node,
-      );
+      if (node) {
+        const model = new HandleModel(
+          {
+            position: this.position(),
+            type: this.type(),
+            id: this.id(),
+            hostReference: this.element.parentElement!,
+            template: this.template(),
+          },
+          node,
+        );
 
-      this.handleService.createHandle(this.model);
+        this.handleService.createHandle(model);
 
-      requestAnimationFrame(() => this.model.updateHost());
+        requestAnimationFrame(() => model.updateHost());
 
-      this.destroyRef.onDestroy(() => this.handleService.destroyHandle(this.model));
-    }
+        this.destroyRef.onDestroy(() => this.handleService.destroyHandle(model));
+      }
+    });
   }
 }

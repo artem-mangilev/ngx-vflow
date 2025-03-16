@@ -21,6 +21,8 @@ import { VflowMocks } from './vflow-mocks';
       [entitiesSelectable]="true"
       [keyboardShortcuts]="{ multiSelection: null }"
       [connection]="connection"
+      [snapGrid]="[1, 1]"
+      [elevateNodesOnSelect]="true"
       (onComponentNodeEvent)="(null)"
       (onConnect)="(null)">
       <ng-template nodeHtml>
