@@ -4,8 +4,9 @@
     [attr.d]="model().path().path"
     [attr.marker-start]="markerStartUrl()"
     [attr.marker-end]="markerEndUrl()"
-    [class.edge_selected]="model().selected()"
-    (mousedown)="onEdgeMouseDown()" />
+    [class.edge_selected]="model().selected()" />
+
+  <svg:path class="interactive-edge" [attr.d]="model().path().path" (mousedown)="onEdgeMouseDown()" />
 }
 
 @if (model().type === 'template' && edgeTemplate()) {
