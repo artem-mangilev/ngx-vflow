@@ -1,12 +1,14 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  ElementRef,
   Injector,
   OnInit,
   TemplateRef,
   computed,
   inject,
   input,
+  viewChild,
 } from '@angular/core';
 import { EdgeModel } from '../../models/edge.model';
 import { hashCode } from '../../utils/hash';
@@ -37,6 +39,8 @@ export class EdgeComponent implements OnInit {
   public edgeTemplate = input<TemplateRef<EdgeContext>>();
 
   public edgeLabelHtmlTemplate = input<TemplateRef<any>>();
+
+  public interactiveEdgeRef = viewChild.required<ElementRef<Element>>('interactiveEdge');
 
   protected markerStartUrl = computed(() => {
     const marker = this.model().edge.markers?.start;

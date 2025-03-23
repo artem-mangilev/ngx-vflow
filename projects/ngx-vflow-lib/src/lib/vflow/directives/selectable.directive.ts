@@ -1,10 +1,12 @@
-import { Directive, HostListener, inject } from '@angular/core';
+import { Directive, ElementRef, inject } from '@angular/core';
 import { SelectionService } from '../services/selection.service';
 import { EdgeComponent } from '../components/edge/edge.component';
 
 import { FlowEntity } from '../interfaces/flow-entity.interface';
 import { NodeComponent } from '../components/node/node.component';
 import { FlowSettingsService } from '../services/flow-settings.service';
+import { fromEvent, merge, tap } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Directive({
   standalone: true,
@@ -16,9 +18,16 @@ export class SelectableDirective {
   private parentEdge = inject(EdgeComponent, { optional: true });
   private parentNode = inject(NodeComponent, { optional: true });
 
-  @HostListener('mousedown')
-  @HostListener('touchstart')
-  protected onMousedown() {
+  private host = inject<ElementRef<Element>>(ElementRef);
+
+  protected selectOnEvent = this.getEvent$()
+    .pipe(
+      tap(() => this.select()),
+      takeUntilDestroyed(),
+    )
+    .subscribe();
+
+  private select() {
     const entity = this.entity();
     if (entity && this.flowSettingsService.entitiesSelectable()) {
       this.selectionService.select(entity);
@@ -33,5 +42,16 @@ export class SelectableDirective {
     }
 
     return null;
+  }
+
+  private getEvent$() {
+    if (this.parentEdge) {
+      // get not the edge itself, but the interactive edge (which is more UX friendly)
+      const interactiveEdge = this.parentEdge.interactiveEdgeRef().nativeElement;
+
+      return merge(fromEvent(interactiveEdge, 'mousedown'), fromEvent(interactiveEdge, 'touchstart'));
+    }
+
+    return merge(fromEvent(this.host.nativeElement, 'mousedown'), fromEvent(this.host.nativeElement, 'touchstart'));
   }
 }
