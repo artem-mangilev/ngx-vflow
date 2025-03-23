@@ -5,11 +5,10 @@ import { EdgeLabelModel } from './edge-label.model';
 import { NodeModel } from './node.model';
 import { straightPath } from '../math/edge-path/straigh-path';
 import { bezierPath } from '../math/edge-path/bezier-path';
-import { UsingPoints } from '../types/using-points.type';
-import { HandleModel } from './handle.model';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { FlowEntity } from '../interfaces/flow-entity.interface';
 import { smoothStepPath } from '../math/edge-path/smooth-step-path';
+import { UsingPoints } from '../types/using-points.type';
 
 export class EdgeModel implements FlowEntity {
   public source = signal<NodeModel | undefined>(undefined);
@@ -49,27 +48,8 @@ export class EdgeModel implements FlowEntity {
   public detached$ = toObservable(this.detached);
 
   public path = computed(() => {
-    let source: HandleModel | undefined;
-    if (this.edge.sourceHandle) {
-      source = this.source()
-        ?.handles()
-        .find((handle) => handle.rawHandle.id === this.edge.sourceHandle);
-    } else {
-      source = this.source()
-        ?.handles()
-        .find((handle) => handle.rawHandle.type === 'source');
-    }
-
-    let target: HandleModel | undefined;
-    if (this.edge.targetHandle) {
-      target = this.target()
-        ?.handles()
-        .find((handle) => handle.rawHandle.id === this.edge.targetHandle);
-    } else {
-      target = this.target()
-        ?.handles()
-        .find((handle) => handle.rawHandle.type === 'target');
-    }
+    const source = this.sourceHandle();
+    const target = this.targetHandle();
 
     // TODO: don't like this
     if (!source || !target) {
@@ -110,6 +90,38 @@ export class EdgeModel implements FlowEntity {
           0,
         );
     }
+  });
+
+  public sourceHandle = computed(() => {
+    if (this.edge.sourceHandle) {
+      return (
+        this.source()
+          ?.handles()
+          .find((handle) => handle.rawHandle.id === this.edge.sourceHandle) ?? null
+      );
+    }
+
+    return (
+      this.source()
+        ?.handles()
+        .find((handle) => handle.rawHandle.type === 'source') ?? null
+    );
+  });
+
+  public targetHandle = computed(() => {
+    if (this.edge.targetHandle) {
+      return (
+        this.target()
+          ?.handles()
+          .find((handle) => handle.rawHandle.id === this.edge.targetHandle) ?? null
+      );
+    }
+
+    return (
+      this.target()
+        ?.handles()
+        .find((handle) => handle.rawHandle.type === 'target') ?? null
+    );
   });
 
   public edgeLabels: { [position in EdgeLabelPosition]?: EdgeLabelModel } = {};

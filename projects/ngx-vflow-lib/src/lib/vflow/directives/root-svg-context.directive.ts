@@ -16,7 +16,7 @@ export class RootSvgContextDirective {
   protected resetConnection() {
     const status = this.flowStatusService.status();
 
-    if (status.state === 'connection-start') {
+    if (status.state === 'connection-start' || status.state === 'reconnection-start') {
       this.flowStatusService.setIdleStatus();
     }
   }

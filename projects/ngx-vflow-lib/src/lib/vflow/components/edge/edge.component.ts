@@ -17,6 +17,9 @@ import { SelectionService } from '../../services/selection.service';
 import { FlowSettingsService } from '../../services/flow-settings.service';
 import { EdgeLabelComponent } from '../edge-label/edge-label.component';
 import { NgTemplateOutlet } from '@angular/common';
+import { ConnectionControllerDirective } from '../../directives/connection-controller.directive';
+import { HandleModel } from '../../models/handle.model';
+import { FlowStatusService } from '../../services/flow-status.service';
 
 @Component({
   standalone: true,
@@ -26,6 +29,7 @@ import { NgTemplateOutlet } from '@angular/common';
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'selectable',
+    '[style.visibility]': 'isReconnecting() ? "hidden" : "visible"',
   },
   imports: [NgTemplateOutlet, EdgeLabelComponent],
 })
@@ -33,6 +37,10 @@ export class EdgeComponent implements OnInit {
   protected injector = inject(Injector);
   private selectionService = inject(SelectionService);
   private flowSettingsService = inject(FlowSettingsService);
+  private flowStatusService = inject(FlowStatusService);
+
+  // TODO remove dependency from this directive
+  private connectionController = inject(ConnectionControllerDirective, { optional: true });
 
   public model = input.required<EdgeModel>();
 
@@ -54,6 +62,13 @@ export class EdgeComponent implements OnInit {
     return marker ? `url(#${hashCode(JSON.stringify(marker))})` : '';
   });
 
+  protected isReconnecting = computed(() => {
+    const status = this.flowStatusService.status();
+    const isReconnecting = status.state === 'reconnection-start' || status.state === 'reconnection-validation';
+
+    return isReconnecting && status.payload.oldEdge === this.model();
+  });
+
   protected edgeContext!: EdgeContext;
 
   public ngOnInit(): void {
@@ -73,5 +88,12 @@ export class EdgeComponent implements OnInit {
     if (this.flowSettingsService.entitiesSelectable()) {
       this.selectionService.select(this.model());
     }
+  }
+
+  protected startReconnection(event: Event, handle: HandleModel) {
+    // ignore drag by stopping propagation
+    event.stopPropagation();
+
+    this.connectionController?.startReconnection(handle, this.model());
   }
 }

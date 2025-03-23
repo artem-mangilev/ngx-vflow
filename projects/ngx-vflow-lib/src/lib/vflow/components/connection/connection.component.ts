@@ -44,7 +44,7 @@ export class ConnectionComponent {
   protected path = computed(() => {
     const status = this.flowStatusService.status();
 
-    if (status.state === 'connection-start') {
+    if (status.state === 'connection-start' || status.state === 'reconnection-start') {
       const sourceHandle = status.payload.sourceHandle;
       const sourcePoint = sourceHandle.pointAbsolute();
       const sourcePosition = sourceHandle.rawHandle.position;
@@ -64,7 +64,7 @@ export class ConnectionComponent {
       }
     }
 
-    if (status.state === 'connection-validation') {
+    if (status.state === 'connection-validation' || status.state === 'reconnection-validation') {
       const sourceHandle = status.payload.sourceHandle;
       const sourcePoint = sourceHandle.pointAbsolute();
       const sourcePosition = sourceHandle.rawHandle.position;

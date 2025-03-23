@@ -82,7 +82,9 @@ export class NodeComponent implements OnInit, OnDestroy {
   protected showMagnet = computed(
     () =>
       this.flowStatusService.status().state === 'connection-start' ||
-      this.flowStatusService.status().state === 'connection-validation',
+      this.flowStatusService.status().state === 'connection-validation' ||
+      this.flowStatusService.status().state === 'reconnection-start' ||
+      this.flowStatusService.status().state === 'reconnection-validation',
   );
 
   protected toolbar = computed(() => this.overlaysService.nodeToolbars().get(this.model()));
