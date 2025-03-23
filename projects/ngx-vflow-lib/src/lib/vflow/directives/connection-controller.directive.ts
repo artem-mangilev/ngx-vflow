@@ -106,10 +106,10 @@ export class ConnectionControllerDirective {
       isReconnection
         ? this.statusService.setReconnectionValidationStatus(
             valid,
-            source,
-            target,
-            sourceHandle,
-            targetHandle,
+            status.payload.source,
+            handle.parentNode,
+            status.payload.sourceHandle,
+            handle,
             status.payload.oldEdge,
           )
         : this.statusService.setConnectionValidationStatus(

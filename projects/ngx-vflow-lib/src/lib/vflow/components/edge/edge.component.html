@@ -48,20 +48,18 @@
 }
 
 <!-- Source reconnect handle -->
-@if (model().sourceHandle(); as source) {
+@if (model().sourceHandle() && model().targetHandle()) {
   <svg:circle
     class="reconnect-handle"
     r="10"
-    [attr.cx]="source.pointAbsolute().x"
-    [attr.cy]="source.pointAbsolute().y"
-    (mousedown)="startReconnection($event, source)" />
-}
+    [attr.cx]="model().sourceHandle()!.pointAbsolute().x"
+    [attr.cy]="model().sourceHandle()!.pointAbsolute().y"
+    (mousedown)="startReconnection($event, model().targetHandle()!)" />
 
-@if (model().targetHandle(); as target) {
   <svg:circle
     class="reconnect-handle"
     r="10"
-    [attr.cx]="target.pointAbsolute().x"
-    [attr.cy]="target.pointAbsolute().y"
-    (mousedown)="startReconnection($event, target)" />
+    [attr.cx]="model().targetHandle()!.pointAbsolute().x"
+    [attr.cy]="model().targetHandle()!.pointAbsolute().y"
+    (mousedown)="startReconnection($event, model().sourceHandle()!)" />
 }
