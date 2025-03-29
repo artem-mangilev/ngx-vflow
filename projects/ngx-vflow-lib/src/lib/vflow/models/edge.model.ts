@@ -19,6 +19,8 @@ export class EdgeModel implements FlowEntity {
   public selected = signal(false);
   public selected$ = toObservable(this.selected);
 
+  public renderOrder = signal(0);
+
   public detached = computed(() => {
     const source = this.source();
     const target = this.target();

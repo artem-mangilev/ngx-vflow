@@ -6,7 +6,7 @@
     [attr.marker-end]="markerEndUrl()"
     [class.edge_selected]="model().selected()" />
 
-  <svg:path #interactiveEdge class="interactive-edge" [attr.d]="model().path().path" (mousedown)="onEdgeMouseDown()" />
+  <svg:path #interactiveEdge class="interactive-edge" [attr.d]="model().path().path" (mousedown)="select(); pull()" />
 }
 
 @if (model().type === 'template' && edgeTemplate()) {
@@ -16,7 +16,7 @@
       [ngTemplateOutletContext]="edgeContext"
       [ngTemplateOutletInjector]="injector" />
 
-    <svg:path #interactiveEdge class="interactive-edge" [attr.d]="model().path().path" />
+    <svg:path #interactiveEdge class="interactive-edge" [attr.d]="model().path().path" (mousedown)="pull()" />
   }
 }
 

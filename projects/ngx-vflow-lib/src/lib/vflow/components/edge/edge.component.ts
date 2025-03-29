@@ -20,6 +20,7 @@ import { NgTemplateOutlet } from '@angular/common';
 import { ConnectionControllerDirective } from '../../directives/connection-controller.directive';
 import { HandleModel } from '../../models/handle.model';
 import { FlowStatusService } from '../../services/flow-status.service';
+import { EdgeRenderingService } from '../../services/edge-rendering.service';
 
 @Component({
   standalone: true,
@@ -38,6 +39,7 @@ export class EdgeComponent implements OnInit {
   private selectionService = inject(SelectionService);
   private flowSettingsService = inject(FlowSettingsService);
   private flowStatusService = inject(FlowStatusService);
+  private edgeRenderingService = inject(EdgeRenderingService);
 
   // TODO remove dependency from this directive
   private connectionController = inject(ConnectionControllerDirective, { optional: true });
@@ -84,9 +86,15 @@ export class EdgeComponent implements OnInit {
     };
   }
 
-  public onEdgeMouseDown() {
+  public select() {
     if (this.flowSettingsService.entitiesSelectable()) {
       this.selectionService.select(this.model());
+    }
+  }
+
+  public pull() {
+    if (this.flowSettingsService.elevateEdgesOnSelect()) {
+      this.edgeRenderingService.pull(this.model());
     }
   }
 

@@ -6,6 +6,7 @@ export class FlowSettingsService {
   public entitiesSelectable = signal(true);
 
   public elevateNodesOnSelect = signal(true);
+  public elevateEdgesOnSelect = signal(true);
 
   /**
    * @see {VflowComponent.view}

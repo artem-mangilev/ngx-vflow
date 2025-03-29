@@ -169,6 +169,9 @@ export class VflowMockComponent implements AsInterface<VflowComponent>, OnInit {
   @Input()
   public elevateNodesOnSelect!: boolean;
 
+  @Input()
+  public elevateEdgesOnSelect!: boolean;
+
   // eslint-disable-next-line @angular-eslint/no-output-on-prefix
   public readonly onComponentNodeEvent = output<any>();
 
