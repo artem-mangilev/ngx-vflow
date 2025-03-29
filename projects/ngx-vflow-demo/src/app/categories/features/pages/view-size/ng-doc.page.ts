@@ -20,7 +20,6 @@ const TestPage: NgDocPage = {
       },
     ],
   },
-  order: 2,
 };
 
 export default TestPage;

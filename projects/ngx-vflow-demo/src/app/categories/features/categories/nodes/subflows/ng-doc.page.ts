@@ -1,14 +1,14 @@
 import { NgDocPage } from '@ng-doc/core';
-import ExamplesCategory from '../../ng-doc.category';
+import NodesCategory from '../ng-doc.category';
 import { SubflowsDemoComponent } from './demo/subflows-demo.component';
 
 const TestPage: NgDocPage = {
   title: `Subflows`,
   mdFile: './index.md',
-  category: ExamplesCategory,
+  category: NodesCategory,
   demos: { SubflowsDemoComponent },
   keyword: 'FeaturesSubflows',
-  order: 1,
+  order: 3,
 };
 
 export default TestPage;

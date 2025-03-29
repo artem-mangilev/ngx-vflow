@@ -1,13 +1,13 @@
 import { NgDocPage } from '@ng-doc/core';
-import ExamplesCategory from '../../ng-doc.category';
+import EdgesCategory from '../ng-doc.category';
 import { DefaultEdgesDemoComponent } from './demo/default-edges-demo.component';
 
 const TestPage: NgDocPage = {
   title: `Default edges`,
   mdFile: './index.md',
-  category: ExamplesCategory,
+  category: EdgesCategory,
   demos: { DefaultEdgesDemoComponent },
-  order: 2,
+  order: 1,
 };
 
 export default TestPage;

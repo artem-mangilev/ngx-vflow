@@ -13,7 +13,6 @@ const TestPage: NgDocPage = {
     DotsCustomBackgroundDemoComponent,
     ImageCustomBackgroundDemoComponent,
   },
-  order: 11,
 };
 
 export default TestPage;

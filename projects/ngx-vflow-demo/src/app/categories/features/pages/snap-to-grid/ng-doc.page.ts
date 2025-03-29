@@ -7,7 +7,6 @@ const TestPage: NgDocPage = {
   mdFile: './index.md',
   category: ExamplesCategory,
   demos: { SubflowsDemoComponent },
-  order: 1,
 };
 
 export default TestPage;

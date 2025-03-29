@@ -1,5 +1,5 @@
 import { NgDocPage } from '@ng-doc/core';
-import ExamplesCategory from '../../ng-doc.category';
+import NodesCategory from '../ng-doc.category';
 import { DefaultGroupResizerDemoComponent } from './demo/default-group-resizer-demo.component';
 import { TemplateGroupResizerDemoComponent } from './demo/template-group-resizer-demo.component';
 import { TemplateNodeResizerDemoComponent } from './demo/template-node-resizer-demo.component';
@@ -7,13 +7,13 @@ import { TemplateNodeResizerDemoComponent } from './demo/template-node-resizer-d
 const TestPage: NgDocPage = {
   title: `Resizer`,
   mdFile: './index.md',
-  category: ExamplesCategory,
+  category: NodesCategory,
   demos: {
     DefaultGroupResizerDemoComponent,
     TemplateGroupResizerDemoComponent,
     TemplateNodeResizerDemoComponent,
   },
-  order: 1,
+  order: 4,
 };
 
 export default TestPage;
