@@ -8,6 +8,6 @@ export interface Connection {
 }
 
 export interface ReconnectionEvent {
-  newConnection: Connection;
+  connection: Connection;
   oldEdge: Edge;
 }

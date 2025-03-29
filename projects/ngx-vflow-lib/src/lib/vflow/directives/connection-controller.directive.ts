@@ -41,16 +41,13 @@ export class ConnectionControllerDirective {
     toObservable(this.statusService.status).pipe(
       filter((status): status is FlowStatusReconnectionEnd => status.state === 'reconnection-end'),
       map((status) => {
-        const newConnection = statusToConnection(status, this.isStrictMode());
+        const connection = statusToConnection(status, this.isStrictMode());
         const oldEdge = status.payload.oldEdge.edge;
 
-        return {
-          newConnection,
-          oldEdge,
-        };
+        return { connection, oldEdge };
       }),
       tap(() => this.statusService.setIdleStatus()),
-      filter(({ newConnection }) => this.flowEntitiesService.connection().validator(newConnection)),
+      filter(({ connection }) => this.flowEntitiesService.connection().validator(connection)),
     ),
   );
 
