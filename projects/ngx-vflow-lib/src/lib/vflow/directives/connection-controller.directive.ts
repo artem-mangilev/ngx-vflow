@@ -10,7 +10,7 @@ import { filter, map, tap } from 'rxjs';
 import { EdgeModel } from '../models/edge.model';
 
 @Directive({
-  selector: '[onConnect]',
+  selector: '[onConnect], [onReconnect]',
   standalone: true,
 })
 export class ConnectionControllerDirective {
