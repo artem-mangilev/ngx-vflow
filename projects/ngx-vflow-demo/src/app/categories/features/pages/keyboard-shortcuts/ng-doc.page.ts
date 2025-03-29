@@ -7,7 +7,6 @@ const TestPage: NgDocPage = {
   mdFile: './index.md',
   category: ExamplesCategory,
   demos: { KeyboardShortcutsDemoComponent },
-  order: 1,
 };
 
 export default TestPage;

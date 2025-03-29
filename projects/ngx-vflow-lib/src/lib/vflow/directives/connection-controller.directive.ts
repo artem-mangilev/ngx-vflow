@@ -1,15 +1,16 @@
 import { Directive, computed, inject } from '@angular/core';
-import { Connection } from '../interfaces/connection.interface';
-import { FlowStatusConnectionEnd, FlowStatusService } from '../services/flow-status.service';
+import { Connection, ReconnectionEvent } from '../interfaces/connection.interface';
+import { FlowStatusConnectionEnd, FlowStatusReconnectionEnd, FlowStatusService } from '../services/flow-status.service';
 
 import { FlowEntitiesService } from '../services/flow-entities.service';
 import { HandleModel } from '../models/handle.model';
 import { adjustDirection } from '../utils/adjust-direction';
 import { outputFromObservable, toObservable } from '@angular/core/rxjs-interop';
 import { filter, map, tap } from 'rxjs';
+import { EdgeModel } from '../models/edge.model';
 
 @Directive({
-  selector: '[onConnect]',
+  selector: '[onConnect], [onReconnect]',
   standalone: true,
 })
 export class ConnectionControllerDirective {
@@ -30,41 +31,23 @@ export class ConnectionControllerDirective {
   public readonly onConnect = outputFromObservable<Connection>(
     toObservable(this.statusService.status).pipe(
       filter((status): status is FlowStatusConnectionEnd => status.state === 'connection-end'),
-      map((status) => {
-        let source = status.payload.source;
-        let target = status.payload.target;
-        let sourceHandle = status.payload.sourceHandle;
-        let targetHandle = status.payload.targetHandle;
-
-        if (this.isStrictMode()) {
-          const adjusted = adjustDirection({
-            source: status.payload.source,
-            sourceHandle: status.payload.sourceHandle,
-            target: status.payload.target,
-            targetHandle: status.payload.targetHandle,
-          });
-
-          source = adjusted.source;
-          target = adjusted.target;
-          sourceHandle = adjusted.sourceHandle;
-          targetHandle = adjusted.targetHandle;
-        }
-
-        const sourceId = source.node.id;
-        const targetId = target.node.id;
-
-        const sourceHandleId = sourceHandle.rawHandle.id;
-        const targetHandleId = targetHandle.rawHandle.id;
-
-        return {
-          source: sourceId,
-          target: targetId,
-          sourceHandle: sourceHandleId,
-          targetHandle: targetHandleId,
-        };
-      }),
+      map((status) => statusToConnection(status, this.isStrictMode())),
       tap(() => this.statusService.setIdleStatus()),
       filter((connection) => this.flowEntitiesService.connection().validator(connection)),
+    ),
+  );
+
+  public readonly onReconnect = outputFromObservable<ReconnectionEvent>(
+    toObservable(this.statusService.status).pipe(
+      filter((status): status is FlowStatusReconnectionEnd => status.state === 'reconnection-end'),
+      map((status) => {
+        const connection = statusToConnection(status, this.isStrictMode());
+        const oldEdge = status.payload.oldEdge.edge;
+
+        return { connection, oldEdge };
+      }),
+      tap(() => this.statusService.setIdleStatus()),
+      filter(({ connection }) => this.flowEntitiesService.connection().validator(connection)),
     ),
   );
 
@@ -74,10 +57,16 @@ export class ConnectionControllerDirective {
     this.statusService.setConnectionStartStatus(handle.parentNode, handle);
   }
 
+  public startReconnection(handle: HandleModel, oldEdge: EdgeModel) {
+    this.statusService.setReconnectionStartStatus(handle.parentNode, handle, oldEdge);
+  }
+
   public validateConnection(handle: HandleModel) {
     const status = this.statusService.status();
 
-    if (status.state === 'connection-start') {
+    if (status.state === 'connection-start' || status.state === 'reconnection-start') {
+      const isReconnection = status.state === 'reconnection-start';
+
       let source = status.payload.source;
       let target = handle.parentNode;
       let sourceHandle = status.payload.sourceHandle;
@@ -111,13 +100,22 @@ export class ConnectionControllerDirective {
 
       // status is about how we draw connection, so we don't need
       // swapped diretion here
-      this.statusService.setConnectionValidationStatus(
-        valid,
-        status.payload.source,
-        handle.parentNode,
-        status.payload.sourceHandle,
-        handle,
-      );
+      isReconnection
+        ? this.statusService.setReconnectionValidationStatus(
+            valid,
+            status.payload.source,
+            handle.parentNode,
+            status.payload.sourceHandle,
+            handle,
+            status.payload.oldEdge,
+          )
+        : this.statusService.setConnectionValidationStatus(
+            valid,
+            status.payload.source,
+            handle.parentNode,
+            status.payload.sourceHandle,
+            handle,
+          );
     }
   }
 
@@ -126,21 +124,76 @@ export class ConnectionControllerDirective {
 
     // drop back to start status
     const status = this.statusService.status();
-    if (status.state === 'connection-validation') {
-      this.statusService.setConnectionStartStatus(status.payload.source, status.payload.sourceHandle);
+    if (status.state === 'connection-validation' || status.state === 'reconnection-validation') {
+      const isReconnection = status.state === 'reconnection-validation';
+
+      isReconnection
+        ? this.statusService.setReconnectionStartStatus(
+            status.payload.source,
+            status.payload.sourceHandle,
+            status.payload.oldEdge,
+          )
+        : this.statusService.setConnectionStartStatus(status.payload.source, status.payload.sourceHandle);
     }
   }
 
   public endConnection() {
     const status = this.statusService.status();
 
-    if (status.state === 'connection-validation') {
+    if (status.state === 'connection-validation' || status.state === 'reconnection-validation') {
+      const isReconnection = status.state === 'reconnection-validation';
+
       const source = status.payload.source;
       const sourceHandle = status.payload.sourceHandle;
       const target = status.payload.target;
       const targetHandle = status.payload.targetHandle;
 
-      this.statusService.setConnectionEndStatus(source, target, sourceHandle, targetHandle);
+      isReconnection
+        ? this.statusService.setReconnectionEndStatus(
+            source,
+            target,
+            sourceHandle,
+            targetHandle,
+            status.payload.oldEdge,
+          )
+        : this.statusService.setConnectionEndStatus(source, target, sourceHandle, targetHandle);
     }
   }
+}
+
+function statusToConnection(
+  status: FlowStatusConnectionEnd | FlowStatusReconnectionEnd,
+  isStrictMode: boolean,
+): Connection {
+  let source = status.payload.source;
+  let target = status.payload.target;
+  let sourceHandle = status.payload.sourceHandle;
+  let targetHandle = status.payload.targetHandle;
+
+  if (isStrictMode) {
+    const adjusted = adjustDirection({
+      source: status.payload.source,
+      sourceHandle: status.payload.sourceHandle,
+      target: status.payload.target,
+      targetHandle: status.payload.targetHandle,
+    });
+
+    source = adjusted.source;
+    target = adjusted.target;
+    sourceHandle = adjusted.sourceHandle;
+    targetHandle = adjusted.targetHandle;
+  }
+
+  const sourceId = source.node.id;
+  const targetId = target.node.id;
+
+  const sourceHandleId = sourceHandle.rawHandle.id;
+  const targetHandleId = targetHandle.rawHandle.id;
+
+  return {
+    source: sourceId,
+    target: targetId,
+    sourceHandle: sourceHandleId,
+    targetHandle: targetHandleId,
+  };
 }

@@ -62,6 +62,7 @@ import { FlowSizeControllerDirective } from '../../directives/flow-size-controll
 import { RootPointerDirective } from '../../directives/root-pointer.directive';
 import { RootSvgContextDirective } from '../../directives/root-svg-context.directive';
 import { RootSvgReferenceDirective } from '../../directives/reference.directive';
+import { EdgeRenderingService } from '../../services/edge-rendering.service';
 
 const changesControllerHostDirective = {
   directive: ChangesControllerDirective,
@@ -112,6 +113,7 @@ const changesControllerHostDirective = {
     NodesChangeService,
     EdgeChangesService,
     NodeRenderingService,
+    EdgeRenderingService,
     SelectionService,
     FlowSettingsService,
     ComponentEventBusService,
@@ -141,6 +143,7 @@ export class VflowComponent implements OnInit {
   private nodesChangeService = inject(NodesChangeService);
   private edgesChangeService = inject(EdgeChangesService);
   private nodeRenderingService = inject(NodeRenderingService);
+  private edgeRenderingService = inject(EdgeRenderingService);
   private flowSettingsService = inject(FlowSettingsService);
   private componentEventBusService = inject(ComponentEventBusService);
   private keyboardService = inject(KeyboardService);
@@ -233,6 +236,14 @@ export class VflowComponent implements OnInit {
   public set elevateNodesOnSelect(value: boolean) {
     this.flowSettingsService.elevateNodesOnSelect.set(value);
   }
+
+  /**
+   * Raizing z-index for selected edge
+   */
+  @Input()
+  public set elevateEdgesOnSelect(value: boolean) {
+    this.flowSettingsService.elevateEdgesOnSelect.set(value);
+  }
   // #endregion
 
   // #region MAIN_INPUTS
@@ -270,7 +281,7 @@ export class VflowComponent implements OnInit {
     this.flowEntitiesService.edges.set(newModels);
   }
 
-  protected edgeModels = computed(() => this.flowEntitiesService.validEdges());
+  protected edgeModels = computed(() => this.edgeRenderingService.edges());
   // #endregion
 
   // #region OUTPUTS

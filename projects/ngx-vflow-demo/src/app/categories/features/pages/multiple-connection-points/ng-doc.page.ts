@@ -7,7 +7,6 @@ const TestPage: NgDocPage = {
   mdFile: './index.md',
   category: ExamplesCategory,
   demos: { MultipleConnectionPointsDemoComponent },
-  order: 2,
 };
 
 export default TestPage;

@@ -8,3 +8,14 @@
     stroke: #0f4c75;
   }
 }
+
+.interactive-edge {
+  fill: none;
+  stroke-width: 20;
+  stroke: transparent;
+}
+
+.reconnect-handle {
+  fill: transparent;
+  cursor: move;
+}
