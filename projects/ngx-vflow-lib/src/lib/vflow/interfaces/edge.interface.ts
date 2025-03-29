@@ -15,4 +15,5 @@ export interface Edge<T = unknown> extends Connection {
     start?: Marker;
     end?: Marker;
   };
+  reconnectable?: boolean | 'source' | 'target';
 }

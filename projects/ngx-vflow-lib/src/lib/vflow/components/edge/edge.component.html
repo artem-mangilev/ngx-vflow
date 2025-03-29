@@ -47,19 +47,22 @@
     [htmlTemplate]="edgeLabelHtmlTemplate()" />
 }
 
-<!-- Source reconnect handle -->
 @if (model().sourceHandle() && model().targetHandle()) {
-  <svg:circle
-    class="reconnect-handle"
-    r="10"
-    [attr.cx]="model().sourceHandle()!.pointAbsolute().x"
-    [attr.cy]="model().sourceHandle()!.pointAbsolute().y"
-    (mousedown)="startReconnection($event, model().targetHandle()!)" />
+  @if (model().reconnectable === true || model().reconnectable === 'source') {
+    <svg:circle
+      class="reconnect-handle"
+      r="10"
+      [attr.cx]="model().sourceHandle()!.pointAbsolute().x"
+      [attr.cy]="model().sourceHandle()!.pointAbsolute().y"
+      (mousedown)="startReconnection($event, model().targetHandle()!)" />
+  }
 
-  <svg:circle
-    class="reconnect-handle"
-    r="10"
-    [attr.cx]="model().targetHandle()!.pointAbsolute().x"
-    [attr.cy]="model().targetHandle()!.pointAbsolute().y"
-    (mousedown)="startReconnection($event, model().sourceHandle()!)" />
+  @if (model().reconnectable === true || model().reconnectable === 'target') {
+    <svg:circle
+      class="reconnect-handle"
+      r="10"
+      [attr.cx]="model().targetHandle()!.pointAbsolute().x"
+      [attr.cy]="model().targetHandle()!.pointAbsolute().y"
+      (mousedown)="startReconnection($event, model().sourceHandle()!)" />
+  }
 }

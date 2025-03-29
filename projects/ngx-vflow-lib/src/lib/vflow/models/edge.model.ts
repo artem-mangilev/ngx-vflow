@@ -15,6 +15,7 @@ export class EdgeModel implements FlowEntity {
   public target = signal<NodeModel | undefined>(undefined);
   public curve: Curve;
   public type: EdgeType;
+  public reconnectable: boolean | 'source' | 'target';
 
   public selected = signal(false);
   public selected$ = toObservable(this.selected);
@@ -133,6 +134,7 @@ export class EdgeModel implements FlowEntity {
   constructor(public edge: Edge) {
     this.type = edge.type ?? 'default';
     this.curve = edge.curve ?? 'bezier';
+    this.reconnectable = edge.reconnectable ?? false;
 
     if (edge.edgeLabels?.start) this.edgeLabels.start = new EdgeLabelModel(edge.edgeLabels.start);
     if (edge.edgeLabels?.center) this.edgeLabels.center = new EdgeLabelModel(edge.edgeLabels.center);
