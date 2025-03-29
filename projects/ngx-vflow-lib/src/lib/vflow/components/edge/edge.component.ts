@@ -21,6 +21,7 @@ import { ConnectionControllerDirective } from '../../directives/connection-contr
 import { HandleModel } from '../../models/handle.model';
 import { FlowStatusService } from '../../services/flow-status.service';
 import { EdgeRenderingService } from '../../services/edge-rendering.service';
+import { PointerDirective } from '../../directives/pointer.directive';
 
 @Component({
   standalone: true,
@@ -32,7 +33,7 @@ import { EdgeRenderingService } from '../../services/edge-rendering.service';
     class: 'selectable',
     '[style.visibility]': 'isReconnecting() ? "hidden" : "visible"',
   },
-  imports: [NgTemplateOutlet, EdgeLabelComponent],
+  imports: [NgTemplateOutlet, EdgeLabelComponent, PointerDirective],
 })
 export class EdgeComponent implements OnInit {
   protected injector = inject(Injector);
