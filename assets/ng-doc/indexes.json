@@ -86,6 +86,54 @@
   {
     "breadcrumbs": [
       "Features",
+      "Handling changes"
+    ],
+    "pageType": "guide",
+    "title": "Handling changes",
+    "section": "Handling changes",
+    "route": "/features/handling-changes",
+    "fragment": "handling-changes",
+    "content": "You can observe changes in the toasts."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Handling changes"
+    ],
+    "pageType": "guide",
+    "title": "Handling changes",
+    "section": "Handling changes",
+    "route": "/features/handling-changes",
+    "fragment": "handling-changes",
+    "content": "You can observe various changes in nodes and edges. Types of NodeChanges: position - new node position after drag and dropsize - new node sizeadd - when node was createdremove - when node was removedselect - when node was selected (also triggers for unselected nodes) Types of EdgeChanges: add - when edge was createdremove - when edge was removedselect - when edge was selected (also triggers for unselected edges)detached - when edge became invisible due to the absence of the source or target node. Use this to delete such edges from the edges list There are a several ways to receive these changes:"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Handling changes"
+    ],
+    "pageType": "guide",
+    "title": "Handling changes",
+    "section": "From (onNodesChange) and (onEdgesChange) outputs",
+    "route": "/features/handling-changes",
+    "fragment": "from-onnodeschange-and-onedgeschange-outputs",
+    "content": "This is a way to get every possible change. Changes came as non empty arrays: (onNodesChange) emits NodeChange[](onEdgesChange) emits EdgeChange[]"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Handling changes"
+    ],
+    "pageType": "guide",
+    "title": "Handling changes",
+    "section": "From filtered outputs",
+    "route": "/features/handling-changes",
+    "fragment": "from-filtered-outputs",
+    "content": "For your convenience, here is the filtering scheme for changes based on the (onNodesChange) and (onEdgesChange) events: (onNodesChange.[NodeChangeType]) - a list of node changes of a certain type(onNodesChange.[EdgeChangeType]) - a list of edge changes of a certain type(onNodesChange.[NodeChangeType].[Count]) - a list (many) or single (single) node change of a certain type(onEdgesChange.[EdgeChangeType].[Count]) - a list (many) or single (single) edge change of a certain type Where: List of all possible filter outputs:"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
       "Keyboard shortcuts"
     ],
     "pageType": "guide",
@@ -178,54 +226,6 @@
     "route": "/features/keyboard-shortcuts",
     "fragment": "customization",
     "content": "To customize the keyboard shortcuts for specific actions, pass a [keyboardShortcuts] input object to the VflowComponent with the following KeyboardShortcuts interface. Here are some key details: The passed object will be merged with the default key combinations.To disable a specific action, pass null for that action.If you want to trigger an action with multiple keys, pass an array of keys. Note: this is not a key combination. For example, if you pass ['ShiftLeft', 'ControlLeft'], the action will be triggered by either ShiftLeft or ControlLeft, but not by pressing both together (ShiftLeft+ControlLeft).You can find the list of available key codes here. In the following example, the default combination for multiSelection is replaced with ['ShiftLeft', 'ShiftRight']."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Handling changes"
-    ],
-    "pageType": "guide",
-    "title": "Handling changes",
-    "section": "Handling changes",
-    "route": "/features/handling-changes",
-    "fragment": "handling-changes",
-    "content": "You can observe changes in the toasts."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Handling changes"
-    ],
-    "pageType": "guide",
-    "title": "Handling changes",
-    "section": "Handling changes",
-    "route": "/features/handling-changes",
-    "fragment": "handling-changes",
-    "content": "You can observe various changes in nodes and edges. Types of NodeChanges: position - new node position after drag and dropsize - new node sizeadd - when node was createdremove - when node was removedselect - when node was selected (also triggers for unselected nodes) Types of EdgeChanges: add - when edge was createdremove - when edge was removedselect - when edge was selected (also triggers for unselected edges)detached - when edge became invisible due to the absence of the source or target node. Use this to delete such edges from the edges list There are a several ways to receive these changes:"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Handling changes"
-    ],
-    "pageType": "guide",
-    "title": "Handling changes",
-    "section": "From (onNodesChange) and (onEdgesChange) outputs",
-    "route": "/features/handling-changes",
-    "fragment": "from-onnodeschange-and-onedgeschange-outputs",
-    "content": "This is a way to get every possible change. Changes came as non empty arrays: (onNodesChange) emits NodeChange[](onEdgesChange) emits EdgeChange[]"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Handling changes"
-    ],
-    "pageType": "guide",
-    "title": "Handling changes",
-    "section": "From filtered outputs",
-    "route": "/features/handling-changes",
-    "fragment": "from-filtered-outputs",
-    "content": "For your convenience, here is the filtering scheme for changes based on the (onNodesChange) and (onEdgesChange) events: (onNodesChange.[NodeChangeType]) - a list of node changes of a certain type(onNodesChange.[EdgeChangeType]) - a list of edge changes of a certain type(onNodesChange.[NodeChangeType].[Count]) - a list (many) or single (single) node change of a certain type(onEdgesChange.[EdgeChangeType].[Count]) - a list (many) or single (single) edge change of a certain type Where: List of all possible filter outputs:"
   },
   {
     "breadcrumbs": [
@@ -410,6 +410,30 @@
   {
     "breadcrumbs": [
       "Getting Started",
+      "How node sizing works"
+    ],
+    "pageType": "guide",
+    "title": "How node sizing works",
+    "section": "How node sizing works",
+    "route": "/getting-started/how-node-sizing-works",
+    "fragment": "how-node-sizing-works",
+    "content": "This topic needs some clarification due to the design decisions behind the library. The library renders the flow by combining two technologies: SVG, which is responsible for rendering curves, managing zoom, pan, and other tasks that SVG handles well.HTML (with CSS), which is used to create the content for the nodes, allowing front-end engineers to design dynamic and visually appealing UIs more easily than with SVG. The link between these two technologies is the "
+  },
+  {
+    "breadcrumbs": [
+      "Getting Started",
+      "How node sizing works"
+    ],
+    "pageType": "guide",
+    "title": "How node sizing works",
+    "section": "How node sizing works",
+    "route": "/getting-started/how-node-sizing-works",
+    "fragment": "how-node-sizing-works",
+    "content": " element, which enables HTML to be rendered inside SVG. The diagram below illustrates how this element interacts with its content."
+  },
+  {
+    "breadcrumbs": [
+      "Getting Started",
       "Dynamic vs Static nodes"
     ],
     "pageType": "guide",
@@ -470,30 +494,6 @@
   {
     "breadcrumbs": [
       "Getting Started",
-      "How node sizing works"
-    ],
-    "pageType": "guide",
-    "title": "How node sizing works",
-    "section": "How node sizing works",
-    "route": "/getting-started/how-node-sizing-works",
-    "fragment": "how-node-sizing-works",
-    "content": "This topic needs some clarification due to the design decisions behind the library. The library renders the flow by combining two technologies: SVG, which is responsible for rendering curves, managing zoom, pan, and other tasks that SVG handles well.HTML (with CSS), which is used to create the content for the nodes, allowing front-end engineers to design dynamic and visually appealing UIs more easily than with SVG. The link between these two technologies is the "
-  },
-  {
-    "breadcrumbs": [
-      "Getting Started",
-      "How node sizing works"
-    ],
-    "pageType": "guide",
-    "title": "How node sizing works",
-    "section": "How node sizing works",
-    "route": "/getting-started/how-node-sizing-works",
-    "fragment": "how-node-sizing-works",
-    "content": " element, which enables HTML to be rendered inside SVG. The diagram below illustrates how this element interacts with its content."
-  },
-  {
-    "breadcrumbs": [
-      "Getting Started",
       "Migrations"
     ],
     "pageType": "guide",
@@ -525,7 +525,7 @@
     "section": "Roadmap",
     "route": "/getting-started/roadmap",
     "fragment": "roadmap",
-    "content": "This is a roadmap for ngx-vflow: improve consistency across browsers (mainly appeals to Safari)custom SVG shapesfloating edgesplugin systemnode rotationUI controls for flowsupport for more layout engines (Dagree, etc.)modal system for context menulazy loading nodes based on current viewport (decrease initial bundle)HTML-based renderer as alternative to current SVG-based rendererExperimental canvas/webgl renderer for insane performance"
+    "content": "This is a roadmap for ngx-vflow:"
   },
   {
     "breadcrumbs": [
@@ -598,6 +598,32 @@
     "route": "/workshops/drag-and-drop-nodes",
     "fragment": "drag-and-drop-nodes",
     "content": "This workshop will show you how to implement dynamic node creation with basic drag and drop implementation. This implementation uses documentPointToFlowPoint() method of VflowComponent that translates document coordinate to vflow coordinate."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Connection validation"
+    ],
+    "pageType": "guide",
+    "title": "Connection validation",
+    "section": "Connection validation",
+    "route": "/features/edges/connection-validation",
+    "fragment": "connection-validation",
+    "content": "ngx-vflow supports real-time synchronous validation of connections. Validation occurs when a user attempts to create a new edge. By default, every connection is valid, but you can provide a ConnectionSettings with a validatior callback where you specify the validation logic. For example, in this case, validation only passes connections from node 1 to node 2. If the validator returns false, the (onConnect) event won't be triggered because there is no valid connection."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Curves"
+    ],
+    "pageType": "guide",
+    "title": "Curves",
+    "section": "Curves",
+    "route": "/features/edges/curves",
+    "fragment": "curves",
+    "content": "It's possible to set Curve for both the edges and connection."
   },
   {
     "breadcrumbs": [
@@ -832,19 +858,6 @@
     "route": "/features/edges/connection",
     "fragment": "loose-connections",
     "content": "This is the 'loose' mode of ConnectionSettings, where the flow ignores the handle type and allows any handle to connect with any other handle. In this mode, an id must be provided for the HandleComponent to function correctly."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Connection validation"
-    ],
-    "pageType": "guide",
-    "title": "Connection validation",
-    "section": "Connection validation",
-    "route": "/features/edges/connection-validation",
-    "fragment": "connection-validation",
-    "content": "ngx-vflow supports real-time synchronous validation of connections. Validation occurs when a user attempts to create a new edge. By default, every connection is valid, but you can provide a ConnectionSettings with a validatior callback where you specify the validation logic. For example, in this case, validation only passes connections from node 1 to node 2. If the validator returns false, the (onConnect) event won't be triggered because there is no valid connection."
   },
   {
     "breadcrumbs": [
@@ -1227,19 +1240,6 @@
     "breadcrumbs": [
       "Features",
       "Edges",
-      "Curves"
-    ],
-    "pageType": "guide",
-    "title": "Curves",
-    "section": "Curves",
-    "route": "/features/edges/curves",
-    "fragment": "curves",
-    "content": "It's possible to set Curve for both the edges and connection."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
       "Default edges"
     ],
     "pageType": "guide",
@@ -1313,6 +1313,45 @@
     "route": "/features/edges/labels",
     "fragment": "context",
     "content": "You may access some data for label through let-ctx according to this interface."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Subflows"
+    ],
+    "pageType": "guide",
+    "title": "Subflows",
+    "section": "Subflows",
+    "route": "/features/nodes/subflows",
+    "fragment": "subflows",
+    "content": "A subflow is a node that can contain child nodes. Key things about subflows: To create a subflow, you need to use a default-group or template-group type on Node or DynamicNode.To associate a node with a subflow, set the parentId to the ID of the subflow.Nodes within a subflow have coordinates relative to that subflow.A subflow is itself a node, so it can act as a source or a target (this functionality is available only for template-group subflows).Use the groupNode directive on an ng-template to define your custom subflow. While a custom subflow can theoretically be any SVG structure, it's recommended to use the "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Subflows"
+    ],
+    "pageType": "guide",
+    "title": "Subflows",
+    "section": "Subflows",
+    "route": "/features/nodes/subflows",
+    "fragment": "subflows",
+    "content": " element."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Subflows"
+    ],
+    "pageType": "guide",
+    "title": "Subflows",
+    "section": "See also",
+    "route": "/features/nodes/subflows",
+    "fragment": "see-also",
+    "content": "DefaultGroupNodeTemplateGroupNodeDefaultDynamicGroupNodeTemplateDynamicGroupNode"
   },
   {
     "breadcrumbs": [
@@ -2111,19 +2150,6 @@
     "breadcrumbs": [
       "Features",
       "Nodes",
-      "Node toolbar"
-    ],
-    "pageType": "guide",
-    "title": "Node toolbar",
-    "section": "Node toolbar",
-    "route": "/features/nodes/node-toolbar",
-    "fragment": "node-toolbar",
-    "content": "You can add a NodeToolbarComponent to your node. The content of this component is automatically positioned near one side of the node, based on the value of the position input."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
       "Resizer"
     ],
     "pageType": "guide",
@@ -2228,40 +2254,14 @@
     "breadcrumbs": [
       "Features",
       "Nodes",
-      "Subflows"
+      "Node toolbar"
     ],
     "pageType": "guide",
-    "title": "Subflows",
-    "section": "Subflows",
-    "route": "/features/nodes/subflows",
-    "fragment": "subflows",
-    "content": "A subflow is a node that can contain child nodes. Key things about subflows: To create a subflow, you need to use a default-group or template-group type on Node or DynamicNode.To associate a node with a subflow, set the parentId to the ID of the subflow.Nodes within a subflow have coordinates relative to that subflow.A subflow is itself a node, so it can act as a source or a target (this functionality is available only for template-group subflows).Use the groupNode directive on an ng-template to define your custom subflow. While a custom subflow can theoretically be any SVG structure, it's recommended to use the "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Subflows"
-    ],
-    "pageType": "guide",
-    "title": "Subflows",
-    "section": "Subflows",
-    "route": "/features/nodes/subflows",
-    "fragment": "subflows",
-    "content": " element."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Subflows"
-    ],
-    "pageType": "guide",
-    "title": "Subflows",
-    "section": "See also",
-    "route": "/features/nodes/subflows",
-    "fragment": "see-also",
-    "content": "DefaultGroupNodeTemplateGroupNodeDefaultDynamicGroupNodeTemplateDynamicGroupNode"
+    "title": "Node toolbar",
+    "section": "Node toolbar",
+    "route": "/features/nodes/node-toolbar",
+    "fragment": "node-toolbar",
+    "content": "You can add a NodeToolbarComponent to your node. The content of this component is automatically positioned near one side of the node, based on the value of the position input."
   },
   {
     "breadcrumbs": [
