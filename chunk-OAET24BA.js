@@ -1,0 +1,33 @@
+import{a as r}from"./chunk-PQ7BIBKJ.js";import{a as g}from"./chunk-GPBMHN32.js";import"./chunk-MUKF72JZ.js";import{a}from"./chunk-T6GQPSCF.js";import{Ba as c,R as t,Ta as p,pb as i,qb as d,xc as C}from"./chunk-FDES3R26.js";import{a as o,b as l,g as w}from"./chunk-P2VZOJAX.js";var f=w(C());var k={title:"Component mocks",mdFile:"./index.md",category:r,order:2},s=k;var m=[];var v={},h=v;var j=`<h1 id="component-mocks" class="ngde">Component mocks<a title="Link to heading" class="ng-doc-header-link ngde" href="/testing/component-mocks#component-mocks"><ng-doc-icon icon="link-2" size="16" class="ngde"></ng-doc-icon></a></h1><p class="ngde">The library provides mocks for every public component to simplify testing in a Node environment (e.g., Jest). The naming convention for importing real and mock components follows this pattern: <code class="ngde">*Component</code> \u2192 <code class="ngde">*MockComponent</code>. For example, <code class="ngde ng-doc-code-with-link" class="ngde"><a href="/api/ngx-vflow/classes/VflowComponent" class="ng-doc-code-anchor ngde" data-link-type="Component" class="ngde">VflowComponent</a></code> has a corresponding mock, <code class="ngde ng-doc-code-with-link" class="ngde"><a href="/api/ngx-vflow/classes/VflowMockComponent" class="ng-doc-code-anchor ngde" data-link-type="Component" class="ngde">VflowMockComponent</a></code>.</p><p class="ngde">In the testing environment, you should replace real components with their mock counterparts. For example, to mock the entire library, you should:</p><pre class="ngde hljs"><code class="hljs language-ts code-lines ngde" lang="ts" name="" icon="" highlightedlines="[]"><span class="line ngde"><span class="hljs-meta ngde">@Component</span>({
+</span><span class="line ngde">  <span class="hljs-attr ngde">template</span>: <span class="hljs-string ngde">\`&#x3C;vflow #vflow />\`</span>,
+</span><span class="line ngde">  <span class="hljs-attr ngde">standalone</span>: <span class="hljs-literal ngde">true</span>,
+</span><span class="line ngde">  <span class="hljs-attr ngde">imports</span>: [<span class="hljs-title class_ ngde"><a href="/api/ngx-vflow/variables/Vflow" class="ng-doc-code-anchor ngde" data-link-type="Variable" class="ngde">Vflow</a></span>],
+</span><span class="line ngde">})
+</span><span class="line ngde"><span class="hljs-keyword ngde">class</span> <span class="hljs-title class_ ngde">YourComponent</span> {
+</span><span class="line ngde">  <span class="hljs-comment ngde">// It's important to not reference to <a href="/api/ngx-vflow/classes/VflowComponent" class="ng-doc-code-anchor ngde" data-link-type="Component" class="ngde">VflowComponent</a> class directly</span>
+</span><span class="line ngde">  <span class="hljs-comment ngde">// viewChild(<a href="/api/ngx-vflow/classes/VflowComponent" class="ng-doc-code-anchor ngde" data-link-type="Component" class="ngde">VflowComponent</a>) like this</span>
+</span><span class="line ngde">  <span class="hljs-comment ngde">// because in testing env it changed to <a href="/api/ngx-vflow/classes/VflowMockComponent" class="ng-doc-code-anchor ngde" data-link-type="Component" class="ngde">VflowMockComponent</a></span>
+</span><span class="line ngde">  <span class="hljs-comment ngde">// but the line below works corretly in both environments</span>
+</span><span class="line ngde">  <span class="hljs-keyword ngde">public</span> vflow = viewChild&#x3C;<span class="hljs-title class_ ngde"><a href="/api/ngx-vflow/classes/VflowComponent" class="ng-doc-code-anchor ngde" data-link-type="Component" class="ngde">VflowComponent</a></span>>(<span class="hljs-string ngde">'vflow'</span>);
+</span><span class="line ngde">
+</span><span class="line ngde">  ...
+</span><span class="line ngde">}
+</span><span class="line ngde">
+</span><span class="line ngde"><span class="hljs-title function_ ngde">describe</span>(<span class="hljs-string ngde">'YourComponent'</span>, <span class="hljs-function ngde">() =></span> {
+</span><span class="line ngde">  <span class="hljs-title function_ ngde">beforeEach</span>(<span class="hljs-function ngde">() =></span> {
+</span><span class="line ngde">    <span class="hljs-title class_ ngde">TestBed</span>.<span class="hljs-title function_ ngde">configureTestingModule</span>({
+</span><span class="line ngde">      <span class="hljs-attr ngde">imports</span>: [<span class="hljs-title class_ ngde">YourComponent</span>],
+</span><span class="line ngde">    })
+</span><span class="line ngde">      <span class="hljs-comment ngde">// override imprort of <a href="/api/ngx-vflow/variables/Vflow" class="ng-doc-code-anchor ngde" data-link-type="Variable" class="ngde">Vflow</a> with mocks</span>
+</span><span class="line ngde">      .<span class="hljs-title function_ ngde">overrideComponent</span>(<span class="hljs-title class_ ngde">YourComponent</span>, {
+</span><span class="line ngde">        <span class="hljs-attr ngde">remove</span>: {
+</span><span class="line ngde">          <span class="hljs-attr ngde">imports</span>: [<span class="hljs-title class_ ngde"><a href="/api/ngx-vflow/variables/Vflow" class="ng-doc-code-anchor ngde" data-link-type="Variable" class="ngde">Vflow</a></span>],
+</span><span class="line ngde">        },
+</span><span class="line ngde">        <span class="hljs-attr ngde">add</span>: {
+</span><span class="line ngde">          <span class="hljs-attr ngde">imports</span>: [<span class="hljs-title class_ ngde"><a href="/api/ngx-vflow/variables/VflowMocks" class="ng-doc-code-anchor ngde" data-link-type="Variable" class="ngde">VflowMocks</a></span>],
+</span><span class="line ngde">        },
+</span><span class="line ngde">      })
+</span><span class="line ngde">      .<span class="hljs-title function_ ngde">compileComponents</span>();
+</span><span class="line ngde">  });
+</span><span class="line ngde">});
+</span></code></pre>`,y=(()=>{class n extends a{constructor(){super(),this.routePrefix="",this.pageType="guide",this.pageContent=j,this.editSourceFileUrl="https://github.com/artem-mangilev/ngx-vflow/edit/main/projects/ngx-vflow-demo/src/app/categories/testing/pages/component-mocks/index.md?message=docs(component-mocks): describe your changes here...",this.page=s,this.demoAssets=h}static{this.\u0275fac=function(e){return new(e||n)}}static{this.\u0275cmp=t({type:n,selectors:[["ng-doc-page-testing-component-mocks"]],standalone:!0,features:[i([{provide:a,useExisting:n},m,s.providers??[]]),c,d],decls:1,vars:0,template:function(e,V){e&1&&p(0,"ng-doc-page")},dependencies:[g],encapsulation:2,changeDetection:0})}}return n})(),x=[l(o({},(0,f.isRoute)(s.route)?s.route:{}),{path:"",component:y,title:"Component mocks"})],S=x;export{y as DynamicComponent,S as default};

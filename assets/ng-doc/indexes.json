@@ -50,54 +50,6 @@
   {
     "breadcrumbs": [
       "Features",
-      "Handling changes"
-    ],
-    "pageType": "guide",
-    "title": "Handling changes",
-    "section": "Handling changes",
-    "route": "/features/handling-changes",
-    "fragment": "handling-changes",
-    "content": "You can observe changes in the toasts."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Handling changes"
-    ],
-    "pageType": "guide",
-    "title": "Handling changes",
-    "section": "Handling changes",
-    "route": "/features/handling-changes",
-    "fragment": "handling-changes",
-    "content": "You can observe various changes in nodes and edges. Types of NodeChanges: position - new node position after drag and dropsize - new node sizeadd - when node was createdremove - when node was removedselect - when node was selected (also triggers for unselected nodes) Types of EdgeChanges: add - when edge was createdremove - when edge was removedselect - when edge was selected (also triggers for unselected edges)detached - when edge became invisible due to the absence of the source or target node. Use this to delete such edges from the edges list There are a several ways to receive these changes:"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Handling changes"
-    ],
-    "pageType": "guide",
-    "title": "Handling changes",
-    "section": "From (onNodesChange) and (onEdgesChange) outputs",
-    "route": "/features/handling-changes",
-    "fragment": "from-onnodeschange-and-onedgeschange-outputs",
-    "content": "This is a way to get every possible change. Changes came as non empty arrays: (onNodesChange) emits NodeChange[](onEdgesChange) emits EdgeChange[]"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Handling changes"
-    ],
-    "pageType": "guide",
-    "title": "Handling changes",
-    "section": "From filtered outputs",
-    "route": "/features/handling-changes",
-    "fragment": "from-filtered-outputs",
-    "content": "For your convenience, here is the filtering scheme for changes based on the (onNodesChange) and (onEdgesChange) events: (onNodesChange.[NodeChangeType]) - a list of node changes of a certain type(onNodesChange.[EdgeChangeType]) - a list of edge changes of a certain type(onNodesChange.[NodeChangeType].[Count]) - a list (many) or single (single) node change of a certain type(onEdgesChange.[EdgeChangeType].[Count]) - a list (many) or single (single) edge change of a certain type Where: List of all possible filter outputs:"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
       "Custom handles"
     ],
     "pageType": "guide",
@@ -226,6 +178,54 @@
     "route": "/features/keyboard-shortcuts",
     "fragment": "customization",
     "content": "To customize the keyboard shortcuts for specific actions, pass a [keyboardShortcuts] input object to the VflowComponent with the following KeyboardShortcuts interface. Here are some key details: The passed object will be merged with the default key combinations.To disable a specific action, pass null for that action.If you want to trigger an action with multiple keys, pass an array of keys. Note: this is not a key combination. For example, if you pass ['ShiftLeft', 'ControlLeft'], the action will be triggered by either ShiftLeft or ControlLeft, but not by pressing both together (ShiftLeft+ControlLeft).You can find the list of available key codes here. In the following example, the default combination for multiSelection is replaced with ['ShiftLeft', 'ShiftRight']."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Handling changes"
+    ],
+    "pageType": "guide",
+    "title": "Handling changes",
+    "section": "Handling changes",
+    "route": "/features/handling-changes",
+    "fragment": "handling-changes",
+    "content": "You can observe changes in the toasts."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Handling changes"
+    ],
+    "pageType": "guide",
+    "title": "Handling changes",
+    "section": "Handling changes",
+    "route": "/features/handling-changes",
+    "fragment": "handling-changes",
+    "content": "You can observe various changes in nodes and edges. Types of NodeChanges: position - new node position after drag and dropsize - new node sizeadd - when node was createdremove - when node was removedselect - when node was selected (also triggers for unselected nodes) Types of EdgeChanges: add - when edge was createdremove - when edge was removedselect - when edge was selected (also triggers for unselected edges)detached - when edge became invisible due to the absence of the source or target node. Use this to delete such edges from the edges list There are a several ways to receive these changes:"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Handling changes"
+    ],
+    "pageType": "guide",
+    "title": "Handling changes",
+    "section": "From (onNodesChange) and (onEdgesChange) outputs",
+    "route": "/features/handling-changes",
+    "fragment": "from-onnodeschange-and-onedgeschange-outputs",
+    "content": "This is a way to get every possible change. Changes came as non empty arrays: (onNodesChange) emits NodeChange[](onEdgesChange) emits EdgeChange[]"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Handling changes"
+    ],
+    "pageType": "guide",
+    "title": "Handling changes",
+    "section": "From filtered outputs",
+    "route": "/features/handling-changes",
+    "fragment": "from-filtered-outputs",
+    "content": "For your convenience, here is the filtering scheme for changes based on the (onNodesChange) and (onEdgesChange) events: (onNodesChange.[NodeChangeType]) - a list of node changes of a certain type(onNodesChange.[EdgeChangeType]) - a list of edge changes of a certain type(onNodesChange.[NodeChangeType].[Count]) - a list (many) or single (single) node change of a certain type(onEdgesChange.[EdgeChangeType].[Count]) - a list (many) or single (single) edge change of a certain type Where: List of all possible filter outputs:"
   },
   {
     "breadcrumbs": [
@@ -553,15 +553,15 @@
   },
   {
     "breadcrumbs": [
-      "Workshops",
-      "Delete selected"
+      "Testing",
+      "Component mocks"
     ],
     "pageType": "guide",
-    "title": "Delete selected",
-    "section": "Delete selected",
-    "route": "/workshops/delete-selected",
-    "fragment": "delete-selected",
-    "content": "This workshop will show you how to implement deletion of nodes and edges."
+    "title": "Component mocks",
+    "section": "Component mocks",
+    "route": "/testing/component-mocks",
+    "fragment": "component-mocks",
+    "content": "The library provides mocks for every public component to simplify testing in a Node environment (e.g., Jest). The naming convention for importing real and mock components follows this pattern: \\*Component → \\*MockComponent. For example, VflowComponent has a corresponding mock, VflowMockComponent. In the testing environment, you should replace real components with their mock counterparts. For example, to mock the entire library, you should:"
   },
   {
     "breadcrumbs": [
@@ -574,6 +574,18 @@
     "route": "/testing/unit-testing-component-nodes",
     "fragment": "unit-testing-component-nodes",
     "content": "To simplify writing isolated tests for component nodes, you can use the provideCustomNodeMocks function. This helps prevent dependency injection (DI) errors that occur when a node is used outside the scope of the VflowComponent."
+  },
+  {
+    "breadcrumbs": [
+      "Workshops",
+      "Delete selected"
+    ],
+    "pageType": "guide",
+    "title": "Delete selected",
+    "section": "Delete selected",
+    "route": "/workshops/delete-selected",
+    "fragment": "delete-selected",
+    "content": "This workshop will show you how to implement deletion of nodes and edges."
   },
   {
     "breadcrumbs": [
@@ -833,19 +845,6 @@
     "route": "/features/edges/connection-validation",
     "fragment": "connection-validation",
     "content": "ngx-vflow supports real-time synchronous validation of connections. Validation occurs when a user attempts to create a new edge. By default, every connection is valid, but you can provide a ConnectionSettings with a validatior callback where you specify the validation logic. For example, in this case, validation only passes connections from node 1 to node 2. If the validator returns false, the (onConnect) event won't be triggered because there is no valid connection."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Curves"
-    ],
-    "pageType": "guide",
-    "title": "Curves",
-    "section": "Curves",
-    "route": "/features/edges/curves",
-    "fragment": "curves",
-    "content": "It's possible to set Curve for both the edges and connection."
   },
   {
     "breadcrumbs": [
@@ -1223,6 +1222,19 @@
     "route": "/features/edges/custom-edges",
     "fragment": "context",
     "content": "It's tricky to infer type for let-ctx, so here is an interface with available fields for this context."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Curves"
+    ],
+    "pageType": "guide",
+    "title": "Curves",
+    "section": "Curves",
+    "route": "/features/edges/curves",
+    "fragment": "curves",
+    "content": "It's possible to set Curve for both the edges and connection."
   },
   {
     "breadcrumbs": [
@@ -2255,19 +2267,6 @@
     "breadcrumbs": [
       "Workshops",
       "Layout",
-      "Vizdom layout"
-    ],
-    "pageType": "guide",
-    "title": "Vizdom layout",
-    "section": "Vizdom layout",
-    "route": "/workshops/layout/vizdom-layout",
-    "fragment": "vizdom-layout",
-    "content": "This is an example of using the vizdom library for computing layout."
-  },
-  {
-    "breadcrumbs": [
-      "Workshops",
-      "Layout",
       "D3 Force"
     ],
     "pageType": "guide",
@@ -2276,6 +2275,19 @@
     "route": "/workshops/layout/force",
     "fragment": "d3-force",
     "content": "This is a simple example of using the d3-force layout package."
+  },
+  {
+    "breadcrumbs": [
+      "Workshops",
+      "Layout",
+      "Vizdom layout"
+    ],
+    "pageType": "guide",
+    "title": "Vizdom layout",
+    "section": "Vizdom layout",
+    "route": "/workshops/layout/vizdom-layout",
+    "fragment": "vizdom-layout",
+    "content": "This is an example of using the vizdom library for computing layout."
   },
   {
     "breadcrumbs": [
