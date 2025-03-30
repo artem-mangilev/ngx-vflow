@@ -33,6 +33,7 @@
     "d3-zoom": "^3.0.0",
     "ngx-drag-drop": "^17.0.0",
     "ngxtension": "^4.2.0",
+    "octokit": "^4.1.2",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.14.10"
