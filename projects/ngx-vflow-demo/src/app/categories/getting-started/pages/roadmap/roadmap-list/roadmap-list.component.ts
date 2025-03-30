@@ -23,6 +23,9 @@ export class RoadmapListComponent {
         repo: 'ngx-vflow',
         state: 'open',
       }),
-    ).pipe(map((response: any) => response.data as any[]));
+    ).pipe(
+      map((response: any) => response.data as any[]),
+      map((issues) => issues.filter((issue) => !!issue.labels.find((label: any) => label.name === 'enhancement'))),
+    );
   }
 }
