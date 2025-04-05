@@ -6,12 +6,7 @@
     [attr.marker-end]="markerEndUrl()"
     [class.edge_selected]="model().selected()" />
 
-  <!-- TODO: pull() -->
-  <svg:path
-    #interactiveEdge
-    class="interactive-edge"
-    [attr.d]="model().path().path"
-    (pointerStart)="select(); pull()" />
+  <svg:path class="interactive-edge" [attr.d]="model().path().path" (pointerStart)="select(); pull()" />
 }
 
 @if (model().type === 'template' && edgeTemplate()) {
