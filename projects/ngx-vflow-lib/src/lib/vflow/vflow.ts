@@ -14,6 +14,7 @@ import { NodeToolbarComponent } from './public-components/node-toolbar/node-tool
 import { ResizableComponent } from './public-components/resizable/resizable.component';
 import { HandleComponent } from './public-components/handle/handle.component';
 import { ConnectionControllerDirective } from './directives/connection-controller.directive';
+import { CustomTemplateEdgeComponent } from '../../public-api';
 
 export const Vflow = [
   VflowComponent,
@@ -22,6 +23,7 @@ export const Vflow = [
   SelectableDirective,
   MiniMapComponent,
   NodeToolbarComponent,
+  CustomTemplateEdgeComponent,
   DragHandleDirective,
   ConnectionControllerDirective,
 

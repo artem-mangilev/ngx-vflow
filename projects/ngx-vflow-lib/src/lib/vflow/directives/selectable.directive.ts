@@ -45,13 +45,6 @@ export class SelectableDirective {
   }
 
   private getEvent$() {
-    if (this.parentEdge) {
-      // get not the edge itself, but the interactive edge (which is more UX friendly)
-      const interactiveEdge = this.parentEdge.interactiveEdgeRef().nativeElement;
-
-      return merge(fromEvent(interactiveEdge, 'mousedown'), fromEvent(interactiveEdge, 'touchstart'));
-    }
-
     return merge(fromEvent(this.host.nativeElement, 'mousedown'), fromEvent(this.host.nativeElement, 'touchstart'));
   }
 }

@@ -6,6 +6,7 @@
     [attr.marker-end]="markerEndUrl()"
     [class.edge_selected]="model().selected()" />
 
+  <!-- TODO: pull() -->
   <svg:path
     #interactiveEdge
     class="interactive-edge"
@@ -19,8 +20,6 @@
       [ngTemplateOutlet]="edgeTemplate"
       [ngTemplateOutletContext]="edgeContext"
       [ngTemplateOutletInjector]="injector" />
-
-    <svg:path #interactiveEdge class="interactive-edge" [attr.d]="model().path().path" (pointerStart)="pull()" />
   }
 }
 
