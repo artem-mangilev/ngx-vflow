@@ -1,5 +1,11 @@
 import { Directive, TemplateRef, inject } from '@angular/core';
-import { EdgeContext } from '../interfaces/template-context.interface';
+import {
+  ConnectionContext,
+  EdgeContext,
+  GroupNodeContext,
+  HtmlEdgeLabelContext,
+  NodeContext,
+} from '../interfaces/template-context.interface';
 
 @Directive({
   standalone: true,
@@ -7,6 +13,10 @@ import { EdgeContext } from '../interfaces/template-context.interface';
 })
 export class EdgeTemplateDirective {
   public templateRef = inject<TemplateRef<EdgeContext>>(TemplateRef);
+
+  static ngTemplateContextGuard(dir: EdgeTemplateDirective, ctx: unknown): ctx is EdgeContext {
+    return true;
+  }
 }
 
 @Directive({
@@ -15,6 +25,10 @@ export class EdgeTemplateDirective {
 })
 export class ConnectionTemplateDirective {
   public templateRef = inject(TemplateRef);
+
+  static ngTemplateContextGuard(dir: ConnectionTemplateDirective, ctx: unknown): ctx is ConnectionContext {
+    return true;
+  }
 }
 
 @Directive({
@@ -23,6 +37,10 @@ export class ConnectionTemplateDirective {
 })
 export class EdgeLabelHtmlTemplateDirective {
   public templateRef = inject(TemplateRef);
+
+  static ngTemplateContextGuard(dir: EdgeLabelHtmlTemplateDirective, ctx: unknown): ctx is HtmlEdgeLabelContext {
+    return true;
+  }
 }
 
 @Directive({
@@ -31,6 +49,10 @@ export class EdgeLabelHtmlTemplateDirective {
 })
 export class NodeHtmlTemplateDirective {
   public templateRef = inject(TemplateRef);
+
+  static ngTemplateContextGuard(dir: NodeHtmlTemplateDirective, ctx: unknown): ctx is NodeContext {
+    return true;
+  }
 }
 
 @Directive({
@@ -39,6 +61,10 @@ export class NodeHtmlTemplateDirective {
 })
 export class GroupNodeTemplateDirective {
   public templateRef = inject(TemplateRef);
+
+  static ngTemplateContextGuard(dir: GroupNodeTemplateDirective, ctx: unknown): ctx is GroupNodeContext {
+    return true;
+  }
 }
 
 @Directive({
@@ -47,4 +73,9 @@ export class GroupNodeTemplateDirective {
 })
 export class HandleTemplateDirective {
   public templateRef = inject(TemplateRef);
+
+  // TODO
+  // static ngTemplateContextGuard(dir: HandleTemplateDirective, ctx: unknown): ctx is HandleContext {
+  //   return true;
+  // }
 }
