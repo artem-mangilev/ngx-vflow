@@ -72,9 +72,10 @@ export class EdgeComponent implements OnInit {
     return isReconnecting && status.payload.oldEdge === this.model();
   });
 
-  protected edgeContext!: EdgeContext;
+  public edgeContext!: EdgeContext;
 
   public ngOnInit(): void {
+    // TODO: move to model
     this.edgeContext = {
       $implicit: {
         // TODO: check if edge could change

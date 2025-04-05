@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { EdgeContext } from '../../interfaces/template-context.interface';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { EdgeComponent } from '../../components/edge/edge.component';
 
 @Component({
   selector: 'g[customTemplateEdge]',
@@ -9,5 +9,5 @@ import { EdgeContext } from '../../interfaces/template-context.interface';
   standalone: true,
 })
 export class CustomTemplateEdgeComponent {
-  public context = input.required<EdgeContext['$implicit']>({ alias: 'customTemplateEdge' });
+  protected context = inject(EdgeComponent).edgeContext.$implicit;
 }
