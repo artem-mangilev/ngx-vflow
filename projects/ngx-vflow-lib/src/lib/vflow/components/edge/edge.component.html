@@ -2,8 +2,8 @@
   <svg:path
     class="edge"
     [attr.d]="model().path().path"
-    [attr.marker-start]="markerStartUrl()"
-    [attr.marker-end]="markerEndUrl()"
+    [attr.marker-start]="model().markerStartUrl()"
+    [attr.marker-end]="model().markerStartUrl()"
     [class.edge_selected]="model().selected()" />
 
   <svg:path class="interactive-edge" [attr.d]="model().path().path" (pointerStart)="select(); pull()" />
@@ -13,7 +13,7 @@
   @if (edgeTemplate(); as edgeTemplate) {
     <ng-container
       [ngTemplateOutlet]="edgeTemplate"
-      [ngTemplateOutletContext]="edgeContext"
+      [ngTemplateOutletContext]="model().context"
       [ngTemplateOutletInjector]="injector" />
   }
 }

@@ -1,20 +1,11 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  Injector,
-  OnInit,
-  TemplateRef,
-  computed,
-  inject,
-  input,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, Injector, TemplateRef, computed, inject, input } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
+
 import { EdgeModel } from '../../models/edge.model';
-import { hashCode } from '../../utils/hash';
 import { EdgeContext } from '../../interfaces/template-context.interface';
 import { SelectionService } from '../../services/selection.service';
 import { FlowSettingsService } from '../../services/flow-settings.service';
 import { EdgeLabelComponent } from '../edge-label/edge-label.component';
-import { NgTemplateOutlet } from '@angular/common';
 import { ConnectionControllerDirective } from '../../directives/connection-controller.directive';
 import { HandleModel } from '../../models/handle.model';
 import { FlowStatusService } from '../../services/flow-status.service';
@@ -33,7 +24,7 @@ import { PointerDirective } from '../../directives/pointer.directive';
   },
   imports: [NgTemplateOutlet, EdgeLabelComponent, PointerDirective],
 })
-export class EdgeComponent implements OnInit {
+export class EdgeComponent {
   protected injector = inject(Injector);
   private selectionService = inject(SelectionService);
   private flowSettingsService = inject(FlowSettingsService);
@@ -49,40 +40,12 @@ export class EdgeComponent implements OnInit {
 
   public edgeLabelHtmlTemplate = input<TemplateRef<any>>();
 
-  protected markerStartUrl = computed(() => {
-    const marker = this.model().edge.markers?.start;
-
-    return marker ? `url(#${hashCode(JSON.stringify(marker))})` : '';
-  });
-
-  protected markerEndUrl = computed(() => {
-    const marker = this.model().edge.markers?.end;
-
-    return marker ? `url(#${hashCode(JSON.stringify(marker))})` : '';
-  });
-
   protected isReconnecting = computed(() => {
     const status = this.flowStatusService.status();
     const isReconnecting = status.state === 'reconnection-start' || status.state === 'reconnection-validation';
 
     return isReconnecting && status.payload.oldEdge === this.model();
   });
-
-  public edgeContext!: EdgeContext;
-
-  public ngOnInit(): void {
-    // TODO: move to model
-    this.edgeContext = {
-      $implicit: {
-        // TODO: check if edge could change
-        edge: this.model().edge,
-        path: computed(() => this.model().path().path),
-        markerStart: this.markerStartUrl,
-        markerEnd: this.markerEndUrl,
-        selected: this.model().selected.asReadonly(),
-      },
-    };
-  }
 
   public select() {
     if (this.flowSettingsService.entitiesSelectable()) {

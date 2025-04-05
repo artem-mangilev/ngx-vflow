@@ -20,7 +20,7 @@ export class CustomTemplateEdgeComponent {
   private edgeRenderingService = inject(EdgeRenderingService);
 
   protected model = this.edge.model();
-  protected context = this.edge.edgeContext.$implicit;
+  protected context = this.model.context.$implicit;
 
   protected pull() {
     if (this.flowSettingsService.elevateEdgesOnSelect()) {

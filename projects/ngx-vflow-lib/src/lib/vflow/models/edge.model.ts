@@ -9,6 +9,7 @@ import { toObservable } from '@angular/core/rxjs-interop';
 import { FlowEntity } from '../interfaces/flow-entity.interface';
 import { smoothStepPath } from '../math/edge-path/smooth-step-path';
 import { UsingPoints } from '../types/using-points.type';
+import { hashCode } from '../utils/hash';
 
 export class EdgeModel implements FlowEntity {
   public source = signal<NodeModel | undefined>(undefined);
@@ -126,6 +127,35 @@ export class EdgeModel implements FlowEntity {
         .find((handle) => handle.rawHandle.type === 'target') ?? null
     );
   });
+
+  /**
+   * TODO: not reactive
+   */
+  public markerStartUrl = computed(() => {
+    const marker = this.edge.markers?.start;
+
+    return marker ? `url(#${hashCode(JSON.stringify(marker))})` : '';
+  });
+
+  /**
+   * TODO: not reactive
+   */
+  public markerEndUrl = computed(() => {
+    const marker = this.edge.markers?.end;
+
+    return marker ? `url(#${hashCode(JSON.stringify(marker))})` : '';
+  });
+
+  public context = {
+    $implicit: {
+      // TODO: check if edge could change
+      edge: this.edge,
+      path: computed(() => this.path().path),
+      markerStart: this.markerStartUrl,
+      markerEnd: this.markerEndUrl,
+      selected: this.selected.asReadonly(),
+    },
+  };
 
   public edgeLabels: { [position in EdgeLabelPosition]?: EdgeLabelModel } = {};
 
