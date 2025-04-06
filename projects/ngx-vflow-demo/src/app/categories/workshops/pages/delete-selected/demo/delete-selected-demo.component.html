@@ -13,14 +13,17 @@
   </ng-template>
 
   <ng-template let-ctx edge>
-    <svg:path
-      selectable
-      class="without-tab-index"
-      fill="none"
-      stroke-width="2"
+    <svg:g
+      class="without-tab-index custom-template-edge"
       tabindex="0"
-      [attr.d]="ctx.path()"
-      [attr.stroke]="ctx.selected() ? '#0f4c75' : '#bbe1fa'"
-      (keydown.backspace)="ctx.selected() && deleteEdge(ctx.edge)" />
-  </ng-template> </vflow
->`
+      customTemplateEdge
+      selectable
+      (keydown.backspace)="ctx.selected() && deleteEdge(ctx.edge)">
+      <svg:path
+        fill="none"
+        stroke-width="2"
+        [attr.d]="ctx.path()"
+        [attr.stroke]="ctx.selected() ? '#0f4c75' : '#bbe1fa'" />
+    </svg:g>
+  </ng-template>
+</vflow>

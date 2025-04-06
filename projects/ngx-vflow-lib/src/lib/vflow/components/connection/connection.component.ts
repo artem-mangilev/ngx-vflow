@@ -8,6 +8,7 @@ import { hashCode } from '../../utils/hash';
 import { Position } from '../../types/position.type';
 import { smoothStepPath } from '../../math/edge-path/smooth-step-path';
 import { NgTemplateOutlet } from '@angular/common';
+import { ConnectionContext } from '../../interfaces/template-context.interface';
 
 @Component({
   standalone: true,
@@ -105,7 +106,8 @@ export class ConnectionComponent {
 
   protected readonly defaultColor = 'rgb(177, 177, 183)';
 
-  protected getContext() {
+  // TODO: move context to model
+  protected getContext(): ConnectionContext {
     return {
       $implicit: {
         path: this.path,

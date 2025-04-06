@@ -19,6 +19,8 @@ import { startWith, tap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MAGIC_NUMBER_TO_FIX_GLITCH_IN_CHROME } from '../../constants/magic-number-to-fix-glitch-in-chrome.constant';
 import { FlowSettingsService } from '../../services/flow-settings.service';
+import { HtmlEdgeLabelContext } from '../../interfaces/template-context.interface';
+import { HtmlTemplateEdgeLabel } from '../../interfaces/edge-label.interface';
 
 @Component({
   standalone: true,
@@ -114,11 +116,12 @@ export class EdgeLabelComponent implements AfterViewInit {
       .subscribe();
   }
 
-  protected getLabelContext() {
+  // TODO: move to model with Contextable interface
+  protected getLabelContext(): HtmlEdgeLabelContext {
     return {
       $implicit: {
         edge: this.edgeModel().edge,
-        label: this.model().edgeLabel,
+        label: this.model().edgeLabel as HtmlTemplateEdgeLabel,
       },
     };
   }
