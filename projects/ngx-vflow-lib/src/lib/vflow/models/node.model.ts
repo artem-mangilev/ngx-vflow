@@ -13,8 +13,12 @@ import { FlowEntity } from '../interfaces/flow-entity.interface';
 import { Point } from '../interfaces/point.interface';
 import { FlowEntitiesService } from '../services/flow-entities.service';
 import { MAGIC_NUMBER_TO_FIX_GLITCH_IN_CHROME } from '../constants/magic-number-to-fix-glitch-in-chrome.constant';
+import { Contextable } from '../interfaces/contextable.interface';
+import { GroupNodeContext, NodeContext } from '../interfaces/template-context.interface';
 
-export class NodeModel<T = unknown> implements FlowEntity {
+export class NodeModel<T = unknown>
+  implements FlowEntity, Contextable<NodeContext | GroupNodeContext | { $implicit: object }>
+{
   private static defaultWidth = 100;
   private static defaultHeight = 50;
   private static defaultColor = '#1b262c';
@@ -98,6 +102,10 @@ export class NodeModel<T = unknown> implements FlowEntity {
   public resizing = signal(false);
   public resizerTemplate = signal<TemplateRef<unknown> | null>(null);
 
+  public context = {
+    $implicit: {},
+  };
+
   private parentId = signal<string | null>(null);
 
   constructor(public node: Node<T> | DynamicNode<T>) {
@@ -131,6 +139,24 @@ export class NodeModel<T = unknown> implements FlowEntity {
       } else {
         this.resizable.set(node.resizable);
       }
+    }
+
+    if (node.type === 'html-template') {
+      this.context = {
+        $implicit: {
+          node: node,
+          selected: this.selected,
+        },
+      };
+    } else if (node.type === 'template-group') {
+      this.context = {
+        $implicit: {
+          node: node,
+          selected: this.selected.asReadonly(),
+          width: this.width,
+          height: this.height,
+        },
+      };
     }
   }
 

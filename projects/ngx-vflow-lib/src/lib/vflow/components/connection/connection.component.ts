@@ -106,6 +106,7 @@ export class ConnectionComponent {
 
   protected readonly defaultColor = 'rgb(177, 177, 183)';
 
+  // TODO: move context to model
   protected getContext(): ConnectionContext {
     return {
       $implicit: {

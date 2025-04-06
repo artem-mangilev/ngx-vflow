@@ -116,6 +116,7 @@ export class EdgeLabelComponent implements AfterViewInit {
       .subscribe();
   }
 
+  // TODO: move to model with Contextable interface
   protected getLabelContext(): HtmlEdgeLabelContext {
     return {
       $implicit: {

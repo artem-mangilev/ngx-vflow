@@ -10,8 +10,10 @@ import { FlowEntity } from '../interfaces/flow-entity.interface';
 import { smoothStepPath } from '../math/edge-path/smooth-step-path';
 import { UsingPoints } from '../types/using-points.type';
 import { hashCode } from '../utils/hash';
+import { Contextable } from '../interfaces/contextable.interface';
+import { EdgeContext } from '../interfaces/template-context.interface';
 
-export class EdgeModel implements FlowEntity {
+export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
   public source = signal<NodeModel | undefined>(undefined);
   public target = signal<NodeModel | undefined>(undefined);
   public curve: Curve;
