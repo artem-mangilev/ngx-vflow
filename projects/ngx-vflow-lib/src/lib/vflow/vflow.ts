@@ -1,4 +1,5 @@
 import { VflowComponent } from './components/vflow/vflow.component';
+
 import { DragHandleDirective } from './directives/drag-handle.directive';
 import { SelectableDirective } from './directives/selectable.directive';
 import {
@@ -9,12 +10,13 @@ import {
   HandleTemplateDirective,
   NodeHtmlTemplateDirective,
 } from './directives/template.directive';
+import { ConnectionControllerDirective } from './directives/connection-controller.directive';
+
 import { MiniMapComponent } from './public-components/minimap/minimap.component';
 import { NodeToolbarComponent } from './public-components/node-toolbar/node-toolbar.component';
 import { ResizableComponent } from './public-components/resizable/resizable.component';
 import { HandleComponent } from './public-components/handle/handle.component';
-import { ConnectionControllerDirective } from './directives/connection-controller.directive';
-import { CustomTemplateEdgeComponent } from '../../public-api';
+import { CustomTemplateEdgeComponent } from './public-components/custom-template-edge/custom-template-edge.component';
 
 export const Vflow = [
   VflowComponent,
