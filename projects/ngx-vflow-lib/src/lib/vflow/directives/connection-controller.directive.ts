@@ -88,8 +88,8 @@ export class ConnectionControllerDirective {
       }
 
       const valid = this.flowEntitiesService.connection().validator({
-        source: source.node.id,
-        target: target.node.id,
+        source: source.rawNode.id,
+        target: target.rawNode.id,
         sourceHandle: sourceHandle.rawHandle.id,
         targetHandle: targetHandle.rawHandle.id,
       });
@@ -184,8 +184,8 @@ function statusToConnection(
     targetHandle = adjusted.targetHandle;
   }
 
-  const sourceId = source.node.id;
-  const targetId = target.node.id;
+  const sourceId = source.rawNode.id;
+  const targetId = target.rawNode.id;
 
   const sourceHandleId = sourceHandle.rawHandle.id;
   const targetHandleId = targetHandle.rawHandle.id;

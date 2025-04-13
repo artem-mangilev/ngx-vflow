@@ -1,12 +1,5 @@
-import { Signal, TemplateRef, computed, inject, signal } from '@angular/core';
-import {
-  DynamicNode,
-  Node,
-  isComponentDynamicNode,
-  isComponentStaticNode,
-  isDynamicNode,
-} from '../interfaces/node.interface';
-import { isDefined } from '../utils/is-defined';
+import { TemplateRef, computed, inject, signal } from '@angular/core';
+import { DynamicNode, Node, isComponentDynamicNode, isComponentStaticNode } from '../interfaces/node.interface';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { HandleModel } from './handle.model';
 import { FlowEntity } from '../interfaces/flow-entity.interface';
@@ -15,6 +8,7 @@ import { FlowEntitiesService } from '../services/flow-entities.service';
 import { MAGIC_NUMBER_TO_FIX_GLITCH_IN_CHROME } from '../constants/magic-number-to-fix-glitch-in-chrome.constant';
 import { Contextable } from '../interfaces/contextable.interface';
 import { GroupNodeContext, NodeContext } from '../interfaces/template-context.interface';
+import { toUnifiedNode } from '../utils/to-unified-node';
 
 export class NodeModel<T = unknown>
   implements FlowEntity, Contextable<NodeContext | GroupNodeContext | { $implicit: object }>
@@ -25,13 +19,13 @@ export class NodeModel<T = unknown>
 
   private entitiesService = inject(FlowEntitiesService);
 
-  public point = this.createInternalPointSignal();
+  public point = signal<Point>({ x: 0, y: 0 });
   public point$ = toObservable(this.point);
 
-  public width = this.createWidthSignal(NodeModel.defaultWidth);
+  public width = signal(NodeModel.defaultWidth);
   public width$ = toObservable(this.width);
 
-  public height = this.createHeightSignal(NodeModel.defaultHeight);
+  public height = signal(NodeModel.defaultHeight);
   public height$ = toObservable(this.height);
 
   /**
@@ -82,19 +76,20 @@ export class NodeModel<T = unknown>
   public readonly magnetRadius = 20;
 
   // TODO: not sure if we need to statically store it
-  public isComponentType = isComponentStaticNode(this.node as Node) || isComponentDynamicNode(this.node as DynamicNode);
+  public isComponentType =
+    isComponentStaticNode(this.rawNode as Node) || isComponentDynamicNode(this.rawNode as DynamicNode);
 
   // Default node specific thing
-  public text = this.createTextSignal();
+  public text = signal('');
 
   // Component node specific thing
   public componentTypeInputs = {
-    node: this.node,
+    node: this.rawNode,
   };
 
-  public parent = computed(() => this.entitiesService.nodes().find((n) => n.node.id === this.parentId()) ?? null);
+  public parent = computed(() => this.entitiesService.nodes().find((n) => n.rawNode.id === this.parentId()) ?? null);
 
-  public children = computed(() => this.entitiesService.nodes().filter((n) => n.parentId() === this.node.id));
+  public children = computed(() => this.entitiesService.nodes().filter((n) => n.parentId() === this.rawNode.id));
 
   public color = signal(NodeModel.defaultColor);
 
@@ -108,50 +103,52 @@ export class NodeModel<T = unknown>
 
   private parentId = signal<string | null>(null);
 
-  constructor(public node: Node<T> | DynamicNode<T>) {
-    if (isDefined(node.draggable)) {
-      if (isDynamicNode(node)) {
-        this.draggable = node.draggable;
-      } else {
-        this.draggable.set(node.draggable);
-      }
+  constructor(public rawNode: Node<T> | DynamicNode<T>) {
+    const internalNode = toUnifiedNode(rawNode);
+
+    if (internalNode.point) {
+      this.point = internalNode.point;
     }
 
-    if (isDefined(node.parentId)) {
-      if (isDynamicNode(node)) {
-        this.parentId = node.parentId;
-      } else {
-        this.parentId.set(node.parentId);
-      }
+    if (internalNode.width) {
+      this.width = internalNode.width;
     }
 
-    if (node.type === 'default-group' && node.color) {
-      if (isDynamicNode(node)) {
-        this.color = node.color;
-      } else {
-        this.color.set(node.color);
-      }
+    if (internalNode.height) {
+      this.height = internalNode.height;
     }
 
-    if (node.type === 'default-group' && node.resizable) {
-      if (isDynamicNode(node)) {
-        this.resizable = node.resizable;
-      } else {
-        this.resizable.set(node.resizable);
-      }
+    if (internalNode.draggable) {
+      this.draggable = internalNode.draggable;
     }
 
-    if (node.type === 'html-template') {
+    if (internalNode.parentId) {
+      this.parentId = internalNode.parentId;
+    }
+
+    if (internalNode.type === 'default-group' && internalNode.color) {
+      this.color = internalNode.color;
+    }
+
+    if (internalNode.type === 'default-group' && internalNode.resizable) {
+      this.resizable = internalNode.resizable;
+    }
+
+    if (internalNode.type === 'default' && internalNode.text) {
+      this.text = internalNode.text;
+    }
+
+    if (internalNode.type === 'html-template') {
       this.context = {
         $implicit: {
-          node: node,
+          node: rawNode,
           selected: this.selected,
         },
       };
-    } else if (node.type === 'template-group') {
+    } else if (internalNode.type === 'template-group') {
       this.context = {
         $implicit: {
-          node: node,
+          node: rawNode,
           selected: this.selected.asReadonly(),
           width: this.width,
           height: this.height,
@@ -162,35 +159,5 @@ export class NodeModel<T = unknown>
 
   public setPoint(point: Point) {
     this.point.set(point);
-  }
-
-  private createTextSignal(): Signal<string> {
-    const node = this.node;
-
-    if (node.type === 'default') {
-      if (isDynamicNode(node)) {
-        return node.text ?? signal('');
-      } else {
-        return signal(node.text ?? '');
-      }
-    }
-
-    return signal('');
-  }
-
-  private createInternalPointSignal() {
-    return isDynamicNode(this.node) ? this.node.point : signal({ x: this.node.point.x, y: this.node.point.y });
-  }
-
-  private createWidthSignal(defaultValue: number) {
-    return isDynamicNode(this.node)
-      ? (this.node.width ?? signal(defaultValue))
-      : signal(this.node.width ?? defaultValue);
-  }
-
-  private createHeightSignal(defaultValue: number) {
-    return isDynamicNode(this.node)
-      ? (this.node.height ?? signal(defaultValue))
-      : signal(this.node.height ?? defaultValue);
   }
 }

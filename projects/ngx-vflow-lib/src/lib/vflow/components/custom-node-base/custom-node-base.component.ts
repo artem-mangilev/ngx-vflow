@@ -43,7 +43,7 @@ export abstract class CustomNodeBaseComponent<T = any> implements OnInit {
         emitter.pipe(
           tap((event) => {
             this.eventBus.pushEvent({
-              nodeId: this.nodeService.model()?.node.id ?? '',
+              nodeId: this.nodeService.model()?.rawNode.id ?? '',
               eventName: emittersOrRefs.get(emitter)!,
               eventPayload: event,
             });

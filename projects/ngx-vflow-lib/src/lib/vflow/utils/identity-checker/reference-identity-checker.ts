@@ -1,15 +1,15 @@
-import { NodeModel } from '../models/node.model';
-import { DynamicNode, Node } from '../interfaces/node.interface';
-import { EdgeModel } from '../models/edge.model';
-import { Edge } from '../interfaces/edge.interface';
+import { NodeModel } from '../../models/node.model';
+import { DynamicNode, Node } from '../../interfaces/node.interface';
+import { EdgeModel } from '../../models/edge.model';
+import { Edge } from '../../interfaces/edge.interface';
 
-export class ReferenceKeeper {
+export class ReferenceIdentityChecker {
   /**
    * Create new models for new node references and keep old models for old node references
    */
   public static nodes(newNodes: Node[] | DynamicNode[], oldNodeModels: NodeModel[]) {
     const oldNodesMap: Map<Node | DynamicNode, NodeModel> = new Map();
-    oldNodeModels.forEach((model) => oldNodesMap.set(model.node, model));
+    oldNodeModels.forEach((model) => oldNodesMap.set(model.rawNode, model));
 
     return newNodes.map((newNode) => {
       if (oldNodesMap.has(newNode)) return oldNodesMap.get(newNode)!;

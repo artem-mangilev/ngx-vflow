@@ -1,3 +1,5 @@
+export type ItemTrackingStrategy = 'id' | 'reference';
+
 export interface Optimization {
   /**
    * If true, the layer with groups will be placed behind the edges layer.
@@ -6,4 +8,6 @@ export interface Optimization {
    * @default false
    */
   detachedGroupsLayer: boolean;
+
+  nodesTrackingStrategy: ItemTrackingStrategy;
 }

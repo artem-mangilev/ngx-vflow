@@ -34,7 +34,7 @@ import { FlowStatusService } from '../../services/flow-status.service';
 import { FlowEntitiesService } from '../../services/flow-entities.service';
 import { ConnectionSettings } from '../../interfaces/connection-settings.interface';
 import { ConnectionModel } from '../../models/connection.model';
-import { ReferenceKeeper } from '../../utils/reference-keeper';
+import { ReferenceIdentityChecker } from '../../utils/identity-checker/reference-identity-checker';
 import { NodesChangeService } from '../../services/node-changes.service';
 import { EdgeChangesService } from '../../services/edge-changes.service';
 import { NodeChange } from '../../types/node-change.type';
@@ -190,6 +190,7 @@ export class VflowComponent implements OnInit {
 
   public optimization = input<Optimization>({
     detachedGroupsLayer: false,
+    nodesTrackingStrategy: 'reference',
   });
 
   /**
@@ -253,7 +254,7 @@ export class VflowComponent implements OnInit {
   @Input({ required: true })
   public set nodes(newNodes: Node[] | DynamicNode[]) {
     const newModels = runInInjectionContext(this.injector, () =>
-      ReferenceKeeper.nodes(newNodes, this.flowEntitiesService.nodes()),
+      ReferenceIdentityChecker.nodes(newNodes, this.flowEntitiesService.nodes()),
     );
 
     // quick and dirty binding nodes to edges
@@ -272,7 +273,7 @@ export class VflowComponent implements OnInit {
   @Input()
   public set edges(newEdges: Edge[]) {
     const newModels = runInInjectionContext(this.injector, () =>
-      ReferenceKeeper.edges(newEdges, this.flowEntitiesService.edges()),
+      ReferenceIdentityChecker.edges(newEdges, this.flowEntitiesService.edges()),
     );
 
     // quick and dirty binding nodes to edges
@@ -407,7 +408,7 @@ export class VflowComponent implements OnInit {
    * @param id node id
    */
   public getNode<T = unknown>(id: string): Node<T> | DynamicNode<T> | undefined {
-    return this.flowEntitiesService.getNode<T>(id)?.node;
+    return this.flowEntitiesService.getNode<T>(id)?.rawNode;
   }
 
   /**
@@ -425,7 +426,7 @@ export class VflowComponent implements OnInit {
   }
   // #endregion
 
-  protected trackNodes(idx: number, { node }: NodeModel) {
+  protected trackNodes(idx: number, { rawNode: node }: NodeModel) {
     return node;
   }
 
@@ -435,7 +436,7 @@ export class VflowComponent implements OnInit {
 
   private setInitialNodesOrder() {
     this.nodeModels().forEach((model) => {
-      switch (model.node.type) {
+      switch (model.rawNode.type) {
         case 'default-group':
         case 'template-group': {
           this.nodeRenderingService.pullNode(model);

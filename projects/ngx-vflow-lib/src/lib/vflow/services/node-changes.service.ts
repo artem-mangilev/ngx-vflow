@@ -40,7 +40,7 @@ export class NodesChangeService {
       return this.entitiesService
         .nodes()
         .filter((node) => node === changedNode || node.selected())
-        .map((node) => ({ type: 'position', id: node.node.id, point: node.point() }));
+        .map((node) => ({ type: 'position', id: node.rawNode.id, point: node.point() }));
     }),
   ) satisfies Observable<NodeChange[]>;
 
@@ -55,21 +55,21 @@ export class NodesChangeService {
         ),
       ),
     ),
-    map((changedNode) => [{ type: 'size', id: changedNode.node.id, size: changedNode.size() }]),
+    map((changedNode) => [{ type: 'size', id: changedNode.rawNode.id, size: changedNode.size() }]),
   ) satisfies Observable<NodeChange[]>;
 
   protected nodeAddChange$ = toObservable(this.entitiesService.nodes).pipe(
     pairwise(),
     map(([oldList, newList]) => newList.filter((node) => !oldList.includes(node))),
     filter((nodes) => !!nodes.length),
-    map((nodes) => nodes.map((node) => ({ type: 'add', id: node.node.id }))),
+    map((nodes) => nodes.map((node) => ({ type: 'add', id: node.rawNode.id }))),
   ) satisfies Observable<NodeChange[]>;
 
   protected nodeRemoveChange$ = toObservable(this.entitiesService.nodes).pipe(
     pairwise(),
     map(([oldList, newList]) => oldList.filter((node) => !newList.includes(node))),
     filter((nodes) => !!nodes.length),
-    map((nodes) => nodes.map((node) => ({ type: 'remove', id: node.node.id }))),
+    map((nodes) => nodes.map((node) => ({ type: 'remove', id: node.rawNode.id }))),
   ) satisfies Observable<NodeChange[]>;
 
   protected nodeSelectedChange$ = toObservable(this.entitiesService.nodes).pipe(
@@ -84,7 +84,7 @@ export class NodesChangeService {
         ),
       ),
     ),
-    map((changedNode) => [{ type: 'select', id: changedNode.node.id, selected: changedNode.selected() }]),
+    map((changedNode) => [{ type: 'select', id: changedNode.rawNode.id, selected: changedNode.selected() }]),
   ) satisfies Observable<NodeChange[]>;
 
   public readonly changes$: Observable<NodeChange[]> = merge(
