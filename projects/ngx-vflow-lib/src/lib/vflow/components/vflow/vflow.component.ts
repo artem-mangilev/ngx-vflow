@@ -190,7 +190,6 @@ export class VflowComponent implements OnInit {
 
   public optimization = input<Optimization>({
     detachedGroupsLayer: false,
-    nodesTrackingStrategy: 'reference',
   });
 
   /**
