@@ -149,7 +149,7 @@ export class MiniMapComponent implements OnInit {
     this.entitiesService.minimap.set(model);
   }
 
-  protected trackNodes(idx: number, { node }: NodeModel) {
-    return node;
+  protected trackNodes(idx: number, { rawNode }: NodeModel) {
+    return rawNode;
   }
 }

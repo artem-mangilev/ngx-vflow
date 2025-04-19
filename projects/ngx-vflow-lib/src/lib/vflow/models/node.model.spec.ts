@@ -53,9 +53,9 @@ describe('NodeModel', () => {
 
     expect(model.children().length).toEqual(1);
     // check if children of model is correct
-    expect(model.children()[0].node.id).toEqual('2');
+    expect(model.children()[0].rawNode.id).toEqual('2');
     // check if parent of child is also set correctly
-    expect(model.children()[0].parent()?.node.id).toEqual('1');
+    expect(model.children()[0].parent()?.rawNode.id).toEqual('1');
   });
 
   it('should return correct global point', () => {

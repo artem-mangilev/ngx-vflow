@@ -1,5 +1,5 @@
 <!-- Default node -->
-@if (model().node.type === 'default') {
+@if (model().rawNode.type === 'default') {
   <svg:foreignObject
     class="selectable"
     [attr.width]="model().foWidth()"
@@ -21,7 +21,7 @@
 }
 
 <!-- Template node -->
-@if (model().node.type === 'html-template' && nodeTemplate()) {
+@if (model().rawNode.type === 'html-template' && nodeTemplate()) {
   <svg:foreignObject
     class="selectable"
     [attr.width]="model().foWidth()"
@@ -55,7 +55,7 @@
       [style.width]="model().styleWidth()"
       [style.height]="model().styleHeight()">
       <ng-container
-        [ngComponentOutlet]="$any(model().node.type)"
+        [ngComponentOutlet]="$any(model().rawNode.type)"
         [ngComponentOutletInputs]="model().componentTypeInputs"
         [ngComponentOutletInjector]="injector" />
     </div>
@@ -63,7 +63,7 @@
 }
 
 <!-- Default group node -->
-@if (model().node.type === 'default-group') {
+@if (model().rawNode.type === 'default-group') {
   <svg:rect
     class="default-group-node"
     rx="5"
@@ -80,7 +80,7 @@
 }
 
 <!-- Template group node  -->
-@if (model().node.type === 'template-group' && groupNodeTemplate()) {
+@if (model().rawNode.type === 'template-group' && groupNodeTemplate()) {
   <svg:g class="selectable" nodeHandlesController (pointerStart)="pullNode()">
     <ng-container
       [ngTemplateOutlet]="groupNodeTemplate() ?? null"

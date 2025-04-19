@@ -56,7 +56,7 @@ export class FlowEntitiesService {
   public minimap: WritableSignal<MinimapModel | null> = signal(null);
 
   public getNode<T>(id: string) {
-    return this.nodes().find(({ node }) => node.id === id) as NodeModel<T> | undefined;
+    return this.nodes().find(({ rawNode }) => rawNode.id === id) as NodeModel<T> | undefined;
   }
 
   public getDetachedEdges() {

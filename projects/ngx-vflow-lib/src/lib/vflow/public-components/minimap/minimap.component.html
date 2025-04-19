@@ -25,7 +25,7 @@
 
       @for (model of entitiesService.nodes(); track trackNodes($index, model)) {
         <ng-container>
-          @if (model.node.type === 'default' || model.node.type === 'html-template' || model.isComponentType) {
+          @if (model.rawNode.type === 'default' || model.rawNode.type === 'html-template' || model.isComponentType) {
             <svg:foreignObject
               [attr.transform]="model.pointTransform()"
               [attr.width]="model.size().width"
@@ -40,7 +40,7 @@
               </default-node>
             </svg:foreignObject>
           }
-          @if (model.node.type === 'default-group' || model.node.type === 'template-group') {
+          @if (model.rawNode.type === 'default-group' || model.rawNode.type === 'template-group') {
             <svg:rect
               class="default-group-node"
               rx="5"

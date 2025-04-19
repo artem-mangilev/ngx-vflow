@@ -91,7 +91,7 @@ export class HandleModel {
     $implicit: {
       point: this.hostOffset,
       state: this.state,
-      node: this.parentNode.node,
+      node: this.parentNode.rawNode,
     },
   };
 
