@@ -148,7 +148,6 @@ export class VflowMockComponent implements AsInterface<VflowComponent>, OnInit {
 
   public readonly optimization = input<Optimization>({
     detachedGroupsLayer: false,
-    nodesTrackingStrategy: 'reference',
   });
 
   @Input()
