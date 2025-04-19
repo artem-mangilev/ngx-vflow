@@ -6,6 +6,7 @@ import { CustomDynamicNodeComponent } from '../public-components/custom-dynamic-
 export type Node<T = any> =
   | DefaultNode
   | HtmlTemplateNode<T>
+  | SvgTemplateNode<T>
   | ComponentNode<T>
   | DefaultGroupNode
   | TemplateGroupNode<T>;
@@ -13,6 +14,7 @@ export type Node<T = any> =
 export type DynamicNode<T = any> =
   | DefaultDynamicNode
   | HtmlTemplateDynamicNode<T>
+  | SvgTemplateDynamicNode<T>
   | ComponentDynamicNode<T>
   | DefaultDynamicGroupNode
   | TemplateDynamicGroupNode<T>;
@@ -52,9 +54,27 @@ export interface HtmlTemplateNode<T = any> extends SharedNode {
   height?: number;
 }
 
+export interface SvgTemplateNode<T = any> extends SharedNode {
+  type: 'svg-template';
+  data?: T;
+
+  // TODO: not sure if we need this
+  width?: number;
+  height?: number;
+}
+
 export interface HtmlTemplateDynamicNode<T = any> extends SharedDynamicNode {
   type: 'html-template';
   data?: WritableSignal<T>;
+  width?: WritableSignal<number>;
+  height?: WritableSignal<number>;
+}
+
+export interface SvgTemplateDynamicNode<T = any> extends SharedDynamicNode {
+  type: 'svg-template';
+  data?: WritableSignal<T>;
+
+  // TODO: not sure if we need this
   width?: WritableSignal<number>;
   height?: WritableSignal<number>;
 }
@@ -124,6 +144,14 @@ export function isTemplateStaticNode<T>(node: Node<T>): node is HtmlTemplateNode
 }
 
 export function isTemplateDynamicNode<T>(node: DynamicNode<T>): node is HtmlTemplateDynamicNode<T> {
+  return node.type === 'html-template';
+}
+
+export function isSvgTemplateStaticNode<T>(node: Node<T>): node is SvgTemplateNode<T> {
+  return node.type === 'svg-template';
+}
+
+export function isSvgTemplateDynamicNode<T>(node: DynamicNode<T>): node is SvgTemplateDynamicNode<T> {
   return node.type === 'html-template';
 }
 

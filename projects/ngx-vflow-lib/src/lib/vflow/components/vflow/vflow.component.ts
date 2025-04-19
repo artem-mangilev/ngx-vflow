@@ -25,6 +25,7 @@ import {
   EdgeTemplateDirective,
   GroupNodeTemplateDirective,
   NodeHtmlTemplateDirective,
+  NodeSvgTemplateDirective,
 } from '../../directives/template.directive';
 import { addNodesToEdges } from '../../utils/add-nodes-to-edges';
 import { skip } from 'rxjs';
@@ -295,6 +296,8 @@ export class VflowComponent implements OnInit {
 
   // #region TEMPLATES
   protected nodeTemplateDirective = contentChild(NodeHtmlTemplateDirective);
+
+  protected nodeSvgTemplateDirective = contentChild(NodeSvgTemplateDirective);
 
   protected groupNodeTemplateDirective = contentChild(GroupNodeTemplateDirective);
 

@@ -57,6 +57,18 @@ export class NodeHtmlTemplateDirective {
 
 @Directive({
   standalone: true,
+  selector: 'ng-template[nodeSvg]',
+})
+export class NodeSvgTemplateDirective {
+  public templateRef = inject(TemplateRef);
+
+  static ngTemplateContextGuard(dir: NodeSvgTemplateDirective, ctx: unknown): ctx is NodeContext {
+    return true;
+  }
+}
+
+@Directive({
+  standalone: true,
   selector: 'ng-template[groupNode]',
 })
 export class GroupNodeTemplateDirective {

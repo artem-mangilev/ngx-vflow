@@ -20,7 +20,7 @@
   </svg:foreignObject>
 }
 
-<!-- Template node -->
+<!-- HTML Template node -->
 @if (model().rawNode.type === 'html-template' && nodeTemplate()) {
   <svg:foreignObject
     class="selectable"
@@ -39,6 +39,16 @@
         [ngTemplateOutletInjector]="injector" />
     </div>
   </svg:foreignObject>
+}
+
+<!-- SVG Template node -->
+@if (model().rawNode.type === 'svg-template' && nodeSvgTemplate()) {
+  <svg:g class="svg-wrapper" nodeHandlesController nodeResizeController (pointerStart)="pullNode()">
+    <ng-container
+      [ngTemplateOutlet]="nodeSvgTemplate() ?? null"
+      [ngTemplateOutletContext]="model().context"
+      [ngTemplateOutletInjector]="injector" />
+  </svg:g>
 }
 
 <!-- Component node -->

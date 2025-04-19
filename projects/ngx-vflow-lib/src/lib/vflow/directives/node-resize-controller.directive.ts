@@ -22,11 +22,20 @@ export class NodeResizeControllerDirective implements OnInit {
         startWith(null),
         filter(() => !model.resizing()),
         tap(() => {
-          const width = this.hostElementRef.nativeElement.clientWidth;
-          const height = this.hostElementRef.nativeElement.clientHeight;
+          if (this.hostElementRef.nativeElement instanceof HTMLElement) {
+            const width = this.hostElementRef.nativeElement.clientWidth;
+            const height = this.hostElementRef.nativeElement.clientHeight;
 
-          model.width.set(width);
-          model.height.set(height);
+            model.width.set(width);
+            model.height.set(height);
+          }
+
+          if (this.hostElementRef.nativeElement instanceof SVGGraphicsElement) {
+            const { width, height } = this.hostElementRef.nativeElement.getBBox();
+
+            model.width.set(width);
+            model.height.set(height);
+          }
         }),
         takeUntilDestroyed(this.destroyRef),
       )

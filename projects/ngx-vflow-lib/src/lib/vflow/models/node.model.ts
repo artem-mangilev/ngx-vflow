@@ -145,7 +145,18 @@ export class NodeModel<T = unknown>
           selected: this.selected,
         },
       };
-    } else if (internalNode.type === 'template-group') {
+    }
+
+    if (internalNode.type === 'svg-template') {
+      this.context = {
+        $implicit: {
+          node: rawNode,
+          selected: this.selected,
+        },
+      };
+    }
+
+    if (internalNode.type === 'template-group') {
       this.context = {
         $implicit: {
           node: rawNode,

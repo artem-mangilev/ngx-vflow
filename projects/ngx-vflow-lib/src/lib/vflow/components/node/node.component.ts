@@ -77,6 +77,8 @@ export class NodeComponent implements OnInit, OnDestroy {
 
   public nodeTemplate = input<TemplateRef<any>>();
 
+  public nodeSvgTemplate = input<TemplateRef<any>>();
+
   public groupNodeTemplate = input<TemplateRef<any>>();
 
   protected showMagnet = computed(
