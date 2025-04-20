@@ -24,6 +24,9 @@ import { Rect } from '../../interfaces/rect';
 import { PointerEvent } from '../../directives/root-pointer.directive';
 import { SpacePointContextDirective } from '../../directives/space-point-context.directive';
 import { PointerDirective } from '../../directives/pointer.directive';
+import { FlowSettingsService } from '../../services/flow-settings.service';
+import { Point } from '../../interfaces/point.interface';
+import { align } from '../../utils/align-number';
 
 type Side = 'top' | 'right' | 'bottom' | 'left' | 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left';
 
@@ -47,6 +50,7 @@ export class ResizableComponent implements OnInit, AfterViewInit {
   private rootPointer = inject(RootPointerDirective);
   private viewportService = inject(ViewportService);
   private spacePointContext = inject(SpacePointContextDirective);
+  private settingsService = inject(FlowSettingsService);
   private hostRef = inject<ElementRef<Element>>(ElementRef);
 
   public resizable = input<boolean | ''>();
@@ -124,7 +128,7 @@ export class ResizableComponent implements OnInit, AfterViewInit {
 
     const offset = calcOffset(event.movementX, event.movementY, this.zoom());
 
-    const resized = applyResize(this.resizeSide, this.model, offset, this.getDistanceToEdge(event));
+    const resized = this.applyResize(this.resizeSide, this.model, offset, this.getDistanceToEdge(event));
 
     const { x, y, width, height } = constrainRect(resized, this.model, this.resizeSide, this.minWidth, this.minHeight);
 
@@ -149,60 +153,121 @@ export class ResizableComponent implements OnInit, AfterViewInit {
       bottom: flowPoint.y - (y + this.model.height()),
     };
   }
-}
 
-function calcOffset(movementX: number, movementY: number, zoom: number) {
-  return {
-    offsetX: round(movementX / zoom),
-    offsetY: round(movementY / zoom),
-  };
-}
+  private applyResize(side: Side, model: NodeModel, offset: Point, distanceToEdge: DistanceToEdge): Rect {
+    const { x, y } = model.point();
+    const width = model.width();
+    const height = model.height();
+    const [snapX, snapY] = this.settingsService.snapGrid();
 
-function applyResize(
-  side: Side,
-  model: NodeModel,
-  offset: { offsetX: number; offsetY: number },
-  distanceToEdge: DistanceToEdge,
-): Rect {
-  const { offsetX, offsetY } = offset;
-  const { x, y } = model.point();
-  const width = model.width();
-  const height = model.height();
+    switch (side) {
+      case 'left': {
+        const movementX = offset.x + distanceToEdge.left;
+        const newX = align(x + movementX, snapX);
+        const deltaX = newX - x;
 
-  // Handle each case of resizing (top, bottom, left, right, corners)
-  switch (side) {
-    case 'left':
-      return { x: x + offsetX + distanceToEdge.left, y, width: width - offsetX - distanceToEdge.left, height };
-    case 'right':
-      return { x, y, width: width + offsetX + distanceToEdge.right, height };
-    case 'top':
-      return { x, y: y + offsetY + distanceToEdge.top, width, height: height - offsetY - distanceToEdge.top };
-    case 'bottom':
-      return { x, y, width, height: height + offsetY + distanceToEdge.bottom };
-    case 'top-left':
-      return {
-        x: x + offsetX + distanceToEdge.left,
-        y: y + offsetY + distanceToEdge.top,
-        width: width - offsetX - distanceToEdge.left,
-        height: height - offsetY - distanceToEdge.top,
-      };
-    case 'top-right':
-      return {
-        x,
-        y: y + offsetY + distanceToEdge.top,
-        width: width + offsetX + distanceToEdge.right,
-        height: height - offsetY - distanceToEdge.top,
-      };
-    case 'bottom-left':
-      return {
-        x: x + offsetX + distanceToEdge.left,
-        y,
-        width: width - offsetX - distanceToEdge.left,
-        height: height + offsetY + distanceToEdge.bottom,
-      };
-    case 'bottom-right':
-      return { x, y, width: width + offsetX + distanceToEdge.right, height: height + offsetY + distanceToEdge.bottom };
+        return {
+          x: newX,
+          y,
+          width: width - deltaX,
+          height,
+        };
+      }
+      case 'right': {
+        const movementX = offset.x + distanceToEdge.right;
+        const newWidth = align(width + movementX, snapX);
+
+        return {
+          x,
+          y,
+          width: newWidth,
+          height,
+        };
+      }
+      case 'top': {
+        const movementY = offset.y + distanceToEdge.top;
+        const newY = align(y + movementY, snapY);
+        const deltaY = newY - y;
+
+        return {
+          x,
+          y: newY,
+          width,
+          height: height - deltaY,
+        };
+      }
+      case 'bottom': {
+        const movementY = offset.y + distanceToEdge.bottom;
+        const newHeight = align(height + movementY, snapY);
+
+        return {
+          x,
+          y,
+          width,
+          height: newHeight,
+        };
+      }
+      case 'top-left': {
+        const movementX = offset.x + distanceToEdge.left;
+        const movementY = offset.y + distanceToEdge.top;
+        const newX = align(x + movementX, snapX);
+        const newY = align(y + movementY, snapY);
+        const deltaX = newX - x;
+        const deltaY = newY - y;
+
+        return {
+          x: newX,
+          y: newY,
+          width: width - deltaX,
+          height: height - deltaY,
+        };
+      }
+      case 'top-right': {
+        const movementX = offset.x + distanceToEdge.right;
+        const movementY = offset.y + distanceToEdge.top;
+        const newY = align(y + movementY, snapY);
+        const deltaY = newY - y;
+
+        return {
+          x,
+          y: newY,
+          width: align(width + movementX, snapX),
+          height: height - deltaY,
+        };
+      }
+      case 'bottom-left': {
+        const movementX = offset.x + distanceToEdge.left;
+        const movementY = offset.y + distanceToEdge.bottom;
+        const newX = align(x + movementX, snapX);
+        const deltaX = newX - x;
+
+        return {
+          x: newX,
+          y,
+          width: width - deltaX,
+          height: align(height + movementY, snapY),
+        };
+      }
+      case 'bottom-right': {
+        const movementX = offset.x + distanceToEdge.right;
+        const movementY = offset.y + distanceToEdge.bottom;
+
+        return {
+          x,
+          y,
+          width: align(width + movementX, snapX),
+          height: align(height + movementY, snapY),
+        };
+      }
+    }
   }
+}
+
+function calcOffset(movementX: number, movementY: number, zoom: number): Point {
+  return {
+    x: round(movementX / zoom),
+    y: round(movementY / zoom),
+  };
 }
 
 function constrainRect(rect: Rect, model: NodeModel, side: Side, minWidth: number, minHeight: number) {
