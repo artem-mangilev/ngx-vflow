@@ -43,7 +43,7 @@
 
 <!-- SVG Template node -->
 @if (model().rawNode.type === 'svg-template' && nodeSvgTemplate()) {
-  <svg:g class="svg-wrapper" nodeHandlesController nodeResizeController (pointerStart)="pullNode()">
+  <svg:g class="selectable" nodeHandlesController (pointerStart)="pullNode()">
     <ng-container
       [ngTemplateOutlet]="nodeSvgTemplate() ?? null"
       [ngTemplateOutletContext]="model().context"

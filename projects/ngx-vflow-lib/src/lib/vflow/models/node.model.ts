@@ -152,6 +152,8 @@ export class NodeModel<T = unknown>
         $implicit: {
           node: rawNode,
           selected: this.selected,
+          width: this.width,
+          height: this.height,
         },
       };
     }

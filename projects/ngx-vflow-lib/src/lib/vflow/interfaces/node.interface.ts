@@ -56,11 +56,9 @@ export interface HtmlTemplateNode<T = any> extends SharedNode {
 
 export interface SvgTemplateNode<T = any> extends SharedNode {
   type: 'svg-template';
+  width: number;
+  height: number;
   data?: T;
-
-  // TODO: not sure if we need this
-  width?: number;
-  height?: number;
 }
 
 export interface HtmlTemplateDynamicNode<T = any> extends SharedDynamicNode {
@@ -72,11 +70,9 @@ export interface HtmlTemplateDynamicNode<T = any> extends SharedDynamicNode {
 
 export interface SvgTemplateDynamicNode<T = any> extends SharedDynamicNode {
   type: 'svg-template';
+  width: WritableSignal<number>;
+  height: WritableSignal<number>;
   data?: WritableSignal<T>;
-
-  // TODO: not sure if we need this
-  width?: WritableSignal<number>;
-  height?: WritableSignal<number>;
 }
 
 export interface DefaultGroupNode extends SharedNode {

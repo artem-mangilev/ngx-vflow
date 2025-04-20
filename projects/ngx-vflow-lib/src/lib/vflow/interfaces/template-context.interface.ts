@@ -23,6 +23,15 @@ export interface NodeContext {
   };
 }
 
+export interface SvgNodeContext {
+  $implicit: {
+    node: any;
+    selected: Signal<boolean>;
+    width: Signal<number>;
+    height: Signal<number>;
+  };
+}
+
 export interface GroupNodeContext {
   $implicit: {
     node: any;

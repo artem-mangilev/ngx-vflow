@@ -4,6 +4,9 @@ import { NodeAccessorService } from '../services/node-accessor.service';
 import { filter, startWith, tap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
+/**
+ * Only suitable for HTML nodes
+ */
 @Directive({
   selector: '[nodeResizeController]',
   standalone: true,
@@ -22,20 +25,11 @@ export class NodeResizeControllerDirective implements OnInit {
         startWith(null),
         filter(() => !model.resizing()),
         tap(() => {
-          if (this.hostElementRef.nativeElement instanceof HTMLElement) {
-            const width = this.hostElementRef.nativeElement.clientWidth;
-            const height = this.hostElementRef.nativeElement.clientHeight;
+          const width = this.hostElementRef.nativeElement.clientWidth;
+          const height = this.hostElementRef.nativeElement.clientHeight;
 
-            model.width.set(width);
-            model.height.set(height);
-          }
-
-          if (this.hostElementRef.nativeElement instanceof SVGGraphicsElement) {
-            const { width, height } = this.hostElementRef.nativeElement.getBBox();
-
-            model.width.set(width);
-            model.height.set(height);
-          }
+          model.width.set(width);
+          model.height.set(height);
         }),
         takeUntilDestroyed(this.destroyRef),
       )
