@@ -5,13 +5,14 @@ import { Microtask } from '../decorators/microtask.decorator';
 
 @Injectable()
 export class OverlaysService {
-  private toolbars = signal<ToolbarModel[]>([]);
+  private readonly toolbars = signal<ToolbarModel[]>([]);
 
-  public nodeToolbars = computed(() => {
-    const map = new Map<NodeModel, ToolbarModel>();
+  public nodeToolbarsMap = computed(() => {
+    const map = new Map<NodeModel, ToolbarModel[]>();
 
     this.toolbars().forEach((toolbar) => {
-      map.set(toolbar.node, toolbar);
+      const existing = map.get(toolbar.node) ?? [];
+      map.set(toolbar.node, [...existing, toolbar]);
     });
 
     return map;
