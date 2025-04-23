@@ -18,7 +18,6 @@ export class MultipleNodeToolbarsDemoComponent {
   ];
 
   public deleteNode(node: Node) {
-    // Since there's only one node, we can simplify this or keep it for potential future expansion
     this.nodes = this.nodes.filter((n) => n.id !== node.id);
   }
 }

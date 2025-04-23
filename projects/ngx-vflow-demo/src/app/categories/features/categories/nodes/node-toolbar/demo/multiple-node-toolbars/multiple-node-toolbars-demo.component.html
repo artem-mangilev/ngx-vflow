@@ -1,12 +1,9 @@
 <vflow view="auto" [nodes]="nodes">
   <ng-template let-ctx nodeHtml>
-    <!-- Only one node type is needed for this demo -->
     <div class="custom-node"></div>
-    <!-- First toolbar -->
     <node-toolbar position="top">
       <button (click)="deleteNode(ctx.node)">Delete</button>
     </node-toolbar>
-    <!-- Second toolbar -->
     <node-toolbar position="right">
       <button>Action</button>
     </node-toolbar>
