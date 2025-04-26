@@ -131,7 +131,7 @@
 }
 
 <!-- Toolbar -->
-@if (toolbar(); as toolbar) {
+@for (toolbar of toolbars(); track toolbar) {
   <svg:foreignObject
     [attr.width]="toolbar.size().width"
     [attr.height]="toolbar.size().height"

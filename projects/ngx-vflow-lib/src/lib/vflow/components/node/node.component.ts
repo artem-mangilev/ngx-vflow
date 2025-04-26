@@ -87,7 +87,7 @@ export class NodeComponent implements OnInit, OnDestroy {
       this.flowStatusService.status().state === 'reconnection-validation',
   );
 
-  protected toolbar = computed(() => this.overlaysService.nodeToolbars().get(this.model()));
+  protected toolbars = computed(() => this.overlaysService.nodeToolbarsMap().get(this.model()));
 
   public ngOnInit() {
     this.nodeAccessor.model.set(this.model());
