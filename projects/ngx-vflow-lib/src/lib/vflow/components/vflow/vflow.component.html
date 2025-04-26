@@ -30,6 +30,7 @@
           node
           [model]="model"
           [nodeTemplate]="nodeTemplateDirective()?.templateRef"
+          [nodeSvgTemplate]="nodeSvgTemplateDirective()?.templateRef"
           [attr.transform]="model.pointTransform()" />
       }
     }
@@ -49,6 +50,7 @@
           node
           [model]="model"
           [nodeTemplate]="nodeTemplateDirective()?.templateRef"
+          [nodeSvgTemplate]="nodeSvgTemplateDirective()?.templateRef"
           [groupNodeTemplate]="groupNodeTemplateDirective()?.templateRef"
           [attr.transform]="model.pointTransform()" />
       }

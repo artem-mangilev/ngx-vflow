@@ -4,6 +4,9 @@ import { NodeAccessorService } from '../services/node-accessor.service';
 import { filter, startWith, tap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
+/**
+ * Only suitable for HTML nodes
+ */
 @Directive({
   selector: '[nodeResizeController]',
   standalone: true,

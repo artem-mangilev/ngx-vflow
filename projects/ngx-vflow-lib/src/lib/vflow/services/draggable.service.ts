@@ -6,6 +6,7 @@ import { round } from '../utils/round';
 import { FlowEntitiesService } from './flow-entities.service';
 import { Point } from '../interfaces/point.interface';
 import { FlowSettingsService } from './flow-settings.service';
+import { align } from '../utils/align-number';
 
 type DragEvent = D3DragEvent<Element, unknown, unknown>;
 
@@ -130,8 +131,4 @@ export class DraggableService {
 
     return point;
   }
-}
-
-function align(num: number, constant: number): number {
-  return Math.ceil(num / constant) * constant;
 }

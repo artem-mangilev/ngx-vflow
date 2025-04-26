@@ -5,6 +5,7 @@ import {
   GroupNodeContext,
   HtmlEdgeLabelContext,
   NodeContext,
+  SvgNodeContext,
 } from '../interfaces/template-context.interface';
 
 @Directive({
@@ -51,6 +52,18 @@ export class NodeHtmlTemplateDirective {
   public templateRef = inject(TemplateRef);
 
   static ngTemplateContextGuard(dir: NodeHtmlTemplateDirective, ctx: unknown): ctx is NodeContext {
+    return true;
+  }
+}
+
+@Directive({
+  standalone: true,
+  selector: 'ng-template[nodeSvg]',
+})
+export class NodeSvgTemplateDirective {
+  public templateRef = inject(TemplateRef);
+
+  static ngTemplateContextGuard(dir: NodeSvgTemplateDirective, ctx: unknown): ctx is SvgNodeContext {
     return true;
   }
 }

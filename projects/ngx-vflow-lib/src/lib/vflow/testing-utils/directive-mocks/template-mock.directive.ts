@@ -43,6 +43,14 @@ export class NodeHtmlTemplateMockDirective implements AsInterface<NodeHtmlTempla
 
 @Directive({
   standalone: true,
+  selector: 'ng-template[nodeSvg]',
+})
+export class NodeSvgTemplateMockDirective implements AsInterface<NodeSvgTemplateMockDirective> {
+  public templateRef = inject(TemplateRef);
+}
+
+@Directive({
+  standalone: true,
   selector: 'ng-template[groupNode]',
 })
 export class GroupNodeTemplateMockDirective implements AsInterface<GroupNodeTemplateDirective> {
