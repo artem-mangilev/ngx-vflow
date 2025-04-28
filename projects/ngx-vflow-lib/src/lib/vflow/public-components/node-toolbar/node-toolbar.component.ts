@@ -10,12 +10,17 @@ import {
   viewChild,
   effect,
   forwardRef,
+  NgZone,
+  DestroyRef,
 } from '@angular/core';
 import { Directive } from '@angular/core';
 import { Position } from '../../types/position.type';
 import { ToolbarModel } from '../../models/toolbar.model';
 import { OverlaysService } from '../../services/overlays.service';
 import { NodeAccessorService } from '../../services/node-accessor.service';
+import { resizable } from '../../utils/resizable';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { tap } from 'rxjs';
 
 @Component({
   standalone: true,
@@ -68,10 +73,21 @@ export class NodeToolbarComponent implements OnInit, OnDestroy {
 })
 export class NodeToolbarWrapperDirective implements OnInit {
   private element = inject<ElementRef<HTMLElement>>(ElementRef);
+  private readonly zone = inject(NgZone);
+  private readonly destroyRef = inject(DestroyRef);
 
   public model = input.required<ToolbarModel>();
 
   public ngOnInit(): void {
+    resizable([this.element.nativeElement], this.zone)
+      .pipe(
+        tap(() => this.setSize()),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe();
+  }
+
+  private setSize() {
     this.model().size.set({
       width: this.element.nativeElement.clientWidth,
       height: this.element.nativeElement.clientHeight,
