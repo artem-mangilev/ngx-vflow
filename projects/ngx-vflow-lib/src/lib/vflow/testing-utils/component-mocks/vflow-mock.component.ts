@@ -32,6 +32,7 @@ import {
 import { VflowComponent } from '../../components/vflow/vflow.component';
 import { ConnectionModel } from '../../models/connection.model';
 import { AsInterface } from '../types';
+import { FlowLayer } from '../../interfaces/flow-layer.interface';
 
 @Component({
   selector: 'vflow',
@@ -217,7 +218,18 @@ export class VflowMockComponent implements AsInterface<VflowComponent>, OnInit {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public fitView(options?: FitViewOptions): void {}
 
-  public documentPointToFlowPoint(point: Point): Point {
+  public documentPointToFlowPoint(point: Point, options?: { layers: false }): Point;
+  public documentPointToFlowPoint(point: Point, options: { layers: true }): FlowLayer[];
+  public documentPointToFlowPoint(point: Point, options?: { layers: boolean }): unknown {
+    if (options?.layers) {
+      return [
+        {
+          nodeId: null,
+          point,
+        },
+      ];
+    }
+
     return point;
   }
 

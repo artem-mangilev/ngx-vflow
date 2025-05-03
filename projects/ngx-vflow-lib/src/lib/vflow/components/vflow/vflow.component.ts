@@ -64,6 +64,8 @@ import { RootPointerDirective } from '../../directives/root-pointer.directive';
 import { RootSvgContextDirective } from '../../directives/root-svg-context.directive';
 import { RootSvgReferenceDirective } from '../../directives/reference.directive';
 import { EdgeRenderingService } from '../../services/edge-rendering.service';
+import { FlowLayer } from '../../interfaces/flow-layer.interface';
+import { getLayersByPoint } from '../../utils/get-layers-by-point';
 
 const changesControllerHostDirective = {
   directive: ChangesControllerDirective,
@@ -423,8 +425,16 @@ export class VflowComponent implements OnInit {
   /**
    * Convert point received from document to point on the flow
    */
-  public documentPointToFlowPoint(point: Point): Point {
-    return this.spacePointContext().documentPointToFlowPoint(point);
+  public documentPointToFlowPoint(point: Point): Point;
+  public documentPointToFlowPoint(point: Point, options?: { layers: true }): FlowLayer[];
+  public documentPointToFlowPoint(point: Point, options?: { layers: boolean }): unknown {
+    const transformedPoint = this.spacePointContext().documentPointToFlowPoint(point);
+
+    if (options?.layers) {
+      return getLayersByPoint(transformedPoint, this.nodeRenderingService.groups());
+    }
+
+    return transformedPoint;
   }
   // #endregion
 
