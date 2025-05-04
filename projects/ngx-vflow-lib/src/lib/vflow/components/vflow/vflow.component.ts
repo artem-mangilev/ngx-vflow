@@ -425,6 +425,7 @@ export class VflowComponent implements OnInit {
    * Convert point received from document to point on the flow
    */
   public documentPointToFlowPoint(point: Point): Point;
+  public documentPointToFlowPoint(point: Point, options?: { layers: false }): Point;
   /**
    * Convert point received from document to a stack of layered points on the flow
    * Layered point has a nodeId, coordinates are relative to this node
