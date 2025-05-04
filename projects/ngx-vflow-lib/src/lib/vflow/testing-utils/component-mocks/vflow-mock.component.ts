@@ -12,7 +12,7 @@ import {
 import { NgTemplateOutlet } from '@angular/common';
 import { Node, DynamicNode } from '../../interfaces/node.interface';
 import { Edge } from '../../interfaces/edge.interface';
-import { Point } from '../../interfaces/point.interface';
+import { LayeredPoint, Point } from '../../interfaces/point.interface';
 import { Background } from '../../types/background.type';
 import { Optimization } from '../../interfaces/optimization.interface';
 import { KeyboardShortcuts } from '../../types/keyboard-action.type';
@@ -32,7 +32,6 @@ import {
 import { VflowComponent } from '../../components/vflow/vflow.component';
 import { ConnectionModel } from '../../models/connection.model';
 import { AsInterface } from '../types';
-import { FlowLayer } from '../../interfaces/flow-layer.interface';
 
 @Component({
   selector: 'vflow',
@@ -219,13 +218,14 @@ export class VflowMockComponent implements AsInterface<VflowComponent>, OnInit {
   public fitView(options?: FitViewOptions): void {}
 
   public documentPointToFlowPoint(point: Point, options?: { layers: false }): Point;
-  public documentPointToFlowPoint(point: Point, options: { layers: true }): FlowLayer[];
+  public documentPointToFlowPoint(point: Point, options: { layers: true }): LayeredPoint[];
   public documentPointToFlowPoint(point: Point, options?: { layers: boolean }): unknown {
     if (options?.layers) {
       return [
         {
           nodeId: null,
-          point,
+          x: point.x,
+          y: point.y,
         },
       ];
     }

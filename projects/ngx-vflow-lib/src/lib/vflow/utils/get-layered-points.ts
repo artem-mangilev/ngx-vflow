@@ -1,5 +1,4 @@
-import { FlowLayer } from '../interfaces/flow-layer.interface';
-import { Point } from '../interfaces/point.interface';
+import { LayeredPoint, Point } from '../interfaces/point.interface';
 import { NodeModel } from '../models/node.model';
 
 /**
@@ -9,27 +8,25 @@ import { NodeModel } from '../models/node.model';
  * @param groups sorted array of groups
  * @returns
  */
-export function getLayersByPoint(point: Point, groups: NodeModel[]): FlowLayer[] {
-  const result: FlowLayer[] = [];
+export function getLayeredPoints(point: Point, groups: NodeModel[]): LayeredPoint[] {
+  const result: LayeredPoint[] = [];
 
   for (const group of groups) {
     const { x, y } = group.globalPoint();
 
     if (point.x >= x && point.x <= x + group.width() && point.y >= y && point.y <= y + group.height()) {
       result.push({
+        x: point.x - x,
+        y: point.y - y,
         nodeId: group.rawNode.id,
-        // convert point to group coordinates
-        point: {
-          x: point.x - x,
-          y: point.y - y,
-        },
       });
     }
   }
 
   result.reverse();
 
-  result.push({ nodeId: null, point });
+  // TODO: spread does not work, because the point is SVGPoint
+  result.push({ nodeId: null, x: point.x, y: point.y });
 
   return result;
 }

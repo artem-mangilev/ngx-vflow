@@ -29,7 +29,7 @@ import {
 } from '../../directives/template.directive';
 import { addNodesToEdges } from '../../utils/add-nodes-to-edges';
 import { skip } from 'rxjs';
-import { Point } from '../../interfaces/point.interface';
+import { LayeredPoint, Point } from '../../interfaces/point.interface';
 import { ViewportState } from '../../interfaces/viewport.interface';
 import { FlowStatusService } from '../../services/flow-status.service';
 import { FlowEntitiesService } from '../../services/flow-entities.service';
@@ -64,8 +64,7 @@ import { RootPointerDirective } from '../../directives/root-pointer.directive';
 import { RootSvgContextDirective } from '../../directives/root-svg-context.directive';
 import { RootSvgReferenceDirective } from '../../directives/reference.directive';
 import { EdgeRenderingService } from '../../services/edge-rendering.service';
-import { FlowLayer } from '../../interfaces/flow-layer.interface';
-import { getLayersByPoint } from '../../utils/get-layers-by-point';
+import { getLayeredPoints } from '../../utils/get-layered-points';
 
 const changesControllerHostDirective = {
   directive: ChangesControllerDirective,
@@ -426,12 +425,16 @@ export class VflowComponent implements OnInit {
    * Convert point received from document to point on the flow
    */
   public documentPointToFlowPoint(point: Point): Point;
-  public documentPointToFlowPoint(point: Point, options?: { layers: true }): FlowLayer[];
+  /**
+   * Convert point received from document to a stack of layered points on the flow
+   * Layered point has a nodeId, coordinates are relative to this node
+   */
+  public documentPointToFlowPoint(point: Point, options?: { layers: true }): LayeredPoint[];
   public documentPointToFlowPoint(point: Point, options?: { layers: boolean }): unknown {
     const transformedPoint = this.spacePointContext().documentPointToFlowPoint(point);
 
     if (options?.layers) {
-      return getLayersByPoint(transformedPoint, this.nodeRenderingService.groups());
+      return getLayeredPoints(transformedPoint, this.nodeRenderingService.groups());
     }
 
     return transformedPoint;
