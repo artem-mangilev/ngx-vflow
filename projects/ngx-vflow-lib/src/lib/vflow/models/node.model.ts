@@ -9,6 +9,7 @@ import { MAGIC_NUMBER_TO_FIX_GLITCH_IN_CHROME } from '../constants/magic-number-
 import { Contextable } from '../interfaces/contextable.interface';
 import { GroupNodeContext, NodeContext } from '../interfaces/template-context.interface';
 import { toUnifiedNode } from '../utils/to-unified-node';
+import { Observable } from 'rxjs';
 
 export class NodeModel<T = unknown>
   implements FlowEntity, Contextable<NodeContext | GroupNodeContext | { $implicit: object }>
@@ -20,13 +21,13 @@ export class NodeModel<T = unknown>
   private entitiesService = inject(FlowEntitiesService);
 
   public point = signal<Point>({ x: 0, y: 0 });
-  public point$ = toObservable(this.point);
+  public point$: Observable<Point>;
 
   public width = signal(NodeModel.defaultWidth);
-  public width$ = toObservable(this.width);
+  public width$: Observable<number>;
 
   public height = signal(NodeModel.defaultHeight);
-  public height$ = toObservable(this.height);
+  public height$: Observable<number>;
 
   /**
    * @deprecated use width or height signals
@@ -35,7 +36,7 @@ export class NodeModel<T = unknown>
   /**
    * @deprecated use width$ or height$
    */
-  public size$ = toObservable(this.size);
+  public size$: Observable<{ width: number; height: number }>;
 
   public styleWidth = computed(() => `${this.width()}px`);
   public styleHeight = computed(() => `${this.height()}px`);
@@ -46,7 +47,7 @@ export class NodeModel<T = unknown>
   public renderOrder = signal(0);
 
   public selected = signal(false);
-  public selected$ = toObservable(this.selected);
+  public selected$: Observable<boolean>;
 
   public globalPoint = computed(() => {
     let parent = this.parent();
@@ -66,7 +67,7 @@ export class NodeModel<T = unknown>
   public pointTransform = computed(() => `translate(${this.globalPoint().x}, ${this.globalPoint().y})`);
 
   public handles = signal<HandleModel[]>([]);
-  public handles$ = toObservable(this.handles);
+  public handles$: Observable<HandleModel[]>;
 
   public draggable = signal(true);
 
@@ -168,6 +169,14 @@ export class NodeModel<T = unknown>
         },
       };
     }
+
+    // Initialize Observables after all signal assignments
+    this.point$ = toObservable(this.point);
+    this.width$ = toObservable(this.width);
+    this.height$ = toObservable(this.height);
+    this.size$ = toObservable(this.size);
+    this.selected$ = toObservable(this.selected);
+    this.handles$ = toObservable(this.handles);
   }
 
   public setPoint(point: Point) {
