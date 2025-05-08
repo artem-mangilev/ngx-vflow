@@ -3,7 +3,6 @@ import {
   Component,
   Injector,
   Input,
-  OnInit,
   computed,
   inject,
   runInInjectionContext,
@@ -138,7 +137,7 @@ const changesControllerHostDirective = {
     NgTemplateOutlet,
   ],
 })
-export class VflowComponent implements OnInit {
+export class VflowComponent {
   // #region DI
   private viewportService = inject(ViewportService);
   private flowEntitiesService = inject(FlowEntitiesService);
@@ -254,14 +253,20 @@ export class VflowComponent implements OnInit {
    */
   @Input({ required: true })
   public set nodes(newNodes: Node[] | DynamicNode[]) {
-    const newModels = runInInjectionContext(this.injector, () =>
+    const models = runInInjectionContext(this.injector, () =>
       ReferenceIdentityChecker.nodes(newNodes, this.flowEntitiesService.nodes()),
     );
+    const all = [...models.old, ...models.new];
 
+    models.new
+      .filter(({ rawNode }) => rawNode.type === 'default-group' || rawNode.type === 'template-group')
+      .forEach((model) => this.nodeRenderingService.pullNode(model));
+
+    // TODO: consider calling only fo new nodes
     // quick and dirty binding nodes to edges
-    addNodesToEdges(newModels, this.flowEntitiesService.edges());
+    addNodesToEdges(all, this.flowEntitiesService.edges());
 
-    this.flowEntitiesService.nodes.set(newModels);
+    this.flowEntitiesService.nodes.set(all);
   }
 
   protected nodeModels = computed(() => this.nodeRenderingService.nodes());
@@ -357,10 +362,6 @@ export class VflowComponent implements OnInit {
 
   protected minimap = this.flowEntitiesService.minimap;
 
-  public ngOnInit(): void {
-    this.setInitialNodesOrder();
-  }
-
   // #region METHODS_API
   /**
    * Change viewport to specified state
@@ -448,16 +449,5 @@ export class VflowComponent implements OnInit {
 
   protected trackEdges(idx: number, { edge }: EdgeModel) {
     return edge;
-  }
-
-  private setInitialNodesOrder() {
-    this.nodeModels().forEach((model) => {
-      switch (model.rawNode.type) {
-        case 'default-group':
-        case 'template-group': {
-          this.nodeRenderingService.pullNode(model);
-        }
-      }
-    });
   }
 }

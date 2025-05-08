@@ -20,17 +20,12 @@ export class NodeRenderingService {
   });
 
   private maxOrder = computed(() => {
-    return Math.max(...this.flowEntitiesService.nodes().map((n) => n.renderOrder()));
+    return this.flowEntitiesService.nodes().length
+      ? Math.max(...this.flowEntitiesService.nodes().map((n) => n.renderOrder()))
+      : 0;
   });
 
   public pullNode(node: NodeModel) {
-    const isAlreadyOnTop = node.renderOrder() !== 0 && this.maxOrder() === node.renderOrder();
-
-    // TODO: does not work for group nodes
-    if (isAlreadyOnTop) {
-      return;
-    }
-
     // pull node
     node.renderOrder.set(this.maxOrder() + 1);
 
