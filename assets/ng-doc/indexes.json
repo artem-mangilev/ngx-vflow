@@ -86,6 +86,54 @@
   {
     "breadcrumbs": [
       "Features",
+      "Handling changes"
+    ],
+    "pageType": "guide",
+    "title": "Handling changes",
+    "section": "Handling changes",
+    "route": "/features/handling-changes",
+    "fragment": "handling-changes",
+    "content": "You can observe changes in the toasts."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Handling changes"
+    ],
+    "pageType": "guide",
+    "title": "Handling changes",
+    "section": "Handling changes",
+    "route": "/features/handling-changes",
+    "fragment": "handling-changes",
+    "content": "You can observe various changes in nodes and edges. Types of NodeChanges: position - new node position after drag and dropsize - new node sizeadd - when node was createdremove - when node was removedselect - when node was selected (also triggers for unselected nodes) Types of EdgeChanges: add - when edge was createdremove - when edge was removedselect - when edge was selected (also triggers for unselected edges)detached - when edge became invisible due to the absence of the source or target node. Use this to delete such edges from the edges list There are a several ways to receive these changes:"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Handling changes"
+    ],
+    "pageType": "guide",
+    "title": "Handling changes",
+    "section": "From (onNodesChange) and (onEdgesChange) outputs",
+    "route": "/features/handling-changes",
+    "fragment": "from-onnodeschange-and-onedgeschange-outputs",
+    "content": "This is a way to get every possible change. Changes came as non empty arrays: (onNodesChange) emits NodeChange[](onEdgesChange) emits EdgeChange[]"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Handling changes"
+    ],
+    "pageType": "guide",
+    "title": "Handling changes",
+    "section": "From filtered outputs",
+    "route": "/features/handling-changes",
+    "fragment": "from-filtered-outputs",
+    "content": "For your convenience, here is the filtering scheme for changes based on the (onNodesChange) and (onEdgesChange) events: (onNodesChange.[NodeChangeType]) - a list of node changes of a certain type(onNodesChange.[EdgeChangeType]) - a list of edge changes of a certain type(onNodesChange.[NodeChangeType].[Count]) - a list (many) or single (single) node change of a certain type(onEdgesChange.[EdgeChangeType].[Count]) - a list (many) or single (single) edge change of a certain type Where: List of all possible filter outputs:"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
       "Keyboard shortcuts"
     ],
     "pageType": "guide",
@@ -178,54 +226,6 @@
     "route": "/features/keyboard-shortcuts",
     "fragment": "customization",
     "content": "To customize the keyboard shortcuts for specific actions, pass a [keyboardShortcuts] input object to the VflowComponent with the following KeyboardShortcuts interface. Here are some key details: The passed object will be merged with the default key combinations.To disable a specific action, pass null for that action.If you want to trigger an action with multiple keys, pass an array of keys. Note: this is not a key combination. For example, if you pass ['ShiftLeft', 'ControlLeft'], the action will be triggered by either ShiftLeft or ControlLeft, but not by pressing both together (ShiftLeft+ControlLeft).You can find the list of available key codes here. In the following example, the default combination for multiSelection is replaced with ['ShiftLeft', 'ShiftRight']."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Handling changes"
-    ],
-    "pageType": "guide",
-    "title": "Handling changes",
-    "section": "Handling changes",
-    "route": "/features/handling-changes",
-    "fragment": "handling-changes",
-    "content": "You can observe changes in the toasts."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Handling changes"
-    ],
-    "pageType": "guide",
-    "title": "Handling changes",
-    "section": "Handling changes",
-    "route": "/features/handling-changes",
-    "fragment": "handling-changes",
-    "content": "You can observe various changes in nodes and edges. Types of NodeChanges: position - new node position after drag and dropsize - new node sizeadd - when node was createdremove - when node was removedselect - when node was selected (also triggers for unselected nodes) Types of EdgeChanges: add - when edge was createdremove - when edge was removedselect - when edge was selected (also triggers for unselected edges)detached - when edge became invisible due to the absence of the source or target node. Use this to delete such edges from the edges list There are a several ways to receive these changes:"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Handling changes"
-    ],
-    "pageType": "guide",
-    "title": "Handling changes",
-    "section": "From (onNodesChange) and (onEdgesChange) outputs",
-    "route": "/features/handling-changes",
-    "fragment": "from-onnodeschange-and-onedgeschange-outputs",
-    "content": "This is a way to get every possible change. Changes came as non empty arrays: (onNodesChange) emits NodeChange[](onEdgesChange) emits EdgeChange[]"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Handling changes"
-    ],
-    "pageType": "guide",
-    "title": "Handling changes",
-    "section": "From filtered outputs",
-    "route": "/features/handling-changes",
-    "fragment": "from-filtered-outputs",
-    "content": "For your convenience, here is the filtering scheme for changes based on the (onNodesChange) and (onEdgesChange) events: (onNodesChange.[NodeChangeType]) - a list of node changes of a certain type(onNodesChange.[EdgeChangeType]) - a list of edge changes of a certain type(onNodesChange.[NodeChangeType].[Count]) - a list (many) or single (single) node change of a certain type(onEdgesChange.[EdgeChangeType].[Count]) - a list (many) or single (single) edge change of a certain type Where: List of all possible filter outputs:"
   },
   {
     "breadcrumbs": [
@@ -374,6 +374,18 @@
   {
     "breadcrumbs": [
       "Features",
+      "Snap to Grid"
+    ],
+    "pageType": "guide",
+    "title": "Snap to Grid",
+    "section": "Snap to Grid",
+    "route": "/features/snap-to-grid",
+    "fragment": "snap-to-grid",
+    "content": "You can snap nodes to the grid by passing the snapGrid input to the VflowComponent"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
       "View size"
     ],
     "pageType": "guide",
@@ -394,18 +406,6 @@
     "route": "/features/view-size",
     "fragment": "fixed-size",
     "content": "vflow can take fixed space if you pass [view]=\"[600, 600]\" input, where first item of array is width (in pixels), and the second is height (in pixels)."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Snap to Grid"
-    ],
-    "pageType": "guide",
-    "title": "Snap to Grid",
-    "section": "Snap to Grid",
-    "route": "/features/snap-to-grid",
-    "fragment": "snap-to-grid",
-    "content": "You can snap nodes to the grid by passing the snapGrid input to the VflowComponent"
   },
   {
     "breadcrumbs": [
@@ -506,18 +506,6 @@
   {
     "breadcrumbs": [
       "Getting Started",
-      "Roadmap"
-    ],
-    "pageType": "guide",
-    "title": "Roadmap",
-    "section": "Roadmap",
-    "route": "/getting-started/roadmap",
-    "fragment": "roadmap",
-    "content": "This is a roadmap for ngx-vflow:"
-  },
-  {
-    "breadcrumbs": [
-      "Getting Started",
       "Principles"
     ],
     "pageType": "guide",
@@ -526,6 +514,18 @@
     "route": "/getting-started/principles",
     "fragment": "principles",
     "content": "This page contains a list of general principles that impact feature implementation. No hidden mutations of your data. For example, the library does not modify any of the Node or Edge objects you pass in as inputs. Instead, it creates internal models around these entities and operates on them. Any changes to the passed entities can be observed through events.This principle also implies that you are responsible for managing invalid data. For instance, if you delete a node, the edges corresponding to this node will not be deleted automatically. However, the library will notify you about detached edges so that you can easily delete them."
+  },
+  {
+    "breadcrumbs": [
+      "Getting Started",
+      "Roadmap"
+    ],
+    "pageType": "guide",
+    "title": "Roadmap",
+    "section": "Roadmap",
+    "route": "/getting-started/roadmap",
+    "fragment": "roadmap",
+    "content": "This is a roadmap for ngx-vflow:"
   },
   {
     "breadcrumbs": [
@@ -598,240 +598,6 @@
     "route": "/workshops/drag-and-drop-nodes",
     "fragment": "drag-and-drop-nodes",
     "content": "This workshop will show you how to implement dynamic node creation with basic drag and drop implementation. This implementation uses documentPointToFlowPoint() method of VflowComponent that translates document coordinate to vflow coordinate."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Connection"
-    ],
-    "pageType": "guide",
-    "title": "Connection",
-    "section": "Connection",
-    "route": "/features/edges/connection",
-    "fragment": "connection",
-    "content": "Edges are not creating automatically. To create a new edge, follow these steps:"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Connection"
-    ],
-    "pageType": "guide",
-    "title": "Connection",
-    "section": "Connection",
-    "route": "/features/edges/connection",
-    "fragment": "connection",
-    "content": "Create handler to the "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Connection"
-    ],
-    "pageType": "guide",
-    "title": "Connection",
-    "section": "Connection",
-    "route": "/features/edges/connection",
-    "fragment": "connection",
-    "content": "(onConnect)"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Connection"
-    ],
-    "pageType": "guide",
-    "title": "Connection",
-    "section": "Connection",
-    "route": "/features/edges/connection",
-    "fragment": "connection",
-    "content": " event This handler accepts a "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Connection"
-    ],
-    "pageType": "guide",
-    "title": "Connection",
-    "section": "Connection",
-    "route": "/features/edges/connection",
-    "fragment": "connection",
-    "content": "Connection"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Connection"
-    ],
-    "pageType": "guide",
-    "title": "Connection",
-    "section": "Connection",
-    "route": "/features/edges/connection",
-    "fragment": "connection",
-    "content": " argument. "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Connection"
-    ],
-    "pageType": "guide",
-    "title": "Connection",
-    "section": "Connection",
-    "route": "/features/edges/connection",
-    "fragment": "connection",
-    "content": "Connection"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Connection"
-    ],
-    "pageType": "guide",
-    "title": "Connection",
-    "section": "Connection",
-    "route": "/features/edges/connection",
-    "fragment": "connection",
-    "content": " is similar to an "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Connection"
-    ],
-    "pageType": "guide",
-    "title": "Connection",
-    "section": "Connection",
-    "route": "/features/edges/connection",
-    "fragment": "connection",
-    "content": "Edge"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Connection"
-    ],
-    "pageType": "guide",
-    "title": "Connection",
-    "section": "Connection",
-    "route": "/features/edges/connection",
-    "fragment": "connection",
-    "content": ", but it doesn't exists in the flow, you need to \"convert\" it into a new "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Connection"
-    ],
-    "pageType": "guide",
-    "title": "Connection",
-    "section": "Connection",
-    "route": "/features/edges/connection",
-    "fragment": "connection",
-    "content": "Edge"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Connection"
-    ],
-    "pageType": "guide",
-    "title": "Connection",
-    "section": "Connection",
-    "route": "/features/edges/connection",
-    "fragment": "connection",
-    "content": "Update the "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Connection"
-    ],
-    "pageType": "guide",
-    "title": "Connection",
-    "section": "Connection",
-    "route": "/features/edges/connection",
-    "fragment": "connection",
-    "content": "Edge[]"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Connection"
-    ],
-    "pageType": "guide",
-    "title": "Connection",
-    "section": "Connection",
-    "route": "/features/edges/connection",
-    "fragment": "connection",
-    "content": " list with the new edge that was created from the "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Connection"
-    ],
-    "pageType": "guide",
-    "title": "Connection",
-    "section": "Connection",
-    "route": "/features/edges/connection",
-    "fragment": "connection",
-    "content": "Connection"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Connection"
-    ],
-    "pageType": "guide",
-    "title": "Connection",
-    "section": "Connection",
-    "route": "/features/edges/connection",
-    "fragment": "connection",
-    "content": "."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Connection"
-    ],
-    "pageType": "guide",
-    "title": "Connection",
-    "section": "Strict connections",
-    "route": "/features/edges/connection",
-    "fragment": "strict-connections",
-    "content": "In the default 'strict' mode of ConnectionSettings, edges are created from connections with strict adherence to the source and target types of the HandleComponent. This means connections can only be established in one direction based on these properties."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Connection"
-    ],
-    "pageType": "guide",
-    "title": "Connection",
-    "section": "Loose connections",
-    "route": "/features/edges/connection",
-    "fragment": "loose-connections",
-    "content": "This is the 'loose' mode of ConnectionSettings, where the flow ignores the handle type and allows any handle to connect with any other handle. In this mode, an id must be provided for the HandleComponent to function correctly."
   },
   {
     "breadcrumbs": [
@@ -1331,6 +1097,240 @@
     "breadcrumbs": [
       "Features",
       "Edges",
+      "Connection"
+    ],
+    "pageType": "guide",
+    "title": "Connection",
+    "section": "Connection",
+    "route": "/features/edges/connection",
+    "fragment": "connection",
+    "content": "Edges are not creating automatically. To create a new edge, follow these steps:"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Connection"
+    ],
+    "pageType": "guide",
+    "title": "Connection",
+    "section": "Connection",
+    "route": "/features/edges/connection",
+    "fragment": "connection",
+    "content": "Create handler to the "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Connection"
+    ],
+    "pageType": "guide",
+    "title": "Connection",
+    "section": "Connection",
+    "route": "/features/edges/connection",
+    "fragment": "connection",
+    "content": "(onConnect)"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Connection"
+    ],
+    "pageType": "guide",
+    "title": "Connection",
+    "section": "Connection",
+    "route": "/features/edges/connection",
+    "fragment": "connection",
+    "content": " event This handler accepts a "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Connection"
+    ],
+    "pageType": "guide",
+    "title": "Connection",
+    "section": "Connection",
+    "route": "/features/edges/connection",
+    "fragment": "connection",
+    "content": "Connection"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Connection"
+    ],
+    "pageType": "guide",
+    "title": "Connection",
+    "section": "Connection",
+    "route": "/features/edges/connection",
+    "fragment": "connection",
+    "content": " argument. "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Connection"
+    ],
+    "pageType": "guide",
+    "title": "Connection",
+    "section": "Connection",
+    "route": "/features/edges/connection",
+    "fragment": "connection",
+    "content": "Connection"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Connection"
+    ],
+    "pageType": "guide",
+    "title": "Connection",
+    "section": "Connection",
+    "route": "/features/edges/connection",
+    "fragment": "connection",
+    "content": " is similar to an "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Connection"
+    ],
+    "pageType": "guide",
+    "title": "Connection",
+    "section": "Connection",
+    "route": "/features/edges/connection",
+    "fragment": "connection",
+    "content": "Edge"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Connection"
+    ],
+    "pageType": "guide",
+    "title": "Connection",
+    "section": "Connection",
+    "route": "/features/edges/connection",
+    "fragment": "connection",
+    "content": ", but it doesn't exists in the flow, you need to \"convert\" it into a new "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Connection"
+    ],
+    "pageType": "guide",
+    "title": "Connection",
+    "section": "Connection",
+    "route": "/features/edges/connection",
+    "fragment": "connection",
+    "content": "Edge"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Connection"
+    ],
+    "pageType": "guide",
+    "title": "Connection",
+    "section": "Connection",
+    "route": "/features/edges/connection",
+    "fragment": "connection",
+    "content": "Update the "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Connection"
+    ],
+    "pageType": "guide",
+    "title": "Connection",
+    "section": "Connection",
+    "route": "/features/edges/connection",
+    "fragment": "connection",
+    "content": "Edge[]"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Connection"
+    ],
+    "pageType": "guide",
+    "title": "Connection",
+    "section": "Connection",
+    "route": "/features/edges/connection",
+    "fragment": "connection",
+    "content": " list with the new edge that was created from the "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Connection"
+    ],
+    "pageType": "guide",
+    "title": "Connection",
+    "section": "Connection",
+    "route": "/features/edges/connection",
+    "fragment": "connection",
+    "content": "Connection"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Connection"
+    ],
+    "pageType": "guide",
+    "title": "Connection",
+    "section": "Connection",
+    "route": "/features/edges/connection",
+    "fragment": "connection",
+    "content": "."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Connection"
+    ],
+    "pageType": "guide",
+    "title": "Connection",
+    "section": "Strict connections",
+    "route": "/features/edges/connection",
+    "fragment": "strict-connections",
+    "content": "In the default 'strict' mode of ConnectionSettings, edges are created from connections with strict adherence to the source and target types of the HandleComponent. This means connections can only be established in one direction based on these properties."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Connection"
+    ],
+    "pageType": "guide",
+    "title": "Connection",
+    "section": "Loose connections",
+    "route": "/features/edges/connection",
+    "fragment": "loose-connections",
+    "content": "This is the 'loose' mode of ConnectionSettings, where the flow ignores the handle type and allows any handle to connect with any other handle. In this mode, an id must be provided for the HandleComponent to function correctly."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
       "Labels"
     ],
     "pageType": "guide",
@@ -1664,6 +1664,175 @@
     "route": "/features/edges/reconnect-edges",
     "fragment": "reconnect-edge",
     "content": ", then remove the reference to the old edge from the list."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Default nodes"
+    ],
+    "pageType": "guide",
+    "title": "Default nodes",
+    "section": "Default nodes",
+    "route": "/features/nodes/default-nodes",
+    "fragment": "default-nodes",
+    "content": "To get started, you just need to provide nodes array to vflow component."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Draggables"
+    ],
+    "pageType": "guide",
+    "title": "Draggables",
+    "section": "Disabling",
+    "route": "/features/nodes/draggables",
+    "fragment": "disabling",
+    "content": "You can disable draggable behavior on certain Node or DynamicNode by passing false."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Draggables"
+    ],
+    "pageType": "guide",
+    "title": "Draggables",
+    "section": "Drag handle",
+    "route": "/features/nodes/draggables",
+    "fragment": "drag-handle",
+    "content": "You can restrict dragging to a specific part of node, by adding dragHandle directive to this element. It's important to note that if a node contains at least one dragHandle, it can only be dragged from those specific areas where dragHandle was added. Otherwise, the entire node can be dragged, provided the draggable property is set to true."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Resizer"
+    ],
+    "pageType": "guide",
+    "title": "Resizer",
+    "section": "Resizer",
+    "route": "/features/nodes/resizer",
+    "fragment": "resizer",
+    "content": "You might want to resize your node. This functionality works with nearly all types of nodes."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Resizer"
+    ],
+    "pageType": "guide",
+    "title": "Resizer",
+    "section": "Resize default group",
+    "route": "/features/nodes/resizer",
+    "fragment": "resize-default-group",
+    "content": "To resize a default group, simply pass the resizable flag to a Node (or DynamicNode) of type default-group."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Resizer"
+    ],
+    "pageType": "guide",
+    "title": "Resizer",
+    "section": "Resize template group",
+    "route": "/features/nodes/resizer",
+    "fragment": "resize-template-group",
+    "content": "This provides a way to have more control over the resizer: Create a template-group node.If you want the resizer to appear consistently, add the resizable directive to the SVG element (likely a "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Resizer"
+    ],
+    "pageType": "guide",
+    "title": "Resizer",
+    "section": "Resize template group",
+    "route": "/features/nodes/resizer",
+    "fragment": "resize-template-group",
+    "content": ") representing your group.If you want the resizer to appear conditionally, apply the directive as [resizable]=\"yourCondition\". You can bind the visibility of the resizer to the node’s selection state (see the code below for an example).Important: Use the ctx.width() and ctx.height() signals from the context, not ctx.node.width and ctx.node.height. The latter properties are not reactive, so the node won’t update its size based on the resizer.The resizer respects the min-width and min-height CSS properties of the resizable node.Optionally, you can customize the [resizerColor] and the [gap] between the node and the resizer, with more customization options coming in the future.\""
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Resizer"
+    ],
+    "pageType": "guide",
+    "title": "Resizer",
+    "section": "Resize a template/component regular node",
+    "route": "/features/nodes/resizer",
+    "fragment": "resize-a-templatecomponent-regular-node",
+    "content": "The algorithm is almost the same as for template-group nodes: Create a node of type html-template or CustomNodeComponent (CustomDynamicNodeComponent).If you want the resizer to always appear, add the resizable directive to the top-level element of your custom node (ideally, a wrapper for the entire node content).If you want the resizer to appear conditionally, apply the directive as [resizable]=\"yourCondition\". Binding the visibility of the resizer to the node’s selection state can be useful.The resizer respects the min-width and min-height CSS properties of the element where the directive is applied.It's up to you to adjust the CSS of your custom node to ensure it renders correctly during resizing. The library only modifies the container size.Optionally, you can customize the [resizerColor] and the [gap] between the node and the resizer, with more customization options coming in the future."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Resizer"
+    ],
+    "pageType": "guide",
+    "title": "Resizer",
+    "section": "Resize event",
+    "route": "/features/nodes/resizer",
+    "fragment": "resize-event",
+    "content": "You may want to perform some actions on resize. To do this, simply add handler to the (onNodesChange.size) output of the "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Resizer"
+    ],
+    "pageType": "guide",
+    "title": "Resizer",
+    "section": "Resize event",
+    "route": "/features/nodes/resizer",
+    "fragment": "resize-event",
+    "content": " component."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Resizer"
+    ],
+    "pageType": "guide",
+    "title": "Resizer",
+    "section": "See also",
+    "route": "/features/nodes/resizer",
+    "fragment": "see-also",
+    "content": "SubflowsCustom nodesHandling changes"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Node toolbar"
+    ],
+    "pageType": "guide",
+    "title": "Node toolbar",
+    "section": "Node toolbar",
+    "route": "/features/nodes/node-toolbar",
+    "fragment": "node-toolbar",
+    "content": "You can add a NodeToolbarComponent to your node. The content of this component is automatically positioned near one side of the node, based on the value of the position input."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Node toolbar"
+    ],
+    "pageType": "guide",
+    "title": "Node toolbar",
+    "section": "Multiple Toolbars",
+    "route": "/features/nodes/node-toolbar",
+    "fragment": "multiple-toolbars",
+    "content": "It's also possible to add multiple toolbars to the same node by simply including multiple NodeToolbarComponent instances with different position inputs."
   },
   {
     "breadcrumbs": [
@@ -2145,175 +2314,6 @@
     "route": "/features/nodes/custom-nodes",
     "fragment": "handling-events",
     "content": "The shape of this accumulator-event contains following useful info: The Library also includes ComponentNodeEvent helper type to get type-safe event, where you just need to pass an array of your custom components in generic, and this type will infer proper types for eventName and eventPayload:"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Default nodes"
-    ],
-    "pageType": "guide",
-    "title": "Default nodes",
-    "section": "Default nodes",
-    "route": "/features/nodes/default-nodes",
-    "fragment": "default-nodes",
-    "content": "To get started, you just need to provide nodes array to vflow component."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Node toolbar"
-    ],
-    "pageType": "guide",
-    "title": "Node toolbar",
-    "section": "Node toolbar",
-    "route": "/features/nodes/node-toolbar",
-    "fragment": "node-toolbar",
-    "content": "You can add a NodeToolbarComponent to your node. The content of this component is automatically positioned near one side of the node, based on the value of the position input."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Node toolbar"
-    ],
-    "pageType": "guide",
-    "title": "Node toolbar",
-    "section": "Multiple Toolbars",
-    "route": "/features/nodes/node-toolbar",
-    "fragment": "multiple-toolbars",
-    "content": "It's also possible to add multiple toolbars to the same node by simply including multiple NodeToolbarComponent instances with different position inputs."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Resizer"
-    ],
-    "pageType": "guide",
-    "title": "Resizer",
-    "section": "Resizer",
-    "route": "/features/nodes/resizer",
-    "fragment": "resizer",
-    "content": "You might want to resize your node. This functionality works with nearly all types of nodes."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Resizer"
-    ],
-    "pageType": "guide",
-    "title": "Resizer",
-    "section": "Resize default group",
-    "route": "/features/nodes/resizer",
-    "fragment": "resize-default-group",
-    "content": "To resize a default group, simply pass the resizable flag to a Node (or DynamicNode) of type default-group."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Resizer"
-    ],
-    "pageType": "guide",
-    "title": "Resizer",
-    "section": "Resize template group",
-    "route": "/features/nodes/resizer",
-    "fragment": "resize-template-group",
-    "content": "This provides a way to have more control over the resizer: Create a template-group node.If you want the resizer to appear consistently, add the resizable directive to the SVG element (likely a "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Resizer"
-    ],
-    "pageType": "guide",
-    "title": "Resizer",
-    "section": "Resize template group",
-    "route": "/features/nodes/resizer",
-    "fragment": "resize-template-group",
-    "content": ") representing your group.If you want the resizer to appear conditionally, apply the directive as [resizable]=\"yourCondition\". You can bind the visibility of the resizer to the node’s selection state (see the code below for an example).Important: Use the ctx.width() and ctx.height() signals from the context, not ctx.node.width and ctx.node.height. The latter properties are not reactive, so the node won’t update its size based on the resizer.The resizer respects the min-width and min-height CSS properties of the resizable node.Optionally, you can customize the [resizerColor] and the [gap] between the node and the resizer, with more customization options coming in the future.\""
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Resizer"
-    ],
-    "pageType": "guide",
-    "title": "Resizer",
-    "section": "Resize a template/component regular node",
-    "route": "/features/nodes/resizer",
-    "fragment": "resize-a-templatecomponent-regular-node",
-    "content": "The algorithm is almost the same as for template-group nodes: Create a node of type html-template or CustomNodeComponent (CustomDynamicNodeComponent).If you want the resizer to always appear, add the resizable directive to the top-level element of your custom node (ideally, a wrapper for the entire node content).If you want the resizer to appear conditionally, apply the directive as [resizable]=\"yourCondition\". Binding the visibility of the resizer to the node’s selection state can be useful.The resizer respects the min-width and min-height CSS properties of the element where the directive is applied.It's up to you to adjust the CSS of your custom node to ensure it renders correctly during resizing. The library only modifies the container size.Optionally, you can customize the [resizerColor] and the [gap] between the node and the resizer, with more customization options coming in the future."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Resizer"
-    ],
-    "pageType": "guide",
-    "title": "Resizer",
-    "section": "Resize event",
-    "route": "/features/nodes/resizer",
-    "fragment": "resize-event",
-    "content": "You may want to perform some actions on resize. To do this, simply add handler to the (onNodesChange.size) output of the "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Resizer"
-    ],
-    "pageType": "guide",
-    "title": "Resizer",
-    "section": "Resize event",
-    "route": "/features/nodes/resizer",
-    "fragment": "resize-event",
-    "content": " component."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Resizer"
-    ],
-    "pageType": "guide",
-    "title": "Resizer",
-    "section": "See also",
-    "route": "/features/nodes/resizer",
-    "fragment": "see-also",
-    "content": "SubflowsCustom nodesHandling changes"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Draggables"
-    ],
-    "pageType": "guide",
-    "title": "Draggables",
-    "section": "Disabling",
-    "route": "/features/nodes/draggables",
-    "fragment": "disabling",
-    "content": "You can disable draggable behavior on certain Node or DynamicNode by passing false."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Draggables"
-    ],
-    "pageType": "guide",
-    "title": "Draggables",
-    "section": "Drag handle",
-    "route": "/features/nodes/draggables",
-    "fragment": "drag-handle",
-    "content": "You can restrict dragging to a specific part of node, by adding dragHandle directive to this element. It's important to note that if a node contains at least one dragHandle, it can only be dragged from those specific areas where dragHandle was added. Otherwise, the entire node can be dragged, provided the draggable property is set to true."
   },
   {
     "breadcrumbs": [

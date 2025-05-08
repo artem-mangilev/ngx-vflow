@@ -1,1 +1,0 @@
-import"./chunk-ODLL2QMY.js";var e=[{path:"",redirectTo:"delete-selected",pathMatch:"full"},{path:"",title:"Workshops",children:[{path:"delete-selected",loadChildren:()=>import("./chunk-QVJZHDT2.js")},{path:"drag-and-drop-nodes",loadChildren:()=>import("./chunk-2TNKMQN4.js")},{path:"layout",loadChildren:()=>import("./chunk-X74QUJ3W.js")}]}],t=e;export{t as default};
