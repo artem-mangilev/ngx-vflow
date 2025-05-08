@@ -14,19 +14,24 @@ export class DragAndDropNodesDemoComponent {
 
   public nodes: Node[] = [
     {
-      id: crypto.randomUUID(),
-      point: { x: 10, y: 150 },
-      type: 'html-template',
+      id: '1',
+      point: { x: 10, y: 10 },
+      type: 'default-group',
+      width: 250,
+      height: 250,
     },
   ];
 
   public edges: Edge[] = [];
 
   public createNode({ event }: DndDropEvent) {
-    const point = this.vflow().documentPointToFlowPoint({
-      x: event.x,
-      y: event.y,
-    });
+    const [point] = this.vflow().documentPointToFlowPoint(
+      {
+        x: event.x,
+        y: event.y,
+      },
+      { layers: true },
+    );
 
     this.nodes = [
       ...this.nodes,
@@ -34,6 +39,7 @@ export class DragAndDropNodesDemoComponent {
         id: crypto.randomUUID(),
         point,
         type: 'html-template',
+        parentId: point.nodeId,
       },
     ];
   }
