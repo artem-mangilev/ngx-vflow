@@ -150,6 +150,7 @@ export class VflowComponent {
   private componentEventBusService = inject(ComponentEventBusService);
   private keyboardService = inject(KeyboardService);
   private injector = inject(Injector);
+
   // #endregion
 
   // #region SETTINGS
@@ -260,11 +261,11 @@ export class VflowComponent {
 
     // TODO: consider calling only fo new nodes
     // quick and dirty binding nodes to edges
-    addNodesToEdges(models.all, this.flowEntitiesService.edges());
+    addNodesToEdges(models, this.flowEntitiesService.edges());
 
-    this.flowEntitiesService.nodes.set(models.all);
+    this.flowEntitiesService.nodes.set(models);
 
-    models.all.filter(isGroupNode).forEach((model) => this.nodeRenderingService.pullNode(model));
+    models.filter(isGroupNode).forEach((model) => this.nodeRenderingService.pullNode(model));
   }
 
   protected nodeModels = computed(() => this.nodeRenderingService.nodes());

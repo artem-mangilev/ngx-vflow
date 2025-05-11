@@ -11,22 +11,9 @@ export class ReferenceIdentityChecker {
     const oldNodesMap: Map<Node | DynamicNode, NodeModel> = new Map();
     oldNodeModels.forEach((model) => oldNodesMap.set(model.rawNode, model));
 
-    const nodes = {
-      all: [] as NodeModel[],
-      new: [] as NodeModel[],
-    };
-
-    newNodes.forEach((newNode) => {
-      const node = oldNodesMap.get(newNode) ?? new NodeModel(newNode);
-
-      if (!oldNodesMap.has(node.rawNode)) {
-        nodes.new.push(node);
-      }
-
-      nodes.all.push(node);
+    return newNodes.map((newNode) => {
+      return oldNodesMap.get(newNode) ?? new NodeModel(newNode);
     });
-
-    return nodes;
   }
 
   /**
