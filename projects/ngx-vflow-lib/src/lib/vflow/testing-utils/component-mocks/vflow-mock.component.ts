@@ -32,6 +32,7 @@ import {
 import { VflowComponent } from '../../components/vflow/vflow.component';
 import { ConnectionModel } from '../../models/connection.model';
 import { AsInterface } from '../types';
+import { readSignalOrPlain } from '../../utils/signals';
 
 @Component({
   selector: 'vflow',
@@ -231,6 +232,21 @@ export class VflowMockComponent implements AsInterface<VflowComponent>, OnInit {
     }
 
     return point;
+  }
+
+  public getLayersUnderNode(nodeId: string): LayeredPoint[] {
+    const node = this.getNode(nodeId);
+    if (!node) {
+      return [];
+    }
+
+    return [
+      {
+        nodeId: nodeId,
+        x: readSignalOrPlain(node.point).x,
+        y: readSignalOrPlain(node.point).y,
+      },
+    ];
   }
 
   public getNode<T = unknown>(id: string): Node<T> | DynamicNode<T> | undefined {
