@@ -1,6 +1,6 @@
-import { ChangeDetectionStrategy, Component, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal, viewChild } from '@angular/core';
 import { DndDropEvent, DndModule } from 'ngx-drag-drop';
-import { Connection, Edge, Node, VflowComponent, Vflow } from 'ngx-vflow';
+import { Connection, Edge, VflowComponent, Vflow, DynamicNode, NodePositionChange } from 'ngx-vflow';
 
 @Component({
   templateUrl: './drag-and-drop-nodes-demo.component.html',
@@ -12,13 +12,13 @@ import { Connection, Edge, Node, VflowComponent, Vflow } from 'ngx-vflow';
 export class DragAndDropNodesDemoComponent {
   public vflow = viewChild.required(VflowComponent);
 
-  public nodes: Node[] = [
+  public nodes: DynamicNode[] = [
     {
       id: '1',
-      point: { x: 10, y: 10 },
+      point: signal({ x: 10, y: 10 }),
       type: 'default-group',
-      width: 250,
-      height: 250,
+      width: signal(250),
+      height: signal(250),
     },
   ];
 
@@ -38,12 +38,12 @@ export class DragAndDropNodesDemoComponent {
       ...this.nodes,
       {
         id: crypto.randomUUID(),
-        point,
+        point: signal(point),
         type: 'html-template',
-        parentId: point.nodeId,
-        data: {
+        parentId: signal(point.nodeId),
+        data: signal({
           detached: layers.length === 1,
-        },
+        }),
       },
     ];
   }
@@ -68,17 +68,21 @@ export class DragAndDropNodesDemoComponent {
     const nodeToUpdate = this.nodes.find((node) => node.id === nodeId);
     if (!nodeToUpdate) return;
 
-    this.nodes = [
-      ...this.nodes.filter((node) => node.id !== nodeId),
-      {
-        ...nodeToUpdate,
-        point: flowLayer,
-        parentId: null,
-        id: nodeId,
-        data: {
-          detached: true,
-        },
-      } as Node,
-    ];
+    if (nodeToUpdate.type === 'html-template') {
+      nodeToUpdate.parentId?.set(null);
+      nodeToUpdate.point.set(flowLayer);
+      nodeToUpdate.data?.set({ detached: true });
+    }
+  }
+
+  onPositionChange([change]: NodePositionChange[]) {
+    const canAttach = this.vflow().getLayersUnderNode(change.id).length > 1;
+
+    const nodeToUpdate = this.nodes.find((node) => node.id === change.id);
+    if (!nodeToUpdate) return;
+
+    if (nodeToUpdate.type === 'html-template') {
+      nodeToUpdate.data?.update((state) => ({ ...state, canAttach }));
+    }
   }
 }

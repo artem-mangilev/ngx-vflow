@@ -10,7 +10,8 @@
   [nodes]="nodes"
   [edges]="edges"
   (dndDrop)="createNode($event)"
-  (onConnect)="connect($event)">
+  (onConnect)="connect($event)"
+  (onNodesChange.position)="onPositionChange($event)">
   <ng-template let-ctx nodeHtml>
     <div class="custom-node" [class.custom-node_selected]="ctx.selected()">
       <button class="custom-node__button" selectable>Select here</button>
@@ -20,8 +21,12 @@
     </div>
 
     <node-toolbar>
-      @if (!ctx.node.data.detached) {
+      @if (!ctx.node.data().detached) {
         <button (click)="detachNode(ctx.node.id)">Detach</button>
+      }
+
+      @if (ctx.node.data().canAttach) {
+        <button>Attach</button>
       }
     </node-toolbar>
   </ng-template>
