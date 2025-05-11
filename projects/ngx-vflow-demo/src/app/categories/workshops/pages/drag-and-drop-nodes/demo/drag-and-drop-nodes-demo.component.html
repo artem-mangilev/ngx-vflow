@@ -21,12 +21,12 @@
     </div>
 
     <node-toolbar>
-      @if (!ctx.node.data().detached) {
+      @if (ctx.node.data().canDetach) {
         <button (click)="detachNode(ctx.node.id)">Detach</button>
       }
 
       @if (ctx.node.data().canAttach) {
-        <button>Attach</button>
+        <button (click)="attachNode(ctx.node.id)">Attach</button>
       }
     </node-toolbar>
   </ng-template>

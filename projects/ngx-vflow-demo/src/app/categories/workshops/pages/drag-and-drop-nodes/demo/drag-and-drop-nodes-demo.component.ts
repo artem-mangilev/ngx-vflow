@@ -42,7 +42,7 @@ export class DragAndDropNodesDemoComponent {
         type: 'html-template',
         parentId: signal(point.nodeId),
         data: signal({
-          detached: layers.length === 1,
+          canDetach: layers.length > 1,
         }),
       },
     ];
@@ -63,26 +63,42 @@ export class DragAndDropNodesDemoComponent {
     const layers = this.vflow().getLayersUnderNode(nodeId);
     const flowLayer = layers[layers.length - 1];
 
-    console.log(flowLayer);
-
     const nodeToUpdate = this.nodes.find((node) => node.id === nodeId);
     if (!nodeToUpdate) return;
 
     if (nodeToUpdate.type === 'html-template') {
       nodeToUpdate.parentId?.set(null);
       nodeToUpdate.point.set(flowLayer);
-      nodeToUpdate.data?.set({ detached: true });
+      nodeToUpdate.data?.set({ canDetach: false });
     }
   }
 
-  onPositionChange([change]: NodePositionChange[]) {
-    const canAttach = this.vflow().getLayersUnderNode(change.id).length > 1;
-
+  onPositionChange([change, second]: NodePositionChange[]) {
     const nodeToUpdate = this.nodes.find((node) => node.id === change.id);
     if (!nodeToUpdate) return;
 
+    console.log('onPositionChange', change, second);
+
+    const canAttach = this.vflow().getLayersUnderNode(change.id).length > 1 && !nodeToUpdate.parentId?.();
+
     if (nodeToUpdate.type === 'html-template') {
       nodeToUpdate.data?.update((state) => ({ ...state, canAttach }));
+    }
+
+    // TODO: update canAttach on group move?
+  }
+
+  attachNode(nodeId: string) {
+    const layers = this.vflow().getLayersUnderNode(nodeId);
+    const [topLayer] = layers;
+
+    const nodeToUpdate = this.nodes.find((node) => node.id === nodeId);
+    if (!nodeToUpdate) return;
+
+    if (nodeToUpdate.type === 'html-template') {
+      nodeToUpdate.parentId?.set(topLayer.nodeId);
+      nodeToUpdate.point.set(topLayer);
+      nodeToUpdate.data?.set({ canDetach: true });
     }
   }
 }
