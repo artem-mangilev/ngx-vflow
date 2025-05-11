@@ -64,7 +64,6 @@ import { RootSvgContextDirective } from '../../directives/root-svg-context.direc
 import { RootSvgReferenceDirective } from '../../directives/reference.directive';
 import { EdgeRenderingService } from '../../services/edge-rendering.service';
 import { getLayeredPoints } from '../../utils/get-layered-points';
-import { isGroupNode } from '../../utils/is-group-node';
 
 const changesControllerHostDirective = {
   directive: ChangesControllerDirective,
@@ -265,7 +264,7 @@ export class VflowComponent {
 
     this.flowEntitiesService.nodes.set(models);
 
-    models.filter(isGroupNode).forEach((model) => this.nodeRenderingService.pullNode(model));
+    models.forEach((model) => this.nodeRenderingService.pullNode(model));
   }
 
   protected nodeModels = computed(() => this.nodeRenderingService.nodes());
