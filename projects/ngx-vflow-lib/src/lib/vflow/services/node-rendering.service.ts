@@ -20,9 +20,7 @@ export class NodeRenderingService {
   });
 
   private maxOrder = computed(() => {
-    return this.flowEntitiesService.nodes().length
-      ? Math.max(...this.flowEntitiesService.nodes().map((n) => n.renderOrder()))
-      : 0;
+    return Math.max(...this.flowEntitiesService.nodes().map((n) => n.renderOrder()));
   });
 
   public pullNode(node: NodeModel) {

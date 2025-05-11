@@ -64,6 +64,7 @@ import { RootSvgContextDirective } from '../../directives/root-svg-context.direc
 import { RootSvgReferenceDirective } from '../../directives/reference.directive';
 import { EdgeRenderingService } from '../../services/edge-rendering.service';
 import { getLayeredPoints } from '../../utils/get-layered-points';
+import { isGroupNode } from '../../utils/is-group-node';
 
 const changesControllerHostDirective = {
   directive: ChangesControllerDirective,
@@ -256,17 +257,14 @@ export class VflowComponent {
     const models = runInInjectionContext(this.injector, () =>
       ReferenceIdentityChecker.nodes(newNodes, this.flowEntitiesService.nodes()),
     );
-    const all = [...models.old, ...models.new];
-
-    models.new
-      .filter(({ rawNode }) => rawNode.type === 'default-group' || rawNode.type === 'template-group')
-      .forEach((model) => this.nodeRenderingService.pullNode(model));
 
     // TODO: consider calling only fo new nodes
     // quick and dirty binding nodes to edges
-    addNodesToEdges(all, this.flowEntitiesService.edges());
+    addNodesToEdges(models.all, this.flowEntitiesService.edges());
 
-    this.flowEntitiesService.nodes.set(all);
+    this.flowEntitiesService.nodes.set(models.all);
+
+    models.all.filter(isGroupNode).forEach((model) => this.nodeRenderingService.pullNode(model));
   }
 
   protected nodeModels = computed(() => this.nodeRenderingService.nodes());

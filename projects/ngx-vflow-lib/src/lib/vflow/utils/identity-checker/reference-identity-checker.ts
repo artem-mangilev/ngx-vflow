@@ -12,16 +12,18 @@ export class ReferenceIdentityChecker {
     oldNodeModels.forEach((model) => oldNodesMap.set(model.rawNode, model));
 
     const nodes = {
-      old: [] as NodeModel[],
+      all: [] as NodeModel[],
       new: [] as NodeModel[],
     };
 
     newNodes.forEach((newNode) => {
-      if (oldNodesMap.has(newNode)) {
-        nodes.old.push(oldNodesMap.get(newNode)!);
-      } else {
-        nodes.new.push(new NodeModel(newNode));
+      const node = oldNodesMap.get(newNode) ?? new NodeModel(newNode);
+
+      if (!oldNodesMap.has(node.rawNode)) {
+        nodes.new.push(node);
       }
+
+      nodes.all.push(node);
     });
 
     return nodes;
