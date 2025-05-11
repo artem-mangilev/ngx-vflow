@@ -18,6 +18,12 @@
       <handle type="source" position="right" />
       <handle type="target" position="left" />
     </div>
+
+    <node-toolbar>
+      @if (!ctx.node.data.detached) {
+        <button (click)="detachNode(ctx.node.id)">Detach</button>
+      }
+    </node-toolbar>
   </ng-template>
 
   <ng-template let-ctx edge>

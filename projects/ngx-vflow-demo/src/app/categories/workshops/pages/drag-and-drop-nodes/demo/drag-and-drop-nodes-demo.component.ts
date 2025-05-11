@@ -25,13 +25,14 @@ export class DragAndDropNodesDemoComponent {
   public edges: Edge[] = [];
 
   public createNode({ event }: DndDropEvent) {
-    const [point] = this.vflow().documentPointToFlowPoint(
+    const layers = this.vflow().documentPointToFlowPoint(
       {
         x: event.x,
         y: event.y,
       },
       { layers: true },
     );
+    const [point] = layers;
 
     this.nodes = [
       ...this.nodes,
@@ -40,6 +41,9 @@ export class DragAndDropNodesDemoComponent {
         point,
         type: 'html-template',
         parentId: point.nodeId,
+        data: {
+          detached: layers.length === 1,
+        },
       },
     ];
   }
@@ -52,6 +56,29 @@ export class DragAndDropNodesDemoComponent {
         source,
         target,
       },
+    ];
+  }
+
+  public detachNode(nodeId: string) {
+    const layers = this.vflow().getLayersUnderNode(nodeId);
+    const flowLayer = layers[layers.length - 1];
+
+    console.log(flowLayer);
+
+    const nodeToUpdate = this.nodes.find((node) => node.id === nodeId);
+    if (!nodeToUpdate) return;
+
+    this.nodes = [
+      ...this.nodes.filter((node) => node.id !== nodeId),
+      {
+        ...nodeToUpdate,
+        point: flowLayer,
+        parentId: null,
+        id: nodeId,
+        data: {
+          detached: true,
+        },
+      } as Node,
     ];
   }
 }
