@@ -1,6 +1,15 @@
 import { ChangeDetectionStrategy, Component, signal, viewChild } from '@angular/core';
 import { DndDropEvent, DndModule } from 'ngx-drag-drop';
-import { Connection, Edge, VflowComponent, Vflow, DynamicNode, NodePositionChange } from 'ngx-vflow';
+import {
+  Connection,
+  Edge,
+  VflowComponent,
+  Vflow,
+  DynamicNode,
+  isDynamicNode,
+  isDefaultDynamicGroupNode,
+  isTemplateDynamicNode,
+} from 'ngx-vflow';
 
 @Component({
   templateUrl: './drag-and-drop-nodes-demo.component.html',
@@ -60,44 +69,41 @@ export class DragAndDropNodesDemoComponent {
   }
 
   public detachNode(nodeId: string) {
-    const layers = this.vflow().getLayersUnderNode(nodeId);
-    const flowLayer = layers[layers.length - 1];
-
     const nodeToUpdate = this.nodes.find((node) => node.id === nodeId);
     if (!nodeToUpdate) return;
 
     if (nodeToUpdate.type === 'html-template') {
+      nodeToUpdate.point.set(this.vflow().toNodeSpace(nodeId, null));
       nodeToUpdate.parentId?.set(null);
-      nodeToUpdate.point.set(flowLayer);
       nodeToUpdate.data?.set({ canDetach: false });
     }
   }
 
-  onPositionChange([change, second]: NodePositionChange[]) {
-    const nodeToUpdate = this.nodes.find((node) => node.id === change.id);
-    if (!nodeToUpdate) return;
+  onPositionChange() {
+    // Update all template nodes' canAttach state
+    this.nodes.filter(isTemplateDynamicNode).forEach((node) => {
+      const intersectingNodes = this.vflow()
+        .getIntesectingNodes(node.id)
+        .filter(isDynamicNode)
+        .filter(isDefaultDynamicGroupNode);
 
-    console.log('onPositionChange', change, second);
-
-    const canAttach = this.vflow().getLayersUnderNode(change.id).length > 1 && !nodeToUpdate.parentId?.();
-
-    if (nodeToUpdate.type === 'html-template') {
-      nodeToUpdate.data?.update((state) => ({ ...state, canAttach }));
-    }
-
-    // TODO: update canAttach on group move?
+      const canAttach = intersectingNodes.length > 0 && !node.parentId?.();
+      node.data?.update((state) => ({ ...state, canAttach }));
+    });
   }
 
   attachNode(nodeId: string) {
-    const layers = this.vflow().getLayersUnderNode(nodeId);
-    const [topLayer] = layers;
+    const [intersectionNode] = this.vflow()
+      .getIntesectingNodes(nodeId)
+      .filter(isDynamicNode)
+      .filter(isDefaultDynamicGroupNode);
 
     const nodeToUpdate = this.nodes.find((node) => node.id === nodeId);
     if (!nodeToUpdate) return;
 
     if (nodeToUpdate.type === 'html-template') {
-      nodeToUpdate.parentId?.set(topLayer.nodeId);
-      nodeToUpdate.point.set(topLayer);
+      nodeToUpdate.point.set(this.vflow().toNodeSpace(nodeId, intersectionNode.id));
+      nodeToUpdate.parentId?.set(intersectionNode.id);
       nodeToUpdate.data?.set({ canDetach: true });
     }
   }
