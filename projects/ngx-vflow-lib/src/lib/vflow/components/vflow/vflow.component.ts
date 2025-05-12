@@ -442,13 +442,6 @@ export class VflowComponent {
     return transformedPoint;
   }
 
-  public getLayersUnderNode(nodeId: string): LayeredPoint[] {
-    const node = this.nodeModels().find((n) => n.rawNode.id === nodeId);
-    if (!node) return [];
-
-    return getLayeredPoints(node.globalPoint(), this.nodeRenderingService.groups());
-  }
-
   public getIntesectingNodes<T>(
     nodeId: string,
     options: IntersectingNodesOptions = { partially: true },
