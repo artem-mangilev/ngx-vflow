@@ -458,11 +458,18 @@ export class VflowComponent {
       | DynamicNode<T>[];
   }
 
-  public toNodeSpace(nodeId: string, spaceNodeId: string): Point {
+  public toNodeSpace(nodeId: string, spaceNodeId: string | null): Point {
     const node = this.nodeModels().find((n) => n.rawNode.id === nodeId);
+
+    if (!node) return { x: Infinity, y: Infinity };
+
+    if (spaceNodeId === null) {
+      return node.globalPoint();
+    }
+
     const coordinateSpaceNode = this.nodeModels().find((n) => n.rawNode.id === spaceNodeId);
 
-    if (!node || !coordinateSpaceNode) return { x: NaN, y: NaN };
+    if (!coordinateSpaceNode) return { x: Infinity, y: Infinity };
 
     return getLayeredPoints(node.globalPoint(), [coordinateSpaceNode])[0];
   }
