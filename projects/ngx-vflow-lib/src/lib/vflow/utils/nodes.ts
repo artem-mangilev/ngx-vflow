@@ -1,6 +1,8 @@
 import { Box } from '../interfaces/box';
+import { IntersectingNodesOptions } from '../interfaces/intersecting-nodes-options.interface';
 import { Rect } from '../interfaces/rect';
 import { NodeModel } from '../models/node.model';
+import { getOverlappingArea } from './get-overlapping-area';
 
 export function getNodesBounds(nodes: NodeModel[]): Rect {
   if (nodes.length === 0) {
@@ -17,12 +19,44 @@ export function getNodesBounds(nodes: NodeModel[]): Rect {
   return boxToRect(box);
 }
 
+export function getIntesectingNodes(
+  nodeId: string,
+  nodes: NodeModel[],
+  options?: IntersectingNodesOptions,
+): NodeModel[] {
+  const node = nodes.find((n) => n.rawNode.id === nodeId);
+  if (!node) return [];
+
+  const nodeRect = nodeToRect(node);
+
+  return nodes.filter((currentNode) => {
+    if (currentNode.rawNode.id === nodeId) return false;
+
+    const overlappingArea = getOverlappingArea(nodeToRect(currentNode), nodeRect);
+
+    if (options?.partially) {
+      return overlappingArea > 0;
+    }
+
+    return overlappingArea >= nodeRect.width * nodeRect.height;
+  });
+}
+
 function nodeToBox(node: NodeModel): Box {
   return {
     x: node.point().x,
     y: node.point().y,
     x2: node.point().x + node.size().width,
     y2: node.point().y + node.size().height,
+  };
+}
+
+export function nodeToRect(node: NodeModel): Rect {
+  return {
+    x: node.point().x,
+    y: node.point().y,
+    width: node.width(),
+    height: node.height(),
   };
 }
 

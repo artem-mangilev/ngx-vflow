@@ -64,6 +64,8 @@ import { RootSvgContextDirective } from '../../directives/root-svg-context.direc
 import { RootSvgReferenceDirective } from '../../directives/reference.directive';
 import { EdgeRenderingService } from '../../services/edge-rendering.service';
 import { getLayeredPoints } from '../../utils/get-layered-points';
+import { getIntesectingNodes } from '../../utils/nodes';
+import { IntersectingNodesOptions } from '../../interfaces/intersecting-nodes-options.interface';
 
 const changesControllerHostDirective = {
   directive: ChangesControllerDirective,
@@ -445,6 +447,24 @@ export class VflowComponent {
     if (!node) return [];
 
     return getLayeredPoints(node.globalPoint(), this.nodeRenderingService.groups());
+  }
+
+  public getIntesectingNodes<T>(
+    nodeId: string,
+    options: IntersectingNodesOptions = { partially: true },
+  ): Node<T>[] | DynamicNode<T>[] {
+    return getIntesectingNodes(nodeId, this.nodeModels(), options).map((n) => n.rawNode) as
+      | Node<T>[]
+      | DynamicNode<T>[];
+  }
+
+  public toNodeSpace(nodeId: string, spaceNodeId: string): Point {
+    const node = this.nodeModels().find((n) => n.rawNode.id === nodeId);
+    const coordinateSpaceNode = this.nodeModels().find((n) => n.rawNode.id === spaceNodeId);
+
+    if (!node || !coordinateSpaceNode) return { x: NaN, y: NaN };
+
+    return getLayeredPoints(node.globalPoint(), [coordinateSpaceNode])[0];
   }
   // #endregion
 

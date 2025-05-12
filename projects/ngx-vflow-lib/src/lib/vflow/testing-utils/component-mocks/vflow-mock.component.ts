@@ -33,6 +33,7 @@ import { VflowComponent } from '../../components/vflow/vflow.component';
 import { ConnectionModel } from '../../models/connection.model';
 import { AsInterface } from '../types';
 import { readSignalOrPlain } from '../../utils/signals';
+import { IntersectingNodesOptions } from '../../interfaces/intersecting-nodes-options.interface';
 
 @Component({
   selector: 'vflow',
@@ -247,6 +248,16 @@ export class VflowMockComponent implements AsInterface<VflowComponent>, OnInit {
         y: readSignalOrPlain(node.point).y,
       },
     ];
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public getIntesectingNodes(nodeId: string, options?: IntersectingNodesOptions): Node[] | DynamicNode[] {
+    return [];
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public toNodeSpace(nodeId: string, spaceNodeId: string): Point {
+    return { x: 0, y: 0 };
   }
 
   public getNode<T = unknown>(id: string): Node<T> | DynamicNode<T> | undefined {
