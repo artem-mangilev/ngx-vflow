@@ -442,6 +442,14 @@ export class VflowComponent {
     return transformedPoint;
   }
 
+  /**
+   * Gets nodes that intersect with the specified node
+   *
+   * @template T - The type of data associated with the nodes
+   * @param nodeId - The ID of the node to check intersections for
+   * @param options.partially - If true, returns nodes that partially intersect. If false, only returns fully intersecting nodes
+   * @returns An array of nodes that intersect with the specified node
+   */
   public getIntesectingNodes<T>(
     nodeId: string,
     options: IntersectingNodesOptions = { partially: true },
@@ -451,6 +459,14 @@ export class VflowComponent {
       | DynamicNode<T>[];
   }
 
+  /**
+   * Converts a node's position to the coordinate space of another node
+   *
+   * @param nodeId - The ID of the node whose position should be converted
+   * @param spaceNodeId - The ID of the node that defines the target coordinate space.
+   *                      If null, returns the position in global coordinates
+   * @returns {Point} The converted position. Returns {x: Infinity, y: Infinity} if either node is not found
+   */
   public toNodeSpace(nodeId: string, spaceNodeId: string | null): Point {
     const node = this.nodeModels().find((n) => n.rawNode.id === nodeId);
 
