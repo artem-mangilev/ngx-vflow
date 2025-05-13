@@ -63,7 +63,7 @@ import { RootPointerDirective } from '../../directives/root-pointer.directive';
 import { RootSvgContextDirective } from '../../directives/root-svg-context.directive';
 import { RootSvgReferenceDirective } from '../../directives/reference.directive';
 import { EdgeRenderingService } from '../../services/edge-rendering.service';
-import { getSpacePoints } from '../../utils/get-layered-points';
+import { getSpacePoints } from '../../utils/get-space-points';
 import { getIntesectingNodes } from '../../utils/nodes';
 import { IntersectingNodesOptions } from '../../interfaces/intersecting-nodes-options.interface';
 
