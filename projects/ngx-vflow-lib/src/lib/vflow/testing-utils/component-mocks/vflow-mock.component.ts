@@ -12,7 +12,7 @@ import {
 import { NgTemplateOutlet } from '@angular/common';
 import { Node, DynamicNode } from '../../interfaces/node.interface';
 import { Edge } from '../../interfaces/edge.interface';
-import { Point } from '../../interfaces/point.interface';
+import { SpacePoint, Point } from '../../interfaces/point.interface';
 import { Background } from '../../types/background.type';
 import { Optimization } from '../../interfaces/optimization.interface';
 import { KeyboardShortcuts } from '../../types/keyboard-action.type';
@@ -32,6 +32,7 @@ import {
 import { VflowComponent } from '../../components/vflow/vflow.component';
 import { ConnectionModel } from '../../models/connection.model';
 import { AsInterface } from '../types';
+import { IntersectingNodesOptions } from '../../interfaces/intersecting-nodes-options.interface';
 
 @Component({
   selector: 'vflow',
@@ -217,8 +218,30 @@ export class VflowMockComponent implements AsInterface<VflowComponent>, OnInit {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public fitView(options?: FitViewOptions): void {}
 
-  public documentPointToFlowPoint(point: Point): Point {
+  public documentPointToFlowPoint(point: Point, options?: { spaces: false }): Point;
+  public documentPointToFlowPoint(point: Point, options: { spaces: true }): SpacePoint[];
+  public documentPointToFlowPoint(point: Point, options?: { spaces: boolean }): unknown {
+    if (options?.spaces) {
+      return [
+        {
+          nodeId: null,
+          x: point.x,
+          y: point.y,
+        },
+      ];
+    }
+
     return point;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public getIntesectingNodes(nodeId: string, options?: IntersectingNodesOptions): Node[] | DynamicNode[] {
+    return [];
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public toNodeSpace(nodeId: string, spaceNodeId: string): Point {
+    return { x: 0, y: 0 };
   }
 
   public getNode<T = unknown>(id: string): Node<T> | DynamicNode<T> | undefined {

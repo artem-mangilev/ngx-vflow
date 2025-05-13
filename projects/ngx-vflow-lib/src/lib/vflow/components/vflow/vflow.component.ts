@@ -3,7 +3,6 @@ import {
   Component,
   Injector,
   Input,
-  OnInit,
   computed,
   inject,
   runInInjectionContext,
@@ -29,7 +28,7 @@ import {
 } from '../../directives/template.directive';
 import { addNodesToEdges } from '../../utils/add-nodes-to-edges';
 import { skip } from 'rxjs';
-import { Point } from '../../interfaces/point.interface';
+import { SpacePoint, Point } from '../../interfaces/point.interface';
 import { ViewportState } from '../../interfaces/viewport.interface';
 import { FlowStatusService } from '../../services/flow-status.service';
 import { FlowEntitiesService } from '../../services/flow-entities.service';
@@ -64,6 +63,9 @@ import { RootPointerDirective } from '../../directives/root-pointer.directive';
 import { RootSvgContextDirective } from '../../directives/root-svg-context.directive';
 import { RootSvgReferenceDirective } from '../../directives/reference.directive';
 import { EdgeRenderingService } from '../../services/edge-rendering.service';
+import { getSpacePoints } from '../../utils/get-space-points';
+import { getIntesectingNodes } from '../../utils/nodes';
+import { IntersectingNodesOptions } from '../../interfaces/intersecting-nodes-options.interface';
 
 const changesControllerHostDirective = {
   directive: ChangesControllerDirective,
@@ -137,7 +139,7 @@ const changesControllerHostDirective = {
     NgTemplateOutlet,
   ],
 })
-export class VflowComponent implements OnInit {
+export class VflowComponent {
   // #region DI
   private viewportService = inject(ViewportService);
   private flowEntitiesService = inject(FlowEntitiesService);
@@ -149,6 +151,7 @@ export class VflowComponent implements OnInit {
   private componentEventBusService = inject(ComponentEventBusService);
   private keyboardService = inject(KeyboardService);
   private injector = inject(Injector);
+
   // #endregion
 
   // #region SETTINGS
@@ -253,14 +256,17 @@ export class VflowComponent implements OnInit {
    */
   @Input({ required: true })
   public set nodes(newNodes: Node[] | DynamicNode[]) {
-    const newModels = runInInjectionContext(this.injector, () =>
+    const models = runInInjectionContext(this.injector, () =>
       ReferenceIdentityChecker.nodes(newNodes, this.flowEntitiesService.nodes()),
     );
 
+    // TODO: consider calling only fo new nodes
     // quick and dirty binding nodes to edges
-    addNodesToEdges(newModels, this.flowEntitiesService.edges());
+    addNodesToEdges(models, this.flowEntitiesService.edges());
 
-    this.flowEntitiesService.nodes.set(newModels);
+    this.flowEntitiesService.nodes.set(models);
+
+    models.forEach((model) => this.nodeRenderingService.pullNode(model));
   }
 
   protected nodeModels = computed(() => this.nodeRenderingService.nodes());
@@ -356,10 +362,6 @@ export class VflowComponent implements OnInit {
 
   protected minimap = this.flowEntitiesService.minimap;
 
-  public ngOnInit(): void {
-    this.setInitialNodesOrder();
-  }
-
   // #region METHODS_API
   /**
    * Change viewport to specified state
@@ -423,8 +425,62 @@ export class VflowComponent implements OnInit {
   /**
    * Convert point received from document to point on the flow
    */
-  public documentPointToFlowPoint(point: Point): Point {
-    return this.spacePointContext().documentPointToFlowPoint(point);
+  public documentPointToFlowPoint(point: Point): Point;
+  public documentPointToFlowPoint(point: Point, options?: { spaces: false }): Point;
+  /**
+   * Convert point received from document to a stack of space points on the flow
+   * Space point has a spaceNodeId, coordinates are relative to this node
+   */
+  public documentPointToFlowPoint(point: Point, options?: { spaces: true }): SpacePoint[];
+  public documentPointToFlowPoint(point: Point, options?: { spaces: boolean }): unknown {
+    const transformedPoint = this.spacePointContext().documentPointToFlowPoint(point);
+
+    if (options?.spaces) {
+      return getSpacePoints(transformedPoint, this.nodeRenderingService.groups());
+    }
+
+    return transformedPoint;
+  }
+
+  /**
+   * Gets nodes that intersect with the specified node
+   *
+   * @template T - The type of data associated with the nodes
+   * @param nodeId - The ID of the node to check intersections for
+   * @param options.partially - If true, returns nodes that partially intersect. If false, only returns fully intersecting nodes
+   * @returns An array of nodes that intersect with the specified node
+   */
+  public getIntesectingNodes<T>(
+    nodeId: string,
+    options: IntersectingNodesOptions = { partially: true },
+  ): Node<T>[] | DynamicNode<T>[] {
+    return getIntesectingNodes(nodeId, this.nodeModels(), options).map((n) => n.rawNode) as
+      | Node<T>[]
+      | DynamicNode<T>[];
+  }
+
+  /**
+   * Converts a node's position to the coordinate space of another node
+   *
+   * @param nodeId - The ID of the node whose position should be converted
+   * @param spaceNodeId - The ID of the node that defines the target coordinate space.
+   *                      If null, returns the position in global coordinates
+   * @returns {Point} The converted position. Returns {x: Infinity, y: Infinity} if either node is not found
+   */
+  public toNodeSpace(nodeId: string, spaceNodeId: string | null): Point {
+    const node = this.nodeModels().find((n) => n.rawNode.id === nodeId);
+
+    if (!node) return { x: Infinity, y: Infinity };
+
+    if (spaceNodeId === null) {
+      return node.globalPoint();
+    }
+
+    const coordinateSpaceNode = this.nodeModels().find((n) => n.rawNode.id === spaceNodeId);
+
+    if (!coordinateSpaceNode) return { x: Infinity, y: Infinity };
+
+    return getSpacePoints(node.globalPoint(), [coordinateSpaceNode])[0];
   }
   // #endregion
 
@@ -434,16 +490,5 @@ export class VflowComponent implements OnInit {
 
   protected trackEdges(idx: number, { edge }: EdgeModel) {
     return edge;
-  }
-
-  private setInitialNodesOrder() {
-    this.nodeModels().forEach((model) => {
-      switch (model.rawNode.type) {
-        case 'default-group':
-        case 'template-group': {
-          this.nodeRenderingService.pullNode(model);
-        }
-      }
-    });
   }
 }

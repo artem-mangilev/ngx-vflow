@@ -1,6 +1,15 @@
-import { ChangeDetectionStrategy, Component, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal, viewChild } from '@angular/core';
 import { DndDropEvent, DndModule } from 'ngx-drag-drop';
-import { Connection, Edge, Node, VflowComponent, Vflow } from 'ngx-vflow';
+import {
+  Connection,
+  Edge,
+  VflowComponent,
+  Vflow,
+  DynamicNode,
+  isDynamicNode,
+  isDefaultDynamicGroupNode,
+  isTemplateDynamicNode,
+} from 'ngx-vflow';
 
 @Component({
   templateUrl: './drag-and-drop-nodes-demo.component.html',
@@ -12,28 +21,38 @@ import { Connection, Edge, Node, VflowComponent, Vflow } from 'ngx-vflow';
 export class DragAndDropNodesDemoComponent {
   public vflow = viewChild.required(VflowComponent);
 
-  public nodes: Node[] = [
+  public nodes: DynamicNode[] = [
     {
-      id: crypto.randomUUID(),
-      point: { x: 10, y: 150 },
-      type: 'html-template',
+      id: '1',
+      point: signal({ x: 10, y: 10 }),
+      type: 'default-group',
+      width: signal(250),
+      height: signal(250),
     },
   ];
 
   public edges: Edge[] = [];
 
   public createNode({ event }: DndDropEvent) {
-    const point = this.vflow().documentPointToFlowPoint({
-      x: event.x,
-      y: event.y,
-    });
+    const spaces = this.vflow().documentPointToFlowPoint(
+      {
+        x: event.x,
+        y: event.y,
+      },
+      { spaces: true },
+    );
+    const [point] = spaces;
 
     this.nodes = [
       ...this.nodes,
       {
         id: crypto.randomUUID(),
-        point,
+        point: signal(point),
         type: 'html-template',
+        parentId: signal(point.spaceNodeId),
+        data: signal({
+          canDetach: spaces.length > 1,
+        }),
       },
     ];
   }
@@ -47,5 +66,45 @@ export class DragAndDropNodesDemoComponent {
         target,
       },
     ];
+  }
+
+  public detachNode(nodeId: string) {
+    const nodeToUpdate = this.nodes.find((node) => node.id === nodeId);
+    if (!nodeToUpdate) return;
+
+    if (nodeToUpdate.type === 'html-template') {
+      nodeToUpdate.point.set(this.vflow().toNodeSpace(nodeId, null));
+      nodeToUpdate.parentId?.set(null);
+      nodeToUpdate.data?.set({ canDetach: false });
+    }
+  }
+
+  onPositionChange() {
+    // Update all template nodes' canAttach state
+    this.nodes.filter(isTemplateDynamicNode).forEach((node) => {
+      const intersectingNodes = this.vflow()
+        .getIntesectingNodes(node.id)
+        .filter(isDynamicNode)
+        .filter(isDefaultDynamicGroupNode);
+
+      const canAttach = intersectingNodes.length > 0 && !node.parentId?.();
+      node.data?.update((state) => ({ ...state, canAttach }));
+    });
+  }
+
+  attachNode(nodeId: string) {
+    const [intersectionNode] = this.vflow()
+      .getIntesectingNodes(nodeId)
+      .filter(isDynamicNode)
+      .filter(isDefaultDynamicGroupNode);
+
+    const nodeToUpdate = this.nodes.find((node) => node.id === nodeId);
+    if (!nodeToUpdate) return;
+
+    if (nodeToUpdate.type === 'html-template') {
+      nodeToUpdate.point.set(this.vflow().toNodeSpace(nodeId, intersectionNode.id));
+      nodeToUpdate.parentId?.set(intersectionNode.id);
+      nodeToUpdate.data?.set({ canDetach: true });
+    }
   }
 }

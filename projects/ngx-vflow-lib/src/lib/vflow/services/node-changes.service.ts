@@ -37,10 +37,14 @@ export class NodesChangeService {
       ),
     ),
     map((changedNode) => {
-      return this.entitiesService
-        .nodes()
-        .filter((node) => node === changedNode || node.selected())
-        .map((node) => ({ type: 'position', id: node.rawNode.id, point: node.point() }));
+      return [
+        { type: 'position', id: changedNode.rawNode.id, point: changedNode.point() } as NodeChange,
+        // TODO: emits even if node is not change position
+        ...(this.entitiesService
+          .nodes()
+          .filter((node) => node !== changedNode && node.selected())
+          .map((node) => ({ type: 'position', id: node.rawNode.id, point: node.point() })) as NodeChange[]),
+      ];
     }),
   ) satisfies Observable<NodeChange[]>;
 

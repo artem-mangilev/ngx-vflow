@@ -12,8 +12,7 @@ export class ReferenceIdentityChecker {
     oldNodeModels.forEach((model) => oldNodesMap.set(model.rawNode, model));
 
     return newNodes.map((newNode) => {
-      if (oldNodesMap.has(newNode)) return oldNodesMap.get(newNode)!;
-      else return new NodeModel(newNode);
+      return oldNodesMap.get(newNode) ?? new NodeModel(newNode);
     });
   }
 
