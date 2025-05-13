@@ -34,14 +34,14 @@ export class DragAndDropNodesDemoComponent {
   public edges: Edge[] = [];
 
   public createNode({ event }: DndDropEvent) {
-    const layers = this.vflow().documentPointToFlowPoint(
+    const spaces = this.vflow().documentPointToFlowPoint(
       {
         x: event.x,
         y: event.y,
       },
-      { layers: true },
+      { spaces: true },
     );
-    const [point] = layers;
+    const [point] = spaces;
 
     this.nodes = [
       ...this.nodes,
@@ -49,9 +49,9 @@ export class DragAndDropNodesDemoComponent {
         id: crypto.randomUUID(),
         point: signal(point),
         type: 'html-template',
-        parentId: signal(point.nodeId),
+        parentId: signal(point.spaceNodeId),
         data: signal({
-          canDetach: layers.length > 1,
+          canDetach: spaces.length > 1,
         }),
       },
     ];
