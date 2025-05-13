@@ -12,7 +12,7 @@ import {
 import { NgTemplateOutlet } from '@angular/common';
 import { Node, DynamicNode } from '../../interfaces/node.interface';
 import { Edge } from '../../interfaces/edge.interface';
-import { LayeredPoint, Point } from '../../interfaces/point.interface';
+import { SpacePoint, Point } from '../../interfaces/point.interface';
 import { Background } from '../../types/background.type';
 import { Optimization } from '../../interfaces/optimization.interface';
 import { KeyboardShortcuts } from '../../types/keyboard-action.type';
@@ -218,10 +218,10 @@ export class VflowMockComponent implements AsInterface<VflowComponent>, OnInit {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public fitView(options?: FitViewOptions): void {}
 
-  public documentPointToFlowPoint(point: Point, options?: { layers: false }): Point;
-  public documentPointToFlowPoint(point: Point, options: { layers: true }): LayeredPoint[];
-  public documentPointToFlowPoint(point: Point, options?: { layers: boolean }): unknown {
-    if (options?.layers) {
+  public documentPointToFlowPoint(point: Point, options?: { spaces: false }): Point;
+  public documentPointToFlowPoint(point: Point, options: { spaces: true }): SpacePoint[];
+  public documentPointToFlowPoint(point: Point, options?: { spaces: boolean }): unknown {
+    if (options?.spaces) {
       return [
         {
           nodeId: null,

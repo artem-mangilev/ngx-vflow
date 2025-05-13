@@ -28,7 +28,7 @@ import {
 } from '../../directives/template.directive';
 import { addNodesToEdges } from '../../utils/add-nodes-to-edges';
 import { skip } from 'rxjs';
-import { LayeredPoint, Point } from '../../interfaces/point.interface';
+import { SpacePoint, Point } from '../../interfaces/point.interface';
 import { ViewportState } from '../../interfaces/viewport.interface';
 import { FlowStatusService } from '../../services/flow-status.service';
 import { FlowEntitiesService } from '../../services/flow-entities.service';
@@ -63,7 +63,7 @@ import { RootPointerDirective } from '../../directives/root-pointer.directive';
 import { RootSvgContextDirective } from '../../directives/root-svg-context.directive';
 import { RootSvgReferenceDirective } from '../../directives/reference.directive';
 import { EdgeRenderingService } from '../../services/edge-rendering.service';
-import { getLayeredPoints } from '../../utils/get-layered-points';
+import { getSpacePoints } from '../../utils/get-layered-points';
 import { getIntesectingNodes } from '../../utils/nodes';
 import { IntersectingNodesOptions } from '../../interfaces/intersecting-nodes-options.interface';
 
@@ -426,17 +426,17 @@ export class VflowComponent {
    * Convert point received from document to point on the flow
    */
   public documentPointToFlowPoint(point: Point): Point;
-  public documentPointToFlowPoint(point: Point, options?: { layers: false }): Point;
+  public documentPointToFlowPoint(point: Point, options?: { spaces: false }): Point;
   /**
-   * Convert point received from document to a stack of layered points on the flow
-   * Layered point has a nodeId, coordinates are relative to this node
+   * Convert point received from document to a stack of space points on the flow
+   * Space point has a spaceNodeId, coordinates are relative to this node
    */
-  public documentPointToFlowPoint(point: Point, options?: { layers: true }): LayeredPoint[];
-  public documentPointToFlowPoint(point: Point, options?: { layers: boolean }): unknown {
+  public documentPointToFlowPoint(point: Point, options?: { spaces: true }): SpacePoint[];
+  public documentPointToFlowPoint(point: Point, options?: { spaces: boolean }): unknown {
     const transformedPoint = this.spacePointContext().documentPointToFlowPoint(point);
 
-    if (options?.layers) {
-      return getLayeredPoints(transformedPoint, this.nodeRenderingService.groups());
+    if (options?.spaces) {
+      return getSpacePoints(transformedPoint, this.nodeRenderingService.groups());
     }
 
     return transformedPoint;
@@ -480,7 +480,7 @@ export class VflowComponent {
 
     if (!coordinateSpaceNode) return { x: Infinity, y: Infinity };
 
-    return getLayeredPoints(node.globalPoint(), [coordinateSpaceNode])[0];
+    return getSpacePoints(node.globalPoint(), [coordinateSpaceNode])[0];
   }
   // #endregion
 

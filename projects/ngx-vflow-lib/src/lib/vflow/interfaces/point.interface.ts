@@ -3,6 +3,6 @@ export interface Point {
   y: number;
 }
 
-export interface LayeredPoint extends Point {
-  nodeId: string | null;
+export interface SpacePoint extends Point {
+  spaceNodeId: string | null;
 }

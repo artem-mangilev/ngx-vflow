@@ -1,4 +1,4 @@
-import { LayeredPoint, Point } from '../interfaces/point.interface';
+import { SpacePoint, Point } from '../interfaces/point.interface';
 import { NodeModel } from '../models/node.model';
 
 /**
@@ -8,8 +8,8 @@ import { NodeModel } from '../models/node.model';
  * @param groups sorted array of groups
  * @returns
  */
-export function getLayeredPoints(point: Point, groups: NodeModel[]): LayeredPoint[] {
-  const result: LayeredPoint[] = [];
+export function getSpacePoints(point: Point, groups: NodeModel[]): SpacePoint[] {
+  const result: SpacePoint[] = [];
 
   for (const group of groups) {
     const { x, y } = group.globalPoint();
@@ -18,7 +18,7 @@ export function getLayeredPoints(point: Point, groups: NodeModel[]): LayeredPoin
       result.push({
         x: point.x - x,
         y: point.y - y,
-        nodeId: group.rawNode.id,
+        spaceNodeId: group.rawNode.id,
       });
     }
   }
@@ -26,7 +26,7 @@ export function getLayeredPoints(point: Point, groups: NodeModel[]): LayeredPoin
   result.reverse();
 
   // TODO: spread does not work, because the point is SVGPoint
-  result.push({ nodeId: null, x: point.x, y: point.y });
+  result.push({ spaceNodeId: null, x: point.x, y: point.y });
 
   return result;
 }
