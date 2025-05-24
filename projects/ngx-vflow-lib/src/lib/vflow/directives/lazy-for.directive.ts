@@ -246,7 +246,9 @@ export class LazyForDirective<T, U extends NgIterable<T> = NgIterable<T>> implem
         bufferCount(this._itemsPerFrame),
         concatMap((itemList) => of(itemList).pipe(delayWhen(() => animationFrames()))),
         tap((itemList: Array<LazyForItem<T>>) => {
-          itemList.forEach((data: LazyForItem<T>) => {
+          for (let i: number = 0; i < itemList.length; i++) {
+            const data: LazyForItem<T> = itemList[i];
+
             if (data.item.previousIndex === null) {
               this._viewContainer.createEmbeddedView(
                 this._template,
@@ -260,7 +262,7 @@ export class LazyForDirective<T, U extends NgIterable<T> = NgIterable<T>> implem
               this._viewContainer.move(view, data.currentIndex);
               this.applyViewChange(view as EmbeddedViewRef<LazyForContextModel<T, U>>, data.item);
             }
-          });
+          }
 
           this.updateViewContext();
 
