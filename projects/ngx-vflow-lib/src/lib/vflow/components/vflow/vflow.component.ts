@@ -66,6 +66,7 @@ import { EdgeRenderingService } from '../../services/edge-rendering.service';
 import { getSpacePoints } from '../../utils/get-space-points';
 import { getIntesectingNodes } from '../../utils/nodes';
 import { IntersectingNodesOptions } from '../../interfaces/intersecting-nodes-options.interface';
+import { LazyForDirective } from '../../directives/lazy-for.directive';
 
 const changesControllerHostDirective = {
   directive: ChangesControllerDirective,
@@ -137,6 +138,7 @@ const changesControllerHostDirective = {
     NodeComponent,
     EdgeComponent,
     NgTemplateOutlet,
+    LazyForDirective,
   ],
 })
 export class VflowComponent {

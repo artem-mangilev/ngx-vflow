@@ -9,51 +9,49 @@
 
     @if (optimization().detachedGroupsLayer) {
       <!-- Groups -->
-      @for (model of groups(); track trackNodes($index, model)) {
-        <svg:g
-          node
-          [model]="model"
-          [groupNodeTemplate]="groupNodeTemplateDirective()?.templateRef"
-          [attr.transform]="model.pointTransform()" />
-      }
+      <svg:g
+        *lazyFor="let model of groups(); trackBy: trackNodes"
+        node
+        [model]="model"
+        [groupNodeTemplate]="groupNodeTemplateDirective()?.templateRef"
+        [attr.transform]="model.pointTransform()" />
+
       <!-- Edges  -->
-      @for (model of edgeModels(); track trackEdges($index, model)) {
-        <svg:g
-          edge
-          [model]="model"
-          [edgeTemplate]="edgeTemplateDirective()?.templateRef"
-          [edgeLabelHtmlTemplate]="edgeLabelHtmlDirective()?.templateRef" />
-      }
+      <svg:g
+        *lazyFor="let model of edgeModels(); trackBy: trackEdges"
+        edge
+        [model]="model"
+        [edgeTemplate]="edgeTemplateDirective()?.templateRef"
+        [edgeLabelHtmlTemplate]="edgeLabelHtmlDirective()?.templateRef" />
+
       <!-- Nodes -->
-      @for (model of nonGroups(); track trackNodes($index, model)) {
-        <svg:g
-          node
-          [model]="model"
-          [nodeTemplate]="nodeTemplateDirective()?.templateRef"
-          [nodeSvgTemplate]="nodeSvgTemplateDirective()?.templateRef"
-          [attr.transform]="model.pointTransform()" />
-      }
+      <svg:g
+        *lazyFor="let model of nonGroups(); trackBy: trackNodes"
+        node
+        [model]="model"
+        [nodeTemplate]="nodeTemplateDirective()?.templateRef"
+        [nodeSvgTemplate]="nodeSvgTemplateDirective()?.templateRef"
+        [attr.transform]="model.pointTransform()" />
     }
 
     @if (!optimization().detachedGroupsLayer) {
       <!-- Edges  -->
-      @for (model of edgeModels(); track trackEdges($index, model)) {
-        <svg:g
-          edge
-          [model]="model"
-          [edgeTemplate]="edgeTemplateDirective()?.templateRef"
-          [edgeLabelHtmlTemplate]="edgeLabelHtmlDirective()?.templateRef" />
-      }
+      <svg:g
+        *lazyFor="let model of edgeModels(); trackBy: trackEdges"
+        edge
+        [model]="model"
+        [edgeTemplate]="edgeTemplateDirective()?.templateRef"
+        [edgeLabelHtmlTemplate]="edgeLabelHtmlDirective()?.templateRef" />
+
       <!-- Nodes -->
-      @for (model of nodeModels(); track trackNodes($index, model)) {
-        <svg:g
-          node
-          [model]="model"
-          [nodeTemplate]="nodeTemplateDirective()?.templateRef"
-          [nodeSvgTemplate]="nodeSvgTemplateDirective()?.templateRef"
-          [groupNodeTemplate]="groupNodeTemplateDirective()?.templateRef"
-          [attr.transform]="model.pointTransform()" />
-      }
+      <svg:g
+        *lazyFor="let model of nodeModels(); trackBy: trackNodes"
+        node
+        [model]="model"
+        [nodeTemplate]="nodeTemplateDirective()?.templateRef"
+        [nodeSvgTemplate]="nodeSvgTemplateDirective()?.templateRef"
+        [groupNodeTemplate]="groupNodeTemplateDirective()?.templateRef"
+        [attr.transform]="model.pointTransform()" />
     }
   </svg:g>
 
