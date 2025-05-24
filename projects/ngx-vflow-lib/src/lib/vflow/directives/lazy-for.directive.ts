@@ -4,14 +4,13 @@ import {
   Directive,
   DoCheck,
   EmbeddedViewRef,
-  EventEmitter,
+  inject,
   Input,
   IterableChangeRecord,
   IterableChanges,
   IterableDiffer,
   IterableDiffers,
   NgIterable,
-  Output,
   TemplateRef,
   TrackByFunction,
   ViewContainerRef,
@@ -84,6 +83,12 @@ type LazyForItem<T> = {
   standalone: true,
 })
 export class LazyForDirective<T, U extends NgIterable<T> = NgIterable<T>> implements DoCheck {
+  private _template = inject<TemplateRef<LazyForContextModel<T, U>>>(TemplateRef);
+  private _viewContainer = inject(ViewContainerRef);
+  private _differs = inject(IterableDiffers);
+  private _cdr = inject(ChangeDetectorRef);
+  private _destroyRef$ = inject(DestroyRef);
+
   /**
    * Asserts the correct type of the context for the template that `lazyFor` will render.
    *
@@ -144,13 +149,6 @@ export class LazyForDirective<T, U extends NgIterable<T> = NgIterable<T>> implem
       this._template = value;
     }
   }
-  //#region
-
-  //#region OUTPUTS
-  /** Output with lazy render directive state */
-  @Output()
-  public readonly lazyForStateEvent: EventEmitter<LazyForState> = new EventEmitter<LazyForState>();
-  //#endregion
 
   /** Getter for TrackBy function */
   public get lazyForTrackBy(): TrackByFunction<T> {
@@ -167,7 +165,7 @@ export class LazyForDirective<T, U extends NgIterable<T> = NgIterable<T>> implem
   /** trackBy function */
   private _trackByFn!: TrackByFunction<T>;
   /** Number of items to be rendered per frame */
-  private _itemsPerFrame: number = 1;
+  private _itemsPerFrame: number = 5;
   /** Directive state */
   private _lazyForState: LazyForState = LazyForState.idle;
   //#endregion
@@ -177,13 +175,7 @@ export class LazyForDirective<T, U extends NgIterable<T> = NgIterable<T>> implem
   private readonly _rerenderUnsub$: Subject<void> = new Subject<void>();
   //#endregion
 
-  constructor(
-    private _template: TemplateRef<LazyForContextModel<T, U>>,
-    private readonly _viewContainer: ViewContainerRef,
-    private readonly _differs: IterableDiffers,
-    private readonly _cdr: ChangeDetectorRef,
-    private readonly _destroyRef$: DestroyRef,
-  ) {
+  constructor() {
     this._destroyRef$.onDestroy(() => this._viewContainer.clear());
   }
 
@@ -274,7 +266,7 @@ export class LazyForDirective<T, U extends NgIterable<T> = NgIterable<T>> implem
 
           this._cdr.markForCheck();
         }),
-        /** При помощи take мы автоматически отписываемся от потока при завершении рендера */
+        /** Using take we automatically unsubscribe from the stream when rendering is complete */
         take(Math.ceil(itemDataListToRender.length / this._itemsPerFrame)),
         takeUntil(this._rerenderUnsub$),
         takeUntilDestroyed(this._destroyRef$),
@@ -319,6 +311,5 @@ export class LazyForDirective<T, U extends NgIterable<T> = NgIterable<T>> implem
    */
   private updateLazyForState(stateToSet: LazyForState): void {
     this._lazyForState = stateToSet;
-    this.lazyForStateEvent.emit(this._lazyForState);
   }
 }
