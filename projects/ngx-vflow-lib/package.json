@@ -19,8 +19,8 @@
     "build": "ng build"
   },
   "peerDependencies": {
-    "@angular/common": "^17.3.12 || 18.x || 19.x",
-    "@angular/core": "^17.3.12 || 18.x || 19.x",
+    "@angular/common": "^17.3.12 || 18.x || 19.x || 20.x",
+    "@angular/core": "^17.3.12 || 18.x || 19.x || 20.x",
     "d3-drag": "^3.0.0",
     "d3-selection": "^3.0.0",
     "d3-zoom": "^3.0.0",

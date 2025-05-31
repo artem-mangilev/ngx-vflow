@@ -1,12 +1,12 @@
 import { Directive, TemplateRef, inject } from '@angular/core';
-import {
+import type {
   ConnectionTemplateDirective,
   EdgeLabelHtmlTemplateDirective,
   EdgeTemplateDirective,
   GroupNodeTemplateDirective,
   HandleTemplateDirective,
   NodeHtmlTemplateDirective,
-} from '../../directives/template.directive';
+} from 'ngx-vflow';
 import { AsInterface } from '../types';
 
 @Directive({

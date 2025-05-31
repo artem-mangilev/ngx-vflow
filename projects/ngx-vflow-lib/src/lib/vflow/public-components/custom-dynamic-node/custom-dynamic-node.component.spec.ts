@@ -1,9 +1,8 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { CustomDynamicNodeComponent } from './custom-dynamic-node.component';
-import { provideCustomNodeMocks } from '../../testing-utils/provide-custom-node-mocks';
 import { Vflow } from '../../vflow';
-import { VflowMocks } from '../../testing-utils/vflow-mocks';
+import { VflowMocks, provideCustomNodeMocks } from 'ngx-vflow/testing';
 
 @Component({
   standalone: true,

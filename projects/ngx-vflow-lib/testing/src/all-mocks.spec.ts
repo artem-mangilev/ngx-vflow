@@ -1,10 +1,10 @@
 import { ChangeDetectionStrategy, Component, viewChild } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { VflowComponent } from '../components/vflow/vflow.component';
-import { Vflow } from '../vflow';
-import { Node } from '../interfaces/node.interface';
-import { Edge } from '../interfaces/edge.interface';
-import { ConnectionSettings } from '../interfaces/connection-settings.interface';
+import { VflowComponent } from '../../src/public-api';
+import { Vflow } from '../../src/public-api';
+import { Node } from '../../src/public-api';
+import { Edge } from '../../src/public-api';
+import { ConnectionSettings } from '../../src/public-api';
 import { VflowMocks } from './vflow-mocks';
 
 @Component({
