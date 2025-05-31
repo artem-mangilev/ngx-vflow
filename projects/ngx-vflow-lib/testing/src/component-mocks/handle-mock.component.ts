@@ -1,6 +1,5 @@
 import { ChangeDetectionStrategy, Component, input, TemplateRef, OnInit } from '@angular/core';
-import { Position } from '../../types/position.type';
-import type { HandleComponent } from '../../public-components/handle/handle.component';
+import type { HandleComponent, Position } from 'ngx-vflow';
 import { AsInterface } from '../types';
 
 @Component({

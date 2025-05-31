@@ -10,18 +10,25 @@ import {
   OnInit,
 } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
-import { Node, DynamicNode } from '../../interfaces/node.interface';
-import { Edge } from '../../interfaces/edge.interface';
-import { SpacePoint, Point } from '../../interfaces/point.interface';
-import { Background } from '../../types/background.type';
-import { Optimization } from '../../interfaces/optimization.interface';
-import { KeyboardShortcuts } from '../../types/keyboard-action.type';
-import { ConnectionSettings } from '../../interfaces/connection-settings.interface';
-import { ViewportState } from '../../interfaces/viewport.interface';
-import { NodeChange } from '../../types/node-change.type';
-import { EdgeChange } from '../../types/edge-change.type';
+import {
+  Node,
+  DynamicNode,
+  Edge,
+  SpacePoint,
+  Point,
+  Background,
+  Optimization,
+  KeyboardShortcuts,
+  ConnectionSettings,
+  ViewportState,
+  NodeChange,
+  EdgeChange,
+  FitViewOptions,
+  VflowComponent,
+  IntersectingNodesOptions,
+  ɵConnectionModel as ConnectionModel,
+} from 'ngx-vflow';
 import { toObservable } from '@angular/core/rxjs-interop';
-import { FitViewOptions } from '../../interfaces/fit-view-options.interface';
 import {
   ConnectionTemplateMockDirective,
   EdgeLabelHtmlTemplateMockDirective,
@@ -29,10 +36,7 @@ import {
   GroupNodeTemplateMockDirective,
   NodeHtmlTemplateMockDirective,
 } from '../directive-mocks/template-mock.directive';
-import type { VflowComponent } from '../../components/vflow/vflow.component';
-import { ConnectionModel } from '../../models/connection.model';
 import { AsInterface } from '../types';
-import { IntersectingNodesOptions } from '../../interfaces/intersecting-nodes-options.interface';
 
 @Component({
   selector: 'vflow',

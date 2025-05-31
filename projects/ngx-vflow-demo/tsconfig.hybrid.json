@@ -8,7 +8,8 @@
       "@ng-doc/generated": ["ng-doc/ngx-vflow-demo/index.ts"],
       "@ng-doc/generated/*": ["ng-doc/ngx-vflow-demo/*"],
       // alias to production build of the library instead of building it as part of application
-      "ngx-vflow": ["dist/ngx-vflow-lib"]
+      "ngx-vflow": ["dist/ngx-vflow-lib"],
+      "ngx-vflow/testing": ["dist/ngx-vflow-lib/testing"]
     }
   },
   "files": ["src/main.ts"],

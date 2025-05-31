@@ -1,16 +1,18 @@
 import { Provider, signal } from '@angular/core';
-import { ComponentEventBusService } from '../services/component-event-bus.service';
-import { HandleService } from '../services/handle.service';
-import { NodeModel } from '../models/node.model';
-import { FlowSettingsService } from '../services/flow-settings.service';
-import { FlowEntitiesService } from '../services/flow-entities.service';
-import { NodeAccessorService } from '../services/node-accessor.service';
-import { RootPointerDirective } from '../directives/root-pointer.directive';
+import {
+  ɵNodeModel as NodeModel,
+  ɵComponentEventBusService as ComponentEventBusService,
+  ɵHandleService as HandleService,
+  ɵFlowSettingsService as FlowSettingsService,
+  ɵFlowEntitiesService as FlowEntitiesService,
+  ɵNodeAccessorService as NodeAccessorService,
+  ɵRootPointerDirective as RootPointerDirective,
+  ɵSpacePointContextDirective as SpacePointContextDirective,
+  ɵViewportService as ViewportService,
+  ɵSelectionService as SelectionService,
+  Point,
+} from 'ngx-vflow';
 import { of } from 'rxjs';
-import { ViewportService } from '../services/viewport.service';
-import { SpacePointContextDirective } from '../directives/space-point-context.directive';
-import { Point } from '../interfaces/point.interface';
-import { SelectionService } from '../services/selection.service';
 
 const mockModel = () => new NodeModel({ id: 'mock', type: 'default', point: { x: 0, y: 0 } });
 

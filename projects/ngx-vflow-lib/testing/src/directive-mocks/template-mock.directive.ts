@@ -6,7 +6,7 @@ import type {
   GroupNodeTemplateDirective,
   HandleTemplateDirective,
   NodeHtmlTemplateDirective,
-} from '../../directives/template.directive';
+} from 'ngx-vflow';
 import { AsInterface } from '../types';
 
 @Directive({

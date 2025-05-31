@@ -41,15 +41,18 @@ export * from './lib/vflow/directives/changes-controller.directive';
 export * from './lib/vflow/directives/selectable.directive';
 export * from './lib/vflow/directives/drag-handle.directive';
 
-// Testing
-export * from './lib/vflow/testing-utils/provide-custom-node-mocks';
-export * from './lib/vflow/testing-utils/component-mocks/vflow-mock.component';
-export * from './lib/vflow/testing-utils/component-mocks/handle-mock.component';
-export * from './lib/vflow/testing-utils/component-mocks/resizable-mock.component';
-export * from './lib/vflow/testing-utils/component-mocks/minimap-mock.component';
-export * from './lib/vflow/testing-utils/component-mocks/node-toolbar-mock.component';
-export * from './lib/vflow/testing-utils/directive-mocks/connection-controller-mock.directive';
-export * from './lib/vflow/testing-utils/directive-mocks/drag-handle-mock.directive';
-export * from './lib/vflow/testing-utils/directive-mocks/selectable-mock.directive';
-export * from './lib/vflow/testing-utils/directive-mocks/template-mock.directive';
-export * from './lib/vflow/testing-utils/vflow-mocks';
+// ! Internals
+export { ConnectionModel as ɵConnectionModel } from './lib/vflow/models/connection.model';
+export { HandleModel as ɵHandleModel } from './lib/vflow/models/handle.model';
+export { NodeModel as ɵNodeModel } from './lib/vflow/models/node.model';
+
+export { ComponentEventBusService as ɵComponentEventBusService } from './lib/vflow/services/component-event-bus.service';
+export { HandleService as ɵHandleService } from './lib/vflow/services/handle.service';
+export { FlowSettingsService as ɵFlowSettingsService } from './lib/vflow/services/flow-settings.service';
+export { FlowEntitiesService as ɵFlowEntitiesService } from './lib/vflow/services/flow-entities.service';
+export { NodeAccessorService as ɵNodeAccessorService } from './lib/vflow/services/node-accessor.service';
+export { ViewportService as ɵViewportService } from './lib/vflow/services/viewport.service';
+export { SelectionService as ɵSelectionService } from './lib/vflow/services/selection.service';
+
+export { RootPointerDirective as ɵRootPointerDirective } from './lib/vflow/directives/root-pointer.directive';
+export { SpacePointContextDirective as ɵSpacePointContextDirective } from './lib/vflow/directives/space-point-context.directive';
