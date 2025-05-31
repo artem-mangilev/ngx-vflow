@@ -1,7 +1,7 @@
 import { Directive, output } from '@angular/core';
 import { Connection, ReconnectionEvent } from '../../interfaces/connection.interface';
 import { AsInterface } from '../types';
-import { ConnectionControllerDirective } from '../../directives/connection-controller.directive';
+import type { ConnectionControllerDirective } from '../../directives/connection-controller.directive';
 import { HandleModel } from '../../models/handle.model';
 
 @Directive({ selector: '[onConnect]', standalone: true })

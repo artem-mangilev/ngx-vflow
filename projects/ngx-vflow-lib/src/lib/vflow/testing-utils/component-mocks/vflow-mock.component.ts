@@ -29,7 +29,7 @@ import {
   GroupNodeTemplateMockDirective,
   NodeHtmlTemplateMockDirective,
 } from '../directive-mocks/template-mock.directive';
-import { VflowComponent } from '../../components/vflow/vflow.component';
+import type { VflowComponent } from '../../components/vflow/vflow.component';
 import { ConnectionModel } from '../../models/connection.model';
 import { AsInterface } from '../types';
 import { IntersectingNodesOptions } from '../../interfaces/intersecting-nodes-options.interface';

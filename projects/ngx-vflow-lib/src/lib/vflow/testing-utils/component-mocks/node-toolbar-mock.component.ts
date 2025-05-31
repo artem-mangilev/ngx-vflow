@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, input, OnInit, OnDestroy } from '@angular/core';
 import { Position } from '../../types/position.type';
-import { NodeToolbarComponent } from '../../public-components/node-toolbar/node-toolbar.component';
+import type { NodeToolbarComponent } from '../../public-components/node-toolbar/node-toolbar.component';
 import { AsInterface } from '../types';
 
 @Component({

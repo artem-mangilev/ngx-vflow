@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { AsInterface } from '../types';
-import { CustomTemplateEdgeComponent } from '../../public-components/custom-template-edge/custom-template-edge.component';
+import type { CustomTemplateEdgeComponent } from '../../public-components/custom-template-edge/custom-template-edge.component';
 
 @Component({
   selector: 'g[customTemplateEdge]',

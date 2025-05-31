@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, input, OnInit, AfterViewInit } from '@angular/core';
-import { ResizableComponent } from '../../public-components/resizable/resizable.component';
+import type { ResizableComponent } from '../../public-components/resizable/resizable.component';
 import { AsInterface } from '../types';
 
 @Component({

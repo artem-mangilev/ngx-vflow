@@ -1,6 +1,6 @@
 import { Directive } from '@angular/core';
 import { AsInterface } from '../types';
-import { SelectableDirective } from '../../directives/selectable.directive';
+import type { SelectableDirective } from '../../directives/selectable.directive';
 
 @Directive({
   selector: '[selectable]',

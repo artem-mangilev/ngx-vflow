@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, input, OnInit } from '@angular/core';
-import { MiniMapComponent, MiniMapPosition } from '../../public-components/minimap/minimap.component';
+import type { MiniMapComponent, MiniMapPosition } from '../../public-components/minimap/minimap.component';
 import { AsInterface } from '../types';
 
 @Component({

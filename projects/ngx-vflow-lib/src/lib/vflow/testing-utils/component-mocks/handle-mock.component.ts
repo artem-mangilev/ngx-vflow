@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, input, TemplateRef, OnInit } from '@angular/core';
 import { Position } from '../../types/position.type';
-import { HandleComponent } from '../../public-components/handle/handle.component';
+import type { HandleComponent } from '../../public-components/handle/handle.component';
 import { AsInterface } from '../types';
 
 @Component({

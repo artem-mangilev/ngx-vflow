@@ -1,5 +1,5 @@
 import { Directive, TemplateRef, inject } from '@angular/core';
-import {
+import type {
   ConnectionTemplateDirective,
   EdgeLabelHtmlTemplateDirective,
   EdgeTemplateDirective,
