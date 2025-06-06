@@ -1,1 +1,0 @@
-import"./chunk-ODLL2QMY.js";var t=[{path:"",redirectTo:"unit-testing-component-nodes",pathMatch:"full"},{path:"",title:"Testing",children:[{path:"unit-testing-component-nodes",loadChildren:()=>import("./chunk-VPDZ2RV2.js")},{path:"component-mocks",loadChildren:()=>import("./chunk-7P6HR5TA.js")}]}],e=t;export{e as default};
