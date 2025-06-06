@@ -3,7 +3,6 @@ import {
   Component,
   Injector,
   Input,
-  computed,
   inject,
   runInInjectionContext,
   input,
@@ -271,9 +270,14 @@ export class VflowComponent {
     models.forEach((model) => this.nodeRenderingService.pullNode(model));
   }
 
-  protected nodeModels = computed(() => this.nodeRenderingService.nodes());
-  protected groups = computed(() => this.nodeRenderingService.groups());
-  protected nonGroups = computed(() => this.nodeRenderingService.nonGroups());
+  protected nodeModels = this.nodeRenderingService.nodes;
+  protected nodesPerFrame = this.nodeRenderingService.nodesPerFrame;
+
+  protected groups = this.nodeRenderingService.groups;
+  protected groupsPerFrame = this.nodeRenderingService.groupsPerFrame;
+
+  protected nonGroups = this.nodeRenderingService.nonGroups;
+  protected nonGroupsPerFrame = this.nodeRenderingService.nonGroupsPerFrame;
 
   /**
    * Edges to render
@@ -290,7 +294,8 @@ export class VflowComponent {
     this.flowEntitiesService.edges.set(newModels);
   }
 
-  protected edgeModels = computed(() => this.edgeRenderingService.edges());
+  protected edgeModels = this.edgeRenderingService.edges;
+  protected edgesPerFrame = this.edgeRenderingService.edgesPerFrame;
   // #endregion
 
   // #region OUTPUTS

@@ -10,7 +10,7 @@
     @if (optimization().detachedGroupsLayer) {
       <!-- Groups -->
       <svg:g
-        *lazyFor="let model of groups(); trackBy: trackNodes"
+        *lazyFor="let model of groups(); trackBy: trackNodes; itemsPerFrame: groupsPerFrame()"
         node
         [model]="model"
         [groupNodeTemplate]="groupNodeTemplateDirective()?.templateRef"
@@ -18,7 +18,7 @@
 
       <!-- Edges  -->
       <svg:g
-        *lazyFor="let model of edgeModels(); trackBy: trackEdges"
+        *lazyFor="let model of edgeModels(); trackBy: trackEdges; itemsPerFrame: edgesPerFrame()"
         edge
         [model]="model"
         [edgeTemplate]="edgeTemplateDirective()?.templateRef"
@@ -26,7 +26,7 @@
 
       <!-- Nodes -->
       <svg:g
-        *lazyFor="let model of nonGroups(); trackBy: trackNodes"
+        *lazyFor="let model of nonGroups(); trackBy: trackNodes; itemsPerFrame: nonGroupsPerFrame()"
         node
         [model]="model"
         [nodeTemplate]="nodeTemplateDirective()?.templateRef"
@@ -37,7 +37,7 @@
     @if (!optimization().detachedGroupsLayer) {
       <!-- Edges  -->
       <svg:g
-        *lazyFor="let model of edgeModels(); trackBy: trackEdges"
+        *lazyFor="let model of edgeModels(); trackBy: trackEdges; itemsPerFrame: edgesPerFrame()"
         edge
         [model]="model"
         [edgeTemplate]="edgeTemplateDirective()?.templateRef"
@@ -45,7 +45,7 @@
 
       <!-- Nodes -->
       <svg:g
-        *lazyFor="let model of nodeModels(); trackBy: trackNodes"
+        *lazyFor="let model of nodeModels(); trackBy: trackNodes; itemsPerFrame: nodesPerFrame()"
         node
         [model]="model"
         [nodeTemplate]="nodeTemplateDirective()?.templateRef"
