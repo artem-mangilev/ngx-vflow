@@ -1,16 +1,9 @@
 import { PathData } from '../../interfaces/path-data.interface';
 import { Point } from '../../interfaces/point.interface';
-import { UsingPoints } from '../../types/using-points.type';
 import { Position } from '../../types/position.type';
 import { getPointOnLineByRatio } from '../point-on-line-by-ratio';
 
-export function bezierPath(
-  source: Point,
-  target: Point,
-  sourcePosition: Position,
-  targetPosition: Position,
-  usingPoints: UsingPoints = [false, false, false],
-): PathData {
+export function bezierPath(source: Point, target: Point, sourcePosition: Position, targetPosition: Position): PathData {
   const distanceVector = { x: source.x - target.x, y: source.y - target.y };
 
   const sourceControl = calcControlPoint(source, sourcePosition, distanceVector);
@@ -18,7 +11,7 @@ export function bezierPath(
 
   const path = `M${source.x},${source.y} C${sourceControl.x},${sourceControl.y} ${targetControl.x},${targetControl.y} ${target.x},${target.y}`;
 
-  return getPathData(path, source, target, sourceControl, targetControl, usingPoints);
+  return getPathData(path, source, target, sourceControl, targetControl);
 }
 
 /**
@@ -65,24 +58,13 @@ function calcControlPoint(point: Point, pointPosition: Position, distanceVector:
   };
 }
 
-function getPathData(
-  path: string,
-  source: Point,
-  target: Point,
-  sourceControl: Point,
-  targetControl: Point,
-  usingPoints: UsingPoints,
-): PathData {
-  const [start, center, end] = usingPoints;
-
-  const nullPoint = { x: 0, y: 0 };
-
+function getPathData(path: string, source: Point, target: Point, sourceControl: Point, targetControl: Point): PathData {
   return {
     path,
     points: {
-      start: start ? getPointOnBezier(source, target, sourceControl, targetControl, 0.1) : nullPoint,
-      center: center ? getPointOnBezier(source, target, sourceControl, targetControl, 0.5) : nullPoint,
-      end: end ? getPointOnBezier(source, target, sourceControl, targetControl, 0.9) : nullPoint,
+      start: getPointOnBezier(source, target, sourceControl, targetControl, 0.1),
+      center: getPointOnBezier(source, target, sourceControl, targetControl, 0.5),
+      end: getPointOnBezier(source, target, sourceControl, targetControl, 0.9),
     },
   };
 }
