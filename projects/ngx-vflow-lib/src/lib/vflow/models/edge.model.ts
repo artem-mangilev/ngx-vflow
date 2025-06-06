@@ -164,7 +164,7 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
 
   private getPathFactoryParams(source: HandleModel, target: HandleModel): CurveFactoryParams {
     return {
-      isConnection: false,
+      mode: 'edge',
       edge: this.edge,
       sourcePoint: source.pointAbsolute(),
       targetPoint: target.pointAbsolute(),

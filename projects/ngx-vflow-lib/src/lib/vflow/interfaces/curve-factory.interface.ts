@@ -14,11 +14,11 @@ interface CurveFactorySharedParams {
 }
 
 interface ConnectionCurveFactoryParams extends CurveFactorySharedParams {
-  isConnection: true;
+  mode: 'connection';
 }
 
 interface EdgeCurveFactoryParams extends CurveFactorySharedParams {
-  isConnection: false;
+  mode: 'edge';
   edge: Edge;
 }
 

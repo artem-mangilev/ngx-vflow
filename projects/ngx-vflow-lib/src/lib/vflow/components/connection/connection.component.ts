@@ -136,7 +136,7 @@ export class ConnectionComponent {
     targetPosition: Position,
   ): CurveFactoryParams {
     return {
-      isConnection: true,
+      mode: 'connection',
       sourcePoint,
       targetPoint,
       sourcePosition,
