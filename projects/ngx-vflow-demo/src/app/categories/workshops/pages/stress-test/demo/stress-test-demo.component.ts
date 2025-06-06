@@ -13,7 +13,7 @@ export class StressTestDemoComponent {
   public edges: Edge[] = [];
 
   constructor() {
-    const { nodes, edges } = initialElements(40, 40);
+    const { nodes, edges } = initialElements(32, 32);
     this.nodes = nodes;
     this.edges = edges;
   }
