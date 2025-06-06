@@ -4,7 +4,7 @@ import { Edge } from './edge.interface';
 import { DynamicNode, Node } from './node.interface';
 import { Point } from './point.interface';
 
-interface CurveFactorySharedParams {
+export interface CurveFactorySharedParams {
   sourcePoint: Point;
   targetPoint: Point;
   sourcePosition: Position;
@@ -13,11 +13,11 @@ interface CurveFactorySharedParams {
   allNodes: Node[] | DynamicNode[];
 }
 
-interface ConnectionCurveFactoryParams extends CurveFactorySharedParams {
+export interface ConnectionCurveFactoryParams extends CurveFactorySharedParams {
   mode: 'connection';
 }
 
-interface EdgeCurveFactoryParams extends CurveFactorySharedParams {
+export interface EdgeCurveFactoryParams extends CurveFactorySharedParams {
   mode: 'edge';
   edge: Edge;
 }
