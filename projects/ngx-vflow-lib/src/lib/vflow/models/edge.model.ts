@@ -1,4 +1,4 @@
-import { computed, signal } from '@angular/core';
+import { computed, inject, signal } from '@angular/core';
 import { EdgeLabelPosition } from '../interfaces/edge-label.interface';
 import { Edge, Curve, EdgeType } from '../interfaces/edge.interface';
 import { EdgeLabelModel } from './edge-label.model';
@@ -11,8 +11,13 @@ import { smoothStepPath } from '../math/edge-path/smooth-step-path';
 import { hashCode } from '../utils/hash';
 import { Contextable } from '../interfaces/contextable.interface';
 import { EdgeContext } from '../interfaces/template-context.interface';
+import { HandleModel } from './handle.model';
+import { CurveFactoryParams } from '../interfaces/curve-factory.interface';
+import { FlowEntitiesService } from '../services/flow-entities.service';
 
 export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
+  private readonly flowEntitiesService = inject(FlowEntitiesService);
+
   public source = signal<NodeModel | undefined>(undefined);
   public target = signal<NodeModel | undefined>(undefined);
   public curve: Curve;
@@ -60,7 +65,7 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
     if (!source || !target) {
       return {
         path: '',
-        points: {
+        labelPoints: {
           start: { x: 0, y: 0 },
           center: { x: 0, y: 0 },
           end: { x: 0, y: 0 },
@@ -68,31 +73,19 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
       };
     }
 
+    const params = this.getPathFactoryParams(source, target);
+
     switch (this.curve) {
       case 'straight':
-        return straightPath(source.pointAbsolute(), target.pointAbsolute());
+        return straightPath(params);
       case 'bezier':
-        return bezierPath(
-          source.pointAbsolute(),
-          target.pointAbsolute(),
-          source.rawHandle.position,
-          target.rawHandle.position,
-        );
+        return bezierPath(params);
       case 'smooth-step':
-        return smoothStepPath(
-          source.pointAbsolute(),
-          target.pointAbsolute(),
-          source.rawHandle.position,
-          target.rawHandle.position,
-        );
+        return smoothStepPath(params);
       case 'step':
-        return smoothStepPath(
-          source.pointAbsolute(),
-          target.pointAbsolute(),
-          source.rawHandle.position,
-          target.rawHandle.position,
-          0,
-        );
+        return smoothStepPath(params, 0);
+      default:
+        return this.curve(params);
     }
   });
 
@@ -167,5 +160,18 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
     if (edge.edgeLabels?.start) this.edgeLabels.start = new EdgeLabelModel(edge.edgeLabels.start);
     if (edge.edgeLabels?.center) this.edgeLabels.center = new EdgeLabelModel(edge.edgeLabels.center);
     if (edge.edgeLabels?.end) this.edgeLabels.end = new EdgeLabelModel(edge.edgeLabels.end);
+  }
+
+  private getPathFactoryParams(source: HandleModel, target: HandleModel): CurveFactoryParams {
+    return {
+      isConnection: false,
+      edge: this.edge,
+      sourcePoint: source.pointAbsolute(),
+      targetPoint: target.pointAbsolute(),
+      sourcePosition: source.rawHandle.position,
+      targetPosition: target.rawHandle.position,
+      allEdges: this.flowEntitiesService.rawEdges(),
+      allNodes: this.flowEntitiesService.rawNodes(),
+    };
   }
 }

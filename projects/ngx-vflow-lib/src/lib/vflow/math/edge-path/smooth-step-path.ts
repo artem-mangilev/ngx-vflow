@@ -1,4 +1,4 @@
-import { PathData } from '../../interfaces/path-data.interface';
+import { CurveFactoryParams, CurveLayout } from '../../interfaces/curve-factory.interface';
 import { Point } from '../../interfaces/point.interface';
 import { Position } from '../../types/position.type';
 
@@ -182,16 +182,13 @@ function getBend(a: Point, b: Point, c: Point, size: number): string {
 }
 
 export function smoothStepPath(
-  source: Point,
-  target: Point,
-  sourcePosition: Position,
-  targetPosition: Position,
+  { sourcePoint, targetPoint, sourcePosition, targetPosition }: CurveFactoryParams,
   borderRadius: number = 5,
-): PathData {
+): CurveLayout {
   const [points, labelX, labelY] = getPoints({
-    source,
+    source: sourcePoint,
     sourcePosition,
-    target,
+    target: targetPoint,
     targetPosition,
     offset: 20,
   });
@@ -212,7 +209,7 @@ export function smoothStepPath(
 
   return {
     path,
-    points: {
+    labelPoints: {
       // TODO start and end points temporary unavailable for this path
       start: { x: labelX, y: labelY },
       center: { x: labelX, y: labelY },

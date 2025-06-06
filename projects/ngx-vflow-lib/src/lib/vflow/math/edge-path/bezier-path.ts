@@ -1,17 +1,22 @@
-import { PathData } from '../../interfaces/path-data.interface';
+import { CurveFactoryParams, CurveLayout } from '../../interfaces/curve-factory.interface';
 import { Point } from '../../interfaces/point.interface';
 import { Position } from '../../types/position.type';
 import { getPointOnLineByRatio } from '../point-on-line-by-ratio';
 
-export function bezierPath(source: Point, target: Point, sourcePosition: Position, targetPosition: Position): PathData {
-  const distanceVector = { x: source.x - target.x, y: source.y - target.y };
+export function bezierPath({
+  sourcePoint,
+  targetPoint,
+  sourcePosition,
+  targetPosition,
+}: CurveFactoryParams): CurveLayout {
+  const distanceVector = { x: sourcePoint.x - targetPoint.x, y: sourcePoint.y - targetPoint.y };
 
-  const sourceControl = calcControlPoint(source, sourcePosition, distanceVector);
-  const targetControl = calcControlPoint(target, targetPosition, distanceVector);
+  const sourceControl = calcControlPoint(sourcePoint, sourcePosition, distanceVector);
+  const targetControl = calcControlPoint(targetPoint, targetPosition, distanceVector);
 
-  const path = `M${source.x},${source.y} C${sourceControl.x},${sourceControl.y} ${targetControl.x},${targetControl.y} ${target.x},${target.y}`;
+  const path = `M${sourcePoint.x},${sourcePoint.y} C${sourceControl.x},${sourceControl.y} ${targetControl.x},${targetControl.y} ${targetPoint.x},${targetPoint.y}`;
 
-  return getPathData(path, source, target, sourceControl, targetControl);
+  return getPathData(path, sourcePoint, targetPoint, sourceControl, targetControl);
 }
 
 /**
@@ -58,10 +63,16 @@ function calcControlPoint(point: Point, pointPosition: Position, distanceVector:
   };
 }
 
-function getPathData(path: string, source: Point, target: Point, sourceControl: Point, targetControl: Point): PathData {
+function getPathData(
+  path: string,
+  source: Point,
+  target: Point,
+  sourceControl: Point,
+  targetControl: Point,
+): CurveLayout {
   return {
     path,
-    points: {
+    labelPoints: {
       start: getPointOnBezier(source, target, sourceControl, targetControl, 0.1),
       center: getPointOnBezier(source, target, sourceControl, targetControl, 0.5),
       end: getPointOnBezier(source, target, sourceControl, targetControl, 0.9),

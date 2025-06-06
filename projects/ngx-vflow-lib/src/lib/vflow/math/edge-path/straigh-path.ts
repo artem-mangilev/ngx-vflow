@@ -1,14 +1,13 @@
-import { PathData } from '../../interfaces/path-data.interface';
-import { Point } from '../../interfaces/point.interface';
+import { CurveFactoryParams, CurveLayout } from '../../interfaces/curve-factory.interface';
 import { getPointOnLineByRatio } from '../point-on-line-by-ratio';
 
-export function straightPath(source: Point, target: Point): PathData {
+export function straightPath({ sourcePoint, targetPoint }: CurveFactoryParams): CurveLayout {
   return {
-    path: `M ${source.x},${source.y}L ${target.x},${target.y}`,
-    points: {
-      start: getPointOnLineByRatio(source, target, 0.15),
-      center: getPointOnLineByRatio(source, target, 0.5),
-      end: getPointOnLineByRatio(source, target, 0.85),
+    path: `M ${sourcePoint.x},${sourcePoint.y}L ${targetPoint.x},${targetPoint.y}`,
+    labelPoints: {
+      start: getPointOnLineByRatio(sourcePoint, targetPoint, 0.15),
+      center: getPointOnLineByRatio(sourcePoint, targetPoint, 0.5),
+      end: getPointOnLineByRatio(sourcePoint, targetPoint, 0.85),
     },
   };
 }
