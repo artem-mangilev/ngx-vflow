@@ -9,6 +9,9 @@ import { Position } from '../../types/position.type';
 import { smoothStepPath } from '../../math/edge-path/smooth-step-path';
 import { NgTemplateOutlet } from '@angular/common';
 import { ConnectionContext } from '../../interfaces/template-context.interface';
+import { Point } from '../../interfaces/point.interface';
+import { CurveFactoryParams } from '../../interfaces/curve-factory.interface';
+import { FlowEntitiesService } from '../../services/flow-entities.service';
 
 @Component({
   standalone: true,
@@ -35,15 +38,17 @@ import { ConnectionContext } from '../../interfaces/template-context.interface';
   imports: [NgTemplateOutlet],
 })
 export class ConnectionComponent {
+  private readonly flowStatusService = inject(FlowStatusService);
+  private readonly spacePointContext = inject(SpacePointContextDirective);
+  private readonly flowEntitiesService = inject(FlowEntitiesService);
+
   public model = input.required<ConnectionModel>();
 
   public template = input<TemplateRef<any>>();
 
-  private flowStatusService = inject(FlowStatusService);
-  private spacePointContext = inject(SpacePointContextDirective);
-
   protected path = computed(() => {
     const status = this.flowStatusService.status();
+    const curve = this.model().curve;
 
     if (status.state === 'connection-start' || status.state === 'reconnection-start') {
       const sourceHandle = status.payload.sourceHandle;
@@ -53,15 +58,19 @@ export class ConnectionComponent {
       const targetPoint = this.spacePointContext.svgCurrentSpacePoint();
       const targetPosition = getOppositePostion(sourceHandle.rawHandle.position);
 
-      switch (this.model().curve) {
+      const params = this.getPathFactoryParams(sourcePoint, targetPoint, sourcePosition, targetPosition);
+
+      switch (curve) {
         case 'straight':
-          return straightPath(sourcePoint, targetPoint).path;
+          return straightPath(params).path;
         case 'bezier':
-          return bezierPath(sourcePoint, targetPoint, sourcePosition, targetPosition).path;
+          return bezierPath(params).path;
         case 'smooth-step':
-          return smoothStepPath(sourcePoint, targetPoint, sourcePosition, targetPosition).path;
+          return smoothStepPath(params).path;
         case 'step':
-          return smoothStepPath(sourcePoint, targetPoint, sourcePosition, targetPosition, 0).path;
+          return smoothStepPath(params, 0).path;
+        default:
+          return curve(params).path;
       }
     }
 
@@ -79,15 +88,19 @@ export class ConnectionComponent {
         ? targetHandle.rawHandle.position
         : getOppositePostion(sourceHandle.rawHandle.position);
 
-      switch (this.model().curve) {
+      const params = this.getPathFactoryParams(sourcePoint, targetPoint, sourcePosition, targetPosition);
+
+      switch (curve) {
         case 'straight':
-          return straightPath(sourcePoint, targetPoint).path;
+          return straightPath(params).path;
         case 'bezier':
-          return bezierPath(sourcePoint, targetPoint, sourcePosition, targetPosition).path;
+          return bezierPath(params).path;
         case 'smooth-step':
-          return smoothStepPath(sourcePoint, targetPoint, sourcePosition, targetPosition).path;
+          return smoothStepPath(params).path;
         case 'step':
-          return smoothStepPath(sourcePoint, targetPoint, sourcePosition, targetPosition, 0).path;
+          return smoothStepPath(params, 0).path;
+        default:
+          return curve(params).path;
       }
     }
 
@@ -113,6 +126,23 @@ export class ConnectionComponent {
         path: this.path,
         marker: this.markerUrl,
       },
+    };
+  }
+
+  private getPathFactoryParams(
+    sourcePoint: Point,
+    targetPoint: Point,
+    sourcePosition: Position,
+    targetPosition: Position,
+  ): CurveFactoryParams {
+    return {
+      mode: 'connection',
+      sourcePoint,
+      targetPoint,
+      sourcePosition,
+      targetPosition,
+      allEdges: this.flowEntitiesService.rawEdges(),
+      allNodes: this.flowEntitiesService.rawNodes(),
     };
   }
 }

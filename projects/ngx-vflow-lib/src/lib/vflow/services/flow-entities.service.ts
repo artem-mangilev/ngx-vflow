@@ -6,6 +6,7 @@ import { Marker } from '../interfaces/marker.interface';
 import { hashCode } from '../utils/hash';
 import { FlowEntity } from '../interfaces/flow-entity.interface';
 import { MinimapModel } from '../models/minimap.model';
+import { DynamicNode, Node } from '../interfaces/node.interface';
 
 @Injectable()
 export class FlowEntitiesService {
@@ -14,10 +15,14 @@ export class FlowEntitiesService {
     equal: (a, b) => (!a.length && !b.length ? true : a === b),
   });
 
+  public readonly rawNodes = computed(() => this.nodes().map((n) => n.rawNode) as Node[] | DynamicNode[]);
+
   public readonly edges = signal<EdgeModel[]>([], {
     // empty arrays considered equal, other arrays may not be equal
     equal: (a, b) => (!a.length && !b.length ? true : a === b),
   });
+
+  public readonly rawEdges = computed(() => this.edges().map((e) => e.edge));
 
   public readonly validEdges = computed(() => {
     const nodes = this.nodes();

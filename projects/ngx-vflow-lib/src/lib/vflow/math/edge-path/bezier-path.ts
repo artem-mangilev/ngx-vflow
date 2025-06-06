@@ -1,24 +1,22 @@
-import { PathData } from '../../interfaces/path-data.interface';
+import { CurveFactoryParams, CurveLayout } from '../../interfaces/curve-factory.interface';
 import { Point } from '../../interfaces/point.interface';
-import { UsingPoints } from '../../types/using-points.type';
 import { Position } from '../../types/position.type';
 import { getPointOnLineByRatio } from '../point-on-line-by-ratio';
 
-export function bezierPath(
-  source: Point,
-  target: Point,
-  sourcePosition: Position,
-  targetPosition: Position,
-  usingPoints: UsingPoints = [false, false, false],
-): PathData {
-  const distanceVector = { x: source.x - target.x, y: source.y - target.y };
+export function bezierPath({
+  sourcePoint,
+  targetPoint,
+  sourcePosition,
+  targetPosition,
+}: CurveFactoryParams): CurveLayout {
+  const distanceVector = { x: sourcePoint.x - targetPoint.x, y: sourcePoint.y - targetPoint.y };
 
-  const sourceControl = calcControlPoint(source, sourcePosition, distanceVector);
-  const targetControl = calcControlPoint(target, targetPosition, distanceVector);
+  const sourceControl = calcControlPoint(sourcePoint, sourcePosition, distanceVector);
+  const targetControl = calcControlPoint(targetPoint, targetPosition, distanceVector);
 
-  const path = `M${source.x},${source.y} C${sourceControl.x},${sourceControl.y} ${targetControl.x},${targetControl.y} ${target.x},${target.y}`;
+  const path = `M${sourcePoint.x},${sourcePoint.y} C${sourceControl.x},${sourceControl.y} ${targetControl.x},${targetControl.y} ${targetPoint.x},${targetPoint.y}`;
 
-  return getPathData(path, source, target, sourceControl, targetControl, usingPoints);
+  return getPathData(path, sourcePoint, targetPoint, sourceControl, targetControl);
 }
 
 /**
@@ -71,18 +69,13 @@ function getPathData(
   target: Point,
   sourceControl: Point,
   targetControl: Point,
-  usingPoints: UsingPoints,
-): PathData {
-  const [start, center, end] = usingPoints;
-
-  const nullPoint = { x: 0, y: 0 };
-
+): CurveLayout {
   return {
     path,
-    points: {
-      start: start ? getPointOnBezier(source, target, sourceControl, targetControl, 0.1) : nullPoint,
-      center: center ? getPointOnBezier(source, target, sourceControl, targetControl, 0.5) : nullPoint,
-      end: end ? getPointOnBezier(source, target, sourceControl, targetControl, 0.9) : nullPoint,
+    labelPoints: {
+      start: getPointOnBezier(source, target, sourceControl, targetControl, 0.1),
+      center: getPointOnBezier(source, target, sourceControl, targetControl, 0.5),
+      end: getPointOnBezier(source, target, sourceControl, targetControl, 0.9),
     },
   };
 }
