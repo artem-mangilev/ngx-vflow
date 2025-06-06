@@ -410,42 +410,6 @@
   {
     "breadcrumbs": [
       "Getting Started",
-      "Migrations"
-    ],
-    "pageType": "guide",
-    "title": "Migrations",
-    "section": "Migration to >= v1.0",
-    "route": "/getting-started/migration",
-    "fragment": "migration-to--v10",
-    "content": "remove imports of VflowModule and use Vflow instead (Vflow contains all public standalone components and directives).for standalone components, simply add Vflow to the imports array.for modules, you need to spread ...Vflow into the imports array; otherwise, you will get a type error.remove usage of the computeLayersOnInit setting from the Optimization interface.remove usage of the handlePositions input in the VflowComponent.for classes extending CustomNodeComponent and CustomDynamicNodeComponent:replace this.node to this.node() due to signal input internal migration."
-  },
-  {
-    "breadcrumbs": [
-      "Getting Started",
-      "How node sizing works"
-    ],
-    "pageType": "guide",
-    "title": "How node sizing works",
-    "section": "How node sizing works",
-    "route": "/getting-started/how-node-sizing-works",
-    "fragment": "how-node-sizing-works",
-    "content": "This topic needs some clarification due to the design decisions behind the library. The library renders the flow by combining two technologies: SVG, which is responsible for rendering curves, managing zoom, pan, and other tasks that SVG handles well.HTML (with CSS), which is used to create the content for the nodes, allowing front-end engineers to design dynamic and visually appealing UIs more easily than with SVG. The link between these two technologies is the "
-  },
-  {
-    "breadcrumbs": [
-      "Getting Started",
-      "How node sizing works"
-    ],
-    "pageType": "guide",
-    "title": "How node sizing works",
-    "section": "How node sizing works",
-    "route": "/getting-started/how-node-sizing-works",
-    "fragment": "how-node-sizing-works",
-    "content": " element, which enables HTML to be rendered inside SVG. The diagram below illustrates how this element interacts with its content."
-  },
-  {
-    "breadcrumbs": [
-      "Getting Started",
       "Dynamic vs Static nodes"
     ],
     "pageType": "guide",
@@ -502,6 +466,42 @@
     "route": "/getting-started/dynamic-vs-static-nodes",
     "fragment": "see-also",
     "content": "D3 Force"
+  },
+  {
+    "breadcrumbs": [
+      "Getting Started",
+      "How node sizing works"
+    ],
+    "pageType": "guide",
+    "title": "How node sizing works",
+    "section": "How node sizing works",
+    "route": "/getting-started/how-node-sizing-works",
+    "fragment": "how-node-sizing-works",
+    "content": "This topic needs some clarification due to the design decisions behind the library. The library renders the flow by combining two technologies: SVG, which is responsible for rendering curves, managing zoom, pan, and other tasks that SVG handles well.HTML (with CSS), which is used to create the content for the nodes, allowing front-end engineers to design dynamic and visually appealing UIs more easily than with SVG. The link between these two technologies is the "
+  },
+  {
+    "breadcrumbs": [
+      "Getting Started",
+      "How node sizing works"
+    ],
+    "pageType": "guide",
+    "title": "How node sizing works",
+    "section": "How node sizing works",
+    "route": "/getting-started/how-node-sizing-works",
+    "fragment": "how-node-sizing-works",
+    "content": " element, which enables HTML to be rendered inside SVG. The diagram below illustrates how this element interacts with its content."
+  },
+  {
+    "breadcrumbs": [
+      "Getting Started",
+      "Migrations"
+    ],
+    "pageType": "guide",
+    "title": "Migrations",
+    "section": "Migration to >= v1.0",
+    "route": "/getting-started/migration",
+    "fragment": "migration-to--v10",
+    "content": "remove imports of VflowModule and use Vflow instead (Vflow contains all public standalone components and directives).for standalone components, simply add Vflow to the imports array.for modules, you need to spread ...Vflow into the imports array; otherwise, you will get a type error.remove usage of the computeLayersOnInit setting from the Optimization interface.remove usage of the handlePositions input in the VflowComponent.for classes extending CustomNodeComponent and CustomDynamicNodeComponent:replace this.node to this.node() due to signal input internal migration."
   },
   {
     "breadcrumbs": [
@@ -590,18 +590,6 @@
   {
     "breadcrumbs": [
       "Workshops",
-      "Drag and drop nodes"
-    ],
-    "pageType": "guide",
-    "title": "Drag and drop nodes",
-    "section": "Drag and drop nodes",
-    "route": "/workshops/drag-and-drop-nodes",
-    "fragment": "drag-and-drop-nodes",
-    "content": "This workshop will show you how to implement dynamic node creation with basic drag and drop functionality. It also demonstrates how to attach nodes to groups or detach them from groups. This implementation uses the following APIs from VflowComponent: documentPointToFlowPoint() to get a stack of SpacePointsgetIntersectingNodes() to get intersections between nodes during drag operationstoNodeSpace() to get a node's position in the coordinate system of another node"
-  },
-  {
-    "breadcrumbs": [
-      "Workshops",
       "Delete selected"
     ],
     "pageType": "guide",
@@ -614,6 +602,18 @@
   {
     "breadcrumbs": [
       "Workshops",
+      "Drag and drop nodes"
+    ],
+    "pageType": "guide",
+    "title": "Drag and drop nodes",
+    "section": "Drag and drop nodes",
+    "route": "/workshops/drag-and-drop-nodes",
+    "fragment": "drag-and-drop-nodes",
+    "content": "This workshop will show you how to implement dynamic node creation with basic drag and drop functionality. It also demonstrates how to attach nodes to groups or detach them from groups. This implementation uses the following APIs from VflowComponent: documentPointToFlowPoint() to get a stack of SpacePointsgetIntersectingNodes() to get intersections between nodes during drag operationstoNodeSpace() to get a node's position in the coordinate system of another node"
+  },
+  {
+    "breadcrumbs": [
+      "Workshops",
       "Stress Test"
     ],
     "pageType": "guide",
@@ -621,1099 +621,7 @@
     "section": "Stress Test",
     "route": "/workshops/stress-test",
     "fragment": "stress-test",
-    "content": "The library can render 1500+ nodes instantly while maintaining smooth user interactions."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Connection"
-    ],
-    "pageType": "guide",
-    "title": "Connection",
-    "section": "Connection",
-    "route": "/features/edges/connection",
-    "fragment": "connection",
-    "content": "Edges are not creating automatically. To create a new edge, follow these steps:"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Connection"
-    ],
-    "pageType": "guide",
-    "title": "Connection",
-    "section": "Connection",
-    "route": "/features/edges/connection",
-    "fragment": "connection",
-    "content": "Create handler to the "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Connection"
-    ],
-    "pageType": "guide",
-    "title": "Connection",
-    "section": "Connection",
-    "route": "/features/edges/connection",
-    "fragment": "connection",
-    "content": "(onConnect)"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Connection"
-    ],
-    "pageType": "guide",
-    "title": "Connection",
-    "section": "Connection",
-    "route": "/features/edges/connection",
-    "fragment": "connection",
-    "content": " event This handler accepts a "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Connection"
-    ],
-    "pageType": "guide",
-    "title": "Connection",
-    "section": "Connection",
-    "route": "/features/edges/connection",
-    "fragment": "connection",
-    "content": "Connection"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Connection"
-    ],
-    "pageType": "guide",
-    "title": "Connection",
-    "section": "Connection",
-    "route": "/features/edges/connection",
-    "fragment": "connection",
-    "content": " argument. "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Connection"
-    ],
-    "pageType": "guide",
-    "title": "Connection",
-    "section": "Connection",
-    "route": "/features/edges/connection",
-    "fragment": "connection",
-    "content": "Connection"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Connection"
-    ],
-    "pageType": "guide",
-    "title": "Connection",
-    "section": "Connection",
-    "route": "/features/edges/connection",
-    "fragment": "connection",
-    "content": " is similar to an "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Connection"
-    ],
-    "pageType": "guide",
-    "title": "Connection",
-    "section": "Connection",
-    "route": "/features/edges/connection",
-    "fragment": "connection",
-    "content": "Edge"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Connection"
-    ],
-    "pageType": "guide",
-    "title": "Connection",
-    "section": "Connection",
-    "route": "/features/edges/connection",
-    "fragment": "connection",
-    "content": ", but it doesn't exists in the flow, you need to \"convert\" it into a new "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Connection"
-    ],
-    "pageType": "guide",
-    "title": "Connection",
-    "section": "Connection",
-    "route": "/features/edges/connection",
-    "fragment": "connection",
-    "content": "Edge"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Connection"
-    ],
-    "pageType": "guide",
-    "title": "Connection",
-    "section": "Connection",
-    "route": "/features/edges/connection",
-    "fragment": "connection",
-    "content": "Update the "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Connection"
-    ],
-    "pageType": "guide",
-    "title": "Connection",
-    "section": "Connection",
-    "route": "/features/edges/connection",
-    "fragment": "connection",
-    "content": "Edge[]"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Connection"
-    ],
-    "pageType": "guide",
-    "title": "Connection",
-    "section": "Connection",
-    "route": "/features/edges/connection",
-    "fragment": "connection",
-    "content": " list with the new edge that was created from the "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Connection"
-    ],
-    "pageType": "guide",
-    "title": "Connection",
-    "section": "Connection",
-    "route": "/features/edges/connection",
-    "fragment": "connection",
-    "content": "Connection"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Connection"
-    ],
-    "pageType": "guide",
-    "title": "Connection",
-    "section": "Connection",
-    "route": "/features/edges/connection",
-    "fragment": "connection",
-    "content": "."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Connection"
-    ],
-    "pageType": "guide",
-    "title": "Connection",
-    "section": "Strict connections",
-    "route": "/features/edges/connection",
-    "fragment": "strict-connections",
-    "content": "In the default 'strict' mode of ConnectionSettings, edges are created from connections with strict adherence to the source and target types of the HandleComponent. This means connections can only be established in one direction based on these properties."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Connection"
-    ],
-    "pageType": "guide",
-    "title": "Connection",
-    "section": "Loose connections",
-    "route": "/features/edges/connection",
-    "fragment": "loose-connections",
-    "content": "This is the 'loose' mode of ConnectionSettings, where the flow ignores the handle type and allows any handle to connect with any other handle. In this mode, an id must be provided for the HandleComponent to function correctly."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Connection validation"
-    ],
-    "pageType": "guide",
-    "title": "Connection validation",
-    "section": "Connection validation",
-    "route": "/features/edges/connection-validation",
-    "fragment": "connection-validation",
-    "content": "ngx-vflow supports real-time synchronous validation of connections. Validation occurs when a user attempts to create a new edge. By default, every connection is valid, but you can provide a ConnectionSettings with a validatior callback where you specify the validation logic. For example, in this case, validation only passes connections from node 1 to node 2. If the validator returns false, the (onConnect) event won't be triggered because there is no valid connection."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Curves"
-    ],
-    "pageType": "guide",
-    "title": "Curves",
-    "section": "Curves",
-    "route": "/features/edges/curves",
-    "fragment": "curves",
-    "content": "It's possible to set Curve for both the edges and connection."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Curves"
-    ],
-    "pageType": "guide",
-    "title": "Curves",
-    "section": "Curve factory",
-    "route": "/features/edges/curves",
-    "fragment": "curve-factory",
-    "content": "This is an experimental API"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Curves"
-    ],
-    "pageType": "guide",
-    "title": "Curves",
-    "section": "Curve factory",
-    "route": "/features/edges/curves",
-    "fragment": "curve-factory",
-    "content": "If the existing curves do not meet your needs, you can provide your own function that implements the CurveFactory signature."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/features/edges/custom-edges",
-    "fragment": "custom-edges",
-    "content": "You can customize your edges. To achieve this, follow these steps:"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/features/edges/custom-edges",
-    "fragment": "custom-edges",
-    "content": "Change the edge type to "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/features/edges/custom-edges",
-    "fragment": "custom-edges",
-    "content": "template"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/features/edges/custom-edges",
-    "fragment": "custom-edges",
-    "content": "Create an "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/features/edges/custom-edges",
-    "fragment": "custom-edges",
-    "content": "ng-template"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/features/edges/custom-edges",
-    "fragment": "custom-edges",
-    "content": " with the "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/features/edges/custom-edges",
-    "fragment": "custom-edges",
-    "content": "edge"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/features/edges/custom-edges",
-    "fragment": "custom-edges",
-    "content": " selector inside "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/features/edges/custom-edges",
-    "fragment": "custom-edges",
-    "content": "vflow"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/features/edges/custom-edges",
-    "fragment": "custom-edges",
-    "content": "Create an "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/features/edges/custom-edges",
-    "fragment": "custom-edges",
-    "content": "<svg:path>"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/features/edges/custom-edges",
-    "fragment": "custom-edges",
-    "content": " which you will customize. Optionally — "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/features/edges/custom-edges",
-    "fragment": "custom-edges",
-    "content": "but recommended"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/features/edges/custom-edges",
-    "fragment": "custom-edges",
-    "content": " — wrap it in a "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/features/edges/custom-edges",
-    "fragment": "custom-edges",
-    "content": "<svg:g customTemplateEdge>"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/features/edges/custom-edges",
-    "fragment": "custom-edges",
-    "content": " element. This adds some UX improvements to the path; for example, it increases the clickable area of the path. In the "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/features/edges/custom-edges",
-    "fragment": "custom-edges",
-    "content": "ng-template"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/features/edges/custom-edges",
-    "fragment": "custom-edges",
-    "content": ", the library provides "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/features/edges/custom-edges",
-    "fragment": "custom-edges",
-    "content": "let-ctx"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/features/edges/custom-edges",
-    "fragment": "custom-edges",
-    "content": " with important data for you, such as the "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/features/edges/custom-edges",
-    "fragment": "custom-edges",
-    "content": "path"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/features/edges/custom-edges",
-    "fragment": "custom-edges",
-    "content": " signal with current path. Additionally, the "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/features/edges/custom-edges",
-    "fragment": "custom-edges",
-    "content": "edge"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/features/edges/custom-edges",
-    "fragment": "custom-edges",
-    "content": " field contains current edge from one the "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/features/edges/custom-edges",
-    "fragment": "custom-edges",
-    "content": "[edges]"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/features/edges/custom-edges",
-    "fragment": "custom-edges",
-    "content": ", from which you can retrieve custom "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/features/edges/custom-edges",
-    "fragment": "custom-edges",
-    "content": "data"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/features/edges/custom-edges",
-    "fragment": "custom-edges",
-    "content": ". Furthermore, you can access "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/features/edges/custom-edges",
-    "fragment": "custom-edges",
-    "content": "markerStart"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/features/edges/custom-edges",
-    "fragment": "custom-edges",
-    "content": " and "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/features/edges/custom-edges",
-    "fragment": "custom-edges",
-    "content": "markerEnd"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/features/edges/custom-edges",
-    "fragment": "custom-edges",
-    "content": " signals with markers for current "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/features/edges/custom-edges",
-    "fragment": "custom-edges",
-    "content": "edge"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/features/edges/custom-edges",
-    "fragment": "custom-edges",
-    "content": "."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Context",
-    "route": "/features/edges/custom-edges",
-    "fragment": "context",
-    "content": "It's tricky to infer type for let-ctx, so here is an interface with available fields for this context."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Labels"
-    ],
-    "pageType": "guide",
-    "title": "Labels",
-    "section": "Labels",
-    "route": "/features/edges/labels",
-    "fragment": "labels",
-    "content": "You can attach labels to edges by providing the edgeLabels property to the Edges. There are three slots available for labels on an edge: start, center, and end. There are several ways a label can appear on an edge."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Labels"
-    ],
-    "pageType": "guide",
-    "title": "Labels",
-    "section": "Default",
-    "route": "/features/edges/labels",
-    "fragment": "default",
-    "content": "This method renders simple static text on the edge. To achieve this, you need to: Pass the default type to EdgeLabel.Set the text.Optionally add the style, which supports any CSS property."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Labels"
-    ],
-    "pageType": "guide",
-    "title": "Labels",
-    "section": "HTML Template",
-    "route": "/features/edges/labels",
-    "fragment": "html-template",
-    "content": "This method renders complex HTML on the edge. To achieve this, you need to: Pass the html-template type to EdgeLabel.Provide the "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Labels"
-    ],
-    "pageType": "guide",
-    "title": "Labels",
-    "section": "HTML Template",
-    "route": "/features/edges/labels",
-    "fragment": "html-template",
-    "content": " inside vflow.Optionally pass any data that will be accessible in the template context."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Labels"
-    ],
-    "pageType": "guide",
-    "title": "Labels",
-    "section": "Context",
-    "route": "/features/edges/labels",
-    "fragment": "context",
-    "content": "You may access some data for label through let-ctx according to this interface."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Default edges"
-    ],
-    "pageType": "guide",
-    "title": "Default edges",
-    "section": "Default edges",
-    "route": "/features/edges/default-edges",
-    "fragment": "default-edges",
-    "content": "You can link nodes with edges. All you need to do is to create another Edge[] array and pass it to the vflow component. Each edge contains the id of the source and target nodes, and each edge must have its own id."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Markers"
-    ],
-    "pageType": "guide",
-    "title": "Markers",
-    "section": "Markers",
-    "route": "/features/edges/markers",
-    "fragment": "markers",
-    "content": "You can create markers for both edges and connections. Edges: Specify start and end markers for corresponding parts of the edge. Currently, markers are limited to two types: arrow and arrow-closed.Connections: You can specify an end marker using the marker property in ConnectionSettings."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Reconnect Edge"
-    ],
-    "pageType": "guide",
-    "title": "Reconnect Edge",
-    "section": "Reconnect Edge",
-    "route": "/features/edges/reconnect-edges",
-    "fragment": "reconnect-edge",
-    "content": "Edges can be reconnected. To reconnect an edge, follow these steps:"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Reconnect Edge"
-    ],
-    "pageType": "guide",
-    "title": "Reconnect Edge",
-    "section": "Reconnect Edge",
-    "route": "/features/edges/reconnect-edges",
-    "fragment": "reconnect-edge",
-    "content": "Mark the "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Reconnect Edge"
-    ],
-    "pageType": "guide",
-    "title": "Reconnect Edge",
-    "section": "Reconnect Edge",
-    "route": "/features/edges/reconnect-edges",
-    "fragment": "reconnect-edge",
-    "content": "Edge"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Reconnect Edge"
-    ],
-    "pageType": "guide",
-    "title": "Reconnect Edge",
-    "section": "Reconnect Edge",
-    "route": "/features/edges/reconnect-edges",
-    "fragment": "reconnect-edge",
-    "content": " object as "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Reconnect Edge"
-    ],
-    "pageType": "guide",
-    "title": "Reconnect Edge",
-    "section": "Reconnect Edge",
-    "route": "/features/edges/reconnect-edges",
-    "fragment": "reconnect-edge",
-    "content": "reconnectable"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Reconnect Edge"
-    ],
-    "pageType": "guide",
-    "title": "Reconnect Edge",
-    "section": "Reconnect Edge",
-    "route": "/features/edges/reconnect-edges",
-    "fragment": "reconnect-edge",
-    "content": ". Create a handler for the "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Reconnect Edge"
-    ],
-    "pageType": "guide",
-    "title": "Reconnect Edge",
-    "section": "Reconnect Edge",
-    "route": "/features/edges/reconnect-edges",
-    "fragment": "reconnect-edge",
-    "content": "(onReconnect)"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Reconnect Edge"
-    ],
-    "pageType": "guide",
-    "title": "Reconnect Edge",
-    "section": "Reconnect Edge",
-    "route": "/features/edges/reconnect-edges",
-    "fragment": "reconnect-edge",
-    "content": " event. This handler accepts a "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Reconnect Edge"
-    ],
-    "pageType": "guide",
-    "title": "Reconnect Edge",
-    "section": "Reconnect Edge",
-    "route": "/features/edges/reconnect-edges",
-    "fragment": "reconnect-edge",
-    "content": "ReconnectionEvent"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Reconnect Edge"
-    ],
-    "pageType": "guide",
-    "title": "Reconnect Edge",
-    "section": "Reconnect Edge",
-    "route": "/features/edges/reconnect-edges",
-    "fragment": "reconnect-edge",
-    "content": " argument, which contains a new "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Reconnect Edge"
-    ],
-    "pageType": "guide",
-    "title": "Reconnect Edge",
-    "section": "Reconnect Edge",
-    "route": "/features/edges/reconnect-edges",
-    "fragment": "reconnect-edge",
-    "content": "Connection"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Reconnect Edge"
-    ],
-    "pageType": "guide",
-    "title": "Reconnect Edge",
-    "section": "Reconnect Edge",
-    "route": "/features/edges/reconnect-edges",
-    "fragment": "reconnect-edge",
-    "content": " and the "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Reconnect Edge"
-    ],
-    "pageType": "guide",
-    "title": "Reconnect Edge",
-    "section": "Reconnect Edge",
-    "route": "/features/edges/reconnect-edges",
-    "fragment": "reconnect-edge",
-    "content": "oldEdge"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Reconnect Edge"
-    ],
-    "pageType": "guide",
-    "title": "Reconnect Edge",
-    "section": "Reconnect Edge",
-    "route": "/features/edges/reconnect-edges",
-    "fragment": "reconnect-edge",
-    "content": " that you are trying to reconnect. Update the "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Reconnect Edge"
-    ],
-    "pageType": "guide",
-    "title": "Reconnect Edge",
-    "section": "Reconnect Edge",
-    "route": "/features/edges/reconnect-edges",
-    "fragment": "reconnect-edge",
-    "content": "Edge[]"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Reconnect Edge"
-    ],
-    "pageType": "guide",
-    "title": "Reconnect Edge",
-    "section": "Reconnect Edge",
-    "route": "/features/edges/reconnect-edges",
-    "fragment": "reconnect-edge",
-    "content": " list with a new edge based on the "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Reconnect Edge"
-    ],
-    "pageType": "guide",
-    "title": "Reconnect Edge",
-    "section": "Reconnect Edge",
-    "route": "/features/edges/reconnect-edges",
-    "fragment": "reconnect-edge",
-    "content": "oldEdge"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Reconnect Edge"
-    ],
-    "pageType": "guide",
-    "title": "Reconnect Edge",
-    "section": "Reconnect Edge",
-    "route": "/features/edges/reconnect-edges",
-    "fragment": "reconnect-edge",
-    "content": " and the new "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Reconnect Edge"
-    ],
-    "pageType": "guide",
-    "title": "Reconnect Edge",
-    "section": "Reconnect Edge",
-    "route": "/features/edges/reconnect-edges",
-    "fragment": "reconnect-edge",
-    "content": "Connection"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Reconnect Edge"
-    ],
-    "pageType": "guide",
-    "title": "Reconnect Edge",
-    "section": "Reconnect Edge",
-    "route": "/features/edges/reconnect-edges",
-    "fragment": "reconnect-edge",
-    "content": ", then remove the reference to the old edge from the list."
+    "content": "The library can render 1000+ nodes instantly while maintaining smooth user interactions."
   },
   {
     "breadcrumbs": [
@@ -2523,16 +1431,1095 @@
   },
   {
     "breadcrumbs": [
-      "Workshops",
-      "Layout",
-      "D3 Force"
+      "Features",
+      "Edges",
+      "Connection"
     ],
     "pageType": "guide",
-    "title": "D3 Force",
-    "section": "D3 Force",
-    "route": "/workshops/layout/force",
-    "fragment": "d3-force",
-    "content": "This is a simple example of using the d3-force layout package."
+    "title": "Connection",
+    "section": "Connection",
+    "route": "/features/edges/connection",
+    "fragment": "connection",
+    "content": "Edges are not creating automatically. To create a new edge, follow these steps:"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Connection"
+    ],
+    "pageType": "guide",
+    "title": "Connection",
+    "section": "Connection",
+    "route": "/features/edges/connection",
+    "fragment": "connection",
+    "content": "Create handler to the "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Connection"
+    ],
+    "pageType": "guide",
+    "title": "Connection",
+    "section": "Connection",
+    "route": "/features/edges/connection",
+    "fragment": "connection",
+    "content": "(onConnect)"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Connection"
+    ],
+    "pageType": "guide",
+    "title": "Connection",
+    "section": "Connection",
+    "route": "/features/edges/connection",
+    "fragment": "connection",
+    "content": " event This handler accepts a "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Connection"
+    ],
+    "pageType": "guide",
+    "title": "Connection",
+    "section": "Connection",
+    "route": "/features/edges/connection",
+    "fragment": "connection",
+    "content": "Connection"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Connection"
+    ],
+    "pageType": "guide",
+    "title": "Connection",
+    "section": "Connection",
+    "route": "/features/edges/connection",
+    "fragment": "connection",
+    "content": " argument. "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Connection"
+    ],
+    "pageType": "guide",
+    "title": "Connection",
+    "section": "Connection",
+    "route": "/features/edges/connection",
+    "fragment": "connection",
+    "content": "Connection"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Connection"
+    ],
+    "pageType": "guide",
+    "title": "Connection",
+    "section": "Connection",
+    "route": "/features/edges/connection",
+    "fragment": "connection",
+    "content": " is similar to an "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Connection"
+    ],
+    "pageType": "guide",
+    "title": "Connection",
+    "section": "Connection",
+    "route": "/features/edges/connection",
+    "fragment": "connection",
+    "content": "Edge"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Connection"
+    ],
+    "pageType": "guide",
+    "title": "Connection",
+    "section": "Connection",
+    "route": "/features/edges/connection",
+    "fragment": "connection",
+    "content": ", but it doesn't exists in the flow, you need to \"convert\" it into a new "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Connection"
+    ],
+    "pageType": "guide",
+    "title": "Connection",
+    "section": "Connection",
+    "route": "/features/edges/connection",
+    "fragment": "connection",
+    "content": "Edge"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Connection"
+    ],
+    "pageType": "guide",
+    "title": "Connection",
+    "section": "Connection",
+    "route": "/features/edges/connection",
+    "fragment": "connection",
+    "content": "Update the "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Connection"
+    ],
+    "pageType": "guide",
+    "title": "Connection",
+    "section": "Connection",
+    "route": "/features/edges/connection",
+    "fragment": "connection",
+    "content": "Edge[]"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Connection"
+    ],
+    "pageType": "guide",
+    "title": "Connection",
+    "section": "Connection",
+    "route": "/features/edges/connection",
+    "fragment": "connection",
+    "content": " list with the new edge that was created from the "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Connection"
+    ],
+    "pageType": "guide",
+    "title": "Connection",
+    "section": "Connection",
+    "route": "/features/edges/connection",
+    "fragment": "connection",
+    "content": "Connection"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Connection"
+    ],
+    "pageType": "guide",
+    "title": "Connection",
+    "section": "Connection",
+    "route": "/features/edges/connection",
+    "fragment": "connection",
+    "content": "."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Connection"
+    ],
+    "pageType": "guide",
+    "title": "Connection",
+    "section": "Strict connections",
+    "route": "/features/edges/connection",
+    "fragment": "strict-connections",
+    "content": "In the default 'strict' mode of ConnectionSettings, edges are created from connections with strict adherence to the source and target types of the HandleComponent. This means connections can only be established in one direction based on these properties."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Connection"
+    ],
+    "pageType": "guide",
+    "title": "Connection",
+    "section": "Loose connections",
+    "route": "/features/edges/connection",
+    "fragment": "loose-connections",
+    "content": "This is the 'loose' mode of ConnectionSettings, where the flow ignores the handle type and allows any handle to connect with any other handle. In this mode, an id must be provided for the HandleComponent to function correctly."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Connection validation"
+    ],
+    "pageType": "guide",
+    "title": "Connection validation",
+    "section": "Connection validation",
+    "route": "/features/edges/connection-validation",
+    "fragment": "connection-validation",
+    "content": "ngx-vflow supports real-time synchronous validation of connections. Validation occurs when a user attempts to create a new edge. By default, every connection is valid, but you can provide a ConnectionSettings with a validatior callback where you specify the validation logic. For example, in this case, validation only passes connections from node 1 to node 2. If the validator returns false, the (onConnect) event won't be triggered because there is no valid connection."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Curves"
+    ],
+    "pageType": "guide",
+    "title": "Curves",
+    "section": "Curves",
+    "route": "/features/edges/curves",
+    "fragment": "curves",
+    "content": "It's possible to set Curve for both the edges and connection."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Curves"
+    ],
+    "pageType": "guide",
+    "title": "Curves",
+    "section": "Curve factory",
+    "route": "/features/edges/curves",
+    "fragment": "curve-factory",
+    "content": "This is an experimental API"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Curves"
+    ],
+    "pageType": "guide",
+    "title": "Curves",
+    "section": "Curve factory",
+    "route": "/features/edges/curves",
+    "fragment": "curve-factory",
+    "content": "If the existing curves do not meet your needs, you can provide your own function that implements the CurveFactory signature."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/edges/custom-edges",
+    "fragment": "custom-edges",
+    "content": "You can customize your edges. To achieve this, follow these steps:"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/edges/custom-edges",
+    "fragment": "custom-edges",
+    "content": "Change the edge type to "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/edges/custom-edges",
+    "fragment": "custom-edges",
+    "content": "template"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/edges/custom-edges",
+    "fragment": "custom-edges",
+    "content": "Create an "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/edges/custom-edges",
+    "fragment": "custom-edges",
+    "content": "ng-template"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/edges/custom-edges",
+    "fragment": "custom-edges",
+    "content": " with the "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/edges/custom-edges",
+    "fragment": "custom-edges",
+    "content": "edge"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/edges/custom-edges",
+    "fragment": "custom-edges",
+    "content": " selector inside "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/edges/custom-edges",
+    "fragment": "custom-edges",
+    "content": "vflow"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/edges/custom-edges",
+    "fragment": "custom-edges",
+    "content": "Create an "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/edges/custom-edges",
+    "fragment": "custom-edges",
+    "content": "<svg:path>"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/edges/custom-edges",
+    "fragment": "custom-edges",
+    "content": " which you will customize. Optionally — "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/edges/custom-edges",
+    "fragment": "custom-edges",
+    "content": "but recommended"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/edges/custom-edges",
+    "fragment": "custom-edges",
+    "content": " — wrap it in a "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/edges/custom-edges",
+    "fragment": "custom-edges",
+    "content": "<svg:g customTemplateEdge>"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/edges/custom-edges",
+    "fragment": "custom-edges",
+    "content": " element. This adds some UX improvements to the path; for example, it increases the clickable area of the path. In the "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/edges/custom-edges",
+    "fragment": "custom-edges",
+    "content": "ng-template"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/edges/custom-edges",
+    "fragment": "custom-edges",
+    "content": ", the library provides "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/edges/custom-edges",
+    "fragment": "custom-edges",
+    "content": "let-ctx"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/edges/custom-edges",
+    "fragment": "custom-edges",
+    "content": " with important data for you, such as the "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/edges/custom-edges",
+    "fragment": "custom-edges",
+    "content": "path"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/edges/custom-edges",
+    "fragment": "custom-edges",
+    "content": " signal with current path. Additionally, the "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/edges/custom-edges",
+    "fragment": "custom-edges",
+    "content": "edge"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/edges/custom-edges",
+    "fragment": "custom-edges",
+    "content": " field contains current edge from one the "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/edges/custom-edges",
+    "fragment": "custom-edges",
+    "content": "[edges]"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/edges/custom-edges",
+    "fragment": "custom-edges",
+    "content": ", from which you can retrieve custom "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/edges/custom-edges",
+    "fragment": "custom-edges",
+    "content": "data"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/edges/custom-edges",
+    "fragment": "custom-edges",
+    "content": ". Furthermore, you can access "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/edges/custom-edges",
+    "fragment": "custom-edges",
+    "content": "markerStart"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/edges/custom-edges",
+    "fragment": "custom-edges",
+    "content": " and "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/edges/custom-edges",
+    "fragment": "custom-edges",
+    "content": "markerEnd"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/edges/custom-edges",
+    "fragment": "custom-edges",
+    "content": " signals with markers for current "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/edges/custom-edges",
+    "fragment": "custom-edges",
+    "content": "edge"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/edges/custom-edges",
+    "fragment": "custom-edges",
+    "content": "."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Context",
+    "route": "/features/edges/custom-edges",
+    "fragment": "context",
+    "content": "It's tricky to infer type for let-ctx, so here is an interface with available fields for this context."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Default edges"
+    ],
+    "pageType": "guide",
+    "title": "Default edges",
+    "section": "Default edges",
+    "route": "/features/edges/default-edges",
+    "fragment": "default-edges",
+    "content": "You can link nodes with edges. All you need to do is to create another Edge[] array and pass it to the vflow component. Each edge contains the id of the source and target nodes, and each edge must have its own id."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Labels"
+    ],
+    "pageType": "guide",
+    "title": "Labels",
+    "section": "Labels",
+    "route": "/features/edges/labels",
+    "fragment": "labels",
+    "content": "You can attach labels to edges by providing the edgeLabels property to the Edges. There are three slots available for labels on an edge: start, center, and end. There are several ways a label can appear on an edge."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Labels"
+    ],
+    "pageType": "guide",
+    "title": "Labels",
+    "section": "Default",
+    "route": "/features/edges/labels",
+    "fragment": "default",
+    "content": "This method renders simple static text on the edge. To achieve this, you need to: Pass the default type to EdgeLabel.Set the text.Optionally add the style, which supports any CSS property."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Labels"
+    ],
+    "pageType": "guide",
+    "title": "Labels",
+    "section": "HTML Template",
+    "route": "/features/edges/labels",
+    "fragment": "html-template",
+    "content": "This method renders complex HTML on the edge. To achieve this, you need to: Pass the html-template type to EdgeLabel.Provide the "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Labels"
+    ],
+    "pageType": "guide",
+    "title": "Labels",
+    "section": "HTML Template",
+    "route": "/features/edges/labels",
+    "fragment": "html-template",
+    "content": " inside vflow.Optionally pass any data that will be accessible in the template context."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Labels"
+    ],
+    "pageType": "guide",
+    "title": "Labels",
+    "section": "Context",
+    "route": "/features/edges/labels",
+    "fragment": "context",
+    "content": "You may access some data for label through let-ctx according to this interface."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Markers"
+    ],
+    "pageType": "guide",
+    "title": "Markers",
+    "section": "Markers",
+    "route": "/features/edges/markers",
+    "fragment": "markers",
+    "content": "You can create markers for both edges and connections. Edges: Specify start and end markers for corresponding parts of the edge. Currently, markers are limited to two types: arrow and arrow-closed.Connections: You can specify an end marker using the marker property in ConnectionSettings."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Reconnect Edge"
+    ],
+    "pageType": "guide",
+    "title": "Reconnect Edge",
+    "section": "Reconnect Edge",
+    "route": "/features/edges/reconnect-edges",
+    "fragment": "reconnect-edge",
+    "content": "Edges can be reconnected. To reconnect an edge, follow these steps:"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Reconnect Edge"
+    ],
+    "pageType": "guide",
+    "title": "Reconnect Edge",
+    "section": "Reconnect Edge",
+    "route": "/features/edges/reconnect-edges",
+    "fragment": "reconnect-edge",
+    "content": "Mark the "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Reconnect Edge"
+    ],
+    "pageType": "guide",
+    "title": "Reconnect Edge",
+    "section": "Reconnect Edge",
+    "route": "/features/edges/reconnect-edges",
+    "fragment": "reconnect-edge",
+    "content": "Edge"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Reconnect Edge"
+    ],
+    "pageType": "guide",
+    "title": "Reconnect Edge",
+    "section": "Reconnect Edge",
+    "route": "/features/edges/reconnect-edges",
+    "fragment": "reconnect-edge",
+    "content": " object as "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Reconnect Edge"
+    ],
+    "pageType": "guide",
+    "title": "Reconnect Edge",
+    "section": "Reconnect Edge",
+    "route": "/features/edges/reconnect-edges",
+    "fragment": "reconnect-edge",
+    "content": "reconnectable"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Reconnect Edge"
+    ],
+    "pageType": "guide",
+    "title": "Reconnect Edge",
+    "section": "Reconnect Edge",
+    "route": "/features/edges/reconnect-edges",
+    "fragment": "reconnect-edge",
+    "content": ". Create a handler for the "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Reconnect Edge"
+    ],
+    "pageType": "guide",
+    "title": "Reconnect Edge",
+    "section": "Reconnect Edge",
+    "route": "/features/edges/reconnect-edges",
+    "fragment": "reconnect-edge",
+    "content": "(onReconnect)"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Reconnect Edge"
+    ],
+    "pageType": "guide",
+    "title": "Reconnect Edge",
+    "section": "Reconnect Edge",
+    "route": "/features/edges/reconnect-edges",
+    "fragment": "reconnect-edge",
+    "content": " event. This handler accepts a "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Reconnect Edge"
+    ],
+    "pageType": "guide",
+    "title": "Reconnect Edge",
+    "section": "Reconnect Edge",
+    "route": "/features/edges/reconnect-edges",
+    "fragment": "reconnect-edge",
+    "content": "ReconnectionEvent"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Reconnect Edge"
+    ],
+    "pageType": "guide",
+    "title": "Reconnect Edge",
+    "section": "Reconnect Edge",
+    "route": "/features/edges/reconnect-edges",
+    "fragment": "reconnect-edge",
+    "content": " argument, which contains a new "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Reconnect Edge"
+    ],
+    "pageType": "guide",
+    "title": "Reconnect Edge",
+    "section": "Reconnect Edge",
+    "route": "/features/edges/reconnect-edges",
+    "fragment": "reconnect-edge",
+    "content": "Connection"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Reconnect Edge"
+    ],
+    "pageType": "guide",
+    "title": "Reconnect Edge",
+    "section": "Reconnect Edge",
+    "route": "/features/edges/reconnect-edges",
+    "fragment": "reconnect-edge",
+    "content": " and the "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Reconnect Edge"
+    ],
+    "pageType": "guide",
+    "title": "Reconnect Edge",
+    "section": "Reconnect Edge",
+    "route": "/features/edges/reconnect-edges",
+    "fragment": "reconnect-edge",
+    "content": "oldEdge"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Reconnect Edge"
+    ],
+    "pageType": "guide",
+    "title": "Reconnect Edge",
+    "section": "Reconnect Edge",
+    "route": "/features/edges/reconnect-edges",
+    "fragment": "reconnect-edge",
+    "content": " that you are trying to reconnect. Update the "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Reconnect Edge"
+    ],
+    "pageType": "guide",
+    "title": "Reconnect Edge",
+    "section": "Reconnect Edge",
+    "route": "/features/edges/reconnect-edges",
+    "fragment": "reconnect-edge",
+    "content": "Edge[]"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Reconnect Edge"
+    ],
+    "pageType": "guide",
+    "title": "Reconnect Edge",
+    "section": "Reconnect Edge",
+    "route": "/features/edges/reconnect-edges",
+    "fragment": "reconnect-edge",
+    "content": " list with a new edge based on the "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Reconnect Edge"
+    ],
+    "pageType": "guide",
+    "title": "Reconnect Edge",
+    "section": "Reconnect Edge",
+    "route": "/features/edges/reconnect-edges",
+    "fragment": "reconnect-edge",
+    "content": "oldEdge"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Reconnect Edge"
+    ],
+    "pageType": "guide",
+    "title": "Reconnect Edge",
+    "section": "Reconnect Edge",
+    "route": "/features/edges/reconnect-edges",
+    "fragment": "reconnect-edge",
+    "content": " and the new "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Reconnect Edge"
+    ],
+    "pageType": "guide",
+    "title": "Reconnect Edge",
+    "section": "Reconnect Edge",
+    "route": "/features/edges/reconnect-edges",
+    "fragment": "reconnect-edge",
+    "content": "Connection"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Reconnect Edge"
+    ],
+    "pageType": "guide",
+    "title": "Reconnect Edge",
+    "section": "Reconnect Edge",
+    "route": "/features/edges/reconnect-edges",
+    "fragment": "reconnect-edge",
+    "content": ", then remove the reference to the old edge from the list."
   },
   {
     "breadcrumbs": [
@@ -2546,6 +2533,19 @@
     "route": "/workshops/layout/vizdom-layout",
     "fragment": "vizdom-layout",
     "content": "This is an example of using the vizdom library for computing layout."
+  },
+  {
+    "breadcrumbs": [
+      "Workshops",
+      "Layout",
+      "D3 Force"
+    ],
+    "pageType": "guide",
+    "title": "D3 Force",
+    "section": "D3 Force",
+    "route": "/workshops/layout/force",
+    "fragment": "d3-force",
+    "content": "This is a simple example of using the d3-force layout package."
   },
   {
     "breadcrumbs": [
