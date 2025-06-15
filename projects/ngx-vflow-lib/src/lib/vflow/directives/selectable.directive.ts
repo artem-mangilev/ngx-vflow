@@ -5,7 +5,7 @@ import { EdgeComponent } from '../components/edge/edge.component';
 import { FlowEntity } from '../interfaces/flow-entity.interface';
 import { NodeComponent } from '../components/node/node.component';
 import { FlowSettingsService } from '../services/flow-settings.service';
-import { fromEvent, merge, tap } from 'rxjs';
+import { fromEvent, tap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Directive({
@@ -45,6 +45,6 @@ export class SelectableDirective {
   }
 
   private getEvent$() {
-    return merge(fromEvent(this.host.nativeElement, 'mousedown'), fromEvent(this.host.nativeElement, 'touchstart'));
+    return fromEvent(this.host.nativeElement, 'click');
   }
 }
