@@ -8,7 +8,7 @@ export class NodeRenderingService {
   private flowEntitiesService = inject(FlowEntitiesService);
 
   public readonly nodes = computed(() => {
-    return this.flowEntitiesService.nodes().sort((aNode, bNode) => aNode.renderOrder() - bNode.renderOrder());
+    return [...this.flowEntitiesService.nodes().sort((aNode, bNode) => aNode.renderOrder() - bNode.renderOrder())];
   });
 
   public readonly groups = computed(() => {
