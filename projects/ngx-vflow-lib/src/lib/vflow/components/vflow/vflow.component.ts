@@ -269,13 +269,8 @@ export class VflowComponent {
   }
 
   protected nodeModels = this.nodeRenderingService.nodes;
-  protected nodesPerFrame = this.nodeRenderingService.nodesPerFrame;
-
   protected groups = this.nodeRenderingService.groups;
-  protected groupsPerFrame = this.nodeRenderingService.groupsPerFrame;
-
   protected nonGroups = this.nodeRenderingService.nonGroups;
-  protected nonGroupsPerFrame = this.nodeRenderingService.nonGroupsPerFrame;
 
   /**
    * Edges to render
@@ -293,7 +288,6 @@ export class VflowComponent {
   }
 
   protected edgeModels = this.edgeRenderingService.edges;
-  protected edgesPerFrame = this.edgeRenderingService.edgesPerFrame;
   // #endregion
 
   // #region OUTPUTS
