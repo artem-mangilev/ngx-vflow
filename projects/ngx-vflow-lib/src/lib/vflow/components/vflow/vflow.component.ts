@@ -65,7 +65,6 @@ import { EdgeRenderingService } from '../../services/edge-rendering.service';
 import { getSpacePoints } from '../../utils/get-space-points';
 import { getIntesectingNodes } from '../../utils/nodes';
 import { IntersectingNodesOptions } from '../../interfaces/intersecting-nodes-options.interface';
-import { LazyForDirective } from '../../directives/lazy-for.directive';
 
 const changesControllerHostDirective = {
   directive: ChangesControllerDirective,
@@ -137,7 +136,6 @@ const changesControllerHostDirective = {
     NodeComponent,
     EdgeComponent,
     NgTemplateOutlet,
-    LazyForDirective,
   ],
 })
 export class VflowComponent {
@@ -271,13 +269,8 @@ export class VflowComponent {
   }
 
   protected nodeModels = this.nodeRenderingService.nodes;
-  protected nodesPerFrame = this.nodeRenderingService.nodesPerFrame;
-
   protected groups = this.nodeRenderingService.groups;
-  protected groupsPerFrame = this.nodeRenderingService.groupsPerFrame;
-
   protected nonGroups = this.nodeRenderingService.nonGroups;
-  protected nonGroupsPerFrame = this.nodeRenderingService.nonGroupsPerFrame;
 
   /**
    * Edges to render
@@ -295,7 +288,6 @@ export class VflowComponent {
   }
 
   protected edgeModels = this.edgeRenderingService.edges;
-  protected edgesPerFrame = this.edgeRenderingService.edgesPerFrame;
   // #endregion
 
   // #region OUTPUTS

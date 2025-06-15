@@ -4,7 +4,7 @@
     class="selectable"
     [attr.width]="model().foWidth()"
     [attr.height]="model().foHeight()"
-    (pointerStart)="pullNode(); selectNode()">
+    (click)="pullNode(); selectNode()">
     <default-node
       nodeHandlesController
       [selected]="model().selected()"
@@ -26,7 +26,7 @@
     class="selectable"
     [attr.width]="model().foWidth()"
     [attr.height]="model().foHeight()"
-    (pointerStart)="pullNode()">
+    (click)="pullNode()">
     <div
       nodeHandlesController
       nodeResizeController
@@ -43,7 +43,7 @@
 
 <!-- SVG Template node -->
 @if (model().rawNode.type === 'svg-template' && nodeSvgTemplate()) {
-  <svg:g class="selectable" nodeHandlesController (pointerStart)="pullNode()">
+  <svg:g class="selectable" nodeHandlesController (click)="pullNode()">
     <ng-container
       [ngTemplateOutlet]="nodeSvgTemplate() ?? null"
       [ngTemplateOutletContext]="model().context"
@@ -57,7 +57,7 @@
     class="selectable"
     [attr.width]="model().foWidth()"
     [attr.height]="model().foHeight()"
-    (pointerStart)="pullNode()">
+    (click)="pullNode()">
     <div
       nodeHandlesController
       nodeResizeController
@@ -86,12 +86,12 @@
     [attr.height]="model().size().height"
     [style.stroke]="model().color()"
     [style.fill]="model().color()"
-    (pointerStart)="pullNode(); selectNode()" />
+    (click)="pullNode(); selectNode()" />
 }
 
 <!-- Template group node  -->
 @if (model().rawNode.type === 'template-group' && groupNodeTemplate()) {
-  <svg:g class="selectable" nodeHandlesController (pointerStart)="pullNode()">
+  <svg:g class="selectable" nodeHandlesController (click)="pullNode()">
     <ng-container
       [ngTemplateOutlet]="groupNodeTemplate() ?? null"
       [ngTemplateOutletContext]="model().context"
