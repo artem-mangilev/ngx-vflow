@@ -74,6 +74,8 @@ export class ResizableComponent implements OnInit, AfterViewInit {
 
   private minWidth = 0;
   private minHeight = 0;
+  private maxWidth = Infinity;
+  private maxHeight = Infinity;
 
   // TODO: allow reszie beside the flow
   protected resizeOnGlobalMouseMove = this.rootPointer.pointerMovement$
@@ -115,6 +117,8 @@ export class ResizableComponent implements OnInit, AfterViewInit {
   public ngAfterViewInit() {
     this.minWidth = +getComputedStyle(this.hostRef.nativeElement).minWidth.replace('px', '') || 0;
     this.minHeight = +getComputedStyle(this.hostRef.nativeElement).minHeight.replace('px', '') || 0;
+    this.maxWidth = +getComputedStyle(this.hostRef.nativeElement).maxWidth.replace('px', '') || Infinity;
+    this.maxHeight = +getComputedStyle(this.hostRef.nativeElement).maxHeight.replace('px', '') || Infinity;
   }
 
   protected startResize(side: Side, event: Event) {
@@ -130,7 +134,15 @@ export class ResizableComponent implements OnInit, AfterViewInit {
 
     const resized = this.applyResize(this.resizeSide, this.model, offset, this.getDistanceToEdge(event));
 
-    const { x, y, width, height } = constrainRect(resized, this.model, this.resizeSide, this.minWidth, this.minHeight);
+    const { x, y, width, height } = constrainRect(
+      resized,
+      this.model,
+      this.resizeSide,
+      this.minWidth,
+      this.minHeight,
+      this.maxWidth,
+      this.maxHeight,
+    );
 
     this.model.setPoint({ x, y });
     this.model.width.set(width);
@@ -270,7 +282,15 @@ function calcOffset(movementX: number, movementY: number, zoom: number): Point {
   };
 }
 
-function constrainRect(rect: Rect, model: NodeModel, side: Side, minWidth: number, minHeight: number) {
+function constrainRect(
+  rect: Rect,
+  model: NodeModel,
+  side: Side,
+  minWidth: number,
+  minHeight: number,
+  maxWidth: number,
+  maxHeight: number,
+) {
   let { x, y, width, height } = rect;
 
   // 1. Prevent negative dimensions
@@ -280,10 +300,14 @@ function constrainRect(rect: Rect, model: NodeModel, side: Side, minWidth: numbe
   // 2. Apply minimum size constraints
   width = Math.max(minWidth, width);
   height = Math.max(minHeight, height);
+  width = Math.min(maxWidth, width);
+  height = Math.min(maxHeight, height);
 
   // Apply left/top constraints based on minimum size
   x = Math.min(x, model.point().x + model.width() - minWidth);
   y = Math.min(y, model.point().y + model.height() - minHeight);
+  x = Math.max(x, model.point().x + model.width() - maxWidth);
+  y = Math.max(y, model.point().y + model.height() - maxHeight);
 
   const parent = model.parent();
   // 3. Apply maximum size constraints based on parent size (if exists)
