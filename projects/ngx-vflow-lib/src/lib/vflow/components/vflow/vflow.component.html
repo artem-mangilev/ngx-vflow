@@ -7,7 +7,7 @@
     <!-- Connection -->
     <svg:g connection [model]="connection" [template]="connectionTemplateDirective()?.templateRef" />
 
-    @if (optimization().detachedGroupsLayer) {
+    @if (flowOptimization().detachedGroupsLayer) {
       <!-- Groups -->
       @for (model of groups(); track trackNodes($index, model)) {
         <svg:g
@@ -35,7 +35,7 @@
       }
     }
 
-    @if (!optimization().detachedGroupsLayer) {
+    @if (!flowOptimization().detachedGroupsLayer) {
       <!-- Edges  -->
       @for (model of edgeModels(); track trackEdges($index, model)) {
         <svg:g

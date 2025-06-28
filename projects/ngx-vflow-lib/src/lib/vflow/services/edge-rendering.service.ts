@@ -12,11 +12,19 @@ export class EdgeRenderingService {
   private flowSettingsService = inject(FlowSettingsService);
 
   public readonly edges = computed(() => {
+    return this.viewportEdges().sort((aEdge, bEdge) => aEdge.renderOrder() - bEdge.renderOrder());
+  });
+
+  private viewportEdges = computed(() => {
+    if (!this.flowSettingsService.optimization().viewportVirtualization) {
+      return this.flowEntitiesService.validEdges();
+    }
+
     const viewport = this.viewportService.readableViewport();
     const flowWidth = this.flowSettingsService.computedFlowWidth();
     const flowHeight = this.flowSettingsService.computedFlowHeight();
 
-    const viewportEdges = this.flowEntitiesService.validEdges().filter((e) => {
+    return this.flowEntitiesService.validEdges().filter((e) => {
       const sourceHandle = e.sourceHandle();
       const targetHandle = e.targetHandle();
 
@@ -32,8 +40,6 @@ export class EdgeRenderingService {
 
       return isLineInViewport(sourcePoint, targetPoint, viewport, flowWidth, flowHeight, padding);
     });
-
-    return viewportEdges.sort((aNode, bNode) => aNode.renderOrder() - bNode.renderOrder());
   });
 
   private maxOrder = computed(() => {

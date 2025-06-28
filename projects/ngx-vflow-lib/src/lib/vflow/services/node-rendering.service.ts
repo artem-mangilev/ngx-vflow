@@ -13,19 +13,7 @@ export class NodeRenderingService {
   private flowSettingsService = inject(FlowSettingsService);
 
   public readonly nodes = computed(() => {
-    const viewport = this.viewportService.readableViewport();
-    const flowWidth = this.flowSettingsService.computedFlowWidth();
-    const flowHeight = this.flowSettingsService.computedFlowHeight();
-
-    const viewportNodes = this.flowEntitiesService.nodes().filter((n) => {
-      const { x, y } = n.globalPoint();
-      const width = untracked(n.width);
-      const height = untracked(n.height);
-
-      return isRectInViewport({ x, y, width, height }, viewport, flowWidth, flowHeight);
-    });
-
-    return viewportNodes.sort((aNode, bNode) => aNode.renderOrder() - bNode.renderOrder());
+    return [...this.viewportNodes().sort((aNode, bNode) => aNode.renderOrder() - bNode.renderOrder())];
   });
 
   public readonly groups = computed(() => {
@@ -34,6 +22,24 @@ export class NodeRenderingService {
 
   public readonly nonGroups = computed(() => {
     return this.nodes().filter((n) => !isGroupNode(n));
+  });
+
+  private viewportNodes = computed(() => {
+    if (!this.flowSettingsService.optimization().viewportVirtualization) {
+      return this.flowEntitiesService.nodes();
+    }
+
+    const viewport = this.viewportService.readableViewport();
+    const flowWidth = this.flowSettingsService.computedFlowWidth();
+    const flowHeight = this.flowSettingsService.computedFlowHeight();
+
+    return this.flowEntitiesService.nodes().filter((n) => {
+      const { x, y } = n.globalPoint();
+      const width = untracked(n.width);
+      const height = untracked(n.height);
+
+      return isRectInViewport({ x, y, width, height }, viewport, flowWidth, flowHeight);
+    });
   });
 
   private maxOrder = computed(() => {

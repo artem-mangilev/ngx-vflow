@@ -5,7 +5,6 @@ import {
   Input,
   inject,
   runInInjectionContext,
-  input,
   contentChild,
   viewChild,
 } from '@angular/core';
@@ -191,9 +190,13 @@ export class VflowComponent {
     this.flowSettingsService.background.set(transformBackground(value));
   }
 
-  public optimization = input<Optimization>({
-    detachedGroupsLayer: false,
-  });
+  @Input()
+  public set optimization(newOptimization: Optimization) {
+    this.flowSettingsService.optimization.update((optimization) => ({
+      ...optimization,
+      ...newOptimization,
+    }));
+  }
 
   /**
    * Global rule if you can or can't select entities
@@ -358,8 +361,8 @@ export class VflowComponent {
   // #endregion
 
   protected markers = this.flowEntitiesService.markers;
-
   protected minimap = this.flowEntitiesService.minimap;
+  protected flowOptimization = this.flowSettingsService.optimization;
 
   // #region METHODS_API
   /**
