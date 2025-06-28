@@ -1,14 +1,31 @@
-import { Injectable, computed, inject } from '@angular/core';
+import { Injectable, computed, inject, untracked } from '@angular/core';
 import { FlowEntitiesService } from './flow-entities.service';
 import { NodeModel } from '../models/node.model';
 import { isGroupNode } from '../utils/is-group-node';
+import { ViewportService } from './viewport.service';
+import { FlowSettingsService } from './flow-settings.service';
+import { isRectInViewport } from '../utils/viewport';
 
 @Injectable()
 export class NodeRenderingService {
   private flowEntitiesService = inject(FlowEntitiesService);
+  private viewportService = inject(ViewportService);
+  private flowSettingsService = inject(FlowSettingsService);
 
   public readonly nodes = computed(() => {
-    return [...this.flowEntitiesService.nodes().sort((aNode, bNode) => aNode.renderOrder() - bNode.renderOrder())];
+    const viewport = this.viewportService.readableViewport();
+    const flowWidth = this.flowSettingsService.computedFlowWidth();
+    const flowHeight = this.flowSettingsService.computedFlowHeight();
+
+    const viewportNodes = this.flowEntitiesService.nodes().filter((n) => {
+      const { x, y } = n.globalPoint();
+      const width = untracked(n.width);
+      const height = untracked(n.height);
+
+      return isRectInViewport({ x, y, width, height }, viewport, flowWidth, flowHeight);
+    });
+
+    return viewportNodes.sort((aNode, bNode) => aNode.renderOrder() - bNode.renderOrder());
   });
 
   public readonly groups = computed(() => {

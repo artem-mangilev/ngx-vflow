@@ -282,7 +282,7 @@ export class VflowComponent {
     );
 
     // quick and dirty binding nodes to edges
-    addNodesToEdges(this.nodeModels(), newModels);
+    addNodesToEdges(this.flowEntitiesService.nodes(), newModels);
 
     this.flowEntitiesService.edges.set(newModels);
   }
