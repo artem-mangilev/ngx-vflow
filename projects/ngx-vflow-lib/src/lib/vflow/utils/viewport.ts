@@ -75,7 +75,6 @@ export function isRectInViewport(rect: Rect, viewport: ViewportState, flowWidth:
  * @param viewport Current viewport state
  * @param flowWidth Width of the flow container
  * @param flowHeight Height of the flow container
- * @param padding Additional padding around the line segment
  * @returns true if the line segment intersects with the viewport, false otherwise
  */
 export function isLineInViewport(
@@ -84,12 +83,11 @@ export function isLineInViewport(
   viewport: ViewportState,
   flowWidth: number,
   flowHeight: number,
-  padding: number = 0,
 ): boolean {
-  const minX = Math.min(startPoint.x, endPoint.x) - padding;
-  const maxX = Math.max(startPoint.x, endPoint.x) + padding;
-  const minY = Math.min(startPoint.y, endPoint.y) + padding;
-  const maxY = Math.max(startPoint.y, endPoint.y) + padding;
+  const minX = Math.min(startPoint.x, endPoint.x);
+  const maxX = Math.max(startPoint.x, endPoint.x);
+  const minY = Math.min(startPoint.y, endPoint.y);
+  const maxY = Math.max(startPoint.y, endPoint.y);
 
   const lineRect = {
     x: minX,

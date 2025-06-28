@@ -36,9 +36,7 @@ export class EdgeRenderingService {
       const sourcePoint = sourceHandle.pointAbsolute();
       const targetPoint = targetHandle.pointAbsolute();
 
-      const padding = 50;
-
-      return isLineInViewport(sourcePoint, targetPoint, viewport, flowWidth, flowHeight, padding);
+      return isLineInViewport(sourcePoint, targetPoint, viewport, flowWidth, flowHeight);
     });
   });
 
