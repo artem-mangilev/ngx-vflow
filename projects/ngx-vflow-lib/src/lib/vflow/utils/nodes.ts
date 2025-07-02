@@ -53,8 +53,8 @@ function nodeToBox(node: NodeModel): Box {
 
 export function nodeToRect(node: NodeModel): Rect {
   return {
-    x: node.point().x,
-    y: node.point().y,
+    x: node.globalPoint().x,
+    y: node.globalPoint().y,
     width: node.width(),
     height: node.height(),
   };
