@@ -2,18 +2,17 @@ import { Injectable, computed, inject, untracked } from '@angular/core';
 import { FlowEntitiesService } from './flow-entities.service';
 import { NodeModel } from '../models/node.model';
 import { isGroupNode } from '../utils/is-group-node';
-import { ViewportService } from './viewport.service';
 import { FlowSettingsService } from './flow-settings.service';
-import { isRectInViewport } from '../utils/viewport';
+import { RenderZoneService } from './render-zone.service';
 
 @Injectable()
 export class NodeRenderingService {
   private flowEntitiesService = inject(FlowEntitiesService);
-  private viewportService = inject(ViewportService);
   private flowSettingsService = inject(FlowSettingsService);
+  private renderZoneService = inject(RenderZoneService);
 
   public readonly nodes = computed(() => {
-    return [...this.viewportNodes().sort((aNode, bNode) => aNode.renderOrder() - bNode.renderOrder())];
+    return this.viewportNodes().sort((aNode, bNode) => aNode.renderOrder() - bNode.renderOrder());
   });
 
   public readonly groups = computed(() => {
@@ -29,16 +28,16 @@ export class NodeRenderingService {
       return this.flowEntitiesService.nodes();
     }
 
-    const viewport = this.viewportService.readableViewport();
-    const flowWidth = this.flowSettingsService.computedFlowWidth();
-    const flowHeight = this.flowSettingsService.computedFlowHeight();
+    const viewportZones = this.renderZoneService.viewportZones();
 
     return this.flowEntitiesService.nodes().filter((n) => {
-      const { x, y } = n.globalPoint();
+      const { x, y } = untracked(n.globalPoint);
       const width = untracked(n.width);
       const height = untracked(n.height);
 
-      return isRectInViewport({ x, y, width, height }, viewport, flowWidth, flowHeight);
+      return viewportZones.some((zone) => {
+        return x + width >= zone.x && x <= zone.x + zone.width && y + height >= zone.y && y <= zone.y + zone.height;
+      });
     });
   });
 

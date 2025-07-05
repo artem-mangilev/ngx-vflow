@@ -64,6 +64,7 @@ import { EdgeRenderingService } from '../../services/edge-rendering.service';
 import { getSpacePoints } from '../../utils/get-space-points';
 import { getIntesectingNodes } from '../../utils/nodes';
 import { IntersectingNodesOptions } from '../../interfaces/intersecting-nodes-options.interface';
+import { RenderZoneService } from '../../services/render-zone.service';
 
 const changesControllerHostDirective = {
   directive: ChangesControllerDirective,
@@ -120,6 +121,7 @@ const changesControllerHostDirective = {
     ComponentEventBusService,
     KeyboardService,
     OverlaysService,
+    RenderZoneService,
   ],
   hostDirectives: [changesControllerHostDirective],
   imports: [
