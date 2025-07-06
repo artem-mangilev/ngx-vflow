@@ -278,18 +278,6 @@
   {
     "breadcrumbs": [
       "Features",
-      "Multiple connection points"
-    ],
-    "pageType": "guide",
-    "title": "Multiple connection points",
-    "section": "Multiple connection points",
-    "route": "/features/multiple-connection-points",
-    "fragment": "multiple-connection-points",
-    "content": "Custom components provide the ability to control handles and their positions. All you need to do is take HandleComponent from library and place it somewhere in your custom node. This component automatically computes its position based on parent element's position."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
       "Selecting"
     ],
     "pageType": "guide",
@@ -406,6 +394,18 @@
     "route": "/features/view-size",
     "fragment": "fixed-size",
     "content": "vflow can take fixed space if you pass [view]=\"[600, 600]\" input, where first item of array is width (in pixels), and the second is height (in pixels)."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Multiple connection points"
+    ],
+    "pageType": "guide",
+    "title": "Multiple connection points",
+    "section": "Multiple connection points",
+    "route": "/features/multiple-connection-points",
+    "fragment": "multiple-connection-points",
+    "content": "Custom components provide the ability to control handles and their positions. All you need to do is take HandleComponent from library and place it somewhere in your custom node. This component automatically computes its position based on parent element's position."
   },
   {
     "breadcrumbs": [
@@ -913,19 +913,6 @@
     "breadcrumbs": [
       "Features",
       "Edges",
-      "Default edges"
-    ],
-    "pageType": "guide",
-    "title": "Default edges",
-    "section": "Default edges",
-    "route": "/features/edges/default-edges",
-    "fragment": "default-edges",
-    "content": "You can link nodes with edges. All you need to do is to create another Edge[] array and pass it to the vflow component. Each edge contains the id of the source and target nodes, and each edge must have its own id."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
       "Custom edges"
     ],
     "pageType": "guide",
@@ -1376,6 +1363,19 @@
     "route": "/features/edges/custom-edges",
     "fragment": "context",
     "content": "It's tricky to infer type for let-ctx, so here is an interface with available fields for this context."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Default edges"
+    ],
+    "pageType": "guide",
+    "title": "Default edges",
+    "section": "Default edges",
+    "route": "/features/edges/default-edges",
+    "fragment": "default-edges",
+    "content": "You can link nodes with edges. All you need to do is to create another Edge[] array and pass it to the vflow component. Each edge contains the id of the source and target nodes, and each edge must have its own id."
   },
   {
     "breadcrumbs": [
