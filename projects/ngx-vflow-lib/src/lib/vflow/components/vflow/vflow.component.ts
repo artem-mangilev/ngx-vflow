@@ -497,10 +497,10 @@ export class VflowComponent {
   // #endregion
 
   protected trackNodes(idx: number, { rawNode: node }: NodeModel) {
-    return node;
+    return node.id;
   }
 
   protected trackEdges(idx: number, { edge }: EdgeModel) {
-    return edge;
+    return edge.id;
   }
 }

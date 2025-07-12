@@ -56,11 +56,12 @@ export class PreviewFlowComponent {
         viewport.y * this.dpr, // vertical translation with DPR
       );
 
-      nodes.forEach((node) => {
+      for (let i = 0; i < nodes.length; i++) {
+        const node = nodes[i];
         if (this.renderStrategy.shouldRenderNode(node)) {
           drawNode(this.ctx, node);
         }
-      });
+      }
 
       // Restore the context state
       this.ctx.restore();
