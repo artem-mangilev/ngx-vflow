@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, effect, ElementRef, inject, input }
 import { FlowEntitiesService } from '../../services/flow-entities.service';
 import { ViewportService } from '../../services/viewport.service';
 import { NodeModel } from '../../models/node.model';
+import { PreviewFlowRenderStrategyService } from '../../services/preview-flow-render-strategy.service';
 
 @Component({
   standalone: true,
@@ -16,6 +17,8 @@ import { NodeModel } from '../../models/node.model';
 export class PreviewFlowComponent {
   private entitiesService = inject(FlowEntitiesService);
   private viewportService = inject(ViewportService);
+  private renderStrategy = inject(PreviewFlowRenderStrategyService);
+
   private ctx = inject<ElementRef<HTMLCanvasElement>>(ElementRef).nativeElement.getContext('2d')!;
 
   readonly width = input<number>(0);
@@ -41,7 +44,11 @@ export class PreviewFlowComponent {
         viewport.y, // vertical translation
       );
 
-      nodes.forEach((node) => this.drawNode(node));
+      nodes.forEach((node) => {
+        if (this.renderStrategy.shouldRenderNode(node)) {
+          this.drawNode(node);
+        }
+      });
 
       // Restore the context state
       this.ctx.restore();
@@ -49,7 +56,7 @@ export class PreviewFlowComponent {
   }
 
   private drawNode(node: NodeModel) {
-    const point = node.point();
+    const point = node.globalPoint();
     const width = node.width();
     const height = node.height();
 

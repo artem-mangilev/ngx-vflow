@@ -100,6 +100,9 @@ export class MapContextDirective implements OnInit {
       target: evTarget(sourceEvent),
     };
 
+    this.viewportService.triggerViewportChangeEvent('end');
+
+    // TODO: maybe use triggerViewportChangeEvent instead of this method?
     this.selectionService.setViewport(this.viewportForSelection as ViewportForSelection);
   };
 

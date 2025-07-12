@@ -20,6 +20,8 @@ export class NodeModel<T = unknown>
 
   private entitiesService = inject(FlowEntitiesService);
 
+  public isVisible = signal(true);
+
   public point = signal<Point>({ x: 0, y: 0 });
   public point$: Observable<Point>;
 

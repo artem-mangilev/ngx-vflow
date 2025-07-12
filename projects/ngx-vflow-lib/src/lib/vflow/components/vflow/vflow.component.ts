@@ -66,6 +66,10 @@ import { getIntesectingNodes } from '../../utils/nodes';
 import { IntersectingNodesOptions } from '../../interfaces/intersecting-nodes-options.interface';
 import { RenderZoneService } from '../../services/render-zone.service';
 import { PreviewFlowComponent } from '../preview-flow/preview-flow.component';
+import {
+  PreviewFlowRenderStrategyService,
+  ViewportPreviewFlowRenderStrategyService,
+} from '../../services/preview-flow-render-strategy.service';
 
 const changesControllerHostDirective = {
   directive: ChangesControllerDirective,
@@ -123,6 +127,7 @@ const changesControllerHostDirective = {
     KeyboardService,
     OverlaysService,
     RenderZoneService,
+    { provide: PreviewFlowRenderStrategyService, useClass: ViewportPreviewFlowRenderStrategyService },
   ],
   hostDirectives: [changesControllerHostDirective],
   imports: [
