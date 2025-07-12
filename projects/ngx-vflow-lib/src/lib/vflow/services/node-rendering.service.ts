@@ -68,11 +68,7 @@ export class NodeRenderingService {
       const width = n.width();
       const height = n.height();
 
-      const inViewport = isRectInViewport({ x, y, width, height }, viewport, flowWidth, flowHeight);
-
-      n.isVisible.set(inViewport);
-
-      return inViewport;
+      return isRectInViewport({ x, y, width, height }, viewport, flowWidth, flowHeight);
     });
   }
 }

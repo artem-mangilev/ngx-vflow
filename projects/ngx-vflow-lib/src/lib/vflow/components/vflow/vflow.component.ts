@@ -69,6 +69,7 @@ import {
   PreviewFlowRenderStrategyService,
   ViewportPreviewFlowRenderStrategyService,
 } from '../../services/preview-flow-render-strategy.service';
+import { LazyForDirective } from '../../directives/lazy-for.directive';
 
 const changesControllerHostDirective = {
   directive: ChangesControllerDirective,
@@ -142,6 +143,7 @@ const changesControllerHostDirective = {
     EdgeComponent,
     NgTemplateOutlet,
     PreviewFlowComponent,
+    LazyForDirective,
   ],
 })
 export class VflowComponent {
