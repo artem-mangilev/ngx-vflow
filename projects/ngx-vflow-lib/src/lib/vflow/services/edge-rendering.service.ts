@@ -1,4 +1,4 @@
-import { Injectable, computed, inject } from '@angular/core';
+import { Injectable, computed, inject, untracked } from '@angular/core';
 import { FlowEntitiesService } from './flow-entities.service';
 import { EdgeModel } from '../models/edge.model';
 import { FlowSettingsService } from './flow-settings.service';
@@ -22,7 +22,7 @@ export class EdgeRenderingService {
   });
 
   private viewportEdges = computed(() => {
-    const viewport = this.viewportService.readableViewport();
+    const viewport = untracked(this.viewportService.readableViewport);
     const flowWidth = this.flowSettingsService.computedFlowWidth();
     const flowHeight = this.flowSettingsService.computedFlowHeight();
 
@@ -35,8 +35,8 @@ export class EdgeRenderingService {
         return false;
       }
 
-      const sourcePoint = sourceHandle.pointAbsolute();
-      const targetPoint = targetHandle.pointAbsolute();
+      const sourcePoint = untracked(sourceHandle.pointAbsolute);
+      const targetPoint = untracked(targetHandle.pointAbsolute);
 
       return isLineInViewport(sourcePoint, targetPoint, viewport, flowWidth, flowHeight);
     });

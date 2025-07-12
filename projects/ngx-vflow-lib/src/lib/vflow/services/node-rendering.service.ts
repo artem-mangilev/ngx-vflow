@@ -6,7 +6,7 @@ import { FlowSettingsService } from './flow-settings.service';
 import { isRectInViewport } from '../utils/viewport';
 import { ViewportService } from './viewport.service';
 import { toObservable } from '@angular/core/rxjs-interop';
-import { asyncScheduler, filter, map, merge, observeOn } from 'rxjs';
+import { asyncScheduler, debounceTime, filter, map, merge, observeOn } from 'rxjs';
 import { toLazySignal } from '../utils/signals/to-lazy-signal';
 
 @Injectable()
@@ -40,7 +40,10 @@ export class NodeRenderingService {
         filter((nodes) => !!nodes.length),
       ),
 
-      this.viewportService.viewportChangeEnd$.pipe(map(() => this.flowEntitiesService.nodes())),
+      this.viewportService.viewportChangeEnd$.pipe(
+        debounceTime(500),
+        map(() => this.flowEntitiesService.nodes()),
+      ),
     ).pipe(map((nodes) => this.getViewportNodes(nodes))),
     {
       initialValue: [],
