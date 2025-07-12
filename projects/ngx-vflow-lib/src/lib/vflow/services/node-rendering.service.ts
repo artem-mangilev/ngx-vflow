@@ -15,7 +15,7 @@ export class NodeRenderingService {
   private viewportService = inject(ViewportService);
 
   public readonly nodes = computed(() => {
-    if (!this.flowSettingsService.optimization().viewportVirtualization.enabled) {
+    if (!this.flowSettingsService.optimization().virtualizationEnabled) {
       return [...this.flowEntitiesService.nodes()].sort((aNode, bNode) => aNode.renderOrder() - bNode.renderOrder());
     }
 
@@ -71,7 +71,7 @@ export class NodeRenderingService {
       return isRectInViewport({ x, y, width, height }, viewport, flowWidth, flowHeight);
     });
 
-    const zoomThreshold = this.flowSettingsService.optimization().viewportVirtualization.zoomThreshold!;
+    const zoomThreshold = this.flowSettingsService.optimization().virtualizationZoomThreshold;
 
     return viewport.zoom < zoomThreshold ? [] : viewportNodes;
   }

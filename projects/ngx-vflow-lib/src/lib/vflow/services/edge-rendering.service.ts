@@ -12,7 +12,7 @@ export class EdgeRenderingService {
   private flowSettingsService = inject(FlowSettingsService);
 
   public readonly edges = computed(() => {
-    if (!this.flowSettingsService.optimization().viewportVirtualization.enabled) {
+    if (!this.flowSettingsService.optimization().virtualizationEnabled) {
       return [...this.flowEntitiesService.validEdges()].sort(
         (aEdge, bEdge) => aEdge.renderOrder() - bEdge.renderOrder(),
       );

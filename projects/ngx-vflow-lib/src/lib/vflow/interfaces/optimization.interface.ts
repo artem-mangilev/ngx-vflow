@@ -1,9 +1,7 @@
 export const DEFAULT_OPTIMIZATION: Required<Optimization> = {
   detachedGroupsLayer: false,
-  viewportVirtualization: {
-    enabled: false,
-    zoomThreshold: 0.5,
-  },
+  virtualizationEnabled: false,
+  virtualizationZoomThreshold: 0.5,
 };
 
 export interface Optimization {
@@ -16,24 +14,19 @@ export interface Optimization {
   detachedGroupsLayer?: boolean;
 
   /**
-   * Optimization settings for viewport virtualization.
+   * If true, enables viewport virtualization to improve performance by only rendering
+   * nodes and edges that are currently visible in the viewport. This optimization
+   * filters out entities that are outside the visible area, reducing the number of
+   * DOM elements and improving rendering performance for large flows.
+   *
+   * It uses canvas as a virtualization layer during viewport change.
+   * When the viewport change ends, the library hydrates the canvas with the actual nodes and edges.
    */
-  viewportVirtualization?: {
-    /**
-     * If true, enables viewport virtualization to improve performance by only rendering
-     * nodes and edges that are currently visible in the viewport. This optimization
-     * filters out entities that are outside the visible area, reducing the number of
-     * DOM elements and improving rendering performance for large flows.
-     *
-     * It uses canvas as a virtualization layer during viewport change.
-     * When the viewport change ends, the library hydrates the canvas with the actual nodes and edges.
-     */
-    enabled: boolean;
+  virtualizationEnabled: boolean;
 
-    /**
-     * The zoom threshold below which the only virtualization layer is drawn.
-     * This should help to avoid performance issues when zooming out too much.
-     */
-    zoomThreshold?: number;
-  };
+  /**
+   * The zoom threshold below which the only virtualization layer is drawn.
+   * This should help to avoid performance issues when zooming out too much.
+   */
+  virtualizationZoomThreshold?: number;
 }
