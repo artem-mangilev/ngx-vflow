@@ -71,8 +71,8 @@ export class NodeRenderingService {
       return isRectInViewport({ x, y, width, height }, viewport, flowWidth, flowHeight);
     });
 
-    const nodesThreshold = this.flowSettingsService.optimization().viewportVirtualization.nodesThreshold!;
+    const zoomThreshold = this.flowSettingsService.optimization().viewportVirtualization.zoomThreshold!;
 
-    return viewportNodes.length > nodesThreshold ? [] : viewportNodes;
+    return viewport.zoom < zoomThreshold ? [] : viewportNodes;
   }
 }
