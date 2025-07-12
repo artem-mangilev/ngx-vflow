@@ -63,6 +63,6 @@
   }
 </svg:svg>
 
-@if (flowOptimization().viewportVirtualization) {
+@if (flowOptimization().viewportVirtualization.enabled) {
   <canvas previewFlow class="preview-flow" [width]="flowWidth()" [height]="flowHeight()"></canvas>
 }

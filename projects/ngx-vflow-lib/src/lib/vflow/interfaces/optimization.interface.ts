@@ -1,6 +1,9 @@
 export const DEFAULT_OPTIMIZATION: Required<Optimization> = {
   detachedGroupsLayer: false,
-  viewportVirtualization: false,
+  viewportVirtualization: {
+    enabled: true,
+    nodesThreshold: 250,
+  },
 };
 
 export interface Optimization {
@@ -20,5 +23,8 @@ export interface Optimization {
    *
    * @default false
    */
-  viewportVirtualization?: boolean;
+  viewportVirtualization?: {
+    enabled: boolean;
+    nodesThreshold?: number;
+  };
 }

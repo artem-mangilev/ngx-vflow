@@ -15,7 +15,7 @@ export class NodeRenderingService {
   private viewportService = inject(ViewportService);
 
   public readonly nodes = computed(() => {
-    if (!this.flowSettingsService.optimization().viewportVirtualization) {
+    if (!this.flowSettingsService.optimization().viewportVirtualization.enabled) {
       return [...this.flowEntitiesService.nodes()].sort((aNode, bNode) => aNode.renderOrder() - bNode.renderOrder());
     }
 
@@ -63,12 +63,16 @@ export class NodeRenderingService {
     const flowWidth = this.flowSettingsService.computedFlowWidth();
     const flowHeight = this.flowSettingsService.computedFlowHeight();
 
-    return nodes.filter((n) => {
+    const viewportNodes = nodes.filter((n) => {
       const { x, y } = n.globalPoint();
       const width = n.width();
       const height = n.height();
 
       return isRectInViewport({ x, y, width, height }, viewport, flowWidth, flowHeight);
     });
+
+    const nodesThreshold = this.flowSettingsService.optimization().viewportVirtualization.nodesThreshold!;
+
+    return viewportNodes.length > nodesThreshold ? [] : viewportNodes;
   }
 }
