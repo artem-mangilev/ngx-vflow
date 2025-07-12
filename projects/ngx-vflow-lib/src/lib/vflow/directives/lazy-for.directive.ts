@@ -165,7 +165,7 @@ export class LazyForDirective<T, U extends NgIterable<T> = NgIterable<T>> implem
   /** trackBy function */
   private _trackByFn!: TrackByFunction<T>;
   /** Number of items to be rendered per frame */
-  private _itemsPerFrame: number = 20;
+  private _itemsPerFrame: number = 50;
   /** Directive state */
   private _lazyForState: LazyForState = LazyForState.idle;
   //#endregion
