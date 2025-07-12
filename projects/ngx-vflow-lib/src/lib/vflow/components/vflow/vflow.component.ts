@@ -13,7 +13,7 @@ import { MapContextDirective } from '../../directives/map-context.directive';
 import { DraggableService } from '../../services/draggable.service';
 import { NodeModel } from '../../models/node.model';
 import { ViewportService } from '../../services/viewport.service';
-import { toObservable, toSignal, outputFromObservable } from '@angular/core/rxjs-interop';
+import { toObservable, outputFromObservable } from '@angular/core/rxjs-interop';
 import { Edge } from '../../interfaces/edge.interface';
 import { EdgeModel } from '../../models/edge.model';
 import {
@@ -69,6 +69,7 @@ import {
   PreviewFlowRenderStrategyService,
   ViewportPreviewFlowRenderStrategyService,
 } from '../../services/preview-flow-render-strategy.service';
+import { toLazySignal } from '../../utils/signals/to-lazy-signal';
 
 const changesControllerHostDirective = {
   directive: ChangesControllerDirective,
@@ -338,14 +339,14 @@ export class VflowComponent {
   /**
    * Signal for reading nodes change
    */
-  public readonly nodesChange = toSignal(this.nodesChangeService.changes$, {
+  public readonly nodesChange = toLazySignal(this.nodesChangeService.changes$, {
     initialValue: [] as NodeChange[],
   });
 
   /**
    * Signal to reading edges change
    */
-  public readonly edgesChange = toSignal(this.edgesChangeService.changes$, {
+  public readonly edgesChange = toLazySignal(this.edgesChangeService.changes$, {
     initialValue: [] as EdgeChange[],
   });
   // #endregion

@@ -5,8 +5,9 @@ import { isGroupNode } from '../utils/is-group-node';
 import { FlowSettingsService } from './flow-settings.service';
 import { isRectInViewport } from '../utils/viewport';
 import { ViewportService } from './viewport.service';
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { toObservable } from '@angular/core/rxjs-interop';
 import { asyncScheduler, filter, map, merge, observeOn } from 'rxjs';
+import { toLazySignal } from '../utils/signals/to-lazy-signal';
 
 @Injectable()
 export class NodeRenderingService {
@@ -30,7 +31,7 @@ export class NodeRenderingService {
     return this.nodes().filter((n) => !isGroupNode(n));
   });
 
-  private viewportNodes = toSignal(
+  private viewportNodes = toLazySignal(
     merge(
       // TODO: maybe there is a better way wait when viewport is ready?
       // (to correctly calculate viewport nodes on first render)
