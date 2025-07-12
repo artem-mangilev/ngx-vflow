@@ -65,6 +65,7 @@ import { getSpacePoints } from '../../utils/get-space-points';
 import { getIntesectingNodes } from '../../utils/nodes';
 import { IntersectingNodesOptions } from '../../interfaces/intersecting-nodes-options.interface';
 import { RenderZoneService } from '../../services/render-zone.service';
+import { PreviewFlowComponent } from '../preview-flow/preview-flow.component';
 
 const changesControllerHostDirective = {
   directive: ChangesControllerDirective,
@@ -137,6 +138,7 @@ const changesControllerHostDirective = {
     NodeComponent,
     EdgeComponent,
     NgTemplateOutlet,
+    PreviewFlowComponent,
   ],
 })
 export class VflowComponent {
@@ -365,6 +367,8 @@ export class VflowComponent {
   protected markers = this.flowEntitiesService.markers;
   protected minimap = this.flowEntitiesService.minimap;
   protected flowOptimization = this.flowSettingsService.optimization;
+  protected flowWidth = this.flowSettingsService.computedFlowWidth;
+  protected flowHeight = this.flowSettingsService.computedFlowHeight;
 
   // #region METHODS_API
   /**

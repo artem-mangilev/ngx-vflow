@@ -1,5 +1,6 @@
 :host {
   display: block;
+  position: relative;
   width: 100%;
   height: 100%;
   user-select: none;
@@ -9,4 +10,11 @@
       box-sizing: border-box;
     }
   }
+}
+
+.preview-flow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
 }
