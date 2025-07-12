@@ -6,7 +6,7 @@ import { FlowSettingsService } from './flow-settings.service';
 import { isRectInViewport } from '../utils/viewport';
 import { ViewportService } from './viewport.service';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { asyncScheduler, filter, map, merge, observeOn, take } from 'rxjs';
+import { asyncScheduler, filter, map, merge, observeOn } from 'rxjs';
 
 @Injectable()
 export class NodeRenderingService {
@@ -37,7 +37,6 @@ export class NodeRenderingService {
       toObservable(this.flowEntitiesService.nodes).pipe(
         observeOn(asyncScheduler),
         filter((nodes) => !!nodes.length),
-        take(1),
       ),
 
       this.viewportService.viewportChangeEnd$.pipe(map(() => this.flowEntitiesService.nodes())),

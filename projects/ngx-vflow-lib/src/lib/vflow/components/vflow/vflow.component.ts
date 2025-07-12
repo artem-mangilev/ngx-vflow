@@ -64,7 +64,6 @@ import { EdgeRenderingService } from '../../services/edge-rendering.service';
 import { getSpacePoints } from '../../utils/get-space-points';
 import { getIntesectingNodes } from '../../utils/nodes';
 import { IntersectingNodesOptions } from '../../interfaces/intersecting-nodes-options.interface';
-import { RenderZoneService } from '../../services/render-zone.service';
 import { PreviewFlowComponent } from '../preview-flow/preview-flow.component';
 import {
   PreviewFlowRenderStrategyService,
@@ -126,7 +125,6 @@ const changesControllerHostDirective = {
     ComponentEventBusService,
     KeyboardService,
     OverlaysService,
-    RenderZoneService,
     { provide: PreviewFlowRenderStrategyService, useClass: ViewportPreviewFlowRenderStrategyService },
   ],
   hostDirectives: [changesControllerHostDirective],

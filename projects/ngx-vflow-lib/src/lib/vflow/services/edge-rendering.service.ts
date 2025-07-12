@@ -12,14 +12,16 @@ export class EdgeRenderingService {
   private flowSettingsService = inject(FlowSettingsService);
 
   public readonly edges = computed(() => {
+    if (!this.flowSettingsService.optimization().viewportVirtualization) {
+      return [...this.flowEntitiesService.validEdges()].sort(
+        (aEdge, bEdge) => aEdge.renderOrder() - bEdge.renderOrder(),
+      );
+    }
+
     return this.viewportEdges().sort((aEdge, bEdge) => aEdge.renderOrder() - bEdge.renderOrder());
   });
 
   private viewportEdges = computed(() => {
-    if (!this.flowSettingsService.optimization().viewportVirtualization) {
-      return this.flowEntitiesService.validEdges();
-    }
-
     const viewport = this.viewportService.readableViewport();
     const flowWidth = this.flowSettingsService.computedFlowWidth();
     const flowHeight = this.flowSettingsService.computedFlowHeight();
