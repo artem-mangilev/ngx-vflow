@@ -15,7 +15,7 @@ export class NodeRenderingService {
   private viewportService = inject(ViewportService);
 
   public readonly nodes = computed(() => {
-    if (!this.flowSettingsService.optimization().virtualizationEnabled) {
+    if (!this.flowSettingsService.optimization().virtualization) {
       return [...this.flowEntitiesService.nodes()].sort((aNode, bNode) => aNode.renderOrder() - bNode.renderOrder());
     }
 

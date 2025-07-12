@@ -1,6 +1,6 @@
 export const DEFAULT_OPTIMIZATION: Required<Optimization> = {
   detachedGroupsLayer: false,
-  virtualizationEnabled: false,
+  virtualization: false,
   virtualizationZoomThreshold: 0.5,
 };
 
@@ -22,7 +22,7 @@ export interface Optimization {
    * It uses canvas as a virtualization layer during viewport change.
    * When the viewport change ends, the library hydrates the canvas with the actual nodes and edges.
    */
-  virtualizationEnabled: boolean;
+  virtualization: boolean;
 
   /**
    * The zoom threshold below which the only virtualization layer is drawn.
