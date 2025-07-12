@@ -3,6 +3,8 @@ import { NodeModel } from '../../models/node.model';
 export function drawNode(ctx: CanvasRenderingContext2D, node: NodeModel) {
   if (node.rawNode.type === 'default') {
     drawDefaultNode(ctx, node);
+  } else if (node.rawNode.type === 'default-group') {
+    drawDefaultGroupNode(ctx, node);
   } else {
     const point = node.globalPoint();
     const width = node.width();
@@ -52,4 +54,19 @@ function drawDefaultNode(ctx: CanvasRenderingContext2D, node: NodeModel) {
   const centerX = point.x + width / 2;
   const centerY = point.y + height / 2;
   ctx.fillText(node.text(), centerX, centerY);
+}
+
+function drawDefaultGroupNode(ctx: CanvasRenderingContext2D, node: NodeModel) {
+  const point = node.globalPoint();
+  const width = node.width();
+  const height = node.height();
+
+  ctx.globalAlpha = 0.05;
+  ctx.fillStyle = node.color();
+  ctx.fillRect(point.x, point.y, width, height);
+  ctx.globalAlpha = 1;
+
+  ctx.strokeStyle = node.color();
+  ctx.lineWidth = 1.5;
+  ctx.strokeRect(point.x, point.y, width, height);
 }
