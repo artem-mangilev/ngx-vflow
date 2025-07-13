@@ -1,3 +1,3 @@
 export interface NodePreview {
-  style: Partial<CSSStyleDeclaration>;
+  style: Pick<Partial<CSSStyleDeclaration>, 'backgroundColor' | 'borderColor' | 'borderWidth' | 'borderRadius'>;
 }

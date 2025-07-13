@@ -1,18 +1,22 @@
 import { NodeModel } from '../../models/node.model';
 
 export function drawNode(ctx: CanvasRenderingContext2D, node: NodeModel) {
+  if (Object.keys(node.preview().style).length) {
+    drawStyledNode(ctx, node);
+    return;
+  }
+
   if (node.rawNode.type === 'default') {
     drawDefaultNode(ctx, node);
-  } else if (node.rawNode.type === 'default-group') {
-    drawDefaultGroupNode(ctx, node);
-  } else {
-    const point = node.globalPoint();
-    const width = node.width();
-    const height = node.height();
-
-    ctx.fillStyle = 'rgb(0 0 0 / 10%)';
-    ctx.fillRect(point.x, point.y, width, height);
+    return;
   }
+
+  if (node.rawNode.type === 'default-group') {
+    drawDefaultGroupNode(ctx, node);
+    return;
+  }
+
+  drawUnknownNode(ctx, node);
 }
 
 function drawDefaultNode(ctx: CanvasRenderingContext2D, node: NodeModel) {
@@ -20,20 +24,7 @@ function drawDefaultNode(ctx: CanvasRenderingContext2D, node: NodeModel) {
   const width = node.width();
   const height = node.height();
 
-  const borderRadius = 5; // Add border radius
-
-  // Create rounded rectangle path
-  ctx.beginPath();
-  ctx.moveTo(point.x + borderRadius, point.y);
-  ctx.lineTo(point.x + width - borderRadius, point.y);
-  ctx.quadraticCurveTo(point.x + width, point.y, point.x + width, point.y + borderRadius);
-  ctx.lineTo(point.x + width, point.y + height - borderRadius);
-  ctx.quadraticCurveTo(point.x + width, point.y + height, point.x + width - borderRadius, point.y + height);
-  ctx.lineTo(point.x + borderRadius, point.y + height);
-  ctx.quadraticCurveTo(point.x, point.y + height, point.x, point.y + height - borderRadius);
-  ctx.lineTo(point.x, point.y + borderRadius);
-  ctx.quadraticCurveTo(point.x, point.y, point.x + borderRadius, point.y);
-  ctx.closePath();
+  borderRadius(ctx, node, 5);
 
   // Draw background (background-color: white)
   ctx.fillStyle = 'white';
@@ -69,4 +60,63 @@ function drawDefaultGroupNode(ctx: CanvasRenderingContext2D, node: NodeModel) {
   ctx.strokeStyle = node.color();
   ctx.lineWidth = 1.5;
   ctx.strokeRect(point.x, point.y, width, height);
+}
+
+function drawStyledNode(ctx: CanvasRenderingContext2D, node: NodeModel) {
+  const point = node.globalPoint();
+  const width = node.width();
+  const height = node.height();
+  const style = node.preview().style;
+
+  if (style.borderRadius) {
+    const radius = parseFloat(style.borderRadius);
+    borderRadius(ctx, node, radius);
+  } else {
+    ctx.beginPath();
+    ctx.rect(point.x, point.y, width, height);
+    ctx.closePath();
+  }
+
+  if (style.backgroundColor) {
+    ctx.fillStyle = style.backgroundColor;
+  }
+
+  if (style.borderColor) {
+    ctx.strokeStyle = style.borderColor;
+  }
+
+  if (style.borderWidth) {
+    ctx.lineWidth = parseFloat(style.borderWidth);
+  }
+
+  ctx.fill();
+  ctx.stroke();
+}
+
+function drawUnknownNode(ctx: CanvasRenderingContext2D, node: NodeModel) {
+  const point = node.globalPoint();
+  const width = node.width();
+  const height = node.height();
+
+  ctx.fillStyle = 'rgb(0 0 0 / 10%)';
+  ctx.fillRect(point.x, point.y, width, height);
+}
+
+function borderRadius(ctx: CanvasRenderingContext2D, node: NodeModel, radius: number) {
+  const point = node.globalPoint();
+  const width = node.width();
+  const height = node.height();
+
+  // Create rounded rectangle path
+  ctx.beginPath();
+  ctx.moveTo(point.x + radius, point.y);
+  ctx.lineTo(point.x + width - radius, point.y);
+  ctx.quadraticCurveTo(point.x + width, point.y, point.x + width, point.y + radius);
+  ctx.lineTo(point.x + width, point.y + height - radius);
+  ctx.quadraticCurveTo(point.x + width, point.y + height, point.x + width - radius, point.y + height);
+  ctx.lineTo(point.x + radius, point.y + height);
+  ctx.quadraticCurveTo(point.x, point.y + height, point.x, point.y + height - radius);
+  ctx.lineTo(point.x, point.y + radius);
+  ctx.quadraticCurveTo(point.x, point.y, point.x + radius, point.y);
+  ctx.closePath();
 }
