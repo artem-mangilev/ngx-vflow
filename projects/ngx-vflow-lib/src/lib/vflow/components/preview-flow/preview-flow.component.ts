@@ -39,7 +39,7 @@ export class PreviewFlowComponent {
 
     effect(() => {
       const nodes = this.entitiesService.nodes();
-      const viewport = this.viewportService.readableViewport();
+      const viewport = this.viewportService.afReadableViewport();
 
       this.ctx.clearRect(0, 0, this.width(), this.height());
 

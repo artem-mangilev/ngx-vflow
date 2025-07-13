@@ -105,7 +105,7 @@ export class MiniMapComponent implements OnInit {
   protected minimapHeight = computed(() => this.flowSettingsService.computedFlowHeight() * this.minimapScale());
 
   protected viewportTransform = computed(() => {
-    const viewport = this.viewportService.readableViewport();
+    const viewport = this.viewportService.afReadableViewport();
     let scale = 1 / viewport.zoom;
 
     let x = -(viewport.x * this.minimapScale()) * scale;

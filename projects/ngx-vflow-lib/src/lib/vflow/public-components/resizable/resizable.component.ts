@@ -70,7 +70,7 @@ export class ResizableComponent implements OnInit, AfterViewInit {
 
   private resizeSide: Side | null = null;
 
-  private zoom = computed(() => this.viewportService.readableViewport().zoom ?? 0);
+  private zoom = computed(() => this.viewportService.afReadableViewport().zoom ?? 0);
 
   private minWidth = 0;
   private minHeight = 0;

@@ -32,7 +32,7 @@ export class BackgroundComponent {
     const background = this.backgroundSignal();
 
     if (background.type === 'dots') {
-      const zoom = this.viewportService.readableViewport().zoom;
+      const zoom = this.viewportService.afReadableViewport().zoom;
 
       return zoom * (background.gap ?? defaultGap);
     }
@@ -40,9 +40,9 @@ export class BackgroundComponent {
     return 0;
   });
 
-  protected x = computed(() => this.viewportService.readableViewport().x % this.scaledGap());
+  protected x = computed(() => this.viewportService.afReadableViewport().x % this.scaledGap());
 
-  protected y = computed(() => this.viewportService.readableViewport().y % this.scaledGap());
+  protected y = computed(() => this.viewportService.afReadableViewport().y % this.scaledGap());
 
   protected patternColor = computed(() => {
     const bg = this.backgroundSignal();
@@ -58,7 +58,7 @@ export class BackgroundComponent {
     const background = this.backgroundSignal();
 
     if (background.type === 'dots') {
-      return (this.viewportService.readableViewport().zoom * (background.size ?? defaultDotSize)) / 2;
+      return (this.viewportService.afReadableViewport().zoom * (background.size ?? defaultDotSize)) / 2;
     }
 
     return 0;
@@ -83,7 +83,7 @@ export class BackgroundComponent {
     const background = this.backgroundSignal();
 
     if (background.type === 'image') {
-      const zoom = background.fixed ? 1 : this.viewportService.readableViewport().zoom;
+      const zoom = background.fixed ? 1 : this.viewportService.afReadableViewport().zoom;
 
       return this.imageSize().width * zoom * (background.scale ?? defaultImageScale);
     }
@@ -95,7 +95,7 @@ export class BackgroundComponent {
     const background = this.backgroundSignal();
 
     if (background.type === 'image') {
-      const zoom = background.fixed ? 1 : this.viewportService.readableViewport().zoom;
+      const zoom = background.fixed ? 1 : this.viewportService.afReadableViewport().zoom;
 
       return this.imageSize().height * zoom * (background.scale ?? defaultImageScale);
     }
@@ -108,10 +108,10 @@ export class BackgroundComponent {
 
     if (background.type === 'image') {
       if (!background.repeat) {
-        return background.fixed ? 0 : this.viewportService.readableViewport().x;
+        return background.fixed ? 0 : this.viewportService.afReadableViewport().x;
       }
 
-      return background.fixed ? 0 : this.viewportService.readableViewport().x % this.scaledImageWidth();
+      return background.fixed ? 0 : this.viewportService.afReadableViewport().x % this.scaledImageWidth();
     }
 
     return 0;
@@ -122,10 +122,10 @@ export class BackgroundComponent {
 
     if (background.type === 'image') {
       if (!background.repeat) {
-        return background.fixed ? 0 : this.viewportService.readableViewport().y;
+        return background.fixed ? 0 : this.viewportService.afReadableViewport().y;
       }
 
-      return background.fixed ? 0 : this.viewportService.readableViewport().y % this.scaledImageHeight();
+      return background.fixed ? 0 : this.viewportService.afReadableViewport().y % this.scaledImageHeight();
     }
 
     return 0;
