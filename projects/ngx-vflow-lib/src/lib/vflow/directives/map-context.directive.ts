@@ -1,4 +1,4 @@
-import { Directive, ElementRef, OnInit, effect, inject, untracked } from '@angular/core';
+import { Directive, ElementRef, NgZone, OnInit, effect, inject, signal, untracked } from '@angular/core';
 import { select } from 'd3-selection';
 import { D3ZoomEvent, ZoomBehavior, ZoomTransform, zoom, zoomIdentity } from 'd3-zoom';
 import { ViewportService } from '../services/viewport.service';
@@ -11,6 +11,9 @@ import { FlowSettingsService } from '../services/flow-settings.service';
 @Directive({
   standalone: true,
   selector: 'g[mapContext]',
+  host: {
+    '[attr.transform]': 'transform()',
+  },
 })
 export class MapContextDirective implements OnInit {
   protected rootSvg = inject(RootSvgReferenceDirective).element;
@@ -18,9 +21,11 @@ export class MapContextDirective implements OnInit {
   protected selectionService = inject(SelectionService);
   protected viewportService = inject(ViewportService);
   protected flowSettingsService = inject(FlowSettingsService);
+  protected zone = inject(NgZone);
 
   protected rootSvgSelection = select(this.rootSvg);
-  protected zoomableSelection = select(this.host);
+
+  protected transform = signal<string>('');
 
   protected viewportForSelection: Partial<ViewportForSelection> = {};
 
@@ -70,6 +75,17 @@ export class MapContextDirective implements OnInit {
   protected zoomBehavior!: ZoomBehavior<SVGSVGElement, unknown>;
 
   public ngOnInit(): void {
+    this.zone.runOutsideAngular(() => {
+      this.zoomBehavior = zoom<SVGSVGElement, unknown>()
+        .scaleExtent([this.flowSettingsService.minZoom(), this.flowSettingsService.maxZoom()])
+        .filter(this.filterCondition)
+        .on('start', this.handleZoomStart)
+        .on('zoom', this.handleZoom)
+        .on('end', this.handleZoomEnd);
+
+      this.rootSvgSelection.call(this.zoomBehavior).on('dblclick.zoom', null);
+    });
+
     this.zoomBehavior = zoom<SVGSVGElement, unknown>()
       .scaleExtent([this.flowSettingsService.minZoom(), this.flowSettingsService.maxZoom()])
       .filter(this.filterCondition)
@@ -84,7 +100,7 @@ export class MapContextDirective implements OnInit {
     // update public signal for user to read
     this.viewportService.readableViewport.set(mapTransformToViewportState(transform));
 
-    this.zoomableSelection.attr('transform', transform.toString());
+    this.transform.set(transform.toString());
   };
 
   private handleZoomStart = ({ transform }: ZoomEvent) => {
@@ -94,16 +110,18 @@ export class MapContextDirective implements OnInit {
   };
 
   private handleZoomEnd = ({ transform, sourceEvent }: ZoomEvent) => {
-    this.viewportForSelection = {
-      ...this.viewportForSelection,
-      end: mapTransformToViewportState(transform),
-      target: evTarget(sourceEvent),
-    };
+    this.zone.run(() => {
+      this.viewportForSelection = {
+        ...this.viewportForSelection,
+        end: mapTransformToViewportState(transform),
+        target: evTarget(sourceEvent),
+      };
 
-    this.viewportService.triggerViewportChangeEvent('end');
+      this.viewportService.triggerViewportChangeEvent('end');
 
-    // TODO: maybe use triggerViewportChangeEvent instead of this method?
-    this.selectionService.setViewport(this.viewportForSelection as ViewportForSelection);
+      // TODO: maybe use triggerViewportChangeEvent instead of this method?
+      this.selectionService.setViewport(this.viewportForSelection as ViewportForSelection);
+    });
   };
 
   private filterCondition = (event: Event) => {
