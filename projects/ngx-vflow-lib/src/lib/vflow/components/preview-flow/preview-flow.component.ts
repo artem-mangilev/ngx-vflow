@@ -3,6 +3,8 @@ import { FlowEntitiesService } from '../../services/flow-entities.service';
 import { ViewportService } from '../../services/viewport.service';
 import { PreviewFlowRenderStrategyService } from '../../services/preview-flow-render-strategy.service';
 import { drawNode } from './draw-node';
+import { FlowSettingsService } from '../../services/flow-settings.service';
+import { isRectInViewport } from '../../utils/viewport';
 
 @Component({
   standalone: true,
@@ -13,6 +15,7 @@ import { drawNode } from './draw-node';
 export class PreviewFlowComponent {
   private entitiesService = inject(FlowEntitiesService);
   private viewportService = inject(ViewportService);
+  private flowSettingsService = inject(FlowSettingsService);
   private renderStrategy = inject(PreviewFlowRenderStrategyService);
 
   private element = inject<ElementRef<HTMLCanvasElement>>(ElementRef).nativeElement;
@@ -39,7 +42,9 @@ export class PreviewFlowComponent {
 
     effect(() => {
       const nodes = this.entitiesService.nodes();
-      const viewport = this.viewportService.afReadableViewport();
+      const viewport = this.viewportService.readableViewport();
+      const flowWidth = this.flowSettingsService.computedFlowWidth();
+      const flowHeight = this.flowSettingsService.computedFlowHeight();
 
       this.ctx.clearRect(0, 0, this.width(), this.height());
 
@@ -56,8 +61,17 @@ export class PreviewFlowComponent {
         viewport.y * this.dpr, // vertical translation with DPR
       );
 
-      for (let i = 0; i < nodes.length; i++) {
-        const node = nodes[i];
+      const viewportNodes = nodes.filter((n) => {
+        const { x, y } = n.globalPoint();
+        const width = n.width();
+        const height = n.height();
+
+        return isRectInViewport({ x, y, width, height }, viewport, flowWidth, flowHeight);
+      });
+
+      for (let i = 0; i < viewportNodes.length; i++) {
+        const node = viewportNodes[i];
+
         if (this.renderStrategy.shouldRenderNode(node)) {
           drawNode(this.ctx, node);
         }

@@ -6,9 +6,7 @@ import { getViewportForBounds } from '../utils/viewport';
 import { FlowSettingsService } from './flow-settings.service';
 import { FitViewOptions } from '../interfaces/fit-view-options.interface';
 import { NodeModel } from '../models/node.model';
-import { animationFrameScheduler, observeOn, shareReplay, Subject } from 'rxjs';
-import { toObservable } from '@angular/core/rxjs-interop';
-import { toLazySignal } from '../utils/signals/to-lazy-signal';
+import { Subject } from 'rxjs';
 
 @Injectable()
 export class ViewportService {
@@ -40,11 +38,6 @@ export class ViewportService {
    * - writableViewport signal
    */
   public readonly readableViewport: WritableSignal<ViewportState> = signal(ViewportService.getDefaultViewport());
-
-  public readonly afReadableViewport = toLazySignal(
-    toObservable(this.readableViewport).pipe(observeOn(animationFrameScheduler), shareReplay(1)),
-    { initialValue: ViewportService.getDefaultViewport() },
-  );
 
   public readonly viewportChangeEnd$ = new Subject<void>();
 
