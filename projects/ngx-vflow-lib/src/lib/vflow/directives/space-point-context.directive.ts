@@ -1,8 +1,8 @@
 import { Directive, ElementRef, Signal, computed, inject } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { RootSvgReferenceDirective } from './reference.directive';
 import { Point } from '../interfaces/point.interface';
 import { RootPointerDirective } from './root-pointer.directive';
+import { toLazySignal } from '../utils/signals/to-lazy-signal';
 
 @Directive({
   standalone: true,
@@ -29,7 +29,7 @@ export class SpacePointContextDirective {
     });
   });
 
-  public pointerMovement = toSignal(this.pointerMovementDirective.pointerMovement$);
+  public pointerMovement = toLazySignal(this.pointerMovementDirective.pointerMovement$);
 
   public documentPointToFlowPoint(documentPoint: Point) {
     const point = this.rootSvg.createSVGPoint();

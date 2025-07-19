@@ -92,8 +92,9 @@ export class NodeComponent implements OnInit, OnDestroy {
   protected toolbars = computed(() => this.overlaysService.nodeToolbarsMap().get(this.model()));
 
   public ngOnInit() {
-    this.nodeAccessor.model.set(this.model());
+    this.model().isVisible.set(true);
 
+    this.nodeAccessor.model.set(this.model());
     this.handleService.node.set(this.model());
 
     effect(
@@ -109,6 +110,8 @@ export class NodeComponent implements OnInit, OnDestroy {
   }
 
   public ngOnDestroy(): void {
+    this.model().isVisible.set(false);
+
     this.draggableService.destroy(this.hostRef.nativeElement);
   }
 

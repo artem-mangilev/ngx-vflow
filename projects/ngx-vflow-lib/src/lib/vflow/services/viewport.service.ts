@@ -6,6 +6,7 @@ import { getViewportForBounds } from '../utils/viewport';
 import { FlowSettingsService } from './flow-settings.service';
 import { FitViewOptions } from '../interfaces/fit-view-options.interface';
 import { NodeModel } from '../models/node.model';
+import { Subject } from 'rxjs';
 
 @Injectable()
 export class ViewportService {
@@ -38,6 +39,8 @@ export class ViewportService {
    */
   public readonly readableViewport: WritableSignal<ViewportState> = signal(ViewportService.getDefaultViewport());
 
+  public readonly viewportChangeEnd$ = new Subject<void>();
+
   // TODO: add writableViewportWithConstraints (to apply min zoom/max zoom values)
 
   public fitView(options: FitViewOptions = { padding: 0.1, duration: 0, nodes: [] }) {
@@ -55,6 +58,12 @@ export class ViewportService {
     const duration = options.duration ?? 0;
 
     this.writableViewport.set({ changeType: 'absolute', state, duration });
+  }
+
+  public triggerViewportChangeEvent(type: 'end') {
+    if (type === 'end') {
+      this.viewportChangeEnd$.next();
+    }
   }
 
   private getBoundsNodes(nodeIds: string[]) {

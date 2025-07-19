@@ -3,8 +3,9 @@ import { ViewportService } from '../../services/viewport.service';
 import { RootSvgReferenceDirective } from '../../directives/reference.directive';
 import { id } from '../../utils/id';
 import { FlowSettingsService } from '../../services/flow-settings.service';
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { toObservable } from '@angular/core/rxjs-interop';
 import { map, switchMap } from 'rxjs';
+import { toLazySignal } from '../../utils/signals/to-lazy-signal';
 
 const defaultBg = '#fff';
 const defaultGap = 20;
@@ -70,7 +71,7 @@ export class BackgroundComponent {
     return background.type === 'image' ? background.src : '';
   });
 
-  protected imageSize = toSignal(
+  protected imageSize = toLazySignal(
     toObservable(this.backgroundSignal).pipe(
       switchMap(() => createImage(this.bgImageSrc())),
       map((image) => ({ width: image.naturalWidth, height: image.naturalHeight })),

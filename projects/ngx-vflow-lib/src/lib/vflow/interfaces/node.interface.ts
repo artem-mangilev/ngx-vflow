@@ -2,6 +2,7 @@ import { Type, WritableSignal } from '@angular/core';
 import { Point } from './point.interface';
 import { CustomNodeComponent } from '../public-components/custom-node/custom-node.component';
 import { CustomDynamicNodeComponent } from '../public-components/custom-dynamic-node/custom-dynamic-node.component';
+import { NodePreview } from './node-preview.interface';
 
 export type Node<T = any> =
   | DefaultNode
@@ -24,6 +25,7 @@ export interface SharedNode {
   point: Point;
   draggable?: boolean;
   parentId?: string | null;
+  preview?: NodePreview;
 }
 
 export interface SharedDynamicNode {
@@ -31,6 +33,7 @@ export interface SharedDynamicNode {
   point: WritableSignal<Point>;
   draggable?: WritableSignal<boolean>;
   parentId?: WritableSignal<string | null>;
+  preview?: WritableSignal<NodePreview>;
 }
 
 export interface DefaultNode extends SharedNode {

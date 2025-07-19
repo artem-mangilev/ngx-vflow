@@ -1,5 +1,6 @@
 import { Injectable, WritableSignal, signal } from '@angular/core';
 import { Background } from '../types/background.type';
+import { DEFAULT_OPTIMIZATION, Optimization } from '../interfaces/optimization.interface';
 
 @Injectable()
 export class FlowSettingsService {
@@ -30,4 +31,6 @@ export class FlowSettingsService {
   public background = signal<Background>({ type: 'solid', color: '#fff' });
 
   public snapGrid = signal<[number, number]>([1, 1]);
+
+  public optimization = signal<Required<Optimization>>(DEFAULT_OPTIMIZATION);
 }
