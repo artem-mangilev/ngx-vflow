@@ -3,7 +3,6 @@ import {
   Component,
   contentChild,
   Input,
-  input,
   output,
   signal,
   WritableSignal,
@@ -17,7 +16,6 @@ import {
   SpacePoint,
   Point,
   Background,
-  Optimization,
   KeyboardShortcuts,
   ConnectionSettings,
   ViewportState,
@@ -27,6 +25,7 @@ import {
   VflowComponent,
   IntersectingNodesOptions,
   ɵConnectionModel as ConnectionModel,
+  DEFAULT_OPTIMIZATION,
 } from 'ngx-vflow';
 import { toObservable } from '@angular/core/rxjs-interop';
 import {
@@ -151,9 +150,8 @@ export class VflowMockComponent implements AsInterface<VflowComponent>, OnInit {
   @Input()
   public readonly background: Background | string = '#fff';
 
-  public readonly optimization = input<Optimization>({
-    detachedGroupsLayer: false,
-  });
+  @Input()
+  public readonly optimization = DEFAULT_OPTIMIZATION;
 
   @Input()
   public readonly entitiesSelectable = true;
