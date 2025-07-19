@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, effect, ElementRef, inject, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, ElementRef, inject, input } from '@angular/core';
 import { FlowEntitiesService } from '../../services/flow-entities.service';
 import { ViewportService } from '../../services/viewport.service';
 import { PreviewFlowRenderStrategyService } from '../../services/preview-flow-render-strategy.service';
@@ -26,6 +26,21 @@ export class PreviewFlowComponent {
 
   private readonly dpr = window.devicePixelRatio;
 
+  private viewportNodes = computed(() => {
+    const nodes = this.entitiesService.nodes();
+    const viewport = this.viewportService.readableViewport();
+    const flowWidth = this.flowSettingsService.computedFlowWidth();
+    const flowHeight = this.flowSettingsService.computedFlowHeight();
+
+    return nodes.filter((n) => {
+      const { x, y } = n.globalPoint();
+      const width = n.width();
+      const height = n.height();
+
+      return isRectInViewport({ x, y, width, height }, viewport, flowWidth, flowHeight);
+    });
+  });
+
   constructor() {
     effect(() => {
       // Set the "actual" size of the canvas
@@ -41,10 +56,7 @@ export class PreviewFlowComponent {
     });
 
     effect(() => {
-      const nodes = this.entitiesService.nodes();
       const viewport = this.viewportService.readableViewport();
-      const flowWidth = this.flowSettingsService.computedFlowWidth();
-      const flowHeight = this.flowSettingsService.computedFlowHeight();
 
       this.ctx.clearRect(0, 0, this.width(), this.height());
 
@@ -61,16 +73,8 @@ export class PreviewFlowComponent {
         viewport.y * this.dpr, // vertical translation with DPR
       );
 
-      const viewportNodes = nodes.filter((n) => {
-        const { x, y } = n.globalPoint();
-        const width = n.width();
-        const height = n.height();
-
-        return isRectInViewport({ x, y, width, height }, viewport, flowWidth, flowHeight);
-      });
-
-      for (let i = 0; i < viewportNodes.length; i++) {
-        const node = viewportNodes[i];
+      for (let i = 0; i < this.viewportNodes().length; i++) {
+        const node = this.viewportNodes()[i];
 
         if (this.renderStrategy.shouldRenderNode(node)) {
           drawNode(this.ctx, node);
