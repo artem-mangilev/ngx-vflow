@@ -1,10 +1,8 @@
-import { ChangeDetectionStrategy, Component, computed, effect, ElementRef, inject, input } from '@angular/core';
-import { FlowEntitiesService } from '../../services/flow-entities.service';
+import { ChangeDetectionStrategy, Component, effect, ElementRef, inject, input, Renderer2 } from '@angular/core';
 import { ViewportService } from '../../services/viewport.service';
 import { PreviewFlowRenderStrategyService } from '../../services/preview-flow-render-strategy.service';
 import { drawNode } from './draw-node';
-import { FlowSettingsService } from '../../services/flow-settings.service';
-import { isRectInViewport } from '../../utils/viewport';
+import { NodeRenderingService } from '../../services/node-rendering.service';
 
 @Component({
   standalone: true,
@@ -13,10 +11,10 @@ import { isRectInViewport } from '../../utils/viewport';
   template: '',
 })
 export class PreviewFlowComponent {
-  private entitiesService = inject(FlowEntitiesService);
   private viewportService = inject(ViewportService);
-  private flowSettingsService = inject(FlowSettingsService);
   private renderStrategy = inject(PreviewFlowRenderStrategyService);
+  private nodeRenderingService = inject(NodeRenderingService);
+  private renderer2 = inject(Renderer2);
 
   private element = inject<ElementRef<HTMLCanvasElement>>(ElementRef).nativeElement;
   private ctx = this.element.getContext('2d')!;
@@ -26,30 +24,15 @@ export class PreviewFlowComponent {
 
   private readonly dpr = window.devicePixelRatio;
 
-  private viewportNodes = computed(() => {
-    const nodes = this.entitiesService.nodes();
-    const viewport = this.viewportService.readableViewport();
-    const flowWidth = this.flowSettingsService.computedFlowWidth();
-    const flowHeight = this.flowSettingsService.computedFlowHeight();
-
-    return nodes.filter((n) => {
-      const { x, y } = n.globalPoint();
-      const width = n.width();
-      const height = n.height();
-
-      return isRectInViewport({ x, y, width, height }, viewport, flowWidth, flowHeight);
-    });
-  });
-
   constructor() {
     effect(() => {
       // Set the "actual" size of the canvas
-      this.element.width = this.width() * this.dpr;
-      this.element.height = this.height() * this.dpr;
+      this.renderer2.setProperty(this.element, 'width', this.width() * this.dpr);
+      this.renderer2.setProperty(this.element, 'height', this.height() * this.dpr);
 
       // Set the "drawn" size of the canvas
-      this.element.style.width = `${this.width()}px`;
-      this.element.style.height = `${this.height()}px`;
+      this.renderer2.setStyle(this.element, 'width', `${this.width()}px`);
+      this.renderer2.setStyle(this.element, 'height', `${this.height()}px`);
 
       // Scale the context to match device pixel ratio
       this.ctx.scale(this.dpr, this.dpr);
@@ -73,8 +56,8 @@ export class PreviewFlowComponent {
         viewport.y * this.dpr, // vertical translation with DPR
       );
 
-      for (let i = 0; i < this.viewportNodes().length; i++) {
-        const node = this.viewportNodes()[i];
+      for (let i = 0; i < this.nodeRenderingService.viewportNodes().length; i++) {
+        const node = this.nodeRenderingService.viewportNodes()[i];
 
         if (this.renderStrategy.shouldRenderNode(node)) {
           drawNode(this.ctx, node);

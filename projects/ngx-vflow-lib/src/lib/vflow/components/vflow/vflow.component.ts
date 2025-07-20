@@ -370,6 +370,7 @@ export class VflowComponent {
 
   protected markers = this.flowEntitiesService.markers;
   protected minimap = this.flowEntitiesService.minimap;
+
   protected flowOptimization = this.flowSettingsService.optimization;
   protected flowWidth = this.flowSettingsService.computedFlowWidth;
   protected flowHeight = this.flowSettingsService.computedFlowHeight;

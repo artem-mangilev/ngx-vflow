@@ -20,7 +20,7 @@ export class NodeRenderingService {
       return [...this.flowEntitiesService.nodes()].sort((aNode, bNode) => aNode.renderOrder() - bNode.renderOrder());
     }
 
-    return this.viewportNodes().sort((aNode, bNode) => aNode.renderOrder() - bNode.renderOrder());
+    return this.viewportNodesAfterInteraction().sort((aNode, bNode) => aNode.renderOrder() - bNode.renderOrder());
   });
 
   public readonly groups = computed(() => {
@@ -31,7 +31,22 @@ export class NodeRenderingService {
     return this.nodes().filter((n) => !isGroupNode(n));
   });
 
-  private viewportNodes = toLazySignal(
+  public viewportNodes = computed(() => {
+    const nodes = this.flowEntitiesService.nodes();
+    const viewport = this.viewportService.readableViewport();
+    const flowWidth = this.flowSettingsService.computedFlowWidth();
+    const flowHeight = this.flowSettingsService.computedFlowHeight();
+
+    return nodes.filter((n) => {
+      const { x, y } = n.globalPoint();
+      const width = n.width();
+      const height = n.height();
+
+      return isRectInViewport({ x, y, width, height }, viewport, flowWidth, flowHeight);
+    });
+  });
+
+  private viewportNodesAfterInteraction = toLazySignal(
     merge(
       // TODO: maybe there is a better way wait when viewport is ready?
       // (to correctly calculate viewport nodes on first render)
@@ -44,7 +59,14 @@ export class NodeRenderingService {
         debounceTime(300),
         map(() => this.flowEntitiesService.nodes()),
       ),
-    ).pipe(map((nodes) => this.getViewportNodes(nodes))),
+    ).pipe(
+      map(() => {
+        const viewport = this.viewportService.readableViewport();
+        const zoomThreshold = this.flowSettingsService.optimization().virtualizationZoomThreshold;
+
+        return viewport.zoom < zoomThreshold ? [] : this.viewportNodes();
+      }),
+    ),
     {
       initialValue: [],
     },
@@ -60,23 +82,5 @@ export class NodeRenderingService {
 
     // pull children
     node.children().forEach((n) => this.pullNode(n));
-  }
-
-  private getViewportNodes(nodes: NodeModel[]) {
-    const viewport = this.viewportService.readableViewport();
-    const flowWidth = this.flowSettingsService.computedFlowWidth();
-    const flowHeight = this.flowSettingsService.computedFlowHeight();
-
-    const viewportNodes = nodes.filter((n) => {
-      const { x, y } = n.globalPoint();
-      const width = n.width();
-      const height = n.height();
-
-      return isRectInViewport({ x, y, width, height }, viewport, flowWidth, flowHeight);
-    });
-
-    const zoomThreshold = this.flowSettingsService.optimization().virtualizationZoomThreshold;
-
-    return viewport.zoom < zoomThreshold ? [] : viewportNodes;
   }
 }
