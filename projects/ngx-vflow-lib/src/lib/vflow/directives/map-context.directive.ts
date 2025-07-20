@@ -85,15 +85,6 @@ export class MapContextDirective implements OnInit {
 
       this.rootSvgSelection.call(this.zoomBehavior).on('dblclick.zoom', null);
     });
-
-    this.zoomBehavior = zoom<SVGSVGElement, unknown>()
-      .scaleExtent([this.flowSettingsService.minZoom(), this.flowSettingsService.maxZoom()])
-      .filter(this.filterCondition)
-      .on('start', this.handleZoomStart)
-      .on('zoom', this.handleZoom)
-      .on('end', this.handleZoomEnd);
-
-    this.rootSvgSelection.call(this.zoomBehavior).on('dblclick.zoom', null);
   }
 
   private handleZoom = ({ transform }: ZoomEvent) => {
