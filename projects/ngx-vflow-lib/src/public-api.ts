@@ -16,6 +16,7 @@ export * from './lib/vflow/interfaces/fit-view-options.interface';
 export * from './lib/vflow/interfaces/optimization.interface';
 export * from './lib/vflow/interfaces/intersecting-nodes-options.interface';
 export * from './lib/vflow/interfaces/curve-factory.interface';
+export * from './lib/vflow/interfaces/node-preview.interface';
 
 // Types
 export * from './lib/vflow/types/node-change.type';
