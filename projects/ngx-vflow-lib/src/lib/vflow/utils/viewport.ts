@@ -66,35 +66,3 @@ export function isRectInViewport(rect: Rect, viewport: ViewportState, flowWidth:
 
   return !isNotIntersecting;
 }
-
-/**
- * Checks if a line segment intersects with the viewport's visible area
- *
- * @param startPoint Start point of the line segment
- * @param endPoint End point of the line segment
- * @param viewport Current viewport state
- * @param flowWidth Width of the flow container
- * @param flowHeight Height of the flow container
- * @returns true if the line segment intersects with the viewport, false otherwise
- */
-export function isLineInViewport(
-  startPoint: { x: number; y: number },
-  endPoint: { x: number; y: number },
-  viewport: ViewportState,
-  flowWidth: number,
-  flowHeight: number,
-): boolean {
-  const minX = Math.min(startPoint.x, endPoint.x);
-  const maxX = Math.max(startPoint.x, endPoint.x);
-  const minY = Math.min(startPoint.y, endPoint.y);
-  const maxY = Math.max(startPoint.y, endPoint.y);
-
-  const lineRect = {
-    x: minX,
-    y: minY,
-    width: maxX - minX,
-    height: maxY - minY,
-  };
-
-  return isRectInViewport(lineRect, viewport, flowWidth, flowHeight);
-}
