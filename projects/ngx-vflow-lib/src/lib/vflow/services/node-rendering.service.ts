@@ -55,10 +55,7 @@ export class NodeRenderingService {
         filter((nodes) => !!nodes.length),
       ),
 
-      this.viewportService.viewportChangeEnd$.pipe(
-        debounceTime(300),
-        map(() => this.flowEntitiesService.nodes()),
-      ),
+      this.viewportService.viewportChangeEnd$.pipe(debounceTime(300)),
     ).pipe(
       map(() => {
         const viewport = this.viewportService.readableViewport();
