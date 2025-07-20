@@ -2,7 +2,7 @@ import { computed, signal } from '@angular/core';
 import { NodeHandle } from '../services/handle.service';
 import { NodeModel } from './node.model';
 import { Subject, map } from 'rxjs';
-import { toLazySignal } from '../utils/signals/to-lazy-signal';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 export type HandleState = 'valid' | 'invalid' | 'idle';
 
@@ -29,11 +29,13 @@ export class HandleModel {
 
   private updateHostSizeAndPosition$ = new Subject<void>();
 
-  private hostSize = toLazySignal(this.updateHostSizeAndPosition$.pipe(map(() => this.getHostSize())), {
+  // TODO: for some reason toLazySignal breaks unit tests, so we use toSignal here
+  private hostSize = toSignal(this.updateHostSizeAndPosition$.pipe(map(() => this.getHostSize())), {
     initialValue: { width: 0, height: 0 },
   });
 
-  private hostPosition = toLazySignal(
+  // TODO: for some reason toLazySignal breaks unit tests, so we use toSignal here
+  private hostPosition = toSignal(
     this.updateHostSizeAndPosition$.pipe(
       map(() => ({
         x: this.hostReference instanceof HTMLElement ? this.hostReference.offsetLeft : 0, // for now just 0 for group nodes
