@@ -14,6 +14,7 @@ import { EdgeContext } from '../interfaces/template-context.interface';
 import { HandleModel } from './handle.model';
 import { CurveFactoryParams } from '../interfaces/curve-factory.interface';
 import { FlowEntitiesService } from '../services/flow-entities.service';
+import { extendedComputed } from '../utils/signals/extended-computed';
 
 export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
   private readonly flowEntitiesService = inject(FlowEntitiesService);
@@ -89,36 +90,56 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
     }
   });
 
-  public sourceHandle = computed(() => {
+  public sourceHandle = extendedComputed<HandleModel | null>((previousHandle) => {
+    let handle: HandleModel | null = null;
+
     if (this.edge.sourceHandle) {
-      return (
+      handle =
         this.source()
           ?.handles()
-          .find((handle) => handle.rawHandle.id === this.edge.sourceHandle) ?? null
-      );
+          .find((handle) => handle.rawHandle.id === this.edge.sourceHandle) ?? null;
+    } else {
+      handle =
+        this.source()
+          ?.handles()
+          .find((handle) => handle.rawHandle.type === 'source') ?? null;
     }
 
-    return (
-      this.source()
-        ?.handles()
-        .find((handle) => handle.rawHandle.type === 'source') ?? null
-    );
+    // In case of virtual scrolling, if the node is scrolled out of view the handle may disappear
+    // which could lead to the edge not being rendered
+    // so we return the previous handle if the current one is null
+    // TODO: check if this breaks anything
+    if (handle === null) {
+      return previousHandle;
+    }
+
+    return handle;
   });
 
-  public targetHandle = computed(() => {
+  public targetHandle = extendedComputed<HandleModel | null>((previousHandle) => {
+    let handle: HandleModel | null = null;
+
     if (this.edge.targetHandle) {
-      return (
+      handle =
         this.target()
           ?.handles()
-          .find((handle) => handle.rawHandle.id === this.edge.targetHandle) ?? null
-      );
+          .find((handle) => handle.rawHandle.id === this.edge.targetHandle) ?? null;
+    } else {
+      handle =
+        this.target()
+          ?.handles()
+          .find((handle) => handle.rawHandle.type === 'target') ?? null;
     }
 
-    return (
-      this.target()
-        ?.handles()
-        .find((handle) => handle.rawHandle.type === 'target') ?? null
-    );
+    // In case of virtual scrolling, if the node is scrolled out of view the handle may disappear
+    // which could lead to the edge not being rendered
+    // so we return the previous handle if the current one is null
+    // TODO: check if this breaks anything
+    if (handle === null) {
+      return previousHandle;
+    }
+
+    return handle;
   });
 
   /**

@@ -29,10 +29,12 @@ export class HandleModel {
 
   private updateHostSizeAndPosition$ = new Subject<void>();
 
+  // TODO: for some reason toLazySignal breaks unit tests, so we use toSignal here
   private hostSize = toSignal(this.updateHostSizeAndPosition$.pipe(map(() => this.getHostSize())), {
     initialValue: { width: 0, height: 0 },
   });
 
+  // TODO: for some reason toLazySignal breaks unit tests, so we use toSignal here
   private hostPosition = toSignal(
     this.updateHostSizeAndPosition$.pipe(
       map(() => ({

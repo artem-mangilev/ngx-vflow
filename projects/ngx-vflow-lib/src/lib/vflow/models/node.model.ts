@@ -10,6 +10,7 @@ import { Contextable } from '../interfaces/contextable.interface';
 import { GroupNodeContext, NodeContext } from '../interfaces/template-context.interface';
 import { toUnifiedNode } from '../utils/to-unified-node';
 import { Observable } from 'rxjs';
+import { NodePreview } from '../interfaces/node-preview.interface';
 
 export class NodeModel<T = unknown>
   implements FlowEntity, Contextable<NodeContext | GroupNodeContext | { $implicit: object }>
@@ -19,6 +20,8 @@ export class NodeModel<T = unknown>
   private static defaultColor = '#1b262c';
 
   private entitiesService = inject(FlowEntitiesService);
+
+  public isVisible = signal(false);
 
   public point = signal<Point>({ x: 0, y: 0 });
   public point$: Observable<Point>;
@@ -48,6 +51,8 @@ export class NodeModel<T = unknown>
 
   public selected = signal(false);
   public selected$: Observable<boolean>;
+
+  public preview = signal<NodePreview>({ style: {} });
 
   public globalPoint = computed(() => {
     let parent = this.parent();
@@ -125,6 +130,10 @@ export class NodeModel<T = unknown>
 
     if (internalNode.parentId) {
       this.parentId = internalNode.parentId;
+    }
+
+    if (internalNode.preview) {
+      this.preview = internalNode.preview;
     }
 
     if (internalNode.type === 'default-group' && internalNode.color) {

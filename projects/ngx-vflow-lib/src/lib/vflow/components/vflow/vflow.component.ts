@@ -5,7 +5,6 @@ import {
   Input,
   inject,
   runInInjectionContext,
-  input,
   contentChild,
   viewChild,
 } from '@angular/core';
@@ -14,7 +13,7 @@ import { MapContextDirective } from '../../directives/map-context.directive';
 import { DraggableService } from '../../services/draggable.service';
 import { NodeModel } from '../../models/node.model';
 import { ViewportService } from '../../services/viewport.service';
-import { toObservable, toSignal, outputFromObservable } from '@angular/core/rxjs-interop';
+import { toObservable, outputFromObservable } from '@angular/core/rxjs-interop';
 import { Edge } from '../../interfaces/edge.interface';
 import { EdgeModel } from '../../models/edge.model';
 import {
@@ -65,6 +64,12 @@ import { EdgeRenderingService } from '../../services/edge-rendering.service';
 import { getSpacePoints } from '../../utils/get-space-points';
 import { getIntesectingNodes } from '../../utils/nodes';
 import { IntersectingNodesOptions } from '../../interfaces/intersecting-nodes-options.interface';
+import { PreviewFlowComponent } from '../preview-flow/preview-flow.component';
+import {
+  PreviewFlowRenderStrategyService,
+  ViewportPreviewFlowRenderStrategyService,
+} from '../../services/preview-flow-render-strategy.service';
+import { toLazySignal } from '../../utils/signals/to-lazy-signal';
 
 const changesControllerHostDirective = {
   directive: ChangesControllerDirective,
@@ -121,6 +126,7 @@ const changesControllerHostDirective = {
     ComponentEventBusService,
     KeyboardService,
     OverlaysService,
+    { provide: PreviewFlowRenderStrategyService, useClass: ViewportPreviewFlowRenderStrategyService },
   ],
   hostDirectives: [changesControllerHostDirective],
   imports: [
@@ -136,6 +142,7 @@ const changesControllerHostDirective = {
     NodeComponent,
     EdgeComponent,
     NgTemplateOutlet,
+    PreviewFlowComponent,
   ],
 })
 export class VflowComponent {
@@ -191,9 +198,13 @@ export class VflowComponent {
     this.flowSettingsService.background.set(transformBackground(value));
   }
 
-  public optimization = input<Optimization>({
-    detachedGroupsLayer: false,
-  });
+  @Input()
+  public set optimization(newOptimization: Optimization) {
+    this.flowSettingsService.optimization.update((optimization) => ({
+      ...optimization,
+      ...newOptimization,
+    }));
+  }
 
   /**
    * Global rule if you can or can't select entities
@@ -282,7 +293,7 @@ export class VflowComponent {
     );
 
     // quick and dirty binding nodes to edges
-    addNodesToEdges(this.nodeModels(), newModels);
+    addNodesToEdges(this.flowEntitiesService.nodes(), newModels);
 
     this.flowEntitiesService.edges.set(newModels);
   }
@@ -328,14 +339,14 @@ export class VflowComponent {
   /**
    * Signal for reading nodes change
    */
-  public readonly nodesChange = toSignal(this.nodesChangeService.changes$, {
+  public readonly nodesChange = toLazySignal(this.nodesChangeService.changes$, {
     initialValue: [] as NodeChange[],
   });
 
   /**
    * Signal to reading edges change
    */
-  public readonly edgesChange = toSignal(this.edgesChangeService.changes$, {
+  public readonly edgesChange = toLazySignal(this.edgesChangeService.changes$, {
     initialValue: [] as EdgeChange[],
   });
   // #endregion
@@ -358,8 +369,11 @@ export class VflowComponent {
   // #endregion
 
   protected markers = this.flowEntitiesService.markers;
-
   protected minimap = this.flowEntitiesService.minimap;
+
+  protected flowOptimization = this.flowSettingsService.optimization;
+  protected flowWidth = this.flowSettingsService.computedFlowWidth;
+  protected flowHeight = this.flowSettingsService.computedFlowHeight;
 
   // #region METHODS_API
   /**

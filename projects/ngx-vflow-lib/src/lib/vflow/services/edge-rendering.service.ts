@@ -1,13 +1,30 @@
 import { Injectable, computed, inject } from '@angular/core';
 import { FlowEntitiesService } from './flow-entities.service';
 import { EdgeModel } from '../models/edge.model';
+import { FlowSettingsService } from './flow-settings.service';
 
 @Injectable()
 export class EdgeRenderingService {
   private flowEntitiesService = inject(FlowEntitiesService);
+  private flowSettingsService = inject(FlowSettingsService);
 
   public readonly edges = computed(() => {
-    return this.flowEntitiesService.validEdges().sort((aNode, bNode) => aNode.renderOrder() - bNode.renderOrder());
+    if (!this.flowSettingsService.optimization().virtualization) {
+      return [...this.flowEntitiesService.validEdges()].sort(
+        (aEdge, bEdge) => aEdge.renderOrder() - bEdge.renderOrder(),
+      );
+    }
+
+    return this.viewportEdges().sort((aEdge, bEdge) => aEdge.renderOrder() - bEdge.renderOrder());
+  });
+
+  private viewportEdges = computed(() => {
+    return this.flowEntitiesService.validEdges().filter((e) => {
+      const sourceHandle = e.sourceHandle();
+      const targetHandle = e.targetHandle();
+
+      return sourceHandle && targetHandle;
+    });
   });
 
   private maxOrder = computed(() => {

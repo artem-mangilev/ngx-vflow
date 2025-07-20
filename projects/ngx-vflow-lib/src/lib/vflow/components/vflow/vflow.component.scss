@@ -1,5 +1,7 @@
 :host {
-  display: block;
+  display: grid;
+  grid-template-columns: 1fr;
+
   width: 100%;
   height: 100%;
   user-select: none;
@@ -9,4 +11,15 @@
       box-sizing: border-box;
     }
   }
+}
+
+.root-svg {
+  grid-row-start: 1;
+  grid-column-start: 1;
+}
+
+.preview-flow {
+  pointer-events: none;
+  grid-row-start: 1;
+  grid-column-start: 1;
 }
