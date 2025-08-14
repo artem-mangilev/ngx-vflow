@@ -5,8 +5,8 @@ describe('smoothStepPath', () => {
   const createParams = (
     sourcePoint = { x: 100, y: 200 },
     targetPoint = { x: 400, y: 200 },
-    sourcePosition = 'right' as const,
-    targetPosition = 'left' as const,
+    sourcePosition: 'top' | 'bottom' | 'left' | 'right' = 'right',
+    targetPosition: 'top' | 'bottom' | 'left' | 'right' = 'left',
   ): CurveFactoryParams => ({
     mode: 'edge',
     edge: {
@@ -35,17 +35,19 @@ describe('smoothStepPath', () => {
       const result = smoothStepPath(createParams());
 
       expect(result.labelPoints).toBeDefined();
-      expect(result.labelPoints.start).toBeDefined();
-      expect(result.labelPoints.center).toBeDefined();
-      expect(result.labelPoints.end).toBeDefined();
+      const labelPoints = result.labelPoints!;
+
+      expect(labelPoints.start).toBeDefined();
+      expect(labelPoints.center).toBeDefined();
+      expect(labelPoints.end).toBeDefined();
 
       // All label points should have x and y coordinates
-      expect(typeof result.labelPoints.start.x).toBe('number');
-      expect(typeof result.labelPoints.start.y).toBe('number');
-      expect(typeof result.labelPoints.center.x).toBe('number');
-      expect(typeof result.labelPoints.center.y).toBe('number');
-      expect(typeof result.labelPoints.end.x).toBe('number');
-      expect(typeof result.labelPoints.end.y).toBe('number');
+      expect(typeof labelPoints.start.x).toBe('number');
+      expect(typeof labelPoints.start.y).toBe('number');
+      expect(typeof labelPoints.center.x).toBe('number');
+      expect(typeof labelPoints.center.y).toBe('number');
+      expect(typeof labelPoints.end.x).toBe('number');
+      expect(typeof labelPoints.end.y).toBe('number');
     });
   });
 
@@ -53,7 +55,7 @@ describe('smoothStepPath', () => {
     it('should position start and end labels at different points along the path', () => {
       const result = smoothStepPath(createParams());
 
-      const { start, center, end } = result.labelPoints;
+      const { start, center, end } = result.labelPoints!;
 
       // Start, center, and end labels should be at different positions
       expect(start.x).not.toBe(center.x);
@@ -66,7 +68,7 @@ describe('smoothStepPath', () => {
       const targetPoint = { x: 400, y: 200 };
       const result = smoothStepPath(createParams(sourcePoint, targetPoint));
 
-      const { start } = result.labelPoints;
+      const { start } = result.labelPoints!;
       const distanceToSource = Math.abs(start.x - sourcePoint.x);
       const distanceToTarget = Math.abs(start.x - targetPoint.x);
 
@@ -78,7 +80,7 @@ describe('smoothStepPath', () => {
       const targetPoint = { x: 400, y: 200 };
       const result = smoothStepPath(createParams(sourcePoint, targetPoint));
 
-      const { end } = result.labelPoints;
+      const { end } = result.labelPoints!;
       const distanceToSource = Math.abs(end.x - sourcePoint.x);
       const distanceToTarget = Math.abs(end.x - targetPoint.x);
 
@@ -90,7 +92,7 @@ describe('smoothStepPath', () => {
       const targetPoint = { x: 400, y: 200 };
       const result = smoothStepPath(createParams(sourcePoint, targetPoint));
 
-      const { start, center, end } = result.labelPoints;
+      const { start, center, end } = result.labelPoints!;
 
       // For left-to-right path, start should be leftmost, end should be rightmost
       expect(start.x).toBeLessThan(center.x);
@@ -103,7 +105,7 @@ describe('smoothStepPath', () => {
       const params = createParams(sourcePoint, targetPoint, 'bottom', 'top');
       const result = smoothStepPath(params);
 
-      const { start, center, end } = result.labelPoints;
+      const { start, center, end } = result.labelPoints!;
 
       // All labels should have valid coordinates
       expect(start.x).toBeDefined();
@@ -133,9 +135,9 @@ describe('smoothStepPath', () => {
       expect(result10.path).toBeDefined();
 
       // All should have properly positioned labels
-      expect(result0.labelPoints.start.x).not.toBe(result0.labelPoints.end.x);
-      expect(result5.labelPoints.start.x).not.toBe(result5.labelPoints.end.x);
-      expect(result10.labelPoints.start.x).not.toBe(result10.labelPoints.end.x);
+      expect(result0.labelPoints!.start.x).not.toBe(result0.labelPoints!.end.x);
+      expect(result5.labelPoints!.start.x).not.toBe(result5.labelPoints!.end.x);
+      expect(result10.labelPoints!.start.x).not.toBe(result10.labelPoints!.end.x);
     });
   });
 
@@ -145,9 +147,9 @@ describe('smoothStepPath', () => {
       const result = smoothStepPath(createParams(point, point));
 
       expect(result.path).toBeDefined();
-      expect(result.labelPoints.start).toBeDefined();
-      expect(result.labelPoints.center).toBeDefined();
-      expect(result.labelPoints.end).toBeDefined();
+      expect(result.labelPoints!.start).toBeDefined();
+      expect(result.labelPoints!.center).toBeDefined();
+      expect(result.labelPoints!.end).toBeDefined();
     });
 
     it('should handle very close points', () => {
@@ -156,9 +158,9 @@ describe('smoothStepPath', () => {
       const result = smoothStepPath(createParams(sourcePoint, targetPoint));
 
       expect(result.path).toBeDefined();
-      expect(result.labelPoints.start).toBeDefined();
-      expect(result.labelPoints.center).toBeDefined();
-      expect(result.labelPoints.end).toBeDefined();
+      expect(result.labelPoints!.start).toBeDefined();
+      expect(result.labelPoints!.center).toBeDefined();
+      expect(result.labelPoints!.end).toBeDefined();
     });
 
     it('should handle very distant points', () => {
@@ -167,12 +169,12 @@ describe('smoothStepPath', () => {
       const result = smoothStepPath(createParams(sourcePoint, targetPoint));
 
       expect(result.path).toBeDefined();
-      expect(result.labelPoints.start).toBeDefined();
-      expect(result.labelPoints.center).toBeDefined();
-      expect(result.labelPoints.end).toBeDefined();
+      expect(result.labelPoints!.start).toBeDefined();
+      expect(result.labelPoints!.center).toBeDefined();
+      expect(result.labelPoints!.end).toBeDefined();
 
       // Labels should still be positioned correctly
-      const { start, end } = result.labelPoints;
+      const { start, end } = result.labelPoints!;
       const distanceStartToSource = Math.abs(start.x - sourcePoint.x) + Math.abs(start.y - sourcePoint.y);
       const distanceEndToTarget = Math.abs(end.x - targetPoint.x) + Math.abs(end.y - targetPoint.y);
       const distanceStartToTarget = Math.abs(start.x - targetPoint.x) + Math.abs(start.y - targetPoint.y);
