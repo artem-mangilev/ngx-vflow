@@ -207,39 +207,69 @@ export function smoothStepPath(
     return res;
   }, '');
 
-  // Calculate label positions along the path segments
-  const segments: { start: Point; end: Point; length: number }[] = [];
-  let totalLength = 0;
-
-  // Build segments and calculate total length
-  for (let i = 0; i < points.length - 1; i++) {
-    const segmentLength = distance(points[i], points[i + 1]);
-    segments.push({
-      start: points[i],
-      end: points[i + 1],
-      length: segmentLength,
-    });
-    totalLength += segmentLength;
+  // Performance optimization: Pre-calculate cumulative distances and use binary search
+  const n = points.length;
+  if (n < 2) {
+    return {
+      path,
+      labelPoints: {
+        start: { x: labelX, y: labelY },
+        center: { x: labelX, y: labelY },
+        end: { x: labelX, y: labelY },
+      },
+    };
   }
 
-  // Helper function to get point at a specific ratio along the entire path
+  // Pre-calculate segment lengths and cumulative distances in a single loop
+  const segmentLengths: number[] = new Array(n - 1);
+  const cumulativeDistances: number[] = new Array(n);
+  cumulativeDistances[0] = 0;
+
+  let totalLength = 0;
+
+  for (let i = 0; i < n - 1; i++) {
+    const dx = points[i + 1].x - points[i].x;
+    const dy = points[i + 1].y - points[i].y;
+    const len = Math.sqrt(dx * dx + dy * dy);
+    segmentLengths[i] = len;
+    totalLength += len;
+    cumulativeDistances[i + 1] = totalLength;
+  }
+
+  // Optimized helper function using binary search
   const getPointAtRatio = (ratio: number): Point => {
     const targetDistance = totalLength * ratio;
-    let accumulatedDistance = 0;
 
-    for (const segment of segments) {
-      if (accumulatedDistance + segment.length >= targetDistance) {
-        const segmentRatio = (targetDistance - accumulatedDistance) / segment.length;
-        return {
-          x: segment.start.x + (segment.end.x - segment.start.x) * segmentRatio,
-          y: segment.start.y + (segment.end.y - segment.start.y) * segmentRatio,
-        };
+    // Edge cases
+    if (targetDistance <= 0) return points[0];
+    if (targetDistance >= totalLength) return points[n - 1];
+
+    // Binary search for the correct segment
+    let low = 0;
+    let high = n - 1;
+
+    while (low < high - 1) {
+      const mid = (low + high) >>> 1; // Bitwise right shift is faster than Math.floor
+      if (cumulativeDistances[mid] < targetDistance) {
+        low = mid;
+      } else {
+        high = mid;
       }
-      accumulatedDistance += segment.length;
     }
 
-    // Fallback to the last point
-    return points[points.length - 1];
+    // Calculate position within the segment
+    const segmentStartDistance = cumulativeDistances[low];
+    const localDistance = targetDistance - segmentStartDistance;
+    const t = localDistance / segmentLengths[low];
+
+    // Linear interpolation
+    const start = points[low];
+    const end = points[low + 1];
+
+    return {
+      x: start.x + (end.x - start.x) * t,
+      y: start.y + (end.y - start.y) * t,
+    };
   };
 
   return {
