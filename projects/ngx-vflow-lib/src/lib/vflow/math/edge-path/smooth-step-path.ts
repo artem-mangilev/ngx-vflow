@@ -207,13 +207,47 @@ export function smoothStepPath(
     return res;
   }, '');
 
+  // Calculate label positions along the path segments
+  const segments: { start: Point; end: Point; length: number }[] = [];
+  let totalLength = 0;
+
+  // Build segments and calculate total length
+  for (let i = 0; i < points.length - 1; i++) {
+    const segmentLength = distance(points[i], points[i + 1]);
+    segments.push({
+      start: points[i],
+      end: points[i + 1],
+      length: segmentLength,
+    });
+    totalLength += segmentLength;
+  }
+
+  // Helper function to get point at a specific ratio along the entire path
+  const getPointAtRatio = (ratio: number): Point => {
+    const targetDistance = totalLength * ratio;
+    let accumulatedDistance = 0;
+
+    for (const segment of segments) {
+      if (accumulatedDistance + segment.length >= targetDistance) {
+        const segmentRatio = (targetDistance - accumulatedDistance) / segment.length;
+        return {
+          x: segment.start.x + (segment.end.x - segment.start.x) * segmentRatio,
+          y: segment.start.y + (segment.end.y - segment.start.y) * segmentRatio,
+        };
+      }
+      accumulatedDistance += segment.length;
+    }
+
+    // Fallback to the last point
+    return points[points.length - 1];
+  };
+
   return {
     path,
     labelPoints: {
-      // TODO start and end points temporary unavailable for this path
-      start: { x: labelX, y: labelY },
+      start: getPointAtRatio(0.15),
       center: { x: labelX, y: labelY },
-      end: { x: labelX, y: labelY },
+      end: getPointAtRatio(0.85),
     },
   };
 }
