@@ -457,42 +457,6 @@
   },
   {
     "breadcrumbs": [
-      "Testing",
-      "Component mocks"
-    ],
-    "pageType": "guide",
-    "title": "Component mocks",
-    "section": "Component mocks",
-    "route": "/testing/component-mocks",
-    "fragment": "component-mocks",
-    "content": "Starting from version 1.9, you must import mock components from ngx-vflow/testing instead of ngx-vflow. The previous approach caused mock components to be bundled with production components, so the testing code has been moved to a separate entry point."
-  },
-  {
-    "breadcrumbs": [
-      "Testing",
-      "Component mocks"
-    ],
-    "pageType": "guide",
-    "title": "Component mocks",
-    "section": "Component mocks",
-    "route": "/testing/component-mocks",
-    "fragment": "component-mocks",
-    "content": "The library provides mocks for every public component to simplify testing in a Node environment (e.g., Jest). The naming convention for importing real and mock components follows this pattern: \\*Component → \\*MockComponent. For example, VflowComponent has a corresponding mock, VflowMockComponent. In the testing environment, you should replace real components with their mock counterparts. For example, to mock the entire library, you should:"
-  },
-  {
-    "breadcrumbs": [
-      "Testing",
-      "Unit testing component nodes"
-    ],
-    "pageType": "guide",
-    "title": "Unit testing component nodes",
-    "section": "Unit testing component nodes",
-    "route": "/testing/unit-testing-component-nodes",
-    "fragment": "unit-testing-component-nodes",
-    "content": "To simplify writing isolated tests for component nodes, you can use the provideCustomNodeMocks function. This helps prevent dependency injection (DI) errors that occur when a node is used outside the scope of the VflowComponent."
-  },
-  {
-    "breadcrumbs": [
       "Getting Started",
       "Dynamic vs Static nodes"
     ],
@@ -637,6 +601,42 @@
   },
   {
     "breadcrumbs": [
+      "Testing",
+      "Component mocks"
+    ],
+    "pageType": "guide",
+    "title": "Component mocks",
+    "section": "Component mocks",
+    "route": "/testing/component-mocks",
+    "fragment": "component-mocks",
+    "content": "Starting from version 1.9, you must import mock components from ngx-vflow/testing instead of ngx-vflow. The previous approach caused mock components to be bundled with production components, so the testing code has been moved to a separate entry point."
+  },
+  {
+    "breadcrumbs": [
+      "Testing",
+      "Component mocks"
+    ],
+    "pageType": "guide",
+    "title": "Component mocks",
+    "section": "Component mocks",
+    "route": "/testing/component-mocks",
+    "fragment": "component-mocks",
+    "content": "The library provides mocks for every public component to simplify testing in a Node environment (e.g., Jest). The naming convention for importing real and mock components follows this pattern: \\*Component → \\*MockComponent. For example, VflowComponent has a corresponding mock, VflowMockComponent. In the testing environment, you should replace real components with their mock counterparts. For example, to mock the entire library, you should:"
+  },
+  {
+    "breadcrumbs": [
+      "Testing",
+      "Unit testing component nodes"
+    ],
+    "pageType": "guide",
+    "title": "Unit testing component nodes",
+    "section": "Unit testing component nodes",
+    "route": "/testing/unit-testing-component-nodes",
+    "fragment": "unit-testing-component-nodes",
+    "content": "To simplify writing isolated tests for component nodes, you can use the provideCustomNodeMocks function. This helps prevent dependency injection (DI) errors that occur when a node is used outside the scope of the VflowComponent."
+  },
+  {
+    "breadcrumbs": [
       "Workshops",
       "Delete selected"
     ],
@@ -670,162 +670,6 @@
     "route": "/workshops/stress-test",
     "fragment": "stress-test",
     "content": "The library can render 1000+ nodes instantly while maintaining smooth user interactions."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Subflows"
-    ],
-    "pageType": "guide",
-    "title": "Subflows",
-    "section": "Subflows",
-    "route": "/features/nodes/subflows",
-    "fragment": "subflows",
-    "content": "A subflow is a node that can contain child nodes. Key things about subflows: To create a subflow, you need to use a default-group or template-group type on Node or DynamicNode.To associate a node with a subflow, set the parentId to the ID of the subflow.Nodes within a subflow have coordinates relative to that subflow.A subflow is itself a node, so it can act as a source or a target (this functionality is available only for template-group subflows).Use the groupNode directive on an ng-template to define your custom subflow. While a custom subflow can theoretically be any SVG structure, it's recommended to use the "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Subflows"
-    ],
-    "pageType": "guide",
-    "title": "Subflows",
-    "section": "Subflows",
-    "route": "/features/nodes/subflows",
-    "fragment": "subflows",
-    "content": " element."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Subflows"
-    ],
-    "pageType": "guide",
-    "title": "Subflows",
-    "section": "See also",
-    "route": "/features/nodes/subflows",
-    "fragment": "see-also",
-    "content": "DefaultGroupNodeTemplateGroupNodeDefaultDynamicGroupNodeTemplateDynamicGroupNode"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "SVG Nodes"
-    ],
-    "pageType": "guide",
-    "title": "SVG Nodes",
-    "section": "SVG Nodes",
-    "route": "/features/nodes/svg-nodes",
-    "fragment": "svg-nodes",
-    "content": "SVG nodes allow you to create custom node shapes using SVG elements. To create an SVG node:"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "SVG Nodes"
-    ],
-    "pageType": "guide",
-    "title": "SVG Nodes",
-    "section": "SVG Nodes",
-    "route": "/features/nodes/svg-nodes",
-    "fragment": "svg-nodes",
-    "content": "Define a node with "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "SVG Nodes"
-    ],
-    "pageType": "guide",
-    "title": "SVG Nodes",
-    "section": "SVG Nodes",
-    "route": "/features/nodes/svg-nodes",
-    "fragment": "svg-nodes",
-    "content": "type: 'svg-template'"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "SVG Nodes"
-    ],
-    "pageType": "guide",
-    "title": "SVG Nodes",
-    "section": "SVG Nodes",
-    "route": "/features/nodes/svg-nodes",
-    "fragment": "svg-nodes",
-    "content": "Use the "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "SVG Nodes"
-    ],
-    "pageType": "guide",
-    "title": "SVG Nodes",
-    "section": "SVG Nodes",
-    "route": "/features/nodes/svg-nodes",
-    "fragment": "svg-nodes",
-    "content": "nodeSvg"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "SVG Nodes"
-    ],
-    "pageType": "guide",
-    "title": "SVG Nodes",
-    "section": "SVG Nodes",
-    "route": "/features/nodes/svg-nodes",
-    "fragment": "svg-nodes",
-    "content": " template in your Vflow component Access node properties via the template context ("
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "SVG Nodes"
-    ],
-    "pageType": "guide",
-    "title": "SVG Nodes",
-    "section": "SVG Nodes",
-    "route": "/features/nodes/svg-nodes",
-    "fragment": "svg-nodes",
-    "content": "ctx"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "SVG Nodes"
-    ],
-    "pageType": "guide",
-    "title": "SVG Nodes",
-    "section": "SVG Nodes",
-    "route": "/features/nodes/svg-nodes",
-    "fragment": "svg-nodes",
-    "content": ")"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "SVG Nodes"
-    ],
-    "pageType": "guide",
-    "title": "SVG Nodes",
-    "section": "SVG Nodes",
-    "route": "/features/nodes/svg-nodes",
-    "fragment": "svg-nodes",
-    "content": "The template context has the following type:"
   },
   {
     "breadcrumbs": [
@@ -1065,14 +909,40 @@
     "breadcrumbs": [
       "Features",
       "Edges",
-      "Connection validation"
+      "Curves"
     ],
     "pageType": "guide",
-    "title": "Connection validation",
-    "section": "Connection validation",
-    "route": "/features/edges/connection-validation",
-    "fragment": "connection-validation",
-    "content": "ngx-vflow supports real-time synchronous validation of connections. Validation occurs when a user attempts to create a new edge. By default, every connection is valid, but you can provide a ConnectionSettings with a validatior callback where you specify the validation logic. For example, in this case, validation only passes connections from node 1 to node 2. If the validator returns false, the (onConnect) event won't be triggered because there is no valid connection."
+    "title": "Curves",
+    "section": "Curves",
+    "route": "/features/edges/curves",
+    "fragment": "curves",
+    "content": "It's possible to set Curve for both the edges and connection."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Curves"
+    ],
+    "pageType": "guide",
+    "title": "Curves",
+    "section": "Curve factory",
+    "route": "/features/edges/curves",
+    "fragment": "curve-factory",
+    "content": "This is an experimental API"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Curves"
+    ],
+    "pageType": "guide",
+    "title": "Curves",
+    "section": "Curve factory",
+    "route": "/features/edges/curves",
+    "fragment": "curve-factory",
+    "content": "If the existing curves do not meet your needs, you can provide your own function that implements the CurveFactory signature."
   },
   {
     "breadcrumbs": [
@@ -1533,6 +1403,32 @@
     "breadcrumbs": [
       "Features",
       "Edges",
+      "Connection validation"
+    ],
+    "pageType": "guide",
+    "title": "Connection validation",
+    "section": "Connection validation",
+    "route": "/features/edges/connection-validation",
+    "fragment": "connection-validation",
+    "content": "ngx-vflow supports real-time synchronous validation of connections. Validation occurs when a user attempts to create a new edge. By default, every connection is valid, but you can provide a ConnectionSettings with a validatior callback where you specify the validation logic. For example, in this case, validation only passes connections from node 1 to node 2. If the validator returns false, the (onConnect) event won't be triggered because there is no valid connection."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Default edges"
+    ],
+    "pageType": "guide",
+    "title": "Default edges",
+    "section": "Default edges",
+    "route": "/features/edges/default-edges",
+    "fragment": "default-edges",
+    "content": "You can link nodes with edges. All you need to do is to create another Edge[] array and pass it to the vflow component. Each edge contains the id of the source and target nodes, and each edge must have its own id."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
       "Labels"
     ],
     "pageType": "guide",
@@ -1606,318 +1502,6 @@
     "route": "/features/edges/markers",
     "fragment": "markers",
     "content": "You can create markers for both edges and connections. Edges: Specify start and end markers for corresponding parts of the edge. Currently, markers are limited to two types: arrow and arrow-closed.Connections: You can specify an end marker using the marker property in ConnectionSettings."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Default edges"
-    ],
-    "pageType": "guide",
-    "title": "Default edges",
-    "section": "Default edges",
-    "route": "/features/edges/default-edges",
-    "fragment": "default-edges",
-    "content": "You can link nodes with edges. All you need to do is to create another Edge[] array and pass it to the vflow component. Each edge contains the id of the source and target nodes, and each edge must have its own id."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Reconnect Edge"
-    ],
-    "pageType": "guide",
-    "title": "Reconnect Edge",
-    "section": "Reconnect Edge",
-    "route": "/features/edges/reconnect-edges",
-    "fragment": "reconnect-edge",
-    "content": "Edges can be reconnected. To reconnect an edge, follow these steps:"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Reconnect Edge"
-    ],
-    "pageType": "guide",
-    "title": "Reconnect Edge",
-    "section": "Reconnect Edge",
-    "route": "/features/edges/reconnect-edges",
-    "fragment": "reconnect-edge",
-    "content": "Mark the "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Reconnect Edge"
-    ],
-    "pageType": "guide",
-    "title": "Reconnect Edge",
-    "section": "Reconnect Edge",
-    "route": "/features/edges/reconnect-edges",
-    "fragment": "reconnect-edge",
-    "content": "Edge"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Reconnect Edge"
-    ],
-    "pageType": "guide",
-    "title": "Reconnect Edge",
-    "section": "Reconnect Edge",
-    "route": "/features/edges/reconnect-edges",
-    "fragment": "reconnect-edge",
-    "content": " object as "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Reconnect Edge"
-    ],
-    "pageType": "guide",
-    "title": "Reconnect Edge",
-    "section": "Reconnect Edge",
-    "route": "/features/edges/reconnect-edges",
-    "fragment": "reconnect-edge",
-    "content": "reconnectable"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Reconnect Edge"
-    ],
-    "pageType": "guide",
-    "title": "Reconnect Edge",
-    "section": "Reconnect Edge",
-    "route": "/features/edges/reconnect-edges",
-    "fragment": "reconnect-edge",
-    "content": ". Create a handler for the "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Reconnect Edge"
-    ],
-    "pageType": "guide",
-    "title": "Reconnect Edge",
-    "section": "Reconnect Edge",
-    "route": "/features/edges/reconnect-edges",
-    "fragment": "reconnect-edge",
-    "content": "(onReconnect)"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Reconnect Edge"
-    ],
-    "pageType": "guide",
-    "title": "Reconnect Edge",
-    "section": "Reconnect Edge",
-    "route": "/features/edges/reconnect-edges",
-    "fragment": "reconnect-edge",
-    "content": " event. This handler accepts a "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Reconnect Edge"
-    ],
-    "pageType": "guide",
-    "title": "Reconnect Edge",
-    "section": "Reconnect Edge",
-    "route": "/features/edges/reconnect-edges",
-    "fragment": "reconnect-edge",
-    "content": "ReconnectionEvent"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Reconnect Edge"
-    ],
-    "pageType": "guide",
-    "title": "Reconnect Edge",
-    "section": "Reconnect Edge",
-    "route": "/features/edges/reconnect-edges",
-    "fragment": "reconnect-edge",
-    "content": " argument, which contains a new "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Reconnect Edge"
-    ],
-    "pageType": "guide",
-    "title": "Reconnect Edge",
-    "section": "Reconnect Edge",
-    "route": "/features/edges/reconnect-edges",
-    "fragment": "reconnect-edge",
-    "content": "Connection"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Reconnect Edge"
-    ],
-    "pageType": "guide",
-    "title": "Reconnect Edge",
-    "section": "Reconnect Edge",
-    "route": "/features/edges/reconnect-edges",
-    "fragment": "reconnect-edge",
-    "content": " and the "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Reconnect Edge"
-    ],
-    "pageType": "guide",
-    "title": "Reconnect Edge",
-    "section": "Reconnect Edge",
-    "route": "/features/edges/reconnect-edges",
-    "fragment": "reconnect-edge",
-    "content": "oldEdge"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Reconnect Edge"
-    ],
-    "pageType": "guide",
-    "title": "Reconnect Edge",
-    "section": "Reconnect Edge",
-    "route": "/features/edges/reconnect-edges",
-    "fragment": "reconnect-edge",
-    "content": " that you are trying to reconnect. Update the "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Reconnect Edge"
-    ],
-    "pageType": "guide",
-    "title": "Reconnect Edge",
-    "section": "Reconnect Edge",
-    "route": "/features/edges/reconnect-edges",
-    "fragment": "reconnect-edge",
-    "content": "Edge[]"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Reconnect Edge"
-    ],
-    "pageType": "guide",
-    "title": "Reconnect Edge",
-    "section": "Reconnect Edge",
-    "route": "/features/edges/reconnect-edges",
-    "fragment": "reconnect-edge",
-    "content": " list with a new edge based on the "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Reconnect Edge"
-    ],
-    "pageType": "guide",
-    "title": "Reconnect Edge",
-    "section": "Reconnect Edge",
-    "route": "/features/edges/reconnect-edges",
-    "fragment": "reconnect-edge",
-    "content": "oldEdge"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Reconnect Edge"
-    ],
-    "pageType": "guide",
-    "title": "Reconnect Edge",
-    "section": "Reconnect Edge",
-    "route": "/features/edges/reconnect-edges",
-    "fragment": "reconnect-edge",
-    "content": " and the new "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Reconnect Edge"
-    ],
-    "pageType": "guide",
-    "title": "Reconnect Edge",
-    "section": "Reconnect Edge",
-    "route": "/features/edges/reconnect-edges",
-    "fragment": "reconnect-edge",
-    "content": "Connection"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Reconnect Edge"
-    ],
-    "pageType": "guide",
-    "title": "Reconnect Edge",
-    "section": "Reconnect Edge",
-    "route": "/features/edges/reconnect-edges",
-    "fragment": "reconnect-edge",
-    "content": ", then remove the reference to the old edge from the list."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Curves"
-    ],
-    "pageType": "guide",
-    "title": "Curves",
-    "section": "Curves",
-    "route": "/features/edges/curves",
-    "fragment": "curves",
-    "content": "It's possible to set Curve for both the edges and connection."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Curves"
-    ],
-    "pageType": "guide",
-    "title": "Curves",
-    "section": "Curve factory",
-    "route": "/features/edges/curves",
-    "fragment": "curve-factory",
-    "content": "This is an experimental API"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Curves"
-    ],
-    "pageType": "guide",
-    "title": "Curves",
-    "section": "Curve factory",
-    "route": "/features/edges/curves",
-    "fragment": "curve-factory",
-    "content": "If the existing curves do not meet your needs, you can provide your own function that implements the CurveFactory signature."
   },
   {
     "breadcrumbs": [
@@ -2404,6 +1988,279 @@
     "breadcrumbs": [
       "Features",
       "Nodes",
+      "Default nodes"
+    ],
+    "pageType": "guide",
+    "title": "Default nodes",
+    "section": "Default nodes",
+    "route": "/features/nodes/default-nodes",
+    "fragment": "default-nodes",
+    "content": "To get started, you just need to provide nodes array to vflow component."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Reconnect Edge"
+    ],
+    "pageType": "guide",
+    "title": "Reconnect Edge",
+    "section": "Reconnect Edge",
+    "route": "/features/edges/reconnect-edges",
+    "fragment": "reconnect-edge",
+    "content": "Edges can be reconnected. To reconnect an edge, follow these steps:"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Reconnect Edge"
+    ],
+    "pageType": "guide",
+    "title": "Reconnect Edge",
+    "section": "Reconnect Edge",
+    "route": "/features/edges/reconnect-edges",
+    "fragment": "reconnect-edge",
+    "content": "Mark the "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Reconnect Edge"
+    ],
+    "pageType": "guide",
+    "title": "Reconnect Edge",
+    "section": "Reconnect Edge",
+    "route": "/features/edges/reconnect-edges",
+    "fragment": "reconnect-edge",
+    "content": "Edge"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Reconnect Edge"
+    ],
+    "pageType": "guide",
+    "title": "Reconnect Edge",
+    "section": "Reconnect Edge",
+    "route": "/features/edges/reconnect-edges",
+    "fragment": "reconnect-edge",
+    "content": " object as "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Reconnect Edge"
+    ],
+    "pageType": "guide",
+    "title": "Reconnect Edge",
+    "section": "Reconnect Edge",
+    "route": "/features/edges/reconnect-edges",
+    "fragment": "reconnect-edge",
+    "content": "reconnectable"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Reconnect Edge"
+    ],
+    "pageType": "guide",
+    "title": "Reconnect Edge",
+    "section": "Reconnect Edge",
+    "route": "/features/edges/reconnect-edges",
+    "fragment": "reconnect-edge",
+    "content": ". Create a handler for the "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Reconnect Edge"
+    ],
+    "pageType": "guide",
+    "title": "Reconnect Edge",
+    "section": "Reconnect Edge",
+    "route": "/features/edges/reconnect-edges",
+    "fragment": "reconnect-edge",
+    "content": "(onReconnect)"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Reconnect Edge"
+    ],
+    "pageType": "guide",
+    "title": "Reconnect Edge",
+    "section": "Reconnect Edge",
+    "route": "/features/edges/reconnect-edges",
+    "fragment": "reconnect-edge",
+    "content": " event. This handler accepts a "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Reconnect Edge"
+    ],
+    "pageType": "guide",
+    "title": "Reconnect Edge",
+    "section": "Reconnect Edge",
+    "route": "/features/edges/reconnect-edges",
+    "fragment": "reconnect-edge",
+    "content": "ReconnectionEvent"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Reconnect Edge"
+    ],
+    "pageType": "guide",
+    "title": "Reconnect Edge",
+    "section": "Reconnect Edge",
+    "route": "/features/edges/reconnect-edges",
+    "fragment": "reconnect-edge",
+    "content": " argument, which contains a new "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Reconnect Edge"
+    ],
+    "pageType": "guide",
+    "title": "Reconnect Edge",
+    "section": "Reconnect Edge",
+    "route": "/features/edges/reconnect-edges",
+    "fragment": "reconnect-edge",
+    "content": "Connection"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Reconnect Edge"
+    ],
+    "pageType": "guide",
+    "title": "Reconnect Edge",
+    "section": "Reconnect Edge",
+    "route": "/features/edges/reconnect-edges",
+    "fragment": "reconnect-edge",
+    "content": " and the "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Reconnect Edge"
+    ],
+    "pageType": "guide",
+    "title": "Reconnect Edge",
+    "section": "Reconnect Edge",
+    "route": "/features/edges/reconnect-edges",
+    "fragment": "reconnect-edge",
+    "content": "oldEdge"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Reconnect Edge"
+    ],
+    "pageType": "guide",
+    "title": "Reconnect Edge",
+    "section": "Reconnect Edge",
+    "route": "/features/edges/reconnect-edges",
+    "fragment": "reconnect-edge",
+    "content": " that you are trying to reconnect. Update the "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Reconnect Edge"
+    ],
+    "pageType": "guide",
+    "title": "Reconnect Edge",
+    "section": "Reconnect Edge",
+    "route": "/features/edges/reconnect-edges",
+    "fragment": "reconnect-edge",
+    "content": "Edge[]"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Reconnect Edge"
+    ],
+    "pageType": "guide",
+    "title": "Reconnect Edge",
+    "section": "Reconnect Edge",
+    "route": "/features/edges/reconnect-edges",
+    "fragment": "reconnect-edge",
+    "content": " list with a new edge based on the "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Reconnect Edge"
+    ],
+    "pageType": "guide",
+    "title": "Reconnect Edge",
+    "section": "Reconnect Edge",
+    "route": "/features/edges/reconnect-edges",
+    "fragment": "reconnect-edge",
+    "content": "oldEdge"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Reconnect Edge"
+    ],
+    "pageType": "guide",
+    "title": "Reconnect Edge",
+    "section": "Reconnect Edge",
+    "route": "/features/edges/reconnect-edges",
+    "fragment": "reconnect-edge",
+    "content": " and the new "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Reconnect Edge"
+    ],
+    "pageType": "guide",
+    "title": "Reconnect Edge",
+    "section": "Reconnect Edge",
+    "route": "/features/edges/reconnect-edges",
+    "fragment": "reconnect-edge",
+    "content": "Connection"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Reconnect Edge"
+    ],
+    "pageType": "guide",
+    "title": "Reconnect Edge",
+    "section": "Reconnect Edge",
+    "route": "/features/edges/reconnect-edges",
+    "fragment": "reconnect-edge",
+    "content": ", then remove the reference to the old edge from the list."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
       "Node toolbar"
     ],
     "pageType": "guide",
@@ -2430,19 +2287,6 @@
     "breadcrumbs": [
       "Features",
       "Nodes",
-      "Default nodes"
-    ],
-    "pageType": "guide",
-    "title": "Default nodes",
-    "section": "Default nodes",
-    "route": "/features/nodes/default-nodes",
-    "fragment": "default-nodes",
-    "content": "To get started, you just need to provide nodes array to vflow component."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
       "Draggables"
     ],
     "pageType": "guide",
@@ -2464,6 +2308,162 @@
     "route": "/features/nodes/draggables",
     "fragment": "drag-handle",
     "content": "You can restrict dragging to a specific part of node, by adding dragHandle directive to this element. It's important to note that if a node contains at least one dragHandle, it can only be dragged from those specific areas where dragHandle was added. Otherwise, the entire node can be dragged, provided the draggable property is set to true."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "SVG Nodes"
+    ],
+    "pageType": "guide",
+    "title": "SVG Nodes",
+    "section": "SVG Nodes",
+    "route": "/features/nodes/svg-nodes",
+    "fragment": "svg-nodes",
+    "content": "SVG nodes allow you to create custom node shapes using SVG elements. To create an SVG node:"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "SVG Nodes"
+    ],
+    "pageType": "guide",
+    "title": "SVG Nodes",
+    "section": "SVG Nodes",
+    "route": "/features/nodes/svg-nodes",
+    "fragment": "svg-nodes",
+    "content": "Define a node with "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "SVG Nodes"
+    ],
+    "pageType": "guide",
+    "title": "SVG Nodes",
+    "section": "SVG Nodes",
+    "route": "/features/nodes/svg-nodes",
+    "fragment": "svg-nodes",
+    "content": "type: 'svg-template'"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "SVG Nodes"
+    ],
+    "pageType": "guide",
+    "title": "SVG Nodes",
+    "section": "SVG Nodes",
+    "route": "/features/nodes/svg-nodes",
+    "fragment": "svg-nodes",
+    "content": "Use the "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "SVG Nodes"
+    ],
+    "pageType": "guide",
+    "title": "SVG Nodes",
+    "section": "SVG Nodes",
+    "route": "/features/nodes/svg-nodes",
+    "fragment": "svg-nodes",
+    "content": "nodeSvg"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "SVG Nodes"
+    ],
+    "pageType": "guide",
+    "title": "SVG Nodes",
+    "section": "SVG Nodes",
+    "route": "/features/nodes/svg-nodes",
+    "fragment": "svg-nodes",
+    "content": " template in your Vflow component Access node properties via the template context ("
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "SVG Nodes"
+    ],
+    "pageType": "guide",
+    "title": "SVG Nodes",
+    "section": "SVG Nodes",
+    "route": "/features/nodes/svg-nodes",
+    "fragment": "svg-nodes",
+    "content": "ctx"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "SVG Nodes"
+    ],
+    "pageType": "guide",
+    "title": "SVG Nodes",
+    "section": "SVG Nodes",
+    "route": "/features/nodes/svg-nodes",
+    "fragment": "svg-nodes",
+    "content": ")"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "SVG Nodes"
+    ],
+    "pageType": "guide",
+    "title": "SVG Nodes",
+    "section": "SVG Nodes",
+    "route": "/features/nodes/svg-nodes",
+    "fragment": "svg-nodes",
+    "content": "The template context has the following type:"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Subflows"
+    ],
+    "pageType": "guide",
+    "title": "Subflows",
+    "section": "Subflows",
+    "route": "/features/nodes/subflows",
+    "fragment": "subflows",
+    "content": "A subflow is a node that can contain child nodes. Key things about subflows: To create a subflow, you need to use a default-group or template-group type on Node or DynamicNode.To associate a node with a subflow, set the parentId to the ID of the subflow.Nodes within a subflow have coordinates relative to that subflow.A subflow is itself a node, so it can act as a source or a target (this functionality is available only for template-group subflows).Use the groupNode directive on an ng-template to define your custom subflow. While a custom subflow can theoretically be any SVG structure, it's recommended to use the "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Subflows"
+    ],
+    "pageType": "guide",
+    "title": "Subflows",
+    "section": "Subflows",
+    "route": "/features/nodes/subflows",
+    "fragment": "subflows",
+    "content": " element."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Subflows"
+    ],
+    "pageType": "guide",
+    "title": "Subflows",
+    "section": "See also",
+    "route": "/features/nodes/subflows",
+    "fragment": "see-also",
+    "content": "DefaultGroupNodeTemplateGroupNodeDefaultDynamicGroupNodeTemplateDynamicGroupNode"
   },
   {
     "breadcrumbs": [
