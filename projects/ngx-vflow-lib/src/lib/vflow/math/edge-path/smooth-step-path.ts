@@ -207,13 +207,77 @@ export function smoothStepPath(
     return res;
   }, '');
 
+  // Performance optimization: Pre-calculate cumulative distances and use binary search
+  const n = points.length;
+  if (n < 2) {
+    return {
+      path,
+      labelPoints: {
+        start: { x: labelX, y: labelY },
+        center: { x: labelX, y: labelY },
+        end: { x: labelX, y: labelY },
+      },
+    };
+  }
+
+  // Pre-calculate segment lengths and cumulative distances in a single loop
+  const segmentLengths: number[] = new Array(n - 1);
+  const cumulativeDistances: number[] = new Array(n);
+  cumulativeDistances[0] = 0;
+
+  let totalLength = 0;
+
+  for (let i = 0; i < n - 1; i++) {
+    const dx = points[i + 1].x - points[i].x;
+    const dy = points[i + 1].y - points[i].y;
+    const len = Math.sqrt(dx * dx + dy * dy);
+    segmentLengths[i] = len;
+    totalLength += len;
+    cumulativeDistances[i + 1] = totalLength;
+  }
+
+  // Optimized helper function using binary search
+  const getPointAtRatio = (ratio: number): Point => {
+    const targetDistance = totalLength * ratio;
+
+    // Edge cases
+    if (targetDistance <= 0) return points[0];
+    if (targetDistance >= totalLength) return points[n - 1];
+
+    // Binary search for the correct segment
+    let low = 0;
+    let high = n - 1;
+
+    while (low < high - 1) {
+      const mid = (low + high) >>> 1; // Bitwise right shift is faster than Math.floor
+      if (cumulativeDistances[mid] < targetDistance) {
+        low = mid;
+      } else {
+        high = mid;
+      }
+    }
+
+    // Calculate position within the segment
+    const segmentStartDistance = cumulativeDistances[low];
+    const localDistance = targetDistance - segmentStartDistance;
+    const t = localDistance / segmentLengths[low];
+
+    // Linear interpolation
+    const start = points[low];
+    const end = points[low + 1];
+
+    return {
+      x: start.x + (end.x - start.x) * t,
+      y: start.y + (end.y - start.y) * t,
+    };
+  };
+
   return {
     path,
     labelPoints: {
-      // TODO start and end points temporary unavailable for this path
-      start: { x: labelX, y: labelY },
+      start: getPointAtRatio(0.15),
       center: { x: labelX, y: labelY },
-      end: { x: labelX, y: labelY },
+      end: getPointAtRatio(0.85),
     },
   };
 }
