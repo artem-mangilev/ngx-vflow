@@ -17,4 +17,5 @@ export interface Edge<T = unknown> extends Connection {
     end?: Marker;
   };
   reconnectable?: boolean | 'source' | 'target';
+  floating?: boolean;
 }

@@ -24,6 +24,7 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
   public curve: Curve;
   public type: EdgeType;
   public reconnectable: boolean | 'source' | 'target';
+  public floating: boolean;
 
   public selected = signal(false);
   public selected$ = toObservable(this.selected);
@@ -93,16 +94,20 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
   public sourceHandle = extendedComputed<HandleModel | null>((previousHandle) => {
     let handle: HandleModel | null = null;
 
-    if (this.edge.sourceHandle) {
-      handle =
-        this.source()
-          ?.handles()
-          .find((handle) => handle.rawHandle.id === this.edge.sourceHandle) ?? null;
+    if (this.floating) {
+      handle = this.closestHandles().sourceHandle;
     } else {
-      handle =
-        this.source()
-          ?.handles()
-          .find((handle) => handle.rawHandle.type === 'source') ?? null;
+      if (this.edge.sourceHandle) {
+        handle =
+          this.source()
+            ?.handles()
+            .find((handle) => handle.rawHandle.id === this.edge.sourceHandle) ?? null;
+      } else {
+        handle =
+          this.source()
+            ?.handles()
+            .find((handle) => handle.rawHandle.type === 'source') ?? null;
+      }
     }
 
     // In case of virtual scrolling, if the node is scrolled out of view the handle may disappear
@@ -119,16 +124,20 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
   public targetHandle = extendedComputed<HandleModel | null>((previousHandle) => {
     let handle: HandleModel | null = null;
 
-    if (this.edge.targetHandle) {
-      handle =
-        this.target()
-          ?.handles()
-          .find((handle) => handle.rawHandle.id === this.edge.targetHandle) ?? null;
+    if (this.floating) {
+      handle = this.closestHandles().targetHandle;
     } else {
-      handle =
-        this.target()
-          ?.handles()
-          .find((handle) => handle.rawHandle.type === 'target') ?? null;
+      if (this.edge.targetHandle) {
+        handle =
+          this.target()
+            ?.handles()
+            .find((handle) => handle.rawHandle.id === this.edge.targetHandle) ?? null;
+      } else {
+        handle =
+          this.target()
+            ?.handles()
+            .find((handle) => handle.rawHandle.type === 'target') ?? null;
+      }
     }
 
     // In case of virtual scrolling, if the node is scrolled out of view the handle may disappear
@@ -140,6 +149,57 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
     }
 
     return handle;
+  });
+
+  public closestHandles = computed(() => {
+    const source = this.source();
+    const target = this.target();
+
+    if (!source || !target) {
+      return { sourceHandle: null, targetHandle: null };
+    }
+
+    // Get all source handles from source node
+    const sourceHandles =
+      this.flowEntitiesService.connection().mode === 'strict'
+        ? source.handles().filter((h) => h.rawHandle.type === 'source')
+        : source.handles();
+    // Get all target handles from target node
+    const targetHandles =
+      this.flowEntitiesService.connection().mode === 'strict'
+        ? target.handles().filter((h) => h.rawHandle.type === 'target')
+        : target.handles();
+
+    if (sourceHandles.length === 0 || targetHandles.length === 0) {
+      return { sourceHandle: null, targetHandle: null };
+    }
+
+    let minDistance = Infinity;
+    let closestSourceHandle: HandleModel | null = null;
+    let closestTargetHandle: HandleModel | null = null;
+
+    // Check all combinations of source and target handles
+    for (const sourceHandle of sourceHandles) {
+      for (const targetHandle of targetHandles) {
+        const sourcePoint = sourceHandle.pointAbsolute();
+        const targetPoint = targetHandle.pointAbsolute();
+
+        const distance = Math.sqrt(
+          Math.pow(sourcePoint.x - targetPoint.x, 2) + Math.pow(sourcePoint.y - targetPoint.y, 2),
+        );
+
+        if (distance < minDistance) {
+          minDistance = distance;
+          closestSourceHandle = sourceHandle;
+          closestTargetHandle = targetHandle;
+        }
+      }
+    }
+
+    return {
+      sourceHandle: closestSourceHandle,
+      targetHandle: closestTargetHandle,
+    };
   });
 
   /**
@@ -177,6 +237,7 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
     this.type = edge.type ?? 'default';
     this.curve = edge.curve ?? 'bezier';
     this.reconnectable = edge.reconnectable ?? false;
+    this.floating = edge.floating ?? false;
 
     if (edge.edgeLabels?.start) this.edgeLabels.start = new EdgeLabelModel(edge.edgeLabels.start);
     if (edge.edgeLabels?.center) this.edgeLabels.center = new EdgeLabelModel(edge.edgeLabels.center);
