@@ -56,6 +56,8 @@ describe('EdgeModel', () => {
             {
               type: 'source',
               position: 'right',
+              userOffsetX: 0,
+              userOffsetY: 0,
             },
             model.source()!,
           ),
@@ -69,6 +71,8 @@ describe('EdgeModel', () => {
             {
               type: 'target',
               position: 'left',
+              userOffsetX: 0,
+              userOffsetY: 0,
             },
             model.source()!,
           ),

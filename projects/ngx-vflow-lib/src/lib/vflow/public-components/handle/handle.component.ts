@@ -41,7 +41,10 @@ export class HandleComponent implements OnInit {
    */
   public id = input<string>();
 
-  public template = input<TemplateRef<any>>();
+  public template = input<TemplateRef<any> | null>();
+
+  public offsetX = input<number>(0);
+  public offsetY = input<number>(0);
 
   public ngOnInit() {
     runInInjectionContext(this.injector, () => {
@@ -55,6 +58,8 @@ export class HandleComponent implements OnInit {
             id: this.id(),
             hostReference: this.element.parentElement!,
             template: this.template(),
+            userOffsetX: this.offsetX(),
+            userOffsetY: this.offsetY(),
           },
           node,
         );

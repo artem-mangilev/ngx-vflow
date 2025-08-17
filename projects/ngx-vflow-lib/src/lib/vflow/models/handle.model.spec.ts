@@ -26,6 +26,8 @@ describe('HandleModel', () => {
             type: 'source',
             position: 'right',
             hostReference: hostReference,
+            userOffsetX: 0,
+            userOffsetY: 0,
           },
           new NodeModel({
             id: '1',

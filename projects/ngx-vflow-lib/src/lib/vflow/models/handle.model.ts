@@ -51,23 +51,23 @@ export class HandleModel {
     switch (this.rawHandle.position) {
       case 'left':
         return {
-          x: 0,
-          y: this.hostPosition().y + this.hostSize().height / 2,
+          x: -this.rawHandle.userOffsetX,
+          y: -this.rawHandle.userOffsetY + this.hostPosition().y + this.hostSize().height / 2,
         };
       case 'right':
         return {
-          x: this.parentNode.size().width,
-          y: this.hostPosition().y + this.hostSize().height / 2,
+          x: -this.rawHandle.userOffsetX + this.parentNode.size().width,
+          y: -this.rawHandle.userOffsetY + this.hostPosition().y + this.hostSize().height / 2,
         };
       case 'top':
         return {
-          x: this.hostPosition().x + this.hostSize().width / 2,
-          y: 0,
+          x: -this.rawHandle.userOffsetX + this.hostPosition().x + this.hostSize().width / 2,
+          y: -this.rawHandle.userOffsetY,
         };
       case 'bottom':
         return {
-          x: this.hostPosition().x + this.hostSize().width / 2,
-          y: this.parentNode.size().height,
+          x: -this.rawHandle.userOffsetX + this.hostPosition().x + this.hostSize().width / 2,
+          y: -this.rawHandle.userOffsetY + this.parentNode.size().height,
         };
     }
   });
