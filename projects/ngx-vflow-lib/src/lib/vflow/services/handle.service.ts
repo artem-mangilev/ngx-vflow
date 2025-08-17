@@ -8,6 +8,8 @@ import { Microtask } from '../decorators/microtask.decorator';
 export interface NodeHandle {
   position: Position;
   type: HandleType;
+  userOffsetX: number;
+  userOffsetY: number;
   id?: string;
   hostReference?: Element;
   template?: TemplateRef<any>;
