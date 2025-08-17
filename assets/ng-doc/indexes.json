@@ -1,6 +1,66 @@
 [
   {
     "breadcrumbs": [
+      "Getting Started",
+      "Migrations"
+    ],
+    "pageType": "guide",
+    "title": "Migrations",
+    "section": "Migration to >= v1.0",
+    "route": "/getting-started/migration",
+    "fragment": "migration-to--v10",
+    "content": "remove imports of VflowModule and use Vflow instead (Vflow contains all public standalone components and directives).for standalone components, simply add Vflow to the imports array.for modules, you need to spread ...Vflow into the imports array; otherwise, you will get a type error.remove usage of the computeLayersOnInit setting from the Optimization interface.remove usage of the handlePositions input in the VflowComponent.for classes extending CustomNodeComponent and CustomDynamicNodeComponent:replace this.node to this.node() due to signal input internal migration."
+  },
+  {
+    "breadcrumbs": [
+      "Getting Started",
+      "Roadmap"
+    ],
+    "pageType": "guide",
+    "title": "Roadmap",
+    "section": "Roadmap",
+    "route": "/getting-started/roadmap",
+    "fragment": "roadmap",
+    "content": "This is a roadmap for ngx-vflow:"
+  },
+  {
+    "breadcrumbs": [
+      "Getting Started",
+      "What is ngx-vflow"
+    ],
+    "pageType": "guide",
+    "title": "What is ngx-vflow",
+    "section": "What is ngx-vflow",
+    "route": "/getting-started/what-is-ngx-vflow",
+    "fragment": "what-is-ngx-vflow",
+    "content": "ngx-vflow is an Angular library for creating node-based applications. It aims to assist you in building anything from a static diagram to a visual editor. You can utilize the default design or apply your own by customizing everything using familiar technologies."
+  },
+  {
+    "breadcrumbs": [
+      "Getting Started",
+      "What is ngx-vflow"
+    ],
+    "pageType": "guide",
+    "title": "What is ngx-vflow",
+    "section": "Main features",
+    "route": "/getting-started/what-is-ngx-vflow",
+    "fragment": "main-features",
+    "content": "Easy to use: Just describe your flow with a simple API; all of the heavy lifting, such as dragging, zooming, and curve math, is handled by the library for you. Customizable: There is a default design for basic usage, and you can also customize nodes with good old HTML and CSS. Other entities such as edges, connection lines, and handles are also customizable, but it will require a little SVG knowledge. Great performance: Angular signals are the heart and soul of ngx-vflow, which are performant by default, so you shouldn't worry about performance even with large flows. Zoneless: Does not require zone.js"
+  },
+  {
+    "breadcrumbs": [
+      "Getting Started",
+      "Principles"
+    ],
+    "pageType": "guide",
+    "title": "Principles",
+    "section": "Principles",
+    "route": "/getting-started/principles",
+    "fragment": "principles",
+    "content": "This page contains a list of general principles that impact feature implementation. No hidden mutations of your data. For example, the library does not modify any of the Node or Edge objects you pass in as inputs. Instead, it creates internal models around these entities and operates on them. Any changes to the passed entities can be observed through events.This principle also implies that you are responsible for managing invalid data. For instance, if you delete a node, the edges corresponding to this node will not be deleted automatically. However, the library will notify you about detached edges so that you can easily delete them."
+  },
+  {
+    "breadcrumbs": [
       "Features",
       "Custom background"
     ],
@@ -134,6 +194,54 @@
   {
     "breadcrumbs": [
       "Features",
+      "Minimap"
+    ],
+    "pageType": "guide",
+    "title": "Minimap",
+    "section": "Minimap",
+    "route": "/features/minimap",
+    "fragment": "minimap",
+    "content": "The library includes a minimap that offers an overview of the entire flow. To enable it, simply add a "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Minimap"
+    ],
+    "pageType": "guide",
+    "title": "Minimap",
+    "section": "Minimap",
+    "route": "/features/minimap",
+    "fragment": "minimap",
+    "content": " component as a direct child of "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Minimap"
+    ],
+    "pageType": "guide",
+    "title": "Minimap",
+    "section": "Minimap",
+    "route": "/features/minimap",
+    "fragment": "minimap",
+    "content": ". For customization options, see the available inputs in MiniMapComponent."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Minimap"
+    ],
+    "pageType": "guide",
+    "title": "Minimap",
+    "section": "Minimap",
+    "route": "/features/minimap",
+    "fragment": "minimap",
+    "content": "Planned enhancements for the minimap: Develop an API to customize mini-node appearance (e.g., color, stroke)Enable panning and zooming within the minimapRender mini-nodes to visually match main nodes, using a simplified DOM structure to optimize performance"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
       "Keyboard shortcuts"
     ],
     "pageType": "guide",
@@ -226,54 +334,6 @@
     "route": "/features/keyboard-shortcuts",
     "fragment": "customization",
     "content": "To customize the keyboard shortcuts for specific actions, pass a [keyboardShortcuts] input object to the VflowComponent with the following KeyboardShortcuts interface. Here are some key details: The passed object will be merged with the default key combinations.To disable a specific action, pass null for that action.If you want to trigger an action with multiple keys, pass an array of keys. Note: this is not a key combination. For example, if you pass ['ShiftLeft', 'ControlLeft'], the action will be triggered by either ShiftLeft or ControlLeft, but not by pressing both together (ShiftLeft+ControlLeft).You can find the list of available key codes here. In the following example, the default combination for multiSelection is replaced with ['ShiftLeft', 'ShiftRight']."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Minimap"
-    ],
-    "pageType": "guide",
-    "title": "Minimap",
-    "section": "Minimap",
-    "route": "/features/minimap",
-    "fragment": "minimap",
-    "content": "The library includes a minimap that offers an overview of the entire flow. To enable it, simply add a "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Minimap"
-    ],
-    "pageType": "guide",
-    "title": "Minimap",
-    "section": "Minimap",
-    "route": "/features/minimap",
-    "fragment": "minimap",
-    "content": " component as a direct child of "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Minimap"
-    ],
-    "pageType": "guide",
-    "title": "Minimap",
-    "section": "Minimap",
-    "route": "/features/minimap",
-    "fragment": "minimap",
-    "content": ". For customization options, see the available inputs in MiniMapComponent."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Minimap"
-    ],
-    "pageType": "guide",
-    "title": "Minimap",
-    "section": "Minimap",
-    "route": "/features/minimap",
-    "fragment": "minimap",
-    "content": "Planned enhancements for the minimap: Develop an API to customize mini-node appearance (e.g., color, stroke)Enable panning and zooming within the minimapRender mini-nodes to visually match main nodes, using a simplified DOM structure to optimize performance"
   },
   {
     "breadcrumbs": [
@@ -457,6 +517,42 @@
   },
   {
     "breadcrumbs": [
+      "Testing",
+      "Component mocks"
+    ],
+    "pageType": "guide",
+    "title": "Component mocks",
+    "section": "Component mocks",
+    "route": "/testing/component-mocks",
+    "fragment": "component-mocks",
+    "content": "Starting from version 1.9, you must import mock components from ngx-vflow/testing instead of ngx-vflow. The previous approach caused mock components to be bundled with production components, so the testing code has been moved to a separate entry point."
+  },
+  {
+    "breadcrumbs": [
+      "Testing",
+      "Component mocks"
+    ],
+    "pageType": "guide",
+    "title": "Component mocks",
+    "section": "Component mocks",
+    "route": "/testing/component-mocks",
+    "fragment": "component-mocks",
+    "content": "The library provides mocks for every public component to simplify testing in a Node environment (e.g., Jest). The naming convention for importing real and mock components follows this pattern: \\*Component → \\*MockComponent. For example, VflowComponent has a corresponding mock, VflowMockComponent. In the testing environment, you should replace real components with their mock counterparts. For example, to mock the entire library, you should:"
+  },
+  {
+    "breadcrumbs": [
+      "Testing",
+      "Unit testing component nodes"
+    ],
+    "pageType": "guide",
+    "title": "Unit testing component nodes",
+    "section": "Unit testing component nodes",
+    "route": "/testing/unit-testing-component-nodes",
+    "fragment": "unit-testing-component-nodes",
+    "content": "To simplify writing isolated tests for component nodes, you can use the provideCustomNodeMocks function. This helps prevent dependency injection (DI) errors that occur when a node is used outside the scope of the VflowComponent."
+  },
+  {
+    "breadcrumbs": [
       "Getting Started",
       "Dynamic vs Static nodes"
     ],
@@ -538,102 +634,6 @@
     "route": "/getting-started/how-node-sizing-works",
     "fragment": "how-node-sizing-works",
     "content": " element, which enables HTML to be rendered inside SVG. The diagram below illustrates how this element interacts with its content."
-  },
-  {
-    "breadcrumbs": [
-      "Getting Started",
-      "Migrations"
-    ],
-    "pageType": "guide",
-    "title": "Migrations",
-    "section": "Migration to >= v1.0",
-    "route": "/getting-started/migration",
-    "fragment": "migration-to--v10",
-    "content": "remove imports of VflowModule and use Vflow instead (Vflow contains all public standalone components and directives).for standalone components, simply add Vflow to the imports array.for modules, you need to spread ...Vflow into the imports array; otherwise, you will get a type error.remove usage of the computeLayersOnInit setting from the Optimization interface.remove usage of the handlePositions input in the VflowComponent.for classes extending CustomNodeComponent and CustomDynamicNodeComponent:replace this.node to this.node() due to signal input internal migration."
-  },
-  {
-    "breadcrumbs": [
-      "Getting Started",
-      "Principles"
-    ],
-    "pageType": "guide",
-    "title": "Principles",
-    "section": "Principles",
-    "route": "/getting-started/principles",
-    "fragment": "principles",
-    "content": "This page contains a list of general principles that impact feature implementation. No hidden mutations of your data. For example, the library does not modify any of the Node or Edge objects you pass in as inputs. Instead, it creates internal models around these entities and operates on them. Any changes to the passed entities can be observed through events.This principle also implies that you are responsible for managing invalid data. For instance, if you delete a node, the edges corresponding to this node will not be deleted automatically. However, the library will notify you about detached edges so that you can easily delete them."
-  },
-  {
-    "breadcrumbs": [
-      "Getting Started",
-      "Roadmap"
-    ],
-    "pageType": "guide",
-    "title": "Roadmap",
-    "section": "Roadmap",
-    "route": "/getting-started/roadmap",
-    "fragment": "roadmap",
-    "content": "This is a roadmap for ngx-vflow:"
-  },
-  {
-    "breadcrumbs": [
-      "Getting Started",
-      "What is ngx-vflow"
-    ],
-    "pageType": "guide",
-    "title": "What is ngx-vflow",
-    "section": "What is ngx-vflow",
-    "route": "/getting-started/what-is-ngx-vflow",
-    "fragment": "what-is-ngx-vflow",
-    "content": "ngx-vflow is an Angular library for creating node-based applications. It aims to assist you in building anything from a static diagram to a visual editor. You can utilize the default design or apply your own by customizing everything using familiar technologies."
-  },
-  {
-    "breadcrumbs": [
-      "Getting Started",
-      "What is ngx-vflow"
-    ],
-    "pageType": "guide",
-    "title": "What is ngx-vflow",
-    "section": "Main features",
-    "route": "/getting-started/what-is-ngx-vflow",
-    "fragment": "main-features",
-    "content": "Easy to use: Just describe your flow with a simple API; all of the heavy lifting, such as dragging, zooming, and curve math, is handled by the library for you. Customizable: There is a default design for basic usage, and you can also customize nodes with good old HTML and CSS. Other entities such as edges, connection lines, and handles are also customizable, but it will require a little SVG knowledge. Great performance: Angular signals are the heart and soul of ngx-vflow, which are performant by default, so you shouldn't worry about performance even with large flows. Zoneless: Does not require zone.js"
-  },
-  {
-    "breadcrumbs": [
-      "Testing",
-      "Component mocks"
-    ],
-    "pageType": "guide",
-    "title": "Component mocks",
-    "section": "Component mocks",
-    "route": "/testing/component-mocks",
-    "fragment": "component-mocks",
-    "content": "Starting from version 1.9, you must import mock components from ngx-vflow/testing instead of ngx-vflow. The previous approach caused mock components to be bundled with production components, so the testing code has been moved to a separate entry point."
-  },
-  {
-    "breadcrumbs": [
-      "Testing",
-      "Component mocks"
-    ],
-    "pageType": "guide",
-    "title": "Component mocks",
-    "section": "Component mocks",
-    "route": "/testing/component-mocks",
-    "fragment": "component-mocks",
-    "content": "The library provides mocks for every public component to simplify testing in a Node environment (e.g., Jest). The naming convention for importing real and mock components follows this pattern: \\*Component → \\*MockComponent. For example, VflowComponent has a corresponding mock, VflowMockComponent. In the testing environment, you should replace real components with their mock counterparts. For example, to mock the entire library, you should:"
-  },
-  {
-    "breadcrumbs": [
-      "Testing",
-      "Unit testing component nodes"
-    ],
-    "pageType": "guide",
-    "title": "Unit testing component nodes",
-    "section": "Unit testing component nodes",
-    "route": "/testing/unit-testing-component-nodes",
-    "fragment": "unit-testing-component-nodes",
-    "content": "To simplify writing isolated tests for component nodes, you can use the provideCustomNodeMocks function. This helps prevent dependency injection (DI) errors that occur when a node is used outside the scope of the VflowComponent."
   },
   {
     "breadcrumbs": [
@@ -909,40 +909,14 @@
     "breadcrumbs": [
       "Features",
       "Edges",
-      "Curves"
+      "Connection validation"
     ],
     "pageType": "guide",
-    "title": "Curves",
-    "section": "Curves",
-    "route": "/features/edges/curves",
-    "fragment": "curves",
-    "content": "It's possible to set Curve for both the edges and connection."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Curves"
-    ],
-    "pageType": "guide",
-    "title": "Curves",
-    "section": "Curve factory",
-    "route": "/features/edges/curves",
-    "fragment": "curve-factory",
-    "content": "This is an experimental API"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Curves"
-    ],
-    "pageType": "guide",
-    "title": "Curves",
-    "section": "Curve factory",
-    "route": "/features/edges/curves",
-    "fragment": "curve-factory",
-    "content": "If the existing curves do not meet your needs, you can provide your own function that implements the CurveFactory signature."
+    "title": "Connection validation",
+    "section": "Connection validation",
+    "route": "/features/edges/connection-validation",
+    "fragment": "connection-validation",
+    "content": "ngx-vflow supports real-time synchronous validation of connections. Validation occurs when a user attempts to create a new edge. By default, every connection is valid, but you can provide a ConnectionSettings with a validatior callback where you specify the validation logic. For example, in this case, validation only passes connections from node 1 to node 2. If the validator returns false, the (onConnect) event won't be triggered because there is no valid connection."
   },
   {
     "breadcrumbs": [
@@ -1403,19 +1377,6 @@
     "breadcrumbs": [
       "Features",
       "Edges",
-      "Connection validation"
-    ],
-    "pageType": "guide",
-    "title": "Connection validation",
-    "section": "Connection validation",
-    "route": "/features/edges/connection-validation",
-    "fragment": "connection-validation",
-    "content": "ngx-vflow supports real-time synchronous validation of connections. Validation occurs when a user attempts to create a new edge. By default, every connection is valid, but you can provide a ConnectionSettings with a validatior callback where you specify the validation logic. For example, in this case, validation only passes connections from node 1 to node 2. If the validator returns false, the (onConnect) event won't be triggered because there is no valid connection."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
       "Default edges"
     ],
     "pageType": "guide",
@@ -1424,6 +1385,71 @@
     "route": "/features/edges/default-edges",
     "fragment": "default-edges",
     "content": "You can link nodes with edges. All you need to do is to create another Edge[] array and pass it to the vflow component. Each edge contains the id of the source and target nodes, and each edge must have its own id."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Curves"
+    ],
+    "pageType": "guide",
+    "title": "Curves",
+    "section": "Curves",
+    "route": "/features/edges/curves",
+    "fragment": "curves",
+    "content": "It's possible to set Curve for both the edges and connection."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Curves"
+    ],
+    "pageType": "guide",
+    "title": "Curves",
+    "section": "Curve factory",
+    "route": "/features/edges/curves",
+    "fragment": "curve-factory",
+    "content": "This is an experimental API"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Curves"
+    ],
+    "pageType": "guide",
+    "title": "Curves",
+    "section": "Curve factory",
+    "route": "/features/edges/curves",
+    "fragment": "curve-factory",
+    "content": "If the existing curves do not meet your needs, you can provide your own function that implements the CurveFactory signature."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Floating Edges"
+    ],
+    "pageType": "guide",
+    "title": "Floating Edges",
+    "section": "Floating Edges",
+    "route": "/features/edges/floating-edges",
+    "fragment": "floating-edges",
+    "content": "The library supports floating edges. A floating edge is an edge that connects the closest handles of the source and target nodes. You can enable floating edges using the floating flag on Edge."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Floating Edges"
+    ],
+    "pageType": "guide",
+    "title": "Floating Edges",
+    "section": "Floating Edges",
+    "route": "/features/edges/floating-edges",
+    "fragment": "floating-edges",
+    "content": "Since the library always looks for the closest handles between nodes, there can only be one edge between any two nodes. Keep this in mind when building your flows. This limitation may be addressed in future releases."
   },
   {
     "breadcrumbs": [
@@ -2287,149 +2313,6 @@
     "breadcrumbs": [
       "Features",
       "Nodes",
-      "Draggables"
-    ],
-    "pageType": "guide",
-    "title": "Draggables",
-    "section": "Disabling",
-    "route": "/features/nodes/draggables",
-    "fragment": "disabling",
-    "content": "You can disable draggable behavior on certain Node or DynamicNode by passing false."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Draggables"
-    ],
-    "pageType": "guide",
-    "title": "Draggables",
-    "section": "Drag handle",
-    "route": "/features/nodes/draggables",
-    "fragment": "drag-handle",
-    "content": "You can restrict dragging to a specific part of node, by adding dragHandle directive to this element. It's important to note that if a node contains at least one dragHandle, it can only be dragged from those specific areas where dragHandle was added. Otherwise, the entire node can be dragged, provided the draggable property is set to true."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "SVG Nodes"
-    ],
-    "pageType": "guide",
-    "title": "SVG Nodes",
-    "section": "SVG Nodes",
-    "route": "/features/nodes/svg-nodes",
-    "fragment": "svg-nodes",
-    "content": "SVG nodes allow you to create custom node shapes using SVG elements. To create an SVG node:"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "SVG Nodes"
-    ],
-    "pageType": "guide",
-    "title": "SVG Nodes",
-    "section": "SVG Nodes",
-    "route": "/features/nodes/svg-nodes",
-    "fragment": "svg-nodes",
-    "content": "Define a node with "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "SVG Nodes"
-    ],
-    "pageType": "guide",
-    "title": "SVG Nodes",
-    "section": "SVG Nodes",
-    "route": "/features/nodes/svg-nodes",
-    "fragment": "svg-nodes",
-    "content": "type: 'svg-template'"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "SVG Nodes"
-    ],
-    "pageType": "guide",
-    "title": "SVG Nodes",
-    "section": "SVG Nodes",
-    "route": "/features/nodes/svg-nodes",
-    "fragment": "svg-nodes",
-    "content": "Use the "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "SVG Nodes"
-    ],
-    "pageType": "guide",
-    "title": "SVG Nodes",
-    "section": "SVG Nodes",
-    "route": "/features/nodes/svg-nodes",
-    "fragment": "svg-nodes",
-    "content": "nodeSvg"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "SVG Nodes"
-    ],
-    "pageType": "guide",
-    "title": "SVG Nodes",
-    "section": "SVG Nodes",
-    "route": "/features/nodes/svg-nodes",
-    "fragment": "svg-nodes",
-    "content": " template in your Vflow component Access node properties via the template context ("
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "SVG Nodes"
-    ],
-    "pageType": "guide",
-    "title": "SVG Nodes",
-    "section": "SVG Nodes",
-    "route": "/features/nodes/svg-nodes",
-    "fragment": "svg-nodes",
-    "content": "ctx"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "SVG Nodes"
-    ],
-    "pageType": "guide",
-    "title": "SVG Nodes",
-    "section": "SVG Nodes",
-    "route": "/features/nodes/svg-nodes",
-    "fragment": "svg-nodes",
-    "content": ")"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "SVG Nodes"
-    ],
-    "pageType": "guide",
-    "title": "SVG Nodes",
-    "section": "SVG Nodes",
-    "route": "/features/nodes/svg-nodes",
-    "fragment": "svg-nodes",
-    "content": "The template context has the following type:"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
       "Subflows"
     ],
     "pageType": "guide",
@@ -2568,6 +2451,149 @@
     "route": "/features/nodes/resizer",
     "fragment": "see-also",
     "content": "SubflowsCustom nodesHandling changes"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Draggables"
+    ],
+    "pageType": "guide",
+    "title": "Draggables",
+    "section": "Disabling",
+    "route": "/features/nodes/draggables",
+    "fragment": "disabling",
+    "content": "You can disable draggable behavior on certain Node or DynamicNode by passing false."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Draggables"
+    ],
+    "pageType": "guide",
+    "title": "Draggables",
+    "section": "Drag handle",
+    "route": "/features/nodes/draggables",
+    "fragment": "drag-handle",
+    "content": "You can restrict dragging to a specific part of node, by adding dragHandle directive to this element. It's important to note that if a node contains at least one dragHandle, it can only be dragged from those specific areas where dragHandle was added. Otherwise, the entire node can be dragged, provided the draggable property is set to true."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "SVG Nodes"
+    ],
+    "pageType": "guide",
+    "title": "SVG Nodes",
+    "section": "SVG Nodes",
+    "route": "/features/nodes/svg-nodes",
+    "fragment": "svg-nodes",
+    "content": "SVG nodes allow you to create custom node shapes using SVG elements. To create an SVG node:"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "SVG Nodes"
+    ],
+    "pageType": "guide",
+    "title": "SVG Nodes",
+    "section": "SVG Nodes",
+    "route": "/features/nodes/svg-nodes",
+    "fragment": "svg-nodes",
+    "content": "Define a node with "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "SVG Nodes"
+    ],
+    "pageType": "guide",
+    "title": "SVG Nodes",
+    "section": "SVG Nodes",
+    "route": "/features/nodes/svg-nodes",
+    "fragment": "svg-nodes",
+    "content": "type: 'svg-template'"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "SVG Nodes"
+    ],
+    "pageType": "guide",
+    "title": "SVG Nodes",
+    "section": "SVG Nodes",
+    "route": "/features/nodes/svg-nodes",
+    "fragment": "svg-nodes",
+    "content": "Use the "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "SVG Nodes"
+    ],
+    "pageType": "guide",
+    "title": "SVG Nodes",
+    "section": "SVG Nodes",
+    "route": "/features/nodes/svg-nodes",
+    "fragment": "svg-nodes",
+    "content": "nodeSvg"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "SVG Nodes"
+    ],
+    "pageType": "guide",
+    "title": "SVG Nodes",
+    "section": "SVG Nodes",
+    "route": "/features/nodes/svg-nodes",
+    "fragment": "svg-nodes",
+    "content": " template in your Vflow component Access node properties via the template context ("
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "SVG Nodes"
+    ],
+    "pageType": "guide",
+    "title": "SVG Nodes",
+    "section": "SVG Nodes",
+    "route": "/features/nodes/svg-nodes",
+    "fragment": "svg-nodes",
+    "content": "ctx"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "SVG Nodes"
+    ],
+    "pageType": "guide",
+    "title": "SVG Nodes",
+    "section": "SVG Nodes",
+    "route": "/features/nodes/svg-nodes",
+    "fragment": "svg-nodes",
+    "content": ")"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "SVG Nodes"
+    ],
+    "pageType": "guide",
+    "title": "SVG Nodes",
+    "section": "SVG Nodes",
+    "route": "/features/nodes/svg-nodes",
+    "fragment": "svg-nodes",
+    "content": "The template context has the following type:"
   },
   {
     "breadcrumbs": [
