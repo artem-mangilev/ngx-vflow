@@ -41,7 +41,7 @@ export class HandleComponent implements OnInit {
    */
   public id = input<string>();
 
-  public template = input<TemplateRef<any>>();
+  public template = input<TemplateRef<any> | null>();
 
   public offsetX = input<number>(0);
   public offsetY = input<number>(0);

@@ -12,7 +12,7 @@ export interface NodeHandle {
   userOffsetY: number;
   id?: string;
   hostReference?: Element;
-  template?: TemplateRef<any>;
+  template?: TemplateRef<any> | null;
 }
 
 @Injectable()

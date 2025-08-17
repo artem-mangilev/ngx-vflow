@@ -108,13 +108,20 @@
 
 <!-- Handles -->
 @for (handle of model().handles(); track handle) {
-  @if (!handle.template) {
+  @if (handle.template === undefined) {
     <svg:circle
       class="default-handle"
       r="5"
       [attr.cx]="handle.hostOffset().x"
       [attr.cy]="handle.hostOffset().y"
       [attr.stroke-width]="handle.strokeWidth"
+      (pointerStart)="startConnection($event, handle)"
+      (pointerEnd)="endConnection()" />
+  }
+
+  @if (handle.template === null) {
+    <svg:g
+      [handleSizeController]="handle"
       (pointerStart)="startConnection($event, handle)"
       (pointerEnd)="endConnection()" />
   }
