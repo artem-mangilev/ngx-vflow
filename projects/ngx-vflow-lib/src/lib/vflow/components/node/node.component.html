@@ -27,12 +27,7 @@
     [attr.width]="model().foWidth()"
     [attr.height]="model().foHeight()"
     (click)="pullNode()">
-    <div
-      nodeHandlesController
-      nodeResizeController
-      class="wrapper"
-      [style.width]="model().styleWidth()"
-      [style.height]="model().styleHeight()">
+    <div nodeHandlesController nodeResizeController class="wrapper" [style.width]="model().styleWidth()">
       <ng-container
         [ngTemplateOutlet]="nodeTemplate() ?? null"
         [ngTemplateOutletContext]="model().context"
@@ -58,12 +53,7 @@
     [attr.width]="model().foWidth()"
     [attr.height]="model().foHeight()"
     (click)="pullNode()">
-    <div
-      nodeHandlesController
-      nodeResizeController
-      class="wrapper"
-      [style.width]="model().styleWidth()"
-      [style.height]="model().styleHeight()">
+    <div nodeHandlesController nodeResizeController class="wrapper" [style.width]="model().styleWidth()">
       <ng-container
         [ngComponentOutlet]="$any(model().rawNode.type)"
         [ngComponentOutletInputs]="model().componentTypeInputs"
