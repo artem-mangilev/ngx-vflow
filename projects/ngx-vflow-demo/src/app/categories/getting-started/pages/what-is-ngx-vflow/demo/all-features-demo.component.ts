@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, inject, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, viewChild } from '@angular/core';
 import { Vflow, Connection, VflowComponent, Edge } from 'ngx-vflow';
 import { FlowStoreService } from './services/flow-store.service';
 
@@ -81,13 +81,20 @@ import { FlowStoreService } from './services/flow-store.service';
   imports: [Vflow],
   providers: [FlowStoreService],
 })
-export class AllFeaturesDemoComponent implements AfterViewInit {
+export class AllFeaturesDemoComponent {
   protected store = inject(FlowStoreService);
 
   protected vflow = viewChild.required(VflowComponent);
 
-  ngAfterViewInit(): void {
-    this.vflow().viewportTo({ x: 0, y: 322, zoom: 0.5 });
+  constructor() {
+    effect(
+      () => {
+        if (this.vflow().initialized()) {
+          this.vflow().fitView();
+        }
+      },
+      { allowSignalWrites: true },
+    );
   }
 
   createEdge(connection: Connection) {
