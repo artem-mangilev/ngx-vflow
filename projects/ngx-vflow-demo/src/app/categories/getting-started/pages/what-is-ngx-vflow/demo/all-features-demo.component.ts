@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, effect, inject, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, untracked, viewChild } from '@angular/core';
 import { Vflow, Connection, VflowComponent, Edge } from 'ngx-vflow';
 import { FlowStoreService } from './services/flow-store.service';
 
@@ -90,7 +90,7 @@ export class AllFeaturesDemoComponent {
     effect(
       () => {
         if (this.vflow().initialized()) {
-          this.vflow().fitView();
+          untracked(() => this.vflow().fitView());
         }
       },
       { allowSignalWrites: true },
