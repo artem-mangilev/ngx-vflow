@@ -1,7 +1,7 @@
 import { DestroyRef, Directive, ElementRef, inject, NgZone, OnInit } from '@angular/core';
 import { resizable } from '../utils/resizable';
 import { NodeAccessorService } from '../services/node-accessor.service';
-import { filter, startWith, tap } from 'rxjs';
+import { filter, merge, startWith, tap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 /**
@@ -20,16 +20,15 @@ export class NodeResizeControllerDirective implements OnInit {
   public ngOnInit(): void {
     const model = this.nodeAccessor.model()!;
 
-    resizable([this.hostElementRef.nativeElement], this.zone)
+    const host = this.hostElementRef.nativeElement;
+
+    merge(resizable([host], this.zone))
       .pipe(
         startWith(null),
         filter(() => !model.resizing()),
         tap(() => {
-          const width = this.hostElementRef.nativeElement.clientWidth;
-          const height = this.hostElementRef.nativeElement.clientHeight;
-
-          model.width.set(width);
-          model.height.set(height);
+          model.width.set(host.clientWidth);
+          model.height.set(host.clientHeight);
         }),
         takeUntilDestroyed(this.destroyRef),
       )
