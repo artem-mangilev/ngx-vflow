@@ -1,4 +1,4 @@
-import { Injectable, computed, inject } from '@angular/core';
+import { Injectable, computed, effect, inject } from '@angular/core';
 import { FlowEntitiesService } from './flow-entities.service';
 import { NodeModel } from '../models/node.model';
 import { isGroupNode } from '../utils/is-group-node';
@@ -72,6 +72,15 @@ export class NodeRenderingService {
   private maxOrder = computed(() => {
     return Math.max(...this.flowEntitiesService.nodes().map((n) => n.renderOrder()));
   });
+
+  constructor() {
+    effect(
+      () => {
+        this.viewportNodes().forEach((n) => n.shouldLoad.set(true));
+      },
+      { allowSignalWrites: true },
+    );
+  }
 
   public pullNode(node: NodeModel) {
     // pull node

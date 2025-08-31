@@ -108,6 +108,8 @@ export class NodeModel<T = unknown>
   public resizing = signal(false);
   public resizerTemplate = signal<TemplateRef<unknown> | null>(null);
 
+  public shouldLoad = signal(false);
+
   public context = {
     $implicit: {},
   };
@@ -158,6 +160,7 @@ export class NodeModel<T = unknown>
         $implicit: {
           node: rawNode,
           selected: this.selected,
+          shouldLoad: this.shouldLoad,
         },
       };
     }

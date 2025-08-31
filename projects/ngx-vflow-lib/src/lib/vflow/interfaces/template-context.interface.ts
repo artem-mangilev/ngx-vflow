@@ -20,6 +20,7 @@ export interface NodeContext {
     // TODO: type properly when separate template directives to static and dynamic nodes
     node: any;
     selected: Signal<boolean>;
+    shouldLoad: Signal<boolean>;
   };
 }
 
