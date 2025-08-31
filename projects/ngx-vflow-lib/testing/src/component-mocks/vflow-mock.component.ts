@@ -196,9 +196,10 @@ export class VflowMockComponent implements AsInterface<VflowComponent>, OnInit {
 
   public nodesChange = signal<NodeChange[]>([]);
   public edgesChange = signal<EdgeChange[]>([]);
+  public initialized = signal(true);
 
+  public initialized$ = toObservable(this.initialized);
   public viewportChange$ = toObservable(this.viewport);
-
   public nodesChange$ = toObservable(this.nodesChange);
   public edgesChange$ = toObservable(this.edgesChange);
 
