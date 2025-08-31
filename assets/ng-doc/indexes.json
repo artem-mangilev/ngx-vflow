@@ -1,186 +1,6 @@
 [
   {
     "breadcrumbs": [
-      "Getting Started",
-      "Dynamic vs Static nodes"
-    ],
-    "pageType": "guide",
-    "title": "Dynamic vs Static nodes",
-    "section": "Dynamic vs Static nodes",
-    "route": "/getting-started/dynamic-vs-static-nodes",
-    "fragment": "dynamic-vs-static-nodes",
-    "content": "You can't mix Node and DynamicNode in a single array so you have to choose what you want to use"
-  },
-  {
-    "breadcrumbs": [
-      "Getting Started",
-      "Dynamic vs Static nodes"
-    ],
-    "pageType": "guide",
-    "title": "Dynamic vs Static nodes",
-    "section": "Dynamic vs Static nodes",
-    "route": "/getting-started/dynamic-vs-static-nodes",
-    "fragment": "dynamic-vs-static-nodes",
-    "content": "For more complex scenarios, you might need to have a fine-grained control on specific nodes. In such cases, you can use DynamicNode, which is essentially a Node with properties with same names but with a WritableSignal type. This offers the following benefits: Granular updates to specific nodes with efficient rendering (only the affected node is re-rendered).Access to the updated state of a node directly (without listening events). For instance, if a point changes due to drag-and-drop, the node's point() signal will reflect the new position.Additional benefits of signals, such as executing actions within an effect when a dynamic property changes."
-  },
-  {
-    "breadcrumbs": [
-      "Getting Started",
-      "Dynamic vs Static nodes"
-    ],
-    "pageType": "guide",
-    "title": "Dynamic vs Static nodes",
-    "section": "Dynamic vs Static nodes",
-    "route": "/getting-started/dynamic-vs-static-nodes",
-    "fragment": "dynamic-vs-static-nodes",
-    "content": "Not all properties of DynamicNode are WritableSignal, for instance an id must be static, so it remains of a regular string type"
-  },
-  {
-    "breadcrumbs": [
-      "Getting Started",
-      "Dynamic vs Static nodes"
-    ],
-    "pageType": "guide",
-    "title": "Dynamic vs Static nodes",
-    "section": "Code example",
-    "route": "/getting-started/dynamic-vs-static-nodes",
-    "fragment": "code-example",
-    "content": "If you want to change a node's position programmatically, you would:"
-  },
-  {
-    "breadcrumbs": [
-      "Getting Started",
-      "Dynamic vs Static nodes"
-    ],
-    "pageType": "guide",
-    "title": "Dynamic vs Static nodes",
-    "section": "See also",
-    "route": "/getting-started/dynamic-vs-static-nodes",
-    "fragment": "see-also",
-    "content": "D3 Force"
-  },
-  {
-    "breadcrumbs": [
-      "Getting Started",
-      "How node sizing works"
-    ],
-    "pageType": "guide",
-    "title": "How node sizing works",
-    "section": "How node sizing works",
-    "route": "/getting-started/how-node-sizing-works",
-    "fragment": "how-node-sizing-works",
-    "content": "This topic needs some clarification due to the design decisions behind the library. The library renders the flow by combining two technologies: SVG, which is responsible for rendering curves, managing zoom, pan, and other tasks that SVG handles well.HTML (with CSS), which is used to create the content for the nodes, allowing front-end engineers to design dynamic and visually appealing UIs more easily than with SVG. The link between these two technologies is the "
-  },
-  {
-    "breadcrumbs": [
-      "Getting Started",
-      "How node sizing works"
-    ],
-    "pageType": "guide",
-    "title": "How node sizing works",
-    "section": "How node sizing works",
-    "route": "/getting-started/how-node-sizing-works",
-    "fragment": "how-node-sizing-works",
-    "content": " element, which enables HTML to be rendered inside SVG. The diagram below illustrates how this element interacts with its content."
-  },
-  {
-    "breadcrumbs": [
-      "Getting Started",
-      "Migrations"
-    ],
-    "pageType": "guide",
-    "title": "Migrations",
-    "section": "Migration to >= v1.0",
-    "route": "/getting-started/migration",
-    "fragment": "migration-to--v10",
-    "content": "remove imports of VflowModule and use Vflow instead (Vflow contains all public standalone components and directives).for standalone components, simply add Vflow to the imports array.for modules, you need to spread ...Vflow into the imports array; otherwise, you will get a type error.remove usage of the computeLayersOnInit setting from the Optimization interface.remove usage of the handlePositions input in the VflowComponent.for classes extending CustomNodeComponent and CustomDynamicNodeComponent:replace this.node to this.node() due to signal input internal migration."
-  },
-  {
-    "breadcrumbs": [
-      "Getting Started",
-      "Principles"
-    ],
-    "pageType": "guide",
-    "title": "Principles",
-    "section": "Principles",
-    "route": "/getting-started/principles",
-    "fragment": "principles",
-    "content": "This page contains a list of general principles that impact feature implementation. No hidden mutations of your data. For example, the library does not modify any of the Node or Edge objects you pass in as inputs. Instead, it creates internal models around these entities and operates on them. Any changes to the passed entities can be observed through events.This principle also implies that you are responsible for managing invalid data. For instance, if you delete a node, the edges corresponding to this node will not be deleted automatically. However, the library will notify you about detached edges so that you can easily delete them."
-  },
-  {
-    "breadcrumbs": [
-      "Getting Started",
-      "Roadmap"
-    ],
-    "pageType": "guide",
-    "title": "Roadmap",
-    "section": "Roadmap",
-    "route": "/getting-started/roadmap",
-    "fragment": "roadmap",
-    "content": "This is a roadmap for ngx-vflow:"
-  },
-  {
-    "breadcrumbs": [
-      "Getting Started",
-      "What is ngx-vflow"
-    ],
-    "pageType": "guide",
-    "title": "What is ngx-vflow",
-    "section": "What is ngx-vflow",
-    "route": "/getting-started/what-is-ngx-vflow",
-    "fragment": "what-is-ngx-vflow",
-    "content": "ngx-vflow is an Angular library for creating node-based applications. It aims to assist you in building anything from a static diagram to a visual editor. You can utilize the default design or apply your own by customizing everything using familiar technologies."
-  },
-  {
-    "breadcrumbs": [
-      "Getting Started",
-      "What is ngx-vflow"
-    ],
-    "pageType": "guide",
-    "title": "What is ngx-vflow",
-    "section": "Main features",
-    "route": "/getting-started/what-is-ngx-vflow",
-    "fragment": "main-features",
-    "content": "Easy to use: Just describe your flow with a simple API; all of the heavy lifting, such as dragging, zooming, and curve math, is handled by the library for you. Customizable: There is a default design for basic usage, and you can also customize nodes with good old HTML and CSS. Other entities such as edges, connection lines, and handles are also customizable, but it will require a little SVG knowledge. Great performance: Angular signals are the heart and soul of ngx-vflow, which are performant by default, so you shouldn't worry about performance even with large flows. Zoneless: Does not require zone.js"
-  },
-  {
-    "breadcrumbs": [
-      "Testing",
-      "Component mocks"
-    ],
-    "pageType": "guide",
-    "title": "Component mocks",
-    "section": "Component mocks",
-    "route": "/testing/component-mocks",
-    "fragment": "component-mocks",
-    "content": "Starting from version 1.9, you must import mock components from ngx-vflow/testing instead of ngx-vflow. The previous approach caused mock components to be bundled with production components, so the testing code has been moved to a separate entry point."
-  },
-  {
-    "breadcrumbs": [
-      "Testing",
-      "Component mocks"
-    ],
-    "pageType": "guide",
-    "title": "Component mocks",
-    "section": "Component mocks",
-    "route": "/testing/component-mocks",
-    "fragment": "component-mocks",
-    "content": "The library provides mocks for every public component to simplify testing in a Node environment (e.g., Jest). The naming convention for importing real and mock components follows this pattern: \\*Component → \\*MockComponent. For example, VflowComponent has a corresponding mock, VflowMockComponent. In the testing environment, you should replace real components with their mock counterparts. For example, to mock the entire library, you should:"
-  },
-  {
-    "breadcrumbs": [
-      "Testing",
-      "Unit testing component nodes"
-    ],
-    "pageType": "guide",
-    "title": "Unit testing component nodes",
-    "section": "Unit testing component nodes",
-    "route": "/testing/unit-testing-component-nodes",
-    "fragment": "unit-testing-component-nodes",
-    "content": "To simplify writing isolated tests for component nodes, you can use the provideCustomNodeMocks function. This helps prevent dependency injection (DI) errors that occur when a node is used outside the scope of the VflowComponent."
-  },
-  {
-    "breadcrumbs": [
       "Features",
       "Custom background"
     ],
@@ -637,6 +457,186 @@
   },
   {
     "breadcrumbs": [
+      "Getting Started",
+      "Dynamic vs Static nodes"
+    ],
+    "pageType": "guide",
+    "title": "Dynamic vs Static nodes",
+    "section": "Dynamic vs Static nodes",
+    "route": "/getting-started/dynamic-vs-static-nodes",
+    "fragment": "dynamic-vs-static-nodes",
+    "content": "You can't mix Node and DynamicNode in a single array so you have to choose what you want to use"
+  },
+  {
+    "breadcrumbs": [
+      "Getting Started",
+      "Dynamic vs Static nodes"
+    ],
+    "pageType": "guide",
+    "title": "Dynamic vs Static nodes",
+    "section": "Dynamic vs Static nodes",
+    "route": "/getting-started/dynamic-vs-static-nodes",
+    "fragment": "dynamic-vs-static-nodes",
+    "content": "For more complex scenarios, you might need to have a fine-grained control on specific nodes. In such cases, you can use DynamicNode, which is essentially a Node with properties with same names but with a WritableSignal type. This offers the following benefits: Granular updates to specific nodes with efficient rendering (only the affected node is re-rendered).Access to the updated state of a node directly (without listening events). For instance, if a point changes due to drag-and-drop, the node's point() signal will reflect the new position.Additional benefits of signals, such as executing actions within an effect when a dynamic property changes."
+  },
+  {
+    "breadcrumbs": [
+      "Getting Started",
+      "Dynamic vs Static nodes"
+    ],
+    "pageType": "guide",
+    "title": "Dynamic vs Static nodes",
+    "section": "Dynamic vs Static nodes",
+    "route": "/getting-started/dynamic-vs-static-nodes",
+    "fragment": "dynamic-vs-static-nodes",
+    "content": "Not all properties of DynamicNode are WritableSignal, for instance an id must be static, so it remains of a regular string type"
+  },
+  {
+    "breadcrumbs": [
+      "Getting Started",
+      "Dynamic vs Static nodes"
+    ],
+    "pageType": "guide",
+    "title": "Dynamic vs Static nodes",
+    "section": "Code example",
+    "route": "/getting-started/dynamic-vs-static-nodes",
+    "fragment": "code-example",
+    "content": "If you want to change a node's position programmatically, you would:"
+  },
+  {
+    "breadcrumbs": [
+      "Getting Started",
+      "Dynamic vs Static nodes"
+    ],
+    "pageType": "guide",
+    "title": "Dynamic vs Static nodes",
+    "section": "See also",
+    "route": "/getting-started/dynamic-vs-static-nodes",
+    "fragment": "see-also",
+    "content": "D3 Force"
+  },
+  {
+    "breadcrumbs": [
+      "Getting Started",
+      "How node sizing works"
+    ],
+    "pageType": "guide",
+    "title": "How node sizing works",
+    "section": "How node sizing works",
+    "route": "/getting-started/how-node-sizing-works",
+    "fragment": "how-node-sizing-works",
+    "content": "This topic needs some clarification due to the design decisions behind the library. The library renders the flow by combining two technologies: SVG, which is responsible for rendering curves, managing zoom, pan, and other tasks that SVG handles well.HTML (with CSS), which is used to create the content for the nodes, allowing front-end engineers to design dynamic and visually appealing UIs more easily than with SVG. The link between these two technologies is the "
+  },
+  {
+    "breadcrumbs": [
+      "Getting Started",
+      "How node sizing works"
+    ],
+    "pageType": "guide",
+    "title": "How node sizing works",
+    "section": "How node sizing works",
+    "route": "/getting-started/how-node-sizing-works",
+    "fragment": "how-node-sizing-works",
+    "content": " element, which enables HTML to be rendered inside SVG. The diagram below illustrates how this element interacts with its content."
+  },
+  {
+    "breadcrumbs": [
+      "Getting Started",
+      "Migrations"
+    ],
+    "pageType": "guide",
+    "title": "Migrations",
+    "section": "Migration to >= v1.0",
+    "route": "/getting-started/migration",
+    "fragment": "migration-to--v10",
+    "content": "remove imports of VflowModule and use Vflow instead (Vflow contains all public standalone components and directives).for standalone components, simply add Vflow to the imports array.for modules, you need to spread ...Vflow into the imports array; otherwise, you will get a type error.remove usage of the computeLayersOnInit setting from the Optimization interface.remove usage of the handlePositions input in the VflowComponent.for classes extending CustomNodeComponent and CustomDynamicNodeComponent:replace this.node to this.node() due to signal input internal migration."
+  },
+  {
+    "breadcrumbs": [
+      "Getting Started",
+      "Principles"
+    ],
+    "pageType": "guide",
+    "title": "Principles",
+    "section": "Principles",
+    "route": "/getting-started/principles",
+    "fragment": "principles",
+    "content": "This page contains a list of general principles that impact feature implementation. No hidden mutations of your data. For example, the library does not modify any of the Node or Edge objects you pass in as inputs. Instead, it creates internal models around these entities and operates on them. Any changes to the passed entities can be observed through events.This principle also implies that you are responsible for managing invalid data. For instance, if you delete a node, the edges corresponding to this node will not be deleted automatically. However, the library will notify you about detached edges so that you can easily delete them."
+  },
+  {
+    "breadcrumbs": [
+      "Getting Started",
+      "Roadmap"
+    ],
+    "pageType": "guide",
+    "title": "Roadmap",
+    "section": "Roadmap",
+    "route": "/getting-started/roadmap",
+    "fragment": "roadmap",
+    "content": "This is a roadmap for ngx-vflow:"
+  },
+  {
+    "breadcrumbs": [
+      "Getting Started",
+      "What is ngx-vflow"
+    ],
+    "pageType": "guide",
+    "title": "What is ngx-vflow",
+    "section": "What is ngx-vflow",
+    "route": "/getting-started/what-is-ngx-vflow",
+    "fragment": "what-is-ngx-vflow",
+    "content": "ngx-vflow is an Angular library for creating node-based applications. It aims to assist you in building anything from a static diagram to a visual editor. You can utilize the default design or apply your own by customizing everything using familiar technologies."
+  },
+  {
+    "breadcrumbs": [
+      "Getting Started",
+      "What is ngx-vflow"
+    ],
+    "pageType": "guide",
+    "title": "What is ngx-vflow",
+    "section": "Main features",
+    "route": "/getting-started/what-is-ngx-vflow",
+    "fragment": "main-features",
+    "content": "Easy to use: Just describe your flow with a simple API; all of the heavy lifting, such as dragging, zooming, and curve math, is handled by the library for you. Customizable: There is a default design for basic usage, and you can also customize nodes with good old HTML and CSS. Other entities such as edges, connection lines, and handles are also customizable, but it will require a little SVG knowledge. Great performance: Angular signals are the heart and soul of ngx-vflow, which are performant by default, so you shouldn't worry about performance even with large flows. Zoneless: Does not require zone.js"
+  },
+  {
+    "breadcrumbs": [
+      "Testing",
+      "Component mocks"
+    ],
+    "pageType": "guide",
+    "title": "Component mocks",
+    "section": "Component mocks",
+    "route": "/testing/component-mocks",
+    "fragment": "component-mocks",
+    "content": "Starting from version 1.9, you must import mock components from ngx-vflow/testing instead of ngx-vflow. The previous approach caused mock components to be bundled with production components, so the testing code has been moved to a separate entry point."
+  },
+  {
+    "breadcrumbs": [
+      "Testing",
+      "Component mocks"
+    ],
+    "pageType": "guide",
+    "title": "Component mocks",
+    "section": "Component mocks",
+    "route": "/testing/component-mocks",
+    "fragment": "component-mocks",
+    "content": "The library provides mocks for every public component to simplify testing in a Node environment (e.g., Jest). The naming convention for importing real and mock components follows this pattern: \\*Component → \\*MockComponent. For example, VflowComponent has a corresponding mock, VflowMockComponent. In the testing environment, you should replace real components with their mock counterparts. For example, to mock the entire library, you should:"
+  },
+  {
+    "breadcrumbs": [
+      "Testing",
+      "Unit testing component nodes"
+    ],
+    "pageType": "guide",
+    "title": "Unit testing component nodes",
+    "section": "Unit testing component nodes",
+    "route": "/testing/unit-testing-component-nodes",
+    "fragment": "unit-testing-component-nodes",
+    "content": "To simplify writing isolated tests for component nodes, you can use the provideCustomNodeMocks function. This helps prevent dependency injection (DI) errors that occur when a node is used outside the scope of the VflowComponent."
+  },
+  {
+    "breadcrumbs": [
       "Workshops",
       "Delete selected"
     ],
@@ -670,32 +670,6 @@
     "route": "/workshops/stress-test",
     "fragment": "stress-test",
     "content": "The library can render 1000+ nodes instantly while maintaining smooth user interactions."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Node toolbar"
-    ],
-    "pageType": "guide",
-    "title": "Node toolbar",
-    "section": "Node toolbar",
-    "route": "/features/nodes/node-toolbar",
-    "fragment": "node-toolbar",
-    "content": "You can add a NodeToolbarComponent to your node. The content of this component is automatically positioned near one side of the node, based on the value of the position input."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Node toolbar"
-    ],
-    "pageType": "guide",
-    "title": "Node toolbar",
-    "section": "Multiple Toolbars",
-    "route": "/features/nodes/node-toolbar",
-    "fragment": "multiple-toolbars",
-    "content": "It's also possible to add multiple toolbars to the same node by simply including multiple NodeToolbarComponent instances with different position inputs."
   },
   {
     "breadcrumbs": [
@@ -1442,19 +1416,6 @@
     "breadcrumbs": [
       "Features",
       "Edges",
-      "Default edges"
-    ],
-    "pageType": "guide",
-    "title": "Default edges",
-    "section": "Default edges",
-    "route": "/features/edges/default-edges",
-    "fragment": "default-edges",
-    "content": "You can link nodes with edges. All you need to do is to create another Edge[] array and pass it to the vflow component. Each edge contains the id of the source and target nodes, and each edge must have its own id."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
       "Floating Edges"
     ],
     "pageType": "guide",
@@ -1554,6 +1515,19 @@
     "route": "/features/edges/markers",
     "fragment": "markers",
     "content": "You can create markers for both edges and connections. Edges: Specify start and end markers for corresponding parts of the edge. Currently, markers are limited to two types: arrow and arrow-closed.Connections: You can specify an end marker using the marker property in ConnectionSettings."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Default edges"
+    ],
+    "pageType": "guide",
+    "title": "Default edges",
+    "section": "Default edges",
+    "route": "/features/edges/default-edges",
+    "fragment": "default-edges",
+    "content": "You can link nodes with edges. All you need to do is to create another Edge[] array and pass it to the vflow component. Each edge contains the id of the source and target nodes, and each edge must have its own id."
   },
   {
     "breadcrumbs": [
@@ -1814,266 +1788,6 @@
     "route": "/features/edges/reconnect-edges",
     "fragment": "reconnect-edge",
     "content": ", then remove the reference to the old edge from the list."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Resizer"
-    ],
-    "pageType": "guide",
-    "title": "Resizer",
-    "section": "Resizer",
-    "route": "/features/nodes/resizer",
-    "fragment": "resizer",
-    "content": "You might want to resize your node. This functionality works with nearly all types of nodes."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Resizer"
-    ],
-    "pageType": "guide",
-    "title": "Resizer",
-    "section": "Resize default group",
-    "route": "/features/nodes/resizer",
-    "fragment": "resize-default-group",
-    "content": "To resize a default group, simply pass the resizable flag to a Node (or DynamicNode) of type default-group."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Resizer"
-    ],
-    "pageType": "guide",
-    "title": "Resizer",
-    "section": "Resize template group",
-    "route": "/features/nodes/resizer",
-    "fragment": "resize-template-group",
-    "content": "This provides a way to have more control over the resizer: Create a template-group node.If you want the resizer to appear consistently, add the resizable directive to the SVG element (likely a "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Resizer"
-    ],
-    "pageType": "guide",
-    "title": "Resizer",
-    "section": "Resize template group",
-    "route": "/features/nodes/resizer",
-    "fragment": "resize-template-group",
-    "content": ") representing your group.If you want the resizer to appear conditionally, apply the directive as [resizable]=\"yourCondition\". You can bind the visibility of the resizer to the node’s selection state (see the code below for an example).Important: Use the ctx.width() and ctx.height() signals from the context, not ctx.node.width and ctx.node.height. The latter properties are not reactive, so the node won’t update its size based on the resizer.The resizer respects the min-width and min-height CSS properties of the resizable node.Optionally, you can customize the [resizerColor] and the [gap] between the node and the resizer, with more customization options coming in the future.\""
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Resizer"
-    ],
-    "pageType": "guide",
-    "title": "Resizer",
-    "section": "Resize a template/component regular node",
-    "route": "/features/nodes/resizer",
-    "fragment": "resize-a-templatecomponent-regular-node",
-    "content": "The algorithm is almost the same as for template-group nodes: Create a node of type html-template or CustomNodeComponent (CustomDynamicNodeComponent).If you want the resizer to always appear, add the resizable directive to the top-level element of your custom node (ideally, a wrapper for the entire node content).If you want the resizer to appear conditionally, apply the directive as [resizable]=\"yourCondition\". Binding the visibility of the resizer to the node’s selection state can be useful.The resizer respects the min-width and min-height CSS properties of the element where the directive is applied.It's up to you to adjust the CSS of your custom node to ensure it renders correctly during resizing. The library only modifies the container size.Optionally, you can customize the [resizerColor] and the [gap] between the node and the resizer, with more customization options coming in the future."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Resizer"
-    ],
-    "pageType": "guide",
-    "title": "Resizer",
-    "section": "Resize event",
-    "route": "/features/nodes/resizer",
-    "fragment": "resize-event",
-    "content": "You may want to perform some actions on resize. To do this, simply add handler to the (onNodesChange.size) output of the "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Resizer"
-    ],
-    "pageType": "guide",
-    "title": "Resizer",
-    "section": "Resize event",
-    "route": "/features/nodes/resizer",
-    "fragment": "resize-event",
-    "content": " component."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Resizer"
-    ],
-    "pageType": "guide",
-    "title": "Resizer",
-    "section": "See also",
-    "route": "/features/nodes/resizer",
-    "fragment": "see-also",
-    "content": "SubflowsCustom nodesHandling changes"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Subflows"
-    ],
-    "pageType": "guide",
-    "title": "Subflows",
-    "section": "Subflows",
-    "route": "/features/nodes/subflows",
-    "fragment": "subflows",
-    "content": "A subflow is a node that can contain child nodes. Key things about subflows: To create a subflow, you need to use a default-group or template-group type on Node or DynamicNode.To associate a node with a subflow, set the parentId to the ID of the subflow.Nodes within a subflow have coordinates relative to that subflow.A subflow is itself a node, so it can act as a source or a target (this functionality is available only for template-group subflows).Use the groupNode directive on an ng-template to define your custom subflow. While a custom subflow can theoretically be any SVG structure, it's recommended to use the "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Subflows"
-    ],
-    "pageType": "guide",
-    "title": "Subflows",
-    "section": "Subflows",
-    "route": "/features/nodes/subflows",
-    "fragment": "subflows",
-    "content": " element."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Subflows"
-    ],
-    "pageType": "guide",
-    "title": "Subflows",
-    "section": "See also",
-    "route": "/features/nodes/subflows",
-    "fragment": "see-also",
-    "content": "DefaultGroupNodeTemplateGroupNodeDefaultDynamicGroupNodeTemplateDynamicGroupNode"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "SVG Nodes"
-    ],
-    "pageType": "guide",
-    "title": "SVG Nodes",
-    "section": "SVG Nodes",
-    "route": "/features/nodes/svg-nodes",
-    "fragment": "svg-nodes",
-    "content": "SVG nodes allow you to create custom node shapes using SVG elements. To create an SVG node:"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "SVG Nodes"
-    ],
-    "pageType": "guide",
-    "title": "SVG Nodes",
-    "section": "SVG Nodes",
-    "route": "/features/nodes/svg-nodes",
-    "fragment": "svg-nodes",
-    "content": "Define a node with "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "SVG Nodes"
-    ],
-    "pageType": "guide",
-    "title": "SVG Nodes",
-    "section": "SVG Nodes",
-    "route": "/features/nodes/svg-nodes",
-    "fragment": "svg-nodes",
-    "content": "type: 'svg-template'"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "SVG Nodes"
-    ],
-    "pageType": "guide",
-    "title": "SVG Nodes",
-    "section": "SVG Nodes",
-    "route": "/features/nodes/svg-nodes",
-    "fragment": "svg-nodes",
-    "content": "Use the "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "SVG Nodes"
-    ],
-    "pageType": "guide",
-    "title": "SVG Nodes",
-    "section": "SVG Nodes",
-    "route": "/features/nodes/svg-nodes",
-    "fragment": "svg-nodes",
-    "content": "nodeSvg"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "SVG Nodes"
-    ],
-    "pageType": "guide",
-    "title": "SVG Nodes",
-    "section": "SVG Nodes",
-    "route": "/features/nodes/svg-nodes",
-    "fragment": "svg-nodes",
-    "content": " template in your Vflow component Access node properties via the template context ("
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "SVG Nodes"
-    ],
-    "pageType": "guide",
-    "title": "SVG Nodes",
-    "section": "SVG Nodes",
-    "route": "/features/nodes/svg-nodes",
-    "fragment": "svg-nodes",
-    "content": "ctx"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "SVG Nodes"
-    ],
-    "pageType": "guide",
-    "title": "SVG Nodes",
-    "section": "SVG Nodes",
-    "route": "/features/nodes/svg-nodes",
-    "fragment": "svg-nodes",
-    "content": ")"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "SVG Nodes"
-    ],
-    "pageType": "guide",
-    "title": "SVG Nodes",
-    "section": "SVG Nodes",
-    "route": "/features/nodes/svg-nodes",
-    "fragment": "svg-nodes",
-    "content": "The template context has the following type:"
   },
   {
     "breadcrumbs": [
@@ -2594,6 +2308,292 @@
     "route": "/features/nodes/draggables",
     "fragment": "drag-handle",
     "content": "You can restrict dragging to a specific part of node, by adding dragHandle directive to this element. It's important to note that if a node contains at least one dragHandle, it can only be dragged from those specific areas where dragHandle was added. Otherwise, the entire node can be dragged, provided the draggable property is set to true."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Resizer"
+    ],
+    "pageType": "guide",
+    "title": "Resizer",
+    "section": "Resizer",
+    "route": "/features/nodes/resizer",
+    "fragment": "resizer",
+    "content": "You might want to resize your node. This functionality works with nearly all types of nodes."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Resizer"
+    ],
+    "pageType": "guide",
+    "title": "Resizer",
+    "section": "Resize default group",
+    "route": "/features/nodes/resizer",
+    "fragment": "resize-default-group",
+    "content": "To resize a default group, simply pass the resizable flag to a Node (or DynamicNode) of type default-group."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Resizer"
+    ],
+    "pageType": "guide",
+    "title": "Resizer",
+    "section": "Resize template group",
+    "route": "/features/nodes/resizer",
+    "fragment": "resize-template-group",
+    "content": "This provides a way to have more control over the resizer: Create a template-group node.If you want the resizer to appear consistently, add the resizable directive to the SVG element (likely a "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Resizer"
+    ],
+    "pageType": "guide",
+    "title": "Resizer",
+    "section": "Resize template group",
+    "route": "/features/nodes/resizer",
+    "fragment": "resize-template-group",
+    "content": ") representing your group.If you want the resizer to appear conditionally, apply the directive as [resizable]=\"yourCondition\". You can bind the visibility of the resizer to the node’s selection state (see the code below for an example).Important: Use the ctx.width() and ctx.height() signals from the context, not ctx.node.width and ctx.node.height. The latter properties are not reactive, so the node won’t update its size based on the resizer.The resizer respects the min-width and min-height CSS properties of the resizable node.Optionally, you can customize the [resizerColor] and the [gap] between the node and the resizer, with more customization options coming in the future.\""
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Resizer"
+    ],
+    "pageType": "guide",
+    "title": "Resizer",
+    "section": "Resize a template/component regular node",
+    "route": "/features/nodes/resizer",
+    "fragment": "resize-a-templatecomponent-regular-node",
+    "content": "The algorithm is almost the same as for template-group nodes: Create a node of type html-template or CustomNodeComponent (CustomDynamicNodeComponent).If you want the resizer to always appear, add the resizable directive to the top-level element of your custom node (ideally, a wrapper for the entire node content).If you want the resizer to appear conditionally, apply the directive as [resizable]=\"yourCondition\". Binding the visibility of the resizer to the node’s selection state can be useful.The resizer respects the min-width and min-height CSS properties of the element where the directive is applied.It's up to you to adjust the CSS of your custom node to ensure it renders correctly during resizing. The library only modifies the container size.Optionally, you can customize the [resizerColor] and the [gap] between the node and the resizer, with more customization options coming in the future."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Resizer"
+    ],
+    "pageType": "guide",
+    "title": "Resizer",
+    "section": "Resize event",
+    "route": "/features/nodes/resizer",
+    "fragment": "resize-event",
+    "content": "You may want to perform some actions on resize. To do this, simply add handler to the (onNodesChange.size) output of the "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Resizer"
+    ],
+    "pageType": "guide",
+    "title": "Resizer",
+    "section": "Resize event",
+    "route": "/features/nodes/resizer",
+    "fragment": "resize-event",
+    "content": " component."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Resizer"
+    ],
+    "pageType": "guide",
+    "title": "Resizer",
+    "section": "See also",
+    "route": "/features/nodes/resizer",
+    "fragment": "see-also",
+    "content": "SubflowsCustom nodesHandling changes"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Node toolbar"
+    ],
+    "pageType": "guide",
+    "title": "Node toolbar",
+    "section": "Node toolbar",
+    "route": "/features/nodes/node-toolbar",
+    "fragment": "node-toolbar",
+    "content": "You can add a NodeToolbarComponent to your node. The content of this component is automatically positioned near one side of the node, based on the value of the position input."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Node toolbar"
+    ],
+    "pageType": "guide",
+    "title": "Node toolbar",
+    "section": "Multiple Toolbars",
+    "route": "/features/nodes/node-toolbar",
+    "fragment": "multiple-toolbars",
+    "content": "It's also possible to add multiple toolbars to the same node by simply including multiple NodeToolbarComponent instances with different position inputs."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "SVG Nodes"
+    ],
+    "pageType": "guide",
+    "title": "SVG Nodes",
+    "section": "SVG Nodes",
+    "route": "/features/nodes/svg-nodes",
+    "fragment": "svg-nodes",
+    "content": "SVG nodes allow you to create custom node shapes using SVG elements. To create an SVG node:"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "SVG Nodes"
+    ],
+    "pageType": "guide",
+    "title": "SVG Nodes",
+    "section": "SVG Nodes",
+    "route": "/features/nodes/svg-nodes",
+    "fragment": "svg-nodes",
+    "content": "Define a node with "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "SVG Nodes"
+    ],
+    "pageType": "guide",
+    "title": "SVG Nodes",
+    "section": "SVG Nodes",
+    "route": "/features/nodes/svg-nodes",
+    "fragment": "svg-nodes",
+    "content": "type: 'svg-template'"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "SVG Nodes"
+    ],
+    "pageType": "guide",
+    "title": "SVG Nodes",
+    "section": "SVG Nodes",
+    "route": "/features/nodes/svg-nodes",
+    "fragment": "svg-nodes",
+    "content": "Use the "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "SVG Nodes"
+    ],
+    "pageType": "guide",
+    "title": "SVG Nodes",
+    "section": "SVG Nodes",
+    "route": "/features/nodes/svg-nodes",
+    "fragment": "svg-nodes",
+    "content": "nodeSvg"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "SVG Nodes"
+    ],
+    "pageType": "guide",
+    "title": "SVG Nodes",
+    "section": "SVG Nodes",
+    "route": "/features/nodes/svg-nodes",
+    "fragment": "svg-nodes",
+    "content": " template in your Vflow component Access node properties via the template context ("
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "SVG Nodes"
+    ],
+    "pageType": "guide",
+    "title": "SVG Nodes",
+    "section": "SVG Nodes",
+    "route": "/features/nodes/svg-nodes",
+    "fragment": "svg-nodes",
+    "content": "ctx"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "SVG Nodes"
+    ],
+    "pageType": "guide",
+    "title": "SVG Nodes",
+    "section": "SVG Nodes",
+    "route": "/features/nodes/svg-nodes",
+    "fragment": "svg-nodes",
+    "content": ")"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "SVG Nodes"
+    ],
+    "pageType": "guide",
+    "title": "SVG Nodes",
+    "section": "SVG Nodes",
+    "route": "/features/nodes/svg-nodes",
+    "fragment": "svg-nodes",
+    "content": "The template context has the following type:"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Subflows"
+    ],
+    "pageType": "guide",
+    "title": "Subflows",
+    "section": "Subflows",
+    "route": "/features/nodes/subflows",
+    "fragment": "subflows",
+    "content": "A subflow is a node that can contain child nodes. Key things about subflows: To create a subflow, you need to use a default-group or template-group type on Node or DynamicNode.To associate a node with a subflow, set the parentId to the ID of the subflow.Nodes within a subflow have coordinates relative to that subflow.A subflow is itself a node, so it can act as a source or a target (this functionality is available only for template-group subflows).Use the groupNode directive on an ng-template to define your custom subflow. While a custom subflow can theoretically be any SVG structure, it's recommended to use the "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Subflows"
+    ],
+    "pageType": "guide",
+    "title": "Subflows",
+    "section": "Subflows",
+    "route": "/features/nodes/subflows",
+    "fragment": "subflows",
+    "content": " element."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Subflows"
+    ],
+    "pageType": "guide",
+    "title": "Subflows",
+    "section": "See also",
+    "route": "/features/nodes/subflows",
+    "fragment": "see-also",
+    "content": "DefaultGroupNodeTemplateGroupNodeDefaultDynamicGroupNodeTemplateDynamicGroupNode"
   },
   {
     "breadcrumbs": [
