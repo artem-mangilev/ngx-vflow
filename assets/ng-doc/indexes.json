@@ -278,18 +278,6 @@
   {
     "breadcrumbs": [
       "Features",
-      "Multiple connection points"
-    ],
-    "pageType": "guide",
-    "title": "Multiple connection points",
-    "section": "Multiple connection points",
-    "route": "/features/multiple-connection-points",
-    "fragment": "multiple-connection-points",
-    "content": "Custom components provide the ability to control handles and their positions. All you need to do is take HandleComponent from library and place it somewhere in your custom node. This component automatically computes its position based on parent element's position."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
       "Selecting"
     ],
     "pageType": "guide",
@@ -374,6 +362,18 @@
   {
     "breadcrumbs": [
       "Features",
+      "Multiple connection points"
+    ],
+    "pageType": "guide",
+    "title": "Multiple connection points",
+    "section": "Multiple connection points",
+    "route": "/features/multiple-connection-points",
+    "fragment": "multiple-connection-points",
+    "content": "Custom components provide the ability to control handles and their positions. All you need to do is take HandleComponent from library and place it somewhere in your custom node. This component automatically computes its position based on parent element's position."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
       "Snap to Grid"
     ],
     "pageType": "guide",
@@ -382,30 +382,6 @@
     "route": "/features/snap-to-grid",
     "fragment": "snap-to-grid",
     "content": "You can snap nodes to the grid by passing the snapGrid input to the VflowComponent"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "View size"
-    ],
-    "pageType": "guide",
-    "title": "View size",
-    "section": "Auto size",
-    "route": "/features/view-size",
-    "fragment": "auto-size",
-    "content": "vflow automatically fits it container if you pass view=\"auto\" input"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "View size"
-    ],
-    "pageType": "guide",
-    "title": "View size",
-    "section": "Fixed size",
-    "route": "/features/view-size",
-    "fragment": "fixed-size",
-    "content": "vflow can take fixed space if you pass [view]=\"[600, 600]\" input, where first item of array is width (in pixels), and the second is height (in pixels)."
   },
   {
     "breadcrumbs": [
@@ -454,6 +430,30 @@
     "route": "/features/virtualization",
     "fragment": "virtualization",
     "content": "To customize the preview for a specific node, use the preview property available on both Node and DynamicNode."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "View size"
+    ],
+    "pageType": "guide",
+    "title": "View size",
+    "section": "Auto size",
+    "route": "/features/view-size",
+    "fragment": "auto-size",
+    "content": "vflow automatically fits it container if you pass view=\"auto\" input"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "View size"
+    ],
+    "pageType": "guide",
+    "title": "View size",
+    "section": "Fixed size",
+    "route": "/features/view-size",
+    "fragment": "fixed-size",
+    "content": "vflow can take fixed space if you pass [view]=\"[600, 600]\" input, where first item of array is width (in pixels), and the second is height (in pixels)."
   },
   {
     "breadcrumbs": [
@@ -922,495 +922,14 @@
     "breadcrumbs": [
       "Features",
       "Edges",
-      "Curves"
+      "Default edges"
     ],
     "pageType": "guide",
-    "title": "Curves",
-    "section": "Curves",
-    "route": "/features/edges/curves",
-    "fragment": "curves",
-    "content": "It's possible to set Curve for both the edges and connection."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Curves"
-    ],
-    "pageType": "guide",
-    "title": "Curves",
-    "section": "Curve factory",
-    "route": "/features/edges/curves",
-    "fragment": "curve-factory",
-    "content": "This is an experimental API"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Curves"
-    ],
-    "pageType": "guide",
-    "title": "Curves",
-    "section": "Curve factory",
-    "route": "/features/edges/curves",
-    "fragment": "curve-factory",
-    "content": "If the existing curves do not meet your needs, you can provide your own function that implements the CurveFactory signature."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/features/edges/custom-edges",
-    "fragment": "custom-edges",
-    "content": "You can customize your edges. To achieve this, follow these steps:"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/features/edges/custom-edges",
-    "fragment": "custom-edges",
-    "content": "Change the edge type to "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/features/edges/custom-edges",
-    "fragment": "custom-edges",
-    "content": "template"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/features/edges/custom-edges",
-    "fragment": "custom-edges",
-    "content": "Create an "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/features/edges/custom-edges",
-    "fragment": "custom-edges",
-    "content": "ng-template"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/features/edges/custom-edges",
-    "fragment": "custom-edges",
-    "content": " with the "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/features/edges/custom-edges",
-    "fragment": "custom-edges",
-    "content": "edge"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/features/edges/custom-edges",
-    "fragment": "custom-edges",
-    "content": " selector inside "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/features/edges/custom-edges",
-    "fragment": "custom-edges",
-    "content": "vflow"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/features/edges/custom-edges",
-    "fragment": "custom-edges",
-    "content": "Create an "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/features/edges/custom-edges",
-    "fragment": "custom-edges",
-    "content": "<svg:path>"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/features/edges/custom-edges",
-    "fragment": "custom-edges",
-    "content": " which you will customize. Optionally — "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/features/edges/custom-edges",
-    "fragment": "custom-edges",
-    "content": "but recommended"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/features/edges/custom-edges",
-    "fragment": "custom-edges",
-    "content": " — wrap it in a "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/features/edges/custom-edges",
-    "fragment": "custom-edges",
-    "content": "<svg:g customTemplateEdge>"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/features/edges/custom-edges",
-    "fragment": "custom-edges",
-    "content": " element. This adds some UX improvements to the path; for example, it increases the clickable area of the path. In the "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/features/edges/custom-edges",
-    "fragment": "custom-edges",
-    "content": "ng-template"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/features/edges/custom-edges",
-    "fragment": "custom-edges",
-    "content": ", the library provides "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/features/edges/custom-edges",
-    "fragment": "custom-edges",
-    "content": "let-ctx"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/features/edges/custom-edges",
-    "fragment": "custom-edges",
-    "content": " with important data for you, such as the "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/features/edges/custom-edges",
-    "fragment": "custom-edges",
-    "content": "path"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/features/edges/custom-edges",
-    "fragment": "custom-edges",
-    "content": " signal with current path. Additionally, the "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/features/edges/custom-edges",
-    "fragment": "custom-edges",
-    "content": "edge"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/features/edges/custom-edges",
-    "fragment": "custom-edges",
-    "content": " field contains current edge from one the "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/features/edges/custom-edges",
-    "fragment": "custom-edges",
-    "content": "[edges]"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/features/edges/custom-edges",
-    "fragment": "custom-edges",
-    "content": ", from which you can retrieve custom "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/features/edges/custom-edges",
-    "fragment": "custom-edges",
-    "content": "data"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/features/edges/custom-edges",
-    "fragment": "custom-edges",
-    "content": ". Furthermore, you can access "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/features/edges/custom-edges",
-    "fragment": "custom-edges",
-    "content": "markerStart"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/features/edges/custom-edges",
-    "fragment": "custom-edges",
-    "content": " and "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/features/edges/custom-edges",
-    "fragment": "custom-edges",
-    "content": "markerEnd"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/features/edges/custom-edges",
-    "fragment": "custom-edges",
-    "content": " signals with markers for current "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/features/edges/custom-edges",
-    "fragment": "custom-edges",
-    "content": "edge"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Custom edges",
-    "route": "/features/edges/custom-edges",
-    "fragment": "custom-edges",
-    "content": "."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Custom edges"
-    ],
-    "pageType": "guide",
-    "title": "Custom edges",
-    "section": "Context",
-    "route": "/features/edges/custom-edges",
-    "fragment": "context",
-    "content": "It's tricky to infer type for let-ctx, so here is an interface with available fields for this context."
+    "title": "Default edges",
+    "section": "Default edges",
+    "route": "/features/edges/default-edges",
+    "fragment": "default-edges",
+    "content": "You can link nodes with edges. All you need to do is to create another Edge[] array and pass it to the vflow component. Each edge contains the id of the source and target nodes, and each edge must have its own id."
   },
   {
     "breadcrumbs": [
@@ -1507,27 +1026,40 @@
     "breadcrumbs": [
       "Features",
       "Edges",
-      "Markers"
+      "Curves"
     ],
     "pageType": "guide",
-    "title": "Markers",
-    "section": "Markers",
-    "route": "/features/edges/markers",
-    "fragment": "markers",
-    "content": "You can create markers for both edges and connections. Edges: Specify start and end markers for corresponding parts of the edge. Currently, markers are limited to two types: arrow and arrow-closed.Connections: You can specify an end marker using the marker property in ConnectionSettings."
+    "title": "Curves",
+    "section": "Curves",
+    "route": "/features/edges/curves",
+    "fragment": "curves",
+    "content": "It's possible to set Curve for both the edges and connection."
   },
   {
     "breadcrumbs": [
       "Features",
       "Edges",
-      "Default edges"
+      "Curves"
     ],
     "pageType": "guide",
-    "title": "Default edges",
-    "section": "Default edges",
-    "route": "/features/edges/default-edges",
-    "fragment": "default-edges",
-    "content": "You can link nodes with edges. All you need to do is to create another Edge[] array and pass it to the vflow component. Each edge contains the id of the source and target nodes, and each edge must have its own id."
+    "title": "Curves",
+    "section": "Curve factory",
+    "route": "/features/edges/curves",
+    "fragment": "curve-factory",
+    "content": "This is an experimental API"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Curves"
+    ],
+    "pageType": "guide",
+    "title": "Curves",
+    "section": "Curve factory",
+    "route": "/features/edges/curves",
+    "fragment": "curve-factory",
+    "content": "If the existing curves do not meet your needs, you can provide your own function that implements the CurveFactory signature."
   },
   {
     "breadcrumbs": [
@@ -1788,6 +1320,19 @@
     "route": "/features/edges/reconnect-edges",
     "fragment": "reconnect-edge",
     "content": ", then remove the reference to the old edge from the list."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Markers"
+    ],
+    "pageType": "guide",
+    "title": "Markers",
+    "section": "Markers",
+    "route": "/features/edges/markers",
+    "fragment": "markers",
+    "content": "You can create markers for both edges and connections. Edges: Specify start and end markers for corresponding parts of the edge. Currently, markers are limited to two types: arrow and arrow-closed.Connections: You can specify an end marker using the marker property in ConnectionSettings."
   },
   {
     "breadcrumbs": [
@@ -2287,6 +1832,32 @@
     "breadcrumbs": [
       "Features",
       "Nodes",
+      "Node toolbar"
+    ],
+    "pageType": "guide",
+    "title": "Node toolbar",
+    "section": "Node toolbar",
+    "route": "/features/nodes/node-toolbar",
+    "fragment": "node-toolbar",
+    "content": "You can add a NodeToolbarComponent to your node. The content of this component is automatically positioned near one side of the node, based on the value of the position input."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Node toolbar"
+    ],
+    "pageType": "guide",
+    "title": "Node toolbar",
+    "section": "Multiple Toolbars",
+    "route": "/features/nodes/node-toolbar",
+    "fragment": "multiple-toolbars",
+    "content": "It's also possible to add multiple toolbars to the same node by simply including multiple NodeToolbarComponent instances with different position inputs."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
       "Draggables"
     ],
     "pageType": "guide",
@@ -2308,6 +1879,461 @@
     "route": "/features/nodes/draggables",
     "fragment": "drag-handle",
     "content": "You can restrict dragging to a specific part of node, by adding dragHandle directive to this element. It's important to note that if a node contains at least one dragHandle, it can only be dragged from those specific areas where dragHandle was added. Otherwise, the entire node can be dragged, provided the draggable property is set to true."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/edges/custom-edges",
+    "fragment": "custom-edges",
+    "content": "You can customize your edges. To achieve this, follow these steps:"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/edges/custom-edges",
+    "fragment": "custom-edges",
+    "content": "Change the edge type to "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/edges/custom-edges",
+    "fragment": "custom-edges",
+    "content": "template"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/edges/custom-edges",
+    "fragment": "custom-edges",
+    "content": "Create an "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/edges/custom-edges",
+    "fragment": "custom-edges",
+    "content": "ng-template"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/edges/custom-edges",
+    "fragment": "custom-edges",
+    "content": " with the "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/edges/custom-edges",
+    "fragment": "custom-edges",
+    "content": "edge"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/edges/custom-edges",
+    "fragment": "custom-edges",
+    "content": " selector inside "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/edges/custom-edges",
+    "fragment": "custom-edges",
+    "content": "vflow"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/edges/custom-edges",
+    "fragment": "custom-edges",
+    "content": "Create an "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/edges/custom-edges",
+    "fragment": "custom-edges",
+    "content": "<svg:path>"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/edges/custom-edges",
+    "fragment": "custom-edges",
+    "content": " which you will customize. Optionally — "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/edges/custom-edges",
+    "fragment": "custom-edges",
+    "content": "but recommended"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/edges/custom-edges",
+    "fragment": "custom-edges",
+    "content": " — wrap it in a "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/edges/custom-edges",
+    "fragment": "custom-edges",
+    "content": "<svg:g customTemplateEdge>"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/edges/custom-edges",
+    "fragment": "custom-edges",
+    "content": " element. This adds some UX improvements to the path; for example, it increases the clickable area of the path. In the "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/edges/custom-edges",
+    "fragment": "custom-edges",
+    "content": "ng-template"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/edges/custom-edges",
+    "fragment": "custom-edges",
+    "content": ", the library provides "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/edges/custom-edges",
+    "fragment": "custom-edges",
+    "content": "let-ctx"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/edges/custom-edges",
+    "fragment": "custom-edges",
+    "content": " with important data for you, such as the "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/edges/custom-edges",
+    "fragment": "custom-edges",
+    "content": "path"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/edges/custom-edges",
+    "fragment": "custom-edges",
+    "content": " signal with current path. Additionally, the "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/edges/custom-edges",
+    "fragment": "custom-edges",
+    "content": "edge"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/edges/custom-edges",
+    "fragment": "custom-edges",
+    "content": " field contains current edge from one the "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/edges/custom-edges",
+    "fragment": "custom-edges",
+    "content": "[edges]"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/edges/custom-edges",
+    "fragment": "custom-edges",
+    "content": ", from which you can retrieve custom "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/edges/custom-edges",
+    "fragment": "custom-edges",
+    "content": "data"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/edges/custom-edges",
+    "fragment": "custom-edges",
+    "content": ". Furthermore, you can access "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/edges/custom-edges",
+    "fragment": "custom-edges",
+    "content": "markerStart"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/edges/custom-edges",
+    "fragment": "custom-edges",
+    "content": " and "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/edges/custom-edges",
+    "fragment": "custom-edges",
+    "content": "markerEnd"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/edges/custom-edges",
+    "fragment": "custom-edges",
+    "content": " signals with markers for current "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/edges/custom-edges",
+    "fragment": "custom-edges",
+    "content": "edge"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Custom edges",
+    "route": "/features/edges/custom-edges",
+    "fragment": "custom-edges",
+    "content": "."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Custom edges"
+    ],
+    "pageType": "guide",
+    "title": "Custom edges",
+    "section": "Context",
+    "route": "/features/edges/custom-edges",
+    "fragment": "context",
+    "content": "It's tricky to infer type for let-ctx, so here is an interface with available fields for this context."
   },
   {
     "breadcrumbs": [
@@ -2412,32 +2438,6 @@
     "route": "/features/nodes/resizer",
     "fragment": "see-also",
     "content": "SubflowsCustom nodesHandling changes"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Node toolbar"
-    ],
-    "pageType": "guide",
-    "title": "Node toolbar",
-    "section": "Node toolbar",
-    "route": "/features/nodes/node-toolbar",
-    "fragment": "node-toolbar",
-    "content": "You can add a NodeToolbarComponent to your node. The content of this component is automatically positioned near one side of the node, based on the value of the position input."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Node toolbar"
-    ],
-    "pageType": "guide",
-    "title": "Node toolbar",
-    "section": "Multiple Toolbars",
-    "route": "/features/nodes/node-toolbar",
-    "fragment": "multiple-toolbars",
-    "content": "It's also possible to add multiple toolbars to the same node by simply including multiple NodeToolbarComponent instances with different position inputs."
   },
   {
     "breadcrumbs": [
