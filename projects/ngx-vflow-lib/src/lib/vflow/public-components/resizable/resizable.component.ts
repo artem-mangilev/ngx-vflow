@@ -10,6 +10,7 @@ import {
   viewChild,
   effect,
   ChangeDetectionStrategy,
+  OnDestroy,
 } from '@angular/core';
 import { RootPointerDirective } from '../../directives/root-pointer.directive';
 import { filter, tap } from 'rxjs';
@@ -45,7 +46,7 @@ interface DistanceToEdge {
   imports: [PointerDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ResizableComponent implements OnInit, AfterViewInit {
+export class ResizableComponent implements OnInit, AfterViewInit, OnDestroy {
   private nodeAccessor = inject(NodeAccessorService);
   private rootPointer = inject(RootPointerDirective);
   private viewportService = inject(ViewportService);
@@ -110,7 +111,12 @@ export class ResizableComponent implements OnInit, AfterViewInit {
   }
 
   public ngOnInit(): void {
+    this.model.controlledByResizer.set(true);
     this.model.resizerTemplate.set(this.resizer());
+  }
+
+  public ngOnDestroy(): void {
+    this.model.controlledByResizer.set(false);
   }
 
   @Microtask
