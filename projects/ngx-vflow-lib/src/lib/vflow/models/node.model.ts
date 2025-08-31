@@ -41,8 +41,12 @@ export class NodeModel<T = unknown>
    */
   public size$: Observable<{ width: number; height: number }>;
 
-  public styleWidth = computed(() => `${this.width()}px`);
-  public styleHeight = computed(() => `${this.height()}px`);
+  /**
+   * If resizer is used, the node size fully depends on the resizer
+   * Otherwise it calculates the size based on the content
+   */
+  public styleWidth = computed(() => (this.controlledByResizer() ? `${this.width()}px` : '100%'));
+  public styleHeight = computed(() => (this.controlledByResizer() ? `${this.height()}px` : '100%'));
 
   public foWidth = computed(() => this.width() + MAGIC_NUMBER_TO_FIX_GLITCH_IN_CHROME);
   public foHeight = computed(() => this.height() + MAGIC_NUMBER_TO_FIX_GLITCH_IN_CHROME);
@@ -99,6 +103,7 @@ export class NodeModel<T = unknown>
 
   public color = signal(NodeModel.defaultColor);
 
+  public controlledByResizer = signal(false);
   public resizable = signal(false);
   public resizing = signal(false);
   public resizerTemplate = signal<TemplateRef<unknown> | null>(null);
