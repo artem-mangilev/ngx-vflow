@@ -10,9 +10,5 @@ export function isGroupNode(node: NodeModel): boolean {
   }
 
   // Check for component nodes with group property
-  if (isDynamicNode(rawNode)) {
-    return isComponentDynamicGroupNode(rawNode);
-  }
-
-  return isComponentStaticGroupNode(rawNode);
+  return isDynamicNode(rawNode) ? isComponentDynamicGroupNode(rawNode) : isComponentStaticGroupNode(rawNode);
 }
