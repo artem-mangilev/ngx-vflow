@@ -185,5 +185,5 @@ export function isComponentStaticGroupNode<T>(node: Node<T>): boolean {
 }
 
 export function isComponentDynamicGroupNode<T>(node: DynamicNode<T>): boolean {
-  return isComponentDynamicNode(node) && !!(node.group && (typeof node.group === 'function' ? node.group() : node.group));
+  return isComponentDynamicNode(node) && !!(node.group && node.group());
 }
