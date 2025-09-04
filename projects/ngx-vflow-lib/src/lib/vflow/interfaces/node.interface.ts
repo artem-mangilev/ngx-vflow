@@ -113,6 +113,7 @@ export interface ComponentNode<T = any> extends SharedNode {
   data?: T;
   width?: number;
   height?: number;
+  group?: boolean;
 }
 
 export interface ComponentDynamicNode<T = any> extends SharedDynamicNode {
@@ -120,6 +121,7 @@ export interface ComponentDynamicNode<T = any> extends SharedDynamicNode {
   data?: WritableSignal<T>;
   width?: WritableSignal<number>;
   height?: WritableSignal<number>;
+  group?: WritableSignal<boolean>;
 }
 
 export function isStaticNode<T>(node: Node<T> | DynamicNode<T>): node is Node<T> {
