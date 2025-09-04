@@ -179,3 +179,11 @@ export function isTemplateStaticGroupNode<T>(node: Node<T>): node is TemplateGro
 export function isTemplateDynamicGroupNode<T>(node: DynamicNode<T>): node is TemplateDynamicGroupNode<T> {
   return node.type === 'template-group';
 }
+
+export function isComponentStaticGroupNode<T>(node: Node<T>): boolean {
+  return isComponentStaticNode(node) && !!node.group;
+}
+
+export function isComponentDynamicGroupNode<T>(node: DynamicNode<T>): boolean {
+  return isComponentDynamicNode(node) && !!(node.group && (typeof node.group === 'function' ? node.group() : node.group));
+}
