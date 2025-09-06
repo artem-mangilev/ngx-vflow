@@ -70,6 +70,7 @@ import {
   ViewportPreviewFlowRenderStrategyService,
 } from '../../services/preview-flow-render-strategy.service';
 import { toLazySignal } from '../../utils/signals/to-lazy-signal';
+import { FlowRenderingService } from '../../services/flow-rendering.service';
 
 const changesControllerHostDirective = {
   directive: ChangesControllerDirective,
@@ -127,6 +128,7 @@ const changesControllerHostDirective = {
     KeyboardService,
     OverlaysService,
     { provide: PreviewFlowRenderStrategyService, useClass: ViewportPreviewFlowRenderStrategyService },
+    FlowRenderingService,
   ],
   hostDirectives: [changesControllerHostDirective],
   imports: [
@@ -157,6 +159,7 @@ export class VflowComponent {
   private componentEventBusService = inject(ComponentEventBusService);
   private keyboardService = inject(KeyboardService);
   private injector = inject(Injector);
+  private flowRenderingService = inject(FlowRenderingService);
 
   // #endregion
 
@@ -349,6 +352,8 @@ export class VflowComponent {
   public readonly edgesChange = toLazySignal(this.edgesChangeService.changes$, {
     initialValue: [] as EdgeChange[],
   });
+
+  public readonly initialized = this.flowRenderingService.flowInitialized.asReadonly();
   // #endregion
 
   // #region RX_API
@@ -366,6 +371,8 @@ export class VflowComponent {
    * Observable with edges change
    */
   public readonly edgesChange$ = this.edgesChangeService.changes$;
+
+  public readonly initialized$ = toObservable(this.flowRenderingService.flowInitialized);
   // #endregion
 
   protected markers = this.flowEntitiesService.markers;
