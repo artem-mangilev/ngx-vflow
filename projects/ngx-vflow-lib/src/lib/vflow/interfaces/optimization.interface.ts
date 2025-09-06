@@ -2,6 +2,7 @@ export const DEFAULT_OPTIMIZATION: Required<Optimization> = {
   detachedGroupsLayer: false,
   virtualization: false,
   virtualizationZoomThreshold: 0.5,
+  lazyLoadTrigger: 'immediate',
 };
 
 export interface Optimization {
@@ -29,4 +30,9 @@ export interface Optimization {
    * This should help to avoid performance issues when zooming out too much.
    */
   virtualizationZoomThreshold?: number;
+
+  /**
+   * The trigger for lazy loading of entities.
+   */
+  lazyLoadTrigger?: 'immediate' | 'viewport';
 }

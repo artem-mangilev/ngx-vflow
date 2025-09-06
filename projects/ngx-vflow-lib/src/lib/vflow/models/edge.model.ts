@@ -29,6 +29,8 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
   public selected = signal(false);
   public selected$ = toObservable(this.selected);
 
+  public shouldLoad = signal(false);
+
   public renderOrder = signal(0);
 
   public detached = computed(() => {
@@ -228,6 +230,7 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
       markerStart: this.markerStartUrl,
       markerEnd: this.markerEndUrl,
       selected: this.selected.asReadonly(),
+      shouldLoad: this.shouldLoad.asReadonly(),
     },
   };
 

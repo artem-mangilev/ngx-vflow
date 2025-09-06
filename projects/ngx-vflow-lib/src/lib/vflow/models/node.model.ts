@@ -159,8 +159,8 @@ export class NodeModel<T = unknown>
       this.context = {
         $implicit: {
           node: rawNode,
-          selected: this.selected,
-          shouldLoad: this.shouldLoad,
+          selected: this.selected.asReadonly(),
+          shouldLoad: this.shouldLoad.asReadonly(),
         },
       };
     }
@@ -169,9 +169,10 @@ export class NodeModel<T = unknown>
       this.context = {
         $implicit: {
           node: rawNode,
-          selected: this.selected,
-          width: this.width,
-          height: this.height,
+          selected: this.selected.asReadonly(),
+          width: this.width.asReadonly(),
+          height: this.height.asReadonly(),
+          shouldLoad: this.shouldLoad.asReadonly(),
         },
       };
     }
@@ -181,8 +182,9 @@ export class NodeModel<T = unknown>
         $implicit: {
           node: rawNode,
           selected: this.selected.asReadonly(),
-          width: this.width,
-          height: this.height,
+          width: this.width.asReadonly(),
+          height: this.height.asReadonly(),
+          shouldLoad: this.shouldLoad.asReadonly(),
         },
       };
     }

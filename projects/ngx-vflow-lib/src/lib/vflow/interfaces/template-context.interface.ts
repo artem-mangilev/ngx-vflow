@@ -12,6 +12,7 @@ export interface EdgeContext {
     markerStart: Signal<string>;
     markerEnd: Signal<string>;
     selected: Signal<boolean>;
+    shouldLoad: Signal<boolean>;
   };
 }
 
@@ -30,6 +31,7 @@ export interface SvgNodeContext {
     selected: Signal<boolean>;
     width: Signal<number>;
     height: Signal<number>;
+    shouldLoad: Signal<boolean>;
   };
 }
 
@@ -39,6 +41,7 @@ export interface GroupNodeContext {
     selected: Signal<boolean>;
     width: Signal<number>;
     height: Signal<number>;
+    shouldLoad: Signal<boolean>;
   };
 }
 
