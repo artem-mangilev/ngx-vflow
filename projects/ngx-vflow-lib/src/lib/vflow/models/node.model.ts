@@ -11,8 +11,6 @@ import { GroupNodeContext, NodeContext } from '../interfaces/template-context.in
 import { toUnifiedNode } from '../utils/to-unified-node';
 import { Observable } from 'rxjs';
 import { NodePreview } from '../interfaces/node-preview.interface';
-import { CustomNodeComponent } from '../public-components/custom-node/custom-node.component';
-import { CustomDynamicNodeComponent } from '../public-components/custom-dynamic-node/custom-dynamic-node.component';
 
 export class NodeModel<T = unknown>
   implements FlowEntity, Contextable<NodeContext | GroupNodeContext | { $implicit: object }>
@@ -91,23 +89,18 @@ export class NodeModel<T = unknown>
   public isComponentType =
     isComponentStaticNode(this.rawNode as Node) || isComponentDynamicNode(this.rawNode as DynamicNode);
 
-  public isLazyComponent =
-    this.isComponentType &&
-    !Object.prototype.isPrototypeOf.call(CustomNodeComponent, this.rawNode.type) &&
-    !Object.prototype.isPrototypeOf.call(CustomDynamicNodeComponent, this.rawNode.type);
-
   public componentInstance = computed(async () => {
-    if (this.isLazyComponent) {
-      if (this.shouldLoad()) {
-        // @ts-expect-error we assume it's a function with dynamic import
-        return await this.rawNode.type();
-      }
-
-      return null;
-    }
-
     if (this.isComponentType) {
-      return this.rawNode.type;
+      try {
+        if (this.shouldLoad()) {
+          // @ts-expect-error we assume it's a function with dynamic import
+          return this.rawNode.type();
+        }
+
+        return null;
+      } catch {
+        return this.rawNode.type;
+      }
     }
 
     return null;
