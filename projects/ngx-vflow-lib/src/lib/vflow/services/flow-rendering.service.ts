@@ -38,7 +38,7 @@ export class FlowRenderingService {
             : toObservable(this.flowEntitiesService.entities, { injector }),
         ),
         filter((entities) => !!entities.length),
-        throttleTime(300),
+        throttleTime(100),
         tap((entities) => entities.forEach((e) => e.shouldLoad.set(true))),
         takeUntilDestroyed(),
       )
