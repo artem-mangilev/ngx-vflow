@@ -67,14 +67,7 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
 
     // TODO: don't like this
     if (!source || !target) {
-      return {
-        path: '',
-        labelPoints: {
-          start: { x: 0, y: 0 },
-          center: { x: 0, y: 0 },
-          end: { x: 0, y: 0 },
-        },
-      };
+      return { path: '' };
     }
 
     const params = this.getPathFactoryParams(source, target);

@@ -53,23 +53,25 @@
 
 <!-- Component node -->
 @if (model().isComponentType) {
-  <svg:foreignObject
-    class="selectable"
-    [attr.width]="model().foWidth()"
-    [attr.height]="model().foHeight()"
-    (click)="pullNode()">
-    <div
-      nodeHandlesController
-      nodeResizeController
-      class="wrapper"
-      [style.width]="model().styleWidth()"
-      [style.height]="model().styleHeight()">
-      <ng-container
-        [ngComponentOutlet]="$any(model().rawNode.type)"
-        [ngComponentOutletInputs]="model().componentTypeInputs"
-        [ngComponentOutletInjector]="injector" />
-    </div>
-  </svg:foreignObject>
+  @if (model().componentInstance() | async; as component) {
+    <svg:foreignObject
+      class="selectable"
+      [attr.width]="model().foWidth()"
+      [attr.height]="model().foHeight()"
+      (click)="pullNode()">
+      <div
+        nodeHandlesController
+        nodeResizeController
+        class="wrapper"
+        [style.width]="model().styleWidth()"
+        [style.height]="model().styleHeight()">
+        <ng-container
+          [ngComponentOutlet]="$any(component)"
+          [ngComponentOutletInputs]="model().componentTypeInputs"
+          [ngComponentOutletInjector]="injector" />
+      </div>
+    </svg:foreignObject>
+  }
 }
 
 <!-- Default group node -->

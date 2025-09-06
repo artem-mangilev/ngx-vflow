@@ -3,6 +3,7 @@ import { Point } from './point.interface';
 import { CustomNodeComponent } from '../public-components/custom-node/custom-node.component';
 import { CustomDynamicNodeComponent } from '../public-components/custom-dynamic-node/custom-dynamic-node.component';
 import { NodePreview } from './node-preview.interface';
+import { isCallable } from '../utils/is-callable';
 
 export type Node<T = any> =
   | DefaultNode
@@ -109,14 +110,14 @@ export interface TemplateDynamicGroupNode<T> extends SharedDynamicNode {
 }
 
 export interface ComponentNode<T = any> extends SharedNode {
-  type: Type<CustomNodeComponent<T>>;
+  type: Type<CustomNodeComponent<T>> | (() => Promise<Type<CustomNodeComponent<T>>>);
   data?: T;
   width?: number;
   height?: number;
 }
 
 export interface ComponentDynamicNode<T = any> extends SharedDynamicNode {
-  type: Type<CustomDynamicNodeComponent<T>>;
+  type: Type<CustomDynamicNodeComponent<T>> | (() => Promise<Type<CustomDynamicNodeComponent<T>>>);
   data?: WritableSignal<T>;
   width?: WritableSignal<number>;
   height?: WritableSignal<number>;
@@ -131,11 +132,11 @@ export function isDynamicNode<T>(node: Node<T> | DynamicNode<T>): node is Dynami
 }
 
 export function isComponentStaticNode<T>(node: Node<T>): node is ComponentNode<T> {
-  return Object.prototype.isPrototypeOf.call(CustomNodeComponent, node.type);
+  return isCallable(node.type) && !isCallable(node.point);
 }
 
 export function isComponentDynamicNode<T>(node: DynamicNode<T>): node is ComponentDynamicNode<T> {
-  return Object.prototype.isPrototypeOf.call(CustomDynamicNodeComponent, node.type);
+  return isCallable(node.type) && isCallable(node.point);
 }
 
 export function isTemplateStaticNode<T>(node: Node<T>): node is HtmlTemplateNode<T> {
