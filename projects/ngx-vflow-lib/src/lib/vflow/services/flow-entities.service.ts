@@ -27,13 +27,7 @@ export class FlowEntitiesService {
   public readonly validEdges = computed(() => {
     const nodes = this.nodes();
 
-    return this.edges().filter(
-      (e) =>
-        nodes.includes(e.source()!) &&
-        nodes.includes(e.target()!) &&
-        e.source()?.shouldLoad() &&
-        e.target()?.shouldLoad(),
-    );
+    return this.edges().filter((e) => nodes.includes(e.source()!) && nodes.includes(e.target()!));
   });
 
   public readonly connection = signal<ConnectionModel>(new ConnectionModel({}));

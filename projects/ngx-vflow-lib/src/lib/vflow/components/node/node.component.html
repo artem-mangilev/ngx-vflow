@@ -53,7 +53,7 @@
 
 <!-- Component node -->
 @if (model().isComponentType) {
-  @if (model().componentInstance() | async; as component) {
+  @if (model().componentInstance$ | async; as component) {
     <svg:foreignObject
       class="selectable"
       [attr.width]="model().foWidth()"

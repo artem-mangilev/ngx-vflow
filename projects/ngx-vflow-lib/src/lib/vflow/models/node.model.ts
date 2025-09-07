@@ -9,8 +9,13 @@ import { MAGIC_NUMBER_TO_FIX_GLITCH_IN_CHROME } from '../constants/magic-number-
 import { Contextable } from '../interfaces/contextable.interface';
 import { GroupNodeContext, NodeContext } from '../interfaces/template-context.interface';
 import { toUnifiedNode } from '../utils/to-unified-node';
-import { Observable } from 'rxjs';
+import { catchError, filter, Observable, of, shareReplay, switchMap } from 'rxjs';
 import { NodePreview } from '../interfaces/node-preview.interface';
+import { FlowSettingsService } from '../services/flow-settings.service';
+import { NodeRenderingService } from '../services/node-rendering.service';
+import { extendedComputed } from '../utils/signals/extended-computed';
+import { isCustomDynamicNodeComponent, isCustomNodeComponent } from '../utils/is-vflow-component';
+import { isCallable } from '../utils/is-callable';
 
 export class NodeModel<T = unknown>
   implements FlowEntity, Contextable<NodeContext | GroupNodeContext | { $implicit: object }>
@@ -20,6 +25,8 @@ export class NodeModel<T = unknown>
   private static defaultColor = '#1b262c';
 
   private entitiesService = inject(FlowEntitiesService);
+  private settingsService = inject(FlowSettingsService);
+  private nodeRenderingService = inject(NodeRenderingService);
 
   public isVisible = signal(false);
 
@@ -89,22 +96,49 @@ export class NodeModel<T = unknown>
   public isComponentType =
     isComponentStaticNode(this.rawNode as Node) || isComponentDynamicNode(this.rawNode as DynamicNode);
 
-  public componentInstance = computed(async () => {
-    if (this.isComponentType) {
-      try {
-        if (this.shouldLoad()) {
-          // @ts-expect-error we assume it's a function with dynamic import
-          return this.rawNode.type();
-        }
+  public shouldLoad = extendedComputed<boolean>((previousShouldLoad) => {
+    if (previousShouldLoad) {
+      return true;
+    }
 
-        return null;
-      } catch {
-        return this.rawNode.type;
+    if (this.settingsService.optimization().lazyLoadTrigger === 'immediate') {
+      return true;
+    } else if (this.settingsService.optimization().lazyLoadTrigger === 'viewport') {
+      // Immediately load component if it's a plain class
+      if (isCustomNodeComponent(this.rawNode.type)) {
+        return true;
+      }
+
+      // Immediately load component if it's a plain class
+      if (isCustomDynamicNodeComponent(this.rawNode.type)) {
+        return true;
+      }
+
+      // For cases
+      // - if it's a factory with dynamic import
+      // - if it's a template (html, svg, group)
+      // check if it's in the viewport
+      if (
+        isCallable(this.rawNode.type) ||
+        this.rawNode.type === 'html-template' ||
+        this.rawNode.type === 'svg-template' ||
+        this.rawNode.type === 'template-group'
+      ) {
+        return this.nodeRenderingService.viewportNodes().includes(this as NodeModel);
       }
     }
 
-    return null;
+    // For each other case, we want to load the component immediately
+    return true;
   });
+
+  public componentInstance$ = toObservable(this.shouldLoad).pipe(
+    filter(Boolean),
+    // @ts-expect-error we assume it's a function with dynamic import
+    switchMap(() => this.rawNode.type()),
+    catchError(() => of(this.rawNode.type)),
+    shareReplay(1),
+  );
 
   // Default node specific thing
   public text = signal('');
@@ -124,8 +158,6 @@ export class NodeModel<T = unknown>
   public resizable = signal(false);
   public resizing = signal(false);
   public resizerTemplate = signal<TemplateRef<unknown> | null>(null);
-
-  public shouldLoad = signal(false);
 
   public context = {
     $implicit: {},
@@ -177,7 +209,7 @@ export class NodeModel<T = unknown>
         $implicit: {
           node: rawNode,
           selected: this.selected.asReadonly(),
-          shouldLoad: this.shouldLoad.asReadonly(),
+          shouldLoad: this.shouldLoad,
         },
       };
     }
@@ -189,7 +221,7 @@ export class NodeModel<T = unknown>
           selected: this.selected.asReadonly(),
           width: this.width.asReadonly(),
           height: this.height.asReadonly(),
-          shouldLoad: this.shouldLoad.asReadonly(),
+          shouldLoad: this.shouldLoad,
         },
       };
     }
@@ -201,7 +233,7 @@ export class NodeModel<T = unknown>
           selected: this.selected.asReadonly(),
           width: this.width.asReadonly(),
           height: this.height.asReadonly(),
-          shouldLoad: this.shouldLoad.asReadonly(),
+          shouldLoad: this.shouldLoad,
         },
       };
     }

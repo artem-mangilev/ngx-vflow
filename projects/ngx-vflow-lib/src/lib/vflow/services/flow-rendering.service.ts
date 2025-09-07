@@ -1,10 +1,8 @@
-import { computed, inject, Injectable, Injector, NgZone, signal } from '@angular/core';
+import { inject, Injectable, NgZone, signal } from '@angular/core';
 import { NodeRenderingService } from './node-rendering.service';
 import { EdgeRenderingService } from './edge-rendering.service';
 import { FlowSettingsService } from './flow-settings.service';
 import { FlowEntitiesService } from './flow-entities.service';
-import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
-import { filter, map, switchMap, tap, throttleTime } from 'rxjs';
 
 @Injectable()
 export class FlowRenderingService {
@@ -15,34 +13,12 @@ export class FlowRenderingService {
 
   public flowInitialized = signal(false);
 
-  private readonly viewportEntities = computed(() => [
-    ...this.nodeRenderingService.viewportNodes(),
-    ...this.edgeRenderingService.viewportEdges(),
-  ]);
-
   constructor() {
     inject(NgZone).runOutsideAngular(async () => {
       await skipFrames(2);
 
       this.flowInitialized.set(true);
     });
-
-    const injector = inject(Injector);
-
-    toObservable(this.settingsService.optimization)
-      .pipe(
-        map(({ lazyLoadTrigger }) => lazyLoadTrigger),
-        switchMap((trigger) =>
-          trigger === 'viewport'
-            ? toObservable(this.viewportEntities, { injector })
-            : toObservable(this.flowEntitiesService.entities, { injector }),
-        ),
-        filter((entities) => !!entities.length),
-        throttleTime(100),
-        tap((entities) => entities.forEach((e) => e.shouldLoad.set(true))),
-        takeUntilDestroyed(),
-      )
-      .subscribe();
   }
 }
 

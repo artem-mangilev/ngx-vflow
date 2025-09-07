@@ -1,6 +1,6 @@
-import { WritableSignal } from '@angular/core';
+import { Signal, WritableSignal } from '@angular/core';
 
 export interface FlowEntity {
   selected: WritableSignal<boolean>;
-  shouldLoad: WritableSignal<boolean>;
+  shouldLoad: Signal<boolean>;
 }

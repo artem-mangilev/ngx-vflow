@@ -4,6 +4,7 @@ import { CustomNodeComponent } from '../public-components/custom-node/custom-nod
 import { CustomDynamicNodeComponent } from '../public-components/custom-dynamic-node/custom-dynamic-node.component';
 import { NodePreview } from './node-preview.interface';
 import { isCallable } from '../utils/is-callable';
+import { isCustomDynamicNodeComponent, isCustomNodeComponent } from '../utils/is-vflow-component';
 
 export type Node<T = any> =
   | DefaultNode
@@ -132,10 +133,20 @@ export function isDynamicNode<T>(node: Node<T> | DynamicNode<T>): node is Dynami
 }
 
 export function isComponentStaticNode<T>(node: Node<T>): node is ComponentNode<T> {
+  if (isCustomNodeComponent(node.type)) {
+    return true;
+  }
+
+  // Check if the type is a function with dynamic import
   return isCallable(node.type) && !isCallable(node.point);
 }
 
 export function isComponentDynamicNode<T>(node: DynamicNode<T>): node is ComponentDynamicNode<T> {
+  if (isCustomDynamicNodeComponent(node.type)) {
+    return true;
+  }
+
+  // Check if the type is a function with dynamic import
   return isCallable(node.type) && isCallable(node.point);
 }
 
