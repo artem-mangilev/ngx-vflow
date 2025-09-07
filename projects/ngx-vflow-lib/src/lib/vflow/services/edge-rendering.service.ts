@@ -18,7 +18,7 @@ export class EdgeRenderingService {
     return this.viewportEdges().sort((aEdge, bEdge) => aEdge.renderOrder() - bEdge.renderOrder());
   });
 
-  private viewportEdges = computed(() => {
+  public readonly viewportEdges = computed(() => {
     return this.flowEntitiesService.validEdges().filter((e) => {
       const sourceHandle = e.sourceHandle();
       const targetHandle = e.targetHandle();

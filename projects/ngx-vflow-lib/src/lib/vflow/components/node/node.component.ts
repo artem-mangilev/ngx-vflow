@@ -23,7 +23,7 @@ import { ConnectionControllerDirective } from '../../directives/connection-contr
 import { NodeAccessorService } from '../../services/node-accessor.service';
 import { OverlaysService } from '../../services/overlays.service';
 import { HandleSizeControllerDirective } from '../../directives/handle-size-controller.directive';
-import { NgTemplateOutlet, NgComponentOutlet } from '@angular/common';
+import { NgTemplateOutlet, NgComponentOutlet, AsyncPipe } from '@angular/common';
 import { DefaultNodeComponent } from '../default-node/default-node.component';
 import { PointerDirective } from '../../directives/pointer.directive';
 
@@ -56,6 +56,7 @@ export type HandleState = 'valid' | 'invalid' | 'idle';
     HandleSizeControllerDirective,
     NodeHandlesControllerDirective,
     NodeResizeControllerDirective,
+    AsyncPipe,
   ],
 })
 export class NodeComponent implements OnInit, OnDestroy {

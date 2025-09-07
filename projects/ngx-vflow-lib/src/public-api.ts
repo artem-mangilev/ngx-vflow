@@ -55,6 +55,7 @@ export { FlowEntitiesService as ɵFlowEntitiesService } from './lib/vflow/servic
 export { NodeAccessorService as ɵNodeAccessorService } from './lib/vflow/services/node-accessor.service';
 export { ViewportService as ɵViewportService } from './lib/vflow/services/viewport.service';
 export { SelectionService as ɵSelectionService } from './lib/vflow/services/selection.service';
+export { NodeRenderingService as ɵNodeRenderingService } from './lib/vflow/services/node-rendering.service';
 
 export { RootPointerDirective as ɵRootPointerDirective } from './lib/vflow/directives/root-pointer.directive';
 export { SpacePointContextDirective as ɵSpacePointContextDirective } from './lib/vflow/directives/space-point-context.directive';

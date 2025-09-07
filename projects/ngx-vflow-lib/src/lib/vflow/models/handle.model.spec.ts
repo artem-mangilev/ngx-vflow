@@ -2,6 +2,9 @@ import { TestBed } from '@angular/core/testing';
 import { FlowEntitiesService } from '../services/flow-entities.service';
 import { HandleModel } from './handle.model';
 import { NodeModel } from './node.model';
+import { FlowSettingsService } from '../services/flow-settings.service';
+import { NodeRenderingService } from '../services/node-rendering.service';
+import { ViewportService } from '../services/viewport.service';
 
 describe('HandleModel', () => {
   const nodeWidth = 10;
@@ -11,7 +14,7 @@ describe('HandleModel', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [FlowEntitiesService],
+      providers: [FlowEntitiesService, FlowSettingsService, NodeRenderingService, ViewportService],
     });
 
     // we assume that host element has same size as whole node, it's actually true for default node
