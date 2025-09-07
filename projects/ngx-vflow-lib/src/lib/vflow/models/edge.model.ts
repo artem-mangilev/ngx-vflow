@@ -15,13 +15,9 @@ import { HandleModel } from './handle.model';
 import { CurveFactoryParams } from '../interfaces/curve-factory.interface';
 import { FlowEntitiesService } from '../services/flow-entities.service';
 import { extendedComputed } from '../utils/signals/extended-computed';
-import { FlowSettingsService } from '../services/flow-settings.service';
-import { EdgeRenderingService } from '../services/edge-rendering.service';
 
 export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
   private readonly flowEntitiesService = inject(FlowEntitiesService);
-  private readonly settingsService = inject(FlowSettingsService);
-  private readonly edgeRenderingService = inject(EdgeRenderingService);
 
   public source = signal<NodeModel | undefined>(undefined);
   public target = signal<NodeModel | undefined>(undefined);

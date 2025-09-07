@@ -6,20 +6,13 @@ import { HandleModel } from './handle.model';
 import { FlowSettingsService } from '../services/flow-settings.service';
 import { NodeRenderingService } from '../services/node-rendering.service';
 import { ViewportService } from '../services/viewport.service';
-import { EdgeRenderingService } from '../services/edge-rendering.service';
 
 describe('EdgeModel', () => {
   let model: EdgeModel;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [
-        FlowEntitiesService,
-        FlowSettingsService,
-        NodeRenderingService,
-        EdgeRenderingService,
-        ViewportService,
-      ],
+      providers: [FlowEntitiesService, FlowSettingsService, NodeRenderingService, ViewportService],
     });
 
     model = TestBed.runInInjectionContext(
