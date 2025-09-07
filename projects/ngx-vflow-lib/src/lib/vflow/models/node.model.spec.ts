@@ -1,6 +1,9 @@
 import { TestBed } from '@angular/core/testing';
 import { NodeModel } from './node.model';
 import { FlowEntitiesService } from '../services/flow-entities.service';
+import { FlowSettingsService } from '../services/flow-settings.service';
+import { NodeRenderingService } from '../services/node-rendering.service';
+import { ViewportService } from '../services/viewport.service';
 
 describe('NodeModel', () => {
   let model: NodeModel;
@@ -8,7 +11,7 @@ describe('NodeModel', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [FlowEntitiesService],
+      providers: [FlowEntitiesService, FlowSettingsService, NodeRenderingService, ViewportService],
     });
 
     model = TestBed.runInInjectionContext(

@@ -2,13 +2,16 @@ import { TestBed } from '@angular/core/testing';
 import { FlowEntitiesService } from '../services/flow-entities.service';
 import { ToolbarModel } from './toolbar.model';
 import { NodeModel } from './node.model';
+import { FlowSettingsService } from '../services/flow-settings.service';
+import { NodeRenderingService } from '../services/node-rendering.service';
+import { ViewportService } from '../services/viewport.service';
 
 describe('ToolbarModel', () => {
   let model: ToolbarModel;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [FlowEntitiesService],
+      providers: [FlowEntitiesService, FlowSettingsService, NodeRenderingService, ViewportService],
     });
 
     model = TestBed.runInInjectionContext(

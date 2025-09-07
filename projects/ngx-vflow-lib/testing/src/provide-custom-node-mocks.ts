@@ -10,6 +10,7 @@ import {
   ɵSpacePointContextDirective as SpacePointContextDirective,
   ɵViewportService as ViewportService,
   ɵSelectionService as SelectionService,
+  ɵNodeRenderingService as NodeRenderingService,
   Point,
 } from 'ngx-vflow';
 import { of } from 'rxjs';
@@ -69,5 +70,6 @@ export function provideCustomNodeMocks(): Provider[] {
     },
     FlowSettingsService,
     ViewportService,
+    NodeRenderingService,
   ];
 }
