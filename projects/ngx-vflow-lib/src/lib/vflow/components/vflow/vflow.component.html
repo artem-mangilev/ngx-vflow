@@ -4,6 +4,10 @@
   <g background />
 
   <svg:g mapContext spacePointContext>
+    @if (alignmentHelper(); as alignmentHelper) {
+      <ng-container [ngTemplateOutlet]="alignmentHelper.template()" />
+    }
+
     <!-- Connection -->
     <svg:g connection [model]="connection" [template]="connectionTemplateDirective()?.templateRef" />
 

@@ -35,6 +35,7 @@ export * from './lib/vflow/public-components/resizable/resizable.component';
 export * from './lib/vflow/public-components/minimap/minimap.component';
 export * from './lib/vflow/public-components/node-toolbar/node-toolbar.component';
 export * from './lib/vflow/public-components/custom-template-edge/custom-template-edge.component';
+export * from './lib/vflow/public-components/alignment-helper/alignment-helper.component';
 
 // Directives
 export * from './lib/vflow/directives/template.directive';

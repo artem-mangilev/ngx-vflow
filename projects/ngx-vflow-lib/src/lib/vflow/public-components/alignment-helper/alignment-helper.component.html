@@ -1,0 +1,10 @@
+<ng-template #alignmentHelper>
+  @for (intersection of intersections(); track $index) {
+    <svg:line
+      stroke="black"
+      [attr.x1]="intersection.x1"
+      [attr.y1]="intersection.y1"
+      [attr.x2]="intersection.x2"
+      [attr.y2]="intersection.y2" />
+  }
+</ng-template>
