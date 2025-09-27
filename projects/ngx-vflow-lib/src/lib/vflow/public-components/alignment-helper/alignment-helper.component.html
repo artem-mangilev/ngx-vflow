@@ -1,10 +1,14 @@
 <ng-template #alignmentHelper>
-  @for (intersection of intersections(); track $index) {
-    <svg:line
-      stroke="black"
-      [attr.x1]="intersection.x"
-      [attr.y1]="intersection.y"
-      [attr.x2]="intersection.x2"
-      [attr.y2]="intersection.y2" />
+  @if (isNodeDragging()) {
+    @if (intersections(); as intersections) {
+      @for (intersection of intersections.lines; track $index) {
+        <svg:line
+          stroke="black"
+          [attr.x1]="intersection.x"
+          [attr.y1]="intersection.y"
+          [attr.x2]="intersection.x2"
+          [attr.y2]="intersection.y2" />
+      }
+    }
   }
 </ng-template>

@@ -140,3 +140,11 @@ export class FlowStatusService {
     this.status.set({ state: 'node-drag-end', payload: { node } });
   }
 }
+
+export function isNodeDragStartStatus(params: FlowStatus): params is FlowStatusNodeDragStart {
+  return params.state === 'node-drag-start';
+}
+
+export function isNodeDragEndStatus(params: FlowStatus): params is FlowStatusNodeDragEnd {
+  return params.state === 'node-drag-end';
+}
