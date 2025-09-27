@@ -5,7 +5,11 @@
 
   <svg:g mapContext spacePointContext>
     @if (alignmentHelper(); as alignmentHelper) {
-      <ng-container [ngTemplateOutlet]="alignmentHelper.template()" />
+      @if (alignmentHelper === true) {
+        <svg:g alignmentHelper />
+      } @else {
+        <svg:g alignmentHelper [tolerance]="alignmentHelper.tolerance" [lineColor]="alignmentHelper.lineColor" />
+      }
     }
 
     <!-- Connection -->

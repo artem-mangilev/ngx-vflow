@@ -7,7 +7,6 @@ import { hashCode } from '../utils/hash';
 import { FlowEntity } from '../interfaces/flow-entity.interface';
 import { MinimapModel } from '../models/minimap.model';
 import { DynamicNode, Node } from '../interfaces/node.interface';
-import { AlignmentHelperModel } from '../models/alignment-helper.model';
 
 @Injectable()
 export class FlowEntitiesService {
@@ -60,8 +59,6 @@ export class FlowEntitiesService {
   public entities: Signal<FlowEntity[]> = computed(() => [...this.nodes(), ...this.edges()]);
 
   public minimap: WritableSignal<MinimapModel | null> = signal(null);
-
-  public alignmentHelper: WritableSignal<AlignmentHelperModel | null> = signal(null);
 
   public getNode<T>(id: string) {
     return this.nodes().find(({ rawNode }) => rawNode.id === id) as NodeModel<T> | undefined;

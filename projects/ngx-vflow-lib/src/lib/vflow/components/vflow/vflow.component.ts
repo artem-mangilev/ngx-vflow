@@ -7,6 +7,7 @@ import {
   runInInjectionContext,
   contentChild,
   viewChild,
+  input,
 } from '@angular/core';
 import { DynamicNode, Node } from '../../interfaces/node.interface';
 import { MapContextDirective } from '../../directives/map-context.directive';
@@ -71,6 +72,8 @@ import {
 } from '../../services/preview-flow-render-strategy.service';
 import { toLazySignal } from '../../utils/signals/to-lazy-signal';
 import { FlowRenderingService } from '../../services/flow-rendering.service';
+import { AlignmentHelperComponent } from '../../public-components/alignment-helper/alignment-helper.component';
+import { AlignmentHelperSettings } from '../../interfaces/alignment-helper-settings.interface';
 
 const changesControllerHostDirective = {
   directive: ChangesControllerDirective,
@@ -145,6 +148,7 @@ const changesControllerHostDirective = {
     EdgeComponent,
     NgTemplateOutlet,
     PreviewFlowComponent,
+    AlignmentHelperComponent,
   ],
 })
 export class VflowComponent {
@@ -282,6 +286,8 @@ export class VflowComponent {
     models.forEach((model) => this.nodeRenderingService.pullNode(model));
   }
 
+  public alignmentHelper = input<AlignmentHelperSettings | boolean>(false);
+
   protected nodeModels = this.nodeRenderingService.nodes;
   protected groups = this.nodeRenderingService.groups;
   protected nonGroups = this.nodeRenderingService.nonGroups;
@@ -377,7 +383,6 @@ export class VflowComponent {
 
   protected markers = this.flowEntitiesService.markers;
   protected minimap = this.flowEntitiesService.minimap;
-  protected alignmentHelper = this.flowEntitiesService.alignmentHelper;
 
   protected flowOptimization = this.flowSettingsService.optimization;
   protected flowWidth = this.flowSettingsService.computedFlowWidth;
