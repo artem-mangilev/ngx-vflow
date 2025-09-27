@@ -33,27 +33,35 @@ export class AlignmentHelperComponent implements OnInit {
       const lines: Box[] = [];
 
       otherRects.forEach((o) => {
-        [
-          [d.left, o.left],
-          [d.left, o.right],
-          [d.right, o.left],
-          [d.right, o.right],
-        ].forEach(([dX, oX]) => {
+        for (const [dX, oX, isCenter] of [
+          // center check
+          [d.left + d.width / 2, o.left + o.width / 2, true] as const,
+          [d.left, o.left, false] as const,
+          [d.left, o.right, false] as const,
+          [d.right, o.left, false] as const,
+          [d.right, o.right, false] as const,
+        ]) {
           if (Math.abs(dX - oX) <= 10) {
             lines.push({ x: oX, y: -10000, x2: oX, y2: 10000 });
-          }
-        });
 
-        [
-          [d.top, o.top],
-          [d.top, o.bottom],
-          [d.bottom, o.top],
-          [d.bottom, o.bottom],
-        ].forEach(([dY, oY]) => {
+            if (isCenter) break;
+          }
+        }
+
+        for (const [dY, oY, isCenter] of [
+          // center check
+          [d.top + d.height / 2, o.top + o.height / 2, true] as const,
+          [d.top, o.top, false] as const,
+          [d.top, o.bottom, false] as const,
+          [d.bottom, o.top, false] as const,
+          [d.bottom, o.bottom, false] as const,
+        ]) {
           if (Math.abs(dY - oY) <= 10) {
             lines.push({ x: -10000, y: oY, x2: 10000, y2: oY });
           }
-        });
+
+          if (isCenter) break;
+        }
       });
 
       return lines;

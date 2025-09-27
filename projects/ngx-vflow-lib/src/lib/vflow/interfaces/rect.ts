@@ -5,7 +5,7 @@ export interface Rect {
   height: number;
 }
 
-export interface RectWithSides {
+export interface RectWithSides extends Rect {
   left: number;
   right: number;
   top: number;
@@ -14,6 +14,7 @@ export interface RectWithSides {
 
 export function rectToRectWithSides(rect: Rect): RectWithSides {
   return {
+    ...rect,
     left: rect.x,
     right: rect.x + rect.width,
     top: rect.y,
