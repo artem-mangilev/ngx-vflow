@@ -4,6 +4,14 @@
   <g background />
 
   <svg:g mapContext spacePointContext>
+    @if (alignmentHelper(); as alignmentHelper) {
+      @if (alignmentHelper === true) {
+        <svg:g alignmentHelper />
+      } @else {
+        <svg:g alignmentHelper [tolerance]="alignmentHelper.tolerance" [lineColor]="alignmentHelper.lineColor" />
+      }
+    }
+
     <!-- Connection -->
     <svg:g connection [model]="connection" [template]="connectionTemplateDirective()?.templateRef" />
 

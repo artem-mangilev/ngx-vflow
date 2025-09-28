@@ -7,6 +7,7 @@ import { FlowEntitiesService } from './flow-entities.service';
 import { Point } from '../interfaces/point.interface';
 import { FlowSettingsService } from './flow-settings.service';
 import { align } from '../utils/align-number';
+import { FlowStatusService } from './flow-status.service';
 
 type DragEvent = D3DragEvent<Element, unknown, unknown>;
 
@@ -14,6 +15,7 @@ type DragEvent = D3DragEvent<Element, unknown, unknown>;
 export class DraggableService {
   private entitiesService = inject(FlowEntitiesService);
   private settingsService = inject(FlowSettingsService);
+  private flowStatusService = inject(FlowStatusService);
 
   /**
    * Enable draggable behavior for element.
@@ -68,6 +70,8 @@ export class DraggableService {
       .on('start', (event: DragEvent) => {
         dragNodes = this.getDragNodes(model);
 
+        this.flowStatusService.setNodeDragStartStatus(model);
+
         initialPositions = dragNodes.map((node) => ({
           x: node.point().x - event.x,
           y: node.point().y - event.y,
@@ -83,6 +87,10 @@ export class DraggableService {
 
           this.moveNode(model, point);
         });
+      })
+
+      .on('end', () => {
+        this.flowStatusService.setNodeDragEndStatus(model);
       });
   }
 

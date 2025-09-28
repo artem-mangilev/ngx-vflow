@@ -1,0 +1,13 @@
+@if (isNodeDragging()) {
+  @if (intersections(); as intersections) {
+    @for (intersection of intersections.lines; track $index) {
+      <svg:line
+        [attr.stroke]="lineColor()"
+        [attr.stroke-dasharray]="intersection.isCenter ? 4 : null"
+        [attr.x1]="intersection.x"
+        [attr.y1]="intersection.y"
+        [attr.x2]="intersection.x2"
+        [attr.y2]="intersection.y2" />
+    }
+  }
+}

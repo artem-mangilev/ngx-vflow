@@ -7,6 +7,7 @@ import {
   signal,
   WritableSignal,
   OnInit,
+  input,
 } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
 import {
@@ -26,6 +27,7 @@ import {
   IntersectingNodesOptions,
   ɵConnectionModel as ConnectionModel,
   DEFAULT_OPTIMIZATION,
+  AlignmentHelperSettings,
 } from 'ngx-vflow';
 import { toObservable } from '@angular/core/rxjs-interop';
 import {
@@ -174,6 +176,8 @@ export class VflowMockComponent implements AsInterface<VflowComponent>, OnInit {
 
   @Input()
   public elevateEdgesOnSelect!: boolean;
+
+  public alignmentHelper = input<boolean | AlignmentHelperSettings>(false);
 
   // eslint-disable-next-line @angular-eslint/no-output-on-prefix
   public readonly onComponentNodeEvent = output<any>();
