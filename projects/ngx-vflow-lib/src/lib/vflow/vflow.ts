@@ -18,7 +18,6 @@ import { NodeToolbarComponent } from './public-components/node-toolbar/node-tool
 import { ResizableComponent } from './public-components/resizable/resizable.component';
 import { HandleComponent } from './public-components/handle/handle.component';
 import { CustomTemplateEdgeComponent } from './public-components/custom-template-edge/custom-template-edge.component';
-import { AlignmentHelperComponent } from './public-components/alignment-helper/alignment-helper.component';
 
 export const Vflow = [
   VflowComponent,
@@ -30,7 +29,6 @@ export const Vflow = [
   CustomTemplateEdgeComponent,
   DragHandleDirective,
   ConnectionControllerDirective,
-  AlignmentHelperComponent,
 
   NodeHtmlTemplateDirective,
   NodeSvgTemplateDirective,

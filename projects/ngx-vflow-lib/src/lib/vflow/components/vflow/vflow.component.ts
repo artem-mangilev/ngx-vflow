@@ -72,7 +72,7 @@ import {
 } from '../../services/preview-flow-render-strategy.service';
 import { toLazySignal } from '../../utils/signals/to-lazy-signal';
 import { FlowRenderingService } from '../../services/flow-rendering.service';
-import { AlignmentHelperComponent } from '../../public-components/alignment-helper/alignment-helper.component';
+import { AlignmentHelperComponent } from '../alignment-helper/alignment-helper.component';
 import { AlignmentHelperSettings } from '../../interfaces/alignment-helper-settings.interface';
 
 const changesControllerHostDirective = {
