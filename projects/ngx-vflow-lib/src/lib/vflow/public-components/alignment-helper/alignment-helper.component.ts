@@ -7,6 +7,7 @@ import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { filter, map, tap } from 'rxjs';
 import { extendedComputed } from '../../utils/signals/extended-computed';
 import { NodeRenderingService } from '../../services/node-rendering.service';
+import { getSpacePoints } from '../../utils/get-space-points';
 
 interface Intersection {
   lines: (Box & { isCenter: boolean })[];
@@ -39,6 +40,8 @@ export class AlignmentHelperComponent {
       const otherRects = this.nodeRenderingService
         .viewportNodes()
         .filter((n) => n !== node)
+        // do not check children of the dragged node
+        .filter((n) => !node.children().includes(n))
         .map((n) => rectToRectWithSides(nodeToRect(n)));
 
       const lines: Intersection['lines'] = [];
@@ -120,7 +123,10 @@ export class AlignmentHelperComponent {
         map((node) => [node, this.intersections()] as const),
         tap(([node, intersections]) => {
           if (intersections) {
-            node.setPoint({ x: intersections.snappedX, y: intersections.snappedY });
+            const snapped = { x: intersections.snappedX, y: intersections.snappedY };
+            const parentIfExists = node.parent() ? [node.parent()!] : [];
+
+            node.setPoint(getSpacePoints(snapped, parentIfExists)[0]);
           }
         }),
         takeUntilDestroyed(),
