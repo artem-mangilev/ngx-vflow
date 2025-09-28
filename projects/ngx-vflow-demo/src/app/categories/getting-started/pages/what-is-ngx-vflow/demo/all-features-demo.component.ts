@@ -8,6 +8,7 @@ import { FlowStoreService } from './services/flow-store.service';
     [nodes]="store.nodes()"
     [edges]="store.edges()"
     [background]="{ type: 'dots' }"
+    [alignmentHelper]="true"
     (onConnect)="createEdge($event)">
     <ng-template let-ctx edge>
       @if (ctx.edge.data?.type === 'animated') {
