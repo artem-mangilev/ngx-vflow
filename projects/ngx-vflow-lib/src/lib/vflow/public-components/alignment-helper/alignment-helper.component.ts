@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
-import { FlowEntitiesService } from '../../services/flow-entities.service';
 import { nodeToRect } from '../../utils/nodes';
 import { FlowStatusService, isNodeDragEndStatus, isNodeDragStartStatus } from '../../services/flow-status.service';
 import { rectToRectWithSides } from '../../interfaces/rect';
@@ -7,6 +6,7 @@ import { Box } from '../../interfaces/box';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { filter, map, tap } from 'rxjs';
 import { extendedComputed } from '../../utils/signals/extended-computed';
+import { NodeRenderingService } from '../../services/node-rendering.service';
 
 interface Intersection {
   lines: (Box & { isCenter: boolean })[];
@@ -21,7 +21,7 @@ interface Intersection {
   standalone: true,
 })
 export class AlignmentHelperComponent {
-  private entitiesService = inject(FlowEntitiesService);
+  private nodeRenderingService = inject(NodeRenderingService);
   private flowStatus = inject(FlowStatusService);
 
   readonly tolerance = input(10);
@@ -36,8 +36,8 @@ export class AlignmentHelperComponent {
       const node = status.payload.node;
 
       const d = rectToRectWithSides(nodeToRect(node));
-      const otherRects = this.entitiesService
-        .nodes()
+      const otherRects = this.nodeRenderingService
+        .viewportNodes()
         .filter((n) => n !== node)
         .map((n) => rectToRectWithSides(nodeToRect(n)));
 
