@@ -2,6 +2,42 @@
   {
     "breadcrumbs": [
       "Features",
+      "Custom handles"
+    ],
+    "pageType": "guide",
+    "title": "Custom handles",
+    "section": "Custom handles",
+    "route": "/features/custom-handles",
+    "fragment": "custom-handles",
+    "content": "You can pass a [template] to HandleComponent with custom handle."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom handles"
+    ],
+    "pageType": "guide",
+    "title": "Custom handles",
+    "section": "Custom handles",
+    "route": "/features/custom-handles",
+    "fragment": "custom-handles",
+    "content": "I't important to note that template must be made with SVG."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom handles"
+    ],
+    "pageType": "guide",
+    "title": "Custom handles",
+    "section": "Custom handles",
+    "route": "/features/custom-handles",
+    "fragment": "custom-handles",
+    "content": "Custom handles are not positioned automatically, but the library provides a useful template context property to position your handle.Custom handles know if validation of ConnectionSettings.validator() has failed or succeeded, so you can use state() signal in let-ctx to add some behavior based on validation result. Refer to this interface for let-ctx when crafting your handle template:"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
       "Custom background"
     ],
     "pageType": "guide",
@@ -46,42 +82,6 @@
     "route": "/features/custom-background",
     "fragment": "image-background",
     "content": "To make an image background, pass an object to the [background] input according to ImageBackground interface"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Custom handles"
-    ],
-    "pageType": "guide",
-    "title": "Custom handles",
-    "section": "Custom handles",
-    "route": "/features/custom-handles",
-    "fragment": "custom-handles",
-    "content": "You can pass a [template] to HandleComponent with custom handle."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Custom handles"
-    ],
-    "pageType": "guide",
-    "title": "Custom handles",
-    "section": "Custom handles",
-    "route": "/features/custom-handles",
-    "fragment": "custom-handles",
-    "content": "I't important to note that template must be made with SVG."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Custom handles"
-    ],
-    "pageType": "guide",
-    "title": "Custom handles",
-    "section": "Custom handles",
-    "route": "/features/custom-handles",
-    "fragment": "custom-handles",
-    "content": "Custom handles are not positioned automatically, but the library provides a useful template context property to position your handle.Custom handles know if validation of ConnectionSettings.validator() has failed or succeeded, so you can use state() signal in let-ctx to add some behavior based on validation result. Refer to this interface for let-ctx when crafting your handle template:"
   },
   {
     "breadcrumbs": [
@@ -230,54 +230,6 @@
   {
     "breadcrumbs": [
       "Features",
-      "Lazy Loading"
-    ],
-    "pageType": "guide",
-    "title": "Lazy Loading",
-    "section": "Lazy Loading",
-    "route": "/features/lazy-loading",
-    "fragment": "lazy-loading",
-    "content": "Open the network tab in DevTools to see components being loaded dynamically."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Lazy Loading"
-    ],
-    "pageType": "guide",
-    "title": "Lazy Loading",
-    "section": "Lazy Loading",
-    "route": "/features/lazy-loading",
-    "fragment": "lazy-loading",
-    "content": "The library supports splitting a large flow into multiple chunks, where each chunk is loaded according to the provided lazyLoadTrigger in the Optimization object. To load nodes when the viewport changes, set lazyLoadTrigger to the value viewport."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Lazy Loading"
-    ],
-    "pageType": "guide",
-    "title": "Lazy Loading",
-    "section": "Lazy loading component nodes",
-    "route": "/features/lazy-loading",
-    "fragment": "lazy-loading-component-nodes",
-    "content": "To adapt your existing component nodes, replace component constructor calls in the type field with dynamic import factories:"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Lazy Loading"
-    ],
-    "pageType": "guide",
-    "title": "Lazy Loading",
-    "section": "Lazy loading template nodes",
-    "route": "/features/lazy-loading",
-    "fragment": "lazy-loading-template-nodes",
-    "content": "For template nodes, the library provides a custom trigger for the @defer syntax through the context."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
       "Minimap"
     ],
     "pageType": "guide",
@@ -326,14 +278,50 @@
   {
     "breadcrumbs": [
       "Features",
-      "Multiple connection points"
+      "Lazy Loading"
     ],
     "pageType": "guide",
-    "title": "Multiple connection points",
-    "section": "Multiple connection points",
-    "route": "/features/multiple-connection-points",
-    "fragment": "multiple-connection-points",
-    "content": "Custom components provide the ability to control handles and their positions. All you need to do is take HandleComponent from library and place it somewhere in your custom node. This component automatically computes its position based on parent element's position."
+    "title": "Lazy Loading",
+    "section": "Lazy Loading",
+    "route": "/features/lazy-loading",
+    "fragment": "lazy-loading",
+    "content": "Open the network tab in DevTools to see components being loaded dynamically."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Lazy Loading"
+    ],
+    "pageType": "guide",
+    "title": "Lazy Loading",
+    "section": "Lazy Loading",
+    "route": "/features/lazy-loading",
+    "fragment": "lazy-loading",
+    "content": "The library supports splitting a large flow into multiple chunks, where each chunk is loaded according to the provided lazyLoadTrigger in the Optimization object. To load nodes when the viewport changes, set lazyLoadTrigger to the value viewport."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Lazy Loading"
+    ],
+    "pageType": "guide",
+    "title": "Lazy Loading",
+    "section": "Lazy loading component nodes",
+    "route": "/features/lazy-loading",
+    "fragment": "lazy-loading-component-nodes",
+    "content": "To adapt your existing component nodes, replace component constructor calls in the type field with dynamic import factories:"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Lazy Loading"
+    ],
+    "pageType": "guide",
+    "title": "Lazy Loading",
+    "section": "Lazy loading template nodes",
+    "route": "/features/lazy-loading",
+    "fragment": "lazy-loading-template-nodes",
+    "content": "For template nodes, the library provides a custom trigger for the @defer syntax through the context."
   },
   {
     "breadcrumbs": [
@@ -422,6 +410,18 @@
   {
     "breadcrumbs": [
       "Features",
+      "Multiple connection points"
+    ],
+    "pageType": "guide",
+    "title": "Multiple connection points",
+    "section": "Multiple connection points",
+    "route": "/features/multiple-connection-points",
+    "fragment": "multiple-connection-points",
+    "content": "Custom components provide the ability to control handles and their positions. All you need to do is take HandleComponent from library and place it somewhere in your custom node. This component automatically computes its position based on parent element's position."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
       "Snap to Grid"
     ],
     "pageType": "guide",
@@ -454,54 +454,6 @@
     "route": "/features/view-size",
     "fragment": "fixed-size",
     "content": "vflow can take fixed space if you pass [view]=\"[600, 600]\" input, where first item of array is width (in pixels), and the second is height (in pixels)."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Virtualization"
-    ],
-    "pageType": "guide",
-    "title": "Virtualization",
-    "section": "Virtualization",
-    "route": "/features/virtualization",
-    "fragment": "virtualization",
-    "content": "This is an experimental API. The library still does not support edge previews - only node previews are available."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Virtualization"
-    ],
-    "pageType": "guide",
-    "title": "Virtualization",
-    "section": "Virtualization",
-    "route": "/features/virtualization",
-    "fragment": "virtualization",
-    "content": "The library supports virtualization, which helps improve performance when rendering large numbers of nodes. When virtualization is enabled, an additional canvas layer is activated alongside the existing SVG layer. During viewport changes (zoom/pan), the canvas layer quickly renders lightweight preview nodes to ensure smooth interaction. Once the interaction ends, these preview nodes are hydrated into full-featured, heavy SVG nodes. To enable virtualization, set the virtualization flag in the Optimization interface. Additionally, you can use the virtualizationZoomThreshold property to specify the minimum zoom level at which previews should be rendered. This helps avoid performance issues by rendering a lot of real SVG nodes."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Virtualization"
-    ],
-    "pageType": "guide",
-    "title": "Virtualization",
-    "section": "Virtualization",
-    "route": "/features/virtualization",
-    "fragment": "virtualization",
-    "content": "It's important to note that a preview node is a simplified version of a real node. It is rendered on the canvas layer, is not interactive, and may not visually match the real node exactly (at least for now) — hence the name preview. However, the library aims to provide a good API for customizing these previews. The NodePreview interface allows you to style preview nodes using a subset of CSSStyleDeclaration, letting you write familiar, declarative CSS instead of low-level canvas code. The library automatically compiles these styles into appropriate canvas calls."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Virtualization"
-    ],
-    "pageType": "guide",
-    "title": "Virtualization",
-    "section": "Virtualization",
-    "route": "/features/virtualization",
-    "fragment": "virtualization",
-    "content": "To customize the preview for a specific node, use the preview property available on both Node and DynamicNode."
   },
   {
     "breadcrumbs": [
@@ -562,6 +514,54 @@
     "route": "/getting-started/dynamic-vs-static-nodes",
     "fragment": "see-also",
     "content": "D3 Force"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Virtualization"
+    ],
+    "pageType": "guide",
+    "title": "Virtualization",
+    "section": "Virtualization",
+    "route": "/features/virtualization",
+    "fragment": "virtualization",
+    "content": "This is an experimental API. The library still does not support edge previews - only node previews are available."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Virtualization"
+    ],
+    "pageType": "guide",
+    "title": "Virtualization",
+    "section": "Virtualization",
+    "route": "/features/virtualization",
+    "fragment": "virtualization",
+    "content": "The library supports virtualization, which helps improve performance when rendering large numbers of nodes. When virtualization is enabled, an additional canvas layer is activated alongside the existing SVG layer. During viewport changes (zoom/pan), the canvas layer quickly renders lightweight preview nodes to ensure smooth interaction. Once the interaction ends, these preview nodes are hydrated into full-featured, heavy SVG nodes. To enable virtualization, set the virtualization flag in the Optimization interface. Additionally, you can use the virtualizationZoomThreshold property to specify the minimum zoom level at which previews should be rendered. This helps avoid performance issues by rendering a lot of real SVG nodes."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Virtualization"
+    ],
+    "pageType": "guide",
+    "title": "Virtualization",
+    "section": "Virtualization",
+    "route": "/features/virtualization",
+    "fragment": "virtualization",
+    "content": "It's important to note that a preview node is a simplified version of a real node. It is rendered on the canvas layer, is not interactive, and may not visually match the real node exactly (at least for now) — hence the name preview. However, the library aims to provide a good API for customizing these previews. The NodePreview interface allows you to style preview nodes using a subset of CSSStyleDeclaration, letting you write familiar, declarative CSS instead of low-level canvas code. The library automatically compiles these styles into appropriate canvas calls."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Virtualization"
+    ],
+    "pageType": "guide",
+    "title": "Virtualization",
+    "section": "Virtualization",
+    "route": "/features/virtualization",
+    "fragment": "virtualization",
+    "content": "To customize the preview for a specific node, use the preview property available on both Node and DynamicNode."
   },
   {
     "breadcrumbs": [
@@ -686,6 +686,18 @@
   {
     "breadcrumbs": [
       "Workshops",
+      "Delete selected"
+    ],
+    "pageType": "guide",
+    "title": "Delete selected",
+    "section": "Delete selected",
+    "route": "/workshops/delete-selected",
+    "fragment": "delete-selected",
+    "content": "This workshop will show you how to implement deletion of nodes and edges."
+  },
+  {
+    "breadcrumbs": [
+      "Workshops",
       "Drag and drop nodes"
     ],
     "pageType": "guide",
@@ -706,18 +718,6 @@
     "route": "/workshops/stress-test",
     "fragment": "stress-test",
     "content": "The library can render 1000+ nodes instantly while maintaining smooth user interactions."
-  },
-  {
-    "breadcrumbs": [
-      "Workshops",
-      "Delete selected"
-    ],
-    "pageType": "guide",
-    "title": "Delete selected",
-    "section": "Delete selected",
-    "route": "/workshops/delete-selected",
-    "fragment": "delete-selected",
-    "content": "This workshop will show you how to implement deletion of nodes and edges."
   },
   {
     "breadcrumbs": [
@@ -1580,6 +1580,279 @@
   {
     "breadcrumbs": [
       "Features",
+      "Edges",
+      "Reconnect Edge"
+    ],
+    "pageType": "guide",
+    "title": "Reconnect Edge",
+    "section": "Reconnect Edge",
+    "route": "/features/edges/reconnect-edges",
+    "fragment": "reconnect-edge",
+    "content": "Edges can be reconnected. To reconnect an edge, follow these steps:"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Reconnect Edge"
+    ],
+    "pageType": "guide",
+    "title": "Reconnect Edge",
+    "section": "Reconnect Edge",
+    "route": "/features/edges/reconnect-edges",
+    "fragment": "reconnect-edge",
+    "content": "Mark the "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Reconnect Edge"
+    ],
+    "pageType": "guide",
+    "title": "Reconnect Edge",
+    "section": "Reconnect Edge",
+    "route": "/features/edges/reconnect-edges",
+    "fragment": "reconnect-edge",
+    "content": "Edge"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Reconnect Edge"
+    ],
+    "pageType": "guide",
+    "title": "Reconnect Edge",
+    "section": "Reconnect Edge",
+    "route": "/features/edges/reconnect-edges",
+    "fragment": "reconnect-edge",
+    "content": " object as "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Reconnect Edge"
+    ],
+    "pageType": "guide",
+    "title": "Reconnect Edge",
+    "section": "Reconnect Edge",
+    "route": "/features/edges/reconnect-edges",
+    "fragment": "reconnect-edge",
+    "content": "reconnectable"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Reconnect Edge"
+    ],
+    "pageType": "guide",
+    "title": "Reconnect Edge",
+    "section": "Reconnect Edge",
+    "route": "/features/edges/reconnect-edges",
+    "fragment": "reconnect-edge",
+    "content": ". Create a handler for the "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Reconnect Edge"
+    ],
+    "pageType": "guide",
+    "title": "Reconnect Edge",
+    "section": "Reconnect Edge",
+    "route": "/features/edges/reconnect-edges",
+    "fragment": "reconnect-edge",
+    "content": "(onReconnect)"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Reconnect Edge"
+    ],
+    "pageType": "guide",
+    "title": "Reconnect Edge",
+    "section": "Reconnect Edge",
+    "route": "/features/edges/reconnect-edges",
+    "fragment": "reconnect-edge",
+    "content": " event. This handler accepts a "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Reconnect Edge"
+    ],
+    "pageType": "guide",
+    "title": "Reconnect Edge",
+    "section": "Reconnect Edge",
+    "route": "/features/edges/reconnect-edges",
+    "fragment": "reconnect-edge",
+    "content": "ReconnectionEvent"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Reconnect Edge"
+    ],
+    "pageType": "guide",
+    "title": "Reconnect Edge",
+    "section": "Reconnect Edge",
+    "route": "/features/edges/reconnect-edges",
+    "fragment": "reconnect-edge",
+    "content": " argument, which contains a new "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Reconnect Edge"
+    ],
+    "pageType": "guide",
+    "title": "Reconnect Edge",
+    "section": "Reconnect Edge",
+    "route": "/features/edges/reconnect-edges",
+    "fragment": "reconnect-edge",
+    "content": "Connection"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Reconnect Edge"
+    ],
+    "pageType": "guide",
+    "title": "Reconnect Edge",
+    "section": "Reconnect Edge",
+    "route": "/features/edges/reconnect-edges",
+    "fragment": "reconnect-edge",
+    "content": " and the "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Reconnect Edge"
+    ],
+    "pageType": "guide",
+    "title": "Reconnect Edge",
+    "section": "Reconnect Edge",
+    "route": "/features/edges/reconnect-edges",
+    "fragment": "reconnect-edge",
+    "content": "oldEdge"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Reconnect Edge"
+    ],
+    "pageType": "guide",
+    "title": "Reconnect Edge",
+    "section": "Reconnect Edge",
+    "route": "/features/edges/reconnect-edges",
+    "fragment": "reconnect-edge",
+    "content": " that you are trying to reconnect. Update the "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Reconnect Edge"
+    ],
+    "pageType": "guide",
+    "title": "Reconnect Edge",
+    "section": "Reconnect Edge",
+    "route": "/features/edges/reconnect-edges",
+    "fragment": "reconnect-edge",
+    "content": "Edge[]"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Reconnect Edge"
+    ],
+    "pageType": "guide",
+    "title": "Reconnect Edge",
+    "section": "Reconnect Edge",
+    "route": "/features/edges/reconnect-edges",
+    "fragment": "reconnect-edge",
+    "content": " list with a new edge based on the "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Reconnect Edge"
+    ],
+    "pageType": "guide",
+    "title": "Reconnect Edge",
+    "section": "Reconnect Edge",
+    "route": "/features/edges/reconnect-edges",
+    "fragment": "reconnect-edge",
+    "content": "oldEdge"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Reconnect Edge"
+    ],
+    "pageType": "guide",
+    "title": "Reconnect Edge",
+    "section": "Reconnect Edge",
+    "route": "/features/edges/reconnect-edges",
+    "fragment": "reconnect-edge",
+    "content": " and the new "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Reconnect Edge"
+    ],
+    "pageType": "guide",
+    "title": "Reconnect Edge",
+    "section": "Reconnect Edge",
+    "route": "/features/edges/reconnect-edges",
+    "fragment": "reconnect-edge",
+    "content": "Connection"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Reconnect Edge"
+    ],
+    "pageType": "guide",
+    "title": "Reconnect Edge",
+    "section": "Reconnect Edge",
+    "route": "/features/edges/reconnect-edges",
+    "fragment": "reconnect-edge",
+    "content": ", then remove the reference to the old edge from the list."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Alignment Helper"
+    ],
+    "pageType": "guide",
+    "title": "Alignment Helper",
+    "section": "Alignment Helper",
+    "route": "/features/nodes/alignment-helper",
+    "fragment": "alignment-helper",
+    "content": "The library supports alignment lines that help align nodes relative to each other. To enable this feature, pass the [alignmentHelper] input to the VflowComponent. Its value can be either: true – to enable the helper with default settingsAn AlignmentHelperSettings object – to configure the helper with custom settings Try aligning the following flow:"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
       "Nodes",
       "Custom nodes"
     ],
@@ -2230,266 +2503,6 @@
   {
     "breadcrumbs": [
       "Features",
-      "Edges",
-      "Reconnect Edge"
-    ],
-    "pageType": "guide",
-    "title": "Reconnect Edge",
-    "section": "Reconnect Edge",
-    "route": "/features/edges/reconnect-edges",
-    "fragment": "reconnect-edge",
-    "content": "Edges can be reconnected. To reconnect an edge, follow these steps:"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Reconnect Edge"
-    ],
-    "pageType": "guide",
-    "title": "Reconnect Edge",
-    "section": "Reconnect Edge",
-    "route": "/features/edges/reconnect-edges",
-    "fragment": "reconnect-edge",
-    "content": "Mark the "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Reconnect Edge"
-    ],
-    "pageType": "guide",
-    "title": "Reconnect Edge",
-    "section": "Reconnect Edge",
-    "route": "/features/edges/reconnect-edges",
-    "fragment": "reconnect-edge",
-    "content": "Edge"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Reconnect Edge"
-    ],
-    "pageType": "guide",
-    "title": "Reconnect Edge",
-    "section": "Reconnect Edge",
-    "route": "/features/edges/reconnect-edges",
-    "fragment": "reconnect-edge",
-    "content": " object as "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Reconnect Edge"
-    ],
-    "pageType": "guide",
-    "title": "Reconnect Edge",
-    "section": "Reconnect Edge",
-    "route": "/features/edges/reconnect-edges",
-    "fragment": "reconnect-edge",
-    "content": "reconnectable"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Reconnect Edge"
-    ],
-    "pageType": "guide",
-    "title": "Reconnect Edge",
-    "section": "Reconnect Edge",
-    "route": "/features/edges/reconnect-edges",
-    "fragment": "reconnect-edge",
-    "content": ". Create a handler for the "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Reconnect Edge"
-    ],
-    "pageType": "guide",
-    "title": "Reconnect Edge",
-    "section": "Reconnect Edge",
-    "route": "/features/edges/reconnect-edges",
-    "fragment": "reconnect-edge",
-    "content": "(onReconnect)"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Reconnect Edge"
-    ],
-    "pageType": "guide",
-    "title": "Reconnect Edge",
-    "section": "Reconnect Edge",
-    "route": "/features/edges/reconnect-edges",
-    "fragment": "reconnect-edge",
-    "content": " event. This handler accepts a "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Reconnect Edge"
-    ],
-    "pageType": "guide",
-    "title": "Reconnect Edge",
-    "section": "Reconnect Edge",
-    "route": "/features/edges/reconnect-edges",
-    "fragment": "reconnect-edge",
-    "content": "ReconnectionEvent"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Reconnect Edge"
-    ],
-    "pageType": "guide",
-    "title": "Reconnect Edge",
-    "section": "Reconnect Edge",
-    "route": "/features/edges/reconnect-edges",
-    "fragment": "reconnect-edge",
-    "content": " argument, which contains a new "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Reconnect Edge"
-    ],
-    "pageType": "guide",
-    "title": "Reconnect Edge",
-    "section": "Reconnect Edge",
-    "route": "/features/edges/reconnect-edges",
-    "fragment": "reconnect-edge",
-    "content": "Connection"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Reconnect Edge"
-    ],
-    "pageType": "guide",
-    "title": "Reconnect Edge",
-    "section": "Reconnect Edge",
-    "route": "/features/edges/reconnect-edges",
-    "fragment": "reconnect-edge",
-    "content": " and the "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Reconnect Edge"
-    ],
-    "pageType": "guide",
-    "title": "Reconnect Edge",
-    "section": "Reconnect Edge",
-    "route": "/features/edges/reconnect-edges",
-    "fragment": "reconnect-edge",
-    "content": "oldEdge"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Reconnect Edge"
-    ],
-    "pageType": "guide",
-    "title": "Reconnect Edge",
-    "section": "Reconnect Edge",
-    "route": "/features/edges/reconnect-edges",
-    "fragment": "reconnect-edge",
-    "content": " that you are trying to reconnect. Update the "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Reconnect Edge"
-    ],
-    "pageType": "guide",
-    "title": "Reconnect Edge",
-    "section": "Reconnect Edge",
-    "route": "/features/edges/reconnect-edges",
-    "fragment": "reconnect-edge",
-    "content": "Edge[]"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Reconnect Edge"
-    ],
-    "pageType": "guide",
-    "title": "Reconnect Edge",
-    "section": "Reconnect Edge",
-    "route": "/features/edges/reconnect-edges",
-    "fragment": "reconnect-edge",
-    "content": " list with a new edge based on the "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Reconnect Edge"
-    ],
-    "pageType": "guide",
-    "title": "Reconnect Edge",
-    "section": "Reconnect Edge",
-    "route": "/features/edges/reconnect-edges",
-    "fragment": "reconnect-edge",
-    "content": "oldEdge"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Reconnect Edge"
-    ],
-    "pageType": "guide",
-    "title": "Reconnect Edge",
-    "section": "Reconnect Edge",
-    "route": "/features/edges/reconnect-edges",
-    "fragment": "reconnect-edge",
-    "content": " and the new "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Reconnect Edge"
-    ],
-    "pageType": "guide",
-    "title": "Reconnect Edge",
-    "section": "Reconnect Edge",
-    "route": "/features/edges/reconnect-edges",
-    "fragment": "reconnect-edge",
-    "content": "Connection"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Reconnect Edge"
-    ],
-    "pageType": "guide",
-    "title": "Reconnect Edge",
-    "section": "Reconnect Edge",
-    "route": "/features/edges/reconnect-edges",
-    "fragment": "reconnect-edge",
-    "content": ", then remove the reference to the old edge from the list."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
       "Nodes",
       "Subflows"
     ],
@@ -2647,19 +2660,6 @@
     "breadcrumbs": [
       "Workshops",
       "Layout",
-      "D3 Force"
-    ],
-    "pageType": "guide",
-    "title": "D3 Force",
-    "section": "D3 Force",
-    "route": "/workshops/layout/force",
-    "fragment": "d3-force",
-    "content": "This is a simple example of using the d3-force layout package."
-  },
-  {
-    "breadcrumbs": [
-      "Workshops",
-      "Layout",
       "Vizdom layout"
     ],
     "pageType": "guide",
@@ -2668,6 +2668,19 @@
     "route": "/workshops/layout/vizdom-layout",
     "fragment": "vizdom-layout",
     "content": "This is an example of using the vizdom library for computing layout."
+  },
+  {
+    "breadcrumbs": [
+      "Workshops",
+      "Layout",
+      "D3 Force"
+    ],
+    "pageType": "guide",
+    "title": "D3 Force",
+    "section": "D3 Force",
+    "route": "/workshops/layout/force",
+    "fragment": "d3-force",
+    "content": "This is a simple example of using the d3-force layout package."
   },
   {
     "breadcrumbs": [
@@ -3780,6 +3793,18 @@
     "section": "NodePreview",
     "route": "/api/ngx-vflow/interfaces/NodePreview",
     "fragment": "nodepreview"
+  },
+  {
+    "breadcrumbs": [
+      "API",
+      "ngx-vflow",
+      "AlignmentHelperSettings"
+    ],
+    "pageType": "api",
+    "title": "AlignmentHelperSettings",
+    "section": "AlignmentHelperSettings",
+    "route": "/api/ngx-vflow/interfaces/AlignmentHelperSettings",
+    "fragment": "alignmenthelpersettings"
   },
   {
     "breadcrumbs": [
