@@ -1,7 +1,6 @@
 import { Injectable, computed, inject } from '@angular/core';
 import { FlowEntitiesService } from './flow-entities.service';
 import { NodeModel } from '../models/node.model';
-import { isGroupNode } from '../utils/is-group-node';
 import { FlowSettingsService } from './flow-settings.service';
 import { isRectInViewport } from '../utils/viewport';
 import { ViewportService } from './viewport.service';
@@ -24,11 +23,11 @@ export class NodeRenderingService {
   });
 
   public readonly groups = computed(() => {
-    return this.nodes().filter((n) => isGroupNode(n));
+    return this.nodes().filter((n) => !!n.children().length);
   });
 
   public readonly nonGroups = computed(() => {
-    return this.nodes().filter((n) => !isGroupNode(n));
+    return this.nodes().filter((n) => !n.children().length);
   });
 
   public viewportNodes = computed(() => {
