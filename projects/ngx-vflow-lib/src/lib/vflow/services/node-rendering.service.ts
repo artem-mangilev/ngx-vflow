@@ -7,6 +7,7 @@ import { ViewportService } from './viewport.service';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { asyncScheduler, debounceTime, filter, map, merge, observeOn } from 'rxjs';
 import { toLazySignal } from '../utils/signals/to-lazy-signal';
+import { isGroupNode } from '../utils/is-group-node';
 
 @Injectable()
 export class NodeRenderingService {
@@ -23,11 +24,11 @@ export class NodeRenderingService {
   });
 
   public readonly groups = computed(() => {
-    return this.nodes().filter((n) => !!n.children().length);
+    return this.nodes().filter((n) => !!n.children().length || isGroupNode(n));
   });
 
   public readonly nonGroups = computed(() => {
-    return this.nodes().filter((n) => !n.children().length);
+    return this.nodes().filter((n) => !this.groups().includes(n));
   });
 
   public viewportNodes = computed(() => {
