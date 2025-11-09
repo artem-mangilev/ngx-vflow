@@ -3,7 +3,7 @@ import { Connection, ConnectionSettings, CustomNodeComponent, Edge, Node, Vflow 
 
 @Component({
   template: `
-    <vflow view="auto" [nodes]="nodes" [edges]="edges" [connection]="connection" (onConnect)="createEdge($event)" />
+    <vflow view="auto" [nodes]="nodes" [edges]="edges" [connection]="connection" (connect)="createEdge($event)" />
   `,
   styles: [
     `

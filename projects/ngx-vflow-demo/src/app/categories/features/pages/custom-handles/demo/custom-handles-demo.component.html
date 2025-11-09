@@ -1,4 +1,4 @@
-<vflow view="auto" [nodes]="nodes" [edges]="edges" [connection]="connectionSettings" (onConnect)="createEdge($event)">
+<vflow view="auto" [nodes]="nodes" [edges]="edges" [connection]="connectionSettings" (connect)="createEdge($event)">
   <ng-template let-ctx nodeHtml>
     @if (ctx.node.data.type === 'output') {
       <div class="custom-node">

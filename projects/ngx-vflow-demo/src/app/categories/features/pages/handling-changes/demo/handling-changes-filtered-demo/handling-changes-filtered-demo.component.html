@@ -4,7 +4,7 @@
   view="auto"
   [nodes]="nodes"
   [edges]="edges"
-  (onConnect)="createEdge($event)"
+  (connect)="createEdge($event)"
   (onNodesChange.position.single)="handleNodePositionChange($event)"
   (onNodesChange.select.single)="handleNodeSelectChange($event)"
   (onNodesChange.add.many)="handleNodesAddChange($event)"

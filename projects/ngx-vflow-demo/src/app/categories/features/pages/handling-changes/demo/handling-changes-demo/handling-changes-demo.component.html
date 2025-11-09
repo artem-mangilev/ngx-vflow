@@ -2,7 +2,7 @@
   view="auto"
   [nodes]="nodes"
   [edges]="edges"
-  (onConnect)="createEdge($event)"
+  (connect)="createEdge($event)"
   (onNodesChange)="handleNodeChanges($event)"
   (onEdgesChange)="handleEdgeChanges($event)" />
 

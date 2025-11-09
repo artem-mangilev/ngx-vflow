@@ -10,7 +10,7 @@ import { filter, map, tap } from 'rxjs';
 import { EdgeModel } from '../models/edge.model';
 
 @Directive({
-  selector: '[onConnect], [onReconnect]',
+  selector: '[onConnect], [onReconnect], [connect], [reconnect]',
   standalone: true,
 })
 export class ConnectionControllerDirective {
@@ -25,7 +25,7 @@ export class ConnectionControllerDirective {
    * Also it's important to note, that this event only fires when connection is valid by validator function in `ConnectionSettings`,
    * by default without passing the validator every connection concidered valid.
    *
-   * @todo add connect event and deprecate onConnect
+   * @deprecated use `connect` output instead
    */
   // eslint-disable-next-line @angular-eslint/no-output-on-prefix
   public readonly onConnect = outputFromObservable<Connection>(
@@ -37,7 +37,33 @@ export class ConnectionControllerDirective {
     ),
   );
 
+  public readonly connect = outputFromObservable<Connection>(
+    toObservable(this.statusService.status).pipe(
+      filter((status): status is FlowStatusConnectionEnd => status.state === 'connection-end'),
+      map((status) => statusToConnection(status, this.isStrictMode())),
+      tap(() => this.statusService.setIdleStatus()),
+      filter((connection) => this.flowEntitiesService.connection().validator(connection)),
+    ),
+  );
+
+  /**
+   * @deprecated use `reconnect` output instead
+   */
   public readonly onReconnect = outputFromObservable<ReconnectionEvent>(
+    toObservable(this.statusService.status).pipe(
+      filter((status): status is FlowStatusReconnectionEnd => status.state === 'reconnection-end'),
+      map((status) => {
+        const connection = statusToConnection(status, this.isStrictMode());
+        const oldEdge = status.payload.oldEdge.edge;
+
+        return { connection, oldEdge };
+      }),
+      tap(() => this.statusService.setIdleStatus()),
+      filter(({ connection }) => this.flowEntitiesService.connection().validator(connection)),
+    ),
+  );
+
+  public readonly reconnect = outputFromObservable<ReconnectionEvent>(
     toObservable(this.statusService.status).pipe(
       filter((status): status is FlowStatusReconnectionEnd => status.state === 'reconnection-end'),
       map((status) => {
