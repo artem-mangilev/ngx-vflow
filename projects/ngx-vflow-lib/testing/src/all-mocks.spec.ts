@@ -24,7 +24,7 @@ import { VflowMocks } from './vflow-mocks';
       [snapGrid]="[1, 1]"
       [elevateNodesOnSelect]="true"
       (onComponentNodeEvent)="(null)"
-      (onConnect)="(null)">
+      (connect)="(null)">
       <ng-template nodeHtml>
         <div dragHandle selectable resizable [resizerColor]="'#2e414c'" [gap]="1.5">
           <handle [position]="'left'" [type]="'source'" [id]="'1'" [template]="handleTemplate" />
