@@ -2,42 +2,6 @@
   {
     "breadcrumbs": [
       "Features",
-      "Custom handles"
-    ],
-    "pageType": "guide",
-    "title": "Custom handles",
-    "section": "Custom handles",
-    "route": "/features/custom-handles",
-    "fragment": "custom-handles",
-    "content": "You can pass a [template] to HandleComponent with custom handle."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Custom handles"
-    ],
-    "pageType": "guide",
-    "title": "Custom handles",
-    "section": "Custom handles",
-    "route": "/features/custom-handles",
-    "fragment": "custom-handles",
-    "content": "I't important to note that template must be made with SVG."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Custom handles"
-    ],
-    "pageType": "guide",
-    "title": "Custom handles",
-    "section": "Custom handles",
-    "route": "/features/custom-handles",
-    "fragment": "custom-handles",
-    "content": "Custom handles are not positioned automatically, but the library provides a useful template context property to position your handle.Custom handles know if validation of ConnectionSettings.validator() has failed or succeeded, so you can use state() signal in let-ctx to add some behavior based on validation result. Refer to this interface for let-ctx when crafting your handle template:"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
       "Custom background"
     ],
     "pageType": "guide",
@@ -82,6 +46,90 @@
     "route": "/features/custom-background",
     "fragment": "image-background",
     "content": "To make an image background, pass an object to the [background] input according to ImageBackground interface"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Handling changes"
+    ],
+    "pageType": "guide",
+    "title": "Handling changes",
+    "section": "Handling changes",
+    "route": "/features/handling-changes",
+    "fragment": "handling-changes",
+    "content": "You can observe changes in the toasts."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Handling changes"
+    ],
+    "pageType": "guide",
+    "title": "Handling changes",
+    "section": "Handling changes",
+    "route": "/features/handling-changes",
+    "fragment": "handling-changes",
+    "content": "You can observe various changes in nodes and edges. Types of NodeChanges: position - new node position after drag and dropsize - new node sizeadd - when node was createdremove - when node was removedselect - when node was selected (also triggers for unselected nodes) Types of EdgeChanges: add - when edge was createdremove - when edge was removedselect - when edge was selected (also triggers for unselected edges)detached - when edge became invisible due to the absence of the source or target node. Use this to delete such edges from the edges list There are a several ways to receive these changes:"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Handling changes"
+    ],
+    "pageType": "guide",
+    "title": "Handling changes",
+    "section": "From (onNodesChange) and (onEdgesChange) outputs",
+    "route": "/features/handling-changes",
+    "fragment": "from-onnodeschange-and-onedgeschange-outputs",
+    "content": "This is a way to get every possible change. Changes came as non empty arrays: (onNodesChange) emits NodeChange[](onEdgesChange) emits EdgeChange[]"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Handling changes"
+    ],
+    "pageType": "guide",
+    "title": "Handling changes",
+    "section": "From filtered outputs",
+    "route": "/features/handling-changes",
+    "fragment": "from-filtered-outputs",
+    "content": "For your convenience, here is the filtering scheme for changes based on the (onNodesChange) and (onEdgesChange) events: (onNodesChange.[NodeChangeType]) - a list of node changes of a certain type(onNodesChange.[EdgeChangeType]) - a list of edge changes of a certain type(onNodesChange.[NodeChangeType].[Count]) - a list (many) or single (single) node change of a certain type(onEdgesChange.[EdgeChangeType].[Count]) - a list (many) or single (single) edge change of a certain type Where: List of all possible filter outputs:"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom handles"
+    ],
+    "pageType": "guide",
+    "title": "Custom handles",
+    "section": "Custom handles",
+    "route": "/features/custom-handles",
+    "fragment": "custom-handles",
+    "content": "You can pass a [template] to HandleComponent with custom handle."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom handles"
+    ],
+    "pageType": "guide",
+    "title": "Custom handles",
+    "section": "Custom handles",
+    "route": "/features/custom-handles",
+    "fragment": "custom-handles",
+    "content": "I't important to note that template must be made with SVG."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Custom handles"
+    ],
+    "pageType": "guide",
+    "title": "Custom handles",
+    "section": "Custom handles",
+    "route": "/features/custom-handles",
+    "fragment": "custom-handles",
+    "content": "Custom handles are not positioned automatically, but the library provides a useful template context property to position your handle.Custom handles know if validation of ConnectionSettings.validator() has failed or succeeded, so you can use state() signal in let-ctx to add some behavior based on validation result. Refer to this interface for let-ctx when crafting your handle template:"
   },
   {
     "breadcrumbs": [
@@ -178,54 +226,6 @@
     "route": "/features/keyboard-shortcuts",
     "fragment": "customization",
     "content": "To customize the keyboard shortcuts for specific actions, pass a [keyboardShortcuts] input object to the VflowComponent with the following KeyboardShortcuts interface. Here are some key details: The passed object will be merged with the default key combinations.To disable a specific action, pass null for that action.If you want to trigger an action with multiple keys, pass an array of keys. Note: this is not a key combination. For example, if you pass ['ShiftLeft', 'ControlLeft'], the action will be triggered by either ShiftLeft or ControlLeft, but not by pressing both together (ShiftLeft+ControlLeft).You can find the list of available key codes here. In the following example, the default combination for multiSelection is replaced with ['ShiftLeft', 'ShiftRight']."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Handling changes"
-    ],
-    "pageType": "guide",
-    "title": "Handling changes",
-    "section": "Handling changes",
-    "route": "/features/handling-changes",
-    "fragment": "handling-changes",
-    "content": "You can observe changes in the toasts."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Handling changes"
-    ],
-    "pageType": "guide",
-    "title": "Handling changes",
-    "section": "Handling changes",
-    "route": "/features/handling-changes",
-    "fragment": "handling-changes",
-    "content": "You can observe various changes in nodes and edges. Types of NodeChanges: position - new node position after drag and dropsize - new node sizeadd - when node was createdremove - when node was removedselect - when node was selected (also triggers for unselected nodes) Types of EdgeChanges: add - when edge was createdremove - when edge was removedselect - when edge was selected (also triggers for unselected edges)detached - when edge became invisible due to the absence of the source or target node. Use this to delete such edges from the edges list There are a several ways to receive these changes:"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Handling changes"
-    ],
-    "pageType": "guide",
-    "title": "Handling changes",
-    "section": "From (onNodesChange) and (onEdgesChange) outputs",
-    "route": "/features/handling-changes",
-    "fragment": "from-onnodeschange-and-onedgeschange-outputs",
-    "content": "This is a way to get every possible change. Changes came as non empty arrays: (onNodesChange) emits NodeChange[](onEdgesChange) emits EdgeChange[]"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Handling changes"
-    ],
-    "pageType": "guide",
-    "title": "Handling changes",
-    "section": "From filtered outputs",
-    "route": "/features/handling-changes",
-    "fragment": "from-filtered-outputs",
-    "content": "For your convenience, here is the filtering scheme for changes based on the (onNodesChange) and (onEdgesChange) events: (onNodesChange.[NodeChangeType]) - a list of node changes of a certain type(onNodesChange.[EdgeChangeType]) - a list of edge changes of a certain type(onNodesChange.[NodeChangeType].[Count]) - a list (many) or single (single) node change of a certain type(onEdgesChange.[EdgeChangeType].[Count]) - a list (many) or single (single) edge change of a certain type Where: List of all possible filter outputs:"
   },
   {
     "breadcrumbs": [
@@ -422,6 +422,18 @@
   {
     "breadcrumbs": [
       "Features",
+      "Snap to Grid"
+    ],
+    "pageType": "guide",
+    "title": "Snap to Grid",
+    "section": "Snap to Grid",
+    "route": "/features/snap-to-grid",
+    "fragment": "snap-to-grid",
+    "content": "You can snap nodes to the grid by passing the snapGrid input to the VflowComponent"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
       "View size"
     ],
     "pageType": "guide",
@@ -442,18 +454,6 @@
     "route": "/features/view-size",
     "fragment": "fixed-size",
     "content": "vflow can take fixed space if you pass [view]=\"[600, 600]\" input, where first item of array is width (in pixels), and the second is height (in pixels)."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Snap to Grid"
-    ],
-    "pageType": "guide",
-    "title": "Snap to Grid",
-    "section": "Snap to Grid",
-    "route": "/features/snap-to-grid",
-    "fragment": "snap-to-grid",
-    "content": "You can snap nodes to the grid by passing the snapGrid input to the VflowComponent"
   },
   {
     "breadcrumbs": [
@@ -590,18 +590,6 @@
   {
     "breadcrumbs": [
       "Getting Started",
-      "Principles"
-    ],
-    "pageType": "guide",
-    "title": "Principles",
-    "section": "Principles",
-    "route": "/getting-started/principles",
-    "fragment": "principles",
-    "content": "This page contains a list of general principles that impact feature implementation. No hidden mutations of your data. For example, the library does not modify any of the Node or Edge objects you pass in as inputs. Instead, it creates internal models around these entities and operates on them. Any changes to the passed entities can be observed through events.This principle also implies that you are responsible for managing invalid data. For instance, if you delete a node, the edges corresponding to this node will not be deleted automatically. However, the library will notify you about detached edges so that you can easily delete them."
-  },
-  {
-    "breadcrumbs": [
-      "Getting Started",
       "Migrations"
     ],
     "pageType": "guide",
@@ -610,6 +598,18 @@
     "route": "/getting-started/migration",
     "fragment": "migration-to--v10",
     "content": "remove imports of VflowModule and use Vflow instead (Vflow contains all public standalone components and directives).for standalone components, simply add Vflow to the imports array.for modules, you need to spread ...Vflow into the imports array; otherwise, you will get a type error.remove usage of the computeLayersOnInit setting from the Optimization interface.remove usage of the handlePositions input in the VflowComponent.for classes extending CustomNodeComponent and CustomDynamicNodeComponent:replace this.node to this.node() due to signal input internal migration."
+  },
+  {
+    "breadcrumbs": [
+      "Getting Started",
+      "Principles"
+    ],
+    "pageType": "guide",
+    "title": "Principles",
+    "section": "Principles",
+    "route": "/getting-started/principles",
+    "fragment": "principles",
+    "content": "This page contains a list of general principles that impact feature implementation. No hidden mutations of your data. For example, the library does not modify any of the Node or Edge objects you pass in as inputs. Instead, it creates internal models around these entities and operates on them. Any changes to the passed entities can be observed through events.This principle also implies that you are responsible for managing invalid data. For instance, if you delete a node, the edges corresponding to this node will not be deleted automatically. However, the library will notify you about detached edges so that you can easily delete them."
   },
   {
     "breadcrumbs": [
@@ -686,18 +686,6 @@
   {
     "breadcrumbs": [
       "Workshops",
-      "Drag and drop nodes"
-    ],
-    "pageType": "guide",
-    "title": "Drag and drop nodes",
-    "section": "Drag and drop nodes",
-    "route": "/workshops/drag-and-drop-nodes",
-    "fragment": "drag-and-drop-nodes",
-    "content": "This workshop will show you how to implement dynamic node creation with basic drag and drop functionality. It also demonstrates how to attach nodes to groups or detach them from groups. This implementation uses the following APIs from VflowComponent: documentPointToFlowPoint() to get a stack of SpacePointsgetIntersectingNodes() to get intersections between nodes during drag operationstoNodeSpace() to get a node's position in the coordinate system of another node"
-  },
-  {
-    "breadcrumbs": [
-      "Workshops",
       "Delete selected"
     ],
     "pageType": "guide",
@@ -710,6 +698,18 @@
   {
     "breadcrumbs": [
       "Workshops",
+      "Drag and drop nodes"
+    ],
+    "pageType": "guide",
+    "title": "Drag and drop nodes",
+    "section": "Drag and drop nodes",
+    "route": "/workshops/drag-and-drop-nodes",
+    "fragment": "drag-and-drop-nodes",
+    "content": "This workshop will show you how to implement dynamic node creation with basic drag and drop functionality. It also demonstrates how to attach nodes to groups or detach them from groups. This implementation uses the following APIs from VflowComponent: documentPointToFlowPoint() to get a stack of SpacePointsgetIntersectingNodes() to get intersections between nodes during drag operationstoNodeSpace() to get a node's position in the coordinate system of another node"
+  },
+  {
+    "breadcrumbs": [
+      "Workshops",
       "Stress Test"
     ],
     "pageType": "guide",
@@ -718,6 +718,838 @@
     "route": "/workshops/stress-test",
     "fragment": "stress-test",
     "content": "The library can render 1000+ nodes instantly while maintaining smooth user interactions."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Alignment Helper"
+    ],
+    "pageType": "guide",
+    "title": "Alignment Helper",
+    "section": "Alignment Helper",
+    "route": "/features/nodes/alignment-helper",
+    "fragment": "alignment-helper",
+    "content": "The library supports alignment lines that help align nodes relative to each other. To enable this feature, pass the [alignmentHelper] input to the VflowComponent. Its value can be either: true – to enable the helper with default settingsAn AlignmentHelperSettings object – to configure the helper with custom settings Try aligning the following flow:"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Custom nodes",
+    "route": "/features/nodes/custom-nodes",
+    "fragment": "custom-nodes",
+    "content": "Be careful with CSS rules applied to node content. Custom nodes are implemented with SVG's foreignObject element, and Safari has issues with some CSS rules inside foreignObject. Therefore, please check this browser when applying complex styling."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Custom nodes",
+    "route": "/features/nodes/custom-nodes",
+    "fragment": "custom-nodes",
+    "content": "This is where things become a lot more interesting. You can create custom nodes with HTML and CSS."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Template nodes",
+    "route": "/features/nodes/custom-nodes",
+    "fragment": "template-nodes",
+    "content": "You can create custom nodes with ng-template Follow these steps to achieve this:"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Template nodes",
+    "route": "/features/nodes/custom-nodes",
+    "fragment": "template-nodes",
+    "content": "Set "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Template nodes",
+    "route": "/features/nodes/custom-nodes",
+    "fragment": "template-nodes",
+    "content": "type"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Template nodes",
+    "route": "/features/nodes/custom-nodes",
+    "fragment": "template-nodes",
+    "content": " of node to "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Template nodes",
+    "route": "/features/nodes/custom-nodes",
+    "fragment": "template-nodes",
+    "content": "html-template"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Template nodes",
+    "route": "/features/nodes/custom-nodes",
+    "fragment": "template-nodes",
+    "content": "Provide "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Template nodes",
+    "route": "/features/nodes/custom-nodes",
+    "fragment": "template-nodes",
+    "content": "ng-template"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Template nodes",
+    "route": "/features/nodes/custom-nodes",
+    "fragment": "template-nodes",
+    "content": " with "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Template nodes",
+    "route": "/features/nodes/custom-nodes",
+    "fragment": "template-nodes",
+    "content": "nodeHtml"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Template nodes",
+    "route": "/features/nodes/custom-nodes",
+    "fragment": "template-nodes",
+    "content": " selector inside "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Template nodes",
+    "route": "/features/nodes/custom-nodes",
+    "fragment": "template-nodes",
+    "content": "vflow"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Template nodes",
+    "route": "/features/nodes/custom-nodes",
+    "fragment": "template-nodes",
+    "content": "Write your HTML inside this template You can also pass any data with "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Template nodes",
+    "route": "/features/nodes/custom-nodes",
+    "fragment": "template-nodes",
+    "content": "data"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Template nodes",
+    "route": "/features/nodes/custom-nodes",
+    "fragment": "template-nodes",
+    "content": " field on node, and then get it inside "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Template nodes",
+    "route": "/features/nodes/custom-nodes",
+    "fragment": "template-nodes",
+    "content": "ng-template"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Component nodes",
+    "route": "/features/nodes/custom-nodes",
+    "fragment": "component-nodes",
+    "content": "Another approach is to render nodes from components. Its benefits: type-safe node data accessgood for complex flows with many different node types Its limitations it's harder to manage events because such nodes are rendered dynamically How to create component node:"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Component nodes",
+    "route": "/features/nodes/custom-nodes",
+    "fragment": "component-nodes",
+    "content": "Create a regular angular standalone component Extend with "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Component nodes",
+    "route": "/features/nodes/custom-nodes",
+    "fragment": "component-nodes",
+    "content": "CustomNodeComponent"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Component nodes",
+    "route": "/features/nodes/custom-nodes",
+    "fragment": "component-nodes",
+    "content": " (please see the reference of this base component to get an idea of what fields you could use in your custom component node), otherwise it won't work! Pass your data interface to generic of "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Component nodes",
+    "route": "/features/nodes/custom-nodes",
+    "fragment": "component-nodes",
+    "content": "CustomNodeComponent"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Component nodes",
+    "route": "/features/nodes/custom-nodes",
+    "fragment": "component-nodes",
+    "content": " to use in component. This "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Component nodes",
+    "route": "/features/nodes/custom-nodes",
+    "fragment": "component-nodes",
+    "content": "data"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Component nodes",
+    "route": "/features/nodes/custom-nodes",
+    "fragment": "component-nodes",
+    "content": " comes from "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Component nodes",
+    "route": "/features/nodes/custom-nodes",
+    "fragment": "component-nodes",
+    "content": "Node"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Component nodes",
+    "route": "/features/nodes/custom-nodes",
+    "fragment": "component-nodes",
+    "content": " definition Use your new component in "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Component nodes",
+    "route": "/features/nodes/custom-nodes",
+    "fragment": "component-nodes",
+    "content": "type"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Component nodes",
+    "route": "/features/nodes/custom-nodes",
+    "fragment": "component-nodes",
+    "content": " field of "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Component nodes",
+    "route": "/features/nodes/custom-nodes",
+    "fragment": "component-nodes",
+    "content": "Node"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Component nodes",
+    "route": "/features/nodes/custom-nodes",
+    "fragment": "component-nodes",
+    "content": ". Library will render your node for you"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Handling events",
+    "route": "/features/nodes/custom-nodes",
+    "fragment": "handling-events",
+    "content": "This is an experimental API"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Handling events",
+    "route": "/features/nodes/custom-nodes",
+    "fragment": "handling-events",
+    "content": "There is a (onComponentNodeEvent) event on VflowComponent. Here is how it works:"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Handling events",
+    "route": "/features/nodes/custom-nodes",
+    "fragment": "handling-events",
+    "content": "It accumulates every "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Handling events",
+    "route": "/features/nodes/custom-nodes",
+    "fragment": "handling-events",
+    "content": "EventEmitter"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Handling events",
+    "route": "/features/nodes/custom-nodes",
+    "fragment": "handling-events",
+    "content": " of every component node of your flow It emits on every emit of those emitters"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Custom nodes"
+    ],
+    "pageType": "guide",
+    "title": "Custom nodes",
+    "section": "Handling events",
+    "route": "/features/nodes/custom-nodes",
+    "fragment": "handling-events",
+    "content": "The shape of this accumulator-event contains following useful info: The Library also includes ComponentNodeEvent helper type to get type-safe event, where you just need to pass an array of your custom components in generic, and this type will infer proper types for eventName and eventPayload:"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Draggables"
+    ],
+    "pageType": "guide",
+    "title": "Draggables",
+    "section": "Disabling",
+    "route": "/features/nodes/draggables",
+    "fragment": "disabling",
+    "content": "You can disable draggable behavior on certain Node or DynamicNode by passing false."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Draggables"
+    ],
+    "pageType": "guide",
+    "title": "Draggables",
+    "section": "Drag handle",
+    "route": "/features/nodes/draggables",
+    "fragment": "drag-handle",
+    "content": "You can restrict dragging to a specific part of node, by adding dragHandle directive to this element. It's important to note that if a node contains at least one dragHandle, it can only be dragged from those specific areas where dragHandle was added. Otherwise, the entire node can be dragged, provided the draggable property is set to true."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Node toolbar"
+    ],
+    "pageType": "guide",
+    "title": "Node toolbar",
+    "section": "Node toolbar",
+    "route": "/features/nodes/node-toolbar",
+    "fragment": "node-toolbar",
+    "content": "You can add a NodeToolbarComponent to your node. The content of this component is automatically positioned near one side of the node, based on the value of the position input."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Node toolbar"
+    ],
+    "pageType": "guide",
+    "title": "Node toolbar",
+    "section": "Multiple Toolbars",
+    "route": "/features/nodes/node-toolbar",
+    "fragment": "multiple-toolbars",
+    "content": "It's also possible to add multiple toolbars to the same node by simply including multiple NodeToolbarComponent instances with different position inputs."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Resizer"
+    ],
+    "pageType": "guide",
+    "title": "Resizer",
+    "section": "Resizer",
+    "route": "/features/nodes/resizer",
+    "fragment": "resizer",
+    "content": "You might want to resize your node. This functionality works with nearly all types of nodes."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Resizer"
+    ],
+    "pageType": "guide",
+    "title": "Resizer",
+    "section": "Resize default group",
+    "route": "/features/nodes/resizer",
+    "fragment": "resize-default-group",
+    "content": "To resize a default group, simply pass the resizable flag to a Node (or DynamicNode) of type default-group."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Resizer"
+    ],
+    "pageType": "guide",
+    "title": "Resizer",
+    "section": "Resize template group",
+    "route": "/features/nodes/resizer",
+    "fragment": "resize-template-group",
+    "content": "This provides a way to have more control over the resizer: Create a template-group node.If you want the resizer to appear consistently, add the resizable directive to the SVG element (likely a "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Resizer"
+    ],
+    "pageType": "guide",
+    "title": "Resizer",
+    "section": "Resize template group",
+    "route": "/features/nodes/resizer",
+    "fragment": "resize-template-group",
+    "content": ") representing your group.If you want the resizer to appear conditionally, apply the directive as [resizable]=\"yourCondition\". You can bind the visibility of the resizer to the node’s selection state (see the code below for an example).Important: Use the ctx.width() and ctx.height() signals from the context, not ctx.node.width and ctx.node.height. The latter properties are not reactive, so the node won’t update its size based on the resizer.The resizer respects the min-width and min-height CSS properties of the resizable node.Optionally, you can customize the [resizerColor] and the [gap] between the node and the resizer, with more customization options coming in the future.\""
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Resizer"
+    ],
+    "pageType": "guide",
+    "title": "Resizer",
+    "section": "Resize a template/component regular node",
+    "route": "/features/nodes/resizer",
+    "fragment": "resize-a-templatecomponent-regular-node",
+    "content": "The algorithm is almost the same as for template-group nodes: Create a node of type html-template or CustomNodeComponent (CustomDynamicNodeComponent).If you want the resizer to always appear, add the resizable directive to the top-level element of your custom node (ideally, a wrapper for the entire node content).If you want the resizer to appear conditionally, apply the directive as [resizable]=\"yourCondition\". Binding the visibility of the resizer to the node’s selection state can be useful.The resizer respects the min-width and min-height CSS properties of the element where the directive is applied.It's up to you to adjust the CSS of your custom node to ensure it renders correctly during resizing. The library only modifies the container size.Optionally, you can customize the [resizerColor] and the [gap] between the node and the resizer, with more customization options coming in the future."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Resizer"
+    ],
+    "pageType": "guide",
+    "title": "Resizer",
+    "section": "Resize event",
+    "route": "/features/nodes/resizer",
+    "fragment": "resize-event",
+    "content": "You may want to perform some actions on resize. To do this, simply add handler to the (onNodesChange.size) output of the "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Resizer"
+    ],
+    "pageType": "guide",
+    "title": "Resizer",
+    "section": "Resize event",
+    "route": "/features/nodes/resizer",
+    "fragment": "resize-event",
+    "content": " component."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Resizer"
+    ],
+    "pageType": "guide",
+    "title": "Resizer",
+    "section": "See also",
+    "route": "/features/nodes/resizer",
+    "fragment": "see-also",
+    "content": "SubflowsCustom nodesHandling changes"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Subflows"
+    ],
+    "pageType": "guide",
+    "title": "Subflows",
+    "section": "Subflows",
+    "route": "/features/nodes/subflows",
+    "fragment": "subflows",
+    "content": "A subflow is a node that can contain child nodes. Key things about subflows: To create a subflow, you need to use a default-group or template-group type on Node or DynamicNode.To associate a node with a subflow, set the parentId to the ID of the subflow.Nodes within a subflow have coordinates relative to that subflow.A subflow is itself a node, so it can act as a source or a target (this functionality is available only for template-group subflows).Use the groupNode directive on an ng-template to define your custom subflow. While a custom subflow can theoretically be any SVG structure, it's recommended to use the "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Subflows"
+    ],
+    "pageType": "guide",
+    "title": "Subflows",
+    "section": "Subflows",
+    "route": "/features/nodes/subflows",
+    "fragment": "subflows",
+    "content": " element."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Subflows"
+    ],
+    "pageType": "guide",
+    "title": "Subflows",
+    "section": "See also",
+    "route": "/features/nodes/subflows",
+    "fragment": "see-also",
+    "content": "DefaultGroupNodeTemplateGroupNodeDefaultDynamicGroupNodeTemplateDynamicGroupNode"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "SVG Nodes"
+    ],
+    "pageType": "guide",
+    "title": "SVG Nodes",
+    "section": "SVG Nodes",
+    "route": "/features/nodes/svg-nodes",
+    "fragment": "svg-nodes",
+    "content": "SVG nodes allow you to create custom node shapes using SVG elements. To create an SVG node:"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "SVG Nodes"
+    ],
+    "pageType": "guide",
+    "title": "SVG Nodes",
+    "section": "SVG Nodes",
+    "route": "/features/nodes/svg-nodes",
+    "fragment": "svg-nodes",
+    "content": "Define a node with "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "SVG Nodes"
+    ],
+    "pageType": "guide",
+    "title": "SVG Nodes",
+    "section": "SVG Nodes",
+    "route": "/features/nodes/svg-nodes",
+    "fragment": "svg-nodes",
+    "content": "type: 'svg-template'"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "SVG Nodes"
+    ],
+    "pageType": "guide",
+    "title": "SVG Nodes",
+    "section": "SVG Nodes",
+    "route": "/features/nodes/svg-nodes",
+    "fragment": "svg-nodes",
+    "content": "Use the "
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "SVG Nodes"
+    ],
+    "pageType": "guide",
+    "title": "SVG Nodes",
+    "section": "SVG Nodes",
+    "route": "/features/nodes/svg-nodes",
+    "fragment": "svg-nodes",
+    "content": "nodeSvg"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "SVG Nodes"
+    ],
+    "pageType": "guide",
+    "title": "SVG Nodes",
+    "section": "SVG Nodes",
+    "route": "/features/nodes/svg-nodes",
+    "fragment": "svg-nodes",
+    "content": " template in your Vflow component Access node properties via the template context ("
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "SVG Nodes"
+    ],
+    "pageType": "guide",
+    "title": "SVG Nodes",
+    "section": "SVG Nodes",
+    "route": "/features/nodes/svg-nodes",
+    "fragment": "svg-nodes",
+    "content": "ctx"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "SVG Nodes"
+    ],
+    "pageType": "guide",
+    "title": "SVG Nodes",
+    "section": "SVG Nodes",
+    "route": "/features/nodes/svg-nodes",
+    "fragment": "svg-nodes",
+    "content": ")"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "SVG Nodes"
+    ],
+    "pageType": "guide",
+    "title": "SVG Nodes",
+    "section": "SVG Nodes",
+    "route": "/features/nodes/svg-nodes",
+    "fragment": "svg-nodes",
+    "content": "The template context has the following type:"
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Nodes",
+      "Default nodes"
+    ],
+    "pageType": "guide",
+    "title": "Default nodes",
+    "section": "Default nodes",
+    "route": "/features/nodes/default-nodes",
+    "fragment": "default-nodes",
+    "content": "To get started, you just need to provide nodes array to vflow component."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Connection validation"
+    ],
+    "pageType": "guide",
+    "title": "Connection validation",
+    "section": "Connection validation",
+    "route": "/features/edges/connection-validation",
+    "fragment": "connection-validation",
+    "content": "ngx-vflow supports real-time synchronous validation of connections. Validation occurs when a user attempts to create a new edge. By default, every connection is valid, but you can provide a ConnectionSettings with a validatior callback where you specify the validation logic. For example, in this case, validation only passes connections from node 1 to node 2. If the validator returns false, the (connect) event won't be triggered because there is no valid connection."
   },
   {
     "breadcrumbs": [
@@ -756,7 +1588,7 @@
     "section": "Connection",
     "route": "/features/edges/connection",
     "fragment": "connection",
-    "content": "(onConnect)"
+    "content": "(connect)"
   },
   {
     "breadcrumbs": [
@@ -952,19 +1784,6 @@
     "route": "/features/edges/connection",
     "fragment": "loose-connections",
     "content": "This is the 'loose' mode of ConnectionSettings, where the flow ignores the handle type and allows any handle to connect with any other handle. In this mode, an id must be provided for the HandleComponent to function correctly."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Connection validation"
-    ],
-    "pageType": "guide",
-    "title": "Connection validation",
-    "section": "Connection validation",
-    "route": "/features/edges/connection-validation",
-    "fragment": "connection-validation",
-    "content": "ngx-vflow supports real-time synchronous validation of connections. Validation occurs when a user attempts to create a new edge. By default, every connection is valid, but you can provide a ConnectionSettings with a validatior callback where you specify the validation logic. For example, in this case, validation only passes connections from node 1 to node 2. If the validator returns false, the (onConnect) event won't be triggered because there is no valid connection."
   },
   {
     "breadcrumbs": [
@@ -1477,6 +2296,32 @@
     "breadcrumbs": [
       "Features",
       "Edges",
+      "Floating Edges"
+    ],
+    "pageType": "guide",
+    "title": "Floating Edges",
+    "section": "Floating Edges",
+    "route": "/features/edges/floating-edges",
+    "fragment": "floating-edges",
+    "content": "The library supports floating edges. A floating edge is an edge that connects the closest handles of the source and target nodes. You can enable floating edges using the floating flag on Edge."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
+      "Floating Edges"
+    ],
+    "pageType": "guide",
+    "title": "Floating Edges",
+    "section": "Floating Edges",
+    "route": "/features/edges/floating-edges",
+    "fragment": "floating-edges",
+    "content": "Since the library always looks for the closest handles between nodes, there can only be one edge between any two nodes. Keep this in mind when building your flows. This limitation may be addressed in future releases."
+  },
+  {
+    "breadcrumbs": [
+      "Features",
+      "Edges",
       "Labels"
     ],
     "pageType": "guide",
@@ -1537,32 +2382,6 @@
     "route": "/features/edges/labels",
     "fragment": "context",
     "content": "You may access some data for label through let-ctx according to this interface."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Floating Edges"
-    ],
-    "pageType": "guide",
-    "title": "Floating Edges",
-    "section": "Floating Edges",
-    "route": "/features/edges/floating-edges",
-    "fragment": "floating-edges",
-    "content": "The library supports floating edges. A floating edge is an edge that connects the closest handles of the source and target nodes. You can enable floating edges using the floating flag on Edge."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Edges",
-      "Floating Edges"
-    ],
-    "pageType": "guide",
-    "title": "Floating Edges",
-    "section": "Floating Edges",
-    "route": "/features/edges/floating-edges",
-    "fragment": "floating-edges",
-    "content": "Since the library always looks for the closest handles between nodes, there can only be one edge between any two nodes. Keep this in mind when building your flows. This limitation may be addressed in future releases."
   },
   {
     "breadcrumbs": [
@@ -1666,7 +2485,7 @@
     "section": "Reconnect Edge",
     "route": "/features/edges/reconnect-edges",
     "fragment": "reconnect-edge",
-    "content": "(onReconnect)"
+    "content": "(reconnect)"
   },
   {
     "breadcrumbs": [
@@ -1836,825 +2655,6 @@
     "route": "/features/edges/reconnect-edges",
     "fragment": "reconnect-edge",
     "content": ", then remove the reference to the old edge from the list."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Alignment Helper"
-    ],
-    "pageType": "guide",
-    "title": "Alignment Helper",
-    "section": "Alignment Helper",
-    "route": "/features/nodes/alignment-helper",
-    "fragment": "alignment-helper",
-    "content": "The library supports alignment lines that help align nodes relative to each other. To enable this feature, pass the [alignmentHelper] input to the VflowComponent. Its value can be either: true – to enable the helper with default settingsAn AlignmentHelperSettings object – to configure the helper with custom settings Try aligning the following flow:"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Custom nodes",
-    "route": "/features/nodes/custom-nodes",
-    "fragment": "custom-nodes",
-    "content": "Be careful with CSS rules applied to node content. Custom nodes are implemented with SVG's foreignObject element, and Safari has issues with some CSS rules inside foreignObject. Therefore, please check this browser when applying complex styling."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Custom nodes",
-    "route": "/features/nodes/custom-nodes",
-    "fragment": "custom-nodes",
-    "content": "This is where things become a lot more interesting. You can create custom nodes with HTML and CSS."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Template nodes",
-    "route": "/features/nodes/custom-nodes",
-    "fragment": "template-nodes",
-    "content": "You can create custom nodes with ng-template Follow these steps to achieve this:"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Template nodes",
-    "route": "/features/nodes/custom-nodes",
-    "fragment": "template-nodes",
-    "content": "Set "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Template nodes",
-    "route": "/features/nodes/custom-nodes",
-    "fragment": "template-nodes",
-    "content": "type"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Template nodes",
-    "route": "/features/nodes/custom-nodes",
-    "fragment": "template-nodes",
-    "content": " of node to "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Template nodes",
-    "route": "/features/nodes/custom-nodes",
-    "fragment": "template-nodes",
-    "content": "html-template"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Template nodes",
-    "route": "/features/nodes/custom-nodes",
-    "fragment": "template-nodes",
-    "content": "Provide "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Template nodes",
-    "route": "/features/nodes/custom-nodes",
-    "fragment": "template-nodes",
-    "content": "ng-template"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Template nodes",
-    "route": "/features/nodes/custom-nodes",
-    "fragment": "template-nodes",
-    "content": " with "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Template nodes",
-    "route": "/features/nodes/custom-nodes",
-    "fragment": "template-nodes",
-    "content": "nodeHtml"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Template nodes",
-    "route": "/features/nodes/custom-nodes",
-    "fragment": "template-nodes",
-    "content": " selector inside "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Template nodes",
-    "route": "/features/nodes/custom-nodes",
-    "fragment": "template-nodes",
-    "content": "vflow"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Template nodes",
-    "route": "/features/nodes/custom-nodes",
-    "fragment": "template-nodes",
-    "content": "Write your HTML inside this template You can also pass any data with "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Template nodes",
-    "route": "/features/nodes/custom-nodes",
-    "fragment": "template-nodes",
-    "content": "data"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Template nodes",
-    "route": "/features/nodes/custom-nodes",
-    "fragment": "template-nodes",
-    "content": " field on node, and then get it inside "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Template nodes",
-    "route": "/features/nodes/custom-nodes",
-    "fragment": "template-nodes",
-    "content": "ng-template"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Component nodes",
-    "route": "/features/nodes/custom-nodes",
-    "fragment": "component-nodes",
-    "content": "Another approach is to render nodes from components. Its benefits: type-safe node data accessgood for complex flows with many different node types Its limitations it's harder to manage events because such nodes are rendered dynamically How to create component node:"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Component nodes",
-    "route": "/features/nodes/custom-nodes",
-    "fragment": "component-nodes",
-    "content": "Create a regular angular standalone component Extend with "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Component nodes",
-    "route": "/features/nodes/custom-nodes",
-    "fragment": "component-nodes",
-    "content": "CustomNodeComponent"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Component nodes",
-    "route": "/features/nodes/custom-nodes",
-    "fragment": "component-nodes",
-    "content": " (please see the reference of this base component to get an idea of what fields you could use in your custom component node), otherwise it won't work! Pass your data interface to generic of "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Component nodes",
-    "route": "/features/nodes/custom-nodes",
-    "fragment": "component-nodes",
-    "content": "CustomNodeComponent"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Component nodes",
-    "route": "/features/nodes/custom-nodes",
-    "fragment": "component-nodes",
-    "content": " to use in component. This "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Component nodes",
-    "route": "/features/nodes/custom-nodes",
-    "fragment": "component-nodes",
-    "content": "data"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Component nodes",
-    "route": "/features/nodes/custom-nodes",
-    "fragment": "component-nodes",
-    "content": " comes from "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Component nodes",
-    "route": "/features/nodes/custom-nodes",
-    "fragment": "component-nodes",
-    "content": "Node"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Component nodes",
-    "route": "/features/nodes/custom-nodes",
-    "fragment": "component-nodes",
-    "content": " definition Use your new component in "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Component nodes",
-    "route": "/features/nodes/custom-nodes",
-    "fragment": "component-nodes",
-    "content": "type"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Component nodes",
-    "route": "/features/nodes/custom-nodes",
-    "fragment": "component-nodes",
-    "content": " field of "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Component nodes",
-    "route": "/features/nodes/custom-nodes",
-    "fragment": "component-nodes",
-    "content": "Node"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Component nodes",
-    "route": "/features/nodes/custom-nodes",
-    "fragment": "component-nodes",
-    "content": ". Library will render your node for you"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Handling events",
-    "route": "/features/nodes/custom-nodes",
-    "fragment": "handling-events",
-    "content": "This is an experimental API"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Handling events",
-    "route": "/features/nodes/custom-nodes",
-    "fragment": "handling-events",
-    "content": "There is a (onComponentNodeEvent) event on VflowComponent. Here is how it works:"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Handling events",
-    "route": "/features/nodes/custom-nodes",
-    "fragment": "handling-events",
-    "content": "It accumulates every "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Handling events",
-    "route": "/features/nodes/custom-nodes",
-    "fragment": "handling-events",
-    "content": "EventEmitter"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Handling events",
-    "route": "/features/nodes/custom-nodes",
-    "fragment": "handling-events",
-    "content": " of every component node of your flow It emits on every emit of those emitters"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Custom nodes"
-    ],
-    "pageType": "guide",
-    "title": "Custom nodes",
-    "section": "Handling events",
-    "route": "/features/nodes/custom-nodes",
-    "fragment": "handling-events",
-    "content": "The shape of this accumulator-event contains following useful info: The Library also includes ComponentNodeEvent helper type to get type-safe event, where you just need to pass an array of your custom components in generic, and this type will infer proper types for eventName and eventPayload:"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Default nodes"
-    ],
-    "pageType": "guide",
-    "title": "Default nodes",
-    "section": "Default nodes",
-    "route": "/features/nodes/default-nodes",
-    "fragment": "default-nodes",
-    "content": "To get started, you just need to provide nodes array to vflow component."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Draggables"
-    ],
-    "pageType": "guide",
-    "title": "Draggables",
-    "section": "Disabling",
-    "route": "/features/nodes/draggables",
-    "fragment": "disabling",
-    "content": "You can disable draggable behavior on certain Node or DynamicNode by passing false."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Draggables"
-    ],
-    "pageType": "guide",
-    "title": "Draggables",
-    "section": "Drag handle",
-    "route": "/features/nodes/draggables",
-    "fragment": "drag-handle",
-    "content": "You can restrict dragging to a specific part of node, by adding dragHandle directive to this element. It's important to note that if a node contains at least one dragHandle, it can only be dragged from those specific areas where dragHandle was added. Otherwise, the entire node can be dragged, provided the draggable property is set to true."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Node toolbar"
-    ],
-    "pageType": "guide",
-    "title": "Node toolbar",
-    "section": "Node toolbar",
-    "route": "/features/nodes/node-toolbar",
-    "fragment": "node-toolbar",
-    "content": "You can add a NodeToolbarComponent to your node. The content of this component is automatically positioned near one side of the node, based on the value of the position input."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Node toolbar"
-    ],
-    "pageType": "guide",
-    "title": "Node toolbar",
-    "section": "Multiple Toolbars",
-    "route": "/features/nodes/node-toolbar",
-    "fragment": "multiple-toolbars",
-    "content": "It's also possible to add multiple toolbars to the same node by simply including multiple NodeToolbarComponent instances with different position inputs."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Subflows"
-    ],
-    "pageType": "guide",
-    "title": "Subflows",
-    "section": "Subflows",
-    "route": "/features/nodes/subflows",
-    "fragment": "subflows",
-    "content": "A subflow is a node that can contain child nodes. Key things about subflows: To create a subflow, you need to use a default-group or template-group type on Node or DynamicNode.To associate a node with a subflow, set the parentId to the ID of the subflow.Nodes within a subflow have coordinates relative to that subflow.A subflow is itself a node, so it can act as a source or a target (this functionality is available only for template-group subflows).Use the groupNode directive on an ng-template to define your custom subflow. While a custom subflow can theoretically be any SVG structure, it's recommended to use the "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Subflows"
-    ],
-    "pageType": "guide",
-    "title": "Subflows",
-    "section": "Subflows",
-    "route": "/features/nodes/subflows",
-    "fragment": "subflows",
-    "content": " element."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Subflows"
-    ],
-    "pageType": "guide",
-    "title": "Subflows",
-    "section": "See also",
-    "route": "/features/nodes/subflows",
-    "fragment": "see-also",
-    "content": "DefaultGroupNodeTemplateGroupNodeDefaultDynamicGroupNodeTemplateDynamicGroupNode"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Resizer"
-    ],
-    "pageType": "guide",
-    "title": "Resizer",
-    "section": "Resizer",
-    "route": "/features/nodes/resizer",
-    "fragment": "resizer",
-    "content": "You might want to resize your node. This functionality works with nearly all types of nodes."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Resizer"
-    ],
-    "pageType": "guide",
-    "title": "Resizer",
-    "section": "Resize default group",
-    "route": "/features/nodes/resizer",
-    "fragment": "resize-default-group",
-    "content": "To resize a default group, simply pass the resizable flag to a Node (or DynamicNode) of type default-group."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Resizer"
-    ],
-    "pageType": "guide",
-    "title": "Resizer",
-    "section": "Resize template group",
-    "route": "/features/nodes/resizer",
-    "fragment": "resize-template-group",
-    "content": "This provides a way to have more control over the resizer: Create a template-group node.If you want the resizer to appear consistently, add the resizable directive to the SVG element (likely a "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Resizer"
-    ],
-    "pageType": "guide",
-    "title": "Resizer",
-    "section": "Resize template group",
-    "route": "/features/nodes/resizer",
-    "fragment": "resize-template-group",
-    "content": ") representing your group.If you want the resizer to appear conditionally, apply the directive as [resizable]=\"yourCondition\". You can bind the visibility of the resizer to the node’s selection state (see the code below for an example).Important: Use the ctx.width() and ctx.height() signals from the context, not ctx.node.width and ctx.node.height. The latter properties are not reactive, so the node won’t update its size based on the resizer.The resizer respects the min-width and min-height CSS properties of the resizable node.Optionally, you can customize the [resizerColor] and the [gap] between the node and the resizer, with more customization options coming in the future.\""
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Resizer"
-    ],
-    "pageType": "guide",
-    "title": "Resizer",
-    "section": "Resize a template/component regular node",
-    "route": "/features/nodes/resizer",
-    "fragment": "resize-a-templatecomponent-regular-node",
-    "content": "The algorithm is almost the same as for template-group nodes: Create a node of type html-template or CustomNodeComponent (CustomDynamicNodeComponent).If you want the resizer to always appear, add the resizable directive to the top-level element of your custom node (ideally, a wrapper for the entire node content).If you want the resizer to appear conditionally, apply the directive as [resizable]=\"yourCondition\". Binding the visibility of the resizer to the node’s selection state can be useful.The resizer respects the min-width and min-height CSS properties of the element where the directive is applied.It's up to you to adjust the CSS of your custom node to ensure it renders correctly during resizing. The library only modifies the container size.Optionally, you can customize the [resizerColor] and the [gap] between the node and the resizer, with more customization options coming in the future."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Resizer"
-    ],
-    "pageType": "guide",
-    "title": "Resizer",
-    "section": "Resize event",
-    "route": "/features/nodes/resizer",
-    "fragment": "resize-event",
-    "content": "You may want to perform some actions on resize. To do this, simply add handler to the (onNodesChange.size) output of the "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Resizer"
-    ],
-    "pageType": "guide",
-    "title": "Resizer",
-    "section": "Resize event",
-    "route": "/features/nodes/resizer",
-    "fragment": "resize-event",
-    "content": " component."
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "Resizer"
-    ],
-    "pageType": "guide",
-    "title": "Resizer",
-    "section": "See also",
-    "route": "/features/nodes/resizer",
-    "fragment": "see-also",
-    "content": "SubflowsCustom nodesHandling changes"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "SVG Nodes"
-    ],
-    "pageType": "guide",
-    "title": "SVG Nodes",
-    "section": "SVG Nodes",
-    "route": "/features/nodes/svg-nodes",
-    "fragment": "svg-nodes",
-    "content": "SVG nodes allow you to create custom node shapes using SVG elements. To create an SVG node:"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "SVG Nodes"
-    ],
-    "pageType": "guide",
-    "title": "SVG Nodes",
-    "section": "SVG Nodes",
-    "route": "/features/nodes/svg-nodes",
-    "fragment": "svg-nodes",
-    "content": "Define a node with "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "SVG Nodes"
-    ],
-    "pageType": "guide",
-    "title": "SVG Nodes",
-    "section": "SVG Nodes",
-    "route": "/features/nodes/svg-nodes",
-    "fragment": "svg-nodes",
-    "content": "type: 'svg-template'"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "SVG Nodes"
-    ],
-    "pageType": "guide",
-    "title": "SVG Nodes",
-    "section": "SVG Nodes",
-    "route": "/features/nodes/svg-nodes",
-    "fragment": "svg-nodes",
-    "content": "Use the "
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "SVG Nodes"
-    ],
-    "pageType": "guide",
-    "title": "SVG Nodes",
-    "section": "SVG Nodes",
-    "route": "/features/nodes/svg-nodes",
-    "fragment": "svg-nodes",
-    "content": "nodeSvg"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "SVG Nodes"
-    ],
-    "pageType": "guide",
-    "title": "SVG Nodes",
-    "section": "SVG Nodes",
-    "route": "/features/nodes/svg-nodes",
-    "fragment": "svg-nodes",
-    "content": " template in your Vflow component Access node properties via the template context ("
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "SVG Nodes"
-    ],
-    "pageType": "guide",
-    "title": "SVG Nodes",
-    "section": "SVG Nodes",
-    "route": "/features/nodes/svg-nodes",
-    "fragment": "svg-nodes",
-    "content": "ctx"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "SVG Nodes"
-    ],
-    "pageType": "guide",
-    "title": "SVG Nodes",
-    "section": "SVG Nodes",
-    "route": "/features/nodes/svg-nodes",
-    "fragment": "svg-nodes",
-    "content": ")"
-  },
-  {
-    "breadcrumbs": [
-      "Features",
-      "Nodes",
-      "SVG Nodes"
-    ],
-    "pageType": "guide",
-    "title": "SVG Nodes",
-    "section": "SVG Nodes",
-    "route": "/features/nodes/svg-nodes",
-    "fragment": "svg-nodes",
-    "content": "The template context has the following type:"
   },
   {
     "breadcrumbs": [
@@ -4924,7 +4924,7 @@
     "section": "Properties",
     "route": "/api/ngx-vflow/classes/ConnectionControllerDirective",
     "fragment": "properties",
-    "content": "This event fires when user tries to create new Edge. Connection is an entity that contains data about source and target nodes. Also it's important to note, that this event only fires when connection is valid by validator function in ConnectionSettings, by default without passing the validator every connection concidered valid. add connect event and deprecate onConnect"
+    "content": "This event fires when user tries to create new Edge. Connection is an entity that contains data about source and target nodes. Also it's important to note, that this event only fires when connection is valid by validator function in ConnectionSettings, by default without passing the validator every connection concidered valid."
   },
   {
     "breadcrumbs": [
