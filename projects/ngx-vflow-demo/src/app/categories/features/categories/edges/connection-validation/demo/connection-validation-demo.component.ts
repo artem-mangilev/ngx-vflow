@@ -7,7 +7,7 @@ import { Connection, ConnectionSettings, Edge, Node, Vflow } from 'ngx-vflow';
     [nodes]="nodes"
     [edges]="edges"
     [connection]="conectionSettings"
-    (onConnect)="createEdge($event)" /> `,
+    (connect)="createEdge($event)" /> `,
   styles: [
     `
       :host {

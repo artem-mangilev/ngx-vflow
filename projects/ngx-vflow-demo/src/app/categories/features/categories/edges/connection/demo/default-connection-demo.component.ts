@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { Connection, Edge, Node, Vflow } from 'ngx-vflow';
 
 @Component({
-  template: `<vflow view="auto" [nodes]="nodes" [edges]="edges" (onConnect)="createEdge($event)" /> `,
+  template: `<vflow view="auto" [nodes]="nodes" [edges]="edges" (connect)="createEdge($event)" /> `,
   styles: [
     `
       :host {

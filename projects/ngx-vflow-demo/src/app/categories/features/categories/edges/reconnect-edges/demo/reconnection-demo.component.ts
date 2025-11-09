@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { Edge, Node, ReconnectionEvent, Vflow } from 'ngx-vflow';
 
 @Component({
-  template: `<vflow view="auto" [nodes]="nodes" [edges]="edges" (onReconnect)="reconnect($event)" /> `,
+  template: `<vflow view="auto" [nodes]="nodes" [edges]="edges" (reconnect)="reconnect($event)" /> `,
   styles: [
     `
       :host {
