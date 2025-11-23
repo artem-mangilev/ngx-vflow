@@ -8,6 +8,7 @@ import { adjustDirection } from '../utils/adjust-direction';
 import { outputFromObservable, toObservable } from '@angular/core/rxjs-interop';
 import { filter, map, tap } from 'rxjs';
 import { EdgeModel } from '../models/edge.model';
+import { ConnectionForValidation } from '../interfaces/connection-settings.interface';
 
 @Directive({
   selector: '[onConnect], [onReconnect], [connect], [reconnect]',
@@ -118,6 +119,8 @@ export class ConnectionControllerDirective {
         target: target.rawNode.id,
         sourceHandle: sourceHandle.rawHandle.id,
         targetHandle: targetHandle.rawHandle.id,
+        sourceHandleType: sourceHandle.rawHandle.type,
+        targetHandleType: targetHandle.rawHandle.type,
       });
 
       // TODO: check how react flow handles highlight of handle
@@ -190,7 +193,7 @@ export class ConnectionControllerDirective {
 function statusToConnection(
   status: FlowStatusConnectionEnd | FlowStatusReconnectionEnd,
   isStrictMode: boolean,
-): Connection {
+): ConnectionForValidation {
   let source = status.payload.source;
   let target = status.payload.target;
   let sourceHandle = status.payload.sourceHandle;
@@ -221,5 +224,7 @@ function statusToConnection(
     target: targetId,
     sourceHandle: sourceHandleId,
     targetHandle: targetHandleId,
+    sourceHandleType: sourceHandle.rawHandle.type,
+    targetHandleType: targetHandle.rawHandle.type,
   };
 }
