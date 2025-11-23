@@ -1,9 +1,15 @@
 import { ConnectionMode } from '../types/connection-mode.type';
+import { HandleType } from '../types/handle-type.type';
 import { Connection } from './connection.interface';
 import { Curve, EdgeType } from './edge.interface';
 import { Marker } from './marker.interface';
 
-export type ConnectionValidatorFn = (connection: Connection) => boolean;
+export type ConnectionForValidation = Connection & {
+  sourceHandleType: HandleType;
+  targetHandleType: HandleType;
+};
+
+export type ConnectionValidatorFn = (connection: ConnectionForValidation) => boolean;
 
 export interface ConnectionSettings {
   curve?: Curve;
@@ -11,4 +17,5 @@ export interface ConnectionSettings {
   validator?: ConnectionValidatorFn;
   marker?: Marker;
   mode?: ConnectionMode;
+  allowSelfConnections?: boolean;
 }
