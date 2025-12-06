@@ -28,6 +28,7 @@ export interface SharedNode {
   draggable?: boolean;
   parentId?: string | null;
   preview?: NodePreview;
+  selected?: boolean;
 }
 
 export interface SharedDynamicNode {
@@ -36,6 +37,7 @@ export interface SharedDynamicNode {
   draggable?: WritableSignal<boolean>;
   parentId?: WritableSignal<string | null>;
   preview?: WritableSignal<NodePreview>;
+  selected?: WritableSignal<boolean>;
 }
 
 export interface DefaultNode extends SharedNode {

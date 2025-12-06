@@ -26,6 +26,7 @@ export * from './lib/vflow/types/position.type';
 export * from './lib/vflow/types/background.type';
 export * from './lib/vflow/types/connection-mode.type';
 export * from './lib/vflow/types/keyboard-action.type';
+export * from './lib/vflow/types/selection-mode.type';
 
 // Components
 export * from './lib/vflow/components/vflow/vflow.component';

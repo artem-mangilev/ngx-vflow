@@ -48,6 +48,7 @@ import { SpacePointContextDirective } from '../../directives/space-point-context
 import { FitViewOptions } from '../../interfaces/fit-view-options.interface';
 import { Optimization } from '../../interfaces/optimization.interface';
 import { KeyboardShortcuts } from '../../types/keyboard-action.type';
+import { SelectionMode } from '../../types/selection-mode.type';
 import { KeyboardService } from '../../services/keyboard.service';
 import { transformBackground } from '../../utils/transform-background';
 import { OverlaysService } from '../../services/overlays.service';
@@ -219,6 +220,16 @@ export class VflowComponent {
   @Input()
   public set entitiesSelectable(value: boolean) {
     this.flowSettingsService.entitiesSelectable.set(value);
+  }
+
+  /**
+   * Selection mode strategy
+   * - 'default': library manages selection automatically
+   * - 'manual': library does not manage selection, user controls it via node.selected signal
+   */
+  @Input()
+  public set selectionMode(value: SelectionMode) {
+    this.flowSettingsService.selectionMode.set(value);
   }
 
   @Input()

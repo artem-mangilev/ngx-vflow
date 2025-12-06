@@ -5,6 +5,7 @@ import { FlowEntity } from '../interfaces/flow-entity.interface';
 import { Subject, tap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { KeyboardService } from './keyboard.service';
+import { FlowSettingsService } from './flow-settings.service';
 
 export interface ViewportForSelection {
   start: ViewportState;
@@ -21,12 +22,17 @@ export class SelectionService {
 
   private flowEntitiesService = inject(FlowEntitiesService);
   private keyboardService = inject(KeyboardService);
+  private flowSettingsService = inject(FlowSettingsService);
 
   protected viewport$ = new Subject<ViewportForSelection>();
 
   protected resetSelection = this.viewport$
     .pipe(
       tap(({ start, end, target }) => {
+        if (this.flowSettingsService.selectionMode() === 'manual') {
+          return;
+        }
+
         if (start && end && target) {
           const delta = SelectionService.delta;
 
@@ -52,6 +58,10 @@ export class SelectionService {
   }
 
   public select(entity: FlowEntity | null) {
+    if (this.flowSettingsService.selectionMode() === 'manual') {
+      return;
+    }
+
     // ? May be not a responsibility of this method
     // if entity already selected - do nothing
     if (entity?.selected()) {

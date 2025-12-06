@@ -192,6 +192,10 @@ export class NodeModel<T = unknown>
       this.preview = internalNode.preview;
     }
 
+    if (internalNode.selected) {
+      this.selected = internalNode.selected;
+    }
+
     if (internalNode.type === 'default-group' && internalNode.color) {
       this.color = internalNode.color;
     }
