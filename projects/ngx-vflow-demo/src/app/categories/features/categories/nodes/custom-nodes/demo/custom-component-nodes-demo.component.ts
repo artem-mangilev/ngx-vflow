@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { NgDocNotifyService } from '@ng-doc/ui-kit';
 import { ComponentNodeEvent, Edge, Node, Vflow } from 'ngx-vflow';
 import { BlueSquareNodeComponent, BlueSquareData } from './components/blue-square-node.component';
@@ -28,19 +28,19 @@ export class CustomComponentNodesDemoComponent {
   public nodes: Node[] = [
     {
       id: '1',
-      point: { x: 100, y: 100 },
+      point: signal({ x: 100, y: 100 }),
       type: RedSquareNodeComponent,
-      data: {
+      data: signal({
         redSquareText: 'Red',
-      } satisfies RedSquareData,
+      } satisfies RedSquareData),
     },
     {
       id: '2',
-      point: { x: 250, y: 250 },
+      point: signal({ x: 250, y: 250 }),
       type: BlueSquareNodeComponent,
-      data: {
+      data: signal({
         blueSquareText: 'Blue',
-      } satisfies BlueSquareData,
+      } satisfies BlueSquareData),
     },
   ];
 

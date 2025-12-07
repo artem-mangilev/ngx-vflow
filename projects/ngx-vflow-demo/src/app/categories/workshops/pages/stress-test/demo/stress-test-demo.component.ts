@@ -1,3 +1,4 @@
+import { signal } from '@angular/core';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { Edge, Node, Vflow } from 'ngx-vflow';
 
@@ -31,8 +32,8 @@ export function initialElements(xNodes = 10, yNodes = 10): { nodes: Node[]; edge
       nodes.push({
         type: 'default',
         id: `stress-${nodeId}`,
-        text: `Node ${nodeId}`,
-        point: { x: x * 150, y: y * 100 },
+        text: signal(`Node ${nodeId}`),
+        point: signal({ x: x * 150, y: y * 100 }),
       });
 
       if (recentNodeId && nodeId <= xNodes * yNodes) {

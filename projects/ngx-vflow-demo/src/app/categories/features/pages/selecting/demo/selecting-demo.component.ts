@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { Edge, Node, Vflow } from 'ngx-vflow';
 
 @Component({
@@ -12,20 +12,20 @@ export class SelectingDemoComponent {
   public nodes: Node[] = [
     {
       id: '1',
-      point: { x: 10, y: 150 },
+      point: signal({ x: 10, y: 150 }),
       type: 'html-template',
     },
     {
       id: '2',
-      point: { x: 290, y: 50 },
+      point: signal({ x: 290, y: 50 }),
       type: 'default',
-      text: 'Selectable',
+      text: signal('Selectable'),
     },
     {
       id: '3',
-      point: { x: 290, y: 300 },
+      point: signal({ x: 290, y: 300 }),
       type: 'default',
-      text: 'Selectable',
+      text: signal('Selectable'),
     },
   ];
 

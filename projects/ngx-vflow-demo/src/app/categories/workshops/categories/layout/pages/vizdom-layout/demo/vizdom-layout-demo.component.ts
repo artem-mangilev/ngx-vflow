@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnInit, signal, viewChild, WritableSignal } from '@angular/core';
 import init, { DirectedGraph, VertexWeakRef } from '@vizdom/vizdom-ts-web';
-import { DynamicNode, Edge, Node, Vflow, VflowComponent } from 'ngx-vflow';
+import { Node, Edge, Vflow, VflowComponent } from 'ngx-vflow';
 
 @Component({
   templateUrl: './vizdom-layout-demo.component.html',
@@ -12,7 +12,7 @@ import { DynamicNode, Edge, Node, Vflow, VflowComponent } from 'ngx-vflow';
 export class VizdomLayoutDemoComponent implements OnInit {
   public vflow = viewChild.required(VflowComponent);
 
-  public nodes: WritableSignal<DynamicNode[]> = signal([]);
+  public nodes: WritableSignal<Node[]> = signal([]);
 
   public edges: WritableSignal<Edge[]> = signal([]);
 
@@ -40,7 +40,7 @@ export class VizdomLayoutDemoComponent implements OnInit {
   onNodeClick(node: Node) {
     const newNodeId = crypto.randomUUID();
 
-    const nodes: DynamicNode[] = [
+    const nodes: Node[] = [
       ...this.nodes(),
       {
         id: newNodeId,
@@ -76,7 +76,7 @@ export class VizdomLayoutDemoComponent implements OnInit {
   /**
    * Method that responsible to layout and render passed nodes and edges
    */
-  private layout(nodesToLayout: DynamicNode[], edgesToLayout: Edge[] = []) {
+  private layout(nodesToLayout: Node[], edgesToLayout: Edge[] = []) {
     const graph = new DirectedGraph({
       layout: {
         margin_x: 75,
@@ -86,7 +86,7 @@ export class VizdomLayoutDemoComponent implements OnInit {
     // DirectedGraph not provide VertexWeakRef ids so we need to store it somewhere
     // for later access
     const vertices = new Map<string, VertexWeakRef>();
-    const nodes = new Map<string, DynamicNode>();
+    const nodes = new Map<string, Node>();
 
     nodesToLayout.forEach((n) => {
       const v = graph.new_vertex(

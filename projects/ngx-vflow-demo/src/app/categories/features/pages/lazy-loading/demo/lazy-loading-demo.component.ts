@@ -18,24 +18,24 @@ export class LazyLoadingDemoComponent {
   public nodes: Node[] = [
     {
       id: '1',
-      point: { x: 10, y: 150 },
+      point: signal({ x: 10, y: 150 }),
       type: () => import('./components/node-a.component').then((m) => m.NodeAComponent),
-      width: 150,
-      height: 100,
+      width: signal(150),
+      height: signal(100),
     },
     {
       id: '2',
-      point: { x: 1000, y: 150 },
+      point: signal({ x: 1000, y: 150 }),
       type: () => import('./components/node-b.component').then((m) => m.NodeBComponent),
-      width: 150,
-      height: 100,
+      width: signal(150),
+      height: signal(100),
     },
     {
       id: '3',
-      point: { x: 2000, y: 150 },
+      point: signal({ x: 2000, y: 150 }),
       type: () => import('./components/node-c.component').then((m) => m.NodeCComponent),
-      width: 150,
-      height: 100,
+      width: signal(150),
+      height: signal(100),
     },
   ];
 

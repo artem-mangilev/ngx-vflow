@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import { DynamicNode, Vflow } from 'ngx-vflow';
+import { Node, Vflow } from 'ngx-vflow';
 
 @Component({
   template: `<vflow view="auto" [nodes]="nodes" [snapGrid]="[10, 10]">
@@ -32,7 +32,7 @@ import { DynamicNode, Vflow } from 'ngx-vflow';
   imports: [Vflow],
 })
 export class SvgNodesDemoComponent {
-  public nodes: DynamicNode[] = [
+  public nodes: Node[] = [
     {
       id: '1',
       point: signal({ x: 100, y: 100 }),

@@ -27,7 +27,7 @@ interface HandleTemplateImplicitContext {
   /**
    * The parent node of this handle
    */
-  node: Node | DynamicNode;
+  node: Node;
 }
 ```
 

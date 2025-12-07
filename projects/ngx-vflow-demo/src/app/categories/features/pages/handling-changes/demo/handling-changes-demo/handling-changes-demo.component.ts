@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, TemplateRef, inject, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, TemplateRef, inject, viewChild, signal } from '@angular/core';
 import { NgDocNotifyService } from '@ng-doc/ui-kit';
 import { Connection, Edge, EdgeChange, Node, NodeChange, Vflow } from 'ngx-vflow';
 
@@ -24,15 +24,15 @@ export class HandlingChangesDemoComponent {
   public nodes: Node[] = [
     {
       id: '1',
-      point: { x: 100, y: 100 },
+      point: signal({ x: 100, y: 100 }),
       type: 'default',
-      text: `1`,
+      text: signal(`1`),
     },
     {
       id: '2',
-      point: { x: 200, y: 200 },
+      point: signal({ x: 200, y: 200 }),
       type: 'default',
-      text: `2`,
+      text: signal(`2`),
     },
   ];
 

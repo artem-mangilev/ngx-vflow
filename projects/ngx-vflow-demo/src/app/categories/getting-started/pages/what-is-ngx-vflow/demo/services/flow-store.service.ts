@@ -1,5 +1,5 @@
 import { Injectable, signal } from '@angular/core';
-import { Edge, DynamicNode } from 'ngx-vflow';
+import { Edge, Node } from 'ngx-vflow';
 import { OnlyInputNodeComponent } from '../components/only-input-node.component';
 import { ToolbarNodeComponent } from '../components/toolbar-node.component';
 import { ResizableNodeComponent } from '../components/resizable-node.component';
@@ -58,7 +58,7 @@ export class FlowStoreService {
       point: signal({ x: 1332, y: 200 }),
       type: PositionNodeComponent,
     },
-  ] as DynamicNode[]);
+  ] as Node[]);
 
   readonly edges = signal([
     {

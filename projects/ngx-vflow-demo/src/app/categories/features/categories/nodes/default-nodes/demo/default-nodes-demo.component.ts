@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { Node, Vflow } from 'ngx-vflow';
 
 @Component({
@@ -19,16 +19,16 @@ export class DefaultNodesDemoComponent {
   public nodes: Node[] = [
     {
       id: '1',
-      point: { x: 100, y: 100 },
+      point: signal({ x: 100, y: 100 }),
       type: 'default',
-      text: `1`,
+      text: signal(`1`),
     },
     {
       id: '2',
-      point: { x: 200, y: 200 },
+      point: signal({ x: 200, y: 200 }),
       type: 'default',
       // it's possible to pass html in this field
-      text: `<strong>2</strong>`,
+      text: signal(`<strong>2</strong>`),
     },
   ];
 }

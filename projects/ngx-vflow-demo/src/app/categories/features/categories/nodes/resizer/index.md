@@ -4,7 +4,7 @@ You might want to resize your node. This functionality works with nearly all typ
 
 ## Resize default group
 
-To resize a default group, simply pass the `resizable` flag to a `Node` (or `DynamicNode`) of type `default-group`.
+To resize a default group, simply pass the `resizable` flag to a `Node` of type `default-group`.
 
 {{ NgDocActions.demoPane("DefaultGroupResizerDemoComponent") }}
 
