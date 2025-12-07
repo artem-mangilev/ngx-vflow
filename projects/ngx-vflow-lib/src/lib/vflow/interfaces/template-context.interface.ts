@@ -9,6 +9,7 @@ import { HtmlTemplateNode, SvgTemplateNode, TemplateGroupNode } from './node.int
 export interface EdgeContext {
   $implicit: {
     edge: Edge<any>;
+    data: Signal<any>;
     path: Signal<string>;
     markerStart: Signal<string>;
     markerEnd: Signal<string>;

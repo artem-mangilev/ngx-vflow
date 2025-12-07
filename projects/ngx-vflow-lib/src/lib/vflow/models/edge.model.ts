@@ -213,17 +213,7 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
     return marker ? `url(#${hashCode(JSON.stringify(marker))})` : '';
   });
 
-  public context = {
-    $implicit: {
-      // TODO: check if edge could change
-      edge: this.edge,
-      path: computed(() => this.path().path),
-      markerStart: this.markerStartUrl,
-      markerEnd: this.markerEndUrl,
-      selected: this.selected.asReadonly(),
-      shouldLoad: this.shouldLoad,
-    },
-  };
+  public context: EdgeContext;
 
   public edgeLabelModels: { [position in EdgeLabelPosition]?: EdgeLabelModel } = {};
 
@@ -259,6 +249,20 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
     if (labels?.start) this.edgeLabelModels.start = new EdgeLabelModel(labels.start);
     if (labels?.center) this.edgeLabelModels.center = new EdgeLabelModel(labels.center);
     if (labels?.end) this.edgeLabelModels.end = new EdgeLabelModel(labels.end);
+
+    this.context = {
+      $implicit: {
+        edge: this.edge,
+        data: this.edge.data ?? signal({}),
+        path: computed(() => this.path().path),
+        markerStart: this.markerStartUrl,
+        markerEnd: this.markerEndUrl,
+        selected: this.selected.asReadonly(),
+        shouldLoad: this.shouldLoad,
+      },
+    };
+
+    this.selected$ = toObservable(this.selected);
   }
 
   private getPathFactoryParams(source: HandleModel, target: HandleModel): CurveFactoryParams {
