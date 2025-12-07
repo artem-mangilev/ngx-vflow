@@ -49,8 +49,8 @@ export class ReconnectionDemoComponent {
       source: '1',
       target: '2',
       type: 'default',
-      reconnectable: true,
-      edgeLabels: {
+      reconnectable: signal(true),
+      edgeLabels: signal({
         center: {
           type: 'default',
           text: 'Reconnectable from both sides',
@@ -60,15 +60,15 @@ export class ReconnectionDemoComponent {
             borderRadius: '5px',
           },
         },
-      },
+      }),
     },
     {
       id: '3 -> 4',
       source: '3',
       target: '4',
       type: 'default',
-      reconnectable: 'source',
-      edgeLabels: {
+      reconnectable: signal('source'),
+      edgeLabels: signal({
         center: {
           type: 'default',
           text: 'Reconnectable only from source side',
@@ -78,7 +78,7 @@ export class ReconnectionDemoComponent {
             borderRadius: '5px',
           },
         },
-      },
+      }),
     },
   ];
 

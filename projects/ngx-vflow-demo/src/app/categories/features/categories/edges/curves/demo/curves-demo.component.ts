@@ -48,19 +48,19 @@ export class CurvesDemoComponent {
       id: '1 -> 2',
       source: '1',
       target: '2',
-      curve: 'bezier',
+      curve: signal('bezier'),
     },
     {
       id: '1 -> 3',
       source: '1',
       target: '3',
-      curve: 'straight',
+      curve: signal('straight'),
     },
     {
       id: '1 -> 4',
       source: '1',
       target: '4',
-      curve: 'smooth-step',
+      curve: signal('smooth-step'),
     },
   ];
 

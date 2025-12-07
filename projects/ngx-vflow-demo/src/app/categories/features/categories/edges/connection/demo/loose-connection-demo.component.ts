@@ -51,11 +51,11 @@ export class LooseConnectionDemoComponent {
       {
         id: `${source}${sourceHandle} -> ${target}${targetHandle}`,
         ...connection,
-        markers: {
+        markers: signal({
           end: {
             type: 'arrow-closed',
           },
-        },
+        }),
       },
     ];
   }

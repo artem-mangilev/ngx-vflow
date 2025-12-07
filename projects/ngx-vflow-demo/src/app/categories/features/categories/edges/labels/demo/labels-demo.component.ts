@@ -54,8 +54,8 @@ export class LabelsDemoComponent {
       id: '1 -> 2',
       source: '1',
       target: '2',
-      curve: 'smooth-step',
-      edgeLabels: {
+      curve: signal('smooth-step'),
+      edgeLabels: signal({
         start: {
           type: 'default',
           text: 'Start',
@@ -84,14 +84,14 @@ export class LabelsDemoComponent {
             fontWeight: '500',
           },
         },
-      },
+      }),
     },
     {
       id: '1 -> 3',
       source: '1',
       target: '3',
-      curve: 'smooth-step',
-      edgeLabels: {
+      curve: signal('smooth-step'),
+      edgeLabels: signal({
         center: {
           type: 'default',
           text: 'Center Only',
@@ -103,7 +103,7 @@ export class LabelsDemoComponent {
             fontSize: '12px',
           },
         },
-      },
+      }),
     },
   ];
 

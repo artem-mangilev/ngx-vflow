@@ -48,23 +48,23 @@ export class FloatingEdgesDemoComponent {
       id: '1 -> 2',
       source: '1',
       target: '2',
-      markers: {
+      markers: signal({
         end: {
           type: 'arrow-closed',
         },
-      },
-      floating: true,
+      }),
+      floating: signal(true),
     },
     {
       id: '2 -> 3',
       source: '2',
       target: '3',
-      markers: {
+      markers: signal({
         end: {
           type: 'arrow-closed',
         },
-      },
-      floating: true,
+      }),
+      floating: signal(true),
     },
   ];
 

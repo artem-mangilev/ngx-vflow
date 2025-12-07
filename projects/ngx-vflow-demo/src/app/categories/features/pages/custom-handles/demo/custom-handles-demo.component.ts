@@ -45,10 +45,10 @@ export class CustomHandlesDemoComponent {
       ...this.edges,
       {
         id: `${source} -> ${target}${sourceHandle ?? ''}${targetHandle ?? ''}`,
-        markers: {
+        markers: signal({
           start: { type: 'arrow-closed' },
           end: { type: 'arrow-closed' },
-        },
+        }),
         source,
         target,
         sourceHandle,

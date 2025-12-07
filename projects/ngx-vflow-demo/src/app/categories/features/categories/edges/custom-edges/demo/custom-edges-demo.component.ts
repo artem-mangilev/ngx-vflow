@@ -8,8 +8,8 @@ import { Edge, Node, Vflow } from 'ngx-vflow';
         <svg:path
           fill="none"
           [attr.d]="ctx.path()"
-          [attr.stroke-width]="ctx.edge.data.strokeWidth"
-          [attr.stroke]="ctx.edge.data.color"
+          [attr.stroke-width]="ctx.edge.data?.().strokeWidth"
+          [attr.stroke]="ctx.edge.data?.().color"
           [attr.marker-end]="ctx.markerEnd()" />
       </svg:g>
     </ng-template>
@@ -54,28 +54,28 @@ export class CustomEdgesDemoComponent {
       source: '1',
       target: '2',
       type: 'template',
-      data: {
+      data: signal({
         strokeWidth: 4,
         color: '#ffeeaa',
-      },
-      markers: {
+      }),
+      markers: signal({
         end: {
           type: 'arrow-closed',
           width: 30,
           height: 30,
           color: '#ffeeaa',
         },
-      },
+      }),
     },
     {
       id: '1 -> 3',
       source: '1',
       target: '3',
       type: 'template',
-      data: {
+      data: signal({
         strokeWidth: 2,
         color: '#ec586e',
-      },
+      }),
     },
   ];
 }

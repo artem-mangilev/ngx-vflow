@@ -36,7 +36,7 @@ export class CurveFactoryDemoComponent {
       id: '1 -> 2',
       source: '1',
       target: '2',
-      curve: straightCurve,
+      curve: signal(straightCurve),
     },
   ];
 }

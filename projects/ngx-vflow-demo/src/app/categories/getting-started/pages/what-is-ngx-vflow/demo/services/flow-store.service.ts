@@ -65,8 +65,8 @@ export class FlowStoreService {
       id: '1 -> 2',
       source: '1',
       target: '2',
-      curve: 'smooth-step',
-      edgeLabels: {
+      curve: signal('smooth-step'),
+      edgeLabels: signal({
         center: {
           type: 'html-template',
           data: {
@@ -74,15 +74,15 @@ export class FlowStoreService {
             text: 'Smooth Step Edge',
           },
         },
-      },
+      }),
     },
     {
       id: '1 -> 3',
       source: '1',
       target: '3',
       type: 'template',
-      curve: 'bezier',
-      edgeLabels: {
+      curve: signal('bezier'),
+      edgeLabels: signal({
         center: {
           type: 'html-template',
           data: {
@@ -90,10 +90,10 @@ export class FlowStoreService {
             text: 'Animated Edge',
           },
         },
-      },
-      data: {
+      }),
+      data: signal({
         type: 'animated',
-      },
+      }),
     },
     {
       id: '2 -> 5',
@@ -110,76 +110,76 @@ export class FlowStoreService {
       source: '6',
       target: '7',
       targetHandle: 'width',
-      edgeLabels: {
+      edgeLabels: signal({
         center: {
           type: 'html-template',
           data: {
             type: 'delete',
           },
         },
-      },
-      markers: {
+      }),
+      markers: signal({
         end: {
           type: 'arrow-closed',
         },
-      },
+      }),
     },
     {
       id: '6 -> 7height',
       source: '6',
       target: '7',
       targetHandle: 'height',
-      edgeLabels: {
+      edgeLabels: signal({
         center: {
           type: 'html-template',
           data: {
             type: 'delete',
           },
         },
-      },
-      markers: {
+      }),
+      markers: signal({
         end: {
           type: 'arrow-closed',
         },
-      },
+      }),
     },
     {
       id: '6 -> 8x',
       source: '6',
       target: '8',
       targetHandle: 'x',
-      edgeLabels: {
+      edgeLabels: signal({
         center: {
           type: 'html-template',
           data: {
             type: 'delete',
           },
         },
-      },
-      markers: {
+      }),
+      markers: signal({
         end: {
           type: 'arrow-closed',
         },
-      },
+      }),
     },
     {
       id: '6 -> 8y',
       source: '6',
       target: '8',
       targetHandle: 'y',
-      edgeLabels: {
+      edgeLabels: signal({
         center: {
           type: 'html-template',
           data: {
             type: 'delete',
           },
         },
-      },
-      markers: {
+      }),
+      markers: signal({
         end: {
           type: 'arrow-closed',
         },
-      },
+      }),
     },
   ] as Edge[]);
 }

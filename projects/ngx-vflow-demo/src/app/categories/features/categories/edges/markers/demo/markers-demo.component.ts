@@ -50,14 +50,14 @@ export class MarkersDemoComponent {
       {
         ...connection,
         id: `${connection.source} -> ${connection.target}`,
-        markers: {
+        markers: signal({
           start: {
             type: 'arrow-closed',
           },
           end: {
             type: 'arrow',
           },
-        },
+        }),
       },
     ];
   }
