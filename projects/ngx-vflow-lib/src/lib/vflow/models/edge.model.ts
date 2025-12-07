@@ -1,6 +1,6 @@
 import { computed, inject, signal } from '@angular/core';
 import { EdgeLabel, EdgeLabelPosition } from '../interfaces/edge-label.interface';
-import { Edge, Curve, EdgeType } from '../interfaces/edge.interface';
+import { Edge, Curve, EdgeType, EDGE_DEFAULTS } from '../interfaces/edge.interface';
 import { EdgeLabelModel } from './edge-label.model';
 import { NodeModel } from './node.model';
 import { straightPath } from '../math/edge-path/straigh-path';
@@ -22,14 +22,14 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
 
   public source = signal<NodeModel | undefined>(undefined);
   public target = signal<NodeModel | undefined>(undefined);
-  public curve = signal<Curve>('bezier');
+  public curve = signal<Curve>(EDGE_DEFAULTS.curve);
   public type: EdgeType;
-  public reconnectable = signal<boolean | 'source' | 'target'>(false);
-  public floating = signal(false);
-  public markers = signal<{ start?: Marker; end?: Marker }>({});
-  public edgeLabels = signal<{ [position in EdgeLabelPosition]?: EdgeLabel }>({});
+  public reconnectable = signal<boolean | 'source' | 'target'>(EDGE_DEFAULTS.reconnectable);
+  public floating = signal(EDGE_DEFAULTS.floating);
+  public markers = signal<{ start?: Marker; end?: Marker }>(EDGE_DEFAULTS.markers);
+  public edgeLabels = signal<{ [position in EdgeLabelPosition]?: EdgeLabel }>(EDGE_DEFAULTS.edgeLabels);
 
-  public selected = signal(false);
+  public selected = signal(EDGE_DEFAULTS.selected);
   public selected$ = toObservable(this.selected);
 
   public shouldLoad = computed(() => (this.source()?.shouldLoad() ?? false) && (this.target()?.shouldLoad() ?? false));
@@ -218,7 +218,7 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
   public edgeLabelModels: { [position in EdgeLabelPosition]?: EdgeLabelModel } = {};
 
   constructor(public edge: Edge) {
-    this.type = edge.type ?? 'default';
+    this.type = edge.type ?? EDGE_DEFAULTS.type;
 
     if (edge.curve) {
       this.curve = edge.curve;
