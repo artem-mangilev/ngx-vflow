@@ -5,28 +5,28 @@ import { Edge, Node, Vflow } from 'ngx-vflow';
   template: `
     <vflow view="auto" [nodes]="nodes" [edges]="edges">
       <ng-template let-ctx nodeHtml>
-        @if (ctx.node.data.type === 'output') {
+        @if (ctx.data().type === 'output') {
           <div resizable class="custom-node">
             <div class="data-block">
               Output 1
-              <handle position="right" type="source" [id]="ctx.node.data.output1" />
+              <handle position="right" type="source" [id]="ctx.data().output1" />
             </div>
             <div class="data-block">
               Output 2
-              <handle position="right" type="source" [id]="ctx.node.data.output2" />
+              <handle position="right" type="source" [id]="ctx.data().output2" />
             </div>
           </div>
         }
 
-        @if (ctx.node.data.type === 'input') {
+        @if (ctx.data().type === 'input') {
           <div resizable class="custom-node">
             <div class="data-block">
               Input 1
-              <handle position="left" type="target" [id]="ctx.node.data.input1" />
+              <handle position="left" type="target" [id]="ctx.data().input1" />
             </div>
             <div class="data-block">
               Input 2
-              <handle position="left" type="target" [id]="ctx.node.data.input2" />
+              <handle position="left" type="target" [id]="ctx.data().input2" />
             </div>
           </div>
         }

@@ -5,8 +5,8 @@
 
 <vflow view="auto" [nodes]="nodes" [edges]="edges">
   <ng-template let-ctx nodeHtml>
-    <div class="custom-node" [style.background-color]="ctx.node.data()">
-      {{ ctx.node.data() }}
+    <div class="custom-node" [style.background-color]="ctx.data()">
+      {{ ctx.data() }}
 
       <handle type="source" position="bottom" />
       <handle type="target" position="top" />

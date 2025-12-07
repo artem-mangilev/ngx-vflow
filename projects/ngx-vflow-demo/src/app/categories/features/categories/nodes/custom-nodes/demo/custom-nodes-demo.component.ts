@@ -5,7 +5,7 @@ import { Node, Edge, Vflow } from 'ngx-vflow';
   template: `<vflow view="auto" [nodes]="nodes" [edges]="edges">
     <ng-template let-ctx nodeHtml>
       <div class="custom-node" selectable [class.custom-node_selected]="ctx.selected()">
-        {{ ctx.node.data().text }}
+        {{ ctx.data().text }}
 
         <handle type="source" position="right" />
       </div>

@@ -4,7 +4,7 @@ import { Node, Vflow } from 'ngx-vflow';
 @Component({
   template: `<vflow view="auto" [nodes]="nodes" [snapGrid]="[10, 10]">
     <ng-template let-ctx nodeSvg>
-      @if (ctx.node.data().type === 'ellipse') {
+      @if (ctx.data().type === 'ellipse') {
         <svg:ellipse
           resizable
           fill="#0f4c75"
@@ -14,7 +14,7 @@ import { Node, Vflow } from 'ngx-vflow';
           [attr.ry]="ctx.height() / 2" />
       }
 
-      @if (ctx.node.data().type === 'rect') {
+      @if (ctx.data().type === 'rect') {
         <svg:rect resizable fill="#bbe1fa" [attr.width]="ctx.width()" [attr.height]="ctx.height()" />
       }
     </ng-template>
