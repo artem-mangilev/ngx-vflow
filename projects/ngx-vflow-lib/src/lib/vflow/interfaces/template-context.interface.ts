@@ -4,6 +4,7 @@ import { Edge } from './edge.interface';
 import { HtmlTemplateEdgeLabel } from './edge-label.interface';
 import { Point } from './point.interface';
 import { HandleState } from '../models/handle.model';
+import { HtmlTemplateNode, SvgTemplateNode, TemplateGroupNode } from './node.interface';
 
 export interface EdgeContext {
   $implicit: {
@@ -18,8 +19,8 @@ export interface EdgeContext {
 
 export interface NodeContext {
   $implicit: {
-    // TODO: type properly when separate template directives to static and dynamic nodes
-    node: any;
+    node: HtmlTemplateNode;
+    data: Signal<any>;
     selected: Signal<boolean>;
     shouldLoad: Signal<boolean>;
   };
@@ -27,7 +28,8 @@ export interface NodeContext {
 
 export interface SvgNodeContext {
   $implicit: {
-    node: any;
+    node: SvgTemplateNode;
+    data: Signal<any>;
     selected: Signal<boolean>;
     width: Signal<number>;
     height: Signal<number>;
@@ -37,7 +39,8 @@ export interface SvgNodeContext {
 
 export interface GroupNodeContext {
   $implicit: {
-    node: any;
+    node: TemplateGroupNode;
+    data: Signal<any>;
     selected: Signal<boolean>;
     width: Signal<number>;
     height: Signal<number>;

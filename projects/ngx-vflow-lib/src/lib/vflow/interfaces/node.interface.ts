@@ -51,7 +51,7 @@ export interface DefaultGroupNode extends SharedNode {
   resizable?: WritableSignal<boolean>;
 }
 
-export interface TemplateGroupNode<T> extends SharedNode {
+export interface TemplateGroupNode<T = any> extends SharedNode {
   type: 'template-group';
   width: WritableSignal<number>;
   height: WritableSignal<number>;

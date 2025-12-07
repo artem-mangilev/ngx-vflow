@@ -203,6 +203,7 @@ export class NodeModel<T = unknown>
       this.context = {
         $implicit: {
           node: rawNode,
+          data: rawNode.data ?? signal({} as T),
           selected: this.selected.asReadonly(),
           shouldLoad: this.shouldLoad,
         },
@@ -213,6 +214,7 @@ export class NodeModel<T = unknown>
       this.context = {
         $implicit: {
           node: rawNode,
+          data: rawNode.data ?? signal({} as T),
           selected: this.selected.asReadonly(),
           width: this.width.asReadonly(),
           height: this.height.asReadonly(),
@@ -225,6 +227,7 @@ export class NodeModel<T = unknown>
       this.context = {
         $implicit: {
           node: rawNode,
+          data: rawNode.data ?? signal({} as T),
           selected: this.selected.asReadonly(),
           width: this.width.asReadonly(),
           height: this.height.asReadonly(),
