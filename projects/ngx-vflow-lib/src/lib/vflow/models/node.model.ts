@@ -13,8 +13,8 @@ import { NodePreview } from '../interfaces/node-preview.interface';
 import { FlowSettingsService } from '../services/flow-settings.service';
 import { NodeRenderingService } from '../services/node-rendering.service';
 import { extendedComputed } from '../utils/signals/extended-computed';
-import { isCustomDynamicNodeComponent } from '../utils/is-vflow-component';
 import { isCallable } from '../utils/is-callable';
+import { isCustomNodeComponent } from '../utils/is-vflow-component';
 
 export class NodeModel<T = unknown>
   implements FlowEntity, Contextable<NodeContext | GroupNodeContext | { $implicit: object }>
@@ -103,7 +103,7 @@ export class NodeModel<T = unknown>
       return true;
     } else if (this.settingsService.optimization().lazyLoadTrigger === 'viewport') {
       // Immediately load component if it's a plain class
-      if (isCustomDynamicNodeComponent(this.rawNode.type)) {
+      if (isCustomNodeComponent(this.rawNode.type)) {
         return true;
       }
 

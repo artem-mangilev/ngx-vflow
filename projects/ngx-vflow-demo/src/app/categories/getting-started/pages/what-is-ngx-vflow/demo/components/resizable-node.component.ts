@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { CustomDynamicNodeComponent, Vflow } from 'ngx-vflow';
+import { CustomNodeComponent, Vflow } from 'ngx-vflow';
 
 @Component({
   standalone: true,
@@ -32,4 +32,4 @@ import { CustomDynamicNodeComponent, Vflow } from 'ngx-vflow';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [Vflow],
 })
-export class ResizableNodeComponent extends CustomDynamicNodeComponent {}
+export class ResizableNodeComponent extends CustomNodeComponent {}

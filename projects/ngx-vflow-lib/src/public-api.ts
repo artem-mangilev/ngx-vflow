@@ -32,7 +32,6 @@ export * from './lib/vflow/types/selection-mode.type';
 export * from './lib/vflow/components/vflow/vflow.component';
 export * from './lib/vflow/public-components/handle/handle.component';
 export * from './lib/vflow/public-components/custom-node/custom-node.component';
-export * from './lib/vflow/public-components/custom-dynamic-node/custom-dynamic-node.component';
 export * from './lib/vflow/public-components/resizable/resizable.component';
 export * from './lib/vflow/public-components/minimap/minimap.component';
 export * from './lib/vflow/public-components/node-toolbar/node-toolbar.component';

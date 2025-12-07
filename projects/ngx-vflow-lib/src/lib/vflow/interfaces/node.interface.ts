@@ -1,9 +1,9 @@
 import { Type, WritableSignal } from '@angular/core';
 import { Point } from './point.interface';
-import { CustomDynamicNodeComponent } from '../public-components/custom-dynamic-node/custom-dynamic-node.component';
 import { NodePreview } from './node-preview.interface';
 import { isCallable } from '../utils/is-callable';
-import { isCustomDynamicNodeComponent } from '../utils/is-vflow-component';
+import { CustomNodeComponent } from '../public-components/custom-node/custom-node.component';
+import { isCustomNodeComponent } from '../utils/is-vflow-component';
 
 export type Node<T = any> =
   | DefaultNode
@@ -59,14 +59,14 @@ export interface TemplateGroupNode<T> extends SharedNode {
 }
 
 export interface ComponentNode<T = any> extends SharedNode {
-  type: Type<CustomDynamicNodeComponent<T>> | (() => Promise<Type<CustomDynamicNodeComponent<T>>>);
+  type: Type<CustomNodeComponent<T>> | (() => Promise<Type<CustomNodeComponent<T>>>);
   data?: WritableSignal<T>;
   width?: WritableSignal<number>;
   height?: WritableSignal<number>;
 }
 
 export function isComponentNode<T>(node: Node<T>): node is ComponentNode<T> {
-  if (isCustomDynamicNodeComponent(node.type)) {
+  if (isCustomNodeComponent(node.type)) {
     return true;
   }
 
