@@ -1,5 +1,5 @@
 import { TemplateRef, computed, inject, signal } from '@angular/core';
-import { DynamicNode, Node, isComponentDynamicNode, isComponentStaticNode } from '../interfaces/node.interface';
+import { Node, isComponentNode } from '../interfaces/node.interface';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { HandleModel } from './handle.model';
 import { FlowEntity } from '../interfaces/flow-entity.interface';
@@ -8,13 +8,12 @@ import { FlowEntitiesService } from '../services/flow-entities.service';
 import { MAGIC_NUMBER_TO_FIX_GLITCH_IN_CHROME } from '../constants/magic-number-to-fix-glitch-in-chrome.constant';
 import { Contextable } from '../interfaces/contextable.interface';
 import { GroupNodeContext, NodeContext } from '../interfaces/template-context.interface';
-import { toUnifiedNode } from '../utils/to-unified-node';
 import { catchError, filter, Observable, of, shareReplay, switchMap } from 'rxjs';
 import { NodePreview } from '../interfaces/node-preview.interface';
 import { FlowSettingsService } from '../services/flow-settings.service';
 import { NodeRenderingService } from '../services/node-rendering.service';
 import { extendedComputed } from '../utils/signals/extended-computed';
-import { isCustomDynamicNodeComponent, isCustomNodeComponent } from '../utils/is-vflow-component';
+import { isCustomDynamicNodeComponent } from '../utils/is-vflow-component';
 import { isCallable } from '../utils/is-callable';
 
 export class NodeModel<T = unknown>
@@ -93,8 +92,7 @@ export class NodeModel<T = unknown>
   public readonly magnetRadius = 20;
 
   // TODO: not sure if we need to statically store it
-  public isComponentType =
-    isComponentStaticNode(this.rawNode as Node) || isComponentDynamicNode(this.rawNode as DynamicNode);
+  public isComponentType = isComponentNode(this.rawNode);
 
   public shouldLoad = extendedComputed<boolean>((previousShouldLoad) => {
     if (previousShouldLoad) {
@@ -104,11 +102,6 @@ export class NodeModel<T = unknown>
     if (this.settingsService.optimization().lazyLoadTrigger === 'immediate') {
       return true;
     } else if (this.settingsService.optimization().lazyLoadTrigger === 'viewport') {
-      // Immediately load component if it's a plain class
-      if (isCustomNodeComponent(this.rawNode.type)) {
-        return true;
-      }
-
       // Immediately load component if it's a plain class
       if (isCustomDynamicNodeComponent(this.rawNode.type)) {
         return true;
@@ -165,50 +158,48 @@ export class NodeModel<T = unknown>
 
   private parentId = signal<string | null>(null);
 
-  constructor(public rawNode: Node<T> | DynamicNode<T>) {
-    const internalNode = toUnifiedNode(rawNode);
-
-    if (internalNode.point) {
-      this.point = internalNode.point;
+  constructor(public rawNode: Node<T>) {
+    if (rawNode.point) {
+      this.point = rawNode.point;
     }
 
-    if (internalNode.width) {
-      this.width = internalNode.width;
+    if (rawNode.width) {
+      this.width = rawNode.width;
     }
 
-    if (internalNode.height) {
-      this.height = internalNode.height;
+    if (rawNode.height) {
+      this.height = rawNode.height;
     }
 
-    if (internalNode.draggable) {
-      this.draggable = internalNode.draggable;
+    if (rawNode.draggable) {
+      this.draggable = rawNode.draggable;
     }
 
-    if (internalNode.parentId) {
-      this.parentId = internalNode.parentId;
+    if (rawNode.parentId) {
+      this.parentId = rawNode.parentId;
     }
 
-    if (internalNode.preview) {
-      this.preview = internalNode.preview;
+    if (rawNode.preview) {
+      this.preview = rawNode.preview;
     }
 
-    if (internalNode.selected) {
-      this.selected = internalNode.selected;
+    if (rawNode.selected) {
+      this.selected = rawNode.selected;
     }
 
-    if (internalNode.type === 'default-group' && internalNode.color) {
-      this.color = internalNode.color;
+    if (rawNode.type === 'default-group' && rawNode.color) {
+      this.color = rawNode.color;
     }
 
-    if (internalNode.type === 'default-group' && internalNode.resizable) {
-      this.resizable = internalNode.resizable;
+    if (rawNode.type === 'default-group' && rawNode.resizable) {
+      this.resizable = rawNode.resizable;
     }
 
-    if (internalNode.type === 'default' && internalNode.text) {
-      this.text = internalNode.text;
+    if (rawNode.type === 'default' && rawNode.text) {
+      this.text = rawNode.text;
     }
 
-    if (internalNode.type === 'html-template') {
+    if (rawNode.type === 'html-template') {
       this.context = {
         $implicit: {
           node: rawNode,
@@ -218,7 +209,7 @@ export class NodeModel<T = unknown>
       };
     }
 
-    if (internalNode.type === 'svg-template') {
+    if (rawNode.type === 'svg-template') {
       this.context = {
         $implicit: {
           node: rawNode,
@@ -230,7 +221,7 @@ export class NodeModel<T = unknown>
       };
     }
 
-    if (internalNode.type === 'template-group') {
+    if (rawNode.type === 'template-group') {
       this.context = {
         $implicit: {
           node: rawNode,

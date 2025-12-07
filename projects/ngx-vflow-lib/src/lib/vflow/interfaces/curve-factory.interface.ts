@@ -1,7 +1,7 @@
 import { Position } from '../types/position.type';
 import { EdgeLabelPosition } from './edge-label.interface';
 import { Edge } from './edge.interface';
-import { DynamicNode, Node } from './node.interface';
+import { Node } from './node.interface';
 import { Point } from './point.interface';
 
 export interface CurveFactorySharedParams {
@@ -16,7 +16,7 @@ export interface CurveFactorySharedParams {
   /** Array of all edges in the flow */
   allEdges: Edge[];
   /** Array of all nodes in the flow */
-  allNodes: Node[] | DynamicNode[];
+  allNodes: Node[];
 }
 
 export interface ConnectionCurveFactoryParams extends CurveFactorySharedParams {

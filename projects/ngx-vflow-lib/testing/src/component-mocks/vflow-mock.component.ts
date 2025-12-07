@@ -12,7 +12,6 @@ import {
 import { NgTemplateOutlet } from '@angular/common';
 import {
   Node,
-  DynamicNode,
   Edge,
   SpacePoint,
   Point,
@@ -28,6 +27,7 @@ import {
   ɵConnectionModel as ConnectionModel,
   DEFAULT_OPTIMIZATION,
   AlignmentHelperSettings,
+  SelectionMode,
 } from 'ngx-vflow';
 import { toObservable } from '@angular/core/rxjs-interop';
 import {
@@ -135,7 +135,7 @@ import { AsInterface } from '../types';
 })
 export class VflowMockComponent implements AsInterface<VflowComponent>, OnInit {
   @Input({ required: true })
-  public readonly nodes!: Node[] | DynamicNode[];
+  public readonly nodes!: Node[];
 
   @Input()
   public readonly edges!: Edge[];
@@ -157,6 +157,9 @@ export class VflowMockComponent implements AsInterface<VflowComponent>, OnInit {
 
   @Input()
   public readonly entitiesSelectable = true;
+
+  @Input()
+  public readonly selectionMode: SelectionMode = 'default';
 
   @Input()
   public readonly keyboardShortcuts: KeyboardShortcuts = {
@@ -242,7 +245,7 @@ export class VflowMockComponent implements AsInterface<VflowComponent>, OnInit {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public getIntesectingNodes(nodeId: string, options?: IntersectingNodesOptions): Node[] | DynamicNode[] {
+  public getIntesectingNodes(nodeId: string, options?: IntersectingNodesOptions): Node[] {
     return [];
   }
 
@@ -251,7 +254,7 @@ export class VflowMockComponent implements AsInterface<VflowComponent>, OnInit {
     return { x: 0, y: 0 };
   }
 
-  public getNode<T = unknown>(id: string): Node<T> | DynamicNode<T> | undefined {
+  public getNode<T = unknown>(id: string): Node<T> | undefined {
     return this.nodes.find((node) => node.id === id);
   }
 
