@@ -36,14 +36,15 @@ export class FlowEntitiesService {
     const markersMap = new Map<number, Marker>();
 
     this.validEdges().forEach((e) => {
-      if (e.edge.markers?.start) {
-        const hash = hashCode(JSON.stringify(e.edge.markers.start));
-        markersMap.set(hash, e.edge.markers.start);
+      const markers = e.markers();
+      if (markers?.start) {
+        const hash = hashCode(JSON.stringify(markers.start));
+        markersMap.set(hash, markers.start);
       }
 
-      if (e.edge.markers?.end) {
-        const hash = hashCode(JSON.stringify(e.edge.markers.end));
-        markersMap.set(hash, e.edge.markers.end);
+      if (markers?.end) {
+        const hash = hashCode(JSON.stringify(markers.end));
+        markersMap.set(hash, markers.end);
       }
     });
 

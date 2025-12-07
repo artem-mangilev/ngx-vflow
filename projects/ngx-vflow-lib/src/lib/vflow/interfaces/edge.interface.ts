@@ -1,3 +1,4 @@
+import { WritableSignal } from '@angular/core';
 import { Connection } from './connection.interface';
 import { CurveFactory } from './curve-factory.interface';
 import { EdgeLabel, EdgeLabelPosition } from './edge-label.interface';
@@ -9,13 +10,14 @@ export type Curve = 'straight' | 'bezier' | 'smooth-step' | 'step' | CurveFactor
 export interface Edge<T = unknown> extends Connection {
   id: string;
   type?: EdgeType;
-  curve?: Curve;
-  data?: T;
-  edgeLabels?: { [position in EdgeLabelPosition]?: EdgeLabel };
-  markers?: {
+  curve?: WritableSignal<Curve>;
+  data?: WritableSignal<T>;
+  edgeLabels?: WritableSignal<{ [position in EdgeLabelPosition]?: EdgeLabel }>;
+  markers?: WritableSignal<{
     start?: Marker;
     end?: Marker;
-  };
-  reconnectable?: boolean | 'source' | 'target';
-  floating?: boolean;
+  }>;
+  reconnectable?: WritableSignal<boolean | 'source' | 'target'>;
+  floating?: WritableSignal<boolean>;
+  selected?: WritableSignal<boolean>;
 }
