@@ -154,7 +154,7 @@ export class NodeModel<T = unknown>
 
   public color = signal(NodeModel.defaultColor);
 
-  public controlledByResizer = signal(false);
+  public controlledByResizer = signal(true);
   public resizable = signal(false);
   public resizing = signal(false);
   public resizerTemplate = signal<TemplateRef<unknown> | null>(null);
@@ -182,6 +182,10 @@ export class NodeModel<T = unknown>
 
     if (internalNode.draggable) {
       this.draggable = internalNode.draggable;
+    }
+
+    if (internalNode.controlledByResizer) {
+      this.controlledByResizer = internalNode.controlledByResizer;
     }
 
     if (internalNode.parentId) {
