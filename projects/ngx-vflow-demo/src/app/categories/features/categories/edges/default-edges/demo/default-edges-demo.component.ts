@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import { Edge, Node, Vflow } from 'ngx-vflow';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { createEdges, createNodes, Vflow } from 'ngx-vflow';
 
 @Component({
   template: `<vflow view="auto" [nodes]="nodes" [edges]="edges" />`,
@@ -16,37 +16,39 @@ import { Edge, Node, Vflow } from 'ngx-vflow';
   imports: [Vflow],
 })
 export class DefaultEdgesDemoComponent {
-  public nodes: Node[] = [
+  public nodes = createNodes([
     {
       id: '1',
-      point: signal({ x: 10, y: 200 }),
+      point: { x: 10, y: 200 },
       type: 'default',
-      text: signal('1'),
+      text: '1',
     },
     {
       id: '2',
-      point: signal({ x: 200, y: 100 }),
+      point: { x: 200, y: 100 },
       type: 'default',
-      text: signal('2'),
+      text: '2',
     },
     {
       id: '3',
-      point: signal({ x: 200, y: 300 }),
+      point: { x: 200, y: 300 },
       type: 'default',
-      text: signal('3'),
+      text: '3',
     },
-  ];
+  ]);
 
-  public edges: Edge[] = [
+  public edges = createEdges([
     {
       id: '1 -> 2',
       source: '1',
       target: '2',
+      selected: true,
     },
     {
       id: '1 -> 3',
       source: '1',
       target: '3',
+      selected: true,
     },
-  ];
+  ]);
 }

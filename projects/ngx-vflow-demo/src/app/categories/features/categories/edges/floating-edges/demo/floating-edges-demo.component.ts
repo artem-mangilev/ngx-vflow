@@ -89,14 +89,14 @@ interface FloatingEdgesNodeData {
   styles: [
     `
       .node {
-        width: signal(100px;)
-        height: signal(50px;)
+        width: 100px;
+        height: 50px;
         border: 1.5px solid #1b262c;
         border-radius: 5px;
         display: flex;
         align-items: center;
         justify-content: center;
-        color: signal(black;)
+        color: black;
         background-color: white;
       }
     `,
