@@ -1,4 +1,4 @@
-import { Type, WritableSignal } from '@angular/core';
+import { signal, Type, WritableSignal } from '@angular/core';
 import { Point } from './point.interface';
 import { NodePreview } from './node-preview.interface';
 import { isCallable } from '../utils/is-callable';
@@ -71,7 +71,7 @@ export function isComponentNode<T>(node: Node<T>): node is ComponentNode<T> {
   }
 
   // Check if the type is a function with dynamic import
-  return isCallable(node.type) && isCallable(node.point);
+  return isCallable(node.type);
 }
 
 export function isTemplateNode<T>(node: Node<T>): node is HtmlTemplateNode<T> {
@@ -92,4 +92,100 @@ export function isDefaultGroupNode(node: Node): node is DefaultGroupNode {
 
 export function isTemplateGroupNode<T>(node: Node<T>): node is TemplateGroupNode<T> {
   return node.type === 'template-group';
+}
+
+type UnwrapWritableSignal<T> = {
+  [K in keyof T]: NonNullable<T[K]> extends WritableSignal<infer U>
+    ? undefined extends T[K]
+      ? U | undefined
+      : U
+    : T[K];
+};
+
+export type PlainNode<T = unknown> =
+  | UnwrapWritableSignal<DefaultNode>
+  | UnwrapWritableSignal<HtmlTemplateNode<T>>
+  | UnwrapWritableSignal<SvgTemplateNode<T>>
+  | UnwrapWritableSignal<ComponentNode<T>>
+  | UnwrapWritableSignal<DefaultGroupNode>
+  | UnwrapWritableSignal<TemplateGroupNode<T>>;
+
+export type PrefilledNode<T = unknown> = Required<Node<T>>;
+
+function createBaseNode(node: UnwrapWritableSignal<SharedNode>) {
+  return {
+    id: node.id,
+    point: signal(node.point),
+    draggable: signal(node.draggable ?? true),
+    parentId: signal(node.parentId ?? null),
+    preview: signal(node.preview ?? { style: {} }),
+    selected: signal(node.selected ?? false),
+  };
+}
+
+export function createNodes<T = unknown>(nodes: PlainNode<T>[]): PrefilledNode<T>[] {
+  return nodes.map((node) => {
+    if (node.type === 'default') {
+      return {
+        ...createBaseNode(node),
+        type: 'default' as const,
+        text: signal(node.text ?? ''),
+        width: signal(node.width ?? 100),
+        height: signal(node.height ?? 50),
+      } as PrefilledNode<T>;
+    }
+
+    if (node.type === 'html-template') {
+      return {
+        ...createBaseNode(node),
+        type: 'html-template' as const,
+        data: signal(node.data ?? ({} as T)),
+        width: signal(node.width ?? 150),
+        height: signal(node.height ?? 100),
+      } as PrefilledNode<T>;
+    }
+
+    if (node.type === 'svg-template') {
+      return {
+        ...createBaseNode(node),
+        type: 'svg-template' as const,
+        width: signal(node.width ?? 150),
+        height: signal(node.height ?? 100),
+        data: signal(node.data ?? ({} as T)),
+      } as PrefilledNode<T>;
+    }
+
+    if (node.type === 'default-group') {
+      return {
+        ...createBaseNode(node),
+        type: 'default-group' as const,
+        width: signal(node.width ?? 300),
+        height: signal(node.height ?? 200),
+        color: signal(node.color ?? '#cccccc'),
+        resizable: signal(node.resizable ?? false),
+      } as PrefilledNode<T>;
+    }
+
+    if (node.type === 'template-group') {
+      return {
+        ...createBaseNode(node),
+        type: 'template-group' as const,
+        width: signal(node.width ?? 300),
+        height: signal(node.height ?? 200),
+        data: signal(node.data ?? ({} as T)),
+      } as PrefilledNode<T>;
+    }
+
+    if (isCustomNodeComponent(node.type) || isCallable(node.type)) {
+      return {
+        ...createBaseNode(node),
+        type: node.type,
+        data: signal(node.data ?? ({} as T)),
+        width: signal(node.width ?? 150),
+        height: signal(node.height ?? 100),
+      } as PrefilledNode<T>;
+    }
+
+    throw new Error(`Unknown node type for node with id ${node.id}`);
+  });
 }
