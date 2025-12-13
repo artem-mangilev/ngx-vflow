@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, effect, inject, untracked, viewChild } from '@angular/core';
-import { Vflow, Connection, VflowComponent, Edge, createEdges } from 'ngx-vflow';
+import { Vflow, Connection, VflowComponent, Edge, createEdge } from 'ngx-vflow';
 import { FlowStoreService } from './services/flow-store.service';
 
 @Component({
@@ -104,20 +104,18 @@ export class AllFeaturesDemoComponent {
     this.store.edges.update((edges) => {
       return [
         ...edges,
-        ...createEdges([
-          {
-            id,
-            edgeLabels: {
-              center: {
-                type: 'html-template',
-                data: {
-                  type: 'delete',
-                },
+        createEdge({
+          id,
+          edgeLabels: {
+            center: {
+              type: 'html-template',
+              data: {
+                type: 'delete',
               },
             },
-            ...connection,
           },
-        ]),
+          ...connection,
+        }),
       ];
     });
   }

@@ -116,69 +116,71 @@ function createBaseNode(node: UnwrapSignal<SharedNode>) {
   };
 }
 
+export function createNode<T>(node: PlainNode<T>): PrefilledNode<T> {
+  if (node.type === 'default') {
+    return {
+      ...createBaseNode(node),
+      type: 'default' as const,
+      text: signal(node.text ?? ''),
+      width: signal(node.width ?? 100),
+      height: signal(node.height ?? 50),
+    } as PrefilledNode<T>;
+  }
+
+  if (node.type === 'html-template') {
+    return {
+      ...createBaseNode(node),
+      type: 'html-template' as const,
+      data: signal(node.data ?? ({} as T)),
+      width: signal(node.width ?? 150),
+      height: signal(node.height ?? 100),
+    } as PrefilledNode<T>;
+  }
+
+  if (node.type === 'svg-template') {
+    return {
+      ...createBaseNode(node),
+      type: 'svg-template' as const,
+      width: signal(node.width ?? 150),
+      height: signal(node.height ?? 100),
+      data: signal(node.data ?? ({} as T)),
+    } as PrefilledNode<T>;
+  }
+
+  if (node.type === 'default-group') {
+    return {
+      ...createBaseNode(node),
+      type: 'default-group' as const,
+      width: signal(node.width ?? 300),
+      height: signal(node.height ?? 200),
+      color: signal(node.color ?? '#cccccc'),
+      resizable: signal(node.resizable ?? false),
+    } as PrefilledNode<T>;
+  }
+
+  if (node.type === 'template-group') {
+    return {
+      ...createBaseNode(node),
+      type: 'template-group' as const,
+      width: signal(node.width ?? 300),
+      height: signal(node.height ?? 200),
+      data: signal(node.data ?? ({} as T)),
+    } as PrefilledNode<T>;
+  }
+
+  if (isCustomNodeComponent(node.type) || isCallable(node.type)) {
+    return {
+      ...createBaseNode(node),
+      type: node.type,
+      data: signal(node.data ?? ({} as T)),
+      width: signal(node.width ?? 150),
+      height: signal(node.height ?? 100),
+    } as PrefilledNode<T>;
+  }
+
+  throw new Error(`Unknown node type for node with id ${node.id}`);
+}
+
 export function createNodes<T = unknown>(nodes: PlainNode<T>[]): PrefilledNode<T>[] {
-  return nodes.map((node) => {
-    if (node.type === 'default') {
-      return {
-        ...createBaseNode(node),
-        type: 'default' as const,
-        text: signal(node.text ?? ''),
-        width: signal(node.width ?? 100),
-        height: signal(node.height ?? 50),
-      } as PrefilledNode<T>;
-    }
-
-    if (node.type === 'html-template') {
-      return {
-        ...createBaseNode(node),
-        type: 'html-template' as const,
-        data: signal(node.data ?? ({} as T)),
-        width: signal(node.width ?? 150),
-        height: signal(node.height ?? 100),
-      } as PrefilledNode<T>;
-    }
-
-    if (node.type === 'svg-template') {
-      return {
-        ...createBaseNode(node),
-        type: 'svg-template' as const,
-        width: signal(node.width ?? 150),
-        height: signal(node.height ?? 100),
-        data: signal(node.data ?? ({} as T)),
-      } as PrefilledNode<T>;
-    }
-
-    if (node.type === 'default-group') {
-      return {
-        ...createBaseNode(node),
-        type: 'default-group' as const,
-        width: signal(node.width ?? 300),
-        height: signal(node.height ?? 200),
-        color: signal(node.color ?? '#cccccc'),
-        resizable: signal(node.resizable ?? false),
-      } as PrefilledNode<T>;
-    }
-
-    if (node.type === 'template-group') {
-      return {
-        ...createBaseNode(node),
-        type: 'template-group' as const,
-        width: signal(node.width ?? 300),
-        height: signal(node.height ?? 200),
-        data: signal(node.data ?? ({} as T)),
-      } as PrefilledNode<T>;
-    }
-
-    if (isCustomNodeComponent(node.type) || isCallable(node.type)) {
-      return {
-        ...createBaseNode(node),
-        type: node.type,
-        data: signal(node.data ?? ({} as T)),
-        width: signal(node.width ?? 150),
-        height: signal(node.height ?? 100),
-      } as PrefilledNode<T>;
-    }
-
-    throw new Error(`Unknown node type for node with id ${node.id}`);
-  });
+  return nodes.map(createNode);
 }
