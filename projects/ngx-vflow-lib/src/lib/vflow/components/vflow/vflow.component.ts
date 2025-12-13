@@ -9,7 +9,7 @@ import {
   viewChild,
   input,
 } from '@angular/core';
-import { DynamicNode, Node } from '../../interfaces/node.interface';
+import { Node } from '../../interfaces/node.interface';
 import { MapContextDirective } from '../../directives/map-context.directive';
 import { DraggableService } from '../../services/draggable.service';
 import { NodeModel } from '../../models/node.model';
@@ -48,6 +48,7 @@ import { SpacePointContextDirective } from '../../directives/space-point-context
 import { FitViewOptions } from '../../interfaces/fit-view-options.interface';
 import { Optimization } from '../../interfaces/optimization.interface';
 import { KeyboardShortcuts } from '../../types/keyboard-action.type';
+import { SelectionMode } from '../../types/selection-mode.type';
 import { KeyboardService } from '../../services/keyboard.service';
 import { transformBackground } from '../../utils/transform-background';
 import { OverlaysService } from '../../services/overlays.service';
@@ -221,6 +222,16 @@ export class VflowComponent {
     this.flowSettingsService.entitiesSelectable.set(value);
   }
 
+  /**
+   * Selection mode strategy
+   * - 'default': library manages selection automatically
+   * - 'manual': library does not manage selection, user controls it via node.selected signal
+   */
+  @Input()
+  public set selectionMode(value: SelectionMode) {
+    this.flowSettingsService.selectionMode.set(value);
+  }
+
   @Input()
   public set keyboardShortcuts(value: KeyboardShortcuts) {
     this.keyboardService.setShortcuts(value);
@@ -272,7 +283,7 @@ export class VflowComponent {
    * Nodes to render
    */
   @Input({ required: true })
-  public set nodes(newNodes: Node[] | DynamicNode[]) {
+  public set nodes(newNodes: Node[]) {
     const models = runInInjectionContext(this.injector, () =>
       ReferenceIdentityChecker.nodes(newNodes, this.flowEntitiesService.nodes()),
     );
@@ -437,7 +448,7 @@ export class VflowComponent {
    *
    * @param id node id
    */
-  public getNode<T = unknown>(id: string): Node<T> | DynamicNode<T> | undefined {
+  public getNode<T = unknown>(id: string): Node<T> | undefined {
     return this.flowEntitiesService.getNode<T>(id)?.rawNode;
   }
 
@@ -476,13 +487,8 @@ export class VflowComponent {
    * @param options.partially - If true, returns nodes that partially intersect. If false, only returns fully intersecting nodes
    * @returns An array of nodes that intersect with the specified node
    */
-  public getIntesectingNodes<T>(
-    nodeId: string,
-    options: IntersectingNodesOptions = { partially: true },
-  ): Node<T>[] | DynamicNode<T>[] {
-    return getIntesectingNodes(nodeId, this.nodeModels(), options).map((n) => n.rawNode) as
-      | Node<T>[]
-      | DynamicNode<T>[];
+  public getIntesectingNodes<T>(nodeId: string, options: IntersectingNodesOptions = { partially: true }): Node<T>[] {
+    return getIntesectingNodes(nodeId, this.nodeModels(), options).map((n) => n.rawNode) as Node<T>[];
   }
 
   /**

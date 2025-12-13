@@ -21,11 +21,11 @@
     </div>
 
     <node-toolbar>
-      @if (ctx.node.data().canDetach) {
+      @if (ctx.data().canDetach) {
         <button (click)="detachNode(ctx.node.id)">Detach</button>
       }
 
-      @if (ctx.node.data().canAttach) {
+      @if (ctx.data().canAttach) {
         <button (click)="attachNode(ctx.node.id)">Attach</button>
       }
     </node-toolbar>

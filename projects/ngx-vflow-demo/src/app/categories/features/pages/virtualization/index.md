@@ -17,6 +17,6 @@ To enable virtualization, set the `virtualization` flag in the `Optimization` in
 > The `NodePreview` interface allows you to style preview nodes using a subset of `CSSStyleDeclaration`, letting you write familiar, declarative CSS instead of low-level canvas code.
 > The library automatically compiles these styles into appropriate `canvas` calls.
 
-To customize the preview for a specific node, use the `preview` property available on both `Node` and `DynamicNode`.
+To customize the preview for a specific node, use the `preview` property available on `Node`.
 
 {{ NgDocActions.demoPane("VirtualizationDemoComponent") }}

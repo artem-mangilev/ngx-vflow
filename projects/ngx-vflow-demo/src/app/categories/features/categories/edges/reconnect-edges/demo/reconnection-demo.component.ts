@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { Edge, Node, ReconnectionEvent, Vflow } from 'ngx-vflow';
 
 @Component({
@@ -19,27 +19,27 @@ export class ReconnectionDemoComponent {
   public nodes: Node[] = [
     {
       id: '1',
-      point: { x: 100, y: 100 },
+      point: signal({ x: 100, y: 100 }),
       type: 'default',
-      text: `1`,
+      text: signal(`1`),
     },
     {
       id: '2',
-      point: { x: 600, y: 100 },
+      point: signal({ x: 600, y: 100 }),
       type: 'default',
-      text: `2`,
+      text: signal(`2`),
     },
     {
       id: '3',
-      point: { x: 100, y: 300 },
+      point: signal({ x: 100, y: 300 }),
       type: 'default',
-      text: `3`,
+      text: signal(`3`),
     },
     {
       id: '4',
-      point: { x: 600, y: 300 },
+      point: signal({ x: 600, y: 300 }),
       type: 'default',
-      text: `4`,
+      text: signal(`4`),
     },
   ];
 
@@ -49,8 +49,8 @@ export class ReconnectionDemoComponent {
       source: '1',
       target: '2',
       type: 'default',
-      reconnectable: true,
-      edgeLabels: {
+      reconnectable: signal(true),
+      edgeLabels: signal({
         center: {
           type: 'default',
           text: 'Reconnectable from both sides',
@@ -60,15 +60,15 @@ export class ReconnectionDemoComponent {
             borderRadius: '5px',
           },
         },
-      },
+      }),
     },
     {
       id: '3 -> 4',
       source: '3',
       target: '4',
       type: 'default',
-      reconnectable: 'source',
-      edgeLabels: {
+      reconnectable: signal('source'),
+      edgeLabels: signal({
         center: {
           type: 'default',
           text: 'Reconnectable only from source side',
@@ -78,7 +78,7 @@ export class ReconnectionDemoComponent {
             borderRadius: '5px',
           },
         },
-      },
+      }),
     },
   ];
 

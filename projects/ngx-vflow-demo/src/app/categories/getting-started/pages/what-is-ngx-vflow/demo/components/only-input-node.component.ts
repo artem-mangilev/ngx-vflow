@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { CustomDynamicNodeComponent, Vflow } from 'ngx-vflow';
+import { CustomNodeComponent, Vflow } from 'ngx-vflow';
 
 @Component({
   template: `<div class="node">
@@ -26,4 +26,4 @@ import { CustomDynamicNodeComponent, Vflow } from 'ngx-vflow';
   imports: [Vflow],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class OnlyInputNodeComponent extends CustomDynamicNodeComponent {}
+export class OnlyInputNodeComponent extends CustomNodeComponent {}

@@ -1,11 +1,11 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import { DynamicNode, Edge, Vflow } from 'ngx-vflow';
+import { Node, Edge, Vflow } from 'ngx-vflow';
 
 @Component({
   template: `<vflow view="auto" [nodes]="nodes" [edges]="edges">
     <ng-template let-ctx nodeHtml>
       <div class="custom-node" selectable [class.custom-node_selected]="ctx.selected()">
-        {{ ctx.node.data().text }}
+        {{ ctx.data().text }}
 
         <handle type="source" position="right" />
       </div>
@@ -40,7 +40,7 @@ import { DynamicNode, Edge, Vflow } from 'ngx-vflow';
   imports: [Vflow],
 })
 export class CustomNodesDemoComponent {
-  public nodes: DynamicNode[] = [
+  public nodes: Node[] = [
     {
       id: '1',
       point: signal({ x: 100, y: 100 }),

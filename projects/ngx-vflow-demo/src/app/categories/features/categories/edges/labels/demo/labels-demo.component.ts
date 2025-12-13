@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { Edge, Node, Vflow } from 'ngx-vflow';
 
 @Component({
@@ -31,21 +31,21 @@ export class LabelsDemoComponent {
   public nodes: Node[] = [
     {
       id: '1',
-      point: { x: 50, y: 200 },
+      point: signal({ x: 50, y: 200 }),
       type: 'default',
-      text: '1',
+      text: signal('1'),
     },
     {
       id: '2',
-      point: { x: 350, y: 100 },
+      point: signal({ x: 350, y: 100 }),
       type: 'default',
-      text: '2',
+      text: signal('2'),
     },
     {
       id: '3',
-      point: { x: 350, y: 300 },
+      point: signal({ x: 350, y: 300 }),
       type: 'default',
-      text: '3',
+      text: signal('3'),
     },
   ];
 
@@ -54,8 +54,8 @@ export class LabelsDemoComponent {
       id: '1 -> 2',
       source: '1',
       target: '2',
-      curve: 'smooth-step',
-      edgeLabels: {
+      curve: signal('smooth-step'),
+      edgeLabels: signal({
         start: {
           type: 'default',
           text: 'Start',
@@ -84,14 +84,14 @@ export class LabelsDemoComponent {
             fontWeight: '500',
           },
         },
-      },
+      }),
     },
     {
       id: '1 -> 3',
       source: '1',
       target: '3',
-      curve: 'smooth-step',
-      edgeLabels: {
+      curve: signal('smooth-step'),
+      edgeLabels: signal({
         center: {
           type: 'default',
           text: 'Center Only',
@@ -103,7 +103,7 @@ export class LabelsDemoComponent {
             fontSize: '12px',
           },
         },
-      },
+      }),
     },
   ];
 

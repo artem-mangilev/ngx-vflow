@@ -1,15 +1,6 @@
 import { ChangeDetectionStrategy, Component, signal, viewChild } from '@angular/core';
 import { DndDropEvent, DndModule } from 'ngx-drag-drop';
-import {
-  Connection,
-  Edge,
-  VflowComponent,
-  Vflow,
-  DynamicNode,
-  isDynamicNode,
-  isDefaultDynamicGroupNode,
-  isTemplateDynamicNode,
-} from 'ngx-vflow';
+import { Connection, Edge, VflowComponent, Vflow, Node, isDefaultGroupNode, isTemplateNode } from 'ngx-vflow';
 
 @Component({
   templateUrl: './drag-and-drop-nodes-demo.component.html',
@@ -21,7 +12,7 @@ import {
 export class DragAndDropNodesDemoComponent {
   public vflow = viewChild.required(VflowComponent);
 
-  public nodes: DynamicNode[] = [
+  public nodes: Node[] = [
     {
       id: '1',
       point: signal({ x: 10, y: 10 }),
@@ -81,11 +72,8 @@ export class DragAndDropNodesDemoComponent {
 
   onPositionChange() {
     // Update all template nodes' canAttach state
-    this.nodes.filter(isTemplateDynamicNode).forEach((node) => {
-      const intersectingNodes = this.vflow()
-        .getIntesectingNodes(node.id)
-        .filter(isDynamicNode)
-        .filter(isDefaultDynamicGroupNode);
+    this.nodes.filter(isTemplateNode).forEach((node) => {
+      const intersectingNodes = this.vflow().getIntesectingNodes(node.id).filter(isDefaultGroupNode);
 
       const canAttach = intersectingNodes.length > 0 && !node.parentId?.();
       node.data?.update((state) => ({ ...state, canAttach }));
@@ -93,10 +81,7 @@ export class DragAndDropNodesDemoComponent {
   }
 
   attachNode(nodeId: string) {
-    const [intersectionNode] = this.vflow()
-      .getIntesectingNodes(nodeId)
-      .filter(isDynamicNode)
-      .filter(isDefaultDynamicGroupNode);
+    const [intersectionNode] = this.vflow().getIntesectingNodes(nodeId).filter(isDefaultGroupNode);
 
     const nodeToUpdate = this.nodes.find((node) => node.id === nodeId);
     if (!nodeToUpdate) return;

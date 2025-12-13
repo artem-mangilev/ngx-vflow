@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { Node, Vflow } from 'ngx-vflow';
 
 @Component({
@@ -12,7 +12,7 @@ export class MultipleNodeToolbarsDemoComponent {
   public nodes: Node[] = [
     {
       id: '1',
-      point: { x: 150, y: 150 },
+      point: signal({ x: 150, y: 150 }),
       type: 'html-template',
     },
   ];

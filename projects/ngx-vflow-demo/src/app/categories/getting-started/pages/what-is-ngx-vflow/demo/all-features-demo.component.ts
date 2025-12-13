@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, effect, inject, untracked, viewChild } from '@angular/core';
-import { Vflow, Connection, VflowComponent, Edge } from 'ngx-vflow';
+import { Vflow, Connection, VflowComponent, Edge, createEdge } from 'ngx-vflow';
 import { FlowStoreService } from './services/flow-store.service';
 
 @Component({
@@ -11,7 +11,7 @@ import { FlowStoreService } from './services/flow-store.service';
     [alignmentHelper]="true"
     (connect)="createEdge($event)">
     <ng-template let-ctx edge>
-      @if (ctx.edge.data?.type === 'animated') {
+      @if (ctx.edge.data?.().type === 'animated') {
         <svg:path
           class="animated-edge"
           fill="none"
@@ -104,7 +104,7 @@ export class AllFeaturesDemoComponent {
     this.store.edges.update((edges) => {
       return [
         ...edges,
-        {
+        createEdge({
           id,
           edgeLabels: {
             center: {
@@ -115,7 +115,7 @@ export class AllFeaturesDemoComponent {
             },
           },
           ...connection,
-        },
+        }),
       ];
     });
   }

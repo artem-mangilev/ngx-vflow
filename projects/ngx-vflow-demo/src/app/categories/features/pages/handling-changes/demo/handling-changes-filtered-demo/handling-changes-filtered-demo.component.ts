@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, TemplateRef, inject, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, TemplateRef, inject, viewChild, signal } from '@angular/core';
 import { NgDocNotifyService } from '@ng-doc/ui-kit';
 import {
   Connection,
@@ -33,15 +33,15 @@ export class HandlingChangesFilteredDemoComponent {
   public nodes: Node[] = [
     {
       id: '1',
-      point: { x: 100, y: 100 },
+      point: signal({ x: 100, y: 100 }),
       type: 'default',
-      text: `1`,
+      text: signal(`1`),
     },
     {
       id: '2',
-      point: { x: 200, y: 200 },
+      point: signal({ x: 200, y: 200 }),
       type: 'default',
-      text: `2`,
+      text: signal(`2`),
     },
   ];
 
@@ -101,15 +101,15 @@ export class HandlingChangesFilteredDemoComponent {
       ...this.nodes,
       {
         id: crypto.randomUUID(),
-        point: { x: 0, y: 0 },
+        point: signal({ x: 0, y: 0 }),
         type: 'default',
-        text: `random`,
+        text: signal(`random`),
       },
       {
         id: crypto.randomUUID(),
-        point: { x: 300, y: 300 },
+        point: signal({ x: 300, y: 300 }),
         type: 'default',
-        text: `random`,
+        text: signal(`random`),
       },
     ];
   }

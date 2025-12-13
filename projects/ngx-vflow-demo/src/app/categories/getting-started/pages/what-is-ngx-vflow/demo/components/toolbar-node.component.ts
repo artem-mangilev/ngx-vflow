@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { CustomDynamicNodeComponent, HandleComponent, NodeToolbarComponent } from 'ngx-vflow';
+import { CustomNodeComponent, HandleComponent, NodeToolbarComponent } from 'ngx-vflow';
 
 const emojis = ['🌞', '💡', '💻'];
 
@@ -46,7 +46,7 @@ const emojis = ['🌞', '💡', '💻'];
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [NodeToolbarComponent, HandleComponent],
 })
-export class ToolbarNodeComponent extends CustomDynamicNodeComponent {
+export class ToolbarNodeComponent extends CustomNodeComponent {
   public emojis = emojis;
   public emoji = emojis[0];
 

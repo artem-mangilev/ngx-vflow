@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { Edge, Node, Vflow, Connection, ConnectionSettings } from 'ngx-vflow';
 
 @Component({
@@ -12,23 +12,23 @@ export class CustomHandlesDemoComponent {
   public nodes: Node[] = [
     {
       id: '1',
-      point: { x: 0, y: 150 },
+      point: signal({ x: 0, y: 150 }),
       type: 'html-template',
-      data: {
+      data: signal({
         type: 'output',
         output1: 'output1',
         output2: 'output2',
-      },
+      }),
     },
     {
       id: '2',
-      point: { x: 250, y: 100 },
+      point: signal({ x: 250, y: 100 }),
       type: 'html-template',
-      data: {
+      data: signal({
         type: 'input',
         input1: 'input1',
         input2: 'input2',
-      },
+      }),
     },
   ];
 
@@ -45,10 +45,10 @@ export class CustomHandlesDemoComponent {
       ...this.edges,
       {
         id: `${source} -> ${target}${sourceHandle ?? ''}${targetHandle ?? ''}`,
-        markers: {
+        markers: signal({
           start: { type: 'arrow-closed' },
           end: { type: 'arrow-closed' },
-        },
+        }),
         source,
         target,
         sourceHandle,

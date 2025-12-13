@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
-import { CustomDynamicNodeComponent, Vflow } from 'ngx-vflow';
+import { CustomNodeComponent, Vflow } from 'ngx-vflow';
 import { FlowStoreService } from '../services/flow-store.service';
 
 @Component({
@@ -38,7 +38,7 @@ import { FlowStoreService } from '../services/flow-store.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [Vflow],
 })
-export class SizeNodeComponent extends CustomDynamicNodeComponent {
+export class SizeNodeComponent extends CustomNodeComponent {
   public store = inject(FlowStoreService);
 
   public connectedNodeWidth = computed(() => {

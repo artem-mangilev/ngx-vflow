@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, signal, viewChild } from '@angular/core';
 import * as d3 from 'd3-force';
-import { DynamicNode, Edge, VflowComponent, Vflow } from 'ngx-vflow';
+import { Node, Edge, VflowComponent, Vflow } from 'ngx-vflow';
 
 @Component({
   templateUrl: './force-layout-demo.component.html',
@@ -12,7 +12,7 @@ import { DynamicNode, Edge, VflowComponent, Vflow } from 'ngx-vflow';
 export class ForceLayoutDemoComponent {
   vflow = viewChild.required(VflowComponent);
 
-  protected nodes: DynamicNode[] = [
+  protected nodes: Node[] = [
     {
       id: '0',
       point: signal({ x: 0, y: 0 }),

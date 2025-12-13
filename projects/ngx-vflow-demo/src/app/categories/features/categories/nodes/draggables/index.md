@@ -2,7 +2,7 @@
 
 ## Disabling
 
-You can disable `draggable` behavior on certain `Node` or `DynamicNode` by passing `false`.
+You can disable `draggable` behavior on certain `Node` by passing `false`.
 
 {{ NgDocActions.demoPane("DraggablesDemoComponent") }}
 

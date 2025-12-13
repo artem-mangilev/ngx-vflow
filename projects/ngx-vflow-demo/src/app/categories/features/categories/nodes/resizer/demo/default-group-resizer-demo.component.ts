@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { Edge, Node, Vflow } from 'ngx-vflow';
 
 @Component({
@@ -19,25 +19,25 @@ export class DefaultGroupResizerDemoComponent {
   public nodes: Node[] = [
     {
       id: '1',
-      point: { x: 10, y: 10 },
+      point: signal({ x: 10, y: 10 }),
       type: 'default',
-      text: `1`,
-      parentId: '3',
+      text: signal(`1`),
+      parentId: signal('3'),
     },
     {
       id: '2',
-      point: { x: 90, y: 80 },
+      point: signal({ x: 90, y: 80 }),
       type: 'default',
-      text: `<strong>2</strong>`,
-      parentId: '3',
+      text: signal(`<strong>2</strong>`),
+      parentId: signal('3'),
     },
     {
       id: '3',
-      point: { x: 10, y: 10 },
+      point: signal({ x: 10, y: 10 }),
       type: 'default-group',
-      width: 250,
-      height: 250,
-      resizable: true,
+      width: signal(250),
+      height: signal(250),
+      resizable: signal(true),
     },
   ];
 

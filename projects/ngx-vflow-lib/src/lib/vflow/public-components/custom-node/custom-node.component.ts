@@ -10,8 +10,9 @@ export abstract class CustomNodeComponent<T = any> extends CustomNodeBaseCompone
   public node = input.required<ComponentNode<T>>();
 
   public override ngOnInit(): void {
-    if (this.node().data) {
-      this.data.set(this.node().data);
+    const nodeData = this.node().data;
+    if (nodeData) {
+      this.data = nodeData;
     }
 
     super.ngOnInit();

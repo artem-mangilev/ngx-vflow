@@ -6,7 +6,7 @@ import { Marker } from '../interfaces/marker.interface';
 import { hashCode } from '../utils/hash';
 import { FlowEntity } from '../interfaces/flow-entity.interface';
 import { MinimapModel } from '../models/minimap.model';
-import { DynamicNode, Node } from '../interfaces/node.interface';
+import { Node } from '../interfaces/node.interface';
 
 @Injectable()
 export class FlowEntitiesService {
@@ -15,7 +15,7 @@ export class FlowEntitiesService {
     equal: (a, b) => (!a.length && !b.length ? true : a === b),
   });
 
-  public readonly rawNodes = computed(() => this.nodes().map((n) => n.rawNode) as Node[] | DynamicNode[]);
+  public readonly rawNodes = computed(() => this.nodes().map((n) => n.rawNode) as Node[]);
 
   public readonly edges = signal<EdgeModel[]>([], {
     // empty arrays considered equal, other arrays may not be equal
@@ -36,14 +36,15 @@ export class FlowEntitiesService {
     const markersMap = new Map<number, Marker>();
 
     this.validEdges().forEach((e) => {
-      if (e.edge.markers?.start) {
-        const hash = hashCode(JSON.stringify(e.edge.markers.start));
-        markersMap.set(hash, e.edge.markers.start);
+      const markers = e.markers();
+      if (markers?.start) {
+        const hash = hashCode(JSON.stringify(markers.start));
+        markersMap.set(hash, markers.start);
       }
 
-      if (e.edge.markers?.end) {
-        const hash = hashCode(JSON.stringify(e.edge.markers.end));
-        markersMap.set(hash, e.edge.markers.end);
+      if (markers?.end) {
+        const hash = hashCode(JSON.stringify(markers.end));
+        markersMap.set(hash, markers.end);
       }
     });
 
