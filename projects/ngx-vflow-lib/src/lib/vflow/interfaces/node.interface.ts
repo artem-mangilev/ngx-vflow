@@ -109,15 +109,13 @@ export function isTemplateGroupNode<T>(node: Node<T>): node is TemplateGroupNode
   return node.type === 'template-group';
 }
 
-export type PlainNode<T = unknown> =
+export type StaticNode<T = unknown> =
   | UnwrapSignal<DefaultNode>
   | UnwrapSignal<HtmlTemplateNode<T>>
   | UnwrapSignal<SvgTemplateNode<T>>
   | UnwrapSignal<ComponentNode<T>>
   | UnwrapSignal<DefaultGroupNode>
   | UnwrapSignal<TemplateGroupNode<T>>;
-
-export type PrefilledNode<T = unknown> = Required<Node<T>>;
 
 function createBaseNode(node: UnwrapSignal<SharedNode>) {
   return {
@@ -130,7 +128,7 @@ function createBaseNode(node: UnwrapSignal<SharedNode>) {
   };
 }
 
-export function createNode<T>(node: PlainNode<T>): PrefilledNode<T> {
+export function createNode<T>(node: StaticNode<T>): Required<Node<T>> {
   if (node.type === 'default') {
     return {
       ...createBaseNode(node),
@@ -138,7 +136,7 @@ export function createNode<T>(node: PlainNode<T>): PrefilledNode<T> {
       text: signal(node.text ?? ''),
       width: signal(node.width ?? NODE_DEFAULTS.width),
       height: signal(node.height ?? NODE_DEFAULTS.height),
-    } as PrefilledNode<T>;
+    };
   }
 
   if (node.type === 'html-template') {
@@ -148,7 +146,7 @@ export function createNode<T>(node: PlainNode<T>): PrefilledNode<T> {
       data: signal(node.data ?? (NODE_DEFAULTS.data as T)),
       width: signal(node.width ?? NODE_DEFAULTS.width),
       height: signal(node.height ?? NODE_DEFAULTS.height),
-    } as PrefilledNode<T>;
+    };
   }
 
   if (node.type === 'svg-template') {
@@ -158,7 +156,7 @@ export function createNode<T>(node: PlainNode<T>): PrefilledNode<T> {
       width: signal(node.width ?? NODE_DEFAULTS.width),
       height: signal(node.height ?? NODE_DEFAULTS.height),
       data: signal(node.data ?? (NODE_DEFAULTS.data as T)),
-    } as PrefilledNode<T>;
+    };
   }
 
   if (node.type === 'default-group') {
@@ -169,7 +167,7 @@ export function createNode<T>(node: PlainNode<T>): PrefilledNode<T> {
       height: signal(node.height ?? NODE_DEFAULTS.height),
       color: signal(node.color ?? NODE_DEFAULTS.color),
       resizable: signal(node.resizable ?? NODE_DEFAULTS.resizable),
-    } as PrefilledNode<T>;
+    };
   }
 
   if (node.type === 'template-group') {
@@ -179,7 +177,7 @@ export function createNode<T>(node: PlainNode<T>): PrefilledNode<T> {
       width: signal(node.width ?? NODE_DEFAULTS.width),
       height: signal(node.height ?? NODE_DEFAULTS.height),
       data: signal(node.data ?? (NODE_DEFAULTS.data as T)),
-    } as PrefilledNode<T>;
+    };
   }
 
   if (isCustomNodeComponent(node.type) || isCallable(node.type)) {
@@ -189,12 +187,12 @@ export function createNode<T>(node: PlainNode<T>): PrefilledNode<T> {
       data: signal(node.data ?? (NODE_DEFAULTS.data as T)),
       width: signal(node.width ?? NODE_DEFAULTS.width),
       height: signal(node.height ?? NODE_DEFAULTS.height),
-    } as PrefilledNode<T>;
+    };
   }
 
   throw new Error(`Unknown node type for node with id ${node.id}`);
 }
 
-export function createNodes<T = unknown>(nodes: PlainNode<T>[]): PrefilledNode<T>[] {
+export function createNodes<T = unknown>(nodes: StaticNode<T>[]): Required<Node<T>>[] {
   return nodes.map(createNode);
 }

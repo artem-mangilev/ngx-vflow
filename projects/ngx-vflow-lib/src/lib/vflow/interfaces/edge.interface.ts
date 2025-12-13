@@ -34,11 +34,9 @@ export interface Edge<T = unknown> extends Connection {
   selected?: WritableSignal<boolean>;
 }
 
-export type PlainEdge<T = unknown> = UnwrapSignal<Edge<T>>;
+export type StaticEdge<T = unknown> = UnwrapSignal<Edge<T>>;
 
-export type PrefilledEdge<T = unknown> = Required<Edge<T>>;
-
-export function createEdge<T>(edge: PlainEdge<T>): PrefilledEdge<T> {
+export function createEdge<T>(edge: StaticEdge<T>): Required<Edge<T>> {
   return {
     type: edge.type ?? EDGE_DEFAULTS.type,
     id: edge.id,
@@ -56,6 +54,6 @@ export function createEdge<T>(edge: PlainEdge<T>): PrefilledEdge<T> {
   };
 }
 
-export function createEdges<T>(edges: PlainEdge<T>[]): PrefilledEdge<T>[] {
+export function createEdges<T>(edges: StaticEdge<T>[]): Required<Edge<T>>[] {
   return edges.map(createEdge);
 }
