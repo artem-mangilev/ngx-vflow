@@ -3,6 +3,7 @@ import { Connection } from './connection.interface';
 import { CurveFactory } from './curve-factory.interface';
 import { EdgeLabel, EdgeLabelPosition } from './edge-label.interface';
 import { Marker } from './marker.interface';
+import { UnwrapSignal } from '../types/unwrap-signal.type';
 
 export const EDGE_DEFAULTS = {
   type: 'default' as EdgeType,
@@ -33,24 +34,19 @@ export interface Edge<T = unknown> extends Connection {
   selected?: WritableSignal<boolean>;
 }
 
-export type PlainEdge<T = unknown> = {
-  [K in keyof Edge<T>]: Edge<T>[K] extends WritableSignal<infer U> | undefined
-    ? Edge<T>[K] extends undefined
-      ? U | undefined
-      : U
-    : Edge<T>[K];
-};
+export type PlainEdge<T = unknown> = UnwrapSignal<Edge<T>>;
 
-export type PrefilledEdge<T = unknown> = Omit<Required<Edge<T>>, 'sourceHandle' | 'targetHandle'> & {
-  sourceHandle?: string;
-  targetHandle?: string;
-};
+export type PrefilledEdge<T = unknown> = Required<Edge<T>>;
 
 export function createEdges(edges: PlainEdge[]): PrefilledEdge[] {
   return edges.map((edge) => {
     return {
-      ...edge,
       type: edge.type ?? EDGE_DEFAULTS.type,
+      id: edge.id,
+      source: edge.source,
+      target: edge.target,
+      sourceHandle: edge.sourceHandle ?? '',
+      targetHandle: edge.targetHandle ?? '',
       curve: signal(edge.curve ?? EDGE_DEFAULTS.curve),
       data: signal(edge.data ?? EDGE_DEFAULTS.data),
       edgeLabels: signal(edge.edgeLabels ?? EDGE_DEFAULTS.edgeLabels),

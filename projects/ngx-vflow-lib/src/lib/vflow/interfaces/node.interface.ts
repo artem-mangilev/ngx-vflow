@@ -4,6 +4,7 @@ import { NodePreview } from './node-preview.interface';
 import { isCallable } from '../utils/is-callable';
 import { CustomNodeComponent } from '../public-components/custom-node/custom-node.component';
 import { isCustomNodeComponent } from '../utils/is-vflow-component';
+import { UnwrapSignal } from '../types/unwrap-signal.type';
 
 export type Node<T = any> =
   | DefaultNode
@@ -94,25 +95,17 @@ export function isTemplateGroupNode<T>(node: Node<T>): node is TemplateGroupNode
   return node.type === 'template-group';
 }
 
-type UnwrapWritableSignal<T> = {
-  [K in keyof T]: NonNullable<T[K]> extends WritableSignal<infer U>
-    ? undefined extends T[K]
-      ? U | undefined
-      : U
-    : T[K];
-};
-
 export type PlainNode<T = unknown> =
-  | UnwrapWritableSignal<DefaultNode>
-  | UnwrapWritableSignal<HtmlTemplateNode<T>>
-  | UnwrapWritableSignal<SvgTemplateNode<T>>
-  | UnwrapWritableSignal<ComponentNode<T>>
-  | UnwrapWritableSignal<DefaultGroupNode>
-  | UnwrapWritableSignal<TemplateGroupNode<T>>;
+  | UnwrapSignal<DefaultNode>
+  | UnwrapSignal<HtmlTemplateNode<T>>
+  | UnwrapSignal<SvgTemplateNode<T>>
+  | UnwrapSignal<ComponentNode<T>>
+  | UnwrapSignal<DefaultGroupNode>
+  | UnwrapSignal<TemplateGroupNode<T>>;
 
 export type PrefilledNode<T = unknown> = Required<Node<T>>;
 
-function createBaseNode(node: UnwrapWritableSignal<SharedNode>) {
+function createBaseNode(node: UnwrapSignal<SharedNode>) {
   return {
     id: node.id,
     point: signal(node.point),
