@@ -6,6 +6,20 @@ import { CustomNodeComponent } from '../public-components/custom-node/custom-nod
 import { isCustomNodeComponent } from '../utils/is-vflow-component';
 import { UnwrapSignal } from '../types/unwrap-signal.type';
 
+export const NODE_DEFAULTS = {
+  point: { x: 0, y: 0 },
+  width: 100,
+  height: 50,
+  draggable: true,
+  parentId: null,
+  preview: { style: {} },
+  selected: false,
+  color: '#1b262c',
+  resizable: false,
+  text: '',
+  data: {},
+};
+
 export type Node<T = any> =
   | DefaultNode
   | HtmlTemplateNode<T>
@@ -109,10 +123,10 @@ function createBaseNode(node: UnwrapSignal<SharedNode>) {
   return {
     id: node.id,
     point: signal(node.point),
-    draggable: signal(node.draggable ?? true),
-    parentId: signal(node.parentId ?? null),
-    preview: signal(node.preview ?? { style: {} }),
-    selected: signal(node.selected ?? false),
+    draggable: signal(node.draggable ?? NODE_DEFAULTS.draggable),
+    parentId: signal(node.parentId ?? NODE_DEFAULTS.parentId),
+    preview: signal(node.preview ?? NODE_DEFAULTS.preview),
+    selected: signal(node.selected ?? NODE_DEFAULTS.selected),
   };
 }
 
@@ -122,8 +136,8 @@ export function createNode<T>(node: PlainNode<T>): PrefilledNode<T> {
       ...createBaseNode(node),
       type: 'default' as const,
       text: signal(node.text ?? ''),
-      width: signal(node.width ?? 100),
-      height: signal(node.height ?? 50),
+      width: signal(node.width ?? NODE_DEFAULTS.width),
+      height: signal(node.height ?? NODE_DEFAULTS.height),
     } as PrefilledNode<T>;
   }
 
@@ -131,9 +145,9 @@ export function createNode<T>(node: PlainNode<T>): PrefilledNode<T> {
     return {
       ...createBaseNode(node),
       type: 'html-template' as const,
-      data: signal(node.data ?? ({} as T)),
-      width: signal(node.width ?? 150),
-      height: signal(node.height ?? 100),
+      data: signal(node.data ?? (NODE_DEFAULTS.data as T)),
+      width: signal(node.width ?? NODE_DEFAULTS.width),
+      height: signal(node.height ?? NODE_DEFAULTS.height),
     } as PrefilledNode<T>;
   }
 
@@ -141,9 +155,9 @@ export function createNode<T>(node: PlainNode<T>): PrefilledNode<T> {
     return {
       ...createBaseNode(node),
       type: 'svg-template' as const,
-      width: signal(node.width ?? 150),
-      height: signal(node.height ?? 100),
-      data: signal(node.data ?? ({} as T)),
+      width: signal(node.width ?? NODE_DEFAULTS.width),
+      height: signal(node.height ?? NODE_DEFAULTS.height),
+      data: signal(node.data ?? (NODE_DEFAULTS.data as T)),
     } as PrefilledNode<T>;
   }
 
@@ -151,10 +165,10 @@ export function createNode<T>(node: PlainNode<T>): PrefilledNode<T> {
     return {
       ...createBaseNode(node),
       type: 'default-group' as const,
-      width: signal(node.width ?? 300),
-      height: signal(node.height ?? 200),
-      color: signal(node.color ?? '#cccccc'),
-      resizable: signal(node.resizable ?? false),
+      width: signal(node.width ?? NODE_DEFAULTS.width),
+      height: signal(node.height ?? NODE_DEFAULTS.height),
+      color: signal(node.color ?? NODE_DEFAULTS.color),
+      resizable: signal(node.resizable ?? NODE_DEFAULTS.resizable),
     } as PrefilledNode<T>;
   }
 
@@ -162,9 +176,9 @@ export function createNode<T>(node: PlainNode<T>): PrefilledNode<T> {
     return {
       ...createBaseNode(node),
       type: 'template-group' as const,
-      width: signal(node.width ?? 300),
-      height: signal(node.height ?? 200),
-      data: signal(node.data ?? ({} as T)),
+      width: signal(node.width ?? NODE_DEFAULTS.width),
+      height: signal(node.height ?? NODE_DEFAULTS.height),
+      data: signal(node.data ?? (NODE_DEFAULTS.data as T)),
     } as PrefilledNode<T>;
   }
 
@@ -172,9 +186,9 @@ export function createNode<T>(node: PlainNode<T>): PrefilledNode<T> {
     return {
       ...createBaseNode(node),
       type: node.type,
-      data: signal(node.data ?? ({} as T)),
-      width: signal(node.width ?? 150),
-      height: signal(node.height ?? 100),
+      data: signal(node.data ?? (NODE_DEFAULTS.data as T)),
+      width: signal(node.width ?? NODE_DEFAULTS.width),
+      height: signal(node.height ?? NODE_DEFAULTS.height),
     } as PrefilledNode<T>;
   }
 

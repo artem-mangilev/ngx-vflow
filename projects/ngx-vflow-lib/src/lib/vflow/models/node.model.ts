@@ -1,5 +1,5 @@
 import { TemplateRef, computed, inject, signal } from '@angular/core';
-import { Node, isComponentNode } from '../interfaces/node.interface';
+import { NODE_DEFAULTS, Node, isComponentNode } from '../interfaces/node.interface';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { HandleModel } from './handle.model';
 import { FlowEntity } from '../interfaces/flow-entity.interface';
@@ -19,10 +19,6 @@ import { isCustomNodeComponent } from '../utils/is-vflow-component';
 export class NodeModel<T = unknown>
   implements FlowEntity, Contextable<NodeContext | GroupNodeContext | { $implicit: object }>
 {
-  private static defaultWidth = 100;
-  private static defaultHeight = 50;
-  private static defaultColor = '#1b262c';
-
   private entitiesService = inject(FlowEntitiesService);
   private settingsService = inject(FlowSettingsService);
   private nodeRenderingService = inject(NodeRenderingService);
@@ -32,10 +28,10 @@ export class NodeModel<T = unknown>
   public point = signal<Point>({ x: 0, y: 0 });
   public point$: Observable<Point>;
 
-  public width = signal(NodeModel.defaultWidth);
+  public width = signal(NODE_DEFAULTS.width);
   public width$: Observable<number>;
 
-  public height = signal(NodeModel.defaultHeight);
+  public height = signal(NODE_DEFAULTS.height);
   public height$: Observable<number>;
 
   /**
@@ -134,7 +130,7 @@ export class NodeModel<T = unknown>
   );
 
   // Default node specific thing
-  public text = signal('');
+  public text = signal(NODE_DEFAULTS.text);
 
   // Component node specific thing
   public componentTypeInputs = {
@@ -145,10 +141,10 @@ export class NodeModel<T = unknown>
 
   public children = computed(() => this.entitiesService.nodes().filter((n) => n.parentId() === this.rawNode.id));
 
-  public color = signal(NodeModel.defaultColor);
+  public color = signal(NODE_DEFAULTS.color);
 
   public controlledByResizer = signal(false);
-  public resizable = signal(false);
+  public resizable = signal(NODE_DEFAULTS.resizable);
   public resizing = signal(false);
   public resizerTemplate = signal<TemplateRef<unknown> | null>(null);
 
@@ -156,7 +152,7 @@ export class NodeModel<T = unknown>
     $implicit: {},
   };
 
-  private parentId = signal<string | null>(null);
+  private parentId = signal<string | null>(NODE_DEFAULTS.parentId);
 
   constructor(public rawNode: Node<T>) {
     if (rawNode.point) {
@@ -203,7 +199,7 @@ export class NodeModel<T = unknown>
       this.context = {
         $implicit: {
           node: rawNode,
-          data: rawNode.data ?? signal({} as T),
+          data: rawNode.data ?? signal(NODE_DEFAULTS.data as T),
           selected: this.selected.asReadonly(),
           shouldLoad: this.shouldLoad,
         },
@@ -214,7 +210,7 @@ export class NodeModel<T = unknown>
       this.context = {
         $implicit: {
           node: rawNode,
-          data: rawNode.data ?? signal({} as T),
+          data: rawNode.data ?? signal(NODE_DEFAULTS.data as T),
           selected: this.selected.asReadonly(),
           width: this.width.asReadonly(),
           height: this.height.asReadonly(),
@@ -227,7 +223,7 @@ export class NodeModel<T = unknown>
       this.context = {
         $implicit: {
           node: rawNode,
-          data: rawNode.data ?? signal({} as T),
+          data: rawNode.data ?? signal(NODE_DEFAULTS.data as T),
           selected: this.selected.asReadonly(),
           width: this.width.asReadonly(),
           height: this.height.asReadonly(),
