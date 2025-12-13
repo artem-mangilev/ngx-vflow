@@ -117,82 +117,188 @@ export type StaticNode<T = unknown> =
   | UnwrapSignal<DefaultGroupNode>
   | UnwrapSignal<TemplateGroupNode<T>>;
 
-function createBaseNode(node: UnwrapSignal<SharedNode>) {
-  return {
-    id: node.id,
-    point: signal(node.point),
-    draggable: signal(node.draggable ?? NODE_DEFAULTS.draggable),
-    parentId: signal(node.parentId ?? NODE_DEFAULTS.parentId),
-    preview: signal(node.preview ?? NODE_DEFAULTS.preview),
-    selected: signal(node.selected ?? NODE_DEFAULTS.selected),
-  };
+interface CreateNodeOptions {
+  useDefaults: boolean;
 }
 
-export function createNode<T>(node: StaticNode<T>): Required<Node<T>> {
-  if (node.type === 'default') {
+function createBaseNode(node: UnwrapSignal<SharedNode>, useDefaults: boolean) {
+  if (useDefaults) {
     return {
-      ...createBaseNode(node),
-      type: 'default' as const,
-      text: signal(node.text ?? ''),
-      width: signal(node.width ?? NODE_DEFAULTS.width),
-      height: signal(node.height ?? NODE_DEFAULTS.height),
+      id: node.id,
+      point: signal(node.point),
+      draggable: signal(node.draggable ?? NODE_DEFAULTS.draggable),
+      parentId: signal(node.parentId ?? NODE_DEFAULTS.parentId),
+      preview: signal(node.preview ?? NODE_DEFAULTS.preview),
+      selected: signal(node.selected ?? NODE_DEFAULTS.selected),
     };
+  } else {
+    return {
+      id: node.id,
+      point: signal(node.point),
+      draggable: node.draggable ? signal(node.draggable) : undefined,
+      parentId: node.parentId ? signal(node.parentId) : undefined,
+      preview: node.preview ? signal(node.preview) : undefined,
+      selected: node.selected ? signal(node.selected) : undefined,
+    };
+  }
+}
+
+// Перегрузка с useDefaults: true (или без опций) - возвращает Required<Node<T>>
+export function createNode<T>(node: StaticNode<T>): Required<Node<T>>;
+export function createNode<T>(node: StaticNode<T>, options: { useDefaults: true }): Required<Node<T>>;
+// Перегрузка с useDefaults: false - возвращает Node<T>
+export function createNode<T>(node: StaticNode<T>, options: { useDefaults: false }): Node<T>;
+// Реализация
+export function createNode<T>(
+  node: StaticNode<T>,
+  options: CreateNodeOptions = { useDefaults: true },
+): Node<T> | Required<Node<T>> {
+  const baseNode = createBaseNode(node, options.useDefaults);
+
+  if (node.type === 'default') {
+    if (options.useDefaults) {
+      return {
+        ...baseNode,
+        type: 'default' as const,
+        text: signal(node.text ?? ''),
+        width: signal(node.width ?? NODE_DEFAULTS.width),
+        height: signal(node.height ?? NODE_DEFAULTS.height),
+      };
+    } else {
+      return {
+        ...baseNode,
+        type: 'default' as const,
+        text: node.text ? signal(node.text) : undefined,
+        width: node.width ? signal(node.width) : undefined,
+        height: node.height ? signal(node.height) : undefined,
+      };
+    }
   }
 
   if (node.type === 'html-template') {
-    return {
-      ...createBaseNode(node),
-      type: 'html-template' as const,
-      data: signal(node.data ?? (NODE_DEFAULTS.data as T)),
-      width: signal(node.width ?? NODE_DEFAULTS.width),
-      height: signal(node.height ?? NODE_DEFAULTS.height),
-    };
+    if (options.useDefaults) {
+      return {
+        ...baseNode,
+        type: 'html-template' as const,
+        data: signal(node.data ?? (NODE_DEFAULTS.data as T)),
+        width: signal(node.width ?? NODE_DEFAULTS.width),
+        height: signal(node.height ?? NODE_DEFAULTS.height),
+      };
+    } else {
+      return {
+        ...baseNode,
+        type: 'html-template' as const,
+        data: node.data ? (signal(node.data) as WritableSignal<T>) : undefined,
+        width: node.width ? signal(node.width) : undefined,
+        height: node.height ? signal(node.height) : undefined,
+      };
+    }
   }
 
   if (node.type === 'svg-template') {
-    return {
-      ...createBaseNode(node),
-      type: 'svg-template' as const,
-      width: signal(node.width ?? NODE_DEFAULTS.width),
-      height: signal(node.height ?? NODE_DEFAULTS.height),
-      data: signal(node.data ?? (NODE_DEFAULTS.data as T)),
-    };
+    const width = signal(node.width);
+    const height = signal(node.height);
+
+    if (options.useDefaults) {
+      return {
+        ...baseNode,
+        type: 'svg-template' as const,
+        width,
+        height,
+        data: signal(node.data ?? (NODE_DEFAULTS.data as T)),
+      };
+    } else {
+      return {
+        ...baseNode,
+        type: 'svg-template' as const,
+        width,
+        height,
+        data: node.data ? (signal(node.data) as WritableSignal<T>) : undefined,
+      };
+    }
   }
 
   if (node.type === 'default-group') {
-    return {
-      ...createBaseNode(node),
-      type: 'default-group' as const,
-      width: signal(node.width ?? NODE_DEFAULTS.width),
-      height: signal(node.height ?? NODE_DEFAULTS.height),
-      color: signal(node.color ?? NODE_DEFAULTS.color),
-      resizable: signal(node.resizable ?? NODE_DEFAULTS.resizable),
-    };
+    const width = signal(node.width);
+    const height = signal(node.height);
+
+    if (options.useDefaults) {
+      return {
+        ...baseNode,
+        type: 'default-group' as const,
+        width,
+        height,
+        color: signal(node.color ?? NODE_DEFAULTS.color),
+        resizable: signal(node.resizable ?? NODE_DEFAULTS.resizable),
+      };
+    } else {
+      return {
+        ...baseNode,
+        type: 'default-group' as const,
+        width,
+        height,
+        color: node.color ? signal(node.color) : undefined,
+        resizable: node.resizable ? signal(node.resizable) : undefined,
+      };
+    }
   }
 
   if (node.type === 'template-group') {
-    return {
-      ...createBaseNode(node),
-      type: 'template-group' as const,
-      width: signal(node.width ?? NODE_DEFAULTS.width),
-      height: signal(node.height ?? NODE_DEFAULTS.height),
-      data: signal(node.data ?? (NODE_DEFAULTS.data as T)),
-    };
+    const width = signal(node.width);
+    const height = signal(node.height);
+
+    if (options.useDefaults) {
+      return {
+        ...baseNode,
+        type: 'template-group' as const,
+        width,
+        height,
+        data: signal(node.data ?? (NODE_DEFAULTS.data as T)),
+      };
+    } else {
+      return {
+        ...baseNode,
+        type: 'template-group' as const,
+        width,
+        height,
+        data: node.data ? (signal(node.data) as WritableSignal<T>) : undefined,
+      };
+    }
   }
 
   if (isCustomNodeComponent(node.type) || isCallable(node.type)) {
-    return {
-      ...createBaseNode(node),
-      type: node.type,
-      data: signal(node.data ?? (NODE_DEFAULTS.data as T)),
-      width: signal(node.width ?? NODE_DEFAULTS.width),
-      height: signal(node.height ?? NODE_DEFAULTS.height),
-    };
+    if (options.useDefaults) {
+      return {
+        ...baseNode,
+        type: node.type,
+        data: signal(node.data ?? (NODE_DEFAULTS.data as T)),
+        width: signal(node.width ?? NODE_DEFAULTS.width),
+        height: signal(node.height ?? NODE_DEFAULTS.height),
+      };
+    } else {
+      return {
+        ...baseNode,
+        type: node.type,
+        data: node.data ? (signal(node.data) as WritableSignal<T>) : undefined,
+        width: node.width ? signal(node.width) : undefined,
+        height: node.height ? signal(node.height) : undefined,
+      };
+    }
   }
 
   throw new Error(`Unknown node type for node with id ${node.id}`);
 }
 
-export function createNodes<T = unknown>(nodes: StaticNode<T>[]): Required<Node<T>>[] {
-  return nodes.map(createNode);
+export function createNodes<T = unknown>(nodes: StaticNode<T>[]): Required<Node<T>>[];
+export function createNodes<T = unknown>(nodes: StaticNode<T>[], options: { useDefaults: true }): Required<Node<T>>[];
+export function createNodes<T = unknown>(nodes: StaticNode<T>[], options: { useDefaults: false }): Node<T>[];
+export function createNodes<T = unknown>(
+  nodes: StaticNode<T>[],
+  options: CreateNodeOptions = { useDefaults: true },
+): Node<T>[] | Required<Node<T>>[] {
+  if (options.useDefaults) {
+    return nodes.map((node) => createNode(node, { useDefaults: true }));
+  } else {
+    return nodes.map((node) => createNode(node, { useDefaults: false }));
+  }
 }
