@@ -5,9 +5,9 @@
   [nodes]="nodes"
   [edges]="edges"
   (connect)="createEdge($event)"
-  (onNodesChange.position.single)="handleNodePositionChange($event)"
-  (onNodesChange.select.single)="handleNodeSelectChange($event)"
-  (onNodesChange.add.many)="handleNodesAddChange($event)"
+  (onNodesChange.position)="handleNodePositionChange($event)"
+  (onNodesChange.select)="handleNodeSelectChange($event)"
+  (onNodesChange.add)="handleNodesAddChange($event)"
   (onEdgesChange.add)="handleEdgesAddChange($event)" />
 
 <ng-template #toast let-ctx>

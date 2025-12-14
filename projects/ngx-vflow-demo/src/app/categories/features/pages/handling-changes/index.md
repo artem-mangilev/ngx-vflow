@@ -37,8 +37,6 @@ For your convenience, here is the filtering scheme for changes based on the `(on
 
 - `(onNodesChange.[NodeChangeType])` - a list of node changes of a certain type
 - `(onNodesChange.[EdgeChangeType])` - a list of edge changes of a certain type
-- `(onNodesChange.[NodeChangeType].[Count])` - a list (`many`) or single (`single`) node change of a certain type
-- `(onEdgesChange.[EdgeChangeType].[Count])` - a list (`many`) or single (`single`) edge change of a certain type
 
 Where:
 
@@ -46,10 +44,6 @@ Where:
 type NodeChangeType = 'position' | 'add' | 'remove' | 'select';
 
 type EdgeChangeType = 'detached' | 'add' | 'remove' | 'select';
-
-// single - when there is only one change of this type (for example if you drag and drop some node, it's consireder as single change)
-// many - when there is more than one change of this type (for example if you deleted several nodes at the same time)
-type Count = 'single' | 'many';
 ```
 
 {{ NgDocActions.demoPane("HandlingChangesFilteredDemoComponent") }}
@@ -58,33 +52,15 @@ List of all possible filter outputs:
 
 ```
 'onNodesChange.position',
-'onNodesChange.position.single',
-'onNodesChange.position.many',
 'onNodesChange.size',
-'onNodesChange.size.single',
-'onNodesChange.size.many',
 'onNodesChange.add',
-'onNodesChange.add.single',
-'onNodesChange.add.many',
 'onNodesChange.remove',
-'onNodesChange.remove.single',
-'onNodesChange.remove.many',
 'onNodesChange.select',
-'onNodesChange.select.single',
-'onNodesChange.select.many',
 
 'onEdgesChange.detached',
-'onEdgesChange.detached.single',
-'onEdgesChange.detached.many',
 'onEdgesChange.add',
-'onEdgesChange.add.single',
-'onEdgesChange.add.many',
 'onEdgesChange.remove',
-'onEdgesChange.remove.single',
-'onEdgesChange.remove.many',
 'onEdgesChange.select',
-'onEdgesChange.select.single',
-'onEdgesChange.select.many',
 ```
 
 ## From componenet itself

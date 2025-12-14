@@ -60,18 +60,18 @@ export class HandlingChangesFilteredDemoComponent {
     ];
   }
 
-  public handleNodePositionChange(change: NodePositionChange) {
+  public handleNodePositionChange(change: NodePositionChange[]) {
     this.toastData = {
-      title: '(onNodesChange.position.single)',
+      title: '(onNodesChange.position)',
       json: JSON.stringify(change, null, 2),
     };
 
     this.notifyService.notify(this.toastTemplate());
   }
 
-  public handleNodeSelectChange(change: NodeSelectedChange) {
+  public handleNodeSelectChange(change: NodeSelectedChange[]) {
     this.toastData = {
-      title: '(onNodesChange.select.single)',
+      title: '(onNodesChange.select)',
       json: JSON.stringify(change, null, 2),
     };
 
@@ -80,7 +80,7 @@ export class HandlingChangesFilteredDemoComponent {
 
   public handleNodesAddChange(changes: NodeAddChange[]) {
     this.toastData = {
-      title: '(onNodesChange.add.many)',
+      title: '(onNodesChange.add)',
       json: JSON.stringify(changes, null, 2),
     };
 
