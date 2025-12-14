@@ -22,21 +22,21 @@ Types of `EdgeChange`s:
 
 There are a several ways to receive these changes:
 
-## From (onNodesChange) and (onEdgesChange) outputs
+## From (nodesChanges) and (edgesChanges) outputs
 
 This is a way to get every possible change. Changes came as non empty arrays:
 
-- `(onNodesChange)` emits `NodeChange[]`
-- `(onEdgesChange)` emits `EdgeChange[]`
+- `(nodesChanges)` emits `NodeChange[]`
+- `(edgesChanges)` emits `EdgeChange[]`
 
 {{ NgDocActions.demoPane("HandlingChangesDemoComponent") }}
 
 ## From filtered outputs
 
-For your convenience, here is the filtering scheme for changes based on the `(onNodesChange)` and `(onEdgesChange)` events:
+For your convenience, here is the filtering scheme for changes based on the `(nodesChanges)` and `(edgesChanges)` events:
 
-- `(onNodesChange.[NodeChangeType])` - a list of node changes of a certain type
-- `(onNodesChange.[EdgeChangeType])` - a list of edge changes of a certain type
+- `(nodesChanges.[NodeChangeType])` - a list of node changes of a certain type
+- `(nodesChanges.[EdgeChangeType])` - a list of edge changes of a certain type
 
 Where:
 
@@ -51,16 +51,16 @@ type EdgeChangeType = 'detached' | 'add' | 'remove' | 'select';
 List of all possible filter outputs:
 
 ```
-'onNodesChange.position',
-'onNodesChange.size',
-'onNodesChange.add',
-'onNodesChange.remove',
-'onNodesChange.select',
+'nodesChanges.position',
+'nodesChanges.size',
+'nodesChanges.add',
+'nodesChanges.remove',
+'nodesChanges.select',
 
-'onEdgesChange.detached',
-'onEdgesChange.add',
-'onEdgesChange.remove',
-'onEdgesChange.select',
+'edgesChanges.detached',
+'edgesChanges.add',
+'edgesChanges.remove',
+'edgesChanges.select',
 ```
 
 ## From componenet itself

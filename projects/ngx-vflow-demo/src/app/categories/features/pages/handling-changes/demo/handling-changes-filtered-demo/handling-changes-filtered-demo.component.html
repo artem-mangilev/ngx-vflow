@@ -5,10 +5,10 @@
   [nodes]="nodes"
   [edges]="edges"
   (connect)="createEdge($event)"
-  (onNodesChange.position)="handleNodePositionChange($event)"
-  (onNodesChange.select)="handleNodeSelectChange($event)"
-  (onNodesChange.add)="handleNodesAddChange($event)"
-  (onEdgesChange.add)="handleEdgesAddChange($event)" />
+  (nodesChanges.position)="handleNodePositionChange($event)"
+  (nodesChanges.select)="handleNodeSelectChange($event)"
+  (nodesChanges.add)="handleNodesAddChange($event)"
+  (edgesChanges.add)="handleEdgesAddChange($event)" />
 
 <ng-template #toast let-ctx>
   <h3>{{ toastData?.title }}</h3>

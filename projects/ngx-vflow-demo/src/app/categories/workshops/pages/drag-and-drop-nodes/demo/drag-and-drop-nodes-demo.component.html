@@ -11,7 +11,7 @@
   [edges]="edges"
   (dndDrop)="createNode($event)"
   (onConnect)="connect($event)"
-  (onNodesChange.position)="onPositionChange()">
+  (nodesChanges.position)="onPositionChange()">
   <ng-template let-ctx nodeHtml>
     <div class="custom-node" [class.custom-node_selected]="ctx.selected()">
       <button class="custom-node__button" selectable>Select here</button>

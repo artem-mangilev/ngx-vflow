@@ -28,49 +28,49 @@ export class ChangesControllerDirective {
   protected edgesChangeService = inject(EdgeChangesService);
 
   /**
-   * Watch nodes change
+   * Watch nodes changes
    */
-  public readonly onNodesChange = outputFromObservable(this.nodesChangeService.changes$);
+  public readonly nodesChanges = outputFromObservable(this.nodesChangeService.changes$);
 
-  public readonly onNodesChangePosition = outputFromObservable(this.nodeChangesOfType('position'), {
-    alias: 'onNodesChange.position',
+  public readonly nodesChangesPosition = outputFromObservable(this.nodeChangesOfType('position'), {
+    alias: 'nodesChanges.position',
   });
 
-  public readonly onNodesChangeSize = outputFromObservable(this.nodeChangesOfType('size'), {
-    alias: 'onNodesChange.size',
+  public readonly nodesChangesSize = outputFromObservable(this.nodeChangesOfType('size'), {
+    alias: 'nodesChanges.size',
   });
 
-  public readonly onNodesChangeAdd = outputFromObservable(this.nodeChangesOfType('add'), {
-    alias: 'onNodesChange.add',
+  public readonly nodesChangesAdd = outputFromObservable(this.nodeChangesOfType('add'), {
+    alias: 'nodesChanges.add',
   });
 
-  public readonly onNodesChangeRemove = outputFromObservable(this.nodeChangesOfType('remove'), {
-    alias: 'onNodesChange.remove',
+  public readonly nodesChangesRemove = outputFromObservable(this.nodeChangesOfType('remove'), {
+    alias: 'nodesChanges.remove',
   });
 
-  public readonly onNodesChangeSelect = outputFromObservable(this.nodeChangesOfType('select'), {
-    alias: 'onNodesChange.select',
+  public readonly nodesChangesSelect = outputFromObservable(this.nodeChangesOfType('select'), {
+    alias: 'nodesChanges.select',
   });
 
   /**
    * Watch edges change
    */
-  public readonly onEdgesChange = outputFromObservable(this.edgesChangeService.changes$);
+  public readonly edgesChanges = outputFromObservable(this.edgesChangeService.changes$);
 
-  public readonly onNodesChangeDetached = outputFromObservable(this.edgeChangesOfType('detached'), {
-    alias: 'onEdgesChange.detached',
+  public readonly edgesChangesDetached = outputFromObservable(this.edgeChangesOfType('detached'), {
+    alias: 'edgesChanges.detached',
   });
 
-  public readonly onEdgesChangeAdd = outputFromObservable(this.edgeChangesOfType('add'), {
-    alias: 'onEdgesChange.add',
+  public readonly edgesChangesAdd = outputFromObservable(this.edgeChangesOfType('add'), {
+    alias: 'edgesChanges.add',
   });
 
-  public readonly onEdgeChangeRemove = outputFromObservable(this.edgeChangesOfType('remove'), {
-    alias: 'onEdgesChange.remove',
+  public readonly edgesChangesRemove = outputFromObservable(this.edgeChangesOfType('remove'), {
+    alias: 'edgesChanges.remove',
   });
 
-  public readonly onEdgeChangeSelect = outputFromObservable(this.edgeChangesOfType('select'), {
-    alias: 'onEdgesChange.select',
+  public readonly edgesChangesSelect = outputFromObservable(this.edgeChangesOfType('select'), {
+    alias: 'edgesChanges.select',
   });
 
   private nodeChangesOfType<T extends NodeChange['type']>(type: T) {

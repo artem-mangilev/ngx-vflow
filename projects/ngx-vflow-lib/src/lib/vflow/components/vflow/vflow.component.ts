@@ -79,17 +79,17 @@ import { AlignmentHelperSettings } from '../../interfaces/alignment-helper-setti
 const changesControllerHostDirective = {
   directive: ChangesControllerDirective,
   outputs: [
-    'onNodesChange',
-    'onNodesChange.position',
-    'onNodesChange.size',
-    'onNodesChange.add',
-    'onNodesChange.remove',
-    'onNodesChange.select',
-    'onEdgesChange',
-    'onEdgesChange.detached',
-    'onEdgesChange.add',
-    'onEdgesChange.remove',
-    'onEdgesChange.select',
+    'nodesChanges',
+    'nodesChanges.position',
+    'nodesChanges.size',
+    'nodesChanges.add',
+    'nodesChanges.remove',
+    'nodesChanges.select',
+    'edgesChanges',
+    'edgesChanges.detached',
+    'edgesChanges.add',
+    'edgesChanges.remove',
+    'edgesChanges.select',
   ],
 };
 
