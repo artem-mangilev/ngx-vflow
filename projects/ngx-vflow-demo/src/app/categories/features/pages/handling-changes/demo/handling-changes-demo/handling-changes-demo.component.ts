@@ -53,7 +53,7 @@ export class HandlingChangesDemoComponent {
 
   public handleNodeChanges(changes: NodeChange[]) {
     this.toastData = {
-      title: '(onNodesChange)',
+      title: '(nodesChanges)',
       json: JSON.stringify(changes, null, 2),
     };
 
@@ -62,7 +62,7 @@ export class HandlingChangesDemoComponent {
 
   public handleEdgeChanges(changes: EdgeChange[]) {
     this.toastData = {
-      title: '(onEdgesChange)',
+      title: '(edgesChanges)',
       json: JSON.stringify(changes, null, 2),
     };
 

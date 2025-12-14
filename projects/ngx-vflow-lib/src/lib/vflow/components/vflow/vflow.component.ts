@@ -79,35 +79,17 @@ import { AlignmentHelperSettings } from '../../interfaces/alignment-helper-setti
 const changesControllerHostDirective = {
   directive: ChangesControllerDirective,
   outputs: [
-    'onNodesChange',
-    'onNodesChange.position',
-    'onNodesChange.position.single',
-    'onNodesChange.position.many',
-    'onNodesChange.size',
-    'onNodesChange.size.single',
-    'onNodesChange.size.many',
-    'onNodesChange.add',
-    'onNodesChange.add.single',
-    'onNodesChange.add.many',
-    'onNodesChange.remove',
-    'onNodesChange.remove.single',
-    'onNodesChange.remove.many',
-    'onNodesChange.select',
-    'onNodesChange.select.single',
-    'onNodesChange.select.many',
-    'onEdgesChange',
-    'onEdgesChange.detached',
-    'onEdgesChange.detached.single',
-    'onEdgesChange.detached.many',
-    'onEdgesChange.add',
-    'onEdgesChange.add.single',
-    'onEdgesChange.add.many',
-    'onEdgesChange.remove',
-    'onEdgesChange.remove.single',
-    'onEdgesChange.remove.many',
-    'onEdgesChange.select',
-    'onEdgesChange.select.single',
-    'onEdgesChange.select.many',
+    'nodesChanges',
+    'nodesChanges.position',
+    'nodesChanges.size',
+    'nodesChanges.add',
+    'nodesChanges.remove',
+    'nodesChanges.select',
+    'edgesChanges',
+    'edgesChanges.detached',
+    'edgesChanges.add',
+    'edgesChanges.remove',
+    'edgesChanges.select',
   ],
 };
 
@@ -324,10 +306,8 @@ export class VflowComponent {
   // #region OUTPUTS
   /**
    * Event that accumulates all custom node events
-   *
-   * @experimental
    */
-  public readonly onComponentNodeEvent = outputFromObservable<any>(this.componentEventBusService.event$); // TODO: research how to remove any
+  public readonly componentNodeEvent = outputFromObservable<any>(this.componentEventBusService.event$); // TODO: research how to remove any
   // #endregion
 
   // #region TEMPLATES

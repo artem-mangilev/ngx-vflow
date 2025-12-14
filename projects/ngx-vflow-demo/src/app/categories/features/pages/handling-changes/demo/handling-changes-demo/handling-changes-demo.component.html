@@ -3,8 +3,8 @@
   [nodes]="nodes"
   [edges]="edges"
   (connect)="createEdge($event)"
-  (onNodesChange)="handleNodeChanges($event)"
-  (onEdgesChange)="handleEdgeChanges($event)" />
+  (nodesChanges)="handleNodeChanges($event)"
+  (edgesChanges)="handleEdgeChanges($event)" />
 
 <ng-template #toast>
   <h3>{{ toastData?.title }}</h3>

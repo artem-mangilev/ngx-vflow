@@ -3,11 +3,11 @@ import { Connection, ReconnectionEvent } from 'ngx-vflow';
 import { AsInterface } from '../types';
 import type { ConnectionControllerDirective, ɵHandleModel as HandleModel } from 'ngx-vflow';
 
-@Directive({ selector: '[connect], [onConnect]', standalone: true })
+@Directive({ selector: '[connect], [connect]', standalone: true })
 export class ConnectionControllerMockDirective implements AsInterface<ConnectionControllerDirective> {
   public readonly connect = output<Connection>();
   // eslint-disable-next-line @angular-eslint/no-output-on-prefix
-  public readonly onConnect = output<Connection>();
+  public readonly connect = output<Connection>();
 
   public readonly reconnect = output<ReconnectionEvent>();
   // eslint-disable-next-line @angular-eslint/no-output-on-prefix
