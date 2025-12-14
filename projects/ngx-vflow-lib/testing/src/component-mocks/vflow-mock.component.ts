@@ -183,7 +183,7 @@ export class VflowMockComponent implements AsInterface<VflowComponent>, OnInit {
   public alignmentHelper = input<boolean | AlignmentHelperSettings>(false);
 
   // eslint-disable-next-line @angular-eslint/no-output-on-prefix
-  public readonly onComponentNodeEvent = output<any>();
+  public readonly componentNodeEvent = output<any>();
 
   protected nodeTemplateDirective = contentChild(NodeHtmlTemplateMockDirective);
 

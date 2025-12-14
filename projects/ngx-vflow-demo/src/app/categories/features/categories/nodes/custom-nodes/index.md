@@ -45,7 +45,7 @@ How to create component node:
 > **Warning**
 > This is an experimental API
 
-There is a `(onComponentNodeEvent)` event on `VflowComponent`. Here is how it works:
+There is a `(componentNodeEvent)` event on `VflowComponent`. Here is how it works:
 
 1. It accumulates every `EventEmitter` of every component node of your flow
 2. It emits on every emit of those emitters

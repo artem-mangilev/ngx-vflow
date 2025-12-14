@@ -5,11 +5,7 @@ import { BlueSquareNodeComponent, BlueSquareData } from './components/blue-squar
 import { RedSquareNodeComponent, RedSquareData } from './components/red-square-node.component';
 
 @Component({
-  template: `<vflow
-    view="auto"
-    [nodes]="nodes"
-    [edges]="edges"
-    (onComponentNodeEvent)="handleComponentEvent($event)" />`,
+  template: `<vflow view="auto" [nodes]="nodes" [edges]="edges" (componentNodeEvent)="handleComponentEvent($event)" />`,
   styles: [
     `
       :host {
