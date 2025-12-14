@@ -1,5 +1,6 @@
 import { smoothStepPath } from './smooth-step-path';
 import { CurveFactoryParams } from '../../interfaces/curve-factory.interface';
+import { createEdge } from '../../interfaces/edge.interface';
 
 describe('smoothStepPath', () => {
   const createParams = (
@@ -9,11 +10,11 @@ describe('smoothStepPath', () => {
     targetPosition: 'top' | 'bottom' | 'left' | 'right' = 'left',
   ): CurveFactoryParams => ({
     mode: 'edge',
-    edge: {
+    edge: createEdge({
       id: 'test-edge',
       source: 'source',
       target: 'target',
-    },
+    }),
     sourcePoint,
     targetPoint,
     sourcePosition,
