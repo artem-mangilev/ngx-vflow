@@ -8,7 +8,7 @@ import { RootSvgReferenceDirective } from './reference.directive';
 import { Point } from '../interfaces/point.interface';
 
 const EDGE = 48; // px from edge to trigger pan
-const BASE_SPEED = 5; // px per frame
+const BASE_SPEED = 10;
 
 const START_STATES = ['node-drag-start', 'connection-start', 'reconnection-start'];
 
@@ -70,14 +70,32 @@ export class AutoPanDirective {
     const dT = point.y;
     const dB = height - point.y;
 
-    const speed = BASE_SPEED;
     let deltaX = 0;
     let deltaY = 0;
 
-    if (dL < EDGE) deltaX = +speed;
-    if (dR < EDGE) deltaX = -speed;
-    if (dT < EDGE) deltaY = +speed;
-    if (dB < EDGE) deltaY = -speed;
+    // Left edge: pan right (increase x)
+    if (dL < EDGE) {
+      const speedL = BASE_SPEED * edgeFactor(dL);
+      deltaX += speedL;
+    }
+
+    // Right edge: pan left (decrease x)
+    if (dR < EDGE) {
+      const speedR = BASE_SPEED * edgeFactor(dR);
+      deltaX -= speedR;
+    }
+
+    // Top edge: pan down (increase y)
+    if (dT < EDGE) {
+      const speedT = BASE_SPEED * edgeFactor(dT);
+      deltaY += speedT;
+    }
+
+    // Bottom edge: pan up (decrease y)
+    if (dB < EDGE) {
+      const speedB = BASE_SPEED * edgeFactor(dB);
+      deltaY -= speedB;
+    }
 
     if (deltaX !== 0 || deltaY !== 0) {
       this.viewportService.writableViewport.set({
@@ -87,4 +105,13 @@ export class AutoPanDirective {
       });
     }
   }
+}
+
+function clamp01(n: number): number {
+  return Math.max(0, Math.min(1, n));
+}
+
+function edgeFactor(distance: number): number {
+  const t = clamp01((EDGE - distance) / EDGE);
+  return t * t; // ease-in: t^2
 }
