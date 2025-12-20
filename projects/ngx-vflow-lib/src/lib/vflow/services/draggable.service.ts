@@ -94,6 +94,7 @@ export class DraggableService {
             y: round(event.y + initialPositions[index].y),
           };
 
+          this.alignToGrid(point);
           this.moveNode(model, point);
         });
       })
@@ -119,8 +120,6 @@ export class DraggableService {
    * @todo make it unit testable
    */
   private moveNode(model: NodeModel, point: Point) {
-    point = this.alignToGrid(point);
-
     const parent = model.parent();
     // keep node in bounds of parent
     if (parent) {
