@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, Injector, inject } from '@angular/core';
 import { select } from 'd3-selection';
 import { D3DragEvent, drag } from 'd3-drag';
 import { NodeModel } from '../models/node.model';
@@ -8,6 +8,9 @@ import { Point } from '../interfaces/point.interface';
 import { FlowSettingsService } from './flow-settings.service';
 import { align } from '../utils/align-number';
 import { FlowStatusService } from './flow-status.service';
+import { ViewportService } from './viewport.service';
+import { toObservable } from '@angular/core/rxjs-interop';
+import { Subscription, pairwise, filter, skip } from 'rxjs';
 
 type DragEvent = D3DragEvent<Element, unknown, unknown>;
 
@@ -16,6 +19,8 @@ export class DraggableService {
   private entitiesService = inject(FlowEntitiesService);
   private settingsService = inject(FlowSettingsService);
   private flowStatusService = inject(FlowStatusService);
+  private viewportService = inject(ViewportService);
+  private injector = inject(Injector);
 
   /**
    * Enable draggable behavior for element.
@@ -55,6 +60,7 @@ export class DraggableService {
   private getDragBehavior(model: NodeModel) {
     let dragNodes: NodeModel[] = [];
     let initialPositions: Point[] = [];
+    let moveNodesOnAutoPanSub: Subscription | null = null;
 
     const filterCondition = (event: Event) => {
       // if there is at least one drag handle, we should check if we are dragging it
@@ -76,6 +82,9 @@ export class DraggableService {
           x: node.point().x - event.x,
           y: node.point().y - event.y,
         }));
+
+        // Subscribe to viewport changes during drag to sync node positions with auto-pan
+        moveNodesOnAutoPanSub = this.moveNodesOnAutoPan$(dragNodes);
       })
 
       .on('drag', (event: DragEvent) => {
@@ -90,6 +99,8 @@ export class DraggableService {
       })
 
       .on('end', () => {
+        moveNodesOnAutoPanSub?.unsubscribe();
+        moveNodesOnAutoPanSub = null;
         this.flowStatusService.setNodeDragEndStatus(model);
       });
   }
@@ -138,5 +149,33 @@ export class DraggableService {
     }
 
     return point;
+  }
+
+  private moveNodesOnAutoPan$(dragNodes: NodeModel[]) {
+    return toObservable(this.viewportService.readableViewport, { injector: this.injector })
+      .pipe(
+        skip(1), // Skip initial value
+        pairwise(),
+        filter(([prev, next]) => prev.x !== next.x || prev.y !== next.y), // Only translate changes
+      )
+      .subscribe(([prev, next]) => {
+        const dx = next.x - prev.x;
+        const dy = next.y - prev.y;
+        const zoom = next.zoom;
+
+        // Calculate shift in flow space (inverse of viewport shift)
+        const shiftX = -dx / zoom;
+        const shiftY = -dy / zoom;
+
+        // Update each dragged node
+        dragNodes.forEach((node) => {
+          // Move node using existing pipeline (snap + parent bounds)
+          const newPoint = {
+            x: node.point().x + shiftX,
+            y: node.point().y + shiftY,
+          };
+          this.moveNode(node, newPoint);
+        });
+      });
   }
 }
