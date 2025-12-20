@@ -1,4 +1,4 @@
-import { Directive, inject } from '@angular/core';
+import { DestroyRef, Directive, inject, Injector, OnInit } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { animationFrames, EMPTY, merge, switchMap, tap, withLatestFrom, map, shareReplay, take, fromEvent } from 'rxjs';
 import { FlowStatusService } from '../services/flow-status.service';
@@ -13,11 +13,13 @@ const BASE_SPEED = 10;
 const START_STATES = ['node-drag-start', 'connection-start', 'reconnection-start'];
 
 @Directive({ selector: '[autoPan]', standalone: true })
-export class AutoPanDirective {
+export class AutoPanDirective implements OnInit {
   private readonly statusService = inject(FlowStatusService);
   private readonly viewportService = inject(ViewportService);
   private readonly flowSettingsService = inject(FlowSettingsService);
   private readonly rootSvg = inject(RootSvgReferenceDirective).element;
+  private readonly injector = inject(Injector);
+  private readonly destroyRef = inject(DestroyRef);
 
   private readonly documentPoint$ = merge(
     fromEvent<PointerEvent>(document, 'pointerdown', { capture: true }),
@@ -28,26 +30,28 @@ export class AutoPanDirective {
     shareReplay({ bufferSize: 1, refCount: true }),
   );
 
-  constructor() {
-    toObservable(this.statusService.status)
-      .pipe(
-        switchMap((status) =>
-          START_STATES.includes(status.state)
-            ? this.documentPoint$.pipe(
-                take(1),
-                switchMap(() =>
-                  animationFrames().pipe(
-                    withLatestFrom(this.documentPoint$),
-                    map(([, point]) => point),
-                    tap((point) => this.pan(point)),
+  ngOnInit() {
+    if (this.flowSettingsService.autoPan()) {
+      toObservable(this.statusService.status, { injector: this.injector })
+        .pipe(
+          switchMap((status) =>
+            START_STATES.includes(status.state)
+              ? this.documentPoint$.pipe(
+                  take(1),
+                  switchMap(() =>
+                    animationFrames().pipe(
+                      withLatestFrom(this.documentPoint$),
+                      map(([, point]) => point),
+                      tap((point) => this.pan(point)),
+                    ),
                   ),
-                ),
-              )
-            : EMPTY,
-        ),
-        takeUntilDestroyed(),
-      )
-      .subscribe();
+                )
+              : EMPTY,
+          ),
+          takeUntilDestroyed(this.destroyRef),
+        )
+        .subscribe();
+    }
   }
 
   private toViewportPoint(event: Point): Point {

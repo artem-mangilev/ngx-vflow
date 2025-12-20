@@ -260,6 +260,14 @@ export class VflowComponent {
   public set elevateEdgesOnSelect(value: boolean) {
     this.flowSettingsService.elevateEdgesOnSelect.set(value);
   }
+
+  /**
+   * Enable auto-pan
+   */
+  @Input()
+  public set autoPan(value: boolean) {
+    this.flowSettingsService.autoPan.set(value);
+  }
   // #endregion
 
   // #region MAIN_INPUTS
