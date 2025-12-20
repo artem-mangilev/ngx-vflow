@@ -9,6 +9,7 @@ export class FlowSettingsService {
 
   public elevateNodesOnSelect = signal(true);
   public elevateEdgesOnSelect = signal(true);
+  public autoPan = signal(true);
 
   /**
    * @see {VflowComponent.view}

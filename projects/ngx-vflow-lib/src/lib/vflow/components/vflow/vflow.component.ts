@@ -75,6 +75,7 @@ import { toLazySignal } from '../../utils/signals/to-lazy-signal';
 import { FlowRenderingService } from '../../services/flow-rendering.service';
 import { AlignmentHelperComponent } from '../alignment-helper/alignment-helper.component';
 import { AlignmentHelperSettings } from '../../interfaces/alignment-helper-settings.interface';
+import { AutoPanDirective } from '../../directives/auto-pan.directive';
 
 const changesControllerHostDirective = {
   directive: ChangesControllerDirective,
@@ -132,6 +133,7 @@ const changesControllerHostDirective = {
     NgTemplateOutlet,
     PreviewFlowComponent,
     AlignmentHelperComponent,
+    AutoPanDirective,
   ],
 })
 export class VflowComponent {
@@ -257,6 +259,14 @@ export class VflowComponent {
   @Input()
   public set elevateEdgesOnSelect(value: boolean) {
     this.flowSettingsService.elevateEdgesOnSelect.set(value);
+  }
+
+  /**
+   * Enable auto-pan
+   */
+  @Input()
+  public set autoPan(value: boolean) {
+    this.flowSettingsService.autoPan.set(value);
   }
   // #endregion
 
