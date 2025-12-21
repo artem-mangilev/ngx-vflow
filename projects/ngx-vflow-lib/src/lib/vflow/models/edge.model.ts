@@ -215,7 +215,16 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
 
   public context: EdgeContext;
 
-  public edgeLabelModels: { [position in EdgeLabelPosition]?: EdgeLabelModel } = {};
+  public labelModels = computed(() => {
+    const models: { [position in EdgeLabelPosition]?: EdgeLabelModel } = {};
+
+    const labels = this.edgeLabels();
+    if (labels?.start) models.start = new EdgeLabelModel(labels.start);
+    if (labels?.center) models.center = new EdgeLabelModel(labels.center);
+    if (labels?.end) models.end = new EdgeLabelModel(labels.end);
+
+    return models;
+  });
 
   constructor(public edge: Edge) {
     this.type = edge.type ?? EDGE_DEFAULTS.type;
@@ -243,12 +252,6 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
     if (edge.edgeLabels) {
       this.edgeLabels = edge.edgeLabels;
     }
-
-    // EdgeLabels модели создаются на основе сигнала
-    const labels = this.edgeLabels();
-    if (labels?.start) this.edgeLabelModels.start = new EdgeLabelModel(labels.start);
-    if (labels?.center) this.edgeLabelModels.center = new EdgeLabelModel(labels.center);
-    if (labels?.end) this.edgeLabelModels.end = new EdgeLabelModel(labels.end);
 
     this.context = {
       $implicit: {

@@ -18,19 +18,19 @@
   }
 }
 
-@if (model().edgeLabelModels.start; as label) {
+@if (model().labelModels().start; as label) {
   @if (model().path().labelPoints?.start; as point) {
     <svg:g edgeLabel [model]="label" [point]="point" [edgeModel]="model()" [htmlTemplate]="edgeLabelHtmlTemplate()" />
   }
 }
 
-@if (model().edgeLabelModels.center; as label) {
+@if (model().labelModels().center; as label) {
   @if (model().path().labelPoints?.center; as point) {
     <svg:g edgeLabel [model]="label" [point]="point" [edgeModel]="model()" [htmlTemplate]="edgeLabelHtmlTemplate()" />
   }
 }
 
-@if (model().edgeLabelModels.end; as label) {
+@if (model().labelModels().end; as label) {
   @if (model().path().labelPoints?.end; as point) {
     <svg:g edgeLabel [model]="label" [point]="point" [edgeModel]="model()" [htmlTemplate]="edgeLabelHtmlTemplate()" />
   }
