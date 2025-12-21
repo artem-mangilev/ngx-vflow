@@ -5,6 +5,7 @@ import { isCallable } from '../utils/is-callable';
 import { CustomNodeComponent } from '../public-components/custom-node/custom-node.component';
 import { isCustomNodeComponent } from '../utils/is-vflow-component';
 import { UnwrapSignal } from '../types/unwrap-signal.type';
+import { isDefined } from '../utils/is-defined';
 
 export const NODE_DEFAULTS = {
   point: { x: 0, y: 0 },
@@ -135,10 +136,10 @@ function createBaseNode(node: UnwrapSignal<SharedNode>, useDefaults: boolean) {
     return {
       id: node.id,
       point: signal(node.point),
-      draggable: node.draggable ? signal(node.draggable) : undefined,
-      parentId: node.parentId ? signal(node.parentId) : undefined,
-      preview: node.preview ? signal(node.preview) : undefined,
-      selected: node.selected ? signal(node.selected) : undefined,
+      draggable: isDefined(node.draggable) ? signal(node.draggable) : undefined,
+      parentId: isDefined(node.parentId) ? signal(node.parentId) : undefined,
+      preview: isDefined(node.preview) ? signal(node.preview) : undefined,
+      selected: isDefined(node.selected) ? signal(node.selected) : undefined,
     };
   }
 }
@@ -168,9 +169,9 @@ export function createNode<T>(
       return {
         ...baseNode,
         type: 'default' as const,
-        text: node.text ? signal(node.text) : undefined,
-        width: node.width ? signal(node.width) : undefined,
-        height: node.height ? signal(node.height) : undefined,
+        text: isDefined(node.text) ? signal(node.text) : undefined,
+        width: isDefined(node.width) ? signal(node.width) : undefined,
+        height: isDefined(node.height) ? signal(node.height) : undefined,
       };
     }
   }
@@ -188,9 +189,9 @@ export function createNode<T>(
       return {
         ...baseNode,
         type: 'html-template' as const,
-        data: node.data ? (signal(node.data) as WritableSignal<T>) : undefined,
-        width: node.width ? signal(node.width) : undefined,
-        height: node.height ? signal(node.height) : undefined,
+        data: isDefined(node.data) ? (signal(node.data) as WritableSignal<T>) : undefined,
+        width: isDefined(node.width) ? signal(node.width) : undefined,
+        height: isDefined(node.height) ? signal(node.height) : undefined,
       };
     }
   }
@@ -213,7 +214,7 @@ export function createNode<T>(
         type: 'svg-template' as const,
         width,
         height,
-        data: node.data ? (signal(node.data) as WritableSignal<T>) : undefined,
+        data: isDefined(node.data) ? (signal(node.data) as WritableSignal<T>) : undefined,
       };
     }
   }
@@ -237,8 +238,8 @@ export function createNode<T>(
         type: 'default-group' as const,
         width,
         height,
-        color: node.color ? signal(node.color) : undefined,
-        resizable: node.resizable ? signal(node.resizable) : undefined,
+        color: isDefined(node.color) ? signal(node.color) : undefined,
+        resizable: isDefined(node.resizable) ? signal(node.resizable) : undefined,
       };
     }
   }
@@ -261,7 +262,7 @@ export function createNode<T>(
         type: 'template-group' as const,
         width,
         height,
-        data: node.data ? (signal(node.data) as WritableSignal<T>) : undefined,
+        data: isDefined(node.data) ? (signal(node.data) as WritableSignal<T>) : undefined,
       };
     }
   }
@@ -279,9 +280,9 @@ export function createNode<T>(
       return {
         ...baseNode,
         type: node.type,
-        data: node.data ? (signal(node.data) as WritableSignal<T>) : undefined,
-        width: node.width ? signal(node.width) : undefined,
-        height: node.height ? signal(node.height) : undefined,
+        data: isDefined(node.data) ? (signal(node.data) as WritableSignal<T>) : undefined,
+        width: isDefined(node.width) ? signal(node.width) : undefined,
+        height: isDefined(node.height) ? signal(node.height) : undefined,
       };
     }
   }

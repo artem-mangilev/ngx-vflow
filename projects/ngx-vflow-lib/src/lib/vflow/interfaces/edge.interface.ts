@@ -4,6 +4,7 @@ import { CurveFactory } from './curve-factory.interface';
 import { EdgeLabel, EdgeLabelPosition } from './edge-label.interface';
 import { Marker } from './marker.interface';
 import { UnwrapSignal } from '../types/unwrap-signal.type';
+import { isDefined } from '../utils/is-defined';
 
 export const EDGE_DEFAULTS = {
   type: 'default' as EdgeType,
@@ -71,13 +72,13 @@ export function createEdge<T>(
       target: edge.target,
       sourceHandle: edge.sourceHandle,
       targetHandle: edge.targetHandle,
-      curve: edge.curve ? signal(edge.curve) : undefined,
-      data: edge.data ? (signal(edge.data) as WritableSignal<T>) : undefined,
-      edgeLabels: edge.edgeLabels ? signal(edge.edgeLabels) : undefined,
-      markers: edge.markers ? signal(edge.markers) : undefined,
-      reconnectable: edge.reconnectable ? signal(edge.reconnectable) : undefined,
-      floating: edge.floating ? signal(edge.floating) : undefined,
-      selected: edge.selected ? signal(edge.selected) : undefined,
+      curve: isDefined(edge.curve) ? signal(edge.curve) : undefined,
+      data: isDefined(edge.data) ? (signal(edge.data) as WritableSignal<T>) : undefined,
+      edgeLabels: isDefined(edge.edgeLabels) ? signal(edge.edgeLabels) : undefined,
+      markers: isDefined(edge.markers) ? signal(edge.markers) : undefined,
+      reconnectable: isDefined(edge.reconnectable) ? signal(edge.reconnectable) : undefined,
+      floating: isDefined(edge.floating) ? signal(edge.floating) : undefined,
+      selected: isDefined(edge.selected) ? signal(edge.selected) : undefined,
     };
   }
 }
