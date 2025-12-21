@@ -6,8 +6,6 @@ import type { ConnectionControllerDirective, ɵHandleModel as HandleModel } from
 @Directive({ selector: '[connect], [connect]', standalone: true })
 export class ConnectionControllerMockDirective implements AsInterface<ConnectionControllerDirective> {
   public readonly connect = output<Connection>();
-  // eslint-disable-next-line @angular-eslint/no-output-on-prefix
-  public readonly connect = output<Connection>();
 
   public readonly reconnect = output<ReconnectionEvent>();
   // eslint-disable-next-line @angular-eslint/no-output-on-prefix

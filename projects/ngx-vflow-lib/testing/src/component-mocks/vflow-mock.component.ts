@@ -84,34 +84,35 @@ import { AsInterface } from '../types';
             },
           }" />
 
-        @if (edge.edgeLabels?.start) {
+        @if (edge.edgeLabels?.()?.start; as label) {
           <ng-component
             [ngTemplateOutlet]="edgeLabelHtmlDirective()?.templateRef ?? null"
             [ngTemplateOutletContext]="{
               $implicit: {
                 edge: edge,
+                label,
               },
             }" />
         }
 
-        @if (edge.edgeLabels?.center) {
+        @if (edge.edgeLabels?.()?.center; as label) {
           <ng-component
             [ngTemplateOutlet]="edgeLabelHtmlDirective()?.templateRef ?? null"
             [ngTemplateOutletContext]="{
               $implicit: {
                 edge: edge,
-                label: edge.edgeLabels?.center,
+                label,
               },
             }" />
         }
 
-        @if (edge.edgeLabels?.end) {
+        @if (edge.edgeLabels?.()?.end; as label) {
           <ng-component
             [ngTemplateOutlet]="edgeLabelHtmlDirective()?.templateRef ?? null"
             [ngTemplateOutletContext]="{
               $implicit: {
                 edge: edge,
-                label: edge.edgeLabels?.end,
+                label,
               },
             }" />
         }
@@ -179,6 +180,9 @@ export class VflowMockComponent implements AsInterface<VflowComponent>, OnInit {
 
   @Input()
   public elevateEdgesOnSelect!: boolean;
+
+  @Input()
+  public autoPan = true;
 
   public alignmentHelper = input<boolean | AlignmentHelperSettings>(false);
 
