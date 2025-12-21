@@ -3,6 +3,8 @@ import { NodeModel } from '../models/node.model';
 import { HandleModel } from '../models/handle.model';
 import { ConnectionInternal } from '../interfaces/connection.internal.interface';
 import { EdgeModel } from '../models/edge.model';
+import { toObservable } from '@angular/core/rxjs-interop';
+import { shareReplay } from 'rxjs';
 
 export interface FlowStatusIdle {
   state: 'idle';
@@ -24,6 +26,11 @@ export interface FlowStatusConnectionValidation {
 export interface FlowStatusConnectionEnd {
   state: 'connection-end';
   payload: ConnectionInternal;
+}
+
+export interface FlowStatusConnectionDropped {
+  state: 'connection-dropped';
+  payload: Omit<ConnectionInternal, 'target' | 'targetHandle'>;
 }
 
 export interface FlowStatusReconnectionStart {
@@ -67,6 +74,7 @@ export type FlowStatus =
   | FlowStatusConnectionStart
   | FlowStatusConnectionValidation
   | FlowStatusConnectionEnd
+  | FlowStatusConnectionDropped
   | FlowStatusReconnectionStart
   | FlowStatusReconnectionValidation
   | FlowStatusReconnectionEnd
@@ -76,6 +84,7 @@ export type FlowStatus =
 @Injectable()
 export class FlowStatusService {
   public readonly status = signal<FlowStatus>({ state: 'idle', payload: null });
+  public readonly status$ = toObservable(this.status).pipe(shareReplay({ bufferSize: 1, refCount: true }));
 
   public setIdleStatus() {
     this.status.set({ state: 'idle', payload: null });
@@ -120,6 +129,10 @@ export class FlowStatusService {
     targetHandle: HandleModel,
   ) {
     this.status.set({ state: 'connection-end', payload: { source, target, sourceHandle, targetHandle } });
+  }
+
+  public setConnectionDroppedStatus(source: NodeModel, sourceHandle: HandleModel) {
+    this.status.set({ state: 'connection-dropped', payload: { source, sourceHandle } });
   }
 
   public setReconnectionEndStatus(

@@ -1,22 +1,43 @@
 import { Directive, computed, inject } from '@angular/core';
 import { Connection, ReconnectionEvent } from '../interfaces/connection.interface';
-import { FlowStatusConnectionEnd, FlowStatusReconnectionEnd, FlowStatusService } from '../services/flow-status.service';
+import {
+  FlowStatusConnectionDropped,
+  FlowStatusConnectionEnd,
+  FlowStatusConnectionStart,
+  FlowStatusReconnectionEnd,
+  FlowStatusService,
+} from '../services/flow-status.service';
 
 import { FlowEntitiesService } from '../services/flow-entities.service';
 import { HandleModel } from '../models/handle.model';
 import { adjustDirection } from '../utils/adjust-direction';
 import { outputFromObservable, toObservable } from '@angular/core/rxjs-interop';
-import { filter, map, tap } from 'rxjs';
+import { filter, map, merge, tap } from 'rxjs';
 import { EdgeModel } from '../models/edge.model';
 import { ConnectionForValidation } from '../interfaces/connection-settings.interface';
+import {
+  ConnectEndEvent,
+  connectEndEventFromConnectionDroppedStatus,
+  connectEndEventFromConnectionEndStatus,
+  ConnectStartEvent,
+  connectStartEventFromConnectionStartStatus,
+} from '../interfaces/connection-events.interface';
 
 @Directive({
-  selector: '[connect], [reconnect]',
+  selector: '[connectStart], [connect], [connectEnd], [reconnect]',
   standalone: true,
 })
 export class ConnectionControllerDirective {
   private statusService = inject(FlowStatusService);
   private flowEntitiesService = inject(FlowEntitiesService);
+
+  // TODO emits duplicates when status degrades back to connection-start from connection-validation
+  public readonly connectStart = outputFromObservable<ConnectStartEvent>(
+    this.statusService.status$.pipe(
+      filter((status): status is FlowStatusConnectionStart => status.state === 'connection-start'),
+      map(connectStartEventFromConnectionStartStatus),
+    ),
+  );
 
   /**
    * This event fires when user tries to create new Edge.
@@ -27,12 +48,24 @@ export class ConnectionControllerDirective {
    * by default without passing the validator every connection concidered valid.
    */
   public readonly connect = outputFromObservable<Connection>(
-    toObservable(this.statusService.status).pipe(
+    this.statusService.status$.pipe(
       filter((status): status is FlowStatusConnectionEnd => status.state === 'connection-end'),
       map((status) => statusToConnection(status, this.isStrictMode())),
-      tap(() => this.statusService.setIdleStatus()),
       filter((connection) => this.flowEntitiesService.connection().validator(connection)),
     ),
+  );
+
+  public readonly connectEnd = outputFromObservable<ConnectEndEvent>(
+    merge(
+      this.statusService.status$.pipe(
+        filter((status): status is FlowStatusConnectionEnd => status.state === 'connection-end'),
+        map(connectEndEventFromConnectionEndStatus),
+      ),
+      this.statusService.status$.pipe(
+        filter((status): status is FlowStatusConnectionDropped => status.state === 'connection-dropped'),
+        map(connectEndEventFromConnectionDroppedStatus),
+      ),
+    ).pipe(tap(() => this.statusService.setIdleStatus())),
   );
 
   public readonly reconnect = outputFromObservable<ReconnectionEvent>(
