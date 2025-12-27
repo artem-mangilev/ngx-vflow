@@ -61,7 +61,7 @@ export class ConnectionControllerDirective {
     this.statusService.status$.pipe(
       filter((status): status is FlowStatusConnectionRelease => status.state === 'connection-release'),
       map((status) => statusToConnection(status, this.isStrictMode())),
-      tap(() => {
+      tap((connection) => {
         // We are 99% sure that status is FlowStatusConnectionRelease here
         const status = this.statusService.status() as FlowStatusConnectionRelease;
         this.statusService.setConnectionReleaseValidatedStatus(
@@ -69,6 +69,7 @@ export class ConnectionControllerDirective {
           status.payload.target,
           status.payload.sourceHandle,
           status.payload.targetHandle,
+          this.flowEntitiesService.connection().validator(connection),
         );
       }),
       filter((connection) => this.flowEntitiesService.connection().validator(connection)),
@@ -106,7 +107,7 @@ export class ConnectionControllerDirective {
 
         return { connection, oldEdge };
       }),
-      tap(() => {
+      tap(({ connection }) => {
         // We are 99% sure that status is FlowStatusReconnectionRelease here
         const status = this.statusService.status() as FlowStatusReconnectionRelease;
         this.statusService.setReconnectionReleaseValidatedStatus(
@@ -115,6 +116,7 @@ export class ConnectionControllerDirective {
           status.payload.sourceHandle,
           status.payload.targetHandle,
           status.payload.oldEdge,
+          this.flowEntitiesService.connection().validator(connection),
         );
       }),
       filter(({ connection }) => this.flowEntitiesService.connection().validator(connection)),

@@ -18,6 +18,7 @@ export interface ConnectStartEvent {
 }
 
 export interface ConnectEndEvent {
+  valid: boolean | null;
   /**
    * The side where the connection started from
    */
@@ -47,6 +48,7 @@ export interface ReconnectEvent {
 
 export interface ReconnectEndEvent {
   edge: Edge;
+  valid: boolean | null;
   /**
    * The side where the edge remain attached during reconnection
    */
@@ -84,6 +86,7 @@ export function connectEndEventFromConnectionReleaseValidatedStatus(
   status: FlowStatusConnectionReleaseValidated,
 ): ConnectEndEvent {
   return {
+    valid: status.payload.valid,
     from: {
       node: status.payload.source.rawNode,
       handle: {
@@ -105,6 +108,7 @@ export function connectEndEventFromConnectionReleaseValidatedStatus(
 
 export function connectEndEventFromConnectionDroppedStatus(status: FlowStatusConnectionDropped): ConnectEndEvent {
   return {
+    valid: null,
     from: {
       node: status.payload.source.rawNode,
       handle: {
@@ -138,6 +142,7 @@ export function reconnectEndEventFromReconnectionReleaseValidatedStatus(
   status: FlowStatusReconnectionReleaseValidated,
 ): ReconnectEndEvent {
   return {
+    valid: status.payload.valid,
     edge: status.payload.oldEdge.edge,
     from: {
       node: status.payload.source.rawNode,
@@ -162,6 +167,7 @@ export function reconnectEndEventFromReconnectionDroppedStatus(
   status: FlowStatusReconnectionDropped,
 ): ReconnectEndEvent {
   return {
+    valid: null,
     edge: status.payload.oldEdge.edge,
     from: {
       node: status.payload.source.rawNode,

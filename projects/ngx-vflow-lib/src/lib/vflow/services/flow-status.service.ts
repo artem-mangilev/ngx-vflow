@@ -30,7 +30,9 @@ export interface FlowStatusConnectionRelease {
 
 export interface FlowStatusConnectionReleaseValidated {
   state: 'connection-release-validated';
-  payload: ConnectionInternal;
+  payload: ConnectionInternal & {
+    valid: boolean;
+  };
 }
 
 export interface FlowStatusConnectionDropped {
@@ -64,6 +66,7 @@ export interface FlowStatusReconnectionReleaseValidated {
   state: 'reconnection-release-validated';
   payload: ConnectionInternal & {
     oldEdge: EdgeModel;
+    valid: boolean;
   };
 }
 
@@ -158,8 +161,12 @@ export class FlowStatusService {
     target: NodeModel,
     sourceHandle: HandleModel,
     targetHandle: HandleModel,
+    valid: boolean,
   ) {
-    this.status.set({ state: 'connection-release-validated', payload: { source, target, sourceHandle, targetHandle } });
+    this.status.set({
+      state: 'connection-release-validated',
+      payload: { source, target, sourceHandle, targetHandle, valid },
+    });
   }
 
   public setConnectionDroppedStatus(source: NodeModel, sourceHandle: HandleModel) {
@@ -185,10 +192,11 @@ export class FlowStatusService {
     sourceHandle: HandleModel,
     targetHandle: HandleModel,
     oldEdge: EdgeModel,
+    valid: boolean,
   ) {
     this.status.set({
       state: 'reconnection-release-validated',
-      payload: { source, target, sourceHandle, targetHandle, oldEdge },
+      payload: { source, target, sourceHandle, targetHandle, oldEdge, valid },
     });
   }
 
