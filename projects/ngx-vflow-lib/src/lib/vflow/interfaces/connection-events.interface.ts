@@ -1,10 +1,10 @@
 import {
+  FlowStatusConnectionReleaseValidated,
   FlowStatusConnectionDropped,
-  FlowStatusConnectionEnd,
   FlowStatusConnectionStart,
   FlowStatusReconnectionDropped,
-  FlowStatusReconnectionEnd,
   FlowStatusReconnectionStart,
+  FlowStatusReconnectionReleaseValidated,
 } from '../services/flow-status.service';
 import { HandleType } from '../types/handle-type.type';
 import { Position } from '../types/position.type';
@@ -80,7 +80,9 @@ export function connectStartEventFromConnectionStartStatus(status: FlowStatusCon
   };
 }
 
-export function connectEndEventFromConnectionEndStatus(status: FlowStatusConnectionEnd): ConnectEndEvent {
+export function connectEndEventFromConnectionReleaseValidatedStatus(
+  status: FlowStatusConnectionReleaseValidated,
+): ConnectEndEvent {
   return {
     from: {
       node: status.payload.source.rawNode,
@@ -132,7 +134,9 @@ export function reconnectStartEventFromReconnectionStartStatus(
   };
 }
 
-export function reconnectEndEventFromReconnectionEndStatus(status: FlowStatusReconnectionEnd): ReconnectEndEvent {
+export function reconnectEndEventFromReconnectionReleaseValidatedStatus(
+  status: FlowStatusReconnectionReleaseValidated,
+): ReconnectEndEvent {
   return {
     edge: status.payload.oldEdge.edge,
     from: {

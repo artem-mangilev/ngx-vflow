@@ -23,8 +23,13 @@ export interface FlowStatusConnectionValidation {
   };
 }
 
-export interface FlowStatusConnectionEnd {
-  state: 'connection-end';
+export interface FlowStatusConnectionRelease {
+  state: 'connection-release';
+  payload: ConnectionInternal;
+}
+
+export interface FlowStatusConnectionReleaseValidated {
+  state: 'connection-release-validated';
   payload: ConnectionInternal;
 }
 
@@ -48,8 +53,15 @@ export interface FlowStatusReconnectionValidation {
   };
 }
 
-export interface FlowStatusReconnectionEnd {
-  state: 'reconnection-end';
+export interface FlowStatusReconnectionRelease {
+  state: 'reconnection-release';
+  payload: ConnectionInternal & {
+    oldEdge: EdgeModel;
+  };
+}
+
+export interface FlowStatusReconnectionReleaseValidated {
+  state: 'reconnection-release-validated';
   payload: ConnectionInternal & {
     oldEdge: EdgeModel;
   };
@@ -80,11 +92,13 @@ export type FlowStatus =
   | FlowStatusIdle
   | FlowStatusConnectionStart
   | FlowStatusConnectionValidation
-  | FlowStatusConnectionEnd
+  | FlowStatusConnectionRelease
+  | FlowStatusConnectionReleaseValidated
   | FlowStatusConnectionDropped
   | FlowStatusReconnectionStart
   | FlowStatusReconnectionValidation
-  | FlowStatusReconnectionEnd
+  | FlowStatusReconnectionRelease
+  | FlowStatusReconnectionReleaseValidated
   | FlowStatusReconnectionDropped
   | FlowStatusNodeDragStart
   | FlowStatusNodeDragEnd;
@@ -130,27 +144,52 @@ export class FlowStatusService {
     });
   }
 
-  public setConnectionEndStatus(
+  public setConnectionReleaseStatus(
     source: NodeModel,
     target: NodeModel,
     sourceHandle: HandleModel,
     targetHandle: HandleModel,
   ) {
-    this.status.set({ state: 'connection-end', payload: { source, target, sourceHandle, targetHandle } });
+    this.status.set({ state: 'connection-release', payload: { source, target, sourceHandle, targetHandle } });
+  }
+
+  public setConnectionReleaseValidatedStatus(
+    source: NodeModel,
+    target: NodeModel,
+    sourceHandle: HandleModel,
+    targetHandle: HandleModel,
+  ) {
+    this.status.set({ state: 'connection-release-validated', payload: { source, target, sourceHandle, targetHandle } });
   }
 
   public setConnectionDroppedStatus(source: NodeModel, sourceHandle: HandleModel) {
     this.status.set({ state: 'connection-dropped', payload: { source, sourceHandle } });
   }
 
-  public setReconnectionEndStatus(
+  public setReconnectionReleaseStatus(
     source: NodeModel,
     target: NodeModel,
     sourceHandle: HandleModel,
     targetHandle: HandleModel,
     oldEdge: EdgeModel,
   ) {
-    this.status.set({ state: 'reconnection-end', payload: { source, target, sourceHandle, targetHandle, oldEdge } });
+    this.status.set({
+      state: 'reconnection-release',
+      payload: { source, target, sourceHandle, targetHandle, oldEdge },
+    });
+  }
+
+  public setReconnectionReleaseValidatedStatus(
+    source: NodeModel,
+    target: NodeModel,
+    sourceHandle: HandleModel,
+    targetHandle: HandleModel,
+    oldEdge: EdgeModel,
+  ) {
+    this.status.set({
+      state: 'reconnection-release-validated',
+      payload: { source, target, sourceHandle, targetHandle, oldEdge },
+    });
   }
 
   public setReconnectionDroppedStatus(source: NodeModel, sourceHandle: HandleModel, oldEdge: EdgeModel) {
