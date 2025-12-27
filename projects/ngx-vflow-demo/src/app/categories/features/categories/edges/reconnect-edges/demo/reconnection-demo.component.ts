@@ -1,8 +1,14 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import { Edge, Node, ReconnectEvent, Vflow } from 'ngx-vflow';
+import { Edge, Node, ReconnectEndEvent, ReconnectEvent, Vflow } from 'ngx-vflow';
 
 @Component({
-  template: `<vflow view="auto" [nodes]="nodes" [edges]="edges" (reconnect)="reconnect($event)" /> `,
+  template: `<vflow
+    view="auto"
+    [nodes]="nodes"
+    [edges]="edges"
+    (reconnectStart)="onReconnectStart()"
+    (reconnectEnd)="onReconnectEnd($event)"
+    (reconnect)="reconnect($event)" /> `,
   styles: [
     `
       :host {
@@ -82,6 +88,20 @@ export class ReconnectionDemoComponent {
     },
   ];
 
+  private edgeReconnectSuccessful = signal(false);
+
+  public onReconnectStart() {
+    this.edgeReconnectSuccessful.set(false);
+  }
+
+  public onReconnectEnd(event: ReconnectEndEvent) {
+    if (!this.edgeReconnectSuccessful()) {
+      this.edges = this.edges.filter((edge) => edge !== event.edge);
+    }
+
+    this.edgeReconnectSuccessful.set(true);
+  }
+
   public reconnect({ oldEdge, connection: { source, target } }: ReconnectEvent) {
     this.edges = [
       ...this.edges.filter((edge) => edge !== oldEdge),
@@ -92,5 +112,7 @@ export class ReconnectionDemoComponent {
         target,
       },
     ];
+
+    this.edgeReconnectSuccessful.set(true);
   }
 }
