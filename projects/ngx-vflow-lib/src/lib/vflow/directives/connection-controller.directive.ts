@@ -4,7 +4,9 @@ import {
   FlowStatusConnectionDropped,
   FlowStatusConnectionEnd,
   FlowStatusConnectionStart,
+  FlowStatusReconnectionDropped,
   FlowStatusReconnectionEnd,
+  FlowStatusReconnectionStart,
   FlowStatusService,
 } from '../services/flow-status.service';
 
@@ -21,10 +23,15 @@ import {
   connectEndEventFromConnectionEndStatus,
   ConnectStartEvent,
   connectStartEventFromConnectionStartStatus,
+  ReconnectEndEvent,
+  reconnectEndEventFromReconnectionDroppedStatus,
+  reconnectEndEventFromReconnectionEndStatus,
+  ReconnectStartEvent,
+  reconnectStartEventFromReconnectionStartStatus,
 } from '../interfaces/connection-events.interface';
 
 @Directive({
-  selector: '[connectStart], [connect], [connectEnd], [reconnect]',
+  selector: '[connectStart], [connect], [connectEnd], [reconnectStart], [reconnect], [reconnectEnd]',
   standalone: true,
 })
 export class ConnectionControllerDirective {
@@ -68,6 +75,13 @@ export class ConnectionControllerDirective {
     ).pipe(tap(() => this.statusService.setIdleStatus())),
   );
 
+  public readonly reconnectStart = outputFromObservable<ReconnectStartEvent>(
+    this.statusService.status$.pipe(
+      filter((status): status is FlowStatusReconnectionStart => status.state === 'reconnection-start'),
+      map(reconnectStartEventFromReconnectionStartStatus),
+    ),
+  );
+
   public readonly reconnect = outputFromObservable<ReconnectionEvent>(
     toObservable(this.statusService.status).pipe(
       filter((status): status is FlowStatusReconnectionEnd => status.state === 'reconnection-end'),
@@ -80,6 +94,19 @@ export class ConnectionControllerDirective {
       tap(() => this.statusService.setIdleStatus()),
       filter(({ connection }) => this.flowEntitiesService.connection().validator(connection)),
     ),
+  );
+
+  public readonly reconnectEnd = outputFromObservable<ReconnectEndEvent>(
+    merge(
+      this.statusService.status$.pipe(
+        filter((status): status is FlowStatusReconnectionEnd => status.state === 'reconnection-end'),
+        map(reconnectEndEventFromReconnectionEndStatus),
+      ),
+      this.statusService.status$.pipe(
+        filter((status): status is FlowStatusReconnectionDropped => status.state === 'reconnection-dropped'),
+        map(reconnectEndEventFromReconnectionDroppedStatus),
+      ),
+    ).pipe(tap(() => this.statusService.setIdleStatus())),
   );
 
   protected isStrictMode = computed(() => this.flowEntitiesService.connection().mode === 'strict');

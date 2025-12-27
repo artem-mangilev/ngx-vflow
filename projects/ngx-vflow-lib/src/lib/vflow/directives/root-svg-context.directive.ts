@@ -16,8 +16,16 @@ export class RootSvgContextDirective {
   protected resetConnection() {
     const status = this.flowStatusService.status();
 
-    if (status.state === 'connection-start' || status.state === 'reconnection-start') {
+    if (status.state === 'connection-start') {
       this.flowStatusService.setConnectionDroppedStatus(status.payload.source, status.payload.sourceHandle);
+    }
+
+    if (status.state === 'reconnection-start') {
+      this.flowStatusService.setReconnectionDroppedStatus(
+        status.payload.source,
+        status.payload.sourceHandle,
+        status.payload.oldEdge,
+      );
     }
   }
 }

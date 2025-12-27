@@ -55,6 +55,13 @@ export interface FlowStatusReconnectionEnd {
   };
 }
 
+export interface FlowStatusReconnectionDropped {
+  state: 'reconnection-dropped';
+  payload: Omit<ConnectionInternal, 'target' | 'targetHandle'> & {
+    oldEdge: EdgeModel;
+  };
+}
+
 export interface FlowStatusNodeDragStart {
   state: 'node-drag-start';
   payload: {
@@ -78,6 +85,7 @@ export type FlowStatus =
   | FlowStatusReconnectionStart
   | FlowStatusReconnectionValidation
   | FlowStatusReconnectionEnd
+  | FlowStatusReconnectionDropped
   | FlowStatusNodeDragStart
   | FlowStatusNodeDragEnd;
 
@@ -143,6 +151,10 @@ export class FlowStatusService {
     oldEdge: EdgeModel,
   ) {
     this.status.set({ state: 'reconnection-end', payload: { source, target, sourceHandle, targetHandle, oldEdge } });
+  }
+
+  public setReconnectionDroppedStatus(source: NodeModel, sourceHandle: HandleModel, oldEdge: EdgeModel) {
+    this.status.set({ state: 'reconnection-dropped', payload: { source, sourceHandle, oldEdge } });
   }
 
   public setNodeDragStartStatus(node: NodeModel) {
