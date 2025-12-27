@@ -1,5 +1,5 @@
 import { Directive, output } from '@angular/core';
-import { Connection, ReconnectionEvent } from 'ngx-vflow';
+import { Connection, ReconnectEvent } from 'ngx-vflow';
 import { AsInterface } from '../types';
 import type { ConnectionControllerDirective, ɵHandleModel as HandleModel } from 'ngx-vflow';
 
@@ -7,9 +7,9 @@ import type { ConnectionControllerDirective, ɵHandleModel as HandleModel } from
 export class ConnectionControllerMockDirective implements AsInterface<ConnectionControllerDirective> {
   public readonly connect = output<Connection>();
 
-  public readonly reconnect = output<ReconnectionEvent>();
+  public readonly reconnect = output<ReconnectEvent>();
   // eslint-disable-next-line @angular-eslint/no-output-on-prefix
-  public readonly onReconnect = output<ReconnectionEvent>();
+  public readonly onReconnect = output<ReconnectEvent>();
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public startConnection(handle: HandleModel): void {}

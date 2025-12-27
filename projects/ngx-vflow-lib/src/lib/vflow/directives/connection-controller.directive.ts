@@ -1,5 +1,5 @@
 import { Directive, computed, inject } from '@angular/core';
-import { Connection, ReconnectionEvent } from '../interfaces/connection.interface';
+import { Connection } from '../interfaces/connection.interface';
 import {
   FlowStatusConnectionDropped,
   FlowStatusConnectionEnd,
@@ -26,6 +26,7 @@ import {
   ReconnectEndEvent,
   reconnectEndEventFromReconnectionDroppedStatus,
   reconnectEndEventFromReconnectionEndStatus,
+  ReconnectEvent,
   ReconnectStartEvent,
   reconnectStartEventFromReconnectionStartStatus,
 } from '../interfaces/connection-events.interface';
@@ -82,7 +83,7 @@ export class ConnectionControllerDirective {
     ),
   );
 
-  public readonly reconnect = outputFromObservable<ReconnectionEvent>(
+  public readonly reconnect = outputFromObservable<ReconnectEvent>(
     toObservable(this.statusService.status).pipe(
       filter((status): status is FlowStatusReconnectionEnd => status.state === 'reconnection-end'),
       map((status) => {

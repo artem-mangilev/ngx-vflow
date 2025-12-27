@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import { Edge, Node, ReconnectionEvent, Vflow } from 'ngx-vflow';
+import { Edge, Node, ReconnectEvent, Vflow } from 'ngx-vflow';
 
 @Component({
   template: `<vflow view="auto" [nodes]="nodes" [edges]="edges" (reconnect)="reconnect($event)" /> `,
@@ -82,7 +82,7 @@ export class ReconnectionDemoComponent {
     },
   ];
 
-  public reconnect({ oldEdge, connection: { source, target } }: ReconnectionEvent) {
+  public reconnect({ oldEdge, connection: { source, target } }: ReconnectEvent) {
     this.edges = [
       ...this.edges.filter((edge) => edge !== oldEdge),
       {

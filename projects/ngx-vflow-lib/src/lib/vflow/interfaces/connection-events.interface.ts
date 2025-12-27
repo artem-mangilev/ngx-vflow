@@ -8,6 +8,7 @@ import {
 } from '../services/flow-status.service';
 import { HandleType } from '../types/handle-type.type';
 import { Position } from '../types/position.type';
+import { Connection } from './connection.interface';
 import { Edge } from './edge.interface';
 import { Node } from './node.interface';
 
@@ -17,10 +18,16 @@ export interface ConnectStartEvent {
 }
 
 export interface ConnectEndEvent {
+  /**
+   * The side where the connection started from
+   */
   from: {
     node: Node;
     handle: Handle;
   };
+  /**
+   * The side where the connection ended to
+   */
   to: {
     node: Node | null;
     handle: Handle | null;
@@ -29,16 +36,27 @@ export interface ConnectEndEvent {
 
 export interface ReconnectStartEvent {
   edge: Edge;
+  node: Node;
   handle: Handle;
+}
+
+export interface ReconnectEvent {
+  connection: Connection;
+  oldEdge: Edge;
 }
 
 export interface ReconnectEndEvent {
   edge: Edge;
-  // The side where the edge remain attached during reconnection
+  /**
+   * The side where the edge remain attached during reconnection
+   */
   from: {
     node: Node;
     handle: Handle;
   };
+  /**
+   * The side where the edge was reconnected to
+   */
   to: {
     node: Node | null;
     handle: Handle | null;
@@ -105,6 +123,7 @@ export function reconnectStartEventFromReconnectionStartStatus(
 ): ReconnectStartEvent {
   return {
     edge: status.payload.oldEdge.edge,
+    node: status.payload.source.rawNode,
     handle: {
       id: status.payload.sourceHandle.rawHandle.id,
       type: status.payload.sourceHandle.rawHandle.type,

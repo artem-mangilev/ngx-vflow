@@ -22,6 +22,7 @@ export {
   ConnectEndEvent,
   ConnectStartEvent,
   ReconnectEndEvent,
+  ReconnectEvent,
   ReconnectStartEvent,
 } from './lib/vflow/interfaces/connection-events.interface';
 
