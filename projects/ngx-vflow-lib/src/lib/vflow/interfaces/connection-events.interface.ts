@@ -12,17 +12,17 @@ import { Edge } from './edge.interface';
 import { Node } from './node.interface';
 
 export interface ConnectStartEvent {
-  nodeId: string;
+  node: Node;
   handle: Handle;
 }
 
 export interface ConnectEndEvent {
   from: {
-    nodeId: string;
+    node: Node;
     handle: Handle;
   };
   to: {
-    nodeId: string | null;
+    node: Node | null;
     handle: Handle | null;
   };
 }
@@ -34,6 +34,7 @@ export interface ReconnectStartEvent {
 
 export interface ReconnectEndEvent {
   edge: Edge;
+  // The side where the edge remain attached during reconnection
   from: {
     node: Node;
     handle: Handle;
@@ -52,7 +53,7 @@ interface Handle {
 
 export function connectStartEventFromConnectionStartStatus(status: FlowStatusConnectionStart): ConnectStartEvent {
   return {
-    nodeId: status.payload.source.rawNode.id,
+    node: status.payload.source.rawNode,
     handle: {
       id: status.payload.sourceHandle.rawHandle.id,
       type: status.payload.sourceHandle.rawHandle.type,
@@ -64,7 +65,7 @@ export function connectStartEventFromConnectionStartStatus(status: FlowStatusCon
 export function connectEndEventFromConnectionEndStatus(status: FlowStatusConnectionEnd): ConnectEndEvent {
   return {
     from: {
-      nodeId: status.payload.source.rawNode.id,
+      node: status.payload.source.rawNode,
       handle: {
         id: status.payload.sourceHandle.rawHandle.id,
         type: status.payload.sourceHandle.rawHandle.type,
@@ -72,7 +73,7 @@ export function connectEndEventFromConnectionEndStatus(status: FlowStatusConnect
       },
     },
     to: {
-      nodeId: status.payload.target.rawNode.id,
+      node: status.payload.target.rawNode,
       handle: {
         id: status.payload.targetHandle.rawHandle.id,
         type: status.payload.targetHandle.rawHandle.type,
@@ -85,7 +86,7 @@ export function connectEndEventFromConnectionEndStatus(status: FlowStatusConnect
 export function connectEndEventFromConnectionDroppedStatus(status: FlowStatusConnectionDropped): ConnectEndEvent {
   return {
     from: {
-      nodeId: status.payload.source.rawNode.id,
+      node: status.payload.source.rawNode,
       handle: {
         id: status.payload.sourceHandle.rawHandle.id,
         type: status.payload.sourceHandle.rawHandle.type,
@@ -93,7 +94,7 @@ export function connectEndEventFromConnectionDroppedStatus(status: FlowStatusCon
       },
     },
     to: {
-      nodeId: null,
+      node: null,
       handle: null,
     },
   };
