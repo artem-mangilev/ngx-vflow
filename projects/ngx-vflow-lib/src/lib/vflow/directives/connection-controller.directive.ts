@@ -1,22 +1,53 @@
 import { Directive, computed, inject } from '@angular/core';
-import { Connection, ReconnectionEvent } from '../interfaces/connection.interface';
-import { FlowStatusConnectionEnd, FlowStatusReconnectionEnd, FlowStatusService } from '../services/flow-status.service';
+import { Connection } from '../interfaces/connection.interface';
+import {
+  FlowStatusConnectionReleaseValidated,
+  FlowStatusConnectionDropped,
+  FlowStatusConnectionRelease,
+  FlowStatusConnectionStart,
+  FlowStatusReconnectionDropped,
+  FlowStatusReconnectionRelease,
+  FlowStatusReconnectionStart,
+  FlowStatusService,
+  FlowStatusReconnectionReleaseValidated,
+} from '../services/flow-status.service';
 
 import { FlowEntitiesService } from '../services/flow-entities.service';
 import { HandleModel } from '../models/handle.model';
 import { adjustDirection } from '../utils/adjust-direction';
 import { outputFromObservable, toObservable } from '@angular/core/rxjs-interop';
-import { filter, map, tap } from 'rxjs';
+import { filter, map, merge, tap } from 'rxjs';
 import { EdgeModel } from '../models/edge.model';
 import { ConnectionForValidation } from '../interfaces/connection-settings.interface';
+import {
+  ConnectEndEvent,
+  connectEndEventFromConnectionDroppedStatus,
+  connectEndEventFromConnectionReleaseValidatedStatus,
+  ConnectStartEvent,
+  connectStartEventFromConnectionStartStatus,
+  ReconnectEndEvent,
+  reconnectEndEventFromReconnectionDroppedStatus,
+  reconnectEndEventFromReconnectionReleaseValidatedStatus,
+  ReconnectEvent,
+  ReconnectStartEvent,
+  reconnectStartEventFromReconnectionStartStatus,
+} from '../interfaces/connection-events.interface';
 
 @Directive({
-  selector: '[connect], [reconnect]',
+  selector: '[connectStart], [connect], [connectEnd], [reconnectStart], [reconnect], [reconnectEnd]',
   standalone: true,
 })
 export class ConnectionControllerDirective {
   private statusService = inject(FlowStatusService);
   private flowEntitiesService = inject(FlowEntitiesService);
+
+  // TODO emits duplicates when status degrades back to connection-start from connection-validation
+  public readonly connectStart = outputFromObservable<ConnectStartEvent>(
+    this.statusService.status$.pipe(
+      filter((status): status is FlowStatusConnectionStart => status.state === 'connection-start'),
+      map(connectStartEventFromConnectionStartStatus),
+    ),
+  );
 
   /**
    * This event fires when user tries to create new Edge.
@@ -27,26 +58,85 @@ export class ConnectionControllerDirective {
    * by default without passing the validator every connection concidered valid.
    */
   public readonly connect = outputFromObservable<Connection>(
-    toObservable(this.statusService.status).pipe(
-      filter((status): status is FlowStatusConnectionEnd => status.state === 'connection-end'),
+    this.statusService.status$.pipe(
+      filter((status): status is FlowStatusConnectionRelease => status.state === 'connection-release'),
       map((status) => statusToConnection(status, this.isStrictMode())),
-      tap(() => this.statusService.setIdleStatus()),
+      tap((connection) => {
+        // We are 99% sure that status is FlowStatusConnectionRelease here
+        const status = this.statusService.status() as FlowStatusConnectionRelease;
+        this.statusService.setConnectionReleaseValidatedStatus(
+          status.payload.source,
+          status.payload.target,
+          status.payload.sourceHandle,
+          status.payload.targetHandle,
+          this.flowEntitiesService.connection().validator(connection),
+        );
+      }),
       filter((connection) => this.flowEntitiesService.connection().validator(connection)),
     ),
   );
 
-  public readonly reconnect = outputFromObservable<ReconnectionEvent>(
+  public readonly connectEnd = outputFromObservable<ConnectEndEvent>(
+    merge(
+      this.statusService.status$.pipe(
+        filter(
+          (status): status is FlowStatusConnectionReleaseValidated => status.state === 'connection-release-validated',
+        ),
+        map(connectEndEventFromConnectionReleaseValidatedStatus),
+      ),
+      this.statusService.status$.pipe(
+        filter((status): status is FlowStatusConnectionDropped => status.state === 'connection-dropped'),
+        map(connectEndEventFromConnectionDroppedStatus),
+      ),
+    ).pipe(tap(() => this.statusService.setIdleStatus())),
+  );
+
+  public readonly reconnectStart = outputFromObservable<ReconnectStartEvent>(
+    this.statusService.status$.pipe(
+      filter((status): status is FlowStatusReconnectionStart => status.state === 'reconnection-start'),
+      map(reconnectStartEventFromReconnectionStartStatus),
+    ),
+  );
+
+  public readonly reconnect = outputFromObservable<ReconnectEvent>(
     toObservable(this.statusService.status).pipe(
-      filter((status): status is FlowStatusReconnectionEnd => status.state === 'reconnection-end'),
+      filter((status): status is FlowStatusReconnectionRelease => status.state === 'reconnection-release'),
       map((status) => {
         const connection = statusToConnection(status, this.isStrictMode());
         const oldEdge = status.payload.oldEdge.edge;
 
         return { connection, oldEdge };
       }),
-      tap(() => this.statusService.setIdleStatus()),
+      tap(({ connection }) => {
+        // We are 99% sure that status is FlowStatusReconnectionRelease here
+        const status = this.statusService.status() as FlowStatusReconnectionRelease;
+        this.statusService.setReconnectionReleaseValidatedStatus(
+          status.payload.source,
+          status.payload.target,
+          status.payload.sourceHandle,
+          status.payload.targetHandle,
+          status.payload.oldEdge,
+          this.flowEntitiesService.connection().validator(connection),
+        );
+      }),
       filter(({ connection }) => this.flowEntitiesService.connection().validator(connection)),
     ),
+  );
+
+  public readonly reconnectEnd = outputFromObservable<ReconnectEndEvent>(
+    merge(
+      this.statusService.status$.pipe(
+        filter(
+          (status): status is FlowStatusReconnectionReleaseValidated =>
+            status.state === 'reconnection-release-validated',
+        ),
+        map(reconnectEndEventFromReconnectionReleaseValidatedStatus),
+      ),
+      this.statusService.status$.pipe(
+        filter((status): status is FlowStatusReconnectionDropped => status.state === 'reconnection-dropped'),
+        map(reconnectEndEventFromReconnectionDroppedStatus),
+      ),
+    ).pipe(tap(() => this.statusService.setIdleStatus())),
   );
 
   protected isStrictMode = computed(() => this.flowEntitiesService.connection().mode === 'strict');
@@ -149,20 +239,20 @@ export class ConnectionControllerDirective {
       const targetHandle = status.payload.targetHandle;
 
       isReconnection
-        ? this.statusService.setReconnectionEndStatus(
+        ? this.statusService.setReconnectionReleaseStatus(
             source,
             target,
             sourceHandle,
             targetHandle,
             status.payload.oldEdge,
           )
-        : this.statusService.setConnectionEndStatus(source, target, sourceHandle, targetHandle);
+        : this.statusService.setConnectionReleaseStatus(source, target, sourceHandle, targetHandle);
     }
   }
 }
 
 function statusToConnection(
-  status: FlowStatusConnectionEnd | FlowStatusReconnectionEnd,
+  status: FlowStatusConnectionRelease | FlowStatusReconnectionRelease,
   isStrictMode: boolean,
 ): ConnectionForValidation {
   let source = status.payload.source;
