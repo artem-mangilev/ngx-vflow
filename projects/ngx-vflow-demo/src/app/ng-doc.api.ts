@@ -9,7 +9,7 @@ const Api: NgDocApi = {
       include: 'projects/ngx-vflow-lib/src/public-api.ts',
     },
   ],
-  order: 7,
+  order: 9999,
 };
 
 export default Api;
