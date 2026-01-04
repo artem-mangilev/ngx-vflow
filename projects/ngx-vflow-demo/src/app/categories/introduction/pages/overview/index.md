@@ -6,23 +6,19 @@
 
 ```
 
-```typescript group="feature-overview" name="only-input-node.component.ts"  file="./demo/components/only-input-node.component.ts"
+```typescript group="feature-overview" name="data-node.component.ts"  file="./demo/components/data-node.component.ts"
 
 ```
 
-```typescript group="feature-overview" name="position-node.component.ts" file="./demo/components/position-node.component.ts"
+```typescript group="feature-overview" name="output-node.component.ts" file="./demo/components/output-node.component.ts"
 
 ```
 
-```typescript group="feature-overview" name="resizable-node.component.ts" file="./demo/components/resizable-node.component.ts"
+```typescript group="feature-overview" name="transform-node.component.ts" file="./demo/components/transform-node.component.ts"
 
 ```
 
-```typescript group="feature-overview" name="size-node.component.ts" file="./demo/components/size-node.component.ts"
-
-```
-
-```typescript group="feature-overview" name="toolbar-node.component.ts" file="./demo/components/toolbar-node.component.ts"
+```typescript group="feature-overview" name="trigger-node.component.ts" file="./demo/components/trigger-node.component.ts"
 
 ```
 

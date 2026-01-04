@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, effect, inject, untracked, viewChild } from '@angular/core';
-import { Vflow, Connection, VflowComponent, Edge, createEdge } from 'ngx-vflow';
+import { Vflow, Connection, VflowComponent, Edge, createEdge, ComponentNodeEvent } from 'ngx-vflow';
 import { FlowStoreService } from './services/flow-store.service';
+import { TransformNodeComponent } from './components/transform-node.component';
 
 @Component({
   template: `<vflow
@@ -8,16 +9,18 @@ import { FlowStoreService } from './services/flow-store.service';
     [nodes]="store.nodes()"
     [edges]="store.edges()"
     [background]="{ type: 'dots' }"
+    [optimization]="{ detachedGroupsLayer: true }"
     [alignmentHelper]="true"
-    (connect)="createEdge($event)">
+    (connect)="createEdge($event)"
+    (componentNodeEvent)="onComponentEvent($event)">
     <ng-template let-ctx edge>
       @if (ctx.edge.data?.().type === 'animated') {
         <svg:path
           class="animated-edge"
           fill="none"
           [attr.d]="ctx.path()"
-          [attr.stroke-width]="2"
-          [attr.stroke]="'black'"
+          [attr.stroke-width]="2.5"
+          [attr.stroke]="'#8b5cf6'"
           [attr.marker-end]="ctx.markerEnd()" />
       }
     </ng-template>
@@ -28,7 +31,11 @@ import { FlowStoreService } from './services/flow-store.service';
       }
 
       @if (ctx.label.data.type === 'delete') {
-        <div class="label-delete" (click)="deleteEdge(ctx.edge)">×</div>
+        <div class="label-delete" (click)="deleteEdge(ctx.edge)">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <path d="M9 3L3 9M3 3L9 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+          </svg>
+        </div>
       }
     </ng-template>
 
@@ -40,39 +47,67 @@ import { FlowStoreService } from './services/flow-store.service';
         display: block;
         width: 100%;
         height: 700px;
+        --node-bg: #fafafa;
+        --node-border: #e4e4e7;
+        --accent-violet: #8b5cf6;
+        --accent-emerald: #10b981;
+        --accent-amber: #f59e0b;
+        --accent-slate: #64748b;
+        --text-primary: #18181b;
+        --text-muted: #71717a;
       }
 
       .label-text {
-        height: 25px;
-        background-color: #122c26;
-        border-radius: 5px;
-        text-align: center;
-        padding-left: 5px;
-        padding-right: 5px;
+        height: 28px;
+        background: var(--node-bg);
+        border: 1px solid var(--node-border);
+        border-radius: 6px;
+        padding: 0 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--text-primary);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
       }
 
       .label-delete {
-        width: 25px;
-        height: 25px;
-        background-color: rgb(177, 177, 183);
-        border-radius: 5px;
-        text-align: center;
-        padding-left: 5px;
-        padding-right: 5px;
+        width: 28px;
+        height: 28px;
+        background: var(--node-bg);
+        border: 1px solid var(--node-border);
         border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: var(--text-muted);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        transition: all 0.15s ease;
+      }
+
+      .label-delete:hover {
+        background: #ef4444;
+        border-color: #ef4444;
+        color: white;
+        transform: scale(1.1);
+      }
+
+      .label-delete:active {
+        transform: scale(0.95);
       }
 
       .animated-edge {
         stroke-linecap: round;
         stroke-linejoin: round;
-        stroke-dasharray: 10; /* Matches the length of the path */
-        stroke-dashoffset: 200; /* Initially offset */
-        animation: move-white-stroke 4s linear infinite;
+        stroke-dasharray: 8 4;
+        animation: dash-flow 1s linear infinite;
       }
 
-      @keyframes move-white-stroke {
+      @keyframes dash-flow {
         to {
-          stroke-dashoffset: 0; /* Move the stroke along the path */
+          stroke-dashoffset: -12;
         }
       }
     `,
@@ -113,6 +148,11 @@ export class AllFeaturesDemoComponent {
               },
             },
           },
+          markers: {
+            end: {
+              type: 'arrow-closed',
+            },
+          },
           ...connection,
         }),
       ];
@@ -123,5 +163,11 @@ export class AllFeaturesDemoComponent {
     this.store.edges.update((edges) => {
       return edges.filter((edge) => edge !== edgeToDelete);
     });
+  }
+
+  onComponentEvent(event: ComponentNodeEvent<[TransformNodeComponent]>) {
+    if (event.eventName === 'deleted') {
+      this.store.nodes.update((nodes) => nodes.filter((node) => node !== event.eventPayload));
+    }
   }
 }
