@@ -1,5 +1,3 @@
-# {{ NgDocPage.title }}
-
 ## Disabling
 
 You can disable `draggable` behavior on certain `Node` or `DynamicNode` by passing `false`.

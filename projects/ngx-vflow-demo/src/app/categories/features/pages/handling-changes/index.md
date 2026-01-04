@@ -1,4 +1,6 @@
-# {{ NgDocPage.title }}
+---
+keyword: `FeaturesHandlingChanges`
+---
 
 > **Info**
 > You can observe changes in the toasts.

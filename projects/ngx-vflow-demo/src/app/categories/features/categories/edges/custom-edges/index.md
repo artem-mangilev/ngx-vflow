@@ -1,5 +1,3 @@
-# {{ NgDocPage.title }}
-
 You can customize your edges. To achieve this, follow these steps:
 
 1. Change the edge type to `template`

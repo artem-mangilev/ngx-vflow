@@ -7,7 +7,6 @@ const Page: NgDocPage = {
   mdFile: './index.md',
   category: LayoutCategory,
   demos: { ForceLayoutDemoComponent },
-  keyword: 'WorkshopsLayoutForce',
   order: 2,
 };
 

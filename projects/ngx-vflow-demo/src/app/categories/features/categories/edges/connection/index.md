@@ -1,5 +1,3 @@
-# {{ NgDocPage.title }}
-
 Edges are not creating automatically. To create a new edge, follow these steps:
 
 1. Create handler to the `(connect)` event

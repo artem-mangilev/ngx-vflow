@@ -1,5 +1,3 @@
-# {{ NgDocPage.title }}
-
 {{ NgDocActions.demoPane("LazyLoadingDemoComponent") }}
 
 > **Note**

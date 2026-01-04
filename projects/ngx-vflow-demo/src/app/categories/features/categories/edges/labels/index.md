@@ -1,5 +1,3 @@
-# {{ NgDocPage.title }}
-
 You can attach labels to edges by providing the `edgeLabels` property to the `Edge`s. There are three slots available for labels on an edge: `start`, `center`, and `end`.
 
 There are several ways a label can appear on an edge.

@@ -1,4 +1,6 @@
-# {{ NgDocPage.title }}
+---
+keyword: `FeaturesCustomNodes`
+---
 
 > **Warning**
 > Be careful with CSS rules applied to node content. Custom nodes are implemented with SVG's `foreignObject` element, and Safari has issues with some CSS rules inside `foreignObject`. Therefore, please check this browser when applying complex styling.

@@ -1,5 +1,3 @@
-# {{ NgDocPage.title }}
-
 SVG nodes allow you to create custom node shapes using SVG elements. To create an SVG node:
 
 1. Define a node with `type: 'svg-template'`

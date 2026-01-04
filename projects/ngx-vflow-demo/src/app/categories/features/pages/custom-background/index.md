@@ -1,5 +1,3 @@
-# {{ NgDocPage.title }}
-
 You're able to select background for your flow.
 
 ## Solid color

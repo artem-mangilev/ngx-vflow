@@ -1,5 +1,3 @@
-# {{ NgDocPage.title }}
-
 The library supports floating edges. A floating edge is an edge that connects the closest handles of the source and target nodes. You can enable floating edges using the `floating` flag on `Edge`.
 
 > **Info**

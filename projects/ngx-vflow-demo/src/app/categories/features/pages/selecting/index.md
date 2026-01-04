@@ -1,5 +1,3 @@
-# {{ NgDocPage.title }}
-
 Nodes and edges can be selected!
 
 1. Default nodes and edges are selectable by default; just click and see that one is selected.

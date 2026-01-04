@@ -1,5 +1,3 @@
-# {{ NgDocPage.title }}
-
 You can pass a `[template]` to `HandleComponent` with custom handle.
 
 > **Info**

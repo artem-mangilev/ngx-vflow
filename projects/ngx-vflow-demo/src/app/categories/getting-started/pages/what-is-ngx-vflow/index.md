@@ -1,5 +1,3 @@
-# {{ NgDocPage.title }}
-
 `ngx-vflow` is an Angular library for creating node-based applications. It aims to assist you in building anything from a static diagram to a visual editor. You can utilize the default design or apply your own by customizing everything using familiar technologies.
 
 {{ NgDocActions.demo("AllFeaturesDemoComponent", { container: false }) }}

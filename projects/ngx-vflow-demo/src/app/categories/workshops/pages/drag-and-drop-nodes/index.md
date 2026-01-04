@@ -1,5 +1,3 @@
-# {{ NgDocPage.title }}
-
 This workshop will show you how to implement dynamic node creation with basic drag and drop functionality. It also demonstrates how to attach nodes to groups or detach them from groups.
 
 This implementation uses the following APIs from `VflowComponent`:

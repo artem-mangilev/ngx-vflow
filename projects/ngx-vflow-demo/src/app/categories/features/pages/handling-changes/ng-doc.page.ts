@@ -7,7 +7,6 @@ const TestPage: NgDocPage = {
   title: `Handling changes`,
   mdFile: './index.md',
   category: ExamplesCategory,
-  keyword: `FeaturesHandlingChanges`,
   demos: { HandlingChangesDemoComponent, HandlingChangesFilteredDemoComponent },
 };
 

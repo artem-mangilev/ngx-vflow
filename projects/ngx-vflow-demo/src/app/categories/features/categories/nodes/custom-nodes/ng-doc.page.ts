@@ -8,7 +8,6 @@ const TestPage: NgDocPage = {
   mdFile: './index.md',
   category: NodesCategory,
   demos: { CustomNodesDemoComponent, CustomComponentNodesDemoComponent },
-  keyword: `FeaturesCustomNodes`,
   order: 2,
 };
 

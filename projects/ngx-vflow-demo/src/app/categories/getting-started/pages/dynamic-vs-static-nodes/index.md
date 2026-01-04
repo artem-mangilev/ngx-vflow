@@ -1,5 +1,3 @@
-# {{ NgDocPage.title }}
-
 > **Info**
 > You can't mix `Node` and `DynamicNode` in a single array so you have to choose what you want to use
 

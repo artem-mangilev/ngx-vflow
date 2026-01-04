@@ -1,5 +1,3 @@
-# {{ NgDocPage.title }}
-
 ## Auto size
 
 `vflow` automatically fits it container if you pass `view="auto"` input

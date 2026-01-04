@@ -1,5 +1,3 @@
-# {{ NgDocPage.title }}
-
 You might want to resize your node. This functionality works with nearly all types of nodes.
 
 ## Resize default group

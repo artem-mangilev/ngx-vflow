@@ -1,5 +1,3 @@
-# {{ NgDocPage.title }}
-
 > **Alert**
 > Starting from version `1.9`, you must import mock components from `ngx-vflow/testing` instead of `ngx-vflow`.
 > The previous approach caused mock components to be bundled with production components,

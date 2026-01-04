@@ -1,5 +1,3 @@
-# {{ NgDocPage.title }}
-
 > **Warning**
 > This is an experimental API. The library still does not support edge previews - only node previews are available.
 

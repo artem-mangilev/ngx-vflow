@@ -1,5 +1,3 @@
-# {{ NgDocPage.title }}
-
 To simplify writing isolated tests for component nodes, you can use the `provideCustomNodeMocks` function. This helps prevent dependency injection (DI) errors that occur when a node is used outside the scope of the `VflowComponent`.
 
 ```ts

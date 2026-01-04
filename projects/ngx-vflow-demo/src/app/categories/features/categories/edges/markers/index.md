@@ -1,5 +1,3 @@
-# {{ NgDocPage.title }}
-
 You can create markers for both edges and connections.
 
 - **Edges**: Specify `start` and `end` markers for corresponding parts of the edge. Currently, markers are limited to two `type`s: `arrow` and `arrow-closed`.

@@ -1,5 +1,3 @@
-# {{ NgDocPage.title }}
-
 You can use keyboard shortcuts to perform additional actions.
 
 # Defaults

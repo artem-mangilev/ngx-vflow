@@ -1,5 +1,3 @@
-# {{ NgDocPage.title }}
-
 Edges can be reconnected. To reconnect an edge, follow these steps:
 
 1. Mark the `Edge` object as `reconnectable`.

@@ -1,5 +1,3 @@
-# {{ NgDocPage.title }}
-
 The library includes a minimap that offers an overview of the entire flow. To enable it, simply add a `<mini-map />` component as a direct child of `<vflow />`. For customization options, see the available inputs in `MiniMapComponent`.
 
 Planned enhancements for the minimap:
