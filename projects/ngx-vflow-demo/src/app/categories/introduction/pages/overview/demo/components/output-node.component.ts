@@ -110,7 +110,6 @@ import { FlowStoreService } from '../services/flow-store.service';
       }
 
       .metric-row {
-        position: relative;
         display: flex;
         align-items: center;
         gap: 8px;

@@ -91,11 +91,6 @@ import { TransformNodeComponent } from './components/transform-node.component';
         background: #ef4444;
         border-color: #ef4444;
         color: white;
-        transform: scale(1.1);
-      }
-
-      .label-delete:active {
-        transform: scale(0.95);
       }
 
       .animated-edge {
