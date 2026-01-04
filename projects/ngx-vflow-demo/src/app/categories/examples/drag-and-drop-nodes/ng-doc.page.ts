@@ -1,5 +1,5 @@
 import { NgDocPage } from '@ng-doc/core';
-import WorkshopsCategory from '../../ng-doc.category';
+import WorkshopsCategory from '../ng-doc.category';
 import { DragAndDropNodesDemoComponent } from './demo/drag-and-drop-nodes-demo.component';
 
 const TestPage: NgDocPage = {

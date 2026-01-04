@@ -1,5 +1,5 @@
 import { NgDocPage } from '@ng-doc/core';
-import WorkshopsCategory from '../../ng-doc.category';
+import WorkshopsCategory from '../ng-doc.category';
 import { StressTestDemoComponent } from './demo/stress-test-demo.component';
 
 const TestPage: NgDocPage = {
