@@ -9,7 +9,6 @@ import { Edge, Node, Vflow, VflowComponent } from 'ngx-vflow';
   `,
   styleUrls: ['./lazy-loading-demo.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
   imports: [Vflow],
 })
 export class LazyLoadingDemoComponent {

@@ -5,7 +5,6 @@ import { Edge, Node, Vflow } from 'ngx-vflow';
   templateUrl: './drag-handle-demo.component.html',
   styleUrls: ['./drag-handle-demo.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
   imports: [Vflow],
 })
 export class DragHandleDemoComponent {

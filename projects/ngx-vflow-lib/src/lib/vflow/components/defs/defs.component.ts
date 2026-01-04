@@ -3,7 +3,6 @@ import { Marker } from '../../interfaces/marker.interface';
 import { KeyValuePipe } from '@angular/common';
 
 @Component({
-  standalone: true,
   selector: 'defs[flowDefs]',
   templateUrl: './defs.component.html',
   styleUrls: ['./defs.component.scss'],

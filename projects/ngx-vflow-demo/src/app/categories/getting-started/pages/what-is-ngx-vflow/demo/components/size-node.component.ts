@@ -3,7 +3,6 @@ import { CustomDynamicNodeComponent, Vflow } from 'ngx-vflow';
 import { FlowStoreService } from '../services/flow-store.service';
 
 @Component({
-  standalone: true,
   template: `
     <div>
       width: {{ connectedNodeWidth() }}

@@ -5,7 +5,6 @@ import { Edge, Node, Vflow } from 'ngx-vflow';
   templateUrl: './stress-test-demo.component.html',
   styleUrls: ['./stress-test-demo.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
   imports: [Vflow],
 })
 export class StressTestDemoComponent {

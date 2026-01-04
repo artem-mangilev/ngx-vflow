@@ -29,7 +29,6 @@ export interface RedSquareData {
       }
     `,
   ],
-  standalone: true,
   imports: [Vflow],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

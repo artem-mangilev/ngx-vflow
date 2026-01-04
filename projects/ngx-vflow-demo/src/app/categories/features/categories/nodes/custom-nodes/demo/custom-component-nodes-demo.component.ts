@@ -19,7 +19,6 @@ import { RedSquareNodeComponent, RedSquareData } from './components/red-square-n
     `,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
   imports: [Vflow],
 })
 export class CustomComponentNodesDemoComponent {

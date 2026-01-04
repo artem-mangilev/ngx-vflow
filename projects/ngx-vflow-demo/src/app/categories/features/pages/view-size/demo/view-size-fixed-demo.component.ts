@@ -4,7 +4,6 @@ import { Edge, Node, Vflow } from 'ngx-vflow';
 @Component({
   template: `<vflow [nodes]="nodes" [edges]="edges" [view]="[600, 600]" />`,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
   imports: [Vflow],
 })
 export class ViewSizeFixedDemoComponent {

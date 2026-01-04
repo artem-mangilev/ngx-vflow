@@ -12,7 +12,6 @@ import { Node, Vflow } from 'ngx-vflow';
     `,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
   imports: [Vflow],
 })
 export class DefaultNodesDemoComponent {

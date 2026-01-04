@@ -13,7 +13,6 @@ import { Connection, Edge, EdgeChange, Node, NodeChange, Vflow } from 'ngx-vflow
     `,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
   imports: [Vflow],
 })
 export class HandlingChangesDemoComponent {

@@ -4,7 +4,6 @@ import { CustomDynamicNodeComponent, HandleComponent, NodeToolbarComponent } fro
 const emojis = ['🌞', '💡', '💻'];
 
 @Component({
-  standalone: true,
   template: `
     {{ emoji }}
 

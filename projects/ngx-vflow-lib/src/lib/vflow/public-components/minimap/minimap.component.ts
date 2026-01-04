@@ -22,7 +22,6 @@ import { DefaultNodeComponent } from '../../components/default-node/default-node
 export type MiniMapPosition = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
 
 @Component({
-  standalone: true,
   selector: 'mini-map',
   templateUrl: './minimap.component.html',
   styleUrls: [`./minimap.component.scss`],

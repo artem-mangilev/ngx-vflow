@@ -5,7 +5,6 @@ import { Edge, Node, Vflow } from 'ngx-vflow';
   templateUrl: './delete-selected-demo.component.html',
   styleUrls: ['./delete-selected-demo.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
   imports: [Vflow],
 })
 export class DeleteSelectedDemoComponent {

@@ -5,7 +5,6 @@ import { Edge, Node, Vflow } from 'ngx-vflow';
   templateUrl: './node-toolbar-demo.component.html',
   styleUrls: ['./node-toolbar-demo.styles.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
   imports: [Vflow],
 })
 export class NodeToolbarDemoComponent {

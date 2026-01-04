@@ -5,7 +5,6 @@ import { Vflow } from '../../vflow';
 import { VflowMocks, provideCustomNodeMocks } from 'ngx-vflow/testing';
 
 @Component({
-  standalone: true,
   template: `<div resizable selectable dragHandle>
     <handle />
   </div>`,

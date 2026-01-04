@@ -5,7 +5,6 @@ import { Node, Vflow } from 'ngx-vflow';
   templateUrl: './multiple-node-toolbars-demo.component.html',
   styleUrls: ['./multiple-node-toolbars-demo.styles.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
   imports: [Vflow],
 })
 export class MultipleNodeToolbarsDemoComponent {

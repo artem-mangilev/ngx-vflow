@@ -78,7 +78,6 @@ import { FlowStoreService } from './services/flow-store.service';
     `,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
   imports: [Vflow],
   providers: [FlowStoreService],
 })

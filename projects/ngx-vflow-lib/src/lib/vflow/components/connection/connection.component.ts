@@ -14,7 +14,6 @@ import { CurveFactoryParams } from '../../interfaces/curve-factory.interface';
 import { FlowEntitiesService } from '../../services/flow-entities.service';
 
 @Component({
-  standalone: true,
   selector: 'g[connection]',
   template: `
     @if (model().type === 'default') {

@@ -6,7 +6,6 @@ import { Edge, Node, Vflow, Connection } from 'ngx-vflow';
   templateUrl: './multiple-connection-points-demo.component.html',
   styleUrls: ['./multiple-connection-points-demo.styles.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
   imports: [Vflow, CommonModule],
 })
 export class MultipleConnectionPointsDemoComponent {

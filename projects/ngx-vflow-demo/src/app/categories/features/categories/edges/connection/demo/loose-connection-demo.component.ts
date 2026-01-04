@@ -14,7 +14,6 @@ import { Connection, ConnectionSettings, CustomNodeComponent, Edge, Node, Vflow 
     `,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
   imports: [Vflow],
 })
 export class LooseConnectionDemoComponent {
@@ -90,7 +89,6 @@ interface LooseConnectionNodeData {
     `,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
   imports: [Vflow],
 })
 export class LooseConnectionNodeComponent extends CustomNodeComponent<LooseConnectionNodeData> {}

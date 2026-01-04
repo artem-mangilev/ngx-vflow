@@ -15,7 +15,6 @@ import {
   templateUrl: './drag-and-drop-nodes-demo.component.html',
   styleUrls: ['./drag-and-drop-nodes-demo.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
   imports: [Vflow, DndModule],
 })
 export class DragAndDropNodesDemoComponent {

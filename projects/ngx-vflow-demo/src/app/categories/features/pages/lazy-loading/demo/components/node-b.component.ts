@@ -24,7 +24,6 @@ import { CustomNodeComponent, Vflow } from 'ngx-vflow';
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
   imports: [Vflow],
 })
 export class NodeBComponent extends CustomNodeComponent {}

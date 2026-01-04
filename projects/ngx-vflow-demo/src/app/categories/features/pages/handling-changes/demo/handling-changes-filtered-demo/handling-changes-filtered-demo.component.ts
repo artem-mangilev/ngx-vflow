@@ -22,7 +22,6 @@ import {
     `,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
   imports: [Vflow],
 })
 export class HandlingChangesFilteredDemoComponent {

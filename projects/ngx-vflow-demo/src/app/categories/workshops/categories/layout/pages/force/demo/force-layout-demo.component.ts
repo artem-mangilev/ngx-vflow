@@ -6,7 +6,6 @@ import { DynamicNode, Edge, VflowComponent, Vflow } from 'ngx-vflow';
   templateUrl: './force-layout-demo.component.html',
   styleUrls: ['./force-layout-demo.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
   imports: [Vflow],
 })
 export class ForceLayoutDemoComponent {

@@ -5,7 +5,6 @@ import { Edge, Node, Vflow, Connection, ConnectionSettings } from 'ngx-vflow';
   templateUrl: './custom-handles-demo.component.html',
   styleUrls: ['./custom-handles-demo.styles.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
   imports: [Vflow],
 })
 export class CustomHandlesDemoComponent {

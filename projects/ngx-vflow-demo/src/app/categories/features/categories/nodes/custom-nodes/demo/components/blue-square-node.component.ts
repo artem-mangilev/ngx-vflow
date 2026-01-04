@@ -29,7 +29,6 @@ export interface BlueSquareData {
       }
     `,
   ],
-  standalone: true,
   imports: [Vflow],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

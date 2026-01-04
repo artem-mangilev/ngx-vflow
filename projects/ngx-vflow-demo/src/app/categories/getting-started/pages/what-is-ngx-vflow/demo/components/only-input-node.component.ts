@@ -22,7 +22,6 @@ import { CustomDynamicNodeComponent, Vflow } from 'ngx-vflow';
       }
     `,
   ],
-  standalone: true,
   imports: [Vflow],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

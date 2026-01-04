@@ -3,12 +3,14 @@ import { ChildrenOutletContexts } from '@angular/router';
 import { routingAnimation } from './animations/routing.animation';
 import { NgDocThemeService } from '@ng-doc/app';
 
+// eslint-disable-next-line @angular-eslint/prefer-standalone
 @Component({
   animations: [routingAnimation()],
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class AppComponent {
   private contexts = inject(ChildrenOutletContexts);

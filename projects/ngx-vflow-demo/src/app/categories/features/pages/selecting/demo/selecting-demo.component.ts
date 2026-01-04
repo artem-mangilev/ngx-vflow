@@ -5,7 +5,6 @@ import { Edge, Node, Vflow } from 'ngx-vflow';
   templateUrl: './selecting-demo.component.html',
   styleUrls: ['./selecting-demo.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
   imports: [Vflow],
 })
 export class SelectingDemoComponent {

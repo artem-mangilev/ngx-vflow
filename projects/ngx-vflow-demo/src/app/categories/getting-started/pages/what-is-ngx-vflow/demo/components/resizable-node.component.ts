@@ -2,7 +2,6 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { CustomDynamicNodeComponent, Vflow } from 'ngx-vflow';
 
 @Component({
-  standalone: true,
   template: ` <div class="resizable" selectable [resizable]="selected()">
     Resizable Node
 

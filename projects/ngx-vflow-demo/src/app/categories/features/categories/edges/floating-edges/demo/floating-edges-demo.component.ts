@@ -12,7 +12,6 @@ import { ConnectionSettings, CustomNodeComponent, Edge, Node, Vflow } from 'ngx-
     `,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
   imports: [Vflow],
 })
 export class FloatingEdgesDemoComponent {
@@ -102,7 +101,6 @@ interface FloatingEdgesNodeData {
     `,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
   imports: [Vflow],
 })
 export class FloatingEdgesNodeComponent extends CustomNodeComponent<FloatingEdgesNodeData> {}

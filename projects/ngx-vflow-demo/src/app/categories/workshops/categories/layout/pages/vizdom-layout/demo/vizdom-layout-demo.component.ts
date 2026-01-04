@@ -6,7 +6,6 @@ import { DynamicNode, Edge, Node, Vflow, VflowComponent } from 'ngx-vflow';
   templateUrl: './vizdom-layout-demo.component.html',
   styleUrls: ['./vizdom-layout-demo.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
   imports: [Vflow],
 })
 export class VizdomLayoutDemoComponent implements OnInit {
