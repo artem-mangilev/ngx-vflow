@@ -39,7 +39,6 @@ interface DistanceToEdge {
 }
 
 @Component({
-  standalone: true,
   selector: '[resizable]',
   templateUrl: './resizable.component.html',
   styleUrls: ['./resizable.component.scss'],

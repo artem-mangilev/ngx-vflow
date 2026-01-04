@@ -74,7 +74,6 @@ import { VflowMocks } from './vflow-mocks';
         [scaleOnHover]="true" />
     </vflow>
   `,
-  standalone: true,
   imports: [Vflow],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

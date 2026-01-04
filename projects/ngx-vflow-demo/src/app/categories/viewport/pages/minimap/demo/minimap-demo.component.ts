@@ -1,0 +1,98 @@
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { Edge, Node, Vflow } from 'ngx-vflow';
+
+@Component({
+  template: `<vflow view="auto" [nodes]="nodes" [edges]="edges">
+    <ng-template let-ctx groupNode>
+      <svg:rect
+        selectable
+        rx="5"
+        ry="5"
+        [attr.width]="ctx.width()"
+        [attr.height]="ctx.height()"
+        [style.stroke]="'red'"
+        [style.fill]="'red'"
+        [style.fill-opacity]="0.05"
+        [style.stroke-width]="ctx.selected() ? 3 : 1">
+        <handle type="source" position="right" />
+      </svg:rect>
+    </ng-template>
+
+    <mini-map [scaleOnHover]="true" />
+  </vflow>`,
+  styles: [
+    `
+      :host {
+        width: 100%;
+        height: 100%;
+      }
+    `,
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [Vflow],
+})
+export class MinimapDemoComponent {
+  public nodes: Node[] = [
+    {
+      id: '1',
+      point: signal({ x: 10, y: 10 }),
+      type: 'default',
+      text: signal(`1`),
+      parentId: signal('3'),
+    },
+    {
+      id: '2',
+      point: signal({ x: 90, y: 80 }),
+      type: 'default',
+      // it's possible to pass html in this field
+      text: signal(`<strong>2</strong>`),
+      parentId: signal('3'),
+    },
+    {
+      id: '3',
+      point: signal({ x: 10, y: 10 }),
+      type: 'default-group',
+      width: signal(250),
+      height: signal(250),
+    },
+    {
+      id: '4',
+      point: signal({ x: 280, y: 10 }),
+      type: 'default',
+      text: signal(`4`),
+    },
+    {
+      id: '5',
+      point: signal({ x: 10, y: 160 }),
+      type: 'template-group',
+      width: signal(170),
+      height: signal(70),
+      parentId: signal('3'),
+    },
+    {
+      id: '6',
+      point: signal({ x: 10, y: 10 }),
+      type: 'default',
+      text: signal(`6`),
+      parentId: signal('5'),
+    },
+  ];
+
+  public edges: Edge[] = [
+    {
+      source: '1',
+      target: '2',
+      id: '1 -> 2',
+    },
+    {
+      source: '2',
+      target: '4',
+      id: '2 -> 4',
+    },
+    {
+      source: '5',
+      target: '4',
+      id: '5 -> 4',
+    },
+  ];
+}

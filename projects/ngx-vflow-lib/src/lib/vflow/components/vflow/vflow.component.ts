@@ -95,7 +95,6 @@ const changesControllerHostDirective = {
 };
 
 @Component({
-  standalone: true,
   selector: 'vflow',
   templateUrl: './vflow.component.html',
   styleUrls: ['./vflow.component.scss'],

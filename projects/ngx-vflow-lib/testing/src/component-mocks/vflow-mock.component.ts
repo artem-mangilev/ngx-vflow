@@ -131,7 +131,6 @@ import { AsInterface } from '../types';
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
   imports: [NgTemplateOutlet],
 })
 export class VflowMockComponent implements AsInterface<VflowComponent>, OnInit {

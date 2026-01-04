@@ -6,7 +6,6 @@ import { from, map, Observable } from 'rxjs';
 
 @Component({
   templateUrl: './roadmap-list.component.html',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [AsyncPipe, NgDocPageLinkComponent],
   styleUrl: './roadmap-list.component.scss',

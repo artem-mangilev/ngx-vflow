@@ -23,7 +23,6 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { tap } from 'rxjs';
 
 @Component({
-  standalone: true,
   selector: 'node-toolbar',
   template: `
     <ng-template #toolbar>

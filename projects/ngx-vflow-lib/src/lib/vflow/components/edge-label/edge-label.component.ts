@@ -23,7 +23,6 @@ import { HtmlEdgeLabelContext } from '../../interfaces/template-context.interfac
 import { HtmlTemplateEdgeLabel } from '../../interfaces/edge-label.interface';
 
 @Component({
-  standalone: true,
   selector: 'g[edgeLabel]',
   templateUrl: './edge-label.component.html',
   styles: [

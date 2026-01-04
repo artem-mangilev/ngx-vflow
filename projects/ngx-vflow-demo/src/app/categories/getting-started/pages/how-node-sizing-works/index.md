@@ -1,5 +1,3 @@
-# {{ NgDocPage.title }}
-
 This topic needs some clarification due to the design decisions behind the library.
 
 The library renders the flow by combining two technologies:

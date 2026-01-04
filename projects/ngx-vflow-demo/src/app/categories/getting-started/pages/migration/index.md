@@ -1,5 +1,3 @@
-# {{ NgDocPage.title }}
-
 ## Migration to >= v1.0
 
 - remove imports of `VflowModule` and use `Vflow` instead (`Vflow` contains all public standalone components and directives).
