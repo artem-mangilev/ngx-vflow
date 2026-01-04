@@ -3,7 +3,7 @@
 > The previous approach caused mock components to be bundled with production components,
 > so the testing code has been moved to a separate entry point.
 
-The library provides mocks for every public component to simplify testing in a Node environment (e.g., Jest). The naming convention for importing real and mock components follows this pattern: `\*Component` → `\*MockComponent`. For example, `VflowComponent` has a corresponding mock, `VflowMockComponent`.
+The library provides mocks for every public component to simplify testing in a Node environment (e.g., Jest). The naming convention for importing real and mock components follows this pattern: `Component` → `MockComponent`. For example, `VflowComponent` has a corresponding mock, `VflowMockComponent`.
 
 In the testing environment, you should replace real components with their mock counterparts. For example, to mock the entire library, you should:
 

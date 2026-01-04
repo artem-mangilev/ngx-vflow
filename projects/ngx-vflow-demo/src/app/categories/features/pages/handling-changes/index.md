@@ -1,5 +1,5 @@
 ---
-keyword: `FeaturesHandlingChanges`
+keyword: 'FeaturesHandlingChanges'
 ---
 
 > **Info**

@@ -39,12 +39,12 @@ import { NgDocButtonIconComponent, NgDocIconComponent, NgDocTooltipDirective } f
   ],
   providers: [
     provideNgDocApp({
-      themes: [
-        {
-          id: 'vflow-theme-dark',
-          path: 'assets/themes/vflow-theme-dark.css',
-        },
-      ],
+      // themes: [
+      //   {
+      //     id: 'vflow-theme-dark',
+      //     path: 'assets/themes/vflow-theme-dark.css',
+      //   },
+      // ],
     }),
     provideNgDocContext(),
     provideSearchEngine(NgDocDefaultSearchEngine),
