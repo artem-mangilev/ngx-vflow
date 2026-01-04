@@ -1,8 +1,8 @@
 import { NgDocCategory } from '@ng-doc/core';
 
 const ExamplesCategory: NgDocCategory = {
-  title: 'Examples',
-  order: 5,
+  title: 'Cookbook',
+  order: 8,
 };
 
 export default ExamplesCategory;
