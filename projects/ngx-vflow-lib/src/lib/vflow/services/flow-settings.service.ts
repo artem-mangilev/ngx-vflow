@@ -1,6 +1,7 @@
 import { Injectable, WritableSignal, signal } from '@angular/core';
 import { Background } from '../types/background.type';
 import { DEFAULT_OPTIMIZATION, Optimization } from '../interfaces/optimization.interface';
+import { SelectionMode } from '../types/selection-mode.type';
 
 @Injectable()
 export class FlowSettingsService {
@@ -8,6 +9,7 @@ export class FlowSettingsService {
 
   public elevateNodesOnSelect = signal(true);
   public elevateEdgesOnSelect = signal(true);
+  public autoPan = signal(true);
 
   /**
    * @see {VflowComponent.view}
@@ -33,4 +35,6 @@ export class FlowSettingsService {
   public snapGrid = signal<[number, number]>([1, 1]);
 
   public optimization = signal<Required<Optimization>>(DEFAULT_OPTIMIZATION);
+
+  public selectionMode = signal<SelectionMode>('default');
 }

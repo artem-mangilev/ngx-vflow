@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { FlowEntitiesService } from '../services/flow-entities.service';
 import { ToolbarModel } from './toolbar.model';
 import { NodeModel } from './node.model';
+import { createNode } from '../interfaces/node.interface';
 import { FlowSettingsService } from '../services/flow-settings.service';
 import { NodeRenderingService } from '../services/node-rendering.service';
 import { ViewportService } from '../services/viewport.service';
@@ -17,12 +18,14 @@ describe('ToolbarModel', () => {
     model = TestBed.runInInjectionContext(
       () =>
         new ToolbarModel(
-          new NodeModel({
-            id: '1',
-            type: 'default',
-            text: 'test',
-            point: { x: 15, y: 15 },
-          }),
+          new NodeModel(
+            createNode({
+              id: '1',
+              type: 'default',
+              text: 'test',
+              point: { x: 15, y: 15 },
+            }),
+          ),
         ),
     );
   });

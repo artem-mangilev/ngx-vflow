@@ -1,16 +1,18 @@
 <ng-doc-root>
-  <ng-doc-navbar [leftContent]="leftContent" [rightContent]="rightContent">
-    <ng-template #leftContent>
+  <ng-doc-navbar>
+    <div ngDocNavbarLeft>
       <div class="logo-container">
         <a href="https://github.com/artem-mangilev/ngx-vflow">
           <img class="logo-icon" src="../assets/logo.svg" />
         </a>
         <h3 data-testid="logo-text" class="logo-text">ngx-vflow</h3>
       </div>
-    </ng-template>
+    </div>
 
-    <ng-template #rightContent>
+    <div ngDocNavbarRight>
       <div class="ng-doc-header-controls">
+        <ng-doc-theme-toggle />
+
         <a
           href="https://github.com/artem-mangilev/ngx-vflow"
           ng-doc-button-icon
@@ -20,8 +22,9 @@
           <ng-doc-icon customIcon="github" [size]="24" />
         </a>
       </div>
-    </ng-template>
+    </div>
   </ng-doc-navbar>
+
   <ng-doc-sidebar />
 
   <div [@routingAnimation]="getRouteAnimationData()">

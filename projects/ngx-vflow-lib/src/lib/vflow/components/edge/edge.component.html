@@ -18,26 +18,26 @@
   }
 }
 
-@if (model().edgeLabels.start; as label) {
+@if (model().labelModels().start; as label) {
   @if (model().path().labelPoints?.start; as point) {
     <svg:g edgeLabel [model]="label" [point]="point" [edgeModel]="model()" [htmlTemplate]="edgeLabelHtmlTemplate()" />
   }
 }
 
-@if (model().edgeLabels.center; as label) {
+@if (model().labelModels().center; as label) {
   @if (model().path().labelPoints?.center; as point) {
     <svg:g edgeLabel [model]="label" [point]="point" [edgeModel]="model()" [htmlTemplate]="edgeLabelHtmlTemplate()" />
   }
 }
 
-@if (model().edgeLabels.end; as label) {
+@if (model().labelModels().end; as label) {
   @if (model().path().labelPoints?.end; as point) {
     <svg:g edgeLabel [model]="label" [point]="point" [edgeModel]="model()" [htmlTemplate]="edgeLabelHtmlTemplate()" />
   }
 }
 
 @if (model().sourceHandle() && model().targetHandle()) {
-  @if (model().reconnectable === true || model().reconnectable === 'source') {
+  @if (model().reconnectable() === true || model().reconnectable() === 'source') {
     <svg:circle
       class="reconnect-handle"
       r="10"
@@ -46,7 +46,7 @@
       (pointerStart)="startReconnection($event, model().targetHandle()!)" />
   }
 
-  @if (model().reconnectable === true || model().reconnectable === 'target') {
+  @if (model().reconnectable() === true || model().reconnectable() === 'target') {
     <svg:circle
       class="reconnect-handle"
       r="10"

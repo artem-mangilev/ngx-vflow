@@ -1,6 +1,6 @@
 import { computed, inject, signal } from '@angular/core';
-import { EdgeLabelPosition } from '../interfaces/edge-label.interface';
-import { Edge, Curve, EdgeType } from '../interfaces/edge.interface';
+import { EdgeLabel, EdgeLabelPosition } from '../interfaces/edge-label.interface';
+import { Edge, Curve, EdgeType, EDGE_DEFAULTS } from '../interfaces/edge.interface';
 import { EdgeLabelModel } from './edge-label.model';
 import { NodeModel } from './node.model';
 import { straightPath } from '../math/edge-path/straigh-path';
@@ -15,18 +15,21 @@ import { HandleModel } from './handle.model';
 import { CurveFactoryParams } from '../interfaces/curve-factory.interface';
 import { FlowEntitiesService } from '../services/flow-entities.service';
 import { extendedComputed } from '../utils/signals/extended-computed';
+import { Marker } from '../interfaces/marker.interface';
 
 export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
   private readonly flowEntitiesService = inject(FlowEntitiesService);
 
   public source = signal<NodeModel | undefined>(undefined);
   public target = signal<NodeModel | undefined>(undefined);
-  public curve: Curve;
+  public curve = signal<Curve>(EDGE_DEFAULTS.curve);
   public type: EdgeType;
-  public reconnectable: boolean | 'source' | 'target';
-  public floating: boolean;
+  public reconnectable = signal<boolean | 'source' | 'target'>(EDGE_DEFAULTS.reconnectable);
+  public floating = signal(EDGE_DEFAULTS.floating);
+  public markers = signal<{ start?: Marker; end?: Marker }>(EDGE_DEFAULTS.markers);
+  public edgeLabels = signal<{ [position in EdgeLabelPosition]?: EdgeLabel }>(EDGE_DEFAULTS.edgeLabels);
 
-  public selected = signal(false);
+  public selected = signal(EDGE_DEFAULTS.selected);
   public selected$ = toObservable(this.selected);
 
   public shouldLoad = computed(() => (this.source()?.shouldLoad() ?? false) && (this.target()?.shouldLoad() ?? false));
@@ -72,7 +75,8 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
 
     const params = this.getPathFactoryParams(source, target);
 
-    switch (this.curve) {
+    const curve = this.curve();
+    switch (curve) {
       case 'straight':
         return straightPath(params);
       case 'bezier':
@@ -82,14 +86,14 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
       case 'step':
         return smoothStepPath(params, 0);
       default:
-        return this.curve(params);
+        return curve(params);
     }
   });
 
   public sourceHandle = extendedComputed<HandleModel | null>((previousHandle) => {
     let handle: HandleModel | null = null;
 
-    if (this.floating) {
+    if (this.floating()) {
       handle = this.closestHandles().sourceHandle;
     } else {
       if (this.edge.sourceHandle) {
@@ -119,7 +123,7 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
   public targetHandle = extendedComputed<HandleModel | null>((previousHandle) => {
     let handle: HandleModel | null = null;
 
-    if (this.floating) {
+    if (this.floating()) {
       handle = this.closestHandles().targetHandle;
     } else {
       if (this.edge.targetHandle) {
@@ -197,47 +201,71 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
     };
   });
 
-  /**
-   * TODO: not reactive
-   */
   public markerStartUrl = computed(() => {
-    const marker = this.edge.markers?.start;
+    const marker = this.markers()?.start;
 
     return marker ? `url(#${hashCode(JSON.stringify(marker))})` : '';
   });
 
-  /**
-   * TODO: not reactive
-   */
   public markerEndUrl = computed(() => {
-    const marker = this.edge.markers?.end;
+    const marker = this.markers()?.end;
 
     return marker ? `url(#${hashCode(JSON.stringify(marker))})` : '';
   });
 
-  public context = {
-    $implicit: {
-      // TODO: check if edge could change
-      edge: this.edge,
-      path: computed(() => this.path().path),
-      markerStart: this.markerStartUrl,
-      markerEnd: this.markerEndUrl,
-      selected: this.selected.asReadonly(),
-      shouldLoad: this.shouldLoad,
-    },
-  };
+  public context: EdgeContext;
 
-  public edgeLabels: { [position in EdgeLabelPosition]?: EdgeLabelModel } = {};
+  public labelModels = computed(() => {
+    const models: { [position in EdgeLabelPosition]?: EdgeLabelModel } = {};
+
+    const labels = this.edgeLabels();
+    if (labels?.start) models.start = new EdgeLabelModel(labels.start);
+    if (labels?.center) models.center = new EdgeLabelModel(labels.center);
+    if (labels?.end) models.end = new EdgeLabelModel(labels.end);
+
+    return models;
+  });
 
   constructor(public edge: Edge) {
-    this.type = edge.type ?? 'default';
-    this.curve = edge.curve ?? 'bezier';
-    this.reconnectable = edge.reconnectable ?? false;
-    this.floating = edge.floating ?? false;
+    this.type = edge.type ?? EDGE_DEFAULTS.type;
 
-    if (edge.edgeLabels?.start) this.edgeLabels.start = new EdgeLabelModel(edge.edgeLabels.start);
-    if (edge.edgeLabels?.center) this.edgeLabels.center = new EdgeLabelModel(edge.edgeLabels.center);
-    if (edge.edgeLabels?.end) this.edgeLabels.end = new EdgeLabelModel(edge.edgeLabels.end);
+    if (edge.curve) {
+      this.curve = edge.curve;
+    }
+
+    if (edge.reconnectable) {
+      this.reconnectable = edge.reconnectable;
+    }
+
+    if (edge.floating) {
+      this.floating = edge.floating;
+    }
+
+    if (edge.selected) {
+      this.selected = edge.selected;
+    }
+
+    if (edge.markers) {
+      this.markers = edge.markers;
+    }
+
+    if (edge.edgeLabels) {
+      this.edgeLabels = edge.edgeLabels;
+    }
+
+    this.context = {
+      $implicit: {
+        edge: this.edge,
+        data: this.edge.data ?? signal({}),
+        path: computed(() => this.path().path),
+        markerStart: this.markerStartUrl,
+        markerEnd: this.markerEndUrl,
+        selected: this.selected.asReadonly(),
+        shouldLoad: this.shouldLoad,
+      },
+    };
+
+    this.selected$ = toObservable(this.selected);
   }
 
   private getPathFactoryParams(source: HandleModel, target: HandleModel): CurveFactoryParams {

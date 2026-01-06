@@ -1,6 +1,8 @@
 import { TestBed } from '@angular/core/testing';
 import { EdgeModel } from './edge.model';
 import { NodeModel } from './node.model';
+import { createNode } from '../interfaces/node.interface';
+import { createEdge } from '../interfaces/edge.interface';
 import { FlowEntitiesService } from '../services/flow-entities.service';
 import { HandleModel } from './handle.model';
 import { FlowSettingsService } from '../services/flow-settings.service';
@@ -17,38 +19,44 @@ describe('EdgeModel', () => {
 
     model = TestBed.runInInjectionContext(
       () =>
-        new EdgeModel({
-          id: '1 -> 2',
-          source: '1',
-          target: '2',
-          curve: 'straight',
-        }),
+        new EdgeModel(
+          createEdge({
+            id: '1 -> 2',
+            source: '1',
+            target: '2',
+            curve: 'straight',
+          }),
+        ),
     );
 
     model.source.set(
       TestBed.runInInjectionContext(
         () =>
-          new NodeModel({
-            id: '1',
-            type: 'default',
-            text: 'test',
-            point: { x: 15, y: 15 },
-            width: 0,
-            height: 0,
-          }),
+          new NodeModel(
+            createNode({
+              id: '1',
+              type: 'default',
+              text: 'test',
+              point: { x: 15, y: 15 },
+              width: 0,
+              height: 0,
+            }),
+          ),
       ),
     );
     model.target.set(
       TestBed.runInInjectionContext(
         () =>
-          new NodeModel({
-            id: '2',
-            type: 'default',
-            text: 'test',
-            point: { x: 15, y: 15 },
-            width: 0,
-            height: 0,
-          }),
+          new NodeModel(
+            createNode({
+              id: '2',
+              type: 'default',
+              text: 'test',
+              point: { x: 15, y: 15 },
+              width: 0,
+              height: 0,
+            }),
+          ),
       ),
     );
 

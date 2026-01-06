@@ -5,6 +5,7 @@ import { Vflow } from '../../src/public-api';
 import { Node } from '../../src/public-api';
 import { Edge } from '../../src/public-api';
 import { ConnectionSettings } from '../../src/public-api';
+import { createNodes, createEdges } from '../../src/public-api';
 import { VflowMocks } from './vflow-mocks';
 
 @Component({
@@ -23,7 +24,7 @@ import { VflowMocks } from './vflow-mocks';
       [connection]="connection"
       [snapGrid]="[1, 1]"
       [elevateNodesOnSelect]="true"
-      (onComponentNodeEvent)="(null)"
+      (componentNodeEvent)="(null)"
       (connect)="(null)">
       <ng-template nodeHtml>
         <div dragHandle selectable resizable [resizerColor]="'#2e414c'" [gap]="1.5">
@@ -73,14 +74,13 @@ import { VflowMocks } from './vflow-mocks';
         [scaleOnHover]="true" />
     </vflow>
   `,
-  standalone: true,
   imports: [Vflow],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 class VflowWrapperComponent {
   public vflow = viewChild<VflowComponent>('vflow');
 
-  public nodes: Node[] = [
+  public nodes: Node[] = createNodes([
     {
       type: 'html-template',
       id: '1',
@@ -93,9 +93,9 @@ class VflowWrapperComponent {
       width: 100,
       height: 100,
     },
-  ];
+  ]);
 
-  public edges: Edge[] = [
+  public edges: Edge[] = createEdges([
     {
       id: '1',
       source: '1',
@@ -107,7 +107,7 @@ class VflowWrapperComponent {
         },
       },
     },
-  ];
+  ]);
 
   public connection: ConnectionSettings = {
     type: 'template',

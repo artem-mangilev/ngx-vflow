@@ -1,8 +1,3 @@
-/**
- * @deprecated not used anymore internally
- */
-export type EdgeLabelType = 'default' | 'html-template';
-
 export type EdgeLabelPosition = 'start' | 'center' | 'end';
 
 export type EdgeLabel<T = unknown> = DefaultEdgeLabel | HtmlTemplateEdgeLabel<T>;

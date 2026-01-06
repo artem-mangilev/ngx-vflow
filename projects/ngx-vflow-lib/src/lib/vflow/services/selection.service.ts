@@ -1,10 +1,15 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, computed } from '@angular/core';
 import { ViewportState } from '../interfaces/viewport.interface';
 import { FlowEntitiesService } from './flow-entities.service';
 import { FlowEntity } from '../interfaces/flow-entity.interface';
 import { Subject, tap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { KeyboardService } from './keyboard.service';
+import { FlowSettingsService } from './flow-settings.service';
+import { SelectionStrategy } from '../interfaces/selection-strategy.interface';
+import { SelectionMode } from '../types/selection-mode.type';
+import { DefaultSelectionStrategy } from '../strategies/default-selection.strategy';
+import { ManualSelectionStrategy } from '../strategies/manual-selection.strategy';
 
 export interface ViewportForSelection {
   start: ViewportState;
@@ -21,26 +26,28 @@ export class SelectionService {
 
   private flowEntitiesService = inject(FlowEntitiesService);
   private keyboardService = inject(KeyboardService);
+  private flowSettingsService = inject(FlowSettingsService);
+
+  private strategies: Record<SelectionMode, SelectionStrategy> = {
+    default: new DefaultSelectionStrategy(),
+    manual: new ManualSelectionStrategy(),
+  };
+
+  private currentStrategy = computed(() => this.strategies[this.flowSettingsService.selectionMode()]);
 
   protected viewport$ = new Subject<ViewportForSelection>();
 
-  protected resetSelection = this.viewport$
+  protected viewportChangeSub = this.viewport$
     .pipe(
       tap(({ start, end, target }) => {
         if (start && end && target) {
-          const delta = SelectionService.delta;
-
-          const diffX = Math.abs(end.x - start.x);
-          const diffY = Math.abs(end.y - start.y);
-
-          // click (not drag)
-          const isClick = diffX < delta && diffY < delta;
-          // do not reset if event chain contains selectable elems
-          const isNotSelectable = !target.closest('.selectable');
-
-          if (isClick && isNotSelectable) {
-            this.select(null);
-          }
+          this.currentStrategy().handleViewportChange(
+            { start, end, target, delta: SelectionService.delta },
+            {
+              entities: this.flowEntitiesService.entities(),
+              isMultiSelectionActive: this.keyboardService.isActiveAction('multiSelection'),
+            },
+          );
         }
       }),
       takeUntilDestroyed(),
@@ -52,20 +59,9 @@ export class SelectionService {
   }
 
   public select(entity: FlowEntity | null) {
-    // ? May be not a responsibility of this method
-    // if entity already selected - do nothing
-    if (entity?.selected()) {
-      return;
-    }
-
-    if (!this.keyboardService.isActiveAction('multiSelection')) {
-      // undo select for previously selected nodes
-      this.flowEntitiesService.entities().forEach((n) => n.selected.set(false));
-    }
-
-    if (entity) {
-      // select passed entity
-      entity.selected.set(true);
-    }
+    this.currentStrategy().select(entity, {
+      entities: this.flowEntitiesService.entities(),
+      isMultiSelectionActive: this.keyboardService.isActiveAction('multiSelection'),
+    });
   }
 }

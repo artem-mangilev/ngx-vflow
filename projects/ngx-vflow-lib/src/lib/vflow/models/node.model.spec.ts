@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { NodeModel } from './node.model';
+import { createNode } from '../interfaces/node.interface';
 import { FlowEntitiesService } from '../services/flow-entities.service';
 import { FlowSettingsService } from '../services/flow-settings.service';
 import { NodeRenderingService } from '../services/node-rendering.service';
@@ -16,12 +17,14 @@ describe('NodeModel', () => {
 
     model = TestBed.runInInjectionContext(
       () =>
-        new NodeModel({
-          id: '1',
-          type: 'default',
-          text: 'test',
-          point: { x: 15, y: 15 },
-        }),
+        new NodeModel(
+          createNode({
+            id: '1',
+            type: 'default',
+            text: 'test',
+            point: { x: 15, y: 15 },
+          }),
+        ),
     );
 
     entitiesService = TestBed.inject(FlowEntitiesService);
@@ -45,12 +48,14 @@ describe('NodeModel', () => {
 
   it('should create correct parent/children links', () => {
     const childModel = () =>
-      new NodeModel({
-        id: '2',
-        parentId: '1',
-        type: 'default',
-        point: { x: 10, y: 10 },
-      });
+      new NodeModel(
+        createNode({
+          id: '2',
+          parentId: '1',
+          type: 'default',
+          point: { x: 10, y: 10 },
+        }),
+      );
 
     entitiesService.nodes.update((nodes) => [...nodes, TestBed.runInInjectionContext(childModel)]);
 
@@ -63,12 +68,14 @@ describe('NodeModel', () => {
 
   it('should return correct global point', () => {
     const childModel = () =>
-      new NodeModel({
-        id: '2',
-        parentId: '1',
-        type: 'default',
-        point: { x: 10, y: 10 },
-      });
+      new NodeModel(
+        createNode({
+          id: '2',
+          parentId: '1',
+          type: 'default',
+          point: { x: 10, y: 10 },
+        }),
+      );
 
     entitiesService.nodes.update((nodes) => [...nodes, TestBed.runInInjectionContext(childModel)]);
 
