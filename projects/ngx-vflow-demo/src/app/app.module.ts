@@ -38,14 +38,7 @@ import { NgDocButtonIconComponent, NgDocIconComponent, NgDocTooltipDirective } f
     NgDocTooltipDirective,
   ],
   providers: [
-    provideNgDocApp({
-      // themes: [
-      //   {
-      //     id: 'vflow-theme-dark',
-      //     path: 'assets/themes/vflow-theme-dark.css',
-      //   },
-      // ],
-    }),
+    provideNgDocApp(),
     provideNgDocContext(),
     provideSearchEngine(NgDocDefaultSearchEngine),
     providePageSkeleton(NG_DOC_DEFAULT_PAGE_SKELETON),
@@ -57,7 +50,7 @@ import { NgDocButtonIconComponent, NgDocIconComponent, NgDocTooltipDirective } f
         ...NG_DOC_ROUTING,
         {
           path: '**',
-          redirectTo: 'getting-started/what-is-ngx-vflow',
+          redirectTo: 'introduction/overview',
           pathMatch: 'full',
         },
       ],
