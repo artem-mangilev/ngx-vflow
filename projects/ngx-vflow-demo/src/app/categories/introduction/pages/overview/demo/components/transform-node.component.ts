@@ -99,7 +99,7 @@ import { CustomNodeComponent, Node, Vflow } from 'ngx-vflow';
         padding: 12px 14px;
         display: flex;
         flex-direction: column;
-        justify-content: space-between;
+        justify-content: space-evenly;
         gap: 12px;
         background: white;
       }
