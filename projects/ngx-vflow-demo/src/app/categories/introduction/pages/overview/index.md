@@ -6,23 +6,19 @@
 
 ```
 
-```typescript group="feature-overview" name="only-input-node.component.ts"  file="./demo/components/only-input-node.component.ts"
+```typescript group="feature-overview" name="data-node.component.ts"  file="./demo/components/data-node.component.ts"
 
 ```
 
-```typescript group="feature-overview" name="position-node.component.ts" file="./demo/components/position-node.component.ts"
+```typescript group="feature-overview" name="output-node.component.ts" file="./demo/components/output-node.component.ts"
 
 ```
 
-```typescript group="feature-overview" name="resizable-node.component.ts" file="./demo/components/resizable-node.component.ts"
+```typescript group="feature-overview" name="transform-node.component.ts" file="./demo/components/transform-node.component.ts"
 
 ```
 
-```typescript group="feature-overview" name="size-node.component.ts" file="./demo/components/size-node.component.ts"
-
-```
-
-```typescript group="feature-overview" name="toolbar-node.component.ts" file="./demo/components/toolbar-node.component.ts"
+```typescript group="feature-overview" name="trigger-node.component.ts" file="./demo/components/trigger-node.component.ts"
 
 ```
 
@@ -39,10 +35,3 @@
 **Great performance:** Angular signals are the heart and soul of `ngx-vflow`, which are performant by default, so you shouldn't worry about performance even with large flows.
 
 **Zoneless:** [Does not require `zone.js`](https://stackblitz.com/edit/stackblitz-starters-qhu6im?file=src%2Fmain.ts)
-
-## Core Principles
-
-The library follows several key principles that impact feature implementation:
-
-- **No hidden mutations of your data.** The library does not modify any of the `Node` or `Edge` objects you pass in as inputs. Instead, it creates internal models around these entities and operates on them. Any changes to the passed entities can be observed through events.
-- **You manage your data.** This principle also implies that you are responsible for managing invalid data. For instance, if you delete a node, the edges corresponding to this node will not be deleted automatically. However, the library will notify you about detached edges so that you can easily delete them.

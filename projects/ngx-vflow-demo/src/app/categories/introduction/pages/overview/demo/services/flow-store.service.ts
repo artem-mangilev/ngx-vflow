@@ -1,63 +1,47 @@
 import { Injectable, signal } from '@angular/core';
 import { createEdges, createNodes } from 'ngx-vflow';
-import { OnlyInputNodeComponent } from '../components/only-input-node.component';
-import { ToolbarNodeComponent } from '../components/toolbar-node.component';
-import { ResizableNodeComponent } from '../components/resizable-node.component';
-import { SizeNodeComponent } from '../components/size-node.component';
-import { PositionNodeComponent } from '../components/position-node.component';
+import { TriggerNodeComponent } from '../components/trigger-node.component';
+import { DataNodeComponent } from '../components/data-node.component';
+import { TransformNodeComponent } from '../components/transform-node.component';
+import { OutputNodeComponent } from '../components/output-node.component';
 
 @Injectable()
 export class FlowStoreService {
   readonly nodes = signal(
     createNodes([
       {
-        id: '1',
-        point: { x: 10, y: 10 },
-        type: 'default',
-        text: 'Default Node',
-        width: 150,
+        id: 'trigger',
+        point: { x: 50, y: -80 },
+        type: TriggerNodeComponent,
       },
       {
-        id: '2',
-        point: { x: 252, y: 200 },
-        type: 'default',
-        text: '<i>I can show styled text</i>',
-        width: 200,
+        id: 'data',
+        point: { x: 50, y: 250 },
+        type: DataNodeComponent,
       },
       {
-        id: '3',
-        point: { x: 254, y: -181 },
-        type: OnlyInputNodeComponent,
+        id: 'transform',
+        point: { x: 400, y: 180 },
+        type: TransformNodeComponent,
       },
       {
-        id: '4',
-        point: { x: 465, y: -90 },
+        id: 'group',
+        point: { x: 800, y: 0 },
         type: 'default-group',
         width: 500,
-        height: 200,
+        height: 800,
       },
       {
-        id: '5',
-        parentId: '4',
-        point: { x: 100, y: 50 },
-        type: ToolbarNodeComponent,
+        id: 'output-size',
+        parentId: 'group',
+        point: { x: 200, y: 70 },
+        type: OutputNodeComponent,
       },
       {
-        id: '6',
-        point: { x: 1056, y: -39 },
-        type: ResizableNodeComponent,
-        width: 0,
-        height: 0,
-      },
-      {
-        id: '7',
-        point: { x: 1332, y: -181 },
-        type: SizeNodeComponent,
-      },
-      {
-        id: '8',
-        point: { x: 1332, y: 200 },
-        type: PositionNodeComponent,
+        id: 'output-position',
+        parentId: 'group',
+        point: { x: 200, y: 400 },
+        type: OutputNodeComponent,
       },
     ]),
   );
@@ -65,9 +49,9 @@ export class FlowStoreService {
   readonly edges = signal(
     createEdges([
       {
-        id: '1 -> 2',
-        source: '1',
-        target: '2',
+        id: 'trigger->data',
+        source: 'trigger',
+        target: 'data',
         curve: 'smooth-step',
         edgeLabels: {
           center: {
@@ -80,9 +64,10 @@ export class FlowStoreService {
         },
       },
       {
-        id: '1 -> 3',
-        source: '1',
-        target: '3',
+        id: 'data->transform-1',
+        source: 'data',
+        target: 'transform',
+        targetHandle: 'input-1',
         type: 'template',
         curve: 'bezier',
         edgeLabels: {
@@ -99,19 +84,10 @@ export class FlowStoreService {
         },
       },
       {
-        id: '2 -> 5',
-        source: '2',
-        target: '5',
-      },
-      {
-        id: '5 -> 6',
-        source: '5',
-        target: '6',
-      },
-      {
-        id: '6 -> 7width',
-        source: '6',
-        target: '7',
+        id: 'transform->output-size-width',
+        source: 'transform',
+        sourceHandle: 'output-1',
+        target: 'output-size',
         targetHandle: 'width',
         edgeLabels: {
           center: {
@@ -128,9 +104,10 @@ export class FlowStoreService {
         },
       },
       {
-        id: '6 -> 7height',
-        source: '6',
-        target: '7',
+        id: 'transform->output-size-height',
+        source: 'transform',
+        sourceHandle: 'output-1',
+        target: 'output-size',
         targetHandle: 'height',
         edgeLabels: {
           center: {
@@ -147,9 +124,10 @@ export class FlowStoreService {
         },
       },
       {
-        id: '6 -> 8x',
-        source: '6',
-        target: '8',
+        id: 'transform->output-position-x',
+        source: 'transform',
+        sourceHandle: 'output-1',
+        target: 'output-position',
         targetHandle: 'x',
         edgeLabels: {
           center: {
@@ -166,9 +144,10 @@ export class FlowStoreService {
         },
       },
       {
-        id: '6 -> 8y',
-        source: '6',
-        target: '8',
+        id: 'transform->output-position-y',
+        source: 'transform',
+        sourceHandle: 'output-1',
+        target: 'output-position',
         targetHandle: 'y',
         edgeLabels: {
           center: {
