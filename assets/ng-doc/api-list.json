@@ -1,0 +1,552 @@
+[
+  {
+    "title": "ngx-vflow",
+    "items": [
+      {
+        "route": "/api/interfaces/ngx-vflow/ConnectionSettings",
+        "type": "Interface",
+        "name": "ConnectionSettings"
+      },
+      {
+        "route": "/api/type-aliases/ngx-vflow/ConnectionValidatorFn",
+        "type": "TypeAlias",
+        "name": "ConnectionValidatorFn"
+      },
+      {
+        "route": "/api/interfaces/ngx-vflow/ViewportState",
+        "type": "Interface",
+        "name": "ViewportState"
+      },
+      {
+        "route": "/api/interfaces/ngx-vflow/ConnectEndEvent",
+        "type": "Interface",
+        "name": "ConnectEndEvent"
+      },
+      {
+        "route": "/api/interfaces/ngx-vflow/ConnectStartEvent",
+        "type": "Interface",
+        "name": "ConnectStartEvent"
+      },
+      {
+        "route": "/api/interfaces/ngx-vflow/ReconnectEndEvent",
+        "type": "Interface",
+        "name": "ReconnectEndEvent"
+      },
+      {
+        "route": "/api/interfaces/ngx-vflow/ReconnectEvent",
+        "type": "Interface",
+        "name": "ReconnectEvent"
+      },
+      {
+        "route": "/api/interfaces/ngx-vflow/ReconnectStartEvent",
+        "type": "Interface",
+        "name": "ReconnectStartEvent"
+      },
+      {
+        "route": "/api/classes/ngx-vflow/ConnectionModel",
+        "type": "Class",
+        "name": "ConnectionModel"
+      },
+      {
+        "route": "/api/classes/ngx-vflow/HandleModel",
+        "type": "Class",
+        "name": "HandleModel"
+      },
+      {
+        "route": "/api/classes/ngx-vflow/NodeModel",
+        "type": "Class",
+        "name": "NodeModel"
+      },
+      {
+        "route": "/api/classes/ngx-vflow/ComponentEventBusService",
+        "type": "Injectable",
+        "name": "ComponentEventBusService"
+      },
+      {
+        "route": "/api/classes/ngx-vflow/HandleService",
+        "type": "Injectable",
+        "name": "HandleService"
+      },
+      {
+        "route": "/api/classes/ngx-vflow/FlowSettingsService",
+        "type": "Injectable",
+        "name": "FlowSettingsService"
+      },
+      {
+        "route": "/api/classes/ngx-vflow/FlowEntitiesService",
+        "type": "Injectable",
+        "name": "FlowEntitiesService"
+      },
+      {
+        "route": "/api/classes/ngx-vflow/NodeAccessorService",
+        "type": "Injectable",
+        "name": "NodeAccessorService"
+      },
+      {
+        "route": "/api/classes/ngx-vflow/ViewportService",
+        "type": "Injectable",
+        "name": "ViewportService"
+      },
+      {
+        "route": "/api/classes/ngx-vflow/SelectionService",
+        "type": "Injectable",
+        "name": "SelectionService"
+      },
+      {
+        "route": "/api/classes/ngx-vflow/NodeRenderingService",
+        "type": "Injectable",
+        "name": "NodeRenderingService"
+      },
+      {
+        "route": "/api/classes/ngx-vflow/RootPointerDirective",
+        "type": "Directive",
+        "name": "RootPointerDirective"
+      },
+      {
+        "route": "/api/classes/ngx-vflow/SpacePointContextDirective",
+        "type": "Directive",
+        "name": "SpacePointContextDirective"
+      },
+      {
+        "route": "/api/variables/ngx-vflow/Vflow",
+        "type": "Variable",
+        "name": "Vflow"
+      },
+      {
+        "route": "/api/functions/ngx-vflow/isComponentNode",
+        "type": "Function",
+        "name": "isComponentNode"
+      },
+      {
+        "route": "/api/functions/ngx-vflow/isTemplateNode",
+        "type": "Function",
+        "name": "isTemplateNode"
+      },
+      {
+        "route": "/api/functions/ngx-vflow/isSvgTemplateNode",
+        "type": "Function",
+        "name": "isSvgTemplateNode"
+      },
+      {
+        "route": "/api/functions/ngx-vflow/isDefaultNode",
+        "type": "Function",
+        "name": "isDefaultNode"
+      },
+      {
+        "route": "/api/functions/ngx-vflow/isDefaultGroupNode",
+        "type": "Function",
+        "name": "isDefaultGroupNode"
+      },
+      {
+        "route": "/api/functions/ngx-vflow/isTemplateGroupNode",
+        "type": "Function",
+        "name": "isTemplateGroupNode"
+      },
+      {
+        "route": "/api/functions/ngx-vflow/createNode",
+        "type": "Function",
+        "name": "createNode"
+      },
+      {
+        "route": "/api/functions/ngx-vflow/createNodes",
+        "type": "Function",
+        "name": "createNodes"
+      },
+      {
+        "route": "/api/variables/ngx-vflow/NODE_DEFAULTS",
+        "type": "Variable",
+        "name": "NODE_DEFAULTS"
+      },
+      {
+        "route": "/api/type-aliases/ngx-vflow/Node",
+        "type": "TypeAlias",
+        "name": "Node"
+      },
+      {
+        "route": "/api/interfaces/ngx-vflow/SharedNode",
+        "type": "Interface",
+        "name": "SharedNode"
+      },
+      {
+        "route": "/api/interfaces/ngx-vflow/DefaultNode",
+        "type": "Interface",
+        "name": "DefaultNode"
+      },
+      {
+        "route": "/api/interfaces/ngx-vflow/HtmlTemplateNode",
+        "type": "Interface",
+        "name": "HtmlTemplateNode"
+      },
+      {
+        "route": "/api/interfaces/ngx-vflow/SvgTemplateNode",
+        "type": "Interface",
+        "name": "SvgTemplateNode"
+      },
+      {
+        "route": "/api/interfaces/ngx-vflow/DefaultGroupNode",
+        "type": "Interface",
+        "name": "DefaultGroupNode"
+      },
+      {
+        "route": "/api/interfaces/ngx-vflow/TemplateGroupNode",
+        "type": "Interface",
+        "name": "TemplateGroupNode"
+      },
+      {
+        "route": "/api/interfaces/ngx-vflow/ComponentNode",
+        "type": "Interface",
+        "name": "ComponentNode"
+      },
+      {
+        "route": "/api/type-aliases/ngx-vflow/StaticNode",
+        "type": "TypeAlias",
+        "name": "StaticNode"
+      },
+      {
+        "route": "/api/interfaces/ngx-vflow/Point",
+        "type": "Interface",
+        "name": "Point"
+      },
+      {
+        "route": "/api/interfaces/ngx-vflow/SpacePoint",
+        "type": "Interface",
+        "name": "SpacePoint"
+      },
+      {
+        "route": "/api/functions/ngx-vflow/createEdge",
+        "type": "Function",
+        "name": "createEdge"
+      },
+      {
+        "route": "/api/functions/ngx-vflow/createEdges",
+        "type": "Function",
+        "name": "createEdges"
+      },
+      {
+        "route": "/api/variables/ngx-vflow/EDGE_DEFAULTS",
+        "type": "Variable",
+        "name": "EDGE_DEFAULTS"
+      },
+      {
+        "route": "/api/type-aliases/ngx-vflow/EdgeType",
+        "type": "TypeAlias",
+        "name": "EdgeType"
+      },
+      {
+        "route": "/api/type-aliases/ngx-vflow/Curve",
+        "type": "TypeAlias",
+        "name": "Curve"
+      },
+      {
+        "route": "/api/interfaces/ngx-vflow/Edge",
+        "type": "Interface",
+        "name": "Edge"
+      },
+      {
+        "route": "/api/type-aliases/ngx-vflow/StaticEdge",
+        "type": "TypeAlias",
+        "name": "StaticEdge"
+      },
+      {
+        "route": "/api/type-aliases/ngx-vflow/EdgeLabelPosition",
+        "type": "TypeAlias",
+        "name": "EdgeLabelPosition"
+      },
+      {
+        "route": "/api/type-aliases/ngx-vflow/EdgeLabel",
+        "type": "TypeAlias",
+        "name": "EdgeLabel"
+      },
+      {
+        "route": "/api/interfaces/ngx-vflow/DefaultEdgeLabel",
+        "type": "Interface",
+        "name": "DefaultEdgeLabel"
+      },
+      {
+        "route": "/api/interfaces/ngx-vflow/HtmlTemplateEdgeLabel",
+        "type": "Interface",
+        "name": "HtmlTemplateEdgeLabel"
+      },
+      {
+        "route": "/api/interfaces/ngx-vflow/Connection",
+        "type": "Interface",
+        "name": "Connection"
+      },
+      {
+        "route": "/api/interfaces/ngx-vflow/Marker",
+        "type": "Interface",
+        "name": "Marker"
+      },
+      {
+        "route": "/api/type-aliases/ngx-vflow/ComponentNodeEvent",
+        "type": "TypeAlias",
+        "name": "ComponentNodeEvent"
+      },
+      {
+        "route": "/api/type-aliases/ngx-vflow/AnyComponentNodeEvent",
+        "type": "TypeAlias",
+        "name": "AnyComponentNodeEvent"
+      },
+      {
+        "route": "/api/interfaces/ngx-vflow/FitViewOptions",
+        "type": "Interface",
+        "name": "FitViewOptions"
+      },
+      {
+        "route": "/api/variables/ngx-vflow/DEFAULT_OPTIMIZATION",
+        "type": "Variable",
+        "name": "DEFAULT_OPTIMIZATION"
+      },
+      {
+        "route": "/api/interfaces/ngx-vflow/Optimization",
+        "type": "Interface",
+        "name": "Optimization"
+      },
+      {
+        "route": "/api/interfaces/ngx-vflow/IntersectingNodesOptions",
+        "type": "Interface",
+        "name": "IntersectingNodesOptions"
+      },
+      {
+        "route": "/api/interfaces/ngx-vflow/CurveFactorySharedParams",
+        "type": "Interface",
+        "name": "CurveFactorySharedParams"
+      },
+      {
+        "route": "/api/interfaces/ngx-vflow/ConnectionCurveFactoryParams",
+        "type": "Interface",
+        "name": "ConnectionCurveFactoryParams"
+      },
+      {
+        "route": "/api/interfaces/ngx-vflow/EdgeCurveFactoryParams",
+        "type": "Interface",
+        "name": "EdgeCurveFactoryParams"
+      },
+      {
+        "route": "/api/interfaces/ngx-vflow/CurveLayout",
+        "type": "Interface",
+        "name": "CurveLayout"
+      },
+      {
+        "route": "/api/type-aliases/ngx-vflow/CurveFactoryParams",
+        "type": "TypeAlias",
+        "name": "CurveFactoryParams"
+      },
+      {
+        "route": "/api/type-aliases/ngx-vflow/CurveFactory",
+        "type": "TypeAlias",
+        "name": "CurveFactory"
+      },
+      {
+        "route": "/api/interfaces/ngx-vflow/NodePreview",
+        "type": "Interface",
+        "name": "NodePreview"
+      },
+      {
+        "route": "/api/interfaces/ngx-vflow/AlignmentHelperSettings",
+        "type": "Interface",
+        "name": "AlignmentHelperSettings"
+      },
+      {
+        "route": "/api/type-aliases/ngx-vflow/NodeChange",
+        "type": "TypeAlias",
+        "name": "NodeChange"
+      },
+      {
+        "route": "/api/interfaces/ngx-vflow/NodePositionChange",
+        "type": "Interface",
+        "name": "NodePositionChange"
+      },
+      {
+        "route": "/api/interfaces/ngx-vflow/NodeSizeChange",
+        "type": "Interface",
+        "name": "NodeSizeChange"
+      },
+      {
+        "route": "/api/interfaces/ngx-vflow/NodeAddChange",
+        "type": "Interface",
+        "name": "NodeAddChange"
+      },
+      {
+        "route": "/api/interfaces/ngx-vflow/NodeRemoveChange",
+        "type": "Interface",
+        "name": "NodeRemoveChange"
+      },
+      {
+        "route": "/api/interfaces/ngx-vflow/NodeSelectedChange",
+        "type": "Interface",
+        "name": "NodeSelectedChange"
+      },
+      {
+        "route": "/api/type-aliases/ngx-vflow/EdgeChange",
+        "type": "TypeAlias",
+        "name": "EdgeChange"
+      },
+      {
+        "route": "/api/interfaces/ngx-vflow/EdgeDetachedChange",
+        "type": "Interface",
+        "name": "EdgeDetachedChange"
+      },
+      {
+        "route": "/api/interfaces/ngx-vflow/EdgeAddChange",
+        "type": "Interface",
+        "name": "EdgeAddChange"
+      },
+      {
+        "route": "/api/interfaces/ngx-vflow/EdgeRemoveChange",
+        "type": "Interface",
+        "name": "EdgeRemoveChange"
+      },
+      {
+        "route": "/api/interfaces/ngx-vflow/EdgeSelectChange",
+        "type": "Interface",
+        "name": "EdgeSelectChange"
+      },
+      {
+        "route": "/api/type-aliases/ngx-vflow/Position",
+        "type": "TypeAlias",
+        "name": "Position"
+      },
+      {
+        "route": "/api/type-aliases/ngx-vflow/Background",
+        "type": "TypeAlias",
+        "name": "Background"
+      },
+      {
+        "route": "/api/interfaces/ngx-vflow/ColorBackground",
+        "type": "Interface",
+        "name": "ColorBackground"
+      },
+      {
+        "route": "/api/interfaces/ngx-vflow/DotsBackground",
+        "type": "Interface",
+        "name": "DotsBackground"
+      },
+      {
+        "route": "/api/interfaces/ngx-vflow/ImageBackground",
+        "type": "Interface",
+        "name": "ImageBackground"
+      },
+      {
+        "route": "/api/type-aliases/ngx-vflow/ConnectionMode",
+        "type": "TypeAlias",
+        "name": "ConnectionMode"
+      },
+      {
+        "route": "/api/type-aliases/ngx-vflow/KeyboardAction",
+        "type": "TypeAlias",
+        "name": "KeyboardAction"
+      },
+      {
+        "route": "/api/type-aliases/ngx-vflow/KeyboardShortcuts",
+        "type": "TypeAlias",
+        "name": "KeyboardShortcuts"
+      },
+      {
+        "route": "/api/type-aliases/ngx-vflow/SelectionMode",
+        "type": "TypeAlias",
+        "name": "SelectionMode"
+      },
+      {
+        "route": "/api/classes/ngx-vflow/VflowComponent",
+        "type": "Component",
+        "name": "VflowComponent"
+      },
+      {
+        "route": "/api/classes/ngx-vflow/HandleComponent",
+        "type": "Component",
+        "name": "HandleComponent"
+      },
+      {
+        "route": "/api/classes/ngx-vflow/CustomNodeComponent",
+        "type": "Directive",
+        "name": "CustomNodeComponent"
+      },
+      {
+        "route": "/api/classes/ngx-vflow/ResizableComponent",
+        "type": "Component",
+        "name": "ResizableComponent"
+      },
+      {
+        "route": "/api/type-aliases/ngx-vflow/MiniMapPosition",
+        "type": "TypeAlias",
+        "name": "MiniMapPosition"
+      },
+      {
+        "route": "/api/classes/ngx-vflow/MiniMapComponent",
+        "type": "Component",
+        "name": "MiniMapComponent"
+      },
+      {
+        "route": "/api/classes/ngx-vflow/NodeToolbarComponent",
+        "type": "Component",
+        "name": "NodeToolbarComponent"
+      },
+      {
+        "route": "/api/classes/ngx-vflow/NodeToolbarWrapperDirective",
+        "type": "Directive",
+        "name": "NodeToolbarWrapperDirective"
+      },
+      {
+        "route": "/api/classes/ngx-vflow/CustomTemplateEdgeComponent",
+        "type": "Component",
+        "name": "CustomTemplateEdgeComponent"
+      },
+      {
+        "route": "/api/classes/ngx-vflow/EdgeTemplateDirective",
+        "type": "Directive",
+        "name": "EdgeTemplateDirective"
+      },
+      {
+        "route": "/api/classes/ngx-vflow/ConnectionTemplateDirective",
+        "type": "Directive",
+        "name": "ConnectionTemplateDirective"
+      },
+      {
+        "route": "/api/classes/ngx-vflow/EdgeLabelHtmlTemplateDirective",
+        "type": "Directive",
+        "name": "EdgeLabelHtmlTemplateDirective"
+      },
+      {
+        "route": "/api/classes/ngx-vflow/NodeHtmlTemplateDirective",
+        "type": "Directive",
+        "name": "NodeHtmlTemplateDirective"
+      },
+      {
+        "route": "/api/classes/ngx-vflow/NodeSvgTemplateDirective",
+        "type": "Directive",
+        "name": "NodeSvgTemplateDirective"
+      },
+      {
+        "route": "/api/classes/ngx-vflow/GroupNodeTemplateDirective",
+        "type": "Directive",
+        "name": "GroupNodeTemplateDirective"
+      },
+      {
+        "route": "/api/classes/ngx-vflow/HandleTemplateDirective",
+        "type": "Directive",
+        "name": "HandleTemplateDirective"
+      },
+      {
+        "route": "/api/classes/ngx-vflow/ConnectionControllerDirective",
+        "type": "Directive",
+        "name": "ConnectionControllerDirective"
+      },
+      {
+        "route": "/api/classes/ngx-vflow/ChangesControllerDirective",
+        "type": "Directive",
+        "name": "ChangesControllerDirective"
+      },
+      {
+        "route": "/api/classes/ngx-vflow/SelectableDirective",
+        "type": "Directive",
+        "name": "SelectableDirective"
+      },
+      {
+        "route": "/api/classes/ngx-vflow/DragHandleDirective",
+        "type": "Directive",
+        "name": "DragHandleDirective"
+      }
+    ]
+  }
+]
