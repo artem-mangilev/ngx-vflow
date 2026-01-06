@@ -8,7 +8,7 @@ import { CustomNodeComponent, Vflow } from 'ngx-vflow';
         <svg class="icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
           <path d="M4 3L12 8L4 13V3Z" fill="currentColor" />
         </svg>
-        <span class="title">Node can be anything</span>
+        <span class="title">A node can be anything</span>
       </div>
       <div class="node-content">
         <iframe width="100%" height="100%" src="https://www.youtube.com/embed/dQw4w9WgXcQ"> </iframe>
@@ -29,7 +29,7 @@ import { CustomNodeComponent, Vflow } from 'ngx-vflow';
       }
 
       .trigger-node {
-        width: 200px;
+        width: 220px;
         background: white;
         border: 2px solid var(--accent-violet);
         border-radius: 8px;
