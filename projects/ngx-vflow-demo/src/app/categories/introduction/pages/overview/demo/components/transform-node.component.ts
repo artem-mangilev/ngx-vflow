@@ -1,10 +1,6 @@
 import { ChangeDetectionStrategy, Component, output } from '@angular/core';
 import { CustomNodeComponent, Node, Vflow } from 'ngx-vflow';
 
-export interface TransformNodeData {
-  transformation: string;
-}
-
 @Component({
   template: `
     <div class="transform-node" selectable [resizable]="selected()">
@@ -23,12 +19,12 @@ export interface TransformNodeData {
             stroke-linecap="round"
             stroke-linejoin="round" />
         </svg>
-        <span class="title">Transform</span>
+        <span class="title">Click to Resize</span>
       </div>
       <div class="node-content">
         <div class="section">
           <div class="section-label">Input</div>
-          <div class="data-preview">Raw data</div>
+          <div class="data-preview">You can attach handle to content inside node</div>
           <handle type="target" position="left" id="input-1" />
         </div>
         <div class="transform-indicator">
@@ -40,11 +36,10 @@ export interface TransformNodeData {
               stroke-linecap="round"
               stroke-linejoin="round" />
           </svg>
-          <span class="transform-text">{{ data()?.transformation || 'Map & Filter' }}</span>
         </div>
         <div class="section">
           <div class="section-label">Output</div>
-          <div class="data-preview">Processed</div>
+          <div class="data-preview">You can attach handle to content inside node</div>
           <handle type="source" position="right" id="output-1" />
         </div>
       </div>
@@ -60,16 +55,11 @@ export interface TransformNodeData {
     `
       :host {
         display: contents;
-        --node-bg: #fafafa;
-        --node-border: #e4e4e7;
-        --accent-amber: #f59e0b;
-        --text-primary: #18181b;
-        --text-muted: #71717a;
       }
 
       .transform-node {
         min-width: 240px;
-        min-height: 290px;
+        min-height: 320px;
         width: 100%;
         height: 100%;
         background: white;
@@ -109,6 +99,7 @@ export interface TransformNodeData {
         padding: 12px 14px;
         display: flex;
         flex-direction: column;
+        justify-content: space-between;
         gap: 12px;
         background: white;
       }
@@ -185,6 +176,6 @@ export interface TransformNodeData {
   imports: [Vflow],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TransformNodeComponent extends CustomNodeComponent<TransformNodeData> {
+export class TransformNodeComponent extends CustomNodeComponent {
   readonly deleted = output<Node>();
 }

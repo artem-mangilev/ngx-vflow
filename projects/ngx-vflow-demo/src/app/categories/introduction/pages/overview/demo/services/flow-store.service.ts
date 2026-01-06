@@ -11,33 +11,18 @@ export class FlowStoreService {
     createNodes([
       {
         id: 'trigger',
-        point: { x: 50, y: 50 },
+        point: { x: 50, y: -80 },
         type: TriggerNodeComponent,
-        data: {
-          triggerType: 'Schedule',
-        },
       },
       {
         id: 'data',
         point: { x: 50, y: 250 },
         type: DataNodeComponent,
-        data: {
-          fields: [
-            { name: 'id', type: 'number' },
-            { name: 'email', type: 'string' },
-            { name: 'status', type: 'boolean' },
-          ],
-        },
       },
       {
         id: 'transform',
         point: { x: 400, y: 180 },
         type: TransformNodeComponent,
-        width: 240,
-        height: 220,
-        data: {
-          transformation: 'Map & Filter',
-        },
       },
       {
         id: 'group',
@@ -73,7 +58,7 @@ export class FlowStoreService {
             type: 'html-template',
             data: {
               type: 'text',
-              text: 'Start',
+              text: 'Smooth Step Edge',
             },
           },
         },
@@ -90,7 +75,7 @@ export class FlowStoreService {
             type: 'html-template',
             data: {
               type: 'text',
-              text: 'Stream',
+              text: 'Animated Edge',
             },
           },
         },

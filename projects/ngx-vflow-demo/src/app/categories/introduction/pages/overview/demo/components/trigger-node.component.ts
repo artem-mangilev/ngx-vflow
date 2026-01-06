@@ -1,10 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { CustomNodeComponent, Vflow } from 'ngx-vflow';
 
-export interface TriggerNodeData {
-  triggerType: 'Schedule' | 'Webhook' | 'Manual';
-}
-
 @Component({
   template: `
     <div class="trigger-node">
@@ -12,10 +8,10 @@ export interface TriggerNodeData {
         <svg class="icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
           <path d="M4 3L12 8L4 13V3Z" fill="currentColor" />
         </svg>
-        <span class="title">Trigger</span>
+        <span class="title">Node can be anything</span>
       </div>
       <div class="node-content">
-        <span class="subtitle">{{ data()?.triggerType || 'Schedule' }}</span>
+        <iframe width="100%" height="100%" src="https://www.youtube.com/embed/dQw4w9WgXcQ"> </iframe>
       </div>
 
       <handle type="source" position="right" />
@@ -23,16 +19,17 @@ export interface TriggerNodeData {
   `,
   styles: [
     `
-      :host {
-        --node-bg: #fafafa;
-        --node-border: #e4e4e7;
-        --accent-violet: #8b5cf6;
-        --text-primary: #18181b;
-        --text-muted: #71717a;
+      iframe {
+        border: none;
+        frameborder: 0;
+        background-color: transparent;
+        margin: 0;
+        padding: 0;
+        display: block;
       }
 
       .trigger-node {
-        width: 180px;
+        width: 200px;
         background: white;
         border: 2px solid var(--accent-violet);
         border-radius: 8px;
@@ -78,4 +75,4 @@ export interface TriggerNodeData {
   imports: [Vflow],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TriggerNodeComponent extends CustomNodeComponent<TriggerNodeData> {}
+export class TriggerNodeComponent extends CustomNodeComponent {}

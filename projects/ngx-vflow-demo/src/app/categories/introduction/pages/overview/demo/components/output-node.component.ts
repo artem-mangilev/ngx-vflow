@@ -47,14 +47,6 @@ import { FlowStoreService } from '../services/flow-store.service';
   `,
   styles: [
     `
-      :host {
-        --node-bg: #fafafa;
-        --node-border: #e4e4e7;
-        --accent-slate: #64748b;
-        --text-primary: #18181b;
-        --text-muted: #71717a;
-      }
-
       .output-node {
         width: 180px;
         background: white;

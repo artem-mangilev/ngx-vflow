@@ -1,10 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { CustomNodeComponent, Vflow } from 'ngx-vflow';
 
-export interface DataNodeData {
-  fields: Array<{ name: string; type: string; value?: string | number }>;
-}
-
 @Component({
   template: `
     <div class="data-node">
@@ -14,10 +10,10 @@ export interface DataNodeData {
           <rect x="2" y="6.75" width="12" height="2.5" rx="1" fill="currentColor" />
           <rect x="2" y="10.5" width="12" height="2.5" rx="1" fill="currentColor" />
         </svg>
-        <span class="title">Data Source</span>
+        <span class="title">For example, a table</span>
       </div>
       <div class="node-content">
-        @for (field of data()?.fields || defaultFields; track field.name) {
+        @for (field of fields; track field.name) {
           <div class="field-row">
             <span class="field-name">{{ field.name }}</span>
             <span class="field-type">{{ field.type }}</span>
@@ -31,14 +27,6 @@ export interface DataNodeData {
   `,
   styles: [
     `
-      :host {
-        --node-bg: #fafafa;
-        --node-border: #e4e4e7;
-        --accent-emerald: #10b981;
-        --text-primary: #18181b;
-        --text-muted: #71717a;
-      }
-
       .data-node {
         width: 200px;
         background: white;
@@ -102,8 +90,8 @@ export interface DataNodeData {
   imports: [Vflow],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class DataNodeComponent extends CustomNodeComponent<DataNodeData> {
-  defaultFields = [
+export class DataNodeComponent extends CustomNodeComponent {
+  protected fields = [
     { name: 'id', type: 'number' },
     { name: 'name', type: 'string' },
     { name: 'count', type: 'number' },
