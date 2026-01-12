@@ -9,7 +9,7 @@ import {
   viewChild,
   input,
 } from '@angular/core';
-import { DynamicNode, Node } from '../../interfaces/node.interface';
+import { Node } from '../../interfaces/node.interface';
 import { MapContextDirective } from '../../directives/map-context.directive';
 import { DraggableService } from '../../services/draggable.service';
 import { NodeModel } from '../../models/node.model';
@@ -48,6 +48,7 @@ import { SpacePointContextDirective } from '../../directives/space-point-context
 import { FitViewOptions } from '../../interfaces/fit-view-options.interface';
 import { Optimization } from '../../interfaces/optimization.interface';
 import { KeyboardShortcuts } from '../../types/keyboard-action.type';
+import { SelectionMode } from '../../types/selection-mode.type';
 import { KeyboardService } from '../../services/keyboard.service';
 import { transformBackground } from '../../utils/transform-background';
 import { OverlaysService } from '../../services/overlays.service';
@@ -74,44 +75,26 @@ import { toLazySignal } from '../../utils/signals/to-lazy-signal';
 import { FlowRenderingService } from '../../services/flow-rendering.service';
 import { AlignmentHelperComponent } from '../alignment-helper/alignment-helper.component';
 import { AlignmentHelperSettings } from '../../interfaces/alignment-helper-settings.interface';
+import { AutoPanDirective } from '../../directives/auto-pan.directive';
 
 const changesControllerHostDirective = {
   directive: ChangesControllerDirective,
   outputs: [
-    'onNodesChange',
-    'onNodesChange.position',
-    'onNodesChange.position.single',
-    'onNodesChange.position.many',
-    'onNodesChange.size',
-    'onNodesChange.size.single',
-    'onNodesChange.size.many',
-    'onNodesChange.add',
-    'onNodesChange.add.single',
-    'onNodesChange.add.many',
-    'onNodesChange.remove',
-    'onNodesChange.remove.single',
-    'onNodesChange.remove.many',
-    'onNodesChange.select',
-    'onNodesChange.select.single',
-    'onNodesChange.select.many',
-    'onEdgesChange',
-    'onEdgesChange.detached',
-    'onEdgesChange.detached.single',
-    'onEdgesChange.detached.many',
-    'onEdgesChange.add',
-    'onEdgesChange.add.single',
-    'onEdgesChange.add.many',
-    'onEdgesChange.remove',
-    'onEdgesChange.remove.single',
-    'onEdgesChange.remove.many',
-    'onEdgesChange.select',
-    'onEdgesChange.select.single',
-    'onEdgesChange.select.many',
+    'nodesChanges',
+    'nodesChanges.position',
+    'nodesChanges.size',
+    'nodesChanges.add',
+    'nodesChanges.remove',
+    'nodesChanges.select',
+    'edgesChanges',
+    'edgesChanges.detached',
+    'edgesChanges.add',
+    'edgesChanges.remove',
+    'edgesChanges.select',
   ],
 };
 
 @Component({
-  standalone: true,
   selector: 'vflow',
   templateUrl: './vflow.component.html',
   styleUrls: ['./vflow.component.scss'],
@@ -149,6 +132,7 @@ const changesControllerHostDirective = {
     NgTemplateOutlet,
     PreviewFlowComponent,
     AlignmentHelperComponent,
+    AutoPanDirective,
   ],
 })
 export class VflowComponent {
@@ -221,6 +205,16 @@ export class VflowComponent {
     this.flowSettingsService.entitiesSelectable.set(value);
   }
 
+  /**
+   * Selection mode strategy
+   * - 'default': library manages selection automatically
+   * - 'manual': library does not manage selection, user controls it via node.selected signal
+   */
+  @Input()
+  public set selectionMode(value: SelectionMode) {
+    this.flowSettingsService.selectionMode.set(value);
+  }
+
   @Input()
   public set keyboardShortcuts(value: KeyboardShortcuts) {
     this.keyboardService.setShortcuts(value);
@@ -265,6 +259,14 @@ export class VflowComponent {
   public set elevateEdgesOnSelect(value: boolean) {
     this.flowSettingsService.elevateEdgesOnSelect.set(value);
   }
+
+  /**
+   * Enable auto-pan
+   */
+  @Input()
+  public set autoPan(value: boolean) {
+    this.flowSettingsService.autoPan.set(value);
+  }
   // #endregion
 
   // #region MAIN_INPUTS
@@ -272,7 +274,7 @@ export class VflowComponent {
    * Nodes to render
    */
   @Input({ required: true })
-  public set nodes(newNodes: Node[] | DynamicNode[]) {
+  public set nodes(newNodes: Node[]) {
     const models = runInInjectionContext(this.injector, () =>
       ReferenceIdentityChecker.nodes(newNodes, this.flowEntitiesService.nodes()),
     );
@@ -313,10 +315,8 @@ export class VflowComponent {
   // #region OUTPUTS
   /**
    * Event that accumulates all custom node events
-   *
-   * @experimental
    */
-  public readonly onComponentNodeEvent = outputFromObservable<any>(this.componentEventBusService.event$); // TODO: research how to remove any
+  public readonly componentNodeEvent = outputFromObservable<any>(this.componentEventBusService.event$); // TODO: research how to remove any
   // #endregion
 
   // #region TEMPLATES
@@ -437,7 +437,7 @@ export class VflowComponent {
    *
    * @param id node id
    */
-  public getNode<T = unknown>(id: string): Node<T> | DynamicNode<T> | undefined {
+  public getNode<T = unknown>(id: string): Node<T> | undefined {
     return this.flowEntitiesService.getNode<T>(id)?.rawNode;
   }
 
@@ -476,13 +476,8 @@ export class VflowComponent {
    * @param options.partially - If true, returns nodes that partially intersect. If false, only returns fully intersecting nodes
    * @returns An array of nodes that intersect with the specified node
    */
-  public getIntesectingNodes<T>(
-    nodeId: string,
-    options: IntersectingNodesOptions = { partially: true },
-  ): Node<T>[] | DynamicNode<T>[] {
-    return getIntesectingNodes(nodeId, this.nodeModels(), options).map((n) => n.rawNode) as
-      | Node<T>[]
-      | DynamicNode<T>[];
+  public getIntesectingNodes<T>(nodeId: string, options: IntersectingNodesOptions = { partially: true }): Node<T>[] {
+    return getIntesectingNodes(nodeId, this.nodeModels(), options).map((n) => n.rawNode) as Node<T>[];
   }
 
   /**

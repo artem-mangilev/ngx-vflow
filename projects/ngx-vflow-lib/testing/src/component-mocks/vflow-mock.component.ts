@@ -12,7 +12,6 @@ import {
 import { NgTemplateOutlet } from '@angular/common';
 import {
   Node,
-  DynamicNode,
   Edge,
   SpacePoint,
   Point,
@@ -28,6 +27,7 @@ import {
   ɵConnectionModel as ConnectionModel,
   DEFAULT_OPTIMIZATION,
   AlignmentHelperSettings,
+  SelectionMode,
 } from 'ngx-vflow';
 import { toObservable } from '@angular/core/rxjs-interop';
 import {
@@ -84,34 +84,35 @@ import { AsInterface } from '../types';
             },
           }" />
 
-        @if (edge.edgeLabels?.start) {
+        @if (edge.edgeLabels?.()?.start; as label) {
           <ng-component
             [ngTemplateOutlet]="edgeLabelHtmlDirective()?.templateRef ?? null"
             [ngTemplateOutletContext]="{
               $implicit: {
                 edge: edge,
+                label,
               },
             }" />
         }
 
-        @if (edge.edgeLabels?.center) {
+        @if (edge.edgeLabels?.()?.center; as label) {
           <ng-component
             [ngTemplateOutlet]="edgeLabelHtmlDirective()?.templateRef ?? null"
             [ngTemplateOutletContext]="{
               $implicit: {
                 edge: edge,
-                label: edge.edgeLabels?.center,
+                label,
               },
             }" />
         }
 
-        @if (edge.edgeLabels?.end) {
+        @if (edge.edgeLabels?.()?.end; as label) {
           <ng-component
             [ngTemplateOutlet]="edgeLabelHtmlDirective()?.templateRef ?? null"
             [ngTemplateOutletContext]="{
               $implicit: {
                 edge: edge,
-                label: edge.edgeLabels?.end,
+                label,
               },
             }" />
         }
@@ -130,12 +131,11 @@ import { AsInterface } from '../types';
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
   imports: [NgTemplateOutlet],
 })
 export class VflowMockComponent implements AsInterface<VflowComponent>, OnInit {
   @Input({ required: true })
-  public readonly nodes!: Node[] | DynamicNode[];
+  public readonly nodes!: Node[];
 
   @Input()
   public readonly edges!: Edge[];
@@ -159,6 +159,9 @@ export class VflowMockComponent implements AsInterface<VflowComponent>, OnInit {
   public readonly entitiesSelectable = true;
 
   @Input()
+  public readonly selectionMode: SelectionMode = 'default';
+
+  @Input()
   public readonly keyboardShortcuts: KeyboardShortcuts = {
     multiSelection: null,
   };
@@ -177,10 +180,13 @@ export class VflowMockComponent implements AsInterface<VflowComponent>, OnInit {
   @Input()
   public elevateEdgesOnSelect!: boolean;
 
+  @Input()
+  public autoPan = true;
+
   public alignmentHelper = input<boolean | AlignmentHelperSettings>(false);
 
   // eslint-disable-next-line @angular-eslint/no-output-on-prefix
-  public readonly onComponentNodeEvent = output<any>();
+  public readonly componentNodeEvent = output<any>();
 
   protected nodeTemplateDirective = contentChild(NodeHtmlTemplateMockDirective);
 
@@ -242,7 +248,7 @@ export class VflowMockComponent implements AsInterface<VflowComponent>, OnInit {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public getIntesectingNodes(nodeId: string, options?: IntersectingNodesOptions): Node[] | DynamicNode[] {
+  public getIntesectingNodes(nodeId: string, options?: IntersectingNodesOptions): Node[] {
     return [];
   }
 
@@ -251,7 +257,7 @@ export class VflowMockComponent implements AsInterface<VflowComponent>, OnInit {
     return { x: 0, y: 0 };
   }
 
-  public getNode<T = unknown>(id: string): Node<T> | DynamicNode<T> | undefined {
+  public getNode<T = unknown>(id: string): Node<T> | undefined {
     return this.nodes.find((node) => node.id === id);
   }
 

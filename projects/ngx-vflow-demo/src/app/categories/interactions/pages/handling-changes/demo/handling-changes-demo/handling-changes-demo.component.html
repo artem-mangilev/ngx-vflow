@@ -1,0 +1,13 @@
+<vflow
+  view="auto"
+  [nodes]="nodes"
+  [edges]="edges"
+  (connect)="createEdge($event)"
+  (nodesChanges)="handleNodeChanges($event)"
+  (edgesChanges)="handleEdgeChanges($event)" />
+
+<ng-template #toast>
+  <h3>{{ toastData?.title }}</h3>
+
+  <pre>{{ toastData?.json }}</pre>
+</ng-template>

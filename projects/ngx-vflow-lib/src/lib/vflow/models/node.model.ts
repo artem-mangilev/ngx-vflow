@@ -1,5 +1,5 @@
 import { TemplateRef, computed, inject, signal } from '@angular/core';
-import { DynamicNode, Node, isComponentDynamicNode, isComponentStaticNode } from '../interfaces/node.interface';
+import { NODE_DEFAULTS, Node, isComponentNode } from '../interfaces/node.interface';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { HandleModel } from './handle.model';
 import { FlowEntity } from '../interfaces/flow-entity.interface';
@@ -8,22 +8,17 @@ import { FlowEntitiesService } from '../services/flow-entities.service';
 import { MAGIC_NUMBER_TO_FIX_GLITCH_IN_CHROME } from '../constants/magic-number-to-fix-glitch-in-chrome.constant';
 import { Contextable } from '../interfaces/contextable.interface';
 import { GroupNodeContext, NodeContext } from '../interfaces/template-context.interface';
-import { toUnifiedNode } from '../utils/to-unified-node';
 import { catchError, filter, Observable, of, shareReplay, switchMap } from 'rxjs';
 import { NodePreview } from '../interfaces/node-preview.interface';
 import { FlowSettingsService } from '../services/flow-settings.service';
 import { NodeRenderingService } from '../services/node-rendering.service';
 import { extendedComputed } from '../utils/signals/extended-computed';
-import { isCustomDynamicNodeComponent, isCustomNodeComponent } from '../utils/is-vflow-component';
 import { isCallable } from '../utils/is-callable';
+import { isCustomNodeComponent } from '../utils/is-vflow-component';
 
 export class NodeModel<T = unknown>
   implements FlowEntity, Contextable<NodeContext | GroupNodeContext | { $implicit: object }>
 {
-  private static defaultWidth = 100;
-  private static defaultHeight = 50;
-  private static defaultColor = '#1b262c';
-
   private entitiesService = inject(FlowEntitiesService);
   private settingsService = inject(FlowSettingsService);
   private nodeRenderingService = inject(NodeRenderingService);
@@ -33,10 +28,10 @@ export class NodeModel<T = unknown>
   public point = signal<Point>({ x: 0, y: 0 });
   public point$: Observable<Point>;
 
-  public width = signal(NodeModel.defaultWidth);
+  public width = signal(NODE_DEFAULTS.width);
   public width$: Observable<number>;
 
-  public height = signal(NodeModel.defaultHeight);
+  public height = signal(NODE_DEFAULTS.height);
   public height$: Observable<number>;
 
   /**
@@ -93,8 +88,7 @@ export class NodeModel<T = unknown>
   public readonly magnetRadius = 20;
 
   // TODO: not sure if we need to statically store it
-  public isComponentType =
-    isComponentStaticNode(this.rawNode as Node) || isComponentDynamicNode(this.rawNode as DynamicNode);
+  public isComponentType = isComponentNode(this.rawNode);
 
   public shouldLoad = extendedComputed<boolean>((previousShouldLoad) => {
     if (previousShouldLoad) {
@@ -106,11 +100,6 @@ export class NodeModel<T = unknown>
     } else if (this.settingsService.optimization().lazyLoadTrigger === 'viewport') {
       // Immediately load component if it's a plain class
       if (isCustomNodeComponent(this.rawNode.type)) {
-        return true;
-      }
-
-      // Immediately load component if it's a plain class
-      if (isCustomDynamicNodeComponent(this.rawNode.type)) {
         return true;
       }
 
@@ -141,7 +130,7 @@ export class NodeModel<T = unknown>
   );
 
   // Default node specific thing
-  public text = signal('');
+  public text = signal(NODE_DEFAULTS.text);
 
   // Component node specific thing
   public componentTypeInputs = {
@@ -152,10 +141,10 @@ export class NodeModel<T = unknown>
 
   public children = computed(() => this.entitiesService.nodes().filter((n) => n.parentId() === this.rawNode.id));
 
-  public color = signal(NodeModel.defaultColor);
+  public color = signal(NODE_DEFAULTS.color);
 
   public controlledByResizer = signal(true);
-  public resizable = signal(false);
+  public resizable = signal(NODE_DEFAULTS.resizable);
   public resizing = signal(false);
   public resizerTemplate = signal<TemplateRef<unknown> | null>(null);
 
@@ -163,65 +152,61 @@ export class NodeModel<T = unknown>
     $implicit: {},
   };
 
-  private parentId = signal<string | null>(null);
+  private parentId = signal<string | null>(NODE_DEFAULTS.parentId);
 
-  constructor(public rawNode: Node<T> | DynamicNode<T>) {
-    const internalNode = toUnifiedNode(rawNode);
-
-    if (internalNode.point) {
-      this.point = internalNode.point;
+  constructor(public rawNode: Node<T>) {
+    if (rawNode.point) {
+      this.point = rawNode.point;
     }
 
-    if (internalNode.width) {
-      this.width = internalNode.width;
+    if (rawNode.width) {
+      this.width = rawNode.width;
     }
 
-    if (internalNode.height) {
-      this.height = internalNode.height;
+    if (rawNode.height) {
+      this.height = rawNode.height;
     }
 
-    if (internalNode.draggable) {
-      this.draggable = internalNode.draggable;
+    if (rawNode.draggable) {
+      this.draggable = rawNode.draggable;
     }
 
-    if (internalNode.controlledByResizer) {
-      this.controlledByResizer = internalNode.controlledByResizer;
+    if (rawNode.preview) {
+      this.preview = rawNode.preview;
     }
 
-    if (internalNode.parentId) {
-      this.parentId = internalNode.parentId;
+    if (rawNode.selected) {
+      this.selected = rawNode.selected;
     }
 
-    if (internalNode.preview) {
-      this.preview = internalNode.preview;
+    if (rawNode.type === 'default-group' && rawNode.color) {
+      this.color = rawNode.color;
     }
 
-    if (internalNode.type === 'default-group' && internalNode.color) {
-      this.color = internalNode.color;
+    if (rawNode.type === 'default-group' && rawNode.resizable) {
+      this.resizable = rawNode.resizable;
     }
 
-    if (internalNode.type === 'default-group' && internalNode.resizable) {
-      this.resizable = internalNode.resizable;
+    if (rawNode.type === 'default' && rawNode.text) {
+      this.text = rawNode.text;
     }
 
-    if (internalNode.type === 'default' && internalNode.text) {
-      this.text = internalNode.text;
-    }
-
-    if (internalNode.type === 'html-template') {
+    if (rawNode.type === 'html-template') {
       this.context = {
         $implicit: {
           node: rawNode,
+          data: rawNode.data ?? signal(NODE_DEFAULTS.data as T),
           selected: this.selected.asReadonly(),
           shouldLoad: this.shouldLoad,
         },
       };
     }
 
-    if (internalNode.type === 'svg-template') {
+    if (rawNode.type === 'svg-template') {
       this.context = {
         $implicit: {
           node: rawNode,
+          data: rawNode.data ?? signal(NODE_DEFAULTS.data as T),
           selected: this.selected.asReadonly(),
           width: this.width.asReadonly(),
           height: this.height.asReadonly(),
@@ -230,10 +215,11 @@ export class NodeModel<T = unknown>
       };
     }
 
-    if (internalNode.type === 'template-group') {
+    if (rawNode.type === 'template-group') {
       this.context = {
         $implicit: {
           node: rawNode,
+          data: rawNode.data ?? signal(NODE_DEFAULTS.data as T),
           selected: this.selected.asReadonly(),
           width: this.width.asReadonly(),
           height: this.height.asReadonly(),

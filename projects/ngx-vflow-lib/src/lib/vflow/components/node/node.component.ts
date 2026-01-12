@@ -37,7 +37,6 @@ import { NodeResizeControllerDirective } from '../../directives/node-resize-cont
 export type HandleState = 'valid' | 'invalid' | 'idle';
 
 @Component({
-  standalone: true,
   selector: 'g[node]',
   templateUrl: './node.component.html',
   styleUrls: ['./node.component.scss'],

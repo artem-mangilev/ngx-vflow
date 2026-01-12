@@ -83,11 +83,7 @@
                 "output": "assets/vizdom"
               }
             ],
-            "styles": [
-              "projects/ngx-vflow-demo/src/styles.scss",
-              "node_modules/@ng-doc/app/styles/global.css",
-              "node_modules/highlight.js/styles/atom-one-dark.css"
-            ],
+            "styles": ["projects/ngx-vflow-demo/src/styles.scss", "node_modules/@ng-doc/app/styles/global.css"],
             "scripts": []
           },
           "configurations": {

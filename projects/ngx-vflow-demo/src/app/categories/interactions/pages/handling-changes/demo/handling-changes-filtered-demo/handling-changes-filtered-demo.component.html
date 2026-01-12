@@ -1,0 +1,17 @@
+<button (click)="addNodes()">Add nodes</button>
+
+<vflow
+  view="auto"
+  [nodes]="nodes"
+  [edges]="edges"
+  (connect)="createEdge($event)"
+  (nodesChanges.position)="handleNodePositionChange($event)"
+  (nodesChanges.select)="handleNodeSelectChange($event)"
+  (nodesChanges.add)="handleNodesAddChange($event)"
+  (edgesChanges.add)="handleEdgesAddChange($event)" />
+
+<ng-template #toast let-ctx>
+  <h3>{{ toastData?.title }}</h3>
+
+  <pre>{{ toastData?.json }}</pre>
+</ng-template>

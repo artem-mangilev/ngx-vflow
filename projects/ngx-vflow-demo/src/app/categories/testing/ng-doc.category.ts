@@ -2,7 +2,7 @@ import { NgDocCategory } from '@ng-doc/core';
 
 const TestingCategory: NgDocCategory = {
   title: 'Testing',
-  order: 2,
+  order: 6,
 };
 
 export default TestingCategory;

@@ -1,6 +1,5 @@
 import { EventEmitter, OutputRef } from '@angular/core';
 import { CustomNodeComponent } from '../public-components/custom-node/custom-node.component';
-import { CustomDynamicNodeComponent } from '../public-components/custom-dynamic-node/custom-dynamic-node.component';
 
 type EventInfo<T> = T extends EventEmitter<infer U> | OutputRef<infer U> ? U : never;
 
@@ -22,7 +21,7 @@ type EventsFromComponent<T> = EventShape<T, EventKeys<T>>;
  *
  * @experimental
  */
-export type ComponentNodeEvent<T extends (CustomNodeComponent | CustomDynamicNodeComponent)[]> = { nodeId: string } & {
+export type ComponentNodeEvent<T extends CustomNodeComponent[]> = { nodeId: string } & {
   [I in keyof T]: EventsFromComponent<T[I]>;
 }[number];
 

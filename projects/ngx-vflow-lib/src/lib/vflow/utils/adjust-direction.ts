@@ -1,18 +1,28 @@
 import { ConnectionInternal } from '../interfaces/connection.internal.interface';
 
 /**
- * This function contains a hack-y behavior.
- * If the handles are of the same type (source-source or target-target),
- * it returns nodes where source === target and
- * handles where sourceHandle === targetHandle
+ * Adjust connection direction based on handle types.
  *
- * This leads to that notSelfValidator returns false for these cases,
- * exactly what we need for strict connection type
+ *
  */
 export function adjustDirection(connection: ConnectionInternal): ConnectionInternal {
+  const sourceType = connection.sourceHandle.rawHandle.type;
+  const targetType = connection.targetHandle.rawHandle.type;
+
+  // If both handles are of the same type, preserve the original
+  // source/target mapping
+  if (sourceType === targetType) {
+    return {
+      source: connection.source,
+      sourceHandle: connection.sourceHandle,
+      target: connection.target,
+      targetHandle: connection.targetHandle,
+    };
+  }
+
   const result = {} as ConnectionInternal;
 
-  if (connection.sourceHandle.rawHandle.type === 'source') {
+  if (sourceType === 'source') {
     result.source = connection.source;
     result.sourceHandle = connection.sourceHandle;
   } else {
@@ -20,7 +30,7 @@ export function adjustDirection(connection: ConnectionInternal): ConnectionInter
     result.sourceHandle = connection.targetHandle;
   }
 
-  if (connection.targetHandle.rawHandle.type === 'target') {
+  if (targetType === 'target') {
     result.target = connection.target;
     result.targetHandle = connection.targetHandle;
   } else {

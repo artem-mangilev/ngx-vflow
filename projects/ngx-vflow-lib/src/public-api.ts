@@ -8,7 +8,7 @@ export * from './lib/vflow/interfaces/edge.interface';
 export * from './lib/vflow/interfaces/edge-label.interface';
 export * from './lib/vflow/interfaces/connection.interface';
 export * from './lib/vflow/interfaces/connection.interface';
-export * from './lib/vflow/interfaces/connection-settings.interface';
+export { ConnectionSettings, ConnectionValidatorFn } from './lib/vflow/interfaces/connection-settings.interface';
 export * from './lib/vflow/interfaces/marker.interface';
 export { ViewportState } from './lib/vflow/interfaces/viewport.interface';
 export * from './lib/vflow/interfaces/component-node-event.interface';
@@ -18,6 +18,13 @@ export * from './lib/vflow/interfaces/intersecting-nodes-options.interface';
 export * from './lib/vflow/interfaces/curve-factory.interface';
 export * from './lib/vflow/interfaces/node-preview.interface';
 export * from './lib/vflow/interfaces/alignment-helper-settings.interface';
+export {
+  ConnectEndEvent,
+  ConnectStartEvent,
+  ReconnectEndEvent,
+  ReconnectEvent,
+  ReconnectStartEvent,
+} from './lib/vflow/interfaces/connection-events.interface';
 
 // Types
 export * from './lib/vflow/types/node-change.type';
@@ -26,12 +33,12 @@ export * from './lib/vflow/types/position.type';
 export * from './lib/vflow/types/background.type';
 export * from './lib/vflow/types/connection-mode.type';
 export * from './lib/vflow/types/keyboard-action.type';
+export * from './lib/vflow/types/selection-mode.type';
 
 // Components
 export * from './lib/vflow/components/vflow/vflow.component';
 export * from './lib/vflow/public-components/handle/handle.component';
 export * from './lib/vflow/public-components/custom-node/custom-node.component';
-export * from './lib/vflow/public-components/custom-dynamic-node/custom-dynamic-node.component';
 export * from './lib/vflow/public-components/resizable/resizable.component';
 export * from './lib/vflow/public-components/minimap/minimap.component';
 export * from './lib/vflow/public-components/node-toolbar/node-toolbar.component';

@@ -13,7 +13,6 @@ import { EdgeRenderingService } from '../../services/edge-rendering.service';
 import { PointerDirective } from '../../directives/pointer.directive';
 
 @Component({
-  standalone: true,
   selector: 'g[edge]',
   templateUrl: './edge.component.html',
   styleUrls: ['./edge.component.scss'],
