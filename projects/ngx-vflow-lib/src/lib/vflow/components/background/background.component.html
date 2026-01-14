@@ -40,3 +40,21 @@
       [attr.href]="bgImageSrc()" />
   }
 }
+
+@if (backgroundSignal().type === 'grid') {
+  <svg:pattern
+    patternUnits="userSpaceOnUse"
+    [attr.id]="patternId"
+    [attr.x]="x()"
+    [attr.y]="y()"
+    [attr.width]="patternSize()"
+    [attr.height]="patternSize()">
+    <svg:path
+      fill="none"
+      [attr.d]="'M ' + patternSize() + ' 0 L 0 0 0 ' + patternSize()"
+      [attr.stroke]="patternColor()"
+      [attr.stroke-width]="strokeWidth()" />
+  </svg:pattern>
+
+  <svg:rect x="0" y="0" width="100%" height="100%" [attr.fill]="patternUrl" />
+}
