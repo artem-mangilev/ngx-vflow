@@ -11,6 +11,8 @@ const defaultBg = '#fff';
 const defaultGap = 20;
 const defaultDotSize = 2;
 const defaultDotColor = 'rgb(177, 177, 183)';
+const defaultGridSize = 40;
+const defaultStrokeWidth = 2;
 const defaultImageScale = 0.1;
 const defaultRepeated = true;
 
@@ -27,6 +29,48 @@ export class BackgroundComponent {
 
   protected backgroundSignal = this.settingsService.background;
 
+  protected x = computed(() => {
+    const background = this.backgroundSignal();
+
+    return (
+      this.viewportService.readableViewport().x %
+      (background?.type === 'grid' ? (background.size ?? defaultGridSize) : this.scaledGap())
+    );
+  });
+
+  protected y = computed(() => {
+    const background = this.backgroundSignal();
+
+    return (
+      this.viewportService.readableViewport().y %
+      (background?.type === 'grid' ? (background.size ?? defaultGridSize) : this.scaledGap())
+    );
+  });
+
+  protected patternColor = computed(() => {
+    const background = this.backgroundSignal();
+
+    if (background.type === 'dots' || background.type === 'grid') {
+      return background.color ?? defaultDotColor;
+    }
+
+    return defaultDotColor;
+  });
+
+  protected patternSize = computed(() => {
+    const background = this.backgroundSignal();
+
+    if (background.type === 'dots') {
+      return (this.viewportService.readableViewport().zoom * (background.size ?? defaultDotSize)) / 2;
+    }
+
+    if (background.type === 'grid') {
+      return (this.viewportService.readableViewport().zoom * (background.size ?? defaultGridSize)) / 2;
+    }
+
+    return 0;
+  });
+
   // DOTS PATTERN
   protected scaledGap = computed(() => {
     const background = this.backgroundSignal();
@@ -40,25 +84,12 @@ export class BackgroundComponent {
     return 0;
   });
 
-  protected x = computed(() => this.viewportService.readableViewport().x % this.scaledGap());
-
-  protected y = computed(() => this.viewportService.readableViewport().y % this.scaledGap());
-
-  protected patternColor = computed(() => {
-    const bg = this.backgroundSignal();
-
-    if (bg.type === 'dots') {
-      return bg.color ?? defaultDotColor;
-    }
-
-    return defaultDotColor;
-  });
-
-  protected patternSize = computed(() => {
+  // GRID PATTERN
+  protected strokeWidth = computed(() => {
     const background = this.backgroundSignal();
 
-    if (background.type === 'dots') {
-      return (this.viewportService.readableViewport().zoom * (background.size ?? defaultDotSize)) / 2;
+    if (background.type === 'grid') {
+      return (this.viewportService.readableViewport().zoom * (background.strokeWidth ?? defaultStrokeWidth)) / 2;
     }
 
     return 0;

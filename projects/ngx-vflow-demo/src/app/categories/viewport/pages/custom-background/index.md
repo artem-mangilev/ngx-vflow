@@ -17,3 +17,9 @@ To make dots pattern, pass an object to the `[background]` input according to `D
 To make an image background, pass an object to the `[background]` input according to `ImageBackground` interface
 
 {{ NgDocActions.demoPane("ImageCustomBackgroundDemoComponent") }}
+
+## Grid pattern
+
+To make grid pattern, pass an object to the `[background]` input according to `GridBackground` interface
+
+{{ NgDocActions.demoPane("GridCustomBackgroundDemoComponent") }}
