@@ -171,6 +171,14 @@ export class NodeModel<T = unknown>
       this.draggable = rawNode.draggable;
     }
 
+    if (rawNode.controlledByResizer) {
+      this.controlledByResizer = rawNode.controlledByResizer;
+    }
+
+    if (rawNode.parentId) {
+      this.parentId = rawNode.parentId;
+    }
+
     if (rawNode.preview) {
       this.preview = rawNode.preview;
     }

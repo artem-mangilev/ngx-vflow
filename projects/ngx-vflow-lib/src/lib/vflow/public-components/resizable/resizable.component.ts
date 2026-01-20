@@ -115,7 +115,7 @@ export class ResizableComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   public ngOnDestroy(): void {
-    this.model.controlledByResizer.set(false);
+    this.model.controlledByResizer.set(true);
   }
 
   @Microtask
