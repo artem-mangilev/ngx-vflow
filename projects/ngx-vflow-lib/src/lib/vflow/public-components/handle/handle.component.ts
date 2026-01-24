@@ -13,6 +13,8 @@ import {
 import { Position } from '../../types/position.type';
 import { HandleService } from '../../services/handle.service';
 import { HandleModel } from '../../models/handle.model';
+import { OffsetBatchingCacheService } from '../../services/offset-batching-cache.service';
+import { RequestAnimationFrameBatchingService } from '../../services/request-animation-frame-batching.service';
 
 @Component({
   standalone: true,
@@ -25,6 +27,8 @@ export class HandleComponent implements OnInit {
   private handleService = inject(HandleService);
   private element = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
   private destroyRef = inject(DestroyRef);
+  private requestAnimationFrameBatchingService = inject(RequestAnimationFrameBatchingService);
+  private offsetBatchingCacheService = inject(OffsetBatchingCacheService);
 
   /**
    * At what side of node this component should be placed
@@ -56,19 +60,26 @@ export class HandleComponent implements OnInit {
             position: this.position(),
             type: this.type(),
             id: this.id(),
+
             hostReference: this.element.parentElement!,
             template: this.template(),
             userOffsetX: this.offsetX(),
             userOffsetY: this.offsetY(),
           },
           node,
+          this.offsetBatchingCacheService,
         );
 
         this.handleService.createHandle(model);
 
-        requestAnimationFrame(() => model.updateHost());
+        this.requestAnimationFrameBatchingService.batchAnimationFrame(() => {
+          model.updateHost();
+        });
 
-        this.destroyRef.onDestroy(() => this.handleService.destroyHandle(model));
+        this.destroyRef.onDestroy(() => {
+          this.handleService.destroyHandle(model);
+          model.onDestroy();
+        });
       }
     });
   }

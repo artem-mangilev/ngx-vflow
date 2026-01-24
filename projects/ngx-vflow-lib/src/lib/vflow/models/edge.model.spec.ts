@@ -8,14 +8,18 @@ import { HandleModel } from './handle.model';
 import { FlowSettingsService } from '../services/flow-settings.service';
 import { NodeRenderingService } from '../services/node-rendering.service';
 import { ViewportService } from '../services/viewport.service';
+import { OffsetBatchingCacheService } from '../services/offset-batching-cache.service';
 
 describe('EdgeModel', () => {
   let model: EdgeModel;
+  let offsetCacheService: OffsetBatchingCacheService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [FlowEntitiesService, FlowSettingsService, NodeRenderingService, ViewportService],
     });
+
+    offsetCacheService = new OffsetBatchingCacheService();
 
     model = TestBed.runInInjectionContext(
       () =>
@@ -71,6 +75,7 @@ describe('EdgeModel', () => {
               userOffsetY: 0,
             },
             model.source()!,
+            offsetCacheService,
           ),
       ),
     ]);
@@ -86,6 +91,7 @@ describe('EdgeModel', () => {
               userOffsetY: 0,
             },
             model.source()!,
+            offsetCacheService,
           ),
       ),
     ]);
