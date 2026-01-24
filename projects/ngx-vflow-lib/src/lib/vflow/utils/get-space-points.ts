@@ -14,13 +14,11 @@ export function getSpacePoints(point: Point, groups: NodeModel[]): SpacePoint[] 
   for (const group of groups) {
     const { x, y } = group.globalPoint();
 
-    if (point.x >= x && point.x <= x + group.width() && point.y >= y && point.y <= y + group.height()) {
-      result.push({
-        x: point.x - x,
-        y: point.y - y,
-        spaceNodeId: group.rawNode.id,
-      });
-    }
+    result.push({
+      x: point.x - x,
+      y: point.y - y,
+      spaceNodeId: group.rawNode.id,
+    });
   }
 
   result.reverse();

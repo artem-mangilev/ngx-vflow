@@ -121,8 +121,9 @@ export class DraggableService {
    */
   private moveNode(model: NodeModel, point: Point) {
     const parent = model.parent();
+
     // keep node in bounds of parent
-    if (parent) {
+    if (model.extent() === 'parent' && parent) {
       point.x = Math.min(parent.width() - model.width(), point.x);
       point.x = Math.max(0, point.x);
 
