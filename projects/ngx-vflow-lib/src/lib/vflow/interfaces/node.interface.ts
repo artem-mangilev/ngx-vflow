@@ -13,6 +13,7 @@ export const NODE_DEFAULTS = {
   height: 50,
   draggable: true,
   parentId: null,
+  extent: 'parent' as const,
   preview: { style: {} },
   selected: false,
   color: '#1b262c',
@@ -34,6 +35,7 @@ export interface SharedNode {
   point: WritableSignal<Point>;
   draggable?: WritableSignal<boolean>;
   parentId?: WritableSignal<string | null>;
+  extent?: WritableSignal<'parent' | null>;
   preview?: WritableSignal<NodePreview>;
   selected?: WritableSignal<boolean>;
 }
@@ -127,10 +129,11 @@ function createBaseNode(node: UnwrapSignal<SharedNode>, useDefaults: boolean) {
     return {
       id: node.id,
       point: signal(node.point),
-      draggable: signal(node.draggable ?? NODE_DEFAULTS.draggable),
-      parentId: signal(node.parentId ?? NODE_DEFAULTS.parentId),
-      preview: signal(node.preview ?? NODE_DEFAULTS.preview),
-      selected: signal(node.selected ?? NODE_DEFAULTS.selected),
+      draggable: signal(isDefined(node.draggable) ? node.draggable : NODE_DEFAULTS.draggable),
+      parentId: signal(isDefined(node.parentId) ? node.parentId : NODE_DEFAULTS.parentId),
+      extent: signal(isDefined(node.extent) ? node.extent : NODE_DEFAULTS.extent),
+      preview: signal(isDefined(node.preview) ? node.preview : NODE_DEFAULTS.preview),
+      selected: signal(isDefined(node.selected) ? node.selected : NODE_DEFAULTS.selected),
     };
   } else {
     return {
@@ -138,6 +141,7 @@ function createBaseNode(node: UnwrapSignal<SharedNode>, useDefaults: boolean) {
       point: signal(node.point),
       draggable: isDefined(node.draggable) ? signal(node.draggable) : undefined,
       parentId: isDefined(node.parentId) ? signal(node.parentId) : undefined,
+      extent: isDefined(node.extent) ? signal(node.extent) : undefined,
       preview: isDefined(node.preview) ? signal(node.preview) : undefined,
       selected: isDefined(node.selected) ? signal(node.selected) : undefined,
     };
