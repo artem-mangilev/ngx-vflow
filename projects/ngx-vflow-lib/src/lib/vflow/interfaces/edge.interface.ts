@@ -51,18 +51,18 @@ export function createEdge<T>(
   if (options.useDefaults) {
     return {
       id: edge.id,
-      type: edge.type ?? EDGE_DEFAULTS.type,
       source: edge.source,
       target: edge.target,
-      sourceHandle: edge.sourceHandle ?? '',
-      targetHandle: edge.targetHandle ?? '',
-      curve: signal(edge.curve ?? EDGE_DEFAULTS.curve),
-      data: signal(edge.data ?? EDGE_DEFAULTS.data) as WritableSignal<T>,
-      edgeLabels: signal(edge.edgeLabels ?? EDGE_DEFAULTS.edgeLabels),
-      markers: signal(edge.markers ?? EDGE_DEFAULTS.markers),
-      reconnectable: signal(edge.reconnectable ?? EDGE_DEFAULTS.reconnectable),
-      floating: signal(edge.floating ?? EDGE_DEFAULTS.floating),
-      selected: signal(edge.selected ?? EDGE_DEFAULTS.selected),
+      type: isDefined(edge.type) ? edge.type : EDGE_DEFAULTS.type,
+      sourceHandle: isDefined(edge.sourceHandle) ? edge.sourceHandle : '',
+      targetHandle: isDefined(edge.targetHandle) ? edge.targetHandle : '',
+      curve: signal(isDefined(edge.curve) ? edge.curve : EDGE_DEFAULTS.curve),
+      data: signal(isDefined(edge.data) ? edge.data : EDGE_DEFAULTS.data) as WritableSignal<T>,
+      edgeLabels: signal(isDefined(edge.edgeLabels) ? edge.edgeLabels : EDGE_DEFAULTS.edgeLabels),
+      markers: signal(isDefined(edge.markers) ? edge.markers : EDGE_DEFAULTS.markers),
+      reconnectable: signal(isDefined(edge.reconnectable) ? edge.reconnectable : EDGE_DEFAULTS.reconnectable),
+      floating: signal(isDefined(edge.floating) ? edge.floating : EDGE_DEFAULTS.floating),
+      selected: signal(isDefined(edge.selected) ? edge.selected : EDGE_DEFAULTS.selected),
     };
   } else {
     return {
