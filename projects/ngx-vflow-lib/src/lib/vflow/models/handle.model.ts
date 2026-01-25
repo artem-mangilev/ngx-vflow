@@ -121,6 +121,7 @@ export class HandleModel {
   }
 
   public updateHost() {
+    this.batchingService.markCacheAsDirty();
     this.updateHostSizeAndPosition$.next();
   }
 

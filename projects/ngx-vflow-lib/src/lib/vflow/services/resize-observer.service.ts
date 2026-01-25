@@ -1,7 +1,7 @@
 import { inject, Injectable, NgZone, OnDestroy } from '@angular/core';
 
 @Injectable()
-export class NodeBatchingResizeService implements OnDestroy {
+export class ResizeObserverService implements OnDestroy {
   private zone = inject(NgZone);
   private readonly thingsToObserve: Map<Element, [(resizeEntry: ResizeObserverEntry) => void]> = new Map();
 
@@ -18,10 +18,6 @@ export class NodeBatchingResizeService implements OnDestroy {
         }
       });
     });
-
-    for (const obs of this.thingsToObserve) {
-      this.resizeObserver.observe(obs[0]);
-    }
   }
 
   public addObserver(element: Element, callback: (resizeEntry: ResizeObserverEntry) => void) {

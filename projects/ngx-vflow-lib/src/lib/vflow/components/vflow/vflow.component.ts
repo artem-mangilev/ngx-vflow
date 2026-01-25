@@ -76,7 +76,7 @@ import { FlowRenderingService } from '../../services/flow-rendering.service';
 import { AlignmentHelperComponent } from '../alignment-helper/alignment-helper.component';
 import { AlignmentHelperSettings } from '../../interfaces/alignment-helper-settings.interface';
 import { AutoPanDirective } from '../../directives/auto-pan.directive';
-import { NodeBatchingResizeService } from '../../services/node-batching-resize.service';
+import { ResizeObserverService } from '../../services/resize-observer.service';
 import { OffsetBatchingCacheService } from '../../services/offset-batching-cache.service';
 import { RequestAnimationFrameBatchingService } from '../../services/request-animation-frame-batching.service';
 
@@ -118,7 +118,7 @@ const changesControllerHostDirective = {
     OverlaysService,
     { provide: PreviewFlowRenderStrategyService, useClass: ViewportPreviewFlowRenderStrategyService },
     FlowRenderingService,
-    NodeBatchingResizeService,
+    ResizeObserverService,
     OffsetBatchingCacheService,
     RequestAnimationFrameBatchingService,
   ],
