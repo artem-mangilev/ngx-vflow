@@ -60,6 +60,8 @@ export class NodeModel<T = unknown>
 
   public preview = signal<NodePreview>({ style: {} });
 
+  public extent = signal<'parent' | null>(NODE_DEFAULTS.extent);
+
   public globalPoint = computed(() => {
     let parent = this.parent();
     let x = this.point().x;
@@ -181,6 +183,10 @@ export class NodeModel<T = unknown>
 
     if (rawNode.selected) {
       this.selected = rawNode.selected;
+    }
+
+    if (rawNode.extent) {
+      this.extent = rawNode.extent;
     }
 
     if (rawNode.type === 'default-group' && rawNode.color) {

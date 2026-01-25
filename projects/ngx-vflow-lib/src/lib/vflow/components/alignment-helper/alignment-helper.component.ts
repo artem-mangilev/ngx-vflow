@@ -7,7 +7,6 @@ import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { filter, map, tap } from 'rxjs';
 import { extendedComputed } from '../../utils/signals/extended-computed';
 import { NodeRenderingService } from '../../services/node-rendering.service';
-import { getSpacePoints } from '../../utils/get-space-points';
 
 interface Intersection {
   lines: (Box & { isCenter: boolean })[];
@@ -124,9 +123,16 @@ export class AlignmentHelperComponent {
         tap(([node, intersections]) => {
           if (intersections) {
             const snapped = { x: intersections.snappedX, y: intersections.snappedY };
-            const parentIfExists = node.parent() ? [node.parent()!] : [];
 
-            node.setPoint(getSpacePoints(snapped, parentIfExists)[0]);
+            const parent = node.parent();
+            if (parent) {
+              node.setPoint({
+                x: snapped.x - parent.globalPoint().x,
+                y: snapped.y - parent.globalPoint().y,
+              });
+            } else {
+              node.setPoint(snapped);
+            }
           }
         }),
         takeUntilDestroyed(),
