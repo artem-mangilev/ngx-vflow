@@ -23,7 +23,7 @@
     "@angular/platform-browser-dynamic": "^21.1.1",
     "@angular/router": "^21.1.1",
     "@ng-doc/app": "19.3.0",
-    "@ng-doc/builder": "19.3.0",
+    "@ng-doc/builder": "21.0.0",
     "@ng-doc/core": "19.3.0",
     "@ng-doc/ui-kit": "19.3.0",
     "@vizdom/vizdom-ts-web": "0.1.19",
