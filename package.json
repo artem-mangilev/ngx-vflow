@@ -63,7 +63,7 @@
     "@typescript-eslint/eslint-plugin": "7.16.0",
     "@typescript-eslint/parser": "7.16.0",
     "@typescript-eslint/utils": "7.16.0",
-    "angular-cli-ghpages": "^2.0.3",
+    "angular-cli-ghpages": "^3.0.2",
     "eslint": "8.57.0",
     "eslint-config-prettier": "^9.1.0",
     "husky": "^9.1.7",
