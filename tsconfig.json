@@ -13,19 +13,30 @@
     "sourceMap": true,
     "declaration": false,
     "experimentalDecorators": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "importHelpers": true,
     "target": "ES2022",
     "module": "ES2022",
     "useDefineForClassFields": false,
-    "lib": ["ES2022", "dom"],
+    "lib": [
+      "ES2022",
+      "dom"
+    ],
     "stripInternal": true,
     "skipLibCheck": true,
     "paths": {
-      "@ng-doc/generated": ["ng-doc/ngx-vflow-demo/index.ts"],
-      "@ng-doc/generated/*": ["ng-doc/ngx-vflow-demo/*"],
-      "ngx-vflow": ["projects/ngx-vflow-lib/src/public-api"],
-      "ngx-vflow/testing": ["projects/ngx-vflow-lib/testing/src/public-api"]
+      "@ng-doc/generated": [
+        "ng-doc/ngx-vflow-demo/index.ts"
+      ],
+      "@ng-doc/generated/*": [
+        "ng-doc/ngx-vflow-demo/*"
+      ],
+      "ngx-vflow": [
+        "projects/ngx-vflow-lib/src/public-api"
+      ],
+      "ngx-vflow/testing": [
+        "projects/ngx-vflow-lib/testing/src/public-api"
+      ]
     }
   },
   "angularCompilerOptions": {
