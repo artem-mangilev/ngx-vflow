@@ -21,24 +21,17 @@
     "stripInternal": true,
     "skipLibCheck": true,
     "paths": {
-      "@ng-doc/generated": [
-        "ng-doc/ngx-vflow-demo/index.ts"
-      ],
-      "@ng-doc/generated/*": [
-        "ng-doc/ngx-vflow-demo/*"
-      ],
-      "ngx-vflow": [
-        "projects/ngx-vflow-lib/src/public-api"
-      ],
-      "ngx-vflow/testing": [
-        "projects/ngx-vflow-lib/testing/src/public-api"
-      ]
+      "@ng-doc/generated": ["ng-doc/ngx-vflow-demo/index.ts"],
+      "@ng-doc/generated/*": ["ng-doc/ngx-vflow-demo/*"],
+      "ngx-vflow": ["projects/ngx-vflow-lib/src/public-api"],
+      "ngx-vflow/testing": ["projects/ngx-vflow-lib/testing/src/public-api"]
     }
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
     "strictInjectionParameters": true,
     "strictInputAccessModifiers": true,
-    "strictTemplates": true
+    "strictTemplates": true,
+    "typeCheckHostBindings": false
   }
 }
