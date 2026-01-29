@@ -16,7 +16,8 @@ import { FlowEntitiesService } from '../services/flow-entities.service';
 import { HandleModel } from '../models/handle.model';
 import { adjustDirection } from '../utils/adjust-direction';
 import { outputFromObservable, toObservable } from '@angular/core/rxjs-interop';
-import { filter, map, merge, tap } from 'rxjs';
+import { merge } from 'rxjs';
+import { filter, map, tap } from 'rxjs/operators';
 import { EdgeModel } from '../models/edge.model';
 import { ConnectionForValidation } from '../interfaces/connection-settings.interface';
 import {

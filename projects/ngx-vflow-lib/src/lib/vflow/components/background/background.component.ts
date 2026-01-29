@@ -4,7 +4,7 @@ import { RootSvgReferenceDirective } from '../../directives/reference.directive'
 import { id } from '../../utils/id';
 import { FlowSettingsService } from '../../services/flow-settings.service';
 import { toObservable } from '@angular/core/rxjs-interop';
-import { map, switchMap } from 'rxjs';
+import { map, switchMap } from 'rxjs/operators';
 import { toLazySignal } from '../../utils/signals/to-lazy-signal';
 
 const defaultBg = '#fff';

@@ -2,7 +2,8 @@ import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { NgDocPageLinkComponent } from '@ng-doc/app';
 import { Octokit } from 'octokit';
-import { from, map, Observable } from 'rxjs';
+import { Observable, from } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Component({
   templateUrl: './roadmap-list.component.html',

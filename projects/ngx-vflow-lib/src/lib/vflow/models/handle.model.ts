@@ -1,7 +1,8 @@
 import { computed, signal } from '@angular/core';
 import { NodeHandle } from '../services/handle.service';
 import { NodeModel } from './node.model';
-import { Subject, map } from 'rxjs';
+import { Subject } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { toSignal } from '@angular/core/rxjs-interop';
 
 export type HandleState = 'valid' | 'invalid' | 'idle';

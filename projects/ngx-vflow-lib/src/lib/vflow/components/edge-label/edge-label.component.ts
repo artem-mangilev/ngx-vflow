@@ -15,7 +15,7 @@ import { EdgeLabelModel } from '../../models/edge-label.model';
 import { EdgeModel } from '../../models/edge.model';
 import { NgTemplateOutlet } from '@angular/common';
 import { resizable } from '../../utils/resizable';
-import { startWith, tap } from 'rxjs';
+import { startWith, tap } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MAGIC_NUMBER_TO_FIX_GLITCH_IN_CHROME } from '../../constants/magic-number-to-fix-glitch-in-chrome.constant';
 import { FlowSettingsService } from '../../services/flow-settings.service';

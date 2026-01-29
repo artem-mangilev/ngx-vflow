@@ -1,7 +1,8 @@
 import { DestroyRef, Directive, ElementRef, inject, NgZone, OnInit } from '@angular/core';
 import { resizable } from '../utils/resizable';
 import { NodeAccessorService } from '../services/node-accessor.service';
-import { filter, merge, startWith, tap } from 'rxjs';
+import { merge } from 'rxjs';
+import { filter, startWith, tap } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 /**

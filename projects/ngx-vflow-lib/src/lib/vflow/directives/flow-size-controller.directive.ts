@@ -1,6 +1,6 @@
 import { Directive, ElementRef, NgZone, Signal, computed, inject } from '@angular/core';
 import { resizable } from '../utils/resizable';
-import { tap } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import { FlowSettingsService } from '../services/flow-settings.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 

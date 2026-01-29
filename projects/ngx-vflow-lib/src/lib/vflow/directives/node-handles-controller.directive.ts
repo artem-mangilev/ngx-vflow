@@ -1,6 +1,6 @@
 import { DestroyRef, Directive, ElementRef, inject, NgZone, OnInit } from '@angular/core';
 import { NodeAccessorService } from '../services/node-accessor.service';
-import { map, switchMap, tap } from 'rxjs';
+import { map, switchMap, tap } from 'rxjs/operators';
 import { resizable } from '../utils/resizable';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
