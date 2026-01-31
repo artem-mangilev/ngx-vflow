@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, provideExperimentalZonelessChangeDetection } from '@angular/core';
 import { CustomNodeComponent } from './custom-node.component';
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { Vflow } from '../../vflow';
@@ -20,7 +20,7 @@ describe('TestCustomNodeComponent', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [TestCustomNodeComponent],
-      providers: [provideCustomNodeMocks()],
+      providers: [provideCustomNodeMocks(), provideExperimentalZonelessChangeDetection()],
     })
       .overrideComponent(TestCustomNodeComponent, {
         remove: {

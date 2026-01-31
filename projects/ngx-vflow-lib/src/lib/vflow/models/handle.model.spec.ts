@@ -7,6 +7,7 @@ import { FlowSettingsService } from '../services/flow-settings.service';
 import { NodeRenderingService } from '../services/node-rendering.service';
 import { ViewportService } from '../services/viewport.service';
 import { OffsetBatchingCacheService } from '../services/offset-batching-cache.service';
+import { provideExperimentalZonelessChangeDetection } from '@angular/core';
 
 describe('HandleModel', () => {
   const nodeWidth = 10;
@@ -17,7 +18,13 @@ describe('HandleModel', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [FlowEntitiesService, FlowSettingsService, NodeRenderingService, ViewportService],
+      providers: [
+        FlowEntitiesService,
+        FlowSettingsService,
+        NodeRenderingService,
+        ViewportService,
+        provideExperimentalZonelessChangeDetection(),
+      ],
     });
 
     offsetCacheService = new OffsetBatchingCacheService();
