@@ -97,6 +97,8 @@ export class DraggableService {
           this.alignToGrid(point);
           this.moveNode(model, point);
         });
+
+        this.flowStatusService.setNodeDragStatus(model);
       })
 
       .on('end', () => {
