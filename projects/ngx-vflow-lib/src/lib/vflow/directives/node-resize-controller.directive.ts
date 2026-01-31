@@ -1,8 +1,6 @@
-import { DestroyRef, Directive, ElementRef, inject, NgZone, OnInit } from '@angular/core';
-import { resizable } from '../utils/resizable';
+import { Directive, ElementRef, inject, OnDestroy, OnInit } from '@angular/core';
 import { NodeAccessorService } from '../services/node-accessor.service';
-import { filter, merge, startWith, tap } from 'rxjs';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ResizeObserverService } from '../services/resize-observer.service';
 
 /**
  * Only suitable for HTML nodes
@@ -11,27 +9,21 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
   selector: '[nodeResizeController]',
   standalone: true,
 })
-export class NodeResizeControllerDirective implements OnInit {
+export class NodeResizeControllerDirective implements OnInit, OnDestroy {
   private nodeAccessor = inject(NodeAccessorService);
-  private zone = inject(NgZone);
-  private destroyRef = inject(DestroyRef);
+  private resizeObserverService = inject(ResizeObserverService);
   private hostElementRef = inject<ElementRef<Element>>(ElementRef);
 
   public ngOnInit(): void {
     const model = this.nodeAccessor.model()!;
 
-    const host = this.hostElementRef.nativeElement;
+    this.resizeObserverService.addObserver(this.hostElementRef.nativeElement, (resizeEntry) => {
+      model.width.set(resizeEntry.target.clientWidth);
+      model.height.set(resizeEntry.target.clientHeight);
+    });
+  }
 
-    merge(resizable([host], this.zone))
-      .pipe(
-        startWith(null),
-        filter(() => !model.resizing()),
-        tap(() => {
-          model.width.set(host.clientWidth);
-          model.height.set(host.clientHeight);
-        }),
-        takeUntilDestroyed(this.destroyRef),
-      )
-      .subscribe();
+  public ngOnDestroy(): void {
+    this.resizeObserverService.removeObserver(this.hostElementRef.nativeElement);
   }
 }
