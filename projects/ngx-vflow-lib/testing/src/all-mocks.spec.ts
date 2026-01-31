@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, Component, viewChild } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  provideExperimentalZonelessChangeDetection,
+  viewChild,
+} from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { VflowComponent } from '../../src/public-api';
 import { Vflow } from '../../src/public-api';
@@ -164,7 +169,7 @@ describe('VflowMockComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [VflowWrapperComponent],
+      imports: [VflowWrapperComponent, provideExperimentalZonelessChangeDetection()],
     })
       .overrideComponent(VflowWrapperComponent, {
         remove: {
