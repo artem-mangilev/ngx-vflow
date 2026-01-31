@@ -428,6 +428,11 @@
         "name": "ImageBackground"
       },
       {
+        "route": "/api/interfaces/ngx-vflow/GridBackground",
+        "type": "Interface",
+        "name": "GridBackground"
+      },
+      {
         "route": "/api/type-aliases/ngx-vflow/ConnectionMode",
         "type": "TypeAlias",
         "name": "ConnectionMode"
