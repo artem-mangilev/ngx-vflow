@@ -84,6 +84,13 @@ export interface FlowStatusNodeDragStart {
   };
 }
 
+export interface FlowStatusNodeDrag {
+  state: 'node-drag';
+  payload: {
+    node: NodeModel;
+  };
+}
+
 export interface FlowStatusNodeDragEnd {
   state: 'node-drag-end';
   payload: {
@@ -104,6 +111,7 @@ export type FlowStatus =
   | FlowStatusReconnectionReleaseValidated
   | FlowStatusReconnectionDropped
   | FlowStatusNodeDragStart
+  | FlowStatusNodeDrag
   | FlowStatusNodeDragEnd;
 
 @Injectable()
@@ -208,6 +216,10 @@ export class FlowStatusService {
     this.status.set({ state: 'node-drag-start', payload: { node } });
   }
 
+  public setNodeDragStatus(node: NodeModel) {
+    this.status.set({ state: 'node-drag', payload: { node } });
+  }
+
   public setNodeDragEndStatus(node: NodeModel) {
     this.status.set({ state: 'node-drag-end', payload: { node } });
   }
@@ -215,6 +227,10 @@ export class FlowStatusService {
 
 export function isNodeDragStartStatus(params: FlowStatus): params is FlowStatusNodeDragStart {
   return params.state === 'node-drag-start';
+}
+
+export function isNodeDragStatus(params: FlowStatus): params is FlowStatusNodeDrag {
+  return params.state === 'node-drag';
 }
 
 export function isNodeDragEndStatus(params: FlowStatus): params is FlowStatusNodeDragEnd {

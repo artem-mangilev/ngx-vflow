@@ -79,6 +79,7 @@ import { AutoPanDirective } from '../../directives/auto-pan.directive';
 import { ResizeObserverService } from '../../services/resize-observer.service';
 import { OffsetBatchingCacheService } from '../../services/offset-batching-cache.service';
 import { RequestAnimationFrameBatchingService } from '../../services/request-animation-frame-batching.service';
+import { NodeDragControllerDirective } from '../../directives/node-drag-controller.directive';
 
 const changesControllerHostDirective = {
   directive: ChangesControllerDirective,
@@ -95,6 +96,11 @@ const changesControllerHostDirective = {
     'edgesChanges.remove',
     'edgesChanges.select',
   ],
+};
+
+const nodeDragControllerHostDirective = {
+  directive: NodeDragControllerDirective,
+  outputs: ['nodeDragStart', 'nodeDrag', 'nodeDragEnd'],
 };
 
 @Component({
@@ -122,7 +128,7 @@ const changesControllerHostDirective = {
     OffsetBatchingCacheService,
     RequestAnimationFrameBatchingService,
   ],
-  hostDirectives: [changesControllerHostDirective],
+  hostDirectives: [changesControllerHostDirective, nodeDragControllerHostDirective],
   imports: [
     RootSvgReferenceDirective,
     RootSvgContextDirective,
