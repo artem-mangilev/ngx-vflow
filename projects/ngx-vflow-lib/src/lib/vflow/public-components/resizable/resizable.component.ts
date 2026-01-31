@@ -95,18 +95,15 @@ export class ResizableComponent implements OnInit, AfterViewInit, OnDestroy {
     .subscribe();
 
   constructor() {
-    effect(
-      () => {
-        const resizable = this.resizable();
+    effect(() => {
+      const resizable = this.resizable();
 
-        if (typeof resizable === 'boolean') {
-          this.model.resizable.set(resizable);
-        } else {
-          this.model.resizable.set(true);
-        }
-      },
-      { allowSignalWrites: true },
-    );
+      if (typeof resizable === 'boolean') {
+        this.model.resizable.set(resizable);
+      } else {
+        this.model.resizable.set(true);
+      }
+    });
   }
 
   public ngOnInit(): void {

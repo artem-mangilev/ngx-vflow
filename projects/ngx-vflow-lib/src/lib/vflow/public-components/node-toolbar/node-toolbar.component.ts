@@ -52,7 +52,7 @@ export class NodeToolbarComponent implements OnInit, OnDestroy {
   protected model = new ToolbarModel(this.nodeService.model()!);
 
   constructor() {
-    effect(() => this.model.position.set(this.position()), { allowSignalWrites: true });
+    effect(() => this.model.position.set(this.position()));
   }
 
   public ngOnInit(): void {
