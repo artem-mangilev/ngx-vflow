@@ -551,6 +551,26 @@
         "route": "/api/classes/ngx-vflow/DragHandleDirective",
         "type": "Directive",
         "name": "DragHandleDirective"
+      },
+      {
+        "route": "/api/interfaces/ngx-vflow/NodeDragStartEvent",
+        "type": "Interface",
+        "name": "NodeDragStartEvent"
+      },
+      {
+        "route": "/api/interfaces/ngx-vflow/NodeDragEvent",
+        "type": "Interface",
+        "name": "NodeDragEvent"
+      },
+      {
+        "route": "/api/interfaces/ngx-vflow/NodeDragEndEvent",
+        "type": "Interface",
+        "name": "NodeDragEndEvent"
+      },
+      {
+        "route": "/api/classes/ngx-vflow/NodeDragControllerDirective",
+        "type": "Directive",
+        "name": "NodeDragControllerDirective"
       }
     ]
   }
