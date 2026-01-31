@@ -2,7 +2,12 @@ import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { Edge, Node, Vflow } from 'ngx-vflow';
 
 @Component({
-  template: `<vflow view="auto" [nodes]="nodes" [edges]="edges" [background]="{ type: 'grid' }" />`,
+  template: `<vflow
+    view="auto"
+    [nodes]="nodes"
+    [edges]="edges"
+    [background]="{ type: 'grid' }"
+    [snapGrid]="[20, 20]" />`,
   styles: [
     `
       :host {
