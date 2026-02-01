@@ -17,7 +17,6 @@ import { filter, tap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ViewportService } from '../../services/viewport.service';
 import { round } from '../../utils/round';
-import { Microtask } from '../../decorators/microtask.decorator';
 import { getNodesBounds } from '../../utils/nodes';
 import { NodeAccessorService } from '../../services/node-accessor.service';
 import { NodeModel } from '../../models/node.model';
@@ -28,6 +27,7 @@ import { PointerDirective } from '../../directives/pointer.directive';
 import { FlowSettingsService } from '../../services/flow-settings.service';
 import { Point } from '../../interfaces/point.interface';
 import { align } from '../../utils/align-number';
+import { RequestAnimationFrameBatchingService } from '../../services/request-animation-frame-batching.service';
 
 type Side = 'top' | 'right' | 'bottom' | 'left' | 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left';
 
@@ -52,6 +52,7 @@ export class ResizableComponent implements OnInit, AfterViewInit, OnDestroy {
   private spacePointContext = inject(SpacePointContextDirective);
   private settingsService = inject(FlowSettingsService);
   private hostRef = inject<ElementRef<Element>>(ElementRef);
+  private afService = inject(RequestAnimationFrameBatchingService);
 
   public resizable = input<boolean | ''>();
 
@@ -115,12 +116,13 @@ export class ResizableComponent implements OnInit, AfterViewInit, OnDestroy {
     this.model.controlledByResizer.set(false);
   }
 
-  @Microtask
   public ngAfterViewInit() {
-    this.minWidth = +getComputedStyle(this.hostRef.nativeElement).minWidth.replace('px', '') || 0;
-    this.minHeight = +getComputedStyle(this.hostRef.nativeElement).minHeight.replace('px', '') || 0;
-    this.maxWidth = +getComputedStyle(this.hostRef.nativeElement).maxWidth.replace('px', '') || Infinity;
-    this.maxHeight = +getComputedStyle(this.hostRef.nativeElement).maxHeight.replace('px', '') || Infinity;
+    this.afService.batchAnimationFrame(() => {
+      this.minWidth = +getComputedStyle(this.hostRef.nativeElement).minWidth.replace('px', '') || 0;
+      this.minHeight = +getComputedStyle(this.hostRef.nativeElement).minHeight.replace('px', '') || 0;
+      this.maxWidth = +getComputedStyle(this.hostRef.nativeElement).maxWidth.replace('px', '') || Infinity;
+      this.maxHeight = +getComputedStyle(this.hostRef.nativeElement).maxHeight.replace('px', '') || Infinity;
+    });
   }
 
   protected startResize(side: Side, event: Event) {
