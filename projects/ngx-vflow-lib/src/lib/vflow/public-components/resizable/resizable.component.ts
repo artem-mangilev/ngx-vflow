@@ -146,9 +146,11 @@ export class ResizableComponent implements OnInit, AfterViewInit, OnDestroy {
       this.maxHeight,
     );
 
-    this.model.setPoint({ x, y });
-    this.model.width.set(width);
-    this.model.height.set(height);
+    setTimeout(() => {
+      this.model.setPoint({ x, y });
+      this.model.width.set(width);
+      this.model.height.set(height);
+    });
   }
 
   protected endResize() {
