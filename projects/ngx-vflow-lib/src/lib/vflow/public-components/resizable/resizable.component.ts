@@ -11,6 +11,7 @@ import {
   effect,
   ChangeDetectionStrategy,
   OnDestroy,
+  NgZone,
 } from '@angular/core';
 import { RootPointerDirective } from '../../directives/root-pointer.directive';
 import { filter, tap } from 'rxjs';
@@ -53,6 +54,7 @@ export class ResizableComponent implements OnInit, AfterViewInit, OnDestroy {
   private settingsService = inject(FlowSettingsService);
   private hostRef = inject<ElementRef<Element>>(ElementRef);
   private afService = inject(RequestAnimationFrameBatchingService);
+  private zone = inject(NgZone);
 
   public resizable = input<boolean | ''>();
 
@@ -148,10 +150,12 @@ export class ResizableComponent implements OnInit, AfterViewInit, OnDestroy {
       this.maxHeight,
     );
 
-    setTimeout(() => {
-      this.model.setPoint({ x, y });
-      this.model.width.set(width);
-      this.model.height.set(height);
+    this.zone.runOutsideAngular(() => {
+      setTimeout(() => {
+        this.model.setPoint({ x, y });
+        this.model.width.set(width);
+        this.model.height.set(height);
+      });
     });
   }
 
