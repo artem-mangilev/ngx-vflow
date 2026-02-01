@@ -12,23 +12,23 @@ export class ToolbarModel {
     switch (this.position()) {
       case 'top':
         return {
-          x: this.node.size().width / 2 - this.size().width / 2,
+          x: this.node.width() / 2 - this.size().width / 2,
           y: -this.size().height - this.offset(),
         };
       case 'bottom':
         return {
-          x: this.node.size().width / 2 - this.size().width / 2,
-          y: this.node.size().height + this.offset(),
+          x: this.node.width() / 2 - this.size().width / 2,
+          y: this.node.height() + this.offset(),
         };
       case 'left':
         return {
           x: -this.size().width - this.offset(),
-          y: this.node.size().height / 2 - this.size().height / 2,
+          y: this.node.height() / 2 - this.size().height / 2,
         };
       case 'right':
         return {
-          x: this.node.size().width + this.offset(),
-          y: this.node.size().height / 2 - this.size().height / 2,
+          x: this.node.width() + this.offset(),
+          y: this.node.height() / 2 - this.size().height / 2,
         };
     }
   });

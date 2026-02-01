@@ -28,14 +28,14 @@
           @if (model.rawNode.type === 'default' || model.rawNode.type === 'html-template' || model.isComponentType) {
             <svg:foreignObject
               [attr.transform]="model.pointTransform()"
-              [attr.width]="model.size().width"
-              [attr.height]="model.size().height">
+              [attr.width]="model.width()"
+              [attr.height]="model.height()">
               <default-node
                 [selected]="model.selected()"
-                [style.width.px]="model.size().width"
-                [style.height.px]="model.size().height"
-                [style.max-width.px]="model.size().width"
-                [style.max-height.px]="model.size().height">
+                [style.width.px]="model.width()"
+                [style.height.px]="model.height()"
+                [style.max-width.px]="model.width()"
+                [style.max-height.px]="model.height()">
                 <div [outerHTML]="model.text()"></div>
               </default-node>
             </svg:foreignObject>
@@ -47,8 +47,8 @@
               ry="5"
               [attr.transform]="model.pointTransform()"
               [class.default-group-node_selected]="model.selected()"
-              [attr.width]="model.size().width"
-              [attr.height]="model.size().height"
+              [attr.width]="model.width()"
+              [attr.height]="model.height()"
               [style.stroke]="model.color()"
               [style.fill]="model.color()" />
           }

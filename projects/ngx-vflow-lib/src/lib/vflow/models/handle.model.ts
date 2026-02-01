@@ -63,7 +63,7 @@ export class HandleModel {
         };
       case 'right':
         return {
-          x: -this.rawHandle.userOffsetX + this.parentNode.size().width,
+          x: -this.rawHandle.userOffsetX + this.parentNode.width(),
           y: -this.rawHandle.userOffsetY + this.hostPosition().y + this.hostSize().height / 2,
         };
       case 'top':
@@ -74,7 +74,7 @@ export class HandleModel {
       case 'bottom':
         return {
           x: -this.rawHandle.userOffsetX + this.hostPosition().x + this.hostSize().width / 2,
-          y: -this.rawHandle.userOffsetY + this.parentNode.size().height,
+          y: -this.rawHandle.userOffsetY + this.parentNode.height(),
         };
     }
   });

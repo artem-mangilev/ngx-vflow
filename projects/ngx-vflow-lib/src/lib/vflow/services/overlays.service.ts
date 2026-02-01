@@ -1,10 +1,12 @@
-import { computed, Injectable, signal } from '@angular/core';
+import { computed, inject, Injectable, signal } from '@angular/core';
 import { ToolbarModel } from '../models/toolbar.model';
 import { NodeModel } from '../models/node.model';
-import { Microtask } from '../decorators/microtask.decorator';
+import { RequestAnimationFrameBatchingService } from './request-animation-frame-batching.service';
 
 @Injectable()
 export class OverlaysService {
+  private afService = inject(RequestAnimationFrameBatchingService);
+
   private readonly toolbars = signal<ToolbarModel[]>([]);
 
   public nodeToolbarsMap = computed(() => {
@@ -18,13 +20,15 @@ export class OverlaysService {
     return map;
   });
 
-  @Microtask
   public addToolbar(toolbar: ToolbarModel): void {
-    this.toolbars.update((toolbars) => [...toolbars, toolbar]);
+    this.afService.batchAnimationFrame(() => {
+      this.toolbars.update((toolbars) => [...toolbars, toolbar]);
+    });
   }
 
-  @Microtask
   public removeToolbar(toolbar: ToolbarModel): void {
-    this.toolbars.update((toolbars) => toolbars.filter((t) => t !== toolbar));
+    this.afService.batchAnimationFrame(() => {
+      this.toolbars.update((toolbars) => toolbars.filter((t) => t !== toolbar));
+    });
   }
 }
