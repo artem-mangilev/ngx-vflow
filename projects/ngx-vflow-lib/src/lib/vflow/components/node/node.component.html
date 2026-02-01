@@ -84,8 +84,8 @@
     [gap]="3"
     [resizerColor]="model().color()"
     [class.default-group-node_selected]="model().selected()"
-    [attr.width]="model().size().width"
-    [attr.height]="model().size().height"
+    [attr.width]="model().width()"
+    [attr.height]="model().height()"
     [style.stroke]="model().color()"
     [style.fill]="model().color()"
     (click)="pullNode(); selectNode()" />

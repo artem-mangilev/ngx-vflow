@@ -35,15 +35,6 @@ export class NodeModel<T = unknown>
   public height$: Observable<number>;
 
   /**
-   * @deprecated use width or height signals
-   */
-  public size = computed(() => ({ width: this.width(), height: this.height() }));
-  /**
-   * @deprecated use width$ or height$
-   */
-  public size$: Observable<{ width: number; height: number }>;
-
-  /**
    * If resizer is used, the node size fully depends on the resizer
    * Otherwise it calculates the size based on the content
    */
@@ -242,7 +233,6 @@ export class NodeModel<T = unknown>
     this.point$ = toObservable(this.point);
     this.width$ = toObservable(this.width);
     this.height$ = toObservable(this.height);
-    this.size$ = toObservable(this.size);
     this.selected$ = toObservable(this.selected);
     this.handles$ = toObservable(this.handles);
   }
