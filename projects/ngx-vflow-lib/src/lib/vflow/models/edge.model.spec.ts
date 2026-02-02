@@ -8,12 +8,12 @@ import { HandleModel } from './handle.model';
 import { FlowSettingsService } from '../services/flow-settings.service';
 import { NodeRenderingService } from '../services/node-rendering.service';
 import { ViewportService } from '../services/viewport.service';
-import { OffsetBatchingCacheService } from '../services/offset-batching-cache.service';
+import { ElementCacheService } from '../services/element-cache.service';
 import { provideExperimentalZonelessChangeDetection } from '@angular/core';
 
 describe('EdgeModel', () => {
   let model: EdgeModel;
-  let offsetCacheService: OffsetBatchingCacheService;
+  let elementCacheService: ElementCacheService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -26,7 +26,7 @@ describe('EdgeModel', () => {
       ],
     });
 
-    offsetCacheService = new OffsetBatchingCacheService();
+    elementCacheService = new ElementCacheService();
 
     model = TestBed.runInInjectionContext(
       () =>
@@ -82,7 +82,7 @@ describe('EdgeModel', () => {
               userOffsetY: 0,
             },
             model.source()!,
-            offsetCacheService,
+            elementCacheService,
           ),
       ),
     ]);
@@ -98,7 +98,7 @@ describe('EdgeModel', () => {
               userOffsetY: 0,
             },
             model.source()!,
-            offsetCacheService,
+            elementCacheService,
           ),
       ),
     ]);

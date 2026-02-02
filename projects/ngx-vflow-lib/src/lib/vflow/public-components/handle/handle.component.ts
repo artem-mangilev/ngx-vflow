@@ -13,7 +13,7 @@ import {
 import { Position } from '../../types/position.type';
 import { HandleService } from '../../services/handle.service';
 import { HandleModel } from '../../models/handle.model';
-import { OffsetBatchingCacheService } from '../../services/offset-batching-cache.service';
+import { ElementCacheService as ElementCacheService } from '../../services/element-cache.service';
 import { RequestAnimationFrameBatchingService } from '../../services/request-animation-frame-batching.service';
 
 @Component({
@@ -28,7 +28,7 @@ export class HandleComponent implements OnInit {
   private element = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
   private destroyRef = inject(DestroyRef);
   private requestAnimationFrameBatchingService = inject(RequestAnimationFrameBatchingService);
-  private offsetBatchingCacheService = inject(OffsetBatchingCacheService);
+  private elementCacheService = inject(ElementCacheService);
 
   /**
    * At what side of node this component should be placed
@@ -67,7 +67,7 @@ export class HandleComponent implements OnInit {
             userOffsetY: this.offsetY(),
           },
           node,
-          this.offsetBatchingCacheService,
+          this.elementCacheService,
         );
 
         this.handleService.createHandle(model);

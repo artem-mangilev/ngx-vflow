@@ -3,7 +3,7 @@ import { NodeHandle } from '../services/handle.service';
 import { NodeModel } from './node.model';
 import { Subject, map } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { OffsetBatchingCacheService } from '../services/offset-batching-cache.service';
+import { ElementCacheService } from '../services/element-cache.service';
 
 export type HandleState = 'valid' | 'invalid' | 'idle';
 
@@ -40,7 +40,7 @@ export class HandleModel {
       map(() => {
         const offsets =
           this.hostReference instanceof HTMLElement
-            ? this.batchingService.getElementOffsets(this.hostReference)
+            ? this.elementCacheService.getElementData({ element: this.hostReference, type: 'htmlElement' })
             : undefined;
 
         return {
@@ -107,28 +107,32 @@ export class HandleModel {
   constructor(
     public rawHandle: NodeHandle,
     public parentNode: NodeModel,
-    public batchingService: OffsetBatchingCacheService,
+    public elementCacheService: ElementCacheService,
   ) {
     if (this.hostReference instanceof HTMLElement) {
-      this.batchingService.addElementCache(this.hostReference);
+      this.elementCacheService.addElementCache({ element: this.hostReference, type: 'htmlElement' });
+    } else if (this.hostReference instanceof SVGGraphicsElement) {
+      this.elementCacheService.addElementCache({ element: this.hostReference, type: 'svgGraphicElement' });
     }
   }
 
   public onDestroy() {
     if (this.hostReference instanceof HTMLElement) {
-      this.batchingService.removeElementCache(this.hostReference);
+      this.elementCacheService.removeElementCache({ element: this.hostReference, type: 'htmlElement' });
+    } else if (this.hostReference instanceof SVGGraphicsElement) {
+      this.elementCacheService.removeElementCache({ element: this.hostReference, type: 'svgGraphicElement' });
     }
   }
 
   public updateHost() {
-    this.batchingService.markCacheAsDirty();
+    this.elementCacheService.markCacheAsDirty();
     this.updateHostSizeAndPosition$.next();
   }
 
   private getHostSize(): { width: number; height: number } {
     //TODO only get the hist ref width once ?
     if (this.hostReference instanceof HTMLElement) {
-      const offsets = this.batchingService.getElementOffsets(this.hostReference);
+      const offsets = this.elementCacheService.getElementData({ element: this.hostReference, type: 'htmlElement' });
 
       if (offsets) {
         return {
@@ -137,7 +141,16 @@ export class HandleModel {
         };
       }
     } else if (this.hostReference instanceof SVGGraphicsElement) {
-      return this.hostReference.getBBox();
+      let rect = this.elementCacheService.getElementData({
+        element: this.hostReference,
+        type: 'svgGraphicElement',
+      })?.rect;
+      if (rect === undefined) {
+        //We should never get here
+        rect = this.hostReference.getBBox();
+      }
+
+      return rect;
     }
 
     return { width: 0, height: 0 };

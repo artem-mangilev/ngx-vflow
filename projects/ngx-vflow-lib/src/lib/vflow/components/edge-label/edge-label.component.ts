@@ -2,9 +2,8 @@ import {
   AfterViewInit,
   ChangeDetectionStrategy,
   Component,
-  DestroyRef,
   ElementRef,
-  NgZone,
+  OnDestroy,
   TemplateRef,
   computed,
   inject,
@@ -14,13 +13,13 @@ import {
 import { EdgeLabelModel } from '../../models/edge-label.model';
 import { EdgeModel } from '../../models/edge.model';
 import { NgTemplateOutlet } from '@angular/common';
-import { resizable } from '../../utils/resizable';
-import { startWith, tap } from 'rxjs';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MAGIC_NUMBER_TO_FIX_GLITCH_IN_CHROME } from '../../constants/magic-number-to-fix-glitch-in-chrome.constant';
 import { FlowSettingsService } from '../../services/flow-settings.service';
 import { HtmlEdgeLabelContext } from '../../interfaces/template-context.interface';
 import { HtmlTemplateEdgeLabel } from '../../interfaces/edge-label.interface';
+import { ResizeObserverService } from '../../services/resize-observer.service';
+import { ElementCacheService } from '../../services/element-cache.service';
+import { RequestAnimationFrameBatchingService } from '../../services/request-animation-frame-batching.service';
 
 @Component({
   selector: 'g[edgeLabel]',
@@ -42,10 +41,11 @@ import { HtmlTemplateEdgeLabel } from '../../interfaces/edge-label.interface';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [NgTemplateOutlet],
 })
-export class EdgeLabelComponent implements AfterViewInit {
-  private zone = inject(NgZone);
-  private destroyRef = inject(DestroyRef);
+export class EdgeLabelComponent implements AfterViewInit, OnDestroy {
   private settingsService = inject(FlowSettingsService);
+  private resizeObserverService = inject(ResizeObserverService);
+  private elementCacheService = inject(ElementCacheService);
+  private requestAnimationFrameBatchService = inject(RequestAnimationFrameBatchingService);
 
   // TODO: too many inputs
   public model = input.required<EdgeLabelModel>();
@@ -100,19 +100,23 @@ export class EdgeLabelComponent implements AfterViewInit {
 
   public ngAfterViewInit(): void {
     const labelElement = this.edgeLabelWrapperRef().nativeElement;
+    this.elementCacheService.addElementCache({ element: labelElement, type: 'basicElement' });
 
-    resizable([labelElement], this.zone)
-      .pipe(
-        startWith(null),
-        tap(() => {
-          const width = labelElement.clientWidth + MAGIC_NUMBER_TO_FIX_GLITCH_IN_CHROME;
-          const height = labelElement.clientHeight + MAGIC_NUMBER_TO_FIX_GLITCH_IN_CHROME;
+    this.resizeObserverService.addObserver(labelElement, () => {
+      this.updateModelSize();
+    });
 
-          this.model().size.set({ width, height });
-        }),
-        takeUntilDestroyed(this.destroyRef),
-      )
-      .subscribe();
+    //force run the first time since previous implementation used startWith(null) to force a first initialization
+    //inside animation frame callback otherwise we ngAfterViewInit calls in between each edge label create
+    this.requestAnimationFrameBatchService.batchAnimationFrame(() => {
+      this.updateModelSize();
+    });
+  }
+
+  public ngOnDestroy(): void {
+    const labelElement = this.edgeLabelWrapperRef().nativeElement;
+    this.elementCacheService.removeElementCache({ element: labelElement, type: 'basicElement' });
+    this.resizeObserverService.removeObserver(labelElement);
   }
 
   // TODO: move to model with Contextable interface
@@ -123,5 +127,22 @@ export class EdgeLabelComponent implements AfterViewInit {
         label: this.model().edgeLabel as HtmlTemplateEdgeLabel,
       },
     };
+  }
+
+  private updateModelSize() {
+    const labelElement = this.edgeLabelWrapperRef().nativeElement;
+    this.elementCacheService.markCacheAsDirty();
+    let labelData = this.elementCacheService.getElementData({ element: labelElement, type: 'basicElement' });
+    if (labelData === undefined) {
+      //Ideally we never get here but in case we do, fallback to request a reflow of the layout.
+      labelData = {
+        clientWidth: labelElement.clientWidth,
+        clientHeight: labelElement.clientHeight,
+      };
+    }
+
+    const width = labelData.clientWidth + MAGIC_NUMBER_TO_FIX_GLITCH_IN_CHROME;
+    const height = labelData.clientHeight + MAGIC_NUMBER_TO_FIX_GLITCH_IN_CHROME;
+    this.model().size.set({ width, height });
   }
 }
