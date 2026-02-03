@@ -46,8 +46,8 @@ function nodeToBox(node: NodeModel): Box {
   return {
     x: node.point().x,
     y: node.point().y,
-    x2: node.point().x + node.size().width,
-    y2: node.point().y + node.size().height,
+    x2: node.point().x + node.width(),
+    y2: node.point().y + node.height(),
   };
 }
 

@@ -117,14 +117,11 @@ export class AllFeaturesDemoComponent {
   protected vflow = viewChild.required(VflowComponent);
 
   constructor() {
-    effect(
-      () => {
-        if (this.vflow().initialized()) {
-          untracked(() => this.vflow().fitView());
-        }
-      },
-      { allowSignalWrites: true },
-    );
+    effect(() => {
+      if (this.vflow().initialized()) {
+        untracked(() => this.vflow().fitView());
+      }
+    });
   }
 
   createEdge(connection: Connection) {

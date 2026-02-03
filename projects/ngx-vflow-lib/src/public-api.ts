@@ -50,6 +50,7 @@ export * from './lib/vflow/directives/connection-controller.directive';
 export * from './lib/vflow/directives/changes-controller.directive';
 export * from './lib/vflow/directives/selectable.directive';
 export * from './lib/vflow/directives/drag-handle.directive';
+export * from './lib/vflow/directives/node-drag-controller.directive';
 
 // ! Internals
 export { ConnectionModel as ɵConnectionModel } from './lib/vflow/models/connection.model';

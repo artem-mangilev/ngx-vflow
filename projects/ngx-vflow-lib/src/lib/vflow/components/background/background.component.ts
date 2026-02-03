@@ -1,16 +1,18 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
-import { ViewportService } from '../../services/viewport.service';
-import { RootSvgReferenceDirective } from '../../directives/reference.directive';
-import { id } from '../../utils/id';
-import { FlowSettingsService } from '../../services/flow-settings.service';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { map, switchMap } from 'rxjs/operators';
+import { RootSvgReferenceDirective } from '../../directives/reference.directive';
+import { FlowSettingsService } from '../../services/flow-settings.service';
+import { ViewportService } from '../../services/viewport.service';
+import { id } from '../../utils/id';
 import { toLazySignal } from '../../utils/signals/to-lazy-signal';
 
 const defaultBg = '#fff';
 const defaultGap = 20;
 const defaultDotSize = 2;
 const defaultDotColor = 'rgb(177, 177, 183)';
+const defaultGridSize = 20;
+const defaultStrokeWidth = 2;
 const defaultImageScale = 0.1;
 const defaultRepeated = true;
 
@@ -27,28 +29,19 @@ export class BackgroundComponent {
 
   protected backgroundSignal = this.settingsService.background;
 
-  // DOTS PATTERN
-  protected scaledGap = computed(() => {
-    const background = this.backgroundSignal();
-
-    if (background.type === 'dots') {
-      const zoom = this.viewportService.readableViewport().zoom;
-
-      return zoom * (background.gap ?? defaultGap);
-    }
-
-    return 0;
+  protected x = computed(() => {
+    return this.viewportService.readableViewport().x % this.scaledGap();
   });
 
-  protected x = computed(() => this.viewportService.readableViewport().x % this.scaledGap());
-
-  protected y = computed(() => this.viewportService.readableViewport().y % this.scaledGap());
+  protected y = computed(() => {
+    return this.viewportService.readableViewport().y % this.scaledGap();
+  });
 
   protected patternColor = computed(() => {
-    const bg = this.backgroundSignal();
+    const background = this.backgroundSignal();
 
-    if (bg.type === 'dots') {
-      return bg.color ?? defaultDotColor;
+    if (background.type === 'dots' || background.type === 'grid') {
+      return background.color ?? defaultDotColor;
     }
 
     return defaultDotColor;
@@ -59,6 +52,37 @@ export class BackgroundComponent {
 
     if (background.type === 'dots') {
       return (this.viewportService.readableViewport().zoom * (background.size ?? defaultDotSize)) / 2;
+    }
+
+    if (background.type === 'grid') {
+      return this.viewportService.readableViewport().zoom * (background.size ?? defaultGridSize);
+    }
+
+    return 0;
+  });
+
+  protected scaledGap = computed(() => {
+    const background = this.backgroundSignal();
+    const zoom = this.viewportService.readableViewport().zoom;
+
+    if (background.type === 'dots') {
+      return zoom * (background.gap ?? defaultGap);
+    }
+
+    if (background.type === 'grid') {
+      return zoom * (background.size ?? defaultGridSize);
+    }
+
+    return 0;
+  });
+
+  // GRID PATTERN
+  protected strokeWidth = computed(() => {
+    const background = this.backgroundSignal();
+
+    if (background.type === 'grid') {
+      const zoom = this.viewportService.readableViewport().zoom;
+      return zoom * ((background.strokeWidth ?? defaultStrokeWidth) / 2);
     }
 
     return 0;
@@ -147,6 +171,10 @@ export class BackgroundComponent {
       const background = this.backgroundSignal();
 
       if (background.type === 'dots') {
+        this.rootSvg.style.backgroundColor = background.backgroundColor ?? defaultBg;
+      }
+
+      if (background.type === 'grid') {
         this.rootSvg.style.backgroundColor = background.backgroundColor ?? defaultBg;
       }
 

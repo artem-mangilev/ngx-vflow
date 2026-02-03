@@ -4,6 +4,7 @@ import { NodeModel } from './node.model';
 import { Subject } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { OffsetBatchingCacheService } from '../services/offset-batching-cache.service';
 
 export type HandleState = 'valid' | 'invalid' | 'idle';
 
@@ -29,7 +30,6 @@ export class HandleModel {
   public state = signal<HandleState>('idle');
 
   private updateHostSizeAndPosition$ = new Subject<void>();
-
   // TODO: for some reason toLazySignal breaks unit tests, so we use toSignal here
   private hostSize = toSignal(this.updateHostSizeAndPosition$.pipe(map(() => this.getHostSize())), {
     initialValue: { width: 0, height: 0 },
@@ -38,10 +38,17 @@ export class HandleModel {
   // TODO: for some reason toLazySignal breaks unit tests, so we use toSignal here
   private hostPosition = toSignal(
     this.updateHostSizeAndPosition$.pipe(
-      map(() => ({
-        x: this.hostReference instanceof HTMLElement ? this.hostReference.offsetLeft : 0, // for now just 0 for group nodes
-        y: this.hostReference instanceof HTMLElement ? this.hostReference.offsetTop : 0, // for now just 0 for group nodes
-      })),
+      map(() => {
+        const offsets =
+          this.hostReference instanceof HTMLElement
+            ? this.batchingService.getElementOffsets(this.hostReference)
+            : undefined;
+
+        return {
+          x: offsets ? offsets.offsetLeft : 0, // for now just 0 for group nodes
+          y: offsets ? offsets.offsetTop : 0, // for now just 0 for group nodes
+        };
+      }),
     ),
     {
       initialValue: { x: 0, y: 0 },
@@ -57,7 +64,7 @@ export class HandleModel {
         };
       case 'right':
         return {
-          x: -this.rawHandle.userOffsetX + this.parentNode.size().width,
+          x: -this.rawHandle.userOffsetX + this.parentNode.width(),
           y: -this.rawHandle.userOffsetY + this.hostPosition().y + this.hostSize().height / 2,
         };
       case 'top':
@@ -68,7 +75,7 @@ export class HandleModel {
       case 'bottom':
         return {
           x: -this.rawHandle.userOffsetX + this.hostPosition().x + this.hostSize().width / 2,
-          y: -this.rawHandle.userOffsetY + this.parentNode.size().height,
+          y: -this.rawHandle.userOffsetY + this.parentNode.height(),
         };
     }
   });
@@ -101,18 +108,35 @@ export class HandleModel {
   constructor(
     public rawHandle: NodeHandle,
     public parentNode: NodeModel,
-  ) {}
+    public batchingService: OffsetBatchingCacheService,
+  ) {
+    if (this.hostReference instanceof HTMLElement) {
+      this.batchingService.addElementCache(this.hostReference);
+    }
+  }
+
+  public onDestroy() {
+    if (this.hostReference instanceof HTMLElement) {
+      this.batchingService.removeElementCache(this.hostReference);
+    }
+  }
 
   public updateHost() {
+    this.batchingService.markCacheAsDirty();
     this.updateHostSizeAndPosition$.next();
   }
 
   private getHostSize(): { width: number; height: number } {
+    //TODO only get the hist ref width once ?
     if (this.hostReference instanceof HTMLElement) {
-      return {
-        width: this.hostReference.offsetWidth,
-        height: this.hostReference.offsetHeight,
-      };
+      const offsets = this.batchingService.getElementOffsets(this.hostReference);
+
+      if (offsets) {
+        return {
+          width: offsets.offsetWidth,
+          height: offsets.offsetHeight,
+        };
+      }
     } else if (this.hostReference instanceof SVGGraphicsElement) {
       return this.hostReference.getBBox();
     }

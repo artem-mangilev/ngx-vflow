@@ -6,13 +6,20 @@ import { createNode } from '../interfaces/node.interface';
 import { FlowSettingsService } from '../services/flow-settings.service';
 import { NodeRenderingService } from '../services/node-rendering.service';
 import { ViewportService } from '../services/viewport.service';
+import { provideExperimentalZonelessChangeDetection } from '@angular/core';
 
 describe('ToolbarModel', () => {
   let model: ToolbarModel;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [FlowEntitiesService, FlowSettingsService, NodeRenderingService, ViewportService],
+      providers: [
+        FlowEntitiesService,
+        FlowSettingsService,
+        NodeRenderingService,
+        ViewportService,
+        provideExperimentalZonelessChangeDetection(),
+      ],
     });
 
     model = TestBed.runInInjectionContext(

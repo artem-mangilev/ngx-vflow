@@ -6,18 +6,28 @@ import { createNode } from '../interfaces/node.interface';
 import { FlowSettingsService } from '../services/flow-settings.service';
 import { NodeRenderingService } from '../services/node-rendering.service';
 import { ViewportService } from '../services/viewport.service';
+import { OffsetBatchingCacheService } from '../services/offset-batching-cache.service';
+import { provideExperimentalZonelessChangeDetection } from '@angular/core';
 
 describe('HandleModel', () => {
   const nodeWidth = 10;
   const nodeHeight = 10;
 
   let model: HandleModel;
+  let offsetCacheService: OffsetBatchingCacheService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [FlowEntitiesService, FlowSettingsService, NodeRenderingService, ViewportService],
+      providers: [
+        FlowEntitiesService,
+        FlowSettingsService,
+        NodeRenderingService,
+        ViewportService,
+        provideExperimentalZonelessChangeDetection(),
+      ],
     });
 
+    offsetCacheService = new OffsetBatchingCacheService();
     // we assume that host element has same size as whole node, it's actually true for default node
     const hostReference = document.createElement('div');
     spyOnProperty(hostReference, 'offsetWidth').and.returnValue(nodeWidth);
@@ -41,6 +51,7 @@ describe('HandleModel', () => {
               point: { x: 15, y: 15 },
             }),
           ),
+          offsetCacheService,
         ),
     );
 

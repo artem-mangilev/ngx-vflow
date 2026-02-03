@@ -30,47 +30,44 @@ export class MapContextDirective implements OnInit {
   protected viewportForSelection: Partial<ViewportForSelection> = {};
 
   // under the hood this effect triggers handleZoom, so error throws without this flag
-  protected manualViewportChangeEffect = effect(
-    () => {
-      const viewport = this.viewportService.writableViewport();
-      const state = viewport.state;
+  protected manualViewportChangeEffect = effect(() => {
+    const viewport = this.viewportService.writableViewport();
+    const state = viewport.state;
 
-      if (viewport.changeType === 'initial') {
-        return;
-      }
+    if (viewport.changeType === 'initial') {
+      return;
+    }
 
-      // If only zoom provided
-      if (isDefined(state.zoom) && !isDefined(state.x) && !isDefined(state.y)) {
-        this.rootSvgSelection.transition().duration(viewport.duration).call(this.zoomBehavior.scaleTo, state.zoom);
+    // If only zoom provided
+    if (isDefined(state.zoom) && !isDefined(state.x) && !isDefined(state.y)) {
+      this.rootSvgSelection.transition().duration(viewport.duration).call(this.zoomBehavior.scaleTo, state.zoom);
 
-        return;
-      }
+      return;
+    }
 
-      // If only pan provided
-      if (isDefined(state.x) && isDefined(state.y) && !isDefined(state.zoom)) {
-        // remain same zoom value
-        const zoom = untracked(this.viewportService.readableViewport).zoom;
+    // If only pan provided
+    if (isDefined(state.x) && isDefined(state.y) && !isDefined(state.zoom)) {
+      // remain same zoom value
+      const zoom = untracked(this.viewportService.readableViewport).zoom;
 
-        this.rootSvgSelection
-          .transition()
-          .duration(viewport.duration)
-          .call(this.zoomBehavior.transform, zoomIdentity.translate(state.x, state.y).scale(zoom));
+      this.rootSvgSelection
+        .transition()
+        .duration(viewport.duration)
+        .call(this.zoomBehavior.transform, zoomIdentity.translate(state.x, state.y).scale(zoom));
 
-        return;
-      }
+      return;
+    }
 
-      // If whole viewort state provided
-      if (isDefined(state.x) && isDefined(state.y) && isDefined(state.zoom)) {
-        this.rootSvgSelection
-          .transition()
-          .duration(viewport.duration)
-          .call(this.zoomBehavior.transform, zoomIdentity.translate(state.x, state.y).scale(state.zoom));
+    // If whole viewort state provided
+    if (isDefined(state.x) && isDefined(state.y) && isDefined(state.zoom)) {
+      this.rootSvgSelection
+        .transition()
+        .duration(viewport.duration)
+        .call(this.zoomBehavior.transform, zoomIdentity.translate(state.x, state.y).scale(state.zoom));
 
-        return;
-      }
-    },
-    { allowSignalWrites: true },
-  );
+      return;
+    }
+  });
 
   protected zoomBehavior!: ZoomBehavior<SVGSVGElement, unknown>;
 

@@ -40,16 +40,11 @@ export class NodesChangeService {
 
   protected nodeSizeChange$ = toObservable(this.entitiesService.nodes).pipe(
     switchMap((nodes) =>
-      merge(
-        ...nodes.map((node) =>
-          node.size$.pipe(
-            skip(1),
-            map(() => node),
-          ),
-        ),
-      ),
+      merge(...nodes.map((node) => merge(node.width$.pipe(skip(1)), node.height$.pipe(skip(1))).pipe(map(() => node)))),
     ),
-    map((changedNode) => [{ type: 'size', id: changedNode.rawNode.id, size: changedNode.size() }]),
+    map((changedNode) => [
+      { type: 'size', id: changedNode.rawNode.id, size: { width: changedNode.width(), height: changedNode.height() } },
+    ]),
   ) satisfies Observable<NodeChange[]>;
 
   protected nodeAddChange$ = toObservable(this.entitiesService.nodes).pipe(

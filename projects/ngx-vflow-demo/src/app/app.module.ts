@@ -14,7 +14,7 @@ import {
 import { NG_DOC_ROUTING, provideNgDocContext } from '@ng-doc/generated';
 import { provideRouter, withInMemoryScrolling } from '@angular/router';
 import { provideAnimations } from '@angular/platform-browser/animations';
-import { NgModule } from '@angular/core';
+import { NgModule, provideExperimentalZonelessChangeDetection } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -59,6 +59,7 @@ import { NgDocButtonIconComponent, NgDocIconComponent, NgDocTooltipDirective } f
         anchorScrolling: 'enabled',
       }),
     ),
+    provideExperimentalZonelessChangeDetection(),
   ],
   bootstrap: [AppComponent],
 })

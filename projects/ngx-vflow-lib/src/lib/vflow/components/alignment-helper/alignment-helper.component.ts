@@ -1,6 +1,11 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import { nodeToRect } from '../../utils/nodes';
-import { FlowStatusService, isNodeDragEndStatus, isNodeDragStartStatus } from '../../services/flow-status.service';
+import {
+  FlowStatusService,
+  isNodeDragEndStatus,
+  isNodeDragStartStatus,
+  isNodeDragStatus,
+} from '../../services/flow-status.service';
 import { rectToRectWithSides } from '../../interfaces/rect';
 import { Box } from '../../interfaces/box';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
@@ -27,12 +32,14 @@ export class AlignmentHelperComponent {
   readonly tolerance = input(10);
   readonly lineColor = input('#1b262c');
 
-  protected isNodeDragging = computed(() => isNodeDragStartStatus(this.flowStatus.status()));
+  protected isNodeDragging = computed(
+    () => isNodeDragStartStatus(this.flowStatus.status()) || isNodeDragStatus(this.flowStatus.status()),
+  );
 
   protected readonly intersections = extendedComputed<Intersection>((lastValue) => {
     const status = this.flowStatus.status();
 
-    if (isNodeDragStartStatus(status)) {
+    if (isNodeDragStartStatus(status) || isNodeDragStatus(status)) {
       const node = status.payload.node;
 
       const d = rectToRectWithSides(nodeToRect(node));

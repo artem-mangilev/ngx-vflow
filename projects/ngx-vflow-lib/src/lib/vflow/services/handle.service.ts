@@ -1,9 +1,9 @@
-import { Injectable, TemplateRef, signal } from '@angular/core';
+import { Injectable, TemplateRef, inject, signal } from '@angular/core';
 import { Position } from '../types/position.type';
 import { HandleType } from '../types/handle-type.type';
 import { NodeModel } from '../models/node.model';
 import { HandleModel } from '../models/handle.model';
-import { Microtask } from '../decorators/microtask.decorator';
+import { RequestAnimationFrameBatchingService } from './request-animation-frame-batching.service';
 
 export interface NodeHandle {
   position: Position;
@@ -17,14 +17,17 @@ export interface NodeHandle {
 
 @Injectable()
 export class HandleService {
+  private afService = inject(RequestAnimationFrameBatchingService);
+
   public readonly node = signal<NodeModel | null>(null);
 
-  @Microtask // TODO fixes rendering of handle for group node
   public createHandle(newHandle: HandleModel) {
-    const node = this.node();
-    if (node) {
-      node.handles.update((handles) => [...handles, newHandle]);
-    }
+    this.afService.batchAnimationFrame(() => {
+      const node = this.node();
+      if (node) {
+        node.handles.update((handles) => [...handles, newHandle]);
+      }
+    });
   }
 
   public destroyHandle(handleToDestoy: HandleModel) {

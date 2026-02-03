@@ -6,7 +6,7 @@ import { Edge, Node, Vflow } from 'ngx-vflow';
     view="auto"
     [nodes]="nodes"
     [edges]="edges"
-    [background]="{ type: 'dots' }"
+    [background]="{ type: 'grid' }"
     [snapGrid]="[20, 20]" />`,
   styles: [
     `
@@ -19,7 +19,7 @@ import { Edge, Node, Vflow } from 'ngx-vflow';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [Vflow],
 })
-export class DotsCustomBackgroundDemoComponent {
+export class GridCustomBackgroundDemoComponent {
   public nodes: Node[] = [
     {
       id: '1',
