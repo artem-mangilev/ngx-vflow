@@ -24,6 +24,7 @@
     "d3-drag": "^3.0.0",
     "d3-selection": "^3.0.0",
     "d3-zoom": "^3.0.0",
+    "rxjs": ">=6.0.0",
     "@types/d3-drag": "^3.0.7",
     "@types/d3-selection": "^3.0.10",
     "@types/d3-zoom": "^3.0.8"
