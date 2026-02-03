@@ -1,5 +1,6 @@
 import { Directive, EventEmitter, OnInit, inject, OutputEmitterRef, input, linkedSignal } from '@angular/core';
-import { merge, Observable, switchMap, tap } from 'rxjs';
+import { Observable, merge } from 'rxjs';
+import { switchMap, tap } from 'rxjs/operators';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { ComponentEventBusService } from '../../services/component-event-bus.service';
 import { NodeAccessorService } from '../../services/node-accessor.service';
