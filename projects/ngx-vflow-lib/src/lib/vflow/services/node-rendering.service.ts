@@ -14,6 +14,7 @@ export class NodeRenderingService {
   private flowEntitiesService = inject(FlowEntitiesService);
   private flowSettingsService = inject(FlowSettingsService);
   private viewportService = inject(ViewportService);
+  private maxOrder = 0;
 
   public readonly nodes = computed(() => {
     if (!this.flowSettingsService.optimization().virtualization) {
@@ -69,13 +70,10 @@ export class NodeRenderingService {
     },
   );
 
-  private maxOrder = computed(() => {
-    return Math.max(...this.flowEntitiesService.nodes().map((n) => n.renderOrder()));
-  });
-
   public pullNode(node: NodeModel) {
+    this.maxOrder++;
     // pull node
-    node.renderOrder.set(this.maxOrder() + 1);
+    node.renderOrder.set(this.maxOrder);
 
     // pull children
     node.children().forEach((n) => this.pullNode(n));

@@ -1,8 +1,6 @@
-export function isCallable(fn: any): boolean {
-  try {
-    new Proxy(fn, { apply: () => undefined })();
-    return true;
-  } catch (err) {
-    return false;
-  }
+import { StaticNode } from '../interfaces/node.interface';
+
+export function isCallable<T = any>(type: StaticNode<T>['type'] | any): boolean {
+  if (typeof type !== 'function') return false;
+  return type.apply !== undefined;
 }
