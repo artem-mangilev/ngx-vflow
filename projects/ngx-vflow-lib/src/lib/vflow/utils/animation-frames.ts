@@ -1,9 +1,8 @@
-import * as rxjs from 'rxjs';
 import { Observable, defer, animationFrameScheduler } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 // A backport of RxJS 7 animationFrames for RxJS 6.
-function customAnimationFrames() {
+export function animationFrames() {
   return defer(() => {
     const start = animationFrameScheduler.now();
 
@@ -19,6 +18,3 @@ function customAnimationFrames() {
     ).pipe(map((timestamp) => ({ timestamp, elapsed: timestamp - start })));
   });
 }
-
-export const animationFrames =
-  typeof rxjs.animationFrames === 'function' ? rxjs.animationFrames : customAnimationFrames;
