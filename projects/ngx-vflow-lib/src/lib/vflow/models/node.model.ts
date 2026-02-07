@@ -131,9 +131,14 @@ export class NodeModel<T = unknown>
     node: this.rawNode,
   };
 
-  public parent = computed(() => this.entitiesService.nodes().find((n) => n.rawNode.id === this.parentId()) ?? null);
+  public parent = computed(() => {
+    const parentId = this.parentId();
+    if (!parentId) return null;
 
-  public children = computed(() => this.entitiesService.nodes().filter((n) => n.parentId() === this.rawNode.id));
+    return this.entitiesService.nodeByIdMap().get(parentId) ?? null;
+  });
+
+  public children = computed(() => this.entitiesService.nodesByParentIdMap().get(this.rawNode.id) ?? []);
 
   public color = signal(NODE_DEFAULTS.color);
 
