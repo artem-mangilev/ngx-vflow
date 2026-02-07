@@ -1,7 +1,7 @@
 import { DestroyRef, Directive, inject, Injector, OnInit } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { EMPTY, merge, fromEvent } from 'rxjs';
-import { switchMap, tap, withLatestFrom, map, shareReplay, take } from 'rxjs/operators';
+import { switchMap, tap, withLatestFrom, map, shareReplay, take, distinctUntilKeyChanged } from 'rxjs/operators';
 import { FlowStatusService } from '../services/flow-status.service';
 import { ViewportService } from '../services/viewport.service';
 import { FlowSettingsService } from '../services/flow-settings.service';
@@ -12,7 +12,7 @@ import { animationFrames } from '../utils/animation-frames';
 const EDGE = 48; // px from edge to trigger pan
 const BASE_SPEED = 10;
 
-const START_STATES = ['node-drag-start', 'connection-start', 'reconnection-start'];
+const START_STATES = ['node-drag', 'connection-start', 'reconnection-start'];
 
 @Directive({ selector: '[autoPan]', standalone: true })
 export class AutoPanDirective implements OnInit {
@@ -36,6 +36,7 @@ export class AutoPanDirective implements OnInit {
     if (this.flowSettingsService.autoPan()) {
       toObservable(this.statusService.status, { injector: this.injector })
         .pipe(
+          distinctUntilKeyChanged('state'),
           switchMap((status) =>
             START_STATES.includes(status.state)
               ? this.documentPoint$.pipe(
