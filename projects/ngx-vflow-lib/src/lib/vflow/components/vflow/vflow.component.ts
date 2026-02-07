@@ -26,7 +26,7 @@ import {
   NodeSvgTemplateDirective,
 } from '../../directives/template.directive';
 import { addNodesToEdges } from '../../utils/add-nodes-to-edges';
-import { skip } from 'rxjs';
+import { skip } from 'rxjs/operators';
 import { SpacePoint, Point } from '../../interfaces/point.interface';
 import { ViewportState } from '../../interfaces/viewport.interface';
 import { FlowStatusService } from '../../services/flow-status.service';

@@ -1,7 +1,8 @@
 import { Injectable, signal, WritableSignal } from '@angular/core';
 import { KeyboardAction, KeyboardShortcuts } from '../types/keyboard-action.type';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
-import { fromEvent, merge, switchMap, tap } from 'rxjs';
+import { fromEvent, merge } from 'rxjs';
+import { switchMap, tap } from 'rxjs/operators';
 import { getOS } from '../utils/get-os';
 
 @Injectable()

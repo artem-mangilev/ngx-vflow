@@ -8,7 +8,8 @@ import { FlowEntitiesService } from '../services/flow-entities.service';
 import { MAGIC_NUMBER_TO_FIX_GLITCH_IN_CHROME } from '../constants/magic-number-to-fix-glitch-in-chrome.constant';
 import { Contextable } from '../interfaces/contextable.interface';
 import { GroupNodeContext, NodeContext } from '../interfaces/template-context.interface';
-import { catchError, filter, Observable, of, shareReplay, switchMap } from 'rxjs';
+import { Observable, of } from 'rxjs';
+import { catchError, filter, shareReplay, switchMap } from 'rxjs/operators';
 import { NodePreview } from '../interfaces/node-preview.interface';
 import { FlowSettingsService } from '../services/flow-settings.service';
 import { NodeRenderingService } from '../services/node-rendering.service';
@@ -130,9 +131,14 @@ export class NodeModel<T = unknown>
     node: this.rawNode,
   };
 
-  public parent = computed(() => this.entitiesService.nodes().find((n) => n.rawNode.id === this.parentId()) ?? null);
+  public parent = computed(() => {
+    const parentId = this.parentId();
+    if (!parentId) return null;
 
-  public children = computed(() => this.entitiesService.nodes().filter((n) => n.parentId() === this.rawNode.id));
+    return this.entitiesService.nodeByIdMap().get(parentId) ?? null;
+  });
+
+  public children = computed(() => this.entitiesService.nodesByParentIdMap().get(this.rawNode.id) ?? []);
 
   public color = signal(NODE_DEFAULTS.color);
 

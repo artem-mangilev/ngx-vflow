@@ -20,7 +20,7 @@ import { OverlaysService } from '../../services/overlays.service';
 import { NodeAccessorService } from '../../services/node-accessor.service';
 import { resizable } from '../../utils/resizable';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { tap } from 'rxjs';
+import { tap } from 'rxjs/operators';
 
 @Component({
   selector: 'node-toolbar',

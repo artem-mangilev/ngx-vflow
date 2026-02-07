@@ -1,5 +1,5 @@
 import { Directive, ElementRef, HostListener, inject, output } from '@angular/core';
-import { filter, tap } from 'rxjs';
+import { filter, tap } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RootPointerDirective } from './root-pointer.directive';
 import { isTouchEvent } from '../utils/event';

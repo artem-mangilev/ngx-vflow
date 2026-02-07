@@ -1,6 +1,6 @@
 import { DestroyRef, Directive, ElementRef, inject, OnInit } from '@angular/core';
 import { NodeAccessorService } from '../services/node-accessor.service';
-import { pairwise, tap } from 'rxjs';
+import { pairwise, tap } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ResizeObserverService } from '../services/resize-observer.service';
 import { RequestAnimationFrameBatchingService } from '../services/request-animation-frame-batching.service';

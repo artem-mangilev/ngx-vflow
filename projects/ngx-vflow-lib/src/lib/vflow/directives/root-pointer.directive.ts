@@ -1,5 +1,6 @@
 import { Directive, ElementRef, inject } from '@angular/core';
-import { Observable, Subject, animationFrameScheduler, fromEvent, map, merge, observeOn, share, tap } from 'rxjs';
+import { Observable, Subject, animationFrameScheduler, fromEvent, merge } from 'rxjs';
+import { map, observeOn, share, tap } from 'rxjs/operators';
 import { Point } from '../interfaces/point.interface';
 
 export interface PointerEvent {

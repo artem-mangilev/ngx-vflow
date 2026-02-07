@@ -10,7 +10,8 @@ import { align } from '../utils/align-number';
 import { FlowStatusService } from './flow-status.service';
 import { ViewportService } from './viewport.service';
 import { toObservable } from '@angular/core/rxjs-interop';
-import { Subscription, pairwise, filter, skip } from 'rxjs';
+import type { Subscription } from 'rxjs';
+import { pairwise, filter, skip } from 'rxjs/operators';
 
 type DragEvent = D3DragEvent<Element, unknown, unknown>;
 

@@ -5,7 +5,8 @@ import { EdgeComponent } from '../components/edge/edge.component';
 import { FlowEntity } from '../interfaces/flow-entity.interface';
 import { NodeComponent } from '../components/node/node.component';
 import { FlowSettingsService } from '../services/flow-settings.service';
-import { fromEvent, tap } from 'rxjs';
+import { fromEvent } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Directive({

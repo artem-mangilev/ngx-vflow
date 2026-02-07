@@ -15,6 +15,32 @@ export class FlowEntitiesService {
     equal: (a, b) => (!a.length && !b.length ? true : a === b),
   });
 
+  public readonly nodeByIdMap = computed(() => {
+    const result = new Map<string, NodeModel>();
+    this.nodes().forEach((x) => {
+      result.set(x.rawNode.id, x);
+    });
+    return result;
+  });
+
+  public readonly nodesByParentIdMap = computed(() => {
+    const result = new Map<string, NodeModel[]>();
+    this.nodes().forEach((x) => {
+      if (!x.rawNode.parentId) return;
+      const parentId = x.rawNode.parentId();
+      if (!parentId) return;
+
+      const nodes = result.get(parentId);
+      if (nodes) {
+        nodes.push(x);
+        result.set(parentId, nodes);
+      } else {
+        result.set(parentId, [x]);
+      }
+    });
+    return result;
+  });
+
   public readonly rawNodes = computed(() => this.nodes().map((n) => n.rawNode) as Node[]);
 
   public readonly edges = signal<EdgeModel[]>([], {

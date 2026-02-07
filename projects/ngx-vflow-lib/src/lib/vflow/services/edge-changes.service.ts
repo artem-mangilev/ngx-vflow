@@ -1,18 +1,7 @@
 import { Injectable, computed, inject, untracked } from '@angular/core';
 import { FlowEntitiesService } from './flow-entities.service';
-import {
-  Observable,
-  asyncScheduler,
-  distinctUntilChanged,
-  filter,
-  map,
-  merge,
-  observeOn,
-  pairwise,
-  skip,
-  switchMap,
-  zip,
-} from 'rxjs';
+import { Observable, asyncScheduler, merge, zip } from 'rxjs';
+import { distinctUntilChanged, filter, map, observeOn, pairwise, skip, switchMap } from 'rxjs/operators';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { EdgeChange } from '../types/edge-change.type';
 

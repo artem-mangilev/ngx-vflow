@@ -9,7 +9,7 @@ import {
 } from '../types/node-change.type';
 import { EdgeChangesService } from '../services/edge-changes.service';
 import { NodesChangeService } from '../services/node-changes.service';
-import { filter, map } from 'rxjs';
+import { filter, map } from 'rxjs/operators';
 import {
   EdgeAddChange,
   EdgeChange,

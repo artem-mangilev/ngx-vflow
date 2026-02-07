@@ -5,7 +5,8 @@ import { FlowSettingsService } from './flow-settings.service';
 import { isRectInViewport } from '../utils/viewport';
 import { ViewportService } from './viewport.service';
 import { toObservable } from '@angular/core/rxjs-interop';
-import { asyncScheduler, debounceTime, filter, map, merge, observeOn } from 'rxjs';
+import { asyncScheduler, merge } from 'rxjs';
+import { debounceTime, filter, map, observeOn } from 'rxjs/operators';
 import { toLazySignal } from '../utils/signals/to-lazy-signal';
 import { isGroupNode } from '../utils/is-group-node';
 
@@ -14,6 +15,7 @@ export class NodeRenderingService {
   private flowEntitiesService = inject(FlowEntitiesService);
   private flowSettingsService = inject(FlowSettingsService);
   private viewportService = inject(ViewportService);
+  private maxOrder = 0;
 
   public readonly nodes = computed(() => {
     if (!this.flowSettingsService.optimization().virtualization) {
@@ -69,13 +71,10 @@ export class NodeRenderingService {
     },
   );
 
-  private maxOrder = computed(() => {
-    return Math.max(...this.flowEntitiesService.nodes().map((n) => n.renderOrder()));
-  });
-
   public pullNode(node: NodeModel) {
+    this.maxOrder++;
     // pull node
-    node.renderOrder.set(this.maxOrder() + 1);
+    node.renderOrder.set(this.maxOrder);
 
     // pull children
     node.children().forEach((n) => this.pullNode(n));
