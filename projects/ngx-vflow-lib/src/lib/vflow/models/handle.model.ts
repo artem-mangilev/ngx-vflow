@@ -145,7 +145,7 @@ export class HandleModel {
         };
       }
     } else if (this.hostReference instanceof SVGGraphicsElement) {
-      return this.svgGraphicElementCacheService.getElementData(this.hostReference).rect;
+      return this.svgGraphicElementCacheService.getElementData(this.hostReference);
     }
 
     return { width: 0, height: 0 };

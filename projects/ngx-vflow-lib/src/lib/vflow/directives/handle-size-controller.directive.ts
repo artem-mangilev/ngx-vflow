@@ -25,7 +25,7 @@ export class HandleSizeControllerDirective implements AfterViewInit, OnDestroy {
     //inside animation frame callback otherwise we ngAfterViewInit calls in between each handle create
     this.animationFrameBtachingService.batchAnimationFrame(() => {
       const element = this.handleWrapper.nativeElement;
-      const rect = this.svgGraphicElementCacheService.getElementData(element)?.rect;
+      const rect = this.svgGraphicElementCacheService.getElementData(element);
       const stroke = getChildStrokeWidth(element);
       this.handleModel().size.set({
         width: rect.width + stroke,
