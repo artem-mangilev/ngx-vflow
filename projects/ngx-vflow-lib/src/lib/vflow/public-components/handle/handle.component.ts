@@ -13,8 +13,9 @@ import {
 import { Position } from '../../types/position.type';
 import { HandleService } from '../../services/handle.service';
 import { HandleModel } from '../../models/handle.model';
-import { ElementCacheService as ElementCacheService } from '../../services/element-cache.service';
 import { RequestAnimationFrameBatchingService } from '../../services/request-animation-frame-batching.service';
+import { HtmlElementCacheService } from '../../services/html-element-cache.service';
+import { SvgGraphicElementCacheService } from '../../services/svg-graphic-element-cache.service';
 
 @Component({
   standalone: true,
@@ -28,7 +29,8 @@ export class HandleComponent implements OnInit {
   private element = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
   private destroyRef = inject(DestroyRef);
   private requestAnimationFrameBatchingService = inject(RequestAnimationFrameBatchingService);
-  private elementCacheService = inject(ElementCacheService);
+  private htmlElementCacheService = inject(HtmlElementCacheService);
+  private svgGraphicElementCacheService = inject(SvgGraphicElementCacheService);
 
   /**
    * At what side of node this component should be placed
@@ -67,7 +69,8 @@ export class HandleComponent implements OnInit {
             userOffsetY: this.offsetY(),
           },
           node,
-          this.elementCacheService,
+          this.htmlElementCacheService,
+          this.svgGraphicElementCacheService,
         );
 
         this.handleService.createHandle(model);

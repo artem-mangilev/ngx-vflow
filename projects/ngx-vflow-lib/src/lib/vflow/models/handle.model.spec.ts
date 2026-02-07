@@ -6,15 +6,17 @@ import { createNode } from '../interfaces/node.interface';
 import { FlowSettingsService } from '../services/flow-settings.service';
 import { NodeRenderingService } from '../services/node-rendering.service';
 import { ViewportService } from '../services/viewport.service';
-import { ElementCacheService } from '../services/element-cache.service';
 import { provideExperimentalZonelessChangeDetection } from '@angular/core';
+import { HtmlElementCacheService } from '../services/html-element-cache.service';
+import { SvgGraphicElementCacheService } from '../services/svg-graphic-element-cache.service';
 
 describe('HandleModel', () => {
   const nodeWidth = 10;
   const nodeHeight = 10;
 
   let model: HandleModel;
-  let elementCacheService: ElementCacheService;
+  let htmlElementCacheService: HtmlElementCacheService;
+  let svgGraphicElementCacheService: SvgGraphicElementCacheService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -27,7 +29,8 @@ describe('HandleModel', () => {
       ],
     });
 
-    elementCacheService = new ElementCacheService();
+    htmlElementCacheService = new HtmlElementCacheService();
+    svgGraphicElementCacheService = new SvgGraphicElementCacheService();
     // we assume that host element has same size as whole node, it's actually true for default node
     const hostReference = document.createElement('div');
     spyOnProperty(hostReference, 'offsetWidth').and.returnValue(nodeWidth);
@@ -51,7 +54,8 @@ describe('HandleModel', () => {
               point: { x: 15, y: 15 },
             }),
           ),
-          elementCacheService,
+          htmlElementCacheService,
+          svgGraphicElementCacheService,
         ),
     );
 

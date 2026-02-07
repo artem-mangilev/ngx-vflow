@@ -1,7 +1,7 @@
 import { AfterViewInit, Directive, ElementRef, inject, input, OnDestroy } from '@angular/core';
 import { HandleModel } from '../models/handle.model';
-import { ElementCacheService } from '../services/element-cache.service';
 import { RequestAnimationFrameBatchingService } from '../services/request-animation-frame-batching.service';
+import { SvgGraphicElementCacheService } from '../services/svg-graphic-element-cache.service';
 
 @Directive({
   standalone: true,
@@ -13,30 +13,19 @@ export class HandleSizeControllerDirective implements AfterViewInit, OnDestroy {
   });
 
   private handleWrapper = inject(ElementRef) as ElementRef<SVGGElement>;
-  private elementCacheService = inject(ElementCacheService);
+  private svgGraphicElementCacheService = inject(SvgGraphicElementCacheService);
   private animationFrameBtachingService = inject(RequestAnimationFrameBatchingService);
 
   public ngOnDestroy(): void {
-    this.elementCacheService.removeElementCache({
-      element: this.handleWrapper.nativeElement,
-      type: 'svgGraphicElement',
-    });
+    this.svgGraphicElementCacheService.removeElementCache(this.handleWrapper.nativeElement);
   }
 
   public ngAfterViewInit(): void {
-    this.elementCacheService.addElementCache({ element: this.handleWrapper.nativeElement, type: 'svgGraphicElement' });
+    this.svgGraphicElementCacheService.addElementCache(this.handleWrapper.nativeElement);
     //inside animation frame callback otherwise we ngAfterViewInit calls in between each handle create
     this.animationFrameBtachingService.batchAnimationFrame(() => {
       const element = this.handleWrapper.nativeElement;
-      let rect = this.elementCacheService.getElementData({
-        element: element,
-        type: 'svgGraphicElement',
-      })?.rect;
-      if (rect === undefined) {
-        //We should never get here but in case we do, we fallback to forcing a reflow of the layout
-        rect = element.getBBox();
-      }
-
+      const rect = this.svgGraphicElementCacheService.getElementData(element)?.rect;
       const stroke = getChildStrokeWidth(element);
       this.handleModel().size.set({
         width: rect.width + stroke,

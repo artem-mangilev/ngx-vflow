@@ -18,8 +18,8 @@ import { FlowSettingsService } from '../../services/flow-settings.service';
 import { HtmlEdgeLabelContext } from '../../interfaces/template-context.interface';
 import { HtmlTemplateEdgeLabel } from '../../interfaces/edge-label.interface';
 import { ResizeObserverService } from '../../services/resize-observer.service';
-import { ElementCacheService } from '../../services/element-cache.service';
 import { RequestAnimationFrameBatchingService } from '../../services/request-animation-frame-batching.service';
+import { BasicElementCacheService } from '../../services/basic-element-cache.service';
 
 @Component({
   selector: 'g[edgeLabel]',
@@ -44,7 +44,7 @@ import { RequestAnimationFrameBatchingService } from '../../services/request-ani
 export class EdgeLabelComponent implements AfterViewInit, OnDestroy {
   private settingsService = inject(FlowSettingsService);
   private resizeObserverService = inject(ResizeObserverService);
-  private elementCacheService = inject(ElementCacheService);
+  private basicElementCacheService = inject(BasicElementCacheService);
   private requestAnimationFrameBatchService = inject(RequestAnimationFrameBatchingService);
 
   // TODO: too many inputs
@@ -100,7 +100,7 @@ export class EdgeLabelComponent implements AfterViewInit, OnDestroy {
 
   public ngAfterViewInit(): void {
     const labelElement = this.edgeLabelWrapperRef().nativeElement;
-    this.elementCacheService.addElementCache({ element: labelElement, type: 'basicElement' });
+    this.basicElementCacheService.addElementCache(labelElement);
 
     this.resizeObserverService.addObserver(labelElement, () => {
       this.updateModelSize();
@@ -115,7 +115,7 @@ export class EdgeLabelComponent implements AfterViewInit, OnDestroy {
 
   public ngOnDestroy(): void {
     const labelElement = this.edgeLabelWrapperRef().nativeElement;
-    this.elementCacheService.removeElementCache({ element: labelElement, type: 'basicElement' });
+    this.basicElementCacheService.removeElementCache(labelElement);
     this.resizeObserverService.removeObserver(labelElement);
   }
 
@@ -131,16 +131,8 @@ export class EdgeLabelComponent implements AfterViewInit, OnDestroy {
 
   private updateModelSize() {
     const labelElement = this.edgeLabelWrapperRef().nativeElement;
-    this.elementCacheService.markCacheAsDirty();
-    let labelData = this.elementCacheService.getElementData({ element: labelElement, type: 'basicElement' });
-    if (labelData === undefined) {
-      //Ideally we never get here but in case we do, fallback to request a reflow of the layout.
-      labelData = {
-        clientWidth: labelElement.clientWidth,
-        clientHeight: labelElement.clientHeight,
-      };
-    }
-
+    this.basicElementCacheService.markCacheAsDirty();
+    const labelData = this.basicElementCacheService.getElementData(labelElement);
     const width = labelData.clientWidth + MAGIC_NUMBER_TO_FIX_GLITCH_IN_CHROME;
     const height = labelData.clientHeight + MAGIC_NUMBER_TO_FIX_GLITCH_IN_CHROME;
     this.model().size.set({ width, height });
