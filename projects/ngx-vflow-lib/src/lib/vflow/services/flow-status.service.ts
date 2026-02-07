@@ -4,7 +4,7 @@ import { HandleModel } from '../models/handle.model';
 import { ConnectionInternal } from '../interfaces/connection.internal.interface';
 import { EdgeModel } from '../models/edge.model';
 import { toObservable } from '@angular/core/rxjs-interop';
-import { shareReplay } from 'rxjs';
+import { shareReplay } from 'rxjs/operators';
 
 export interface FlowStatusIdle {
   state: 'idle';

@@ -1,6 +1,6 @@
 import { Directive, inject } from '@angular/core';
 import { FlowStatusService } from '../services/flow-status.service';
-import { filter, map } from 'rxjs';
+import { filter, map } from 'rxjs/operators';
 import { Node } from '../interfaces/node.interface';
 import { outputFromObservable } from '@angular/core/rxjs-interop';
 

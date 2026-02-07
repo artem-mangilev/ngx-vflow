@@ -1,11 +1,13 @@
 import { DestroyRef, Directive, inject, Injector, OnInit } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
-import { animationFrames, EMPTY, merge, switchMap, tap, withLatestFrom, map, shareReplay, take, fromEvent } from 'rxjs';
+import { EMPTY, merge, fromEvent } from 'rxjs';
+import { switchMap, tap, withLatestFrom, map, shareReplay, take } from 'rxjs/operators';
 import { FlowStatusService } from '../services/flow-status.service';
 import { ViewportService } from '../services/viewport.service';
 import { FlowSettingsService } from '../services/flow-settings.service';
 import { RootSvgReferenceDirective } from './reference.directive';
 import { Point } from '../interfaces/point.interface';
+import { animationFrames } from '../utils/animation-frames';
 
 const EDGE = 48; // px from edge to trigger pan
 const BASE_SPEED = 10;

@@ -9,7 +9,7 @@ import {
 import { rectToRectWithSides } from '../../interfaces/rect';
 import { Box } from '../../interfaces/box';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
-import { filter, map, tap } from 'rxjs';
+import { filter, map, tap } from 'rxjs/operators';
 import { extendedComputed } from '../../utils/signals/extended-computed';
 import { NodeRenderingService } from '../../services/node-rendering.service';
 

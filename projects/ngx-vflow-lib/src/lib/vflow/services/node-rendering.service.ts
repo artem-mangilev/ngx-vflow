@@ -5,7 +5,8 @@ import { FlowSettingsService } from './flow-settings.service';
 import { isRectInViewport } from '../utils/viewport';
 import { ViewportService } from './viewport.service';
 import { toObservable } from '@angular/core/rxjs-interop';
-import { asyncScheduler, debounceTime, filter, map, merge, observeOn } from 'rxjs';
+import { asyncScheduler, merge } from 'rxjs';
+import { debounceTime, filter, map, observeOn } from 'rxjs/operators';
 import { toLazySignal } from '../utils/signals/to-lazy-signal';
 import { isGroupNode } from '../utils/is-group-node';
 

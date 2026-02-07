@@ -14,7 +14,7 @@ import {
   NgZone,
 } from '@angular/core';
 import { RootPointerDirective } from '../../directives/root-pointer.directive';
-import { filter, tap } from 'rxjs';
+import { filter, tap } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ViewportService } from '../../services/viewport.service';
 import { round } from '../../utils/round';
