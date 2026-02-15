@@ -8,12 +8,14 @@ import { HandleModel } from './handle.model';
 import { FlowSettingsService } from '../services/flow-settings.service';
 import { NodeRenderingService } from '../services/node-rendering.service';
 import { ViewportService } from '../services/viewport.service';
-import { OffsetBatchingCacheService } from '../services/offset-batching-cache.service';
 import { provideExperimentalZonelessChangeDetection } from '@angular/core';
+import { HtmlElementCacheService } from '../services/html-element-cache.service';
+import { SvgGraphicElementCacheService } from '../services/svg-graphic-element-cache.service';
 
 describe('EdgeModel', () => {
   let model: EdgeModel;
-  let offsetCacheService: OffsetBatchingCacheService;
+  let htmlElementCacheService: HtmlElementCacheService;
+  let svgGraphicElementCacheService: SvgGraphicElementCacheService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -26,7 +28,8 @@ describe('EdgeModel', () => {
       ],
     });
 
-    offsetCacheService = new OffsetBatchingCacheService();
+    htmlElementCacheService = new HtmlElementCacheService();
+    svgGraphicElementCacheService = new SvgGraphicElementCacheService();
 
     model = TestBed.runInInjectionContext(
       () =>
@@ -82,7 +85,8 @@ describe('EdgeModel', () => {
               userOffsetY: 0,
             },
             model.source()!,
-            offsetCacheService,
+            htmlElementCacheService,
+            svgGraphicElementCacheService,
           ),
       ),
     ]);
@@ -98,7 +102,8 @@ describe('EdgeModel', () => {
               userOffsetY: 0,
             },
             model.source()!,
-            offsetCacheService,
+            htmlElementCacheService,
+            svgGraphicElementCacheService,
           ),
       ),
     ]);

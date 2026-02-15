@@ -4,10 +4,6 @@ import { NodeModel } from '../models/node.model';
 import { FlowSettingsService } from './flow-settings.service';
 import { isRectInViewport } from '../utils/viewport';
 import { ViewportService } from './viewport.service';
-import { toObservable } from '@angular/core/rxjs-interop';
-import { asyncScheduler, merge } from 'rxjs';
-import { debounceTime, filter, map, observeOn } from 'rxjs/operators';
-import { toLazySignal } from '../utils/signals/to-lazy-signal';
 import { isGroupNode } from '../utils/is-group-node';
 
 @Injectable()
@@ -22,7 +18,14 @@ export class NodeRenderingService {
       return [...this.flowEntitiesService.nodes()].sort((aNode, bNode) => aNode.renderOrder() - bNode.renderOrder());
     }
 
-    return this.viewportNodesAfterInteraction().sort((aNode, bNode) => aNode.renderOrder() - bNode.renderOrder());
+    const nodesToRender = this.viewportNodes();
+
+    const viewport = this.viewportService.readableViewport();
+    const zoomThreshold = this.flowSettingsService.optimization().virtualizationZoomThreshold;
+
+    return viewport.zoom < zoomThreshold
+      ? []
+      : nodesToRender.sort((aNode, bNode) => aNode.renderOrder() - bNode.renderOrder());
   });
 
   public readonly groups = computed(() => {
@@ -47,29 +50,6 @@ export class NodeRenderingService {
       return isRectInViewport({ x, y, width, height }, viewport, flowWidth, flowHeight);
     });
   });
-
-  private viewportNodesAfterInteraction = toLazySignal(
-    merge(
-      // TODO: maybe there is a better way wait when viewport is ready?
-      // (to correctly calculate viewport nodes on first render)
-      toObservable(this.flowEntitiesService.nodes).pipe(
-        observeOn(asyncScheduler),
-        filter((nodes) => !!nodes.length),
-      ),
-
-      this.viewportService.viewportChangeEnd$.pipe(debounceTime(300)),
-    ).pipe(
-      map(() => {
-        const viewport = this.viewportService.readableViewport();
-        const zoomThreshold = this.flowSettingsService.optimization().virtualizationZoomThreshold;
-
-        return viewport.zoom < zoomThreshold ? [] : this.viewportNodes();
-      }),
-    ),
-    {
-      initialValue: [],
-    },
-  );
 
   public pullNode(node: NodeModel) {
     this.maxOrder++;

@@ -77,9 +77,11 @@ import { AlignmentHelperComponent } from '../alignment-helper/alignment-helper.c
 import { AlignmentHelperSettings } from '../../interfaces/alignment-helper-settings.interface';
 import { AutoPanDirective } from '../../directives/auto-pan.directive';
 import { ResizeObserverService } from '../../services/resize-observer.service';
-import { OffsetBatchingCacheService } from '../../services/offset-batching-cache.service';
 import { RequestAnimationFrameBatchingService } from '../../services/request-animation-frame-batching.service';
 import { NodeDragControllerDirective } from '../../directives/node-drag-controller.directive';
+import { HtmlElementCacheService } from '../../services/html-element-cache.service';
+import { SvgGraphicElementCacheService } from '../../services/svg-graphic-element-cache.service';
+import { BasicElementCacheService } from '../../services/basic-element-cache.service';
 
 const changesControllerHostDirective = {
   directive: ChangesControllerDirective,
@@ -125,7 +127,9 @@ const nodeDragControllerHostDirective = {
     { provide: PreviewFlowRenderStrategyService, useClass: ViewportPreviewFlowRenderStrategyService },
     FlowRenderingService,
     ResizeObserverService,
-    OffsetBatchingCacheService,
+    HtmlElementCacheService,
+    BasicElementCacheService,
+    SvgGraphicElementCacheService,
     RequestAnimationFrameBatchingService,
   ],
   hostDirectives: [changesControllerHostDirective, nodeDragControllerHostDirective],
