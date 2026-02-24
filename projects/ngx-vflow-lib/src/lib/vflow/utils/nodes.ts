@@ -1,7 +1,7 @@
 import { IntersectingNodesOptions } from '../interfaces/intersecting-nodes-options.interface';
 import { Rect } from '../interfaces/rect';
 import { NodeModel } from '../models/node.model';
-import { getBoundsOfRects, getOverlappingArea, rectsIntersect } from './rect';
+import { getBoundsOfRects, getOverlappingArea } from './rect';
 
 export function getNodesBounds(nodes: NodeModel[]): Rect {
   return getBoundsOfRects(nodes.map((node) => nodeToLocalRect(node)));
@@ -21,12 +21,11 @@ export function getIntesectingNodes(
     if (currentNode.rawNode.id === nodeId) return false;
 
     const currentRect = nodeToRect(currentNode);
+    const overlappingArea = getOverlappingArea(currentRect, nodeRect);
 
     if (options?.partially) {
-      return rectsIntersect(currentRect, nodeRect);
+      return overlappingArea > 0;
     }
-
-    const overlappingArea = getOverlappingArea(currentRect, nodeRect);
 
     return overlappingArea >= nodeRect.width * nodeRect.height;
   });
