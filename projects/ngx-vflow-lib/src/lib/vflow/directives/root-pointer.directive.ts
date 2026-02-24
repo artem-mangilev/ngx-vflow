@@ -23,6 +23,25 @@ export class RootPointerDirective {
 
   private prevTouchEvent: TouchEvent | null = null;
 
+  public pointerStart$ = merge(
+    fromEvent<MouseEvent>(this.host, 'mousedown').pipe(
+      map((event) => ({
+        x: event.clientX,
+        y: event.clientY,
+        target: event.target as Element | null,
+        originalEvent: event as Event,
+      })),
+    ),
+    fromEvent<TouchEvent>(this.host, 'touchstart').pipe(
+      map((event) => ({
+        x: event.touches[0].clientX,
+        y: event.touches[0].clientY,
+        target: event.target as Element | null,
+        originalEvent: event as Event,
+      })),
+    ),
+  ).pipe(observeOn(animationFrameScheduler), share()) satisfies Observable<Point>;
+
   // TODO: do not emit if mouse not down
   public mouseMovement$ = fromEvent<MouseEvent>(this.host, 'mousemove').pipe(
     map((event) => ({

@@ -1,12 +1,12 @@
 import { Directive, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { fromEvent } from 'rxjs';
 import { filter, tap } from 'rxjs/operators';
 import { SelectionBoxModel } from '../models/selection-box.model';
 import { FlowEntitiesService } from '../services/flow-entities.service';
 import { FlowSettingsService } from '../services/flow-settings.service';
 import { KeyboardService } from '../services/keyboard.service';
 import { RootSvgReferenceDirective } from './reference.directive';
+import { RootPointerDirective } from './root-pointer.directive';
 import { SpacePointContextDirective } from './space-point-context.directive';
 import { NodeModel } from '../models/node.model';
 import { EdgeModel } from '../models/edge.model';
@@ -25,39 +25,36 @@ export class SelectionBoxContextDirective {
   private keyboardService = inject(KeyboardService);
   private spacePointContext = inject(SpacePointContextDirective);
   private rootSvg = inject(RootSvgReferenceDirective).element;
+  private rootPointer = inject(RootPointerDirective);
 
   public model = new SelectionBoxModel();
 
-  protected mouseDownSub = fromEvent<MouseEvent>(this.rootSvg, 'mousedown')
+  protected startSub = this.rootPointer.pointerStart$
     .pipe(
       filter(() => this.flowSettingsService.entitiesSelectable()),
       filter(() => this.keyboardService.isActiveAction('selection')),
-      filter((event) => event.button === 0),
-      filter((event) => {
-        const target = event.target as Element | null;
-        return !target?.closest('.vflow-node') && !target?.closest('.selectable');
-      }),
-      tap((event) => {
-        event.preventDefault();
-        const point = this.documentPointToFlowPoint({ x: event.clientX, y: event.clientY });
+      filter(({ target }) => !target?.closest('.vflow-node') && !target?.closest('.selectable')),
+      tap(({ x, y, originalEvent }) => {
+        originalEvent.preventDefault();
+        const point = this.documentPointToFlowPoint({ x, y });
         this.model.setStart(point);
       }),
       takeUntilDestroyed(),
     )
     .subscribe();
 
-  protected mouseMoveSub = fromEvent<MouseEvent>(this.rootSvg, 'mousemove')
+  protected moveSub = this.rootPointer.pointerMovement$
     .pipe(
       filter(() => this.model.active()),
       tap((event) => {
-        const point = this.documentPointToFlowPoint({ x: event.clientX, y: event.clientY });
+        const point = this.documentPointToFlowPoint({ x: event.x, y: event.y });
         this.model.setEnd(point);
       }),
       takeUntilDestroyed(),
     )
     .subscribe();
 
-  protected mouseUpSub = fromEvent<MouseEvent>(document, 'mouseup')
+  protected endSub = this.rootPointer.documentPointerEnd$
     .pipe(
       filter(() => this.model.active()),
       tap(() => this.finish()),
