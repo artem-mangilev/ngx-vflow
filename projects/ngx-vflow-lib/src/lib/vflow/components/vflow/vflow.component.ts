@@ -1,7 +1,6 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  HostListener,
   Injector,
   Input,
   inject,
@@ -84,7 +83,7 @@ import { HtmlElementCacheService } from '../../services/html-element-cache.servi
 import { SvgGraphicElementCacheService } from '../../services/svg-graphic-element-cache.service';
 import { BasicElementCacheService } from '../../services/basic-element-cache.service';
 import { SelectionBoxComponent } from '../selection-box/selection-box.component';
-import { SelectionBoxService } from '../../services/selection-box.service';
+import { SelectionBoxContextDirective } from '../../directives/selection-box-context.directive';
 
 const changesControllerHostDirective = {
   directive: ChangesControllerDirective,
@@ -134,7 +133,6 @@ const nodeDragControllerHostDirective = {
     BasicElementCacheService,
     SvgGraphicElementCacheService,
     RequestAnimationFrameBatchingService,
-    SelectionBoxService,
   ],
   hostDirectives: [changesControllerHostDirective, nodeDragControllerHostDirective],
   imports: [
@@ -153,6 +151,7 @@ const nodeDragControllerHostDirective = {
     PreviewFlowComponent,
     AlignmentHelperComponent,
     SelectionBoxComponent,
+    SelectionBoxContextDirective,
     AutoPanDirective,
   ],
 })
@@ -167,7 +166,6 @@ export class VflowComponent {
   private flowSettingsService = inject(FlowSettingsService);
   private componentEventBusService = inject(ComponentEventBusService);
   private keyboardService = inject(KeyboardService);
-  private selectionBoxService = inject(SelectionBoxService);
   private injector = inject(Injector);
   private flowRenderingService = inject(FlowRenderingService);
 
@@ -533,47 +531,5 @@ export class VflowComponent {
 
   protected trackEdges(idx: number, { edge }: EdgeModel) {
     return edge;
-  }
-
-  protected onSelectionStart(event: MouseEvent) {
-    if (!this.flowSettingsService.entitiesSelectable()) {
-      return;
-    }
-
-    if (!this.keyboardService.isActiveAction('selection')) {
-      return;
-    }
-
-    if (event.button !== 0) {
-      return;
-    }
-
-    const target = event.target as Element | null;
-    if (target?.closest('.vflow-node') || target?.closest('.selectable')) {
-      return;
-    }
-
-    event.preventDefault();
-
-    const point = this.documentPointToFlowPoint({ x: event.clientX, y: event.clientY }) as Point;
-    this.selectionBoxService.start(point);
-  }
-
-  protected onSelectionMove(event: MouseEvent) {
-    if (!this.selectionBoxService.model.active()) {
-      return;
-    }
-
-    const point = this.documentPointToFlowPoint({ x: event.clientX, y: event.clientY }) as Point;
-    this.selectionBoxService.update(point);
-  }
-
-  @HostListener('document:mouseup')
-  protected onSelectionEnd() {
-    if (!this.selectionBoxService.model.active()) {
-      return;
-    }
-
-    this.selectionBoxService.finish();
   }
 }

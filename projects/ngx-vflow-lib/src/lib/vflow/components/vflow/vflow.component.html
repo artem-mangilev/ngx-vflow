@@ -1,17 +1,9 @@
-<svg:svg
-  #flow
-  rootSvgRef
-  rootSvgContext
-  rootPointer
-  flowSizeController
-  class="root-svg"
-  (mousedown)="onSelectionStart($event)"
-  (mousemove)="onSelectionMove($event)">
+<svg:svg #flow rootSvgRef rootSvgContext rootPointer flowSizeController class="root-svg">
   <defs flowDefs [markers]="markers()" />
 
   <g background />
 
-  <svg:g mapContext spacePointContext autoPan>
+  <svg:g mapContext spacePointContext autoPan selectionBoxContext>
     @if (alignmentHelper(); as alignmentHelper) {
       @if (alignmentHelper === true) {
         <svg:g alignmentHelper />

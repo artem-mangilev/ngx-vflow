@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { SelectionBoxService } from '../../services/selection-box.service';
+import { SelectionBoxContextDirective } from '../../directives/selection-box-context.directive';
 
 @Component({
   selector: 'g[selectionBox]',
@@ -9,5 +9,5 @@ import { SelectionBoxService } from '../../services/selection-box.service';
   standalone: true,
 })
 export class SelectionBoxComponent {
-  protected selectionBox = inject(SelectionBoxService).model;
+  protected selectionBox = inject(SelectionBoxContextDirective).model;
 }
