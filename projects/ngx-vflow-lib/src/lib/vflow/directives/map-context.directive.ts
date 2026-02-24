@@ -7,6 +7,7 @@ import { RootSvgReferenceDirective } from './reference.directive';
 import { ViewportState } from '../interfaces/viewport.interface';
 import { SelectionService, ViewportForSelection } from '../services/selection.service';
 import { FlowSettingsService } from '../services/flow-settings.service';
+import { KeyboardService } from '../services/keyboard.service';
 
 @Directive({
   standalone: true,
@@ -21,6 +22,7 @@ export class MapContextDirective implements OnInit {
   protected selectionService = inject(SelectionService);
   protected viewportService = inject(ViewportService);
   protected flowSettingsService = inject(FlowSettingsService);
+  protected keyboardService = inject(KeyboardService);
   protected zone = inject(NgZone);
 
   protected rootSvgSelection = select(this.rootSvg);
@@ -114,6 +116,10 @@ export class MapContextDirective implements OnInit {
 
   private filterCondition = (event: Event) => {
     if (event.type === 'mousedown' || event.type === 'touchstart') {
+      if (this.keyboardService.isActiveAction('selection')) {
+        return false;
+      }
+
       return (event.target as Element).closest('.vflow-node') === null;
     }
 

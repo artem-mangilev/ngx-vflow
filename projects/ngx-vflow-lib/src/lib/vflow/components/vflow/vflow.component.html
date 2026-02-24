@@ -1,4 +1,12 @@
-<svg:svg #flow rootSvgRef rootSvgContext rootPointer flowSizeController class="root-svg">
+<svg:svg
+  #flow
+  rootSvgRef
+  rootSvgContext
+  rootPointer
+  flowSizeController
+  class="root-svg"
+  (mousedown)="onSelectionStart($event)"
+  (mousemove)="onSelectionMove($event)">
   <defs flowDefs [markers]="markers()" />
 
   <g background />
@@ -63,6 +71,8 @@
           [attr.transform]="model.pointTransform()" />
       }
     }
+
+    <svg:g selectionBox />
   </svg:g>
 
   <!-- Minimap -->

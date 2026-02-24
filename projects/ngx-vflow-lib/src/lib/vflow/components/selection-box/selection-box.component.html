@@ -1,0 +1,8 @@
+@if (selectionBox.active()) {
+  <svg:rect
+    class="selection-box"
+    [attr.x]="selectionBox.x()"
+    [attr.y]="selectionBox.y()"
+    [attr.width]="selectionBox.width()"
+    [attr.height]="selectionBox.height()" />
+}
