@@ -5,7 +5,6 @@ import { SelectionBoxModel } from '../models/selection-box.model';
 import { FlowEntitiesService } from '../services/flow-entities.service';
 import { FlowSettingsService } from '../services/flow-settings.service';
 import { KeyboardService } from '../services/keyboard.service';
-import { RootSvgReferenceDirective } from './reference.directive';
 import { RootPointerDirective } from './root-pointer.directive';
 import { SpacePointContextDirective } from './space-point-context.directive';
 import { NodeModel } from '../models/node.model';
@@ -24,7 +23,6 @@ export class SelectionBoxContextDirective {
   private flowSettingsService = inject(FlowSettingsService);
   private keyboardService = inject(KeyboardService);
   private spacePointContext = inject(SpacePointContextDirective);
-  private rootSvg = inject(RootSvgReferenceDirective).element;
   private rootPointer = inject(RootPointerDirective);
 
   public model = new SelectionBoxModel();
@@ -36,6 +34,7 @@ export class SelectionBoxContextDirective {
       filter(({ target }) => !target?.closest('.vflow-node') && !target?.closest('.selectable')),
       tap(({ x, y, originalEvent }) => {
         originalEvent.preventDefault();
+        this.clearPreselection();
         const point = this.documentPointToFlowPoint({ x, y });
         this.model.setStart(point);
       }),
@@ -49,6 +48,7 @@ export class SelectionBoxContextDirective {
       tap((event) => {
         const point = this.documentPointToFlowPoint({ x: event.x, y: event.y });
         this.model.setEnd(point);
+        this.updatePreselection();
       }),
       takeUntilDestroyed(),
     )
@@ -65,6 +65,7 @@ export class SelectionBoxContextDirective {
   private finish() {
     const rect = this.getSelectionRect();
     if (!rect) {
+      this.clearPreselection();
       this.model.reset();
       return;
     }
@@ -77,18 +78,10 @@ export class SelectionBoxContextDirective {
       entities.forEach((entity) => entity.selected.set(false));
     }
 
-    nodes.forEach((node) => {
-      if (this.isNodeInside(node, rect)) {
-        node.selected.set(true);
-      }
-    });
+    nodes.filter((node) => node.preselected()).forEach((node) => node.selected.set(true));
+    edges.filter((edge) => edge.preselected()).forEach((edge) => edge.selected.set(true));
 
-    edges.forEach((edge) => {
-      if (this.isEdgeInside(edge, rect)) {
-        edge.selected.set(true);
-      }
-    });
-
+    this.clearPreselection();
     this.model.reset();
   }
 
@@ -110,6 +103,27 @@ export class SelectionBoxContextDirective {
       width,
       height,
     };
+  }
+
+  private updatePreselection() {
+    const rect = this.getSelectionRect();
+
+    if (!rect) {
+      this.clearPreselection();
+      return;
+    }
+
+    this.flowEntitiesService.nodes().forEach((node) => {
+      node.preselected.set(this.isNodeInside(node, rect));
+    });
+
+    this.flowEntitiesService.edges().forEach((edge) => {
+      edge.preselected.set(this.isEdgeInside(edge, rect));
+    });
+  }
+
+  private clearPreselection() {
+    this.flowEntitiesService.entities().forEach((entity) => entity.preselected.set(false));
   }
 
   private isNodeInside(node: NodeModel, rect: Rect) {

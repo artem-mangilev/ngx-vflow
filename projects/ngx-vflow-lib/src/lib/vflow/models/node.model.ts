@@ -49,6 +49,7 @@ export class NodeModel<T = unknown>
 
   public selected = signal(false);
   public selected$: Observable<boolean>;
+  public preselected = signal(false);
 
   public preview = signal<NodePreview>({ style: {} });
 
@@ -204,6 +205,7 @@ export class NodeModel<T = unknown>
           node: rawNode,
           data: rawNode.data ?? signal(NODE_DEFAULTS.data as T),
           selected: this.selected.asReadonly(),
+          preselected: this.preselected.asReadonly(),
           shouldLoad: this.shouldLoad,
         },
       };
@@ -215,6 +217,7 @@ export class NodeModel<T = unknown>
           node: rawNode,
           data: rawNode.data ?? signal(NODE_DEFAULTS.data as T),
           selected: this.selected.asReadonly(),
+          preselected: this.preselected.asReadonly(),
           width: this.width.asReadonly(),
           height: this.height.asReadonly(),
           shouldLoad: this.shouldLoad,
@@ -228,6 +231,7 @@ export class NodeModel<T = unknown>
           node: rawNode,
           data: rawNode.data ?? signal(NODE_DEFAULTS.data as T),
           selected: this.selected.asReadonly(),
+          preselected: this.preselected.asReadonly(),
           width: this.width.asReadonly(),
           height: this.height.asReadonly(),
           shouldLoad: this.shouldLoad,

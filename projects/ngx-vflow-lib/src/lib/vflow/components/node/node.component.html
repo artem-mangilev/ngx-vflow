@@ -8,6 +8,7 @@
     <default-node
       nodeHandlesController
       [selected]="model().selected()"
+      [preselected]="model().preselected()"
       [style.width]="model().styleWidth()"
       [style.height]="model().styleHeight()"
       [style.max-width]="model().styleWidth()"
@@ -84,6 +85,7 @@
     [gap]="3"
     [resizerColor]="model().color()"
     [class.default-group-node_selected]="model().selected()"
+    [class.default-group-node_preselected]="model().preselected()"
     [attr.width]="model().width()"
     [attr.height]="model().height()"
     [style.stroke]="model().color()"

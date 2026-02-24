@@ -14,6 +14,7 @@ export interface EdgeContext {
     markerStart: Signal<string>;
     markerEnd: Signal<string>;
     selected: Signal<boolean>;
+    preselected: Signal<boolean>;
     shouldLoad: Signal<boolean>;
   };
 }
@@ -23,6 +24,7 @@ export interface NodeContext {
     node: HtmlTemplateNode;
     data: Signal<any>;
     selected: Signal<boolean>;
+    preselected: Signal<boolean>;
     shouldLoad: Signal<boolean>;
   };
 }
@@ -32,6 +34,7 @@ export interface SvgNodeContext {
     node: SvgTemplateNode;
     data: Signal<any>;
     selected: Signal<boolean>;
+    preselected: Signal<boolean>;
     width: Signal<number>;
     height: Signal<number>;
     shouldLoad: Signal<boolean>;
@@ -43,6 +46,7 @@ export interface GroupNodeContext {
     node: TemplateGroupNode;
     data: Signal<any>;
     selected: Signal<boolean>;
+    preselected: Signal<boolean>;
     width: Signal<number>;
     height: Signal<number>;
     shouldLoad: Signal<boolean>;
