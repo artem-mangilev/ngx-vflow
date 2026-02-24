@@ -1,5 +1,6 @@
 import { Rect } from '../interfaces/rect';
 import { ViewportState } from '../interfaces/viewport.interface';
+import { rectsIntersect } from './rect';
 
 export function getViewportForBounds(
   bounds: Rect,
@@ -56,13 +57,5 @@ export function getViewportBounds(viewport: ViewportState, flowWidth: number, fl
 export function isRectInViewport(rect: Rect, viewport: ViewportState, flowWidth: number, flowHeight: number): boolean {
   const viewportBounds = getViewportBounds(viewport, flowWidth, flowHeight);
 
-  // Check if rectangles intersect using standard rectangle intersection test
-  // No intersection if: rect is completely to the left, right, above, or below the viewport
-  const isNotIntersecting =
-    rect.x + rect.width < viewportBounds.x || // Rect is completely to the left
-    rect.x > viewportBounds.x + viewportBounds.width || // Rect is completely to the right
-    rect.y + rect.height < viewportBounds.y || // Rect is completely above
-    rect.y > viewportBounds.y + viewportBounds.height; // Rect is completely below
-
-  return !isNotIntersecting;
+  return rectsIntersect(rect, viewportBounds);
 }

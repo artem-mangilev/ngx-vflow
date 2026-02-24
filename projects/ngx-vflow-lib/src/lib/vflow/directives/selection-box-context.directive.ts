@@ -11,6 +11,7 @@ import { NodeModel } from '../models/node.model';
 import { EdgeModel } from '../models/edge.model';
 import { Point } from '../interfaces/point.interface';
 import { Rect } from '../interfaces/rect';
+import { rectContains } from '../utils/rect';
 
 const minSelectionSize = 2;
 
@@ -129,7 +130,7 @@ export class SelectionBoxContextDirective {
   private isNodeInside(node: NodeModel, rect: Rect) {
     const nodePoint = node.globalPoint();
 
-    return this.isRectInside(
+    return rectContains(
       {
         x: nodePoint.x,
         y: nodePoint.y,
@@ -155,15 +156,6 @@ export class SelectionBoxContextDirective {
       height: Math.abs(target.y - source.y),
     };
 
-    return this.isRectInside(edgeRect, rect);
-  }
-
-  private isRectInside(inner: Rect, outer: Rect) {
-    return (
-      inner.x >= outer.x &&
-      inner.y >= outer.y &&
-      inner.x + inner.width <= outer.x + outer.width &&
-      inner.y + inner.height <= outer.y + outer.height
-    );
+    return rectContains(edgeRect, rect);
   }
 }
