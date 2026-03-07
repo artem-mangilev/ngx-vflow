@@ -115,8 +115,24 @@ export class DraggableService {
           .nodes()
           // selected draggable nodes (with current node)
           .filter((node) => node.selected() && node.draggable())
+          // do not drag descendants if selected ancestor is already dragged
+          .filter((node) => !this.hasSelectedDraggableAncestor(node))
       : // we only can move current node if it's not selected
         [model];
+  }
+
+  private hasSelectedDraggableAncestor(node: NodeModel) {
+    let parent = node.parent();
+
+    while (parent) {
+      if (parent.selected() && parent.draggable()) {
+        return true;
+      }
+
+      parent = parent.parent();
+    }
+
+    return false;
   }
 
   /**
