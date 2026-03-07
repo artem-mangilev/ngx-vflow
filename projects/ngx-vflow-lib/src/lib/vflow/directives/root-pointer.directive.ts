@@ -98,7 +98,13 @@ export class RootPointerDirective {
     share(),
   ) satisfies Observable<Point>;
 
-  public documentPointerEnd$ = merge(fromEvent(document, 'mouseup'), fromEvent(document, 'touchend')).pipe(share());
+  public documentMouseMovement$ = fromEvent<MouseEvent>(document, 'mousemove').pipe(share());
+
+  public documentMouseUp$ = fromEvent<MouseEvent>(document, 'mouseup').pipe(share());
+
+  public documentTouchEnd$ = fromEvent<TouchEvent>(document, 'touchend').pipe(share());
+
+  public documentPointerEnd$ = merge(this.documentMouseUp$, this.documentTouchEnd$).pipe(share());
 
   /**
    * We should know when user started a touch in order to not
