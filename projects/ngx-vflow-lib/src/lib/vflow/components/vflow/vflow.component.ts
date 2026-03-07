@@ -240,6 +240,7 @@ export class VflowComponent {
    * Selection box behavior settings
    * - mode: 'full' selects only fully enclosed entities
    * - mode: 'partial' selects entities that intersect selection box
+   * - color: stroke/fill color for selection area (fill uses opacity)
    */
   @Input()
   public set selectionBox(value: SelectionBoxSettings) {

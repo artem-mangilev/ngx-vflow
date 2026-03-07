@@ -41,5 +41,6 @@ export class FlowSettingsService {
 
   public selectionBox = signal<Required<SelectionBoxSettings>>({
     mode: 'full',
+    color: '#bbe1fa',
   });
 }

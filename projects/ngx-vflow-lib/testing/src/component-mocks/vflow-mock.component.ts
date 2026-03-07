@@ -165,6 +165,7 @@ export class VflowMockComponent implements AsInterface<VflowComponent>, OnInit {
   @Input()
   public readonly selectionBox: SelectionBoxSettings = {
     mode: 'full',
+    color: '#bbe1fa',
   };
 
   @Input()
