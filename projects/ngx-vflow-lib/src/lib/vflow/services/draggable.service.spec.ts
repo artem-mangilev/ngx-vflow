@@ -8,10 +8,17 @@ import { ViewportService } from './viewport.service';
 import { NodeRenderingService } from './node-rendering.service';
 import { NodeModel } from '../models/node.model';
 import { createNode } from '../interfaces/node.interface';
+import { KeyboardService } from './keyboard.service';
 
 describe('DraggableService', () => {
   let service: DraggableService;
   let entitiesService: FlowEntitiesService;
+  const keyboardServiceMock = {
+    selectionActive: false,
+    isActiveAction(action: 'selection' | 'multiSelection') {
+      return action === 'selection' ? this.selectionActive : false;
+    },
+  };
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -22,29 +29,41 @@ describe('DraggableService', () => {
         FlowStatusService,
         ViewportService,
         NodeRenderingService,
+        {
+          provide: KeyboardService,
+          useValue: keyboardServiceMock,
+        },
         provideExperimentalZonelessChangeDetection(),
       ],
     });
 
     service = TestBed.inject(DraggableService);
     entitiesService = TestBed.inject(FlowEntitiesService);
+    keyboardServiceMock.selectionActive = false;
   });
 
-  function createModel(params: { id: string; selected?: boolean; draggable?: boolean; parentId?: string }) {
-    const model = TestBed.runInInjectionContext(
-      () =>
-        new NodeModel(
-          createNode({
-            id: params.id,
-            type: 'default',
-            point: { x: 0, y: 0 },
-            text: params.id,
-            selected: params.selected ?? false,
-            draggable: params.draggable ?? true,
-            parentId: params.parentId,
-          }),
-        ),
-    );
+  function createModel(params: {
+    id: string;
+    type?: 'default' | 'default-group';
+    selected?: boolean;
+    draggable?: boolean;
+    parentId?: string;
+  }) {
+    const type = params.type ?? 'default';
+    const nodeConfig: any = {
+      id: params.id,
+      type,
+      point: { x: 0, y: 0 },
+      selected: params.selected ?? false,
+      draggable: params.draggable ?? true,
+      parentId: params.parentId,
+    };
+
+    if (type === 'default') {
+      nodeConfig.text = params.id;
+    }
+
+    const model = TestBed.runInInjectionContext(() => new NodeModel(createNode(nodeConfig)));
 
     entitiesService.nodes.update((nodes) => [...nodes, model]);
 
@@ -87,5 +106,25 @@ describe('DraggableService', () => {
     const dragNodes = (service as any).getDragNodes(nodeA) as NodeModel[];
 
     expect(dragNodes).toEqual([nodeA, nodeB]);
+  });
+
+  it('should block group drag when selection shortcut is active', () => {
+    const group = createModel({ id: 'group', type: 'default-group' });
+    const dragFilter = (service as any).getDragBehavior(group).filter();
+    const target = document.createElement('div');
+
+    keyboardServiceMock.selectionActive = true;
+
+    expect(dragFilter({ target } as unknown as Event)).toBe(false);
+  });
+
+  it('should keep regular node drag available when selection shortcut is active', () => {
+    const node = createModel({ id: 'node' });
+    const dragFilter = (service as any).getDragBehavior(node).filter();
+    const target = document.createElement('div');
+
+    keyboardServiceMock.selectionActive = true;
+
+    expect(dragFilter({ target } as unknown as Event)).toBe(true);
   });
 });

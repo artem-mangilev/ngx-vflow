@@ -12,6 +12,7 @@ import { EdgeModel } from '../models/edge.model';
 import { Point } from '../interfaces/point.interface';
 import { Rect } from '../interfaces/rect';
 import { rectContains } from '../utils/rect';
+import { FlowStatusService } from '../services/flow-status.service';
 
 const minSelectionSize = 2;
 
@@ -25,6 +26,7 @@ export class SelectionBoxContextDirective {
   private keyboardService = inject(KeyboardService);
   private spacePointContext = inject(SpacePointContextDirective);
   private rootPointer = inject(RootPointerDirective);
+  private flowStatusService = inject(FlowStatusService);
 
   public model = new SelectionBoxModel();
 
@@ -32,7 +34,6 @@ export class SelectionBoxContextDirective {
     .pipe(
       filter(() => this.flowSettingsService.entitiesSelectable()),
       filter(() => this.keyboardService.isActiveAction('selection')),
-      filter(({ target }) => !target?.closest('.vflow-node') && !target?.closest('.selectable')),
       tap(({ x, y, originalEvent }) => {
         originalEvent.preventDefault();
         this.clearPreselection();
@@ -59,6 +60,11 @@ export class SelectionBoxContextDirective {
     .pipe(
       filter(() => this.model.active()),
       tap(() => this.finish()),
+      tap(() => {
+        this.flowStatusService.setSelectionBoxEndStatus();
+
+        setTimeout(() => this.flowStatusService.setIdleStatus());
+      }),
       takeUntilDestroyed(),
     )
     .subscribe();
