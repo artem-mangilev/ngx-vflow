@@ -28,6 +28,7 @@ import {
   DEFAULT_OPTIMIZATION,
   AlignmentHelperSettings,
   SelectionMode,
+  SelectionBoxSettings,
 } from 'ngx-vflow';
 import { toObservable } from '@angular/core/rxjs-interop';
 import {
@@ -160,6 +161,11 @@ export class VflowMockComponent implements AsInterface<VflowComponent>, OnInit {
 
   @Input()
   public readonly selectionMode: SelectionMode = 'default';
+
+  @Input()
+  public readonly selectionBox: SelectionBoxSettings = {
+    mode: 'full',
+  };
 
   @Input()
   public readonly keyboardShortcuts: KeyboardShortcuts = {

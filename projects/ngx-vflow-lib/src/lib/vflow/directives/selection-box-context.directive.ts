@@ -11,8 +11,9 @@ import { NodeModel } from '../models/node.model';
 import { EdgeModel } from '../models/edge.model';
 import { Point } from '../interfaces/point.interface';
 import { Rect } from '../interfaces/rect';
-import { rectContains } from '../utils/rect';
+import { isPointInRect, rectContains, rectsIntersect } from '../utils/rect';
 import { FlowStatusService } from '../services/flow-status.service';
+import { nodeToRect } from '../utils/nodes';
 
 const minSelectionSize = 2;
 
@@ -134,34 +135,32 @@ export class SelectionBoxContextDirective {
   }
 
   private isNodeInside(node: NodeModel, rect: Rect) {
-    const nodePoint = node.globalPoint();
+    const nodeRect = nodeToRect(node);
+    const mode = this.flowSettingsService.selectionBox().mode;
 
-    return rectContains(
-      {
-        x: nodePoint.x,
-        y: nodePoint.y,
-        width: node.width(),
-        height: node.height(),
-      },
-      rect,
-    );
+    if (mode === 'partial') {
+      return rectsIntersect(nodeRect, rect);
+    }
+
+    return rectContains(nodeRect, rect);
   }
 
   private isEdgeInside(edge: EdgeModel, rect: Rect) {
     const source = edge.sourceHandle()?.pointAbsolute();
     const target = edge.targetHandle()?.pointAbsolute();
+    const mode = this.flowSettingsService.selectionBox().mode;
 
     if (!source || !target) {
       return false;
     }
 
-    const edgeRect: Rect = {
-      x: Math.min(source.x, target.x),
-      y: Math.min(source.y, target.y),
-      width: Math.abs(target.x - source.x),
-      height: Math.abs(target.y - source.y),
-    };
+    const isSourceInside = isPointInRect(source, rect);
+    const isTargetInside = isPointInRect(target, rect);
 
-    return rectContains(edgeRect, rect);
+    if (mode === 'partial') {
+      return isSourceInside || isTargetInside;
+    }
+
+    return isSourceInside && isTargetInside;
   }
 }
