@@ -13,7 +13,7 @@ import { Edge, Node, Vflow } from 'ngx-vflow';
         [style.stroke]="'red'"
         [style.fill]="'red'"
         [style.fill-opacity]="0.05"
-        [style.stroke-width]="ctx.selected() ? 3 : 1">
+        [style.stroke-width]="ctx.selected() || ctx.preselected() ? 3 : 1">
         <handle type="source" position="right" />
       </svg:rect>
     </ng-template>
