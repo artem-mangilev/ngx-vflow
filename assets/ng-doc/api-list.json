@@ -348,6 +348,11 @@
         "name": "AlignmentHelperSettings"
       },
       {
+        "route": "/api/interfaces/ngx-vflow/SelectionBoxSettings",
+        "type": "Interface",
+        "name": "SelectionBoxSettings"
+      },
+      {
         "route": "/api/type-aliases/ngx-vflow/NodeChange",
         "type": "TypeAlias",
         "name": "NodeChange"
@@ -451,6 +456,11 @@
         "route": "/api/type-aliases/ngx-vflow/SelectionMode",
         "type": "TypeAlias",
         "name": "SelectionMode"
+      },
+      {
+        "route": "/api/type-aliases/ngx-vflow/SelectionBoxMode",
+        "type": "TypeAlias",
+        "name": "SelectionBoxMode"
       },
       {
         "route": "/api/classes/ngx-vflow/VflowComponent",
