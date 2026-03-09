@@ -1,13 +1,13 @@
 import { NgDocPage } from '@ng-doc/core';
 import InteractionsCategory from '../../ng-doc.category';
-import { KeyboardShortcutsDemoComponent } from './demo/keyboard-shortcuts-demo.component';
+import { SelectionBoxDemoComponent } from './demo/selection-box-demo.component';
 
 const TestPage: NgDocPage = {
-  title: `Keyboard shortcuts`,
+  title: `Selection box`,
   mdFile: './index.md',
   category: InteractionsCategory,
-  demos: { KeyboardShortcutsDemoComponent },
-  order: 3,
+  demos: { SelectionBoxDemoComponent },
+  order: 2,
 };
 
 export default TestPage;

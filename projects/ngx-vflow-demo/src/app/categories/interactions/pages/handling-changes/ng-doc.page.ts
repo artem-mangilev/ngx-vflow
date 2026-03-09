@@ -8,7 +8,7 @@ const TestPage: NgDocPage = {
   mdFile: './index.md',
   category: InteractionsCategory,
   demos: { HandlingChangesDemoComponent, HandlingChangesFilteredDemoComponent },
-  order: 3,
+  order: 4,
 };
 
 export default TestPage;
