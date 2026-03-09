@@ -28,6 +28,14 @@ selectionBox: SelectionBoxSettings = {
 - If `multiSelection` is not active, previous selection is cleared before applying box selection results.
 - For edges, `full`/`partial` checks are based on source/target handle points, not by edge curve path intersection.
 
+# Template state access
+
+The `preselected` state is also exposed in rendering contexts, so custom templates can style the drag-preview state differently from the final selected state.
+
+- Node template contexts expose `preselected` together with `selected`.
+- The base custom node class `CustomNodeComponent` exposes the `preselected` signal for component-based custom nodes.
+- Edge template context also exposes `preselected`, so custom edges can render preselection state explicitly.
+
 In this demo, switch between `full` and `partial`, then hold `Shift` and drag over partially overlapping nodes and edge endpoints.
 
 {{ NgDocActions.demoPane("SelectionBoxDemoComponent") }}
