@@ -3,7 +3,7 @@
 
   <g background />
 
-  <svg:g mapContext spacePointContext autoPan>
+  <svg:g mapContext spacePointContext autoPan selectionBoxContext>
     @if (alignmentHelper(); as alignmentHelper) {
       @if (alignmentHelper === true) {
         <svg:g alignmentHelper />
@@ -63,6 +63,8 @@
           [attr.transform]="model.pointTransform()" />
       }
     }
+
+    <svg:g selectionBox />
   </svg:g>
 
   <!-- Minimap -->

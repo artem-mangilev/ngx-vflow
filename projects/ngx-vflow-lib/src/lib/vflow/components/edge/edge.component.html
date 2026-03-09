@@ -4,7 +4,8 @@
     [attr.d]="model().path().path"
     [attr.marker-start]="model().markerStartUrl()"
     [attr.marker-end]="model().markerEndUrl()"
-    [class.edge_selected]="model().selected()" />
+    [class.edge_selected]="model().selected()"
+    [class.edge_preselected]="model().preselected()" />
 
   <svg:path class="interactive-edge" [attr.d]="model().path().path" (click)="select(); pull()" />
 }

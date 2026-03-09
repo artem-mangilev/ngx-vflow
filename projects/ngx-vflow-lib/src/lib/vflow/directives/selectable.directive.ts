@@ -8,6 +8,7 @@ import { FlowSettingsService } from '../services/flow-settings.service';
 import { fromEvent } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { FlowStatusService, isSelectionBoxEndStatus } from '../services/flow-status.service';
 
 @Directive({
   standalone: true,
@@ -18,6 +19,7 @@ export class SelectableDirective {
   private selectionService = inject(SelectionService);
   private parentEdge = inject(EdgeComponent, { optional: true });
   private parentNode = inject(NodeComponent, { optional: true });
+  private flowStatusService = inject(FlowStatusService);
 
   private host = inject<ElementRef<Element>>(ElementRef);
 
@@ -30,6 +32,12 @@ export class SelectableDirective {
 
   private select() {
     const entity = this.entity();
+
+    // do not select entity if selection is performed by selection box
+    if (isSelectionBoxEndStatus(this.flowStatusService.status())) {
+      return;
+    }
+
     if (entity && this.flowSettingsService.entitiesSelectable()) {
       this.selectionService.select(entity);
     }

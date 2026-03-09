@@ -2,6 +2,7 @@ import { Injectable, WritableSignal, signal } from '@angular/core';
 import { Background } from '../types/background.type';
 import { DEFAULT_OPTIMIZATION, Optimization } from '../interfaces/optimization.interface';
 import { SelectionMode } from '../types/selection-mode.type';
+import { SelectionBoxSettings } from '../interfaces/selection-box-settings.interface';
 
 @Injectable()
 export class FlowSettingsService {
@@ -37,4 +38,9 @@ export class FlowSettingsService {
   public optimization = signal<Required<Optimization>>(DEFAULT_OPTIMIZATION);
 
   public selectionMode = signal<SelectionMode>('default');
+
+  public selectionBox = signal<Required<SelectionBoxSettings>>({
+    mode: 'full',
+    color: '#bbe1fa',
+  });
 }

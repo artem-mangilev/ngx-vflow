@@ -16,6 +16,7 @@ import { KeyboardShortcuts, Node, Vflow } from 'ngx-vflow';
 })
 export class KeyboardShortcutsDemoComponent {
   public shortcuts: KeyboardShortcuts = {
+    selection: ['AltLeft', 'AltRight'],
     multiSelection: ['ShiftLeft', 'ShiftRight'],
   };
 

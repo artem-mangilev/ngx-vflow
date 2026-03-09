@@ -1,5 +1,6 @@
 import { SpacePoint, Point } from '../interfaces/point.interface';
 import { NodeModel } from '../models/node.model';
+import { isPointInRect } from './rect';
 
 /**
  * @todo handle regular nodes
@@ -13,8 +14,9 @@ export function getSpacePoints(point: Point, groups: NodeModel[]): SpacePoint[] 
 
   for (const group of groups) {
     const { x, y } = group.globalPoint();
+    const rect = { x, y, width: group.width(), height: group.height() };
 
-    if (point.x >= x && point.x <= x + group.width() && point.y >= y && point.y <= y + group.height()) {
+    if (isPointInRect(point, rect)) {
       result.push({
         x: point.x - x,
         y: point.y - y,

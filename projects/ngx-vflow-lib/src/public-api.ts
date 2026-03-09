@@ -18,6 +18,7 @@ export * from './lib/vflow/interfaces/intersecting-nodes-options.interface';
 export * from './lib/vflow/interfaces/curve-factory.interface';
 export * from './lib/vflow/interfaces/node-preview.interface';
 export * from './lib/vflow/interfaces/alignment-helper-settings.interface';
+export * from './lib/vflow/interfaces/selection-box-settings.interface';
 export {
   ConnectEndEvent,
   ConnectStartEvent,
@@ -34,6 +35,7 @@ export * from './lib/vflow/types/background.type';
 export * from './lib/vflow/types/connection-mode.type';
 export * from './lib/vflow/types/keyboard-action.type';
 export * from './lib/vflow/types/selection-mode.type';
+export * from './lib/vflow/types/selection-box-mode.type';
 
 // Components
 export * from './lib/vflow/components/vflow/vflow.component';

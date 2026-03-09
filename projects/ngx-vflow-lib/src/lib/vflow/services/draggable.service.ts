@@ -12,6 +12,8 @@ import { ViewportService } from './viewport.service';
 import { toObservable } from '@angular/core/rxjs-interop';
 import type { Subscription } from 'rxjs';
 import { pairwise, filter, skip } from 'rxjs/operators';
+import { KeyboardService } from './keyboard.service';
+import { isGroupNode } from '../utils/is-group-node';
 
 type DragEvent = D3DragEvent<Element, unknown, unknown>;
 
@@ -21,6 +23,7 @@ export class DraggableService {
   private settingsService = inject(FlowSettingsService);
   private flowStatusService = inject(FlowStatusService);
   private viewportService = inject(ViewportService);
+  private keyboardService = inject(KeyboardService);
   private injector = inject(Injector);
 
   /**
@@ -64,6 +67,11 @@ export class DraggableService {
     let moveNodesOnAutoPanSub: Subscription | null = null;
 
     const filterCondition = (event: Event) => {
+      // Do not drag group node if selection occurs inside group node (by keyboard)
+      if (isGroupNode(model) && this.keyboardService.isActiveAction('selection')) {
+        return false;
+      }
+
       // if there is at least one drag handle, we should check if we are dragging it
       if (model.dragHandlesCount()) {
         return !!(event.target as Element).closest('.vflow-drag-handle');
@@ -115,8 +123,24 @@ export class DraggableService {
           .nodes()
           // selected draggable nodes (with current node)
           .filter((node) => node.selected() && node.draggable())
+          // do not drag descendants if selected ancestor is already dragged
+          .filter((node) => !this.hasSelectedDraggableAncestor(node))
       : // we only can move current node if it's not selected
         [model];
+  }
+
+  private hasSelectedDraggableAncestor(node: NodeModel) {
+    let parent = node.parent();
+
+    while (parent) {
+      if (parent.selected() && parent.draggable()) {
+        return true;
+      }
+
+      parent = parent.parent();
+    }
+
+    return false;
   }
 
   /**

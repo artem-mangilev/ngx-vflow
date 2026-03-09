@@ -22,6 +22,11 @@ export abstract class CustomNodeComponent<T = any> implements OnInit {
   public selected = this.nodeService.model()!.selected;
 
   /**
+   * Signal with preselected state of node
+   */
+  public preselected = this.nodeService.model()!.preselected.asReadonly();
+
+  /**
    * Signal with data of node
    *
    * TODO: decide whether to make it a computed or keep as linked signal

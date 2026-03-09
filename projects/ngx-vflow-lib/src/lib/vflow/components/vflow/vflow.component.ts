@@ -82,6 +82,9 @@ import { NodeDragControllerDirective } from '../../directives/node-drag-controll
 import { HtmlElementCacheService } from '../../services/html-element-cache.service';
 import { SvgGraphicElementCacheService } from '../../services/svg-graphic-element-cache.service';
 import { BasicElementCacheService } from '../../services/basic-element-cache.service';
+import { SelectionBoxComponent } from '../selection-box/selection-box.component';
+import { SelectionBoxContextDirective } from '../../directives/selection-box-context.directive';
+import { SelectionBoxSettings } from '../../interfaces/selection-box-settings.interface';
 
 const changesControllerHostDirective = {
   directive: ChangesControllerDirective,
@@ -148,6 +151,8 @@ const nodeDragControllerHostDirective = {
     NgTemplateOutlet,
     PreviewFlowComponent,
     AlignmentHelperComponent,
+    SelectionBoxComponent,
+    SelectionBoxContextDirective,
     AutoPanDirective,
   ],
 })
@@ -229,6 +234,20 @@ export class VflowComponent {
   @Input()
   public set selectionMode(value: SelectionMode) {
     this.flowSettingsService.selectionMode.set(value);
+  }
+
+  /**
+   * Selection box behavior settings
+   * - mode: 'full' selects only fully enclosed entities
+   * - mode: 'partial' selects entities that intersect selection box
+   * - color: stroke/fill color for selection area (fill uses opacity)
+   */
+  @Input()
+  public set selectionBox(value: SelectionBoxSettings) {
+    this.flowSettingsService.selectionBox.update((selectionBox) => ({
+      ...selectionBox,
+      ...value,
+    }));
   }
 
   @Input()

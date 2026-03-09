@@ -13,7 +13,7 @@ import {
 } from '@angular/core';
 import { DraggableService } from '../../services/draggable.service';
 import { NodeModel } from '../../models/node.model';
-import { FlowStatusService } from '../../services/flow-status.service';
+import { FlowStatusService, isSelectionBoxEndStatus } from '../../services/flow-status.service';
 import { HandleService } from '../../services/handle.service';
 import { HandleModel } from '../../models/handle.model';
 import { NodeRenderingService } from '../../services/node-rendering.service';
@@ -141,6 +141,11 @@ export class NodeComponent implements OnInit, OnDestroy {
   }
 
   protected selectNode() {
+    // do not select node if selection is performed by selection box
+    if (isSelectionBoxEndStatus(this.flowStatusService.status())) {
+      return;
+    }
+
     if (this.flowSettingsService.entitiesSelectable()) {
       this.selectionService.select(this.model());
     }

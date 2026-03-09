@@ -1,22 +1,26 @@
 import { Injectable, signal, WritableSignal } from '@angular/core';
 import { KeyboardAction, KeyboardShortcuts } from '../types/keyboard-action.type';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
-import { fromEvent, merge } from 'rxjs';
+import { BehaviorSubject, fromEvent, merge } from 'rxjs';
 import { switchMap, tap } from 'rxjs/operators';
 import { getOS } from '../utils/get-os';
 
 @Injectable()
 export class KeyboardService {
   private actions: WritableSignal<KeyboardShortcuts> = signal({
+    selection: ['ShiftLeft', 'ShiftRight'],
     multiSelection: [
       getOS() === 'macos' ? 'MetaLeft' : 'ControlLeft',
       getOS() === 'macos' ? 'MetaRight' : 'ControlRight',
     ],
   });
 
-  private actionsActive: Record<KeyboardAction, boolean> = {
+  #actionsActive$ = new BehaviorSubject<Record<KeyboardAction, boolean>>({
     multiSelection: false,
-  };
+    selection: false,
+  });
+
+  actionsActive$ = this.#actionsActive$.asObservable();
 
   constructor() {
     toObservable(this.actions)
@@ -29,7 +33,10 @@ export class KeyboardService {
                   const keyCodes = this.actions()[action as KeyboardAction] ?? [];
 
                   if (keyCodes.includes(event.code)) {
-                    this.actionsActive[action as KeyboardAction] = true;
+                    this.#actionsActive$.next({
+                      ...this.#actionsActive$.value,
+                      [action]: true,
+                    });
                   }
                 }
               }),
@@ -41,7 +48,10 @@ export class KeyboardService {
                   const keyCodes = this.actions()[action as KeyboardAction] ?? [];
 
                   if (keyCodes.includes(event.code)) {
-                    this.actionsActive[action as KeyboardAction] = false;
+                    this.#actionsActive$.next({
+                      ...this.#actionsActive$.value,
+                      [action]: false,
+                    });
                   }
                 }
               }),
@@ -58,6 +68,6 @@ export class KeyboardService {
   }
 
   public isActiveAction(action: KeyboardAction) {
-    return this.actionsActive[action];
+    return this.#actionsActive$.value[action];
   }
 }

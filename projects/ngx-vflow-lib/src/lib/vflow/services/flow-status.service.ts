@@ -98,6 +98,10 @@ export interface FlowStatusNodeDragEnd {
   };
 }
 
+export interface FlowStatusSelectionBoxEnd {
+  state: 'selection-box-end';
+}
+
 export type FlowStatus =
   | FlowStatusIdle
   | FlowStatusConnectionStart
@@ -112,7 +116,8 @@ export type FlowStatus =
   | FlowStatusReconnectionDropped
   | FlowStatusNodeDragStart
   | FlowStatusNodeDrag
-  | FlowStatusNodeDragEnd;
+  | FlowStatusNodeDragEnd
+  | FlowStatusSelectionBoxEnd;
 
 @Injectable()
 export class FlowStatusService {
@@ -223,6 +228,10 @@ export class FlowStatusService {
   public setNodeDragEndStatus(node: NodeModel) {
     this.status.set({ state: 'node-drag-end', payload: { node } });
   }
+
+  public setSelectionBoxEndStatus() {
+    this.status.set({ state: 'selection-box-end' });
+  }
 }
 
 export function isNodeDragStartStatus(params: FlowStatus): params is FlowStatusNodeDragStart {
@@ -235,4 +244,8 @@ export function isNodeDragStatus(params: FlowStatus): params is FlowStatusNodeDr
 
 export function isNodeDragEndStatus(params: FlowStatus): params is FlowStatusNodeDragEnd {
   return params.state === 'node-drag-end';
+}
+
+export function isSelectionBoxEndStatus(params: FlowStatus): params is FlowStatusSelectionBoxEnd {
+  return params.state === 'selection-box-end';
 }
