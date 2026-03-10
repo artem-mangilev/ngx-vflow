@@ -20,9 +20,12 @@ export class HandleService {
   private afService = inject(RequestAnimationFrameBatchingService);
 
   public readonly node = signal<NodeModel | null>(null);
+  private deleted = false;
 
   public createHandle(newHandle: HandleModel) {
     this.afService.batchAnimationFrame(() => {
+      if (this.deleted) return;
+
       const node = this.node();
       if (node) {
         node.handles.update((handles) => [...handles, newHandle]);
@@ -31,6 +34,7 @@ export class HandleService {
   }
 
   public destroyHandle(handleToDestoy: HandleModel) {
+    this.deleted = true;
     const node = this.node();
     if (node) {
       node.handles.update((handles) => handles.filter((handle) => handle !== handleToDestoy));
