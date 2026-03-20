@@ -18,7 +18,7 @@ export const EDGE_DEFAULTS = {
 };
 
 export type EdgeType = 'default' | 'template';
-export type Curve = 'straight' | 'bezier' | 'smooth-step' | 'step' | CurveFactory;
+export type Curve = 'straight' | 'bezier' | 'smooth-step' | 'step' | 'quadratic' | CurveFactory;
 
 export interface Edge<T = unknown> extends Connection {
   id: string;
