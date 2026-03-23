@@ -2,6 +2,9 @@ import { NgDocPage } from '@ng-doc/core';
 import WorkshopsCategory from '../ng-doc.category';
 import { ExpandCollapsePaidDemoComponent } from './demo/expand-collapse-paid-demo.component';
 
+/**
+ * @status:primary STUDIO
+ */
 const Page: NgDocPage = {
   title: `Expand Collapse`,
   mdFile: './index.md',
