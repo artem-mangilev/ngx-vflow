@@ -323,6 +323,22 @@ export class VflowComponent {
     models.forEach((model) => this.nodeRenderingService.pullNode(model));
   }
 
+  /**
+   * Enable canvas zoomable
+   */
+  @Input()
+  public set zoomable(value: boolean) {
+    this.flowSettingsService.zoomable.set(value);
+  }
+
+  /**
+   * Enable canvas dragable
+   */
+  @Input()
+  public set dragable(value: boolean) {
+    this.flowSettingsService.dragable.set(value);
+  }
+
   public alignmentHelper = input<AlignmentHelperSettings | boolean>(false);
 
   protected nodeModels = this.nodeRenderingService.nodes;

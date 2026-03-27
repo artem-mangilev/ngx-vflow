@@ -43,4 +43,8 @@ export class FlowSettingsService {
     mode: 'full',
     color: '#bbe1fa',
   });
+
+  public zoomable = signal(true);
+
+  public dragable = signal(true);
 }

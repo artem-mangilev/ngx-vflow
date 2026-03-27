@@ -115,6 +115,30 @@ export class MapContextDirective implements OnInit {
   };
 
   private filterCondition = (event: Event) => {
+    const isNotNode = (event.target as Element).closest('.vflow-node') === null;
+
+    if (!this.flowSettingsService.zoomable() && !this.flowSettingsService.dragable()) {
+      return false;
+    }
+
+    if (this.flowSettingsService.zoomable() && !this.flowSettingsService.dragable()) {
+      return (
+        event.type === 'wheel' ||
+        (isNotNode &&
+          event.type === 'touchstart' &&
+          (event as TouchEvent).touches.length === 2 &&
+          !this.keyboardService.isActiveAction('selection'))
+      );
+    }
+
+    if (!this.flowSettingsService.zoomable() && this.flowSettingsService.dragable()) {
+      return (
+        isNotNode &&
+        (event.type === 'mousedown' || (event.type === 'touchstart' && (event as TouchEvent).touches.length === 1)) &&
+        !this.keyboardService.isActiveAction('selection')
+      );
+    }
+
     if (event.type === 'mousedown' || event.type === 'touchstart') {
       if (this.keyboardService.isActiveAction('selection')) {
         return false;
