@@ -87,27 +87,36 @@ export class MapContextDirective implements OnInit {
   }
 
   private handleZoom = ({ transform }: ZoomEvent) => {
+    const newViewport = mapTransformToViewportState(transform);
     // update public signal for user to read
-    this.viewportService.readableViewport.set(mapTransformToViewportState(transform));
+    this.viewportService.readableViewport.set(newViewport);
 
     this.transform.set(transform.toString());
+
+    this.viewportService.triggerViewportChangeEvent('zoom', newViewport);
   };
 
   private handleZoomStart = ({ transform }: ZoomEvent) => {
+    const newViewport = mapTransformToViewportState(transform);
+
     this.viewportForSelection = {
-      start: mapTransformToViewportState(transform),
+      start: newViewport,
     };
+
+    this.viewportService.triggerViewportChangeEvent('start', newViewport);
   };
 
   private handleZoomEnd = ({ transform, sourceEvent }: ZoomEvent) => {
+    const newViewport = mapTransformToViewportState(transform);
+
     this.zone.run(() => {
       this.viewportForSelection = {
         ...this.viewportForSelection,
-        end: mapTransformToViewportState(transform),
+        end: newViewport,
         target: evTarget(sourceEvent),
       };
 
-      this.viewportService.triggerViewportChangeEvent('end');
+      this.viewportService.triggerViewportChangeEvent('end', newViewport);
 
       // TODO: maybe use triggerViewportChangeEvent instead of this method?
       this.selectionService.setViewport(this.viewportForSelection as ViewportForSelection);

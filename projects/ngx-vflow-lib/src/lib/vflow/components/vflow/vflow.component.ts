@@ -85,6 +85,7 @@ import { BasicElementCacheService } from '../../services/basic-element-cache.ser
 import { SelectionBoxComponent } from '../selection-box/selection-box.component';
 import { SelectionBoxContextDirective } from '../../directives/selection-box-context.directive';
 import { SelectionBoxSettings } from '../../interfaces/selection-box-settings.interface';
+import { ViewportChangesControllerDirective } from '../../directives/viewport-changes-controller.directive';
 
 const changesControllerHostDirective = {
   directive: ChangesControllerDirective,
@@ -106,6 +107,11 @@ const changesControllerHostDirective = {
 const nodeDragControllerHostDirective = {
   directive: NodeDragControllerDirective,
   outputs: ['nodeDragStart', 'nodeDrag', 'nodeDragEnd'],
+};
+
+const viewportChangesControllerHostDirective = {
+  directive: ViewportChangesControllerDirective,
+  outputs: ['viewportChanges', 'viewportChanges.start', 'viewportChanges.end'],
 };
 
 @Component({
@@ -135,7 +141,11 @@ const nodeDragControllerHostDirective = {
     SvgGraphicElementCacheService,
     RequestAnimationFrameBatchingService,
   ],
-  hostDirectives: [changesControllerHostDirective, nodeDragControllerHostDirective],
+  hostDirectives: [
+    changesControllerHostDirective,
+    nodeDragControllerHostDirective,
+    viewportChangesControllerHostDirective,
+  ],
   imports: [
     RootSvgReferenceDirective,
     RootSvgContextDirective,
