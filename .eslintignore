@@ -2,3 +2,4 @@ node_modules
 ng-doc
 dist
 .angular
+**/index.html
