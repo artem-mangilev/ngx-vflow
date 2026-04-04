@@ -127,4 +127,28 @@ describe('DraggableService', () => {
 
     expect(dragFilter({ target } as unknown as Event)).toBe(true);
   });
+
+  it('should reject drag for non-primary mouse buttons (d3-drag default)', () => {
+    const node = createModel({ id: 'node' });
+    const dragFilter = (service as any).getDragBehavior(node).filter();
+
+    expect(dragFilter(new MouseEvent('mousedown', { button: 1, bubbles: true, clientX: 0, clientY: 0 }))).toBe(false);
+    expect(dragFilter(new MouseEvent('mousedown', { button: 2, bubbles: true, clientX: 0, clientY: 0 }))).toBe(false);
+  });
+
+  it('should reject drag when ctrlKey is set (d3-drag default)', () => {
+    const node = createModel({ id: 'node' });
+    const dragFilter = (service as any).getDragBehavior(node).filter();
+
+    expect(
+      dragFilter(new MouseEvent('mousedown', { button: 0, ctrlKey: true, bubbles: true, clientX: 0, clientY: 0 })),
+    ).toBe(false);
+  });
+
+  it('should allow drag for primary mouse button', () => {
+    const node = createModel({ id: 'node' });
+    const dragFilter = (service as any).getDragBehavior(node).filter();
+
+    expect(dragFilter(new MouseEvent('mousedown', { button: 0, bubbles: true, clientX: 0, clientY: 0 }))).toBe(true);
+  });
 });

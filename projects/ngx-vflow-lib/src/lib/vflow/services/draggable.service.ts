@@ -72,6 +72,11 @@ export class DraggableService {
         return false;
       }
 
+      // Match d3-drag defaultFilter: primary button only, no ctrl+click (context menu on macOS)
+      if (event instanceof MouseEvent && (event.ctrlKey || event.button !== 0)) {
+        return false;
+      }
+
       // if there is at least one drag handle, we should check if we are dragging it
       if (model.dragHandlesCount()) {
         return !!(event.target as Element).closest('.vflow-drag-handle');
@@ -183,7 +188,9 @@ export class DraggableService {
       .pipe(
         skip(1), // Skip initial value
         pairwise(),
-        filter(([prev, next]) => prev.x !== next.x || prev.y !== next.y), // Only translate changes
+        filter(
+          ([prev, next]) => prev.zoom === next.zoom && (prev.x !== next.x || prev.y !== next.y), // Pan only, not wheel zoom (x/y+k change together)
+        ),
       )
       .subscribe(([prev, next]) => {
         const dx = next.x - prev.x;
