@@ -59,6 +59,16 @@
             "inlineStyleLanguage": "scss",
             "assets": [
               "projects/ngx-vflow-demo/src/favicon.ico",
+              {
+                "glob": "robots.txt",
+                "input": "projects/ngx-vflow-demo/src/assets",
+                "output": "/"
+              },
+              {
+                "glob": "sitemap.xml",
+                "input": "projects/ngx-vflow-demo/src/assets",
+                "output": "/"
+              },
               "projects/ngx-vflow-demo/src/assets",
               {
                 "glob": "**/*",
