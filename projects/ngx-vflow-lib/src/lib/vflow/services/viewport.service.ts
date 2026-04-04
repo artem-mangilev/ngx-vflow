@@ -1,6 +1,6 @@
 import { Injectable, WritableSignal, inject, signal } from '@angular/core';
 import { ViewportState, WritableViewport } from '../interfaces/viewport.interface';
-import { getNodesBounds } from '../utils/nodes';
+import { getNodesFlowBounds } from '../utils/nodes';
 import { FlowEntitiesService } from './flow-entities.service';
 import { getViewportForBounds } from '../utils/viewport';
 import { FlowSettingsService } from './flow-settings.service';
@@ -47,7 +47,7 @@ export class ViewportService {
     const nodes = this.getBoundsNodes(options.nodes ?? []);
 
     const state = getViewportForBounds(
-      getNodesBounds(nodes),
+      getNodesFlowBounds(nodes),
       this.flowSettingsService.computedFlowWidth(),
       this.flowSettingsService.computedFlowHeight(),
       this.flowSettingsService.minZoom(),

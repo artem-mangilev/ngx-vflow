@@ -40,19 +40,23 @@ export class DraggableService {
    * Disable draggable behavior for element.
    *
    * @param element target element for toggling draggable
-   * @param model model with data for this element
    */
   public disable(element: Element) {
-    select(element).call(drag().on('drag', null));
+    this.clearDrag(element);
   }
 
   /**
-   * TODO: not shure if this work, need to check
-   *
-   * @param element
+   * Remove d3-drag listeners and inline styles it applied (so pointer events can reach root zoom).
    */
   public destroy(element: Element) {
-    select(element).on('.drag', null);
+    this.clearDrag(element);
+  }
+
+  private clearDrag(element: Element) {
+    const s = select(element);
+    s.on('.drag', null);
+    s.style('touch-action', null);
+    s.style('-webkit-tap-highlight-color', null);
   }
 
   /**
@@ -69,6 +73,11 @@ export class DraggableService {
     const filterCondition = (event: Event) => {
       // Do not drag group node if selection occurs inside group node (by keyboard)
       if (isGroupNode(model) && this.keyboardService.isActiveAction('selection')) {
+        return false;
+      }
+
+      // Match d3-drag defaultFilter: primary button only, no ctrl+click (context menu on macOS)
+      if (event instanceof MouseEvent && (event.ctrlKey || event.button !== 0)) {
         return false;
       }
 
@@ -183,7 +192,9 @@ export class DraggableService {
       .pipe(
         skip(1), // Skip initial value
         pairwise(),
-        filter(([prev, next]) => prev.x !== next.x || prev.y !== next.y), // Only translate changes
+        filter(
+          ([prev, next]) => prev.zoom === next.zoom && (prev.x !== next.x || prev.y !== next.y), // Pan only, not wheel zoom (x/y+k change together)
+        ),
       )
       .subscribe(([prev, next]) => {
         const dx = next.x - prev.x;

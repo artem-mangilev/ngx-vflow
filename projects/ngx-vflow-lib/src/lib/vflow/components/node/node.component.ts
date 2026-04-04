@@ -44,6 +44,8 @@ export type HandleState = 'valid' | 'invalid' | 'idle';
   providers: [HandleService, NodeAccessorService],
   host: {
     class: 'vflow-node',
+    '[class.vflow-node--undraggable]': 'hostUndraggable()',
+    '[class.vflow-node--drag-handles-only]': 'hostDragHandlesOnly()',
   },
   imports: [
     PointerDirective,
@@ -74,6 +76,12 @@ export class NodeComponent implements OnInit, OnDestroy {
   private connectionController = inject(ConnectionControllerDirective, { optional: true });
 
   public model = input.required<NodeModel>();
+
+  protected readonly hostUndraggable = computed(() => !this.model().draggable());
+
+  protected readonly hostDragHandlesOnly = computed(
+    () => this.model().draggable() && this.model().dragHandlesCount() > 0,
+  );
 
   public nodeTemplate = input<TemplateRef<any>>();
 

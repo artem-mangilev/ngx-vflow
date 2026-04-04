@@ -8,6 +8,7 @@ import { ViewportState } from '../interfaces/viewport.interface';
 import { SelectionService, ViewportForSelection } from '../services/selection.service';
 import { FlowSettingsService } from '../services/flow-settings.service';
 import { KeyboardService } from '../services/keyboard.service';
+import { allowRootZoomForNodeTarget } from '../utils/allow-root-zoom-for-node-target';
 
 @Directive({
   standalone: true,
@@ -114,17 +115,8 @@ export class MapContextDirective implements OnInit {
     });
   };
 
-  private filterCondition = (event: Event) => {
-    if (event.type === 'mousedown' || event.type === 'touchstart') {
-      if (this.keyboardService.isActiveAction('selection')) {
-        return false;
-      }
-
-      return (event.target as Element).closest('.vflow-node') === null;
-    }
-
-    return true;
-  };
+  private filterCondition = (event: Event) =>
+    allowRootZoomForNodeTarget(event, this.keyboardService.isActiveAction('selection'));
 }
 
 const mapTransformToViewportState = (transform: ZoomTransform): ViewportState => ({

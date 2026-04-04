@@ -15,7 +15,7 @@ import { MinimapModel } from '../../models/minimap.model';
 import { NodeModel } from '../../models/node.model';
 import { FlowSettingsService } from '../../services/flow-settings.service';
 import { getViewportForBounds } from '../../utils/viewport';
-import { getNodesBounds } from '../../utils/nodes';
+import { getNodesFlowBounds } from '../../utils/nodes';
 import { ViewportService } from '../../services/viewport.service';
 import { DefaultNodeComponent } from '../../components/default-node/default-node.component';
 
@@ -122,7 +122,7 @@ export class MiniMapComponent implements OnInit {
     const nodes = this.entitiesService.nodes();
 
     return getViewportForBounds(
-      getNodesBounds(nodes),
+      getNodesFlowBounds(nodes),
       this.flowSettingsService.computedFlowWidth(),
       this.flowSettingsService.computedFlowHeight(),
       -Infinity,
