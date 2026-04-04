@@ -40,19 +40,23 @@ export class DraggableService {
    * Disable draggable behavior for element.
    *
    * @param element target element for toggling draggable
-   * @param model model with data for this element
    */
   public disable(element: Element) {
-    select(element).call(drag().on('drag', null));
+    this.clearDrag(element);
   }
 
   /**
-   * TODO: not shure if this work, need to check
-   *
-   * @param element
+   * Remove d3-drag listeners and inline styles it applied (so pointer events can reach root zoom).
    */
   public destroy(element: Element) {
-    select(element).on('.drag', null);
+    this.clearDrag(element);
+  }
+
+  private clearDrag(element: Element) {
+    const s = select(element);
+    s.on('.drag', null);
+    s.style('touch-action', null);
+    s.style('-webkit-tap-highlight-color', null);
   }
 
   /**
