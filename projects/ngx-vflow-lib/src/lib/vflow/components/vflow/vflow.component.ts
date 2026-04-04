@@ -451,9 +451,11 @@ export class VflowComponent {
   }
 
   /**
-   * Move to specified coordinate
+   * Sets the D3 zoom **translation** (`x`, `y`) while keeping the current zoom — the same meaning as
+   * `x` / `y` on the public {@link viewport} signal. This is not a node position in flow space; to
+   * center on a world point, use {@link fitView} or compute translate from flow coordinates and current `zoom`.
    *
-   * @param point point where to move
+   * @param point viewport translation `{ x, y }`
    */
   public panTo(point: Point): void {
     this.viewportService.writableViewport.set({

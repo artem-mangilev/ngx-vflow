@@ -7,6 +7,14 @@ export function getNodesBounds(nodes: NodeModel[]): Rect {
   return getBoundsOfRects(nodes.map((node) => nodeToLocalRect(node)));
 }
 
+/**
+ * Union of node rectangles in flow (world) space — same space as SVG transforms and viewport math.
+ * Use for fitView, minimap, etc. For bounds relative to a parent (e.g. children inside a group during resize), use {@link getNodesBounds}.
+ */
+export function getNodesFlowBounds(nodes: NodeModel[]): Rect {
+  return getBoundsOfRects(nodes.map((node) => nodeToRect(node)));
+}
+
 export function getIntesectingNodes(
   nodeId: string,
   nodes: NodeModel[],
