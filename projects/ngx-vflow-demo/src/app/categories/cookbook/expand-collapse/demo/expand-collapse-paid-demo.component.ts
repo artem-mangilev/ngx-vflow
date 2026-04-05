@@ -3,9 +3,7 @@ import { PaidIframeComponent } from '../../../../shared/components/paid-iframe/p
 
 @Component({
   template: `
-    <ngx-vflow-paid-iframe
-      src="https://vflow-studio.com/expand-collapse?showHeader=false"
-      title="Expand Collapse demo" />
+    <ngx-vflow-paid-iframe src="https://vflow-studio.com/embed/expand-collapse" title="Expand Collapse demo" />
   `,
   imports: [PaidIframeComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,

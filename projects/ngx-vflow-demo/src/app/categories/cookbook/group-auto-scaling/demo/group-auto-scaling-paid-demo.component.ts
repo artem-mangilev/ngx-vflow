@@ -3,9 +3,7 @@ import { PaidIframeComponent } from '../../../../shared/components/paid-iframe/p
 
 @Component({
   template: `
-    <ngx-vflow-paid-iframe
-      src="https://vflow-studio.com/group-auto-scaling?showHeader=false"
-      title="Group Auto Scaling demo" />
+    <ngx-vflow-paid-iframe src="https://vflow-studio.com/embed/group-auto-scaling" title="Group Auto Scaling demo" />
   `,
   imports: [PaidIframeComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,

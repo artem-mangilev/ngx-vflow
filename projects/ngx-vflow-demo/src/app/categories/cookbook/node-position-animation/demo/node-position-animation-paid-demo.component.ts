@@ -4,7 +4,7 @@ import { PaidIframeComponent } from '../../../../shared/components/paid-iframe/p
 @Component({
   template: `
     <ngx-vflow-paid-iframe
-      src="https://vflow-studio.com/node-position-animation?showHeader=false"
+      src="https://vflow-studio.com/embed/node-position-animation"
       title="Node Position Animation demo" />
   `,
   imports: [PaidIframeComponent],
