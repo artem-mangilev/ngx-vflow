@@ -25,7 +25,6 @@ import {
   NodeHtmlTemplateDirective,
   NodeSvgTemplateDirective,
 } from '../../directives/template.directive';
-import { addNodesToEdges } from '../../utils/add-nodes-to-edges';
 import { skip } from 'rxjs/operators';
 import { SpacePoint, Point } from '../../interfaces/point.interface';
 import { ViewportState } from '../../interfaces/viewport.interface';
@@ -314,10 +313,6 @@ export class VflowComponent {
       ReferenceIdentityChecker.nodes(newNodes, this.flowEntitiesService.nodes()),
     );
 
-    // TODO: consider calling only fo new nodes
-    // quick and dirty binding nodes to edges
-    addNodesToEdges(models, this.flowEntitiesService.edges());
-
     this.flowEntitiesService.nodes.set(models);
 
     models.forEach((model) => this.nodeRenderingService.pullNode(model));
@@ -337,9 +332,6 @@ export class VflowComponent {
     const newModels = runInInjectionContext(this.injector, () =>
       ReferenceIdentityChecker.edges(newEdges, this.flowEntitiesService.edges()),
     );
-
-    // quick and dirty binding nodes to edges
-    addNodesToEdges(this.flowEntitiesService.nodes(), newModels);
 
     this.flowEntitiesService.edges.set(newModels);
   }

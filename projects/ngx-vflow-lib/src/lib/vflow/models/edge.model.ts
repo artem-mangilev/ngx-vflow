@@ -2,7 +2,6 @@ import { computed, inject, signal } from '@angular/core';
 import { EdgeLabel, EdgeLabelPosition } from '../interfaces/edge-label.interface';
 import { Edge, Curve, EdgeType, EDGE_DEFAULTS } from '../interfaces/edge.interface';
 import { EdgeLabelModel } from './edge-label.model';
-import { NodeModel } from './node.model';
 import { straightPath } from '../math/edge-path/straigh-path';
 import { bezierPath } from '../math/edge-path/bezier-path';
 import { toObservable } from '@angular/core/rxjs-interop';
@@ -20,8 +19,9 @@ import { Marker } from '../interfaces/marker.interface';
 export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
   private readonly flowEntitiesService = inject(FlowEntitiesService);
 
-  public source = signal<NodeModel | undefined>(undefined);
-  public target = signal<NodeModel | undefined>(undefined);
+  public source = computed(() => this.flowEntitiesService.nodeByIdMap().get(this.edge.source));
+  public target = computed(() => this.flowEntitiesService.nodeByIdMap().get(this.edge.target));
+
   public curve = signal<Curve>(EDGE_DEFAULTS.curve);
   public type: EdgeType;
   public reconnectable = signal<boolean | 'source' | 'target'>(EDGE_DEFAULTS.reconnectable);
