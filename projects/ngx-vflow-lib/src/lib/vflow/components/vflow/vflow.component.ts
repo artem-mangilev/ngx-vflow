@@ -14,7 +14,7 @@ import { MapContextDirective } from '../../directives/map-context.directive';
 import { DraggableService } from '../../services/draggable.service';
 import { NodeModel } from '../../models/node.model';
 import { ViewportService } from '../../services/viewport.service';
-import { toObservable, outputFromObservable } from '@angular/core/rxjs-interop';
+import { toObservable, outputFromObservable, toSignal } from '@angular/core/rxjs-interop';
 import { Edge } from '../../interfaces/edge.interface';
 import { EdgeModel } from '../../models/edge.model';
 import {
@@ -25,7 +25,7 @@ import {
   NodeHtmlTemplateDirective,
   NodeSvgTemplateDirective,
 } from '../../directives/template.directive';
-import { skip } from 'rxjs/operators';
+import { map, shareReplay, skip } from 'rxjs/operators';
 import { SpacePoint, Point } from '../../interfaces/point.interface';
 import { ViewportState } from '../../interfaces/viewport.interface';
 import { FlowStatusService } from '../../services/flow-status.service';
@@ -71,7 +71,6 @@ import {
   ViewportPreviewFlowRenderStrategyService,
 } from '../../services/preview-flow-render-strategy.service';
 import { toLazySignal } from '../../utils/signals/to-lazy-signal';
-import { FlowRenderingService } from '../../services/flow-rendering.service';
 import { AlignmentHelperComponent } from '../alignment-helper/alignment-helper.component';
 import { AlignmentHelperSettings } from '../../interfaces/alignment-helper-settings.interface';
 import { AutoPanDirective } from '../../directives/auto-pan.directive';
@@ -84,6 +83,7 @@ import { BasicElementCacheService } from '../../services/basic-element-cache.ser
 import { SelectionBoxComponent } from '../selection-box/selection-box.component';
 import { SelectionBoxContextDirective } from '../../directives/selection-box-context.directive';
 import { SelectionBoxSettings } from '../../interfaces/selection-box-settings.interface';
+import { animationFrameScheduler, timer } from 'rxjs';
 
 const changesControllerHostDirective = {
   directive: ChangesControllerDirective,
@@ -127,7 +127,6 @@ const nodeDragControllerHostDirective = {
     KeyboardService,
     OverlaysService,
     { provide: PreviewFlowRenderStrategyService, useClass: ViewportPreviewFlowRenderStrategyService },
-    FlowRenderingService,
     ResizeObserverService,
     HtmlElementCacheService,
     BasicElementCacheService,
@@ -167,7 +166,6 @@ export class VflowComponent {
   private componentEventBusService = inject(ComponentEventBusService);
   private keyboardService = inject(KeyboardService);
   private injector = inject(Injector);
-  private flowRenderingService = inject(FlowRenderingService);
 
   // #endregion
 
@@ -366,6 +364,28 @@ export class VflowComponent {
   protected spacePointContext = viewChild.required(SpacePointContextDirective);
   // #endregion
 
+  // #region RX_API
+  /**
+   * Observable with viewport change
+   */
+  public readonly viewportChange$ = toObservable(this.viewportService.readableViewport).pipe(skip(1)); // skip default value that set by signal
+
+  /**
+   * Observable with nodes change
+   */
+  public readonly nodesChange$ = this.nodesChangeService.changes$;
+
+  /**
+   * Observable with edges change
+   */
+  public readonly edgesChange$ = this.edgesChangeService.changes$;
+
+  public readonly initialized$ = timer(0, animationFrameScheduler).pipe(
+    map(() => true),
+    shareReplay(1),
+  );
+  // #endregion
+
   // #region SIGNAL_API
   /**
    * Signal for reading viewport change
@@ -386,26 +406,9 @@ export class VflowComponent {
     initialValue: [] as EdgeChange[],
   });
 
-  public readonly initialized = this.flowRenderingService.flowInitialized.asReadonly();
-  // #endregion
-
-  // #region RX_API
-  /**
-   * Observable with viewport change
-   */
-  public readonly viewportChange$ = toObservable(this.viewportService.readableViewport).pipe(skip(1)); // skip default value that set by signal
-
-  /**
-   * Observable with nodes change
-   */
-  public readonly nodesChange$ = this.nodesChangeService.changes$;
-
-  /**
-   * Observable with edges change
-   */
-  public readonly edgesChange$ = this.edgesChangeService.changes$;
-
-  public readonly initialized$ = toObservable(this.flowRenderingService.flowInitialized);
+  public readonly initialized = toSignal(this.initialized$, {
+    initialValue: false,
+  });
   // #endregion
 
   protected markers = this.flowEntitiesService.markers;
