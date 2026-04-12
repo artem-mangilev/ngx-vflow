@@ -1,38 +1,31 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  ElementRef,
   Injector,
-  OnDestroy,
   OnInit,
   TemplateRef,
   computed,
-  effect,
   inject,
   input,
 } from '@angular/core';
-import { DraggableService } from '../../services/draggable.service';
 import { NodeModel } from '../../models/node.model';
-import { FlowStatusService, isSelectionBoxEndStatus } from '../../services/flow-status.service';
+import { FlowStatusService } from '../../services/flow-status.service';
 import { HandleService } from '../../services/handle.service';
 import { HandleModel } from '../../models/handle.model';
+import { ConnectionControllerDirective } from '../../directives/connection-controller.directive';
+import { NodeAccessorService } from '../../services/node-accessor.service';
+import { HandleSizeControllerDirective } from '../../directives/handle-size-controller.directive';
+import { NgTemplateOutlet } from '@angular/common';
+import { PointerDirective } from '../../directives/pointer.directive';
 import { NodeRenderingService } from '../../services/node-rendering.service';
 import { FlowSettingsService } from '../../services/flow-settings.service';
 import { SelectionService } from '../../services/selection.service';
-import { ConnectionControllerDirective } from '../../directives/connection-controller.directive';
-import { NodeAccessorService } from '../../services/node-accessor.service';
-import { OverlaysService } from '../../services/overlays.service';
-import { HandleSizeControllerDirective } from '../../directives/handle-size-controller.directive';
-import { NgTemplateOutlet, NgComponentOutlet, AsyncPipe } from '@angular/common';
-import { DefaultNodeComponent } from '../default-node/default-node.component';
-import { PointerDirective } from '../../directives/pointer.directive';
+import { isSelectionBoxEndStatus } from '../../services/flow-status.service';
 
 // TODO: fix loading of these by @defer (should work in Angular 18+)
 // public components that uses in default node (loaded by defer)
 import { ResizableComponent } from '../../public-components/resizable/resizable.component';
-import { HandleComponent } from '../../public-components/handle/handle.component';
 import { NodeHandlesControllerDirective } from '../../directives/node-handles-controller.directive';
-import { NodeResizeControllerDirective } from '../../directives/node-resize-controller.directive';
 
 export type HandleState = 'valid' | 'invalid' | 'idle';
 
@@ -44,44 +37,28 @@ export type HandleState = 'valid' | 'invalid' | 'idle';
   providers: [HandleService, NodeAccessorService],
   host: {
     class: 'vflow-node',
-    '[class.vflow-node--undraggable]': 'hostUndraggable()',
-    '[class.vflow-node--drag-handles-only]': 'hostDragHandlesOnly()',
   },
   imports: [
     PointerDirective,
-    DefaultNodeComponent,
-    HandleComponent,
     NgTemplateOutlet,
-    NgComponentOutlet,
     ResizableComponent,
     HandleSizeControllerDirective,
     NodeHandlesControllerDirective,
-    NodeResizeControllerDirective,
-    AsyncPipe,
   ],
 })
-export class NodeComponent implements OnInit, OnDestroy {
+export class NodeComponent implements OnInit {
   protected injector = inject(Injector);
-  private handleService = inject(HandleService);
-  private draggableService = inject(DraggableService);
   private flowStatusService = inject(FlowStatusService);
+  private handleService = inject(HandleService);
+  private nodeAccessor = inject(NodeAccessorService);
   private nodeRenderingService = inject(NodeRenderingService);
   private flowSettingsService = inject(FlowSettingsService);
   private selectionService = inject(SelectionService);
-  private hostRef = inject<ElementRef<SVGElement>>(ElementRef);
-  private nodeAccessor = inject(NodeAccessorService);
-  private overlaysService = inject(OverlaysService);
 
   // TODO remove dependency from this directive
   private connectionController = inject(ConnectionControllerDirective, { optional: true });
 
   public model = input.required<NodeModel>();
-
-  protected readonly hostUndraggable = computed(() => !this.model().draggable());
-
-  protected readonly hostDragHandlesOnly = computed(
-    () => this.model().draggable() && this.model().dragHandlesCount() > 0,
-  );
 
   public nodeTemplate = input<TemplateRef<any>>();
 
@@ -97,30 +74,9 @@ export class NodeComponent implements OnInit, OnDestroy {
       this.flowStatusService.status().state === 'reconnection-validation',
   );
 
-  protected toolbars = computed(() => this.overlaysService.nodeToolbarsMap().get(this.model()));
-
-  public ngOnInit() {
-    this.model().isVisible.set(true);
-
+  public ngOnInit(): void {
     this.nodeAccessor.model.set(this.model());
     this.handleService.node.set(this.model());
-
-    effect(
-      () => {
-        if (this.model().draggable()) {
-          this.draggableService.enable(this.hostRef.nativeElement, this.model());
-        } else {
-          this.draggableService.disable(this.hostRef.nativeElement);
-        }
-      },
-      { injector: this.injector },
-    );
-  }
-
-  public ngOnDestroy(): void {
-    this.model().isVisible.set(false);
-
-    this.draggableService.destroy(this.hostRef.nativeElement);
   }
 
   protected startConnection(event: Event, handle: HandleModel) {
@@ -149,7 +105,6 @@ export class NodeComponent implements OnInit, OnDestroy {
   }
 
   protected selectNode() {
-    // do not select node if selection is performed by selection box
     if (isSelectionBoxEndStatus(this.flowStatusService.status())) {
       return;
     }

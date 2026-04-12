@@ -12,12 +12,16 @@ export interface PointerEvent {
   originalEvent: MouseEvent | TouchEvent;
 }
 
+/**
+ * Must live on a DOM ancestor of both the root SVG and the HTML viewport layer
+ * so `inject(RootPointerDirective)` works for node-html, resizable, etc.
+ */
 @Directive({
   standalone: true,
-  selector: 'svg[rootPointer]',
+  selector: '[rootPointer]',
 })
 export class RootPointerDirective {
-  private host = inject<ElementRef<SVGSVGElement>>(ElementRef).nativeElement;
+  private host = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
 
   private initialTouch$ = new Subject<TouchEvent>();
 

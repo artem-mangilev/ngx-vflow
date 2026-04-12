@@ -1,0 +1,68 @@
+@if (model().rawNode.type === 'default') {
+  <default-node
+    nodeHandlesController
+    nodeResizeController
+    [selected]="model().selected()"
+    [preselected]="model().preselected()"
+    [style.width]="model().styleWidth()"
+    [style.height]="model().styleHeight()"
+    [style.max-width]="model().styleWidth()"
+    [style.max-height]="model().styleHeight()"
+    (mousedown)="pullNode(); selectNode()"
+    (touchstart)="onTouchStart($event); pullNode(); selectNode()">
+    <div [outerHTML]="model().text()"></div>
+
+    <handle type="source" position="right" />
+    <handle type="target" position="left" />
+  </default-node>
+}
+
+@if (model().rawNode.type === 'html-template' && nodeTemplate()) {
+  <div
+    nodeHandlesController
+    nodeResizeController
+    class="wrapper"
+    [style.width]="model().styleWidth()"
+    [style.height]="model().styleHeight()"
+    (mousedown)="pullNode()"
+    (touchstart)="onTouchStart($event); pullNode()">
+    <ng-container
+      [ngTemplateOutlet]="nodeTemplate() ?? null"
+      [ngTemplateOutletContext]="model().context"
+      [ngTemplateOutletInjector]="injector" />
+  </div>
+}
+
+@if (model().isComponentType) {
+  @if (model().componentInstance$ | async; as component) {
+    <div
+      nodeHandlesController
+      nodeResizeController
+      class="wrapper"
+      [style.width]="model().styleWidth()"
+      [style.height]="model().styleHeight()"
+      (mousedown)="pullNode()"
+      (touchstart)="onTouchStart($event); pullNode()">
+      <ng-container
+        [ngComponentOutlet]="$any(component)"
+        [ngComponentOutletInputs]="model().componentTypeInputs"
+        [ngComponentOutletInjector]="injector" />
+    </div>
+  }
+}
+
+@if (model().resizerTemplate(); as template) {
+  @if (model().resizable()) {
+    <ng-template [ngTemplateOutlet]="template" />
+  }
+}
+
+@for (toolbar of toolbars(); track toolbar) {
+  <div
+    class="node-toolbar"
+    [style.width.px]="toolbar.size().width"
+    [style.height.px]="toolbar.size().height"
+    [style.transform]="toolbar.transform()">
+    <ng-container [ngTemplateOutlet]="toolbar.template()" />
+  </div>
+}

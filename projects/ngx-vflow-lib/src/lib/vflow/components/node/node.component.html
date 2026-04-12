@@ -1,47 +1,3 @@
-<!-- Default node -->
-@if (model().rawNode.type === 'default') {
-  <svg:foreignObject
-    class="selectable"
-    [attr.width]="model().foWidth()"
-    [attr.height]="model().foHeight()"
-    (click)="pullNode(); selectNode()">
-    <default-node
-      nodeHandlesController
-      [selected]="model().selected()"
-      [preselected]="model().preselected()"
-      [style.width]="model().styleWidth()"
-      [style.height]="model().styleHeight()"
-      [style.max-width]="model().styleWidth()"
-      [style.max-height]="model().styleHeight()">
-      <div [outerHTML]="model().text()"></div>
-
-      <handle type="source" position="right" />
-      <handle type="target" position="left" />
-    </default-node>
-  </svg:foreignObject>
-}
-
-<!-- HTML Template node -->
-@if (model().rawNode.type === 'html-template' && nodeTemplate()) {
-  <svg:foreignObject
-    class="selectable"
-    [attr.width]="model().foWidth()"
-    [attr.height]="model().foHeight()"
-    (click)="pullNode()">
-    <div
-      nodeHandlesController
-      nodeResizeController
-      class="wrapper"
-      [style.width]="model().styleWidth()"
-      [style.height]="model().styleHeight()">
-      <ng-container
-        [ngTemplateOutlet]="nodeTemplate() ?? null"
-        [ngTemplateOutletContext]="model().context"
-        [ngTemplateOutletInjector]="injector" />
-    </div>
-  </svg:foreignObject>
-}
-
 <!-- SVG Template node -->
 @if (model().rawNode.type === 'svg-template' && nodeSvgTemplate()) {
   <svg:g class="selectable" nodeHandlesController (click)="pullNode()">
@@ -50,29 +6,6 @@
       [ngTemplateOutletContext]="model().context"
       [ngTemplateOutletInjector]="injector" />
   </svg:g>
-}
-
-<!-- Component node -->
-@if (model().isComponentType) {
-  @if (model().componentInstance$ | async; as component) {
-    <svg:foreignObject
-      class="selectable"
-      [attr.width]="model().foWidth()"
-      [attr.height]="model().foHeight()"
-      (click)="pullNode()">
-      <div
-        nodeHandlesController
-        nodeResizeController
-        class="wrapper"
-        [style.width]="model().styleWidth()"
-        [style.height]="model().styleHeight()">
-        <ng-container
-          [ngComponentOutlet]="$any(component)"
-          [ngComponentOutletInputs]="model().componentTypeInputs"
-          [ngComponentOutletInjector]="injector" />
-      </div>
-    </svg:foreignObject>
-  }
 }
 
 <!-- Default group node -->
@@ -149,14 +82,4 @@
       (pointerOver)="validateConnection(handle)"
       (pointerOut)="resetValidateConnection(handle)" />
   }
-}
-
-<!-- Toolbar -->
-@for (toolbar of toolbars(); track toolbar) {
-  <svg:foreignObject
-    [attr.width]="toolbar.size().width"
-    [attr.height]="toolbar.size().height"
-    [attr.transform]="toolbar.transform()">
-    <ng-container [ngTemplateOutlet]="toolbar.template()" />
-  </svg:foreignObject>
 }

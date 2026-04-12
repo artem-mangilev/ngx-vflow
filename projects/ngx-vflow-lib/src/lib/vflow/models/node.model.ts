@@ -5,7 +5,6 @@ import { HandleModel } from './handle.model';
 import { FlowEntity } from '../interfaces/flow-entity.interface';
 import { Point } from '../interfaces/point.interface';
 import { FlowEntitiesService } from '../services/flow-entities.service';
-import { MAGIC_NUMBER_TO_FIX_GLITCH_IN_CHROME } from '../constants/magic-number-to-fix-glitch-in-chrome.constant';
 import { Contextable } from '../interfaces/contextable.interface';
 import { GroupNodeContext, NodeContext } from '../interfaces/template-context.interface';
 import { Observable, of } from 'rxjs';
@@ -41,9 +40,6 @@ export class NodeModel<T = unknown>
    */
   public styleWidth = computed(() => (this.controlledByResizer() ? `${this.width()}px` : '100%'));
   public styleHeight = computed(() => (this.controlledByResizer() ? `${this.height()}px` : '100%'));
-
-  public foWidth = computed(() => this.width() + MAGIC_NUMBER_TO_FIX_GLITCH_IN_CHROME);
-  public foHeight = computed(() => this.height() + MAGIC_NUMBER_TO_FIX_GLITCH_IN_CHROME);
 
   public renderOrder = signal(0);
 

@@ -1,9 +1,9 @@
-import { Directive, ElementRef, Signal, computed, inject } from '@angular/core';
-import { RootSvgReferenceDirective } from './reference.directive';
+import { Directive, Signal, computed, inject } from '@angular/core';
 import { Point } from '../interfaces/point.interface';
 import { RootPointerDirective } from './root-pointer.directive';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ViewportService } from '../services/viewport.service';
+import { FlowCoordinateMapperService } from '../services/flow-coordinate-mapper.service';
 
 @Directive({
   standalone: true,
@@ -11,9 +11,8 @@ import { ViewportService } from '../services/viewport.service';
 })
 export class SpacePointContextDirective {
   private pointerMovementDirective = inject(RootPointerDirective);
-  private rootSvg = inject(RootSvgReferenceDirective).element;
-  private host = inject<ElementRef<SVGGElement>>(ElementRef).nativeElement;
   private viewportService = inject(ViewportService);
+  private coordinateMapper = inject(FlowCoordinateMapperService);
 
   /**
    * Signal with current mouse position in svg space
@@ -38,10 +37,6 @@ export class SpacePointContextDirective {
   private currentPoint = toSignal(this.pointerMovementDirective.pointerMovement$);
 
   public documentPointToFlowPoint(documentPoint: Point) {
-    const point = this.rootSvg.createSVGPoint();
-    point.x = documentPoint.x;
-    point.y = documentPoint.y;
-
-    return point.matrixTransform(this.host.getScreenCTM()!.inverse());
+    return this.coordinateMapper.documentPointToFlowPoint(documentPoint);
   }
 }

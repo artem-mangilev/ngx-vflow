@@ -14,6 +14,7 @@ import type { Subscription } from 'rxjs';
 import { pairwise, filter, skip } from 'rxjs/operators';
 import { KeyboardService } from './keyboard.service';
 import { isGroupNode } from '../utils/is-group-node';
+import { FlowCoordinateMapperService } from './flow-coordinate-mapper.service';
 
 type DragEvent = D3DragEvent<Element, unknown, unknown>;
 
@@ -24,6 +25,7 @@ export class DraggableService {
   private flowStatusService = inject(FlowStatusService);
   private viewportService = inject(ViewportService);
   private keyboardService = inject(KeyboardService);
+  private coordinateMapper = inject(FlowCoordinateMapperService);
   private injector = inject(Injector);
 
   /**
@@ -92,13 +94,18 @@ export class DraggableService {
     return drag()
       .filter(filterCondition)
       .on('start', (event: DragEvent) => {
+        const startPoint = this.coordinateMapper.documentPointToFlowPoint({
+          x: event.sourceEvent.clientX,
+          y: event.sourceEvent.clientY,
+        });
+
         dragNodes = this.getDragNodes(model);
 
         this.flowStatusService.setNodeDragStartStatus(model);
 
         initialPositions = dragNodes.map((node) => ({
-          x: node.point().x - event.x,
-          y: node.point().y - event.y,
+          x: node.point().x - startPoint.x,
+          y: node.point().y - startPoint.y,
         }));
 
         // Subscribe to viewport changes during drag to sync node positions with auto-pan
@@ -106,10 +113,15 @@ export class DraggableService {
       })
 
       .on('drag', (event: DragEvent) => {
+        const dragPoint = this.coordinateMapper.documentPointToFlowPoint({
+          x: event.sourceEvent.clientX,
+          y: event.sourceEvent.clientY,
+        });
+
         dragNodes.forEach((model, index) => {
           const point = {
-            x: round(event.x + initialPositions[index].x),
-            y: round(event.y + initialPositions[index].y),
+            x: round(dragPoint.x + initialPositions[index].x),
+            y: round(dragPoint.y + initialPositions[index].y),
           };
 
           this.alignToGrid(point);

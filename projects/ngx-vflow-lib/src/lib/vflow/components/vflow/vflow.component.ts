@@ -85,6 +85,11 @@ import { BasicElementCacheService } from '../../services/basic-element-cache.ser
 import { SelectionBoxComponent } from '../selection-box/selection-box.component';
 import { SelectionBoxContextDirective } from '../../directives/selection-box-context.directive';
 import { SelectionBoxSettings } from '../../interfaces/selection-box-settings.interface';
+import { FlowCoordinateMapperService } from '../../services/flow-coordinate-mapper.service';
+import { NodeHtmlComponent } from '../node-html/node-html.component';
+import { FlowHostContextDirective } from '../../directives/flow-host-context.directive';
+import { DefaultEdgeLabel, HtmlTemplateEdgeLabel } from '../../interfaces/edge-label.interface';
+import { HtmlEdgeLabelContext } from '../../interfaces/template-context.interface';
 
 const changesControllerHostDirective = {
   directive: ChangesControllerDirective,
@@ -134,6 +139,7 @@ const nodeDragControllerHostDirective = {
     BasicElementCacheService,
     SvgGraphicElementCacheService,
     RequestAnimationFrameBatchingService,
+    FlowCoordinateMapperService,
   ],
   hostDirectives: [changesControllerHostDirective, nodeDragControllerHostDirective],
   imports: [
@@ -147,6 +153,7 @@ const nodeDragControllerHostDirective = {
     SpacePointContextDirective,
     ConnectionComponent,
     NodeComponent,
+    NodeHtmlComponent,
     EdgeComponent,
     NgTemplateOutlet,
     PreviewFlowComponent,
@@ -154,10 +161,12 @@ const nodeDragControllerHostDirective = {
     SelectionBoxComponent,
     SelectionBoxContextDirective,
     AutoPanDirective,
+    FlowHostContextDirective,
   ],
 })
 export class VflowComponent {
   // #region DI
+  private coordinateMapper = inject(FlowCoordinateMapperService);
   private viewportService = inject(ViewportService);
   private flowEntitiesService = inject(FlowEntitiesService);
   private nodesChangeService = inject(NodesChangeService);
@@ -169,6 +178,10 @@ export class VflowComponent {
   private keyboardService = inject(KeyboardService);
   private injector = inject(Injector);
   private flowRenderingService = inject(FlowRenderingService);
+
+  constructor() {
+    this.coordinateMapper.setViewportStateAccessor(() => this.viewportService.readableViewport());
+  }
 
   // #endregion
 
@@ -422,6 +435,7 @@ export class VflowComponent {
   protected flowOptimization = this.flowSettingsService.optimization;
   protected flowWidth = this.flowSettingsService.computedFlowWidth;
   protected flowHeight = this.flowSettingsService.computedFlowHeight;
+  protected htmlViewportTransform = this.coordinateMapper.viewportTransformCss;
 
   // #region METHODS_API
   /**
@@ -548,5 +562,33 @@ export class VflowComponent {
 
   protected trackEdges(idx: number, { edge }: EdgeModel) {
     return edge;
+  }
+
+  protected edgeLabelStyle(label: DefaultEdgeLabel) {
+    if (!label.style) {
+      return null;
+    }
+
+    const flowBackground = this.flowSettingsService.background();
+    const style = { ...label.style };
+
+    if (!style.backgroundColor) {
+      if (flowBackground.type === 'solid') {
+        style.backgroundColor = flowBackground.color;
+      } else if (flowBackground.type === 'dots') {
+        style.backgroundColor = flowBackground.backgroundColor ?? '#fff';
+      }
+    }
+
+    return style;
+  }
+
+  protected edgeLabelContext(edgeModel: EdgeModel, label: HtmlTemplateEdgeLabel<any>): HtmlEdgeLabelContext {
+    return {
+      $implicit: {
+        edge: edgeModel.edge,
+        label,
+      },
+    };
   }
 }
