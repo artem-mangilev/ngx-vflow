@@ -1,60 +1,77 @@
-import { DestroyRef, Directive, ElementRef, inject, OnInit } from '@angular/core';
+import { DestroyRef, Directive, ElementRef, effect, inject, Injector } from '@angular/core';
 import { NodeAccessorService } from '../services/node-accessor.service';
-import { pairwise, tap } from 'rxjs/operators';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ResizeObserverService } from '../services/resize-observer.service';
 import { RequestAnimationFrameBatchingService } from '../services/request-animation-frame-batching.service';
+import { HandleModel } from '../models/handle.model';
 
 @Directive({
   selector: '[nodeHandlesController]',
   standalone: true,
 })
-export class NodeHandlesControllerDirective implements OnInit {
-  private nodeAccessor = inject(NodeAccessorService);
-  private destroyRef = inject(DestroyRef);
-  private hostElementRef = inject<ElementRef<Element>>(ElementRef);
-  private resizeObserverService = inject(ResizeObserverService);
-  private requestAnimationFrameBatchingService = inject(RequestAnimationFrameBatchingService);
+export class NodeHandlesControllerDirective {
+  private readonly nodeAccessor = inject(NodeAccessorService);
+  private readonly hostElementRef = inject<ElementRef<Element>>(ElementRef);
+  private readonly resizeObserverService = inject(ResizeObserverService);
+  private readonly requestAnimationFrameBatchingService = inject(RequestAnimationFrameBatchingService);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly injector = inject(Injector);
 
-  public ngOnInit(): void {
-    const model = this.nodeAccessor.model()!;
+  constructor() {
+    let previousHandles: HandleModel[] = [];
+    let hostResizeTracked = false;
 
-    let isTrackingHostElement = false;
+    effect(
+      () => {
+        const nodeModel = this.nodeAccessor.model();
+        if (!nodeModel) {
+          return;
+        }
 
-    model.handles$
-      .pipe(
-        pairwise(),
-        tap(([previousHandles, currentHandles]) => {
-          const handlesToRemove = previousHandles.filter(
-            (prev) => currentHandles.find((curr) => curr.hostReference === prev.hostReference) === undefined,
-          );
-          handlesToRemove.forEach((h) => this.resizeObserverService.removeObserver(h.hostReference));
+        const currentHandles = nodeModel.handles();
+        const prevRefs = new Set(previousHandles.map((h) => h.hostReference));
+        const currRefs = new Set(currentHandles.map((h) => h.hostReference));
 
-          const handlesToAdd = currentHandles.filter(
-            (curr) => previousHandles.find((prev) => curr.hostReference === prev.hostReference) === undefined,
-          );
+        const handlesToRemove = previousHandles.filter((h) => !currRefs.has(h.hostReference));
+        const handlesToAdd = currentHandles.filter((h) => !prevRefs.has(h.hostReference));
 
-          if (!isTrackingHostElement) {
-            this.resizeObserverService.addObserver(this.hostElementRef.nativeElement, () => {
-              currentHandles.forEach((h) => h.updateHost());
-            });
-            isTrackingHostElement = true;
-          }
+        for (const h of handlesToRemove) {
+          this.resizeObserverService.removeObserver(h.hostReference);
+        }
 
-          handlesToAdd.forEach((h) =>
-            this.resizeObserverService.addObserver(h.hostReference, () => {
-              currentHandles.forEach((h) => h.updateHost());
-            }),
-          );
-
-          //Here we need this to be in a requestAnimationFrame otherwise the handle can still be present in the dom which throws off the offset cache
-          this.requestAnimationFrameBatchingService.batchAnimationFrame(() => {
-            currentHandles.forEach((h) => h.updateHost());
+        if (currentHandles.length > 0 && !hostResizeTracked) {
+          this.resizeObserverService.addObserver(this.hostElementRef.nativeElement, () => {
+            nodeModel.handles().forEach((handle) => handle.updateHost());
           });
-          // TODO (performance) inspect how to avoid calls of this when flow initially rendered
-        }),
-        takeUntilDestroyed(this.destroyRef),
-      )
-      .subscribe();
+          hostResizeTracked = true;
+        }
+
+        for (const handle of handlesToAdd) {
+          this.resizeObserverService.addObserver(handle.hostReference, () => {
+            nodeModel.handles().forEach((h) => h.updateHost());
+          });
+        }
+
+        // After removal the detached handle can still affect layout reads in the same frame; defer
+        // a full refresh. Pure adds are covered by HandleComponent's batched updateHost.
+        if (handlesToRemove.length > 0) {
+          this.requestAnimationFrameBatchingService.batchAnimationFrame(() => {
+            nodeModel.handles().forEach((handle) => handle.updateHost());
+          });
+        }
+
+        previousHandles = currentHandles;
+      },
+      { injector: this.injector },
+    );
+
+    this.destroyRef.onDestroy(() => {
+      const nodeModel = this.nodeAccessor.model();
+      this.resizeObserverService.removeObserver(this.hostElementRef.nativeElement);
+      if (nodeModel) {
+        for (const h of nodeModel.handles()) {
+          this.resizeObserverService.removeObserver(h.hostReference);
+        }
+      }
+    });
   }
 }
