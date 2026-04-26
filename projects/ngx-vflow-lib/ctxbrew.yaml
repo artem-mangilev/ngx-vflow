@@ -1,0 +1,26 @@
+version: 1
+slices:
+  - id: overview
+    description: High-level overview of the library
+    include:
+      - README.md
+
+  - id: default-nodes
+    description: How to create default nodes
+    include:
+      - ../ngx-vflow-demo/src/app/categories/nodes/default-nodes/**/*
+
+  - id: custom-nodes
+    description: How to create custom nodes
+    include:
+      - ../ngx-vflow-demo/src/app/categories/nodes/custom-nodes/**/*
+
+  - id: default-edges
+    description: How to create default edges
+    include:
+      - ../ngx-vflow-demo/src/app/categories/edges/default-edges/**/*
+
+  - id: create-connection-from-ui
+    description: How to create connections from the UI
+    include:
+      - ../ngx-vflow-demo/src/app/categories/edges/connections/**/*

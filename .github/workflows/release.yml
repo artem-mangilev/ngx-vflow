@@ -30,7 +30,7 @@ jobs:
       - name: Build Library
         run: |
           cd projects/ngx-vflow-lib
-          npx ng build
+          npm run build
 
       # Step 4: Analyze version and publish using Semantic Release
       - name: Run Semantic Release

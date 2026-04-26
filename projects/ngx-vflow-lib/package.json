@@ -16,7 +16,7 @@
     "type": "git"
   },
   "scripts": {
-    "build": "ng build"
+    "build": "npx ctxbrew build && ng build"
   },
   "peerDependencies": {
     "@angular/common": "^19.2.17 || 20.x || 21.x",
