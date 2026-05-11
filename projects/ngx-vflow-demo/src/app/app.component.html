@@ -1,11 +1,30 @@
 <ng-doc-root>
   <ng-doc-navbar>
     <div ngDocNavbarLeft>
-      <div class="logo-container">
-        <a href="https://github.com/artem-mangilev/ngx-vflow">
-          <img class="logo-icon" src="../assets/logo.svg" />
-        </a>
-        <h3 data-testid="logo-text" class="logo-text">ngx-vflow</h3>
+      <div class="navbar-left-content">
+        <div class="logo-container">
+          <a href="https://github.com/artem-mangilev/ngx-vflow">
+            <img class="logo-icon" src="../assets/logo.svg" />
+          </a>
+          <h3 data-testid="logo-text" class="logo-text">ngx-vflow</h3>
+        </div>
+
+        @if (isSponsorBannerVisible) {
+          <div class="sponsor-banner" role="region" aria-label="Sponsor message">
+            <p class="sponsor-banner__text">
+              Looking for a Sponsor.
+              <a class="sponsor-banner__link" [routerLink]="['/introduction/looking-for-sponsor']">Learn more</a>
+            </p>
+
+            <button
+              class="sponsor-banner__close"
+              type="button"
+              aria-label="Close sponsor banner"
+              (click)="dismissSponsorBanner()">
+              ✕
+            </button>
+          </div>
+        }
       </div>
     </div>
 

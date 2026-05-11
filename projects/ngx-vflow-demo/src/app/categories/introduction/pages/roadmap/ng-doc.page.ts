@@ -6,7 +6,7 @@ const TestPage: NgDocPage = {
   title: `Roadmap`,
   mdFile: './index.md',
   category: IntroductionCategory,
-  order: 3,
+  order: 4,
   demos: { RoadmapListComponent },
 };
 

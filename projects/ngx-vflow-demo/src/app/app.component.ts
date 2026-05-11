@@ -14,7 +14,18 @@ import { routingAnimation } from './animations/routing.animation';
 export class AppComponent {
   private contexts = inject(ChildrenOutletContexts);
 
+  protected isSponsorBannerVisible = !this.isSponsorBannerDismissed();
+
   getRouteAnimationData() {
     return this.contexts.getContext('primary')?.route?.snapshot?.title;
+  }
+
+  dismissSponsorBanner(): void {
+    this.isSponsorBannerVisible = false;
+    localStorage.setItem('sponsor-banner-dismissed', 'true');
+  }
+
+  private isSponsorBannerDismissed(): boolean {
+    return localStorage.getItem('sponsor-banner-dismissed') === 'true';
   }
 }
