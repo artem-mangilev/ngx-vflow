@@ -1,6 +1,6 @@
 :host {
-  display: grid;
-  grid-template-columns: 1fr;
+  display: block;
+  position: relative;
 
   width: 100%;
   height: 100%;
@@ -13,13 +13,125 @@
   }
 }
 
-.root-svg {
-  grid-row-start: 1;
-  grid-column-start: 1;
+.vflow-root {
+  position: relative;
+  overflow: hidden;
+}
+
+// Background sits behind everything (first in DOM, painted before the pane)
+.vflow-background-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+// d3-zoom target, receives all wheel/drag events
+.vflow-pane {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+// Transformed layer (translate + scale). Must never block the pane.
+.vflow-viewport {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  transform-origin: 0 0;
+  pointer-events: none;
+}
+
+.vflow-defs-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+
+// No z-index here so per-edge svg z-index competes with per-node z-index
+.vflow-edges-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}
+
+// No z-index here so per-node z-index competes with per-edge z-index
+.vflow-nodes-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+  pointer-events: none;
+}
+
+.vflow-edge-labels-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}
+
+.vflow-overlay-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  overflow: visible;
+  pointer-events: none;
+  z-index: 1000000;
+}
+
+.vflow-connection-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  overflow: visible;
+  pointer-events: none;
+  z-index: 1000001;
+}
+
+.vflow-toolbars-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 1000000;
+}
+
+.vflow-toolbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+  pointer-events: all;
+}
+
+.vflow-minimap-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1000002;
 }
 
 .preview-flow {
+  position: absolute;
+  inset: 0;
   pointer-events: none;
-  grid-row-start: 1;
-  grid-column-start: 1;
+  z-index: 2;
 }

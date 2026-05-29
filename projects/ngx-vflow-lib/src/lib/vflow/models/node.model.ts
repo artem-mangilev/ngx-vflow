@@ -5,7 +5,6 @@ import { HandleModel } from './handle.model';
 import { FlowEntity } from '../interfaces/flow-entity.interface';
 import { Point } from '../interfaces/point.interface';
 import { FlowEntitiesService } from '../services/flow-entities.service';
-import { MAGIC_NUMBER_TO_FIX_GLITCH_IN_CHROME } from '../constants/magic-number-to-fix-glitch-in-chrome.constant';
 import { Contextable } from '../interfaces/contextable.interface';
 import { GroupNodeContext, NodeContext } from '../interfaces/template-context.interface';
 import { Observable, of } from 'rxjs';
@@ -26,6 +25,13 @@ export class NodeModel<T = unknown>
 
   public isVisible = signal(false);
 
+  /**
+   * Whether the node dimensions have been measured at least once.
+   * Until then the node is rendered hidden to avoid flicker and wrong
+   * edge endpoints (mirrors xyflow behavior).
+   */
+  public isMeasured = signal(false);
+
   public point = signal<Point>({ x: 0, y: 0 });
   public point$: Observable<Point>;
 
@@ -41,9 +47,6 @@ export class NodeModel<T = unknown>
    */
   public styleWidth = computed(() => (this.controlledByResizer() ? `${this.width()}px` : '100%'));
   public styleHeight = computed(() => (this.controlledByResizer() ? `${this.height()}px` : '100%'));
-
-  public foWidth = computed(() => this.width() + MAGIC_NUMBER_TO_FIX_GLITCH_IN_CHROME);
-  public foHeight = computed(() => this.height() + MAGIC_NUMBER_TO_FIX_GLITCH_IN_CHROME);
 
   public renderOrder = signal(0);
 
@@ -71,6 +74,11 @@ export class NodeModel<T = unknown>
   });
 
   public pointTransform = computed(() => `translate(${this.globalPoint().x}, ${this.globalPoint().y})`);
+
+  /**
+   * CSS transform for positioning the node div in the (transformed) viewport.
+   */
+  public pointTransformCss = computed(() => `translate(${this.globalPoint().x}px, ${this.globalPoint().y}px)`);
 
   public handles = signal<HandleModel[]>([]);
   public handles$: Observable<HandleModel[]>;
@@ -105,7 +113,6 @@ export class NodeModel<T = unknown>
       if (
         isCallable(this.rawNode.type) ||
         this.rawNode.type === 'html-template' ||
-        this.rawNode.type === 'svg-template' ||
         this.rawNode.type === 'template-group'
       ) {
         return this.nodeRenderingService.viewportNodes().includes(this as NodeModel);
@@ -206,20 +213,6 @@ export class NodeModel<T = unknown>
           data: rawNode.data ?? signal(NODE_DEFAULTS.data as T),
           selected: this.selected.asReadonly(),
           preselected: this.preselected.asReadonly(),
-          shouldLoad: this.shouldLoad,
-        },
-      };
-    }
-
-    if (rawNode.type === 'svg-template') {
-      this.context = {
-        $implicit: {
-          node: rawNode,
-          data: rawNode.data ?? signal(NODE_DEFAULTS.data as T),
-          selected: this.selected.asReadonly(),
-          preselected: this.preselected.asReadonly(),
-          width: this.width.asReadonly(),
-          height: this.height.asReadonly(),
           shouldLoad: this.shouldLoad,
         },
       };

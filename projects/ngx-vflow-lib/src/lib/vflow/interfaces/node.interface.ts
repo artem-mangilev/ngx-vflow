@@ -25,7 +25,6 @@ export const NODE_DEFAULTS = {
 export type Node<T = any> =
   | DefaultNode
   | HtmlTemplateNode<T>
-  | SvgTemplateNode<T>
   | ComponentNode<T>
   | DefaultGroupNode
   | TemplateGroupNode<T>;
@@ -52,13 +51,6 @@ export interface HtmlTemplateNode<T = any> extends SharedNode {
   data?: WritableSignal<T>;
   width?: WritableSignal<number>;
   height?: WritableSignal<number>;
-}
-
-export interface SvgTemplateNode<T = any> extends SharedNode {
-  type: 'svg-template';
-  width: WritableSignal<number>;
-  height: WritableSignal<number>;
-  data?: WritableSignal<T>;
 }
 
 export interface DefaultGroupNode extends SharedNode {
@@ -96,10 +88,6 @@ export function isTemplateNode<T>(node: Node<T>): node is HtmlTemplateNode<T> {
   return node.type === 'html-template';
 }
 
-export function isSvgTemplateNode<T>(node: Node<T>): node is SvgTemplateNode<T> {
-  return node.type === 'svg-template';
-}
-
 export function isDefaultNode(node: Node): node is DefaultNode {
   return node.type === 'default';
 }
@@ -115,7 +103,6 @@ export function isTemplateGroupNode<T>(node: Node<T>): node is TemplateGroupNode
 export type StaticNode<T = unknown> =
   | UnwrapSignal<DefaultNode>
   | UnwrapSignal<HtmlTemplateNode<T>>
-  | UnwrapSignal<SvgTemplateNode<T>>
   | UnwrapSignal<ComponentNode<T>>
   | UnwrapSignal<DefaultGroupNode>
   | UnwrapSignal<TemplateGroupNode<T>>;
@@ -196,29 +183,6 @@ export function createNode<T>(
         data: isDefined(node.data) ? (signal(node.data) as WritableSignal<T>) : undefined,
         width: isDefined(node.width) ? signal(node.width) : undefined,
         height: isDefined(node.height) ? signal(node.height) : undefined,
-      };
-    }
-  }
-
-  if (node.type === 'svg-template') {
-    const width = signal(node.width);
-    const height = signal(node.height);
-
-    if (options.useDefaults) {
-      return {
-        ...baseNode,
-        type: 'svg-template' as const,
-        width,
-        height,
-        data: signal(node.data ?? (NODE_DEFAULTS.data as T)),
-      };
-    } else {
-      return {
-        ...baseNode,
-        type: 'svg-template' as const,
-        width,
-        height,
-        data: isDefined(node.data) ? (signal(node.data) as WritableSignal<T>) : undefined,
       };
     }
   }

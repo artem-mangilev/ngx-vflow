@@ -14,10 +14,10 @@ export interface PointerEvent {
 
 @Directive({
   standalone: true,
-  selector: 'svg[rootPointer]',
+  selector: 'div[rootPointer]',
 })
 export class RootPointerDirective {
-  private host = inject<ElementRef<SVGSVGElement>>(ElementRef).nativeElement;
+  private host = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
 
   private initialTouch$ = new Subject<TouchEvent>();
 

@@ -6,3 +6,9 @@
     stroke-width: 2px;
   }
 }
+
+.node-preview {
+  &_selected {
+    stroke: #0f4c75;
+  }
+}

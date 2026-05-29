@@ -1,3 +1,8 @@
+.resize-handle {
+  position: absolute;
+  pointer-events: all;
+}
+
 .top {
   cursor: n-resize;
 }

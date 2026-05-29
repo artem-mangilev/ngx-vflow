@@ -20,6 +20,7 @@ export class NodeResizeControllerDirective implements OnInit, OnDestroy {
     this.resizeObserverService.addObserver(this.hostElementRef.nativeElement, (resizeEntry) => {
       model.width.set(resizeEntry.target.clientWidth);
       model.height.set(resizeEntry.target.clientHeight);
+      model.isMeasured.set(true);
     });
   }
 

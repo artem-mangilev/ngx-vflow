@@ -8,6 +8,7 @@ import {
   contentChild,
   viewChild,
   input,
+  computed,
 } from '@angular/core';
 import { Node } from '../../interfaces/node.interface';
 import { MapContextDirective } from '../../directives/map-context.directive';
@@ -23,7 +24,6 @@ import {
   EdgeTemplateDirective,
   GroupNodeTemplateDirective,
   NodeHtmlTemplateDirective,
-  NodeSvgTemplateDirective,
 } from '../../directives/template.directive';
 import { addNodesToEdges } from '../../utils/add-nodes-to-edges';
 import { skip } from 'rxjs/operators';
@@ -52,8 +52,10 @@ import { SelectionMode } from '../../types/selection-mode.type';
 import { KeyboardService } from '../../services/keyboard.service';
 import { transformBackground } from '../../utils/transform-background';
 import { OverlaysService } from '../../services/overlays.service';
+import { ToolbarModel } from '../../models/toolbar.model';
 import { NgTemplateOutlet } from '@angular/common';
 import { EdgeComponent } from '../edge/edge.component';
+import { EdgeLabelComponent } from '../edge-label/edge-label.component';
 import { NodeComponent } from '../node/node.component';
 import { ConnectionComponent } from '../connection/connection.component';
 import { BackgroundComponent } from '../background/background.component';
@@ -148,6 +150,7 @@ const nodeDragControllerHostDirective = {
     ConnectionComponent,
     NodeComponent,
     EdgeComponent,
+    EdgeLabelComponent,
     NgTemplateOutlet,
     PreviewFlowComponent,
     AlignmentHelperComponent,
@@ -169,7 +172,21 @@ export class VflowComponent {
   private keyboardService = inject(KeyboardService);
   private injector = inject(Injector);
   private flowRenderingService = inject(FlowRenderingService);
+  private overlaysService = inject(OverlaysService);
 
+  // #endregion
+
+  // #region VIEWPORT
+  /**
+   * CSS transform applied to the viewport div (translate px + scale).
+   */
+  protected viewportTransform = computed(() => {
+    const { x, y, zoom } = this.viewportService.readableViewport();
+
+    return `translate(${x}px, ${y}px) scale(${zoom})`;
+  });
+
+  protected nodeToolbarsMap = this.overlaysService.nodeToolbarsMap;
   // #endregion
 
   // #region SETTINGS
@@ -357,8 +374,6 @@ export class VflowComponent {
   // #region TEMPLATES
   protected nodeTemplateDirective = contentChild(NodeHtmlTemplateDirective);
 
-  protected nodeSvgTemplateDirective = contentChild(NodeSvgTemplateDirective);
-
   protected groupNodeTemplateDirective = contentChild(GroupNodeTemplateDirective);
 
   protected edgeTemplateDirective = contentChild(EdgeTemplateDirective);
@@ -541,6 +556,13 @@ export class VflowComponent {
     return getSpacePoints(node.globalPoint(), [coordinateSpaceNode])[0];
   }
   // #endregion
+
+  protected toolbarTransform(node: NodeModel, toolbar: ToolbarModel): string {
+    const { x, y } = node.globalPoint();
+    const point = toolbar.point();
+
+    return `translate(${x + point.x}px, ${y + point.y}px)`;
+  }
 
   protected trackNodes(idx: number, { rawNode: node }: NodeModel) {
     return node;

@@ -21,7 +21,6 @@ import { FlowSettingsService } from '../../services/flow-settings.service';
 import { SelectionService } from '../../services/selection.service';
 import { ConnectionControllerDirective } from '../../directives/connection-controller.directive';
 import { NodeAccessorService } from '../../services/node-accessor.service';
-import { OverlaysService } from '../../services/overlays.service';
 import { HandleSizeControllerDirective } from '../../directives/handle-size-controller.directive';
 import { NgTemplateOutlet, NgComponentOutlet, AsyncPipe } from '@angular/common';
 import { DefaultNodeComponent } from '../default-node/default-node.component';
@@ -37,7 +36,7 @@ import { NodeResizeControllerDirective } from '../../directives/node-resize-cont
 export type HandleState = 'valid' | 'invalid' | 'idle';
 
 @Component({
-  selector: 'g[node]',
+  selector: 'div[node]',
   templateUrl: './node.component.html',
   styleUrls: ['./node.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -46,6 +45,7 @@ export type HandleState = 'valid' | 'invalid' | 'idle';
     class: 'vflow-node',
     '[class.vflow-node--undraggable]': 'hostUndraggable()',
     '[class.vflow-node--drag-handles-only]': 'hostDragHandlesOnly()',
+    '[style.visibility]': "model().isMeasured() ? 'visible' : 'hidden'",
   },
   imports: [
     PointerDirective,
@@ -68,9 +68,8 @@ export class NodeComponent implements OnInit, OnDestroy {
   private nodeRenderingService = inject(NodeRenderingService);
   private flowSettingsService = inject(FlowSettingsService);
   private selectionService = inject(SelectionService);
-  private hostRef = inject<ElementRef<SVGElement>>(ElementRef);
+  private hostRef = inject<ElementRef<HTMLElement>>(ElementRef);
   private nodeAccessor = inject(NodeAccessorService);
-  private overlaysService = inject(OverlaysService);
 
   // TODO remove dependency from this directive
   private connectionController = inject(ConnectionControllerDirective, { optional: true });
@@ -85,8 +84,6 @@ export class NodeComponent implements OnInit, OnDestroy {
 
   public nodeTemplate = input<TemplateRef<any>>();
 
-  public nodeSvgTemplate = input<TemplateRef<any>>();
-
   public groupNodeTemplate = input<TemplateRef<any>>();
 
   protected showMagnet = computed(
@@ -97,10 +94,16 @@ export class NodeComponent implements OnInit, OnDestroy {
       this.flowStatusService.status().state === 'reconnection-validation',
   );
 
-  protected toolbars = computed(() => this.overlaysService.nodeToolbarsMap().get(this.model()));
-
   public ngOnInit() {
     this.model().isVisible.set(true);
+
+    // Nodes whose size is content-driven (html-template / component) are measured
+    // by nodeResizeController; until then they stay hidden. Other node types have
+    // explicit dimensions and are considered measured immediately.
+    const type = this.model().rawNode.type;
+    if (type !== 'html-template' && !this.model().isComponentType) {
+      this.model().isMeasured.set(true);
+    }
 
     this.nodeAccessor.model.set(this.model());
     this.handleService.node.set(this.model());

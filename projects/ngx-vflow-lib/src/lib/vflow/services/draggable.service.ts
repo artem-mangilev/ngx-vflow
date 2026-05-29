@@ -17,6 +17,19 @@ import { isGroupNode } from '../utils/is-group-node';
 
 type DragEvent = D3DragEvent<Element, unknown, unknown>;
 
+function clientFromEvent(event: MouseEvent | TouchEvent): Point {
+  if ('touches' in event && event.touches.length) {
+    return { x: event.touches[0].clientX, y: event.touches[0].clientY };
+  }
+
+  if ('changedTouches' in event && event.changedTouches.length) {
+    return { x: event.changedTouches[0].clientX, y: event.changedTouches[0].clientY };
+  }
+
+  const mouseEvent = event as MouseEvent;
+  return { x: mouseEvent.clientX, y: mouseEvent.clientY };
+}
+
 @Injectable()
 export class DraggableService {
   private entitiesService = inject(FlowEntitiesService);
@@ -33,7 +46,7 @@ export class DraggableService {
    * @param model model with data for this element
    */
   public enable(element: Element, model: NodeModel) {
-    select(element).call(this.getDragBehavior(model));
+    select(element).call(this.getDragBehavior(model, element));
   }
 
   /**
@@ -65,7 +78,7 @@ export class DraggableService {
    * @param model
    * @returns
    */
-  private getDragBehavior(model: NodeModel) {
+  private getDragBehavior(model: NodeModel, element: Element) {
     let dragNodes: NodeModel[] = [];
     let initialPositions: Point[] = [];
     let moveNodesOnAutoPanSub: Subscription | null = null;
@@ -96,9 +109,13 @@ export class DraggableService {
 
         this.flowStatusService.setNodeDragStartStatus(model);
 
+        // d3-drag event.x/y are screen px (not auto-scaled like the old SVG CTM),
+        // so recompute the pointer position in flow space (xyflow XYDrag approach).
+        const flow = this.getFlowPoint(event.sourceEvent, element);
+
         initialPositions = dragNodes.map((node) => ({
-          x: node.point().x - event.x,
-          y: node.point().y - event.y,
+          x: node.point().x - flow.x,
+          y: node.point().y - flow.y,
         }));
 
         // Subscribe to viewport changes during drag to sync node positions with auto-pan
@@ -106,10 +123,12 @@ export class DraggableService {
       })
 
       .on('drag', (event: DragEvent) => {
+        const flow = this.getFlowPoint(event.sourceEvent, element);
+
         dragNodes.forEach((model, index) => {
           const point = {
-            x: round(event.x + initialPositions[index].x),
-            y: round(event.y + initialPositions[index].y),
+            x: round(flow.x + initialPositions[index].x),
+            y: round(flow.y + initialPositions[index].y),
           };
 
           this.alignToGrid(point);
@@ -124,6 +143,23 @@ export class DraggableService {
         moveNodesOnAutoPanSub = null;
         this.flowStatusService.setNodeDragEndStatus(model);
       });
+  }
+
+  /**
+   * Convert the pointer position of a d3-drag source event into flow coordinates,
+   * mirroring SpacePointContextDirective: flow = (client - paneRect - {x,y}) / zoom.
+   */
+  private getFlowPoint(sourceEvent: MouseEvent | TouchEvent, element: Element): Point {
+    const pane = (element.closest('.vflow-pane') as HTMLElement | null) ?? element;
+    const rect = pane.getBoundingClientRect();
+    const { x, y, zoom } = this.viewportService.readableViewport();
+
+    const client = clientFromEvent(sourceEvent);
+
+    return {
+      x: (client.x - rect.left - x) / zoom,
+      y: (client.y - rect.top - y) / zoom,
+    };
   }
 
   private getDragNodes(model: NodeModel) {

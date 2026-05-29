@@ -9,7 +9,6 @@ import {
   GroupNodeTemplateDirective,
   HandleTemplateDirective,
   NodeHtmlTemplateDirective,
-  NodeSvgTemplateDirective,
 } from './directives/template.directive';
 import { ConnectionControllerDirective } from './directives/connection-controller.directive';
 
@@ -31,7 +30,6 @@ export const Vflow = [
   ConnectionControllerDirective,
 
   NodeHtmlTemplateDirective,
-  NodeSvgTemplateDirective,
   GroupNodeTemplateDirective,
   EdgeLabelHtmlTemplateDirective,
   EdgeTemplateDirective,

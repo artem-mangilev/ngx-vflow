@@ -1,25 +1,50 @@
-.magnet {
-  opacity: 0;
+:host {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+  pointer-events: all;
 }
 
 .wrapper {
-  display: table-cell;
+  width: max-content;
 }
 
 .default-group-node {
-  stroke-width: 1.5px;
-  fill-opacity: 0.05;
+  border: 1.5px solid var(--group-color);
+  background-color: color-mix(in srgb, var(--group-color) 5%, transparent);
+  border-radius: 5px;
 
   &_selected {
-    stroke-width: 2px;
+    border-width: 2px;
   }
 
   &_preselected {
-    stroke-width: 2px;
+    border-width: 2px;
   }
 }
 
 .default-handle {
-  stroke: #fff;
-  fill: #1b262c;
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  background: #1b262c;
+  transform: translate(-50%, -50%);
+  pointer-events: all;
+}
+
+.custom-handle {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  pointer-events: all;
+}
+
+.magnet {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0;
+  transform: translate(-50%, -50%);
+  pointer-events: all;
 }

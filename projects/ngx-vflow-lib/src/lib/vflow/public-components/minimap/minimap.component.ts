@@ -17,7 +17,6 @@ import { FlowSettingsService } from '../../services/flow-settings.service';
 import { getViewportForBounds } from '../../utils/viewport';
 import { getNodesFlowBounds } from '../../utils/nodes';
 import { ViewportService } from '../../services/viewport.service';
-import { DefaultNodeComponent } from '../../components/default-node/default-node.component';
 
 export type MiniMapPosition = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
 
@@ -25,7 +24,6 @@ export type MiniMapPosition = 'top-left' | 'top-right' | 'bottom-left' | 'bottom
   selector: 'mini-map',
   templateUrl: './minimap.component.html',
   styleUrls: [`./minimap.component.scss`],
-  imports: [DefaultNodeComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MiniMapComponent implements OnInit {

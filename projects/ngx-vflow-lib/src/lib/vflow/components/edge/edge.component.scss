@@ -1,3 +1,11 @@
+:host {
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+
 .edge {
   fill: none;
   stroke-width: 2;
@@ -18,9 +26,12 @@
   fill: none;
   stroke-width: 20;
   stroke: transparent;
+  pointer-events: stroke;
+  cursor: pointer;
 }
 
 .reconnect-handle {
   fill: transparent;
   cursor: move;
+  pointer-events: all;
 }

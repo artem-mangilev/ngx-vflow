@@ -1,9 +1,8 @@
-import { Directive, ElementRef, NgZone, OnInit, effect, inject, signal, untracked } from '@angular/core';
+import { Directive, ElementRef, NgZone, OnInit, effect, inject, untracked } from '@angular/core';
 import { select } from 'd3-selection';
 import { D3ZoomEvent, ZoomBehavior, ZoomTransform, zoom, zoomIdentity } from 'd3-zoom';
 import { ViewportService } from '../services/viewport.service';
 import { isDefined } from '../utils/is-defined';
-import { RootSvgReferenceDirective } from './reference.directive';
 import { ViewportState } from '../interfaces/viewport.interface';
 import { SelectionService, ViewportForSelection } from '../services/selection.service';
 import { FlowSettingsService } from '../services/flow-settings.service';
@@ -12,23 +11,17 @@ import { allowRootZoomForNodeTarget } from '../utils/allow-root-zoom-for-node-ta
 
 @Directive({
   standalone: true,
-  selector: 'g[mapContext]',
-  host: {
-    '[attr.transform]': 'transform()',
-  },
+  selector: 'div[mapContext]',
 })
 export class MapContextDirective implements OnInit {
-  protected rootSvg = inject(RootSvgReferenceDirective).element;
-  protected host = inject<ElementRef<SVGGElement>>(ElementRef).nativeElement;
+  protected host = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
   protected selectionService = inject(SelectionService);
   protected viewportService = inject(ViewportService);
   protected flowSettingsService = inject(FlowSettingsService);
   protected keyboardService = inject(KeyboardService);
   protected zone = inject(NgZone);
 
-  protected rootSvgSelection = select(this.rootSvg);
-
-  protected transform = signal<string>('');
+  protected paneSelection = select(this.host);
 
   protected viewportForSelection: Partial<ViewportForSelection> = {};
 
@@ -43,7 +36,7 @@ export class MapContextDirective implements OnInit {
 
     // If only zoom provided
     if (isDefined(state.zoom) && !isDefined(state.x) && !isDefined(state.y)) {
-      this.rootSvgSelection.transition().duration(viewport.duration).call(this.zoomBehavior.scaleTo, state.zoom);
+      this.paneSelection.transition().duration(viewport.duration).call(this.zoomBehavior.scaleTo, state.zoom);
 
       return;
     }
@@ -53,7 +46,7 @@ export class MapContextDirective implements OnInit {
       // remain same zoom value
       const zoom = untracked(this.viewportService.readableViewport).zoom;
 
-      this.rootSvgSelection
+      this.paneSelection
         .transition()
         .duration(viewport.duration)
         .call(this.zoomBehavior.transform, zoomIdentity.translate(state.x, state.y).scale(zoom));
@@ -63,7 +56,7 @@ export class MapContextDirective implements OnInit {
 
     // If whole viewort state provided
     if (isDefined(state.x) && isDefined(state.y) && isDefined(state.zoom)) {
-      this.rootSvgSelection
+      this.paneSelection
         .transition()
         .duration(viewport.duration)
         .call(this.zoomBehavior.transform, zoomIdentity.translate(state.x, state.y).scale(state.zoom));
@@ -72,26 +65,24 @@ export class MapContextDirective implements OnInit {
     }
   });
 
-  protected zoomBehavior!: ZoomBehavior<SVGSVGElement, unknown>;
+  protected zoomBehavior!: ZoomBehavior<HTMLElement, unknown>;
 
   public ngOnInit(): void {
     this.zone.runOutsideAngular(() => {
-      this.zoomBehavior = zoom<SVGSVGElement, unknown>()
+      this.zoomBehavior = zoom<HTMLElement, unknown>()
         .scaleExtent([this.flowSettingsService.minZoom(), this.flowSettingsService.maxZoom()])
         .filter(this.filterCondition)
         .on('start', this.handleZoomStart)
         .on('zoom', this.handleZoom)
         .on('end', this.handleZoomEnd);
 
-      this.rootSvgSelection.call(this.zoomBehavior).on('dblclick.zoom', null);
+      this.paneSelection.call(this.zoomBehavior).on('dblclick.zoom', null);
     });
   }
 
   private handleZoom = ({ transform }: ZoomEvent) => {
     // update public signal for user to read
     this.viewportService.readableViewport.set(mapTransformToViewportState(transform));
-
-    this.transform.set(transform.toString());
   };
 
   private handleZoomStart = ({ transform }: ZoomEvent) => {
@@ -140,4 +131,4 @@ declare module 'd3-selection' {
   }
 }
 
-type ZoomEvent = D3ZoomEvent<SVGSVGElement, unknown>;
+type ZoomEvent = D3ZoomEvent<HTMLElement, unknown>;

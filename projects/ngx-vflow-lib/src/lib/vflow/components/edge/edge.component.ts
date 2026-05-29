@@ -5,7 +5,6 @@ import { EdgeModel } from '../../models/edge.model';
 import { EdgeContext } from '../../interfaces/template-context.interface';
 import { SelectionService } from '../../services/selection.service';
 import { FlowSettingsService } from '../../services/flow-settings.service';
-import { EdgeLabelComponent } from '../edge-label/edge-label.component';
 import { ConnectionControllerDirective } from '../../directives/connection-controller.directive';
 import { HandleModel } from '../../models/handle.model';
 import { FlowStatusService } from '../../services/flow-status.service';
@@ -13,7 +12,7 @@ import { EdgeRenderingService } from '../../services/edge-rendering.service';
 import { PointerDirective } from '../../directives/pointer.directive';
 
 @Component({
-  selector: 'g[edge]',
+  selector: 'svg[edge]',
   templateUrl: './edge.component.html',
   styleUrls: ['./edge.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -21,7 +20,7 @@ import { PointerDirective } from '../../directives/pointer.directive';
     class: 'selectable',
     '[style.visibility]': 'isReconnecting() ? "hidden" : "visible"',
   },
-  imports: [NgTemplateOutlet, EdgeLabelComponent, PointerDirective],
+  imports: [NgTemplateOutlet, PointerDirective],
 })
 export class EdgeComponent {
   protected injector = inject(Injector);
@@ -36,8 +35,6 @@ export class EdgeComponent {
   public model = input.required<EdgeModel>();
 
   public edgeTemplate = input<TemplateRef<EdgeContext>>();
-
-  public edgeLabelHtmlTemplate = input<TemplateRef<any>>();
 
   protected isReconnecting = computed(() => {
     const status = this.flowStatusService.status();
