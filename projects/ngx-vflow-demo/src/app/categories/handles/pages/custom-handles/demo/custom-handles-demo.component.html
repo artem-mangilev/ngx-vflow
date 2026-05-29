@@ -29,26 +29,13 @@
 </vflow>
 
 <ng-template #handleTemplate let-ctx>
-  <svg:circle
-    stroke-width="1"
-    stroke="black"
-    r="6"
-    fill="#1b262c"
-    [attr.cx]="ctx.point().x"
-    [attr.cy]="ctx.point().y" />
+  <div class="circle-handle"></div>
 </ng-template>
 
 <ng-template #squareHandleTemplate let-ctx>
-  <svg:rect
-    width="10"
-    height="10"
-    stroke-width="1"
-    stroke="black"
-    rx="1"
-    ry="1"
-    [attr.x]="ctx.point().x - 5"
-    [attr.y]="ctx.point().y - 5"
+  <div
+    class="square-handle"
     [class.handle_idle]="ctx.state() === 'idle'"
     [class.handle_valid]="ctx.state() === 'valid'"
-    [class.handle_invalid]="ctx.state() === 'invalid'" />
+    [class.handle_invalid]="ctx.state() === 'invalid'"></div>
 </ng-template>

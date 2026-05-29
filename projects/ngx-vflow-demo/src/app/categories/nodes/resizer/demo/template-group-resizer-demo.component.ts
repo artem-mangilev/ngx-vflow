@@ -4,17 +4,13 @@ import { Node, Vflow } from 'ngx-vflow';
 @Component({
   template: `<vflow view="auto" [nodes]="nodes">
     <ng-template let-ctx groupNode>
-      <svg:rect
+      <div
         selectable
-        rx="5"
-        ry="5"
-        stroke="red"
-        fill="red"
-        fill-opacity="0.05"
+        class="group-node"
         [resizable]="ctx.selected()"
-        [style.stroke-width]="ctx.selected() ? 3 : 1"
-        [attr.width]="ctx.width()"
-        [attr.height]="ctx.height()" />
+        [class.group-node_selected]="ctx.selected()"
+        [style.width.px]="ctx.width()"
+        [style.height.px]="ctx.height()"></div>
     </ng-template>
   </vflow>`,
   styles: [
@@ -22,6 +18,17 @@ import { Node, Vflow } from 'ngx-vflow';
       :host {
         width: 100%;
         height: 100%;
+      }
+
+      .group-node {
+        box-sizing: border-box;
+        border: 1px solid red;
+        border-radius: 5px;
+        background-color: rgba(255, 0, 0, 0.05);
+      }
+
+      .group-node_selected {
+        border-width: 3px;
       }
     `,
   ],

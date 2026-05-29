@@ -84,6 +84,7 @@
                 [model]="label"
                 [point]="point"
                 [edgeModel]="model"
+                [style.zIndex]="model.renderOrder()"
                 [htmlTemplate]="edgeLabelHtmlDirective()?.templateRef"></div>
             }
           }
@@ -94,6 +95,7 @@
                 [model]="label"
                 [point]="point"
                 [edgeModel]="model"
+                [style.zIndex]="model.renderOrder()"
                 [htmlTemplate]="edgeLabelHtmlDirective()?.templateRef"></div>
             }
           }
@@ -104,6 +106,7 @@
                 [model]="label"
                 [point]="point"
                 [edgeModel]="model"
+                [style.zIndex]="model.renderOrder()"
                 [htmlTemplate]="edgeLabelHtmlDirective()?.templateRef"></div>
             }
           }

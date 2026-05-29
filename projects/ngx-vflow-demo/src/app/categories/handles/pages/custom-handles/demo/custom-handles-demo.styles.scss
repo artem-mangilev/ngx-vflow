@@ -22,16 +22,29 @@
   text-align: center;
 }
 
-.handle {
-  &_idle {
-    fill: #fff;
-  }
+.circle-handle {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1px solid black;
+  background-color: #1b262c;
+}
 
-  &_valid {
-    fill: green;
-  }
+.square-handle {
+  width: 10px;
+  height: 10px;
+  border-radius: 1px;
+  border: 1px solid black;
+}
 
-  &_invalid {
-    fill: red;
-  }
+.handle_idle {
+  background-color: #fff;
+}
+
+.handle_valid {
+  background-color: green;
+}
+
+.handle_invalid {
+  background-color: red;
 }

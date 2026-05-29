@@ -9,18 +9,14 @@ import { Edge, Node, Vflow } from 'ngx-vflow';
     [snapGrid]="[25, 25]"
     [background]="{ type: 'dots', gap: 25 }">
     <ng-template let-ctx groupNode>
-      <svg:rect
+      <div
         selectable
-        rx="5"
-        ry="5"
-        [attr.width]="ctx.width()"
-        [attr.height]="ctx.height()"
-        [style.stroke]="'red'"
-        [style.fill]="'red'"
-        [style.fill-opacity]="0.05"
-        [style.stroke-width]="ctx.selected() ? 3 : 1">
+        class="group-node"
+        [class.group-node_selected]="ctx.selected()"
+        [style.width.px]="ctx.width()"
+        [style.height.px]="ctx.height()">
         <handle type="source" position="right" />
-      </svg:rect>
+      </div>
     </ng-template>
   </vflow>`,
   styles: [
@@ -28,6 +24,17 @@ import { Edge, Node, Vflow } from 'ngx-vflow';
       :host {
         width: 100%;
         height: 100%;
+      }
+
+      .group-node {
+        box-sizing: border-box;
+        border: 1px solid red;
+        border-radius: 5px;
+        background-color: rgba(255, 0, 0, 0.05);
+      }
+
+      .group-node_selected {
+        border-width: 3px;
       }
     `,
   ],
