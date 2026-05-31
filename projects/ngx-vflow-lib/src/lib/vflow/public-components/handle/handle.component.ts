@@ -1,4 +1,5 @@
 import {
+  AfterViewInit,
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
@@ -6,31 +7,39 @@ import {
   Injector,
   OnInit,
   TemplateRef,
+  computed,
   inject,
   input,
   runInInjectionContext,
+  viewChild,
 } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
 import { Position } from '../../types/position.type';
 import { HandleService } from '../../services/handle.service';
 import { HandleModel } from '../../models/handle.model';
 import { RequestAnimationFrameBatchingService } from '../../services/request-animation-frame-batching.service';
-import { HtmlElementCacheService } from '../../services/html-element-cache.service';
-import { SvgGraphicElementCacheService } from '../../services/svg-graphic-element-cache.service';
+import { PointerDirective } from '../../directives/pointer.directive';
+import { ConnectionControllerDirective } from '../../directives/connection-controller.directive';
+import { FlowStatusService } from '../../services/flow-status.service';
 
 @Component({
   standalone: true,
   selector: 'handle',
   templateUrl: './handle.component.html',
+  styleUrls: ['./handle.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [NgTemplateOutlet, PointerDirective],
 })
-export class HandleComponent implements OnInit {
+export class HandleComponent implements OnInit, AfterViewInit {
   private injector = inject(Injector);
   private handleService = inject(HandleService);
   private element = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
   private destroyRef = inject(DestroyRef);
   private requestAnimationFrameBatchingService = inject(RequestAnimationFrameBatchingService);
-  private htmlElementCacheService = inject(HtmlElementCacheService);
-  private svgGraphicElementCacheService = inject(SvgGraphicElementCacheService);
+  private flowStatusService = inject(FlowStatusService);
+
+  // TODO remove dependency from this directive
+  private connectionController = inject(ConnectionControllerDirective, { optional: true });
 
   /**
    * At what side of node this component should be placed
@@ -52,38 +61,99 @@ export class HandleComponent implements OnInit {
   public offsetX = input<number>(0);
   public offsetY = input<number>(0);
 
+  private handleElementRef = viewChild<ElementRef<HTMLElement>>('handleElement');
+
+  protected model: HandleModel | null = null;
+
+  protected showMagnet = computed(
+    () =>
+      this.flowStatusService.status().state === 'connection-start' ||
+      this.flowStatusService.status().state === 'connection-validation' ||
+      this.flowStatusService.status().state === 'reconnection-start' ||
+      this.flowStatusService.status().state === 'reconnection-validation',
+  );
+
   public ngOnInit() {
     runInInjectionContext(this.injector, () => {
       const node = this.handleService.node();
 
-      if (node) {
-        const model = new HandleModel(
-          {
-            position: this.position(),
-            type: this.type(),
-            id: this.id(),
-
-            hostReference: this.element.parentElement!,
-            template: this.template(),
-            userOffsetX: this.offsetX(),
-            userOffsetY: this.offsetY(),
-          },
-          node,
-          this.htmlElementCacheService,
-          this.svgGraphicElementCacheService,
-        );
-
-        this.handleService.createHandle(model);
-
-        this.requestAnimationFrameBatchingService.batchAnimationFrame(() => {
-          model.updateHost();
-        });
-
-        this.destroyRef.onDestroy(() => {
-          this.handleService.destroyHandle(model);
-          model.onDestroy();
-        });
+      if (!node) {
+        return;
       }
+
+      // The handle is absolutely positioned and centered against its parent DOM
+      // element, so the parent has to establish a positioning context.
+      const parent = this.element.parentElement;
+      if (parent && getComputedStyle(parent).position === 'static') {
+        parent.style.position = 'relative';
+      }
+
+      const model = new HandleModel(
+        {
+          position: this.position(),
+          type: this.type(),
+          id: this.id(),
+
+          hostReference: parent!,
+          template: this.template(),
+          userOffsetX: this.offsetX(),
+          userOffsetY: this.offsetY(),
+        },
+        node,
+      );
+
+      this.model = model;
+      this.handleService.createHandle(model);
+
+      this.destroyRef.onDestroy(() => {
+        this.handleService.destroyHandle(model);
+      });
     });
+  }
+
+  public ngAfterViewInit() {
+    const model = this.model;
+    const handleElement = this.handleElementRef()?.nativeElement;
+
+    if (!model || !handleElement) {
+      return;
+    }
+
+    model.handleElement = handleElement;
+
+    this.requestAnimationFrameBatchingService.batchAnimationFrame(() => {
+      model.updateHost();
+    });
+  }
+
+  protected startConnection(event: Event) {
+    if (!this.model) {
+      return;
+    }
+
+    // ignore drag by stopping propagation
+    event.stopPropagation();
+
+    this.connectionController?.startConnection(this.model);
+  }
+
+  protected endConnection() {
+    this.connectionController?.endConnection();
+  }
+
+  protected validateConnection() {
+    if (!this.model) {
+      return;
+    }
+
+    this.connectionController?.validateConnection(this.model);
+  }
+
+  protected resetValidateConnection() {
+    if (!this.model) {
+      return;
+    }
+
+    this.connectionController?.resetValidateConnection(this.model);
   }
 }

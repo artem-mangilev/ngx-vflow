@@ -1,0 +1,26 @@
+@if (model; as model) {
+  <div
+    #handleElement
+    class="handle handle--{{ position() }}"
+    [class.handle--default]="template() === undefined"
+    [style.--vflow-handle-offset-x]="-offsetX() + 'px'"
+    [style.--vflow-handle-offset-y]="-offsetY() + 'px'"
+    (pointerStart)="startConnection($event)"
+    (pointerEnd)="endConnection()">
+    @if (template()) {
+      <ng-container *ngTemplateOutlet="template()!; context: model.templateContext" />
+    }
+  </div>
+
+  @if (showMagnet()) {
+    <div
+      class="magnet handle--{{ position() }}"
+      [style.width.px]="model.parentNode.magnetRadius * 2"
+      [style.height.px]="model.parentNode.magnetRadius * 2"
+      [style.--vflow-handle-offset-x]="-offsetX() + 'px'"
+      [style.--vflow-handle-offset-y]="-offsetY() + 'px'"
+      (pointerEnd)="endConnection(); resetValidateConnection()"
+      (pointerOver)="validateConnection()"
+      (pointerOut)="resetValidateConnection()"></div>
+  }
+}

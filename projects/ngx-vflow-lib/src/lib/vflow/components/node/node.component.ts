@@ -15,16 +15,12 @@ import { DraggableService } from '../../services/draggable.service';
 import { NodeModel } from '../../models/node.model';
 import { FlowStatusService, isSelectionBoxEndStatus } from '../../services/flow-status.service';
 import { HandleService } from '../../services/handle.service';
-import { HandleModel } from '../../models/handle.model';
 import { NodeRenderingService } from '../../services/node-rendering.service';
 import { FlowSettingsService } from '../../services/flow-settings.service';
 import { SelectionService } from '../../services/selection.service';
-import { ConnectionControllerDirective } from '../../directives/connection-controller.directive';
 import { NodeAccessorService } from '../../services/node-accessor.service';
-import { HandleSizeControllerDirective } from '../../directives/handle-size-controller.directive';
 import { NgTemplateOutlet, NgComponentOutlet, AsyncPipe } from '@angular/common';
 import { DefaultNodeComponent } from '../default-node/default-node.component';
-import { PointerDirective } from '../../directives/pointer.directive';
 
 // TODO: fix loading of these by @defer (should work in Angular 18+)
 // public components that uses in default node (loaded by defer)
@@ -48,13 +44,11 @@ export type HandleState = 'valid' | 'invalid' | 'idle';
     '[style.visibility]': "model().isMeasured() ? 'visible' : 'hidden'",
   },
   imports: [
-    PointerDirective,
     DefaultNodeComponent,
     HandleComponent,
     NgTemplateOutlet,
     NgComponentOutlet,
     ResizableComponent,
-    HandleSizeControllerDirective,
     NodeHandlesControllerDirective,
     NodeResizeControllerDirective,
     AsyncPipe,
@@ -71,9 +65,6 @@ export class NodeComponent implements OnInit, OnDestroy {
   private hostRef = inject<ElementRef<HTMLElement>>(ElementRef);
   private nodeAccessor = inject(NodeAccessorService);
 
-  // TODO remove dependency from this directive
-  private connectionController = inject(ConnectionControllerDirective, { optional: true });
-
   public model = input.required<NodeModel>();
 
   protected readonly hostUndraggable = computed(() => !this.model().draggable());
@@ -85,14 +76,6 @@ export class NodeComponent implements OnInit, OnDestroy {
   public nodeTemplate = input<TemplateRef<any>>();
 
   public groupNodeTemplate = input<TemplateRef<any>>();
-
-  protected showMagnet = computed(
-    () =>
-      this.flowStatusService.status().state === 'connection-start' ||
-      this.flowStatusService.status().state === 'connection-validation' ||
-      this.flowStatusService.status().state === 'reconnection-start' ||
-      this.flowStatusService.status().state === 'reconnection-validation',
-  );
 
   public ngOnInit() {
     this.model().isVisible.set(true);
@@ -107,6 +90,7 @@ export class NodeComponent implements OnInit, OnDestroy {
 
     this.nodeAccessor.model.set(this.model());
     this.handleService.node.set(this.model());
+    this.model().nodeElement.set(this.hostRef.nativeElement);
 
     effect(
       () => {
@@ -124,25 +108,6 @@ export class NodeComponent implements OnInit, OnDestroy {
     this.model().isVisible.set(false);
 
     this.draggableService.destroy(this.hostRef.nativeElement);
-  }
-
-  protected startConnection(event: Event, handle: HandleModel) {
-    // ignore drag by stopping propagation
-    event.stopPropagation();
-
-    this.connectionController?.startConnection(handle);
-  }
-
-  protected validateConnection(handle: HandleModel) {
-    this.connectionController?.validateConnection(handle);
-  }
-
-  protected resetValidateConnection(targetHandle: HandleModel) {
-    this.connectionController?.resetValidateConnection(targetHandle);
-  }
-
-  protected endConnection() {
-    this.connectionController?.endConnection();
   }
 
   protected pullNode() {

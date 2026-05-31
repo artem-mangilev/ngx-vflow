@@ -1,106 +1,45 @@
-import { computed, signal } from '@angular/core';
+import { computed, inject, signal } from '@angular/core';
 import { NodeHandle } from '../services/handle.service';
 import { NodeModel } from './node.model';
-import { Subject } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { HtmlElementCacheService } from '../services/html-element-cache.service';
-import { SvgGraphicElementCacheService } from '../services/svg-graphic-element-cache.service';
+import { Point } from '../interfaces/point.interface';
+import { ViewportService } from '../services/viewport.service';
 
 export type HandleState = 'valid' | 'invalid' | 'idle';
 
 export class HandleModel {
-  public readonly strokeWidth = 2;
-
-  /**
-   * Pre-computed size for default handle, changed dynamically
-   * for custom handles
-   */
-  public size = signal({
-    width: 10 + 2 * this.strokeWidth,
-    height: 10 + 2 * this.strokeWidth,
-  });
-
-  public pointAbsolute = computed(() => {
-    return {
-      x: this.parentNode.globalPoint().x + this.hostOffset().x + this.sizeOffset().x,
-      y: this.parentNode.globalPoint().y + this.hostOffset().y + this.sizeOffset().y,
-    };
-  });
+  private viewportService = inject(ViewportService);
 
   public state = signal<HandleState>('idle');
 
-  private updateHostSizeAndPosition$ = new Subject<void>();
-  // TODO: for some reason toLazySignal breaks unit tests, so we use toSignal here
-  private hostSize = toSignal(this.updateHostSizeAndPosition$.pipe(map(() => this.getHostSize())), {
-    initialValue: { width: 0, height: 0 },
-  });
-
-  // TODO: for some reason toLazySignal breaks unit tests, so we use toSignal here
-  private hostPosition = toSignal(
-    this.updateHostSizeAndPosition$.pipe(
-      map(() => {
-        const offsets =
-          this.hostReference instanceof HTMLElement
-            ? this.htmlElementCacheService.getElementData(this.hostReference)
-            : undefined;
-
-        return {
-          x: offsets ? offsets.offsetLeft : 0, // for now just 0 for group nodes
-          y: offsets ? offsets.offsetTop : 0, // for now just 0 for group nodes
-        };
-      }),
-    ),
-    {
-      initialValue: { x: 0, y: 0 },
-    },
-  );
-
-  public hostOffset = computed(() => {
-    switch (this.rawHandle.position) {
-      case 'left':
-        return {
-          x: -this.rawHandle.userOffsetX,
-          y: -this.rawHandle.userOffsetY + this.hostPosition().y + this.hostSize().height / 2,
-        };
-      case 'right':
-        return {
-          x: -this.rawHandle.userOffsetX + this.parentNode.width(),
-          y: -this.rawHandle.userOffsetY + this.hostPosition().y + this.hostSize().height / 2,
-        };
-      case 'top':
-        return {
-          x: -this.rawHandle.userOffsetX + this.hostPosition().x + this.hostSize().width / 2,
-          y: -this.rawHandle.userOffsetY,
-        };
-      case 'bottom':
-        return {
-          x: -this.rawHandle.userOffsetX + this.hostPosition().x + this.hostSize().width / 2,
-          y: -this.rawHandle.userOffsetY + this.parentNode.height(),
-        };
-    }
-  });
-
-  private sizeOffset = computed(() => {
-    switch (this.rawHandle.position) {
-      case 'left':
-        return { x: -(this.size().width / 2), y: 0 };
-      case 'right':
-        return { x: this.size().width / 2, y: 0 };
-      case 'top':
-        return { x: 0, y: -(this.size().height / 2) };
-      case 'bottom':
-        return { x: 0, y: this.size().height / 2 };
-    }
-  });
-
+  /**
+   * Parent DOM element the `<handle>` was placed into. Kept so the node can
+   * observe it for resizes and re-measure the handle position.
+   */
   public hostReference = this.rawHandle.hostReference!;
+
+  /**
+   * The rendered handle DOM element. Set by `HandleComponent` once its view is
+   * initialized, then used to measure the connection point.
+   */
+  public handleElement: HTMLElement | null = null;
 
   public template = this.rawHandle.template;
 
+  /**
+   * Connection point of the handle relative to the node origin, in flow units.
+   * It is measured directly from the DOM so that it always matches the
+   * CSS-centered handle, regardless of paddings, borders or custom sizes.
+   */
+  private localPoint = signal<Point>({ x: 0, y: 0 });
+
+  public pointAbsolute = computed<Point>(() => ({
+    x: this.parentNode.globalPoint().x + this.localPoint().x,
+    y: this.parentNode.globalPoint().y + this.localPoint().y,
+  }));
+
   public templateContext = {
     $implicit: {
-      point: this.hostOffset,
+      point: this.pointAbsolute,
       state: this.state,
       node: this.parentNode.rawNode,
     },
@@ -109,45 +48,48 @@ export class HandleModel {
   constructor(
     public rawHandle: NodeHandle,
     public parentNode: NodeModel,
-    public htmlElementCacheService: HtmlElementCacheService,
-    public svgGraphicElementCacheService: SvgGraphicElementCacheService,
-  ) {
-    if (this.hostReference instanceof HTMLElement) {
-      this.htmlElementCacheService.addElementCache(this.hostReference);
-    } else if (this.hostReference instanceof SVGGraphicsElement) {
-      this.svgGraphicElementCacheService.addElementCache(this.hostReference);
-    }
-  }
-
-  public onDestroy() {
-    if (this.hostReference instanceof HTMLElement) {
-      this.htmlElementCacheService.removeElementCache(this.hostReference);
-    } else if (this.hostReference instanceof SVGGraphicsElement) {
-      this.svgGraphicElementCacheService.removeElementCache(this.hostReference);
-    }
-  }
+  ) {}
 
   public updateHost() {
-    this.htmlElementCacheService.markCacheAsDirty();
-    this.svgGraphicElementCacheService.markCacheAsDirty();
-    this.updateHostSizeAndPosition$.next();
-  }
+    const handleElement = this.handleElement;
+    const nodeElement = this.parentNode.nodeElement();
 
-  private getHostSize(): { width: number; height: number } {
-    //TODO only get the hist ref width once ?
-    if (this.hostReference instanceof HTMLElement) {
-      const offsets = this.htmlElementCacheService.getElementData(this.hostReference);
-
-      if (offsets) {
-        return {
-          width: offsets.offsetWidth,
-          height: offsets.offsetHeight,
-        };
-      }
-    } else if (this.hostReference instanceof SVGGraphicsElement) {
-      return this.svgGraphicElementCacheService.getElementData(this.hostReference);
+    if (!handleElement || !nodeElement) {
+      return;
     }
 
-    return { width: 0, height: 0 };
+    // Both rects live in the same zoomed coordinate space (they share the
+    // CSS-scaled viewport), so subtracting them and dividing by the zoom yields
+    // the connection point in flow units, independent of the current zoom.
+    const zoom = this.viewportService.readableViewport().zoom || 1;
+    const handleRect = handleElement.getBoundingClientRect();
+    const nodeRect = nodeElement.getBoundingClientRect();
+
+    let pointX: number;
+    let pointY: number;
+
+    switch (this.rawHandle.position) {
+      case 'left':
+        pointX = handleRect.left;
+        pointY = handleRect.top + handleRect.height / 2;
+        break;
+      case 'right':
+        pointX = handleRect.right;
+        pointY = handleRect.top + handleRect.height / 2;
+        break;
+      case 'top':
+        pointX = handleRect.left + handleRect.width / 2;
+        pointY = handleRect.top;
+        break;
+      case 'bottom':
+        pointX = handleRect.left + handleRect.width / 2;
+        pointY = handleRect.bottom;
+        break;
+    }
+
+    this.localPoint.set({
+      x: (pointX - nodeRect.left) / zoom,
+      y: (pointY - nodeRect.top) / zoom,
+    });
   }
 }

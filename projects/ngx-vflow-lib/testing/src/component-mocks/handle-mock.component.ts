@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input, TemplateRef, OnInit } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, input, TemplateRef, OnInit } from '@angular/core';
 import type { HandleComponent, Position } from 'ngx-vflow';
 import { AsInterface } from '../types';
 
@@ -8,7 +8,7 @@ import { AsInterface } from '../types';
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
 })
-export class HandleMockComponent implements AsInterface<HandleComponent>, OnInit {
+export class HandleMockComponent implements AsInterface<HandleComponent>, OnInit, AfterViewInit {
   public position = input.required<Position>();
   public type = input.required<'source' | 'target'>();
   public id = input<string>();
@@ -18,4 +18,7 @@ export class HandleMockComponent implements AsInterface<HandleComponent>, OnInit
 
   // eslint-disable-next-line @angular-eslint/no-empty-lifecycle-method
   public ngOnInit(): void {}
+
+  // eslint-disable-next-line @angular-eslint/no-empty-lifecycle-method
+  public ngAfterViewInit(): void {}
 }

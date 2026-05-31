@@ -26,6 +26,12 @@ export class NodeModel<T = unknown>
   public isVisible = signal(false);
 
   /**
+   * Reference to the rendered node host element. Set by `NodeComponent` and used
+   * by handles to measure their connection point relative to the node origin.
+   */
+  public nodeElement = signal<HTMLElement | null>(null);
+
+  /**
    * Whether the node dimensions have been measured at least once.
    * Until then the node is rendered hidden to avoid flicker and wrong
    * edge endpoints.
