@@ -53,8 +53,6 @@ function calcControlPoint(point: Point, pointPosition: Position, distanceVector:
 
   // TODO: probably need to make this configurable
   const curvature = 0.25;
-  // thanks colleagues from react/svelte world
-  // https://github.com/xyflow/xyflow/blob/f0117939bae934447fa7f232081f937169ee23b5/packages/system/src/utils/edges/bezier-edge.ts#L56
   const controlOffset = curvature * 25 * Math.sqrt(Math.abs(fullDistanceVector.x + fullDistanceVector.y));
 
   return {

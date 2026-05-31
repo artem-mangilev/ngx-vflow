@@ -1,36 +1,105 @@
-.resize-handle {
+.resize-control {
   position: absolute;
   pointer-events: all;
 }
 
-.top {
-  cursor: n-resize;
+// Cursors per position
+.resize-control.left,
+.resize-control.right {
+  cursor: ew-resize;
 }
 
-.left {
-  cursor: w-resize;
+.resize-control.top,
+.resize-control.bottom {
+  cursor: ns-resize;
 }
 
-.right {
-  cursor: e-resize;
+.resize-control.top.left,
+.resize-control.bottom.right {
+  cursor: nwse-resize;
 }
 
-.bottom {
-  cursor: s-resize;
+.resize-control.bottom.left,
+.resize-control.top.right {
+  cursor: nesw-resize;
 }
 
-.top-left {
-  cursor: nw-resize;
+// Corner handles
+.resize-control.handle {
+  width: 6px;
+  height: 6px;
+  border: 1px solid #fff;
+  border-radius: 1px;
+  translate: -50% -50%;
 }
 
-.top-right {
-  cursor: ne-resize;
+.resize-control.handle.left {
+  left: 0;
+  top: 50%;
+}
+.resize-control.handle.right {
+  left: 100%;
+  top: 50%;
+}
+.resize-control.handle.top {
+  left: 50%;
+  top: 0;
+}
+.resize-control.handle.bottom {
+  left: 50%;
+  top: 100%;
+}
+.resize-control.handle.top.left {
+  left: 0;
+}
+.resize-control.handle.bottom.left {
+  left: 0;
+}
+.resize-control.handle.top.right {
+  left: 100%;
+}
+.resize-control.handle.bottom.right {
+  left: 100%;
 }
 
-.bottom-left {
-  cursor: sw-resize;
+// Edge lines
+.resize-control.line {
+  border-width: 0;
+  border-style: solid;
 }
 
-.bottom-right {
-  cursor: se-resize;
+.resize-control.line.left,
+.resize-control.line.right {
+  width: 1px;
+  transform: translate(-50%, 0);
+  top: 0;
+  height: 100%;
+}
+
+.resize-control.line.left {
+  left: 0;
+  border-left-width: 1px;
+}
+
+.resize-control.line.right {
+  left: 100%;
+  border-right-width: 1px;
+}
+
+.resize-control.line.top,
+.resize-control.line.bottom {
+  height: 1px;
+  transform: translate(0, -50%);
+  left: 0;
+  width: 100%;
+}
+
+.resize-control.line.top {
+  top: 0;
+  border-top-width: 1px;
+}
+
+.resize-control.line.bottom {
+  border-bottom-width: 1px;
+  top: 100%;
 }

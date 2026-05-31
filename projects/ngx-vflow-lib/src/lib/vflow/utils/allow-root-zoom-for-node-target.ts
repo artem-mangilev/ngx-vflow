@@ -16,6 +16,11 @@ export function allowRootZoomForNodeTarget(event: Event, isSelectionKeyboardMode
     return true;
   }
 
+  // No-drag elements (e.g. resize controls) must not start a pan
+  if (target.closest('.nodrag')) {
+    return false;
+  }
+
   const node = target.closest('.vflow-node');
   if (!node) {
     return true;

@@ -42,6 +42,8 @@ export * from './lib/vflow/components/vflow/vflow.component';
 export * from './lib/vflow/public-components/handle/handle.component';
 export * from './lib/vflow/public-components/custom-node/custom-node.component';
 export * from './lib/vflow/public-components/resizable/resizable.component';
+export * from './lib/vflow/public-components/resizable/node-resize-control.component';
+export * from './lib/vflow/public-components/resizable/resizer-types';
 export * from './lib/vflow/public-components/minimap/minimap.component';
 export * from './lib/vflow/public-components/node-toolbar/node-toolbar.component';
 export * from './lib/vflow/public-components/custom-template-edge/custom-template-edge.component';

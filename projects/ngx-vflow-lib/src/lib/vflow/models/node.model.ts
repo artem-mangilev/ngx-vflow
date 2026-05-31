@@ -28,7 +28,7 @@ export class NodeModel<T = unknown>
   /**
    * Whether the node dimensions have been measured at least once.
    * Until then the node is rendered hidden to avoid flicker and wrong
-   * edge endpoints (mirrors xyflow behavior).
+   * edge endpoints.
    */
   public isMeasured = signal(false);
 

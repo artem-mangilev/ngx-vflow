@@ -1,83 +1,41 @@
 <ng-template #resizer>
-  <!-- Top line -->
-  <div
-    class="resize-handle top"
-    [style.left.px]="lineGap"
-    [style.top.px]="-gap() - 1"
-    [style.width.px]="model.width() - 2 * lineGap"
-    [style.height.px]="2"
-    [style.background-color]="resizerColor()"
-    (pointerStart)="startResize('top', $event)"></div>
+  @for (position of linePositions; track position) {
+    <div
+      nodeResizeControl
+      [position]="position"
+      [variant]="lineVariant"
+      [color]="resizerColor()"
+      [minWidth]="effectiveMinWidth()"
+      [minHeight]="effectiveMinHeight()"
+      [maxWidth]="effectiveMaxWidth()"
+      [maxHeight]="effectiveMaxHeight()"
+      [keepAspectRatio]="keepAspectRatio()"
+      [resizeDirection]="resizeDirection()"
+      [autoScale]="autoScale()"
+      [onResizeStart]="emitResizeStart"
+      [onResize]="emitResize"
+      [onResizeEnd]="emitResizeEnd"
+      [shouldResize]="shouldResize()"></div>
+  }
 
-  <!-- Left line -->
-  <div
-    class="resize-handle left"
-    [style.left.px]="-gap() - 1"
-    [style.top.px]="lineGap"
-    [style.width.px]="2"
-    [style.height.px]="model.height() - 2 * lineGap"
-    [style.background-color]="resizerColor()"
-    (pointerStart)="startResize('left', $event)"></div>
-
-  <!-- Bottom line -->
-  <div
-    class="resize-handle bottom"
-    [style.left.px]="lineGap"
-    [style.top.px]="model.height() + gap() - 1"
-    [style.width.px]="model.width() - 2 * lineGap"
-    [style.height.px]="2"
-    [style.background-color]="resizerColor()"
-    (pointerStart)="startResize('bottom', $event)"></div>
-
-  <!-- Right line -->
-  <div
-    class="resize-handle right"
-    [style.left.px]="model.width() + gap() - 1"
-    [style.top.px]="lineGap"
-    [style.width.px]="2"
-    [style.height.px]="model.height() - 2 * lineGap"
-    [style.background-color]="resizerColor()"
-    (pointerStart)="startResize('right', $event)"></div>
-
-  <!-- Top Left -->
-  <div
-    class="resize-handle top-left"
-    [style.left.px]="-(handleSize / 2) - gap()"
-    [style.top.px]="-(handleSize / 2) - gap()"
-    [style.width.px]="handleSize"
-    [style.height.px]="handleSize"
-    [style.background-color]="resizerColor()"
-    (pointerStart)="startResize('top-left', $event)"></div>
-
-  <!-- Top right -->
-  <div
-    class="resize-handle top-right"
-    [style.left.px]="model.width() - handleSize / 2 + gap()"
-    [style.top.px]="-(handleSize / 2) - gap()"
-    [style.width.px]="handleSize"
-    [style.height.px]="handleSize"
-    [style.background-color]="resizerColor()"
-    (pointerStart)="startResize('top-right', $event)"></div>
-
-  <!-- Bottom left -->
-  <div
-    class="resize-handle bottom-left"
-    [style.left.px]="-(handleSize / 2) - gap()"
-    [style.top.px]="model.height() - handleSize / 2 + gap()"
-    [style.width.px]="handleSize"
-    [style.height.px]="handleSize"
-    [style.background-color]="resizerColor()"
-    (pointerStart)="startResize('bottom-left', $event)"></div>
-
-  <!-- Bottom right -->
-  <div
-    class="resize-handle bottom-right"
-    [style.left.px]="model.width() - handleSize / 2 + gap()"
-    [style.top.px]="model.height() - handleSize / 2 + gap()"
-    [style.width.px]="handleSize"
-    [style.height.px]="handleSize"
-    [style.background-color]="resizerColor()"
-    (pointerStart)="startResize('bottom-right', $event)"></div>
+  @for (position of handlePositions; track position) {
+    <div
+      nodeResizeControl
+      [position]="position"
+      [variant]="handleVariant"
+      [color]="resizerColor()"
+      [minWidth]="effectiveMinWidth()"
+      [minHeight]="effectiveMinHeight()"
+      [maxWidth]="effectiveMaxWidth()"
+      [maxHeight]="effectiveMaxHeight()"
+      [keepAspectRatio]="keepAspectRatio()"
+      [resizeDirection]="resizeDirection()"
+      [autoScale]="autoScale()"
+      [onResizeStart]="emitResizeStart"
+      [onResize]="emitResize"
+      [onResizeEnd]="emitResizeEnd"
+      [shouldResize]="shouldResize()"></div>
+  }
 </ng-template>
 
 <ng-content />

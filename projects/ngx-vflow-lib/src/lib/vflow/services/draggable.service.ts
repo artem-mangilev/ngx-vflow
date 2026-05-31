@@ -94,6 +94,11 @@ export class DraggableService {
         return false;
       }
 
+      // Do not drag the node when interacting with a no-drag element (e.g. resize controls)
+      if ((event.target as Element).closest('.nodrag')) {
+        return false;
+      }
+
       // if there is at least one drag handle, we should check if we are dragging it
       if (model.dragHandlesCount()) {
         return !!(event.target as Element).closest('.vflow-drag-handle');
@@ -110,7 +115,7 @@ export class DraggableService {
         this.flowStatusService.setNodeDragStartStatus(model);
 
         // d3-drag event.x/y are screen px (not auto-scaled like the old SVG CTM),
-        // so recompute the pointer position in flow space (xyflow XYDrag approach).
+        // so recompute the pointer position in flow space.
         const flow = this.getFlowPoint(event.sourceEvent, element);
 
         initialPositions = dragNodes.map((node) => ({
