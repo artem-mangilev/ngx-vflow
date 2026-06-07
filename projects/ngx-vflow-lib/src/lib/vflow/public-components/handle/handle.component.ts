@@ -119,7 +119,7 @@ export class HandleComponent implements OnInit, AfterViewInit {
     model.handleElement = handleElement;
 
     this.requestAnimationFrameBatchingService.batchAnimationFrame(() => {
-      model.updateHost();
+      model.sync();
     });
   }
 

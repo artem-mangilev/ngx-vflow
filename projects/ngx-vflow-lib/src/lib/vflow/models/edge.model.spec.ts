@@ -59,7 +59,7 @@ function createHandle(
   );
 
   handle.handleElement = handleElement;
-  handle.updateHost();
+  handle.sync();
 
   return handle;
 }

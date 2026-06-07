@@ -68,8 +68,12 @@ export class HandleModel {
     public parentNode: NodeModel,
   ) {}
 
-  public updateHost() {
-    const handleElement = this.handleElement;
+  public sync() {
+    this.updateLayout();
+    this.updateConnectionPoint();
+  }
+
+  public updateLayout() {
     const nodeElement = this.parentNode.nodeElement();
 
     if (!nodeElement) {
@@ -82,17 +86,26 @@ export class HandleModel {
     const layoutStyles = computeHandleLayoutStyles(this.rawHandle.position, anchorRect, nodeRect, zoom);
 
     this.layoutStyles.set(layoutStyles);
+  }
 
-    if (!handleElement) {
+  public updateConnectionPoint() {
+    const handleElement = this.handleElement;
+    const nodeElement = this.parentNode.nodeElement();
+
+    if (!handleElement || !nodeElement) {
       return;
     }
 
-    applyHandleLayoutStyles(handleElement, layoutStyles);
+    // Template bindings also apply these styles, but we need them on the DOM
+    // synchronously so the measurement below matches the rendered handle.
+    applyHandleLayoutStyles(handleElement, this.layoutStyles());
 
     // Both rects live in the same zoomed coordinate space (they share the
     // CSS-scaled viewport), so subtracting them and dividing by the zoom yields
     // the connection point in flow units, independent of the current zoom.
+    const zoom = this.viewportService.readableViewport().zoom || 1;
     const handleRect = handleElement.getBoundingClientRect();
+    const nodeRect = nodeElement.getBoundingClientRect();
 
     let pointX: number;
     let pointY: number;

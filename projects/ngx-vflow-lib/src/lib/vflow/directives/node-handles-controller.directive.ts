@@ -36,20 +36,20 @@ export class NodeHandlesControllerDirective implements OnInit {
 
           if (!isTrackingHostElement) {
             this.resizeObserverService.addObserver(this.hostElementRef.nativeElement, () => {
-              currentHandles.forEach((h) => h.updateHost());
+              currentHandles.forEach((h) => h.sync());
             });
             isTrackingHostElement = true;
           }
 
           handlesToAdd.forEach((h) =>
             this.resizeObserverService.addObserver(h.hostReference, () => {
-              currentHandles.forEach((h) => h.updateHost());
+              currentHandles.forEach((h) => h.sync());
             }),
           );
 
           //Here we need this to be in a requestAnimationFrame otherwise the handle can still be present in the dom which throws off the offset cache
           this.requestAnimationFrameBatchingService.batchAnimationFrame(() => {
-            currentHandles.forEach((h) => h.updateHost());
+            currentHandles.forEach((h) => h.sync());
           });
           // TODO (performance) inspect how to avoid calls of this when flow initially rendered
         }),

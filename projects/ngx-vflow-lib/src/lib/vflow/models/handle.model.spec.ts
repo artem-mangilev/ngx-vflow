@@ -96,7 +96,7 @@ describe('HandleModel', () => {
   it('should place a right handle on the node boundary at the anchor center', () => {
     const { model } = createModel('right', { left: 10, top: 30, width: 80, height: 20 });
 
-    model.updateHost();
+    model.updateLayout();
 
     expect(model.layoutStyles()).toEqual({
       top: '40px',
@@ -109,7 +109,7 @@ describe('HandleModel', () => {
   it('should place a left handle on the node boundary at the anchor center', () => {
     const { model } = createModel('left', { left: 10, top: 10, width: 80, height: 20 });
 
-    model.updateHost();
+    model.updateLayout();
 
     expect(model.layoutStyles()).toEqual({
       top: '20px',
@@ -122,7 +122,7 @@ describe('HandleModel', () => {
   it('should place a top handle on the node boundary at the anchor center', () => {
     const { model } = createModel('top', { left: 20, top: 10, width: 30, height: 20 });
 
-    model.updateHost();
+    model.updateLayout();
 
     expect(model.layoutStyles()).toEqual({
       top: '0',
@@ -137,7 +137,7 @@ describe('HandleModel', () => {
 
     const { model } = createModel('right', { left: 20, top: 60, width: 160, height: 40 });
 
-    model.updateHost();
+    model.updateLayout();
 
     expect(model.layoutStyles().top).toBe('40px');
   });
@@ -152,7 +152,7 @@ describe('HandleModel', () => {
 
     mockRect(handleElement, { left: 86, top: 33, width: 14, height: 14 });
 
-    model.updateHost();
+    model.sync();
 
     expect(model.pointAbsolute()).toEqual({ x: 100, y: 40 });
     expect(nodeElement).toBeTruthy();
