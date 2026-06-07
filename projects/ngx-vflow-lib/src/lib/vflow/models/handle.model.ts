@@ -3,8 +3,16 @@ import { NodeHandle } from '../services/handle.service';
 import { NodeModel } from './node.model';
 import { Point } from '../interfaces/point.interface';
 import { ViewportService } from '../services/viewport.service';
+import { Position } from '../types/position.type';
 
 export type HandleState = 'valid' | 'invalid' | 'idle';
+
+export type HandleLayoutStyles = {
+  top: string;
+  left: string;
+  right: string;
+  bottom: string;
+};
 
 export class HandleModel {
   private viewportService = inject(ViewportService);
@@ -12,10 +20,20 @@ export class HandleModel {
   public state = signal<HandleState>('idle');
 
   /**
-   * Parent DOM element the `<handle>` was placed into. Kept so the node can
-   * observe it for resizes and re-measure the handle position.
+   * Anchor element the `<handle>` was placed into. Used to align the handle
+   * along the node edge while keeping it on the node boundary.
    */
   public hostReference = this.rawHandle.hostReference!;
+
+  /**
+   * Absolute position of the handle relative to the node, same as xyflow handles.
+   */
+  public layoutStyles = signal<HandleLayoutStyles>({
+    top: 'auto',
+    left: 'auto',
+    right: 'auto',
+    bottom: 'auto',
+  });
 
   /**
    * The rendered handle DOM element. Set by `HandleComponent` once its view is
@@ -54,16 +72,27 @@ export class HandleModel {
     const handleElement = this.handleElement;
     const nodeElement = this.parentNode.nodeElement();
 
-    if (!handleElement || !nodeElement) {
+    if (!nodeElement) {
       return;
     }
+
+    const zoom = this.viewportService.readableViewport().zoom || 1;
+    const anchorRect = this.hostReference.getBoundingClientRect();
+    const nodeRect = nodeElement.getBoundingClientRect();
+    const layoutStyles = computeHandleLayoutStyles(this.rawHandle.position, anchorRect, nodeRect, zoom);
+
+    this.layoutStyles.set(layoutStyles);
+
+    if (!handleElement) {
+      return;
+    }
+
+    applyHandleLayoutStyles(handleElement, layoutStyles);
 
     // Both rects live in the same zoomed coordinate space (they share the
     // CSS-scaled viewport), so subtracting them and dividing by the zoom yields
     // the connection point in flow units, independent of the current zoom.
-    const zoom = this.viewportService.readableViewport().zoom || 1;
     const handleRect = handleElement.getBoundingClientRect();
-    const nodeRect = nodeElement.getBoundingClientRect();
 
     let pointX: number;
     let pointY: number;
@@ -92,4 +121,32 @@ export class HandleModel {
       y: (pointY - nodeRect.top) / zoom,
     });
   }
+}
+
+function computeHandleLayoutStyles(
+  position: Position,
+  anchorRect: DOMRect,
+  nodeRect: DOMRect,
+  zoom: number,
+): HandleLayoutStyles {
+  const alongY = `${(anchorRect.top + anchorRect.height / 2 - nodeRect.top) / zoom}px`;
+  const alongX = `${(anchorRect.left + anchorRect.width / 2 - nodeRect.left) / zoom}px`;
+
+  switch (position) {
+    case 'left':
+      return { top: alongY, left: '0', right: 'auto', bottom: 'auto' };
+    case 'right':
+      return { top: alongY, left: 'auto', right: '0', bottom: 'auto' };
+    case 'top':
+      return { top: '0', left: alongX, right: 'auto', bottom: 'auto' };
+    case 'bottom':
+      return { top: 'auto', left: alongX, right: 'auto', bottom: '0' };
+  }
+}
+
+function applyHandleLayoutStyles(element: HTMLElement, styles: HandleLayoutStyles) {
+  element.style.top = styles.top;
+  element.style.left = styles.left;
+  element.style.right = styles.right;
+  element.style.bottom = styles.bottom;
 }

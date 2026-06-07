@@ -81,12 +81,9 @@ export class HandleComponent implements OnInit, AfterViewInit {
         return;
       }
 
-      // The handle is absolutely positioned and centered against its parent DOM
-      // element, so the parent has to establish a positioning context.
+      // The anchor element determines where the handle sits along the node edge.
+      // Positioning itself is relative to the node, same as xyflow handles.
       const parent = this.element.parentElement;
-      if (parent && getComputedStyle(parent).position === 'static') {
-        parent.style.position = 'relative';
-      }
 
       const model = new HandleModel(
         {

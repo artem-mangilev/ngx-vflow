@@ -3,6 +3,10 @@
     #handleElement
     class="handle handle--{{ position() }}"
     [class.handle--default]="template() === undefined"
+    [style.top]="model.layoutStyles().top"
+    [style.left]="model.layoutStyles().left"
+    [style.right]="model.layoutStyles().right"
+    [style.bottom]="model.layoutStyles().bottom"
     [style.--vflow-handle-offset-x]="-offsetX() + 'px'"
     [style.--vflow-handle-offset-y]="-offsetY() + 'px'"
     (pointerStart)="startConnection($event)"
@@ -15,6 +19,10 @@
   @if (showMagnet()) {
     <div
       class="magnet handle--{{ position() }}"
+      [style.top]="model.layoutStyles().top"
+      [style.left]="model.layoutStyles().left"
+      [style.right]="model.layoutStyles().right"
+      [style.bottom]="model.layoutStyles().bottom"
       [style.width.px]="model.parentNode.magnetRadius * 2"
       [style.height.px]="model.parentNode.magnetRadius * 2"
       [style.--vflow-handle-offset-x]="-offsetX() + 'px'"

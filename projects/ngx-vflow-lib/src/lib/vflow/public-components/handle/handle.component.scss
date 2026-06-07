@@ -16,26 +16,18 @@
 }
 
 .handle--left {
-  top: 50%;
-  left: 0;
   transform: translate(-50%, -50%) translate(var(--vflow-handle-offset-x, 0px), var(--vflow-handle-offset-y, 0px));
 }
 
 .handle--right {
-  top: 50%;
-  right: 0;
   transform: translate(50%, -50%) translate(var(--vflow-handle-offset-x, 0px), var(--vflow-handle-offset-y, 0px));
 }
 
 .handle--top {
-  top: 0;
-  left: 50%;
   transform: translate(-50%, -50%) translate(var(--vflow-handle-offset-x, 0px), var(--vflow-handle-offset-y, 0px));
 }
 
 .handle--bottom {
-  bottom: 0;
-  left: 50%;
   transform: translate(-50%, 50%) translate(var(--vflow-handle-offset-x, 0px), var(--vflow-handle-offset-y, 0px));
 }
 
