@@ -12,6 +12,7 @@ import { ConnectionContext } from '../../interfaces/template-context.interface';
 import { Point } from '../../interfaces/point.interface';
 import { CurveFactoryParams } from '../../interfaces/curve-factory.interface';
 import { FlowEntitiesService } from '../../services/flow-entities.service';
+import { quadraticPath } from '../../math/edge-path/quadratic-path';
 
 @Component({
   selector: 'g[connection]',
@@ -68,6 +69,8 @@ export class ConnectionComponent {
           return smoothStepPath(params).path;
         case 'step':
           return smoothStepPath(params, 0).path;
+        case 'quadratic':
+          return quadraticPath(params).path;
         default:
           return curve(params).path;
       }
@@ -98,6 +101,8 @@ export class ConnectionComponent {
           return smoothStepPath(params).path;
         case 'step':
           return smoothStepPath(params, 0).path;
+        case 'quadratic':
+          return quadraticPath(params).path;
         default:
           return curve(params).path;
       }

@@ -16,6 +16,7 @@ import { CurveFactoryParams } from '../interfaces/curve-factory.interface';
 import { FlowEntitiesService } from '../services/flow-entities.service';
 import { extendedComputed } from '../utils/signals/extended-computed';
 import { Marker } from '../interfaces/marker.interface';
+import { quadraticPath } from '../math/edge-path/quadratic-path';
 
 export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
   private readonly flowEntitiesService = inject(FlowEntitiesService);
@@ -86,6 +87,8 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
         return smoothStepPath(params);
       case 'step':
         return smoothStepPath(params, 0);
+      case 'quadratic':
+        return quadraticPath(params);
       default:
         return curve(params);
     }
