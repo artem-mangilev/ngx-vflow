@@ -32,7 +32,7 @@ import { VflowMocks } from './vflow-mocks';
       (componentNodeEvent)="(null)"
       (connect)="(null)">
       <ng-template nodeHtml>
-        <div dragHandle selectable resizable [resizerColor]="'#2e414c'">
+        <div dragHandle selectable resizable [resizerColor]="'#2e414c'" [gap]="2">
           <handle [position]="'left'" [type]="'source'" [id]="'1'" [template]="handleTemplate" />
 
           <ng-template #handleTemplate>

@@ -50,6 +50,8 @@ export class ResizableComponent implements OnInit, AfterViewInit, OnDestroy {
 
   public resizerColor = input('#2e414c');
 
+  public gap = input(1.5);
+
   public minWidth = input<number>();
   public minHeight = input<number>();
   public maxWidth = input<number>();
