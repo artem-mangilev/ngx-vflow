@@ -50,6 +50,7 @@ export class EdgeLabelComponent implements AfterViewInit, OnDestroy {
   private resizeObserverService = inject(ResizeObserverService);
   private basicElementCacheService = inject(BasicElementCacheService);
   private requestAnimationFrameBatchService = inject(RequestAnimationFrameBatchingService);
+  private readonly resizeCallback = () => this.updateModelSize();
 
   // TODO: too many inputs
   public model = input.required<EdgeLabelModel>();
@@ -112,9 +113,7 @@ export class EdgeLabelComponent implements AfterViewInit, OnDestroy {
     const labelElement = this.edgeLabelWrapperRef().nativeElement;
     this.basicElementCacheService.addElementCache(labelElement);
 
-    this.resizeObserverService.addObserver(labelElement, () => {
-      this.updateModelSize();
-    });
+    this.resizeObserverService.addObserver(labelElement, this.resizeCallback);
 
     //force run the first time since previous implementation used startWith(null) to force a first initialization
     //inside animation frame callback otherwise we ngAfterViewInit calls in between each edge label create
@@ -126,7 +125,7 @@ export class EdgeLabelComponent implements AfterViewInit, OnDestroy {
   public ngOnDestroy(): void {
     const labelElement = this.edgeLabelWrapperRef().nativeElement;
     this.basicElementCacheService.removeElementCache(labelElement);
-    this.resizeObserverService.removeObserver(labelElement);
+    this.resizeObserverService.removeObserver(labelElement, this.resizeCallback);
   }
 
   // TODO: move to model with Contextable interface

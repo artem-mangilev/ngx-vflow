@@ -150,7 +150,7 @@ describe('EdgeModel', () => {
    * @todo add more path tests
    */
   it('should provide path', () => {
-    expect(model.path().path).toBe('M 15.5,15L 14.5,15');
+    expect(model.path().path).toBe('M 22,15L 8,15');
   });
 
   it('should set detached === true if there no source', () => {

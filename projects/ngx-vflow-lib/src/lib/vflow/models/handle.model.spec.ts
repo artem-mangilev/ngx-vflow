@@ -46,6 +46,7 @@ describe('HandleModel', () => {
   function createModel(
     position: 'left' | 'right' | 'top' | 'bottom',
     anchorRect: { left: number; top: number; width: number; height: number },
+    nodeType: 'default' | 'html-template' = 'default',
   ) {
     const anchor = document.createElement('div');
     const nodeElement = document.createElement('div');
@@ -59,8 +60,7 @@ describe('HandleModel', () => {
         new NodeModel(
           createNode({
             id: '1',
-            type: 'default',
-            text: 'test',
+            type: nodeType,
             point: { x: 0, y: 0 },
           }),
         ),
@@ -84,7 +84,7 @@ describe('HandleModel', () => {
 
     model.handleElement = handleElement;
 
-    return { model, nodeElement, handleElement, anchor };
+    return { model, parentNode, nodeElement, handleElement, anchor };
   }
 
   it('should create', () => {
@@ -93,68 +93,61 @@ describe('HandleModel', () => {
     expect(model).toBeTruthy();
   });
 
-  it('should place a right handle on the node boundary at the anchor center', () => {
-    const { model } = createModel('right', { left: 10, top: 30, width: 80, height: 20 });
-
-    model.updateLayout();
-
-    expect(model.layoutStyles()).toEqual({
-      top: '40px',
-      left: 'auto',
-      right: '0',
-      bottom: 'auto',
-    });
-  });
-
-  it('should place a left handle on the node boundary at the anchor center', () => {
-    const { model } = createModel('left', { left: 10, top: 10, width: 80, height: 20 });
-
-    model.updateLayout();
-
-    expect(model.layoutStyles()).toEqual({
-      top: '20px',
-      left: '0',
-      right: 'auto',
-      bottom: 'auto',
-    });
-  });
-
-  it('should place a top handle on the node boundary at the anchor center', () => {
-    const { model } = createModel('top', { left: 20, top: 10, width: 30, height: 20 });
-
-    model.updateLayout();
-
-    expect(model.layoutStyles()).toEqual({
-      top: '0',
-      left: '35px',
-      right: 'auto',
-      bottom: 'auto',
-    });
-  });
-
-  it('should account for viewport zoom when computing layout', () => {
-    viewportService.readableViewport.set({ zoom: 2, x: 0, y: 0 });
-
-    const { model } = createModel('right', { left: 20, top: 60, width: 160, height: 40 });
-
-    model.updateLayout();
-
-    expect(model.layoutStyles().top).toBe('40px');
-  });
-
-  it('should measure the connection point from the rendered handle', () => {
-    const { model, handleElement, nodeElement } = createModel('right', {
+  it('should derive a standard handle from node dimensions without measuring DOM geometry', () => {
+    const { model, parentNode, anchor, nodeElement, handleElement } = createModel('right', {
       left: 10,
       top: 30,
       width: 80,
       height: 20,
     });
 
-    mockRect(handleElement, { left: 86, top: 33, width: 14, height: 14 });
+    anchor.getBoundingClientRect = jasmine.createSpy('anchor rect').and.throwError('unexpected anchor measurement');
+    nodeElement.getBoundingClientRect = jasmine.createSpy('node rect').and.throwError('unexpected node measurement');
+    handleElement.getBoundingClientRect = jasmine
+      .createSpy('handle rect')
+      .and.throwError('unexpected handle measurement');
 
     model.sync();
 
-    expect(model.pointAbsolute()).toEqual({ x: 100, y: 40 });
-    expect(nodeElement).toBeTruthy();
+    expect(model.layoutStyles()).toEqual({
+      top: '25px',
+      left: 'auto',
+      right: '0',
+      bottom: 'auto',
+    });
+    expect(model.pointAbsolute()).toEqual({ x: 107, y: 25 });
+
+    parentNode.height.set(160);
+    model.sync();
+
+    expect(model.layoutStyles().top).toBe('80px');
+    expect(model.pointAbsolute()).toEqual({ x: 107, y: 80 });
+  });
+
+  it('should keep a custom handle aligned with its anchor after node resize', () => {
+    const { model, parentNode, anchor, nodeElement, handleElement } = createModel(
+      'right',
+      { left: 10, top: 30, width: 80, height: 20 },
+      'html-template',
+    );
+
+    mockRect(handleElement, { left: 90, top: 35, width: 20, height: 10 });
+
+    model.sync();
+
+    expect(model.layoutStyles().top).toBe('40px');
+    expect(model.pointAbsolute()).toEqual({ x: 110, y: 40 });
+
+    viewportService.readableViewport.set({ zoom: 2, x: 0, y: 0 });
+    parentNode.width.set(160);
+    parentNode.height.set(160);
+    mockRect(nodeElement, { left: 0, top: 0, width: 320, height: 320 });
+    mockRect(anchor, { left: 20, top: 140, width: 280, height: 40 });
+    mockRect(handleElement, { left: 300, top: 150, width: 40, height: 20 });
+
+    model.sync();
+
+    expect(model.layoutStyles().top).toBe('80px');
+    expect(model.pointAbsolute()).toEqual({ x: 170, y: 80 });
   });
 });

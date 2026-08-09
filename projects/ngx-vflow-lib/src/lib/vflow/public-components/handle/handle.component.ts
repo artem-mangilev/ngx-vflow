@@ -17,7 +17,6 @@ import { NgTemplateOutlet } from '@angular/common';
 import { Position } from '../../types/position.type';
 import { HandleService } from '../../services/handle.service';
 import { HandleModel } from '../../models/handle.model';
-import { RequestAnimationFrameBatchingService } from '../../services/request-animation-frame-batching.service';
 import { PointerDirective } from '../../directives/pointer.directive';
 import { ConnectionControllerDirective } from '../../directives/connection-controller.directive';
 import { FlowStatusService } from '../../services/flow-status.service';
@@ -35,7 +34,6 @@ export class HandleComponent implements OnInit, AfterViewInit {
   private handleService = inject(HandleService);
   private element = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
   private destroyRef = inject(DestroyRef);
-  private requestAnimationFrameBatchingService = inject(RequestAnimationFrameBatchingService);
   private flowStatusService = inject(FlowStatusService);
 
   // TODO remove dependency from this directive
@@ -117,10 +115,6 @@ export class HandleComponent implements OnInit, AfterViewInit {
     }
 
     model.handleElement = handleElement;
-
-    this.requestAnimationFrameBatchingService.batchAnimationFrame(() => {
-      model.sync();
-    });
   }
 
   protected startConnection(event: Event) {

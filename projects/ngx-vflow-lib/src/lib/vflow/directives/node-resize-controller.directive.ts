@@ -13,11 +13,12 @@ export class NodeResizeControllerDirective implements OnInit, OnDestroy {
   private nodeAccessor = inject(NodeAccessorService);
   private resizeObserverService = inject(ResizeObserverService);
   private hostElementRef = inject<ElementRef<Element>>(ElementRef);
+  private resizeCallback: ((resizeEntry: ResizeObserverEntry) => void) | null = null;
 
   public ngOnInit(): void {
     const model = this.nodeAccessor.model()!;
 
-    this.resizeObserverService.addObserver(this.hostElementRef.nativeElement, (resizeEntry) => {
+    this.resizeCallback = (resizeEntry) => {
       const target = resizeEntry.target;
       // Use scroll size (overflow-aware) so a node whose content is larger than the
       // box it is constrained to (e.g. a resizable wrapper clamped to the model size,
@@ -26,10 +27,13 @@ export class NodeResizeControllerDirective implements OnInit, OnDestroy {
       model.width.set(target.scrollWidth);
       model.height.set(target.scrollHeight);
       model.isMeasured.set(true);
-    });
+    };
+    this.resizeObserverService.addObserver(this.hostElementRef.nativeElement, this.resizeCallback);
   }
 
   public ngOnDestroy(): void {
-    this.resizeObserverService.removeObserver(this.hostElementRef.nativeElement);
+    if (this.resizeCallback) {
+      this.resizeObserverService.removeObserver(this.hostElementRef.nativeElement, this.resizeCallback);
+    }
   }
 }

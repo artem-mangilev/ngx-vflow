@@ -14,20 +14,30 @@ export type HandleLayoutStyles = {
   bottom: string;
 };
 
+export type HandleGeometry = {
+  layoutStyles: HandleLayoutStyles;
+  localPoint: Point;
+};
+
+type HandleGeometryInput = {
+  position: Position;
+  nodeSize: { width: number; height: number };
+  handleSize: { width: number; height: number };
+  offset: Point;
+  anchorPoint?: Point;
+};
+
+const DEFAULT_HANDLE_SIZE = 14;
+
 export class HandleModel {
   private viewportService = inject(ViewportService);
 
   public state = signal<HandleState>('idle');
 
-  /**
-   * Anchor element the `<handle>` was placed into. Used to align the handle
-   * along the node edge while keeping it on the node boundary.
-   */
+  /** Anchor element the `<handle>` was placed into. */
   public hostReference = this.rawHandle.hostReference!;
 
-  /**
-   * Absolute position of the handle relative to the node, same as xyflow handles.
-   */
+  /** Absolute position of the handle relative to the node, same as xyflow handles. */
   public layoutStyles = signal<HandleLayoutStyles>({
     top: 'auto',
     left: 'auto',
@@ -35,19 +45,15 @@ export class HandleModel {
     bottom: 'auto',
   });
 
-  /**
-   * The rendered handle DOM element. Set by `HandleComponent` once its view is
-   * initialized, then used to measure the connection point.
-   */
+  /** The rendered handle DOM element. Set by `HandleComponent` after view initialization. */
   public handleElement: HTMLElement | null = null;
 
   public template = this.rawHandle.template;
 
-  /**
-   * Connection point of the handle relative to the node origin, in flow units.
-   * It is measured directly from the DOM so that it always matches the
-   * CSS-centered handle, regardless of paddings, borders or custom sizes.
-   */
+  /** Built-in default-node handles have fixed geometry and need no DOM measurement. */
+  public readonly isStandard = this.parentNode.rawNode.type === 'default';
+
+  /** Connection point relative to the node origin, in flow units. */
   private localPoint = signal<Point>({ x: 0, y: 0 });
 
   public pointAbsolute = computed<Point>(() => ({
@@ -68,98 +74,88 @@ export class HandleModel {
     public parentNode: NodeModel,
   ) {}
 
-  public sync() {
-    this.updateLayout();
-    this.updateConnectionPoint();
-  }
+  /**
+   * Read phase. Standard handles are derived from model dimensions; custom
+   * handles read their anchor and rendered size without changing styles.
+   */
+  public measure(nodeRect?: DOMRect): HandleGeometry | null {
+    if (this.isStandard) {
+      return computeHandleGeometry({
+        position: this.rawHandle.position,
+        nodeSize: { width: this.parentNode.width(), height: this.parentNode.height() },
+        handleSize: { width: DEFAULT_HANDLE_SIZE, height: DEFAULT_HANDLE_SIZE },
+        offset: { x: this.rawHandle.userOffsetX, y: this.rawHandle.userOffsetY },
+      });
+    }
 
-  public updateLayout() {
-    const nodeElement = this.parentNode.nodeElement();
+    const handleElement = this.handleElement;
+    const resolvedNodeRect = nodeRect ?? this.parentNode.nodeElement()?.getBoundingClientRect();
 
-    if (!nodeElement) {
-      return;
+    if (!handleElement || !resolvedNodeRect) {
+      return null;
     }
 
     const zoom = this.viewportService.readableViewport().zoom || 1;
     const anchorRect = this.hostReference.getBoundingClientRect();
-    const nodeRect = nodeElement.getBoundingClientRect();
-    const layoutStyles = computeHandleLayoutStyles(this.rawHandle.position, anchorRect, nodeRect, zoom);
+    const handleRect = handleElement.getBoundingClientRect();
+    const alongY = (anchorRect.top + anchorRect.height / 2 - resolvedNodeRect.top) / zoom;
+    const alongX = (anchorRect.left + anchorRect.width / 2 - resolvedNodeRect.left) / zoom;
 
-    this.layoutStyles.set(layoutStyles);
+    return computeHandleGeometry({
+      position: this.rawHandle.position,
+      nodeSize: { width: this.parentNode.width(), height: this.parentNode.height() },
+      handleSize: { width: handleRect.width / zoom, height: handleRect.height / zoom },
+      offset: { x: this.rawHandle.userOffsetX, y: this.rawHandle.userOffsetY },
+      anchorPoint: { x: alongX, y: alongY },
+    });
   }
 
-  public updateConnectionPoint() {
-    const handleElement = this.handleElement;
-    const nodeElement = this.parentNode.nodeElement();
-
-    if (!handleElement || !nodeElement) {
+  /** Write phase. Called only after every handle in the node has been measured. */
+  public applyGeometry(geometry: HandleGeometry | null): void {
+    if (!geometry) {
       return;
     }
 
-    // Template bindings also apply these styles, but we need them on the DOM
-    // synchronously so the measurement below matches the rendered handle.
-    applyHandleLayoutStyles(handleElement, this.layoutStyles());
+    this.layoutStyles.set(geometry.layoutStyles);
+    this.localPoint.set(geometry.localPoint);
+  }
 
-    // Both rects live in the same zoomed coordinate space (they share the
-    // CSS-scaled viewport), so subtracting them and dividing by the zoom yields
-    // the connection point in flow units, independent of the current zoom.
-    const zoom = this.viewportService.readableViewport().zoom || 1;
-    const handleRect = handleElement.getBoundingClientRect();
-    const nodeRect = nodeElement.getBoundingClientRect();
-
-    let pointX: number;
-    let pointY: number;
-
-    switch (this.rawHandle.position) {
-      case 'left':
-        pointX = handleRect.left;
-        pointY = handleRect.top + handleRect.height / 2;
-        break;
-      case 'right':
-        pointX = handleRect.right;
-        pointY = handleRect.top + handleRect.height / 2;
-        break;
-      case 'top':
-        pointX = handleRect.left + handleRect.width / 2;
-        pointY = handleRect.top;
-        break;
-      case 'bottom':
-        pointX = handleRect.left + handleRect.width / 2;
-        pointY = handleRect.bottom;
-        break;
-    }
-
-    this.localPoint.set({
-      x: (pointX - nodeRect.left) / zoom,
-      y: (pointY - nodeRect.top) / zoom,
-    });
+  /** Synchronous convenience for isolated model use. Node rendering uses the coalesced controller pass. */
+  public sync(): void {
+    this.applyGeometry(this.measure());
   }
 }
 
-function computeHandleLayoutStyles(
-  position: Position,
-  anchorRect: DOMRect,
-  nodeRect: DOMRect,
-  zoom: number,
-): HandleLayoutStyles {
-  const alongY = `${(anchorRect.top + anchorRect.height / 2 - nodeRect.top) / zoom}px`;
-  const alongX = `${(anchorRect.left + anchorRect.width / 2 - nodeRect.left) / zoom}px`;
+function computeHandleGeometry({
+  position,
+  nodeSize,
+  handleSize,
+  offset,
+  anchorPoint = { x: nodeSize.width / 2, y: nodeSize.height / 2 },
+}: HandleGeometryInput): HandleGeometry {
+  const alongX = anchorPoint.x - offset.x;
+  const alongY = anchorPoint.y - offset.y;
 
   switch (position) {
     case 'left':
-      return { top: alongY, left: '0', right: 'auto', bottom: 'auto' };
+      return {
+        layoutStyles: { top: `${anchorPoint.y}px`, left: '0', right: 'auto', bottom: 'auto' },
+        localPoint: { x: -handleSize.width / 2 - offset.x, y: alongY },
+      };
     case 'right':
-      return { top: alongY, left: 'auto', right: '0', bottom: 'auto' };
+      return {
+        layoutStyles: { top: `${anchorPoint.y}px`, left: 'auto', right: '0', bottom: 'auto' },
+        localPoint: { x: nodeSize.width + handleSize.width / 2 - offset.x, y: alongY },
+      };
     case 'top':
-      return { top: '0', left: alongX, right: 'auto', bottom: 'auto' };
+      return {
+        layoutStyles: { top: '0', left: `${anchorPoint.x}px`, right: 'auto', bottom: 'auto' },
+        localPoint: { x: alongX, y: -handleSize.height / 2 - offset.y },
+      };
     case 'bottom':
-      return { top: 'auto', left: alongX, right: 'auto', bottom: '0' };
+      return {
+        layoutStyles: { top: 'auto', left: `${anchorPoint.x}px`, right: 'auto', bottom: '0' },
+        localPoint: { x: alongX, y: nodeSize.height + handleSize.height / 2 - offset.y },
+      };
   }
-}
-
-function applyHandleLayoutStyles(element: HTMLElement, styles: HandleLayoutStyles) {
-  element.style.top = styles.top;
-  element.style.left = styles.left;
-  element.style.right = styles.right;
-  element.style.bottom = styles.bottom;
 }

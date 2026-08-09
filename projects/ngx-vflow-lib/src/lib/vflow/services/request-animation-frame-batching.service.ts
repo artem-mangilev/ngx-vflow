@@ -10,13 +10,11 @@ export class RequestAnimationFrameBatchingService {
     if (!this.requestAnimationFrameStarted) {
       this.requestAnimationFrameStarted = true;
       requestAnimationFrame(() => {
-        this.callbacks.map((x) => {
-          if (x) {
-            x();
-          }
-        });
+        const callbacks = this.callbacks;
         this.callbacks = [];
         this.requestAnimationFrameStarted = false;
+
+        callbacks.forEach((callback) => callback());
       });
     }
   }
