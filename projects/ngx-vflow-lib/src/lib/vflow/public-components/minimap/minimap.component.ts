@@ -4,7 +4,6 @@ import {
   inject,
   Injector,
   OnInit,
-  signal,
   TemplateRef,
   input,
   viewChild,
@@ -47,22 +46,10 @@ export class MiniMapComponent implements OnInit {
    */
   public position = input<MiniMapPosition>('bottom-right');
 
-  /**
-   * Make a minimap bigger on hover
-   */
-  public scaleOnHover = input(false);
-
   private minimap = viewChild.required<TemplateRef<unknown>>('minimap');
 
   private readonly minimapOffset = 10;
-
-  private readonly minimapScale = computed(() => {
-    if (this.scaleOnHover()) {
-      return this.hovered() ? 0.4 : 0.2;
-    }
-
-    return 0.2;
-  });
+  private readonly minimapScale = 0.2;
 
   protected viewportColor = computed(() => {
     const bg = this.flowSettingsService.background();
@@ -73,8 +60,6 @@ export class MiniMapComponent implements OnInit {
 
     return '#fff';
   });
-
-  protected hovered = signal(false);
 
   protected minimapPoint = computed(() => {
     switch (this.position()) {
@@ -98,20 +83,20 @@ export class MiniMapComponent implements OnInit {
     }
   });
 
-  protected minimapWidth = computed(() => this.flowSettingsService.computedFlowWidth() * this.minimapScale());
-  protected minimapHeight = computed(() => this.flowSettingsService.computedFlowHeight() * this.minimapScale());
+  protected minimapWidth = computed(() => this.flowSettingsService.computedFlowWidth() * this.minimapScale);
+  protected minimapHeight = computed(() => this.flowSettingsService.computedFlowHeight() * this.minimapScale);
 
   protected viewportTransform = computed(() => {
     const viewport = this.viewportService.readableViewport();
     let scale = 1 / viewport.zoom;
 
-    let x = -(viewport.x * this.minimapScale()) * scale;
-    x /= this.minimapScale();
+    let x = -(viewport.x * this.minimapScale) * scale;
+    x /= this.minimapScale;
 
-    let y = -(viewport.y * this.minimapScale()) * scale;
-    y /= this.minimapScale();
+    let y = -(viewport.y * this.minimapScale) * scale;
+    y /= this.minimapScale;
 
-    scale /= this.minimapScale();
+    scale /= this.minimapScale;
 
     return `translate(${x}, ${y}) scale(${scale})`;
   });
@@ -132,9 +117,9 @@ export class MiniMapComponent implements OnInit {
   protected minimapTransform = computed(() => {
     const vport = this.boundsViewport();
 
-    const x = vport.x * this.minimapScale();
-    const y = vport.y * this.minimapScale();
-    const scale = vport.zoom * this.minimapScale();
+    const x = vport.x * this.minimapScale;
+    const y = vport.y * this.minimapScale;
+    const scale = vport.zoom * this.minimapScale;
 
     return `translate(${x} ${y}) scale(${scale})`;
   });

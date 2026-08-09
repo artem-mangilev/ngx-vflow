@@ -11,9 +11,7 @@
     [attr.x]="minimapPoint().x"
     [attr.y]="minimapPoint().y"
     [attr.width]="minimapWidth()"
-    [attr.height]="minimapHeight()"
-    (mouseover)="hovered.set(true)"
-    (mouseleave)="hovered.set(false)">
+    [attr.height]="minimapHeight()">
     <svg:rect [attr.width]="minimapWidth()" [attr.height]="minimapHeight()" [attr.fill]="maskColor()" />
 
     <svg:g [attr.transform]="minimapTransform()">

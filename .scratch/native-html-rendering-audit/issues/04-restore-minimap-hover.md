@@ -1,11 +1,11 @@
-# Restore minimap hover interaction
+# Remove minimap hover scaling
 
 Status: ready-for-agent
 Priority: P1
 
-## Problem
+## Decision
 
-`.vflow-minimap-svg` has `pointer-events: none`, so the nested minimap never receives its `mouseover` and `mouseleave` events. `MiniMapComponent.scaleOnHover` therefore cannot change the minimap scale.
+`MiniMapComponent.scaleOnHover` is no longer needed. Instead of making the fixed minimap SVG receive pointer input solely to restore this feature, remove hover scaling from the v3 API.
 
 Relevant code:
 
@@ -13,16 +13,19 @@ Relevant code:
 - `projects/ngx-vflow-lib/src/lib/vflow/public-components/minimap/minimap.component.html`
 - `projects/ngx-vflow-lib/src/lib/vflow/public-components/minimap/minimap.component.ts`
 
-## Required behavior
+## Required change
 
-- The visible minimap interaction area receives pointer input when hover scaling or minimap interaction needs it.
-- Transparent space in the fixed full-size minimap SVG does not block the underlying pane.
-- Existing minimap pan/zoom options remain functional.
+- Remove the `scaleOnHover` input from `MiniMapComponent` and its testing mock.
+- Remove the hover event handlers and reactive scaling state.
+- Keep the minimap at its existing default scale.
+- Remove `scaleOnHover` usage from the demo and mock compilation fixture.
+- Keep the fixed minimap SVG transparent to pointer input so the underlying pane remains interactive.
 
 ## Acceptance
 
-- With `scaleOnHover` enabled, entering and leaving the minimap visibly changes and restores its size.
-- Hit-testing outside the minimap content still reaches `.vflow-pane`.
-- Add focused browser coverage for hover and at least one minimap interaction mode.
+- Production and testing public APIs no longer expose `scaleOnHover`.
+- The minimap demo and testing fixture compile without the removed input.
+- The minimap remains visible at its default scale.
+- Pane pan/zoom is not blocked by the full-size minimap SVG.
 
 ## Comments

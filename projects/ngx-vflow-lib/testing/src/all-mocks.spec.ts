@@ -75,8 +75,7 @@ import { VflowMocks } from './vflow-mocks';
       <mini-map
         [maskColor]="'rgba(215, 215, 215, 0.6)'"
         [strokeColor]="'rgb(200, 200, 200)'"
-        [position]="'bottom-right'"
-        [scaleOnHover]="true" />
+        [position]="'bottom-right'" />
     </vflow>
   `,
   imports: [Vflow],

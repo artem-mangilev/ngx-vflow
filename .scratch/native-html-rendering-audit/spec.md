@@ -5,6 +5,7 @@ The `3.0` branch replaces SVG `foreignObject` rendering with native HTML nodes i
 ## Agreed contract
 
 - `svg-template`, `NodeSvgTemplateDirective`, and `nodeSvgTemplate` are intentional v3 removals.
+- `MiniMapComponent.scaleOnHover` is an intentional v3 removal; the minimap remains at its default scale and does not capture pointer input.
 - `groupNode`, handle `[template]`, and `[resizable]` keep their existing names but become HTML-only contracts. Migration documentation, rather than renamed APIs or runtime heuristics, communicates the break.
 - The handle wrapper owns placement; the obsolete SVG placement `ctx.point` is removed from custom handle template context.
 - Resizer `[gap]` remains public with its old meaning and default of `1.5px`.
@@ -29,10 +30,6 @@ A cold wheel input is queued for 1.21–1.24 s by the first handle-sync wave. A 
 ### Custom edges cannot receive pointer input
 
 The per-edge SVG host has `pointer-events: none`, while custom edge interaction paths do not opt back in. Selection, elevation, mouse/touch handling, and the delete-selected cookbook scenario are unreachable.
-
-### Minimap hover cannot receive pointer input
-
-The fixed minimap SVG has `pointer-events: none`, so the nested `mouseover` and `mouseleave` handlers never run and `scaleOnHover` is inert.
 
 ### Drag filter test suite is red
 
@@ -77,7 +74,7 @@ With 1,023 visible edges, the per-edge SVG model adds approximately 108 ms of pa
 1. [Eliminate handle initialization layout thrashing](issues/01-eliminate-handle-layout-thrashing.md)
 2. [Cache pane geometry during node drag](issues/02-cache-drag-pane-geometry.md)
 3. [Restore custom-edge pointer interactions](issues/03-restore-custom-edge-pointer-interactions.md)
-4. [Restore minimap hover interaction](issues/04-restore-minimap-hover.md)
+4. [Remove minimap hover scaling](issues/04-restore-minimap-hover.md)
 5. [Harden the drag filter for a missing event target](issues/05-harden-drag-filter-target.md)
 6. [Align the public API, testing entrypoint, and migration documentation](issues/06-align-html-api-and-migration-docs.md)
 7. [Restore the resizer gap input](issues/07-restore-resizer-gap.md)

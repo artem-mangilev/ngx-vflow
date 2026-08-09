@@ -14,7 +14,7 @@ import { Edge, Node, Vflow } from 'ngx-vflow';
       </div>
     </ng-template>
 
-    <mini-map [scaleOnHover]="true" />
+    <mini-map />
   </vflow>`,
   styles: [
     `

@@ -33,6 +33,7 @@ Relevant code and docs:
 - Remove `ctx.point` from the HTML handle template context. Keep `state` and `node`; do not add a replacement coordinate unless a separate use case establishes one.
 - Remove the stale `NodeSvgTemplateMockDirective` export in lockstep with the intentional production removal.
 - Document the intentional removal of `svg-template`, `NodeSvgTemplateDirective`, and `nodeSvgTemplate`.
+- Document the intentional removal of `MiniMapComponent.scaleOnHover`.
 - Describe exact private DOM structure as non-contractual while retaining documented classes and observable behavior as supported contracts.
 
 ## Acceptance
