@@ -259,11 +259,34 @@ describe('DraggableService', () => {
     ).toBe(false);
   });
 
-  it('should allow drag for primary mouse button', () => {
+  it('should allow drag for primary mouse button with a null target', () => {
     const node = createModel({ id: 'node' });
     const dragFilter = (service as any).getDragBehavior(node).filter();
+    const event = new MouseEvent('mousedown', { button: 0, bubbles: true, clientX: 0, clientY: 0 });
 
-    expect(dragFilter(new MouseEvent('mousedown', { button: 0, bubbles: true, clientX: 0, clientY: 0 }))).toBe(true);
+    expect(event.target).toBeNull();
+    expect(dragFilter(event)).toBe(true);
+  });
+
+  it('should reject drag from a descendant of a nodrag element', () => {
+    const node = createModel({ id: 'node' });
+    const dragFilter = (service as any).getDragBehavior(node).filter();
+    const noDragElement = document.createElement('div');
+    const target = document.createElement('span');
+    noDragElement.classList.add('nodrag');
+    noDragElement.append(target);
+
+    expect(dragFilter({ target } as unknown as Event)).toBe(false);
+  });
+
+  it('should allow drag from a valid drag handle target', () => {
+    const node = createModel({ id: 'node' });
+    const dragFilter = (service as any).getDragBehavior(node).filter();
+    const target = document.createElement('div');
+    target.classList.add('vflow-drag-handle');
+    node.dragHandlesCount.set(1);
+
+    expect(dragFilter({ target } as unknown as Event)).toBe(true);
   });
 
   it('should reuse pane geometry while dragging at non-unit zoom', () => {

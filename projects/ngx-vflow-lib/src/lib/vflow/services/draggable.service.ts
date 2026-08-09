@@ -175,13 +175,13 @@ export class DraggableService {
       }
 
       // Do not drag the node when interacting with a no-drag element (e.g. resize controls)
-      if ((event.target as Element).closest('.nodrag')) {
+      if (event.target instanceof Element && event.target.closest('.nodrag')) {
         return false;
       }
 
       // if there is at least one drag handle, we should check if we are dragging it
       if (model.dragHandlesCount()) {
-        return !!(event.target as Element).closest('.vflow-drag-handle');
+        return event.target instanceof Element && !!event.target.closest('.vflow-drag-handle');
       }
 
       return true;
