@@ -14,6 +14,7 @@ import type { Subscription } from 'rxjs';
 import { pairwise, filter, skip } from 'rxjs/operators';
 import { KeyboardService } from './keyboard.service';
 import { isGroupNode } from '../utils/is-group-node';
+import { ResizeObserverService } from './resize-observer.service';
 
 type DragEvent = D3DragEvent<Element, unknown, unknown>;
 
@@ -37,6 +38,7 @@ export class DraggableService {
   private flowStatusService = inject(FlowStatusService);
   private viewportService = inject(ViewportService);
   private keyboardService = inject(KeyboardService);
+  private resizeObserverService = inject(ResizeObserverService);
   private injector = inject(Injector);
 
   /**
@@ -82,6 +84,84 @@ export class DraggableService {
     let dragNodes: NodeModel[] = [];
     let initialPositions: Point[] = [];
     let moveNodesOnAutoPanSub: Subscription | null = null;
+    let pane: Element | null = null;
+    let paneRect: DOMRectReadOnly | null = null;
+    let panePositionObserver: IntersectionObserver | null = null;
+
+    const invalidatePaneRect = () => {
+      paneRect = null;
+    };
+
+    const handlePaneResize = (entry: ResizeObserverEntry) => {
+      if (paneRect && (entry.contentRect.width !== paneRect.width || entry.contentRect.height !== paneRect.height)) {
+        invalidatePaneRect();
+      }
+    };
+
+    const observePanePosition = () => {
+      if (!pane || !paneRect || typeof IntersectionObserver === 'undefined') {
+        return;
+      }
+
+      panePositionObserver?.disconnect();
+      const rootMargin = `${-paneRect.top}px ${paneRect.right - window.innerWidth}px ${paneRect.bottom - window.innerHeight}px ${-paneRect.left}px`;
+      panePositionObserver = new IntersectionObserver(
+        ([entry]) => {
+          const currentRect = paneRect;
+          if (!pane || !currentRect) {
+            return;
+          }
+
+          if (
+            entry.boundingClientRect.left !== currentRect.left ||
+            entry.boundingClientRect.top !== currentRect.top ||
+            entry.boundingClientRect.width !== currentRect.width ||
+            entry.boundingClientRect.height !== currentRect.height
+          ) {
+            paneRect = entry.boundingClientRect;
+            observePanePosition();
+          }
+        },
+        { rootMargin, threshold: 1 },
+      );
+
+      panePositionObserver.observe(pane);
+    };
+
+    const stopTrackingPaneGeometry = () => {
+      if (pane) {
+        this.resizeObserverService.removeObserver(pane, handlePaneResize);
+      }
+      document.removeEventListener('scroll', invalidatePaneRect, true);
+      window.removeEventListener('resize', invalidatePaneRect);
+      panePositionObserver?.disconnect();
+      panePositionObserver = null;
+      pane = null;
+      paneRect = null;
+    };
+
+    const startTrackingPaneGeometry = () => {
+      stopTrackingPaneGeometry();
+      pane = element.closest('.vflow-pane') ?? element;
+      paneRect = pane.getBoundingClientRect();
+      observePanePosition();
+      this.resizeObserverService.addObserver(pane, handlePaneResize);
+      document.addEventListener('scroll', invalidatePaneRect, true);
+      window.addEventListener('resize', invalidatePaneRect);
+    };
+
+    const getPaneRect = () => {
+      if (!pane) {
+        throw new Error('Pane geometry is unavailable outside an active drag');
+      }
+
+      if (!paneRect) {
+        paneRect = pane.getBoundingClientRect();
+        observePanePosition();
+      }
+
+      return paneRect;
+    };
 
     const filterCondition = (event: Event) => {
       // Do not drag group node if selection occurs inside group node (by keyboard)
@@ -111,12 +191,13 @@ export class DraggableService {
       .filter(filterCondition)
       .on('start', (event: DragEvent) => {
         dragNodes = this.getDragNodes(model);
+        startTrackingPaneGeometry();
 
         this.flowStatusService.setNodeDragStartStatus(model);
 
         // d3-drag event.x/y are screen px (not auto-scaled like the old SVG CTM),
         // so recompute the pointer position in flow space.
-        const flow = this.getFlowPoint(event.sourceEvent, element);
+        const flow = this.getFlowPoint(event.sourceEvent, getPaneRect());
 
         initialPositions = dragNodes.map((node) => ({
           x: node.point().x - flow.x,
@@ -128,7 +209,7 @@ export class DraggableService {
       })
 
       .on('drag', (event: DragEvent) => {
-        const flow = this.getFlowPoint(event.sourceEvent, element);
+        const flow = this.getFlowPoint(event.sourceEvent, getPaneRect());
 
         dragNodes.forEach((model, index) => {
           const point = {
@@ -146,6 +227,7 @@ export class DraggableService {
       .on('end', () => {
         moveNodesOnAutoPanSub?.unsubscribe();
         moveNodesOnAutoPanSub = null;
+        stopTrackingPaneGeometry();
         this.flowStatusService.setNodeDragEndStatus(model);
       });
   }
@@ -154,16 +236,14 @@ export class DraggableService {
    * Convert the pointer position of a d3-drag source event into flow coordinates,
    * mirroring SpacePointContextDirective: flow = (client - paneRect - {x,y}) / zoom.
    */
-  private getFlowPoint(sourceEvent: MouseEvent | TouchEvent, element: Element): Point {
-    const pane = (element.closest('.vflow-pane') as HTMLElement | null) ?? element;
-    const rect = pane.getBoundingClientRect();
+  private getFlowPoint(sourceEvent: MouseEvent | TouchEvent, paneRect: DOMRectReadOnly): Point {
     const { x, y, zoom } = this.viewportService.readableViewport();
 
     const client = clientFromEvent(sourceEvent);
 
     return {
-      x: (client.x - rect.left - x) / zoom,
-      y: (client.y - rect.top - y) / zoom,
+      x: (client.x - paneRect.left - x) / zoom,
+      y: (client.y - paneRect.top - y) / zoom,
     };
   }
 
