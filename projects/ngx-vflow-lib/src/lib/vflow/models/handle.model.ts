@@ -63,7 +63,6 @@ export class HandleModel {
 
   public templateContext = {
     $implicit: {
-      point: this.pointAbsolute,
       state: this.state,
       node: this.parentNode.rawNode,
     },

@@ -1,21 +1,15 @@
 You can pass a `[template]` to `HandleComponent` with custom handle.
 
 > **Info**
-> I't important to note that template must be made with SVG.
+> Custom handle templates render as native HTML. The library positions the template wrapper at the handle anchor.
 
-- Custom handles are not positioned automatically, but the library provides a useful template context property to position your handle.
 - Custom handles know if validation of `ConnectionSettings.validator()` has failed or succeeded, so you can use `state()` signal in `let-ctx` to add some behavior based on validation result.
+- The parent node is available through `node`.
 
-Refer to this interface for `let-ctx` when crafting your handle template:
+Add the `handle` directive to the `ng-template` to type its `let-ctx` context. The context has this shape:
 
 ```ts
 interface HandleTemplateImplicitContext {
-  /**
-   * Point from library where you should put your handle.
-   * Pass it in proper SVG element properties
-   */
-  point: Signal<{ x: number; y: number }>;
-
   /**
    * Helper signal to get validation state for current handle. 'idle' by default.
    * You can use it do apply some styles based on state

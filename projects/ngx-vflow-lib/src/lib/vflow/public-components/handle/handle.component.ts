@@ -20,6 +20,7 @@ import { HandleModel } from '../../models/handle.model';
 import { PointerDirective } from '../../directives/pointer.directive';
 import { ConnectionControllerDirective } from '../../directives/connection-controller.directive';
 import { FlowStatusService } from '../../services/flow-status.service';
+import { HandleContext } from '../../interfaces/template-context.interface';
 
 @Component({
   standalone: true,
@@ -54,7 +55,7 @@ export class HandleComponent implements OnInit, AfterViewInit {
    */
   public id = input<string>();
 
-  public template = input<TemplateRef<any> | null>();
+  public template = input<TemplateRef<HandleContext> | null>();
 
   public offsetX = input<number>(0);
   public offsetY = input<number>(0);

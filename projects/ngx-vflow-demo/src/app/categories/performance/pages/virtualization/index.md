@@ -1,11 +1,11 @@
 > **Warning**
 > This is an experimental API. The library still does not support edge previews - only node previews are available.
 
-The library supports **virtualization**, which helps improve performance when rendering large numbers of nodes. When virtualization is enabled, an additional `canvas` layer is activated alongside the existing `SVG` layer.
+The library supports **virtualization**, which helps improve performance when rendering large numbers of nodes. When virtualization is enabled, an additional `canvas` layer is activated alongside the native HTML viewport and SVG edge layers.
 
-During viewport changes (zoom/pan), the canvas layer quickly renders lightweight **preview nodes** to ensure smooth interaction. Once the interaction ends, these preview nodes are **hydrated** into full-featured, heavy **SVG nodes**.
+During viewport changes (zoom/pan), the canvas layer quickly renders lightweight **preview nodes** to ensure smooth interaction. Once the interaction ends, these previews are hydrated into full-featured native HTML nodes.
 
-To enable virtualization, set the `virtualization` flag in the `Optimization` interface. Additionally, you can use the `virtualizationZoomThreshold` property to specify the minimum zoom level at which previews should be rendered. This helps avoid performance issues by rendering a lot of real `SVG` nodes.
+To enable virtualization, set the `virtualization` flag in the `Optimization` interface. Additionally, you can use the `virtualizationZoomThreshold` property to specify the minimum zoom level at which previews should be rendered. This avoids rendering large numbers of full interactive nodes during viewport changes.
 
 > **Info**
 > It's important to note that a preview node is a simplified version of a real node. It is rendered on the canvas layer,

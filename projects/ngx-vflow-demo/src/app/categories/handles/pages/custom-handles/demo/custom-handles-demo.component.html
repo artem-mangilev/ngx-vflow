@@ -28,11 +28,11 @@
   </ng-template>
 </vflow>
 
-<ng-template #handleTemplate let-ctx>
+<ng-template #handleTemplate let-ctx handle>
   <div class="circle-handle"></div>
 </ng-template>
 
-<ng-template #squareHandleTemplate let-ctx>
+<ng-template #squareHandleTemplate let-ctx handle>
   <div
     class="square-handle"
     [class.handle_idle]="ctx.state() === 'idle'"

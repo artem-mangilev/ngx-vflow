@@ -1,5 +1,5 @@
 import { AfterViewInit, ChangeDetectionStrategy, Component, input, TemplateRef, OnInit } from '@angular/core';
-import type { HandleComponent, Position } from 'ngx-vflow';
+import type { HandleComponent, HandleContext, Position } from 'ngx-vflow';
 import { AsInterface } from '../types';
 
 @Component({
@@ -12,7 +12,7 @@ export class HandleMockComponent implements AsInterface<HandleComponent>, OnInit
   public position = input.required<Position>();
   public type = input.required<'source' | 'target'>();
   public id = input<string>();
-  public template = input<TemplateRef<any> | null>();
+  public template = input<TemplateRef<HandleContext> | null>();
   public offsetX = input<number>(0);
   public offsetY = input<number>(0);
 

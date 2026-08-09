@@ -3,6 +3,7 @@ import {
   ConnectionContext,
   EdgeContext,
   GroupNodeContext,
+  HandleContext,
   HtmlEdgeLabelContext,
   NodeContext,
 } from '../interfaces/template-context.interface';
@@ -72,10 +73,9 @@ export class GroupNodeTemplateDirective {
   selector: 'ng-template[handle]',
 })
 export class HandleTemplateDirective {
-  public templateRef = inject(TemplateRef);
+  public templateRef = inject<TemplateRef<HandleContext>>(TemplateRef);
 
-  // TODO
-  // static ngTemplateContextGuard(dir: HandleTemplateDirective, ctx: unknown): ctx is HandleContext {
-  //   return true;
-  // }
+  static ngTemplateContextGuard(dir: HandleTemplateDirective, ctx: unknown): ctx is HandleContext {
+    return true;
+  }
 }

@@ -11,7 +11,7 @@ To resize a default group, simply pass the `resizable` flag to a `Node` of type 
 This provides a way to have more control over the resizer:
 
 - Create a `template-group` node.
-  - If you want the resizer to appear consistently, add the `resizable` directive to the SVG element (likely a `<svg:rect />`) representing your group.
+  - If you want the resizer to appear consistently, add the `resizable` directive to the native HTML element representing your group.
   - If you want the resizer to appear conditionally, apply the directive as `[resizable]="yourCondition"`. You can bind the visibility of the resizer to the node’s selection state (see the code below for an example).
 - **Important**: Use the `ctx.width()` and `ctx.height()` signals from the context, not `ctx.node.width` and `ctx.node.height`. The latter properties are not reactive, so the node won’t update its size based on the resizer.
 - The resizer respects the `min-width` and `min-height` CSS properties of the resizable node, or you can pass `[minWidth]` / `[minHeight]` / `[maxWidth]` / `[maxHeight]` explicitly.

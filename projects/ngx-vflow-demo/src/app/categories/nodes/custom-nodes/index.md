@@ -2,10 +2,9 @@
 keyword: 'FeaturesCustomNodes'
 ---
 
-> **Warning**
-> Be careful with CSS rules applied to node content. Custom nodes are implemented with SVG's `foreignObject` element, and Safari has issues with some CSS rules inside `foreignObject`. Therefore, please check this browser when applying complex styling.
-
 This is where things become a lot more interesting. You can create custom nodes with HTML and CSS.
+
+Custom node content is rendered as native HTML in the transformed flow viewport, so regular HTML layout and CSS rules apply.
 
 ## Template nodes
 

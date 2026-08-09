@@ -2,7 +2,6 @@ import { Signal } from '@angular/core';
 
 import { Edge } from './edge.interface';
 import { HtmlTemplateEdgeLabel } from './edge-label.interface';
-import { Point } from './point.interface';
 import { HandleState } from '../models/handle.model';
 import { HtmlTemplateNode, TemplateGroupNode } from './node.interface';
 
@@ -57,7 +56,6 @@ export interface HtmlEdgeLabelContext {
 
 export interface HandleContext {
   $implicit: {
-    point: Signal<Point>;
     state: Signal<HandleState>;
     node: any;
   };
