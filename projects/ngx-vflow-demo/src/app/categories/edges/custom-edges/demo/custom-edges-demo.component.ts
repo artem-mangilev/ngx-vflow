@@ -4,12 +4,12 @@ import { Edge, Node, Vflow } from 'ngx-vflow';
 @Component({
   template: `<vflow view="auto" [nodes]="nodes" [edges]="edges">
     <ng-template let-ctx edge>
-      <svg:g customTemplateEdge>
+      <svg:g customTemplateEdge selectable>
         <svg:path
           fill="none"
           [attr.d]="ctx.path()"
           [attr.stroke-width]="ctx.edge.data?.().strokeWidth"
-          [attr.stroke]="ctx.edge.data?.().color"
+          [attr.stroke]="ctx.selected() ? '#0f4c75' : ctx.edge.data?.().color"
           [attr.marker-end]="ctx.markerEnd()" />
       </svg:g>
     </ng-template>
