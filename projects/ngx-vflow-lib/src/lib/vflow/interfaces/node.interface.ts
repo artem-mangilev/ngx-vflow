@@ -37,6 +37,9 @@ export interface SharedNode {
   extent?: WritableSignal<'parent' | null>;
   preview?: WritableSignal<NodePreview>;
   selected?: WritableSignal<boolean>;
+  selectable?: WritableSignal<boolean>;
+  deletable?: WritableSignal<boolean>;
+  focusable?: WritableSignal<boolean>;
 }
 
 export interface DefaultNode extends SharedNode {
@@ -111,6 +114,10 @@ interface CreateNodeOptions {
   useDefaults: boolean;
 }
 
+type CapabilityName = 'selectable' | 'deletable' | 'focusable';
+
+export type NodeWithDefaults<T = any> = Omit<Required<Node<T>>, CapabilityName> & Pick<SharedNode, CapabilityName>;
+
 function createBaseNode(node: UnwrapSignal<SharedNode>, useDefaults: boolean) {
   if (useDefaults) {
     return {
@@ -121,6 +128,9 @@ function createBaseNode(node: UnwrapSignal<SharedNode>, useDefaults: boolean) {
       extent: signal(isDefined(node.extent) ? node.extent : NODE_DEFAULTS.extent),
       preview: signal(isDefined(node.preview) ? node.preview : NODE_DEFAULTS.preview),
       selected: signal(isDefined(node.selected) ? node.selected : NODE_DEFAULTS.selected),
+      ...(isDefined(node.selectable) ? { selectable: signal(node.selectable) } : {}),
+      ...(isDefined(node.deletable) ? { deletable: signal(node.deletable) } : {}),
+      ...(isDefined(node.focusable) ? { focusable: signal(node.focusable) } : {}),
     };
   } else {
     return {
@@ -131,20 +141,23 @@ function createBaseNode(node: UnwrapSignal<SharedNode>, useDefaults: boolean) {
       extent: isDefined(node.extent) ? signal(node.extent) : undefined,
       preview: isDefined(node.preview) ? signal(node.preview) : undefined,
       selected: isDefined(node.selected) ? signal(node.selected) : undefined,
+      ...(isDefined(node.selectable) ? { selectable: signal(node.selectable) } : {}),
+      ...(isDefined(node.deletable) ? { deletable: signal(node.deletable) } : {}),
+      ...(isDefined(node.focusable) ? { focusable: signal(node.focusable) } : {}),
     };
   }
 }
 
-// Перегрузка с useDefaults: true (или без опций) - возвращает Required<Node<T>>
-export function createNode<T>(node: StaticNode<T>): Required<Node<T>>;
-export function createNode<T>(node: StaticNode<T>, options: { useDefaults: true }): Required<Node<T>>;
+// Overloads with useDefaults: true (or no options) keep inherited capabilities optional.
+export function createNode<T>(node: StaticNode<T>): NodeWithDefaults<T>;
+export function createNode<T>(node: StaticNode<T>, options: { useDefaults: true }): NodeWithDefaults<T>;
 // Перегрузка с useDefaults: false - возвращает Node<T>
 export function createNode<T>(node: StaticNode<T>, options: { useDefaults: false }): Node<T>;
 // Реализация
 export function createNode<T>(
   node: StaticNode<T>,
   options: CreateNodeOptions = { useDefaults: true },
-): Node<T> | Required<Node<T>> {
+): Node<T> | NodeWithDefaults<T> {
   const baseNode = createBaseNode(node, options.useDefaults);
 
   if (node.type === 'default') {
@@ -258,13 +271,13 @@ export function createNode<T>(
   throw new Error(`Unknown node type for node with id ${node.id}`);
 }
 
-export function createNodes<T = unknown>(nodes: StaticNode<T>[]): Required<Node<T>>[];
-export function createNodes<T = unknown>(nodes: StaticNode<T>[], options: { useDefaults: true }): Required<Node<T>>[];
+export function createNodes<T = unknown>(nodes: StaticNode<T>[]): NodeWithDefaults<T>[];
+export function createNodes<T = unknown>(nodes: StaticNode<T>[], options: { useDefaults: true }): NodeWithDefaults<T>[];
 export function createNodes<T = unknown>(nodes: StaticNode<T>[], options: { useDefaults: false }): Node<T>[];
 export function createNodes<T = unknown>(
   nodes: StaticNode<T>[],
   options: CreateNodeOptions = { useDefaults: true },
-): Node<T>[] | Required<Node<T>>[] {
+): Node<T>[] | NodeWithDefaults<T>[] {
   if (options.useDefaults) {
     return nodes.map((node) => createNode(node, { useDefaults: true }));
   } else {

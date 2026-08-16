@@ -59,6 +59,9 @@ export class NodeModel<T = unknown>
   public selected = signal(false);
   public selected$: Observable<boolean>;
   public preselected = signal(false);
+  public selectable = computed(() => this.rawNode.selectable?.() ?? this.settingsService.nodesSelectable());
+  public deletable = computed(() => this.rawNode.deletable?.() ?? true);
+  public focusable = computed(() => this.rawNode.focusable?.() ?? this.settingsService.nodesFocusable());
 
   public preview = signal<NodePreview>({ style: {} });
 

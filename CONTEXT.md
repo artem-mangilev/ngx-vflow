@@ -12,6 +12,14 @@ _Avoid_: Diagramming suite, workflow application
 A capability provided through the documented API of the main ngx-vflow package without requiring application-specific implementation.
 _Avoid_: Built-in recipe, native integration
 
+**Capability policy**:
+A resolved rule that gates a library-originated interaction while preserving application-owned state and explicit entity overrides.
+_Avoid_: Permission system, authorization
+
+**Interaction eligibility**:
+Whether a node, edge, or handle may participate in a specific library-originated interaction such as selection or connection.
+_Avoid_: Visibility, disabled state
+
 **First-party extension**:
 An optional capability maintained by the package authors but distributed outside the main package contract.
 _Avoid_: Core feature, third-party integration

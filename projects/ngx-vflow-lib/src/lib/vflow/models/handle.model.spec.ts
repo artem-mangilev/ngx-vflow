@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { provideExperimentalZonelessChangeDetection } from '@angular/core';
+import { provideExperimentalZonelessChangeDetection, signal } from '@angular/core';
 import { FlowEntitiesService } from '../services/flow-entities.service';
 import { HandleModel } from './handle.model';
 import { NodeModel } from './node.model';
@@ -149,5 +149,35 @@ describe('HandleModel', () => {
 
     expect(model.layoutStyles().top).toBe('80px');
     expect(model.pointAbsolute()).toEqual({ x: 170, y: 80 });
+  });
+
+  it('should expose connectability in the custom handle template context', () => {
+    const { parentNode, anchor } = createModel('right', { left: 10, top: 30, width: 80, height: 20 });
+    const canStart = signal(false);
+    const canAccept = signal(true);
+    const model = TestBed.runInInjectionContext(
+      () =>
+        new HandleModel(
+          {
+            type: 'source',
+            position: 'right',
+            hostReference: anchor,
+            userOffsetX: 0,
+            userOffsetY: 0,
+            canStart,
+            canAccept,
+          },
+          parentNode,
+        ),
+    );
+
+    expect(model.templateContext.$implicit.canStart()).toBeFalse();
+    expect(model.templateContext.$implicit.canAccept()).toBeTrue();
+
+    canStart.set(true);
+    canAccept.set(false);
+
+    expect(model.templateContext.$implicit.canStart()).toBeTrue();
+    expect(model.templateContext.$implicit.canAccept()).toBeFalse();
   });
 });

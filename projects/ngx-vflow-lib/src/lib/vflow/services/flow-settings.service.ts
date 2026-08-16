@@ -6,7 +6,10 @@ import { SelectionBoxSettings } from '../interfaces/selection-box-settings.inter
 
 @Injectable()
 export class FlowSettingsService {
-  public entitiesSelectable = signal(true);
+  public nodesSelectable = signal(true);
+  public edgesSelectable = signal(true);
+  public nodesFocusable = signal(true);
+  public edgesFocusable = signal(true);
 
   public elevateNodesOnSelect = signal(true);
   public elevateEdgesOnSelect = signal(true);

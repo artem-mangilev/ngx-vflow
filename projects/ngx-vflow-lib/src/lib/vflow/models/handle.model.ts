@@ -1,4 +1,4 @@
-import { computed, inject, signal } from '@angular/core';
+import { Signal, computed, inject, signal } from '@angular/core';
 import { NodeHandle } from '../services/handle.service';
 import { NodeModel } from './node.model';
 import { Point } from '../interfaces/point.interface';
@@ -33,6 +33,8 @@ export class HandleModel {
   private viewportService = inject(ViewportService);
 
   public state = signal<HandleState>('idle');
+  public canStart: Signal<boolean> = this.rawHandle.canStart ?? signal(true);
+  public canAccept: Signal<boolean> = this.rawHandle.canAccept ?? signal(true);
 
   /** Anchor element the `<handle>` was placed into. */
   public hostReference = this.rawHandle.hostReference!;
@@ -65,6 +67,8 @@ export class HandleModel {
     $implicit: {
       state: this.state,
       node: this.parentNode.rawNode,
+      canStart: this.canStart,
+      canAccept: this.canAccept,
     },
   };
 

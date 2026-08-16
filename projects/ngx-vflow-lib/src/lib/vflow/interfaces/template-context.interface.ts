@@ -58,5 +58,7 @@ export interface HandleContext {
   $implicit: {
     state: Signal<HandleState>;
     node: any;
+    canStart: Signal<boolean>;
+    canAccept: Signal<boolean>;
   };
 }

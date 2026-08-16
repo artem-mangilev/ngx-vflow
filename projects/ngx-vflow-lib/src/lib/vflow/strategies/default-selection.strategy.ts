@@ -3,6 +3,10 @@ import { FlowEntity } from '../interfaces/flow-entity.interface';
 
 export class DefaultSelectionStrategy implements SelectionStrategy {
   select(entity: FlowEntity | null, context: SelectionContext): void {
+    if (entity && !entity.selectable()) {
+      return;
+    }
+
     // if entity already selected - do nothing
     if (entity?.selected()) {
       return;

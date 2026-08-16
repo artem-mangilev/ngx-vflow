@@ -16,9 +16,11 @@ import { CurveFactoryParams } from '../interfaces/curve-factory.interface';
 import { FlowEntitiesService } from '../services/flow-entities.service';
 import { extendedComputed } from '../utils/signals/extended-computed';
 import { Marker } from '../interfaces/marker.interface';
+import { FlowSettingsService } from '../services/flow-settings.service';
 
 export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
   private readonly flowEntitiesService = inject(FlowEntitiesService);
+  private readonly settingsService = inject(FlowSettingsService);
 
   public source = signal<NodeModel | undefined>(undefined);
   public target = signal<NodeModel | undefined>(undefined);
@@ -32,6 +34,9 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
   public selected = signal(EDGE_DEFAULTS.selected);
   public selected$ = toObservable(this.selected);
   public preselected = signal(false);
+  public selectable = computed(() => this.edge.selectable?.() ?? this.settingsService.edgesSelectable());
+  public deletable = computed(() => this.edge.deletable?.() ?? true);
+  public focusable = computed(() => this.edge.focusable?.() ?? this.settingsService.edgesFocusable());
 
   public shouldLoad = computed(() => (this.source()?.shouldLoad() ?? false) && (this.target()?.shouldLoad() ?? false));
 

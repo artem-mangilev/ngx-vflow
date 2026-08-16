@@ -143,6 +143,10 @@ export class ConnectionControllerDirective {
   protected isStrictMode = computed(() => this.flowEntitiesService.connection().mode === 'strict');
 
   public startConnection(handle: HandleModel) {
+    if (!handle.canStart()) {
+      return;
+    }
+
     this.statusService.setConnectionStartStatus(handle.parentNode, handle);
   }
 
@@ -160,30 +164,33 @@ export class ConnectionControllerDirective {
       let target = handle.parentNode;
       let sourceHandle = status.payload.sourceHandle;
       let targetHandle = handle;
+      let valid = false;
 
-      if (this.isStrictMode()) {
-        // swap direction (if needed) according to actual source and target of strict mode
-        const adjusted = adjustDirection({
-          source: status.payload.source,
-          sourceHandle: status.payload.sourceHandle,
-          target: handle.parentNode,
-          targetHandle: handle,
+      if (handle.canAccept()) {
+        if (this.isStrictMode()) {
+          // swap direction (if needed) according to actual source and target of strict mode
+          const adjusted = adjustDirection({
+            source: status.payload.source,
+            sourceHandle: status.payload.sourceHandle,
+            target: handle.parentNode,
+            targetHandle: handle,
+          });
+
+          source = adjusted.source;
+          target = adjusted.target;
+          sourceHandle = adjusted.sourceHandle;
+          targetHandle = adjusted.targetHandle;
+        }
+
+        valid = this.flowEntitiesService.connection().validator({
+          source: source.rawNode.id,
+          target: target.rawNode.id,
+          sourceHandle: sourceHandle.rawHandle.id,
+          targetHandle: targetHandle.rawHandle.id,
+          sourceHandleType: sourceHandle.rawHandle.type,
+          targetHandleType: targetHandle.rawHandle.type,
         });
-
-        source = adjusted.source;
-        target = adjusted.target;
-        sourceHandle = adjusted.sourceHandle;
-        targetHandle = adjusted.targetHandle;
       }
-
-      const valid = this.flowEntitiesService.connection().validator({
-        source: source.rawNode.id,
-        target: target.rawNode.id,
-        sourceHandle: sourceHandle.rawHandle.id,
-        targetHandle: targetHandle.rawHandle.id,
-        sourceHandleType: sourceHandle.rawHandle.type,
-        targetHandleType: targetHandle.rawHandle.type,
-      });
 
       // TODO: check how react flow handles highlight of handle
       // if direction changes
@@ -238,6 +245,14 @@ export class ConnectionControllerDirective {
       const sourceHandle = status.payload.sourceHandle;
       const target = status.payload.target;
       const targetHandle = status.payload.targetHandle;
+
+      if (!targetHandle.canAccept()) {
+        isReconnection
+          ? this.statusService.setReconnectionDroppedStatus(source, sourceHandle, status.payload.oldEdge)
+          : this.statusService.setConnectionDroppedStatus(source, sourceHandle);
+
+        return;
+      }
 
       isReconnection
         ? this.statusService.setReconnectionReleaseStatus(

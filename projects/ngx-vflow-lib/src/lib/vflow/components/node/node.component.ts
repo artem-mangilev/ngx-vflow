@@ -122,7 +122,7 @@ export class NodeComponent implements OnInit, OnDestroy {
       return;
     }
 
-    if (this.flowSettingsService.entitiesSelectable()) {
+    if (this.model().selectable()) {
       this.selectionService.select(this.model());
     }
   }

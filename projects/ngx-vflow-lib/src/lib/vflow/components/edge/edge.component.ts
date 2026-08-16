@@ -44,7 +44,7 @@ export class EdgeComponent {
   });
 
   public select() {
-    if (this.flowSettingsService.entitiesSelectable()) {
+    if (this.model().selectable()) {
       this.selectionService.select(this.model());
     }
   }

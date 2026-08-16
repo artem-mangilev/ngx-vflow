@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import { Edge, Node, Vflow, Connection, ConnectionSettings } from 'ngx-vflow';
+import { Edge, Node, Vflow, Connection } from 'ngx-vflow';
 
 @Component({
   templateUrl: './custom-handles-demo.component.html',
@@ -8,6 +8,9 @@ import { Edge, Node, Vflow, Connection, ConnectionSettings } from 'ngx-vflow';
   imports: [Vflow],
 })
 export class CustomHandlesDemoComponent {
+  public outputOneCanStart = signal(true);
+  public inputOneCanAccept = signal(true);
+
   public nodes: Node[] = [
     {
       id: '1',
@@ -33,12 +36,6 @@ export class CustomHandlesDemoComponent {
 
   public edges: Edge[] = [];
 
-  public connectionSettings: ConnectionSettings = {
-    validator: (connection) => {
-      return connection.target === '2' && connection.targetHandle === 'input1';
-    },
-  };
-
   public createEdge({ source, target, sourceHandle, targetHandle }: Connection) {
     this.edges = [
       ...this.edges,
@@ -54,5 +51,13 @@ export class CustomHandlesDemoComponent {
         targetHandle,
       },
     ];
+  }
+
+  public setOutputOneCanStart(enabled: boolean): void {
+    this.outputOneCanStart.set(enabled);
+  }
+
+  public setInputOneCanAccept(enabled: boolean): void {
+    this.inputOneCanAccept.set(enabled);
   }
 }

@@ -157,7 +157,16 @@ export class VflowMockComponent implements AsInterface<VflowComponent>, OnInit {
   public readonly optimization = DEFAULT_OPTIMIZATION;
 
   @Input()
-  public readonly entitiesSelectable = true;
+  public readonly nodesSelectable = true;
+
+  @Input()
+  public readonly edgesSelectable = true;
+
+  @Input()
+  public readonly nodesFocusable = true;
+
+  @Input()
+  public readonly edgesFocusable = true;
 
   @Input()
   public readonly selectionMode: SelectionMode = 'default';

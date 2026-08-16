@@ -66,6 +66,7 @@ function createHandle(
 
 describe('EdgeModel', () => {
   let model: EdgeModel;
+  let settingsService: FlowSettingsService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -77,6 +78,8 @@ describe('EdgeModel', () => {
         provideExperimentalZonelessChangeDetection(),
       ],
     });
+
+    settingsService = TestBed.inject(FlowSettingsService);
 
     model = TestBed.runInInjectionContext(
       () =>
@@ -175,5 +178,49 @@ describe('EdgeModel', () => {
 
   it('should detached === false if source and target exists and their source and target handle also exists', () => {
     expect(model.detached()).toEqual(false);
+  });
+
+  it('should resolve default capabilities and inherit reactive global settings', () => {
+    expect(model.selectable()).toBeTrue();
+    expect(model.deletable()).toBeTrue();
+    expect(model.focusable()).toBeTrue();
+
+    settingsService.edgesSelectable.set(false);
+    settingsService.edgesFocusable.set(false);
+
+    expect(model.selectable()).toBeFalse();
+    expect(model.focusable()).toBeFalse();
+    expect(model.deletable()).toBeTrue();
+  });
+
+  it('should let explicit capability overrides win over global settings', () => {
+    const explicitModel = TestBed.runInInjectionContext(
+      () =>
+        new EdgeModel(
+          createEdge({
+            id: 'explicit',
+            source: '1',
+            target: '2',
+            selectable: false,
+            deletable: false,
+            focusable: true,
+          }),
+        ),
+    );
+
+    settingsService.edgesSelectable.set(true);
+    settingsService.edgesFocusable.set(false);
+
+    expect(explicitModel.selectable()).toBeFalse();
+    expect(explicitModel.deletable()).toBeFalse();
+    expect(explicitModel.focusable()).toBeTrue();
+  });
+
+  it('should keep inherited capabilities absent when factories materialize defaults', () => {
+    const created = createEdge({ id: 'factory', source: '1', target: '2' });
+
+    expect(created.selectable).toBeUndefined();
+    expect(created.deletable).toBeUndefined();
+    expect(created.focusable).toBeUndefined();
   });
 });

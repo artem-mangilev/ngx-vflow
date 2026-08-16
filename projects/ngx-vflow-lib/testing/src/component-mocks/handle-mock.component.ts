@@ -15,6 +15,8 @@ export class HandleMockComponent implements AsInterface<HandleComponent>, OnInit
   public template = input<TemplateRef<HandleContext> | null>();
   public offsetX = input<number>(0);
   public offsetY = input<number>(0);
+  public canStart = input<boolean>(true);
+  public canAccept = input<boolean>(true);
 
   // eslint-disable-next-line @angular-eslint/no-empty-lifecycle-method
   public ngOnInit(): void {}

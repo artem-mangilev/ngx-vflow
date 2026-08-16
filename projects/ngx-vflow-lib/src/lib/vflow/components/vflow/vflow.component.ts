@@ -235,12 +235,28 @@ export class VflowComponent {
     }));
   }
 
-  /**
-   * Global rule if you can or can't select entities
-   */
+  /** Global default for node selection eligibility. */
   @Input()
-  public set entitiesSelectable(value: boolean) {
-    this.flowSettingsService.entitiesSelectable.set(value);
+  public set nodesSelectable(value: boolean) {
+    this.flowSettingsService.nodesSelectable.set(value);
+  }
+
+  /** Global default for edge selection eligibility. */
+  @Input()
+  public set edgesSelectable(value: boolean) {
+    this.flowSettingsService.edgesSelectable.set(value);
+  }
+
+  /** Global default for node focus eligibility. */
+  @Input()
+  public set nodesFocusable(value: boolean) {
+    this.flowSettingsService.nodesFocusable.set(value);
+  }
+
+  /** Global default for edge focus eligibility. */
+  @Input()
+  public set edgesFocusable(value: boolean) {
+    this.flowSettingsService.edgesFocusable.set(value);
   }
 
   /**

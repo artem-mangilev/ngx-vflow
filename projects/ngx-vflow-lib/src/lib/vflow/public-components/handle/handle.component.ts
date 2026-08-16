@@ -60,6 +60,10 @@ export class HandleComponent implements OnInit, AfterViewInit {
   public offsetX = input<number>(0);
   public offsetY = input<number>(0);
 
+  public canStart = input<boolean>(true);
+
+  public canAccept = input<boolean>(true);
+
   private handleElementRef = viewChild<ElementRef<HTMLElement>>('handleElement');
 
   protected model: HandleModel | null = null;
@@ -94,6 +98,8 @@ export class HandleComponent implements OnInit, AfterViewInit {
           template: this.template(),
           userOffsetX: this.offsetX(),
           userOffsetY: this.offsetY(),
+          canStart: this.canStart,
+          canAccept: this.canAccept,
         },
         node,
       );

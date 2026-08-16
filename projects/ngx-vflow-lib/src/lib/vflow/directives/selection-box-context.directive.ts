@@ -33,7 +33,7 @@ export class SelectionBoxContextDirective {
 
   protected startSub = this.rootPointer.pointerStart$
     .pipe(
-      filter(() => this.flowSettingsService.entitiesSelectable()),
+      filter(() => this.flowSettingsService.selectionMode() !== 'manual'),
       filter(() => this.keyboardService.isActiveAction('selection')),
       tap(({ x, y, originalEvent }) => {
         originalEvent.preventDefault();
@@ -73,6 +73,12 @@ export class SelectionBoxContextDirective {
   private finish() {
     const rect = this.getSelectionRect();
     if (!rect) {
+      this.clearPreselection();
+      this.model.reset();
+      return;
+    }
+
+    if (this.flowSettingsService.selectionMode() === 'manual') {
       this.clearPreselection();
       this.model.reset();
       return;
@@ -122,11 +128,11 @@ export class SelectionBoxContextDirective {
     }
 
     this.flowEntitiesService.nodes().forEach((node) => {
-      node.preselected.set(this.isNodeInside(node, rect));
+      node.preselected.set(node.selectable() && this.isNodeInside(node, rect));
     });
 
     this.flowEntitiesService.edges().forEach((edge) => {
-      edge.preselected.set(this.isEdgeInside(edge, rect));
+      edge.preselected.set(edge.selectable() && this.isEdgeInside(edge, rect));
     });
   }
 

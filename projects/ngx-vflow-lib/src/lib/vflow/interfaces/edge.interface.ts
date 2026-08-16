@@ -33,6 +33,9 @@ export interface Edge<T = unknown> extends Connection {
   reconnectable?: WritableSignal<boolean | 'source' | 'target'>;
   floating?: WritableSignal<boolean>;
   selected?: WritableSignal<boolean>;
+  selectable?: WritableSignal<boolean>;
+  deletable?: WritableSignal<boolean>;
+  focusable?: WritableSignal<boolean>;
 }
 
 export type StaticEdge<T = unknown> = UnwrapSignal<Edge<T>>;
@@ -41,13 +44,17 @@ interface CreateEdgeOptions {
   useDefaults: boolean;
 }
 
-export function createEdge<T>(edge: StaticEdge<T>): Required<Edge<T>>;
-export function createEdge<T>(edge: StaticEdge<T>, options: { useDefaults: true }): Required<Edge<T>>;
+type CapabilityName = 'selectable' | 'deletable' | 'focusable';
+
+export type EdgeWithDefaults<T = unknown> = Omit<Required<Edge<T>>, CapabilityName> & Pick<Edge<T>, CapabilityName>;
+
+export function createEdge<T>(edge: StaticEdge<T>): EdgeWithDefaults<T>;
+export function createEdge<T>(edge: StaticEdge<T>, options: { useDefaults: true }): EdgeWithDefaults<T>;
 export function createEdge<T>(edge: StaticEdge<T>, options: { useDefaults: false }): Edge<T>;
 export function createEdge<T>(
   edge: StaticEdge<T>,
   options: CreateEdgeOptions = { useDefaults: true },
-): Edge<T> | Required<Edge<T>> {
+): Edge<T> | EdgeWithDefaults<T> {
   if (options.useDefaults) {
     return {
       id: edge.id,
@@ -63,6 +70,9 @@ export function createEdge<T>(
       reconnectable: signal(isDefined(edge.reconnectable) ? edge.reconnectable : EDGE_DEFAULTS.reconnectable),
       floating: signal(isDefined(edge.floating) ? edge.floating : EDGE_DEFAULTS.floating),
       selected: signal(isDefined(edge.selected) ? edge.selected : EDGE_DEFAULTS.selected),
+      ...(isDefined(edge.selectable) ? { selectable: signal(edge.selectable) } : {}),
+      ...(isDefined(edge.deletable) ? { deletable: signal(edge.deletable) } : {}),
+      ...(isDefined(edge.focusable) ? { focusable: signal(edge.focusable) } : {}),
     };
   } else {
     return {
@@ -79,17 +89,20 @@ export function createEdge<T>(
       reconnectable: isDefined(edge.reconnectable) ? signal(edge.reconnectable) : undefined,
       floating: isDefined(edge.floating) ? signal(edge.floating) : undefined,
       selected: isDefined(edge.selected) ? signal(edge.selected) : undefined,
+      ...(isDefined(edge.selectable) ? { selectable: signal(edge.selectable) } : {}),
+      ...(isDefined(edge.deletable) ? { deletable: signal(edge.deletable) } : {}),
+      ...(isDefined(edge.focusable) ? { focusable: signal(edge.focusable) } : {}),
     };
   }
 }
 
-export function createEdges<T>(edges: StaticEdge<T>[]): Required<Edge<T>>[];
-export function createEdges<T>(edges: StaticEdge<T>[], options: { useDefaults: true }): Required<Edge<T>>[];
+export function createEdges<T>(edges: StaticEdge<T>[]): EdgeWithDefaults<T>[];
+export function createEdges<T>(edges: StaticEdge<T>[], options: { useDefaults: true }): EdgeWithDefaults<T>[];
 export function createEdges<T>(edges: StaticEdge<T>[], options: { useDefaults: false }): Edge<T>[];
 export function createEdges<T>(
   edges: StaticEdge<T>[],
   options: CreateEdgeOptions = { useDefaults: true },
-): Edge<T>[] | Required<Edge<T>>[] {
+): Edge<T>[] | EdgeWithDefaults<T>[] {
   if (options.useDefaults) {
     return edges.map((edge) => createEdge(edge, { useDefaults: true }));
   } else {
