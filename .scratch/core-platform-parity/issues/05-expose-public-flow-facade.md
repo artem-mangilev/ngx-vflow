@@ -22,7 +22,7 @@ Consumers can read a few values and call a few methods on `VflowComponent`, but 
 
 - Every documented facade method has stable public types and defined behavior before and after initialization.
 - Custom Angular nodes can query graph relationships without importing an internal service.
-- Queries respect hidden entities and nested groups consistently with issues 01 and 02.
+- Graph and geometry queries handle nested groups consistently with issue 02 and distinguish application-provided entities from currently rendered instances.
 - The facade does not expose internal writable collections or create a second graph store.
 - Existing root methods are retained, delegated, or migrated with a documented compatibility path.
 - Public API tests verify both component-reference and DI access.
@@ -32,5 +32,6 @@ Consumers can read a few values and call a few methods on `VflowComponent`, but 
 - An imperative CRUD store.
 - History, persistence, or serialization.
 - Generic store selectors or devtools.
+- Presentation filtering or hidden-state semantics. The application-provided node and edge collections remain authoritative.
 
 ## Comments

@@ -13,7 +13,7 @@ The minimap uses fixed built-in preview styles and has no public entity interact
 - Add per-node or per-type minimap presentation hooks for color, stroke, class, and lightweight SVG preview data.
 - Add node activation events without rendering the full custom node DOM.
 - Define accessible name, instructions, focus behavior, and keyboard navigation for the minimap control.
-- Expose selected, hidden, grouped, and viewport-mask states consistently.
+- Expose selected, grouped, focusable, and viewport-mask states consistently.
 - Keep customization functions pure and inexpensive for large graphs.
 
 ## Acceptance
@@ -21,7 +21,7 @@ The minimap uses fixed built-in preview styles and has no public entity interact
 - Consumers can visually distinguish node types and states without duplicating node components.
 - Clicking or keyboard-activating a minimap node can focus or center it through documented events/settings.
 - The minimap is labeled and operable without a pointer.
-- Hidden and non-focusable entity policies are respected.
+- Non-focusable nodes are excluded from keyboard activation while remaining available for non-focus navigation such as centering.
 - Performance tests demonstrate that presentation hooks do not create an Angular component tree per minimap node.
 - Documentation includes custom styling, node activation, and accessible navigation examples.
 
@@ -30,5 +30,6 @@ The minimap uses fixed built-in preview styles and has no public entity interact
 - Arbitrary Angular templates in the minimap.
 - Editing graph entities directly inside the minimap.
 - Canvas/WebGL minimap rendering.
+- Hidden-state presentation or filtering.
 
 ## Comments

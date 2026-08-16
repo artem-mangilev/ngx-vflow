@@ -14,7 +14,7 @@ Keyboard settings currently cover only selection modifiers. Users cannot travers
 - Support keyboard selection, deselection, and multi-selection.
 - Move selected movable nodes with arrow keys and a configurable accelerated step.
 - Pan focused entities into view while respecting viewport constraints.
-- Respect per-entity focus, selection, visibility, and movement policies.
+- Respect per-entity focus and selection policies together with the existing node movement capability.
 - Ignore graph shortcuts while focus is inside inputs, textareas, contenteditable regions, or opted-out controls.
 
 ## Acceptance
@@ -23,12 +23,13 @@ Keyboard settings currently cover only selection modifiers. Users cannot travers
 - Focus order is deterministic for nested groups and updates safely when entities are added or removed by the application.
 - Movement uses existing writable signals and emits the same public change events as pointer movement.
 - Focus auto-pan respects configured bounds and does not cause unexpected zoom.
-- Unit and browser tests cover nested groups, hidden/disabled entities, multi-selection, embedded controls, and entity removal during focus.
+- Unit and browser tests cover nested groups, non-focusable and non-selectable entities, multi-selection, embedded controls, and entity removal during focus.
 
 ## Out of scope
 
 - Keyboard connection creation and deletion.
 - Command palette UI.
 - Spatial-navigation algorithms beyond the documented initial policy.
+- Hidden-state traversal semantics.
 
 ## Comments
