@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import { Connection, ConnectionSettings, Edge, Node, Vflow } from 'ngx-vflow';
+import { Connection, ConnectionSettings, Edge, Node, Vflow, addEdges } from 'ngx-vflow';
 
 @Component({
   template: `<vflow
@@ -41,14 +41,7 @@ export class ConnectionValidationDemoComponent {
     validator: (connection) => connection.source === '1' && connection.target === '2',
   };
 
-  public createEdge({ source, target }: Connection) {
-    this.edges = [
-      ...this.edges,
-      {
-        id: `${source} -> ${target}`,
-        source,
-        target,
-      },
-    ];
+  public createEdge(connection: Connection) {
+    this.edges = addEdges([{ id: crypto.randomUUID(), ...connection }], { nodes: this.nodes, edges: this.edges });
   }
 }

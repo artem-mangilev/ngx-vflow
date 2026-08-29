@@ -1,6 +1,7 @@
 // Standalone Util
 export * from './lib/vflow/vflow';
 export * from './lib/vflow/utils/graph';
+export * from './lib/vflow/utils/graph-operations';
 
 // Interfaces
 export * from './lib/vflow/interfaces/node.interface';

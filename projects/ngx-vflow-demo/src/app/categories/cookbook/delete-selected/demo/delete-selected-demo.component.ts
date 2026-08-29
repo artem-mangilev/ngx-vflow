@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import { Edge, Node, Vflow } from 'ngx-vflow';
+import { Edge, Node, Vflow, removeEdges, removeNodes } from 'ngx-vflow';
 
 @Component({
   templateUrl: './delete-selected-demo.component.html',
@@ -42,10 +42,12 @@ export class DeleteSelectedDemoComponent {
   ];
 
   public deleteNode(node: Node) {
-    this.nodes = this.nodes.filter((n) => n.id !== node.id);
+    const result = removeNodes([node.id], { nodes: this.nodes, edges: this.edges });
+    this.nodes = result.nodes;
+    this.edges = result.edges;
   }
 
   public deleteEdge(edge: Edge) {
-    this.edges = this.edges.filter((e) => e.id !== edge.id);
+    this.edges = removeEdges([edge.id], this.edges);
   }
 }

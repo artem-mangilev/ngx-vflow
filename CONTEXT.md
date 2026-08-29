@@ -40,6 +40,18 @@ _Avoid_: Internal graph store, uncontrolled flow
 Adding, removing, or reparenting a node or edge. ngx-vflow describes the requested change, and the application decides whether and how to apply it.
 _Avoid_: Interactive property update, internal mutation
 
+**Change notification**:
+A post-mutation report that application-owned graph state or one of its writable signals has already changed. It is observational and must not be replayed as a structural graph operation.
+_Avoid_: Change request, reducer action
+
+**Structural graph operation**:
+A pre-application description of a structural graph change that the application may apply to its owned graph state with pure package helpers.
+_Avoid_: Change notification, internal mutation
+
+**Parent node**:
+A node referenced by another node's parent relationship, establishing nested coordinates. Any node type may be a parent; a visual group type is not required.
+_Avoid_: Group node
+
 **Runtime grouping**:
 An interaction that proposes moving a node into or out of a group while preserving its visual position across coordinate spaces.
 _Avoid_: Subflow rendering, static parent assignment

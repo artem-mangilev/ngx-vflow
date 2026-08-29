@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import { Edge, Node, ReconnectEndEvent, ReconnectEvent, Vflow } from 'ngx-vflow';
+import { Edge, Node, ReconnectEndEvent, ReconnectEvent, Vflow, reconnectEdges, removeEdges } from 'ngx-vflow';
 
 @Component({
   template: `<vflow
@@ -95,22 +95,14 @@ export class ReconnectionDemoComponent {
 
   public onReconnectEnd(event: ReconnectEndEvent) {
     if (!this.edgeReconnectSuccessful()) {
-      this.edges = this.edges.filter((edge) => edge !== event.edge);
+      this.edges = removeEdges([event.edge.id], this.edges);
     }
 
     this.edgeReconnectSuccessful.set(true);
   }
 
-  public reconnect({ oldEdge, connection: { source, target } }: ReconnectEvent) {
-    this.edges = [
-      ...this.edges.filter((edge) => edge !== oldEdge),
-      {
-        ...oldEdge,
-        id: `${source} -> ${target}`,
-        source,
-        target,
-      },
-    ];
+  public reconnect({ oldEdge, connection }: ReconnectEvent) {
+    this.edges = reconnectEdges([{ id: oldEdge.id, connection }], { nodes: this.nodes, edges: this.edges });
 
     this.edgeReconnectSuccessful.set(true);
   }

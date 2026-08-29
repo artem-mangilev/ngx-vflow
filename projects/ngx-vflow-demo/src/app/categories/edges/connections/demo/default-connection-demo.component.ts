@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import { Connection, Edge, Node, Vflow } from 'ngx-vflow';
+import { Connection, Edge, Node, Vflow, addEdges } from 'ngx-vflow';
 
 @Component({
   template: `<vflow view="auto" [nodes]="nodes" [edges]="edges" (connect)="createEdge($event)" /> `,
@@ -32,14 +32,7 @@ export class DefaultConnectionDemoComponent {
 
   public edges: Edge[] = [];
 
-  public createEdge({ source, target }: Connection) {
-    this.edges = [
-      ...this.edges,
-      {
-        id: `${source} -> ${target}`,
-        source,
-        target,
-      },
-    ];
+  public createEdge(connection: Connection) {
+    this.edges = addEdges([{ id: crypto.randomUUID(), ...connection }], { nodes: this.nodes, edges: this.edges });
   }
 }

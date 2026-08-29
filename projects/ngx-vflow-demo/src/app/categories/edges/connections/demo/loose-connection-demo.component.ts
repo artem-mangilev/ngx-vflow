@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import { Connection, ConnectionSettings, CustomNodeComponent, Edge, Node, Vflow } from 'ngx-vflow';
+import { Connection, ConnectionSettings, CustomNodeComponent, Edge, Node, Vflow, addEdges } from 'ngx-vflow';
 
 @Component({
   template: `
@@ -45,18 +45,20 @@ export class LooseConnectionDemoComponent {
   public createEdge(connection: Connection) {
     const { source, target, sourceHandle, targetHandle } = connection;
 
-    this.edges = [
-      ...this.edges,
-      {
-        id: `${source}${sourceHandle} -> ${target}${targetHandle}`,
-        ...connection,
-        markers: signal({
-          end: {
-            type: 'arrow-closed',
-          },
-        }),
-      },
-    ];
+    this.edges = addEdges(
+      [
+        {
+          id: `${source}${sourceHandle} -> ${target}${targetHandle}`,
+          ...connection,
+          markers: signal({
+            end: {
+              type: 'arrow-closed',
+            },
+          }),
+        },
+      ],
+      { nodes: this.nodes, edges: this.edges },
+    );
   }
 }
 
