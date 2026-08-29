@@ -35,7 +35,6 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
   public selected$ = toObservable(this.selected);
   public preselected = signal(false);
   public selectable = computed(() => this.edge.selectable?.() ?? this.settingsService.edgesSelectable());
-  public deletable = computed(() => this.edge.deletable?.() ?? true);
   public focusable = computed(() => this.edge.focusable?.() ?? this.settingsService.edgesFocusable());
 
   public shouldLoad = computed(() => (this.source()?.shouldLoad() ?? false) && (this.target()?.shouldLoad() ?? false));

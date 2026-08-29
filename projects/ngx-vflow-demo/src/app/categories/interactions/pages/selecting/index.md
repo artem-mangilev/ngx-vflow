@@ -11,8 +11,7 @@ Selection eligibility is resolved independently for nodes and edges. The library
 
 - `nodesSelectable` and `edgesSelectable` are the global selection defaults.
 - `nodesFocusable` and `edgesFocusable` are the global focus defaults for focus behavior added by later interaction features.
-- An entity's `selectable`, `focusable`, or `deletable` signal overrides its corresponding global setting. Explicit `true` and `false` both override; an omitted field inherits.
-- `deletable` has no global input and defaults to `true`.
+- An entity's `selectable` or `focusable` signal overrides its corresponding global setting. Explicit `true` and `false` both override; an omitted field inherits.
 
 These policies gate library-originated interactions only. The application still owns the entity collection and may write `selected` or remove entities directly.
 

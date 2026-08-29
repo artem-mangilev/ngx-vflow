@@ -180,9 +180,8 @@ describe('EdgeModel', () => {
     expect(model.detached()).toEqual(false);
   });
 
-  it('should resolve default capabilities and inherit reactive global settings', () => {
+  it('should resolve selection and focus defaults reactively', () => {
     expect(model.selectable()).toBeTrue();
-    expect(model.deletable()).toBeTrue();
     expect(model.focusable()).toBeTrue();
 
     settingsService.edgesSelectable.set(false);
@@ -190,7 +189,6 @@ describe('EdgeModel', () => {
 
     expect(model.selectable()).toBeFalse();
     expect(model.focusable()).toBeFalse();
-    expect(model.deletable()).toBeTrue();
   });
 
   it('should let explicit capability overrides win over global settings', () => {
@@ -202,7 +200,6 @@ describe('EdgeModel', () => {
             source: '1',
             target: '2',
             selectable: false,
-            deletable: false,
             focusable: true,
           }),
         ),
@@ -212,7 +209,6 @@ describe('EdgeModel', () => {
     settingsService.edgesFocusable.set(false);
 
     expect(explicitModel.selectable()).toBeFalse();
-    expect(explicitModel.deletable()).toBeFalse();
     expect(explicitModel.focusable()).toBeTrue();
   });
 
@@ -220,7 +216,6 @@ describe('EdgeModel', () => {
     const created = createEdge({ id: 'factory', source: '1', target: '2' });
 
     expect(created.selectable).toBeUndefined();
-    expect(created.deletable).toBeUndefined();
     expect(created.focusable).toBeUndefined();
   });
 });

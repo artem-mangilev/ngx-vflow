@@ -95,9 +95,8 @@ describe('NodeModel', () => {
     expect(model.text()).toEqual('test');
   });
 
-  it('should resolve default capabilities and inherit reactive global settings', () => {
+  it('should resolve selection and focus defaults reactively', () => {
     expect(model.selectable()).toBeTrue();
-    expect(model.deletable()).toBeTrue();
     expect(model.focusable()).toBeTrue();
 
     settingsService.nodesSelectable.set(false);
@@ -105,7 +104,6 @@ describe('NodeModel', () => {
 
     expect(model.selectable()).toBeFalse();
     expect(model.focusable()).toBeFalse();
-    expect(model.deletable()).toBeTrue();
   });
 
   it('should let explicit capability overrides win over global settings', () => {
@@ -114,7 +112,6 @@ describe('NodeModel', () => {
       type: 'default',
       point: { x: 0, y: 0 },
       selectable: false,
-      deletable: false,
       focusable: true,
     });
     const explicitModel = TestBed.runInInjectionContext(() => new NodeModel(rawNode));
@@ -123,7 +120,6 @@ describe('NodeModel', () => {
     settingsService.nodesFocusable.set(false);
 
     expect(explicitModel.selectable()).toBeFalse();
-    expect(explicitModel.deletable()).toBeFalse();
     expect(explicitModel.focusable()).toBeTrue();
   });
 
@@ -131,7 +127,6 @@ describe('NodeModel', () => {
     const created = createNode({ id: 'factory', type: 'default', point: { x: 0, y: 0 } });
 
     expect(created.selectable).toBeUndefined();
-    expect(created.deletable).toBeUndefined();
     expect(created.focusable).toBeUndefined();
   });
 });

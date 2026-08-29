@@ -38,7 +38,6 @@ export interface SharedNode {
   preview?: WritableSignal<NodePreview>;
   selected?: WritableSignal<boolean>;
   selectable?: WritableSignal<boolean>;
-  deletable?: WritableSignal<boolean>;
   focusable?: WritableSignal<boolean>;
 }
 
@@ -114,7 +113,7 @@ interface CreateNodeOptions {
   useDefaults: boolean;
 }
 
-type CapabilityName = 'selectable' | 'deletable' | 'focusable';
+type CapabilityName = 'selectable' | 'focusable';
 
 export type NodeWithDefaults<T = any> = Omit<Required<Node<T>>, CapabilityName> & Pick<SharedNode, CapabilityName>;
 
@@ -129,7 +128,6 @@ function createBaseNode(node: UnwrapSignal<SharedNode>, useDefaults: boolean) {
       preview: signal(isDefined(node.preview) ? node.preview : NODE_DEFAULTS.preview),
       selected: signal(isDefined(node.selected) ? node.selected : NODE_DEFAULTS.selected),
       ...(isDefined(node.selectable) ? { selectable: signal(node.selectable) } : {}),
-      ...(isDefined(node.deletable) ? { deletable: signal(node.deletable) } : {}),
       ...(isDefined(node.focusable) ? { focusable: signal(node.focusable) } : {}),
     };
   } else {
@@ -142,7 +140,6 @@ function createBaseNode(node: UnwrapSignal<SharedNode>, useDefaults: boolean) {
       preview: isDefined(node.preview) ? signal(node.preview) : undefined,
       selected: isDefined(node.selected) ? signal(node.selected) : undefined,
       ...(isDefined(node.selectable) ? { selectable: signal(node.selectable) } : {}),
-      ...(isDefined(node.deletable) ? { deletable: signal(node.deletable) } : {}),
       ...(isDefined(node.focusable) ? { focusable: signal(node.focusable) } : {}),
     };
   }

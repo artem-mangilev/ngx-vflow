@@ -26,7 +26,6 @@ describe('SelectableDirective', () => {
       selected: signal(false),
       preselected: signal(false),
       selectable: signal(true),
-      deletable: signal(true),
       focusable: signal(true),
       shouldLoad: signal(true),
     };

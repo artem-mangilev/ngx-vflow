@@ -34,7 +34,6 @@ export interface Edge<T = unknown> extends Connection {
   floating?: WritableSignal<boolean>;
   selected?: WritableSignal<boolean>;
   selectable?: WritableSignal<boolean>;
-  deletable?: WritableSignal<boolean>;
   focusable?: WritableSignal<boolean>;
 }
 
@@ -44,7 +43,7 @@ interface CreateEdgeOptions {
   useDefaults: boolean;
 }
 
-type CapabilityName = 'selectable' | 'deletable' | 'focusable';
+type CapabilityName = 'selectable' | 'focusable';
 
 export type EdgeWithDefaults<T = unknown> = Omit<Required<Edge<T>>, CapabilityName> & Pick<Edge<T>, CapabilityName>;
 
@@ -71,7 +70,6 @@ export function createEdge<T>(
       floating: signal(isDefined(edge.floating) ? edge.floating : EDGE_DEFAULTS.floating),
       selected: signal(isDefined(edge.selected) ? edge.selected : EDGE_DEFAULTS.selected),
       ...(isDefined(edge.selectable) ? { selectable: signal(edge.selectable) } : {}),
-      ...(isDefined(edge.deletable) ? { deletable: signal(edge.deletable) } : {}),
       ...(isDefined(edge.focusable) ? { focusable: signal(edge.focusable) } : {}),
     };
   } else {
@@ -90,7 +88,6 @@ export function createEdge<T>(
       floating: isDefined(edge.floating) ? signal(edge.floating) : undefined,
       selected: isDefined(edge.selected) ? signal(edge.selected) : undefined,
       ...(isDefined(edge.selectable) ? { selectable: signal(edge.selectable) } : {}),
-      ...(isDefined(edge.deletable) ? { deletable: signal(edge.deletable) } : {}),
       ...(isDefined(edge.focusable) ? { focusable: signal(edge.focusable) } : {}),
     };
   }
