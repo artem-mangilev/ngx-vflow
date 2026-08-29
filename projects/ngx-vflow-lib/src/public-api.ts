@@ -1,9 +1,11 @@
 // Standalone Util
 export * from './lib/vflow/vflow';
+export * from './lib/vflow/utils/graph';
 
 // Interfaces
 export * from './lib/vflow/interfaces/node.interface';
 export * from './lib/vflow/interfaces/point.interface';
+export * from './lib/vflow/interfaces/rect';
 export * from './lib/vflow/interfaces/edge.interface';
 export * from './lib/vflow/interfaces/edge-label.interface';
 export * from './lib/vflow/interfaces/connection.interface';

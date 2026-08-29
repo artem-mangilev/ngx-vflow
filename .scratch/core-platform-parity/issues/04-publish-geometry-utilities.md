@@ -11,7 +11,7 @@ ngx-vflow contains path and viewport math internally, while the public API expos
 ## Required behavior
 
 - Export supported straight, bezier, step, and smooth-step path builders with label or midpoint metadata where meaningful.
-- Export viewport-for-bounds and flow-bounds helpers.
+- Export a viewport-for-bounds helper that consumes bounds calculated by issue 02.
 - Provide both document-to-flow and flow-to-document coordinate transformations.
 - Define transformations for nested group coordinate spaces.
 - Keep pure geometry functions independent of DOM and Angular injection.

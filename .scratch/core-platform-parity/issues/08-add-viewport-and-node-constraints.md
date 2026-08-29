@@ -13,6 +13,7 @@ Nodes can be constrained to a parent, but consumers cannot declare general movem
 - Add viewport translation bounds.
 - Add global and per-node movement extents while preserving `extent: 'parent'`.
 - Define node origin semantics for positioning, resizing, bounds, fit-view, and group coordinates.
+- Extend the public `getNodesBounds` options from issue 02 with the same node-origin semantics; do not introduce a bounds-only origin interpretation.
 - Split auto-pan settings for node drag, connection drag, selection, and keyboard focus.
 - Make auto-pan speed and activation margin configurable.
 - Apply constraints consistently during pointer interaction, keyboard movement, resize, programmatic viewport changes, and fit-view where applicable.
