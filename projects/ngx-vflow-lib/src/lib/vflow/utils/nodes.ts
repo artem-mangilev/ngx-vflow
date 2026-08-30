@@ -16,7 +16,7 @@ export function getNodesFlowBounds(nodes: NodeModel[]): Rect {
   return getBoundsOfRects(nodes.map((node) => nodeToRect(node)));
 }
 
-export function getIntesectingNodes(
+export function getIntersectingNodes(
   nodeId: string,
   nodes: NodeModel[],
   options?: IntersectingNodesOptions,

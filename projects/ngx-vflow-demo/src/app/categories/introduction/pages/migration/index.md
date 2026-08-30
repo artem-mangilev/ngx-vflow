@@ -89,6 +89,8 @@ After:
 | `scaleOnHover` input on `MiniMapComponent`         | Remove the input binding. The minimap remains at its default scale and does not capture pointer input. |
 | `documentPointToFlowPoint()`                       | Rename to `clientToFlowPosition()`. Use `flowToClientPosition()` for the inverse conversion.           |
 | `{ spaces: true }`, `SpacePoint`, `getSpacePoints` | Convert with `clientToFlowPosition()`, then call `getNodesAtPoint()` on the flow component.            |
+| VflowComponent.toNodeSpace()                       | Use the pure `getNodePositionInSpace()` utility.                                                       |
+| getIntesectingNodes()                              | Rename to `getIntersectingNodes()`.                                                                    |
 
 ### DOM compatibility
 

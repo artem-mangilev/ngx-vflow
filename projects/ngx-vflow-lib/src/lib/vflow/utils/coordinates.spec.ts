@@ -1,9 +1,21 @@
+import { signal } from '@angular/core';
+import { Node } from '../interfaces/node.interface';
 import {
   clientToFlowPosition,
   flowToClientPosition,
   flowToNodeSpacePosition,
+  getNodePositionInSpace,
   nodeSpaceToFlowPosition,
 } from './coordinates';
+
+function node(id: string, x: number, y: number, parentId?: string): Node {
+  return {
+    id,
+    type: 'default',
+    point: signal({ x, y }),
+    ...(parentId ? { parentId: signal(parentId) } : {}),
+  };
+}
 
 describe('coordinate utilities', () => {
   it('round-trips client and flow positions with translation and non-unit zoom', () => {
@@ -24,8 +36,8 @@ describe('coordinate utilities', () => {
 
   it('converts positions through nested node spaces', () => {
     const lookup = new Map([
-      ['parent', { id: 'parent', point: () => ({ x: 100, y: 50 }) }],
-      ['child', { id: 'child', point: () => ({ x: 20, y: 30 }), parentId: () => 'parent' }],
+      ['parent', node('parent', 100, 50)],
+      ['child', node('child', 20, 30, 'parent')],
     ]);
 
     expect(nodeSpaceToFlowPosition({ x: 10, y: 5 }, 'child', lookup)).toEqual({ x: 130, y: 85 });
@@ -33,13 +45,20 @@ describe('coordinate utilities', () => {
     expect(nodeSpaceToFlowPosition({ x: 0, y: 0 }, 'missing', lookup)).toBeUndefined();
   });
 
+  it('gets a node position in flow or another node space', () => {
+    const nodes = [node('parent', 100, 50), node('child', 20, 30, 'parent'), node('target', 40, 10)];
+
+    expect(getNodePositionInSpace('child', null, nodes)).toEqual({ x: 120, y: 80 });
+    expect(getNodePositionInSpace('child', 'target', nodes)).toEqual({ x: 80, y: 70 });
+    expect(getNodePositionInSpace('missing', null, nodes)).toBeUndefined();
+    expect(getNodePositionInSpace('child', 'missing', nodes)).toBeUndefined();
+  });
+
   it('treats a missing ancestor as a root and rejects cyclic ancestry', () => {
-    const orphanLookup = new Map([
-      ['orphan', { id: 'orphan', point: () => ({ x: 5, y: 6 }), parentId: () => 'missing' }],
-    ]);
+    const orphanLookup = new Map([['orphan', node('orphan', 5, 6, 'missing')]]);
     const cycleLookup = new Map([
-      ['a', { id: 'a', point: () => ({ x: 1, y: 2 }), parentId: () => 'b' }],
-      ['b', { id: 'b', point: () => ({ x: 3, y: 4 }), parentId: () => 'a' }],
+      ['a', node('a', 1, 2, 'b')],
+      ['b', node('b', 3, 4, 'a')],
     ]);
     spyOn(console, 'warn');
 

@@ -1,13 +1,9 @@
 import { isDevMode } from '@angular/core';
+import { Node } from '../interfaces/node.interface';
 import { Rect } from '../interfaces/rect';
 import { Connection } from '../interfaces/connection.interface';
 import { getBoundsOfRects } from './rect';
-import { getNodeFlowPosition, PositionNode } from './node-position';
-
-type BoundsNode = PositionNode & {
-  width?: () => number;
-  height?: () => number;
-};
+import { getNodeFlowPosition } from './node-position';
 
 /**
  * Returns every edge incident to at least one supplied node, preserving edge order and duplicates.
@@ -67,8 +63,8 @@ export function getOutgoers<NodeType extends { id: string }, EdgeType extends Co
  * `getNodesBounds([child], { nodeLookup: new Map(nodes.map((node) => [node.id, node])) })`
  */
 export function getNodesBounds(
-  nodes: readonly BoundsNode[],
-  { nodeLookup }: { nodeLookup?: ReadonlyMap<string, BoundsNode> } = {},
+  nodes: readonly Node[],
+  { nodeLookup }: { nodeLookup?: ReadonlyMap<string, Node> } = {},
 ): Rect {
   if (!nodeLookup && nodes.some((node) => node.parentId?.())) {
     if (isDevMode()) console.warn('[ngx-vflow] Pass nodeLookup to get flow-space bounds for nested nodes.');

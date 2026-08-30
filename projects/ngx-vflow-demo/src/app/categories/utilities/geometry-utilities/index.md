@@ -75,11 +75,12 @@ Each result is a shallow copy of the application node with a snapshot `nodeSpace
 Node points are relative to their parent. Supply a lookup containing the requested node and any available ancestors to convert through that hierarchy:
 
 ```ts
-import { flowToNodeSpacePosition, nodeSpaceToFlowPosition } from 'ngx-vflow';
+import { flowToNodeSpacePosition, getNodePositionInSpace, nodeSpaceToFlowPosition } from 'ngx-vflow';
 
 const nodeLookup = new Map(nodes.map((node) => [node.id, node]));
 const childPoint = flowToNodeSpacePosition(flowPoint, childId, nodeLookup);
 const flowPointAgain = nodeSpaceToFlowPosition(childPoint!, childId, nodeLookup);
+const childPositionInParent = getNodePositionInSpace(childId, parentId, nodes);
 ```
 
-A missing requested node or a parent cycle returns `undefined`. A missing ancestor ends the traversal and treats the last available node as a root.
+A missing requested node, target space, or parent cycle returns `undefined`. A missing ancestor ends the traversal and treats the last available node as a root. `getNodePositionInSpace` accepts the node collection directly; pass `null` as its target space to get the node's flow-space position.

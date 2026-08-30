@@ -1,13 +1,8 @@
 import { isDevMode } from '@angular/core';
+import { Node } from '../interfaces/node.interface';
 import { Point } from '../interfaces/point.interface';
 
-export interface PositionNode {
-  id: string;
-  point: () => Point;
-  parentId?: () => string | null;
-}
-
-export function getNodeFlowPosition(nodeId: string, nodeLookup: ReadonlyMap<string, PositionNode>): Point | undefined {
+export function getNodeFlowPosition(nodeId: string, nodeLookup: ReadonlyMap<string, Node>): Point | undefined {
   const visited = new Set<string>();
   const requestedNode = nodeLookup.get(nodeId);
   let current = requestedNode;

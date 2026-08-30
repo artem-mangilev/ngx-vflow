@@ -39,7 +39,8 @@ ngx-vflow contains path and viewport math internally, while the public API expos
 - Publish the existing positional `getViewportForBounds(bounds, width, height, minZoom, maxZoom, padding)` contract with numeric padding. Accept zero-sized bounds, validate finite non-negative bounds, positive viewport dimensions, `0 < minZoom <= maxZoom`, and `padding > -1`. A rendered `fitView` call with no resolved nodes or an unmeasured container is a no-op.
 - Use `client space` for DOM `clientX`/`clientY` coordinates. Replace the breaking public component API with symmetric `clientToFlowPosition` and `flowToClientPosition` methods, backed by pure functions that accept the viewport and flow-container position explicitly.
 - Remove `documentPointToFlowPoint`, its `{ spaces: true }` overload, `SpacePoint`, and the internal `getSpacePoints` helper. Replace the overloaded containment behavior with an explicit live `getNodesAtPoint(flowPoint)` facade method that returns topmost-first shallow node copies with snapshot `nodeSpacePoint` values.
-- Add pure `nodeSpaceToFlowPosition` and `flowToNodeSpacePosition` helpers using an explicit space-node id and readonly node lookup. Any node may define a node space. A missing requested node returns `undefined`; a missing ancestor terminates the chain as a root; a cycle returns `undefined` with a development warning.
+- Add pure `nodeSpaceToFlowPosition`, `flowToNodeSpacePosition`, and `getNodePositionInSpace` helpers. Any node may define a node space. A missing requested node or target space returns `undefined`; a missing ancestor terminates the chain as a root; a cycle returns `undefined` with a development warning.
+- Remove the redundant `VflowComponent.toNodeSpace` facade. Keep rendered intersection queries on the component because content-sized node dimensions live in `NodeModel`, and fix the breaking `getIntesectingNodes` typo to `getIntersectingNodes`.
 - Coordinate transforms reject a non-positive or non-finite zoom, do not round results, and round-trip within floating-point test tolerance.
 - Document the public surface on one `Geometry utilities` page under `Utilities` and record the breaking coordinate migration.
 
@@ -51,4 +52,4 @@ Resolved on 2026-08-29.
 - Internal edge rendering, pointer geometry, resizing, viewport fitting, and the drag/drop recipe now reuse the public geometry implementations where their semantics match.
 - Removed the superseded document/space-point APIs and documented the breaking migration and new utility surface.
 - Follow-up: the drag/drop recipe uses the explicit containment facade, reparents through coordinate signals in place, and updates both toolbar flags atomically, preventing node recreation and transiently missing attach/detach actions.
-- Verified with 106 library tests, the focused demo regression test, library and demo lint, the packaged library build, and the documentation demo build.
+- Verified with 107 library tests, the focused demo regression test, library and demo lint, the packaged library build, and the documentation demo build.

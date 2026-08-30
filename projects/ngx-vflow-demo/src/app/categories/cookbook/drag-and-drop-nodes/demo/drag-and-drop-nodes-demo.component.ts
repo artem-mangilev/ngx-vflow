@@ -8,6 +8,7 @@ import {
   Node,
   addEdges,
   addNodes,
+  getNodePositionInSpace,
   isDefaultGroupNode,
   isTemplateNode,
 } from 'ngx-vflow';
@@ -62,7 +63,10 @@ export class DragAndDropNodesDemoComponent {
     if (!nodeToUpdate) return;
 
     if (nodeToUpdate.type === 'html-template') {
-      nodeToUpdate.point.set(this.vflow().toNodeSpace(nodeId, null));
+      const point = getNodePositionInSpace(nodeId, null, this.nodes);
+      if (!point) return;
+
+      nodeToUpdate.point.set(point);
       nodeToUpdate.parentId?.set(null);
       nodeToUpdate.data?.set({ canDetach: false, canAttach: true });
     }
@@ -71,7 +75,7 @@ export class DragAndDropNodesDemoComponent {
   onPositionChange() {
     // Update all template nodes' canAttach state
     this.nodes.filter(isTemplateNode).forEach((node) => {
-      const intersectingNodes = this.vflow().getIntesectingNodes(node.id).filter(isDefaultGroupNode);
+      const intersectingNodes = this.vflow().getIntersectingNodes(node.id).filter(isDefaultGroupNode);
 
       const canAttach = intersectingNodes.length > 0 && !node.parentId?.();
       node.data?.update((state) => ({ ...state, canAttach }));
@@ -79,14 +83,17 @@ export class DragAndDropNodesDemoComponent {
   }
 
   attachNode(nodeId: string) {
-    const [intersectionNode] = this.vflow().getIntesectingNodes(nodeId).filter(isDefaultGroupNode);
+    const [intersectionNode] = this.vflow().getIntersectingNodes(nodeId).filter(isDefaultGroupNode);
     if (!intersectionNode) return;
 
     const nodeToUpdate = this.nodes.find((node) => node.id === nodeId);
     if (!nodeToUpdate) return;
 
     if (nodeToUpdate.type === 'html-template') {
-      nodeToUpdate.point.set(this.vflow().toNodeSpace(nodeId, intersectionNode.id));
+      const point = getNodePositionInSpace(nodeId, intersectionNode.id, this.nodes);
+      if (!point) return;
+
+      nodeToUpdate.point.set(point);
       nodeToUpdate.parentId?.set(intersectionNode.id);
       nodeToUpdate.data?.set({ canDetach: true, canAttach: false });
     }

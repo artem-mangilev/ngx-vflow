@@ -1,6 +1,7 @@
+import { Node } from '../interfaces/node.interface';
 import { Point } from '../interfaces/point.interface';
 import { ViewportState } from '../interfaces/viewport.interface';
-import { getNodeFlowPosition, PositionNode } from './node-position';
+import { getNodeFlowPosition } from './node-position';
 
 export interface ClientTransformOptions {
   /** Current flow translation and zoom. */
@@ -9,7 +10,19 @@ export interface ClientTransformOptions {
   containerPosition: Point;
 }
 
-export type NodePositionLookup = ReadonlyMap<string, PositionNode>;
+/** Gets a node's position relative to another node, or in flow space when `spaceNodeId` is null. */
+export function getNodePositionInSpace(
+  nodeId: string,
+  spaceNodeId: string | null,
+  nodes: readonly Node[],
+): Point | undefined {
+  const nodeLookup = new Map(nodes.map((node) => [node.id, node]));
+  const flowPosition = nodeSpaceToFlowPosition({ x: 0, y: 0 }, nodeId, nodeLookup);
+
+  if (!flowPosition || spaceNodeId === null) return flowPosition;
+
+  return flowToNodeSpacePosition(flowPosition, spaceNodeId, nodeLookup);
+}
 
 /** Converts a DOM client-space position to flow space. */
 export function clientToFlowPosition(point: Point, { viewport, containerPosition }: ClientTransformOptions): Point {
@@ -35,7 +48,7 @@ export function flowToClientPosition(point: Point, { viewport, containerPosition
 export function nodeSpaceToFlowPosition(
   point: Point,
   spaceNodeId: string,
-  nodeLookup: NodePositionLookup,
+  nodeLookup: ReadonlyMap<string, Node>,
 ): Point | undefined {
   const origin = getNodeFlowPosition(spaceNodeId, nodeLookup);
   return origin ? { x: origin.x + point.x, y: origin.y + point.y } : undefined;
@@ -45,7 +58,7 @@ export function nodeSpaceToFlowPosition(
 export function flowToNodeSpacePosition(
   point: Point,
   spaceNodeId: string,
-  nodeLookup: NodePositionLookup,
+  nodeLookup: ReadonlyMap<string, Node>,
 ): Point | undefined {
   const origin = getNodeFlowPosition(spaceNodeId, nodeLookup);
   return origin ? { x: point.x - origin.x, y: point.y - origin.y } : undefined;

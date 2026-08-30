@@ -26,9 +26,7 @@ describe('DragAndDropNodesDemoComponent', () => {
     };
     component.nodes = [parent, child];
     component.vflow = (() => ({
-      getIntesectingNodes: () => [parent],
-      toNodeSpace: (_nodeId: string, spaceNodeId: string | null) =>
-        spaceNodeId ? { x: 10, y: 20 } : { x: 110, y: 120 },
+      getIntersectingNodes: () => [parent],
     })) as unknown as typeof component.vflow;
 
     component.detachNode(child.id);

@@ -65,8 +65,7 @@ import { RootPointerDirective } from '../../directives/root-pointer.directive';
 import { RootSvgContextDirective } from '../../directives/root-svg-context.directive';
 import { RootSvgReferenceDirective } from '../../directives/reference.directive';
 import { EdgeRenderingService } from '../../services/edge-rendering.service';
-import { flowToNodeSpacePosition, nodeSpaceToFlowPosition } from '../../utils/coordinates';
-import { getIntesectingNodes, getNodesAtPoint as findNodesAtPoint } from '../../utils/nodes';
+import { getIntersectingNodes, getNodesAtPoint as findNodesAtPoint } from '../../utils/nodes';
 import { IntersectingNodesOptions } from '../../interfaces/intersecting-nodes-options.interface';
 import { PreviewFlowComponent } from '../preview-flow/preview-flow.component';
 import {
@@ -548,25 +547,8 @@ export class VflowComponent {
    * @param options.partially - If true, returns nodes that partially intersect. If false, only returns fully intersecting nodes
    * @returns An array of nodes that intersect with the specified node
    */
-  public getIntesectingNodes<T>(nodeId: string, options: IntersectingNodesOptions = { partially: true }): Node<T>[] {
-    return getIntesectingNodes(nodeId, this.nodeModels(), options).map((n) => n.rawNode) as Node<T>[];
-  }
-
-  /**
-   * Converts a node's position to the coordinate space of another node
-   *
-   * @param nodeId - The ID of the node whose position should be converted
-   * @param spaceNodeId - The ID of the node that defines the target coordinate space.
-   *                      If null, returns the position in global coordinates
-   * @returns {Point} The converted position. Returns {x: Infinity, y: Infinity} if either node is not found
-   */
-  public toNodeSpace(nodeId: string, spaceNodeId: string | null): Point {
-    const nodeLookup = new Map(this.flowEntitiesService.rawNodes().map((node) => [node.id, node]));
-    const flowPosition = nodeSpaceToFlowPosition({ x: 0, y: 0 }, nodeId, nodeLookup);
-    if (!flowPosition) return { x: Infinity, y: Infinity };
-    if (spaceNodeId === null) return flowPosition;
-
-    return flowToNodeSpacePosition(flowPosition, spaceNodeId, nodeLookup) ?? { x: Infinity, y: Infinity };
+  public getIntersectingNodes<T>(nodeId: string, options: IntersectingNodesOptions = { partially: true }): Node<T>[] {
+    return getIntersectingNodes(nodeId, this.nodeModels(), options).map((n) => n.rawNode) as Node<T>[];
   }
   // #endregion
 

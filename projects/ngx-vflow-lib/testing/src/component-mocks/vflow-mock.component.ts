@@ -259,13 +259,8 @@ export class VflowMockComponent implements AsInterface<VflowComponent>, OnInit {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public getIntesectingNodes(nodeId: string, options?: IntersectingNodesOptions): Node[] {
+  public getIntersectingNodes(nodeId: string, options?: IntersectingNodesOptions): Node[] {
     return [];
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public toNodeSpace(nodeId: string, spaceNodeId: string): Point {
-    return { x: 0, y: 0 };
   }
 
   public getNode<T = unknown>(id: string): Node<T> | undefined {
