@@ -2,6 +2,7 @@ import { drag } from 'd3-drag';
 import { select } from 'd3-selection';
 import { NodeModel } from '../../models/node.model';
 import { Point } from '../../interfaces/point.interface';
+import { clientToFlowPosition } from '../../utils/coordinates';
 import { align } from '../../utils/align-number';
 import { getControlDirection, getDimensionsAfterResize, getResizeDirection } from './resizer-utils';
 import {
@@ -87,8 +88,7 @@ function clientFromEvent(event: MouseEvent | TouchEvent): Point {
 }
 
 /**
- * Converts the pointer position of a drag source event into flow coordinates and snaps it
- * to the grid, mirroring `SpacePointContextDirective`: `flow = (client - paneRect - {x,y}) / zoom`.
+ * Converts the pointer position of a drag source event into flow coordinates and snaps it to the grid.
  */
 function getPointerPosition(
   event: MouseEvent | TouchEvent,
@@ -97,11 +97,10 @@ function getPointerPosition(
   containerBounds: DOMRect | null,
 ) {
   const client = clientFromEvent(event);
-  const left = containerBounds?.left ?? 0;
-  const top = containerBounds?.top ?? 0;
-
-  const x = (client.x - left - viewport.x) / viewport.zoom;
-  const y = (client.y - top - viewport.y) / viewport.zoom;
+  const { x, y } = clientToFlowPosition(client, {
+    viewport,
+    containerPosition: { x: containerBounds?.left ?? 0, y: containerBounds?.top ?? 0 },
+  });
 
   const [snapX, snapY] = snapGrid;
   const shouldSnap = snapX > 1 || snapY > 1;

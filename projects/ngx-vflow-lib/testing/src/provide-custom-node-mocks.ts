@@ -59,7 +59,8 @@ export function provideCustomNodeMocks(): Provider[] {
     {
       provide: SpacePointContextDirective,
       useValue: {
-        documentPointToFlowPoint: (point: Point) => point,
+        clientToFlowPosition: (point: Point) => point,
+        flowToClientPosition: (point: Point) => point,
       },
     },
     {

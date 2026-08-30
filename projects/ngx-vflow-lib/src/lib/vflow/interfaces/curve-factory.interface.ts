@@ -19,6 +19,29 @@ export interface CurveFactorySharedParams {
   allNodes: Node[];
 }
 
+/** Parameters required to build a straight edge path. */
+export type StraightPathParams = Pick<CurveFactorySharedParams, 'sourcePoint' | 'targetPoint'>;
+
+/** Parameters required to build a bezier edge path. */
+export type BezierPathParams = Pick<
+  CurveFactorySharedParams,
+  'sourcePoint' | 'targetPoint' | 'sourcePosition' | 'targetPosition'
+> & {
+  /** Curve intensity. */
+  curvature?: number;
+};
+
+/** Parameters required to build a stepped edge path. */
+export type SmoothStepPathParams = Pick<
+  CurveFactorySharedParams,
+  'sourcePoint' | 'targetPoint' | 'sourcePosition' | 'targetPosition'
+> & {
+  /** Distance from each handle before the first bend. */
+  offset?: number;
+  /** Corner radius. Use `0` for a step path. */
+  borderRadius?: number;
+};
+
 export interface ConnectionCurveFactoryParams extends CurveFactorySharedParams {
   /** Indicates this is a temporary connection being drawn */
   mode: 'connection';

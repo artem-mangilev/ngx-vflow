@@ -27,7 +27,7 @@ import {
 } from '../../directives/template.directive';
 import { addNodesToEdges } from '../../utils/add-nodes-to-edges';
 import { skip } from 'rxjs/operators';
-import { SpacePoint, Point } from '../../interfaces/point.interface';
+import { Point } from '../../interfaces/point.interface';
 import { ViewportState } from '../../interfaces/viewport.interface';
 import { FlowStatusService } from '../../services/flow-status.service';
 import { FlowEntitiesService } from '../../services/flow-entities.service';
@@ -65,8 +65,8 @@ import { RootPointerDirective } from '../../directives/root-pointer.directive';
 import { RootSvgContextDirective } from '../../directives/root-svg-context.directive';
 import { RootSvgReferenceDirective } from '../../directives/reference.directive';
 import { EdgeRenderingService } from '../../services/edge-rendering.service';
-import { getSpacePoints } from '../../utils/get-space-points';
-import { getIntesectingNodes } from '../../utils/nodes';
+import { flowToNodeSpacePosition, nodeSpaceToFlowPosition } from '../../utils/coordinates';
+import { getIntesectingNodes, getNodesAtPoint as findNodesAtPoint } from '../../utils/nodes';
 import { IntersectingNodesOptions } from '../../interfaces/intersecting-nodes-options.interface';
 import { PreviewFlowComponent } from '../preview-flow/preview-flow.component';
 import {
@@ -516,24 +516,28 @@ export class VflowComponent {
     return this.flowEntitiesService.getDetachedEdges().map((e) => e.edge);
   }
 
-  /**
-   * Convert point received from document to point on the flow
-   */
-  public documentPointToFlowPoint(point: Point): Point;
-  public documentPointToFlowPoint(point: Point, options?: { spaces: false }): Point;
-  /**
-   * Convert point received from document to a stack of space points on the flow
-   * Space point has a spaceNodeId, coordinates are relative to this node
-   */
-  public documentPointToFlowPoint(point: Point, options?: { spaces: true }): SpacePoint[];
-  public documentPointToFlowPoint(point: Point, options?: { spaces: boolean }): unknown {
-    const transformedPoint = this.spacePointContext().documentPointToFlowPoint(point);
+  /** Converts a DOM client-space position to flow space. */
+  public clientToFlowPosition(point: Point): Point {
+    return this.spacePointContext().clientToFlowPosition(point);
+  }
 
-    if (options?.spaces) {
-      return getSpacePoints(transformedPoint, this.nodeRenderingService.groups());
-    }
+  /** Converts a flow-space position to DOM client space. */
+  public flowToClientPosition(point: Point): Point {
+    return this.spacePointContext().flowToClientPosition(point);
+  }
 
-    return transformedPoint;
+  /** Gets rendered nodes containing a flow-space position, with the topmost node first. */
+  public getNodesAtPoint<T = unknown>(point: Point): Array<Node<T> & { nodeSpacePoint: Point }> {
+    return findNodesAtPoint(point, this.nodeModels())
+      .reverse()
+      .map((model) => {
+        const globalPoint = model.globalPoint();
+
+        return {
+          ...(model.rawNode as Node<T>),
+          nodeSpacePoint: { x: point.x - globalPoint.x, y: point.y - globalPoint.y },
+        };
+      });
   }
 
   /**
@@ -557,19 +561,12 @@ export class VflowComponent {
    * @returns {Point} The converted position. Returns {x: Infinity, y: Infinity} if either node is not found
    */
   public toNodeSpace(nodeId: string, spaceNodeId: string | null): Point {
-    const node = this.nodeModels().find((n) => n.rawNode.id === nodeId);
+    const nodeLookup = new Map(this.flowEntitiesService.rawNodes().map((node) => [node.id, node]));
+    const flowPosition = nodeSpaceToFlowPosition({ x: 0, y: 0 }, nodeId, nodeLookup);
+    if (!flowPosition) return { x: Infinity, y: Infinity };
+    if (spaceNodeId === null) return flowPosition;
 
-    if (!node) return { x: Infinity, y: Infinity };
-
-    if (spaceNodeId === null) {
-      return node.globalPoint();
-    }
-
-    const coordinateSpaceNode = this.nodeModels().find((n) => n.rawNode.id === spaceNodeId);
-
-    if (!coordinateSpaceNode) return { x: Infinity, y: Infinity };
-
-    return getSpacePoints(node.globalPoint(), [coordinateSpaceNode])[0];
+    return flowToNodeSpacePosition(flowPosition, spaceNodeId, nodeLookup) ?? { x: Infinity, y: Infinity };
   }
   // #endregion
 

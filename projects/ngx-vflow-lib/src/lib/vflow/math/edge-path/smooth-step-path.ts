@@ -1,4 +1,4 @@
-import { CurveFactoryParams, CurveLayout } from '../../interfaces/curve-factory.interface';
+import { CurveLayout, SmoothStepPathParams } from '../../interfaces/curve-factory.interface';
 import { Point } from '../../interfaces/point.interface';
 import { Position } from '../../types/position.type';
 
@@ -181,16 +181,21 @@ function getBend(a: Point, b: Point, c: Point, size: number): string {
   return `L ${x},${y + bendSize * yDir}Q ${x},${y} ${x + bendSize * xDir},${y}`;
 }
 
-export function smoothStepPath(
-  { sourcePoint, targetPoint, sourcePosition, targetPosition }: CurveFactoryParams,
-  borderRadius: number = 5,
-): CurveLayout {
+/** Builds a stepped SVG edge path and its label positions. Set `borderRadius` to `0` for sharp corners. */
+export function getSmoothStepPath({
+  sourcePoint,
+  targetPoint,
+  sourcePosition,
+  targetPosition,
+  borderRadius = 5,
+  offset = 20,
+}: SmoothStepPathParams): CurveLayout {
   const [points, labelX, labelY] = getPoints({
     source: sourcePoint,
     sourcePosition,
     target: targetPoint,
     targetPosition,
-    offset: 20,
+    offset,
   });
 
   const path = points.reduce<string>((res, p, i) => {

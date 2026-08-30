@@ -10,7 +10,6 @@ import {
   addNodes,
   isDefaultGroupNode,
   isTemplateNode,
-  reparentNodes,
 } from 'ngx-vflow';
 
 @Component({
@@ -35,24 +34,18 @@ export class DragAndDropNodesDemoComponent {
   public edges: Edge[] = [];
 
   public createNode({ event }: DndDropEvent) {
-    const spaces = this.vflow().documentPointToFlowPoint(
-      {
-        x: event.x,
-        y: event.y,
-      },
-      { spaces: true },
-    );
-    const [point] = spaces;
+    const flowPoint = this.vflow().clientToFlowPosition({ x: event.x, y: event.y });
+    const parent = this.vflow().getNodesAtPoint(flowPoint).find(isDefaultGroupNode);
 
     this.nodes = addNodes(
       [
         {
           id: crypto.randomUUID(),
-          point: signal(point),
+          point: signal(parent?.nodeSpacePoint ?? flowPoint),
           type: 'html-template',
-          parentId: signal(point.spaceNodeId),
+          parentId: signal(parent?.id ?? null),
           data: signal({
-            canDetach: spaces.length > 1,
+            canDetach: !!parent,
           }),
         },
       ],
@@ -69,8 +62,9 @@ export class DragAndDropNodesDemoComponent {
     if (!nodeToUpdate) return;
 
     if (nodeToUpdate.type === 'html-template') {
-      nodeToUpdate.data?.set({ canDetach: false });
-      this.nodes = reparentNodes([{ id: nodeId, parentId: null }], this.nodes);
+      nodeToUpdate.point.set(this.vflow().toNodeSpace(nodeId, null));
+      nodeToUpdate.parentId?.set(null);
+      nodeToUpdate.data?.set({ canDetach: false, canAttach: true });
     }
   }
 
@@ -86,13 +80,15 @@ export class DragAndDropNodesDemoComponent {
 
   attachNode(nodeId: string) {
     const [intersectionNode] = this.vflow().getIntesectingNodes(nodeId).filter(isDefaultGroupNode);
+    if (!intersectionNode) return;
 
     const nodeToUpdate = this.nodes.find((node) => node.id === nodeId);
     if (!nodeToUpdate) return;
 
     if (nodeToUpdate.type === 'html-template') {
-      nodeToUpdate.data?.set({ canDetach: true });
-      this.nodes = reparentNodes([{ id: nodeId, parentId: intersectionNode.id }], this.nodes);
+      nodeToUpdate.point.set(this.vflow().toNodeSpace(nodeId, intersectionNode.id));
+      nodeToUpdate.parentId?.set(intersectionNode.id);
+      nodeToUpdate.data?.set({ canDetach: true, canAttach: false });
     }
   }
 }

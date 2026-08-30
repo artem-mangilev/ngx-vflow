@@ -52,6 +52,18 @@ _Avoid_: Change notification, internal mutation
 A node referenced by another node's parent relationship, establishing nested coordinates. Any node type may be a parent; a visual group type is not required.
 _Avoid_: Group node
 
+**Client space**:
+The browser viewport coordinate system used by DOM events through `clientX` and `clientY`.
+_Avoid_: Document space, screen space
+
+**Flow space**:
+The root graph coordinate system before viewport translation and zoom are applied.
+_Avoid_: World space, canvas space
+
+**Node space**:
+A coordinate system whose origin is a specific parent node's origin in flow space. Any parent node may define a node space.
+_Avoid_: Group space
+
 **Runtime grouping**:
 An interaction that proposes moving a node into or out of a group while preserving its visual position across coordinate spaces.
 _Avoid_: Subflow rendering, static parent assignment

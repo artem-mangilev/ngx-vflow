@@ -1,18 +1,20 @@
-import { CurveFactoryParams, CurveLayout } from '../../interfaces/curve-factory.interface';
+import { BezierPathParams, CurveLayout } from '../../interfaces/curve-factory.interface';
 import { Point } from '../../interfaces/point.interface';
 import { Position } from '../../types/position.type';
 import { getPointOnLineByRatio } from '../point-on-line-by-ratio';
 
-export function bezierPath({
+/** Builds a cubic bezier SVG edge path and its label positions. */
+export function getBezierPath({
   sourcePoint,
   targetPoint,
   sourcePosition,
   targetPosition,
-}: CurveFactoryParams): CurveLayout {
+  curvature = 0.25,
+}: BezierPathParams): CurveLayout {
   const distanceVector = { x: sourcePoint.x - targetPoint.x, y: sourcePoint.y - targetPoint.y };
 
-  const sourceControl = calcControlPoint(sourcePoint, sourcePosition, distanceVector);
-  const targetControl = calcControlPoint(targetPoint, targetPosition, distanceVector);
+  const sourceControl = calcControlPoint(sourcePoint, sourcePosition, distanceVector, curvature);
+  const targetControl = calcControlPoint(targetPoint, targetPosition, distanceVector, curvature);
 
   const path = `M${sourcePoint.x},${sourcePoint.y} C${sourceControl.x},${sourceControl.y} ${targetControl.x},${targetControl.y} ${targetPoint.x},${targetPoint.y}`;
 
@@ -27,7 +29,7 @@ export function bezierPath({
  * @param distanceVector transmits the distance between the source and the target as x and y coordinates
  */
 
-function calcControlPoint(point: Point, pointPosition: Position, distanceVector: Point) {
+function calcControlPoint(point: Point, pointPosition: Position, distanceVector: Point, curvature: number) {
   const factorPoint = { x: 0, y: 0 };
 
   switch (pointPosition) {
@@ -51,8 +53,6 @@ function calcControlPoint(point: Point, pointPosition: Position, distanceVector:
     y: distanceVector.y * Math.abs(factorPoint.y),
   };
 
-  // TODO: probably need to make this configurable
-  const curvature = 0.25;
   const controlOffset = curvature * 25 * Math.sqrt(Math.abs(fullDistanceVector.x + fullDistanceVector.y));
 
   return {

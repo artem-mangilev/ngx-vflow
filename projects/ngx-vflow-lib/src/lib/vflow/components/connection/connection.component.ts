@@ -1,12 +1,12 @@
 import { ChangeDetectionStrategy, Component, TemplateRef, computed, inject, input } from '@angular/core';
 import { FlowStatusService } from '../../services/flow-status.service';
-import { straightPath } from '../../math/edge-path/straigh-path';
+import { getStraightPath } from '../../math/edge-path/straigh-path';
 import { SpacePointContextDirective } from '../../directives/space-point-context.directive';
 import { ConnectionModel } from '../../models/connection.model';
-import { bezierPath } from '../../math/edge-path/bezier-path';
+import { getBezierPath } from '../../math/edge-path/bezier-path';
 import { hashCode } from '../../utils/hash';
 import { Position } from '../../types/position.type';
-import { smoothStepPath } from '../../math/edge-path/smooth-step-path';
+import { getSmoothStepPath } from '../../math/edge-path/smooth-step-path';
 import { NgTemplateOutlet } from '@angular/common';
 import { ConnectionContext } from '../../interfaces/template-context.interface';
 import { Point } from '../../interfaces/point.interface';
@@ -61,13 +61,13 @@ export class ConnectionComponent {
 
       switch (curve) {
         case 'straight':
-          return straightPath(params).path;
+          return getStraightPath(params).path;
         case 'bezier':
-          return bezierPath(params).path;
+          return getBezierPath(params).path;
         case 'smooth-step':
-          return smoothStepPath(params).path;
+          return getSmoothStepPath(params).path;
         case 'step':
-          return smoothStepPath(params, 0).path;
+          return getSmoothStepPath({ ...params, borderRadius: 0 }).path;
         default:
           return curve(params).path;
       }
@@ -91,13 +91,13 @@ export class ConnectionComponent {
 
       switch (curve) {
         case 'straight':
-          return straightPath(params).path;
+          return getStraightPath(params).path;
         case 'bezier':
-          return bezierPath(params).path;
+          return getBezierPath(params).path;
         case 'smooth-step':
-          return smoothStepPath(params).path;
+          return getSmoothStepPath(params).path;
         case 'step':
-          return smoothStepPath(params, 0).path;
+          return getSmoothStepPath({ ...params, borderRadius: 0 }).path;
         default:
           return curve(params).path;
       }

@@ -38,7 +38,7 @@ export class SelectionBoxContextDirective {
       tap(({ x, y, originalEvent }) => {
         originalEvent.preventDefault();
         this.clearPreselection();
-        const point = this.documentPointToFlowPoint({ x, y });
+        const point = this.clientToFlowPosition({ x, y });
         this.model.setStart(point);
       }),
       takeUntilDestroyed(),
@@ -49,7 +49,7 @@ export class SelectionBoxContextDirective {
     .pipe(
       filter(() => this.model.active()),
       tap((event) => {
-        const point = this.documentPointToFlowPoint({ x: event.x, y: event.y });
+        const point = this.clientToFlowPosition({ x: event.x, y: event.y });
         this.model.setEnd(point);
         this.updatePreselection();
       }),
@@ -99,8 +99,8 @@ export class SelectionBoxContextDirective {
     this.model.reset();
   }
 
-  private documentPointToFlowPoint(documentPoint: Point): Point {
-    return this.spacePointContext.documentPointToFlowPoint(documentPoint);
+  private clientToFlowPosition(point: Point): Point {
+    return this.spacePointContext.clientToFlowPosition(point);
   }
 
   private getSelectionRect(): Rect | null {

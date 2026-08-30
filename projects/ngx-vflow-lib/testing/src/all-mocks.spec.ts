@@ -149,7 +149,17 @@ class VflowWrapperComponent {
 
       this.vflow()!.fitView();
 
-      this.vflow()!.documentPointToFlowPoint({
+      this.vflow()!.clientToFlowPosition({
+        x: 0,
+        y: 0,
+      });
+
+      this.vflow()!.flowToClientPosition({
+        x: 0,
+        y: 0,
+      });
+
+      this.vflow()!.getNodesAtPoint({
         x: 0,
         y: 0,
       });

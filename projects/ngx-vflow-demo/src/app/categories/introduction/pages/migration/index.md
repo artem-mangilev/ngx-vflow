@@ -82,11 +82,13 @@ After:
 
 ### Removed APIs
 
-| Removed in v3                                    | Migration                                                                                              |
-| ------------------------------------------------ | ------------------------------------------------------------------------------------------------------ |
-| Node type `svg-template`                         | Use `html-template` and provide native HTML through `<ng-template nodeHtml>`.                          |
-| `NodeSvgTemplateDirective` and `nodeSvgTemplate` | Remove these imports/usages and use `NodeHtmlTemplateDirective` / `nodeHtml`.                          |
-| `scaleOnHover` input on `MiniMapComponent`       | Remove the input binding. The minimap remains at its default scale and does not capture pointer input. |
+| Removed in v3                                      | Migration                                                                                              |
+| -------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| Node type `svg-template`                           | Use `html-template` and provide native HTML through `<ng-template nodeHtml>`.                          |
+| `NodeSvgTemplateDirective` and `nodeSvgTemplate`   | Remove these imports/usages and use `NodeHtmlTemplateDirective` / `nodeHtml`.                          |
+| `scaleOnHover` input on `MiniMapComponent`         | Remove the input binding. The minimap remains at its default scale and does not capture pointer input. |
+| `documentPointToFlowPoint()`                       | Rename to `clientToFlowPosition()`. Use `flowToClientPosition()` for the inverse conversion.           |
+| `{ spaces: true }`, `SpacePoint`, `getSpacePoints` | Convert with `clientToFlowPosition()`, then call `getNodesAtPoint()` on the flow component.            |
 
 ### DOM compatibility
 

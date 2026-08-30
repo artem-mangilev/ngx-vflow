@@ -13,7 +13,6 @@ import { NgTemplateOutlet } from '@angular/common';
 import {
   Node,
   Edge,
-  SpacePoint,
   Point,
   Background,
   KeyboardShortcuts,
@@ -247,20 +246,16 @@ export class VflowMockComponent implements AsInterface<VflowComponent>, OnInit {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public fitView(options?: FitViewOptions): void {}
 
-  public documentPointToFlowPoint(point: Point, options?: { spaces: false }): Point;
-  public documentPointToFlowPoint(point: Point, options: { spaces: true }): SpacePoint[];
-  public documentPointToFlowPoint(point: Point, options?: { spaces: boolean }): unknown {
-    if (options?.spaces) {
-      return [
-        {
-          nodeId: null,
-          x: point.x,
-          y: point.y,
-        },
-      ];
-    }
-
+  public clientToFlowPosition(point: Point): Point {
     return point;
+  }
+
+  public flowToClientPosition(point: Point): Point {
+    return point;
+  }
+
+  public getNodesAtPoint<T = unknown>(): Array<Node<T> & { nodeSpacePoint: Point }> {
+    return [];
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

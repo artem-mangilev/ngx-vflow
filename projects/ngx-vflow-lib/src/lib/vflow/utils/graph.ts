@@ -1,13 +1,10 @@
 import { isDevMode } from '@angular/core';
-import { Point } from '../interfaces/point.interface';
 import { Rect } from '../interfaces/rect';
 import { Connection } from '../interfaces/connection.interface';
 import { getBoundsOfRects } from './rect';
+import { getNodeFlowPosition, PositionNode } from './node-position';
 
-type BoundsNode = {
-  id: string;
-  point: () => Point;
-  parentId?: () => string | null;
+type BoundsNode = PositionNode & {
   width?: () => number;
   height?: () => number;
 };
@@ -81,7 +78,7 @@ export function getNodesBounds(
     const node = nodeLookup?.get(requestedNode.id) ?? (nodeLookup ? undefined : requestedNode);
     if (!node) return [];
 
-    const point = nodeLookup ? getFlowPoint(node, nodeLookup) : node.point();
+    const point = nodeLookup ? getNodeFlowPosition(node.id, nodeLookup) : node.point();
     if (!point) return [];
 
     return [
@@ -94,28 +91,4 @@ export function getNodesBounds(
   });
 
   return getBoundsOfRects(rects);
-}
-
-function getFlowPoint(node: BoundsNode, nodeLookup: ReadonlyMap<string, BoundsNode>): Point | null {
-  const visited = new Set<string>();
-  let current: BoundsNode | undefined = node;
-  let x = 0;
-  let y = 0;
-
-  while (current) {
-    if (visited.has(current.id)) {
-      if (isDevMode()) console.warn(`[ngx-vflow] Skipping node "${node.id}" with cyclic parent ancestry.`);
-      return null;
-    }
-
-    visited.add(current.id);
-    const point = current.point();
-    x += point.x;
-    y += point.y;
-
-    const parentId: string | null | undefined = current.parentId?.();
-    current = parentId ? nodeLookup.get(parentId) : undefined;
-  }
-
-  return { x, y };
 }

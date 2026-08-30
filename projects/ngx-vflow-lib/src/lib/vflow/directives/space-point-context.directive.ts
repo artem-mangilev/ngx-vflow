@@ -3,6 +3,7 @@ import { Point } from '../interfaces/point.interface';
 import { RootPointerDirective } from './root-pointer.directive';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ViewportService } from '../services/viewport.service';
+import { clientToFlowPosition as toFlowPosition, flowToClientPosition as toClientPosition } from '../utils/coordinates';
 
 @Directive({
   standalone: true,
@@ -27,7 +28,7 @@ export class SpacePointContextDirective {
       return { x: 0, y: 0 };
     }
 
-    return this.documentPointToFlowPoint({
+    return this.clientToFlowPosition({
       x: point.x,
       y: point.y,
     });
@@ -35,13 +36,19 @@ export class SpacePointContextDirective {
 
   private currentPoint = toSignal(this.pointerMovementDirective.pointerMovement$);
 
-  public documentPointToFlowPoint(documentPoint: Point): Point {
+  public clientToFlowPosition(point: Point): Point {
     const rect = this.host.getBoundingClientRect();
-    const { x, y, zoom } = this.viewportService.readableViewport();
+    return toFlowPosition(point, {
+      viewport: this.viewportService.readableViewport(),
+      containerPosition: { x: rect.left, y: rect.top },
+    });
+  }
 
-    return {
-      x: (documentPoint.x - rect.left - x) / zoom,
-      y: (documentPoint.y - rect.top - y) / zoom,
-    };
+  public flowToClientPosition(point: Point): Point {
+    const rect = this.host.getBoundingClientRect();
+    return toClientPosition(point, {
+      viewport: this.viewportService.readableViewport(),
+      containerPosition: { x: rect.left, y: rect.top },
+    });
   }
 }

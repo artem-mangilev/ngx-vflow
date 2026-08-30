@@ -2,6 +2,11 @@
 export * from './lib/vflow/vflow';
 export * from './lib/vflow/utils/graph';
 export * from './lib/vflow/utils/graph-operations';
+export * from './lib/vflow/utils/coordinates';
+export { getViewportForBounds } from './lib/vflow/utils/viewport';
+export { getStraightPath } from './lib/vflow/math/edge-path/straigh-path';
+export { getBezierPath } from './lib/vflow/math/edge-path/bezier-path';
+export { getSmoothStepPath } from './lib/vflow/math/edge-path/smooth-step-path';
 
 // Interfaces
 export * from './lib/vflow/interfaces/node.interface';

@@ -103,15 +103,12 @@ export class MiniMapComponent implements OnInit {
 
   protected boundsViewport = computed(() => {
     const nodes = this.entitiesService.nodes();
+    const width = this.flowSettingsService.computedFlowWidth();
+    const height = this.flowSettingsService.computedFlowHeight();
 
-    return getViewportForBounds(
-      getNodesFlowBounds(nodes),
-      this.flowSettingsService.computedFlowWidth(),
-      this.flowSettingsService.computedFlowHeight(),
-      -Infinity,
-      1.5,
-      0,
-    );
+    if (!nodes.length || width <= 0 || height <= 0) return { x: 0, y: 0, zoom: 1 };
+
+    return getViewportForBounds(getNodesFlowBounds(nodes), width, height, Number.MIN_VALUE, 1.5, 0);
   });
 
   protected minimapTransform = computed(() => {

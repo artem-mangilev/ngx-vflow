@@ -87,7 +87,6 @@
   <url><loc>https://www.ngx-vflow.org/api/interfaces/ngx-vflow/ReconnectStartEvent</loc><lastmod>2026-04-04</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
   <url><loc>https://www.ngx-vflow.org/api/interfaces/ngx-vflow/SelectionBoxSettings</loc><lastmod>2026-04-04</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
   <url><loc>https://www.ngx-vflow.org/api/interfaces/ngx-vflow/SharedNode</loc><lastmod>2026-04-04</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://www.ngx-vflow.org/api/interfaces/ngx-vflow/SpacePoint</loc><lastmod>2026-04-04</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
   <url><loc>https://www.ngx-vflow.org/api/interfaces/ngx-vflow/SvgTemplateNode</loc><lastmod>2026-04-04</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
   <url><loc>https://www.ngx-vflow.org/api/interfaces/ngx-vflow/TemplateGroupNode</loc><lastmod>2026-04-04</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
   <url><loc>https://www.ngx-vflow.org/api/interfaces/ngx-vflow/ViewportState</loc><lastmod>2026-04-04</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>

@@ -3,11 +3,11 @@ import { EdgeLabel, EdgeLabelPosition } from '../interfaces/edge-label.interface
 import { Edge, Curve, EdgeType, EDGE_DEFAULTS } from '../interfaces/edge.interface';
 import { EdgeLabelModel } from './edge-label.model';
 import { NodeModel } from './node.model';
-import { straightPath } from '../math/edge-path/straigh-path';
-import { bezierPath } from '../math/edge-path/bezier-path';
+import { getStraightPath } from '../math/edge-path/straigh-path';
+import { getBezierPath } from '../math/edge-path/bezier-path';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { FlowEntity } from '../interfaces/flow-entity.interface';
-import { smoothStepPath } from '../math/edge-path/smooth-step-path';
+import { getSmoothStepPath } from '../math/edge-path/smooth-step-path';
 import { hashCode } from '../utils/hash';
 import { Contextable } from '../interfaces/contextable.interface';
 import { EdgeContext } from '../interfaces/template-context.interface';
@@ -83,13 +83,13 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
     const curve = this.curve();
     switch (curve) {
       case 'straight':
-        return straightPath(params);
+        return getStraightPath(params);
       case 'bezier':
-        return bezierPath(params);
+        return getBezierPath(params);
       case 'smooth-step':
-        return smoothStepPath(params);
+        return getSmoothStepPath(params);
       case 'step':
-        return smoothStepPath(params, 0);
+        return getSmoothStepPath({ ...params, borderRadius: 0 });
       default:
         return curve(params);
     }

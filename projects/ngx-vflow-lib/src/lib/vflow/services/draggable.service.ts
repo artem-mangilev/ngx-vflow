@@ -15,6 +15,7 @@ import { pairwise, filter, skip } from 'rxjs/operators';
 import { KeyboardService } from './keyboard.service';
 import { isGroupNode } from '../utils/is-group-node';
 import { ResizeObserverService } from './resize-observer.service';
+import { clientToFlowPosition } from '../utils/coordinates';
 
 type DragEvent = D3DragEvent<Element, unknown, unknown>;
 
@@ -234,17 +235,15 @@ export class DraggableService {
 
   /**
    * Convert the pointer position of a d3-drag source event into flow coordinates,
-   * mirroring SpacePointContextDirective: flow = (client - paneRect - {x,y}) / zoom.
+   * flow = (client - paneRect - {x,y}) / zoom.
    */
   private getFlowPoint(sourceEvent: MouseEvent | TouchEvent, paneRect: DOMRectReadOnly): Point {
-    const { x, y, zoom } = this.viewportService.readableViewport();
-
     const client = clientFromEvent(sourceEvent);
 
-    return {
-      x: (client.x - paneRect.left - x) / zoom,
-      y: (client.y - paneRect.top - y) / zoom,
-    };
+    return clientToFlowPosition(client, {
+      viewport: this.viewportService.readableViewport(),
+      containerPosition: { x: paneRect.left, y: paneRect.top },
+    });
   }
 
   private getDragNodes(model: NodeModel) {
