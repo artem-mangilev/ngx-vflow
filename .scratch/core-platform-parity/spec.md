@@ -9,7 +9,7 @@ Bring ngx-vflow's core platform contract to parity with mature node-based UI eng
 - accessibility and keyboard operation;
 - a stable public graph facade;
 - per-entity capability policies;
-- structural deletion orchestration;
+- application-owned structural deletion and keyboard intent;
 - public graph, change, path, bounds, viewport, and coordinate utilities;
 - configurable viewport/input policy and constraints;
 - an interactive, accessible minimap.
@@ -25,7 +25,7 @@ Bring ngx-vflow's core platform contract to parity with mature node-based UI eng
 
 - Prefer deep framework-neutral modules where no live rendered state is required: a small cohesive interface should hide topology, cascade, and geometry complexity rather than mirror internal services.
 - Put DOM measurements and rendered-instance queries behind one stable public facade. The facade must earn its seam by removing consumer knowledge of internal models, not by passing through every `ɵ` method.
-- Define entity policies before accessibility and deletion depend on them.
+- Define entity policies before accessibility depends on them.
 - Keep keyboard behavior configurable and safe around inputs, contenteditable regions, and embedded controls.
 - Keep the minimap SVG lightweight; do not render a second Angular node tree.
 - Treat each public interface as its module's test surface; tests should assert observable results without reaching past the seam into internal services.
@@ -43,7 +43,7 @@ Bring ngx-vflow's core platform contract to parity with mature node-based UI eng
 | Phase                 | Foundation                                                                                     | Enables                                               |
 | --------------------- | ---------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
 | A — public contracts  | 01 capability policy; 02 topology/bounds utilities; 03 change utilities; 04 geometry utilities | Facade, deletion, accessibility, viewport constraints |
-| B — platform behavior | 05 public facade; 06 deletion lifecycle; 07 gesture policy; 08 constraints/auto-pan            | Keyboard operation and consistent navigation          |
+| B — platform behavior | 05 public facade; 07 gesture policy; 08 constraints/auto-pan                                   | Keyboard operation and consistent navigation          |
 | C — accessibility     | 09 semantics; 10 focus/navigation; 11 keyboard editing/announcements                           | Complete keyboard-operable graph                      |
 | D — minimap           | 12 navigation; 13 presentation/accessibility                                                   | Complete interactive minimap                          |
 
@@ -56,7 +56,7 @@ This is a dependency order, not a release commitment. Independent issues may pro
 3. [Publish structural graph operation helpers](issues/03-publish-graph-change-utilities.md)
 4. [Publish path, viewport, and coordinate utilities](issues/04-publish-geometry-utilities.md)
 5. [Expose a stable public flow facade](issues/05-expose-public-flow-facade.md)
-6. [Add a structural deletion request lifecycle](issues/06-add-deletion-request-lifecycle.md)
+6. ~~[Add a structural deletion request lifecycle](issues/06-add-deletion-request-lifecycle.md)~~ — closed; issues 03 and 11 cover the required behavior
 7. [Make viewport gesture policy configurable](issues/07-configure-viewport-gestures.md)
 8. [Add viewport and node movement constraints](issues/08-add-viewport-and-node-constraints.md)
 9. [Establish graph accessibility semantics](issues/09-establish-accessibility-semantics.md)

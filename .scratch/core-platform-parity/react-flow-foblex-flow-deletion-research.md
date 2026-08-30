@@ -21,8 +21,6 @@
 
 ## Вывод для ngx-vflow
 
-Не следует распознавать DOM-клик или добавлять CRUD-метод во facade: issue 05 прямо оставляет структурные изменения запросам и pure helpers.
+Не следует распознавать DOM-клик, добавлять CRUD-метод во facade или вводить отдельный deletion lifecycle. В application-owned модели custom-кнопки и другой прикладной UI напрямую используют существующие `removeNodes` и `removeEdges`; игнорирование результата уже является veto, а иное обновление коллекций — application-defined transformation.
 
-Нужен один публичный pure helper, условно `planDeletion(trigger, targetIds, nodes, edges)`. Хоткей вызывает его внутри библиотеки; custom-кнопка вызывает его из обработчика Angular с `ctx.node.id`. Helper считает каскад и отдаёт request; приложение одним обработчиком принимает, меняет или отклоняет request и обновляет свои коллекции.
-
-Так мы получаем общую политику для двух источников без наблюдения за пользовательским DOM, второго state store или imperative CRUD API.
+Issue 11 добавит только keyboard-событие с выбранными node и edge ids. Приложение обработает их теми же pure helpers. Это покрывает оба источника без нового request helper, второго state store или imperative CRUD API.

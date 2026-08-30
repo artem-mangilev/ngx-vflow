@@ -64,7 +64,7 @@ Factories must preserve inheritance. `createNode()` and `createEdge()` must not 
 ## Out of scope
 
 - Entity visibility or hidden-state behavior, including rendering, queries, fit-view, minimap, descendants, and connected edges.
-- The structural deletion request lifecycle, cascade calculation, and application veto behavior from issue 06.
+- Structural deletion helpers and keyboard deletion behavior from issues 03 and 11.
 - DOM focus behavior, keyboard traversal, and keyboard selection from issues 09 and 10.
 - Keyboard connection creation and deletion from issue 11.
 - ARIA labels, arbitrary DOM attributes, and disabled-state accessibility semantics.
