@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import { Edge, Node, Vflow } from 'ngx-vflow';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
 
 @Component({
   template: `<vflow
@@ -42,51 +42,51 @@ import { Edge, Node, Vflow } from 'ngx-vflow';
   imports: [Vflow],
 })
 export class SubflowsDemoComponent {
-  public nodes: Node[] = [
+  public nodes: Node[] = createNodes([
     {
       id: '1',
-      point: signal({ x: 10, y: 10 }),
+      point: { x: 10, y: 10 },
       type: 'default',
-      text: signal(`1`),
-      parentId: signal('3'),
+      text: `1`,
+      parentId: '3',
     },
     {
       id: '2',
-      point: signal({ x: 90, y: 80 }),
+      point: { x: 90, y: 80 },
       type: 'default',
       // it's possible to pass html in this field
-      text: signal(`<strong>2</strong>`),
-      parentId: signal('3'),
+      text: `<strong>2</strong>`,
+      parentId: '3',
     },
     {
       id: '3',
-      point: signal({ x: 10, y: 10 }),
+      point: { x: 10, y: 10 },
       type: 'default-group',
-      width: signal(250),
-      height: signal(250),
+      width: 250,
+      height: 250,
     },
     {
       id: '4',
-      point: signal({ x: 280, y: 10 }),
+      point: { x: 280, y: 10 },
       type: 'default',
-      text: signal(`4`),
+      text: `4`,
     },
     {
       id: '5',
-      point: signal({ x: 10, y: 160 }),
+      point: { x: 10, y: 160 },
       type: 'template-group',
-      width: signal(170),
-      height: signal(70),
-      parentId: signal('3'),
+      width: 170,
+      height: 70,
+      parentId: '3',
     },
     {
       id: '6',
-      point: signal({ x: 10, y: 10 }),
+      point: { x: 10, y: 10 },
       type: 'default',
-      text: signal(`6`),
-      parentId: signal('5'),
+      text: `6`,
+      parentId: '5',
     },
-  ];
+  ]);
 
   public edges: Edge[] = [
     {

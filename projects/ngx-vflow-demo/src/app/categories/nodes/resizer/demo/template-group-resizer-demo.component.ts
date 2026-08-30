@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import { Node, Vflow } from 'ngx-vflow';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { Node, Vflow, createNodes } from 'ngx-vflow';
 
 @Component({
   template: `<vflow view="auto" [nodes]="nodes">
@@ -36,20 +36,20 @@ import { Node, Vflow } from 'ngx-vflow';
   imports: [Vflow],
 })
 export class TemplateGroupResizerDemoComponent {
-  public nodes: Node[] = [
+  public nodes: Node[] = createNodes([
     {
       id: '5',
-      point: signal({ x: 10, y: 10 }),
+      point: { x: 10, y: 10 },
       type: 'template-group',
-      width: signal(170),
-      height: signal(70),
+      width: 170,
+      height: 70,
     },
     {
       id: '6',
-      point: signal({ x: 10, y: 10 }),
+      point: { x: 10, y: 10 },
       type: 'default',
-      text: signal(`6`),
-      parentId: signal('5'),
+      text: `6`,
+      parentId: '5',
     },
-  ];
+  ]);
 }

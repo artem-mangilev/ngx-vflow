@@ -21,6 +21,7 @@ class VflowTestHostComponent {
     id: 'parent',
     type: 'default-group',
     point: signal({ x: 100, y: 100 }),
+    parentId: signal(null),
     width: signal(200),
     height: signal(200),
   };

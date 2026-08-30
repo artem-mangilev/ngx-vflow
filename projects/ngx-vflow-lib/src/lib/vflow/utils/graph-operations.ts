@@ -123,24 +123,24 @@ export function removeNodes<NodeType extends Node, EdgeType extends Edge>(
   };
 }
 
-/** Reparents nodes without changing their flow-space positions. */
+/** Reparents nodes through their existing signals without changing their flow-space positions. */
 export function reparentNodes<NodeType extends Node>(
   operations: readonly NodeReparentOperation[],
   nodes: readonly NodeType[],
 ): NodeType[] {
-  let result: readonly NodeType[] = nodes;
+  let changed = false;
 
   for (const { id, parentId } of operations) {
-    const source = findUniqueIndex(result, id);
+    const source = findUniqueIndex(nodes, id);
     if (source.count !== 1) {
       warnTarget('node', id, source.count);
       continue;
     }
 
-    const node = result[source.index];
+    const node = nodes[source.index];
     if ((node.parentId?.() ?? null) === parentId) continue;
 
-    const sourcePoint = getFlowPoint(node, result);
+    const sourcePoint = getFlowPoint(node, nodes);
     if ('error' in sourcePoint) {
       warnAncestry(id, sourcePoint.error);
       continue;
@@ -148,13 +148,13 @@ export function reparentNodes<NodeType extends Node>(
 
     let parentPoint: Point = { x: 0, y: 0 };
     if (parentId) {
-      const parent = findUniqueIndex(result, parentId);
+      const parent = findUniqueIndex(nodes, parentId);
       if (parent.count !== 1) {
         warnTarget('parent node', parentId, parent.count);
         continue;
       }
 
-      const resolvedParentPoint = getFlowPoint(result[parent.index], result, id);
+      const resolvedParentPoint = getFlowPoint(nodes[parent.index], nodes, id);
       if ('error' in resolvedParentPoint) {
         warnAncestry(id, resolvedParentPoint.error);
         continue;
@@ -162,16 +162,13 @@ export function reparentNodes<NodeType extends Node>(
       parentPoint = resolvedParentPoint.point;
     }
 
-    const replacement = {
-      ...node,
-      point: signal({ x: sourcePoint.point.x - parentPoint.x, y: sourcePoint.point.y - parentPoint.y }),
-      parentId: signal(parentId),
-    } as NodeType;
-
-    result = result.map((candidate, index) => (index === source.index ? replacement : candidate));
+    node.point.set({ x: sourcePoint.point.x - parentPoint.x, y: sourcePoint.point.y - parentPoint.y });
+    if (node.parentId) node.parentId.set(parentId);
+    else node.parentId = signal(parentId);
+    changed = true;
   }
 
-  return result as NodeType[];
+  return (changed ? [...nodes] : nodes) as NodeType[];
 }
 
 /** Appends edges with valid endpoints and unique connection tuples. */

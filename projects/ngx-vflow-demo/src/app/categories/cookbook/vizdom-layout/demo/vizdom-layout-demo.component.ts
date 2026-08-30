@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnInit, signal, viewChild, WritableSignal } from '@angular/core';
 import init, { DirectedGraph, VertexWeakRef } from '@vizdom/vizdom-ts-web';
-import { Node, Edge, Vflow, VflowComponent } from 'ngx-vflow';
+import { Node, Edge, Vflow, VflowComponent, createNodes } from 'ngx-vflow';
 
 @Component({
   templateUrl: './vizdom-layout-demo.component.html',
@@ -23,17 +23,19 @@ export class VizdomLayoutDemoComponent implements OnInit {
     }
 
     // default layout with one node
-    this.layout([
-      {
-        id: crypto.randomUUID(),
-        point: signal({ x: 0, y: 0 }),
-        type: 'html-template',
-        data: signal({
-          color: randomHex(),
-        }),
-        draggable: signal(false),
-      },
-    ]);
+    this.layout(
+      createNodes([
+        {
+          id: crypto.randomUUID(),
+          point: { x: 0, y: 0 },
+          type: 'html-template',
+          data: {
+            color: randomHex(),
+          },
+          draggable: false,
+        },
+      ]),
+    );
   }
 
   onNodeClick(node: Node) {
@@ -41,15 +43,17 @@ export class VizdomLayoutDemoComponent implements OnInit {
 
     const nodes: Node[] = [
       ...this.nodes(),
-      {
-        id: newNodeId,
-        point: signal({ x: 0, y: 0 }),
-        type: 'html-template',
-        draggable: signal(false),
-        data: signal({
-          color: randomHex(),
-        }),
-      },
+      ...createNodes([
+        {
+          id: newNodeId,
+          point: { x: 0, y: 0 },
+          type: 'html-template',
+          draggable: false,
+          data: {
+            color: randomHex(),
+          },
+        },
+      ]),
     ];
 
     const edges: Edge[] = [

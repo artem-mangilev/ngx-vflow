@@ -1,4 +1,4 @@
-Structural graph operations return new application-owned collections without maintaining a store or writing existing signals. Existing `NodeChange` and `EdgeChange` values are notifications that describe changes which already happened; they are not inputs to these helpers.
+Structural graph operations work on application-owned collections without maintaining a store. Existing `NodeChange` and `EdgeChange` values are notifications that describe changes which already happened; they are not inputs to these helpers.
 
 ## Add and remove
 
@@ -28,6 +28,6 @@ nodes = reparentNodes([{ id: nodeId, parentId }], nodes);
 edges = reconnectEdges([{ id: oldEdge.id, connection }], { nodes, edges });
 ```
 
-Reparenting accepts any node type as a parent and preserves the moved node's flow-space position. The returned node has new `point` and `parentId` signals; unrelated entities and signals retain their references. Reconnection preserves the edge ID, array slot, metadata, and signal fields.
+Reparenting accepts any node type as a parent and preserves the moved node's flow-space position. It updates the existing `point` and `parentId` signals, creating only a missing optional `parentId` signal, keeps the node object reference stable, and returns a new node array after a successful operation. A full no-op returns the original array. Reconnection preserves the edge ID, array slot, metadata, and signal fields.
 
 Operations in one call apply left-to-right. Invalid operations never throw: development builds warn and leave that operation unchanged. Application-specific validation, persistence, and history remain application concerns.

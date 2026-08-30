@@ -13,7 +13,7 @@ function node(id: string, x: number, y: number, parentId?: string): Node {
     id,
     type: 'default',
     point: signal({ x, y }),
-    ...(parentId ? { parentId: signal(parentId) } : {}),
+    parentId: signal(parentId ?? null),
   };
 }
 

@@ -15,7 +15,7 @@ function node(id: string, x = 0, y = 0, parentId?: string | null): Node {
     id,
     type: 'default',
     point: signal({ x, y }),
-    ...(parentId === undefined ? {} : { parentId: signal(parentId) }),
+    parentId: signal(parentId ?? null),
   };
 }
 
@@ -111,6 +111,8 @@ describe('graph operations', () => {
     const newParent = node('new-parent', 300, 50);
     const selected = signal(true);
     const child = { ...node('child', 10, 20, 'old-parent'), selected };
+    const point = child.point;
+    const parentId = child.parentId;
     const descendant = node('descendant', 5, 5, 'child');
     const nodes = [oldParent, child, descendant, newParent];
 
@@ -119,13 +121,14 @@ describe('graph operations', () => {
 
     expect(result[0]).toBe(oldParent);
     expect(result[2]).toBe(descendant);
-    expect(moved).not.toBe(child);
-    expect(moved.point).not.toBe(child.point);
-    expect(moved.parentId).not.toBe(child.parentId);
+    expect(result).not.toBe(nodes);
+    expect(moved).toBe(child);
+    expect(moved.point).toBe(point);
+    expect(moved.parentId).toBe(parentId);
     expect(moved.selected).toBe(selected);
     expect(moved.point()).toEqual({ x: -190, y: 70 });
     expect(moved.parentId?.()).toBe('new-parent');
-    expect(child.point()).toEqual({ x: 10, y: 20 });
+    expect(reparentNodes([{ id: 'child', parentId: 'new-parent' }], result)).toBe(result);
   });
 
   it('rejects descendant reparenting and cyclic ancestry', () => {
@@ -140,6 +143,17 @@ describe('graph operations', () => {
     expect(reparentNodes([{ id: 'cycle-a', parentId: null }], nodes)).toBe(nodes);
     expect(warn).toHaveBeenCalledWith('[ngx-vflow] Cannot update node "parent" because of descendant parent.');
     expect(warn).toHaveBeenCalledWith('[ngx-vflow] Cannot update node "cycle-a" because of cyclic ancestry.');
+  });
+
+  it('adds a parent signal without replacing a node that did not have one', () => {
+    const child: Node = { id: 'child', type: 'default', point: signal({ x: 10, y: 20 }) };
+    const parent = node('parent', 100, 50);
+
+    const result = reparentNodes([{ id: 'child', parentId: 'parent' }], [child, parent]);
+
+    expect(result[0]).toBe(child);
+    expect(child.parentId?.()).toBe('parent');
+    expect(child.point()).toEqual({ x: -90, y: -30 });
   });
 
   it('removes only uniquely addressed edges and preserves a full no-op reference', () => {

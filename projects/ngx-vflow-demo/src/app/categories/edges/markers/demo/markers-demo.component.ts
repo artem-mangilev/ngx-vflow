@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import { Connection, ConnectionSettings, Edge, Node, Vflow } from 'ngx-vflow';
+import { Connection, ConnectionSettings, Edge, Node, Vflow, createNodes } from 'ngx-vflow';
 
 @Component({
   template: `<vflow
@@ -20,20 +20,20 @@ import { Connection, ConnectionSettings, Edge, Node, Vflow } from 'ngx-vflow';
   imports: [Vflow],
 })
 export class MarkersDemoComponent {
-  public nodes: Node[] = [
+  public nodes: Node[] = createNodes([
     {
       id: '1',
-      point: signal({ x: 100, y: 100 }),
+      point: { x: 100, y: 100 },
       type: 'default',
-      text: signal(`1`),
+      text: `1`,
     },
     {
       id: '2',
-      point: signal({ x: 200, y: 200 }),
+      point: { x: 200, y: 200 },
       type: 'default',
-      text: signal(`2`),
+      text: `2`,
     },
-  ];
+  ]);
 
   public edges: Edge[] = [];
 

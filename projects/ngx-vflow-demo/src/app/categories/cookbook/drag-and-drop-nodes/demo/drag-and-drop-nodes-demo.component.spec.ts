@@ -16,6 +16,7 @@ describe('DragAndDropNodesDemoComponent', () => {
       point: signal({ x: 100, y: 100 }),
       width: signal(250),
       height: signal(250),
+      parentId: signal(null),
     };
     const child = {
       id: 'child',

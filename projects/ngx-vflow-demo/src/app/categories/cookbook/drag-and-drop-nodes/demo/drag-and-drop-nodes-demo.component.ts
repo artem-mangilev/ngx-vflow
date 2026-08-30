@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, viewChild } from '@angular/core';
 import { DndDropEvent, DndModule } from 'ngx-drag-drop';
 import {
   Connection,
@@ -8,9 +8,10 @@ import {
   Node,
   addEdges,
   addNodes,
-  getNodePositionInSpace,
   isDefaultGroupNode,
   isTemplateNode,
+  reparentNodes,
+  createNodes,
 } from 'ngx-vflow';
 
 @Component({
@@ -22,15 +23,15 @@ import {
 export class DragAndDropNodesDemoComponent {
   public vflow = viewChild.required(VflowComponent);
 
-  public nodes: Node[] = [
+  public nodes: Node[] = createNodes([
     {
       id: '1',
-      point: signal({ x: 10, y: 10 }),
+      point: { x: 10, y: 10 },
       type: 'default-group',
-      width: signal(250),
-      height: signal(250),
+      width: 250,
+      height: 250,
     },
-  ];
+  ]);
 
   public edges: Edge[] = [];
 
@@ -39,17 +40,17 @@ export class DragAndDropNodesDemoComponent {
     const parent = this.vflow().getNodesAtPoint(flowPoint).find(isDefaultGroupNode);
 
     this.nodes = addNodes(
-      [
+      createNodes([
         {
           id: crypto.randomUUID(),
-          point: signal(parent?.nodeSpacePoint ?? flowPoint),
+          point: parent?.nodeSpacePoint ?? flowPoint,
           type: 'html-template',
-          parentId: signal(parent?.id ?? null),
-          data: signal({
+          parentId: parent?.id ?? null,
+          data: {
             canDetach: !!parent,
-          }),
+          },
         },
-      ],
+      ]),
       this.nodes,
     );
   }
@@ -63,11 +64,10 @@ export class DragAndDropNodesDemoComponent {
     if (!nodeToUpdate) return;
 
     if (nodeToUpdate.type === 'html-template') {
-      const point = getNodePositionInSpace(nodeId, null, this.nodes);
-      if (!point) return;
+      const nodes = reparentNodes([{ id: nodeId, parentId: null }], this.nodes);
+      if (nodes === this.nodes) return;
 
-      nodeToUpdate.point.set(point);
-      nodeToUpdate.parentId?.set(null);
+      this.nodes = nodes;
       nodeToUpdate.data?.set({ canDetach: false, canAttach: true });
     }
   }
@@ -90,11 +90,10 @@ export class DragAndDropNodesDemoComponent {
     if (!nodeToUpdate) return;
 
     if (nodeToUpdate.type === 'html-template') {
-      const point = getNodePositionInSpace(nodeId, intersectionNode.id, this.nodes);
-      if (!point) return;
+      const nodes = reparentNodes([{ id: nodeId, parentId: intersectionNode.id }], this.nodes);
+      if (nodes === this.nodes) return;
 
-      nodeToUpdate.point.set(point);
-      nodeToUpdate.parentId?.set(intersectionNode.id);
+      this.nodes = nodes;
       nodeToUpdate.data?.set({ canDetach: true, canAttach: false });
     }
   }

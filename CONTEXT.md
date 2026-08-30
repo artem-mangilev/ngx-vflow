@@ -45,7 +45,7 @@ A post-mutation report that application-owned graph state or one of its writable
 _Avoid_: Change request, reducer action
 
 **Structural graph operation**:
-A pre-application description of a structural graph change that the application may apply to its owned graph state with pure package helpers.
+A pre-application description of a structural graph change that the application may apply to its owned graph state with package helpers.
 _Avoid_: Change notification, internal mutation
 
 **Parent node**:

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, TemplateRef, inject, viewChild, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, TemplateRef, inject, viewChild } from '@angular/core';
 import { NgDocNotifyService } from '@ng-doc/ui-kit';
 import {
   Connection,
@@ -9,6 +9,7 @@ import {
   NodePositionChange,
   NodeSelectedChange,
   Vflow,
+  createNodes,
 } from 'ngx-vflow';
 
 @Component({
@@ -29,20 +30,20 @@ export class HandlingChangesFilteredDemoComponent {
 
   public toastTemplate = viewChild<TemplateRef<object>>('toast');
 
-  public nodes: Node[] = [
+  public nodes: Node[] = createNodes([
     {
       id: '1',
-      point: signal({ x: 100, y: 100 }),
+      point: { x: 100, y: 100 },
       type: 'default',
-      text: signal(`1`),
+      text: `1`,
     },
     {
       id: '2',
-      point: signal({ x: 200, y: 200 }),
+      point: { x: 200, y: 200 },
       type: 'default',
-      text: signal(`2`),
+      text: `2`,
     },
-  ];
+  ]);
 
   public edges: Edge[] = [];
 
@@ -98,18 +99,20 @@ export class HandlingChangesFilteredDemoComponent {
   public addNodes() {
     this.nodes = [
       ...this.nodes,
-      {
-        id: crypto.randomUUID(),
-        point: signal({ x: 0, y: 0 }),
-        type: 'default',
-        text: signal(`random`),
-      },
-      {
-        id: crypto.randomUUID(),
-        point: signal({ x: 300, y: 300 }),
-        type: 'default',
-        text: signal(`random`),
-      },
+      ...createNodes([
+        {
+          id: crypto.randomUUID(),
+          point: { x: 0, y: 0 },
+          type: 'default',
+          text: `random`,
+        },
+        {
+          id: crypto.randomUUID(),
+          point: { x: 300, y: 300 },
+          type: 'default',
+          text: `random`,
+        },
+      ]),
     ];
   }
 }

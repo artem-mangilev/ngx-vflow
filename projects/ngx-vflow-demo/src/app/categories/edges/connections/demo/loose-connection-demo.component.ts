@@ -1,5 +1,14 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import { Connection, ConnectionSettings, CustomNodeComponent, Edge, Node, Vflow, addEdges } from 'ngx-vflow';
+import {
+  Connection,
+  ConnectionSettings,
+  CustomNodeComponent,
+  Edge,
+  Node,
+  Vflow,
+  addEdges,
+  createNodes,
+} from 'ngx-vflow';
 
 @Component({
   template: `
@@ -17,24 +26,24 @@ import { Connection, ConnectionSettings, CustomNodeComponent, Edge, Node, Vflow,
   imports: [Vflow],
 })
 export class LooseConnectionDemoComponent {
-  public nodes: Node[] = [
+  public nodes: Node[] = createNodes([
     {
       id: '1',
-      point: signal({ x: 100, y: 100 }),
+      point: { x: 100, y: 100 },
       type: LooseConnectionNodeComponent,
-      data: signal({
+      data: {
         text: 'Node 1',
-      }),
+      },
     },
     {
       id: '2',
-      point: signal({ x: 200, y: 200 }),
+      point: { x: 200, y: 200 },
       type: LooseConnectionNodeComponent,
-      data: signal({
+      data: {
         text: 'Node 2',
-      }),
+      },
     },
-  ];
+  ]);
 
   public edges: Edge[] = [];
 

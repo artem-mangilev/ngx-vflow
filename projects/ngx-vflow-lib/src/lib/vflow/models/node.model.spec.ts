@@ -128,5 +128,6 @@ describe('NodeModel', () => {
 
     expect(created.selectable).toBeUndefined();
     expect(created.focusable).toBeUndefined();
+    expect(created.parentId()).toBeNull();
   });
 });

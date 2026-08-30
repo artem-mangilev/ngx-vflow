@@ -8,7 +8,7 @@ function node(id: string, x = 0, y = 0, parentId?: string, width?: number, heigh
     id,
     type: 'default',
     point: signal({ x, y }),
-    ...(parentId ? { parentId: signal(parentId) } : {}),
+    parentId: signal(parentId ?? null),
     ...(width === undefined ? {} : { width: signal(width) }),
     ...(height === undefined ? {} : { height: signal(height) }),
   };

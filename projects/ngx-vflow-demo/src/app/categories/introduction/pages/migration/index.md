@@ -2,6 +2,12 @@
 
 Version 3 renders node-facing templates as native HTML in a CSS-transformed viewport. Edges and connection overlays still use SVG. The existing `groupNode`, handle `[template]`, and `[resizable]` names are unchanged, but SVG content passed to these APIs is no longer supported. The library does not inspect template roots or provide a compatibility fallback, so these templates must be rewritten explicitly.
 
+### Reparenting identity
+
+The optional `parentId` field may still be omitted from `Node` and `StaticNode`. The `NodeWithDefaults` values returned by ordinary `createNode()` and `createNodes()` calls always contain a `parentId` signal initialized to `null` when no parent is supplied.
+
+`reparentNodes()` now updates the existing `point` and `parentId` signals, preserving the node object reference. If an optional `parentId` signal is absent, it is added to that same object. A successful call returns a new array containing the same node objects; a full no-op returns the original array.
+
 ### Group-node templates
 
 Replace SVG group-node content with a native HTML element. Continue to use the reactive `ctx.width()` and `ctx.height()` values.
