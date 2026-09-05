@@ -9,16 +9,16 @@ test('reads default and custom graphs, preserves controls and describes only the
   const graph = demo.getByRole('region', { name: 'Review graph', exact: true });
   const target = graph.getByRole('group', { name: 'Accept request', exact: true });
   await expect(graph.getByRole('group', { name: 'Request', exact: true })).toHaveAccessibleDescription(
-    'Needs approval. Parent: Review. Selected. Selection unavailable. Movement unavailable.',
+    /^Needs approval\. Parent: Review\. Selected\. Selection unavailable\. Movement unavailable\./,
   );
   await expect(graph.getByRole('group', { name: 'Archive route', exact: true })).toHaveAccessibleDescription(
-    'Keep a copy. Connection from Request to Archive Selected. Selection unavailable. Reconnection unavailable.',
+    /^Keep a copy\. Connection from Request to Archive Selected\. Selection unavailable\. Reconnection unavailable\./,
   );
   await expect(target).toHaveAccessibleDescription('Inbound route. Starting connections unavailable.');
   await expect(graph.getByRole('img', { name: 'Graph minimap' })).toHaveCount(1);
   const button = graph.getByRole('button', { name: 'Review request' });
   await demo.getByRole('button', { name: 'Switch graph language' }).focus();
-  await page.keyboard.press('Tab');
+  for (let step = 0; step < 4; step++) await page.keyboard.press('Tab');
   await expect(button).toBeFocused();
   await page.keyboard.press('Enter');
   await expect(demo.getByText('Reviews: 1.', { exact: false })).toBeVisible();

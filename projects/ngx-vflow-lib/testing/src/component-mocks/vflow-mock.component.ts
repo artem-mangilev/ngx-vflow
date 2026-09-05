@@ -210,6 +210,8 @@ export class VflowMockComponent implements AsInterface<VflowComponent>, OnInit {
   @Input()
   public autoPan: boolean | AutoPanSettings = true;
 
+  @Input() public autoPanOnNodeFocus = true;
+
   public alignmentHelper = input<boolean | AlignmentHelperSettings>(false);
 
   // eslint-disable-next-line @angular-eslint/no-output-on-prefix

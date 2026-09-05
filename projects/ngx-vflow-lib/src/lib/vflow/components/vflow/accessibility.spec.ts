@@ -83,7 +83,7 @@ describe('public graph accessibility', () => {
     expect(description(edge)).toContain('Connection from Node empty to Node custom');
   });
 
-  it('names the graph, entities, relationships, handles and minimap without new Tab stops', async () => {
+  it('names the graph, entities, relationships, handles and minimap with entity Tab stops', async () => {
     TestBed.configureTestingModule({
       imports: [AccessibilityHostComponent],
       providers: [provideExperimentalZonelessChangeDetection()],
@@ -102,9 +102,10 @@ describe('public graph accessibility', () => {
       root.querySelector('[role="group"][aria-label="Source connection point of Request & review"]'),
     ).not.toBeNull();
     expect(root.querySelector('[role="img"][aria-label="Graph minimap"]')).not.toBeNull();
-    expect(root.querySelector('[tabindex]')).toBeNull();
+    expect(root.querySelectorAll('[tabindex="0"]').length).toBe(4);
+    expect(root.querySelector('[role="img"]')?.hasAttribute('tabindex')).toBeFalse();
     const child = root.querySelector('[aria-label="Request & review"]')!;
-    expect(description(child)).toBe('Parent: Group parent.');
+    expect(description(child)).toContain('Parent: Group parent.');
   });
 
   it('reactively combines custom descriptions, relationships and actual selection despite denied eligibility', async () => {
@@ -137,7 +138,7 @@ describe('public graph accessibility', () => {
     await fixture.whenStable();
     const root: HTMLElement = fixture.nativeElement;
     const child = root.querySelector('[aria-label="Application"]')!;
-    expect(description(child)).toBe(
+    expect(description(child)).toContain(
       'Requires review. Parent: Processing. Selected. Selection unavailable. Movement unavailable.',
     );
     expect(child.hasAttribute('aria-selected')).toBeFalse();
@@ -167,7 +168,7 @@ describe('public graph accessibility', () => {
       lang: 'en',
       dir: 'ltr',
       id: 'hijacked',
-      tabindex: 0,
+      tabindex: 8,
       'aria-label': 'Wrong',
       'aria-hidden': true,
       style: 'display:none',
@@ -197,9 +198,10 @@ describe('public graph accessibility', () => {
     expect(node.getAttribute('title')).toBe('Details');
     expect(node.getAttribute('lang')).toBe('en');
     expect(node.getAttribute('dir')).toBe('ltr');
-    for (const attribute of ['id', 'tabindex', 'aria-hidden', 'onclick', 'data-object']) {
+    for (const attribute of ['id', 'aria-hidden', 'onclick', 'data-object']) {
       expect(node.hasAttribute(attribute)).withContext(attribute).toBeFalse();
     }
+    expect(node.getAttribute('tabindex')).toBe('0');
     expect(node.getAttribute('style')).not.toContain('display: none');
     fixture.componentInstance.nodes[0].domAttributes!.set({ 'data-test': 'updated', 'data-count': 2 });
     fixture.detectChanges();
@@ -269,7 +271,7 @@ describe('public graph accessibility', () => {
     expect(document.getElementById(updatedFirstId)).not.toBeNull();
     first.destroy();
     expect(document.getElementById(updatedFirstId)).toBeNull();
-    expect(document.getElementById(secondId)?.textContent).toBe('Parent: Group parent.');
+    expect(document.getElementById(secondId)?.textContent).toContain('Parent: Group parent.');
   });
 });
 

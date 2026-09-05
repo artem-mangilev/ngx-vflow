@@ -17,6 +17,10 @@ export interface AriaLabelConfig {
   connectionAcceptUnavailable: string;
   connectionValid: string;
   connectionInvalid: string;
+  keyboardNavigation: string;
+  keyboardSelect: string;
+  keyboardDeselect: string;
+  keyboardMove: string;
 }
 
 export const DEFAULT_ARIA_LABEL_CONFIG: AriaLabelConfig = {
@@ -38,4 +42,8 @@ export const DEFAULT_ARIA_LABEL_CONFIG: AriaLabelConfig = {
   connectionAcceptUnavailable: 'Accepting connections unavailable.',
   connectionValid: 'Valid connection target.',
   connectionInvalid: 'Invalid connection target.',
+  keyboardNavigation: 'Use Tab and Shift+Tab to move focus.',
+  keyboardSelect: 'Press Enter or Space to select. Hold the multiselection modifier to toggle selection.',
+  keyboardDeselect: 'Press Escape to clear selection.',
+  keyboardMove: 'When selected, use arrow keys to move movable selected nodes. Hold Shift to move faster.',
 };

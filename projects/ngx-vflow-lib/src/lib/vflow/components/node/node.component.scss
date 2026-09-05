@@ -6,6 +6,11 @@
   pointer-events: all;
 }
 
+:host(:focus-visible) {
+  outline: 2px solid #005fcc;
+  outline-offset: 3px;
+}
+
 .wrapper {
   width: max-content;
 }

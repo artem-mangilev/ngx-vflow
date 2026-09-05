@@ -38,7 +38,9 @@ export class KeyboardService {
           const target = event.composedPath()[0] ?? event.target;
           const editable =
             target instanceof Element &&
-            !!target.closest('input, textarea, select, [contenteditable]:not([contenteditable="false"])');
+            !!target.closest(
+              'input, textarea, select, [contenteditable]:not([contenteditable="false"]), [data-vflow-no-keyboard]',
+            );
           if (event.type === 'keydown') {
             this.pressed.add(event.code);
             if (!editable) this.gestureKeys.add(event.code);

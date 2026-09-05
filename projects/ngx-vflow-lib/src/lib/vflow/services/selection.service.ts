@@ -63,4 +63,15 @@ export class SelectionService {
       isMultiSelectionActive: this.keyboardService.isActiveAction('multiSelection'),
     });
   }
+
+  public selectFromKeyboard(entity: FlowEntity | null, toggle: boolean) {
+    if (this.flowSettingsService.selectionMode() === 'manual') return;
+    // Denying selection acquisition must still allow deselection.
+    if (entity && !entity.selectable() && !(toggle && entity.selected())) return;
+    if (entity && toggle) {
+      entity.selected.set(!entity.selected());
+    } else {
+      this.flowEntitiesService.entities().forEach((item) => item.selected.set(item === entity));
+    }
+  }
 }

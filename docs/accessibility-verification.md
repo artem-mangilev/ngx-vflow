@@ -1,4 +1,4 @@
-# Accessibility verification — issue 09
+# Accessibility verification
 
 Scenario: the documentation page `/interactions/accessibility`, containing two flows with repeated node IDs, default/custom nodes and edges, a resizable visual group, a custom button, handles and one minimap.
 
@@ -45,3 +45,13 @@ An attempted check using ordinary keyboard events through System Events failed w
 After the retry, both the temporary VoiceOver AppleScript checkbox and VoiceOver itself were switched off and their off states verified in the UI. No library code changed during this retry.
 
 NVDA + Chrome is unavailable on this macOS host. No second screen-reader combination was tested. Keyboard graph navigation, action announcements, minimap operation and accessible resize/reconnect remain the explicit scope of issues 10–14.
+
+## Keyboard operation — issue 10, 2026-09-05
+
+The same documentation page now also includes a dedicated keyboard example (`data-testid="keyboard-demo"`). The issue 09 observations above remain historical; entity wrappers now have the keyboard behavior specified in issue 10.
+
+- Public-boundary tests exercise input-order traversal, focus independent of selection, replacement/toggle/clear selection, manual mode, capability restrictions, fixed/grid movement, parent extents, position notifications, ancestor/descendant selection, embedded controls, opt-out, focus removal/recovery, localization and focus auto-pan. The full library suite passed with 175 tests; the demo suite passed with 1 test.
+- All 7 Playwright tests passed in Chromium. The new scenarios use real Tab/Shift+Tab, Enter, Space, modifiers and arrow keys; cover nodes, nested parents, non-focusable/non-selectable entities, native controls, custom edges, graph exit, removal of a node by its focused embedded button, manual selection, grid movement and independent focus-pan opt-out. axe checks of the accessibility and keyboard examples passed without disabling rules.
+- Browser screenshots were inspected for distinct node and edge focus indicators. The editor demo keeps its embedded controls inside the visible graph. Focus pan preserves zoom and only centers fully offscreen nodes; it does not follow keyboard movement or edge focus.
+- These checks are browser automation and visual inspection, not a new physical-keyboard or VoiceOver session. No new screen-reader result is claimed. Existing screen-reader limitations recorded above remain available for follow-up.
+- Virtualization, action announcements, keyboard connections, minimap operation and resize/reconnect keyboard controls remain outside issue 10.

@@ -121,6 +121,11 @@ export class AccessibilityDemoComponent {
           connectionAcceptUnavailable: 'Приём соединения недоступен.',
           connectionValid: 'Допустимая цель соединения.',
           connectionInvalid: 'Недопустимая цель соединения.',
+          keyboardNavigation: 'Переходите между объектами клавишами Tab и Shift+Tab.',
+          keyboardSelect:
+            'Нажмите Enter или пробел для выбора. Удерживайте модификатор множественного выбора для переключения выделения.',
+          keyboardDeselect: 'Нажмите Escape, чтобы снять выделение.',
+          keyboardMove: 'Перемещайте выбранные доступные узлы стрелками. Удерживайте Shift для ускорения.',
         }
       : { flowLabel: 'Review graph', flowDescription: 'Request and its review.' },
   );

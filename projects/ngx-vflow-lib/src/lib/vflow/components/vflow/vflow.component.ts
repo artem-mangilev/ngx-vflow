@@ -1,4 +1,5 @@
 import { AutoPanSettings } from '../../interfaces/auto-pan-settings.interface';
+import { KeyboardEntityDirective, KeyboardNavigationDirective } from '../../directives/keyboard-navigation.directive';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -143,6 +144,8 @@ const nodeDragControllerHostDirective = {
   ],
   hostDirectives: [changesControllerHostDirective, nodeDragControllerHostDirective],
   imports: [
+    KeyboardEntityDirective,
+    KeyboardNavigationDirective,
     EntityAccessibilityDirective,
     RootSvgReferenceDirective,
     RootSvgContextDirective,
@@ -398,6 +401,12 @@ export class VflowComponent {
   public set autoPan(value: boolean | AutoPanSettings) {
     this.flowSettingsService.autoPan.set(value);
   }
+
+  /** Center fully offscreen keyboard-focused nodes without changing zoom. Default: true. */
+  @Input()
+  public set autoPanOnNodeFocus(value: boolean) {
+    this.flowSettingsService.autoPanOnNodeFocus.set(value);
+  }
   // #endregion
 
   // #region MAIN_INPUTS
@@ -423,7 +432,9 @@ export class VflowComponent {
 
   protected nodeModels = this.nodeRenderingService.nodes;
   protected groups = this.nodeRenderingService.groups;
-  protected nonGroups = this.nodeRenderingService.nonGroups;
+  protected orderedNodes = computed(() =>
+    this.flowSettingsService.optimization().virtualization ? this.nodeModels() : this.flowEntitiesService.nodes(),
+  );
 
   /**
    * Edges to render
@@ -441,6 +452,9 @@ export class VflowComponent {
   }
 
   protected edgeModels = this.edgeRenderingService.edges;
+  protected orderedEdges = computed(() =>
+    this.flowSettingsService.optimization().virtualization ? this.edgeModels() : this.flowEntitiesService.validEdges(),
+  );
   // #endregion
 
   // #region OUTPUTS

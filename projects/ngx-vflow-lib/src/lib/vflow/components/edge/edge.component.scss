@@ -6,6 +6,24 @@
   pointer-events: none;
 }
 
+.focus-indicator {
+  display: none;
+  fill: none;
+  stroke: CanvasText;
+  stroke-width: 5;
+  stroke-dasharray: 4 4;
+  vector-effect: non-scaling-stroke;
+  pointer-events: none;
+}
+
+:host(:focus-visible) {
+  outline: none;
+
+  .focus-indicator {
+    display: block;
+  }
+}
+
 .edge {
   fill: none;
   stroke-width: 2;

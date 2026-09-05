@@ -1,5 +1,6 @@
 <div
   #flow
+  vflowKeyboard
   rootSvgRef
   rootSvgContext
   rootPointer
@@ -21,18 +22,6 @@
         <defs flowDefs [markers]="markers()" />
       </svg>
 
-      <!-- Edges -->
-      <div class="vflow-edges-layer">
-        @for (model of edgeModels(); track trackEdges($index, model)) {
-          <svg
-            edge
-            [vflowA11y]="model.accessibility()"
-            [model]="model"
-            [edgeTemplate]="edgeTemplateDirective()?.templateRef"
-            [style.zIndex]="model.renderOrder()" />
-        }
-      </div>
-
       <!-- Overlays: connection line, selection box, alignment helper (flow coords) -->
       <svg class="vflow-overlay-svg" aria-hidden="true">
         @if (alignmentHelper(); as alignmentHelper) {
@@ -51,38 +40,35 @@
         <svg:g connection [model]="connection" [template]="connectionTemplateDirective()?.templateRef" />
       </svg>
 
-      <!-- Nodes -->
+      <!-- DOM order follows application input; z-index controls visual elevation. -->
       <div class="vflow-nodes-layer">
-        @if (flowOptimization().detachedGroupsLayer) {
-          @for (model of groups(); track trackNodes($index, model)) {
-            <div
-              node
-              [vflowA11y]="model.accessibility()"
-              [model]="model"
-              [groupNodeTemplate]="groupNodeTemplateDirective()?.templateRef"
-              [style.transform]="model.pointTransformCss()"
-              [style.zIndex]="model.renderOrder()"></div>
-          }
-          @for (model of nonGroups(); track trackNodes($index, model)) {
-            <div
-              node
-              [vflowA11y]="model.accessibility()"
-              [model]="model"
-              [nodeTemplate]="nodeTemplateDirective()?.templateRef"
-              [style.transform]="model.pointTransformCss()"
-              [style.zIndex]="model.renderOrder()"></div>
-          }
-        } @else {
-          @for (model of nodeModels(); track trackNodes($index, model)) {
-            <div
-              node
-              [vflowA11y]="model.accessibility()"
-              [model]="model"
-              [nodeTemplate]="nodeTemplateDirective()?.templateRef"
-              [groupNodeTemplate]="groupNodeTemplateDirective()?.templateRef"
-              [style.transform]="model.pointTransformCss()"
-              [style.zIndex]="model.renderOrder()"></div>
-          }
+        @for (model of orderedNodes(); track trackNodes($index, model)) {
+          <div
+            node
+            [vflowA11y]="model.accessibility()"
+            [vflowKeyboardEntity]="model"
+            [model]="model"
+            [nodeTemplate]="nodeTemplateDirective()?.templateRef"
+            [groupNodeTemplate]="groupNodeTemplateDirective()?.templateRef"
+            [style.transform]="model.pointTransformCss()"
+            [style.zIndex]="
+              flowOptimization().detachedGroupsLayer && groups().includes(model)
+                ? groups().indexOf(model) - groups().length
+                : model.renderOrder()
+            "></div>
+        }
+      </div>
+
+      <!-- Edges -->
+      <div class="vflow-edges-layer">
+        @for (model of orderedEdges(); track trackEdges($index, model)) {
+          <svg
+            edge
+            [vflowA11y]="model.accessibility()"
+            [vflowKeyboardEntity]="model"
+            [model]="model"
+            [edgeTemplate]="edgeTemplateDirective()?.templateRef"
+            [style.zIndex]="model.renderOrder()" />
         }
       </div>
 

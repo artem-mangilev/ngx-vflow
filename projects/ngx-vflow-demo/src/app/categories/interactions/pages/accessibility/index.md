@@ -2,6 +2,32 @@ Graph entities have readable names, relationships and state descriptions. This e
 
 {{ NgDocActions.demoPane("AccessibilityDemoComponent") }}
 
+## Keyboard navigation
+
+{{ NgDocActions.demoPane("KeyboardNavigationDemoComponent") }}
+
+`Tab` and `Shift+Tab` visit focusable nodes in the input `nodes` order, then edges in the input `edges` order. Parent relationships and visual elevation do not reorder the sequence. Embedded controls keep their DOM order and their own keyboard behavior. Tab leaves the graph normally; there is no focus trap. Focus has a separate visible indicator and does not change selection.
+
+| Command on an entity wrapper                | Behavior                                                                                                                               |
+| ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| `Enter` / `Space`                           | Select the entity and clear other selection.                                                                                           |
+| Multiselection modifier + `Enter` / `Space` | Toggle only the focused entity. The modifier follows `keyboardShortcuts.multiSelection` (Meta on macOS, Control elsewhere by default). |
+| `Escape`                                    | Clear selection and retain focus.                                                                                                      |
+| Arrow keys on a selected movable node       | Move all selected movable nodes by 5 flow-space units.                                                                                 |
+| `Shift` + arrow keys                        | Move by 20 flow-space units.                                                                                                           |
+
+With snapping enabled on an axis (`snapGrid` value greater than 1), movement on that axis uses one cell, or four cells with Shift. The steps are fixed. Existing snapping and `extent: 'parent'` bounds apply. Selected descendants of a moving selected ancestor are not moved twice. Movement updates the application's writable position signals and emits the ordinary position change notifications; it does not synthesize pointer drag lifecycle events.
+
+Selection acquisition respects `selectable`; deselection remains allowed. In `selectionMode="manual"`, keyboard commands do not write selection. A focused node must itself be selected and movable to initiate movement of the selected set. Focus eligibility uses the existing node/edge `focusable` overrides and global `nodesFocusable` / `edgesFocusable` defaults. Denying wrapper focus does not disable embedded controls.
+
+When a focused entity is removed or becomes non-focusable, focus moves to the next eligible entity, then the previous, then the graph container if none remain. Changes do not steal focus from elsewhere. No initial focus is taken on page load.
+
+`autoPanOnNodeFocus` defaults to `true`, independently of drag `autoPan`. A fully offscreen node receiving keyboard-visible focus is immediately centered at the current zoom. Any positive overlap with the viewport suppresses this pan, even for oversized nodes. Edge focus and movement with arrow keys do not pan. Set `[autoPanOnNodeFocus]="false"` to disable focus panning; it supports runtime changes.
+
+Commands from inputs, textareas, selects, contenteditable regions, buttons and other descendants do not trigger graph selection or movement. Add `vflowNoKeyboard` to an element or ancestor to opt an application area out of graph keyboard commands without changing native Tab behavior. The directive is included in `Vflow` and can also be imported as `NoKeyboardDirective`.
+
+This keyboard contract requires virtualization to be disabled. Compatibility with the current virtualization implementation is deferred.
+
 ## Names and descriptions
 
 The flow is a named `region`. Nodes (including visual groups), edges and handles are named `group` elements. The minimap is one `img` named `Graph minimap`; its preview nodes do not form a second graph in the accessibility tree.
@@ -69,6 +95,10 @@ const labels: Partial<AriaLabelConfig> = {
 | `connectionAcceptUnavailable` | `Accepting connections unavailable.`                                    |
 | `connectionValid`             | `Valid connection target.`                                              |
 | `connectionInvalid`           | `Invalid connection target.`                                            |
+| `keyboardNavigation`          | Instructions for Tab and Shift+Tab traversal.                           |
+| `keyboardSelect`              | Instructions for selection and the multiselection modifier.             |
+| `keyboardDeselect`            | Instructions for clearing selection with Escape.                        |
+| `keyboardMove`                | Instructions for arrows and accelerated movement with Shift.            |
 
 Formatters receive plain text. Return plain text without HTML markup.
 
@@ -82,9 +112,8 @@ Each flow owns independent description references and one initially empty, polit
 
 ## Current limits
 
-This contract establishes readable graph semantics. It does not establish full keyboard accessibility. Embedded application controls retain their native keyboard behavior; graph wrappers and handles gain no Tab stops here.
+Graph wrappers support the keyboard operations described above. Embedded application controls retain their native keyboard behavior. Handles and the minimap do not gain Tab stops. This does not establish full keyboard accessibility for every graph operation.
 
-- Issue 10 owns graph focus, navigation, keyboard selection and movement.
 - Issue 11 owns keyboard connections and action announcements, including coalescing frequent updates.
 - Issues 12–13 own minimap interaction and keyboard navigation.
 - Issue 14 owns accessible resize/reconnect controls. Existing library resize and reconnect controls remain pointer-only; naming their owner does not make those controls accessible.
