@@ -2,11 +2,14 @@ import { Injectable, computed, inject } from '@angular/core';
 import { FlowEntitiesService } from './flow-entities.service';
 import { EdgeModel } from '../models/edge.model';
 import { FlowSettingsService } from './flow-settings.service';
+import { ViewportService } from './viewport.service';
+import { isRectInViewport } from '../utils/viewport';
 
 @Injectable()
 export class EdgeRenderingService {
   private flowEntitiesService = inject(FlowEntitiesService);
   private flowSettingsService = inject(FlowSettingsService);
+  private viewportService = inject(ViewportService);
 
   public readonly edges = computed(() => {
     if (!this.flowSettingsService.optimization().virtualization) {
@@ -19,11 +22,13 @@ export class EdgeRenderingService {
   });
 
   public readonly viewportEdges = computed(() => {
+    const viewport = this.viewportService.readableViewport();
+    if (viewport.zoom < this.flowSettingsService.optimization().virtualizationZoomThreshold) return [];
+    const width = this.flowSettingsService.computedFlowWidth();
+    const height = this.flowSettingsService.computedFlowHeight();
     return this.flowEntitiesService.validEdges().filter((e) => {
-      const sourceHandle = e.sourceHandle();
-      const targetHandle = e.targetHandle();
-
-      return sourceHandle && targetHandle;
+      const bounds = e.bounds();
+      return bounds !== null && isRectInViewport(bounds, viewport, width, height);
     });
   });
 

@@ -106,6 +106,20 @@ describe('graph operations', () => {
     expect(warn).toHaveBeenCalledWith('[ngx-vflow] Removing node "a" and its cyclic descendant closure.');
   });
 
+  it('resolves duplicate ids against the survivors of earlier removals in the same batch', () => {
+    const parent = node('parent');
+    const child = node('duplicate', 0, 0, 'parent');
+    const other = node('duplicate');
+    const warn = spyOn(console, 'warn');
+    const nodes = [parent, child, other];
+    const result = removeNodes(['duplicate', 'parent', 'duplicate'], { nodes, edges: [] });
+    expect(result.nodes).toEqual([]);
+    expect(result.removedNodes).toEqual(nodes);
+    expect(warn).toHaveBeenCalledTimes(1);
+    const unchanged = removeNodes(['missing'], { nodes, edges: [] });
+    expect(unchanged.nodes).toBe(nodes);
+  });
+
   it('reparents any node type while preserving flow position and unrelated signals', () => {
     const oldParent = node('old-parent', 100, 100);
     const newParent = node('new-parent', 300, 50);

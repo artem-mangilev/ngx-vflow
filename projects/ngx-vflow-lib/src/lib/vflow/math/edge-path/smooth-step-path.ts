@@ -1,6 +1,7 @@
 import { CurveLayout, SmoothStepPathParams } from '../../interfaces/curve-factory.interface';
 import { Point } from '../../interfaces/point.interface';
 import { Position } from '../../types/position.type';
+import { getBoundsOfPoints } from '../../utils/rect';
 
 const handleDirections = {
   left: { x: -1, y: 0 },
@@ -279,6 +280,7 @@ export function getSmoothStepPath({
 
   return {
     path,
+    bounds: getBoundsOfPoints(points),
     labelPoints: {
       start: getPointAtRatio(0.15),
       center: { x: labelX, y: labelY },

@@ -17,10 +17,12 @@ import { NodeRenderingService } from '../services/node-rendering.service';
 import { extendedComputed } from '../utils/signals/extended-computed';
 import { isCallable } from '../utils/is-callable';
 import { isCustomNodeComponent } from '../utils/is-vflow-component';
+import { createModelInjector } from '../utils/model-injector';
 
 export class NodeModel<T = unknown>
   implements FlowEntity, Contextable<NodeContext | GroupNodeContext | { $implicit: object }>
 {
+  private modelInjector = createModelInjector();
   private entitiesService = inject(FlowEntitiesService);
   private settingsService = inject(FlowSettingsService);
   private nodeRenderingService = inject(NodeRenderingService);
@@ -61,6 +63,8 @@ export class NodeModel<T = unknown>
   });
 
   public isVisible = signal(false);
+  /** The view was removed by virtualization; its last handle geometry remains usable. */
+  public virtualized = signal(false);
 
   /**
    * Reference to the rendered node host element. Set by `NodeComponent` and used
@@ -83,13 +87,6 @@ export class NodeModel<T = unknown>
 
   public height = signal(NODE_DEFAULTS.height);
   public height$: Observable<number>;
-
-  /**
-   * If resizer is used, the node size fully depends on the resizer
-   * Otherwise it calculates the size based on the content
-   */
-  public styleWidth = computed(() => (this.controlledByResizer() ? `${this.width()}px` : '100%'));
-  public styleHeight = computed(() => (this.controlledByResizer() ? `${this.height()}px` : '100%'));
 
   public renderOrder = signal(0);
 
@@ -168,7 +165,7 @@ export class NodeModel<T = unknown>
     return true;
   });
 
-  public componentInstance$ = toObservable(this.shouldLoad).pipe(
+  public componentInstance$ = toObservable(this.shouldLoad, { injector: this.modelInjector }).pipe(
     filter(Boolean),
     // @ts-expect-error we assume it's a function with dynamic import
     switchMap(() => this.rawNode.type()),
@@ -185,10 +182,12 @@ export class NodeModel<T = unknown>
   };
 
   public parent = computed<NodeModel | null>(() => {
-    const parentId = this.parentId();
+    // Re-read optional signals when application-owned graph structure changes.
+    const nodes = this.entitiesService.nodeByIdMap();
+    const parentId = this.rawNode.parentId?.();
     if (!parentId) return null;
 
-    return this.entitiesService.nodeByIdMap().get(parentId) ?? null;
+    return nodes.get(parentId) ?? null;
   });
 
   public children = computed(() => this.entitiesService.nodesByParentIdMap().get(this.rawNode.id) ?? []);
@@ -203,8 +202,6 @@ export class NodeModel<T = unknown>
   public context = {
     $implicit: {},
   };
-
-  private parentId = signal<string | null>(NODE_DEFAULTS.parentId);
 
   constructor(public rawNode: Node<T>) {
     if (rawNode.point) {
@@ -221,10 +218,6 @@ export class NodeModel<T = unknown>
 
     if (rawNode.draggable) {
       this.draggable = rawNode.draggable;
-    }
-
-    if (rawNode.parentId) {
-      this.parentId = rawNode.parentId;
     }
 
     if (rawNode.preview) {
@@ -278,11 +271,15 @@ export class NodeModel<T = unknown>
     }
 
     // Initialize Observables after all signal assignments
-    this.point$ = toObservable(this.point);
-    this.width$ = toObservable(this.width);
-    this.height$ = toObservable(this.height);
-    this.selected$ = toObservable(this.selected);
-    this.handles$ = toObservable(this.handles);
+    this.point$ = toObservable(this.point, { injector: this.modelInjector });
+    this.width$ = toObservable(this.width, { injector: this.modelInjector });
+    this.height$ = toObservable(this.height, { injector: this.modelInjector });
+    this.selected$ = toObservable(this.selected, { injector: this.modelInjector });
+    this.handles$ = toObservable(this.handles, { injector: this.modelInjector });
+  }
+
+  public destroy() {
+    this.modelInjector.destroy();
   }
 
   public setPoint(point: Point) {

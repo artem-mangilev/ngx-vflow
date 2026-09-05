@@ -65,36 +65,40 @@ export function removeNodes<NodeType extends Node, EdgeType extends Edge>(
   nodeIds: readonly string[],
   { nodes, edges }: { nodes: readonly NodeType[]; edges: readonly EdgeType[] },
 ): RemoveNodesResult<NodeType, EdgeType> {
-  let nextNodes: readonly NodeType[] = nodes;
-  let nextEdges: readonly EdgeType[] = edges;
-  const removedNodeSet = new Set<NodeType>();
-  const removedEdgeSet = new Set<EdgeType>();
+  const nodesById = new Map<string, NodeType[]>();
+  const children = new Map<string, NodeType[]>();
+  for (const node of nodes) {
+    const matches = nodesById.get(node.id);
+    if (matches) matches.push(node);
+    else nodesById.set(node.id, [node]);
+    const parentId = node.parentId?.();
+    if (parentId) {
+      const siblings = children.get(parentId);
+      if (siblings) siblings.push(node);
+      else children.set(parentId, [node]);
+    }
+  }
 
+  const removedNodeSet = new Set<NodeType>();
+  const removedIds = new Set<string>();
   for (const id of nodeIds) {
-    const match = findUniqueIndex(nextNodes, id);
-    if (!match.count) continue;
-    if (match.count > 1) {
-      warnTarget('node', id, match.count);
+    const matches = nodesById.get(id);
+    if (!matches?.length) continue;
+    if (matches.length > 1) {
+      warnTarget('node', id, matches.length);
       continue;
     }
 
-    const children = new Map<string, NodeType[]>();
-    for (const node of nextNodes) {
-      const parentId = node.parentId?.();
-      if (parentId) children.set(parentId, [...(children.get(parentId) ?? []), node]);
-    }
-
-    const descendants = new Set<NodeType>([nextNodes[match.index]]);
-    const pending = [nextNodes[match.index]];
+    const descendants = new Set<NodeType>(matches);
+    const pending = [...matches];
     const expandedIds = new Set<string>();
     let cyclic = false;
-
     while (pending.length) {
       const parent = pending.pop()!;
       if (expandedIds.has(parent.id)) continue;
       expandedIds.add(parent.id);
-
       for (const child of children.get(parent.id) ?? []) {
+        if (removedNodeSet.has(child)) continue;
         if (descendants.has(child)) {
           cyclic = true;
           continue;
@@ -103,23 +107,28 @@ export function removeNodes<NodeType extends Node, EdgeType extends Edge>(
         pending.push(child);
       }
     }
-
     if (cyclic) warn(`Removing node "${id}" and its cyclic descendant closure.`);
 
-    const removedIds = new Set([...descendants].map((node) => node.id));
-    const incidentEdges = nextEdges.filter((edge) => removedIds.has(edge.source) || removedIds.has(edge.target));
-
-    descendants.forEach((node) => removedNodeSet.add(node));
-    incidentEdges.forEach((edge) => removedEdgeSet.add(edge));
-    nextNodes = nextNodes.filter((node) => !descendants.has(node));
-    nextEdges = nextEdges.filter((edge) => !removedEdgeSet.has(edge));
+    const ids = new Set<string>();
+    for (const node of descendants) {
+      removedNodeSet.add(node);
+      removedIds.add(node.id);
+      ids.add(node.id);
+    }
+    for (const removedId of ids) {
+      const remaining = nodesById.get(removedId)!.filter((node) => !removedNodeSet.has(node));
+      if (remaining.length) nodesById.set(removedId, remaining);
+      else nodesById.delete(removedId);
+    }
   }
 
+  const removedEdges = edges.filter((edge) => removedIds.has(edge.source) || removedIds.has(edge.target));
+  const removedEdgeSet = new Set(removedEdges);
   return {
-    nodes: nextNodes as NodeType[],
-    edges: nextEdges as EdgeType[],
+    nodes: (removedNodeSet.size ? nodes.filter((node) => !removedNodeSet.has(node)) : nodes) as NodeType[],
+    edges: (removedEdges.length ? edges.filter((edge) => !removedEdgeSet.has(edge)) : edges) as EdgeType[],
     removedNodes: nodes.filter((node) => removedNodeSet.has(node)),
-    removedEdges: edges.filter((edge) => removedEdgeSet.has(edge)),
+    removedEdges,
   };
 }
 

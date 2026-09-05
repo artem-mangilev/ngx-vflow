@@ -2,6 +2,7 @@ import { BezierPathParams, CurveLayout } from '../../interfaces/curve-factory.in
 import { Point } from '../../interfaces/point.interface';
 import { Position } from '../../types/position.type';
 import { getPointOnLineByRatio } from '../point-on-line-by-ratio';
+import { getBoundsOfPoints } from '../../utils/rect';
 
 /** Builds a cubic bezier SVG edge path and its label positions. */
 export function getBezierPath({
@@ -70,6 +71,7 @@ function getPathData(
 ): CurveLayout {
   return {
     path,
+    bounds: getBoundsOfPoints([source, sourceControl, targetControl, target]),
     labelPoints: {
       start: getPointOnBezier(source, target, sourceControl, targetControl, 0.1),
       center: getPointOnBezier(source, target, sourceControl, targetControl, 0.5),

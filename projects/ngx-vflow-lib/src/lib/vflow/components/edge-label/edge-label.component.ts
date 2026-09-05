@@ -1,24 +1,10 @@
-import {
-  AfterViewInit,
-  ChangeDetectionStrategy,
-  Component,
-  ElementRef,
-  OnDestroy,
-  TemplateRef,
-  computed,
-  inject,
-  input,
-  viewChild,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, TemplateRef, computed, inject, input } from '@angular/core';
 import { EdgeLabelModel } from '../../models/edge-label.model';
 import { EdgeModel } from '../../models/edge.model';
 import { NgTemplateOutlet } from '@angular/common';
 import { FlowSettingsService } from '../../services/flow-settings.service';
 import { HtmlEdgeLabelContext } from '../../interfaces/template-context.interface';
 import { HtmlTemplateEdgeLabel } from '../../interfaces/edge-label.interface';
-import { ResizeObserverService } from '../../services/resize-observer.service';
-import { RequestAnimationFrameBatchingService } from '../../services/request-animation-frame-batching.service';
-import { BasicElementCacheService } from '../../services/basic-element-cache.service';
 
 @Component({
   selector: 'div[edgeLabel]',
@@ -35,6 +21,7 @@ import { BasicElementCacheService } from '../../services/basic-element-cache.ser
 
       .edge-label-wrapper {
         width: max-content;
+        transform: translate(-50%, -50%);
         pointer-events: all;
       }
     `,
@@ -45,13 +32,8 @@ import { BasicElementCacheService } from '../../services/basic-element-cache.ser
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [NgTemplateOutlet],
 })
-export class EdgeLabelComponent implements AfterViewInit, OnDestroy {
+export class EdgeLabelComponent {
   private settingsService = inject(FlowSettingsService);
-  private resizeObserverService = inject(ResizeObserverService);
-  private basicElementCacheService = inject(BasicElementCacheService);
-  private requestAnimationFrameBatchService = inject(RequestAnimationFrameBatchingService);
-  private readonly resizeCallback = () => this.updateModelSize();
-
   // TODO: too many inputs
   public model = input.required<EdgeLabelModel>();
 
@@ -61,26 +43,8 @@ export class EdgeLabelComponent implements AfterViewInit, OnDestroy {
 
   public htmlTemplate = input<TemplateRef<any>>();
 
-  public edgeLabelWrapperRef = viewChild.required<ElementRef<Element>>('edgeLabelWrapper');
-
-  /**
-   * Centered point of label
-   *
-   * TODO: maybe put it into EdgeLabelModel
-   */
-  protected edgeLabelPoint = computed(() => {
-    const point = this.point();
-
-    const { width, height } = this.model().size();
-
-    return {
-      x: point.x - width / 2,
-      y: point.y - height / 2,
-    };
-  });
-
   protected transform = computed(() => {
-    const { x, y } = this.edgeLabelPoint();
+    const { x, y } = this.point();
 
     return `translate(${x}px, ${y}px)`;
   });
@@ -109,25 +73,6 @@ export class EdgeLabelComponent implements AfterViewInit, OnDestroy {
     return null;
   });
 
-  public ngAfterViewInit(): void {
-    const labelElement = this.edgeLabelWrapperRef().nativeElement;
-    this.basicElementCacheService.addElementCache(labelElement);
-
-    this.resizeObserverService.addObserver(labelElement, this.resizeCallback);
-
-    //force run the first time since previous implementation used startWith(null) to force a first initialization
-    //inside animation frame callback otherwise we ngAfterViewInit calls in between each edge label create
-    this.requestAnimationFrameBatchService.batchAnimationFrame(() => {
-      this.updateModelSize();
-    });
-  }
-
-  public ngOnDestroy(): void {
-    const labelElement = this.edgeLabelWrapperRef().nativeElement;
-    this.basicElementCacheService.removeElementCache(labelElement);
-    this.resizeObserverService.removeObserver(labelElement, this.resizeCallback);
-  }
-
   // TODO: move to model with Contextable interface
   protected getLabelContext(): HtmlEdgeLabelContext {
     return {
@@ -136,14 +81,5 @@ export class EdgeLabelComponent implements AfterViewInit, OnDestroy {
         label: this.model().edgeLabel as HtmlTemplateEdgeLabel,
       },
     };
-  }
-
-  private updateModelSize() {
-    const labelElement = this.edgeLabelWrapperRef().nativeElement;
-    this.basicElementCacheService.markCacheAsDirty();
-    const labelData = this.basicElementCacheService.getElementData(labelElement);
-    const width = labelData.clientWidth;
-    const height = labelData.clientHeight;
-    this.model().size.set({ width, height });
   }
 }

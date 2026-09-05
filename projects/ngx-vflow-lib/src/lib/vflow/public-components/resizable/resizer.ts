@@ -256,12 +256,14 @@ export function createResizer({ domNode, getStoreItems, onChange, onEnd }: Resiz
           return;
         }
 
-        if (isXPosChange || isYPosChange || nodeOrigin[0] === 1 || nodeOrigin[1] === 1) {
-          change.x = isXPosChange ? x : prevValues.x;
-          change.y = isYPosChange ? y : prevValues.y;
+        const nextValues = { ...prevValues };
 
-          prevValues.x = change.x;
-          prevValues.y = change.y;
+        if (isXPosChange || isYPosChange || nodeOrigin[0] === 1 || nodeOrigin[1] === 1) {
+          change.x = isXPosChange ? x : nextValues.x;
+          change.y = isYPosChange ? y : nextValues.y;
+
+          nextValues.x = change.x;
+          nextValues.y = change.y;
 
           /*
            * when top/left changes, correct the relative positions of child nodes
@@ -272,43 +274,47 @@ export function createResizer({ domNode, getStoreItems, onChange, onEnd }: Resiz
             const yChange = y - prevY;
 
             for (const childNode of childNodes) {
-              childNode.position = {
-                x: childNode.position.x - xChange + nodeOrigin[0] * (width - prevWidth),
-                y: childNode.position.y - yChange + nodeOrigin[1] * (height - prevHeight),
-              };
-              childChanges.push(childNode);
+              childChanges.push({
+                model: childNode.model,
+                position: {
+                  x: childNode.position.x - xChange + nodeOrigin[0] * (width - prevWidth),
+                  y: childNode.position.y - yChange + nodeOrigin[1] * (height - prevHeight),
+                },
+              });
             }
           }
         }
 
         if (isWidthChange || isHeightChange) {
           change.width =
-            isWidthChange && (!resizeDirection || resizeDirection === 'horizontal') ? width : prevValues.width;
+            isWidthChange && (!resizeDirection || resizeDirection === 'horizontal') ? width : nextValues.width;
           change.height =
-            isHeightChange && (!resizeDirection || resizeDirection === 'vertical') ? height : prevValues.height;
-          prevValues.width = change.width;
-          prevValues.height = change.height;
+            isHeightChange && (!resizeDirection || resizeDirection === 'vertical') ? height : nextValues.height;
+          nextValues.width = change.width;
+          nextValues.height = change.height;
         }
 
         const direction = getResizeDirection({
-          width: prevValues.width,
+          width: nextValues.width,
           prevWidth,
-          height: prevValues.height,
+          height: nextValues.height,
           prevHeight,
           affectsX: controlDirection.affectsX,
           affectsY: controlDirection.affectsY,
         });
 
-        const nextValues = { ...prevValues, direction };
+        const params = { ...nextValues, direction };
 
-        const callResize = shouldResize?.(event, nextValues);
+        const callResize = shouldResize?.(event, params);
 
         if (callResize === false) {
           return;
         }
+        prevValues = nextValues;
+        if (childChanges.length) childNodes = childChanges;
         resizeDetected = true;
 
-        onResize?.(event, nextValues);
+        onResize?.(event, params);
         onChange(change, childChanges);
       })
       .on('end', (event: ResizeDragEvent) => {

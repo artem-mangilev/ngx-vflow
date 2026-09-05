@@ -1,6 +1,5 @@
 import { ChangeDetectionStrategy, Component, effect, ElementRef, inject, input, Renderer2 } from '@angular/core';
 import { ViewportService } from '../../services/viewport.service';
-import { PreviewFlowRenderStrategyService } from '../../services/preview-flow-render-strategy.service';
 import { drawNode } from './draw-node';
 import { NodeRenderingService } from '../../services/node-rendering.service';
 
@@ -12,7 +11,6 @@ import { NodeRenderingService } from '../../services/node-rendering.service';
 })
 export class PreviewFlowComponent {
   private viewportService = inject(ViewportService);
-  private renderStrategy = inject(PreviewFlowRenderStrategyService);
   private nodeRenderingService = inject(NodeRenderingService);
   private renderer2 = inject(Renderer2);
 
@@ -59,7 +57,7 @@ export class PreviewFlowComponent {
       for (let i = 0; i < this.nodeRenderingService.viewportNodes().length; i++) {
         const node = this.nodeRenderingService.viewportNodes()[i];
 
-        if (this.renderStrategy.shouldRenderNode(node)) {
+        if (!node.isVisible()) {
           drawNode(this.ctx, node);
         }
       }

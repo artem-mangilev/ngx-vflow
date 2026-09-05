@@ -1,4 +1,5 @@
 import {
+  AfterViewInit,
   ChangeDetectionStrategy,
   Component,
   ElementRef,
@@ -54,7 +55,7 @@ export type HandleState = 'valid' | 'invalid' | 'idle';
     AsyncPipe,
   ],
 })
-export class NodeComponent implements OnInit, OnDestroy {
+export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
   protected injector = inject(Injector);
   private handleService = inject(HandleService);
   private draggableService = inject(DraggableService);
@@ -104,8 +105,14 @@ export class NodeComponent implements OnInit, OnDestroy {
     );
   }
 
+  public ngAfterViewInit(): void {
+    this.model().virtualized.set(false);
+  }
+
   public ngOnDestroy(): void {
+    this.model().virtualized.set(this.flowSettingsService.optimization().virtualization);
     this.model().isVisible.set(false);
+    this.model().nodeElement.set(null);
 
     this.draggableService.destroy(this.hostRef.nativeElement);
   }

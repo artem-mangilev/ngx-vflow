@@ -3,6 +3,7 @@ import { EdgeLabelPosition } from './edge-label.interface';
 import { Edge } from './edge.interface';
 import { Node } from './node.interface';
 import { Point } from './point.interface';
+import { Rect } from './rect';
 
 export interface CurveFactorySharedParams {
   /** Starting point coordinates of the curve */
@@ -62,6 +63,8 @@ export interface CurveLayout {
    * (d attribute - https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Attribute/d)
    * */
   path: string;
+  /** Conservative flow-space bounds for virtualization. Omit to measure custom paths using SVG. */
+  bounds?: Rect;
   /** Optional points for label placement along the curve */
   labelPoints?: { [key in EdgeLabelPosition]: Point };
 }

@@ -3,9 +3,9 @@
 
 The library supports **virtualization**, which helps improve performance when rendering large numbers of nodes. When virtualization is enabled, an additional `canvas` layer is activated alongside the native HTML viewport and SVG edge layers.
 
-During viewport changes (zoom/pan), the canvas layer quickly renders lightweight **preview nodes** to ensure smooth interaction. Once the interaction ends, these previews are hydrated into full-featured native HTML nodes.
+Nodes outside the viewport are removed from the HTML layer. Edges whose path bounds are outside the viewport are also removed, while paths crossing the viewport remain eligible even when both endpoint nodes are outside it. Previously measured handles retain their geometry while their node is virtualized.
 
-To enable virtualization, set the `virtualization` flag in the `Optimization` interface. Additionally, you can use the `virtualizationZoomThreshold` property to specify the minimum zoom level at which previews should be rendered. This avoids rendering large numbers of full interactive nodes during viewport changes.
+To enable virtualization, set the `virtualization` flag in the `Optimization` interface. Below `virtualizationZoomThreshold`, only canvas node previews are shown; interactive nodes and SVG edges are hidden. Zooming back above the threshold restores the visible entities.
 
 > **Info**
 > It's important to note that a preview node is a simplified version of a real node. It is rendered on the canvas layer,

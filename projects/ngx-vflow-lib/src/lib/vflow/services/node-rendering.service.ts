@@ -32,10 +32,6 @@ export class NodeRenderingService {
     return this.nodes().filter((n) => !!n.children().length || isGroupNode(n));
   });
 
-  public readonly nonGroups = computed(() => {
-    return this.nodes().filter((n) => !this.groups().includes(n));
-  });
-
   public viewportNodes = computed(() => {
     const nodes = this.flowEntitiesService.nodes();
     const viewport = this.viewportService.readableViewport();

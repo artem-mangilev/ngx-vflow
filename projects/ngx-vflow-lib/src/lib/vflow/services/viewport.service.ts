@@ -76,7 +76,7 @@ export class ViewportService {
         this.entitiesService.nodes()
       : // Otherwise fit to specific nodes
         nodeIds
-          .map((nodeId) => this.entitiesService.nodes().find(({ rawNode }) => rawNode.id === nodeId))
+          .map((nodeId) => this.entitiesService.nodeByIdMap().get(nodeId))
           .filter((node): node is NodeModel => !!node);
   }
 }

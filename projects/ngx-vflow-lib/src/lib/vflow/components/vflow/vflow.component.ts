@@ -70,10 +70,6 @@ import { EdgeRenderingService } from '../../services/edge-rendering.service';
 import { getIntersectingNodes, getNodesAtPoint as findNodesAtPoint } from '../../utils/nodes';
 import { IntersectingNodesOptions } from '../../interfaces/intersecting-nodes-options.interface';
 import { PreviewFlowComponent } from '../preview-flow/preview-flow.component';
-import {
-  PreviewFlowRenderStrategyService,
-  ViewportPreviewFlowRenderStrategyService,
-} from '../../services/preview-flow-render-strategy.service';
 import { toLazySignal } from '../../utils/signals/to-lazy-signal';
 import { FlowRenderingService } from '../../services/flow-rendering.service';
 import { AlignmentHelperComponent } from '../alignment-helper/alignment-helper.component';
@@ -82,9 +78,6 @@ import { AutoPanDirective } from '../../directives/auto-pan.directive';
 import { ResizeObserverService } from '../../services/resize-observer.service';
 import { RequestAnimationFrameBatchingService } from '../../services/request-animation-frame-batching.service';
 import { NodeDragControllerDirective } from '../../directives/node-drag-controller.directive';
-import { HtmlElementCacheService } from '../../services/html-element-cache.service';
-import { SvgGraphicElementCacheService } from '../../services/svg-graphic-element-cache.service';
-import { BasicElementCacheService } from '../../services/basic-element-cache.service';
 import { SelectionBoxComponent } from '../selection-box/selection-box.component';
 import { SelectionBoxContextDirective } from '../../directives/selection-box-context.directive';
 import { SelectionBoxSettings } from '../../interfaces/selection-box-settings.interface';
@@ -134,12 +127,8 @@ const nodeDragControllerHostDirective = {
     ComponentEventBusService,
     KeyboardService,
     OverlaysService,
-    { provide: PreviewFlowRenderStrategyService, useClass: ViewportPreviewFlowRenderStrategyService },
     FlowRenderingService,
     ResizeObserverService,
-    HtmlElementCacheService,
-    BasicElementCacheService,
-    SvgGraphicElementCacheService,
     RequestAnimationFrameBatchingService,
   ],
   hostDirectives: [changesControllerHostDirective, nodeDragControllerHostDirective],

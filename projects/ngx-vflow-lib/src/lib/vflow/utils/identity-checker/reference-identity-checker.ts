@@ -11,9 +11,13 @@ export class ReferenceIdentityChecker {
     const oldNodesMap: Map<Node, NodeModel> = new Map();
     oldNodeModels.forEach((model) => oldNodesMap.set(model.rawNode, model));
 
-    return newNodes.map((newNode) => {
-      return oldNodesMap.get(newNode) ?? new NodeModel(newNode);
+    const models = newNodes.map((newNode) => {
+      const model = oldNodesMap.get(newNode) ?? new NodeModel(newNode);
+      oldNodesMap.delete(newNode);
+      return model;
     });
+    oldNodesMap.forEach((model) => model.destroy());
+    return models;
   }
 
   /**
@@ -23,9 +27,12 @@ export class ReferenceIdentityChecker {
     const oldEdgesMap: Map<Edge, EdgeModel> = new Map();
     oldEdgeModels.forEach((model) => oldEdgesMap.set(model.edge, model));
 
-    return newEdges.map((newEdge) => {
-      if (oldEdgesMap.has(newEdge)) return oldEdgesMap.get(newEdge)!;
-      else return new EdgeModel(newEdge);
+    const models = newEdges.map((newEdge) => {
+      const model = oldEdgesMap.get(newEdge) ?? new EdgeModel(newEdge);
+      oldEdgesMap.delete(newEdge);
+      return model;
     });
+    oldEdgesMap.forEach((model) => model.destroy());
+    return models;
   }
 }

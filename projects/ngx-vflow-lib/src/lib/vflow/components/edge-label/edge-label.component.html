@@ -1,14 +1,14 @@
 @if (model(); as model) {
   @if (model.edgeLabel.type === 'html-template' && htmlTemplate()) {
     @if (htmlTemplate(); as htmlTemplate) {
-      <div #edgeLabelWrapper class="edge-label-wrapper">
+      <div class="edge-label-wrapper">
         <ng-container *ngTemplateOutlet="htmlTemplate; context: getLabelContext()" />
       </div>
     }
   }
 
   @if (model.edgeLabel.type === 'default') {
-    <div #edgeLabelWrapper class="edge-label-wrapper" [style]="edgeLabelStyle()">
+    <div class="edge-label-wrapper" [style]="edgeLabelStyle()">
       {{ model.edgeLabel.text }}
     </div>
   }

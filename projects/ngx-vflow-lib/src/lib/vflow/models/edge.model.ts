@@ -12,13 +12,19 @@ import { hashCode } from '../utils/hash';
 import { Contextable } from '../interfaces/contextable.interface';
 import { EdgeContext } from '../interfaces/template-context.interface';
 import { HandleModel } from './handle.model';
-import { CurveFactoryParams } from '../interfaces/curve-factory.interface';
+import { CurveFactoryParams, CurveLayout } from '../interfaces/curve-factory.interface';
 import { FlowEntitiesService } from '../services/flow-entities.service';
 import { extendedComputed } from '../utils/signals/extended-computed';
 import { Marker } from '../interfaces/marker.interface';
 import { FlowSettingsService } from '../services/flow-settings.service';
+import { createModelInjector } from '../utils/model-injector';
+import { Observable } from 'rxjs';
+import { DOCUMENT } from '@angular/common';
+import { getSvgPathBounds } from '../utils/svg-path-bounds';
 
 export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
+  private modelInjector = createModelInjector();
+  private document = inject(DOCUMENT);
   private readonly flowEntitiesService = inject(FlowEntitiesService);
   private readonly settingsService = inject(FlowSettingsService);
 
@@ -54,7 +60,7 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
   public edgeLabels = signal<{ [position in EdgeLabelPosition]?: EdgeLabel }>(EDGE_DEFAULTS.edgeLabels);
 
   public selected = signal(EDGE_DEFAULTS.selected);
-  public selected$ = toObservable(this.selected);
+  public selected$: Observable<boolean>;
   public preselected = signal(false);
   public selectable = computed(() => this.edge.selectable?.() ?? this.settingsService.edgesSelectable());
   public focusable = computed(() => this.edge.focusable?.() ?? this.settingsService.edgesFocusable());
@@ -71,27 +77,12 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
       return true;
     }
 
-    let existsSourceHandle = false;
-    let existsTargetHandle = false;
-
-    if (this.edge.sourceHandle) {
-      existsSourceHandle = !!source.handles().find((handle) => handle.rawHandle.id === this.edge.sourceHandle);
-    } else {
-      existsSourceHandle = !!source.handles().find((handle) => handle.rawHandle.type === 'source');
-    }
-
-    if (this.edge.targetHandle) {
-      existsTargetHandle = !!target.handles().find((handle) => handle.rawHandle.id === this.edge.targetHandle);
-    } else {
-      existsTargetHandle = !!target.handles().find((handle) => handle.rawHandle.type === 'target');
-    }
-
-    return !existsSourceHandle || !existsTargetHandle;
+    return !this.sourceHandle() || !this.targetHandle();
   });
 
-  public detached$ = toObservable(this.detached);
+  public detached$ = toObservable(this.detached, { injector: this.modelInjector });
 
-  public path = computed(() => {
+  public path = computed<CurveLayout>(() => {
     const source = this.sourceHandle();
     const target = this.targetHandle();
 
@@ -117,6 +108,11 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
     }
   });
 
+  public bounds = computed(() => {
+    const layout = this.path();
+    return layout.path ? (layout.bounds ?? getSvgPathBounds(this.document, layout.path)) : null;
+  });
+
   public sourceHandle = extendedComputed<HandleModel | null>((previousHandle) => {
     let handle: HandleModel | null = null;
 
@@ -136,11 +132,7 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
       }
     }
 
-    // In case of virtual scrolling, if the node is scrolled out of view the handle may disappear
-    // which could lead to the edge not being rendered
-    // so we return the previous handle if the current one is null
-    // TODO: check if this breaks anything
-    if (handle === null) {
+    if (handle === null && this.source()?.virtualized() && previousHandle?.parentNode === this.source()) {
       return previousHandle;
     }
 
@@ -166,11 +158,7 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
       }
     }
 
-    // In case of virtual scrolling, if the node is scrolled out of view the handle may disappear
-    // which could lead to the edge not being rendered
-    // so we return the previous handle if the current one is null
-    // TODO: check if this breaks anything
-    if (handle === null) {
+    if (handle === null && this.target()?.virtualized() && previousHandle?.parentNode === this.target()) {
       return previousHandle;
     }
 
@@ -293,7 +281,11 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
       },
     };
 
-    this.selected$ = toObservable(this.selected);
+    this.selected$ = toObservable(this.selected, { injector: this.modelInjector });
+  }
+
+  public destroy() {
+    this.modelInjector.destroy();
   }
 
   private getPathFactoryParams(source: HandleModel, target: HandleModel): CurveFactoryParams {

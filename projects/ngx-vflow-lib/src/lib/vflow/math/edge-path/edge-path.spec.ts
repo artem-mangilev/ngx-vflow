@@ -6,6 +6,7 @@ describe('edge path utilities', () => {
   it('builds a straight path with label positions', () => {
     expect(getStraightPath({ sourcePoint: { x: 0, y: 0 }, targetPoint: { x: 100, y: 50 } })).toEqual({
       path: 'M 0,0L 100,50',
+      bounds: { x: 0, y: 0, width: 100, height: 50 },
       labelPoints: {
         start: { x: 15, y: 7.5 },
         center: { x: 50, y: 25 },
