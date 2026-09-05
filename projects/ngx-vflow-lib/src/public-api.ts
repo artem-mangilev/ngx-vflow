@@ -1,9 +1,19 @@
 // Standalone Util
 export * from './lib/vflow/vflow';
+export * from './lib/vflow/utils/graph';
+export * from './lib/vflow/utils/graph-operations';
+export * from './lib/vflow/utils/coordinates';
+export { getViewportForBounds } from './lib/vflow/utils/viewport';
+export { getStraightPath } from './lib/vflow/math/edge-path/straigh-path';
+export { getBezierPath } from './lib/vflow/math/edge-path/bezier-path';
+export { getSmoothStepPath } from './lib/vflow/math/edge-path/smooth-step-path';
 
 // Interfaces
+export * from './lib/vflow/interfaces/aria-label-config.interface';
+export * from './lib/vflow/interfaces/dom-attributes.interface';
 export * from './lib/vflow/interfaces/node.interface';
 export * from './lib/vflow/interfaces/point.interface';
+export * from './lib/vflow/interfaces/rect';
 export * from './lib/vflow/interfaces/edge.interface';
 export * from './lib/vflow/interfaces/edge-label.interface';
 export * from './lib/vflow/interfaces/connection.interface';
@@ -19,6 +29,7 @@ export * from './lib/vflow/interfaces/curve-factory.interface';
 export * from './lib/vflow/interfaces/node-preview.interface';
 export * from './lib/vflow/interfaces/alignment-helper-settings.interface';
 export * from './lib/vflow/interfaces/selection-box-settings.interface';
+export { HandleContext } from './lib/vflow/interfaces/template-context.interface';
 export {
   ConnectEndEvent,
   ConnectStartEvent,
@@ -42,6 +53,8 @@ export * from './lib/vflow/components/vflow/vflow.component';
 export * from './lib/vflow/public-components/handle/handle.component';
 export * from './lib/vflow/public-components/custom-node/custom-node.component';
 export * from './lib/vflow/public-components/resizable/resizable.component';
+export * from './lib/vflow/public-components/resizable/node-resize-control.component';
+export * from './lib/vflow/public-components/resizable/resizer-types';
 export * from './lib/vflow/public-components/minimap/minimap.component';
 export * from './lib/vflow/public-components/node-toolbar/node-toolbar.component';
 export * from './lib/vflow/public-components/custom-template-edge/custom-template-edge.component';
@@ -70,3 +83,7 @@ export { NodeRenderingService as ɵNodeRenderingService } from './lib/vflow/serv
 
 export { RootPointerDirective as ɵRootPointerDirective } from './lib/vflow/directives/root-pointer.directive';
 export { SpacePointContextDirective as ɵSpacePointContextDirective } from './lib/vflow/directives/space-point-context.directive';
+
+export * from './lib/vflow/directives/gesture-exclusions.directive';
+
+export * from './lib/vflow/interfaces/auto-pan-settings.interface';

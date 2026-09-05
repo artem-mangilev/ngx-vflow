@@ -45,11 +45,15 @@ export class ViewportService {
 
   public fitView(options: FitViewOptions = { padding: 0.1, duration: 0, nodes: [] }) {
     const nodes = this.getBoundsNodes(options.nodes ?? []);
+    const width = this.flowSettingsService.computedFlowWidth();
+    const height = this.flowSettingsService.computedFlowHeight();
+
+    if (!nodes.length || width <= 0 || height <= 0) return;
 
     const state = getViewportForBounds(
       getNodesFlowBounds(nodes),
-      this.flowSettingsService.computedFlowWidth(),
-      this.flowSettingsService.computedFlowHeight(),
+      width,
+      height,
       this.flowSettingsService.minZoom(),
       this.flowSettingsService.maxZoom(),
       options.padding ?? 0.1,

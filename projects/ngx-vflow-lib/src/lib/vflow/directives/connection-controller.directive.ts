@@ -1,4 +1,6 @@
-import { Directive, computed, inject } from '@angular/core';
+import { FlowSettingsService } from '../services/flow-settings.service';
+import { eventClientPoint, isTouchEvent } from '../utils/event';
+import { DestroyRef, Directive, computed, inject } from '@angular/core';
 import { Connection } from '../interfaces/connection.interface';
 import {
   FlowStatusConnectionReleaseValidated,
@@ -39,6 +41,41 @@ import {
   standalone: true,
 })
 export class ConnectionControllerDirective {
+  private settings = inject(FlowSettingsService);
+  private destroyRef = inject(DestroyRef);
+  private pendingDrag?: AbortController;
+
+  constructor() {
+    this.destroyRef.onDestroy(() => this.pendingDrag?.abort());
+  }
+
+  private afterDragThreshold(event: Event | undefined, start: () => void) {
+    this.pendingDrag?.abort();
+    const threshold = this.settings.connectionDragThreshold();
+    if (!event || threshold === 0) {
+      start();
+      return;
+    }
+    if (!(event instanceof MouseEvent) && !isTouchEvent(event)) return;
+    const origin = eventClientPoint(event);
+    const pending = (this.pendingDrag = new AbortController());
+    const options = { signal: pending.signal, capture: true, passive: false };
+    const move = (next: MouseEvent | TouchEvent) => {
+      if (isTouchEvent(next)) next.preventDefault();
+      const point = eventClientPoint(next);
+      if (Math.hypot(point.x - origin.x, point.y - origin.y) > threshold) {
+        pending.abort();
+        start();
+      }
+    };
+    document.addEventListener('mousemove', move, options);
+    document.addEventListener('touchmove', move, options);
+    for (const type of ['mouseup', 'touchend', 'touchcancel']) {
+      document.addEventListener(type, () => pending.abort(), options);
+    }
+    window.addEventListener('blur', () => pending.abort(), options);
+  }
+
   private statusService = inject(FlowStatusService);
   private flowEntitiesService = inject(FlowEntitiesService);
 
@@ -142,12 +179,20 @@ export class ConnectionControllerDirective {
 
   protected isStrictMode = computed(() => this.flowEntitiesService.connection().mode === 'strict');
 
-  public startConnection(handle: HandleModel) {
-    this.statusService.setConnectionStartStatus(handle.parentNode, handle);
+  public startConnection(handle: HandleModel, event?: Event) {
+    if (!handle.canStart()) {
+      return;
+    }
+
+    this.afterDragThreshold(event, () => {
+      if (handle.canStart()) this.statusService.setConnectionStartStatus(handle.parentNode, handle);
+    });
   }
 
-  public startReconnection(handle: HandleModel, oldEdge: EdgeModel) {
-    this.statusService.setReconnectionStartStatus(handle.parentNode, handle, oldEdge);
+  public startReconnection(handle: HandleModel, oldEdge: EdgeModel, event?: Event) {
+    this.afterDragThreshold(event, () =>
+      this.statusService.setReconnectionStartStatus(handle.parentNode, handle, oldEdge),
+    );
   }
 
   public validateConnection(handle: HandleModel) {
@@ -160,30 +205,33 @@ export class ConnectionControllerDirective {
       let target = handle.parentNode;
       let sourceHandle = status.payload.sourceHandle;
       let targetHandle = handle;
+      let valid = false;
 
-      if (this.isStrictMode()) {
-        // swap direction (if needed) according to actual source and target of strict mode
-        const adjusted = adjustDirection({
-          source: status.payload.source,
-          sourceHandle: status.payload.sourceHandle,
-          target: handle.parentNode,
-          targetHandle: handle,
+      if (handle.canAccept()) {
+        if (this.isStrictMode()) {
+          // swap direction (if needed) according to actual source and target of strict mode
+          const adjusted = adjustDirection({
+            source: status.payload.source,
+            sourceHandle: status.payload.sourceHandle,
+            target: handle.parentNode,
+            targetHandle: handle,
+          });
+
+          source = adjusted.source;
+          target = adjusted.target;
+          sourceHandle = adjusted.sourceHandle;
+          targetHandle = adjusted.targetHandle;
+        }
+
+        valid = this.flowEntitiesService.connection().validator({
+          source: source.rawNode.id,
+          target: target.rawNode.id,
+          sourceHandle: sourceHandle.rawHandle.id,
+          targetHandle: targetHandle.rawHandle.id,
+          sourceHandleType: sourceHandle.rawHandle.type,
+          targetHandleType: targetHandle.rawHandle.type,
         });
-
-        source = adjusted.source;
-        target = adjusted.target;
-        sourceHandle = adjusted.sourceHandle;
-        targetHandle = adjusted.targetHandle;
       }
-
-      const valid = this.flowEntitiesService.connection().validator({
-        source: source.rawNode.id,
-        target: target.rawNode.id,
-        sourceHandle: sourceHandle.rawHandle.id,
-        targetHandle: targetHandle.rawHandle.id,
-        sourceHandleType: sourceHandle.rawHandle.type,
-        targetHandleType: targetHandle.rawHandle.type,
-      });
 
       // TODO: check how react flow handles highlight of handle
       // if direction changes
@@ -238,6 +286,14 @@ export class ConnectionControllerDirective {
       const sourceHandle = status.payload.sourceHandle;
       const target = status.payload.target;
       const targetHandle = status.payload.targetHandle;
+
+      if (!targetHandle.canAccept()) {
+        isReconnection
+          ? this.statusService.setReconnectionDroppedStatus(source, sourceHandle, status.payload.oldEdge)
+          : this.statusService.setConnectionDroppedStatus(source, sourceHandle);
+
+        return;
+      }
 
       isReconnection
         ? this.statusService.setReconnectionReleaseStatus(

@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import { Connection, ConnectionSettings, Edge, Node, Vflow } from 'ngx-vflow';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { Connection, ConnectionSettings, Edge, Node, Vflow, addEdges, createNodes } from 'ngx-vflow';
 
 @Component({
   template: `<vflow
@@ -20,20 +20,20 @@ import { Connection, ConnectionSettings, Edge, Node, Vflow } from 'ngx-vflow';
   imports: [Vflow],
 })
 export class ConnectionValidationDemoComponent {
-  public nodes: Node[] = [
+  public nodes: Node[] = createNodes([
     {
       id: '1',
-      point: signal({ x: 100, y: 100 }),
+      point: { x: 100, y: 100 },
       type: 'default',
-      text: signal(`1`),
+      text: `1`,
     },
     {
       id: '2',
-      point: signal({ x: 200, y: 200 }),
+      point: { x: 200, y: 200 },
       type: 'default',
-      text: signal(`2`),
+      text: `2`,
     },
-  ];
+  ]);
 
   public edges: Edge[] = [];
 
@@ -41,14 +41,7 @@ export class ConnectionValidationDemoComponent {
     validator: (connection) => connection.source === '1' && connection.target === '2',
   };
 
-  public createEdge({ source, target }: Connection) {
-    this.edges = [
-      ...this.edges,
-      {
-        id: `${source} -> ${target}`,
-        source,
-        target,
-      },
-    ];
+  public createEdge(connection: Connection) {
+    this.edges = addEdges([{ id: crypto.randomUUID(), ...connection }], { nodes: this.nodes, edges: this.edges });
   }
 }

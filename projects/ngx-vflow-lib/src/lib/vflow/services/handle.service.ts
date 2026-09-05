@@ -1,4 +1,4 @@
-import { Injectable, TemplateRef, inject, signal } from '@angular/core';
+import { Injectable, Signal, TemplateRef, inject, signal } from '@angular/core';
 import { Position } from '../types/position.type';
 import { HandleType } from '../types/handle-type.type';
 import { NodeModel } from '../models/node.model';
@@ -13,6 +13,8 @@ export interface NodeHandle {
   id?: string;
   hostReference?: Element;
   template?: TemplateRef<any> | null;
+  canStart?: Signal<boolean>;
+  canAccept?: Signal<boolean>;
 }
 
 @Injectable()

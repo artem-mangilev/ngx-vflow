@@ -1,3 +1,9 @@
+import {
+  NoDragDirective,
+  NoPanDirective,
+  NoWheelDirective,
+  NoKeyboardDirective,
+} from './directives/gesture-exclusions.directive';
 import { VflowComponent } from './components/vflow/vflow.component';
 
 import { DragHandleDirective } from './directives/drag-handle.directive';
@@ -9,7 +15,6 @@ import {
   GroupNodeTemplateDirective,
   HandleTemplateDirective,
   NodeHtmlTemplateDirective,
-  NodeSvgTemplateDirective,
 } from './directives/template.directive';
 import { ConnectionControllerDirective } from './directives/connection-controller.directive';
 
@@ -20,6 +25,10 @@ import { HandleComponent } from './public-components/handle/handle.component';
 import { CustomTemplateEdgeComponent } from './public-components/custom-template-edge/custom-template-edge.component';
 
 export const Vflow = [
+  NoKeyboardDirective,
+  NoDragDirective,
+  NoPanDirective,
+  NoWheelDirective,
   VflowComponent,
   HandleComponent,
   ResizableComponent,
@@ -31,7 +40,6 @@ export const Vflow = [
   ConnectionControllerDirective,
 
   NodeHtmlTemplateDirective,
-  NodeSvgTemplateDirective,
   GroupNodeTemplateDirective,
   EdgeLabelHtmlTemplateDirective,
   EdgeTemplateDirective,

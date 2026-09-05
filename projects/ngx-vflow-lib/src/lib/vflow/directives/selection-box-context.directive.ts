@@ -19,7 +19,7 @@ const minSelectionSize = 2;
 
 @Directive({
   standalone: true,
-  selector: 'g[selectionBoxContext]',
+  selector: 'div[selectionBoxContext]',
 })
 export class SelectionBoxContextDirective {
   private flowEntitiesService = inject(FlowEntitiesService);
@@ -33,12 +33,12 @@ export class SelectionBoxContextDirective {
 
   protected startSub = this.rootPointer.pointerStart$
     .pipe(
-      filter(() => this.flowSettingsService.entitiesSelectable()),
+      filter(() => this.flowSettingsService.selectionMode() !== 'manual'),
       filter(() => this.keyboardService.isActiveAction('selection')),
       tap(({ x, y, originalEvent }) => {
         originalEvent.preventDefault();
         this.clearPreselection();
-        const point = this.documentPointToFlowPoint({ x, y });
+        const point = this.clientToFlowPosition({ x, y });
         this.model.setStart(point);
       }),
       takeUntilDestroyed(),
@@ -49,7 +49,7 @@ export class SelectionBoxContextDirective {
     .pipe(
       filter(() => this.model.active()),
       tap((event) => {
-        const point = this.documentPointToFlowPoint({ x: event.x, y: event.y });
+        const point = this.clientToFlowPosition({ x: event.x, y: event.y });
         this.model.setEnd(point);
         this.updatePreselection();
       }),
@@ -78,6 +78,12 @@ export class SelectionBoxContextDirective {
       return;
     }
 
+    if (this.flowSettingsService.selectionMode() === 'manual') {
+      this.clearPreselection();
+      this.model.reset();
+      return;
+    }
+
     const nodes = this.flowEntitiesService.nodes();
     const edges = this.flowEntitiesService.edges();
     const entities = this.flowEntitiesService.entities();
@@ -93,8 +99,8 @@ export class SelectionBoxContextDirective {
     this.model.reset();
   }
 
-  private documentPointToFlowPoint(documentPoint: Point): Point {
-    return this.spacePointContext.documentPointToFlowPoint(documentPoint);
+  private clientToFlowPosition(point: Point): Point {
+    return this.spacePointContext.clientToFlowPosition(point);
   }
 
   private getSelectionRect(): Rect | null {
@@ -122,11 +128,11 @@ export class SelectionBoxContextDirective {
     }
 
     this.flowEntitiesService.nodes().forEach((node) => {
-      node.preselected.set(this.isNodeInside(node, rect));
+      node.preselected.set(node.selectable() && this.isNodeInside(node, rect));
     });
 
     this.flowEntitiesService.edges().forEach((edge) => {
-      edge.preselected.set(this.isEdgeInside(edge, rect));
+      edge.preselected.set(edge.selectable() && this.isEdgeInside(edge, rect));
     });
   }
 

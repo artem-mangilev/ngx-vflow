@@ -3,7 +3,7 @@ import { inject, Injectable, NgZone, OnDestroy } from '@angular/core';
 @Injectable()
 export class ResizeObserverService implements OnDestroy {
   private zone = inject(NgZone);
-  private readonly thingsToObserve: Map<Element, [(resizeEntry: ResizeObserverEntry) => void]> = new Map();
+  private readonly thingsToObserve = new Map<Element, Set<(resizeEntry: ResizeObserverEntry) => void>>();
 
   private resizeObserver: ResizeObserver;
 
@@ -13,7 +13,7 @@ export class ResizeObserverService implements OnDestroy {
         for (const entry of entries) {
           const callbacks = this.thingsToObserve.get(entry.target);
           if (callbacks !== undefined) {
-            callbacks.forEach((c) => c(entry));
+            callbacks.forEach((callback) => callback(entry));
           }
         }
       });
@@ -23,17 +23,28 @@ export class ResizeObserverService implements OnDestroy {
   public addObserver(element: Element, callback: (resizeEntry: ResizeObserverEntry) => void) {
     const callbacks = this.thingsToObserve.get(element);
     if (callbacks === undefined) {
-      this.thingsToObserve.set(element, [callback]);
+      this.thingsToObserve.set(element, new Set([callback]));
+      this.resizeObserver.observe(element);
     } else {
-      callbacks.push(callback);
+      callbacks.add(callback);
     }
-
-    this.resizeObserver.observe(element);
   }
 
-  public removeObserver(element: Element) {
-    this.thingsToObserve.delete(element);
-    if (this.resizeObserver) {
+  public removeObserver(element: Element, callback?: (resizeEntry: ResizeObserverEntry) => void) {
+    const callbacks = this.thingsToObserve.get(element);
+
+    if (!callbacks) {
+      return;
+    }
+
+    if (callback) {
+      callbacks.delete(callback);
+    } else {
+      callbacks.clear();
+    }
+
+    if (callbacks.size === 0) {
+      this.thingsToObserve.delete(element);
       this.resizeObserver.unobserve(element);
     }
   }

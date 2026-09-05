@@ -13,7 +13,6 @@ import {
 import { EdgeLabelModel } from '../../models/edge-label.model';
 import { EdgeModel } from '../../models/edge.model';
 import { NgTemplateOutlet } from '@angular/common';
-import { MAGIC_NUMBER_TO_FIX_GLITCH_IN_CHROME } from '../../constants/magic-number-to-fix-glitch-in-chrome.constant';
 import { FlowSettingsService } from '../../services/flow-settings.service';
 import { HtmlEdgeLabelContext } from '../../interfaces/template-context.interface';
 import { HtmlTemplateEdgeLabel } from '../../interfaces/edge-label.interface';
@@ -22,22 +21,27 @@ import { RequestAnimationFrameBatchingService } from '../../services/request-ani
 import { BasicElementCacheService } from '../../services/basic-element-cache.service';
 
 @Component({
-  selector: 'g[edgeLabel]',
+  selector: 'div[edgeLabel]',
   templateUrl: './edge-label.component.html',
   styles: [
     `
+      :host {
+        position: absolute;
+        top: 0;
+        left: 0;
+        transform-origin: 0 0;
+        pointer-events: none;
+      }
+
       .edge-label-wrapper {
         width: max-content;
-
-        /*
-        this is a fix for bug in chrome, for some reason if the div fully matches the size
-        of foreignObject there are occurs some visual artifacts around this div
-       */
-        margin-top: 1px;
-        margin-left: 1px;
+        pointer-events: all;
       }
     `,
   ],
+  host: {
+    '[style.transform]': 'transform()',
+  },
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [NgTemplateOutlet],
 })
@@ -46,6 +50,7 @@ export class EdgeLabelComponent implements AfterViewInit, OnDestroy {
   private resizeObserverService = inject(ResizeObserverService);
   private basicElementCacheService = inject(BasicElementCacheService);
   private requestAnimationFrameBatchService = inject(RequestAnimationFrameBatchingService);
+  private readonly resizeCallback = () => this.updateModelSize();
 
   // TODO: too many inputs
   public model = input.required<EdgeLabelModel>();
@@ -72,6 +77,12 @@ export class EdgeLabelComponent implements AfterViewInit, OnDestroy {
       x: point.x - width / 2,
       y: point.y - height / 2,
     };
+  });
+
+  protected transform = computed(() => {
+    const { x, y } = this.edgeLabelPoint();
+
+    return `translate(${x}px, ${y}px)`;
   });
 
   protected edgeLabelStyle = computed(() => {
@@ -102,9 +113,7 @@ export class EdgeLabelComponent implements AfterViewInit, OnDestroy {
     const labelElement = this.edgeLabelWrapperRef().nativeElement;
     this.basicElementCacheService.addElementCache(labelElement);
 
-    this.resizeObserverService.addObserver(labelElement, () => {
-      this.updateModelSize();
-    });
+    this.resizeObserverService.addObserver(labelElement, this.resizeCallback);
 
     //force run the first time since previous implementation used startWith(null) to force a first initialization
     //inside animation frame callback otherwise we ngAfterViewInit calls in between each edge label create
@@ -116,7 +125,7 @@ export class EdgeLabelComponent implements AfterViewInit, OnDestroy {
   public ngOnDestroy(): void {
     const labelElement = this.edgeLabelWrapperRef().nativeElement;
     this.basicElementCacheService.removeElementCache(labelElement);
-    this.resizeObserverService.removeObserver(labelElement);
+    this.resizeObserverService.removeObserver(labelElement, this.resizeCallback);
   }
 
   // TODO: move to model with Contextable interface
@@ -133,8 +142,8 @@ export class EdgeLabelComponent implements AfterViewInit, OnDestroy {
     const labelElement = this.edgeLabelWrapperRef().nativeElement;
     this.basicElementCacheService.markCacheAsDirty();
     const labelData = this.basicElementCacheService.getElementData(labelElement);
-    const width = labelData.clientWidth + MAGIC_NUMBER_TO_FIX_GLITCH_IN_CHROME;
-    const height = labelData.clientHeight + MAGIC_NUMBER_TO_FIX_GLITCH_IN_CHROME;
+    const width = labelData.clientWidth;
+    const height = labelData.clientHeight;
     this.model().size.set({ width, height });
   }
 }

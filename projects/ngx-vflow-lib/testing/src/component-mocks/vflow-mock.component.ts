@@ -13,7 +13,6 @@ import { NgTemplateOutlet } from '@angular/common';
 import {
   Node,
   Edge,
-  SpacePoint,
   Point,
   Background,
   KeyboardShortcuts,
@@ -29,6 +28,8 @@ import {
   AlignmentHelperSettings,
   SelectionMode,
   SelectionBoxSettings,
+  AutoPanSettings,
+  AriaLabelConfig,
 } from 'ngx-vflow';
 import { toObservable } from '@angular/core/rxjs-interop';
 import {
@@ -135,6 +136,7 @@ import { AsInterface } from '../types';
   imports: [NgTemplateOutlet],
 })
 export class VflowMockComponent implements AsInterface<VflowComponent>, OnInit {
+  @Input() public ariaLabelConfig: Partial<AriaLabelConfig> = {};
   @Input({ required: true })
   public readonly nodes!: Node[];
 
@@ -157,7 +159,16 @@ export class VflowMockComponent implements AsInterface<VflowComponent>, OnInit {
   public readonly optimization = DEFAULT_OPTIMIZATION;
 
   @Input()
-  public readonly entitiesSelectable = true;
+  public readonly nodesSelectable = true;
+
+  @Input()
+  public readonly edgesSelectable = true;
+
+  @Input()
+  public readonly nodesFocusable = true;
+
+  @Input()
+  public readonly edgesFocusable = true;
 
   @Input()
   public readonly selectionMode: SelectionMode = 'default';
@@ -167,6 +178,15 @@ export class VflowMockComponent implements AsInterface<VflowComponent>, OnInit {
     mode: 'full',
     color: '#bbe1fa',
   };
+
+  @Input() public zoomOnScroll = true;
+  @Input() public zoomOnPinch = true;
+  @Input() public zoomOnDoubleClick = false;
+  @Input() public panOnDrag: boolean | number[] = true;
+  @Input() public panOnScroll = false;
+  @Input() public paneClickDistance = 6;
+  @Input() public nodeDragThreshold = 0;
+  @Input() public connectionDragThreshold = 0;
 
   @Input()
   public readonly keyboardShortcuts: KeyboardShortcuts = {
@@ -188,7 +208,9 @@ export class VflowMockComponent implements AsInterface<VflowComponent>, OnInit {
   public elevateEdgesOnSelect!: boolean;
 
   @Input()
-  public autoPan = true;
+  public autoPan: boolean | AutoPanSettings = true;
+
+  @Input() public autoPanOnNodeFocus = true;
 
   public alignmentHelper = input<boolean | AlignmentHelperSettings>(false);
 
@@ -238,30 +260,21 @@ export class VflowMockComponent implements AsInterface<VflowComponent>, OnInit {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public fitView(options?: FitViewOptions): void {}
 
-  public documentPointToFlowPoint(point: Point, options?: { spaces: false }): Point;
-  public documentPointToFlowPoint(point: Point, options: { spaces: true }): SpacePoint[];
-  public documentPointToFlowPoint(point: Point, options?: { spaces: boolean }): unknown {
-    if (options?.spaces) {
-      return [
-        {
-          nodeId: null,
-          x: point.x,
-          y: point.y,
-        },
-      ];
-    }
-
+  public clientToFlowPosition(point: Point): Point {
     return point;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public getIntesectingNodes(nodeId: string, options?: IntersectingNodesOptions): Node[] {
+  public flowToClientPosition(point: Point): Point {
+    return point;
+  }
+
+  public getNodesAtPoint<T = unknown>(): Array<Node<T> & { nodeSpacePoint: Point }> {
     return [];
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public toNodeSpace(nodeId: string, spaceNodeId: string): Point {
-    return { x: 0, y: 0 };
+  public getIntersectingNodes(nodeId: string, options?: IntersectingNodesOptions): Node[] {
+    return [];
   }
 
   public getNode<T = unknown>(id: string): Node<T> | undefined {

@@ -23,8 +23,6 @@ export interface ViewportForSelection {
 
 @Injectable()
 export class SelectionService {
-  private static delta = 6;
-
   private flowEntitiesService = inject(FlowEntitiesService);
   private keyboardService = inject(KeyboardService);
   private flowSettingsService = inject(FlowSettingsService);
@@ -43,7 +41,7 @@ export class SelectionService {
       tap(({ start, end, target }) => {
         if (start && end && target) {
           this.currentStrategy().handleViewportChange(
-            { start, end, target, delta: SelectionService.delta },
+            { start, end, target, delta: this.flowSettingsService.paneClickDistance() },
             {
               entities: this.flowEntitiesService.entities(),
               isMultiSelectionActive: this.keyboardService.isActiveAction('multiSelection'),
@@ -64,5 +62,16 @@ export class SelectionService {
       entities: this.flowEntitiesService.entities(),
       isMultiSelectionActive: this.keyboardService.isActiveAction('multiSelection'),
     });
+  }
+
+  public selectFromKeyboard(entity: FlowEntity | null, toggle: boolean) {
+    if (this.flowSettingsService.selectionMode() === 'manual') return;
+    // Denying selection acquisition must still allow deselection.
+    if (entity && !entity.selectable() && !(toggle && entity.selected())) return;
+    if (entity && toggle) {
+      entity.selected.set(!entity.selected());
+    } else {
+      this.flowEntitiesService.entities().forEach((item) => item.selected.set(item === entity));
+    }
   }
 }

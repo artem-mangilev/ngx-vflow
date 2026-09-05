@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, WritableSignal, inject, signal } from '@angular/core';
-import { CurveFactory, CurveFactoryParams, Edge, Node, Point, Vflow } from 'ngx-vflow';
+import { CurveFactory, CurveFactoryParams, Edge, Node, Point, Vflow, createNodes } from 'ngx-vflow';
 
 interface RopeCurveEdgeData {
   ropeState: {
@@ -51,20 +51,20 @@ const ropeCurve = createRopeCurveFactory();
   imports: [Vflow],
 })
 export class RopeCurveDemoComponent {
-  public nodes: Node[] = [
+  public nodes: Node[] = createNodes([
     {
       id: 'left',
-      point: signal({ x: 90, y: 180 }),
+      point: { x: 90, y: 180 },
       type: 'default',
-      text: signal('Left node'),
+      text: 'Left node',
     },
     {
       id: 'right',
-      point: signal({ x: 470, y: 130 }),
+      point: { x: 470, y: 130 },
       type: 'default',
-      text: signal('Right node'),
+      text: 'Right node',
     },
-  ];
+  ]);
 
   public edges: Edge<RopeCurveEdgeData>[] = [
     {

@@ -1,0 +1,39 @@
+:host {
+  display: contents;
+}
+
+.handle {
+  position: absolute;
+  pointer-events: all;
+}
+
+.handle--default {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  background: #1b262c;
+}
+
+.handle--left {
+  transform: translate(-50%, -50%) translate(var(--vflow-handle-offset-x, 0px), var(--vflow-handle-offset-y, 0px));
+}
+
+.handle--right {
+  transform: translate(50%, -50%) translate(var(--vflow-handle-offset-x, 0px), var(--vflow-handle-offset-y, 0px));
+}
+
+.handle--top {
+  transform: translate(-50%, -50%) translate(var(--vflow-handle-offset-x, 0px), var(--vflow-handle-offset-y, 0px));
+}
+
+.handle--bottom {
+  transform: translate(-50%, 50%) translate(var(--vflow-handle-offset-x, 0px), var(--vflow-handle-offset-y, 0px));
+}
+
+.magnet {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: all;
+}

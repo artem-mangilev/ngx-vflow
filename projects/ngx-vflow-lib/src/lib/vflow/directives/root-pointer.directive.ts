@@ -1,3 +1,4 @@
+import { FlowStatusService } from '../services/flow-status.service';
 import { Directive, ElementRef, inject } from '@angular/core';
 import { Observable, Subject, animationFrameScheduler, fromEvent, merge } from 'rxjs';
 import { map, observeOn, share, tap } from 'rxjs/operators';
@@ -14,10 +15,12 @@ export interface PointerEvent {
 
 @Directive({
   standalone: true,
-  selector: 'svg[rootPointer]',
+  selector: 'div[rootPointer]',
 })
 export class RootPointerDirective {
-  private host = inject<ElementRef<SVGSVGElement>>(ElementRef).nativeElement;
+  private host = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
+
+  private status = inject(FlowStatusService);
 
   private initialTouch$ = new Subject<TouchEvent>();
 
@@ -56,13 +59,23 @@ export class RootPointerDirective {
     share(),
   ) satisfies Observable<Point>;
 
-  public touchMovement$ = merge(this.initialTouch$, fromEvent<TouchEvent>(this.host, 'touchmove')).pipe(
-    tap((event) => event.preventDefault()),
+  public touchMovement$ = merge(
+    this.initialTouch$,
+    fromEvent<TouchEvent>(this.host, 'touchmove', { passive: false }),
+  ).pipe(
+    tap((event) => {
+      const state = this.status.status().state;
+      if (state.startsWith('connection-') || state.startsWith('reconnection-')) event.preventDefault();
+    }),
     map((originalEvent) => {
       const x = originalEvent.touches[0]?.clientX ?? 0;
       const y = originalEvent.touches[0]?.clientY ?? 0;
-      const movementX = this.prevTouchEvent ? originalEvent.touches[0].pageX - this.prevTouchEvent.touches[0].pageX : 0;
-      const movementY = this.prevTouchEvent ? originalEvent.touches[0].pageY - this.prevTouchEvent.touches[0].pageY : 0;
+      const movementX =
+        (originalEvent.touches[0]?.pageX ?? 0) -
+        (this.prevTouchEvent?.touches[0]?.pageX ?? originalEvent.touches[0]?.pageX ?? 0);
+      const movementY =
+        (originalEvent.touches[0]?.pageY ?? 0) -
+        (this.prevTouchEvent?.touches[0]?.pageY ?? originalEvent.touches[0]?.pageY ?? 0);
 
       const target = document.elementFromPoint(x, y);
 

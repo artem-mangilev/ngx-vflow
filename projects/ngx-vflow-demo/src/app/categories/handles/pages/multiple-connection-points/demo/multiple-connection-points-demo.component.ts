@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import { Edge, Node, Vflow, Connection } from 'ngx-vflow';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { Edge, Node, Vflow, Connection, createNodes } from 'ngx-vflow';
 
 @Component({
   templateUrl: './multiple-connection-points-demo.component.html',
@@ -9,28 +9,28 @@ import { Edge, Node, Vflow, Connection } from 'ngx-vflow';
   imports: [Vflow, CommonModule],
 })
 export class MultipleConnectionPointsDemoComponent {
-  public nodes: Node[] = [
+  public nodes: Node[] = createNodes([
     {
       id: '1',
-      point: signal({ x: 0, y: 150 }),
+      point: { x: 0, y: 150 },
       type: 'html-template',
-      data: signal({
+      data: {
         type: 'output',
         output1: 'output1',
         output2: 'output2',
-      }),
+      },
     },
     {
       id: '2',
-      point: signal({ x: 250, y: 100 }),
+      point: { x: 250, y: 100 },
       type: 'html-template',
-      data: signal({
+      data: {
         type: 'input',
         input1: 'input1',
         input2: 'input2',
-      }),
+      },
     },
-  ];
+  ]);
 
   public edges: Edge[] = [
     {

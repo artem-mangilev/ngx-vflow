@@ -1,3 +1,5 @@
+import { AutoPanSettings } from '../../interfaces/auto-pan-settings.interface';
+import { KeyboardEntityDirective, KeyboardNavigationDirective } from '../../directives/keyboard-navigation.directive';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -8,6 +10,7 @@ import {
   contentChild,
   viewChild,
   input,
+  computed,
 } from '@angular/core';
 import { Node } from '../../interfaces/node.interface';
 import { MapContextDirective } from '../../directives/map-context.directive';
@@ -23,11 +26,10 @@ import {
   EdgeTemplateDirective,
   GroupNodeTemplateDirective,
   NodeHtmlTemplateDirective,
-  NodeSvgTemplateDirective,
 } from '../../directives/template.directive';
 import { addNodesToEdges } from '../../utils/add-nodes-to-edges';
 import { skip } from 'rxjs/operators';
-import { SpacePoint, Point } from '../../interfaces/point.interface';
+import { Point } from '../../interfaces/point.interface';
 import { ViewportState } from '../../interfaces/viewport.interface';
 import { FlowStatusService } from '../../services/flow-status.service';
 import { FlowEntitiesService } from '../../services/flow-entities.service';
@@ -52,8 +54,10 @@ import { SelectionMode } from '../../types/selection-mode.type';
 import { KeyboardService } from '../../services/keyboard.service';
 import { transformBackground } from '../../utils/transform-background';
 import { OverlaysService } from '../../services/overlays.service';
+import { ToolbarModel } from '../../models/toolbar.model';
 import { NgTemplateOutlet } from '@angular/common';
 import { EdgeComponent } from '../edge/edge.component';
+import { EdgeLabelComponent } from '../edge-label/edge-label.component';
 import { NodeComponent } from '../node/node.component';
 import { ConnectionComponent } from '../connection/connection.component';
 import { BackgroundComponent } from '../background/background.component';
@@ -63,8 +67,7 @@ import { RootPointerDirective } from '../../directives/root-pointer.directive';
 import { RootSvgContextDirective } from '../../directives/root-svg-context.directive';
 import { RootSvgReferenceDirective } from '../../directives/reference.directive';
 import { EdgeRenderingService } from '../../services/edge-rendering.service';
-import { getSpacePoints } from '../../utils/get-space-points';
-import { getIntesectingNodes } from '../../utils/nodes';
+import { getIntersectingNodes, getNodesAtPoint as findNodesAtPoint } from '../../utils/nodes';
 import { IntersectingNodesOptions } from '../../interfaces/intersecting-nodes-options.interface';
 import { PreviewFlowComponent } from '../preview-flow/preview-flow.component';
 import {
@@ -85,6 +88,9 @@ import { BasicElementCacheService } from '../../services/basic-element-cache.ser
 import { SelectionBoxComponent } from '../selection-box/selection-box.component';
 import { SelectionBoxContextDirective } from '../../directives/selection-box-context.directive';
 import { SelectionBoxSettings } from '../../interfaces/selection-box-settings.interface';
+import { AriaDescriber } from '@angular/cdk/a11y';
+import { EntityAccessibilityDirective } from '../../directives/entity-accessibility.directive';
+import { AriaLabelConfig, DEFAULT_ARIA_LABEL_CONFIG } from '../../interfaces/aria-label-config.interface';
 
 const changesControllerHostDirective = {
   directive: ChangesControllerDirective,
@@ -114,6 +120,7 @@ const nodeDragControllerHostDirective = {
   styleUrls: ['./vflow.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
+    AriaDescriber,
     DraggableService,
     ViewportService,
     FlowStatusService,
@@ -137,6 +144,9 @@ const nodeDragControllerHostDirective = {
   ],
   hostDirectives: [changesControllerHostDirective, nodeDragControllerHostDirective],
   imports: [
+    KeyboardEntityDirective,
+    KeyboardNavigationDirective,
+    EntityAccessibilityDirective,
     RootSvgReferenceDirective,
     RootSvgContextDirective,
     RootPointerDirective,
@@ -148,6 +158,7 @@ const nodeDragControllerHostDirective = {
     ConnectionComponent,
     NodeComponent,
     EdgeComponent,
+    EdgeLabelComponent,
     NgTemplateOutlet,
     PreviewFlowComponent,
     AlignmentHelperComponent,
@@ -165,14 +176,38 @@ export class VflowComponent {
   private nodeRenderingService = inject(NodeRenderingService);
   private edgeRenderingService = inject(EdgeRenderingService);
   private flowSettingsService = inject(FlowSettingsService);
+  protected ariaLabels = this.flowSettingsService.ariaLabels;
   private componentEventBusService = inject(ComponentEventBusService);
   private keyboardService = inject(KeyboardService);
   private injector = inject(Injector);
   private flowRenderingService = inject(FlowRenderingService);
+  private overlaysService = inject(OverlaysService);
 
   // #endregion
 
+  // #region VIEWPORT
+  /**
+   * CSS transform applied to the viewport div (translate px + scale).
+   */
+  protected viewportTransform = computed(() => {
+    const { x, y, zoom } = this.viewportService.readableViewport();
+
+    return `translate(${x}px, ${y}px) scale(${zoom})`;
+  });
+
+  protected nodeToolbarsMap = this.overlaysService.nodeToolbarsMap;
+  // #endregion
+
   // #region SETTINGS
+
+  /** Partial localization overrides; omitted entries use the English defaults. */
+  @Input()
+  public set ariaLabelConfig(value: Partial<AriaLabelConfig>) {
+    this.flowSettingsService.ariaLabels.set({
+      ...DEFAULT_ARIA_LABEL_CONFIG,
+      ...Object.fromEntries(Object.entries(value).filter(([, entry]) => entry !== undefined)),
+    });
+  }
 
   /**
    * Size for flow view
@@ -202,6 +237,54 @@ export class VflowComponent {
     this.flowSettingsService.maxZoom.set(value);
   }
 
+  /** Zoom with ordinary wheel/trackpad scrolling. */
+  @Input()
+  public set zoomOnScroll(value: boolean) {
+    this.flowSettingsService.zoomOnScroll.set(value);
+  }
+
+  /** Zoom with trackpad or touchscreen pinch. */
+  @Input()
+  public set zoomOnPinch(value: boolean) {
+    this.flowSettingsService.zoomOnPinch.set(value);
+  }
+
+  /** Zoom with double-click. */
+  @Input()
+  public set zoomOnDoubleClick(value: boolean) {
+    this.flowSettingsService.zoomOnDoubleClick.set(value);
+  }
+
+  /** Pan by dragging. true allows all mouse buttons; arrays restrict mouse buttons, not touch. */
+  @Input()
+  public set panOnDrag(value: boolean | number[]) {
+    this.flowSettingsService.panOnDrag.set(value);
+  }
+
+  /** Pan with scrolling, taking priority over ordinary wheel zoom. */
+  @Input()
+  public set panOnScroll(value: boolean) {
+    this.flowSettingsService.panOnScroll.set(value);
+  }
+
+  /** Viewport click tolerance in CSS pixels. Default: 6. */
+  @Input()
+  public set paneClickDistance(value: number) {
+    this.flowSettingsService.paneClickDistance.set(Number.isFinite(value) ? Math.max(0, value) : 0);
+  }
+
+  /** Distance in CSS pixels before node drag starts. Default: 0. */
+  @Input()
+  public set nodeDragThreshold(value: number) {
+    this.flowSettingsService.nodeDragThreshold.set(Number.isFinite(value) ? Math.max(0, value) : 0);
+  }
+
+  /** Distance in CSS pixels before connection or reconnection starts. Default: 0. */
+  @Input()
+  public set connectionDragThreshold(value: number) {
+    this.flowSettingsService.connectionDragThreshold.set(Number.isFinite(value) ? Math.max(0, value) : 0);
+  }
+
   /**
    * Background for flow
    */
@@ -218,12 +301,28 @@ export class VflowComponent {
     }));
   }
 
-  /**
-   * Global rule if you can or can't select entities
-   */
+  /** Global default for node selection eligibility. */
   @Input()
-  public set entitiesSelectable(value: boolean) {
-    this.flowSettingsService.entitiesSelectable.set(value);
+  public set nodesSelectable(value: boolean) {
+    this.flowSettingsService.nodesSelectable.set(value);
+  }
+
+  /** Global default for edge selection eligibility. */
+  @Input()
+  public set edgesSelectable(value: boolean) {
+    this.flowSettingsService.edgesSelectable.set(value);
+  }
+
+  /** Global default for node focus eligibility. */
+  @Input()
+  public set nodesFocusable(value: boolean) {
+    this.flowSettingsService.nodesFocusable.set(value);
+  }
+
+  /** Global default for edge focus eligibility. */
+  @Input()
+  public set edgesFocusable(value: boolean) {
+    this.flowSettingsService.edgesFocusable.set(value);
   }
 
   /**
@@ -296,11 +395,17 @@ export class VflowComponent {
   }
 
   /**
-   * Enable auto-pan
+   * Configure auto-pan at editor creation. Later changes are ignored.
    */
   @Input()
-  public set autoPan(value: boolean) {
+  public set autoPan(value: boolean | AutoPanSettings) {
     this.flowSettingsService.autoPan.set(value);
+  }
+
+  /** Center fully offscreen keyboard-focused nodes without changing zoom. Default: true. */
+  @Input()
+  public set autoPanOnNodeFocus(value: boolean) {
+    this.flowSettingsService.autoPanOnNodeFocus.set(value);
   }
   // #endregion
 
@@ -327,7 +432,9 @@ export class VflowComponent {
 
   protected nodeModels = this.nodeRenderingService.nodes;
   protected groups = this.nodeRenderingService.groups;
-  protected nonGroups = this.nodeRenderingService.nonGroups;
+  protected orderedNodes = computed(() =>
+    this.flowSettingsService.optimization().virtualization ? this.nodeModels() : this.flowEntitiesService.nodes(),
+  );
 
   /**
    * Edges to render
@@ -345,6 +452,9 @@ export class VflowComponent {
   }
 
   protected edgeModels = this.edgeRenderingService.edges;
+  protected orderedEdges = computed(() =>
+    this.flowSettingsService.optimization().virtualization ? this.edgeModels() : this.flowEntitiesService.validEdges(),
+  );
   // #endregion
 
   // #region OUTPUTS
@@ -356,8 +466,6 @@ export class VflowComponent {
 
   // #region TEMPLATES
   protected nodeTemplateDirective = contentChild(NodeHtmlTemplateDirective);
-
-  protected nodeSvgTemplateDirective = contentChild(NodeSvgTemplateDirective);
 
   protected groupNodeTemplateDirective = contentChild(GroupNodeTemplateDirective);
 
@@ -485,24 +593,28 @@ export class VflowComponent {
     return this.flowEntitiesService.getDetachedEdges().map((e) => e.edge);
   }
 
-  /**
-   * Convert point received from document to point on the flow
-   */
-  public documentPointToFlowPoint(point: Point): Point;
-  public documentPointToFlowPoint(point: Point, options?: { spaces: false }): Point;
-  /**
-   * Convert point received from document to a stack of space points on the flow
-   * Space point has a spaceNodeId, coordinates are relative to this node
-   */
-  public documentPointToFlowPoint(point: Point, options?: { spaces: true }): SpacePoint[];
-  public documentPointToFlowPoint(point: Point, options?: { spaces: boolean }): unknown {
-    const transformedPoint = this.spacePointContext().documentPointToFlowPoint(point);
+  /** Converts a DOM client-space position to flow space. */
+  public clientToFlowPosition(point: Point): Point {
+    return this.spacePointContext().clientToFlowPosition(point);
+  }
 
-    if (options?.spaces) {
-      return getSpacePoints(transformedPoint, this.nodeRenderingService.groups());
-    }
+  /** Converts a flow-space position to DOM client space. */
+  public flowToClientPosition(point: Point): Point {
+    return this.spacePointContext().flowToClientPosition(point);
+  }
 
-    return transformedPoint;
+  /** Gets rendered nodes containing a flow-space position, with the topmost node first. */
+  public getNodesAtPoint<T = unknown>(point: Point): Array<Node<T> & { nodeSpacePoint: Point }> {
+    return findNodesAtPoint(point, this.nodeModels())
+      .reverse()
+      .map((model) => {
+        const globalPoint = model.globalPoint();
+
+        return {
+          ...(model.rawNode as Node<T>),
+          nodeSpacePoint: { x: point.x - globalPoint.x, y: point.y - globalPoint.y },
+        };
+      });
   }
 
   /**
@@ -513,34 +625,17 @@ export class VflowComponent {
    * @param options.partially - If true, returns nodes that partially intersect. If false, only returns fully intersecting nodes
    * @returns An array of nodes that intersect with the specified node
    */
-  public getIntesectingNodes<T>(nodeId: string, options: IntersectingNodesOptions = { partially: true }): Node<T>[] {
-    return getIntesectingNodes(nodeId, this.nodeModels(), options).map((n) => n.rawNode) as Node<T>[];
-  }
-
-  /**
-   * Converts a node's position to the coordinate space of another node
-   *
-   * @param nodeId - The ID of the node whose position should be converted
-   * @param spaceNodeId - The ID of the node that defines the target coordinate space.
-   *                      If null, returns the position in global coordinates
-   * @returns {Point} The converted position. Returns {x: Infinity, y: Infinity} if either node is not found
-   */
-  public toNodeSpace(nodeId: string, spaceNodeId: string | null): Point {
-    const node = this.nodeModels().find((n) => n.rawNode.id === nodeId);
-
-    if (!node) return { x: Infinity, y: Infinity };
-
-    if (spaceNodeId === null) {
-      return node.globalPoint();
-    }
-
-    const coordinateSpaceNode = this.nodeModels().find((n) => n.rawNode.id === spaceNodeId);
-
-    if (!coordinateSpaceNode) return { x: Infinity, y: Infinity };
-
-    return getSpacePoints(node.globalPoint(), [coordinateSpaceNode])[0];
+  public getIntersectingNodes<T>(nodeId: string, options: IntersectingNodesOptions = { partially: true }): Node<T>[] {
+    return getIntersectingNodes(nodeId, this.nodeModels(), options).map((n) => n.rawNode) as Node<T>[];
   }
   // #endregion
+
+  protected toolbarTransform(node: NodeModel, toolbar: ToolbarModel): string {
+    const { x, y } = node.globalPoint();
+    const point = toolbar.point();
+
+    return `translate(${x + point.x}px, ${y + point.y}px)`;
+  }
 
   protected trackNodes(idx: number, { rawNode: node }: NodeModel) {
     return node;

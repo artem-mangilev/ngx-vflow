@@ -1,54 +1,72 @@
-<vflow view="auto" [nodes]="nodes" [edges]="edges" [connection]="connectionSettings" (connect)="createEdge($event)">
-  <ng-template let-ctx nodeHtml>
-    @if (ctx.data().type === 'output') {
-      <div class="custom-node">
-        <div class="data-block">
-          Output 1
-          <handle position="right" type="source" [id]="ctx.data().output1" [template]="handleTemplate" />
-        </div>
-        <div class="data-block">
-          Output 2
-          <handle position="right" type="source" [id]="ctx.data().output2" [template]="handleTemplate" />
-        </div>
-      </div>
-    }
+<div class="demo">
+  <div class="controls">
+    <label>
+      <input
+        type="checkbox"
+        [checked]="outputOneCanStart()"
+        (change)="setOutputOneCanStart($any($event.target).checked)" />
+      Output 1 can start connections
+    </label>
 
-    @if (ctx.data().type === 'input') {
-      <div class="custom-node">
-        <div class="data-block">
-          Input 1
-          <handle position="left" type="target" [id]="ctx.data().input1" [template]="squareHandleTemplate" />
-        </div>
-        <div class="data-block">
-          Input 2
-          <handle position="left" type="target" [id]="ctx.data().input2" [template]="squareHandleTemplate" />
-        </div>
-      </div>
-    }
-  </ng-template>
-</vflow>
+    <label>
+      <input
+        type="checkbox"
+        [checked]="inputOneCanAccept()"
+        (change)="setInputOneCanAccept($any($event.target).checked)" />
+      Input 1 can accept connections
+    </label>
+  </div>
 
-<ng-template #handleTemplate let-ctx>
-  <svg:circle
-    stroke-width="1"
-    stroke="black"
-    r="6"
-    fill="#1b262c"
-    [attr.cx]="ctx.point().x"
-    [attr.cy]="ctx.point().y" />
+  <vflow view="auto" [nodes]="nodes" [edges]="edges" (connect)="createEdge($event)">
+    <ng-template let-ctx nodeHtml>
+      @if (ctx.data().type === 'output') {
+        <div class="custom-node">
+          <div class="data-block">
+            Output 1
+            <handle
+              position="right"
+              type="source"
+              [id]="ctx.data().output1"
+              [canStart]="outputOneCanStart()"
+              [template]="handleTemplate" />
+          </div>
+          <div class="data-block">
+            Output 2
+            <handle position="right" type="source" [id]="ctx.data().output2" [template]="handleTemplate" />
+          </div>
+        </div>
+      }
+
+      @if (ctx.data().type === 'input') {
+        <div class="custom-node">
+          <div class="data-block">
+            Input 1
+            <handle
+              position="left"
+              type="target"
+              [id]="ctx.data().input1"
+              [canAccept]="inputOneCanAccept()"
+              [template]="squareHandleTemplate" />
+          </div>
+          <div class="data-block">
+            Input 2
+            <handle position="left" type="target" [id]="ctx.data().input2" [template]="squareHandleTemplate" />
+          </div>
+        </div>
+      }
+    </ng-template>
+  </vflow>
+</div>
+
+<ng-template #handleTemplate let-ctx handle>
+  <div class="circle-handle" [class.handle_disabled]="!ctx.canStart()"></div>
 </ng-template>
 
-<ng-template #squareHandleTemplate let-ctx>
-  <svg:rect
-    width="10"
-    height="10"
-    stroke-width="1"
-    stroke="black"
-    rx="1"
-    ry="1"
-    [attr.x]="ctx.point().x - 5"
-    [attr.y]="ctx.point().y - 5"
+<ng-template #squareHandleTemplate let-ctx handle>
+  <div
+    class="square-handle"
     [class.handle_idle]="ctx.state() === 'idle'"
     [class.handle_valid]="ctx.state() === 'valid'"
-    [class.handle_invalid]="ctx.state() === 'invalid'" />
+    [class.handle_invalid]="ctx.state() === 'invalid'"
+    [class.handle_disabled]="!ctx.canAccept()"></div>
 </ng-template>

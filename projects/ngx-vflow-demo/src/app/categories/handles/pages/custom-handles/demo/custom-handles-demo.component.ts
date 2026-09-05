@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import { Edge, Node, Vflow, Connection, ConnectionSettings } from 'ngx-vflow';
+import { Edge, Node, Vflow, Connection, createNodes } from 'ngx-vflow';
 
 @Component({
   templateUrl: './custom-handles-demo.component.html',
@@ -8,36 +8,33 @@ import { Edge, Node, Vflow, Connection, ConnectionSettings } from 'ngx-vflow';
   imports: [Vflow],
 })
 export class CustomHandlesDemoComponent {
-  public nodes: Node[] = [
+  public outputOneCanStart = signal(true);
+  public inputOneCanAccept = signal(true);
+
+  public nodes: Node[] = createNodes([
     {
       id: '1',
-      point: signal({ x: 0, y: 150 }),
+      point: { x: 0, y: 150 },
       type: 'html-template',
-      data: signal({
+      data: {
         type: 'output',
         output1: 'output1',
         output2: 'output2',
-      }),
+      },
     },
     {
       id: '2',
-      point: signal({ x: 250, y: 100 }),
+      point: { x: 250, y: 100 },
       type: 'html-template',
-      data: signal({
+      data: {
         type: 'input',
         input1: 'input1',
         input2: 'input2',
-      }),
+      },
     },
-  ];
+  ]);
 
   public edges: Edge[] = [];
-
-  public connectionSettings: ConnectionSettings = {
-    validator: (connection) => {
-      return connection.target === '2' && connection.targetHandle === 'input1';
-    },
-  };
 
   public createEdge({ source, target, sourceHandle, targetHandle }: Connection) {
     this.edges = [
@@ -54,5 +51,13 @@ export class CustomHandlesDemoComponent {
         targetHandle,
       },
     ];
+  }
+
+  public setOutputOneCanStart(enabled: boolean): void {
+    this.outputOneCanStart.set(enabled);
+  }
+
+  public setInputOneCanAccept(enabled: boolean): void {
+    this.inputOneCanAccept.set(enabled);
   }
 }

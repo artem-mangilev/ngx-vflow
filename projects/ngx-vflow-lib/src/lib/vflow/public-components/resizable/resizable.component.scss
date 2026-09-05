@@ -1,31 +1,102 @@
-.top {
-  cursor: n-resize;
+.resize-control {
+  position: absolute;
+  pointer-events: all;
 }
 
-.left {
-  cursor: w-resize;
+// Cursors per position
+.resize-control.left,
+.resize-control.right {
+  cursor: ew-resize;
 }
 
-.right {
-  cursor: e-resize;
+.resize-control.top,
+.resize-control.bottom {
+  cursor: ns-resize;
 }
 
-.bottom {
-  cursor: s-resize;
+.resize-control.top.left,
+.resize-control.bottom.right {
+  cursor: nwse-resize;
 }
 
-.top-left {
-  cursor: nw-resize;
+.resize-control.bottom.left,
+.resize-control.top.right {
+  cursor: nesw-resize;
 }
 
-.top-right {
-  cursor: ne-resize;
+// Corner handles
+.resize-control.handle {
+  width: 6px;
+  height: 6px;
+  border: 1px solid #fff;
+  border-radius: 1px;
+  translate: -50% -50%;
 }
 
-.bottom-left {
-  cursor: sw-resize;
+.resize-control.handle.left,
+.resize-control.handle.right {
+  top: 50%;
 }
 
-.bottom-right {
-  cursor: se-resize;
+.resize-control.handle.top,
+.resize-control.handle.bottom {
+  left: 50%;
+}
+
+// Edge lines
+.resize-control.line {
+  border-width: 0;
+  border-style: solid;
+}
+
+.resize-control.line.left,
+.resize-control.line.right {
+  width: 1px;
+  transform: translate(-50%, 0);
+  top: 0;
+  height: 100%;
+}
+
+.resize-control.line.left {
+  border-left-width: 1px;
+}
+
+.resize-control.line.right {
+  border-right-width: 1px;
+}
+
+.resize-control.line.top,
+.resize-control.line.bottom {
+  height: 1px;
+  transform: translate(0, -50%);
+  left: 0;
+  width: 100%;
+}
+
+.resize-control.line.top {
+  border-top-width: 1px;
+}
+
+.resize-control.line.bottom {
+  border-bottom-width: 1px;
+}
+
+.resize-control.handle.left,
+.resize-control.line.left {
+  left: calc(0px - var(--resizer-gap));
+}
+
+.resize-control.handle.right,
+.resize-control.line.right {
+  left: calc(100% + var(--resizer-gap));
+}
+
+.resize-control.handle.top,
+.resize-control.line.top {
+  top: calc(0px - var(--resizer-gap));
+}
+
+.resize-control.handle.bottom,
+.resize-control.line.bottom {
+  top: calc(100% + var(--resizer-gap));
 }

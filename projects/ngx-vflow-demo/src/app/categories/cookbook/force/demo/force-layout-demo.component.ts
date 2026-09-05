@@ -1,6 +1,6 @@
-import { ChangeDetectionStrategy, Component, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, viewChild } from '@angular/core';
 import * as d3 from 'd3-force';
-import { Node, Edge, VflowComponent, Vflow } from 'ngx-vflow';
+import { Node, Edge, VflowComponent, Vflow, createNodes } from 'ngx-vflow';
 
 @Component({
   templateUrl: './force-layout-demo.component.html',
@@ -11,50 +11,50 @@ import { Node, Edge, VflowComponent, Vflow } from 'ngx-vflow';
 export class ForceLayoutDemoComponent {
   vflow = viewChild.required(VflowComponent);
 
-  protected nodes: Node[] = [
+  protected nodes: Node[] = createNodes([
     {
       id: '0',
-      point: signal({ x: 0, y: 0 }),
+      point: { x: 0, y: 0 },
       type: 'html-template',
-      data: signal(randomHex()),
-      draggable: signal(false),
+      data: randomHex(),
+      draggable: false,
     },
     {
       id: '1',
-      point: signal({ x: 0, y: 0 }),
+      point: { x: 0, y: 0 },
       type: 'html-template',
-      data: signal(randomHex()),
-      draggable: signal(false),
+      data: randomHex(),
+      draggable: false,
     },
     {
       id: '2',
-      point: signal({ x: 0, y: 0 }),
+      point: { x: 0, y: 0 },
       type: 'html-template',
-      data: signal(randomHex()),
-      draggable: signal(false),
+      data: randomHex(),
+      draggable: false,
     },
     {
       id: '3',
-      point: signal({ x: 0, y: 0 }),
+      point: { x: 0, y: 0 },
       type: 'html-template',
-      data: signal(randomHex()),
-      draggable: signal(false),
+      data: randomHex(),
+      draggable: false,
     },
     {
       id: '4',
-      point: signal({ x: 0, y: 0 }),
+      point: { x: 0, y: 0 },
       type: 'html-template',
-      data: signal(randomHex()),
-      draggable: signal(false),
+      data: randomHex(),
+      draggable: false,
     },
     {
       id: '5',
-      point: signal({ x: 0, y: 0 }),
+      point: { x: 0, y: 0 },
       type: 'html-template',
-      data: signal(randomHex()),
-      draggable: signal(false),
+      data: randomHex(),
+      draggable: false,
     },
-  ];
+  ]);
 
   protected edges: Edge[] = [
     {

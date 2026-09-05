@@ -9,13 +9,64 @@ import { FlowSettingsService } from '../services/flow-settings.service';
 import { NodeRenderingService } from '../services/node-rendering.service';
 import { ViewportService } from '../services/viewport.service';
 import { provideExperimentalZonelessChangeDetection } from '@angular/core';
-import { HtmlElementCacheService } from '../services/html-element-cache.service';
-import { SvgGraphicElementCacheService } from '../services/svg-graphic-element-cache.service';
+
+function mockRect(element: Element, rect: { left: number; top: number; width: number; height: number }): void {
+  const { left, top, width, height } = rect;
+
+  element.getBoundingClientRect = () =>
+    ({
+      x: left,
+      y: top,
+      left,
+      top,
+      right: left + width,
+      bottom: top + height,
+      width,
+      height,
+      toJSON: () => ({}),
+    }) as DOMRect;
+}
+
+function createHandle(
+  type: 'source' | 'target',
+  position: 'left' | 'right',
+  parentNode: NodeModel,
+  nodeRect: { left: number; top: number; width: number; height: number },
+  handleRect: { left: number; top: number; width: number; height: number },
+) {
+  const anchor = document.createElement('div');
+  const nodeElement = document.createElement('div');
+  const handleElement = document.createElement('div');
+
+  mockRect(anchor, nodeRect);
+  mockRect(nodeElement, nodeRect);
+  mockRect(handleElement, handleRect);
+
+  parentNode.nodeElement.set(nodeElement);
+
+  const handle = TestBed.runInInjectionContext(
+    () =>
+      new HandleModel(
+        {
+          type,
+          position,
+          hostReference: anchor,
+          userOffsetX: 0,
+          userOffsetY: 0,
+        },
+        parentNode,
+      ),
+  );
+
+  handle.handleElement = handleElement;
+  handle.sync();
+
+  return handle;
+}
 
 describe('EdgeModel', () => {
   let model: EdgeModel;
-  let htmlElementCacheService: HtmlElementCacheService;
-  let svgGraphicElementCacheService: SvgGraphicElementCacheService;
+  let settingsService: FlowSettingsService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -28,8 +79,7 @@ describe('EdgeModel', () => {
       ],
     });
 
-    htmlElementCacheService = new HtmlElementCacheService();
-    svgGraphicElementCacheService = new SvgGraphicElementCacheService();
+    settingsService = TestBed.inject(FlowSettingsService);
 
     model = TestBed.runInInjectionContext(
       () =>
@@ -74,38 +124,24 @@ describe('EdgeModel', () => {
       ),
     );
 
+    const nodeRect = { left: 100, top: 200, width: 0, height: 0 };
+
     model.source()!.handles.set([
-      TestBed.runInInjectionContext(
-        () =>
-          new HandleModel(
-            {
-              type: 'source',
-              position: 'right',
-              userOffsetX: 0,
-              userOffsetY: 0,
-            },
-            model.source()!,
-            htmlElementCacheService,
-            svgGraphicElementCacheService,
-          ),
-      ),
+      createHandle('source', 'right', model.source()!, nodeRect, {
+        left: 86.5,
+        top: 193,
+        width: 14,
+        height: 14,
+      }),
     ]);
 
     model.target()!.handles.set([
-      TestBed.runInInjectionContext(
-        () =>
-          new HandleModel(
-            {
-              type: 'target',
-              position: 'left',
-              userOffsetX: 0,
-              userOffsetY: 0,
-            },
-            model.source()!,
-            htmlElementCacheService,
-            svgGraphicElementCacheService,
-          ),
-      ),
+      createHandle('target', 'left', model.target()!, nodeRect, {
+        left: 99.5,
+        top: 193,
+        width: 14,
+        height: 14,
+      }),
     ]);
   });
 
@@ -117,10 +153,7 @@ describe('EdgeModel', () => {
    * @todo add more path tests
    */
   it('should provide path', () => {
-    model.source()?.handles()[0].size.set({ width: 1, height: 1 });
-    model.target()?.handles()[0].size.set({ width: 1, height: 1 });
-
-    expect(model.path().path).toBe('M 15.5,15L 14.5,15');
+    expect(model.path().path).toBe('M 22,15L 8,15');
   });
 
   it('should set detached === true if there no source', () => {
@@ -145,5 +178,44 @@ describe('EdgeModel', () => {
 
   it('should detached === false if source and target exists and their source and target handle also exists', () => {
     expect(model.detached()).toEqual(false);
+  });
+
+  it('should resolve selection and focus defaults reactively', () => {
+    expect(model.selectable()).toBeTrue();
+    expect(model.focusable()).toBeTrue();
+
+    settingsService.edgesSelectable.set(false);
+    settingsService.edgesFocusable.set(false);
+
+    expect(model.selectable()).toBeFalse();
+    expect(model.focusable()).toBeFalse();
+  });
+
+  it('should let explicit capability overrides win over global settings', () => {
+    const explicitModel = TestBed.runInInjectionContext(
+      () =>
+        new EdgeModel(
+          createEdge({
+            id: 'explicit',
+            source: '1',
+            target: '2',
+            selectable: false,
+            focusable: true,
+          }),
+        ),
+    );
+
+    settingsService.edgesSelectable.set(true);
+    settingsService.edgesFocusable.set(false);
+
+    expect(explicitModel.selectable()).toBeFalse();
+    expect(explicitModel.focusable()).toBeTrue();
+  });
+
+  it('should keep inherited capabilities absent when factories materialize defaults', () => {
+    const created = createEdge({ id: 'factory', source: '1', target: '2' });
+
+    expect(created.selectable).toBeUndefined();
+    expect(created.focusable).toBeUndefined();
   });
 });

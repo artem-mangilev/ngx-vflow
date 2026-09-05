@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import { Edge, Node, Vflow } from 'ngx-vflow';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { Edge, Node, Vflow, removeEdges, removeNodes, createNodes } from 'ngx-vflow';
 
 @Component({
   templateUrl: './delete-selected-demo.component.html',
@@ -8,23 +8,23 @@ import { Edge, Node, Vflow } from 'ngx-vflow';
   imports: [Vflow],
 })
 export class DeleteSelectedDemoComponent {
-  public nodes: Node[] = [
+  public nodes: Node[] = createNodes([
     {
       id: '1',
-      point: signal({ x: 10, y: 150 }),
+      point: { x: 10, y: 150 },
       type: 'html-template',
     },
     {
       id: '2',
-      point: signal({ x: 290, y: 50 }),
+      point: { x: 290, y: 50 },
       type: 'html-template',
     },
     {
       id: '3',
-      point: signal({ x: 290, y: 300 }),
+      point: { x: 290, y: 300 },
       type: 'html-template',
     },
-  ];
+  ]);
 
   public edges: Edge[] = [
     {
@@ -42,10 +42,12 @@ export class DeleteSelectedDemoComponent {
   ];
 
   public deleteNode(node: Node) {
-    this.nodes = this.nodes.filter((n) => n.id !== node.id);
+    const result = removeNodes([node.id], { nodes: this.nodes, edges: this.edges });
+    this.nodes = result.nodes;
+    this.edges = result.edges;
   }
 
   public deleteEdge(edge: Edge) {
-    this.edges = this.edges.filter((e) => e.id !== edge.id);
+    this.edges = removeEdges([edge.id], this.edges);
   }
 }

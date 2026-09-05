@@ -4,7 +4,6 @@ import {
   inject,
   Injector,
   OnInit,
-  signal,
   TemplateRef,
   input,
   viewChild,
@@ -17,7 +16,6 @@ import { FlowSettingsService } from '../../services/flow-settings.service';
 import { getViewportForBounds } from '../../utils/viewport';
 import { getNodesFlowBounds } from '../../utils/nodes';
 import { ViewportService } from '../../services/viewport.service';
-import { DefaultNodeComponent } from '../../components/default-node/default-node.component';
 
 export type MiniMapPosition = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
 
@@ -25,7 +23,6 @@ export type MiniMapPosition = 'top-left' | 'top-right' | 'bottom-left' | 'bottom
   selector: 'mini-map',
   templateUrl: './minimap.component.html',
   styleUrls: [`./minimap.component.scss`],
-  imports: [DefaultNodeComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MiniMapComponent implements OnInit {
@@ -49,22 +46,10 @@ export class MiniMapComponent implements OnInit {
    */
   public position = input<MiniMapPosition>('bottom-right');
 
-  /**
-   * Make a minimap bigger on hover
-   */
-  public scaleOnHover = input(false);
-
   private minimap = viewChild.required<TemplateRef<unknown>>('minimap');
 
   private readonly minimapOffset = 10;
-
-  private readonly minimapScale = computed(() => {
-    if (this.scaleOnHover()) {
-      return this.hovered() ? 0.4 : 0.2;
-    }
-
-    return 0.2;
-  });
+  private readonly minimapScale = 0.2;
 
   protected viewportColor = computed(() => {
     const bg = this.flowSettingsService.background();
@@ -75,8 +60,6 @@ export class MiniMapComponent implements OnInit {
 
     return '#fff';
   });
-
-  protected hovered = signal(false);
 
   protected minimapPoint = computed(() => {
     switch (this.position()) {
@@ -100,43 +83,40 @@ export class MiniMapComponent implements OnInit {
     }
   });
 
-  protected minimapWidth = computed(() => this.flowSettingsService.computedFlowWidth() * this.minimapScale());
-  protected minimapHeight = computed(() => this.flowSettingsService.computedFlowHeight() * this.minimapScale());
+  protected minimapWidth = computed(() => this.flowSettingsService.computedFlowWidth() * this.minimapScale);
+  protected minimapHeight = computed(() => this.flowSettingsService.computedFlowHeight() * this.minimapScale);
 
   protected viewportTransform = computed(() => {
     const viewport = this.viewportService.readableViewport();
     let scale = 1 / viewport.zoom;
 
-    let x = -(viewport.x * this.minimapScale()) * scale;
-    x /= this.minimapScale();
+    let x = -(viewport.x * this.minimapScale) * scale;
+    x /= this.minimapScale;
 
-    let y = -(viewport.y * this.minimapScale()) * scale;
-    y /= this.minimapScale();
+    let y = -(viewport.y * this.minimapScale) * scale;
+    y /= this.minimapScale;
 
-    scale /= this.minimapScale();
+    scale /= this.minimapScale;
 
     return `translate(${x}, ${y}) scale(${scale})`;
   });
 
   protected boundsViewport = computed(() => {
     const nodes = this.entitiesService.nodes();
+    const width = this.flowSettingsService.computedFlowWidth();
+    const height = this.flowSettingsService.computedFlowHeight();
 
-    return getViewportForBounds(
-      getNodesFlowBounds(nodes),
-      this.flowSettingsService.computedFlowWidth(),
-      this.flowSettingsService.computedFlowHeight(),
-      -Infinity,
-      1.5,
-      0,
-    );
+    if (!nodes.length || width <= 0 || height <= 0) return { x: 0, y: 0, zoom: 1 };
+
+    return getViewportForBounds(getNodesFlowBounds(nodes), width, height, Number.MIN_VALUE, 1.5, 0);
   });
 
   protected minimapTransform = computed(() => {
     const vport = this.boundsViewport();
 
-    const x = vport.x * this.minimapScale();
-    const y = vport.y * this.minimapScale();
-    const scale = vport.zoom * this.minimapScale();
+    const x = vport.x * this.minimapScale;
+    const y = vport.y * this.minimapScale;
+    const scale = vport.zoom * this.minimapScale;
 
     return `translate(${x} ${y}) scale(${scale})`;
   });

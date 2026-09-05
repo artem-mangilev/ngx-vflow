@@ -24,7 +24,10 @@ import { VflowMocks } from './vflow-mocks';
       [maxZoom]="0"
       [background]="'#fff'"
       [optimization]="{ detachedGroupsLayer: true }"
-      [entitiesSelectable]="true"
+      [nodesSelectable]="true"
+      [edgesSelectable]="true"
+      [nodesFocusable]="true"
+      [edgesFocusable]="true"
       [keyboardShortcuts]="{ multiSelection: null }"
       [connection]="connection"
       [snapGrid]="[1, 1]"
@@ -32,7 +35,7 @@ import { VflowMocks } from './vflow-mocks';
       (componentNodeEvent)="(null)"
       (connect)="(null)">
       <ng-template nodeHtml>
-        <div dragHandle selectable resizable [resizerColor]="'#2e414c'" [gap]="1.5">
+        <div dragHandle selectable resizable [resizerColor]="'#2e414c'" [gap]="2">
           <handle [position]="'left'" [type]="'source'" [id]="'1'" [template]="handleTemplate" />
 
           <ng-template #handleTemplate>
@@ -75,8 +78,7 @@ import { VflowMocks } from './vflow-mocks';
       <mini-map
         [maskColor]="'rgba(215, 215, 215, 0.6)'"
         [strokeColor]="'rgb(200, 200, 200)'"
-        [position]="'bottom-right'"
-        [scaleOnHover]="true" />
+        [position]="'bottom-right'" />
     </vflow>
   `,
   imports: [Vflow],
@@ -147,7 +149,17 @@ class VflowWrapperComponent {
 
       this.vflow()!.fitView();
 
-      this.vflow()!.documentPointToFlowPoint({
+      this.vflow()!.clientToFlowPosition({
+        x: 0,
+        y: 0,
+      });
+
+      this.vflow()!.flowToClientPosition({
+        x: 0,
+        y: 0,
+      });
+
+      this.vflow()!.getNodesAtPoint({
         x: 0,
         y: 0,
       });

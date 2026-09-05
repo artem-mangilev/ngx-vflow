@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import { Node, Vflow } from 'ngx-vflow';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { Node, Vflow, createNodes } from 'ngx-vflow';
 
 @Component({
   templateUrl: './multiple-node-toolbars-demo.component.html',
@@ -8,13 +8,13 @@ import { Node, Vflow } from 'ngx-vflow';
   imports: [Vflow],
 })
 export class MultipleNodeToolbarsDemoComponent {
-  public nodes: Node[] = [
+  public nodes: Node[] = createNodes([
     {
       id: '1',
-      point: signal({ x: 150, y: 150 }),
+      point: { x: 150, y: 150 },
       type: 'html-template',
     },
-  ];
+  ]);
 
   public deleteNode(node: Node) {
     this.nodes = this.nodes.filter((n) => n.id !== node.id);

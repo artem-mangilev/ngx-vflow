@@ -3,11 +3,11 @@ import { EdgeLabel, EdgeLabelPosition } from '../interfaces/edge-label.interface
 import { Edge, Curve, EdgeType, EDGE_DEFAULTS } from '../interfaces/edge.interface';
 import { EdgeLabelModel } from './edge-label.model';
 import { NodeModel } from './node.model';
-import { straightPath } from '../math/edge-path/straigh-path';
-import { bezierPath } from '../math/edge-path/bezier-path';
+import { getStraightPath } from '../math/edge-path/straigh-path';
+import { getBezierPath } from '../math/edge-path/bezier-path';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { FlowEntity } from '../interfaces/flow-entity.interface';
-import { smoothStepPath } from '../math/edge-path/smooth-step-path';
+import { getSmoothStepPath } from '../math/edge-path/smooth-step-path';
 import { hashCode } from '../utils/hash';
 import { Contextable } from '../interfaces/contextable.interface';
 import { EdgeContext } from '../interfaces/template-context.interface';
@@ -16,9 +16,33 @@ import { CurveFactoryParams } from '../interfaces/curve-factory.interface';
 import { FlowEntitiesService } from '../services/flow-entities.service';
 import { extendedComputed } from '../utils/signals/extended-computed';
 import { Marker } from '../interfaces/marker.interface';
+import { FlowSettingsService } from '../services/flow-settings.service';
 
 export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
   private readonly flowEntitiesService = inject(FlowEntitiesService);
+  private readonly settingsService = inject(FlowSettingsService);
+
+  public accessibility = computed(() => {
+    const labels = this.settingsService.ariaLabels();
+    const endpoints = labels.edgeLabel({
+      source: this.source()?.ariaLabel() ?? labels.nodeLabel(this.edge.source),
+      target: this.target()?.ariaLabel() ?? labels.nodeLabel(this.edge.target),
+    });
+    const label = this.edge.ariaLabel?.().trim() || endpoints;
+    return {
+      label,
+      domAttributes: this.edge.domAttributes?.(),
+      description: [
+        this.edge.ariaDescription?.(),
+        label !== endpoints ? endpoints : '',
+        this.selected() ? labels.selected : '',
+        !this.selectable() ? labels.selectionUnavailable : '',
+        !this.reconnectable() ? labels.reconnectionUnavailable : '',
+      ]
+        .filter(Boolean)
+        .join(' '),
+    };
+  });
 
   public source = signal<NodeModel | undefined>(undefined);
   public target = signal<NodeModel | undefined>(undefined);
@@ -32,6 +56,8 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
   public selected = signal(EDGE_DEFAULTS.selected);
   public selected$ = toObservable(this.selected);
   public preselected = signal(false);
+  public selectable = computed(() => this.edge.selectable?.() ?? this.settingsService.edgesSelectable());
+  public focusable = computed(() => this.edge.focusable?.() ?? this.settingsService.edgesFocusable());
 
   public shouldLoad = computed(() => (this.source()?.shouldLoad() ?? false) && (this.target()?.shouldLoad() ?? false));
 
@@ -79,13 +105,13 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
     const curve = this.curve();
     switch (curve) {
       case 'straight':
-        return straightPath(params);
+        return getStraightPath(params);
       case 'bezier':
-        return bezierPath(params);
+        return getBezierPath(params);
       case 'smooth-step':
-        return smoothStepPath(params);
+        return getSmoothStepPath(params);
       case 'step':
-        return smoothStepPath(params, 0);
+        return getSmoothStepPath({ ...params, borderRadius: 0 });
       default:
         return curve(params);
     }

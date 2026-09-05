@@ -10,6 +10,7 @@ import { provideExperimentalZonelessChangeDetection } from '@angular/core';
 describe('NodeModel', () => {
   let model: NodeModel;
   let entitiesService: FlowEntitiesService;
+  let settingsService: FlowSettingsService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -35,6 +36,7 @@ describe('NodeModel', () => {
     );
 
     entitiesService = TestBed.inject(FlowEntitiesService);
+    settingsService = TestBed.inject(FlowSettingsService);
 
     entitiesService.nodes.update((nodes) => [...nodes, model]);
   });
@@ -91,5 +93,41 @@ describe('NodeModel', () => {
 
   it('should get text for default node', () => {
     expect(model.text()).toEqual('test');
+  });
+
+  it('should resolve selection and focus defaults reactively', () => {
+    expect(model.selectable()).toBeTrue();
+    expect(model.focusable()).toBeTrue();
+
+    settingsService.nodesSelectable.set(false);
+    settingsService.nodesFocusable.set(false);
+
+    expect(model.selectable()).toBeFalse();
+    expect(model.focusable()).toBeFalse();
+  });
+
+  it('should let explicit capability overrides win over global settings', () => {
+    const rawNode = createNode({
+      id: 'explicit',
+      type: 'default',
+      point: { x: 0, y: 0 },
+      selectable: false,
+      focusable: true,
+    });
+    const explicitModel = TestBed.runInInjectionContext(() => new NodeModel(rawNode));
+
+    settingsService.nodesSelectable.set(true);
+    settingsService.nodesFocusable.set(false);
+
+    expect(explicitModel.selectable()).toBeFalse();
+    expect(explicitModel.focusable()).toBeTrue();
+  });
+
+  it('should keep inherited capabilities absent when factories materialize defaults', () => {
+    const created = createNode({ id: 'factory', type: 'default', point: { x: 0, y: 0 } });
+
+    expect(created.selectable).toBeUndefined();
+    expect(created.focusable).toBeUndefined();
+    expect(created.parentId()).toBeNull();
   });
 });

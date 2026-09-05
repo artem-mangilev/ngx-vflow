@@ -2,8 +2,8 @@ import { Directive, ElementRef, inject } from '@angular/core';
 
 @Directive({
   standalone: true,
-  selector: 'svg[rootSvgRef]',
+  selector: 'div[rootSvgRef]',
 })
 export class RootSvgReferenceDirective {
-  public readonly element = inject<ElementRef<SVGSVGElement>>(ElementRef).nativeElement;
+  public readonly element = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
 }

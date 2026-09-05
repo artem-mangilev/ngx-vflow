@@ -1,11 +1,12 @@
 import { TemplateRef, computed, inject, signal } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
+import { DomAttributes } from '../interfaces/dom-attributes.interface';
 import { NODE_DEFAULTS, Node, isComponentNode } from '../interfaces/node.interface';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { HandleModel } from './handle.model';
 import { FlowEntity } from '../interfaces/flow-entity.interface';
 import { Point } from '../interfaces/point.interface';
 import { FlowEntitiesService } from '../services/flow-entities.service';
-import { MAGIC_NUMBER_TO_FIX_GLITCH_IN_CHROME } from '../constants/magic-number-to-fix-glitch-in-chrome.constant';
 import { Contextable } from '../interfaces/contextable.interface';
 import { GroupNodeContext, NodeContext } from '../interfaces/template-context.interface';
 import { Observable, of } from 'rxjs';
@@ -23,8 +24,56 @@ export class NodeModel<T = unknown>
   private entitiesService = inject(FlowEntitiesService);
   private settingsService = inject(FlowSettingsService);
   private nodeRenderingService = inject(NodeRenderingService);
+  private document = inject(DOCUMENT);
+
+  public ariaLabel = computed(() => {
+    const override = this.rawNode.ariaLabel?.().trim();
+    if (override) return override;
+    const labels = this.settingsService.ariaLabels();
+    if (this.rawNode.type === 'default') {
+      const template = this.document.createElement('template');
+      template.innerHTML = this.text();
+      template.content.querySelectorAll('script, style, template').forEach((element) => element.remove());
+      const text = template.content.textContent?.replace(/\s+/g, ' ').trim();
+      if (text) return text;
+    }
+    return this.rawNode.type === 'default-group' || this.rawNode.type === 'template-group'
+      ? labels.groupLabel(this.rawNode.id)
+      : labels.nodeLabel(this.rawNode.id);
+  });
+
+  public accessibility = computed((): { label: string; description: string; domAttributes?: DomAttributes } => {
+    const labels = this.settingsService.ariaLabels();
+    const parent = this.parent();
+    return {
+      label: this.ariaLabel(),
+      domAttributes: this.rawNode.domAttributes?.(),
+      description: [
+        this.rawNode.ariaDescription?.(),
+        parent ? labels.parentDescription(parent.ariaLabel()) : '',
+        this.selected() ? labels.selected : '',
+        !this.selectable() ? labels.selectionUnavailable : '',
+        !this.draggable() ? labels.movementUnavailable : '',
+      ]
+        .filter(Boolean)
+        .join(' '),
+    };
+  });
 
   public isVisible = signal(false);
+
+  /**
+   * Reference to the rendered node host element. Set by `NodeComponent` and used
+   * by handles to measure their connection point relative to the node origin.
+   */
+  public nodeElement = signal<HTMLElement | null>(null);
+
+  /**
+   * Whether the node dimensions have been measured at least once.
+   * Until then the node is rendered hidden to avoid flicker and wrong
+   * edge endpoints.
+   */
+  public isMeasured = signal(false);
 
   public point = signal<Point>({ x: 0, y: 0 });
   public point$: Observable<Point>;
@@ -42,14 +91,13 @@ export class NodeModel<T = unknown>
   public styleWidth = computed(() => (this.controlledByResizer() ? `${this.width()}px` : '100%'));
   public styleHeight = computed(() => (this.controlledByResizer() ? `${this.height()}px` : '100%'));
 
-  public foWidth = computed(() => this.width() + MAGIC_NUMBER_TO_FIX_GLITCH_IN_CHROME);
-  public foHeight = computed(() => this.height() + MAGIC_NUMBER_TO_FIX_GLITCH_IN_CHROME);
-
   public renderOrder = signal(0);
 
   public selected = signal(false);
   public selected$: Observable<boolean>;
   public preselected = signal(false);
+  public selectable = computed(() => this.rawNode.selectable?.() ?? this.settingsService.nodesSelectable());
+  public focusable = computed(() => this.rawNode.focusable?.() ?? this.settingsService.nodesFocusable());
 
   public preview = signal<NodePreview>({ style: {} });
 
@@ -71,6 +119,11 @@ export class NodeModel<T = unknown>
   });
 
   public pointTransform = computed(() => `translate(${this.globalPoint().x}, ${this.globalPoint().y})`);
+
+  /**
+   * CSS transform for positioning the node div in the (transformed) viewport.
+   */
+  public pointTransformCss = computed(() => `translate(${this.globalPoint().x}px, ${this.globalPoint().y}px)`);
 
   public handles = signal<HandleModel[]>([]);
   public handles$: Observable<HandleModel[]>;
@@ -105,7 +158,6 @@ export class NodeModel<T = unknown>
       if (
         isCallable(this.rawNode.type) ||
         this.rawNode.type === 'html-template' ||
-        this.rawNode.type === 'svg-template' ||
         this.rawNode.type === 'template-group'
       ) {
         return this.nodeRenderingService.viewportNodes().includes(this as NodeModel);
@@ -132,7 +184,7 @@ export class NodeModel<T = unknown>
     node: this.rawNode,
   };
 
-  public parent = computed(() => {
+  public parent = computed<NodeModel | null>(() => {
     const parentId = this.parentId();
     if (!parentId) return null;
 
@@ -206,20 +258,6 @@ export class NodeModel<T = unknown>
           data: rawNode.data ?? signal(NODE_DEFAULTS.data as T),
           selected: this.selected.asReadonly(),
           preselected: this.preselected.asReadonly(),
-          shouldLoad: this.shouldLoad,
-        },
-      };
-    }
-
-    if (rawNode.type === 'svg-template') {
-      this.context = {
-        $implicit: {
-          node: rawNode,
-          data: rawNode.data ?? signal(NODE_DEFAULTS.data as T),
-          selected: this.selected.asReadonly(),
-          preselected: this.preselected.asReadonly(),
-          width: this.width.asReadonly(),
-          height: this.height.asReadonly(),
           shouldLoad: this.shouldLoad,
         },
       };

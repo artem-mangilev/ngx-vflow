@@ -1,8 +1,8 @@
-import { smoothStepPath } from './smooth-step-path';
+import { getSmoothStepPath } from './smooth-step-path';
 import { CurveFactoryParams } from '../../interfaces/curve-factory.interface';
 import { createEdge } from '../../interfaces/edge.interface';
 
-describe('smoothStepPath', () => {
+describe('getSmoothStepPath', () => {
   const createParams = (
     sourcePoint = { x: 100, y: 200 },
     targetPoint = { x: 400, y: 200 },
@@ -25,7 +25,7 @@ describe('smoothStepPath', () => {
 
   describe('basic functionality', () => {
     it('should create a valid SVG path', () => {
-      const result = smoothStepPath(createParams());
+      const result = getSmoothStepPath(createParams());
 
       expect(result.path).toBeDefined();
       expect(result.path).toMatch(/^M\d+/); // Should start with M (move to)
@@ -33,7 +33,7 @@ describe('smoothStepPath', () => {
     });
 
     it('should return label points for start, center, and end', () => {
-      const result = smoothStepPath(createParams());
+      const result = getSmoothStepPath(createParams());
 
       expect(result.labelPoints).toBeDefined();
       const labelPoints = result.labelPoints!;
@@ -54,7 +54,7 @@ describe('smoothStepPath', () => {
 
   describe('label positioning fix', () => {
     it('should position start and end labels at different points along the path', () => {
-      const result = smoothStepPath(createParams());
+      const result = getSmoothStepPath(createParams());
 
       const { start, center, end } = result.labelPoints!;
 
@@ -67,7 +67,7 @@ describe('smoothStepPath', () => {
     it('should position start label closer to source than target', () => {
       const sourcePoint = { x: 100, y: 200 };
       const targetPoint = { x: 400, y: 200 };
-      const result = smoothStepPath(createParams(sourcePoint, targetPoint));
+      const result = getSmoothStepPath(createParams(sourcePoint, targetPoint));
 
       const { start } = result.labelPoints!;
       const distanceToSource = Math.abs(start.x - sourcePoint.x);
@@ -79,7 +79,7 @@ describe('smoothStepPath', () => {
     it('should position end label closer to target than source', () => {
       const sourcePoint = { x: 100, y: 200 };
       const targetPoint = { x: 400, y: 200 };
-      const result = smoothStepPath(createParams(sourcePoint, targetPoint));
+      const result = getSmoothStepPath(createParams(sourcePoint, targetPoint));
 
       const { end } = result.labelPoints!;
       const distanceToSource = Math.abs(end.x - sourcePoint.x);
@@ -91,7 +91,7 @@ describe('smoothStepPath', () => {
     it('should position labels in correct order along horizontal path', () => {
       const sourcePoint = { x: 100, y: 200 };
       const targetPoint = { x: 400, y: 200 };
-      const result = smoothStepPath(createParams(sourcePoint, targetPoint));
+      const result = getSmoothStepPath(createParams(sourcePoint, targetPoint));
 
       const { start, center, end } = result.labelPoints!;
 
@@ -104,7 +104,7 @@ describe('smoothStepPath', () => {
       const sourcePoint = { x: 200, y: 100 };
       const targetPoint = { x: 200, y: 400 };
       const params = createParams(sourcePoint, targetPoint, 'bottom', 'top');
-      const result = smoothStepPath(params);
+      const result = getSmoothStepPath(params);
 
       const { start, center, end } = result.labelPoints!;
 
@@ -126,9 +126,9 @@ describe('smoothStepPath', () => {
     it('should handle different border radius values', () => {
       const params = createParams();
 
-      const result0 = smoothStepPath(params, 0);
-      const result5 = smoothStepPath(params, 5);
-      const result10 = smoothStepPath(params, 10);
+      const result0 = getSmoothStepPath({ ...params, borderRadius: 0 });
+      const result5 = getSmoothStepPath({ ...params, borderRadius: 5 });
+      const result10 = getSmoothStepPath({ ...params, borderRadius: 10 });
 
       // All should produce valid paths
       expect(result0.path).toBeDefined();
@@ -145,7 +145,7 @@ describe('smoothStepPath', () => {
   describe('edge cases', () => {
     it('should handle same source and target positions', () => {
       const point = { x: 200, y: 200 };
-      const result = smoothStepPath(createParams(point, point));
+      const result = getSmoothStepPath(createParams(point, point));
 
       expect(result.path).toBeDefined();
       expect(result.labelPoints!.start).toBeDefined();
@@ -156,7 +156,7 @@ describe('smoothStepPath', () => {
     it('should handle very close points', () => {
       const sourcePoint = { x: 200, y: 200 };
       const targetPoint = { x: 201, y: 201 };
-      const result = smoothStepPath(createParams(sourcePoint, targetPoint));
+      const result = getSmoothStepPath(createParams(sourcePoint, targetPoint));
 
       expect(result.path).toBeDefined();
       expect(result.labelPoints!.start).toBeDefined();
@@ -167,7 +167,7 @@ describe('smoothStepPath', () => {
     it('should handle very distant points', () => {
       const sourcePoint = { x: 0, y: 0 };
       const targetPoint = { x: 1000, y: 1000 };
-      const result = smoothStepPath(createParams(sourcePoint, targetPoint));
+      const result = getSmoothStepPath(createParams(sourcePoint, targetPoint));
 
       expect(result.path).toBeDefined();
       expect(result.labelPoints!.start).toBeDefined();

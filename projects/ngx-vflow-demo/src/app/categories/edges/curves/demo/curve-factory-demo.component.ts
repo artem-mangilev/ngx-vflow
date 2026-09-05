@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import { CurveFactory, Edge, Node, Vflow } from 'ngx-vflow';
+import { CurveFactory, Edge, Node, Vflow, createNodes } from 'ngx-vflow';
 
 @Component({
   template: `<vflow view="auto" [nodes]="nodes" [edges]="edges" />`,
@@ -15,20 +15,20 @@ import { CurveFactory, Edge, Node, Vflow } from 'ngx-vflow';
   imports: [Vflow],
 })
 export class CurveFactoryDemoComponent {
-  public nodes: Node[] = [
+  public nodes: Node[] = createNodes([
     {
       id: '1',
-      point: signal({ x: 30, y: 100 }),
+      point: { x: 30, y: 100 },
       type: 'default',
-      text: signal('1'),
+      text: '1',
     },
     {
       id: '2',
-      point: signal({ x: 220, y: 100 }),
+      point: { x: 220, y: 100 },
       type: 'default',
-      text: signal('2'),
+      text: '2',
     },
-  ];
+  ]);
 
   public edges: Edge[] = [
     {

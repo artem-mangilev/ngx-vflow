@@ -15,8 +15,6 @@ export class MiniMapMockComponent implements AsInterface<MiniMapComponent>, OnIn
 
   public position = input<MiniMapPosition>('bottom-right');
 
-  public scaleOnHover = input(false);
-
   // eslint-disable-next-line @angular-eslint/no-empty-lifecycle-method
   public ngOnInit() {}
 }

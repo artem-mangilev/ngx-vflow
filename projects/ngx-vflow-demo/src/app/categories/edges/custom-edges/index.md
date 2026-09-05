@@ -2,8 +2,10 @@ You can customize your edges. To achieve this, follow these steps:
 
 1. Change the edge type to `template`
 2. Create an `ng-template` with the `edge` selector inside `vflow`
-3. Create an `<svg:path>` which you will customize. Optionally — **but recommended** — wrap it in a `<svg:g customTemplateEdge>` element. This adds some UX improvements to the path; for example, it increases the clickable area of the path.
+3. Create an `<svg:path>` which you will customize. Optionally — **but recommended** — wrap it in a `<svg:g customTemplateEdge>` element. The wrapper adds a 20px interaction stroke while leaving the rest of the edge SVG transparent to pointer input. Add `selectable` to the wrapper when the edge should participate in the flow's selection behavior.
 4. In the `ng-template`, the library provides `let-ctx` with important data for you, such as the `path` signal with current path. Additionally, the `edge` field contains current edge from one the `[edges]`, from which you can retrieve custom `data`. Furthermore, you can access `markerStart` and `markerEnd` signals with markers for current `edge`.
+
+If you provide your own interaction path instead of using `customTemplateEdge`, opt that path into hit-testing with `pointer-events="stroke"`. Do not enable pointer events on the whole edge SVG because its bounds would block nodes and canvas panning.
 
 ## Context
 
