@@ -84,6 +84,11 @@ This issue establishes readable graph semantics. It does not claim full keyboard
 
 ## Comments
 
+### VoiceOver retry — 2026-09-05
+
+- With explicit user permission, temporarily enabled VoiceOver's AppleScript interface and obtained actual spoken phrases. Verified both graph regions, default entities, parent/endpoint descriptions, selection/restrictions, minimap, custom-button activation, pointed custom-handle descriptions and reactive localization. Restored the temporary setting and disabled VoiceOver afterwards.
+- Acceptance remains open: sequential cursor navigation skipped the custom edge and custom handle; the latter was readable by pointed inspection. Ordinary keyboard-event verification was blocked by macOS error `1002` for `osascript`. Keep `ready-for-human` for a physical VoiceOver keyboard reproduction; if confirmed, fix the traversal issue before resolving this ticket. See [the detailed retry observations](../../../docs/accessibility-verification.md).
+
 ### Implementation — 2026-09-05
 
 - Implemented the public metadata/localization API, library-owned roles and descriptions, independent per-flow CDK description references, quiet live regions, safe DOM metadata, and current-candidate handle descriptions. Added the documentation example and public-contract/Playwright axe checks.
