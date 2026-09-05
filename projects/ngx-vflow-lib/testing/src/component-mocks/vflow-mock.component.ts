@@ -28,6 +28,7 @@ import {
   AlignmentHelperSettings,
   SelectionMode,
   SelectionBoxSettings,
+  AutoPanSettings,
 } from 'ngx-vflow';
 import { toObservable } from '@angular/core/rxjs-interop';
 import {
@@ -205,7 +206,7 @@ export class VflowMockComponent implements AsInterface<VflowComponent>, OnInit {
   public elevateEdgesOnSelect!: boolean;
 
   @Input()
-  public autoPan = true;
+  public autoPan: boolean | AutoPanSettings = true;
 
   public alignmentHelper = input<boolean | AlignmentHelperSettings>(false);
 

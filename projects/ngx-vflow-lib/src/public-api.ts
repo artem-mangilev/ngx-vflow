@@ -83,3 +83,5 @@ export { RootPointerDirective as ɵRootPointerDirective } from './lib/vflow/dire
 export { SpacePointContextDirective as ɵSpacePointContextDirective } from './lib/vflow/directives/space-point-context.directive';
 
 export * from './lib/vflow/directives/gesture-exclusions.directive';
+
+export * from './lib/vflow/interfaces/auto-pan-settings.interface';

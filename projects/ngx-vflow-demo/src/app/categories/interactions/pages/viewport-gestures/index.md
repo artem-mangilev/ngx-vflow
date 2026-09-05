@@ -87,3 +87,24 @@ Accepted touch pan/zoom gestures suppress native scrolling. Disabled gestures an
 ```
 
 Explicit `panTo`, `zoomTo`, `viewportTo`, and `fitView` calls continue to work. These settings only control viewport gestures; configure node dragging and selection separately if needed.
+
+# Auto-pan during dragging
+
+`autoPan` accepts a boolean or `AutoPanSettings`. The default `true` enables auto-pan for node dragging, connection creation, and reconnection; `false` disables all three.
+
+```html
+<vflow [nodes]="nodes" [autoPan]="{ nodeDrag: true, connectionDrag: false, speed: 600, margin: 48 }" />
+```
+
+| Option           | Default | Meaning                                                                                             |
+| ---------------- | ------- | --------------------------------------------------------------------------------------------------- |
+| `nodeDrag`       | `true`  | Auto-pan while dragging nodes.                                                                      |
+| `connectionDrag` | `true`  | Auto-pan while creating or reconnecting an edge.                                                    |
+| `speed`          | `600`   | Maximum speed per axis in viewport pixels per second, independent of zoom and display refresh rate. |
+| `margin`         | `48`    | Distance from each viewport edge, in pixels, where auto-pan starts.                                 |
+
+Speed and margin are shared by both operations. Movement accelerates quadratically toward an edge; at half the margin, speed is one quarter of the maximum. The default speed approximates the previous behavior at 60 Hz.
+
+Omitted fields use their defaults. Setting either `speed` or `margin` to zero disables auto-pan. Negative numbers, `NaN`, and infinities fall back to the corresponding default and produce a warning in development mode.
+
+Settings are captured when the editor is created. Updating the input or mutating its options afterward has no effect; recreate the editor to apply different settings. Auto-pan for selection and keyboard focus is not supported.

@@ -1,3 +1,4 @@
+import { AutoPanSettings } from '../interfaces/auto-pan-settings.interface';
 import { Injectable, WritableSignal, signal } from '@angular/core';
 import { Background } from '../types/background.type';
 import { DEFAULT_OPTIMIZATION, Optimization } from '../interfaces/optimization.interface';
@@ -13,7 +14,7 @@ export class FlowSettingsService {
 
   public elevateNodesOnSelect = signal(true);
   public elevateEdgesOnSelect = signal(true);
-  public autoPan = signal(true);
+  public autoPan = signal<boolean | AutoPanSettings>(true);
 
   /**
    * @see {VflowComponent.view}

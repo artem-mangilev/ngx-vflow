@@ -1,3 +1,4 @@
+import { AutoPanSettings } from '../../interfaces/auto-pan-settings.interface';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -376,10 +377,10 @@ export class VflowComponent {
   }
 
   /**
-   * Enable auto-pan
+   * Configure auto-pan at editor creation. Later changes are ignored.
    */
   @Input()
-  public set autoPan(value: boolean) {
+  public set autoPan(value: boolean | AutoPanSettings) {
     this.flowSettingsService.autoPan.set(value);
   }
   // #endregion
