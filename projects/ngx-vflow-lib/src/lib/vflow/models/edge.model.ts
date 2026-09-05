@@ -22,6 +22,28 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
   private readonly flowEntitiesService = inject(FlowEntitiesService);
   private readonly settingsService = inject(FlowSettingsService);
 
+  public accessibility = computed(() => {
+    const labels = this.settingsService.ariaLabels();
+    const endpoints = labels.edgeLabel({
+      source: this.source()?.ariaLabel() ?? labels.nodeLabel(this.edge.source),
+      target: this.target()?.ariaLabel() ?? labels.nodeLabel(this.edge.target),
+    });
+    const label = this.edge.ariaLabel?.().trim() || endpoints;
+    return {
+      label,
+      domAttributes: this.edge.domAttributes?.(),
+      description: [
+        this.edge.ariaDescription?.(),
+        label !== endpoints ? endpoints : '',
+        this.selected() ? labels.selected : '',
+        !this.selectable() ? labels.selectionUnavailable : '',
+        !this.reconnectable() ? labels.reconnectionUnavailable : '',
+      ]
+        .filter(Boolean)
+        .join(' '),
+    };
+  });
+
   public source = signal<NodeModel | undefined>(undefined);
   public target = signal<NodeModel | undefined>(undefined);
   public curve = signal<Curve>(EDGE_DEFAULTS.curve);

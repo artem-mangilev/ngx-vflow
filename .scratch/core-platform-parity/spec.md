@@ -44,7 +44,7 @@ Bring ngx-vflow's core platform contract to parity with mature node-based UI eng
 | --------------------- | ---------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
 | A — public contracts  | 01 capability policy; 02 topology/bounds utilities; 03 change utilities; 04 geometry utilities | Facade, deletion, accessibility, viewport constraints |
 | B — platform behavior | 05 public facade; 07 gesture policy; 08 constraints/auto-pan                                   | Keyboard operation and consistent navigation          |
-| C — accessibility     | 09 semantics; 10 focus/navigation; 11 keyboard editing/announcements                           | Complete keyboard-operable graph                      |
+| C — accessibility     | 09 semantics; 10 focus/navigation; 11 keyboard editing/announcements; 14 resize/reconnect      | Keyboard-operable graph and editing controls          |
 | D — minimap           | 12 navigation; 13 presentation/accessibility                                                   | Complete interactive minimap                          |
 
 This is a dependency order, not a release commitment. Independent issues may proceed in parallel after their prerequisites are settled.
@@ -64,3 +64,4 @@ This is a dependency order, not a release commitment. Independent issues may pro
 11. [Implement keyboard editing and live announcements](issues/11-implement-keyboard-editing-and-announcements.md)
 12. [Make the minimap navigable](issues/12-make-minimap-navigable.md)
 13. [Add minimap presentation and accessibility hooks](issues/13-add-minimap-presentation-hooks.md)
+14. [Implement accessible resize and reconnect controls](issues/14-implement-accessible-resize-and-reconnect.md) — follow-up identified while defining issue 09; requires its own design session.

@@ -18,6 +18,15 @@
   overflow: hidden;
 }
 
+.vflow-a11y-live {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 // Background sits behind everything (first in DOM, painted before the pane)
 .vflow-background-svg {
   position: absolute;

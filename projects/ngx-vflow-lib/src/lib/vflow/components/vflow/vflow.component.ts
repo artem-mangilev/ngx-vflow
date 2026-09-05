@@ -87,6 +87,9 @@ import { BasicElementCacheService } from '../../services/basic-element-cache.ser
 import { SelectionBoxComponent } from '../selection-box/selection-box.component';
 import { SelectionBoxContextDirective } from '../../directives/selection-box-context.directive';
 import { SelectionBoxSettings } from '../../interfaces/selection-box-settings.interface';
+import { AriaDescriber } from '@angular/cdk/a11y';
+import { EntityAccessibilityDirective } from '../../directives/entity-accessibility.directive';
+import { AriaLabelConfig, DEFAULT_ARIA_LABEL_CONFIG } from '../../interfaces/aria-label-config.interface';
 
 const changesControllerHostDirective = {
   directive: ChangesControllerDirective,
@@ -116,6 +119,7 @@ const nodeDragControllerHostDirective = {
   styleUrls: ['./vflow.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
+    AriaDescriber,
     DraggableService,
     ViewportService,
     FlowStatusService,
@@ -139,6 +143,7 @@ const nodeDragControllerHostDirective = {
   ],
   hostDirectives: [changesControllerHostDirective, nodeDragControllerHostDirective],
   imports: [
+    EntityAccessibilityDirective,
     RootSvgReferenceDirective,
     RootSvgContextDirective,
     RootPointerDirective,
@@ -168,6 +173,7 @@ export class VflowComponent {
   private nodeRenderingService = inject(NodeRenderingService);
   private edgeRenderingService = inject(EdgeRenderingService);
   private flowSettingsService = inject(FlowSettingsService);
+  protected ariaLabels = this.flowSettingsService.ariaLabels;
   private componentEventBusService = inject(ComponentEventBusService);
   private keyboardService = inject(KeyboardService);
   private injector = inject(Injector);
@@ -190,6 +196,15 @@ export class VflowComponent {
   // #endregion
 
   // #region SETTINGS
+
+  /** Partial localization overrides; omitted entries use the English defaults. */
+  @Input()
+  public set ariaLabelConfig(value: Partial<AriaLabelConfig>) {
+    this.flowSettingsService.ariaLabels.set({
+      ...DEFAULT_ARIA_LABEL_CONFIG,
+      ...Object.fromEntries(Object.entries(value).filter(([, entry]) => entry !== undefined)),
+    });
+  }
 
   /**
    * Size for flow view

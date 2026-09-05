@@ -5,6 +5,7 @@ import { EdgeLabel, EdgeLabelPosition } from './edge-label.interface';
 import { Marker } from './marker.interface';
 import { UnwrapSignal } from '../types/unwrap-signal.type';
 import { isDefined } from '../utils/is-defined';
+import { DomAttributes } from './dom-attributes.interface';
 
 export const EDGE_DEFAULTS = {
   type: 'default' as EdgeType,
@@ -35,6 +36,9 @@ export interface Edge<T = unknown> extends Connection {
   selected?: WritableSignal<boolean>;
   selectable?: WritableSignal<boolean>;
   focusable?: WritableSignal<boolean>;
+  ariaLabel?: WritableSignal<string>;
+  ariaDescription?: WritableSignal<string>;
+  domAttributes?: WritableSignal<DomAttributes>;
 }
 
 export type StaticEdge<T = unknown> = UnwrapSignal<Edge<T>>;
@@ -43,9 +47,9 @@ interface CreateEdgeOptions {
   useDefaults: boolean;
 }
 
-type CapabilityName = 'selectable' | 'focusable';
+type OptionalProperty = 'selectable' | 'focusable' | 'ariaLabel' | 'ariaDescription' | 'domAttributes';
 
-export type EdgeWithDefaults<T = unknown> = Omit<Required<Edge<T>>, CapabilityName> & Pick<Edge<T>, CapabilityName>;
+export type EdgeWithDefaults<T = unknown> = Omit<Required<Edge<T>>, OptionalProperty> & Pick<Edge<T>, OptionalProperty>;
 
 export function createEdge<T>(edge: StaticEdge<T>): EdgeWithDefaults<T>;
 export function createEdge<T>(edge: StaticEdge<T>, options: { useDefaults: true }): EdgeWithDefaults<T>;
@@ -71,6 +75,9 @@ export function createEdge<T>(
       selected: signal(isDefined(edge.selected) ? edge.selected : EDGE_DEFAULTS.selected),
       ...(isDefined(edge.selectable) ? { selectable: signal(edge.selectable) } : {}),
       ...(isDefined(edge.focusable) ? { focusable: signal(edge.focusable) } : {}),
+      ...(isDefined(edge.ariaLabel) ? { ariaLabel: signal(edge.ariaLabel) } : {}),
+      ...(isDefined(edge.ariaDescription) ? { ariaDescription: signal(edge.ariaDescription) } : {}),
+      ...(isDefined(edge.domAttributes) ? { domAttributes: signal(edge.domAttributes) } : {}),
     };
   } else {
     return {
@@ -89,6 +96,9 @@ export function createEdge<T>(
       selected: isDefined(edge.selected) ? signal(edge.selected) : undefined,
       ...(isDefined(edge.selectable) ? { selectable: signal(edge.selectable) } : {}),
       ...(isDefined(edge.focusable) ? { focusable: signal(edge.focusable) } : {}),
+      ...(isDefined(edge.ariaLabel) ? { ariaLabel: signal(edge.ariaLabel) } : {}),
+      ...(isDefined(edge.ariaDescription) ? { ariaDescription: signal(edge.ariaDescription) } : {}),
+      ...(isDefined(edge.domAttributes) ? { domAttributes: signal(edge.domAttributes) } : {}),
     };
   }
 }

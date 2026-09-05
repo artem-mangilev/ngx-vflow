@@ -9,6 +9,8 @@ export { getBezierPath } from './lib/vflow/math/edge-path/bezier-path';
 export { getSmoothStepPath } from './lib/vflow/math/edge-path/smooth-step-path';
 
 // Interfaces
+export * from './lib/vflow/interfaces/aria-label-config.interface';
+export * from './lib/vflow/interfaces/dom-attributes.interface';
 export * from './lib/vflow/interfaces/node.interface';
 export * from './lib/vflow/interfaces/point.interface';
 export * from './lib/vflow/interfaces/rect';

@@ -4,9 +4,11 @@ import { Background } from '../types/background.type';
 import { DEFAULT_OPTIMIZATION, Optimization } from '../interfaces/optimization.interface';
 import { SelectionMode } from '../types/selection-mode.type';
 import { SelectionBoxSettings } from '../interfaces/selection-box-settings.interface';
+import { DEFAULT_ARIA_LABEL_CONFIG } from '../interfaces/aria-label-config.interface';
 
 @Injectable()
 export class FlowSettingsService {
+  public ariaLabels = signal(DEFAULT_ARIA_LABEL_CONFIG);
   public nodesSelectable = signal(true);
   public edgesSelectable = signal(true);
   public nodesFocusable = signal(true);

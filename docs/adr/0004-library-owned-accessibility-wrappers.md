@@ -1,0 +1,3 @@
+# Keep accessibility wrapper semantics library-owned
+
+ngx-vflow owns entity wrapper roles, computed accessibility states, relationships, and focus behavior; applications supply names, supplemental descriptions, and a restricted set of DOM metadata. This deliberately limits the role and ARIA overrides available in engines such as React Flow so custom content cannot accidentally erase graph semantics or contradict interaction eligibility. Wrappers preserve the independent semantics of embedded controls, and unavailable interactions are described individually rather than treating an entire node as disabled.

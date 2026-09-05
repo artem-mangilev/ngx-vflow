@@ -1,4 +1,6 @@
 import { TemplateRef, computed, inject, signal } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
+import { DomAttributes } from '../interfaces/dom-attributes.interface';
 import { NODE_DEFAULTS, Node, isComponentNode } from '../interfaces/node.interface';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { HandleModel } from './handle.model';
@@ -22,6 +24,41 @@ export class NodeModel<T = unknown>
   private entitiesService = inject(FlowEntitiesService);
   private settingsService = inject(FlowSettingsService);
   private nodeRenderingService = inject(NodeRenderingService);
+  private document = inject(DOCUMENT);
+
+  public ariaLabel = computed(() => {
+    const override = this.rawNode.ariaLabel?.().trim();
+    if (override) return override;
+    const labels = this.settingsService.ariaLabels();
+    if (this.rawNode.type === 'default') {
+      const template = this.document.createElement('template');
+      template.innerHTML = this.text();
+      template.content.querySelectorAll('script, style, template').forEach((element) => element.remove());
+      const text = template.content.textContent?.replace(/\s+/g, ' ').trim();
+      if (text) return text;
+    }
+    return this.rawNode.type === 'default-group' || this.rawNode.type === 'template-group'
+      ? labels.groupLabel(this.rawNode.id)
+      : labels.nodeLabel(this.rawNode.id);
+  });
+
+  public accessibility = computed((): { label: string; description: string; domAttributes?: DomAttributes } => {
+    const labels = this.settingsService.ariaLabels();
+    const parent = this.parent();
+    return {
+      label: this.ariaLabel(),
+      domAttributes: this.rawNode.domAttributes?.(),
+      description: [
+        this.rawNode.ariaDescription?.(),
+        parent ? labels.parentDescription(parent.ariaLabel()) : '',
+        this.selected() ? labels.selected : '',
+        !this.selectable() ? labels.selectionUnavailable : '',
+        !this.draggable() ? labels.movementUnavailable : '',
+      ]
+        .filter(Boolean)
+        .join(' '),
+    };
+  });
 
   public isVisible = signal(false);
 
@@ -147,7 +184,7 @@ export class NodeModel<T = unknown>
     node: this.rawNode,
   };
 
-  public parent = computed(() => {
+  public parent = computed<NodeModel | null>(() => {
     const parentId = this.parentId();
     if (!parentId) return null;
 

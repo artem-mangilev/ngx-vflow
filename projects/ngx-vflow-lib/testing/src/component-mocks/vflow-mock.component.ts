@@ -29,6 +29,7 @@ import {
   SelectionMode,
   SelectionBoxSettings,
   AutoPanSettings,
+  AriaLabelConfig,
 } from 'ngx-vflow';
 import { toObservable } from '@angular/core/rxjs-interop';
 import {
@@ -135,6 +136,7 @@ import { AsInterface } from '../types';
   imports: [NgTemplateOutlet],
 })
 export class VflowMockComponent implements AsInterface<VflowComponent>, OnInit {
+  @Input() public ariaLabelConfig: Partial<AriaLabelConfig> = {};
   @Input({ required: true })
   public readonly nodes!: Node[];
 

@@ -6,6 +6,7 @@ import { CustomNodeComponent } from '../public-components/custom-node/custom-nod
 import { isCustomNodeComponent } from '../utils/is-vflow-component';
 import { UnwrapSignal } from '../types/unwrap-signal.type';
 import { isDefined } from '../utils/is-defined';
+import { DomAttributes } from './dom-attributes.interface';
 
 export const NODE_DEFAULTS = {
   point: { x: 0, y: 0 },
@@ -39,6 +40,9 @@ export interface SharedNode {
   selected?: WritableSignal<boolean>;
   selectable?: WritableSignal<boolean>;
   focusable?: WritableSignal<boolean>;
+  ariaLabel?: WritableSignal<string>;
+  ariaDescription?: WritableSignal<string>;
+  domAttributes?: WritableSignal<DomAttributes>;
 }
 
 export interface DefaultNode extends SharedNode {
@@ -113,9 +117,9 @@ interface CreateNodeOptions {
   useDefaults: boolean;
 }
 
-type CapabilityName = 'selectable' | 'focusable';
+type OptionalProperty = 'selectable' | 'focusable' | 'ariaLabel' | 'ariaDescription' | 'domAttributes';
 
-export type NodeWithDefaults<T = any> = Omit<Required<Node<T>>, CapabilityName> & Pick<SharedNode, CapabilityName>;
+export type NodeWithDefaults<T = any> = Omit<Required<Node<T>>, OptionalProperty> & Pick<SharedNode, OptionalProperty>;
 
 function createBaseNode(node: UnwrapSignal<SharedNode>, useDefaults: boolean) {
   if (useDefaults) {
@@ -129,6 +133,9 @@ function createBaseNode(node: UnwrapSignal<SharedNode>, useDefaults: boolean) {
       selected: signal(isDefined(node.selected) ? node.selected : NODE_DEFAULTS.selected),
       ...(isDefined(node.selectable) ? { selectable: signal(node.selectable) } : {}),
       ...(isDefined(node.focusable) ? { focusable: signal(node.focusable) } : {}),
+      ...(isDefined(node.ariaLabel) ? { ariaLabel: signal(node.ariaLabel) } : {}),
+      ...(isDefined(node.ariaDescription) ? { ariaDescription: signal(node.ariaDescription) } : {}),
+      ...(isDefined(node.domAttributes) ? { domAttributes: signal(node.domAttributes) } : {}),
     };
   } else {
     return {
@@ -141,6 +148,9 @@ function createBaseNode(node: UnwrapSignal<SharedNode>, useDefaults: boolean) {
       selected: isDefined(node.selected) ? signal(node.selected) : undefined,
       ...(isDefined(node.selectable) ? { selectable: signal(node.selectable) } : {}),
       ...(isDefined(node.focusable) ? { focusable: signal(node.focusable) } : {}),
+      ...(isDefined(node.ariaLabel) ? { ariaLabel: signal(node.ariaLabel) } : {}),
+      ...(isDefined(node.ariaDescription) ? { ariaDescription: signal(node.ariaDescription) } : {}),
+      ...(isDefined(node.domAttributes) ? { domAttributes: signal(node.domAttributes) } : {}),
     };
   }
 }

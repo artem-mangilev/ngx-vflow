@@ -19,6 +19,7 @@ import { FlowEntitiesService } from '../../services/flow-entities.service';
     @if (model().type === 'default') {
       @if (path(); as path) {
         <svg:path
+          aria-hidden="true"
           fill="none"
           stroke-width="2"
           [attr.d]="path"

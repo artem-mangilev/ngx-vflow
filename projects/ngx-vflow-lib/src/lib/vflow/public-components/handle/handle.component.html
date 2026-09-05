@@ -1,6 +1,7 @@
 @if (model; as model) {
   <div
     #handleElement
+    [vflowA11y]="accessibility()"
     class="handle handle--{{ position() }}"
     [class.handle--default]="template() === undefined"
     [style.top]="model.layoutStyles().top"
@@ -18,6 +19,7 @@
 
   @if (showMagnet()) {
     <div
+      aria-hidden="true"
       class="magnet handle--{{ position() }}"
       [style.top]="model.layoutStyles().top"
       [style.left]="model.layoutStyles().left"

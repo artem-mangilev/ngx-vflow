@@ -21,6 +21,9 @@ import { PointerDirective } from '../../directives/pointer.directive';
 import { ConnectionControllerDirective } from '../../directives/connection-controller.directive';
 import { FlowStatusService } from '../../services/flow-status.service';
 import { HandleContext } from '../../interfaces/template-context.interface';
+import { FlowSettingsService } from '../../services/flow-settings.service';
+import { EntityAccessibilityDirective } from '../../directives/entity-accessibility.directive';
+import { DomAttributes } from '../../interfaces/dom-attributes.interface';
 
 @Component({
   standalone: true,
@@ -28,7 +31,7 @@ import { HandleContext } from '../../interfaces/template-context.interface';
   templateUrl: './handle.component.html',
   styleUrls: ['./handle.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [NgTemplateOutlet, PointerDirective],
+  imports: [NgTemplateOutlet, PointerDirective, EntityAccessibilityDirective],
 })
 export class HandleComponent implements OnInit, AfterViewInit {
   private injector = inject(Injector);
@@ -36,6 +39,37 @@ export class HandleComponent implements OnInit, AfterViewInit {
   private element = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
   private destroyRef = inject(DestroyRef);
   private flowStatusService = inject(FlowStatusService);
+  private settings = inject(FlowSettingsService);
+
+  protected accessibility = computed(() => {
+    const labels = this.settings.ariaLabels();
+    const status = this.flowStatusService.status();
+    const candidateDescription =
+      (status.state === 'connection-validation' || status.state === 'reconnection-validation') &&
+      status.payload.targetHandle === this.model
+        ? status.payload.valid
+          ? labels.connectionValid
+          : labels.connectionInvalid
+        : '';
+    return {
+      label:
+        this.ariaLabel()?.trim() ||
+        labels.handleLabel({
+          type: this.type(),
+          id: this.id(),
+          node: this.model!.parentNode.ariaLabel(),
+        }),
+      description: [
+        this.ariaDescription(),
+        !this.canStart() ? labels.connectionStartUnavailable : '',
+        !this.canAccept() ? labels.connectionAcceptUnavailable : '',
+        candidateDescription,
+      ]
+        .filter(Boolean)
+        .join(' '),
+      domAttributes: this.domAttributes(),
+    };
+  });
 
   // TODO remove dependency from this directive
   private connectionController = inject(ConnectionControllerDirective, { optional: true });
@@ -63,6 +97,9 @@ export class HandleComponent implements OnInit, AfterViewInit {
   public canStart = input<boolean>(true);
 
   public canAccept = input<boolean>(true);
+  public ariaLabel = input<string>();
+  public ariaDescription = input<string>();
+  public domAttributes = input<DomAttributes>();
 
   private handleElementRef = viewChild<ElementRef<HTMLElement>>('handleElement');
 
