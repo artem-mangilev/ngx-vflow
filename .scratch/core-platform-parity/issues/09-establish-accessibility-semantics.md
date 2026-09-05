@@ -1,6 +1,6 @@
 # Establish graph accessibility semantics
 
-Status: ready-for-human
+Status: resolved
 Tier: critical-parity
 Depends on: 01
 
@@ -83,6 +83,11 @@ This issue establishes readable graph semantics. It does not claim full keyboard
 - Hidden-state accessibility semantics.
 
 ## Comments
+
+### MVP acceptance — 2026-09-05
+
+- The user accepted the implementation as sufficient for MVP and requested closing this issue as completed. This supersedes the open acceptance status recorded in the earlier comments below.
+- The VoiceOver traversal skips and incomplete physical-keyboard verification remain documented limitations, not passed checks. They do not block this MVP closure. See [verification evidence](../../../docs/accessibility-verification.md).
 
 ### VoiceOver retry — 2026-09-05
 

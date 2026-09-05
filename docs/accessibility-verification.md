@@ -2,6 +2,8 @@
 
 Scenario: the documentation page `/interactions/accessibility`, containing two flows with repeated node IDs, default/custom nodes and edges, a resizable visual group, a custom button, handles and one minimap.
 
+MVP acceptance decision, 2026-09-05: the user accepted the implementation as sufficient for MVP and closed issue 09 as resolved. The limitations below remain recorded; this decision does not turn incomplete or unsuccessful checks into passes.
+
 ## Automated checks
 
 - `npx ng test ngx-vflow-lib --no-watch --no-progress --browsers=ChromeHeadless --include='**/accessibility.spec.ts'`: public inputs/factories → rendered roles, names, descriptions, reactive updates, safe metadata, custom button and independent description cleanup/live regions.
@@ -38,7 +40,7 @@ This was an agent-operated interactive screen-reader check, not a human keyboard
 
 **Unresolved traversal observations:** repeated sequential VoiceOver cursor movement skipped `Archive route` and the custom `Accept request` handle despite their presence in Safari's accessibility tree. Moving left from the pointed handle reached `Review request`; moving right again left the Approval group instead of visiting the handle. Pointed inspection confirmed the handle's speech, but custom-edge speech was not confirmed. Some traversals also skipped Archive, so the effect of cursor context must be isolated before attributing the skips to the library or Safari.
 
-An attempted check using ordinary keyboard events through System Events failed with error `1002`: macOS did not allow `osascript` to send keystrokes. Accessibility permissions were not expanded to bypass that restriction. Therefore the next check is a physical VoiceOver keyboard traversal of the same scenario, specifically the custom edge and custom handle; if the skips reproduce, fix the reading behavior and repeat the scenario before resolving issue 09. Do not treat these observations as proof of full screen-reader usability, or dismiss reading-order problems as merely the deferred graph-keyboard feature.
+An attempted check using ordinary keyboard events through System Events failed with error `1002`: macOS did not allow `osascript` to send keystrokes. Accessibility permissions were not expanded to bypass that restriction. A follow-up check should use physical VoiceOver keyboard traversal of the same scenario, specifically the custom edge and custom handle; if the skips reproduce, fix the reading behavior and repeat the scenario. This follow-up does not block the user-approved MVP closure. Do not treat these observations as proof of full screen-reader usability, or dismiss reading-order problems as merely the deferred graph-keyboard feature.
 
 After the retry, both the temporary VoiceOver AppleScript checkbox and VoiceOver itself were switched off and their off states verified in the UI. No library code changed during this retry.
 
