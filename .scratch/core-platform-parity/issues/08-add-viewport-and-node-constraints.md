@@ -66,3 +66,11 @@ Resolved on 2026-09-05.
 - Verified 157 library tests, the demo test, 29 focused auto-pan tests after the final test-host lint adjustment, library typechecking/lint, and library/testing-package and documentation-demo builds.
 - Parallel code review: Standards — no actionable findings; Spec — no actionable findings.
 - Viewport/node constraints, configurable origins, and new selection/focus auto-pan remain deferred.
+
+### Follow-up: neighbouring nodes jitter during auto-pan
+
+- A user-reported jitter reproduced with two nodes and real browser frames: the stationary neighbour reversed direction 41 times over 90 frames while the pointer remained at the left edge.
+- Root cause: zero-duration viewport writes still created asynchronous D3 transitions. Auto-pan calculated newer targets from a viewport whose previous write had not yet applied, producing alternating stale positions.
+- Apply zero-duration requests directly to the D3 selection in the shared viewport path. Keep transitions for positive durations; D3's direct transform interrupts older animations.
+- Added a regression test that samples the neighbour's rendered position on every real animation frame. The earlier mocked-frame tests waited for each transition to finish, hiding this race.
+- Verified live-browser node dragging, the real-frame regression, all 158 library tests, library/testing-package build, and lint. Standards and Spec reviews found no actionable issues.

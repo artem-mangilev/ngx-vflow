@@ -225,3 +225,53 @@ describe('public auto-pan settings', () => {
     expect(fixture.componentInstance.flow.viewport().x).toBeCloseTo(80, 8);
   });
 });
+
+describe('auto-pan with real browser frames', () => {
+  it('moves stationary neighbouring nodes in one direction while a node is held at the left edge', async () => {
+    TestBed.configureTestingModule({
+      imports: [AutoPanHostComponent],
+      providers: [provideExperimentalZonelessChangeDetection()],
+    });
+    const fixture = TestBed.createComponent(AutoPanHostComponent);
+    fixture.componentRef.setInput('nodes', [
+      createNode({ id: 'dragged', type: 'default', point: { x: 100, y: 100 }, text: 'Dragged' }),
+      createNode({ id: 'neighbour', type: 'default', point: { x: 250, y: 100 }, text: 'Neighbour' }),
+    ]);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    const root = fixture.nativeElement.querySelector('.vflow-root') as HTMLElement;
+    const nodes = fixture.nativeElement.querySelectorAll('[node]') as NodeListOf<HTMLElement>;
+    const rect = root.getBoundingClientRect();
+    const mouse = (target: EventTarget, type: string, x: number) =>
+      target.dispatchEvent(
+        new MouseEvent(type, {
+          bubbles: true,
+          cancelable: true,
+          clientX: rect.left + x,
+          clientY: rect.top + 150,
+          view: window,
+        }),
+      );
+    const positions: number[] = [];
+    try {
+      mouse(nodes[0], 'mousedown', 110);
+      mouse(window, 'mousemove', 4);
+      fixture.detectChanges();
+      TestBed.flushEffects();
+      document.dispatchEvent(new PointerEvent('pointermove', { clientX: rect.left + 4, clientY: rect.top + 150 }));
+      for (let i = 0; i < 90; i++) {
+        await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+        positions.push(nodes[1].getBoundingClientRect().x);
+      }
+    } finally {
+      mouse(window, 'mouseup', 4);
+      fixture.destroy();
+    }
+    const reversals = positions.slice(1).filter((x, i) => x < positions[i] - 0.1);
+    expect(positions.at(-1)! - positions[0]).toBeGreaterThan(100);
+    expect(reversals)
+      .withContext(`Neighbour reversed ${reversals.length} times: ${positions.join(', ')}`)
+      .toEqual([]);
+  });
+});

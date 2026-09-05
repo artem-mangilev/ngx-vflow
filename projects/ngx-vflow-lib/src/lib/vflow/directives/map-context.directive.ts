@@ -35,9 +35,14 @@ export class MapContextDirective implements OnInit, OnDestroy {
       return;
     }
 
+    // Auto-pan updates every frame; a zero-duration transition still queues work in D3.
+    // D3 applies selection transforms synchronously and interrupts older animations.
+    const target =
+      viewport.duration > 0 ? this.paneSelection.transition().duration(viewport.duration) : this.paneSelection;
+
     // If only zoom provided
     if (isDefined(state.zoom) && !isDefined(state.x) && !isDefined(state.y)) {
-      this.paneSelection.transition().duration(viewport.duration).call(this.zoomBehavior.scaleTo, state.zoom);
+      target.call(this.zoomBehavior.scaleTo, state.zoom);
 
       return;
     }
@@ -47,20 +52,14 @@ export class MapContextDirective implements OnInit, OnDestroy {
       // remain same zoom value
       const zoom = untracked(this.viewportService.readableViewport).zoom;
 
-      this.paneSelection
-        .transition()
-        .duration(viewport.duration)
-        .call(this.zoomBehavior.transform, zoomIdentity.translate(state.x, state.y).scale(zoom));
+      target.call(this.zoomBehavior.transform, zoomIdentity.translate(state.x, state.y).scale(zoom));
 
       return;
     }
 
     // If whole viewort state provided
     if (isDefined(state.x) && isDefined(state.y) && isDefined(state.zoom)) {
-      this.paneSelection
-        .transition()
-        .duration(viewport.duration)
-        .call(this.zoomBehavior.transform, zoomIdentity.translate(state.x, state.y).scale(state.zoom));
+      target.call(this.zoomBehavior.transform, zoomIdentity.translate(state.x, state.y).scale(state.zoom));
 
       return;
     }
