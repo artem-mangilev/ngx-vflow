@@ -1,9 +1,8 @@
-import { Injectable, TemplateRef, inject, signal } from '@angular/core';
+import { Injectable, TemplateRef, signal } from '@angular/core';
 import { Position } from '../types/position.type';
 import { HandleType } from '../types/handle-type.type';
 import { NodeModel } from '../models/node.model';
 import { HandleModel } from '../models/handle.model';
-import { RequestAnimationFrameBatchingService } from './request-animation-frame-batching.service';
 
 export interface NodeHandle {
   position: Position;
@@ -17,17 +16,13 @@ export interface NodeHandle {
 
 @Injectable()
 export class HandleService {
-  private afService = inject(RequestAnimationFrameBatchingService);
-
   public readonly node = signal<NodeModel | null>(null);
 
   public createHandle(newHandle: HandleModel) {
-    this.afService.batchAnimationFrame(() => {
-      const node = this.node();
-      if (node) {
-        node.handles.update((handles) => [...handles, newHandle]);
-      }
-    });
+    const node = this.node();
+    if (node) {
+      node.handles.update((handles) => [...handles, newHandle]);
+    }
   }
 
   public destroyHandle(handleToDestoy: HandleModel) {

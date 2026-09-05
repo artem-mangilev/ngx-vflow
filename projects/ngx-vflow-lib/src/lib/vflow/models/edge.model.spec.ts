@@ -14,6 +14,9 @@ import { SvgGraphicElementCacheService } from '../services/svg-graphic-element-c
 
 describe('EdgeModel', () => {
   let model: EdgeModel;
+  let flowEntities: FlowEntitiesService;
+  let node1: NodeModel;
+  let node2: NodeModel;
   let htmlElementCacheService: HtmlElementCacheService;
   let svgGraphicElementCacheService: SvgGraphicElementCacheService;
 
@@ -30,6 +33,36 @@ describe('EdgeModel', () => {
 
     htmlElementCacheService = new HtmlElementCacheService();
     svgGraphicElementCacheService = new SvgGraphicElementCacheService();
+    flowEntities = TestBed.inject(FlowEntitiesService);
+
+    node1 = TestBed.runInInjectionContext(
+      () =>
+        new NodeModel(
+          createNode({
+            id: '1',
+            type: 'default',
+            text: 'test',
+            point: { x: 15, y: 15 },
+            width: 0,
+            height: 0,
+          }),
+        ),
+    );
+    node2 = TestBed.runInInjectionContext(
+      () =>
+        new NodeModel(
+          createNode({
+            id: '2',
+            type: 'default',
+            text: 'test',
+            point: { x: 15, y: 15 },
+            width: 0,
+            height: 0,
+          }),
+        ),
+    );
+
+    flowEntities.nodes.set([node1, node2]);
 
     model = TestBed.runInInjectionContext(
       () =>
@@ -43,38 +76,7 @@ describe('EdgeModel', () => {
         ),
     );
 
-    model.source.set(
-      TestBed.runInInjectionContext(
-        () =>
-          new NodeModel(
-            createNode({
-              id: '1',
-              type: 'default',
-              text: 'test',
-              point: { x: 15, y: 15 },
-              width: 0,
-              height: 0,
-            }),
-          ),
-      ),
-    );
-    model.target.set(
-      TestBed.runInInjectionContext(
-        () =>
-          new NodeModel(
-            createNode({
-              id: '2',
-              type: 'default',
-              text: 'test',
-              point: { x: 15, y: 15 },
-              width: 0,
-              height: 0,
-            }),
-          ),
-      ),
-    );
-
-    model.source()!.handles.set([
+    node1.handles.set([
       TestBed.runInInjectionContext(
         () =>
           new HandleModel(
@@ -84,14 +86,14 @@ describe('EdgeModel', () => {
               userOffsetX: 0,
               userOffsetY: 0,
             },
-            model.source()!,
+            node1,
             htmlElementCacheService,
             svgGraphicElementCacheService,
           ),
       ),
     ]);
 
-    model.target()!.handles.set([
+    node2.handles.set([
       TestBed.runInInjectionContext(
         () =>
           new HandleModel(
@@ -101,7 +103,7 @@ describe('EdgeModel', () => {
               userOffsetX: 0,
               userOffsetY: 0,
             },
-            model.source()!,
+            node2,
             htmlElementCacheService,
             svgGraphicElementCacheService,
           ),
@@ -124,12 +126,12 @@ describe('EdgeModel', () => {
   });
 
   it('should set detached === true if there no source', () => {
-    model.source.set(undefined);
+    flowEntities.nodes.set([node2]);
     expect(model.detached()).toEqual(true);
   });
 
   it('should detached === true if there no target', () => {
-    model.target.set(undefined);
+    flowEntities.nodes.set([node1]);
     expect(model.detached()).toEqual(true);
   });
 

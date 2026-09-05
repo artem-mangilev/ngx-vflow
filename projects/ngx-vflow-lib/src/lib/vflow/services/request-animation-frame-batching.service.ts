@@ -10,7 +10,7 @@ export class RequestAnimationFrameBatchingService {
     if (!this.requestAnimationFrameStarted) {
       this.requestAnimationFrameStarted = true;
       requestAnimationFrame(() => {
-        this.callbacks.map((x) => {
+        this.callbacks.forEach((x) => {
           if (x) {
             x();
           }
