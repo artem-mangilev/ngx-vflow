@@ -55,3 +55,7 @@ The same documentation page now also includes a dedicated keyboard example (`dat
 - Browser screenshots were inspected for distinct node and edge focus indicators. The editor demo keeps its embedded controls inside the visible graph. Focus pan preserves zoom and only centers fully offscreen nodes; it does not follow keyboard movement or edge focus.
 - These checks are browser automation and visual inspection, not a new physical-keyboard or VoiceOver session. No new screen-reader result is claimed. Existing screen-reader limitations recorded above remain available for follow-up.
 - Virtualization, action announcements, keyboard connections, minimap operation and resize/reconnect keyboard controls remain outside issue 10.
+
+## Keyboard editing — issue 11 rollback, 2026-09-05
+
+The user requested rolling back issue 11 after evaluating its interaction design and research into other graph libraries. Keyboard connection creation is currently unsupported. The issue 11 deletion-request API, action announcements, handle Tab stops, editing demo and related tests were also removed. Issue 10's keyboard navigation, selection and movement remain in place. Test results from the discarded implementation are not evidence of current support, and its pending VoiceOver check is no longer an acceptance task.

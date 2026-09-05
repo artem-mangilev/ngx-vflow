@@ -114,7 +114,7 @@ Each flow owns independent description references and one initially empty, polit
 
 Graph wrappers support the keyboard operations described above. Embedded application controls retain their native keyboard behavior. Handles and the minimap do not gain Tab stops. This does not establish full keyboard accessibility for every graph operation.
 
-- Issue 11 owns keyboard connections and action announcements, including coalescing frequent updates.
+- Keyboard connection creation is currently unsupported. The issue 11 implementation was rolled back pending a new interaction design. Core deletion requests and action announcements are also unavailable.
 - Issues 12–13 own minimap interaction and keyboard navigation.
 - Issue 14 owns accessible resize/reconnect controls. Existing library resize and reconnect controls remain pointer-only; naming their owner does not make those controls accessible.
 
