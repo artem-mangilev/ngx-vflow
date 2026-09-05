@@ -75,7 +75,10 @@ export class HandleModel {
   constructor(
     public rawHandle: NodeHandle,
     public parentNode: NodeModel,
-  ) {}
+  ) {
+    // Standard geometry is already known; waiting for a frame flashes unpositioned handles.
+    if (this.isStandard) this.sync();
+  }
 
   /**
    * Read phase. Standard handles are derived from model dimensions; custom

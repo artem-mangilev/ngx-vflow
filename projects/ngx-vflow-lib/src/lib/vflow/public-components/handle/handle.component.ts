@@ -41,16 +41,19 @@ export class HandleComponent implements OnInit, AfterViewInit {
   private flowStatusService = inject(FlowStatusService);
   private settings = inject(FlowSettingsService);
 
-  protected accessibility = computed(() => {
+  private candidateDescription = computed(() => {
     const labels = this.settings.ariaLabels();
     const status = this.flowStatusService.status();
-    const candidateDescription =
-      (status.state === 'connection-validation' || status.state === 'reconnection-validation') &&
+    return (status.state === 'connection-validation' || status.state === 'reconnection-validation') &&
       status.payload.targetHandle === this.model
-        ? status.payload.valid
-          ? labels.connectionValid
-          : labels.connectionInvalid
-        : '';
+      ? status.payload.valid
+        ? labels.connectionValid
+        : labels.connectionInvalid
+      : '';
+  });
+
+  protected accessibility = computed(() => {
+    const labels = this.settings.ariaLabels();
     return {
       label:
         this.ariaLabel()?.trim() ||
@@ -63,7 +66,7 @@ export class HandleComponent implements OnInit, AfterViewInit {
         this.ariaDescription(),
         !this.canStart() ? labels.connectionStartUnavailable : '',
         !this.canAccept() ? labels.connectionAcceptUnavailable : '',
-        candidateDescription,
+        this.candidateDescription(),
       ]
         .filter(Boolean)
         .join(' '),

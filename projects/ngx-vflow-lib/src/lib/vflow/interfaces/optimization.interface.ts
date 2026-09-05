@@ -20,8 +20,8 @@ export interface Optimization {
    * filters out entities that are outside the visible area, reducing the number of
    * DOM elements and improving rendering performance for large flows.
    *
-   * It uses canvas as a virtualization layer during viewport change.
-   * When the viewport change ends, the library hydrates the canvas with the actual nodes and edges.
+   * Below virtualizationZoomThreshold, nodes are drawn as a canvas preview and edges
+   * are hidden. At higher zoom, visible node views mount as the viewport changes.
    */
   virtualization?: boolean;
 
