@@ -165,7 +165,10 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
     return handle;
   });
 
-  public closestHandles = computed(() => {
+  public closestHandles = extendedComputed<{
+    sourceHandle: HandleModel | null;
+    targetHandle: HandleModel | null;
+  }>((previous) => {
     const source = this.source();
     const target = this.target();
 
@@ -173,19 +176,29 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
       return { sourceHandle: null, targetHandle: null };
     }
 
-    // Get all source handles from source node
+    // A virtually unmounted endpoint still participates in closest-pair selection.
+    const availableSourceHandles = source.handles().length
+      ? source.handles()
+      : source.virtualized() && previous?.sourceHandle?.parentNode === source
+        ? [previous.sourceHandle]
+        : [];
+    const availableTargetHandles = target.handles().length
+      ? target.handles()
+      : target.virtualized() && previous?.targetHandle?.parentNode === target
+        ? [previous.targetHandle]
+        : [];
+
     const sourceHandles =
       this.flowEntitiesService.connection().mode === 'strict'
-        ? source.handles().filter((h) => h.rawHandle.type === 'source')
-        : source.handles();
-    // Get all target handles from target node
+        ? availableSourceHandles.filter((h) => h.rawHandle.type === 'source')
+        : availableSourceHandles;
     const targetHandles =
       this.flowEntitiesService.connection().mode === 'strict'
-        ? target.handles().filter((h) => h.rawHandle.type === 'target')
-        : target.handles();
+        ? availableTargetHandles.filter((h) => h.rawHandle.type === 'target')
+        : availableTargetHandles;
 
     if (sourceHandles.length === 0 || targetHandles.length === 0) {
-      return { sourceHandle: null, targetHandle: null };
+      return { sourceHandle: sourceHandles[0] ?? null, targetHandle: targetHandles[0] ?? null };
     }
 
     let minDistance = Infinity;

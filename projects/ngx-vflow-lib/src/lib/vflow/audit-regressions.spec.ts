@@ -21,6 +21,7 @@ import { ConnectionControllerDirective } from './directives/connection-controlle
 import { EdgeLabelComponent } from './components/edge-label/edge-label.component';
 import { EdgeLabelModel } from './models/edge-label.model';
 import { ConnectionModel } from './models/connection.model';
+import { VflowComponent } from './components/vflow/vflow.component';
 
 describe('Graph rendering and interaction regressions', () => {
   beforeEach(() =>
@@ -170,6 +171,41 @@ describe('Graph rendering and interaction regressions', () => {
     expect(edges[0].detached()).toBeTrue();
   });
 
+  it('restores actual node views and edges after panning without emitting detached notifications', async () => {
+    const fixture = TestBed.createComponent(VflowComponent);
+    fixture.componentRef.setInput('view', [400, 300]);
+    fixture.componentRef.setInput('optimization', { virtualization: true });
+    fixture.componentRef.setInput('nodes', [
+      createNode({ id: 'a', type: 'default', point: { x: 10, y: 20 } }),
+      createNode({ id: 'b', type: 'default', point: { x: 250, y: 20 } }),
+    ]);
+    fixture.componentRef.setInput('edges', [createEdge({ id: 'a-b', source: 'a', target: 'b' })]);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    await settle();
+    await fixture.whenStable();
+    const events: unknown[] = [];
+    const subscription = fixture.componentInstance.edgesChange$.subscribe((changes) => events.push(...changes));
+    fixture.detectChanges();
+    await fixture.whenStable();
+    const host = fixture.nativeElement as HTMLElement;
+    expect(host.querySelectorAll('.vflow-node').length).toBe(2);
+    expect(host.querySelectorAll('svg[edge]').length).toBe(1);
+    fixture.componentInstance.panTo({ x: 1000, y: 0 });
+    fixture.detectChanges();
+    await fixture.whenStable();
+    expect(host.querySelectorAll('.vflow-node').length).toBe(0);
+    expect(host.querySelectorAll('svg[edge]').length).toBe(0);
+    fixture.componentInstance.panTo({ x: 0, y: 0 });
+    fixture.detectChanges();
+    await fixture.whenStable();
+    await settle();
+    expect(host.querySelectorAll('.vflow-node').length).toBe(2);
+    expect(host.querySelectorAll('svg[edge]').length).toBe(1);
+    expect(events).not.toContain({ type: 'detached', id: 'a-b' });
+    subscription.unsubscribe();
+  });
+
   it('uses the whole custom curve, including a detour away from its endpoints', () => {
     const { nodes, edges } = graph();
     const settings = TestBed.inject(FlowSettingsService);
@@ -183,6 +219,23 @@ describe('Graph rendering and interaction regressions', () => {
     edges[0].curve.set(() => ({ path: 'M -1000,-1000 l 100,0' }));
     expect(rendering.edges()).not.toContain(edges[0]);
   });
+
+  for (const virtualizedIndex of [0, 1]) {
+    it(`preserves a floating edge with only endpoint ${virtualizedIndex} virtualized`, () => {
+      const { nodes, edges } = graph();
+      const edge = edges[0];
+      edge.floating.set(true);
+      const path = edge.path().path;
+      expect(path).not.toBe('');
+      nodes[virtualizedIndex].virtualized.set(true);
+      nodes[virtualizedIndex].handles.set([]);
+      expect(edge.detached()).toBeFalse();
+      expect(edge.path().path).toBe(path);
+      nodes[1 - virtualizedIndex].handles.set([]);
+      expect(edge.detached()).toBeTrue();
+      expect(edge.path().path).toBe('');
+    });
+  }
 
   it('preserves rendered position when reparentNodes adds an omitted parentId signal', () => {
     const parent = createNode({ id: 'parent', type: 'default', point: { x: 100, y: 0 } });

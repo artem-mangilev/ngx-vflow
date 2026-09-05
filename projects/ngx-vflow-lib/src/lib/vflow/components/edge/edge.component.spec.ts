@@ -8,6 +8,7 @@ import { FlowEntitiesService } from '../../services/flow-entities.service';
 import { FlowSettingsService } from '../../services/flow-settings.service';
 import { FlowStatusService } from '../../services/flow-status.service';
 import { EdgeRenderingService } from '../../services/edge-rendering.service';
+import { ViewportService } from '../../services/viewport.service';
 import { KeyboardService } from '../../services/keyboard.service';
 import { SelectionService } from '../../services/selection.service';
 import { RootPointerDirective } from '../../directives/root-pointer.directive';
@@ -37,6 +38,7 @@ describe('EdgeComponent', () => {
       imports: [EdgeHostComponent],
       providers: [
         EdgeRenderingService,
+        ViewportService,
         FlowEntitiesService,
         FlowSettingsService,
         FlowStatusService,
