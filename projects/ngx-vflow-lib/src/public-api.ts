@@ -81,3 +81,5 @@ export { NodeRenderingService as ɵNodeRenderingService } from './lib/vflow/serv
 
 export { RootPointerDirective as ɵRootPointerDirective } from './lib/vflow/directives/root-pointer.directive';
 export { SpacePointContextDirective as ɵSpacePointContextDirective } from './lib/vflow/directives/space-point-context.directive';
+
+export * from './lib/vflow/directives/gesture-exclusions.directive';

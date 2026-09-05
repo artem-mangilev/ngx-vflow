@@ -218,6 +218,54 @@ export class VflowComponent {
     this.flowSettingsService.maxZoom.set(value);
   }
 
+  /** Zoom with ordinary wheel/trackpad scrolling. */
+  @Input()
+  public set zoomOnScroll(value: boolean) {
+    this.flowSettingsService.zoomOnScroll.set(value);
+  }
+
+  /** Zoom with trackpad or touchscreen pinch. */
+  @Input()
+  public set zoomOnPinch(value: boolean) {
+    this.flowSettingsService.zoomOnPinch.set(value);
+  }
+
+  /** Zoom with double-click. */
+  @Input()
+  public set zoomOnDoubleClick(value: boolean) {
+    this.flowSettingsService.zoomOnDoubleClick.set(value);
+  }
+
+  /** Pan by dragging. true allows all mouse buttons; arrays restrict mouse buttons, not touch. */
+  @Input()
+  public set panOnDrag(value: boolean | number[]) {
+    this.flowSettingsService.panOnDrag.set(value);
+  }
+
+  /** Pan with scrolling, taking priority over ordinary wheel zoom. */
+  @Input()
+  public set panOnScroll(value: boolean) {
+    this.flowSettingsService.panOnScroll.set(value);
+  }
+
+  /** Viewport click tolerance in CSS pixels. Default: 6. */
+  @Input()
+  public set paneClickDistance(value: number) {
+    this.flowSettingsService.paneClickDistance.set(Number.isFinite(value) ? Math.max(0, value) : 0);
+  }
+
+  /** Distance in CSS pixels before node drag starts. Default: 0. */
+  @Input()
+  public set nodeDragThreshold(value: number) {
+    this.flowSettingsService.nodeDragThreshold.set(Number.isFinite(value) ? Math.max(0, value) : 0);
+  }
+
+  /** Distance in CSS pixels before connection or reconnection starts. Default: 0. */
+  @Input()
+  public set connectionDragThreshold(value: number) {
+    this.flowSettingsService.connectionDragThreshold.set(Number.isFinite(value) ? Math.max(0, value) : 0);
+  }
+
   /**
    * Background for flow
    */

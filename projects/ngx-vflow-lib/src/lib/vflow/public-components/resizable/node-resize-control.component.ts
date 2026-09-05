@@ -1,3 +1,4 @@
+import { NoDragDirective } from '../../directives/gesture-exclusions.directive';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -30,9 +31,10 @@ import {
   selector: '[nodeResizeControl]',
   standalone: true,
   template: '',
+  hostDirectives: [NoDragDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
-    class: 'resize-control nodrag',
+    class: 'resize-control',
     '[class.top]': "position().includes('top')",
     '[class.right]': "position().includes('right')",
     '[class.bottom]': "position().includes('bottom')",

@@ -1,3 +1,4 @@
+import { NoDragDirective, NoPanDirective, NoWheelDirective } from './directives/gesture-exclusions.directive';
 import { VflowComponent } from './components/vflow/vflow.component';
 
 import { DragHandleDirective } from './directives/drag-handle.directive';
@@ -19,6 +20,9 @@ import { HandleComponent } from './public-components/handle/handle.component';
 import { CustomTemplateEdgeComponent } from './public-components/custom-template-edge/custom-template-edge.component';
 
 export const Vflow = [
+  NoDragDirective,
+  NoPanDirective,
+  NoWheelDirective,
   VflowComponent,
   HandleComponent,
   ResizableComponent,

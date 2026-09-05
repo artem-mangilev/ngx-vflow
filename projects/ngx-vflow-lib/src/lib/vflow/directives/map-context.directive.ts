@@ -1,5 +1,5 @@
-import { Directive, ElementRef, NgZone, OnInit, effect, inject, untracked } from '@angular/core';
-import { select } from 'd3-selection';
+import { Directive, ElementRef, NgZone, OnDestroy, OnInit, effect, inject, untracked } from '@angular/core';
+import { pointer, select } from 'd3-selection';
 import { D3ZoomEvent, ZoomBehavior, ZoomTransform, zoom, zoomIdentity } from 'd3-zoom';
 import { ViewportService } from '../services/viewport.service';
 import { isDefined } from '../utils/is-defined';
@@ -7,13 +7,14 @@ import { ViewportState } from '../interfaces/viewport.interface';
 import { SelectionService, ViewportForSelection } from '../services/selection.service';
 import { FlowSettingsService } from '../services/flow-settings.service';
 import { KeyboardService } from '../services/keyboard.service';
+import { isTouchEvent } from '../utils/event';
 import { allowRootZoomForNodeTarget } from '../utils/allow-root-zoom-for-node-target';
 
 @Directive({
   standalone: true,
   selector: 'div[mapContext]',
 })
-export class MapContextDirective implements OnInit {
+export class MapContextDirective implements OnInit, OnDestroy {
   protected host = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
   protected selectionService = inject(SelectionService);
   protected viewportService = inject(ViewportService);
@@ -65,6 +66,8 @@ export class MapContextDirective implements OnInit {
     }
   });
 
+  private touchCenter?: [number, number];
+
   protected zoomBehavior!: ZoomBehavior<HTMLElement, unknown>;
 
   public ngOnInit(): void {
@@ -76,16 +79,83 @@ export class MapContextDirective implements OnInit {
         .on('zoom', this.handleZoom)
         .on('end', this.handleZoomEnd);
 
-      this.paneSelection.call(this.zoomBehavior).on('dblclick.zoom', null);
+      this.paneSelection.call(this.zoomBehavior);
+      const wheelZoom = this.paneSelection.on('wheel.zoom')!;
+      const doubleClickZoom = this.paneSelection.on('dblclick.zoom')!;
+      this.paneSelection
+        .on(
+          'wheel.zoom',
+          (event: WheelEvent) => {
+            if (this.excluded(event, '[data-vflow-no-wheel]')) return;
+            if (!event.ctrlKey && this.scrollPanning()) {
+              if (
+                this.keyboardService.isActiveAction('selection') ||
+                this.excluded(event, '[data-vflow-no-pan], [data-vflow-no-drag]')
+              )
+                return;
+              event.preventDefault();
+              const unit = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? this.host.clientHeight : 1;
+              const k = this.viewportService.readableViewport().zoom;
+              this.zoomBehavior.translateBy(this.paneSelection, (-event.deltaX * unit) / k, (-event.deltaY * unit) / k);
+            } else {
+              wheelZoom.call(this.host, event, undefined);
+            }
+          },
+          { passive: false },
+        )
+        .on('dblclick.zoom', (event: MouseEvent) => {
+          if (this.flowSettingsService.zoomOnDoubleClick() && this.filterCondition(event)) {
+            doubleClickZoom.call(this.host, event, undefined);
+          }
+        });
+      // D3 consumes accepted touch gestures itself; controls must retain native scrolling.
+      this.paneSelection.style('touch-action', null);
     });
   }
 
-  private handleZoom = ({ transform }: ZoomEvent) => {
+  public ngOnDestroy() {
+    this.paneSelection.on('.zoom', null);
+  }
+
+  private handleZoom = ({ transform, sourceEvent }: ZoomEvent) => {
+    if (sourceEvent && isTouchEvent(sourceEvent)) {
+      const current = this.viewportService.readableViewport();
+      const touches = Array.from(sourceEvent.touches);
+      const rect = this.host.getBoundingClientRect();
+      const center: [number, number] = [
+        touches.reduce((sum, touch) => sum + touch.clientX, 0) / touches.length - rect.left,
+        touches.reduce((sum, touch) => sum + touch.clientY, 0) / touches.length - rect.top,
+      ];
+      const pan = this.dragPanning() && !this.excluded(sourceEvent, '[data-vflow-no-pan], [data-vflow-no-drag]');
+      if (!this.flowSettingsService.zoomOnPinch()) {
+        const ratio = current.zoom / transform.k;
+        transform = zoomIdentity
+          .translate(center[0] - (center[0] - transform.x) * ratio, center[1] - (center[1] - transform.y) * ratio)
+          .scale(current.zoom);
+      }
+      if (!pan) {
+        const ratio = touches.length > 1 ? transform.k / current.zoom : 1;
+        const anchor = this.touchCenter ?? center;
+        transform = zoomIdentity
+          .translate(anchor[0] - (anchor[0] - current.x) * ratio, anchor[1] - (anchor[1] - current.y) * ratio)
+          .scale(current.zoom * ratio);
+      }
+      this.touchCenter = center;
+      this.paneSelection.property('__zoom', transform);
+    }
     // update public signal for user to read
     this.viewportService.readableViewport.set(mapTransformToViewportState(transform));
   };
 
-  private handleZoomStart = ({ transform }: ZoomEvent) => {
+  private handleZoomStart = ({ transform, sourceEvent }: ZoomEvent) => {
+    this.touchCenter = undefined;
+    if (sourceEvent && isTouchEvent(sourceEvent)) {
+      const points = Array.from(sourceEvent.touches).map((touch) => pointer(touch, this.host));
+      this.touchCenter = [
+        points.reduce((sum, p) => sum + p[0], 0) / points.length,
+        points.reduce((sum, p) => sum + p[1], 0) / points.length,
+      ];
+    }
     this.viewportForSelection = {
       start: mapTransformToViewportState(transform),
     };
@@ -106,8 +176,47 @@ export class MapContextDirective implements OnInit {
     });
   };
 
-  private filterCondition = (event: Event) =>
-    allowRootZoomForNodeTarget(event, this.keyboardService.isActiveAction('selection'));
+  private excluded(event: Event, selector: string) {
+    return event.target instanceof Element && !!event.target.closest(selector);
+  }
+
+  private dragPanning() {
+    return this.keyboardService.isActiveAction('pan') || this.flowSettingsService.panOnDrag() !== false;
+  }
+
+  private scrollPanning() {
+    return (
+      (this.flowSettingsService.panOnScroll() || this.keyboardService.isActiveAction('pan')) &&
+      !this.keyboardService.isActiveAction('zoom')
+    );
+  }
+
+  private filterCondition = (event: Event) => {
+    if (event.type === 'wheel') {
+      const wheel = event as WheelEvent;
+      return (
+        !this.excluded(event, '[data-vflow-no-wheel]') &&
+        (wheel.ctrlKey
+          ? this.flowSettingsService.zoomOnPinch()
+          : this.keyboardService.isActiveAction('zoom') || this.flowSettingsService.zoomOnScroll())
+      );
+    }
+    if (event.type === 'dblclick') return this.flowSettingsService.zoomOnDoubleClick();
+    const selecting = this.keyboardService.isActiveAction('selection');
+    const panTarget = allowRootZoomForNodeTarget(event, selecting);
+    if (isTouchEvent(event)) {
+      return (
+        !selecting &&
+        ((panTarget && this.dragPanning()) || (event.touches.length > 1 && this.flowSettingsService.zoomOnPinch()))
+      );
+    }
+    if (!panTarget) return false;
+    const buttons = this.flowSettingsService.panOnDrag();
+    return (
+      this.dragPanning() &&
+      (!(event instanceof MouseEvent) || !Array.isArray(buttons) || buttons.includes(event.button))
+    );
+  };
 }
 
 const mapTransformToViewportState = (transform: ZoomTransform): ViewportState => ({

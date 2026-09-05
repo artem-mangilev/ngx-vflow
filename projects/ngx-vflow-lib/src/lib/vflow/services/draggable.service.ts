@@ -17,20 +17,9 @@ import { isGroupNode } from '../utils/is-group-node';
 import { ResizeObserverService } from './resize-observer.service';
 import { clientToFlowPosition } from '../utils/coordinates';
 
+import { eventClientPoint } from '../utils/event';
+
 type DragEvent = D3DragEvent<Element, unknown, unknown>;
-
-function clientFromEvent(event: MouseEvent | TouchEvent): Point {
-  if ('touches' in event && event.touches.length) {
-    return { x: event.touches[0].clientX, y: event.touches[0].clientY };
-  }
-
-  if ('changedTouches' in event && event.changedTouches.length) {
-    return { x: event.changedTouches[0].clientX, y: event.changedTouches[0].clientY };
-  }
-
-  const mouseEvent = event as MouseEvent;
-  return { x: mouseEvent.clientX, y: mouseEvent.clientY };
-}
 
 @Injectable()
 export class DraggableService {
@@ -49,7 +38,7 @@ export class DraggableService {
    * @param model model with data for this element
    */
   public enable(element: Element, model: NodeModel) {
-    select(element).call(this.getDragBehavior(model, element));
+    select(element).call(this.getDragBehavior(model, element)).style('touch-action', null);
   }
 
   /**
@@ -82,6 +71,9 @@ export class DraggableService {
    * @returns
    */
   private getDragBehavior(model: NodeModel, element: Element) {
+    let startEvent: MouseEvent | TouchEvent;
+    let activated = false;
+    let threshold = 0;
     let dragNodes: NodeModel[] = [];
     let initialPositions: Point[] = [];
     let moveNodesOnAutoPanSub: Subscription | null = null;
@@ -176,7 +168,7 @@ export class DraggableService {
       }
 
       // Do not drag the node when interacting with a no-drag element (e.g. resize controls)
-      if (event.target instanceof Element && event.target.closest('.nodrag')) {
+      if (event.target instanceof Element && event.target.closest('[data-vflow-no-drag]')) {
         return false;
       }
 
@@ -188,28 +180,44 @@ export class DraggableService {
       return true;
     };
 
-    return drag()
+    const activate = () => {
+      activated = true;
+      dragNodes = this.getDragNodes(model);
+      startTrackingPaneGeometry();
+
+      this.flowStatusService.setNodeDragStartStatus(model);
+
+      // d3-drag event.x/y are screen px (not auto-scaled like the old SVG CTM),
+      // so recompute the pointer position in flow space.
+      const flow = this.getFlowPoint(startEvent, getPaneRect());
+
+      initialPositions = dragNodes.map((node) => ({
+        x: node.point().x - flow.x,
+        y: node.point().y - flow.y,
+      }));
+
+      // Subscribe to viewport changes during drag to sync node positions with auto-pan
+      moveNodesOnAutoPanSub = this.moveNodesOnAutoPan$(dragNodes);
+    };
+
+    const behavior = drag()
       .filter(filterCondition)
       .on('start', (event: DragEvent) => {
-        dragNodes = this.getDragNodes(model);
-        startTrackingPaneGeometry();
-
-        this.flowStatusService.setNodeDragStartStatus(model);
-
-        // d3-drag event.x/y are screen px (not auto-scaled like the old SVG CTM),
-        // so recompute the pointer position in flow space.
-        const flow = this.getFlowPoint(event.sourceEvent, getPaneRect());
-
-        initialPositions = dragNodes.map((node) => ({
-          x: node.point().x - flow.x,
-          y: node.point().y - flow.y,
-        }));
-
-        // Subscribe to viewport changes during drag to sync node positions with auto-pan
-        moveNodesOnAutoPanSub = this.moveNodesOnAutoPan$(dragNodes);
+        startEvent = event.sourceEvent;
+        activated = false;
+        threshold = this.settingsService.nodeDragThreshold();
+        behavior.clickDistance(threshold);
+        if (threshold === 0) activate();
       })
 
       .on('drag', (event: DragEvent) => {
+        const starting = !activated;
+        if (!activated) {
+          const start = eventClientPoint(startEvent);
+          const current = eventClientPoint(event.sourceEvent);
+          if (Math.hypot(current.x - start.x, current.y - start.y) <= threshold) return;
+          activate();
+        }
         const flow = this.getFlowPoint(event.sourceEvent, getPaneRect());
 
         dragNodes.forEach((model, index) => {
@@ -222,15 +230,19 @@ export class DraggableService {
           this.moveNode(model, point);
         });
 
-        this.flowStatusService.setNodeDragStatus(model);
+        if (!starting) this.flowStatusService.setNodeDragStatus(model);
       })
 
       .on('end', () => {
+        if (!activated) return;
+        activated = false;
         moveNodesOnAutoPanSub?.unsubscribe();
         moveNodesOnAutoPanSub = null;
         stopTrackingPaneGeometry();
         this.flowStatusService.setNodeDragEndStatus(model);
       });
+
+    return behavior;
   }
 
   /**
@@ -238,7 +250,7 @@ export class DraggableService {
    * flow = (client - paneRect - {x,y}) / zoom.
    */
   private getFlowPoint(sourceEvent: MouseEvent | TouchEvent, paneRect: DOMRectReadOnly): Point {
-    const client = clientFromEvent(sourceEvent);
+    const client = eventClientPoint(sourceEvent);
 
     return clientToFlowPosition(client, {
       viewport: this.viewportService.readableViewport(),

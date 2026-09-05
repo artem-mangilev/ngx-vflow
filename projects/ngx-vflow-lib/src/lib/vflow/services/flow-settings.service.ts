@@ -30,6 +30,16 @@ export class FlowSettingsService {
    */
   public computedFlowHeight = signal(0);
 
+  public zoomOnScroll = signal(true);
+  public zoomOnPinch = signal(true);
+  public zoomOnDoubleClick = signal(false);
+  /** true preserves panning with any mouse button; arrays restrict mouse buttons only. */
+  public panOnDrag = signal<boolean | number[]>(true);
+  public panOnScroll = signal(false);
+  public paneClickDistance = signal(6);
+  public nodeDragThreshold = signal(0);
+  public connectionDragThreshold = signal(0);
+
   public minZoom = signal(0.5);
 
   public maxZoom = signal(3);

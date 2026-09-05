@@ -66,6 +66,48 @@ describe('ConnectionControllerDirective', () => {
     );
   }
 
+  it('delays connection and reconnection until the pointer crosses the configured threshold', () => {
+    TestBed.inject(FlowSettingsService).connectionDragThreshold.set(10);
+    const handle = createHandle(createNodeModel('source'), 'source');
+    const down = new MouseEvent('mousedown', { clientX: 100, clientY: 100 });
+    controller.startConnection(handle, down);
+    expect(statusService.status().state).toBe('idle');
+    document.dispatchEvent(new MouseEvent('mousemove', { clientX: 106, clientY: 100 }));
+    expect(statusService.status().state).toBe('idle');
+    document.dispatchEvent(new MouseEvent('mousemove', { clientX: 112, clientY: 100 }));
+    expect(statusService.status().state).toBe('connection-start');
+    statusService.setIdleStatus();
+    const edge = TestBed.runInInjectionContext(
+      () => new EdgeModel(createEdge({ id: 'edge', source: 'source', target: 'target' })),
+    );
+    controller.startReconnection(handle, edge, down);
+    expect(statusService.status().state).toBe('idle');
+    document.dispatchEvent(new MouseEvent('mousemove', { clientX: 112, clientY: 100 }));
+    expect(statusService.status().state).toBe('reconnection-start');
+  });
+
+  it('uses the same client-space activation threshold for touch connections', () => {
+    TestBed.inject(FlowSettingsService).connectionDragThreshold.set(10);
+    const handle = createHandle(createNodeModel('source'), 'source');
+    const touch = (x: number) => new Touch({ identifier: 0, target: document.body, clientX: x, clientY: 100 });
+    controller.startConnection(handle, new TouchEvent('touchstart', { touches: [touch(100)] }));
+    document.dispatchEvent(new TouchEvent('touchmove', { touches: [touch(105)], cancelable: true }));
+    expect(statusService.status().state).toBe('idle');
+    document.dispatchEvent(new TouchEvent('touchmove', { touches: [touch(112)], cancelable: true }));
+    expect(statusService.status().state).toBe('connection-start');
+  });
+
+  it('cancels a pending connection on pointer release or window blur', () => {
+    TestBed.inject(FlowSettingsService).connectionDragThreshold.set(10);
+    const handle = createHandle(createNodeModel('source'), 'source');
+    for (const cancel of ['mouseup', 'blur']) {
+      controller.startConnection(handle, new MouseEvent('mousedown', { clientX: 100, clientY: 100 }));
+      (cancel === 'blur' ? window : document).dispatchEvent(new Event(cancel));
+      document.dispatchEvent(new MouseEvent('mousemove', { clientX: 150, clientY: 100 }));
+      expect(statusService.status().state).toBe('idle');
+    }
+  });
+
   it('should reject a new connection when its starting handle cannot start', () => {
     const source = createHandle(createNodeModel('source'), 'source', false);
     const connectStart = jasmine.createSpy('connectStart');

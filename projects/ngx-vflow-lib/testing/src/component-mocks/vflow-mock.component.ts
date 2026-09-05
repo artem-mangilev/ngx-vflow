@@ -176,6 +176,15 @@ export class VflowMockComponent implements AsInterface<VflowComponent>, OnInit {
     color: '#bbe1fa',
   };
 
+  @Input() public zoomOnScroll = true;
+  @Input() public zoomOnPinch = true;
+  @Input() public zoomOnDoubleClick = false;
+  @Input() public panOnDrag: boolean | number[] = true;
+  @Input() public panOnScroll = false;
+  @Input() public paneClickDistance = 6;
+  @Input() public nodeDragThreshold = 0;
+  @Input() public connectionDragThreshold = 0;
+
   @Input()
   public readonly keyboardShortcuts: KeyboardShortcuts = {
     multiSelection: null,

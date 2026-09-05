@@ -20,6 +20,10 @@ _Avoid_: Permission system, authorization
 Whether a node, edge, or handle may participate in a specific library-originated interaction such as selection or connection.
 _Avoid_: Visibility, disabled state
 
+**Viewport gesture policy**:
+The rules that determine which user gestures pan or zoom the viewport and how competing gestures are prioritized. Explicit programmatic viewport changes are outside this policy.
+_Avoid_: Keyboard shortcuts, interaction eligibility
+
 **First-party extension**:
 An optional capability maintained by the package authors but distributed outside the main package contract.
 _Avoid_: Core feature, third-party integration

@@ -59,6 +59,6 @@ export class EdgeComponent {
     // ignore drag by stopping propagation
     event.stopPropagation();
 
-    this.connectionController?.startReconnection(handle, this.model());
+    this.connectionController?.startReconnection(handle, this.model(), event);
   }
 }

@@ -132,7 +132,7 @@ export class HandleComponent implements OnInit, AfterViewInit {
     // ignore drag by stopping propagation
     event.stopPropagation();
 
-    this.connectionController?.startConnection(this.model);
+    this.connectionController?.startConnection(this.model, event);
   }
 
   protected endConnection() {

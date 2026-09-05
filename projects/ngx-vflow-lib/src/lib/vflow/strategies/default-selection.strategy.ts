@@ -30,7 +30,7 @@ export class DefaultSelectionStrategy implements SelectionStrategy {
     const diffY = Math.abs(end.y - start.y);
 
     // click (not drag)
-    const isClick = diffX < delta && diffY < delta;
+    const isClick = delta === 0 ? diffX === 0 && diffY === 0 : diffX < delta && diffY < delta;
     // do not reset if event chain contains selectable elems
     const isNotSelectable = !target.closest('.selectable');
 

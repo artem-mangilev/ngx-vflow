@@ -1,4 +1,6 @@
-import { Directive, computed, inject } from '@angular/core';
+import { FlowSettingsService } from '../services/flow-settings.service';
+import { eventClientPoint, isTouchEvent } from '../utils/event';
+import { DestroyRef, Directive, computed, inject } from '@angular/core';
 import { Connection } from '../interfaces/connection.interface';
 import {
   FlowStatusConnectionReleaseValidated,
@@ -39,6 +41,41 @@ import {
   standalone: true,
 })
 export class ConnectionControllerDirective {
+  private settings = inject(FlowSettingsService);
+  private destroyRef = inject(DestroyRef);
+  private pendingDrag?: AbortController;
+
+  constructor() {
+    this.destroyRef.onDestroy(() => this.pendingDrag?.abort());
+  }
+
+  private afterDragThreshold(event: Event | undefined, start: () => void) {
+    this.pendingDrag?.abort();
+    const threshold = this.settings.connectionDragThreshold();
+    if (!event || threshold === 0) {
+      start();
+      return;
+    }
+    if (!(event instanceof MouseEvent) && !isTouchEvent(event)) return;
+    const origin = eventClientPoint(event);
+    const pending = (this.pendingDrag = new AbortController());
+    const options = { signal: pending.signal, capture: true, passive: false };
+    const move = (next: MouseEvent | TouchEvent) => {
+      if (isTouchEvent(next)) next.preventDefault();
+      const point = eventClientPoint(next);
+      if (Math.hypot(point.x - origin.x, point.y - origin.y) > threshold) {
+        pending.abort();
+        start();
+      }
+    };
+    document.addEventListener('mousemove', move, options);
+    document.addEventListener('touchmove', move, options);
+    for (const type of ['mouseup', 'touchend', 'touchcancel']) {
+      document.addEventListener(type, () => pending.abort(), options);
+    }
+    window.addEventListener('blur', () => pending.abort(), options);
+  }
+
   private statusService = inject(FlowStatusService);
   private flowEntitiesService = inject(FlowEntitiesService);
 
@@ -142,16 +179,20 @@ export class ConnectionControllerDirective {
 
   protected isStrictMode = computed(() => this.flowEntitiesService.connection().mode === 'strict');
 
-  public startConnection(handle: HandleModel) {
+  public startConnection(handle: HandleModel, event?: Event) {
     if (!handle.canStart()) {
       return;
     }
 
-    this.statusService.setConnectionStartStatus(handle.parentNode, handle);
+    this.afterDragThreshold(event, () => {
+      if (handle.canStart()) this.statusService.setConnectionStartStatus(handle.parentNode, handle);
+    });
   }
 
-  public startReconnection(handle: HandleModel, oldEdge: EdgeModel) {
-    this.statusService.setReconnectionStartStatus(handle.parentNode, handle, oldEdge);
+  public startReconnection(handle: HandleModel, oldEdge: EdgeModel, event?: Event) {
+    this.afterDragThreshold(event, () =>
+      this.statusService.setReconnectionStartStatus(handle.parentNode, handle, oldEdge),
+    );
   }
 
   public validateConnection(handle: HandleModel) {

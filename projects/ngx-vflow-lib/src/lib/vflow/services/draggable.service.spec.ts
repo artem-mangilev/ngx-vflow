@@ -184,6 +184,29 @@ describe('DraggableService', () => {
     );
   }
 
+  it('delays node drag until the client-space threshold is crossed at non-unit zoom', () => {
+    TestBed.inject(FlowSettingsService).nodeDragThreshold.set(10);
+    viewportService.readableViewport.set({ x: 0, y: 0, zoom: 2 });
+    const { model } = startNodeDrag(new DOMRect(0, 0, 400, 300));
+    const status = TestBed.inject(FlowStatusService);
+    expect(status.status().state).toBe('idle');
+    dispatchMouse(window, 'mousemove', 156, 100);
+    expect(model.point()).toEqual({ x: 10, y: 20 });
+    expect(status.status().state).toBe('idle');
+    dispatchMouse(window, 'mousemove', 162, 100);
+    expect(model.point()).toEqual({ x: 16, y: 20 });
+    expect(status.status().state).toBe('node-drag-start');
+    dispatchMouse(window, 'mouseup', 162, 100);
+  });
+
+  it('does not emit node drag end for a release below the threshold', () => {
+    TestBed.inject(FlowSettingsService).nodeDragThreshold.set(10);
+    const { model } = startNodeDrag(new DOMRect(0, 0, 400, 300));
+    dispatchMouse(window, 'mouseup', 150, 100);
+    expect(model.point()).toEqual({ x: 10, y: 20 });
+    expect(TestBed.inject(FlowStatusService).status().state).toBe('idle');
+  });
+
   it('should not include selected child when selected parent is dragged', () => {
     const parent = createModel({ id: 'parent', selected: true });
     const child = createModel({ id: 'child', selected: true, parentId: 'parent' });
@@ -268,12 +291,12 @@ describe('DraggableService', () => {
     expect(dragFilter(event)).toBe(true);
   });
 
-  it('should reject drag from a descendant of a nodrag element', () => {
+  it('should reject drag from a descendant of a no-drag element', () => {
     const node = createModel({ id: 'node' });
     const dragFilter = (service as any).getDragBehavior(node).filter();
     const noDragElement = document.createElement('div');
     const target = document.createElement('span');
-    noDragElement.classList.add('nodrag');
+    noDragElement.setAttribute('data-vflow-no-drag', '');
     noDragElement.append(target);
 
     expect(dragFilter({ target } as unknown as Event)).toBe(false);
