@@ -33,6 +33,7 @@ export class HandleModel {
   private viewportService = inject(ViewportService);
 
   public state = signal<HandleState>('idle');
+  public isMeasured = signal(false);
   public canStart: Signal<boolean> = this.rawHandle.canStart ?? signal(true);
   public canAccept: Signal<boolean> = this.rawHandle.canAccept ?? signal(true);
 
@@ -101,7 +102,12 @@ export class HandleModel {
       return null;
     }
 
-    const zoom = this.viewportService.readableViewport().zoom || 1;
+    // A wheel event can update the signal before Angular applies the DOM transform.
+    // DOM measurements must use the scale that is actually rendered.
+    const viewport = this.parentNode.nodeElement()?.closest<HTMLElement>('.vflow-viewport');
+    const zoom = viewport
+      ? new DOMMatrixReadOnly(viewport.style.transform).a || 1
+      : this.viewportService.readableViewport().zoom || 1;
     const anchorRect = this.hostReference.getBoundingClientRect();
     const handleRect = handleElement.getBoundingClientRect();
     const alongY = (anchorRect.top + anchorRect.height / 2 - resolvedNodeRect.top) / zoom;
@@ -124,6 +130,7 @@ export class HandleModel {
 
     this.layoutStyles.set(geometry.layoutStyles);
     this.localPoint.set(geometry.localPoint);
+    this.isMeasured.set(true);
   }
 
   /** Synchronous convenience for isolated model use. Node rendering uses the coalesced controller pass. */

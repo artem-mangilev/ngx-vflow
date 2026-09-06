@@ -28,6 +28,7 @@ import { HtmlTemplateEdgeLabel } from '../../interfaces/edge-label.interface';
   ],
   host: {
     '[style.transform]': 'transform()',
+    '[style.visibility]': 'edgeModel().isReady() ? "visible" : "hidden"',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [NgTemplateOutlet],

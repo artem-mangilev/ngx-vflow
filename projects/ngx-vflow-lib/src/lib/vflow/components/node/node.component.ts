@@ -42,7 +42,7 @@ export type HandleState = 'valid' | 'invalid' | 'idle';
     class: 'vflow-node',
     '[class.vflow-node--undraggable]': 'hostUndraggable()',
     '[class.vflow-node--drag-handles-only]': 'hostDragHandlesOnly()',
-    '[style.visibility]': "model().isMeasured() ? 'visible' : 'hidden'",
+    '[style.visibility]': "model().isReady() ? 'visible' : 'hidden'",
   },
   imports: [
     DefaultNodeComponent,

@@ -69,6 +69,8 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
 
   public renderOrder = signal(0);
 
+  public isReady = computed(() => !!this.source()?.isReady() && !!this.target()?.isReady());
+
   public detached = computed(() => {
     const source = this.source();
     const target = this.target();

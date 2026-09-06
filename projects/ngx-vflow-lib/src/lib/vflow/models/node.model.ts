@@ -79,6 +79,9 @@ export class NodeModel<T = unknown>
    */
   public isMeasured = signal(false);
 
+  /** The current view has both node dimensions and positioned handles. */
+  public isReady = computed(() => this.isMeasured() && this.handles().every((handle) => handle.isMeasured()));
+
   public point = signal<Point>({ x: 0, y: 0 });
   public point$: Observable<Point>;
 

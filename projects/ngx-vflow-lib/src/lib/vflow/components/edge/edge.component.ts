@@ -18,7 +18,7 @@ import { PointerDirective } from '../../directives/pointer.directive';
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'selectable',
-    '[style.visibility]': 'isReconnecting() ? "hidden" : "visible"',
+    '[style.visibility]': '!model().isReady() || isReconnecting() ? "hidden" : "visible"',
   },
   imports: [NgTemplateOutlet, PointerDirective],
 })
