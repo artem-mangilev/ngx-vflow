@@ -22,7 +22,7 @@ class SmallCustomNodeComponent extends CustomNodeComponent {}
 
 describe('Initial handle placement', () => {
   for (const count of [1, 1024]) {
-    it(`never shows unpositioned custom handles on initial mount or remount (${count} nodes)`, async () => {
+    it(`never shows unpositioned custom handles on initial mount or restore (${count} nodes)`, async () => {
       TestBed.configureTestingModule({ providers: [provideExperimentalZonelessChangeDetection()] });
       const fixture = TestBed.createComponent(VflowComponent);
       fixture.componentRef.setInput('view', [400, 300]);
@@ -56,9 +56,14 @@ describe('Initial handle placement', () => {
       fixture.componentInstance.panTo({ x: 10000, y: 10000 });
       fixture.detectChanges();
       await fixture.whenStable();
-      expect(fixture.nativeElement.querySelectorAll('.vflow-node').length).toBe(0);
+      expect(fixture.nativeElement.querySelectorAll('.vflow-node').length).toBe(count);
+      expect(
+        [...fixture.nativeElement.querySelectorAll('.vflow-node')].every(
+          (node) => getComputedStyle(node).display === 'none',
+        ),
+      ).toBeTrue();
       fixture.componentInstance.panTo({ x: 0, y: 0 });
-      await capture('virtual remount');
+      await capture('CSS restore');
     }, 10000);
   }
 
@@ -99,7 +104,8 @@ describe('Initial handle placement', () => {
     fixture.componentInstance.panTo({ x: -120, y: 0 });
     fixture.detectChanges();
     await fixture.whenStable();
-    expect(fixture.nativeElement.querySelectorAll('.vflow-node').length).toBe(1);
+    expect(fixture.nativeElement.querySelectorAll('.vflow-node').length).toBe(2);
+    expect(getComputedStyle(fixture.nativeElement.querySelector('.vflow-node')).display).toBe('none');
     const edge = fixture.nativeElement.querySelector('svg[edge] .edge');
     expect(edge).not.toBeNull();
     expect(getComputedStyle(edge).visibility).toBe('visible');

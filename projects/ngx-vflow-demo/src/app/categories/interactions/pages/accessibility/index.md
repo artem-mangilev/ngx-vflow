@@ -26,7 +26,7 @@ When a focused entity is removed or becomes non-focusable, focus moves to the ne
 
 Commands from inputs, textareas, selects, contenteditable regions, buttons and other descendants do not trigger graph selection or movement. Add `vflowNoKeyboard` to an element or ancestor to opt an application area out of graph keyboard commands without changing native Tab behavior. The directive is included in `Vflow` and can also be imported as `NoKeyboardDirective`.
 
-This keyboard contract requires virtualization to be disabled. Compatibility with the current virtualization implementation is deferred.
+With virtualization enabled, CSS-hidden entities are skipped by native Tab navigation and focus repair. The currently focused node or edge (including embedded node, toolbar and edge-label controls) stays in layout when the viewport moves. To reach every offscreen entity through Tab and focus auto-pan, leave virtualization disabled.
 
 ## Names and descriptions
 

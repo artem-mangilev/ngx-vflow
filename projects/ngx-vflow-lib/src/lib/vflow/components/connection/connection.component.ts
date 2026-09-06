@@ -47,7 +47,8 @@ export class ConnectionComponent {
   public template = input<TemplateRef<any>>();
 
   protected path = computed(() => {
-    const status = this.flowStatusService.status();
+    const status = this.flowStatusService.connectionStatus();
+    if (!status) return null;
     const curve = this.model().curve;
 
     if (status.state === 'connection-start' || status.state === 'reconnection-start') {

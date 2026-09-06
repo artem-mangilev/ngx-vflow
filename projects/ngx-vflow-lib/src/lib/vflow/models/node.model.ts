@@ -11,7 +11,6 @@ import { Contextable } from '../interfaces/contextable.interface';
 import { GroupNodeContext, NodeContext } from '../interfaces/template-context.interface';
 import { Observable, of } from 'rxjs';
 import { catchError, filter, shareReplay, switchMap } from 'rxjs/operators';
-import { NodePreview } from '../interfaces/node-preview.interface';
 import { FlowSettingsService } from '../services/flow-settings.service';
 import { NodeRenderingService } from '../services/node-rendering.service';
 import { extendedComputed } from '../utils/signals/extended-computed';
@@ -62,9 +61,29 @@ export class NodeModel<T = unknown>
     };
   });
 
-  public isVisible = signal(false);
-  /** The view was removed by virtualization; its last handle geometry remains usable. */
-  public virtualized = signal(false);
+  public focused = signal(false);
+  public dragging = signal(false);
+  public connectionActive = signal(false);
+  public inViewport = signal(false);
+
+  /** CSS culling retains the view and its last measured geometry. */
+  public culled = computed(() => {
+    if (
+      !this.settingsService.optimization().virtualization ||
+      !this.isReady() ||
+      this.focused() ||
+      this.connectionActive() ||
+      this.dragging() ||
+      this.resizing() ||
+      this.inViewport()
+    ) {
+      return false;
+    }
+    for (let node = this.parent(); node; node = node.parent()) {
+      if (node.dragging() || node.resizing()) return false;
+    }
+    return true;
+  });
 
   /**
    * Reference to the rendered node host element. Set by `NodeComponent` and used
@@ -98,8 +117,6 @@ export class NodeModel<T = unknown>
   public preselected = signal(false);
   public selectable = computed(() => this.rawNode.selectable?.() ?? this.settingsService.nodesSelectable());
   public focusable = computed(() => this.rawNode.focusable?.() ?? this.settingsService.nodesFocusable());
-
-  public preview = signal<NodePreview>({ style: {} });
 
   public extent = signal<'parent' | null>(NODE_DEFAULTS.extent);
 
@@ -143,7 +160,11 @@ export class NodeModel<T = unknown>
       return true;
     }
 
-    if (this.settingsService.optimization().lazyLoadTrigger === 'immediate') {
+    // Culling needs initial node and handle geometry, including offscreen nodes.
+    if (
+      this.settingsService.optimization().virtualization ||
+      this.settingsService.optimization().lazyLoadTrigger === 'immediate'
+    ) {
       return true;
     } else if (this.settingsService.optimization().lazyLoadTrigger === 'viewport') {
       // Immediately load component if it's a plain class
@@ -221,10 +242,6 @@ export class NodeModel<T = unknown>
 
     if (rawNode.draggable) {
       this.draggable = rawNode.draggable;
-    }
-
-    if (rawNode.preview) {
-      this.preview = rawNode.preview;
     }
 
     if (rawNode.selected) {

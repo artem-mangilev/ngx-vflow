@@ -131,7 +131,9 @@ export class KeyboardNavigationDirective {
   constructor() {
     afterRenderEffect(() => {
       const entities = this.entities();
-      const eligible = entities.filter((entity) => entity.vflowKeyboardEntity().focusable());
+      const eligible = entities.filter(
+        (entity) => entity.vflowKeyboardEntity().focusable() && !entity.vflowKeyboardEntity().culled(),
+      );
       const previous = this.previous;
       this.previous = entities;
       if (!this.focused) return;

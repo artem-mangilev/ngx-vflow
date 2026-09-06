@@ -95,10 +95,12 @@ export class HandleModel {
       });
     }
 
+    if (this.parentNode.culled()) return null;
+
     const handleElement = this.handleElement;
     const resolvedNodeRect = nodeRect ?? this.parentNode.nodeElement()?.getBoundingClientRect();
 
-    if (!handleElement || !resolvedNodeRect) {
+    if (!handleElement || !resolvedNodeRect || !handleElement.getClientRects().length) {
       return null;
     }
 

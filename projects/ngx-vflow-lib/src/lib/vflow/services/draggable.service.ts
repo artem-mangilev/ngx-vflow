@@ -197,6 +197,7 @@ export class DraggableService {
     const activate = () => {
       activated = true;
       dragNodes = this.getDragNodes(model);
+      dragNodes.forEach((node) => node.dragging.set(true));
       startTrackingPaneGeometry();
 
       this.flowStatusService.setNodeDragStartStatus(model);
@@ -253,6 +254,7 @@ export class DraggableService {
         moveNodesOnAutoPanSub?.unsubscribe();
         moveNodesOnAutoPanSub = null;
         stopTrackingPaneGeometry();
+        dragNodes.forEach((node) => node.dragging.set(false));
         this.flowStatusService.setNodeDragEndStatus(model);
       });
 

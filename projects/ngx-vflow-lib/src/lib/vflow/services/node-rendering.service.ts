@@ -1,4 +1,4 @@
-import { Injectable, computed, inject } from '@angular/core';
+import { Injectable, computed, effect, inject } from '@angular/core';
 import { FlowEntitiesService } from './flow-entities.service';
 import { NodeModel } from '../models/node.model';
 import { FlowSettingsService } from './flow-settings.service';
@@ -14,22 +14,17 @@ export class NodeRenderingService {
   private maxOrder = 0;
 
   public readonly nodes = computed(() => {
-    if (!this.flowSettingsService.optimization().virtualization) {
-      return [...this.flowEntitiesService.nodes()].sort((aNode, bNode) => aNode.renderOrder() - bNode.renderOrder());
-    }
-
-    const nodesToRender = this.viewportNodes();
-
-    const viewport = this.viewportService.readableViewport();
-    const zoomThreshold = this.flowSettingsService.optimization().virtualizationZoomThreshold;
-
-    return viewport.zoom < zoomThreshold
-      ? []
-      : nodesToRender.sort((aNode, bNode) => aNode.renderOrder() - bNode.renderOrder());
+    return this.flowEntitiesService
+      .nodes()
+      .filter((node) => !node.culled())
+      .sort((a, b) => a.renderOrder() - b.renderOrder());
   });
 
   public readonly groups = computed(() => {
-    return this.nodes().filter((n) => !!n.children().length || isGroupNode(n));
+    return this.flowEntitiesService
+      .nodes()
+      .filter((n) => !!n.children().length || isGroupNode(n))
+      .sort((a, b) => a.renderOrder() - b.renderOrder());
   });
 
   public viewportNodes = computed(() => {
@@ -46,6 +41,16 @@ export class NodeRenderingService {
       return isRectInViewport({ x, y, width, height }, viewport, flowWidth, flowHeight);
     });
   });
+
+  constructor() {
+    effect(() => {
+      if (!this.flowSettingsService.optimization().virtualization) return;
+      // ponytail: linear viewport scan; add a spatial index if this scan becomes the bottleneck.
+      const visible = new Set(this.viewportNodes());
+      // Only membership changes notify node views; camera movement alone must not.
+      for (const node of this.flowEntitiesService.nodes()) node.inViewport.set(visible.has(node));
+    });
+  }
 
   public pullNode(node: NodeModel) {
     this.maxOrder++;

@@ -10,10 +10,12 @@ import {
   contentChild,
   viewChild,
   input,
-  computed,
+  effect,
+  ElementRef,
 } from '@angular/core';
 import { Node } from '../../interfaces/node.interface';
 import { MapContextDirective } from '../../directives/map-context.directive';
+import { ViewportVisibilityDirective } from '../../directives/viewport-visibility.directive';
 import { DraggableService } from '../../services/draggable.service';
 import { NodeModel } from '../../models/node.model';
 import { ViewportService } from '../../services/viewport.service';
@@ -54,7 +56,6 @@ import { SelectionMode } from '../../types/selection-mode.type';
 import { KeyboardService } from '../../services/keyboard.service';
 import { transformBackground } from '../../utils/transform-background';
 import { OverlaysService } from '../../services/overlays.service';
-import { ToolbarModel } from '../../models/toolbar.model';
 import { NgTemplateOutlet } from '@angular/common';
 import { EdgeComponent } from '../edge/edge.component';
 import { EdgeLabelComponent } from '../edge-label/edge-label.component';
@@ -69,7 +70,6 @@ import { RootSvgReferenceDirective } from '../../directives/reference.directive'
 import { EdgeRenderingService } from '../../services/edge-rendering.service';
 import { getIntersectingNodes, getNodesAtPoint as findNodesAtPoint } from '../../utils/nodes';
 import { IntersectingNodesOptions } from '../../interfaces/intersecting-nodes-options.interface';
-import { PreviewFlowComponent } from '../preview-flow/preview-flow.component';
 import { toLazySignal } from '../../utils/signals/to-lazy-signal';
 import { FlowRenderingService } from '../../services/flow-rendering.service';
 import { AlignmentHelperComponent } from '../alignment-helper/alignment-helper.component';
@@ -143,13 +143,13 @@ const nodeDragControllerHostDirective = {
     DefsComponent,
     BackgroundComponent,
     MapContextDirective,
+    ViewportVisibilityDirective,
     SpacePointContextDirective,
     ConnectionComponent,
     NodeComponent,
     EdgeComponent,
     EdgeLabelComponent,
     NgTemplateOutlet,
-    PreviewFlowComponent,
     AlignmentHelperComponent,
     SelectionBoxComponent,
     SelectionBoxContextDirective,
@@ -163,7 +163,6 @@ export class VflowComponent {
   private nodesChangeService = inject(NodesChangeService);
   private edgesChangeService = inject(EdgeChangesService);
   private nodeRenderingService = inject(NodeRenderingService);
-  private edgeRenderingService = inject(EdgeRenderingService);
   private flowSettingsService = inject(FlowSettingsService);
   protected ariaLabels = this.flowSettingsService.ariaLabels;
   private componentEventBusService = inject(ComponentEventBusService);
@@ -175,14 +174,15 @@ export class VflowComponent {
   // #endregion
 
   // #region VIEWPORT
-  /**
-   * CSS transform applied to the viewport div (translate px + scale).
-   */
-  protected viewportTransform = computed(() => {
-    const { x, y, zoom } = this.viewportService.readableViewport();
+  private viewportElement = viewChild.required<ElementRef<HTMLElement>>('viewportElement');
 
-    return `translate(${x}px, ${y}px) scale(${zoom})`;
-  });
+  constructor() {
+    effect(() => {
+      const { x, y, zoom } = this.viewportService.readableViewport();
+      // Camera movement must not reconcile every node, edge, label and toolbar.
+      this.viewportElement().nativeElement.style.transform = `translate(${x}px, ${y}px) scale(${zoom})`;
+    });
+  }
 
   protected nodeToolbarsMap = this.overlaysService.nodeToolbarsMap;
   // #endregion
@@ -420,10 +420,7 @@ export class VflowComponent {
   public alignmentHelper = input<AlignmentHelperSettings | boolean>(false);
 
   protected nodeModels = this.nodeRenderingService.nodes;
-  protected groups = this.nodeRenderingService.groups;
-  protected orderedNodes = computed(() =>
-    this.flowSettingsService.optimization().virtualization ? this.nodeModels() : this.flowEntitiesService.nodes(),
-  );
+  protected orderedNodes = this.flowEntitiesService.nodes;
 
   /**
    * Edges to render
@@ -440,10 +437,7 @@ export class VflowComponent {
     this.flowEntitiesService.edges.set(newModels);
   }
 
-  protected edgeModels = this.edgeRenderingService.edges;
-  protected orderedEdges = computed(() =>
-    this.flowSettingsService.optimization().virtualization ? this.edgeModels() : this.flowEntitiesService.validEdges(),
-  );
+  protected orderedEdges = this.flowEntitiesService.validEdges;
   // #endregion
 
   // #region OUTPUTS
@@ -618,13 +612,6 @@ export class VflowComponent {
     return getIntersectingNodes(nodeId, this.nodeModels(), options).map((n) => n.rawNode) as Node<T>[];
   }
   // #endregion
-
-  protected toolbarTransform(node: NodeModel, toolbar: ToolbarModel): string {
-    const { x, y } = node.globalPoint();
-    const point = toolbar.point();
-
-    return `translate(${x + point.x}px, ${y + point.y}px)`;
-  }
 
   protected trackNodes(idx: number, { rawNode: node }: NodeModel) {
     return node;

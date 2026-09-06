@@ -132,3 +132,9 @@ Documented Angular APIs, CSS classes, and observable behavior remain supported c
 - remove usage of the `handlePositions` input in the `VflowComponent`.
 - for classes extending `CustomNodeComponent` and `CustomDynamicNodeComponent`:
   - replace `this.node` to `this.node()` due to signal input internal migration.
+
+## Viewport virtualization
+
+Virtualization now hides offscreen views using `display: none`, retaining their Angular component instances. It no longer replaces nodes with canvas previews or hides all edges at low zoom. `virtualizationZoomThreshold`, `NodePreview` and the node’s `preview` property remain accepted but are deprecated and ignored.
+
+Nodes are initially loaded and measured even offscreen, overriding `lazyLoadTrigger: 'viewport'` when virtualization is enabled. Component effects and subscriptions continue while CSS-hidden. Focused entities and active node gestures stay in layout; merely selected entities can be culled.

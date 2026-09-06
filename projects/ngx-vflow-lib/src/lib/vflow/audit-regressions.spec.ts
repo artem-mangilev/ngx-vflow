@@ -48,8 +48,17 @@ describe('Graph rendering and interaction regressions', () => {
 
   it('centers an HTML label immediately after its content changes, including at non-unit zoom', () => {
     const fixture = TestBed.createComponent(EdgeLabelComponent);
-    fixture.componentRef.setInput('edgeModel', graph().edges[0]);
-    fixture.componentRef.setInput('point', { x: 200, y: 100 });
+    const edge = graph().edges[0];
+    edge.curve.set(() => ({
+      path: 'M 0,0 L 400,200',
+      labelPoints: {
+        start: { x: 0, y: 0 },
+        center: { x: 200, y: 100 },
+        end: { x: 400, y: 200 },
+      },
+    }));
+    fixture.componentRef.setInput('edgeModel', edge);
+    fixture.componentRef.setInput('position', 'center');
     const container = document.createElement('div');
     container.style.cssText = 'position:relative; transform:scale(0.5); transform-origin:0 0';
     document.body.append(container);
@@ -141,10 +150,12 @@ describe('Graph rendering and interaction regressions', () => {
     edges[0].path();
     nodes.forEach((n) => n.point.set({ x: 100000, y: 100000 }));
     expect(TestBed.inject(NodeRenderingService).viewportNodes()).toEqual([]);
-    expect(TestBed.inject(EdgeRenderingService).edges()).toEqual([]);
+    const rendering = TestBed.inject(EdgeRenderingService);
+    TestBed.flushEffects();
+    expect(rendering.edges()).toEqual([]);
   });
 
-  it('keeps crossing paths after virtual unmount, culls them on pan, and restores them on return', () => {
+  it('keeps crossing paths with offscreen endpoints at every zoom', () => {
     const { nodes, edges } = graph();
     const settings = TestBed.inject(FlowSettingsService);
     settings.computedFlowWidth.set(400);
@@ -154,24 +165,24 @@ describe('Graph rendering and interaction regressions', () => {
     nodes[1].point.set({ x: 800, y: 0 });
     const rendering = TestBed.inject(EdgeRenderingService);
     const viewport = TestBed.inject(ViewportService).readableViewport;
+    TestBed.flushEffects();
     expect(rendering.edges()).toContain(edges[0]);
-    for (const node of nodes.slice(0, 2)) {
-      node.virtualized.set(true);
-      node.handles.set([]);
-    }
     expect(edges[0].detached()).toBeFalse();
     expect(rendering.edges()).toContain(edges[0]);
     viewport.set({ x: 0, y: 1000, zoom: 1 });
+    TestBed.flushEffects();
     expect(rendering.edges()).not.toContain(edges[0]);
     viewport.set({ x: 0, y: 0, zoom: 1 });
+    TestBed.flushEffects();
     expect(rendering.edges()).toContain(edges[0]);
     viewport.set({ x: 0, y: 0, zoom: 0.1 });
-    expect(rendering.edges()).toEqual([]);
-    nodes[0].virtualized.set(false);
+    TestBed.flushEffects();
+    expect(rendering.edges()).toContain(edges[0]);
+    nodes[0].handles.set([]);
     expect(edges[0].detached()).toBeTrue();
   });
 
-  it('restores actual node views and edges after panning without emitting detached notifications', async () => {
+  it('retains actual node views and edges while panning without detached notifications', async () => {
     const fixture = TestBed.createComponent(VflowComponent);
     fixture.componentRef.setInput('view', [400, 300]);
     fixture.componentRef.setInput('optimization', { virtualization: true });
@@ -194,8 +205,13 @@ describe('Graph rendering and interaction regressions', () => {
     fixture.componentInstance.panTo({ x: 1000, y: 0 });
     fixture.detectChanges();
     await fixture.whenStable();
-    expect(host.querySelectorAll('.vflow-node').length).toBe(0);
-    expect(host.querySelectorAll('svg[edge]').length).toBe(0);
+    expect(host.querySelectorAll('.vflow-node').length).toBe(2);
+    expect(host.querySelectorAll('svg[edge]').length).toBe(1);
+    expect(
+      Array.from(host.querySelectorAll('.vflow-node, svg[edge]')).every(
+        (element) => getComputedStyle(element).display === 'none',
+      ),
+    ).toBeTrue();
     fixture.componentInstance.panTo({ x: 0, y: 0 });
     fixture.detectChanges();
     await fixture.whenStable();
@@ -215,23 +231,25 @@ describe('Graph rendering and interaction regressions', () => {
     nodes.forEach((node) => node.point.set({ x: -1000, y: -1000 }));
     edges[0].curve.set(() => ({ path: 'M -1000,-1000 Q 2000,1500 -900,-1000' }));
     const rendering = TestBed.inject(EdgeRenderingService);
+    TestBed.flushEffects();
     expect(rendering.edges()).toContain(edges[0]);
     edges[0].curve.set(() => ({ path: 'M -1000,-1000 l 100,0' }));
+    TestBed.flushEffects();
     expect(rendering.edges()).not.toContain(edges[0]);
   });
 
-  for (const virtualizedIndex of [0, 1]) {
-    it(`preserves a floating edge with only endpoint ${virtualizedIndex} virtualized`, () => {
+  for (const offscreenIndex of [0, 1]) {
+    it(`updates a floating edge with offscreen endpoint ${offscreenIndex}`, () => {
       const { nodes, edges } = graph();
       const edge = edges[0];
       edge.floating.set(true);
       const path = edge.path().path;
       expect(path).not.toBe('');
-      nodes[virtualizedIndex].virtualized.set(true);
-      nodes[virtualizedIndex].handles.set([]);
+      nodes[offscreenIndex].point.set({ x: -1000, y: 0 });
       expect(edge.detached()).toBeFalse();
-      expect(edge.path().path).toBe(path);
-      nodes[1 - virtualizedIndex].handles.set([]);
+      expect(edge.path().path).not.toBe('');
+      expect(edge.path().path).not.toBe(path);
+      nodes[offscreenIndex].handles.set([]);
       expect(edge.detached()).toBeTrue();
       expect(edge.path().path).toBe('');
     });

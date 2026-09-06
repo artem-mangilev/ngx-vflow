@@ -10,6 +10,7 @@ import { ViewportService } from '../services/viewport.service';
 
 function mockRect(element: Element, rect: { left: number; top: number; width: number; height: number }): void {
   const { left, top, width, height } = rect;
+  element.getClientRects = () => [element.getBoundingClientRect()] as unknown as DOMRectList;
 
   element.getBoundingClientRect = () =>
     ({

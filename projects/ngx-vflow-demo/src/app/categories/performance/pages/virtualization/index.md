@@ -1,20 +1,17 @@
-> **Warning**
-> This is an experimental API. The library still does not support edge previews - only node previews are available.
+Enable viewport virtualization with `[optimization]="{ virtualization: true }"`.
 
-The library supports **virtualization**, which helps improve performance when rendering large numbers of nodes. When virtualization is enabled, an additional `canvas` layer is activated alongside the native HTML viewport and SVG edge layers.
+Nodes and edges outside the viewport use `display: none`. Their DOM and Angular components remain mounted, so local component state survives panning away and back. Nodes and edges keep their original appearance at every zoom; there is no canvas preview layer.
 
-Nodes outside the viewport are removed from the HTML layer. Edges whose path bounds are outside the viewport are also removed, while paths crossing the viewport remain eligible even when both endpoint nodes are outside it. Previously measured handles retain their geometry while their node is virtualized.
+New nodes are loaded and measured even outside the viewport. Until their dimensions and handles are ready, they use `visibility: hidden`. Last measured geometry is retained while CSS-hidden and refreshed when layout is restored. Virtualization therefore takes precedence over `lazyLoadTrigger: 'viewport'`.
 
-To enable virtualization, set the `virtualization` flag in the `Optimization` interface. Below `virtualizationZoomThreshold`, only canvas node previews are shown; interactive nodes and SVG edges are hidden. Zooming back above the threshold restores the visible entities.
+Edges are checked by their path bounds, so a path crossing the viewport can remain visible even when both endpoint nodes are outside it. Node toolbars and edge labels follow their owner's visibility. Focused nodes, toolbars and edge labels remain in layout; node dragging (including the dragged group), resizing and connection gestures also retain their participating nodes. Selection alone does not prevent culling.
 
-> **Info**
-> It's important to note that a preview node is a simplified version of a real node. It is rendered on the canvas layer,
-> is **not interactive**, and may not visually match the real node exactly (at least for now) — hence the name _preview_.
->
-> However, the library aims to provide a good API for customizing these previews.
-> The `NodePreview` interface allows you to style preview nodes using a subset of `CSSStyleDeclaration`, letting you write familiar, declarative CSS instead of low-level canvas code.
-> The library automatically compiles these styles into appropriate `canvas` calls.
+Viewport geometry is checked in shared passes; only changes in viewport membership notify entity views. Camera transforms and CSS culling are applied independently of the graph list template.
 
-To customize the preview for a specific node, use the `preview` property available on `Node`.
+This reduces layout and paint work for hidden content. It does not release DOM memory, stop subscriptions or component effects, or avoid initial component creation. When the entire graph fits in the viewport, all its visible content still needs to be drawn.
+
+While a node is CSS-hidden, its cached dimensions may become stale if its custom content changes size. The library refreshes them on return; it cannot continuously measure content excluded from layout. Keep geometry in application-owned state when offscreen layout must remain exact.
+
+`virtualizationZoomThreshold`, `NodePreview` and the node’s `preview` property are deprecated and ignored; existing code may retain these fields while migrating.
 
 {{ NgDocActions.demoPane("VirtualizationDemoComponent") }}

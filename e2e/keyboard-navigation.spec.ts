@@ -91,6 +91,8 @@ test('uses grid steps and manual selection and independently disables focus auto
   await page.keyboard.press('Shift+ArrowRight');
   await expect.poll(async () => (await relativePosition(draft)).x).toBeCloseTo(before.x + 100);
   await demo.getByLabel('Application owns selection').check();
+  // Wait for the new interaction policy to reach the graph before sending Escape.
+  await expect(draft).not.toHaveAccessibleDescription(/Press Escape to clear selection/);
   await draft.focus();
   await page.keyboard.press('Escape');
   await expect(demo.getByText('Selected: draft', { exact: true })).toBeVisible();

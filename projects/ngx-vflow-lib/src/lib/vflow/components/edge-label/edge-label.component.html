@@ -1,15 +1,17 @@
-@if (model(); as model) {
-  @if (model.edgeLabel.type === 'html-template' && htmlTemplate()) {
-    @if (htmlTemplate(); as htmlTemplate) {
-      <div class="edge-label-wrapper">
-        <ng-container *ngTemplateOutlet="htmlTemplate; context: getLabelContext()" />
+@if (point()) {
+  @if (model(); as model) {
+    @if (model.edgeLabel.type === 'html-template' && htmlTemplate()) {
+      @if (htmlTemplate(); as htmlTemplate) {
+        <div class="edge-label-wrapper">
+          <ng-container *ngTemplateOutlet="htmlTemplate; context: getLabelContext()" />
+        </div>
+      }
+    }
+
+    @if (model.edgeLabel.type === 'default') {
+      <div class="edge-label-wrapper" [style]="edgeLabelStyle()">
+        {{ model.edgeLabel.text }}
       </div>
     }
-  }
-
-  @if (model.edgeLabel.type === 'default') {
-    <div class="edge-label-wrapper" [style]="edgeLabelStyle()">
-      {{ model.edgeLabel.text }}
-    </div>
   }
 }

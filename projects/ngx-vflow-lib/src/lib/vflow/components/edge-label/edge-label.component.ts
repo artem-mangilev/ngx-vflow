@@ -1,10 +1,19 @@
-import { ChangeDetectionStrategy, Component, TemplateRef, computed, inject, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  TemplateRef,
+  computed,
+  effect,
+  inject,
+  input,
+} from '@angular/core';
 import { EdgeLabelModel } from '../../models/edge-label.model';
 import { EdgeModel } from '../../models/edge.model';
 import { NgTemplateOutlet } from '@angular/common';
 import { FlowSettingsService } from '../../services/flow-settings.service';
 import { HtmlEdgeLabelContext } from '../../interfaces/template-context.interface';
-import { HtmlTemplateEdgeLabel } from '../../interfaces/edge-label.interface';
+import { EdgeLabelPosition, HtmlTemplateEdgeLabel } from '../../interfaces/edge-label.interface';
 
 @Component({
   selector: 'div[edgeLabel]',
@@ -27,7 +36,8 @@ import { HtmlTemplateEdgeLabel } from '../../interfaces/edge-label.interface';
     `,
   ],
   host: {
-    '[style.transform]': 'transform()',
+    '(focusin)': 'edgeModel().focused.set(true)',
+    '(focusout)': 'edgeModel().focused.set(false)',
     '[style.visibility]': 'edgeModel().isReady() ? "visible" : "hidden"',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -35,20 +45,27 @@ import { HtmlTemplateEdgeLabel } from '../../interfaces/edge-label.interface';
 })
 export class EdgeLabelComponent {
   private settingsService = inject(FlowSettingsService);
+  private element = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
   // TODO: too many inputs
   public model = input.required<EdgeLabelModel>();
 
   public edgeModel = input.required<EdgeModel>();
 
-  public point = input({ x: 0, y: 0 });
+  public position = input.required<EdgeLabelPosition>();
+
+  protected point = computed(() => this.edgeModel().path().labelPoints?.[this.position()]);
 
   public htmlTemplate = input<TemplateRef<any>>();
 
-  protected transform = computed(() => {
-    const { x, y } = this.point();
-
-    return `translate(${x}px, ${y}px)`;
-  });
+  constructor() {
+    effect(() => {
+      this.element.style.zIndex = String(this.edgeModel().renderOrder());
+    });
+    effect(() => {
+      const point = this.point();
+      this.element.style.transform = point ? `translate(${point.x}px, ${point.y}px)` : '';
+    });
+  }
 
   protected edgeLabelStyle = computed(() => {
     const label = this.model().edgeLabel;

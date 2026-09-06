@@ -1,4 +1,13 @@
-import { ChangeDetectionStrategy, Component, Injector, TemplateRef, computed, inject, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  effect,
+  Injector,
+  TemplateRef,
+  inject,
+  input,
+} from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
 
 import { EdgeModel } from '../../models/edge.model';
@@ -7,7 +16,6 @@ import { SelectionService } from '../../services/selection.service';
 import { FlowSettingsService } from '../../services/flow-settings.service';
 import { ConnectionControllerDirective } from '../../directives/connection-controller.directive';
 import { HandleModel } from '../../models/handle.model';
-import { FlowStatusService } from '../../services/flow-status.service';
 import { EdgeRenderingService } from '../../services/edge-rendering.service';
 import { PointerDirective } from '../../directives/pointer.directive';
 
@@ -17,8 +25,9 @@ import { PointerDirective } from '../../directives/pointer.directive';
   styleUrls: ['./edge.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
+    '(focusin)': 'model().focused.set(true)',
+    '(focusout)': 'model().focused.set(false)',
     class: 'selectable',
-    '[style.visibility]': '!model().isReady() || isReconnecting() ? "hidden" : "visible"',
   },
   imports: [NgTemplateOutlet, PointerDirective],
 })
@@ -26,7 +35,6 @@ export class EdgeComponent {
   protected injector = inject(Injector);
   private selectionService = inject(SelectionService);
   private flowSettingsService = inject(FlowSettingsService);
-  private flowStatusService = inject(FlowStatusService);
   private edgeRenderingService = inject(EdgeRenderingService);
 
   // TODO remove dependency from this directive
@@ -36,12 +44,15 @@ export class EdgeComponent {
 
   public edgeTemplate = input<TemplateRef<EdgeContext>>();
 
-  protected isReconnecting = computed(() => {
-    const status = this.flowStatusService.status();
-    const isReconnecting = status.state === 'reconnection-start' || status.state === 'reconnection-validation';
-
-    return isReconnecting && status.payload.oldEdge === this.model();
-  });
+  constructor() {
+    const element = inject<ElementRef<SVGElement>>(ElementRef).nativeElement;
+    effect(() => {
+      element.style.visibility = !this.model().isReady() || this.model().reconnecting() ? 'hidden' : 'visible';
+    });
+    effect(() => {
+      element.style.zIndex = String(this.model().renderOrder());
+    });
+  }
 
   public select() {
     if (this.model().selectable()) {

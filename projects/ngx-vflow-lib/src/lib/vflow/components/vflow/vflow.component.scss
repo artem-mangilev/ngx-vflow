@@ -129,18 +129,11 @@
   pointer-events: all;
 }
 
-.vflow-minimap-svg {
+.vflow-minimap {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   pointer-events: none;
   z-index: 1000002;
-}
-
-.preview-flow {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 2;
 }

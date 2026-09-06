@@ -14,7 +14,6 @@ import { EdgeContext } from '../interfaces/template-context.interface';
 import { HandleModel } from './handle.model';
 import { CurveFactoryParams, CurveLayout } from '../interfaces/curve-factory.interface';
 import { FlowEntitiesService } from '../services/flow-entities.service';
-import { extendedComputed } from '../utils/signals/extended-computed';
 import { Marker } from '../interfaces/marker.interface';
 import { FlowSettingsService } from '../services/flow-settings.service';
 import { createModelInjector } from '../utils/model-injector';
@@ -58,6 +57,13 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
   public floating = signal(EDGE_DEFAULTS.floating);
   public markers = signal<{ start?: Marker; end?: Marker }>(EDGE_DEFAULTS.markers);
   public edgeLabels = signal<{ [position in EdgeLabelPosition]?: EdgeLabel }>(EDGE_DEFAULTS.edgeLabels);
+
+  public focused = signal(false);
+  public reconnecting = signal(false);
+  public inViewport = signal(false);
+  public culled = computed(
+    () => !!this.settingsService.optimization().virtualization && !this.focused() && !this.inViewport(),
+  );
 
   public selected = signal(EDGE_DEFAULTS.selected);
   public selected$: Observable<boolean>;
@@ -115,7 +121,7 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
     return layout.path ? (layout.bounds ?? getSvgPathBounds(this.document, layout.path)) : null;
   });
 
-  public sourceHandle = extendedComputed<HandleModel | null>((previousHandle) => {
+  public sourceHandle = computed<HandleModel | null>(() => {
     let handle: HandleModel | null = null;
 
     if (this.floating()) {
@@ -134,14 +140,10 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
       }
     }
 
-    if (handle === null && this.source()?.virtualized() && previousHandle?.parentNode === this.source()) {
-      return previousHandle;
-    }
-
     return handle;
   });
 
-  public targetHandle = extendedComputed<HandleModel | null>((previousHandle) => {
+  public targetHandle = computed<HandleModel | null>(() => {
     let handle: HandleModel | null = null;
 
     if (this.floating()) {
@@ -160,17 +162,13 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
       }
     }
 
-    if (handle === null && this.target()?.virtualized() && previousHandle?.parentNode === this.target()) {
-      return previousHandle;
-    }
-
     return handle;
   });
 
-  public closestHandles = extendedComputed<{
+  public closestHandles = computed<{
     sourceHandle: HandleModel | null;
     targetHandle: HandleModel | null;
-  }>((previous) => {
+  }>(() => {
     const source = this.source();
     const target = this.target();
 
@@ -178,26 +176,14 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
       return { sourceHandle: null, targetHandle: null };
     }
 
-    // A virtually unmounted endpoint still participates in closest-pair selection.
-    const availableSourceHandles = source.handles().length
-      ? source.handles()
-      : source.virtualized() && previous?.sourceHandle?.parentNode === source
-        ? [previous.sourceHandle]
-        : [];
-    const availableTargetHandles = target.handles().length
-      ? target.handles()
-      : target.virtualized() && previous?.targetHandle?.parentNode === target
-        ? [previous.targetHandle]
-        : [];
-
     const sourceHandles =
       this.flowEntitiesService.connection().mode === 'strict'
-        ? availableSourceHandles.filter((h) => h.rawHandle.type === 'source')
-        : availableSourceHandles;
+        ? source.handles().filter((h) => h.rawHandle.type === 'source')
+        : source.handles();
     const targetHandles =
       this.flowEntitiesService.connection().mode === 'strict'
-        ? availableTargetHandles.filter((h) => h.rawHandle.type === 'target')
-        : availableTargetHandles;
+        ? target.handles().filter((h) => h.rawHandle.type === 'target')
+        : target.handles();
 
     if (sourceHandles.length === 0 || targetHandles.length === 0) {
       return { sourceHandle: sourceHandles[0] ?? null, targetHandle: targetHandles[0] ?? null };

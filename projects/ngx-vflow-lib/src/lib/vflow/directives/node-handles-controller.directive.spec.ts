@@ -34,6 +34,8 @@ describe('NodeHandlesControllerDirective', () => {
       .and.returnValue({ left: 0, top: 0, width: 100, height: 100 } as DOMRect);
 
     const model = {
+      culled: () => false,
+      rawNode: { type: 'html-template' },
       handles$,
       handles: () => handles,
       nodeElement: () => nodeElement,

@@ -1,4 +1,4 @@
-import { DestroyRef, Directive, ElementRef, inject, OnInit } from '@angular/core';
+import { afterRenderEffect, DestroyRef, Directive, ElementRef, inject, OnInit } from '@angular/core';
 import { NodeAccessorService } from '../services/node-accessor.service';
 import { tap } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -22,6 +22,20 @@ export class NodeHandlesControllerDirective implements OnInit {
   private syncScheduled = false;
   private destroyed = false;
   private readonly resizeCallback = () => this.scheduleSync();
+
+  constructor() {
+    afterRenderEffect(() => {
+      const model = this.nodeAccessor.model();
+      if (model?.rawNode.type === 'default') {
+        // Standard handles depend on model dimensions, even without layout.
+        model.width();
+        model.height();
+        this.scheduleSync();
+      } else if (model && !model.culled()) {
+        this.scheduleSync();
+      }
+    });
+  }
 
   public ngOnInit(): void {
     this.model = this.nodeAccessor.model()!;
@@ -88,9 +102,10 @@ export class NodeHandlesControllerDirective implements OnInit {
       }
 
       const handles = this.model.handles();
-      const nodeRect = handles.some((handle) => !handle.isStandard)
-        ? this.model.nodeElement()?.getBoundingClientRect()
-        : undefined;
+      const nodeRect =
+        !this.model.culled() && handles.some((handle) => !handle.isStandard)
+          ? this.model.nodeElement()?.getBoundingClientRect()
+          : undefined;
       const measurements = handles.map((handle) => handle.measure(nodeRect));
 
       handles.forEach((handle, index) => handle.applyGeometry(measurements[index]));

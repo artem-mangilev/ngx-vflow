@@ -36,6 +36,7 @@ export interface SharedNode {
   draggable?: WritableSignal<boolean>;
   parentId?: WritableSignal<string | null>;
   extent?: WritableSignal<'parent' | null>;
+  /** @deprecated Ignored. Virtualization retains the original node view at every zoom. */
   preview?: WritableSignal<NodePreview>;
   selected?: WritableSignal<boolean>;
   selectable?: WritableSignal<boolean>;

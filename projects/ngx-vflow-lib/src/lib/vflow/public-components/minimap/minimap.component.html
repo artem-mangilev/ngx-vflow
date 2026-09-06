@@ -1,55 +1,8 @@
 <ng-template #minimap>
-  <svg:rect
-    fill="none"
-    [attr.x]="minimapPoint().x"
-    [attr.y]="minimapPoint().y"
-    [attr.width]="minimapWidth()"
-    [attr.height]="minimapHeight()"
-    [attr.stroke]="strokeColor()" />
-
-  <svg:svg
-    [attr.x]="minimapPoint().x"
-    [attr.y]="minimapPoint().y"
-    [attr.width]="minimapWidth()"
-    [attr.height]="minimapHeight()">
-    <svg:rect [attr.width]="minimapWidth()" [attr.height]="minimapHeight()" [attr.fill]="maskColor()" />
-
-    <svg:g [attr.transform]="minimapTransform()">
-      <svg:rect
-        [attr.fill]="viewportColor()"
-        [attr.transform]="viewportTransform()"
-        [attr.width]="minimapWidth()"
-        [attr.height]="minimapHeight()" />
-
-      @for (model of entitiesService.nodes(); track trackNodes($index, model)) {
-        <ng-container>
-          @if (model.rawNode.type === 'default' || model.rawNode.type === 'html-template' || model.isComponentType) {
-            <svg:rect
-              class="node-preview"
-              rx="2"
-              ry="2"
-              fill="#fff"
-              stroke="#1b262c"
-              stroke-width="2"
-              [class.node-preview_selected]="model.selected()"
-              [attr.transform]="model.pointTransform()"
-              [attr.width]="model.width()"
-              [attr.height]="model.height()" />
-          }
-          @if (model.rawNode.type === 'default-group' || model.rawNode.type === 'template-group') {
-            <svg:rect
-              class="default-group-node"
-              rx="5"
-              ry="5"
-              [attr.transform]="model.pointTransform()"
-              [class.default-group-node_selected]="model.selected()"
-              [attr.width]="model.width()"
-              [attr.height]="model.height()"
-              [style.stroke]="model.color()"
-              [style.fill]="model.color()" />
-          }
-        </ng-container>
-      }
-    </svg:g>
-  </svg:svg>
+  <canvas
+    minimapCanvas
+    aria-hidden="true"
+    [maskColor]="maskColor()"
+    [strokeColor]="strokeColor()"
+    [position]="position()"></canvas>
 </ng-template>

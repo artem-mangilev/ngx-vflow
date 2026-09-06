@@ -43,13 +43,8 @@ export class HandleComponent implements OnInit, AfterViewInit {
 
   private candidateDescription = computed(() => {
     const labels = this.settings.ariaLabels();
-    const status = this.flowStatusService.status();
-    return (status.state === 'connection-validation' || status.state === 'reconnection-validation') &&
-      status.payload.targetHandle === this.model
-      ? status.payload.valid
-        ? labels.connectionValid
-        : labels.connectionInvalid
-      : '';
+    const state = this.model?.state();
+    return state === 'valid' ? labels.connectionValid : state === 'invalid' ? labels.connectionInvalid : '';
   });
 
   protected accessibility = computed(() => {
@@ -108,13 +103,7 @@ export class HandleComponent implements OnInit, AfterViewInit {
 
   protected model: HandleModel | null = null;
 
-  protected showMagnet = computed(
-    () =>
-      this.flowStatusService.status().state === 'connection-start' ||
-      this.flowStatusService.status().state === 'connection-validation' ||
-      this.flowStatusService.status().state === 'reconnection-start' ||
-      this.flowStatusService.status().state === 'reconnection-validation',
-  );
+  protected showMagnet = this.flowStatusService.connectionActive.asReadonly();
 
   public ngOnInit() {
     runInInjectionContext(this.injector, () => {
