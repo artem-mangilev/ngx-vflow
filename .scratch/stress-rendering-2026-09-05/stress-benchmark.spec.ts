@@ -5,6 +5,7 @@ import { VflowComponent } from './components/vflow/vflow.component';
 import { createNode } from './interfaces/node.interface';
 import { createEdge } from './interfaces/edge.interface';
 import { FlowEntitiesService } from './services/flow-entities.service';
+import { StressTestNodeComponent } from '../../../../ngx-vflow-demo/src/app/categories/performance/pages/stress-test/demo/stress-test-node.component';
 
 const frame = () => new Promise<number>(requestAnimationFrame);
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -44,16 +45,17 @@ describe('Stress rendering measurement', () => {
     console.log('STRESS-FANOUT ' + JSON.stringify({ nodes: models.length, panVisited, moveVisited }));
     fixture.destroy();
   });
-  for (const mode of ['full', 'virtual', 'contain', 'will-change']) {
+  for (const mode of ['full', 'virtual', 'contain', 'will-change', 'custom-full', 'custom-virtual']) {
     it(
       mode,
       async () => {
         TestBed.configureTestingModule({ providers: [provideExperimentalZonelessChangeDetection()] });
         const nodes = Array.from({ length: 1024 }, (_, i) =>
-          createNode({
+          createNode<{ label: string }>({
             id: String(i),
-            type: 'default',
-            text: `Node ${i}`,
+            ...(mode.startsWith('custom')
+              ? { type: StressTestNodeComponent, data: { label: `Node ${i}` }, ariaLabel: `Node ${i}` }
+              : { type: 'default', text: `Node ${i}` }),
             point: { x: (i % 32) * 150, y: Math.floor(i / 32) * 100 },
           }),
         );
@@ -63,7 +65,7 @@ describe('Stress rendering measurement', () => {
         fixture.componentRef.setInput('minZoom', 0.1);
         fixture.componentRef.setInput('nodes', nodes);
         fixture.componentRef.setInput('edges', edges);
-        fixture.componentRef.setInput('optimization', { virtualization: mode === 'virtual' });
+        fixture.componentRef.setInput('optimization', { virtualization: mode.endsWith('virtual') });
         const start = performance.now();
         fixture.detectChanges();
         await fixture.whenStable();

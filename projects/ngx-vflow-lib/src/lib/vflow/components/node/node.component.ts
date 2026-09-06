@@ -85,9 +85,8 @@ export class NodeComponent implements OnInit, AfterViewInit, OnDestroy {
     // by nodeResizeController; until then they stay hidden. Other node types have
     // explicit dimensions and are considered measured immediately.
     const type = this.model().rawNode.type;
-    if (type !== 'html-template' && !this.model().isComponentType) {
-      this.model().isMeasured.set(true);
-    }
+    // A remounted custom view must measure its new DOM before becoming visible.
+    this.model().isMeasured.set(type !== 'html-template' && !this.model().isComponentType);
 
     this.nodeAccessor.model.set(this.model());
     this.handleService.node.set(this.model());

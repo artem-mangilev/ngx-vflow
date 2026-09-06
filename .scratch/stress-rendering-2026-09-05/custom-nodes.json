@@ -1,0 +1,170 @@
+[
+  {
+    "mode": "custom-full",
+    "ready": 377,
+    "initialDom": 13324,
+    "zoom": {
+      "frame": {
+        "median": 16.7,
+        "p95": 16.7,
+        "over25ms": 0
+      },
+      "eventAndDetect": {
+        "median": 6.2,
+        "p95": 6.5,
+        "over25ms": 0
+      },
+      "finalScale": 0.18946457081379978
+    },
+    "pan": {
+      "frame": {
+        "median": 16.7,
+        "p95": 16.8,
+        "over25ms": 0
+      },
+      "eventAndDetect": {
+        "median": 6.1,
+        "p95": 6.5,
+        "over25ms": 0
+      }
+    },
+    "drag": {
+      "frame": {
+        "median": 16.7,
+        "p95": 33.4,
+        "over25ms": 6
+      },
+      "eventAndDetect": {
+        "median": 15.4,
+        "p95": 16,
+        "over25ms": 0
+      }
+    }
+  },
+  {
+    "mode": "virtual",
+    "ready": 25.2,
+    "initialDom": 389,
+    "zoom": {
+      "frame": {
+        "median": 16.7,
+        "p95": 16.8,
+        "over25ms": 0
+      },
+      "eventAndDetect": {
+        "median": 2.1,
+        "p95": 8,
+        "over25ms": 0
+      },
+      "finalScale": 0.18946457081379978
+    },
+    "pan": {
+      "frame": {
+        "median": 16.7,
+        "p95": 16.8,
+        "over25ms": 0
+      },
+      "eventAndDetect": {
+        "median": 2,
+        "p95": 3.5,
+        "over25ms": 0
+      }
+    },
+    "drag": {
+      "frame": {
+        "median": 16.7,
+        "p95": 16.8,
+        "over25ms": 0
+      },
+      "eventAndDetect": {
+        "median": 2.3,
+        "p95": 4.4,
+        "over25ms": 0
+      }
+    }
+  },
+  {
+    "mode": "full",
+    "ready": 311.8,
+    "initialDom": 10252,
+    "zoom": {
+      "frame": {
+        "median": 16.7,
+        "p95": 16.8,
+        "over25ms": 0
+      },
+      "eventAndDetect": {
+        "median": 5.8,
+        "p95": 6.2,
+        "over25ms": 0
+      },
+      "finalScale": 0.18946457081379978
+    },
+    "pan": {
+      "frame": {
+        "median": 16.7,
+        "p95": 16.8,
+        "over25ms": 0
+      },
+      "eventAndDetect": {
+        "median": 5.8,
+        "p95": 6.3,
+        "over25ms": 0
+      }
+    },
+    "drag": {
+      "frame": {
+        "median": 16.7,
+        "p95": 16.8,
+        "over25ms": 0
+      },
+      "eventAndDetect": {
+        "median": 13.5,
+        "p95": 14.1,
+        "over25ms": 0
+      }
+    }
+  },
+  {
+    "mode": "custom-virtual",
+    "ready": 26.3,
+    "initialDom": 515,
+    "zoom": {
+      "frame": {
+        "median": 16.7,
+        "p95": 16.8,
+        "over25ms": 0
+      },
+      "eventAndDetect": {
+        "median": 2.1,
+        "p95": 8.3,
+        "over25ms": 0
+      },
+      "finalScale": 0.18946457081379978
+    },
+    "pan": {
+      "frame": {
+        "median": 16.7,
+        "p95": 16.8,
+        "over25ms": 0
+      },
+      "eventAndDetect": {
+        "median": 2,
+        "p95": 3.2,
+        "over25ms": 0
+      }
+    },
+    "drag": {
+      "frame": {
+        "median": 16.7,
+        "p95": 16.7,
+        "over25ms": 0
+      },
+      "eventAndDetect": {
+        "median": 2.4,
+        "p95": 4.8,
+        "over25ms": 0
+      }
+    }
+  }
+]
