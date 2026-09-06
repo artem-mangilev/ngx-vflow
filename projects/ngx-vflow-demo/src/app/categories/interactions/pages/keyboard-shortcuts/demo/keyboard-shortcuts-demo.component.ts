@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import { KeyboardShortcuts, Node, Vflow } from 'ngx-vflow';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { KeyboardShortcuts, Node, Vflow, createNodes } from 'ngx-vflow';
 
 @Component({
   template: `<vflow view="auto" [nodes]="nodes" [keyboardShortcuts]="shortcuts" />`,
@@ -20,26 +20,26 @@ export class KeyboardShortcutsDemoComponent {
     multiSelection: ['ShiftLeft', 'ShiftRight'],
   };
 
-  public nodes: Node[] = [
+  public nodes: Node[] = createNodes([
     {
       id: '1',
-      point: signal({ x: 10, y: 10 }),
+      point: { x: 10, y: 10 },
       type: 'default',
-      text: signal(`1`),
-      parentId: signal('3'),
+      text: `1`,
+      parentId: '3',
     },
     {
       id: '2',
-      point: signal({ x: 200, y: 200 }),
+      point: { x: 200, y: 200 },
       type: 'default',
-      text: signal(`<strong>2</strong>`),
+      text: `<strong>2</strong>`,
     },
     {
       id: '3',
-      point: signal({ x: 10, y: 10 }),
+      point: { x: 10, y: 10 },
       type: 'default-group',
-      width: signal(150),
-      height: signal(150),
+      width: 150,
+      height: 150,
     },
-  ];
+  ]);
 }

@@ -1,40 +1,28 @@
-import { Injectable, computed, inject, untracked } from '@angular/core';
+import { Injectable, computed, inject } from '@angular/core';
 import { FlowEntitiesService } from './flow-entities.service';
-import { Observable, asyncScheduler, merge, zip } from 'rxjs';
+import { Observable, asyncScheduler, merge } from 'rxjs';
 import { distinctUntilChanged, filter, map, observeOn, pairwise, skip, switchMap } from 'rxjs/operators';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { EdgeChange } from '../types/edge-change.type';
-
-const haveSameContents = <T>(a: T[], b: T[]) =>
-  a.length === b.length &&
-  [...new Set([...a, ...b])].every((v) => a.filter((e) => e === v).length === b.filter((e) => e === v).length);
 
 @Injectable()
 export class EdgeChangesService {
   protected entitiesService = inject(FlowEntitiesService);
 
-  protected edgeDetachedChange$ = merge(
-    toObservable(
-      computed(() => {
-        const nodes = this.entitiesService.nodes();
-        const edges = untracked(this.entitiesService.edges);
-
-        return edges.filter(({ source, target }) => !nodes.includes(source()!) || !nodes.includes(target()!));
-      }),
-    ),
-    toObservable(this.entitiesService.edges).pipe(
-      switchMap((edges) => {
-        return zip(...edges.map((e) => e.detached$.pipe(map(() => e))));
-      }),
-      map((edges) => edges.filter((e) => e.detached())),
-      // TODO check why there are 2 emits
-      skip(2),
-    ),
+  protected edgeDetachedChange$ = toObservable(
+    computed(() => {
+      const nodes = new Set(this.entitiesService.nodes());
+      return this.entitiesService
+        .edges()
+        .filter((edge) => !nodes.has(edge.source()!) || !nodes.has(edge.target()!) || edge.detached());
+    }),
   ).pipe(
-    // here we check if 2 approaches to detect detached edges emits same
-    // and same values (this may happen on node delete)
-    distinctUntilChanged(haveSameContents),
-    filter((edges) => !!edges.length),
+    pairwise(),
+    map(([previous, current]) => {
+      const detached = new Set(previous);
+      return current.filter((edge) => !detached.has(edge));
+    }),
+    filter((edges) => edges.length > 0),
     map((edges) => edges.map(({ edge }) => ({ type: 'detached', id: edge.id }))),
   ) satisfies Observable<EdgeChange[]>;
 

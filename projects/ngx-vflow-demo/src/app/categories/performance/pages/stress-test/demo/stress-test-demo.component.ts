@@ -1,6 +1,6 @@
-import { signal } from '@angular/core';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { Edge, Node, Vflow } from 'ngx-vflow';
+import { Edge, Node, StaticNode, Vflow, createNodes } from 'ngx-vflow';
+import { StressTestNodeComponent } from './stress-test-node.component';
 
 @Component({
   templateUrl: './stress-test-demo.component.html',
@@ -20,7 +20,7 @@ export class StressTestDemoComponent {
 }
 
 export function initialElements(xNodes = 10, yNodes = 10): { nodes: Node[]; edges: Edge[] } {
-  const nodes = [] as Node[];
+  const nodes: StaticNode<{ label: string }>[] = [];
   const edges = [] as Edge[];
 
   let nodeId = 1;
@@ -29,10 +29,11 @@ export function initialElements(xNodes = 10, yNodes = 10): { nodes: Node[]; edge
   for (let y = 0; y < yNodes; y++) {
     for (let x = 0; x < xNodes; x++) {
       nodes.push({
-        type: 'default',
+        type: StressTestNodeComponent,
         id: `stress-${nodeId}`,
-        text: signal(`Node ${nodeId}`),
-        point: signal({ x: x * 150, y: y * 100 }),
+        data: { label: `Node ${nodeId}` },
+        ariaLabel: `Node ${nodeId}`,
+        point: { x: x * 150, y: y * 100 },
       });
 
       if (recentNodeId && nodeId <= xNodes * yNodes) {
@@ -48,5 +49,5 @@ export function initialElements(xNodes = 10, yNodes = 10): { nodes: Node[]; edge
     }
   }
 
-  return { nodes, edges };
+  return { nodes: createNodes(nodes), edges };
 }

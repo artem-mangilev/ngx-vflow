@@ -6,7 +6,7 @@ import { FlowEntitiesService } from '../services/flow-entities.service';
 import { FlowSettingsService } from '../services/flow-settings.service';
 import { NodeRenderingService } from '../services/node-rendering.service';
 import { ViewportService } from '../services/viewport.service';
-import { getNodesBounds, getNodesFlowBounds } from './nodes';
+import { getIntersectingNodes, getNodesAtPoint, getNodesBounds, getNodesFlowBounds } from './nodes';
 
 describe('nodes utils', () => {
   beforeEach(() => {
@@ -67,5 +67,9 @@ describe('nodes utils', () => {
       width: 80,
       height: 40,
     });
+
+    expect(getNodesAtPoint({ x: 115, y: 115 }, [group, child])).toEqual([group, child]);
+    expect(getNodesAtPoint({ x: 99, y: 99 }, [group, child])).toEqual([]);
+    expect(getIntersectingNodes('child', [group, child], { partially: true })).toEqual([group]);
   });
 });

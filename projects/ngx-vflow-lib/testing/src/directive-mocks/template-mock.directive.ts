@@ -4,6 +4,7 @@ import type {
   EdgeLabelHtmlTemplateDirective,
   EdgeTemplateDirective,
   GroupNodeTemplateDirective,
+  HandleContext,
   HandleTemplateDirective,
   NodeHtmlTemplateDirective,
 } from 'ngx-vflow';
@@ -43,14 +44,6 @@ export class NodeHtmlTemplateMockDirective implements AsInterface<NodeHtmlTempla
 
 @Directive({
   standalone: true,
-  selector: 'ng-template[nodeSvg]',
-})
-export class NodeSvgTemplateMockDirective implements AsInterface<NodeSvgTemplateMockDirective> {
-  public templateRef = inject(TemplateRef);
-}
-
-@Directive({
-  standalone: true,
   selector: 'ng-template[groupNode]',
 })
 export class GroupNodeTemplateMockDirective implements AsInterface<GroupNodeTemplateDirective> {
@@ -62,5 +55,9 @@ export class GroupNodeTemplateMockDirective implements AsInterface<GroupNodeTemp
   selector: 'ng-template[handle]',
 })
 export class HandleTemplateMockDirective implements AsInterface<HandleTemplateDirective> {
-  public templateRef = inject(TemplateRef);
+  public templateRef = inject<TemplateRef<HandleContext>>(TemplateRef);
+
+  static ngTemplateContextGuard(dir: HandleTemplateMockDirective, ctx: unknown): ctx is HandleContext {
+    return true;
+  }
 }

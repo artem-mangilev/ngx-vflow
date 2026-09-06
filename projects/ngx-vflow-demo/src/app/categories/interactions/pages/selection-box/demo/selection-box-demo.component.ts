@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
-import { Edge, Node, SelectionBoxMode, SelectionBoxSettings, Vflow } from 'ngx-vflow';
+import { Edge, Node, SelectionBoxMode, SelectionBoxSettings, Vflow, createNodes } from 'ngx-vflow';
 
 @Component({
   template: `
@@ -62,32 +62,32 @@ export class SelectionBoxDemoComponent {
     this.mode.set(mode);
   }
 
-  public nodes: Node[] = [
+  public nodes: Node[] = createNodes([
     {
       id: '1',
-      point: signal({ x: 40, y: 120 }),
+      point: { x: 40, y: 120 },
       type: 'default',
-      text: signal('Node 1'),
+      text: 'Node 1',
     },
     {
       id: '2',
-      point: signal({ x: 260, y: 150 }),
+      point: { x: 260, y: 150 },
       type: 'default',
-      text: signal('Node 2'),
+      text: 'Node 2',
     },
     {
       id: '3',
-      point: signal({ x: 430, y: 95 }),
+      point: { x: 430, y: 95 },
       type: 'default',
-      text: signal('Node 3'),
+      text: 'Node 3',
     },
     {
       id: '4',
-      point: signal({ x: 360, y: 300 }),
+      point: { x: 360, y: 300 },
       type: 'default',
-      text: signal('Node 4'),
+      text: 'Node 4',
     },
-  ];
+  ]);
 
   public edges: Edge[] = [
     {

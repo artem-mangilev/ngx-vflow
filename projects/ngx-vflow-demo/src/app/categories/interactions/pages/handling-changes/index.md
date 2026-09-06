@@ -5,7 +5,7 @@ keyword: 'FeaturesHandlingChanges'
 > **Info**
 > You can observe changes in the toasts.
 
-You can observe various changes in nodes and edges.
+You can observe various changes in nodes and edges. Every `NodeChange` and `EdgeChange` is a post-mutation notification: the collection or writable signal has already changed. Do not replay these notifications through structural graph helpers.
 
 Types of `NodeChange`s:
 
@@ -43,7 +43,7 @@ For your convenience, here is the filtering scheme for changes based on the `(no
 Where:
 
 ```ts
-type NodeChangeType = 'position' | 'add' | 'remove' | 'select';
+type NodeChangeType = 'position' | 'size' | 'add' | 'remove' | 'select';
 
 type EdgeChangeType = 'detached' | 'add' | 'remove' | 'select';
 ```

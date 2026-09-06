@@ -4,7 +4,6 @@ import { EdgeComponent } from '../components/edge/edge.component';
 
 import { FlowEntity } from '../interfaces/flow-entity.interface';
 import { NodeComponent } from '../components/node/node.component';
-import { FlowSettingsService } from '../services/flow-settings.service';
 import { fromEvent } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -15,7 +14,6 @@ import { FlowStatusService, isSelectionBoxEndStatus } from '../services/flow-sta
   selector: '[selectable]',
 })
 export class SelectableDirective {
-  private flowSettingsService = inject(FlowSettingsService);
   private selectionService = inject(SelectionService);
   private parentEdge = inject(EdgeComponent, { optional: true });
   private parentNode = inject(NodeComponent, { optional: true });
@@ -38,7 +36,7 @@ export class SelectableDirective {
       return;
     }
 
-    if (entity && this.flowSettingsService.entitiesSelectable()) {
+    if (entity?.selectable()) {
       this.selectionService.select(entity);
     }
   }

@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, effect, signal, untracked, viewChild } from '@angular/core';
-import { Edge, Node, Vflow, VflowComponent } from 'ngx-vflow';
+import { Edge, Node, Vflow, VflowComponent, createNodes } from 'ngx-vflow';
 
 @Component({
   template: `
@@ -14,29 +14,29 @@ import { Edge, Node, Vflow, VflowComponent } from 'ngx-vflow';
 export class LazyLoadingDemoComponent {
   protected vflow = viewChild.required(VflowComponent);
 
-  public nodes: Node[] = [
+  public nodes: Node[] = createNodes([
     {
       id: '1',
-      point: signal({ x: 10, y: 150 }),
+      point: { x: 10, y: 150 },
       type: () => import('./components/node-a.component').then((m) => m.NodeAComponent),
-      width: signal(150),
-      height: signal(100),
+      width: 150,
+      height: 100,
     },
     {
       id: '2',
-      point: signal({ x: 1000, y: 150 }),
+      point: { x: 1000, y: 150 },
       type: () => import('./components/node-b.component').then((m) => m.NodeBComponent),
-      width: signal(150),
-      height: signal(100),
+      width: 150,
+      height: 100,
     },
     {
       id: '3',
-      point: signal({ x: 2000, y: 150 }),
+      point: { x: 2000, y: 150 },
       type: () => import('./components/node-c.component').then((m) => m.NodeCComponent),
-      width: signal(150),
-      height: signal(100),
+      width: 150,
+      height: 100,
     },
-  ];
+  ]);
 
   public edges: Edge[] = [
     {

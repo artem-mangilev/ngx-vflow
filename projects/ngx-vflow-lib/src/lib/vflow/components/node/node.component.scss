@@ -1,25 +1,30 @@
-.magnet {
-  opacity: 0;
+:host {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+  pointer-events: all;
+}
+
+:host(:focus-visible) {
+  outline: 2px solid #005fcc;
+  outline-offset: 3px;
 }
 
 .wrapper {
-  display: table-cell;
+  width: max-content;
 }
 
 .default-group-node {
-  stroke-width: 1.5px;
-  fill-opacity: 0.05;
+  border: 1.5px solid var(--group-color);
+  background-color: color-mix(in srgb, var(--group-color) 5%, transparent);
+  border-radius: 5px;
 
   &_selected {
-    stroke-width: 2px;
+    border-width: 2px;
   }
 
   &_preselected {
-    stroke-width: 2px;
+    border-width: 2px;
   }
-}
-
-.default-handle {
-  stroke: #fff;
-  fill: #1b262c;
 }

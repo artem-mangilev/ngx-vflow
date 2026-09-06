@@ -3,22 +3,51 @@ import { EdgeLabel, EdgeLabelPosition } from '../interfaces/edge-label.interface
 import { Edge, Curve, EdgeType, EDGE_DEFAULTS } from '../interfaces/edge.interface';
 import { EdgeLabelModel } from './edge-label.model';
 import { NodeModel } from './node.model';
-import { straightPath } from '../math/edge-path/straigh-path';
-import { bezierPath } from '../math/edge-path/bezier-path';
+import { getStraightPath } from '../math/edge-path/straigh-path';
+import { getBezierPath } from '../math/edge-path/bezier-path';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { FlowEntity } from '../interfaces/flow-entity.interface';
-import { smoothStepPath } from '../math/edge-path/smooth-step-path';
+import { getSmoothStepPath } from '../math/edge-path/smooth-step-path';
 import { hashCode } from '../utils/hash';
 import { Contextable } from '../interfaces/contextable.interface';
 import { EdgeContext } from '../interfaces/template-context.interface';
 import { HandleModel } from './handle.model';
-import { CurveFactoryParams } from '../interfaces/curve-factory.interface';
+import { CurveFactoryParams, CurveLayout } from '../interfaces/curve-factory.interface';
 import { FlowEntitiesService } from '../services/flow-entities.service';
-import { extendedComputed } from '../utils/signals/extended-computed';
 import { Marker } from '../interfaces/marker.interface';
+import { FlowSettingsService } from '../services/flow-settings.service';
+import { createModelInjector } from '../utils/model-injector';
+import { Observable } from 'rxjs';
+import { DOCUMENT } from '@angular/common';
+import { getSvgPathBounds } from '../utils/svg-path-bounds';
 
 export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
+  private modelInjector = createModelInjector();
+  private document = inject(DOCUMENT);
   private readonly flowEntitiesService = inject(FlowEntitiesService);
+  private readonly settingsService = inject(FlowSettingsService);
+
+  public accessibility = computed(() => {
+    const labels = this.settingsService.ariaLabels();
+    const endpoints = labels.edgeLabel({
+      source: this.source()?.ariaLabel() ?? labels.nodeLabel(this.edge.source),
+      target: this.target()?.ariaLabel() ?? labels.nodeLabel(this.edge.target),
+    });
+    const label = this.edge.ariaLabel?.().trim() || endpoints;
+    return {
+      label,
+      domAttributes: this.edge.domAttributes?.(),
+      description: [
+        this.edge.ariaDescription?.(),
+        label !== endpoints ? endpoints : '',
+        this.selected() ? labels.selected : '',
+        !this.selectable() ? labels.selectionUnavailable : '',
+        !this.reconnectable() ? labels.reconnectionUnavailable : '',
+      ]
+        .filter(Boolean)
+        .join(' '),
+    };
+  });
 
   public source = signal<NodeModel | undefined>(undefined);
   public target = signal<NodeModel | undefined>(undefined);
@@ -29,13 +58,24 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
   public markers = signal<{ start?: Marker; end?: Marker }>(EDGE_DEFAULTS.markers);
   public edgeLabels = signal<{ [position in EdgeLabelPosition]?: EdgeLabel }>(EDGE_DEFAULTS.edgeLabels);
 
+  public focused = signal(false);
+  public reconnecting = signal(false);
+  public inViewport = signal(false);
+  public culled = computed(
+    () => !!this.settingsService.optimization().virtualization && !this.focused() && !this.inViewport(),
+  );
+
   public selected = signal(EDGE_DEFAULTS.selected);
-  public selected$ = toObservable(this.selected);
+  public selected$: Observable<boolean>;
   public preselected = signal(false);
+  public selectable = computed(() => this.edge.selectable?.() ?? this.settingsService.edgesSelectable());
+  public focusable = computed(() => this.edge.focusable?.() ?? this.settingsService.edgesFocusable());
 
   public shouldLoad = computed(() => (this.source()?.shouldLoad() ?? false) && (this.target()?.shouldLoad() ?? false));
 
   public renderOrder = signal(0);
+
+  public isReady = computed(() => !!this.source()?.isReady() && !!this.target()?.isReady());
 
   public detached = computed(() => {
     const source = this.source();
@@ -45,27 +85,12 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
       return true;
     }
 
-    let existsSourceHandle = false;
-    let existsTargetHandle = false;
-
-    if (this.edge.sourceHandle) {
-      existsSourceHandle = !!source.handles().find((handle) => handle.rawHandle.id === this.edge.sourceHandle);
-    } else {
-      existsSourceHandle = !!source.handles().find((handle) => handle.rawHandle.type === 'source');
-    }
-
-    if (this.edge.targetHandle) {
-      existsTargetHandle = !!target.handles().find((handle) => handle.rawHandle.id === this.edge.targetHandle);
-    } else {
-      existsTargetHandle = !!target.handles().find((handle) => handle.rawHandle.type === 'target');
-    }
-
-    return !existsSourceHandle || !existsTargetHandle;
+    return !this.sourceHandle() || !this.targetHandle();
   });
 
-  public detached$ = toObservable(this.detached);
+  public detached$ = toObservable(this.detached, { injector: this.modelInjector });
 
-  public path = computed(() => {
+  public path = computed<CurveLayout>(() => {
     const source = this.sourceHandle();
     const target = this.targetHandle();
 
@@ -79,19 +104,24 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
     const curve = this.curve();
     switch (curve) {
       case 'straight':
-        return straightPath(params);
+        return getStraightPath(params);
       case 'bezier':
-        return bezierPath(params);
+        return getBezierPath(params);
       case 'smooth-step':
-        return smoothStepPath(params);
+        return getSmoothStepPath(params);
       case 'step':
-        return smoothStepPath(params, 0);
+        return getSmoothStepPath({ ...params, borderRadius: 0 });
       default:
         return curve(params);
     }
   });
 
-  public sourceHandle = extendedComputed<HandleModel | null>((previousHandle) => {
+  public bounds = computed(() => {
+    const layout = this.path();
+    return layout.path ? (layout.bounds ?? getSvgPathBounds(this.document, layout.path)) : null;
+  });
+
+  public sourceHandle = computed<HandleModel | null>(() => {
     let handle: HandleModel | null = null;
 
     if (this.floating()) {
@@ -110,18 +140,10 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
       }
     }
 
-    // In case of virtual scrolling, if the node is scrolled out of view the handle may disappear
-    // which could lead to the edge not being rendered
-    // so we return the previous handle if the current one is null
-    // TODO: check if this breaks anything
-    if (handle === null) {
-      return previousHandle;
-    }
-
     return handle;
   });
 
-  public targetHandle = extendedComputed<HandleModel | null>((previousHandle) => {
+  public targetHandle = computed<HandleModel | null>(() => {
     let handle: HandleModel | null = null;
 
     if (this.floating()) {
@@ -140,18 +162,13 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
       }
     }
 
-    // In case of virtual scrolling, if the node is scrolled out of view the handle may disappear
-    // which could lead to the edge not being rendered
-    // so we return the previous handle if the current one is null
-    // TODO: check if this breaks anything
-    if (handle === null) {
-      return previousHandle;
-    }
-
     return handle;
   });
 
-  public closestHandles = computed(() => {
+  public closestHandles = computed<{
+    sourceHandle: HandleModel | null;
+    targetHandle: HandleModel | null;
+  }>(() => {
     const source = this.source();
     const target = this.target();
 
@@ -159,19 +176,17 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
       return { sourceHandle: null, targetHandle: null };
     }
 
-    // Get all source handles from source node
     const sourceHandles =
       this.flowEntitiesService.connection().mode === 'strict'
         ? source.handles().filter((h) => h.rawHandle.type === 'source')
         : source.handles();
-    // Get all target handles from target node
     const targetHandles =
       this.flowEntitiesService.connection().mode === 'strict'
         ? target.handles().filter((h) => h.rawHandle.type === 'target')
         : target.handles();
 
     if (sourceHandles.length === 0 || targetHandles.length === 0) {
-      return { sourceHandle: null, targetHandle: null };
+      return { sourceHandle: sourceHandles[0] ?? null, targetHandle: targetHandles[0] ?? null };
     }
 
     let minDistance = Infinity;
@@ -267,7 +282,11 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
       },
     };
 
-    this.selected$ = toObservable(this.selected);
+    this.selected$ = toObservable(this.selected, { injector: this.modelInjector });
+  }
+
+  public destroy() {
+    this.modelInjector.destroy();
   }
 
   private getPathFactoryParams(source: HandleModel, target: HandleModel): CurveFactoryParams {

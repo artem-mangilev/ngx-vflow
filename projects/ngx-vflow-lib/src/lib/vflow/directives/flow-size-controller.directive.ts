@@ -6,26 +6,26 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Directive({
   standalone: true,
-  selector: 'svg[flowSizeController]',
+  selector: 'div[flowSizeController]',
   host: {
-    '[attr.width]': 'flowWidth()',
-    '[attr.height]': 'flowHeight()',
+    '[style.width]': 'flowWidth()',
+    '[style.height]': 'flowHeight()',
   },
 })
 export class FlowSizeControllerDirective {
-  private host = inject<ElementRef<SVGSVGElement>>(ElementRef);
+  private host = inject<ElementRef<HTMLElement>>(ElementRef);
   private flowSettingsService = inject(FlowSettingsService);
 
-  public flowWidth: Signal<string | number> = computed(() => {
+  public flowWidth: Signal<string> = computed(() => {
     const view = this.flowSettingsService.view();
 
-    return view === 'auto' ? '100%' : view[0];
+    return view === 'auto' ? '100%' : `${view[0]}px`;
   });
 
-  public flowHeight: Signal<string | number> = computed(() => {
+  public flowHeight: Signal<string> = computed(() => {
     const view = this.flowSettingsService.view();
 
-    return view === 'auto' ? '100%' : view[1];
+    return view === 'auto' ? '100%' : `${view[1]}px`;
   });
 
   constructor() {

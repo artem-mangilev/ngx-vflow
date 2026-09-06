@@ -1,7 +1,7 @@
 import { Directive, EventEmitter, OnInit, inject, OutputEmitterRef, input, linkedSignal } from '@angular/core';
 import { Observable, merge } from 'rxjs';
 import { switchMap, tap } from 'rxjs/operators';
-import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toObservable, outputToObservable } from '@angular/core/rxjs-interop';
 import { ComponentEventBusService } from '../../services/component-event-bus.service';
 import { NodeAccessorService } from '../../services/node-accessor.service';
 import { ComponentNode } from '../../interfaces/node.interface';
@@ -64,7 +64,7 @@ export abstract class CustomNodeComponent<T = any> implements OnInit {
       }
 
       if (field instanceof OutputEmitterRef) {
-        emittersOrRefs.set(outputRefToObservable(field), prop);
+        emittersOrRefs.set(outputToObservable(field), prop);
       }
     }
 
@@ -82,16 +82,4 @@ export abstract class CustomNodeComponent<T = any> implements OnInit {
       ),
     );
   }
-}
-
-function outputRefToObservable(ref: OutputEmitterRef<unknown>) {
-  return new Observable((subscriber) => {
-    const subscription = ref.subscribe((value) => {
-      subscriber.next(value);
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  });
 }

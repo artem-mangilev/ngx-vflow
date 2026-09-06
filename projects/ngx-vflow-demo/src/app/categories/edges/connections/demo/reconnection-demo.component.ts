@@ -1,5 +1,14 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import { Edge, Node, ReconnectEndEvent, ReconnectEvent, Vflow } from 'ngx-vflow';
+import {
+  Edge,
+  Node,
+  ReconnectEndEvent,
+  ReconnectEvent,
+  Vflow,
+  reconnectEdges,
+  removeEdges,
+  createNodes,
+} from 'ngx-vflow';
 
 @Component({
   template: `<vflow
@@ -21,32 +30,32 @@ import { Edge, Node, ReconnectEndEvent, ReconnectEvent, Vflow } from 'ngx-vflow'
   imports: [Vflow],
 })
 export class ReconnectionDemoComponent {
-  public nodes: Node[] = [
+  public nodes: Node[] = createNodes([
     {
       id: '1',
-      point: signal({ x: 100, y: 100 }),
+      point: { x: 100, y: 100 },
       type: 'default',
-      text: signal(`1`),
+      text: `1`,
     },
     {
       id: '2',
-      point: signal({ x: 600, y: 100 }),
+      point: { x: 600, y: 100 },
       type: 'default',
-      text: signal(`2`),
+      text: `2`,
     },
     {
       id: '3',
-      point: signal({ x: 100, y: 300 }),
+      point: { x: 100, y: 300 },
       type: 'default',
-      text: signal(`3`),
+      text: `3`,
     },
     {
       id: '4',
-      point: signal({ x: 600, y: 300 }),
+      point: { x: 600, y: 300 },
       type: 'default',
-      text: signal(`4`),
+      text: `4`,
     },
-  ];
+  ]);
 
   public edges: Edge[] = [
     {
@@ -95,22 +104,14 @@ export class ReconnectionDemoComponent {
 
   public onReconnectEnd(event: ReconnectEndEvent) {
     if (!this.edgeReconnectSuccessful()) {
-      this.edges = this.edges.filter((edge) => edge !== event.edge);
+      this.edges = removeEdges([event.edge.id], this.edges);
     }
 
     this.edgeReconnectSuccessful.set(true);
   }
 
-  public reconnect({ oldEdge, connection: { source, target } }: ReconnectEvent) {
-    this.edges = [
-      ...this.edges.filter((edge) => edge !== oldEdge),
-      {
-        ...oldEdge,
-        id: `${source} -> ${target}`,
-        source,
-        target,
-      },
-    ];
+  public reconnect({ oldEdge, connection }: ReconnectEvent) {
+    this.edges = reconnectEdges([{ id: oldEdge.id, connection }], { nodes: this.nodes, edges: this.edges });
 
     this.edgeReconnectSuccessful.set(true);
   }

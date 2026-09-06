@@ -3,9 +3,9 @@ import {
   ConnectionContext,
   EdgeContext,
   GroupNodeContext,
+  HandleContext,
   HtmlEdgeLabelContext,
   NodeContext,
-  SvgNodeContext,
 } from '../interfaces/template-context.interface';
 
 @Directive({
@@ -58,18 +58,6 @@ export class NodeHtmlTemplateDirective {
 
 @Directive({
   standalone: true,
-  selector: 'ng-template[nodeSvg]',
-})
-export class NodeSvgTemplateDirective {
-  public templateRef = inject(TemplateRef);
-
-  static ngTemplateContextGuard(dir: NodeSvgTemplateDirective, ctx: unknown): ctx is SvgNodeContext {
-    return true;
-  }
-}
-
-@Directive({
-  standalone: true,
   selector: 'ng-template[groupNode]',
 })
 export class GroupNodeTemplateDirective {
@@ -85,10 +73,9 @@ export class GroupNodeTemplateDirective {
   selector: 'ng-template[handle]',
 })
 export class HandleTemplateDirective {
-  public templateRef = inject(TemplateRef);
+  public templateRef = inject<TemplateRef<HandleContext>>(TemplateRef);
 
-  // TODO
-  // static ngTemplateContextGuard(dir: HandleTemplateDirective, ctx: unknown): ctx is HandleContext {
-  //   return true;
-  // }
+  static ngTemplateContextGuard(dir: HandleTemplateDirective, ctx: unknown): ctx is HandleContext {
+    return true;
+  }
 }

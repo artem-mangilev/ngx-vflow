@@ -77,6 +77,16 @@ export class NodeToolbarWrapperDirective implements OnInit {
 
   public model = input.required<ToolbarModel>();
 
+  constructor() {
+    effect(() => {
+      const toolbar = this.model();
+      const { x, y } = toolbar.node.globalPoint();
+      const offset = toolbar.point();
+      // This template is mounted inside the flow's positioned toolbar container.
+      this.element.nativeElement.parentElement!.style.transform = `translate(${x + offset.x}px, ${y + offset.y}px)`;
+    });
+  }
+
   public ngOnInit(): void {
     resizable([this.element.nativeElement], this.zone)
       .pipe(

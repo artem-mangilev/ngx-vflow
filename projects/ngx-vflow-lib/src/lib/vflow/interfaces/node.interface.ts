@@ -1,11 +1,11 @@
 import { signal, Type, WritableSignal } from '@angular/core';
 import { Point } from './point.interface';
-import { NodePreview } from './node-preview.interface';
 import { isCallable } from '../utils/is-callable';
 import { CustomNodeComponent } from '../public-components/custom-node/custom-node.component';
 import { isCustomNodeComponent } from '../utils/is-vflow-component';
 import { UnwrapSignal } from '../types/unwrap-signal.type';
 import { isDefined } from '../utils/is-defined';
+import { DomAttributes } from './dom-attributes.interface';
 
 export const NODE_DEFAULTS = {
   point: { x: 0, y: 0 },
@@ -14,7 +14,6 @@ export const NODE_DEFAULTS = {
   draggable: true,
   parentId: null,
   extent: 'parent' as const,
-  preview: { style: {} },
   selected: false,
   color: '#1b262c',
   resizable: false,
@@ -25,7 +24,6 @@ export const NODE_DEFAULTS = {
 export type Node<T = any> =
   | DefaultNode
   | HtmlTemplateNode<T>
-  | SvgTemplateNode<T>
   | ComponentNode<T>
   | DefaultGroupNode
   | TemplateGroupNode<T>;
@@ -36,8 +34,12 @@ export interface SharedNode {
   draggable?: WritableSignal<boolean>;
   parentId?: WritableSignal<string | null>;
   extent?: WritableSignal<'parent' | null>;
-  preview?: WritableSignal<NodePreview>;
   selected?: WritableSignal<boolean>;
+  selectable?: WritableSignal<boolean>;
+  focusable?: WritableSignal<boolean>;
+  ariaLabel?: WritableSignal<string>;
+  ariaDescription?: WritableSignal<string>;
+  domAttributes?: WritableSignal<DomAttributes>;
 }
 
 export interface DefaultNode extends SharedNode {
@@ -52,13 +54,6 @@ export interface HtmlTemplateNode<T = any> extends SharedNode {
   data?: WritableSignal<T>;
   width?: WritableSignal<number>;
   height?: WritableSignal<number>;
-}
-
-export interface SvgTemplateNode<T = any> extends SharedNode {
-  type: 'svg-template';
-  width: WritableSignal<number>;
-  height: WritableSignal<number>;
-  data?: WritableSignal<T>;
 }
 
 export interface DefaultGroupNode extends SharedNode {
@@ -96,10 +91,6 @@ export function isTemplateNode<T>(node: Node<T>): node is HtmlTemplateNode<T> {
   return node.type === 'html-template';
 }
 
-export function isSvgTemplateNode<T>(node: Node<T>): node is SvgTemplateNode<T> {
-  return node.type === 'svg-template';
-}
-
 export function isDefaultNode(node: Node): node is DefaultNode {
   return node.type === 'default';
 }
@@ -115,7 +106,6 @@ export function isTemplateGroupNode<T>(node: Node<T>): node is TemplateGroupNode
 export type StaticNode<T = unknown> =
   | UnwrapSignal<DefaultNode>
   | UnwrapSignal<HtmlTemplateNode<T>>
-  | UnwrapSignal<SvgTemplateNode<T>>
   | UnwrapSignal<ComponentNode<T>>
   | UnwrapSignal<DefaultGroupNode>
   | UnwrapSignal<TemplateGroupNode<T>>;
@@ -123,6 +113,10 @@ export type StaticNode<T = unknown> =
 interface CreateNodeOptions {
   useDefaults: boolean;
 }
+
+type OptionalProperty = 'selectable' | 'focusable' | 'ariaLabel' | 'ariaDescription' | 'domAttributes';
+
+export type NodeWithDefaults<T = any> = Omit<Required<Node<T>>, OptionalProperty> & Pick<SharedNode, OptionalProperty>;
 
 function createBaseNode(node: UnwrapSignal<SharedNode>, useDefaults: boolean) {
   if (useDefaults) {
@@ -132,8 +126,12 @@ function createBaseNode(node: UnwrapSignal<SharedNode>, useDefaults: boolean) {
       draggable: signal(isDefined(node.draggable) ? node.draggable : NODE_DEFAULTS.draggable),
       parentId: signal(isDefined(node.parentId) ? node.parentId : NODE_DEFAULTS.parentId),
       extent: signal(isDefined(node.extent) ? node.extent : NODE_DEFAULTS.extent),
-      preview: signal(isDefined(node.preview) ? node.preview : NODE_DEFAULTS.preview),
       selected: signal(isDefined(node.selected) ? node.selected : NODE_DEFAULTS.selected),
+      ...(isDefined(node.selectable) ? { selectable: signal(node.selectable) } : {}),
+      ...(isDefined(node.focusable) ? { focusable: signal(node.focusable) } : {}),
+      ...(isDefined(node.ariaLabel) ? { ariaLabel: signal(node.ariaLabel) } : {}),
+      ...(isDefined(node.ariaDescription) ? { ariaDescription: signal(node.ariaDescription) } : {}),
+      ...(isDefined(node.domAttributes) ? { domAttributes: signal(node.domAttributes) } : {}),
     };
   } else {
     return {
@@ -142,22 +140,26 @@ function createBaseNode(node: UnwrapSignal<SharedNode>, useDefaults: boolean) {
       draggable: isDefined(node.draggable) ? signal(node.draggable) : undefined,
       parentId: isDefined(node.parentId) ? signal(node.parentId) : undefined,
       extent: isDefined(node.extent) ? signal(node.extent) : undefined,
-      preview: isDefined(node.preview) ? signal(node.preview) : undefined,
       selected: isDefined(node.selected) ? signal(node.selected) : undefined,
+      ...(isDefined(node.selectable) ? { selectable: signal(node.selectable) } : {}),
+      ...(isDefined(node.focusable) ? { focusable: signal(node.focusable) } : {}),
+      ...(isDefined(node.ariaLabel) ? { ariaLabel: signal(node.ariaLabel) } : {}),
+      ...(isDefined(node.ariaDescription) ? { ariaDescription: signal(node.ariaDescription) } : {}),
+      ...(isDefined(node.domAttributes) ? { domAttributes: signal(node.domAttributes) } : {}),
     };
   }
 }
 
-// Перегрузка с useDefaults: true (или без опций) - возвращает Required<Node<T>>
-export function createNode<T>(node: StaticNode<T>): Required<Node<T>>;
-export function createNode<T>(node: StaticNode<T>, options: { useDefaults: true }): Required<Node<T>>;
+// Overloads with useDefaults: true (or no options) keep inherited capabilities optional.
+export function createNode<T>(node: StaticNode<T>): NodeWithDefaults<T>;
+export function createNode<T>(node: StaticNode<T>, options: { useDefaults: true }): NodeWithDefaults<T>;
 // Перегрузка с useDefaults: false - возвращает Node<T>
 export function createNode<T>(node: StaticNode<T>, options: { useDefaults: false }): Node<T>;
 // Реализация
 export function createNode<T>(
   node: StaticNode<T>,
   options: CreateNodeOptions = { useDefaults: true },
-): Node<T> | Required<Node<T>> {
+): Node<T> | NodeWithDefaults<T> {
   const baseNode = createBaseNode(node, options.useDefaults);
 
   if (node.type === 'default') {
@@ -196,29 +198,6 @@ export function createNode<T>(
         data: isDefined(node.data) ? (signal(node.data) as WritableSignal<T>) : undefined,
         width: isDefined(node.width) ? signal(node.width) : undefined,
         height: isDefined(node.height) ? signal(node.height) : undefined,
-      };
-    }
-  }
-
-  if (node.type === 'svg-template') {
-    const width = signal(node.width);
-    const height = signal(node.height);
-
-    if (options.useDefaults) {
-      return {
-        ...baseNode,
-        type: 'svg-template' as const,
-        width,
-        height,
-        data: signal(node.data ?? (NODE_DEFAULTS.data as T)),
-      };
-    } else {
-      return {
-        ...baseNode,
-        type: 'svg-template' as const,
-        width,
-        height,
-        data: isDefined(node.data) ? (signal(node.data) as WritableSignal<T>) : undefined,
       };
     }
   }
@@ -294,13 +273,13 @@ export function createNode<T>(
   throw new Error(`Unknown node type for node with id ${node.id}`);
 }
 
-export function createNodes<T = unknown>(nodes: StaticNode<T>[]): Required<Node<T>>[];
-export function createNodes<T = unknown>(nodes: StaticNode<T>[], options: { useDefaults: true }): Required<Node<T>>[];
+export function createNodes<T = unknown>(nodes: StaticNode<T>[]): NodeWithDefaults<T>[];
+export function createNodes<T = unknown>(nodes: StaticNode<T>[], options: { useDefaults: true }): NodeWithDefaults<T>[];
 export function createNodes<T = unknown>(nodes: StaticNode<T>[], options: { useDefaults: false }): Node<T>[];
 export function createNodes<T = unknown>(
   nodes: StaticNode<T>[],
   options: CreateNodeOptions = { useDefaults: true },
-): Node<T>[] | Required<Node<T>>[] {
+): Node<T>[] | NodeWithDefaults<T>[] {
   if (options.useDefaults) {
     return nodes.map((node) => createNode(node, { useDefaults: true }));
   } else {

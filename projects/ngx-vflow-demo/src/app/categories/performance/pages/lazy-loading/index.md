@@ -5,7 +5,7 @@
 
 The library supports splitting a large flow into multiple chunks, where each chunk is loaded according to the provided `lazyLoadTrigger` in the `Optimization` object.
 
-To load nodes when the viewport changes, set `lazyLoadTrigger` to the value viewport.
+To load nodes when the viewport changes, set `lazyLoadTrigger` to the value viewport. When `virtualization` is enabled, nodes are loaded immediately instead so the library can measure initial node and handle geometry.
 
 ## Lazy loading component nodes
 

@@ -33,8 +33,6 @@ export class ToolbarModel {
     }
   });
 
-  public transform = computed(() => `translate(${this.point().x}, ${this.point().y})`);
-
   public size = signal({ width: 0, height: 0 });
 
   constructor(public node: NodeModel) {}

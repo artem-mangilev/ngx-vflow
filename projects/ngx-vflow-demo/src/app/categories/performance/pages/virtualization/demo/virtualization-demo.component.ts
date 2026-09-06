@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import { Edge, Node, Vflow } from 'ngx-vflow';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { Edge, Node, StaticNode, Vflow, createNodes } from 'ngx-vflow';
 
 @Component({
   templateUrl: './virtualization-demo.component.html',
@@ -19,7 +19,7 @@ export class VirtualizationDemoComponent {
 }
 
 export function initialElements(xNodes = 10, yNodes = 10): { nodes: Node[]; edges: Edge[] } {
-  const nodes = [] as Node[];
+  const nodes: StaticNode[] = [];
   const edges = [] as Edge[];
 
   let nodeId = 1;
@@ -30,8 +30,8 @@ export function initialElements(xNodes = 10, yNodes = 10): { nodes: Node[]; edge
       nodes.push({
         type: 'default',
         id: `stress-${nodeId}`,
-        text: signal(`Node ${nodeId}`),
-        point: signal({ x: x * 150, y: y * 100 }),
+        text: `Node ${nodeId}`,
+        point: { x: x * 150, y: y * 100 },
       });
 
       if (recentNodeId && nodeId <= xNodes * yNodes) {
@@ -47,5 +47,5 @@ export function initialElements(xNodes = 10, yNodes = 10): { nodes: Node[]; edge
     }
   }
 
-  return { nodes, edges };
+  return { nodes: createNodes(nodes), edges };
 }

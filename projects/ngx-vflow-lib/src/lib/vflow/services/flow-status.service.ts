@@ -1,10 +1,10 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, effect, signal } from '@angular/core';
 import { NodeModel } from '../models/node.model';
 import { HandleModel } from '../models/handle.model';
 import { ConnectionInternal } from '../interfaces/connection.internal.interface';
 import { EdgeModel } from '../models/edge.model';
-import { toObservable } from '@angular/core/rxjs-interop';
-import { shareReplay } from 'rxjs/operators';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { map, shareReplay } from 'rxjs/operators';
 
 export interface FlowStatusIdle {
   state: 'idle';
@@ -123,6 +123,54 @@ export type FlowStatus =
 export class FlowStatusService {
   public readonly status = signal<FlowStatus>({ state: 'idle', payload: null });
   public readonly status$ = toObservable(this.status).pipe(shareReplay({ bufferSize: 1, refCount: true }));
+
+  // Publish only connection changes to entity views. A computed projection would
+  // still propagate every drag invalidation to all its consumers before equality is checked.
+  public readonly connectionStatus = toSignal(
+    this.status$.pipe(
+      map((status) =>
+        status.state === 'connection-start' ||
+        status.state === 'connection-validation' ||
+        status.state === 'reconnection-start' ||
+        status.state === 'reconnection-validation'
+          ? status
+          : null,
+      ),
+    ),
+    { initialValue: null },
+  );
+
+  public readonly connectionActive = signal(false);
+
+  constructor() {
+    let participants = new Set<NodeModel>();
+    let candidate: HandleModel | undefined;
+    let reconnecting: EdgeModel | undefined;
+    effect(() => {
+      const status = this.connectionStatus();
+      const next = new Set<NodeModel>();
+      const nextEdge = status && 'oldEdge' in status.payload ? status.payload.oldEdge : undefined;
+      const nextCandidate = status && 'targetHandle' in status.payload ? status.payload.targetHandle : undefined;
+      if (status) {
+        next.add(status.payload.source);
+        if ('target' in status.payload) next.add(status.payload.target);
+        for (const node of [nextEdge?.source(), nextEdge?.target()]) if (node) next.add(node);
+      }
+      for (const node of participants) if (!next.has(node)) node.connectionActive.set(false);
+      for (const node of next) if (!participants.has(node)) node.connectionActive.set(true);
+      if (candidate && candidate !== nextCandidate) candidate.state.set('idle');
+      if (nextCandidate && status && 'valid' in status.payload)
+        nextCandidate.state.set(status.payload.valid ? 'valid' : 'invalid');
+      if (reconnecting !== nextEdge) {
+        reconnecting?.reconnecting.set(false);
+        nextEdge?.reconnecting.set(true);
+      }
+      this.connectionActive.set(status !== null);
+      participants = next;
+      candidate = nextCandidate;
+      reconnecting = nextEdge;
+    });
+  }
 
   public setIdleStatus() {
     this.status.set({ state: 'idle', payload: null });

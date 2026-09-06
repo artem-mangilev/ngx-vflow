@@ -1,0 +1,67 @@
+05 09 2026 16:42:08.092:INFO [karma-server]: Karma v6.4.4 server started at http://localhost:9876/
+05 09 2026 16:42:08.094:INFO [launcher]: Launching browsers ChromeHeadless with concurrency unlimited
+05 09 2026 16:42:08.100:INFO [launcher]: Starting browser ChromeHeadless
+05 09 2026 16:42:09.824:INFO [Chrome Headless 152.0.0.0 (Mac OS 10.15.7)]: Connected on socket KUSNytMRkCqSzsWrAAAB with id 74951910
+Chrome Headless 152.0.0.0 (Mac OS 10.15.7) Audit reproduction 2026-09-05 emits detached when only one of two edges loses its handle FAILED
+	Expected [  ] to contain Object({ type: 'detached', id: '0' }).
+	    at <Jasmine>
+	    at UserContext.<anonymous> (projects/ngx-vflow-lib/src/lib/vflow/audit-review.spec.ts:102:20)
+	    at Generator.next (<anonymous>)
+	    at asyncGeneratorStep (node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:3:1)
+	    at _next (node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:17:1)
+Chrome Headless 152.0.0.0 (Mac OS 10.15.7) Audit reproduction 2026-09-05 culls an already-measured edge wholly outside the viewport FAILED
+	Expected $.length = 2 to equal 0.
+	Unexpected $[0] = EdgeModel({ edge: Object({ id: '0', source: 'a', target: 'b', type: 'default', sourceHandle: '', targetHandle: '', curve: Function, data: Function, edgeLabels: Function, markers: Function, reconnectable: Function, floating: Function, selected: Function }), flowEntitiesService: FlowEntitiesService({ nodes: Function, nodeByIdMap: Function, nodesByParentIdMap: Function, rawNodes: Function, edges: Function, rawEdges: Function, validEdges: Function, connection: Function, markers: Function, entities: Function, minimap: Function }), settingsService: FlowSettingsService({ ariaLabels: Function, nodesSelectable: Function, edgesSelectable: Function, nodesFocusable: Function, edgesFocusable: Function, elevateNodesOnSelect: Function, elevateEdgesOnSelect: Function, autoPan: Function, autoPanOnNodeFocus: Function, view: Function, computedFlowWidth: Function, computedFlowHeight: Function, zoomOnScroll: Function, zoomOnPinch: Function, zoomOnDoubleClick: Function, panOnDrag: Function, panOnScroll:  ... in array.
+	Unexpected $[1] = EdgeModel({ edge: Object({ id: '2', source: 'c', target: 'd', type: 'default', sourceHandle: '', targetHandle: '', curve: Function, data: Function, edgeLabels: Function, markers: Function, reconnectable: Function, floating: Function, selected: Function }), flowEntitiesService: FlowEntitiesService({ nodes: Function, nodeByIdMap: Function, nodesByParentIdMap: Function, rawNodes: Function, edges: Function, rawEdges: Function, validEdges: Function, connection: Function, markers: Function, entities: Function, minimap: Function }), settingsService: FlowSettingsService({ ariaLabels: Function, nodesSelectable: Function, edgesSelectable: Function, nodesFocusable: Function, edgesFocusable: Function, elevateNodesOnSelect: Function, elevateEdgesOnSelect: Function, autoPan: Function, autoPanOnNodeFocus: Function, view: Function, computedFlowWidth: Function, computedFlowHeight: Function, zoomOnScroll: Function, zoomOnPinch: Function, zoomOnDoubleClick: Function, panOnDrag: Function, panOnScroll:  ... in array.
+	    at <Jasmine>
+	    at UserContext.<anonymous> (projects/ngx-vflow-lib/src/lib/vflow/audit-review.spec.ts:121:58)
+	    at <Jasmine>
+Chrome Headless 152.0.0.0 (Mac OS 10.15.7) Audit reproduction 2026-09-05 clears the path after a handle is really removed without virtualization FAILED
+	Expected 'M 107,25L 107,25' to be ''.
+	    at <Jasmine>
+	    at UserContext.<anonymous> (projects/ngx-vflow-lib/src/lib/vflow/audit-review.spec.ts:111:34)
+	    at <Jasmine>
+Chrome Headless 152.0.0.0 (Mac OS 10.15.7) Audit reproduction 2026-09-05 does not report position changes for stationary selected nodes FAILED
+	Expected $.length = 2 to equal 1.
+	Unexpected $[1] = 'b' in array.
+	    at <Jasmine>
+	    at UserContext.<anonymous> (projects/ngx-vflow-lib/src/lib/vflow/audit-review.spec.ts:164:74)
+	    at Generator.next (<anonymous>)
+	    at asyncGeneratorStep (node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:3:1)
+	    at _next (node_modules/@babel/runtime/helpers/esm/asyncToGenerator.js:17:1)
+Chrome Headless 152.0.0.0 (Mac OS 10.15.7) Audit reproduction 2026-09-05 does not lose a final cache invalidation within 16ms FAILED
+	Expected 100 to be 200.
+	    at <Jasmine>
+	    at UserContext.<anonymous> (projects/ngx-vflow-lib/src/lib/vflow/audit-review.spec.ts:150:55)
+	    at <Jasmine>
+Chrome Headless 152.0.0.0 (Mac OS 10.15.7) Audit reproduction 2026-09-05 preserves rendered position when reparentNodes adds an omitted parentId signal FAILED
+	Expected $.x = 50 to equal 150.
+	    at <Jasmine>
+	    at UserContext.<anonymous> (projects/ngx-vflow-lib/src/lib/vflow/audit-review.spec.ts:134:47)
+	    at <Jasmine>
+LOG: 'AUDIT BENCH count=1000 validEdges median=0.20ms removeNodes=25.40ms'
+LOG: 'AUDIT BENCH count=1000 validEdges median=0.20ms removeNodes=25.40ms'
+LOG: 'AUDIT BENCH count=5000 validEdges median=2.80ms removeNodes=135.60ms'
+LOG: 'AUDIT BENCH count=5000 validEdges median=2.80ms removeNodes=135.60ms'
+LOG: 'AUDIT BENCH count=10000 validEdges median=10.70ms removeNodes=502.90ms'
+LOG: 'AUDIT BENCH count=10000 validEdges median=10.70ms removeNodes=502.90ms'
+Chrome Headless 152.0.0.0 (Mac OS 10.15.7) Audit reproduction 2026-09-05 stops observing a model after the node is removed from the graph FAILED
+	Expected spy removed node point not to have been called.
+	    at <Jasmine>
+	    at UserContext.<anonymous> (projects/ngx-vflow-lib/src/lib/vflow/audit-review.spec.ts:241:22)
+	    at <Jasmine>
+Chrome Headless 152.0.0.0 (Mac OS 10.15.7) Audit reproduction 2026-09-05 reports the last accepted size at resizeEnd after a rejected move FAILED
+	Expected 120 to be 110.
+	    at <Jasmine>
+	    at UserContext.<anonymous> (projects/ngx-vflow-lib/src/lib/vflow/audit-review.spec.ts:223:50)
+	    at <Jasmine>
+Chrome Headless 152.0.0.0 (Mac OS 10.15.7) Audit reproduction 2026-09-05 completes connectEnd without requiring a connect subscriber FAILED
+	Expected 0 to be 1.
+	    at <Jasmine>
+	    at UserContext.<anonymous> (projects/ngx-vflow-lib/src/lib/vflow/audit-review.spec.ts:180:27)
+	    at <Jasmine>
+	Expected 'connection-release' to be 'idle'.
+	    at <Jasmine>
+	    at UserContext.<anonymous> (projects/ngx-vflow-lib/src/lib/vflow/audit-review.spec.ts:181:62)
+	    at <Jasmine>
+TOTAL: 9 FAILED, 2 SUCCESS

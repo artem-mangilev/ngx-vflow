@@ -1,18 +1,17 @@
 import { Directive, ElementRef, Signal, computed, inject } from '@angular/core';
-import { RootSvgReferenceDirective } from './reference.directive';
 import { Point } from '../interfaces/point.interface';
 import { RootPointerDirective } from './root-pointer.directive';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ViewportService } from '../services/viewport.service';
+import { clientToFlowPosition as toFlowPosition, flowToClientPosition as toClientPosition } from '../utils/coordinates';
 
 @Directive({
   standalone: true,
-  selector: 'g[spacePointContext]',
+  selector: 'div[spacePointContext]',
 })
 export class SpacePointContextDirective {
   private pointerMovementDirective = inject(RootPointerDirective);
-  private rootSvg = inject(RootSvgReferenceDirective).element;
-  private host = inject<ElementRef<SVGGElement>>(ElementRef).nativeElement;
+  private host = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
   private viewportService = inject(ViewportService);
 
   /**
@@ -29,7 +28,7 @@ export class SpacePointContextDirective {
       return { x: 0, y: 0 };
     }
 
-    return this.documentPointToFlowPoint({
+    return this.clientToFlowPosition({
       x: point.x,
       y: point.y,
     });
@@ -37,11 +36,19 @@ export class SpacePointContextDirective {
 
   private currentPoint = toSignal(this.pointerMovementDirective.pointerMovement$);
 
-  public documentPointToFlowPoint(documentPoint: Point) {
-    const point = this.rootSvg.createSVGPoint();
-    point.x = documentPoint.x;
-    point.y = documentPoint.y;
+  public clientToFlowPosition(point: Point): Point {
+    const rect = this.host.getBoundingClientRect();
+    return toFlowPosition(point, {
+      viewport: this.viewportService.readableViewport(),
+      containerPosition: { x: rect.left, y: rect.top },
+    });
+  }
 
-    return point.matrixTransform(this.host.getScreenCTM()!.inverse());
+  public flowToClientPosition(point: Point): Point {
+    const rect = this.host.getBoundingClientRect();
+    return toClientPosition(point, {
+      viewport: this.viewportService.readableViewport(),
+      containerPosition: { x: rect.left, y: rect.top },
+    });
   }
 }

@@ -1,13 +1,16 @@
+<svg:path aria-hidden="true" class="focus-indicator" [attr.d]="model().path().path" />
+
 @if (model().type === 'default') {
   <svg:path
     class="edge"
+    aria-hidden="true"
     [attr.d]="model().path().path"
     [attr.marker-start]="model().markerStartUrl()"
     [attr.marker-end]="model().markerEndUrl()"
     [class.edge_selected]="model().selected()"
     [class.edge_preselected]="model().preselected()" />
 
-  <svg:path class="interactive-edge" [attr.d]="model().path().path" (click)="select(); pull()" />
+  <svg:path aria-hidden="true" class="interactive-edge" [attr.d]="model().path().path" (click)="select(); pull()" />
 }
 
 @if (model().type === 'template' && edgeTemplate()) {
@@ -16,24 +19,6 @@
       [ngTemplateOutlet]="edgeTemplate"
       [ngTemplateOutletContext]="model().context"
       [ngTemplateOutletInjector]="injector" />
-  }
-}
-
-@if (model().labelModels().start; as label) {
-  @if (model().path().labelPoints?.start; as point) {
-    <svg:g edgeLabel [model]="label" [point]="point" [edgeModel]="model()" [htmlTemplate]="edgeLabelHtmlTemplate()" />
-  }
-}
-
-@if (model().labelModels().center; as label) {
-  @if (model().path().labelPoints?.center; as point) {
-    <svg:g edgeLabel [model]="label" [point]="point" [edgeModel]="model()" [htmlTemplate]="edgeLabelHtmlTemplate()" />
-  }
-}
-
-@if (model().labelModels().end; as label) {
-  @if (model().path().labelPoints?.end; as point) {
-    <svg:g edgeLabel [model]="label" [point]="point" [edgeModel]="model()" [htmlTemplate]="edgeLabelHtmlTemplate()" />
   }
 }
 

@@ -51,9 +51,9 @@ export class FlowEntitiesService {
   public readonly rawEdges = computed(() => this.edges().map((e) => e.edge));
 
   public readonly validEdges = computed(() => {
-    const nodes = this.nodes();
+    const nodes = new Set(this.nodes());
 
-    return this.edges().filter((e) => nodes.includes(e.source()!) && nodes.includes(e.target()!));
+    return this.edges().filter((e) => nodes.has(e.source()!) && nodes.has(e.target()!));
   });
 
   public readonly connection = signal<ConnectionModel>(new ConnectionModel({}));
@@ -88,7 +88,7 @@ export class FlowEntitiesService {
   public minimap: WritableSignal<MinimapModel | null> = signal(null);
 
   public getNode<T>(id: string) {
-    return this.nodes().find(({ rawNode }) => rawNode.id === id) as NodeModel<T> | undefined;
+    return this.nodeByIdMap().get(id) as NodeModel<T> | undefined;
   }
 
   public getDetachedEdges() {

@@ -4,7 +4,7 @@ import { FlowStatusService } from '../services/flow-status.service';
 // TODO: too general purpose nane
 @Directive({
   standalone: true,
-  selector: 'svg[rootSvgContext]',
+  selector: 'div[rootSvgContext]',
 })
 export class RootSvgContextDirective {
   private flowStatusService = inject(FlowStatusService);

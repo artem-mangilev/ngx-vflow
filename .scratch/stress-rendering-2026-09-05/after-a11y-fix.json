@@ -1,0 +1,118 @@
+[
+  {
+    "mode": "will-change",
+    "ready": 378.9,
+    "initialDom": 10252,
+    "pan": {
+      "frame": {
+        "median": 16.7,
+        "p95": 16.8,
+        "over25ms": 0
+      },
+      "eventAndDetect": {
+        "median": 5.3,
+        "p95": 5.8,
+        "over25ms": 0
+      }
+    },
+    "drag": {
+      "frame": {
+        "median": 16.7,
+        "p95": 33.3,
+        "over25ms": 5
+      },
+      "eventAndDetect": {
+        "median": 13.3,
+        "p95": 13.7,
+        "over25ms": 0
+      }
+    }
+  },
+  {
+    "mode": "virtual",
+    "ready": 20.8,
+    "initialDom": 389,
+    "pan": {
+      "frame": {
+        "median": 16.7,
+        "p95": 16.8,
+        "over25ms": 0
+      },
+      "eventAndDetect": {
+        "median": 2,
+        "p95": 2.6,
+        "over25ms": 0
+      }
+    },
+    "drag": {
+      "frame": {
+        "median": 16.7,
+        "p95": 16.7,
+        "over25ms": 0
+      },
+      "eventAndDetect": {
+        "median": 2.4,
+        "p95": 2.6,
+        "over25ms": 0
+      }
+    }
+  },
+  {
+    "mode": "contain",
+    "ready": 305.5,
+    "initialDom": 10252,
+    "pan": {
+      "frame": {
+        "median": 16.7,
+        "p95": 16.7,
+        "over25ms": 0
+      },
+      "eventAndDetect": {
+        "median": 6.1,
+        "p95": 6.5,
+        "over25ms": 0
+      }
+    },
+    "drag": {
+      "frame": {
+        "median": 16.7,
+        "p95": 16.8,
+        "over25ms": 0
+      },
+      "eventAndDetect": {
+        "median": 13.9,
+        "p95": 14.6,
+        "over25ms": 0
+      }
+    }
+  },
+  {
+    "mode": "full",
+    "ready": 275,
+    "initialDom": 10252,
+    "pan": {
+      "frame": {
+        "median": 16.7,
+        "p95": 16.8,
+        "over25ms": 0
+      },
+      "eventAndDetect": {
+        "median": 6.1,
+        "p95": 6.4,
+        "over25ms": 0
+      }
+    },
+    "drag": {
+      "frame": {
+        "median": 16.7,
+        "p95": 16.8,
+        "over25ms": 0
+      },
+      "eventAndDetect": {
+        "median": 14.3,
+        "p95": 15.4,
+        "over25ms": 0
+      }
+    }
+  }
+]

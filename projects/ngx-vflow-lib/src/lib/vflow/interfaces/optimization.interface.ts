@@ -1,7 +1,6 @@
 export const DEFAULT_OPTIMIZATION: Required<Optimization> = {
   detachedGroupsLayer: false,
   virtualization: false,
-  virtualizationZoomThreshold: 0.5,
   lazyLoadTrigger: 'immediate',
 };
 
@@ -15,24 +14,16 @@ export interface Optimization {
   detachedGroupsLayer?: boolean;
 
   /**
-   * If true, enables viewport virtualization to improve performance by only rendering
-   * nodes and edges that are currently visible in the viewport. This optimization
-   * filters out entities that are outside the visible area, reducing the number of
-   * DOM elements and improving rendering performance for large flows.
-   *
-   * It uses canvas as a virtualization layer during viewport change.
-   * When the viewport change ends, the library hydrates the canvas with the actual nodes and edges.
+   * Hide offscreen nodes and edges with display:none while retaining their views
+   * and component state. Nodes are initially loaded and measured even offscreen.
+   * Focused elements and nodes in active gestures remain in layout.
+   * Applies at every zoom; does not reduce DOM memory or stop component effects.
    */
   virtualization?: boolean;
 
   /**
-   * The zoom threshold below which the only virtualization layer is drawn.
-   * This should help to avoid performance issues when zooming out too much.
-   */
-  virtualizationZoomThreshold?: number;
-
-  /**
-   * The trigger for lazy loading of entities.
+   * The trigger for lazy loading of entities. Virtualization loads nodes immediately
+   * to obtain their initial geometry, regardless of this setting.
    */
   lazyLoadTrigger?: 'immediate' | 'viewport';
 }

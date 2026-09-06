@@ -1,33 +1,40 @@
-import { ChangeDetectionStrategy, Component, Injector, TemplateRef, computed, inject, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  effect,
+  Injector,
+  TemplateRef,
+  inject,
+  input,
+} from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
 
 import { EdgeModel } from '../../models/edge.model';
 import { EdgeContext } from '../../interfaces/template-context.interface';
 import { SelectionService } from '../../services/selection.service';
 import { FlowSettingsService } from '../../services/flow-settings.service';
-import { EdgeLabelComponent } from '../edge-label/edge-label.component';
 import { ConnectionControllerDirective } from '../../directives/connection-controller.directive';
 import { HandleModel } from '../../models/handle.model';
-import { FlowStatusService } from '../../services/flow-status.service';
 import { EdgeRenderingService } from '../../services/edge-rendering.service';
 import { PointerDirective } from '../../directives/pointer.directive';
 
 @Component({
-  selector: 'g[edge]',
+  selector: 'svg[edge]',
   templateUrl: './edge.component.html',
   styleUrls: ['./edge.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
+    '(focusin)': 'model().focused.set(true)',
+    '(focusout)': 'model().focused.set(false)',
     class: 'selectable',
-    '[style.visibility]': 'isReconnecting() ? "hidden" : "visible"',
   },
-  imports: [NgTemplateOutlet, EdgeLabelComponent, PointerDirective],
+  imports: [NgTemplateOutlet, PointerDirective],
 })
 export class EdgeComponent {
   protected injector = inject(Injector);
   private selectionService = inject(SelectionService);
   private flowSettingsService = inject(FlowSettingsService);
-  private flowStatusService = inject(FlowStatusService);
   private edgeRenderingService = inject(EdgeRenderingService);
 
   // TODO remove dependency from this directive
@@ -37,17 +44,18 @@ export class EdgeComponent {
 
   public edgeTemplate = input<TemplateRef<EdgeContext>>();
 
-  public edgeLabelHtmlTemplate = input<TemplateRef<any>>();
-
-  protected isReconnecting = computed(() => {
-    const status = this.flowStatusService.status();
-    const isReconnecting = status.state === 'reconnection-start' || status.state === 'reconnection-validation';
-
-    return isReconnecting && status.payload.oldEdge === this.model();
-  });
+  constructor() {
+    const element = inject<ElementRef<SVGElement>>(ElementRef).nativeElement;
+    effect(() => {
+      element.style.visibility = !this.model().isReady() || this.model().reconnecting() ? 'hidden' : 'visible';
+    });
+    effect(() => {
+      element.style.zIndex = String(this.model().renderOrder());
+    });
+  }
 
   public select() {
-    if (this.flowSettingsService.entitiesSelectable()) {
+    if (this.model().selectable()) {
       this.selectionService.select(this.model());
     }
   }
@@ -62,6 +70,6 @@ export class EdgeComponent {
     // ignore drag by stopping propagation
     event.stopPropagation();
 
-    this.connectionController?.startReconnection(handle, this.model());
+    this.connectionController?.startReconnection(handle, this.model(), event);
   }
 }

@@ -1,18 +1,20 @@
-You can use keyboard shortcuts to control selection behavior.
+You can use keyboard shortcuts to control selection and temporarily activate viewport gestures.
 
 # Defaults
 
-| Action               | Default key                           |
-| -------------------- | ------------------------------------- |
-| Selection box        | `ShiftLeft` or `ShiftRight`           |
-| Node multi selection | `CMD` (Mac) or `CTRL` (Other systems) |
+| Action                   | Default key                           |
+| ------------------------ | ------------------------------------- |
+| Viewport pan activation  | Disabled (`null`)                     |
+| Viewport zoom activation | Disabled (`null`)                     |
+| Selection box            | `ShiftLeft` or `ShiftRight`           |
+| Node multi selection     | `CMD` (Mac) or `CTRL` (Other systems) |
 
 When `selection` is active (default: `Shift`), dragging on the canvas starts selection box mode instead of map pan.
 
 # Customization
 
 To customize shortcuts, pass a `[keyboardShortcuts]` input object to `VflowComponent`.
-Supported actions are only `selection` and `multiSelection` (`KeyboardShortcuts` is a partial object, so you can override only one action if needed).
+Supported actions are `selection`, `multiSelection`, `pan`, and `zoom` (`KeyboardShortcuts` is a partial object, so you can override only one action if needed).
 
 Key details:
 
@@ -27,3 +29,5 @@ In the following example:
 - `multiSelection` is remapped from `CMD/CTRL` to `Shift`
 
 {{ NgDocActions.demoPane("KeyboardShortcutsDemoComponent") }}
+
+The `pan` and `zoom` actions are opt-in. Ordinary pan/zoom gestures retain their defaults when these shortcuts are `null`. See [Viewport gestures](../viewport-gestures) for priorities, embedded controls, and complete gesture disabling.

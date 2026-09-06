@@ -75,3 +75,7 @@ export function getBoundsOfRects(rects: Rect[]): Rect {
     height: maxY - minY,
   };
 }
+
+export function getBoundsOfPoints(points: Point[]): Rect {
+  return getBoundsOfRects(points.map((point) => ({ ...point, width: 0, height: 0 })));
+}

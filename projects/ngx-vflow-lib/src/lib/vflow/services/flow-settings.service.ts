@@ -1,16 +1,23 @@
+import { AutoPanSettings } from '../interfaces/auto-pan-settings.interface';
 import { Injectable, WritableSignal, signal } from '@angular/core';
 import { Background } from '../types/background.type';
 import { DEFAULT_OPTIMIZATION, Optimization } from '../interfaces/optimization.interface';
 import { SelectionMode } from '../types/selection-mode.type';
 import { SelectionBoxSettings } from '../interfaces/selection-box-settings.interface';
+import { DEFAULT_ARIA_LABEL_CONFIG } from '../interfaces/aria-label-config.interface';
 
 @Injectable()
 export class FlowSettingsService {
-  public entitiesSelectable = signal(true);
+  public ariaLabels = signal(DEFAULT_ARIA_LABEL_CONFIG);
+  public nodesSelectable = signal(true);
+  public edgesSelectable = signal(true);
+  public nodesFocusable = signal(true);
+  public edgesFocusable = signal(true);
 
   public elevateNodesOnSelect = signal(true);
   public elevateEdgesOnSelect = signal(true);
-  public autoPan = signal(true);
+  public autoPan = signal<boolean | AutoPanSettings>(true);
+  public autoPanOnNodeFocus = signal(true);
 
   /**
    * @see {VflowComponent.view}
@@ -26,6 +33,16 @@ export class FlowSettingsService {
    * Set based on view property. May change if view is 'auto'
    */
   public computedFlowHeight = signal(0);
+
+  public zoomOnScroll = signal(true);
+  public zoomOnPinch = signal(true);
+  public zoomOnDoubleClick = signal(false);
+  /** true preserves panning with any mouse button; arrays restrict mouse buttons only. */
+  public panOnDrag = signal<boolean | number[]>(true);
+  public panOnScroll = signal(false);
+  public paneClickDistance = signal(6);
+  public nodeDragThreshold = signal(0);
+  public connectionDragThreshold = signal(0);
 
   public minZoom = signal(0.5);
 

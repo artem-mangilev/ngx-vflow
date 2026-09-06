@@ -1,0 +1,5 @@
+05 09 2026 16:32:12.556:INFO [karma-server]: Karma v6.4.4 server started at http://localhost:9876/
+05 09 2026 16:32:12.557:INFO [launcher]: Launching browsers ChromeHeadless with concurrency unlimited
+05 09 2026 16:32:12.564:INFO [launcher]: Starting browser ChromeHeadless
+05 09 2026 16:32:14.420:INFO [Chrome Headless 152.0.0.0 (Mac OS 10.15.7)]: Connected on socket zS-ttBqqi8lf81BOAAAB with id 66035430
+TOTAL: 175 SUCCESS

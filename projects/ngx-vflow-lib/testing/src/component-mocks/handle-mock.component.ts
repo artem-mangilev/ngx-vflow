@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, Component, input, TemplateRef, OnInit } from '@angular/core';
-import type { HandleComponent, Position } from 'ngx-vflow';
+import { AfterViewInit, ChangeDetectionStrategy, Component, input, TemplateRef, OnInit } from '@angular/core';
+import type { DomAttributes, HandleComponent, HandleContext, Position } from 'ngx-vflow';
 import { AsInterface } from '../types';
 
 @Component({
@@ -8,14 +8,22 @@ import { AsInterface } from '../types';
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
 })
-export class HandleMockComponent implements AsInterface<HandleComponent>, OnInit {
+export class HandleMockComponent implements AsInterface<HandleComponent>, OnInit, AfterViewInit {
   public position = input.required<Position>();
   public type = input.required<'source' | 'target'>();
   public id = input<string>();
-  public template = input<TemplateRef<any> | null>();
+  public template = input<TemplateRef<HandleContext> | null>();
   public offsetX = input<number>(0);
   public offsetY = input<number>(0);
+  public canStart = input<boolean>(true);
+  public canAccept = input<boolean>(true);
+  public ariaLabel = input<string>();
+  public ariaDescription = input<string>();
+  public domAttributes = input<DomAttributes>();
 
   // eslint-disable-next-line @angular-eslint/no-empty-lifecycle-method
   public ngOnInit(): void {}
+
+  // eslint-disable-next-line @angular-eslint/no-empty-lifecycle-method
+  public ngAfterViewInit(): void {}
 }

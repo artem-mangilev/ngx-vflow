@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import { ConnectionSettings, CustomNodeComponent, Edge, Node, Vflow } from 'ngx-vflow';
+import { ConnectionSettings, CustomNodeComponent, Edge, Node, Vflow, createNodes } from 'ngx-vflow';
 
 @Component({
   template: ` <vflow view="auto" [nodes]="nodes" [edges]="edges" [connection]="connection" /> `,
@@ -15,32 +15,32 @@ import { ConnectionSettings, CustomNodeComponent, Edge, Node, Vflow } from 'ngx-
   imports: [Vflow],
 })
 export class FloatingEdgesDemoComponent {
-  public nodes: Node[] = [
+  public nodes: Node[] = createNodes([
     {
       id: '1',
-      point: signal({ x: 100, y: 100 }),
+      point: { x: 100, y: 100 },
       type: FloatingEdgesNodeComponent,
-      data: signal({
+      data: {
         text: 'Node 1',
-      }),
+      },
     },
     {
       id: '2',
-      point: signal({ x: 200, y: 200 }),
+      point: { x: 200, y: 200 },
       type: FloatingEdgesNodeComponent,
-      data: signal({
+      data: {
         text: 'Node 2',
-      }),
+      },
     },
     {
       id: '3',
-      point: signal({ x: 100, y: 300 }),
+      point: { x: 100, y: 300 },
       type: FloatingEdgesNodeComponent,
-      data: signal({
+      data: {
         text: 'Node 3',
-      }),
+      },
     },
-  ];
+  ]);
 
   public edges: Edge[] = [
     {

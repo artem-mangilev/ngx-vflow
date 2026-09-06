@@ -1,60 +1,50 @@
 import {
   AfterViewInit,
+  ChangeDetectionStrategy,
   Component,
-  computed,
   ElementRef,
-  inject,
+  OnDestroy,
   OnInit,
   TemplateRef,
-  input,
-  viewChild,
+  computed,
   effect,
-  ChangeDetectionStrategy,
-  OnDestroy,
-  NgZone,
+  inject,
+  input,
+  output,
+  signal,
+  viewChild,
 } from '@angular/core';
-import { RootPointerDirective } from '../../directives/root-pointer.directive';
-import { filter, tap } from 'rxjs/operators';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ViewportService } from '../../services/viewport.service';
-import { round } from '../../utils/round';
-import { getNodesBounds } from '../../utils/nodes';
 import { NodeAccessorService } from '../../services/node-accessor.service';
-import { NodeModel } from '../../models/node.model';
-import { Rect } from '../../interfaces/rect';
-import { PointerEvent } from '../../directives/root-pointer.directive';
-import { SpacePointContextDirective } from '../../directives/space-point-context.directive';
-import { PointerDirective } from '../../directives/pointer.directive';
-import { FlowSettingsService } from '../../services/flow-settings.service';
-import { Point } from '../../interfaces/point.interface';
-import { align } from '../../utils/align-number';
 import { RequestAnimationFrameBatchingService } from '../../services/request-animation-frame-batching.service';
+import { NodeResizeControlComponent } from './node-resize-control.component';
+import {
+  ControlLinePosition,
+  ControlPosition,
+  RESIZER_HANDLE_POSITIONS,
+  RESIZER_LINE_POSITIONS,
+  ResizeControlDirection,
+  ResizeControlVariant,
+  ResizeDragEvent,
+  ResizeParams,
+  ResizeParamsWithDirection,
+  ShouldResize,
+} from './resizer-types';
 
-type Side = 'top' | 'right' | 'bottom' | 'left' | 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left';
-
-interface DistanceToEdge {
-  left: number;
-  right: number;
-  top: number;
-  bottom: number;
-}
-
+/**
+ * Adds resize controls (four lines + four corner handles) to a node. The controls
+ * mutate the node dimensions/position through a d3-drag based resize engine.
+ */
 @Component({
   selector: '[resizable]',
   templateUrl: './resizable.component.html',
   styleUrls: ['./resizable.component.scss'],
-  imports: [PointerDirective],
+  imports: [NodeResizeControlComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ResizableComponent implements OnInit, AfterViewInit, OnDestroy {
   private nodeAccessor = inject(NodeAccessorService);
-  private rootPointer = inject(RootPointerDirective);
-  private viewportService = inject(ViewportService);
-  private spacePointContext = inject(SpacePointContextDirective);
-  private settingsService = inject(FlowSettingsService);
-  private hostRef = inject<ElementRef<Element>>(ElementRef);
+  private hostRef = inject<ElementRef<HTMLElement>>(ElementRef);
   private afService = inject(RequestAnimationFrameBatchingService);
-  private zone = inject(NgZone);
 
   public resizable = input<boolean | ''>();
 
@@ -62,50 +52,52 @@ export class ResizableComponent implements OnInit, AfterViewInit, OnDestroy {
 
   public gap = input(1.5);
 
+  public minWidth = input<number>();
+  public minHeight = input<number>();
+  public maxWidth = input<number>();
+  public maxHeight = input<number>();
+
+  public keepAspectRatio = input(false);
+
+  public resizeDirection = input<ResizeControlDirection>();
+
+  public autoScale = input(true);
+
+  public readonly resizeStart = output<ResizeParams>();
+  public readonly resizeChange = output<ResizeParamsWithDirection>();
+  public readonly resizeEnd = output<ResizeParams>();
+  public shouldResize = input<ShouldResize>();
+
+  protected readonly linePositions: ControlLinePosition[] = RESIZER_LINE_POSITIONS;
+  protected readonly handlePositions: ControlPosition[] = RESIZER_HANDLE_POSITIONS;
+  protected readonly lineVariant = ResizeControlVariant.Line;
+  protected readonly handleVariant = ResizeControlVariant.Handle;
+
   private resizer = viewChild.required<TemplateRef<unknown>>('resizer');
+
+  // Min/max read from the element's computed style; used as a fallback when no explicit input is given.
+  private cssMinWidth = signal(0);
+  private cssMinHeight = signal(0);
+  private cssMaxWidth = signal(Infinity);
+  private cssMaxHeight = signal(Infinity);
+
+  protected effectiveMinWidth = computed(() => this.minWidth() ?? this.cssMinWidth());
+  protected effectiveMinHeight = computed(() => this.minHeight() ?? this.cssMinHeight());
+  protected effectiveMaxWidth = computed(() => this.maxWidth() ?? this.cssMaxWidth());
+  protected effectiveMaxHeight = computed(() => this.maxHeight() ?? this.cssMaxHeight());
 
   protected get model() {
     return this.nodeAccessor.model()!;
   }
 
-  protected lineGap = 3;
-  protected handleSize = 6;
-
-  private resizeSide: Side | null = null;
-
-  private zoom = computed(() => this.viewportService.readableViewport().zoom ?? 0);
-
-  private minWidth = 0;
-  private minHeight = 0;
-  private maxWidth = Infinity;
-  private maxHeight = Infinity;
-
-  // TODO: allow reszie beside the flow
-  protected resizeOnGlobalMouseMove = this.rootPointer.pointerMovement$
-    .pipe(
-      filter(() => this.resizeSide !== null),
-      filter((event) => event.movementX !== 0 || event.movementY !== 0),
-      tap((event) => this.resize(event)),
-      takeUntilDestroyed(),
-    )
-    .subscribe();
-
-  protected endResizeOnGlobalMouseUp = this.rootPointer.documentPointerEnd$
-    .pipe(
-      tap(() => this.endResize()),
-      takeUntilDestroyed(),
-    )
-    .subscribe();
+  protected emitResizeStart = (_: ResizeDragEvent, params: ResizeParams) => this.resizeStart.emit(params);
+  protected emitResize = (_: ResizeDragEvent, params: ResizeParamsWithDirection) => this.resizeChange.emit(params);
+  protected emitResizeEnd = (_: ResizeDragEvent, params: ResizeParams) => this.resizeEnd.emit(params);
 
   constructor() {
     effect(() => {
       const resizable = this.resizable();
-
-      if (typeof resizable === 'boolean') {
-        this.model.resizable.set(resizable);
-      } else {
-        this.model.resizable.set(true);
-      }
+      this.model.resizable.set(typeof resizable === 'boolean' ? resizable : true);
     });
   }
 
@@ -120,255 +112,11 @@ export class ResizableComponent implements OnInit, AfterViewInit, OnDestroy {
 
   public ngAfterViewInit() {
     this.afService.batchAnimationFrame(() => {
-      this.minWidth = +getComputedStyle(this.hostRef.nativeElement).minWidth.replace('px', '') || 0;
-      this.minHeight = +getComputedStyle(this.hostRef.nativeElement).minHeight.replace('px', '') || 0;
-      this.maxWidth = +getComputedStyle(this.hostRef.nativeElement).maxWidth.replace('px', '') || Infinity;
-      this.maxHeight = +getComputedStyle(this.hostRef.nativeElement).maxHeight.replace('px', '') || Infinity;
+      const style = getComputedStyle(this.hostRef.nativeElement);
+      this.cssMinWidth.set(+style.minWidth.replace('px', '') || 0);
+      this.cssMinHeight.set(+style.minHeight.replace('px', '') || 0);
+      this.cssMaxWidth.set(+style.maxWidth.replace('px', '') || Infinity);
+      this.cssMaxHeight.set(+style.maxHeight.replace('px', '') || Infinity);
     });
   }
-
-  protected startResize(side: Side, event: Event) {
-    event.stopPropagation();
-    this.resizeSide = side;
-    this.model.resizing.set(true);
-  }
-
-  protected resize(event: PointerEvent) {
-    if (!this.resizeSide) return;
-
-    const offset = calcOffset(event.movementX, event.movementY, this.zoom());
-
-    const resized = this.applyResize(this.resizeSide, this.model, offset, this.getDistanceToEdge(event));
-
-    const { x, y, width, height } = constrainRect(
-      resized,
-      this.model,
-      this.resizeSide,
-      this.minWidth,
-      this.minHeight,
-      this.maxWidth,
-      this.maxHeight,
-    );
-
-    this.zone.runOutsideAngular(() => {
-      setTimeout(() => {
-        this.model.setPoint({ x, y });
-        this.model.width.set(width);
-        this.model.height.set(height);
-      });
-    });
-  }
-
-  protected endResize() {
-    this.resizeSide = null;
-    this.model.resizing.set(false);
-  }
-
-  private getDistanceToEdge(event: PointerEvent): DistanceToEdge {
-    const flowPoint = this.spacePointContext.documentPointToFlowPoint({ x: event.x, y: event.y });
-    const { x, y } = this.model.globalPoint();
-
-    return {
-      left: flowPoint.x - x,
-      right: flowPoint.x - (x + this.model.width()),
-      top: flowPoint.y - y,
-      bottom: flowPoint.y - (y + this.model.height()),
-    };
-  }
-
-  private applyResize(side: Side, model: NodeModel, offset: Point, distanceToEdge: DistanceToEdge): Rect {
-    const { x, y } = model.point();
-    const width = model.width();
-    const height = model.height();
-    const [snapX, snapY] = this.settingsService.snapGrid();
-
-    switch (side) {
-      case 'left': {
-        const movementX = offset.x + distanceToEdge.left;
-        const newX = align(x + movementX, snapX);
-        const deltaX = newX - x;
-
-        return {
-          x: newX,
-          y,
-          width: width - deltaX,
-          height,
-        };
-      }
-      case 'right': {
-        const movementX = offset.x + distanceToEdge.right;
-        const newWidth = align(width + movementX, snapX);
-
-        return {
-          x,
-          y,
-          width: newWidth,
-          height,
-        };
-      }
-      case 'top': {
-        const movementY = offset.y + distanceToEdge.top;
-        const newY = align(y + movementY, snapY);
-        const deltaY = newY - y;
-
-        return {
-          x,
-          y: newY,
-          width,
-          height: height - deltaY,
-        };
-      }
-      case 'bottom': {
-        const movementY = offset.y + distanceToEdge.bottom;
-        const newHeight = align(height + movementY, snapY);
-
-        return {
-          x,
-          y,
-          width,
-          height: newHeight,
-        };
-      }
-      case 'top-left': {
-        const movementX = offset.x + distanceToEdge.left;
-        const movementY = offset.y + distanceToEdge.top;
-        const newX = align(x + movementX, snapX);
-        const newY = align(y + movementY, snapY);
-        const deltaX = newX - x;
-        const deltaY = newY - y;
-
-        return {
-          x: newX,
-          y: newY,
-          width: width - deltaX,
-          height: height - deltaY,
-        };
-      }
-      case 'top-right': {
-        const movementX = offset.x + distanceToEdge.right;
-        const movementY = offset.y + distanceToEdge.top;
-        const newY = align(y + movementY, snapY);
-        const deltaY = newY - y;
-
-        return {
-          x,
-          y: newY,
-          width: align(width + movementX, snapX),
-          height: height - deltaY,
-        };
-      }
-      case 'bottom-left': {
-        const movementX = offset.x + distanceToEdge.left;
-        const movementY = offset.y + distanceToEdge.bottom;
-        const newX = align(x + movementX, snapX);
-        const deltaX = newX - x;
-
-        return {
-          x: newX,
-          y,
-          width: width - deltaX,
-          height: align(height + movementY, snapY),
-        };
-      }
-      case 'bottom-right': {
-        const movementX = offset.x + distanceToEdge.right;
-        const movementY = offset.y + distanceToEdge.bottom;
-
-        return {
-          x,
-          y,
-          width: align(width + movementX, snapX),
-          height: align(height + movementY, snapY),
-        };
-      }
-    }
-  }
-}
-
-function calcOffset(movementX: number, movementY: number, zoom: number): Point {
-  return {
-    x: round(movementX / zoom),
-    y: round(movementY / zoom),
-  };
-}
-
-function constrainRect(
-  rect: Rect,
-  model: NodeModel,
-  side: Side,
-  minWidth: number,
-  minHeight: number,
-  maxWidth: number,
-  maxHeight: number,
-) {
-  let { x, y, width, height } = rect;
-
-  // 1. Prevent negative dimensions
-  width = Math.max(width, 0);
-  height = Math.max(height, 0);
-
-  // 2. Apply minimum size constraints
-  width = Math.max(minWidth, width);
-  height = Math.max(minHeight, height);
-  width = Math.min(maxWidth, width);
-  height = Math.min(maxHeight, height);
-
-  // Apply left/top constraints based on minimum size
-  x = Math.min(x, model.point().x + model.width() - minWidth);
-  y = Math.min(y, model.point().y + model.height() - minHeight);
-  x = Math.max(x, model.point().x + model.width() - maxWidth);
-  y = Math.max(y, model.point().y + model.height() - maxHeight);
-
-  const parent = model.parent();
-  // 3. Apply maximum size constraints based on parent size (if exists)
-  if (parent) {
-    const parentWidth = parent.width();
-    const parentHeight = parent.height();
-    const modelX = model.point().x;
-    const modelY = model.point().y;
-
-    x = Math.max(x, 0);
-    y = Math.max(y, 0);
-
-    // Stop resizing when hitting left or top boundary
-    if (side.includes('left') && x === 0) {
-      width = Math.min(width, modelX + model.width());
-    }
-    if (side.includes('top') && y === 0) {
-      height = Math.min(height, modelY + model.height());
-    }
-
-    // Allow right/bottom resizing without being blocked
-    width = Math.min(width, parentWidth - x);
-    height = Math.min(height, parentHeight - y);
-  }
-
-  const bounds = getNodesBounds(model.children());
-  // 4. Apply child node constraints (if children exist)
-  if (bounds) {
-    if (side.includes('left')) {
-      x = Math.min(x, model.point().x + model.width() - (bounds.x + bounds.width));
-      width = Math.max(width, bounds.x + bounds.width);
-    }
-
-    if (side.includes('right')) {
-      width = Math.max(width, bounds.x + bounds.width);
-    }
-
-    if (side.includes('bottom')) {
-      height = Math.max(height, bounds.y + bounds.height);
-    }
-
-    if (side.includes('top')) {
-      y = Math.min(y, model.point().y + model.height() - (bounds.y + bounds.height));
-      height = Math.max(height, bounds.y + bounds.height);
-    }
-  }
-
-  return {
-    x,
-    y,
-    width,
-    height,
-  };
 }

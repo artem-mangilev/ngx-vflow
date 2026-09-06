@@ -1,86 +1,43 @@
 <ng-template #resizer>
-  <svg:g>
-    <!-- top line -->
-    <svg:line
-      class="top"
-      stroke-width="2"
-      [attr.x1]="lineGap"
-      [attr.y1]="-gap()"
-      [attr.x2]="model.width() - lineGap"
-      [attr.y2]="-gap()"
-      [attr.stroke]="resizerColor()"
-      (pointerStart)="startResize('top', $event)" />
-    <!-- Left line -->
-    <svg:line
-      class="left"
-      stroke-width="2"
-      [attr.x1]="-gap()"
-      [attr.y1]="lineGap"
-      [attr.x2]="-gap()"
-      [attr.y2]="model.height() - lineGap"
-      [attr.stroke]="resizerColor()"
-      (pointerStart)="startResize('left', $event)" />
-    <!-- Bottom line -->
-    <svg:line
-      class="bottom"
-      stroke-width="2"
-      [attr.x1]="lineGap"
-      [attr.y1]="model.height() + gap()"
-      [attr.x2]="model.width() - lineGap"
-      [attr.y2]="model.height() + gap()"
-      [attr.stroke]="resizerColor()"
-      (pointerStart)="startResize('bottom', $event)" />
-    <!-- Right line -->
-    <svg:line
-      class="right"
-      stroke-width="2"
-      [attr.x1]="model.width() + gap()"
-      [attr.y1]="lineGap"
-      [attr.x2]="model.width() + gap()"
-      [attr.y2]="model.height() - lineGap"
-      [attr.stroke]="resizerColor()"
-      (pointerStart)="startResize('right', $event)" />
+  @for (position of linePositions; track position) {
+    <div
+      nodeResizeControl
+      [position]="position"
+      [variant]="lineVariant"
+      [color]="resizerColor()"
+      [style.--resizer-gap.px]="gap()"
+      [minWidth]="effectiveMinWidth()"
+      [minHeight]="effectiveMinHeight()"
+      [maxWidth]="effectiveMaxWidth()"
+      [maxHeight]="effectiveMaxHeight()"
+      [keepAspectRatio]="keepAspectRatio()"
+      [resizeDirection]="resizeDirection()"
+      [autoScale]="autoScale()"
+      [onResizeStart]="emitResizeStart"
+      [onResize]="emitResize"
+      [onResizeEnd]="emitResizeEnd"
+      [shouldResize]="shouldResize()"></div>
+  }
 
-    <!-- Top Left -->
-    <svg:rect
-      class="top-left"
-      [attr.x]="-(handleSize / 2) - gap()"
-      [attr.y]="-(handleSize / 2) - gap()"
-      [attr.width]="handleSize"
-      [attr.height]="handleSize"
-      [attr.fill]="resizerColor()"
-      (pointerStart)="startResize('top-left', $event)" />
-
-    <!-- Top right -->
-    <svg:rect
-      class="top-right"
-      [attr.x]="model.width() - handleSize / 2 + gap()"
-      [attr.y]="-(handleSize / 2) - gap()"
-      [attr.width]="handleSize"
-      [attr.height]="handleSize"
-      [attr.fill]="resizerColor()"
-      (pointerStart)="startResize('top-right', $event)" />
-
-    <!-- Bottom left -->
-    <svg:rect
-      class="bottom-left"
-      [attr.x]="-(handleSize / 2) - gap()"
-      [attr.y]="model.height() - handleSize / 2 + gap()"
-      [attr.width]="handleSize"
-      [attr.height]="handleSize"
-      [attr.fill]="resizerColor()"
-      (pointerStart)="startResize('bottom-left', $event)" />
-
-    <!-- Bottom right -->
-    <svg:rect
-      class="bottom-right"
-      [attr.x]="model.width() - handleSize / 2 + gap()"
-      [attr.y]="model.height() - handleSize / 2 + gap()"
-      [attr.width]="handleSize"
-      [attr.height]="handleSize"
-      [attr.fill]="resizerColor()"
-      (pointerStart)="startResize('bottom-right', $event)" />
-  </svg:g>
+  @for (position of handlePositions; track position) {
+    <div
+      nodeResizeControl
+      [position]="position"
+      [variant]="handleVariant"
+      [color]="resizerColor()"
+      [style.--resizer-gap.px]="gap()"
+      [minWidth]="effectiveMinWidth()"
+      [minHeight]="effectiveMinHeight()"
+      [maxWidth]="effectiveMaxWidth()"
+      [maxHeight]="effectiveMaxHeight()"
+      [keepAspectRatio]="keepAspectRatio()"
+      [resizeDirection]="resizeDirection()"
+      [autoScale]="autoScale()"
+      [onResizeStart]="emitResizeStart"
+      [onResize]="emitResize"
+      [onResizeEnd]="emitResizeEnd"
+      [shouldResize]="shouldResize()"></div>
+  }
 </ng-template>
 
 <ng-content />

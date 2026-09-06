@@ -2,7 +2,7 @@ Edges are not created automatically. To create a new edge, follow these steps:
 
 1. Create a handler for the `(connect)` event
 2. This handler accepts a `Connection` argument. `Connection` is similar to an `Edge`, but it doesn't exist in the flow yet—you need to "convert" it into a new `Edge`
-3. Update the `Edge[]` list with the new edge that was created from the `Connection`
+3. Give the edge an ID and pass it to `addEdges` with the application-owned collections
 
 ## Strict connections
 
@@ -31,6 +31,6 @@ Edges can be reconnected. To reconnect an edge, follow these steps:
 1. Mark the `Edge` object as `reconnectable`
 2. Create a handler for the `(reconnect)` event
 3. This handler accepts a `ReconnectionEvent` argument, which contains a new `Connection` and the `oldEdge` that you are trying to reconnect
-4. Update the `Edge[]` list with a new edge based on the `oldEdge` and the new `Connection`, then remove the reference to the old edge from the list
+4. Pass the old edge ID and new `Connection` to `reconnectEdges`
 
 {{ NgDocActions.demoPane("ReconnectionDemoComponent") }}

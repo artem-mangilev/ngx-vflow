@@ -1,10 +1,12 @@
 This topic needs some clarification due to the design decisions behind the library.
 
-The library renders the flow by combining two technologies:
+The library renders the flow with coordinated HTML and SVG layers:
 
-- **SVG**, which is responsible for rendering curves, managing zoom, pan, and other tasks that SVG handles well.
-- **HTML (with CSS)**, which is used to create the content for the nodes, allowing front-end engineers to design dynamic and visually appealing UIs more easily than with SVG.
+- **HTML (with CSS)** renders nodes, group-node templates, handles, labels, toolbars, and resize controls in a transformed viewport.
+- **SVG** renders edges and connection overlays. Each edge retains its own SVG root so edge and node `z-index` values can interleave.
 
-The link between these two technologies is the `<svg:foreignObject />` element, which enables HTML to be rendered inside SVG. The diagram below illustrates how this element interacts with its content.
+With virtualization enabled, offscreen views stay mounted and use `display: none`. Initial measurement and active interactions temporarily keep nodes in layout.
 
-<img src="assets/size-schema.png" width="700px" />
+Zooming and panning transform the shared viewport, keeping its HTML and SVG content in the same flow coordinate system.
+
+Documented Angular APIs, CSS classes, and observable behavior are supported contracts. The exact private DOM structure and nesting of these layers are implementation details and can change between releases.

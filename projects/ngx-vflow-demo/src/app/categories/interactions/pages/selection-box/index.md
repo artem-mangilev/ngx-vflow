@@ -21,6 +21,8 @@ selectionBox: SelectionBoxSettings = {
 - `mode: 'partial'` selects entities that intersect the box.
 - `color` controls selection box stroke/fill color.
 
+To disable the selection-box gesture, pass `[keyboardShortcuts]="{ selection: null }"`.
+
 # Selection semantics
 
 - During drag, entities are marked as preselected.

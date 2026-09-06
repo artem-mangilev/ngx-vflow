@@ -2,6 +2,10 @@ import { Rect } from '../interfaces/rect';
 import { ViewportState } from '../interfaces/viewport.interface';
 import { rectsIntersect } from './rect';
 
+/**
+ * Returns the translated and clamped viewport that centers the supplied bounds.
+ * Zero-sized bounds are treated as a point and use `maxZoom`.
+ */
 export function getViewportForBounds(
   bounds: Rect,
   width: number,
@@ -10,6 +14,21 @@ export function getViewportForBounds(
   maxZoom: number,
   padding: number,
 ): ViewportState {
+  if (
+    ![bounds.x, bounds.y, bounds.width, bounds.height, width, height, minZoom, maxZoom, padding].every(
+      Number.isFinite,
+    ) ||
+    bounds.width < 0 ||
+    bounds.height < 0 ||
+    width <= 0 ||
+    height <= 0 ||
+    minZoom <= 0 ||
+    minZoom > maxZoom ||
+    padding <= -1
+  ) {
+    throw new RangeError('getViewportForBounds received invalid bounds, viewport, zoom, or padding');
+  }
+
   const xZoom = width / (bounds.width * (1 + padding));
   const yZoom = height / (bounds.height * (1 + padding));
   const zoom = Math.min(xZoom, yZoom);

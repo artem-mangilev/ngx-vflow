@@ -15,7 +15,8 @@ import {
 } from 'ngx-vflow';
 import { of } from 'rxjs';
 
-const mockModel = () => new NodeModel({ id: 'mock', type: 'default', point: signal({ x: 0, y: 0 }) });
+const mockModel = () =>
+  new NodeModel({ id: 'mock', type: 'default', point: signal({ x: 0, y: 0 }), parentId: signal(null) });
 
 export function provideCustomNodeMocks(): Provider[] {
   return [
@@ -59,7 +60,8 @@ export function provideCustomNodeMocks(): Provider[] {
     {
       provide: SpacePointContextDirective,
       useValue: {
-        documentPointToFlowPoint: (point: Point) => point,
+        clientToFlowPosition: (point: Point) => point,
+        flowToClientPosition: (point: Point) => point,
       },
     },
     {

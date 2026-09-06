@@ -1,6 +1,6 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { NgDocNotifyService } from '@ng-doc/ui-kit';
-import { ComponentNodeEvent, Edge, Node, Vflow } from 'ngx-vflow';
+import { ComponentNodeEvent, Edge, Node, Vflow, createNodes } from 'ngx-vflow';
 import { BlueSquareNodeComponent, BlueSquareData } from './components/blue-square-node.component';
 import { RedSquareNodeComponent, RedSquareData } from './components/red-square-node.component';
 
@@ -21,22 +21,26 @@ export class CustomComponentNodesDemoComponent {
   private notifyService = inject(NgDocNotifyService);
 
   public nodes: Node[] = [
-    {
-      id: '1',
-      point: signal({ x: 100, y: 100 }),
-      type: RedSquareNodeComponent,
-      data: signal({
-        redSquareText: 'Red',
-      } satisfies RedSquareData),
-    },
-    {
-      id: '2',
-      point: signal({ x: 250, y: 250 }),
-      type: BlueSquareNodeComponent,
-      data: signal({
-        blueSquareText: 'Blue',
-      } satisfies BlueSquareData),
-    },
+    ...createNodes<RedSquareData>([
+      {
+        id: '1',
+        point: { x: 100, y: 100 },
+        type: RedSquareNodeComponent,
+        data: {
+          redSquareText: 'Red',
+        },
+      },
+    ]),
+    ...createNodes<BlueSquareData>([
+      {
+        id: '2',
+        point: { x: 250, y: 250 },
+        type: BlueSquareNodeComponent,
+        data: {
+          blueSquareText: 'Blue',
+        },
+      },
+    ]),
   ];
 
   public edges: Edge[] = [
