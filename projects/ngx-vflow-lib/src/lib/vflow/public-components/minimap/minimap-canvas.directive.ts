@@ -4,20 +4,45 @@ import { FlowEntitiesService } from '../../services/flow-entities.service';
 import { FlowSettingsService } from '../../services/flow-settings.service';
 import { ViewportService } from '../../services/viewport.service';
 import { getNodesFlowBounds } from '../../utils/nodes';
-import { getViewportBounds, getViewportForBounds } from '../../utils/viewport';
+import { clamp, getViewportBounds, getViewportForBounds } from '../../utils/viewport';
 import { MiniMapPosition } from './minimap.component';
+import { KeyboardService } from '../../services/keyboard.service';
+import { Point } from '../../interfaces/point.interface';
+import { clientToFlowPosition } from '../../utils/coordinates';
+import { isPointInRect } from '../../utils/rect';
 
-@Directive({ selector: 'canvas[minimapCanvas]' })
+@Directive({
+  selector: 'canvas[minimapCanvas]',
+  host: {
+    '[style.pointer-events]': 'pannable() || zoomable() ? "auto" : "none"',
+    '[style.touch-action]': 'pannable() || zoomable() ? "none" : "auto"',
+    '[style.cursor]': 'pannable() ? "grab" : "auto"',
+    '(pointerdown)': 'onPointerDown($event)',
+    '(pointermove)': 'onPointerMove($event)',
+    '(pointerup)': 'onPointerUp($event)',
+    '(pointercancel)': 'cancelDrag($event)',
+    '(lostpointercapture)': 'cancelDrag($event)',
+    '(mousedown)': '$event.stopPropagation()',
+    '(touchstart)': '$event.stopPropagation()',
+    '(click)': '$event.stopPropagation()',
+    '(dblclick)': '$event.stopPropagation()',
+  },
+})
 export class MinimapCanvasDirective {
   public maskColor = input.required<string>();
   public strokeColor = input.required<string>();
   public position = input.required<MiniMapPosition>();
+  public pannable = input.required<boolean>();
+  public zoomable = input.required<boolean>();
+  public zoomStep = input.required<number>();
 
   private document = inject(DOCUMENT);
   private canvas = inject<ElementRef<HTMLCanvasElement>>(ElementRef).nativeElement;
   private entities = inject(FlowEntitiesService);
   private settings = inject(FlowSettingsService);
   private viewport = inject(ViewportService);
+  private keyboard = inject(KeyboardService);
+  private drag?: { id: number; start: Point; offset: Point; moved: boolean };
   private pixelRatio = signal(this.document.defaultView?.devicePixelRatio || 1);
   private previews = this.document.createElement('canvas');
   private width = computed(() => this.settings.computedFlowWidth() * 0.2);
@@ -70,10 +95,20 @@ export class MinimapCanvasDirective {
   constructor() {
     const view = this.document.defaultView;
     const updateRatio = () => this.pixelRatio.set(view?.devicePixelRatio || 1);
+    const cancelDrag = () => this.cancelDrag();
+    const wheel = (event: WheelEvent) => this.onWheel(event);
     view?.addEventListener('resize', updateRatio);
-    inject(DestroyRef).onDestroy(() => view?.removeEventListener('resize', updateRatio));
+    view?.addEventListener('blur', cancelDrag);
+    this.canvas.addEventListener('wheel', wheel, { passive: false });
+    inject(DestroyRef).onDestroy(() => {
+      this.cancelDrag();
+      view?.removeEventListener('resize', updateRatio);
+      view?.removeEventListener('blur', cancelDrag);
+      this.canvas.removeEventListener('wheel', wheel);
+    });
 
     afterRenderEffect(() => {
+      if (!this.pannable()) this.cancelDrag();
       const width = this.width();
       const height = this.height();
       const ratio = this.pixelRatio();
@@ -113,5 +148,144 @@ export class MinimapCanvasDirective {
       context.lineWidth = 1;
       context.strokeRect(0.5, 0.5, width - 1, height - 1);
     });
+  }
+
+  private flowPoint(event: PointerEvent): Point | undefined {
+    const rect = this.canvas.getBoundingClientRect();
+    if (rect.width <= 0 || rect.height <= 0 || this.width() <= 0 || this.height() <= 0) return;
+    return clientToFlowPosition(
+      {
+        x: ((event.clientX - rect.left) * this.width()) / rect.width,
+        y: ((event.clientY - rect.top) * this.height()) / rect.height,
+      },
+      { viewport: this.graph().transform, containerPosition: { x: 0, y: 0 } },
+    );
+  }
+
+  private canPan(event: PointerEvent) {
+    const buttons = this.settings.panOnDrag();
+    return (
+      this.pannable() &&
+      !this.keyboard.isActiveAction('selection') &&
+      (buttons !== false || this.keyboard.isActiveAction('pan')) &&
+      (event.pointerType === 'touch' || !Array.isArray(buttons) || buttons.includes(event.button))
+    );
+  }
+
+  protected onPointerDown(event: PointerEvent) {
+    event.stopPropagation();
+    if (this.drag || !event.isPrimary || !this.canPan(event)) return;
+    const point = this.flowPoint(event);
+    if (!point) return;
+    event.preventDefault();
+    const bounds = getViewportBounds(
+      this.viewport.readableViewport(),
+      this.settings.computedFlowWidth(),
+      this.settings.computedFlowHeight(),
+    );
+    const inside = isPointInRect(point, bounds);
+    this.drag = {
+      id: event.pointerId,
+      start: { x: event.clientX, y: event.clientY },
+      offset: inside
+        ? { x: bounds.x + bounds.width / 2 - point.x, y: bounds.y + bounds.height / 2 - point.y }
+        : { x: 0, y: 0 },
+      moved: false,
+    };
+    this.canvas.setPointerCapture(event.pointerId);
+    if (!inside) this.centerOn(point);
+  }
+
+  protected onPointerMove(event: PointerEvent) {
+    event.stopPropagation();
+    const drag = this.drag;
+    if (!drag || drag.id !== event.pointerId) return;
+    // Mouse move events have button=-1; the accepted button is checked on pointerdown.
+    if (
+      !this.pannable() ||
+      this.keyboard.isActiveAction('selection') ||
+      (this.settings.panOnDrag() === false && !this.keyboard.isActiveAction('pan'))
+    ) {
+      this.cancelDrag();
+      return;
+    }
+    const point = this.flowPoint(event);
+    if (!point) return;
+    event.preventDefault();
+    drag.moved ||=
+      Math.hypot(event.clientX - drag.start.x, event.clientY - drag.start.y) > this.settings.paneClickDistance();
+    if (drag.moved) this.centerOn({ x: point.x + drag.offset.x, y: point.y + drag.offset.y });
+  }
+
+  protected onPointerUp(event: PointerEvent) {
+    this.onPointerMove(event);
+    if (this.drag?.id !== event.pointerId) return;
+    const point = this.flowPoint(event);
+    if (!this.drag.moved && point) this.centerOn(point);
+    this.cancelDrag();
+  }
+
+  protected cancelDrag(event?: PointerEvent) {
+    const drag = this.drag;
+    if (event && drag?.id !== event.pointerId) return;
+    this.drag = undefined;
+    if (drag && this.canvas.hasPointerCapture(drag.id)) this.canvas.releasePointerCapture(drag.id);
+  }
+
+  private centerOn(point: Point, zoom = this.viewport.readableViewport().zoom) {
+    this.viewport.writableViewport.set({
+      changeType: 'absolute',
+      state: {
+        x: this.settings.computedFlowWidth() / 2 - point.x * zoom,
+        y: this.settings.computedFlowHeight() / 2 - point.y * zoom,
+        zoom,
+      },
+      duration: 0,
+    });
+  }
+
+  private onWheel(event: WheelEvent) {
+    event.stopPropagation();
+    // An opted-in minimap owns wheel input even at a zoom limit or with a gesture disabled.
+    if (!this.pannable() && !this.zoomable()) return;
+    event.preventDefault();
+    if (this.drag) return;
+    const viewport = this.viewport.readableViewport();
+    const scrollPan =
+      !event.ctrlKey &&
+      (this.settings.panOnScroll() || this.keyboard.isActiveAction('pan')) &&
+      !this.keyboard.isActiveAction('zoom');
+    if (scrollPan) {
+      if (!this.pannable() || this.keyboard.isActiveAction('selection')) return;
+      const unit = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? this.height() : 1;
+      const scale = (unit * viewport.zoom) / this.graph().transform.zoom;
+      this.viewport.writableViewport.set({
+        changeType: 'absolute',
+        state: { ...viewport, x: viewport.x - event.deltaX * scale, y: viewport.y - event.deltaY * scale },
+        duration: 0,
+      });
+      return;
+    }
+    if (
+      !this.zoomable() ||
+      !(event.ctrlKey
+        ? this.settings.zoomOnPinch()
+        : this.settings.zoomOnScroll() || this.keyboard.isActiveAction('zoom'))
+    )
+      return;
+    const step = this.zoomStep();
+    const factor = 1 + (Number.isFinite(step) && step > 0 ? step : 0.1);
+    const zoom = clamp(
+      viewport.zoom * factor ** -Math.sign(event.deltaY),
+      this.settings.minZoom(),
+      this.settings.maxZoom(),
+    );
+    this.centerOn(
+      {
+        x: (this.settings.computedFlowWidth() / 2 - viewport.x) / viewport.zoom,
+        y: (this.settings.computedFlowHeight() / 2 - viewport.y) / viewport.zoom,
+      },
+      zoom,
+    );
   }
 }

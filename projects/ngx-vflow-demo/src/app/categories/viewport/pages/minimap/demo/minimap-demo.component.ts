@@ -14,7 +14,7 @@ import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
       </div>
     </ng-template>
 
-    <mini-map />
+    <mini-map [pannable]="true" [zoomable]="true" />
   </vflow>`,
   styles: [
     `

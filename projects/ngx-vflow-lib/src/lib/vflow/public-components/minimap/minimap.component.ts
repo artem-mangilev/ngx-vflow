@@ -31,6 +31,15 @@ export class MiniMapComponent implements OnInit {
    */
   public position = input<MiniMapPosition>('bottom-right');
 
+  /** Enable click, drag and scroll panning, subject to the main flow gesture settings. */
+  public pannable = input(false);
+
+  /** Enable wheel and trackpad pinch zoom, subject to the main flow gesture settings. */
+  public zoomable = input(false);
+
+  /** Multiplicative wheel zoom increment; invalid values fall back to 0.1. */
+  public zoomStep = input(0.1);
+
   private minimap = viewChild.required<TemplateRef<unknown>>('minimap');
 
   public ngOnInit(): void {

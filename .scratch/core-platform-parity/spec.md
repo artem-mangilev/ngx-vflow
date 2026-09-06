@@ -27,7 +27,7 @@ Bring ngx-vflow's core platform contract to parity with mature node-based UI eng
 - Put DOM measurements and rendered-instance queries behind one stable public facade. The facade must earn its seam by removing consumer knowledge of internal models, not by passing through every `ɵ` method.
 - Define entity policies before accessibility depends on them.
 - Keep keyboard behavior configurable and safe around inputs, contenteditable regions, and embedded controls.
-- Keep the minimap SVG lightweight; do not render a second Angular node tree.
+- Keep the minimap canvas lightweight and cache node previews; do not render a second Angular node tree.
 - Treat each public interface as its module's test surface; tests should assert observable results without reaching past the seam into internal services.
 - Add focused public-contract tests and documentation with each issue rather than postponing them to a cleanup ticket.
 

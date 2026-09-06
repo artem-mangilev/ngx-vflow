@@ -76,6 +76,9 @@ import { VflowMocks } from './vflow-mocks';
       </ng-template>
 
       <mini-map
+        [pannable]="true"
+        [zoomable]="true"
+        [zoomStep]="0.2"
         [maskColor]="'rgba(215, 215, 215, 0.6)'"
         [strokeColor]="'rgb(200, 200, 200)'"
         [position]="'bottom-right'" />
