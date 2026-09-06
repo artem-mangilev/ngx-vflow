@@ -38,7 +38,7 @@ import { EdgeLabelPosition, HtmlTemplateEdgeLabel } from '../../interfaces/edge-
   host: {
     '(focusin)': 'edgeModel().focused.set(true)',
     '(focusout)': 'edgeModel().focused.set(false)',
-    '[style.visibility]': 'edgeModel().isReady() ? "visible" : "hidden"',
+    '[style.visibility]': 'edgeModel().isReady() && !edgeModel().reconnecting() ? "visible" : "hidden"',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [NgTemplateOutlet],

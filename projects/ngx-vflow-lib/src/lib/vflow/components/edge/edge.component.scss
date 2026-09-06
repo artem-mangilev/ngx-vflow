@@ -4,6 +4,7 @@
   left: 0;
   overflow: visible;
   pointer-events: none;
+  outline: none;
 }
 
 .focus-indicator {
@@ -17,8 +18,6 @@
 }
 
 :host(:focus-visible) {
-  outline: none;
-
   .focus-indicator {
     display: block;
   }
