@@ -76,7 +76,6 @@
   <url><loc>https://www.ngx-vflow.org/api/interfaces/ngx-vflow/NodeDragEvent</loc><lastmod>2026-04-04</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
   <url><loc>https://www.ngx-vflow.org/api/interfaces/ngx-vflow/NodeDragStartEvent</loc><lastmod>2026-04-04</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
   <url><loc>https://www.ngx-vflow.org/api/interfaces/ngx-vflow/NodePositionChange</loc><lastmod>2026-04-04</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://www.ngx-vflow.org/api/interfaces/ngx-vflow/NodePreview</loc><lastmod>2026-04-04</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
   <url><loc>https://www.ngx-vflow.org/api/interfaces/ngx-vflow/NodeRemoveChange</loc><lastmod>2026-04-04</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
   <url><loc>https://www.ngx-vflow.org/api/interfaces/ngx-vflow/NodeSelectedChange</loc><lastmod>2026-04-04</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
   <url><loc>https://www.ngx-vflow.org/api/interfaces/ngx-vflow/NodeSizeChange</loc><lastmod>2026-04-04</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>

@@ -135,6 +135,6 @@ Documented Angular APIs, CSS classes, and observable behavior remain supported c
 
 ## Viewport virtualization
 
-Virtualization now hides offscreen views using `display: none`, retaining their Angular component instances. It no longer replaces nodes with canvas previews or hides all edges at low zoom. `virtualizationZoomThreshold`, `NodePreview` and the node’s `preview` property remain accepted but are deprecated and ignored.
+Virtualization now hides offscreen views using `display: none`, retaining their Angular component instances. It no longer replaces nodes with canvas previews or hides all edges at low zoom. `virtualizationZoomThreshold`, `NodePreview` and the node’s `preview` property have been removed. Remove these options and type imports from application code.
 
 Nodes are initially loaded and measured even offscreen, overriding `lazyLoadTrigger: 'viewport'` when virtualization is enabled. Component effects and subscriptions continue while CSS-hidden. Focused entities and active node gestures stay in layout; merely selected entities can be culled.

@@ -1,6 +1,5 @@
 import { signal, Type, WritableSignal } from '@angular/core';
 import { Point } from './point.interface';
-import { NodePreview } from './node-preview.interface';
 import { isCallable } from '../utils/is-callable';
 import { CustomNodeComponent } from '../public-components/custom-node/custom-node.component';
 import { isCustomNodeComponent } from '../utils/is-vflow-component';
@@ -15,7 +14,6 @@ export const NODE_DEFAULTS = {
   draggable: true,
   parentId: null,
   extent: 'parent' as const,
-  preview: { style: {} },
   selected: false,
   color: '#1b262c',
   resizable: false,
@@ -36,8 +34,6 @@ export interface SharedNode {
   draggable?: WritableSignal<boolean>;
   parentId?: WritableSignal<string | null>;
   extent?: WritableSignal<'parent' | null>;
-  /** @deprecated Ignored. Virtualization retains the original node view at every zoom. */
-  preview?: WritableSignal<NodePreview>;
   selected?: WritableSignal<boolean>;
   selectable?: WritableSignal<boolean>;
   focusable?: WritableSignal<boolean>;
@@ -130,7 +126,6 @@ function createBaseNode(node: UnwrapSignal<SharedNode>, useDefaults: boolean) {
       draggable: signal(isDefined(node.draggable) ? node.draggable : NODE_DEFAULTS.draggable),
       parentId: signal(isDefined(node.parentId) ? node.parentId : NODE_DEFAULTS.parentId),
       extent: signal(isDefined(node.extent) ? node.extent : NODE_DEFAULTS.extent),
-      preview: signal(isDefined(node.preview) ? node.preview : NODE_DEFAULTS.preview),
       selected: signal(isDefined(node.selected) ? node.selected : NODE_DEFAULTS.selected),
       ...(isDefined(node.selectable) ? { selectable: signal(node.selectable) } : {}),
       ...(isDefined(node.focusable) ? { focusable: signal(node.focusable) } : {}),
@@ -145,7 +140,6 @@ function createBaseNode(node: UnwrapSignal<SharedNode>, useDefaults: boolean) {
       draggable: isDefined(node.draggable) ? signal(node.draggable) : undefined,
       parentId: isDefined(node.parentId) ? signal(node.parentId) : undefined,
       extent: isDefined(node.extent) ? signal(node.extent) : undefined,
-      preview: isDefined(node.preview) ? signal(node.preview) : undefined,
       selected: isDefined(node.selected) ? signal(node.selected) : undefined,
       ...(isDefined(node.selectable) ? { selectable: signal(node.selectable) } : {}),
       ...(isDefined(node.focusable) ? { focusable: signal(node.focusable) } : {}),

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { Edge, Node, StaticNode, Vflow, createNodes } from 'ngx-vflow';
 import { StressTestNodeComponent } from './stress-test-node.component';
 
@@ -9,7 +9,6 @@ import { StressTestNodeComponent } from './stress-test-node.component';
   imports: [Vflow],
 })
 export class StressTestDemoComponent {
-  public virtualization = signal(false);
   public nodes: Node[] = [];
   public edges: Edge[] = [];
 

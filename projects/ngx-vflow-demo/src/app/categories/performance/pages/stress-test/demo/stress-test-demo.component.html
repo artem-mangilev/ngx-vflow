@@ -1,11 +1,1 @@
-<label>
-  <input type="checkbox" [checked]="virtualization()" (change)="virtualization.set($any($event.target).checked)" />
-  Enable virtualization
-</label>
-<vflow
-  #vflow
-  view="auto"
-  [nodes]="nodes"
-  [edges]="edges"
-  [minZoom]="0.1"
-  [optimization]="{ virtualization: virtualization() }" />
+<vflow #vflow view="auto" [nodes]="nodes" [edges]="edges" [minZoom]="0.1" />

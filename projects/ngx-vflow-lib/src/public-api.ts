@@ -26,7 +26,6 @@ export * from './lib/vflow/interfaces/fit-view-options.interface';
 export * from './lib/vflow/interfaces/optimization.interface';
 export * from './lib/vflow/interfaces/intersecting-nodes-options.interface';
 export * from './lib/vflow/interfaces/curve-factory.interface';
-export * from './lib/vflow/interfaces/node-preview.interface';
 export * from './lib/vflow/interfaces/alignment-helper-settings.interface';
 export * from './lib/vflow/interfaces/selection-box-settings.interface';
 export { HandleContext } from './lib/vflow/interfaces/template-context.interface';

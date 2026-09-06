@@ -25,13 +25,6 @@ export class EdgeRenderingService {
     });
   }
 
-  public readonly edges = computed(() =>
-    this.flowEntitiesService
-      .validEdges()
-      .filter((edge) => !edge.culled())
-      .sort((a, b) => a.renderOrder() - b.renderOrder()),
-  );
-
   private maxOrder = computed(() => {
     return Math.max(...this.flowEntitiesService.validEdges().map((n) => n.renderOrder()));
   });

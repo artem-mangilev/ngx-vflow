@@ -1,21 +1,20 @@
 import { expect, test } from '@playwright/test';
 
-test('stress virtualization retains node DOM and geometry through viewport pan', async ({ page }) => {
-  await page.goto('/performance/stress-test');
+test('virtualization demo retains node DOM and geometry through viewport pan', async ({ page }) => {
+  await page.goto('/performance/virtualization');
   const nodes = page.locator('.vflow-node');
-  await expect(nodes).toHaveCount(1024);
+  await expect(nodes).toHaveCount(4900);
   await expect(nodes.first()).toHaveCSS('visibility', 'visible');
+  await page.locator('.vflow-pane').scrollIntoViewIfNeeded();
   const first = await nodes.first().elementHandle();
   const handleTop = await first!.evaluate((node) => node.querySelector<HTMLElement>('.handle--right')!.style.top);
-  await page.getByRole('checkbox', { name: 'Enable virtualization' }).check();
-  await expect(nodes).toHaveCount(1024);
   await expect
     .poll(() => nodes.evaluateAll((items) => items.filter((node) => getComputedStyle(node).display === 'none').length))
     .toBeGreaterThan(0);
   await expect(page.locator('canvas')).toHaveCount(0);
   const box = (await nodes.first().boundingBox())!;
-  // The gap immediately to the right of the first card is the pan surface.
-  const start = { x: box.x + box.width + 10, y: box.y + 20 };
+  // Start between rows, clear of both nodes and edge interaction strokes.
+  const start = { x: box.x + box.width + 10, y: box.y + box.height + 25 };
   await page.mouse.move(start.x, start.y);
   await page.mouse.down();
   await page.mouse.move(start.x - 450, start.y, { steps: 12 });
@@ -23,7 +22,13 @@ test('stress virtualization retains node DOM and geometry through viewport pan',
   await expect(nodes.first()).toHaveCSS('display', 'none');
   expect(await first!.evaluate((node) => node.isConnected)).toBe(true);
   expect(await first!.evaluate((node) => node.querySelector<HTMLElement>('.handle--right')!.style.top)).toBe(handleTop);
-  await page.getByRole('checkbox', { name: 'Enable virtualization' }).uncheck();
+  const pane = (await page.locator('.vflow-pane').boundingBox())!;
+  // Return via a gap between columns in the translated graph.
+  const back = { x: pane.x + 125, y: pane.y + box.height + 25 };
+  await page.mouse.move(back.x, back.y);
+  await page.mouse.down();
+  await page.mouse.move(back.x + 450, back.y, { steps: 12 });
+  await page.mouse.up();
   await expect(nodes.first()).not.toHaveCSS('display', 'none');
   await expect(nodes.first()).toHaveCSS('visibility', 'visible');
   expect(await first!.evaluate((node) => node.isConnected)).toBe(true);
@@ -67,6 +72,12 @@ test('stress demo reveals custom nodes and edges with positioned handles', async
       (sample: { hidden: number; visibleEdges: number }) => sample.hidden === 1024 && sample.visibleEdges > 0,
     ),
   ).toEqual([]);
+  await expect(page.getByRole('checkbox', { name: 'Enable virtualization' })).toHaveCount(0);
+  expect(
+    await page
+      .locator('.vflow-node')
+      .evaluateAll((nodes) => nodes.filter((node) => getComputedStyle(node).display === 'none').length),
+  ).toBe(0);
   await expect(page.locator('.stress-node')).toHaveCount(1024);
   await expect(page.locator('default-node')).toHaveCount(0);
   await expect(page.locator('svg[edge] .edge')).toHaveCount(1023);

@@ -150,9 +150,9 @@ describe('Graph rendering and interaction regressions', () => {
     edges[0].path();
     nodes.forEach((n) => n.point.set({ x: 100000, y: 100000 }));
     expect(TestBed.inject(NodeRenderingService).viewportNodes()).toEqual([]);
-    const rendering = TestBed.inject(EdgeRenderingService);
+    TestBed.inject(EdgeRenderingService);
     TestBed.flushEffects();
-    expect(rendering.edges()).toEqual([]);
+    expect(edges[0].culled()).toBeTrue();
   });
 
   it('keeps crossing paths with offscreen endpoints at every zoom', () => {
@@ -163,21 +163,20 @@ describe('Graph rendering and interaction regressions', () => {
     settings.optimization.update((value) => ({ ...value, virtualization: true }));
     nodes[0].point.set({ x: -200, y: 0 });
     nodes[1].point.set({ x: 800, y: 0 });
-    const rendering = TestBed.inject(EdgeRenderingService);
+    TestBed.inject(EdgeRenderingService);
     const viewport = TestBed.inject(ViewportService).readableViewport;
     TestBed.flushEffects();
-    expect(rendering.edges()).toContain(edges[0]);
+    expect(edges[0].culled()).toBeFalse();
     expect(edges[0].detached()).toBeFalse();
-    expect(rendering.edges()).toContain(edges[0]);
     viewport.set({ x: 0, y: 1000, zoom: 1 });
     TestBed.flushEffects();
-    expect(rendering.edges()).not.toContain(edges[0]);
+    expect(edges[0].culled()).toBeTrue();
     viewport.set({ x: 0, y: 0, zoom: 1 });
     TestBed.flushEffects();
-    expect(rendering.edges()).toContain(edges[0]);
+    expect(edges[0].culled()).toBeFalse();
     viewport.set({ x: 0, y: 0, zoom: 0.1 });
     TestBed.flushEffects();
-    expect(rendering.edges()).toContain(edges[0]);
+    expect(edges[0].culled()).toBeFalse();
     nodes[0].handles.set([]);
     expect(edges[0].detached()).toBeTrue();
   });
@@ -230,12 +229,12 @@ describe('Graph rendering and interaction regressions', () => {
     settings.optimization.update((value) => ({ ...value, virtualization: true }));
     nodes.forEach((node) => node.point.set({ x: -1000, y: -1000 }));
     edges[0].curve.set(() => ({ path: 'M -1000,-1000 Q 2000,1500 -900,-1000' }));
-    const rendering = TestBed.inject(EdgeRenderingService);
+    TestBed.inject(EdgeRenderingService);
     TestBed.flushEffects();
-    expect(rendering.edges()).toContain(edges[0]);
+    expect(edges[0].culled()).toBeFalse();
     edges[0].curve.set(() => ({ path: 'M -1000,-1000 l 100,0' }));
     TestBed.flushEffects();
-    expect(rendering.edges()).not.toContain(edges[0]);
+    expect(edges[0].culled()).toBeTrue();
   });
 
   for (const offscreenIndex of [0, 1]) {

@@ -12,6 +12,4 @@ This reduces layout and paint work for hidden content. It does not release DOM m
 
 While a node is CSS-hidden, its cached dimensions may become stale if its custom content changes size. The library refreshes them on return; it cannot continuously measure content excluded from layout. Keep geometry in application-owned state when offscreen layout must remain exact.
 
-`virtualizationZoomThreshold`, `NodePreview` and the node’s `preview` property are deprecated and ignored; existing code may retain these fields while migrating.
-
 {{ NgDocActions.demoPane("VirtualizationDemoComponent") }}

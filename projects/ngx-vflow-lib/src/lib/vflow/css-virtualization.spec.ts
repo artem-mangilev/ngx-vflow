@@ -280,7 +280,6 @@ describe('CSS viewport virtualization', () => {
     fixture.componentRef.setInput('optimization', {
       virtualization: true,
       lazyLoadTrigger: 'viewport',
-      virtualizationZoomThreshold: 10,
     });
     fixture.componentRef.setInput('edges', [createEdge({ id: 'edge', source: '0', target: '1' })]);
     await settle(fixture);

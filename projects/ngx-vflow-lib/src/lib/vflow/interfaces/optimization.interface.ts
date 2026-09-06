@@ -1,7 +1,6 @@
 export const DEFAULT_OPTIMIZATION: Required<Optimization> = {
   detachedGroupsLayer: false,
   virtualization: false,
-  virtualizationZoomThreshold: 0.5,
   lazyLoadTrigger: 'immediate',
 };
 
@@ -21,11 +20,6 @@ export interface Optimization {
    * Applies at every zoom; does not reduce DOM memory or stop component effects.
    */
   virtualization?: boolean;
-
-  /**
-   * @deprecated Ignored. Virtualization now uses CSS culling at every zoom.
-   */
-  virtualizationZoomThreshold?: number;
 
   /**
    * The trigger for lazy loading of entities. Virtualization loads nodes immediately
