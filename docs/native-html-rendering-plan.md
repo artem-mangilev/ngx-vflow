@@ -58,42 +58,42 @@ This is what keeps pan/zoom working through the full-size HTML/SVG layers. Get t
 
 ### Core change: zoom/pan transform target
 
-- [projects/ngx-vflow-lib/src/lib/vflow/directives/map-context.directive.ts](projects/ngx-vflow-lib/src/lib/vflow/directives/map-context.directive.ts): retarget `selector` to the pane `div`; attach `d3-zoom` to the pane div (`zoom<HTMLElement, unknown>()`); change host binding from `[attr.transform]` to `[style.transform]` on the viewport div, emitting `translate(${x}px, ${y}px) scale(${k})`. Set `transform-origin: 0 0` in CSS. The d3 transform object (`{x,y,k}`) and `handleZoom`/start/end logic stay the same.
+- [libs/ngx-vflow/src/lib/vflow/directives/map-context.directive.ts](libs/ngx-vflow/src/lib/vflow/directives/map-context.directive.ts): retarget `selector` to the pane `div`; attach `d3-zoom` to the pane div (`zoom<HTMLElement, unknown>()`); change host binding from `[attr.transform]` to `[style.transform]` on the viewport div, emitting `translate(${x}px, ${y}px) scale(${k})`. Set `transform-origin: 0 0` in CSS. The d3 transform object (`{x,y,k}`) and `handleZoom`/start/end logic stay the same.
 
 ### Coordinate conversion (screen <-> flow)
 
-- [projects/ngx-vflow-lib/src/lib/vflow/directives/space-point-context.directive.ts](projects/ngx-vflow-lib/src/lib/vflow/directives/space-point-context.directive.ts): replace SVG `getScreenCTM().inverse()` math with pane-rect + viewport math: `flow = (client - paneRect - {x,y}) / k` using `viewportService.readableViewport()`. This drives `documentPointToFlowPoint` and `svgCurrentSpacePoint` (used by connection line).
-- Update the public `documentPointToFlowPoint` path in [vflow.component.ts](projects/ngx-vflow-lib/src/lib/vflow/components/vflow/vflow.component.ts) accordingly.
+- [libs/ngx-vflow/src/lib/vflow/directives/space-point-context.directive.ts](libs/ngx-vflow/src/lib/vflow/directives/space-point-context.directive.ts): replace SVG `getScreenCTM().inverse()` math with pane-rect + viewport math: `flow = (client - paneRect - {x,y}) / k` using `viewportService.readableViewport()`. This drives `documentPointToFlowPoint` and `svgCurrentSpacePoint` (used by connection line).
+- Update the public `documentPointToFlowPoint` path in [vflow.component.ts](libs/ngx-vflow/src/lib/vflow/components/vflow/vflow.component.ts) accordingly.
 
 ### Root host + directives -> `div`
 
-- [vflow.component.html](projects/ngx-vflow-lib/src/lib/vflow/components/vflow/vflow.component.html) + [vflow.component.scss](projects/ngx-vflow-lib/src/lib/vflow/components/vflow/vflow.component.scss): rebuild template into the layered structure above.
+- [vflow.component.html](libs/ngx-vflow/src/lib/vflow/components/vflow/vflow.component.html) + [vflow.component.scss](libs/ngx-vflow/src/lib/vflow/components/vflow/vflow.component.scss): rebuild template into the layered structure above.
 - Retarget directives from `svg`/`g` to `div`, updating selectors and `ElementRef` generics:
-  - [reference.directive.ts](projects/ngx-vflow-lib/src/lib/vflow/directives/reference.directive.ts) (`RootSvgReferenceDirective` -> root div ref; rename optional),
-  - [root-svg-context.directive.ts](projects/ngx-vflow-lib/src/lib/vflow/directives/root-svg-context.directive.ts),
-  - [root-pointer.directive.ts](projects/ngx-vflow-lib/src/lib/vflow/directives/root-pointer.directive.ts) (listen on root div),
-  - [flow-size-controller.directive.ts](projects/ngx-vflow-lib/src/lib/vflow/directives/flow-size-controller.directive.ts) (measure root div).
+  - [reference.directive.ts](libs/ngx-vflow/src/lib/vflow/directives/reference.directive.ts) (`RootSvgReferenceDirective` -> root div ref; rename optional),
+  - [root-svg-context.directive.ts](libs/ngx-vflow/src/lib/vflow/directives/root-svg-context.directive.ts),
+  - [root-pointer.directive.ts](libs/ngx-vflow/src/lib/vflow/directives/root-pointer.directive.ts) (listen on root div),
+  - [flow-size-controller.directive.ts](libs/ngx-vflow/src/lib/vflow/directives/flow-size-controller.directive.ts) (measure root div).
 
 ### Nodes -> native HTML
 
-- [node.component.ts](projects/ngx-vflow-lib/src/lib/vflow/components/node/node.component.ts): change selector `g[node]` -> `div[node]`, host `ElementRef<HTMLElement>`, host styles `position:absolute; top:0; left:0; transform-origin:0 0`, bind `[style.transform]` to a new CSS translate.
-- [node.component.html](projects/ngx-vflow-lib/src/lib/vflow/components/node/node.component.html): remove all `foreignObject`; render `default` / `html-template` / component nodes as plain `<div>`; convert `default-group`/`template-group` to HTML divs (border/box styling moved to CSS); delete the `svg-template` branch. Move toolbars out to the HTML toolbars layer.
-- [node.model.ts](projects/ngx-vflow-lib/src/lib/vflow/models/node.model.ts): add `pointTransformCss` (`translate(${x}px, ${y}px)`); drop `foWidth`/`foHeight` and the Chrome magic-number; keep `width/height` (still measured by `nodeResizeController`).
-- Position binding in [vflow.component.html](projects/ngx-vflow-lib/src/lib/vflow/components/vflow/vflow.component.html) switches from `[attr.transform]="model.pointTransform()"` to `[style.transform]="model.pointTransformCss()"`.
+- [node.component.ts](libs/ngx-vflow/src/lib/vflow/components/node/node.component.ts): change selector `g[node]` -> `div[node]`, host `ElementRef<HTMLElement>`, host styles `position:absolute; top:0; left:0; transform-origin:0 0`, bind `[style.transform]` to a new CSS translate.
+- [node.component.html](libs/ngx-vflow/src/lib/vflow/components/node/node.component.html): remove all `foreignObject`; render `default` / `html-template` / component nodes as plain `<div>`; convert `default-group`/`template-group` to HTML divs (border/box styling moved to CSS); delete the `svg-template` branch. Move toolbars out to the HTML toolbars layer.
+- [node.model.ts](libs/ngx-vflow/src/lib/vflow/models/node.model.ts): add `pointTransformCss` (`translate(${x}px, ${y}px)`); drop `foWidth`/`foHeight` and the Chrome magic-number; keep `width/height` (still measured by `nodeResizeController`).
+- Position binding in [vflow.component.html](libs/ngx-vflow/src/lib/vflow/components/vflow/vflow.component.html) switches from `[attr.transform]="model.pointTransform()"` to `[style.transform]="model.pointTransformCss()"`.
 
 ### Handles -> native HTML
 
-- [node.component.html](projects/ngx-vflow-lib/src/lib/vflow/components/node/node.component.html): the visual handle elements (`<svg:circle>` default, magnet circle, custom-template `<svg:g>`) become absolutely-positioned HTML `<div>`s using `handle.hostOffset()` for `left/top`. Pointer events (`pointerStart`/`pointerEnd`/`pointerOver`/`pointerOut`) stay.
-- [handle.model.ts](projects/ngx-vflow-lib/src/lib/vflow/models/handle.model.ts): `hostOffset`/`sizeOffset` math is unchanged (now interpreted as CSS px inside the node div). Host measuring via `offsetLeft/offsetTop/offsetWidth/offsetHeight` ([html-element-cache.service.ts](projects/ngx-vflow-lib/src/lib/vflow/services/html-element-cache.service.ts)) keeps working and is actually simpler/cheaper than xyflow here: xyflow uses `getBoundingClientRect` and must divide by `zoom`, but `offsetLeft/offsetTop` are pre-transform layout values, so NO zoom division is needed. The SVG host-reference path (`SvgGraphicElementCacheService`) becomes effectively unused after SVG nodes are dropped.
-- [node.component.scss](projects/ngx-vflow-lib/src/lib/vflow/components/node/node.component.scss): rewrite `.default-handle`, `.magnet`, `.default-group-node` as HTML styles.
+- [node.component.html](libs/ngx-vflow/src/lib/vflow/components/node/node.component.html): the visual handle elements (`<svg:circle>` default, magnet circle, custom-template `<svg:g>`) become absolutely-positioned HTML `<div>`s using `handle.hostOffset()` for `left/top`. Pointer events (`pointerStart`/`pointerEnd`/`pointerOver`/`pointerOut`) stay.
+- [handle.model.ts](libs/ngx-vflow/src/lib/vflow/models/handle.model.ts): `hostOffset`/`sizeOffset` math is unchanged (now interpreted as CSS px inside the node div). Host measuring via `offsetLeft/offsetTop/offsetWidth/offsetHeight` ([html-element-cache.service.ts](libs/ngx-vflow/src/lib/vflow/services/html-element-cache.service.ts)) keeps working and is actually simpler/cheaper than xyflow here: xyflow uses `getBoundingClientRect` and must divide by `zoom`, but `offsetLeft/offsetTop` are pre-transform layout values, so NO zoom division is needed. The SVG host-reference path (`SvgGraphicElementCacheService`) becomes effectively unused after SVG nodes are dropped.
+- [node.component.scss](libs/ngx-vflow/src/lib/vflow/components/node/node.component.scss): rewrite `.default-handle`, `.magnet`, `.default-group-node` as HTML styles.
 
 ### Dragging with zoom
 
-- [draggable.service.ts](projects/ngx-vflow-lib/src/lib/vflow/services/draggable.service.ts): d3-drag now runs on HTML node divs, so `event.x/y` are screen px (not auto-scaled by the old SVG CTM). Following xyflow `XYDrag`, do NOT rely on d3 `event.x/y` deltas; instead recompute the pointer position in flow space from `event.sourceEvent` client coords via the new screen->flow conversion (`(client - rootRect - {x,y}) / zoom`) on every `start`/`drag`. Keep snap-grid, parent-extent, multi-select, and auto-pan logic (auto-pan shifts `lastPos -= movement / zoom`).
+- [draggable.service.ts](libs/ngx-vflow/src/lib/vflow/services/draggable.service.ts): d3-drag now runs on HTML node divs, so `event.x/y` are screen px (not auto-scaled by the old SVG CTM). Following xyflow `XYDrag`, do NOT rely on d3 `event.x/y` deltas; instead recompute the pointer position in flow space from `event.sourceEvent` client coords via the new screen->flow conversion (`(client - rootRect - {x,y}) / zoom`) on every `start`/`drag`. Keep snap-grid, parent-extent, multi-select, and auto-pan logic (auto-pan shifts `lastPos -= movement / zoom`).
 
 ### Zoom/drag event filters (re-validate for HTML DOM)
 
-- With the pane as a `<div>` and HTML nodes, confirm `allowRootZoomForNodeTarget` (d3-zoom `filter`) and the d3-drag `filter` still: (a) allow panning on empty canvas, and (b) suppress panning when interacting with a node/handle. xyflow achieves this with the pointer-events model above plus `nopan`/`nodrag` class checks ([allow-root-zoom-for-node-target.ts](projects/ngx-vflow-lib/src/lib/vflow/utils/allow-root-zoom-for-node-target.ts)).
+- With the pane as a `<div>` and HTML nodes, confirm `allowRootZoomForNodeTarget` (d3-zoom `filter`) and the d3-drag `filter` still: (a) allow panning on empty canvas, and (b) suppress panning when interacting with a node/handle. xyflow achieves this with the pointer-events model above plus `nopan`/`nodrag` class checks ([allow-root-zoom-for-node-target.ts](libs/ngx-vflow/src/lib/vflow/utils/allow-root-zoom-for-node-target.ts)).
 
 ### Node visibility until measured
 
@@ -104,14 +104,14 @@ This is what keeps pan/zoom working through the full-size HTML/SVG layers. Get t
 DECISION (fixed): adopt the xyflow-style **per-edge `<svg>`** approach (not a single shared SVG), so edges and nodes interleave by z-index.
 
 - `.edges-layer`: a `<div>` with `position:absolute; pointer-events:none` and NO `z-index` (must not create an isolated stacking context). Render one `<svg>` per edge inside it.
-- [edge.component.ts](projects/ngx-vflow-lib/src/lib/vflow/components/edge/edge.component.ts): change selector from `g[edge]` to a wrapper that renders its own `<svg style="position:absolute; overflow:visible; pointer-events:none" [style.zIndex]="...">` containing the existing `<g>` content ([edge.component.html](projects/ngx-vflow-lib/src/lib/vflow/components/edge/edge.component.html) paths + reconnect handles, flow coords already correct via `pointAbsolute()`). The interaction path keeps `pointer-events: visibleStroke`/`all`.
+- [edge.component.ts](libs/ngx-vflow/src/lib/vflow/components/edge/edge.component.ts): change selector from `g[edge]` to a wrapper that renders its own `<svg style="position:absolute; overflow:visible; pointer-events:none" [style.zIndex]="...">` containing the existing `<g>` content ([edge.component.html](libs/ngx-vflow/src/lib/vflow/components/edge/edge.component.html) paths + reconnect handles, flow coords already correct via `pointAbsolute()`). The interaction path keeps `pointer-events: visibleStroke`/`all`.
 - Per-edge `z-index`: derive from the edge model render/elevation order (extend `EdgeModel` with a `renderOrder`/z signal analogous to `NodeModel.renderOrder`), honoring `elevateEdgesOnSelect`. Nodes already get a per-node `z-index` from `renderOrder`; both must be emitted as real CSS `z-index` so they share one stacking context.
 - Shared `<defs flowDefs>`: render once as its own `<svg class="defs">` inside the viewport (xyflow renders `MarkerDefinitions` as a standalone `<svg>`; `url(#id)` marker refs are document-global).
 - Connection line, `selection-box`, `alignment-helper` stay SVG but move to a dedicated overlay `<svg>` (flow coords). Give the connection-line overlay a high `z-index` (xyflow uses ~1001 for `.connectionline`) so it draws above edges/nodes while connecting.
 
 ### HTML edge labels
 
-- [edge-label.component.ts](projects/ngx-vflow-lib/src/lib/vflow/components/edge-label/edge-label.component.ts) + [.html](projects/ngx-vflow-lib/src/lib/vflow/components/edge-label/edge-label.component.html): change from `g[edgeLabel]`/`foreignObject` to an HTML `<div>` positioned with `transform: translate(labelPoint)` rendered in the dedicated `.edge-labels-layer` (lifted out of the edges SVG). Size measurement keeps using `BasicElementCacheService` (drop the Chrome magic-number).
+- [edge-label.component.ts](libs/ngx-vflow/src/lib/vflow/components/edge-label/edge-label.component.ts) + [.html](libs/ngx-vflow/src/lib/vflow/components/edge-label/edge-label.component.html): change from `g[edgeLabel]`/`foreignObject` to an HTML `<div>` positioned with `transform: translate(labelPoint)` rendered in the dedicated `.edge-labels-layer` (lifted out of the edges SVG). Size measurement keeps using `BasicElementCacheService` (drop the Chrome magic-number).
 
 ### Toolbars (HTML overlay)
 
@@ -119,16 +119,16 @@ DECISION (fixed): adopt the xyflow-style **per-edge `<svg>`** approach (not a si
 
 ### Resizer -> HTML
 
-- [resizable.component.html](projects/ngx-vflow-lib/src/lib/vflow/public-components/resizable/resizable.component.html) (+ ts/scss): rewrite the SVG `<line>`/`<rect>` resizer as HTML border/corner handle `<div>`s, keeping `(pointerStart)` -> `startResize(...)` directions.
+- [resizable.component.html](libs/ngx-vflow/src/lib/vflow/public-components/resizable/resizable.component.html) (+ ts/scss): rewrite the SVG `<line>`/`<rect>` resizer as HTML border/corner handle `<div>`s, keeping `(pointerStart)` -> `startResize(...)` directions.
 
 ### Background & minimap
 
-- [background.component.ts](projects/ngx-vflow-lib/src/lib/vflow/components/background/background.component.ts): stays a fixed full-size SVG layer driven by viewport signals; retarget its `RootSvgReferenceDirective` usage (background-color now set on the root/background element).
-- [minimap.component.html](projects/ngx-vflow-lib/src/lib/vflow/public-components/minimap/minimap.component.html): move to a fixed positioned overlay `<svg>` (currently injected inside the root svg). Replace its node-preview `foreignObject` with `<rect>` previews to keep it fully SVG.
+- [background.component.ts](libs/ngx-vflow/src/lib/vflow/components/background/background.component.ts): stays a fixed full-size SVG layer driven by viewport signals; retarget its `RootSvgReferenceDirective` usage (background-color now set on the root/background element).
+- [minimap.component.html](libs/ngx-vflow/src/lib/vflow/public-components/minimap/minimap.component.html): move to a fixed positioned overlay `<svg>` (currently injected inside the root svg). Replace its node-preview `foreignObject` with `<rect>` previews to keep it fully SVG.
 
 ### Cleanup / API changes
 
-- Remove `svg-template` from [node.interface](projects/ngx-vflow-lib/src/lib/vflow/models/node.model.ts) types, `NodeSvgTemplateDirective` and `nodeSvgTemplate` inputs (template.directive + vflow.component), and the `MAGIC_NUMBER_TO_FIX_GLITCH_IN_CHROME` usages. Update `public-api.ts` and demo references if needed.
+- Remove `svg-template` from [node.interface](libs/ngx-vflow/src/lib/vflow/models/node.model.ts) types, `NodeSvgTemplateDirective` and `nodeSvgTemplate` inputs (template.directive + vflow.component), and the `MAGIC_NUMBER_TO_FIX_GLITCH_IN_CHROME` usages. Update `public-api.ts` and demo references if needed.
 
 ### Validation
 

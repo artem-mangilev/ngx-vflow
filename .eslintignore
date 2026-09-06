@@ -3,3 +3,5 @@ ng-doc
 dist
 .angular
 **/index.html
+
+.nx

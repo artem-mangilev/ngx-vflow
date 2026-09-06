@@ -1,0 +1,60 @@
+{
+  "$schema": "./node_modules/nx/schemas/nx-schema.json",
+  "defaultBase": "main",
+  "workspaceLayout": {
+    "appsDir": "apps",
+    "libsDir": "libs"
+  },
+  "namedInputs": {
+    "default": ["{projectRoot}/**/*", "sharedGlobals"],
+    "sharedGlobals": ["{workspaceRoot}/tsconfig.json", "{workspaceRoot}/.postcssrc.json"],
+    "production": ["default", "!{projectRoot}/**/*.spec.ts"]
+  },
+  "targetDefaults": {
+    "build": {
+      "cache": true,
+      "dependsOn": ["^build"],
+      "inputs": ["production", "^production"]
+    },
+    "lint": {
+      "cache": true,
+      "inputs": ["default", "{workspaceRoot}/.eslintrc"]
+    },
+    "test": {
+      "cache": true
+    }
+  },
+  "release": {
+    "projects": ["tag:release"],
+    "projectsRelationship": "fixed",
+    "releaseTagPattern": "v{version}",
+    "version": {
+      "preVersionCommand": "npx nx run-many -t build -p tag:release --configuration production",
+      "manifestRootsToUpdate": ["{projectRoot}", "dist/{projectRoot}"],
+      "versionActionsOptions": {
+        "skipLockFileUpdate": true
+      },
+      "conventionalCommits": true
+    },
+    "changelog": {
+      "workspaceChangelog": {
+        "createRelease": false
+      }
+    },
+    "git": {
+      "commit": true,
+      "tag": true
+    },
+    "conventionalCommits": {
+      "types": {
+        "refactor": {
+          "semverBump": "patch"
+        },
+        "perf": {
+          "semverBump": "patch"
+        }
+      }
+    }
+  },
+  "plugins": ["@nx/angular/plugin"]
+}

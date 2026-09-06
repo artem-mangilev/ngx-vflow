@@ -1,0 +1,44 @@
+{
+  "projectType": "library",
+  "sourceRoot": "libs/ngx-vflow/src",
+  "prefix": "lib",
+  "name": "ngx-vflow",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "targets": {
+    "build": {
+      "options": {
+        "project": "libs/ngx-vflow/ng-package.json"
+      },
+      "configurations": {
+        "production": {
+          "tsConfig": "libs/ngx-vflow/tsconfig.lib.prod.json"
+        },
+        "development": {
+          "tsConfig": "libs/ngx-vflow/tsconfig.lib.json"
+        }
+      },
+      "defaultConfiguration": "production",
+      "executor": "@angular-devkit/build-angular:ng-packagr",
+      "outputs": ["{workspaceRoot}/dist/libs/ngx-vflow"]
+    },
+    "test": {
+      "options": {
+        "tsConfig": "libs/ngx-vflow/tsconfig.spec.json"
+      },
+      "executor": "@angular-devkit/build-angular:karma"
+    },
+    "lint": {
+      "options": {
+        "lintFilePatterns": ["libs/ngx-vflow/**/*.ts", "libs/ngx-vflow/**/*.component.html"]
+      },
+      "executor": "@angular-eslint/builder:lint"
+    },
+    "nx-release-publish": {
+      "executor": "@nx/js:release-publish",
+      "options": {
+        "packageRoot": "dist/{projectRoot}"
+      }
+    }
+  },
+  "tags": ["release"]
+}

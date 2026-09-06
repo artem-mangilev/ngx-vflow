@@ -1,0 +1,42 @@
+{
+  "name": "ui",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "library",
+  "sourceRoot": "libs/ui/src",
+  "tags": ["release"],
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "outputs": ["{workspaceRoot}/dist/libs/ui"],
+      "options": {
+        "parallel": false,
+        "commands": [
+          "ng-packagr -p libs/ui/ng-package.json -c libs/ui/tsconfig.lib.prod.json",
+          "tailwindcss -i libs/ui/src/styles.css -o dist/libs/ui/styles.css --minify"
+        ]
+      },
+      "configurations": {
+        "production": {},
+        "development": {
+          "commands": [
+            "ng-packagr -p libs/ui/ng-package.json -c libs/ui/tsconfig.lib.json",
+            "tailwindcss -i libs/ui/src/styles.css -o dist/libs/ui/styles.css --minify"
+          ]
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "lint": {
+      "executor": "@angular-eslint/builder:lint",
+      "options": {
+        "lintFilePatterns": ["libs/ui/src/**/*.ts"]
+      }
+    },
+    "nx-release-publish": {
+      "executor": "@nx/js:release-publish",
+      "options": {
+        "packageRoot": "dist/{projectRoot}"
+      }
+    }
+  }
+}

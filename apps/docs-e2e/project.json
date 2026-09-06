@@ -1,0 +1,20 @@
+{
+  "name": "docs-e2e",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "implicitDependencies": ["docs"],
+  "targets": {
+    "e2e": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "playwright test --config apps/docs-e2e/playwright.config.ts"
+      }
+    },
+    "lint": {
+      "executor": "@angular-eslint/builder:lint",
+      "options": {
+        "lintFilePatterns": ["apps/docs-e2e/**/*.ts"]
+      }
+    }
+  }
+}

@@ -1,0 +1,36 @@
+@if (model; as model) {
+  <div
+    #handleElement
+    class="handle handle--{{ position() }}"
+    [vflowA11y]="accessibility()"
+    [class.handle--default]="template() === undefined"
+    [style.top]="model.layoutStyles().top"
+    [style.left]="model.layoutStyles().left"
+    [style.right]="model.layoutStyles().right"
+    [style.bottom]="model.layoutStyles().bottom"
+    [style.--vflow-handle-offset-x]="-offsetX() + 'px'"
+    [style.--vflow-handle-offset-y]="-offsetY() + 'px'"
+    (pointerStart)="startConnection($event)"
+    (pointerEnd)="endConnection()">
+    @if (template()) {
+      <ng-container *ngTemplateOutlet="template()!; context: model.templateContext" />
+    }
+  </div>
+
+  @if (showMagnet()) {
+    <div
+      class="magnet handle--{{ position() }}"
+      aria-hidden="true"
+      [style.top]="model.layoutStyles().top"
+      [style.left]="model.layoutStyles().left"
+      [style.right]="model.layoutStyles().right"
+      [style.bottom]="model.layoutStyles().bottom"
+      [style.width.px]="model.parentNode.magnetRadius * 2"
+      [style.height.px]="model.parentNode.magnetRadius * 2"
+      [style.--vflow-handle-offset-x]="-offsetX() + 'px'"
+      [style.--vflow-handle-offset-y]="-offsetY() + 'px'"
+      (pointerEnd)="endConnection(); resetValidateConnection()"
+      (pointerOver)="validateConnection()"
+      (pointerOut)="resetValidateConnection()"></div>
+  }
+}

@@ -1,0 +1,136 @@
+{
+  "projectType": "application",
+  "schematics": {
+    "@schematics/angular:component": {
+      "style": "scss"
+    }
+  },
+  "sourceRoot": "apps/docs/src",
+  "prefix": "app",
+  "name": "docs",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "targets": {
+    "build": {
+      "options": {
+        "outputPath": "dist/apps/docs",
+        "index": "apps/docs/src/index.html",
+        "browser": "apps/docs/src/main.ts",
+        "tsConfig": "apps/docs/tsconfig.app.json",
+        "inlineStyleLanguage": "scss",
+        "assets": [
+          "apps/docs/src/favicon.ico",
+          {
+            "glob": "robots.txt",
+            "input": "apps/docs/src/assets",
+            "output": "/"
+          },
+          {
+            "glob": "sitemap.xml",
+            "input": "apps/docs/src/assets",
+            "output": "/"
+          },
+          "apps/docs/src/assets",
+          {
+            "glob": "**/*",
+            "input": "node_modules/@ng-doc/ui-kit/assets",
+            "output": "assets/ng-doc/ui-kit"
+          },
+          {
+            "glob": "**/*",
+            "input": "node_modules/@ng-doc/app/assets",
+            "output": "assets/ng-doc/app"
+          },
+          {
+            "glob": "**/*",
+            "input": "ng-doc/docs/assets",
+            "output": "assets/ng-doc"
+          },
+          {
+            "glob": "**/*.wasm",
+            "input": "node_modules/@vizdom/vizdom-ts-web/",
+            "output": "assets/vizdom"
+          }
+        ],
+        "styles": ["libs/ui/src/styles.css", "apps/docs/src/styles.scss", "node_modules/@ng-doc/app/styles/global.css"],
+        "scripts": []
+      },
+      "configurations": {
+        "production": {
+          "budgets": [
+            {
+              "type": "initial",
+              "maximumWarning": "2mb",
+              "maximumError": "4mb"
+            },
+            {
+              "type": "anyComponentStyle",
+              "maximumWarning": "2kb",
+              "maximumError": "4kb"
+            }
+          ],
+          "outputHashing": "all"
+        },
+        "hybrid": {
+          "tsConfig": "apps/docs/tsconfig.hybrid.json",
+          "optimization": false,
+          "extractLicenses": false,
+          "sourceMap": true,
+          "namedChunks": true,
+          "styles": [
+            "dist/libs/ui/styles.css",
+            "apps/docs/src/styles.scss",
+            "node_modules/@ng-doc/app/styles/global.css"
+          ]
+        },
+        "development": {
+          "optimization": false,
+          "extractLicenses": false,
+          "sourceMap": true,
+          "namedChunks": true
+        }
+      },
+      "defaultConfiguration": "production",
+      "executor": "@ng-doc/builder:application",
+      "outputs": ["{workspaceRoot}/dist/apps/docs", "{workspaceRoot}/ng-doc/docs"]
+    },
+    "serve": {
+      "configurations": {
+        "production": {
+          "buildTarget": "docs:build:production"
+        },
+        "hybrid": {
+          "buildTarget": "docs:build:hybrid"
+        },
+        "development": {
+          "buildTarget": "docs:build:development"
+        }
+      },
+      "defaultConfiguration": "development",
+      "executor": "@ng-doc/builder:dev-server"
+    },
+    "test": {
+      "options": {
+        "tsConfig": "apps/docs/tsconfig.spec.json",
+        "inlineStyleLanguage": "scss",
+        "assets": [
+          "apps/docs/src/favicon.ico",
+          "apps/docs/src/assets",
+          {
+            "glob": "**/*.wasm",
+            "input": "node_modules/@vizdom/vizdom-ts-web/",
+            "output": "assets/vizdom"
+          }
+        ],
+        "styles": ["apps/docs/src/styles.scss"],
+        "scripts": []
+      },
+      "executor": "@angular-devkit/build-angular:karma"
+    },
+    "lint": {
+      "options": {
+        "lintFilePatterns": ["apps/docs/src/**/*.ts", "apps/docs/src/**/*.component.html"]
+      },
+      "executor": "@angular-eslint/builder:lint"
+    }
+  }
+}

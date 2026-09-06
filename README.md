@@ -34,11 +34,12 @@ npm install ngx-vflow --save
 
 ## Version Compatibility
 
-| ngx-vflow | Angular   |
-| --------- | --------- |
-| v0.x      | v16.2.0+  |
-| v1.x      | v17.3.12+ |
-| v2.x      | v19.2.17+ |
+| ngx-vflow   | Angular   |
+| ----------- | --------- |
+| v0.x        | v16.2.0+  |
+| v1.x        | v17.3.12+ |
+| v2.x        | v19.2.17+ |
+| v3.x (next) | v20.0.0+  |
 
 ## Community & Support
 
@@ -49,3 +50,17 @@ npm install ngx-vflow --save
 ## License
 
 MIT © [Artem Mangilev](https://github.com/artem-mangilev)
+
+## Development
+
+Use Node 22 (`nvm use`) and `npm ci`.
+
+- `apps/docs`: NgDoc application; `apps/docs-e2e`: Playwright tests.
+- `libs/ngx-vflow`: engine and `ngx-vflow/testing` entry point.
+- `libs/ui`: optional `@vflow/ui` design system (Tailwind CSS 4).
+- `npm start`: docs dev server with source imports and live reload.
+- `npm run build:dev` / `npm run build`: all libraries and docs in development / production.
+- `npm run start:hybrid`: build both libraries, then serve docs using their distribution entry points.
+- `npm run lint`, `npm test`, `npm run e2e`: Nx verification targets.
+
+See [release instructions](docs/releasing.md) for shared package versions, dry-runs and adding packages.

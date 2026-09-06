@@ -1,40 +1,50 @@
 name: release
 
 on:
-  workflow_dispatch: # Allow manual triggering
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Preview only; do not publish, commit or push'
+        type: boolean
+        default: true
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions:
+  contents: write
 
 env:
-  NODE_VERSION: '20.9.0' # Node.js version
+  NX_DAEMON: 'false'
 
 jobs:
-  release-and-publish:
+  release:
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-
     steps:
-      # Step 1: Checkout the repository
-      - name: Checkout Repository
-        uses: actions/checkout@v3
-
-      # Step 2: Set up Node.js environment
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
         with:
-          registry-url: 'https://registry.npmjs.org/'
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-
-      # Step 3: Install dependencies
-      - name: Install Dependencies
-        run: npm ci
-
-      - name: Build Library
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          registry-url: https://registry.npmjs.org
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test -- --watch=false --browsers=ChromeHeadless
+      - run: npm run build
+      - name: Configure release author
         run: |
-          cd projects/ngx-vflow-lib
-          npx ng build
-
-      # Step 4: Analyze version and publish using Semantic Release
-      - name: Run Semantic Release
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+      - name: Version, changelog and publish all release packages
         env:
+          DRY_RUN: ${{ inputs.dry_run }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           GITHUB_TOKEN: ${{ github.token }}
-        run: npx semantic-release
+        run: npx nx release --yes --dry-run="$DRY_RUN"
+      - name: Push release commit and tag
+        if: ${{ !inputs.dry_run }}
+        run: git push --follow-tags origin HEAD:main

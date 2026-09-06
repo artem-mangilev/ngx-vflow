@@ -1,0 +1,25 @@
+{
+  "name": "@vflow/ui",
+  "version": "2.7.0",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/artem-mangilev/ngx-vflow",
+    "directory": "libs/ui"
+  },
+  "peerDependencies": {
+    "@angular/core": "^20.0.0 || ^21.0.0"
+  },
+  "dependencies": {
+    "tslib": "^2.3.0"
+  },
+  "sideEffects": [
+    "./styles.css"
+  ],
+  "exports": {
+    "./styles.css": "./styles.css"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

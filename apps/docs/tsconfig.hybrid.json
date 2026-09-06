@@ -1,0 +1,18 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "../../out-tsc/app",
+    "types": [],
+    // override paths from root tsconfig.json
+    "paths": {
+      "@ng-doc/generated": ["ng-doc/docs/index.ts"],
+      "@ng-doc/generated/*": ["ng-doc/docs/*"],
+      // alias to production build of the library instead of building it as part of application
+      "@vflow/ui": ["dist/libs/ui"],
+      "ngx-vflow": ["dist/libs/ngx-vflow"],
+      "ngx-vflow/testing": ["dist/libs/ngx-vflow/testing"]
+    }
+  },
+  "files": ["src/main.ts"],
+  "include": ["src/**/*.d.ts"]
+}

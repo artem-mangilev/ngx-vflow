@@ -6,8 +6,8 @@ MVP acceptance decision, 2026-09-05: the user accepted the implementation as suf
 
 ## Automated checks
 
-- `npx ng test ngx-vflow-lib --no-watch --no-progress --browsers=ChromeHeadless --include='**/accessibility.spec.ts'`: public inputs/factories → rendered roles, names, descriptions, reactive updates, safe metadata, custom button and independent description cleanup/live regions.
-- `npx playwright test e2e/accessibility.spec.ts --reporter=line`: real pointer connection gestures, idle/valid/invalid candidate descriptions, capability restrictions, localization and native button activation. axe runs over the example in idle, valid and invalid states without disabled rules.
+- `npx nx test ngx-vflow --watch=false --browsers=ChromeHeadless --include='**/accessibility.spec.ts'`: public inputs/factories → rendered roles, names, descriptions, reactive updates, safe metadata, custom button and independent description cleanup/live regions.
+- `npm run e2e -- accessibility.spec.ts --reporter=line`: real pointer connection gestures, idle/valid/invalid candidate descriptions, capability restrictions, localization and native button activation. axe runs over the example in idle, valid and invalid states without disabled rules.
 - Both targeted checks passed on 2026-09-05. axe reported zero violations in those states. This is scoped to the example, not the documentation site's unrelated navigation shell.
 - Final regression run on 2026-09-05: all 164 library tests and all 4 Playwright tests passed. `npx ng build ngx-vflow-lib` built both the main library and `ngx-vflow/testing`. Commit hooks passed ESLint and Prettier for changed files.
 

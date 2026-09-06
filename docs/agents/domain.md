@@ -17,7 +17,8 @@ If these files don't exist, **proceed silently**. Don't flag their absence or su
 ├── docs/adr/
 │   ├── 0001-example-decision.md
 │   └── 0002-another-decision.md
-└── projects/
+├── apps/
+└── libs/
 ```
 
 ## Use the glossary's vocabulary
