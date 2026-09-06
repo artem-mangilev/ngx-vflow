@@ -39,7 +39,11 @@ export class ViewportService {
    */
   public readonly readableViewport: WritableSignal<ViewportState> = signal(ViewportService.getDefaultViewport());
 
-  public readonly viewportChangeEnd$ = new Subject<void>();
+  public readonly viewportChangeStart$ = new Subject<ViewportState>();
+
+  public readonly viewportChange$ = new Subject<ViewportState>();
+
+  public readonly viewportChangeEnd$ = new Subject<ViewportState>();
 
   // TODO: add writableViewportWithConstraints (to apply min zoom/max zoom values)
 
@@ -60,9 +64,13 @@ export class ViewportService {
     this.writableViewport.set({ changeType: 'absolute', state, duration });
   }
 
-  public triggerViewportChangeEvent(type: 'end') {
-    if (type === 'end') {
-      this.viewportChangeEnd$.next();
+  public triggerViewportChangeEvent(type: 'start' | 'zoom' | 'end', viewport: ViewportState) {
+    if (type === 'start') {
+      this.viewportChangeStart$.next(viewport);
+    } else if (type === 'end') {
+      this.viewportChangeEnd$.next(viewport);
+    } else if (type === 'zoom') {
+      this.viewportChange$.next(viewport);
     }
   }
 
