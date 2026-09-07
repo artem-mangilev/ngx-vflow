@@ -24,6 +24,10 @@ _Avoid_: Visibility, disabled state
 The rules that determine which user gestures pan or zoom the viewport and how competing gestures are prioritized. Explicit programmatic viewport changes are outside this policy.
 _Avoid_: Keyboard shortcuts, interaction eligibility
 
+**Viewport controls**:
+Visible controls for navigating the graph's viewing area and changing its zoom.
+_Avoid_: Node actions, form controls
+
 **First-party extension**:
 An optional capability maintained by the package authors but distributed outside the main package contract.
 _Avoid_: Core feature, third-party integration
@@ -31,6 +35,14 @@ _Avoid_: Core feature, third-party integration
 **Official recipe**:
 A documented composition of package primitives that application code must implement and own.
 _Avoid_: Core feature, built-in feature
+
+**UI primitive**:
+A stable, composable presentation part of a node-based interface whose application-specific content and business rules belong to the consuming application.
+_Avoid_: Business component, editor application
+
+**Headless presentation**:
+A consumption model in which the application supplies node and edge visuals, using its own UI or first-party UI primitives, while the engine owns graph rendering and interaction mechanics.
+_Avoid_: No rendering, no interaction feedback
 
 **Feature gap**:
 A capability supplied as a core feature by a competing node-based UI engine but absent from ngx-vflow's core package.
@@ -55,6 +67,10 @@ _Avoid_: Change notification, internal mutation
 **Parent node**:
 A node referenced by another node's parent relationship, establishing nested coordinates. Any node type may be a parent; a visual group type is not required.
 _Avoid_: Group node
+
+**Container frame**:
+A titled visual boundary around a set of nodes. Its presentation is distinct from the parent relationships that determine coordinate nesting and movement.
+_Avoid_: Parent node, automatic grouping
 
 **Client space**:
 The browser viewport coordinate system used by DOM events through `clientX` and `clientY`.

@@ -1,4 +1,265 @@
-@layer theme, utilities;
+@layer vui, theme, utilities;
 @import 'tailwindcss/theme.css' layer(theme) prefix(vui);
 @import 'tailwindcss/utilities.css' layer(utilities) prefix(vui) source(none);
 @source './';
+
+@layer vui {
+  :root,
+  [data-vui-theme='light'] {
+    --vui-canvas: #f4f6fa;
+    --vui-surface: #fff;
+    --vui-surface-muted: #f0f3f8;
+    --vui-foreground: #192638;
+    --vui-muted: #566579;
+    --vui-border: #b5bfce;
+    --vui-accent: #4338ca;
+    --vui-on-accent: #fff;
+    --vui-success: #166534;
+    --vui-warning: #854d0e;
+    --vui-danger: #b91c1c;
+    --vui-info: #1d4ed8;
+    --vui-radius: 12px;
+    --vui-padding: 14px;
+    --vui-field-height: 38px;
+    --vui-font-size: 14px;
+    --vui-port-size: 14px;
+    --vui-edge-width: 2px;
+  }
+
+  [data-vui-theme='dark'] {
+    --vui-canvas: #101827;
+    --vui-surface: #1b283b;
+    --vui-surface-muted: #243449;
+    --vui-foreground: #f1f5fb;
+    --vui-muted: #afbed1;
+    --vui-border: #6b7e96;
+    --vui-accent: #b5acff;
+    --vui-on-accent: #19143d;
+    --vui-success: #86efac;
+    --vui-warning: #fde047;
+    --vui-danger: #fca5a5;
+    --vui-info: #93c5fd;
+  }
+
+  :where(
+    .vui-node,
+    .vui-group,
+    .vui-bpmn-event,
+    .vui-bpmn-gateway,
+    .vui-button,
+    .vui-edge-label,
+    .vui-status,
+    .vui-port
+  ) {
+    box-sizing: border-box;
+    font: inherit;
+  }
+
+  :where(.vui-node, .vui-group, .vui-bpmn-event, .vui-bpmn-gateway) {
+    position: relative;
+    color: var(--vui-foreground);
+    font-size: var(--vui-font-size);
+    line-height: 1.4;
+  }
+
+  .vui-node {
+    background: var(--vui-surface);
+    border: 1px solid var(--vui-border);
+    border-radius: var(--vui-radius);
+    box-shadow: 0 3px 10px #0000000a;
+  }
+
+  :where(.vui-node-header, .vui-node-footer, .vui-field) {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: var(--vui-padding);
+  }
+
+  .vui-node-header {
+    font-weight: 600;
+    border-bottom: 1px solid var(--vui-border);
+    border-radius: var(--vui-radius) var(--vui-radius) 0 0;
+    background: var(--vui-surface-muted);
+  }
+
+  .vui-node-body {
+    padding: var(--vui-padding);
+  }
+  .vui-node-footer {
+    border-top: 1px solid var(--vui-border);
+  }
+  .vui-field {
+    min-height: var(--vui-field-height);
+    padding-block: 6px;
+  }
+  .vui-field + .vui-field {
+    border-top: 1px solid var(--vui-border);
+  }
+
+  .vui-group {
+    border: 1px dashed var(--vui-border);
+    border-radius: var(--vui-radius);
+    background: color-mix(in srgb, var(--vui-surface-muted) 55%, transparent);
+  }
+
+  :where(.vui-node, .vui-group, .vui-bpmn-event)[data-vui-selected='true'] {
+    outline: 2px solid var(--vui-selection, var(--vui-accent));
+    outline-offset: 2px;
+  }
+
+  .vui-port {
+    display: block;
+    width: var(--vui-port-size);
+    height: var(--vui-port-size);
+    border: 2px solid var(--vui-surface);
+    border-radius: 50%;
+    background: var(--vui-port-color, var(--vui-muted));
+  }
+  .vui-port[data-state='valid'] {
+    background: var(--vui-success);
+  }
+  .vui-port[data-state='invalid'] {
+    background: var(--vui-danger);
+    border-style: dashed;
+  }
+
+  .vui-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    border: 1px solid currentColor;
+    border-radius: 999px;
+    padding: 2px 8px;
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--vui-muted);
+    background: var(--vui-surface);
+  }
+  .vui-status[data-tone='info'] {
+    color: var(--vui-info);
+  }
+  .vui-status[data-tone='success'] {
+    color: var(--vui-success);
+  }
+  .vui-status[data-tone='warning'] {
+    color: var(--vui-warning);
+  }
+  .vui-status[data-tone='danger'] {
+    color: var(--vui-danger);
+  }
+
+  .vui-edge {
+    fill: none;
+    stroke: var(--vui-edge-color, var(--vui-muted));
+    stroke-width: var(--vui-edge-width);
+    stroke-linejoin: round;
+  }
+  .vui-edge[data-vui-selected='true'] {
+    stroke: var(--vui-selection, var(--vui-accent));
+  }
+
+  .vui-edge-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 9px;
+    border: 1px solid var(--vui-border);
+    border-radius: 6px;
+    background: var(--vui-surface);
+    color: var(--vui-foreground);
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  .vui-button {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    border: 1px solid transparent;
+    border-radius: 7px;
+    padding: 7px 12px;
+    background: var(--vui-accent);
+    color: var(--vui-on-accent);
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.4;
+    cursor: pointer;
+  }
+  .vui-button:hover:enabled {
+    filter: brightness(1.12);
+  }
+  .vui-button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+  .vui-button:focus-visible {
+    outline: 2px solid var(--vui-focus, var(--vui-accent));
+    outline-offset: 3px;
+  }
+
+  .vui-bpmn-event {
+    display: grid;
+    place-items: center;
+    width: 56px;
+    height: 56px;
+    border: 2px solid var(--vui-foreground);
+    border-radius: 50%;
+    background: var(--vui-surface);
+  }
+  .vui-bpmn-event[data-event='intermediate'] {
+    border: 5px double var(--vui-foreground);
+  }
+  .vui-bpmn-event[data-event='end'] {
+    border-width: 5px;
+  }
+
+  .vui-bpmn-gateway {
+    display: grid;
+    place-items: center;
+    isolation: isolate;
+    width: 64px;
+    height: 64px;
+    font-size: 28px;
+  }
+  .vui-bpmn-gateway::before {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    box-sizing: border-box;
+    width: 70.7107%;
+    height: 70.7107%;
+    background: var(--vui-surface);
+    border: 2px solid var(--vui-foreground);
+    transform: rotate(45deg);
+  }
+  .vui-bpmn-gateway[data-vui-selected='true']::before {
+    outline: 2px solid var(--vui-selection, var(--vui-accent));
+    outline-offset: 2px;
+  }
+
+  @media (forced-colors: active) {
+    .vui-button {
+      border-color: ButtonText;
+    }
+    .vui-port {
+      background: ButtonText;
+      border-color: Canvas;
+      forced-color-adjust: none;
+    }
+    .vui-port[data-state='invalid'] {
+      border-style: dashed;
+    }
+    .vui-edge {
+      stroke: CanvasText;
+    }
+    .vui-edge[data-vui-selected='true'] {
+      stroke: Highlight;
+    }
+    :where(.vui-node, .vui-group, .vui-bpmn-event)[data-vui-selected='true'],
+    .vui-bpmn-gateway[data-vui-selected='true']::before {
+      outline-color: Highlight;
+    }
+  }
+}

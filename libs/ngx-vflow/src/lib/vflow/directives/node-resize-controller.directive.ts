@@ -12,7 +12,7 @@ import { ResizeObserverService } from '../services/resize-observer.service';
 export class NodeResizeControllerDirective implements OnInit, OnDestroy {
   private nodeAccessor = inject(NodeAccessorService);
   private resizeObserverService = inject(ResizeObserverService);
-  private hostElementRef = inject<ElementRef<Element>>(ElementRef);
+  private hostElementRef = inject<ElementRef<HTMLElement>>(ElementRef);
   private resizeCallback: ((resizeEntry: ResizeObserverEntry) => void) | null = null;
 
   constructor() {
@@ -26,8 +26,10 @@ export class NodeResizeControllerDirective implements OnInit, OnDestroy {
     const target = this.hostElementRef.nativeElement;
     // display:none notifications must not overwrite cached geometry with zeros.
     if (!model || model.culled() || !target.getClientRects().length) return;
-    model.width.set(target.scrollWidth);
-    model.height.set(target.scrollHeight);
+    // Measure the layout box, excluding protruding ports and external labels.
+    // scrollWidth/Height would feed their overflow back into the next edge geometry pass.
+    model.width.set(target.offsetWidth);
+    model.height.set(target.offsetHeight);
     model.isMeasured.set(true);
   }
 

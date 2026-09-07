@@ -1,0 +1,41 @@
+:host {
+  display: block;
+}
+.demo {
+  border: 1px solid var(--vui-border);
+  border-radius: 14px;
+  background: var(--vui-canvas);
+  color: var(--vui-foreground);
+  overflow: hidden;
+}
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 14px;
+  border-bottom: 1px solid var(--vui-border);
+}
+.controls label {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  font-size: 13px;
+}
+.controls p {
+  margin: 0;
+  color: var(--vui-muted);
+  font-size: 13px;
+}
+vflow {
+  display: block;
+  height: 480px;
+}
+.grow {
+  flex: 1;
+  min-width: 0;
+}
+.muted {
+  color: var(--vui-muted);
+  font-size: 12px;
+}

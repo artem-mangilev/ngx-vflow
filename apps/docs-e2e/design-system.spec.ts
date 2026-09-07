@@ -1,15 +1,130 @@
-import { expect, test } from '@playwright/test';
+import { expect, Locator, test } from '@playwright/test';
 
-test('NgDoc uses the UI package and flow engine together', async ({ page }) => {
+async function rowAlignment(demo: Locator) {
+  return demo.locator('[vflowField]').evaluateAll((rows) =>
+    Math.max(
+      ...rows.flatMap((row) => {
+        const rect = row.getBoundingClientRect();
+        return Array.from(row.querySelectorAll('.vui-port')).map((port) => {
+          const handle = port.getBoundingClientRect();
+          return Math.abs(rect.y + rect.height / 2 - handle.y - handle.height / 2);
+        });
+      }),
+    ),
+  );
+}
+
+test('consumer DOM, scoped themes, selection and native workflow actions', async ({ page }, testInfo) => {
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
   await page.goto('/introduction/design-system');
-  const button = page.getByRole('button', { name: 'Fit graph', exact: true });
-  await expect(button).toBeVisible();
-  await expect(button).toHaveCSS('border-radius', '6px');
-  await expect(button).toHaveCSS('padding-left', '16px');
-  await expect(page.locator('vflow').getByText('ngx-vflow + @vflow/ui', { exact: true })).toBeVisible();
-  await button.click();
-  await expect(button).toBeFocused();
+  const workflow = page.locator('app-ui-workflow-demo');
+  const entities = page.locator('app-ui-entities-demo');
+  await expect(workflow.locator('article.vui-node')).toHaveCount(4);
+  await expect(workflow.locator('path.vui-edge')).toHaveCount(3);
+  await expect(workflow.locator('article.vui-node').first()).toHaveCSS('background-color', 'rgb(255, 255, 255)');
+  await expect(entities.locator('article.vui-node').first()).toHaveCSS('background-color', 'rgb(27, 40, 59)');
+  // Directives add classes to the consumer article/header, without injecting wrapper elements.
+  await expect(workflow.locator('article > header.vui-node-header')).toHaveCount(4);
+  const review = workflow.locator('article').filter({ hasText: 'Finance review' });
+  await review.locator('header').click();
+  await expect(review).toHaveAttribute('data-vui-selected', 'true');
+  await expect(review.locator('.vui-status')).toHaveText('Waiting');
+  await expect(workflow.locator('node-toolbar')).toBeAttached();
+  await workflow.getByLabel('Read only', { exact: true }).check();
+  const approve = review.getByRole('button', { name: 'Approve', exact: true });
+  await expect(approve).toBeDisabled();
+  await workflow.getByLabel('Read only', { exact: true }).uncheck();
+  await expect(approve).toBeEnabled();
+  await approve.focus();
+  await expect(approve).toBeFocused();
+  await page.keyboard.press('Enter');
+  await expect(review.locator('.vui-status')).toHaveText('Approved');
+  await expect(approve).toBeDisabled();
+  await expect(review).toHaveAttribute('data-vui-selected', 'true');
+  await workflow.getByLabel('Dark theme', { exact: true }).check();
+  await expect(review).toHaveCSS('background-color', 'rgb(27, 40, 59)');
+  await expect(workflow.locator('.vflow-toolbar .vui-edge-label')).toHaveCSS('background-color', 'rgb(27, 40, 59)');
+  await expect(workflow.locator('path.vui-edge').first()).toHaveCSS('stroke', 'rgb(175, 190, 209)');
+  await expect(workflow.locator('marker polyline').first()).toHaveCSS('fill', 'rgb(175, 190, 209)');
+  await workflow.screenshot({ path: testInfo.outputPath('workflow.png') });
   expect(errors).toEqual([]);
+});
+
+test('field connections follow stable IDs through rename, reorder, density and recreation', async ({
+  page,
+}, testInfo) => {
+  await page.goto('/introduction/design-system');
+  const demo = page.locator('app-ui-entities-demo');
+  await demo.scrollIntoViewIfNeeded();
+  await expect(demo.locator('article')).toHaveCount(4);
+  await expect(demo.locator('path.vui-edge')).toHaveCount(2);
+  await expect.poll(() => rowAlignment(demo)).toBeLessThan(1);
+  await demo.getByRole('button', { name: 'Rename email', exact: true }).click();
+  await expect(demo.locator('[data-entity="crm"] [data-field="email"]')).toContainText('primary_email');
+  await demo.getByRole('button', { name: 'Reverse fields', exact: true }).click();
+  await expect(demo.locator('[data-entity="crm"] [vflowField]').first()).toHaveAttribute('data-field', 'name');
+  await expect.poll(() => rowAlignment(demo)).toBeLessThan(1);
+  await demo.getByLabel('Compact', { exact: true }).check();
+  await expect.poll(() => rowAlignment(demo)).toBeLessThan(1);
+
+  // The actual SVG endpoints must meet the outer rim of their original field ports.
+  const endpointError = () =>
+    demo.evaluate((root) => {
+      const edge = root.querySelectorAll<SVGPathElement>('path.vui-edge')[1];
+      const source = root
+        .querySelector('[data-entity="crm"] [data-field="email"] .handle--right .vui-port')!
+        .getBoundingClientRect();
+      const target = root
+        .querySelector('[data-entity="erp"] [data-field="email"] .handle--left .vui-port')!
+        .getBoundingClientRect();
+      const matrix = edge.getScreenCTM()!;
+      const start = edge.getPointAtLength(0).matrixTransform(matrix);
+      const end = edge.getPointAtLength(edge.getTotalLength()).matrixTransform(matrix);
+      return Math.max(
+        Math.abs(start.x - source.right),
+        Math.abs(start.y - source.y - source.height / 2),
+        Math.abs(end.x - target.left),
+        Math.abs(end.y - target.y - target.height / 2),
+      );
+    });
+  await expect.poll(endpointError).toBeLessThan(1);
+  await demo.getByRole('button', { name: 'Remove Copy email connection', exact: true }).click();
+  await expect(demo.locator('path.vui-edge')).toHaveCount(1);
+  const source = demo.locator('[data-entity="crm"] [data-field="email"] .handle.handle--right');
+  const target = demo.locator('[data-entity="erp"] [data-field="email"] .handle.handle--left');
+  // Core intentionally overlays the target with its magnetic hit area during a connection.
+  // Move the pointer through that real surface instead of asking locator.dragTo to bypass it.
+  await source.scrollIntoViewIfNeeded();
+  const from = (await source.boundingBox())!;
+  const to = (await target.boundingBox())!;
+  await page.mouse.move(from.x + from.width / 2, from.y + from.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(to.x + to.width / 2, to.y + to.height / 2, { steps: 12 });
+  await expect(target.locator('.vui-port')).toHaveAttribute('data-state', 'valid');
+  await page.mouse.up();
+  await expect(demo.locator('path.vui-edge')).toHaveCount(2);
+  await expect(demo.getByRole('button', { name: 'Remove Mapping connection', exact: true })).toBeVisible();
+  await expect.poll(endpointError).toBeLessThan(1);
+  await demo.screenshot({ path: testInfo.outputPath('entities.png') });
+});
+
+test('BPMN outlines, lane frames and core selection render in both themes', async ({ page }, testInfo) => {
+  await page.goto('/introduction/design-system');
+  const demo = page.locator('app-ui-bpmn-demo');
+  await demo.scrollIntoViewIfNeeded();
+  await expect(demo.locator('.vui-group')).toHaveCount(2);
+  await expect(demo.locator('.vui-bpmn-event')).toHaveCount(3);
+  await expect(demo.locator('path.vui-edge')).toHaveCount(7);
+  await expect(demo.locator('[data-event="intermediate"]')).toHaveCSS('border-top-style', 'double');
+  await expect(demo.locator('[data-event="end"]')).toHaveCSS('border-top-width', '5px');
+  const gateway = demo.locator('.vui-bpmn-gateway');
+  await gateway.click();
+  await expect(gateway).toHaveAttribute('data-vui-selected', 'true');
+  await expect(gateway).toHaveCSS('transform', 'none');
+  await demo.getByLabel('Dark theme', { exact: true }).check();
+  await expect(demo.locator('[data-event="start"]')).toHaveCSS('background-color', 'rgb(27, 40, 59)');
+  await demo.screenshot({ path: testInfo.outputPath('bpmn.png') });
+  await page.emulateMedia({ forcedColors: 'active' });
+  await expect(demo.locator('path.vui-edge').first()).toHaveCSS('stroke', 'rgb(0, 0, 0)');
 });
