@@ -1,4 +1,4 @@
-<vflow view="auto" [nodes]="nodes" [edges]="edges">
+<vflow view="auto" data-vui-theme="light" [nodes]="nodes" [edges]="edges">
   <ng-template let-ctx nodeHtml>
     <div class="custom-node" [class.custom-node_selected]="ctx.selected()">
       <button class="custom-node__button" dragHandle selectable>Drag here</button>
@@ -6,5 +6,7 @@
       <handle type="source" position="right" />
       <handle type="target" position="left" />
     </div>
-  </ng-template> </vflow
->`
+  </ng-template>
+  <ng-template let-ctx edge
+    ><svg:g customTemplateEdge selectable><svg:path class="vui-edge" [attr.d]="ctx.path()" /></svg:g></ng-template
+></vflow>

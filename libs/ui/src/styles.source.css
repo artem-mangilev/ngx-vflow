@@ -88,7 +88,7 @@
   }
 
   .vui-group {
-    border: 1px dashed var(--vui-border);
+    border: 2px solid var(--vui-muted);
     border-radius: var(--vui-radius);
     background: color-mix(in srgb, var(--vui-surface-muted) 55%, transparent);
   }

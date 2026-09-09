@@ -13,6 +13,9 @@
 
 .wrapper {
   width: max-content;
+  // A resize allocation must still contain the child's intrinsic minimum size.
+  min-width: min-content;
+  min-height: min-content;
 }
 
 :host(.vflow-node-selected:not(:focus-visible)) {

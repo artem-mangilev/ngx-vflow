@@ -11,14 +11,26 @@ import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
     [snapGrid]="[25, 25]"
     [background]="{ type: 'dots', gap: 25 }">
     <ng-template let-ctx groupNode>
-      <div
-        selectable
-        class="group-node"
-        [class.group-node_selected]="ctx.selected()"
-        [style.width.px]="ctx.width()"
-        [style.height.px]="ctx.height()">
-        <handle type="source" position="right" />
-      </div>
+      @if (ctx.data()?.custom) {
+        <div
+          selectable
+          class="group-node"
+          [class.group-node_selected]="ctx.selected()"
+          [style.width.px]="ctx.width()"
+          [style.height.px]="ctx.height()">
+          <handle type="source" position="right" />
+        </div>
+      } @else {
+        <div
+          class="vui-group"
+          selectable
+          [attr.data-vui-selected]="ctx.selected() || ctx.preselected()"
+          [resizable]="ctx.data()?.resizable ?? false"
+          [style.width.px]="ctx.width()"
+          [style.height.px]="ctx.height()">
+          {{ ctx.data()?.text }}
+        </div>
+      }
     </ng-template>
     <ng-template let-ctx edge
       ><svg:g customTemplateEdge selectable>
@@ -91,6 +103,7 @@ export class SubflowsDemoComponent {
       id: '5',
       point: { x: 10, y: 160 },
       type: 'template-group',
+      data: { custom: true },
       width: 170,
       height: 70,
       parentId: '3',

@@ -15,9 +15,7 @@ import { createNodes, createEdges, Vflow } from 'ngx-vflow';
       <div
         selectable
         [resizable]="true"
-        [style.width.px]="ctx.node.width?.()"
-        [style.height.px]="ctx.node.height?.()"
-        style="border:1px solid currentColor">
+        style="width:100%;height:100%;box-sizing:border-box;border:1px solid currentColor">
         {{ ctx.data().name }} <handle type="source" position="right" /><handle type="target" position="left" />
       </div>
     </ng-template>

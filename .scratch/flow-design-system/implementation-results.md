@@ -1,5 +1,7 @@
 # Implementation checks
 
+Follow-up: the user reported visual regressions missed by this functional acceptance. See [the visual regression audit](visual-regressions.md) for the corrections and expanded checks.
+
 Baseline: `1c3e2d06056a329d78910eba1e57d6a300936ec0`, 2026-09-09.
 
 `NX_DAEMON=false npx playwright test -c apps/docs-e2e/playwright.config.ts apps/docs-e2e/design-system.spec.ts --workers=2 --reporter=line`: **3 passed** (27.1s), before primitive changes. Workflow actions/themes, field geometry and reconnection, BPMN/forced colors.

@@ -2,7 +2,7 @@
 
 `vflow` automatically fits it container if you pass `view="auto"` input
 
-{{ NgDocActions.demo("ViewSizeFullscreenDemoComponent", { fullscreenRoute: "view-size-auto" }) }}
+{{ NgDocActions.demo("ViewSizeAutoDemoComponent", { fullscreenRoute: "view-size-auto" }) }}
 
 ## Fixed size
 

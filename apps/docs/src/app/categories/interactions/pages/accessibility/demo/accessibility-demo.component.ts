@@ -52,7 +52,17 @@ import { AriaLabelConfig, Vflow, createEdges, createNodes } from 'ngx-vflow';
         </ng-template>
         <ng-template let-ctx edgeLabelHtml
           ><span class="vui-edge-label">{{ ctx.label.data }}</span></ng-template
-        ></vflow
+        ><ng-template let-ctx groupNode>
+          <div
+            class="vui-group"
+            selectable
+            [attr.data-vui-selected]="ctx.selected() || ctx.preselected()"
+            [resizable]="ctx.data()?.resizable ?? false"
+            [style.width.px]="ctx.width()"
+            [style.height.px]="ctx.height()">
+            {{ ctx.data()?.text }}
+          </div>
+        </ng-template></vflow
       >
       <vflow
         data-vui-theme="light"

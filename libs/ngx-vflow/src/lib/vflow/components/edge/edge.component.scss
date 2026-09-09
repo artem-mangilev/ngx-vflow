@@ -20,6 +20,8 @@
 :host(:focus-visible) {
   .focus-indicator {
     display: block;
+    stroke-width: 5;
+    stroke-dasharray: 4 4;
   }
 }
 
@@ -39,5 +41,7 @@
 
 .selection-indicator {
   display: block;
+  stroke-width: 3;
+  stroke-dasharray: none;
   stroke: var(--vflow-selection, #0f4c75);
 }

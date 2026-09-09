@@ -5,6 +5,14 @@ import { VflowNode, VflowNodeBody, VflowSelected, VflowGroup } from './primitive
 /** Convenience presentation for migrating core default nodes; use templates for richer content. */
 @Component({
   selector: 'vflow-card-node',
+  styles: `
+    .vui-node {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+  `,
   imports: [VflowNode, VflowNodeBody, VflowSelected, HandleComponent, SelectableDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `<div

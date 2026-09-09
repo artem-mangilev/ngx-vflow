@@ -5,7 +5,17 @@ import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
 @Component({
   template: `<vflow view="auto" data-vui-theme="light" [nodes]="nodes" [edges]="edges">
     <ng-template let-ctx edgeLabelHtml>
-      <div class="label" [style.background-color]="ctx.label.data.color" (click)="deleteEdge(ctx.edge)">Delete</div>
+      @if (ctx.label.data.color) {
+        <button
+          type="button"
+          class="label"
+          [style.background-color]="ctx.label.data.color"
+          (click)="deleteEdge(ctx.edge)">
+          Delete
+        </button>
+      } @else {
+        <span class="vui-edge-label">{{ ctx.label.data }}</span>
+      }
     </ng-template>
     <ng-template let-ctx edge
       ><svg:g customTemplateEdge selectable>
@@ -15,17 +25,7 @@ import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
           [attr.marker-start]="ctx.markerStart()"
           [attr.marker-end]="ctx.markerEnd()"
           [attr.data-vui-selected]="ctx.selected() || ctx.preselected()" /></svg:g></ng-template
-    ><ng-template let-ctx groupNode
-      ><div
-        class="vui-group"
-        selectable
-        [resizable]="ctx.data().resizable ?? false"
-        [style.width.px]="ctx.width()"
-        [style.height.px]="ctx.height()">
-        {{ ctx.data().text }}
-      </div></ng-template
-    ></vflow
-  >`,
+  ></vflow>`,
   styles: [
     `
       :host {
@@ -37,6 +37,9 @@ import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
         width: 60px;
         height: 25px;
         background-color: #122c26;
+        color: white;
+        border: 0;
+        cursor: pointer;
         border-radius: 5px;
         text-align: center;
       }

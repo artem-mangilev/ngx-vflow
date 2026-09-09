@@ -74,8 +74,7 @@ export class HandleModel {
   ) {}
 
   /**
-   * Read phase. Standard handles are derived from model dimensions; custom
-   * handles read their anchor and rendered size without changing styles.
+   * Read phase: handles read their anchor and rendered size without changing styles.
    */
   public measure(nodeRect?: DOMRect): HandleGeometry | null {
     if (this.parentNode.culled()) return null;
@@ -98,13 +97,39 @@ export class HandleModel {
     const alongY = (anchorRect.top + anchorRect.height / 2 - resolvedNodeRect.top) / zoom;
     const alongX = (anchorRect.left + anchorRect.width / 2 - resolvedNodeRect.left) / zoom;
 
-    return computeHandleGeometry({
+    const geometry = computeHandleGeometry({
       position: this.rawHandle.position,
       nodeSize: { width: this.parentNode.width(), height: this.parentNode.height() },
       handleSize: { width: handleRect.width / zoom, height: handleRect.height / zoom },
       offset: { x: this.rawHandle.userOffsetX, y: this.rawHandle.userOffsetY },
       anchorPoint: { x: alongX, y: alongY },
     });
+    // A positioned row/card can be the CSS containing block. Edge points stay
+    // in node space; only the CSS offsets need conversion to that block.
+    const containingBlock = handleElement.offsetParent;
+    if (containingBlock instanceof HTMLElement) {
+      const rect = containingBlock.getBoundingClientRect();
+      const offsets = {
+        left: (resolvedNodeRect.left - rect.left) / zoom - containingBlock.clientLeft,
+        top: (resolvedNodeRect.top - rect.top) / zoom - containingBlock.clientTop,
+        right:
+          (rect.left - resolvedNodeRect.left) / zoom +
+          containingBlock.clientLeft +
+          containingBlock.clientWidth -
+          this.parentNode.width(),
+        bottom:
+          (rect.top - resolvedNodeRect.top) / zoom +
+          containingBlock.clientTop +
+          containingBlock.clientHeight -
+          this.parentNode.height(),
+      };
+      for (const side of ['left', 'top', 'right', 'bottom'] as const) {
+        if (geometry.layoutStyles[side] !== 'auto') {
+          geometry.layoutStyles[side] = `${parseFloat(geometry.layoutStyles[side]) + offsets[side]}px`;
+        }
+      }
+    }
+    return geometry;
   }
 
   /** Write phase. Called only after every handle in the node has been measured. */

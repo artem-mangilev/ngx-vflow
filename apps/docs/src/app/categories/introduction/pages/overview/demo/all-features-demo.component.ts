@@ -15,15 +15,14 @@ import { TransformNodeComponent } from './components/transform-node.component';
     (connect)="createEdge($event)"
     (componentNodeEvent)="onComponentEvent($event)">
     <ng-template let-ctx edge>
-      @if (ctx.edge.data?.().type === 'animated') {
+      <svg:g customTemplateEdge selectable>
         <svg:path
-          class="animated-edge"
-          fill="none"
+          class="vui-edge"
+          [class.animated-edge]="ctx.edge.data?.().type === 'animated'"
           [attr.d]="ctx.path()"
-          [attr.stroke-width]="2.5"
-          [attr.stroke]="'#8b5cf6'"
-          [attr.marker-end]="ctx.markerEnd()" />
-      }
+          [attr.marker-end]="ctx.markerEnd()"
+          [attr.data-vui-selected]="ctx.selected() || ctx.preselected()" />
+      </svg:g>
     </ng-template>
 
     <ng-template let-ctx edgeLabelHtml>
@@ -105,6 +104,8 @@ import { TransformNodeComponent } from './components/transform-node.component';
       }
 
       .animated-edge {
+        stroke: #8b5cf6;
+        stroke-width: 2.5;
         stroke-linecap: round;
         stroke-linejoin: round;
         stroke-dasharray: 8 4;
