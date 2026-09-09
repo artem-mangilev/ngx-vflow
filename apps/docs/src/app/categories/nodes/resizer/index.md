@@ -2,7 +2,7 @@ You might want to resize your node. This functionality works with nearly all typ
 
 ## Resize default group
 
-To resize a default group, simply pass the `resizable` flag to a `Node` of type `default-group`.
+For a UI container, set `data.resizable` on a node whose type is `VflowContainerNode`. For custom templates, attach `[resizable]` to the node surface.
 
 {{ NgDocActions.demoPane("DefaultGroupResizerDemoComponent") }}
 
@@ -15,7 +15,7 @@ This provides a way to have more control over the resizer:
   - If you want the resizer to appear conditionally, apply the directive as `[resizable]="yourCondition"`. You can bind the visibility of the resizer to the node’s selection state (see the code below for an example).
 - **Important**: Use the `ctx.width()` and `ctx.height()` signals from the context, not `ctx.node.width` and `ctx.node.height`. The latter properties are not reactive, so the node won’t update its size based on the resizer.
 - The resizer respects the `min-width` and `min-height` CSS properties of the resizable node, or you can pass `[minWidth]` / `[minHeight]` / `[maxWidth]` / `[maxHeight]` explicitly.
-- Optionally, you can customize the `[resizerColor]`, keep the aspect ratio with `[keepAspectRatio]`, restrict resizing to one axis with `[resizeDirection]` (`horizontal` | `vertical`), toggle handle auto-scaling with `[autoScale]`, and react to `(resizeStart)` / `(resizeChange)` / `(resizeEnd)`.
+- Optionally, you can style `.vflow-resize-line` / `.vflow-resize-handle` or set `--vflow-border`, keep the aspect ratio with `[keepAspectRatio]`, restrict resizing to one axis with `[resizeDirection]` (`horizontal` | `vertical`), toggle handle auto-scaling with `[autoScale]`, and react to `(resizeStart)` / `(resizeChange)` / `(resizeEnd)`.
 
 {{ NgDocActions.demoPane("TemplateGroupResizerDemoComponent") }}
 
@@ -31,7 +31,7 @@ The algorithm is almost the same as for `template-group` nodes:
 
 - It's up to you to adjust the CSS of your custom node to ensure it renders correctly during resizing. The library only modifies the container size.
 
-- Optionally, you can customize the `[resizerColor]`, keep the aspect ratio with `[keepAspectRatio]`, restrict resizing to one axis with `[resizeDirection]` (`horizontal` | `vertical`), toggle handle auto-scaling with `[autoScale]`, and react to `(resizeStart)` / `(resizeChange)` / `(resizeEnd)`.
+- Optionally, you can style `.vflow-resize-line` / `.vflow-resize-handle` or set `--vflow-border`, keep the aspect ratio with `[keepAspectRatio]`, restrict resizing to one axis with `[resizeDirection]` (`horizontal` | `vertical`), toggle handle auto-scaling with `[autoScale]`, and react to `(resizeStart)` / `(resizeChange)` / `(resizeEnd)`.
 
 {{ NgDocActions.demoPane("TemplateNodeResizerDemoComponent") }}
 

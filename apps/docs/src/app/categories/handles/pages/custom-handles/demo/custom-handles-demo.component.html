@@ -17,7 +17,7 @@
     </label>
   </div>
 
-  <vflow view="auto" [nodes]="nodes" [edges]="edges" (connect)="createEdge($event)">
+  <vflow view="auto" data-vui-theme="light" [nodes]="nodes" [edges]="edges" (connect)="createEdge($event)">
     <ng-template let-ctx nodeHtml>
       @if (ctx.data().type === 'output') {
         <div class="custom-node">
@@ -55,7 +55,18 @@
         </div>
       }
     </ng-template>
-  </vflow>
+    <ng-template let-ctx edge
+      ><svg:g customTemplateEdge selectable>
+        <svg:path
+          class="vui-edge"
+          [attr.d]="ctx.path()"
+          [attr.marker-start]="ctx.markerStart()"
+          [attr.marker-end]="ctx.markerEnd()"
+          [attr.data-vui-selected]="ctx.selected() || ctx.preselected()" /></svg:g></ng-template
+    ><ng-template let-ctx edgeLabelHtml
+      ><span class="vui-edge-label">{{ ctx.label.data }}</span></ng-template
+    ></vflow
+  >
 </div>
 
 <ng-template #handleTemplate let-ctx handle>

@@ -1,3 +1,4 @@
+import { TestNodeComponent } from '../../../testing/test-node.component';
 import { TestBed } from '@angular/core/testing';
 import { NodeModel } from './node.model';
 import { createNode } from '../interfaces/node.interface';
@@ -28,8 +29,9 @@ describe('NodeModel', () => {
         new NodeModel(
           createNode({
             id: '1',
-            type: 'default',
-            text: 'test',
+            type: TestNodeComponent,
+            data: { text: 'test' },
+            ariaLabel: 'test',
             point: { x: 15, y: 15 },
           }),
         ),
@@ -61,7 +63,7 @@ describe('NodeModel', () => {
         createNode({
           id: '2',
           parentId: '1',
-          type: 'default',
+          type: TestNodeComponent,
           point: { x: 10, y: 10 },
         }),
       );
@@ -81,7 +83,7 @@ describe('NodeModel', () => {
         createNode({
           id: '2',
           parentId: '1',
-          type: 'default',
+          type: TestNodeComponent,
           point: { x: 10, y: 10 },
         }),
       );
@@ -89,10 +91,6 @@ describe('NodeModel', () => {
     entitiesService.nodes.update((nodes) => [...nodes, TestBed.runInInjectionContext(childModel)]);
 
     expect(model.children()[0].globalPoint()).toEqual({ x: 25, y: 25 });
-  });
-
-  it('should get text for default node', () => {
-    expect(model.text()).toEqual('test');
   });
 
   it('should resolve selection and focus defaults reactively', () => {
@@ -109,7 +107,7 @@ describe('NodeModel', () => {
   it('should let explicit capability overrides win over global settings', () => {
     const rawNode = createNode({
       id: 'explicit',
-      type: 'default',
+      type: TestNodeComponent,
       point: { x: 0, y: 0 },
       selectable: false,
       focusable: true,
@@ -124,7 +122,7 @@ describe('NodeModel', () => {
   });
 
   it('should keep inherited capabilities absent when factories materialize defaults', () => {
-    const created = createNode({ id: 'factory', type: 'default', point: { x: 0, y: 0 } });
+    const created = createNode({ id: 'factory', type: TestNodeComponent, point: { x: 0, y: 0 } });
 
     expect(created.selectable).toBeUndefined();
     expect(created.focusable).toBeUndefined();

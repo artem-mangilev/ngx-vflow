@@ -47,7 +47,7 @@ describe('HandleModel', () => {
   function createModel(
     position: 'left' | 'right' | 'top' | 'bottom',
     anchorRect: { left: number; top: number; width: number; height: number },
-    nodeType: 'default' | 'html-template' = 'default',
+    nodeType: 'html-template' = 'html-template',
   ) {
     const anchor = document.createElement('div');
     const nodeElement = document.createElement('div');
@@ -92,37 +92,6 @@ describe('HandleModel', () => {
     const { model } = createModel('right', { left: 10, top: 30, width: 80, height: 20 });
 
     expect(model).toBeTruthy();
-  });
-
-  it('should derive a standard handle from node dimensions without measuring DOM geometry', () => {
-    const { model, parentNode, anchor, nodeElement, handleElement } = createModel('right', {
-      left: 10,
-      top: 30,
-      width: 80,
-      height: 20,
-    });
-
-    anchor.getBoundingClientRect = jasmine.createSpy('anchor rect').and.throwError('unexpected anchor measurement');
-    nodeElement.getBoundingClientRect = jasmine.createSpy('node rect').and.throwError('unexpected node measurement');
-    handleElement.getBoundingClientRect = jasmine
-      .createSpy('handle rect')
-      .and.throwError('unexpected handle measurement');
-
-    model.sync();
-
-    expect(model.layoutStyles()).toEqual({
-      top: '25px',
-      left: 'auto',
-      right: '0',
-      bottom: 'auto',
-    });
-    expect(model.pointAbsolute()).toEqual({ x: 107, y: 25 });
-
-    parentNode.height.set(160);
-    model.sync();
-
-    expect(model.layoutStyles().top).toBe('80px');
-    expect(model.pointAbsolute()).toEqual({ x: 107, y: 80 });
   });
 
   it('should keep a custom handle aligned with its anchor after node resize', () => {

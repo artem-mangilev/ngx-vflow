@@ -11,8 +11,8 @@
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  border: 2px solid #fff;
-  background: #1b262c;
+  border: 2px solid var(--vflow-surface, #fff);
+  background: var(--vflow-foreground, #1b262c);
 }
 
 .handle--left {
@@ -36,4 +36,15 @@
   border-radius: 50%;
   opacity: 0;
   pointer-events: all;
+}
+
+// The visible port can shrink without shrinking the pointer target or moving its endpoint.
+.handle::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: max(24px, 100%);
+  height: max(24px, 100%);
+  transform: translate(-50%, -50%);
 }

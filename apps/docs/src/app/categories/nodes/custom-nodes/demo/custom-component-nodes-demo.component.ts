@@ -5,7 +5,24 @@ import { BlueSquareNodeComponent, BlueSquareData } from './components/blue-squar
 import { RedSquareNodeComponent, RedSquareData } from './components/red-square-node.component';
 
 @Component({
-  template: `<vflow view="auto" [nodes]="nodes" [edges]="edges" (componentNodeEvent)="handleComponentEvent($event)" />`,
+  template: `<vflow
+    view="auto"
+    data-vui-theme="light"
+    [nodes]="nodes"
+    [edges]="edges"
+    (componentNodeEvent)="handleComponentEvent($event)"
+    ><ng-template let-ctx edge
+      ><svg:g customTemplateEdge selectable>
+        <svg:path
+          class="vui-edge"
+          [attr.d]="ctx.path()"
+          [attr.marker-start]="ctx.markerStart()"
+          [attr.marker-end]="ctx.markerEnd()"
+          [attr.data-vui-selected]="ctx.selected() || ctx.preselected()" /></svg:g></ng-template
+    ><ng-template let-ctx edgeLabelHtml
+      ><span class="vui-edge-label">{{ ctx.label.data }}</span></ng-template
+    ></vflow
+  >`,
   styles: [
     `
       :host {

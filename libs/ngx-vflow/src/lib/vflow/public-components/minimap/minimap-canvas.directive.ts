@@ -29,13 +29,19 @@ import { isPointInRect } from '../../utils/rect';
   },
 })
 export class MinimapCanvasDirective {
-  public maskColor = input.required<string>();
-  public strokeColor = input.required<string>();
   public position = input.required<MiniMapPosition>();
   public pannable = input.required<boolean>();
   public zoomable = input.required<boolean>();
   public zoomStep = input.required<number>();
 
+  private colors = signal({
+    background: '#fff',
+    surface: '#fff',
+    foreground: '#1b262c',
+    muted: '#d7d7d7',
+    border: '#c8c8c8',
+    selection: '#0f4c75',
+  });
   private document = inject(DOCUMENT);
   private canvas = inject<ElementRef<HTMLCanvasElement>>(ElementRef).nativeElement;
   private entities = inject(FlowEntitiesService);
@@ -50,6 +56,7 @@ export class MinimapCanvasDirective {
 
   // The graph bitmap depends on geometry and selection, never on the camera.
   private graph = computed(() => {
+    const colors = this.colors();
     const width = this.width();
     const height = this.height();
     const nodes = this.entities.nodes();
@@ -73,18 +80,17 @@ export class MinimapCanvasDirective {
       );
       // ponytail: redraw all previews on graph edits; use dirty regions if edits become the bottleneck.
       for (const node of nodes) {
-        const group = node.rawNode.type === 'default-group' || node.rawNode.type === 'template-group';
-        if (!group && node.rawNode.type !== 'default' && node.rawNode.type !== 'html-template' && !node.isComponentType)
-          continue;
+        const group = node.rawNode.type === 'template-group';
+        if (!group && node.rawNode.type !== 'html-template' && !node.isComponentType) continue;
         const { x, y } = node.globalPoint();
         const selected = node.selected();
         context.beginPath();
         context.roundRect(x, y, node.width(), node.height(), group ? 5 : 2);
-        context.fillStyle = group ? node.color() : '#fff';
+        context.fillStyle = colors.surface;
         context.globalAlpha = group ? 0.05 : 1;
         context.fill();
         context.globalAlpha = 1;
-        context.strokeStyle = group ? node.color() : selected ? '#0f4c75' : '#1b262c';
+        context.strokeStyle = selected ? colors.selection : colors.foreground;
         context.lineWidth = group && !selected ? 1.5 : 2;
         context.stroke();
       }
@@ -94,6 +100,47 @@ export class MinimapCanvasDirective {
 
   constructor() {
     const view = this.document.defaultView;
+    // Supported theme changes are ancestor class/style/data-vui-theme attributes.
+    // Stylesheet-only edits can be synchronized by dispatching vflow-theme-change on the flow.
+    const updateColors = () => {
+      if (!view) return;
+      const colors = {
+        background: '#fff',
+        surface: '#fff',
+        foreground: '#1b262c',
+        muted: '#d7d7d7',
+        border: '#c8c8c8',
+        selection: '#0f4c75',
+      };
+      const previous = this.canvas.style.color;
+      for (const key of Object.keys(colors) as (keyof typeof colors)[]) {
+        this.canvas.style.color = `var(--vflow-${key}, ${colors[key]})`;
+        colors[key] = view.getComputedStyle(this.canvas).color;
+      }
+      this.canvas.style.color = previous;
+      this.colors.set(colors);
+    };
+    let themeFrame = 0;
+    const scheduleColors = () => {
+      if (themeFrame || !view) return;
+      themeFrame = view.requestAnimationFrame(() => {
+        themeFrame = 0;
+        updateColors();
+      });
+    };
+    const observer = view ? new view.MutationObserver(scheduleColors) : undefined;
+    let flow: Element | null = null;
+    let observing = false;
+    afterRenderEffect(() => {
+      if (observing || !this.canvas.isConnected) return;
+      observing = true;
+      for (let ancestor = this.canvas.parentElement; ancestor; ancestor = ancestor.parentElement) {
+        observer?.observe(ancestor, { attributes: true, attributeFilter: ['class', 'style', 'data-vui-theme'] });
+      }
+      flow = this.canvas.closest('vflow');
+      flow?.addEventListener('vflow-theme-change', scheduleColors);
+      scheduleColors();
+    });
     const updateRatio = () => this.pixelRatio.set(view?.devicePixelRatio || 1);
     const cancelDrag = () => this.cancelDrag();
     const wheel = (event: WheelEvent) => this.onWheel(event);
@@ -102,6 +149,9 @@ export class MinimapCanvasDirective {
     this.canvas.addEventListener('wheel', wheel, { passive: false });
     inject(DestroyRef).onDestroy(() => {
       this.cancelDrag();
+      observer?.disconnect();
+      if (themeFrame) view?.cancelAnimationFrame(themeFrame);
+      flow?.removeEventListener('vflow-theme-change', scheduleColors);
       view?.removeEventListener('resize', updateRatio);
       view?.removeEventListener('blur', cancelDrag);
       this.canvas.removeEventListener('wheel', wheel);
@@ -130,13 +180,12 @@ export class MinimapCanvasDirective {
         this.settings.computedFlowWidth(),
         this.settings.computedFlowHeight(),
       );
-      const background = this.settings.background();
+      const colors = this.colors();
       context.setTransform(ratio, 0, 0, ratio, 0, 0);
       context.clearRect(0, 0, width, height);
-      context.fillStyle = this.maskColor();
+      context.fillStyle = colors.muted;
       context.fillRect(0, 0, width, height);
-      context.fillStyle =
-        background.type === 'solid' || background.type === 'dots' ? (background.color ?? '#fff') : '#fff';
+      context.fillStyle = colors.background;
       context.fillRect(
         transform.x + viewport.x * transform.zoom,
         transform.y + viewport.y * transform.zoom,
@@ -144,7 +193,7 @@ export class MinimapCanvasDirective {
         viewport.height * transform.zoom,
       );
       if (image.width && image.height) context.drawImage(image, 0, 0, width, height);
-      context.strokeStyle = this.strokeColor();
+      context.strokeStyle = colors.border;
       context.lineWidth = 1;
       context.strokeRect(0.5, 0.5, width - 1, height - 1);
     });

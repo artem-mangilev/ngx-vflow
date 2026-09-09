@@ -6,6 +6,7 @@ import { TransformNodeComponent } from './components/transform-node.component';
 @Component({
   template: `<vflow
     view="auto"
+    data-vui-theme="light"
     [nodes]="store.nodes()"
     [edges]="store.edges()"
     [background]="{ type: 'dots' }"
@@ -40,7 +41,17 @@ import { TransformNodeComponent } from './components/transform-node.component';
     </ng-template>
 
     <mini-map />
-  </vflow>`,
+    <ng-template let-ctx groupNode
+      ><div
+        class="vui-group"
+        selectable
+        [resizable]="ctx.data().resizable ?? false"
+        [style.width.px]="ctx.width()"
+        [style.height.px]="ctx.height()">
+        {{ ctx.data().text }}
+      </div></ng-template
+    ></vflow
+  >`,
   styles: [
     `
       :host {

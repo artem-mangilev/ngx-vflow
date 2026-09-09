@@ -1,41 +1,20 @@
 # @vflow/ui
 
-Optional, directive-first design-system primitives for ngx-vflow. Requires Angular 20 or 21.
-This package is developed locally and will first be published with the next ngx-vflow major release.
+Optional Angular presentation primitives for ngx-vflow. Applications own content and graph
+state; core owns geometry and interaction. Import `VflowUi` or individual exports, alongside
+`Vflow`. Import BPMN separately through `@vflow/ui/bpmn`.
 
-Import individual directives or the `VflowUi` array from `@vflow/ui` into your standalone
-component. They style your own HTML/SVG, without adding wrappers or depending on ngx-vflow.
+Choose one global CSS entry: `@vflow/ui/styles.css` (compiled) or
+`@vflow/ui/styles.source.css` (standard CSS for your bundler). Neither requires Tailwind at
+runtime or in a consumer build. The source entry contains no monorepo paths or generator directives.
+Both entries come from one source and preserve the same rules; source consumption does not
+promise unused-rule removal.
 
-```html
-<section vflowTheme="light">
-  <article vflowNode>
-    <header vflowNodeHeader>Review invoice</header>
-    <div vflowNodeBody>Your content and controls</div>
-    <footer vflowNodeFooter>
-      <span vflowStatus="warning">Waiting for approval</span>
-      <button vflowButton type="button">Approve</button>
-    </footer>
-  </article>
-</section>
-```
+Apply `[vflowTheme]="'light'"` or `[vflowTheme]="'dark'"` around the editor. Importing CSS alone
+does not activate a theme. Override general `--vui-*` / `--vflow-*` tokens or public `.vui-*`
+part selectors using application CSS. See the Design system section of the documentation for
+all selectors, tokens, five runnable compositions and canvas theme synchronization.
 
-Include `@vflow/ui/styles.css` in your application's global styles. CSS is built with Tailwind 4,
-with `vui:`-prefixed utilities, and includes no Preflight. Consumers need no Tailwind build step.
-Presentation rules use the `vui` cascade layer; unlayered application styles override them.
-
-The MVP includes node anatomy, field rows, port visuals, status tones, SVG edge strokes,
-HTML labels, group frames, BPMN event/gateway outlines, theme and selection directives.
-For flow interaction compose them with core `selectable`, `handle`, `customTemplateEdge`
-and gesture-exclusion directives. Bind `vflowSelected` to selection/preselection and put
-`vflowPort` inside a handle template. UI never changes roles, focus or graph state.
-
-Use `vflowTheme="light"` or `vflowTheme="dark"` on the editor ancestor and override semantic CSS variables such as
-`--vui-surface`, `--vui-foreground`, `--vui-border`, `--vui-accent`, `--vui-on-accent`,
-`--vui-padding` and `--vui-field-height` to match your application. States retain text/icons
-alongside their colors. Internal row scrolling/collapse and a full BPMN modeler are outside this MVP.
-
-See the **Introduction → Design system** ng-doc page for the complete directive/token reference
-and interactive workflow, ERD/mapping and BPMN recipes. Existing core defaults remain available;
-removing them is a separate major-release migration.
-
-Versions and releases are shared with ngx-vflow. See `docs/releasing.md` in the repository.
+Viewport controls: `<vflow-controls [flow]="editor" />`, where `editor` is a `VflowComponent`.
+Native buttons projected into it remain application-owned. Activity, diagnosis, selection and
+available actions are independent states; `vflowStatusActive` never disables an action.

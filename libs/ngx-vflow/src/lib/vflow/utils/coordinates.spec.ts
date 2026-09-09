@@ -1,3 +1,4 @@
+import { TestNodeComponent } from '../../../testing/test-node.component';
 import { signal } from '@angular/core';
 import { Node } from '../interfaces/node.interface';
 import {
@@ -11,7 +12,7 @@ import {
 function node(id: string, x: number, y: number, parentId?: string): Node {
   return {
     id,
-    type: 'default',
+    type: TestNodeComponent,
     point: signal({ x, y }),
     parentId: signal(parentId ?? null),
   };

@@ -8,8 +8,16 @@ import { FlowEntity } from '../interfaces/flow-entity.interface';
 import { MinimapModel } from '../models/minimap.model';
 import { Node } from '../interfaces/node.interface';
 
+let nextMarkerScope = 0;
+
 @Injectable()
 export class FlowEntitiesService {
+  private readonly markerScope = nextMarkerScope++;
+
+  public markerId(marker: Marker): string {
+    return `vflow-${this.markerScope}-${hashCode(JSON.stringify(marker))}`;
+  }
+
   public readonly nodes = signal<NodeModel[]>([], {
     // empty arrays considered equal, other arrays may not be equal
     equal: (a, b) => (!a.length && !b.length ? true : a === b),
@@ -59,24 +67,24 @@ export class FlowEntitiesService {
   public readonly connection = signal<ConnectionModel>(new ConnectionModel({}));
 
   public readonly markers = computed(() => {
-    const markersMap = new Map<number, Marker>();
+    const markersMap = new Map<string, Marker>();
 
     this.validEdges().forEach((e) => {
       const markers = e.markers();
       if (markers?.start) {
-        const hash = hashCode(JSON.stringify(markers.start));
+        const hash = this.markerId(markers.start);
         markersMap.set(hash, markers.start);
       }
 
       if (markers?.end) {
-        const hash = hashCode(JSON.stringify(markers.end));
+        const hash = this.markerId(markers.end);
         markersMap.set(hash, markers.end);
       }
     });
 
     const connectionMarker = this.connection().settings.marker;
     if (connectionMarker) {
-      const hash = hashCode(JSON.stringify(connectionMarker));
+      const hash = this.markerId(connectionMarker);
       markersMap.set(hash, connectionMarker);
     }
 

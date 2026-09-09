@@ -1,3 +1,4 @@
+import { VflowCardNode } from '@vflow/ui';
 import { ChangeDetectionStrategy, Component, TemplateRef, inject, viewChild } from '@angular/core';
 import { NgDocNotifyService } from '@ng-doc/ui-kit';
 import { Connection, Edge, EdgeChange, Node, NodeChange, Vflow, createNodes } from 'ngx-vflow';
@@ -24,14 +25,16 @@ export class HandlingChangesDemoComponent {
     {
       id: '1',
       point: { x: 100, y: 100 },
-      type: 'default',
-      text: `1`,
+      type: VflowCardNode,
+      data: { text: `1` },
+      ariaLabel: `1`,
     },
     {
       id: '2',
       point: { x: 200, y: 200 },
-      type: 'default',
-      text: `2`,
+      type: VflowCardNode,
+      data: { text: `2` },
+      ariaLabel: `2`,
     },
   ]);
 

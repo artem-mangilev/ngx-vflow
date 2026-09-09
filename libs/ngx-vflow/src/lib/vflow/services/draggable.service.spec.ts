@@ -113,12 +113,12 @@ describe('DraggableService', () => {
 
   function createModel(params: {
     id: string;
-    type?: 'default' | 'default-group';
+    type?: 'html-template' | 'template-group';
     selected?: boolean;
     draggable?: boolean;
     parentId?: string;
   }) {
-    const type = params.type ?? 'default';
+    const type = params.type ?? 'html-template';
     const nodeConfig: any = {
       id: params.id,
       type,
@@ -128,8 +128,9 @@ describe('DraggableService', () => {
       parentId: params.parentId,
     };
 
-    if (type === 'default') {
-      nodeConfig.text = params.id;
+    if (type === 'html-template') {
+      nodeConfig.data = { text: params.id };
+      nodeConfig.ariaLabel = params.id;
     }
 
     const model = TestBed.runInInjectionContext(() => new NodeModel(createNode(nodeConfig)));
@@ -246,7 +247,7 @@ describe('DraggableService', () => {
   });
 
   it('should block group drag when selection shortcut is active', () => {
-    const group = createModel({ id: 'group', type: 'default-group' });
+    const group = createModel({ id: 'group', type: 'template-group' });
     const dragFilter = (service as any).getDragBehavior(group).filter();
     const target = document.createElement('div');
 

@@ -1,7 +1,7 @@
 import { ConnectionMode } from '../types/connection-mode.type';
 import { HandleType } from '../types/handle-type.type';
 import { Connection } from './connection.interface';
-import { Curve, EdgeType } from './edge.interface';
+import { Curve } from './edge.interface';
 import { Marker } from './marker.interface';
 
 export type ConnectionForValidation = Connection & {
@@ -13,7 +13,7 @@ export type ConnectionValidatorFn = (connection: ConnectionForValidation) => boo
 
 export interface ConnectionSettings {
   curve?: Curve;
-  type?: EdgeType;
+  type?: 'default' | 'template';
   validator?: ConnectionValidatorFn;
   marker?: Marker;
   mode?: ConnectionMode;

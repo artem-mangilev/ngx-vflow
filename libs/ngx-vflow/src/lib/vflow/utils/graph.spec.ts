@@ -1,3 +1,4 @@
+import { TestNodeComponent } from '../../../testing/test-node.component';
 import { signal } from '@angular/core';
 import { Edge } from '../interfaces/edge.interface';
 import { Node } from '../interfaces/node.interface';
@@ -6,7 +7,7 @@ import { getConnectedEdges, getIncomers, getNodesBounds, getOutgoers } from './g
 function node(id: string, x = 0, y = 0, parentId?: string, width?: number, height?: number): Node<unknown> {
   return {
     id,
-    type: 'default',
+    type: TestNodeComponent,
     point: signal({ x, y }),
     parentId: signal(parentId ?? null),
     ...(width === undefined ? {} : { width: signal(width) }),

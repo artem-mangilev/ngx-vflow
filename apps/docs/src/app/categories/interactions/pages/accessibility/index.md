@@ -36,7 +36,7 @@ The flow is a named `region`. Nodes (including visual groups), edges and handles
 import { AriaLabelConfig, createNodes, createEdges } from 'ngx-vflow';
 
 const nodes = createNodes([
-  { id: 'request', type: 'default', point: { x: 20, y: 40 }, text: 'Request', ariaLabel: 'Expense request', ariaDescription: 'Requires approval.', domAttributes: { 'data-record': 'request', lang: 'en' } },
+  { id: 'request', type: 'html-template', point: { x: 20, y: 40 }, data: { name: 'Request' }, ariaLabel: 'Expense request', ariaDescription: 'Requires approval.', domAttributes: { 'data-record': 'request', lang: 'en' } },
   { id: 'approval', type: 'html-template', point: { x: 250, y: 40 }, ariaLabel: 'Approval' },
 ]);
 const edges = createEdges([{ id: 'review', source: 'request', target: 'approval', ariaLabel: 'Review route' }]);

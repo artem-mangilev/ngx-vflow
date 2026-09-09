@@ -1,0 +1,52 @@
+{
+  "name": "ui-consumer",
+  "projectType": "application",
+  "sourceRoot": "apps/ui-consumer/src",
+  "targets": {
+    "build": {
+      "executor": "@angular-devkit/build-angular:application",
+      "dependsOn": ["ui:build"],
+      "options": {
+        "outputPath": "dist/apps/ui-consumer",
+        "index": "apps/ui-consumer/src/index.html",
+        "browser": "apps/ui-consumer/src/main.ts",
+        "tsConfig": "apps/ui-consumer/tsconfig.app.json",
+        "styles": [],
+        "optimization": false
+      },
+      "configurations": {
+        "compiled": {
+          "styles": ["dist/libs/ui/styles.css"]
+        },
+        "source": {
+          "styles": ["dist/libs/ui/styles.source.css"]
+        },
+        "core": {
+          "fileReplacements": [
+            {
+              "replace": "apps/ui-consumer/src/main.ts",
+              "with": "apps/ui-consumer/src/main-core.ts"
+            }
+          ]
+        }
+      }
+    },
+    "serve": {
+      "executor": "@angular-devkit/build-angular:dev-server",
+      "options": {
+        "port": 4201
+      },
+      "configurations": {
+        "compiled": {
+          "buildTarget": "ui-consumer:build:compiled"
+        },
+        "source": {
+          "buildTarget": "ui-consumer:build:source"
+        },
+        "core": {
+          "buildTarget": "ui-consumer:build:core"
+        }
+      }
+    }
+  }
+}

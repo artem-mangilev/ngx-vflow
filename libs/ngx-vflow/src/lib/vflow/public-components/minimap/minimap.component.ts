@@ -19,12 +19,10 @@ export class MiniMapComponent implements OnInit {
   /**
    * The color outside the viewport (invisible area)
    */
-  public maskColor = input(`rgba(215, 215, 215, 0.6)`);
 
   /**
    * The minimap stroke color
    */
-  public strokeColor = input(`rgb(200, 200, 200)`);
 
   /**
    * The corner of the flow where to render a mini-map

@@ -1,8 +1,8 @@
 @if (selectionBox.active()) {
   <svg:rect
     class="selection-box"
-    [attr.fill]="color()"
-    [attr.stroke]="color()"
+    fill="var(--vflow-selection, #bbe1fa)"
+    stroke="var(--vflow-selection, #bbe1fa)"
     [attr.x]="selectionBox.x()"
     [attr.y]="selectionBox.y()"
     [attr.width]="selectionBox.width()"

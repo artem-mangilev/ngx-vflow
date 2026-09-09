@@ -8,7 +8,7 @@ import { isDefined } from '../utils/is-defined';
 import { DomAttributes } from './dom-attributes.interface';
 
 export const EDGE_DEFAULTS = {
-  type: 'default' as EdgeType,
+  type: 'template' as EdgeType,
   curve: 'bezier' as Curve,
   data: {},
   edgeLabels: {},
@@ -18,7 +18,7 @@ export const EDGE_DEFAULTS = {
   selected: false,
 };
 
-export type EdgeType = 'default' | 'template';
+export type EdgeType = 'template';
 export type Curve = 'straight' | 'bezier' | 'smooth-step' | 'step' | CurveFactory;
 
 export interface Edge<T = unknown> extends Connection {

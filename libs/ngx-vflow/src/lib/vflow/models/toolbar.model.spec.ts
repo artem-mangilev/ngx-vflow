@@ -1,3 +1,4 @@
+import { TestNodeComponent } from '../../../testing/test-node.component';
 import { TestBed } from '@angular/core/testing';
 import { FlowEntitiesService } from '../services/flow-entities.service';
 import { ToolbarModel } from './toolbar.model';
@@ -28,8 +29,9 @@ describe('ToolbarModel', () => {
           new NodeModel(
             createNode({
               id: '1',
-              type: 'default',
-              text: 'test',
+              type: TestNodeComponent,
+              data: { text: 'test' },
+              ariaLabel: 'test',
               point: { x: 15, y: 15 },
             }),
           ),

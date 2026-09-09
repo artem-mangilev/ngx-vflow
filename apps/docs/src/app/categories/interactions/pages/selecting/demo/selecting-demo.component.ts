@@ -1,3 +1,4 @@
+import { VflowCardNode } from '@vflow/ui';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
 
@@ -17,14 +18,16 @@ export class SelectingDemoComponent {
     {
       id: '2',
       point: { x: 290, y: 50 },
-      type: 'default',
-      text: 'Selectable',
+      type: VflowCardNode,
+      data: { text: 'Selectable' },
+      ariaLabel: 'Selectable',
     },
     {
       id: '3',
       point: { x: 290, y: 300 },
-      type: 'default',
-      text: 'Selectable',
+      type: VflowCardNode,
+      data: { text: 'Selectable' },
+      ariaLabel: 'Selectable',
     },
   ]);
 

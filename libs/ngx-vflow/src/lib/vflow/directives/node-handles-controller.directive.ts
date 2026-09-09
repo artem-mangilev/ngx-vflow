@@ -26,12 +26,7 @@ export class NodeHandlesControllerDirective implements OnInit {
   constructor() {
     afterRenderEffect(() => {
       const model = this.nodeAccessor.model();
-      if (model?.rawNode.type === 'default') {
-        // Standard handles depend on model dimensions, even without layout.
-        model.width();
-        model.height();
-        this.scheduleSync();
-      } else if (model && !model.culled()) {
+      if (model && !model.culled()) {
         this.scheduleSync();
       }
     });
@@ -63,10 +58,6 @@ export class NodeHandlesControllerDirective implements OnInit {
     const nextElements = new Set<Element>([this.hostElementRef.nativeElement]);
 
     handles.forEach((handle) => {
-      if (handle.isStandard) {
-        return;
-      }
-
       nextElements.add(handle.hostReference);
       if (handle.handleElement) {
         nextElements.add(handle.handleElement);
@@ -102,10 +93,7 @@ export class NodeHandlesControllerDirective implements OnInit {
       }
 
       const handles = this.model.handles();
-      const nodeRect =
-        !this.model.culled() && handles.some((handle) => !handle.isStandard)
-          ? this.model.nodeElement()?.getBoundingClientRect()
-          : undefined;
+      const nodeRect = !this.model.culled() ? this.model.nodeElement()?.getBoundingClientRect() : undefined;
       const measurements = handles.map((handle) => handle.measure(nodeRect));
 
       handles.forEach((handle, index) => handle.applyGeometry(measurements[index]));

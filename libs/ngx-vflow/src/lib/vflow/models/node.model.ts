@@ -1,5 +1,4 @@
 import { TemplateRef, computed, inject, signal } from '@angular/core';
-import { DOCUMENT } from '@angular/common';
 import { DomAttributes } from '../interfaces/dom-attributes.interface';
 import { NODE_DEFAULTS, Node, isComponentNode } from '../interfaces/node.interface';
 import { toObservable } from '@angular/core/rxjs-interop';
@@ -25,20 +24,12 @@ export class NodeModel<T = unknown>
   private entitiesService = inject(FlowEntitiesService);
   private settingsService = inject(FlowSettingsService);
   private nodeRenderingService = inject(NodeRenderingService);
-  private document = inject(DOCUMENT);
 
   public ariaLabel = computed(() => {
     const override = this.rawNode.ariaLabel?.().trim();
     if (override) return override;
     const labels = this.settingsService.ariaLabels();
-    if (this.rawNode.type === 'default') {
-      const template = this.document.createElement('template');
-      template.innerHTML = this.text();
-      template.content.querySelectorAll('script, style, template').forEach((element) => element.remove());
-      const text = template.content.textContent?.replace(/\s+/g, ' ').trim();
-      if (text) return text;
-    }
-    return this.rawNode.type === 'default-group' || this.rawNode.type === 'template-group'
+    return this.rawNode.type === 'template-group'
       ? labels.groupLabel(this.rawNode.id)
       : labels.nodeLabel(this.rawNode.id);
   });
@@ -197,9 +188,6 @@ export class NodeModel<T = unknown>
     shareReplay(1),
   );
 
-  // Default node specific thing
-  public text = signal(NODE_DEFAULTS.text);
-
   // Component node specific thing
   public componentTypeInputs = {
     node: this.rawNode,
@@ -215,8 +203,6 @@ export class NodeModel<T = unknown>
   });
 
   public children = computed(() => this.entitiesService.nodesByParentIdMap().get(this.rawNode.id) ?? []);
-
-  public color = signal(NODE_DEFAULTS.color);
 
   public controlledByResizer = signal(false);
   public resizable = signal(NODE_DEFAULTS.resizable);
@@ -250,18 +236,6 @@ export class NodeModel<T = unknown>
 
     if (rawNode.extent) {
       this.extent = rawNode.extent;
-    }
-
-    if (rawNode.type === 'default-group' && rawNode.color) {
-      this.color = rawNode.color;
-    }
-
-    if (rawNode.type === 'default-group' && rawNode.resizable) {
-      this.resizable = rawNode.resizable;
-    }
-
-    if (rawNode.type === 'default' && rawNode.text) {
-      this.text = rawNode.text;
     }
 
     if (rawNode.type === 'html-template') {

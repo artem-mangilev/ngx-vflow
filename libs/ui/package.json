@@ -8,16 +8,19 @@
     "directory": "libs/ui"
   },
   "peerDependencies": {
-    "@angular/core": "^20.0.0 || ^21.0.0"
+    "@angular/core": "^20.0.0 || ^21.0.0",
+    "ngx-vflow": "^2.7.0"
   },
   "dependencies": {
     "tslib": "^2.3.0"
   },
   "sideEffects": [
-    "./styles.css"
+    "./styles.css",
+    "./styles.source.css"
   ],
   "exports": {
-    "./styles.css": "./styles.css"
+    "./styles.css": "./styles.css",
+    "./styles.source.css": "./styles.source.css"
   },
   "publishConfig": {
     "access": "public"

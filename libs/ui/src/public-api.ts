@@ -1,3 +1,6 @@
+export { VflowCardNode, VflowContainerNode } from './lib/card-node.component';
+export { VflowControls } from './lib/controls.component';
+import { VflowControls } from './lib/controls.component';
 export { VflowButton } from './lib/button.directive';
 export * from './lib/primitives.directive';
 
@@ -15,12 +18,13 @@ import {
   VflowEdge,
   VflowEdgeLabel,
   VflowGroup,
-  VflowBpmnEvent,
-  VflowBpmnGateway,
+  VflowToolbar,
+  VflowExternalLabel,
 } from './lib/primitives.directive';
 
 /** Convenience imports; every directive is also independently importable. */
 export const VflowUi = [
+  VflowControls,
   VflowButton,
   VflowTheme,
   VflowSelected,
@@ -34,6 +38,6 @@ export const VflowUi = [
   VflowEdge,
   VflowEdgeLabel,
   VflowGroup,
-  VflowBpmnEvent,
-  VflowBpmnGateway,
+  VflowToolbar,
+  VflowExternalLabel,
 ] as const;

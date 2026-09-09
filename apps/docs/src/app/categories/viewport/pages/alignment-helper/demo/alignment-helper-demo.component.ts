@@ -1,8 +1,21 @@
+import { VflowCardNode } from '@vflow/ui';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
 
 @Component({
-  template: `<vflow view="auto" [nodes]="nodes" [edges]="edges" [alignmentHelper]="true" />`,
+  template: `<vflow view="auto" data-vui-theme="light" [nodes]="nodes" [edges]="edges" [alignmentHelper]="true"
+    ><ng-template let-ctx edge
+      ><svg:g customTemplateEdge selectable>
+        <svg:path
+          class="vui-edge"
+          [attr.d]="ctx.path()"
+          [attr.marker-start]="ctx.markerStart()"
+          [attr.marker-end]="ctx.markerEnd()"
+          [attr.data-vui-selected]="ctx.selected() || ctx.preselected()" /></svg:g></ng-template
+    ><ng-template let-ctx edgeLabelHtml
+      ><span class="vui-edge-label">{{ ctx.label.data }}</span></ng-template
+    ></vflow
+  >`,
   styles: [
     `
       :host {
@@ -19,29 +32,32 @@ export class AlignmentHelperDemoComponent {
     {
       id: '1',
       point: { x: 10, y: 10 },
-      type: 'default',
-      text: `1`,
+      type: VflowCardNode,
+      data: { text: `1` },
+      ariaLabel: `1`,
     },
     {
       id: '2',
       point: { x: 90, y: 80 },
-      type: 'default',
+      type: VflowCardNode,
       // it's possible to pass html in this field
-      text: `<strong>2</strong>`,
+      data: { text: `2` },
+      ariaLabel: `2`,
       parentId: '3',
     },
     {
       id: '3',
       point: { x: 150, y: 10 },
-      type: 'default-group',
+      type: 'template-group',
       width: 250,
       height: 250,
     },
     {
       id: '4',
       point: { x: 450, y: 70 },
-      type: 'default',
-      text: `4`,
+      type: VflowCardNode,
+      data: { text: `4` },
+      ariaLabel: `4`,
     },
   ]);
 

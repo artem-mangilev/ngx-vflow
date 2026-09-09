@@ -5,7 +5,24 @@ import { Edge, Node, Vflow, VflowComponent, createNodes } from 'ngx-vflow';
   template: `
     <button (click)="nextNode()">Go To Next Node</button>
 
-    <vflow view="auto" [nodes]="nodes" [edges]="edges" [optimization]="{ lazyLoadTrigger: 'viewport' }" />
+    <vflow
+      view="auto"
+      data-vui-theme="light"
+      [nodes]="nodes"
+      [edges]="edges"
+      [optimization]="{ lazyLoadTrigger: 'viewport' }"
+      ><ng-template let-ctx edge
+        ><svg:g customTemplateEdge selectable>
+          <svg:path
+            class="vui-edge"
+            [attr.d]="ctx.path()"
+            [attr.marker-start]="ctx.markerStart()"
+            [attr.marker-end]="ctx.markerEnd()"
+            [attr.data-vui-selected]="ctx.selected() || ctx.preselected()" /></svg:g></ng-template
+      ><ng-template let-ctx edgeLabelHtml
+        ><span class="vui-edge-label">{{ ctx.label.data }}</span></ng-template
+      ></vflow
+    >
   `,
   styleUrls: ['./lazy-loading-demo.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

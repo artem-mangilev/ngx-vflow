@@ -1,3 +1,4 @@
+import { TestNodeComponent } from '../../../testing/test-node.component';
 import { TestBed } from '@angular/core/testing';
 import { provideZonelessChangeDetection, signal } from '@angular/core';
 import { ConnectionControllerDirective } from './connection-controller.directive';
@@ -41,7 +42,7 @@ describe('ConnectionControllerDirective', () => {
         new NodeModel(
           createNode({
             id,
-            type: 'default',
+            type: TestNodeComponent,
             point: { x: 0, y: 0 },
           }),
         ),

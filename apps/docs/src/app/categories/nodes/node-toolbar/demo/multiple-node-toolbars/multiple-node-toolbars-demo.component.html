@@ -1,4 +1,4 @@
-<vflow view="auto" [nodes]="nodes">
+<vflow view="auto" data-vui-theme="light" [nodes]="nodes">
   <ng-template let-ctx nodeHtml>
     <div class="custom-node"></div>
     <node-toolbar position="top">
@@ -8,4 +8,15 @@
       <button>Action</button>
     </node-toolbar>
   </ng-template>
-</vflow>
+  <ng-template let-ctx edge
+    ><svg:g customTemplateEdge selectable>
+      <svg:path
+        class="vui-edge"
+        [attr.d]="ctx.path()"
+        [attr.marker-start]="ctx.markerStart()"
+        [attr.marker-end]="ctx.markerEnd()"
+        [attr.data-vui-selected]="ctx.selected() || ctx.preselected()" /></svg:g></ng-template
+  ><ng-template let-ctx edgeLabelHtml
+    ><span class="vui-edge-label">{{ ctx.label.data }}</span></ng-template
+  ></vflow
+>

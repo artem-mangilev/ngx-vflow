@@ -1,3 +1,4 @@
+import { VflowCardNode } from '@vflow/ui';
 import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
 import { Vflow, createEdges, createNodes } from 'ngx-vflow';
 
@@ -18,6 +19,7 @@ import { Vflow, createEdges, createNodes } from 'ngx-vflow';
       <p>Selected: {{ selected() || 'none' }}</p>
       <button type="button">Before graph</button>
       <vflow
+        data-vui-theme="light"
         [nodes]="nodes()"
         [edges]="edges()"
         [view]="[600, 300]"
@@ -39,7 +41,10 @@ import { Vflow, createEdges, createNodes } from 'ngx-vflow';
             <svg:path aria-hidden="true" fill="none" stroke="#345" stroke-width="2" [attr.d]="context.path()" />
           </svg:g>
         </ng-template>
-      </vflow>
+        <ng-template let-ctx edgeLabelHtml
+          ><span class="vui-edge-label">{{ ctx.label.data }}</span></ng-template
+        ></vflow
+      >
       <button type="button">After graph</button>
     </section>
   `,
@@ -87,10 +92,17 @@ export class KeyboardNavigationDemoComponent {
   protected manual = signal(false);
   protected nodes = signal(
     createNodes([
-      { id: 'draft', type: 'default', parentId: 'stage', point: { x: 20, y: 30 }, text: 'Draft' },
+      {
+        id: 'draft',
+        type: VflowCardNode,
+        parentId: 'stage',
+        point: { x: 20, y: 30 },
+        data: { text: 'Draft' },
+        ariaLabel: 'Draft',
+      },
       {
         id: 'stage',
-        type: 'default-group',
+        type: 'template-group',
         point: { x: 20, y: 20 },
         width: 260,
         height: 180,
@@ -100,14 +112,23 @@ export class KeyboardNavigationDemoComponent {
       },
       {
         id: 'decoration',
-        type: 'default',
+        type: VflowCardNode,
         point: { x: 20, y: 240 },
-        text: 'Decoration',
+        data: { text: 'Decoration' },
+        ariaLabel: 'Decoration',
         focusable: false,
         selectable: false,
       },
       { id: 'editor', type: 'html-template', point: { x: 330, y: 40 }, ariaLabel: 'Editor' },
-      { id: 'later', type: 'default', point: { x: 1000, y: 80 }, text: 'Later', width: 100, height: 50 },
+      {
+        id: 'later',
+        type: VflowCardNode,
+        point: { x: 1000, y: 80 },
+        data: { text: 'Later' },
+        ariaLabel: 'Later',
+        width: 100,
+        height: 50,
+      },
     ]),
   );
   protected edges = signal(

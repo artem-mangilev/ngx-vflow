@@ -10,7 +10,7 @@
 .focus-indicator {
   display: none;
   fill: none;
-  stroke: CanvasText;
+  stroke: var(--vflow-focus, CanvasText);
   stroke-width: 5;
   stroke-dasharray: 4 4;
   vector-effect: non-scaling-stroke;
@@ -20,22 +20,6 @@
 :host(:focus-visible) {
   .focus-indicator {
     display: block;
-  }
-}
-
-.edge {
-  fill: none;
-  stroke-width: 2;
-  stroke: rgb(177, 177, 183);
-
-  &_selected {
-    stroke-width: 2.5;
-    stroke: #0f4c75;
-  }
-
-  &_preselected {
-    stroke-width: 2.5;
-    stroke: #0f4c75;
   }
 }
 
@@ -51,4 +35,9 @@
   fill: transparent;
   cursor: move;
   pointer-events: all;
+}
+
+.selection-indicator {
+  display: block;
+  stroke: var(--vflow-selection, #0f4c75);
 }

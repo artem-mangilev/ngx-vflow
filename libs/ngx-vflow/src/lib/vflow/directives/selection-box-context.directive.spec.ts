@@ -1,3 +1,4 @@
+import { TestNodeComponent } from '../../../testing/test-node.component';
 import { ChangeDetectionStrategy, Component, ViewChild } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideZonelessChangeDetection } from '@angular/core';
@@ -61,7 +62,7 @@ describe('SelectionBoxContextDirective', () => {
         new NodeModel(
           createRawNode({
             id,
-            type: 'default',
+            type: TestNodeComponent,
             point: { x: 0, y: 0 },
             width: 10,
             height: 10,

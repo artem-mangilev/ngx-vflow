@@ -1,4 +1,10 @@
-<vflow view="auto" [minZoom]="0.1" [nodes]="nodes()" [edges]="edges()" (nodesChanges.add)="fitView()">
+<vflow
+  view="auto"
+  data-vui-theme="light"
+  [minZoom]="0.1"
+  [nodes]="nodes()"
+  [edges]="edges()"
+  (nodesChanges.add)="fitView()">
   <ng-template let-ctx nodeHtml>
     <div class="custom-node" [style.background-color]="ctx.data().color" (click)="onNodeClick(ctx.node)">
       {{ ctx.data().color }}
@@ -7,4 +13,15 @@
       <handle type="target" position="top" />
     </div>
   </ng-template>
-</vflow>
+  <ng-template let-ctx edge
+    ><svg:g customTemplateEdge selectable>
+      <svg:path
+        class="vui-edge"
+        [attr.d]="ctx.path()"
+        [attr.marker-start]="ctx.markerStart()"
+        [attr.marker-end]="ctx.markerEnd()"
+        [attr.data-vui-selected]="ctx.selected() || ctx.preselected()" /></svg:g></ng-template
+  ><ng-template let-ctx edgeLabelHtml
+    ><span class="vui-edge-label">{{ ctx.label.data }}</span></ng-template
+  ></vflow
+>

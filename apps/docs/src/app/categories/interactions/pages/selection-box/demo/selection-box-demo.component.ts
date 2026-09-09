@@ -1,3 +1,4 @@
+import { VflowCardNode } from '@vflow/ui';
 import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
 import { Edge, Node, SelectionBoxMode, SelectionBoxSettings, Vflow, createNodes } from 'ngx-vflow';
 
@@ -9,7 +10,19 @@ import { Edge, Node, SelectionBoxMode, SelectionBoxSettings, Vflow, createNodes 
       <span class="hint">Hold Shift and drag on canvas</span>
     </div>
 
-    <vflow view="auto" [nodes]="nodes" [edges]="edges" [selectionBox]="selectionBox()" />
+    <vflow view="auto" data-vui-theme="light" [nodes]="nodes" [edges]="edges" [selectionBox]="selectionBox()"
+      ><ng-template let-ctx edge
+        ><svg:g customTemplateEdge selectable>
+          <svg:path
+            class="vui-edge"
+            [attr.d]="ctx.path()"
+            [attr.marker-start]="ctx.markerStart()"
+            [attr.marker-end]="ctx.markerEnd()"
+            [attr.data-vui-selected]="ctx.selected() || ctx.preselected()" /></svg:g></ng-template
+      ><ng-template let-ctx edgeLabelHtml
+        ><span class="vui-edge-label">{{ ctx.label.data }}</span></ng-template
+      ></vflow
+    >
   `,
   styles: [
     `
@@ -66,26 +79,30 @@ export class SelectionBoxDemoComponent {
     {
       id: '1',
       point: { x: 40, y: 120 },
-      type: 'default',
-      text: 'Node 1',
+      type: VflowCardNode,
+      data: { text: 'Node 1' },
+      ariaLabel: 'Node 1',
     },
     {
       id: '2',
       point: { x: 260, y: 150 },
-      type: 'default',
-      text: 'Node 2',
+      type: VflowCardNode,
+      data: { text: 'Node 2' },
+      ariaLabel: 'Node 2',
     },
     {
       id: '3',
       point: { x: 430, y: 95 },
-      type: 'default',
-      text: 'Node 3',
+      type: VflowCardNode,
+      data: { text: 'Node 3' },
+      ariaLabel: 'Node 3',
     },
     {
       id: '4',
       point: { x: 360, y: 300 },
-      type: 'default',
-      text: 'Node 4',
+      type: VflowCardNode,
+      data: { text: 'Node 4' },
+      ariaLabel: 'Node 4',
     },
   ]);
 

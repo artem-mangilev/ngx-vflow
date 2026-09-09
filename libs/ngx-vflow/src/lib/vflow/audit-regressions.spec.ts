@@ -1,4 +1,12 @@
-import { provideZonelessChangeDetection, signal } from '@angular/core';
+import { TestNodeComponent } from '../../testing/test-node.component';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  TemplateRef,
+  viewChild,
+  provideZonelessChangeDetection,
+  signal,
+} from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { FlowEntitiesService } from './services/flow-entities.service';
 import { FlowSettingsService } from './services/flow-settings.service';
@@ -23,6 +31,14 @@ import { EdgeLabelModel } from './models/edge-label.model';
 import { ConnectionModel } from './models/connection.model';
 import { VflowComponent } from './components/vflow/vflow.component';
 
+@Component({
+  template: '<ng-template #label let-ctx>{{ ctx.label.data }}</ng-template>',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+class LabelPresentation {
+  readonly label = viewChild.required<TemplateRef<unknown>>('label');
+}
+
 describe('Graph rendering and interaction regressions', () => {
   beforeEach(() =>
     TestBed.configureTestingModule({
@@ -42,12 +58,15 @@ describe('Graph rendering and interaction regressions', () => {
 
   function node(id: string) {
     return TestBed.runInInjectionContext(
-      () => new NodeModel(createNode({ id, type: 'default', point: { x: 0, y: 0 } })),
+      () => new NodeModel(createNode({ id, type: TestNodeComponent, point: { x: 0, y: 0 } })),
     );
   }
 
   it('centers an HTML label immediately after its content changes, including at non-unit zoom', () => {
+    const presentation = TestBed.createComponent(LabelPresentation);
+    presentation.detectChanges();
     const fixture = TestBed.createComponent(EdgeLabelComponent);
+    fixture.componentRef.setInput('htmlTemplate', presentation.componentInstance.label());
     const edge = graph().edges[0];
     edge.curve.set(() => ({
       path: 'M 0,0 L 400,200',
@@ -64,7 +83,7 @@ describe('Graph rendering and interaction regressions', () => {
     document.body.append(container);
     container.append(fixture.nativeElement);
     for (const text of ['Short', 'A significantly wider label that changed within one frame']) {
-      fixture.componentRef.setInput('model', new EdgeLabelModel({ type: 'default', text }));
+      fixture.componentRef.setInput('model', new EdgeLabelModel({ type: 'html-template', data: text }));
       fixture.detectChanges();
       const origin = container.getBoundingClientRect();
       const rect = fixture.nativeElement.querySelector('.edge-label-wrapper').getBoundingClientRect();
@@ -186,8 +205,8 @@ describe('Graph rendering and interaction regressions', () => {
     fixture.componentRef.setInput('view', [400, 300]);
     fixture.componentRef.setInput('optimization', { virtualization: true });
     fixture.componentRef.setInput('nodes', [
-      createNode({ id: 'a', type: 'default', point: { x: 10, y: 20 } }),
-      createNode({ id: 'b', type: 'default', point: { x: 250, y: 20 } }),
+      createNode({ id: 'a', type: TestNodeComponent, point: { x: 10, y: 20 } }),
+      createNode({ id: 'b', type: TestNodeComponent, point: { x: 250, y: 20 } }),
     ]);
     fixture.componentRef.setInput('edges', [createEdge({ id: 'a-b', source: 'a', target: 'b' })]);
     fixture.detectChanges();
@@ -255,8 +274,8 @@ describe('Graph rendering and interaction regressions', () => {
   }
 
   it('preserves rendered position when reparentNodes adds an omitted parentId signal', () => {
-    const parent = createNode({ id: 'parent', type: 'default', point: { x: 100, y: 0 } });
-    const child: Node = { id: 'child', type: 'default', point: signal({ x: 150, y: 0 }) };
+    const parent = createNode({ id: 'parent', type: TestNodeComponent, point: { x: 100, y: 0 } });
+    const child: Node = { id: 'child', type: TestNodeComponent, point: signal({ x: 150, y: 0 }) };
     const entities = TestBed.inject(FlowEntitiesService);
     const models = TestBed.runInInjectionContext(() => ReferenceIdentityChecker.nodes([parent, child], []));
     entities.nodes.set(models);
@@ -375,7 +394,7 @@ describe('Graph rendering and interaction regressions', () => {
     const point = signal({ x: 0, y: 0 });
     const read = jasmine.createSpy('removed node point').and.callFake(() => point());
     const observedPoint = Object.assign(read, point);
-    const raw: Node = { id: 'removed', type: 'default', point: observedPoint };
+    const raw: Node = { id: 'removed', type: TestNodeComponent, point: observedPoint };
     const entities = TestBed.inject(FlowEntitiesService);
     entities.nodes.set(TestBed.runInInjectionContext(() => ReferenceIdentityChecker.nodes([raw], [])));
     TestBed.flushEffects();
@@ -400,7 +419,9 @@ describe('Graph rendering and interaction regressions', () => {
         expect(entities.validEdges().length).toBe(count);
         samples.push(performance.now() - start);
       }
-      const rawNodes = nodes.map((n) => ({ id: n.rawNode.id, type: 'default', point: signal({ x: 0, y: 0 }) }) as Node);
+      const rawNodes = nodes.map(
+        (n) => ({ id: n.rawNode.id, type: TestNodeComponent, point: signal({ x: 0, y: 0 }) }) as Node,
+      );
       const start = performance.now();
       expect(
         removeNodes(

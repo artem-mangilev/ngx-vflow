@@ -1,3 +1,4 @@
+import { TestNodeComponent } from '../../../../testing/test-node.component';
 import { ChangeDetectionStrategy, Component, provideZonelessChangeDetection, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { createNodes } from '../../interfaces/node.interface';
@@ -31,9 +32,16 @@ class AccessibilityHostComponent {
   canAccept = signal(true);
   clicks = 0;
   nodes = createNodes([
-    { id: 'parent', type: 'default-group', point: { x: 0, y: 0 }, width: 250, height: 200 },
-    { id: 'a', type: 'default', parentId: 'parent', point: { x: 20, y: 30 }, text: '<b>Request</b> &amp; review' },
-    { id: 'b', type: 'default', point: { x: 350, y: 30 }, text: 'Approval' },
+    { id: 'parent', type: 'template-group', point: { x: 0, y: 0 }, width: 250, height: 200 },
+    {
+      id: 'a',
+      type: TestNodeComponent,
+      parentId: 'parent',
+      point: { x: 20, y: 30 },
+      data: { text: '<b>Request</b> &amp; review' },
+      ariaLabel: 'Request & review',
+    },
+    { id: 'b', type: TestNodeComponent, point: { x: 350, y: 30 }, data: { text: 'Approval' }, ariaLabel: 'Approval' },
   ]);
   edges: Edge[] = createEdges([{ id: 'ab', source: 'a', target: 'b' }]);
 }
@@ -47,7 +55,7 @@ describe('public graph accessibility', () => {
     const fixture = TestBed.createComponent(AccessibilityHostComponent);
     const host = fixture.componentInstance;
     host.nodes = createNodes([
-      { id: 'empty', type: 'default', point: { x: 0, y: 0 }, text: ' <br> ', ariaLabel: '  ' },
+      { id: 'empty', type: TestNodeComponent, point: { x: 0, y: 0 }, data: { text: ' <br> ' }, ariaLabel: '  ' },
       { id: 'custom', type: 'html-template', point: { x: 250, y: 0 } },
     ]);
     host.edges = createEdges(
@@ -116,10 +124,16 @@ describe('public graph accessibility', () => {
     const fixture = TestBed.createComponent(AccessibilityHostComponent);
     const host = fixture.componentInstance;
     host.nodes = createNodes([
-      { id: 'parent', type: 'default', point: { x: 0, y: 0 }, text: 'Processing' },
+      {
+        id: 'parent',
+        type: TestNodeComponent,
+        point: { x: 0, y: 0 },
+        data: { text: 'Processing' },
+        ariaLabel: 'Processing',
+      },
       {
         id: 'a',
-        type: 'default',
+        type: TestNodeComponent,
         point: { x: 10, y: 10 },
         parentId: 'parent',
         ariaLabel: 'Application',
@@ -128,7 +142,7 @@ describe('public graph accessibility', () => {
         selectable: false,
         draggable: false,
       },
-      { id: 'b', type: 'default', point: { x: 350, y: 30 }, text: 'Approval' },
+      { id: 'b', type: TestNodeComponent, point: { x: 350, y: 30 }, data: { text: 'Approval' }, ariaLabel: 'Approval' },
     ]);
     host.edges = createEdges(
       [{ id: 'ab', source: 'a', target: 'b', ariaLabel: 'Approve', ariaDescription: 'Review route.' }],
@@ -184,9 +198,10 @@ describe('public graph accessibility', () => {
     fixture.componentInstance.nodes = createNodes([
       {
         id: 'safe',
-        type: 'default',
+        type: TestNodeComponent,
         point: { x: 0, y: 0 },
-        text: 'Safe',
+        data: { text: 'Safe' },
+        ariaLabel: 'Safe',
         domAttributes: attributes as unknown as DomAttributes,
       },
     ]);

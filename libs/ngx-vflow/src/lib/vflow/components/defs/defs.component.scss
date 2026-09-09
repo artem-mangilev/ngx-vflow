@@ -1,5 +1,13 @@
 .marker {
   &__arrow {
+    &_closed,
+    &_default {
+      stroke: var(--vflow-muted, #b1b1b7);
+      stroke-width: 2px;
+    }
+    &_closed {
+      fill: var(--vflow-muted, #b1b1b7);
+    }
     &_default {
       stroke-width: 1px;
       stroke-linecap: round;

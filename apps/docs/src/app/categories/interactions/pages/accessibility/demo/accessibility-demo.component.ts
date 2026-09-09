@@ -1,3 +1,4 @@
+import { VflowCardNode } from '@vflow/ui';
 import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
 import { AriaLabelConfig, Vflow, createEdges, createNodes } from 'ngx-vflow';
 
@@ -22,6 +23,7 @@ import { AriaLabelConfig, Vflow, createEdges, createNodes } from 'ngx-vflow';
         {{ attempts() }}.
       </p>
       <vflow
+        data-vui-theme="light"
         [nodes]="nodes"
         [edges]="edges"
         [view]="[600, 300]"
@@ -48,8 +50,27 @@ import { AriaLabelConfig, Vflow, createEdges, createNodes } from 'ngx-vflow';
             <svg:path aria-hidden="true" fill="none" stroke="#345" stroke-width="2" [attr.d]="ctx.path()" />
           </svg:g>
         </ng-template>
-      </vflow>
-      <vflow [nodes]="referenceNodes" [view]="[600, 120]" [ariaLabelConfig]="{ flowLabel: 'Reference graph' }" />
+        <ng-template let-ctx edgeLabelHtml
+          ><span class="vui-edge-label">{{ ctx.label.data }}</span></ng-template
+        ></vflow
+      >
+      <vflow
+        data-vui-theme="light"
+        [nodes]="referenceNodes"
+        [view]="[600, 120]"
+        [ariaLabelConfig]="{ flowLabel: 'Reference graph' }"
+        ><ng-template let-ctx edge
+          ><svg:g customTemplateEdge selectable>
+            <svg:path
+              class="vui-edge"
+              [attr.d]="ctx.path()"
+              [attr.marker-start]="ctx.markerStart()"
+              [attr.marker-end]="ctx.markerEnd()"
+              [attr.data-vui-selected]="ctx.selected() || ctx.preselected()" /></svg:g></ng-template
+        ><ng-template let-ctx edgeLabelHtml
+          ><span class="vui-edge-label">{{ ctx.label.data }}</span></ng-template
+        ></vflow
+      >
     </section>
   `,
   styles: `
@@ -132,27 +153,28 @@ export class AccessibilityDemoComponent {
   protected nodes = createNodes([
     {
       id: 'parent',
-      type: 'default-group',
+      type: 'template-group',
       point: { x: 10, y: 20 },
       width: 250,
       height: 180,
       ariaLabel: 'Review',
-      color: '#64748b',
-      resizable: true,
+
+      data: { resizable: true },
     },
     {
       id: 'request',
-      type: 'default',
+      type: VflowCardNode,
       point: { x: 40, y: 55 },
       parentId: 'parent',
-      text: '<b>Request</b>',
+      data: { text: 'Request' },
+      ariaLabel: 'Request',
       selected: true,
       selectable: false,
       draggable: false,
       ariaDescription: 'Needs approval.',
     },
     { id: 'approval', type: 'html-template', point: { x: 340, y: 70 }, ariaLabel: 'Approval', selectable: false },
-    { id: 'archive', type: 'default', point: { x: 340, y: 210 }, text: 'Archive' },
+    { id: 'archive', type: VflowCardNode, point: { x: 340, y: 210 }, data: { text: 'Archive' }, ariaLabel: 'Archive' },
   ]);
   protected edges = createEdges([
     { id: 'review', source: 'request', target: 'approval', targetHandle: 'incoming' },
@@ -168,7 +190,15 @@ export class AccessibilityDemoComponent {
     },
   ]);
   protected referenceNodes = createNodes([
-    { id: 'parent', type: 'default', point: { x: 20, y: 20 }, text: 'Reference' },
-    { id: 'request', type: 'default', point: { x: 220, y: 20 }, text: 'Copy', parentId: 'parent', extent: null },
+    { id: 'parent', type: VflowCardNode, point: { x: 20, y: 20 }, data: { text: 'Reference' }, ariaLabel: 'Reference' },
+    {
+      id: 'request',
+      type: VflowCardNode,
+      point: { x: 220, y: 20 },
+      data: { text: 'Copy' },
+      ariaLabel: 'Copy',
+      parentId: 'parent',
+      extent: null,
+    },
   ]);
 }

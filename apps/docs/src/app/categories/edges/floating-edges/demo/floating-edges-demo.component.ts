@@ -2,7 +2,21 @@ import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { ConnectionSettings, CustomNodeComponent, Edge, Node, Vflow, createNodes } from 'ngx-vflow';
 
 @Component({
-  template: ` <vflow view="auto" [nodes]="nodes" [edges]="edges" [connection]="connection" /> `,
+  template: `
+    <vflow view="auto" data-vui-theme="light" [nodes]="nodes" [edges]="edges" [connection]="connection"
+      ><ng-template let-ctx edge
+        ><svg:g customTemplateEdge selectable>
+          <svg:path
+            class="vui-edge"
+            [attr.d]="ctx.path()"
+            [attr.marker-start]="ctx.markerStart()"
+            [attr.marker-end]="ctx.markerEnd()"
+            [attr.data-vui-selected]="ctx.selected() || ctx.preselected()" /></svg:g></ng-template
+      ><ng-template let-ctx edgeLabelHtml
+        ><span class="vui-edge-label">{{ ctx.label.data }}</span></ng-template
+      ></vflow
+    >
+  `,
   styles: [
     `
       :host {

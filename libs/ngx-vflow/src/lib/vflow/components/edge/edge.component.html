@@ -1,17 +1,8 @@
-<svg:path aria-hidden="true" class="focus-indicator" [attr.d]="model().path().path" />
-
-@if (model().type === 'default') {
-  <svg:path
-    class="edge"
-    aria-hidden="true"
-    [attr.d]="model().path().path"
-    [attr.marker-start]="model().markerStartUrl()"
-    [attr.marker-end]="model().markerEndUrl()"
-    [class.edge_selected]="model().selected()"
-    [class.edge_preselected]="model().preselected()" />
-
-  <svg:path aria-hidden="true" class="interactive-edge" [attr.d]="model().path().path" (click)="select(); pull()" />
-}
+<svg:path
+  aria-hidden="true"
+  class="focus-indicator"
+  [class.selection-indicator]="model().selected() || model().preselected()"
+  [attr.d]="model().path().path" />
 
 @if (model().type === 'template' && edgeTemplate()) {
   @if (edgeTemplate(); as edgeTemplate) {

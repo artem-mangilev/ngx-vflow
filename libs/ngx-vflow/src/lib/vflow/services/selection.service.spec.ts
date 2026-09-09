@@ -1,3 +1,4 @@
+import { TestNodeComponent } from '../../../testing/test-node.component';
 import { TestBed } from '@angular/core/testing';
 import { provideZonelessChangeDetection } from '@angular/core';
 import { createNode } from '../interfaces/node.interface';
@@ -38,7 +39,7 @@ describe('SelectionService', () => {
         new NodeModel(
           createNode({
             id,
-            type: 'default',
+            type: TestNodeComponent,
             point: { x: 0, y: 0 },
             selectable,
           }),

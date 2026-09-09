@@ -64,3 +64,7 @@ Use Node 22 (`nvm use`) and `npm ci`.
 - `npm run lint`, `npm test`, `npm run e2e`: Nx verification targets.
 
 See [release instructions](docs/releasing.md) for shared package versions, dry-runs and adding packages.
+
+### Presentation in the next major release
+
+Core uses application-supplied node and edge templates. Optional `@vflow/ui` provides cards, fields, ports, status indicators, viewport controls and a separate `@vflow/ui/bpmn` entry point. Choose compiled or source CSS and an explicit theme scope. See the Design system section and headless migration guide in the documentation.

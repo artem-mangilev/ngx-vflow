@@ -1,10 +1,11 @@
 import { ChangeDetectionStrategy, Component, effect, signal, untracked, viewChild } from '@angular/core';
 import { VflowUi } from '@vflow/ui';
+import { VflowBpmn } from '@vflow/ui/bpmn';
 import { createEdges, createNodes, Vflow, VflowComponent } from 'ngx-vflow';
 
 @Component({
   selector: 'app-ui-bpmn-demo',
-  imports: [Vflow, VflowUi],
+  imports: [Vflow, VflowUi, VflowBpmn],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrls: ['./demo.css'],
   styles: `
@@ -14,14 +15,6 @@ import { createEdges, createNodes, Vflow, VflowComponent } from 'ngx-vflow';
       display: grid;
       place-items: center;
       text-align: center;
-    }
-    .external-label {
-      position: absolute;
-      top: calc(100% + 12px);
-      left: 50%;
-      transform: translateX(-50%);
-      white-space: nowrap;
-      font-size: 12px;
     }
     .symbol {
       font-size: 28px;
@@ -47,23 +40,29 @@ import { createEdges, createNodes, Vflow, VflowComponent } from 'ngx-vflow';
         <label><input type="checkbox" [checked]="dark()" (change)="dark.set(!dark())" /> Dark theme</label>
         <p>Drag tasks inside lanes. A visual subset; no BPMN execution or XML model.</p>
       </div>
-      <vflow view="auto" background="var(--vui-canvas)" [nodes]="nodes" [edges]="edges">
+      <vflow view="auto" [nodes]="nodes" [edges]="edges">
         <ng-template let-ctx groupNode>
-          <div
-            vflowGroup
-            class="lane"
-            selectable
-            [vflowSelected]="ctx.selected() || ctx.preselected()"
-            [style.width.px]="ctx.width()"
-            [style.height.px]="ctx.height()">
-            <strong class="lane-title">{{ ctx.data().title }}</strong>
-          </div>
+          @if (ctx.data().kind === 'pool') {
+            <div vflowBpmnPool [style.width.px]="ctx.width()" [style.height.px]="ctx.height()">
+              <header>{{ ctx.data().title }}</header>
+            </div>
+          } @else {
+            <div
+              vflowBpmnLane
+              class="lane"
+              selectable
+              [vflowSelected]="ctx.selected() || ctx.preselected()"
+              [style.width.px]="ctx.width()"
+              [style.height.px]="ctx.height()">
+              <strong class="lane-title">{{ ctx.data().title }}</strong>
+            </div>
+          }
         </ng-template>
         <ng-template let-ctx nodeHtml>
           @switch (ctx.data().kind) {
             @case ('task') {
               <div
-                vflowNode
+                vflowBpmnTask
                 vflowNodeBody
                 class="task"
                 selectable
@@ -75,8 +74,8 @@ import { createEdges, createNodes, Vflow, VflowComponent } from 'ngx-vflow';
             }
             @case ('gateway') {
               <div vflowBpmnGateway selectable [vflowSelected]="ctx.selected() || ctx.preselected()">
-                <span aria-hidden="true">×</span>
-                <span class="external-label">{{ ctx.data().title }}</span>
+                <span aria-hidden="true">{{ ctx.node.id === 'parallel' ? '+' : '×' }}</span>
+                <span vflowExternalLabel>{{ ctx.data().title }}</span>
                 <handle type="target" position="left" [template]="port" [canStart]="false" [canAccept]="false" />
                 <handle
                   type="source"
@@ -99,7 +98,7 @@ import { createEdges, createNodes, Vflow, VflowComponent } from 'ngx-vflow';
                 @if (ctx.data().kind === 'intermediate') {
                   <span class="symbol" aria-hidden="true">◷</span>
                 }
-                <span class="external-label">{{ ctx.data().title }}</span>
+                <span vflowExternalLabel>{{ ctx.data().title }}</span>
                 @if (ctx.data().kind !== 'start') {
                   <handle type="target" position="left" [template]="port" [canStart]="false" [canAccept]="false" />
                 }
@@ -112,10 +111,41 @@ import { createEdges, createNodes, Vflow, VflowComponent } from 'ngx-vflow';
         </ng-template>
         <ng-template let-ctx edge>
           <svg:g customTemplateEdge selectable>
+            <svg:defs>
+              <svg:marker
+                viewBox="0 0 12 12"
+                refX="10"
+                refY="6"
+                markerWidth="12"
+                markerHeight="12"
+                orient="auto"
+                markerUnits="userSpaceOnUse"
+                [attr.id]="markerPrefix + ctx.edge.id + '-end'">
+                <svg:path
+                  d="M 1 1 L 10 6 L 1 11"
+                  stroke="var(--vui-muted)"
+                  [attr.fill]="ctx.data().kind === 'message' ? 'none' : 'var(--vui-muted)'" />
+              </svg:marker>
+              <svg:marker
+                viewBox="0 0 12 12"
+                refX="6"
+                refY="6"
+                markerWidth="10"
+                markerHeight="10"
+                markerUnits="userSpaceOnUse"
+                [attr.id]="markerPrefix + ctx.edge.id + '-start'">
+                <svg:circle cx="6" cy="6" r="4" fill="var(--vui-surface)" stroke="var(--vui-muted)" />
+              </svg:marker>
+            </svg:defs>
             <svg:path
-              vflowEdge
+              [vflowBpmnLink]="ctx.data().kind"
               [attr.d]="ctx.path()"
-              [attr.marker-end]="ctx.markerEnd()"
+              [attr.marker-end]="
+                ctx.data().kind === 'association' ? null : 'url(#' + markerPrefix + ctx.edge.id + '-end)'
+              "
+              [attr.marker-start]="
+                ctx.data().kind === 'message' ? 'url(#' + markerPrefix + ctx.edge.id + '-start)' : null
+              "
               [vflowSelected]="ctx.selected() || ctx.preselected()" />
           </svg:g>
         </ng-template>
@@ -130,11 +160,22 @@ import { createEdges, createNodes, Vflow, VflowComponent } from 'ngx-vflow';
 export class BpmnDemoComponent {
   readonly flow = viewChild(VflowComponent);
   readonly dark = signal(false);
+  readonly markerPrefix = 'bpmn-' + crypto.randomUUID();
   readonly nodes = createNodes([
+    {
+      id: 'pool',
+      type: 'template-group',
+      point: { x: 0, y: 0 },
+      width: 1050,
+      height: 440,
+      ariaLabel: 'Invoice processing pool',
+      data: { title: 'Invoice processing', kind: 'pool' },
+    },
     {
       id: 'operations',
       type: 'template-group',
-      point: { x: 20, y: 20 },
+      point: { x: 20, y: 30 },
+      parentId: 'pool',
       width: 1010,
       height: 190,
       ariaLabel: 'Operations lane',
@@ -143,7 +184,8 @@ export class BpmnDemoComponent {
     {
       id: 'finance',
       type: 'template-group',
-      point: { x: 20, y: 210 },
+      point: { x: 20, y: 220 },
+      parentId: 'pool',
       width: 1010,
       height: 190,
       ariaLabel: 'Finance lane',
@@ -174,12 +216,12 @@ export class BpmnDemoComponent {
       data: { kind: 'gateway', title: 'Under limit?' },
     },
     {
-      id: 'timer',
+      id: 'parallel',
       type: 'html-template',
       point: { x: 620, y: 60 },
       parentId: 'operations',
-      ariaLabel: 'Intermediate timer: payment date',
-      data: { kind: 'intermediate', title: 'Payment date' },
+      ariaLabel: 'Parallel gateway: payment and notification',
+      data: { kind: 'gateway', title: 'Payment and notification' },
     },
     {
       id: 'review',
@@ -214,7 +256,7 @@ export class BpmnDemoComponent {
         id: 'decision-timer',
         source: 'decision',
         sourceHandle: 'yes',
-        target: 'timer',
+        target: 'parallel',
         edgeLabels: { center: { type: 'html-template' as const, data: 'Yes' } },
       },
       {
@@ -224,14 +266,16 @@ export class BpmnDemoComponent {
         target: 'review',
         edgeLabels: { center: { type: 'html-template' as const, data: 'No' } },
       },
-      { id: 'timer-pay', source: 'timer', target: 'pay' },
+      { id: 'timer-pay', source: 'parallel', sourceHandle: 'yes', target: 'pay' },
       { id: 'review-pay', source: 'review', target: 'pay' },
       { id: 'pay-end', source: 'pay', target: 'end' },
+      { id: 'notification', source: 'parallel', sourceHandle: 'no', target: 'review' },
+      { id: 'audit', source: 'validate', target: 'review' },
     ].map((edge) => ({
       ...edge,
       type: 'template' as const,
       curve: 'smooth-step' as const,
-      markers: { end: { color: 'var(--vui-foreground)' } },
+      data: { kind: edge.id === 'notification' ? 'message' : edge.id === 'audit' ? 'association' : 'sequence' },
     })),
   );
 

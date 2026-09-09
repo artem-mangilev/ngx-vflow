@@ -1,3 +1,4 @@
+import { TestNodeComponent } from '../../../testing/test-node.component';
 import { TestBed } from '@angular/core/testing';
 import { EdgeModel } from './edge.model';
 import { NodeModel } from './node.model';
@@ -12,6 +13,7 @@ import { provideZonelessChangeDetection } from '@angular/core';
 
 function mockRect(element: Element, rect: { left: number; top: number; width: number; height: number }): void {
   const { left, top, width, height } = rect;
+  element.getClientRects = () => [element.getBoundingClientRect()] as unknown as DOMRectList;
 
   element.getBoundingClientRect = () =>
     ({
@@ -99,8 +101,9 @@ describe('EdgeModel', () => {
           new NodeModel(
             createNode({
               id: '1',
-              type: 'default',
-              text: 'test',
+              type: TestNodeComponent,
+              data: { text: 'test' },
+              ariaLabel: 'test',
               point: { x: 15, y: 15 },
               width: 0,
               height: 0,
@@ -114,8 +117,9 @@ describe('EdgeModel', () => {
           new NodeModel(
             createNode({
               id: '2',
-              type: 'default',
-              text: 'test',
+              type: TestNodeComponent,
+              data: { text: 'test' },
+              ariaLabel: 'test',
               point: { x: 15, y: 15 },
               width: 0,
               height: 0,

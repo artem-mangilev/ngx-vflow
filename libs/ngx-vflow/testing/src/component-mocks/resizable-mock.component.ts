@@ -16,7 +16,6 @@ import { AsInterface } from '../types';
 })
 export class ResizableMockComponent implements AsInterface<ResizableComponent>, OnInit, OnDestroy, AfterViewInit {
   public resizable = input<boolean | ''>();
-  public resizerColor = input('#2e414c');
   public gap = input(1.5);
   public minWidth = input<number>();
   public minHeight = input<number>();

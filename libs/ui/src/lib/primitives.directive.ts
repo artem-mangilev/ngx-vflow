@@ -39,8 +39,12 @@ export class VflowPort {
 }
 
 /** Tone and status text are independent from graph selection and focus. */
-@Directive({ selector: '[vflowStatus]', host: { class: 'vui-status', '[attr.data-tone]': 'vflowStatus()' } })
+@Directive({
+  selector: '[vflowStatus]',
+  host: { class: 'vui-status', '[attr.data-tone]': 'vflowStatus()', '[attr.data-active]': 'vflowStatusActive()' },
+})
 export class VflowStatus {
+  readonly vflowStatusActive = input(false, { transform: booleanAttribute });
   readonly vflowStatus = input<'neutral' | 'info' | 'success' | 'warning' | 'danger'>('neutral');
 }
 
@@ -55,12 +59,9 @@ export class VflowEdgeLabel {}
 @Directive({ selector: '[vflowGroup]', host: { class: 'vui-group' } })
 export class VflowGroup {}
 
-/** A BPMN event outline. The consumer supplies its symbol and accessible name. */
-@Directive({ selector: '[vflowBpmnEvent]', host: { class: 'vui-bpmn-event', '[attr.data-event]': 'vflowBpmnEvent()' } })
-export class VflowBpmnEvent {
-  readonly vflowBpmnEvent = input<'start' | 'intermediate' | 'end'>('start');
-}
+/** Surface for consumer toolbar contents, including ordinary native controls. */
+@Directive({ selector: '[vflowToolbar]', host: { class: 'vui-toolbar' } })
+export class VflowToolbar {}
 
-/** A diamond outline that leaves the consumer's text and handle coordinates unrotated. */
-@Directive({ selector: '[vflowBpmnGateway]', host: { class: 'vui-bpmn-gateway' } })
-export class VflowBpmnGateway {}
+@Directive({ selector: '[vflowExternalLabel]', host: { class: 'vui-external-label' } })
+export class VflowExternalLabel {}

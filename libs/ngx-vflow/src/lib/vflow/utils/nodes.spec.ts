@@ -1,3 +1,4 @@
+import { TestNodeComponent } from '../../../testing/test-node.component';
 import { TestBed } from '@angular/core/testing';
 import { provideZonelessChangeDetection } from '@angular/core';
 import { createNode } from '../interfaces/node.interface';
@@ -29,7 +30,7 @@ describe('nodes utils', () => {
         new NodeModel(
           createNode({
             id: 'group',
-            type: 'default-group',
+            type: 'template-group',
             point: { x: 100, y: 100 },
             width: 400,
             height: 300,
@@ -43,8 +44,9 @@ describe('nodes utils', () => {
           createNode({
             id: 'child',
             parentId: 'group',
-            type: 'default',
-            text: 'child',
+            type: TestNodeComponent,
+            data: { text: 'child' },
+            ariaLabel: 'child',
             point: { x: 10, y: 10 },
             width: 80,
             height: 40,

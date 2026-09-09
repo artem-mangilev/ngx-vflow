@@ -31,6 +31,9 @@ import {
   selector: '[nodeResizeControl]',
   standalone: true,
   template: '',
+  styles: [
+    ':host(.vflow-resize-line) { border-color: var(--vflow-border, #2e414c); } :host(.vflow-resize-handle) { background: var(--vflow-border, #2e414c); }',
+  ],
   hostDirectives: [NoDragDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
@@ -40,10 +43,10 @@ import {
     '[class.bottom]': "position().includes('bottom')",
     '[class.left]': "position().includes('left')",
     '[class.line]': 'isLine()',
+    '[class.vflow-resize-line]': 'isLine()',
+    '[class.vflow-resize-handle]': '!isLine()',
     '[class.handle]': '!isLine()',
     '[style.scale]': 'scale()',
-    '[style.background-color]': 'backgroundColor()',
-    '[style.border-color]': 'borderColor()',
   },
 })
 export class NodeResizeControlComponent implements OnDestroy {
@@ -54,7 +57,6 @@ export class NodeResizeControlComponent implements OnDestroy {
 
   public position = input.required<ControlPosition>();
   public variant = input<ResizeControlVariant>(ResizeControlVariant.Handle);
-  public color = input<string>();
   public minWidth = input(0);
   public minHeight = input(0);
   public maxWidth = input(Infinity);
@@ -81,9 +83,6 @@ export class NodeResizeControlComponent implements OnDestroy {
     const zoom = this.viewportService.readableViewport().zoom;
     return `${Math.max(1 / zoom, 1)}`;
   });
-
-  protected backgroundColor = computed(() => (this.isLine() ? null : (this.color() ?? null)));
-  protected borderColor = computed(() => (this.isLine() ? (this.color() ?? null) : null));
 
   private get model() {
     return this.nodeAccessor.model()!;

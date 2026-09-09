@@ -1,3 +1,4 @@
+import { TestNodeComponent } from '../../../../testing/test-node.component';
 import { ChangeDetectionStrategy, Component, provideZonelessChangeDetection, viewChild, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { createNodes } from '../../interfaces/node.interface';
@@ -10,19 +11,33 @@ import { filter, firstValueFrom, timeout } from 'rxjs';
   imports: [Vflow],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `<button>Before</button
-    ><vflow
-      [nodes]="nodes()"
-      [edges]="edges"
-      [view]="[600, 350]"
-      [optimization]="{ detachedGroupsLayer: true }" /><button>After</button>`,
+    ><vflow [nodes]="nodes()" [edges]="edges" [view]="[600, 350]" [optimization]="{ detachedGroupsLayer: true }">
+      <ng-template groupNode let-ctx
+        ><div selectable [style.width.px]="ctx.width()" [style.height.px]="ctx.height()"></div
+      ></ng-template> </vflow
+    ><button>After</button>`,
 })
 class KeyboardHostComponent {
   flow = viewChild.required(VflowComponent);
   nodes = signal(
     createNodes([
-      { id: 'child', type: 'default', parentId: 'parent', point: { x: 10, y: 10 }, text: 'Child' },
-      { id: 'parent', type: 'default-group', point: { x: 20, y: 20 }, width: 250, height: 200, ariaLabel: 'Parent' },
-      { id: 'other', type: 'default', point: { x: 400, y: 50 }, text: 'Other', focusable: false },
+      {
+        id: 'child',
+        type: TestNodeComponent,
+        parentId: 'parent',
+        point: { x: 10, y: 10 },
+        data: { text: 'Child' },
+        ariaLabel: 'Child',
+      },
+      { id: 'parent', type: 'template-group', point: { x: 20, y: 20 }, width: 250, height: 200, ariaLabel: 'Parent' },
+      {
+        id: 'other',
+        type: TestNodeComponent,
+        point: { x: 400, y: 50 },
+        data: { text: 'Other' },
+        ariaLabel: 'Other',
+        focusable: false,
+      },
     ]),
   );
   edges = createEdges([{ id: 'edge', source: 'child', target: 'other', ariaLabel: 'Route' }]);
@@ -47,7 +62,14 @@ class KeyboardControlsHostComponent {
     { id: 'custom', type: 'html-template', point: { x: 0, y: 0 }, ariaLabel: 'Custom', selected: true },
   ]);
   excluded = createNodes([
-    { id: 'excluded', type: 'default', point: { x: 0, y: 0 }, text: 'Excluded', selected: true },
+    {
+      id: 'excluded',
+      type: TestNodeComponent,
+      point: { x: 0, y: 0 },
+      data: { text: 'Excluded' },
+      ariaLabel: 'Excluded',
+      selected: true,
+    },
   ]);
 }
 
@@ -77,7 +99,7 @@ describe('public keyboard graph navigation', () => {
     const { fixture, host, root } = await setup();
     const order = () => Array.from(root.querySelectorAll('[tabindex="0"]')).map((e) => e.getAttribute('aria-label'));
     expect(order()).toEqual(['Child', 'Parent', 'Route']);
-    root.querySelector<HTMLElement>('[aria-label="Child"] default-node')!.click();
+    root.querySelector<HTMLElement>('[aria-label="Child"] test-node')!.click();
     fixture.detectChanges();
     await fixture.whenStable();
     expect(order()).toEqual(['Child', 'Parent', 'Route']);
@@ -92,15 +114,15 @@ describe('public keyboard graph navigation', () => {
       createNodes([
         {
           id: 'child',
-          type: 'default-group',
+          type: 'template-group',
           parentId: 'parent',
           point: { x: 10, y: 10 },
           width: 100,
           height: 100,
           ariaLabel: 'Child',
         },
-        { id: 'parent', type: 'default-group', point: { x: 20, y: 20 }, width: 250, height: 200, ariaLabel: 'Parent' },
-        { id: 'other', type: 'default-group', point: { x: 100, y: 50 }, width: 250, height: 200, ariaLabel: 'Other' },
+        { id: 'parent', type: 'template-group', point: { x: 20, y: 20 }, width: 250, height: 200, ariaLabel: 'Parent' },
+        { id: 'other', type: 'template-group', point: { x: 100, y: 50 }, width: 250, height: 200, ariaLabel: 'Other' },
       ]),
     );
     fixture.detectChanges();

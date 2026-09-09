@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { map, switchMap } from 'rxjs/operators';
 import { RootSvgReferenceDirective } from '../../directives/reference.directive';
@@ -7,12 +7,10 @@ import { ViewportService } from '../../services/viewport.service';
 import { id } from '../../utils/id';
 import { toLazySignal } from '../../utils/signals/to-lazy-signal';
 
-const defaultBg = '#fff';
+const defaultBg = 'var(--vflow-background, #fff)';
 const defaultGap = 20;
 const defaultDotSize = 2;
-const defaultDotColor = 'rgb(177, 177, 183)';
 const defaultGridSize = 20;
-const defaultStrokeWidth = 2;
 const defaultImageScale = 0.1;
 const defaultRepeated = true;
 
@@ -35,16 +33,6 @@ export class BackgroundComponent {
 
   protected y = computed(() => {
     return this.viewportService.readableViewport().y % this.scaledGap();
-  });
-
-  protected patternColor = computed(() => {
-    const background = this.backgroundSignal();
-
-    if (background.type === 'dots' || background.type === 'grid') {
-      return background.color ?? defaultDotColor;
-    }
-
-    return defaultDotColor;
   });
 
   protected patternSize = computed(() => {
@@ -71,18 +59,6 @@ export class BackgroundComponent {
 
     if (background.type === 'grid') {
       return zoom * (background.size ?? defaultGridSize);
-    }
-
-    return 0;
-  });
-
-  // GRID PATTERN
-  protected strokeWidth = computed(() => {
-    const background = this.backgroundSignal();
-
-    if (background.type === 'grid') {
-      const zoom = this.viewportService.readableViewport().zoom;
-      return zoom * ((background.strokeWidth ?? defaultStrokeWidth) / 2);
     }
 
     return 0;
@@ -167,21 +143,7 @@ export class BackgroundComponent {
   protected patternUrl = `url(#${this.patternId})`;
 
   constructor() {
-    effect(() => {
-      const background = this.backgroundSignal();
-
-      if (background.type === 'dots') {
-        this.rootSvg.style.backgroundColor = background.backgroundColor ?? defaultBg;
-      }
-
-      if (background.type === 'grid') {
-        this.rootSvg.style.backgroundColor = background.backgroundColor ?? defaultBg;
-      }
-
-      if (background.type === 'solid') {
-        this.rootSvg.style.backgroundColor = background.color;
-      }
-    });
+    this.rootSvg.style.backgroundColor = defaultBg;
   }
 }
 

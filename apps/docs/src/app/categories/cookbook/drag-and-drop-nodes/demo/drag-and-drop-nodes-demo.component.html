@@ -7,6 +7,7 @@
 <vflow
   view="auto"
   dndDropzone
+  data-vui-theme="light"
   [nodes]="nodes"
   [edges]="edges"
   (dndDrop)="createNode($event)"
@@ -39,4 +40,7 @@
       [attr.d]="ctx.path()"
       [attr.stroke]="ctx.selected() ? '#0f4c75' : '#bbe1fa'" />
   </ng-template>
-</vflow>
+  <ng-template let-ctx edgeLabelHtml
+    ><span class="vui-edge-label">{{ ctx.label.data }}</span></ng-template
+  ></vflow
+>

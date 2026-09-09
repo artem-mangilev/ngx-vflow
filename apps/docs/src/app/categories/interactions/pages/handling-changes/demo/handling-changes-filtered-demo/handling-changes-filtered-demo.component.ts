@@ -1,3 +1,4 @@
+import { VflowCardNode } from '@vflow/ui';
 import { ChangeDetectionStrategy, Component, TemplateRef, inject, viewChild } from '@angular/core';
 import { NgDocNotifyService } from '@ng-doc/ui-kit';
 import {
@@ -34,14 +35,16 @@ export class HandlingChangesFilteredDemoComponent {
     {
       id: '1',
       point: { x: 100, y: 100 },
-      type: 'default',
-      text: `1`,
+      type: VflowCardNode,
+      data: { text: `1` },
+      ariaLabel: `1`,
     },
     {
       id: '2',
       point: { x: 200, y: 200 },
-      type: 'default',
-      text: `2`,
+      type: VflowCardNode,
+      data: { text: `2` },
+      ariaLabel: `2`,
     },
   ]);
 
@@ -103,14 +106,16 @@ export class HandlingChangesFilteredDemoComponent {
         {
           id: crypto.randomUUID(),
           point: { x: 0, y: 0 },
-          type: 'default',
-          text: `random`,
+          type: VflowCardNode,
+          data: { text: `random` },
+          ariaLabel: `random`,
         },
         {
           id: crypto.randomUUID(),
           point: { x: 300, y: 300 },
-          type: 'default',
-          text: `random`,
+          type: VflowCardNode,
+          data: { text: `random` },
+          ariaLabel: `random`,
         },
       ]),
     ];

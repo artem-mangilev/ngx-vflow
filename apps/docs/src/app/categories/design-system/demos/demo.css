@@ -4,7 +4,7 @@
 .demo {
   border: 1px solid var(--vui-border);
   border-radius: 14px;
-  background: var(--vui-canvas);
+  background: var(--vflow-background);
   color: var(--vui-foreground);
   overflow: hidden;
 }

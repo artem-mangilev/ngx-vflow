@@ -1,3 +1,118 @@
+## Headless presentation and the UI package
+
+Core no longer supplies default node/group/edge/label presentations. It still owns graph
+geometry, selection, focus, connection previews, handles and resize interaction. Choose one
+of the two paths below. Both run in the built-package consumer under `apps/ui-consumer`.
+
+### Own templates, without UI
+
+```typescript
+import { createNodes, createEdges, Vflow } from 'ngx-vflow';
+
+const nodes = createNodes([
+  { id: 'a', type: 'html-template', point: { x: 20, y: 60 }, ariaLabel: 'Source', data: { name: 'Source' } },
+  { id: 'b', type: 'html-template', point: { x: 240, y: 60 }, ariaLabel: 'Target', data: { name: 'Target' } },
+]);
+const edges = createEdges([{ id: 'ab', source: 'a', target: 'b' }]);
+```
+
+{% raw %}
+
+```html
+<vflow [nodes]="nodes" [edges]="edges">
+  <ng-template nodeHtml let-ctx>
+    <div selectable style="width:100px; height:50px; border:1px solid currentColor">
+      {{ ctx.data().name }}
+      <handle type="source" position="right" />
+      <handle type="target" position="left" />
+    </div>
+  </ng-template>
+  <ng-template edge let-ctx>
+    <svg:g customTemplateEdge selectable>
+      <svg:path [attr.d]="ctx.path()" stroke="currentColor" fill="none" />
+    </svg:g>
+  </ng-template>
+  <ng-template edgeLabelHtml let-ctx><span>{{ ctx.label.data }}</span></ng-template>
+</vflow>
+```
+
+{% endraw %}
+
+### UI presentations
+
+Import `VflowUi` alongside `Vflow`, and include either `@vflow/ui/styles.css` or
+`@vflow/ui/styles.source.css`. Apply a theme explicitly. Use UI primitives in the same templates,
+or use `VflowCardNode` for simple cards. Preserve group selection gestures with `template-group`:
+
+```typescript
+import { VflowCardNode, VflowUi } from '@vflow/ui';
+import { createNodes } from 'ngx-vflow';
+
+const nodes = createNodes([
+  { id: 'a', type: VflowCardNode, point: { x: 20, y: 30 }, width: 120, height: 60, ariaLabel: 'Source', data: { text: 'Source' } },
+  { id: 'frame', type: 'template-group', point: { x: 200, y: 20 }, width: 300, height: 200, ariaLabel: 'Team', data: { text: 'Team', resizable: true } },
+  { id: 'b', type: VflowCardNode, parentId: 'frame', point: { x: 30, y: 60 }, width: 120, height: 60, ariaLabel: 'Target', data: { text: 'Target' } },
+]);
+```
+
+{% raw %}
+
+```html
+<section vflowTheme="light">
+  <vflow [nodes]="nodes" [edges]="edges">
+    <ng-template groupNode let-ctx>
+      <div vflowGroup selectable [resizable]="ctx.data().resizable ?? false" [style.width.px]="ctx.width()" [style.height.px]="ctx.height()">{{ ctx.data().text }}</div>
+    </ng-template>
+    <ng-template edge let-ctx>
+      <svg:g customTemplateEdge selectable>
+        <svg:path vflowEdge [attr.d]="ctx.path()" [attr.marker-end]="ctx.markerEnd()" [vflowSelected]="ctx.selected() || ctx.preselected()" />
+      </svg:g>
+    </ng-template>
+    <ng-template edgeLabelHtml let-ctx><span vflowEdgeLabel>{{ ctx.label.data }}</span></ng-template>
+  </vflow>
+</section>
+```
+
+{% endraw %}
+
+`VflowCardNode` displays plain text. Rich HTML belongs in an application template with Angular's
+normal binding/sanitization. Supply `ariaLabel` explicitly when replacing a former default text
+name. Keep original IDs, points, dimensions, parent relationships and handle IDs; card source
+and target handles retain their empty IDs and right/left directions. A container's parent role
+still comes from another node's `parentId`, not from its appearance class.
+`VflowContainerNode` is an optional component alternative: its interior follows ordinary node
+dragging rules; use `template-group` to preserve group Shift-drag selection behavior.
+
+| Removed API                                                       | Replacement                                                                                                 |
+| ----------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| `DefaultNode`, `type: 'default'`, `isDefaultNode`                 | `ComponentNode` using `VflowCardNode`, or `HtmlTemplateNode`; inspect `node.type` for your chosen component |
+| `DefaultGroupNode`, `type: 'default-group'`, `isDefaultGroupNode` | `TemplateGroupNode` with a `groupNode` template; use `parentId` to inspect relationships                    |
+| Default edge type                                                 | `type: 'template'` (also the create-helper default), with an explicit `edge` template                       |
+| `DefaultEdgeLabel`, default label `text`/`style`                  | `{ type: 'html-template', data: ... }`, with `edgeLabelHtml` and ordinary CSS                               |
+| `resizerColor`, resize control `color`                            | `--vflow-border`; `.vflow-resize-line`, `.vflow-resize-handle`                                              |
+| Minimap `maskColor`, `strokeColor`                                | Editor `--vflow-muted`, `--vflow-border`                                                                    |
+| Alignment `lineColor`                                             | `--vflow-selection` or `.vflow-alignment-line`                                                              |
+| Selection-box `color`                                             | `--vflow-selection` or `.selection-box`                                                                     |
+| Background string / `color` / `backgroundColor`                   | `--vflow-background`, `--vflow-muted`, `.vflow-background-dot`, `.vflow-background-grid`                    |
+| Grid `strokeWidth`                                                | `.vflow-background-grid { stroke-width: ... }`                                                              |
+| Marker `color`, `strokeWidth`                                     | `.marker__arrow_closed`, `.marker__arrow_default`; default reads `--vflow-muted`                            |
+| Default group `color`                                             | `.vui-group` or general UI border/surface tokens                                                            |
+
+Marker dimensions, orientation and units remain SVG geometry. For custom marker shapes, put
+consumer-owned SVG markers in an edge template, as the BPMN demo does. Marker IDs generated by
+core are scoped to the flow instance, so simultaneous themes do not reuse another editor's marker.
+Background pattern spacing, image data/scale, resize constraints and interaction tolerances remain
+behavior/geometry inputs. Custom CSS should target documented part selectors rather than private DOM.
+
+Canvas minimap resolves CSS colors from the editor and observes ancestor `class`, `style` and
+`data-vui-theme` changes. For stylesheet-only changes, dispatch `vflow-theme-change` on the flow.
+It does not clone node-local theme overrides into its canvas. UI theme mapping is scoped; importing
+its CSS does not theme standalone core flows elsewhere on the page.
+
+## Earlier migration notes
+
+The following sections describe earlier releases; the headless migration above supersedes their default presentation APIs.
+
 ## Migration to >= v3.0
 
 Angular 20 is now the minimum supported version. Upgrade Angular before installing ngx-vflow v3.

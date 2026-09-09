@@ -22,12 +22,15 @@ import { createEdges, createNodes, Vflow, VflowComponent } from 'ngx-vflow';
   template: `
     <section class="demo" aria-label="Approval workflow demo" [vflowTheme]="dark() ? 'dark' : 'light'">
       <div class="controls">
-        <button vflowButton type="button" (click)="flow()?.fitView()">Fit workflow</button>
+        @if (flow(); as editor) {
+          <vflow-controls [flow]="editor" />
+        }
         <label><input type="checkbox" [checked]="dark()" (change)="dark.set(!dark())" /> Dark theme</label>
         <label><input type="checkbox" [checked]="readOnly()" (change)="toggleReadOnly()" /> Read only</label>
         <p>Approve the invoice; select a node to inspect it.</p>
       </div>
-      <vflow view="auto" background="var(--vui-canvas)" [nodes]="nodes" [edges]="edges">
+      <vflow view="auto" [minZoom]="0.5" [maxZoom]="1.5" [nodes]="nodes" [edges]="edges">
+        <mini-map />
         <ng-template let-ctx nodeHtml>
           <article vflowNode selectable [vflowSelected]="ctx.selected() || ctx.preselected()">
             <header vflowNodeHeader>
@@ -37,7 +40,8 @@ import { createEdges, createNodes, Vflow, VflowComponent } from 'ngx-vflow';
             <div vflowNodeBody class="description">{{ ctx.data().description }}</div>
             <footer vflowNodeFooter>
               @if (ctx.node.id === 'review') {
-                <span [vflowStatus]="approved() ? 'success' : 'warning'">{{
+                <span vflowStatus="danger" title="Diagnostic: purchase order missing">Missing PO</span>
+                <span [vflowStatus]="approved() ? 'success' : 'warning'" [vflowStatusActive]="!approved()">{{
                   approved() ? 'Approved' : 'Waiting'
                 }}</span>
                 <button
@@ -56,11 +60,30 @@ import { createEdges, createNodes, Vflow, VflowComponent } from 'ngx-vflow';
               <handle type="target" position="left" [canStart]="false" [canAccept]="false" [template]="port" />
             }
             @if (ctx.node.id !== 'paid' && ctx.node.id !== 'fix') {
-              <handle type="source" position="right" [canStart]="false" [canAccept]="false" [template]="port" />
+              @if (ctx.node.id === 'review') {
+                <handle
+                  id="approved"
+                  type="source"
+                  position="right"
+                  [offsetY]="-30"
+                  [canStart]="false"
+                  [canAccept]="false"
+                  [template]="port" />
+                <handle
+                  id="changes"
+                  type="source"
+                  position="right"
+                  [offsetY]="30"
+                  [canStart]="false"
+                  [canAccept]="false"
+                  [template]="port" />
+              } @else {
+                <handle type="source" position="right" [canStart]="false" [canAccept]="false" [template]="port" />
+              }
             }
             @if (ctx.selected()) {
               <node-toolbar>
-                <span vflowEdgeLabel>{{ ctx.data().title }} · {{ readOnly() ? 'View only' : 'Drag to move' }}</span>
+                <span vflowToolbar>{{ ctx.data().title }} · {{ readOnly() ? 'View only' : 'Drag to move' }}</span>
               </node-toolbar>
             }
           </article>
@@ -150,24 +173,30 @@ export class WorkflowDemoComponent {
       target: 'review',
       type: 'template',
       curve: 'smooth-step',
-      markers: { end: { color: 'var(--vui-muted)' } },
+      markers: { end: {} },
     },
     {
       id: 'review-paid',
+      sourceHandle: 'approved',
       source: 'review',
       target: 'paid',
       type: 'template',
       curve: 'smooth-step',
-      markers: { end: { color: 'var(--vui-muted)' } },
-      edgeLabels: { center: { type: 'html-template', data: 'Approved' } },
+      markers: { end: {} },
+      edgeLabels: {
+        start: { type: 'html-template', data: 'Yes' },
+        center: { type: 'html-template', data: 'Approved' },
+        end: { type: 'html-template', data: 'Queue' },
+      },
     },
     {
       id: 'review-fix',
+      sourceHandle: 'changes',
       source: 'review',
       target: 'fix',
       type: 'template',
       curve: 'smooth-step',
-      markers: { end: { color: 'var(--vui-muted)' } },
+      markers: { end: {} },
       edgeLabels: { center: { type: 'html-template', data: 'Needs changes' } },
     },
   ]);

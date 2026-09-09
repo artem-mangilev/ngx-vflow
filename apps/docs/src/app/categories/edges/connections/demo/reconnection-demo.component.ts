@@ -1,3 +1,4 @@
+import { VflowCardNode } from '@vflow/ui';
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import {
   Edge,
@@ -13,11 +14,24 @@ import {
 @Component({
   template: `<vflow
     view="auto"
+    data-vui-theme="light"
     [nodes]="nodes"
     [edges]="edges"
     (reconnectStart)="onReconnectStart()"
     (reconnectEnd)="onReconnectEnd($event)"
-    (reconnect)="reconnect($event)" /> `,
+    (reconnect)="reconnect($event)"
+    ><ng-template let-ctx edge
+      ><svg:g customTemplateEdge selectable>
+        <svg:path
+          class="vui-edge"
+          [attr.d]="ctx.path()"
+          [attr.marker-start]="ctx.markerStart()"
+          [attr.marker-end]="ctx.markerEnd()"
+          [attr.data-vui-selected]="ctx.selected() || ctx.preselected()" /></svg:g></ng-template
+    ><ng-template let-ctx edgeLabelHtml
+      ><span class="vui-edge-label">{{ ctx.label.data }}</span></ng-template
+    ></vflow
+  > `,
   styles: [
     `
       :host {
@@ -34,26 +48,30 @@ export class ReconnectionDemoComponent {
     {
       id: '1',
       point: { x: 100, y: 100 },
-      type: 'default',
-      text: `1`,
+      type: VflowCardNode,
+      data: { text: `1` },
+      ariaLabel: `1`,
     },
     {
       id: '2',
       point: { x: 600, y: 100 },
-      type: 'default',
-      text: `2`,
+      type: VflowCardNode,
+      data: { text: `2` },
+      ariaLabel: `2`,
     },
     {
       id: '3',
       point: { x: 100, y: 300 },
-      type: 'default',
-      text: `3`,
+      type: VflowCardNode,
+      data: { text: `3` },
+      ariaLabel: `3`,
     },
     {
       id: '4',
       point: { x: 600, y: 300 },
-      type: 'default',
-      text: `4`,
+      type: VflowCardNode,
+      data: { text: `4` },
+      ariaLabel: `4`,
     },
   ]);
 
@@ -62,17 +80,12 @@ export class ReconnectionDemoComponent {
       id: '1 -> 2',
       source: '1',
       target: '2',
-      type: 'default',
+      type: 'template',
       reconnectable: signal(true),
       edgeLabels: signal({
         center: {
-          type: 'default',
-          text: 'Reconnectable from both sides',
-          style: {
-            color: 'black',
-            lineHeight: '80%',
-            borderRadius: '5px',
-          },
+          type: 'html-template',
+          data: 'Reconnectable from both sides',
         },
       }),
     },
@@ -80,17 +93,12 @@ export class ReconnectionDemoComponent {
       id: '3 -> 4',
       source: '3',
       target: '4',
-      type: 'default',
+      type: 'template',
       reconnectable: signal('source'),
       edgeLabels: signal({
         center: {
-          type: 'default',
-          text: 'Reconnectable only from source side',
-          style: {
-            color: 'black',
-            lineHeight: '80%',
-            borderRadius: '5px',
-          },
+          type: 'html-template',
+          data: 'Reconnectable only from source side',
         },
       }),
     },

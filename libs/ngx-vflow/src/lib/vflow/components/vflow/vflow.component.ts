@@ -54,7 +54,6 @@ import { Optimization } from '../../interfaces/optimization.interface';
 import { KeyboardShortcuts } from '../../types/keyboard-action.type';
 import { SelectionMode } from '../../types/selection-mode.type';
 import { KeyboardService } from '../../services/keyboard.service';
-import { transformBackground } from '../../utils/transform-background';
 import { OverlaysService } from '../../services/overlays.service';
 import { NgTemplateOutlet } from '@angular/common';
 import { EdgeComponent } from '../edge/edge.component';
@@ -218,12 +217,20 @@ export class VflowComponent {
     this.flowSettingsService.minZoom.set(value);
   }
 
+  public get minZoom(): number {
+    return this.flowSettingsService.minZoom();
+  }
+
   /**
    * Maximum zoom value
    */
   @Input()
   public set maxZoom(value: number) {
     this.flowSettingsService.maxZoom.set(value);
+  }
+
+  public get maxZoom(): number {
+    return this.flowSettingsService.maxZoom();
   }
 
   /** Zoom with ordinary wheel/trackpad scrolling. */
@@ -278,8 +285,8 @@ export class VflowComponent {
    * Background for flow
    */
   @Input()
-  public set background(value: Background | string) {
-    this.flowSettingsService.background.set(transformBackground(value));
+  public set background(value: Background) {
+    this.flowSettingsService.background.set(value);
   }
 
   @Input()

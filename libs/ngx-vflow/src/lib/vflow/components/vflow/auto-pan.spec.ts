@@ -1,3 +1,4 @@
+import { TestNodeComponent } from '../../../../testing/test-node.component';
 import { ChangeDetectionStrategy, Component, Input, ViewChild, provideZonelessChangeDetection } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { animationFrameScheduler } from 'rxjs';
@@ -57,8 +58,20 @@ describe('public auto-pan settings', () => {
     fixture = TestBed.createComponent(AutoPanHostComponent);
     fixture.componentRef.setInput('view', [400, 300]);
     fixture.componentRef.setInput('nodes', [
-      createNode({ id: 'node', point: { x: 100, y: 100 }, type: 'default', text: 'Node' }),
-      createNode({ id: 'target', point: { x: 250, y: 100 }, type: 'default', text: 'Target' }),
+      createNode({
+        id: 'node',
+        point: { x: 100, y: 100 },
+        type: TestNodeComponent,
+        data: { text: 'Node' },
+        ariaLabel: 'Node',
+      }),
+      createNode({
+        id: 'target',
+        point: { x: 250, y: 100 },
+        type: TestNodeComponent,
+        data: { text: 'Target' },
+        ariaLabel: 'Target',
+      }),
     ]);
     fixture.componentRef.setInput('edges', [
       createEdge({ id: 'edge', source: 'node', target: 'target', reconnectable: true }),
@@ -228,8 +241,20 @@ describe('auto-pan with real browser frames', () => {
     });
     const fixture = TestBed.createComponent(AutoPanHostComponent);
     fixture.componentRef.setInput('nodes', [
-      createNode({ id: 'dragged', type: 'default', point: { x: 100, y: 100 }, text: 'Dragged' }),
-      createNode({ id: 'neighbour', type: 'default', point: { x: 250, y: 100 }, text: 'Neighbour' }),
+      createNode({
+        id: 'dragged',
+        type: TestNodeComponent,
+        point: { x: 100, y: 100 },
+        data: { text: 'Dragged' },
+        ariaLabel: 'Dragged',
+      }),
+      createNode({
+        id: 'neighbour',
+        type: TestNodeComponent,
+        point: { x: 250, y: 100 },
+        data: { text: 'Neighbour' },
+        ariaLabel: 'Neighbour',
+      }),
     ]);
     fixture.detectChanges();
     await fixture.whenStable();

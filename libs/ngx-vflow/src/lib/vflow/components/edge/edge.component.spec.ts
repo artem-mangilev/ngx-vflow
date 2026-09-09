@@ -1,3 +1,4 @@
+import { Vflow } from '../../vflow';
 import { ChangeDetectionStrategy, Component, ViewChild } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideZonelessChangeDetection } from '@angular/core';
@@ -16,10 +17,13 @@ import { RootPointerDirective } from '../../directives/root-pointer.directive';
 @Component({
   template: `
     <div rootPointer>
-      <svg edge [model]="model" />
+      <ng-template #presentation let-ctx
+        ><svg:g customTemplateEdge selectable><svg:path [attr.d]="ctx.path()" /></svg:g
+      ></ng-template>
+      <svg edge [model]="model" [edgeTemplate]="presentation" />
     </div>
   `,
-  imports: [EdgeComponent, RootPointerDirective],
+  imports: [Vflow, EdgeComponent, RootPointerDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 class EdgeHostComponent {

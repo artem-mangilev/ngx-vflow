@@ -1,12 +1,31 @@
+import { VflowCardNode } from '@vflow/ui';
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
 
 @Component({
-  template: `<vflow view="auto" [nodes]="nodes" [edges]="edges">
+  template: `<vflow view="auto" data-vui-theme="light" [nodes]="nodes" [edges]="edges">
     <ng-template let-ctx edgeLabelHtml>
       <div class="label" [style.background-color]="ctx.label.data.color" (click)="deleteEdge(ctx.edge)">Delete</div>
     </ng-template>
-  </vflow>`,
+    <ng-template let-ctx edge
+      ><svg:g customTemplateEdge selectable>
+        <svg:path
+          class="vui-edge"
+          [attr.d]="ctx.path()"
+          [attr.marker-start]="ctx.markerStart()"
+          [attr.marker-end]="ctx.markerEnd()"
+          [attr.data-vui-selected]="ctx.selected() || ctx.preselected()" /></svg:g></ng-template
+    ><ng-template let-ctx groupNode
+      ><div
+        class="vui-group"
+        selectable
+        [resizable]="ctx.data().resizable ?? false"
+        [style.width.px]="ctx.width()"
+        [style.height.px]="ctx.height()">
+        {{ ctx.data().text }}
+      </div></ng-template
+    ></vflow
+  >`,
   styles: [
     `
       :host {
@@ -31,20 +50,23 @@ export class LabelsDemoComponent {
     {
       id: '1',
       point: { x: 50, y: 200 },
-      type: 'default',
-      text: '1',
+      type: VflowCardNode,
+      data: { text: '1' },
+      ariaLabel: '1',
     },
     {
       id: '2',
       point: { x: 350, y: 100 },
-      type: 'default',
-      text: '2',
+      type: VflowCardNode,
+      data: { text: '2' },
+      ariaLabel: '2',
     },
     {
       id: '3',
       point: { x: 350, y: 300 },
-      type: 'default',
-      text: '3',
+      type: VflowCardNode,
+      data: { text: '3' },
+      ariaLabel: '3',
     },
   ]);
 
@@ -56,32 +78,16 @@ export class LabelsDemoComponent {
       curve: signal('smooth-step'),
       edgeLabels: signal({
         start: {
-          type: 'default',
-          text: 'Start',
-          style: {
-            background: '#e3f2fd',
-            color: '#1976d2',
-            padding: '2px 6px',
-            borderRadius: '12px',
-            fontSize: '11px',
-            fontWeight: '500',
-          },
+          type: 'html-template',
+          data: 'Start',
         },
         center: {
           type: 'html-template',
           data: { color: '#122c26' },
         },
         end: {
-          type: 'default',
-          text: 'End',
-          style: {
-            background: '#e8f5e8',
-            color: '#2e7d32',
-            padding: '2px 6px',
-            borderRadius: '12px',
-            fontSize: '11px',
-            fontWeight: '500',
-          },
+          type: 'html-template',
+          data: 'End',
         },
       }),
     },
@@ -92,15 +98,8 @@ export class LabelsDemoComponent {
       curve: signal('smooth-step'),
       edgeLabels: signal({
         center: {
-          type: 'default',
-          text: 'Center Only',
-          style: {
-            color: 'black',
-            background: '#f5f5f5',
-            padding: '4px 8px',
-            borderRadius: '4px',
-            fontSize: '12px',
-          },
+          type: 'html-template',
+          data: 'Center Only',
         },
       }),
     },

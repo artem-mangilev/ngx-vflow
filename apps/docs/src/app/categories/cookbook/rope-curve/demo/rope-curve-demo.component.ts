@@ -1,3 +1,4 @@
+import { VflowCardNode } from '@vflow/ui';
 import { ChangeDetectionStrategy, Component, DestroyRef, WritableSignal, inject, signal } from '@angular/core';
 import { CurveFactory, CurveFactoryParams, Edge, Node, Point, Vflow, createNodes } from 'ngx-vflow';
 
@@ -38,7 +39,19 @@ const HANDLE_RADIUS_WITH_STROKE = 7;
 const ropeCurve = createRopeCurveFactory();
 
 @Component({
-  template: `<vflow view="auto" [nodes]="nodes" [edges]="edges" />`,
+  template: `<vflow view="auto" data-vui-theme="light" [nodes]="nodes" [edges]="edges"
+    ><ng-template let-ctx edge
+      ><svg:g customTemplateEdge selectable>
+        <svg:path
+          class="vui-edge"
+          [attr.d]="ctx.path()"
+          [attr.marker-start]="ctx.markerStart()"
+          [attr.marker-end]="ctx.markerEnd()"
+          [attr.data-vui-selected]="ctx.selected() || ctx.preselected()" /></svg:g></ng-template
+    ><ng-template let-ctx edgeLabelHtml
+      ><span class="vui-edge-label">{{ ctx.label.data }}</span></ng-template
+    ></vflow
+  >`,
   styles: [
     `
       :host {
@@ -55,14 +68,16 @@ export class RopeCurveDemoComponent {
     {
       id: 'left',
       point: { x: 90, y: 180 },
-      type: 'default',
-      text: 'Left node',
+      type: VflowCardNode,
+      data: { text: 'Left node' },
+      ariaLabel: 'Left node',
     },
     {
       id: 'right',
       point: { x: 470, y: 130 },
-      type: 'default',
-      text: 'Right node',
+      type: VflowCardNode,
+      data: { text: 'Right node' },
+      ariaLabel: 'Right node',
     },
   ]);
 

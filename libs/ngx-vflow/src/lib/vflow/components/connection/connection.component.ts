@@ -4,7 +4,6 @@ import { getStraightPath } from '../../math/edge-path/straigh-path';
 import { SpacePointContextDirective } from '../../directives/space-point-context.directive';
 import { ConnectionModel } from '../../models/connection.model';
 import { getBezierPath } from '../../math/edge-path/bezier-path';
-import { hashCode } from '../../utils/hash';
 import { Position } from '../../types/position.type';
 import { getSmoothStepPath } from '../../math/edge-path/smooth-step-path';
 import { NgTemplateOutlet } from '@angular/common';
@@ -20,6 +19,7 @@ import { FlowEntitiesService } from '../../services/flow-entities.service';
       @if (path(); as path) {
         <svg:path
           aria-hidden="true"
+          class="vflow-connection-preview"
           fill="none"
           stroke-width="2"
           [attr.d]="path"
@@ -112,13 +112,13 @@ export class ConnectionComponent {
     const marker = this.model().settings.marker;
 
     if (marker) {
-      return `url(#${hashCode(JSON.stringify(marker))})`;
+      return `url(#${this.flowEntitiesService.markerId(marker)})`;
     }
 
     return '';
   });
 
-  protected readonly defaultColor = 'rgb(177, 177, 183)';
+  protected readonly defaultColor = 'var(--vflow-muted, rgb(177, 177, 183))';
 
   // TODO: move context to model
   protected getContext(): ConnectionContext {

@@ -1,4 +1,4 @@
-<vflow view="auto" [nodes]="nodes" [edges]="edges">
+<vflow view="auto" data-vui-theme="light" [nodes]="nodes" [edges]="edges">
   <ng-template let-ctx nodeHtml>
     <div
       class="custom-node without-tab-index"
@@ -26,4 +26,7 @@
         [attr.stroke]="ctx.selected() ? '#0f4c75' : '#bbe1fa'" />
     </svg:g>
   </ng-template>
-</vflow>
+  <ng-template let-ctx edgeLabelHtml
+    ><span class="vui-edge-label">{{ ctx.label.data }}</span></ng-template
+  ></vflow
+>

@@ -39,6 +39,20 @@ interface EntityData {
     vflow {
       height: 560px;
     }
+    .vui-field {
+      min-height: 42px;
+    }
+    .compact .vui-field {
+      min-height: 28px;
+      padding-block: 2px;
+    }
+    .experiment .fields {
+      max-height: 68px;
+      overflow-y: auto;
+    }
+    .collapsed .fields {
+      display: none;
+    }
     .field-name {
       overflow-wrap: anywhere;
     }
@@ -59,22 +73,30 @@ interface EntityData {
       class="demo"
       aria-label="Entity relationships and field mapping demo"
       [vflowTheme]="dark() ? 'dark' : 'light'"
-      [style.--vui-field-height]="compact() ? '28px' : '42px'">
+      [class.compact]="compact()"
+      [class.experiment]="experiment()"
+      [class.collapsed]="collapsed()">
       <div class="controls">
         <button vflowButton type="button" (click)="flow()?.fitView()">Fit entities</button>
         <button vflowButton type="button" (click)="reverseFields()">Reverse fields</button>
         <button vflowButton type="button" (click)="renameField()">Rename email</button>
+        <button vflowButton type="button" (click)="deleteField()">Delete CRM email</button>
+        <label
+          ><input type="checkbox" [checked]="experiment()" (change)="experiment.set(!experiment())" /> Scroll
+          experiment</label
+        >
+        <label
+          ><input type="checkbox" [checked]="collapsed()" (change)="collapsed.set(!collapsed())" /> Collapse
+          fields</label
+        >
+        @if (flow(); as editor) {
+          <vflow-controls [flow]="editor" />
+        }
         <label><input type="checkbox" [checked]="compact()" (change)="compact.set(!compact())" /> Compact</label>
         <label><input type="checkbox" [checked]="dark()" (change)="dark.set(!dark())" /> Dark theme</label>
         <p>Connect matching field types; names and row order can change.</p>
       </div>
-      <vflow
-        view="auto"
-        background="var(--vui-canvas)"
-        [nodes]="nodes"
-        [edges]="edges()"
-        [connection]="connection"
-        (connect)="connect($event)">
+      <vflow view="auto" [nodes]="nodes" [edges]="edges()" [connection]="connection" (connect)="connect($event)">
         <ng-template let-ctx nodeHtml>
           <article
             vflowNode
@@ -85,25 +107,27 @@ interface EntityData {
               <span class="grow">{{ ctx.data().title }}</span>
               <span class="muted">{{ ctx.data().category }}</span>
             </header>
-            @for (field of ctx.data().fields; track field.id) {
-              <div vflowField [attr.data-field]="field.id">
-                <span class="key">{{ field.key }}</span>
-                <span class="grow field-name">{{ field.name }}</span>
-                <span class="muted">{{ field.type }}</span>
-                <handle
-                  type="target"
-                  position="left"
-                  [id]="'in:' + field.id"
-                  [template]="port"
-                  [ariaLabel]="ctx.data().title + '.' + field.name + ' input'" />
-                <handle
-                  type="source"
-                  position="right"
-                  [id]="'out:' + field.id"
-                  [template]="port"
-                  [ariaLabel]="ctx.data().title + '.' + field.name + ' output'" />
-              </div>
-            }
+            <div class="fields" vflowNoDrag vflowNoWheel>
+              @for (field of ctx.data().fields; track field.id) {
+                <div vflowField [attr.data-field]="field.id">
+                  <span class="key">{{ field.key }}</span>
+                  <span class="grow field-name">{{ field.name }}</span>
+                  <span class="muted">{{ field.type }}</span>
+                  <handle
+                    type="target"
+                    position="left"
+                    [id]="'in:' + field.id"
+                    [template]="port"
+                    [ariaLabel]="ctx.data().title + '.' + field.name + ' input'" />
+                  <handle
+                    type="source"
+                    position="right"
+                    [id]="'out:' + field.id"
+                    [template]="port"
+                    [ariaLabel]="ctx.data().title + '.' + field.name + ' output'" />
+                </div>
+              }
+            </div>
           </article>
         </ng-template>
         <ng-template let-ctx edge>
@@ -137,6 +161,8 @@ interface EntityData {
 export class EntitiesDemoComponent {
   readonly flow = viewChild(VflowComponent);
   readonly dark = signal(true);
+  readonly experiment = signal(false);
+  readonly collapsed = signal(false);
   readonly compact = signal(false);
   readonly nodes = createNodes<EntityData>([
     {
@@ -251,7 +277,9 @@ export class EntitiesDemoComponent {
     crm.data.update((data) => ({
       ...data,
       fields: data.fields.map((field) =>
-        field.id === 'email' ? { ...field, name: field.name === 'email' ? 'primary_email' : 'email' } : field,
+        field.id === 'email'
+          ? { ...field, name: field.name === 'email' ? 'primary_email_for_customer_notifications' : 'email' }
+          : field,
       ),
     }));
   }
@@ -264,6 +292,20 @@ export class EntitiesDemoComponent {
       edgeLabels: { center: { type: 'html-template', data: 'Mapping' } },
     });
     this.edges.update((edges) => addEdges([edge], { nodes: this.nodes, edges }));
+  }
+
+  deleteField() {
+    // The application removes incident edges explicitly before removing a field.
+    this.edges.update((edges) =>
+      edges.filter(
+        (edge) =>
+          !(edge.source === 'crm' && edge.sourceHandle === 'out:email') &&
+          !(edge.target === 'crm' && edge.targetHandle === 'in:email'),
+      ),
+    );
+    this.nodes
+      .find((node) => node.id === 'crm')!
+      .data.update((data) => ({ ...data, fields: data.fields.filter((field) => field.id !== 'email') }));
   }
 
   removeEdge(id: string) {

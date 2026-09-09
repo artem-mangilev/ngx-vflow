@@ -27,7 +27,7 @@ export class FlowStoreService {
       {
         id: 'group',
         point: { x: 800, y: 0 },
-        type: 'default-group',
+        type: 'template-group',
         width: 500,
         height: 800,
       },

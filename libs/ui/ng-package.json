@@ -3,5 +3,12 @@
   "dest": "../../dist/libs/ui",
   "lib": {
     "entryFile": "src/public-api.ts"
-  }
+  },
+  "assets": [
+    {
+      "glob": "styles.source.css",
+      "input": "src",
+      "output": "."
+    }
+  ]
 }

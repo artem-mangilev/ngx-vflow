@@ -50,3 +50,7 @@ npm install ngx-vflow --save
 ## License
 
 MIT © [Artem Mangilev](https://github.com/artem-mangilev)
+
+### Presentation in the next major release
+
+Core uses application-supplied node and edge templates. Optional `@vflow/ui` provides cards, fields, ports, status indicators, viewport controls and a separate `@vflow/ui/bpmn` entry point. Choose compiled or source CSS and an explicit theme scope. See the Design system section and headless migration guide in the documentation.

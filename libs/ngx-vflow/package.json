@@ -24,7 +24,8 @@
     "rxjs": ">=6.0.0",
     "@types/d3-drag": "^3.0.7",
     "@types/d3-selection": "^3.0.10",
-    "@types/d3-zoom": "^3.0.8"
+    "@types/d3-zoom": "^3.0.8",
+    "@angular/cdk": "^20.0.0 || ^21.0.0"
   },
   "dependencies": {
     "tslib": "^2.3.0"

@@ -24,6 +24,7 @@
     "paths": {
       "@ng-doc/generated": ["ng-doc/docs/index.ts"],
       "@ng-doc/generated/*": ["ng-doc/docs/*"],
+      "@vflow/ui/bpmn": ["libs/ui/bpmn/public-api"],
       "@vflow/ui": ["libs/ui/src/public-api"],
       "ngx-vflow": ["libs/ngx-vflow/src/public-api"],
       "ngx-vflow/testing": ["libs/ngx-vflow/testing/src/public-api"]
