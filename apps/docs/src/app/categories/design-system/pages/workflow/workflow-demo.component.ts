@@ -6,7 +6,7 @@ import { createEdges, createNodes, Vflow, VflowComponent } from 'ngx-vflow';
   selector: 'app-ui-workflow-demo',
   imports: [Vflow, VflowUi],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styleUrls: ['./demo.css'],
+  styleUrls: ['../../demo.css'],
   styles: `
     article {
       width: 210px;
@@ -27,17 +27,25 @@ import { createEdges, createNodes, Vflow, VflowComponent } from 'ngx-vflow';
         <label><input type="checkbox" [checked]="readOnly()" (change)="toggleReadOnly()" /> Read only</label>
         <p>Approve the invoice; select a node to inspect it.</p>
       </div>
-      <vflow view="auto" background="var(--vui-canvas)" [nodes]="nodes" [edges]="edges">
+      @if (flow(); as editor) {
+        <vflow-controls [flow]="editor" />
+      }
+      <vflow view="auto" background="var(--vflow-background)" [nodes]="nodes" [edges]="edges">
         <ng-template let-ctx nodeHtml>
           <article vflowNode selectable [vflowSelected]="ctx.selected() || ctx.preselected()">
             <header vflowNodeHeader>
               <span aria-hidden="true">{{ ctx.data().icon }}</span>
               <span class="grow">{{ ctx.data().title }}</span>
             </header>
-            <div vflowNodeBody class="description">{{ ctx.data().description }}</div>
+            <div vflowNodeBody class="description">
+              {{ ctx.data().description }}
+              @if (ctx.node.id === 'review') {
+                <span vflowStatus="danger">Missing purchase order</span>
+              }
+            </div>
             <footer vflowNodeFooter>
               @if (ctx.node.id === 'review') {
-                <span [vflowStatus]="approved() ? 'success' : 'warning'">{{
+                <span [vflowStatus]="approved() ? 'success' : 'warning'" [vflowStatusActive]="!approved()">{{
                   approved() ? 'Approved' : 'Waiting'
                 }}</span>
                 <button
@@ -58,9 +66,18 @@ import { createEdges, createNodes, Vflow, VflowComponent } from 'ngx-vflow';
             @if (ctx.node.id !== 'paid' && ctx.node.id !== 'fix') {
               <handle type="source" position="right" [canStart]="false" [canAccept]="false" [template]="port" />
             }
+            @if (ctx.node.id === 'review') {
+              <handle
+                type="source"
+                position="bottom"
+                id="correction"
+                [canStart]="false"
+                [canAccept]="false"
+                [template]="port" />
+            }
             @if (ctx.selected()) {
               <node-toolbar>
-                <span vflowEdgeLabel>{{ ctx.data().title }} · {{ readOnly() ? 'View only' : 'Drag to move' }}</span>
+                <span vflowToolbar>{{ ctx.data().title }} · {{ readOnly() ? 'View only' : 'Drag to move' }}</span>
               </node-toolbar>
             }
           </article>
@@ -164,6 +181,7 @@ export class WorkflowDemoComponent {
     {
       id: 'review-fix',
       source: 'review',
+      sourceHandle: 'correction',
       target: 'fix',
       type: 'template',
       curve: 'smooth-step',

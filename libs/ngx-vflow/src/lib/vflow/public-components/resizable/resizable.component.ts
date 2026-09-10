@@ -48,7 +48,7 @@ export class ResizableComponent implements OnInit, AfterViewInit, OnDestroy {
 
   public resizable = input<boolean | ''>();
 
-  public resizerColor = input('#2e414c');
+  public resizerColor = input('var(--vflow-selection, #2e414c)');
 
   public gap = input(1.5);
 

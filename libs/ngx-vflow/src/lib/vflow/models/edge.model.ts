@@ -8,7 +8,6 @@ import { getBezierPath } from '../math/edge-path/bezier-path';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { FlowEntity } from '../interfaces/flow-entity.interface';
 import { getSmoothStepPath } from '../math/edge-path/smooth-step-path';
-import { hashCode } from '../utils/hash';
 import { Contextable } from '../interfaces/contextable.interface';
 import { EdgeContext } from '../interfaces/template-context.interface';
 import { HandleModel } from './handle.model';
@@ -220,13 +219,13 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
   public markerStartUrl = computed(() => {
     const marker = this.markers()?.start;
 
-    return marker ? `url(#${hashCode(JSON.stringify(marker))})` : '';
+    return marker ? `url(#${this.flowEntitiesService.markerId(marker)})` : '';
   });
 
   public markerEndUrl = computed(() => {
     const marker = this.markers()?.end;
 
-    return marker ? `url(#${hashCode(JSON.stringify(marker))})` : '';
+    return marker ? `url(#${this.flowEntitiesService.markerId(marker)})` : '';
   });
 
   public context: EdgeContext;

@@ -28,7 +28,7 @@
 .resize-control.handle {
   width: 6px;
   height: 6px;
-  border: 1px solid #fff;
+  border: 1px solid var(--vflow-surface, #fff);
   border-radius: 1px;
   translate: -50% -50%;
 }

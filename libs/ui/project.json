@@ -29,7 +29,7 @@
     "lint": {
       "executor": "@angular-eslint/builder:lint",
       "options": {
-        "lintFilePatterns": ["libs/ui/src/**/*.ts"]
+        "lintFilePatterns": ["libs/ui/src/**/*.ts", "libs/ui/bpmn/src/**/*.ts"]
       }
     },
     "nx-release-publish": {

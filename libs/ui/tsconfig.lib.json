@@ -6,7 +6,12 @@
     "declaration": true,
     "declarationMap": true,
     "inlineSources": true,
-    "types": []
+    "types": [],
+    "paths": {
+      "ngx-vflow": ["dist/libs/ngx-vflow"],
+      "@vflow/ui": ["libs/ui/src/public-api"],
+      "@vflow/ui/bpmn": ["libs/ui/bpmn/src/public-api"]
+    }
   },
   "exclude": ["**/*.spec.ts"]
 }

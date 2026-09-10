@@ -48,7 +48,7 @@ export class FlowSettingsService {
 
   public maxZoom = signal(3);
 
-  public background = signal<Background>({ type: 'solid', color: '#fff' });
+  public background = signal<Background>({ type: 'solid', color: 'var(--vflow-background, #fff)' });
 
   public snapGrid = signal<[number, number]>([1, 1]);
 
@@ -58,6 +58,6 @@ export class FlowSettingsService {
 
   public selectionBox = signal<Required<SelectionBoxSettings>>({
     mode: 'full',
-    color: '#bbe1fa',
+    color: 'var(--vflow-selection, #bbe1fa)',
   });
 }

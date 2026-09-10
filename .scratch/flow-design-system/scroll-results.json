@@ -1,0 +1,86 @@
+{
+  "browser": "153.0.8010.12",
+  "results": [
+    {
+      "before": {
+        "viewport": "translate(3.42246px, 85.3476px) scale(0.855615)",
+        "scrollTop": 0,
+        "endpointErrorY": 0.842,
+        "endpointToRowErrorY": 0,
+        "portToRowErrorY": 0.842,
+        "rowVisible": true,
+        "path": "M286.9999803550552,100.59373738665668 C367.5256069267331,100.59373738665668 372.4743930732669,142.59372651924042 453.0000196449448,142.59372651924042",
+        "mountedFields": 10,
+        "renderedEdges": 2
+      },
+      "after": {
+        "viewport": "translate(3.42246px, 85.3476px) scale(0.855615)",
+        "scrollTop": 24,
+        "endpointErrorY": 0.842,
+        "endpointToRowErrorY": 20.535,
+        "portToRowErrorY": 21.377,
+        "rowVisible": true,
+        "path": "M286.9999803550552,100.59373738665668 C367.5256069267331,100.59373738665668 372.4743930732669,142.59372651924042 453.0000196449448,142.59372651924042",
+        "mountedFields": 10,
+        "renderedEdges": 2
+      }
+    },
+    {
+      "before": {
+        "viewport": "translate(56.1854px, 117.79px) scale(0.713012)",
+        "scrollTop": 0,
+        "endpointErrorY": 0.702,
+        "endpointToRowErrorY": 0,
+        "portToRowErrorY": 0.702,
+        "rowVisible": true,
+        "path": "M286.9999803550552,100.59373738665668 C367.5256069267331,100.59373738665668 372.4743930732669,142.59372651924042 453.0000196449448,142.59372651924042",
+        "mountedFields": 10,
+        "renderedEdges": 2
+      },
+      "after": {
+        "viewport": "translate(56.1854px, 117.79px) scale(0.713012)",
+        "scrollTop": 24,
+        "endpointErrorY": 0.702,
+        "endpointToRowErrorY": 17.112,
+        "portToRowErrorY": 17.814,
+        "rowVisible": true,
+        "path": "M286.9999803550552,100.59373738665668 C367.5256069267331,100.59373738665668 372.4743930732669,142.59372651924042 453.0000196449448,142.59372651924042",
+        "mountedFields": 10,
+        "renderedEdges": 2
+      }
+    }
+  ],
+  "beforeCollapse": {
+    "viewport": "translate(100.154px, 144.825px) scale(0.594177)",
+    "scrollTop": 0,
+    "endpointErrorY": 0.594,
+    "endpointToRowErrorY": 0,
+    "portToRowErrorY": 0.594,
+    "rowVisible": true,
+    "path": "M287.00000280880954,100.59376227600245 C367.5256184883047,100.59376227600245 372.4743815116953,142.59377912885975 452.99999719119046,142.59377912885975",
+    "mountedFields": 10,
+    "renderedEdges": 2
+  },
+  "collapsed": {
+    "viewport": "translate(100.154px, 144.825px) scale(0.594177)",
+    "scrollTop": 0,
+    "endpointErrorY": 742.158,
+    "endpointToRowErrorY": 742.158,
+    "portToRowErrorY": 0,
+    "rowVisible": false,
+    "path": "M287.00000280880954,100.59376227600245 C367.5256184883047,100.59376227600245 372.4743815116953,142.59377912885975 452.99999719119046,142.59377912885975",
+    "mountedFields": 10,
+    "renderedEdges": 2
+  },
+  "expanded": {
+    "viewport": "translate(100.154px, 144.825px) scale(0.594177)",
+    "scrollTop": 0,
+    "endpointErrorY": 0.594,
+    "endpointToRowErrorY": 0,
+    "portToRowErrorY": 0.594,
+    "rowVisible": true,
+    "path": "M287.00000280880954,100.59376227600245 C367.5256184883047,100.59376227600245 372.4743815116953,142.59377912885975 452.99999719119046,142.59377912885975",
+    "mountedFields": 10,
+    "renderedEdges": 2
+  }
+}

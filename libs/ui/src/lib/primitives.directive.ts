@@ -39,9 +39,14 @@ export class VflowPort {
 }
 
 /** Tone and status text are independent from graph selection and focus. */
-@Directive({ selector: '[vflowStatus]', host: { class: 'vui-status', '[attr.data-tone]': 'vflowStatus()' } })
+@Directive({
+  selector: '[vflowStatus]',
+  host: { class: 'vui-status', '[attr.data-tone]': 'vflowStatus()', '[attr.data-active]': 'vflowStatusActive()' },
+})
 export class VflowStatus {
   readonly vflowStatus = input<'neutral' | 'info' | 'success' | 'warning' | 'danger'>('neutral');
+  /** Activity is visual, not an action gate or an automatic live-region announcement. */
+  readonly vflowStatusActive = input(false, { transform: booleanAttribute });
 }
 
 /** SVG presentation only. Compose with core customTemplateEdge/selectable for interaction. */
@@ -55,12 +60,14 @@ export class VflowEdgeLabel {}
 @Directive({ selector: '[vflowGroup]', host: { class: 'vui-group' } })
 export class VflowGroup {}
 
-/** A BPMN event outline. The consumer supplies its symbol and accessible name. */
-@Directive({ selector: '[vflowBpmnEvent]', host: { class: 'vui-bpmn-event', '[attr.data-event]': 'vflowBpmnEvent()' } })
-export class VflowBpmnEvent {
-  readonly vflowBpmnEvent = input<'start' | 'intermediate' | 'end'>('start');
-}
+@Directive({ selector: '[vflowGroupHeader]', host: { class: 'vui-group-header' } })
+export class VflowGroupHeader {}
 
-/** A diamond outline that leaves the consumer's text and handle coordinates unrotated. */
-@Directive({ selector: '[vflowBpmnGateway]', host: { class: 'vui-bpmn-gateway' } })
-export class VflowBpmnGateway {}
+@Directive({ selector: '[vflowToolbar]', host: { class: 'vui-toolbar' } })
+export class VflowToolbar {}
+
+@Directive({ selector: '[vflowExternalLabel]', host: { class: 'vui-external-label' } })
+export class VflowExternalLabel {}
+
+@Directive({ selector: '[vflowPortLabel]', host: { class: 'vui-port-label' } })
+export class VflowPortLabel {}

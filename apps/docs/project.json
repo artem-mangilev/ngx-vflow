@@ -82,6 +82,18 @@
             "node_modules/@ng-doc/app/styles/global.css"
           ]
         },
+        "hybrid-source": {
+          "tsConfig": "apps/docs/tsconfig.hybrid.json",
+          "optimization": false,
+          "extractLicenses": false,
+          "sourceMap": true,
+          "namedChunks": true,
+          "styles": [
+            "dist/libs/ui/styles.source.css",
+            "apps/docs/src/styles.scss",
+            "node_modules/@ng-doc/app/styles/global.css"
+          ]
+        },
         "development": {
           "optimization": false,
           "extractLicenses": false,
@@ -100,6 +112,9 @@
         },
         "hybrid": {
           "buildTarget": "docs:build:hybrid"
+        },
+        "hybrid-source": {
+          "buildTarget": "docs:build:hybrid-source"
         },
         "development": {
           "buildTarget": "docs:build:development"

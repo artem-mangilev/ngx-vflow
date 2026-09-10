@@ -5,6 +5,7 @@ import {
   Input,
   output,
   signal,
+  computed,
   WritableSignal,
   OnInit,
   input,
@@ -146,11 +147,26 @@ export class VflowMockComponent implements AsInterface<VflowComponent>, OnInit {
   @Input()
   public readonly view: [number, number] | 'auto' = [400, 400];
 
-  @Input()
-  public readonly minZoom = 0.5;
+  private readonly minimumZoom = signal(0.5);
+  private readonly maximumZoom = signal(3);
 
   @Input()
-  public readonly maxZoom = 3;
+  public set minZoom(value: number) {
+    this.minimumZoom.set(value);
+  }
+  public get minZoom(): number {
+    return this.minimumZoom();
+  }
+
+  @Input()
+  public set maxZoom(value: number) {
+    this.maximumZoom.set(value);
+  }
+  public get maxZoom(): number {
+    return this.maximumZoom();
+  }
+
+  public readonly zoomRange = computed(() => ({ min: this.minZoom, max: this.maxZoom }));
 
   @Input()
   public readonly background: Background | string = '#fff';

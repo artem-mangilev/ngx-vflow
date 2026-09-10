@@ -31,13 +31,26 @@ interface EntityData {
   selector: 'app-ui-entities-demo',
   imports: [Vflow, VflowUi],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styleUrls: ['./demo.css'],
+  styleUrls: ['../../demo.css'],
   styles: `
     article {
       width: 250px;
     }
     vflow {
       height: 560px;
+    }
+    [vflowField] {
+      min-height: 42px;
+    }
+    .compact [vflowField] {
+      min-height: 28px;
+    }
+    .experiment .fields {
+      max-height: 48px;
+      overflow-y: auto;
+    }
+    .collapsed .fields {
+      display: none;
     }
     .field-name {
       overflow-wrap: anywhere;
@@ -59,18 +72,39 @@ interface EntityData {
       class="demo"
       aria-label="Entity relationships and field mapping demo"
       [vflowTheme]="dark() ? 'dark' : 'light'"
-      [style.--vui-field-height]="compact() ? '28px' : '42px'">
+      [class.compact]="compact()"
+      [class.experiment]="experiment()"
+      [class.collapsed]="collapsed()">
       <div class="controls">
         <button vflowButton type="button" (click)="flow()?.fitView()">Fit entities</button>
         <button vflowButton type="button" (click)="reverseFields()">Reverse fields</button>
         <button vflowButton type="button" (click)="renameField()">Rename email</button>
         <label><input type="checkbox" [checked]="compact()" (change)="compact.set(!compact())" /> Compact</label>
         <label><input type="checkbox" [checked]="dark()" (change)="dark.set(!dark())" /> Dark theme</label>
+        <button vflowButton type="button" [disabled]="emailDeleted()" (click)="deleteEmail()">
+          Delete CRM email field
+        </button>
+        <label
+          ><input type="checkbox" [checked]="experiment()" (change)="experiment.set(!experiment())" /> Scroll
+          experiment</label
+        >
+        <label
+          ><input type="checkbox" [checked]="collapsed()" (change)="collapsed.set(!collapsed())" /> Collapse
+          experiment</label
+        >
         <p>Connect matching field types; names and row order can change.</p>
+        @if (experiment() || collapsed()) {
+          <p role="status">
+            Experiment: hidden endpoints retain stale geometry; scroll/collapse is not supported by the library.
+          </p>
+        }
       </div>
+      @if (flow(); as editor) {
+        <vflow-controls [flow]="editor" />
+      }
       <vflow
         view="auto"
-        background="var(--vui-canvas)"
+        background="var(--vflow-background)"
         [nodes]="nodes"
         [edges]="edges()"
         [connection]="connection"
@@ -85,25 +119,27 @@ interface EntityData {
               <span class="grow">{{ ctx.data().title }}</span>
               <span class="muted">{{ ctx.data().category }}</span>
             </header>
-            @for (field of ctx.data().fields; track field.id) {
-              <div vflowField [attr.data-field]="field.id">
-                <span class="key">{{ field.key }}</span>
-                <span class="grow field-name">{{ field.name }}</span>
-                <span class="muted">{{ field.type }}</span>
-                <handle
-                  type="target"
-                  position="left"
-                  [id]="'in:' + field.id"
-                  [template]="port"
-                  [ariaLabel]="ctx.data().title + '.' + field.name + ' input'" />
-                <handle
-                  type="source"
-                  position="right"
-                  [id]="'out:' + field.id"
-                  [template]="port"
-                  [ariaLabel]="ctx.data().title + '.' + field.name + ' output'" />
-              </div>
-            }
+            <div class="fields" vflowNoWheel vflowNoDrag>
+              @for (field of ctx.data().fields; track field.id) {
+                <div vflowField [attr.data-field]="field.id">
+                  <span class="key">{{ field.key }}</span>
+                  <span class="grow field-name">{{ field.name }}</span>
+                  <span class="muted">{{ field.type }}</span>
+                  <handle
+                    type="target"
+                    position="left"
+                    [id]="'in:' + field.id"
+                    [template]="port"
+                    [ariaLabel]="ctx.data().title + '.' + field.name + ' input'" />
+                  <handle
+                    type="source"
+                    position="right"
+                    [id]="'out:' + field.id"
+                    [template]="port"
+                    [ariaLabel]="ctx.data().title + '.' + field.name + ' output'" />
+                </div>
+              }
+            </div>
           </article>
         </ng-template>
         <ng-template let-ctx edge>
@@ -138,6 +174,9 @@ export class EntitiesDemoComponent {
   readonly flow = viewChild(VflowComponent);
   readonly dark = signal(true);
   readonly compact = signal(false);
+  readonly experiment = signal(false);
+  readonly collapsed = signal(false);
+  readonly emailDeleted = signal(false);
   readonly nodes = createNodes<EntityData>([
     {
       id: 'customer',
@@ -264,6 +303,21 @@ export class EntitiesDemoComponent {
       edgeLabels: { center: { type: 'html-template', data: 'Mapping' } },
     });
     this.edges.update((edges) => addEdges([edge], { nodes: this.nodes, edges }));
+  }
+
+  deleteEmail() {
+    // The application explicitly removes incident edges, rather than leaving detached connections.
+    this.edges.update((edges) =>
+      edges.filter(
+        (edge) =>
+          !(edge.source === 'crm' && edge.sourceHandle === 'out:email') &&
+          !(edge.target === 'crm' && edge.targetHandle === 'in:email'),
+      ),
+    );
+    this.nodes
+      .find((node) => node.id === 'crm')!
+      .data.update((data) => ({ ...data, fields: data.fields.filter((field) => field.id !== 'email') }));
+    this.emailDeleted.set(true);
   }
 
   removeEdge(id: string) {

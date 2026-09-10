@@ -1,0 +1,59 @@
+{
+  "route": "/introduction/design-system",
+  "platform": "darwin arm64 25.6.0",
+  "cpu": "Apple M1 Pro",
+  "browser": "153.0.8010.12",
+  "viewport": "1280x900",
+  "results": [
+    {
+      "nodes": 4,
+      "fields": 10,
+      "edges": 2,
+      "dom": 173,
+      "themeMs": 22.4,
+      "densityMs": 33.3,
+      "zoomFrameMedianMs": 16.7,
+      "zoomFrameP95Ms": 16.8
+    },
+    {
+      "nodes": 4,
+      "fields": 10,
+      "edges": 2,
+      "dom": 173,
+      "themeMs": 24.2,
+      "densityMs": 33.3,
+      "zoomFrameMedianMs": 16.7,
+      "zoomFrameP95Ms": 16.7
+    },
+    {
+      "nodes": 4,
+      "fields": 10,
+      "edges": 2,
+      "dom": 173,
+      "themeMs": 24.6,
+      "densityMs": 33.3,
+      "zoomFrameMedianMs": 16.7,
+      "zoomFrameP95Ms": 16.7
+    },
+    {
+      "nodes": 4,
+      "fields": 10,
+      "edges": 2,
+      "dom": 173,
+      "themeMs": 25.6,
+      "densityMs": 33.4,
+      "zoomFrameMedianMs": 16.7,
+      "zoomFrameP95Ms": 16.8
+    },
+    {
+      "nodes": 4,
+      "fields": 10,
+      "edges": 2,
+      "dom": 173,
+      "themeMs": 24.3,
+      "densityMs": 33.5,
+      "zoomFrameMedianMs": 16.7,
+      "zoomFrameP95Ms": 16.7
+    }
+  ]
+}

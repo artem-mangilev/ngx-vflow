@@ -47,6 +47,7 @@ import { NgDocButtonIconComponent, NgDocIconComponent, NgDocTooltipDirective } f
     provideHttpClient(),
     provideRouter(
       [
+        { path: 'introduction/design-system', redirectTo: 'design-system/overview', pathMatch: 'full' },
         ...NG_DOC_ROUTING,
         {
           path: '**',

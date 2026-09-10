@@ -10,6 +10,7 @@ import { KeyboardService } from '../../services/keyboard.service';
 import { Point } from '../../interfaces/point.interface';
 import { clientToFlowPosition } from '../../utils/coordinates';
 import { isPointInRect } from '../../utils/rect';
+import { minimapTheme } from './minimap-theme';
 
 @Directive({
   selector: 'canvas[minimapCanvas]',
@@ -29,8 +30,9 @@ import { isPointInRect } from '../../utils/rect';
   },
 })
 export class MinimapCanvasDirective {
-  public maskColor = input.required<string>();
-  public strokeColor = input.required<string>();
+  public maskColor = input<string>();
+  public strokeColor = input<string>();
+  public themeRevision = input(0);
   public position = input.required<MiniMapPosition>();
   public pannable = input.required<boolean>();
   public zoomable = input.required<boolean>();
@@ -40,6 +42,7 @@ export class MinimapCanvasDirective {
   private canvas = inject<ElementRef<HTMLCanvasElement>>(ElementRef).nativeElement;
   private entities = inject(FlowEntitiesService);
   private settings = inject(FlowSettingsService);
+  private readonly theme = minimapTheme(this.themeRevision, this.settings.background);
   private viewport = inject(ViewportService);
   private keyboard = inject(KeyboardService);
   private drag?: { id: number; start: Point; offset: Point; moved: boolean };
@@ -80,11 +83,11 @@ export class MinimapCanvasDirective {
         const selected = node.selected();
         context.beginPath();
         context.roundRect(x, y, node.width(), node.height(), group ? 5 : 2);
-        context.fillStyle = group ? node.color() : '#fff';
+        context.fillStyle = this.theme().surface;
         context.globalAlpha = group ? 0.05 : 1;
         context.fill();
         context.globalAlpha = 1;
-        context.strokeStyle = group ? node.color() : selected ? '#0f4c75' : '#1b262c';
+        context.strokeStyle = selected ? this.theme().selection : this.theme().foreground;
         context.lineWidth = group && !selected ? 1.5 : 2;
         context.stroke();
       }
@@ -130,13 +133,11 @@ export class MinimapCanvasDirective {
         this.settings.computedFlowWidth(),
         this.settings.computedFlowHeight(),
       );
-      const background = this.settings.background();
       context.setTransform(ratio, 0, 0, ratio, 0, 0);
       context.clearRect(0, 0, width, height);
-      context.fillStyle = this.maskColor();
+      context.fillStyle = this.maskColor() ?? this.theme().muted;
       context.fillRect(0, 0, width, height);
-      context.fillStyle =
-        background.type === 'solid' || background.type === 'dots' ? (background.color ?? '#fff') : '#fff';
+      context.fillStyle = this.theme().background;
       context.fillRect(
         transform.x + viewport.x * transform.zoom,
         transform.y + viewport.y * transform.zoom,
@@ -144,7 +145,7 @@ export class MinimapCanvasDirective {
         viewport.height * transform.zoom,
       );
       if (image.width && image.height) context.drawImage(image, 0, 0, width, height);
-      context.strokeStyle = this.strokeColor();
+      context.strokeStyle = this.strokeColor() ?? this.theme().border;
       context.lineWidth = 1;
       context.strokeRect(0.5, 0.5, width - 1, height - 1);
     });

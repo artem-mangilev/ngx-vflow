@@ -7,7 +7,7 @@
 }
 
 :host(:focus-visible) {
-  outline: 2px solid #005fcc;
+  outline: 2px solid var(--vflow-focus, #005fcc);
   outline-offset: 3px;
 }
 

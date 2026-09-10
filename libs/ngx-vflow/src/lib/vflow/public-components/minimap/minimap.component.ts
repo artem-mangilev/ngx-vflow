@@ -1,4 +1,13 @@
-import { Component, inject, OnInit, TemplateRef, input, viewChild, ChangeDetectionStrategy } from '@angular/core';
+import {
+  Component,
+  inject,
+  OnInit,
+  TemplateRef,
+  input,
+  viewChild,
+  ChangeDetectionStrategy,
+  signal,
+} from '@angular/core';
 import { FlowEntitiesService } from '../../services/flow-entities.service';
 import { MinimapModel } from '../../models/minimap.model';
 
@@ -19,12 +28,21 @@ export class MiniMapComponent implements OnInit {
   /**
    * The color outside the viewport (invisible area)
    */
-  public maskColor = input(`rgba(215, 215, 215, 0.6)`);
+  public maskColor = input<string>();
 
   /**
    * The minimap stroke color
    */
-  public strokeColor = input(`rgb(200, 200, 200)`);
+  public strokeColor = input<string>();
+
+  protected readonly themeRevision = signal(0);
+
+  /** Refresh resolved canvas colors after external stylesheet/media changes.
+   * Ancestor attribute changes (including class, style and theme attributes) refresh automatically.
+   */
+  public refreshTheme(): void {
+    this.themeRevision.update((value) => value + 1);
+  }
 
   /**
    * The corner of the flow where to render a mini-map

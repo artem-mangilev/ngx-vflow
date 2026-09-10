@@ -12,6 +12,7 @@ import {
   input,
   effect,
   ElementRef,
+  computed,
 } from '@angular/core';
 import { Node } from '../../interfaces/node.interface';
 import { MapContextDirective } from '../../directives/map-context.directive';
@@ -209,6 +210,12 @@ export class VflowComponent {
   public set view(view: [number, number] | 'auto') {
     this.flowSettingsService.view.set(view);
   }
+
+  /** Resolved zoom constraints for viewport controls. Programmatic viewport APIs remain unrestricted. */
+  public readonly zoomRange = computed(() => ({
+    min: this.flowSettingsService.minZoom(),
+    max: this.flowSettingsService.maxZoom(),
+  }));
 
   /**
    * Minimum zoom value

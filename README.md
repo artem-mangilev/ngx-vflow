@@ -57,7 +57,7 @@ Use Node 22 (`nvm use`) and `npm ci`.
 
 - `apps/docs`: NgDoc application; `apps/docs-e2e`: Playwright tests.
 - `libs/ngx-vflow`: engine and `ngx-vflow/testing` entry point.
-- `libs/ui`: optional `@vflow/ui` design system (Tailwind CSS 4).
+- `libs/ui`: optional `@vflow/ui` design system with compiled/source CSS and a separate BPMN entry point. See [Design system](https://www.ngx-vflow.org/design-system/overview).
 - `npm start`: docs dev server with source imports and live reload.
 - `npm run build:dev` / `npm run build`: all libraries and docs in development / production.
 - `npm run start:hybrid`: build both libraries, then serve docs using their distribution entry points.

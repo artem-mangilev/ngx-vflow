@@ -75,6 +75,13 @@ describe('public viewport gesture settings', () => {
     return event;
   }
 
+  it('publishes reactive zoom constraints for explicit-instance viewport controls', () => {
+    expect(flow.zoomRange()).toEqual({ min: 0.5, max: 3 });
+    fixture.componentRef.setInput('minZoom', 0.25);
+    fixture.componentRef.setInput('maxZoom', 1.5);
+    expect(flow.zoomRange()).toEqual({ min: 0.25, max: 1.5 });
+  });
+
   it('preserves ordinary wheel zoom and all-button drag defaults', () => {
     drag(2);
     expect(flow.viewport().x).toBe(40);
