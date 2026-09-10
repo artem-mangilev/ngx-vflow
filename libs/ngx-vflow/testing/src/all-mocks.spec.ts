@@ -17,7 +17,7 @@ import { VflowMocks } from './vflow-mocks';
       [view]="'auto'"
       [minZoom]="0"
       [maxZoom]="0"
-      [background]="'#fff'"
+      [background]="{ type: 'solid' }"
       [optimization]="{ detachedGroupsLayer: true }"
       [nodesSelectable]="true"
       [edgesSelectable]="true"
@@ -30,7 +30,7 @@ import { VflowMocks } from './vflow-mocks';
       (componentNodeEvent)="(null)"
       (connect)="(null)">
       <ng-template nodeHtml>
-        <div dragHandle selectable resizable [resizerColor]="'#2e414c'" [gap]="2">
+        <div dragHandle selectable resizable style="--vflow-resize-handle-color: #2e414c" [gap]="2">
           <handle [position]="'left'" [type]="'source'" [id]="'1'" [template]="handleTemplate" />
 
           <ng-template #handleTemplate>
@@ -70,13 +70,7 @@ import { VflowMocks } from './vflow-mocks';
         <svg:path fill="none" [attr.d]="ctx.path()" [attr.stroke]="ctx.marker()" />
       </ng-template>
 
-      <mini-map
-        [pannable]="true"
-        [zoomable]="true"
-        [zoomStep]="0.2"
-        [maskColor]="'rgba(215, 215, 215, 0.6)'"
-        [strokeColor]="'rgb(200, 200, 200)'"
-        [position]="'bottom-right'" />
+      <mini-map [pannable]="true" [zoomable]="true" [zoomStep]="0.2" [position]="'bottom-right'" />
     </vflow>
   `,
   imports: [Vflow],

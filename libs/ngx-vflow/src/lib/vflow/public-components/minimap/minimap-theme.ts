@@ -1,8 +1,6 @@
 import { DOCUMENT } from '@angular/common';
 import { DestroyRef, ElementRef, afterRenderEffect, inject, signal, untracked, Signal } from '@angular/core';
 
-import { Background } from '../../types/background.type';
-
 const defaults = {
   background: '#fff',
   surface: '#fff',
@@ -12,12 +10,20 @@ const defaults = {
   selection: '#0f4c75',
 };
 type Palette = Record<keyof typeof defaults, string>;
+const parts: Palette = {
+  background: 'viewport-color',
+  surface: 'node-fill',
+  foreground: 'node-stroke',
+  muted: 'mask-color',
+  border: 'stroke-color',
+  selection: 'node-selected-stroke',
+};
 
 /** Resolve CSS through a real color property; canvas cannot consume custom-property expressions.
  * Only ancestor attributes and explicit refreshes are observed, not arbitrary stylesheet changes.
  * The probes never participate in graph layout or node measurement.
  */
-export function minimapTheme(revision: Signal<number>, background: Signal<Background>): Signal<Palette> {
+export function minimapTheme(revision: Signal<number>): Signal<Palette> {
   const document = inject(DOCUMENT);
   const canvas = inject<ElementRef<HTMLCanvasElement>>(ElementRef).nativeElement;
   const palette = signal<Palette>(defaults, {
@@ -26,7 +32,7 @@ export function minimapTheme(revision: Signal<number>, background: Signal<Backgr
   const probes = Object.entries(defaults).map(([key, fallback]) => {
     const probe = document.createElement('span');
     probe.setAttribute('aria-hidden', 'true');
-    probe.style.cssText = `position:absolute;visibility:hidden;pointer-events:none;width:0;height:0;overflow:hidden;color:var(--vflow-${key}, ${fallback})`;
+    probe.style.cssText = `position:absolute;visibility:hidden;pointer-events:none;width:0;height:0;overflow:hidden;color:var(--vflow-minimap-${parts[key as keyof Palette]}, var(--vflow-${key}, ${fallback}))`;
     return { key: key as keyof Palette, probe };
   });
   let observer: MutationObserver | undefined;
@@ -39,15 +45,6 @@ export function minimapTheme(revision: Signal<number>, background: Signal<Backgr
   };
   afterRenderEffect(() => {
     revision();
-    // Compatibility until appearance inputs are removed: resolve explicit legacy backgrounds too.
-    const legacy = background();
-    const color =
-      legacy.type === 'solid'
-        ? legacy.color
-        : legacy.type === 'dots' || legacy.type === 'grid'
-          ? legacy.backgroundColor
-          : undefined;
-    probes[0].probe.style.color = color ?? 'var(--vflow-background, #fff)';
     if (!observer) {
       probes.forEach(({ probe }) => canvas.parentElement?.appendChild(probe));
       observer = new MutationObserver(resolve);

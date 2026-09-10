@@ -1,18 +1,13 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { map, switchMap } from 'rxjs/operators';
-import { RootSvgReferenceDirective } from '../../directives/reference.directive';
 import { FlowSettingsService } from '../../services/flow-settings.service';
 import { ViewportService } from '../../services/viewport.service';
 import { id } from '../../utils/id';
 import { toLazySignal } from '../../utils/signals/to-lazy-signal';
 
-const defaultBg = 'var(--vflow-background, #fff)';
 const defaultGap = 20;
-const defaultDotSize = 2;
-const defaultDotColor = 'var(--vflow-muted, rgb(177, 177, 183))';
 const defaultGridSize = 20;
-const defaultStrokeWidth = 2;
 const defaultImageScale = 0.1;
 const defaultRepeated = true;
 
@@ -20,14 +15,17 @@ const defaultRepeated = true;
   standalone: true,
   selector: 'g[background]',
   templateUrl: './background.component.html',
+  styleUrl: './background.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BackgroundComponent {
   private viewportService = inject(ViewportService);
-  private rootSvg = inject(RootSvgReferenceDirective).element;
   private settingsService = inject(FlowSettingsService);
 
   protected backgroundSignal = this.settingsService.background;
+  // Bind inside this component's template, not its host: a host binding would subscribe
+  // the parent flow view to zoom and reconcile graph lists on every camera change.
+  protected zoom = computed(() => this.viewportService.readableViewport().zoom);
 
   protected x = computed(() => {
     return this.viewportService.readableViewport().x % this.scaledGap();
@@ -37,22 +35,8 @@ export class BackgroundComponent {
     return this.viewportService.readableViewport().y % this.scaledGap();
   });
 
-  protected patternColor = computed(() => {
-    const background = this.backgroundSignal();
-
-    if (background.type === 'dots' || background.type === 'grid') {
-      return background.color ?? defaultDotColor;
-    }
-
-    return defaultDotColor;
-  });
-
   protected patternSize = computed(() => {
     const background = this.backgroundSignal();
-
-    if (background.type === 'dots') {
-      return (this.viewportService.readableViewport().zoom * (background.size ?? defaultDotSize)) / 2;
-    }
 
     if (background.type === 'grid') {
       return this.viewportService.readableViewport().zoom * (background.size ?? defaultGridSize);
@@ -71,18 +55,6 @@ export class BackgroundComponent {
 
     if (background.type === 'grid') {
       return zoom * (background.size ?? defaultGridSize);
-    }
-
-    return 0;
-  });
-
-  // GRID PATTERN
-  protected strokeWidth = computed(() => {
-    const background = this.backgroundSignal();
-
-    if (background.type === 'grid') {
-      const zoom = this.viewportService.readableViewport().zoom;
-      return zoom * ((background.strokeWidth ?? defaultStrokeWidth) / 2);
     }
 
     return 0;
@@ -165,24 +137,6 @@ export class BackgroundComponent {
   // Later pattern ID may be exposed to API
   protected patternId = id();
   protected patternUrl = `url(#${this.patternId})`;
-
-  constructor() {
-    effect(() => {
-      const background = this.backgroundSignal();
-
-      if (background.type === 'dots') {
-        this.rootSvg.style.backgroundColor = background.backgroundColor ?? defaultBg;
-      }
-
-      if (background.type === 'grid') {
-        this.rootSvg.style.backgroundColor = background.backgroundColor ?? defaultBg;
-      }
-
-      if (background.type === 'solid') {
-        this.rootSvg.style.backgroundColor = background.color;
-      }
-    });
-  }
 }
 
 function createImage(url: string) {

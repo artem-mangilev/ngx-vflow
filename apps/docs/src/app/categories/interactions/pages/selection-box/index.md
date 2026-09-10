@@ -13,13 +13,12 @@ Use the `[selectionBox]` input:
 ```typescript
 selectionBox: SelectionBoxSettings = {
   mode: 'full',
-  color: '#ff8a65',
 };
 ```
 
 - `mode: 'full'` selects only entities fully enclosed by the box.
 - `mode: 'partial'` selects entities that intersect the box.
-- `color` controls selection box stroke/fill color.
+- Set `--vflow-selection-box-fill` and `--vflow-selection-box-stroke` on the editor for colors, and `--vflow-selection-box-fill-opacity` / `--vflow-selection-box-stroke-width` for details. Appearance is CSS, not a settings field.
 
 To disable the selection-box gesture, pass `[keyboardShortcuts]="{ selection: null }"`.
 

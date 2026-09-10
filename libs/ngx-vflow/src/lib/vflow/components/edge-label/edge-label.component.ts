@@ -11,7 +11,6 @@ import {
 import { EdgeLabelModel } from '../../models/edge-label.model';
 import { EdgeModel } from '../../models/edge.model';
 import { NgTemplateOutlet } from '@angular/common';
-import { FlowSettingsService } from '../../services/flow-settings.service';
 import { HtmlEdgeLabelContext } from '../../interfaces/template-context.interface';
 import { EdgeLabelPosition, HtmlTemplateEdgeLabel } from '../../interfaces/edge-label.interface';
 
@@ -26,6 +25,16 @@ import { EdgeLabelPosition, HtmlTemplateEdgeLabel } from '../../interfaces/edge-
         left: 0;
         transform-origin: 0 0;
         pointer-events: none;
+      }
+
+      .default-label {
+        background: var(--vflow-edge-label-background, var(--vflow-background, #fff));
+        color: var(--vflow-edge-label-color, var(--vflow-foreground, #1b262c));
+        padding: var(--vflow-edge-label-padding, 0);
+        border-radius: var(--vflow-edge-label-radius, 0);
+        font-size: var(--vflow-edge-label-font-size, inherit);
+        font-weight: var(--vflow-edge-label-font-weight, inherit);
+        line-height: var(--vflow-edge-label-line-height, inherit);
       }
 
       .edge-label-wrapper {
@@ -44,7 +53,6 @@ import { EdgeLabelPosition, HtmlTemplateEdgeLabel } from '../../interfaces/edge-
   imports: [NgTemplateOutlet],
 })
 export class EdgeLabelComponent {
-  private settingsService = inject(FlowSettingsService);
   private element = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
   // TODO: too many inputs
   public model = input.required<EdgeLabelModel>();
@@ -66,30 +74,6 @@ export class EdgeLabelComponent {
       this.element.style.transform = point ? `translate(${point.x}px, ${point.y}px)` : '';
     });
   }
-
-  protected edgeLabelStyle = computed(() => {
-    const label = this.model().edgeLabel;
-
-    if (label.type === 'default' && label.style) {
-      const flowBackground = this.settingsService.background();
-
-      let color = 'transparent';
-
-      if (flowBackground.type === 'dots') {
-        color = flowBackground.backgroundColor ?? '#fff';
-      }
-
-      if (flowBackground.type === 'solid') {
-        color = flowBackground.color;
-      }
-
-      label.style.backgroundColor = label.style.backgroundColor ?? color;
-
-      return label.style;
-    }
-
-    return null;
-  });
 
   // TODO: move to model with Contextable interface
   protected getLabelContext(): HtmlEdgeLabelContext {

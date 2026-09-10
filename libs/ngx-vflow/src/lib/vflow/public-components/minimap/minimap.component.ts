@@ -25,16 +25,6 @@ export type MiniMapPosition = 'top-left' | 'top-right' | 'bottom-left' | 'bottom
 export class MiniMapComponent implements OnInit {
   protected entitiesService = inject(FlowEntitiesService);
 
-  /**
-   * The color outside the viewport (invisible area)
-   */
-  public maskColor = input<string>();
-
-  /**
-   * The minimap stroke color
-   */
-  public strokeColor = input<string>();
-
   protected readonly themeRevision = signal(0);
 
   /** Refresh resolved canvas colors after external stylesheet/media changes.

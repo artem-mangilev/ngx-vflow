@@ -19,6 +19,8 @@ import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
       :host {
         width: 100%;
         height: 100%;
+        --vflow-marker-color: #ffeeaa;
+        --vflow-marker-scale: 1.818182;
       }
     `,
   ],
@@ -60,9 +62,6 @@ export class CustomEdgesDemoComponent {
       markers: signal({
         end: {
           type: 'arrow-closed',
-          width: 30,
-          height: 30,
-          color: '#ffeeaa',
         },
       }),
     },

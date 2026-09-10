@@ -1,7 +1,8 @@
 # Implementation checkpoint
 
-Status: in progress. The complete seven-stage plan is **not finished**; default presentations
-and appearance APIs have deliberately not been removed before the acceptance gate.
+Status: in progress. The complete seven-stage plan is **not finished**. Per the user's
+2026-09-10 correction, appearance APIs are removed in favor of CSS custom properties,
+including part variables. Default presentations remain behind their separate acceptance gate.
 
 ## Implemented
 
@@ -10,8 +11,8 @@ and appearance APIs have deliberately not been removed before the acceptance gat
 - Shared card/field/port/container anatomy, toolbar and external-label parts. Status tone and
   activity are independent of diagnostics, selection and action availability; reduced motion
   and forced colors have explicit rules. No business model, forms engine or plugin registry.
-- Exactly the agreed shared UI tokens, scoped UI→core mappings and no global theme installation.
-  Component-specific MVP tokens replaced with ordinary CSS selectors.
+- Shared UI tokens, scoped UI→core mappings and no global theme installation. Part-specific
+  CSS variables now supplement shared tokens; classes are NOT public styling API (ADR-0007).
 - `styles.css` and self-contained `styles.source.css`, assets/exports/sideEffects, one Angular
   package build. CSS parity test processes the published source with Tailwind CLI and compares
   browser computed styles against compiled CSS; consumers need no Tailwind dependency.
@@ -24,9 +25,10 @@ and appearance APIs have deliberately not been removed before the acceptance gat
   read-only metrics map with container-owned connection and portless note; BPMN subset.
 - Canvas CSS resolution isolated from geometry. Attribute changes on the editor/ancestors
   refresh the palette automatically; `MiniMapComponent.refreshTheme()` handles external
-  stylesheet/media changes. Legacy explicit background colors remain a compatibility path.
+  stylesheet/media changes. Legacy background/minimap color APIs are removed.
 - Scoped SVG marker IDs fix cross-editor theme collisions for identical marker specifications.
-- [Appearance inventory](appearance-inventory.md) records the remaining coordinated removal.
+- [Appearance inventory](appearance-inventory.md) records the completed appearance migration
+  and the still-pending default-presentation removal.
 
 ## Verification artifacts and commands
 
@@ -40,7 +42,7 @@ and appearance APIs have deliberately not been removed before the acceptance gat
 - `E2E_CONFIGURATION=hybrid` selects distribution JS + compiled CSS; `hybrid-source` selects
   distribution JS + source CSS. Stop any pre-existing :4200 development server before switching.
 
-### Results (2026-09-10)
+### Historical results before the CSS-only appearance migration (2026-09-10)
 
 - Core + UI/BPMN production package build: passed. Docs development and production builds:
   passed; production retains the repository's third-party CommonJS warnings.
@@ -66,7 +68,56 @@ and appearance APIs have deliberately not been removed before the acceptance gat
 - Latest rebuilt tarballs repeated both Angular 20.0.0 and 21.0.0 consumer checks successfully.
 - Prettier on changed files and `git diff --check`: passed. No release or version bump performed.
 
-None of these results substitutes for the remaining production matrix or authorizes stage-7 removal.
+None of these results substitutes for the remaining production matrix or authorizes
+removal of default presentations.
+
+## Current continuation: CSS-only appearance (2026-09-10)
+
+The user rejected public styling classes and explicitly chose part-specific variables and
+removal of programmatic appearance inputs. [ADR-0007](../../docs/adr/0007-css-custom-properties-for-appearance.md)
+supersedes the earlier selector/no-component-token decision; plan, contract and inventory
+are updated. The prior selector-promotion attempt is withdrawn.
+
+- Removed resize color inputs, minimap mask/stroke inputs, guide and selection-box color
+  fields, background color shorthand/fields and dot-size/grid-stroke fields, marker
+  color/stroke/size fields, default-group color and default-label style. Updated templates,
+  types, NodeModel/create helpers, testing mocks and all affected docs consumers.
+- Added core part variables for resize, guides, selection box, backgrounds, markers,
+  minimap, default groups and labels; UI part variables for cards, fields, groups, ports,
+  statuses, edges, buttons and BPMN. Fallbacks occur at usage sites, not on intermediate hosts.
+- Marker scale transforms the shape around its attachment point with visible overflow;
+  original type/orientation/units and scoped URL wiring remain. The migration guide explains
+  old width/height conversion and the custom-SVG path for clipping/per-edge presentation.
+- Canvas continues to resolve CSS colors, refresh automatically on ancestor attributes,
+  and expose explicit refresh for stylesheet/media changes. No appearance compatibility
+  branch remains. DOM inheritance boundaries (including sibling core resize controls) are
+  explicitly documented; no automatic copying of card-local variables was introduced.
+- Added `/design-system/styling` with the variable catalogue and core-only/UI migration
+  examples. Updated existing resizer, background, selection-box, label and minimap docs.
+- Regression tests cover compile-time rejection of removed fields, production/mock input
+  parity, inherited part overrides, fallback restoration, SVG zoom behavior, marker scale,
+  multi-editor isolation, canvas refresh and zero color-only node/handle measurements.
+- The existing viewport reconciliation tests caught a real interim regression: reading
+  zoom in the background component's host binding subscribed the parent flow view. Moving
+  that binding inside the background template fixed it; no tests were weakened.
+
+### Current verification
+
+- **225 core unit tests passed** in Chromium. UI/core/docs lint passed.
+- Core + UI/BPMN package builds and docs production build passed (existing third-party
+  CommonJS warnings remain).
+- Full source-development Chromium docs suite: **28 passed**.
+- Rebuilt distribution JS + compiled CSS (`hybrid`): **15 passed**.
+- Rebuilt distribution JS + source CSS (`hybrid-source`): **15 passed**.
+  Both include the five two-theme Axe audits, composition interactions, theme/marker/canvas
+  isolation, no-remeasurement check and published CSS parity with part-variable overrides.
+- Latest tarballs: Angular **20.0.0 / TS 5.8.3** and **21.0.0 / TS 5.9.3** both pass
+  `ngc` and Chromium runtime smoke. Core-only remains separate; CSS modes match without a
+  Tailwind consumer dependency. This remains a smoke, not every Angular minor's full suite.
+- Prettier and `git diff --check` passed. No version bump or release performed.
+
+Default presentations, the larger-scene production gate and scroll/collapse policy remain
+unfinished. Appearance migration does not imply completion of all seven stages.
 
 ## Performance interpretation
 
@@ -98,8 +149,10 @@ endpoint precision. No projection to header/boundary and no library scroll API w
   Color-only measurement instrumentation is now present, but only for the small multi-editor fixture.
 - Review the local scroll/collapse experiment with the user; no automatic hidden-endpoint
   policy or universal scroll support has been added.
-- Finish public core feedback selector promotion and all appearance replacement details from
-  the inventory; do not expose arbitrary internal DOM accidentally.
+- Finish the remaining core feedback variable review (focus, selection, basic handles and
+  connection preview). Do not promote implementation classes; part appearance uses CSS
+  variables. The inventory's programmatic appearance fields have now been removed.
 - After that gate, carry out stage 7 together: types/create helpers/NodeModel/default handles,
   optimized branches, minimap, testing mocks, all docs consumers, default presentation removal,
-  appearance input removal, both working migration paths and final repeat acceptance.
+  both final headless migration paths and repeat acceptance. Appearance input removal has
+  already been completed independently by explicit user request.

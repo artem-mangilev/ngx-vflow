@@ -29,7 +29,7 @@ test('published compiled and source CSS have identical browser output', async ({
     const outputs: unknown[] = [];
     for (const css of styles) {
       await page.setContent(`<style>${css}</style>
-        <style>.override { --vui-space: 20px; --vui-font-size: 17px; --vui-accent: #007766; } .override .vui-field { min-height: 55px; }</style>
+        <style>.override { --vui-space: 20px; --vui-font-size: 17px; --vui-accent: #007766; --vui-field-min-height: 55px; --vui-edge-width: 4px; --vui-status-warning-color: #854d0e; }</style>
         <div id="unscoped"></div>
         ${['light', 'dark']
           .map(
@@ -64,6 +64,8 @@ test('published compiled and source CSS have identical browser output', async ({
         await page.locator('#unscoped').evaluate((el) => getComputedStyle(el).getPropertyValue('--vflow-background')),
       ).toBe('');
       await expect(page.locator('.vui-field').first()).toHaveCSS('min-height', '55px');
+      await expect(page.locator('.vui-edge').first()).toHaveCSS('stroke-width', '4px');
+      await expect(page.locator('.vui-status').last()).toHaveCSS('color', 'rgb(133, 77, 14)');
       await expect(page.locator('.vui-button').first()).toHaveCSS('background-color', 'rgb(0, 119, 102)');
     }
     expect(outputs[0]).toEqual(outputs[1]);

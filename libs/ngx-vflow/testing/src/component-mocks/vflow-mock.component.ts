@@ -169,7 +169,7 @@ export class VflowMockComponent implements AsInterface<VflowComponent>, OnInit {
   public readonly zoomRange = computed(() => ({ min: this.minZoom, max: this.maxZoom }));
 
   @Input()
-  public readonly background: Background | string = '#fff';
+  public readonly background: Background = { type: 'solid' };
 
   @Input()
   public readonly optimization = DEFAULT_OPTIMIZATION;
@@ -192,7 +192,6 @@ export class VflowMockComponent implements AsInterface<VflowComponent>, OnInit {
   @Input()
   public readonly selectionBox: SelectionBoxSettings = {
     mode: 'full',
-    color: '#bbe1fa',
   };
 
   @Input() public zoomOnScroll = true;

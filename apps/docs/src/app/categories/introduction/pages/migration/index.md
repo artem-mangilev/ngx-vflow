@@ -102,7 +102,11 @@ After:
 
 ### DOM compatibility
 
-Documented Angular APIs, CSS classes, and observable behavior remain supported contracts. Exact private DOM elements, nesting, and layer structure are not public contracts; avoid selectors or application logic that depend on them.
+Documented Angular APIs, CSS custom properties and observable behavior are supported contracts.
+Implementation classes, DOM elements, nesting and layer structure are not public styling contracts.
+Use the [CSS variable catalogue and appearance migration guide](/design-system/styling) to replace
+programmatic color/style fields and class-based styling dependencies. This appearance migration
+is separate from the later removal of default core presentations.
 
 ## Migration to >= v2.0
 

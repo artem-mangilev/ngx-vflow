@@ -19,6 +19,8 @@ import { Edge, Node, SelectionBoxMode, SelectionBoxSettings, Vflow, createNodes 
         display: grid;
         grid-template-rows: auto 1fr;
         gap: 8px;
+        --vflow-selection-box-fill: #ff8a65;
+        --vflow-selection-box-stroke: #ff8a65;
       }
 
       .controls {
@@ -55,7 +57,6 @@ export class SelectionBoxDemoComponent {
 
   public selectionBox = computed<SelectionBoxSettings>(() => ({
     mode: this.mode(),
-    color: '#ff8a65',
   }));
 
   public setMode(mode: SelectionBoxMode) {

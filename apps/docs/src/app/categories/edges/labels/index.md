@@ -8,7 +8,7 @@ This method renders simple static text on the edge. To achieve this, you need to
 
 - Pass the `default` type to `EdgeLabel`.
 - Set the `text`.
-- Optionally add the `style`, which supports any CSS property.
+- Customize with the `--vflow-edge-label-*` variables on the editor (see [styling](/design-system/styling)). There is no `style` field. For distinct per-label appearance, supply application-owned HTML as below.
 
 ## HTML Template
 

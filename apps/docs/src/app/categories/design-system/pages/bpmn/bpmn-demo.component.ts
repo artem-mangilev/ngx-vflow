@@ -42,7 +42,6 @@ import { createEdges, createNodes, Vflow, VflowComponent } from 'ngx-vflow';
       </div>
       <vflow
         view="auto"
-        background="var(--vflow-background)"
         [minZoom]="0.25"
         [optimization]="{ detachedGroupsLayer: true }"
         [nodes]="nodes"
@@ -280,7 +279,6 @@ export class BpmnDemoComponent {
           : {
               end: {
                 type: edge.link === 'message' ? ('arrow' as const) : ('arrow-closed' as const),
-                color: 'var(--vui-muted)',
               },
             },
     })),

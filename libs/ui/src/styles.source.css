@@ -1,4 +1,5 @@
-/* Public semantic parts. No generator directives, source scanning or external imports. */
+/* Public CSS custom properties; implementation selectors are not styling API.
+ * No generator directives, source scanning or external imports. */
 @layer vui {
   [data-vui-theme] {
     color-scheme: light;
@@ -53,10 +54,10 @@
     color: var(--vui-foreground);
   }
   .vui-node {
-    background: var(--vui-surface);
-    border: 1px solid var(--vui-border);
-    border-radius: var(--vui-radius);
-    box-shadow: 0 3px 10px #0000000a;
+    background: var(--vui-node-background, var(--vui-surface));
+    border: var(--vui-node-border-width, 1px) solid var(--vui-node-border-color, var(--vui-border));
+    border-radius: var(--vui-node-radius, var(--vui-radius));
+    box-shadow: var(--vui-node-shadow, 0 3px 10px #0000000a);
   }
   :where(.vui-node-header, .vui-node-footer, .vui-field, .vui-group-header) {
     display: flex;
@@ -67,26 +68,27 @@
   .vui-node-header {
     font-weight: 600;
     border-bottom: 1px solid var(--vui-border);
-    border-radius: var(--vui-radius) var(--vui-radius) 0 0;
-    background: var(--vui-surface-muted);
+    border-radius: var(--vui-node-radius, var(--vui-radius)) var(--vui-node-radius, var(--vui-radius)) 0 0;
+    background: var(--vui-node-header-background, var(--vui-surface-muted));
   }
   .vui-node-body {
-    padding: var(--vui-space);
+    padding: var(--vui-node-body-padding, var(--vui-space));
   }
   .vui-node-footer {
     border-top: 1px solid var(--vui-border);
   }
   .vui-field {
-    min-height: 38px;
-    padding-block: 6px;
+    min-height: var(--vui-field-min-height, 38px);
+    padding-block: var(--vui-field-padding-block, 6px);
   }
   .vui-field + .vui-field {
     border-top: 1px solid var(--vui-border);
   }
   .vui-group {
-    border: 1px dashed var(--vui-border);
-    border-radius: var(--vui-radius);
-    background: color-mix(in srgb, var(--vui-surface-muted) 55%, transparent);
+    border: var(--vui-group-border-width, 1px) var(--vui-group-border-style, dashed)
+      var(--vui-group-border-color, var(--vui-border));
+    border-radius: var(--vui-group-radius, var(--vui-radius));
+    background: var(--vui-group-background, color-mix(in srgb, var(--vui-surface-muted) 55%, transparent));
   }
   .vui-group-header {
     font-weight: 600;
@@ -97,17 +99,17 @@
   }
   .vui-port {
     display: block;
-    width: 14px;
-    height: 14px;
-    border: 2px solid var(--vui-surface);
-    border-radius: 50%;
-    background: var(--vui-muted);
+    width: var(--vui-port-size, 14px);
+    height: var(--vui-port-size, 14px);
+    border: var(--vui-port-border-width, 2px) solid var(--vui-port-border-color, var(--vui-surface));
+    border-radius: var(--vui-port-radius, 50%);
+    background: var(--vui-port-color, var(--vui-muted));
   }
   .vui-port[data-state='valid'] {
-    background: var(--vui-accent);
+    background: var(--vui-port-valid-color, var(--vui-accent));
   }
   .vui-port[data-state='invalid'] {
-    background: var(--vui-foreground);
+    background: var(--vui-port-invalid-color, var(--vui-foreground));
     border-style: dashed;
   }
   .vui-port-label {
@@ -130,13 +132,13 @@
     color: var(--vui-accent);
   }
   .vui-status[data-tone='success'] {
-    color: light-dark(#166534, #86efac);
+    color: var(--vui-status-success-color, light-dark(#166534, #86efac));
   }
   .vui-status[data-tone='warning'] {
-    color: light-dark(#854d0e, #fde047);
+    color: var(--vui-status-warning-color, light-dark(#854d0e, #fde047));
   }
   .vui-status[data-tone='danger'] {
-    color: light-dark(#b91c1c, #fca5a5);
+    color: var(--vui-status-danger-color, light-dark(#b91c1c, #fca5a5));
   }
   .vui-status[data-active='true']::before {
     content: '';
@@ -154,12 +156,12 @@
   }
   .vui-edge {
     fill: none;
-    stroke: var(--vui-muted);
-    stroke-width: 2px;
+    stroke: var(--vui-edge-color, var(--vui-muted));
+    stroke-width: var(--vui-edge-width, 2px);
     stroke-linejoin: round;
   }
   .vui-edge[data-vui-selected='true'] {
-    stroke: var(--vui-accent);
+    stroke: var(--vui-edge-selected-color, var(--vui-accent));
   }
   .vui-edge-label,
   .vui-toolbar {
@@ -190,8 +192,8 @@
     border: 1px solid transparent;
     border-radius: 7px;
     padding: 7px 12px;
-    background: var(--vui-accent);
-    color: var(--vui-on-accent);
+    background: var(--vui-button-background, var(--vui-accent));
+    color: var(--vui-button-color, var(--vui-on-accent));
     font-size: 13px;
     font-weight: 600;
     line-height: 1.4;
@@ -223,7 +225,7 @@
     background: var(--vui-surface);
   }
   .vui-bpmn-event[data-event='end'] {
-    border-width: 5px;
+    border-width: var(--vui-bpmn-end-border-width, 5px);
   }
   .vui-bpmn-gateway {
     display: grid;
@@ -254,10 +256,10 @@
     border-radius: 0;
   }
   .vui-bpmn-link[data-link='message'] {
-    stroke-dasharray: 8 5;
+    stroke-dasharray: var(--vui-bpmn-message-dash, 8 5);
   }
   .vui-bpmn-link[data-link='association'] {
-    stroke-dasharray: 2 5;
+    stroke-dasharray: var(--vui-bpmn-association-dash, 2 5);
   }
   @media (prefers-reduced-motion: reduce) {
     .vui-status[data-active='true']::before {

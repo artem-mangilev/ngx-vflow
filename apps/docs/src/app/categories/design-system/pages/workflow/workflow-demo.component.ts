@@ -30,7 +30,7 @@ import { createEdges, createNodes, Vflow, VflowComponent } from 'ngx-vflow';
       @if (flow(); as editor) {
         <vflow-controls [flow]="editor" />
       }
-      <vflow view="auto" background="var(--vflow-background)" [nodes]="nodes" [edges]="edges">
+      <vflow view="auto" [nodes]="nodes" [edges]="edges">
         <ng-template let-ctx nodeHtml>
           <article vflowNode selectable [vflowSelected]="ctx.selected() || ctx.preselected()">
             <header vflowNodeHeader>
@@ -167,7 +167,7 @@ export class WorkflowDemoComponent {
       target: 'review',
       type: 'template',
       curve: 'smooth-step',
-      markers: { end: { color: 'var(--vui-muted)' } },
+      markers: { end: {} },
     },
     {
       id: 'review-paid',
@@ -175,7 +175,7 @@ export class WorkflowDemoComponent {
       target: 'paid',
       type: 'template',
       curve: 'smooth-step',
-      markers: { end: { color: 'var(--vui-muted)' } },
+      markers: { end: {} },
       edgeLabels: { center: { type: 'html-template', data: 'Approved' } },
     },
     {
@@ -185,7 +185,7 @@ export class WorkflowDemoComponent {
       target: 'fix',
       type: 'template',
       curve: 'smooth-step',
-      markers: { end: { color: 'var(--vui-muted)' } },
+      markers: { end: {} },
       edgeLabels: { center: { type: 'html-template', data: 'Needs changes' } },
     },
   ]);

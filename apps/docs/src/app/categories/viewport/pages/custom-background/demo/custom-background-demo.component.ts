@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
 
 @Component({
-  template: `<vflow view="auto" background="#bbe1fa" [nodes]="nodes" [edges]="edges" />`,
+  template: `<vflow view="auto" style="--vflow-background: #bbe1fa" [nodes]="nodes" [edges]="edges" />`,
   styles: [
     `
       :host {

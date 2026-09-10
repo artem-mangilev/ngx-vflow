@@ -23,6 +23,9 @@ import {
       :host {
         width: 100%;
         height: 100%;
+        --vflow-edge-label-color: black;
+        --vflow-edge-label-radius: 5px;
+        --vflow-edge-label-line-height: 80%;
       }
     `,
   ],
@@ -68,11 +71,6 @@ export class ReconnectionDemoComponent {
         center: {
           type: 'default',
           text: 'Reconnectable from both sides',
-          style: {
-            color: 'black',
-            lineHeight: '80%',
-            borderRadius: '5px',
-          },
         },
       }),
     },
@@ -86,11 +84,6 @@ export class ReconnectionDemoComponent {
         center: {
           type: 'default',
           text: 'Reconnectable only from source side',
-          style: {
-            color: 'black',
-            lineHeight: '80%',
-            borderRadius: '5px',
-          },
         },
       }),
     },

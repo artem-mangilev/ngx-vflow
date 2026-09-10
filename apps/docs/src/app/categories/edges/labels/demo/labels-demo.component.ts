@@ -4,7 +4,11 @@ import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
 @Component({
   template: `<vflow view="auto" [nodes]="nodes" [edges]="edges">
     <ng-template let-ctx edgeLabelHtml>
-      <div class="label" [style.background-color]="ctx.label.data.color" (click)="deleteEdge(ctx.edge)">Delete</div>
+      @if (ctx.label.data.kind === 'delete') {
+        <button class="label" (click)="deleteEdge(ctx.edge)">Delete</button>
+      } @else {
+        <span class="endpoint-label" [class.end]="ctx.label.data.kind === 'end'">{{ ctx.label.data.text }}</span>
+      }
     </ng-template>
   </vflow>`,
   styles: [
@@ -12,8 +16,25 @@ import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
       :host {
         width: 100%;
         height: 100%;
+        --vflow-edge-label-color: black;
+        --vflow-edge-label-background: #f5f5f5;
+        --vflow-edge-label-padding: 4px 8px;
+        --vflow-edge-label-radius: 4px;
+        --vflow-edge-label-font-size: 12px;
       }
 
+      .endpoint-label {
+        background: #e3f2fd;
+        color: #1976d2;
+        padding: 2px 6px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 500;
+      }
+      .endpoint-label.end {
+        background: #e8f5e8;
+        color: #2e7d32;
+      }
       .label {
         width: 60px;
         height: 25px;
@@ -56,32 +77,16 @@ export class LabelsDemoComponent {
       curve: signal('smooth-step'),
       edgeLabels: signal({
         start: {
-          type: 'default',
-          text: 'Start',
-          style: {
-            background: '#e3f2fd',
-            color: '#1976d2',
-            padding: '2px 6px',
-            borderRadius: '12px',
-            fontSize: '11px',
-            fontWeight: '500',
-          },
+          type: 'html-template',
+          data: { kind: 'start', text: 'Start' },
         },
         center: {
           type: 'html-template',
-          data: { color: '#122c26' },
+          data: { kind: 'delete' },
         },
         end: {
-          type: 'default',
-          text: 'End',
-          style: {
-            background: '#e8f5e8',
-            color: '#2e7d32',
-            padding: '2px 6px',
-            borderRadius: '12px',
-            fontSize: '11px',
-            fontWeight: '500',
-          },
+          type: 'html-template',
+          data: { kind: 'end', text: 'End' },
         },
       }),
     },
@@ -94,13 +99,6 @@ export class LabelsDemoComponent {
         center: {
           type: 'default',
           text: 'Center Only',
-          style: {
-            color: 'black',
-            background: '#f5f5f5',
-            padding: '4px 8px',
-            borderRadius: '4px',
-            fontSize: '12px',
-          },
         },
       }),
     },

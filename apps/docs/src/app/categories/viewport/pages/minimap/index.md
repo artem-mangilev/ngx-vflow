@@ -1,5 +1,10 @@
 The library includes a minimap that offers an overview of the entire flow. To enable it, simply add a `<mini-map />` component as a direct child of `<vflow />`. For customization options, see the available inputs in `MiniMapComponent`.
 
+Appearance uses `--vflow-minimap-mask-color`, `--vflow-minimap-stroke-color` and the
+other [minimap part variables](/design-system/styling), placed on the editor or an ancestor.
+There are no color inputs. Ancestor attribute changes refresh resolved colors automatically;
+call `refreshTheme()` after external stylesheet/media changes.
+
 The minimap uses canvas and caches node previews during pan and zoom. It updates the previews when node geometry or selection changes, and keeps the image sharp on high-DPI displays.
 
 Navigation is opt-in; `<mini-map />` remains a read-only overview.

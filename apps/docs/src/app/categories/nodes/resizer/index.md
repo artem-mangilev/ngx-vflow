@@ -15,7 +15,8 @@ This provides a way to have more control over the resizer:
   - If you want the resizer to appear conditionally, apply the directive as `[resizable]="yourCondition"`. You can bind the visibility of the resizer to the node’s selection state (see the code below for an example).
 - **Important**: Use the `ctx.width()` and `ctx.height()` signals from the context, not `ctx.node.width` and `ctx.node.height`. The latter properties are not reactive, so the node won’t update its size based on the resizer.
 - The resizer respects the `min-width` and `min-height` CSS properties of the resizable node, or you can pass `[minWidth]` / `[minHeight]` / `[maxWidth]` / `[maxHeight]` explicitly.
-- Optionally, you can customize the `[resizerColor]`, keep the aspect ratio with `[keepAspectRatio]`, restrict resizing to one axis with `[resizeDirection]` (`horizontal` | `vertical`), toggle handle auto-scaling with `[autoScale]`, and react to `(resizeStart)` / `(resizeChange)` / `(resizeEnd)`.
+- Keep the aspect ratio with `[keepAspectRatio]`, restrict resizing with `[resizeDirection]` (`horizontal` | `vertical`), toggle handle auto-scaling with `[autoScale]`, and react to `(resizeStart)` / `(resizeChange)` / `(resizeEnd)`.
+- Set `--vflow-resize-handle-color` and `--vflow-resize-line-color` on your editor or an ancestor. See [part variables](/design-system/styling) for size, border and radius options.
 
 {{ NgDocActions.demoPane("TemplateGroupResizerDemoComponent") }}
 
@@ -31,7 +32,8 @@ The algorithm is almost the same as for `template-group` nodes:
 
 - It's up to you to adjust the CSS of your custom node to ensure it renders correctly during resizing. The library only modifies the container size.
 
-- Optionally, you can customize the `[resizerColor]`, keep the aspect ratio with `[keepAspectRatio]`, restrict resizing to one axis with `[resizeDirection]` (`horizontal` | `vertical`), toggle handle auto-scaling with `[autoScale]`, and react to `(resizeStart)` / `(resizeChange)` / `(resizeEnd)`.
+- Keep the aspect ratio with `[keepAspectRatio]`, restrict resizing with `[resizeDirection]` (`horizontal` | `vertical`), toggle handle auto-scaling with `[autoScale]`, and react to `(resizeStart)` / `(resizeChange)` / `(resizeEnd)`.
+- Use the same resize CSS variables as for template groups; there are no color inputs.
 
 {{ NgDocActions.demoPane("TemplateNodeResizerDemoComponent") }}
 

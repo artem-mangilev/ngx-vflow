@@ -26,10 +26,20 @@
 
 // Corner handles
 .resize-control.handle {
-  width: 6px;
-  height: 6px;
-  border: 1px solid var(--vflow-surface, #fff);
-  border-radius: 1px;
+  background-color: var(--vflow-resize-handle-color, var(--vflow-selection, #2e414c));
+  border: var(--vflow-resize-handle-border-width, 1px) solid
+    var(--vflow-resize-handle-border-color, var(--vflow-surface, #fff));
+  border-radius: var(--vflow-resize-handle-radius, 1px);
+}
+
+.resize-control.line {
+  border-color: var(--vflow-resize-line-color, var(--vflow-selection, #2e414c));
+  border-style: var(--vflow-resize-line-style, solid);
+}
+
+.resize-control.handle {
+  width: var(--vflow-resize-handle-size, 6px);
+  height: var(--vflow-resize-handle-size, 6px);
   translate: -50% -50%;
 }
 
@@ -46,7 +56,6 @@
 // Edge lines
 .resize-control.line {
   border-width: 0;
-  border-style: solid;
 }
 
 .resize-control.line.left,
@@ -58,11 +67,11 @@
 }
 
 .resize-control.line.left {
-  border-left-width: 1px;
+  border-left-width: var(--vflow-resize-line-width, 1px);
 }
 
 .resize-control.line.right {
-  border-right-width: 1px;
+  border-right-width: var(--vflow-resize-line-width, 1px);
 }
 
 .resize-control.line.top,
@@ -74,11 +83,11 @@
 }
 
 .resize-control.line.top {
-  border-top-width: 1px;
+  border-top-width: var(--vflow-resize-line-width, 1px);
 }
 
 .resize-control.line.bottom {
-  border-bottom-width: 1px;
+  border-bottom-width: var(--vflow-resize-line-width, 1px);
 }
 
 .resize-control.handle.left,

@@ -91,6 +91,26 @@ describe('ResizableComponent', () => {
     controls.forEach((control) => expect(control.style.getPropertyValue('--resizer-gap')).toBe('4px'));
   });
 
+  it('inherits part colors and restores semantic fallbacks when cleared', async () => {
+    const fixture = await createFixture();
+    const host = fixture.nativeElement as HTMLElement;
+    host.style.setProperty('--vflow-selection', 'rgb(10, 20, 30)');
+    const handle = host.querySelector<HTMLElement>('.resize-control.handle')!;
+    const line = host.querySelector<HTMLElement>('.resize-control.line')!;
+
+    host.style.setProperty('--vflow-resize-handle-color', 'rgb(40, 50, 60)');
+    host.style.setProperty('--vflow-resize-line-color', 'rgb(40, 50, 60)');
+    expect(getComputedStyle(handle).backgroundColor).toBe('rgb(40, 50, 60)');
+    expect(getComputedStyle(line).borderColor).toBe('rgb(40, 50, 60)');
+
+    host.style.removeProperty('--vflow-resize-handle-color');
+    host.style.removeProperty('--vflow-resize-line-color');
+    expect(handle.style.backgroundColor).toBe('');
+    expect(line.style.borderColor).toBe('');
+    expect(getComputedStyle(handle).backgroundColor).toBe('rgb(10, 20, 30)');
+    expect(getComputedStyle(line).borderColor).toBe('rgb(10, 20, 30)');
+  });
+
   it('renders controls at the default 1.5px gap', async () => {
     const fixture = await createFixture(false);
 

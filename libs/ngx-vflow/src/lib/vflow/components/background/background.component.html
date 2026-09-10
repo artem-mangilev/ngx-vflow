@@ -1,16 +1,13 @@
 @if (backgroundSignal().type === 'dots') {
   <svg:pattern
     patternUnits="userSpaceOnUse"
+    [style.--vflow-internal-zoom]="zoom()"
     [attr.id]="patternId"
     [attr.x]="x()"
     [attr.y]="y()"
     [attr.width]="scaledGap()"
     [attr.height]="scaledGap()">
-    <svg:circle
-      [attr.cx]="patternSize()"
-      [attr.cy]="patternSize()"
-      [attr.r]="patternSize()"
-      [attr.fill]="patternColor()" />
+    <svg:circle />
   </svg:pattern>
 
   <svg:rect x="0" y="0" width="100%" height="100%" [attr.fill]="patternUrl" />
@@ -44,16 +41,13 @@
 @if (backgroundSignal().type === 'grid') {
   <svg:pattern
     patternUnits="userSpaceOnUse"
+    [style.--vflow-internal-zoom]="zoom()"
     [attr.id]="patternId"
     [attr.x]="x()"
     [attr.y]="y()"
     [attr.width]="patternSize()"
     [attr.height]="patternSize()">
-    <svg:path
-      fill="none"
-      [attr.d]="'M ' + patternSize() + ' 0 L 0 0 0 ' + patternSize()"
-      [attr.stroke]="patternColor()"
-      [attr.stroke-width]="strokeWidth()" />
+    <svg:path fill="none" [attr.d]="'M ' + patternSize() + ' 0 L 0 0 0 ' + patternSize()" />
   </svg:pattern>
 
   <svg:rect x="0" y="0" width="100%" height="100%" [attr.fill]="patternUrl" />

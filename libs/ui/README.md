@@ -41,7 +41,9 @@ The theme is explicit, never installed on `:root`. Override shared tokens:
 `--vui-surface`, `--vui-surface-muted`, `--vui-foreground`, `--vui-muted`, `--vui-border`,
 `--vui-accent`, `--vui-on-accent`, `--vui-font-family`, `--vui-font-size`,
 `--vui-line-height`, `--vui-space`, `--vui-radius`.
-Part-specific adjustments use CSS (`.vui-field { min-height: 30px }`), not component tokens.
+Part-specific adjustments also use variables, for example `--vui-field-min-height: 30px`,
+`--vui-edge-width: 3px`, `--vui-node-body-padding: 20px`. Classes added by directives are
+implementation details, not a public styling API.
 
 Compose cards, fields, port visuals/labels, status indicators, container frames/headers,
 toolbar surfaces, external labels and SVG edge paths on consumer elements. Bind `vflowSelected`
@@ -56,10 +58,10 @@ BPMN is separate: `VflowBpmnTask`, `VflowBpmnEvent` (start/end), `VflowBpmnGatew
 `VflowBpmnPool`, `VflowBpmnLane`, `VflowBpmnLink` (sequence/message/association).
 Consumers provide symbols, anchors, core path/marker bindings and process semantics.
 
-See the **Design system** documentation section for five reference compositions, selectors,
+See the **Design system** documentation section for five reference compositions, the part-variable catalogue and migration guide,
 theme examples and limitations. Scroll/collapse is an explicitly unsupported demo experiment.
 Minimap follows editor tokens, not node-local overrides; ancestor attribute changes refresh
 its resolved canvas colors, while external stylesheet/media changes require `refreshTheme()`.
 
-Core default presentations and appearance inputs remain during the pre-migration acceptance
-stage. Versions/releases follow the shared ngx-vflow release process (`docs/releasing.md`).
+Core appearance inputs have been removed in favor of CSS variables. Default presentations
+remain until their separate acceptance gate passes. Versions/releases follow the shared ngx-vflow release process (`docs/releasing.md`).

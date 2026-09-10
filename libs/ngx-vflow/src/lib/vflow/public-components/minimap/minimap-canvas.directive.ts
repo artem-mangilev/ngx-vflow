@@ -30,8 +30,6 @@ import { minimapTheme } from './minimap-theme';
   },
 })
 export class MinimapCanvasDirective {
-  public maskColor = input<string>();
-  public strokeColor = input<string>();
   public themeRevision = input(0);
   public position = input.required<MiniMapPosition>();
   public pannable = input.required<boolean>();
@@ -42,7 +40,7 @@ export class MinimapCanvasDirective {
   private canvas = inject<ElementRef<HTMLCanvasElement>>(ElementRef).nativeElement;
   private entities = inject(FlowEntitiesService);
   private settings = inject(FlowSettingsService);
-  private readonly theme = minimapTheme(this.themeRevision, this.settings.background);
+  private readonly theme = minimapTheme(this.themeRevision);
   private viewport = inject(ViewportService);
   private keyboard = inject(KeyboardService);
   private drag?: { id: number; start: Point; offset: Point; moved: boolean };
@@ -135,7 +133,7 @@ export class MinimapCanvasDirective {
       );
       context.setTransform(ratio, 0, 0, ratio, 0, 0);
       context.clearRect(0, 0, width, height);
-      context.fillStyle = this.maskColor() ?? this.theme().muted;
+      context.fillStyle = this.theme().muted;
       context.fillRect(0, 0, width, height);
       context.fillStyle = this.theme().background;
       context.fillRect(
@@ -145,7 +143,7 @@ export class MinimapCanvasDirective {
         viewport.height * transform.zoom,
       );
       if (image.width && image.height) context.drawImage(image, 0, 0, width, height);
-      context.strokeStyle = this.strokeColor() ?? this.theme().border;
+      context.strokeStyle = this.theme().border;
       context.lineWidth = 1;
       context.strokeRect(0.5, 0.5, width - 1, height - 1);
     });

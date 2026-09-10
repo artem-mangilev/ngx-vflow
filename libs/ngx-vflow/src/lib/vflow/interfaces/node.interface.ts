@@ -15,7 +15,6 @@ export const NODE_DEFAULTS = {
   parentId: null,
   extent: 'parent' as const,
   selected: false,
-  color: '#1b262c',
   resizable: false,
   text: '',
   data: {},
@@ -56,7 +55,6 @@ export interface DefaultGroupNode extends SharedNode {
   type: 'default-group';
   width: WritableSignal<number>;
   height: WritableSignal<number>;
-  color?: WritableSignal<string>;
   resizable?: WritableSignal<boolean>;
 }
 
@@ -208,7 +206,6 @@ export function createNode<T>(
         type: 'default-group' as const,
         width,
         height,
-        color: signal(node.color ?? NODE_DEFAULTS.color),
         resizable: signal(node.resizable ?? NODE_DEFAULTS.resizable),
       };
     } else {
@@ -217,7 +214,6 @@ export function createNode<T>(
         type: 'default-group' as const,
         width,
         height,
-        color: isDefined(node.color) ? signal(node.color) : undefined,
         resizable: isDefined(node.resizable) ? signal(node.resizable) : undefined,
       };
     }

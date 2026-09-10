@@ -216,8 +216,6 @@ export class NodeModel<T = unknown>
 
   public children = computed(() => this.entitiesService.nodesByParentIdMap().get(this.rawNode.id) ?? []);
 
-  public color = signal(NODE_DEFAULTS.color);
-
   public controlledByResizer = signal(false);
   public resizable = signal(NODE_DEFAULTS.resizable);
   public resizing = signal(false);
@@ -250,10 +248,6 @@ export class NodeModel<T = unknown>
 
     if (rawNode.extent) {
       this.extent = rawNode.extent;
-    }
-
-    if (rawNode.type === 'default-group' && rawNode.color) {
-      this.color = rawNode.color;
     }
 
     if (rawNode.type === 'default-group' && rawNode.resizable) {

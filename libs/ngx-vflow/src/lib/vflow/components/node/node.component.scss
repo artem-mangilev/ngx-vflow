@@ -16,9 +16,9 @@
 }
 
 .default-group-node {
-  border: 1.5px solid var(--group-color);
-  background-color: color-mix(in srgb, var(--group-color) 5%, transparent);
-  border-radius: 5px;
+  border: var(--vflow-group-border-width, 1.5px) solid var(--vflow-group-border-color, var(--vflow-foreground, #1b262c));
+  background-color: var(--vflow-group-background, color-mix(in srgb, var(--vflow-foreground, #1b262c) 5%, transparent));
+  border-radius: var(--vflow-group-radius, 5px);
 
   &_selected {
     border-width: 2px;

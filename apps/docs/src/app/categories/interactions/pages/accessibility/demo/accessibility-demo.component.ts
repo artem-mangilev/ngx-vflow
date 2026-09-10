@@ -62,6 +62,12 @@ import { AriaLabelConfig, Vflow, createEdges, createNodes } from 'ngx-vflow';
       padding: 12px;
       overflow: auto;
     }
+    vflow {
+      --vflow-group-border-color: #64748b;
+      --vflow-group-background: rgb(100 116 139 / 5%);
+      --vflow-resize-handle-color: #64748b;
+      --vflow-resize-line-color: #64748b;
+    }
     .controls {
       display: flex;
       flex-wrap: wrap;
@@ -137,7 +143,6 @@ export class AccessibilityDemoComponent {
       width: 250,
       height: 180,
       ariaLabel: 'Review',
-      color: '#64748b',
       resizable: true,
     },
     {

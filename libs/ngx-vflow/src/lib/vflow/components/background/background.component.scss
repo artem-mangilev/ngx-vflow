@@ -1,0 +1,11 @@
+circle {
+  cx: calc(var(--vflow-background-dot-size, 2px) * var(--vflow-internal-zoom) / 2);
+  cy: calc(var(--vflow-background-dot-size, 2px) * var(--vflow-internal-zoom) / 2);
+  r: calc(var(--vflow-background-dot-size, 2px) * var(--vflow-internal-zoom) / 2);
+  fill: var(--vflow-background-dot-color, var(--vflow-muted, #b1b1b7));
+}
+
+path {
+  stroke: var(--vflow-background-grid-color, var(--vflow-muted, #b1b1b7));
+  stroke-width: calc(var(--vflow-background-grid-width, 1px) * var(--vflow-internal-zoom));
+}

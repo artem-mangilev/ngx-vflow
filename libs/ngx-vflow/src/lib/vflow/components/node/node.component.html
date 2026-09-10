@@ -56,12 +56,10 @@
   <div
     class="default-group-node selectable"
     [resizable]="model().resizable()"
-    [resizerColor]="model().color()"
     [class.default-group-node_selected]="model().selected()"
     [class.default-group-node_preselected]="model().preselected()"
     [style.width.px]="model().width()"
     [style.height.px]="model().height()"
-    [style.--group-color]="model().color()"
     (click)="pullNode(); selectNode()"></div>
 }
 

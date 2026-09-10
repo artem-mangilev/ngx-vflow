@@ -2,8 +2,13 @@
   @if (intersections(); as intersections) {
     @for (intersection of intersections.lines; track $index) {
       <svg:line
-        [attr.stroke]="lineColor()"
-        [attr.stroke-dasharray]="intersection.isCenter ? 4 : null"
+        stroke="var(--vflow-alignment-guide-color, var(--vflow-foreground, #1b262c))"
+        stroke-width="var(--vflow-alignment-guide-width, 1)"
+        [attr.stroke-dasharray]="
+          intersection.isCenter
+            ? 'var(--vflow-alignment-guide-center-dash, 4)'
+            : 'var(--vflow-alignment-guide-dash, none)'
+        "
         [attr.x1]="intersection.x"
         [attr.y1]="intersection.y"
         [attr.x2]="intersection.x2"

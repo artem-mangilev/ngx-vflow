@@ -2,7 +2,6 @@ export type Background = ColorBackground | DotsBackground | ImageBackground | Gr
 
 export interface ColorBackground {
   type: 'solid';
-  color: string;
 }
 
 export interface DotsBackground {
@@ -11,21 +10,6 @@ export interface DotsBackground {
    * Gap between dots
    */
   gap?: number;
-
-  /**
-   * Color of the dot
-   */
-  color?: string;
-
-  /**
-   * Diameter of the dot
-   */
-  size?: number;
-
-  /**
-   * Color behind tha dot pattern
-   */
-  backgroundColor?: string;
 }
 
 export interface ImageBackground {
@@ -59,22 +43,7 @@ export interface GridBackground {
   type: 'grid';
 
   /**
-   * Color of the grid lines
-   */
-  color?: string;
-
-  /**
    * Size of the grid squares
    */
   size?: number;
-
-  /**
-   * Width of the grid lines
-   */
-  strokeWidth?: number;
-
-  /**
-   * Color behind tha dot pattern
-   */
-  backgroundColor?: string;
 }

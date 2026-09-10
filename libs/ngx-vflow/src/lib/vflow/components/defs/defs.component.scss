@@ -1,7 +1,17 @@
+// Scale the visual around the attachment point, without changing the engine's marker URL/anchor.
+marker {
+  overflow: visible;
+}
+
+polyline {
+  transform: scale(var(--vflow-marker-scale, 1));
+  stroke: var(--vflow-marker-color, var(--vflow-muted, #b1b1b7));
+  stroke-width: var(--vflow-marker-stroke-width, 2px);
+}
+
 .marker {
   &__arrow {
     &_default {
-      stroke-width: 1px;
       stroke-linecap: round;
       stroke-linejoin: round;
       fill: none;

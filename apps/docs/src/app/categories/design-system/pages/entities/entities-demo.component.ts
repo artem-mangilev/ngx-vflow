@@ -102,13 +102,7 @@ interface EntityData {
       @if (flow(); as editor) {
         <vflow-controls [flow]="editor" />
       }
-      <vflow
-        view="auto"
-        background="var(--vflow-background)"
-        [nodes]="nodes"
-        [edges]="edges()"
-        [connection]="connection"
-        (connect)="connect($event)">
+      <vflow view="auto" [nodes]="nodes" [edges]="edges()" [connection]="connection" (connect)="connect($event)">
         <ng-template let-ctx nodeHtml>
           <article
             vflowNode
