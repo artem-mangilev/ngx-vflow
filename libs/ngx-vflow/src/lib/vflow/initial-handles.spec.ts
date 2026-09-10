@@ -20,7 +20,59 @@ import { HandleComponent } from './public-components/handle/handle.component';
 })
 class SmallCustomNodeComponent extends CustomNodeComponent {}
 
+@Component({
+  template: `<article style="position:relative; width:240px; padding:12px; border:1.5px solid;">
+    <div style="height:80px">Rich content</div>
+    <div class="port-row" style="position:relative; margin-left:16px; height:40px; border:2px solid;">
+      Port row
+      <handle id="left" type="source" position="left" />
+      <handle id="right" type="source" position="right" />
+      <handle id="top" type="source" position="top" />
+      <handle id="bottom" type="source" position="bottom" />
+    </div>
+  </article>`,
+  imports: [HandleComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+class PositionedAnchorNodeComponent extends CustomNodeComponent {}
+
 describe('Initial handle placement', () => {
+  it('converts positioned, bordered row coordinates without moving graph endpoints at non-unit zoom', async () => {
+    TestBed.configureTestingModule({ providers: [provideZonelessChangeDetection()] });
+    const fixture = TestBed.createComponent(VflowComponent);
+    fixture.componentRef.setInput('view', [400, 300]);
+    fixture.componentRef.setInput('nodes', [
+      createNode({ id: 'a', type: PositionedAnchorNodeComponent, point: { x: 20, y: 30 } }),
+    ]);
+    fixture.detectChanges();
+    for (let i = 0; i < 5; i++) await new Promise(requestAnimationFrame);
+    const model = fixture.debugElement.injector.get(FlowEntitiesService).nodes()[0];
+    for (const zoom of [1, 0.5, 1.5]) {
+      fixture.componentInstance.viewportTo({ x: 0, y: 0, zoom });
+      for (let i = 0; i < 3; i++) await new Promise(requestAnimationFrame);
+      await fixture.whenStable();
+      const node = fixture.nativeElement.querySelector('.vflow-node').getBoundingClientRect();
+      const row = fixture.nativeElement.querySelector('.port-row').getBoundingClientRect();
+      for (const position of ['left', 'right', 'top', 'bottom'] as const) {
+        const handle = fixture.nativeElement.querySelector('.handle--' + position).getBoundingClientRect();
+        const vertical = position === 'left' || position === 'right';
+        expect(vertical ? handle.y + handle.height / 2 : handle.x + handle.width / 2)
+          .withContext(`${position}, zoom ${zoom}`)
+          .toBeCloseTo(vertical ? row.y + row.height / 2 : row.x + row.width / 2, 1);
+        const endpoint = model
+          .handles()
+          .find((handle) => handle.rawHandle.position === position)!
+          .pointAbsolute();
+        const actual = {
+          x: position === 'left' ? handle.left : position === 'right' ? handle.right : handle.x + handle.width / 2,
+          y: position === 'top' ? handle.top : position === 'bottom' ? handle.bottom : handle.y + handle.height / 2,
+        };
+        expect(actual.x).toBeCloseTo(node.x + (endpoint.x - model.globalPoint().x) * zoom, 1);
+        expect(actual.y).toBeCloseTo(node.y + (endpoint.y - model.globalPoint().y) * zoom, 1);
+      }
+    }
+  });
+
   for (const count of [1, 1024]) {
     it(`never shows unpositioned custom handles on initial mount or restore (${count} nodes)`, async () => {
       TestBed.configureTestingModule({ providers: [provideZonelessChangeDetection()] });
@@ -38,16 +90,25 @@ describe('Initial handle placement', () => {
       );
       fixture.detectChanges();
       const capture = async (phase: string) => {
-        const frames: { visibility: string; top: string }[] = [];
+        const frames: { visibility: string; xError: number; yError: number; width: number }[] = [];
         for (let i = 0; i < 8; i++) {
           await new Promise(requestAnimationFrame);
           const node = fixture.nativeElement.querySelector('.vflow-node') as HTMLElement;
           const handle = node?.querySelector('.handle--right') as HTMLElement | null;
-          if (handle) frames.push({ visibility: getComputedStyle(node).visibility, top: handle.style.top });
+          if (handle) {
+            const nodeRect = node.getBoundingClientRect();
+            const port = handle.getBoundingClientRect();
+            frames.push({
+              visibility: getComputedStyle(node).visibility,
+              xError: Math.abs(port.x + port.width / 2 - nodeRect.right),
+              yError: Math.abs(port.y + port.height / 2 - nodeRect.y - nodeRect.height / 2),
+              width: port.width,
+            });
+          }
         }
         const visible = frames.filter((frame) => frame.visibility === 'visible');
         expect(visible.length).toBeGreaterThan(0);
-        expect(visible.filter((frame) => frame.top !== '24px'))
+        expect(visible.filter((frame) => frame.xError > 0.1 || frame.yError > 0.1 || frame.width <= 0))
           .withContext(phase + ': ' + JSON.stringify(frames))
           .toEqual([]);
       };
@@ -145,7 +206,18 @@ describe('Initial handle placement', () => {
     for (let i = 0; i < 8; i++) await new Promise(requestAnimationFrame);
     expect(zoomed).toBeTrue();
     const handle = fixture.nativeElement.querySelector('.handle--right') as HTMLElement;
-    expect(parseFloat(handle.style.top)).toBeCloseTo(48, 1);
+    const port = handle.getBoundingClientRect();
+    const row = anchor.getBoundingClientRect();
+    expect(port.y + port.height / 2).toBeCloseTo(row.y + row.height / 2, 1);
+    expect(port.x + port.width / 2).toBeCloseTo(row.right, 1);
+    const model = fixture.debugElement.injector.get(FlowEntitiesService).nodes()[0];
+    const endpoint = model
+      .handles()
+      .find((handle) => handle.rawHandle.position === 'right')!
+      .pointAbsolute();
+    const clientEndpoint = fixture.componentInstance.flowToClientPosition(endpoint);
+    expect(clientEndpoint.x).toBeCloseTo(port.right, 1);
+    expect(clientEndpoint.y).toBeCloseTo(port.y + port.height / 2, 1);
   });
 
   it('positions handles before the first frame without waiting for DOM measurement', () => {

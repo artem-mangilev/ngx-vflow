@@ -9,7 +9,7 @@ import { Point } from '../interfaces/point.interface';
 import { FlowEntitiesService } from '../services/flow-entities.service';
 import { Contextable } from '../interfaces/contextable.interface';
 import { GroupNodeContext, NodeContext } from '../interfaces/template-context.interface';
-import { Observable, of } from 'rxjs';
+import { Observable, Subject, of } from 'rxjs';
 import { catchError, filter, shareReplay, switchMap } from 'rxjs/operators';
 import { FlowSettingsService } from '../services/flow-settings.service';
 import { NodeRenderingService } from '../services/node-rendering.service';
@@ -144,6 +144,9 @@ export class NodeModel<T = unknown>
 
   public handles = signal<HandleModel[]>([]);
   public handles$: Observable<HandleModel[]>;
+
+  /** Internal invalidation channel; geometry is measured by the mounted view. */
+  public readonly handleGeometryRefresh$ = new Subject<void>();
 
   public draggable = signal(true);
 
@@ -293,6 +296,7 @@ export class NodeModel<T = unknown>
   }
 
   public destroy() {
+    this.handleGeometryRefresh$.complete();
     this.modelInjector.destroy();
   }
 

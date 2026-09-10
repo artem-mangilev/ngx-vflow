@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, provideZonelessChangeDetection } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 import { HandleModel } from '../models/handle.model';
 import { NodeModel } from '../models/node.model';
 import { NodeAccessorService } from '../services/node-accessor.service';
@@ -37,6 +37,7 @@ describe('NodeHandlesControllerDirective', () => {
       culled: () => false,
       rawNode: { type: 'html-template' },
       handles$,
+      handleGeometryRefresh$: new Subject<void>(),
       handles: () => handles,
       nodeElement: () => nodeElement,
     } as unknown as NodeModel;
@@ -63,6 +64,36 @@ describe('NodeHandlesControllerDirective', () => {
 
     fixture = TestBed.createComponent(TestHostComponent);
     fixture.detectChanges();
+  });
+
+  it('captures non-bubbling descendant scroll, batches measurements and cleans up', () => {
+    const host = fixture.nativeElement.querySelector('[nodeHandlesController]') as HTMLElement;
+    const scroller = host.appendChild(document.createElement('div'));
+    const handle = jasmine.createSpyObj<HandleModel>('handle', ['measure', 'applyGeometry'], {
+      hostReference: scroller,
+      isStandard: false,
+    });
+    handles = [handle];
+    handles$.next(handles);
+    frameCallbacks.shift()!();
+    handle.measure.calls.reset();
+
+    scroller.dispatchEvent(new Event('scroll'));
+    scroller.dispatchEvent(new Event('scroll'));
+    const refresh = TestBed.inject(NodeAccessorService).model()!.handleGeometryRefresh$;
+    refresh.next();
+    refresh.next();
+    expect(frameCallbacks.length).toBe(1);
+    frameCallbacks.shift()!();
+    expect(handle.measure).toHaveBeenCalledTimes(1);
+
+    scroller.dispatchEvent(new Event('scroll'));
+    fixture.destroy();
+    frameCallbacks.shift()!();
+    expect(handle.measure).toHaveBeenCalledTimes(1);
+    scroller.dispatchEvent(new Event('scroll'));
+    refresh.next();
+    expect(frameCallbacks.length).toBe(0);
   });
 
   it('should coalesce node measurement and observe a shared anchor once', () => {

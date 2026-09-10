@@ -8,6 +8,7 @@ import {
   WritableSignal,
 } from '@angular/core';
 import { VflowUi } from '@vflow/ui';
+import { EntityPortsDirective } from './entity-ports.directive';
 import {
   addEdges,
   Connection,
@@ -29,12 +30,24 @@ interface EntityData {
 
 @Component({
   selector: 'app-ui-entities-demo',
-  imports: [Vflow, VflowUi],
+  imports: [Vflow, VflowUi, EntityPortsDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrls: ['../../demo.css'],
   styles: `
     article {
+      position: relative;
       width: 250px;
+    }
+    .port-anchor {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 0;
+      pointer-events: none;
+    }
+    .inset .port-anchor {
+      left: 24px;
+      right: 24px;
     }
     vflow {
       height: 560px;
@@ -42,10 +55,13 @@ interface EntityData {
     [vflowField] {
       min-height: 42px;
     }
+    .inset [vflowField] {
+      margin-inline: 24px;
+    }
     .compact [vflowField] {
       min-height: 28px;
     }
-    .experiment .fields {
+    .scrollable .fields {
       max-height: 48px;
       overflow-y: auto;
     }
@@ -72,10 +88,13 @@ interface EntityData {
       class="demo"
       aria-label="Entity relationships and field mapping demo"
       [vflowTheme]="dark() ? 'dark' : 'light'"
+      [class.inset]="inset()"
       [class.compact]="compact()"
-      [class.experiment]="experiment()"
+      [class.scrollable]="scrollable()"
       [class.collapsed]="collapsed()">
+      <p>DOM-first handles. Hidden field ports dock to the scroll boundary or header.</p>
       <div class="controls">
+        <label><input type="checkbox" [checked]="inset()" (change)="inset.set(!inset())" /> Inset rows (24px)</label>
         <button vflowButton type="button" (click)="flow()?.fitView()">Fit entities</button>
         <button vflowButton type="button" (click)="reverseFields()">Reverse fields</button>
         <button vflowButton type="button" (click)="renameField()">Rename email</button>
@@ -85,17 +104,17 @@ interface EntityData {
           Delete CRM email field
         </button>
         <label
-          ><input type="checkbox" [checked]="experiment()" (change)="experiment.set(!experiment())" /> Scroll
-          experiment</label
+          ><input type="checkbox" [checked]="scrollable()" (change)="scrollable.set(!scrollable())" /> Scrollable
+          fields</label
         >
         <label
           ><input type="checkbox" [checked]="collapsed()" (change)="collapsed.set(!collapsed())" /> Collapse
-          experiment</label
+          fields</label
         >
         <p>Connect matching field types; names and row order can change.</p>
-        @if (experiment() || collapsed()) {
+        @if (scrollable() || collapsed()) {
           <p role="status">
-            Experiment: hidden endpoints retain stale geometry; scroll/collapse is not supported by the library.
+            Demo policy: connections stay visible; hidden field ports retain their IDs and dock without overlapping.
           </p>
         }
       </div>
@@ -106,9 +125,11 @@ interface EntityData {
         <ng-template let-ctx nodeHtml>
           <article
             vflowNode
+            entityPorts
             selectable
             [vflowSelected]="ctx.selected() || ctx.preselected()"
-            [attr.data-entity]="ctx.node.id">
+            [attr.data-entity]="ctx.node.id"
+            (portsPlaced)="flow()?.refreshNodeHandles([ctx.node.id])">
             <header vflowNodeHeader>
               <span class="grow">{{ ctx.data().title }}</span>
               <span class="muted">{{ ctx.data().category }}</span>
@@ -119,21 +140,25 @@ interface EntityData {
                   <span class="key">{{ field.key }}</span>
                   <span class="grow field-name">{{ field.name }}</span>
                   <span class="muted">{{ field.type }}</span>
-                  <handle
-                    type="target"
-                    position="left"
-                    [id]="'in:' + field.id"
-                    [template]="port"
-                    [ariaLabel]="ctx.data().title + '.' + field.name + ' input'" />
-                  <handle
-                    type="source"
-                    position="right"
-                    [id]="'out:' + field.id"
-                    [template]="port"
-                    [ariaLabel]="ctx.data().title + '.' + field.name + ' output'" />
                 </div>
               }
             </div>
+            @for (field of ctx.data().fields; track field.id) {
+              <div class="port-anchor" [attr.data-port-field]="field.id">
+                <handle
+                  type="target"
+                  position="left"
+                  [id]="'in:' + field.id"
+                  [template]="port"
+                  [ariaLabel]="ctx.data().title + '.' + field.name + ' input'" />
+                <handle
+                  type="source"
+                  position="right"
+                  [id]="'out:' + field.id"
+                  [template]="port"
+                  [ariaLabel]="ctx.data().title + '.' + field.name + ' output'" />
+              </div>
+            }
           </article>
         </ng-template>
         <ng-template let-ctx edge>
@@ -168,7 +193,8 @@ export class EntitiesDemoComponent {
   readonly flow = viewChild(VflowComponent);
   readonly dark = signal(true);
   readonly compact = signal(false);
-  readonly experiment = signal(false);
+  readonly inset = signal(false);
+  readonly scrollable = signal(false);
   readonly collapsed = signal(false);
   readonly emailDeleted = signal(false);
   readonly nodes = createNodes<EntityData>([

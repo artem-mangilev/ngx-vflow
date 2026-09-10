@@ -119,6 +119,72 @@ are updated. The prior selector-promotion attempt is withdrawn.
 Default presentations, the larger-scene production gate and scroll/collapse policy remain
 unfinished. Appearance migration does not imply completion of all seven stages.
 
+## Pipeline positioned-anchor fix (2026-09-10)
+
+- User reported pipeline handles below their nodes. Reproduced 119–164 px row-to-handle
+  errors; the new Playwright `pipeline handles` check failed at 164.255 px. Prior controls
+  checks did not assert row alignment, so their success had missed this defect.
+- Cause: custom-handle CSS insets were expressed in node space even when a positioned
+  row/card was the actual CSS containing block, adding its offset twice. `HandleModel`
+  now converts only CSS insets to the containing block's padding-box coordinates (including
+  borders and current scroll offset), while graph endpoint coordinates remain in node space.
+  No CSS workaround in the pipeline demo, new public API, or scroll-observation policy.
+- Regression coverage: positioned/bordered custom anchors on all four sides at zoom
+  1 / 0.5 / 1.5, graph-endpoint agreement, and all five pipeline ports through zoom limits,
+  theme switch and native slider interaction.
+- Verification after fix: **226 core tests**, **29 full Chromium docs checks**, core lint
+  and core + UI/BPMN build passed. Distribution-mode/isolated-consumer results above predate
+  this fix and were not repeated in this follow-up.
+
+## DOM-first handle prototypes — target approved, integration isolated
+
+- User requested a throwaway prototype after the [competitor/source research](handle-placement-research.md),
+  then approved DOM-first placement. [Standalone observations and archive](handles-dom-first-prototype.md);
+  [real Angular follow-up, run instructions and remaining gates](angular-dom-first.md).
+- Simplified HTML replicas of simple nodes, pipeline and ERD compare measured DOM-port endpoints
+  with ghost node-boundary projections. Includes four sides, nested rows, borders/port size,
+  rename/reorder/delete, camera/color changes and explicit scroll/collapse experiments.
+- Chromium smoke: endpoint/DOM discrepancy rounded to 0.000 screen px for all three scenes at
+  zoom 0.5 / 1 / 1.5. Unobserved 45 px scroll at zoom 0.8 produced 36 px stale-cache error;
+  explicit refresh restored agreement. These are prototype results, not production acceptance.
+- Source archived on local branch **`prototype/dom-first-handles`**, worktree
+  `../ngx-vflow-dom-first-prototype`, integration commit **`162e2db7`**.
+  Baseline **`d5a5c4ca`** preserves the original checkout's
+  existing changes and standalone prototype; subsequent changes are the real Angular experiment.
+- Isolated integration: custom handles read their own DOM box; CSS provides side defaults.
+  Pipeline requires no consumer layout change; ERD adds `position: relative` to the shared UI field.
+  Existing batching, readiness, interactions and built-in default presentations remain.
+- Real pipeline/ERD geometry, row insets, zoom, rename/reorder and magnetic connection recreation
+  work in the sampled checks. Core/UI builds and core lint pass. Tests remain honest: 219/226 core
+  checks and 3/4 relevant docs checks pass; five unit failures expect inline positioning, two expose
+  a constrained-resizable extra-frame sync difference; the docs failure is page scrolling on focus.
+- Main-tree production code/ADRs were not migrated. Before adoption, resolve resizable synchronization,
+  migrate behavior-level tests and repeat broader acceptance. Hidden-port policy is still unresolved.
+
+## DOM-first promotion to the working branch (2026-09-10)
+
+- User approved the real Angular scroll/collapse behavior and requested transfer into
+  `new-design-system-pi`. Imported the tested core/UI/demo changes, preserving unrelated
+  worktree changes and keeping the standalone archives / prototype launch scripts separate.
+  The earlier positioned-anchor compensation is superseded, not maintained as a second mode.
+- Custom handles use CSS containing-block placement and measured DOM boxes. Native scroll
+  participates in the existing per-node batch; `refreshNodeHandles(nodeIds)` explicitly
+  invalidates geometry after application-owned position-only DOM writes.
+- Entities keeps persistent port anchors outside clipped/hidden rows and owns boundary/header
+  docking. Synthetic scroll is removed; UI controls are now **Scrollable fields** and
+  **Collapse fields**. This is a small-field-set recipe, not universal field virtualization.
+- [ADR-0008](../../docs/adr/0008-dom-first-handle-geometry.md) updates the placement decision;
+  migration/custom-handle/Entities docs explain the changed contract. The original prototype
+  observations above are historical. [Detailed follow-up](angular-scroll-collapse.md).
+- Migrated old inline-placement assertions to actual DOM/SVG geometry, including first visible
+  frames and cull/restore. The two resizable failures were premature one-frame assertions:
+  native ResizeObserver/model rendering converges a frame later. Tests now wait for expected
+  geometry within a bounded frame budget; resizable runtime code did not change.
+- Verification on the destination working tree: **230 core unit tests**, **all 30 Chromium
+  docs tests**, core/UI lint, and core/testing/UI/BPMN development builds passed. Distribution
+  browser modes and isolated Angular-version consumers were not repeated in this promotion.
+- No commit, version bump, release, default-presentation removal or large-scene acceptance claimed.
+
 ## Performance interpretation
 
 Same Chromium 153, Apple M1 Pro, 1280×900, five samples of the existing four-node / ten-field /

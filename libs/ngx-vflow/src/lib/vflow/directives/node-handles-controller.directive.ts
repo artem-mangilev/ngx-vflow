@@ -40,6 +40,13 @@ export class NodeHandlesControllerDirective implements OnInit {
   public ngOnInit(): void {
     this.model = this.nodeAccessor.model()!;
 
+    // Scroll does not bubble and does not resize the node. Capture descendant
+    // scrolling and reuse the node's coalesced read/write measurement pass.
+    const host = this.hostElementRef.nativeElement;
+    host.addEventListener('scroll', this.resizeCallback, { capture: true, passive: true });
+
+    this.model.handleGeometryRefresh$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => this.scheduleSync());
+
     this.model.handles$
       .pipe(
         tap((handles) => {
@@ -52,6 +59,7 @@ export class NodeHandlesControllerDirective implements OnInit {
 
     this.destroyRef.onDestroy(() => {
       this.destroyed = true;
+      host.removeEventListener('scroll', this.resizeCallback, true);
       this.observedElements.forEach((element) =>
         this.resizeObserverService.removeObserver(element, this.resizeCallback),
       );

@@ -40,7 +40,7 @@ After:
 
 ### Custom handle templates
 
-Custom handles now render as native HTML, and the library-owned wrapper positions them. The former SVG placement coordinate `ctx.point` has been removed. The template context still exposes `ctx.state()` and `ctx.node`.
+Custom handles now render as native HTML. CSS positions the library-owned wrapper in its containing block, and the engine measures the resulting DOM box for connection endpoints. The former SVG placement coordinate `ctx.point` has been removed. The template context still exposes `ctx.state()` and `ctx.node`.
 
 Before:
 
@@ -66,7 +66,9 @@ After:
 }
 ```
 
-Do not calculate a replacement coordinate in the template: placement belongs to the handle wrapper.
+Do not calculate a replacement `ctx.point` in the visual template. Place `<handle>` inside an application-owned positioned container (for example, a field row with `position: relative`); `position="left|right|top|bottom"` supplies CSS side defaults and the connection exit side. Inset rows now place ports at the row boundary, not implicitly at the whole node boundary. Remove workarounds that compensate for node-to-row offsets. Built-in default-node handles keep their existing placement.
+
+For scrollable or collapsible fields, keep persistent handles in a measurable layer outside the clipped/hidden content. The application decides where hidden-field ports dock; the core does not invent that policy. Native scroll is observed, while position-only CSS writes can explicitly request new measurements with `flow.refreshNodeHandles(['node-id'])` after the DOM update. Requests are coalesced on the next frame; they do not move DOM or change graph state. See [custom handles](/handles/custom-handles) and the [Entities composition](/design-system/entities).
 
 ### Resizable templates
 

@@ -125,18 +125,19 @@ describe('HandleModel', () => {
     expect(model.pointAbsolute()).toEqual({ x: 107, y: 80 });
   });
 
-  it('should keep a custom handle aligned with its anchor after node resize', () => {
+  it('reads custom handle endpoints after resize and zoom without rewriting CSS placement', () => {
     const { model, parentNode, anchor, nodeElement, handleElement } = createModel(
       'right',
       { left: 10, top: 30, width: 80, height: 20 },
       'html-template',
     );
 
+    handleElement.style.top = '50%';
     mockRect(handleElement, { left: 90, top: 35, width: 20, height: 10 });
 
     model.sync();
 
-    expect(model.layoutStyles().top).toBe('40px');
+    expect(handleElement.style.top).toBe('50%');
     expect(model.pointAbsolute()).toEqual({ x: 110, y: 40 });
 
     viewportService.readableViewport.set({ zoom: 2, x: 0, y: 0 });
@@ -148,7 +149,7 @@ describe('HandleModel', () => {
 
     model.sync();
 
-    expect(model.layoutStyles().top).toBe('80px');
+    expect(handleElement.style.top).toBe('50%');
     expect(model.pointAbsolute()).toEqual({ x: 170, y: 80 });
   });
 

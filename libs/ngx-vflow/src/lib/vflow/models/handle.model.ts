@@ -15,7 +15,7 @@ export type HandleLayoutStyles = {
 };
 
 export type HandleGeometry = {
-  layoutStyles: HandleLayoutStyles;
+  layoutStyles?: HandleLayoutStyles;
   localPoint: Point;
 };
 
@@ -37,10 +37,10 @@ export class HandleModel {
   public canStart: Signal<boolean> = this.rawHandle.canStart ?? signal(true);
   public canAccept: Signal<boolean> = this.rawHandle.canAccept ?? signal(true);
 
-  /** Anchor element the `<handle>` was placed into. */
+  /** Layout dependency observed for resize; no longer a custom-port placement source. */
   public hostReference = this.rawHandle.hostReference!;
 
-  /** Absolute position of the handle relative to the node, same as xyflow handles. */
+  /** Legacy built-in default-node positioning only. Custom handles are positioned by CSS. */
   public layoutStyles = signal<HandleLayoutStyles>({
     top: 'auto',
     left: 'auto',
@@ -82,8 +82,8 @@ export class HandleModel {
   }
 
   /**
-   * Read phase. Standard handles are derived from model dimensions; custom
-   * handles read their anchor and rendered size without changing styles.
+   * Standard handles retain known geometry; custom handles measure their
+   * actual DOM box. Neither the parent rect nor node boundary determines placement.
    */
   public measure(nodeRect?: DOMRect): HandleGeometry | null {
     if (this.isStandard) {
@@ -110,18 +110,12 @@ export class HandleModel {
     const zoom = viewport
       ? new DOMMatrixReadOnly(viewport.style.transform).a || 1
       : this.viewportService.readableViewport().zoom || 1;
-    const anchorRect = this.hostReference.getBoundingClientRect();
-    const handleRect = handleElement.getBoundingClientRect();
-    const alongY = (anchorRect.top + anchorRect.height / 2 - resolvedNodeRect.top) / zoom;
-    const alongX = (anchorRect.left + anchorRect.width / 2 - resolvedNodeRect.left) / zoom;
-
-    return computeHandleGeometry({
-      position: this.rawHandle.position,
-      nodeSize: { width: this.parentNode.width(), height: this.parentNode.height() },
-      handleSize: { width: handleRect.width / zoom, height: handleRect.height / zoom },
-      offset: { x: this.rawHandle.userOffsetX, y: this.rawHandle.userOffsetY },
-      anchorPoint: { x: alongX, y: alongY },
-    });
+    const rect = handleElement.getBoundingClientRect();
+    const side = this.rawHandle.position;
+    // Offsets already participate in CSS layout/transform. Do not apply them twice.
+    const x = side === 'left' ? rect.left : side === 'right' ? rect.right : rect.left + rect.width / 2;
+    const y = side === 'top' ? rect.top : side === 'bottom' ? rect.bottom : rect.top + rect.height / 2;
+    return { localPoint: { x: (x - resolvedNodeRect.left) / zoom, y: (y - resolvedNodeRect.top) / zoom } };
   }
 
   /** Write phase. Called only after every handle in the node has been measured. */
@@ -130,7 +124,7 @@ export class HandleModel {
       return;
     }
 
-    this.layoutStyles.set(geometry.layoutStyles);
+    if (geometry.layoutStyles) this.layoutStyles.set(geometry.layoutStyles);
     this.localPoint.set(geometry.localPoint);
     this.isMeasured.set(true);
   }

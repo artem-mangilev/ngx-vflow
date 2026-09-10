@@ -326,7 +326,14 @@ describe('CSS viewport virtualization', () => {
       await new Promise(requestAnimationFrame);
       if (getComputedStyle(host).visibility === 'visible') {
         expect([node.width(), node.height()]).toEqual([320, 120]);
-        expect(host.querySelector<HTMLElement>('.handle--right')!.style.top).toBe('60px');
+        const port = host.querySelector<HTMLElement>('.handle--right')!.getBoundingClientRect();
+        const rect = host.getBoundingClientRect();
+        expect(port.y + port.height / 2).toBeCloseTo(rect.y + rect.height / 2, 1);
+        expect(port.x + port.width / 2).toBeCloseTo(rect.right, 1);
+        const source = node.handles().find((handle) => handle.rawHandle.position === 'right')!;
+        const endpoint = fixture.componentInstance.flowToClientPosition(source.pointAbsolute());
+        expect(endpoint.x).toBeCloseTo(port.right, 1);
+        expect(endpoint.y).toBeCloseTo(port.y + port.height / 2, 1);
       }
     }
     expect(fixture.debugElement.query(By.directive(StatefulNodeComponent)).componentInstance).toBe(component);

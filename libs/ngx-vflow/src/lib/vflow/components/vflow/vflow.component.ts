@@ -517,6 +517,19 @@ export class VflowComponent {
   protected minimap = this.flowEntitiesService.minimap;
 
   // #region METHODS_API
+
+  /**
+   * Request fresh handle geometry for the supplied node IDs after changing DOM
+   * placement without a resize (for example, docking ports to a collapsed header).
+   * Call after the DOM writes/render. Requests are coalesced per node on the next
+   * animation frame; this does not synchronously measure or move any DOM elements.
+   * Unknown IDs are ignored. Culled nodes retain their geometry until restored.
+   */
+  public refreshNodeHandles(nodeIds: readonly string[]): void {
+    for (const id of new Set(nodeIds)) {
+      this.flowEntitiesService.getNode(id)?.handleGeometryRefresh$.next();
+    }
+  }
   /**
    * Change viewport to specified state
    *

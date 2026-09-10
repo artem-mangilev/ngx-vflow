@@ -1,0 +1,7 @@
+# Let CSS place custom handles and measure their rendered geometry
+
+Custom handles use CSS side defaults in their containing block; the engine reads each rendered handle box to derive the connection endpoint in flow space. This replaces the custom-handle placement part of [ADR-0001](0001-native-html-node-rendering.md): projecting row anchors to the node boundary and converting that geometry back into CSS insets coupled the engine to containing blocks, borders and scrolling, and could double-count offsets. Built-in default-node handles retain their known geometry; custom ports intentionally follow inset row boundaries instead of implicitly projecting to the node edge.
+
+Geometry invalidation belongs to the engine: native node-content scroll and resize reuse a coalesced measurement pass, and `VflowComponent.refreshNodeHandles(nodeIds)` requests it after application-owned position-only DOM changes. Requests do not place DOM or mutate application-owned graph state. Hidden-field docking belongs to the application; the Entities recipe keeps stable, measurable ports outside clipped/collapsed fields and docks them to the visible bounds or header. The engine does not infer a universal hidden-endpoint policy.
+
+This does not promote implementation classes or internal DOM structure to styling API; [ADR-0007](0007-css-custom-properties-for-appearance.md) still applies. It also does not remove default presentations or establish large-list/virtualized-field performance acceptance.

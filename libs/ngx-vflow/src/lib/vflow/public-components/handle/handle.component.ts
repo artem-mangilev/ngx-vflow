@@ -73,7 +73,7 @@ export class HandleComponent implements OnInit, AfterViewInit {
   private connectionController = inject(ConnectionControllerDirective, { optional: true });
 
   /**
-   * At what side of node this component should be placed
+   * CSS default side in the containing block, and the connection's exit side.
    */
   public position = input.required<Position>();
 
@@ -113,8 +113,8 @@ export class HandleComponent implements OnInit, AfterViewInit {
         return;
       }
 
-      // The anchor element determines where the handle sits along the node edge.
-      // Positioning itself is relative to the node, same as xyflow handles.
+      // Observe the containing content for layout changes. CSS places the wrapper;
+      // the core measures that wrapper rather than projecting this parent to a node edge.
       const parent = this.element.parentElement;
 
       const model = new HandleModel(

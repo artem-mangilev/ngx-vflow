@@ -6,7 +6,12 @@ async function rowAlignment(demo: Locator) {
     Math.max(
       ...rows.flatMap((row) => {
         const rect = row.getBoundingClientRect();
-        return Array.from(row.querySelectorAll('.vui-port')).map((port) => {
+        const ports = row.closest('[data-entity]')
+          ? row
+              .closest('[data-entity]')!
+              .querySelectorAll(`[data-port-field="${row.getAttribute('data-field')}"] .vui-port`)
+          : row.querySelectorAll('.vui-port');
+        return Array.from(ports).map((port) => {
           const handle = port.getBoundingClientRect();
           return Math.abs(rect.y + rect.height / 2 - handle.y - handle.height / 2);
         });
@@ -74,10 +79,10 @@ test('field connections follow stable IDs through rename, reorder, density and r
     demo.evaluate((root) => {
       const edge = root.querySelectorAll<SVGPathElement>('path.vui-edge')[1];
       const source = root
-        .querySelector('[data-entity="crm"] [data-field="email"] .handle--right .vui-port')!
+        .querySelector('[data-entity="crm"] [data-port-field="email"] .handle--right .vui-port')!
         .getBoundingClientRect();
       const target = root
-        .querySelector('[data-entity="erp"] [data-field="email"] .handle--left .vui-port')!
+        .querySelector('[data-entity="erp"] [data-port-field="email"] .handle--left .vui-port')!
         .getBoundingClientRect();
       const matrix = edge.getScreenCTM()!;
       const start = edge.getPointAtLength(0).matrixTransform(matrix);
@@ -92,8 +97,8 @@ test('field connections follow stable IDs through rename, reorder, density and r
   await expect.poll(endpointError).toBeLessThan(1);
   await demo.getByRole('button', { name: 'Remove Copy email connection', exact: true }).click();
   await expect(demo.locator('path.vui-edge')).toHaveCount(1);
-  const source = demo.locator('[data-entity="crm"] [data-field="email"] .handle.handle--right');
-  const target = demo.locator('[data-entity="erp"] [data-field="email"] .handle.handle--left');
+  const source = demo.locator('[data-entity="crm"] [data-port-field="email"] .handle.handle--right');
+  const target = demo.locator('[data-entity="erp"] [data-port-field="email"] .handle.handle--left');
   // Core intentionally overlays the target with its magnetic hit area during a connection.
   // Move the pointer through that real surface instead of asking locator.dragTo to bypass it.
   await source.scrollIntoViewIfNeeded();
@@ -140,6 +145,39 @@ test('BPMN outlines, lane frames and core selection render in both themes', asyn
   await expect(demo.locator('path.vui-edge').first()).toHaveCSS('stroke', 'rgb(0, 0, 0)');
 });
 
+test('pipeline handles stay aligned with their rows at every zoom', async ({ page }) => {
+  await page.goto('/design-system/pipeline');
+  const demo = page.locator('app-ui-pipeline-demo');
+  const rows = demo.locator('[data-port]');
+  await expect(rows).toHaveCount(5);
+  const alignment = () =>
+    rows.evaluateAll((rows) =>
+      Math.max(
+        ...rows.map((row) => {
+          const anchor = row.getBoundingClientRect();
+          const handle = row.querySelector('.handle')!.getBoundingClientRect();
+          return Math.abs(anchor.y + anchor.height / 2 - handle.y - handle.height / 2);
+        }),
+      ),
+    );
+  await expect.poll(alignment).toBeLessThan(1);
+  for (const name of ['Zoom in', 'Zoom out']) {
+    const button = demo.getByRole('button', { name, exact: true });
+    for (let i = 0; i < 20; i++) {
+      await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+      if (await button.isDisabled()) break;
+      await button.click();
+      await expect.poll(alignment).toBeLessThan(1);
+    }
+    await expect(button).toBeDisabled();
+  }
+  await demo.getByLabel('Dark theme', { exact: true }).check();
+  await expect.poll(alignment).toBeLessThan(1);
+  await demo.getByRole('slider').focus();
+  await page.keyboard.press('ArrowRight');
+  await expect.poll(alignment).toBeLessThan(1);
+});
+
 test('pipeline native controls do not drag nodes and viewport controls enforce zoom limits', async ({ page }) => {
   await page.goto('/design-system/pipeline');
   const demo = page.locator('app-ui-pipeline-demo');
@@ -147,11 +185,20 @@ test('pipeline native controls do not drag nodes and viewport controls enforce z
   await expect(demo.locator('path.vui-edge')).toHaveCount(2);
   await expect(demo.locator('.vui-port-label')).toHaveCount(5);
   const node = demo.locator('[data-node="resize"]');
-  const before = await node.boundingBox();
+  // Focusing a native control may scroll the document, not move the graph node.
+  const canvasPosition = () =>
+    node.evaluate((element) => {
+      const rect = element.getBoundingClientRect();
+      const canvas = element.closest('vflow')!.getBoundingClientRect();
+      return { x: rect.x - canvas.x, y: rect.y - canvas.y };
+    });
+  const before = await canvasPosition();
   await demo.getByRole('slider').focus();
   await page.keyboard.press('ArrowRight');
   await expect(demo.getByRole('slider')).toHaveValue('800');
-  expect(await node.boundingBox()).toEqual(before);
+  const after = await canvasPosition();
+  expect(after.x).toBeCloseTo(before.x, 2);
+  expect(after.y).toBeCloseTo(before.y, 2);
   await demo.getByRole('button', { name: 'Export preview', exact: true }).click();
   await expect(demo.locator('p[aria-live="polite"]')).toHaveText('Exports: 1');
   const zoomIn = demo.getByRole('button', { name: 'Zoom in', exact: true });
@@ -255,21 +302,19 @@ test('a color-only theme switch does not remeasure node or handle DOM', async ({
   expect(reads).toEqual([]);
 });
 
-test('field deletion explicitly removes incident edges; collapse experiment preserves mounted IDs', async ({
-  page,
-}) => {
+test('field deletion explicitly removes incident edges; collapse preserves mounted IDs', async ({ page }) => {
   await page.goto('/design-system/entities');
   const demo = page.locator('app-ui-entities-demo');
   await expect(demo.locator('path.vui-edge')).toHaveCount(2);
   const fields = await demo
     .locator('[data-field]')
     .evaluateAll((fields) => fields.map((field) => field.getAttribute('data-field')));
-  await demo.getByLabel('Collapse experiment', { exact: true }).check();
+  await demo.getByLabel('Collapse fields', { exact: true }).check();
   await expect(demo.locator('path.vui-edge')).toHaveCount(2);
   expect(
     await demo.locator('[data-field]').evaluateAll((fields) => fields.map((field) => field.getAttribute('data-field'))),
   ).toEqual(fields);
-  await demo.getByLabel('Collapse experiment', { exact: true }).uncheck();
+  await demo.getByLabel('Collapse fields', { exact: true }).uncheck();
   await expect.poll(() => rowAlignment(demo)).toBeLessThan(1);
   await demo.getByRole('button', { name: 'Delete CRM email field', exact: true }).click();
   await expect(demo.locator('[data-entity="crm"] [data-field="email"]')).toHaveCount(0);

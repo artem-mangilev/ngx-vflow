@@ -17,6 +17,9 @@ import { createEdges, createNodes, Vflow, VflowComponent } from 'ngx-vflow';
       display: flex;
       justify-content: space-between;
     }
+    .inset .port-row {
+      margin-inline: 24px;
+    }
     .preview {
       width: 100%;
       height: 100px;
@@ -32,9 +35,15 @@ import { createEdges, createNodes, Vflow, VflowComponent } from 'ngx-vflow';
     }
   `,
   template: `
-    <section class="demo" aria-label="Media pipeline demo" [vflowTheme]="dark() ? 'dark' : 'light'">
+    <section
+      class="demo"
+      aria-label="Media pipeline demo"
+      [vflowTheme]="dark() ? 'dark' : 'light'"
+      [class.inset]="inset()">
+      <p>DOM-first handles. CSS places the ports; core measures their actual boxes.</p>
       <div class="controls">
         <label><input type="checkbox" [checked]="dark()" (change)="dark.set(!dark())" /> Dark theme</label>
+        <label><input type="checkbox" [checked]="inset()" (change)="inset.set(!inset())" /> Inset rows (24px)</label>
         <p>Native image and range input; typed ports are application data.</p>
       </div>
       @if (flow(); as editor) {
@@ -98,6 +107,7 @@ import { createEdges, createNodes, Vflow, VflowComponent } from 'ngx-vflow';
 export class PipelineDemoComponent {
   readonly flow = viewChild(VflowComponent);
   readonly dark = signal(false);
+  readonly inset = signal(false);
   readonly width = signal(640);
   readonly exports = signal(0);
   readonly increment = (value: number) => value + 1;

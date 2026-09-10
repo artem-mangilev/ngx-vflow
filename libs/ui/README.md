@@ -59,7 +59,7 @@ BPMN is separate: `VflowBpmnTask`, `VflowBpmnEvent` (start/end), `VflowBpmnGatew
 Consumers provide symbols, anchors, core path/marker bindings and process semantics.
 
 See the **Design system** documentation section for five reference compositions, the part-variable catalogue and migration guide,
-theme examples and limitations. Scroll/collapse is an explicitly unsupported demo experiment.
+theme examples and limitations. The Entities composition demonstrates application-owned scroll/collapse docking for small field sets: persistent ports stay outside hidden/clipped content and request updated core geometry after CSS placement. This is not an automatic UI or core policy for arbitrary lists.
 Minimap follows editor tokens, not node-local overrides; ancestor attribute changes refresh
 its resolved canvas colors, while external stylesheet/media changes require `refreshTheme()`.
 

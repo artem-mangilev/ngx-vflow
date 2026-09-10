@@ -36,28 +36,36 @@ for (const initialWidth of [undefined, 500]) {
     const fixture = TestBed.createComponent(MeasurementHost);
     if (initialWidth !== undefined) fixture.componentInstance.nodes[0].width!.set(initialWidth);
     fixture.detectChanges();
-    const settle = async () => {
-      await fixture.whenStable();
-      await new Promise(requestAnimationFrame);
-      await fixture.whenStable();
-    };
-    await settle();
+    await fixture.whenStable();
     const root = fixture.nativeElement as HTMLElement;
     const surface = root.querySelector<HTMLElement>('.surface')!;
     const wrapper = root.querySelector<HTMLElement>('.wrapper')!;
-    const assertSize = (width: number) => {
+    const assertSize = async (width: number) => {
+      // Angular stability does not include ResizeObserver delivery. A CSS change
+      // first resizes the surface; observation and the model-sized wrapper render
+      // follow later. Wait for the result, but still fail if it never converges.
+      for (let frame = 0; frame < 10; frame++) {
+        await fixture.whenStable();
+        await new Promise(requestAnimationFrame);
+        const handle = root.querySelector('.handle--right')!.getBoundingClientRect();
+        if (
+          surface.offsetWidth === width &&
+          wrapper.offsetWidth === width &&
+          wrapper.offsetHeight === 320 &&
+          Math.abs(handle.x + handle.width / 2 - surface.getBoundingClientRect().right) < 0.05
+        )
+          break;
+      }
       expect(surface.offsetWidth).toBe(width);
       expect(wrapper.offsetWidth).toBe(width);
       expect(wrapper.offsetHeight).toBe(320);
       const handle = root.querySelector('.handle--right')!.getBoundingClientRect();
       expect(handle.x + handle.width / 2).toBeCloseTo(surface.getBoundingClientRect().right, 1);
     };
-    assertSize(initialWidth === undefined ? 240 : 350);
+    await assertSize(initialWidth === undefined ? 240 : 350);
     fixture.componentInstance.minimumWidth.set(420);
-    await settle();
-    assertSize(420);
+    await assertSize(420);
     fixture.componentInstance.minimumWidth.set(240);
-    await settle();
-    assertSize(350);
+    await assertSize(350);
   });
 }

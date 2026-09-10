@@ -78,6 +78,7 @@
     border-top: 1px solid var(--vui-border);
   }
   .vui-field {
+    position: relative;
     min-height: var(--vui-field-min-height, 38px);
     padding-block: var(--vui-field-padding-block, 6px);
   }
