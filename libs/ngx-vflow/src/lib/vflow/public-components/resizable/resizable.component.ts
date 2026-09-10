@@ -102,11 +102,13 @@ export class ResizableComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   public ngOnInit(): void {
+    this.nodeAccessor.resizerHost.set(this.hostRef.nativeElement);
     this.model.controlledByResizer.set(true);
     this.model.resizerTemplate.set(this.resizer());
   }
 
   public ngOnDestroy(): void {
+    this.nodeAccessor.resizerHost.set(null);
     this.model.controlledByResizer.set(false);
   }
 

@@ -1,46 +1,49 @@
-import { afterRenderEffect, Directive, ElementRef, inject, OnDestroy, OnInit } from '@angular/core';
+import { afterRenderEffect, Directive, ElementRef, inject, OnDestroy } from '@angular/core';
 import { NodeAccessorService } from '../services/node-accessor.service';
 import { ResizeObserverService } from '../services/resize-observer.service';
 
-/**
- * Only suitable for HTML nodes
- */
+/** Measures the layout surface of HTML nodes, excluding decorative overflow. */
 @Directive({
   selector: '[nodeResizeController]',
   standalone: true,
 })
-export class NodeResizeControllerDirective implements OnInit, OnDestroy {
+export class NodeResizeControllerDirective implements OnDestroy {
   private nodeAccessor = inject(NodeAccessorService);
   private resizeObserverService = inject(ResizeObserverService);
   private hostElementRef = inject<ElementRef<HTMLElement>>(ElementRef);
-  private resizeCallback: ((resizeEntry: ResizeObserverEntry) => void) | null = null;
+  private observedElement: HTMLElement | null = null;
+  private readonly resizeCallback = () => this.measure();
 
   constructor() {
     afterRenderEffect(() => {
-      if (!this.nodeAccessor.model()?.culled()) this.measure();
+      const model = this.nodeAccessor.model();
+      const target = this.nodeAccessor.resizerHost() ?? this.hostElementRef.nativeElement;
+      if (target !== this.observedElement) {
+        if (this.observedElement) {
+          this.resizeObserverService.removeObserver(this.observedElement, this.resizeCallback);
+        }
+        this.observedElement = target;
+        this.resizeObserverService.addObserver(target, this.resizeCallback);
+      }
+      if (!model?.culled()) this.measure();
     });
   }
 
   private measure(): void {
     const model = this.nodeAccessor.model();
-    const target = this.hostElementRef.nativeElement;
-    // display:none notifications must not overwrite cached geometry with zeros.
+    // A resizable node's wrapper is sized from the model. Measuring that wrapper
+    // would miss CSS constraints that make the actual surface larger or smaller.
+    const target = this.nodeAccessor.resizerHost() ?? this.hostElementRef.nativeElement;
     if (!model || model.culled() || !target.getClientRects().length) return;
-    // Measure the layout box, excluding protruding ports and external labels.
-    // scrollWidth/Height would feed their overflow back into the next edge geometry pass.
+    // Border-box layout dimensions exclude protruding ports and external labels.
     model.width.set(target.offsetWidth);
     model.height.set(target.offsetHeight);
     model.isMeasured.set(true);
   }
 
-  public ngOnInit(): void {
-    this.resizeCallback = () => this.measure();
-    this.resizeObserverService.addObserver(this.hostElementRef.nativeElement, this.resizeCallback);
-  }
-
   public ngOnDestroy(): void {
-    if (this.resizeCallback) {
-      this.resizeObserverService.removeObserver(this.hostElementRef.nativeElement, this.resizeCallback);
+    if (this.observedElement) {
+      this.resizeObserverService.removeObserver(this.observedElement, this.resizeCallback);
     }
   }
 }
