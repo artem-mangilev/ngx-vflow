@@ -1,23 +1,26 @@
 export { VflowButton } from './lib/button.directive';
-export * from './lib/primitives.directive';
+export { VflowTheme, VflowSelected } from './lib/theme.directive';
+export { VflowNode, VflowNodeHeader, VflowNodeBody, VflowNodeFooter } from './lib/node.directive';
+export { VflowField } from './lib/field.directive';
+export { VflowContainer } from './lib/container.directive';
+export { VflowTitle, VflowMeta, VflowIcon, VflowActions } from './lib/text.directive';
+export { VflowPort } from './lib/port.directive';
+export { VflowStatus, VflowTone } from './lib/indicator.directive';
+export { VflowEdge, VflowEdgeLabel } from './lib/edge.directive';
+export { VflowToolbar, VflowExternalLabel } from './lib/overlay.directive';
+export { VflowBpmnEvent, VflowBpmnGateway } from './lib/bpmn.directive';
 
 import { VflowButton } from './lib/button.directive';
-import {
-  VflowTheme,
-  VflowSelected,
-  VflowNode,
-  VflowNodeHeader,
-  VflowNodeBody,
-  VflowNodeFooter,
-  VflowField,
-  VflowPort,
-  VflowStatus,
-  VflowEdge,
-  VflowEdgeLabel,
-  VflowGroup,
-  VflowBpmnEvent,
-  VflowBpmnGateway,
-} from './lib/primitives.directive';
+import { VflowTheme, VflowSelected } from './lib/theme.directive';
+import { VflowNode, VflowNodeHeader, VflowNodeBody, VflowNodeFooter } from './lib/node.directive';
+import { VflowField } from './lib/field.directive';
+import { VflowContainer } from './lib/container.directive';
+import { VflowTitle, VflowMeta, VflowIcon, VflowActions } from './lib/text.directive';
+import { VflowPort } from './lib/port.directive';
+import { VflowStatus } from './lib/indicator.directive';
+import { VflowEdge, VflowEdgeLabel } from './lib/edge.directive';
+import { VflowToolbar, VflowExternalLabel } from './lib/overlay.directive';
+import { VflowBpmnEvent, VflowBpmnGateway } from './lib/bpmn.directive';
 
 /** Convenience imports; every directive is also independently importable. */
 export const VflowUi = [
@@ -29,11 +32,17 @@ export const VflowUi = [
   VflowNodeBody,
   VflowNodeFooter,
   VflowField,
+  VflowContainer,
+  VflowTitle,
+  VflowMeta,
+  VflowIcon,
+  VflowActions,
   VflowPort,
   VflowStatus,
   VflowEdge,
   VflowEdgeLabel,
-  VflowGroup,
+  VflowToolbar,
+  VflowExternalLabel,
   VflowBpmnEvent,
   VflowBpmnGateway,
 ] as const;

@@ -27,8 +27,18 @@ test('consumer DOM, scoped themes, selection and native workflow actions', async
   const review = workflow.locator('article').filter({ hasText: 'Finance review' });
   await review.locator('header').click();
   await expect(review).toHaveAttribute('data-vui-selected', 'true');
-  await expect(review.locator('.vui-status')).toHaveText('Waiting');
-  await expect(workflow.locator('node-toolbar')).toBeAttached();
+  // Selection, application status and a model diagnostic are visible at the same time.
+  await expect(review.locator('.vui-status')).toHaveText(['Waiting', 'Above limit']);
+  await expect(review.locator('.vui-status').nth(1)).toHaveAttribute('data-tone', 'warning');
+  await expect(workflow.locator('.vflow-toolbar .vui-toolbar')).toBeAttached();
+  await expect(workflow.getByRole('button', { name: 'Details of Finance review', exact: true })).toBeVisible();
+  // Activity is presentation only: the busy node keeps its action enabled.
+  const paid = workflow.locator('article').filter({ hasText: 'Schedule payment' });
+  await expect(paid.locator('.vui-status')).toHaveAttribute('data-busy', 'true');
+  const open = paid.getByRole('button', { name: 'Open Schedule payment', exact: true });
+  await expect(open).toBeEnabled();
+  await open.click();
+  await expect(workflow.getByTestId('opened')).toHaveText('Opened: Schedule payment');
   await workflow.getByLabel('Read only', { exact: true }).check();
   const approve = review.getByRole('button', { name: 'Approve', exact: true });
   await expect(approve).toBeDisabled();
@@ -37,12 +47,12 @@ test('consumer DOM, scoped themes, selection and native workflow actions', async
   await approve.focus();
   await expect(approve).toBeFocused();
   await page.keyboard.press('Enter');
-  await expect(review.locator('.vui-status')).toHaveText('Approved');
+  await expect(review.locator('.vui-status').first()).toHaveText('Approved');
   await expect(approve).toBeDisabled();
   await expect(review).toHaveAttribute('data-vui-selected', 'true');
   await workflow.getByLabel('Dark theme', { exact: true }).check();
   await expect(review).toHaveCSS('background-color', 'rgb(27, 40, 59)');
-  await expect(workflow.locator('.vflow-toolbar .vui-edge-label')).toHaveCSS('background-color', 'rgb(27, 40, 59)');
+  await expect(workflow.locator('.vflow-toolbar .vui-toolbar')).toHaveCSS('background-color', 'rgb(27, 40, 59)');
   await expect(workflow.locator('path.vui-edge').first()).toHaveCSS('stroke', 'rgb(175, 190, 209)');
   await expect(workflow.locator('marker polyline').first()).toHaveCSS('fill', 'rgb(175, 190, 209)');
   await workflow.screenshot({ path: testInfo.outputPath('workflow.png') });
@@ -59,6 +69,7 @@ test('field connections follow stable IDs through rename, reorder, density and r
   // This page opts into the dark theme while the workflow page stays light.
   await expect(demo.locator('article.vui-node').first()).toHaveCSS('background-color', 'rgb(27, 40, 59)');
   await expect(demo.locator('path.vui-edge')).toHaveCount(2);
+  await expect(demo.locator('.vui-port[data-connected="true"]')).toHaveCount(4);
   await expect.poll(() => rowAlignment(demo)).toBeLessThan(1);
   await demo.getByRole('button', { name: 'Rename email', exact: true }).click();
   await expect(demo.locator('[data-entity="crm"] [data-field="email"]')).toContainText('primary_email');
@@ -91,6 +102,7 @@ test('field connections follow stable IDs through rename, reorder, density and r
   await expect.poll(endpointError).toBeLessThan(1);
   await demo.getByRole('button', { name: 'Remove Copy email connection', exact: true }).click();
   await expect(demo.locator('path.vui-edge')).toHaveCount(1);
+  await expect(demo.locator('.vui-port[data-connected="true"]')).toHaveCount(2);
   const source = demo.locator('[data-entity="crm"] [data-field="email"] .handle.handle--right');
   const target = demo.locator('[data-entity="erp"] [data-field="email"] .handle.handle--left');
   // Core intentionally overlays the target with its magnetic hit area during a connection.
@@ -105,6 +117,7 @@ test('field connections follow stable IDs through rename, reorder, density and r
   await page.mouse.up();
   await expect(demo.locator('path.vui-edge')).toHaveCount(2);
   await expect(demo.getByRole('button', { name: 'Remove Mapping connection', exact: true })).toBeVisible();
+  await expect(demo.locator('.vui-port[data-connected="true"]')).toHaveCount(4);
   await expect.poll(endpointError).toBeLessThan(1);
   await demo.screenshot({ path: testInfo.outputPath('entities.png') });
 });
@@ -113,7 +126,9 @@ test('BPMN outlines, lane frames and core selection render in both themes', asyn
   await page.goto('/design-system/bpmn');
   const demo = page.locator('app-ui-bpmn-demo');
   await demo.scrollIntoViewIfNeeded();
-  await expect(demo.locator('.vui-group')).toHaveCount(2);
+  await expect(demo.locator('.vui-container')).toHaveCount(2);
+  await expect(demo.locator('.vui-container > .vui-title')).toHaveText(['Operations', 'Finance']);
+  await expect(demo.locator('.vui-external-label')).toHaveCount(4);
   await expect(demo.locator('.vui-bpmn-event')).toHaveCount(3);
   await expect(demo.locator('path.vui-edge')).toHaveCount(7);
   await expect(demo.locator('[data-event="intermediate"]')).toHaveCSS('border-top-style', 'double');

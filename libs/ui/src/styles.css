@@ -43,11 +43,12 @@
 
   :where(
     .vui-node,
-    .vui-group,
+    .vui-container,
     .vui-bpmn-event,
     .vui-bpmn-gateway,
     .vui-button,
     .vui-edge-label,
+    .vui-toolbar,
     .vui-status,
     .vui-port
   ) {
@@ -55,7 +56,7 @@
     font: inherit;
   }
 
-  :where(.vui-node, .vui-group, .vui-bpmn-event, .vui-bpmn-gateway) {
+  :where(.vui-node, .vui-container, .vui-bpmn-event, .vui-bpmn-gateway) {
     position: relative;
     color: var(--vui-foreground);
     font-size: var(--vui-font-size);
@@ -88,6 +89,39 @@
   }
   .vui-node-footer {
     border-top: 1px solid var(--vui-border);
+    flex-wrap: wrap;
+  }
+  .vui-icon {
+    display: inline-grid;
+    place-items: center;
+    flex: none;
+    width: 20px;
+    height: 20px;
+  }
+  .vui-title {
+    flex: 1;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  :where(.vui-node-header, .vui-container) > .vui-title {
+    font-weight: 600;
+  }
+  .vui-container > .vui-title {
+    display: block;
+    padding: 8px var(--vui-padding);
+    border-bottom: 1px dashed var(--vui-border);
+  }
+  .vui-meta {
+    color: var(--vui-muted);
+    font-size: 12px;
+    line-height: 1.4;
+  }
+  .vui-actions {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    margin-inline-start: auto;
   }
   .vui-field {
     min-height: var(--vui-field-height);
@@ -97,13 +131,13 @@
     border-top: 1px solid var(--vui-border);
   }
 
-  .vui-group {
+  .vui-container {
     border: 1px dashed var(--vui-border);
     border-radius: var(--vui-radius);
     background: color-mix(in srgb, var(--vui-surface-muted) 55%, transparent);
   }
 
-  :where(.vui-node, .vui-group, .vui-bpmn-event)[data-vui-selected='true'] {
+  :where(.vui-node, .vui-container, .vui-bpmn-event)[data-vui-selected='true'] {
     outline: 2px solid var(--vui-selection, var(--vui-accent));
     outline-offset: 2px;
   }
@@ -122,6 +156,9 @@
   .vui-port[data-state='invalid'] {
     background: var(--vui-danger);
     border-style: dashed;
+  }
+  .vui-port[data-connected='true'] {
+    background: var(--vui-port-color, var(--vui-foreground));
   }
 
   .vui-status {
@@ -148,6 +185,19 @@
   .vui-status[data-tone='danger'] {
     color: var(--vui-danger);
   }
+  .vui-status[data-busy='true']::before {
+    content: '';
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+    animation: vui-pulse 1.2s ease-in-out infinite;
+  }
+  @keyframes vui-pulse {
+    50% {
+      opacity: 0.25;
+    }
+  }
 
   .vui-edge {
     fill: none;
@@ -170,6 +220,31 @@
     color: var(--vui-foreground);
     font-size: 12px;
     line-height: 1.5;
+  }
+
+  .vui-toolbar {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 6px;
+    border: 1px solid var(--vui-border);
+    border-radius: 8px;
+    background: var(--vui-surface);
+    color: var(--vui-foreground);
+    box-shadow: 0 3px 10px #0000001a;
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  .vui-external-label {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    font-size: 12px;
+    line-height: 1.4;
+    color: var(--vui-foreground);
   }
 
   .vui-button {
@@ -239,6 +314,12 @@
     outline-offset: 2px;
   }
 
+  @media (prefers-reduced-motion: reduce) {
+    .vui-status[data-busy='true']::before {
+      animation: none;
+    }
+  }
+
   @media (forced-colors: active) {
     .vui-button {
       border-color: ButtonText;
@@ -257,7 +338,7 @@
     .vui-edge[data-vui-selected='true'] {
       stroke: Highlight;
     }
-    :where(.vui-node, .vui-group, .vui-bpmn-event)[data-vui-selected='true'],
+    :where(.vui-node, .vui-container, .vui-bpmn-event)[data-vui-selected='true'],
     .vui-bpmn-gateway[data-vui-selected='true']::before {
       outline-color: Highlight;
     }
