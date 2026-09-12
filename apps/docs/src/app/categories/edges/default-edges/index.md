@@ -12,4 +12,4 @@ hit target; the visible line comes from your `<ng-template edge>`: bind `ctx.pat
 ## Curves and markers
 
 `curve` selects the routing (`bezier`, `straight`, `smooth-step`, `step` or a factory), `markers` adds
-arrowheads that follow the edge's stroke color; see `*FeaturesCurves` and the markers page.
+arrowheads that follow the edge's stroke color; see the curves and markers pages.

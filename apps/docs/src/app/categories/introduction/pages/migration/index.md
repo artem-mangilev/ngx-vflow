@@ -71,7 +71,7 @@ Include `@vflow/ui/styles.css` in your global styles for path B. See the Design 
 | `DefaultNode`, `DefaultGroupNode`, `isDefaultNode`, `isDefaultGroupNode` | `HtmlTemplateNode`, `TemplateGroupNode`, `isTemplateNode`, `isTemplateGroupNode`                                                                                    |
 | Edge `type` (`'default'` / `'template'`)                                 | Removed; every edge renders through the `edge` template                                                                                                             |
 | `EdgeLabel` `type: 'default'`, `text`, `style`                           | `type: 'html-template'` with `data` and an `edgeLabelHtml` template                                                                                                 |
-| `Marker.color`, `Marker.strokeWidth`                                     | Markers follow the edge stroke (`context-stroke`); style `.vflow-marker` or define your own marker                                                                  |
+| `color` and `strokeWidth` fields of `Marker`                             | Markers follow the edge stroke (`context-stroke`); style `.vflow-marker` or define your own marker                                                                  |
 | Connection `type: 'default'` preview                                     | Unchanged: the default connection line and the `connection` template both remain                                                                                    |
 
 ### Appearance inputs removed
@@ -86,8 +86,8 @@ Set them on the `vflow` element or any ancestor; a `vflowTheme` scope from `@vfl
 | Dots/grid `color`, `backgroundColor`                 | `--vflow-muted` and `--vflow-background`; the `.vflow-background-pattern` class              |
 | `resizerColor`, resize control `color`               | `--vflow-selection`, `--vflow-surface`; `.resize-control.handle` / `.resize-control.line`    |
 | `mini-map` `maskColor`, `strokeColor`                | `--vflow-muted` (mask) and `--vflow-border` (frame); the minimap samples the resolved tokens |
-| `alignmentHelper.lineColor`                          | `--vflow-foreground`; `.vflow-alignment-line`. `tolerance` stays                             |
-| `selectionBox.color`                                 | `--vflow-selection`; `.selection-box`. `mode` stays                                          |
+| `lineColor` in `alignmentHelper` settings            | `--vflow-foreground`; `.vflow-alignment-line`. `tolerance` stays                             |
+| `color` in `selectionBox` settings                   | `--vflow-selection`; `.selection-box`. `mode` stays                                          |
 
 Behavior parameters are untouched: node points, sizes, `extent`, resize constraints, drag thresholds,
 snap grid, zoom limits, curves, handle offsets and connection validation keep their APIs.

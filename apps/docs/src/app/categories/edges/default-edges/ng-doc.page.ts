@@ -3,7 +3,8 @@ import EdgesCategory from '../ng-doc.category';
 import { DefaultEdgesDemoComponent } from './demo/default-edges-demo.component';
 
 const TestPage: NgDocPage = {
-  title: `Default edges`,
+  title: `Edge templates`,
+  route: 'default-edges',
   mdFile: './index.md',
   category: EdgesCategory,
   demos: { DefaultEdgesDemoComponent },
