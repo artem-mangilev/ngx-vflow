@@ -72,11 +72,21 @@ export default defineConfig({
   ],
 
   /* Run your local dev server before starting the tests */
-  webServer: {
-    command: `npm run start -- --configuration=${process.env['E2E_CONFIGURATION'] ?? 'development'}`,
-    cwd: '../..',
-    timeout: 180_000,
-    url: 'http://localhost:4200/',
-    reuseExistingServer: !process.env['CI'],
-  },
+  webServer: [
+    {
+      command: `npm run start -- --configuration=${process.env['E2E_CONFIGURATION'] ?? 'development'}`,
+      cwd: '../..',
+      timeout: 180_000,
+      url: 'http://localhost:4200/',
+      reuseExistingServer: !process.env['CI'],
+    },
+    {
+      // Minimal consumer of the built packages; `nx serve consumer` builds ngx-vflow and @vflow/ui first.
+      command: 'npx nx serve consumer',
+      cwd: '../..',
+      timeout: 300_000,
+      url: 'http://localhost:4300/',
+      reuseExistingServer: !process.env['CI'],
+    },
+  ],
 });

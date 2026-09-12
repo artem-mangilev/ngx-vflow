@@ -62,6 +62,7 @@ interface EntityData {
         <button vflowButton type="button" (click)="flow()?.fitView()">Fit entities</button>
         <button vflowButton type="button" (click)="reverseFields()">Reverse fields</button>
         <button vflowButton type="button" (click)="renameField()">Rename email</button>
+        <button vflowButton type="button" (click)="toggleLongNames()">Long names</button>
         <label><input type="checkbox" [checked]="compact()" (change)="compact.set(!compact())" /> Compact</label>
         <label><input type="checkbox" [checked]="dark()" (change)="dark.set(!dark())" /> Dark theme</label>
         <p>Connect matching field types; names and row order can change.</p>
@@ -150,6 +151,7 @@ export class EntitiesDemoComponent {
   readonly flow = viewChild(VflowComponent);
   readonly dark = signal(true);
   readonly compact = signal(false);
+  readonly longNames = signal(false);
   readonly nodes = createNodes<EntityData>([
     {
       id: 'customer',
@@ -263,6 +265,22 @@ export class EntitiesDemoComponent {
 
   reverseFields() {
     this.nodes.forEach((node) => node.data.update((data) => ({ ...data, fields: [...data.fields].reverse() })));
+  }
+
+  /** Long identifiers wrap inside the row; endpoints must stay on the rows. */
+  toggleLongNames() {
+    const long = !this.longNames();
+    this.longNames.set(long);
+    const erp = this.nodes.find((node) => node.id === 'erp')!;
+    erp.data.update((data) => ({
+      ...data,
+      fields: data.fields.map((field) => ({
+        ...field,
+        name: long
+          ? `${field.name}_of_the_primary_business_contact_record`
+          : field.name.replace('_of_the_primary_business_contact_record', ''),
+      })),
+    }));
   }
 
   renameField() {
