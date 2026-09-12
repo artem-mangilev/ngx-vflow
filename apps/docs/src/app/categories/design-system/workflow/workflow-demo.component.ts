@@ -22,6 +22,7 @@ interface StepData {
       width: 230px;
     }
     .description {
+      margin: 0;
       min-height: 58px;
     }
     .controls {
@@ -48,11 +49,11 @@ interface StepData {
         <ng-template let-ctx nodeHtml>
           <article vflowNode selectable [vflowSelected]="ctx.selected() || ctx.preselected()">
             <header vflowNodeHeader>
-              <span vflowNodeIcon aria-hidden="true">{{ ctx.data().icon }}</span>
-              <span vflowNodeTitle>{{ ctx.data().title }}</span>
+              <span vflowIcon aria-hidden="true">{{ ctx.data().icon }}</span>
+              <span vflowTitle>{{ ctx.data().title }}</span>
             </header>
             <div vflowNodeBody>
-              <p vflowNodeDescription class="description">{{ ctx.data().description }}</p>
+              <p class="description">{{ ctx.data().description }}</p>
             </div>
             <footer vflowNodeFooter>
               @if (ctx.node.id === 'review') {
@@ -67,7 +68,7 @@ interface StepData {
               @if (ctx.data().diagnostic; as diagnostic) {
                 <span [vflowStatus]="diagnostic.tone">{{ diagnostic.text }}</span>
               }
-              <span vflowNodeActions>
+              <span vflowActions>
                 @if (ctx.node.id === 'review') {
                   <button
                     vflowButton

@@ -127,7 +127,7 @@ test('BPMN outlines, lane frames and core selection render in both themes', asyn
   const demo = page.locator('app-ui-bpmn-demo');
   await demo.scrollIntoViewIfNeeded();
   await expect(demo.locator('.vui-container')).toHaveCount(2);
-  await expect(demo.locator('.vui-container-title')).toHaveText(['Operations', 'Finance']);
+  await expect(demo.locator('.vui-container > .vui-title')).toHaveText(['Operations', 'Finance']);
   await expect(demo.locator('.vui-external-label')).toHaveCount(4);
   await expect(demo.locator('.vui-bpmn-event')).toHaveCount(3);
   await expect(demo.locator('path.vui-edge')).toHaveCount(7);

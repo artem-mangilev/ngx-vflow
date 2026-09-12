@@ -37,17 +37,16 @@ CSS can override them. If your application uses layers, declare your override la
 ## Anatomy and states
 
 Directives add a public class to your own element and nothing else: no wrappers, no roles, no graph state.
-Compose the parts with plain HTML and content projection; anything not listed here (forms, images, charts,
-notes, menus) is your content inside `vflowNodeBody` or a field row.
+Compose the parts with plain HTML and content projection; anything not listed here (descriptions, forms,
+images, charts, notes, menus) is your content inside `vflowNodeBody` or a field row.
 
-| Area      | Parts                                                                                                                                                                    |
-| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Card      | `vflowNode` shell; `vflowNodeHeader`, `vflowNodeBody`, `vflowNodeFooter`; `vflowNodeIcon`, `vflowNodeTitle`, `vflowNodeDescription`, `vflowNodeMeta`, `vflowNodeActions` |
-| Field     | `vflowField` row; `vflowFieldName`, `vflowFieldMeta`; indicators and core handles on both sides                                                                          |
-| Port      | `vflowPort` inside a handle template, `vflowPortLabel` next to it                                                                                                        |
-| Edge      | `vflowEdge` on the SVG path, `vflowEdgeLabel` for HTML labels                                                                                                            |
-| Container | `vflowContainer` frame with `vflowContainerTitle` and `vflowContainerBody`                                                                                               |
-| Extras    | `vflowStatus`, `vflowExternalLabel`, `vflowToolbar`, `vflowButton`                                                                                                       |
+| Area       | Parts                                                                                                  |
+| ---------- | ------------------------------------------------------------------------------------------------------ |
+| Shells     | `vflowNode` with `vflowNodeHeader`, `vflowNodeBody`, `vflowNodeFooter`; `vflowField`; `vflowContainer` |
+| Text roles | `vflowTitle`, `vflowMeta`, `vflowIcon`, `vflowActions`, usable in any shell, label or toolbar          |
+| Port       | `vflowPort` inside a handle template                                                                   |
+| Edge       | `vflowEdge` on the SVG path, `vflowEdgeLabel` for HTML labels                                          |
+| Extras     | `vflowStatus`, `vflowExternalLabel`, `vflowToolbar`, `vflowButton`                                     |
 
 Three kinds of state stay separate so they can be shown at once:
 
@@ -66,18 +65,14 @@ Ports mirror two independent facts: `vflowPortState` is core feedback for the co
 | `VflowSelected`                                       | `[vflowSelected]="ctx.selected() \|\| ctx.preselected()"`           | Selection presentation; no interaction or ARIA changes         |
 | `VflowNode`                                           | `vflowNode`                                                         | Node surface; consumer chooses size and content                |
 | `VflowNodeHeader`, `VflowNodeBody`, `VflowNodeFooter` | `vflowNodeHeader`, `vflowNodeBody`, `vflowNodeFooter`               | Optional anatomy on consumer elements                          |
-| `VflowNodeIcon`, `VflowNodeTitle`                     | `vflowNodeIcon`, `vflowNodeTitle`                                   | Header icon slot and wrapping title                            |
-| `VflowNodeDescription`, `VflowNodeMeta`               | `vflowNodeDescription`, `vflowNodeMeta`                             | Body text and secondary metadata                               |
-| `VflowNodeActions`                                    | `vflowNodeActions`                                                  | Group of consumer controls; add `vflowNoDrag` to each control  |
-| `VflowField`                                          | `vflowField`                                                        | Field row with room for names, metadata and core handles       |
-| `VflowFieldName`, `VflowFieldMeta`                    | `vflowFieldName`, `vflowFieldMeta`                                  | Wrapping field name and its type/key metadata                  |
+| `VflowField`                                          | `vflowField`                                                        | Field row with room for text roles and core handles            |
+| `VflowContainer`                                      | `vflowContainer`                                                    | Frame; parent relationships remain explicit in graph data      |
+| `VflowTitle`, `VflowMeta`                             | `vflowTitle`, `vflowMeta`                                           | Primary wrapping text and secondary text in any shell          |
+| `VflowIcon`, `VflowActions`                           | `vflowIcon`, `vflowActions`                                         | Icon slot and a group of controls; add `vflowNoDrag` to each   |
 | `VflowPort`                                           | `vflowPort [vflowPortState]="ctx.state()" [vflowPortConnected]="…"` | Visual inside a handle template: idle/valid/invalid, connected |
-| `VflowPortLabel`                                      | `vflowPortLabel`                                                    | Text next to a port                                            |
 | `VflowStatus`                                         | `[vflowStatus]="'warning'" [vflowStatusBusy]="true"`                | Indicator: semantic tone, your text and optional activity      |
 | `VflowEdge`                                           | `vflowEdge` on an SVG path                                          | Stroke; bind core path and marker URLs yourself                |
 | `VflowEdgeLabel`                                      | `vflowEdgeLabel`                                                    | HTML label surface, including optional native controls         |
-| `VflowContainer`                                      | `vflowContainer`                                                    | Frame; parent relationships remain explicit in graph data      |
-| `VflowContainerTitle`, `VflowContainerBody`           | `vflowContainerTitle`, `vflowContainerBody`                         | Container heading and content area                             |
 | `VflowToolbar`                                        | `vflowToolbar`                                                      | Surface for `node-toolbar` content                             |
 | `VflowExternalLabel`                                  | `vflowExternalLabel`                                                | Label below a positioned shape                                 |
 | `VflowBpmnEvent`                                      | `[vflowBpmnEvent]="'start'"`                                        | Start/intermediate/end event outlines                          |
@@ -86,7 +81,8 @@ Ports mirror two independent facts: `vflowPortState` is core feedback for the co
 
 Each directive is independently importable. None imports ngx-vflow, owns graph state,
 adds wrapper elements, registers ports or changes accessibility roles. Public selectors are the
-`.vui-*` classes named after the attributes, for example `.vui-node-title` or `.vui-status[data-tone='warning']`.
+`.vui-*` classes named after the attributes, for example `.vui-title` or `.vui-status[data-tone='warning']`;
+context rules such as `.vui-container > .vui-title` style a role inside a shell.
 
 ## Themes and composition
 

@@ -80,14 +80,14 @@ interface EntityData {
             [vflowSelected]="ctx.selected() || ctx.preselected()"
             [attr.data-entity]="ctx.node.id">
             <header vflowNodeHeader>
-              <span vflowNodeTitle>{{ ctx.data().title }}</span>
-              <span vflowNodeMeta>{{ ctx.data().category }}</span>
+              <span vflowTitle>{{ ctx.data().title }}</span>
+              <span vflowMeta>{{ ctx.data().category }}</span>
             </header>
             @for (field of ctx.data().fields; track field.id) {
               <div vflowField [attr.data-field]="field.id">
-                <span vflowFieldMeta class="key">{{ field.key }}</span>
-                <span vflowFieldName>{{ field.name }}</span>
-                <span vflowFieldMeta>{{ field.type }}</span>
+                <span vflowMeta class="key">{{ field.key }}</span>
+                <span vflowTitle>{{ field.name }}</span>
+                <span vflowMeta>{{ field.type }}</span>
                 <!-- Per-row templates: connection state is application knowledge about existing edges. -->
                 <ng-template #inPort let-handle handle>
                   <span

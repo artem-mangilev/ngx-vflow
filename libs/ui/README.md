@@ -10,14 +10,14 @@ component. They style your own HTML/SVG, without adding wrappers or depending on
 <section vflowTheme="light">
   <article vflowNode>
     <header vflowNodeHeader>
-      <span vflowNodeIcon aria-hidden="true">✓</span>
-      <span vflowNodeTitle>Review invoice</span>
+      <span vflowIcon aria-hidden="true">✓</span>
+      <span vflowTitle>Review invoice</span>
     </header>
     <div vflowNodeBody>Your content and controls</div>
     <footer vflowNodeFooter>
       <span vflowStatus="warning">Waiting for approval</span>
       <span vflowStatus="danger">Missing PO</span>
-      <span vflowNodeActions><button vflowButton type="button">Approve</button></span>
+      <span vflowActions><button vflowButton type="button">Approve</button></span>
     </footer>
   </article>
 </section>
@@ -27,8 +27,8 @@ Include `@vflow/ui/styles.css` in your application's global styles. CSS is built
 with `vui:`-prefixed utilities, and includes no Preflight. Consumers need no Tailwind build step.
 Presentation rules use the `vui` cascade layer; unlayered application styles override them.
 
-The package includes card anatomy, field rows, port visuals, status indicators,
-SVG edge strokes, HTML labels, toolbar surfaces, external labels, container frames,
+The package includes card, field-row and container shells, text roles (title, meta, icon, actions),
+port visuals, status indicators, SVG edge strokes, HTML labels, toolbar surfaces, external labels,
 BPMN event/gateway outlines, theme and selection directives.
 For flow interaction compose them with core `selectable`, `handle`, `customTemplateEdge`
 and gesture-exclusion directives. Bind `vflowSelected` to selection/preselection and put

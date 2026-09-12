@@ -6,9 +6,3 @@ import { Directive } from '@angular/core';
  */
 @Directive({ selector: '[vflowContainer]', host: { class: 'vui-container' } })
 export class VflowContainer {}
-
-@Directive({ selector: '[vflowContainerTitle]', host: { class: 'vui-container-title' } })
-export class VflowContainerTitle {}
-
-@Directive({ selector: '[vflowContainerBody]', host: { class: 'vui-container-body' } })
-export class VflowContainerBody {}

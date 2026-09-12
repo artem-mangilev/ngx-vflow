@@ -49,7 +49,7 @@ import { createEdges, createNodes, Vflow, VflowComponent } from 'ngx-vflow';
             [vflowSelected]="ctx.selected() || ctx.preselected()"
             [style.width.px]="ctx.width()"
             [style.height.px]="ctx.height()">
-            <strong vflowContainerTitle class="lane-title">{{ ctx.data().title }}</strong>
+            <strong vflowTitle class="lane-title">{{ ctx.data().title }}</strong>
           </div>
         </ng-template>
         <ng-template let-ctx nodeHtml>
