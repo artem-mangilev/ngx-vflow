@@ -2,6 +2,21 @@
 You own the HTML/SVG structure; directives add presentation without wrapping it.
 The package is developed in this workspace and will first be published with the next major release.
 
+## Core and UI boundary
+
+Core owns positions, hit areas, focus, keyboard behavior, wrapper semantics and interaction eligibility.
+Business logic, node content and graph state belong to your application. `@vflow/ui` sits between them:
+stable anatomy, states and a CSS token contract for cards, fields, ports, edges, containers and toolbars.
+Specialized sets, such as BPMN, build on the same primitives and tokens.
+
+Each page in this section shows one reference composition, its code and its limitations:
+
+- `Workflow` — cards, branching, edge labels, native actions, independent status and diagnostics.
+- `ERD and schema mapping` — field rows with ports and stable field IDs through rename and reorder.
+- `BPMN` — events, gateway, task cards, lane frames and sequence links.
+
+Data/media pipeline and relationships/metrics map pages are added together with their working examples.
+
 ## Setup
 
 Import individual directives or the `VflowUi` convenience array alongside `Vflow`:
@@ -18,49 +33,6 @@ Include `@vflow/ui/styles.css` in your application's global styles. It is precom
 consumers need neither Tailwind nor source scanning. The build retains prefixed Tailwind 4
 utilities without Preflight. UI styles live in the `vui` cascade layer; unlayered application
 CSS can override them. If your application uses layers, declare your override layer after `vui`.
-
-## Approval workflow
-
-Cards, headers, footers, status badges, edge labels and a node toolbar all use consumer DOM.
-Approve is an ordinary native button; read-only disables editing while preserving navigation.
-This recipe displays application state and does not execute a workflow.
-
-{{ NgDocActions.demo("WorkflowDemoComponent", { container: false }) }}
-
-```typescript file="./workflow-demo.component.ts"
-
-```
-
-## Entities and field mapping
-
-The same `vflowField` structure serves both Customer/Order relationships and CRM/ERP mapping.
-Handles use stable field IDs, so renaming a field and reversing rows preserve endpoints.
-Input and output IDs are distinct (`in:field-id` and `out:field-id`) and independent of visible names.
-Drag between ports of matching types to add a connection; remove it using its label button.
-Type compatibility and graph changes belong to this application, not to the UI directive.
-
-{{ NgDocActions.demo("EntitiesDemoComponent", { container: false }) }}
-
-```typescript file="./entities-demo.component.ts"
-
-```
-
-Rows remain mounted: this MVP does not implement internal scrolling, collapsing or virtualized
-field lists. Those features need an explicit policy for connections to hidden fields.
-The `1 → N` label illustrates cardinality; it is not SQL schema validation or a crow's-foot marker.
-
-## BPMN presentation
-
-Start, intermediate and end outlines, an exclusive gateway, task cards and two lane frames.
-The gateway rotates only its decorative outline, leaving the text and port anchors unrotated.
-Symbols and names are supplied by the consumer. These are visual primitives, not a BPMN
-modeler: XML import/export, modeling rules, boundary events and execution are outside this MVP.
-
-{{ NgDocActions.demo("BpmnDemoComponent", { container: false }) }}
-
-```typescript file="./bpmn-demo.component.ts"
-
-```
 
 ## Directive reference
 
@@ -108,7 +80,9 @@ Per-node overrides do not automatically propagate to toolbar content mounted in 
 | `--vui-port-size`, `--vui-edge-width`                                    | Visible port size and line width                                   |
 | `--vui-selection`, `--vui-focus`, `--vui-port-color`, `--vui-edge-color` | Optional local overrides; fall back to semantic tokens             |
 
-Core still owns positions, hit areas, focus, keyboard behavior and interaction eligibility.
+The token set above is the current MVP contract. The public set will be reduced to shared semantic
+tokens; part details such as field height or port size will become ordinary CSS on public selectors.
+
 Compose custom edges with `customTemplateEdge` and `selectable`, and use core gesture
 exclusions such as `vflowNoDrag` for embedded controls. Do not shrink a hit area just to make
 its visual smaller. Keep status text alongside color and give icon-only buttons accessible names.

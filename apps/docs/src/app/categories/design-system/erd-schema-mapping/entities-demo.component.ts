@@ -31,7 +31,7 @@ interface EntityData {
   selector: 'app-ui-entities-demo',
   imports: [Vflow, VflowUi],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styleUrls: ['./demo.css'],
+  styleUrls: ['../demo.css'],
   styles: `
     article {
       width: 250px;

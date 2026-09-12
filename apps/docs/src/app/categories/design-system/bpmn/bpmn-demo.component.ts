@@ -6,7 +6,7 @@ import { createEdges, createNodes, Vflow, VflowComponent } from 'ngx-vflow';
   selector: 'app-ui-bpmn-demo',
   imports: [Vflow, VflowUi],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styleUrls: ['./demo.css'],
+  styleUrls: ['../demo.css'],
   styles: `
     .task {
       width: 170px;

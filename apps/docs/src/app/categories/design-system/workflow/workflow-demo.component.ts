@@ -6,7 +6,7 @@ import { createEdges, createNodes, Vflow, VflowComponent } from 'ngx-vflow';
   selector: 'app-ui-workflow-demo',
   imports: [Vflow, VflowUi],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styleUrls: ['./demo.css'],
+  styleUrls: ['../demo.css'],
   styles: `
     article {
       width: 210px;
