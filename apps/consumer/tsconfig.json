@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "../../out-tsc/consumer",
+    "types": [],
+    "paths": {
+      "@vflow/ui": ["dist/libs/ui"],
+      "@vflow/ui/bpmn": ["dist/libs/ui/bpmn"],
+      "ngx-vflow": ["dist/libs/ngx-vflow"]
+    }
+  }
+}

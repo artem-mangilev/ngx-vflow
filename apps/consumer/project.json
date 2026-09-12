@@ -1,0 +1,64 @@
+{
+  "name": "consumer",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/consumer/src",
+  "prefix": "app",
+  "targets": {
+    "build": {
+      "executor": "@angular/build:application",
+      "dependsOn": [
+        {
+          "projects": ["ngx-vflow", "ui"],
+          "target": "build"
+        }
+      ],
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/apps/consumer-ui",
+        "index": "apps/consumer/src/index.html",
+        "browser": "apps/consumer/src/main.ts",
+        "tsConfig": "apps/consumer/tsconfig.app.json",
+        "styles": ["dist/libs/ui/styles.css"],
+        "optimization": false,
+        "sourceMap": false,
+        "outputHashing": "none"
+      },
+      "configurations": {
+        "ui": {},
+        "core-only": {
+          "outputPath": "dist/apps/consumer-core-only",
+          "browser": "apps/consumer/src/main.core-only.ts",
+          "styles": []
+        }
+      },
+      "defaultConfiguration": "ui"
+    },
+    "serve": {
+      "executor": "@angular/build:dev-server",
+      "dependsOn": [
+        {
+          "projects": ["ngx-vflow", "ui"],
+          "target": "build"
+        }
+      ],
+      "options": {
+        "buildTarget": "consumer:build:ui",
+        "port": 4300
+      }
+    },
+    "check": {
+      "executor": "nx:run-commands",
+      "dependsOn": [
+        {
+          "target": "build",
+          "params": "forward"
+        }
+      ],
+      "options": {
+        "parallel": false,
+        "commands": ["nx build consumer --configuration core-only", "node apps/consumer/scripts/check-bundles.mjs"]
+      }
+    }
+  }
+}

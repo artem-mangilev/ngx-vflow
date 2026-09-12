@@ -1,0 +1,5 @@
+{
+  "extends": "./tsconfig.json",
+  "files": ["src/main.ts", "src/main.core-only.ts"],
+  "include": ["src/**/*.d.ts"]
+}
