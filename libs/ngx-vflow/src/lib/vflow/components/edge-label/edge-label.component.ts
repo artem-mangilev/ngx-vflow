@@ -76,7 +76,7 @@ export class EdgeLabelComponent {
       let color = 'transparent';
 
       if (flowBackground.type === 'dots') {
-        color = flowBackground.backgroundColor ?? '#fff';
+        color = flowBackground.backgroundColor ?? 'var(--vflow-background, #fff)';
       }
 
       if (flowBackground.type === 'solid') {

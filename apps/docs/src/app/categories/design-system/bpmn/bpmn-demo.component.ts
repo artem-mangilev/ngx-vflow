@@ -40,7 +40,7 @@ import { createEdges, createNodes, Vflow, VflowComponent } from 'ngx-vflow';
         <label><input type="checkbox" [checked]="dark()" (change)="dark.set(!dark())" /> Dark theme</label>
         <p>Drag tasks inside lanes. A visual subset; no BPMN execution or XML model.</p>
       </div>
-      <vflow view="auto" background="var(--vui-canvas)" [nodes]="nodes" [edges]="edges">
+      <vflow view="auto" [nodes]="nodes" [edges]="edges">
         <ng-template let-ctx groupNode>
           <div
             vflowContainer

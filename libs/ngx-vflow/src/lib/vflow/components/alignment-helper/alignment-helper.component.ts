@@ -40,7 +40,7 @@ export class AlignmentHelperComponent {
   private flowStatus = inject(FlowStatusService);
 
   readonly tolerance = input(10);
-  readonly lineColor = input('#1b262c');
+  readonly lineColor = input('var(--vflow-foreground, #1b262c)');
 
   protected isNodeDragging = computed(
     () => isNodeDragStartStatus(this.flowStatus.status()) || isNodeDragStatus(this.flowStatus.status()),

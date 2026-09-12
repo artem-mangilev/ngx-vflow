@@ -9,9 +9,9 @@ import { AsInterface } from '../types';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MiniMapMockComponent implements AsInterface<MiniMapComponent>, OnInit {
-  public maskColor = input(`rgba(215, 215, 215, 0.6)`);
+  public maskColor = input<string>();
 
-  public strokeColor = input(`rgb(200, 200, 200)`);
+  public strokeColor = input<string>();
 
   public position = input<MiniMapPosition>('bottom-right');
 

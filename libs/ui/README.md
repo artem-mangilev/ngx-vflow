@@ -23,9 +23,10 @@ component. They style your own HTML/SVG, without adding wrappers or depending on
 </section>
 ```
 
-Include `@vflow/ui/styles.css` in your application's global styles. CSS is built with Tailwind 4,
-with `vui:`-prefixed utilities, and includes no Preflight. Consumers need no Tailwind build step.
-Presentation rules use the `vui` cascade layer; unlayered application styles override them.
+Include `@vflow/ui/styles.css` in your application's global styles: it is compiled with Tailwind 4
+(`vui:`-prefixed utilities, no Preflight) and needs no Tailwind on your side. If you run Tailwind v4
+yourself, import `@vflow/ui/styles.source.css` as a separate global stylesheet instead and let your
+pipeline compile it. Rules live in cascade layers; unlayered application styles override them.
 
 The package includes card, field-row and container shells, text roles (title, meta, icon, actions),
 port visuals, status indicators, SVG edge strokes, HTML labels, toolbar surfaces, external labels,
@@ -34,10 +35,12 @@ For flow interaction compose them with core `selectable`, `handle`, `customTempl
 and gesture-exclusion directives. Bind `vflowSelected` to selection/preselection and put
 `vflowPort` inside a handle template. UI never changes roles, focus or graph state.
 
-Use `vflowTheme="light"` or `vflowTheme="dark"` on the editor ancestor and override semantic CSS variables such as
-`--vui-surface`, `--vui-foreground`, `--vui-border`, `--vui-accent`, `--vui-on-accent`,
-`--vui-padding` and `--vui-field-height` to match your application. States retain text/icons
-alongside their colors. Internal row scrolling/collapse and a full BPMN modeler are outside this MVP.
+Use `vflowTheme="light"` or `vflowTheme="dark"` on the editor ancestor and override the shared tokens
+`--vui-surface`, `--vui-surface-muted`, `--vui-foreground`, `--vui-muted`, `--vui-border`, `--vui-accent`,
+`--vui-on-accent`, `--vui-font-family`, `--vui-font-size`, `--vui-line-height`, `--vui-space` and
+`--vui-radius` to match your application. Part details are ordinary CSS on the `.vui-*` selectors.
+A theme scope also maps core feedback (`--vflow-*`) to the same values; a flow outside a theme scope
+keeps core defaults. States retain text/icons alongside their colors.
 
 See the **Design system** ng-doc section for the complete directive/token reference
 and interactive workflow, ERD/mapping and BPMN recipes. Existing core defaults remain available;

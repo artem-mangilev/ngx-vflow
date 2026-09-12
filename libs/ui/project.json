@@ -12,7 +12,7 @@
         "parallel": false,
         "commands": [
           "ng-packagr -p libs/ui/ng-package.json -c libs/ui/tsconfig.lib.prod.json",
-          "tailwindcss -i libs/ui/src/styles.css -o dist/libs/ui/styles.css --minify"
+          "node libs/ui/scripts/build-styles.mjs"
         ]
       },
       "configurations": {
@@ -20,7 +20,7 @@
         "development": {
           "commands": [
             "ng-packagr -p libs/ui/ng-package.json -c libs/ui/tsconfig.lib.json",
-            "tailwindcss -i libs/ui/src/styles.css -o dist/libs/ui/styles.css --minify"
+            "node libs/ui/scripts/build-styles.mjs"
           ]
         }
       },
@@ -36,6 +36,13 @@
       "executor": "@nx/js:release-publish",
       "options": {
         "packageRoot": "dist/{projectRoot}"
+      }
+    },
+    "check-styles": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["build"],
+      "options": {
+        "command": "node libs/ui/scripts/check-styles.mjs"
       }
     }
   }

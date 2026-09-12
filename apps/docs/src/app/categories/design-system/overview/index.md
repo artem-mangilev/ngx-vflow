@@ -29,10 +29,16 @@ import { Vflow } from 'ngx-vflow';
 // imports: [Vflow, VflowUi]
 ```
 
-Include `@vflow/ui/styles.css` in your application's global styles. It is precompiled;
-consumers need neither Tailwind nor source scanning. The build retains prefixed Tailwind 4
-utilities without Preflight. UI styles live in the `vui` cascade layer; unlayered application
-CSS can override them. If your application uses layers, declare your override layer after `vui`.
+Then add one of the two stylesheet entries to your application:
+
+| Entry                         | Use when                                                                                       | How                                                                                                                                                                                                                                          |
+| ----------------------------- | ---------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@vflow/ui/styles.css`        | Default. Compiled and minified; no Tailwind or source scanning on your side.                   | Add it to the `styles` of your build, or `@import '@vflow/ui/styles.css';` in a global stylesheet.                                                                                                                                           |
+| `@vflow/ui/styles.source.css` | You run Tailwind v4 and want this CSS processed by your own pipeline (minification, bundling). | Create a separate global stylesheet containing only `@import '@vflow/ui/styles.source.css';` and let Tailwind process it. The file registers the package code with `@source`, so the utilities of the directives are generated on your side. |
+
+The source entry uses the `vui` prefix, so it has to be compiled as its own stylesheet, not inside the
+`@import 'tailwindcss'` of your application. Both entries produce the same rules; import only one.
+UI rules live in Tailwind cascade layers, so unlayered application CSS overrides them without `!important`.
 
 ## Anatomy and states
 
@@ -86,37 +92,46 @@ context rules such as `.vui-container > .vui-title` style a role inside a shell.
 
 ## Themes and composition
 
-Put `vflowTheme` on an ancestor of the whole flow so nodes, SVG edges, markers, labels and
-toolbars share its tokens. Different editors can have different themes on the same page.
-Per-node overrides do not automatically propagate to toolbar content mounted in another layer.
+Put `vflowTheme` on an ancestor of the whole flow so nodes, SVG edges, markers, labels, toolbars and
+the minimap share its tokens. Different editors can have different themes on the same page, and a flow
+outside every theme scope keeps the core defaults: importing the stylesheet never themes a flow by itself.
+
+{{ NgDocActions.demo("ThemesDemoComponent", { container: false }) }}
+
+Shared values are the public tokens below. Everything else, such as card padding, row height, port size or
+line width, is ordinary CSS on the public `.vui-*` selectors; the density of all parts follows `--vui-space`.
 
 ```css
 .my-editor {
   --vui-accent: #0f766e;
   --vui-on-accent: white;
   --vui-radius: 6px;
-  --vui-field-height: 30px;
+  --vui-space: 3px;
+}
+.my-editor .vui-port {
+  width: 10px;
+  height: 10px;
 }
 ```
 
-| Tokens                                                                   | Purpose                                                            |
-| ------------------------------------------------------------------------ | ------------------------------------------------------------------ |
-| `--vui-canvas`, `--vui-surface`, `--vui-surface-muted`                   | Backgrounds; explicitly pass the canvas token to core `background` |
-| `--vui-foreground`, `--vui-muted`, `--vui-border`                        | Text, secondary text and borders                                   |
-| `--vui-accent`, `--vui-on-accent`                                        | Actions and their text                                             |
-| `--vui-success`, `--vui-warning`, `--vui-danger`, `--vui-info`           | Status and port validation colors                                  |
-| `--vui-radius`, `--vui-padding`, `--vui-font-size`, `--vui-field-height` | Node anatomy and density                                           |
-| `--vui-port-size`, `--vui-edge-width`                                    | Visible port size and line width                                   |
-| `--vui-selection`, `--vui-focus`, `--vui-port-color`, `--vui-edge-color` | Optional local overrides; fall back to semantic tokens             |
+| Tokens                                                      | Purpose                           |
+| ----------------------------------------------------------- | --------------------------------- |
+| `--vui-surface`, `--vui-surface-muted`                      | Card and header backgrounds       |
+| `--vui-foreground`, `--vui-muted`, `--vui-border`           | Text, secondary text and borders  |
+| `--vui-accent`, `--vui-on-accent`                           | Actions, selection and their text |
+| `--vui-font-family`, `--vui-font-size`, `--vui-line-height` | Typography                        |
+| `--vui-space`, `--vui-radius`                               | Spacing unit and corner radius    |
 
-The token set above is the current MVP contract. The public set will be reduced to shared semantic
-tokens; part details such as field height or port size will become ordinary CSS on public selectors.
+Core has its own tokens with defaults for standalone use: `--vflow-background`, `--vflow-surface`,
+`--vflow-foreground`, `--vflow-muted`, `--vflow-border`, `--vflow-selection` and `--vflow-focus`.
+A theme scope maps the UI tokens onto them; set a `--vflow-*` token on the flow element or any
+descendant to override both. The canvas minimap samples the resolved tokens and repaints when an
+attribute changes on any ancestor of the flow (for example `data-vui-theme` or a class) or when the
+`prefers-color-scheme` preference changes; edits to a stylesheet alone are not observed.
 
 Compose custom edges with `customTemplateEdge` and `selectable`, and use core gesture
 exclusions such as `vflowNoDrag` for embedded controls. Do not shrink a hit area just to make
 its visual smaller. Keep status text alongside color and give icon-only buttons accessible names.
 
-This release adds opt-in presentations. Existing core default types remain available;
-their removal/migration is a separate major-release step. Canvas minimap presentation is
-also outside this MVP: it needs resolved colors through core presentation hooks, not CSS
-variables passed directly to canvas drawing APIs.
+This release adds opt-in presentations. Existing core default types and appearance inputs remain
+available with token-based defaults; their removal is a separate major-release step.

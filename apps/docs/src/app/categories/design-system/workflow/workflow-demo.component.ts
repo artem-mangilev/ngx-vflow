@@ -45,7 +45,7 @@ interface StepData {
         <label><input type="checkbox" [checked]="readOnly()" (change)="toggleReadOnly()" /> Read only</label>
         <p>Approve the invoice; select a node to inspect it.</p>
       </div>
-      <vflow view="auto" background="var(--vui-canvas)" [nodes]="nodes" [edges]="edges">
+      <vflow view="auto" [nodes]="nodes" [edges]="edges">
         <ng-template let-ctx nodeHtml>
           <article vflowNode selectable [vflowSelected]="ctx.selected() || ctx.preselected()">
             <header vflowNodeHeader>
