@@ -8,8 +8,8 @@ interface StepData {
   description: string;
   /** Application status: a word of this application, not a library lifecycle. */
   status: { tone: VflowTone; text: string; busy?: boolean };
-  /** Model diagnostic; shown next to status and independent from selection. */
-  diagnostic?: { tone: 'info' | 'warning' | 'danger'; text: string };
+  /** Model diagnostic: a second indicator next to status, independent from selection. */
+  diagnostic?: { tone: VflowTone; text: string };
 }
 
 @Component({
@@ -65,7 +65,7 @@ interface StepData {
                 }}</span>
               }
               @if (ctx.data().diagnostic; as diagnostic) {
-                <span [vflowDiagnostic]="diagnostic.tone">{{ diagnostic.text }}</span>
+                <span [vflowStatus]="diagnostic.tone">{{ diagnostic.text }}</span>
               }
               <span vflowNodeActions>
                 @if (ctx.node.id === 'review') {

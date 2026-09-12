@@ -50,7 +50,6 @@
     .vui-edge-label,
     .vui-toolbar,
     .vui-status,
-    .vui-diagnostic,
     .vui-port
   ) {
     box-sizing: border-box;
@@ -205,30 +204,6 @@
     50% {
       opacity: 0.25;
     }
-  }
-
-  .vui-diagnostic {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 12px;
-    font-weight: 600;
-    line-height: 1.5;
-    color: var(--vui-info);
-  }
-  .vui-diagnostic::before {
-    content: '';
-    width: 8px;
-    height: 8px;
-    border-radius: 2px;
-    background: currentColor;
-    transform: rotate(45deg);
-  }
-  .vui-diagnostic[data-tone='warning'] {
-    color: var(--vui-warning);
-  }
-  .vui-diagnostic[data-tone='danger'] {
-    color: var(--vui-danger);
   }
 
   .vui-edge {

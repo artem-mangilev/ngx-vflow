@@ -47,13 +47,12 @@ notes, menus) is your content inside `vflowNodeBody` or a field row.
 | Port      | `vflowPort` inside a handle template, `vflowPortLabel` next to it                                                                                                        |
 | Edge      | `vflowEdge` on the SVG path, `vflowEdgeLabel` for HTML labels                                                                                                            |
 | Container | `vflowContainer` frame with `vflowContainerTitle` and `vflowContainerBody`                                                                                               |
-| Extras    | `vflowStatus`, `vflowDiagnostic`, `vflowExternalLabel`, `vflowToolbar`, `vflowButton`                                                                                    |
+| Extras    | `vflowStatus`, `vflowExternalLabel`, `vflowToolbar`, `vflowButton`                                                                                                       |
 
-Four kinds of state stay separate so they can be shown at once:
+Three kinds of state stay separate so they can be shown at once:
 
 - **Interaction** is owned by core: bind `vflowSelected` to `ctx.selected() || ctx.preselected()`. Focus comes from the core wrapper.
-- **Diagnostics** about the model belong to your application: `[vflowDiagnostic]="'warning'"` with text.
-- **Application status** is your own vocabulary: `[vflowStatus]="'info'"` with text, plus `vflowStatusBusy` for activity. Activity is presentation only and never disables anything.
+- **Diagnostics** about the model and **application status** are both your vocabulary. Each is one `vflowStatus` indicator with a tone and your text; place two side by side to show a warning next to a running status. `vflowStatusBusy` adds activity, which is presentation only and never disables anything.
 - **Action availability** is the native `disabled` attribute on your buttons, driven by your rules such as read-only.
 
 Ports mirror two independent facts: `vflowPortState` is core feedback for the connection in progress
@@ -74,8 +73,7 @@ Ports mirror two independent facts: `vflowPortState` is core feedback for the co
 | `VflowFieldName`, `VflowFieldMeta`                    | `vflowFieldName`, `vflowFieldMeta`                                  | Wrapping field name and its type/key metadata                  |
 | `VflowPort`                                           | `vflowPort [vflowPortState]="ctx.state()" [vflowPortConnected]="…"` | Visual inside a handle template: idle/valid/invalid, connected |
 | `VflowPortLabel`                                      | `vflowPortLabel`                                                    | Text next to a port                                            |
-| `VflowStatus`                                         | `[vflowStatus]="'warning'" [vflowStatusBusy]="true"`                | Application status tone, text and optional activity            |
-| `VflowDiagnostic`                                     | `[vflowDiagnostic]="'danger'"`                                      | Model diagnostic; independent from status and selection        |
+| `VflowStatus`                                         | `[vflowStatus]="'warning'" [vflowStatusBusy]="true"`                | Indicator: semantic tone, your text and optional activity      |
 | `VflowEdge`                                           | `vflowEdge` on an SVG path                                          | Stroke; bind core path and marker URLs yourself                |
 | `VflowEdgeLabel`                                      | `vflowEdgeLabel`                                                    | HTML label surface, including optional native controls         |
 | `VflowContainer`                                      | `vflowContainer`                                                    | Frame; parent relationships remain explicit in graph data      |

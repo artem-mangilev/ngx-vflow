@@ -13,7 +13,7 @@ export {
 } from './lib/node.directive';
 export { VflowField, VflowFieldName, VflowFieldMeta } from './lib/field.directive';
 export { VflowPort, VflowPortLabel } from './lib/port.directive';
-export { VflowStatus, VflowDiagnostic, VflowTone } from './lib/indicator.directive';
+export { VflowStatus, VflowTone } from './lib/indicator.directive';
 export { VflowEdge, VflowEdgeLabel } from './lib/edge.directive';
 export { VflowContainer, VflowContainerTitle, VflowContainerBody } from './lib/container.directive';
 export { VflowToolbar, VflowExternalLabel } from './lib/overlay.directive';
@@ -34,7 +34,7 @@ import {
 } from './lib/node.directive';
 import { VflowField, VflowFieldName, VflowFieldMeta } from './lib/field.directive';
 import { VflowPort, VflowPortLabel } from './lib/port.directive';
-import { VflowStatus, VflowDiagnostic } from './lib/indicator.directive';
+import { VflowStatus } from './lib/indicator.directive';
 import { VflowEdge, VflowEdgeLabel } from './lib/edge.directive';
 import { VflowContainer, VflowContainerTitle, VflowContainerBody } from './lib/container.directive';
 import { VflowToolbar, VflowExternalLabel } from './lib/overlay.directive';
@@ -60,7 +60,6 @@ export const VflowUi = [
   VflowPort,
   VflowPortLabel,
   VflowStatus,
-  VflowDiagnostic,
   VflowEdge,
   VflowEdgeLabel,
   VflowContainer,

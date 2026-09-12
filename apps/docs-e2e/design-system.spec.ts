@@ -28,9 +28,8 @@ test('consumer DOM, scoped themes, selection and native workflow actions', async
   await review.locator('header').click();
   await expect(review).toHaveAttribute('data-vui-selected', 'true');
   // Selection, application status and a model diagnostic are visible at the same time.
-  await expect(review.locator('.vui-status')).toHaveText('Waiting');
-  await expect(review.locator('.vui-diagnostic')).toHaveText('Above limit');
-  await expect(review.locator('.vui-diagnostic')).toBeVisible();
+  await expect(review.locator('.vui-status')).toHaveText(['Waiting', 'Above limit']);
+  await expect(review.locator('.vui-status').nth(1)).toHaveAttribute('data-tone', 'warning');
   await expect(workflow.locator('.vflow-toolbar .vui-toolbar')).toBeAttached();
   await expect(workflow.getByRole('button', { name: 'Details of Finance review', exact: true })).toBeVisible();
   // Activity is presentation only: the busy node keeps its action enabled.
@@ -48,7 +47,7 @@ test('consumer DOM, scoped themes, selection and native workflow actions', async
   await approve.focus();
   await expect(approve).toBeFocused();
   await page.keyboard.press('Enter');
-  await expect(review.locator('.vui-status')).toHaveText('Approved');
+  await expect(review.locator('.vui-status').first()).toHaveText('Approved');
   await expect(approve).toBeDisabled();
   await expect(review).toHaveAttribute('data-vui-selected', 'true');
   await workflow.getByLabel('Dark theme', { exact: true }).check();

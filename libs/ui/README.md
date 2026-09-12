@@ -16,7 +16,7 @@ component. They style your own HTML/SVG, without adding wrappers or depending on
     <div vflowNodeBody>Your content and controls</div>
     <footer vflowNodeFooter>
       <span vflowStatus="warning">Waiting for approval</span>
-      <span vflowDiagnostic="danger">Missing PO</span>
+      <span vflowStatus="danger">Missing PO</span>
       <span vflowNodeActions><button vflowButton type="button">Approve</button></span>
     </footer>
   </article>
@@ -27,7 +27,7 @@ Include `@vflow/ui/styles.css` in your application's global styles. CSS is built
 with `vui:`-prefixed utilities, and includes no Preflight. Consumers need no Tailwind build step.
 Presentation rules use the `vui` cascade layer; unlayered application styles override them.
 
-The package includes card anatomy, field rows, port visuals, status and diagnostic indicators,
+The package includes card anatomy, field rows, port visuals, status indicators,
 SVG edge strokes, HTML labels, toolbar surfaces, external labels, container frames,
 BPMN event/gateway outlines, theme and selection directives.
 For flow interaction compose them with core `selectable`, `handle`, `customTemplateEdge`
