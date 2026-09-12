@@ -26,6 +26,8 @@ import { TransformNodeComponent } from './components/transform-node.component';
           [attr.stroke-width]="2.5"
           [attr.stroke]="'#8b5cf6'"
           [attr.marker-end]="ctx.markerEnd()" />
+      } @else {
+        <svg:g docsEdge [ctx]="ctx" />
       }
     </ng-template>
 

@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, viewChild } from '@angular/core';
+import { DocsPresentations } from '../../../../shared/flow-presentations';
 import { DndDropEvent, DndModule } from 'ngx-drag-drop';
 import {
   Connection,
@@ -18,7 +19,7 @@ import {
   templateUrl: './drag-and-drop-nodes-demo.component.html',
   styleUrls: ['./drag-and-drop-nodes-demo.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Vflow, DndModule],
+  imports: [DocsPresentations, Vflow, DndModule],
 })
 export class DragAndDropNodesDemoComponent {
   public vflow = viewChild.required(VflowComponent);

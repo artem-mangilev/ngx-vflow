@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, viewChild } from '@angular/core';
+import { DocsPresentations } from '../../../../shared/flow-presentations';
 import * as d3 from 'd3-force';
 import { Node, Edge, VflowComponent, Vflow, createNodes } from 'ngx-vflow';
 
@@ -6,7 +7,7 @@ import { Node, Edge, VflowComponent, Vflow, createNodes } from 'ngx-vflow';
   templateUrl: './force-layout-demo.component.html',
   styleUrls: ['./force-layout-demo.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Vflow],
+  imports: [DocsPresentations, Vflow],
 })
 export class ForceLayoutDemoComponent {
   vflow = viewChild.required(VflowComponent);
