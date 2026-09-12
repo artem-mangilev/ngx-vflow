@@ -9,6 +9,7 @@
       "@ng-doc/generated/*": ["ng-doc/docs/*"],
       // alias to production build of the library instead of building it as part of application
       "@vflow/ui": ["dist/libs/ui"],
+      "@vflow/ui/bpmn": ["dist/libs/ui/bpmn"],
       "ngx-vflow": ["dist/libs/ngx-vflow"],
       "ngx-vflow/testing": ["dist/libs/ngx-vflow/testing"]
     }

@@ -6,7 +6,10 @@
     "declaration": true,
     "declarationMap": true,
     "inlineSources": true,
-    "types": []
+    "types": [],
+    "paths": {
+      "ngx-vflow": ["dist/libs/ngx-vflow"]
+    }
   },
   "exclude": ["**/*.spec.ts"]
 }

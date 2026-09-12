@@ -39,3 +39,14 @@ vflow {
   color: var(--vui-muted);
   font-size: 12px;
 }
+
+.stage {
+  position: relative;
+}
+.stage-controls {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  /* Above the flow pane, which owns pointer events at z-index 1. */
+  z-index: 2;
+}

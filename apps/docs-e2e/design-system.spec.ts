@@ -21,6 +21,7 @@ test('consumer DOM, scoped themes, selection and native workflow actions', async
   const workflow = page.locator('app-ui-workflow-demo');
   await expect(workflow.locator('article.vui-node')).toHaveCount(4);
   await expect(workflow.locator('path.vui-edge')).toHaveCount(3);
+  await expect(workflow.locator('.vflow-edge-labels-layer .vui-edge-label')).toHaveCount(4);
   await expect(workflow.locator('article.vui-node').first()).toHaveCSS('background-color', 'rgb(255, 255, 255)');
   // Directives add classes to the consumer article/header, without injecting wrapper elements.
   await expect(workflow.locator('article > header.vui-node-header')).toHaveCount(4);
@@ -122,18 +123,44 @@ test('field connections follow stable IDs through rename, reorder, density and r
   await demo.screenshot({ path: testInfo.outputPath('entities.png') });
 });
 
-test('BPMN outlines, lane frames and core selection render in both themes', async ({ page }, testInfo) => {
+test('BPMN subset: pools with own message flows, lanes, gateways, flow kinds and themes', async ({
+  page,
+}, testInfo) => {
   await page.goto('/design-system/bpmn');
   const demo = page.locator('app-ui-bpmn-demo');
   await demo.scrollIntoViewIfNeeded();
-  await expect(demo.locator('.vui-container')).toHaveCount(2);
-  await expect(demo.locator('.vui-container > .vui-title')).toHaveText(['Operations', 'Finance']);
-  await expect(demo.locator('.vui-external-label')).toHaveCount(4);
+  await expect(demo.locator('.vui-bpmn-pool')).toHaveCount(2);
+  await expect(demo.locator('.vui-bpmn-lane')).toHaveCount(2);
+  await expect(demo.locator('.vui-bpmn-task')).toHaveCount(4);
   await expect(demo.locator('.vui-bpmn-event')).toHaveCount(3);
-  await expect(demo.locator('path.vui-edge')).toHaveCount(7);
+  await expect(demo.locator('.vui-bpmn-gateway[data-gateway="exclusive"]')).toHaveCount(1);
+  await expect(demo.locator('.vui-bpmn-gateway[data-gateway="parallel"]')).toHaveCount(1);
+  await expect(demo.locator('.vui-external-label')).toHaveCount(5);
+  await expect(demo.locator('path.vui-bpmn-flow[data-flow="sequence"]')).toHaveCount(9);
+  await expect(demo.locator('path.vui-bpmn-flow[data-flow="message"]')).toHaveCount(2);
+  await expect(demo.locator('path.vui-bpmn-flow[data-flow="association"]')).toHaveCount(1);
+  await expect(demo.locator('path.vui-bpmn-flow[data-flow="message"]').first()).toHaveCSS(
+    'stroke-dasharray',
+    '8px, 5px',
+  );
   await expect(demo.locator('[data-event="intermediate"]')).toHaveCSS('border-top-style', 'double');
   await expect(demo.locator('[data-event="end"]')).toHaveCSS('border-top-width', '5px');
-  const gateway = demo.locator('.vui-bpmn-gateway');
+  // The supplier pool is a container that takes part in flows through its own handles.
+  const pool = demo.locator('.vui-bpmn-pool').first();
+  await expect(pool.locator('.handle .vui-port')).toHaveCount(2);
+  const messageEndpoint = () =>
+    demo.evaluate((root) => {
+      const edge = root.querySelector<SVGPathElement>('path.vui-bpmn-flow[data-flow="message"]')!;
+      // The pool's second bottom handle is its message source; the first one receives messages.
+      const source = root
+        .querySelector('.vui-bpmn-pool')!
+        .querySelectorAll('.handle--bottom .vui-port')[1]
+        .getBoundingClientRect();
+      const start = edge.getPointAtLength(0).matrixTransform(edge.getScreenCTM()!);
+      return Math.max(Math.abs(start.x - source.x - source.width / 2), Math.abs(start.y - source.bottom));
+    });
+  await expect.poll(messageEndpoint).toBeLessThan(1.5);
+  const gateway = demo.locator('.vui-bpmn-gateway').first();
   await gateway.click();
   await expect(gateway).toHaveAttribute('data-vui-selected', 'true');
   await expect(gateway).toHaveCSS('transform', 'none');
@@ -141,7 +168,89 @@ test('BPMN outlines, lane frames and core selection render in both themes', asyn
   await expect(demo.locator('[data-event="start"]')).toHaveCSS('background-color', 'rgb(27, 40, 59)');
   await demo.screenshot({ path: testInfo.outputPath('bpmn.png') });
   await page.emulateMedia({ forcedColors: 'active' });
-  await expect(demo.locator('path.vui-edge').first()).toHaveCSS('stroke', 'rgb(0, 0, 0)');
+  await expect(demo.locator('path.vui-bpmn-flow').first()).toHaveCSS('stroke', 'rgb(0, 0, 0)');
+});
+
+test('viewport controls drive the given flow within its zoom limits, and edge labels follow geometry', async ({
+  page,
+}) => {
+  await page.goto('/design-system/workflow');
+  const workflow = page.locator('app-ui-workflow-demo');
+  const controls = workflow.getByRole('group', { name: 'Viewport controls' });
+  const zoomIn = controls.getByRole('button', { name: 'Zoom in', exact: true });
+  const zoomOut = controls.getByRole('button', { name: 'Zoom out', exact: true });
+  const zoom = () =>
+    workflow.locator('.vflow-viewport').evaluate((element) => {
+      const match = /scale\(([^)]+)\)/.exec(element.style.transform);
+      return match ? Number(match[1]) : 1;
+    });
+  await expect(controls.getByRole('button', { name: 'Reset demo', exact: true })).toBeVisible();
+  const initial = await zoom();
+  await zoomIn.click();
+  await expect.poll(zoom).toBeGreaterThan(initial);
+  for (let index = 0; index < 8 && (await zoom()) < 2 - 1e-6; index += 1) {
+    const previous = await zoom();
+    await zoomIn.click();
+    await expect.poll(zoom).toBeGreaterThan(previous);
+  }
+  await expect.poll(zoom).toBeCloseTo(2, 5);
+  await expect(zoomIn).toBeDisabled();
+  await controls.getByRole('button', { name: 'Fit view', exact: true }).click();
+  await expect(zoomIn).toBeEnabled();
+  for (let index = 0; index < 8 && (await zoom()) > 0.5 + 1e-6; index += 1) {
+    const previous = await zoom();
+    await zoomOut.click();
+    await expect.poll(zoom).toBeLessThan(previous);
+  }
+  await expect.poll(zoom).toBeCloseTo(0.5, 5);
+  await expect(zoomOut).toBeDisabled();
+  await controls.getByRole('button', { name: 'Fit view', exact: true }).click();
+  await expect(zoomOut).toBeEnabled();
+
+  // Start, center and end labels of one edge sit on its path and move with the target node.
+  const labels = ['review', 'Approved', 'accounting'];
+  const labelDistance = () =>
+    workflow.evaluate((root, names) => {
+      const edge = root.querySelectorAll<SVGPathElement>('path.vui-edge')[1];
+      const matrix = edge.getScreenCTM()!;
+      const total = edge.getTotalLength();
+      return names.map((name) => {
+        const rect = root.querySelector(`[data-label="${name}"]`)!.getBoundingClientRect();
+        const center = { x: rect.x + rect.width / 2, y: rect.y + rect.height / 2 };
+        let best = Infinity;
+        for (let length = 0; length <= total; length += 2) {
+          const point = edge.getPointAtLength(length).matrixTransform(matrix);
+          best = Math.min(best, Math.hypot(point.x - center.x, point.y - center.y));
+        }
+        return { name, best, x: center.x, y: center.y };
+      });
+    }, labels);
+  // Fit view animates; wait for the camera to settle before dragging in screen coordinates.
+  const viewportTransform = () => workflow.locator('.vflow-viewport').evaluate((element) => element.style.transform);
+  await expect
+    .poll(async () => {
+      const first = await viewportTransform();
+      await page.waitForTimeout(150);
+      return first === (await viewportTransform());
+    })
+    .toBe(true);
+  const before = await labelDistance();
+  for (const label of before) expect(label.best, label.name).toBeLessThan(2);
+  const paid = workflow.locator('article').filter({ hasText: 'Schedule payment' });
+  const wrapper = paid.locator('xpath=ancestor::*[contains(@class, "vflow-node")][1]');
+  const position = () => wrapper.evaluate((element: HTMLElement) => element.style.transform);
+  const start = await position();
+  // Center the node: the docs header is sticky and would cover an element scrolled to the top edge.
+  await paid.evaluate((element) => element.scrollIntoView({ block: 'center' }));
+  const box = (await paid.locator('header').boundingBox())!;
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(box.x + box.width / 2 + 60, box.y + box.height / 2 + 90, { steps: 10 });
+  await page.mouse.up();
+  await expect.poll(position).not.toBe(start);
+  const after = await labelDistance();
+  for (const label of after) expect(label.best, label.name).toBeLessThan(2);
+  expect(after.map((label) => label.y)).not.toEqual(before.map((label) => label.y));
 });
 
 test('themes stay scoped per editor, reach every layer and leave core-only flows and geometry alone', async ({

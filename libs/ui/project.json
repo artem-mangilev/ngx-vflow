@@ -24,7 +24,8 @@
           ]
         }
       },
-      "defaultConfiguration": "production"
+      "defaultConfiguration": "production",
+      "dependsOn": ["^build"]
     },
     "lint": {
       "executor": "@angular-eslint/builder:lint",
