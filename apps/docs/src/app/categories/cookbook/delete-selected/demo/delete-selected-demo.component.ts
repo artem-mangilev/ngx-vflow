@@ -31,13 +31,11 @@ export class DeleteSelectedDemoComponent {
       id: '1 -> 2',
       source: '1',
       target: '2',
-      type: 'template',
     },
     {
       id: '1 -> 3',
       source: '1',
       target: '3',
-      type: 'template',
     },
   ];
 

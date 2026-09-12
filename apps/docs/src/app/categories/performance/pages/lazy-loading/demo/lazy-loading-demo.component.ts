@@ -1,15 +1,21 @@
 import { ChangeDetectionStrategy, Component, effect, signal, untracked, viewChild } from '@angular/core';
+import { DocsPresentations } from '../../../../../shared/flow-presentations';
 import { Edge, Node, Vflow, VflowComponent, createNodes } from 'ngx-vflow';
 
 @Component({
   template: `
     <button (click)="nextNode()">Go To Next Node</button>
 
-    <vflow view="auto" [nodes]="nodes" [edges]="edges" [optimization]="{ lazyLoadTrigger: 'viewport' }" />
+    <vflow view="auto" [nodes]="nodes" [edges]="edges" [optimization]="{ lazyLoadTrigger: 'viewport' }">
+      <ng-template let-ctx nodeHtml><docs-node [ctx]="ctx" /></ng-template>
+      <ng-template let-ctx groupNode><docs-group [ctx]="ctx" /></ng-template>
+      <ng-template let-ctx edge><svg:g docsEdge [ctx]="ctx" /></ng-template>
+      <ng-template let-ctx edgeLabelHtml><docs-edge-label [ctx]="ctx" /></ng-template>
+    </vflow>
   `,
   styleUrls: ['./lazy-loading-demo.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Vflow],
+  imports: [DocsPresentations, Vflow],
 })
 export class LazyLoadingDemoComponent {
   protected vflow = viewChild.required(VflowComponent);

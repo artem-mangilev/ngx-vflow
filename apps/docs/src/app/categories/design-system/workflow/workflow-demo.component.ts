@@ -210,17 +210,15 @@ export class WorkflowDemoComponent {
       id: 'received-review',
       source: 'received',
       target: 'review',
-      type: 'template',
       curve: 'smooth-step',
-      markers: { end: { color: 'var(--vui-muted)' } },
+      markers: { end: {} },
     },
     {
       id: 'review-paid',
       source: 'review',
       target: 'paid',
-      type: 'template',
       curve: 'smooth-step',
-      markers: { end: { color: 'var(--vui-muted)' } },
+      markers: { end: {} },
       // Labels at the start, center and end of the same edge follow its geometry.
       edgeLabels: {
         start: { type: 'html-template', data: { kind: 'meta', text: 'review' } },
@@ -232,9 +230,8 @@ export class WorkflowDemoComponent {
       id: 'review-fix',
       source: 'review',
       target: 'fix',
-      type: 'template',
       curve: 'smooth-step',
-      markers: { end: { color: 'var(--vui-muted)' } },
+      markers: { end: {} },
       edgeLabels: { center: { type: 'html-template', data: { kind: 'label', text: 'Needs changes' } } },
     },
   ]);

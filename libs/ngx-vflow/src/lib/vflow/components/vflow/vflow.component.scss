@@ -16,6 +16,7 @@
 .vflow-root {
   position: relative;
   overflow: hidden;
+  background-color: var(--vflow-background, #fff);
 }
 
 .vflow-a11y-live {

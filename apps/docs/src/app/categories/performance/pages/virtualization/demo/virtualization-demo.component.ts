@@ -1,11 +1,12 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { DocsPresentations } from '../../../../../shared/flow-presentations';
 import { Edge, Node, StaticNode, Vflow, createNodes } from 'ngx-vflow';
 
 @Component({
   templateUrl: './virtualization-demo.component.html',
   styleUrls: ['./virtualization-demo.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Vflow],
+  imports: [DocsPresentations, Vflow],
 })
 export class VirtualizationDemoComponent {
   public nodes: Node[] = [];
@@ -28,9 +29,9 @@ export function initialElements(xNodes = 10, yNodes = 10): { nodes: Node[]; edge
   for (let y = 0; y < yNodes; y++) {
     for (let x = 0; x < xNodes; x++) {
       nodes.push({
-        type: 'default',
+        type: 'html-template',
         id: `stress-${nodeId}`,
-        text: `Node ${nodeId}`,
+        data: { text: `Node ${nodeId}` },
         point: { x: x * 150, y: y * 100 },
       });
 

@@ -1,8 +1,13 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { DocsPresentations } from '../../../../shared/flow-presentations';
 import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
 
 @Component({
   template: `<vflow view="auto" [nodes]="nodes" [edges]="edges">
+    <ng-template let-ctx nodeHtml><docs-node [ctx]="ctx" /></ng-template>
+    <ng-template let-ctx groupNode><docs-group [ctx]="ctx" /></ng-template>
+    <ng-template let-ctx edgeLabelHtml><docs-edge-label [ctx]="ctx" /></ng-template>
+
     <ng-template let-ctx edge>
       <svg:g customTemplateEdge selectable>
         <svg:path
@@ -23,27 +28,27 @@ import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
     `,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Vflow],
+  imports: [DocsPresentations, Vflow],
 })
 export class CustomEdgesDemoComponent {
   public nodes: Node[] = createNodes([
     {
       id: '1',
       point: { x: 10, y: 200 },
-      type: 'default',
-      text: '1',
+      type: 'html-template',
+      data: { text: '1' },
     },
     {
       id: '2',
       point: { x: 200, y: 100 },
-      type: 'default',
-      text: '2',
+      type: 'html-template',
+      data: { text: '2' },
     },
     {
       id: '3',
       point: { x: 200, y: 300 },
-      type: 'default',
-      text: '3',
+      type: 'html-template',
+      data: { text: '3' },
     },
   ]);
 
@@ -52,9 +57,8 @@ export class CustomEdgesDemoComponent {
       id: '1 -> 2',
       source: '1',
       target: '2',
-      type: 'template',
       data: signal({
-        strokeWidth: 4,
+        strokeWidth: 3,
         color: '#ffeeaa',
       }),
       markers: signal({
@@ -62,7 +66,6 @@ export class CustomEdgesDemoComponent {
           type: 'arrow-closed',
           width: 30,
           height: 30,
-          color: '#ffeeaa',
         },
       }),
     },
@@ -70,7 +73,6 @@ export class CustomEdgesDemoComponent {
       id: '1 -> 3',
       source: '1',
       target: '3',
-      type: 'template',
       data: signal({
         strokeWidth: 2,
         color: '#ec586e',

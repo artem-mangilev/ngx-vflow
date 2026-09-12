@@ -1,10 +1,14 @@
 <vflow view="auto" [nodes]="nodes" [edges]="edges">
   <ng-template let-ctx nodeHtml>
-    <div class="custom-node" [class.custom-node_selected]="ctx.selected()">
-      <button class="custom-node__button" selectable>Select here</button>
+    @if (ctx.data()?.text) {
+      <docs-node [ctx]="ctx" />
+    } @else {
+      <div class="custom-node" [class.custom-node_selected]="ctx.selected()">
+        <button class="custom-node__button" selectable>Select here</button>
 
-      <handle type="source" position="right" />
-    </div>
+        <handle type="source" position="right" />
+      </div>
+    }
   </ng-template>
 
   <ng-template let-ctx edge>

@@ -4,7 +4,7 @@ keyword: 'FeaturesSubflows'
 
 A subflow is a node that can contain child nodes. Key things about subflows:
 
-- Any node type may be a parent node. The `default-group` and `template-group` types provide dedicated group presentation but are not required for the parent relationship.
+- Any node type may be a parent node. The `template-group` type provides a group presentation through your `groupNode` template but is not required for the parent relationship.
 - To associate a node with a subflow, set the `parentId` to the ID of the subflow.
 - Nodes within a subflow have coordinates _relative_ to that subflow.
 - A parent node retains the connection behavior of its node type; `template-group` is the group type that can expose handles.
@@ -14,5 +14,4 @@ A subflow is a node that can contain child nodes. Key things about subflows:
 
 ## See also
 
-- `DefaultGroupNode`
 - `TemplateGroupNode`

@@ -2,6 +2,96 @@
 
 Angular 20 is now the minimum supported version. Upgrade Angular before installing ngx-vflow v3.
 
+### Headless core: default presentations removed
+
+Core no longer ships ready-made node, group, edge or label presentations. It keeps geometry, hit targets,
+accessibility, focus, selection feedback, the connection preview, basic handles and resize controls. Every
+graph needs templates. There are two working paths:
+
+**Path A: your own templates on the headless core**
+
+{% raw %}
+
+```html
+<vflow [nodes]="nodes" [edges]="edges">
+  <ng-template let-ctx nodeHtml>
+    <div class="card" selectable>
+      {{ ctx.data().title }}
+      <handle type="target" position="left" />
+      <handle type="source" position="right" />
+    </div>
+  </ng-template>
+  <ng-template let-ctx groupNode>
+    <div class="frame" [style.width.px]="ctx.width()" [style.height.px]="ctx.height()"></div>
+  </ng-template>
+  <ng-template let-ctx edge>
+    <svg:g customTemplateEdge selectable>
+      <svg:path class="line" [attr.d]="ctx.path()" [attr.marker-end]="ctx.markerEnd()" />
+    </svg:g>
+  </ng-template>
+  <ng-template let-ctx edgeLabelHtml><span>{{ ctx.label.data }}</span></ng-template>
+</vflow>
+```
+
+{% endraw %}
+
+**Path B: presentations from `@vflow/ui`**
+
+{% raw %}
+
+```html
+<section vflowTheme="light">
+  <vflow [nodes]="nodes" [edges]="edges">
+    <ng-template let-ctx nodeHtml>
+      <article vflowNode selectable [vflowSelected]="ctx.selected() || ctx.preselected()">
+        <header vflowNodeHeader><span vflowTitle>{{ ctx.data().title }}</span></header>
+        <handle type="target" position="left" [template]="port" />
+        <handle type="source" position="right" [template]="port" />
+      </article>
+    </ng-template>
+    <ng-template let-ctx edge>
+      <svg:g customTemplateEdge selectable>
+        <svg:path vflowEdge [attr.d]="ctx.path()" [attr.marker-end]="ctx.markerEnd()" [vflowSelected]="ctx.selected()" />
+      </svg:g>
+    </ng-template>
+    <ng-template let-ctx edgeLabelHtml><span vflowEdgeLabel>{{ ctx.label.data }}</span></ng-template>
+  </vflow>
+  <ng-template #port let-ctx handle><span vflowPort [vflowPortState]="ctx.state()"></span></ng-template>
+</section>
+```
+
+{% endraw %}
+
+Include `@vflow/ui/styles.css` in your global styles for path B. See the Design system section for the parts.
+
+| Removed                                                                  | Replacement                                                                                                                                                         |
+| ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Node `type: 'default'`, `text`                                           | `type: 'html-template'` with `data` and a `nodeHtml` template; standard handles become `<handle>` elements in the template. Use `ariaLabel` for the accessible name |
+| Node `type: 'default-group'`, `color`, `resizable`                       | `type: 'template-group'` with a `groupNode` template; put `resizable` on the template's element                                                                     |
+| `DefaultNode`, `DefaultGroupNode`, `isDefaultNode`, `isDefaultGroupNode` | `HtmlTemplateNode`, `TemplateGroupNode`, `isTemplateNode`, `isTemplateGroupNode`                                                                                    |
+| Edge `type` (`'default'` / `'template'`)                                 | Removed; every edge renders through the `edge` template                                                                                                             |
+| `EdgeLabel` `type: 'default'`, `text`, `style`                           | `type: 'html-template'` with `data` and an `edgeLabelHtml` template                                                                                                 |
+| `Marker.color`, `Marker.strokeWidth`                                     | Markers follow the edge stroke (`context-stroke`); style `.vflow-marker` or define your own marker                                                                  |
+| Connection `type: 'default'` preview                                     | Unchanged: the default connection line and the `connection` template both remain                                                                                    |
+
+### Appearance inputs removed
+
+Colors are CSS. Core reads the tokens `--vflow-background`, `--vflow-surface`, `--vflow-foreground`,
+`--vflow-muted`, `--vflow-border`, `--vflow-selection` and `--vflow-focus`, each with a built-in default.
+Set them on the `vflow` element or any ancestor; a `vflowTheme` scope from `@vflow/ui` maps its theme onto them.
+
+| Removed input                                        | Replacement                                                                                  |
+| ---------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| `[background]="'#fff'"` / `{ type: 'solid', color }` | `--vflow-background` token; `[background]` now takes only `dots`, `grid` or `image` patterns |
+| Dots/grid `color`, `backgroundColor`                 | `--vflow-muted` and `--vflow-background`; the `.vflow-background-pattern` class              |
+| `resizerColor`, resize control `color`               | `--vflow-selection`, `--vflow-surface`; `.resize-control.handle` / `.resize-control.line`    |
+| `mini-map` `maskColor`, `strokeColor`                | `--vflow-muted` (mask) and `--vflow-border` (frame); the minimap samples the resolved tokens |
+| `alignmentHelper.lineColor`                          | `--vflow-foreground`; `.vflow-alignment-line`. `tolerance` stays                             |
+| `selectionBox.color`                                 | `--vflow-selection`; `.selection-box`. `mode` stays                                          |
+
+Behavior parameters are untouched: node points, sizes, `extent`, resize constraints, drag thresholds,
+snap grid, zoom limits, curves, handle offsets and connection validation keep their APIs.
+
 Version 3 renders node-facing templates as native HTML in a CSS-transformed viewport. Edges and connection overlays still use SVG. The existing `groupNode`, handle `[template]`, and `[resizable]` names are unchanged, but SVG content passed to these APIs is no longer supported. The library does not inspect template roots or provide a compatibility fallback, so these templates must be rewritten explicitly.
 
 ### Reparenting identity
@@ -121,8 +211,8 @@ Documented Angular APIs, CSS classes, and observable behavior remain supported c
 | Type guards / helpers          | `isComponentStaticNode` and `isComponentDynamicNode` → `isComponentNode`.                 | Replace both old checks with `isComponentNode`.                                                                                                             | One unified type guard.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 | Type guards / helpers          | `isTemplateStaticNode` and `isTemplateDynamicNode` → `isTemplateNode`.                    | Replace both old checks with `isTemplateNode`.                                                                                                              | One unified type guard.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 | Type guards / helpers          | `isSvgTemplateStaticNode` and `isSvgTemplateDynamicNode` → `isSvgTemplateNode`.           | Replace both old checks with `isSvgTemplateNode`.                                                                                                           | One unified type guard.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| Type guards / helpers          | `isDefaultStaticNode` and `isDefaultDynamicNode` → `isDefaultNode`.                       | Replace both old checks with `isDefaultNode`.                                                                                                               | One unified type guard.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| Type guards / helpers (groups) | `isDefaultStaticGroupNode` and `isDefaultDynamicGroupNode` → `isDefaultGroupNode`.        | Replace both old checks with `isDefaultGroupNode`.                                                                                                          | One unified type guard.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| Type guards / helpers          | `isDefaultStaticNode` and `isDefaultDynamicNode` → removed with default nodes.            | Use `isTemplateNode` for template nodes.                                                                                                                    | Default nodes no longer exist.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| Type guards / helpers (groups) | `isDefaultStaticGroupNode` and `isDefaultDynamicGroupNode` → removed with default groups. | Use `isTemplateGroupNode`.                                                                                                                                  | Default groups no longer exist.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 | Type guards / helpers (groups) | `isTemplateStaticGroupNode` and `isTemplateDynamicGroupNode` → `isTemplateGroupNode`.     | Replace both old checks with `isTemplateGroupNode`.                                                                                                         | One unified type guard.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 
 ## Migration to >= v1.0

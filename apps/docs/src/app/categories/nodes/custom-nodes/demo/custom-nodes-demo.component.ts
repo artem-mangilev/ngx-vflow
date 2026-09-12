@@ -1,8 +1,13 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { DocsPresentations } from '../../../../shared/flow-presentations';
 import { Node, Edge, Vflow, createNodes } from 'ngx-vflow';
 
 @Component({
   template: `<vflow view="auto" [nodes]="nodes" [edges]="edges">
+    <ng-template let-ctx groupNode><docs-group [ctx]="ctx" /></ng-template>
+    <ng-template let-ctx edge><svg:g docsEdge [ctx]="ctx" /></ng-template>
+    <ng-template let-ctx edgeLabelHtml><docs-edge-label [ctx]="ctx" /></ng-template>
+
     <ng-template let-ctx nodeHtml>
       <div class="custom-node" selectable [class.custom-node_selected]="ctx.selected()">
         {{ ctx.data().text }}
@@ -36,7 +41,7 @@ import { Node, Edge, Vflow, createNodes } from 'ngx-vflow';
     `,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Vflow],
+  imports: [DocsPresentations, Vflow],
 })
 export class CustomNodesDemoComponent {
   public nodes: Node[] = createNodes([
@@ -52,8 +57,8 @@ export class CustomNodesDemoComponent {
     {
       id: '2',
       point: { x: 250, y: 250 },
-      type: 'default',
-      text: 'Default',
+      type: 'html-template',
+      data: { text: 'Default' },
     },
   ]);
 

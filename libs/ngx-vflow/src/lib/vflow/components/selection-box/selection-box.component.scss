@@ -1,5 +1,7 @@
 .selection-box {
   pointer-events: none;
+  fill: var(--vflow-selection, #bbe1fa);
   fill-opacity: 0.12;
+  stroke: var(--vflow-selection, #bbe1fa);
   stroke-width: 1;
 }

@@ -175,7 +175,7 @@ describe('public viewport gesture settings', () => {
 
   it('keeps draggable nodes draggable while pan activation is held', async () => {
     const { createNode } = await import('../../interfaces/node.interface');
-    const node = createNode({ id: 'node', type: 'default', point: { x: 0, y: 0 } });
+    const node = createNode({ id: 'node', type: 'html-template', point: { x: 0, y: 0 } });
     fixture.componentRef.setInput('nodes', [node]);
     fixture.detectChanges();
     await fixture.whenStable();
@@ -188,7 +188,7 @@ describe('public viewport gesture settings', () => {
 
   it('leaves touch scrolling available in an opted-out draggable-node control', async () => {
     const { createNode } = await import('../../interfaces/node.interface');
-    fixture.componentRef.setInput('nodes', [createNode({ id: 'node', type: 'default', point: { x: 0, y: 0 } })]);
+    fixture.componentRef.setInput('nodes', [createNode({ id: 'node', type: 'html-template', point: { x: 0, y: 0 } })]);
     fixture.detectChanges();
     await fixture.whenStable();
     const controls = TestBed.createComponent(ControlsComponent);
@@ -239,7 +239,7 @@ describe('public viewport gesture settings', () => {
 
   it('uses the configured pane click tolerance to clear selection', async () => {
     const { createNode } = await import('../../interfaces/node.interface');
-    const node = createNode({ id: 'node', type: 'default', point: { x: 200, y: 200 }, selected: true });
+    const node = createNode({ id: 'node', type: 'html-template', point: { x: 200, y: 200 }, selected: true });
     fixture.componentRef.setInput('nodes', [node]);
     fixture.detectChanges();
     await fixture.whenStable();

@@ -157,5 +157,5 @@ Compose custom edges with `customTemplateEdge` and `selectable`, and use core ge
 exclusions such as `vflowNoDrag` for embedded controls. Do not shrink a hit area just to make
 its visual smaller. Keep status text alongside color and give icon-only buttons accessible names.
 
-This release adds opt-in presentations. Existing core default types and appearance inputs remain
-available with token-based defaults; their removal is a separate major-release step.
+Core is headless: it ships no ready-made node, group, edge or label presentation and no appearance
+inputs. Supply templates yourself or use these parts; see the migration guide in the Introduction section.

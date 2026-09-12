@@ -11,6 +11,4 @@ import { KeyValuePipe } from '@angular/common';
 })
 export class DefsComponent {
   public markers = input.required<Map<number, Marker>>();
-
-  protected readonly defaultColor = 'var(--vflow-muted, rgb(177, 177, 183))';
 }

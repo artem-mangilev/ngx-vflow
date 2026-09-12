@@ -1,8 +1,9 @@
 import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
+import { DocsPresentations } from '../../../../../shared/flow-presentations';
 import { Vflow, createEdges, createNodes } from 'ngx-vflow';
 
 @Component({
-  imports: [Vflow],
+  imports: [DocsPresentations, Vflow],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section data-testid="keyboard-demo" aria-label="Keyboard navigation example">
@@ -27,12 +28,19 @@ import { Vflow, createEdges, createNodes } from 'ngx-vflow';
         [selectionMode]="manual() ? 'manual' : 'default'"
         [optimization]="{ detachedGroupsLayer: true }"
         [ariaLabelConfig]="{ flowLabel: 'Keyboard graph' }">
-        <ng-template nodeHtml>
-          <div class="editor">
-            <label>Node title <input aria-label="Node title" vflowNoDrag /></label>
-            <button type="button" vflowNoDrag (click)="removeEditor()">Remove editor</button>
-            <handle type="target" position="left" />
-          </div>
+        <ng-template let-ctx groupNode><docs-group [ctx]="ctx" /></ng-template>
+        <ng-template let-ctx edgeLabelHtml><docs-edge-label [ctx]="ctx" /></ng-template>
+
+        <ng-template let-ctx nodeHtml>
+          @if (ctx.node.id === 'editor') {
+            <div class="editor">
+              <label>Node title <input aria-label="Node title" vflowNoDrag /></label>
+              <button type="button" vflowNoDrag (click)="removeEditor()">Remove editor</button>
+              <handle type="target" position="left" />
+            </div>
+          } @else {
+            <docs-node [ctx]="ctx" />
+          }
         </ng-template>
         <ng-template let-context edge>
           <svg:g customTemplateEdge selectable>
@@ -87,10 +95,17 @@ export class KeyboardNavigationDemoComponent {
   protected manual = signal(false);
   protected nodes = signal(
     createNodes([
-      { id: 'draft', type: 'default', parentId: 'stage', point: { x: 20, y: 30 }, text: 'Draft' },
+      {
+        id: 'draft',
+        ariaLabel: 'Draft',
+        type: 'html-template',
+        parentId: 'stage',
+        point: { x: 20, y: 30 },
+        data: { text: 'Draft' },
+      },
       {
         id: 'stage',
-        type: 'default-group',
+        type: 'template-group',
         point: { x: 20, y: 20 },
         width: 260,
         height: 180,
@@ -100,20 +115,29 @@ export class KeyboardNavigationDemoComponent {
       },
       {
         id: 'decoration',
-        type: 'default',
+        type: 'html-template',
         point: { x: 20, y: 240 },
-        text: 'Decoration',
+        data: { text: 'Decoration' },
+        ariaLabel: 'Decoration',
         focusable: false,
         selectable: false,
       },
       { id: 'editor', type: 'html-template', point: { x: 330, y: 40 }, ariaLabel: 'Editor' },
-      { id: 'later', type: 'default', point: { x: 1000, y: 80 }, text: 'Later', width: 100, height: 50 },
+      {
+        id: 'later',
+        type: 'html-template',
+        point: { x: 1000, y: 80 },
+        data: { text: 'Later' },
+        ariaLabel: 'Later',
+        width: 100,
+        height: 50,
+      },
     ]),
   );
   protected edges = signal(
     createEdges([
       { id: 'next', source: 'draft', target: 'later', ariaLabel: 'Next step' },
-      { id: 'edit', source: 'draft', target: 'editor', ariaLabel: 'Edit route', type: 'template' },
+      { id: 'edit', source: 'draft', target: 'editor', ariaLabel: 'Edit route' },
     ]),
   );
   protected selected = computed(() =>

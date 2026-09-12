@@ -1,6 +1,6 @@
 import { computed, inject, signal } from '@angular/core';
 import { EdgeLabel, EdgeLabelPosition } from '../interfaces/edge-label.interface';
-import { Edge, Curve, EdgeType, EDGE_DEFAULTS } from '../interfaces/edge.interface';
+import { Edge, Curve, EDGE_DEFAULTS } from '../interfaces/edge.interface';
 import { EdgeLabelModel } from './edge-label.model';
 import { NodeModel } from './node.model';
 import { getStraightPath } from '../math/edge-path/straigh-path';
@@ -52,7 +52,6 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
   public source = signal<NodeModel | undefined>(undefined);
   public target = signal<NodeModel | undefined>(undefined);
   public curve = signal<Curve>(EDGE_DEFAULTS.curve);
-  public type: EdgeType;
   public reconnectable = signal<boolean | 'source' | 'target'>(EDGE_DEFAULTS.reconnectable);
   public floating = signal(EDGE_DEFAULTS.floating);
   public markers = signal<{ start?: Marker; end?: Marker }>(EDGE_DEFAULTS.markers);
@@ -243,8 +242,6 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
   });
 
   constructor(public edge: Edge) {
-    this.type = edge.type ?? EDGE_DEFAULTS.type;
-
     if (edge.curve) {
       this.curve = edge.curve;
     }

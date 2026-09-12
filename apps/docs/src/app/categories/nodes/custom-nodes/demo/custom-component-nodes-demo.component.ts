@@ -1,11 +1,17 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { DocsPresentations } from '../../../../shared/flow-presentations';
 import { NgDocNotifyService } from '@ng-doc/ui-kit';
 import { ComponentNodeEvent, Edge, Node, Vflow, createNodes } from 'ngx-vflow';
 import { BlueSquareNodeComponent, BlueSquareData } from './components/blue-square-node.component';
 import { RedSquareNodeComponent, RedSquareData } from './components/red-square-node.component';
 
 @Component({
-  template: `<vflow view="auto" [nodes]="nodes" [edges]="edges" (componentNodeEvent)="handleComponentEvent($event)" />`,
+  template: `<vflow view="auto" [nodes]="nodes" [edges]="edges" (componentNodeEvent)="handleComponentEvent($event)">
+    <ng-template let-ctx nodeHtml><docs-node [ctx]="ctx" /></ng-template>
+    <ng-template let-ctx groupNode><docs-group [ctx]="ctx" /></ng-template>
+    <ng-template let-ctx edge><svg:g docsEdge [ctx]="ctx" /></ng-template>
+    <ng-template let-ctx edgeLabelHtml><docs-edge-label [ctx]="ctx" /></ng-template>
+  </vflow>`,
   styles: [
     `
       :host {
@@ -15,7 +21,7 @@ import { RedSquareNodeComponent, RedSquareData } from './components/red-square-n
     `,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Vflow],
+  imports: [DocsPresentations, Vflow],
 })
 export class CustomComponentNodesDemoComponent {
   private notifyService = inject(NgDocNotifyService);

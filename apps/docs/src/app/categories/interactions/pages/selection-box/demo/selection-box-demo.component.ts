@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
+import { DocsPresentations } from '../../../../../shared/flow-presentations';
 import { Edge, Node, SelectionBoxMode, SelectionBoxSettings, Vflow, createNodes } from 'ngx-vflow';
 
 @Component({
@@ -9,7 +10,12 @@ import { Edge, Node, SelectionBoxMode, SelectionBoxSettings, Vflow, createNodes 
       <span class="hint">Hold Shift and drag on canvas</span>
     </div>
 
-    <vflow view="auto" [nodes]="nodes" [edges]="edges" [selectionBox]="selectionBox()" />
+    <vflow view="auto" [nodes]="nodes" [edges]="edges" [selectionBox]="selectionBox()">
+      <ng-template let-ctx nodeHtml><docs-node [ctx]="ctx" /></ng-template>
+      <ng-template let-ctx groupNode><docs-group [ctx]="ctx" /></ng-template>
+      <ng-template let-ctx edge><svg:g docsEdge [ctx]="ctx" /></ng-template>
+      <ng-template let-ctx edgeLabelHtml><docs-edge-label [ctx]="ctx" /></ng-template>
+    </vflow>
   `,
   styles: [
     `
@@ -48,7 +54,7 @@ import { Edge, Node, SelectionBoxMode, SelectionBoxSettings, Vflow, createNodes 
     `,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Vflow],
+  imports: [DocsPresentations, Vflow],
 })
 export class SelectionBoxDemoComponent {
   public mode = signal<SelectionBoxMode>('full');
@@ -66,26 +72,26 @@ export class SelectionBoxDemoComponent {
     {
       id: '1',
       point: { x: 40, y: 120 },
-      type: 'default',
-      text: 'Node 1',
+      type: 'html-template',
+      data: { text: 'Node 1' },
     },
     {
       id: '2',
       point: { x: 260, y: 150 },
-      type: 'default',
-      text: 'Node 2',
+      type: 'html-template',
+      data: { text: 'Node 2' },
     },
     {
       id: '3',
       point: { x: 430, y: 95 },
-      type: 'default',
-      text: 'Node 3',
+      type: 'html-template',
+      data: { text: 'Node 3' },
     },
     {
       id: '4',
       point: { x: 360, y: 300 },
-      type: 'default',
-      text: 'Node 4',
+      type: 'html-template',
+      data: { text: 'Node 4' },
     },
   ]);
 

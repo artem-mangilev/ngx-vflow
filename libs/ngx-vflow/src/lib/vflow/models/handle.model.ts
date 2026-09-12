@@ -27,8 +27,6 @@ type HandleGeometryInput = {
   anchorPoint?: Point;
 };
 
-const DEFAULT_HANDLE_SIZE = 14;
-
 export class HandleModel {
   private viewportService = inject(ViewportService);
 
@@ -53,9 +51,6 @@ export class HandleModel {
 
   public template = this.rawHandle.template;
 
-  /** Built-in default-node handles have fixed geometry and need no DOM measurement. */
-  public readonly isStandard = this.parentNode.rawNode.type === 'default';
-
   /** Connection point relative to the node origin, in flow units. */
   private localPoint = signal<Point>({ x: 0, y: 0 });
 
@@ -76,25 +71,10 @@ export class HandleModel {
   constructor(
     public rawHandle: NodeHandle,
     public parentNode: NodeModel,
-  ) {
-    // Standard geometry is already known; waiting for a frame flashes unpositioned handles.
-    if (this.isStandard) this.sync();
-  }
+  ) {}
 
-  /**
-   * Read phase. Standard handles are derived from model dimensions; custom
-   * handles read their anchor and rendered size without changing styles.
-   */
+  /** Read phase: handles read their anchor and rendered size without changing styles. */
   public measure(nodeRect?: DOMRect): HandleGeometry | null {
-    if (this.isStandard) {
-      return computeHandleGeometry({
-        position: this.rawHandle.position,
-        nodeSize: { width: this.parentNode.width(), height: this.parentNode.height() },
-        handleSize: { width: DEFAULT_HANDLE_SIZE, height: DEFAULT_HANDLE_SIZE },
-        offset: { x: this.rawHandle.userOffsetX, y: this.rawHandle.userOffsetY },
-      });
-    }
-
     if (this.parentNode.culled()) return null;
 
     const handleElement = this.handleElement;

@@ -8,7 +8,6 @@ import { isDefined } from '../utils/is-defined';
 import { DomAttributes } from './dom-attributes.interface';
 
 export const EDGE_DEFAULTS = {
-  type: 'default' as EdgeType,
   curve: 'bezier' as Curve,
   data: {},
   edgeLabels: {},
@@ -18,12 +17,10 @@ export const EDGE_DEFAULTS = {
   selected: false,
 };
 
-export type EdgeType = 'default' | 'template';
 export type Curve = 'straight' | 'bezier' | 'smooth-step' | 'step' | CurveFactory;
 
 export interface Edge<T = unknown> extends Connection {
   id: string;
-  type?: EdgeType;
   curve?: WritableSignal<Curve>;
   data?: WritableSignal<T>;
   edgeLabels?: WritableSignal<{ [position in EdgeLabelPosition]?: EdgeLabel }>;
@@ -63,7 +60,6 @@ export function createEdge<T>(
       id: edge.id,
       source: edge.source,
       target: edge.target,
-      type: isDefined(edge.type) ? edge.type : EDGE_DEFAULTS.type,
       sourceHandle: isDefined(edge.sourceHandle) ? edge.sourceHandle : '',
       targetHandle: isDefined(edge.targetHandle) ? edge.targetHandle : '',
       curve: signal(isDefined(edge.curve) ? edge.curve : EDGE_DEFAULTS.curve),
@@ -82,7 +78,6 @@ export function createEdge<T>(
   } else {
     return {
       id: edge.id,
-      type: edge.type,
       source: edge.source,
       target: edge.target,
       sourceHandle: edge.sourceHandle,

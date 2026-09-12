@@ -9,20 +9,11 @@
     [attr.orient]="marker.value.orient ?? 'auto-start-reverse'"
     [attr.markerUnits]="marker.value.markerUnits ?? 'userSpaceOnUse'">
     @if (marker.value.type === 'arrow-closed' || !marker.value.type) {
-      <polyline
-        class="marker__arrow_closed"
-        points="-5,-4 1,0 -5,4 -5,-4"
-        [style.stroke]="marker.value.color ?? defaultColor"
-        [style.stroke-width]="marker.value.strokeWidth ?? 2"
-        [style.fill]="marker.value.color ?? defaultColor" />
+      <polyline class="vflow-marker vflow-marker--arrow-closed" points="-5,-4 1,0 -5,4 -5,-4" />
     }
 
     @if (marker.value.type === 'arrow') {
-      <polyline
-        class="marker__arrow_default"
-        points="-5,-4 0,0 -5,4"
-        [style.stroke]="marker.value.color ?? defaultColor"
-        [style.stroke-width]="marker.value.strokeWidth ?? 2" />
+      <polyline class="vflow-marker vflow-marker--arrow" points="-5,-4 0,0 -5,4" />
     }
   </svg:marker>
 }

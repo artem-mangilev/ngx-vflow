@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { DocsPresentations } from '../../../../../shared/flow-presentations';
 import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
 
 @Component({
@@ -8,6 +9,10 @@ import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
     [edges]="edges"
     [snapGrid]="[25, 25]"
     [background]="{ type: 'dots', gap: 25 }">
+    <ng-template let-ctx nodeHtml><docs-node [ctx]="ctx" /></ng-template>
+    <ng-template let-ctx edge><svg:g docsEdge [ctx]="ctx" /></ng-template>
+    <ng-template let-ctx edgeLabelHtml><docs-edge-label [ctx]="ctx" /></ng-template>
+
     <ng-template let-ctx groupNode>
       <div
         selectable
@@ -39,37 +44,37 @@ import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
     `,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Vflow],
+  imports: [DocsPresentations, Vflow],
 })
 export class SubflowsDemoComponent {
   public nodes: Node[] = createNodes([
     {
       id: '1',
       point: { x: 10, y: 10 },
-      type: 'default',
-      text: `1`,
+      type: 'html-template',
+      data: { text: `1` },
       parentId: '3',
     },
     {
       id: '2',
       point: { x: 90, y: 80 },
-      type: 'default',
+      type: 'html-template',
       // it's possible to pass html in this field
-      text: `<strong>2</strong>`,
+      data: { text: `<strong>2</strong>` },
       parentId: '3',
     },
     {
       id: '3',
       point: { x: 10, y: 10 },
-      type: 'default-group',
+      type: 'template-group',
       width: 250,
       height: 250,
     },
     {
       id: '4',
       point: { x: 280, y: 10 },
-      type: 'default',
-      text: `4`,
+      type: 'html-template',
+      data: { text: `4` },
     },
     {
       id: '5',
@@ -82,8 +87,8 @@ export class SubflowsDemoComponent {
     {
       id: '6',
       point: { x: 10, y: 10 },
-      type: 'default',
-      text: `6`,
+      type: 'html-template',
+      data: { text: `6` },
       parentId: '5',
     },
   ]);

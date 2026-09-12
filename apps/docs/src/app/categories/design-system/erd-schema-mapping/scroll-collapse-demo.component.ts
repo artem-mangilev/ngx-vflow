@@ -227,7 +227,6 @@ export class ScrollCollapseDemoComponent {
       sourceHandle: 'out:supplier-id',
       target: 'supplier',
       targetHandle: 'in:id',
-      type: 'template',
     },
     {
       id: 'brand',
@@ -235,7 +234,6 @@ export class ScrollCollapseDemoComponent {
       sourceHandle: 'out:brand-id',
       target: 'brand',
       targetHandle: 'in:id',
-      type: 'template',
     },
   ]);
 

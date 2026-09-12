@@ -8,7 +8,7 @@ import {
   Node,
   addEdges,
   addNodes,
-  isDefaultGroupNode,
+  isTemplateGroupNode,
   isTemplateNode,
   reparentNodes,
   createNodes,
@@ -27,7 +27,7 @@ export class DragAndDropNodesDemoComponent {
     {
       id: '1',
       point: { x: 10, y: 10 },
-      type: 'default-group',
+      type: 'template-group',
       width: 250,
       height: 250,
     },
@@ -37,7 +37,7 @@ export class DragAndDropNodesDemoComponent {
 
   public createNode({ event }: DndDropEvent) {
     const flowPoint = this.vflow().clientToFlowPosition({ x: event.x, y: event.y });
-    const parent = this.vflow().getNodesAtPoint(flowPoint).find(isDefaultGroupNode);
+    const parent = this.vflow().getNodesAtPoint(flowPoint).find(isTemplateGroupNode);
 
     this.nodes = addNodes(
       createNodes([
@@ -75,7 +75,7 @@ export class DragAndDropNodesDemoComponent {
   onPositionChange() {
     // Update all template nodes' canAttach state
     this.nodes.filter(isTemplateNode).forEach((node) => {
-      const intersectingNodes = this.vflow().getIntersectingNodes(node.id).filter(isDefaultGroupNode);
+      const intersectingNodes = this.vflow().getIntersectingNodes(node.id).filter(isTemplateGroupNode);
 
       const canAttach = intersectingNodes.length > 0 && !node.parentId?.();
       node.data?.update((state) => ({ ...state, canAttach }));
@@ -83,7 +83,7 @@ export class DragAndDropNodesDemoComponent {
   }
 
   attachNode(nodeId: string) {
-    const [intersectionNode] = this.vflow().getIntersectingNodes(nodeId).filter(isDefaultGroupNode);
+    const [intersectionNode] = this.vflow().getIntersectingNodes(nodeId).filter(isTemplateGroupNode);
     if (!intersectionNode) return;
 
     const nodeToUpdate = this.nodes.find((node) => node.id === nodeId);

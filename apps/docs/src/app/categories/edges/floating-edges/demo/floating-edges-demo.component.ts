@@ -1,8 +1,16 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { DocsPresentations } from '../../../../shared/flow-presentations';
 import { ConnectionSettings, CustomNodeComponent, Edge, Node, Vflow, createNodes } from 'ngx-vflow';
 
 @Component({
-  template: ` <vflow view="auto" [nodes]="nodes" [edges]="edges" [connection]="connection" /> `,
+  template: `
+    <vflow view="auto" [nodes]="nodes" [edges]="edges" [connection]="connection">
+      <ng-template let-ctx nodeHtml><docs-node [ctx]="ctx" /></ng-template>
+      <ng-template let-ctx groupNode><docs-group [ctx]="ctx" /></ng-template>
+      <ng-template let-ctx edge><svg:g docsEdge [ctx]="ctx" /></ng-template>
+      <ng-template let-ctx edgeLabelHtml><docs-edge-label [ctx]="ctx" /></ng-template>
+    </vflow>
+  `,
   styles: [
     `
       :host {
@@ -12,7 +20,7 @@ import { ConnectionSettings, CustomNodeComponent, Edge, Node, Vflow, createNodes
     `,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Vflow],
+  imports: [DocsPresentations, Vflow],
 })
 export class FloatingEdgesDemoComponent {
   public nodes: Node[] = createNodes([

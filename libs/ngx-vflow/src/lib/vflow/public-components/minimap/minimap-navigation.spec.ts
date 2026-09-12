@@ -18,9 +18,9 @@ class MinimapHostComponent {
   zoomable = signal(false);
   step = signal(0.1);
   nodes = createNodes([
-    { id: 'parent', type: 'default-group', point: { x: 10000, y: -5000 }, width: 400, height: 300, selected: true },
-    { id: 'child', type: 'default-group', parentId: 'parent', point: { x: 600, y: 200 }, width: 200, height: 200 },
-    { id: 'grandchild', type: 'default-group', parentId: 'child', point: { x: 100, y: 100 }, width: 100, height: 100 },
+    { id: 'parent', type: 'template-group', point: { x: 10000, y: -5000 }, width: 400, height: 300, selected: true },
+    { id: 'child', type: 'template-group', parentId: 'parent', point: { x: 600, y: 200 }, width: 200, height: 200 },
+    { id: 'grandchild', type: 'template-group', parentId: 'child', point: { x: 100, y: 100 }, width: 100, height: 100 },
   ]);
 }
 
