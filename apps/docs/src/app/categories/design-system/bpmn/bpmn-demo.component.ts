@@ -15,14 +15,6 @@ import { createEdges, createNodes, Vflow, VflowComponent } from 'ngx-vflow';
       place-items: center;
       text-align: center;
     }
-    .external-label {
-      position: absolute;
-      top: calc(100% + 12px);
-      left: 50%;
-      transform: translateX(-50%);
-      white-space: nowrap;
-      font-size: 12px;
-    }
     .symbol {
       font-size: 28px;
     }
@@ -37,6 +29,7 @@ import { createEdges, createNodes, Vflow, VflowComponent } from 'ngx-vflow';
       padding: 12px;
       writing-mode: vertical-rl;
       transform: rotate(180deg);
+      border-bottom: 0;
       border-left: 1px solid var(--vui-border);
     }
   `,
@@ -50,13 +43,13 @@ import { createEdges, createNodes, Vflow, VflowComponent } from 'ngx-vflow';
       <vflow view="auto" background="var(--vui-canvas)" [nodes]="nodes" [edges]="edges">
         <ng-template let-ctx groupNode>
           <div
-            vflowGroup
+            vflowContainer
             class="lane"
             selectable
             [vflowSelected]="ctx.selected() || ctx.preselected()"
             [style.width.px]="ctx.width()"
             [style.height.px]="ctx.height()">
-            <strong class="lane-title">{{ ctx.data().title }}</strong>
+            <strong vflowContainerTitle class="lane-title">{{ ctx.data().title }}</strong>
           </div>
         </ng-template>
         <ng-template let-ctx nodeHtml>
@@ -76,7 +69,7 @@ import { createEdges, createNodes, Vflow, VflowComponent } from 'ngx-vflow';
             @case ('gateway') {
               <div vflowBpmnGateway selectable [vflowSelected]="ctx.selected() || ctx.preselected()">
                 <span aria-hidden="true">×</span>
-                <span class="external-label">{{ ctx.data().title }}</span>
+                <span vflowExternalLabel>{{ ctx.data().title }}</span>
                 <handle type="target" position="left" [template]="port" [canStart]="false" [canAccept]="false" />
                 <handle
                   type="source"
@@ -99,7 +92,7 @@ import { createEdges, createNodes, Vflow, VflowComponent } from 'ngx-vflow';
                 @if (ctx.data().kind === 'intermediate') {
                   <span class="symbol" aria-hidden="true">◷</span>
                 }
-                <span class="external-label">{{ ctx.data().title }}</span>
+                <span vflowExternalLabel>{{ ctx.data().title }}</span>
                 @if (ctx.data().kind !== 'start') {
                   <handle type="target" position="left" [template]="port" [canStart]="false" [canAccept]="false" />
                 }

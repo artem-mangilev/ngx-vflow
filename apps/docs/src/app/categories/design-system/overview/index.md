@@ -34,26 +34,61 @@ consumers need neither Tailwind nor source scanning. The build retains prefixed 
 utilities without Preflight. UI styles live in the `vui` cascade layer; unlayered application
 CSS can override them. If your application uses layers, declare your override layer after `vui`.
 
+## Anatomy and states
+
+Directives add a public class to your own element and nothing else: no wrappers, no roles, no graph state.
+Compose the parts with plain HTML and content projection; anything not listed here (forms, images, charts,
+notes, menus) is your content inside `vflowNodeBody` or a field row.
+
+| Area      | Parts                                                                                                                                                                    |
+| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Card      | `vflowNode` shell; `vflowNodeHeader`, `vflowNodeBody`, `vflowNodeFooter`; `vflowNodeIcon`, `vflowNodeTitle`, `vflowNodeDescription`, `vflowNodeMeta`, `vflowNodeActions` |
+| Field     | `vflowField` row; `vflowFieldName`, `vflowFieldMeta`; indicators and core handles on both sides                                                                          |
+| Port      | `vflowPort` inside a handle template, `vflowPortLabel` next to it                                                                                                        |
+| Edge      | `vflowEdge` on the SVG path, `vflowEdgeLabel` for HTML labels                                                                                                            |
+| Container | `vflowContainer` frame with `vflowContainerTitle` and `vflowContainerBody`                                                                                               |
+| Extras    | `vflowStatus`, `vflowDiagnostic`, `vflowExternalLabel`, `vflowToolbar`, `vflowButton`                                                                                    |
+
+Four kinds of state stay separate so they can be shown at once:
+
+- **Interaction** is owned by core: bind `vflowSelected` to `ctx.selected() || ctx.preselected()`. Focus comes from the core wrapper.
+- **Diagnostics** about the model belong to your application: `[vflowDiagnostic]="'warning'"` with text.
+- **Application status** is your own vocabulary: `[vflowStatus]="'info'"` with text, plus `vflowStatusBusy` for activity. Activity is presentation only and never disables anything.
+- **Action availability** is the native `disabled` attribute on your buttons, driven by your rules such as read-only.
+
+Ports mirror two independent facts: `vflowPortState` is core feedback for the connection in progress
+(`idle`, `valid`, `invalid`); `vflowPortConnected` is your knowledge about existing edges.
+
 ## Directive reference
 
-| Import                                                | Attribute                                             | Responsibility                                                   |
-| ----------------------------------------------------- | ----------------------------------------------------- | ---------------------------------------------------------------- |
-| `VflowTheme`                                          | `[vflowTheme]="'light'"`                              | Scoped light/dark semantic tokens                                |
-| `VflowSelected`                                       | `[vflowSelected]="ctx.selected()                      |                                                                  | ctx.preselected()"` | Selection presentation; no interaction or ARIA changes |
-| `VflowNode`                                           | `vflowNode`                                           | Node surface; consumer chooses size and content                  |
-| `VflowNodeHeader`, `VflowNodeBody`, `VflowNodeFooter` | `vflowNodeHeader`, `vflowNodeBody`, `vflowNodeFooter` | Optional anatomy on consumer elements                            |
-| `VflowField`                                          | `vflowField`                                          | Field row with room for names, metadata and core handles         |
-| `VflowPort`                                           | `vflowPort [vflowPortState]="ctx.state()"`            | Visual inside a handle template: idle/valid/invalid              |
-| `VflowStatus`                                         | `[vflowStatus]="'warning'"`                           | Neutral/info/success/warning/danger tone; supply meaningful text |
-| `VflowEdge`                                           | `vflowEdge` on an SVG path                            | Stroke; bind core path and marker URLs yourself                  |
-| `VflowEdgeLabel`                                      | `vflowEdgeLabel`                                      | HTML label surface, including optional native controls           |
-| `VflowGroup`                                          | `vflowGroup`                                          | Frame; parent relationships remain explicit in graph data        |
-| `VflowBpmnEvent`                                      | `[vflowBpmnEvent]="'start'"`                          | Start/intermediate/end event outlines                            |
-| `VflowBpmnGateway`                                    | `vflowBpmnGateway`                                    | Diamond outline; supply the gateway symbol                       |
-| `VflowButton`                                         | `vflowButton` on a native button                      | Button presentation with focus and disabled states               |
+| Import                                                | Attribute                                                           | Responsibility                                                 |
+| ----------------------------------------------------- | ------------------------------------------------------------------- | -------------------------------------------------------------- |
+| `VflowTheme`                                          | `[vflowTheme]="'light'"`                                            | Scoped light/dark semantic tokens                              |
+| `VflowSelected`                                       | `[vflowSelected]="ctx.selected() \|\| ctx.preselected()"`           | Selection presentation; no interaction or ARIA changes         |
+| `VflowNode`                                           | `vflowNode`                                                         | Node surface; consumer chooses size and content                |
+| `VflowNodeHeader`, `VflowNodeBody`, `VflowNodeFooter` | `vflowNodeHeader`, `vflowNodeBody`, `vflowNodeFooter`               | Optional anatomy on consumer elements                          |
+| `VflowNodeIcon`, `VflowNodeTitle`                     | `vflowNodeIcon`, `vflowNodeTitle`                                   | Header icon slot and wrapping title                            |
+| `VflowNodeDescription`, `VflowNodeMeta`               | `vflowNodeDescription`, `vflowNodeMeta`                             | Body text and secondary metadata                               |
+| `VflowNodeActions`                                    | `vflowNodeActions`                                                  | Group of consumer controls; add `vflowNoDrag` to each control  |
+| `VflowField`                                          | `vflowField`                                                        | Field row with room for names, metadata and core handles       |
+| `VflowFieldName`, `VflowFieldMeta`                    | `vflowFieldName`, `vflowFieldMeta`                                  | Wrapping field name and its type/key metadata                  |
+| `VflowPort`                                           | `vflowPort [vflowPortState]="ctx.state()" [vflowPortConnected]="…"` | Visual inside a handle template: idle/valid/invalid, connected |
+| `VflowPortLabel`                                      | `vflowPortLabel`                                                    | Text next to a port                                            |
+| `VflowStatus`                                         | `[vflowStatus]="'warning'" [vflowStatusBusy]="true"`                | Application status tone, text and optional activity            |
+| `VflowDiagnostic`                                     | `[vflowDiagnostic]="'danger'"`                                      | Model diagnostic; independent from status and selection        |
+| `VflowEdge`                                           | `vflowEdge` on an SVG path                                          | Stroke; bind core path and marker URLs yourself                |
+| `VflowEdgeLabel`                                      | `vflowEdgeLabel`                                                    | HTML label surface, including optional native controls         |
+| `VflowContainer`                                      | `vflowContainer`                                                    | Frame; parent relationships remain explicit in graph data      |
+| `VflowContainerTitle`, `VflowContainerBody`           | `vflowContainerTitle`, `vflowContainerBody`                         | Container heading and content area                             |
+| `VflowToolbar`                                        | `vflowToolbar`                                                      | Surface for `node-toolbar` content                             |
+| `VflowExternalLabel`                                  | `vflowExternalLabel`                                                | Label below a positioned shape                                 |
+| `VflowBpmnEvent`                                      | `[vflowBpmnEvent]="'start'"`                                        | Start/intermediate/end event outlines                          |
+| `VflowBpmnGateway`                                    | `vflowBpmnGateway`                                                  | Diamond outline; supply the gateway symbol                     |
+| `VflowButton`                                         | `vflowButton` on a native button                                    | Button presentation with focus and disabled states             |
 
 Each directive is independently importable. None imports ngx-vflow, owns graph state,
-adds wrapper elements, registers ports or changes accessibility roles.
+adds wrapper elements, registers ports or changes accessibility roles. Public selectors are the
+`.vui-*` classes named after the attributes, for example `.vui-node-title` or `.vui-status[data-tone='warning']`.
 
 ## Themes and composition
 

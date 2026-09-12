@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   effect,
   signal,
   untracked,
@@ -38,9 +39,6 @@ interface EntityData {
     }
     vflow {
       height: 560px;
-    }
-    .field-name {
-      overflow-wrap: anywhere;
     }
     .key {
       min-width: 22px;
@@ -82,25 +80,38 @@ interface EntityData {
             [vflowSelected]="ctx.selected() || ctx.preselected()"
             [attr.data-entity]="ctx.node.id">
             <header vflowNodeHeader>
-              <span class="grow">{{ ctx.data().title }}</span>
-              <span class="muted">{{ ctx.data().category }}</span>
+              <span vflowNodeTitle>{{ ctx.data().title }}</span>
+              <span vflowNodeMeta>{{ ctx.data().category }}</span>
             </header>
             @for (field of ctx.data().fields; track field.id) {
               <div vflowField [attr.data-field]="field.id">
-                <span class="key">{{ field.key }}</span>
-                <span class="grow field-name">{{ field.name }}</span>
-                <span class="muted">{{ field.type }}</span>
+                <span vflowFieldMeta class="key">{{ field.key }}</span>
+                <span vflowFieldName>{{ field.name }}</span>
+                <span vflowFieldMeta>{{ field.type }}</span>
+                <!-- Per-row templates: connection state is application knowledge about existing edges. -->
+                <ng-template #inPort let-handle handle>
+                  <span
+                    vflowPort
+                    [vflowPortState]="handle.state()"
+                    [vflowPortConnected]="connected().has(ctx.node.id + '/in:' + field.id)"></span>
+                </ng-template>
+                <ng-template #outPort let-handle handle>
+                  <span
+                    vflowPort
+                    [vflowPortState]="handle.state()"
+                    [vflowPortConnected]="connected().has(ctx.node.id + '/out:' + field.id)"></span>
+                </ng-template>
                 <handle
                   type="target"
                   position="left"
                   [id]="'in:' + field.id"
-                  [template]="port"
+                  [template]="inPort"
                   [ariaLabel]="ctx.data().title + '.' + field.name + ' input'" />
                 <handle
                   type="source"
                   position="right"
                   [id]="'out:' + field.id"
-                  [template]="port"
+                  [template]="outPort"
                   [ariaLabel]="ctx.data().title + '.' + field.name + ' output'" />
               </div>
             }
@@ -130,7 +141,6 @@ interface EntityData {
           </span>
         </ng-template>
       </vflow>
-      <ng-template #port let-ctx handle><span vflowPort [vflowPortState]="ctx.state()"></span></ng-template>
     </section>
   `,
 })
@@ -219,6 +229,13 @@ export class EntitiesDemoComponent {
         edgeLabels: { center: { type: 'html-template', data: 'Copy email' } },
       },
     ]),
+  );
+  /** `${nodeId}/${handleId}` for every endpoint of an existing edge. */
+  readonly connected = computed(
+    () =>
+      new Set(
+        this.edges().flatMap((edge) => [`${edge.source}/${edge.sourceHandle}`, `${edge.target}/${edge.targetHandle}`]),
+      ),
   );
   readonly connection: ConnectionSettings = {
     type: 'template',

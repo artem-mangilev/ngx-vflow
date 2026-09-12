@@ -1,6 +1,16 @@
 import { ChangeDetectionStrategy, Component, effect, signal, untracked, viewChild } from '@angular/core';
-import { VflowUi } from '@vflow/ui';
+import { VflowTone, VflowUi } from '@vflow/ui';
 import { createEdges, createNodes, Vflow, VflowComponent } from 'ngx-vflow';
+
+interface StepData {
+  title: string;
+  icon: string;
+  description: string;
+  /** Application status: a word of this application, not a library lifecycle. */
+  status: { tone: VflowTone; text: string; busy?: boolean };
+  /** Model diagnostic; shown next to status and independent from selection. */
+  diagnostic?: { tone: 'info' | 'warning' | 'danger'; text: string };
+}
 
 @Component({
   selector: 'app-ui-workflow-demo',
@@ -9,7 +19,7 @@ import { createEdges, createNodes, Vflow, VflowComponent } from 'ngx-vflow';
   styleUrls: ['../demo.css'],
   styles: `
     article {
-      width: 210px;
+      width: 230px;
     }
     .description {
       min-height: 58px;
@@ -17,6 +27,13 @@ import { createEdges, createNodes, Vflow, VflowComponent } from 'ngx-vflow';
     .controls {
       --vui-accent: #0f766e;
       --vui-on-accent: white;
+    }
+    .footnote {
+      margin: 0;
+      min-height: 20px;
+      padding: 8px 14px;
+      font-size: 13px;
+      color: var(--vui-muted);
     }
   `,
   template: `
@@ -31,26 +48,47 @@ import { createEdges, createNodes, Vflow, VflowComponent } from 'ngx-vflow';
         <ng-template let-ctx nodeHtml>
           <article vflowNode selectable [vflowSelected]="ctx.selected() || ctx.preselected()">
             <header vflowNodeHeader>
-              <span aria-hidden="true">{{ ctx.data().icon }}</span>
-              <span class="grow">{{ ctx.data().title }}</span>
+              <span vflowNodeIcon aria-hidden="true">{{ ctx.data().icon }}</span>
+              <span vflowNodeTitle>{{ ctx.data().title }}</span>
             </header>
-            <div vflowNodeBody class="description">{{ ctx.data().description }}</div>
+            <div vflowNodeBody>
+              <p vflowNodeDescription class="description">{{ ctx.data().description }}</p>
+            </div>
             <footer vflowNodeFooter>
               @if (ctx.node.id === 'review') {
                 <span [vflowStatus]="approved() ? 'success' : 'warning'">{{
                   approved() ? 'Approved' : 'Waiting'
                 }}</span>
-                <button
-                  vflowButton
-                  vflowNoDrag
-                  type="button"
-                  [disabled]="readOnly() || approved()"
-                  (click)="approved.set(true)">
-                  Approve
-                </button>
               } @else {
-                <span [vflowStatus]="ctx.data().tone">{{ ctx.data().status }}</span>
+                <span [vflowStatus]="ctx.data().status.tone" [vflowStatusBusy]="ctx.data().status.busy ?? false">{{
+                  ctx.data().status.text
+                }}</span>
               }
+              @if (ctx.data().diagnostic; as diagnostic) {
+                <span [vflowDiagnostic]="diagnostic.tone">{{ diagnostic.text }}</span>
+              }
+              <span vflowNodeActions>
+                @if (ctx.node.id === 'review') {
+                  <button
+                    vflowButton
+                    vflowNoDrag
+                    type="button"
+                    [disabled]="readOnly() || approved()"
+                    (click)="approved.set(true)">
+                    Approve
+                  </button>
+                } @else {
+                  <button
+                    vflowButton
+                    vflowNoDrag
+                    type="button"
+                    [disabled]="readOnly()"
+                    [attr.aria-label]="'Open ' + ctx.data().title"
+                    (click)="opened.set(ctx.data().title)">
+                    Open
+                  </button>
+                }
+              </span>
             </footer>
             @if (ctx.node.id !== 'received') {
               <handle type="target" position="left" [canStart]="false" [canAccept]="false" [template]="port" />
@@ -60,7 +98,17 @@ import { createEdges, createNodes, Vflow, VflowComponent } from 'ngx-vflow';
             }
             @if (ctx.selected()) {
               <node-toolbar>
-                <span vflowEdgeLabel>{{ ctx.data().title }} · {{ readOnly() ? 'View only' : 'Drag to move' }}</span>
+                <div vflowToolbar>
+                  <span>{{ readOnly() ? 'View only' : 'Drag to move' }}</span>
+                  <button
+                    vflowButton
+                    vflowNoDrag
+                    type="button"
+                    [attr.aria-label]="'Details of ' + ctx.data().title"
+                    (click)="opened.set(ctx.data().title)">
+                    Details
+                  </button>
+                </div>
               </node-toolbar>
             }
           </article>
@@ -79,8 +127,9 @@ import { createEdges, createNodes, Vflow, VflowComponent } from 'ngx-vflow';
         </ng-template>
       </vflow>
       <ng-template #port let-ctx handle>
-        <span vflowPort [vflowPortState]="ctx.state()"></span>
+        <span vflowPort vflowPortConnected [vflowPortState]="ctx.state()"></span>
       </ng-template>
+      <p class="footnote" aria-live="polite" data-testid="opened">{{ opened() ? 'Opened: ' + opened() : '' }}</p>
     </section>
   `,
 })
@@ -89,7 +138,8 @@ export class WorkflowDemoComponent {
   readonly dark = signal(false);
   readonly readOnly = signal(false);
   readonly approved = signal(false);
-  readonly nodes = createNodes([
+  readonly opened = signal('');
+  readonly nodes = createNodes<StepData>([
     {
       id: 'received',
       type: 'html-template',
@@ -99,47 +149,45 @@ export class WorkflowDemoComponent {
         title: 'Invoice received',
         icon: '↓',
         description: 'A new invoice from the supplier.',
-        tone: 'success',
-        status: 'Complete',
+        status: { tone: 'success', text: 'Complete' },
       },
     },
     {
       id: 'review',
       type: 'html-template',
-      point: { x: 310, y: 110 },
+      point: { x: 330, y: 110 },
       ariaLabel: 'Finance review',
       data: {
         title: 'Finance review',
         icon: '✓',
         description: 'Check the amount and approve payment.',
-        tone: 'warning',
-        status: 'Waiting',
+        status: { tone: 'warning', text: 'Waiting' },
+        diagnostic: { tone: 'warning', text: 'Above limit' },
       },
     },
     {
       id: 'paid',
       type: 'html-template',
-      point: { x: 610, y: 10 },
+      point: { x: 650, y: 10 },
       ariaLabel: 'Schedule payment',
       data: {
         title: 'Schedule payment',
         icon: '→',
         description: 'Send the approved invoice to accounting.',
-        tone: 'neutral',
-        status: 'Next step',
+        status: { tone: 'info', text: 'Scheduling', busy: true },
       },
     },
     {
       id: 'fix',
       type: 'html-template',
-      point: { x: 610, y: 250 },
+      point: { x: 650, y: 250 },
       ariaLabel: 'Request correction',
       data: {
         title: 'Request correction',
         icon: '!',
         description: 'The supplier must provide a purchase order.',
-        tone: 'danger',
-        status: 'Missing PO',
+        status: { tone: 'neutral', text: 'Waiting for supplier' },
+        diagnostic: { tone: 'danger', text: 'Missing PO' },
       },
     },
   ]);
