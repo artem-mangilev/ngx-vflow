@@ -17,13 +17,11 @@ async function rowAlignment(demo: Locator) {
 test('consumer DOM, scoped themes, selection and native workflow actions', async ({ page }, testInfo) => {
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
-  await page.goto('/introduction/design-system');
+  await page.goto('/design-system/workflow');
   const workflow = page.locator('app-ui-workflow-demo');
-  const entities = page.locator('app-ui-entities-demo');
   await expect(workflow.locator('article.vui-node')).toHaveCount(4);
   await expect(workflow.locator('path.vui-edge')).toHaveCount(3);
   await expect(workflow.locator('article.vui-node').first()).toHaveCSS('background-color', 'rgb(255, 255, 255)');
-  await expect(entities.locator('article.vui-node').first()).toHaveCSS('background-color', 'rgb(27, 40, 59)');
   // Directives add classes to the consumer article/header, without injecting wrapper elements.
   await expect(workflow.locator('article > header.vui-node-header')).toHaveCount(4);
   const review = workflow.locator('article').filter({ hasText: 'Finance review' });
@@ -54,10 +52,12 @@ test('consumer DOM, scoped themes, selection and native workflow actions', async
 test('field connections follow stable IDs through rename, reorder, density and recreation', async ({
   page,
 }, testInfo) => {
-  await page.goto('/introduction/design-system');
+  await page.goto('/design-system/erd-schema-mapping');
   const demo = page.locator('app-ui-entities-demo');
   await demo.scrollIntoViewIfNeeded();
   await expect(demo.locator('article')).toHaveCount(4);
+  // This page opts into the dark theme while the workflow page stays light.
+  await expect(demo.locator('article.vui-node').first()).toHaveCSS('background-color', 'rgb(27, 40, 59)');
   await expect(demo.locator('path.vui-edge')).toHaveCount(2);
   await expect.poll(() => rowAlignment(demo)).toBeLessThan(1);
   await demo.getByRole('button', { name: 'Rename email', exact: true }).click();
@@ -110,7 +110,7 @@ test('field connections follow stable IDs through rename, reorder, density and r
 });
 
 test('BPMN outlines, lane frames and core selection render in both themes', async ({ page }, testInfo) => {
-  await page.goto('/introduction/design-system');
+  await page.goto('/design-system/bpmn');
   const demo = page.locator('app-ui-bpmn-demo');
   await demo.scrollIntoViewIfNeeded();
   await expect(demo.locator('.vui-group')).toHaveCount(2);
