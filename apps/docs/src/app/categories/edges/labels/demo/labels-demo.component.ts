@@ -1,8 +1,14 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { DocsPresentations } from '../../../../shared/flow-presentations';
 import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
 
 @Component({
   template: `<vflow view="auto" [nodes]="nodes" [edges]="edges">
+    <ng-template let-ctx edge><svg:g docsEdge [ctx]="ctx" /></ng-template>
+
+    <ng-template let-ctx nodeHtml><docs-node [ctx]="ctx" /></ng-template>
+    <ng-template let-ctx groupNode><docs-group [ctx]="ctx" /></ng-template>
+
     <ng-template let-ctx edgeLabelHtml>
       <div class="label" [style.background-color]="ctx.label.data.color" (click)="deleteEdge(ctx.edge)">Delete</div>
     </ng-template>
@@ -24,27 +30,27 @@ import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
     `,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Vflow],
+  imports: [DocsPresentations, Vflow],
 })
 export class LabelsDemoComponent {
   public nodes: Node[] = createNodes([
     {
       id: '1',
       point: { x: 50, y: 200 },
-      type: 'default',
-      text: '1',
+      type: 'html-template',
+      data: { text: '1' },
     },
     {
       id: '2',
       point: { x: 350, y: 100 },
-      type: 'default',
-      text: '2',
+      type: 'html-template',
+      data: { text: '2' },
     },
     {
       id: '3',
       point: { x: 350, y: 300 },
-      type: 'default',
-      text: '3',
+      type: 'html-template',
+      data: { text: '3' },
     },
   ]);
 
@@ -56,32 +62,16 @@ export class LabelsDemoComponent {
       curve: signal('smooth-step'),
       edgeLabels: signal({
         start: {
-          type: 'default',
-          text: 'Start',
-          style: {
-            background: '#e3f2fd',
-            color: '#1976d2',
-            padding: '2px 6px',
-            borderRadius: '12px',
-            fontSize: '11px',
-            fontWeight: '500',
-          },
+          type: 'html-template',
+          data: 'Start',
         },
         center: {
           type: 'html-template',
           data: { color: '#122c26' },
         },
         end: {
-          type: 'default',
-          text: 'End',
-          style: {
-            background: '#e8f5e8',
-            color: '#2e7d32',
-            padding: '2px 6px',
-            borderRadius: '12px',
-            fontSize: '11px',
-            fontWeight: '500',
-          },
+          type: 'html-template',
+          data: 'End',
         },
       }),
     },
@@ -92,15 +82,8 @@ export class LabelsDemoComponent {
       curve: signal('smooth-step'),
       edgeLabels: signal({
         center: {
-          type: 'default',
-          text: 'Center Only',
-          style: {
-            color: 'black',
-            background: '#f5f5f5',
-            padding: '4px 8px',
-            borderRadius: '4px',
-            fontSize: '12px',
-          },
+          type: 'html-template',
+          data: 'Center Only',
         },
       }),
     },

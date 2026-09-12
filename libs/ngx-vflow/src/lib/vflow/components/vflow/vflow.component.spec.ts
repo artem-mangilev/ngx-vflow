@@ -13,7 +13,7 @@ class VflowTestHostComponent {
   public readonly vflow = viewChild.required(VflowComponent);
   public readonly parent: Node = {
     id: 'parent',
-    type: 'default-group',
+    type: 'template-group',
     point: signal({ x: 100, y: 100 }),
     parentId: signal(null),
     width: signal(200),
@@ -21,7 +21,7 @@ class VflowTestHostComponent {
   };
   public readonly child: Node = {
     id: 'child',
-    type: 'default',
+    type: 'html-template',
     point: signal({ x: 10, y: 20 }),
     parentId: signal('parent'),
   };

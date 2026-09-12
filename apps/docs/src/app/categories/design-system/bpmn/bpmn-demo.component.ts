@@ -186,7 +186,6 @@ export class BpmnDemoComponent {
       source: 'limit',
       target: 'decision',
       targetHandle: 'association',
-      type: 'template' as const,
       curve: 'straight' as const,
       data: { flow: 'association' as Flow },
     },
@@ -222,9 +221,8 @@ function sequence(id: string, source: string, target: string, sourceHandle?: str
     source,
     target,
     sourceHandle,
-    type: 'template' as const,
     curve: 'smooth-step' as const,
-    markers: { end: { type: 'arrow-closed' as const, color: 'var(--vui-foreground)' } },
+    markers: { end: { type: 'arrow-closed' as const } },
     data: { flow: 'sequence' as Flow },
   };
 }
@@ -236,9 +234,8 @@ function message(id: string, source: string, sourceHandle: string, target: strin
     sourceHandle,
     target,
     targetHandle,
-    type: 'template' as const,
     curve: 'smooth-step' as const,
-    markers: { end: { type: 'arrow' as const, color: 'var(--vui-foreground)' } },
+    markers: { end: { type: 'arrow' as const } },
     edgeLabels: label(text),
     data: { flow: 'message' as Flow },
   };

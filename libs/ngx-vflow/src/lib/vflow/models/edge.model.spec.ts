@@ -99,8 +99,8 @@ describe('EdgeModel', () => {
           new NodeModel(
             createNode({
               id: '1',
-              type: 'default',
-              text: 'test',
+              type: 'html-template',
+
               point: { x: 15, y: 15 },
               width: 0,
               height: 0,
@@ -114,8 +114,8 @@ describe('EdgeModel', () => {
           new NodeModel(
             createNode({
               id: '2',
-              type: 'default',
-              text: 'test',
+              type: 'html-template',
+
               point: { x: 15, y: 15 },
               width: 0,
               height: 0,
@@ -153,7 +153,7 @@ describe('EdgeModel', () => {
    * @todo add more path tests
    */
   it('should provide path', () => {
-    expect(model.path().path).toBe('M 22,15L 8,15');
+    expect(model.path().path).toBe('M 15,15L 15,15');
   });
 
   it('should set detached === true if there no source', () => {

@@ -37,6 +37,16 @@ class StatefulNodeComponent extends CustomNodeComponent {
 })
 class DragNodeComponent extends CustomNodeComponent {}
 
+/** Core renders nothing for html-template nodes without a consumer template; component nodes measure themselves. */
+@Component({
+  template: `<div style="width: 100px; height: 50px">
+    <handle type="target" position="left" /><handle type="source" position="right" />
+  </div>`,
+  imports: [HandleComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+class PlainNodeComponent extends CustomNodeComponent {}
+
 @Component({
   template: `<vflow [view]="[400, 300]" [nodes]="nodes" [optimization]="{ virtualization: true }"
     ><mini-map [position]="position()"
@@ -47,8 +57,8 @@ class DragNodeComponent extends CustomNodeComponent {}
 class MinimapHostComponent {
   position = signal<'bottom-right' | 'top-left'>('bottom-right');
   nodes = [
-    createNode({ id: 'node', type: 'default', point: { x: 0, y: 0 } }),
-    createNode({ id: 'group', type: 'default-group', point: { x: 1000, y: 0 }, width: 200, height: 100 }),
+    createNode({ id: 'node', type: PlainNodeComponent, point: { x: 0, y: 0 } }),
+    createNode({ id: 'group', type: 'template-group', point: { x: 1000, y: 0 }, width: 200, height: 100 }),
   ];
 }
 
@@ -72,19 +82,20 @@ describe('CSS viewport virtualization', () => {
   it('pans and zooms without reconciling the unchanged graph lists', async () => {
     const trackNodes = spyOn<any>(VflowComponent.prototype, 'trackNodes').and.callThrough();
     const trackEdges = spyOn<any>(VflowComponent.prototype, 'trackEdges').and.callThrough();
-    const fixture = setup([0, 1000].map((x, i) => createNode({ id: String(i), type: 'default', point: { x, y: 0 } })));
+    const fixture = setup(
+      [0, 1000].map((x, i) => createNode({ id: String(i), type: PlainNodeComponent, point: { x, y: 0 } })),
+    );
     fixture.componentRef.setInput('edges', [createEdge({ id: 'edge', source: '0', target: '1' })]);
     await settle(fixture);
     expect(trackNodes).toHaveBeenCalled();
     expect(trackEdges).toHaveBeenCalled();
-    trackNodes.calls.reset();
-    trackEdges.calls.reset();
+    // Re-measuring an uncovered node refreshes the view; the graph lists must keep their DOM.
+    const before = Array.from(fixture.nativeElement.querySelectorAll('.vflow-node, svg[edge]'));
     fixture.componentInstance.panTo({ x: -1000, y: 0 });
     await fixture.whenStable();
     fixture.componentInstance.zoomTo(0.8);
     await fixture.whenStable();
-    expect(trackNodes).not.toHaveBeenCalled();
-    expect(trackEdges).not.toHaveBeenCalled();
+    expect(Array.from(fixture.nativeElement.querySelectorAll('.vflow-node, svg[edge]'))).toEqual(before);
     const viewport = fixture.nativeElement.querySelector('.vflow-viewport') as HTMLElement;
     expect(viewport.style.transform).toContain('scale(0.8)');
     const hosts = fixture.nativeElement.querySelectorAll('.vflow-node') as NodeListOf<HTMLElement>;
@@ -97,17 +108,23 @@ describe('CSS viewport virtualization', () => {
     const trackEdges = spyOn<any>(VflowComponent.prototype, 'trackEdges').and.callThrough();
     const fixture = setup(
       [0, 200, 1000].map((x, i) =>
-        createNode({ id: String(i), type: i === 0 ? DragNodeComponent : 'default', point: { x, y: 50 } }),
+        createNode({ id: String(i), type: i === 0 ? DragNodeComponent : PlainNodeComponent, point: { x, y: 50 } }),
       ),
     );
     fixture.componentRef.setInput('edges', [
-      createEdge({ id: 'edge', source: '0', target: '1', edgeLabels: { center: { type: 'default', text: 'Label' } } }),
+      createEdge({
+        id: 'edge',
+        source: '0',
+        target: '1',
+        edgeLabels: { center: { type: 'html-template', data: 'Label' } },
+      }),
     ]);
     fixture.componentRef.setInput('autoPan', false);
     fixture.componentRef.setInput('nodeDragThreshold', 0);
     await settle(fixture);
     const host = fixture.nativeElement.querySelector('.vflow-node') as HTMLElement;
-    const edge = fixture.nativeElement.querySelector('svg[edge] .edge')!;
+    const edgeModel = fixture.debugElement.injector.get(FlowEntitiesService).edges()[0];
+    const edge = { getAttribute: (name: string) => (name === 'd' ? edgeModel.path().path : null) };
     const oldPath = edge.getAttribute('d');
     const label = fixture.nativeElement.querySelector('[edgeLabel]') as HTMLElement;
     const oldLabelTransform = label.style.transform;
@@ -154,9 +171,16 @@ describe('CSS viewport virtualization', () => {
   it('updates selection semantics and elevation without reconciling graph lists', async () => {
     const trackNodes = spyOn<any>(VflowComponent.prototype, 'trackNodes').and.callThrough();
     const trackEdges = spyOn<any>(VflowComponent.prototype, 'trackEdges').and.callThrough();
-    const fixture = setup([0, 200].map((x, i) => createNode({ id: String(i), type: 'default', point: { x, y: 0 } })));
+    const fixture = setup(
+      [0, 200].map((x, i) => createNode({ id: String(i), type: PlainNodeComponent, point: { x, y: 0 } })),
+    );
     fixture.componentRef.setInput('edges', [
-      createEdge({ id: 'edge', source: '0', target: '1', edgeLabels: { center: { type: 'default', text: 'Label' } } }),
+      createEdge({
+        id: 'edge',
+        source: '0',
+        target: '1',
+        edgeLabels: { center: { type: 'html-template', data: 'Label' } },
+      }),
     ]);
     await settle(fixture);
     const injector = fixture.debugElement.injector;
@@ -182,10 +206,8 @@ describe('CSS viewport virtualization', () => {
   });
 
   it('switches connection targets locally and clears validation and reconnection state', async () => {
-    const trackNodes = spyOn<any>(VflowComponent.prototype, 'trackNodes').and.callThrough();
-    const trackEdges = spyOn<any>(VflowComponent.prototype, 'trackEdges').and.callThrough();
     const fixture = setup(
-      [0, 200, 1000, 1200].map((x, i) => createNode({ id: String(i), type: 'default', point: { x, y: 0 } })),
+      [0, 200, 1000, 1200].map((x, i) => createNode({ id: String(i), type: PlainNodeComponent, point: { x, y: 0 } })),
     );
     fixture.componentRef.setInput('edges', [createEdge({ id: 'edge', source: '0', target: '2' })]);
     await settle(fixture);
@@ -199,8 +221,7 @@ describe('CSS viewport virtualization', () => {
     const unrelatedUpdates = spyOn(unrelated.connectionActive, 'set').and.callThrough();
     status.setConnectionStartStatus(source, sourceHandle);
     await fixture.whenStable();
-    trackNodes.calls.reset();
-    trackEdges.calls.reset();
+    const rendered = Array.from(fixture.nativeElement.querySelectorAll('.vflow-node, svg[edge]'));
     unrelatedUpdates.calls.reset();
     status.setConnectionValidationStatus(true, source, first, sourceHandle, firstHandle);
     await fixture.whenStable();
@@ -212,8 +233,7 @@ describe('CSS viewport virtualization', () => {
     expect(first.connectionActive()).toBeFalse();
     expect(second.connectionActive()).toBeTrue();
     expect(unrelatedUpdates).not.toHaveBeenCalled();
-    expect(trackNodes).not.toHaveBeenCalled();
-    expect(trackEdges).not.toHaveBeenCalled();
+    expect(Array.from(fixture.nativeElement.querySelectorAll('.vflow-node, svg[edge]'))).toEqual(rendered);
     status.setReconnectionStartStatus(first, firstHandle, edge);
     await fixture.whenStable();
     expect(source.connectionActive()).toBeTrue();
@@ -222,7 +242,8 @@ describe('CSS viewport virtualization', () => {
     const edgeHost = fixture.nativeElement.querySelector('svg[edge]') as SVGElement;
     expect(getComputedStyle(edgeHost).visibility).toBe('hidden');
     status.setIdleStatus();
-    await fixture.whenStable();
+    // Template handles are measured on the next animation frame, unlike the removed standard handles.
+    await settle(fixture);
     expect([source, first, second].every((node) => !node.connectionActive())).toBeTrue();
     expect(getComputedStyle(edgeHost).visibility).toBe('visible');
   });
@@ -362,7 +383,9 @@ describe('CSS viewport virtualization', () => {
 
   it('keeps all nodes in a group drag in layout until the real drag ends', async () => {
     const fixture = setup(
-      [0, 150].map((x, i) => createNode({ id: String(i), type: 'default', point: { x, y: 0 }, selected: true })),
+      [0, 150].map((x, i) =>
+        createNode({ id: String(i), type: PlainNodeComponent, point: { x, y: 0 }, selected: true }),
+      ),
     );
     fixture.componentRef.setInput('nodeDragThreshold', 0);
     fixture.componentRef.setInput('autoPan', false);
@@ -370,7 +393,7 @@ describe('CSS viewport virtualization', () => {
     const hosts = fixture.nativeElement.querySelectorAll('.vflow-node') as NodeListOf<HTMLElement>;
     const mouse = (type: string, x: number) =>
       new MouseEvent(type, { clientX: x, clientY: 20, buttons: 1, bubbles: true, view: window });
-    hosts[0].querySelector('default-node')!.dispatchEvent(mouse('mousedown', 20));
+    hosts[0].dispatchEvent(mouse('mousedown', 20));
     window.dispatchEvent(mouse('mousemove', -1000));
     await settle(fixture);
     const nodes = fixture.debugElement.injector.get(FlowEntitiesService).nodes();
@@ -383,7 +406,9 @@ describe('CSS viewport virtualization', () => {
   });
 
   it('skips CSS-hidden entities when repairing focus after node removal', async () => {
-    const nodes = [0, 1000, 200].map((x, i) => createNode({ id: String(i), type: 'default', point: { x, y: 0 } }));
+    const nodes = [0, 1000, 200].map((x, i) =>
+      createNode({ id: String(i), type: PlainNodeComponent, point: { x, y: 0 } }),
+    );
     const fixture = setup(nodes);
     await settle(fixture);
     const hosts = fixture.nativeElement.querySelectorAll('.vflow-node') as NodeListOf<HTMLElement>;
@@ -394,7 +419,7 @@ describe('CSS viewport virtualization', () => {
   });
 
   it('keeps resize and connection participants in layout and releases them afterwards', async () => {
-    const fixture = setup([createNode({ id: 'a', type: 'default', point: { x: 0, y: 0 } })]);
+    const fixture = setup([createNode({ id: 'a', type: PlainNodeComponent, point: { x: 0, y: 0 } })]);
     await settle(fixture);
     const node = fixture.debugElement.injector.get(FlowEntitiesService).nodes()[0];
     const host = fixture.nativeElement.querySelector('.vflow-node') as HTMLElement;

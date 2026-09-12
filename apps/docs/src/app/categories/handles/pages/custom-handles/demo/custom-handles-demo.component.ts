@@ -1,11 +1,12 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { DocsPresentations } from '../../../../../shared/flow-presentations';
 import { Edge, Node, Vflow, Connection, createNodes } from 'ngx-vflow';
 
 @Component({
   templateUrl: './custom-handles-demo.component.html',
   styleUrls: ['./custom-handles-demo.styles.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Vflow],
+  imports: [DocsPresentations, Vflow],
 })
 export class CustomHandlesDemoComponent {
   public outputOneCanStart = signal(true);

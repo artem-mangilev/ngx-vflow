@@ -31,14 +31,7 @@ export class NodeModel<T = unknown>
     const override = this.rawNode.ariaLabel?.().trim();
     if (override) return override;
     const labels = this.settingsService.ariaLabels();
-    if (this.rawNode.type === 'default') {
-      const template = this.document.createElement('template');
-      template.innerHTML = this.text();
-      template.content.querySelectorAll('script, style, template').forEach((element) => element.remove());
-      const text = template.content.textContent?.replace(/\s+/g, ' ').trim();
-      if (text) return text;
-    }
-    return this.rawNode.type === 'default-group' || this.rawNode.type === 'template-group'
+    return this.rawNode.type === 'template-group'
       ? labels.groupLabel(this.rawNode.id)
       : labels.nodeLabel(this.rawNode.id);
   });
@@ -120,6 +113,9 @@ export class NodeModel<T = unknown>
 
   public extent = signal<'parent' | null>(NODE_DEFAULTS.extent);
 
+  /** Set by the `resizable` directive; drives the resizer template. */
+  public resizable = signal(false);
+
   public globalPoint = computed(() => {
     let parent = this.parent();
     let x = this.point().x;
@@ -198,7 +194,6 @@ export class NodeModel<T = unknown>
   );
 
   // Default node specific thing
-  public text = signal(NODE_DEFAULTS.text);
 
   // Component node specific thing
   public componentTypeInputs = {
@@ -216,10 +211,7 @@ export class NodeModel<T = unknown>
 
   public children = computed(() => this.entitiesService.nodesByParentIdMap().get(this.rawNode.id) ?? []);
 
-  public color = signal(NODE_DEFAULTS.color);
-
   public controlledByResizer = signal(false);
-  public resizable = signal(NODE_DEFAULTS.resizable);
   public resizing = signal(false);
   public resizerTemplate = signal<TemplateRef<unknown> | null>(null);
 
@@ -250,18 +242,6 @@ export class NodeModel<T = unknown>
 
     if (rawNode.extent) {
       this.extent = rawNode.extent;
-    }
-
-    if (rawNode.type === 'default-group' && rawNode.color) {
-      this.color = rawNode.color;
-    }
-
-    if (rawNode.type === 'default-group' && rawNode.resizable) {
-      this.resizable = rawNode.resizable;
-    }
-
-    if (rawNode.type === 'default' && rawNode.text) {
-      this.text = rawNode.text;
     }
 
     if (rawNode.type === 'html-template') {

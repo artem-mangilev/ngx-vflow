@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, TemplateRef, inject, viewChild } from '@angular/core';
+import { DocsPresentations } from '../../../../../../shared/flow-presentations';
 import { NgDocNotifyService } from '@ng-doc/ui-kit';
 import { Connection, Edge, EdgeChange, Node, NodeChange, Vflow, createNodes } from 'ngx-vflow';
 
@@ -13,7 +14,7 @@ import { Connection, Edge, EdgeChange, Node, NodeChange, Vflow, createNodes } fr
     `,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Vflow],
+  imports: [DocsPresentations, Vflow],
 })
 export class HandlingChangesDemoComponent {
   private notifyService = inject(NgDocNotifyService);
@@ -24,14 +25,14 @@ export class HandlingChangesDemoComponent {
     {
       id: '1',
       point: { x: 100, y: 100 },
-      type: 'default',
-      text: `1`,
+      type: 'html-template',
+      data: { text: `1` },
     },
     {
       id: '2',
       point: { x: 200, y: 200 },
-      type: 'default',
-      text: `2`,
+      type: 'html-template',
+      data: { text: `2` },
     },
   ]);
 

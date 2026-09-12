@@ -92,6 +92,6 @@ export class UiAppComponent {
     },
   ]);
   readonly edges = createEdges([
-    { id: 'card-task', source: 'card', target: 'task', type: 'template', curve: 'smooth-step', markers: { end: {} } },
+    { id: 'card-task', source: 'card', target: 'task', curve: 'smooth-step', markers: { end: {} } },
   ]);
 }

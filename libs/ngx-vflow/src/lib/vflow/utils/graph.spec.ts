@@ -6,7 +6,7 @@ import { getConnectedEdges, getIncomers, getNodesBounds, getOutgoers } from './g
 function node(id: string, x = 0, y = 0, parentId?: string, width?: number, height?: number): Node<unknown> {
   return {
     id,
-    type: 'default',
+    type: 'html-template',
     point: signal({ x, y }),
     parentId: signal(parentId ?? null),
     ...(width === undefined ? {} : { width: signal(width) }),

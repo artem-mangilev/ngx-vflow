@@ -41,8 +41,6 @@ const TRANSPARENT = new Set(['', 'transparent', 'rgba(0, 0, 0, 0)']);
   },
 })
 export class MinimapCanvasDirective {
-  public maskColor = input<string>();
-  public strokeColor = input<string>();
   public position = input.required<MiniMapPosition>();
   public pannable = input.required<boolean>();
   public zoomable = input.required<boolean>();
@@ -111,18 +109,16 @@ export class MinimapCanvasDirective {
       );
       // ponytail: redraw all previews on graph edits; use dirty regions if edits become the bottleneck.
       for (const node of nodes) {
-        const group = node.rawNode.type === 'default-group' || node.rawNode.type === 'template-group';
-        if (!group && node.rawNode.type !== 'default' && node.rawNode.type !== 'html-template' && !node.isComponentType)
-          continue;
+        const group = node.rawNode.type === 'template-group';
         const { x, y } = node.globalPoint();
         const selected = node.selected();
         context.beginPath();
         context.roundRect(x, y, node.width(), node.height(), group ? 5 : 2);
-        context.fillStyle = group ? node.color() : theme.surface;
-        context.globalAlpha = group ? 0.05 : 1;
+        context.fillStyle = group ? theme.muted : theme.surface;
+        context.globalAlpha = group ? 0.08 : 1;
         context.fill();
         context.globalAlpha = 1;
-        context.strokeStyle = group ? node.color() : selected ? theme.selection : theme.foreground;
+        context.strokeStyle = selected ? theme.selection : group ? theme.border : theme.foreground;
         context.lineWidth = group && !selected ? 1.5 : 2;
         context.stroke();
       }
@@ -182,11 +178,10 @@ export class MinimapCanvasDirective {
         this.settings.computedFlowHeight(),
       );
       const theme = this.theme();
-      const mask = this.maskColor();
       context.setTransform(ratio, 0, 0, ratio, 0, 0);
       context.clearRect(0, 0, width, height);
-      context.fillStyle = mask ?? theme.muted;
-      context.globalAlpha = mask ? 1 : 0.35;
+      context.fillStyle = theme.muted;
+      context.globalAlpha = 0.35;
       context.fillRect(0, 0, width, height);
       context.globalAlpha = 1;
       context.fillStyle = theme.background;
@@ -197,7 +192,7 @@ export class MinimapCanvasDirective {
         viewport.height * transform.zoom,
       );
       if (image.width && image.height) context.drawImage(image, 0, 0, width, height);
-      context.strokeStyle = this.strokeColor() ?? theme.border;
+      context.strokeStyle = theme.border;
       context.lineWidth = 1;
       context.strokeRect(0.5, 0.5, width - 1, height - 1);
     });

@@ -27,7 +27,7 @@ export class FlowStoreService {
       {
         id: 'group',
         point: { x: 800, y: 0 },
-        type: 'default-group',
+        type: 'template-group',
         width: 500,
         height: 800,
       },
@@ -68,7 +68,6 @@ export class FlowStoreService {
         source: 'data',
         target: 'transform',
         targetHandle: 'input-1',
-        type: 'template',
         curve: 'bezier',
         edgeLabels: {
           center: {

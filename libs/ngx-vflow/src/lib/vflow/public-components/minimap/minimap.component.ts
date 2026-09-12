@@ -17,17 +17,6 @@ export class MiniMapComponent implements OnInit {
   protected entitiesService = inject(FlowEntitiesService);
 
   /**
-   * The color outside the viewport (invisible area).
-   * Defaults to the `--vflow-muted` token with reduced opacity.
-   */
-  public maskColor = input<string>();
-
-  /**
-   * The minimap frame color. Defaults to the `--vflow-border` token.
-   */
-  public strokeColor = input<string>();
-
-  /**
    * The corner of the flow where to render a mini-map
    */
   public position = input<MiniMapPosition>('bottom-right');

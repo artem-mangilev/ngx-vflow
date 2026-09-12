@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, effect, inject, untracked, viewChild } from '@angular/core';
+import { DocsPresentations } from '../../../../../shared/flow-presentations';
 import { Vflow, Connection, VflowComponent, Edge, createEdge, ComponentNodeEvent } from 'ngx-vflow';
 import { FlowStoreService } from './services/flow-store.service';
 import { TransformNodeComponent } from './components/transform-node.component';
@@ -13,6 +14,9 @@ import { TransformNodeComponent } from './components/transform-node.component';
     [alignmentHelper]="true"
     (connect)="createEdge($event)"
     (componentNodeEvent)="onComponentEvent($event)">
+    <ng-template let-ctx nodeHtml><docs-node [ctx]="ctx" /></ng-template>
+    <ng-template let-ctx groupNode><docs-group [ctx]="ctx" /></ng-template>
+
     <ng-template let-ctx edge>
       @if (ctx.edge.data?.().type === 'animated') {
         <svg:path
@@ -22,6 +26,8 @@ import { TransformNodeComponent } from './components/transform-node.component';
           [attr.stroke-width]="2.5"
           [attr.stroke]="'#8b5cf6'"
           [attr.marker-end]="ctx.markerEnd()" />
+      } @else {
+        <svg:g docsEdge [ctx]="ctx" />
       }
     </ng-template>
 
@@ -108,7 +114,7 @@ import { TransformNodeComponent } from './components/transform-node.component';
     `,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Vflow],
+  imports: [DocsPresentations, Vflow],
   providers: [FlowStoreService],
 })
 export class AllFeaturesDemoComponent {

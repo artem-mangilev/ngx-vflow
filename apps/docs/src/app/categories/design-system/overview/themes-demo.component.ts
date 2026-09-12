@@ -34,6 +34,20 @@ import { createEdges, createNodes, Vflow } from 'ngx-vflow';
     article {
       width: 150px;
     }
+    .plain-node {
+      width: 130px;
+      padding: 8px;
+      border: 1.5px solid rgb(27, 38, 44);
+      border-radius: 4px;
+      background: #fff;
+      color: #1b262c;
+      font-size: 13px;
+    }
+    .plain-edge {
+      fill: none;
+      stroke: var(--vflow-muted, rgb(177, 177, 183));
+      stroke-width: 2;
+    }
   `,
   template: `
     <section class="demo" aria-label="Themes demo" vflowTheme="light">
@@ -93,10 +107,22 @@ import { createEdges, createNodes, Vflow } from 'ngx-vflow';
       </div>
       <ng-template #port let-ctx handle><span vflowPort [vflowPortState]="ctx.state()"></span></ng-template>
     </section>
-    <!-- Outside every theme scope: core defaults only, even though the UI stylesheet is loaded. -->
+    <!-- Outside every theme scope and without @vflow/ui: own templates on the headless core. -->
     <div class="editor" data-testid="editor-core" style="margin-top: 10px">
-      <p>Core only: default node and edge presentation without a theme scope.</p>
+      <p>Core only: own node and edge templates without a theme scope; core tokens keep their defaults.</p>
       <vflow [nodes]="coreNodes" [edges]="coreEdges">
+        <ng-template let-ctx nodeHtml>
+          <div class="plain-node" selectable>
+            {{ ctx.data().title }}
+            <handle type="target" position="left" />
+            <handle type="source" position="right" />
+          </div>
+        </ng-template>
+        <ng-template let-ctx edge>
+          <svg:g customTemplateEdge selectable>
+            <svg:path class="plain-edge" [attr.d]="ctx.path()" [attr.marker-end]="ctx.markerEnd()" />
+          </svg:g>
+        </ng-template>
         <mini-map />
       </vflow>
     </div>
@@ -108,12 +134,10 @@ export class ThemesDemoComponent {
     { id: 'a', type: 'html-template', point: { x: 20, y: 40 }, ariaLabel: 'Source', data: { title: 'Source' } },
     { id: 'b', type: 'html-template', point: { x: 240, y: 120 }, ariaLabel: 'Target', data: { title: 'Target' } },
   ]);
-  readonly edges = createEdges([
-    { id: 'a-b', source: 'a', target: 'b', type: 'template', curve: 'smooth-step', markers: { end: {} } },
-  ]);
+  readonly edges = createEdges([{ id: 'a-b', source: 'a', target: 'b', curve: 'smooth-step', markers: { end: {} } }]);
   readonly coreNodes = createNodes([
-    { id: 'c1', type: 'default', point: { x: 20, y: 40 }, text: 'Default' },
-    { id: 'c2', type: 'default', point: { x: 240, y: 120 }, text: 'Node' },
+    { id: 'c1', type: 'html-template', point: { x: 20, y: 40 }, data: { title: 'Own template' } },
+    { id: 'c2', type: 'html-template', point: { x: 240, y: 120 }, data: { title: 'Headless core' } },
   ]);
   readonly coreEdges = createEdges([
     { id: 'c1-c2', source: 'c1', target: 'c2', curve: 'smooth-step', markers: { end: {} } },

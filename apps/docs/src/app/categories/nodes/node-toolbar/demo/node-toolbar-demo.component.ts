@@ -1,11 +1,12 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { DocsPresentations } from '../../../../shared/flow-presentations';
 import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
 
 @Component({
   templateUrl: './node-toolbar-demo.component.html',
   styleUrls: ['./node-toolbar-demo.styles.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Vflow],
+  imports: [DocsPresentations, Vflow],
 })
 export class NodeToolbarDemoComponent {
   public nodes: Node[] = createNodes([

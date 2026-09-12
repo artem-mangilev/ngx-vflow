@@ -55,7 +55,7 @@ test('consumer DOM, scoped themes, selection and native workflow actions', async
   await expect(review).toHaveCSS('background-color', 'rgb(27, 40, 59)');
   await expect(workflow.locator('.vflow-toolbar .vui-toolbar')).toHaveCSS('background-color', 'rgb(27, 40, 59)');
   await expect(workflow.locator('path.vui-edge').first()).toHaveCSS('stroke', 'rgb(175, 190, 209)');
-  await expect(workflow.locator('marker polyline').first()).toHaveCSS('fill', 'rgb(175, 190, 209)');
+  await expect(workflow.locator('marker polyline').first()).toHaveCSS('fill', 'context-stroke');
   await workflow.screenshot({ path: testInfo.outputPath('workflow.png') });
   expect(errors).toEqual([]);
 });
@@ -265,12 +265,14 @@ test('themes stay scoped per editor, reach every layer and leave core-only flows
   const dark = { node: 'rgb(27, 40, 59)', edge: 'rgb(175, 190, 209)' };
   await expect(a.locator('article.vui-node').first()).toHaveCSS('background-color', light.node);
   await expect(a.locator('path.vui-edge')).toHaveCSS('stroke', light.edge);
-  await expect(a.locator('marker polyline')).toHaveCSS('fill', light.edge);
+  // Markers take the edge stroke through context-stroke, so theming the edge themes its arrowhead.
+  await expect(a.locator('marker polyline')).toHaveCSS('fill', 'context-stroke');
   await expect(b.locator('article.vui-node').first()).toHaveCSS('background-color', dark.node);
   await expect(b.locator('path.vui-edge')).toHaveCSS('stroke', dark.edge);
   // Core-only flow keeps its own defaults although the UI stylesheet is loaded on the page.
-  await expect(core.locator('.edge').first()).toHaveCSS('stroke', 'rgb(177, 177, 183)');
-  await expect(core.locator('default-node').first()).toHaveCSS('border-color', 'rgb(27, 38, 44)');
+  await expect(core.locator('.plain-edge').first()).toHaveCSS('stroke', 'rgb(177, 177, 183)');
+  await expect(core.locator('.plain-node').first()).toHaveCSS('border-color', 'rgb(27, 38, 44)');
+  await expect(core.locator('.handle--default').first()).toHaveCSS('background-color', 'rgb(27, 38, 44)');
   await expect(core.locator('.vflow-root')).toHaveCSS('background-color', 'rgb(255, 255, 255)');
 
   const geometry = () =>
@@ -290,12 +292,11 @@ test('themes stay scoped per editor, reach every layer and leave core-only flows
   await page.getByLabel('Dark first editor', { exact: true }).check();
   await expect(a.locator('article.vui-node').first()).toHaveCSS('background-color', dark.node);
   await expect(a.locator('path.vui-edge')).toHaveCSS('stroke', dark.edge);
-  await expect(a.locator('marker polyline')).toHaveCSS('fill', dark.edge);
   await expect(a.locator('.vflow-root')).toHaveCSS('background-color', 'rgb(16, 24, 39)');
   await expect.poll(minimapPixel).not.toBe(pixelBefore);
   expect(await geometry()).toEqual(before);
   await expect(b.locator('article.vui-node').first()).toHaveCSS('background-color', dark.node);
-  await expect(core.locator('.edge').first()).toHaveCSS('stroke', 'rgb(177, 177, 183)');
+  await expect(core.locator('.plain-edge').first()).toHaveCSS('stroke', 'rgb(177, 177, 183)');
 });
 
 test('pipeline: typed labeled ports, native controls inside nodes and geometry that follows content', async ({

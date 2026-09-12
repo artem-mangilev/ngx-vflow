@@ -1,11 +1,12 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { DocsPresentations } from '../../../../../shared/flow-presentations';
 import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
 
 @Component({
   templateUrl: './selecting-demo.component.html',
   styleUrls: ['./selecting-demo.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Vflow],
+  imports: [DocsPresentations, Vflow],
 })
 export class SelectingDemoComponent {
   public nodes: Node[] = createNodes([
@@ -17,14 +18,14 @@ export class SelectingDemoComponent {
     {
       id: '2',
       point: { x: 290, y: 50 },
-      type: 'default',
-      text: 'Selectable',
+      type: 'html-template',
+      data: { text: 'Selectable' },
     },
     {
       id: '3',
       point: { x: 290, y: 300 },
-      type: 'default',
-      text: 'Selectable',
+      type: 'html-template',
+      data: { text: 'Selectable' },
     },
   ]);
 
@@ -38,7 +39,6 @@ export class SelectingDemoComponent {
       id: '1 -> 3',
       source: '1',
       target: '3',
-      type: 'template',
     },
   ];
 }

@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { DocsPresentations } from '../../../../../shared/flow-presentations';
 import { Edge, Node, StaticNode, Vflow, createNodes } from 'ngx-vflow';
 import { StressTestNodeComponent } from './stress-test-node.component';
 
@@ -6,7 +7,7 @@ import { StressTestNodeComponent } from './stress-test-node.component';
   templateUrl: './stress-test-demo.component.html',
   styleUrls: ['./stress-test-demo.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Vflow],
+  imports: [DocsPresentations, Vflow],
 })
 export class StressTestDemoComponent {
   public nodes: Node[] = [];

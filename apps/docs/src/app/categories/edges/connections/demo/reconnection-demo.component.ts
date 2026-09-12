@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { DocsPresentations } from '../../../../shared/flow-presentations';
 import {
   Edge,
   Node,
@@ -17,7 +18,12 @@ import {
     [edges]="edges"
     (reconnectStart)="onReconnectStart()"
     (reconnectEnd)="onReconnectEnd($event)"
-    (reconnect)="reconnect($event)" /> `,
+    (reconnect)="reconnect($event)">
+    <ng-template let-ctx nodeHtml><docs-node [ctx]="ctx" /></ng-template>
+    <ng-template let-ctx groupNode><docs-group [ctx]="ctx" /></ng-template>
+    <ng-template let-ctx edge><svg:g docsEdge [ctx]="ctx" /></ng-template>
+    <ng-template let-ctx edgeLabelHtml><docs-edge-label [ctx]="ctx" /></ng-template>
+  </vflow> `,
   styles: [
     `
       :host {
@@ -27,33 +33,33 @@ import {
     `,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Vflow],
+  imports: [DocsPresentations, Vflow],
 })
 export class ReconnectionDemoComponent {
   public nodes: Node[] = createNodes([
     {
       id: '1',
       point: { x: 100, y: 100 },
-      type: 'default',
-      text: `1`,
+      type: 'html-template',
+      data: { text: `1` },
     },
     {
       id: '2',
       point: { x: 600, y: 100 },
-      type: 'default',
-      text: `2`,
+      type: 'html-template',
+      data: { text: `2` },
     },
     {
       id: '3',
       point: { x: 100, y: 300 },
-      type: 'default',
-      text: `3`,
+      type: 'html-template',
+      data: { text: `3` },
     },
     {
       id: '4',
       point: { x: 600, y: 300 },
-      type: 'default',
-      text: `4`,
+      type: 'html-template',
+      data: { text: `4` },
     },
   ]);
 
@@ -62,17 +68,11 @@ export class ReconnectionDemoComponent {
       id: '1 -> 2',
       source: '1',
       target: '2',
-      type: 'default',
       reconnectable: signal(true),
       edgeLabels: signal({
         center: {
-          type: 'default',
-          text: 'Reconnectable from both sides',
-          style: {
-            color: 'black',
-            lineHeight: '80%',
-            borderRadius: '5px',
-          },
+          type: 'html-template',
+          data: 'Reconnectable from both sides',
         },
       }),
     },
@@ -80,17 +80,11 @@ export class ReconnectionDemoComponent {
       id: '3 -> 4',
       source: '3',
       target: '4',
-      type: 'default',
       reconnectable: signal('source'),
       edgeLabels: signal({
         center: {
-          type: 'default',
-          text: 'Reconnectable only from source side',
-          style: {
-            color: 'black',
-            lineHeight: '80%',
-            borderRadius: '5px',
-          },
+          type: 'html-template',
+          data: 'Reconnectable only from source side',
         },
       }),
     },

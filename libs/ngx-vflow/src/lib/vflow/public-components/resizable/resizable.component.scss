@@ -28,7 +28,8 @@
 .resize-control.handle {
   width: 6px;
   height: 6px;
-  border: 1px solid #fff;
+  background-color: var(--vflow-selection, #2e414c);
+  border: 1px solid var(--vflow-surface, #fff);
   border-radius: 1px;
   translate: -50% -50%;
 }
@@ -47,6 +48,7 @@
 .resize-control.line {
   border-width: 0;
   border-style: solid;
+  border-color: var(--vflow-selection, #2e414c);
 }
 
 .resize-control.line.left,

@@ -220,7 +220,6 @@ export class EntitiesDemoComponent {
         sourceHandle: 'out:id',
         target: 'order',
         targetHandle: 'in:customer-id',
-        type: 'template',
         edgeLabels: { center: { type: 'html-template', data: '1 → N' } },
       },
       {
@@ -229,7 +228,6 @@ export class EntitiesDemoComponent {
         sourceHandle: 'out:email',
         target: 'erp',
         targetHandle: 'in:email',
-        type: 'template',
         edgeLabels: { center: { type: 'html-template', data: 'Copy email' } },
       },
     ]),
@@ -297,7 +295,6 @@ export class EntitiesDemoComponent {
     const edge = createEdge({
       ...connection,
       id: crypto.randomUUID(),
-      type: 'template',
       edgeLabels: { center: { type: 'html-template', data: 'Mapping' } },
     });
     this.edges.update((edges) => addEdges([edge], { nodes: this.nodes, edges }));

@@ -1,31 +1,21 @@
-export type Background = ColorBackground | DotsBackground | ImageBackground | GridBackground;
-
-export interface ColorBackground {
-  type: 'solid';
-  color: string;
-}
+/**
+ * Optional pattern drawn over the flow canvas. The canvas color itself and the pattern color are CSS:
+ * `--vflow-background` and `--vflow-muted` (or the `.vflow-background-pattern` class).
+ */
+export type Background = DotsBackground | ImageBackground | GridBackground;
 
 export interface DotsBackground {
   type: 'dots';
+
   /**
    * Gap between dots
    */
   gap?: number;
 
   /**
-   * Color of the dot
-   */
-  color?: string;
-
-  /**
    * Diameter of the dot
    */
   size?: number;
-
-  /**
-   * Color behind tha dot pattern
-   */
-  backgroundColor?: string;
 }
 
 export interface ImageBackground {
@@ -59,11 +49,6 @@ export interface GridBackground {
   type: 'grid';
 
   /**
-   * Color of the grid lines
-   */
-  color?: string;
-
-  /**
    * Size of the grid squares
    */
   size?: number;
@@ -72,9 +57,4 @@ export interface GridBackground {
    * Width of the grid lines
    */
   strokeWidth?: number;
-
-  /**
-   * Color behind tha dot pattern
-   */
-  backgroundColor?: string;
 }

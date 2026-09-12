@@ -1,8 +1,13 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { DocsPresentations } from '../../../../shared/flow-presentations';
 import { Node, Vflow, createNodes } from 'ngx-vflow';
 
 @Component({
   template: `<vflow view="auto" [nodes]="nodes">
+    <ng-template let-ctx nodeHtml><docs-node [ctx]="ctx" /></ng-template>
+    <ng-template let-ctx edge><svg:g docsEdge [ctx]="ctx" /></ng-template>
+    <ng-template let-ctx edgeLabelHtml><docs-edge-label [ctx]="ctx" /></ng-template>
+
     <ng-template let-ctx groupNode>
       <div
         selectable
@@ -33,7 +38,7 @@ import { Node, Vflow, createNodes } from 'ngx-vflow';
     `,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Vflow],
+  imports: [DocsPresentations, Vflow],
 })
 export class TemplateGroupResizerDemoComponent {
   public nodes: Node[] = createNodes([
@@ -47,8 +52,8 @@ export class TemplateGroupResizerDemoComponent {
     {
       id: '6',
       point: { x: 10, y: 10 },
-      type: 'default',
-      text: `6`,
+      type: 'html-template',
+      data: { text: `6` },
       parentId: '5',
     },
   ]);

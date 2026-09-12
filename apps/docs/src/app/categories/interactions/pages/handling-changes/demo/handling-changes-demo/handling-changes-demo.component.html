@@ -4,7 +4,12 @@
   [edges]="edges"
   (connect)="createEdge($event)"
   (nodesChanges)="handleNodeChanges($event)"
-  (edgesChanges)="handleEdgeChanges($event)" />
+  (edgesChanges)="handleEdgeChanges($event)">
+  <ng-template let-ctx nodeHtml><docs-node [ctx]="ctx" /></ng-template>
+  <ng-template let-ctx groupNode><docs-group [ctx]="ctx" /></ng-template>
+  <ng-template let-ctx edge><svg:g docsEdge [ctx]="ctx" /></ng-template>
+  <ng-template let-ctx edgeLabelHtml><docs-edge-label [ctx]="ctx" /></ng-template>
+</vflow>
 
 <ng-template #toast>
   <h3>{{ toastData?.title }}</h3>

@@ -1,8 +1,9 @@
 import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
+import { DocsPresentations } from '../../../../../shared/flow-presentations';
 import { AriaLabelConfig, Vflow, createEdges, createNodes } from 'ngx-vflow';
 
 @Component({
-  imports: [Vflow],
+  imports: [DocsPresentations, Vflow],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section data-testid="accessibility-demo" aria-label="Accessibility example">
@@ -29,19 +30,26 @@ import { AriaLabelConfig, Vflow, createEdges, createNodes } from 'ngx-vflow';
         [connection]="connection"
         (connect)="connections.set(connections() + 1)"
         (connectEnd)="attempts.set(attempts() + 1)">
+        <ng-template let-ctx groupNode><docs-group [ctx]="ctx" /></ng-template>
+        <ng-template let-ctx edgeLabelHtml><docs-edge-label [ctx]="ctx" /></ng-template>
+
         <mini-map />
-        <ng-template nodeHtml>
-          <div class="reviewer">
-            <button type="button" noDrag noPan (click)="reviews.set(reviews() + 1)">Review request</button>
-            <handle
-              type="target"
-              position="left"
-              id="incoming"
-              ariaLabel="Accept request"
-              ariaDescription="Inbound route."
-              [canStart]="false"
-              [canAccept]="canAccept()" />
-          </div>
+        <ng-template let-ctx nodeHtml>
+          @if (ctx.node.id === 'approval') {
+            <div class="reviewer">
+              <button type="button" noDrag noPan (click)="reviews.set(reviews() + 1)">Review request</button>
+              <handle
+                type="target"
+                position="left"
+                id="incoming"
+                ariaLabel="Accept request"
+                ariaDescription="Inbound route."
+                [canStart]="false"
+                [canAccept]="canAccept()" />
+            </div>
+          } @else {
+            <docs-node [ctx]="ctx" />
+          }
         </ng-template>
         <ng-template let-ctx edge>
           <svg:g customTemplateEdge selectable>
@@ -49,7 +57,12 @@ import { AriaLabelConfig, Vflow, createEdges, createNodes } from 'ngx-vflow';
           </svg:g>
         </ng-template>
       </vflow>
-      <vflow [nodes]="referenceNodes" [view]="[600, 120]" [ariaLabelConfig]="{ flowLabel: 'Reference graph' }" />
+      <vflow [nodes]="referenceNodes" [view]="[600, 120]" [ariaLabelConfig]="{ flowLabel: 'Reference graph' }">
+        <ng-template let-ctx nodeHtml><docs-node [ctx]="ctx" /></ng-template>
+        <ng-template let-ctx groupNode><docs-group [ctx]="ctx" /></ng-template>
+        <ng-template let-ctx edge><svg:g docsEdge [ctx]="ctx" /></ng-template>
+        <ng-template let-ctx edgeLabelHtml><docs-edge-label [ctx]="ctx" /></ng-template>
+      </vflow>
     </section>
   `,
   styles: `
@@ -132,27 +145,33 @@ export class AccessibilityDemoComponent {
   protected nodes = createNodes([
     {
       id: 'parent',
-      type: 'default-group',
+      type: 'template-group',
       point: { x: 10, y: 20 },
       width: 250,
       height: 180,
       ariaLabel: 'Review',
-      color: '#64748b',
-      resizable: true,
+      data: { resizable: true },
     },
     {
       id: 'request',
-      type: 'default',
+      type: 'html-template',
       point: { x: 40, y: 55 },
       parentId: 'parent',
-      text: '<b>Request</b>',
+      data: { text: '<b>Request</b>' },
+      ariaLabel: 'Request',
       selected: true,
       selectable: false,
       draggable: false,
       ariaDescription: 'Needs approval.',
     },
     { id: 'approval', type: 'html-template', point: { x: 340, y: 70 }, ariaLabel: 'Approval', selectable: false },
-    { id: 'archive', type: 'default', point: { x: 340, y: 210 }, text: 'Archive' },
+    {
+      id: 'archive',
+      type: 'html-template',
+      point: { x: 340, y: 210 },
+      data: { text: 'Archive' },
+      ariaLabel: 'Archive',
+    },
   ]);
   protected edges = createEdges([
     { id: 'review', source: 'request', target: 'approval', targetHandle: 'incoming' },
@@ -160,7 +179,6 @@ export class AccessibilityDemoComponent {
       id: 'archive',
       source: 'request',
       target: 'archive',
-      type: 'template',
       ariaLabel: 'Archive route',
       ariaDescription: 'Keep a copy.',
       selected: true,
@@ -168,7 +186,14 @@ export class AccessibilityDemoComponent {
     },
   ]);
   protected referenceNodes = createNodes([
-    { id: 'parent', type: 'default', point: { x: 20, y: 20 }, text: 'Reference' },
-    { id: 'request', type: 'default', point: { x: 220, y: 20 }, text: 'Copy', parentId: 'parent', extent: null },
+    { id: 'parent', type: 'html-template', point: { x: 20, y: 20 }, data: { text: 'Reference' } },
+    {
+      id: 'request',
+      type: 'html-template',
+      point: { x: 220, y: 20 },
+      data: { text: 'Copy' },
+      parentId: 'parent',
+      extent: null,
+    },
   ]);
 }

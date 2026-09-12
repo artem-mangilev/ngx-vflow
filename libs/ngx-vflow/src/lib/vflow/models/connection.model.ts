@@ -1,10 +1,10 @@
-import { ConnectionSettings, ConnectionValidatorFn } from '../interfaces/connection-settings.interface';
-import { Curve, EdgeType } from '../interfaces/edge.interface';
+import { ConnectionSettings, ConnectionType, ConnectionValidatorFn } from '../interfaces/connection-settings.interface';
+import { Curve } from '../interfaces/edge.interface';
 import { ConnectionMode } from '../types/connection-mode.type';
 
 export class ConnectionModel {
   public curve: Curve;
-  public type: EdgeType;
+  public type: ConnectionType;
   public validator: ConnectionValidatorFn;
   public mode: ConnectionMode;
   public allowSelfConnections: boolean;

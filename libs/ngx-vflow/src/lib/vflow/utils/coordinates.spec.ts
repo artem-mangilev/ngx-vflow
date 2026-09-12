@@ -11,7 +11,7 @@ import {
 function node(id: string, x: number, y: number, parentId?: string): Node {
   return {
     id,
-    type: 'default',
+    type: 'html-template',
     point: signal({ x, y }),
     parentId: signal(parentId ?? null),
   };

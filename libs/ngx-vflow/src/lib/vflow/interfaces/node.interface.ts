@@ -15,14 +15,10 @@ export const NODE_DEFAULTS = {
   parentId: null,
   extent: 'parent' as const,
   selected: false,
-  color: '#1b262c',
-  resizable: false,
-  text: '',
   data: {},
 };
 
-export type Node<T = any> =
-  DefaultNode | HtmlTemplateNode<T> | ComponentNode<T> | DefaultGroupNode | TemplateGroupNode<T>;
+export type Node<T = any> = HtmlTemplateNode<T> | ComponentNode<T> | TemplateGroupNode<T>;
 
 export interface SharedNode {
   id: string;
@@ -38,26 +34,11 @@ export interface SharedNode {
   domAttributes?: WritableSignal<DomAttributes>;
 }
 
-export interface DefaultNode extends SharedNode {
-  type: 'default';
-  text?: WritableSignal<string>;
-  width?: WritableSignal<number>;
-  height?: WritableSignal<number>;
-}
-
 export interface HtmlTemplateNode<T = any> extends SharedNode {
   type: 'html-template';
   data?: WritableSignal<T>;
   width?: WritableSignal<number>;
   height?: WritableSignal<number>;
-}
-
-export interface DefaultGroupNode extends SharedNode {
-  type: 'default-group';
-  width: WritableSignal<number>;
-  height: WritableSignal<number>;
-  color?: WritableSignal<string>;
-  resizable?: WritableSignal<boolean>;
 }
 
 export interface TemplateGroupNode<T = any> extends SharedNode {
@@ -87,24 +68,12 @@ export function isTemplateNode<T>(node: Node<T>): node is HtmlTemplateNode<T> {
   return node.type === 'html-template';
 }
 
-export function isDefaultNode(node: Node): node is DefaultNode {
-  return node.type === 'default';
-}
-
-export function isDefaultGroupNode(node: Node): node is DefaultGroupNode {
-  return node.type === 'default-group';
-}
-
 export function isTemplateGroupNode<T>(node: Node<T>): node is TemplateGroupNode<T> {
   return node.type === 'template-group';
 }
 
 export type StaticNode<T = unknown> =
-  | UnwrapSignal<DefaultNode>
-  | UnwrapSignal<HtmlTemplateNode<T>>
-  | UnwrapSignal<ComponentNode<T>>
-  | UnwrapSignal<DefaultGroupNode>
-  | UnwrapSignal<TemplateGroupNode<T>>;
+  UnwrapSignal<HtmlTemplateNode<T>> | UnwrapSignal<ComponentNode<T>> | UnwrapSignal<TemplateGroupNode<T>>;
 
 interface CreateNodeOptions {
   useDefaults: boolean;
@@ -158,26 +127,6 @@ export function createNode<T>(
 ): Node<T> | NodeWithDefaults<T> {
   const baseNode = createBaseNode(node, options.useDefaults);
 
-  if (node.type === 'default') {
-    if (options.useDefaults) {
-      return {
-        ...baseNode,
-        type: 'default' as const,
-        text: signal(node.text ?? ''),
-        width: signal(node.width ?? NODE_DEFAULTS.width),
-        height: signal(node.height ?? NODE_DEFAULTS.height),
-      };
-    } else {
-      return {
-        ...baseNode,
-        type: 'default' as const,
-        text: isDefined(node.text) ? signal(node.text) : undefined,
-        width: isDefined(node.width) ? signal(node.width) : undefined,
-        height: isDefined(node.height) ? signal(node.height) : undefined,
-      };
-    }
-  }
-
   if (node.type === 'html-template') {
     if (options.useDefaults) {
       return {
@@ -194,31 +143,6 @@ export function createNode<T>(
         data: isDefined(node.data) ? (signal(node.data) as WritableSignal<T>) : undefined,
         width: isDefined(node.width) ? signal(node.width) : undefined,
         height: isDefined(node.height) ? signal(node.height) : undefined,
-      };
-    }
-  }
-
-  if (node.type === 'default-group') {
-    const width = signal(node.width);
-    const height = signal(node.height);
-
-    if (options.useDefaults) {
-      return {
-        ...baseNode,
-        type: 'default-group' as const,
-        width,
-        height,
-        color: signal(node.color ?? NODE_DEFAULTS.color),
-        resizable: signal(node.resizable ?? NODE_DEFAULTS.resizable),
-      };
-    } else {
-      return {
-        ...baseNode,
-        type: 'default-group' as const,
-        width,
-        height,
-        color: isDefined(node.color) ? signal(node.color) : undefined,
-        resizable: isDefined(node.resizable) ? signal(node.resizable) : undefined,
       };
     }
   }
