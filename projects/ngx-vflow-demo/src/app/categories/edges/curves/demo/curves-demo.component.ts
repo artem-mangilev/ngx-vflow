@@ -40,6 +40,12 @@ export class CurvesDemoComponent {
       type: 'default',
       text: signal('4'),
     },
+    {
+      id: '5',
+      point: signal({ x: 400, y: 100 }),
+      type: 'default',
+      text: signal('5'),
+    },
   ];
 
   public edges: Edge[] = [
@@ -60,6 +66,27 @@ export class CurvesDemoComponent {
       source: '1',
       target: '4',
       curve: signal('smooth-step'),
+    },
+    {
+      id: '1 -> 5 straight',
+      source: '1',
+      target: '5',
+      curve: signal('straight'),
+    },
+    {
+      id: '1 -> 5 quadratic',
+      source: '1',
+      target: '5',
+      curve: signal('quadratic'),
+      data: signal({
+        distance: 30,
+      }),
+      edgeLabels: signal({
+        center: {
+          type: 'default',
+          text: 'label',
+        },
+      }),
     },
   ];
 

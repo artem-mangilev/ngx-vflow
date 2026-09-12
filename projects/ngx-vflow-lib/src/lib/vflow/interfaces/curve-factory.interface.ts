@@ -28,7 +28,7 @@ export interface EdgeCurveFactoryParams extends CurveFactorySharedParams {
   /** Indicates this is a permanent edge */
   mode: 'edge';
   /** The edge instance this curve belongs to */
-  edge: Edge;
+  edge: Edge<any>;
 }
 
 /**
