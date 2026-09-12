@@ -10,6 +10,7 @@
 @import 'tailwindcss/theme.css' layer(theme) prefix(vui);
 @import 'tailwindcss/utilities.css' layer(utilities) prefix(vui) source(none);
 @source './lib';
+@source '../bpmn/src';
 
 /* Public tokens (see the Design system docs). Utilities reference them directly through `inline`. */
 @theme inline {
@@ -71,6 +72,12 @@
    * Only an explicit theme scope maps the UI theme onto core tokens, so importing this file
    * does not restyle a standalone flow. Override `--vflow-*` on the flow or a descendant to win.
    */
+  /* Glyphs for the BPMN entry; ASCII-only class names keep both CSS entries identical. */
+  :root {
+    --vui-bpmn-exclusive: '\00d7';
+    --vui-bpmn-parallel: '+';
+  }
+
   [data-vui-theme] {
     --vflow-surface: var(--vui-surface);
     --vflow-foreground: var(--vui-foreground);

@@ -217,6 +217,9 @@ export class VflowComponent {
   public set minZoom(value: number) {
     this.flowSettingsService.minZoom.set(value);
   }
+  public get minZoom(): number {
+    return this.flowSettingsService.minZoom();
+  }
 
   /**
    * Maximum zoom value
@@ -224,6 +227,9 @@ export class VflowComponent {
   @Input()
   public set maxZoom(value: number) {
     this.flowSettingsService.maxZoom.set(value);
+  }
+  public get maxZoom(): number {
+    return this.flowSettingsService.maxZoom();
   }
 
   /** Zoom with ordinary wheel/trackpad scrolling. */

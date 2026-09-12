@@ -45,88 +45,101 @@ interface StepData {
         <label><input type="checkbox" [checked]="readOnly()" (change)="toggleReadOnly()" /> Read only</label>
         <p>Approve the invoice; select a node to inspect it.</p>
       </div>
-      <vflow view="auto" [nodes]="nodes" [edges]="edges">
-        <ng-template let-ctx nodeHtml>
-          <article vflowNode selectable [vflowSelected]="ctx.selected() || ctx.preselected()">
-            <header vflowNodeHeader>
-              <span vflowIcon aria-hidden="true">{{ ctx.data().icon }}</span>
-              <span vflowTitle>{{ ctx.data().title }}</span>
-            </header>
-            <div vflowNodeBody>
-              <p class="description">{{ ctx.data().description }}</p>
-            </div>
-            <footer vflowNodeFooter>
-              @if (ctx.node.id === 'review') {
-                <span [vflowStatus]="approved() ? 'success' : 'warning'">{{
-                  approved() ? 'Approved' : 'Waiting'
-                }}</span>
-              } @else {
-                <span [vflowStatus]="ctx.data().status.tone" [vflowStatusBusy]="ctx.data().status.busy ?? false">{{
-                  ctx.data().status.text
-                }}</span>
-              }
-              @if (ctx.data().diagnostic; as diagnostic) {
-                <span [vflowStatus]="diagnostic.tone">{{ diagnostic.text }}</span>
-              }
-              <span vflowActions>
+      <div class="stage">
+        <vflow view="auto" [nodes]="nodes" [edges]="edges" [minZoom]="0.5" [maxZoom]="2">
+          <ng-template let-ctx nodeHtml>
+            <article vflowNode selectable [vflowSelected]="ctx.selected() || ctx.preselected()">
+              <header vflowNodeHeader>
+                <span vflowIcon aria-hidden="true">{{ ctx.data().icon }}</span>
+                <span vflowTitle>{{ ctx.data().title }}</span>
+              </header>
+              <div vflowNodeBody>
+                <p class="description">{{ ctx.data().description }}</p>
+              </div>
+              <footer vflowNodeFooter>
                 @if (ctx.node.id === 'review') {
-                  <button
-                    vflowButton
-                    vflowNoDrag
-                    type="button"
-                    [disabled]="readOnly() || approved()"
-                    (click)="approved.set(true)">
-                    Approve
-                  </button>
+                  <span [vflowStatus]="approved() ? 'success' : 'warning'">{{
+                    approved() ? 'Approved' : 'Waiting'
+                  }}</span>
                 } @else {
-                  <button
-                    vflowButton
-                    vflowNoDrag
-                    type="button"
-                    [disabled]="readOnly()"
-                    [attr.aria-label]="'Open ' + ctx.data().title"
-                    (click)="opened.set(ctx.data().title)">
-                    Open
-                  </button>
+                  <span [vflowStatus]="ctx.data().status.tone" [vflowStatusBusy]="ctx.data().status.busy ?? false">{{
+                    ctx.data().status.text
+                  }}</span>
                 }
-              </span>
-            </footer>
-            @if (ctx.node.id !== 'received') {
-              <handle type="target" position="left" [canStart]="false" [canAccept]="false" [template]="port" />
+                @if (ctx.data().diagnostic; as diagnostic) {
+                  <span [vflowStatus]="diagnostic.tone">{{ diagnostic.text }}</span>
+                }
+                <span vflowActions>
+                  @if (ctx.node.id === 'review') {
+                    <button
+                      vflowButton
+                      vflowNoDrag
+                      type="button"
+                      [disabled]="readOnly() || approved()"
+                      (click)="approved.set(true)">
+                      Approve
+                    </button>
+                  } @else {
+                    <button
+                      vflowButton
+                      vflowNoDrag
+                      type="button"
+                      [disabled]="readOnly()"
+                      [attr.aria-label]="'Open ' + ctx.data().title"
+                      (click)="opened.set(ctx.data().title)">
+                      Open
+                    </button>
+                  }
+                </span>
+              </footer>
+              @if (ctx.node.id !== 'received') {
+                <handle type="target" position="left" [canStart]="false" [canAccept]="false" [template]="port" />
+              }
+              @if (ctx.node.id !== 'paid' && ctx.node.id !== 'fix') {
+                <handle type="source" position="right" [canStart]="false" [canAccept]="false" [template]="port" />
+              }
+              @if (ctx.selected()) {
+                <node-toolbar>
+                  <div vflowToolbar>
+                    <span>{{ readOnly() ? 'View only' : 'Drag to move' }}</span>
+                    <button
+                      vflowButton
+                      vflowNoDrag
+                      type="button"
+                      [attr.aria-label]="'Details of ' + ctx.data().title"
+                      (click)="opened.set(ctx.data().title)">
+                      Details
+                    </button>
+                  </div>
+                </node-toolbar>
+              }
+            </article>
+          </ng-template>
+          <ng-template let-ctx edge>
+            <svg:g customTemplateEdge selectable>
+              <svg:path
+                vflowEdge
+                [attr.d]="ctx.path()"
+                [attr.marker-end]="ctx.markerEnd()"
+                [vflowSelected]="ctx.selected() || ctx.preselected()" />
+            </svg:g>
+          </ng-template>
+          <ng-template let-ctx edgeLabelHtml>
+            @if (ctx.label.data.kind === 'meta') {
+              <span vflowEdgeLabel vflowMeta [attr.data-label]="ctx.label.data.text">{{ ctx.label.data.text }}</span>
+            } @else {
+              <span vflowEdgeLabel [attr.data-label]="ctx.label.data.text">{{ ctx.label.data.text }}</span>
             }
-            @if (ctx.node.id !== 'paid' && ctx.node.id !== 'fix') {
-              <handle type="source" position="right" [canStart]="false" [canAccept]="false" [template]="port" />
-            }
-            @if (ctx.selected()) {
-              <node-toolbar>
-                <div vflowToolbar>
-                  <span>{{ readOnly() ? 'View only' : 'Drag to move' }}</span>
-                  <button
-                    vflowButton
-                    vflowNoDrag
-                    type="button"
-                    [attr.aria-label]="'Details of ' + ctx.data().title"
-                    (click)="opened.set(ctx.data().title)">
-                    Details
-                  </button>
-                </div>
-              </node-toolbar>
-            }
-          </article>
-        </ng-template>
-        <ng-template let-ctx edge>
-          <svg:g customTemplateEdge selectable>
-            <svg:path
-              vflowEdge
-              [attr.d]="ctx.path()"
-              [attr.marker-end]="ctx.markerEnd()"
-              [vflowSelected]="ctx.selected() || ctx.preselected()" />
-          </svg:g>
-        </ng-template>
-        <ng-template let-ctx edgeLabelHtml>
-          <span vflowEdgeLabel>{{ ctx.label.data }}</span>
-        </ng-template>
-      </vflow>
+          </ng-template>
+        </vflow>
+        @if (flow(); as flow) {
+          <vflow-controls class="stage-controls" [flow]="flow">
+            <button vflowControlButton type="button" aria-label="Reset demo" title="Reset demo" (click)="reset()">
+              ↺
+            </button>
+          </vflow-controls>
+        }
+      </div>
       <ng-template #port let-ctx handle>
         <span vflowPort vflowPortConnected [vflowPortState]="ctx.state()"></span>
       </ng-template>
@@ -208,7 +221,12 @@ export class WorkflowDemoComponent {
       type: 'template',
       curve: 'smooth-step',
       markers: { end: { color: 'var(--vui-muted)' } },
-      edgeLabels: { center: { type: 'html-template', data: 'Approved' } },
+      // Labels at the start, center and end of the same edge follow its geometry.
+      edgeLabels: {
+        start: { type: 'html-template', data: { kind: 'meta', text: 'review' } },
+        center: { type: 'html-template', data: { kind: 'label', text: 'Approved' } },
+        end: { type: 'html-template', data: { kind: 'meta', text: 'accounting' } },
+      },
     },
     {
       id: 'review-fix',
@@ -217,7 +235,7 @@ export class WorkflowDemoComponent {
       type: 'template',
       curve: 'smooth-step',
       markers: { end: { color: 'var(--vui-muted)' } },
-      edgeLabels: { center: { type: 'html-template', data: 'Needs changes' } },
+      edgeLabels: { center: { type: 'html-template', data: { kind: 'label', text: 'Needs changes' } } },
     },
   ]);
 
@@ -226,6 +244,12 @@ export class WorkflowDemoComponent {
       const flow = this.flow();
       if (flow?.initialized()) untracked(() => flow.fitView());
     });
+  }
+
+  reset() {
+    this.approved.set(false);
+    this.opened.set('');
+    this.flow()?.fitView();
   }
 
   toggleReadOnly() {

@@ -30,7 +30,8 @@ pipeline compile it. Rules live in cascade layers; unlayered application styles 
 
 The package includes card, field-row and container shells, text roles (title, meta, icon, actions),
 port visuals, status indicators, SVG edge strokes, HTML labels, toolbar surfaces, external labels,
-BPMN event/gateway outlines, theme and selection directives.
+theme and selection directives, and `vflow-controls` (zoom in/out, fit view, custom buttons) for a
+flow instance. The BPMN subset lives in the `@vflow/ui/bpmn` entry point.
 For flow interaction compose them with core `selectable`, `handle`, `customTemplateEdge`
 and gesture-exclusion directives. Bind `vflowSelected` to selection/preselection and put
 `vflowPort` inside a handle template. UI never changes roles, focus or graph state.

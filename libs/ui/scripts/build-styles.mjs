@@ -10,7 +10,7 @@ import { fileURLToPath } from 'node:url';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 const source = join(root, 'libs/ui/src/styles.css');
 const dist = join(root, 'dist/libs/ui');
-const workspaceSource = "@source './lib';";
+const workspaceSource = "@source './lib';\n@source '../bpmn/src';";
 const publishedSource = "@source './fesm2022';";
 
 mkdirSync(dist, { recursive: true });
