@@ -297,3 +297,188 @@ test('themes stay scoped per editor, reach every layer and leave core-only flows
   await expect(b.locator('article.vui-node').first()).toHaveCSS('background-color', dark.node);
   await expect(core.locator('.edge').first()).toHaveCSS('stroke', 'rgb(177, 177, 183)');
 });
+
+test('pipeline: typed labeled ports, native controls inside nodes and geometry that follows content', async ({
+  page,
+}) => {
+  await page.goto('/design-system/pipeline');
+  const demo = page.locator('app-ui-pipeline-demo');
+  await demo.scrollIntoViewIfNeeded();
+  await expect(demo.locator('article.vui-node')).toHaveCount(4);
+  await expect(demo.locator('path.vui-edge')).toHaveCount(4);
+  await expect(demo.locator('.vui-port[data-type="video"]')).toHaveCount(4);
+  await expect(demo.locator('[data-stage="publish"] [data-port="poster"] .vui-port')).toHaveAttribute(
+    'data-connected',
+    'false',
+  );
+  const endpointError = () =>
+    demo.evaluate((root) => {
+      const edge = root.querySelectorAll<SVGPathElement>('path.vui-edge')[2];
+      const source = root
+        .querySelector('[data-stage="transcode"] [data-port="video"].output .handle--right .vui-port')!
+        .getBoundingClientRect();
+      const target = root
+        .querySelector('[data-stage="publish"] [data-port="video"] .handle--left .vui-port')!
+        .getBoundingClientRect();
+      const matrix = edge.getScreenCTM()!;
+      const start = edge.getPointAtLength(0).matrixTransform(matrix);
+      const end = edge.getPointAtLength(edge.getTotalLength()).matrixTransform(matrix);
+      return Math.max(
+        Math.abs(start.x - source.right),
+        Math.abs(start.y - source.y - source.height / 2),
+        Math.abs(end.x - target.left),
+        Math.abs(end.y - target.y - target.height / 2),
+      );
+    });
+  await expect.poll(endpointError).toBeLessThan(1);
+  const transcode = demo.locator('[data-stage="transcode"]');
+  const wrapper = transcode.locator('xpath=ancestor::*[contains(@class, "vflow-node")][1]');
+  const position = () => wrapper.evaluate((element: HTMLElement) => element.style.transform);
+  const start = await position();
+  // Native controls work and do not drag the node.
+  await transcode.getByLabel('Resolution').selectOption('2160p');
+  await expect(demo.locator('[data-stage="publish"] .vui-node-body .vui-meta')).toContainText('2160p');
+  await transcode.getByLabel(/Bitrate/).fill('30');
+  await expect(transcode.locator('.vui-status')).toHaveAttribute('data-busy', 'true');
+  expect(await position()).toBe(start);
+  // An extra typed output row above the video output moves the port; the edge follows.
+  await transcode.getByLabel('Poster output', { exact: true }).check();
+  await expect(transcode.locator('[data-port="poster"]')).toBeVisible();
+  await expect.poll(endpointError).toBeLessThan(1);
+  const source = transcode.locator('[data-port="poster"] .handle--right');
+  const target = demo.locator('[data-stage="publish"] [data-port="poster"] .handle--left');
+  const from = (await source.boundingBox())!;
+  const to = (await target.boundingBox())!;
+  await page.mouse.move(from.x + from.width / 2, from.y + from.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(to.x + to.width / 2, to.y + to.height / 2, { steps: 12 });
+  await expect(target.locator('.vui-port')).toHaveAttribute('data-state', 'valid');
+  await page.mouse.up();
+  await expect(demo.locator('path.vui-edge')).toHaveCount(5);
+  await expect(target.locator('.vui-port')).toHaveAttribute('data-connected', 'true');
+  // A type mismatch is rejected by the application's validator.
+  const audio = demo.locator('[data-stage="mix"] [data-port="audio"].output .handle--right');
+  const video = demo.locator('[data-stage="publish"] [data-port="video"] .handle--left');
+  const a = (await audio.boundingBox())!;
+  const v = (await video.boundingBox())!;
+  await page.mouse.move(a.x + a.width / 2, a.y + a.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(v.x + v.width / 2, v.y + v.height / 2, { steps: 12 });
+  await expect(video.locator('.vui-port')).toHaveAttribute('data-state', 'invalid');
+  await page.mouse.up();
+  await expect(demo.locator('path.vui-edge')).toHaveCount(5);
+});
+
+test('relationships map: container connections, a note without ports, custom content and view mode', async ({
+  page,
+}) => {
+  await page.goto('/design-system/relationships-map');
+  const demo = page.locator('app-ui-relationships-demo');
+  await demo.scrollIntoViewIfNeeded();
+  await expect(demo.locator('.vui-container')).toHaveCount(2);
+  await expect(demo.locator('article.vui-node')).toHaveCount(6);
+  await expect(demo.locator('path.vui-edge')).toHaveCount(4);
+  await expect(demo.locator('svg.avatar')).toHaveCount(4);
+  await expect(demo.locator('.note .handle')).toHaveCount(0);
+  // The edge between the two containers starts at the container's own handle.
+  const containerEdgeError = () =>
+    demo.evaluate((root) => {
+      const edge = root.querySelectorAll<SVGPathElement>('path.vui-edge')[0];
+      const source = root.querySelector('.vui-container .handle--right .vui-port')!.getBoundingClientRect();
+      const start = edge.getPointAtLength(0).matrixTransform(edge.getScreenCTM()!);
+      return Math.max(Math.abs(start.x - source.right), Math.abs(start.y - source.y - source.height / 2));
+    });
+  await expect.poll(containerEdgeError).toBeLessThan(1.5);
+  await expect(demo.locator('.vflow-edge-labels-layer .vui-edge-label').first()).toHaveText('3 shared services');
+  const ana = demo.locator('article').filter({ hasText: 'Ana Lima' });
+  const wrapper = ana.locator('xpath=ancestor::*[contains(@class, "vflow-node")][1]');
+  const position = () => wrapper.evaluate((element: HTMLElement) => element.style.transform);
+  await demo.getByLabel('View mode', { exact: true }).check();
+  await ana.evaluate((element) => element.scrollIntoView({ block: 'center' }));
+  const start = await position();
+  const box = (await ana.locator('header').boundingBox())!;
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(box.x + box.width / 2 + 80, box.y + box.height / 2 + 40, { steps: 10 });
+  await page.mouse.up();
+  await page.waitForTimeout(200);
+  expect(await position()).toBe(start);
+  // Selection still works in view mode.
+  await ana.locator('header').click();
+  await expect(ana).toHaveAttribute('data-vui-selected', 'true');
+  await demo.getByLabel('View mode', { exact: true }).uncheck();
+  await ana.evaluate((element) => element.scrollIntoView({ block: 'center' }));
+  const again = (await ana.locator('header').boundingBox())!;
+  await page.mouse.move(again.x + again.width / 2, again.y + again.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(again.x + again.width / 2 + 80, again.y + again.height / 2 + 40, { steps: 10 });
+  await page.mouse.up();
+  await expect.poll(position).not.toBe(start);
+});
+
+test('scroll and collapse experiment: model kept, endpoints move to the header and back, wheel scrolls rows', async ({
+  page,
+}) => {
+  await page.goto('/design-system/erd-schema-mapping');
+  const demo = page.locator('app-ui-scroll-collapse-demo');
+  await demo.evaluate((element) => element.scrollIntoView({ block: 'center' }));
+  await expect(demo.locator('path.vui-edge')).toHaveCount(2);
+  const rows = demo.locator('[data-rows="product"]');
+  await expect(rows.locator('[vflowField]')).toHaveCount(12);
+  const edgeStart = (index: number) =>
+    demo.evaluate((root, i) => {
+      const edge = root.querySelectorAll<SVGPathElement>('path.vui-edge')[i];
+      const point = edge.getPointAtLength(0).matrixTransform(edge.getScreenCTM()!);
+      return { x: point.x, y: point.y };
+    }, index);
+  const portCenter = (selector: string) =>
+    demo.evaluate((root, s) => {
+      const rect = root.querySelector(s)!.getBoundingClientRect();
+      return { x: rect.right, y: rect.y + rect.height / 2 };
+    }, selector);
+  const rowPort = '[data-entity="product"] [data-field="brand-id"] .handle--right .vui-port';
+  const footerPort = '[data-entity="product"] footer .handle--right .vui-port';
+  const distance = (index: number, selector: string) => async () => {
+    const start = await edgeStart(index);
+    const port = await portCenter(selector);
+    return Math.hypot(start.x - port.x, start.y - port.y);
+  };
+  // Initial layout: the brand edge sits on its visible row, the supplier edge on the footer proxy.
+  await expect.poll(distance(1, rowPort)).toBeLessThan(1.5);
+  await expect.poll(distance(0, footerPort)).toBeLessThan(1.5);
+  // Wheel over the rows scrolls them instead of zooming the graph.
+  const zoom = () => demo.locator('.vflow-viewport').evaluate((element) => element.style.transform);
+  const zoomBefore = await zoom();
+  const box = (await rows.boundingBox())!;
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+  await page.mouse.wheel(0, 120);
+  await expect.poll(() => rows.evaluate((element) => element.scrollTop)).toBeGreaterThan(0);
+  expect(await zoom()).toBe(zoomBefore);
+  // Demo policy: the supplier edge stays on the footer proxy, the visible brand row keeps its re-measured handle.
+  await expect.poll(distance(0, footerPort)).toBeLessThan(1.5);
+  await expect.poll(distance(1, rowPort)).toBeLessThan(1.5);
+  await rows.evaluate((element) => (element.scrollTop = 0));
+  // Collapse: rows leave the DOM, proxy handles keep both edges attached to the header.
+  await demo.getByRole('button', { name: 'Collapse Product', exact: true }).click();
+  await expect(rows).toHaveCount(0);
+  await expect(demo.locator('path.vui-edge')).toHaveCount(2);
+  const headerPort = '[data-entity="product"] header .handle--right .vui-port';
+  await expect.poll(distance(1, headerPort)).toBeLessThan(1.5);
+  await expect.poll(distance(0, headerPort)).toBeLessThan(1.5);
+  // Expand: the same field IDs restore the endpoints on the rows.
+  await demo.getByRole('button', { name: 'Expand Product', exact: true }).click();
+  await expect(rows.locator('[vflowField]')).toHaveCount(12);
+  await expect.poll(distance(1, rowPort)).toBeLessThan(1.5);
+  await expect.poll(distance(0, footerPort)).toBeLessThan(1.5);
+});
+
+test('ERD: deleting a field removes its edges and leaves no detached endpoints', async ({ page }) => {
+  await page.goto('/design-system/erd-schema-mapping');
+  const demo = page.locator('app-ui-entities-demo');
+  await demo.scrollIntoViewIfNeeded();
+  await expect(demo.locator('path.vui-edge')).toHaveCount(2);
+  await demo.getByRole('button', { name: 'Delete CRM contact.email', exact: true }).click();
+  await expect(demo.locator('[data-entity="crm"] [vflowField]')).toHaveCount(1);
+  await expect(demo.locator('path.vui-edge')).toHaveCount(1);
+  await expect(demo.locator('.vui-port[data-connected="true"]')).toHaveCount(2);
+});

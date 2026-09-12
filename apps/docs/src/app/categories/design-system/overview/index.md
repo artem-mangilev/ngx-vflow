@@ -11,11 +11,11 @@ Specialized sets, such as BPMN, build on the same primitives and tokens.
 
 Each page in this section shows one reference composition, its code and its limitations:
 
-- `Workflow` — cards, branching, edge labels, native actions, independent status and diagnostics.
-- `ERD and schema mapping` — field rows with ports and stable field IDs through rename and reorder.
-- `BPMN` — events, gateway, task cards, lane frames and sequence links.
-
-Data/media pipeline and relationships/metrics map pages are added together with their working examples.
+- `Workflow` — cards, branching, edge labels, native actions, independent status and diagnostics, viewport controls.
+- `Data and media pipeline` — typed labeled ports, rich body content, native controls inside nodes.
+- `ERD and schema mapping` — field rows with ports, stable field IDs through rename, reorder and deletion, a scroll/collapse experiment.
+- `Relationships and metrics map` — containers with their own connections, a note without ports, metrics and images, view mode.
+- `BPMN` — pools with message flows, lanes, tasks, events, gateways and flow kinds from the `@vflow/ui/bpmn` entry.
 
 ## Setup
 

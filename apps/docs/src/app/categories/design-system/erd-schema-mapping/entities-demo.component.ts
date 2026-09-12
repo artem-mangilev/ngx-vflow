@@ -82,6 +82,14 @@ interface EntityData {
                 <span vflowMeta class="key">{{ field.key }}</span>
                 <span vflowTitle>{{ field.name }}</span>
                 <span vflowMeta>{{ field.type }}</span>
+                <button
+                  vflowNoDrag
+                  class="remove"
+                  type="button"
+                  [attr.aria-label]="'Delete ' + ctx.data().title + '.' + field.name"
+                  (click)="deleteField(ctx.node.id, field.id)">
+                  ×
+                </button>
                 <!-- Per-row templates: connection state is application knowledge about existing edges. -->
                 <ng-template #inPort let-handle handle>
                   <span
@@ -275,6 +283,19 @@ export class EntitiesDemoComponent {
       edgeLabels: { center: { type: 'html-template', data: 'Mapping' } },
     });
     this.edges.update((edges) => addEdges([edge], { nodes: this.nodes, edges }));
+  }
+
+  /** Deleting a field is an application decision: its edges go with it, nothing is left detached. */
+  deleteField(nodeId: string, fieldId: string) {
+    const node = this.nodes.find((entity) => entity.id === nodeId)!;
+    node.data.update((data) => ({ ...data, fields: data.fields.filter((field) => field.id !== fieldId) }));
+    this.edges.update((edges) =>
+      edges.filter(
+        (edge) =>
+          !(edge.source === nodeId && edge.sourceHandle === 'out:' + fieldId) &&
+          !(edge.target === nodeId && edge.targetHandle === 'in:' + fieldId),
+      ),
+    );
   }
 
   removeEdge(id: string) {
