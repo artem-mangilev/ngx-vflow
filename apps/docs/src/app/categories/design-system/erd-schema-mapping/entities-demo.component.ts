@@ -57,7 +57,7 @@ interface EntityData {
       class="demo"
       aria-label="Entity relationships and field mapping demo"
       [vflowTheme]="dark() ? 'dark' : 'light'"
-      [style.--vui-field-height]="compact() ? '28px' : '42px'">
+      [style.--vui-space]="compact() ? '3px' : '4px'">
       <div class="controls">
         <button vflowButton type="button" (click)="flow()?.fitView()">Fit entities</button>
         <button vflowButton type="button" (click)="reverseFields()">Reverse fields</button>
@@ -66,13 +66,7 @@ interface EntityData {
         <label><input type="checkbox" [checked]="dark()" (change)="dark.set(!dark())" /> Dark theme</label>
         <p>Connect matching field types; names and row order can change.</p>
       </div>
-      <vflow
-        view="auto"
-        background="var(--vui-canvas)"
-        [nodes]="nodes"
-        [edges]="edges()"
-        [connection]="connection"
-        (connect)="connect($event)">
+      <vflow view="auto" [nodes]="nodes" [edges]="edges()" [connection]="connection" (connect)="connect($event)">
         <ng-template let-ctx nodeHtml>
           <article
             vflowNode

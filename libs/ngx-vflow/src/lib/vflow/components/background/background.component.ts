@@ -7,10 +7,10 @@ import { ViewportService } from '../../services/viewport.service';
 import { id } from '../../utils/id';
 import { toLazySignal } from '../../utils/signals/to-lazy-signal';
 
-const defaultBg = '#fff';
+const defaultBg = 'var(--vflow-background, #fff)';
 const defaultGap = 20;
 const defaultDotSize = 2;
-const defaultDotColor = 'rgb(177, 177, 183)';
+const defaultDotColor = 'var(--vflow-muted, rgb(177, 177, 183))';
 const defaultGridSize = 20;
 const defaultStrokeWidth = 2;
 const defaultImageScale = 0.1;

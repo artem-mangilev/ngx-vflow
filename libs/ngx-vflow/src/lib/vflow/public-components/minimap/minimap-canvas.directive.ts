@@ -1,5 +1,15 @@
 import { DOCUMENT } from '@angular/common';
-import { DestroyRef, Directive, ElementRef, afterRenderEffect, computed, inject, input, signal } from '@angular/core';
+import {
+  DestroyRef,
+  Directive,
+  ElementRef,
+  afterNextRender,
+  afterRenderEffect,
+  computed,
+  inject,
+  input,
+  signal,
+} from '@angular/core';
 import { FlowEntitiesService } from '../../services/flow-entities.service';
 import { FlowSettingsService } from '../../services/flow-settings.service';
 import { ViewportService } from '../../services/viewport.service';
@@ -10,6 +20,8 @@ import { KeyboardService } from '../../services/keyboard.service';
 import { Point } from '../../interfaces/point.interface';
 import { clientToFlowPosition } from '../../utils/coordinates';
 import { isPointInRect } from '../../utils/rect';
+
+const TRANSPARENT = new Set(['', 'transparent', 'rgba(0, 0, 0, 0)']);
 
 @Directive({
   selector: 'canvas[minimapCanvas]',
@@ -29,8 +41,8 @@ import { isPointInRect } from '../../utils/rect';
   },
 })
 export class MinimapCanvasDirective {
-  public maskColor = input.required<string>();
-  public strokeColor = input.required<string>();
+  public maskColor = input<string>();
+  public strokeColor = input<string>();
   public position = input.required<MiniMapPosition>();
   public pannable = input.required<boolean>();
   public zoomable = input.required<boolean>();
@@ -47,6 +59,31 @@ export class MinimapCanvasDirective {
   private previews = this.document.createElement('canvas');
   private width = computed(() => this.settings.computedFlowWidth() * 0.2);
   private height = computed(() => this.settings.computedFlowHeight() * 0.2);
+  private themeVersion = signal(0);
+
+  /**
+   * Canvas cannot read CSS variables, so the resolved `--vflow-*` tokens are sampled from computed style.
+   * The sample is refreshed when an attribute changes on any ancestor of the flow (class, data-*, style)
+   * or when the color scheme preference changes; other stylesheet edits are not observed.
+   */
+  private theme = computed(() => {
+    this.themeVersion();
+    const view = this.document.defaultView;
+    const style = view?.getComputedStyle(this.canvas);
+    const token = (name: string, fallback: string) => style?.getPropertyValue(name).trim() || fallback;
+    const surface = token('--vflow-surface', '#fff');
+    // The minimap template is projected by the consumer, so the flow root is found through the DOM.
+    const root = this.canvas.closest('.vflow-root');
+    const rootBackground = root && view ? view.getComputedStyle(root).backgroundColor : '';
+    return {
+      surface,
+      foreground: token('--vflow-foreground', '#1b262c'),
+      muted: token('--vflow-muted', 'rgb(177, 177, 183)'),
+      border: token('--vflow-border', 'rgb(200, 200, 200)'),
+      selection: token('--vflow-selection', '#0f4c75'),
+      background: TRANSPARENT.has(rootBackground) ? surface : rootBackground,
+    };
+  });
 
   // The graph bitmap depends on geometry and selection, never on the camera.
   private graph = computed(() => {
@@ -54,6 +91,7 @@ export class MinimapCanvasDirective {
     const height = this.height();
     const nodes = this.entities.nodes();
     const ratio = this.pixelRatio();
+    const theme = this.theme();
     const image = this.previews;
     image.width = Math.max(0, Math.round(width * ratio));
     image.height = Math.max(0, Math.round(height * ratio));
@@ -80,11 +118,11 @@ export class MinimapCanvasDirective {
         const selected = node.selected();
         context.beginPath();
         context.roundRect(x, y, node.width(), node.height(), group ? 5 : 2);
-        context.fillStyle = group ? node.color() : '#fff';
+        context.fillStyle = group ? node.color() : theme.surface;
         context.globalAlpha = group ? 0.05 : 1;
         context.fill();
         context.globalAlpha = 1;
-        context.strokeStyle = group ? node.color() : selected ? '#0f4c75' : '#1b262c';
+        context.strokeStyle = group ? node.color() : selected ? theme.selection : theme.foreground;
         context.lineWidth = group && !selected ? 1.5 : 2;
         context.stroke();
       }
@@ -97,13 +135,26 @@ export class MinimapCanvasDirective {
     const updateRatio = () => this.pixelRatio.set(view?.devicePixelRatio || 1);
     const cancelDrag = () => this.cancelDrag();
     const wheel = (event: WheelEvent) => this.onWheel(event);
+    const refreshTheme = () => this.themeVersion.update((version) => version + 1);
+    const scheme = view?.matchMedia?.('(prefers-color-scheme: dark)');
+    const observer = view && 'MutationObserver' in view ? new view.MutationObserver(refreshTheme) : undefined;
+    // Ancestors are complete only once the projected template is attached to the document.
+    afterNextRender(() => {
+      for (let element = this.canvas.parentElement; element; element = element.parentElement) {
+        observer?.observe(element, { attributes: true });
+      }
+      refreshTheme();
+    });
     view?.addEventListener('resize', updateRatio);
     view?.addEventListener('blur', cancelDrag);
+    scheme?.addEventListener('change', refreshTheme);
     this.canvas.addEventListener('wheel', wheel, { passive: false });
     inject(DestroyRef).onDestroy(() => {
       this.cancelDrag();
+      observer?.disconnect();
       view?.removeEventListener('resize', updateRatio);
       view?.removeEventListener('blur', cancelDrag);
+      scheme?.removeEventListener('change', refreshTheme);
       this.canvas.removeEventListener('wheel', wheel);
     });
 
@@ -130,13 +181,15 @@ export class MinimapCanvasDirective {
         this.settings.computedFlowWidth(),
         this.settings.computedFlowHeight(),
       );
-      const background = this.settings.background();
+      const theme = this.theme();
+      const mask = this.maskColor();
       context.setTransform(ratio, 0, 0, ratio, 0, 0);
       context.clearRect(0, 0, width, height);
-      context.fillStyle = this.maskColor();
+      context.fillStyle = mask ?? theme.muted;
+      context.globalAlpha = mask ? 1 : 0.35;
       context.fillRect(0, 0, width, height);
-      context.fillStyle =
-        background.type === 'solid' || background.type === 'dots' ? (background.color ?? '#fff') : '#fff';
+      context.globalAlpha = 1;
+      context.fillStyle = theme.background;
       context.fillRect(
         transform.x + viewport.x * transform.zoom,
         transform.y + viewport.y * transform.zoom,
@@ -144,7 +197,7 @@ export class MinimapCanvasDirective {
         viewport.height * transform.zoom,
       );
       if (image.width && image.height) context.drawImage(image, 0, 0, width, height);
-      context.strokeStyle = this.strokeColor();
+      context.strokeStyle = this.strokeColor() ?? theme.border;
       context.lineWidth = 1;
       context.strokeRect(0.5, 0.5, width - 1, height - 1);
     });

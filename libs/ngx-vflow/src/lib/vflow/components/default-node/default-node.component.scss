@@ -1,11 +1,11 @@
 :host {
-  border: 1.5px solid #1b262c;
+  border: 1.5px solid var(--vflow-border, #1b262c);
   border-radius: 5px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: black;
-  background-color: white;
+  color: var(--vflow-foreground, black);
+  background-color: var(--vflow-surface, white);
 }
 
 :host(.selected) {

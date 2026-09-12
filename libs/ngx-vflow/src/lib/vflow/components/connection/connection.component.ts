@@ -118,7 +118,7 @@ export class ConnectionComponent {
     return '';
   });
 
-  protected readonly defaultColor = 'rgb(177, 177, 183)';
+  protected readonly defaultColor = 'var(--vflow-muted, rgb(177, 177, 183))';
 
   // TODO: move context to model
   protected getContext(): ConnectionContext {
