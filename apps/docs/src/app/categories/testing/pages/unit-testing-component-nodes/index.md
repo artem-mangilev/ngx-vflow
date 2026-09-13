@@ -3,10 +3,12 @@ To simplify writing isolated tests for component nodes, you can use the `provide
 ```ts
 @Component({
   standalone: true,
-  template: `<div resizable><handle /></div>`,
+  template: `<div resizable>{{ ctx.node.id }}<handle type="source" position="right" /></div>`,
   imports: [Vflow],
 })
-class TestCustomNodeComponent extends CustomNodeComponent {}
+class TestCustomNodeComponent {
+  protected readonly ctx = injectNode();
+}
 
 describe('TestCustomNodeComponent', () => {
   let component: TestCustomNodeComponent;

@@ -175,31 +175,14 @@ describe('NodeModel', () => {
     expect(model.ariaLabel()).toBe('Node 1');
   });
 
-  it('renders a component class as is and resolves a lazy component factory', async () => {
-    const classModel = TestBed.runInInjectionContext(
-      () => new NodeModel(createNode({ id: 'class', component: ProbeNodeComponent, point: { x: 0, y: 0 } })),
-    );
-    const factoryModel = TestBed.runInInjectionContext(
-      () =>
-        new NodeModel(
-          createNode({ id: 'factory', component: () => Promise.resolve(ProbeNodeComponent), point: { x: 0, y: 0 } }),
-        ),
-    );
-    const templateModel = model;
-    const resolved: unknown[] = [];
-    classModel.componentInstance$.subscribe((value) => resolved.push(['class', value]));
-    factoryModel.componentInstance$.subscribe((value) => resolved.push(['factory', value]));
-    TestBed.tick();
-    await new Promise((resolve) => setTimeout(resolve));
+  it('loads a component class immediately and waits for the viewport with a lazy factory', () => {
+    settingsService.optimization.update((optimization) => ({ ...optimization, lazyLoadTrigger: 'viewport' }));
+    const make = (component: Parameters<typeof createNode>[0]['component']) =>
+      TestBed.runInInjectionContext(
+        () => new NodeModel(createNode({ id: 'c', component, point: { x: 5000, y: 5000 } })),
+      );
 
-    expect(classModel.isComponentType).toBeTrue();
-    expect(factoryModel.isComponentType).toBeTrue();
-    expect(templateModel.isComponentType).toBeFalse();
-    expect(resolved).toEqual(
-      jasmine.arrayWithExactContents([
-        ['class', ProbeNodeComponent],
-        ['factory', ProbeNodeComponent],
-      ]),
-    );
+    expect(make(ProbeNodeComponent).shouldLoad()).toBeTrue();
+    expect(make(() => Promise.resolve(ProbeNodeComponent)).shouldLoad()).toBeFalse();
   });
 });

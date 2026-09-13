@@ -5,13 +5,12 @@
     class="wrapper"
     [style.width.px]="wrapperSize()?.width ?? null"
     [style.height.px]="wrapperSize()?.height ?? null">
-    @if (model().isComponentType) {
-      @if (model().componentInstance$ | async; as component) {
-        <ng-container
-          [ngComponentOutlet]="$any(component)"
-          [ngComponentOutletInputs]="model().componentTypeInputs"
-          [ngComponentOutletInjector]="injector" />
-      }
+    @if (model().rawNode.component; as component) {
+      <ng-container
+        [entityComponentOutlet]="component"
+        [entityComponentOutletLoad]="model().shouldLoad()"
+        [entityComponentOutletInjector]="injector"
+        (entityComponentEvent)="pushComponentEvent($event)" />
     } @else if (nodeTemplate(); as template) {
       <ng-container
         [ngTemplateOutlet]="template"

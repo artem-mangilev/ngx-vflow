@@ -19,7 +19,6 @@ import { createResizer } from './public-components/resizable/resizer';
 import { FlowStatusService } from './services/flow-status.service';
 import { ConnectionControllerDirective } from './directives/connection-controller.directive';
 import { HandleComponent } from './public-components/handle/handle.component';
-import { CustomNodeComponent } from './public-components/custom-node/custom-node.component';
 import { EdgeLabelComponent } from './components/edge-label/edge-label.component';
 import { EdgeLabelModel } from './models/edge-label.model';
 import { ConnectionModel } from './models/connection.model';
@@ -50,7 +49,7 @@ class LabelHostComponent {
   imports: [HandleComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-class BoxNodeComponent extends CustomNodeComponent {}
+class BoxNodeComponent {}
 
 describe('Graph rendering and interaction regressions', () => {
   beforeEach(() =>

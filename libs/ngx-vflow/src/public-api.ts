@@ -22,6 +22,7 @@ export { ConnectionSettings, ConnectionValidatorFn } from './lib/vflow/interface
 export * from './lib/vflow/interfaces/marker.interface';
 export { ViewportState } from './lib/vflow/interfaces/viewport.interface';
 export * from './lib/vflow/interfaces/component-node-event.interface';
+export { NODE_REF, NodeRef, injectNode } from './lib/vflow/utils/inject-node';
 export * from './lib/vflow/interfaces/fit-view-options.interface';
 export * from './lib/vflow/interfaces/optimization.interface';
 export * from './lib/vflow/interfaces/intersecting-nodes-options.interface';
@@ -50,7 +51,6 @@ export * from './lib/vflow/types/selection-box-mode.type';
 // Components
 export * from './lib/vflow/components/vflow/vflow.component';
 export * from './lib/vflow/public-components/handle/handle.component';
-export * from './lib/vflow/public-components/custom-node/custom-node.component';
 export * from './lib/vflow/public-components/resizable/resizable.component';
 export * from './lib/vflow/public-components/resizable/node-resize-control.component';
 export * from './lib/vflow/public-components/resizable/resizer-types';

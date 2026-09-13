@@ -1,15 +1,6 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { DocsPresentations } from '@docs/shared';
-import {
-  Connection,
-  ConnectionSettings,
-  CustomNodeComponent,
-  Edge,
-  Node,
-  Vflow,
-  addEdges,
-  createNodes,
-} from 'ngx-vflow';
+import { Connection, ConnectionSettings, Edge, Node, Vflow, addEdges, createNodes, injectNode } from 'ngx-vflow';
 
 @Component({
   template: `
@@ -82,7 +73,7 @@ interface LooseConnectionNodeData {
 
 @Component({
   template: `<div class="node">
-    {{ data()?.text }}
+    {{ ctx.data().text }}
 
     <handle type="source" position="top" id="a" />
     <handle type="source" position="right" id="b" />
@@ -107,4 +98,6 @@ interface LooseConnectionNodeData {
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [Vflow],
 })
-export class LooseConnectionNodeComponent extends CustomNodeComponent<LooseConnectionNodeData> {}
+export class LooseConnectionNodeComponent {
+  protected readonly ctx = injectNode<LooseConnectionNodeData>();
+}

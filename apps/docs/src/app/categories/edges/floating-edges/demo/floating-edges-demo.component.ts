@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { DocsPresentations } from '@docs/shared';
-import { ConnectionSettings, CustomNodeComponent, Edge, Node, Vflow, createNodes } from 'ngx-vflow';
+import { ConnectionSettings, Edge, Node, Vflow, createNodes, injectNode } from 'ngx-vflow';
 
 @Component({
   template: `
@@ -85,7 +85,7 @@ interface FloatingEdgesNodeData {
 
 @Component({
   template: `<div class="node">
-    {{ data()?.text }}
+    {{ ctx.data().text }}
 
     <handle type="source" position="top" id="a" />
     <handle type="source" position="right" id="b" />
@@ -110,4 +110,6 @@ interface FloatingEdgesNodeData {
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [Vflow],
 })
-export class FloatingEdgesNodeComponent extends CustomNodeComponent<FloatingEdgesNodeData> {}
+export class FloatingEdgesNodeComponent {
+  protected readonly ctx = injectNode<FloatingEdgesNodeData>();
+}

@@ -1,5 +1,5 @@
 import { Component, output, ChangeDetectionStrategy } from '@angular/core';
-import { Vflow, CustomNodeComponent } from 'ngx-vflow';
+import { Vflow, injectNode } from 'ngx-vflow';
 
 // --- Description of blue square component node
 export interface BlueSquareData {
@@ -9,7 +9,7 @@ export interface BlueSquareData {
 @Component({
   template: `
     <div class="blue-square" (click)="onClick()">
-      {{ data()?.blueSquareText }}
+      {{ ctx.data().blueSquareText }}
 
       <handle type="target" position="left" />
     </div>
@@ -32,7 +32,8 @@ export interface BlueSquareData {
   imports: [Vflow],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class BlueSquareNodeComponent extends CustomNodeComponent<BlueSquareData> {
+export class BlueSquareNodeComponent {
+  protected readonly ctx = injectNode<BlueSquareData>();
   readonly blueSquareEvent = output<{ x: number; y: number }>();
 
   onClick() {

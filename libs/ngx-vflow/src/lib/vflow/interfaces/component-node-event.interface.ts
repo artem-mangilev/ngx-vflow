@@ -1,5 +1,4 @@
 import { EventEmitter, OutputRef } from '@angular/core';
-import { CustomNodeComponent } from '../public-components/custom-node/custom-node.component';
 
 type EventInfo<T> = T extends EventEmitter<infer U> | OutputRef<infer U> ? U : never;
 
@@ -14,14 +13,12 @@ type EventShape<T, K extends keyof T> = {
 type EventsFromComponent<T> = EventShape<T, EventKeys<T>>;
 
 /**
- * Event of custom component node
+ * Event of a component node. `eventName` is the property name of the output on the component class.
  *
- * Generic accepts array of custom components and merge their event emitters for type-safe
- * event handling
- *
- * @experimental
+ * The generic accepts the component classes of the flow and merges their outputs for type-safe
+ * event handling.
  */
-export type ComponentNodeEvent<T extends CustomNodeComponent[]> = { nodeId: string } & {
+export type ComponentNodeEvent<T extends object[]> = { nodeId: string } & {
   [I in keyof T]: EventsFromComponent<T[I]>;
 }[number];
 

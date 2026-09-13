@@ -5,7 +5,6 @@ import { createNode } from './interfaces/node.interface';
 import { createEdge } from './interfaces/edge.interface';
 import { FlowStatusService } from './services/flow-status.service';
 import { FlowEntitiesService } from './services/flow-entities.service';
-import { CustomNodeComponent } from './public-components/custom-node/custom-node.component';
 import { RequestAnimationFrameBatchingService } from './services/request-animation-frame-batching.service';
 import { HandleComponent } from './public-components/handle/handle.component';
 
@@ -18,7 +17,7 @@ import { HandleComponent } from './public-components/handle/handle.component';
   imports: [HandleComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-class SmallCustomNodeComponent extends CustomNodeComponent {}
+class SmallCustomNodeComponent {}
 
 describe('Initial handle placement', () => {
   for (const count of [1, 1024]) {

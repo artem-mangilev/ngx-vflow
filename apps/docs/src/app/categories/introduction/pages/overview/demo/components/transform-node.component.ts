@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, Component, output } from '@angular/core';
-import { CustomNodeComponent, Node, Vflow } from 'ngx-vflow';
+import { Node, Vflow, injectNode } from 'ngx-vflow';
 
 @Component({
   template: `
-    <div class="transform-node" selectable [resizable]="selected()">
+    <div class="transform-node" selectable [resizable]="ctx.selected()">
       <div class="node-header">
         <svg class="icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
           <path
@@ -47,7 +47,7 @@ import { CustomNodeComponent, Node, Vflow } from 'ngx-vflow';
 
     <node-toolbar position="top">
       <div class="toolbar-content">
-        <button class="toolbar-btn" (click)="deleted.emit(node())">Delete</button>
+        <button class="toolbar-btn" (click)="deleted.emit(ctx.node)">Delete</button>
       </div>
     </node-toolbar>
   `,
@@ -175,6 +175,7 @@ import { CustomNodeComponent, Node, Vflow } from 'ngx-vflow';
   imports: [Vflow],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TransformNodeComponent extends CustomNodeComponent {
+export class TransformNodeComponent {
+  protected readonly ctx = injectNode();
   readonly deleted = output<Node>();
 }

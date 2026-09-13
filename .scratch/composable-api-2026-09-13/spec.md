@@ -1,6 +1,6 @@
 # Спецификация: единая нода, компонентные ноды и рёбра, handle-директива, декларативные лейблы
 
-Status: in-progress (01 resolved)
+Status: in-progress (01, 02 resolved)
 Ветка: `3.0`. Обсуждение и сравнение с React Flow, ng-diagram и Foblex зафиксированы в `report.md`.
 
 ## Цель
@@ -107,6 +107,12 @@ eventPayload }`. Подписки снимаются при уничтожени
 - Симметрично для рёбер: `(componentEdgeEvent)` с `{ edgeId, eventName, eventPayload }` и тип
   `ComponentEdgeEvent<[A, B]>`. Один сервис шины с двумя потоками.
 - Отвергнуто: убрать шину и оставить только DI-сервис приложения. Пользователь решил оставить шину.
+- Решено при реализации 02: `eventName` это имя свойства output на классе, а не его алиас, чтобы
+  совпадать с ключами, которые выводит `ComponentNodeEvent<[...]>`. `NodeRef` не дублирует `id`,
+  он доступен как `ctx.node.id`. `NODE_REF` публичный, чтобы `provideCustomNodeMocks` и тесты приложений
+  могли подставить контекст. Внутренняя директива названа `EntityComponentOutletDirective`
+  (`ng-container[entityComponentOutlet]`) и сама разрешает ленивые фабрики, так что
+  `NodeModel.componentInstance$`, `componentTypeInputs` и `isComponentType` удалены.
 
 ### D4. Компонентные рёбра
 

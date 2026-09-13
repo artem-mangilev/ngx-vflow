@@ -3,7 +3,7 @@ import { Signal } from '@angular/core';
 import { Edge } from './edge.interface';
 import { HtmlTemplateEdgeLabel } from './edge-label.interface';
 import { HandleState } from '../models/handle.model';
-import { Node } from './node.interface';
+import { NodeRef } from '../utils/inject-node';
 
 export interface EdgeContext {
   $implicit: {
@@ -19,16 +19,7 @@ export interface EdgeContext {
 }
 
 export interface NodeContext {
-  $implicit: {
-    node: Node;
-    data: Signal<any>;
-    selected: Signal<boolean>;
-    preselected: Signal<boolean>;
-    /** Measured size for `auto` nodes; application or resizer size for `explicit` nodes. */
-    width: Signal<number>;
-    height: Signal<number>;
-    shouldLoad: Signal<boolean>;
-  };
+  $implicit: NodeRef;
 }
 
 export interface ConnectionContext {

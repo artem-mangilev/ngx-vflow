@@ -9,7 +9,6 @@ import { SelectionService } from './services/selection.service';
 import { NodeRenderingService } from './services/node-rendering.service';
 import { EdgeRenderingService } from './services/edge-rendering.service';
 import { FlowStatusService } from './services/flow-status.service';
-import { CustomNodeComponent } from './public-components/custom-node/custom-node.component';
 import { HandleComponent } from './public-components/handle/handle.component';
 import { MiniMapComponent } from './public-components/minimap/minimap.component';
 import { NodeToolbarComponent } from './public-components/node-toolbar/node-toolbar.component';
@@ -22,7 +21,7 @@ import { NodeToolbarComponent } from './public-components/node-toolbar/node-tool
   imports: [HandleComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-class StatefulNodeComponent extends CustomNodeComponent {
+class StatefulNodeComponent {
   width = signal(240);
   height = signal(80);
   draft = '';
@@ -35,7 +34,7 @@ class StatefulNodeComponent extends CustomNodeComponent {
   imports: [HandleComponent, NodeToolbarComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-class DragNodeComponent extends CustomNodeComponent {}
+class DragNodeComponent {}
 
 /** Nodes without a presentation render an empty wrapper of their size; component nodes measure themselves. */
 @Component({
@@ -45,7 +44,7 @@ class DragNodeComponent extends CustomNodeComponent {}
   imports: [HandleComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-class PlainNodeComponent extends CustomNodeComponent {}
+class PlainNodeComponent {}
 
 @Component({
   template: `<vflow [view]="[400, 300]" [nodes]="nodes" [optimization]="{ virtualization: true }"

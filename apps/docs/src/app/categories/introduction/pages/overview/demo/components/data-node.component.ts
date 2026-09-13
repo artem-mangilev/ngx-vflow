@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { CustomNodeComponent, Vflow } from 'ngx-vflow';
+import { Vflow } from 'ngx-vflow';
 
 @Component({
   template: `
@@ -90,7 +90,7 @@ import { CustomNodeComponent, Vflow } from 'ngx-vflow';
   imports: [Vflow],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class DataNodeComponent extends CustomNodeComponent {
+export class DataNodeComponent {
   protected fields = [
     { name: 'id', type: 'number' },
     { name: 'name', type: 'string' },

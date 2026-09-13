@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { CustomNodeComponent, Vflow } from 'ngx-vflow';
+import { Vflow } from 'ngx-vflow';
 
 @Component({
   template: `
@@ -75,4 +75,4 @@ import { CustomNodeComponent, Vflow } from 'ngx-vflow';
   imports: [Vflow],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TriggerNodeComponent extends CustomNodeComponent {}
+export class TriggerNodeComponent {}

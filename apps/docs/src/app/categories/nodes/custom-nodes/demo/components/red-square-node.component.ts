@@ -1,5 +1,5 @@
 import { Component, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
-import { Vflow, CustomNodeComponent } from 'ngx-vflow';
+import { Vflow, injectNode } from 'ngx-vflow';
 
 // --- Description of red square component node
 export interface RedSquareData {
@@ -9,7 +9,7 @@ export interface RedSquareData {
 @Component({
   template: `
     <div class="red-square" (click)="onClick()">
-      {{ data()?.redSquareText }}
+      {{ ctx.data().redSquareText }}
 
       <handle type="source" position="right" />
     </div>
@@ -32,7 +32,8 @@ export interface RedSquareData {
   imports: [Vflow],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class RedSquareNodeComponent extends CustomNodeComponent<RedSquareData> {
+export class RedSquareNodeComponent {
+  protected readonly ctx = injectNode<RedSquareData>();
   @Output()
   readonly redSquareEvent = new EventEmitter<string>();
 

@@ -11,6 +11,7 @@ import {
   ɵViewportService as ViewportService,
   ɵSelectionService as SelectionService,
   ɵNodeRenderingService as NodeRenderingService,
+  NODE_REF,
   Point,
 } from 'ngx-vflow';
 import { of } from 'rxjs';
@@ -30,6 +31,10 @@ export function provideCustomNodeMocks(): Provider[] {
       useFactory: () => ({
         model: signal(mockModel()),
       }),
+    },
+    {
+      provide: NODE_REF,
+      useFactory: () => mockModel().context.$implicit,
     },
     FlowEntitiesService,
 

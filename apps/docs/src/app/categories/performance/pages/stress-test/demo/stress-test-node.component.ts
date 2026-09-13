@@ -1,13 +1,13 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { CustomNodeComponent, Vflow } from 'ngx-vflow';
+import { Vflow, injectNode } from 'ngx-vflow';
 
 @Component({
   selector: 'stress-test-node',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [Vflow],
   template: `
-    <div class="stress-node" selectable [class.selected]="selected()">
-      {{ data()?.label }}
+    <div class="stress-node" selectable [class.selected]="ctx.selected()">
+      {{ ctx.data().label }}
       <handle type="target" position="left" />
       <handle type="source" position="right" />
     </div>
@@ -31,4 +31,6 @@ import { CustomNodeComponent, Vflow } from 'ngx-vflow';
     }
   `,
 })
-export class StressTestNodeComponent extends CustomNodeComponent<{ label: string }> {}
+export class StressTestNodeComponent {
+  protected readonly ctx = injectNode<{ label: string }>();
+}

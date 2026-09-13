@@ -1,7 +1,7 @@
-import { TemplateRef, Type, computed, inject, reflectComponentType, signal } from '@angular/core';
+import { TemplateRef, computed, inject, signal } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 import { DomAttributes } from '../interfaces/dom-attributes.interface';
-import { NODE_DEFAULTS, Node, isComponentNode } from '../interfaces/node.interface';
+import { NODE_DEFAULTS, Node } from '../interfaces/node.interface';
 import { NodeSizeMode } from '../types/node-change.type';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { HandleModel } from './handle.model';
@@ -10,12 +10,12 @@ import { Point } from '../interfaces/point.interface';
 import { FlowEntitiesService } from '../services/flow-entities.service';
 import { Contextable } from '../interfaces/contextable.interface';
 import { NodeContext } from '../interfaces/template-context.interface';
-import { Observable, from, of } from 'rxjs';
-import { filter, shareReplay, switchMap } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 import { FlowSettingsService } from '../services/flow-settings.service';
 import { NodeRenderingService } from '../services/node-rendering.service';
 import { extendedComputed } from '../utils/signals/extended-computed';
 import { createModelInjector } from '../utils/model-injector';
+import { isComponentClass } from '../utils/is-component-class';
 
 export class NodeModel<T = unknown> implements FlowEntity, Contextable<NodeContext> {
   private modelInjector = createModelInjector();
@@ -156,13 +156,8 @@ export class NodeModel<T = unknown> implements FlowEntity, Contextable<NodeConte
   // disabled for configuration for now
   public readonly magnetRadius = 20;
 
-  // TODO: not sure if we need to statically store it
-  public isComponentType = isComponentNode(this.rawNode);
-
-  /** A component class renders immediately; a lazy factory resolves to one. */
-  // A factory is not a decorated class, so reflection returns null for it.
-  private isComponentClass =
-    !!this.rawNode.component && reflectComponentType(this.rawNode.component as Type<unknown>) !== null;
+  /** A component class renders immediately; a lazy factory or a template waits for the viewport. */
+  private isComponentClass = isComponentClass(this.rawNode.component);
 
   public shouldLoad = extendedComputed<boolean>((previousShouldLoad) => {
     if (previousShouldLoad) {
@@ -184,21 +179,6 @@ export class NodeModel<T = unknown> implements FlowEntity, Contextable<NodeConte
 
     return true;
   });
-
-  public componentInstance$ = toObservable(this.shouldLoad, { injector: this.modelInjector }).pipe(
-    filter(Boolean),
-    switchMap(() => {
-      const component = this.rawNode.component;
-      if (!component || this.isComponentClass) return of(component);
-      return from((component as () => Promise<unknown>)());
-    }),
-    shareReplay(1),
-  );
-
-  // Component node specific thing
-  public componentTypeInputs = {
-    node: this.rawNode,
-  };
 
   public parent = computed<NodeModel | null>(() => {
     // Re-read optional signals when application-owned graph structure changes.

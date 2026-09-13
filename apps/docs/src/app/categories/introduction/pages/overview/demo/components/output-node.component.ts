@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
-import { CustomNodeComponent, Vflow } from 'ngx-vflow';
+import { Vflow, injectNode } from 'ngx-vflow';
 import { FlowStoreService } from '../services/flow-store.service';
 
 @Component({
@@ -133,30 +133,33 @@ import { FlowStoreService } from '../services/flow-store.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [Vflow],
 })
-export class OutputNodeComponent extends CustomNodeComponent {
+export class OutputNodeComponent {
+  protected readonly ctx = injectNode();
   public store = inject(FlowStoreService);
 
   public connectedNodeWidth = computed(() => {
     const edge =
-      this.store.edges().find((edge) => edge.target === this.node().id && edge.targetHandle === 'width') ?? null;
+      this.store.edges().find((edge) => edge.target === this.ctx.node.id && edge.targetHandle === 'width') ?? null;
     // A content-sized node has no width in its data; the flow reports measured and resized sizes as changes.
     return Math.floor((edge && this.store.sizes()[edge.source]?.width) ?? 0);
   });
 
   public connectedNodeHeight = computed(() => {
     const edge =
-      this.store.edges().find((edge) => edge.target === this.node().id && edge.targetHandle === 'height') ?? null;
+      this.store.edges().find((edge) => edge.target === this.ctx.node.id && edge.targetHandle === 'height') ?? null;
     return Math.floor((edge && this.store.sizes()[edge.source]?.height) ?? 0);
   });
 
   public connectedNodeX = computed(() => {
-    const edge = this.store.edges().find((edge) => edge.target === this.node().id && edge.targetHandle === 'x') ?? null;
+    const edge =
+      this.store.edges().find((edge) => edge.target === this.ctx.node.id && edge.targetHandle === 'x') ?? null;
     const sourceNode = edge ? this.store.nodes().find((node) => node.id === edge?.source) : null;
     return Math.floor(sourceNode?.point().x ?? 0);
   });
 
   public connectedNodeY = computed(() => {
-    const edge = this.store.edges().find((edge) => edge.target === this.node().id && edge.targetHandle === 'y') ?? null;
+    const edge =
+      this.store.edges().find((edge) => edge.target === this.ctx.node.id && edge.targetHandle === 'y') ?? null;
     const sourceNode = edge ? this.store.nodes().find((node) => node.id === edge?.source) : null;
     return Math.floor(sourceNode?.point().y ?? 0);
   });

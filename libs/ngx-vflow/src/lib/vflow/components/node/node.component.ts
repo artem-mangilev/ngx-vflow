@@ -20,7 +20,13 @@ import { NodeRenderingService } from '../../services/node-rendering.service';
 import { FlowSettingsService } from '../../services/flow-settings.service';
 import { SelectionService } from '../../services/selection.service';
 import { NodeAccessorService } from '../../services/node-accessor.service';
-import { NgTemplateOutlet, NgComponentOutlet, AsyncPipe } from '@angular/common';
+import { NgTemplateOutlet } from '@angular/common';
+import { ComponentEventBusService } from '../../services/component-event-bus.service';
+import {
+  EntityComponentOutletDirective,
+  EntityComponentOutputEvent,
+} from '../../directives/entity-component-outlet.directive';
+import { NODE_REF } from '../../utils/inject-node';
 
 // TODO: fix loading of these by @defer (should work in Angular 18+)
 // public components that uses in default node (loaded by defer)
@@ -34,7 +40,12 @@ export type HandleState = 'valid' | 'invalid' | 'idle';
   templateUrl: './node.component.html',
   styleUrls: ['./node.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [HandleService, NodeAccessorService],
+  providers: [
+    HandleService,
+    NodeAccessorService,
+    // Resolved lazily by presentations, which are created after the node model is set in ngOnInit.
+    { provide: NODE_REF, useFactory: () => inject(NodeAccessorService).model()!.context.$implicit },
+  ],
   host: {
     class: 'vflow-node',
     '[class.vflow-node--undraggable]': 'hostUndraggable()',
@@ -45,10 +56,9 @@ export type HandleState = 'valid' | 'invalid' | 'idle';
   },
   imports: [
     NgTemplateOutlet,
-    NgComponentOutlet,
+    EntityComponentOutletDirective,
     NodeHandlesControllerDirective,
     NodeResizeControllerDirective,
-    AsyncPipe,
   ],
 })
 export class NodeComponent implements OnInit, OnDestroy {
@@ -61,6 +71,7 @@ export class NodeComponent implements OnInit, OnDestroy {
   private selectionService = inject(SelectionService);
   private hostRef = inject<ElementRef<HTMLElement>>(ElementRef);
   private nodeAccessor = inject(NodeAccessorService);
+  private componentEventBus = inject(ComponentEventBusService);
 
   public model = input.required<NodeModel>();
 
@@ -142,6 +153,10 @@ export class NodeComponent implements OnInit, OnDestroy {
     this.model().nodeElement.set(null);
 
     this.draggableService.destroy(this.hostRef.nativeElement);
+  }
+
+  protected pushComponentEvent({ eventName, eventPayload }: EntityComponentOutputEvent) {
+    this.componentEventBus.pushEvent({ nodeId: this.model().rawNode.id, eventName, eventPayload });
   }
 
   protected pullNode() {
