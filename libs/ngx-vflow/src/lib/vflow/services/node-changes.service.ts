@@ -34,7 +34,12 @@ export class NodesChangeService {
       merge(...nodes.map((node) => merge(node.width$.pipe(skip(1)), node.height$.pipe(skip(1))).pipe(map(() => node)))),
     ),
     map((changedNode) => [
-      { type: 'size', id: changedNode.rawNode.id, size: { width: changedNode.width(), height: changedNode.height() } },
+      {
+        type: 'size',
+        id: changedNode.rawNode.id,
+        size: { width: changedNode.width(), height: changedNode.height() },
+        mode: changedNode.sizeMode(),
+      },
     ]),
   ) satisfies Observable<NodeChange[]>;
 

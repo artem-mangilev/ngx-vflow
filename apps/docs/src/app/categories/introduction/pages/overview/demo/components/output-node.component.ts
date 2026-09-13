@@ -139,15 +139,14 @@ export class OutputNodeComponent extends CustomNodeComponent {
   public connectedNodeWidth = computed(() => {
     const edge =
       this.store.edges().find((edge) => edge.target === this.node().id && edge.targetHandle === 'width') ?? null;
-    const sourceNode = edge ? this.store.nodes().find((node) => node.id === edge?.source) : null;
-    return Math.floor(sourceNode?.width?.() ?? 0);
+    // A content-sized node has no width in its data; the flow reports measured and resized sizes as changes.
+    return Math.floor((edge && this.store.sizes()[edge.source]?.width) ?? 0);
   });
 
   public connectedNodeHeight = computed(() => {
     const edge =
       this.store.edges().find((edge) => edge.target === this.node().id && edge.targetHandle === 'height') ?? null;
-    const sourceNode = edge ? this.store.nodes().find((node) => node.id === edge?.source) : null;
-    return Math.floor(sourceNode?.height?.() ?? 0);
+    return Math.floor((edge && this.store.sizes()[edge.source]?.height) ?? 0);
   });
 
   public connectedNodeX = computed(() => {

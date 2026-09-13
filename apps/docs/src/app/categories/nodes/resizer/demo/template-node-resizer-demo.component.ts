@@ -48,7 +48,6 @@ import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
       .custom-node {
         min-width: 150px;
         min-height: 100px;
-        height: 100%;
         background-color: #0f4c75;
         border: 1px solid gray;
         border-radius: 5px;

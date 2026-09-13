@@ -174,9 +174,17 @@ After:
 
 ```html
 <ng-template let-ctx groupNode>
-  <div [resizable]="ctx.selected()" [style.width.px]="ctx.width()" [style.height.px]="ctx.height()"></div>
+  <div [resizable]="ctx.selected()"></div>
 </ng-template>
 ```
+
+The `[resizable]` element is now the node's sizing box: for an explicitly sized node the library sets its `width`, `height` and `box-sizing: border-box` inline, so size bindings on that element are no longer needed. The node wrapper no longer receives an inline size when a `[resizable]` element exists, so put the directive on the top-level element of the node template. Content-sized nodes stay unsized until the first resize, as described in Node size modes above.
+
+### Node size modes
+
+`createNodes` / `createNode` no longer give `html-template` and component nodes a default `width` / `height` of 100 x 50. A node without a size in its data is content-sized (`auto`): the library measures it and never writes inline dimensions. A node becomes explicitly sized (`explicit`) when its data carries both `width` and `height`, or after the first resize gesture. `NodeWithDefaults` reflects this: `width` and `height` are optional for those node types, so read them with `node.width?.()`.
+
+`nodesChanges.size` now carries `mode: 'auto' | 'explicit'`. Persist a size only when it is `explicit`; an `auto` size is a measurement of the node's content and must not be written back as data, or the node would stop following its content.
 
 ### Removed APIs
 

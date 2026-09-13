@@ -70,6 +70,17 @@ export class NodeComponent implements OnInit, OnDestroy {
     () => this.model().draggable() && this.model().dragHandlesCount() > 0,
   );
 
+  /**
+   * An explicit size goes to the `[resizable]` element when one exists, so its CSS min/max, padding and border
+   * apply to the box that is measured. Without one, the wrapper carries the application-provided size.
+   */
+  protected readonly wrapperSize = computed(() => {
+    const model = this.model();
+    return model.sizeMode() === 'explicit' && !model.resizerTemplate()
+      ? { width: model.width(), height: model.height() }
+      : null;
+  });
+
   public nodeTemplate = input<TemplateRef<any>>();
 
   public groupNodeTemplate = input<TemplateRef<any>>();

@@ -2,6 +2,7 @@ import { TemplateRef, computed, inject, signal } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 import { DomAttributes } from '../interfaces/dom-attributes.interface';
 import { NODE_DEFAULTS, Node, isComponentNode } from '../interfaces/node.interface';
+import { NodeSizeMode } from '../types/node-change.type';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { HandleModel } from './handle.model';
 import { FlowEntity } from '../interfaces/flow-entity.interface';
@@ -113,8 +114,23 @@ export class NodeModel<T = unknown>
 
   public extent = signal<'parent' | null>(NODE_DEFAULTS.extent);
 
-  /** Set by the `resizable` directive; drives the resizer template. */
-  public resizable = signal(false);
+  /**
+   * Set by the resizer on its first accepted change; never reset. Together with
+   * application-provided size signals it decides {@link sizeMode}.
+   */
+  public resizedExplicitly = signal(false);
+
+  /**
+   * `auto`: the size mirrors the measured DOM and no inline width/height is written.
+   * `explicit`: the size comes from application data or the resizer and is written to the DOM.
+   */
+  public sizeMode = computed<NodeSizeMode>(() =>
+    this.rawNode.type === 'template-group' ||
+    (this.rawNode.width !== undefined && this.rawNode.height !== undefined) ||
+    this.resizedExplicitly()
+      ? 'explicit'
+      : 'auto',
+  );
 
   public globalPoint = computed(() => {
     let parent = this.parent();
@@ -211,8 +227,13 @@ export class NodeModel<T = unknown>
 
   public children = computed(() => this.entitiesService.nodesByParentIdMap().get(this.rawNode.id) ?? []);
 
-  public controlledByResizer = signal(false);
   public resizing = signal(false);
+
+  /**
+   * Registered by the `[resizable]` element while it exists. The node renders these controls in its own
+   * layer, so a clipping element (`overflow: hidden`) cannot hide them, and the registered element, not the
+   * node wrapper, receives the explicit size.
+   */
   public resizerTemplate = signal<TemplateRef<unknown> | null>(null);
 
   public context = {

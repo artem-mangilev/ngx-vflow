@@ -5,8 +5,8 @@
       nodeHandlesController
       nodeResizeController
       class="wrapper"
-      [style.width]="model().controlledByResizer() ? model().width() + 'px' : null"
-      [style.height]="model().controlledByResizer() ? model().height() + 'px' : null">
+      [style.width.px]="wrapperSize()?.width ?? null"
+      [style.height.px]="wrapperSize()?.height ?? null">
       <ng-container
         [ngTemplateOutlet]="nodeTemplate() ?? null"
         [ngTemplateOutletContext]="model().context"
@@ -23,8 +23,8 @@
         nodeHandlesController
         nodeResizeController
         class="wrapper"
-        [style.width]="model().controlledByResizer() ? model().width() + 'px' : null"
-        [style.height]="model().controlledByResizer() ? model().height() + 'px' : null">
+        [style.width.px]="wrapperSize()?.width ?? null"
+        [style.height.px]="wrapperSize()?.height ?? null">
         <ng-container
           [ngComponentOutlet]="$any(component)"
           [ngComponentOutletInputs]="model().componentTypeInputs"
@@ -46,7 +46,5 @@
 
 <!-- Resizer -->
 @if (model().resizerTemplate(); as template) {
-  @if (model().resizable()) {
-    <ng-template [ngTemplateOutlet]="template" />
-  }
+  <ng-template [ngTemplateOutlet]="template" />
 }

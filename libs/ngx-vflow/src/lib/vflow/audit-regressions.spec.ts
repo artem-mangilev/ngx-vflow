@@ -399,6 +399,50 @@ describe('Graph rendering and interaction regressions', () => {
     element.remove();
   });
 
+  it('grows a node that starts below its min size from the min size instead of shrinking it', () => {
+    const model = node('resize-below-min');
+    model.width.set(100);
+    const element = document.createElement('div');
+    document.body.append(element);
+    const resizer = createResizer({
+      domNode: element,
+      getStoreItems: () => ({
+        model,
+        viewport: { x: 0, y: 0, zoom: 1 },
+        snapGrid: [1, 1],
+        nodeOrigin: [0, 0],
+        paneDomNode: element,
+      }),
+      onChange: (change) => {
+        if (change.width !== undefined) model.width.set(change.width);
+        if (change.x !== undefined && change.y !== undefined) model.setPoint({ x: change.x, y: change.y });
+      },
+    });
+    resizer.update({
+      controlPosition: 'right',
+      boundaries: { minWidth: 240, minHeight: 0, maxWidth: Infinity, maxHeight: Infinity },
+      keepAspectRatio: false,
+    });
+    const mouse = (type: string, x: number) =>
+      new MouseEvent(type, {
+        clientX: x,
+        clientY: 25,
+        bubbles: true,
+        view: window,
+        buttons: type === 'mouseup' ? 0 : 1,
+      });
+    const pointBefore = model.point();
+
+    element.dispatchEvent(mouse('mousedown', 100));
+    window.dispatchEvent(mouse('mousemove', 140));
+    window.dispatchEvent(mouse('mouseup', 140));
+
+    expect(model.width()).toBe(280);
+    expect(model.point()).toEqual(pointBefore);
+    resizer.destroy();
+    element.remove();
+  });
+
   it('stops observing a model after the node is removed from the graph', () => {
     const point = signal({ x: 0, y: 0 });
     const read = jasmine.createSpy('removed node point').and.callFake(() => point());

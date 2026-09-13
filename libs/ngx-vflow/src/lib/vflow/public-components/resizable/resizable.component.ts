@@ -7,7 +7,6 @@ import {
   OnInit,
   TemplateRef,
   computed,
-  effect,
   inject,
   input,
   output,
@@ -33,6 +32,10 @@ import {
 /**
  * Adds resize controls (four lines + four corner handles) to a node. The controls
  * mutate the node dimensions/position through a d3-drag based resize engine.
+ *
+ * The host element is the node's sizing box: in `explicit` size mode it receives the node size as an inline
+ * border-box width/height, while an `auto` node keeps its content size. Put it on the top-level element of the
+ * node template so the node box, the controls and the handles describe the same rectangle.
  */
 @Component({
   selector: '[resizable]',
@@ -40,6 +43,12 @@ import {
   styleUrls: ['./resizable.component.scss'],
   imports: [NodeResizeControlComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    '[style.width.px]': 'explicitSize()?.width ?? null',
+    '[style.height.px]': 'explicitSize()?.height ?? null',
+    // The written size must equal the measured offset size, or every gesture would grow the node by its padding.
+    '[style.box-sizing]': "explicitSize() ? 'border-box' : null",
+  },
 })
 export class ResizableComponent implements OnInit, AfterViewInit, OnDestroy {
   private nodeAccessor = inject(NodeAccessorService);
@@ -88,24 +97,30 @@ export class ResizableComponent implements OnInit, AfterViewInit, OnDestroy {
     return this.nodeAccessor.model()!;
   }
 
+  /** `[resizable]="false"` hides the controls but keeps the element as the node's sizing box. */
+  protected readonly enabled = computed(() => this.resizable() !== false);
+
+  protected readonly explicitSize = computed(() => {
+    const model = this.nodeAccessor.model();
+    return model?.sizeMode() === 'explicit' ? { width: model.width(), height: model.height() } : null;
+  });
+
+  private registeredTemplate: TemplateRef<unknown> | null = null;
+
   protected emitResizeStart = (_: ResizeDragEvent, params: ResizeParams) => this.resizeStart.emit(params);
   protected emitResize = (_: ResizeDragEvent, params: ResizeParamsWithDirection) => this.resizeChange.emit(params);
   protected emitResizeEnd = (_: ResizeDragEvent, params: ResizeParams) => this.resizeEnd.emit(params);
 
-  constructor() {
-    effect(() => {
-      const resizable = this.resizable();
-      this.model.resizable.set(typeof resizable === 'boolean' ? resizable : true);
-    });
-  }
-
   public ngOnInit(): void {
-    this.model.controlledByResizer.set(true);
-    this.model.resizerTemplate.set(this.resizer());
+    this.registeredTemplate = this.resizer();
+    this.model.resizerTemplate.set(this.registeredTemplate);
   }
 
   public ngOnDestroy(): void {
-    this.model.controlledByResizer.set(false);
+    // A replacement element may already have registered its own controls.
+    if (this.model.resizerTemplate() === this.registeredTemplate) {
+      this.model.resizerTemplate.set(null);
+    }
   }
 
   public ngAfterViewInit() {

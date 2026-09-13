@@ -17,7 +17,10 @@ export class NodeResizeControllerDirective implements OnInit, OnDestroy {
 
   constructor() {
     afterRenderEffect(() => {
-      if (!this.nodeAccessor.model()?.culled()) this.measure();
+      const model = this.nodeAccessor.model();
+      // Reading resizing() re-runs the measurement when a gesture ends, reconciling the size the resizer wrote
+      // with the size the browser rendered (CSS min/max can clamp it).
+      if (model && !model.resizing() && !model.culled()) this.measure();
     });
   }
 
@@ -25,7 +28,8 @@ export class NodeResizeControllerDirective implements OnInit, OnDestroy {
     const model = this.nodeAccessor.model();
     const target = this.hostElementRef.nativeElement;
     // display:none notifications must not overwrite cached geometry with zeros.
-    if (!model || model.culled() || !target.getClientRects().length) return;
+    // During a gesture the resizer owns the size: writing a clamped DOM size would make the next move oscillate.
+    if (!model || model.culled() || model.resizing() || !target.getClientRects().length) return;
     // Measure the layout box, excluding protruding ports and external labels.
     // scrollWidth/Height would feed their overflow back into the next edge geometry pass.
     model.width.set(target.offsetWidth);

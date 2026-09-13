@@ -1,40 +1,42 @@
 <ng-template #resizer>
-  @for (position of linePositions; track position) {
-    <div
-      nodeResizeControl
-      [position]="position"
-      [variant]="lineVariant"
-      [style.--resizer-gap.px]="gap()"
-      [minWidth]="effectiveMinWidth()"
-      [minHeight]="effectiveMinHeight()"
-      [maxWidth]="effectiveMaxWidth()"
-      [maxHeight]="effectiveMaxHeight()"
-      [keepAspectRatio]="keepAspectRatio()"
-      [resizeDirection]="resizeDirection()"
-      [autoScale]="autoScale()"
-      [onResizeStart]="emitResizeStart"
-      [onResize]="emitResize"
-      [onResizeEnd]="emitResizeEnd"
-      [shouldResize]="shouldResize()"></div>
-  }
+  @if (enabled()) {
+    @for (position of linePositions; track position) {
+      <div
+        nodeResizeControl
+        [position]="position"
+        [variant]="lineVariant"
+        [style.--resizer-gap.px]="gap()"
+        [minWidth]="effectiveMinWidth()"
+        [minHeight]="effectiveMinHeight()"
+        [maxWidth]="effectiveMaxWidth()"
+        [maxHeight]="effectiveMaxHeight()"
+        [keepAspectRatio]="keepAspectRatio()"
+        [resizeDirection]="resizeDirection()"
+        [autoScale]="autoScale()"
+        [onResizeStart]="emitResizeStart"
+        [onResize]="emitResize"
+        [onResizeEnd]="emitResizeEnd"
+        [shouldResize]="shouldResize()"></div>
+    }
 
-  @for (position of handlePositions; track position) {
-    <div
-      nodeResizeControl
-      [position]="position"
-      [variant]="handleVariant"
-      [style.--resizer-gap.px]="gap()"
-      [minWidth]="effectiveMinWidth()"
-      [minHeight]="effectiveMinHeight()"
-      [maxWidth]="effectiveMaxWidth()"
-      [maxHeight]="effectiveMaxHeight()"
-      [keepAspectRatio]="keepAspectRatio()"
-      [resizeDirection]="resizeDirection()"
-      [autoScale]="autoScale()"
-      [onResizeStart]="emitResizeStart"
-      [onResize]="emitResize"
-      [onResizeEnd]="emitResizeEnd"
-      [shouldResize]="shouldResize()"></div>
+    @for (position of handlePositions; track position) {
+      <div
+        nodeResizeControl
+        [position]="position"
+        [variant]="handleVariant"
+        [style.--resizer-gap.px]="gap()"
+        [minWidth]="effectiveMinWidth()"
+        [minHeight]="effectiveMinHeight()"
+        [maxWidth]="effectiveMaxWidth()"
+        [maxHeight]="effectiveMaxHeight()"
+        [keepAspectRatio]="keepAspectRatio()"
+        [resizeDirection]="resizeDirection()"
+        [autoScale]="autoScale()"
+        [onResizeStart]="emitResizeStart"
+        [onResize]="emitResize"
+        [onResizeEnd]="emitResizeEnd"
+        [shouldResize]="shouldResize()"></div>
+    }
   }
 </ng-template>
 

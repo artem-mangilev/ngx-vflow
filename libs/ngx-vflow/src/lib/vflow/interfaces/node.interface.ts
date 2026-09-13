@@ -81,7 +81,22 @@ interface CreateNodeOptions {
 
 type OptionalProperty = 'selectable' | 'focusable' | 'ariaLabel' | 'ariaDescription' | 'domAttributes';
 
-export type NodeWithDefaults<T = any> = Omit<Required<Node<T>>, OptionalProperty> & Pick<SharedNode, OptionalProperty>;
+/** Properties that stay optional even with defaults; `width`/`height` of html/component nodes decide the size mode. */
+type OptionalSizeProperty = 'width' | 'height';
+
+export type NodeWithDefaults<T = any> =
+  | (Omit<Required<HtmlTemplateNode<T>>, OptionalProperty | OptionalSizeProperty> &
+      Pick<HtmlTemplateNode<T>, OptionalProperty | OptionalSizeProperty>)
+  | (Omit<Required<ComponentNode<T>>, OptionalProperty | OptionalSizeProperty> &
+      Pick<ComponentNode<T>, OptionalProperty | OptionalSizeProperty>)
+  | (Omit<Required<TemplateGroupNode<T>>, OptionalProperty> & Pick<TemplateGroupNode<T>, OptionalProperty>);
+
+function createOptionalSize(node: { width?: number; height?: number }) {
+  return {
+    width: isDefined(node.width) ? signal(node.width) : undefined,
+    height: isDefined(node.height) ? signal(node.height) : undefined,
+  };
+}
 
 function createBaseNode(node: UnwrapSignal<SharedNode>, useDefaults: boolean) {
   if (useDefaults) {
@@ -133,8 +148,8 @@ export function createNode<T>(
         ...baseNode,
         type: 'html-template' as const,
         data: signal(node.data ?? (NODE_DEFAULTS.data as T)),
-        width: signal(node.width ?? NODE_DEFAULTS.width),
-        height: signal(node.height ?? NODE_DEFAULTS.height),
+        // No default size: a content-sized node stays `auto` until the application or the resizer sets one.
+        ...createOptionalSize(node),
       };
     } else {
       return {
@@ -176,8 +191,7 @@ export function createNode<T>(
         ...baseNode,
         type: node.type,
         data: signal(node.data ?? (NODE_DEFAULTS.data as T)),
-        width: signal(node.width ?? NODE_DEFAULTS.width),
-        height: signal(node.height ?? NODE_DEFAULTS.height),
+        ...createOptionalSize(node),
       };
     } else {
       return {

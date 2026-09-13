@@ -35,6 +35,8 @@ describe('NodeHandlesControllerDirective', () => {
 
     const model = {
       culled: () => false,
+      width: () => 100,
+      height: () => 50,
       rawNode: { type: 'html-template' },
       handles$,
       handles: () => handles,

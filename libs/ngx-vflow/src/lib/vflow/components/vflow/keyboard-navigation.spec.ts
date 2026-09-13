@@ -25,7 +25,15 @@ class KeyboardHostComponent {
   flow = viewChild.required(VflowComponent);
   nodes = signal(
     createNodes([
-      { id: 'child', type: 'html-template', parentId: 'parent', point: { x: 10, y: 10 }, ariaLabel: 'Child' },
+      {
+        id: 'child',
+        type: 'html-template',
+        parentId: 'parent',
+        point: { x: 10, y: 10 },
+        width: 100,
+        height: 50,
+        ariaLabel: 'Child',
+      },
       { id: 'parent', type: 'template-group', point: { x: 20, y: 20 }, width: 250, height: 200, ariaLabel: 'Parent' },
       { id: 'other', type: 'html-template', point: { x: 400, y: 50 }, ariaLabel: 'Other', focusable: false },
     ]),
@@ -217,8 +225,8 @@ describe('public keyboard graph navigation', () => {
 
   it('centers only fully offscreen keyboard-focused nodes at unchanged zoom using nested coordinates', async () => {
     const { fixture, host, root } = await setup();
-    host.nodes()[0].width.set(100);
-    host.nodes()[0].height.set(50);
+    host.nodes()[0].width!.set(100);
+    host.nodes()[0].height!.set(50);
     host.nodes()[1].point.set({ x: 800, y: 400 });
     host.flow().viewportTo({ x: 0, y: 0, zoom: 2 });
     fixture.detectChanges();
@@ -322,8 +330,8 @@ describe('public keyboard graph navigation', () => {
     child.focus();
     key(child, 'Escape');
     expect(host.nodes()[0].selected()).toBeTrue();
-    host.nodes()[0].width.set(100);
-    host.nodes()[0].height.set(50);
+    host.nodes()[0].width!.set(100);
+    host.nodes()[0].height!.set(50);
     host.nodes()[0].point.set({ x: 149, y: 149 });
     key(child, 'ArrowRight');
     key(child, 'ArrowDown', 'ArrowDown', true);
@@ -345,7 +353,7 @@ describe('public keyboard graph navigation', () => {
     const before = root.querySelector('button')!;
     host.nodes()[1].point.set({ x: 0, y: 0 });
     host.nodes()[0].point.set({ x: -50, y: 10 });
-    host.nodes()[0].width.set(100);
+    host.nodes()[0].width!.set(100);
     fixture.detectChanges();
     await fixture.whenStable();
     child.focus();
@@ -353,7 +361,7 @@ describe('public keyboard graph navigation', () => {
     await fixture.whenStable();
     expect(host.flow().viewport()).toEqual({ x: 0, y: 0, zoom: 1 });
     before.focus();
-    host.nodes()[0].width.set(1000);
+    host.nodes()[0].width!.set(1000);
     fixture.detectChanges();
     await fixture.whenStable();
     child.focus();

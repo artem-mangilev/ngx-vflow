@@ -13,9 +13,7 @@ import { Node, Vflow, createNodes } from 'ngx-vflow';
         selectable
         class="group-node"
         [resizable]="ctx.selected()"
-        [class.group-node_selected]="ctx.selected()"
-        [style.width.px]="ctx.width()"
-        [style.height.px]="ctx.height()"></div>
+        [class.group-node_selected]="ctx.selected()"></div>
     </ng-template>
   </vflow>`,
   styles: [

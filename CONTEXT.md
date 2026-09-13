@@ -68,6 +68,10 @@ _Avoid_: Change notification, internal mutation
 A node referenced by another node's parent relationship, establishing nested coordinates. Any node type may be a parent; a visual group type is not required.
 _Avoid_: Group node
 
+**Node size mode**:
+Whether a node's size follows its measured content (`auto`) or is a fixed size supplied by application data or a resize gesture (`explicit`), which the library renders on the node's resizable element.
+_Avoid_: Autosize flag, controlled size
+
 **Container frame**:
 A titled visual boundary around a set of nodes. Its presentation is distinct from the parent relationships that determine coordinate nesting and movement.
 _Avoid_: Parent node, automatic grouping

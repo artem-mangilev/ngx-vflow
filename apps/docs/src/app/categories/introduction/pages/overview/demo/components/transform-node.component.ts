@@ -58,10 +58,9 @@ import { CustomNodeComponent, Node, Vflow } from 'ngx-vflow';
       }
 
       .transform-node {
+        width: 240px;
         min-width: 240px;
         min-height: 320px;
-        width: 100%;
-        height: 100%;
         background: white;
         border: 2px solid var(--accent-amber);
         border-radius: 8px;

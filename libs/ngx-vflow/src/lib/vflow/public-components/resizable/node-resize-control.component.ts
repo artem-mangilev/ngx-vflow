@@ -99,6 +99,12 @@ export class NodeResizeControlComponent implements OnDestroy {
         model.resizing.set(true);
       }
 
+      // The first accepted change turns the node into an explicitly sized one before the size is written,
+      // so the inline dimensions appear in the same frame as the value.
+      if (!model.resizedExplicitly()) {
+        model.resizedExplicitly.set(true);
+      }
+
       if (change.x !== undefined && change.y !== undefined) {
         model.setPoint({ x: change.x, y: change.y });
       }

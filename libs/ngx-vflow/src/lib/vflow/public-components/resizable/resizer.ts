@@ -113,6 +113,10 @@ function getPointerPosition(
   };
 }
 
+function clamp(value: number, min: number, max: number) {
+  return Math.min(Math.max(value, min), max);
+}
+
 function nodeToParentExtent(parent: NodeModel): CoordinateExtent {
   return [
     [0, 0],
@@ -179,11 +183,19 @@ export function createResizer({ domNode, getStoreItems, onChange, onEnd }: Resiz
           y: node.point().y,
         };
 
+        // A node can start outside its boundaries, e.g. an explicit size below the CSS min-size. The resize math
+        // assumes an in-range start; growing from the unclamped size would subtract the gap from the pointer
+        // distance. prevValues keep the real size so the first move always writes the clamped result.
+        const startWidth = clamp(prevValues.width, boundaries.minWidth, boundaries.maxWidth);
+        const startHeight = clamp(prevValues.height, boundaries.minHeight, boundaries.maxHeight);
+
         startValues = {
           ...prevValues,
+          width: startWidth,
+          height: startHeight,
           pointerX: xSnapped,
           pointerY: ySnapped,
-          aspectRatio: prevValues.width / prevValues.height,
+          aspectRatio: startWidth / startHeight,
         };
 
         parentExtent = undefined;

@@ -45,6 +45,34 @@ describe('NodeModel', () => {
     expect(model).toBeTruthy();
   });
 
+  describe('sizeMode', () => {
+    const make = (node: Parameters<typeof createNode>[0]) =>
+      TestBed.runInInjectionContext(() => new NodeModel(createNode(node, { useDefaults: false })));
+
+    it('is auto for html and component nodes without application-provided size', () => {
+      expect(make({ id: 'a', type: 'html-template', point: { x: 0, y: 0 } }).sizeMode()).toBe('auto');
+    });
+
+    it('is explicit when the application provides both width and height', () => {
+      expect(make({ id: 'b', type: 'html-template', point: { x: 0, y: 0 }, width: 10, height: 20 }).sizeMode()).toBe(
+        'explicit',
+      );
+      expect(make({ id: 'c', type: 'html-template', point: { x: 0, y: 0 }, width: 10 }).sizeMode()).toBe('auto');
+    });
+
+    it('is always explicit for template groups', () => {
+      expect(make({ id: 'd', type: 'template-group', point: { x: 0, y: 0 }, width: 1, height: 1 }).sizeMode()).toBe(
+        'explicit',
+      );
+    });
+
+    it('switches to explicit once the resizer commits and never switches back', () => {
+      const auto = make({ id: 'e', type: 'html-template', point: { x: 0, y: 0 } });
+      auto.resizedExplicitly.set(true);
+      expect(auto.sizeMode()).toBe('explicit');
+    });
+  });
+
   it('should set/get point', () => {
     model.setPoint({ x: 10, y: 10 });
     expect(model.point()).toEqual({ x: 10, y: 10 });

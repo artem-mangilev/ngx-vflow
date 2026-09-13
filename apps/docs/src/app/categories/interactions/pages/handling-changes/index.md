@@ -10,7 +10,7 @@ You can observe various changes in nodes and edges. Every `NodeChange` and `Edge
 Types of `NodeChange`s:
 
 - `position` - new node position after drag and drop
-- `size` - new node size
+- `size` - new node size; `mode` tells whether it is an `explicit` size (set by the application or the resizer, worth persisting) or an `auto` measurement of the node's content
 - `add` - when node was created
 - `remove` - when node was removed
 - `select` - when node was selected (also triggers for unselected nodes)

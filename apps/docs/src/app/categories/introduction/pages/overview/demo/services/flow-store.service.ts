@@ -1,5 +1,5 @@
 import { Injectable, signal } from '@angular/core';
-import { createEdges, createNodes } from 'ngx-vflow';
+import { NodeSizeChange, createEdges, createNodes } from 'ngx-vflow';
 import { TriggerNodeComponent } from '../components/trigger-node.component';
 import { DataNodeComponent } from '../components/data-node.component';
 import { TransformNodeComponent } from '../components/transform-node.component';
@@ -7,6 +7,16 @@ import { OutputNodeComponent } from '../components/output-node.component';
 
 @Injectable()
 export class FlowStoreService {
+  /** Latest size of every node, reported by `(nodesChanges.size)` for content-sized and resized nodes alike. */
+  readonly sizes = signal<Record<string, { width: number; height: number }>>({});
+
+  applySizeChanges(changes: NodeSizeChange[]) {
+    this.sizes.update((sizes) => ({
+      ...sizes,
+      ...Object.fromEntries(changes.map((change) => [change.id, change.size])),
+    }));
+  }
+
   readonly nodes = signal(
     createNodes([
       {

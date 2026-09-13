@@ -13,6 +13,7 @@ import { TransformNodeComponent } from './components/transform-node.component';
     [optimization]="{ detachedGroupsLayer: true }"
     [alignmentHelper]="true"
     (connect)="createEdge($event)"
+    (nodesChanges.size)="store.applySizeChanges($event)"
     (componentNodeEvent)="onComponentEvent($event)">
     <ng-template let-ctx nodeHtml><docs-node [ctx]="ctx" /></ng-template>
     <ng-template let-ctx groupNode><docs-group [ctx]="ctx" /></ng-template>

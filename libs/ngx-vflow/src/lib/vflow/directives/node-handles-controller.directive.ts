@@ -26,7 +26,12 @@ export class NodeHandlesControllerDirective implements OnInit {
   constructor() {
     afterRenderEffect(() => {
       const model = this.nodeAccessor.model();
-      if (model && !model.culled()) {
+      if (!model) return;
+
+      // Right/bottom handle points use the model size, which reconciliation can change after a gesture without
+      // resizing any observed element, so the size is a dependency of the sync.
+      const hasSize = model.width() >= 0 && model.height() >= 0;
+      if (hasSize && !model.culled()) {
         this.scheduleSync();
       }
     });
