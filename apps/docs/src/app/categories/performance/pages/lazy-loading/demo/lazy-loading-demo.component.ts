@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, effect, signal, untracked, viewChild } from '@angular/core';
-import { DocsPresentations } from '../../../../../shared/flow-presentations';
+import { DocsPresentations } from '@docs/shared';
 import { Edge, Node, Vflow, VflowComponent, createNodes } from 'ngx-vflow';
 
 @Component({

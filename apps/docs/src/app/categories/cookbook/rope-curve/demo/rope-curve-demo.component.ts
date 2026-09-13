@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, WritableSignal, inject, signal } from '@angular/core';
-import { DocsPresentations } from '../../../../shared/flow-presentations';
+import { DocsPresentations } from '@docs/shared';
 import { CurveFactory, CurveFactoryParams, Edge, Node, Point, Vflow, createNodes } from 'ngx-vflow';
 
 interface RopeCurveEdgeData {

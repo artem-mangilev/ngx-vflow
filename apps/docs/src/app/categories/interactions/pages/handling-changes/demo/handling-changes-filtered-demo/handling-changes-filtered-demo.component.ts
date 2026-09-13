@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, TemplateRef, inject, viewChild } from '@angular/core';
-import { DocsPresentations } from '../../../../../../shared/flow-presentations';
+import { DocsPresentations } from '@docs/shared';
 import { NgDocNotifyService } from '@ng-doc/ui-kit';
 import {
   Connection,

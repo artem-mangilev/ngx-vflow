@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { DocsPresentations } from '../../../../shared/flow-presentations';
+import { DocsPresentations } from '@docs/shared';
 import { Connection, Edge, Node, Vflow, addEdges, createNodes } from 'ngx-vflow';
 
 @Component({

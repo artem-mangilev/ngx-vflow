@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, viewChild } from '@angular/core';
-import { DocsPresentations } from '../../../../shared/flow-presentations';
+import { DocsPresentations } from '@docs/shared';
 import * as d3 from 'd3-force';
 import { Node, Edge, VflowComponent, Vflow, createNodes } from 'ngx-vflow';
 

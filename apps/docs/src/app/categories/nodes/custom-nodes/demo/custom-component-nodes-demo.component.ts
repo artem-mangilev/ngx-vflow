@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { DocsPresentations } from '../../../../shared/flow-presentations';
+import { DocsPresentations } from '@docs/shared';
 import { NgDocNotifyService } from '@ng-doc/ui-kit';
 import { ComponentNodeEvent, Edge, Node, Vflow, createNodes } from 'ngx-vflow';
 import { BlueSquareNodeComponent, BlueSquareData } from './components/blue-square-node.component';

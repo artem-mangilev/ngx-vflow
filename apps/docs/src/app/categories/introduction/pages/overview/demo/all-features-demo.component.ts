@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, effect, inject, untracked, viewChild } from '@angular/core';
-import { DocsPresentations } from '../../../../../shared/flow-presentations';
+import { DocsPresentations } from '@docs/shared';
 import { Vflow, Connection, VflowComponent, Edge, createEdge, ComponentNodeEvent } from 'ngx-vflow';
 import { FlowStoreService } from './services/flow-store.service';
 import { TransformNodeComponent } from './components/transform-node.component';

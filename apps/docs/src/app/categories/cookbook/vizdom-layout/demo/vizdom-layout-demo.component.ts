@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, OnInit, signal, viewChild, WritableSignal } from '@angular/core';
-import { DocsPresentations } from '../../../../shared/flow-presentations';
+import { DocsPresentations } from '@docs/shared';
 import init, { DirectedGraph, VertexWeakRef } from '@vizdom/vizdom-ts-web';
 import { Node, Edge, Vflow, VflowComponent, createNodes } from 'ngx-vflow';
 
