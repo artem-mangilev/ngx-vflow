@@ -21,12 +21,9 @@ import { FlowSettingsService } from '../../services/flow-settings.service';
 import { SelectionService } from '../../services/selection.service';
 import { NodeAccessorService } from '../../services/node-accessor.service';
 import { NgTemplateOutlet, NgComponentOutlet, AsyncPipe } from '@angular/common';
-import { DefaultNodeComponent } from '../default-node/default-node.component';
 
 // TODO: fix loading of these by @defer (should work in Angular 18+)
 // public components that uses in default node (loaded by defer)
-import { ResizableComponent } from '../../public-components/resizable/resizable.component';
-import { HandleComponent } from '../../public-components/handle/handle.component';
 import { NodeHandlesControllerDirective } from '../../directives/node-handles-controller.directive';
 import { NodeResizeControllerDirective } from '../../directives/node-resize-controller.directive';
 
@@ -47,11 +44,8 @@ export type HandleState = 'valid' | 'invalid' | 'idle';
     '(focusout)': 'model().focused.set(false)',
   },
   imports: [
-    DefaultNodeComponent,
-    HandleComponent,
     NgTemplateOutlet,
     NgComponentOutlet,
-    ResizableComponent,
     NodeHandlesControllerDirective,
     NodeResizeControllerDirective,
     AsyncPipe,
@@ -118,10 +112,7 @@ export class NodeComponent implements OnInit, OnDestroy {
           // Restore layout hidden, then refresh dimensions and handles before painting.
           untracked(() => {
             model.isMeasured.set(type !== 'html-template' && !model.isComponentType);
-            model
-              .handles()
-              .filter((handle) => !handle.isStandard)
-              .forEach((handle) => handle.isMeasured.set(false));
+            model.handles().forEach((handle) => handle.isMeasured.set(false));
           });
         }
         wasCulled = culled;

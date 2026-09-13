@@ -1,20 +1,3 @@
-<!-- Default node -->
-@if (model().rawNode.type === 'default') {
-  <default-node
-    class="selectable"
-    nodeHandlesController
-    [selected]="model().selected()"
-    [preselected]="model().preselected()"
-    [style.width.px]="model().width()"
-    [style.height.px]="model().height()"
-    (click)="pullNode(); selectNode()">
-    <div [outerHTML]="model().text()"></div>
-
-    <handle type="source" position="right" />
-    <handle type="target" position="left" />
-  </default-node>
-}
-
 <!-- HTML Template node -->
 @if (model().rawNode.type === 'html-template' && nodeTemplate()) {
   <div class="selectable" (click)="pullNode()">
@@ -49,20 +32,6 @@
       </div>
     </div>
   }
-}
-
-<!-- Default group node -->
-@if (model().rawNode.type === 'default-group') {
-  <div
-    class="default-group-node selectable"
-    [resizable]="model().resizable()"
-    [resizerColor]="model().color()"
-    [class.default-group-node_selected]="model().selected()"
-    [class.default-group-node_preselected]="model().preselected()"
-    [style.width.px]="model().width()"
-    [style.height.px]="model().height()"
-    [style.--group-color]="model().color()"
-    (click)="pullNode(); selectNode()"></div>
 }
 
 <!-- Template group node  -->

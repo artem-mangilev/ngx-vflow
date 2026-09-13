@@ -1,6 +1,6 @@
 # Flow design system: план перехода от MVP к production
 
-Статус: план согласован 2026-09-12. Этапы 1–5 смержены в `3.0`, этап 6 реализован в ветке `design-system-stage-6`; результаты приёмки — в [acceptance-results.md](acceptance-results.md), эксперимента scroll/collapse — в [scroll-collapse-results.md](scroll-collapse-results.md); список appearance inputs и замен — в [appearance-inputs.md](appearance-inputs.md). Открытые вопросы плана закрыты решениями в разделе «Решения от 2026-09-12». Дата первой редакции: 2026-09-07.
+Статус: план согласован 2026-09-12. Этапы 1–6 смержены в `3.0`, этап 7 реализован в ветке `design-system-stage-7` (default presentation и appearance inputs удалены, migration guide — на странице Migration в docs); результаты приёмки — в [acceptance-results.md](acceptance-results.md), эксперимента scroll/collapse — в [scroll-collapse-results.md](scroll-collapse-results.md); список appearance inputs и замен — в [appearance-inputs.md](appearance-inputs.md). Открытые вопросы плана закрыты решениями в разделе «Решения от 2026-09-12». Дата первой редакции: 2026-09-07.
 
 Основание: [исследование](research.md), [обзор аналогов](ecosystem-research.md), текущий MVP в `libs/ui` и три примера на странице Design system.
 

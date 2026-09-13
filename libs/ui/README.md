@@ -44,7 +44,7 @@ A theme scope also maps core feedback (`--vflow-*`) to the same values; a flow o
 keeps core defaults. States retain text/icons alongside their colors.
 
 See the **Design system** ng-doc section for the complete directive/token reference
-and interactive workflow, ERD/mapping and BPMN recipes. Existing core defaults remain available;
-removing them is a separate major-release migration.
+and interactive workflow, pipeline, ERD/mapping, relationships map and BPMN recipes. Core is headless:
+it renders no presentation of its own, so every graph uses these parts or your own templates.
 
 Versions and releases are shared with ngx-vflow. See `docs/releasing.md` in the repository.

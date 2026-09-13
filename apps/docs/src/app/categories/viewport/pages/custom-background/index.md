@@ -1,8 +1,10 @@
-You're able to select background for your flow.
+You're able to select a background pattern for your flow.
 
-## Solid color
+## Canvas color
 
-To select a color, simply pass a color string it to the `[background]` input.
+The canvas color is CSS: set the `--vflow-background` token on the `vflow` element or any ancestor. Pattern
+colors (dots, grid) follow `--vflow-muted`; the `.vflow-background-pattern` class is the public selector
+for finer control.
 
 {{ NgDocActions.demoPane("CustomBackgroundDemoComponent") }}
 

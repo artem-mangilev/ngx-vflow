@@ -7,6 +7,7 @@
     "paths": {
       "@ng-doc/generated": ["ng-doc/docs/index.ts"],
       "@ng-doc/generated/*": ["ng-doc/docs/*"],
+      "@docs/shared": ["apps/docs/src/app/shared/flow-presentations.ts"],
       // alias to production build of the library instead of building it as part of application
       "@vflow/ui": ["dist/libs/ui"],
       "@vflow/ui/bpmn": ["dist/libs/ui/bpmn"],

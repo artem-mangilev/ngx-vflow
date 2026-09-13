@@ -1,4 +1,4 @@
-Graph entities have readable names, relationships and state descriptions. This example includes default and custom nodes, a visual group, default and custom edges, a minimap and a second graph.
+Graph entities have readable names, relationships and state descriptions. This example includes template nodes, a visual group, template edges, a minimap and a second graph.
 
 {{ NgDocActions.demoPane("AccessibilityDemoComponent") }}
 
@@ -36,7 +36,7 @@ The flow is a named `region`. Nodes (including visual groups), edges and handles
 import { AriaLabelConfig, createNodes, createEdges } from 'ngx-vflow';
 
 const nodes = createNodes([
-  { id: 'request', type: 'default', point: { x: 20, y: 40 }, text: 'Request', ariaLabel: 'Expense request', ariaDescription: 'Requires approval.', domAttributes: { 'data-record': 'request', lang: 'en' } },
+  { id: 'request', type: 'html-template', point: { x: 20, y: 40 }, data: { text: 'Request' }, ariaLabel: 'Expense request', ariaDescription: 'Requires approval.', domAttributes: { 'data-record': 'request', lang: 'en' } },
   { id: 'approval', type: 'html-template', point: { x: 250, y: 40 }, ariaLabel: 'Approval' },
 ]);
 const edges = createEdges([{ id: 'review', source: 'request', target: 'approval', ariaLabel: 'Review route' }]);
@@ -50,7 +50,7 @@ nodes[0].ariaDescription!.set('Ready for approval.');
 <handle type="target" position="left" id="incoming" ariaLabel="Approve expense" ariaDescription="Inbound review route." [canStart]="false" [canAccept]="true" [domAttributes]="{ 'data-port': 'review' }" />
 ```
 
-Names prefer a nonblank `ariaLabel`, then a default node's text with HTML removed, then `Node {id}` or `Group {id}`. Custom templates/components need application-supplied names; the library does not inspect their descendants. An edge defaults to `Connection from {source name} to {target name}`. A handle defaults to `Source connection point [id] of {node name}` or its `Target` equivalent, omitting a missing ID.
+Names prefer a nonblank `ariaLabel`, then `Node {id}` or `Group {id}`. Custom templates/components need application-supplied names; the library does not inspect their descendants. An edge defaults to `Connection from {source name} to {target name}`. A handle defaults to `Source connection point [id] of {node name}` or its `Target` equivalent, omitting a missing ID.
 
 The graph remains flat. A child's description identifies its direct parent by accessible name, including ordinary parent nodes. A custom edge name retains endpoint information in its description. Application descriptions supplement these relationships and library state descriptions.
 

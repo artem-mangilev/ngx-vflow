@@ -80,13 +80,5 @@ export default defineConfig({
       url: 'http://localhost:4200/',
       reuseExistingServer: !process.env['CI'],
     },
-    {
-      // Minimal consumer of the built packages; `nx serve consumer` builds ngx-vflow and @vflow/ui first.
-      command: 'npx nx serve consumer',
-      cwd: '../..',
-      timeout: 300_000,
-      url: 'http://localhost:4300/',
-      reuseExistingServer: !process.env['CI'],
-    },
   ],
 });

@@ -1,4 +1,4 @@
-import { provideZonelessChangeDetection, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, provideZonelessChangeDetection, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { FlowEntitiesService } from './services/flow-entities.service';
 import { FlowSettingsService } from './services/flow-settings.service';
@@ -18,10 +18,39 @@ import { addNodesToEdges } from './utils/add-nodes-to-edges';
 import { createResizer } from './public-components/resizable/resizer';
 import { FlowStatusService } from './services/flow-status.service';
 import { ConnectionControllerDirective } from './directives/connection-controller.directive';
+import { HandleComponent } from './public-components/handle/handle.component';
+import { CustomNodeComponent } from './public-components/custom-node/custom-node.component';
 import { EdgeLabelComponent } from './components/edge-label/edge-label.component';
 import { EdgeLabelModel } from './models/edge-label.model';
 import { ConnectionModel } from './models/connection.model';
 import { VflowComponent } from './components/vflow/vflow.component';
+
+/** Labels render only through a consumer template; this host supplies a minimal one. */
+@Component({
+  imports: [EdgeLabelComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: `
+    <ng-template #label let-ctx
+      ><span>{{ ctx.label.data }}</span></ng-template
+    >
+    @if (model && edge) {
+      <div edgeLabel position="center" [model]="model" [edgeModel]="edge" [htmlTemplate]="label"></div>
+    }
+  `,
+})
+class LabelHostComponent {
+  model?: EdgeLabelModel;
+  edge?: EdgeModel;
+}
+
+@Component({
+  template: `<div style="width: 100px; height: 50px">
+    <handle type="target" position="left" /><handle type="source" position="right" />
+  </div>`,
+  imports: [HandleComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+class BoxNodeComponent extends CustomNodeComponent {}
 
 describe('Graph rendering and interaction regressions', () => {
   beforeEach(() =>
@@ -42,12 +71,12 @@ describe('Graph rendering and interaction regressions', () => {
 
   function node(id: string) {
     return TestBed.runInInjectionContext(
-      () => new NodeModel(createNode({ id, type: 'default', point: { x: 0, y: 0 } })),
+      () => new NodeModel(createNode({ id, type: 'html-template', point: { x: 0, y: 0 } })),
     );
   }
 
   it('centers an HTML label immediately after its content changes, including at non-unit zoom', () => {
-    const fixture = TestBed.createComponent(EdgeLabelComponent);
+    const fixture = TestBed.createComponent(LabelHostComponent);
     const edge = graph().edges[0];
     edge.curve.set(() => ({
       path: 'M 0,0 L 400,200',
@@ -57,14 +86,13 @@ describe('Graph rendering and interaction regressions', () => {
         end: { x: 400, y: 200 },
       },
     }));
-    fixture.componentRef.setInput('edgeModel', edge);
-    fixture.componentRef.setInput('position', 'center');
+    fixture.componentInstance.edge = edge;
     const container = document.createElement('div');
     container.style.cssText = 'position:relative; transform:scale(0.5); transform-origin:0 0';
     document.body.append(container);
     container.append(fixture.nativeElement);
     for (const text of ['Short', 'A significantly wider label that changed within one frame']) {
-      fixture.componentRef.setInput('model', new EdgeLabelModel({ type: 'default', text }));
+      fixture.componentInstance.model = new EdgeLabelModel({ type: 'html-template', data: text });
       fixture.detectChanges();
       const origin = container.getBoundingClientRect();
       const rect = fixture.nativeElement.querySelector('.edge-label-wrapper').getBoundingClientRect();
@@ -186,8 +214,8 @@ describe('Graph rendering and interaction regressions', () => {
     fixture.componentRef.setInput('view', [400, 300]);
     fixture.componentRef.setInput('optimization', { virtualization: true });
     fixture.componentRef.setInput('nodes', [
-      createNode({ id: 'a', type: 'default', point: { x: 10, y: 20 } }),
-      createNode({ id: 'b', type: 'default', point: { x: 250, y: 20 } }),
+      createNode({ id: 'a', type: BoxNodeComponent, point: { x: 10, y: 20 } }),
+      createNode({ id: 'b', type: BoxNodeComponent, point: { x: 250, y: 20 } }),
     ]);
     fixture.componentRef.setInput('edges', [createEdge({ id: 'a-b', source: 'a', target: 'b' })]);
     fixture.detectChanges();
@@ -255,8 +283,8 @@ describe('Graph rendering and interaction regressions', () => {
   }
 
   it('preserves rendered position when reparentNodes adds an omitted parentId signal', () => {
-    const parent = createNode({ id: 'parent', type: 'default', point: { x: 100, y: 0 } });
-    const child: Node = { id: 'child', type: 'default', point: signal({ x: 150, y: 0 }) };
+    const parent = createNode({ id: 'parent', type: 'html-template', point: { x: 100, y: 0 } });
+    const child: Node = { id: 'child', type: 'html-template', point: signal({ x: 150, y: 0 }) };
     const entities = TestBed.inject(FlowEntitiesService);
     const models = TestBed.runInInjectionContext(() => ReferenceIdentityChecker.nodes([parent, child], []));
     entities.nodes.set(models);
@@ -375,7 +403,7 @@ describe('Graph rendering and interaction regressions', () => {
     const point = signal({ x: 0, y: 0 });
     const read = jasmine.createSpy('removed node point').and.callFake(() => point());
     const observedPoint = Object.assign(read, point);
-    const raw: Node = { id: 'removed', type: 'default', point: observedPoint };
+    const raw: Node = { id: 'removed', type: 'html-template', point: observedPoint };
     const entities = TestBed.inject(FlowEntitiesService);
     entities.nodes.set(TestBed.runInInjectionContext(() => ReferenceIdentityChecker.nodes([raw], [])));
     TestBed.flushEffects();
@@ -400,7 +428,9 @@ describe('Graph rendering and interaction regressions', () => {
         expect(entities.validEdges().length).toBe(count);
         samples.push(performance.now() - start);
       }
-      const rawNodes = nodes.map((n) => ({ id: n.rawNode.id, type: 'default', point: signal({ x: 0, y: 0 }) }) as Node);
+      const rawNodes = nodes.map(
+        (n) => ({ id: n.rawNode.id, type: 'html-template', point: signal({ x: 0, y: 0 }) }) as Node,
+      );
       const start = performance.now();
       expect(
         removeNodes(

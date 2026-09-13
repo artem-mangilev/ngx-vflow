@@ -73,7 +73,7 @@ import { AsInterface } from '../types';
     }
 
     @for (edge of edges; track $index) {
-      @if (edge.type === 'template') {
+      @if (edgeTemplateDirective()) {
         <ng-component
           [ngTemplateOutlet]="edgeTemplateDirective()?.templateRef ?? null"
           [ngTemplateOutletContext]="{
@@ -153,7 +153,7 @@ export class VflowMockComponent implements AsInterface<VflowComponent>, OnInit {
   public readonly maxZoom = 3;
 
   @Input()
-  public readonly background: Background | string = '#fff';
+  public readonly background: Background | null = null;
 
   @Input()
   public readonly optimization = DEFAULT_OPTIMIZATION;
@@ -174,10 +174,7 @@ export class VflowMockComponent implements AsInterface<VflowComponent>, OnInit {
   public readonly selectionMode: SelectionMode = 'default';
 
   @Input()
-  public readonly selectionBox: SelectionBoxSettings = {
-    mode: 'full',
-    color: '#bbe1fa',
-  };
+  public readonly selectionBox: SelectionBoxSettings = { mode: 'full' };
 
   @Input() public zoomOnScroll = true;
   @Input() public zoomOnPinch = true;

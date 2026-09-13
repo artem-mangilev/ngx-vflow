@@ -16,7 +16,7 @@ import {
 import { of } from 'rxjs';
 
 const mockModel = () =>
-  new NodeModel({ id: 'mock', type: 'default', point: signal({ x: 0, y: 0 }), parentId: signal(null) });
+  new NodeModel({ id: 'mock', type: 'html-template', point: signal({ x: 0, y: 0 }), parentId: signal(null) });
 
 export function provideCustomNodeMocks(): Provider[] {
   return [

@@ -3,7 +3,8 @@ import NodesCategory from '../ng-doc.category';
 import { DefaultNodesDemoComponent } from './demo/default-nodes-demo.component';
 
 const TestPage: NgDocPage = {
-  title: `Default nodes`,
+  title: `Node templates`,
+  route: 'default-nodes',
   mdFile: './index.md',
   category: NodesCategory,
   demos: { DefaultNodesDemoComponent },

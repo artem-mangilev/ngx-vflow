@@ -41,7 +41,7 @@ describe('ConnectionControllerDirective', () => {
         new NodeModel(
           createNode({
             id,
-            type: 'default',
+            type: 'html-template',
             point: { x: 0, y: 0 },
           }),
         ),

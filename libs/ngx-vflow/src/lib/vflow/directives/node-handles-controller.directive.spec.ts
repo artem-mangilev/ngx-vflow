@@ -77,12 +77,10 @@ describe('NodeHandlesControllerDirective', () => {
     const first = jasmine.createSpyObj<HandleModel>('first handle', ['measure', 'applyGeometry'], {
       hostReference: anchor,
       handleElement: firstElement,
-      isStandard: false,
     });
     const second = jasmine.createSpyObj<HandleModel>('second handle', ['measure', 'applyGeometry'], {
       hostReference: anchor,
       handleElement: secondElement,
-      isStandard: false,
     });
     first.measure.and.callFake(() => {
       executionOrder.push('measure first');

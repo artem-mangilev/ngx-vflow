@@ -328,7 +328,7 @@ export class PipelineDemoComponent {
   }
 
   connect(connection: Connection) {
-    const edge = createEdge({ ...connection, id: crypto.randomUUID(), type: 'template' });
+    const edge = createEdge({ ...connection, id: crypto.randomUUID() });
     this.edges.update((edges) => addEdges([edge], { nodes: this.nodes, edges }));
   }
 
@@ -354,5 +354,5 @@ function stage(
 }
 
 function wire(id: string, source: string, out: string, target: string, input: string) {
-  return { id, source, sourceHandle: 'out:' + out, target, targetHandle: 'in:' + input, type: 'template' as const };
+  return { id, source, sourceHandle: 'out:' + out, target, targetHandle: 'in:' + input };
 }

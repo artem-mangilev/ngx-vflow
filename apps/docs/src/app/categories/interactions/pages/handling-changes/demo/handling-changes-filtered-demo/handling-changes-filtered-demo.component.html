@@ -8,7 +8,12 @@
   (nodesChanges.position)="handleNodePositionChange($event)"
   (nodesChanges.select)="handleNodeSelectChange($event)"
   (nodesChanges.add)="handleNodesAddChange($event)"
-  (edgesChanges.add)="handleEdgesAddChange($event)" />
+  (edgesChanges.add)="handleEdgesAddChange($event)">
+  <ng-template let-ctx nodeHtml><docs-node [ctx]="ctx" /></ng-template>
+  <ng-template let-ctx groupNode><docs-group [ctx]="ctx" /></ng-template>
+  <ng-template let-ctx edge><svg:g docsEdge [ctx]="ctx" /></ng-template>
+  <ng-template let-ctx edgeLabelHtml><docs-edge-label [ctx]="ctx" /></ng-template>
+</vflow>
 
 <ng-template #toast let-ctx>
   <h3>{{ toastData?.title }}</h3>

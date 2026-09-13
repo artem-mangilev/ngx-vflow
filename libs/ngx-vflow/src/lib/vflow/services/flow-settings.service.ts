@@ -48,7 +48,8 @@ export class FlowSettingsService {
 
   public maxZoom = signal(3);
 
-  public background = signal<Background>({ type: 'solid', color: 'var(--vflow-background, #fff)' });
+  /** Pattern drawn over the token-colored canvas; `null` draws no pattern. */
+  public background = signal<Background | null>(null);
 
   public snapGrid = signal<[number, number]>([1, 1]);
 
@@ -56,8 +57,5 @@ export class FlowSettingsService {
 
   public selectionMode = signal<SelectionMode>('default');
 
-  public selectionBox = signal<Required<SelectionBoxSettings>>({
-    mode: 'full',
-    color: 'var(--vflow-selection, #bbe1fa)',
-  });
+  public selectionBox = signal<Required<SelectionBoxSettings>>({ mode: 'full' });
 }

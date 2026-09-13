@@ -1,15 +1,15 @@
-.marker {
-  &__arrow {
-    &_default {
-      stroke-width: 1px;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-      fill: none;
-    }
+/* Markers follow the stroke of the edge that references them; override via the public classes. */
+.vflow-marker {
+  stroke: context-stroke;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
 
-    &_closed {
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-  }
+.vflow-marker--arrow-closed {
+  fill: context-stroke;
+}
+
+.vflow-marker--arrow {
+  fill: none;
 }

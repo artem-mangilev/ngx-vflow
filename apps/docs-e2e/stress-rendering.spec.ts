@@ -54,7 +54,7 @@ test('stress demo reveals custom nodes and edges with positioned handles', async
             }
           }
         }
-        const visibleEdges = Array.from(document.querySelectorAll('svg[edge] .edge')).filter(
+        const visibleEdges = Array.from(document.querySelectorAll('svg[edge] .vui-edge')).filter(
           (edge) => getComputedStyle(edge).visibility === 'visible' && edge.getAttribute('d'),
         ).length;
         samples.push({ hidden, visibleEdges, misplaced });
@@ -80,6 +80,6 @@ test('stress demo reveals custom nodes and edges with positioned handles', async
   ).toBe(0);
   await expect(page.locator('.stress-node')).toHaveCount(1024);
   await expect(page.locator('default-node')).toHaveCount(0);
-  await expect(page.locator('svg[edge] .edge')).toHaveCount(1023);
+  await expect(page.locator('svg[edge] .vui-edge')).toHaveCount(1023);
   expect(samples.at(-1).visibleEdges).toBe(1023);
 });

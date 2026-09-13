@@ -22,6 +22,7 @@ import { DomAttributes } from '../../interfaces/dom-attributes.interface';
         ariaLabel="Accept request"
         ariaDescription="Inbound route."
         [domAttributes]="{ 'data-port': 'incoming' }" />
+      <handle type="source" position="right" />
     </ng-template>
   </vflow>`,
 })
@@ -31,9 +32,9 @@ class AccessibilityHostComponent {
   canAccept = signal(true);
   clicks = 0;
   nodes = createNodes([
-    { id: 'parent', type: 'default-group', point: { x: 0, y: 0 }, width: 250, height: 200 },
-    { id: 'a', type: 'default', parentId: 'parent', point: { x: 20, y: 30 }, text: '<b>Request</b> &amp; review' },
-    { id: 'b', type: 'default', point: { x: 350, y: 30 }, text: 'Approval' },
+    { id: 'parent', type: 'template-group', point: { x: 0, y: 0 }, width: 250, height: 200 },
+    { id: 'a', type: 'html-template', parentId: 'parent', point: { x: 20, y: 30 }, ariaLabel: 'Request & review' },
+    { id: 'b', type: 'html-template', point: { x: 350, y: 30 }, ariaLabel: 'Approval' },
   ]);
   edges: Edge[] = createEdges([{ id: 'ab', source: 'a', target: 'b' }]);
 }
@@ -47,7 +48,7 @@ describe('public graph accessibility', () => {
     const fixture = TestBed.createComponent(AccessibilityHostComponent);
     const host = fixture.componentInstance;
     host.nodes = createNodes([
-      { id: 'empty', type: 'default', point: { x: 0, y: 0 }, text: ' <br> ', ariaLabel: '  ' },
+      { id: 'empty', type: 'html-template', point: { x: 0, y: 0 }, ariaLabel: '  ' },
       { id: 'custom', type: 'html-template', point: { x: 250, y: 0 } },
     ]);
     host.edges = createEdges(
@@ -116,10 +117,10 @@ describe('public graph accessibility', () => {
     const fixture = TestBed.createComponent(AccessibilityHostComponent);
     const host = fixture.componentInstance;
     host.nodes = createNodes([
-      { id: 'parent', type: 'default', point: { x: 0, y: 0 }, text: 'Processing' },
+      { id: 'parent', type: 'html-template', point: { x: 0, y: 0 }, ariaLabel: 'Processing' },
       {
         id: 'a',
-        type: 'default',
+        type: 'html-template',
         point: { x: 10, y: 10 },
         parentId: 'parent',
         ariaLabel: 'Application',
@@ -128,7 +129,7 @@ describe('public graph accessibility', () => {
         selectable: false,
         draggable: false,
       },
-      { id: 'b', type: 'default', point: { x: 350, y: 30 }, text: 'Approval' },
+      { id: 'b', type: 'html-template', point: { x: 350, y: 30 }, ariaLabel: 'Approval' },
     ]);
     host.edges = createEdges(
       [{ id: 'ab', source: 'a', target: 'b', ariaLabel: 'Approve', ariaDescription: 'Review route.' }],
@@ -184,9 +185,9 @@ describe('public graph accessibility', () => {
     fixture.componentInstance.nodes = createNodes([
       {
         id: 'safe',
-        type: 'default',
+        type: 'html-template',
         point: { x: 0, y: 0 },
-        text: 'Safe',
+        ariaLabel: 'Safe',
         domAttributes: attributes as unknown as DomAttributes,
       },
     ]);

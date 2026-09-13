@@ -80,13 +80,13 @@ describe('Initial handle placement', () => {
         id: 'ab',
         source: 'a',
         target: 'b',
-        edgeLabels: { center: { type: 'default', text: 'Connection' } },
+        edgeLabels: { center: { type: 'html-template', data: 'Connection' } },
       }),
     ]);
     fixture.detectChanges();
     const sample = () => {
       const nodes = Array.from(fixture.nativeElement.querySelectorAll('.vflow-node')) as HTMLElement[];
-      const paths = Array.from(fixture.nativeElement.querySelectorAll('svg[edge] .edge, [edgeLabel]')) as Element[];
+      const paths = Array.from(fixture.nativeElement.querySelectorAll('svg[edge], [edgeLabel]')) as Element[];
       if (nodes.some((node) => getComputedStyle(node).visibility === 'hidden')) {
         expect(paths.filter((path) => getComputedStyle(path).visibility === 'visible'))
           .withContext('visible edge while an endpoint is hidden')
@@ -98,7 +98,7 @@ describe('Initial handle placement', () => {
       await new Promise(requestAnimationFrame);
       sample();
     }
-    expect(fixture.nativeElement.querySelector('svg[edge] .edge')?.getAttribute('d')).toBeTruthy();
+    expect(fixture.debugElement.injector.get(FlowEntitiesService).edges()[0].path().path).toBeTruthy();
     // An offscreen endpoint retains measured geometry for an edge crossing the viewport.
     fixture.componentRef.setInput('optimization', { virtualization: true });
     fixture.componentInstance.panTo({ x: -120, y: 0 });
@@ -106,7 +106,7 @@ describe('Initial handle placement', () => {
     await fixture.whenStable();
     expect(fixture.nativeElement.querySelectorAll('.vflow-node').length).toBe(2);
     expect(getComputedStyle(fixture.nativeElement.querySelector('.vflow-node')).display).toBe('none');
-    const edge = fixture.nativeElement.querySelector('svg[edge] .edge');
+    const edge = fixture.nativeElement.querySelector('svg[edge]');
     expect(edge).not.toBeNull();
     expect(getComputedStyle(edge).visibility).toBe('visible');
   });
@@ -146,20 +146,6 @@ describe('Initial handle placement', () => {
     expect(zoomed).toBeTrue();
     const handle = fixture.nativeElement.querySelector('.handle--right') as HTMLElement;
     expect(parseFloat(handle.style.top)).toBeCloseTo(48, 1);
-  });
-
-  it('positions handles before the first frame without waiting for DOM measurement', () => {
-    TestBed.configureTestingModule({ providers: [provideZonelessChangeDetection()] });
-    const fixture = TestBed.createComponent(VflowComponent);
-    fixture.componentRef.setInput('view', [400, 300]);
-    fixture.componentRef.setInput('nodes', [createNode({ id: 'a', type: 'default', point: { x: 0, y: 0 } })]);
-    fixture.detectChanges();
-    const source = fixture.nativeElement.querySelector('.handle--right') as HTMLElement;
-    const target = fixture.nativeElement.querySelector('.handle--left') as HTMLElement;
-    expect(source.style.top).toBe('25px');
-    expect(source.style.right).toBe('0px');
-    expect(target.style.top).toBe('25px');
-    expect(target.style.left).toBe('0px');
   });
 
   it('does not rewrite unchanged custom handle accessibility during node movement', async () => {

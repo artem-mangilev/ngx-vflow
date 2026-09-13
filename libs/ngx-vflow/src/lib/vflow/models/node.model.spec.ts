@@ -28,8 +28,8 @@ describe('NodeModel', () => {
         new NodeModel(
           createNode({
             id: '1',
-            type: 'default',
-            text: 'test',
+            type: 'html-template',
+
             point: { x: 15, y: 15 },
           }),
         ),
@@ -61,7 +61,7 @@ describe('NodeModel', () => {
         createNode({
           id: '2',
           parentId: '1',
-          type: 'default',
+          type: 'html-template',
           point: { x: 10, y: 10 },
         }),
       );
@@ -81,7 +81,7 @@ describe('NodeModel', () => {
         createNode({
           id: '2',
           parentId: '1',
-          type: 'default',
+          type: 'html-template',
           point: { x: 10, y: 10 },
         }),
       );
@@ -89,10 +89,6 @@ describe('NodeModel', () => {
     entitiesService.nodes.update((nodes) => [...nodes, TestBed.runInInjectionContext(childModel)]);
 
     expect(model.children()[0].globalPoint()).toEqual({ x: 25, y: 25 });
-  });
-
-  it('should get text for default node', () => {
-    expect(model.text()).toEqual('test');
   });
 
   it('should resolve selection and focus defaults reactively', () => {
@@ -109,7 +105,7 @@ describe('NodeModel', () => {
   it('should let explicit capability overrides win over global settings', () => {
     const rawNode = createNode({
       id: 'explicit',
-      type: 'default',
+      type: 'html-template',
       point: { x: 0, y: 0 },
       selectable: false,
       focusable: true,
@@ -124,7 +120,7 @@ describe('NodeModel', () => {
   });
 
   it('should keep inherited capabilities absent when factories materialize defaults', () => {
-    const created = createNode({ id: 'factory', type: 'default', point: { x: 0, y: 0 } });
+    const created = createNode({ id: 'factory', type: 'html-template', point: { x: 0, y: 0 } });
 
     expect(created.selectable).toBeUndefined();
     expect(created.focusable).toBeUndefined();

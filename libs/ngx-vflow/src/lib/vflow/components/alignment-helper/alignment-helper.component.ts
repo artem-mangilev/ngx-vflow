@@ -32,6 +32,13 @@ interface Intersection {
 @Component({
   selector: 'g[alignmentHelper]',
   templateUrl: './alignment-helper.component.html',
+  styles: [
+    `
+      .vflow-alignment-line {
+        stroke: var(--vflow-foreground, #1b262c);
+      }
+    `,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
 })
@@ -40,7 +47,6 @@ export class AlignmentHelperComponent {
   private flowStatus = inject(FlowStatusService);
 
   readonly tolerance = input(10);
-  readonly lineColor = input('var(--vflow-foreground, #1b262c)');
 
   protected isNodeDragging = computed(
     () => isNodeDragStartStatus(this.flowStatus.status()) || isNodeDragStatus(this.flowStatus.status()),
