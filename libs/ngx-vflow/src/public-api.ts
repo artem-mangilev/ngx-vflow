@@ -58,13 +58,13 @@ export * from './lib/vflow/public-components/resizable/node-resize-control.compo
 export * from './lib/vflow/public-components/resizable/resizer-types';
 export * from './lib/vflow/public-components/minimap/minimap.component';
 export * from './lib/vflow/public-components/node-toolbar/node-toolbar.component';
-export * from './lib/vflow/public-components/custom-edge/custom-edge.component';
 
 // Directives
 export * from './lib/vflow/directives/template.directive';
 export * from './lib/vflow/directives/connection-controller.directive';
 export * from './lib/vflow/directives/changes-controller.directive';
 export * from './lib/vflow/directives/selectable.directive';
+export * from './lib/vflow/directives/edge-interaction.directive';
 export * from './lib/vflow/directives/drag-handle.directive';
 export * from './lib/vflow/directives/node-drag-controller.directive';
 

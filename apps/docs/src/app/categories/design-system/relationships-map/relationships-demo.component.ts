@@ -186,7 +186,7 @@ type MapData = Person | Metric | Note | Team;
           }
         </ng-template>
         <ng-template let-ctx edge>
-          <svg:g customEdge selectable>
+          <svg:g edgeInteraction>
             <svg:path
               vflowEdge
               [attr.d]="ctx.path()"

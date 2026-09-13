@@ -1,6 +1,5 @@
 import { Directive, ElementRef, inject } from '@angular/core';
 import { SelectionService } from '../services/selection.service';
-import { EdgeComponent } from '../components/edge/edge.component';
 
 import { FlowEntity } from '../interfaces/flow-entity.interface';
 import { NodeComponent } from '../components/node/node.component';
@@ -15,7 +14,6 @@ import { FlowStatusService, isSelectionBoxEndStatus } from '../services/flow-sta
 })
 export class SelectableDirective {
   private selectionService = inject(SelectionService);
-  private parentEdge = inject(EdgeComponent, { optional: true });
   private parentNode = inject(NodeComponent, { optional: true });
   private flowStatusService = inject(FlowStatusService);
 
@@ -42,13 +40,7 @@ export class SelectableDirective {
   }
 
   private entity(): FlowEntity | null {
-    if (this.parentNode) {
-      return this.parentNode.model();
-    } else if (this.parentEdge) {
-      return this.parentEdge.model();
-    }
-
-    return null;
+    return this.parentNode?.model() ?? null;
   }
 
   private getEvent$() {

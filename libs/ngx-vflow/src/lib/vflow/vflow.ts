@@ -8,6 +8,7 @@ import { VflowComponent } from './components/vflow/vflow.component';
 
 import { DragHandleDirective } from './directives/drag-handle.directive';
 import { SelectableDirective } from './directives/selectable.directive';
+import { EdgeInteractionDirective } from './directives/edge-interaction.directive';
 import {
   ConnectionTemplateDirective,
   EdgeLabelHtmlTemplateDirective,
@@ -21,7 +22,6 @@ import { MiniMapComponent } from './public-components/minimap/minimap.component'
 import { NodeToolbarComponent } from './public-components/node-toolbar/node-toolbar.component';
 import { ResizableComponent } from './public-components/resizable/resizable.component';
 import { HandleComponent } from './public-components/handle/handle.component';
-import { CustomEdgeComponent } from './public-components/custom-edge/custom-edge.component';
 
 export const Vflow = [
   NoKeyboardDirective,
@@ -32,9 +32,9 @@ export const Vflow = [
   HandleComponent,
   ResizableComponent,
   SelectableDirective,
+  EdgeInteractionDirective,
   MiniMapComponent,
   NodeToolbarComponent,
-  CustomEdgeComponent,
   DragHandleDirective,
   ConnectionControllerDirective,
 

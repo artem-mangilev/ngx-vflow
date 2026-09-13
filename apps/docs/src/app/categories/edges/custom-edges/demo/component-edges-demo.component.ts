@@ -1,26 +1,34 @@
 import { ChangeDetectionStrategy, Component, output, signal } from '@angular/core';
 import { DocsPresentations } from '@docs/shared';
-import { ComponentEdgeEvent, Edge, Node, Vflow, createNodes, injectEdge } from 'ngx-vflow';
+import { ComponentEdgeEvent, Edge, EdgeInteractionDirective, Node, Vflow, createNodes, injectEdge } from 'ngx-vflow';
 
 interface ColoredEdgeData {
   color: string;
 }
 
-/** An edge drawn by a component. The flow renders it on its own SVG group, so the template is plain SVG. */
+/**
+ * An edge drawn by a component. The flow renders it on its own SVG group; the host directive moves the interaction
+ * stroke into that group, so host listeners and `:host(:hover)` react to the whole clickable area.
+ */
 @Component({
   selector: 'g[docsColoredEdge]',
+  hostDirectives: [EdgeInteractionDirective],
+  host: { '(click)': 'picked.emit(ctx.edge.id)' },
+  styles: `
+    :host(:hover) .line {
+      stroke-width: 5px;
+    }
+  `,
   template: `
-    <svg:g customEdge selectable (click)="picked.emit(ctx.edge.id)">
-      <svg:path
-        fill="none"
-        stroke-width="3"
-        [attr.d]="ctx.path()"
-        [attr.stroke]="ctx.selected() ? '#0f4c75' : ctx.data().color"
-        [attr.marker-end]="ctx.markerEnd()" />
-    </svg:g>
+    <svg:path
+      class="line"
+      fill="none"
+      stroke-width="3"
+      [attr.d]="ctx.path()"
+      [attr.stroke]="ctx.selected() ? '#0f4c75' : ctx.data().color"
+      [attr.marker-end]="ctx.markerEnd()" />
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Vflow],
 })
 export class ColoredEdgeComponent {
   protected readonly ctx = injectEdge<ColoredEdgeData>();

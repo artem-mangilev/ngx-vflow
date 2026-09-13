@@ -4,8 +4,8 @@ keyword: 'FeaturesDefaultEdges'
 
 You can link nodes with edges. Create an `Edge[]` array and pass it to the `vflow` component. Each edge
 contains the id of the `source` and `target` nodes and has its own `id`. Core routes the path and owns the
-hit target; the visible line comes from your `<ng-template edge>`: bind `ctx.path()` to an SVG path inside
-`<svg:g customEdge selectable>`. The `docs-edge` component used below draws the path with `@vflow/ui`.
+click selection; the visible line comes from your `<ng-template edge>`: bind `ctx.path()` to an SVG path inside a
+`<svg:g edgeInteraction>`, which adds the hit target. The `docs-edge` component used below draws the path with `@vflow/ui`.
 
 {{ NgDocActions.demoPane("DefaultEdgesDemoComponent") }}
 

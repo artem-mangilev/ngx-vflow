@@ -115,7 +115,7 @@ type Flow = 'sequence' | 'message' | 'association';
           }
         </ng-template>
         <ng-template let-ctx edge>
-          <svg:g customEdge selectable>
+          <svg:g edgeInteraction>
             <svg:path
               [vflowBpmnFlow]="ctx.data()?.flow ?? 'sequence'"
               [attr.d]="ctx.path()"

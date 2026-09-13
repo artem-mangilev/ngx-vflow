@@ -24,6 +24,7 @@ import {
   EntityComponentOutputEvent,
 } from '../../directives/entity-component-outlet.directive';
 import { EDGE_REF } from '../../utils/inject-edge';
+import { FlowStatusService, isSelectionBoxEndStatus } from '../../services/flow-status.service';
 
 @Component({
   selector: 'svg[edge]',
@@ -33,6 +34,10 @@ import { EDGE_REF } from '../../utils/inject-edge';
   host: {
     '(focusin)': 'model().focused.set(true)',
     '(focusout)': 'model().focused.set(false)',
+    // Clicks from the interaction stroke and from presentation elements bubble here.
+    '(click)': 'onClick($event)',
+    '(mousedown)': 'pull()',
+    '(touchstart)': 'pull()',
     class: 'selectable',
   },
   providers: [
@@ -47,6 +52,7 @@ export class EdgeComponent {
   private flowSettingsService = inject(FlowSettingsService);
   private edgeRenderingService = inject(EdgeRenderingService);
   private componentEventBus = inject(ComponentEventBusService);
+  private flowStatusService = inject(FlowStatusService);
 
   // TODO remove dependency from this directive
   private connectionController = inject(ConnectionControllerDirective, { optional: true });
@@ -66,6 +72,11 @@ export class EdgeComponent {
   }
 
   public select() {
+    // A selection box gesture ends with a click that must not select the edge under the pointer.
+    if (isSelectionBoxEndStatus(this.flowStatusService.status())) {
+      return;
+    }
+
     if (this.model().selectable()) {
       this.selectionService.select(this.model());
     }
@@ -75,6 +86,15 @@ export class EdgeComponent {
     if (this.flowSettingsService.elevateEdgesOnSelect()) {
       this.edgeRenderingService.pull(this.model());
     }
+  }
+
+  protected onClick(event: Event) {
+    // A click on a reconnection handle belongs to the reconnection gesture.
+    if ((event.target as Element | null)?.closest?.('.reconnect-handle')) {
+      return;
+    }
+
+    this.select();
   }
 
   protected pushComponentEvent({ eventName, eventPayload }: EntityComponentOutputEvent) {

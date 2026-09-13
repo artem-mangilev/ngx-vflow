@@ -16,6 +16,7 @@ export const EDGE_DEFAULTS = {
   reconnectable: false,
   floating: false,
   selected: false,
+  interactionWidth: 20,
 };
 
 export type Curve = 'straight' | 'bezier' | 'smooth-step' | 'step' | CurveFactory;
@@ -34,6 +35,13 @@ export interface Edge<T = unknown> extends Connection {
   reconnectable?: WritableSignal<boolean | 'source' | 'target'>;
   floating?: WritableSignal<boolean>;
   selected?: WritableSignal<boolean>;
+  /**
+   * Width in pixels of the transparent stroke the flow draws along the edge path to make the edge easy to click.
+   * `0` removes it; presentation elements can then opt into hit-testing with `pointer-events="stroke"`.
+   *
+   * @default 20
+   */
+  interactionWidth?: WritableSignal<number>;
   selectable?: WritableSignal<boolean>;
   focusable?: WritableSignal<boolean>;
   ariaLabel?: WritableSignal<string>;
@@ -73,6 +81,9 @@ export function createEdge<T>(
       reconnectable: signal(isDefined(edge.reconnectable) ? edge.reconnectable : EDGE_DEFAULTS.reconnectable),
       floating: signal(isDefined(edge.floating) ? edge.floating : EDGE_DEFAULTS.floating),
       selected: signal(isDefined(edge.selected) ? edge.selected : EDGE_DEFAULTS.selected),
+      interactionWidth: signal(
+        isDefined(edge.interactionWidth) ? edge.interactionWidth : EDGE_DEFAULTS.interactionWidth,
+      ),
       ...(isDefined(edge.selectable) ? { selectable: signal(edge.selectable) } : {}),
       ...(isDefined(edge.focusable) ? { focusable: signal(edge.focusable) } : {}),
       ...(isDefined(edge.ariaLabel) ? { ariaLabel: signal(edge.ariaLabel) } : {}),
@@ -94,6 +105,7 @@ export function createEdge<T>(
       reconnectable: isDefined(edge.reconnectable) ? signal(edge.reconnectable) : undefined,
       floating: isDefined(edge.floating) ? signal(edge.floating) : undefined,
       selected: isDefined(edge.selected) ? signal(edge.selected) : undefined,
+      interactionWidth: isDefined(edge.interactionWidth) ? signal(edge.interactionWidth) : undefined,
       ...(isDefined(edge.selectable) ? { selectable: signal(edge.selectable) } : {}),
       ...(isDefined(edge.focusable) ? { focusable: signal(edge.focusable) } : {}),
       ...(isDefined(edge.ariaLabel) ? { ariaLabel: signal(edge.ariaLabel) } : {}),

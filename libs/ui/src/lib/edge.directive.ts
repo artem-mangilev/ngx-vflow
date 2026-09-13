@@ -1,6 +1,6 @@
 import { Directive } from '@angular/core';
 
-/** SVG presentation only. Compose with core customEdge/selectable for interaction. */
+/** SVG presentation only. Put it inside a core `edgeInteraction` group for the hit area and selection. */
 @Directive({
   selector: 'path[vflowEdge]',
   host: {

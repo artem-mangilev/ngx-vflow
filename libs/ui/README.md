@@ -32,8 +32,8 @@ The package includes card, field-row and container shells, text roles (title, me
 port visuals, status indicators, SVG edge strokes, HTML labels, toolbar surfaces, external labels,
 theme and selection directives, and `vflow-controls` (zoom in/out, fit view, custom buttons) for a
 flow instance. The BPMN subset lives in the `@vflow/ui/bpmn` entry point.
-For flow interaction compose them with core `selectable`, `handle`, `customEdge`
-and gesture-exclusion directives. Bind `vflowSelected` to selection/preselection and put
+For flow interaction compose them with core `selectable`, `handle`
+and gesture-exclusion directives; `edgeInteraction` gives an edge its hit area and click selection. Bind `vflowSelected` to selection/preselection and put
 `vflowPort` inside a handle template. UI never changes roles, focus or graph state.
 
 Use `vflowTheme="light"` or `vflowTheme="dark"` on the editor ancestor and override the shared tokens

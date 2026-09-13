@@ -131,8 +131,13 @@ export interface Edge<T = unknown> extends Connection {
   Host-биндинги компонента применяются к `<g>`.
 - Иначе, как сейчас, рендерится `ng-template[edge]`. Focus-индикатор, reconnect-хэндлы и
   `visibility`/`zIndex` остаются в библиотечном `<svg edge>`.
-- `CustomTemplateEdgeComponent` (`g[customTemplateEdge]`) переименовывается в
-  `g[customEdge]`: он нужен и шаблону, и компоненту. `EdgeComponent` инжектится в него, как сейчас.
+- Интерактивный штрих и выделение (решено 2026-09-13). `EdgeComponent` выделяет ребро по клику и поднимает его на
+  `mousedown`/`touchstart`, `selectable` к рёбрам не относится, `CustomTemplateEdgeComponent` удалён. Прозрачный путь
+  шириной `Edge.interactionWidth` (по умолчанию 20, `0` скрывает) лежит внутри презентации, чтобы клики, наведение и
+  `:hover` доходили до неё: директива `g[edgeInteraction]` вставляет его первым элементом своей группы в шаблоне, а
+  компонентное ребро подключает `EdgeInteractionDirective` через `hostDirectives`, и путь попадает в хост. Запасного пути в корне SVG нет (решение
+  пользователя): без директивы у ребра нет зоны клика, выделяет только клик по своему элементу с `pointer-events="stroke"`. Референсы: React Flow (`BaseEdge`, `interactionWidth` 20, выделение в обёртке ребра),
+  ng-diagram (путь в базовом компоненте ребра), Foblex (`.f-connection-selection` внутри `f-connection`).
 - Решено при реализации 03: `EDGE_REF` провайдится в `EdgeComponent` через `inject(EdgeComponent)`, отдельный
   `EdgeAccessorService` не понадобился. Алиас типа компонента назван `EntityComponentType` без
   `NodeComponentType`. Шина разделена на `pushNodeEvent`/`nodeEvent$` и `pushEdgeEvent`/`edgeEvent$`; общий

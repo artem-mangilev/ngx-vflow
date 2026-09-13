@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { VflowUi } from '@vflow/ui';
-import { Vflow } from 'ngx-vflow';
+import { EdgeInteractionDirective, Vflow } from 'ngx-vflow';
 
 /**
  * Presentations shared by the documentation demos. Core is headless: every demo supplies
@@ -77,20 +77,22 @@ export class DocsNodeComponent {
   protected readonly text = computed(() => this.ctx().data()?.text ?? this.ctx().data()?.title ?? this.ctx().node.id);
 }
 
-/** A selectable edge path with the core markers of the edge. */
+/**
+ * An edge path with the core markers of the edge. The interaction stroke sits inside the host group,
+ * so hover and clicks near the line reach this presentation.
+ */
 @Component({
   selector: 'g[docsEdge]',
+  hostDirectives: [EdgeInteractionDirective],
   imports: [Vflow, VflowUi],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <svg:g customEdge selectable>
-      <svg:path
-        vflowEdge
-        [attr.d]="ctx().path()"
-        [attr.marker-start]="ctx().markerStart()"
-        [attr.marker-end]="ctx().markerEnd()"
-        [vflowSelected]="ctx().selected() || ctx().preselected()" />
-    </svg:g>
+    <svg:path
+      vflowEdge
+      [attr.d]="ctx().path()"
+      [attr.marker-start]="ctx().markerStart()"
+      [attr.marker-end]="ctx().markerEnd()"
+      [vflowSelected]="ctx().selected() || ctx().preselected()" />
   `,
 })
 export class DocsEdgeComponent {

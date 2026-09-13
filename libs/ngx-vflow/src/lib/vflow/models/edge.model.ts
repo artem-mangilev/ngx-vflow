@@ -54,6 +54,7 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
   public curve = signal<Curve>(EDGE_DEFAULTS.curve);
   public reconnectable = signal<boolean | 'source' | 'target'>(EDGE_DEFAULTS.reconnectable);
   public floating = signal(EDGE_DEFAULTS.floating);
+  public interactionWidth = signal(EDGE_DEFAULTS.interactionWidth);
   public markers = signal<{ start?: Marker; end?: Marker }>(EDGE_DEFAULTS.markers);
   public edgeLabels = signal<{ [position in EdgeLabelPosition]?: EdgeLabel }>(EDGE_DEFAULTS.edgeLabels);
 
@@ -252,6 +253,10 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
 
     if (edge.floating) {
       this.floating = edge.floating;
+    }
+
+    if (edge.interactionWidth) {
+      this.interactionWidth = edge.interactionWidth;
     }
 
     if (edge.selected) {

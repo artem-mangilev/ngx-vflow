@@ -8,7 +8,7 @@ import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
     <ng-template let-ctx edgeLabelHtml><docs-edge-label [ctx]="ctx" /></ng-template>
 
     <ng-template let-ctx edge>
-      <svg:g customEdge selectable>
+      <svg:g edgeInteraction class="edge">
         <svg:path
           fill="none"
           [attr.d]="ctx.path()"
@@ -23,6 +23,11 @@ import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
       :host {
         width: 100%;
         height: 100%;
+      }
+
+      /* The interaction stroke sits inside the group, so hovering near the line counts as hovering the group. */
+      .edge:hover path:not(.interactive-edge) {
+        filter: brightness(0.85);
       }
     `,
   ],
