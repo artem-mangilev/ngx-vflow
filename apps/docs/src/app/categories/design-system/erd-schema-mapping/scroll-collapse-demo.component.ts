@@ -152,7 +152,7 @@ const ALL_VISIBLE: Visibility = { visible: new Set(), above: [], below: [], key:
           </article>
         </ng-template>
         <ng-template let-ctx edge>
-          <svg:g customTemplateEdge selectable>
+          <svg:g customEdge selectable>
             <svg:path vflowEdge [attr.d]="ctx.path()" [vflowSelected]="ctx.selected() || ctx.preselected()" />
           </svg:g>
         </ng-template>

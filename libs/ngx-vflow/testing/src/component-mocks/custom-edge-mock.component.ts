@@ -1,11 +1,11 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { AsInterface } from '../types';
-import type { CustomTemplateEdgeComponent } from 'ngx-vflow';
+import type { CustomEdgeComponent } from 'ngx-vflow';
 
 @Component({
-  selector: 'g[customTemplateEdge]',
+  selector: 'g[customEdge]',
   template: '',
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
 })
-export class CustomTemplateEdgeMockComponent implements AsInterface<CustomTemplateEdgeComponent> {}
+export class CustomEdgeMockComponent implements AsInterface<CustomEdgeComponent> {}

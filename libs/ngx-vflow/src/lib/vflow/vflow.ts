@@ -21,7 +21,7 @@ import { MiniMapComponent } from './public-components/minimap/minimap.component'
 import { NodeToolbarComponent } from './public-components/node-toolbar/node-toolbar.component';
 import { ResizableComponent } from './public-components/resizable/resizable.component';
 import { HandleComponent } from './public-components/handle/handle.component';
-import { CustomTemplateEdgeComponent } from './public-components/custom-template-edge/custom-template-edge.component';
+import { CustomEdgeComponent } from './public-components/custom-edge/custom-edge.component';
 
 export const Vflow = [
   NoKeyboardDirective,
@@ -34,7 +34,7 @@ export const Vflow = [
   SelectableDirective,
   MiniMapComponent,
   NodeToolbarComponent,
-  CustomTemplateEdgeComponent,
+  CustomEdgeComponent,
   DragHandleDirective,
   ConnectionControllerDirective,
 

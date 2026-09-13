@@ -1,12 +1,17 @@
 <svg:path aria-hidden="true" class="focus-indicator" [attr.d]="model().path().path" />
 
-@if (edgeTemplate()) {
-  @if (edgeTemplate(); as edgeTemplate) {
-    <ng-container
-      [ngTemplateOutlet]="edgeTemplate"
-      [ngTemplateOutletContext]="model().context"
-      [ngTemplateOutletInjector]="injector" />
-  }
+@if (model().edge.component; as component) {
+  <ng-container
+    [entityComponentOutlet]="component"
+    [entityComponentOutletLoad]="model().shouldLoad()"
+    [entityComponentOutletInjector]="injector"
+    [entityComponentOutletSvgHost]="true"
+    (entityComponentEvent)="pushComponentEvent($event)" />
+} @else if (edgeTemplate(); as edgeTemplate) {
+  <ng-container
+    [ngTemplateOutlet]="edgeTemplate"
+    [ngTemplateOutletContext]="model().context"
+    [ngTemplateOutletInjector]="injector" />
 }
 
 @if (model().sourceHandle() && model().targetHandle()) {

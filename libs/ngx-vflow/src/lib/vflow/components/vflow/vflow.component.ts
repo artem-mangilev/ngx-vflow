@@ -448,7 +448,12 @@ export class VflowComponent {
   /**
    * Event that accumulates all custom node events
    */
-  public readonly componentNodeEvent = outputFromObservable<any>(this.componentEventBusService.event$); // TODO: research how to remove any
+  public readonly componentNodeEvent = outputFromObservable<any>(this.componentEventBusService.nodeEvent$); // TODO: research how to remove any
+
+  /**
+   * Event that accumulates all custom edge events
+   */
+  public readonly componentEdgeEvent = outputFromObservable<any>(this.componentEventBusService.edgeEvent$);
   // #endregion
 
   // #region TEMPLATES

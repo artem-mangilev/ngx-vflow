@@ -8,7 +8,7 @@ import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
     <ng-template let-ctx edgeLabelHtml><docs-edge-label [ctx]="ctx" /></ng-template>
 
     <ng-template let-ctx edge>
-      <svg:g customTemplateEdge selectable>
+      <svg:g customEdge selectable>
         <svg:path
           fill="none"
           [attr.d]="ctx.path()"

@@ -4,18 +4,10 @@ import { Edge } from './edge.interface';
 import { HtmlTemplateEdgeLabel } from './edge-label.interface';
 import { HandleState } from '../models/handle.model';
 import { NodeRef } from '../utils/inject-node';
+import { EdgeRef } from '../utils/inject-edge';
 
 export interface EdgeContext {
-  $implicit: {
-    edge: Edge<any>;
-    data: Signal<any>;
-    path: Signal<string>;
-    markerStart: Signal<string>;
-    markerEnd: Signal<string>;
-    selected: Signal<boolean>;
-    preselected: Signal<boolean>;
-    shouldLoad: Signal<boolean>;
-  };
+  $implicit: EdgeRef;
 }
 
 export interface NodeContext {

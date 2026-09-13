@@ -51,7 +51,7 @@ import { AriaLabelConfig, Vflow, createEdges, createNodes } from 'ngx-vflow';
           }
         </ng-template>
         <ng-template let-ctx edge>
-          <svg:g customTemplateEdge selectable>
+          <svg:g customEdge selectable>
             <svg:path aria-hidden="true" fill="none" stroke="#345" stroke-width="2" [attr.d]="ctx.path()" />
           </svg:g>
         </ng-template>

@@ -16,9 +16,9 @@
 
   <ng-template let-ctx edge>
     <svg:g
-      class="without-tab-index custom-template-edge"
+      class="without-tab-index custom-edge"
       tabindex="0"
-      customTemplateEdge
+      customEdge
       selectable
       (keydown.backspace)="ctx.selected() && deleteEdge(ctx.edge)">
       <svg:path

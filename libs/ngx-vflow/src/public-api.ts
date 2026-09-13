@@ -22,7 +22,9 @@ export { ConnectionSettings, ConnectionValidatorFn } from './lib/vflow/interface
 export * from './lib/vflow/interfaces/marker.interface';
 export { ViewportState } from './lib/vflow/interfaces/viewport.interface';
 export * from './lib/vflow/interfaces/component-node-event.interface';
+export * from './lib/vflow/interfaces/component-edge-event.interface';
 export { NODE_REF, NodeRef, injectNode } from './lib/vflow/utils/inject-node';
+export { EDGE_REF, EdgeRef, injectEdge } from './lib/vflow/utils/inject-edge';
 export * from './lib/vflow/interfaces/fit-view-options.interface';
 export * from './lib/vflow/interfaces/optimization.interface';
 export * from './lib/vflow/interfaces/intersecting-nodes-options.interface';
@@ -56,7 +58,7 @@ export * from './lib/vflow/public-components/resizable/node-resize-control.compo
 export * from './lib/vflow/public-components/resizable/resizer-types';
 export * from './lib/vflow/public-components/minimap/minimap.component';
 export * from './lib/vflow/public-components/node-toolbar/node-toolbar.component';
-export * from './lib/vflow/public-components/custom-template-edge/custom-template-edge.component';
+export * from './lib/vflow/public-components/custom-edge/custom-edge.component';
 
 // Directives
 export * from './lib/vflow/directives/template.directive';

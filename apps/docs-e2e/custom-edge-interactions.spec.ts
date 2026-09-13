@@ -65,21 +65,21 @@ test('custom edge interaction stroke can select without blocking empty canvas', 
     .toContain('vflow-pane');
 
   await clickMidpoint(interactionPath);
-  await expect(page.locator('vflow g[customTemplateEdge] path[stroke="#0f4c75"]')).toHaveCount(1);
+  await expect(page.locator('vflow g[customEdge] path[stroke="#0f4c75"]')).toHaveCount(1);
 });
 
 test('custom edge can be selected and deleted by clicking its interaction stroke', async ({ page }) => {
   await page.goto('/cookbook/delete-selected');
 
-  const customEdges = page.locator('vflow g[customTemplateEdge]');
+  const customEdges = page.locator('vflow g[customEdge]');
   const customEdge = customEdges.first();
   const interactionPath = customEdge.locator('path.interactive-edge');
   await interactionPath.scrollIntoViewIfNeeded();
 
-  await expect(page.locator('vflow g[customTemplateEdge] path[stroke="#0f4c75"]')).toHaveCount(0);
+  await expect(page.locator('vflow g[customEdge] path[stroke="#0f4c75"]')).toHaveCount(0);
   await expect.poll(() => hitTargetAtMidpoint(interactionPath)).toContain('interactive-edge');
   await clickMidpoint(interactionPath);
-  await expect(page.locator('vflow g[customTemplateEdge] path[stroke="#0f4c75"]')).toHaveCount(1);
+  await expect(page.locator('vflow g[customEdge] path[stroke="#0f4c75"]')).toHaveCount(1);
 
   await page.keyboard.press('Backspace');
   await expect(customEdges).toHaveCount(1);

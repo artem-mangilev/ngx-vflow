@@ -156,7 +156,7 @@ export class NodeComponent implements OnInit, OnDestroy {
   }
 
   protected pushComponentEvent({ eventName, eventPayload }: EntityComponentOutputEvent) {
-    this.componentEventBus.pushEvent({ nodeId: this.model().rawNode.id, eventName, eventPayload });
+    this.componentEventBus.pushNodeEvent({ nodeId: this.model().rawNode.id, eventName, eventPayload });
   }
 
   protected pullNode() {

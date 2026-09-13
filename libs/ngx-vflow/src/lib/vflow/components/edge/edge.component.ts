@@ -18,6 +18,12 @@ import { ConnectionControllerDirective } from '../../directives/connection-contr
 import { HandleModel } from '../../models/handle.model';
 import { EdgeRenderingService } from '../../services/edge-rendering.service';
 import { PointerDirective } from '../../directives/pointer.directive';
+import { ComponentEventBusService } from '../../services/component-event-bus.service';
+import {
+  EntityComponentOutletDirective,
+  EntityComponentOutputEvent,
+} from '../../directives/entity-component-outlet.directive';
+import { EDGE_REF } from '../../utils/inject-edge';
 
 @Component({
   selector: 'svg[edge]',
@@ -29,13 +35,18 @@ import { PointerDirective } from '../../directives/pointer.directive';
     '(focusout)': 'model().focused.set(false)',
     class: 'selectable',
   },
-  imports: [NgTemplateOutlet, PointerDirective],
+  providers: [
+    // Resolved lazily by presentations, which are created after the model input is set.
+    { provide: EDGE_REF, useFactory: () => inject(EdgeComponent).model().context.$implicit },
+  ],
+  imports: [NgTemplateOutlet, PointerDirective, EntityComponentOutletDirective],
 })
 export class EdgeComponent {
   protected injector = inject(Injector);
   private selectionService = inject(SelectionService);
   private flowSettingsService = inject(FlowSettingsService);
   private edgeRenderingService = inject(EdgeRenderingService);
+  private componentEventBus = inject(ComponentEventBusService);
 
   // TODO remove dependency from this directive
   private connectionController = inject(ConnectionControllerDirective, { optional: true });
@@ -64,6 +75,10 @@ export class EdgeComponent {
     if (this.flowSettingsService.elevateEdgesOnSelect()) {
       this.edgeRenderingService.pull(this.model());
     }
+  }
+
+  protected pushComponentEvent({ eventName, eventPayload }: EntityComponentOutputEvent) {
+    this.componentEventBus.pushEdgeEvent({ edgeId: this.model().edge.id, eventName, eventPayload });
   }
 
   protected startReconnection(event: Event, handle: HandleModel) {

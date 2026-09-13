@@ -116,7 +116,7 @@ interface StepData {
             </article>
           </ng-template>
           <ng-template let-ctx edge>
-            <svg:g customTemplateEdge selectable>
+            <svg:g customEdge selectable>
               <svg:path
                 vflowEdge
                 [attr.d]="ctx.path()"

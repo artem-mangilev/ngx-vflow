@@ -25,7 +25,7 @@ graph needs templates. There are two working paths:
     <div class="frame" [style.width.px]="ctx.width()" [style.height.px]="ctx.height()"></div>
   </ng-template>
   <ng-template let-ctx edge>
-    <svg:g customTemplateEdge selectable>
+    <svg:g customEdge selectable>
       <svg:path class="line" [attr.d]="ctx.path()" [attr.marker-end]="ctx.markerEnd()" />
     </svg:g>
   </ng-template>
@@ -50,7 +50,7 @@ graph needs templates. There are two working paths:
       </article>
     </ng-template>
     <ng-template let-ctx edge>
-      <svg:g customTemplateEdge selectable>
+      <svg:g customEdge selectable>
         <svg:path vflowEdge [attr.d]="ctx.path()" [attr.marker-end]="ctx.markerEnd()" [vflowSelected]="ctx.selected()" />
       </svg:g>
     </ng-template>

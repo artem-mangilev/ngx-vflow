@@ -1,6 +1,6 @@
 import { Directive } from '@angular/core';
 
-/** SVG presentation only. Compose with core customTemplateEdge/selectable for interaction. */
+/** SVG presentation only. Compose with core customEdge/selectable for interaction. */
 @Directive({
   selector: 'path[vflowEdge]',
   host: {

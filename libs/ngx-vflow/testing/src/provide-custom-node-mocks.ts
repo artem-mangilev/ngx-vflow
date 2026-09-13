@@ -23,7 +23,8 @@ export function provideCustomNodeMocks(): Provider[] {
     {
       provide: ComponentEventBusService,
       useValue: {
-        pushEvent: () => {},
+        pushNodeEvent: () => {},
+        pushEdgeEvent: () => {},
       },
     },
     {

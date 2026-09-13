@@ -65,7 +65,7 @@ Ports mirror two independent facts: `vflowPortState` is core feedback for the co
 
 ### Edges
 
-`vflowEdge` styles the visible SVG path of a `customTemplateEdge`; routing, hit targets and markers stay in core,
+`vflowEdge` styles the visible SVG path of a `customEdge`; routing, hit targets and markers stay in core,
 so attach `markers` in edge data and bind `ctx.markerEnd()`. Labels at `start`, `center` and `end` positions
 come from core `edgeLabels`; `vflowEdgeLabel` is their surface and can hold `vflowActions` with native buttons.
 
@@ -153,7 +153,7 @@ descendant to override both. The canvas minimap samples the resolved tokens and 
 attribute changes on any ancestor of the flow (for example `data-vui-theme` or a class) or when the
 `prefers-color-scheme` preference changes; edits to a stylesheet alone are not observed.
 
-Compose custom edges with `customTemplateEdge` and `selectable`, and use core gesture
+Compose custom edges with `customEdge` and `selectable`, and use core gesture
 exclusions such as `vflowNoDrag` for embedded controls. Do not shrink a hit area just to make
 its visual smaller. Keep status text alongside color and give icon-only buttons accessible names.
 

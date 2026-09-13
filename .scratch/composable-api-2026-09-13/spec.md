@@ -1,6 +1,6 @@
 # Спецификация: единая нода, компонентные ноды и рёбра, handle-директива, декларативные лейблы
 
-Status: in-progress (01, 02 resolved)
+Status: in-progress (01, 02, 03 resolved)
 Ветка: `3.0`. Обсуждение и сравнение с React Flow, ng-diagram и Foblex зафиксированы в `report.md`.
 
 ## Цель
@@ -133,6 +133,13 @@ export interface Edge<T = unknown> extends Connection {
   `visibility`/`zIndex` остаются в библиотечном `<svg edge>`.
 - `CustomTemplateEdgeComponent` (`g[customTemplateEdge]`) переименовывается в
   `g[customEdge]`: он нужен и шаблону, и компоненту. `EdgeComponent` инжектится в него, как сейчас.
+- Решено при реализации 03: `EDGE_REF` провайдится в `EdgeComponent` через `inject(EdgeComponent)`, отдельный
+  `EdgeAccessorService` не понадобился. Алиас типа компонента назван `EntityComponentType` без
+  `NodeComponentType`. Шина разделена на `pushNodeEvent`/`nodeEvent$` и `pushEdgeEvent`/`edgeEvent$`; общий
+  вывод событий из output вынесен в публичный `ComponentOutputEvent<T>`. Outlet получил вход
+  `entityComponentOutletSvgHost` и в этом режиме создаёт компонент через `createComponent` с `hostElement`
+  `<svg:g>`, вставляя его представление в контейнер. На странице custom-edges добавлено демо
+  `ComponentEdgesDemoComponent`.
 - Отвергнуто: HTML-хост с `<svg>` внутри, который рисует консьюмер или библиотечный `<svg
 vflowBaseEdge>` (модель ng-diagram/Foblex). Требует переделки reconnect и селекции и сужает
   свободу рисовать произвольный SVG. Подробности в `report.md`.

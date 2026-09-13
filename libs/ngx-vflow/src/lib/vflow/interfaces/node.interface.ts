@@ -16,15 +16,15 @@ export const NODE_DEFAULTS = {
 };
 
 /**
- * A component class, or a factory that lazily imports one. Nodes without a component render
- * through the `ng-template[node]` presentation of the flow.
+ * A component class, or a factory that lazily imports one. Nodes and edges without a component render
+ * through the `ng-template[node]` or `ng-template[edge]` presentation of the flow.
  */
-export type NodeComponentType = Type<unknown> | (() => Promise<Type<unknown>>);
+export type EntityComponentType = Type<unknown> | (() => Promise<Type<unknown>>);
 
 export interface Node<T = any> {
   id: string;
   point: WritableSignal<Point>;
-  component?: NodeComponentType;
+  component?: EntityComponentType;
   data?: WritableSignal<T>;
   /** With `height`, makes the size explicit; without both, the node follows its measured content. */
   width?: WritableSignal<number>;

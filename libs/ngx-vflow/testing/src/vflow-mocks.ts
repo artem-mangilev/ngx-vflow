@@ -1,4 +1,4 @@
-import { CustomTemplateEdgeMockComponent } from './component-mocks/custom-template-edge-mock.component';
+import { CustomEdgeMockComponent } from './component-mocks/custom-edge-mock.component';
 import { HandleMockComponent } from './component-mocks/handle-mock.component';
 import { MiniMapMockComponent } from './component-mocks/minimap-mock.component';
 import { NodeToolbarMockComponent } from './component-mocks/node-toolbar-mock.component';
@@ -24,7 +24,7 @@ export const VflowMocks = [
   NodeToolbarMockComponent,
   DragHandleMockDirective,
   ConnectionControllerMockDirective,
-  CustomTemplateEdgeMockComponent,
+  CustomEdgeMockComponent,
 
   NodeTemplateMockDirective,
   EdgeLabelHtmlTemplateMockDirective,

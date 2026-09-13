@@ -205,6 +205,9 @@ export class VflowMockComponent implements AsInterface<VflowComponent>, OnInit {
   // eslint-disable-next-line @angular-eslint/no-output-on-prefix
   public readonly componentNodeEvent = output<any>();
 
+  // eslint-disable-next-line @angular-eslint/no-output-on-prefix
+  public readonly componentEdgeEvent = output<any>();
+
   protected nodeTemplateDirective = contentChild(NodeTemplateMockDirective);
 
   protected edgeTemplateDirective = contentChild(EdgeTemplateMockDirective);

@@ -6,6 +6,7 @@ import { Marker } from './marker.interface';
 import { UnwrapSignal } from '../types/unwrap-signal.type';
 import { isDefined } from '../utils/is-defined';
 import { DomAttributes } from './dom-attributes.interface';
+import { EntityComponentType } from './node.interface';
 
 export const EDGE_DEFAULTS = {
   curve: 'bezier' as Curve,
@@ -21,6 +22,8 @@ export type Curve = 'straight' | 'bezier' | 'smooth-step' | 'step' | CurveFactor
 
 export interface Edge<T = unknown> extends Connection {
   id: string;
+  /** Component that draws the edge; without it the edge renders through `ng-template[edge]`. */
+  component?: EntityComponentType;
   curve?: WritableSignal<Curve>;
   data?: WritableSignal<T>;
   edgeLabels?: WritableSignal<{ [position in EdgeLabelPosition]?: EdgeLabel }>;
@@ -44,7 +47,7 @@ interface CreateEdgeOptions {
   useDefaults: boolean;
 }
 
-type OptionalProperty = 'selectable' | 'focusable' | 'ariaLabel' | 'ariaDescription' | 'domAttributes';
+type OptionalProperty = 'component' | 'selectable' | 'focusable' | 'ariaLabel' | 'ariaDescription' | 'domAttributes';
 
 export type EdgeWithDefaults<T = unknown> = Omit<Required<Edge<T>>, OptionalProperty> & Pick<Edge<T>, OptionalProperty>;
 
@@ -62,6 +65,7 @@ export function createEdge<T>(
       target: edge.target,
       sourceHandle: isDefined(edge.sourceHandle) ? edge.sourceHandle : '',
       targetHandle: isDefined(edge.targetHandle) ? edge.targetHandle : '',
+      ...(isDefined(edge.component) ? { component: edge.component } : {}),
       curve: signal(isDefined(edge.curve) ? edge.curve : EDGE_DEFAULTS.curve),
       data: signal(isDefined(edge.data) ? edge.data : EDGE_DEFAULTS.data) as WritableSignal<T>,
       edgeLabels: signal(isDefined(edge.edgeLabels) ? edge.edgeLabels : EDGE_DEFAULTS.edgeLabels),
@@ -82,6 +86,7 @@ export function createEdge<T>(
       target: edge.target,
       sourceHandle: edge.sourceHandle,
       targetHandle: edge.targetHandle,
+      ...(isDefined(edge.component) ? { component: edge.component } : {}),
       curve: isDefined(edge.curve) ? signal(edge.curve) : undefined,
       data: isDefined(edge.data) ? (signal(edge.data) as WritableSignal<T>) : undefined,
       edgeLabels: isDefined(edge.edgeLabels) ? signal(edge.edgeLabels) : undefined,

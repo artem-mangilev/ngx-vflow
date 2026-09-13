@@ -10,7 +10,8 @@ type EventShape<T, K extends keyof T> = {
   [P in K]: { eventName: P; eventPayload: EventInfo<T[P]> };
 }[K];
 
-type EventsFromComponent<T> = EventShape<T, EventKeys<T>>;
+/** Union of `{ eventName, eventPayload }` for every output declared on a component class. */
+export type ComponentOutputEvent<T> = EventShape<T, EventKeys<T>>;
 
 /**
  * Event of a component node. `eventName` is the property name of the output on the component class.
@@ -19,7 +20,7 @@ type EventsFromComponent<T> = EventShape<T, EventKeys<T>>;
  * event handling.
  */
 export type ComponentNodeEvent<T extends object[]> = { nodeId: string } & {
-  [I in keyof T]: EventsFromComponent<T[I]>;
+  [I in keyof T]: ComponentOutputEvent<T[I]>;
 }[number];
 
 export type AnyComponentNodeEvent = {
