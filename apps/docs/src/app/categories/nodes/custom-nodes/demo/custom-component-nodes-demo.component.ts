@@ -7,8 +7,7 @@ import { RedSquareNodeComponent, RedSquareData } from './components/red-square-n
 
 @Component({
   template: `<vflow view="auto" [nodes]="nodes" [edges]="edges" (componentNodeEvent)="handleComponentEvent($event)">
-    <ng-template let-ctx nodeHtml><docs-node [ctx]="ctx" /></ng-template>
-    <ng-template let-ctx groupNode><docs-group [ctx]="ctx" /></ng-template>
+    <ng-template let-ctx node><docs-node [ctx]="ctx" /></ng-template>
     <ng-template let-ctx edge><svg:g docsEdge [ctx]="ctx" /></ng-template>
     <ng-template let-ctx edgeLabelHtml><docs-edge-label [ctx]="ctx" /></ng-template>
   </vflow>`,
@@ -31,7 +30,7 @@ export class CustomComponentNodesDemoComponent {
       {
         id: '1',
         point: { x: 100, y: 100 },
-        type: RedSquareNodeComponent,
+        component: RedSquareNodeComponent,
         data: {
           redSquareText: 'Red',
         },
@@ -41,7 +40,7 @@ export class CustomComponentNodesDemoComponent {
       {
         id: '2',
         point: { x: 250, y: 250 },
-        type: BlueSquareNodeComponent,
+        component: BlueSquareNodeComponent,
         data: {
           blueSquareText: 'Blue',
         },

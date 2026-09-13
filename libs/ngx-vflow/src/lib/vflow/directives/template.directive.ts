@@ -3,7 +3,6 @@ import { Directive, TemplateRef, inject } from '@angular/core';
 import {
   ConnectionContext,
   EdgeContext,
-  GroupNodeContext,
   HandleContext,
   HtmlEdgeLabelContext,
   NodeContext,
@@ -45,26 +44,15 @@ export class EdgeLabelHtmlTemplateDirective {
   }
 }
 
+/** Presentation of every node without a `component`. */
 @Directive({
   standalone: true,
-  selector: 'ng-template[nodeHtml]',
+  selector: 'ng-template[node]',
 })
-export class NodeHtmlTemplateDirective {
-  public templateRef = inject(TemplateRef);
+export class NodeTemplateDirective {
+  public templateRef = inject<TemplateRef<NodeContext>>(TemplateRef);
 
-  static ngTemplateContextGuard(dir: NodeHtmlTemplateDirective, ctx: unknown): ctx is NodeContext {
-    return true;
-  }
-}
-
-@Directive({
-  standalone: true,
-  selector: 'ng-template[groupNode]',
-})
-export class GroupNodeTemplateDirective {
-  public templateRef = inject(TemplateRef);
-
-  static ngTemplateContextGuard(dir: GroupNodeTemplateDirective, ctx: unknown): ctx is GroupNodeContext {
+  static ngTemplateContextGuard(dir: NodeTemplateDirective, ctx: unknown): ctx is NodeContext {
     return true;
   }
 }

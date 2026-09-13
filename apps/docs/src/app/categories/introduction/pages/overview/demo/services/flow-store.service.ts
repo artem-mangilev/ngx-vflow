@@ -22,22 +22,22 @@ export class FlowStoreService {
       {
         id: 'trigger',
         point: { x: 50, y: -80 },
-        type: TriggerNodeComponent,
+        component: TriggerNodeComponent,
       },
       {
         id: 'data',
         point: { x: 50, y: 250 },
-        type: DataNodeComponent,
+        component: DataNodeComponent,
       },
       {
         id: 'transform',
         point: { x: 400, y: 180 },
-        type: TransformNodeComponent,
+        component: TransformNodeComponent,
       },
       {
         id: 'group',
         point: { x: 800, y: 0 },
-        type: 'template-group',
+        data: { type: 'group' },
         width: 500,
         height: 800,
       },
@@ -45,13 +45,13 @@ export class FlowStoreService {
         id: 'output-size',
         parentId: 'group',
         point: { x: 200, y: 70 },
-        type: OutputNodeComponent,
+        component: OutputNodeComponent,
       },
       {
         id: 'output-position',
         parentId: 'group',
         point: { x: 200, y: 400 },
-        type: OutputNodeComponent,
+        component: OutputNodeComponent,
       },
     ]),
   );

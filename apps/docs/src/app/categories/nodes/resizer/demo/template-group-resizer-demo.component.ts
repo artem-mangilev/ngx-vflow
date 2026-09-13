@@ -4,17 +4,19 @@ import { Node, Vflow, createNodes } from 'ngx-vflow';
 
 @Component({
   template: `<vflow view="auto" [nodes]="nodes">
-    <ng-template let-ctx nodeHtml><docs-node [ctx]="ctx" /></ng-template>
+    <ng-template let-ctx node>
+      @if (ctx.data().type === 'group') {
+        <div
+          selectable
+          class="group-node"
+          [resizable]="ctx.selected()"
+          [class.group-node_selected]="ctx.selected()"></div>
+      } @else {
+        <docs-node [ctx]="ctx" />
+      }
+    </ng-template>
     <ng-template let-ctx edge><svg:g docsEdge [ctx]="ctx" /></ng-template>
     <ng-template let-ctx edgeLabelHtml><docs-edge-label [ctx]="ctx" /></ng-template>
-
-    <ng-template let-ctx groupNode>
-      <div
-        selectable
-        class="group-node"
-        [resizable]="ctx.selected()"
-        [class.group-node_selected]="ctx.selected()"></div>
-    </ng-template>
   </vflow>`,
   styles: [
     `
@@ -43,14 +45,13 @@ export class TemplateGroupResizerDemoComponent {
     {
       id: '5',
       point: { x: 10, y: 10 },
-      type: 'template-group',
+      data: { type: 'group' },
       width: 170,
       height: 70,
     },
     {
       id: '6',
       point: { x: 10, y: 10 },
-      type: 'html-template',
       data: { text: `6` },
       parentId: '5',
     },

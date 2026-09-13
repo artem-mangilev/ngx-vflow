@@ -30,7 +30,7 @@ export function initialElements(xNodes = 10, yNodes = 10): { nodes: Node[]; edge
   for (let y = 0; y < yNodes; y++) {
     for (let x = 0; x < xNodes; x++) {
       nodes.push({
-        type: StressTestNodeComponent,
+        component: StressTestNodeComponent,
         id: `stress-${nodeId}`,
         data: { label: `Node ${nodeId}` },
         ariaLabel: `Node ${nodeId}`,

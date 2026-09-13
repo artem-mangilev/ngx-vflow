@@ -59,7 +59,7 @@ import { createEdges, createNodes, Vflow } from 'ngx-vflow';
         <div class="editor" data-testid="editor-a" [vflowTheme]="dark() ? 'dark' : 'light'">
           <p>Editor A: {{ dark() ? 'dark' : 'light' }}</p>
           <vflow [nodes]="nodes" [edges]="edges">
-            <ng-template let-ctx nodeHtml>
+            <ng-template let-ctx node>
               <article vflowNode selectable [vflowSelected]="ctx.selected() || ctx.preselected()">
                 <header vflowNodeHeader>
                   <span vflowTitle>{{ ctx.data().title }}</span>
@@ -83,7 +83,7 @@ import { createEdges, createNodes, Vflow } from 'ngx-vflow';
         <div class="editor" data-testid="editor-b" vflowTheme="dark">
           <p>Editor B: dark</p>
           <vflow [nodes]="nodes" [edges]="edges">
-            <ng-template let-ctx nodeHtml>
+            <ng-template let-ctx node>
               <article vflowNode selectable [vflowSelected]="ctx.selected() || ctx.preselected()">
                 <header vflowNodeHeader>
                   <span vflowTitle>{{ ctx.data().title }}</span>
@@ -111,7 +111,7 @@ import { createEdges, createNodes, Vflow } from 'ngx-vflow';
     <div class="editor" data-testid="editor-core" style="margin-top: 10px">
       <p>Core only: own node and edge templates without a theme scope; core tokens keep their defaults.</p>
       <vflow [nodes]="coreNodes" [edges]="coreEdges">
-        <ng-template let-ctx nodeHtml>
+        <ng-template let-ctx node>
           <div class="plain-node" selectable>
             {{ ctx.data().title }}
             <handle type="target" position="left" />
@@ -131,13 +131,13 @@ import { createEdges, createNodes, Vflow } from 'ngx-vflow';
 export class ThemesDemoComponent {
   readonly dark = signal(false);
   readonly nodes = createNodes([
-    { id: 'a', type: 'html-template', point: { x: 20, y: 40 }, ariaLabel: 'Source', data: { title: 'Source' } },
-    { id: 'b', type: 'html-template', point: { x: 240, y: 120 }, ariaLabel: 'Target', data: { title: 'Target' } },
+    { id: 'a', point: { x: 20, y: 40 }, ariaLabel: 'Source', data: { title: 'Source' } },
+    { id: 'b', point: { x: 240, y: 120 }, ariaLabel: 'Target', data: { title: 'Target' } },
   ]);
   readonly edges = createEdges([{ id: 'a-b', source: 'a', target: 'b', curve: 'smooth-step', markers: { end: {} } }]);
   readonly coreNodes = createNodes([
-    { id: 'c1', type: 'html-template', point: { x: 20, y: 40 }, data: { title: 'Own template' } },
-    { id: 'c2', type: 'html-template', point: { x: 240, y: 120 }, data: { title: 'Headless core' } },
+    { id: 'c1', point: { x: 20, y: 40 }, data: { title: 'Own template' } },
+    { id: 'c2', point: { x: 240, y: 120 }, data: { title: 'Headless core' } },
   ]);
   readonly coreEdges = createEdges([
     { id: 'c1-c2', source: 'c1', target: 'c2', curve: 'smooth-step', markers: { end: {} } },

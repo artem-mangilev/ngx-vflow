@@ -40,8 +40,7 @@ const ropeCurve = createRopeCurveFactory();
 
 @Component({
   template: `<vflow view="auto" [nodes]="nodes" [edges]="edges">
-    <ng-template let-ctx nodeHtml><docs-node [ctx]="ctx" /></ng-template>
-    <ng-template let-ctx groupNode><docs-group [ctx]="ctx" /></ng-template>
+    <ng-template let-ctx node><docs-node [ctx]="ctx" /></ng-template>
     <ng-template let-ctx edge><svg:g docsEdge [ctx]="ctx" /></ng-template>
     <ng-template let-ctx edgeLabelHtml><docs-edge-label [ctx]="ctx" /></ng-template>
   </vflow>`,
@@ -61,13 +60,11 @@ export class RopeCurveDemoComponent {
     {
       id: 'left',
       point: { x: 90, y: 180 },
-      type: 'html-template',
       data: { text: 'Left node' },
     },
     {
       id: 'right',
       point: { x: 470, y: 130 },
-      type: 'html-template',
       data: { text: 'Right node' },
     },
   ]);

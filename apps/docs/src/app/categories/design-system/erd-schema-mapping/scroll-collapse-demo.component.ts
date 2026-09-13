@@ -11,7 +11,7 @@ import {
   WritableSignal,
 } from '@angular/core';
 import { VflowUi } from '@vflow/ui';
-import { createEdges, createNodes, HtmlTemplateNode, Vflow, VflowComponent } from 'ngx-vflow';
+import { createEdges, createNodes, Node, Vflow, VflowComponent } from 'ngx-vflow';
 
 interface LongEntity {
   title: string;
@@ -77,7 +77,7 @@ const ALL_VISIBLE: Visibility = { visible: new Set(), above: [], below: [], key:
         <p>Scroll the Product rows with the wheel; collapse a node to move its endpoints to the header.</p>
       </div>
       <vflow view="auto" [nodes]="nodes" [edges]="edges">
-        <ng-template let-ctx nodeHtml>
+        <ng-template let-ctx node>
           @let view = visibility(ctx.node.id);
           <article
             vflowNode
@@ -169,7 +169,6 @@ export class ScrollCollapseDemoComponent {
   readonly nodes = createNodes<LongEntity>([
     {
       id: 'product',
-      type: 'html-template',
       point: { x: 20, y: 20 },
       ariaLabel: 'Product entity',
       data: {
@@ -193,7 +192,6 @@ export class ScrollCollapseDemoComponent {
     },
     {
       id: 'supplier',
-      type: 'html-template',
       point: { x: 420, y: 60 },
       ariaLabel: 'Supplier entity',
       data: {
@@ -207,7 +205,6 @@ export class ScrollCollapseDemoComponent {
     },
     {
       id: 'brand',
-      type: 'html-template',
       point: { x: 420, y: 260 },
       ariaLabel: 'Brand entity',
       data: {
@@ -219,7 +216,7 @@ export class ScrollCollapseDemoComponent {
         ],
       },
     },
-  ]) as (HtmlTemplateNode<LongEntity> & { data: WritableSignal<LongEntity> })[];
+  ]) as (Node<LongEntity> & { data: WritableSignal<LongEntity> })[];
   readonly edges = createEdges([
     {
       id: 'supplier',

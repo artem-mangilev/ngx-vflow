@@ -99,7 +99,6 @@ describe('EdgeModel', () => {
           new NodeModel(
             createNode({
               id: '1',
-              type: 'html-template',
 
               point: { x: 15, y: 15 },
               width: 0,
@@ -114,7 +113,6 @@ describe('EdgeModel', () => {
           new NodeModel(
             createNode({
               id: '2',
-              type: 'html-template',
 
               point: { x: 15, y: 15 },
               width: 0,

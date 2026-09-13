@@ -107,70 +107,81 @@ type MapData = Person | Metric | Note | Team;
         </p>
       </div>
       <vflow view="auto" [nodes]="nodes" [edges]="edges">
-        <ng-template let-ctx groupNode>
-          <div
-            vflowContainer
-            class="team"
-            selectable
-            [vflowSelected]="ctx.selected() || ctx.preselected()"
-            [style.width.px]="ctx.width()"
-            [style.height.px]="ctx.height()">
-            <span vflowTitle
-              >{{ ctx.data().title }} <span vflowMeta>· {{ ctx.data().members }} people</span></span
-            >
-            <!-- The container has its own connections; it is not a parent of the other team. -->
-            <handle type="source" position="right" [template]="port" [canStart]="!viewMode()" [canAccept]="false" />
-            <handle type="target" position="left" [template]="port" [canStart]="false" [canAccept]="!viewMode()" />
-          </div>
-        </ng-template>
-        <ng-template let-ctx nodeHtml>
-          @switch (ctx.data().kind) {
-            @case ('person') {
-              <article vflowNode class="person" selectable [vflowSelected]="ctx.selected() || ctx.preselected()">
-                <header vflowNodeHeader>
-                  <svg
-                    vflowIcon
-                    class="avatar"
-                    viewBox="0 0 28 28"
-                    role="img"
-                    [attr.aria-label]="'Avatar of ' + ctx.data().name">
-                    <circle cx="14" cy="14" r="14" [attr.fill]="'hsl(' + ctx.data().hue + ' 55% 45%)'" />
-                    <text x="14" y="18" text-anchor="middle" fill="#fff" font-size="11" font-weight="600">
-                      {{ ctx.data().initials }}
-                    </text>
-                  </svg>
-                  <span vflowTitle>{{ ctx.data().name }}</span>
-                </header>
-                <div vflowNodeBody>
-                  <p vflowMeta>{{ ctx.data().role }} · {{ ctx.data().reviews }} reviews this month</p>
-                  <div class="meter" role="img" [attr.aria-label]="ctx.data().reviews + ' of 20 reviews'">
-                    <span [style.width.%]="ctx.data().reviews * 5"></span>
+        <ng-template let-ctx node>
+          @if (ctx.data().kind === 'team') {
+            <div
+              vflowContainer
+              class="team"
+              selectable
+              [vflowSelected]="ctx.selected() || ctx.preselected()"
+              [style.width.px]="ctx.width()"
+              [style.height.px]="ctx.height()">
+              <span vflowTitle
+                >{{ ctx.data().title }} <span vflowMeta>· {{ ctx.data().members }} people</span></span
+              >
+              <!-- The container has its own connections; it is not a parent of the other team. -->
+              <handle type="source" position="right" [template]="port" [canStart]="!viewMode()" [canAccept]="false" />
+              <handle type="target" position="left" [template]="port" [canStart]="false" [canAccept]="!viewMode()" />
+            </div>
+          } @else {
+            @switch (ctx.data().kind) {
+              @case ('person') {
+                <article vflowNode class="person" selectable [vflowSelected]="ctx.selected() || ctx.preselected()">
+                  <header vflowNodeHeader>
+                    <svg
+                      vflowIcon
+                      class="avatar"
+                      viewBox="0 0 28 28"
+                      role="img"
+                      [attr.aria-label]="'Avatar of ' + ctx.data().name">
+                      <circle cx="14" cy="14" r="14" [attr.fill]="'hsl(' + ctx.data().hue + ' 55% 45%)'" />
+                      <text x="14" y="18" text-anchor="middle" fill="#fff" font-size="11" font-weight="600">
+                        {{ ctx.data().initials }}
+                      </text>
+                    </svg>
+                    <span vflowTitle>{{ ctx.data().name }}</span>
+                  </header>
+                  <div vflowNodeBody>
+                    <p vflowMeta>{{ ctx.data().role }} · {{ ctx.data().reviews }} reviews this month</p>
+                    <div class="meter" role="img" [attr.aria-label]="ctx.data().reviews + ' of 20 reviews'">
+                      <span [style.width.%]="ctx.data().reviews * 5"></span>
+                    </div>
                   </div>
-                </div>
-                <handle type="target" position="left" [template]="port" [canStart]="false" [canAccept]="!viewMode()" />
-                <handle type="source" position="right" [template]="port" [canStart]="!viewMode()" [canAccept]="false" />
-              </article>
-            }
-            @case ('metric') {
-              <article vflowNode class="metric" selectable [vflowSelected]="ctx.selected() || ctx.preselected()">
-                <header vflowNodeHeader>
-                  <span vflowTitle>{{ ctx.data().title }}</span>
-                </header>
-                <div vflowNodeBody>
-                  <div class="value">{{ ctx.data().value }}</div>
-                  <div class="spark" role="img" aria-label="Weekly trend, rising">
-                    @for (point of ctx.data().series; track $index) {
-                      <span [style.height.%]="point"></span>
-                    }
+                  <handle
+                    type="target"
+                    position="left"
+                    [template]="port"
+                    [canStart]="false"
+                    [canAccept]="!viewMode()" />
+                  <handle
+                    type="source"
+                    position="right"
+                    [template]="port"
+                    [canStart]="!viewMode()"
+                    [canAccept]="false" />
+                </article>
+              }
+              @case ('metric') {
+                <article vflowNode class="metric" selectable [vflowSelected]="ctx.selected() || ctx.preselected()">
+                  <header vflowNodeHeader>
+                    <span vflowTitle>{{ ctx.data().title }}</span>
+                  </header>
+                  <div vflowNodeBody>
+                    <div class="value">{{ ctx.data().value }}</div>
+                    <div class="spark" role="img" aria-label="Weekly trend, rising">
+                      @for (point of ctx.data().series; track $index) {
+                        <span [style.height.%]="point"></span>
+                      }
+                    </div>
                   </div>
-                </div>
-              </article>
-            }
-            @default {
-              <!-- A note has no ports: it is content on the canvas, not a participant of the graph. -->
-              <article vflowNode class="note" selectable [vflowSelected]="ctx.selected() || ctx.preselected()">
-                <div vflowNodeBody>{{ ctx.data().text }}</div>
-              </article>
+                </article>
+              }
+              @default {
+                <!-- A note has no ports: it is content on the canvas, not a participant of the graph. -->
+                <article vflowNode class="note" selectable [vflowSelected]="ctx.selected() || ctx.preselected()">
+                  <div vflowNodeBody>{{ ctx.data().text }}</div>
+                </article>
+              }
             }
           }
         </ng-template>
@@ -200,7 +211,6 @@ export class RelationshipsDemoComponent {
   readonly nodes = createNodes<MapData>([
     {
       id: 'platform',
-      type: 'template-group',
       point: { x: 20, y: 20 },
       width: 440,
       height: 300,
@@ -209,7 +219,6 @@ export class RelationshipsDemoComponent {
     },
     {
       id: 'growth',
-      type: 'template-group',
       point: { x: 560, y: 20 },
       width: 440,
       height: 300,
@@ -222,14 +231,12 @@ export class RelationshipsDemoComponent {
     person('dea', { x: 230, y: 160 }, 'growth', 'Dea Rossi', 'Analyst', 'DR', 280, 11),
     {
       id: 'deploys',
-      type: 'html-template',
       point: { x: 20, y: 360 },
       ariaLabel: 'Deploys per week metric',
       data: { kind: 'metric', title: 'Deploys / week', value: '14', series: [30, 45, 40, 60, 55, 80, 100] },
     },
     {
       id: 'note',
-      type: 'html-template',
       point: { x: 560, y: 360 },
       ariaLabel: 'Note',
       data: { kind: 'note', text: 'Q3 focus: fewer handoffs between the two teams.' },
@@ -275,7 +282,6 @@ function person(
 ) {
   return {
     id,
-    type: 'html-template' as const,
     point,
     parentId,
     ariaLabel: name,

@@ -13,7 +13,6 @@ class VflowTestHostComponent {
   public readonly vflow = viewChild.required(VflowComponent);
   public readonly parent: Node = {
     id: 'parent',
-    type: 'template-group',
     point: signal({ x: 100, y: 100 }),
     parentId: signal(null),
     width: signal(200),
@@ -21,9 +20,11 @@ class VflowTestHostComponent {
   };
   public readonly child: Node = {
     id: 'child',
-    type: 'html-template',
     point: signal({ x: 10, y: 20 }),
     parentId: signal('parent'),
+    // Without a presentation the node renders an empty wrapper, so its hit area comes from an explicit size.
+    width: signal(100),
+    height: signal(50),
   };
   public readonly nodes = [this.parent, this.child];
 }

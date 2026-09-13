@@ -32,8 +32,7 @@ describe('NodesChangeService', () => {
 
   it('reports the size mode with every size change', async () => {
     const model = TestBed.runInInjectionContext(
-      () =>
-        new NodeModel(createNode({ id: '1', type: 'html-template', point: { x: 0, y: 0 } }, { useDefaults: false })),
+      () => new NodeModel(createNode({ id: '1', point: { x: 0, y: 0 } }, { useDefaults: false })),
     );
     const changes: NodeChange[] = [];
     service.changes$.subscribe((c) => changes.push(...c));

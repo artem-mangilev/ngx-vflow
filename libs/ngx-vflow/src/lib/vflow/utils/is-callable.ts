@@ -1,6 +1,4 @@
-import { StaticNode } from '../interfaces/node.interface';
-
-export function isCallable<T = any>(type: StaticNode<T>['type'] | any): boolean {
-  if (typeof type !== 'function') return false;
-  return type.apply !== undefined;
+export function isCallable(value: unknown): boolean {
+  if (typeof value !== 'function') return false;
+  return value.apply !== undefined;
 }

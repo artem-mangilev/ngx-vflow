@@ -31,7 +31,7 @@ describe('Initial handle placement', () => {
         Array.from({ length: count }, (_, i) =>
           createNode({
             id: String(i),
-            type: SmallCustomNodeComponent,
+            component: SmallCustomNodeComponent,
             point: { x: (i % 32) * 150, y: Math.floor(i / 32) * 100 },
           }),
         ),
@@ -73,7 +73,7 @@ describe('Initial handle placement', () => {
     fixture.componentRef.setInput('view', [400, 300]);
     fixture.componentRef.setInput(
       'nodes',
-      ['a', 'b'].map((id, i) => createNode({ id, type: SmallCustomNodeComponent, point: { x: i * 150, y: 0 } })),
+      ['a', 'b'].map((id, i) => createNode({ id, component: SmallCustomNodeComponent, point: { x: i * 150, y: 0 } })),
     );
     fixture.componentRef.setInput('edges', [
       createEdge({
@@ -116,7 +116,7 @@ describe('Initial handle placement', () => {
     const fixture = TestBed.createComponent(VflowComponent);
     fixture.componentRef.setInput('view', [400, 300]);
     fixture.componentRef.setInput('nodes', [
-      createNode({ id: 'a', type: SmallCustomNodeComponent, point: { x: 0, y: 0 } }),
+      createNode({ id: 'a', component: SmallCustomNodeComponent, point: { x: 0, y: 0 } }),
     ]);
     fixture.detectChanges();
     for (let i = 0; i < 5; i++) await new Promise(requestAnimationFrame);
@@ -153,7 +153,7 @@ describe('Initial handle placement', () => {
     const fixture = TestBed.createComponent(VflowComponent);
     fixture.componentRef.setInput('view', [400, 300]);
     fixture.componentRef.setInput('nodes', [
-      createNode({ id: 'a', type: SmallCustomNodeComponent, point: { x: 0, y: 0 } }),
+      createNode({ id: 'a', component: SmallCustomNodeComponent, point: { x: 0, y: 0 } }),
     ]);
     fixture.detectChanges();
     await fixture.whenStable();

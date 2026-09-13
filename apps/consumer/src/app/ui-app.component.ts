@@ -33,7 +33,7 @@ import { createEdges, createNodes, Vflow, VflowComponent } from 'ngx-vflow';
   template: `
     <div class="stage" [vflowTheme]="dark() ? 'dark' : 'light'">
       <vflow view="auto" data-testid="ui-flow" [nodes]="nodes" [edges]="edges">
-        <ng-template let-ctx nodeHtml>
+        <ng-template let-ctx node>
           @if (ctx.data().kind === 'task') {
             <div vflowBpmnTask class="task" selectable [vflowSelected]="ctx.selected()">
               {{ ctx.data().title }}
@@ -78,14 +78,12 @@ export class UiAppComponent {
   readonly nodes = createNodes([
     {
       id: 'card',
-      type: 'html-template',
       point: { x: 40, y: 60 },
       ariaLabel: 'Card',
       data: { kind: 'card', title: 'Card from @vflow/ui' },
     },
     {
       id: 'task',
-      type: 'html-template',
       point: { x: 360, y: 80 },
       ariaLabel: 'Task',
       data: { kind: 'task', title: 'BPMN task' },

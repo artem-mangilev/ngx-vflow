@@ -83,8 +83,6 @@ export class NodeComponent implements OnInit, OnDestroy {
 
   public nodeTemplate = input<TemplateRef<any>>();
 
-  public groupNodeTemplate = input<TemplateRef<any>>();
-
   constructor() {
     effect(() => {
       const model = this.model();
@@ -103,12 +101,9 @@ export class NodeComponent implements OnInit, OnDestroy {
   }
 
   public ngOnInit() {
-    // Nodes whose size is content-driven (html-template / component) are measured
-    // by nodeResizeController; until then they stay hidden. Other node types have
-    // explicit dimensions and are considered measured immediately.
-    const type = this.model().rawNode.type;
-    // A remounted custom view must measure its new DOM before becoming visible.
-    this.model().isMeasured.set(type !== 'html-template' && !this.model().isComponentType);
+    // Every node is measured by nodeResizeController and stays hidden until then; an explicit size is measured
+    // from the wrapper or the resizable element that carries it. A remounted view must measure its new DOM.
+    this.model().isMeasured.set(false);
 
     this.nodeAccessor.model.set(this.model());
     this.handleService.node.set(this.model());
@@ -122,7 +117,7 @@ export class NodeComponent implements OnInit, OnDestroy {
         if (wasCulled && !culled) {
           // Restore layout hidden, then refresh dimensions and handles before painting.
           untracked(() => {
-            model.isMeasured.set(type !== 'html-template' && !model.isComponentType);
+            model.isMeasured.set(false);
             model.handles().forEach((handle) => handle.isMeasured.set(false));
           });
         }

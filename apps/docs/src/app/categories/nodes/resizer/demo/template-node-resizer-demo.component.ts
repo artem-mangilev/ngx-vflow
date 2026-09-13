@@ -5,11 +5,10 @@ import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
 @Component({
   template: `
     <vflow view="auto" [nodes]="nodes" [edges]="edges">
-      <ng-template let-ctx groupNode><docs-group [ctx]="ctx" /></ng-template>
       <ng-template let-ctx edge><svg:g docsEdge [ctx]="ctx" /></ng-template>
       <ng-template let-ctx edgeLabelHtml><docs-edge-label [ctx]="ctx" /></ng-template>
 
-      <ng-template let-ctx nodeHtml>
+      <ng-template let-ctx node>
         @if (ctx.data().type === 'output') {
           <div resizable class="custom-node">
             <div class="data-block">
@@ -75,7 +74,6 @@ export class TemplateNodeResizerDemoComponent {
     {
       id: '1',
       point: { x: 0, y: 150 },
-      type: 'html-template',
       data: {
         type: 'output',
         output1: 'output1',
@@ -85,7 +83,6 @@ export class TemplateNodeResizerDemoComponent {
     {
       id: '2',
       point: { x: 250, y: 100 },
-      type: 'html-template',
       data: {
         type: 'input',
         input1: 'input1',

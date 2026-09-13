@@ -9,11 +9,12 @@ import {
   Node,
   addEdges,
   addNodes,
-  isTemplateGroupNode,
-  isTemplateNode,
   reparentNodes,
   createNodes,
 } from 'ngx-vflow';
+
+/** Containers are marked in application data; the flow itself has no group node type. */
+const isGroup = (node: Node) => node.data?.().type === 'group';
 
 @Component({
   templateUrl: './drag-and-drop-nodes-demo.component.html',
@@ -28,7 +29,7 @@ export class DragAndDropNodesDemoComponent {
     {
       id: '1',
       point: { x: 10, y: 10 },
-      type: 'template-group',
+      data: { type: 'group' },
       width: 250,
       height: 250,
     },
@@ -38,14 +39,13 @@ export class DragAndDropNodesDemoComponent {
 
   public createNode({ event }: DndDropEvent) {
     const flowPoint = this.vflow().clientToFlowPosition({ x: event.x, y: event.y });
-    const parent = this.vflow().getNodesAtPoint(flowPoint).find(isTemplateGroupNode);
+    const parent = this.vflow().getNodesAtPoint(flowPoint).find(isGroup);
 
     this.nodes = addNodes(
       createNodes([
         {
           id: crypto.randomUUID(),
           point: parent?.nodeSpacePoint ?? flowPoint,
-          type: 'html-template',
           parentId: parent?.id ?? null,
           data: {
             canDetach: !!parent,
@@ -64,7 +64,7 @@ export class DragAndDropNodesDemoComponent {
     const nodeToUpdate = this.nodes.find((node) => node.id === nodeId);
     if (!nodeToUpdate) return;
 
-    if (nodeToUpdate.type === 'html-template') {
+    if (!isGroup(nodeToUpdate)) {
       const nodes = reparentNodes([{ id: nodeId, parentId: null }], this.nodes);
       if (nodes === this.nodes) return;
 
@@ -75,22 +75,24 @@ export class DragAndDropNodesDemoComponent {
 
   onPositionChange() {
     // Update all template nodes' canAttach state
-    this.nodes.filter(isTemplateNode).forEach((node) => {
-      const intersectingNodes = this.vflow().getIntersectingNodes(node.id).filter(isTemplateGroupNode);
+    this.nodes
+      .filter((node) => !isGroup(node))
+      .forEach((node) => {
+        const intersectingNodes = this.vflow().getIntersectingNodes(node.id).filter(isGroup);
 
-      const canAttach = intersectingNodes.length > 0 && !node.parentId?.();
-      node.data?.update((state) => ({ ...state, canAttach }));
-    });
+        const canAttach = intersectingNodes.length > 0 && !node.parentId?.();
+        node.data?.update((state) => ({ ...state, canAttach }));
+      });
   }
 
   attachNode(nodeId: string) {
-    const [intersectionNode] = this.vflow().getIntersectingNodes(nodeId).filter(isTemplateGroupNode);
+    const [intersectionNode] = this.vflow().getIntersectingNodes(nodeId).filter(isGroup);
     if (!intersectionNode) return;
 
     const nodeToUpdate = this.nodes.find((node) => node.id === nodeId);
     if (!nodeToUpdate) return;
 
-    if (nodeToUpdate.type === 'html-template') {
+    if (!isGroup(nodeToUpdate)) {
       const nodes = reparentNodes([{ id: nodeId, parentId: intersectionNode.id }], this.nodes);
       if (nodes === this.nodes) return;
 

@@ -17,7 +17,7 @@ import {
   createEdges,
   createNodes,
   Edge,
-  HtmlTemplateNode,
+  Node,
   Vflow,
   VflowComponent,
 } from 'ngx-vflow';
@@ -68,7 +68,7 @@ interface EntityData {
         <p>Connect matching field types; names and row order can change.</p>
       </div>
       <vflow view="auto" [nodes]="nodes" [edges]="edges()" [connection]="connection" (connect)="connect($event)">
-        <ng-template let-ctx nodeHtml>
+        <ng-template let-ctx node>
           <article
             vflowNode
             selectable
@@ -155,7 +155,6 @@ export class EntitiesDemoComponent {
   readonly nodes = createNodes<EntityData>([
     {
       id: 'customer',
-      type: 'html-template',
       point: { x: 30, y: 30 },
       ariaLabel: 'Customer entity',
       data: {
@@ -170,7 +169,6 @@ export class EntitiesDemoComponent {
     },
     {
       id: 'order',
-      type: 'html-template',
       point: { x: 460, y: 30 },
       ariaLabel: 'Order entity',
       data: {
@@ -185,7 +183,6 @@ export class EntitiesDemoComponent {
     },
     {
       id: 'crm',
-      type: 'html-template',
       point: { x: 30, y: 290 },
       ariaLabel: 'CRM source schema',
       data: {
@@ -199,7 +196,6 @@ export class EntitiesDemoComponent {
     },
     {
       id: 'erp',
-      type: 'html-template',
       point: { x: 460, y: 290 },
       ariaLabel: 'ERP target schema',
       data: {
@@ -211,7 +207,7 @@ export class EntitiesDemoComponent {
         ],
       },
     },
-  ]) as (HtmlTemplateNode<EntityData> & { data: WritableSignal<EntityData> })[];
+  ]) as (Node<EntityData> & { data: WritableSignal<EntityData> })[];
   readonly edges = signal<Edge[]>(
     createEdges([
       {

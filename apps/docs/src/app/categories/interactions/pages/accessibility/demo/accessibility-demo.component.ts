@@ -30,11 +30,10 @@ import { AriaLabelConfig, Vflow, createEdges, createNodes } from 'ngx-vflow';
         [connection]="connection"
         (connect)="connections.set(connections() + 1)"
         (connectEnd)="attempts.set(attempts() + 1)">
-        <ng-template let-ctx groupNode><docs-group [ctx]="ctx" /></ng-template>
         <ng-template let-ctx edgeLabelHtml><docs-edge-label [ctx]="ctx" /></ng-template>
 
         <mini-map />
-        <ng-template let-ctx nodeHtml>
+        <ng-template let-ctx node>
           @if (ctx.node.id === 'approval') {
             <div class="reviewer">
               <button type="button" noDrag noPan (click)="reviews.set(reviews() + 1)">Review request</button>
@@ -58,8 +57,7 @@ import { AriaLabelConfig, Vflow, createEdges, createNodes } from 'ngx-vflow';
         </ng-template>
       </vflow>
       <vflow [nodes]="referenceNodes" [view]="[600, 120]" [ariaLabelConfig]="{ flowLabel: 'Reference graph' }">
-        <ng-template let-ctx nodeHtml><docs-node [ctx]="ctx" /></ng-template>
-        <ng-template let-ctx groupNode><docs-group [ctx]="ctx" /></ng-template>
+        <ng-template let-ctx node><docs-node [ctx]="ctx" /></ng-template>
         <ng-template let-ctx edge><svg:g docsEdge [ctx]="ctx" /></ng-template>
         <ng-template let-ctx edgeLabelHtml><docs-edge-label [ctx]="ctx" /></ng-template>
       </vflow>
@@ -145,16 +143,14 @@ export class AccessibilityDemoComponent {
   protected nodes = createNodes([
     {
       id: 'parent',
-      type: 'template-group',
       point: { x: 10, y: 20 },
       width: 250,
       height: 180,
       ariaLabel: 'Review',
-      data: { resizable: true },
+      data: { type: 'group', resizable: true },
     },
     {
       id: 'request',
-      type: 'html-template',
       point: { x: 40, y: 55 },
       parentId: 'parent',
       data: { text: '<b>Request</b>' },
@@ -164,10 +160,9 @@ export class AccessibilityDemoComponent {
       draggable: false,
       ariaDescription: 'Needs approval.',
     },
-    { id: 'approval', type: 'html-template', point: { x: 340, y: 70 }, ariaLabel: 'Approval', selectable: false },
+    { id: 'approval', point: { x: 340, y: 70 }, ariaLabel: 'Approval', selectable: false },
     {
       id: 'archive',
-      type: 'html-template',
       point: { x: 340, y: 210 },
       data: { text: 'Archive' },
       ariaLabel: 'Archive',
@@ -186,10 +181,9 @@ export class AccessibilityDemoComponent {
     },
   ]);
   protected referenceNodes = createNodes([
-    { id: 'parent', type: 'html-template', point: { x: 20, y: 20 }, data: { text: 'Reference' } },
+    { id: 'parent', point: { x: 20, y: 20 }, data: { text: 'Reference' } },
     {
       id: 'request',
-      type: 'html-template',
       point: { x: 220, y: 20 },
       data: { text: 'Copy' },
       parentId: 'parent',

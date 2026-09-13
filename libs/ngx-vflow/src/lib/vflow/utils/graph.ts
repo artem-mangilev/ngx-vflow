@@ -60,7 +60,7 @@ export function getOutgoers<NodeType extends { id: string }, EdgeType extends Co
  * Returns the bounds of the supplied nodes. A lookup makes its node snapshots and ancestry authoritative.
  *
  * @example
- * `getNodesBounds([child], { nodeLookup: new Map(nodes.map((node) => [node.id, node])) })`
+ * `getNodesBounds([child], { nodeLookup: new Map(nodes.map((item) => [item.id, item])) })`
  */
 export function getNodesBounds(
   nodes: readonly Node[],

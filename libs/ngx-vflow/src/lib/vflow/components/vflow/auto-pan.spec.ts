@@ -17,7 +17,7 @@ import { VflowComponent } from './vflow.component';
     [autoPan]="autoPan"
     (connect)="(undefined)"
     (reconnect)="(undefined)">
-    <ng-template nodeHtml>
+    <ng-template node>
       <div style="width: 100px; height: 50px">
         <handle type="target" position="left" />
         <handle type="source" position="right" />
@@ -64,8 +64,8 @@ describe('public auto-pan settings', () => {
     fixture = TestBed.createComponent(AutoPanHostComponent);
     fixture.componentRef.setInput('view', [400, 300]);
     fixture.componentRef.setInput('nodes', [
-      createNode({ id: 'node', point: { x: 100, y: 100 }, type: 'html-template', data: { text: 'Node' } }),
-      createNode({ id: 'target', point: { x: 250, y: 100 }, type: 'html-template', data: { text: 'Target' } }),
+      createNode({ id: 'node', point: { x: 100, y: 100 }, data: { text: 'Node' } }),
+      createNode({ id: 'target', point: { x: 250, y: 100 }, data: { text: 'Target' } }),
     ]);
     fixture.componentRef.setInput('edges', [
       createEdge({ id: 'edge', source: 'node', target: 'target', reconnectable: true }),
@@ -235,8 +235,8 @@ describe('auto-pan with real browser frames', () => {
     });
     const fixture = TestBed.createComponent(AutoPanHostComponent);
     fixture.componentRef.setInput('nodes', [
-      createNode({ id: 'dragged', type: 'html-template', point: { x: 100, y: 100 }, data: { text: 'Dragged' } }),
-      createNode({ id: 'neighbour', type: 'html-template', point: { x: 250, y: 100 }, data: { text: 'Neighbour' } }),
+      createNode({ id: 'dragged', point: { x: 100, y: 100 }, data: { text: 'Dragged' } }),
+      createNode({ id: 'neighbour', point: { x: 250, y: 100 }, data: { text: 'Neighbour' } }),
     ]);
     fixture.detectChanges();
     await fixture.whenStable();

@@ -28,10 +28,9 @@ import { Vflow, createEdges, createNodes } from 'ngx-vflow';
         [selectionMode]="manual() ? 'manual' : 'default'"
         [optimization]="{ detachedGroupsLayer: true }"
         [ariaLabelConfig]="{ flowLabel: 'Keyboard graph' }">
-        <ng-template let-ctx groupNode><docs-group [ctx]="ctx" /></ng-template>
         <ng-template let-ctx edgeLabelHtml><docs-edge-label [ctx]="ctx" /></ng-template>
 
-        <ng-template let-ctx nodeHtml>
+        <ng-template let-ctx node>
           @if (ctx.node.id === 'editor') {
             <div class="editor">
               <label>Node title <input aria-label="Node title" vflowNoDrag /></label>
@@ -98,14 +97,13 @@ export class KeyboardNavigationDemoComponent {
       {
         id: 'draft',
         ariaLabel: 'Draft',
-        type: 'html-template',
         parentId: 'stage',
         point: { x: 20, y: 30 },
         data: { text: 'Draft' },
       },
       {
         id: 'stage',
-        type: 'template-group',
+        data: { type: 'group' },
         point: { x: 20, y: 20 },
         width: 260,
         height: 180,
@@ -115,17 +113,15 @@ export class KeyboardNavigationDemoComponent {
       },
       {
         id: 'decoration',
-        type: 'html-template',
         point: { x: 20, y: 240 },
         data: { text: 'Decoration' },
         ariaLabel: 'Decoration',
         focusable: false,
         selectable: false,
       },
-      { id: 'editor', type: 'html-template', point: { x: 330, y: 40 }, ariaLabel: 'Editor' },
+      { id: 'editor', point: { x: 330, y: 40 }, ariaLabel: 'Editor' },
       {
         id: 'later',
-        type: 'html-template',
         point: { x: 1000, y: 80 },
         data: { text: 'Later' },
         ariaLabel: 'Later',

@@ -29,7 +29,6 @@ export function initialElements(xNodes = 10, yNodes = 10): { nodes: Node[]; edge
   for (let y = 0; y < yNodes; y++) {
     for (let x = 0; x < xNodes; x++) {
       nodes.push({
-        type: 'html-template',
         id: `stress-${nodeId}`,
         data: { text: `Node ${nodeId}` },
         point: { x: x * 150, y: y * 100 },

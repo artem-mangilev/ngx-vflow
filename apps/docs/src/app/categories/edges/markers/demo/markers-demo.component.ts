@@ -9,8 +9,7 @@ import { Connection, ConnectionSettings, Edge, Node, Vflow, createNodes } from '
     [edges]="edges"
     [connection]="connectionSettings"
     (connect)="createEdge($event)">
-    <ng-template let-ctx nodeHtml><docs-node [ctx]="ctx" /></ng-template>
-    <ng-template let-ctx groupNode><docs-group [ctx]="ctx" /></ng-template>
+    <ng-template let-ctx node><docs-node [ctx]="ctx" /></ng-template>
     <ng-template let-ctx edge><svg:g docsEdge [ctx]="ctx" /></ng-template>
     <ng-template let-ctx edgeLabelHtml><docs-edge-label [ctx]="ctx" /></ng-template>
   </vflow> `,
@@ -30,13 +29,11 @@ export class MarkersDemoComponent {
     {
       id: '1',
       point: { x: 100, y: 100 },
-      type: 'html-template',
       data: { text: `1` },
     },
     {
       id: '2',
       point: { x: 200, y: 200 },
-      type: 'html-template',
       data: { text: `2` },
     },
   ]);

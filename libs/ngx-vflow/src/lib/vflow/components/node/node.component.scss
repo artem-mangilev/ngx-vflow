@@ -14,17 +14,3 @@
 .wrapper {
   width: max-content;
 }
-
-.default-group-node {
-  border: 1.5px solid var(--group-color);
-  background-color: color-mix(in srgb, var(--group-color) 5%, transparent);
-  border-radius: 5px;
-
-  &_selected {
-    border-width: 2px;
-  }
-
-  &_preselected {
-    border-width: 2px;
-  }
-}

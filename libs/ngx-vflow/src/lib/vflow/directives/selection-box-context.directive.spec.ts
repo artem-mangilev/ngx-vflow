@@ -61,7 +61,6 @@ describe('SelectionBoxContextDirective', () => {
         new NodeModel(
           createRawNode({
             id,
-            type: 'html-template',
             point: { x: 0, y: 0 },
             width: 10,
             height: 10,

@@ -20,6 +20,7 @@ import { KeyboardService } from '../../services/keyboard.service';
 import { Point } from '../../interfaces/point.interface';
 import { clientToFlowPosition } from '../../utils/coordinates';
 import { isPointInRect } from '../../utils/rect';
+import { isGroupNode } from '../../utils/is-group-node';
 
 const TRANSPARENT = new Set(['', 'transparent', 'rgba(0, 0, 0, 0)']);
 
@@ -109,7 +110,7 @@ export class MinimapCanvasDirective {
       );
       // ponytail: redraw all previews on graph edits; use dirty regions if edits become the bottleneck.
       for (const node of nodes) {
-        const group = node.rawNode.type === 'template-group';
+        const group = isGroupNode(node);
         const { x, y } = node.globalPoint();
         const selected = node.selected();
         context.beginPath();

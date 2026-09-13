@@ -19,7 +19,7 @@ import { ResizableComponent } from './resizable.component';
 @Component({
   template: `
     <vflow [view]="[400, 300]" [nodes]="nodes">
-      <ng-template nodeHtml>
+      <ng-template node>
         @if (useCustomGap()) {
           <div class="resizable-host" resizable [gap]="gap()"></div>
         } @else {
@@ -47,13 +47,13 @@ class ResizableTestHostComponent {
   public readonly vflow = viewChild.required(VflowComponent);
   public readonly gap = signal(4);
   public readonly useCustomGap = signal(true);
-  public readonly nodes = createNodes([{ id: 'node', type: 'html-template', point: { x: 50, y: 50 } }]);
+  public readonly nodes = createNodes([{ id: 'node', point: { x: 50, y: 50 } }]);
 }
 
 @Component({
   template: `
     <vflow [view]="[400, 300]" [nodes]="nodes()">
-      <ng-template nodeHtml>
+      <ng-template node>
         @if (withResizable()) {
           <div class="card" resizable>
             <div class="content"></div>
@@ -96,11 +96,10 @@ class ResizableTestHostComponent {
 })
 class SizeTargetHostComponent {
   public readonly withResizable = signal(true);
-  public readonly nodes = signal<Node[]>(createNodes([{ id: 'node', type: 'html-template', point: { x: 20, y: 20 } }]));
+  public readonly nodes = signal<Node[]>(createNodes([{ id: 'node', point: { x: 20, y: 20 } }]));
 }
 
-const SIZED_NODES = () =>
-  createNodes([{ id: 'node', type: 'html-template', point: { x: 20, y: 20 }, width: 300, height: 150 }]);
+const SIZED_NODES = () => createNodes([{ id: 'node', point: { x: 20, y: 20 }, width: 300, height: 150 }]);
 
 async function settle(fixture: ComponentFixture<unknown>) {
   fixture.detectChanges();

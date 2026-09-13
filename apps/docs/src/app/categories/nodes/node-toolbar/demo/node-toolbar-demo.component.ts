@@ -13,7 +13,6 @@ export class NodeToolbarDemoComponent {
     {
       id: '1',
       point: { x: 60, y: 150 },
-      type: 'html-template',
       data: {
         type: 'output',
         output1: 'output1',
@@ -23,7 +22,6 @@ export class NodeToolbarDemoComponent {
     {
       id: '2',
       point: { x: 300, y: 100 },
-      type: 'html-template',
       data: {
         type: 'input',
         input1: 'input1',

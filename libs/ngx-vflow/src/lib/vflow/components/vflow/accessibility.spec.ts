@@ -11,7 +11,7 @@ import { DomAttributes } from '../../interfaces/dom-attributes.interface';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `<vflow [nodes]="nodes" [edges]="edges" [view]="[600, 350]" [ariaLabelConfig]="labels()">
     <mini-map />
-    <ng-template nodeHtml>
+    <ng-template node>
       <button type="button" noDrag (click)="clicks = clicks + 1">Review request</button>
       <handle
         type="target"
@@ -32,9 +32,9 @@ class AccessibilityHostComponent {
   canAccept = signal(true);
   clicks = 0;
   nodes = createNodes([
-    { id: 'parent', type: 'template-group', point: { x: 0, y: 0 }, width: 250, height: 200 },
-    { id: 'a', type: 'html-template', parentId: 'parent', point: { x: 20, y: 30 }, ariaLabel: 'Request & review' },
-    { id: 'b', type: 'html-template', point: { x: 350, y: 30 }, ariaLabel: 'Approval' },
+    { id: 'parent', point: { x: 0, y: 0 }, width: 250, height: 200 },
+    { id: 'a', parentId: 'parent', point: { x: 20, y: 30 }, ariaLabel: 'Request & review' },
+    { id: 'b', point: { x: 350, y: 30 }, ariaLabel: 'Approval' },
   ]);
   edges: Edge[] = createEdges([{ id: 'ab', source: 'a', target: 'b' }]);
 }
@@ -48,8 +48,8 @@ describe('public graph accessibility', () => {
     const fixture = TestBed.createComponent(AccessibilityHostComponent);
     const host = fixture.componentInstance;
     host.nodes = createNodes([
-      { id: 'empty', type: 'html-template', point: { x: 0, y: 0 }, ariaLabel: '  ' },
-      { id: 'custom', type: 'html-template', point: { x: 250, y: 0 } },
+      { id: 'empty', point: { x: 0, y: 0 }, ariaLabel: '  ' },
+      { id: 'custom', point: { x: 250, y: 0 } },
     ]);
     host.edges = createEdges(
       [
@@ -117,10 +117,9 @@ describe('public graph accessibility', () => {
     const fixture = TestBed.createComponent(AccessibilityHostComponent);
     const host = fixture.componentInstance;
     host.nodes = createNodes([
-      { id: 'parent', type: 'html-template', point: { x: 0, y: 0 }, ariaLabel: 'Processing' },
+      { id: 'parent', point: { x: 0, y: 0 }, ariaLabel: 'Processing' },
       {
         id: 'a',
-        type: 'html-template',
         point: { x: 10, y: 10 },
         parentId: 'parent',
         ariaLabel: 'Application',
@@ -129,7 +128,7 @@ describe('public graph accessibility', () => {
         selectable: false,
         draggable: false,
       },
-      { id: 'b', type: 'html-template', point: { x: 350, y: 30 }, ariaLabel: 'Approval' },
+      { id: 'b', point: { x: 350, y: 30 }, ariaLabel: 'Approval' },
     ]);
     host.edges = createEdges(
       [{ id: 'ab', source: 'a', target: 'b', ariaLabel: 'Approve', ariaDescription: 'Review route.' }],
@@ -185,7 +184,6 @@ describe('public graph accessibility', () => {
     fixture.componentInstance.nodes = createNodes([
       {
         id: 'safe',
-        type: 'html-template',
         point: { x: 0, y: 0 },
         ariaLabel: 'Safe',
         domAttributes: attributes as unknown as DomAttributes,
@@ -220,9 +218,7 @@ describe('public graph accessibility', () => {
     });
     const fixture = TestBed.createComponent(AccessibilityHostComponent);
     const host = fixture.componentInstance;
-    host.nodes = createNodes([
-      { id: 'custom', type: 'html-template', point: { x: 0, y: 0 }, ariaLabel: 'Reviewer', selectable: false },
-    ]);
+    host.nodes = createNodes([{ id: 'custom', point: { x: 0, y: 0 }, ariaLabel: 'Reviewer', selectable: false }]);
     fixture.detectChanges();
     await fixture.whenStable();
     const root: HTMLElement = fixture.nativeElement;

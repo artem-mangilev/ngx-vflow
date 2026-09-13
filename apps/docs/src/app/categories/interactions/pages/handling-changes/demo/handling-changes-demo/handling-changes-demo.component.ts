@@ -25,13 +25,11 @@ export class HandlingChangesDemoComponent {
     {
       id: '1',
       point: { x: 100, y: 100 },
-      type: 'html-template',
       data: { text: `1` },
     },
     {
       id: '2',
       point: { x: 200, y: 200 },
-      type: 'html-template',
       data: { text: `2` },
     },
   ]);

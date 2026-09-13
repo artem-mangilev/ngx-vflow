@@ -13,18 +13,15 @@ export class SelectingDemoComponent {
     {
       id: '1',
       point: { x: 10, y: 150 },
-      type: 'html-template',
     },
     {
       id: '2',
       point: { x: 290, y: 50 },
-      type: 'html-template',
       data: { text: 'Selectable' },
     },
     {
       id: '3',
       point: { x: 290, y: 300 },
-      type: 'html-template',
       data: { text: 'Selectable' },
     },
   ]);

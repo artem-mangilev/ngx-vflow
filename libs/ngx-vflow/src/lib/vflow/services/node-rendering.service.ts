@@ -23,7 +23,7 @@ export class NodeRenderingService {
   public readonly groups = computed(() => {
     return this.flowEntitiesService
       .nodes()
-      .filter((n) => !!n.children().length || isGroupNode(n))
+      .filter((n) => isGroupNode(n))
       .sort((a, b) => a.renderOrder() - b.renderOrder());
   });
 

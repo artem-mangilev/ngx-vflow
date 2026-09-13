@@ -1,48 +1,25 @@
-<!-- HTML Template node -->
-@if (model().rawNode.type === 'html-template' && nodeTemplate()) {
-  <div class="selectable" (click)="pullNode()">
-    <div
-      nodeHandlesController
-      nodeResizeController
-      class="wrapper"
-      [style.width.px]="wrapperSize()?.width ?? null"
-      [style.height.px]="wrapperSize()?.height ?? null">
-      <ng-container
-        [ngTemplateOutlet]="nodeTemplate() ?? null"
-        [ngTemplateOutletContext]="model().context"
-        [ngTemplateOutletInjector]="injector" />
-    </div>
-  </div>
-}
-
-<!-- Component node -->
-@if (model().isComponentType) {
-  @if (model().componentInstance$ | async; as component) {
-    <div class="selectable" (click)="pullNode()">
-      <div
-        nodeHandlesController
-        nodeResizeController
-        class="wrapper"
-        [style.width.px]="wrapperSize()?.width ?? null"
-        [style.height.px]="wrapperSize()?.height ?? null">
+<div class="selectable" (click)="pullNode()">
+  <div
+    nodeHandlesController
+    nodeResizeController
+    class="wrapper"
+    [style.width.px]="wrapperSize()?.width ?? null"
+    [style.height.px]="wrapperSize()?.height ?? null">
+    @if (model().isComponentType) {
+      @if (model().componentInstance$ | async; as component) {
         <ng-container
           [ngComponentOutlet]="$any(component)"
           [ngComponentOutletInputs]="model().componentTypeInputs"
           [ngComponentOutletInjector]="injector" />
-      </div>
-    </div>
-  }
-}
-
-<!-- Template group node  -->
-@if (model().rawNode.type === 'template-group' && groupNodeTemplate()) {
-  <div class="selectable" nodeHandlesController (click)="pullNode()">
-    <ng-container
-      [ngTemplateOutlet]="groupNodeTemplate() ?? null"
-      [ngTemplateOutletContext]="model().context"
-      [ngTemplateOutletInjector]="injector" />
+      }
+    } @else if (nodeTemplate(); as template) {
+      <ng-container
+        [ngTemplateOutlet]="template"
+        [ngTemplateOutletContext]="model().context"
+        [ngTemplateOutletInjector]="injector" />
+    }
   </div>
-}
+</div>
 
 <!-- Resizer -->
 @if (model().resizerTemplate(); as template) {

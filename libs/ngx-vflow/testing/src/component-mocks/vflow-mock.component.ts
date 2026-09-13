@@ -36,8 +36,7 @@ import {
   ConnectionTemplateMockDirective,
   EdgeLabelHtmlTemplateMockDirective,
   EdgeTemplateMockDirective,
-  GroupNodeTemplateMockDirective,
-  NodeHtmlTemplateMockDirective,
+  NodeTemplateMockDirective,
 } from '../directive-mocks/template-mock.directive';
 import { AsInterface } from '../types';
 
@@ -47,26 +46,18 @@ import { AsInterface } from '../types';
     <ng-content />
 
     @for (node of nodes; track $index) {
-      @if (node.type === 'html-template') {
+      @if (!node.component) {
         <ng-component
           [ngTemplateOutlet]="nodeTemplateDirective()?.templateRef ?? null"
           [ngTemplateOutletContext]="{
             $implicit: {
               node: node,
+              data: node.data ?? createSignal({}),
               selected: createSignal(false),
-            },
-          }" />
-      }
-
-      @if (node.type === 'template-group') {
-        <ng-component
-          [ngTemplateOutlet]="groupNodeTemplateDirective()?.templateRef ?? null"
-          [ngTemplateOutletContext]="{
-            $implicit: {
-              node: node,
-              selected: createSignal(false),
-              width: createSignal(node.width),
-              height: createSignal(node.height),
+              preselected: createSignal(false),
+              width: node.width ?? createSignal(0),
+              height: node.height ?? createSignal(0),
+              shouldLoad: createSignal(true),
             },
           }" />
       }
@@ -214,9 +205,7 @@ export class VflowMockComponent implements AsInterface<VflowComponent>, OnInit {
   // eslint-disable-next-line @angular-eslint/no-output-on-prefix
   public readonly componentNodeEvent = output<any>();
 
-  protected nodeTemplateDirective = contentChild(NodeHtmlTemplateMockDirective);
-
-  protected groupNodeTemplateDirective = contentChild(GroupNodeTemplateMockDirective);
+  protected nodeTemplateDirective = contentChild(NodeTemplateMockDirective);
 
   protected edgeTemplateDirective = contentChild(EdgeTemplateMockDirective);
 

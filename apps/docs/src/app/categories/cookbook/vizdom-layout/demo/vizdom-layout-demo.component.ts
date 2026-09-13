@@ -29,7 +29,6 @@ export class VizdomLayoutDemoComponent implements OnInit {
         {
           id: crypto.randomUUID(),
           point: { x: 0, y: 0 },
-          type: 'html-template',
           data: {
             color: randomHex(),
           },
@@ -48,7 +47,6 @@ export class VizdomLayoutDemoComponent implements OnInit {
         {
           id: newNodeId,
           point: { x: 0, y: 0 },
-          type: 'html-template',
           draggable: false,
           data: {
             color: randomHex(),

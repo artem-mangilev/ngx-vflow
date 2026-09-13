@@ -35,13 +35,11 @@ export class HandlingChangesFilteredDemoComponent {
     {
       id: '1',
       point: { x: 100, y: 100 },
-      type: 'html-template',
       data: { text: `1` },
     },
     {
       id: '2',
       point: { x: 200, y: 200 },
-      type: 'html-template',
       data: { text: `2` },
     },
   ]);
@@ -104,13 +102,11 @@ export class HandlingChangesFilteredDemoComponent {
         {
           id: crypto.randomUUID(),
           point: { x: 0, y: 0 },
-          type: 'html-template',
           data: { text: `random` },
         },
         {
           id: crypto.randomUUID(),
           point: { x: 300, y: 300 },
-          type: 'html-template',
           data: { text: `random` },
         },
       ]),

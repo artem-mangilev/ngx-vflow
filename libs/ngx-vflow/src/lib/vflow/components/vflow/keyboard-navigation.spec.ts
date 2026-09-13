@@ -11,13 +11,10 @@ import { filter, firstValueFrom, timeout } from 'rxjs';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `<button>Before</button
     ><vflow [nodes]="nodes()" [edges]="edges" [view]="[600, 350]" [optimization]="{ detachedGroupsLayer: true }">
-      <ng-template nodeHtml>
+      <ng-template node>
         <div style="width: 100px; height: 50px">
           <handle type="target" position="left" /><handle type="source" position="right" />
         </div>
-      </ng-template>
-      <ng-template let-ctx groupNode>
-        <div [style.width.px]="ctx.width()" [style.height.px]="ctx.height()"></div>
       </ng-template> </vflow
     ><button>After</button>`,
 })
@@ -27,15 +24,14 @@ class KeyboardHostComponent {
     createNodes([
       {
         id: 'child',
-        type: 'html-template',
         parentId: 'parent',
         point: { x: 10, y: 10 },
         width: 100,
         height: 50,
         ariaLabel: 'Child',
       },
-      { id: 'parent', type: 'template-group', point: { x: 20, y: 20 }, width: 250, height: 200, ariaLabel: 'Parent' },
-      { id: 'other', type: 'html-template', point: { x: 400, y: 50 }, ariaLabel: 'Other', focusable: false },
+      { id: 'parent', point: { x: 20, y: 20 }, width: 250, height: 200, ariaLabel: 'Parent' },
+      { id: 'other', point: { x: 400, y: 50 }, ariaLabel: 'Other', focusable: false },
     ]),
   );
   edges = createEdges([{ id: 'edge', source: 'child', target: 'other', ariaLabel: 'Route' }]);
@@ -45,7 +41,7 @@ class KeyboardHostComponent {
   imports: [Vflow],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `<vflow [nodes]="nodes" [view]="[600, 200]">
-      <ng-template nodeHtml
+      <ng-template node
         ><button>Action</button><input aria-label="Name" /> <textarea aria-label="Notes"></textarea
         ><select aria-label="Choice">
           <option>One</option>
@@ -55,17 +51,13 @@ class KeyboardHostComponent {
     </vflow>
     <section vflowNoKeyboard>
       <vflow [nodes]="excluded" [view]="[600, 100]">
-        <ng-template nodeHtml><div style="width: 100px; height: 50px"></div></ng-template>
+        <ng-template node><div style="width: 100px; height: 50px"></div></ng-template>
       </vflow>
     </section>`,
 })
 class KeyboardControlsHostComponent {
-  nodes = createNodes([
-    { id: 'custom', type: 'html-template', point: { x: 0, y: 0 }, ariaLabel: 'Custom', selected: true },
-  ]);
-  excluded = createNodes([
-    { id: 'excluded', type: 'html-template', point: { x: 0, y: 0 }, ariaLabel: 'Excluded', selected: true },
-  ]);
+  nodes = createNodes([{ id: 'custom', point: { x: 0, y: 0 }, ariaLabel: 'Custom', selected: true }]);
+  excluded = createNodes([{ id: 'excluded', point: { x: 0, y: 0 }, ariaLabel: 'Excluded', selected: true }]);
 }
 
 describe('public keyboard graph navigation', () => {
@@ -109,15 +101,17 @@ describe('public keyboard graph navigation', () => {
       createNodes([
         {
           id: 'child',
-          type: 'template-group',
           parentId: 'parent',
           point: { x: 10, y: 10 },
           width: 100,
           height: 100,
           ariaLabel: 'Child',
         },
-        { id: 'parent', type: 'template-group', point: { x: 20, y: 20 }, width: 250, height: 200, ariaLabel: 'Parent' },
-        { id: 'other', type: 'template-group', point: { x: 100, y: 50 }, width: 250, height: 200, ariaLabel: 'Other' },
+        { id: 'parent', point: { x: 20, y: 20 }, width: 250, height: 200, ariaLabel: 'Parent' },
+        { id: 'other', point: { x: 100, y: 50 }, width: 250, height: 200, ariaLabel: 'Other' },
+        // Non-focusable members keep child and other in the detached groups layer without joining traversal.
+        { id: 'child-member', parentId: 'child', point: { x: 10, y: 10 }, width: 20, height: 20, focusable: false },
+        { id: 'other-member', parentId: 'other', point: { x: 10, y: 10 }, width: 20, height: 20, focusable: false },
       ]),
     );
     fixture.detectChanges();

@@ -6,8 +6,7 @@ import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
   template: `<vflow view="auto" [nodes]="nodes" [edges]="edges">
     <ng-template let-ctx edge><svg:g docsEdge [ctx]="ctx" /></ng-template>
 
-    <ng-template let-ctx nodeHtml><docs-node [ctx]="ctx" /></ng-template>
-    <ng-template let-ctx groupNode><docs-group [ctx]="ctx" /></ng-template>
+    <ng-template let-ctx node><docs-node [ctx]="ctx" /></ng-template>
 
     <ng-template let-ctx edgeLabelHtml>
       <div class="label" [style.background-color]="ctx.label.data.color" (click)="deleteEdge(ctx.edge)">Delete</div>
@@ -37,19 +36,16 @@ export class LabelsDemoComponent {
     {
       id: '1',
       point: { x: 50, y: 200 },
-      type: 'html-template',
       data: { text: '1' },
     },
     {
       id: '2',
       point: { x: 350, y: 100 },
-      type: 'html-template',
       data: { text: '2' },
     },
     {
       id: '3',
       point: { x: 350, y: 300 },
-      type: 'html-template',
       data: { text: '3' },
     },
   ]);

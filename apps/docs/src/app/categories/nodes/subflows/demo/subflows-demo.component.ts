@@ -4,20 +4,22 @@ import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
 
 @Component({
   template: `<vflow view="auto" [nodes]="nodes" [edges]="edges">
-    <ng-template let-ctx nodeHtml><docs-node [ctx]="ctx" /></ng-template>
+    <ng-template let-ctx node>
+      @if (ctx.data().type === 'group') {
+        <div
+          selectable
+          class="group-node"
+          [class.group-node_selected]="ctx.selected() || ctx.preselected()"
+          [style.width.px]="ctx.width()"
+          [style.height.px]="ctx.height()">
+          <handle type="source" position="right" />
+        </div>
+      } @else {
+        <docs-node [ctx]="ctx" />
+      }
+    </ng-template>
     <ng-template let-ctx edge><svg:g docsEdge [ctx]="ctx" /></ng-template>
     <ng-template let-ctx edgeLabelHtml><docs-edge-label [ctx]="ctx" /></ng-template>
-
-    <ng-template let-ctx groupNode>
-      <div
-        selectable
-        class="group-node"
-        [class.group-node_selected]="ctx.selected() || ctx.preselected()"
-        [style.width.px]="ctx.width()"
-        [style.height.px]="ctx.height()">
-        <handle type="source" position="right" />
-      </div>
-    </ng-template>
   </vflow>`,
   styles: [
     `
@@ -46,14 +48,12 @@ export class SubflowsDemoComponent {
     {
       id: '1',
       point: { x: 10, y: 10 },
-      type: 'html-template',
       data: { text: `1` },
       parentId: '3',
     },
     {
       id: '2',
       point: { x: 90, y: 80 },
-      type: 'html-template',
       // it's possible to pass html in this field
       data: { text: `<strong>2</strong>` },
       parentId: '3',
@@ -61,20 +61,19 @@ export class SubflowsDemoComponent {
     {
       id: '3',
       point: { x: 10, y: 10 },
-      type: 'template-group',
+      data: { type: 'group' },
       width: 250,
       height: 250,
     },
     {
       id: '4',
       point: { x: 280, y: 10 },
-      type: 'html-template',
       data: { text: `4` },
     },
     {
       id: '5',
       point: { x: 10, y: 160 },
-      type: 'template-group',
+      data: { type: 'group' },
       width: 170,
       height: 70,
       parentId: '3',
@@ -82,7 +81,6 @@ export class SubflowsDemoComponent {
     {
       id: '6',
       point: { x: 10, y: 10 },
-      type: 'html-template',
       data: { text: `6` },
       parentId: '5',
     },

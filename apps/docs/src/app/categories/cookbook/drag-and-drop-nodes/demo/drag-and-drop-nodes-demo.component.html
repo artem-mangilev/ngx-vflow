@@ -12,26 +12,29 @@
   (dndDrop)="createNode($event)"
   (connect)="connect($event)"
   (nodesChanges.position)="onPositionChange()">
-  <ng-template let-ctx groupNode><docs-group [ctx]="ctx" /></ng-template>
   <ng-template let-ctx edgeLabelHtml><docs-edge-label [ctx]="ctx" /></ng-template>
 
-  <ng-template let-ctx nodeHtml>
-    <div class="custom-node" [class.custom-node_selected]="ctx.selected()">
-      <button class="custom-node__button" selectable>Select here</button>
+  <ng-template let-ctx node>
+    @if (ctx.data().type === 'group') {
+      <docs-node [ctx]="ctx" />
+    } @else {
+      <div class="custom-node" [class.custom-node_selected]="ctx.selected()">
+        <button class="custom-node__button" selectable>Select here</button>
 
-      <handle type="source" position="right" />
-      <handle type="target" position="left" />
-    </div>
+        <handle type="source" position="right" />
+        <handle type="target" position="left" />
+      </div>
 
-    <node-toolbar>
-      @if (ctx.data().canDetach) {
-        <button (click)="detachNode(ctx.node.id)">Detach</button>
-      }
+      <node-toolbar>
+        @if (ctx.data().canDetach) {
+          <button (click)="detachNode(ctx.node.id)">Detach</button>
+        }
 
-      @if (ctx.data().canAttach) {
-        <button (click)="attachNode(ctx.node.id)">Attach</button>
-      }
-    </node-toolbar>
+        @if (ctx.data().canAttach) {
+          <button (click)="attachNode(ctx.node.id)">Attach</button>
+        }
+      </node-toolbar>
+    }
   </ng-template>
 
   <ng-template let-ctx edge>

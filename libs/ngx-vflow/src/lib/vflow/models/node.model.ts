@@ -1,4 +1,4 @@
-import { TemplateRef, computed, inject, signal } from '@angular/core';
+import { TemplateRef, Type, computed, inject, reflectComponentType, signal } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 import { DomAttributes } from '../interfaces/dom-attributes.interface';
 import { NODE_DEFAULTS, Node, isComponentNode } from '../interfaces/node.interface';
@@ -9,19 +9,15 @@ import { FlowEntity } from '../interfaces/flow-entity.interface';
 import { Point } from '../interfaces/point.interface';
 import { FlowEntitiesService } from '../services/flow-entities.service';
 import { Contextable } from '../interfaces/contextable.interface';
-import { GroupNodeContext, NodeContext } from '../interfaces/template-context.interface';
-import { Observable, of } from 'rxjs';
-import { catchError, filter, shareReplay, switchMap } from 'rxjs/operators';
+import { NodeContext } from '../interfaces/template-context.interface';
+import { Observable, from, of } from 'rxjs';
+import { filter, shareReplay, switchMap } from 'rxjs/operators';
 import { FlowSettingsService } from '../services/flow-settings.service';
 import { NodeRenderingService } from '../services/node-rendering.service';
 import { extendedComputed } from '../utils/signals/extended-computed';
-import { isCallable } from '../utils/is-callable';
-import { isCustomNodeComponent } from '../utils/is-vflow-component';
 import { createModelInjector } from '../utils/model-injector';
 
-export class NodeModel<T = unknown>
-  implements FlowEntity, Contextable<NodeContext | GroupNodeContext | { $implicit: object }>
-{
+export class NodeModel<T = unknown> implements FlowEntity, Contextable<NodeContext> {
   private modelInjector = createModelInjector();
   private entitiesService = inject(FlowEntitiesService);
   private settingsService = inject(FlowSettingsService);
@@ -32,9 +28,7 @@ export class NodeModel<T = unknown>
     const override = this.rawNode.ariaLabel?.().trim();
     if (override) return override;
     const labels = this.settingsService.ariaLabels();
-    return this.rawNode.type === 'template-group'
-      ? labels.groupLabel(this.rawNode.id)
-      : labels.nodeLabel(this.rawNode.id);
+    return this.children().length > 0 ? labels.groupLabel(this.rawNode.id) : labels.nodeLabel(this.rawNode.id);
   });
 
   public accessibility = computed((): { label: string; description: string; domAttributes?: DomAttributes } => {
@@ -125,9 +119,7 @@ export class NodeModel<T = unknown>
    * `explicit`: the size comes from application data or the resizer and is written to the DOM.
    */
   public sizeMode = computed<NodeSizeMode>(() =>
-    this.rawNode.type === 'template-group' ||
-    (this.rawNode.width !== undefined && this.rawNode.height !== undefined) ||
-    this.resizedExplicitly()
+    (this.rawNode.width !== undefined && this.rawNode.height !== undefined) || this.resizedExplicitly()
       ? 'explicit'
       : 'auto',
   );
@@ -167,6 +159,11 @@ export class NodeModel<T = unknown>
   // TODO: not sure if we need to statically store it
   public isComponentType = isComponentNode(this.rawNode);
 
+  /** A component class renders immediately; a lazy factory resolves to one. */
+  // A factory is not a decorated class, so reflection returns null for it.
+  private isComponentClass =
+    !!this.rawNode.component && reflectComponentType(this.rawNode.component as Type<unknown>) !== null;
+
   public shouldLoad = extendedComputed<boolean>((previousShouldLoad) => {
     if (previousShouldLoad) {
       return true;
@@ -178,38 +175,25 @@ export class NodeModel<T = unknown>
       this.settingsService.optimization().lazyLoadTrigger === 'immediate'
     ) {
       return true;
-    } else if (this.settingsService.optimization().lazyLoadTrigger === 'viewport') {
-      // Immediately load component if it's a plain class
-      if (isCustomNodeComponent(this.rawNode.type)) {
-        return true;
-      }
-
-      // For cases
-      // - if it's a factory with dynamic import
-      // - if it's a template (html, svg, group)
-      // check if it's in the viewport
-      if (
-        isCallable(this.rawNode.type) ||
-        this.rawNode.type === 'html-template' ||
-        this.rawNode.type === 'template-group'
-      ) {
-        return this.nodeRenderingService.viewportNodes().includes(this as NodeModel);
-      }
     }
 
-    // For each other case, we want to load the component immediately
+    if (this.settingsService.optimization().lazyLoadTrigger === 'viewport' && !this.isComponentClass) {
+      // A lazy component factory or a template presentation loads once the node reaches the viewport.
+      return this.nodeRenderingService.viewportNodes().includes(this as NodeModel);
+    }
+
     return true;
   });
 
   public componentInstance$ = toObservable(this.shouldLoad, { injector: this.modelInjector }).pipe(
     filter(Boolean),
-    // @ts-expect-error we assume it's a function with dynamic import
-    switchMap(() => this.rawNode.type()),
-    catchError(() => of(this.rawNode.type)),
+    switchMap(() => {
+      const component = this.rawNode.component;
+      if (!component || this.isComponentClass) return of(component);
+      return from((component as () => Promise<unknown>)());
+    }),
     shareReplay(1),
   );
-
-  // Default node specific thing
 
   // Component node specific thing
   public componentTypeInputs = {
@@ -236,9 +220,7 @@ export class NodeModel<T = unknown>
    */
   public resizerTemplate = signal<TemplateRef<unknown> | null>(null);
 
-  public context = {
-    $implicit: {},
-  };
+  public context: NodeContext;
 
   constructor(public rawNode: Node<T>) {
     if (rawNode.point) {
@@ -265,31 +247,17 @@ export class NodeModel<T = unknown>
       this.extent = rawNode.extent;
     }
 
-    if (rawNode.type === 'html-template') {
-      this.context = {
-        $implicit: {
-          node: rawNode,
-          data: rawNode.data ?? signal(NODE_DEFAULTS.data as T),
-          selected: this.selected.asReadonly(),
-          preselected: this.preselected.asReadonly(),
-          shouldLoad: this.shouldLoad,
-        },
-      };
-    }
-
-    if (rawNode.type === 'template-group') {
-      this.context = {
-        $implicit: {
-          node: rawNode,
-          data: rawNode.data ?? signal(NODE_DEFAULTS.data as T),
-          selected: this.selected.asReadonly(),
-          preselected: this.preselected.asReadonly(),
-          width: this.width.asReadonly(),
-          height: this.height.asReadonly(),
-          shouldLoad: this.shouldLoad,
-        },
-      };
-    }
+    this.context = {
+      $implicit: {
+        node: rawNode,
+        data: rawNode.data ?? signal(NODE_DEFAULTS.data as T),
+        selected: this.selected.asReadonly(),
+        preselected: this.preselected.asReadonly(),
+        width: this.width.asReadonly(),
+        height: this.height.asReadonly(),
+        shouldLoad: this.shouldLoad,
+      },
+    };
 
     // Initialize Observables after all signal assignments
     this.point$ = toObservable(this.point, { injector: this.modelInjector });

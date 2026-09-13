@@ -13,7 +13,6 @@ export class MultipleNodeToolbarsDemoComponent {
     {
       id: '1',
       point: { x: 150, y: 150 },
-      type: 'html-template',
     },
   ]);
 

@@ -13,7 +13,6 @@ import {
 function node(id: string, x = 0, y = 0, parentId?: string | null): Node {
   return {
     id,
-    type: 'html-template',
     point: signal({ x, y }),
     parentId: signal(parentId ?? null),
   };
@@ -160,7 +159,7 @@ describe('graph operations', () => {
   });
 
   it('adds a parent signal without replacing a node that did not have one', () => {
-    const child: Node = { id: 'child', type: 'html-template', point: signal({ x: 10, y: 20 }) };
+    const child: Node = { id: 'child', point: signal({ x: 10, y: 20 }) };
     const parent = node('parent', 100, 50);
 
     const result = reparentNodes([{ id: 'child', parentId: 'parent' }], [child, parent]);

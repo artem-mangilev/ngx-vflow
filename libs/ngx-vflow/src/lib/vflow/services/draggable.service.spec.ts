@@ -111,17 +111,9 @@ describe('DraggableService', () => {
     });
   });
 
-  function createModel(params: {
-    id: string;
-    type?: 'html-template' | 'template-group';
-    selected?: boolean;
-    draggable?: boolean;
-    parentId?: string;
-  }) {
-    const type = params.type ?? 'html-template';
+  function createModel(params: { id: string; selected?: boolean; draggable?: boolean; parentId?: string }) {
     const nodeConfig: any = {
       id: params.id,
-      type,
       point: { x: 0, y: 0 },
       selected: params.selected ?? false,
       draggable: params.draggable ?? true,
@@ -242,7 +234,8 @@ describe('DraggableService', () => {
   });
 
   it('should block group drag when selection shortcut is active', () => {
-    const group = createModel({ id: 'group', type: 'template-group' });
+    const group = createModel({ id: 'group' });
+    createModel({ id: 'member', parentId: 'group' });
     const dragFilter = (service as any).getDragBehavior(group).filter();
     const target = document.createElement('div');
 

@@ -38,7 +38,6 @@ describe('SelectionService', () => {
         new NodeModel(
           createNode({
             id,
-            type: 'html-template',
             point: { x: 0, y: 0 },
             selectable,
           }),

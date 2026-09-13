@@ -70,9 +70,7 @@ describe('Graph rendering and interaction regressions', () => {
   );
 
   function node(id: string) {
-    return TestBed.runInInjectionContext(
-      () => new NodeModel(createNode({ id, type: 'html-template', point: { x: 0, y: 0 } })),
-    );
+    return TestBed.runInInjectionContext(() => new NodeModel(createNode({ id, point: { x: 0, y: 0 } })));
   }
 
   it('centers an HTML label immediately after its content changes, including at non-unit zoom', () => {
@@ -214,8 +212,8 @@ describe('Graph rendering and interaction regressions', () => {
     fixture.componentRef.setInput('view', [400, 300]);
     fixture.componentRef.setInput('optimization', { virtualization: true });
     fixture.componentRef.setInput('nodes', [
-      createNode({ id: 'a', type: BoxNodeComponent, point: { x: 10, y: 20 } }),
-      createNode({ id: 'b', type: BoxNodeComponent, point: { x: 250, y: 20 } }),
+      createNode({ id: 'a', component: BoxNodeComponent, point: { x: 10, y: 20 } }),
+      createNode({ id: 'b', component: BoxNodeComponent, point: { x: 250, y: 20 } }),
     ]);
     fixture.componentRef.setInput('edges', [createEdge({ id: 'a-b', source: 'a', target: 'b' })]);
     fixture.detectChanges();
@@ -283,8 +281,8 @@ describe('Graph rendering and interaction regressions', () => {
   }
 
   it('preserves rendered position when reparentNodes adds an omitted parentId signal', () => {
-    const parent = createNode({ id: 'parent', type: 'html-template', point: { x: 100, y: 0 } });
-    const child: Node = { id: 'child', type: 'html-template', point: signal({ x: 150, y: 0 }) };
+    const parent = createNode({ id: 'parent', point: { x: 100, y: 0 } });
+    const child: Node = { id: 'child', point: signal({ x: 150, y: 0 }) };
     const entities = TestBed.inject(FlowEntitiesService);
     const models = TestBed.runInInjectionContext(() => ReferenceIdentityChecker.nodes([parent, child], []));
     entities.nodes.set(models);
@@ -447,7 +445,7 @@ describe('Graph rendering and interaction regressions', () => {
     const point = signal({ x: 0, y: 0 });
     const read = jasmine.createSpy('removed node point').and.callFake(() => point());
     const observedPoint = Object.assign(read, point);
-    const raw: Node = { id: 'removed', type: 'html-template', point: observedPoint };
+    const raw: Node = { id: 'removed', point: observedPoint };
     const entities = TestBed.inject(FlowEntitiesService);
     entities.nodes.set(TestBed.runInInjectionContext(() => ReferenceIdentityChecker.nodes([raw], [])));
     TestBed.flushEffects();
@@ -472,9 +470,7 @@ describe('Graph rendering and interaction regressions', () => {
         expect(entities.validEdges().length).toBe(count);
         samples.push(performance.now() - start);
       }
-      const rawNodes = nodes.map(
-        (n) => ({ id: n.rawNode.id, type: 'html-template', point: signal({ x: 0, y: 0 }) }) as Node,
-      );
+      const rawNodes = nodes.map((n) => ({ id: n.rawNode.id, point: signal({ x: 0, y: 0 }) }) as Node);
       const start = performance.now();
       expect(
         removeNodes(

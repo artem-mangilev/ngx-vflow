@@ -3,10 +3,9 @@ import type {
   ConnectionTemplateDirective,
   EdgeLabelHtmlTemplateDirective,
   EdgeTemplateDirective,
-  GroupNodeTemplateDirective,
   HandleContext,
   HandleTemplateDirective,
-  NodeHtmlTemplateDirective,
+  NodeTemplateDirective,
 } from 'ngx-vflow';
 import { AsInterface } from '../types';
 
@@ -36,17 +35,9 @@ export class EdgeLabelHtmlTemplateMockDirective implements AsInterface<EdgeLabel
 
 @Directive({
   standalone: true,
-  selector: 'ng-template[nodeHtml]',
+  selector: 'ng-template[node]',
 })
-export class NodeHtmlTemplateMockDirective implements AsInterface<NodeHtmlTemplateDirective> {
-  public templateRef = inject(TemplateRef);
-}
-
-@Directive({
-  standalone: true,
-  selector: 'ng-template[groupNode]',
-})
-export class GroupNodeTemplateMockDirective implements AsInterface<GroupNodeTemplateDirective> {
+export class NodeTemplateMockDirective implements AsInterface<NodeTemplateDirective> {
   public templateRef = inject(TemplateRef);
 }
 

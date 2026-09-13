@@ -12,7 +12,7 @@ describe('DragAndDropNodesDemoComponent', () => {
     const component = TestBed.createComponent(DragAndDropNodesDemoComponent).componentInstance;
     const parent: Node = {
       id: 'parent',
-      type: 'default-group',
+      data: signal({ type: 'group' }),
       point: signal({ x: 100, y: 100 }),
       width: signal(250),
       height: signal(250),
@@ -20,7 +20,6 @@ describe('DragAndDropNodesDemoComponent', () => {
     };
     const child = {
       id: 'child',
-      type: 'html-template' as const,
       point: signal({ x: 10, y: 20 }),
       parentId: signal<string | null>('parent'),
       data: signal({ canDetach: true, canAttach: false }),

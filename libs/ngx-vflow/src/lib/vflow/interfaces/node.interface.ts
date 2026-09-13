@@ -1,8 +1,5 @@
 import { signal, Type, WritableSignal } from '@angular/core';
 import { Point } from './point.interface';
-import { isCallable } from '../utils/is-callable';
-import { CustomNodeComponent } from '../public-components/custom-node/custom-node.component';
-import { isCustomNodeComponent } from '../utils/is-vflow-component';
 import { UnwrapSignal } from '../types/unwrap-signal.type';
 import { isDefined } from '../utils/is-defined';
 import { DomAttributes } from './dom-attributes.interface';
@@ -18,11 +15,20 @@ export const NODE_DEFAULTS = {
   data: {},
 };
 
-export type Node<T = any> = HtmlTemplateNode<T> | ComponentNode<T> | TemplateGroupNode<T>;
+/**
+ * A component class, or a factory that lazily imports one. Nodes without a component render
+ * through the `ng-template[node]` presentation of the flow.
+ */
+export type NodeComponentType = Type<unknown> | (() => Promise<Type<unknown>>);
 
-export interface SharedNode {
+export interface Node<T = any> {
   id: string;
   point: WritableSignal<Point>;
+  component?: NodeComponentType;
+  data?: WritableSignal<T>;
+  /** With `height`, makes the size explicit; without both, the node follows its measured content. */
+  width?: WritableSignal<number>;
+  height?: WritableSignal<number>;
   draggable?: WritableSignal<boolean>;
   parentId?: WritableSignal<string | null>;
   extent?: WritableSignal<'parent' | null>;
@@ -34,177 +40,67 @@ export interface SharedNode {
   domAttributes?: WritableSignal<DomAttributes>;
 }
 
-export interface HtmlTemplateNode<T = any> extends SharedNode {
-  type: 'html-template';
-  data?: WritableSignal<T>;
-  width?: WritableSignal<number>;
-  height?: WritableSignal<number>;
+export function isComponentNode<T>(node: Node<T>): boolean {
+  return node.component !== undefined;
 }
 
-export interface TemplateGroupNode<T = any> extends SharedNode {
-  type: 'template-group';
-  width: WritableSignal<number>;
-  height: WritableSignal<number>;
-  data?: WritableSignal<T>;
-}
-
-export interface ComponentNode<T = any> extends SharedNode {
-  type: Type<CustomNodeComponent<T>> | (() => Promise<Type<CustomNodeComponent<T>>>);
-  data?: WritableSignal<T>;
-  width?: WritableSignal<number>;
-  height?: WritableSignal<number>;
-}
-
-export function isComponentNode<T>(node: Node<T>): node is ComponentNode<T> {
-  if (isCustomNodeComponent(node.type)) {
-    return true;
-  }
-
-  // Check if the type is a function with dynamic import
-  return isCallable(node.type);
-}
-
-export function isTemplateNode<T>(node: Node<T>): node is HtmlTemplateNode<T> {
-  return node.type === 'html-template';
-}
-
-export function isTemplateGroupNode<T>(node: Node<T>): node is TemplateGroupNode<T> {
-  return node.type === 'template-group';
-}
-
-export type StaticNode<T = unknown> =
-  UnwrapSignal<HtmlTemplateNode<T>> | UnwrapSignal<ComponentNode<T>> | UnwrapSignal<TemplateGroupNode<T>>;
+export type StaticNode<T = unknown> = UnwrapSignal<Node<T>>;
 
 interface CreateNodeOptions {
   useDefaults: boolean;
 }
 
-type OptionalProperty = 'selectable' | 'focusable' | 'ariaLabel' | 'ariaDescription' | 'domAttributes';
+/** Properties that stay optional even with defaults; `width`/`height` decide the size mode. */
+type OptionalProperty =
+  'component' | 'width' | 'height' | 'selectable' | 'focusable' | 'ariaLabel' | 'ariaDescription' | 'domAttributes';
 
-/** Properties that stay optional even with defaults; `width`/`height` of html/component nodes decide the size mode. */
-type OptionalSizeProperty = 'width' | 'height';
+export type NodeWithDefaults<T = any> = Omit<Required<Node<T>>, OptionalProperty> & Pick<Node<T>, OptionalProperty>;
 
-export type NodeWithDefaults<T = any> =
-  | (Omit<Required<HtmlTemplateNode<T>>, OptionalProperty | OptionalSizeProperty> &
-      Pick<HtmlTemplateNode<T>, OptionalProperty | OptionalSizeProperty>)
-  | (Omit<Required<ComponentNode<T>>, OptionalProperty | OptionalSizeProperty> &
-      Pick<ComponentNode<T>, OptionalProperty | OptionalSizeProperty>)
-  | (Omit<Required<TemplateGroupNode<T>>, OptionalProperty> & Pick<TemplateGroupNode<T>, OptionalProperty>);
-
-function createOptionalSize(node: { width?: number; height?: number }) {
+function createOptionalProperties(node: StaticNode<unknown>) {
   return {
-    width: isDefined(node.width) ? signal(node.width) : undefined,
-    height: isDefined(node.height) ? signal(node.height) : undefined,
+    ...(isDefined(node.component) ? { component: node.component } : {}),
+    ...(isDefined(node.width) ? { width: signal(node.width) } : {}),
+    ...(isDefined(node.height) ? { height: signal(node.height) } : {}),
+    ...(isDefined(node.selectable) ? { selectable: signal(node.selectable) } : {}),
+    ...(isDefined(node.focusable) ? { focusable: signal(node.focusable) } : {}),
+    ...(isDefined(node.ariaLabel) ? { ariaLabel: signal(node.ariaLabel) } : {}),
+    ...(isDefined(node.ariaDescription) ? { ariaDescription: signal(node.ariaDescription) } : {}),
+    ...(isDefined(node.domAttributes) ? { domAttributes: signal(node.domAttributes) } : {}),
   };
-}
-
-function createBaseNode(node: UnwrapSignal<SharedNode>, useDefaults: boolean) {
-  if (useDefaults) {
-    return {
-      id: node.id,
-      point: signal(node.point),
-      draggable: signal(isDefined(node.draggable) ? node.draggable : NODE_DEFAULTS.draggable),
-      parentId: signal(isDefined(node.parentId) ? node.parentId : NODE_DEFAULTS.parentId),
-      extent: signal(isDefined(node.extent) ? node.extent : NODE_DEFAULTS.extent),
-      selected: signal(isDefined(node.selected) ? node.selected : NODE_DEFAULTS.selected),
-      ...(isDefined(node.selectable) ? { selectable: signal(node.selectable) } : {}),
-      ...(isDefined(node.focusable) ? { focusable: signal(node.focusable) } : {}),
-      ...(isDefined(node.ariaLabel) ? { ariaLabel: signal(node.ariaLabel) } : {}),
-      ...(isDefined(node.ariaDescription) ? { ariaDescription: signal(node.ariaDescription) } : {}),
-      ...(isDefined(node.domAttributes) ? { domAttributes: signal(node.domAttributes) } : {}),
-    };
-  } else {
-    return {
-      id: node.id,
-      point: signal(node.point),
-      draggable: isDefined(node.draggable) ? signal(node.draggable) : undefined,
-      parentId: isDefined(node.parentId) ? signal(node.parentId) : undefined,
-      extent: isDefined(node.extent) ? signal(node.extent) : undefined,
-      selected: isDefined(node.selected) ? signal(node.selected) : undefined,
-      ...(isDefined(node.selectable) ? { selectable: signal(node.selectable) } : {}),
-      ...(isDefined(node.focusable) ? { focusable: signal(node.focusable) } : {}),
-      ...(isDefined(node.ariaLabel) ? { ariaLabel: signal(node.ariaLabel) } : {}),
-      ...(isDefined(node.ariaDescription) ? { ariaDescription: signal(node.ariaDescription) } : {}),
-      ...(isDefined(node.domAttributes) ? { domAttributes: signal(node.domAttributes) } : {}),
-    };
-  }
 }
 
 // Overloads with useDefaults: true (or no options) keep inherited capabilities optional.
 export function createNode<T>(node: StaticNode<T>): NodeWithDefaults<T>;
 export function createNode<T>(node: StaticNode<T>, options: { useDefaults: true }): NodeWithDefaults<T>;
-// Перегрузка с useDefaults: false - возвращает Node<T>
 export function createNode<T>(node: StaticNode<T>, options: { useDefaults: false }): Node<T>;
-// Реализация
 export function createNode<T>(
   node: StaticNode<T>,
   options: CreateNodeOptions = { useDefaults: true },
 ): Node<T> | NodeWithDefaults<T> {
-  const baseNode = createBaseNode(node, options.useDefaults);
-
-  if (node.type === 'html-template') {
-    if (options.useDefaults) {
-      return {
-        ...baseNode,
-        type: 'html-template' as const,
-        data: signal(node.data ?? (NODE_DEFAULTS.data as T)),
-        // No default size: a content-sized node stays `auto` until the application or the resizer sets one.
-        ...createOptionalSize(node),
-      };
-    } else {
-      return {
-        ...baseNode,
-        type: 'html-template' as const,
-        data: isDefined(node.data) ? (signal(node.data) as WritableSignal<T>) : undefined,
-        width: isDefined(node.width) ? signal(node.width) : undefined,
-        height: isDefined(node.height) ? signal(node.height) : undefined,
-      };
-    }
+  if (options.useDefaults) {
+    return {
+      id: node.id,
+      point: signal(node.point),
+      data: signal(node.data ?? (NODE_DEFAULTS.data as T)),
+      draggable: signal(isDefined(node.draggable) ? node.draggable : NODE_DEFAULTS.draggable),
+      parentId: signal(isDefined(node.parentId) ? node.parentId : NODE_DEFAULTS.parentId),
+      extent: signal(isDefined(node.extent) ? node.extent : NODE_DEFAULTS.extent),
+      selected: signal(isDefined(node.selected) ? node.selected : NODE_DEFAULTS.selected),
+      // No default size: a content-sized node stays `auto` until the application or the resizer sets one.
+      ...createOptionalProperties(node),
+    };
   }
 
-  if (node.type === 'template-group') {
-    const width = signal(node.width);
-    const height = signal(node.height);
-
-    if (options.useDefaults) {
-      return {
-        ...baseNode,
-        type: 'template-group' as const,
-        width,
-        height,
-        data: signal(node.data ?? (NODE_DEFAULTS.data as T)),
-      };
-    } else {
-      return {
-        ...baseNode,
-        type: 'template-group' as const,
-        width,
-        height,
-        data: isDefined(node.data) ? (signal(node.data) as WritableSignal<T>) : undefined,
-      };
-    }
-  }
-
-  if (isCustomNodeComponent(node.type) || isCallable(node.type)) {
-    if (options.useDefaults) {
-      return {
-        ...baseNode,
-        type: node.type,
-        data: signal(node.data ?? (NODE_DEFAULTS.data as T)),
-        ...createOptionalSize(node),
-      };
-    } else {
-      return {
-        ...baseNode,
-        type: node.type,
-        data: isDefined(node.data) ? (signal(node.data) as WritableSignal<T>) : undefined,
-        width: isDefined(node.width) ? signal(node.width) : undefined,
-        height: isDefined(node.height) ? signal(node.height) : undefined,
-      };
-    }
-  }
-
-  throw new Error(`Unknown node type for node with id ${node.id}`);
+  return {
+    id: node.id,
+    point: signal(node.point),
+    data: isDefined(node.data) ? (signal(node.data) as WritableSignal<T>) : undefined,
+    draggable: isDefined(node.draggable) ? signal(node.draggable) : undefined,
+    parentId: isDefined(node.parentId) ? signal(node.parentId) : undefined,
+    extent: isDefined(node.extent) ? signal(node.extent) : undefined,
+    selected: isDefined(node.selected) ? signal(node.selected) : undefined,
+    ...createOptionalProperties(node),
+  };
 }
 
 export function createNodes<T = unknown>(nodes: StaticNode<T>[]): NodeWithDefaults<T>[];

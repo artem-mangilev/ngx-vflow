@@ -17,7 +17,7 @@ import {
   createEdges,
   createNodes,
   Edge,
-  HtmlTemplateNode,
+  Node,
   Vflow,
   VflowComponent,
 } from 'ngx-vflow';
@@ -102,7 +102,7 @@ interface StageData {
         <p>Connect ports of the same type. Controls inside nodes do not drag or zoom the graph.</p>
       </div>
       <vflow view="auto" [nodes]="nodes" [edges]="edges()" [connection]="connection" (connect)="connect($event)">
-        <ng-template let-ctx nodeHtml>
+        <ng-template let-ctx node>
           <article
             vflowNode
             selectable
@@ -280,7 +280,7 @@ export class PipelineDemoComponent {
       ],
       [],
     ),
-  ]) as (HtmlTemplateNode<StageData> & { data: WritableSignal<StageData> })[];
+  ]) as (Node<StageData> & { data: WritableSignal<StageData> })[];
   readonly edges = signal<Edge[]>(
     createEdges([
       wire('source-transcode', 'source', 'video', 'transcode', 'video'),
@@ -350,7 +350,7 @@ function stage(
   inputs: Port[],
   outputs: Port[],
 ) {
-  return { id, type: 'html-template' as const, point, ariaLabel: title, data: { title, icon, kind, inputs, outputs } };
+  return { id, point, ariaLabel: title, data: { title, icon, kind, inputs, outputs } };
 }
 
 function wire(id: string, source: string, out: string, target: string, input: string) {

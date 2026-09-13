@@ -25,7 +25,7 @@ import { createEdges, createNodes, Vflow } from 'ngx-vflow';
   `,
   template: `
     <vflow view="auto" data-testid="core-flow" [nodes]="nodes" [edges]="edges">
-      <ng-template let-ctx nodeHtml>
+      <ng-template let-ctx node>
         <div class="card" selectable>
           {{ ctx.data().title }}
           <handle type="target" position="left" />
@@ -38,9 +38,9 @@ import { createEdges, createNodes, Vflow } from 'ngx-vflow';
 })
 export class CoreAppComponent {
   readonly nodes = createNodes([
-    { id: 'a', type: 'html-template', point: { x: 40, y: 60 }, data: { title: 'Own template' } },
-    { id: 'b', type: 'html-template', point: { x: 320, y: 160 }, data: { title: 'No UI package' } },
-    { id: 'c', type: 'html-template', point: { x: 320, y: 20 }, data: { title: 'Third card' } },
+    { id: 'a', point: { x: 40, y: 60 }, data: { title: 'Own template' } },
+    { id: 'b', point: { x: 320, y: 160 }, data: { title: 'No UI package' } },
+    { id: 'c', point: { x: 320, y: 20 }, data: { title: 'Third card' } },
   ]);
   readonly edges = createEdges([
     { id: 'a-b', source: 'a', target: 'b', markers: { end: {} } },

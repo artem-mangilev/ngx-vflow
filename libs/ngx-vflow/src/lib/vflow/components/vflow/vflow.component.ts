@@ -26,8 +26,7 @@ import {
   ConnectionTemplateDirective,
   EdgeLabelHtmlTemplateDirective,
   EdgeTemplateDirective,
-  GroupNodeTemplateDirective,
-  NodeHtmlTemplateDirective,
+  NodeTemplateDirective,
 } from '../../directives/template.directive';
 import { addNodesToEdges } from '../../utils/add-nodes-to-edges';
 import { skip } from 'rxjs/operators';
@@ -453,9 +452,7 @@ export class VflowComponent {
   // #endregion
 
   // #region TEMPLATES
-  protected nodeTemplateDirective = contentChild(NodeHtmlTemplateDirective);
-
-  protected groupNodeTemplateDirective = contentChild(GroupNodeTemplateDirective);
+  protected nodeTemplateDirective = contentChild(NodeTemplateDirective);
 
   protected edgeTemplateDirective = contentChild(EdgeTemplateDirective);
 

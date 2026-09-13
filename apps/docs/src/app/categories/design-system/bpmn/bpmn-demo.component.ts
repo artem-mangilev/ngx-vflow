@@ -19,94 +19,98 @@ type Flow = 'sequence' | 'message' | 'association';
         <p>Two pools with a message flow between them; drag tasks inside lanes. A visual subset without execution.</p>
       </div>
       <vflow view="auto" [nodes]="nodes" [edges]="edges">
-        <ng-template let-ctx groupNode>
-          @if (ctx.data().kind === 'pool') {
-            <div
-              vflowBpmnPool
-              selectable
-              [vflowSelected]="ctx.selected() || ctx.preselected()"
-              [style.width.px]="ctx.width()"
-              [style.height.px]="ctx.height()">
-              <strong vflowTitle>{{ ctx.data().title }}</strong>
-              <!-- The supplier pool takes part in message flows through its own handles. -->
-              @if (ctx.node.id === 'supplier') {
-                <handle
-                  type="target"
-                  position="bottom"
-                  id="message-in"
-                  [template]="port"
-                  [canStart]="false"
-                  [offsetX]="ctx.width() * -0.4" />
-                <handle
-                  type="source"
-                  position="bottom"
-                  id="message-out"
-                  [template]="port"
-                  [canAccept]="false"
-                  [offsetX]="ctx.width() * 0.4" />
-              }
-            </div>
+        <ng-template let-ctx node>
+          @if (ctx.data().kind === 'pool' || ctx.data().kind === 'lane') {
+            @if (ctx.data().kind === 'pool') {
+              <div
+                vflowBpmnPool
+                selectable
+                [vflowSelected]="ctx.selected() || ctx.preselected()"
+                [style.width.px]="ctx.width()"
+                [style.height.px]="ctx.height()">
+                <strong vflowTitle>{{ ctx.data().title }}</strong>
+                <!-- The supplier pool takes part in message flows through its own handles. -->
+                @if (ctx.node.id === 'supplier') {
+                  <handle
+                    type="target"
+                    position="bottom"
+                    id="message-in"
+                    [template]="port"
+                    [canStart]="false"
+                    [offsetX]="ctx.width() * -0.4" />
+                  <handle
+                    type="source"
+                    position="bottom"
+                    id="message-out"
+                    [template]="port"
+                    [canAccept]="false"
+                    [offsetX]="ctx.width() * 0.4" />
+                }
+              </div>
+            } @else {
+              <div
+                vflowBpmnLane
+                selectable
+                [vflowSelected]="ctx.selected() || ctx.preselected()"
+                [style.width.px]="ctx.width()"
+                [style.height.px]="ctx.height()">
+                <strong vflowTitle>{{ ctx.data().title }}</strong>
+              </div>
+            }
           } @else {
-            <div
-              vflowBpmnLane
-              selectable
-              [vflowSelected]="ctx.selected() || ctx.preselected()"
-              [style.width.px]="ctx.width()"
-              [style.height.px]="ctx.height()">
-              <strong vflowTitle>{{ ctx.data().title }}</strong>
-            </div>
-          }
-        </ng-template>
-        <ng-template let-ctx nodeHtml>
-          @switch (ctx.data().kind) {
-            @case ('task') {
-              <div vflowBpmnTask class="task" selectable [vflowSelected]="ctx.selected() || ctx.preselected()">
-                {{ ctx.data().title }}
-                <handle type="target" position="left" [template]="port" [canStart]="false" [canAccept]="false" />
-                <handle type="source" position="right" [template]="port" [canStart]="false" [canAccept]="false" />
-                @if (ctx.node.id === 'notify') {
-                  <handle type="source" position="top" id="message-out" [template]="port" [canAccept]="false" />
-                }
-              </div>
-            }
-            @case ('exclusive') {
-              <div vflowBpmnGateway="exclusive" selectable [vflowSelected]="ctx.selected() || ctx.preselected()">
-                <span vflowExternalLabel>{{ ctx.data().title }}</span>
-                <handle type="target" position="left" [template]="port" [canStart]="false" [canAccept]="false" />
-                <handle type="target" position="top" id="association" [template]="port" [canStart]="false" />
-                <handle type="source" position="right" id="yes" [template]="port" [canStart]="false" />
-                <handle type="source" position="bottom" id="no" [template]="port" [canStart]="false" />
-              </div>
-            }
-            @case ('parallel') {
-              <div vflowBpmnGateway="parallel" selectable [vflowSelected]="ctx.selected() || ctx.preselected()">
-                <span vflowExternalLabel>{{ ctx.data().title }}</span>
-                <handle type="target" position="left" [template]="port" [canStart]="false" [canAccept]="false" />
-                <handle type="source" position="right" id="a" [template]="port" [canStart]="false" />
-                <handle type="source" position="bottom" id="b" [template]="port" [canStart]="false" />
-              </div>
-            }
-            @case ('annotation') {
-              <div class="annotation" selectable [vflowSelected]="ctx.selected() || ctx.preselected()">
-                {{ ctx.data().title }}
-                <handle type="source" position="bottom" [template]="port" [canAccept]="false" />
-              </div>
-            }
-            @default {
-              <div selectable [vflowBpmnEvent]="ctx.data().kind" [vflowSelected]="ctx.selected() || ctx.preselected()">
-                @if (ctx.data().kind === 'intermediate') {
-                  <span class="symbol" aria-hidden="true">◷</span>
-                }
-                <span vflowExternalLabel>{{ ctx.data().title }}</span>
-                @if (ctx.data().kind === 'start') {
-                  <handle type="target" position="top" id="message-in" [template]="port" [canStart]="false" />
-                } @else {
+            @switch (ctx.data().kind) {
+              @case ('task') {
+                <div vflowBpmnTask class="task" selectable [vflowSelected]="ctx.selected() || ctx.preselected()">
+                  {{ ctx.data().title }}
                   <handle type="target" position="left" [template]="port" [canStart]="false" [canAccept]="false" />
-                }
-                @if (ctx.data().kind !== 'end') {
                   <handle type="source" position="right" [template]="port" [canStart]="false" [canAccept]="false" />
-                }
-              </div>
+                  @if (ctx.node.id === 'notify') {
+                    <handle type="source" position="top" id="message-out" [template]="port" [canAccept]="false" />
+                  }
+                </div>
+              }
+              @case ('exclusive') {
+                <div vflowBpmnGateway="exclusive" selectable [vflowSelected]="ctx.selected() || ctx.preselected()">
+                  <span vflowExternalLabel>{{ ctx.data().title }}</span>
+                  <handle type="target" position="left" [template]="port" [canStart]="false" [canAccept]="false" />
+                  <handle type="target" position="top" id="association" [template]="port" [canStart]="false" />
+                  <handle type="source" position="right" id="yes" [template]="port" [canStart]="false" />
+                  <handle type="source" position="bottom" id="no" [template]="port" [canStart]="false" />
+                </div>
+              }
+              @case ('parallel') {
+                <div vflowBpmnGateway="parallel" selectable [vflowSelected]="ctx.selected() || ctx.preselected()">
+                  <span vflowExternalLabel>{{ ctx.data().title }}</span>
+                  <handle type="target" position="left" [template]="port" [canStart]="false" [canAccept]="false" />
+                  <handle type="source" position="right" id="a" [template]="port" [canStart]="false" />
+                  <handle type="source" position="bottom" id="b" [template]="port" [canStart]="false" />
+                </div>
+              }
+              @case ('annotation') {
+                <div class="annotation" selectable [vflowSelected]="ctx.selected() || ctx.preselected()">
+                  {{ ctx.data().title }}
+                  <handle type="source" position="bottom" [template]="port" [canAccept]="false" />
+                </div>
+              }
+              @default {
+                <div
+                  selectable
+                  [vflowBpmnEvent]="ctx.data().kind"
+                  [vflowSelected]="ctx.selected() || ctx.preselected()">
+                  @if (ctx.data().kind === 'intermediate') {
+                    <span class="symbol" aria-hidden="true">◷</span>
+                  }
+                  <span vflowExternalLabel>{{ ctx.data().title }}</span>
+                  @if (ctx.data().kind === 'start') {
+                    <handle type="target" position="top" id="message-in" [template]="port" [canStart]="false" />
+                  } @else {
+                    <handle type="target" position="left" [template]="port" [canStart]="false" [canAccept]="false" />
+                  }
+                  @if (ctx.data().kind !== 'end') {
+                    <handle type="source" position="right" [template]="port" [canStart]="false" [canAccept]="false" />
+                  }
+                </div>
+              }
             }
           }
         </ng-template>
@@ -202,7 +206,6 @@ export class BpmnDemoComponent {
 function group(id: string, point: { x: number; y: number }, width: number, height: number, kind: Kind, title: string) {
   return {
     id,
-    type: 'template-group' as const,
     point,
     width,
     height,
@@ -212,7 +215,7 @@ function group(id: string, point: { x: number; y: number }, width: number, heigh
 }
 
 function element(id: string, point: { x: number; y: number }, parentId: string, kind: Kind, title: string) {
-  return { id, type: 'html-template' as const, point, parentId, ariaLabel: `${kind}: ${title}`, data: { kind, title } };
+  return { id, point, parentId, ariaLabel: `${kind}: ${title}`, data: { kind, title } };
 }
 
 function sequence(id: string, source: string, target: string, sourceHandle?: string) {

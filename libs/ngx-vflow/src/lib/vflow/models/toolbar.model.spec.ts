@@ -28,7 +28,6 @@ describe('ToolbarModel', () => {
           new NodeModel(
             createNode({
               id: '1',
-              type: 'html-template',
 
               point: { x: 15, y: 15 },
             }),

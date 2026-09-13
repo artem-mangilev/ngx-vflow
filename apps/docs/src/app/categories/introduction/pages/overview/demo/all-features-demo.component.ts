@@ -15,8 +15,7 @@ import { TransformNodeComponent } from './components/transform-node.component';
     (connect)="createEdge($event)"
     (nodesChanges.size)="store.applySizeChanges($event)"
     (componentNodeEvent)="onComponentEvent($event)">
-    <ng-template let-ctx nodeHtml><docs-node [ctx]="ctx" /></ng-template>
-    <ng-template let-ctx groupNode><docs-group [ctx]="ctx" /></ng-template>
+    <ng-template let-ctx node><docs-node [ctx]="ctx" /></ng-template>
 
     <ng-template let-ctx edge>
       @if (ctx.edge.data?.().type === 'animated') {

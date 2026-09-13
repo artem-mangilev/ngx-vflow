@@ -47,7 +47,6 @@ describe('HandleModel', () => {
   function createModel(
     position: 'left' | 'right' | 'top' | 'bottom',
     anchorRect: { left: number; top: number; width: number; height: number },
-    nodeType: 'html-template' = 'html-template',
   ) {
     const anchor = document.createElement('div');
     const nodeElement = document.createElement('div');
@@ -61,7 +60,6 @@ describe('HandleModel', () => {
         new NodeModel(
           createNode({
             id: '1',
-            type: nodeType,
             point: { x: 0, y: 0 },
           }),
         ),
@@ -95,11 +93,12 @@ describe('HandleModel', () => {
   });
 
   it('should keep a custom handle aligned with its anchor after node resize', () => {
-    const { model, parentNode, anchor, nodeElement, handleElement } = createModel(
-      'right',
-      { left: 10, top: 30, width: 80, height: 20 },
-      'html-template',
-    );
+    const { model, parentNode, anchor, nodeElement, handleElement } = createModel('right', {
+      left: 10,
+      top: 30,
+      width: 80,
+      height: 20,
+    });
 
     mockRect(handleElement, { left: 90, top: 35, width: 20, height: 10 });
 

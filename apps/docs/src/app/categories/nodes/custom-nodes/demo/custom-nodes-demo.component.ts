@@ -4,11 +4,10 @@ import { Node, Edge, Vflow, createNodes } from 'ngx-vflow';
 
 @Component({
   template: `<vflow view="auto" [nodes]="nodes" [edges]="edges">
-    <ng-template let-ctx groupNode><docs-group [ctx]="ctx" /></ng-template>
     <ng-template let-ctx edge><svg:g docsEdge [ctx]="ctx" /></ng-template>
     <ng-template let-ctx edgeLabelHtml><docs-edge-label [ctx]="ctx" /></ng-template>
 
-    <ng-template let-ctx nodeHtml>
+    <ng-template let-ctx node>
       <div class="custom-node" selectable [class.custom-node_selected]="ctx.selected()">
         {{ ctx.data().text }}
 
@@ -48,7 +47,6 @@ export class CustomNodesDemoComponent {
     {
       id: '1',
       point: { x: 100, y: 100 },
-      type: 'html-template',
       data: {
         customType: 'gradient',
         text: 'I am a nice custom node with gradient',
@@ -57,7 +55,6 @@ export class CustomNodesDemoComponent {
     {
       id: '2',
       point: { x: 250, y: 250 },
-      type: 'html-template',
       data: { text: 'Default' },
     },
   ]);

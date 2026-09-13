@@ -4,18 +4,16 @@ import { Vflow } from 'ngx-vflow';
 
 /**
  * Presentations shared by the documentation demos. Core is headless: every demo supplies
- * node, group, edge and label templates. These components use `@vflow/ui` so feature demos
+ * node, edge and label templates. These components use `@vflow/ui` so feature demos
  * can focus on the feature instead of drawing; copy them or replace them with your own.
  */
 
 interface NodeCtx {
   node: { id: string };
-  data: () => { text?: string; title?: string } | undefined;
+  /** `type: 'group'` marks a container; the application owns this discriminator. */
+  data: () => { text?: string; title?: string; type?: string } | undefined;
   selected: () => boolean;
   preselected: () => boolean;
-}
-
-interface GroupCtx extends NodeCtx {
   width: () => number;
   height: () => number;
 }
@@ -33,7 +31,7 @@ interface LabelCtx {
   label: { data?: unknown };
 }
 
-/** A card with the node's text and one target/source handle pair. */
+/** A card with the node's text and a target/source handle pair, or a titled container for `data.type === 'group'`. */
 @Component({
   selector: 'docs-node',
   imports: [Vflow, VflowUi],
@@ -51,41 +49,32 @@ interface LabelCtx {
     }
   `,
   template: `
-    <div vflowNode class="card" selectable [vflowSelected]="ctx().selected() || ctx().preselected()">
-      <span [innerHTML]="text()"></span>
-      <handle type="target" position="left" [template]="port" />
-      <handle type="source" position="right" [template]="port" />
-    </div>
+    @if (isGroup()) {
+      <div
+        vflowContainer
+        selectable
+        [vflowSelected]="ctx().selected() || ctx().preselected()"
+        [style.width.px]="ctx().width()"
+        [style.height.px]="ctx().height()">
+        @if (title(); as title) {
+          <span vflowTitle>{{ title }}</span>
+        }
+      </div>
+    } @else {
+      <div vflowNode class="card" selectable [vflowSelected]="ctx().selected() || ctx().preselected()">
+        <span [innerHTML]="text()"></span>
+        <handle type="target" position="left" [template]="port" />
+        <handle type="source" position="right" [template]="port" />
+      </div>
+    }
     <ng-template #port let-handle handle><span vflowPort [vflowPortState]="handle.state()"></span></ng-template>
   `,
 })
 export class DocsNodeComponent {
   readonly ctx = input.required<NodeCtx>();
-  protected readonly text = computed(() => this.ctx().data()?.text ?? this.ctx().data()?.title ?? this.ctx().node.id);
-}
-
-/** A container frame with the group's title, sized by the model. */
-@Component({
-  selector: 'docs-group',
-  imports: [Vflow, VflowUi],
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { style: 'display: block' },
-  template: `
-    <div
-      vflowContainer
-      selectable
-      [vflowSelected]="ctx().selected() || ctx().preselected()"
-      [style.width.px]="ctx().width()"
-      [style.height.px]="ctx().height()">
-      @if (title(); as title) {
-        <span vflowTitle>{{ title }}</span>
-      }
-    </div>
-  `,
-})
-export class DocsGroupComponent {
-  readonly ctx = input.required<GroupCtx>();
+  protected readonly isGroup = computed(() => this.ctx().data()?.type === 'group');
   protected readonly title = computed(() => this.ctx().data()?.text ?? this.ctx().data()?.title ?? '');
+  protected readonly text = computed(() => this.ctx().data()?.text ?? this.ctx().data()?.title ?? this.ctx().node.id);
 }
 
 /** A selectable edge path with the core markers of the edge. */
@@ -124,10 +113,5 @@ export class DocsEdgeLabelComponent {
   });
 }
 
-/** Import into a demo and place the four templates inside `<vflow>`. */
-export const DocsPresentations = [
-  DocsNodeComponent,
-  DocsGroupComponent,
-  DocsEdgeComponent,
-  DocsEdgeLabelComponent,
-] as const;
+/** Import into a demo and place the node, edge and label templates inside `<vflow>`. */
+export const DocsPresentations = [DocsNodeComponent, DocsEdgeComponent, DocsEdgeLabelComponent] as const;

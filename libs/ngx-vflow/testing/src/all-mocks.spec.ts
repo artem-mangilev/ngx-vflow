@@ -29,7 +29,7 @@ import { VflowMocks } from './vflow-mocks';
       [elevateNodesOnSelect]="true"
       (componentNodeEvent)="(null)"
       (connect)="(null)">
-      <ng-template nodeHtml>
+      <ng-template node>
         <div dragHandle selectable resizable [gap]="2">
           <handle [position]="'left'" [type]="'source'" [id]="'1'" [template]="handleTemplate" />
 
@@ -41,21 +41,6 @@ import { VflowMocks } from './vflow-mocks';
             <button>Delete</button>
           </node-toolbar>
         </div>
-      </ng-template>
-
-      <ng-template let-ctx groupNode>
-        <svg:rect
-          selectable
-          rx="5"
-          ry="5"
-          [attr.width]="ctx.width()"
-          [attr.height]="ctx.height()"
-          [style.stroke]="'red'"
-          [style.fill]="'red'"
-          [style.fill-opacity]="0.05"
-          [style.stroke-width]="ctx.selected() ? 3 : 1">
-          <handle type="source" position="right" />
-        </svg:rect>
       </ng-template>
 
       <ng-template let-ctx edge>
@@ -81,12 +66,10 @@ class VflowWrapperComponent {
 
   public nodes: Node[] = createNodes([
     {
-      type: 'html-template',
       id: '1',
       point: { x: 0, y: 0 },
     },
     {
-      type: 'template-group',
       id: '2',
       point: { x: 0, y: 0 },
       width: 100,

@@ -15,8 +15,7 @@ import {
 } from 'ngx-vflow';
 import { of } from 'rxjs';
 
-const mockModel = () =>
-  new NodeModel({ id: 'mock', type: 'html-template', point: signal({ x: 0, y: 0 }), parentId: signal(null) });
+const mockModel = () => new NodeModel({ id: 'mock', point: signal({ x: 0, y: 0 }), parentId: signal(null) });
 
 export function provideCustomNodeMocks(): Provider[] {
   return [

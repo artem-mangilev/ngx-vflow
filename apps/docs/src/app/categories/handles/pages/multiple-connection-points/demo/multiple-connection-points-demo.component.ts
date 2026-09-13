@@ -14,7 +14,6 @@ export class MultipleConnectionPointsDemoComponent {
     {
       id: '1',
       point: { x: 0, y: 150 },
-      type: 'html-template',
       data: {
         type: 'output',
         output1: 'output1',
@@ -24,7 +23,6 @@ export class MultipleConnectionPointsDemoComponent {
     {
       id: '2',
       point: { x: 250, y: 100 },
-      type: 'html-template',
       data: {
         type: 'input',
         input1: 'input1',

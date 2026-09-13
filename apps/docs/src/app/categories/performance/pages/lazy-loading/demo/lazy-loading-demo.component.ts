@@ -7,8 +7,7 @@ import { Edge, Node, Vflow, VflowComponent, createNodes } from 'ngx-vflow';
     <button (click)="nextNode()">Go To Next Node</button>
 
     <vflow view="auto" [nodes]="nodes" [edges]="edges" [optimization]="{ lazyLoadTrigger: 'viewport' }">
-      <ng-template let-ctx nodeHtml><docs-node [ctx]="ctx" /></ng-template>
-      <ng-template let-ctx groupNode><docs-group [ctx]="ctx" /></ng-template>
+      <ng-template let-ctx node><docs-node [ctx]="ctx" /></ng-template>
       <ng-template let-ctx edge><svg:g docsEdge [ctx]="ctx" /></ng-template>
       <ng-template let-ctx edgeLabelHtml><docs-edge-label [ctx]="ctx" /></ng-template>
     </vflow>
@@ -24,21 +23,21 @@ export class LazyLoadingDemoComponent {
     {
       id: '1',
       point: { x: 10, y: 150 },
-      type: () => import('./components/node-a.component').then((m) => m.NodeAComponent),
+      component: () => import('./components/node-a.component').then((m) => m.NodeAComponent),
       width: 150,
       height: 100,
     },
     {
       id: '2',
       point: { x: 1000, y: 150 },
-      type: () => import('./components/node-b.component').then((m) => m.NodeBComponent),
+      component: () => import('./components/node-b.component').then((m) => m.NodeBComponent),
       width: 150,
       height: 100,
     },
     {
       id: '3',
       point: { x: 2000, y: 150 },
-      type: () => import('./components/node-c.component').then((m) => m.NodeCComponent),
+      component: () => import('./components/node-c.component').then((m) => m.NodeCComponent),
       width: 150,
       height: 100,
     },

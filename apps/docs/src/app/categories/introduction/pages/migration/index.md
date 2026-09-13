@@ -182,7 +182,7 @@ The `[resizable]` element is now the node's sizing box: for an explicitly sized 
 
 ### Node size modes
 
-`createNodes` / `createNode` no longer give `html-template` and component nodes a default `width` / `height` of 100 x 50. A node without a size in its data is content-sized (`auto`): the library measures it and never writes inline dimensions. A node becomes explicitly sized (`explicit`) when its data carries both `width` and `height`, or after the first resize gesture. `NodeWithDefaults` reflects this: `width` and `height` are optional for those node types, so read them with `node.width?.()`.
+`createNodes` / `createNode` no longer give `html-template` and component nodes a default `width` / `height` of 100 x 50. A node without a size in its data is content-sized (`auto`): the library measures it and never writes inline dimensions. A node becomes explicitly sized (`explicit`) when its data carries both `width` and `height`, or after the first resize gesture. `NodeWithDefaults` reflects this: `width` and `height` are optional for those node types, so read them with optional chaining, for example `width?.()`.
 
 `nodesChanges.size` now carries `mode: 'auto' | 'explicit'`. Persist a size only when it is `explicit`; an `auto` size is a measurement of the node's content and must not be written back as data, or the node would stop following its content.
 

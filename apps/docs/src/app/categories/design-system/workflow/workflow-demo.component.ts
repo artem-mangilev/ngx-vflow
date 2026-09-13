@@ -47,7 +47,7 @@ interface StepData {
       </div>
       <div class="stage">
         <vflow view="auto" [nodes]="nodes" [edges]="edges" [minZoom]="0.5" [maxZoom]="2">
-          <ng-template let-ctx nodeHtml>
+          <ng-template let-ctx node>
             <article vflowNode selectable [vflowSelected]="ctx.selected() || ctx.preselected()">
               <header vflowNodeHeader>
                 <span vflowIcon aria-hidden="true">{{ ctx.data().icon }}</span>
@@ -156,7 +156,6 @@ export class WorkflowDemoComponent {
   readonly nodes = createNodes<StepData>([
     {
       id: 'received',
-      type: 'html-template',
       point: { x: 20, y: 110 },
       ariaLabel: 'Invoice received',
       data: {
@@ -168,7 +167,6 @@ export class WorkflowDemoComponent {
     },
     {
       id: 'review',
-      type: 'html-template',
       point: { x: 330, y: 110 },
       ariaLabel: 'Finance review',
       data: {
@@ -181,7 +179,6 @@ export class WorkflowDemoComponent {
     },
     {
       id: 'paid',
-      type: 'html-template',
       point: { x: 650, y: 10 },
       ariaLabel: 'Schedule payment',
       data: {
@@ -193,7 +190,6 @@ export class WorkflowDemoComponent {
     },
     {
       id: 'fix',
-      type: 'html-template',
       point: { x: 650, y: 250 },
       ariaLabel: 'Request correction',
       data: {

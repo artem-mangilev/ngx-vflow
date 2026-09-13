@@ -4,7 +4,7 @@ import { switchMap, tap } from 'rxjs/operators';
 import { takeUntilDestroyed, toObservable, outputToObservable } from '@angular/core/rxjs-interop';
 import { ComponentEventBusService } from '../../services/component-event-bus.service';
 import { NodeAccessorService } from '../../services/node-accessor.service';
-import { ComponentNode } from '../../interfaces/node.interface';
+import { Node } from '../../interfaces/node.interface';
 
 @Directive()
 export abstract class CustomNodeComponent<T = any> implements OnInit {
@@ -14,7 +14,7 @@ export abstract class CustomNodeComponent<T = any> implements OnInit {
   /**
    * Reference to node bound to this component
    */
-  public node = input.required<ComponentNode<T>>();
+  public node = input.required<Node<T>>();
 
   /**
    * Signal with selected state of node

@@ -29,7 +29,6 @@ describe('nodes utils', () => {
         new NodeModel(
           createNode({
             id: 'group',
-            type: 'template-group',
             point: { x: 100, y: 100 },
             width: 400,
             height: 300,
@@ -43,7 +42,6 @@ describe('nodes utils', () => {
           createNode({
             id: 'child',
             parentId: 'group',
-            type: 'html-template',
 
             point: { x: 10, y: 10 },
             width: 80,
