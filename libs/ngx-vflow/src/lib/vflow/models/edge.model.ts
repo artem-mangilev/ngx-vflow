@@ -1,7 +1,6 @@
-import { computed, inject, signal } from '@angular/core';
-import { EdgeLabel, EdgeLabelPosition } from '../interfaces/edge-label.interface';
+import { TemplateRef, computed, inject, signal } from '@angular/core';
+import { EdgeLabelPosition } from '../interfaces/edge-label.interface';
 import { Edge, Curve, EDGE_DEFAULTS } from '../interfaces/edge.interface';
-import { EdgeLabelModel } from './edge-label.model';
 import { NodeModel } from './node.model';
 import { getStraightPath } from '../math/edge-path/straigh-path';
 import { getBezierPath } from '../math/edge-path/bezier-path';
@@ -20,6 +19,8 @@ import { createModelInjector } from '../utils/model-injector';
 import { Observable } from 'rxjs';
 import { DOCUMENT } from '@angular/common';
 import { getSvgPathBounds } from '../utils/svg-path-bounds';
+
+const LABEL_POSITIONS: EdgeLabelPosition[] = ['start', 'center', 'end'];
 
 export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
   private modelInjector = createModelInjector();
@@ -56,7 +57,15 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
   public floating = signal(EDGE_DEFAULTS.floating);
   public interactionWidth = signal(EDGE_DEFAULTS.interactionWidth);
   public markers = signal<{ start?: Marker; end?: Marker }>(EDGE_DEFAULTS.markers);
-  public edgeLabels = signal<{ [position in EdgeLabelPosition]?: EdgeLabel }>(EDGE_DEFAULTS.edgeLabels);
+  /** Label templates registered by `ng-template[edgeLabel]` inside the presentation of this edge. */
+  public labelTemplates = signal<Partial<Record<EdgeLabelPosition, TemplateRef<unknown>>>>({});
+  public labelEntries = computed(() => {
+    const templates = this.labelTemplates();
+    return LABEL_POSITIONS.flatMap((position) => {
+      const template = templates[position];
+      return template ? [{ position, template }] : [];
+    });
+  });
 
   public focused = signal(false);
   public reconnecting = signal(false);
@@ -231,17 +240,6 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
 
   public context: EdgeContext;
 
-  public labelModels = computed(() => {
-    const models: { [position in EdgeLabelPosition]?: EdgeLabelModel } = {};
-
-    const labels = this.edgeLabels();
-    if (labels?.start) models.start = new EdgeLabelModel(labels.start);
-    if (labels?.center) models.center = new EdgeLabelModel(labels.center);
-    if (labels?.end) models.end = new EdgeLabelModel(labels.end);
-
-    return models;
-  });
-
   constructor(public edge: Edge) {
     if (edge.curve) {
       this.curve = edge.curve;
@@ -265,10 +263,6 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
 
     if (edge.markers) {
       this.markers = edge.markers;
-    }
-
-    if (edge.edgeLabels) {
-      this.edgeLabels = edge.edgeLabels;
     }
 
     this.context = {

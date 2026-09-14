@@ -22,8 +22,9 @@ Status: in-progress (01, 02, 03 resolved)
   `selected`, `preselected`, `shouldLoad`.
 - **Handle**: элемент презентации ноды с директивой `[vflowHandle]`. Точка соединения это центр
   этого элемента. В `CONTEXT.md` термин «Handle» нужно добавить при реализации.
-- **Лейбл ребра**: `ng-template[edgeLabel]`, объявленный внутри презентации ребра и отрендеренный
-  библиотекой в HTML-слое лейблов в точке `start | center | end` пути.
+- **Лейбл ребра**: элемент с `*edgeLabel` (или `ng-template[edgeLabel]`), объявленный внутри
+  презентации ребра рядом с её `svg:g` и отрендеренный библиотекой в HTML-слое лейблов в точке
+  `start | center | end` пути.
 
 ## Решения
 
@@ -186,34 +187,60 @@ vflowBaseEdge>` (модель ng-diagram/Foblex). Требует передел�
 
 ```html
 <ng-template let-ctx edge>
-  <svg:g customEdge selectable>
+  <svg:g edgeInteraction>
     <svg:path vflowEdge [attr.d]="ctx.path()" />
-    <ng-template edgeLabel position="center">
-      <span vflowEdgeLabel>{{ ctx.data().label }}</span>
-    </ng-template>
   </svg:g>
+
+  <span *edgeLabel vflowEdgeLabel>{{ ctx.data().label }}</span>
+  <button *edgeLabel="'end'" vflowEdgeLabel (click)="remove(ctx.edge)">×</button>
 </ng-template>
 ```
 
-- `EdgeLabelTemplateDirective`, селектор `ng-template[edgeLabel]`, вход `position: 'start' |
-'center' | 'end'` (обязателен). Инжектит `EDGE_REF`-модель через `EdgeAccessorService`
-  (предоставляется в `EdgeComponent`, как `NodeAccessorService` в ноде) и регистрирует
-  `TemplateRef` в `EdgeModel.labelTemplates: signal<Partial<Record<EdgeLabelPosition, TemplateRef>>>`.
-  Снимает регистрацию на destroy. Две регистрации на одну позицию: побеждает последняя, dev-warning.
+- `EdgeLabelTemplateDirective`, селектор `ng-template[edgeLabel]`. Единственный вход `edgeLabel:
+EdgeLabelPosition` (`'start' | 'center' | 'end'`) с дефолтом `center` и `transform`, который
+  превращает пустую строку в `center`: и `*edgeLabel`, и `<ng-template edgeLabel>` ставят статический
+  атрибут со значением `''`. Отдельного входа `position` нет, потому что у микросинтаксиса одно главное
+  поле с именем селектора.
+- Две формы записи, одна механика (решено 2026-09-14). Структурная `*edgeLabel` / `*edgeLabel="'end'"`
+  для одного корневого элемента, это основной вид в документации. Длинная
+  `<ng-template edgeLabel="end">…</ng-template>` для нескольких корневых элементов. Обе
+  разворачиваются в `ng-template` с `TemplateRef`; содержимое не проецируется на месте, а рендерится в
+  слое лейблов. Значение в `*edgeLabel="'end'"` это выражение, кавычки обязательны; `*edgeLabel="end"`
+  со `strictTemplates` не компилируется, молчаливого `undefined` нет.
+- Директива инжектит `EdgeComponent` (`EDGE_REF` провайдится там же, см. D4) и в эффекте по
+  `edgeLabel()` регистрирует `TemplateRef` в `EdgeModel.labelTemplates: signal<Partial<Record<EdgeLabelPosition,
+TemplateRef>>>`, снимая регистрацию через `onCleanup` при смене позиции и на destroy. Две регистрации
+  на одну позицию: побеждает последняя, dev-warning.
+- Namespace (проверено 2026-09-14 одноразовым Karma-тестом, zoneless TestBed). Angular наследует
+  namespace родителя для детей `ng-template`: `<span>` внутри `ng-template` внутри `<svg:g>` компилируется
+  как SVG-элемент (`namespaceURI` svg, не `HTMLElement`) и в HTML-слое не рисуется; тот же `span`
+  рядом с `<svg:g>` внутри `ng-template[edge]` или `ng-container` получает HTML namespace. Библиотека
+  это на этапе компиляции не чинит. Правило для обеих форм: лейбл стоит рядом с `svg:g`, не внутри;
+  для компонентного ребра в корне шаблона компонента. Пример выше и все демо следуют правилу.
+  `div[edgeLabelHost]` после рендера проверяет `namespaceURI` первого элемента обёртки и в dev-режиме
+  предупреждает с подсказкой вынести `*edgeLabel` из svg-элемента.
+- Кривая без `labelPoints` (кастомная `CurveFactory`): лейбл не рендерится; директива при регистрации
+  даёт dev-warning.
+- Проверено 2026-09-13 одноразовым Karma-тестом: директива с селектором `ng-template[...]` получает
+  вход и из статического атрибута, и из биндинга, `inject(TemplateRef)` работает.
 - Внутренний `div[edgeLabel]` переименовывается в `div[edgeLabelHost]`, чтобы не конфликтовать.
-- Проверено 2026-09-13 одноразовым Karma-тестом в этом репозитории (zoneless TestBed): директива с
-  селектором `ng-template[...]` получает `input.required` и из статического атрибута
-  (`position="center"`), и из биндинга (`[position]="expr"`), `inject(TemplateRef)` работает.
-  Микросинтаксис `*edgeLabel` не нужен: содержимое не проецируется на месте, а рендерится в слое.
-- Слой лейблов в `vflow.component.html` итерирует `model.labelTemplates()` вместо
-  `labelModels()`. Контекст outlet пустой: шаблон замыкает `ctx` ребра или состояние компонента.
-  Инжектор outlet тот же, что у ребра.
-- Позиционирование, `visibility` по `isReady`/`reconnecting`, `zIndex = renderOrder`,
-  `pointer-events: all` на обёртке не меняются.
+  Входы: `edgeModel`, `position`, `template`, `injector`; outlet с пустым контекстом и инжектором
+  ребра. Позиционирование по `path().labelPoints[position]`, `visibility` по `isReady`/`reconnecting`,
+  `zIndex = renderOrder`, `pointer-events: all` на обёртке не меняются.
+- Слой лейблов в `vflow.component.html` итерирует записи `model.labelTemplates()` вместо трёх
+  захардкоженных блоков по `labelModels()`.
 - Удаляются: `Edge.edgeLabels`, `EDGE_DEFAULTS.edgeLabels`, `EdgeLabel`, `HtmlTemplateEdgeLabel`,
   `EdgeLabelModel`, `EdgeLabelHtmlTemplateDirective` (`ng-template[edgeLabelHtml]`),
   `HtmlEdgeLabelContext`, `contentChild(EdgeLabelHtmlTemplateDirective)`. `EdgeLabelPosition`
   остаётся публичным типом. Данные лейбла берутся из `ctx.data()`.
+- Решено при реализации 04 (2026-09-14). Отдельного входа `injector` у `div[edgeLabelHost]` нет: поиск DI идёт по
+  цепочке объявления и на каждой границе view проверяет встроенный инжектор, поэтому контент лейбла из
+  `ng-template[edge]` доходит до `EdgeComponent` через view шаблона ребра, а из компонентного ребра через хост
+  компонента. `EdgeModel.labelEntries` отдаёт зарегистрированные шаблоны в порядке `start`, `center`, `end` для слоя.
+  Мок `ngx-vflow/testing` рендерит лейбл на месте. ng-doc падает на любом слове со `*` в инлайн-коде markdown и
+  JSDoc, если для него нет страницы; структурная форма пишется только в fenced-блоках.
+- Отвергнуто (2026-09-14): `labelPoints` в `EdgeRef` для SVG-подписей через `<svg:text>`. Это второй
+  способ рендера лейблов, который пришлось бы поддерживать и документировать наравне с первым.
 - Отложено: числовая позиция `0..1` вдоль пути (ng-diagram, Foblex). Требует сэмплирования пути
   для `CurveFactory`; не входит в эту работу.
 

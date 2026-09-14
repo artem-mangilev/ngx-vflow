@@ -18,7 +18,7 @@ import { TransformNodeComponent } from './components/transform-node.component';
     <ng-template let-ctx node><docs-node [ctx]="ctx" /></ng-template>
 
     <ng-template let-ctx edge>
-      @if (ctx.edge.data?.().type === 'animated') {
+      @if (ctx.data().type === 'animated') {
         <svg:path
           class="animated-edge"
           fill="none"
@@ -29,15 +29,13 @@ import { TransformNodeComponent } from './components/transform-node.component';
       } @else {
         <svg:g docsEdge [ctx]="ctx" />
       }
-    </ng-template>
 
-    <ng-template let-ctx edgeLabelHtml>
-      @if (ctx.label.data.type === 'text') {
-        <div class="label-text">{{ ctx.label.data.text }}</div>
+      @if (ctx.data().text; as text) {
+        <div *edgeLabel class="label-text">{{ text }}</div>
       }
 
-      @if (ctx.label.data.type === 'delete') {
-        <div class="label-delete" (click)="deleteEdge(ctx.edge)">
+      @if (ctx.data().deletable) {
+        <div *edgeLabel class="label-delete" (click)="deleteEdge(ctx.edge)">
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
             <path d="M9 3L3 9M3 3L9 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
           </svg>
@@ -138,14 +136,7 @@ export class AllFeaturesDemoComponent {
         ...edges,
         createEdge({
           id,
-          edgeLabels: {
-            center: {
-              type: 'html-template',
-              data: {
-                type: 'delete',
-              },
-            },
-          },
+          data: { deletable: true },
           markers: {
             end: {
               type: 'arrow-closed',

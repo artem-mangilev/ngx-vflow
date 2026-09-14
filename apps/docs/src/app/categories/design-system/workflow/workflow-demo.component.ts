@@ -123,12 +123,14 @@ interface StepData {
                 [attr.marker-end]="ctx.markerEnd()"
                 [vflowSelected]="ctx.selected() || ctx.preselected()" />
             </svg:g>
-          </ng-template>
-          <ng-template let-ctx edgeLabelHtml>
-            @if (ctx.label.data.kind === 'meta') {
-              <span vflowEdgeLabel vflowMeta [attr.data-label]="ctx.label.data.text">{{ ctx.label.data.text }}</span>
-            } @else {
-              <span vflowEdgeLabel [attr.data-label]="ctx.label.data.text">{{ ctx.label.data.text }}</span>
+            @if (ctx.data()?.start; as text) {
+              <span *edgeLabel="'start'" vflowEdgeLabel vflowMeta [attr.data-label]="text">{{ text }}</span>
+            }
+            @if (ctx.data()?.center; as text) {
+              <span *edgeLabel vflowEdgeLabel [attr.data-label]="text">{{ text }}</span>
+            }
+            @if (ctx.data()?.end; as text) {
+              <span *edgeLabel="'end'" vflowEdgeLabel vflowMeta [attr.data-label]="text">{{ text }}</span>
             }
           </ng-template>
         </vflow>
@@ -216,11 +218,7 @@ export class WorkflowDemoComponent {
       curve: 'smooth-step',
       markers: { end: {} },
       // Labels at the start, center and end of the same edge follow its geometry.
-      edgeLabels: {
-        start: { type: 'html-template', data: { kind: 'meta', text: 'review' } },
-        center: { type: 'html-template', data: { kind: 'label', text: 'Approved' } },
-        end: { type: 'html-template', data: { kind: 'meta', text: 'accounting' } },
-      },
+      data: { start: 'review', center: 'Approved', end: 'accounting' },
     },
     {
       id: 'review-fix',
@@ -228,7 +226,7 @@ export class WorkflowDemoComponent {
       target: 'fix',
       curve: 'smooth-step',
       markers: { end: {} },
-      edgeLabels: { center: { type: 'html-template', data: { kind: 'label', text: 'Needs changes' } } },
+      data: { center: 'Needs changes' },
     },
   ]);
 

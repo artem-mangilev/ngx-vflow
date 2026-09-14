@@ -28,6 +28,11 @@ export interface EdgeContext {
 
 An edge can also be drawn by a component. Pass the component class, or a function that lazily imports it, in the `component` field of the edge. The flow creates the component on its own SVG group inside the edge SVG, so the component template is plain SVG and its selector is not used. Read the edge through `injectEdge()`, which returns the same fields as the template context. Add `EdgeInteractionDirective` to its `hostDirectives` to give the edge a hit area: the stroke goes into the component host, a click selects the edge, and host listeners and `:host(:hover)` see the whole clickable area.
 
+An edge component declares labels in its own template with the `edgeLabel` structural directive, next to its SVG
+elements, the same way as an edge template; see `*FeaturesEdgeLabels`. A label renders in the HTML label layer of the
+flow, outside the component host, so host listeners and `:host(:hover)` do not see it. Put listeners on the label
+element itself; the demo below emits the same output from a click on the line and on the label.
+
 Outputs of an edge component reach the `componentEdgeEvent` output of `vflow` with the edge id, the property name of the output and its payload. The `ComponentEdgeEvent` type narrows these events for a list of edge component classes.
 
 {{ NgDocActions.demoPane("ComponentEdgesDemoComponent") }}

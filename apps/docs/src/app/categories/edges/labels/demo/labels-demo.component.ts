@@ -1,15 +1,33 @@
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { DocsPresentations } from '@docs/shared';
-import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
+import { VflowUi } from '@vflow/ui';
+import { Edge, Node, Vflow, createEdges, createNodes } from 'ngx-vflow';
+
+interface LabelData {
+  start?: string;
+  center?: string;
+  end?: string;
+  deletable?: boolean;
+}
 
 @Component({
   template: `<vflow view="auto" [nodes]="nodes" [edges]="edges">
-    <ng-template let-ctx edge><svg:g docsEdge [ctx]="ctx" /></ng-template>
-
     <ng-template let-ctx node><docs-node [ctx]="ctx" /></ng-template>
 
-    <ng-template let-ctx edgeLabelHtml>
-      <div class="label" [style.background-color]="ctx.label.data.color" (click)="deleteEdge(ctx.edge)">Delete</div>
+    <ng-template let-ctx edge>
+      <svg:g docsEdge [ctx]="ctx" />
+
+      @if (ctx.data().start; as text) {
+        <span *edgeLabel="'start'" vflowEdgeLabel>{{ text }}</span>
+      }
+      @if (ctx.data().deletable) {
+        <button *edgeLabel class="delete" type="button" (click)="deleteEdge(ctx.edge)">Delete</button>
+      } @else if (ctx.data().center; as text) {
+        <span *edgeLabel vflowEdgeLabel>{{ text }}</span>
+      }
+      @if (ctx.data().end; as text) {
+        <span *edgeLabel="'end'" vflowEdgeLabel>{{ text }}</span>
+      }
     </ng-template>
   </vflow>`,
   styles: [
@@ -19,17 +37,19 @@ import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
         height: 100%;
       }
 
-      .label {
+      .delete {
         width: 60px;
         height: 25px;
-        background-color: #122c26;
+        border: none;
         border-radius: 5px;
-        text-align: center;
+        background-color: #122c26;
+        color: white;
+        cursor: pointer;
       }
     `,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DocsPresentations, Vflow],
+  imports: [DocsPresentations, Vflow, VflowUi],
 })
 export class LabelsDemoComponent {
   public nodes: Node[] = createNodes([
@@ -50,42 +70,24 @@ export class LabelsDemoComponent {
     },
   ]);
 
-  public edges: Edge[] = [
+  public edges: Edge<LabelData>[] = createEdges<LabelData>([
     {
       id: '1 -> 2',
       source: '1',
       target: '2',
-      curve: signal('smooth-step'),
-      edgeLabels: signal({
-        start: {
-          type: 'html-template',
-          data: 'Start',
-        },
-        center: {
-          type: 'html-template',
-          data: { color: '#122c26' },
-        },
-        end: {
-          type: 'html-template',
-          data: 'End',
-        },
-      }),
+      curve: 'smooth-step',
+      data: { start: 'Start', deletable: true, end: 'End' },
     },
     {
       id: '1 -> 3',
       source: '1',
       target: '3',
-      curve: signal('smooth-step'),
-      edgeLabels: signal({
-        center: {
-          type: 'html-template',
-          data: 'Center Only',
-        },
-      }),
+      curve: 'smooth-step',
+      data: { center: 'Center Only' },
     },
-  ];
+  ]);
 
-  public deleteEdge(edge: Edge) {
+  public deleteEdge(edge: Edge<LabelData>) {
     this.edges = this.edges.filter((e) => e !== edge);
   }
 }

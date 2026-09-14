@@ -6,7 +6,6 @@ import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
   template: `<vflow [nodes]="nodes" [edges]="edges" [view]="[600, 600]">
     <ng-template let-ctx node><docs-node [ctx]="ctx" /></ng-template>
     <ng-template let-ctx edge><svg:g docsEdge [ctx]="ctx" /></ng-template>
-    <ng-template let-ctx edgeLabelHtml><docs-edge-label [ctx]="ctx" /></ng-template>
   </vflow>`,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [DocsPresentations, Vflow],

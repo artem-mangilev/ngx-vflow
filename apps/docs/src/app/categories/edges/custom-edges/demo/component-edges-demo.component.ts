@@ -1,22 +1,32 @@
 import { ChangeDetectionStrategy, Component, output, signal } from '@angular/core';
 import { DocsPresentations } from '@docs/shared';
+import { VflowUi } from '@vflow/ui';
 import { ComponentEdgeEvent, Edge, EdgeInteractionDirective, Node, Vflow, createNodes, injectEdge } from 'ngx-vflow';
 
 interface ColoredEdgeData {
   color: string;
+  label: string;
 }
 
 /**
  * An edge drawn by a component. The flow renders it on its own SVG group; the host directive moves the interaction
  * stroke into that group, so host listeners and `:host(:hover)` react to the whole clickable area.
+ *
+ * The label is declared next to the path and renders in the HTML label layer of the flow. Its clicks do not reach the
+ * host, so the label emits the output itself.
  */
 @Component({
   selector: 'g[docsColoredEdge]',
   hostDirectives: [EdgeInteractionDirective],
+  imports: [Vflow, VflowUi],
   host: { '(click)': 'picked.emit(ctx.edge.id)' },
   styles: `
     :host(:hover) .line {
       stroke-width: 5px;
+    }
+
+    .label {
+      cursor: pointer;
     }
   `,
   template: `
@@ -27,6 +37,14 @@ interface ColoredEdgeData {
       [attr.d]="ctx.path()"
       [attr.stroke]="ctx.selected() ? '#0f4c75' : ctx.data().color"
       [attr.marker-end]="ctx.markerEnd()" />
+    <span
+      *edgeLabel
+      vflowEdgeLabel
+      class="label"
+      [style.border-color]="ctx.data().color"
+      (click)="picked.emit(ctx.edge.id)">
+      {{ ctx.data().label }}
+    </span>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -75,7 +93,7 @@ export class ComponentEdgesDemoComponent {
       source: '1',
       target: '2',
       component: ColoredEdgeComponent,
-      data: signal<ColoredEdgeData>({ color: '#e0a100' }),
+      data: signal<ColoredEdgeData>({ color: '#e0a100', label: 'Amber' }),
       markers: signal({ end: { type: 'arrow-closed' } }),
     },
     {
@@ -83,7 +101,7 @@ export class ComponentEdgesDemoComponent {
       source: '1',
       target: '3',
       component: ColoredEdgeComponent,
-      data: signal<ColoredEdgeData>({ color: '#ec586e' }),
+      data: signal<ColoredEdgeData>({ color: '#ec586e', label: 'Rose' }),
     },
   ];
 

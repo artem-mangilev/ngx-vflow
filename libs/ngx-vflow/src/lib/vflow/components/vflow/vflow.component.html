@@ -66,35 +66,16 @@
         }
       </div>
 
-      <!-- HTML edge labels -->
+      <!-- HTML edge labels declared by ng-template[edgeLabel] inside edge presentations -->
       <div class="vflow-edge-labels-layer">
         @for (model of orderedEdges(); track trackEdges($index, model)) {
-          @if (model.labelModels().start; as label) {
+          @for (label of model.labelEntries(); track label.position) {
             <div
-              edgeLabel
-              position="start"
-              [model]="label"
+              edgeLabelHost
+              [position]="label.position"
+              [template]="label.template"
               [edgeModel]="model"
-              [viewportVisibility]="model"
-              [htmlTemplate]="edgeLabelHtmlDirective()?.templateRef"></div>
-          }
-          @if (model.labelModels().center; as label) {
-            <div
-              edgeLabel
-              position="center"
-              [model]="label"
-              [edgeModel]="model"
-              [viewportVisibility]="model"
-              [htmlTemplate]="edgeLabelHtmlDirective()?.templateRef"></div>
-          }
-          @if (model.labelModels().end; as label) {
-            <div
-              edgeLabel
-              position="end"
-              [model]="label"
-              [edgeModel]="model"
-              [viewportVisibility]="model"
-              [htmlTemplate]="edgeLabelHtmlDirective()?.templateRef"></div>
+              [viewportVisibility]="model"></div>
           }
         }
       </div>

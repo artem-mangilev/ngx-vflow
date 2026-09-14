@@ -1,6 +1,5 @@
 <vflow view="auto" [minZoom]="0.1" [nodes]="nodes()" [edges]="edges()" (nodesChanges.add)="fitView()">
   <ng-template let-ctx edge><svg:g docsEdge [ctx]="ctx" /></ng-template>
-  <ng-template let-ctx edgeLabelHtml><docs-edge-label [ctx]="ctx" /></ng-template>
 
   <ng-template let-ctx node>
     <div class="custom-node" [style.background-color]="ctx.data().color" (click)="onNodeClick(ctx.node)">

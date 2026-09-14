@@ -67,7 +67,8 @@ Ports mirror two independent facts: `vflowPortState` is core feedback for the co
 
 `vflowEdge` styles the visible SVG path of an edge; routing, hit targets and markers stay in core,
 so attach `markers` in edge data and bind `ctx.markerEnd()`. Labels at `start`, `center` and `end` positions
-come from core `edgeLabels`; `vflowEdgeLabel` is their surface and can hold `vflowActions` with native buttons.
+are declared with the core `edgeLabel` structural directive inside the edge template; `vflowEdgeLabel` is their surface and can hold
+`vflowActions` with native buttons.
 
 ### Viewport controls
 

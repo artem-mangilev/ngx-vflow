@@ -20,25 +20,24 @@ import { FlowStatusService } from './services/flow-status.service';
 import { ConnectionControllerDirective } from './directives/connection-controller.directive';
 import { HandleComponent } from './public-components/handle/handle.component';
 import { EdgeLabelComponent } from './components/edge-label/edge-label.component';
-import { EdgeLabelModel } from './models/edge-label.model';
 import { ConnectionModel } from './models/connection.model';
 import { VflowComponent } from './components/vflow/vflow.component';
 
-/** Labels render only through a consumer template; this host supplies a minimal one. */
+/** Labels render a template declared by the edge presentation; this host supplies a minimal one. */
 @Component({
   imports: [EdgeLabelComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <ng-template #label let-ctx
-      ><span>{{ ctx.label.data }}</span></ng-template
+    <ng-template #label
+      ><span>{{ text() }}</span></ng-template
     >
-    @if (model && edge) {
-      <div edgeLabel position="center" [model]="model" [edgeModel]="edge" [htmlTemplate]="label"></div>
+    @if (edge) {
+      <div edgeLabelHost position="center" [edgeModel]="edge" [template]="label"></div>
     }
   `,
 })
 class LabelHostComponent {
-  model?: EdgeLabelModel;
+  text = signal('');
   edge?: EdgeModel;
 }
 
@@ -89,7 +88,7 @@ describe('Graph rendering and interaction regressions', () => {
     document.body.append(container);
     container.append(fixture.nativeElement);
     for (const text of ['Short', 'A significantly wider label that changed within one frame']) {
-      fixture.componentInstance.model = new EdgeLabelModel({ type: 'html-template', data: text });
+      fixture.componentInstance.text.set(text);
       fixture.detectChanges();
       const origin = container.getBoundingClientRect();
       const rect = fixture.nativeElement.querySelector('.edge-label-wrapper').getBoundingClientRect();

@@ -5,8 +5,8 @@ Type: task
 Blocked by: 04, 06
 
 - `apps/docs/src/app/shared/flow-presentations.ts`: `DocsGroupComponent` сливается в `DocsNodeComponent`
-  веткой по `ctx.data().type === 'group'`; `docs-edge` объявляет `<ng-template edgeLabel
-position="center">` с `ctx.data().label`; удалить `DocsEdgeLabelComponent`; handle через
+  веткой по `ctx.data().type === 'group'`; `docs-edge` объявляет
+  `<span *edgeLabel vflowEdgeLabel>` с `ctx.data().label` рядом с путём, не внутри `svg:g`; удалить `DocsEdgeLabelComponent`; handle через
   `<span vflowHandle="…" position="…" vflowPort>`.
 - Все демо (список файлов в `grep -rl "groupNode\|nodeHtml\|edgeLabelHtml\|<handle\|template-group\|html-template\|CustomNodeComponent\|customTemplateEdge" apps/docs/src`):
   убрать `type`, `groupNode`, `edgeLabelHtml`; `nodeHtml` → `node`; `edgeLabels` → `data.label`;

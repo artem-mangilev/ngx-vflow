@@ -193,9 +193,9 @@ type MapData = Person | Metric | Note | Team;
               [attr.marker-end]="ctx.markerEnd()"
               [vflowSelected]="ctx.selected() || ctx.preselected()" />
           </svg:g>
-        </ng-template>
-        <ng-template let-ctx edgeLabelHtml>
-          <span vflowEdgeLabel>{{ ctx.label.data }}</span>
+          @if (ctx.data()?.label; as label) {
+            <span *edgeLabel vflowEdgeLabel>{{ label }}</span>
+          }
         </ng-template>
       </vflow>
       <ng-template #port let-ctx handle
@@ -250,7 +250,7 @@ export class RelationshipsDemoComponent {
       target: 'growth',
       curve: 'smooth-step',
       markers: { end: {} },
-      edgeLabels: { center: { type: 'html-template', data: '3 shared services' } },
+      data: { label: '3 shared services' },
     },
     review('ana-ben', 'ana', 'ben', 'reviews'),
     review('ben-chi', 'ben', 'chi', 'pairs with'),
@@ -296,6 +296,6 @@ function review(id: string, source: string, target: string, text: string) {
     target,
     curve: 'bezier' as const,
     markers: { end: {} },
-    edgeLabels: { center: { type: 'html-template' as const, data: text } },
+    data: { label: text },
   };
 }

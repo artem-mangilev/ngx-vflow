@@ -24,7 +24,6 @@ import { Edge } from '../../interfaces/edge.interface';
 import { EdgeModel } from '../../models/edge.model';
 import {
   ConnectionTemplateDirective,
-  EdgeLabelHtmlTemplateDirective,
   EdgeTemplateDirective,
   NodeTemplateDirective,
 } from '../../directives/template.directive';
@@ -460,8 +459,6 @@ export class VflowComponent {
   protected nodeTemplateDirective = contentChild(NodeTemplateDirective);
 
   protected edgeTemplateDirective = contentChild(EdgeTemplateDirective);
-
-  protected edgeLabelHtmlDirective = contentChild(EdgeLabelHtmlTemplateDirective);
 
   protected connectionTemplateDirective = contentChild(ConnectionTemplateDirective);
   // #endregion

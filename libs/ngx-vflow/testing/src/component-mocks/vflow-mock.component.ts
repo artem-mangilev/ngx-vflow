@@ -34,7 +34,6 @@ import {
 import { toObservable } from '@angular/core/rxjs-interop';
 import {
   ConnectionTemplateMockDirective,
-  EdgeLabelHtmlTemplateMockDirective,
   EdgeTemplateMockDirective,
   NodeTemplateMockDirective,
 } from '../directive-mocks/template-mock.directive';
@@ -70,45 +69,13 @@ import { AsInterface } from '../types';
           [ngTemplateOutletContext]="{
             $implicit: {
               edge: edge,
+              data: edge.data ?? createSignal({}),
               selected: createSignal(false),
               path: createSignal(''),
               markerStart: createSignal(''),
               markerEnd: createSignal(''),
             },
           }" />
-
-        @if (edge.edgeLabels?.()?.start; as label) {
-          <ng-component
-            [ngTemplateOutlet]="edgeLabelHtmlDirective()?.templateRef ?? null"
-            [ngTemplateOutletContext]="{
-              $implicit: {
-                edge: edge,
-                label,
-              },
-            }" />
-        }
-
-        @if (edge.edgeLabels?.()?.center; as label) {
-          <ng-component
-            [ngTemplateOutlet]="edgeLabelHtmlDirective()?.templateRef ?? null"
-            [ngTemplateOutletContext]="{
-              $implicit: {
-                edge: edge,
-                label,
-              },
-            }" />
-        }
-
-        @if (edge.edgeLabels?.()?.end; as label) {
-          <ng-component
-            [ngTemplateOutlet]="edgeLabelHtmlDirective()?.templateRef ?? null"
-            [ngTemplateOutletContext]="{
-              $implicit: {
-                edge: edge,
-                label,
-              },
-            }" />
-        }
       }
     }
 
@@ -211,8 +178,6 @@ export class VflowMockComponent implements AsInterface<VflowComponent>, OnInit {
   protected nodeTemplateDirective = contentChild(NodeTemplateMockDirective);
 
   protected edgeTemplateDirective = contentChild(EdgeTemplateMockDirective);
-
-  protected edgeLabelHtmlDirective = contentChild(EdgeLabelHtmlTemplateMockDirective);
 
   protected connectionTemplateDirective = contentChild(ConnectionTemplateMockDirective);
 

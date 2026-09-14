@@ -45,10 +45,7 @@ import { VflowMocks } from './vflow-mocks';
 
       <ng-template let-ctx edge>
         <svg:path fill="none" [attr.d]="ctx.path()" [attr.stroke-width]="4" [attr.marker-end]="ctx.markerEnd()" />
-      </ng-template>
-
-      <ng-template let-ctx edgeLabelHtml>
-        <div>{{ ctx.edge.id }}</div>
+        <div *edgeLabel="'start'">{{ ctx.edge.id }}</div>
       </ng-template>
 
       <ng-template let-ctx connection>
@@ -82,11 +79,6 @@ class VflowWrapperComponent {
       id: '1',
       source: '1',
       target: '2',
-      edgeLabels: {
-        start: {
-          type: 'html-template',
-        },
-      },
     },
   ]);
 

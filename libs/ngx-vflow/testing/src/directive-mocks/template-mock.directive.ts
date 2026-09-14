@@ -1,7 +1,8 @@
-import { Directive, TemplateRef, inject } from '@angular/core';
+import { Directive, TemplateRef, ViewContainerRef, inject, input } from '@angular/core';
 import type {
   ConnectionTemplateDirective,
-  EdgeLabelHtmlTemplateDirective,
+  EdgeLabelPosition,
+  EdgeLabelTemplateDirective,
   EdgeTemplateDirective,
   HandleContext,
   HandleTemplateDirective,
@@ -25,12 +26,19 @@ export class ConnectionTemplateMockDirective implements AsInterface<ConnectionTe
   public templateRef = inject(TemplateRef);
 }
 
+/** Renders the label in place, next to the edge presentation that declares it. */
 @Directive({
   standalone: true,
-  selector: 'ng-template[edgeLabelHtml]',
+  selector: 'ng-template[edgeLabel]',
 })
-export class EdgeLabelHtmlTemplateMockDirective implements AsInterface<EdgeLabelHtmlTemplateDirective> {
-  public templateRef = inject(TemplateRef);
+export class EdgeLabelTemplateMockDirective implements AsInterface<EdgeLabelTemplateDirective> {
+  public edgeLabel = input<EdgeLabelPosition, EdgeLabelPosition | '' | null | undefined>('center', {
+    transform: (position) => position || 'center',
+  });
+
+  constructor() {
+    inject(ViewContainerRef).createEmbeddedView(inject(TemplateRef));
+  }
 }
 
 @Directive({

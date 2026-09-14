@@ -28,8 +28,6 @@ import { Vflow, createEdges, createNodes } from 'ngx-vflow';
         [selectionMode]="manual() ? 'manual' : 'default'"
         [optimization]="{ detachedGroupsLayer: true }"
         [ariaLabelConfig]="{ flowLabel: 'Keyboard graph' }">
-        <ng-template let-ctx edgeLabelHtml><docs-edge-label [ctx]="ctx" /></ng-template>
-
         <ng-template let-ctx node>
           @if (ctx.node.id === 'editor') {
             <div class="editor">

@@ -21,7 +21,6 @@ import {
     (reconnect)="reconnect($event)">
     <ng-template let-ctx node><docs-node [ctx]="ctx" /></ng-template>
     <ng-template let-ctx edge><svg:g docsEdge [ctx]="ctx" /></ng-template>
-    <ng-template let-ctx edgeLabelHtml><docs-edge-label [ctx]="ctx" /></ng-template>
   </vflow> `,
   styles: [
     `
@@ -64,24 +63,14 @@ export class ReconnectionDemoComponent {
       source: '1',
       target: '2',
       reconnectable: signal(true),
-      edgeLabels: signal({
-        center: {
-          type: 'html-template',
-          data: 'Reconnectable from both sides',
-        },
-      }),
+      data: signal({ label: 'Reconnectable from both sides' }),
     },
     {
       id: '3 -> 4',
       source: '3',
       target: '4',
       reconnectable: signal('source'),
-      edgeLabels: signal({
-        center: {
-          type: 'html-template',
-          data: 'Reconnectable only from source side',
-        },
-      }),
+      data: signal({ label: 'Reconnectable only from source side' }),
     },
   ];
 

@@ -122,9 +122,9 @@ type Flow = 'sequence' | 'message' | 'association';
               [attr.marker-end]="ctx.markerEnd()"
               [vflowSelected]="ctx.selected() || ctx.preselected()" />
           </svg:g>
-        </ng-template>
-        <ng-template let-ctx edgeLabelHtml>
-          <span vflowEdgeLabel>{{ ctx.label.data }}</span>
+          @if (ctx.data()?.label; as label) {
+            <span *edgeLabel vflowEdgeLabel>{{ label }}</span>
+          }
         </ng-template>
       </vflow>
       <ng-template #port let-ctx handle><span vflowPort [vflowPortState]="ctx.state()"></span></ng-template>
@@ -171,11 +171,11 @@ export class BpmnDemoComponent {
     element('end', { x: 760, y: 30 }, 'finance', 'end', 'Paid'),
     element('notify', { x: 820, y: 118 }, 'finance', 'task', 'Notify supplier'),
   ]);
-  readonly edges = createEdges([
+  readonly edges = createEdges<{ flow: Flow; label?: string }>([
     sequence('start-validate', 'start', 'validate'),
     sequence('validate-decision', 'validate', 'decision'),
-    { ...sequence('decision-timer', 'decision', 'timer', 'yes'), edgeLabels: label('Yes') },
-    { ...sequence('decision-review', 'decision', 'review', 'no'), edgeLabels: label('No') },
+    sequence('decision-timer', 'decision', 'timer', 'yes', 'Yes'),
+    sequence('decision-review', 'decision', 'review', 'no', 'No'),
     sequence('timer-pay', 'timer', 'pay'),
     sequence('review-pay', 'review', 'pay'),
     sequence('pay-split', 'pay', 'split'),
@@ -218,7 +218,7 @@ function element(id: string, point: { x: number; y: number }, parentId: string, 
   return { id, point, parentId, ariaLabel: `${kind}: ${title}`, data: { kind, title } };
 }
 
-function sequence(id: string, source: string, target: string, sourceHandle?: string) {
+function sequence(id: string, source: string, target: string, sourceHandle?: string, label?: string) {
   return {
     id,
     source,
@@ -226,7 +226,7 @@ function sequence(id: string, source: string, target: string, sourceHandle?: str
     sourceHandle,
     curve: 'smooth-step' as const,
     markers: { end: { type: 'arrow-closed' as const } },
-    data: { flow: 'sequence' as Flow },
+    data: { flow: 'sequence' as Flow, label },
   };
 }
 
@@ -239,11 +239,6 @@ function message(id: string, source: string, sourceHandle: string, target: strin
     targetHandle,
     curve: 'smooth-step' as const,
     markers: { end: { type: 'arrow' as const } },
-    edgeLabels: label(text),
-    data: { flow: 'message' as Flow },
+    data: { flow: 'message' as Flow, label: text },
   };
-}
-
-function label(text: string) {
-  return { center: { type: 'html-template' as const, data: text } };
 }

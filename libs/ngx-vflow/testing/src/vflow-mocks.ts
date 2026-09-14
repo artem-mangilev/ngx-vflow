@@ -9,7 +9,7 @@ import { SelectableMockDirective } from './directive-mocks/selectable-mock.direc
 import { EdgeInteractionMockDirective } from './directive-mocks/edge-interaction-mock.directive';
 import {
   ConnectionTemplateMockDirective,
-  EdgeLabelHtmlTemplateMockDirective,
+  EdgeLabelTemplateMockDirective,
   EdgeTemplateMockDirective,
   HandleTemplateMockDirective,
   NodeTemplateMockDirective,
@@ -27,7 +27,7 @@ export const VflowMocks = [
   ConnectionControllerMockDirective,
 
   NodeTemplateMockDirective,
-  EdgeLabelHtmlTemplateMockDirective,
+  EdgeLabelTemplateMockDirective,
   EdgeTemplateMockDirective,
   ConnectionTemplateMockDirective,
   HandleTemplateMockDirective,

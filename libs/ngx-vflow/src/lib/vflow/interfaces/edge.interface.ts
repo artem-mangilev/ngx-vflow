@@ -1,7 +1,6 @@
 import { signal, WritableSignal } from '@angular/core';
 import { Connection } from './connection.interface';
 import { CurveFactory } from './curve-factory.interface';
-import { EdgeLabel, EdgeLabelPosition } from './edge-label.interface';
 import { Marker } from './marker.interface';
 import { UnwrapSignal } from '../types/unwrap-signal.type';
 import { isDefined } from '../utils/is-defined';
@@ -11,7 +10,6 @@ import { EntityComponentType } from './node.interface';
 export const EDGE_DEFAULTS = {
   curve: 'bezier' as Curve,
   data: {},
-  edgeLabels: {},
   markers: {},
   reconnectable: false,
   floating: false,
@@ -27,7 +25,6 @@ export interface Edge<T = unknown> extends Connection {
   component?: EntityComponentType;
   curve?: WritableSignal<Curve>;
   data?: WritableSignal<T>;
-  edgeLabels?: WritableSignal<{ [position in EdgeLabelPosition]?: EdgeLabel }>;
   markers?: WritableSignal<{
     start?: Marker;
     end?: Marker;
@@ -76,7 +73,6 @@ export function createEdge<T>(
       ...(isDefined(edge.component) ? { component: edge.component } : {}),
       curve: signal(isDefined(edge.curve) ? edge.curve : EDGE_DEFAULTS.curve),
       data: signal(isDefined(edge.data) ? edge.data : EDGE_DEFAULTS.data) as WritableSignal<T>,
-      edgeLabels: signal(isDefined(edge.edgeLabels) ? edge.edgeLabels : EDGE_DEFAULTS.edgeLabels),
       markers: signal(isDefined(edge.markers) ? edge.markers : EDGE_DEFAULTS.markers),
       reconnectable: signal(isDefined(edge.reconnectable) ? edge.reconnectable : EDGE_DEFAULTS.reconnectable),
       floating: signal(isDefined(edge.floating) ? edge.floating : EDGE_DEFAULTS.floating),
@@ -100,7 +96,6 @@ export function createEdge<T>(
       ...(isDefined(edge.component) ? { component: edge.component } : {}),
       curve: isDefined(edge.curve) ? signal(edge.curve) : undefined,
       data: isDefined(edge.data) ? (signal(edge.data) as WritableSignal<T>) : undefined,
-      edgeLabels: isDefined(edge.edgeLabels) ? signal(edge.edgeLabels) : undefined,
       markers: isDefined(edge.markers) ? signal(edge.markers) : undefined,
       reconnectable: isDefined(edge.reconnectable) ? signal(edge.reconnectable) : undefined,
       floating: isDefined(edge.floating) ? signal(edge.floating) : undefined,

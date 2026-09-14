@@ -8,7 +8,7 @@ template you provide. Pass a `nodes` array and an `<ng-template nodeHtml>` to `v
 `ctx.selected()` and `ctx.preselected()`.
 
 The documentation demos share a few small presentation components built on `@vflow/ui`
-(`docs-node`, `docs-group`, `docs-edge`, `docs-edge-label`), so each feature page can focus on its feature.
+(`docs-node`, `docs-group`, `docs-edge`), so each feature page can focus on its feature.
 Copy them or write your own; see `*FeaturesCustomNodes` for templates and components.
 
 {{ NgDocActions.demoPane("DefaultNodesDemoComponent") }}

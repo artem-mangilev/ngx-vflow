@@ -12,6 +12,15 @@ import { FlowStatusService } from './services/flow-status.service';
 import { HandleComponent } from './public-components/handle/handle.component';
 import { MiniMapComponent } from './public-components/minimap/minimap.component';
 import { NodeToolbarComponent } from './public-components/node-toolbar/node-toolbar.component';
+import { EdgeLabelTemplateDirective } from './directives/template.directive';
+
+/** An edge presentation that declares a center label, so the flow renders it in the label layer. */
+@Component({
+  template: `<span *edgeLabel>Label</span>`,
+  imports: [EdgeLabelTemplateDirective],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+class LabelEdgeComponent {}
 
 @Component({
   template: `<div [style.width.px]="width()" [style.height.px]="height()">
@@ -117,7 +126,7 @@ describe('CSS viewport virtualization', () => {
         id: 'edge',
         source: '0',
         target: '1',
-        edgeLabels: { center: { type: 'html-template', data: 'Label' } },
+        component: LabelEdgeComponent,
       }),
     ]);
     fixture.componentRef.setInput('autoPan', false);
@@ -127,7 +136,7 @@ describe('CSS viewport virtualization', () => {
     const edgeModel = fixture.debugElement.injector.get(FlowEntitiesService).edges()[0];
     const edge = { getAttribute: (name: string) => (name === 'd' ? edgeModel.path().path : null) };
     const oldPath = edge.getAttribute('d');
-    const label = fixture.nativeElement.querySelector('[edgeLabel]') as HTMLElement;
+    const label = fixture.nativeElement.querySelector('[edgeLabelHost]') as HTMLElement;
     const oldLabelTransform = label.style.transform;
     const toolbar = fixture.nativeElement.querySelector('.vflow-toolbar') as HTMLElement;
     const oldToolbarX = toolbar.getBoundingClientRect().x;
@@ -180,7 +189,7 @@ describe('CSS viewport virtualization', () => {
         id: 'edge',
         source: '0',
         target: '1',
-        edgeLabels: { center: { type: 'html-template', data: 'Label' } },
+        component: LabelEdgeComponent,
       }),
     ]);
     await settle(fixture);
@@ -201,7 +210,7 @@ describe('CSS viewport virtualization', () => {
     const edgeHost = fixture.nativeElement.querySelector('svg[edge]') as SVGElement;
     expect(edgeHost.getAttribute('aria-label')).toBe(edge.accessibility().label);
     expect(edgeHost.style.zIndex).toBe(String(edge.renderOrder()));
-    expect(fixture.nativeElement.querySelector('[edgeLabel]').style.zIndex).toBe(String(edge.renderOrder()));
+    expect(fixture.nativeElement.querySelector('[edgeLabelHost]').style.zIndex).toBe(String(edge.renderOrder()));
     expect(trackNodes).not.toHaveBeenCalled();
     expect(trackEdges).not.toHaveBeenCalled();
   });

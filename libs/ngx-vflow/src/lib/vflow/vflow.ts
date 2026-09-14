@@ -11,7 +11,7 @@ import { SelectableDirective } from './directives/selectable.directive';
 import { EdgeInteractionDirective } from './directives/edge-interaction.directive';
 import {
   ConnectionTemplateDirective,
-  EdgeLabelHtmlTemplateDirective,
+  EdgeLabelTemplateDirective,
   EdgeTemplateDirective,
   HandleTemplateDirective,
   NodeTemplateDirective,
@@ -39,7 +39,7 @@ export const Vflow = [
   ConnectionControllerDirective,
 
   NodeTemplateDirective,
-  EdgeLabelHtmlTemplateDirective,
+  EdgeLabelTemplateDirective,
   EdgeTemplateDirective,
   ConnectionTemplateDirective,
   HandleTemplateDirective,

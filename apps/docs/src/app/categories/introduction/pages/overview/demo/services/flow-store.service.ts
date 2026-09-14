@@ -63,15 +63,7 @@ export class FlowStoreService {
         source: 'trigger',
         target: 'data',
         curve: 'smooth-step',
-        edgeLabels: {
-          center: {
-            type: 'html-template',
-            data: {
-              type: 'text',
-              text: 'Smooth Step Edge',
-            },
-          },
-        },
+        data: { text: 'Smooth Step Edge' },
       },
       {
         id: 'data->transform-1',
@@ -79,18 +71,7 @@ export class FlowStoreService {
         target: 'transform',
         targetHandle: 'input-1',
         curve: 'bezier',
-        edgeLabels: {
-          center: {
-            type: 'html-template',
-            data: {
-              type: 'text',
-              text: 'Animated Edge',
-            },
-          },
-        },
-        data: {
-          type: 'animated',
-        },
+        data: { type: 'animated', text: 'Animated Edge' },
       },
       {
         id: 'transform->output-size-width',
@@ -98,14 +79,7 @@ export class FlowStoreService {
         sourceHandle: 'output-1',
         target: 'output-size',
         targetHandle: 'width',
-        edgeLabels: {
-          center: {
-            type: 'html-template',
-            data: {
-              type: 'delete',
-            },
-          },
-        },
+        data: { deletable: true },
         markers: {
           end: {
             type: 'arrow-closed',
@@ -118,14 +92,7 @@ export class FlowStoreService {
         sourceHandle: 'output-1',
         target: 'output-size',
         targetHandle: 'height',
-        edgeLabels: {
-          center: {
-            type: 'html-template',
-            data: {
-              type: 'delete',
-            },
-          },
-        },
+        data: { deletable: true },
         markers: {
           end: {
             type: 'arrow-closed',
@@ -138,14 +105,7 @@ export class FlowStoreService {
         sourceHandle: 'output-1',
         target: 'output-position',
         targetHandle: 'x',
-        edgeLabels: {
-          center: {
-            type: 'html-template',
-            data: {
-              type: 'delete',
-            },
-          },
-        },
+        data: { deletable: true },
         markers: {
           end: {
             type: 'arrow-closed',
@@ -158,14 +118,7 @@ export class FlowStoreService {
         sourceHandle: 'output-1',
         target: 'output-position',
         targetHandle: 'y',
-        edgeLabels: {
-          center: {
-            type: 'html-template',
-            data: {
-              type: 'delete',
-            },
-          },
-        },
+        data: { deletable: true },
         markers: {
           end: {
             type: 'arrow-closed',

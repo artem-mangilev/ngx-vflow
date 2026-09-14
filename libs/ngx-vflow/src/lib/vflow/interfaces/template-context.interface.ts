@@ -1,7 +1,5 @@
 import { Signal } from '@angular/core';
 
-import { Edge } from './edge.interface';
-import { HtmlTemplateEdgeLabel } from './edge-label.interface';
 import { HandleState } from '../models/handle.model';
 import { NodeRef } from '../utils/inject-node';
 import { EdgeRef } from '../utils/inject-edge';
@@ -18,13 +16,6 @@ export interface ConnectionContext {
   $implicit: {
     path: Signal<string | null>;
     marker: Signal<string>;
-  };
-}
-
-export interface HtmlEdgeLabelContext {
-  $implicit: {
-    edge: Edge<any>;
-    label: HtmlTemplateEdgeLabel<any>;
   };
 }
 

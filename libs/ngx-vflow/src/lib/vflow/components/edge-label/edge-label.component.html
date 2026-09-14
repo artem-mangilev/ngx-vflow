@@ -1,11 +1,5 @@
 @if (point()) {
-  @if (model(); as model) {
-    @if (model.edgeLabel.type === 'html-template' && htmlTemplate()) {
-      @if (htmlTemplate(); as htmlTemplate) {
-        <div class="edge-label-wrapper">
-          <ng-container *ngTemplateOutlet="htmlTemplate; context: getLabelContext()" />
-        </div>
-      }
-    }
-  }
+  <div #wrapper class="edge-label-wrapper">
+    <ng-container [ngTemplateOutlet]="template()" />
+  </div>
 }

@@ -1,21 +1,28 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  ElementRef,
+  TemplateRef,
+  afterRenderEffect,
   computed,
   effect,
-  ElementRef,
   inject,
   input,
-  TemplateRef,
+  isDevMode,
+  viewChild,
 } from '@angular/core';
-import { EdgeLabelModel } from '../../models/edge-label.model';
-import { EdgeModel } from '../../models/edge.model';
 import { NgTemplateOutlet } from '@angular/common';
-import { HtmlEdgeLabelContext } from '../../interfaces/template-context.interface';
-import { EdgeLabelPosition, HtmlTemplateEdgeLabel } from '../../interfaces/edge-label.interface';
+import { EdgeModel } from '../../models/edge.model';
+import { EdgeLabelPosition } from '../../interfaces/edge-label.interface';
 
+const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
+
+/**
+ * Renders one `ng-template[edgeLabel]` of an edge in the HTML label layer at its point of the path. The template has
+ * no context: it closes over the edge presentation that declares it and resolves the edge through that declaration.
+ */
 @Component({
-  selector: 'div[edgeLabel]',
+  selector: 'div[edgeLabelHost]',
   templateUrl: './edge-label.component.html',
   styles: [
     `
@@ -44,16 +51,16 @@ import { EdgeLabelPosition, HtmlTemplateEdgeLabel } from '../../interfaces/edge-
 })
 export class EdgeLabelComponent {
   private element = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
-  // TODO: too many inputs
-  public model = input.required<EdgeLabelModel>();
 
   public edgeModel = input.required<EdgeModel>();
 
   public position = input.required<EdgeLabelPosition>();
 
+  public template = input.required<TemplateRef<unknown>>();
+
   protected point = computed(() => this.edgeModel().path().labelPoints?.[this.position()]);
 
-  public htmlTemplate = input<TemplateRef<any>>();
+  private wrapper = viewChild<ElementRef<HTMLElement>>('wrapper');
 
   constructor() {
     effect(() => {
@@ -63,15 +70,22 @@ export class EdgeLabelComponent {
       const point = this.point();
       this.element.style.transform = point ? `translate(${point.x}px, ${point.y}px)` : '';
     });
-  }
 
-  // TODO: move to model with Contextable interface
-  protected getLabelContext(): HtmlEdgeLabelContext {
-    return {
-      $implicit: {
-        edge: this.edgeModel().edge,
-        label: this.model().edgeLabel as HtmlTemplateEdgeLabel,
-      },
-    };
+    if (isDevMode()) {
+      let warned = false;
+      afterRenderEffect(() => {
+        this.template();
+        const first = this.wrapper()?.nativeElement.firstElementChild;
+        if (warned || first?.namespaceURI !== SVG_NAMESPACE) {
+          return;
+        }
+        warned = true;
+        console.warn(
+          `[ngx-vflow] The "${this.position()}" label of edge "${this.edgeModel().edge.id}" was compiled in the SVG ` +
+            'namespace and does not render. Declare *edgeLabel next to the SVG presentation of the edge, ' +
+            'not inside an svg:* element.',
+        );
+      });
+    }
   }
 }

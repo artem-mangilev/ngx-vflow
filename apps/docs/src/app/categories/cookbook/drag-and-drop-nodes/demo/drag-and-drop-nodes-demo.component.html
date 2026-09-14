@@ -12,8 +12,6 @@
   (dndDrop)="createNode($event)"
   (connect)="connect($event)"
   (nodesChanges.position)="onPositionChange()">
-  <ng-template let-ctx edgeLabelHtml><docs-edge-label [ctx]="ctx" /></ng-template>
-
   <ng-template let-ctx node>
     @if (ctx.data().type === 'group') {
       <docs-node [ctx]="ctx" />

@@ -30,8 +30,6 @@ import { AriaLabelConfig, Vflow, createEdges, createNodes } from 'ngx-vflow';
         [connection]="connection"
         (connect)="connections.set(connections() + 1)"
         (connectEnd)="attempts.set(attempts() + 1)">
-        <ng-template let-ctx edgeLabelHtml><docs-edge-label [ctx]="ctx" /></ng-template>
-
         <mini-map />
         <ng-template let-ctx node>
           @if (ctx.node.id === 'approval') {
@@ -59,7 +57,6 @@ import { AriaLabelConfig, Vflow, createEdges, createNodes } from 'ngx-vflow';
       <vflow [nodes]="referenceNodes" [view]="[600, 120]" [ariaLabelConfig]="{ flowLabel: 'Reference graph' }">
         <ng-template let-ctx node><docs-node [ctx]="ctx" /></ng-template>
         <ng-template let-ctx edge><svg:g docsEdge [ctx]="ctx" /></ng-template>
-        <ng-template let-ctx edgeLabelHtml><docs-edge-label [ctx]="ctx" /></ng-template>
       </vflow>
     </section>
   `,

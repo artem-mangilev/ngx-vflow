@@ -124,24 +124,24 @@ interface EntityData {
           <svg:g edgeInteraction>
             <svg:path vflowEdge [attr.d]="ctx.path()" [vflowSelected]="ctx.selected() || ctx.preselected()" />
           </svg:g>
+          @if (ctx.data()?.label; as label) {
+            <span *edgeLabel vflowEdgeLabel>
+              {{ label }}
+              <button
+                vflowNoDrag
+                class="remove"
+                type="button"
+                [attr.aria-label]="'Remove ' + label + ' connection'"
+                (click)="removeEdge(ctx.edge.id)">
+                ×
+              </button>
+            </span>
+          }
         </ng-template>
         <ng-template let-ctx connection>
           @if (ctx.path(); as path) {
             <svg:path vflowEdge stroke-dasharray="5 4" [attr.d]="path" />
           }
-        </ng-template>
-        <ng-template let-ctx edgeLabelHtml>
-          <span vflowEdgeLabel>
-            {{ ctx.label.data }}
-            <button
-              vflowNoDrag
-              class="remove"
-              type="button"
-              [attr.aria-label]="'Remove ' + ctx.label.data + ' connection'"
-              (click)="removeEdge(ctx.edge.id)">
-              ×
-            </button>
-          </span>
         </ng-template>
       </vflow>
     </section>
@@ -216,7 +216,7 @@ export class EntitiesDemoComponent {
         sourceHandle: 'out:id',
         target: 'order',
         targetHandle: 'in:customer-id',
-        edgeLabels: { center: { type: 'html-template', data: '1 → N' } },
+        data: { label: '1 → N' },
       },
       {
         id: 'email-mapping',
@@ -224,7 +224,7 @@ export class EntitiesDemoComponent {
         sourceHandle: 'out:email',
         target: 'erp',
         targetHandle: 'in:email',
-        edgeLabels: { center: { type: 'html-template', data: 'Copy email' } },
+        data: { label: 'Copy email' },
       },
     ]),
   );
@@ -291,7 +291,7 @@ export class EntitiesDemoComponent {
     const edge = createEdge({
       ...connection,
       id: crypto.randomUUID(),
-      edgeLabels: { center: { type: 'html-template', data: 'Mapping' } },
+      data: { label: 'Mapping' },
     });
     this.edges.update((edges) => addEdges([edge], { nodes: this.nodes, edges }));
   }

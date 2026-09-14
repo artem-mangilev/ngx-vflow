@@ -4,7 +4,7 @@ import { EdgeInteractionDirective, Vflow } from 'ngx-vflow';
 
 /**
  * Presentations shared by the documentation demos. Core is headless: every demo supplies
- * node, edge and label templates. These components use `@vflow/ui` so feature demos
+ * node and edge templates. These components use `@vflow/ui` so feature demos
  * can focus on the feature instead of drawing; copy them or replace them with your own.
  */
 
@@ -25,10 +25,8 @@ interface EdgeCtx {
   markerEnd: () => string;
   selected: () => boolean;
   preselected: () => boolean;
-}
-
-interface LabelCtx {
-  label: { data?: unknown };
+  /** `label` renders at the center of the edge. */
+  data: () => { label?: string } | undefined;
 }
 
 /** A card with the node's text and a target/source handle pair, or a titled container for `data.type === 'group'`. */
@@ -78,8 +76,8 @@ export class DocsNodeComponent {
 }
 
 /**
- * An edge path with the core markers of the edge. The interaction stroke sits inside the host group,
- * so hover and clicks near the line reach this presentation.
+ * An edge path with the core markers of the edge and, when `data.label` is set, a center label. The interaction stroke
+ * sits inside the host group, so hover and clicks near the line reach this presentation.
  */
 @Component({
   selector: 'g[docsEdge]',
@@ -93,27 +91,15 @@ export class DocsNodeComponent {
       [attr.marker-start]="ctx().markerStart()"
       [attr.marker-end]="ctx().markerEnd()"
       [vflowSelected]="ctx().selected() || ctx().preselected()" />
+    @if (label(); as label) {
+      <span *edgeLabel vflowEdgeLabel>{{ label }}</span>
+    }
   `,
 })
 export class DocsEdgeComponent {
   readonly ctx = input.required<EdgeCtx>();
+  protected readonly label = computed(() => this.ctx().data()?.label);
 }
 
-/** An HTML label surface showing the label's data as text. */
-@Component({
-  selector: 'docs-edge-label',
-  imports: [VflowUi],
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { style: 'display: block' },
-  template: `<span vflowEdgeLabel>{{ text() }}</span>`,
-})
-export class DocsEdgeLabelComponent {
-  readonly ctx = input.required<LabelCtx>();
-  protected readonly text = computed(() => {
-    const data = this.ctx().label.data;
-    return typeof data === 'string' ? data : ((data as { text?: string } | undefined)?.text ?? '');
-  });
-}
-
-/** Import into a demo and place the node, edge and label templates inside `<vflow>`. */
-export const DocsPresentations = [DocsNodeComponent, DocsEdgeComponent, DocsEdgeLabelComponent] as const;
+/** Import into a demo and place the node and edge templates inside `<vflow>`. */
+export const DocsPresentations = [DocsNodeComponent, DocsEdgeComponent] as const;

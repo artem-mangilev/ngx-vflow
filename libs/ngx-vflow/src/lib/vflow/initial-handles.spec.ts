@@ -7,6 +7,15 @@ import { FlowStatusService } from './services/flow-status.service';
 import { FlowEntitiesService } from './services/flow-entities.service';
 import { RequestAnimationFrameBatchingService } from './services/request-animation-frame-batching.service';
 import { HandleComponent } from './public-components/handle/handle.component';
+import { EdgeLabelTemplateDirective } from './directives/template.directive';
+
+/** An edge presentation that declares a center label, so the flow renders it in the label layer. */
+@Component({
+  template: `<span *edgeLabel>Connection</span>`,
+  imports: [EdgeLabelTemplateDirective],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+class LabelEdgeComponent {}
 
 @Component({
   template: `<div style="width:100px;height:48px;display:flex;align-items:center;justify-content:center">
@@ -79,13 +88,13 @@ describe('Initial handle placement', () => {
         id: 'ab',
         source: 'a',
         target: 'b',
-        edgeLabels: { center: { type: 'html-template', data: 'Connection' } },
+        component: LabelEdgeComponent,
       }),
     ]);
     fixture.detectChanges();
     const sample = () => {
       const nodes = Array.from(fixture.nativeElement.querySelectorAll('.vflow-node')) as HTMLElement[];
-      const paths = Array.from(fixture.nativeElement.querySelectorAll('svg[edge], [edgeLabel]')) as Element[];
+      const paths = Array.from(fixture.nativeElement.querySelectorAll('svg[edge], [edgeLabelHost]')) as Element[];
       if (nodes.some((node) => getComputedStyle(node).visibility === 'hidden')) {
         expect(paths.filter((path) => getComputedStyle(path).visibility === 'visible'))
           .withContext('visible edge while an endpoint is hidden')
@@ -98,6 +107,7 @@ describe('Initial handle placement', () => {
       sample();
     }
     expect(fixture.debugElement.injector.get(FlowEntitiesService).edges()[0].path().path).toBeTruthy();
+    expect(fixture.nativeElement.querySelector('[edgeLabelHost]')?.textContent).toContain('Connection');
     // An offscreen endpoint retains measured geometry for an edge crossing the viewport.
     fixture.componentRef.setInput('optimization', { virtualization: true });
     fixture.componentInstance.panTo({ x: -120, y: 0 });
