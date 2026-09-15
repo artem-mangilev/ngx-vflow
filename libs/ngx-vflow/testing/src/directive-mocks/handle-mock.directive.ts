@@ -1,22 +1,14 @@
-import { Directive, inject, input, signal } from '@angular/core';
-import { HANDLE_REF } from 'ngx-vflow';
-import type {
-  DomAttributes,
-  HandleLayout,
-  HandleRef,
-  HandleState,
-  HandleType,
-  Position,
-  VflowHandleDirective,
-} from 'ngx-vflow';
+import { Directive, forwardRef, input, signal } from '@angular/core';
+import { VflowHandleDirective } from 'ngx-vflow';
+import type { DomAttributes, HandleLayout, HandleState, HandleType, Position } from 'ngx-vflow';
 import { AsInterface } from '../types';
 
-/** Accepts the handle inputs and provides a handle whose state stays `idle`. */
+/** Accepts the handle inputs and stands in for the handle directive in DI; its state stays `idle`. */
 @Directive({
   selector: '[vflowHandle]',
   exportAs: 'vflowHandle',
   standalone: true,
-  providers: [{ provide: HANDLE_REF, useFactory: () => inject(HandleMockDirective).ref }],
+  providers: [{ provide: VflowHandleDirective, useExisting: forwardRef(() => HandleMockDirective) }],
 })
 export class HandleMockDirective implements AsInterface<VflowHandleDirective> {
   public readonly type = input<HandleType>('source');
@@ -32,13 +24,4 @@ export class HandleMockDirective implements AsInterface<VflowHandleDirective> {
   public readonly domAttributes = input<DomAttributes>();
 
   public readonly state = signal<HandleState>('idle').asReadonly();
-
-  public readonly ref: HandleRef = {
-    state: this.state,
-    type: this.type,
-    position: this.position,
-    id: this.id,
-    canStart: this.canStart,
-    canAccept: this.canAccept,
-  };
 }

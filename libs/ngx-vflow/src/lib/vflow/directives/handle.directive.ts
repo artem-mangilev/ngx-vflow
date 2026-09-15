@@ -10,20 +10,19 @@ import { EntityAccessibility, bindEntityAccessibility } from './entity-accessibi
 import { DomAttributes } from '../interfaces/dom-attributes.interface';
 import { Position } from '../types/position.type';
 import { HandleLayout, HandleType } from '../types/handle-type.type';
-import { HANDLE_REF, HandleRef } from '../utils/inject-handle';
 import { isTouchEvent } from '../utils/event';
 
 /**
  * Makes an element of a node presentation a connection point. The library registers, measures and, in the `auto`
  * layout, positions the element; its size and look belong to the application. State is exposed as
- * `data-vflow-handle-*` attributes for CSS and through `injectHandle()` for code, so a component can become a
- * handle with `hostDirectives: [VflowHandleDirective]`.
+ * `data-vflow-handle-*` attributes for CSS and as signals of this directive for code: `#h="vflowHandle"` in a
+ * template, `inject(VflowHandleDirective)` in a component that applies it through `hostDirectives` or in content of
+ * a handle element.
  */
 @Directive({
   selector: '[vflowHandle]',
   exportAs: 'vflowHandle',
   standalone: true,
-  providers: [{ provide: HANDLE_REF, useFactory: () => inject(VflowHandleDirective).ref }],
   host: {
     class: 'vflow-handle',
     '[attr.data-vflow-handle-type]': 'type()',
@@ -90,15 +89,6 @@ export class VflowHandleDirective {
   );
 
   public readonly state = this.model.state.asReadonly();
-
-  public readonly ref: HandleRef = {
-    state: this.state,
-    type: this.type,
-    position: this.position,
-    id: this.id,
-    canStart: this.canStart,
-    canAccept: this.canAccept,
-  };
 
   protected readonly placement = computed(() => {
     if (this.layout() !== 'auto') return null;

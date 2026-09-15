@@ -154,7 +154,7 @@ vflowBaseEdge>` (модель ng-diagram/Foblex). Требует передел�
 
 Пересмотрено 2026-09-15. Ядро делает только регистрацию, измерение и позиционирование элемента; размер,
 цвет, рамка и `pointer-events` принадлежат приложению. Состояние отдаётся двумя каналами: атрибутами
-host-элемента для CSS и `injectHandle()` для кода.
+host-элемента для CSS и сигналами самой директивы для кода.
 
 - `VflowHandleDirective`, селектор `[vflowHandle]`, `exportAs: 'vflowHandle'`. Ставится на любой элемент
   презентации ноды или подключается компонентом через `hostDirectives`.
@@ -169,9 +169,10 @@ host-элемента для CSS и `injectHandle()` для кода.
   `data-vflow-handle-state`, `data-vflow-handle-can-start`, `data-vflow-handle-can-accept`. Префикс
   `data-vflow-` как у `data-vflow-no-drag`, чтобы не спорить с `data-type`/`data-state` приложения и
   `vflowPort` на том же элементе.
-- Состояние для кода: `HANDLE_REF` провайдится директивой, `injectHandle()` это `inject(HANDLE_REF)`,
-  по аналогии с `NODE_REF`/`EDGE_REF`. `HandleRef`: `state`, `type`, `position`, `id`, `canStart`,
-  `canAccept`, все `Signal`. Те же сигналы публичны на директиве (`#h="vflowHandle"`). Контекста шаблона нет.
+- Состояние для кода: сигналы директивы `state`, `type`, `position`, `id`, `canStart`, `canAccept`, `layout`.
+  В шаблоне `#h="vflowHandle"`, в коде `inject(VflowHandleDirective)`: на хосте с `hostDirectives` и в любом
+  элементе внутри handle. Отдельного токена нет, в отличие от `NODE_REF`/`EDGE_REF`: у ноды и ребра на элементе
+  консьюмера нет директивы, а у handle есть. Контекста шаблона нет.
 - Модель. `HandleModel` получает сигналы, а не снимок входов, поэтому смена `position`, `type`, `id`,
   `offset*` и `layout` на лету работает. `hostReference` и `handleElement` схлопываются в `element`;
   `rawHandle` удалён, читать `handle.type()`, `handle.position()`, `handle.id()`. Регистрация в
@@ -208,8 +209,8 @@ host-элемента для CSS и `injectHandle()` для кода.
   (`<span vflowPort type="target" position="left">`). `state` берётся из директивы на том же
   элементе; `vflowPortState` остаётся явным override. `vflowHandle` и `vflowPort` на одном элементе не ставятся
   (директива применилась бы дважды); порт вне ноды не работает (решено 2026-09-15, других использований нет).
-- Тестовые моки: `HandleMockDirective` с селектором `[vflowHandle]` и теми же входами, провайдит
-  статический `HANDLE_REF`. Компонент консьюмера с `hostDirectives: [VflowHandleDirective]` (и `vflowPort`) в
+- Тестовые моки: `HandleMockDirective` с селектором `[vflowHandle]` и теми же входами, провайдит себя
+  как `VflowHandleDirective` (`useExisting`), поэтому `inject(VflowHandleDirective)` работает и с моками. Компонент консьюмера с `hostDirectives: [VflowHandleDirective]` (и `vflowPort`) в
   юнит-тесте получает настоящую директиву, её зависимости покрывает `provideCustomNodeMocks()`.
 
 ```html
@@ -223,7 +224,7 @@ host-элемента для CSS и `injectHandle()` для кода.
   template: `<svg:svg viewBox="0 0 12 12">…</svg:svg>`,
 })
 export class OutputPortComponent {
-  protected readonly handle = injectHandle();
+  protected readonly handle = inject(VflowHandleDirective);
 }
 ```
 
@@ -241,8 +242,10 @@ export class OutputPortComponent {
   в `handle.directive.ts`.
 - Отвергнуто: `PointerDirective` и `EntityAccessibilityDirective` через `hostDirectives` (см. выше);
   переходная обёртка `<handle>` с `@deprecated` (решение пользователя, удалить сразу);
-  `provideHandleDefaults()` (был реализован и удалён 2026-09-15, см. выше); `vflowPort` как отдельный визуал,
-  читающий `HANDLE_REF` предка; `data-type`/`data-state`
+  `provideHandleDefaults()` (был реализован и удалён 2026-09-15, см. выше); `injectHandle()`, `HANDLE_REF` и
+  `HandleRef` (реализованы и удалены 2026-09-15: директива сама доступна через DI и `exportAs`, а мок подменяет её
+  класс); `vflowPort` как отдельный визуал,
+  читающий состояние handle-предка через токен; `data-type`/`data-state`
   без префикса (конфликт с атрибутами приложения и `vflowPort`).
 
 ### D6. Лейблы рёбер объявляются внутри презентации ребра
@@ -315,7 +318,7 @@ TemplateRef>>>`, снимая регистрацию через `onCleanup` пр
 - `CustomNodeComponent` удалён; контекст через `injectNode()`; вход `node` не ставится.
 - `<handle>` → `[vflowHandle]`; `HandleComponent`, `HandleTemplateDirective`, `HandleContext`, `[template]`
   удалены; дефолтной точки в core нет, визуал у приложения или `vflowPort` из `@vflow/ui`. Новое:
-  `injectHandle()`, `HANDLE_REF`, `layout`; вход типа `type`; `vflowPort` сам является handle.
+  `layout`; вход типа `type`; `vflowPort` сам является handle.
 - `g[customTemplateEdge]` → `g[customEdge]`.
 - Новые output: `(componentEdgeEvent)`.
 - Внутренние (`ɵ`): `HandleModel.hostReference`/`handleElement` → `element`, `rawHandle` → сигналы

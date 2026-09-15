@@ -1,6 +1,6 @@
-import { ChangeDetectionStrategy, Component, provideZonelessChangeDetection } from '@angular/core';
+import { ChangeDetectionStrategy, Component, provideZonelessChangeDetection, inject } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { VflowHandleDirective, injectHandle } from 'ngx-vflow';
+import { VflowHandleDirective } from 'ngx-vflow';
 import { provideCustomNodeMocks } from './provide-custom-node-mocks';
 
 @Component({
@@ -10,7 +10,7 @@ import { provideCustomNodeMocks } from './provide-custom-node-mocks';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 class PortComponent {
-  protected readonly handle = injectHandle();
+  protected readonly handle = inject(VflowHandleDirective);
 }
 
 @Component({

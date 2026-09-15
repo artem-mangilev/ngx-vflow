@@ -90,3 +90,12 @@ dev-сервере. Отдельный прогон Playwright на custom-handl
 - Вход типа переименован в `type` (`vflowHandle type="source"`, `vflowPort type="target"`), пробросы в
   `hostDirectives` без алиаса, ловушка NG0309 снята. В JSDoc входа и на странице custom-handles указано, что
   handle не ставится на `button`/`input`. В `handle.directive.ts` TODO про префикс входов (`vflowType`/`vwType`).
+- `injectHandle()`, `HANDLE_REF`, `HandleRef` и поле `ref` удалены: код читает сигналы через
+  `inject(VflowHandleDirective)` (хост на `hostDirectives` и содержимое handle), шаблон через `#h="vflowHandle"`.
+  `HandleMockDirective` провайдит себя как `VflowHandleDirective` через `useExisting`. `square-handle`, спеки,
+  custom-handles, migration и D5 обновлены.
+- Спеки в `ngx-vflow/testing` штатный `nx test ngx-vflow` не запускает; их прогон:
+  `nx test ngx-vflow --include='../testing/src/**/*.spec.ts'`. Новые `provide-custom-node-mocks.spec.ts` (компонент на
+  `hostDirectives` с `provideCustomNodeMocks()`) и `handle-mock.directive.spec.ts` (`inject(VflowHandleDirective)`
+  получает мок через `useExisting`) проходят. `all-mocks.spec.ts` падает с `Unexpected value 'undefined' imported by
+the module 'DynamicTestModule'` и на чистом HEAD, то есть до этой задачи; вынесено в отдельную задачу.

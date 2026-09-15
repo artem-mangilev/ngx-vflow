@@ -63,16 +63,16 @@ graph needs templates. There are two working paths:
 
 Include `@vflow/ui/styles.css` in your global styles for path B. See the Design system section for the parts.
 
-| Removed                                                                  | Replacement                                                                                                                                                                       |
-| ------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Node `type: 'default'`, `text`                                           | `type: 'html-template'` with `data` and a `nodeHtml` template; standard handles become `[vflowHandle]` elements in the template. Use `ariaLabel` for the accessible name          |
-| Node `type: 'default-group'`, `color`, `resizable`                       | `type: 'template-group'` with a `groupNode` template; put `resizable` on the template's element                                                                                   |
-| `DefaultNode`, `DefaultGroupNode`, `isDefaultNode`, `isDefaultGroupNode` | `HtmlTemplateNode`, `TemplateGroupNode`, `isTemplateNode`, `isTemplateGroupNode`                                                                                                  |
-| Edge `type` (`'default'` / `'template'`)                                 | Removed; every edge renders through the `edge` template                                                                                                                           |
-| `EdgeLabel` `type: 'default'`, `text`, `style`                           | `type: 'html-template'` with `data` and an `edgeLabelHtml` template                                                                                                               |
-| `color` and `strokeWidth` fields of `Marker`                             | Markers follow the edge stroke (`context-stroke`); style `.vflow-marker` or define your own marker                                                                                |
-| Connection `type: 'default'` preview                                     | Unchanged: the default connection line and the `connection` template both remain                                                                                                  |
-| `<handle>`, `[template]`, `ng-template[handle]`, `HandleContext`         | `[vflowHandle]` on your own element; state via the `data-vflow-handle-state` attribute and its siblings or `injectHandle()`; `vflowPort` from `@vflow/ui` for the old default dot |
+| Removed                                                                  | Replacement                                                                                                                                                                              |
+| ------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Node `type: 'default'`, `text`                                           | `type: 'html-template'` with `data` and a `nodeHtml` template; standard handles become `[vflowHandle]` elements in the template. Use `ariaLabel` for the accessible name                 |
+| Node `type: 'default-group'`, `color`, `resizable`                       | `type: 'template-group'` with a `groupNode` template; put `resizable` on the template's element                                                                                          |
+| `DefaultNode`, `DefaultGroupNode`, `isDefaultNode`, `isDefaultGroupNode` | `HtmlTemplateNode`, `TemplateGroupNode`, `isTemplateNode`, `isTemplateGroupNode`                                                                                                         |
+| Edge `type` (`'default'` / `'template'`)                                 | Removed; every edge renders through the `edge` template                                                                                                                                  |
+| `EdgeLabel` `type: 'default'`, `text`, `style`                           | `type: 'html-template'` with `data` and an `edgeLabelHtml` template                                                                                                                      |
+| `color` and `strokeWidth` fields of `Marker`                             | Markers follow the edge stroke (`context-stroke`); style `.vflow-marker` or define your own marker                                                                                       |
+| Connection `type: 'default'` preview                                     | Unchanged: the default connection line and the `connection` template both remain                                                                                                         |
+| `<handle>`, `[template]`, `ng-template[handle]`, `HandleContext`         | `[vflowHandle]` on your own element; state via the `data-vflow-handle-state` attribute and its siblings or the directive's signals; `vflowPort` from `@vflow/ui` for the old default dot |
 
 ### Appearance inputs removed
 
@@ -130,7 +130,7 @@ After:
 
 ### Custom handle templates
 
-Custom handles are now your own native HTML elements with the `vflowHandle` directive, which positions them on the node side. The former SVG placement coordinate `ctx.point` and the handle template context have been removed; the validation state is exposed as the `data-vflow-handle-state` attribute and through `injectHandle()`. See the Custom handles page.
+Custom handles are now your own native HTML elements with the `vflowHandle` directive, which positions them on the node side. The former SVG placement coordinate `ctx.point` and the handle template context have been removed; the validation state is exposed as the `data-vflow-handle-state` attribute and as the `state` signal of `VflowHandleDirective`. See the Custom handles page.
 
 Before:
 

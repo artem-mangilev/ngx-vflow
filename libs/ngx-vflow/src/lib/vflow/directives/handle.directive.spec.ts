@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, provideZonelessChangeDetection, signal, Type } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  provideZonelessChangeDetection,
+  signal,
+  Type,
+  inject,
+} from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { VflowComponent } from '../components/vflow/vflow.component';
 import { createNode } from '../interfaces/node.interface';
@@ -6,7 +13,6 @@ import { createEdge } from '../interfaces/edge.interface';
 import { FlowEntitiesService } from '../services/flow-entities.service';
 import { FlowStatusService } from '../services/flow-status.service';
 import { Position } from '../types/position.type';
-import { injectHandle } from '../utils/inject-handle';
 import { VflowHandleDirective } from './handle.directive';
 
 const side = signal<Position>('right');
@@ -65,7 +71,7 @@ class HiddenHandlesNodeComponent {}
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 class PortComponent {
-  protected readonly handle = injectHandle();
+  protected readonly handle = inject(VflowHandleDirective);
 }
 
 @Component({

@@ -25,7 +25,6 @@ export * from './lib/vflow/interfaces/component-node-event.interface';
 export * from './lib/vflow/interfaces/component-edge-event.interface';
 export { NODE_REF, NodeRef, injectNode } from './lib/vflow/utils/inject-node';
 export { EDGE_REF, EdgeRef, injectEdge } from './lib/vflow/utils/inject-edge';
-export { HANDLE_REF, HandleRef, injectHandle } from './lib/vflow/utils/inject-handle';
 export * from './lib/vflow/interfaces/fit-view-options.interface';
 export * from './lib/vflow/interfaces/optimization.interface';
 export * from './lib/vflow/interfaces/intersecting-nodes-options.interface';

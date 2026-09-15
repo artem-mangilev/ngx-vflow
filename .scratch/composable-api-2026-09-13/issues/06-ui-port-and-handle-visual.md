@@ -23,3 +23,4 @@ e2e design-system (entities и pipeline), они зелёные.
 2026-09-15, пересмотрено: `VflowPort` больше не инжектит `HANDLE_REF` предка, а сам является handle через
 `hostDirectives: [VflowHandleDirective]` (тип `vflowPort="target"`, остальные входы handle проброшены) и читает
 `state` директивы на своём элементе. `vflowPortState` остаётся override.
+`HANDLE_REF` удалён в тот же день: `VflowPort` инжектит `VflowHandleDirective` со своего элемента.

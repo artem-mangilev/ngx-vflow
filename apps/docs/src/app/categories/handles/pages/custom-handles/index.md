@@ -71,7 +71,7 @@ The directive is exported as `vflowHandle`. A template reference gives access to
 
 ## Handle components
 
-A component can become a handle by applying the directive through `hostDirectives`. Forward the inputs that the places using the component bind, including the type and `position`. `injectHandle()` returns the handle of the current element or of the closest ancestor element that is a handle, with the `state`, `type`, `position`, `id`, `canStart` and `canAccept` signals.
+A component can become a handle by applying the directive through `hostDirectives`. Forward the inputs that the places using the component bind, including the type and `position`. Inject `VflowHandleDirective` to read its signals: `state`, `type`, `position`, `id`, `canStart`, `canAccept` and `layout`. The same works in any element inside a handle element, and in unit tests with `VflowMocks`, whose handle mock stands in for the directive.
 
 ```ts
 @Component({
@@ -84,7 +84,7 @@ A component can become a handle by applying the directive through `hostDirective
   template: '',
 })
 export class SquareHandleComponent {
-  protected readonly handle = injectHandle();
+  protected readonly handle = inject(VflowHandleDirective);
 }
 ```
 
