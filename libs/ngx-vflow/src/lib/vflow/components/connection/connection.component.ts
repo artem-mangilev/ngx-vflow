@@ -54,10 +54,10 @@ export class ConnectionComponent {
     if (status.state === 'connection-start' || status.state === 'reconnection-start') {
       const sourceHandle = status.payload.sourceHandle;
       const sourcePoint = sourceHandle.pointAbsolute();
-      const sourcePosition = sourceHandle.rawHandle.position;
+      const sourcePosition = sourceHandle.position();
 
       const targetPoint = this.spacePointContext.svgCurrentSpacePoint();
-      const targetPosition = getOppositePostion(sourceHandle.rawHandle.position);
+      const targetPosition = getOppositePostion(sourceHandle.position());
 
       const params = this.getPathFactoryParams(sourcePoint, targetPoint, sourcePosition, targetPosition);
 
@@ -78,7 +78,7 @@ export class ConnectionComponent {
     if (status.state === 'connection-validation' || status.state === 'reconnection-validation') {
       const sourceHandle = status.payload.sourceHandle;
       const sourcePoint = sourceHandle.pointAbsolute();
-      const sourcePosition = sourceHandle.rawHandle.position;
+      const sourcePosition = sourceHandle.position();
 
       const targetHandle = status.payload.targetHandle;
       // ignore magnet if validation failed
@@ -86,8 +86,8 @@ export class ConnectionComponent {
         ? targetHandle.pointAbsolute()
         : this.spacePointContext.svgCurrentSpacePoint();
       const targetPosition = status.payload.valid
-        ? targetHandle.rawHandle.position
-        : getOppositePostion(sourceHandle.rawHandle.position);
+        ? targetHandle.position()
+        : getOppositePostion(sourceHandle.position());
 
       const params = this.getPathFactoryParams(sourcePoint, targetPoint, sourcePosition, targetPosition);
 

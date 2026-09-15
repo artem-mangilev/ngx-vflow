@@ -33,7 +33,7 @@ async function expectOutline(node: Locator, card: Locator) {
 
 /** Distance between the right handle's center and the card's right edge, in screen pixels. */
 async function rightHandleOffset(node: Locator, card: Locator) {
-  const handle = await box(node.locator('handle .handle--right').first());
+  const handle = await box(node.locator('.vflow-handle[data-vflow-handle-position="right"]').first());
   return Math.abs(handle.centerX - (await box(card)).right);
 }
 

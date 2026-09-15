@@ -8,7 +8,7 @@ import { HandleModel } from './handle.model';
 import { FlowSettingsService } from '../services/flow-settings.service';
 import { NodeRenderingService } from '../services/node-rendering.service';
 import { ViewportService } from '../services/viewport.service';
-import { provideZonelessChangeDetection } from '@angular/core';
+import { provideZonelessChangeDetection, signal } from '@angular/core';
 
 function mockRect(element: Element, rect: { left: number; top: number; width: number; height: number }): void {
   const { left, top, width, height } = rect;
@@ -44,21 +44,12 @@ function createHandle(
 
   parentNode.nodeElement.set(nodeElement);
 
+  anchor.append(handleElement);
+
   const handle = TestBed.runInInjectionContext(
-    () =>
-      new HandleModel(
-        {
-          type,
-          position,
-          hostReference: anchor,
-          userOffsetX: 0,
-          userOffsetY: 0,
-        },
-        parentNode,
-      ),
+    () => new HandleModel({ type: signal(type), position: signal(position), element: handleElement }, parentNode),
   );
 
-  handle.handleElement = handleElement;
   handle.sync();
 
   return handle;

@@ -18,7 +18,7 @@ import { addNodesToEdges } from './utils/add-nodes-to-edges';
 import { createResizer } from './public-components/resizable/resizer';
 import { FlowStatusService } from './services/flow-status.service';
 import { ConnectionControllerDirective } from './directives/connection-controller.directive';
-import { HandleComponent } from './public-components/handle/handle.component';
+import { VflowHandleDirective } from './directives/handle.directive';
 import { EdgeLabelComponent } from './components/edge-label/edge-label.component';
 import { ConnectionModel } from './models/connection.model';
 import { VflowComponent } from './components/vflow/vflow.component';
@@ -43,9 +43,9 @@ class LabelHostComponent {
 
 @Component({
   template: `<div style="width: 100px; height: 50px">
-    <handle type="target" position="left" /><handle type="source" position="right" />
+    <span vflowHandle type="target" position="left"></span><span vflowHandle type="source" position="right"></span>
   </div>`,
-  imports: [HandleComponent],
+  imports: [VflowHandleDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 class BoxNodeComponent {}
@@ -100,7 +100,7 @@ describe('Graph rendering and interaction regressions', () => {
   });
   function handle(parent: NodeModel, type: 'source' | 'target') {
     const value = TestBed.runInInjectionContext(
-      () => new HandleModel({ type, position: 'right', userOffsetX: 0, userOffsetY: 0 }, parent),
+      () => new HandleModel({ type: signal(type), position: signal('right') }, parent),
     );
     value.sync();
     parent.handles.update((values) => [...values, value]);

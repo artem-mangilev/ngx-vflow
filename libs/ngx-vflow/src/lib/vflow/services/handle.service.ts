@@ -1,20 +1,6 @@
-import { Injectable, Signal, TemplateRef, signal } from '@angular/core';
-import { Position } from '../types/position.type';
-import { HandleType } from '../types/handle-type.type';
+import { Injectable, signal } from '@angular/core';
 import { NodeModel } from '../models/node.model';
 import { HandleModel } from '../models/handle.model';
-
-export interface NodeHandle {
-  position: Position;
-  type: HandleType;
-  userOffsetX: number;
-  userOffsetY: number;
-  id?: string;
-  hostReference?: Element;
-  template?: TemplateRef<any> | null;
-  canStart?: Signal<boolean>;
-  canAccept?: Signal<boolean>;
-}
 
 @Injectable()
 export class HandleService {

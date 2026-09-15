@@ -93,10 +93,22 @@ interface StepData {
                 </span>
               </footer>
               @if (ctx.node.id !== 'received') {
-                <handle type="target" position="left" [canStart]="false" [canAccept]="false" [template]="port" />
+                <span
+                  vflowPort
+                  type="target"
+                  position="left"
+                  vflowPortConnected
+                  [canStart]="false"
+                  [canAccept]="false"></span>
               }
               @if (ctx.node.id !== 'paid' && ctx.node.id !== 'fix') {
-                <handle type="source" position="right" [canStart]="false" [canAccept]="false" [template]="port" />
+                <span
+                  vflowPort
+                  type="source"
+                  position="right"
+                  vflowPortConnected
+                  [canStart]="false"
+                  [canAccept]="false"></span>
               }
               @if (ctx.selected()) {
                 <node-toolbar>
@@ -142,9 +154,6 @@ interface StepData {
           </vflow-controls>
         }
       </div>
-      <ng-template #port let-ctx handle>
-        <span vflowPort vflowPortConnected [vflowPortState]="ctx.state()"></span>
-      </ng-template>
       <p class="footnote" aria-live="polite" data-testid="opened">{{ opened() ? 'Opened: ' + opened() : '' }}</p>
     </section>
   `,

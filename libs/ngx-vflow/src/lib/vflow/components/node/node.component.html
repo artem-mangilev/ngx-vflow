@@ -24,3 +24,21 @@
 @if (model().resizerTemplate(); as template) {
   <ng-template [ngTemplateOutlet]="template" />
 }
+
+<!-- Magnets: the snap area around each measured handle while a connection is in progress -->
+@if (connectionActive()) {
+  @for (handle of model().handles(); track handle) {
+    @if (handle.isMeasured()) {
+      <div
+        class="magnet"
+        aria-hidden="true"
+        [style.left.px]="handle.localPoint().x"
+        [style.top.px]="handle.localPoint().y"
+        [style.width.px]="model().magnetRadius * 2"
+        [style.height.px]="model().magnetRadius * 2"
+        (pointerEnd)="endConnection(); resetValidateConnection(handle)"
+        (pointerOver)="validateConnection(handle)"
+        (pointerOut)="resetValidateConnection(handle)"></div>
+    }
+  }
+}

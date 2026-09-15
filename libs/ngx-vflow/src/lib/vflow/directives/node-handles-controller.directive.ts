@@ -28,6 +28,14 @@ export class NodeHandlesControllerDirective implements OnInit {
       const model = this.nodeAccessor.model();
       if (!model) return;
 
+      // Changing a handle's side, offset or layout moves its point without resizing any observed element.
+      for (const handle of model.handles()) {
+        handle.position();
+        handle.offsetX();
+        handle.offsetY();
+        handle.layout();
+      }
+
       // Right/bottom handle points use the model size, which reconciliation can change after a gesture without
       // resizing any observed element, so the size is a dependency of the sync.
       const hasSize = model.width() >= 0 && model.height() >= 0;
@@ -62,10 +70,11 @@ export class NodeHandlesControllerDirective implements OnInit {
   private updateObservedElements(handles: HandleModel[]): void {
     const nextElements = new Set<Element>([this.hostElementRef.nativeElement]);
 
-    handles.forEach((handle) => {
-      nextElements.add(handle.hostReference);
-      if (handle.handleElement) {
-        nextElements.add(handle.handleElement);
+    handles.forEach(({ element }) => {
+      if (element) {
+        nextElements.add(element);
+        // The parent anchors the `auto` layout.
+        if (element.parentElement) nextElements.add(element.parentElement);
       }
     });
 

@@ -10,7 +10,7 @@ import {
   EdgeTemplateDirective,
   NodeTemplateDirective,
 } from '../../directives/template.directive';
-import { HandleComponent } from '../../public-components/handle/handle.component';
+import { VflowHandleDirective } from '../../directives/handle.directive';
 import { FlowEntitiesService } from '../../services/flow-entities.service';
 import { injectEdge } from '../../utils/inject-edge';
 
@@ -41,7 +41,7 @@ class LabelledEdgeComponent {
   template: `<vflow [view]="[600, 400]" [nodes]="nodes" [edges]="edges">
     <ng-template node>
       <div style="width: 60px; height: 30px">
-        <handle type="target" position="left" /><handle type="source" position="right" />
+        <span vflowHandle type="target" position="left"></span><span vflowHandle type="source" position="right"></span>
       </div>
     </ng-template>
     <ng-template let-ctx edge>
@@ -73,7 +73,7 @@ class LabelledEdgeComponent {
     NodeTemplateDirective,
     EdgeTemplateDirective,
     EdgeLabelTemplateDirective,
-    HandleComponent,
+    VflowHandleDirective,
     LabelEdgeIdComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,

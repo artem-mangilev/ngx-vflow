@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { VflowPort } from '@vflow/ui';
 import { Vflow, injectNode } from 'ngx-vflow';
 import { FlowStoreService } from '../services/flow-store.service';
 
@@ -18,12 +19,12 @@ import { FlowStoreService } from '../services/flow-store.service';
           <div class="metric-row">
             <span class="metric-name">W:</span>
             <span class="metric-value">{{ connectedNodeWidth() }}px</span>
-            <handle position="left" type="target" id="width" />
+            <span vflowPort type="target" position="left" id="width"></span>
           </div>
           <div class="metric-row">
             <span class="metric-name">H:</span>
             <span class="metric-value">{{ connectedNodeHeight() }}px</span>
-            <handle position="left" type="target" id="height" />
+            <span vflowPort type="target" position="left" id="height"></span>
           </div>
         </div>
 
@@ -34,12 +35,12 @@ import { FlowStoreService } from '../services/flow-store.service';
           <div class="metric-row">
             <span class="metric-name">X:</span>
             <span class="metric-value">{{ connectedNodeX() }}</span>
-            <handle position="left" type="target" id="x" />
+            <span vflowPort type="target" position="left" id="x"></span>
           </div>
           <div class="metric-row">
             <span class="metric-name">Y:</span>
             <span class="metric-value">{{ connectedNodeY() }}</span>
-            <handle position="left" type="target" id="y" />
+            <span vflowPort type="target" position="left" id="y"></span>
           </div>
         </div>
       </div>
@@ -131,7 +132,7 @@ import { FlowStoreService } from '../services/flow-store.service';
     `,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Vflow],
+  imports: [Vflow, VflowPort],
 })
 export class OutputNodeComponent {
   protected readonly ctx = injectNode();

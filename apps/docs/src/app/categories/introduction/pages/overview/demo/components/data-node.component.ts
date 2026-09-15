@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { VflowPort } from '@vflow/ui';
 import { Vflow } from 'ngx-vflow';
 
 @Component({
@@ -21,8 +22,8 @@ import { Vflow } from 'ngx-vflow';
         }
       </div>
 
-      <handle type="target" position="left" />
-      <handle type="source" position="right" />
+      <span vflowPort type="target" position="left"></span>
+      <span vflowPort type="source" position="right"></span>
     </div>
   `,
   styles: [
@@ -87,7 +88,7 @@ import { Vflow } from 'ngx-vflow';
       }
     `,
   ],
-  imports: [Vflow],
+  imports: [Vflow, VflowPort],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DataNodeComponent {

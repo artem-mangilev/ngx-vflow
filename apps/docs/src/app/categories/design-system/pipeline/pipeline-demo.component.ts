@@ -175,40 +175,30 @@ interface StageData {
             }
             @for (port of ctx.data().inputs; track port.id) {
               <div vflowField [attr.data-port]="port.id">
-                <ng-template #inPort let-handle handle>
-                  <span
-                    vflowPort
-                    [attr.data-type]="port.type"
-                    [vflowPortState]="handle.state()"
-                    [vflowPortConnected]="connected().has(ctx.node.id + '/in:' + port.id)"></span>
-                </ng-template>
-                <handle
+                <span
+                  vflowPort
                   type="target"
                   position="left"
                   [id]="'in:' + port.id"
-                  [template]="inPort"
-                  [ariaLabel]="ctx.data().title + ' ' + port.name + ' input (' + port.type + ')'" />
+                  [ariaLabel]="ctx.data().title + ' ' + port.name + ' input (' + port.type + ')'"
+                  [attr.data-type]="port.type"
+                  [vflowPortConnected]="connected().has(ctx.node.id + '/in:' + port.id)"></span>
                 <span vflowTitle>{{ port.name }}</span>
                 <span vflowMeta>{{ port.type }}</span>
               </div>
             }
             @for (port of ctx.data().outputs; track port.id) {
               <div vflowField class="output" [attr.data-port]="port.id">
-                <ng-template #outPort let-handle handle>
-                  <span
-                    vflowPort
-                    [attr.data-type]="port.type"
-                    [vflowPortState]="handle.state()"
-                    [vflowPortConnected]="connected().has(ctx.node.id + '/out:' + port.id)"></span>
-                </ng-template>
                 <span vflowMeta>{{ port.type }}</span>
                 <span vflowTitle>{{ port.name }}</span>
-                <handle
+                <span
+                  vflowPort
                   type="source"
                   position="right"
                   [id]="'out:' + port.id"
-                  [template]="outPort"
-                  [ariaLabel]="ctx.data().title + ' ' + port.name + ' output (' + port.type + ')'" />
+                  [ariaLabel]="ctx.data().title + ' ' + port.name + ' output (' + port.type + ')'"
+                  [attr.data-type]="port.type"
+                  [vflowPortConnected]="connected().has(ctx.node.id + '/out:' + port.id)"></span>
               </div>
             }
           </article>

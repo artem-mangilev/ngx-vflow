@@ -50,7 +50,7 @@ images, charts, notes, menus) is your content inside `vflowNodeBody` or a field 
 | ---------- | ------------------------------------------------------------------------------------------------------ |
 | Shells     | `vflowNode` with `vflowNodeHeader`, `vflowNodeBody`, `vflowNodeFooter`; `vflowField`; `vflowContainer` |
 | Text roles | `vflowTitle`, `vflowMeta`, `vflowIcon`, `vflowActions`, usable in any shell, label or toolbar          |
-| Port       | `vflowPort` inside a handle template                                                                   |
+| Port       | `vflowPort` with `type`, `position` and the other handle inputs: a core handle with the port look      |
 | Edge       | `vflowEdge` on the SVG path, `vflowEdgeLabel` for HTML labels                                          |
 | Extras     | `vflowStatus`, `vflowExternalLabel`, `vflowToolbar`, `vflowButton`                                     |
 
@@ -60,8 +60,9 @@ Three kinds of state stay separate so they can be shown at once:
 - **Diagnostics** about the model and **application status** are both your vocabulary. Each is one `vflowStatus` indicator with a tone and your text; place two side by side to show a warning next to a running status. `vflowStatusBusy` adds activity, which is presentation only and never disables anything.
 - **Action availability** is the native `disabled` attribute on your buttons, driven by your rules such as read-only.
 
-Ports mirror two independent facts: `vflowPortState` is core feedback for the connection in progress
-(`idle`, `valid`, `invalid`); `vflowPortConnected` is your knowledge about existing edges.
+Ports mirror two independent facts: the core feedback for the connection in progress (`idle`, `valid`, `invalid`),
+read from the core handle that `vflowPort` applies to the same element (`vflowPortState` only overrides it); `vflowPortConnected` is your
+knowledge about existing edges.
 
 ### Edges
 
@@ -87,28 +88,28 @@ for message flows. Execution semantics, BPMN XML and model validation belong to 
 
 ## Directive reference
 
-| Import                                                   | Attribute                                                           | Responsibility                                                 |
-| -------------------------------------------------------- | ------------------------------------------------------------------- | -------------------------------------------------------------- |
-| `VflowTheme`                                             | `[vflowTheme]="'light'"`                                            | Scoped light/dark semantic tokens                              |
-| `VflowSelected`                                          | `[vflowSelected]="ctx.selected() \|\| ctx.preselected()"`           | Selection presentation; no interaction or ARIA changes         |
-| `VflowNode`                                              | `vflowNode`                                                         | Node surface; consumer chooses size and content                |
-| `VflowNodeHeader`, `VflowNodeBody`, `VflowNodeFooter`    | `vflowNodeHeader`, `vflowNodeBody`, `vflowNodeFooter`               | Optional anatomy on consumer elements                          |
-| `VflowField`                                             | `vflowField`                                                        | Field row with room for text roles and core handles            |
-| `VflowContainer`                                         | `vflowContainer`                                                    | Frame; parent relationships remain explicit in graph data      |
-| `VflowTitle`, `VflowMeta`                                | `vflowTitle`, `vflowMeta`                                           | Primary wrapping text and secondary text in any shell          |
-| `VflowIcon`, `VflowActions`                              | `vflowIcon`, `vflowActions`                                         | Icon slot and a group of controls; add `vflowNoDrag` to each   |
-| `VflowPort`                                              | `vflowPort [vflowPortState]="ctx.state()" [vflowPortConnected]="…"` | Visual inside a handle template: idle/valid/invalid, connected |
-| `VflowStatus`                                            | `[vflowStatus]="'warning'" [vflowStatusBusy]="true"`                | Indicator: semantic tone, your text and optional activity      |
-| `VflowEdge`                                              | `vflowEdge` on an SVG path                                          | Stroke; bind core path and marker URLs yourself                |
-| `VflowEdgeLabel`                                         | `vflowEdgeLabel`                                                    | HTML label surface, including optional native controls         |
-| `VflowToolbar`                                           | `vflowToolbar`                                                      | Surface for `node-toolbar` content                             |
-| `VflowExternalLabel`                                     | `vflowExternalLabel`                                                | Label below a positioned shape                                 |
-| `VflowControls`, `VflowControlButton`                    | `<vflow-controls [flow]="flow">`, `button[vflowControlButton]`      | Viewport controls for one flow instance and custom buttons     |
-| `VflowBpmnEvent` (bpmn)                                  | `[vflowBpmnEvent]="'start'"`                                        | Start/intermediate/end event outlines                          |
-| `VflowBpmnGateway` (bpmn)                                | `[vflowBpmnGateway]="'exclusive'"`                                  | Diamond with × or + marker; text goes in `vflowExternalLabel`  |
-| `VflowBpmnTask`, `VflowBpmnPool`, `VflowBpmnLane` (bpmn) | `vflowBpmnTask`, `vflowBpmnPool`, `vflowBpmnLane`                   | Task card, participant frame and lane frame                    |
-| `VflowBpmnFlow` (bpmn)                                   | `[vflowBpmnFlow]="'message'"` on an SVG path                        | Sequence, message or association line style                    |
-| `VflowButton`                                            | `vflowButton` on a native button                                    | Button presentation with focus and disabled states             |
+| Import                                                   | Attribute                                                          | Responsibility                                                                  |
+| -------------------------------------------------------- | ------------------------------------------------------------------ | ------------------------------------------------------------------------------- |
+| `VflowTheme`                                             | `[vflowTheme]="'light'"`                                           | Scoped light/dark semantic tokens                                               |
+| `VflowSelected`                                          | `[vflowSelected]="ctx.selected() \|\| ctx.preselected()"`          | Selection presentation; no interaction or ARIA changes                          |
+| `VflowNode`                                              | `vflowNode`                                                        | Node surface; consumer chooses size and content                                 |
+| `VflowNodeHeader`, `VflowNodeBody`, `VflowNodeFooter`    | `vflowNodeHeader`, `vflowNodeBody`, `vflowNodeFooter`              | Optional anatomy on consumer elements                                           |
+| `VflowField`                                             | `vflowField`                                                       | Field row with room for text roles and core handles                             |
+| `VflowContainer`                                         | `vflowContainer`                                                   | Frame; parent relationships remain explicit in graph data                       |
+| `VflowTitle`, `VflowMeta`                                | `vflowTitle`, `vflowMeta`                                          | Primary wrapping text and secondary text in any shell                           |
+| `VflowIcon`, `VflowActions`                              | `vflowIcon`, `vflowActions`                                        | Icon slot and a group of controls; add `vflowNoDrag` to each                    |
+| `VflowPort`                                              | `vflowPort type="target" position="left" [vflowPortConnected]="…"` | A core handle with the port look: idle/valid/invalid from the handle, connected |
+| `VflowStatus`                                            | `[vflowStatus]="'warning'" [vflowStatusBusy]="true"`               | Indicator: semantic tone, your text and optional activity                       |
+| `VflowEdge`                                              | `vflowEdge` on an SVG path                                         | Stroke; bind core path and marker URLs yourself                                 |
+| `VflowEdgeLabel`                                         | `vflowEdgeLabel`                                                   | HTML label surface, including optional native controls                          |
+| `VflowToolbar`                                           | `vflowToolbar`                                                     | Surface for `node-toolbar` content                                              |
+| `VflowExternalLabel`                                     | `vflowExternalLabel`                                               | Label below a positioned shape                                                  |
+| `VflowControls`, `VflowControlButton`                    | `<vflow-controls [flow]="flow">`, `button[vflowControlButton]`     | Viewport controls for one flow instance and custom buttons                      |
+| `VflowBpmnEvent` (bpmn)                                  | `[vflowBpmnEvent]="'start'"`                                       | Start/intermediate/end event outlines                                           |
+| `VflowBpmnGateway` (bpmn)                                | `[vflowBpmnGateway]="'exclusive'"`                                 | Diamond with × or + marker; text goes in `vflowExternalLabel`                   |
+| `VflowBpmnTask`, `VflowBpmnPool`, `VflowBpmnLane` (bpmn) | `vflowBpmnTask`, `vflowBpmnPool`, `vflowBpmnLane`                  | Task card, participant frame and lane frame                                     |
+| `VflowBpmnFlow` (bpmn)                                   | `[vflowBpmnFlow]="'message'"` on an SVG path                       | Sequence, message or association line style                                     |
+| `VflowButton`                                            | `vflowButton` on a native button                                   | Button presentation with focus and disabled states                              |
 
 Each directive is independently importable. Apart from `vflow-controls`, none imports ngx-vflow; none owns
 graph state, adds wrapper elements, registers ports or changes accessibility roles. Public selectors are the

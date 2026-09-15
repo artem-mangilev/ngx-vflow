@@ -4,7 +4,7 @@ import { VflowMocks, provideCustomNodeMocks } from 'ngx-vflow/testing';
 import { injectNode } from './inject-node';
 
 @Component({
-  template: `<div resizable>{{ ctx.node.id }}<handle type="source" position="right" /></div>`,
+  template: `<div resizable>{{ ctx.node.id }}<span vflowHandle type="source" position="right"></span></div>`,
   imports: [VflowMocks],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

@@ -6,8 +6,8 @@ import { ConnectionInternal } from '../interfaces/connection.internal.interface'
  *
  */
 export function adjustDirection(connection: ConnectionInternal): ConnectionInternal {
-  const sourceType = connection.sourceHandle.rawHandle.type;
-  const targetType = connection.targetHandle.rawHandle.type;
+  const sourceType = connection.sourceHandle.type();
+  const targetType = connection.targetHandle.type();
 
   // If both handles are of the same type, preserve the original
   // source/target mapping

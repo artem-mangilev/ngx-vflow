@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, output } from '@angular/core';
+import { VflowPort } from '@vflow/ui';
 import { Node, Vflow, injectNode } from 'ngx-vflow';
 
 @Component({
@@ -25,7 +26,7 @@ import { Node, Vflow, injectNode } from 'ngx-vflow';
         <div class="section">
           <div class="section-label">Input</div>
           <div class="data-preview">You can attach handle to content inside node</div>
-          <handle type="target" position="left" id="input-1" />
+          <span vflowPort type="target" position="left" id="input-1"></span>
         </div>
         <div class="transform-indicator">
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
@@ -40,7 +41,7 @@ import { Node, Vflow, injectNode } from 'ngx-vflow';
         <div class="section">
           <div class="section-label">Output</div>
           <div class="data-preview">You can attach handle to content inside node</div>
-          <handle type="source" position="right" id="output-1" />
+          <span vflowPort type="source" position="right" id="output-1"></span>
         </div>
       </div>
     </div>
@@ -172,7 +173,7 @@ import { Node, Vflow, injectNode } from 'ngx-vflow';
       }
     `,
   ],
-  imports: [Vflow],
+  imports: [Vflow, VflowPort],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TransformNodeComponent {

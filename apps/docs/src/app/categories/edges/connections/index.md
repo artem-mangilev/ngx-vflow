@@ -6,13 +6,13 @@ Edges are not created automatically. To create a new edge, follow these steps:
 
 ## Strict connections
 
-In the default `'strict'` `mode` of `ConnectionSettings`, edges are created from connections with strict adherence to the `source` and `target` types of the `HandleComponent`. This means connections can only be established in one direction based on these properties.
+In the default `'strict'` `mode` of `ConnectionSettings`, edges are created from connections with strict adherence to the `source` and `target` types of the `vflowHandle` directive. This means connections can only be established in one direction based on these properties.
 
 {{ NgDocActions.demoPane("DefaultConnectionDemoComponent") }}
 
 ## Loose connections
 
-This is the `'loose'` `mode` of `ConnectionSettings`, where the flow ignores the handle `type` and allows any handle to connect with any other handle. In this mode, an `id` must be provided for the `HandleComponent` to function correctly.
+This is the `'loose'` `mode` of `ConnectionSettings`, where the flow ignores the handle `type` and allows any handle to connect with any other handle. In this mode, an `id` must be provided for each `vflowHandle` to function correctly.
 
 {{ NgDocActions.demoPane("LooseConnectionDemoComponent") }}
 

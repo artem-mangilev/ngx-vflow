@@ -43,3 +43,7 @@ lazy-loading, accessibility, design-system) ещё описывают `html-temp
 на overview, custom-nodes, subflows, resizer, accessibility, minimap, lazy-loading, stress-test,
 drag-and-drop, relationships и bpmn все ноды и рёбра видимы, размеры групп совпадают с данными,
 ошибок в консоли нет.
+
+2026-09-15, после тикета 05: всё про handle в этом тикете уже сделано (демо, `flow-presentations`, моки `handle-mock`,
+страница handles, сниппеты и строка таблицы в migration, термин «Handle» в `CONTEXT.md`). Раздел migration про
+остальные пункты «Что ломается» и «Лейбл ребра» в `CONTEXT.md` остаются здесь.

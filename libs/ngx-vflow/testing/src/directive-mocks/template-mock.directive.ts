@@ -4,8 +4,6 @@ import type {
   EdgeLabelPosition,
   EdgeLabelTemplateDirective,
   EdgeTemplateDirective,
-  HandleContext,
-  HandleTemplateDirective,
   NodeTemplateDirective,
 } from 'ngx-vflow';
 import { AsInterface } from '../types';
@@ -47,17 +45,4 @@ export class EdgeLabelTemplateMockDirective implements AsInterface<EdgeLabelTemp
 })
 export class NodeTemplateMockDirective implements AsInterface<NodeTemplateDirective> {
   public templateRef = inject(TemplateRef);
-}
-
-@Directive({
-  standalone: true,
-  selector: 'ng-template[handle]',
-})
-export class HandleTemplateMockDirective implements AsInterface<HandleTemplateDirective> {
-  public templateRef = inject<TemplateRef<HandleContext>>(TemplateRef);
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Angular consumes this type predicate to check templates.
-  static ngTemplateContextGuard(dir: HandleTemplateMockDirective, ctx: unknown): ctx is HandleContext {
-    return true;
-  }
 }

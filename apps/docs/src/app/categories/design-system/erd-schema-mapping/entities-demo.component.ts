@@ -91,31 +91,20 @@ interface EntityData {
                   (click)="deleteField(ctx.node.id, field.id)">
                   ×
                 </button>
-                <!-- Per-row templates: connection state is application knowledge about existing edges. -->
-                <ng-template #inPort let-handle handle>
-                  <span
-                    vflowPort
-                    [vflowPortState]="handle.state()"
-                    [vflowPortConnected]="connected().has(ctx.node.id + '/in:' + field.id)"></span>
-                </ng-template>
-                <ng-template #outPort let-handle handle>
-                  <span
-                    vflowPort
-                    [vflowPortState]="handle.state()"
-                    [vflowPortConnected]="connected().has(ctx.node.id + '/out:' + field.id)"></span>
-                </ng-template>
-                <handle
+                <span
+                  vflowPort
                   type="target"
                   position="left"
                   [id]="'in:' + field.id"
-                  [template]="inPort"
-                  [ariaLabel]="ctx.data().title + '.' + field.name + ' input'" />
-                <handle
+                  [ariaLabel]="ctx.data().title + '.' + field.name + ' input'"
+                  [vflowPortConnected]="connected().has(ctx.node.id + '/in:' + field.id)"></span>
+                <span
+                  vflowPort
                   type="source"
                   position="right"
                   [id]="'out:' + field.id"
-                  [template]="outPort"
-                  [ariaLabel]="ctx.data().title + '.' + field.name + ' output'" />
+                  [ariaLabel]="ctx.data().title + '.' + field.name + ' output'"
+                  [vflowPortConnected]="connected().has(ctx.node.id + '/out:' + field.id)"></span>
               </div>
             }
           </article>

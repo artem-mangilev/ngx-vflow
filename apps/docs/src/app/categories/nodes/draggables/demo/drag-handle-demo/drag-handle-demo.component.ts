@@ -1,12 +1,13 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { DocsPresentations } from '@docs/shared';
+import { VflowPort } from '@vflow/ui';
 import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
 
 @Component({
   templateUrl: './drag-handle-demo.component.html',
   styleUrls: ['./drag-handle-demo.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DocsPresentations, Vflow],
+  imports: [DocsPresentations, Vflow, VflowPort],
 })
 export class DragHandleDemoComponent {
   public nodes: Node[] = createNodes([

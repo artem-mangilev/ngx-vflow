@@ -22,14 +22,22 @@ import { createEdges, createNodes, Vflow } from 'ngx-vflow';
       border-radius: 4px;
       background: #fff;
     }
+    .dot {
+      width: 12px;
+      height: 12px;
+      box-sizing: border-box;
+      border-radius: 50%;
+      border: 2px solid #fff;
+      background: #333;
+    }
   `,
   template: `
     <vflow view="auto" data-testid="core-flow" [nodes]="nodes" [edges]="edges">
       <ng-template let-ctx node>
         <div class="card" selectable>
           {{ ctx.data().title }}
-          <handle type="target" position="left" />
-          <handle type="source" position="right" />
+          <span vflowHandle type="target" position="left" class="dot"></span>
+          <span vflowHandle type="source" position="right" class="dot"></span>
         </div>
       </ng-template>
       <mini-map />

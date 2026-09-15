@@ -1,12 +1,13 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { DocsPresentations } from '@docs/shared';
+import { VflowPort } from '@vflow/ui';
 import { Edge, Node, Vflow, removeEdges, removeNodes, createNodes } from 'ngx-vflow';
 
 @Component({
   templateUrl: './delete-selected-demo.component.html',
   styleUrls: ['./delete-selected-demo.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DocsPresentations, Vflow],
+  imports: [DocsPresentations, Vflow, VflowPort],
 })
 export class DeleteSelectedDemoComponent {
   public nodes: Node[] = createNodes([

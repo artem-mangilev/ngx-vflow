@@ -85,10 +85,14 @@ test('field connections follow stable IDs through rename, reorder, density and r
     demo.evaluate((root) => {
       const edge = root.querySelectorAll<SVGPathElement>('path.vui-edge')[1];
       const source = root
-        .querySelector('[data-entity="crm"] [data-field="email"] .handle--right .vui-port')!
+        .querySelector(
+          '[data-entity="crm"] [data-field="email"] .vui-port.vflow-handle[data-vflow-handle-position="right"]',
+        )!
         .getBoundingClientRect();
       const target = root
-        .querySelector('[data-entity="erp"] [data-field="email"] .handle--left .vui-port')!
+        .querySelector(
+          '[data-entity="erp"] [data-field="email"] .vui-port.vflow-handle[data-vflow-handle-position="left"]',
+        )!
         .getBoundingClientRect();
       const matrix = edge.getScreenCTM()!;
       const start = edge.getPointAtLength(0).matrixTransform(matrix);
@@ -104,8 +108,12 @@ test('field connections follow stable IDs through rename, reorder, density and r
   await demo.getByRole('button', { name: 'Remove Copy email connection', exact: true }).click();
   await expect(demo.locator('path.vui-edge')).toHaveCount(1);
   await expect(demo.locator('.vui-port[data-connected="true"]')).toHaveCount(2);
-  const source = demo.locator('[data-entity="crm"] [data-field="email"] .handle.handle--right');
-  const target = demo.locator('[data-entity="erp"] [data-field="email"] .handle.handle--left');
+  const source = demo.locator(
+    '[data-entity="crm"] [data-field="email"] .vflow-handle[data-vflow-handle-position="right"]',
+  );
+  const target = demo.locator(
+    '[data-entity="erp"] [data-field="email"] .vflow-handle[data-vflow-handle-position="left"]',
+  );
   // Core intentionally overlays the target with its magnetic hit area during a connection.
   // Move the pointer through that real surface instead of asking locator.dragTo to bypass it.
   await source.scrollIntoViewIfNeeded();
@@ -114,7 +122,7 @@ test('field connections follow stable IDs through rename, reorder, density and r
   await page.mouse.move(from.x + from.width / 2, from.y + from.height / 2);
   await page.mouse.down();
   await page.mouse.move(to.x + to.width / 2, to.y + to.height / 2, { steps: 12 });
-  await expect(target.locator('.vui-port')).toHaveAttribute('data-state', 'valid');
+  await expect(target).toHaveAttribute('data-state', 'valid');
   await page.mouse.up();
   await expect(demo.locator('path.vui-edge')).toHaveCount(2);
   await expect(demo.getByRole('button', { name: 'Remove Mapping connection', exact: true })).toBeVisible();
@@ -147,14 +155,14 @@ test('BPMN subset: pools with own message flows, lanes, gateways, flow kinds and
   await expect(demo.locator('[data-event="end"]')).toHaveCSS('border-top-width', '5px');
   // The supplier pool is a container that takes part in flows through its own handles.
   const pool = demo.locator('.vui-bpmn-pool').first();
-  await expect(pool.locator('.handle .vui-port')).toHaveCount(2);
+  await expect(pool.locator('.vui-port.vflow-handle')).toHaveCount(2);
   const messageEndpoint = () =>
     demo.evaluate((root) => {
       const edge = root.querySelector<SVGPathElement>('path.vui-bpmn-flow[data-flow="message"]')!;
       // The pool's second bottom handle is its message source; the first one receives messages.
       const source = root
         .querySelector('.vui-bpmn-pool')!
-        .querySelectorAll('.handle--bottom .vui-port')[1]
+        .querySelectorAll('.vui-port.vflow-handle[data-vflow-handle-position="bottom"]')[1]
         .getBoundingClientRect();
       const start = edge.getPointAtLength(0).matrixTransform(edge.getScreenCTM()!);
       return Math.max(Math.abs(start.x - source.x - source.width / 2), Math.abs(start.y - source.bottom));
@@ -272,12 +280,12 @@ test('themes stay scoped per editor, reach every layer and leave core-only flows
   // Core-only flow keeps its own defaults although the UI stylesheet is loaded on the page.
   await expect(core.locator('.plain-edge').first()).toHaveCSS('stroke', 'rgb(177, 177, 183)');
   await expect(core.locator('.plain-node').first()).toHaveCSS('border-color', 'rgb(27, 38, 44)');
-  await expect(core.locator('.handle--default').first()).toHaveCSS('background-color', 'rgb(27, 38, 44)');
+  await expect(core.locator('.plain-handle').first()).toHaveCSS('background-color', 'rgb(27, 38, 44)');
   await expect(core.locator('.vflow-root')).toHaveCSS('background-color', 'rgb(255, 255, 255)');
 
   const geometry = () =>
     a.evaluate((root) =>
-      Array.from(root.querySelectorAll<HTMLElement>('.vflow-node, .handle, path.vui-edge')).map(
+      Array.from(root.querySelectorAll<HTMLElement>('.vflow-node, .vflow-handle, path.vui-edge')).map(
         (element) =>
           element.getAttribute('d') ?? `${element.style.transform}|${element.style.top}|${element.style.left}`,
       ),
@@ -316,10 +324,14 @@ test('pipeline: typed labeled ports, native controls inside nodes and geometry t
     demo.evaluate((root) => {
       const edge = root.querySelectorAll<SVGPathElement>('path.vui-edge')[2];
       const source = root
-        .querySelector('[data-stage="transcode"] [data-port="video"].output .handle--right .vui-port')!
+        .querySelector(
+          '[data-stage="transcode"] [data-port="video"].output .vui-port.vflow-handle[data-vflow-handle-position="right"]',
+        )!
         .getBoundingClientRect();
       const target = root
-        .querySelector('[data-stage="publish"] [data-port="video"] .handle--left .vui-port')!
+        .querySelector(
+          '[data-stage="publish"] [data-port="video"] .vui-port.vflow-handle[data-vflow-handle-position="left"]',
+        )!
         .getBoundingClientRect();
       const matrix = edge.getScreenCTM()!;
       const start = edge.getPointAtLength(0).matrixTransform(matrix);
@@ -346,26 +358,32 @@ test('pipeline: typed labeled ports, native controls inside nodes and geometry t
   await transcode.getByLabel('Poster output', { exact: true }).check();
   await expect(transcode.locator('[data-port="poster"]')).toBeVisible();
   await expect.poll(endpointError).toBeLessThan(1);
-  const source = transcode.locator('[data-port="poster"] .handle--right');
-  const target = demo.locator('[data-stage="publish"] [data-port="poster"] .handle--left');
+  const source = transcode.locator('[data-port="poster"] .vflow-handle[data-vflow-handle-position="right"]');
+  const target = demo.locator(
+    '[data-stage="publish"] [data-port="poster"] .vflow-handle[data-vflow-handle-position="left"]',
+  );
   const from = (await source.boundingBox())!;
   const to = (await target.boundingBox())!;
   await page.mouse.move(from.x + from.width / 2, from.y + from.height / 2);
   await page.mouse.down();
   await page.mouse.move(to.x + to.width / 2, to.y + to.height / 2, { steps: 12 });
-  await expect(target.locator('.vui-port')).toHaveAttribute('data-state', 'valid');
+  await expect(target).toHaveAttribute('data-state', 'valid');
   await page.mouse.up();
   await expect(demo.locator('path.vui-edge')).toHaveCount(5);
-  await expect(target.locator('.vui-port')).toHaveAttribute('data-connected', 'true');
+  await expect(target).toHaveAttribute('data-connected', 'true');
   // A type mismatch is rejected by the application's validator.
-  const audio = demo.locator('[data-stage="mix"] [data-port="audio"].output .handle--right');
-  const video = demo.locator('[data-stage="publish"] [data-port="video"] .handle--left');
+  const audio = demo.locator(
+    '[data-stage="mix"] [data-port="audio"].output .vflow-handle[data-vflow-handle-position="right"]',
+  );
+  const video = demo.locator(
+    '[data-stage="publish"] [data-port="video"] .vflow-handle[data-vflow-handle-position="left"]',
+  );
   const a = (await audio.boundingBox())!;
   const v = (await video.boundingBox())!;
   await page.mouse.move(a.x + a.width / 2, a.y + a.height / 2);
   await page.mouse.down();
   await page.mouse.move(v.x + v.width / 2, v.y + v.height / 2, { steps: 12 });
-  await expect(video.locator('.vui-port')).toHaveAttribute('data-state', 'invalid');
+  await expect(video).toHaveAttribute('data-state', 'invalid');
   await page.mouse.up();
   await expect(demo.locator('path.vui-edge')).toHaveCount(5);
 });
@@ -380,12 +398,14 @@ test('relationships map: container connections, a note without ports, custom con
   await expect(demo.locator('article.vui-node')).toHaveCount(6);
   await expect(demo.locator('path.vui-edge')).toHaveCount(4);
   await expect(demo.locator('svg.avatar')).toHaveCount(4);
-  await expect(demo.locator('.note .handle')).toHaveCount(0);
+  await expect(demo.locator('.note .vflow-handle')).toHaveCount(0);
   // The edge between the two containers starts at the container's own handle.
   const containerEdgeError = () =>
     demo.evaluate((root) => {
       const edge = root.querySelectorAll<SVGPathElement>('path.vui-edge')[0];
-      const source = root.querySelector('.vui-container .handle--right .vui-port')!.getBoundingClientRect();
+      const source = root
+        .querySelector('.vui-container .vui-port.vflow-handle[data-vflow-handle-position="right"]')!
+        .getBoundingClientRect();
       const start = edge.getPointAtLength(0).matrixTransform(edge.getScreenCTM()!);
       return Math.max(Math.abs(start.x - source.right), Math.abs(start.y - source.y - source.height / 2));
     });
@@ -437,8 +457,9 @@ test('scroll and collapse experiment: model kept, endpoints move to the header a
       const rect = root.querySelector(s)!.getBoundingClientRect();
       return { x: rect.right, y: rect.y + rect.height / 2 };
     }, selector);
-  const rowPort = '[data-entity="product"] [data-field="brand-id"] .handle--right .vui-port';
-  const footerPort = '[data-entity="product"] footer .handle--right .vui-port';
+  const rowPort =
+    '[data-entity="product"] [data-field="brand-id"] .vui-port.vflow-handle[data-vflow-handle-position="right"]';
+  const footerPort = '[data-entity="product"] footer .vui-port.vflow-handle[data-vflow-handle-position="right"]';
   const distance = (index: number, selector: string) => async () => {
     const start = await edgeStart(index);
     const port = await portCenter(selector);
@@ -463,7 +484,7 @@ test('scroll and collapse experiment: model kept, endpoints move to the header a
   await demo.getByRole('button', { name: 'Collapse Product', exact: true }).click();
   await expect(rows).toHaveCount(0);
   await expect(demo.locator('path.vui-edge')).toHaveCount(2);
-  const headerPort = '[data-entity="product"] header .handle--right .vui-port';
+  const headerPort = '[data-entity="product"] header .vui-port.vflow-handle[data-vflow-handle-position="right"]';
   await expect.poll(distance(1, headerPort)).toBeLessThan(1.5);
   await expect.poll(distance(0, headerPort)).toBeLessThan(1.5);
   // Expand: the same field IDs restore the endpoints on the rows.

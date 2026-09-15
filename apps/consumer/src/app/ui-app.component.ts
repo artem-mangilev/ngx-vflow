@@ -37,7 +37,7 @@ import { createEdges, createNodes, Vflow, VflowComponent } from 'ngx-vflow';
           @if (ctx.data().kind === 'task') {
             <div vflowBpmnTask class="task" selectable [vflowSelected]="ctx.selected()">
               {{ ctx.data().title }}
-              <handle type="target" position="left" [template]="port" />
+              <span vflowPort type="target" position="left"></span>
             </div>
           } @else {
             <article vflowNode selectable [vflowSelected]="ctx.selected()">
@@ -50,7 +50,7 @@ import { createEdges, createNodes, Vflow, VflowComponent } from 'ngx-vflow';
                   <button vflowButton vflowNoDrag type="button" (click)="dark.set(!dark())">Theme</button>
                 </span>
               </footer>
-              <handle type="source" position="right" [template]="port" />
+              <span vflowPort type="source" position="right"></span>
             </article>
           }
         </ng-template>
@@ -68,7 +68,6 @@ import { createEdges, createNodes, Vflow, VflowComponent } from 'ngx-vflow';
       @if (flow(); as flow) {
         <vflow-controls [flow]="flow" />
       }
-      <ng-template #port let-ctx handle><span vflowPort [vflowPortState]="ctx.state()"></span></ng-template>
     </div>
   `,
 })

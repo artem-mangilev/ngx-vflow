@@ -13,7 +13,8 @@ import { filter, firstValueFrom, timeout } from 'rxjs';
     ><vflow [nodes]="nodes()" [edges]="edges" [view]="[600, 350]" [optimization]="{ detachedGroupsLayer: true }">
       <ng-template node>
         <div style="width: 100px; height: 50px">
-          <handle type="target" position="left" /><handle type="source" position="right" />
+          <span vflowHandle type="target" position="left"></span
+          ><span vflowHandle type="source" position="right"></span>
         </div>
       </ng-template> </vflow
     ><button>After</button>`,

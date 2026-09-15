@@ -27,13 +27,14 @@ import {
   EntityComponentOutputEvent,
 } from '../../directives/entity-component-outlet.directive';
 import { NODE_REF } from '../../utils/inject-node';
+import { PointerDirective } from '../../directives/pointer.directive';
+import { ConnectionControllerDirective } from '../../directives/connection-controller.directive';
+import { HandleModel } from '../../models/handle.model';
 
 // TODO: fix loading of these by @defer (should work in Angular 18+)
 // public components that uses in default node (loaded by defer)
 import { NodeHandlesControllerDirective } from '../../directives/node-handles-controller.directive';
 import { NodeResizeControllerDirective } from '../../directives/node-resize-controller.directive';
-
-export type HandleState = 'valid' | 'invalid' | 'idle';
 
 @Component({
   selector: 'div[node]',
@@ -59,6 +60,7 @@ export type HandleState = 'valid' | 'invalid' | 'idle';
     EntityComponentOutletDirective,
     NodeHandlesControllerDirective,
     NodeResizeControllerDirective,
+    PointerDirective,
   ],
 })
 export class NodeComponent implements OnInit, OnDestroy {
@@ -72,6 +74,10 @@ export class NodeComponent implements OnInit, OnDestroy {
   private hostRef = inject<ElementRef<HTMLElement>>(ElementRef);
   private nodeAccessor = inject(NodeAccessorService);
   private componentEventBus = inject(ComponentEventBusService);
+  private connectionController = inject(ConnectionControllerDirective, { optional: true });
+
+  /** Every handle of every node gets a magnet while any connection is in progress. */
+  protected readonly connectionActive = this.flowStatusService.connectionActive.asReadonly();
 
   public model = input.required<NodeModel>();
 
@@ -157,6 +163,18 @@ export class NodeComponent implements OnInit, OnDestroy {
 
   protected pushComponentEvent({ eventName, eventPayload }: EntityComponentOutputEvent) {
     this.componentEventBus.pushNodeEvent({ nodeId: this.model().rawNode.id, eventName, eventPayload });
+  }
+
+  protected endConnection() {
+    this.connectionController?.endConnection();
+  }
+
+  protected validateConnection(handle: HandleModel) {
+    this.connectionController?.validateConnection(handle);
+  }
+
+  protected resetValidateConnection(handle: HandleModel) {
+    this.connectionController?.resetValidateConnection(handle);
   }
 
   protected pullNode() {

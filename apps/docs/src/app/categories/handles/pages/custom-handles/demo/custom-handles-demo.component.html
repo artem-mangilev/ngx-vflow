@@ -22,53 +22,38 @@
 
     <ng-template let-ctx node>
       @if (ctx.data().type === 'output') {
+        <!-- Plain elements: the application styles them through data-vflow-handle attributes. -->
         <div class="custom-node">
           <div class="data-block">
             Output 1
-            <handle
-              position="right"
+            <span
+              vflowHandle
               type="source"
+              position="right"
+              class="dot-handle"
               [id]="ctx.data().output1"
-              [canStart]="outputOneCanStart()"
-              [template]="handleTemplate" />
+              [canStart]="outputOneCanStart()"></span>
           </div>
           <div class="data-block">
             Output 2
-            <handle position="right" type="source" [id]="ctx.data().output2" [template]="handleTemplate" />
+            <span vflowHandle type="source" position="right" class="dot-handle" [id]="ctx.data().output2"></span>
           </div>
         </div>
       }
 
       @if (ctx.data().type === 'input') {
+        <!-- A component that is a handle: see square-handle.component.ts. -->
         <div class="custom-node">
           <div class="data-block">
             Input 1
-            <handle
-              position="left"
-              type="target"
-              [id]="ctx.data().input1"
-              [canAccept]="inputOneCanAccept()"
-              [template]="squareHandleTemplate" />
+            <square-handle type="target" position="left" [id]="ctx.data().input1" [canAccept]="inputOneCanAccept()" />
           </div>
           <div class="data-block">
             Input 2
-            <handle position="left" type="target" [id]="ctx.data().input2" [template]="squareHandleTemplate" />
+            <square-handle type="target" position="left" [id]="ctx.data().input2" />
           </div>
         </div>
       }
     </ng-template>
   </vflow>
 </div>
-
-<ng-template #handleTemplate let-ctx handle>
-  <div class="circle-handle" [class.handle_disabled]="!ctx.canStart()"></div>
-</ng-template>
-
-<ng-template #squareHandleTemplate let-ctx handle>
-  <div
-    class="square-handle"
-    [class.handle_idle]="ctx.state() === 'idle'"
-    [class.handle_valid]="ctx.state() === 'valid'"
-    [class.handle_invalid]="ctx.state() === 'invalid'"
-    [class.handle_disabled]="!ctx.canAccept()"></div>
-</ng-template>

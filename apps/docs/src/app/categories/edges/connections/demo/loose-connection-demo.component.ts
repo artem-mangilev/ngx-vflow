@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { DocsPresentations } from '@docs/shared';
+import { VflowPort } from '@vflow/ui';
 import { Connection, ConnectionSettings, Edge, Node, Vflow, addEdges, createNodes, injectNode } from 'ngx-vflow';
 
 @Component({
@@ -74,10 +75,10 @@ interface LooseConnectionNodeData {
   template: `<div class="node">
     {{ ctx.data().text }}
 
-    <handle type="source" position="top" id="a" />
-    <handle type="source" position="right" id="b" />
-    <handle type="source" position="bottom" id="c" />
-    <handle type="source" position="left" id="d" />
+    <span vflowPort type="source" position="top" id="a"></span>
+    <span vflowPort type="source" position="right" id="b"></span>
+    <span vflowPort type="source" position="bottom" id="c"></span>
+    <span vflowPort type="source" position="left" id="d"></span>
   </div>`,
   styles: [
     `
@@ -95,7 +96,7 @@ interface LooseConnectionNodeData {
     `,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Vflow],
+  imports: [Vflow, VflowPort],
 })
 export class LooseConnectionNodeComponent {
   protected readonly ctx = injectNode<LooseConnectionNodeData>();

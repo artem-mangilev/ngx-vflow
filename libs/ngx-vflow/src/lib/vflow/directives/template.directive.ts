@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars -- Angular template context guards use parameters only in type predicates. */
 import { Directive, TemplateRef, effect, inject, input, isDevMode, untracked } from '@angular/core';
-import { ConnectionContext, EdgeContext, HandleContext, NodeContext } from '../interfaces/template-context.interface';
+import { ConnectionContext, EdgeContext, NodeContext } from '../interfaces/template-context.interface';
 import { EdgeLabelPosition } from '../interfaces/edge-label.interface';
 import { EdgeComponent } from '../components/edge/edge.component';
 
@@ -111,18 +111,6 @@ export class NodeTemplateDirective {
   public templateRef = inject<TemplateRef<NodeContext>>(TemplateRef);
 
   static ngTemplateContextGuard(dir: NodeTemplateDirective, ctx: unknown): ctx is NodeContext {
-    return true;
-  }
-}
-
-@Directive({
-  standalone: true,
-  selector: 'ng-template[handle]',
-})
-export class HandleTemplateDirective {
-  public templateRef = inject<TemplateRef<HandleContext>>(TemplateRef);
-
-  static ngTemplateContextGuard(dir: HandleTemplateDirective, ctx: unknown): ctx is HandleContext {
     return true;
   }
 }

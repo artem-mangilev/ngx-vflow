@@ -9,7 +9,7 @@ import { SelectionService } from './services/selection.service';
 import { NodeRenderingService } from './services/node-rendering.service';
 import { EdgeRenderingService } from './services/edge-rendering.service';
 import { FlowStatusService } from './services/flow-status.service';
-import { HandleComponent } from './public-components/handle/handle.component';
+import { VflowHandleDirective } from './directives/handle.directive';
 import { MiniMapComponent } from './public-components/minimap/minimap.component';
 import { NodeToolbarComponent } from './public-components/node-toolbar/node-toolbar.component';
 import { EdgeLabelTemplateDirective } from './directives/template.directive';
@@ -25,9 +25,9 @@ class LabelEdgeComponent {}
 @Component({
   template: `<div [style.width.px]="width()" [style.height.px]="height()">
     <input [value]="draft" (input)="draft = $any($event.target).value" />
-    <handle type="target" position="left" /><handle type="source" position="right" />
+    <span vflowHandle type="target" position="left"></span><span vflowHandle type="source" position="right"></span>
   </div>`,
-  imports: [HandleComponent],
+  imports: [VflowHandleDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 class StatefulNodeComponent {
@@ -38,9 +38,9 @@ class StatefulNodeComponent {
 
 @Component({
   template: `<div style="width: 100px; height: 50px">
-    Drag me<handle type="source" position="right" /><node-toolbar>Tools</node-toolbar>
+    Drag me<span vflowHandle type="source" position="right"></span><node-toolbar>Tools</node-toolbar>
   </div>`,
-  imports: [HandleComponent, NodeToolbarComponent],
+  imports: [VflowHandleDirective, NodeToolbarComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 class DragNodeComponent {}
@@ -48,9 +48,9 @@ class DragNodeComponent {}
 /** Nodes without a presentation render an empty wrapper of their size; component nodes measure themselves. */
 @Component({
   template: `<div style="width: 100px; height: 50px">
-    <handle type="target" position="left" /><handle type="source" position="right" />
+    <span vflowHandle type="target" position="left"></span><span vflowHandle type="source" position="right"></span>
   </div>`,
-  imports: [HandleComponent],
+  imports: [VflowHandleDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 class PlainNodeComponent {}
@@ -227,9 +227,9 @@ describe('CSS viewport virtualization', () => {
     const [source, first, second, unrelated] = injector.get(FlowEntitiesService).nodes();
     const edge = injector.get(FlowEntitiesService).edges()[0];
     const status = injector.get(FlowStatusService);
-    const sourceHandle = source.handles().find((handle) => handle.rawHandle.type === 'source')!;
-    const firstHandle = first.handles().find((handle) => handle.rawHandle.type === 'target')!;
-    const secondHandle = second.handles().find((handle) => handle.rawHandle.type === 'target')!;
+    const sourceHandle = source.handles().find((handle) => handle.type() === 'source')!;
+    const firstHandle = first.handles().find((handle) => handle.type() === 'target')!;
+    const secondHandle = second.handles().find((handle) => handle.type() === 'target')!;
     const unrelatedUpdates = spyOn(unrelated.connectionActive, 'set').and.callThrough();
     status.setConnectionStartStatus(source, sourceHandle);
     await fixture.whenStable();
@@ -359,7 +359,9 @@ describe('CSS viewport virtualization', () => {
       await new Promise(requestAnimationFrame);
       if (getComputedStyle(host).visibility === 'visible') {
         expect([node.width(), node.height()]).toEqual([320, 120]);
-        expect(host.querySelector<HTMLElement>('.handle--right')!.style.top).toBe('60px');
+        expect(host.querySelector<HTMLElement>('.vflow-handle[data-vflow-handle-position="right"]')!.style.top).toBe(
+          '60px',
+        );
       }
     }
     expect(fixture.debugElement.query(By.directive(StatefulNodeComponent)).componentInstance).toBe(component);

@@ -14,3 +14,11 @@
 .wrapper {
   width: max-content;
 }
+
+.magnet {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: all;
+}

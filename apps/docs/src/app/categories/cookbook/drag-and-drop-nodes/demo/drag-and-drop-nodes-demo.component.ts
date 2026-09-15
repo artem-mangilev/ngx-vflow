@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, viewChild } from '@angular/core';
 import { DocsPresentations } from '@docs/shared';
+import { VflowPort } from '@vflow/ui';
 import { DndDropEvent, DndModule } from 'ngx-drag-drop';
 import {
   Connection,
@@ -20,7 +21,7 @@ const isGroup = (node: Node) => node.data?.().type === 'group';
   templateUrl: './drag-and-drop-nodes-demo.component.html',
   styleUrls: ['./drag-and-drop-nodes-demo.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DocsPresentations, Vflow, DndModule],
+  imports: [DocsPresentations, Vflow, DndModule, VflowPort],
 })
 export class DragAndDropNodesDemoComponent {
   public vflow = viewChild.required(VflowComponent);

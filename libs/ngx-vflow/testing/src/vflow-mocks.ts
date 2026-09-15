@@ -1,4 +1,4 @@
-import { HandleMockComponent } from './component-mocks/handle-mock.component';
+import { HandleMockDirective } from './directive-mocks/handle-mock.directive';
 import { MiniMapMockComponent } from './component-mocks/minimap-mock.component';
 import { NodeToolbarMockComponent } from './component-mocks/node-toolbar-mock.component';
 import { ResizableMockComponent } from './component-mocks/resizable-mock.component';
@@ -11,13 +11,12 @@ import {
   ConnectionTemplateMockDirective,
   EdgeLabelTemplateMockDirective,
   EdgeTemplateMockDirective,
-  HandleTemplateMockDirective,
   NodeTemplateMockDirective,
 } from './directive-mocks/template-mock.directive';
 
 export const VflowMocks = [
   VflowMockComponent,
-  HandleMockComponent,
+  HandleMockDirective,
   ResizableMockComponent,
   SelectableMockDirective,
   EdgeInteractionMockDirective,
@@ -30,5 +29,4 @@ export const VflowMocks = [
   EdgeLabelTemplateMockDirective,
   EdgeTemplateMockDirective,
   ConnectionTemplateMockDirective,
-  HandleTemplateMockDirective,
 ] as const;

@@ -75,9 +75,9 @@ export function connectStartEventFromConnectionStartStatus(status: FlowStatusCon
   return {
     node: status.payload.source.rawNode,
     handle: {
-      id: status.payload.sourceHandle.rawHandle.id,
-      type: status.payload.sourceHandle.rawHandle.type,
-      position: status.payload.sourceHandle.rawHandle.position,
+      id: status.payload.sourceHandle.id(),
+      type: status.payload.sourceHandle.type(),
+      position: status.payload.sourceHandle.position(),
     },
   };
 }
@@ -90,17 +90,17 @@ export function connectEndEventFromConnectionReleaseValidatedStatus(
     from: {
       node: status.payload.source.rawNode,
       handle: {
-        id: status.payload.sourceHandle.rawHandle.id,
-        type: status.payload.sourceHandle.rawHandle.type,
-        position: status.payload.sourceHandle.rawHandle.position,
+        id: status.payload.sourceHandle.id(),
+        type: status.payload.sourceHandle.type(),
+        position: status.payload.sourceHandle.position(),
       },
     },
     to: {
       node: status.payload.target.rawNode,
       handle: {
-        id: status.payload.targetHandle.rawHandle.id,
-        type: status.payload.targetHandle.rawHandle.type,
-        position: status.payload.targetHandle.rawHandle.position,
+        id: status.payload.targetHandle.id(),
+        type: status.payload.targetHandle.type(),
+        position: status.payload.targetHandle.position(),
       },
     },
   };
@@ -112,9 +112,9 @@ export function connectEndEventFromConnectionDroppedStatus(status: FlowStatusCon
     from: {
       node: status.payload.source.rawNode,
       handle: {
-        id: status.payload.sourceHandle.rawHandle.id,
-        type: status.payload.sourceHandle.rawHandle.type,
-        position: status.payload.sourceHandle.rawHandle.position,
+        id: status.payload.sourceHandle.id(),
+        type: status.payload.sourceHandle.type(),
+        position: status.payload.sourceHandle.position(),
       },
     },
     to: {
@@ -131,9 +131,9 @@ export function reconnectStartEventFromReconnectionStartStatus(
     edge: status.payload.oldEdge.edge,
     node: status.payload.source.rawNode,
     handle: {
-      id: status.payload.sourceHandle.rawHandle.id,
-      type: status.payload.sourceHandle.rawHandle.type,
-      position: status.payload.sourceHandle.rawHandle.position,
+      id: status.payload.sourceHandle.id(),
+      type: status.payload.sourceHandle.type(),
+      position: status.payload.sourceHandle.position(),
     },
   };
 }
@@ -147,17 +147,17 @@ export function reconnectEndEventFromReconnectionReleaseValidatedStatus(
     from: {
       node: status.payload.source.rawNode,
       handle: {
-        id: status.payload.sourceHandle.rawHandle.id,
-        type: status.payload.sourceHandle.rawHandle.type,
-        position: status.payload.sourceHandle.rawHandle.position,
+        id: status.payload.sourceHandle.id(),
+        type: status.payload.sourceHandle.type(),
+        position: status.payload.sourceHandle.position(),
       },
     },
     to: {
       node: status.payload.target.rawNode,
       handle: {
-        id: status.payload.targetHandle.rawHandle.id,
-        type: status.payload.targetHandle.rawHandle.type,
-        position: status.payload.targetHandle.rawHandle.position,
+        id: status.payload.targetHandle.id(),
+        type: status.payload.targetHandle.type(),
+        position: status.payload.targetHandle.position(),
       },
     },
   };
@@ -172,9 +172,9 @@ export function reconnectEndEventFromReconnectionDroppedStatus(
     from: {
       node: status.payload.source.rawNode,
       handle: {
-        id: status.payload.sourceHandle.rawHandle.id,
-        type: status.payload.sourceHandle.rawHandle.type,
-        position: status.payload.sourceHandle.rawHandle.position,
+        id: status.payload.sourceHandle.id(),
+        type: status.payload.sourceHandle.type(),
+        position: status.payload.sourceHandle.position(),
       },
     },
     to: {

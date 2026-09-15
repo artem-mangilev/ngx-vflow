@@ -6,7 +6,7 @@ import { createEdge } from './interfaces/edge.interface';
 import { FlowStatusService } from './services/flow-status.service';
 import { FlowEntitiesService } from './services/flow-entities.service';
 import { RequestAnimationFrameBatchingService } from './services/request-animation-frame-batching.service';
-import { HandleComponent } from './public-components/handle/handle.component';
+import { VflowHandleDirective } from './directives/handle.directive';
 import { EdgeLabelTemplateDirective } from './directives/template.directive';
 
 /** An edge presentation that declares a center label, so the flow renders it in the label layer. */
@@ -20,10 +20,10 @@ class LabelEdgeComponent {}
 @Component({
   template: `<div style="width:100px;height:48px;display:flex;align-items:center;justify-content:center">
     Custom node
-    <handle type="target" position="left" />
-    <handle type="source" position="right" />
+    <span vflowHandle type="target" position="left"></span>
+    <span vflowHandle type="source" position="right"></span>
   </div>`,
-  imports: [HandleComponent],
+  imports: [VflowHandleDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 class SmallCustomNodeComponent {}
@@ -50,7 +50,7 @@ describe('Initial handle placement', () => {
         for (let i = 0; i < 8; i++) {
           await new Promise(requestAnimationFrame);
           const node = fixture.nativeElement.querySelector('.vflow-node') as HTMLElement;
-          const handle = node?.querySelector('.handle--right') as HTMLElement | null;
+          const handle = node?.querySelector('.vflow-handle[data-vflow-handle-position="right"]') as HTMLElement | null;
           if (handle) frames.push({ visibility: getComputedStyle(node).visibility, top: handle.style.top });
         }
         const visible = frames.filter((frame) => frame.visibility === 'visible');
@@ -149,11 +149,13 @@ describe('Initial handle placement', () => {
         callback();
       }),
     );
-    const anchor = fixture.nativeElement.querySelector('handle').parentElement as HTMLElement;
+    const anchor = fixture.nativeElement.querySelector('.vflow-handle').parentElement as HTMLElement;
     anchor.style.height = '96px';
     for (let i = 0; i < 8; i++) await new Promise(requestAnimationFrame);
     expect(zoomed).toBeTrue();
-    const handle = fixture.nativeElement.querySelector('.handle--right') as HTMLElement;
+    const handle = fixture.nativeElement.querySelector(
+      '.vflow-handle[data-vflow-handle-position="right"]',
+    ) as HTMLElement;
     expect(parseFloat(handle.style.top)).toBeCloseTo(48, 1);
   });
 
@@ -167,7 +169,9 @@ describe('Initial handle placement', () => {
     fixture.detectChanges();
     await fixture.whenStable();
     await new Promise((resolve) => setTimeout(resolve, 40));
-    const handle = fixture.nativeElement.querySelector('.handle--right') as HTMLElement;
+    const handle = fixture.nativeElement.querySelector(
+      '.vflow-handle[data-vflow-handle-position="right"]',
+    ) as HTMLElement;
     const attributes = spyOn(handle, 'setAttribute').and.callThrough();
     const model = fixture.debugElement.injector.get(FlowEntitiesService).nodes()[0];
     const status = fixture.debugElement.injector.get(FlowStatusService);

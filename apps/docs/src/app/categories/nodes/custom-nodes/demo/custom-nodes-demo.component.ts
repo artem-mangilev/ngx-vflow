@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { DocsPresentations } from '@docs/shared';
+import { VflowPort } from '@vflow/ui';
 import { Node, Edge, Vflow, createNodes } from 'ngx-vflow';
 
 @Component({
@@ -10,7 +11,7 @@ import { Node, Edge, Vflow, createNodes } from 'ngx-vflow';
       <div class="custom-node" selectable [class.custom-node_selected]="ctx.selected()">
         {{ ctx.data().text }}
 
-        <handle type="source" position="right" />
+        <span vflowPort type="source" position="right"></span>
       </div>
     </ng-template>
   </vflow>`,
@@ -39,7 +40,7 @@ import { Node, Edge, Vflow, createNodes } from 'ngx-vflow';
     `,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DocsPresentations, Vflow],
+  imports: [DocsPresentations, Vflow, VflowPort],
 })
 export class CustomNodesDemoComponent {
   public nodes: Node[] = createNodes([

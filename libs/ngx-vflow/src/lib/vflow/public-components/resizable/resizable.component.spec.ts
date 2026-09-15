@@ -57,12 +57,12 @@ class ResizableTestHostComponent {
         @if (withResizable()) {
           <div class="card" resizable>
             <div class="content"></div>
-            <handle type="source" position="right" />
+            <span vflowHandle type="source" position="right"></span>
           </div>
         } @else {
           <div class="card">
             <div class="content"></div>
-            <handle type="source" position="right" />
+            <span vflowHandle type="source" position="right"></span>
           </div>
         }
       </ng-template>
@@ -129,7 +129,7 @@ async function createSizeTargetFixture(options: { withResizable?: boolean; nodes
     wrapper: () => root.querySelector<HTMLElement>('.wrapper')!,
     node: () => root.querySelector<HTMLElement>('.vflow-node')!,
     controls: () => Array.from(root.querySelectorAll<HTMLElement>('.resize-control')),
-    handle: () => root.querySelector<HTMLElement>('handle .handle')!,
+    handle: () => root.querySelector<HTMLElement>('.vflow-handle')!,
   };
 }
 

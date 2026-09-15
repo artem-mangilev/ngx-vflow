@@ -4,7 +4,7 @@ Optional, directive-first design-system primitives for ngx-vflow. Requires Angul
 This package is developed locally and will first be published with the next ngx-vflow major release.
 
 Import individual directives or the `VflowUi` array from `@vflow/ui` into your standalone
-component. They style your own HTML/SVG, without adding wrappers or depending on ngx-vflow.
+component. They style your own HTML/SVG without adding wrappers; `vflowPort` is itself a core handle.
 
 ```html
 <section vflowTheme="light">
@@ -32,9 +32,10 @@ The package includes card, field-row and container shells, text roles (title, me
 port visuals, status indicators, SVG edge strokes, HTML labels, toolbar surfaces, external labels,
 theme and selection directives, and `vflow-controls` (zoom in/out, fit view, custom buttons) for a
 flow instance. The BPMN subset lives in the `@vflow/ui/bpmn` entry point.
-For flow interaction compose them with core `selectable`, `handle`
+For flow interaction compose them with core `selectable`, `vflowHandle`
 and gesture-exclusion directives; `edgeInteraction` gives an edge its hit area and click selection. Bind `vflowSelected` to selection/preselection and put
-`vflowPort` inside a handle template. UI never changes roles, focus or graph state.
+`vflowPort` with the handle inputs `type`, `position`, `id`, `canStart`, `canAccept` on the element that
+is the connection point: it applies core `vflowHandle` as a host directive and shows its connection feedback. UI never changes roles, focus or graph state.
 
 Use `vflowTheme="light"` or `vflowTheme="dark"` on the editor ancestor and override the shared tokens
 `--vui-surface`, `--vui-surface-muted`, `--vui-foreground`, `--vui-muted`, `--vui-border`, `--vui-accent`,

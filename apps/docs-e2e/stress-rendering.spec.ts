@@ -7,7 +7,9 @@ test('virtualization demo retains node DOM and geometry through viewport pan', a
   await expect(nodes.first()).toHaveCSS('visibility', 'visible');
   await page.locator('.vflow-pane').scrollIntoViewIfNeeded();
   const first = await nodes.first().elementHandle();
-  const handleTop = await first!.evaluate((node) => node.querySelector<HTMLElement>('.handle--right')!.style.top);
+  const handleTop = await first!.evaluate(
+    (node) => node.querySelector<HTMLElement>('.vflow-handle[data-vflow-handle-position="right"]')!.style.top,
+  );
   await expect
     .poll(() => nodes.evaluateAll((items) => items.filter((node) => getComputedStyle(node).display === 'none').length))
     .toBeGreaterThan(0);
@@ -21,7 +23,11 @@ test('virtualization demo retains node DOM and geometry through viewport pan', a
   await page.mouse.up();
   await expect(nodes.first()).toHaveCSS('display', 'none');
   expect(await first!.evaluate((node) => node.isConnected)).toBe(true);
-  expect(await first!.evaluate((node) => node.querySelector<HTMLElement>('.handle--right')!.style.top)).toBe(handleTop);
+  expect(
+    await first!.evaluate(
+      (node) => node.querySelector<HTMLElement>('.vflow-handle[data-vflow-handle-position="right"]')!.style.top,
+    ),
+  ).toBe(handleTop);
   const pane = (await page.locator('.vflow-pane').boundingBox())!;
   // Return via a gap between columns in the translated graph.
   const back = { x: pane.x + 125, y: pane.y + box.height + 25 };
@@ -47,7 +53,7 @@ test('stress demo reveals custom nodes and edges with positioned handles', async
           if (getComputedStyle(node).visibility !== 'visible') continue;
           const anchor = node.querySelector('.stress-node')?.getBoundingClientRect();
           if (!anchor) continue;
-          for (const handle of node.querySelectorAll<HTMLElement>('.handle')) {
+          for (const handle of node.querySelectorAll<HTMLElement>('.vflow-handle')) {
             const rect = handle.getBoundingClientRect();
             if (Math.abs(rect.y + rect.height / 2 - anchor.y - anchor.height / 2) > 0.2) {
               misplaced.push(handle.style.top);

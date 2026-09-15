@@ -1,6 +1,6 @@
 # Спецификация: единая нода, компонентные ноды и рёбра, handle-директива, декларативные лейблы
 
-Status: in-progress (01, 02, 03 resolved)
+Status: in-progress (01–06 resolved)
 Ветка: `3.0`. Обсуждение и сравнение с React Flow, ng-diagram и Foblex зафиксированы в `report.md`.
 
 ## Цель
@@ -150,38 +150,100 @@ export interface Edge<T = unknown> extends Connection {
 vflowBaseEdge>` (модель ng-diagram/Foblex). Требует переделки reconnect и селекции и сужает
   свободу рисовать произвольный SVG. Подробности в `report.md`.
 
-### D5. Handle это директива в core; визуал в `@vflow/ui`
+### D5. Handle это директива в core; визуал целиком у консьюмера
 
-- `[vflowHandle]` (core, `exportAs: 'vflowHandle'`), ставится на любой элемент презентации ноды:
-  - входы: `vflowHandle: 'source' | 'target'` (тип), `position: Position` (сторона, от неё зависит
-    направление пути), `id?`, `canStart`, `canAccept`, `offsetX`, `offsetY`, `ariaLabel?`,
-    `ariaDescription?`, `domAttributes?`, `layout: 'auto' | 'manual'` (по умолчанию `auto`);
-  - публичные сигналы: `state`, `canStart`, `canAccept`, `type`, `position`;
-  - регистрирует `HandleModel` в `HandleService` на init, снимает на destroy;
-  - точка соединения это центр host-элемента (`getBoundingClientRect`), деление на фактический
-    zoom как сейчас; `hostReference` и `handleElement` в `HandleModel` схлопываются в один
-    `element`; `nodeHandlesController` наблюдает host-элементы директив;
-  - pointer-взаимодействие (`pointerStart`/`pointerEnd`) навешивается на host;
-  - `EntityAccessibilityDirective` применяется к host через `hostDirectives`.
-- `layout: 'auto'`: директива пишет host-стили `position: absolute`, `top/left/right/bottom` и
-  `transform` по стороне, как сегодняшний `.handle--<side>`. Якорь по-прежнему родитель host-элемента:
-  handle встаёт на сторону ноды на уровне центра родителя. Только позиционирование, никаких
-  размеров, цветов и рамок.
-- `layout: 'manual'`: директива стили не пишет; консьюмер размещает элемент сам.
-- Пустой handle: элемент обязан оставаться в layout. `visibility: hidden`, `opacity: 0` и нулевой
-  размер измеряются, `display: none` нет и модель остаётся неизмеренной (рёбра к ней не
-  показываются). Чтобы из невидимого handle можно было тянуть, ему дают размер и `opacity: 0`.
-  Правило фиксируется в документации и в dev-предупреждении при первом неудачном измерении.
-- Магнит (зона прилипания при активном соединении) рендерится `NodeComponent` в слое ноды по
-  `localPoint` каждого handle, как контролы ресайзера, а не соседним элементом в DOM консьюмера.
-- Удаляются: `HandleComponent` (`<handle>`), `HandleTemplateDirective`, `HandleContext`, вход
-  `template`, стили `.handle--default`. Дефолтной точки в core нет.
-- `@vflow/ui`: `[vflowPort]` инжектит `VflowHandle` с того же host (`self`, `optional`) и берёт
-  `state` из него; вход `vflowPortState` остаётся как явный override. Типичное использование:
+Пересмотрено 2026-09-15. Ядро делает только регистрацию, измерение и позиционирование элемента; размер,
+цвет, рамка и `pointer-events` принадлежат приложению. Состояние отдаётся двумя каналами: атрибутами
+host-элемента для CSS и `injectHandle()` для кода.
 
-  ```html
-  <span vflowHandle="source" position="right" id="out" vflowPort></span> <span vflowHandle="target" position="left" vflowPort [vflowPortConnected]="hasEdge()"></span>
-  ```
+- `VflowHandleDirective`, селектор `[vflowHandle]`, `exportAs: 'vflowHandle'`. Ставится на любой элемент
+  презентации ноды или подключается компонентом через `hostDirectives`.
+- Входы: `type: 'source' | 'target'`, `position`, `id`, `layout: 'auto' | 'manual'`,
+  `offsetX`, `offsetY`, `canStart`, `canAccept`, `ariaLabel`, `ariaDescription`, `domAttributes`.
+- Дефолты зашиты в директиву: `source`, `top`, `auto`, как у React Flow. `position` и `layout`
+  обычные входы. Роль компонента на `hostDirectives` задаётся там, где он используется, через проброшенные входы
+  (`inputs: ['type', 'position', …]`); компонент с неизменной ролью ставит `vflowHandle` на элемент
+  своего шаблона. Решено 2026-09-15: провайдер дефолтов удалён, он требовал публичных полей-двойников входов
+  (`positionInput`/`layoutInput`) и давал второй способ задать роль.
+- Состояние для CSS: класс `vflow-handle` и `data-vflow-handle-type`, `data-vflow-handle-position`,
+  `data-vflow-handle-state`, `data-vflow-handle-can-start`, `data-vflow-handle-can-accept`. Префикс
+  `data-vflow-` как у `data-vflow-no-drag`, чтобы не спорить с `data-type`/`data-state` приложения и
+  `vflowPort` на том же элементе.
+- Состояние для кода: `HANDLE_REF` провайдится директивой, `injectHandle()` это `inject(HANDLE_REF)`,
+  по аналогии с `NODE_REF`/`EDGE_REF`. `HandleRef`: `state`, `type`, `position`, `id`, `canStart`,
+  `canAccept`, все `Signal`. Те же сигналы публичны на директиве (`#h="vflowHandle"`). Контекста шаблона нет.
+- Модель. `HandleModel` получает сигналы, а не снимок входов, поэтому смена `position`, `type`, `id`,
+  `offset*` и `layout` на лету работает. `hostReference` и `handleElement` схлопываются в `element`;
+  `rawHandle` удалён, читать `handle.type()`, `handle.position()`, `handle.id()`. Регистрация в
+  `HandleService` в конструкторе директивы, снятие в `DestroyRef`.
+- Точка соединения это середина стороны `position` у прямоугольника host-элемента (внешний край, как у
+  React Flow и как было у `<handle>`), в единицах потока после деления на фактический zoom.
+- `layout: 'auto'`: директива пишет `position: absolute`, `top/left/right/bottom` и `transform`
+  (`translate` по стороне плюс `offsetX/offsetY`). Якорь это родитель host: handle встаёт на сторону ноды на
+  уровне центра родителя. Координаты считаются от фактического containing block host-элемента
+  (`offsetParent`, его padding box и scroll). Если это сама нода, стили как раньше (`left: 0` / `right: 0`),
+  иначе `left/top` от этого блока, поэтому `position: relative` у строки поля или карточки не сдвигает handle.
+  В `auto` директива владеет `transform`; для эффектов наведения использовать CSS-свойства `scale`/`translate`
+  или вложенный элемент.
+- `layout: 'manual'`: стили не пишутся, консьюмер размещает элемент сам, точка берётся из измеренного
+  прямоугольника; `offsetX/offsetY` не применяются. Перемер по resize host, его родителя и ноды.
+- Пустой handle: элемент обязан оставаться в layout. `visibility: hidden`, `opacity: 0` и нулевой размер
+  измеряются. `display: none` нет: модель помечается `hasBox = false`, рёбра к ней не показываются, но нода
+  не ждёт такой handle для показа. Первое такое измерение даёт dev-warning. Чтобы из невидимого handle
+  можно было тянуть, ему дают размер и `opacity: 0`.
+- Pointer: `mousedown`/`touchstart` и `mouseup`/`touchend` через host-listeners директивы;
+  `RootPointerDirective` инжектится опционально, чтобы директива работала в юнит-тестах консьюмера с
+  `provideCustomNodeMocks()`. `PointerDirective` в `hostDirectives` не используется: его output
+  защищены, и он требует корневой директивы.
+- A11y: логика `EntityAccessibilityDirective` вынесена в функцию `bindEntityAccessibility(source)`,
+  директива `[vflowA11y]` и handle вызывают её; `hostDirectives` с обязательным входом не нужен.
+- Магнит (зона прилипания при активном соединении) рендерит `NodeComponent` в слое ноды по
+  `localPoint` каждого измеренного handle, как контролы ресайзера. `validateConnection`,
+  `resetValidateConnection` и `endConnection` на магните живут в `NodeComponent`.
+- Удаляются в этой же задаче, без переходной обёртки: `HandleComponent` (`<handle>`),
+  `HandleTemplateDirective`, `HandleContext`, вход `template`, стили `.handle--*`. Docs, `apps/consumer`,
+  моки `ngx-vflow/testing` и e2e-селекторы переводятся сразу.
+- `@vflow/ui`: `VflowPort` сам является handle: `hostDirectives: [VflowHandleDirective]` с пробросом
+  `type`, `position`, `id`, `layout`, `offsetX/Y`, `canStart`, `canAccept`, `aria*`, `domAttributes`
+  (`<span vflowPort type="target" position="left">`). `state` берётся из директивы на том же
+  элементе; `vflowPortState` остаётся явным override. `vflowHandle` и `vflowPort` на одном элементе не ставятся
+  (директива применилась бы дважды); порт вне ноды не работает (решено 2026-09-15, других использований нет).
+- Тестовые моки: `HandleMockDirective` с селектором `[vflowHandle]` и теми же входами, провайдит
+  статический `HANDLE_REF`. Компонент консьюмера с `hostDirectives: [VflowHandleDirective]` (и `vflowPort`) в
+  юнит-тесте получает настоящую директиву, её зависимости покрывает `provideCustomNodeMocks()`.
+
+```html
+<span vflowHandle type="source" position="right" id="out" class="port"></span> <span vflowPort type="target" position="left" [vflowPortConnected]="hasEdge()"></span>
+```
+
+```ts
+@Component({
+  selector: 'app-output-port',
+  hostDirectives: [{ directive: VflowHandleDirective, inputs: ['type', 'position', 'id', 'canStart'] }],
+  template: `<svg:svg viewBox="0 0 12 12">…</svg:svg>`,
+})
+export class OutputPortComponent {
+  protected readonly handle = injectHandle();
+}
+```
+
+```html
+<app-output-port type="source" position="right" id="out" />
+```
+
+- Тип handle это вход `type` (решено 2026-09-15), как у React Flow и старого `<handle>`. Вариант
+  `vflowHandle="source"` отвергнут: компонент на `hostDirectives` мог пробросить вход только под другим именем,
+  иначе атрибут `vflowHandle` в шаблоне с импортом `Vflow` совпадал с селектором и директива применялась второй
+  раз (NG0309). Цена: статический `type` доходит и до нативного атрибута, поэтому handle не ставится на
+  `button` и `input`; это описано в документации и в JSDoc входа.
+- TODO: придумать префикс для входов handle (например `vflowType` или `vwType`), чтобы они не конфликтовали с
+  нативными атрибутами и входами компонентов, применяющих директиву через `hostDirectives`. Пометка оставлена
+  в `handle.directive.ts`.
+- Отвергнуто: `PointerDirective` и `EntityAccessibilityDirective` через `hostDirectives` (см. выше);
+  переходная обёртка `<handle>` с `@deprecated` (решение пользователя, удалить сразу);
+  `provideHandleDefaults()` (был реализован и удалён 2026-09-15, см. выше); `vflowPort` как отдельный визуал,
+  читающий `HANDLE_REF` предка; `data-type`/`data-state`
+  без префикса (конфликт с атрибутами приложения и `vflowPort`).
 
 ### D6. Лейблы рёбер объявляются внутри презентации ребра
 
@@ -251,11 +313,13 @@ TemplateRef>>>`, снимая регистрацию через `onCleanup` пр
 - `Edge`: поле `edgeLabels` удалено; добавлено `component`.
 - Шаблоны `<vflow>`: `nodeHtml` → `node`; `groupNode` удалён; `edgeLabelHtml` удалён.
 - `CustomNodeComponent` удалён; контекст через `injectNode()`; вход `node` не ставится.
-- `<handle>` → `[vflowHandle]`; `HandleContext`, `[template]` удалены; дефолтная точка уехала в
-  `@vflow/ui` (`vflowPort`).
+- `<handle>` → `[vflowHandle]`; `HandleComponent`, `HandleTemplateDirective`, `HandleContext`, `[template]`
+  удалены; дефолтной точки в core нет, визуал у приложения или `vflowPort` из `@vflow/ui`. Новое:
+  `injectHandle()`, `HANDLE_REF`, `layout`; вход типа `type`; `vflowPort` сам является handle.
 - `g[customTemplateEdge]` → `g[customEdge]`.
 - Новые output: `(componentEdgeEvent)`.
-- Внутренние (`ɵ`): `HandleModel.hostReference`/`handleElement` → `element`; `NodeModel.context`
+- Внутренние (`ɵ`): `HandleModel.hostReference`/`handleElement` → `element`, `rawHandle` → сигналы
+  `type`/`position`/`id`; `NodeModel.context`
   для всех нод с `width`/`height`; `EdgeModel.labelModels` → `labelTemplates`.
 - Тестовые моки `ngx-vflow/testing`: `handle-mock`, `template-mock` (`nodeHtml`, `groupNode`,
   `edgeLabelHtml`), `vflow-mock` (ветки по `type`, слой лейблов), `provide-custom-node-mocks`.
@@ -267,7 +331,7 @@ TemplateRef>>>`, снимая регистрацию через `onCleanup` пр
   события через `reflectComponentType` для `@Output`, `output()`, `outputFromObservable` и отписка
   при уничтожении; компонентное ребро рендерится в SVG-namespace (`instanceof SVGGElement` у host);
   `injectEdge()`; регистрация/снятие `edgeLabel` и рендер в слое лейблов; `[vflowHandle]` в `auto`
-  и `manual`, измерение центра, `display: none` не измеряется; `vflowPort` берёт `state` из
+  и `manual`, точка на стороне `position`, `display: none` не измеряется и не блокирует ноду; `vflowPort` берёт `state` из
   `VflowHandle`; `initial-handles.spec.ts` остаётся зелёным.
 - E2E (`apps/docs-e2e`): `resizer.spec.ts`, `custom-edge-interactions.spec.ts`,
   `accessibility.spec.ts`, `keyboard-navigation.spec.ts`, stress-rendering (первые кадры: 0 линий до

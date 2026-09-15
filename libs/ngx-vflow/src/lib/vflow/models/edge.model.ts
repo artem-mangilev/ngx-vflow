@@ -84,7 +84,14 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
 
   public renderOrder = signal(0);
 
-  public isReady = computed(() => !!this.source()?.isReady() && !!this.target()?.isReady());
+  public isReady = computed(
+    () =>
+      !!this.source()?.isReady() &&
+      !!this.target()?.isReady() &&
+      // An endpoint handle without a layout box has no point to draw to.
+      this.sourceHandle()?.hasBox() !== false &&
+      this.targetHandle()?.hasBox() !== false,
+  );
 
   public detached = computed(() => {
     const source = this.source();
@@ -140,12 +147,12 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
         handle =
           this.source()
             ?.handles()
-            .find((handle) => handle.rawHandle.id === this.edge.sourceHandle) ?? null;
+            .find((handle) => handle.id() === this.edge.sourceHandle) ?? null;
       } else {
         handle =
           this.source()
             ?.handles()
-            .find((handle) => handle.rawHandle.type === 'source') ?? null;
+            .find((handle) => handle.type() === 'source') ?? null;
       }
     }
 
@@ -162,12 +169,12 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
         handle =
           this.target()
             ?.handles()
-            .find((handle) => handle.rawHandle.id === this.edge.targetHandle) ?? null;
+            .find((handle) => handle.id() === this.edge.targetHandle) ?? null;
       } else {
         handle =
           this.target()
             ?.handles()
-            .find((handle) => handle.rawHandle.type === 'target') ?? null;
+            .find((handle) => handle.type() === 'target') ?? null;
       }
     }
 
@@ -187,11 +194,11 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
 
     const sourceHandles =
       this.flowEntitiesService.connection().mode === 'strict'
-        ? source.handles().filter((h) => h.rawHandle.type === 'source')
+        ? source.handles().filter((h) => h.type() === 'source')
         : source.handles();
     const targetHandles =
       this.flowEntitiesService.connection().mode === 'strict'
-        ? target.handles().filter((h) => h.rawHandle.type === 'target')
+        ? target.handles().filter((h) => h.type() === 'target')
         : target.handles();
 
     if (sourceHandles.length === 0 || targetHandles.length === 0) {
@@ -291,8 +298,8 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
       edge: this.edge,
       sourcePoint: source.pointAbsolute(),
       targetPoint: target.pointAbsolute(),
-      sourcePosition: source.rawHandle.position,
-      targetPosition: target.rawHandle.position,
+      sourcePosition: source.position(),
+      targetPosition: target.position(),
       allEdges: this.flowEntitiesService.rawEdges(),
       allNodes: this.flowEntitiesService.rawNodes(),
     };

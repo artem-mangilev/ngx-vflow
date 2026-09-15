@@ -13,7 +13,6 @@ import {
   ConnectionTemplateDirective,
   EdgeLabelTemplateDirective,
   EdgeTemplateDirective,
-  HandleTemplateDirective,
   NodeTemplateDirective,
 } from './directives/template.directive';
 import { ConnectionControllerDirective } from './directives/connection-controller.directive';
@@ -21,7 +20,7 @@ import { ConnectionControllerDirective } from './directives/connection-controlle
 import { MiniMapComponent } from './public-components/minimap/minimap.component';
 import { NodeToolbarComponent } from './public-components/node-toolbar/node-toolbar.component';
 import { ResizableComponent } from './public-components/resizable/resizable.component';
-import { HandleComponent } from './public-components/handle/handle.component';
+import { VflowHandleDirective } from './directives/handle.directive';
 
 export const Vflow = [
   NoKeyboardDirective,
@@ -29,7 +28,7 @@ export const Vflow = [
   NoPanDirective,
   NoWheelDirective,
   VflowComponent,
-  HandleComponent,
+  VflowHandleDirective,
   ResizableComponent,
   SelectableDirective,
   EdgeInteractionDirective,
@@ -42,5 +41,4 @@ export const Vflow = [
   EdgeLabelTemplateDirective,
   EdgeTemplateDirective,
   ConnectionTemplateDirective,
-  HandleTemplateDirective,
 ] as const;

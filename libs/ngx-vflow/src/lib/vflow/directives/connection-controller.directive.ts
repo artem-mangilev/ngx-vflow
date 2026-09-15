@@ -177,10 +177,10 @@ export class ConnectionControllerDirective {
         valid = this.flowEntitiesService.connection().validator({
           source: source.rawNode.id,
           target: target.rawNode.id,
-          sourceHandle: sourceHandle.rawHandle.id,
-          targetHandle: targetHandle.rawHandle.id,
-          sourceHandleType: sourceHandle.rawHandle.type,
-          targetHandleType: targetHandle.rawHandle.type,
+          sourceHandle: sourceHandle.id(),
+          targetHandle: targetHandle.id(),
+          sourceHandleType: sourceHandle.type(),
+          targetHandleType: targetHandle.type(),
         });
       }
 
@@ -285,15 +285,15 @@ function statusToConnection(
   const sourceId = source.rawNode.id;
   const targetId = target.rawNode.id;
 
-  const sourceHandleId = sourceHandle.rawHandle.id;
-  const targetHandleId = targetHandle.rawHandle.id;
+  const sourceHandleId = sourceHandle.id();
+  const targetHandleId = targetHandle.id();
 
   return {
     source: sourceId,
     target: targetId,
     sourceHandle: sourceHandleId,
     targetHandle: targetHandleId,
-    sourceHandleType: sourceHandle.rawHandle.type,
-    targetHandleType: targetHandle.rawHandle.type,
+    sourceHandleType: sourceHandle.type(),
+    targetHandleType: targetHandle.type(),
   };
 }

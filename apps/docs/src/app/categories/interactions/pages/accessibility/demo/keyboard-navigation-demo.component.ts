@@ -1,9 +1,10 @@
 import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
 import { DocsPresentations } from '@docs/shared';
+import { VflowPort } from '@vflow/ui';
 import { Vflow, createEdges, createNodes } from 'ngx-vflow';
 
 @Component({
-  imports: [DocsPresentations, Vflow],
+  imports: [DocsPresentations, Vflow, VflowPort],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section data-testid="keyboard-demo" aria-label="Keyboard navigation example">
@@ -33,7 +34,7 @@ import { Vflow, createEdges, createNodes } from 'ngx-vflow';
             <div class="editor">
               <label>Node title <input aria-label="Node title" vflowNoDrag /></label>
               <button type="button" vflowNoDrag (click)="removeEditor()">Remove editor</button>
-              <handle type="target" position="left" />
+              <span vflowPort type="target" position="left"></span>
             </div>
           } @else {
             <docs-node [ctx]="ctx" />

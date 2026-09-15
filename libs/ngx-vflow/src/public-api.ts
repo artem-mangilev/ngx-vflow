@@ -25,13 +25,13 @@ export * from './lib/vflow/interfaces/component-node-event.interface';
 export * from './lib/vflow/interfaces/component-edge-event.interface';
 export { NODE_REF, NodeRef, injectNode } from './lib/vflow/utils/inject-node';
 export { EDGE_REF, EdgeRef, injectEdge } from './lib/vflow/utils/inject-edge';
+export { HANDLE_REF, HandleRef, injectHandle } from './lib/vflow/utils/inject-handle';
 export * from './lib/vflow/interfaces/fit-view-options.interface';
 export * from './lib/vflow/interfaces/optimization.interface';
 export * from './lib/vflow/interfaces/intersecting-nodes-options.interface';
 export * from './lib/vflow/interfaces/curve-factory.interface';
 export * from './lib/vflow/interfaces/alignment-helper-settings.interface';
 export * from './lib/vflow/interfaces/selection-box-settings.interface';
-export { HandleContext } from './lib/vflow/interfaces/template-context.interface';
 export {
   ConnectEndEvent,
   ConnectStartEvent,
@@ -44,6 +44,7 @@ export {
 export * from './lib/vflow/types/node-change.type';
 export * from './lib/vflow/types/edge-change.type';
 export * from './lib/vflow/types/position.type';
+export * from './lib/vflow/types/handle-type.type';
 export * from './lib/vflow/types/background.type';
 export * from './lib/vflow/types/connection-mode.type';
 export * from './lib/vflow/types/keyboard-action.type';
@@ -52,7 +53,6 @@ export * from './lib/vflow/types/selection-box-mode.type';
 
 // Components
 export * from './lib/vflow/components/vflow/vflow.component';
-export * from './lib/vflow/public-components/handle/handle.component';
 export * from './lib/vflow/public-components/resizable/resizable.component';
 export * from './lib/vflow/public-components/resizable/node-resize-control.component';
 export * from './lib/vflow/public-components/resizable/resizer-types';
@@ -61,6 +61,7 @@ export * from './lib/vflow/public-components/node-toolbar/node-toolbar.component
 
 // Directives
 export * from './lib/vflow/directives/template.directive';
+export * from './lib/vflow/directives/handle.directive';
 export * from './lib/vflow/directives/connection-controller.directive';
 export * from './lib/vflow/directives/changes-controller.directive';
 export * from './lib/vflow/directives/selectable.directive';

@@ -48,34 +48,30 @@ vflow {
   text-align: center;
 }
 
-.circle-handle {
+.dot-handle {
   width: 12px;
   height: 12px;
+  box-sizing: border-box;
   border-radius: 50%;
   border: 1px solid black;
   background-color: #1b262c;
+  transition: scale 0.1s;
 }
 
-.square-handle {
-  width: 10px;
-  height: 10px;
-  border-radius: 1px;
-  border: 1px solid black;
+// In the auto layout the directive owns transform, so hover effects use the scale property.
+.dot-handle:hover {
+  scale: 1.3;
 }
 
-.handle_idle {
-  background-color: #fff;
-}
-
-.handle_valid {
+.dot-handle[data-vflow-handle-state='valid'] {
   background-color: green;
 }
 
-.handle_invalid {
+.dot-handle[data-vflow-handle-state='invalid'] {
   background-color: red;
 }
 
-.handle_disabled {
+.dot-handle[data-vflow-handle-can-start='false'] {
   background-color: #9e9e9e;
   opacity: 0.55;
 }

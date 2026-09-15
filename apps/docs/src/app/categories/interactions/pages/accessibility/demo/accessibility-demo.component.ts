@@ -1,9 +1,10 @@
 import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
 import { DocsPresentations } from '@docs/shared';
+import { VflowPort } from '@vflow/ui';
 import { AriaLabelConfig, Vflow, createEdges, createNodes } from 'ngx-vflow';
 
 @Component({
-  imports: [DocsPresentations, Vflow],
+  imports: [DocsPresentations, Vflow, VflowPort],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section data-testid="accessibility-demo" aria-label="Accessibility example">
@@ -35,14 +36,15 @@ import { AriaLabelConfig, Vflow, createEdges, createNodes } from 'ngx-vflow';
           @if (ctx.node.id === 'approval') {
             <div class="reviewer">
               <button type="button" noDrag noPan (click)="reviews.set(reviews() + 1)">Review request</button>
-              <handle
+              <span
+                vflowPort
                 type="target"
                 position="left"
                 id="incoming"
                 ariaLabel="Accept request"
                 ariaDescription="Inbound route."
                 [canStart]="false"
-                [canAccept]="canAccept()" />
+                [canAccept]="canAccept()"></span>
             </div>
           } @else {
             <docs-node [ctx]="ctx" />

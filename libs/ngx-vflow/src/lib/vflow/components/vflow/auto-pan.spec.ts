@@ -19,8 +19,8 @@ import { VflowComponent } from './vflow.component';
     (reconnect)="(undefined)">
     <ng-template node>
       <div style="width: 100px; height: 50px">
-        <handle type="target" position="left" />
-        <handle type="source" position="right" />
+        <span vflowHandle type="target" position="left"></span>
+        <span vflowHandle type="source" position="right"></span>
       </div>
     </ng-template>
   </vflow>`,
@@ -174,7 +174,7 @@ describe('public auto-pan settings', () => {
       it(`${enabled ? 'enables' : 'disables'} auto-pan for ${reconnect ? 'reconnection' : 'connection creation'}`, async () => {
         await setup({ nodeDrag: false, connectionDrag: enabled });
         const target = fixture.nativeElement.querySelector(
-          reconnect ? '.reconnect-handle' : 'handle[type="source"] .handle',
+          reconnect ? '.reconnect-handle' : '.vflow-handle[data-vflow-handle-type="source"]',
         );
         expect(target).not.toBeNull();
         const rect = fixture.nativeElement.querySelector('.vflow-root').getBoundingClientRect();

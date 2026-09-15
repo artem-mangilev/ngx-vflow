@@ -6,7 +6,7 @@ import { Edge, createEdges } from '../../interfaces/edge.interface';
 import { AnyComponentEdgeEvent } from '../../interfaces/component-edge-event.interface';
 import { AnyComponentNodeEvent } from '../../interfaces/component-node-event.interface';
 import { EdgeTemplateDirective, NodeTemplateDirective } from '../../directives/template.directive';
-import { HandleComponent } from '../../public-components/handle/handle.component';
+import { VflowHandleDirective } from '../../directives/handle.directive';
 import { injectEdge } from '../../utils/inject-edge';
 import { EdgeInteractionDirective } from '../../directives/edge-interaction.directive';
 
@@ -50,7 +50,7 @@ class TemplateEdgeChildComponent {
     (componentNodeEvent)="nodeEvents.push($event)">
     <ng-template node>
       <div style="width: 60px; height: 30px">
-        <handle type="target" position="left" /><handle type="source" position="right" />
+        <span vflowHandle type="target" position="left"></span><span vflowHandle type="source" position="right"></span>
       </div>
     </ng-template>
     <ng-template let-ctx edge>
@@ -62,7 +62,7 @@ class TemplateEdgeChildComponent {
     NodeTemplateDirective,
     EdgeTemplateDirective,
     EdgeInteractionDirective,
-    HandleComponent,
+    VflowHandleDirective,
     TemplateEdgeChildComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -193,12 +193,12 @@ class PlainEdgeComponent {
   template: `<vflow [view]="[400, 200]" [nodes]="nodes" [edges]="edges">
     <ng-template node>
       <div style="width: 60px; height: 30px">
-        <handle type="target" position="left" /><handle type="source" position="right" />
+        <span vflowHandle type="target" position="left"></span><span vflowHandle type="source" position="right"></span>
       </div>
     </ng-template>
     <ng-template let-ctx edge><svg:path class="plain" fill="none" [attr.d]="ctx.path()" /></ng-template>
   </vflow>`,
-  imports: [VflowComponent, NodeTemplateDirective, EdgeTemplateDirective, HandleComponent],
+  imports: [VflowComponent, NodeTemplateDirective, EdgeTemplateDirective, VflowHandleDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 class PlainTemplateHostComponent {

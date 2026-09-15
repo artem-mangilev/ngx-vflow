@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { DocsPresentations } from '@docs/shared';
+import { VflowPort } from '@vflow/ui';
 import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
 
 @Component({
@@ -12,7 +13,7 @@ import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
           [class.group-node_selected]="ctx.selected()"
           [style.width.px]="ctx.width()"
           [style.height.px]="ctx.height()">
-          <handle type="source" position="right" />
+          <span vflowPort type="source" position="right"></span>
         </div>
       } @else {
         <docs-node [ctx]="ctx" />
@@ -42,7 +43,7 @@ import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
     `,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DocsPresentations, Vflow],
+  imports: [DocsPresentations, Vflow, VflowPort],
 })
 export class MinimapDemoComponent {
   public nodes: Node[] = createNodes([

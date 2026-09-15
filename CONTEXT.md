@@ -40,6 +40,10 @@ _Avoid_: Core feature, built-in feature
 A stable, composable presentation part of a node-based interface whose application-specific content and business rules belong to the consuming application.
 _Avoid_: Business component, editor application
 
+**Handle**:
+An element of a node presentation marked as a connection point. The engine registers, measures and positions it on a node side; its size and look belong to the consuming application.
+_Avoid_: Port, anchor
+
 **Headless presentation**:
 A consumption model in which the application supplies node and edge visuals, using its own UI or first-party UI primitives, while the engine owns graph rendering and interaction mechanics.
 _Avoid_: No rendering, no interaction feedback

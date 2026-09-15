@@ -61,11 +61,10 @@ interface EdgeCtx {
     } @else {
       <div vflowNode class="card" selectable [vflowSelected]="ctx().selected() || ctx().preselected()">
         <span [innerHTML]="text()"></span>
-        <handle type="target" position="left" [template]="port" />
-        <handle type="source" position="right" [template]="port" />
+        <span vflowPort type="target" position="left"></span>
+        <span vflowPort type="source" position="right"></span>
       </div>
     }
-    <ng-template #port let-handle handle><span vflowPort [vflowPortState]="handle.state()"></span></ng-template>
   `,
 })
 export class DocsNodeComponent {

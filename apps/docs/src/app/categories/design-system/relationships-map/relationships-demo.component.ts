@@ -120,8 +120,20 @@ type MapData = Person | Metric | Note | Team;
                 >{{ ctx.data().title }} <span vflowMeta>· {{ ctx.data().members }} people</span></span
               >
               <!-- The container has its own connections; it is not a parent of the other team. -->
-              <handle type="source" position="right" [template]="port" [canStart]="!viewMode()" [canAccept]="false" />
-              <handle type="target" position="left" [template]="port" [canStart]="false" [canAccept]="!viewMode()" />
+              <span
+                vflowPort
+                type="source"
+                position="right"
+                vflowPortConnected
+                [canStart]="!viewMode()"
+                [canAccept]="false"></span>
+              <span
+                vflowPort
+                type="target"
+                position="left"
+                vflowPortConnected
+                [canStart]="false"
+                [canAccept]="!viewMode()"></span>
             </div>
           } @else {
             @switch (ctx.data().kind) {
@@ -147,18 +159,20 @@ type MapData = Person | Metric | Note | Team;
                       <span [style.width.%]="ctx.data().reviews * 5"></span>
                     </div>
                   </div>
-                  <handle
+                  <span
+                    vflowPort
                     type="target"
                     position="left"
-                    [template]="port"
+                    vflowPortConnected
                     [canStart]="false"
-                    [canAccept]="!viewMode()" />
-                  <handle
+                    [canAccept]="!viewMode()"></span>
+                  <span
+                    vflowPort
                     type="source"
                     position="right"
-                    [template]="port"
+                    vflowPortConnected
                     [canStart]="!viewMode()"
-                    [canAccept]="false" />
+                    [canAccept]="false"></span>
                 </article>
               }
               @case ('metric') {
@@ -198,9 +212,6 @@ type MapData = Person | Metric | Note | Team;
           }
         </ng-template>
       </vflow>
-      <ng-template #port let-ctx handle
-        ><span vflowPort vflowPortConnected [vflowPortState]="ctx.state()"></span
-      ></ng-template>
     </section>
   `,
 })

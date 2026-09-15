@@ -17,8 +17,8 @@ graph needs templates. There are two working paths:
   <ng-template let-ctx nodeHtml>
     <div class="card" selectable>
       {{ ctx.data().title }}
-      <handle type="target" position="left" />
-      <handle type="source" position="right" />
+      <span vflowHandle type="target" position="left" class="dot"></span>
+      <span vflowHandle type="source" position="right" class="dot"></span>
     </div>
   </ng-template>
   <ng-template let-ctx groupNode>
@@ -45,8 +45,8 @@ graph needs templates. There are two working paths:
     <ng-template let-ctx nodeHtml>
       <article vflowNode selectable [vflowSelected]="ctx.selected() || ctx.preselected()">
         <header vflowNodeHeader><span vflowTitle>{{ ctx.data().title }}</span></header>
-        <handle type="target" position="left" [template]="port" />
-        <handle type="source" position="right" [template]="port" />
+        <span vflowPort type="target" position="left"></span>
+        <span vflowPort type="source" position="right"></span>
       </article>
     </ng-template>
     <ng-template let-ctx edge>
@@ -56,7 +56,6 @@ graph needs templates. There are two working paths:
     </ng-template>
     <ng-template let-ctx edgeLabelHtml><span vflowEdgeLabel>{{ ctx.label.data }}</span></ng-template>
   </vflow>
-  <ng-template #port let-ctx handle><span vflowPort [vflowPortState]="ctx.state()"></span></ng-template>
 </section>
 ```
 
@@ -64,15 +63,16 @@ graph needs templates. There are two working paths:
 
 Include `@vflow/ui/styles.css` in your global styles for path B. See the Design system section for the parts.
 
-| Removed                                                                  | Replacement                                                                                                                                                         |
-| ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Node `type: 'default'`, `text`                                           | `type: 'html-template'` with `data` and a `nodeHtml` template; standard handles become `<handle>` elements in the template. Use `ariaLabel` for the accessible name |
-| Node `type: 'default-group'`, `color`, `resizable`                       | `type: 'template-group'` with a `groupNode` template; put `resizable` on the template's element                                                                     |
-| `DefaultNode`, `DefaultGroupNode`, `isDefaultNode`, `isDefaultGroupNode` | `HtmlTemplateNode`, `TemplateGroupNode`, `isTemplateNode`, `isTemplateGroupNode`                                                                                    |
-| Edge `type` (`'default'` / `'template'`)                                 | Removed; every edge renders through the `edge` template                                                                                                             |
-| `EdgeLabel` `type: 'default'`, `text`, `style`                           | `type: 'html-template'` with `data` and an `edgeLabelHtml` template                                                                                                 |
-| `color` and `strokeWidth` fields of `Marker`                             | Markers follow the edge stroke (`context-stroke`); style `.vflow-marker` or define your own marker                                                                  |
-| Connection `type: 'default'` preview                                     | Unchanged: the default connection line and the `connection` template both remain                                                                                    |
+| Removed                                                                  | Replacement                                                                                                                                                                       |
+| ------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Node `type: 'default'`, `text`                                           | `type: 'html-template'` with `data` and a `nodeHtml` template; standard handles become `[vflowHandle]` elements in the template. Use `ariaLabel` for the accessible name          |
+| Node `type: 'default-group'`, `color`, `resizable`                       | `type: 'template-group'` with a `groupNode` template; put `resizable` on the template's element                                                                                   |
+| `DefaultNode`, `DefaultGroupNode`, `isDefaultNode`, `isDefaultGroupNode` | `HtmlTemplateNode`, `TemplateGroupNode`, `isTemplateNode`, `isTemplateGroupNode`                                                                                                  |
+| Edge `type` (`'default'` / `'template'`)                                 | Removed; every edge renders through the `edge` template                                                                                                                           |
+| `EdgeLabel` `type: 'default'`, `text`, `style`                           | `type: 'html-template'` with `data` and an `edgeLabelHtml` template                                                                                                               |
+| `color` and `strokeWidth` fields of `Marker`                             | Markers follow the edge stroke (`context-stroke`); style `.vflow-marker` or define your own marker                                                                                |
+| Connection `type: 'default'` preview                                     | Unchanged: the default connection line and the `connection` template both remain                                                                                                  |
+| `<handle>`, `[template]`, `ng-template[handle]`, `HandleContext`         | `[vflowHandle]` on your own element; state via the `data-vflow-handle-state` attribute and its siblings or `injectHandle()`; `vflowPort` from `@vflow/ui` for the old default dot |
 
 ### Appearance inputs removed
 
@@ -92,7 +92,7 @@ Set them on the `vflow` element or any ancestor; a `vflowTheme` scope from `@vfl
 Behavior parameters are untouched: node points, sizes, `extent`, resize constraints, drag thresholds,
 snap grid, zoom limits, curves, handle offsets and connection validation keep their APIs.
 
-Version 3 renders node-facing templates as native HTML in a CSS-transformed viewport. Edges and connection overlays still use SVG. The existing `groupNode`, handle `[template]`, and `[resizable]` names are unchanged, but SVG content passed to these APIs is no longer supported. The library does not inspect template roots or provide a compatibility fallback, so these templates must be rewritten explicitly.
+Version 3 renders node-facing templates as native HTML in a CSS-transformed viewport. Edges and connection overlays still use SVG. The existing `groupNode` and `[resizable]` names are unchanged, but SVG content passed to these APIs is no longer supported. The library does not inspect template roots or provide a compatibility fallback, so these templates must be rewritten explicitly.
 
 ### Reparenting identity
 
@@ -130,7 +130,7 @@ After:
 
 ### Custom handle templates
 
-Custom handles now render as native HTML, and the library-owned wrapper positions them. The former SVG placement coordinate `ctx.point` has been removed. The template context still exposes `ctx.state()` and `ctx.node`.
+Custom handles are now your own native HTML elements with the `vflowHandle` directive, which positions them on the node side. The former SVG placement coordinate `ctx.point` and the handle template context have been removed; the validation state is exposed as the `data-vflow-handle-state` attribute and through `injectHandle()`. See the Custom handles page.
 
 Before:
 
@@ -143,20 +143,22 @@ Before:
 After:
 
 ```html
-<ng-template #handleTemplate let-ctx handle>
-  <div class="handle" [class.handle_valid]="ctx.state() === 'valid'"></div>
-</ng-template>
+<span vflowHandle type="source" position="right" class="port"></span>
 ```
 
 ```css
-.handle {
+.port {
   width: 12px;
   height: 12px;
   border-radius: 50%;
 }
+
+.port[data-vflow-handle-state='valid'] {
+  background: green;
+}
 ```
 
-Do not calculate a replacement coordinate in the template: placement belongs to the handle wrapper.
+Do not calculate a replacement coordinate in the template: placement belongs to the directive.
 
 ### Resizable templates
 

@@ -1,11 +1,11 @@
-import { Signal, computed, inject, signal } from '@angular/core';
-import { NodeHandle } from '../services/handle.service';
+import { Signal, computed, inject, isDevMode, signal } from '@angular/core';
 import { NodeModel } from './node.model';
 import { Point } from '../interfaces/point.interface';
 import { ViewportService } from '../services/viewport.service';
 import { Position } from '../types/position.type';
+import { HandleLayout, HandleState, HandleType } from '../types/handle-type.type';
 
-export type HandleState = 'valid' | 'invalid' | 'idle';
+export type { HandleState } from '../types/handle-type.type';
 
 export type HandleLayoutStyles = {
   top: string;
@@ -19,99 +19,144 @@ export type HandleGeometry = {
   localPoint: Point;
 };
 
-type HandleGeometryInput = {
-  position: Position;
-  nodeSize: { width: number; height: number };
-  handleSize: { width: number; height: number };
-  offset: Point;
-  anchorPoint?: Point;
-};
+/** Measurement of an element that is rendered without a layout box, for example under `display: none`. */
+export const HANDLE_WITHOUT_BOX = 'without-box';
+
+export type HandleMeasurement = HandleGeometry | typeof HANDLE_WITHOUT_BOX | null;
+
+export interface HandleOptions {
+  /** The element the `vflowHandle` directive is applied to. Its parent is the anchor in the `auto` layout. */
+  element?: HTMLElement | null;
+  type: Signal<HandleType>;
+  position: Signal<Position>;
+  id?: Signal<string | undefined>;
+  layout?: Signal<HandleLayout>;
+  offsetX?: Signal<number>;
+  offsetY?: Signal<number>;
+  canStart?: Signal<boolean>;
+  canAccept?: Signal<boolean>;
+}
+
+type Box = { left: number; top: number; width: number; height: number };
+
+const UNPLACED: HandleLayoutStyles = { top: 'auto', left: 'auto', right: 'auto', bottom: 'auto' };
 
 export class HandleModel {
   private viewportService = inject(ViewportService);
 
-  public state = signal<HandleState>('idle');
-  public isMeasured = signal(false);
-  public canStart: Signal<boolean> = this.rawHandle.canStart ?? signal(true);
-  public canAccept: Signal<boolean> = this.rawHandle.canAccept ?? signal(true);
+  public readonly element: HTMLElement | null;
+  public readonly type: Signal<HandleType>;
+  public readonly position: Signal<Position>;
+  public readonly id: Signal<string | undefined>;
+  public readonly layout: Signal<HandleLayout>;
+  public readonly offsetX: Signal<number>;
+  public readonly offsetY: Signal<number>;
+  public readonly canStart: Signal<boolean>;
+  public readonly canAccept: Signal<boolean>;
 
-  /** Anchor element the `<handle>` was placed into. */
-  public hostReference = this.rawHandle.hostReference!;
+  public readonly state = signal<HandleState>('idle');
+  public readonly isMeasured = signal(false);
 
-  /** Absolute position of the handle relative to the node, same as xyflow handles. */
-  public layoutStyles = signal<HandleLayoutStyles>({
-    top: 'auto',
-    left: 'auto',
-    right: 'auto',
-    bottom: 'auto',
-  });
+  /** False while the element has no layout box. Such a handle does not keep its node hidden, but its edges are. */
+  public readonly hasBox = signal(true);
 
-  /** The rendered handle DOM element. Set by `HandleComponent` after view initialization. */
-  public handleElement: HTMLElement | null = null;
+  /** Styles of the `auto` layout, relative to the containing block of the element. */
+  public readonly layoutStyles = signal<HandleLayoutStyles>(UNPLACED);
 
-  public template = this.rawHandle.template;
+  private readonly local = signal<Point>({ x: 0, y: 0 });
 
   /** Connection point relative to the node origin, in flow units. */
-  private localPoint = signal<Point>({ x: 0, y: 0 });
+  public readonly localPoint = this.local.asReadonly();
 
-  public pointAbsolute = computed<Point>(() => ({
-    x: this.parentNode.globalPoint().x + this.localPoint().x,
-    y: this.parentNode.globalPoint().y + this.localPoint().y,
+  public readonly pointAbsolute = computed<Point>(() => ({
+    x: this.parentNode.globalPoint().x + this.local().x,
+    y: this.parentNode.globalPoint().y + this.local().y,
   }));
 
-  public templateContext = {
-    $implicit: {
-      state: this.state,
-      node: this.parentNode.rawNode,
-      canStart: this.canStart,
-      canAccept: this.canAccept,
-    },
-  };
+  private warnedWithoutBox = false;
 
   constructor(
-    public rawHandle: NodeHandle,
-    public parentNode: NodeModel,
-  ) {}
+    options: HandleOptions,
+    public readonly parentNode: NodeModel,
+  ) {
+    this.element = options.element ?? null;
+    this.type = options.type;
+    this.position = options.position;
+    this.id = options.id ?? signal(undefined);
+    this.layout = options.layout ?? signal('auto');
+    this.offsetX = options.offsetX ?? signal(0);
+    this.offsetY = options.offsetY ?? signal(0);
+    this.canStart = options.canStart ?? signal(true);
+    this.canAccept = options.canAccept ?? signal(true);
+  }
 
-  /** Read phase: handles read their anchor and rendered size without changing styles. */
-  public measure(nodeRect?: DOMRect): HandleGeometry | null {
+  /** Read phase: reads the element, its anchor and its containing block without changing styles. */
+  public measure(nodeRect?: DOMRect): HandleMeasurement {
     if (this.parentNode.culled()) return null;
 
-    const handleElement = this.handleElement;
-    const resolvedNodeRect = nodeRect ?? this.parentNode.nodeElement()?.getBoundingClientRect();
+    const element = this.element;
+    const nodeElement = this.parentNode.nodeElement();
+    const resolvedNodeRect = nodeRect ?? nodeElement?.getBoundingClientRect();
 
-    if (!handleElement || !resolvedNodeRect || !handleElement.getClientRects().length) {
+    if (!element || !resolvedNodeRect) {
       return null;
+    }
+
+    if (!element.getClientRects().length) {
+      return HANDLE_WITHOUT_BOX;
     }
 
     // A wheel event can update the signal before Angular applies the DOM transform.
     // DOM measurements must use the scale that is actually rendered.
-    const viewport = this.parentNode.nodeElement()?.closest<HTMLElement>('.vflow-viewport');
+    const viewport = nodeElement?.closest<HTMLElement>('.vflow-viewport');
     const zoom = viewport
       ? new DOMMatrixReadOnly(viewport.style.transform).a || 1
       : this.viewportService.readableViewport().zoom || 1;
-    const anchorRect = this.hostReference.getBoundingClientRect();
-    const handleRect = handleElement.getBoundingClientRect();
-    const alongY = (anchorRect.top + anchorRect.height / 2 - resolvedNodeRect.top) / zoom;
-    const alongX = (anchorRect.left + anchorRect.width / 2 - resolvedNodeRect.left) / zoom;
+    const toLocal = (rect: DOMRect): Box => ({
+      left: (rect.left - resolvedNodeRect.left) / zoom,
+      top: (rect.top - resolvedNodeRect.top) / zoom,
+      width: rect.width / zoom,
+      height: rect.height / zoom,
+    });
 
-    return computeHandleGeometry({
-      position: this.rawHandle.position,
-      nodeSize: { width: this.parentNode.width(), height: this.parentNode.height() },
-      handleSize: { width: handleRect.width / zoom, height: handleRect.height / zoom },
-      offset: { x: this.rawHandle.userOffsetX, y: this.rawHandle.userOffsetY },
-      anchorPoint: { x: alongX, y: alongY },
+    const position = this.position();
+    const handle = toLocal(element.getBoundingClientRect());
+
+    if (this.layout() === 'manual') {
+      return { layoutStyles: UNPLACED, localPoint: sidePoint(position, handle) };
+    }
+
+    const node = { width: this.parentNode.width(), height: this.parentNode.height() };
+    const anchor = element.parentElement
+      ? toLocal(element.parentElement.getBoundingClientRect())
+      : { left: 0, top: 0, ...node };
+
+    return computeAutoGeometry({
+      position,
+      node,
+      handle,
+      anchor,
+      offset: { x: this.offsetX(), y: this.offsetY() },
+      origin: containingBlockOrigin(element, nodeElement, resolvedNodeRect, zoom),
     });
   }
 
   /** Write phase. Called only after every handle in the node has been measured. */
-  public applyGeometry(geometry: HandleGeometry | null): void {
+  public applyGeometry(geometry: HandleMeasurement): void {
     if (!geometry) {
       return;
     }
 
+    if (geometry === HANDLE_WITHOUT_BOX) {
+      this.hasBox.set(false);
+      this.isMeasured.set(false);
+      this.warnWithoutBox();
+      return;
+    }
+
+    this.hasBox.set(true);
     this.layoutStyles.set(geometry.layoutStyles);
-    this.localPoint.set(geometry.localPoint);
+    this.local.set(geometry.localPoint);
     this.isMeasured.set(true);
   }
 
@@ -119,38 +164,105 @@ export class HandleModel {
   public sync(): void {
     this.applyGeometry(this.measure());
   }
+
+  private warnWithoutBox() {
+    if (this.warnedWithoutBox || !isDevMode()) return;
+    this.warnedWithoutBox = true;
+    const id = this.id();
+    console.warn(
+      `[ngx-vflow] The ${this.type()} handle${id ? ` "${id}"` : ''} of node "${this.parentNode.rawNode.id}" ` +
+        'has no layout box (display: none?), so it is not measured and its edges are hidden. ' +
+        'Keep the element in layout; hide it with visibility: hidden or opacity: 0 instead.',
+    );
+  }
 }
 
-function computeHandleGeometry({
-  position,
-  nodeSize,
-  handleSize,
-  offset,
-  anchorPoint = { x: nodeSize.width / 2, y: nodeSize.height / 2 },
-}: HandleGeometryInput): HandleGeometry {
-  const alongX = anchorPoint.x - offset.x;
-  const alongY = anchorPoint.y - offset.y;
+/** The middle of the `position` side of a box. */
+function sidePoint(position: Position, box: Box): Point {
+  switch (position) {
+    case 'left':
+      return { x: box.left, y: box.top + box.height / 2 };
+    case 'right':
+      return { x: box.left + box.width, y: box.top + box.height / 2 };
+    case 'top':
+      return { x: box.left + box.width / 2, y: box.top };
+    case 'bottom':
+      return { x: box.left + box.width / 2, y: box.top + box.height };
+  }
+}
 
+/**
+ * Origin of the padding box that `top` and `left` of the absolutely positioned element resolve against, in node
+ * units. `null` when that box is the node itself or cannot be resolved, which keeps the node-relative styles.
+ */
+function containingBlockOrigin(
+  element: HTMLElement,
+  nodeElement: HTMLElement | null,
+  nodeRect: DOMRect,
+  zoom: number,
+): Point | null {
+  const container = element.offsetParent;
+
+  if (!(container instanceof HTMLElement) || container === nodeElement || !nodeElement?.contains(container)) {
+    return null;
+  }
+
+  const rect = container.getBoundingClientRect();
+
+  return {
+    x: (rect.left - nodeRect.left) / zoom + container.clientLeft - container.scrollLeft,
+    y: (rect.top - nodeRect.top) / zoom + container.clientTop - container.scrollTop,
+  };
+}
+
+function computeAutoGeometry({
+  position,
+  node,
+  handle,
+  anchor,
+  offset,
+  origin,
+}: {
+  position: Position;
+  node: { width: number; height: number };
+  handle: Box;
+  anchor: Box;
+  offset: Point;
+  origin: Point | null;
+}): HandleGeometry {
+  const anchorX = anchor.left + anchor.width / 2;
+  const anchorY = anchor.top + anchor.height / 2;
+  const px = (value: number) => `${value}px`;
+
+  // The element center sits on the node side; the connection point is the outer edge of the element.
   switch (position) {
     case 'left':
       return {
-        layoutStyles: { top: `${anchorPoint.y}px`, left: '0', right: 'auto', bottom: 'auto' },
-        localPoint: { x: -handleSize.width / 2 - offset.x, y: alongY },
+        layoutStyles: origin
+          ? { top: px(anchorY - origin.y), left: px(-origin.x), right: 'auto', bottom: 'auto' }
+          : { top: px(anchorY), left: '0', right: 'auto', bottom: 'auto' },
+        localPoint: { x: -handle.width / 2 - offset.x, y: anchorY - offset.y },
       };
     case 'right':
       return {
-        layoutStyles: { top: `${anchorPoint.y}px`, left: 'auto', right: '0', bottom: 'auto' },
-        localPoint: { x: nodeSize.width + handleSize.width / 2 - offset.x, y: alongY },
+        layoutStyles: origin
+          ? { top: px(anchorY - origin.y), left: px(node.width - origin.x), right: 'auto', bottom: 'auto' }
+          : { top: px(anchorY), left: 'auto', right: '0', bottom: 'auto' },
+        localPoint: { x: node.width + handle.width / 2 - offset.x, y: anchorY - offset.y },
       };
     case 'top':
       return {
-        layoutStyles: { top: '0', left: `${anchorPoint.x}px`, right: 'auto', bottom: 'auto' },
-        localPoint: { x: alongX, y: -handleSize.height / 2 - offset.y },
+        layoutStyles: origin
+          ? { top: px(-origin.y), left: px(anchorX - origin.x), right: 'auto', bottom: 'auto' }
+          : { top: '0', left: px(anchorX), right: 'auto', bottom: 'auto' },
+        localPoint: { x: anchorX - offset.x, y: -handle.height / 2 - offset.y },
       };
     case 'bottom':
       return {
-        layoutStyles: { top: 'auto', left: `${anchorPoint.x}px`, right: 'auto', bottom: '0' },
-        localPoint: { x: alongX, y: nodeSize.height + handleSize.height / 2 - offset.y },
+        layoutStyles: origin
+          ? { top: px(node.height - origin.y), left: px(anchorX - origin.x), right: 'auto', bottom: 'auto' }
+          : { top: 'auto', left: px(anchorX), right: 'auto', bottom: '0' },
+        localPoint: { x: anchorX - offset.x, y: node.height + handle.height / 2 - offset.y },
       };
   }
 }

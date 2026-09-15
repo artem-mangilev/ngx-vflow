@@ -57,10 +57,14 @@ async function rowEndpointError(demo: Locator) {
   return demo.evaluate((root) => {
     const edge = root.querySelectorAll<SVGPathElement>('path.vui-edge')[1];
     const source = root
-      .querySelector('[data-entity="crm"] [data-field="email"] .handle--right .vui-port')!
+      .querySelector(
+        '[data-entity="crm"] [data-field="email"] .vui-port.vflow-handle[data-vflow-handle-position="right"]',
+      )!
       .getBoundingClientRect();
     const target = root
-      .querySelector('[data-entity="erp"] [data-field="email"] .handle--left .vui-port')!
+      .querySelector(
+        '[data-entity="erp"] [data-field="email"] .vui-port.vflow-handle[data-vflow-handle-position="left"]',
+      )!
       .getBoundingClientRect();
     const matrix = edge.getScreenCTM()!;
     const start = edge.getPointAtLength(0).matrixTransform(matrix);
@@ -102,7 +106,9 @@ test('geometry: endpoints stay on ports after zooming through the controls', asy
   const endpointError = () =>
     workflow.evaluate((root) => {
       const edge = root.querySelectorAll<SVGPathElement>('path.vui-edge')[0];
-      const port = root.querySelector('.vflow-node .handle--right .vui-port')!.getBoundingClientRect();
+      const port = root
+        .querySelector('.vflow-node .vui-port.vflow-handle[data-vflow-handle-position="right"]')!
+        .getBoundingClientRect();
       const start = edge.getPointAtLength(0).matrixTransform(edge.getScreenCTM()!);
       return Math.max(Math.abs(start.x - port.right), Math.abs(start.y - port.y - port.height / 2));
     });

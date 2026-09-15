@@ -87,7 +87,10 @@ export class NodeModel<T = unknown> implements FlowEntity, Contextable<NodeConte
   public isMeasured = signal(false);
 
   /** The current view has both node dimensions and positioned handles. */
-  public isReady = computed(() => this.isMeasured() && this.handles().every((handle) => handle.isMeasured()));
+  public isReady = computed(
+    // A handle without a layout box (display: none) never gets measured and must not keep the node hidden.
+    () => this.isMeasured() && this.handles().every((handle) => handle.isMeasured() || !handle.hasBox()),
+  );
 
   public point = signal<Point>({ x: 0, y: 0 });
   public point$: Observable<Point>;

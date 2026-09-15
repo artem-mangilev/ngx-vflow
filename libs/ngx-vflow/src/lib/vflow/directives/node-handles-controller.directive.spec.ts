@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, provideZonelessChangeDetection } from '@angular/core';
+import { ChangeDetectionStrategy, Component, provideZonelessChangeDetection, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BehaviorSubject } from 'rxjs';
 import { HandleModel } from '../models/handle.model';
@@ -7,6 +7,8 @@ import { NodeAccessorService } from '../services/node-accessor.service';
 import { RequestAnimationFrameBatchingService } from '../services/request-animation-frame-batching.service';
 import { ResizeObserverService } from '../services/resize-observer.service';
 import { NodeHandlesControllerDirective } from './node-handles-controller.directive';
+import { Position } from '../types/position.type';
+import { HandleLayout } from '../types/handle-type.type';
 
 @Component({
   template: '<div nodeHandlesController></div>',
@@ -76,13 +78,20 @@ describe('NodeHandlesControllerDirective', () => {
       layoutStyles: { top: '0', left: '0', right: 'auto', bottom: 'auto' },
       localPoint: { x: 0, y: 0 },
     };
+    anchor.append(firstElement, secondElement);
+    const handleSignals = {
+      position: signal<Position>('right'),
+      offsetX: signal(0),
+      offsetY: signal(0),
+      layout: signal<HandleLayout>('auto'),
+    };
     const first = jasmine.createSpyObj<HandleModel>('first handle', ['measure', 'applyGeometry'], {
-      hostReference: anchor,
-      handleElement: firstElement,
+      element: firstElement,
+      ...handleSignals,
     });
     const second = jasmine.createSpyObj<HandleModel>('second handle', ['measure', 'applyGeometry'], {
-      hostReference: anchor,
-      handleElement: secondElement,
+      element: secondElement,
+      ...handleSignals,
     });
     first.measure.and.callFake(() => {
       executionOrder.push('measure first');

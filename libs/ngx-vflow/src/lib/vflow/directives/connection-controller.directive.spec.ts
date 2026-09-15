@@ -52,11 +52,9 @@ describe('ConnectionControllerDirective', () => {
       () =>
         new HandleModel(
           {
-            type,
-            position: type === 'source' ? 'right' : 'left',
-            hostReference: document.createElement('div'),
-            userOffsetX: 0,
-            userOffsetY: 0,
+            type: signal(type),
+            position: signal(type === 'source' ? 'right' : 'left'),
+            element: document.createElement('div'),
             canStart: signal(canStart),
             canAccept: signal(canAccept),
           },

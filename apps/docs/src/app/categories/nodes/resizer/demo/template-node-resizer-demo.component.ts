@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { DocsPresentations } from '@docs/shared';
+import { VflowPort } from '@vflow/ui';
 import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
 
 @Component({
@@ -12,11 +13,11 @@ import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
           <div resizable class="custom-node">
             <div class="data-block">
               Output 1
-              <handle position="right" type="source" [id]="ctx.data().output1" />
+              <span vflowPort type="source" position="right" [id]="ctx.data().output1"></span>
             </div>
             <div class="data-block">
               Output 2
-              <handle position="right" type="source" [id]="ctx.data().output2" />
+              <span vflowPort type="source" position="right" [id]="ctx.data().output2"></span>
             </div>
           </div>
         }
@@ -25,11 +26,11 @@ import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
           <div resizable class="custom-node">
             <div class="data-block">
               Input 1
-              <handle position="left" type="target" [id]="ctx.data().input1" />
+              <span vflowPort type="target" position="left" [id]="ctx.data().input1"></span>
             </div>
             <div class="data-block">
               Input 2
-              <handle position="left" type="target" [id]="ctx.data().input2" />
+              <span vflowPort type="target" position="left" [id]="ctx.data().input2"></span>
             </div>
           </div>
         }
@@ -66,7 +67,7 @@ import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
     `,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DocsPresentations, Vflow],
+  imports: [DocsPresentations, Vflow, VflowPort],
 })
 export class TemplateNodeResizerDemoComponent {
   public nodes: Node[] = createNodes([

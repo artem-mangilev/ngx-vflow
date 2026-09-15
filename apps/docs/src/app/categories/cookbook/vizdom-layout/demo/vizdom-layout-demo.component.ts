@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnInit, signal, viewChild, WritableSignal } from '@angular/core';
 import { DocsPresentations } from '@docs/shared';
+import { VflowPort } from '@vflow/ui';
 import init, { DirectedGraph, VertexWeakRef } from '@vizdom/vizdom-ts-web';
 import { Node, Edge, Vflow, VflowComponent, createNodes } from 'ngx-vflow';
 
@@ -7,7 +8,7 @@ import { Node, Edge, Vflow, VflowComponent, createNodes } from 'ngx-vflow';
   templateUrl: './vizdom-layout-demo.component.html',
   styleUrls: ['./vizdom-layout-demo.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DocsPresentations, Vflow],
+  imports: [DocsPresentations, Vflow, VflowPort],
 })
 export class VizdomLayoutDemoComponent implements OnInit {
   public vflow = viewChild.required(VflowComponent);

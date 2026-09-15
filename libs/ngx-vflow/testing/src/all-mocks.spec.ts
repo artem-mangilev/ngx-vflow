@@ -31,11 +31,9 @@ import { VflowMocks } from './vflow-mocks';
       (connect)="(null)">
       <ng-template node>
         <div dragHandle selectable resizable [gap]="2">
-          <handle [position]="'left'" [type]="'source'" [id]="'1'" [template]="handleTemplate" />
-
-          <ng-template #handleTemplate>
-            <div>Handle Template</div>
-          </ng-template>
+          <span vflowHandle type="source" #handle="vflowHandle" [position]="'left'" [id]="'1'" [layout]="'manual'">
+            {{ handle.state() }}
+          </span>
 
           <node-toolbar position="left">
             <button>Delete</button>
