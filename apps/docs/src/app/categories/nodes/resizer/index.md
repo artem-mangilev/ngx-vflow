@@ -1,11 +1,11 @@
-You might want to resize your node. The resizer is part of core's interaction feedback and works with template groups and template/component nodes.
+You might want to resize your node. The resizer is part of core's interaction feedback and works with template and component nodes, including groups.
 
 ## Node size modes
 
 Every node has a size mode:
 
-- `auto` — the node follows its content. The library measures the rendered node and never writes inline dimensions. This is the default for `html-template` and component nodes without `width` / `height` in their data.
-- `explicit` — the node has a fixed size that the library renders. A node is explicit when its data carries both `width` and `height`, when it is a `template-group`, or after the first resize gesture turns an `auto` node into an explicit one. A click on a resize control without movement doesn't change the mode.
+- `auto` — the node follows its content. The library measures the rendered node and never writes inline dimensions. This is the default for nodes without `width` / `height` in their data.
+- `explicit` — the node has a fixed size that the library renders. A node is explicit when its data carries both `width` and `height`, or after the first resize gesture turns an `auto` node into an explicit one. A click on a resize control without movement doesn't change the mode.
 
 ## Where the size is applied
 
@@ -17,18 +17,18 @@ The element with the `resizable` directive is the node's sizing box:
 - Size the element for `auto` mode with regular CSS, for example `width: 240px`. Avoid `width: 100%` / `height: 100%`: they resolve against the content-sized node wrapper.
 - `[resizable]="false"` hides the controls but keeps the element as the sizing box, so you can bind the controls to the selection state.
 
-## Resize template group
+## Resize a group
 
-- Create a `template-group` node. Its `width` and `height` are required, so the group is always `explicit`.
+- Create a node with `width` and `height`, so the group starts `explicit`, and mark it in `data` to draw it as a group in the `node` template.
 - Add `resizable` (or `[resizable]="yourCondition"`) to the native HTML element representing your group. The library applies the group size to that element.
 - If other elements depend on the group size, read `ctx.width()` and `ctx.height()` from the context, not `ctx.node.width` and `ctx.node.height`: the latter are not reactive.
 - Optionally, keep the aspect ratio with `[keepAspectRatio]`, restrict resizing to one axis with `[resizeDirection]` (`horizontal` | `vertical`), toggle handle auto-scaling with `[autoScale]`, and react to `(resizeStart)` / `(resizeChange)` / `(resizeEnd)`.
 
-{{ NgDocActions.demoPane("TemplateGroupResizerDemoComponent") }}
+{{ NgDocActions.demoPane("GroupResizerDemoComponent") }}
 
 ## Resize a template/component regular node
 
-- Create a node of type `html-template` or `CustomNodeComponent` (`CustomDynamicNodeComponent`).
+- Create a node rendered by the `node` template or by a `component`.
   - Leave out `width` / `height` to start content-sized; the first resize makes the node explicit.
   - Provide both `width` and `height` to start with a fixed size.
 - Add `resizable` (or `[resizable]="yourCondition"`) to the top-level element of your node.

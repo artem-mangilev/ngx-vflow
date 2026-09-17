@@ -1,6 +1,6 @@
 # 07. Docs, демо, migration guide, тестовые моки, CONTEXT.md
 
-Status: ready-for-agent
+Status: resolved
 Type: task
 Blocked by: 04, 06
 
@@ -47,3 +47,22 @@ drag-and-drop, relationships и bpmn все ноды и рёбра видимы,
 2026-09-15, после тикета 05: всё про handle в этом тикете уже сделано (демо, `flow-presentations`, моки `handle-mock`,
 страница handles, сниппеты и строка таблицы в migration, термин «Handle» в `CONTEXT.md`). Раздел migration про
 остальные пункты «Что ломается» и «Лейбл ребра» в `CONTEXT.md` остаются здесь.
+
+2026-09-17, закрыт:
+
+- Migration 3.0: сниппеты Path A/B на `ng-template[node]` и `*edgeLabel`, строки таблицы замен без `html-template`/`template-group`;
+  раздел «Group-node templates» заменён разделами «One node model», «Component nodes», «Edge presentations»
+  (`customTemplateEdge` → `edgeInteraction`, `component` у ребра, `componentEdgeEvent`), «Edge labels», «Testing mocks»;
+  Resizable templates, Node size modes и Removed APIs переведены на `node`/`NodeTemplateDirective`. Разделы v2/v1 не
+  трогались как история. Сниппеты с `@if` помечены `<!-- prettier-ignore -->`, иначе prettier сносит отступы; блоки с
+  `{{ }}` в ts нужно оборачивать в `{% raw %}`, иначе ng-doc падает с Template render error.
+- Тексты custom-nodes (без базового класса, `injectNode()`, события по объявленным output), default-nodes, subflows,
+  resizer (демо переименовано в `GroupResizerDemoComponent`), accessibility, selection-box, lazy-loading (`component`),
+  design-system overview/bpmn/relationships-map.
+- `CONTEXT.md`: термин «Edge label», в «Parent node» убран тип группы.
+- ADR `docs/adr/0007-composable-entity-presentation.md` с D1–D6 и отвергнутыми вариантами.
+- Моки `ngx-vflow/testing` и `flow-presentations.ts` уже были сделаны в тикетах 01–06, здесь не менялись.
+
+Проверки: prettier, `nx build docs` зелёный; в прод-сборке страницы migration, resizer, custom-nodes, subflows,
+lazy-loading рендерятся, демо на месте, ошибок в консоли нет. Dev-сервер на 4200 был запущен вне сессии и правки не
+подхватил, проверял статикой из `dist/apps/docs/browser`.

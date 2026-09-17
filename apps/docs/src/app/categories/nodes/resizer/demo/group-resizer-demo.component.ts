@@ -39,7 +39,7 @@ import { Node, Vflow, createNodes } from 'ngx-vflow';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [DocsPresentations, Vflow],
 })
-export class TemplateGroupResizerDemoComponent {
+export class GroupResizerDemoComponent {
   public nodes: Node[] = createNodes([
     {
       id: '5',

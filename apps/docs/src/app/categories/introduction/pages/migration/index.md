@@ -12,24 +12,26 @@ graph needs templates. There are two working paths:
 
 {% raw %}
 
+<!-- prettier-ignore -->
 ```html
 <vflow [nodes]="nodes" [edges]="edges">
-  <ng-template let-ctx nodeHtml>
-    <div class="card" selectable>
-      {{ ctx.data().title }}
-      <span vflowHandle type="target" position="left" class="dot"></span>
-      <span vflowHandle type="source" position="right" class="dot"></span>
-    </div>
-  </ng-template>
-  <ng-template let-ctx groupNode>
-    <div class="frame" [style.width.px]="ctx.width()" [style.height.px]="ctx.height()"></div>
+  <ng-template let-ctx node>
+    @if (ctx.data().type === 'group') {
+      <div class="frame" [style.width.px]="ctx.width()" [style.height.px]="ctx.height()"></div>
+    } @else {
+      <div class="card" selectable>
+        {{ ctx.data().title }}
+        <span vflowHandle type="target" position="left" class="dot"></span>
+        <span vflowHandle type="source" position="right" class="dot"></span>
+      </div>
+    }
   </ng-template>
   <ng-template let-ctx edge>
     <svg:g edgeInteraction>
       <svg:path class="line" [attr.d]="ctx.path()" [attr.marker-end]="ctx.markerEnd()" />
     </svg:g>
+    <span *edgeLabel>{{ ctx.data().label }}</span>
   </ng-template>
-  <ng-template let-ctx edgeLabelHtml><span>{{ ctx.label.data }}</span></ng-template>
 </vflow>
 ```
 
@@ -42,7 +44,7 @@ graph needs templates. There are two working paths:
 ```html
 <section vflowTheme="light">
   <vflow [nodes]="nodes" [edges]="edges">
-    <ng-template let-ctx nodeHtml>
+    <ng-template let-ctx node>
       <article vflowNode selectable [vflowSelected]="ctx.selected() || ctx.preselected()">
         <header vflowNodeHeader><span vflowTitle>{{ ctx.data().title }}</span></header>
         <span vflowPort type="target" position="left"></span>
@@ -53,8 +55,8 @@ graph needs templates. There are two working paths:
       <svg:g edgeInteraction>
         <svg:path vflowEdge [attr.d]="ctx.path()" [attr.marker-end]="ctx.markerEnd()" [vflowSelected]="ctx.selected()" />
       </svg:g>
+      <span *edgeLabel vflowEdgeLabel>{{ ctx.data().label }}</span>
     </ng-template>
-    <ng-template let-ctx edgeLabelHtml><span vflowEdgeLabel>{{ ctx.label.data }}</span></ng-template>
   </vflow>
 </section>
 ```
@@ -65,11 +67,11 @@ Include `@vflow/ui/styles.css` in your global styles for path B. See the Design 
 
 | Removed                                                                  | Replacement                                                                                                                                                                              |
 | ------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Node `type: 'default'`, `text`                                           | `type: 'html-template'` with `data` and a `nodeHtml` template; standard handles become `[vflowHandle]` elements in the template. Use `ariaLabel` for the accessible name                 |
-| Node `type: 'default-group'`, `color`, `resizable`                       | `type: 'template-group'` with a `groupNode` template; put `resizable` on the template's element                                                                                          |
-| `DefaultNode`, `DefaultGroupNode`, `isDefaultNode`, `isDefaultGroupNode` | `HtmlTemplateNode`, `TemplateGroupNode`, `isTemplateNode`, `isTemplateGroupNode`                                                                                                         |
-| Edge `type` (`'default'` / `'template'`)                                 | Removed; every edge renders through the `edge` template                                                                                                                                  |
-| `EdgeLabel` `type: 'default'`, `text`, `style`                           | `type: 'html-template'` with `data` and an `edgeLabelHtml` template                                                                                                                      |
+| Node `type: 'default'`, `text`                                           | A node without `type`, with `data` and a `node` template; standard handles become `[vflowHandle]` elements in the template. Use `ariaLabel` for the accessible name                      |
+| Node `type: 'default-group'`, `color`, `resizable`                       | A node with `width`, `height` and a group marker in `data`, drawn by a branch of the `node` template; put `resizable` on the template's element                                          |
+| `DefaultNode`, `DefaultGroupNode`, `isDefaultNode`, `isDefaultGroupNode` | `Node`; the application tells its node kinds apart by `data`                                                                                                                             |
+| Edge `type` (`'default'` / `'template'`)                                 | Removed; every edge renders through the `edge` template or its `component`                                                                                                               |
+| `EdgeLabel` `type: 'default'`, `text`, `style`                           | A label declared inside the edge presentation with the `edgeLabel` directive; see Edge labels below                                                                                      |
 | `color` and `strokeWidth` fields of `Marker`                             | Markers follow the edge stroke (`context-stroke`); style `.vflow-marker` or define your own marker                                                                                       |
 | Connection `type: 'default'` preview                                     | Unchanged: the default connection line and the `connection` template both remain                                                                                                         |
 | `<handle>`, `[template]`, `ng-template[handle]`, `HandleContext`         | `[vflowHandle]` on your own element; state via the `data-vflow-handle-state` attribute and its siblings or the directive's signals; `vflowPort` from `@vflow/ui` for the old default dot |
@@ -92,7 +94,7 @@ Set them on the `vflow` element or any ancestor; a `vflowTheme` scope from `@vfl
 Behavior parameters are untouched: node points, sizes, `extent`, resize constraints, drag thresholds,
 snap grid, zoom limits, curves, handle offsets and connection validation keep their APIs.
 
-Version 3 renders node-facing templates as native HTML in a CSS-transformed viewport. Edges and connection overlays still use SVG. The existing `groupNode` and `[resizable]` names are unchanged, but SVG content passed to these APIs is no longer supported. The library does not inspect template roots or provide a compatibility fallback, so these templates must be rewritten explicitly.
+Version 3 renders node-facing templates as native HTML in a CSS-transformed viewport. Edges and connection overlays still use SVG. SVG content passed to the node template or to `[resizable]` is no longer supported. The library does not inspect template roots or provide a compatibility fallback, so these templates must be rewritten explicitly.
 
 ### Reparenting identity
 
@@ -100,25 +102,73 @@ The optional `parentId` field may still be omitted from `Node` and `StaticNode`.
 
 `reparentNodes()` now updates the existing `point` and `parentId` signals, preserving the node object reference. If an optional `parentId` signal is absent, it is added to that same object. A successful call returns a new array containing the same node objects; a full no-op returns the original array.
 
-### Group-node templates
+### One node model
 
-Replace SVG group-node content with a native HTML element. Continue to use the reactive `ctx.width()` and `ctx.height()` values.
+`Node` is one interface instead of a union discriminated by `type`. The `type` field is gone: a node with `component` renders that component, any other node renders the `node` template. `createNode()` and `createNodes()` no longer accept `type`.
+
+| Removed                                                                     | Replacement                                                                                       |
+| --------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| `type: 'html-template'`                                                     | Remove the field                                                                                  |
+| `type: 'template-group'`                                                    | Remove the field, keep `width` and `height`; mark the group in `data` if its presentation differs |
+| `type: YourNodeComponent` or a lazy import function                         | `component: YourNodeComponent` or the same function                                               |
+| `HtmlTemplateNode`, `TemplateGroupNode`, `ComponentNode`                    | `Node`                                                                                            |
+| `isTemplateNode`, `isTemplateGroupNode`                                     | Check `component` or your own `data`; `isComponentNode` stays                                     |
+| `<ng-template nodeHtml>`, `NodeHtmlTemplateDirective`                       | `<ng-template node>`, `NodeTemplateDirective`                                                     |
+| `<ng-template groupNode>`, `GroupNodeTemplateDirective`, `GroupNodeContext` | A branch of the `node` template; every node context has `width` and `height`                      |
+
+The library does not read a node kind. Keep your own discriminator in `data` and branch on it in the template. A group is any node with a size and children that reference it through `parentId`; its accessible name still defaults to `Group {id}` when it has children.
 
 Before:
 
-```html
-<ng-template let-ctx groupNode>
-  <svg:rect [attr.width]="ctx.width()" [attr.height]="ctx.height()" [style.stroke]="'red'" [style.fill]="'transparent'" />
-</ng-template>
+{% raw %}
+
+```ts
+const nodes = createNodes([
+  { id: 'group', type: 'template-group', point: { x: 0, y: 0 }, width: 300, height: 200 },
+  { id: 'task', type: 'html-template', point: { x: 20, y: 20 }, parentId: 'group', data: { title: 'Task' } },
+  { id: 'chart', type: ChartNodeComponent, point: { x: 400, y: 0 } },
+]);
 ```
+
+```html
+<vflow [nodes]="nodes">
+  <ng-template let-ctx nodeHtml><div class="card">{{ ctx.data().title }}</div></ng-template>
+  <ng-template let-ctx groupNode>
+    <div class="group-node" [style.width.px]="ctx.width()" [style.height.px]="ctx.height()"></div>
+  </ng-template>
+</vflow>
+```
+
+{% endraw %}
 
 After:
 
-```html
-<ng-template let-ctx groupNode>
-  <div class="group-node" [style.width.px]="ctx.width()" [style.height.px]="ctx.height()"></div>
-</ng-template>
+{% raw %}
+
+```ts
+const nodes = createNodes([
+  { id: 'group', point: { x: 0, y: 0 }, width: 300, height: 200, data: { type: 'group' } },
+  { id: 'task', point: { x: 20, y: 20 }, parentId: 'group', data: { title: 'Task' } },
+  { id: 'chart', component: ChartNodeComponent, point: { x: 400, y: 0 } },
+]);
 ```
+
+<!-- prettier-ignore -->
+```html
+<vflow [nodes]="nodes">
+  <ng-template let-ctx node>
+    @if (ctx.data()?.type === 'group') {
+      <div class="group-node" [style.width.px]="ctx.width()" [style.height.px]="ctx.height()"></div>
+    } @else {
+      <div class="card">{{ ctx.data().title }}</div>
+    }
+  </ng-template>
+</vflow>
+```
+
+{% endraw %}
+
+SVG group content from version 2 becomes a native HTML element in that branch:
 
 ```css
 .group-node {
@@ -127,6 +177,123 @@ After:
   background: transparent;
 }
 ```
+
+### Component nodes
+
+A component node no longer extends a base class. Any standalone component works, and it reads its node through `injectNode()`, which returns the same object a `node` template receives as `let-ctx`. The `node` input is no longer set on the component.
+
+| Removed                                                 | Replacement                                                                           |
+| ------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| `CustomNodeComponent`, `extends CustomNodeComponent<T>` | A plain component with `injectNode<T>()`                                              |
+| `this.node()` input                                     | `injectNode()`; the node object is its `node` field, the data signal its `data` field |
+| Fields on the base class (`selected`, `preselected`, …) | The same signals on the object returned by `injectNode()`                             |
+
+Before:
+
+{% raw %}
+
+```ts
+@Component({ template: `<div>{{ data()?.title }}</div>` })
+export class TaskNodeComponent extends CustomNodeComponent<TaskData> {
+  readonly done = output<string>();
+}
+```
+
+{% endraw %}
+
+After:
+
+{% raw %}
+
+```ts
+@Component({ template: `<div [class.selected]="ctx.selected()">{{ ctx.data().title }}</div>` })
+export class TaskNodeComponent {
+  protected readonly ctx = injectNode<TaskData>();
+  readonly done = output<string>();
+}
+```
+
+{% endraw %}
+
+`(componentNodeEvent)` stays. It now collects every declared output of the component, including `@Output()`, `output()` and `outputFromObservable()`, and `eventName` is the property name of the output. `ComponentNodeEvent<[A, B]>` infers events from those outputs. In a component unit test, `provideCustomNodeMocks()` also provides a mock for `injectNode()`.
+
+### Edge presentations
+
+The `customTemplateEdge` selector and `CustomTemplateEdgeComponent` are removed. Wrap the path in `<svg:g edgeInteraction>` instead: the directive draws a transparent interaction stroke of `interactionWidth` (20 by default) as the first child of the group, and a click near the line selects the edge. Without it the edge has no hit area.
+
+Before:
+
+```html
+<ng-template let-ctx edge>
+  <svg:g customTemplateEdge>
+    <svg:path [attr.d]="ctx.path()" />
+  </svg:g>
+</ng-template>
+```
+
+After:
+
+```html
+<ng-template let-ctx edge>
+  <svg:g edgeInteraction>
+    <svg:path [attr.d]="ctx.path()" />
+  </svg:g>
+</ng-template>
+```
+
+An edge can now be drawn by a component instead of the template: set `component` on the edge. The flow creates the component on an SVG group inside the edge, reads the edge through `injectEdge()`, and forwards its outputs to the new `(componentEdgeEvent)` output of `vflow`, typed with `ComponentEdgeEvent<[A, B]>`. Add `EdgeInteractionDirective` to the component's `hostDirectives` to give it a hit area.
+
+### Edge labels
+
+Labels are no longer edge data rendered by one global template. The `edgeLabels` field of `Edge`, the `EdgeLabel` and `HtmlTemplateEdgeLabel` types, `<ng-template edgeLabelHtml>`, `EdgeLabelHtmlTemplateDirective` and `HtmlEdgeLabelContext` are removed. Declare labels inside the edge presentation with the `edgeLabel` directive and keep their text in edge `data`. `EdgeLabelPosition` stays.
+
+Before:
+
+{% raw %}
+
+```ts
+const edges = createEdges([{ id: '1 -> 2', source: '1', target: '2', edgeLabels: { center: { type: 'html-template', data: { text: 'Approve' } } } }]);
+```
+
+```html
+<vflow [nodes]="nodes" [edges]="edges">
+  <ng-template let-ctx edgeLabelHtml>
+    <span class="label">{{ ctx.label.data.text }}</span>
+  </ng-template>
+</vflow>
+```
+
+{% endraw %}
+
+After:
+
+{% raw %}
+
+```ts
+const edges = createEdges([{ id: '1 -> 2', source: '1', target: '2', data: { label: 'Approve' } }]);
+```
+
+<!-- prettier-ignore -->
+```html
+<vflow [nodes]="nodes" [edges]="edges">
+  <ng-template let-ctx edge>
+    <svg:g edgeInteraction>
+      <svg:path [attr.d]="ctx.path()" />
+    </svg:g>
+    @if (ctx.data()?.label; as label) {
+      <span *edgeLabel class="label">{{ label }}</span>
+    }
+  </ng-template>
+</vflow>
+```
+
+{% endraw %}
+
+Place a label next to the SVG elements of the edge, not inside `svg:g`: Angular compiles HTML inside SVG in the SVG namespace and such a label does not render. The label value picks `start`, `center` (default) or `end` and is an expression, so write it with quotes. See the Edge labels page.
+
+### Testing mocks
+
+`ngx-vflow/testing` follows the new API. `VflowMocks` declare `ng-template[node]`, `ng-template[edge]`, `ng-template[edgeLabel]` and `ng-template[connection]`, plus mocks for `vflowHandle` and `edgeInteraction`. The `nodeHtml`, `groupNode`, `edgeLabelHtml` and `handle` template mocks, `HandleMockComponent` and `CustomTemplateEdgeMockComponent` are removed. The `vflowHandle` mock provides itself as `VflowHandleDirective`, and `provideCustomNodeMocks()` provides the node object returned by `injectNode()`.
 
 ### Custom handle templates
 
@@ -175,7 +342,7 @@ Before:
 After:
 
 ```html
-<ng-template let-ctx groupNode>
+<ng-template let-ctx node>
   <div [resizable]="ctx.selected()"></div>
 </ng-template>
 ```
@@ -184,7 +351,7 @@ The `[resizable]` element is now the node's sizing box: for an explicitly sized 
 
 ### Node size modes
 
-`createNodes` / `createNode` no longer give `html-template` and component nodes a default `width` / `height` of 100 x 50. A node without a size in its data is content-sized (`auto`): the library measures it and never writes inline dimensions. A node becomes explicitly sized (`explicit`) when its data carries both `width` and `height`, or after the first resize gesture. `NodeWithDefaults` reflects this: `width` and `height` are optional for those node types, so read them with optional chaining, for example `width?.()`.
+`createNodes` / `createNode` no longer give nodes a default `width` / `height` of 100 x 50. A node without a size in its data is content-sized (`auto`): the library measures it and never writes inline dimensions. A node becomes explicitly sized (`explicit`) when its data carries both `width` and `height`, or after the first resize gesture. `NodeWithDefaults` reflects this: `width` and `height` are optional, so read them with optional chaining, for example `width?.()`.
 
 `nodesChanges.size` now carries `mode: 'auto' | 'explicit'`. Persist a size only when it is `explicit`; an `auto` size is a measurement of the node's content and must not be written back as data, or the node would stop following its content.
 
@@ -192,8 +359,8 @@ The `[resizable]` element is now the node's sizing box: for an explicitly sized 
 
 | Removed in v3                                      | Migration                                                                                              |
 | -------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| Node type `svg-template`                           | Use `html-template` and provide native HTML through `<ng-template nodeHtml>`.                          |
-| `NodeSvgTemplateDirective` and `nodeSvgTemplate`   | Remove these imports/usages and use `NodeHtmlTemplateDirective` / `nodeHtml`.                          |
+| Node type `svg-template`                           | Remove `type` and provide native HTML through `<ng-template node>`.                                    |
+| `NodeSvgTemplateDirective` and `nodeSvgTemplate`   | Remove these imports/usages and use `NodeTemplateDirective` / `node`.                                  |
 | `scaleOnHover` input on `MiniMapComponent`         | Remove the input binding. The minimap remains at its default scale and does not capture pointer input. |
 | `documentPointToFlowPoint()`                       | Rename to `clientToFlowPosition()`. Use `flowToClientPosition()` for the inverse conversion.           |
 | `{ spaces: true }`, `SpacePoint`, `getSpacePoints` | Convert with `clientToFlowPosition()`, then call `getNodesAtPoint()` on the flow component.            |

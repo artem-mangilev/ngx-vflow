@@ -35,7 +35,7 @@ To disable the selection-box gesture, pass `[keyboardShortcuts]="{ selection: nu
 The `preselected` state is also exposed in rendering contexts, so custom templates can style the drag-preview state differently from the final selected state.
 
 - Node template contexts expose `preselected` together with `selected`.
-- The base custom node class `CustomNodeComponent` exposes the `preselected` signal for component-based custom nodes.
+- Component nodes read the same `preselected` signal from `injectNode()`.
 - Edge template context also exposes `preselected`, so custom edges can render preselection state explicitly.
 
 In this demo, switch between `full` and `partial`, then hold `Shift` and drag over partially overlapping nodes and edge endpoints.

@@ -1,6 +1,6 @@
 # Спецификация: единая нода, компонентные ноды и рёбра, handle-директива, декларативные лейблы
 
-Status: in-progress (01–06 resolved)
+Status: in-progress (01–07 resolved)
 Ветка: `3.0`. Обсуждение и сравнение с React Flow, ng-diagram и Foblex зафиксированы в `report.md`.
 
 ## Цель

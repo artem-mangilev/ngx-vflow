@@ -83,7 +83,7 @@ not part of the library; `@vflow/ui` declares `ngx-vflow` as a peer dependency f
 `import { VflowBpmn } from '@vflow/ui/bpmn'` adds the agreed subset on top of the shared parts: task,
 start/intermediate/end events, exclusive and parallel gateways, pool and lane frames with a vertical
 `vflowTitle`, and `vflowBpmnFlow` for sequence, message and association paths. Pools and lanes are
-`template-group` nodes; their parent relationships stay in graph data, and a pool can carry its own handles
+sized nodes drawn as frames; their parent relationships stay in graph data, and a pool can carry its own handles
 for message flows. Execution semantics, BPMN XML and model validation belong to the application.
 
 ## Directive reference

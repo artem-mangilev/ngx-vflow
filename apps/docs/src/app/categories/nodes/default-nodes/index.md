@@ -3,12 +3,12 @@ keyword: 'FeaturesDefaultNodes'
 ---
 
 Core is headless: it owns geometry, interaction and accessibility, and renders a node through the
-template you provide. Pass a `nodes` array and an `<ng-template nodeHtml>` to `vflow`. Nodes of type
-`html-template` carry your `data`; the template receives it through `ctx.data()` together with
-`ctx.selected()` and `ctx.preselected()`.
+template you provide. Pass a `nodes` array and an `<ng-template node>` to `vflow`. Nodes carry your `data`; the
+template receives it through `ctx.data()` together with `ctx.selected()`, `ctx.preselected()`, `ctx.width()` and
+`ctx.height()`.
 
 The documentation demos share a few small presentation components built on `@vflow/ui`
-(`docs-node`, `docs-group`, `docs-edge`), so each feature page can focus on its feature.
+(`docs-node` and `docs-edge`), so each feature page can focus on its feature.
 Copy them or write your own; see `*FeaturesCustomNodes` for templates and components.
 
 {{ NgDocActions.demoPane("DefaultNodesDemoComponent") }}

@@ -12,10 +12,12 @@ You can create custom nodes with `ng-template`
 
 Follow these steps to achieve this:
 
-1. Set `type` of node to `html-template`
-2. Provide `ng-template` with `nodeHtml` selector inside `vflow`
-3. Write your HTML inside this template
-4. You can also pass any data with `data` field on node, and then get it inside `ng-template`
+1. Provide `ng-template` with the `node` selector inside `vflow`
+2. Write your HTML inside this template
+3. Pass any data with the `data` field of the node and read it inside the template through `ctx.data()`
+
+Every node without `component` renders through this template. The library does not read a node kind: if your flow has
+several kinds of nodes, keep a discriminator in `data` and branch on it with `@if` or `@switch` in the template.
 
 {{ NgDocActions.demoPane("CustomNodesDemoComponent") }}
 
@@ -28,16 +30,15 @@ Its benefits:
 - type-safe node data access
 - good for complex flows with many different node types
 
-Its limitations
-
-- it's harder to manage events because such nodes are rendered dynamically
-
 How to create component node:
 
-1. Create a regular angular standalone component
-2. Extend with `CustomNodeComponent` (please see the reference of this base component to get an idea of what fields you could use in your custom component node), otherwise it won't work!
-3. Pass your data interface to generic of `CustomNodeComponent` to use in component. This `data` comes from `Node` definition
-4. Use your new component in `type` field of `Node`. Library will render your node for you
+1. Create a regular angular standalone component. It does not extend any base class
+2. Read the node with `injectNode()`. Pass your data interface to its generic to get typed `data`. The returned object
+   is the same one a `node` template receives as `let-ctx`: `data`, `selected`, `preselected`, `width`, `height` and
+   the node itself
+3. Put your component in the `component` field of `Node`. The library will render your node for you
+
+A lazy import function in `component` loads the component only when it is needed; see the Lazy loading page.
 
 {{ NgDocActions.demoPane("CustomComponentNodesDemoComponent") }}
 
@@ -48,20 +49,21 @@ How to create component node:
 
 There is a `(componentNodeEvent)` event on `VflowComponent`. Here is how it works:
 
-1. It accumulates every `EventEmitter` of every component node of your flow
-2. It emits on every emit of those emitters
+1. It subscribes to every output declared by every component node of your flow: `@Output()`, `output()` and
+   `outputFromObservable()`
+2. It emits on every emit of those outputs and stops listening when the node is destroyed
 
 The shape of this accumulator-event contains following useful info:
 
 ```ts
 export type AnyComponentNodeEvent = {
   nodeId: string; // Id of node where event occurs
-  eventName: string;
+  eventName: string; // Property name of the output
   eventPayload: unknown;
 };
 ```
 
-The Library also includes `ComponentNodeEvent` helper type to get type-safe event, where you just need to pass an array of your custom components in generic, and this type will infer proper types for `eventName` and `eventPayload`:
+The Library also includes `ComponentNodeEvent` helper type to get type-safe event, where you just need to pass an array of your custom components in generic, and this type will infer proper types for `eventName` and `eventPayload` from their outputs:
 
 ```ts
   ...

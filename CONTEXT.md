@@ -44,6 +44,10 @@ _Avoid_: Business component, editor application
 An element of a node presentation marked as a connection point. The engine registers, measures and positions it on a node side; its size and look belong to the consuming application.
 _Avoid_: Port, anchor
 
+**Edge label**:
+HTML content declared inside an edge presentation and rendered by the library in its label layer at the start, center or end point of the edge path. Its text belongs to edge data; a separate label collection or global label template does not exist.
+_Avoid_: Label data, edge label type
+
 **Headless presentation**:
 A consumption model in which the application supplies node and edge visuals, using its own UI or first-party UI primitives, while the engine owns graph rendering and interaction mechanics.
 _Avoid_: No rendering, no interaction feedback
@@ -69,7 +73,7 @@ A pre-application description of a structural graph change that the application 
 _Avoid_: Change notification, internal mutation
 
 **Parent node**:
-A node referenced by another node's parent relationship, establishing nested coordinates. Any node type may be a parent; a visual group type is not required.
+A node referenced by another node's parent relationship, establishing nested coordinates. Any node may be a parent; there is no group node type or group template.
 _Avoid_: Group node
 
 **Node size mode**:
