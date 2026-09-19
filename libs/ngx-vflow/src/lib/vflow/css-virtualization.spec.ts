@@ -25,7 +25,8 @@ class LabelEdgeComponent {}
 @Component({
   template: `<div [style.width.px]="width()" [style.height.px]="height()">
     <input [value]="draft" (input)="draft = $any($event.target).value" />
-    <span vflowHandle type="target" position="left"></span><span vflowHandle type="source" position="right"></span>
+    <span vflowHandle handleType="target" position="left"></span
+    ><span vflowHandle handleType="source" position="right"></span>
   </div>`,
   imports: [VflowHandleDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -38,7 +39,7 @@ class StatefulNodeComponent {
 
 @Component({
   template: `<div style="width: 100px; height: 50px">
-    Drag me<span vflowHandle type="source" position="right"></span><node-toolbar>Tools</node-toolbar>
+    Drag me<span vflowHandle handleType="source" position="right"></span><node-toolbar>Tools</node-toolbar>
   </div>`,
   imports: [VflowHandleDirective, NodeToolbarComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -48,7 +49,8 @@ class DragNodeComponent {}
 /** Nodes without a presentation render an empty wrapper of their size; component nodes measure themselves. */
 @Component({
   template: `<div style="width: 100px; height: 50px">
-    <span vflowHandle type="target" position="left"></span><span vflowHandle type="source" position="right"></span>
+    <span vflowHandle handleType="target" position="left"></span
+    ><span vflowHandle handleType="source" position="right"></span>
   </div>`,
   imports: [VflowHandleDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,

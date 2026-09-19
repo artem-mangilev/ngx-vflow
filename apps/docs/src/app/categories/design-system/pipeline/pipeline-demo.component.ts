@@ -177,7 +177,7 @@ interface StageData {
               <div vflowField [attr.data-port]="port.id">
                 <span
                   vflowPort
-                  type="target"
+                  handleType="target"
                   position="left"
                   [id]="'in:' + port.id"
                   [ariaLabel]="ctx.data().title + ' ' + port.name + ' input (' + port.type + ')'"
@@ -193,7 +193,7 @@ interface StageData {
                 <span vflowTitle>{{ port.name }}</span>
                 <span
                   vflowPort
-                  type="source"
+                  handleType="source"
                   position="right"
                   [id]="'out:' + port.id"
                   [ariaLabel]="ctx.data().title + ' ' + port.name + ' output (' + port.type + ')'"

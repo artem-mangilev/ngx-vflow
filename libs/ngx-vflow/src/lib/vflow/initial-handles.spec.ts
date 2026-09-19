@@ -20,8 +20,8 @@ class LabelEdgeComponent {}
 @Component({
   template: `<div style="width:100px;height:48px;display:flex;align-items:center;justify-content:center">
     Custom node
-    <span vflowHandle type="target" position="left"></span>
-    <span vflowHandle type="source" position="right"></span>
+    <span vflowHandle handleType="target" position="left"></span>
+    <span vflowHandle handleType="source" position="right"></span>
   </div>`,
   imports: [VflowHandleDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,

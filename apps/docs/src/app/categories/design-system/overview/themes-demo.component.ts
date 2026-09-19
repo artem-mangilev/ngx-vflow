@@ -72,8 +72,8 @@ import { createEdges, createNodes, Vflow } from 'ngx-vflow';
                 <header vflowNodeHeader>
                   <span vflowTitle>{{ ctx.data().title }}</span>
                 </header>
-                <span vflowPort type="target" position="left"></span>
-                <span vflowPort type="source" position="right"></span>
+                <span vflowPort handleType="target" position="left"></span>
+                <span vflowPort handleType="source" position="right"></span>
               </article>
             </ng-template>
             <ng-template let-ctx edge>
@@ -96,8 +96,8 @@ import { createEdges, createNodes, Vflow } from 'ngx-vflow';
                 <header vflowNodeHeader>
                   <span vflowTitle>{{ ctx.data().title }}</span>
                 </header>
-                <span vflowPort type="target" position="left"></span>
-                <span vflowPort type="source" position="right"></span>
+                <span vflowPort handleType="target" position="left"></span>
+                <span vflowPort handleType="source" position="right"></span>
               </article>
             </ng-template>
             <ng-template let-ctx edge>
@@ -121,8 +121,8 @@ import { createEdges, createNodes, Vflow } from 'ngx-vflow';
         <ng-template let-ctx node>
           <div class="plain-node" selectable>
             {{ ctx.data().title }}
-            <span vflowHandle type="target" position="left" class="plain-handle"></span>
-            <span vflowHandle type="source" position="right" class="plain-handle"></span>
+            <span vflowHandle handleType="target" position="left" class="plain-handle"></span>
+            <span vflowHandle handleType="source" position="right" class="plain-handle"></span>
           </div>
         </ng-template>
         <ng-template let-ctx edge>

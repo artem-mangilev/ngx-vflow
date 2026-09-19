@@ -11,7 +11,7 @@ import { AsInterface } from '../types';
   providers: [{ provide: VflowHandleDirective, useExisting: forwardRef(() => HandleMockDirective) }],
 })
 export class HandleMockDirective implements AsInterface<VflowHandleDirective> {
-  public readonly type = input<HandleType>('source');
+  public readonly handleType = input<HandleType>('source');
   public readonly position = input<Position>('top');
   public readonly id = input<string>();
   public readonly layout = input<HandleLayout>('auto');

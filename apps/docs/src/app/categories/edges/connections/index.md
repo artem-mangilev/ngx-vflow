@@ -12,7 +12,7 @@ In the default `'strict'` `mode` of `ConnectionSettings`, edges are created from
 
 ## Loose connections
 
-This is the `'loose'` `mode` of `ConnectionSettings`, where the flow ignores the handle `type` and allows any handle to connect with any other handle. In this mode, an `id` must be provided for each `vflowHandle` to function correctly.
+This is the `'loose'` `mode` of `ConnectionSettings`, where the flow ignores the `handleType` and allows any handle to connect with any other handle. In this mode, an `id` must be provided for each `vflowHandle` to function correctly.
 
 {{ NgDocActions.demoPane("LooseConnectionDemoComponent") }}
 

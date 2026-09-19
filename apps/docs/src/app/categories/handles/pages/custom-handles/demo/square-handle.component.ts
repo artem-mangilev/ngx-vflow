@@ -8,7 +8,7 @@ import { VflowHandleDirective } from 'ngx-vflow';
 @Component({
   selector: 'square-handle',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  hostDirectives: [{ directive: VflowHandleDirective, inputs: ['type', 'position', 'id', 'canAccept'] }],
+  hostDirectives: [{ directive: VflowHandleDirective, inputs: ['handleType', 'position', 'id', 'canAccept'] }],
   host: {
     '[class.valid]': "handle.state() === 'valid'",
     '[class.invalid]': "handle.state() === 'invalid'",

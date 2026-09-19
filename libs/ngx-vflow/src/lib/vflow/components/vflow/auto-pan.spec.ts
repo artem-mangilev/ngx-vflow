@@ -19,8 +19,8 @@ import { VflowComponent } from './vflow.component';
     (reconnect)="(undefined)">
     <ng-template node>
       <div style="width: 100px; height: 50px">
-        <span vflowHandle type="target" position="left"></span>
-        <span vflowHandle type="source" position="right"></span>
+        <span vflowHandle handleType="target" position="left"></span>
+        <span vflowHandle handleType="source" position="right"></span>
       </div>
     </ng-template>
   </vflow>`,

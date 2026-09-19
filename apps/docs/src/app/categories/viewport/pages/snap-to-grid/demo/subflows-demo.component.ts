@@ -18,7 +18,7 @@ import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
           [class.group-node_selected]="ctx.selected()"
           [style.width.px]="ctx.width()"
           [style.height.px]="ctx.height()">
-          <span vflowPort type="source" position="right"></span>
+          <span vflowPort handleType="source" position="right"></span>
         </div>
       } @else {
         <docs-node [ctx]="ctx" />

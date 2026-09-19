@@ -34,7 +34,7 @@ import { Vflow, createEdges, createNodes } from 'ngx-vflow';
             <div class="editor">
               <label>Node title <input aria-label="Node title" vflowNoDrag /></label>
               <button type="button" vflowNoDrag (click)="removeEditor()">Remove editor</button>
-              <span vflowPort type="target" position="left"></span>
+              <span vflowPort handleType="target" position="left"></span>
             </div>
           } @else {
             <docs-node [ctx]="ctx" />

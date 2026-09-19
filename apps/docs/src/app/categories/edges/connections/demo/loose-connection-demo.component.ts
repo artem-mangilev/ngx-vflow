@@ -75,10 +75,10 @@ interface LooseConnectionNodeData {
   template: `<div class="node">
     {{ ctx.data().text }}
 
-    <span vflowPort type="source" position="top" id="a"></span>
-    <span vflowPort type="source" position="right" id="b"></span>
-    <span vflowPort type="source" position="bottom" id="c"></span>
-    <span vflowPort type="source" position="left" id="d"></span>
+    <span vflowPort handleType="source" position="top" id="a"></span>
+    <span vflowPort handleType="source" position="right" id="b"></span>
+    <span vflowPort handleType="source" position="bottom" id="c"></span>
+    <span vflowPort handleType="source" position="left" id="d"></span>
   </div>`,
   styles: [
     `

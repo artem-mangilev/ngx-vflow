@@ -31,7 +31,13 @@ import { VflowMocks } from './vflow-mocks';
       (connect)="(null)">
       <ng-template node>
         <div dragHandle selectable resizable [gap]="2">
-          <span vflowHandle type="source" #handle="vflowHandle" [position]="'left'" [id]="'1'" [layout]="'manual'">
+          <span
+            vflowHandle
+            handleType="source"
+            #handle="vflowHandle"
+            [position]="'left'"
+            [id]="'1'"
+            [layout]="'manual'">
             {{ handle.state() }}
           </span>
 

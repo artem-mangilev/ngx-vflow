@@ -5,7 +5,7 @@ import { provideCustomNodeMocks } from './provide-custom-node-mocks';
 
 @Component({
   selector: 'test-port',
-  hostDirectives: [{ directive: VflowHandleDirective, inputs: ['type', 'position', 'id'] }],
+  hostDirectives: [{ directive: VflowHandleDirective, inputs: ['handleType', 'position', 'id'] }],
   template: `{{ handle.type() }} {{ handle.state() }}`,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -14,7 +14,7 @@ class PortComponent {
 }
 
 @Component({
-  template: `<test-port type="target" position="left" id="in" />`,
+  template: `<test-port handleType="target" position="left" id="in" />`,
   imports: [PortComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

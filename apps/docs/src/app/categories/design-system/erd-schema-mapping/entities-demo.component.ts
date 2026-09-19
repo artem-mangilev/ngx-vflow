@@ -93,14 +93,14 @@ interface EntityData {
                 </button>
                 <span
                   vflowPort
-                  type="target"
+                  handleType="target"
                   position="left"
                   [id]="'in:' + field.id"
                   [ariaLabel]="ctx.data().title + '.' + field.name + ' input'"
                   [vflowPortConnected]="connected().has(ctx.node.id + '/in:' + field.id)"></span>
                 <span
                   vflowPort
-                  type="source"
+                  handleType="source"
                   position="right"
                   [id]="'out:' + field.id"
                   [ariaLabel]="ctx.data().title + '.' + field.name + ' output'"

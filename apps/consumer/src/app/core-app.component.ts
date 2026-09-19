@@ -36,8 +36,8 @@ import { createEdges, createNodes, Vflow } from 'ngx-vflow';
       <ng-template let-ctx node>
         <div class="card" selectable>
           {{ ctx.data().title }}
-          <span vflowHandle type="target" position="left" class="dot"></span>
-          <span vflowHandle type="source" position="right" class="dot"></span>
+          <span vflowHandle handleType="target" position="left" class="dot"></span>
+          <span vflowHandle handleType="source" position="right" class="dot"></span>
         </div>
       </ng-template>
       <mini-map />

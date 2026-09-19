@@ -19,6 +19,7 @@ import { createModelInjector } from '../utils/model-injector';
 import { Observable } from 'rxjs';
 import { DOCUMENT } from '@angular/common';
 import { getSvgPathBounds } from '../utils/svg-path-bounds';
+import { insetPoint, markerInset } from '../utils/marker-inset';
 
 const LABEL_POSITIONS: EdgeLabelPosition[] = ['start', 'center', 'end'];
 
@@ -293,11 +294,14 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
   }
 
   private getPathFactoryParams(source: HandleModel, target: HandleModel): CurveFactoryParams {
+    const markers = this.markers();
+
     return {
       mode: 'edge',
       edge: this.edge,
-      sourcePoint: source.pointAbsolute(),
-      targetPoint: target.pointAbsolute(),
+      // An arrow tip touches the handle; the path itself ends under the arrowhead.
+      sourcePoint: insetPoint(source.pointAbsolute(), source.position(), markerInset(markers?.start)),
+      targetPoint: insetPoint(target.pointAbsolute(), target.position(), markerInset(markers?.end)),
       sourcePosition: source.position(),
       targetPosition: target.position(),
       allEdges: this.flowEntitiesService.rawEdges(),

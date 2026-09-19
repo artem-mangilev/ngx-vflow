@@ -61,8 +61,8 @@ interface EdgeCtx {
     } @else {
       <div vflowNode class="card" selectable [vflowSelected]="ctx().selected() || ctx().preselected()">
         <span [innerHTML]="text()"></span>
-        <span vflowPort type="target" position="left"></span>
-        <span vflowPort type="source" position="right"></span>
+        <span vflowPort handleType="target" position="left"></span>
+        <span vflowPort handleType="source" position="right"></span>
       </div>
     }
   `,

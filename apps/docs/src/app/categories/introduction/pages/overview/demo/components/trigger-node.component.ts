@@ -15,7 +15,7 @@ import { Vflow } from 'ngx-vflow';
         <iframe width="100%" height="100%" src="https://www.youtube.com/embed/dQw4w9WgXcQ"> </iframe>
       </div>
 
-      <span vflowPort type="source" position="right"></span>
+      <span vflowPort handleType="source" position="right"></span>
     </div>
   `,
   styles: [

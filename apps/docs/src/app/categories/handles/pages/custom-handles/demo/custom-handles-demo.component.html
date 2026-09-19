@@ -28,7 +28,7 @@
             Output 1
             <span
               vflowHandle
-              type="source"
+              handleType="source"
               position="right"
               class="dot-handle"
               [id]="ctx.data().output1"
@@ -36,7 +36,7 @@
           </div>
           <div class="data-block">
             Output 2
-            <span vflowHandle type="source" position="right" class="dot-handle" [id]="ctx.data().output2"></span>
+            <span vflowHandle handleType="source" position="right" class="dot-handle" [id]="ctx.data().output2"></span>
           </div>
         </div>
       }
@@ -46,11 +46,15 @@
         <div class="custom-node">
           <div class="data-block">
             Input 1
-            <square-handle type="target" position="left" [id]="ctx.data().input1" [canAccept]="inputOneCanAccept()" />
+            <square-handle
+              handleType="target"
+              position="left"
+              [id]="ctx.data().input1"
+              [canAccept]="inputOneCanAccept()" />
           </div>
           <div class="data-block">
             Input 2
-            <square-handle type="target" position="left" [id]="ctx.data().input2" />
+            <square-handle handleType="target" position="left" [id]="ctx.data().input2" />
           </div>
         </div>
       }

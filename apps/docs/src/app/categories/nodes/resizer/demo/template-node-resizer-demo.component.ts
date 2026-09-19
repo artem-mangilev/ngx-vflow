@@ -13,11 +13,11 @@ import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
           <div resizable class="custom-node">
             <div class="data-block">
               Output 1
-              <span vflowPort type="source" position="right" [id]="ctx.data().output1"></span>
+              <span vflowPort handleType="source" position="right" [id]="ctx.data().output1"></span>
             </div>
             <div class="data-block">
               Output 2
-              <span vflowPort type="source" position="right" [id]="ctx.data().output2"></span>
+              <span vflowPort handleType="source" position="right" [id]="ctx.data().output2"></span>
             </div>
           </div>
         }
@@ -26,11 +26,11 @@ import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
           <div resizable class="custom-node">
             <div class="data-block">
               Input 1
-              <span vflowPort type="target" position="left" [id]="ctx.data().input1"></span>
+              <span vflowPort handleType="target" position="left" [id]="ctx.data().input1"></span>
             </div>
             <div class="data-block">
               Input 2
-              <span vflowPort type="target" position="left" [id]="ctx.data().input2"></span>
+              <span vflowPort handleType="target" position="left" [id]="ctx.data().input2"></span>
             </div>
           </div>
         }

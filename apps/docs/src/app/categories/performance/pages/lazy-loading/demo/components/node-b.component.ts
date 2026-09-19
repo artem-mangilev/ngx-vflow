@@ -8,8 +8,8 @@ import { Vflow } from 'ngx-vflow';
     <div class="custom-node">
       Node B
 
-      <span vflowPort type="source" position="right"></span>
-      <span vflowPort type="target" position="left"></span>
+      <span vflowPort handleType="source" position="right"></span>
+      <span vflowPort handleType="target" position="left"></span>
     </div>
   `,
   styles: `

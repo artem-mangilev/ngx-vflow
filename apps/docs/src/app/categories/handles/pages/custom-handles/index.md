@@ -1,31 +1,29 @@
 A handle is an element of your node presentation with the `vflowHandle` directive. The library registers and measures the element and, by default, places it on the node side. Core ships no visual for a handle: size, color, border and pointer events belong to your application.
 
 ```html
-<span vflowHandle type="source" position="right" class="dot"></span>
+<span vflowHandle handleType="source" position="right" class="dot"></span>
 ```
 
 > **Info**
-> With `@vflow/ui`, use `vflowPort` instead of `vflowHandle`: it is a handle with the standard port visual and valid/invalid feedback and takes the same inputs: `<span vflowPort type="target" position="left"></span>`.
+> With `@vflow/ui`, use `vflowPort` instead of `vflowHandle`: it is a handle with the standard port visual and valid/invalid feedback and takes the same inputs: `<span vflowPort handleType="target" position="left"></span>`.
 
 ## Inputs
 
-| Input                                           | Default  | Description                                                                       |
-| ----------------------------------------------- | -------- | --------------------------------------------------------------------------------- |
-| `vflowHandle`                                   | `source` | Handle type: `source` or `target`                                                 |
-| `position`                                      | `top`    | Side of the node: `left`, `right`, `top` or `bottom`                              |
-| `id`                                            |          | Identifies the handle when a node has more than one handle of a type              |
-| `layout`                                        | `auto`   | `auto` or `manual`, see below                                                     |
-| `offsetX`, `offsetY`                            | `0`      | Shift of the element and its connection point in the `auto` layout, in flow units |
-| `canStart`                                      | `true`   | Whether a new connection may start from this handle                               |
-| `canAccept`                                     | `true`   | Whether the handle may accept a connection or reconnection candidate              |
-| `ariaLabel`, `ariaDescription`, `domAttributes` |          | Accessibility metadata, see the Accessibility page                                |
+| Input                                           | Default  | Description                                                                                                   |
+| ----------------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------- |
+| `handleType`                                    | `source` | Handle type: `source` or `target`                                                                             |
+| `position`                                      | `top`    | Side of the node: `left`, `right`, `top` or `bottom`                                                          |
+| `id`                                            |          | Identifies the handle when a node has more than one handle of a type                                          |
+| `layout`                                        | `auto`   | `auto` or `manual`, see below                                                                                 |
+| `offsetX`, `offsetY`                            | `0`      | Shift of the element and its connection point in the `auto` layout, in flow units; positive is right and down |
+| `canStart`                                      | `true`   | Whether a new connection may start from this handle                                                           |
+| `canAccept`                                     | `true`   | Whether the handle may accept a connection or reconnection candidate                                          |
+| `ariaLabel`, `ariaDescription`, `domAttributes` |          | Accessibility metadata, see the Accessibility page                                                            |
 
 ## Layout
 
 - `auto` (default): the directive writes `position: absolute`, the side offsets and `transform` on the element, so it sits on the `position` side of the node at the center of its parent element. The connection point is the outer edge of the element on that side.
 - `manual`: the directive writes no styles. Position the element yourself; the connection point is read from the element's box on the `position` side, and `offsetX` and `offsetY` are ignored.
-
-Put the directive on a non-form element such as `span` or `div`: on `button` or `input` the static `type` attribute also sets the native `type`.
 
 In the `auto` layout the directive owns `transform` on the element. For hover effects use the CSS `scale` or `translate` properties, or animate an inner element.
 
@@ -59,24 +57,24 @@ The state follows `ConnectionSettings.validator()`, so plain CSS is enough for c
 }
 ```
 
-The directive is exported as `vflowHandle`. A template reference gives access to its signals `state`, `type`, `position`, `id`, `canStart`, `canAccept` and `layout`:
+The directive is exported as `vflowHandle`. A template reference gives access to its signals `state`, `handleType`, `position`, `id`, `canStart`, `canAccept` and `layout`:
 
 {% raw %}
 
 ```html
-<span #h="vflowHandle" vflowHandle type="target" position="left" class="dot" [title]="h.state()"></span>
+<span #h="vflowHandle" vflowHandle handleType="target" position="left" class="dot" [title]="h.state()"></span>
 ```
 
 {% endraw %}
 
 ## Handle components
 
-A component can become a handle by applying the directive through `hostDirectives`. Forward the inputs that the places using the component bind, including the type and `position`. Inject `VflowHandleDirective` to read its signals: `state`, `type`, `position`, `id`, `canStart`, `canAccept` and `layout`. The same works in any element inside a handle element, and in unit tests with `VflowMocks`, whose handle mock stands in for the directive.
+A component can become a handle by applying the directive through `hostDirectives`. Forward the inputs that the places using the component bind, including `handleType` and `position`. Inject `VflowHandleDirective` to read its signals: `state`, `handleType`, `position`, `id`, `canStart`, `canAccept` and `layout`. The same works in any element inside a handle element, and in unit tests with `VflowMocks`, whose handle mock stands in for the directive.
 
 ```ts
 @Component({
   selector: 'square-handle',
-  hostDirectives: [{ directive: VflowHandleDirective, inputs: ['type', 'position', 'id', 'canAccept'] }],
+  hostDirectives: [{ directive: VflowHandleDirective, inputs: ['handleType', 'position', 'id', 'canAccept'] }],
   host: {
     '[class.valid]': "handle.state() === 'valid'",
     '[class.invalid]': "handle.state() === 'invalid'",
@@ -89,7 +87,7 @@ export class SquareHandleComponent {
 ```
 
 ```html
-<square-handle type="target" position="left" [id]="'input-1'" [canAccept]="canAccept()" />
+<square-handle handleType="target" position="left" [id]="'input-1'" [canAccept]="canAccept()" />
 ```
 
 ## Demo

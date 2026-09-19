@@ -95,7 +95,7 @@ interface StepData {
               @if (ctx.node.id !== 'received') {
                 <span
                   vflowPort
-                  type="target"
+                  handleType="target"
                   position="left"
                   vflowPortConnected
                   [canStart]="false"
@@ -104,7 +104,7 @@ interface StepData {
               @if (ctx.node.id !== 'paid' && ctx.node.id !== 'fix') {
                 <span
                   vflowPort
-                  type="source"
+                  handleType="source"
                   position="right"
                   vflowPortConnected
                   [canStart]="false"

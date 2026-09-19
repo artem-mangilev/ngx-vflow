@@ -102,8 +102,13 @@ const ALL_VISIBLE: Visibility = { visible: new Set(), above: [], below: [], key:
                 field of ctx.data().collapsed ? ctx.data().fields : hidden(ctx.data(), view.above);
                 track field.id
               ) {
-                <span vflowPort type="target" position="left" [id]="'in:' + field.id" [canStart]="false"></span>
-                <span vflowPort type="source" position="right" [id]="'out:' + field.id" [canAccept]="false"></span>
+                <span vflowPort handleType="target" position="left" [id]="'in:' + field.id" [canStart]="false"></span>
+                <span
+                  vflowPort
+                  handleType="source"
+                  position="right"
+                  [id]="'out:' + field.id"
+                  [canAccept]="false"></span>
               }
             </header>
             @if (!ctx.data().collapsed) {
@@ -115,13 +120,13 @@ const ALL_VISIBLE: Visibility = { visible: new Set(), above: [], below: [], key:
                     @if (row.handles) {
                       <span
                         vflowPort
-                        type="target"
+                        handleType="target"
                         position="left"
                         [id]="'in:' + row.field.id"
                         [canStart]="false"></span>
                       <span
                         vflowPort
-                        type="source"
+                        handleType="source"
                         position="right"
                         [id]="'out:' + row.field.id"
                         [canAccept]="false"></span>
@@ -133,8 +138,18 @@ const ALL_VISIBLE: Visibility = { visible: new Set(), above: [], below: [], key:
                 <footer vflowNodeFooter class="proxy edge-note">
                   <span vflowMeta>{{ view.below.length }} more below</span>
                   @for (field of hidden(ctx.data(), view.below); track field.id) {
-                    <span vflowPort type="target" position="left" [id]="'in:' + field.id" [canStart]="false"></span>
-                    <span vflowPort type="source" position="right" [id]="'out:' + field.id" [canAccept]="false"></span>
+                    <span
+                      vflowPort
+                      handleType="target"
+                      position="left"
+                      [id]="'in:' + field.id"
+                      [canStart]="false"></span>
+                    <span
+                      vflowPort
+                      handleType="source"
+                      position="right"
+                      [id]="'out:' + field.id"
+                      [canAccept]="false"></span>
                   }
                 </footer>
               }

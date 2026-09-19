@@ -9,8 +9,8 @@ import { Vflow, injectNode } from 'ngx-vflow';
   template: `
     <div class="stress-node" selectable [class.selected]="ctx.selected()">
       {{ ctx.data().label }}
-      <span vflowPort type="target" position="left"></span>
-      <span vflowPort type="source" position="right"></span>
+      <span vflowPort handleType="target" position="left"></span>
+      <span vflowPort handleType="source" position="right"></span>
     </div>
   `,
   styles: `

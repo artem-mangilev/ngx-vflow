@@ -5,8 +5,8 @@
     <div class="custom-node" [style.background-color]="ctx.data().color" (click)="onNodeClick(ctx.node)">
       {{ ctx.data().color }}
 
-      <span vflowPort type="source" position="bottom"></span>
-      <span vflowPort type="target" position="top"></span>
+      <span vflowPort handleType="source" position="bottom"></span>
+      <span vflowPort handleType="target" position="top"></span>
     </div>
   </ng-template>
 </vflow>

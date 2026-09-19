@@ -12,7 +12,7 @@ export interface RedSquareData {
     <div class="red-square" (click)="onClick()">
       {{ ctx.data().redSquareText }}
 
-      <span vflowPort type="source" position="right"></span>
+      <span vflowPort handleType="source" position="right"></span>
     </div>
   `,
   styles: [

@@ -15,7 +15,7 @@ import { DomAttributes } from '../../interfaces/dom-attributes.interface';
       <button type="button" noDrag (click)="clicks = clicks + 1">Review request</button>
       <span
         vflowHandle
-        type="target"
+        handleType="target"
         position="left"
         id="incoming"
         [canStart]="canStart()"
@@ -23,7 +23,7 @@ import { DomAttributes } from '../../interfaces/dom-attributes.interface';
         ariaLabel="Accept request"
         ariaDescription="Inbound route."
         [domAttributes]="{ 'data-port': 'incoming' }"></span>
-      <span vflowHandle type="source" position="right"></span>
+      <span vflowHandle handleType="source" position="right"></span>
     </ng-template>
   </vflow>`,
 })

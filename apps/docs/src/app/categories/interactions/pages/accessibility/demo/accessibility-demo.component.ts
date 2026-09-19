@@ -38,7 +38,7 @@ import { AriaLabelConfig, Vflow, createEdges, createNodes } from 'ngx-vflow';
               <button type="button" noDrag noPan (click)="reviews.set(reviews() + 1)">Review request</button>
               <span
                 vflowPort
-                type="target"
+                handleType="target"
                 position="left"
                 id="incoming"
                 ariaLabel="Accept request"

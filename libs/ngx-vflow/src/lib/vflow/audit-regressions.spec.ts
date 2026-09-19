@@ -43,7 +43,8 @@ class LabelHostComponent {
 
 @Component({
   template: `<div style="width: 100px; height: 50px">
-    <span vflowHandle type="target" position="left"></span><span vflowHandle type="source" position="right"></span>
+    <span vflowHandle handleType="target" position="left"></span
+    ><span vflowHandle handleType="source" position="right"></span>
   </div>`,
   imports: [VflowHandleDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,

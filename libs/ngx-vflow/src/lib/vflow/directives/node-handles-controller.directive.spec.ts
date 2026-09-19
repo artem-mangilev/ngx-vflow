@@ -6,6 +6,7 @@ import { NodeModel } from '../models/node.model';
 import { NodeAccessorService } from '../services/node-accessor.service';
 import { RequestAnimationFrameBatchingService } from '../services/request-animation-frame-batching.service';
 import { ResizeObserverService } from '../services/resize-observer.service';
+import { ViewportService } from '../services/viewport.service';
 import { NodeHandlesControllerDirective } from './node-handles-controller.directive';
 import { Position } from '../types/position.type';
 import { HandleLayout } from '../types/handle-type.type';
@@ -62,6 +63,7 @@ describe('NodeHandlesControllerDirective', () => {
         { provide: NodeAccessorService, useValue: nodeAccessor },
         { provide: ResizeObserverService, useValue: resizeObserver },
         { provide: RequestAnimationFrameBatchingService, useValue: animationFrames },
+        { provide: ViewportService, useValue: { readableViewport: () => ({ zoom: 1, x: 0, y: 0 }) } },
       ],
     });
 

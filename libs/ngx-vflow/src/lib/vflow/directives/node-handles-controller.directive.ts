@@ -5,7 +5,8 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ResizeObserverService } from '../services/resize-observer.service';
 import { RequestAnimationFrameBatchingService } from '../services/request-animation-frame-batching.service';
 import { NodeModel } from '../models/node.model';
-import { HandleModel } from '../models/handle.model';
+import { createHandleMeasureContext, HandleModel } from '../models/handle.model';
+import { ViewportService } from '../services/viewport.service';
 
 @Directive({
   selector: '[nodeHandlesController]',
@@ -17,6 +18,7 @@ export class NodeHandlesControllerDirective implements OnInit {
   private hostElementRef = inject<ElementRef<Element>>(ElementRef);
   private resizeObserverService = inject(ResizeObserverService);
   private requestAnimationFrameBatchingService = inject(RequestAnimationFrameBatchingService);
+  private viewportService = inject(ViewportService);
   private observedElements = new Set<Element>();
   private model: NodeModel | null = null;
   private syncScheduled = false;
@@ -107,8 +109,13 @@ export class NodeHandlesControllerDirective implements OnInit {
       }
 
       const handles = this.model.handles();
-      const nodeRect = !this.model.culled() ? this.model.nodeElement()?.getBoundingClientRect() : undefined;
-      const measurements = handles.map((handle) => handle.measure(nodeRect));
+      const nodeElement = this.model.nodeElement();
+      // The node rectangle, the rendered zoom and shared anchors are read once for every handle of the node.
+      const context =
+        !this.model.culled() && nodeElement
+          ? createHandleMeasureContext(nodeElement, this.viewportService.readableViewport().zoom)
+          : null;
+      const measurements = handles.map((handle) => (context ? handle.measure(context) : null));
 
       handles.forEach((handle, index) => handle.applyGeometry(measurements[index]));
     });

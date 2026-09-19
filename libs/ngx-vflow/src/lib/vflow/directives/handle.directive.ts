@@ -25,7 +25,7 @@ import { isTouchEvent } from '../utils/event';
   standalone: true,
   host: {
     class: 'vflow-handle',
-    '[attr.data-vflow-handle-type]': 'type()',
+    '[attr.data-vflow-handle-type]': 'handleType()',
     '[attr.data-vflow-handle-position]': 'position()',
     '[attr.data-vflow-handle-state]': 'state()',
     '[attr.data-vflow-handle-can-start]': 'canStart()',
@@ -49,10 +49,8 @@ export class VflowHandleDirective {
   // Optional, so the directive also runs in unit tests of application components with `provideCustomNodeMocks()`.
   private readonly rootPointer = inject(RootPointerDirective, { optional: true });
 
-  // TODO: pick a prefix for handle inputs (for example `vflowType` or `vwType`) so they never clash with native
-  // attributes such as `button[type]` or with inputs of components that apply this directive as a host directive.
-  /** `source` or `target`. Avoid on `button` and `input` elements: the attribute also reaches the native `type`. */
-  public readonly type = input<HandleType>('source');
+  /** `source` or `target`. */
+  public readonly handleType = input<HandleType>('source');
 
   /** Side of the node. */
   public readonly position = input<Position>('top');
@@ -63,7 +61,7 @@ export class VflowHandleDirective {
   /** `auto` positions the element on the node side; `manual` leaves positioning to the application. */
   public readonly layout = input<HandleLayout>('auto');
 
-  /** Shift of the element and its connection point in the `auto` layout, in flow units. */
+  /** Shift of the element and its connection point in the `auto` layout, in flow units: positive is right and down. */
   public readonly offsetX = input(0);
   public readonly offsetY = input(0);
 
@@ -76,7 +74,7 @@ export class VflowHandleDirective {
   private readonly model = new HandleModel(
     {
       element: this.element,
-      type: this.type,
+      type: this.handleType,
       position: this.position,
       id: this.id,
       layout: this.layout,
@@ -100,7 +98,7 @@ export class VflowHandleDirective {
 
     return {
       ...styles,
-      transform: `translate(${x}, ${y}) translate(${-this.offsetX()}px, ${-this.offsetY()}px)`,
+      transform: `translate(${x}, ${y}) translate(${this.offsetX()}px, ${this.offsetY()}px)`,
     };
   });
 
@@ -112,7 +110,7 @@ export class VflowHandleDirective {
     return {
       label:
         this.ariaLabel()?.trim() ||
-        labels.handleLabel({ type: this.type(), id: this.id(), node: this.model.parentNode.ariaLabel() }),
+        labels.handleLabel({ type: this.handleType(), id: this.id(), node: this.model.parentNode.ariaLabel() }),
       description: [
         this.ariaDescription(),
         !this.canStart() ? labels.connectionStartUnavailable : '',

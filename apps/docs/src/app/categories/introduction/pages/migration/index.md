@@ -21,8 +21,8 @@ graph needs templates. There are two working paths:
     } @else {
       <div class="card" selectable>
         {{ ctx.data().title }}
-        <span vflowHandle type="target" position="left" class="dot"></span>
-        <span vflowHandle type="source" position="right" class="dot"></span>
+        <span vflowHandle handleType="target" position="left" class="dot"></span>
+        <span vflowHandle handleType="source" position="right" class="dot"></span>
       </div>
     }
   </ng-template>
@@ -47,8 +47,8 @@ graph needs templates. There are two working paths:
     <ng-template let-ctx node>
       <article vflowNode selectable [vflowSelected]="ctx.selected() || ctx.preselected()">
         <header vflowNodeHeader><span vflowTitle>{{ ctx.data().title }}</span></header>
-        <span vflowPort type="target" position="left"></span>
-        <span vflowPort type="source" position="right"></span>
+        <span vflowPort handleType="target" position="left"></span>
+        <span vflowPort handleType="source" position="right"></span>
       </article>
     </ng-template>
     <ng-template let-ctx edge>
@@ -92,7 +92,8 @@ Set them on the `vflow` element or any ancestor; a `vflowTheme` scope from `@vfl
 | `color` in `selectionBox` settings                   | `--vflow-selection`; `.selection-box`. `mode` stays                                          |
 
 Behavior parameters are untouched: node points, sizes, `extent`, resize constraints, drag thresholds,
-snap grid, zoom limits, curves, handle offsets and connection validation keep their APIs.
+snap grid, zoom limits, curves and connection validation keep their APIs. Handle `offsetX` and `offsetY` keep their
+names, but a positive value now moves the handle right and down; version 2 moved it the other way.
 
 Version 3 renders node-facing templates as native HTML in a CSS-transformed viewport. Edges and connection overlays still use SVG. SVG content passed to the node template or to `[resizable]` is no longer supported. The library does not inspect template roots or provide a compatibility fallback, so these templates must be rewritten explicitly.
 
@@ -297,7 +298,8 @@ Place a label next to the SVG elements of the edge, not inside `svg:g`: Angular 
 
 ### Custom handle templates
 
-Custom handles are now your own native HTML elements with the `vflowHandle` directive, which positions them on the node side. The former SVG placement coordinate `ctx.point` and the handle template context have been removed; the validation state is exposed as the `data-vflow-handle-state` attribute and as the `state` signal of `VflowHandleDirective`. See the Custom handles page.
+Custom handles are now your own native HTML elements with the `vflowHandle` directive, which positions them on the node side. The former SVG placement coordinate `ctx.point` and the handle template context have been removed; the validation state is exposed as the `data-vflow-handle-state` attribute and as the `state` signal of `VflowHandleDirective`. The handle type is the `handleType` input (`handleType="target"`),
+not `type`, so it never reaches the native `type` attribute of the element. See the Custom handles page.
 
 Before:
 
@@ -310,7 +312,7 @@ Before:
 After:
 
 ```html
-<span vflowHandle type="source" position="right" class="port"></span>
+<span vflowHandle handleType="source" position="right" class="port"></span>
 ```
 
 ```css

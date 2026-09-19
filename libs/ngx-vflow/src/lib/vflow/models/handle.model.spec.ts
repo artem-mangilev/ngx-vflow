@@ -106,10 +106,11 @@ describe('HandleModel', () => {
     expect(model.localPoint()).toEqual({ x: 105, y: 20 });
     expect(model.layoutStyles()).toEqual({ top: '20px', left: 'auto', right: '0', bottom: 'auto' });
 
+    // A positive offset moves the element and its point to the right.
     position.set('left');
     offsetX.set(4);
     model.sync();
-    expect(model.localPoint()).toEqual({ x: -9, y: 20 });
+    expect(model.localPoint()).toEqual({ x: -1, y: 20 });
     expect(model.layoutStyles()).toEqual({ top: '20px', left: '0', right: 'auto', bottom: 'auto' });
 
     // The manual layout takes the middle of the element's side as it is rendered and ignores offsets.

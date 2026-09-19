@@ -11,7 +11,7 @@ import { Node, Edge, Vflow, createNodes } from 'ngx-vflow';
       <div class="custom-node" selectable [class.custom-node_selected]="ctx.selected()">
         {{ ctx.data().text }}
 
-        <span vflowPort type="source" position="right"></span>
+        <span vflowPort handleType="source" position="right"></span>
       </div>
     </ng-template>
   </vflow>`,

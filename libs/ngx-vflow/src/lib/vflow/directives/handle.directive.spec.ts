@@ -20,9 +20,9 @@ const side = signal<Position>('right');
 @Component({
   template: `<div style="width: 120px; height: 80px">
     <div style="height: 40px">
-      <span vflowHandle type="target" position="left" style="display: block; width: 10px; height: 10px"></span>
+      <span vflowHandle handleType="target" position="left" style="display: block; width: 10px; height: 10px"></span>
     </div>
-    <span vflowHandle type="source" [position]="side()" style="display: block; width: 10px; height: 10px"></span>
+    <span vflowHandle handleType="source" [position]="side()" style="display: block; width: 10px; height: 10px"></span>
   </div>`,
   imports: [VflowHandleDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -35,11 +35,11 @@ class PlainHandlesNodeComponent {
 @Component({
   template: `<div style="position: relative; box-sizing: border-box; width: 120px; height: 80px; border: 4px solid">
     <div style="margin-top: 20px; height: 20px">
-      <span vflowHandle type="source" position="right" style="display: block; width: 10px; height: 10px"></span>
+      <span vflowHandle handleType="source" position="right" style="display: block; width: 10px; height: 10px"></span>
     </div>
     <span
       vflowHandle
-      type="target"
+      handleType="target"
       position="left"
       layout="manual"
       style="position: absolute; left: 30px; top: 10px; display: block; width: 10px; height: 20px"></span>
@@ -51,10 +51,10 @@ class PositionedContentNodeComponent {}
 
 @Component({
   template: `<div style="width: 100px; height: 40px">
-    <span vflowHandle type="target" position="left" style="display: none"></span>
+    <span vflowHandle handleType="target" position="left" style="display: none"></span>
     <span
       vflowHandle
-      type="source"
+      handleType="source"
       position="right"
       style="visibility: hidden; display: block; width: 0; height: 0"></span>
   </div>`,
@@ -65,9 +65,9 @@ class HiddenHandlesNodeComponent {}
 
 @Component({
   selector: 'test-port',
-  hostDirectives: [{ directive: VflowHandleDirective, inputs: ['type', 'position', 'id', 'canAccept'] }],
+  hostDirectives: [{ directive: VflowHandleDirective, inputs: ['handleType', 'position', 'id', 'canAccept'] }],
   host: { style: 'display: block; width: 8px; height: 8px' },
-  template: `{{ handle.type() }} {{ handle.state() }}`,
+  template: `{{ handle.handleType() }} {{ handle.state() }}`,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 class PortComponent {
@@ -76,7 +76,7 @@ class PortComponent {
 
 @Component({
   template: `<div style="width: 100px; height: 40px">
-    <test-port type="target" position="left" id="in" [canAccept]="false" />
+    <test-port handleType="target" position="left" id="in" [canAccept]="false" />
   </div>`,
   imports: [PortComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,

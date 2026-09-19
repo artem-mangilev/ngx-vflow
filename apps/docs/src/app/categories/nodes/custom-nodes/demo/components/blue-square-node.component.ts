@@ -12,7 +12,7 @@ export interface BlueSquareData {
     <div class="blue-square" (click)="onClick()">
       {{ ctx.data().blueSquareText }}
 
-      <span vflowPort type="target" position="left"></span>
+      <span vflowPort handleType="target" position="left"></span>
     </div>
   `,
   styles: [

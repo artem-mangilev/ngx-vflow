@@ -12,6 +12,7 @@ import { ConnectionContext } from '../../interfaces/template-context.interface';
 import { Point } from '../../interfaces/point.interface';
 import { CurveFactoryParams } from '../../interfaces/curve-factory.interface';
 import { FlowEntitiesService } from '../../services/flow-entities.service';
+import { insetPoint, markerInset } from '../../utils/marker-inset';
 
 @Component({
   selector: 'g[connection]',
@@ -139,7 +140,8 @@ export class ConnectionComponent {
     return {
       mode: 'connection',
       sourcePoint,
-      targetPoint,
+      // The arrow tip reaches the pointer or the candidate handle; the path ends under the arrowhead.
+      targetPoint: insetPoint(targetPoint, targetPosition, markerInset(this.model().settings.marker)),
       sourcePosition,
       targetPosition,
       allEdges: this.flowEntitiesService.rawEdges(),

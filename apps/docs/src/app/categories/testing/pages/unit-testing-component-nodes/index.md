@@ -3,7 +3,7 @@ To simplify writing isolated tests for component nodes, you can use the `provide
 ```ts
 @Component({
   standalone: true,
-  template: `<div resizable>{{ ctx.node.id }}<span vflowHandle type="source" position="right"></span></div>`,
+  template: `<div resizable>{{ ctx.node.id }}<span vflowHandle handleType="source" position="right"></span></div>`,
   imports: [Vflow],
 })
 class TestCustomNodeComponent {

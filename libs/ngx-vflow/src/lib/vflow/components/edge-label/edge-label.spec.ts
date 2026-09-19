@@ -41,7 +41,8 @@ class LabelledEdgeComponent {
   template: `<vflow [view]="[600, 400]" [nodes]="nodes" [edges]="edges">
     <ng-template node>
       <div style="width: 60px; height: 30px">
-        <span vflowHandle type="target" position="left"></span><span vflowHandle type="source" position="right"></span>
+        <span vflowHandle handleType="target" position="left"></span
+        ><span vflowHandle handleType="source" position="right"></span>
       </div>
     </ng-template>
     <ng-template let-ctx edge>

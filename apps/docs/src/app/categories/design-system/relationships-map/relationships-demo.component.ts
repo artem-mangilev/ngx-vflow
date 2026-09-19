@@ -122,14 +122,14 @@ type MapData = Person | Metric | Note | Team;
               <!-- The container has its own connections; it is not a parent of the other team. -->
               <span
                 vflowPort
-                type="source"
+                handleType="source"
                 position="right"
                 vflowPortConnected
                 [canStart]="!viewMode()"
                 [canAccept]="false"></span>
               <span
                 vflowPort
-                type="target"
+                handleType="target"
                 position="left"
                 vflowPortConnected
                 [canStart]="false"
@@ -161,14 +161,14 @@ type MapData = Person | Metric | Note | Team;
                   </div>
                   <span
                     vflowPort
-                    type="target"
+                    handleType="target"
                     position="left"
                     vflowPortConnected
                     [canStart]="false"
                     [canAccept]="!viewMode()"></span>
                   <span
                     vflowPort
-                    type="source"
+                    handleType="source"
                     position="right"
                     vflowPortConnected
                     [canStart]="!viewMode()"

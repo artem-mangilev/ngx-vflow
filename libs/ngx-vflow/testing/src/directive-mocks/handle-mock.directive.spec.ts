@@ -13,7 +13,7 @@ class HandleStateComponent {
 }
 
 @Component({
-  template: `<span vflowHandle type="target"><test-handle-state /></span>`,
+  template: `<span vflowHandle handleType="target"><test-handle-state /></span>`,
   imports: [VflowHandleDirective, HandleStateComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

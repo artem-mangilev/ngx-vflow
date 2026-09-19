@@ -50,7 +50,8 @@ class TemplateEdgeChildComponent {
     (componentNodeEvent)="nodeEvents.push($event)">
     <ng-template node>
       <div style="width: 60px; height: 30px">
-        <span vflowHandle type="target" position="left"></span><span vflowHandle type="source" position="right"></span>
+        <span vflowHandle handleType="target" position="left"></span
+        ><span vflowHandle handleType="source" position="right"></span>
       </div>
     </ng-template>
     <ng-template let-ctx edge>
@@ -193,7 +194,8 @@ class PlainEdgeComponent {
   template: `<vflow [view]="[400, 200]" [nodes]="nodes" [edges]="edges">
     <ng-template node>
       <div style="width: 60px; height: 30px">
-        <span vflowHandle type="target" position="left"></span><span vflowHandle type="source" position="right"></span>
+        <span vflowHandle handleType="target" position="left"></span
+        ><span vflowHandle handleType="source" position="right"></span>
       </div>
     </ng-template>
     <ng-template let-ctx edge><svg:path class="plain" fill="none" [attr.d]="ctx.path()" /></ng-template>

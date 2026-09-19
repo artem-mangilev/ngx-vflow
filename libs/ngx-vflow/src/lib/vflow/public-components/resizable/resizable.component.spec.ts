@@ -57,12 +57,12 @@ class ResizableTestHostComponent {
         @if (withResizable()) {
           <div class="card" resizable>
             <div class="content"></div>
-            <span vflowHandle type="source" position="right"></span>
+            <span vflowHandle handleType="source" position="right"></span>
           </div>
         } @else {
           <div class="card">
             <div class="content"></div>
-            <span vflowHandle type="source" position="right"></span>
+            <span vflowHandle handleType="source" position="right"></span>
           </div>
         }
       </ng-template>

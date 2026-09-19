@@ -39,6 +39,34 @@ export interface HandleOptions {
 
 type Box = { left: number; top: number; width: number; height: number };
 
+/** Reads shared by every handle of a node in one measurement pass. */
+export type HandleMeasureContext = {
+  nodeRect: DOMRect;
+  /** The zoom that is rendered. A wheel event updates the viewport signal before Angular applies the transform. */
+  zoom: number;
+  /** Client rectangles read in this pass, so handles that share an anchor or a containing block read it once. */
+  rects: Map<Element, DOMRect>;
+};
+
+/** `fallbackZoom` applies to a node that is rendered outside of a flow viewport, for example in a unit test. */
+export function createHandleMeasureContext(nodeElement: HTMLElement, fallbackZoom: number): HandleMeasureContext {
+  const viewport = nodeElement.closest<HTMLElement>('.vflow-viewport');
+  const zoom = (viewport ? new DOMMatrixReadOnly(viewport.style.transform).a : fallbackZoom) || 1;
+
+  return { nodeRect: nodeElement.getBoundingClientRect(), zoom, rects: new Map() };
+}
+
+function clientRect(context: HandleMeasureContext, element: Element): DOMRect {
+  let rect = context.rects.get(element);
+
+  if (!rect) {
+    rect = element.getBoundingClientRect();
+    context.rects.set(element, rect);
+  }
+
+  return rect;
+}
+
 const UNPLACED: HandleLayoutStyles = { top: 'auto', left: 'auto', right: 'auto', bottom: 'auto' };
 
 export class HandleModel {
@@ -91,14 +119,13 @@ export class HandleModel {
   }
 
   /** Read phase: reads the element, its anchor and its containing block without changing styles. */
-  public measure(nodeRect?: DOMRect): HandleMeasurement {
+  public measure(context = this.createMeasureContext()): HandleMeasurement {
     if (this.parentNode.culled()) return null;
 
     const element = this.element;
     const nodeElement = this.parentNode.nodeElement();
-    const resolvedNodeRect = nodeRect ?? nodeElement?.getBoundingClientRect();
 
-    if (!element || !resolvedNodeRect) {
+    if (!element || !nodeElement || !context) {
       return null;
     }
 
@@ -106,15 +133,10 @@ export class HandleModel {
       return HANDLE_WITHOUT_BOX;
     }
 
-    // A wheel event can update the signal before Angular applies the DOM transform.
-    // DOM measurements must use the scale that is actually rendered.
-    const viewport = nodeElement?.closest<HTMLElement>('.vflow-viewport');
-    const zoom = viewport
-      ? new DOMMatrixReadOnly(viewport.style.transform).a || 1
-      : this.viewportService.readableViewport().zoom || 1;
+    const { nodeRect, zoom } = context;
     const toLocal = (rect: DOMRect): Box => ({
-      left: (rect.left - resolvedNodeRect.left) / zoom,
-      top: (rect.top - resolvedNodeRect.top) / zoom,
+      left: (rect.left - nodeRect.left) / zoom,
+      top: (rect.top - nodeRect.top) / zoom,
       width: rect.width / zoom,
       height: rect.height / zoom,
     });
@@ -128,7 +150,7 @@ export class HandleModel {
 
     const node = { width: this.parentNode.width(), height: this.parentNode.height() };
     const anchor = element.parentElement
-      ? toLocal(element.parentElement.getBoundingClientRect())
+      ? toLocal(clientRect(context, element.parentElement))
       : { left: 0, top: 0, ...node };
 
     return computeAutoGeometry({
@@ -137,8 +159,15 @@ export class HandleModel {
       handle,
       anchor,
       offset: { x: this.offsetX(), y: this.offsetY() },
-      origin: containingBlockOrigin(element, nodeElement, resolvedNodeRect, zoom),
+      origin: containingBlockOrigin(element, nodeElement, context),
     });
+  }
+
+  /** Isolated model use. Node rendering shares one context between the handles of the node. */
+  private createMeasureContext(): HandleMeasureContext | null {
+    const nodeElement = this.parentNode.nodeElement();
+
+    return nodeElement ? createHandleMeasureContext(nodeElement, this.viewportService.readableViewport().zoom) : null;
   }
 
   /** Write phase. Called only after every handle in the node has been measured. */
@@ -197,17 +226,16 @@ function sidePoint(position: Position, box: Box): Point {
  */
 function containingBlockOrigin(
   element: HTMLElement,
-  nodeElement: HTMLElement | null,
-  nodeRect: DOMRect,
-  zoom: number,
+  nodeElement: HTMLElement,
+  { nodeRect, zoom, ...context }: HandleMeasureContext,
 ): Point | null {
   const container = element.offsetParent;
 
-  if (!(container instanceof HTMLElement) || container === nodeElement || !nodeElement?.contains(container)) {
+  if (!(container instanceof HTMLElement) || container === nodeElement || !nodeElement.contains(container)) {
     return null;
   }
 
-  const rect = container.getBoundingClientRect();
+  const rect = clientRect({ nodeRect, zoom, ...context }, container);
 
   return {
     x: (rect.left - nodeRect.left) / zoom + container.clientLeft - container.scrollLeft,
@@ -241,28 +269,28 @@ function computeAutoGeometry({
         layoutStyles: origin
           ? { top: px(anchorY - origin.y), left: px(-origin.x), right: 'auto', bottom: 'auto' }
           : { top: px(anchorY), left: '0', right: 'auto', bottom: 'auto' },
-        localPoint: { x: -handle.width / 2 - offset.x, y: anchorY - offset.y },
+        localPoint: { x: -handle.width / 2 + offset.x, y: anchorY + offset.y },
       };
     case 'right':
       return {
         layoutStyles: origin
           ? { top: px(anchorY - origin.y), left: px(node.width - origin.x), right: 'auto', bottom: 'auto' }
           : { top: px(anchorY), left: 'auto', right: '0', bottom: 'auto' },
-        localPoint: { x: node.width + handle.width / 2 - offset.x, y: anchorY - offset.y },
+        localPoint: { x: node.width + handle.width / 2 + offset.x, y: anchorY + offset.y },
       };
     case 'top':
       return {
         layoutStyles: origin
           ? { top: px(-origin.y), left: px(anchorX - origin.x), right: 'auto', bottom: 'auto' }
           : { top: '0', left: px(anchorX), right: 'auto', bottom: 'auto' },
-        localPoint: { x: anchorX - offset.x, y: -handle.height / 2 - offset.y },
+        localPoint: { x: anchorX + offset.x, y: -handle.height / 2 + offset.y },
       };
     case 'bottom':
       return {
         layoutStyles: origin
           ? { top: px(node.height - origin.y), left: px(anchorX - origin.x), right: 'auto', bottom: 'auto' }
           : { top: 'auto', left: px(anchorX), right: 'auto', bottom: '0' },
-        localPoint: { x: anchorX - offset.x, y: node.height + handle.height / 2 - offset.y },
+        localPoint: { x: anchorX + offset.x, y: node.height + handle.height / 2 + offset.y },
       };
   }
 }
