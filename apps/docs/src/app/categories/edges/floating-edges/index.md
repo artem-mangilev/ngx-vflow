@@ -6,3 +6,5 @@ The library supports floating edges. A floating edge is an edge that connects th
 > This limitation may be addressed in future releases.
 
 {{ NgDocActions.demoPane("FloatingEdgesDemoComponent") }}
+
+For edges that leave and enter nodes anywhere on their borders, without ports at all, see the Easy connect recipe in the cookbook: it combines a handle that covers the node with a curve built from `getFloatingEdgeParams`.

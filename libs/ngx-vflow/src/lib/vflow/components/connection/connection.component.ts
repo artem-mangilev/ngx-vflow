@@ -13,6 +13,7 @@ import { Point } from '../../interfaces/point.interface';
 import { CurveFactoryParams } from '../../interfaces/curve-factory.interface';
 import { FlowEntitiesService } from '../../services/flow-entities.service';
 import { insetPoint, markerInset } from '../../utils/marker-inset';
+import { NodeModel } from '../../models/node.model';
 
 @Component({
   selector: 'g[connection]',
@@ -60,7 +61,13 @@ export class ConnectionComponent {
       const targetPoint = this.spacePointContext.svgCurrentSpacePoint();
       const targetPosition = getOppositePostion(sourceHandle.position());
 
-      const params = this.getPathFactoryParams(sourcePoint, targetPoint, sourcePosition, targetPosition);
+      const params = this.getPathFactoryParams(
+        sourcePoint,
+        targetPoint,
+        sourcePosition,
+        targetPosition,
+        status.payload.source,
+      );
 
       switch (curve) {
         case 'straight':
@@ -90,7 +97,14 @@ export class ConnectionComponent {
         ? targetHandle.position()
         : getOppositePostion(sourceHandle.position());
 
-      const params = this.getPathFactoryParams(sourcePoint, targetPoint, sourcePosition, targetPosition);
+      const params = this.getPathFactoryParams(
+        sourcePoint,
+        targetPoint,
+        sourcePosition,
+        targetPosition,
+        status.payload.source,
+        status.payload.valid ? status.payload.target : undefined,
+      );
 
       switch (curve) {
         case 'straight':
@@ -136,12 +150,19 @@ export class ConnectionComponent {
     targetPoint: Point,
     sourcePosition: Position,
     targetPosition: Position,
+    sourceNode: NodeModel,
+    targetNode?: NodeModel,
   ): CurveFactoryParams {
+    const inset = { start: 0, end: markerInset(this.model().settings.marker) };
+
     return {
       mode: 'connection',
       sourcePoint,
       // The arrow tip reaches the pointer or the candidate handle; the path ends under the arrowhead.
-      targetPoint: insetPoint(targetPoint, targetPosition, markerInset(this.model().settings.marker)),
+      targetPoint: insetPoint(targetPoint, targetPosition, inset.end),
+      markerInset: inset,
+      sourceNode: sourceNode.geometry(),
+      targetNode: targetNode?.geometry(),
       sourcePosition,
       targetPosition,
       allEdges: this.flowEntitiesService.rawEdges(),

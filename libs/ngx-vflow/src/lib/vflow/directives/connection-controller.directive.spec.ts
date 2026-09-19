@@ -105,6 +105,40 @@ describe('ConnectionControllerDirective', () => {
     }
   });
 
+  it('should mark the origin handle connecting and keep it while leaving it or resetting other handles', () => {
+    const source = createHandle(createNodeModel('source'), 'source');
+    const target = createHandle(createNodeModel('target'), 'target');
+
+    controller.startConnection(source);
+    TestBed.flushEffects();
+    expect(source.state()).toBe('connecting');
+
+    // Leaving the origin, or a handle that is not the candidate, changes nothing.
+    controller.resetValidateConnection(source);
+    controller.resetValidateConnection(target);
+    TestBed.flushEffects();
+    expect(source.state()).toBe('connecting');
+    expect(statusService.status().state).toBe('connection-start');
+
+    controller.validateConnection(target);
+    TestBed.flushEffects();
+    expect(target.state()).toBe('valid');
+    expect(source.state()).toBe('connecting');
+
+    // The origin can be its own candidate; leaving it restores connecting.
+    controller.resetValidateConnection(target);
+    controller.validateConnection(source);
+    TestBed.flushEffects();
+    expect(source.state()).toBe('invalid');
+    controller.resetValidateConnection(source);
+    TestBed.flushEffects();
+    expect(source.state()).toBe('connecting');
+
+    statusService.setIdleStatus();
+    TestBed.flushEffects();
+    expect(source.state()).toBe('idle');
+  });
+
   it('should reject a new connection when its starting handle cannot start', () => {
     const source = createHandle(createNodeModel('source'), 'source', false);
     const connectStart = jasmine.createSpy('connectStart');

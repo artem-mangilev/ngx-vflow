@@ -12,6 +12,7 @@ import { Contextable } from '../interfaces/contextable.interface';
 import { EdgeContext } from '../interfaces/template-context.interface';
 import { HandleModel } from './handle.model';
 import { CurveFactoryParams, CurveLayout } from '../interfaces/curve-factory.interface';
+import { HandleType } from '../types/handle-type.type';
 import { FlowEntitiesService } from '../services/flow-entities.service';
 import { Marker } from '../interfaces/marker.interface';
 import { FlowSettingsService } from '../services/flow-settings.service';
@@ -138,49 +139,28 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
     return layout.path ? (layout.bounds ?? getSvgPathBounds(this.document, layout.path)) : null;
   });
 
-  public sourceHandle = computed<HandleModel | null>(() => {
-    let handle: HandleModel | null = null;
+  public sourceHandle = computed<HandleModel | null>(() =>
+    this.floating()
+      ? this.closestHandles().sourceHandle
+      : this.findHandle(this.source()?.handles() ?? [], 'source', this.edge.sourceHandle),
+  );
 
-    if (this.floating()) {
-      handle = this.closestHandles().sourceHandle;
-    } else {
-      if (this.edge.sourceHandle) {
-        handle =
-          this.source()
-            ?.handles()
-            .find((handle) => handle.id() === this.edge.sourceHandle) ?? null;
-      } else {
-        handle =
-          this.source()
-            ?.handles()
-            .find((handle) => handle.type() === 'source') ?? null;
-      }
+  public targetHandle = computed<HandleModel | null>(() =>
+    this.floating()
+      ? this.closestHandles().targetHandle
+      : this.findHandle(this.target()?.handles() ?? [], 'target', this.edge.targetHandle),
+  );
+
+  /** Without an id, the first handle of the role; in the loose connection mode any handle when the role has none. */
+  private findHandle(handles: HandleModel[], type: HandleType, id?: string) {
+    if (id) {
+      return handles.find((handle) => handle.id() === id) ?? null;
     }
 
-    return handle;
-  });
+    const ofType = handles.find((handle) => handle.type() === type) ?? null;
 
-  public targetHandle = computed<HandleModel | null>(() => {
-    let handle: HandleModel | null = null;
-
-    if (this.floating()) {
-      handle = this.closestHandles().targetHandle;
-    } else {
-      if (this.edge.targetHandle) {
-        handle =
-          this.target()
-            ?.handles()
-            .find((handle) => handle.id() === this.edge.targetHandle) ?? null;
-      } else {
-        handle =
-          this.target()
-            ?.handles()
-            .find((handle) => handle.type() === 'target') ?? null;
-      }
-    }
-
-    return handle;
-  });
+    return ofType ?? (this.flowEntitiesService.connection().mode === 'loose' ? (handles[0] ?? null) : null);
+  }
 
   public closestHandles = computed<{
     sourceHandle: HandleModel | null;
@@ -295,13 +275,17 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
 
   private getPathFactoryParams(source: HandleModel, target: HandleModel): CurveFactoryParams {
     const markers = this.markers();
+    const inset = { start: markerInset(markers?.start), end: markerInset(markers?.end) };
 
     return {
       mode: 'edge',
       edge: this.edge,
       // An arrow tip touches the handle; the path itself ends under the arrowhead.
-      sourcePoint: insetPoint(source.pointAbsolute(), source.position(), markerInset(markers?.start)),
-      targetPoint: insetPoint(target.pointAbsolute(), target.position(), markerInset(markers?.end)),
+      sourcePoint: insetPoint(source.pointAbsolute(), source.position(), inset.start),
+      targetPoint: insetPoint(target.pointAbsolute(), target.position(), inset.end),
+      markerInset: inset,
+      sourceNode: source.parentNode.geometry(),
+      targetNode: target.parentNode.geometry(),
       sourcePosition: source.position(),
       targetPosition: target.position(),
       allEdges: this.flowEntitiesService.rawEdges(),

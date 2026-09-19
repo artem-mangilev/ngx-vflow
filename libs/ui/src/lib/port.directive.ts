@@ -29,7 +29,7 @@ import { HandleState, VflowHandleDirective } from 'ngx-vflow';
   ],
   host: {
     class:
-      'vui-port vui:block vui:box-border vui:size-3.5 vui:rounded-full vui:border-2 vui:border-surface vui:bg-muted vui:data-[connected=true]:bg-foreground vui:data-[state=valid]:bg-success vui:data-[state=invalid]:bg-danger vui:data-[state=invalid]:border-dashed vui:forced-colors:bg-[ButtonText] vui:forced-colors:border-[Canvas] vui:forced-colors:[forced-color-adjust:none]',
+      'vui-port vui:block vui:box-border vui:size-3.5 vui:rounded-full vui:border-2 vui:border-surface vui:bg-muted vui:data-[connected=true]:bg-foreground vui:data-[state=connecting]:bg-accent vui:data-[state=valid]:bg-success vui:data-[state=invalid]:bg-danger vui:data-[state=invalid]:border-dashed vui:forced-colors:bg-[ButtonText] vui:forced-colors:border-[Canvas] vui:forced-colors:[forced-color-adjust:none]',
     '[attr.data-state]': 'state()',
     '[attr.data-connected]': 'vflowPortConnected()',
   },

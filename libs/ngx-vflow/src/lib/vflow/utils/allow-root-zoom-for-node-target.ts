@@ -21,6 +21,12 @@ export function allowRootZoomForNodeTarget(event: Event, isSelectionKeyboardMode
     return false;
   }
 
+  // A handle starts a connection, never a pan, unless a drag handle inside it is the closer ancestor
+  const nearest = target.closest('.vflow-handle, .vflow-drag-handle');
+  if (nearest?.classList.contains('vflow-handle')) {
+    return false;
+  }
+
   const node = target.closest('.vflow-node');
   if (!node) {
     return true;

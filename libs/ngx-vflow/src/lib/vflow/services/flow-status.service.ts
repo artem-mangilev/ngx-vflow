@@ -145,12 +145,14 @@ export class FlowStatusService {
   constructor() {
     let participants = new Set<NodeModel>();
     let candidate: HandleModel | undefined;
+    let origin: HandleModel | undefined;
     let reconnecting: EdgeModel | undefined;
     effect(() => {
       const status = this.connectionStatus();
       const next = new Set<NodeModel>();
       const nextEdge = status && 'oldEdge' in status.payload ? status.payload.oldEdge : undefined;
       const nextCandidate = status && 'targetHandle' in status.payload ? status.payload.targetHandle : undefined;
+      const nextOrigin = status?.payload.sourceHandle;
       if (status) {
         next.add(status.payload.source);
         if ('target' in status.payload) next.add(status.payload.target);
@@ -161,6 +163,9 @@ export class FlowStatusService {
       if (candidate && candidate !== nextCandidate) candidate.state.set('idle');
       if (nextCandidate && status && 'valid' in status.payload)
         nextCandidate.state.set(status.payload.valid ? 'valid' : 'invalid');
+      // The handle a connection is dragged from is `connecting`, unless it is also the candidate.
+      if (origin && origin !== nextOrigin) origin.state.set('idle');
+      if (nextOrigin && nextOrigin !== nextCandidate) nextOrigin.state.set('connecting');
       if (reconnecting !== nextEdge) {
         reconnecting?.reconnecting.set(false);
         nextEdge?.reconnecting.set(true);
@@ -168,6 +173,7 @@ export class FlowStatusService {
       this.connectionActive.set(status !== null);
       participants = next;
       candidate = nextCandidate;
+      origin = nextOrigin;
       reconnecting = nextEdge;
     });
   }

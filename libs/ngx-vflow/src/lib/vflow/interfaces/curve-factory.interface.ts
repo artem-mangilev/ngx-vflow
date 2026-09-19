@@ -5,11 +5,21 @@ import { Node } from './node.interface';
 import { Point } from './point.interface';
 import { Rect } from './rect';
 
+/** Rendered geometry of a node in flow space: its absolute position and measured size. */
+export interface NodeGeometry extends Rect {
+  id: string;
+}
+
 export interface CurveFactorySharedParams {
-  /** Starting point coordinates of the curve */
+  /** Starting point coordinates of the curve, already moved by `markerInset.start` along the source handle side */
   sourcePoint: Point;
-  /** Ending point coordinates of the curve */
+  /** Ending point coordinates of the curve, already moved by `markerInset.end` along the target handle side */
   targetPoint: Point;
+  /**
+   * Distance by which a path ends short of the arrow tip of its start and end markers, in flow units. A factory
+   * that computes its own endpoints applies it itself, for example through `getFloatingEdgeParams`.
+   */
+  markerInset: { start: number; end: number };
   /** Position of the source handle relative to the source node */
   sourcePosition: Position;
   /** Position of the target handle relative to the target node */
@@ -46,6 +56,10 @@ export type SmoothStepPathParams = Pick<
 export interface ConnectionCurveFactoryParams extends CurveFactorySharedParams {
   /** Indicates this is a temporary connection being drawn */
   mode: 'connection';
+  /** The node the connection is dragged from */
+  sourceNode: NodeGeometry;
+  /** The node of the candidate handle, while the connection snaps to one */
+  targetNode?: NodeGeometry;
 }
 
 export interface EdgeCurveFactoryParams extends CurveFactorySharedParams {
@@ -53,6 +67,10 @@ export interface EdgeCurveFactoryParams extends CurveFactorySharedParams {
   mode: 'edge';
   /** The edge instance this curve belongs to */
   edge: Edge;
+  /** The node of the source handle */
+  sourceNode: NodeGeometry;
+  /** The node of the target handle */
+  targetNode: NodeGeometry;
 }
 
 /**

@@ -7,13 +7,17 @@ import {
   inject,
 } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
 import { VflowComponent } from '../components/vflow/vflow.component';
 import { createNode } from '../interfaces/node.interface';
 import { createEdge } from '../interfaces/edge.interface';
+import { ConnectionSettings } from '../interfaces/connection-settings.interface';
 import { FlowEntitiesService } from '../services/flow-entities.service';
 import { FlowStatusService } from '../services/flow-status.service';
 import { Position } from '../types/position.type';
 import { VflowHandleDirective } from './handle.directive';
+import { ConnectionControllerDirective } from './connection-controller.directive';
+import { DragHandleDirective } from './drag-handle.directive';
 
 const side = signal<Position>('right');
 
@@ -62,6 +66,36 @@ class PositionedContentNodeComponent {}
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 class HiddenHandlesNodeComponent {}
+
+/** The node is the handle; its title is a drag handle. */
+@Component({
+  template: `<div
+    vflowHandle
+    handleType="source"
+    position="right"
+    layout="manual"
+    [id]="'io'"
+    style="display: block; width: 120px; height: 60px">
+    <div dragHandle class="title" style="height: 20px">Title</div>
+    <div class="body" style="height: 40px"></div>
+  </div>`,
+  imports: [VflowHandleDirective, DragHandleDirective],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+class NodeAsHandleComponent {}
+
+/** Binds `connect`, so the connection controller exists and handles can start and validate connections. */
+@Component({
+  template: `<vflow [view]="[400, 300]" [nodes]="nodes" [connection]="connection" (connect)="(undefined)" />`,
+  imports: [VflowComponent, ConnectionControllerDirective],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+class ConnectableHostComponent {
+  readonly connection: ConnectionSettings = { mode: 'loose' };
+  readonly nodes = ['a', 'b'].map((id, i) =>
+    createNode({ id, component: NodeAsHandleComponent, point: { x: i * 200, y: 0 } }),
+  );
+}
 
 @Component({
   selector: 'test-port',
@@ -196,6 +230,42 @@ describe('VflowHandleDirective', () => {
 
     expect(port.textContent!.trim()).toBe('target valid');
     expect(port.getAttribute('data-vflow-handle-state')).toBe('valid');
+  });
+
+  it('validates a candidate when the pointer enters a handle element and drags the node only from a drag handle', async () => {
+    TestBed.configureTestingModule({ providers: [provideZonelessChangeDetection()] });
+    const fixture = TestBed.createComponent(ConnectableHostComponent);
+    await settle(fixture);
+    const flow = fixture.debugElement.query(By.directive(VflowComponent)).injector;
+    const [a, b] = flow.get(FlowEntitiesService).nodes();
+    const status = flow.get(FlowStatusService);
+    const elementOf = (node: typeof a) => node.handles()[0].element!;
+
+    // A mousedown on the drag handle drags the node instead of starting a connection.
+    const mousedown = () => new MouseEvent('mousedown', { bubbles: true, cancelable: true, view: window });
+    elementOf(a).querySelector('.title')!.dispatchEvent(mousedown());
+    expect(status.status().state).toBe('node-drag-start');
+    window.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, view: window }));
+    expect(status.status().state).toBe('node-drag-end');
+
+    elementOf(a).querySelector('.body')!.dispatchEvent(mousedown());
+    expect(status.status().state).toBe('connection-start');
+    await settle(fixture);
+    expect(elementOf(a).dataset['vflowHandleState']).toBe('connecting');
+
+    elementOf(b).dispatchEvent(new MouseEvent('mouseenter'));
+    await settle(fixture);
+    expect(status.status().state).toBe('connection-validation');
+    expect(elementOf(b).dataset['vflowHandleState']).toBe('valid');
+
+    elementOf(b).dispatchEvent(new MouseEvent('mouseleave'));
+    await settle(fixture);
+    expect(status.status().state).toBe('connection-start');
+    expect(elementOf(b).dataset['vflowHandleState']).toBe('idle');
+
+    status.setIdleStatus();
+    await settle(fixture);
+    expect(elementOf(a).dataset['vflowHandleState']).toBe('idle');
   });
 
   it('renders a magnet at every measured handle only while a connection is in progress', async () => {

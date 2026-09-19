@@ -210,10 +210,18 @@ export class ConnectionControllerDirective {
   }
 
   public resetValidateConnection(targetHandle: HandleModel) {
+    const status = this.statusService.status();
+
+    // Only the current candidate is reset: leaving the handle a connection is dragged from keeps it `connecting`.
+    if (status.state === 'connection-validation' || status.state === 'reconnection-validation') {
+      if (status.payload.targetHandle !== targetHandle) return;
+    } else if (status.state === 'connection-start' || status.state === 'reconnection-start') {
+      if (status.payload.sourceHandle === targetHandle) return;
+    }
+
     targetHandle.state.set('idle');
 
     // drop back to start status
-    const status = this.statusService.status();
     if (status.state === 'connection-validation' || status.state === 'reconnection-validation') {
       const isReconnection = status.state === 'reconnection-validation';
 

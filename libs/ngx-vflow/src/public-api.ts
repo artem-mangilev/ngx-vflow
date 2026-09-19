@@ -7,6 +7,7 @@ export { getViewportForBounds } from './lib/vflow/utils/viewport';
 export { getStraightPath } from './lib/vflow/math/edge-path/straigh-path';
 export { getBezierPath } from './lib/vflow/math/edge-path/bezier-path';
 export { getSmoothStepPath } from './lib/vflow/math/edge-path/smooth-step-path';
+export { getFloatingEdgeParams, FloatingEdgeParams, FloatingEdgeOptions } from './lib/vflow/math/floating-edge-params';
 
 // Interfaces
 export * from './lib/vflow/interfaces/aria-label-config.interface';

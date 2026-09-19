@@ -186,9 +186,16 @@ export class DraggableService {
         return false;
       }
 
+      // A handle starts a connection instead of a drag, unless a drag handle inside it is the closer ancestor
+      const nearest =
+        event.target instanceof Element ? event.target.closest('.vflow-handle, .vflow-drag-handle') : null;
+      if (nearest?.classList.contains('vflow-handle')) {
+        return false;
+      }
+
       // if there is at least one drag handle, we should check if we are dragging it
       if (model.dragHandlesCount()) {
-        return event.target instanceof Element && !!event.target.closest('.vflow-drag-handle');
+        return nearest !== null;
       }
 
       return true;

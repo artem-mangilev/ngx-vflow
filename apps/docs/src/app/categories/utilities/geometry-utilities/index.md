@@ -25,6 +25,19 @@ const smoothStep = getSmoothStepPath({
 
 Each function returns a `CurveLayout` with the SVG `path` and label points. For a sharp step path, pass `borderRadius: 0` to `getSmoothStepPath`.
 
+## Floating endpoints
+
+`getFloatingEdgeParams` builds the endpoints of an edge between two rectangles that does not use fixed handles: each endpoint is where the segment between the centers crosses the border of its rectangle, and the side is the border it crosses. The result feeds `getBezierPath` or `getSmoothStepPath`.
+
+```ts
+import { getBezierPath, getFloatingEdgeParams } from 'ngx-vflow';
+
+const params = getFloatingEdgeParams({ x: 0, y: 0, width: 160, height: 80 }, { x: 300, y: 200, width: 160, height: 80 }, { inset: { end: 1.65 } });
+const path = getBezierPath(params);
+```
+
+`inset` moves an endpoint away from its rectangle along the side, which keeps an arrow tip on the border: a curve factory receives the distances of the edge markers as `markerInset`. A rectangle without size stands for a point, such as the pointer of a connection in progress. Curve factories also receive `sourceNode` and `targetNode`, the absolute position and measured size of the nodes, which are the rectangles to pass here.
+
 ## Viewport
 
 ```ts

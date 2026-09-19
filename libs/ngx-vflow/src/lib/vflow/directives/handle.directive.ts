@@ -1,9 +1,10 @@
 import { DestroyRef, Directive, ElementRef, computed, inject, input } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { filter } from 'rxjs/operators';
+import { filter, tap } from 'rxjs/operators';
 import { HandleService } from '../services/handle.service';
 import { HandleModel } from '../models/handle.model';
 import { FlowSettingsService } from '../services/flow-settings.service';
+import { FlowStatusService } from '../services/flow-status.service';
 import { ConnectionControllerDirective } from './connection-controller.directive';
 import { RootPointerDirective } from './root-pointer.directive';
 import { EntityAccessibility, bindEntityAccessibility } from './entity-accessibility.directive';
@@ -39,12 +40,15 @@ import { isTouchEvent } from '../utils/event';
     '(mousedown)': 'startConnection($event)',
     '(touchstart)': 'startConnection($event)',
     '(mouseup)': 'endConnection()',
+    '(mouseenter)': 'pointerEnter()',
+    '(mouseleave)': 'pointerLeave()',
   },
 })
 export class VflowHandleDirective {
   private readonly element = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
   private readonly handleService = inject(HandleService);
   private readonly settings = inject(FlowSettingsService);
+  private readonly flowStatus = inject(FlowStatusService);
   private readonly connectionController = inject(ConnectionControllerDirective, { optional: true });
   // Optional, so the directive also runs in unit tests of application components with `provideCustomNodeMocks()`.
   private readonly rootPointer = inject(RootPointerDirective, { optional: true });
@@ -135,11 +139,29 @@ export class VflowHandleDirective {
         takeUntilDestroyed(),
       )
       .subscribe(() => this.endConnection());
+
+    // Touch has no enter and leave: the element under the finger decides.
+    let touchInside = false;
+    this.rootPointer?.touchMovement$
+      ?.pipe(
+        tap(({ target }) => {
+          const inside = !!target && this.element.contains(target);
+          if (inside && !touchInside) this.pointerEnter();
+          if (!inside && touchInside) this.pointerLeave();
+          touchInside = inside;
+        }),
+        takeUntilDestroyed(),
+      )
+      .subscribe();
   }
 
+  /**
+   * The event also reaches the node, whose drag and the pane's pan reject targets inside a handle. A drag handle
+   * inside the handle element keeps dragging the node instead of starting a connection.
+   */
   protected startConnection(event: Event) {
-    // A connection gesture must not drag the node.
-    event.stopPropagation();
+    const dragHandle = event.target instanceof Element ? event.target.closest('.vflow-drag-handle') : null;
+    if (dragHandle && this.element.contains(dragHandle)) return;
 
     this.connectionController?.startConnection(this.model, event);
 
@@ -150,6 +172,15 @@ export class VflowHandleDirective {
 
   protected endConnection() {
     this.connectionController?.endConnection();
+  }
+
+  /** The element is a drop zone of the connection in progress, in addition to the magnet around its point. */
+  protected pointerEnter() {
+    if (this.flowStatus.connectionActive()) this.connectionController?.validateConnection(this.model);
+  }
+
+  protected pointerLeave() {
+    if (this.flowStatus.connectionActive()) this.connectionController?.resetValidateConnection(this.model);
   }
 
   private requireNode() {

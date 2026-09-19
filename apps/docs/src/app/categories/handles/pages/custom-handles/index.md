@@ -33,15 +33,15 @@ A handle must stay in layout. An element with `display: none`, or inside one, is
 
 The element gets the `vflow-handle` class and these attributes:
 
-| Attribute                      | Values                                                                                   |
-| ------------------------------ | ---------------------------------------------------------------------------------------- |
-| `data-vflow-handle-type`       | `source`, `target`                                                                       |
-| `data-vflow-handle-position`   | `left`, `right`, `top`, `bottom`                                                         |
-| `data-vflow-handle-state`      | `idle`, or `valid` / `invalid` while the handle is the candidate of a connection gesture |
-| `data-vflow-handle-can-start`  | `true`, `false`                                                                          |
-| `data-vflow-handle-can-accept` | `true`, `false`                                                                          |
+| Attribute                      | Values                                                                                                |
+| ------------------------------ | ----------------------------------------------------------------------------------------------------- |
+| `data-vflow-handle-type`       | `source`, `target`                                                                                    |
+| `data-vflow-handle-position`   | `left`, `right`, `top`, `bottom`                                                                      |
+| `data-vflow-handle-state`      | `idle`; `connecting` on the handle a connection is dragged from; `valid` / `invalid` on the candidate |
+| `data-vflow-handle-can-start`  | `true`, `false`                                                                                       |
+| `data-vflow-handle-can-accept` | `true`, `false`                                                                                       |
 
-The state follows `ConnectionSettings.validator()`, so plain CSS is enough for connection feedback:
+The state follows `ConnectionSettings.validator()`, so plain CSS is enough for connection feedback. While a connection is in progress the handle element is a drop zone in addition to the magnet around its point, so a handle of any size, even a whole node, validates the candidate under the pointer:
 
 ```css
 .dot[data-vflow-handle-state='valid'] {

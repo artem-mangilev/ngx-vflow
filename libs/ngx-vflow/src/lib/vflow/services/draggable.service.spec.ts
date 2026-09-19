@@ -291,6 +291,24 @@ describe('DraggableService', () => {
     expect(dragFilter({ target } as unknown as Event)).toBe(false);
   });
 
+  it('should reject drag from inside a handle unless a drag handle inside it is the closer ancestor', () => {
+    const node = createModel({ id: 'node' });
+    const dragFilter = (service as any).getDragBehavior(node).filter();
+    const handle = document.createElement('div');
+    handle.classList.add('vflow-handle');
+    const dragHandle = document.createElement('div');
+    dragHandle.classList.add('vflow-drag-handle');
+    const body = document.createElement('span');
+    const title = document.createElement('span');
+    handle.append(dragHandle, body);
+    dragHandle.append(title);
+
+    expect(dragFilter({ target: body } as unknown as Event)).toBe(false);
+    node.dragHandlesCount.set(1);
+    expect(dragFilter({ target: body } as unknown as Event)).toBe(false);
+    expect(dragFilter({ target: title } as unknown as Event)).toBe(true);
+  });
+
   it('should allow drag from a valid drag handle target', () => {
     const node = createModel({ id: 'node' });
     const dragFilter = (service as any).getDragBehavior(node).filter();

@@ -1,4 +1,5 @@
 import { TemplateRef, computed, inject, signal } from '@angular/core';
+import { NodeGeometry } from '../interfaces/curve-factory.interface';
 import { DOCUMENT } from '@angular/common';
 import { DomAttributes } from '../interfaces/dom-attributes.interface';
 import { NODE_DEFAULTS, Node } from '../interfaces/node.interface';
@@ -148,6 +149,13 @@ export class NodeModel<T = unknown> implements FlowEntity, Contextable<NodeConte
    * CSS transform for positioning the node div in the (transformed) viewport.
    */
   public pointTransformCss = computed(() => `translate(${this.globalPoint().x}px, ${this.globalPoint().y}px)`);
+
+  /** Absolute position and measured size, as curve factories receive them. */
+  public geometry = computed<NodeGeometry>(() => {
+    const { x, y } = this.globalPoint();
+
+    return { id: this.rawNode.id, x, y, width: this.width(), height: this.height() };
+  });
 
   public handles = signal<HandleModel[]>([]);
   public handles$: Observable<HandleModel[]>;

@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { EdgeModel } from './edge.model';
+import { ConnectionModel } from './connection.model';
 import { NodeModel } from './node.model';
 import { createNode } from '../interfaces/node.interface';
 import { createEdge } from '../interfaces/edge.interface';
@@ -167,6 +168,37 @@ describe('EdgeModel', () => {
 
   it('should detached === false if source and target exists and their source and target handle also exists', () => {
     expect(model.detached()).toEqual(false);
+  });
+
+  it('should fall back to any handle of a node without one of the role only in the loose connection mode', () => {
+    const nodeRect = { left: 100, top: 200, width: 0, height: 0 };
+    const only = createHandle('source', 'right', model.target()!, nodeRect, {
+      left: 86.5,
+      top: 193,
+      width: 14,
+      height: 14,
+    });
+    model.target()!.handles.set([only]);
+
+    expect(model.targetHandle()).toBeNull();
+
+    TestBed.inject(FlowEntitiesService).connection.set(new ConnectionModel({ mode: 'loose' }));
+
+    expect(model.targetHandle()).toBe(only);
+  });
+
+  it('should pass node geometry and the marker inset to a custom curve', () => {
+    const curve = jasmine.createSpy('curve').and.returnValue({ path: 'M 0,0' });
+    model.curve.set(curve);
+    model.markers.set({ end: { type: 'arrow-closed', width: 20 } });
+    model.path();
+
+    const params = curve.calls.mostRecent().args[0];
+    expect(params.sourceNode).toEqual({ id: '1', x: 15, y: 15, width: 0, height: 0 });
+    expect(params.targetNode).toEqual({ id: '2', x: 15, y: 15, width: 0, height: 0 });
+    expect(params.markerInset).toEqual({ start: 0, end: 2 });
+    // The left target handle point moves away from the node by the inset.
+    expect(params.targetPoint.x).toBe(params.sourcePoint.x - 2);
   });
 
   it('should resolve selection and focus defaults reactively', () => {
