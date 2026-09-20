@@ -143,7 +143,7 @@ describe('public keyboard graph navigation', () => {
     const child = root.querySelector<HTMLElement>('[aria-label="Child"]')!;
     const parent = root.querySelector<HTMLElement>('[aria-label="Parent"]')!;
     const edge = root.querySelector<SVGElement>('[aria-label="Route"]')!;
-    host.flow().keyboardShortcuts = { modifiers: { multiSelection: ['AltLeft'] } };
+    host.flow().keyboardShortcuts = { modifiers: { multiSelection: ['Alt'] } };
     host.nodes()[1].selected.set(true);
     child.focus();
     key(child, 'Enter');
@@ -160,7 +160,7 @@ describe('public keyboard graph navigation', () => {
     key(edge, 'Escape');
     expect([...host.nodes(), ...host.edges].every((n) => !n.selected())).toBeTrue();
     expect(document.activeElement).toBe(edge);
-    document.dispatchEvent(new KeyboardEvent('keyup', { code: 'AltLeft' }));
+    document.dispatchEvent(new KeyboardEvent('keyup', { key: 'Alt', code: 'AltLeft' }));
     fixture.detectChanges();
   });
 
@@ -394,7 +394,7 @@ describe('public keyboard graph navigation', () => {
     child.focus();
     key(child, 'Enter');
     expect(await spoken()).toBe('Child selected. 1 selected in total.');
-    host.flow().keyboardShortcuts = { modifiers: { multiSelection: ['AltLeft'] } };
+    host.flow().keyboardShortcuts = { modifiers: { multiSelection: ['code:AltLeft'] } };
     document.dispatchEvent(new KeyboardEvent('keydown', { code: 'AltLeft' }));
     parent.focus();
     key(parent, ' ');
@@ -474,7 +474,7 @@ describe('public keyboard graph navigation', () => {
     edge.focus();
     key(edge, 'Delete');
     expect(requests[3]).toEqual({ nodeIds: ['child', 'other'], edgeIds: ['edge'] });
-    host.flow().keyboardShortcuts = { commands: { delete: ['KeyX'] } };
+    host.flow().keyboardShortcuts = { commands: { delete: ['x'] } };
     fixture.detectChanges();
     await fixture.whenStable();
     expect(key(edge, 'Delete').defaultPrevented).toBeFalse();
@@ -590,7 +590,7 @@ describe('public keyboard graph navigation', () => {
         .split(/\s+/)
         .map((id) => document.getElementById(id)!.textContent)
         .join(' ');
-    host.flow().keyboardShortcuts = { commands: { select: ['KeyS'] }, modifiers: { multiSelection: ['AltLeft'] } };
+    host.flow().keyboardShortcuts = { commands: { select: ['s'] }, modifiers: { multiSelection: ['code:AltLeft'] } };
     await settle();
     child.focus();
     // An entry is replaced, not extended.

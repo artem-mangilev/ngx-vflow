@@ -21,12 +21,12 @@ Use the existing `keyboardShortcuts` input for all activation keys:
 shortcuts: KeyboardShortcuts = {
   modifiers: {
     panActivation: ['Space'],
-    zoomActivation: ['MetaLeft', 'MetaRight'], // macOS; use ControlLeft/ControlRight elsewhere
+    zoomActivation: ['Mod'], // Meta on macOS, Control elsewhere
   },
 };
 ```
 
-Both entries default to an empty list. That disables their keyboard activation, **not** ordinary pan/zoom gestures. A list holds alternative `KeyboardEvent.code` values, not a chord.
+Both entries default to an empty list. That disables their keyboard activation, **not** ordinary pan/zoom gestures. A list holds alternative keys, not a chord; see [Keyboard shortcuts](../keyboard-shortcuts) for the binding grammar.
 
 - `panActivation` temporarily enables drag and scroll panning. Configured mouse-button restrictions still apply.
 - `zoomActivation` temporarily enables wheel zoom and takes priority over scroll panning.

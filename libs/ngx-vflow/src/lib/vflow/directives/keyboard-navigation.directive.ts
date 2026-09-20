@@ -110,13 +110,13 @@ export class KeyboardEntityDirective {
       !model.focusable() ||
       this.element.closest('[data-vflow-no-keyboard]') ||
       // A key held as a gesture modifier (for example Space for panning) belongs to the gesture layer.
-      this.keyboard.isModifierKey(event.code)
+      this.keyboard.isModifierKey(event)
     )
       return;
 
     const labels = this.settings.ariaLabels();
-    const select = this.keyboard.isCommand('select', event.code);
-    if (select || this.keyboard.isCommand('clearSelection', event.code)) {
+    const select = this.keyboard.isCommand('select', event);
+    if (select || this.keyboard.isCommand('clearSelection', event)) {
       event.preventDefault();
       event.stopPropagation();
       if (event.repeat) return;
@@ -134,7 +134,7 @@ export class KeyboardEntityDirective {
               count: this.entities.entities().filter((entity) => entity.selected()).length,
             }),
       );
-    } else if (this.keyboard.isCommand('delete', event.code)) {
+    } else if (this.keyboard.isCommand('delete', event)) {
       event.preventDefault();
       event.stopPropagation();
       if (event.repeat) return;
@@ -153,7 +153,7 @@ export class KeyboardEntityDirective {
       });
     } else if (model instanceof NodeModel && model.selected() && model.draggable()) {
       // An arrow that moves nothing is left unhandled, so the container pans the view with it instead.
-      const direction = DIRECTIONS.find((entry) => this.keyboard.isCommand(entry.move, event.code));
+      const direction = DIRECTIONS.find((entry) => this.keyboard.isCommand(entry.move, event));
       if (!direction) return;
       event.preventDefault();
       event.stopPropagation();
@@ -214,20 +214,17 @@ export class KeyboardNavigationDirective {
 
   protected onKeydown(event: KeyboardEvent) {
     const target = event.composedPath()[0];
-    // Only the container and library wrappers issue viewport commands; embedded content keeps its own keys, and
-    // browser shortcuts such as Ctrl+Plus stay untouched.
+    // Only the container and library wrappers issue viewport commands; embedded content keeps its own keys.
+    // Browser shortcuts such as Ctrl+Plus survive because a binding that names no modifier requires none.
     if (
       event.defaultPrevented ||
-      event.ctrlKey ||
-      event.metaKey ||
-      event.altKey ||
       !(target instanceof Element) ||
       (target !== this.element && !this.entities().some((entity) => entity.element === target)) ||
       target.closest('[data-vflow-no-keyboard]')
     )
       return;
 
-    const direction = DIRECTIONS.find((entry) => this.keyboard.isCommand(entry.pan, event.code));
+    const direction = DIRECTIONS.find((entry) => this.keyboard.isCommand(entry.pan, event));
     if (direction) {
       event.preventDefault();
       const { vector } = direction;
@@ -243,16 +240,16 @@ export class KeyboardNavigationDirective {
     }
 
     const labels = this.settings.ariaLabels();
-    if (this.keyboard.isCommand('zoomIn', event.code) || this.keyboard.isCommand('zoomOut', event.code)) {
+    if (this.keyboard.isCommand('zoomIn', event) || this.keyboard.isCommand('zoomOut', event)) {
       event.preventDefault();
-      const direction = this.keyboard.isCommand('zoomIn', event.code) ? 1 : -1;
+      const direction = this.keyboard.isCommand('zoomIn', event) ? 1 : -1;
       const zoom = Math.min(
         this.settings.maxZoom(),
         Math.max(this.settings.minZoom(), this.viewport.readableViewport().zoom * ZOOM_STEP ** direction),
       );
       this.viewport.writableViewport.set({ changeType: 'absolute', state: { zoom }, duration: 0 });
       this.announcer.announce(labels.zoomAnnouncement(zoom));
-    } else if (this.keyboard.isCommand('fitView', event.code)) {
+    } else if (this.keyboard.isCommand('fitView', event)) {
       event.preventDefault();
       if (event.repeat) return;
       const state = this.viewport.fitView({ padding: 0.1, duration: 0 });

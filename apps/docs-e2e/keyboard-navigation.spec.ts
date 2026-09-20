@@ -156,3 +156,26 @@ test('pans, zooms and fits the viewport from the keyboard', async ({ page }) => 
   await expect.poll(transform).toBe(fitted);
   expect((await new AxeBuilder({ page }).include('[data-testid="keyboard-demo"]').analyze()).violations).toEqual([]);
 });
+
+test('zooms from a layout that puts plus and minus on other physical keys', async ({ page }) => {
+  await page.goto('/interactions/accessibility');
+  const demo = page.getByTestId('keyboard-demo');
+  const graph = demo.getByRole('region', { name: 'Keyboard graph', exact: true });
+  const viewport = demo.locator('.vflow-viewport').first();
+  const zoom = () =>
+    viewport.evaluate((element) => Number((element as HTMLElement).style.getPropertyValue('--vflow-zoom')));
+  // A German layout reaches + on BracketRight and - on Slash; the binding names the character, not the position.
+  const press = (detail: { key: string; code: string }) =>
+    page.evaluate(
+      (init) =>
+        document.activeElement?.dispatchEvent(
+          new KeyboardEvent('keydown', { ...init, bubbles: true, cancelable: true }),
+        ),
+      detail,
+    );
+  await graph.getByRole('group', { name: 'Draft', exact: true }).focus();
+  await press({ key: '+', code: 'BracketRight' });
+  await expect.poll(zoom).toBeGreaterThan(1.1);
+  await press({ key: '-', code: 'Slash' });
+  await expect.poll(zoom).toBeLessThan(1.1);
+});

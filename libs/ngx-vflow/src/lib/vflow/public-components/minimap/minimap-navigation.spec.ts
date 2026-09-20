@@ -141,7 +141,7 @@ describe('minimap navigation through the public viewport API', () => {
   it('gates pan by buttons, selection and activation keys, and supports single-pointer touch', async () => {
     host.pannable.set(true);
     flow.panOnDrag = [1];
-    flow.keyboardShortcuts = { modifiers: { panActivation: ['Space'] } };
+    flow.keyboardShortcuts = { modifiers: { panActivation: ['code:Space'] } };
     await settle();
     await click();
     expect(flow.viewport().x).toBe(0);
@@ -153,10 +153,10 @@ describe('minimap navigation through the public viewport API', () => {
     document.dispatchEvent(new KeyboardEvent('keydown', { code: 'Space' }));
     await click(50, 30, { pointerType: 'touch' });
     expect(flow.viewport().x).toBe(-10300);
-    document.dispatchEvent(new KeyboardEvent('keydown', { code: 'ShiftLeft' }));
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Shift', code: 'ShiftLeft' }));
     await click();
     expect(flow.viewport().x).toBe(-10300);
-    document.dispatchEvent(new KeyboardEvent('keyup', { code: 'ShiftLeft' }));
+    document.dispatchEvent(new KeyboardEvent('keyup', { key: 'Shift', code: 'ShiftLeft' }));
     pointer('pointerdown', 50, 30, { pointerType: 'touch' });
     pointer('pointermove', 70, 30, { pointerType: 'touch' });
     pointer('pointerup', 70, 30, { pointerType: 'touch' });
@@ -199,7 +199,7 @@ describe('minimap navigation through the public viewport API', () => {
     host.pannable.set(true);
     host.zoomable.set(true);
     flow.panOnScroll = true;
-    flow.keyboardShortcuts = { modifiers: { zoomActivation: ['KeyZ'] } };
+    flow.keyboardShortcuts = { modifiers: { zoomActivation: ['code:KeyZ'] } };
     await settle();
     await wheel(10, { deltaX: 5 });
     expect(flow.viewport()).toEqual({ x: -50, y: -100, zoom: 1 });

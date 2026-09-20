@@ -88,3 +88,16 @@ The user requested rolling back issue 11 after evaluating its interaction design
   of `.scratch/keyboard-shortcuts-2026-09-20` generates them from the resolved bindings.
 - Verified by 272 library tests, including a new public-contract test for per-entry merging and disabling, and by the
   full docs e2e suite. No new screen-reader session was run.
+
+## Layout-independent shortcut keys — 2026-09-20
+
+- Shortcut bindings moved from `KeyboardEvent.code` to `KeyboardEvent.key`, with `Mod` for the platform primary
+  modifier and a `code:` prefix for a physical key. `zoomIn` is now `+`, `=` and `code:NumpadAdd`, so zooming works on
+  a layout that does not put those characters where a US keyboard does. A Playwright test zooms from `+` on
+  `BracketRight` and `-` on `Slash`, the German layout positions.
+- Control, Meta and Alt are matched exactly, which keeps browser and system shortcuts such as `Ctrl+0` working and
+  replaces the blanket modifier guard the container directive used to carry. Shift stays free unless a binding names
+  it, so accelerated movement and characters like `+` still reach their commands. The key bound as `multiSelection`
+  does not block `select`, so holding it still toggles the focused entity.
+- Verified by 277 library tests, including a parser and matcher spec, and by the full docs e2e suite of 35. No new
+  screen-reader session was run.

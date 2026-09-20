@@ -374,15 +374,27 @@ runs on a press. `select`, `clearSelection` and the arrow keys for node movement
 too, so they can be remapped or disabled like the rest. The types `KeyboardAction` and `KeyboardCommand` are gone;
 `KeyboardShortcuts` and the new `KeyboardCommandName` remain. See [Keyboard shortcuts](../../interactions/keyboard-shortcuts).
 
-| Before                           | After                                                |
-| -------------------------------- | ---------------------------------------------------- |
-| `{ selection: ['ShiftLeft'] }`   | `{ modifiers: { selection: ['ShiftLeft'] } }`        |
-| `{ multiSelection: [...] }`      | `{ modifiers: { multiSelection: [...] } }`           |
-| `{ pan: ['Space'] }`             | `{ modifiers: { panActivation: ['Space'] } }`        |
-| `{ zoom: ['ControlLeft'] }`      | `{ modifiers: { zoomActivation: ['ControlLeft'] } }` |
-| `{ delete: ['KeyX'] }`           | `{ commands: { delete: ['KeyX'] } }`                 |
-| `{ zoomIn, zoomOut, fitView }`   | `{ commands: { zoomIn, zoomOut, fitView } }`         |
-| `{ selection: null }` to disable | `{ modifiers: { selection: [] } }`                   |
+| Before                           | After                                            |
+| -------------------------------- | ------------------------------------------------ |
+| `{ selection: ['ShiftLeft'] }`   | `{ modifiers: { selection: ['Shift'] } }`        |
+| `{ multiSelection: [...] }`      | `{ modifiers: { multiSelection: [...] } }`       |
+| `{ pan: ['Space'] }`             | `{ modifiers: { panActivation: ['Space'] } }`    |
+| `{ zoom: ['ControlLeft'] }`      | `{ modifiers: { zoomActivation: ['Control'] } }` |
+| `{ delete: ['KeyX'] }`           | `{ commands: { delete: ['x'] } }`                |
+| `{ zoomIn, zoomOut, fitView }`   | `{ commands: { zoomIn, zoomOut, fitView } }`     |
+| `{ selection: null }` to disable | `{ modifiers: { selection: [] } }`               |
+
+Keys are also spelled differently. A binding is now optional modifiers and one key joined by `+`, and the key is a
+`KeyboardEvent.key` value rather than a `KeyboardEvent.code`, so a binding follows the character a layout produces.
+`Mod` stands for Meta on macOS and Control elsewhere, and `code:` before the key returns to matching a physical key.
+
+| Before                               | After                                        |
+| ------------------------------------ | -------------------------------------------- |
+| `['ShiftLeft', 'ShiftRight']`        | `['Shift']`                                  |
+| `['MetaLeft', 'ControlLeft']`        | `['Mod']`                                    |
+| `['Equal', 'NumpadAdd']` for zoom in | `['+', '=', 'code:NumpadAdd']`               |
+| `['Digit0', 'Numpad0']` for fit view | `['0', 'code:Numpad0']`                      |
+| `['KeyX']`                           | `['x']`, or `['code:KeyX']` for the position |
 
 ### Removed APIs
 

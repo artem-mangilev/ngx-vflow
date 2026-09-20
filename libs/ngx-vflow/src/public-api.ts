@@ -48,6 +48,13 @@ export * from './lib/vflow/types/position.type';
 export * from './lib/vflow/types/handle-type.type';
 export * from './lib/vflow/types/background.type';
 export * from './lib/vflow/types/keyboard-shortcuts.type';
+export {
+  KeyboardModifierFlag,
+  MatchBindingOptions,
+  ParsedBinding,
+  matchesBinding,
+  parseBinding,
+} from './lib/vflow/utils/keyboard-binding';
 export * from './lib/vflow/types/selection-mode.type';
 export * from './lib/vflow/types/selection-box-mode.type';
 
