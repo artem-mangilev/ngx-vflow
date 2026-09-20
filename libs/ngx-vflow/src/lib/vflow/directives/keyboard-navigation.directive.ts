@@ -2,7 +2,6 @@ import { Directive, ElementRef, afterRenderEffect, contentChildren, inject } fro
 import { NodeModel } from '../models/node.model';
 import { EdgeModel } from '../models/edge.model';
 import { KeyboardService } from '../services/keyboard.service';
-import { KeyboardLabelsService } from '../services/keyboard-labels.service';
 import { KeyboardEntityCommandsService } from '../services/keyboard-entity-commands.service';
 import { KeyboardViewportCommandsService } from '../services/keyboard-viewport-commands.service';
 import { KeyboardCommandName } from '../types/keyboard-shortcuts.type';
@@ -27,7 +26,6 @@ interface KeyboardCommand {
   selector: '[vflowKeyboard]',
   host: {
     tabindex: '-1',
-    '[attr.aria-keyshortcuts]': 'shortcuts()',
     '(focusin)': 'onFocusIn($event)',
     '(focusout)': 'onFocusOut($event)',
     '(keydown)': 'onKeydown($event)',
@@ -38,7 +36,6 @@ export class KeyboardNavigationDirective {
   private element = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
   private entities = contentChildren(KeyboardEntityDirective, { descendants: true });
   private keyboard = inject(KeyboardService);
-  protected shortcuts = inject(KeyboardLabelsService).shortcuts;
   private entityCommands = inject(KeyboardEntityCommandsService);
   private viewportCommands = inject(KeyboardViewportCommandsService);
   private previous: readonly KeyboardEntityDirective[] = [];

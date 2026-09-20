@@ -290,9 +290,4 @@ export class KeyboardService {
   public modifierBindings(modifier: KeyboardModifierName): readonly ParsedBinding[] {
     return this.state().modifiers[modifier];
   }
-
-  /** Every bound key of every command, for the shortcut list the graph advertises. Reactive. */
-  public allCommandBindings(): readonly ParsedBinding[] {
-    return Object.values(this.state().commands).flat();
-  }
 }

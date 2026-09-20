@@ -38,11 +38,6 @@ export interface AriaLabelConfig {
   keyboardDelete: KeyboardInstruction;
   keyboardPan: KeyboardInstruction;
   keyboardZoom: KeyboardInstruction;
-  /**
-   * Display names for keys, looked up by the binding in lower case, as in `{ arrowup: 'стрелка вверх' }`. Two
-   * entries are reserved: `or` joins a list of keys and `arrowkeys` names the four arrows together.
-   */
-  keyNames: Record<string, string>;
   /** Live feedback after a keyboard selection change of one entity. */
   selectionAnnouncement: (selection: { label: string; selected: boolean; count: number }) => string;
   /** Live feedback after Escape clears the selection. */
@@ -81,7 +76,6 @@ export const DEFAULT_ARIA_LABEL_CONFIG: AriaLabelConfig = {
   keyboardPan: ({ pan }) => `Use ${pan} to pan the view when they do not move a node. Hold Shift to pan faster.`,
   keyboardZoom: ({ zoomIn, zoomOut, fitView }) =>
     `Press ${zoomIn} to zoom in, ${zoomOut} to zoom out and ${fitView} to fit the graph.`,
-  keyNames: {},
   selectionAnnouncement: ({ label, selected, count }) =>
     `${label} ${selected ? 'selected' : 'deselected'}. ${count} selected in total.`,
   selectionClearedAnnouncement: 'Selection cleared.',

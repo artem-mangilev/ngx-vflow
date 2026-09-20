@@ -1,6 +1,6 @@
 import { getOS } from './get-os';
 
-/** Modifier flags of a keyboard event, named as UI Events and `aria-keyshortcuts` name them. */
+/** Modifier flags of a keyboard event, named as the UI Events specification names them. */
 export type KeyboardModifierFlag = 'control' | 'meta' | 'alt' | 'shift';
 
 /** A shortcut binding split into its modifiers and its key, ready to compare against a keyboard event. */

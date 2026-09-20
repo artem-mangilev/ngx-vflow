@@ -119,11 +119,12 @@ The user requested rolling back issue 11 after evaluating its interaction design
 
 - Every `keyboard*` entry of `AriaLabelConfig` is now a sentence or a function of the keys that are bound, so an
   instruction names the keys that actually work. Remapping selection to `x` makes the description say `Press X to
-select`, and disabling a command removes its sentence. A plain string still overrides the sentence completely, and
-  `keyNames` translates individual key names, the word that joins a list, and the phrase for the four arrows.
+select`, and disabling a command removes its sentence. A plain string still overrides the sentence completely,
+  which is also how a translation supplies its own words for the keys.
 - Modifiers are named in words, not macOS glyphs, because this text is read out and a screen reader spells a glyph
-  unpredictably. An application that wants glyphs supplies them through `keyNames`.
-- The graph container carries `aria-keyshortcuts` with every bound key; entity wrappers do not, so focusing a node
-  does not announce a sixteen-key list on top of its description.
-- Verified by 284 library tests and the full docs e2e suite of 35, with axe clean while the attribute is present. No
-  new screen-reader session was run.
+  unpredictably.
+- A `keyNames` map and an `aria-keyshortcuts` attribute were built first and then removed on review: no library in
+  this category advertises the attribute, its information already sits in the prose description, and a full sentence
+  override covers what the map did. Following a remap is the part that fixes a real defect, since the keys became
+  remappable, so that part stayed.
+- Verified by 283 library tests and the full docs e2e suite of 35. No new screen-reader session was run.
