@@ -148,12 +148,16 @@ line width, is ordinary CSS on the public `.vui-*` selectors; the density of all
 | `--vui-font-family`, `--vui-font-size`, `--vui-line-height` | Typography                        |
 | `--vui-space`, `--vui-radius`                               | Spacing unit and corner radius    |
 
-Core has its own tokens with defaults for standalone use: `--vflow-background`, `--vflow-surface`,
-`--vflow-foreground`, `--vflow-muted`, `--vflow-border`, `--vflow-selection` and `--vflow-focus`.
-A theme scope maps the UI tokens onto them; set a `--vflow-*` token on the flow element or any
+Core has its own tokens with defaults for standalone use: the colors `--vflow-background`, `--vflow-surface`,
+`--vflow-foreground`, `--vflow-muted`, `--vflow-border`, `--vflow-selection` and `--vflow-focus`, and the
+focus ring geometry `--vflow-focus-width` (2px), `--vflow-focus-offset` (3px, the gap between a node and its
+ring) and `--vflow-focus-radius` (0px, the corner radius of the node itself; the ring follows it, widened by
+the offset, so it stays concentric). A theme scope maps the UI tokens onto them, including `--vui-radius`
+onto the ring radius since the node part is rounded with it; set a `--vflow-*` token on the flow element or any
 descendant to override both. Under `forced-colors: active` core maps its tokens to system colors
 regardless of the theme. Core also sets the read-only `--vflow-zoom` on the zoomed viewport, so content
-inside it can keep screen-sized details (`calc(2px / var(--vflow-zoom, 1))`), as the node focus ring does. The canvas minimap samples the resolved tokens and repaints when an
+inside it can keep screen-sized details (`calc(2px / var(--vflow-zoom, 1))`), as the node focus ring does
+with its width and offset. The canvas minimap samples the resolved tokens and repaints when an
 attribute changes on any ancestor of the flow (for example `data-vui-theme` or a class) or when the
 `prefers-color-scheme` preference changes; edits to a stylesheet alone are not observed.
 

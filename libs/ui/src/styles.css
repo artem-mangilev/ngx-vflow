@@ -85,6 +85,8 @@
     --vflow-border: var(--vui-border);
     --vflow-selection: var(--vui-accent);
     --vflow-focus: var(--vui-accent);
+    /* The node part is rounded with --vui-radius, so the core focus ring follows the same corners. */
+    --vflow-focus-radius: var(--vui-radius);
   }
   [data-vui-theme='light'] {
     --vflow-background: #f4f6fa;

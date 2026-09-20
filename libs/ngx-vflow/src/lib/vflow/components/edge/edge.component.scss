@@ -11,7 +11,8 @@
   display: none;
   fill: none;
   stroke: var(--vflow-focus);
-  stroke-width: 5;
+  // A halo around the path: the node ring width plus a margin on each side, kept on screen by non-scaling-stroke.
+  stroke-width: calc(var(--vflow-focus-width) * 2.5);
   stroke-dasharray: 4 4;
   vector-effect: non-scaling-stroke;
   pointer-events: none;

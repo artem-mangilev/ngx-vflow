@@ -43,6 +43,26 @@
   initial-value: #005fcc;
 }
 
+// Geometry of the focus ring. Width and offset are screen lengths: the node ring divides them by the zoom.
+// The radius is the corner radius of the focused node itself, in flow units, so the ring follows its shape.
+@property --vflow-focus-width {
+  syntax: '<length>';
+  inherits: true;
+  initial-value: 2px;
+}
+
+@property --vflow-focus-offset {
+  syntax: '<length>';
+  inherits: true;
+  initial-value: 3px;
+}
+
+@property --vflow-focus-radius {
+  syntax: '<length-percentage>';
+  inherits: true;
+  initial-value: 0px;
+}
+
 :host {
   display: block;
   position: relative;
@@ -76,6 +96,13 @@
   position: relative;
   overflow: hidden;
   background-color: var(--vflow-background);
+
+  // The container is a keyboard target: it takes focus after the last entity disappears and runs the viewport
+  // commands. The ring is drawn inside the box so it stays visible in a full-page canvas and adds no overflow.
+  &:focus-visible {
+    outline: var(--vflow-focus-width) solid var(--vflow-focus);
+    outline-offset: calc(-1 * var(--vflow-focus-width));
+  }
 }
 
 .vflow-a11y-live {
