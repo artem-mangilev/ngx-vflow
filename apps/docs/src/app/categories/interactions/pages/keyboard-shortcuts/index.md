@@ -66,4 +66,12 @@ In the following example `selection` is remapped from `Shift` to `Alt` and `mult
 
 {{ NgDocActions.demoPane("KeyboardShortcutsDemoComponent") }}
 
+The following example rebinds selection and deletion and turns the zoom commands off and on again. The object it passes is printed as you change it:
+
+{{ NgDocActions.demoPane("ShortcutsConfigurationDemoComponent") }}
+
+# Single-character keys
+
+Several commands are bound to a printable character: `+`, `-`, `0`, and any letter you bind yourself. [WCAG 2.1.4](https://www.w3.org/WAI/WCAG21/Understanding/character-key-shortcuts.html) asks that such a shortcut can be turned off, be remapped to include a non-printable key, or be active only while its component has focus, because speech input otherwise triggers it by accident. All three hold here: an entry takes an empty list, a binding may name `Mod`, `Control`, `Meta`, `Alt` or `Shift`, and a command runs only while focus is on a graph entity or on the graph container, never while the page is focused elsewhere or a field is being typed into.
+
 `panActivation` and `zoomActivation` are opt-in. Ordinary pan and zoom gestures keep their defaults while these entries are empty. See [Viewport gestures](../viewport-gestures) for priorities, embedded controls, and complete gesture disabling, and [Accessibility](../accessibility) for what each command does and announces.

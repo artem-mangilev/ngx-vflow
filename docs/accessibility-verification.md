@@ -128,3 +128,16 @@ select`, and disabling a command removes its sentence. A plain string still over
   override covers what the map did. Following a remap is the part that fixes a real defect, since the keys became
   remappable, so that part stayed.
 - Verified by 283 library tests and the full docs e2e suite of 35. No new screen-reader session was run.
+
+## Shortcut documentation and a configuration example — 2026-09-20
+
+- The keyboard-shortcuts page now carries a WCAG 2.1.4 note: a shortcut bound to a printable character can be turned
+  off with an empty list, remapped to include a modifier, and runs only while focus is on a graph entity or the
+  container, so all three of the ways the criterion allows are satisfied.
+- The accessibility page stopped repeating the keys. Its command table describes behavior and links to the shortcut
+  page, so remapping a key cannot make the prose stale.
+- A configuration example rebinds selection and deletion, disables and restores the zoom commands, and prints the
+  object it passes. A Playwright test rebinds deletion in it and watches the graph follow. axe flagged the printed
+  block as a scrollable region without keyboard access, which was fixed by giving it a Tab stop rather than by
+  excluding the rule.
+- Verified by 283 library tests and 36 e2e. No new screen-reader session was run.
