@@ -84,6 +84,7 @@ import { EntityAccessibilityDirective } from '../../directives/entity-accessibil
 import { LiveRegionDirective } from '../../directives/live-region.directive';
 import { AnnouncerService } from '../../services/announcer.service';
 import { KeyboardEntityCommandsService } from '../../services/keyboard-entity-commands.service';
+import { KeyboardLabelsService } from '../../services/keyboard-labels.service';
 import { KeyboardViewportCommandsService } from '../../services/keyboard-viewport-commands.service';
 import { AriaLabelConfig, DEFAULT_ARIA_LABEL_CONFIG } from '../../interfaces/aria-label-config.interface';
 
@@ -129,6 +130,7 @@ const nodeDragControllerHostDirective = {
     ComponentEventBusService,
     KeyboardService,
     KeyboardEntityCommandsService,
+    KeyboardLabelsService,
     KeyboardViewportCommandsService,
     AnnouncerService,
     OverlaysService,

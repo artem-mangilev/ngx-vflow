@@ -10,13 +10,13 @@ function parse(binding: string) {
 
 describe('public keyboard binding grammar', () => {
   it('reads modifiers, keys, the space alias and physical codes without regard to case', () => {
-    expect(parseBinding('Enter')).toEqual({ key: 'enter', modifiers: [], mod: false });
-    expect(parseBinding(' ')).toEqual({ key: ' ', modifiers: [], mod: false });
-    expect(parseBinding('Space')).toEqual({ key: 'space', modifiers: [], mod: false });
-    expect(parseBinding('MOD+shift+A')).toEqual({ key: 'a', modifiers: ['shift'], mod: true });
-    expect(parseBinding('+')).toEqual({ key: '+', modifiers: [], mod: false });
-    expect(parseBinding('Shift++')).toEqual({ key: '+', modifiers: ['shift'], mod: false });
-    expect(parseBinding('Mod+KeyS')).toEqual({ key: 'keys', modifiers: [], mod: true });
+    expect(parseBinding('Enter')).toEqual({ key: 'enter', source: 'Enter', modifiers: [], mod: false });
+    expect(parseBinding(' ')).toEqual({ key: ' ', source: ' ', modifiers: [], mod: false });
+    expect(parseBinding('Space')).toEqual({ key: 'space', source: 'Space', modifiers: [], mod: false });
+    expect(parseBinding('MOD+shift+A')).toEqual({ key: 'a', source: 'A', modifiers: ['shift'], mod: true });
+    expect(parseBinding('+')).toEqual({ key: '+', source: '+', modifiers: [], mod: false });
+    expect(parseBinding('Shift++')).toEqual({ key: '+', source: '+', modifiers: ['shift'], mod: false });
+    expect(parseBinding('Mod+KeyS')).toEqual({ key: 'keys', source: 'KeyS', modifiers: [], mod: true });
   });
 
   it('rejects a binding that names anything but a modifier before its key', () => {

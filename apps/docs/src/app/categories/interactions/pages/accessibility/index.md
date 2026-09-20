@@ -52,6 +52,8 @@ With virtualization enabled, CSS-hidden entities are skipped by native Tab navig
 
 ## Names and descriptions
 
+The graph container carries `aria-keyshortcuts` with every key that is bound, so a tool can read the list without parsing prose. It is not repeated on each entity: the keys belong to the graph, and announcing a list of them on every Tab stop would make focusing a node needlessly loud.
+
 The flow is a named `region`. Nodes (including visual groups) and edges are named `group` elements. The minimap is one `img` named `Graph minimap`; its preview nodes do not form a second graph in the accessibility tree. Handles are semantically transparent: no role, name or description, while their own content keeps its semantics and `domAttributes` still applies `data-*` metadata to the element.
 
 ```typescript
@@ -99,32 +101,44 @@ const labels: Partial<AriaLabelConfig> = {
 
 `DEFAULT_ARIA_LABEL_CONFIG` exports all defaults. Use the following keys to translate the complete library vocabulary; translate application-provided names and descriptions separately.
 
-| Key                            | Default / formatter arguments                                                            |
-| ------------------------------ | ---------------------------------------------------------------------------------------- |
-| `flowLabel`                    | `Graph`                                                                                  |
-| `flowDescription`              | Empty string                                                                             |
-| `minimapLabel`                 | `Graph minimap`                                                                          |
-| `minimapDescription`           | Empty string                                                                             |
-| `nodeLabel`, `groupLabel`      | `(id: string) => string`                                                                 |
-| `edgeLabel`                    | `({ source: string, target: string }) => string`                                         |
-| `parentDescription`            | `(parent: string) => string`, default `Parent: {parent}.`                                |
-| `selected`                     | `Selected.`                                                                              |
-| `selectionUnavailable`         | `Selection unavailable.`                                                                 |
-| `movementUnavailable`          | `Movement unavailable.`                                                                  |
-| `reconnectionUnavailable`      | `Reconnection unavailable.`                                                              |
-| `keyboardNavigation`           | Instructions for Tab and Shift+Tab traversal.                                            |
-| `keyboardSelect`               | Instructions for selection and the multiselection modifier.                              |
-| `keyboardDeselect`             | Instructions for clearing selection with Escape.                                         |
-| `keyboardMove`                 | Instructions for arrows and accelerated movement with Shift.                             |
-| `keyboardDelete`               | Instructions for the deletion request; omitted when its command is disabled.             |
-| `keyboardPan`                  | Instructions for panning with arrow keys.                                                |
-| `keyboardZoom`                 | Instructions for zoom and fit view; omitted when all three viewport commands are `null`. |
-| `zoomAnnouncement`             | `(zoom: number) => string`, default `Zoom {percent}%.`                                   |
-| `selectionAnnouncement`        | `({ label: string, selected: boolean, count: number }) => string`, live feedback         |
-| `selectionClearedAnnouncement` | `Selection cleared.`                                                                     |
-| `movedAnnouncement`            | `({ count, direction: 'left' \| 'right' \| 'up' \| 'down', x, y }) => string`            |
+| Key                            | Default / formatter arguments                                                                                            |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
+| `flowLabel`                    | `Graph`                                                                                                                  |
+| `flowDescription`              | Empty string                                                                                                             |
+| `minimapLabel`                 | `Graph minimap`                                                                                                          |
+| `minimapDescription`           | Empty string                                                                                                             |
+| `nodeLabel`, `groupLabel`      | `(id: string) => string`                                                                                                 |
+| `edgeLabel`                    | `({ source: string, target: string }) => string`                                                                         |
+| `parentDescription`            | `(parent: string) => string`, default `Parent: {parent}.`                                                                |
+| `selected`                     | `Selected.`                                                                                                              |
+| `selectionUnavailable`         | `Selection unavailable.`                                                                                                 |
+| `movementUnavailable`          | `Movement unavailable.`                                                                                                  |
+| `reconnectionUnavailable`      | `Reconnection unavailable.`                                                                                              |
+| `keyboardNavigation`           | Instructions for Tab and Shift+Tab traversal.                                                                            |
+| `keyboardSelect`               | Written from `keys.select` and `keys.multiSelection`.                                                                    |
+| `keyboardDeselect`             | Written from `keys.clearSelection`.                                                                                      |
+| `keyboardMove`                 | Written from `keys.move`; omitted when no movement command has a key.                                                    |
+| `keyboardDelete`               | Written from `keys.delete`; omitted when the command is disabled.                                                        |
+| `keyboardPan`                  | Written from `keys.pan`; omitted when no panning command has a key.                                                      |
+| `keyboardZoom`                 | Written from `keys.zoomIn`, `keys.zoomOut` and `keys.fitView`; omitted when all three are disabled.                      |
+| `keyNames`                     | Display names for keys, looked up by the binding in lower case; `or` joins a list and `arrowkeys` names the four arrows. |
+| `zoomAnnouncement`             | `(zoom: number) => string`, default `Zoom {percent}%.`                                                                   |
+| `selectionAnnouncement`        | `({ label: string, selected: boolean, count: number }) => string`, live feedback                                         |
+| `selectionClearedAnnouncement` | `Selection cleared.`                                                                                                     |
+| `movedAnnouncement`            | `({ count, direction: 'left' \| 'right' \| 'up' \| 'down', x, y }) => string`                                            |
 
 Formatters receive plain text. Return plain text without HTML markup.
+
+Every `keyboard*` entry is either a sentence or a function of the keys that are bound right now, so an instruction follows a remap on its own:
+
+```typescript
+const labels: Partial<AriaLabelConfig> = {
+  keyboardSelect: ({ select, multiSelection }) => `Нажмите ${select}, чтобы выбрать. Удерживайте ${multiSelection} для переключения.`,
+  keyNames: { arrowup: 'стрелка вверх', or: 'или', arrowkeys: 'стрелки' },
+};
+```
+
+`keys` carries `select`, `clearSelection`, `delete`, `move`, `pan`, `zoomIn`, `zoomOut`, `fitView` and `multiSelection`, each already formatted as a phrase such as `Enter or Space`. A modifier is named in words rather than glyphs, because a screen reader spells a glyph unpredictably; `keyNames` replaces any of them. Passing a plain string instead keeps the sentence fixed.
 
 ## Custom content and safe metadata
 

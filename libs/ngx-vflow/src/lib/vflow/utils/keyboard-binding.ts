@@ -7,6 +7,8 @@ export type KeyboardModifierFlag = 'control' | 'meta' | 'alt' | 'shift';
 export interface ParsedBinding {
   /** Lowercased key, compared against both `KeyboardEvent.key` and `KeyboardEvent.code` of the event. */
   key: string;
+  /** The key as the configuration spells it, which is what a reader of a shortcut list sees. */
+  source: string;
   /** Modifiers the event must carry, besides the primary one when `mod` is set. */
   modifiers: KeyboardModifierFlag[];
   /** The binding named `Mod`, which resolves to Meta on macOS and Control elsewhere. */
@@ -45,10 +47,13 @@ const MODIFIER_KEYS: Record<string, KeyboardModifierFlag | 'mod'> = {
   shiftright: 'shift',
 };
 
-function onMac(mac?: boolean) {
-  if (mac !== undefined) return mac;
+export function isMacPlatform() {
   const os = getOS();
   return os === 'macos' || os === 'ios';
+}
+
+function onMac(mac?: boolean) {
+  return mac ?? isMacPlatform();
 }
 
 /**
@@ -90,7 +95,7 @@ export function parseBinding(binding: string): ParsedBinding | null {
   const key = rawKey.toLowerCase();
   if (!key) return null;
 
-  return { key, modifiers, mod };
+  return { key, source: rawKey, modifiers, mod };
 }
 
 /** The key the binding compares against, with `Mod` resolved for the platform. */

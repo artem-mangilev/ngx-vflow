@@ -15,10 +15,10 @@ export interface ArrowCommand {
 }
 
 export const ARROW_COMMANDS: ArrowCommand[] = [
-  { name: 'left', vector: { x: -1, y: 0 }, move: 'moveLeft', pan: 'panLeft' },
-  { name: 'right', vector: { x: 1, y: 0 }, move: 'moveRight', pan: 'panRight' },
   { name: 'up', vector: { x: 0, y: -1 }, move: 'moveUp', pan: 'panUp' },
   { name: 'down', vector: { x: 0, y: 1 }, move: 'moveDown', pan: 'panDown' },
+  { name: 'left', vector: { x: -1, y: 0 }, move: 'moveLeft', pan: 'panLeft' },
+  { name: 'right', vector: { x: 1, y: 0 }, move: 'moveRight', pan: 'panRight' },
 ];
 
 export const ZOOM_COMMANDS: KeyboardCommandName[] = ['zoomIn', 'zoomOut', 'fitView'];

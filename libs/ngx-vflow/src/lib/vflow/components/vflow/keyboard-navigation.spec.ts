@@ -569,7 +569,7 @@ describe('public keyboard graph navigation', () => {
         .map((id) => document.getElementById(id)!.textContent)
         .join(' ');
     expect(description()).toContain('Use arrow keys to pan the view');
-    expect(description()).toContain('Press Plus or Minus to zoom and 0 to fit the graph.');
+    expect(description()).toContain('Press +, = or NumpadAdd to zoom in');
     host.flow().keyboardShortcuts = { commands: { zoomIn: [], zoomOut: [], fitView: [] } };
     await settle();
     expect(key(container, '=', 'Equal').defaultPrevented).toBeFalse();
@@ -678,6 +678,43 @@ describe('public keyboard graph navigation', () => {
     expect(key(child, 'q', 'KeyQ').defaultPrevented).toBeTrue();
     expect(requests).toEqual([{ nodeIds: ['child'], edgeIds: [] }]);
     subscription.unsubscribe();
+  });
+
+  it('writes the instructions and the advertised shortcuts from the keys that are bound', async () => {
+    const { fixture, host, root } = await setup();
+    const settle = async () => {
+      fixture.detectChanges();
+      await fixture.whenStable();
+    };
+    const child = root.querySelector<HTMLElement>('[aria-label="Child"]')!;
+    const container = root.querySelector<HTMLElement>('[role="region"]')!;
+    const description = () =>
+      child
+        .getAttribute('aria-describedby')!
+        .split(/\s+/)
+        .map((id) => document.getElementById(id)!.textContent)
+        .join(' ');
+    // The defaults name their own keys, and the graph advertises every one of them once.
+    expect(description()).toContain('Press Enter or Space to select.');
+    expect(description()).toContain('use arrow keys to move');
+    expect(container.getAttribute('aria-keyshortcuts')).toBe(
+      'Enter Space Escape Delete Backspace ArrowUp ArrowDown ArrowLeft ArrowRight Plus = NumpadAdd - NumpadSubtract 0 Numpad0',
+    );
+    // A remap rewrites both, and a group that is no longer the four arrows is spelled out.
+    host.flow().keyboardShortcuts = { commands: { select: ['x'], moveUp: ['w'], clearSelection: [] } };
+    await settle();
+    expect(description()).toContain('Press X to select.');
+    expect(description()).toContain('use W, ArrowDown, ArrowLeft or ArrowRight to move');
+    expect(description()).not.toContain('Press Escape');
+    const advertised = container.getAttribute('aria-keyshortcuts')!;
+    expect(advertised).toContain('w ArrowDown ArrowLeft ArrowRight');
+    expect(advertised).not.toContain('Enter');
+    expect(advertised).not.toContain('Escape');
+    // A sentence of its own still wins, and key names are translatable.
+    host.flow().ariaLabelConfig = { keyboardSelect: 'Нажмите свою клавишу.', keyNames: { arrowkeys: 'стрелки' } };
+    await settle();
+    expect(description()).toContain('Нажмите свою клавишу.');
+    expect(description()).toContain('Use стрелки to pan the view');
   });
 
   it('does not restore stale graph focus after focus has left the graph', async () => {

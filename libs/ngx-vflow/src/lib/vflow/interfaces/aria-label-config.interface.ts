@@ -1,3 +1,22 @@
+/** Key lists of the commands an instruction talks about, already formatted for a reader. */
+export interface KeyboardInstructionKeys {
+  select: string;
+  clearSelection: string;
+  delete: string;
+  /** The four movement keys as one phrase. */
+  move: string;
+  /** The four panning keys as one phrase. */
+  pan: string;
+  zoomIn: string;
+  zoomOut: string;
+  fitView: string;
+  /** The key held to toggle one entity instead of replacing the selection. */
+  multiSelection: string;
+}
+
+/** A sentence, or one written from the keys that are bound right now. */
+export type KeyboardInstruction = string | ((keys: KeyboardInstructionKeys) => string);
+
 /** Localizable graph names and descriptions. Formatters receive plain text. */
 export interface AriaLabelConfig {
   flowLabel: string;
@@ -12,13 +31,18 @@ export interface AriaLabelConfig {
   selectionUnavailable: string;
   movementUnavailable: string;
   reconnectionUnavailable: string;
-  keyboardNavigation: string;
-  keyboardSelect: string;
-  keyboardDeselect: string;
-  keyboardMove: string;
-  keyboardDelete: string;
-  keyboardPan: string;
-  keyboardZoom: string;
+  keyboardNavigation: KeyboardInstruction;
+  keyboardSelect: KeyboardInstruction;
+  keyboardDeselect: KeyboardInstruction;
+  keyboardMove: KeyboardInstruction;
+  keyboardDelete: KeyboardInstruction;
+  keyboardPan: KeyboardInstruction;
+  keyboardZoom: KeyboardInstruction;
+  /**
+   * Display names for keys, looked up by the binding in lower case, as in `{ arrowup: 'стрелка вверх' }`. Two
+   * entries are reserved: `or` joins a list of keys and `arrowkeys` names the four arrows together.
+   */
+  keyNames: Record<string, string>;
   /** Live feedback after a keyboard selection change of one entity. */
   selectionAnnouncement: (selection: { label: string; selected: boolean; count: number }) => string;
   /** Live feedback after Escape clears the selection. */
@@ -48,13 +72,16 @@ export const DEFAULT_ARIA_LABEL_CONFIG: AriaLabelConfig = {
   movementUnavailable: 'Movement unavailable.',
   reconnectionUnavailable: 'Reconnection unavailable.',
   keyboardNavigation: 'Use Tab and Shift+Tab to move focus.',
-  keyboardSelect: 'Press Enter or Space to select. Hold the multiselection modifier to toggle selection.',
-  keyboardDeselect: 'Press Escape to clear selection.',
-  keyboardMove: 'When selected, use arrow keys to move movable selected nodes. Hold Shift to move faster.',
-  keyboardDelete:
-    'Press Delete or Backspace to request deletion of this item, or of the whole selection when it is selected.',
-  keyboardPan: 'Use arrow keys to pan the view when they do not move a node. Hold Shift to pan faster.',
-  keyboardZoom: 'Press Plus or Minus to zoom and 0 to fit the graph.',
+  keyboardSelect: ({ select, multiSelection }) =>
+    `Press ${select} to select. Hold ${multiSelection} to toggle selection.`,
+  keyboardDeselect: ({ clearSelection }) => `Press ${clearSelection} to clear selection.`,
+  keyboardMove: ({ move }) => `When selected, use ${move} to move movable selected nodes. Hold Shift to move faster.`,
+  keyboardDelete: ({ delete: remove }) =>
+    `Press ${remove} to request deletion of this item, or of the whole selection when it is selected.`,
+  keyboardPan: ({ pan }) => `Use ${pan} to pan the view when they do not move a node. Hold Shift to pan faster.`,
+  keyboardZoom: ({ zoomIn, zoomOut, fitView }) =>
+    `Press ${zoomIn} to zoom in, ${zoomOut} to zoom out and ${fitView} to fit the graph.`,
+  keyNames: {},
   selectionAnnouncement: ({ label, selected, count }) =>
     `${label} ${selected ? 'selected' : 'deselected'}. ${count} selected in total.`,
   selectionClearedAnnouncement: 'Selection cleared.',

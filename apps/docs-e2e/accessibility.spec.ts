@@ -12,6 +12,12 @@ test('reads default and custom graphs, preserves controls and keeps handles tran
     /^Keep a copy\. Connection from Request to Archive Selected\. Selection unavailable\. Reconnection unavailable\./,
   );
   await expect(graph.getByRole('img', { name: 'Graph minimap' })).toHaveCount(1);
+  // The graph advertises its keys once, on the container rather than on every Tab stop.
+  await expect(graph).toHaveAttribute('aria-keyshortcuts', /Enter Space Escape Delete Backspace/);
+  await expect(graph.getByRole('group', { name: 'Request', exact: true })).not.toHaveAttribute(
+    'aria-keyshortcuts',
+    /.*/,
+  );
   const handles = graph.locator('[data-vflow-handle-type]');
   expect(await handles.count()).toBeGreaterThan(0);
   for (const handle of await handles.all()) {
