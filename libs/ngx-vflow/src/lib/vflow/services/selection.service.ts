@@ -64,14 +64,23 @@ export class SelectionService {
     });
   }
 
-  public selectFromKeyboard(entity: FlowEntity | null, toggle: boolean) {
-    if (this.flowSettingsService.selectionMode() === 'manual') return;
+  /** Returns whether any selection state changed. */
+  public selectFromKeyboard(entity: FlowEntity | null, toggle: boolean): boolean {
+    if (this.flowSettingsService.selectionMode() === 'manual') return false;
     // Denying selection acquisition must still allow deselection.
-    if (entity && !entity.selectable() && !(toggle && entity.selected())) return;
+    if (entity && !entity.selectable() && !(toggle && entity.selected())) return false;
     if (entity && toggle) {
       entity.selected.set(!entity.selected());
-    } else {
-      this.flowEntitiesService.entities().forEach((item) => item.selected.set(item === entity));
+      return true;
     }
+    let changed = false;
+    for (const item of this.flowEntitiesService.entities()) {
+      const selected = item === entity;
+      if (item.selected() !== selected) {
+        item.selected.set(selected);
+        changed = true;
+      }
+    }
+    return changed;
   }
 }

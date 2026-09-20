@@ -21,6 +21,17 @@ export interface AriaLabelConfig {
   keyboardSelect: string;
   keyboardDeselect: string;
   keyboardMove: string;
+  /** Live feedback after a keyboard selection change of one entity. */
+  selectionAnnouncement: (selection: { label: string; selected: boolean; count: number }) => string;
+  /** Live feedback after Escape clears the selection. */
+  selectionClearedAnnouncement: string;
+  /** Live feedback after arrow keys move the selected nodes; `x` and `y` are the focused node's position. */
+  movedAnnouncement: (move: {
+    count: number;
+    direction: 'left' | 'right' | 'up' | 'down';
+    x: number;
+    y: number;
+  }) => string;
 }
 
 export const DEFAULT_ARIA_LABEL_CONFIG: AriaLabelConfig = {
@@ -48,4 +59,9 @@ export const DEFAULT_ARIA_LABEL_CONFIG: AriaLabelConfig = {
   keyboardSelect: 'Press Enter or Space to select. Hold the multiselection modifier to toggle selection.',
   keyboardDeselect: 'Press Escape to clear selection.',
   keyboardMove: 'When selected, use arrow keys to move movable selected nodes. Hold Shift to move faster.',
+  selectionAnnouncement: ({ label, selected, count }) =>
+    `${label} ${selected ? 'selected' : 'deselected'}. ${count} selected in total.`,
+  selectionClearedAnnouncement: 'Selection cleared.',
+  movedAnnouncement: ({ count, direction, x, y }) =>
+    `Moved ${count === 1 ? 'node' : `${count} nodes`} ${direction}. Position: ${Math.round(x)}, ${Math.round(y)}.`,
 };

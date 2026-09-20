@@ -80,6 +80,8 @@ import { SelectionBoxContextDirective } from '../../directives/selection-box-con
 import { SelectionBoxSettings } from '../../interfaces/selection-box-settings.interface';
 import { AriaDescriber } from '@angular/cdk/a11y';
 import { EntityAccessibilityDirective } from '../../directives/entity-accessibility.directive';
+import { LiveRegionDirective } from '../../directives/live-region.directive';
+import { AnnouncerService } from '../../services/announcer.service';
 import { AriaLabelConfig, DEFAULT_ARIA_LABEL_CONFIG } from '../../interfaces/aria-label-config.interface';
 
 const changesControllerHostDirective = {
@@ -123,6 +125,7 @@ const nodeDragControllerHostDirective = {
     FlowSettingsService,
     ComponentEventBusService,
     KeyboardService,
+    AnnouncerService,
     OverlaysService,
     FlowRenderingService,
     ResizeObserverService,
@@ -133,6 +136,7 @@ const nodeDragControllerHostDirective = {
     KeyboardEntityDirective,
     KeyboardNavigationDirective,
     EntityAccessibilityDirective,
+    LiveRegionDirective,
     RootSvgReferenceDirective,
     RootSvgContextDirective,
     RootPointerDirective,
@@ -177,7 +181,10 @@ export class VflowComponent {
     effect(() => {
       const { x, y, zoom } = this.viewportService.readableViewport();
       // Camera movement must not reconcile every node, edge, label and toolbar.
-      this.viewportElement().nativeElement.style.transform = `translate(${x}px, ${y}px) scale(${zoom})`;
+      const viewport = this.viewportElement().nativeElement;
+      viewport.style.transform = `translate(${x}px, ${y}px) scale(${zoom})`;
+      // Lets scaled content keep screen-sized details, such as the node focus ring.
+      viewport.style.setProperty('--vflow-zoom', String(zoom));
     });
   }
 

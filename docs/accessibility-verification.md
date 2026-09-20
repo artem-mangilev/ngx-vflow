@@ -59,3 +59,10 @@ The same documentation page now also includes a dedicated keyboard example (`dat
 ## Keyboard editing — issue 11 rollback, 2026-09-05
 
 The user requested rolling back issue 11 after evaluating its interaction design and research into other graph libraries. Keyboard connection creation is currently unsupported. The issue 11 deletion-request API, action announcements, handle Tab stops, editing demo and related tests were also removed. Issue 10's keyboard navigation, selection and movement remain in place. Test results from the discarded implementation are not evidence of current support, and its pending VoiceOver check is no longer an acceptance task.
+
+## Keyboard feedback, focus ring and shortcut keys — 2026-09-20
+
+- Keyboard selection, clearing and arrow movement now write localized feedback to the flow's own polite, atomic live region (`selectionAnnouncement`, `selectionClearedAnnouncement`, `movedAnnouncement`). Pointer and programmatic changes stay silent. Unit tests cover the messages, the no-change case and localization; the browser check on the documentation page showed `Draft selected. 1 selected in total.` in the region after Enter.
+- The node focus ring is divided by the new read-only `--vflow-zoom` variable of the zoomed viewport, so it stays 2px on screen. Verified in the browser at zoom 0.5: computed outline 4px, visible as a 2px ring.
+- A key bound to a `keyboardShortcuts` action (for example `Space` for `pan`) is no longer consumed as a selection command by a focused entity. Unit test covers Space passthrough with `Enter` still selecting.
+- Library suite: 269 tests passed; ESLint and Prettier passed for changed files. No new screen-reader session was run.

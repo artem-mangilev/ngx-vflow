@@ -6,9 +6,10 @@
   pointer-events: all;
 }
 
+// The host is inside the zoomed viewport, so the ring is divided by the zoom to stay 2px on screen.
 :host(:focus-visible) {
-  outline: 2px solid var(--vflow-focus);
-  outline-offset: 3px;
+  outline: calc(2px / var(--vflow-zoom, 1)) solid var(--vflow-focus);
+  outline-offset: calc(3px / var(--vflow-zoom, 1));
 }
 
 .wrapper {

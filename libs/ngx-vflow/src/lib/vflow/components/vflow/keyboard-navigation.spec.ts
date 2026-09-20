@@ -381,6 +381,66 @@ describe('public keyboard graph navigation', () => {
     expect(host.flow().viewport().x).toBe(-1200);
   });
 
+  it('announces keyboard selection, clearing and movement in the flow live region and localizes them', async () => {
+    const { fixture, host, root } = await setup();
+    const live = root.querySelector('[aria-live="polite"]')!;
+    const spoken = async () => {
+      await new Promise((resolve) => setTimeout(resolve, 150));
+      return live.textContent;
+    };
+    const child = root.querySelector<HTMLElement>('[aria-label="Child"]')!;
+    const parent = root.querySelector<HTMLElement>('[aria-label="Parent"]')!;
+    expect(live.getAttribute('aria-atomic')).toBe('true');
+    child.focus();
+    key(child, 'Enter');
+    expect(await spoken()).toBe('Child selected. 1 selected in total.');
+    host.flow().keyboardShortcuts = { multiSelection: ['AltLeft'] };
+    document.dispatchEvent(new KeyboardEvent('keydown', { code: 'AltLeft' }));
+    parent.focus();
+    key(parent, ' ');
+    expect(await spoken()).toBe('Parent selected. 2 selected in total.');
+    document.dispatchEvent(new KeyboardEvent('keyup', { code: 'AltLeft' }));
+    key(parent, 'ArrowRight');
+    expect(await spoken()).toBe('Moved node right. Position: 25, 20.');
+    host.nodes()[0].selected.set(false);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    key(parent, 'Escape');
+    expect(await spoken()).toBe('Selection cleared.');
+    live.textContent = 'stale';
+    key(parent, 'Escape');
+    expect(await spoken()).toBe('stale');
+    host.flow().ariaLabelConfig = {
+      selectionAnnouncement: ({ label, count }) => `${label}: выбрано ${count}`,
+      movedAnnouncement: ({ direction, x, y }) => `Сдвиг ${direction} в ${x}, ${y}`,
+    };
+    fixture.detectChanges();
+    await fixture.whenStable();
+    key(parent, 'Enter');
+    expect(await spoken()).toBe('Parent: выбрано 1');
+    key(parent, 'ArrowDown', 'ArrowDown', true);
+    expect(await spoken()).toBe('Сдвиг down в 25, 40');
+  });
+
+  it('leaves keys bound to gesture shortcuts to the gesture layer', async () => {
+    const { fixture, host, root } = await setup();
+    host.flow().keyboardShortcuts = { pan: ['Space'] };
+    const child = root.querySelector<HTMLElement>('[aria-label="Child"]')!;
+    child.focus();
+    const space = key(child, ' ');
+    expect(host.nodes()[0].selected()).toBeFalse();
+    // The document-level gesture layer received the key and claimed it for panning.
+    expect(space.defaultPrevented).toBeTrue();
+    document.dispatchEvent(new KeyboardEvent('keyup', { code: 'Space' }));
+    expect(key(child, 'Enter').defaultPrevented).toBeTrue();
+    expect(host.nodes()[0].selected()).toBeTrue();
+    host.flow().keyboardShortcuts = { pan: null };
+    key(child, 'Escape');
+    key(child, ' ');
+    expect(host.nodes()[0].selected()).toBeTrue();
+    fixture.detectChanges();
+  });
+
   it('does not restore stale graph focus after focus has left the graph', async () => {
     const { fixture, host, root } = await setup();
     root.querySelector<HTMLElement>('[aria-label="Child"]')!.focus();

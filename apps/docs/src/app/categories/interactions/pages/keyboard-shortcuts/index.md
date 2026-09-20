@@ -21,6 +21,7 @@ Key details:
 - The passed object is merged with defaults.
 - To disable a specific action, pass `null` for that action.
 - If you want to trigger one action with multiple keys, pass an array. This is not a chord combination. For example, if you pass `['ShiftLeft', 'ControlLeft']`, the action is triggered by either `ShiftLeft` or `ControlLeft`, not by pressing both together (`ShiftLeft+ControlLeft`).
+- A key bound to an action is reserved for it: a focused node or edge no longer treats it as a selection command. With `pan: ['Space']`, Space pans while `Enter` still selects.
 - You can find the list of available key codes [here](https://www.w3.org/TR/uievents-code/#key-alphanumeric-section).
 
 In the following example:

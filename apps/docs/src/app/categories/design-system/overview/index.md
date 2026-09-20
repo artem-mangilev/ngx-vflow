@@ -152,7 +152,8 @@ Core has its own tokens with defaults for standalone use: `--vflow-background`, 
 `--vflow-foreground`, `--vflow-muted`, `--vflow-border`, `--vflow-selection` and `--vflow-focus`.
 A theme scope maps the UI tokens onto them; set a `--vflow-*` token on the flow element or any
 descendant to override both. Under `forced-colors: active` core maps its tokens to system colors
-regardless of the theme. The canvas minimap samples the resolved tokens and repaints when an
+regardless of the theme. Core also sets the read-only `--vflow-zoom` on the zoomed viewport, so content
+inside it can keep screen-sized details (`calc(2px / var(--vflow-zoom, 1))`), as the node focus ring does. The canvas minimap samples the resolved tokens and repaints when an
 attribute changes on any ancestor of the flow (for example `data-vui-theme` or a class) or when the
 `prefers-color-scheme` preference changes; edits to a stylesheet alone are not observed.
 

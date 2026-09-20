@@ -10,12 +10,16 @@ import { ViewportService } from '../services/viewport.service';
 import { getViewportBounds, getViewportForBounds } from '../utils/viewport';
 import { getNodesFlowBounds } from '../utils/nodes';
 import { getOverlappingArea } from '../utils/rect';
+import { AnnouncerService } from '../services/announcer.service';
+import { FlowEntitiesService } from '../services/flow-entities.service';
 
-const ARROW_DIRECTIONS: Record<string, Point> = {
-  ArrowLeft: { x: -1, y: 0 },
-  ArrowRight: { x: 1, y: 0 },
-  ArrowUp: { x: 0, y: -1 },
-  ArrowDown: { x: 0, y: 1 },
+type ArrowDirection = 'left' | 'right' | 'up' | 'down';
+
+const ARROW_DIRECTIONS: Record<string, { name: ArrowDirection; vector: Point }> = {
+  ArrowLeft: { name: 'left', vector: { x: -1, y: 0 } },
+  ArrowRight: { name: 'right', vector: { x: 1, y: 0 } },
+  ArrowUp: { name: 'up', vector: { x: 0, y: -1 } },
+  ArrowDown: { name: 'down', vector: { x: 0, y: 1 } },
 };
 
 @Directive({
@@ -34,6 +38,8 @@ export class KeyboardEntityDirective {
   private draggable = inject(DraggableService);
   private settings = inject(FlowSettingsService);
   private viewport = inject(ViewportService);
+  private announcer = inject(AnnouncerService);
+  private entities = inject(FlowEntitiesService);
 
   public description = computed(() => {
     const model = this.vflowKeyboardEntity();
@@ -91,14 +97,28 @@ export class KeyboardEntityDirective {
     )
       return;
 
+    const labels = this.settings.ariaLabels();
     if (['Enter', ' ', 'Escape'].includes(event.key)) {
+      // A key bound to a gesture action (for example Space for pan) belongs to the gesture layer.
+      if (this.keyboard.hasShortcut(event.code)) return;
       event.preventDefault();
       event.stopPropagation();
-      if (!event.repeat)
-        this.selection.selectFromKeyboard(
-          event.key === 'Escape' ? null : model,
-          this.keyboard.isActiveAction('multiSelection'),
-        );
+      if (event.repeat) return;
+      const clear = event.key === 'Escape';
+      const changed = this.selection.selectFromKeyboard(
+        clear ? null : model,
+        this.keyboard.isActiveAction('multiSelection'),
+      );
+      if (!changed) return;
+      this.announcer.announce(
+        clear
+          ? labels.selectionClearedAnnouncement
+          : labels.selectionAnnouncement({
+              label: model.accessibility().label,
+              selected: model.selected(),
+              count: this.entities.entities().filter((entity) => entity.selected()).length,
+            }),
+      );
     } else if (
       Object.hasOwn(ARROW_DIRECTIONS, event.key) &&
       model instanceof NodeModel &&
@@ -107,7 +127,11 @@ export class KeyboardEntityDirective {
     ) {
       event.preventDefault();
       event.stopPropagation();
-      this.draggable.moveSelected(model, ARROW_DIRECTIONS[event.key], event.shiftKey);
+      const { name, vector } = ARROW_DIRECTIONS[event.key];
+      const moved = this.draggable.moveSelected(model, vector, event.shiftKey);
+      if (moved.length === 0) return;
+      const { x, y } = model.point();
+      this.announcer.announce(labels.movedAnnouncement({ count: moved.length, direction: name, x, y }));
     }
   }
 }

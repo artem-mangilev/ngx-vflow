@@ -50,11 +50,13 @@ export class DraggableService {
     this.clearDrag(element);
   }
 
-  public moveSelected(model: NodeModel, direction: Point, accelerated: boolean) {
-    if (!model.selected() || !model.draggable()) return;
+  /** Returns the nodes that were moved. */
+  public moveSelected(model: NodeModel, direction: Point, accelerated: boolean): NodeModel[] {
+    if (!model.selected() || !model.draggable()) return [];
     const [gridX, gridY] = this.settingsService.snapGrid();
     const factor = accelerated ? 4 : 1;
-    for (const node of this.getDragNodes(model)) {
+    const nodes = this.getDragNodes(model);
+    for (const node of nodes) {
       const point = {
         x: node.point().x + direction.x * (gridX > 1 ? gridX : 5) * factor,
         y: node.point().y + direction.y * (gridY > 1 ? gridY : 5) * factor,
@@ -62,6 +64,7 @@ export class DraggableService {
       this.alignToGrid(point);
       this.moveNode(node, point);
     }
+    return nodes;
   }
 
   /**

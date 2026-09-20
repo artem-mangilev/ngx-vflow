@@ -84,4 +84,9 @@ export class KeyboardService {
   public isActiveAction(action: KeyboardAction) {
     return this.#actionsActive$.value[action];
   }
+
+  /** Whether a physical key is bound to any action, so entity commands leave it to the gesture layer. */
+  public hasShortcut(code: string) {
+    return Object.values(this.actions).some((codes) => codes?.includes(code));
+  }
 }

@@ -7,7 +7,7 @@
   flowSizeController
   class="vflow-root"
   [vflowA11y]="{ role: 'region', label: ariaLabels().flowLabel, description: ariaLabels().flowDescription }">
-  <div class="vflow-a11y-live" aria-live="polite" aria-atomic="true"></div>
+  <div class="vflow-a11y-live" vflowLiveRegion></div>
   <!-- Background (fixed, full-size svg behind everything) -->
   <svg class="vflow-background-svg" aria-hidden="true">
     <g background />
