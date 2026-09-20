@@ -1,21 +1,47 @@
-import { ChangeDetectionStrategy, Component, Injectable, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Injectable, computed, inject, signal } from '@angular/core';
 import { DocsPresentations } from '@docs/shared';
 import {
   Connection,
   ConnectionSettings,
+  Curve,
+  CurveFactory,
   Edge,
   HandlePosition,
   Node,
   Vflow,
   createEdge,
   createNodes,
+  getBezierPath,
+  getFloatingEdgeParams,
   injectNode,
 } from 'ngx-vflow';
+
+/** `auto` and `center` are handle positions; `crossing` keeps `auto` and replaces the endpoints in a custom curve. */
+type Meeting = 'auto' | 'center' | 'crossing';
+
+/**
+ * Endpoints on the exact crossing of the line between the node centers with the node borders. Every curve factory
+ * receives both node rectangles and the marker inset; the pointer of a connection in progress is a rectangle
+ * without size that the flow has already moved by the inset, so only the start is inset again.
+ */
+const crossingCurve: CurveFactory = (params) => {
+  if (params.targetNode) {
+    return getBezierPath(getFloatingEdgeParams(params.sourceNode, params.targetNode, { inset: params.markerInset }));
+  }
+
+  const pointer = { ...params.targetPoint, width: 0, height: 0 };
+
+  return getBezierPath(
+    getFloatingEdgeParams(params.sourceNode, pointer, { inset: { start: params.markerInset.start } }),
+  );
+};
 
 /** Shared by the demo controls and the nodes: where edges meet a node. */
 @Injectable()
 export class EasyConnectSettings {
-  readonly position = signal<HandlePosition>('auto');
+  readonly meeting = signal<Meeting>('auto');
+  readonly position = computed<HandlePosition>(() => (this.meeting() === 'center' ? 'center' : 'auto'));
+  readonly curve = computed<Curve>(() => (this.meeting() === 'crossing' ? crossingCurve : 'bezier'));
 }
 
 /** The whole node is the handle: the title drags the node, everywhere else starts or accepts a connection. */
@@ -83,13 +109,14 @@ export class EasyConnectNodeComponent {
     <div class="demo">
       <label class="controls">
         Edges meet nodes at
-        <select [value]="settings.position()" (change)="settings.position.set($any($event.target).value)">
-          <option value="auto">the border facing the other node</option>
+        <select [value]="settings.meeting()" (change)="settings.meeting.set($any($event.target).value)">
+          <option value="auto">the middle of the border facing the other node</option>
           <option value="center">the center</option>
+          <option value="crossing">the exact crossing of the border (custom curve)</option>
         </select>
       </label>
 
-      <vflow view="auto" [nodes]="nodes" [edges]="edges()" [connection]="connection" (connect)="connect($event)">
+      <vflow view="auto" [nodes]="nodes" [edges]="edges()" [connection]="connection()" (connect)="connect($event)">
         <ng-template let-ctx edge><svg:g docsEdge [ctx]="ctx" /></ng-template>
       </vflow>
     </div>
@@ -131,7 +158,10 @@ export class EasyConnectNodeComponent {
 export class EasyConnectDemoComponent {
   protected readonly settings = inject(EasyConnectSettings);
 
-  public readonly connection: ConnectionSettings = { marker: { type: 'arrow-closed' } };
+  public readonly connection = computed<ConnectionSettings>(() => ({
+    marker: { type: 'arrow-closed' },
+    curve: this.settings.curve(),
+  }));
 
   public readonly nodes: Node[] = createNodes([
     // Nodes stay away from the pane edges, where a connection drag would auto-pan the viewport.
@@ -140,17 +170,21 @@ export class EasyConnectDemoComponent {
     { id: '3', point: { x: 100, y: 200 }, component: EasyConnectNodeComponent, data: { title: 'Review' } },
   ]);
 
-  public readonly edges = signal<Edge[]>([this.createEdge({ source: '1', target: '2' })]);
+  private readonly connections = signal<Connection[]>([{ source: '1', target: '2' }]);
+
+  /** Edges follow the chosen curve; the application owns the list and rebuilds it when the setting changes. */
+  public readonly edges = computed<Edge[]>(() =>
+    this.connections().map((connection) =>
+      createEdge({
+        id: `${connection.source} -> ${connection.target}`,
+        ...connection,
+        curve: this.settings.curve(),
+        markers: { end: { type: 'arrow-closed' } },
+      }),
+    ),
+  );
 
   public connect(connection: Connection) {
-    this.edges.update((edges) => [...edges, this.createEdge(connection)]);
-  }
-
-  private createEdge(connection: Connection): Edge {
-    return createEdge({
-      id: `${connection.source} -> ${connection.target}`,
-      ...connection,
-      markers: { end: { type: 'arrow-closed' } },
-    });
+    this.connections.update((connections) => [...connections, connection]);
   }
 }

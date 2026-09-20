@@ -71,5 +71,14 @@ test('easy connect: connects from anywhere on a node, drags by the title and rou
   expect(Math.abs(centerStart.x - (source.x + source.width / 2))).toBeLessThan(2);
   expect(Math.abs(centerStart.y - (source.y + source.height / 2))).toBeLessThan(2);
 
+  // The custom curve keeps the endpoint on the border but slides it towards the target instead of the middle.
+  await demo.locator('select').selectOption('crossing');
+  const crossingStart = await edges.first().evaluate((path: SVGPathElement) => {
+    const point = path.getPointAtLength(0).matrixTransform(path.getScreenCTM()!);
+    return { x: point.x, y: point.y };
+  });
+  expect(await distanceToBorder(nodes.nth(0), crossingStart)).toBeLessThan(2);
+  expect(Math.abs(crossingStart.y - (source.y + source.height / 2))).toBeGreaterThan(4);
+
   expect(errors).toEqual([]);
 });

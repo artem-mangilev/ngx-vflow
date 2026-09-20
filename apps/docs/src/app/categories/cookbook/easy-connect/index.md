@@ -23,4 +23,20 @@ While a connection is in progress the handle element itself is the drop zone: th
 
 `position="auto"` takes the middle of the side facing the other node, which works with every built-in curve, including the stepped ones, and keeps arrow markers visible. `position="center"` runs edges to the node center, the look of force-directed graphs; the edge layer lies under the nodes, so markers are hidden there. The demo switches between both.
 
-For endpoints on the exact crossing of the line between the node centers, or for nodes of other shapes, write a custom curve: every curve factory receives `sourceNode`, `targetNode` and `markerInset`, and `getFloatingEdgeParams` computes the crossing for rectangles.
+## Exact crossing of the border
+
+For endpoints that slide along the border, on the crossing of the line between the node centers, keep `position="auto"` and replace the endpoints in a custom curve. Every curve factory receives `sourceNode`, `targetNode` and `markerInset`; `getFloatingEdgeParams` computes the crossing for rectangles, other shapes need their own border function. The pointer of a connection in progress comes as `targetPoint`, already moved by the marker inset.
+
+```ts
+const crossingCurve: CurveFactory = (params) => {
+  if (params.targetNode) {
+    return getBezierPath(getFloatingEdgeParams(params.sourceNode, params.targetNode, { inset: params.markerInset }));
+  }
+
+  const pointer = { ...params.targetPoint, width: 0, height: 0 };
+
+  return getBezierPath(getFloatingEdgeParams(params.sourceNode, pointer, { inset: { start: params.markerInset.start } }));
+};
+```
+
+The curve goes to every edge through `curve` and to the preview through `curve` of `ConnectionSettings`; the third option of the demo does exactly that.
