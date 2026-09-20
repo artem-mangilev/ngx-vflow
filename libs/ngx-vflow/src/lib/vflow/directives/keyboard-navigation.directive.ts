@@ -30,24 +30,32 @@ const DIRECTIONS: { name: ArrowDirection; vector: Point; move: KeyboardCommandNa
   { name: 'down', vector: { x: 0, y: 1 }, move: 'moveDown', pan: 'panDown' },
 ];
 
+/** Where a press must come from: a focused entity wrapper, the graph container, or either of them. */
+type KeyboardCommandScope = 'entity' | 'container' | 'both';
+
+interface KeyboardCommand {
+  name: KeyboardCommandName;
+  scope: KeyboardCommandScope;
+  /** Whether holding the key runs the command again. */
+  repeat: boolean;
+  /** Whether the command took the press. Declining leaves the key to the commands behind it. */
+  run: (model: NodeModel | EdgeModel | null, event: KeyboardEvent) => boolean;
+}
+
+/** Focus, its visible order and the description read out for one entity. Commands live on the container. */
 @Directive({
   selector: '[vflowKeyboardEntity]',
   host: {
     '[attr.tabindex]': 'vflowKeyboardEntity().focusable() ? 0 : -1',
-    '(keydown)': 'onKeydown($event)',
     '(focus)': 'onFocus()',
   },
 })
 export class KeyboardEntityDirective {
   public vflowKeyboardEntity = input.required<NodeModel | EdgeModel>();
   public element = inject<ElementRef<HTMLElement | SVGElement>>(ElementRef).nativeElement;
-  private selection = inject(SelectionService);
   private keyboard = inject(KeyboardService);
-  private draggable = inject(DraggableService);
   private settings = inject(FlowSettingsService);
   private viewport = inject(ViewportService);
-  private announcer = inject(AnnouncerService);
-  private entities = inject(FlowEntitiesService);
 
   public description = computed(() => {
     const model = this.vflowKeyboardEntity();
@@ -100,74 +108,12 @@ export class KeyboardEntityDirective {
       duration: 0,
     });
   }
-
-  protected onKeydown(event: KeyboardEvent) {
-    const model = this.vflowKeyboardEntity();
-    if (
-      event.defaultPrevented ||
-      event.composedPath()[0] !== this.element ||
-      this.element.ownerDocument.activeElement !== this.element ||
-      !model.focusable() ||
-      this.element.closest('[data-vflow-no-keyboard]') ||
-      // A key held as a gesture modifier (for example Space for panning) belongs to the gesture layer.
-      this.keyboard.isModifierKey(event)
-    )
-      return;
-
-    const labels = this.settings.ariaLabels();
-    const select = this.keyboard.isCommand('select', event);
-    if (select || this.keyboard.isCommand('clearSelection', event)) {
-      event.preventDefault();
-      event.stopPropagation();
-      if (event.repeat) return;
-      const changed = this.selection.selectFromKeyboard(
-        select ? model : null,
-        this.keyboard.isActiveModifier('multiSelection'),
-      );
-      if (!changed) return;
-      this.announcer.announce(
-        !select
-          ? labels.selectionClearedAnnouncement
-          : labels.selectionAnnouncement({
-              label: model.accessibility().label,
-              selected: model.selected(),
-              count: this.entities.entities().filter((entity) => entity.selected()).length,
-            }),
-      );
-    } else if (this.keyboard.isCommand('delete', event)) {
-      event.preventDefault();
-      event.stopPropagation();
-      if (event.repeat) return;
-      // The command acts at the point of focus: the whole selection when the focused entity belongs to it,
-      // otherwise only the focused entity, so a stale selection elsewhere is never deleted by surprise.
-      const target = (entity: NodeModel | EdgeModel) => (model.selected() ? entity.selected() : entity === model);
-      this.keyboard.deleteRequest$.next({
-        nodeIds: this.entities
-          .nodes()
-          .filter(target)
-          .map((node) => node.rawNode.id),
-        edgeIds: this.entities
-          .edges()
-          .filter(target)
-          .map((edge) => edge.edge.id),
-      });
-    } else if (model instanceof NodeModel && model.selected() && model.draggable()) {
-      // An arrow that moves nothing is left unhandled, so the container pans the view with it instead.
-      const direction = DIRECTIONS.find((entry) => this.keyboard.isCommand(entry.move, event));
-      if (!direction) return;
-      event.preventDefault();
-      event.stopPropagation();
-      const moved = this.draggable.moveSelected(model, direction.vector, event.shiftKey);
-      if (moved.length === 0) return;
-      const { x, y } = model.point();
-      this.announcer.announce(labels.movedAnnouncement({ count: moved.length, direction: direction.name, x, y }));
-    }
-  }
 }
 
 /**
- * Native Tab traversal; only repair focus when its owning entity disappears or opts out. Viewport commands that
- * a focused wrapper does not consume, and the same commands on the container itself, pan and zoom the view.
+ * Native Tab traversal, focus repair when an entity disappears, and the one listener that turns a key press into a
+ * command. A press is answered by the first command whose key it carries, that its origin allows, and that accepts
+ * it; a command that declines leaves the key to the ones behind it.
  */
 @Directive({
   selector: '[vflowKeyboard]',
@@ -186,8 +132,33 @@ export class KeyboardNavigationDirective {
   private viewport = inject(ViewportService);
   private settings = inject(FlowSettingsService);
   private announcer = inject(AnnouncerService);
+  private selection = inject(SelectionService);
+  private draggable = inject(DraggableService);
+  private flowEntities = inject(FlowEntitiesService);
   private previous: readonly KeyboardEntityDirective[] = [];
   private focused?: { entity: KeyboardEntityDirective; target: Element };
+
+  /** Every command in the order a press consults them. */
+  private readonly commands: KeyboardCommand[] = [
+    { name: 'select', scope: 'entity', repeat: false, run: (model) => this.runSelect(model, true) },
+    { name: 'clearSelection', scope: 'entity', repeat: false, run: (model) => this.runSelect(model, false) },
+    { name: 'delete', scope: 'entity', repeat: false, run: (model) => this.runDelete(model) },
+    ...DIRECTIONS.map((direction): KeyboardCommand => ({
+      name: direction.move,
+      scope: 'entity',
+      repeat: true,
+      run: (model, event) => this.runMove(model, direction, event),
+    })),
+    ...DIRECTIONS.map((direction): KeyboardCommand => ({
+      name: direction.pan,
+      scope: 'both',
+      repeat: true,
+      run: (_model, event) => this.runPan(direction, event),
+    })),
+    { name: 'zoomIn', scope: 'both', repeat: true, run: () => this.runZoom(1) },
+    { name: 'zoomOut', scope: 'both', repeat: true, run: () => this.runZoom(-1) },
+    { name: 'fitView', scope: 'both', repeat: false, run: () => this.runFitView() },
+  ];
 
   constructor() {
     afterRenderEffect(() => {
@@ -214,47 +185,111 @@ export class KeyboardNavigationDirective {
 
   protected onKeydown(event: KeyboardEvent) {
     const target = event.composedPath()[0];
-    // Only the container and library wrappers issue viewport commands; embedded content keeps its own keys.
-    // Browser shortcuts such as Ctrl+Plus survive because a binding that names no modifier requires none.
     if (
       event.defaultPrevented ||
       !(target instanceof Element) ||
-      (target !== this.element && !this.entities().some((entity) => entity.element === target)) ||
-      target.closest('[data-vflow-no-keyboard]')
+      target !== this.element.ownerDocument.activeElement ||
+      target.closest('[data-vflow-no-keyboard]') ||
+      target.closest('input, textarea, select, [contenteditable]:not([contenteditable="false"])') ||
+      // A key held as a gesture modifier (for example Space for panning) belongs to the gesture layer.
+      this.keyboard.isModifierKey(event)
     )
       return;
 
-    const direction = DIRECTIONS.find((entry) => this.keyboard.isCommand(entry.pan, event));
-    if (direction) {
+    // Embedded application content keeps its own keys: only a library wrapper and the container issue commands.
+    const entity = this.entities().find((candidate) => candidate.element === target);
+    const origin: KeyboardCommandScope | null = entity ? 'entity' : target === this.element ? 'container' : null;
+    if (!origin || (entity && !entity.vflowKeyboardEntity().focusable())) return;
+    const model = entity?.vflowKeyboardEntity() ?? null;
+
+    for (const command of this.commands) {
+      if (command.scope !== 'both' && command.scope !== origin) continue;
+      if (!this.keyboard.isCommand(command.name, event)) continue;
+      // Auto-repeat holds the key for its command while only the repeating ones run again.
+      if (!(event.repeat && !command.repeat) && !command.run(model, event)) continue;
       event.preventDefault();
-      const { vector } = direction;
-      const { x, y } = this.viewport.readableViewport();
-      const step = PAN_STEP * (event.shiftKey ? 4 : 1);
-      // Arrows scroll the view: pressing right reveals what lies to the right, so the content moves left.
-      this.viewport.writableViewport.set({
-        changeType: 'absolute',
-        state: { x: x - vector.x * step, y: y - vector.y * step },
-        duration: 0,
-      });
+      event.stopPropagation();
       return;
     }
+  }
 
+  private runSelect(model: NodeModel | EdgeModel | null, select: boolean) {
+    if (!model) return false;
     const labels = this.settings.ariaLabels();
-    if (this.keyboard.isCommand('zoomIn', event) || this.keyboard.isCommand('zoomOut', event)) {
-      event.preventDefault();
-      const direction = this.keyboard.isCommand('zoomIn', event) ? 1 : -1;
-      const zoom = Math.min(
-        this.settings.maxZoom(),
-        Math.max(this.settings.minZoom(), this.viewport.readableViewport().zoom * ZOOM_STEP ** direction),
+    const changed = this.selection.selectFromKeyboard(
+      select ? model : null,
+      this.keyboard.isActiveModifier('multiSelection'),
+    );
+    if (changed) {
+      this.announcer.announce(
+        select
+          ? labels.selectionAnnouncement({
+              label: model.accessibility().label,
+              selected: model.selected(),
+              count: this.flowEntities.entities().filter((entity) => entity.selected()).length,
+            })
+          : labels.selectionClearedAnnouncement,
       );
-      this.viewport.writableViewport.set({ changeType: 'absolute', state: { zoom }, duration: 0 });
-      this.announcer.announce(labels.zoomAnnouncement(zoom));
-    } else if (this.keyboard.isCommand('fitView', event)) {
-      event.preventDefault();
-      if (event.repeat) return;
-      const state = this.viewport.fitView({ padding: 0.1, duration: 0 });
-      if (state) this.announcer.announce(labels.zoomAnnouncement(state.zoom));
     }
+    return true;
+  }
+
+  private runDelete(model: NodeModel | EdgeModel | null) {
+    if (!model) return false;
+    // The command acts at the point of focus: the whole selection when the focused entity belongs to it,
+    // otherwise only the focused entity, so a stale selection elsewhere is never deleted by surprise.
+    const target = (entity: NodeModel | EdgeModel) => (model.selected() ? entity.selected() : entity === model);
+    this.keyboard.deleteRequest$.next({
+      nodeIds: this.flowEntities
+        .nodes()
+        .filter(target)
+        .map((node) => node.rawNode.id),
+      edgeIds: this.flowEntities
+        .edges()
+        .filter(target)
+        .map((edge) => edge.edge.id),
+    });
+    return true;
+  }
+
+  private runMove(model: NodeModel | EdgeModel | null, direction: (typeof DIRECTIONS)[number], event: KeyboardEvent) {
+    // An arrow that moves nothing is declined, so the same key pans the view instead.
+    if (!(model instanceof NodeModel) || !model.selected() || !model.draggable()) return false;
+    const moved = this.draggable.moveSelected(model, direction.vector, event.shiftKey);
+    if (moved.length > 0) {
+      const { x, y } = model.point();
+      const labels = this.settings.ariaLabels();
+      this.announcer.announce(labels.movedAnnouncement({ count: moved.length, direction: direction.name, x, y }));
+    }
+    return true;
+  }
+
+  private runPan(direction: (typeof DIRECTIONS)[number], event: KeyboardEvent) {
+    const { x, y } = this.viewport.readableViewport();
+    const step = PAN_STEP * (event.shiftKey ? 4 : 1);
+    // Arrows scroll the view: pressing right reveals what lies to the right, so the content moves left.
+    this.viewport.writableViewport.set({
+      changeType: 'absolute',
+      state: { x: x - direction.vector.x * step, y: y - direction.vector.y * step },
+      duration: 0,
+    });
+    return true;
+  }
+
+  private runZoom(step: 1 | -1) {
+    const zoom = Math.min(
+      this.settings.maxZoom(),
+      Math.max(this.settings.minZoom(), this.viewport.readableViewport().zoom * ZOOM_STEP ** step),
+    );
+    this.viewport.writableViewport.set({ changeType: 'absolute', state: { zoom }, duration: 0 });
+    this.announcer.announce(this.settings.ariaLabels().zoomAnnouncement(zoom));
+    return true;
+  }
+
+  private runFitView() {
+    const state = this.viewport.fitView({ padding: 0.1, duration: 0 });
+    if (state) this.announcer.announce(this.settings.ariaLabels().zoomAnnouncement(state.zoom));
+    return true;
   }
 
   protected onFocusIn(event: FocusEvent) {

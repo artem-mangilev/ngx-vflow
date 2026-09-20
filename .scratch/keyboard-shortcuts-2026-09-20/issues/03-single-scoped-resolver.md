@@ -1,6 +1,6 @@
 # Resolve every key press through one scoped dispatcher
 
-Status: needs-triage
+Status: resolved
 Tier: 3.0-breaking
 Depends on: 01, 02
 
@@ -24,3 +24,20 @@ Dispatch is split between `KeyboardEntityDirective` (select, clear, delete, move
 - A test remaps `panRight` to `moveRight`'s key and verifies that a selected movable node moves while an edge pans, proving order and fall-through.
 - A test binds a command to a reserved modifier key and verifies the dev-mode warning and that the modifier wins.
 - Both directives lose their keydown handlers; `KeyboardEntityDirective` keeps focus, tabindex and description; `KeyboardNavigationDirective` keeps focus recovery and hosts the single listener.
+
+## Comments
+
+- 2026-09-20: Implemented. `KeyboardEntityDirective` lost its keydown handler and keeps tabindex, focus auto-pan and
+  the description; `KeyboardNavigationDirective` hosts the only listener and carries the command registry as an
+  ordered array of `{ name, scope, repeat, run }`. `run` returns whether the command took the press, so `move*`
+  declining on an edge or an unselected node is what hands the key to `pan*`. The implicit rule and the
+  `stopPropagation` handshake between the two directives are gone.
+- A press is skipped before any command when its key is bound as a modifier, which replaces the old `hasShortcut`
+  check that only guarded selection. Editable targets and `[data-vflow-no-keyboard]` are filtered once, in the
+  dispatcher, rather than in each handler.
+- The blanket `ctrlKey || metaKey || altKey` guard stayed removed: exact modifier matching from issue 02 covers it.
+- Auto-repeat holds the key for its command while only `move*`, `pan*`, `zoomIn` and `zoomOut` run again, matching
+  what the two handlers did before.
+- Verified: 279 library tests, with every prior expectation unchanged; two were added, one proving the order and the
+  fall-through on a key shared by `moveRight` and `panRight`, the other proving that a key bound as a modifier never
+  reaches a command and that the overlap is reported. Full docs e2e 35 passed, lint clean.

@@ -620,6 +620,66 @@ describe('public keyboard graph navigation', () => {
     fixture.detectChanges();
   });
 
+  it('answers a press with the first command that can act on it, whatever key two commands share', async () => {
+    const { fixture, host, root } = await setup();
+    const settle = async () => {
+      fixture.detectChanges();
+      await fixture.whenStable();
+    };
+    const parent = root.querySelector<HTMLElement>('[aria-label="Parent"]')!;
+    const edge = root.querySelector<SVGElement>('[aria-label="Route"]')!;
+    host.flow().autoPanOnNodeFocus = false;
+    host.flow().keyboardShortcuts = { commands: { moveRight: ['d'], panRight: ['d'] } };
+    await settle();
+    // An edge can never move, so the shared key falls through to panning.
+    edge.focus();
+    expect(key(edge, 'd', 'KeyD').defaultPrevented).toBeTrue();
+    await settle();
+    expect(host.flow().viewport()).toEqual({ x: -15, y: 0, zoom: 1 });
+    // An unselected node cannot move either.
+    parent.focus();
+    key(parent, 'd', 'KeyD');
+    await settle();
+    expect(host.flow().viewport()).toEqual({ x: -30, y: 0, zoom: 1 });
+    expect(host.nodes()[1].point()).toEqual({ x: 20, y: 20 });
+    // Once it is selected and movable, movement comes first and the view stays put.
+    host.nodes()[1].selected.set(true);
+    await settle();
+    key(parent, 'd', 'KeyD');
+    await settle();
+    expect(host.nodes()[1].point()).toEqual({ x: 25, y: 20 });
+    expect(host.flow().viewport()).toEqual({ x: -30, y: 0, zoom: 1 });
+    // Each entry was replaced, so the arrow key now neither moves nor pans.
+    expect(key(parent, 'ArrowRight').defaultPrevented).toBeFalse();
+    await settle();
+    expect(host.nodes()[1].point()).toEqual({ x: 25, y: 20 });
+    expect(host.flow().viewport()).toEqual({ x: -30, y: 0, zoom: 1 });
+  });
+
+  it('keeps a key bound as a modifier out of the commands and reports the overlap', async () => {
+    const { fixture, host, root } = await setup();
+    const settle = async () => {
+      fixture.detectChanges();
+      await fixture.whenStable();
+    };
+    const requests: { nodeIds: string[]; edgeIds: string[] }[] = [];
+    const subscription = host.flow().deleteRequest.subscribe((request) => requests.push(request));
+    const warn = spyOn(console, 'warn');
+    host.flow().keyboardShortcuts = { modifiers: { selection: ['q'] }, commands: { delete: ['q'] } };
+    await settle();
+    expect(warn).toHaveBeenCalledWith(jasmine.stringContaining('commands.delete and modifiers.selection share a key'));
+    const child = root.querySelector<HTMLElement>('[aria-label="Child"]')!;
+    child.focus();
+    expect(key(child, 'q', 'KeyQ').defaultPrevented).toBeFalse();
+    expect(requests).toEqual([]);
+    // Releasing the key from the modifier hands it back to the command, which proves what blocked it.
+    host.flow().keyboardShortcuts = { modifiers: { selection: [] } };
+    await settle();
+    expect(key(child, 'q', 'KeyQ').defaultPrevented).toBeTrue();
+    expect(requests).toEqual([{ nodeIds: ['child'], edgeIds: [] }]);
+    subscription.unsubscribe();
+  });
+
   it('does not restore stale graph focus after focus has left the graph', async () => {
     const { fixture, host, root } = await setup();
     root.querySelector<HTMLElement>('[aria-label="Child"]')!.focus();

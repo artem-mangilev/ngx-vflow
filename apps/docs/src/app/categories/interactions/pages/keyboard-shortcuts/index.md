@@ -24,7 +24,7 @@ Keyboard shortcuts come in two kinds. **Modifiers** change what a pointer gestur
 | `zoomOut`                                     | `-`, `NumpadSubtract` | a focused entity or the graph container     |
 | `fitView`                                     | `0`, `Numpad0`        | a focused entity or the graph container     |
 
-An arrow key moves a node when the focused node is selected and movable, and pans the view otherwise. `Shift` makes movement and panning four times faster; that multiplier is fixed.
+When two commands share a key, the one listed first takes it, and a command that cannot act on the press leaves the key to the next one. That is why an arrow moves a node while the focused node is selected and movable, and pans the view otherwise. `Shift` makes movement and panning four times faster; that multiplier is fixed. Holding a key repeats movement, panning and zooming, while selection, deletion and fit view run once per press.
 
 # Binding grammar
 

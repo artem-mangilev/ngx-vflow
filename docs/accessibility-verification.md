@@ -102,3 +102,15 @@ The user requested rolling back issue 11 after evaluating its interaction design
   does not block `select`, so holding it still toggles the focused entity.
 - Verified by 277 library tests, including a parser and matcher spec, and by the full docs e2e suite of 35. No new
   screen-reader session was run.
+
+## One dispatcher for keyboard commands — 2026-09-20
+
+- Every key press in the graph is now resolved in one place. The container directive holds an ordered registry of
+  commands, each with the origin it accepts (a focused entity, the container, or either) and whether holding the key
+  repeats it. The first command that carries the key and can act on the press takes it; one that cannot, such as
+  movement on an edge, leaves the key to the next, which is how the same arrow pans the view.
+- A key bound as a gesture modifier is skipped before any command runs, and editable targets and `vflowNoKeyboard`
+  regions are filtered once for every command rather than per handler.
+- No keyboard behavior changed: all previous library expectations pass unchanged. Two tests were added for the
+  command order and for the reserved modifier. 279 library tests and 35 e2e passed. No new screen-reader session was
+  run.
