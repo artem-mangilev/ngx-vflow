@@ -10,14 +10,13 @@ function parse(binding: string) {
 
 describe('public keyboard binding grammar', () => {
   it('reads modifiers, keys, the space alias and physical codes without regard to case', () => {
-    expect(parseBinding('Enter')).toEqual({ key: 'enter', code: false, modifiers: [], mod: false });
-    expect(parseBinding('Space')).toEqual({ key: ' ', code: false, modifiers: [], mod: false });
-    expect(parseBinding(' ')).toEqual({ key: ' ', code: false, modifiers: [], mod: false });
-    expect(parseBinding('code:Space')).toEqual({ key: 'space', code: true, modifiers: [], mod: false });
-    expect(parseBinding('MOD+shift+A')).toEqual({ key: 'a', code: false, modifiers: ['shift'], mod: true });
-    expect(parseBinding('+')).toEqual({ key: '+', code: false, modifiers: [], mod: false });
-    expect(parseBinding('Shift++')).toEqual({ key: '+', code: false, modifiers: ['shift'], mod: false });
-    expect(parseBinding('Mod+code:KeyS')).toEqual({ key: 'keys', code: true, modifiers: [], mod: true });
+    expect(parseBinding('Enter')).toEqual({ key: 'enter', modifiers: [], mod: false });
+    expect(parseBinding(' ')).toEqual({ key: ' ', modifiers: [], mod: false });
+    expect(parseBinding('Space')).toEqual({ key: 'space', modifiers: [], mod: false });
+    expect(parseBinding('MOD+shift+A')).toEqual({ key: 'a', modifiers: ['shift'], mod: true });
+    expect(parseBinding('+')).toEqual({ key: '+', modifiers: [], mod: false });
+    expect(parseBinding('Shift++')).toEqual({ key: '+', modifiers: ['shift'], mod: false });
+    expect(parseBinding('Mod+KeyS')).toEqual({ key: 'keys', modifiers: [], mod: true });
   });
 
   it('rejects a binding that names anything but a modifier before its key', () => {
@@ -36,7 +35,7 @@ describe('public keyboard binding grammar', () => {
     expect(matchesBindingKey(parse('Mod'), event({ key: 'Meta', metaKey: true }), true)).toBeTrue();
     expect(matchesBindingKey(parse('Mod'), event({ key: 'Meta', metaKey: true }), false)).toBeFalse();
     expect(matchesBindingKey(parse('Mod'), event({ key: 'Control', ctrlKey: true }), false)).toBeTrue();
-    expect(matchesBindingKey(parse('code:MetaRight'), event({ key: 'Meta', code: 'MetaRight' }))).toBeTrue();
+    expect(matchesBindingKey(parse('MetaRight'), event({ key: 'Meta', code: 'MetaRight' }))).toBeTrue();
   });
 
   it('checks Control, Meta and Alt exactly and leaves Shift free unless the binding names it', () => {
@@ -57,12 +56,16 @@ describe('public keyboard binding grammar', () => {
     expect(matchesBinding(zero, event({ key: '0' }), { ignoreModifiers: ['meta'] })).toBeTrue();
   });
 
-  it('compares a code binding against the physical key and a key binding against the character', () => {
-    expect(matchesBinding(parse('code:NumpadAdd'), event({ key: '+', code: 'NumpadAdd' }))).toBeTrue();
+  it('accepts a binding that names the character and one that names the physical key', () => {
     // The same character reached from two layout positions, and the same position giving another character.
     expect(matchesBinding(parse('+'), event({ key: '+', code: 'BracketRight' }))).toBeTrue();
     expect(matchesBinding(parse('+'), event({ key: '+', code: 'Equal', shiftKey: true }))).toBeTrue();
     expect(matchesBinding(parse('='), event({ key: '+', code: 'Equal', shiftKey: true }))).toBeFalse();
-    expect(matchesBinding(parse('code:Equal'), event({ key: '+', code: 'Equal' }))).toBeTrue();
+    // A code name matches the position whatever the character is, which is how a keypad key is named.
+    expect(matchesBinding(parse('NumpadAdd'), event({ key: '+', code: 'NumpadAdd' }))).toBeTrue();
+    expect(matchesBinding(parse('Numpad0'), event({ key: 'Insert', code: 'Numpad0' }))).toBeTrue();
+    expect(matchesBinding(parse('Equal'), event({ key: '+', code: 'Equal', shiftKey: true }))).toBeTrue();
+    expect(matchesBinding(parse('Space'), event({ key: ' ', code: 'Space' }))).toBeTrue();
+    expect(matchesBinding(parse(' '), event({ key: ' ', code: 'Space' }))).toBeTrue();
   });
 });

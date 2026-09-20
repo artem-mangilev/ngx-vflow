@@ -91,9 +91,10 @@ The user requested rolling back issue 11 after evaluating its interaction design
 
 ## Layout-independent shortcut keys — 2026-09-20
 
-- Shortcut bindings moved from `KeyboardEvent.code` to `KeyboardEvent.key`, with `Mod` for the platform primary
-  modifier and a `code:` prefix for a physical key. `zoomIn` is now `+`, `=` and `code:NumpadAdd`, so zooming works on
-  a layout that does not put those characters where a US keyboard does. A Playwright test zooms from `+` on
+- A shortcut binding may name the character a layout produces or the physical key, and matches when either value of
+  the event equals it, the rule tinykeys uses; `Mod` covers the platform primary modifier. `zoomIn` is now `+`, `=`
+  and `NumpadAdd`, so zooming works on a layout that does not put those characters where a US keyboard does, while
+  every previous code spelling keeps working. A Playwright test zooms from `+` on
   `BracketRight` and `-` on `Slash`, the German layout positions.
 - Control, Meta and Alt are matched exactly, which keeps browser and system shortcuts such as `Ctrl+0` working and
   replaces the blanket modifier guard the container directive used to carry. Shift stays free unless a binding names

@@ -13,32 +13,31 @@ Keyboard shortcuts come in two kinds. **Modifiers** change what a pointer gestur
 
 ## Commands
 
-| Entry                                         | Default key                | Runs on                                     |
-| --------------------------------------------- | -------------------------- | ------------------------------------------- |
-| `select`                                      | `Enter`, `Space`           | a focused node or edge                      |
-| `clearSelection`                              | `Escape`                   | a focused node or edge                      |
-| `delete`                                      | `Delete`, `Backspace`      | a focused node or edge                      |
-| `moveUp`, `moveDown`, `moveLeft`, `moveRight` | the arrow keys             | a focused node that is selected and movable |
-| `panUp`, `panDown`, `panLeft`, `panRight`     | the arrow keys             | a focused entity or the graph container     |
-| `zoomIn`                                      | `+`, `=`, `code:NumpadAdd` | a focused entity or the graph container     |
-| `zoomOut`                                     | `-`, `code:NumpadSubtract` | a focused entity or the graph container     |
-| `fitView`                                     | `0`, `code:Numpad0`        | a focused entity or the graph container     |
+| Entry                                         | Default key           | Runs on                                     |
+| --------------------------------------------- | --------------------- | ------------------------------------------- |
+| `select`                                      | `Enter`, `Space`      | a focused node or edge                      |
+| `clearSelection`                              | `Escape`              | a focused node or edge                      |
+| `delete`                                      | `Delete`, `Backspace` | a focused node or edge                      |
+| `moveUp`, `moveDown`, `moveLeft`, `moveRight` | the arrow keys        | a focused node that is selected and movable |
+| `panUp`, `panDown`, `panLeft`, `panRight`     | the arrow keys        | a focused entity or the graph container     |
+| `zoomIn`                                      | `+`, `=`, `NumpadAdd` | a focused entity or the graph container     |
+| `zoomOut`                                     | `-`, `NumpadSubtract` | a focused entity or the graph container     |
+| `fitView`                                     | `0`, `Numpad0`        | a focused entity or the graph container     |
 
 An arrow key moves a node when the focused node is selected and movable, and pans the view otherwise. `Shift` makes movement and panning four times faster; that multiplier is fixed.
 
 # Binding grammar
 
-A binding is optional modifiers and one key, joined by `+`: `Enter`, `Mod+Shift+a`, `code:NumpadAdd`.
+A binding is optional modifiers and one key, joined by `+`: `Enter`, `Mod+Shift+a`, `NumpadAdd`.
 
 - Modifiers are `Mod`, `Control`, `Meta`, `Alt` and `Shift`, in any order. `Mod` is Meta on macOS and Control everywhere else, so one binding covers both platforms.
-- The key is a [`KeyboardEvent.key`](https://developer.mozilla.org/en-US/docs/Web/API/UI_Events/Keyboard_key_values) value: the character a layout produces (`a`, `+`, `0`) or the name of a key that produces none (`Enter`, `ArrowUp`, `Escape`). `Space` is an alias for the spacebar.
-- `code:` before the key matches a [physical key](https://www.w3.org/TR/uievents-code/#key-alphanumeric-section) instead: `code:KeyW`, `code:NumpadAdd`. Use it when you mean a position on the keyboard rather than a character.
+- The key is either a [`KeyboardEvent.key`](https://developer.mozilla.org/en-US/docs/Web/API/UI_Events/Keyboard_key_values) value, which names the character a layout produces (`a`, `+`, `0`) or a key that produces none (`Enter`, `ArrowUp`, `Escape`), or a [`KeyboardEvent.code`](https://www.w3.org/TR/uievents-code/#key-alphanumeric-section) value, which names a position on the keyboard (`KeyW`, `NumpadAdd`, `Digit0`). A binding runs when either value of the event equals it, so write whichever one you mean. `Space` and `' '` both reach the spacebar.
 - Keys and modifiers are compared without regard to case. The plus key is written `+`, and `Shift++` when it carries a modifier.
 - Control, Meta and Alt must match exactly. A binding that names none of them never runs while one of them is held, so browser and system shortcuts such as `Ctrl+0` keep working.
 - Shift is checked only when a binding names it, because Shift both accelerates movement and produces characters such as `+`.
 - The key bound as `multiSelection` never blocks `select`; that is how holding it turns selection into a toggle.
 
-Because a binding names the character, `zoomIn: ['+', '=']` works on a layout that puts those characters anywhere. Add `code:` entries for the numeric keypad, whose keys produce no character while Num Lock is off.
+Naming the character makes `zoomIn: ['+', '=']` work on a layout that puts those characters anywhere. Naming the position makes `fitView: ['0', 'Numpad0']` reach the keypad key even while Num Lock is off and it produces no character.
 
 # Customization
 

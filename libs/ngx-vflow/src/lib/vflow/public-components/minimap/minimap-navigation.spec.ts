@@ -141,7 +141,7 @@ describe('minimap navigation through the public viewport API', () => {
   it('gates pan by buttons, selection and activation keys, and supports single-pointer touch', async () => {
     host.pannable.set(true);
     flow.panOnDrag = [1];
-    flow.keyboardShortcuts = { modifiers: { panActivation: ['code:Space'] } };
+    flow.keyboardShortcuts = { modifiers: { panActivation: ['Space'] } };
     await settle();
     await click();
     expect(flow.viewport().x).toBe(0);
@@ -199,7 +199,7 @@ describe('minimap navigation through the public viewport API', () => {
     host.pannable.set(true);
     host.zoomable.set(true);
     flow.panOnScroll = true;
-    flow.keyboardShortcuts = { modifiers: { zoomActivation: ['code:KeyZ'] } };
+    flow.keyboardShortcuts = { modifiers: { zoomActivation: ['KeyZ'] } };
     await settle();
     await wheel(10, { deltaX: 5 });
     expect(flow.viewport()).toEqual({ x: -50, y: -100, zoom: 1 });

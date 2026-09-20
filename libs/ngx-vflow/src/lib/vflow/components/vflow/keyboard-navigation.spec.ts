@@ -394,7 +394,7 @@ describe('public keyboard graph navigation', () => {
     child.focus();
     key(child, 'Enter');
     expect(await spoken()).toBe('Child selected. 1 selected in total.');
-    host.flow().keyboardShortcuts = { modifiers: { multiSelection: ['code:AltLeft'] } };
+    host.flow().keyboardShortcuts = { modifiers: { multiSelection: ['AltLeft'] } };
     document.dispatchEvent(new KeyboardEvent('keydown', { code: 'AltLeft' }));
     parent.focus();
     key(parent, ' ');
@@ -590,7 +590,7 @@ describe('public keyboard graph navigation', () => {
         .split(/\s+/)
         .map((id) => document.getElementById(id)!.textContent)
         .join(' ');
-    host.flow().keyboardShortcuts = { commands: { select: ['s'] }, modifiers: { multiSelection: ['code:AltLeft'] } };
+    host.flow().keyboardShortcuts = { commands: { select: ['s'] }, modifiers: { multiSelection: ['AltLeft'] } };
     await settle();
     child.focus();
     // An entry is replaced, not extended.

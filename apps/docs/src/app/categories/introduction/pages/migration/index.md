@@ -384,17 +384,24 @@ too, so they can be remapped or disabled like the rest. The types `KeyboardActio
 | `{ zoomIn, zoomOut, fitView }`   | `{ commands: { zoomIn, zoomOut, fitView } }`     |
 | `{ selection: null }` to disable | `{ modifiers: { selection: [] } }`               |
 
-Keys are also spelled differently. A binding is now optional modifiers and one key joined by `+`, and the key is a
-`KeyboardEvent.key` value rather than a `KeyboardEvent.code`, so a binding follows the character a layout produces.
-`Mod` stands for Meta on macOS and Control elsewhere, and `code:` before the key returns to matching a physical key.
+Keys gained spellings rather than losing them. A binding is optional modifiers and one key joined by `+`, and the key
+may name a `KeyboardEvent.code` as before, or the `KeyboardEvent.key` character a layout produces; the event matches
+when either of its values equals the binding. Existing code names such as `ShiftLeft` or `NumpadAdd` therefore keep
+working, and the shorter spellings below are an option rather than a migration. `Mod` stands for Meta on macOS and
+Control elsewhere, which one binding could not express before.
 
-| Before                               | After                                        |
-| ------------------------------------ | -------------------------------------------- |
-| `['ShiftLeft', 'ShiftRight']`        | `['Shift']`                                  |
-| `['MetaLeft', 'ControlLeft']`        | `['Mod']`                                    |
-| `['Equal', 'NumpadAdd']` for zoom in | `['+', '=', 'code:NumpadAdd']`               |
-| `['Digit0', 'Numpad0']` for fit view | `['0', 'code:Numpad0']`                      |
-| `['KeyX']`                           | `['x']`, or `['code:KeyX']` for the position |
+| Before                               | After                                   |
+| ------------------------------------ | --------------------------------------- |
+| `['ShiftLeft', 'ShiftRight']`        | `['Shift']`                             |
+| `['MetaLeft', 'ControlLeft']`        | `['Mod']`                               |
+| `['Equal', 'NumpadAdd']` for zoom in | `['+', '=', 'NumpadAdd']`               |
+| `['Digit0', 'Numpad0']` for fit view | `['0', 'Numpad0']`                      |
+| `['KeyX']`                           | `['x']` to follow the character instead |
+
+What did change is how modifiers are read. Control, Meta and Alt must now match exactly, so a command bound without
+them no longer runs while one of them is held: browser shortcuts such as `Ctrl+0` keep working, and a binding may name
+a modifier itself, as in `Mod+0`. Shift is checked only when a binding names it, so accelerated movement with
+`Shift` and characters such as `+` still reach their commands.
 
 ### Removed APIs
 

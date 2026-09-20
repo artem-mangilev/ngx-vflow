@@ -11,7 +11,7 @@ Bindings match `KeyboardEvent.code` only. The defaults `Equal` and `Minus` name 
 ## Required behavior
 
 - Binding grammar: `[<Modifier>+]*<Key>`. Modifier tokens: `Mod`, `Control`, `Meta`, `Alt`, `Shift` (case-insensitive, any order). `Mod` resolves to `Meta` on macOS and `Control` elsewhere.
-- Key tokens: `KeyboardEvent.key` values (`Delete`, `ArrowUp`, `Enter`, `' '` or `Space`, `+`, `=`, `-`, `0`, letters). Single characters compare case-insensitively. `code:<code>` compares `KeyboardEvent.code` instead (`code:Space`, `code:KeyW`, `code:NumpadAdd`).
+- Key tokens: a `KeyboardEvent.key` value (`Delete`, `ArrowUp`, `Enter`, `' '`, `+`, `=`, `-`, `0`, letters) or a `KeyboardEvent.code` value (`Space`, `KeyW`, `NumpadAdd`); the event matches when either of its values equals the token. Everything compares case-insensitively.
 - Modifiers must match exactly: an unspecified modifier must be released. On macOS, a binding with `Mod` also accepts `metaKey` when the OS reports `ctrlKey` false; a binding with `Meta` and one with `Mod` are equivalent there.
 - Modifier entries (`modifiers` section) name modifier keys themselves (`'Shift'`, `'Mod'`, `'code:Space'`); they are matched on keydown/keyup by `key` or `code` the same way and must not carry other modifiers.
 - Defaults: `selection: ['Shift']`, `multiSelection: ['Mod']`, `panActivation: []`, `zoomActivation: []`, `select: ['Enter', 'Space']`, `clearSelection: ['Escape']`, `delete: ['Delete', 'Backspace']`, `moveUp: ['ArrowUp']` and the other three arrows, `panUp: ['ArrowUp']` and the other three, `zoomIn: ['+', '=', 'code:NumpadAdd']`, `zoomOut: ['-', 'code:NumpadSubtract']`, `fitView: ['0', 'code:Numpad0']`.
@@ -41,5 +41,10 @@ Bindings match `KeyboardEvent.code` only. The defaults `Equal` and `Minus` name 
   carry and makes a modifier chord expressible for the first time.
 - Modifier entries name one held key and constrain nothing else; the service tracks presses as a map of code to key,
   so `['Shift']` covers both physical Shift keys and `['Mod']` covers the platform primary.
+- On review the user replaced the `code:` prefix with the tinykeys rule: a token is compared against both
+  `KeyboardEvent.key` and `KeyboardEvent.code`, so `NumpadAdd` names a position and `+` names a character without a
+  marker. No library uses a `code:` prefix; the precedents are VS Code's `[ScanCode]` brackets and tinykeys' bare code
+  names. This also makes every pre-3.0 code spelling keep working, so the only real change in this issue is the
+  modifier semantics, and the `Space` alias became unnecessary.
 - Verified: 277 library tests including a new parser and matcher spec; full docs e2e 35 passed, including a new test
   that zooms from `+` on `BracketRight` and `-` on `Slash`, the German layout positions. ESLint and Prettier clean.

@@ -10,6 +10,7 @@ import {
   bindingModifierFlag,
   canonicalBinding,
   matchesBinding,
+  matchesBindingKey,
   parseBinding,
   resolveBindingKey,
 } from '../utils/keyboard-binding';
@@ -62,9 +63,9 @@ function defaultShortcuts(): RawShortcuts {
       panDown: ['ArrowDown'],
       panLeft: ['ArrowLeft'],
       panRight: ['ArrowRight'],
-      zoomIn: ['+', '=', 'code:NumpadAdd'],
-      zoomOut: ['-', 'code:NumpadSubtract'],
-      fitView: ['0', 'code:Numpad0'],
+      zoomIn: ['+', '=', 'NumpadAdd'],
+      zoomOut: ['-', 'NumpadSubtract'],
+      fitView: ['0', 'Numpad0'],
     },
   };
 }
@@ -226,7 +227,7 @@ export class KeyboardService {
     const wanted = resolveBindingKey(binding, this.mac);
     for (const [code, key] of this.pressed) {
       if (gestureOnly && !this.gesture.has(code)) continue;
-      if ((binding.code ? code : key) === wanted) return true;
+      if (key === wanted || code === wanted) return true;
     }
     return false;
   }
@@ -260,10 +261,8 @@ export class KeyboardService {
 
   /** Whether the pressed key is bound as a modifier, so entity commands leave it to the gesture layer. */
   public isModifierKey(event: KeyboardEvent) {
-    const key = event.key?.toLowerCase();
-    const code = event.code?.toLowerCase();
     return Object.values(this.state().modifiers).some((bindings) =>
-      bindings.some((binding) => (binding.code ? code : key) === resolveBindingKey(binding, this.mac)),
+      bindings.some((binding) => matchesBindingKey(binding, event, this.mac)),
     );
   }
 

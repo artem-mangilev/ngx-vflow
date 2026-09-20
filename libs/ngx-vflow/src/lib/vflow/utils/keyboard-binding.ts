@@ -5,10 +5,8 @@ export type KeyboardModifierFlag = 'control' | 'meta' | 'alt' | 'shift';
 
 /** A shortcut binding split into its modifiers and its key, ready to compare against a keyboard event. */
 export interface ParsedBinding {
-  /** Lowercased key or code. `mod` stands for the primary modifier of the platform. */
+  /** Lowercased key, compared against both `KeyboardEvent.key` and `KeyboardEvent.code` of the event. */
   key: string;
-  /** Compare `key` against `KeyboardEvent.code` rather than `KeyboardEvent.key`. */
-  code: boolean;
   /** Modifiers the event must carry, besides the primary one when `mod` is set. */
   modifiers: KeyboardModifierFlag[];
   /** The binding named `Mod`, which resolves to Meta on macOS and Control elsewhere. */
@@ -54,10 +52,11 @@ function onMac(mac?: boolean) {
 }
 
 /**
- * Reads `[<Modifier>+]*<Key>`, for example `Enter`, `Mod+Shift+a`, `+` or `code:NumpadAdd`. Modifier tokens are
- * `Mod`, `Control`, `Meta`, `Alt` and `Shift`; the key is a `KeyboardEvent.key` value, `Space` for the spacebar, or
- * a `KeyboardEvent.code` value behind `code:`. Everything is compared without case. Returns `null` for a binding
- * that names something other than a modifier before its key.
+ * Reads `[<Modifier>+]*<Key>`, for example `Enter`, `Mod+Shift+a`, `+` or `NumpadAdd`. Modifier tokens are `Mod`,
+ * `Control`, `Meta`, `Alt` and `Shift`. The key is either a `KeyboardEvent.key` value, which names the character a
+ * layout produces, or a `KeyboardEvent.code` value, which names a position on the keyboard; the event matches when
+ * either of its own values equals it. Everything is compared without case. Returns `null` for a binding that names
+ * something other than a modifier before its key.
  */
 export function parseBinding(binding: string): ParsedBinding | null {
   if (typeof binding !== 'string') return null;
@@ -88,28 +87,25 @@ export function parseBinding(binding: string): ParsedBinding | null {
     else if (!modifiers.includes(flag)) modifiers.push(flag);
   }
 
-  const code = /^code:/i.test(rawKey);
-  let key = (code ? rawKey.slice('code:'.length) : rawKey).toLowerCase();
+  const key = rawKey.toLowerCase();
   if (!key) return null;
-  if (!code && key === 'space') key = ' ';
 
-  return { key, code, modifiers, mod };
+  return { key, modifiers, mod };
 }
 
-/** The key or code the binding compares against, with `Mod` resolved for the platform. */
+/** The key the binding compares against, with `Mod` resolved for the platform. */
 export function resolveBindingKey(binding: ParsedBinding, mac?: boolean): string {
   if (binding.key !== 'mod') return binding.key;
-  const primary = onMac(mac) ? 'meta' : 'control';
-  return binding.code ? `${primary}left` : primary;
+  return onMac(mac) ? 'meta' : 'control';
 }
 
-/** Whether the event carries the key of the binding, ignoring every modifier. */
+/**
+ * Whether the event carries the key of the binding, ignoring every modifier. The binding names either the character
+ * or the physical key, so both values of the event are compared against it.
+ */
 export function matchesBindingKey(binding: ParsedBinding, event: KeyboardEvent, mac?: boolean): boolean {
-  const actual = (binding.code ? event.code : event.key)?.toLowerCase();
-  if (actual === undefined) return false;
-  if (binding.key !== 'mod') return actual === binding.key;
-  const flag = MODIFIER_KEYS[actual];
-  return flag === (onMac(mac) ? 'meta' : 'control');
+  const wanted = resolveBindingKey(binding, mac);
+  return event.key?.toLowerCase() === wanted || event.code?.toLowerCase() === wanted;
 }
 
 /**
@@ -150,5 +146,5 @@ export function bindingModifierFlag(binding: ParsedBinding, mac?: boolean): Keyb
 export function canonicalBinding(binding: ParsedBinding): string {
   const modifiers = [...binding.modifiers].sort();
   if (binding.mod) modifiers.unshift('mod' as KeyboardModifierFlag);
-  return `${modifiers.join('+')}|${binding.code ? 'code:' : ''}${binding.key}`;
+  return `${modifiers.join('+')}|${binding.key}`;
 }
