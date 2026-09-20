@@ -15,7 +15,7 @@ Bindings match `KeyboardEvent.code` only. The defaults `Equal` and `Minus` name 
 - Modifiers must match exactly: an unspecified modifier must be released. On macOS, a binding with `Mod` also accepts `metaKey` when the OS reports `ctrlKey` false; a binding with `Meta` and one with `Mod` are equivalent there.
 - Modifier entries (`modifiers` section) name modifier keys themselves (`'Shift'`, `'Mod'`, `'code:Space'`); they are matched on keydown/keyup by `key` or `code` the same way and must not carry other modifiers.
 - Defaults: `selection: ['Shift']`, `multiSelection: ['Mod']`, `panActivation: []`, `zoomActivation: []`, `select: ['Enter', 'Space']`, `clearSelection: ['Escape']`, `delete: ['Delete', 'Backspace']`, `moveUp: ['ArrowUp']` and the other three arrows, `panUp: ['ArrowUp']` and the other three, `zoomIn: ['+', '=', 'code:NumpadAdd']`, `zoomOut: ['-', 'code:NumpadSubtract']`, `fitView: ['0', 'code:Numpad0']`.
-- A pure parser `parseBinding(binding): ParsedBinding` and matcher `matchesBinding(parsed, event, platform)` in `utils/`, exported for application use.
+- A pure parser `parseBinding(binding): ParsedBinding` and matcher `matchesBinding(parsed, event, platform)` in `utils/`, kept internal to the library.
 - Dev-mode warnings: unknown modifier token, a binding with two non-modifier keys, the same binding in two entries of different sections.
 - Browser shortcuts stay untouched: a command binding without modifiers never fires while `ctrlKey`, `metaKey` or `altKey` is held; bindings that name those modifiers do fire and `preventDefault`.
 
@@ -28,9 +28,9 @@ Bindings match `KeyboardEvent.code` only. The defaults `Equal` and `Minus` name 
 ## Comments
 
 - 2026-09-20: Implemented in `utils/keyboard-binding.ts`: `parseBinding`, `matchesBinding`, plus `matchesBindingKey`,
-  `resolveBindingKey`, `bindingModifierFlag` and `canonicalBinding` for the service. `parseBinding` and
-  `matchesBinding` are exported from the public API together with `ParsedBinding`, `KeyboardModifierFlag` and
-  `MatchBindingOptions`.
+  `resolveBindingKey`, `bindingModifierFlag` and `canonicalBinding` for the service. On review the user asked to keep
+  the grammar out of the public API, so none of these are exported from `public-api.ts`; the public surface stays
+  `KeyboardShortcuts` and its two name unions. A consumer configures keys, it does not match them.
 - `matchesBinding(binding, event, options)` takes `{ mac, ignoreModifiers }` rather than a bare platform argument, so
   the caller can also tolerate a modifier. The service uses that for one documented case: the key bound as
   `multiSelection` does not block `select`, which is how holding it turns selection into a toggle.

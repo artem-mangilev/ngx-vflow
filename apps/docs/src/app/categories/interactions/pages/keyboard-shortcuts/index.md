@@ -68,5 +68,3 @@ In the following example `selection` is remapped from `Shift` to `Alt` and `mult
 {{ NgDocActions.demoPane("KeyboardShortcutsDemoComponent") }}
 
 `panActivation` and `zoomActivation` are opt-in. Ordinary pan and zoom gestures keep their defaults while these entries are empty. See [Viewport gestures](../viewport-gestures) for priorities, embedded controls, and complete gesture disabling, and [Accessibility](../accessibility) for what each command does and announces.
-
-`parseBinding` and `matchesBinding` are exported, so an application that recognizes the same keys elsewhere can reuse the grammar instead of reimplementing it.
