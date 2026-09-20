@@ -1,15 +1,15 @@
-Nodes without ports: a connection starts anywhere on a node and ends anywhere on another one, and edges leave and enter nodes through their borders wherever the other node is. The node title drags the node.
+Nodes without ports: a connection starts anywhere on a node and ends anywhere on another one, and edges meet the nodes on the side facing the other node, or at the center. The node title drags the node.
 
 {{ NgDocActions.demoPane("EasyConnectDemoComponent") }}
 
 ## The node is the handle
 
-The root element of the node presentation carries `vflowHandle` with `layout="manual"`, so the directive writes no styles and the whole card starts connections. Dragging the node needs its own surface: an element with `dragHandle` inside the handle keeps dragging the node, and everywhere else a press starts a connection. The `id` is the node id, because the `loose` connection mode needs a handle id on both ends.
+The root element of the node presentation carries `vflowHandle` with `handleType="any"`, so the whole card starts and accepts connections in either direction, and `position="auto"`, so every edge meets the node on the side that faces the other end. Dragging the node needs its own surface: an element with `dragHandle` inside the handle keeps dragging the node, and everywhere else a press starts a connection.
 
 {% raw %}
 
 ```html
-<div class="easy-node" vflowHandle handleType="source" layout="manual" [id]="ctx.node.id">
+<div class="easy-node" vflowHandle handleType="any" position="auto">
   <div class="easy-node__title" dragHandle>{{ ctx.data().title }}</div>
   <div class="easy-node__body">Drag from here to connect</div>
 </div>
@@ -17,31 +17,10 @@ The root element of the node presentation carries `vflowHandle` with `layout="ma
 
 {% endraw %}
 
-While a connection is in progress the handle element itself is a drop zone: the node under the pointer becomes the candidate, and the node the connection started from carries `data-vflow-handle-state="connecting"`. Plain CSS styles both.
+While a connection is in progress the handle element itself is the drop zone: the node under the pointer becomes the candidate, and the node the connection started from carries `data-vflow-handle-state="connecting"`. Plain CSS styles both. No connection settings are needed beyond the marker of the preview line.
 
-## Edges through the borders
+## Border or center
 
-A handle has a fixed side, so an edge between whole-node handles would always leave through the same border. A custom curve computes its own endpoints instead: `getFloatingEdgeParams` takes the geometry of both nodes, which every curve factory receives as `sourceNode` and `targetNode`, and returns the points where the segment between the node centers crosses the borders, with the sides for the bezier control points. `markerInset` keeps the arrow tip on the border.
+`position="auto"` takes the middle of the side facing the other node, which works with every built-in curve, including the stepped ones, and keeps arrow markers visible. `position="center"` runs edges to the node center, the look of force-directed graphs; the edge layer lies under the nodes, so markers are hidden there. The demo switches between both.
 
-```ts
-const floatingCurve: CurveFactory = (params) => {
-  if (params.targetNode) {
-    return getBezierPath(getFloatingEdgeParams(params.sourceNode, params.targetNode, { inset: params.markerInset }));
-  }
-
-  // The connection preview follows the pointer, which is already moved by the marker inset.
-  const pointer = { ...params.targetPoint, width: 0, height: 0 };
-
-  return getBezierPath(getFloatingEdgeParams(params.sourceNode, pointer, { inset: { start: params.markerInset.start } }));
-};
-```
-
-The same factory serves the edges, through `curve` of each edge, and the connection preview, through `curve` of `ConnectionSettings`. Nodes of other shapes need their own border function; the utility handles rectangles.
-
-## Settings
-
-```ts
-connection: ConnectionSettings = { mode: 'loose', curve: floatingCurve, marker: { type: 'arrow-closed' } };
-```
-
-With one handle per node there is one edge per pair of nodes and no distinct ports; use handles with `position` for typed inputs and outputs.
+For endpoints on the exact crossing of the line between the node centers, or for nodes of other shapes, write a custom curve: every curve factory receives `sourceNode`, `targetNode` and `markerInset`, and `getFloatingEdgeParams` computes the crossing for rectangles.

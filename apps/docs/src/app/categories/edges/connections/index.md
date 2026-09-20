@@ -4,15 +4,15 @@ Edges are not created automatically. To create a new edge, follow these steps:
 2. This handler accepts a `Connection` argument. `Connection` is similar to an `Edge`, but it doesn't exist in the flow yet—you need to "convert" it into a new `Edge`
 3. Give the edge an ID and pass it to `addEdges` with the application-owned collections
 
-## Strict connections
+## Typed handles
 
-In the default `'strict'` `mode` of `ConnectionSettings`, edges are created from connections with strict adherence to the `source` and `target` types of the `vflowHandle` directive. This means connections can only be established in one direction based on these properties.
+Edges run from a `source` handle to a `target` handle: a connection dragged the other way round is reversed, and two handles of the same type do not connect.
 
 {{ NgDocActions.demoPane("DefaultConnectionDemoComponent") }}
 
-## Loose connections
+## Handles of type `any`
 
-This is the `'loose'` `mode` of `ConnectionSettings`, where the flow ignores the `handleType` and allows any handle to connect with any other handle. In this mode, an `id` must be provided for each `vflowHandle` to function correctly.
+A handle with `handleType="any"` connects to any other handle in either direction, and the edge keeps the direction of the gesture. Give such handles a `handleId` when a node has several, so that the edge refers to the right one.
 
 {{ NgDocActions.demoPane("LooseConnectionDemoComponent") }}
 

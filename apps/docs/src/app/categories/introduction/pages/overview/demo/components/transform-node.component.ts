@@ -26,7 +26,7 @@ import { Node, Vflow, injectNode } from 'ngx-vflow';
         <div class="section">
           <div class="section-label">Input</div>
           <div class="data-preview">You can attach handle to content inside node</div>
-          <span vflowPort handleType="target" position="left" id="input-1"></span>
+          <span vflowPort handleType="target" position="left" handleId="input-1"></span>
         </div>
         <div class="transform-indicator">
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
@@ -41,7 +41,7 @@ import { Node, Vflow, injectNode } from 'ngx-vflow';
         <div class="section">
           <div class="section-label">Output</div>
           <div class="data-preview">You can attach handle to content inside node</div>
-          <span vflowPort handleType="source" position="right" id="output-1"></span>
+          <span vflowPort handleType="source" position="right" handleId="output-1"></span>
         </div>
       </div>
     </div>

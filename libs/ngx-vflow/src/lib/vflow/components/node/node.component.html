@@ -25,10 +25,10 @@
   <ng-template [ngTemplateOutlet]="template" />
 }
 
-<!-- Magnets: the snap area around each measured handle while a connection is in progress -->
+<!-- Magnets: the snap area around each measured port while a connection is in progress; a dynamic handle is its own drop zone -->
 @if (connectionActive()) {
   @for (handle of model().handles(); track handle) {
-    @if (handle.isMeasured()) {
+    @if (handle.isMeasured() && !handle.dynamic()) {
       <div
         class="magnet"
         aria-hidden="true"

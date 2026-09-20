@@ -36,7 +36,7 @@ import { VflowMocks } from './vflow-mocks';
             handleType="source"
             #handle="vflowHandle"
             [position]="'left'"
-            [id]="'1'"
+            [handleId]="'1'"
             [layout]="'manual'">
             {{ handle.state() }}
           </span>
@@ -86,9 +86,7 @@ class VflowWrapperComponent {
     },
   ]);
 
-  public connection: ConnectionSettings = {
-    type: 'template',
-  };
+  public connection: ConnectionSettings = {};
 
   callViewChildApis() {
     try {

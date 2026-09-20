@@ -1,32 +1,19 @@
-import { ConnectionSettings, ConnectionType, ConnectionValidatorFn } from '../interfaces/connection-settings.interface';
+import { ConnectionSettings, ConnectionValidatorFn } from '../interfaces/connection-settings.interface';
 import { Curve } from '../interfaces/edge.interface';
-import { ConnectionMode } from '../types/connection-mode.type';
 
 export class ConnectionModel {
   public curve: Curve;
-  public type: ConnectionType;
   public validator: ConnectionValidatorFn;
-  public mode: ConnectionMode;
   public allowSelfConnections: boolean;
 
   constructor(public settings: ConnectionSettings) {
     this.curve = settings.curve ?? 'bezier';
-    this.type = settings.type ?? 'default';
-    this.mode = settings.mode ?? 'strict';
     this.allowSelfConnections = settings.allowSelfConnections ?? false;
 
-    const validators: ConnectionValidatorFn[] = [];
+    const validators: ConnectionValidatorFn[] = [notSameTypedHandlesValidator];
 
     if (!this.allowSelfConnections) {
       validators.push(notSelfValidator);
-    }
-
-    if (this.mode === 'strict') {
-      validators.push(notSameHandleTypeValidator);
-    }
-
-    if (this.mode === 'loose') {
-      validators.push(hasSourceAndTargetHandleValidator);
     }
 
     if (settings.validator) {
@@ -45,12 +32,11 @@ const notSelfValidator: ConnectionValidatorFn = (connection) => {
 };
 
 /**
- * Internal validator that not allows connections between handles of the same type
+ * Internal validator that rejects a connection between two `source` or two `target` handles. A handle of type
+ * `any` connects in either direction.
  */
-const notSameHandleTypeValidator: ConnectionValidatorFn = (connection) => {
-  return connection.sourceHandleType !== connection.targetHandleType;
-};
+const notSameTypedHandlesValidator: ConnectionValidatorFn = (connection) => {
+  const { sourceHandleType, targetHandleType } = connection;
 
-const hasSourceAndTargetHandleValidator: ConnectionValidatorFn = (connection) => {
-  return connection.sourceHandle !== undefined && connection.targetHandle !== undefined;
+  return sourceHandleType === 'any' || targetHandleType === 'any' || sourceHandleType !== targetHandleType;
 };

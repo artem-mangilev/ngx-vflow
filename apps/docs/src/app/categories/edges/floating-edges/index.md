@@ -1,10 +1,9 @@
-The library supports floating edges. A floating edge is an edge that connects the closest handles of the source and target nodes. You can enable floating edges using the `floating` flag on `Edge`.
+A floating edge has no fixed port: it meets the node on the side that faces the other end, and moves to another side when the nodes move. In ngx-vflow this is a property of the handle, `position="auto"`: the node gets one handle whose connection point is resolved for every edge. With `handleType="any"` the same handle starts and accepts connections in both directions.
 
-> **Info**
-> Since the library always looks for the closest handles between nodes, there can only be one edge between any two nodes. Keep this in mind when building your flows.
->
-> This limitation may be addressed in future releases.
+```html
+<span vflowHandle handleType="any" position="auto"></span>
+```
+
+An edge can float on one end and use a port on the other: the port keeps its side, and the floating end faces the port. `position="center"` runs edges to the node center instead, for graphs whose nodes are drawn over their lines. See the Custom handles page for the details and the Easy connect recipe for a node that is a handle itself.
 
 {{ NgDocActions.demoPane("FloatingEdgesDemoComponent") }}
-
-For edges that leave and enter nodes anywhere on their borders, without ports at all, see the Easy connect recipe in the cookbook: it combines a handle that covers the node with a curve built from `getFloatingEdgeParams`.

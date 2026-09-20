@@ -1,6 +1,5 @@
 import { TestBed } from '@angular/core/testing';
 import { EdgeModel } from './edge.model';
-import { ConnectionModel } from './connection.model';
 import { NodeModel } from './node.model';
 import { createNode } from '../interfaces/node.interface';
 import { createEdge } from '../interfaces/edge.interface';
@@ -29,7 +28,7 @@ function mockRect(element: Element, rect: { left: number; top: number; width: nu
 }
 
 function createHandle(
-  type: 'source' | 'target',
+  type: 'source' | 'target' | 'any',
   position: 'left' | 'right',
   parentNode: NodeModel,
   nodeRect: { left: number; top: number; width: number; height: number },
@@ -170,21 +169,16 @@ describe('EdgeModel', () => {
     expect(model.detached()).toEqual(false);
   });
 
-  it('should fall back to any handle of a node without one of the role only in the loose connection mode', () => {
+  it('should serve either role with a handle of type any and none with a handle of the other role', () => {
     const nodeRect = { left: 100, top: 200, width: 0, height: 0 };
-    const only = createHandle('source', 'right', model.target()!, nodeRect, {
-      left: 86.5,
-      top: 193,
-      width: 14,
-      height: 14,
-    });
-    model.target()!.handles.set([only]);
+    const handleRect = { left: 86.5, top: 193, width: 14, height: 14 };
+    model.target()!.handles.set([createHandle('source', 'right', model.target()!, nodeRect, handleRect)]);
 
     expect(model.targetHandle()).toBeNull();
 
-    TestBed.inject(FlowEntitiesService).connection.set(new ConnectionModel({ mode: 'loose' }));
+    model.target()!.handles.set([createHandle('any', 'right', model.target()!, nodeRect, handleRect)]);
 
-    expect(model.targetHandle()).toBe(only);
+    expect(model.targetHandle()).not.toBeNull();
   });
 
   it('should pass node geometry and the marker inset to a custom curve', () => {

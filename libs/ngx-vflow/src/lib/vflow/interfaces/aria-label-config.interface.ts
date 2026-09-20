@@ -7,7 +7,7 @@ export interface AriaLabelConfig {
   nodeLabel: (id: string) => string;
   groupLabel: (id: string) => string;
   edgeLabel: (endpoints: { source: string; target: string }) => string;
-  handleLabel: (handle: { type: 'source' | 'target'; id?: string; node: string }) => string;
+  handleLabel: (handle: { type: 'source' | 'target' | 'any'; id?: string; node: string }) => string;
   parentDescription: (parent: string) => string;
   selected: string;
   selectionUnavailable: string;
@@ -32,7 +32,9 @@ export const DEFAULT_ARIA_LABEL_CONFIG: AriaLabelConfig = {
   groupLabel: (id) => `Group ${id}`,
   edgeLabel: ({ source, target }) => `Connection from ${source} to ${target}`,
   handleLabel: ({ type, id, node }) =>
-    `${type === 'source' ? 'Source' : 'Target'} connection point${id ? ` ${id}` : ''} of ${node}`,
+    type === 'any'
+      ? `Connection surface${id ? ` ${id}` : ''} of ${node}`
+      : `${type === 'source' ? 'Source' : 'Target'} connection point${id ? ` ${id}` : ''} of ${node}`,
   parentDescription: (parent) => `Parent: ${parent}.`,
   selected: 'Selected.',
   selectionUnavailable: 'Selection unavailable.',

@@ -179,7 +179,7 @@ interface StageData {
                   vflowPort
                   handleType="target"
                   position="left"
-                  [id]="'in:' + port.id"
+                  [handleId]="'in:' + port.id"
                   [ariaLabel]="ctx.data().title + ' ' + port.name + ' input (' + port.type + ')'"
                   [attr.data-type]="port.type"
                   [vflowPortConnected]="connected().has(ctx.node.id + '/in:' + port.id)"></span>
@@ -195,7 +195,7 @@ interface StageData {
                   vflowPort
                   handleType="source"
                   position="right"
-                  [id]="'out:' + port.id"
+                  [handleId]="'out:' + port.id"
                   [ariaLabel]="ctx.data().title + ' ' + port.name + ' output (' + port.type + ')'"
                   [attr.data-type]="port.type"
                   [vflowPortConnected]="connected().has(ctx.node.id + '/out:' + port.id)"></span>
@@ -287,7 +287,6 @@ export class PipelineDemoComponent {
       ),
   );
   readonly connection: ConnectionSettings = {
-    type: 'template',
     validator: (c) => {
       const source = this.port(c.source, 'outputs', c.sourceHandle);
       const target = this.port(c.target, 'inputs', c.targetHandle);

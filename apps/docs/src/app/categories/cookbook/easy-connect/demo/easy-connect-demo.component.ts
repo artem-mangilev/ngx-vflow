@@ -1,48 +1,28 @@
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Injectable, inject, signal } from '@angular/core';
 import { DocsPresentations } from '@docs/shared';
 import {
   Connection,
   ConnectionSettings,
-  CurveFactory,
   Edge,
+  HandlePosition,
   Node,
   Vflow,
   createEdge,
   createNodes,
-  getBezierPath,
-  getFloatingEdgeParams,
   injectNode,
 } from 'ngx-vflow';
 
-/**
- * Edges and the connection preview leave and enter nodes through their borders instead of fixed handles. The
- * pointer of a connection in progress is a rectangle without size that the flow has already moved by the marker
- * inset, so only the start is inset again.
- */
-const floatingCurve: CurveFactory = (params) => {
-  if (params.targetNode) {
-    return getBezierPath(getFloatingEdgeParams(params.sourceNode, params.targetNode, { inset: params.markerInset }));
-  }
+/** Shared by the demo controls and the nodes: where edges meet a node. */
+@Injectable()
+export class EasyConnectSettings {
+  readonly position = signal<HandlePosition>('auto');
+}
 
-  const pointer = { ...params.targetPoint, width: 0, height: 0 };
-
-  return getBezierPath(
-    getFloatingEdgeParams(params.sourceNode, pointer, { inset: { start: params.markerInset.start } }),
-  );
-};
-
-/** The whole node is the handle: the title drags the node, everywhere else starts a connection. */
+/** The whole node is the handle: the title drags the node, everywhere else starts or accepts a connection. */
 @Component({
   selector: 'easy-connect-node',
   template: `
-    <div
-      class="easy-node"
-      vflowHandle
-      handleType="source"
-      position="right"
-      layout="manual"
-      [id]="ctx.node.id"
-      [ariaLabel]="ctx.data().title">
+    <div class="easy-node" vflowHandle handleType="any" [position]="settings.position()" [ariaLabel]="ctx.data().title">
       <div class="easy-node__title" dragHandle>{{ ctx.data().title }}</div>
       <div class="easy-node__body">Drag from here to connect</div>
     </div>
@@ -94,43 +74,73 @@ const floatingCurve: CurveFactory = (params) => {
 })
 export class EasyConnectNodeComponent {
   protected readonly ctx = injectNode<{ title: string }>();
+  protected readonly settings = inject(EasyConnectSettings);
 }
 
 @Component({
   selector: 'app-easy-connect-demo',
   template: `
-    <vflow view="auto" [nodes]="nodes" [edges]="edges()" [connection]="connection" (connect)="connect($event)">
-      <ng-template let-ctx edge><svg:g docsEdge [ctx]="ctx" /></ng-template>
-    </vflow>
+    <div class="demo">
+      <label class="controls">
+        Edges meet nodes at
+        <select [value]="settings.position()" (change)="settings.position.set($any($event.target).value)">
+          <option value="auto">the border facing the other node</option>
+          <option value="center">the center</option>
+        </select>
+      </label>
+
+      <vflow view="auto" [nodes]="nodes" [edges]="edges()" [connection]="connection" (connect)="connect($event)">
+        <ng-template let-ctx edge><svg:g docsEdge [ctx]="ctx" /></ng-template>
+      </vflow>
+    </div>
   `,
   styles: [
     `
       :host {
+        display: block;
         width: 100%;
         height: 100%;
       }
+
+      .demo {
+        display: grid;
+        grid-template-rows: auto minmax(0, 1fr);
+        width: 100%;
+        height: 100%;
+      }
+
+      .controls {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        background-color: #f5f5f5;
+        color: #1b262c;
+        font-size: 14px;
+      }
+
+      vflow {
+        min-height: 0;
+      }
     `,
   ],
+  providers: [EasyConnectSettings],
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [DocsPresentations, Vflow],
 })
 export class EasyConnectDemoComponent {
-  /** Every node has one handle, so the loose mode lets any node connect to any other; ids make the pair unique. */
-  public readonly connection: ConnectionSettings = {
-    mode: 'loose',
-    curve: floatingCurve,
-    marker: { type: 'arrow-closed' },
-  };
+  protected readonly settings = inject(EasyConnectSettings);
+
+  public readonly connection: ConnectionSettings = { marker: { type: 'arrow-closed' } };
 
   public readonly nodes: Node[] = createNodes([
-    { id: '1', point: { x: 40, y: 40 }, component: EasyConnectNodeComponent, data: { title: 'Idea' } },
-    { id: '2', point: { x: 340, y: 160 }, component: EasyConnectNodeComponent, data: { title: 'Draft' } },
-    { id: '3', point: { x: 80, y: 300 }, component: EasyConnectNodeComponent, data: { title: 'Review' } },
+    // Nodes stay away from the pane edges, where a connection drag would auto-pan the viewport.
+    { id: '1', point: { x: 60, y: 30 }, component: EasyConnectNodeComponent, data: { title: 'Idea' } },
+    { id: '2', point: { x: 360, y: 110 }, component: EasyConnectNodeComponent, data: { title: 'Draft' } },
+    { id: '3', point: { x: 100, y: 200 }, component: EasyConnectNodeComponent, data: { title: 'Review' } },
   ]);
 
-  public readonly edges = signal<Edge[]>([
-    this.createEdge({ source: '1', target: '2', sourceHandle: '1', targetHandle: '2' }),
-  ]);
+  public readonly edges = signal<Edge[]>([this.createEdge({ source: '1', target: '2' })]);
 
   public connect(connection: Connection) {
     this.edges.update((edges) => [...edges, this.createEdge(connection)]);
@@ -140,7 +150,6 @@ export class EasyConnectDemoComponent {
     return createEdge({
       id: `${connection.source} -> ${connection.target}`,
       ...connection,
-      curve: floatingCurve,
       markers: { end: { type: 'arrow-closed' } },
     });
   }

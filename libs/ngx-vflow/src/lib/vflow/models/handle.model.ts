@@ -3,7 +3,8 @@ import { NodeModel } from './node.model';
 import { Point } from '../interfaces/point.interface';
 import { ViewportService } from '../services/viewport.service';
 import { Position } from '../types/position.type';
-import { HandleLayout, HandleState, HandleType } from '../types/handle-type.type';
+import { HandleLayout, HandlePosition, HandleState, HandleType } from '../types/handle-type.type';
+import { NodeEndpoint, getNodeEndpoint } from '../math/node-endpoint';
 
 export type { HandleState } from '../types/handle-type.type';
 
@@ -28,7 +29,7 @@ export interface HandleOptions {
   /** The element the `vflowHandle` directive is applied to. Its parent is the anchor in the `auto` layout. */
   element?: HTMLElement | null;
   type: Signal<HandleType>;
-  position: Signal<Position>;
+  position: Signal<HandlePosition>;
   id?: Signal<string | undefined>;
   layout?: Signal<HandleLayout>;
   offsetX?: Signal<number>;
@@ -74,7 +75,7 @@ export class HandleModel {
 
   public readonly element: HTMLElement | null;
   public readonly type: Signal<HandleType>;
-  public readonly position: Signal<Position>;
+  public readonly position: Signal<HandlePosition>;
   public readonly id: Signal<string | undefined>;
   public readonly layout: Signal<HandleLayout>;
   public readonly offsetX: Signal<number>;
@@ -93,8 +94,16 @@ export class HandleModel {
 
   private readonly local = signal<Point>({ x: 0, y: 0 });
 
-  /** Connection point relative to the node origin, in flow units. */
-  public readonly localPoint = this.local.asReadonly();
+  /** `auto` or `center`: the point is resolved per edge on the node, the element is only the surface. */
+  public readonly dynamic = computed(() => {
+    const position = this.position();
+    return position === 'auto' || position === 'center';
+  });
+
+  /** Connection point relative to the node origin, in flow units; the node center for a dynamic position. */
+  public readonly localPoint = computed<Point>(() =>
+    this.dynamic() ? { x: this.parentNode.width() / 2, y: this.parentNode.height() / 2 } : this.local(),
+  );
 
   public readonly pointAbsolute = computed<Point>(() => ({
     x: this.parentNode.globalPoint().x + this.local().x,
@@ -129,6 +138,13 @@ export class HandleModel {
       return null;
     }
 
+    const position = this.position();
+
+    // A dynamic position follows the node size and needs no layout box of the element.
+    if (position === 'auto' || position === 'center') {
+      return { layoutStyles: UNPLACED, localPoint: this.localPoint() };
+    }
+
     if (!element.getClientRects().length) {
       return HANDLE_WITHOUT_BOX;
     }
@@ -141,7 +157,6 @@ export class HandleModel {
       height: rect.height / zoom,
     });
 
-    const position = this.position();
     const handle = toLocal(element.getBoundingClientRect());
 
     if (this.layout() === 'manual') {
@@ -161,6 +176,18 @@ export class HandleModel {
       offset: { x: this.offsetX(), y: this.offsetY() },
       origin: containingBlockOrigin(element, nodeElement, context),
     });
+  }
+
+  /**
+   * Where an edge towards `towards` meets this handle: the fixed point and side of a port, or, for `auto` and
+   * `center`, the point on the node that faces `towards`.
+   */
+  public endpoint(towards: Point): NodeEndpoint {
+    const position = this.position();
+
+    return position === 'auto' || position === 'center'
+      ? getNodeEndpoint(this.parentNode.geometry(), towards, position)
+      : { point: this.pointAbsolute(), position };
   }
 
   /** Isolated model use. Node rendering shares one context between the handles of the node. */

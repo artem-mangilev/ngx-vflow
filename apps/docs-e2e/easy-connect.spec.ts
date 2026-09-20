@@ -26,12 +26,14 @@ test('easy connect: connects from anywhere on a node, drags by the title and rou
   await expect(nodes).toHaveCount(3);
   await expect(edges).toHaveCount(1);
 
-  // The existing edge starts on the border of its source node, not at a fixed handle.
+  // The existing edge starts on the middle of the border of its source node that faces the target.
   const start = await edges.first().evaluate((path: SVGPathElement) => {
     const point = path.getPointAtLength(0).matrixTransform(path.getScreenCTM()!);
     return { x: point.x, y: point.y };
   });
+  const sourceBox = (await nodes.nth(0).boundingBox())!;
   expect(await distanceToBorder(nodes.nth(0), start)).toBeLessThan(2);
+  expect(Math.abs(start.y - (sourceBox.y + sourceBox.height / 2))).toBeLessThan(2);
 
   // A press on the body starts a connection; the candidate under the pointer validates without a port.
   const from = await center(nodes.nth(1).locator('.easy-node__body'));
@@ -40,6 +42,8 @@ test('easy connect: connects from anywhere on a node, drags by the title and rou
   await page.mouse.down();
   await page.mouse.move(from.x + 30, from.y + 30, { steps: 4 });
   await expect(nodes.nth(1)).toHaveAttribute('data-vflow-handle-state', 'connecting');
+  // A node handle is its own drop zone: no magnets are rendered.
+  await expect(demo.locator('.magnet')).toHaveCount(0);
   await page.mouse.move(to.x, to.y, { steps: 8 });
   await expect(nodes.nth(2)).toHaveAttribute('data-vflow-handle-state', 'valid');
   await page.mouse.up();
@@ -56,6 +60,16 @@ test('easy connect: connects from anywhere on a node, drags by the title and rou
   const after = (await nodes.nth(0).boundingBox())!;
   expect(after.x - before.x).toBeGreaterThan(40);
   expect(after.y - before.y).toBeGreaterThan(20);
+
+  // With position center the same edge starts at the center of its source node.
+  await demo.locator('select').selectOption('center');
+  const centerStart = await edges.first().evaluate((path: SVGPathElement) => {
+    const point = path.getPointAtLength(0).matrixTransform(path.getScreenCTM()!);
+    return { x: point.x, y: point.y };
+  });
+  const source = (await nodes.nth(0).boundingBox())!;
+  expect(Math.abs(centerStart.x - (source.x + source.width / 2))).toBeLessThan(2);
+  expect(Math.abs(centerStart.y - (source.y + source.height / 2))).toBeLessThan(2);
 
   expect(errors).toEqual([]);
 });

@@ -4,6 +4,7 @@ import {
   ɵComponentEventBusService as ComponentEventBusService,
   ɵHandleService as HandleService,
   ɵFlowSettingsService as FlowSettingsService,
+  ɵFlowStatusService as FlowStatusService,
   ɵFlowEntitiesService as FlowEntitiesService,
   ɵNodeAccessorService as NodeAccessorService,
   ɵRootPointerDirective as RootPointerDirective,
@@ -76,6 +77,8 @@ export function provideCustomNodeMocks(): Provider[] {
       },
     },
     FlowSettingsService,
+    // The handle directive reads the connection state to act as a drop zone.
+    FlowStatusService,
     ViewportService,
     NodeRenderingService,
   ];

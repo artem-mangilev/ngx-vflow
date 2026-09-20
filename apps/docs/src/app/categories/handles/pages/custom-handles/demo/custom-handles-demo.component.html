@@ -31,12 +31,17 @@
               handleType="source"
               position="right"
               class="dot-handle"
-              [id]="ctx.data().output1"
+              [handleId]="ctx.data().output1"
               [canStart]="outputOneCanStart()"></span>
           </div>
           <div class="data-block">
             Output 2
-            <span vflowHandle handleType="source" position="right" class="dot-handle" [id]="ctx.data().output2"></span>
+            <span
+              vflowHandle
+              handleType="source"
+              position="right"
+              class="dot-handle"
+              [handleId]="ctx.data().output2"></span>
           </div>
         </div>
       }
@@ -54,7 +59,7 @@
           </div>
           <div class="data-block">
             Input 2
-            <square-handle handleType="target" position="left" [id]="ctx.data().input2" />
+            <square-handle handleType="target" position="left" [handleId]="ctx.data().input2" />
           </div>
         </div>
       }

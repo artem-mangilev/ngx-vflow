@@ -6,8 +6,7 @@ import {
   FlowStatusReconnectionStart,
   FlowStatusReconnectionReleaseValidated,
 } from '../services/flow-status.service';
-import { HandleType } from '../types/handle-type.type';
-import { Position } from '../types/position.type';
+import { HandlePosition, HandleType } from '../types/handle-type.type';
 import { Connection } from './connection.interface';
 import { Edge } from './edge.interface';
 import { Node } from './node.interface';
@@ -68,7 +67,7 @@ export interface ReconnectEndEvent {
 interface Handle {
   id?: string;
   type: HandleType;
-  position: Position;
+  position: HandlePosition;
 }
 
 export function connectStartEventFromConnectionStartStatus(status: FlowStatusConnectionStart): ConnectStartEvent {

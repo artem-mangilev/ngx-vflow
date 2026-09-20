@@ -1,6 +1,6 @@
 import { FlowSettingsService } from '../services/flow-settings.service';
 import { eventClientPoint, isTouchEvent } from '../utils/event';
-import { DestroyRef, Directive, computed, inject, output } from '@angular/core';
+import { DestroyRef, Directive, inject, output } from '@angular/core';
 import { Connection } from '../interfaces/connection.interface';
 import {
   FlowStatusConnectionRelease,
@@ -48,7 +48,7 @@ export class ConnectionControllerDirective {
           this.reconnectStart.emit(reconnectStartEventFromReconnectionStartStatus(status));
           break;
         case 'connection-release': {
-          const connection = statusToConnection(status, this.isStrictMode());
+          const connection = statusToConnection(status);
           const valid = this.flowEntitiesService.connection().validator(connection);
           const { source, target, sourceHandle, targetHandle } = status.payload;
           this.statusService.setConnectionReleaseValidatedStatus(source, target, sourceHandle, targetHandle, valid);
@@ -56,7 +56,7 @@ export class ConnectionControllerDirective {
           break;
         }
         case 'reconnection-release': {
-          const connection = statusToConnection(status, this.isStrictMode());
+          const connection = statusToConnection(status);
           const valid = this.flowEntitiesService.connection().validator(connection);
           const { source, target, sourceHandle, targetHandle, oldEdge } = status.payload;
           this.statusService.setReconnectionReleaseValidatedStatus(
@@ -128,8 +128,6 @@ export class ConnectionControllerDirective {
   public readonly reconnect = output<ReconnectEvent>();
   public readonly reconnectEnd = output<ReconnectEndEvent>();
 
-  protected isStrictMode = computed(() => this.flowEntitiesService.connection().mode === 'strict');
-
   public startConnection(handle: HandleModel, event?: Event) {
     if (!handle.canStart()) {
       return;
@@ -159,20 +157,18 @@ export class ConnectionControllerDirective {
       let valid = false;
 
       if (handle.canAccept()) {
-        if (this.isStrictMode()) {
-          // swap direction (if needed) according to actual source and target of strict mode
-          const adjusted = adjustDirection({
-            source: status.payload.source,
-            sourceHandle: status.payload.sourceHandle,
-            target: handle.parentNode,
-            targetHandle: handle,
-          });
+        // typed handles keep their roles whichever end the gesture started from
+        const adjusted = adjustDirection({
+          source: status.payload.source,
+          sourceHandle: status.payload.sourceHandle,
+          target: handle.parentNode,
+          targetHandle: handle,
+        });
 
-          source = adjusted.source;
-          target = adjusted.target;
-          sourceHandle = adjusted.sourceHandle;
-          targetHandle = adjusted.targetHandle;
-        }
+        source = adjusted.source;
+        target = adjusted.target;
+        sourceHandle = adjusted.sourceHandle;
+        targetHandle = adjusted.targetHandle;
 
         valid = this.flowEntitiesService.connection().validator({
           source: source.rawNode.id,
@@ -269,38 +265,19 @@ export class ConnectionControllerDirective {
 
 function statusToConnection(
   status: FlowStatusConnectionRelease | FlowStatusReconnectionRelease,
-  isStrictMode: boolean,
 ): ConnectionForValidation {
-  let source = status.payload.source;
-  let target = status.payload.target;
-  let sourceHandle = status.payload.sourceHandle;
-  let targetHandle = status.payload.targetHandle;
-
-  if (isStrictMode) {
-    const adjusted = adjustDirection({
-      source: status.payload.source,
-      sourceHandle: status.payload.sourceHandle,
-      target: status.payload.target,
-      targetHandle: status.payload.targetHandle,
-    });
-
-    source = adjusted.source;
-    target = adjusted.target;
-    sourceHandle = adjusted.sourceHandle;
-    targetHandle = adjusted.targetHandle;
-  }
-
-  const sourceId = source.rawNode.id;
-  const targetId = target.rawNode.id;
-
-  const sourceHandleId = sourceHandle.id();
-  const targetHandleId = targetHandle.id();
+  const { source, target, sourceHandle, targetHandle } = adjustDirection({
+    source: status.payload.source,
+    sourceHandle: status.payload.sourceHandle,
+    target: status.payload.target,
+    targetHandle: status.payload.targetHandle,
+  });
 
   return {
-    source: sourceId,
-    target: targetId,
-    sourceHandle: sourceHandleId,
-    targetHandle: targetHandleId,
+    source: source.rawNode.id,
+    target: target.rawNode.id,
+    sourceHandle: sourceHandle.id(),
+    targetHandle: targetHandle.id(),
     sourceHandleType: sourceHandle.type(),
     targetHandleType: targetHandle.type(),
   };

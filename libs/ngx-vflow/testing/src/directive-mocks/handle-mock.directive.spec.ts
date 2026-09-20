@@ -5,7 +5,7 @@ import { HandleMockDirective } from './handle-mock.directive';
 
 @Component({
   selector: 'test-handle-state',
-  template: `{{ handle.type() }} {{ handle.state() }}`,
+  template: `{{ handle.handleType() }} {{ handle.state() }}`,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 class HandleStateComponent {

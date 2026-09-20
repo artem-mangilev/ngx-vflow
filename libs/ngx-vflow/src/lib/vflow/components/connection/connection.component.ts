@@ -18,22 +18,16 @@ import { NodeModel } from '../../models/node.model';
 @Component({
   selector: 'g[connection]',
   template: `
-    @if (model().type === 'default') {
-      @if (path(); as path) {
-        <svg:path
-          aria-hidden="true"
-          fill="none"
-          stroke-width="2"
-          [attr.d]="path"
-          [attr.marker-end]="markerUrl()"
-          [attr.stroke]="defaultColor" />
-      }
-    }
-
-    @if (model().type === 'template') {
-      @if (template(); as template) {
-        <ng-container *ngTemplateOutlet="template; context: getContext()" />
-      }
+    @if (template(); as template) {
+      <ng-container *ngTemplateOutlet="template; context: getContext()" />
+    } @else if (path(); as path) {
+      <svg:path
+        aria-hidden="true"
+        fill="none"
+        stroke-width="2"
+        [attr.d]="path"
+        [attr.marker-end]="markerUrl()"
+        [attr.stroke]="defaultColor" />
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -53,74 +47,40 @@ export class ConnectionComponent {
     if (!status) return null;
     const curve = this.model().curve;
 
-    if (status.state === 'connection-start' || status.state === 'reconnection-start') {
-      const sourceHandle = status.payload.sourceHandle;
-      const sourcePoint = sourceHandle.pointAbsolute();
-      const sourcePosition = sourceHandle.position();
+    const sourceHandle = status.payload.sourceHandle;
+    const pointer = this.spacePointContext.svgCurrentSpacePoint();
+    // The candidate is the end only while valid; otherwise the preview follows the pointer.
+    const candidate =
+      (status.state === 'connection-validation' || status.state === 'reconnection-validation') && status.payload.valid
+        ? { node: status.payload.target, handle: status.payload.targetHandle }
+        : null;
 
-      const targetPoint = this.spacePointContext.svgCurrentSpacePoint();
-      const targetPosition = getOppositePostion(sourceHandle.position());
+    const source = sourceHandle.endpoint(candidate ? candidate.handle.pointAbsolute() : pointer);
+    const target = candidate
+      ? candidate.handle.endpoint(sourceHandle.pointAbsolute())
+      : { point: pointer, position: getOppositePostion(source.position) };
 
-      const params = this.getPathFactoryParams(
-        sourcePoint,
-        targetPoint,
-        sourcePosition,
-        targetPosition,
-        status.payload.source,
-      );
+    const params = this.getPathFactoryParams(
+      source.point,
+      target.point,
+      source.position,
+      target.position,
+      status.payload.source,
+      candidate?.node,
+    );
 
-      switch (curve) {
-        case 'straight':
-          return getStraightPath(params).path;
-        case 'bezier':
-          return getBezierPath(params).path;
-        case 'smooth-step':
-          return getSmoothStepPath(params).path;
-        case 'step':
-          return getSmoothStepPath({ ...params, borderRadius: 0 }).path;
-        default:
-          return curve(params).path;
-      }
+    switch (curve) {
+      case 'straight':
+        return getStraightPath(params).path;
+      case 'bezier':
+        return getBezierPath(params).path;
+      case 'smooth-step':
+        return getSmoothStepPath(params).path;
+      case 'step':
+        return getSmoothStepPath({ ...params, borderRadius: 0 }).path;
+      default:
+        return curve(params).path;
     }
-
-    if (status.state === 'connection-validation' || status.state === 'reconnection-validation') {
-      const sourceHandle = status.payload.sourceHandle;
-      const sourcePoint = sourceHandle.pointAbsolute();
-      const sourcePosition = sourceHandle.position();
-
-      const targetHandle = status.payload.targetHandle;
-      // ignore magnet if validation failed
-      const targetPoint = status.payload.valid
-        ? targetHandle.pointAbsolute()
-        : this.spacePointContext.svgCurrentSpacePoint();
-      const targetPosition = status.payload.valid
-        ? targetHandle.position()
-        : getOppositePostion(sourceHandle.position());
-
-      const params = this.getPathFactoryParams(
-        sourcePoint,
-        targetPoint,
-        sourcePosition,
-        targetPosition,
-        status.payload.source,
-        status.payload.valid ? status.payload.target : undefined,
-      );
-
-      switch (curve) {
-        case 'straight':
-          return getStraightPath(params).path;
-        case 'bezier':
-          return getBezierPath(params).path;
-        case 'smooth-step':
-          return getSmoothStepPath(params).path;
-        case 'step':
-          return getSmoothStepPath({ ...params, borderRadius: 0 }).path;
-        default:
-          return curve(params).path;
-      }
-    }
-
-    return null;
   });
 
   protected markerUrl = computed(() => {

@@ -56,7 +56,6 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
   public target = signal<NodeModel | undefined>(undefined);
   public curve = signal<Curve>(EDGE_DEFAULTS.curve);
   public reconnectable = signal<boolean | 'source' | 'target'>(EDGE_DEFAULTS.reconnectable);
-  public floating = signal(EDGE_DEFAULTS.floating);
   public interactionWidth = signal(EDGE_DEFAULTS.interactionWidth);
   public markers = signal<{ start?: Marker; end?: Marker }>(EDGE_DEFAULTS.markers);
   /** Label templates registered by `ng-template[edgeLabel]` inside the presentation of this edge. */
@@ -140,79 +139,21 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
   });
 
   public sourceHandle = computed<HandleModel | null>(() =>
-    this.floating()
-      ? this.closestHandles().sourceHandle
-      : this.findHandle(this.source()?.handles() ?? [], 'source', this.edge.sourceHandle),
+    this.findHandle(this.source()?.handles() ?? [], 'source', this.edge.sourceHandle),
   );
 
   public targetHandle = computed<HandleModel | null>(() =>
-    this.floating()
-      ? this.closestHandles().targetHandle
-      : this.findHandle(this.target()?.handles() ?? [], 'target', this.edge.targetHandle),
+    this.findHandle(this.target()?.handles() ?? [], 'target', this.edge.targetHandle),
   );
 
-  /** Without an id, the first handle of the role; in the loose connection mode any handle when the role has none. */
+  /** By id, or the first handle of the role; a handle of type `any` serves either role. */
   private findHandle(handles: HandleModel[], type: HandleType, id?: string) {
     if (id) {
       return handles.find((handle) => handle.id() === id) ?? null;
     }
 
-    const ofType = handles.find((handle) => handle.type() === type) ?? null;
-
-    return ofType ?? (this.flowEntitiesService.connection().mode === 'loose' ? (handles[0] ?? null) : null);
+    return handles.find((handle) => handle.type() === type || handle.type() === 'any') ?? null;
   }
-
-  public closestHandles = computed<{
-    sourceHandle: HandleModel | null;
-    targetHandle: HandleModel | null;
-  }>(() => {
-    const source = this.source();
-    const target = this.target();
-
-    if (!source || !target) {
-      return { sourceHandle: null, targetHandle: null };
-    }
-
-    const sourceHandles =
-      this.flowEntitiesService.connection().mode === 'strict'
-        ? source.handles().filter((h) => h.type() === 'source')
-        : source.handles();
-    const targetHandles =
-      this.flowEntitiesService.connection().mode === 'strict'
-        ? target.handles().filter((h) => h.type() === 'target')
-        : target.handles();
-
-    if (sourceHandles.length === 0 || targetHandles.length === 0) {
-      return { sourceHandle: sourceHandles[0] ?? null, targetHandle: targetHandles[0] ?? null };
-    }
-
-    let minDistance = Infinity;
-    let closestSourceHandle: HandleModel | null = null;
-    let closestTargetHandle: HandleModel | null = null;
-
-    // Check all combinations of source and target handles
-    for (const sourceHandle of sourceHandles) {
-      for (const targetHandle of targetHandles) {
-        const sourcePoint = sourceHandle.pointAbsolute();
-        const targetPoint = targetHandle.pointAbsolute();
-
-        const distance = Math.sqrt(
-          Math.pow(sourcePoint.x - targetPoint.x, 2) + Math.pow(sourcePoint.y - targetPoint.y, 2),
-        );
-
-        if (distance < minDistance) {
-          minDistance = distance;
-          closestSourceHandle = sourceHandle;
-          closestTargetHandle = targetHandle;
-        }
-      }
-    }
-
-    return {
-      sourceHandle: closestSourceHandle,
-      targetHandle: closestTargetHandle,
-    };
-  });
 
   public markerStartUrl = computed(() => {
     const marker = this.markers()?.start;
@@ -235,10 +176,6 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
 
     if (edge.reconnectable) {
       this.reconnectable = edge.reconnectable;
-    }
-
-    if (edge.floating) {
-      this.floating = edge.floating;
     }
 
     if (edge.interactionWidth) {
@@ -276,18 +213,21 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
   private getPathFactoryParams(source: HandleModel, target: HandleModel): CurveFactoryParams {
     const markers = this.markers();
     const inset = { start: markerInset(markers?.start), end: markerInset(markers?.end) };
+    // A dynamic handle resolves its point towards the reference point of the other end.
+    const start = source.endpoint(target.pointAbsolute());
+    const end = target.endpoint(source.pointAbsolute());
 
     return {
       mode: 'edge',
       edge: this.edge,
       // An arrow tip touches the handle; the path itself ends under the arrowhead.
-      sourcePoint: insetPoint(source.pointAbsolute(), source.position(), inset.start),
-      targetPoint: insetPoint(target.pointAbsolute(), target.position(), inset.end),
+      sourcePoint: insetPoint(start.point, start.position, inset.start),
+      targetPoint: insetPoint(end.point, end.position, inset.end),
       markerInset: inset,
       sourceNode: source.parentNode.geometry(),
       targetNode: target.parentNode.geometry(),
-      sourcePosition: source.position(),
-      targetPosition: target.position(),
+      sourcePosition: start.position,
+      targetPosition: end.position,
       allEdges: this.flowEntitiesService.rawEdges(),
       allNodes: this.flowEntitiesService.rawNodes(),
     };

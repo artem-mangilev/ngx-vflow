@@ -79,9 +79,9 @@ import { AsInterface } from '../types';
       }
     }
 
-    @if (connection.type === 'template') {
+    @if (connectionTemplateDirective()?.templateRef; as connectionTemplate) {
       <ng-component
-        [ngTemplateOutlet]="connectionTemplateDirective()?.templateRef ?? null"
+        [ngTemplateOutlet]="connectionTemplate"
         [ngTemplateOutletContext]="{
           $implicit: {
             path: createSignal(''),

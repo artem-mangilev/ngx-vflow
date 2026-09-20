@@ -17,7 +17,7 @@ import { DomAttributes } from '../../interfaces/dom-attributes.interface';
         vflowHandle
         handleType="target"
         position="left"
-        id="incoming"
+        handleId="incoming"
         [canStart]="canStart()"
         [canAccept]="canAccept()"
         ariaLabel="Accept request"

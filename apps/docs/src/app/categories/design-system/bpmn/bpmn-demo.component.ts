@@ -35,14 +35,14 @@ type Flow = 'sequence' | 'message' | 'association';
                     vflowPort
                     handleType="target"
                     position="bottom"
-                    id="message-in"
+                    handleId="message-in"
                     [canStart]="false"
                     [offsetX]="ctx.width() * 0.4"></span>
                   <span
                     vflowPort
                     handleType="source"
                     position="bottom"
-                    id="message-out"
+                    handleId="message-out"
                     [canAccept]="false"
                     [offsetX]="ctx.width() * -0.4"></span>
                 }
@@ -65,7 +65,12 @@ type Flow = 'sequence' | 'message' | 'association';
                   <span vflowPort handleType="target" position="left" [canStart]="false" [canAccept]="false"></span>
                   <span vflowPort handleType="source" position="right" [canStart]="false" [canAccept]="false"></span>
                   @if (ctx.node.id === 'notify') {
-                    <span vflowPort handleType="source" position="top" id="message-out" [canAccept]="false"></span>
+                    <span
+                      vflowPort
+                      handleType="source"
+                      position="top"
+                      handleId="message-out"
+                      [canAccept]="false"></span>
                   }
                 </div>
               }
@@ -73,17 +78,17 @@ type Flow = 'sequence' | 'message' | 'association';
                 <div vflowBpmnGateway="exclusive" selectable [vflowSelected]="ctx.selected() || ctx.preselected()">
                   <span vflowExternalLabel>{{ ctx.data().title }}</span>
                   <span vflowPort handleType="target" position="left" [canStart]="false" [canAccept]="false"></span>
-                  <span vflowPort handleType="target" position="top" id="association" [canStart]="false"></span>
-                  <span vflowPort handleType="source" position="right" id="yes" [canStart]="false"></span>
-                  <span vflowPort handleType="source" position="bottom" id="no" [canStart]="false"></span>
+                  <span vflowPort handleType="target" position="top" handleId="association" [canStart]="false"></span>
+                  <span vflowPort handleType="source" position="right" handleId="yes" [canStart]="false"></span>
+                  <span vflowPort handleType="source" position="bottom" handleId="no" [canStart]="false"></span>
                 </div>
               }
               @case ('parallel') {
                 <div vflowBpmnGateway="parallel" selectable [vflowSelected]="ctx.selected() || ctx.preselected()">
                   <span vflowExternalLabel>{{ ctx.data().title }}</span>
                   <span vflowPort handleType="target" position="left" [canStart]="false" [canAccept]="false"></span>
-                  <span vflowPort handleType="source" position="right" id="a" [canStart]="false"></span>
-                  <span vflowPort handleType="source" position="bottom" id="b" [canStart]="false"></span>
+                  <span vflowPort handleType="source" position="right" handleId="a" [canStart]="false"></span>
+                  <span vflowPort handleType="source" position="bottom" handleId="b" [canStart]="false"></span>
                 </div>
               }
               @case ('annotation') {
@@ -102,7 +107,7 @@ type Flow = 'sequence' | 'message' | 'association';
                   }
                   <span vflowExternalLabel>{{ ctx.data().title }}</span>
                   @if (ctx.data().kind === 'start') {
-                    <span vflowPort handleType="target" position="top" id="message-in" [canStart]="false"></span>
+                    <span vflowPort handleType="target" position="top" handleId="message-in" [canStart]="false"></span>
                   } @else {
                     <span vflowPort handleType="target" position="left" [canStart]="false" [canAccept]="false"></span>
                   }

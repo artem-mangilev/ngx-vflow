@@ -1,4 +1,3 @@
-import { ConnectionMode } from '../types/connection-mode.type';
 import { HandleType } from '../types/handle-type.type';
 import { Connection } from './connection.interface';
 import { Curve } from './edge.interface';
@@ -9,16 +8,12 @@ export type ConnectionForValidation = Connection & {
   targetHandleType: HandleType;
 };
 
-/** Connection preview: core's default line or the `connection` template. */
-export type ConnectionType = 'default' | 'template';
-
 export type ConnectionValidatorFn = (connection: ConnectionForValidation) => boolean;
 
+/** Settings of the connection gesture. The preview renders the `connection` template when one is declared. */
 export interface ConnectionSettings {
   curve?: Curve;
-  type?: ConnectionType;
   validator?: ConnectionValidatorFn;
   marker?: Marker;
-  mode?: ConnectionMode;
   allowSelfConnections?: boolean;
 }

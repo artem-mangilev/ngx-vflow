@@ -19,12 +19,12 @@ import { FlowStoreService } from '../services/flow-store.service';
           <div class="metric-row">
             <span class="metric-name">W:</span>
             <span class="metric-value">{{ connectedNodeWidth() }}px</span>
-            <span vflowPort handleType="target" position="left" id="width"></span>
+            <span vflowPort handleType="target" position="left" handleId="width"></span>
           </div>
           <div class="metric-row">
             <span class="metric-name">H:</span>
             <span class="metric-value">{{ connectedNodeHeight() }}px</span>
-            <span vflowPort handleType="target" position="left" id="height"></span>
+            <span vflowPort handleType="target" position="left" handleId="height"></span>
           </div>
         </div>
 
@@ -35,12 +35,12 @@ import { FlowStoreService } from '../services/flow-store.service';
           <div class="metric-row">
             <span class="metric-name">X:</span>
             <span class="metric-value">{{ connectedNodeX() }}</span>
-            <span vflowPort handleType="target" position="left" id="x"></span>
+            <span vflowPort handleType="target" position="left" handleId="x"></span>
           </div>
           <div class="metric-row">
             <span class="metric-name">Y:</span>
             <span class="metric-value">{{ connectedNodeY() }}</span>
-            <span vflowPort handleType="target" position="left" id="y"></span>
+            <span vflowPort handleType="target" position="left" handleId="y"></span>
           </div>
         </div>
       </div>

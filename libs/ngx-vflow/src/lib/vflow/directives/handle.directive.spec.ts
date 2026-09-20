@@ -11,7 +11,6 @@ import { By } from '@angular/platform-browser';
 import { VflowComponent } from '../components/vflow/vflow.component';
 import { createNode } from '../interfaces/node.interface';
 import { createEdge } from '../interfaces/edge.interface';
-import { ConnectionSettings } from '../interfaces/connection-settings.interface';
 import { FlowEntitiesService } from '../services/flow-entities.service';
 import { FlowStatusService } from '../services/flow-status.service';
 import { Position } from '../types/position.type';
@@ -71,10 +70,9 @@ class HiddenHandlesNodeComponent {}
 @Component({
   template: `<div
     vflowHandle
-    handleType="source"
+    handleType="any"
     position="right"
     layout="manual"
-    [id]="'io'"
     style="display: block; width: 120px; height: 60px">
     <div dragHandle class="title" style="height: 20px">Title</div>
     <div class="body" style="height: 40px"></div>
@@ -86,12 +84,11 @@ class NodeAsHandleComponent {}
 
 /** Binds `connect`, so the connection controller exists and handles can start and validate connections. */
 @Component({
-  template: `<vflow [view]="[400, 300]" [nodes]="nodes" [connection]="connection" (connect)="(undefined)" />`,
+  template: `<vflow [view]="[400, 300]" [nodes]="nodes" (connect)="(undefined)" />`,
   imports: [VflowComponent, ConnectionControllerDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 class ConnectableHostComponent {
-  readonly connection: ConnectionSettings = { mode: 'loose' };
   readonly nodes = ['a', 'b'].map((id, i) =>
     createNode({ id, component: NodeAsHandleComponent, point: { x: i * 200, y: 0 } }),
   );
@@ -99,7 +96,7 @@ class ConnectableHostComponent {
 
 @Component({
   selector: 'test-port',
-  hostDirectives: [{ directive: VflowHandleDirective, inputs: ['handleType', 'position', 'id', 'canAccept'] }],
+  hostDirectives: [{ directive: VflowHandleDirective, inputs: ['handleType', 'position', 'handleId', 'canAccept'] }],
   host: { style: 'display: block; width: 8px; height: 8px' },
   template: `{{ handle.handleType() }} {{ handle.state() }}`,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -110,7 +107,7 @@ class PortComponent {
 
 @Component({
   template: `<div style="width: 100px; height: 40px">
-    <test-port handleType="target" position="left" id="in" [canAccept]="false" />
+    <test-port handleType="target" position="left" handleId="in" [canAccept]="false" />
   </div>`,
   imports: [PortComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,

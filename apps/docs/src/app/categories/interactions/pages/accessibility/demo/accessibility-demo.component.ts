@@ -40,7 +40,7 @@ import { AriaLabelConfig, Vflow, createEdges, createNodes } from 'ngx-vflow';
                 vflowPort
                 handleType="target"
                 position="left"
-                id="incoming"
+                handleId="incoming"
                 ariaLabel="Accept request"
                 ariaDescription="Inbound route."
                 [canStart]="false"

@@ -47,7 +47,7 @@ nodes[0].ariaDescription!.set('Ready for approval.');
 `ariaLabel`, `ariaDescription` and `domAttributes` are optional writable signals on `Node` and `Edge`. Both factory modes preserve supplied values. Omitted metadata remains absent, allowing generated defaults. Handles expose ordinary Angular inputs:
 
 ```html
-<span vflowHandle handleType="target" position="left" id="incoming" ariaLabel="Approve expense" ariaDescription="Inbound review route." [canStart]="false" [canAccept]="true" [domAttributes]="{ 'data-port': 'review' }"></span>
+<span vflowHandle handleType="target" position="left" handleId="incoming" ariaLabel="Approve expense" ariaDescription="Inbound review route." [canStart]="false" [canAccept]="true" [domAttributes]="{ 'data-port': 'review' }"></span>
 ```
 
 Names prefer a nonblank `ariaLabel`, then `Node {id}` or `Group {id}`. Custom templates/components need application-supplied names; the library does not inspect their descendants. An edge defaults to `Connection from {source name} to {target name}`. A handle defaults to `Source connection point [id] of {node name}` or its `Target` equivalent, omitting a missing ID.
@@ -77,28 +77,28 @@ const labels: Partial<AriaLabelConfig> = {
 
 `DEFAULT_ARIA_LABEL_CONFIG` exports all defaults. Use the following keys to translate the complete library vocabulary; translate application-provided names and descriptions separately.
 
-| Key                           | Default / formatter arguments                                           |
-| ----------------------------- | ----------------------------------------------------------------------- |
-| `flowLabel`                   | `Graph`                                                                 |
-| `flowDescription`             | Empty string                                                            |
-| `minimapLabel`                | `Graph minimap`                                                         |
-| `minimapDescription`          | Empty string                                                            |
-| `nodeLabel`, `groupLabel`     | `(id: string) => string`                                                |
-| `edgeLabel`                   | `({ source: string, target: string }) => string`                        |
-| `handleLabel`                 | `({ type: 'source' \| 'target', id?: string, node: string }) => string` |
-| `parentDescription`           | `(parent: string) => string`, default `Parent: {parent}.`               |
-| `selected`                    | `Selected.`                                                             |
-| `selectionUnavailable`        | `Selection unavailable.`                                                |
-| `movementUnavailable`         | `Movement unavailable.`                                                 |
-| `reconnectionUnavailable`     | `Reconnection unavailable.`                                             |
-| `connectionStartUnavailable`  | `Starting connections unavailable.`                                     |
-| `connectionAcceptUnavailable` | `Accepting connections unavailable.`                                    |
-| `connectionValid`             | `Valid connection target.`                                              |
-| `connectionInvalid`           | `Invalid connection target.`                                            |
-| `keyboardNavigation`          | Instructions for Tab and Shift+Tab traversal.                           |
-| `keyboardSelect`              | Instructions for selection and the multiselection modifier.             |
-| `keyboardDeselect`            | Instructions for clearing selection with Escape.                        |
-| `keyboardMove`                | Instructions for arrows and accelerated movement with Shift.            |
+| Key                           | Default / formatter arguments                                                    |
+| ----------------------------- | -------------------------------------------------------------------------------- |
+| `flowLabel`                   | `Graph`                                                                          |
+| `flowDescription`             | Empty string                                                                     |
+| `minimapLabel`                | `Graph minimap`                                                                  |
+| `minimapDescription`          | Empty string                                                                     |
+| `nodeLabel`, `groupLabel`     | `(id: string) => string`                                                         |
+| `edgeLabel`                   | `({ source: string, target: string }) => string`                                 |
+| `handleLabel`                 | `({ type: 'source' \| 'target' \| 'any', id?: string, node: string }) => string` |
+| `parentDescription`           | `(parent: string) => string`, default `Parent: {parent}.`                        |
+| `selected`                    | `Selected.`                                                                      |
+| `selectionUnavailable`        | `Selection unavailable.`                                                         |
+| `movementUnavailable`         | `Movement unavailable.`                                                          |
+| `reconnectionUnavailable`     | `Reconnection unavailable.`                                                      |
+| `connectionStartUnavailable`  | `Starting connections unavailable.`                                              |
+| `connectionAcceptUnavailable` | `Accepting connections unavailable.`                                             |
+| `connectionValid`             | `Valid connection target.`                                                       |
+| `connectionInvalid`           | `Invalid connection target.`                                                     |
+| `keyboardNavigation`          | Instructions for Tab and Shift+Tab traversal.                                    |
+| `keyboardSelect`              | Instructions for selection and the multiselection modifier.                      |
+| `keyboardDeselect`            | Instructions for clearing selection with Escape.                                 |
+| `keyboardMove`                | Instructions for arrows and accelerated movement with Shift.                     |
 
 Formatters receive plain text. Return plain text without HTML markup.
 

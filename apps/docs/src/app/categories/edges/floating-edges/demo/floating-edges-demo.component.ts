@@ -1,11 +1,10 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { DocsPresentations } from '@docs/shared';
-import { VflowPort } from '@vflow/ui';
-import { ConnectionSettings, Edge, Node, Vflow, createNodes, injectNode } from 'ngx-vflow';
+import { Edge, Node, Vflow, createNodes, injectNode } from 'ngx-vflow';
 
 @Component({
   template: `
-    <vflow view="auto" [nodes]="nodes" [edges]="edges" [connection]="connection">
+    <vflow view="auto" [nodes]="nodes" [edges]="edges">
       <ng-template let-ctx node><docs-node [ctx]="ctx" /></ng-template>
       <ng-template let-ctx edge><svg:g docsEdge [ctx]="ctx" /></ng-template>
     </vflow>
@@ -59,7 +58,6 @@ export class FloatingEdgesDemoComponent {
           type: 'arrow-closed',
         },
       }),
-      floating: signal(true),
     },
     {
       id: '2 -> 3',
@@ -70,13 +68,8 @@ export class FloatingEdgesDemoComponent {
           type: 'arrow-closed',
         },
       }),
-      floating: signal(true),
     },
   ];
-
-  public connection: ConnectionSettings = {
-    mode: 'loose',
-  };
 }
 
 interface FloatingEdgesNodeData {
@@ -87,10 +80,8 @@ interface FloatingEdgesNodeData {
   template: `<div class="node">
     {{ ctx.data().text }}
 
-    <span vflowPort handleType="source" position="top" id="a"></span>
-    <span vflowPort handleType="source" position="right" id="b"></span>
-    <span vflowPort handleType="source" position="bottom" id="c"></span>
-    <span vflowPort handleType="source" position="left" id="d"></span>
+    <!-- One handle whose point follows the other end of each edge: the node has no ports. -->
+    <span vflowHandle handleType="any" position="auto"></span>
   </div>`,
   styles: [
     `
@@ -108,7 +99,7 @@ interface FloatingEdgesNodeData {
     `,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Vflow, VflowPort],
+  imports: [Vflow],
 })
 export class FloatingEdgesNodeComponent {
   protected readonly ctx = injectNode<FloatingEdgesNodeData>();

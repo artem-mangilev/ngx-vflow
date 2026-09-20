@@ -41,8 +41,8 @@ A stable, composable presentation part of a node-based interface whose applicati
 _Avoid_: Business component, editor application
 
 **Handle**:
-An element of a node presentation marked as a connection point. The engine registers, measures and positions it on a node side; its size and look belong to the consuming application.
-_Avoid_: Port, anchor
+An element of a node presentation marked as a connection point: a port on a node side, or a surface such as the whole node whose edges meet the node on the side facing the other end or at its center. The engine registers it, measures and positions a port; size and look belong to the consuming application.
+_Avoid_: Port, anchor, node handle
 
 **Edge label**:
 HTML content declared inside an edge presentation and rendered by the library in its label layer at the start, center or end point of the edge path. Its text belongs to edge data; a separate label collection or global label template does not exist.

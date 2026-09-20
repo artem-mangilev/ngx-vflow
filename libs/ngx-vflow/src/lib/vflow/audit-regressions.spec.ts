@@ -1,4 +1,10 @@
-import { ChangeDetectionStrategy, Component, provideZonelessChangeDetection, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  provideZonelessChangeDetection,
+  signal,
+  WritableSignal,
+} from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { FlowEntitiesService } from './services/flow-entities.service';
 import { FlowSettingsService } from './services/flow-settings.service';
@@ -10,6 +16,7 @@ import { NodesChangeService } from './services/node-changes.service';
 import { NodeModel } from './models/node.model';
 import { EdgeModel } from './models/edge.model';
 import { HandleModel } from './models/handle.model';
+import { HandlePosition } from './types/handle-type.type';
 import { createNode, Node } from './interfaces/node.interface';
 import { createEdge } from './interfaces/edge.interface';
 import { reparentNodes, removeNodes } from './utils/graph-operations';
@@ -263,10 +270,12 @@ describe('Graph rendering and interaction regressions', () => {
   });
 
   for (const offscreenIndex of [0, 1]) {
-    it(`updates a floating edge with offscreen endpoint ${offscreenIndex}`, () => {
+    it(`updates an edge between auto handles with offscreen endpoint ${offscreenIndex}`, () => {
       const { nodes, edges } = graph();
       const edge = edges[0];
-      edge.floating.set(true);
+      for (const handle of [edge.sourceHandle()!, edge.targetHandle()!]) {
+        (handle.position as WritableSignal<HandlePosition>).set('auto');
+      }
       const path = edge.path().path;
       expect(path).not.toBe('');
       nodes[offscreenIndex].point.set({ x: -1000, y: 0 });

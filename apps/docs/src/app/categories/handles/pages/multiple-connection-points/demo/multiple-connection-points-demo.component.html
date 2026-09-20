@@ -6,11 +6,11 @@
       <div class="custom-node">
         <div class="data-block">
           Output 1
-          <span vflowPort handleType="source" position="right" [id]="ctx.data().output1"></span>
+          <span vflowPort handleType="source" position="right" [handleId]="ctx.data().output1"></span>
         </div>
         <div class="data-block">
           Output 2
-          <span vflowPort handleType="source" position="right" [id]="ctx.data().output2"></span>
+          <span vflowPort handleType="source" position="right" [handleId]="ctx.data().output2"></span>
         </div>
       </div>
     }
@@ -19,11 +19,11 @@
       <div class="custom-node">
         <div class="data-block">
           Input 1
-          <span vflowPort handleType="target" position="left" [id]="ctx.data().input1"></span>
+          <span vflowPort handleType="target" position="left" [handleId]="ctx.data().input1"></span>
         </div>
         <div class="data-block">
           Input 2
-          <span vflowPort handleType="target" position="left" [id]="ctx.data().input2"></span>
+          <span vflowPort handleType="target" position="left" [handleId]="ctx.data().input2"></span>
         </div>
       </div>
     }

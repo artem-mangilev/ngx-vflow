@@ -27,7 +27,7 @@ Each function returns a `CurveLayout` with the SVG `path` and label points. For 
 
 ## Floating endpoints
 
-`getFloatingEdgeParams` builds the endpoints of an edge between two rectangles that does not use fixed handles: each endpoint is where the segment between the centers crosses the border of its rectangle, and the side is the border it crosses. The result feeds `getBezierPath` or `getSmoothStepPath`.
+`getFloatingEdgeParams` builds the endpoints of an edge between two rectangles that does not use fixed handles: each endpoint is where the segment between the centers crosses the border of its rectangle, and the side is the border it crosses. The result feeds `getBezierPath` or `getSmoothStepPath`. Handles with `position="auto"` use the middle of the facing side instead; this utility is for custom curves that want the exact crossing.
 
 ```ts
 import { getBezierPath, getFloatingEdgeParams } from 'ngx-vflow';

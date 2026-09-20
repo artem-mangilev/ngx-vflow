@@ -1,6 +1,6 @@
 import { Directive, forwardRef, input, signal } from '@angular/core';
 import { VflowHandleDirective } from 'ngx-vflow';
-import type { DomAttributes, HandleLayout, HandleState, HandleType, Position } from 'ngx-vflow';
+import type { DomAttributes, HandleLayout, HandlePosition, HandleState, HandleType } from 'ngx-vflow';
 import { AsInterface } from '../types';
 
 /** Accepts the handle inputs and stands in for the handle directive in DI; its state stays `idle`. */
@@ -12,8 +12,8 @@ import { AsInterface } from '../types';
 })
 export class HandleMockDirective implements AsInterface<VflowHandleDirective> {
   public readonly handleType = input<HandleType>('source');
-  public readonly position = input<Position>('top');
-  public readonly id = input<string>();
+  public readonly position = input<HandlePosition>('top');
+  public readonly handleId = input<string>();
   public readonly layout = input<HandleLayout>('auto');
   public readonly offsetX = input(0);
   public readonly offsetY = input(0);

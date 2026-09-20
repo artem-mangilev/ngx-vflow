@@ -12,7 +12,6 @@ export const EDGE_DEFAULTS = {
   data: {},
   markers: {},
   reconnectable: false,
-  floating: false,
   selected: false,
   interactionWidth: 20,
 };
@@ -30,7 +29,6 @@ export interface Edge<T = unknown> extends Connection {
     end?: Marker;
   }>;
   reconnectable?: WritableSignal<boolean | 'source' | 'target'>;
-  floating?: WritableSignal<boolean>;
   selected?: WritableSignal<boolean>;
   /**
    * Width in pixels of the transparent stroke the flow draws along the edge path to make the edge easy to click.
@@ -75,7 +73,6 @@ export function createEdge<T>(
       data: signal(isDefined(edge.data) ? edge.data : EDGE_DEFAULTS.data) as WritableSignal<T>,
       markers: signal(isDefined(edge.markers) ? edge.markers : EDGE_DEFAULTS.markers),
       reconnectable: signal(isDefined(edge.reconnectable) ? edge.reconnectable : EDGE_DEFAULTS.reconnectable),
-      floating: signal(isDefined(edge.floating) ? edge.floating : EDGE_DEFAULTS.floating),
       selected: signal(isDefined(edge.selected) ? edge.selected : EDGE_DEFAULTS.selected),
       interactionWidth: signal(
         isDefined(edge.interactionWidth) ? edge.interactionWidth : EDGE_DEFAULTS.interactionWidth,
@@ -98,7 +95,6 @@ export function createEdge<T>(
       data: isDefined(edge.data) ? (signal(edge.data) as WritableSignal<T>) : undefined,
       markers: isDefined(edge.markers) ? signal(edge.markers) : undefined,
       reconnectable: isDefined(edge.reconnectable) ? signal(edge.reconnectable) : undefined,
-      floating: isDefined(edge.floating) ? signal(edge.floating) : undefined,
       selected: isDefined(edge.selected) ? signal(edge.selected) : undefined,
       interactionWidth: isDefined(edge.interactionWidth) ? signal(edge.interactionWidth) : undefined,
       ...(isDefined(edge.selectable) ? { selectable: signal(edge.selectable) } : {}),

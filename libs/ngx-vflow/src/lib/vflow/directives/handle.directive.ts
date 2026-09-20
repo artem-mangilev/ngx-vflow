@@ -9,13 +9,14 @@ import { ConnectionControllerDirective } from './connection-controller.directive
 import { RootPointerDirective } from './root-pointer.directive';
 import { EntityAccessibility, bindEntityAccessibility } from './entity-accessibility.directive';
 import { DomAttributes } from '../interfaces/dom-attributes.interface';
-import { Position } from '../types/position.type';
-import { HandleLayout, HandleType } from '../types/handle-type.type';
+import { HandleLayout, HandlePosition, HandleType } from '../types/handle-type.type';
 import { isTouchEvent } from '../utils/event';
 
 /**
- * Makes an element of a node presentation a connection point. The library registers, measures and, in the `auto`
- * layout, positions the element; its size and look belong to the application. State is exposed as
+ * Makes an element of a node presentation a connection point: a port on a node side, or, with `position="auto"`
+ * or `"center"`, a surface such as the whole node whose edges meet the node wherever the other end is. The
+ * library registers, measures and, in the `auto` layout, positions a port; its size and look belong to the
+ * application. State is exposed as
  * `data-vflow-handle-*` attributes for CSS and as signals of this directive for code: `#h="vflowHandle"` in a
  * template, `inject(VflowHandleDirective)` in a component that applies it through `hostDirectives` or in content of
  * a handle element.
@@ -53,16 +54,19 @@ export class VflowHandleDirective {
   // Optional, so the directive also runs in unit tests of application components with `provideCustomNodeMocks()`.
   private readonly rootPointer = inject(RootPointerDirective, { optional: true });
 
-  /** `source` or `target`. */
+  /** `source`, `target`, or `any` for both directions. */
   public readonly handleType = input<HandleType>('source');
 
-  /** Side of the node. */
-  public readonly position = input<Position>('top');
+  /**
+   * Where the connection point is: a side of the node, `auto` (the side facing the other end of each edge) or
+   * `center`. With `auto` and `center` the element is not positioned and only starts and accepts connections.
+   */
+  public readonly position = input<HandlePosition>('top');
 
-  /** Identifies the handle when a node has more than one handle of a type. */
-  public readonly id = input<string>();
+  /** Identifies the handle when a node has more than one handle of a role; `Edge.sourceHandle` and `targetHandle` refer to it. */
+  public readonly handleId = input<string>();
 
-  /** `auto` positions the element on the node side; `manual` leaves positioning to the application. */
+  /** `auto` positions the element on the node side; `manual` leaves positioning to the application. Sides only. */
   public readonly layout = input<HandleLayout>('auto');
 
   /** Shift of the element and its connection point in the `auto` layout, in flow units: positive is right and down. */
@@ -80,7 +84,7 @@ export class VflowHandleDirective {
       element: this.element,
       type: this.handleType,
       position: this.position,
-      id: this.id,
+      id: this.handleId,
       layout: this.layout,
       offsetX: this.offsetX,
       offsetY: this.offsetY,
@@ -93,7 +97,7 @@ export class VflowHandleDirective {
   public readonly state = this.model.state.asReadonly();
 
   protected readonly placement = computed(() => {
-    if (this.layout() !== 'auto') return null;
+    if (this.layout() !== 'auto' || this.model.dynamic()) return null;
 
     const styles = this.model.layoutStyles();
     // Styles anchored to the right or bottom edge put the element's far half outside of that edge.
@@ -114,7 +118,7 @@ export class VflowHandleDirective {
     return {
       label:
         this.ariaLabel()?.trim() ||
-        labels.handleLabel({ type: this.handleType(), id: this.id(), node: this.model.parentNode.ariaLabel() }),
+        labels.handleLabel({ type: this.handleType(), id: this.handleId(), node: this.model.parentNode.ariaLabel() }),
       description: [
         this.ariaDescription(),
         !this.canStart() ? labels.connectionStartUnavailable : '',
