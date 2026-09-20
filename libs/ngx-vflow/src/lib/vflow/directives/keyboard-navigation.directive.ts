@@ -12,15 +12,23 @@ import { getNodesFlowBounds } from '../utils/nodes';
 import { getOverlappingArea } from '../utils/rect';
 import { AnnouncerService } from '../services/announcer.service';
 import { FlowEntitiesService } from '../services/flow-entities.service';
+import { KeyboardCommandName } from '../types/keyboard-shortcuts.type';
 
 type ArrowDirection = 'left' | 'right' | 'up' | 'down';
 
-const ARROW_DIRECTIONS: Record<string, { name: ArrowDirection; vector: Point }> = {
-  ArrowLeft: { name: 'left', vector: { x: -1, y: 0 } },
-  ArrowRight: { name: 'right', vector: { x: 1, y: 0 } },
-  ArrowUp: { name: 'up', vector: { x: 0, y: -1 } },
-  ArrowDown: { name: 'down', vector: { x: 0, y: 1 } },
-};
+const ZOOM_COMMANDS: KeyboardCommandName[] = ['zoomIn', 'zoomOut', 'fitView'];
+/** Screen pixels per arrow press when panning the viewport; Shift multiplies by 4 like node movement. */
+const PAN_STEP = 15;
+/** Multiplicative zoom step per press, the same as the `vflow-controls` buttons. */
+const ZOOM_STEP = 1.2;
+
+/** The four directions with the command that moves a node and the command that pans the view in each. */
+const DIRECTIONS: { name: ArrowDirection; vector: Point; move: KeyboardCommandName; pan: KeyboardCommandName }[] = [
+  { name: 'left', vector: { x: -1, y: 0 }, move: 'moveLeft', pan: 'panLeft' },
+  { name: 'right', vector: { x: 1, y: 0 }, move: 'moveRight', pan: 'panRight' },
+  { name: 'up', vector: { x: 0, y: -1 }, move: 'moveUp', pan: 'panUp' },
+  { name: 'down', vector: { x: 0, y: 1 }, move: 'moveDown', pan: 'panDown' },
+];
 
 @Directive({
   selector: '[vflowKeyboardEntity]',
@@ -49,10 +57,16 @@ export class KeyboardEntityDirective {
     const selection = this.settings.selectionMode() !== 'manual';
     return [
       labels.keyboardNavigation,
-      selection && model.selectable() ? labels.keyboardSelect : '',
-      selection ? labels.keyboardDeselect : '',
-      model instanceof NodeModel && model.draggable() ? labels.keyboardMove : '',
+      selection && model.selectable() && this.keyboard.hasCommand('select') ? labels.keyboardSelect : '',
+      selection && this.keyboard.hasCommand('clearSelection') ? labels.keyboardDeselect : '',
+      model instanceof NodeModel &&
+      model.draggable() &&
+      DIRECTIONS.some((entry) => this.keyboard.hasCommand(entry.move))
+        ? labels.keyboardMove
+        : '',
       this.keyboard.hasCommand('delete') ? labels.keyboardDelete : '',
+      DIRECTIONS.some((entry) => this.keyboard.hasCommand(entry.pan)) ? labels.keyboardPan : '',
+      ZOOM_COMMANDS.some((command) => this.keyboard.hasCommand(command)) ? labels.keyboardZoom : '',
     ]
       .filter(Boolean)
       .join(' ');
@@ -94,25 +108,25 @@ export class KeyboardEntityDirective {
       event.composedPath()[0] !== this.element ||
       this.element.ownerDocument.activeElement !== this.element ||
       !model.focusable() ||
-      this.element.closest('[data-vflow-no-keyboard]')
+      this.element.closest('[data-vflow-no-keyboard]') ||
+      // A key held as a gesture modifier (for example Space for panning) belongs to the gesture layer.
+      this.keyboard.isModifierKey(event.code)
     )
       return;
 
     const labels = this.settings.ariaLabels();
-    if (['Enter', ' ', 'Escape'].includes(event.key)) {
-      // A key bound to a gesture action (for example Space for pan) belongs to the gesture layer.
-      if (this.keyboard.hasShortcut(event.code)) return;
+    const select = this.keyboard.isCommand('select', event.code);
+    if (select || this.keyboard.isCommand('clearSelection', event.code)) {
       event.preventDefault();
       event.stopPropagation();
       if (event.repeat) return;
-      const clear = event.key === 'Escape';
       const changed = this.selection.selectFromKeyboard(
-        clear ? null : model,
-        this.keyboard.isActiveAction('multiSelection'),
+        select ? model : null,
+        this.keyboard.isActiveModifier('multiSelection'),
       );
       if (!changed) return;
       this.announcer.announce(
-        clear
+        !select
           ? labels.selectionClearedAnnouncement
           : labels.selectionAnnouncement({
               label: model.accessibility().label,
@@ -137,36 +151,41 @@ export class KeyboardEntityDirective {
           .filter(target)
           .map((edge) => edge.edge.id),
       });
-    } else if (
-      Object.hasOwn(ARROW_DIRECTIONS, event.key) &&
-      model instanceof NodeModel &&
-      model.selected() &&
-      model.draggable()
-    ) {
+    } else if (model instanceof NodeModel && model.selected() && model.draggable()) {
+      // An arrow that moves nothing is left unhandled, so the container pans the view with it instead.
+      const direction = DIRECTIONS.find((entry) => this.keyboard.isCommand(entry.move, event.code));
+      if (!direction) return;
       event.preventDefault();
       event.stopPropagation();
-      const { name, vector } = ARROW_DIRECTIONS[event.key];
-      const moved = this.draggable.moveSelected(model, vector, event.shiftKey);
+      const moved = this.draggable.moveSelected(model, direction.vector, event.shiftKey);
       if (moved.length === 0) return;
       const { x, y } = model.point();
-      this.announcer.announce(labels.movedAnnouncement({ count: moved.length, direction: name, x, y }));
+      this.announcer.announce(labels.movedAnnouncement({ count: moved.length, direction: direction.name, x, y }));
     }
   }
 }
 
-/** Native Tab traversal; only repair focus when its owning entity disappears or opts out. */
+/**
+ * Native Tab traversal; only repair focus when its owning entity disappears or opts out. Viewport commands that
+ * a focused wrapper does not consume, and the same commands on the container itself, pan and zoom the view.
+ */
 @Directive({
   selector: '[vflowKeyboard]',
   host: {
     tabindex: '-1',
     '(focusin)': 'onFocusIn($event)',
     '(focusout)': 'onFocusOut($event)',
+    '(keydown)': 'onKeydown($event)',
     '(scroll)': 'resetScroll()',
   },
 })
 export class KeyboardNavigationDirective {
   private element = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
   private entities = contentChildren(KeyboardEntityDirective, { descendants: true });
+  private keyboard = inject(KeyboardService);
+  private viewport = inject(ViewportService);
+  private settings = inject(FlowSettingsService);
+  private announcer = inject(AnnouncerService);
   private previous: readonly KeyboardEntityDirective[] = [];
   private focused?: { entity: KeyboardEntityDirective; target: Element };
 
@@ -191,6 +210,54 @@ export class KeyboardNavigationDirective {
         ) ?? eligible[0];
       (next?.element ?? this.element).focus({ preventScroll: true });
     });
+  }
+
+  protected onKeydown(event: KeyboardEvent) {
+    const target = event.composedPath()[0];
+    // Only the container and library wrappers issue viewport commands; embedded content keeps its own keys, and
+    // browser shortcuts such as Ctrl+Plus stay untouched.
+    if (
+      event.defaultPrevented ||
+      event.ctrlKey ||
+      event.metaKey ||
+      event.altKey ||
+      !(target instanceof Element) ||
+      (target !== this.element && !this.entities().some((entity) => entity.element === target)) ||
+      target.closest('[data-vflow-no-keyboard]')
+    )
+      return;
+
+    const direction = DIRECTIONS.find((entry) => this.keyboard.isCommand(entry.pan, event.code));
+    if (direction) {
+      event.preventDefault();
+      const { vector } = direction;
+      const { x, y } = this.viewport.readableViewport();
+      const step = PAN_STEP * (event.shiftKey ? 4 : 1);
+      // Arrows scroll the view: pressing right reveals what lies to the right, so the content moves left.
+      this.viewport.writableViewport.set({
+        changeType: 'absolute',
+        state: { x: x - vector.x * step, y: y - vector.y * step },
+        duration: 0,
+      });
+      return;
+    }
+
+    const labels = this.settings.ariaLabels();
+    if (this.keyboard.isCommand('zoomIn', event.code) || this.keyboard.isCommand('zoomOut', event.code)) {
+      event.preventDefault();
+      const direction = this.keyboard.isCommand('zoomIn', event.code) ? 1 : -1;
+      const zoom = Math.min(
+        this.settings.maxZoom(),
+        Math.max(this.settings.minZoom(), this.viewport.readableViewport().zoom * ZOOM_STEP ** direction),
+      );
+      this.viewport.writableViewport.set({ changeType: 'absolute', state: { zoom }, duration: 0 });
+      this.announcer.announce(labels.zoomAnnouncement(zoom));
+    } else if (this.keyboard.isCommand('fitView', event.code)) {
+      event.preventDefault();
+      if (event.repeat) return;
+      const state = this.viewport.fitView({ padding: 0.1, duration: 0 });
+      if (state) this.announcer.announce(labels.zoomAnnouncement(state.zoom));
+    }
   }
 
   protected onFocusIn(event: FocusEvent) {

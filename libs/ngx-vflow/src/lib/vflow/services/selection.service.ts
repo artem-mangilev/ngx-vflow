@@ -44,7 +44,7 @@ export class SelectionService {
             { start, end, target, delta: this.flowSettingsService.paneClickDistance() },
             {
               entities: this.flowEntitiesService.entities(),
-              isMultiSelectionActive: this.keyboardService.isActiveAction('multiSelection'),
+              isMultiSelectionActive: this.keyboardService.isActiveModifier('multiSelection'),
             },
           );
         }
@@ -60,7 +60,7 @@ export class SelectionService {
   public select(entity: FlowEntity | null) {
     this.currentStrategy().select(entity, {
       entities: this.flowEntitiesService.entities(),
-      isMultiSelectionActive: this.keyboardService.isActiveAction('multiSelection'),
+      isMultiSelectionActive: this.keyboardService.isActiveModifier('multiSelection'),
     });
   }
 

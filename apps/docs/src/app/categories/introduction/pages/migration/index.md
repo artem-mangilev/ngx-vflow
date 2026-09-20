@@ -366,6 +366,24 @@ The `[resizable]` element is now the node's sizing box: for an explicitly sized 
 
 Handles are no longer exposed to assistive technology: the handle inputs `ariaLabel` and `ariaDescription` and the label keys `handleLabel`, `connectionStartUnavailable`, `connectionAcceptUnavailable`, `connectionValid` and `connectionInvalid` are removed. A handle gets no role, name or description; its content keeps its own semantics and `domAttributes` still applies `data-*`. Keyboard commands on focused nodes and edges now report their outcome in the flow's live region, `Delete` and `Backspace` emit `(deleteRequest)` for the focused entity or, when it is selected, for the whole selection, and a key bound through `keyboardShortcuts` is reserved for its action. See [Accessibility](../../interactions/accessibility).
 
+### Keyboard shortcut configuration
+
+`keyboardShortcuts` now has two sections instead of one flat object, and an empty list replaces `null` as the way to
+disable an entry. `selection`, `multiSelection`, `pan` and `zoom` are held modifiers; everything else is a command that
+runs on a press. `select`, `clearSelection` and the arrow keys for node movement and viewport panning became commands
+too, so they can be remapped or disabled like the rest. The types `KeyboardAction` and `KeyboardCommand` are gone;
+`KeyboardShortcuts` and the new `KeyboardCommandName` remain. See [Keyboard shortcuts](../../interactions/keyboard-shortcuts).
+
+| Before                           | After                                                |
+| -------------------------------- | ---------------------------------------------------- |
+| `{ selection: ['ShiftLeft'] }`   | `{ modifiers: { selection: ['ShiftLeft'] } }`        |
+| `{ multiSelection: [...] }`      | `{ modifiers: { multiSelection: [...] } }`           |
+| `{ pan: ['Space'] }`             | `{ modifiers: { panActivation: ['Space'] } }`        |
+| `{ zoom: ['ControlLeft'] }`      | `{ modifiers: { zoomActivation: ['ControlLeft'] } }` |
+| `{ delete: ['KeyX'] }`           | `{ commands: { delete: ['KeyX'] } }`                 |
+| `{ zoomIn, zoomOut, fitView }`   | `{ commands: { zoomIn, zoomOut, fitView } }`         |
+| `{ selection: null }` to disable | `{ modifiers: { selection: [] } }`                   |
+
 ### Removed APIs
 
 | Removed in v3                                      | Migration                                                                                              |

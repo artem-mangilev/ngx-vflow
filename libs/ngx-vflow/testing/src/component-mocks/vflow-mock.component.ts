@@ -146,7 +146,7 @@ export class VflowMockComponent implements AsInterface<VflowComponent>, OnInit {
 
   @Input()
   public readonly keyboardShortcuts: KeyboardShortcuts = {
-    multiSelection: null,
+    modifiers: { multiSelection: [] },
   };
 
   @Input({

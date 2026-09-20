@@ -8,16 +8,19 @@ Graph entities have readable names, relationships and state descriptions. This e
 
 `Tab` and `Shift+Tab` visit focusable nodes in the input `nodes` order, then edges in the input `edges` order. Parent relationships and visual elevation do not reorder the sequence. Embedded controls keep their DOM order and their own keyboard behavior. Tab leaves the graph normally; there is no focus trap. Focus has a separate visible indicator and does not change selection.
 
-| Command on an entity wrapper                | Behavior                                                                                                                                                                |
-| ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `Enter` / `Space`                           | Select the entity and clear other selection.                                                                                                                            |
-| Multiselection modifier + `Enter` / `Space` | Toggle only the focused entity. The modifier follows `keyboardShortcuts.multiSelection` (Meta on macOS, Control elsewhere by default).                                  |
-| `Escape`                                    | Clear selection and retain focus.                                                                                                                                       |
-| Arrow keys on a selected movable node       | Move all selected movable nodes by 5 flow-space units.                                                                                                                  |
-| `Shift` + arrow keys                        | Move by 20 flow-space units.                                                                                                                                            |
-| `Delete` / `Backspace`                      | Emit `deleteRequest`: the whole selection when the focused entity is selected, otherwise only the focused entity. The application removes them, or ignores the request. |
+| Command on an entity wrapper                                     | Behavior                                                                                                                                                                |
+| ---------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Enter` / `Space`                                                | Select the entity and clear other selection.                                                                                                                            |
+| Multiselection modifier + `Enter` / `Space`                      | Toggle only the focused entity. The modifier follows `keyboardShortcuts.modifiers.multiSelection` (Meta on macOS, Control elsewhere by default).                        |
+| `Escape`                                                         | Clear selection and retain focus.                                                                                                                                       |
+| Arrow keys on a selected movable node                            | Move all selected movable nodes by 5 flow-space units.                                                                                                                  |
+| `Shift` + arrow keys                                             | Move by 20 flow-space units.                                                                                                                                            |
+| `Delete` / `Backspace`                                           | Emit `deleteRequest`: the whole selection when the focused entity is selected, otherwise only the focused entity. The application removes them, or ignores the request. |
+| Arrow keys on any other focused entity or on the graph container | Pan the view by 15 screen pixels in the reading direction: right reveals what lies to the right. `Shift` pans by 60.                                                    |
+| `=` / `+` and `-`                                                | Zoom in and out by a factor of 1.2 around the view center, within `minZoom` and `maxZoom`.                                                                              |
+| `0`                                                              | Fit the whole graph into the view.                                                                                                                                      |
 
-A deletion key on a focused node or edge emits `(deleteRequest)` with `{ nodeIds, edgeIds }`, once per press. The command acts at the point of focus: when the focused entity is selected, the request carries the whole selection; otherwise it carries only the focused entity, and a selection elsewhere stays untouched. The library does not remove anything or clear selection: apply the request with `removeNodes` and `removeEdges`, or ignore it. When the focused entity disappears, focus recovery moves focus to the next entity. The keys follow `keyboardShortcuts.delete` (`Delete` and `Backspace` by default, `null` disables the command and its instruction).
+A deletion key on a focused node or edge emits `(deleteRequest)` with `{ nodeIds, edgeIds }`, once per press. The command acts at the point of focus: when the focused entity is selected, the request carries the whole selection; otherwise it carries only the focused entity, and a selection elsewhere stays untouched. The library does not remove anything or clear selection: apply the request with `removeNodes` and `removeEdges`, or ignore it. When the focused entity disappears, focus recovery moves focus to the next entity. The keys follow `keyboardShortcuts.commands.delete` (`Delete` and `Backspace` by default, an empty list disables the command and its instruction).
 
 ```html
 <vflow [nodes]="nodes" [edges]="edges" (deleteRequest)="onDeleteRequest($event)" />
@@ -30,6 +33,8 @@ onDeleteRequest({ nodeIds, edgeIds }: DeleteRequest) {
   this.edges = result.edges;
 }
 ```
+
+Viewport commands work on a focused node or edge and on the graph container itself, which receives focus after the last entity disappears. Arrow keys pan only when they do not move a node, so a selected movable node still moves. The keys follow `keyboardShortcuts.commands.zoomIn`, `zoomOut`, `fitView` and `panUp` and its three siblings; `Ctrl`, `Cmd` and `Alt` combinations are left to the browser. Panning is silent; zooming announces the resulting scale.
 
 Keyboard commands report their outcome in the flow's own polite, atomic live region: `Child selected. 1 selected in total.`, `Selection cleared.` and `Moved node right. Position: 25, 20.` (the focused node's position after the move). Only a command that changes state is announced; pointer and programmatic changes stay silent. A key bound to a gesture action through `keyboardShortcuts`, such as `Space` for `pan`, is left to the gesture layer and does not select.
 
@@ -94,27 +99,30 @@ const labels: Partial<AriaLabelConfig> = {
 
 `DEFAULT_ARIA_LABEL_CONFIG` exports all defaults. Use the following keys to translate the complete library vocabulary; translate application-provided names and descriptions separately.
 
-| Key                            | Default / formatter arguments                                                             |
-| ------------------------------ | ----------------------------------------------------------------------------------------- |
-| `flowLabel`                    | `Graph`                                                                                   |
-| `flowDescription`              | Empty string                                                                              |
-| `minimapLabel`                 | `Graph minimap`                                                                           |
-| `minimapDescription`           | Empty string                                                                              |
-| `nodeLabel`, `groupLabel`      | `(id: string) => string`                                                                  |
-| `edgeLabel`                    | `({ source: string, target: string }) => string`                                          |
-| `parentDescription`            | `(parent: string) => string`, default `Parent: {parent}.`                                 |
-| `selected`                     | `Selected.`                                                                               |
-| `selectionUnavailable`         | `Selection unavailable.`                                                                  |
-| `movementUnavailable`          | `Movement unavailable.`                                                                   |
-| `reconnectionUnavailable`      | `Reconnection unavailable.`                                                               |
-| `keyboardNavigation`           | Instructions for Tab and Shift+Tab traversal.                                             |
-| `keyboardSelect`               | Instructions for selection and the multiselection modifier.                               |
-| `keyboardDeselect`             | Instructions for clearing selection with Escape.                                          |
-| `keyboardMove`                 | Instructions for arrows and accelerated movement with Shift.                              |
-| `keyboardDelete`               | Instructions for the deletion request; omitted when `keyboardShortcuts.delete` is `null`. |
-| `selectionAnnouncement`        | `({ label: string, selected: boolean, count: number }) => string`, live feedback          |
-| `selectionClearedAnnouncement` | `Selection cleared.`                                                                      |
-| `movedAnnouncement`            | `({ count, direction: 'left' \| 'right' \| 'up' \| 'down', x, y }) => string`             |
+| Key                            | Default / formatter arguments                                                            |
+| ------------------------------ | ---------------------------------------------------------------------------------------- |
+| `flowLabel`                    | `Graph`                                                                                  |
+| `flowDescription`              | Empty string                                                                             |
+| `minimapLabel`                 | `Graph minimap`                                                                          |
+| `minimapDescription`           | Empty string                                                                             |
+| `nodeLabel`, `groupLabel`      | `(id: string) => string`                                                                 |
+| `edgeLabel`                    | `({ source: string, target: string }) => string`                                         |
+| `parentDescription`            | `(parent: string) => string`, default `Parent: {parent}.`                                |
+| `selected`                     | `Selected.`                                                                              |
+| `selectionUnavailable`         | `Selection unavailable.`                                                                 |
+| `movementUnavailable`          | `Movement unavailable.`                                                                  |
+| `reconnectionUnavailable`      | `Reconnection unavailable.`                                                              |
+| `keyboardNavigation`           | Instructions for Tab and Shift+Tab traversal.                                            |
+| `keyboardSelect`               | Instructions for selection and the multiselection modifier.                              |
+| `keyboardDeselect`             | Instructions for clearing selection with Escape.                                         |
+| `keyboardMove`                 | Instructions for arrows and accelerated movement with Shift.                             |
+| `keyboardDelete`               | Instructions for the deletion request; omitted when its command is disabled.             |
+| `keyboardPan`                  | Instructions for panning with arrow keys.                                                |
+| `keyboardZoom`                 | Instructions for zoom and fit view; omitted when all three viewport commands are `null`. |
+| `zoomAnnouncement`             | `(zoom: number) => string`, default `Zoom {percent}%.`                                   |
+| `selectionAnnouncement`        | `({ label: string, selected: boolean, count: number }) => string`, live feedback         |
+| `selectionClearedAnnouncement` | `Selection cleared.`                                                                     |
+| `movedAnnouncement`            | `({ count, direction: 'left' \| 'right' \| 'up' \| 'down', x, y }) => string`            |
 
 Formatters receive plain text. Return plain text without HTML markup.
 

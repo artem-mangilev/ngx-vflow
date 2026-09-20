@@ -38,7 +38,7 @@ describe('DraggableService', () => {
   };
   const keyboardServiceMock = {
     selectionActive: false,
-    isActiveAction(action: 'selection' | 'multiSelection') {
+    isActiveModifier(action: 'selection' | 'multiSelection') {
       return action === 'selection' ? this.selectionActive : false;
     },
   };

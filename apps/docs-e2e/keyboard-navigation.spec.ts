@@ -117,3 +117,42 @@ async function relativePosition(node: Locator) {
     return { x: rect.x - graph.x, y: rect.y - graph.y };
   });
 }
+
+test('pans, zooms and fits the viewport from the keyboard', async ({ page }) => {
+  await page.goto('/interactions/accessibility');
+  const demo = page.getByTestId('keyboard-demo');
+  const graph = demo.getByRole('region', { name: 'Keyboard graph', exact: true });
+  const viewport = demo.locator('.vflow-viewport').first();
+  const live = demo.locator('[aria-live="polite"]');
+  const transform = () => viewport.evaluate((element) => element.style.transform);
+  await demo.getByLabel('Pan on node focus').uncheck();
+  await graph.getByRole('group', { name: 'Next step', exact: true }).focus();
+  await page.keyboard.press('ArrowRight');
+  await expect.poll(transform).toBe('translate(-15px, 0px) scale(1)');
+  await page.keyboard.press('Shift+ArrowDown');
+  await expect.poll(transform).toBe('translate(-15px, -60px) scale(1)');
+  // A focused unselected node pans as well; a selected movable node moves instead.
+  const draft = graph.getByRole('group', { name: 'Draft', exact: true });
+  await draft.focus();
+  await page.keyboard.press('ArrowLeft');
+  await expect.poll(transform).toBe('translate(0px, -60px) scale(1)');
+  await page.keyboard.press('Enter');
+  await page.keyboard.press('ArrowLeft');
+  await expect.poll(transform).toBe('translate(0px, -60px) scale(1)');
+  await expect(demo.getByText('Selected: draft', { exact: false })).toBeVisible();
+  await page.keyboard.press('Equal');
+  await expect.poll(transform).toMatch(/scale\(1\.2\)$/);
+  await expect(live).toHaveText('Zoom 120%.');
+  await page.keyboard.press('Digit0');
+  await expect.poll(transform).not.toMatch(/scale\(1\.2\)$/);
+  await expect(live).toHaveText(/^Zoom \d+%\.$/);
+  await expect(live).not.toHaveText('Zoom 120%.');
+  // Browser zoom shortcuts and keys from embedded controls are left alone.
+  const fitted = await transform();
+  await page.keyboard.press('Control+Equal');
+  await graph.getByRole('textbox', { name: 'Node title' }).focus();
+  await page.keyboard.press('ArrowRight');
+  await page.keyboard.press('Minus');
+  await expect.poll(transform).toBe(fitted);
+  expect((await new AxeBuilder({ page }).include('[data-testid="keyboard-demo"]').analyze()).violations).toEqual([]);
+});

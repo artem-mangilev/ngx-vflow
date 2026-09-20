@@ -21,7 +21,7 @@ selectionBox: SelectionBoxSettings = {
 - `mode: 'partial'` selects entities that intersect the box.
 - `color` controls selection box stroke/fill color.
 
-To disable the selection-box gesture, pass `[keyboardShortcuts]="{ selection: null }"`.
+To disable the selection-box gesture, pass `[keyboardShortcuts]="{ modifiers: { selection: [] } }"`.
 
 # Selection semantics
 

@@ -34,7 +34,7 @@ export class SelectionBoxContextDirective {
   protected startSub = this.rootPointer.pointerStart$
     .pipe(
       filter(() => this.flowSettingsService.selectionMode() !== 'manual'),
-      filter(() => this.keyboardService.isActiveAction('selection')),
+      filter(() => this.keyboardService.isActiveModifier('selection')),
       tap(({ x, y, originalEvent }) => {
         originalEvent.preventDefault();
         this.clearPreselection();
@@ -88,7 +88,7 @@ export class SelectionBoxContextDirective {
     const edges = this.flowEntitiesService.edges();
     const entities = this.flowEntitiesService.entities();
 
-    if (!this.keyboardService.isActiveAction('multiSelection')) {
+    if (!this.keyboardService.isActiveModifier('multiSelection')) {
       entities.forEach((entity) => entity.selected.set(false));
     }
 

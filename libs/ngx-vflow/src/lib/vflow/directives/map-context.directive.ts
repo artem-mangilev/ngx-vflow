@@ -88,7 +88,7 @@ export class MapContextDirective implements OnInit, OnDestroy {
             if (this.excluded(event, '[data-vflow-no-wheel]')) return;
             if (!event.ctrlKey && this.scrollPanning()) {
               if (
-                this.keyboardService.isActiveAction('selection') ||
+                this.keyboardService.isActiveModifier('selection') ||
                 this.excluded(event, '[data-vflow-no-pan], [data-vflow-no-drag]')
               )
                 return;
@@ -180,13 +180,13 @@ export class MapContextDirective implements OnInit, OnDestroy {
   }
 
   private dragPanning() {
-    return this.keyboardService.isActiveAction('pan') || this.flowSettingsService.panOnDrag() !== false;
+    return this.keyboardService.isActiveModifier('panActivation') || this.flowSettingsService.panOnDrag() !== false;
   }
 
   private scrollPanning() {
     return (
-      (this.flowSettingsService.panOnScroll() || this.keyboardService.isActiveAction('pan')) &&
-      !this.keyboardService.isActiveAction('zoom')
+      (this.flowSettingsService.panOnScroll() || this.keyboardService.isActiveModifier('panActivation')) &&
+      !this.keyboardService.isActiveModifier('zoomActivation')
     );
   }
 
@@ -197,11 +197,11 @@ export class MapContextDirective implements OnInit, OnDestroy {
         !this.excluded(event, '[data-vflow-no-wheel]') &&
         (wheel.ctrlKey
           ? this.flowSettingsService.zoomOnPinch()
-          : this.keyboardService.isActiveAction('zoom') || this.flowSettingsService.zoomOnScroll())
+          : this.keyboardService.isActiveModifier('zoomActivation') || this.flowSettingsService.zoomOnScroll())
       );
     }
     if (event.type === 'dblclick') return this.flowSettingsService.zoomOnDoubleClick();
-    const selecting = this.keyboardService.isActiveAction('selection');
+    const selecting = this.keyboardService.isActiveModifier('selection');
     const panTarget = allowRootZoomForNodeTarget(event, selecting);
     if (isTouchEvent(event)) {
       return (

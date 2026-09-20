@@ -175,7 +175,7 @@ export class DraggableService {
 
     const filterCondition = (event: Event) => {
       // Do not drag group node if selection occurs inside group node (by keyboard)
-      if (isGroupNode(model) && this.keyboardService.isActiveAction('selection')) {
+      if (isGroupNode(model) && this.keyboardService.isActiveModifier('selection')) {
         return false;
       }
 

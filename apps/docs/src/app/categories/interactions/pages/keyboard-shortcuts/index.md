@@ -1,35 +1,56 @@
-You can use keyboard shortcuts to control selection and temporarily activate viewport gestures.
+Keyboard shortcuts come in two kinds. **Modifiers** change what a pointer gesture does while they are held. **Commands** run once per key press on a focused node or edge, or on the graph container.
 
 # Defaults
 
-| Action                   | Default key                           |
-| ------------------------ | ------------------------------------- |
-| Viewport pan activation  | Disabled (`null`)                     |
-| Viewport zoom activation | Disabled (`null`)                     |
-| Selection box            | `ShiftLeft` or `ShiftRight`           |
-| Node multi selection     | `CMD` (Mac) or `CTRL` (Other systems) |
-| Delete selected          | `Delete` or `Backspace`               |
+## Modifiers
 
-When `selection` is active (default: `Shift`), dragging on the canvas starts selection box mode instead of map pan.
+| Entry            | Default key                                                      | While held                                                          |
+| ---------------- | ---------------------------------------------------------------- | ------------------------------------------------------------------- |
+| `selection`      | `ShiftLeft`, `ShiftRight`                                        | Dragging the canvas draws a selection box instead of panning        |
+| `multiSelection` | `MetaLeft`, `MetaRight` (macOS) or `ControlLeft`, `ControlRight` | Selecting an entity toggles it instead of replacing the selection   |
+| `panActivation`  | Disabled                                                         | Drag and scroll pan the viewport                                    |
+| `zoomActivation` | Disabled                                                         | The wheel zooms the viewport and takes priority over scroll panning |
+
+## Commands
+
+| Entry                                         | Default key                     | Runs on                                     |
+| --------------------------------------------- | ------------------------------- | ------------------------------------------- |
+| `select`                                      | `Enter`, `NumpadEnter`, `Space` | a focused node or edge                      |
+| `clearSelection`                              | `Escape`                        | a focused node or edge                      |
+| `delete`                                      | `Delete`, `Backspace`           | a focused node or edge                      |
+| `moveUp`, `moveDown`, `moveLeft`, `moveRight` | the arrow keys                  | a focused node that is selected and movable |
+| `panUp`, `panDown`, `panLeft`, `panRight`     | the arrow keys                  | a focused entity or the graph container     |
+| `zoomIn`                                      | `Equal`, `NumpadAdd`            | a focused entity or the graph container     |
+| `zoomOut`                                     | `Minus`, `NumpadSubtract`       | a focused entity or the graph container     |
+| `fitView`                                     | `Digit0`, `Numpad0`             | a focused entity or the graph container     |
+
+An arrow key moves a node when the focused node is selected and movable, and pans the view otherwise. `Shift` makes movement and panning four times faster; that multiplier is fixed.
 
 # Customization
 
-To customize shortcuts, pass a `[keyboardShortcuts]` input object to `VflowComponent`.
-Supported actions are `selection`, `multiSelection`, `pan`, `zoom` and the `delete` command (`KeyboardShortcuts` is a partial object, so you can override only one action if needed). The first four stay active while the key is held; `delete` fires once per press on a focused node or edge and emits `(deleteRequest)` with the whole selection when the focused entity is selected, otherwise with the focused entity alone, see [Accessibility](../accessibility).
+Pass a `[keyboardShortcuts]` input with either section, or both:
+
+```typescript
+import { KeyboardShortcuts } from 'ngx-vflow';
+
+shortcuts: KeyboardShortcuts = {
+  modifiers: { selection: ['AltLeft', 'AltRight'], panActivation: ['Space'] },
+  commands: { delete: ['KeyX'], fitView: [] },
+};
+```
 
 Key details:
 
-- The passed object is merged with defaults.
-- To disable a specific action, pass `null` for that action.
-- If you want to trigger one action with multiple keys, pass an array. This is not a chord combination. For example, if you pass `['ShiftLeft', 'ControlLeft']`, the action is triggered by either `ShiftLeft` or `ControlLeft`, not by pressing both together (`ShiftLeft+ControlLeft`).
-- A key bound to an action is reserved for it: a focused node or edge no longer treats it as a selection command. With `pan: ['Space']`, Space pans while `Enter` still selects.
-- You can find the list of available key codes [here](https://www.w3.org/TR/uievents-code/#key-alphanumeric-section).
+- Each section merges entry by entry with the current configuration. Setting `commands.delete` leaves every other command and every modifier untouched.
+- An entry holds alternative keys, not a chord. `['ShiftLeft', 'ControlLeft']` fires on either key, never on both together.
+- Setting an entry replaces its whole list. To add a key, repeat the defaults you want to keep.
+- An empty list disables an entry. A disabled command stops running and disappears from the instructions that assistive technology reads.
+- A key bound as a modifier is reserved for the gesture layer: a focused node or edge no longer treats it as a command. With `panActivation: ['Space']`, Space pans while `Enter` still selects.
+- Keys are [`KeyboardEvent.code` values](https://www.w3.org/TR/uievents-code/#key-alphanumeric-section), which name physical keys rather than the characters a layout produces.
+- Commands run only while focus is inside the graph, so single-character keys never interfere with typing elsewhere on the page.
 
-In the following example:
-
-- `selection` is remapped from `Shift` to `Alt`
-- `multiSelection` is remapped from `CMD/CTRL` to `Shift`
+In the following example `selection` is remapped from `Shift` to `Alt` and `multiSelection` from `CMD`/`CTRL` to `Shift`:
 
 {{ NgDocActions.demoPane("KeyboardShortcutsDemoComponent") }}
 
-The `pan` and `zoom` actions are opt-in. Ordinary pan/zoom gestures retain their defaults when these shortcuts are `null`. See [Viewport gestures](../viewport-gestures) for priorities, embedded controls, and complete gesture disabling.
+`panActivation` and `zoomActivation` are opt-in. Ordinary pan and zoom gestures keep their defaults while these entries are empty. See [Viewport gestures](../viewport-gestures) for priorities, embedded controls, and complete gesture disabling, and [Accessibility](../accessibility) for what each command does and announces.

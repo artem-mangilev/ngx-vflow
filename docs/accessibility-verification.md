@@ -72,3 +72,19 @@ The user requested rolling back issue 11 after evaluating its interaction design
 - `Delete` and `Backspace` on a focused node or edge emit `(deleteRequest)` once per press: the whole selection when the focused entity is selected, otherwise the focused entity alone (rule chosen after the research in `.scratch/core-platform-parity/keyboard-delete-focus-vs-selection.md`); `keyboardShortcuts.delete` configures or disables the keys and the matching instruction in entity descriptions. The library removes nothing. Unit tests cover the payload, auto-repeat, configured keys, `null` and the description; the Delete selected workshop applies the request with `removeNodes` and `removeEdges`.
 - Handles are no longer exposed to assistive technology at all: the handle `ariaLabel`/`ariaDescription` inputs and the five handle-related label keys are removed after checking React Flow (plain `div` with `data-*` only), Foblex (ports absent from its semantics layer, keyboard connection works at node level) and ng-diagram (no port semantics). `domAttributes` still applies `data-*`. The accessibility example and its Playwright scenario now assert the absence of handle semantics and a working pointer connection.
 - Library suite: 271 tests passed. Playwright `accessibility.spec.ts` and `keyboard-navigation.spec.ts`: 4 passed. No new screen-reader session was run.
+
+## Keyboard viewport pan and zoom — 2026-09-20
+
+- Arrow keys on a focused edge, on an unselected or immovable node, or on the graph container pan the view by 15 screen pixels (60 with Shift) in scroll direction; a selected movable node still moves instead. `Equal`/`NumpadAdd` and `Minus`/`NumpadSubtract` zoom by 1.2 around the view center within `minZoom`/`maxZoom`, `Digit0`/`Numpad0` fits the graph. Zoom commands announce the resulting scale through the live region; panning stays silent. Modifier combinations are left to the browser, keys from embedded content are ignored, and the commands are configurable through `keyboardShortcuts.zoomIn`, `zoomOut` and `fitView`.
+- Unit test covers pan direction and acceleration, the precedence of node movement, zoom limits and announcements, fit view from the container, embedded content, browser shortcuts and disabled commands with their instruction. A Playwright scenario on the keyboard example repeats pan, Shift acceleration, node movement precedence, zoom with its announcement, fit view, `Control+Equal` and keys from an embedded text box with real key presses; all 4 keyboard tests and the full suite of 33 passed. No new screen-reader session was run.
+
+## Keyboard shortcut configuration — 2026-09-20
+
+- `keyboardShortcuts` moved to two sections, `modifiers` and `commands`, with an empty list as the way to disable an
+  entry. Selection, clearing, node movement and viewport panning became configurable commands alongside deletion and
+  zoom. Matching still uses `KeyboardEvent.code`; `select` gained `NumpadEnter` so numpad Enter keeps selecting.
+- A disabled command now drops its instruction from the entity description, so what assistive technology reads matches
+  what the keys do. The instruction sentences themselves are still static and can name keys that were remapped; issue 04
+  of `.scratch/keyboard-shortcuts-2026-09-20` generates them from the resolved bindings.
+- Verified by 272 library tests, including a new public-contract test for per-entry merging and disabling, and by the
+  full docs e2e suite. No new screen-reader session was run.

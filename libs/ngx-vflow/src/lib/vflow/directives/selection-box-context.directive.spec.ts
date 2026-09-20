@@ -42,7 +42,7 @@ describe('SelectionBoxContextDirective', () => {
         FlowEntitiesService,
         FlowSettingsService,
         FlowStatusService,
-        { provide: KeyboardService, useValue: { isActiveAction: () => selectionShortcutActive } },
+        { provide: KeyboardService, useValue: { isActiveModifier: () => selectionShortcutActive } },
         NodeRenderingService,
         ViewportService,
         provideZonelessChangeDetection(),

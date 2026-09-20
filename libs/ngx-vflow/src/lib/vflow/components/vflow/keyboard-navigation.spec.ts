@@ -143,7 +143,7 @@ describe('public keyboard graph navigation', () => {
     const child = root.querySelector<HTMLElement>('[aria-label="Child"]')!;
     const parent = root.querySelector<HTMLElement>('[aria-label="Parent"]')!;
     const edge = root.querySelector<SVGElement>('[aria-label="Route"]')!;
-    host.flow().keyboardShortcuts = { multiSelection: ['AltLeft'] };
+    host.flow().keyboardShortcuts = { modifiers: { multiSelection: ['AltLeft'] } };
     host.nodes()[1].selected.set(true);
     child.focus();
     key(child, 'Enter');
@@ -394,7 +394,7 @@ describe('public keyboard graph navigation', () => {
     child.focus();
     key(child, 'Enter');
     expect(await spoken()).toBe('Child selected. 1 selected in total.');
-    host.flow().keyboardShortcuts = { multiSelection: ['AltLeft'] };
+    host.flow().keyboardShortcuts = { modifiers: { multiSelection: ['AltLeft'] } };
     document.dispatchEvent(new KeyboardEvent('keydown', { code: 'AltLeft' }));
     parent.focus();
     key(parent, ' ');
@@ -424,7 +424,7 @@ describe('public keyboard graph navigation', () => {
 
   it('leaves keys bound to gesture shortcuts to the gesture layer', async () => {
     const { fixture, host, root } = await setup();
-    host.flow().keyboardShortcuts = { pan: ['Space'] };
+    host.flow().keyboardShortcuts = { modifiers: { panActivation: ['Space'] } };
     const child = root.querySelector<HTMLElement>('[aria-label="Child"]')!;
     child.focus();
     const space = key(child, ' ');
@@ -434,7 +434,7 @@ describe('public keyboard graph navigation', () => {
     document.dispatchEvent(new KeyboardEvent('keyup', { code: 'Space' }));
     expect(key(child, 'Enter').defaultPrevented).toBeTrue();
     expect(host.nodes()[0].selected()).toBeTrue();
-    host.flow().keyboardShortcuts = { pan: null };
+    host.flow().keyboardShortcuts = { modifiers: { panActivation: [] } };
     key(child, 'Escape');
     key(child, ' ');
     expect(host.nodes()[0].selected()).toBeTrue();
@@ -474,19 +474,150 @@ describe('public keyboard graph navigation', () => {
     edge.focus();
     key(edge, 'Delete');
     expect(requests[3]).toEqual({ nodeIds: ['child', 'other'], edgeIds: ['edge'] });
-    host.flow().keyboardShortcuts = { delete: ['KeyX'] };
+    host.flow().keyboardShortcuts = { commands: { delete: ['KeyX'] } };
     fixture.detectChanges();
     await fixture.whenStable();
     expect(key(edge, 'Delete').defaultPrevented).toBeFalse();
     key(edge, 'x', 'KeyX');
     expect(requests.length).toBe(5);
-    host.flow().keyboardShortcuts = { delete: null };
+    host.flow().keyboardShortcuts = { commands: { delete: [] } };
     fixture.detectChanges();
     await fixture.whenStable();
     key(edge, 'x', 'KeyX');
     expect(requests.length).toBe(5);
     expect(description()).not.toContain('Press Delete or Backspace');
     subscription.unsubscribe();
+  });
+
+  it('pans and zooms the viewport from wrappers that do not consume the keys and from the container', async () => {
+    const { fixture, host, root } = await setup();
+    const live = root.querySelector('[aria-live="polite"]')!;
+    const spoken = async () => {
+      await new Promise((resolve) => setTimeout(resolve, 150));
+      return live.textContent;
+    };
+    const settle = async () => {
+      fixture.detectChanges();
+      await fixture.whenStable();
+    };
+    const child = root.querySelector<HTMLElement>('[aria-label="Child"]')!;
+    const edge = root.querySelector<SVGElement>('[aria-label="Route"]')!;
+    const container = root.querySelector<HTMLElement>('[role="region"]')!;
+    host.flow().autoPanOnNodeFocus = false;
+    await settle();
+    expect(host.flow().viewport()).toEqual({ x: 0, y: 0, zoom: 1 });
+    // An edge never moves, so arrows scroll the view: right reveals the right side.
+    edge.focus();
+    expect(key(edge, 'ArrowRight').defaultPrevented).toBeTrue();
+    await settle();
+    expect(host.flow().viewport()).toEqual({ x: -15, y: 0, zoom: 1 });
+    key(edge, 'ArrowUp', 'ArrowUp', true);
+    await settle();
+    expect(host.flow().viewport()).toEqual({ x: -15, y: 60, zoom: 1 });
+    // An unselected node does not move either, so its arrows pan; a selected movable one moves instead.
+    child.focus();
+    key(child, 'ArrowLeft');
+    await settle();
+    expect(host.flow().viewport()).toEqual({ x: 0, y: 60, zoom: 1 });
+    expect(host.nodes()[0].point()).toEqual({ x: 10, y: 10 });
+    host.nodes()[0].selected.set(true);
+    key(child, 'ArrowLeft');
+    await settle();
+    expect(host.nodes()[0].point()).toEqual({ x: 5, y: 10 });
+    expect(host.flow().viewport()).toEqual({ x: 0, y: 60, zoom: 1 });
+    // Zoom keys with announcements; browser zoom shortcuts stay untouched.
+    expect(key(child, '=', 'Equal').defaultPrevented).toBeTrue();
+    await settle();
+    expect(host.flow().viewport().zoom).toBeCloseTo(1.2, 5);
+    expect(await spoken()).toBe('Zoom 120%.');
+    const browserZoom = new KeyboardEvent('keydown', {
+      key: '=',
+      code: 'Equal',
+      ctrlKey: true,
+      bubbles: true,
+      cancelable: true,
+    });
+    child.dispatchEvent(browserZoom);
+    expect(browserZoom.defaultPrevented).toBeFalse();
+    key(child, '-', 'NumpadSubtract');
+    await settle();
+    expect(host.flow().viewport().zoom).toBeCloseTo(1, 5);
+    host.flow().minZoom = 0.9;
+    key(child, '-', 'Minus');
+    await settle();
+    expect(host.flow().viewport().zoom).toBeCloseTo(0.9, 5);
+    expect(await spoken()).toBe('Zoom 90%.');
+    // Fit view announces the resulting zoom; the container itself accepts the same commands.
+    container.focus();
+    key(container, '0', 'Digit0');
+    await settle();
+    const fitted = host.flow().viewport();
+    expect(fitted.zoom).not.toBeCloseTo(0.9, 5);
+    expect(await spoken()).toBe(`Zoom ${Math.round(fitted.zoom * 100)}%.`);
+    key(container, 'ArrowDown');
+    await settle();
+    expect(host.flow().viewport()).toEqual({ ...fitted, y: fitted.y - 15 });
+    // Keys from embedded content are left alone; disabled commands drop their instruction.
+    const handle = root.querySelector<HTMLElement>('[data-vflow-handle-type="source"]')!;
+    expect(key(handle, 'ArrowDown').defaultPrevented).toBeFalse();
+    await settle();
+    expect(host.flow().viewport()).toEqual({ ...fitted, y: fitted.y - 15 });
+    const description = () =>
+      child
+        .getAttribute('aria-describedby')!
+        .split(/\s+/)
+        .map((id) => document.getElementById(id)!.textContent)
+        .join(' ');
+    expect(description()).toContain('Use arrow keys to pan the view');
+    expect(description()).toContain('Press Plus or Minus to zoom and 0 to fit the graph.');
+    host.flow().keyboardShortcuts = { commands: { zoomIn: [], zoomOut: [], fitView: [] } };
+    await settle();
+    expect(key(container, '=', 'Equal').defaultPrevented).toBeFalse();
+    expect(description()).not.toContain('Press Plus or Minus');
+  });
+
+  it('merges sections and entries independently and disables an entry with an empty list', async () => {
+    const { fixture, host, root } = await setup();
+    const settle = async () => {
+      fixture.detectChanges();
+      await fixture.whenStable();
+    };
+    const child = root.querySelector<HTMLElement>('[aria-label="Child"]')!;
+    const parent = root.querySelector<HTMLElement>('[aria-label="Parent"]')!;
+    const description = () =>
+      child
+        .getAttribute('aria-describedby')!
+        .split(/\s+/)
+        .map((id) => document.getElementById(id)!.textContent)
+        .join(' ');
+    host.flow().keyboardShortcuts = { commands: { select: ['KeyS'] }, modifiers: { multiSelection: ['AltLeft'] } };
+    await settle();
+    child.focus();
+    // An entry is replaced, not extended.
+    expect(key(child, 'Enter').defaultPrevented).toBeFalse();
+    expect(host.nodes()[0].selected()).toBeFalse();
+    key(child, 's', 'KeyS');
+    expect(host.nodes()[0].selected()).toBeTrue();
+    // Entries left out of the update keep their defaults.
+    key(child, 'Escape');
+    expect(host.nodes()[0].selected()).toBeFalse();
+    // A later update touches two command entries; the modifier set before it survives.
+    host.flow().keyboardShortcuts = { commands: { clearSelection: [], delete: [] } };
+    await settle();
+    key(child, 's', 'KeyS');
+    document.dispatchEvent(new KeyboardEvent('keydown', { code: 'AltLeft' }));
+    parent.focus();
+    key(parent, 's', 'KeyS');
+    document.dispatchEvent(new KeyboardEvent('keyup', { code: 'AltLeft' }));
+    expect(host.nodes().map((n) => n.selected())).toEqual([true, true, false]);
+    // A disabled entry neither runs nor claims its key, and drops out of the instructions.
+    expect(key(parent, 'Escape').defaultPrevented).toBeFalse();
+    expect(key(parent, 'Delete').defaultPrevented).toBeFalse();
+    expect(host.nodes().map((n) => n.selected())).toEqual([true, true, false]);
+    expect(description()).not.toContain('Press Escape');
+    expect(description()).not.toContain('Press Delete or Backspace');
+    expect(description()).toContain('to select');
+    fixture.detectChanges();
   });
 
   it('does not restore stale graph focus after focus has left the graph', async () => {

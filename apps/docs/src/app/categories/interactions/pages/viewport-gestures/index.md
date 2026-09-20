@@ -19,15 +19,17 @@ Use the existing `keyboardShortcuts` input for all activation keys:
 
 ```typescript
 shortcuts: KeyboardShortcuts = {
-  pan: ['Space'],
-  zoom: ['MetaLeft', 'MetaRight'], // macOS; use ControlLeft/ControlRight elsewhere
+  modifiers: {
+    panActivation: ['Space'],
+    zoomActivation: ['MetaLeft', 'MetaRight'], // macOS; use ControlLeft/ControlRight elsewhere
+  },
 };
 ```
 
-Both new actions default to `null`. This disables their keyboard activation, **not** ordinary pan/zoom gestures. Arrays contain alternative `KeyboardEvent.code` values, not chords.
+Both entries default to an empty list. That disables their keyboard activation, **not** ordinary pan/zoom gestures. A list holds alternative `KeyboardEvent.code` values, not a chord.
 
-- `pan` temporarily enables drag and scroll panning. Configured mouse-button restrictions still apply.
-- `zoom` temporarily enables wheel zoom and takes priority over scroll panning.
+- `panActivation` temporarily enables drag and scroll panning. Configured mouse-button restrictions still apply.
+- `zoomActivation` temporarily enables wheel zoom and takes priority over scroll panning.
 - Otherwise, enabled `panOnScroll` takes priority over `zoomOnScroll`.
 - Pinch remains controlled by `zoomOnPinch`. Browsers also report Ctrl+wheel as pinch, so disabling pinch disables that path even with Control mapped to `zoom`.
 - Explicit keyboard selection takes priority over drag panning. `multiSelection` remains independent.
@@ -83,7 +85,7 @@ Accepted touch pan/zoom gestures suppress native scrolling. Disabled gestures an
 # Disable all user viewport gestures
 
 ```html
-<vflow [nodes]="nodes" [panOnDrag]="false" [panOnScroll]="false" [zoomOnScroll]="false" [zoomOnPinch]="false" [zoomOnDoubleClick]="false" [keyboardShortcuts]="{ pan: null, zoom: null }" />
+<vflow [nodes]="nodes" [panOnDrag]="false" [panOnScroll]="false" [zoomOnScroll]="false" [zoomOnPinch]="false" [zoomOnDoubleClick]="false" [keyboardShortcuts]="{ modifiers: { panActivation: [], zoomActivation: [] } }" />
 ```
 
 Explicit `panTo`, `zoomTo`, `viewportTo`, and `fitView` calls continue to work. These settings only control viewport gestures; configure node dragging and selection separately if needed.

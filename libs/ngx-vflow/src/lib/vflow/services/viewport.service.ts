@@ -43,12 +43,13 @@ export class ViewportService {
 
   // TODO: add writableViewportWithConstraints (to apply min zoom/max zoom values)
 
-  public fitView(options: FitViewOptions = { padding: 0.1, duration: 0, nodes: [] }) {
+  /** Returns the target state, or `undefined` when there is nothing to fit. */
+  public fitView(options: FitViewOptions = { padding: 0.1, duration: 0, nodes: [] }): ViewportState | undefined {
     const nodes = this.getBoundsNodes(options.nodes ?? []);
     const width = this.flowSettingsService.computedFlowWidth();
     const height = this.flowSettingsService.computedFlowHeight();
 
-    if (!nodes.length || width <= 0 || height <= 0) return;
+    if (!nodes.length || width <= 0 || height <= 0) return undefined;
 
     const state = getViewportForBounds(
       getNodesFlowBounds(nodes),
@@ -62,6 +63,7 @@ export class ViewportService {
     const duration = options.duration ?? 0;
 
     this.writableViewport.set({ changeType: 'absolute', state, duration });
+    return state;
   }
 
   public triggerViewportChangeEvent(type: 'end') {

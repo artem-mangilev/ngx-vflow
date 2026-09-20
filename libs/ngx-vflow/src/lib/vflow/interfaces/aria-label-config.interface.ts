@@ -17,10 +17,14 @@ export interface AriaLabelConfig {
   keyboardDeselect: string;
   keyboardMove: string;
   keyboardDelete: string;
+  keyboardPan: string;
+  keyboardZoom: string;
   /** Live feedback after a keyboard selection change of one entity. */
   selectionAnnouncement: (selection: { label: string; selected: boolean; count: number }) => string;
   /** Live feedback after Escape clears the selection. */
   selectionClearedAnnouncement: string;
+  /** Live feedback after a keyboard zoom command, including fit view; `zoom` is the resulting scale. */
+  zoomAnnouncement: (zoom: number) => string;
   /** Live feedback after arrow keys move the selected nodes; `x` and `y` are the focused node's position. */
   movedAnnouncement: (move: {
     count: number;
@@ -49,9 +53,12 @@ export const DEFAULT_ARIA_LABEL_CONFIG: AriaLabelConfig = {
   keyboardMove: 'When selected, use arrow keys to move movable selected nodes. Hold Shift to move faster.',
   keyboardDelete:
     'Press Delete or Backspace to request deletion of this item, or of the whole selection when it is selected.',
+  keyboardPan: 'Use arrow keys to pan the view when they do not move a node. Hold Shift to pan faster.',
+  keyboardZoom: 'Press Plus or Minus to zoom and 0 to fit the graph.',
   selectionAnnouncement: ({ label, selected, count }) =>
     `${label} ${selected ? 'selected' : 'deselected'}. ${count} selected in total.`,
   selectionClearedAnnouncement: 'Selection cleared.',
+  zoomAnnouncement: (zoom) => `Zoom ${Math.round(zoom * 100)}%.`,
   movedAnnouncement: ({ count, direction, x, y }) =>
     `Moved ${count === 1 ? 'node' : `${count} nodes`} ${direction}. Position: ${Math.round(x)}, ${Math.round(y)}.`,
 };

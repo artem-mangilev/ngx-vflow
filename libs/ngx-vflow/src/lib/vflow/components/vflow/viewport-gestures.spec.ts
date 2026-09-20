@@ -84,7 +84,7 @@ describe('public viewport gesture settings', () => {
 
   it('gives scroll pan priority, with opt-in zoom and pan activation keys', () => {
     flow.panOnScroll = true;
-    flow.keyboardShortcuts = { zoom: ['KeyZ'], pan: ['Space'] };
+    flow.keyboardShortcuts = { modifiers: { zoomActivation: ['KeyZ'], panActivation: ['Space'] } };
     wheel();
     expect(flow.viewport()).toEqual({ x: 0, y: 40, zoom: 1 });
     key('keydown', 'KeyZ');
@@ -104,7 +104,7 @@ describe('public viewport gesture settings', () => {
     flow.zoomOnScroll = false;
     flow.zoomOnPinch = false;
     flow.zoomOnDoubleClick = false;
-    flow.keyboardShortcuts = { pan: null, zoom: null };
+    flow.keyboardShortcuts = { modifiers: { panActivation: [], zoomActivation: [] } };
     drag();
     expect(wheel().defaultPrevented).toBeFalse();
     expect(wheel(pane, true).defaultPrevented).toBeFalse();
@@ -133,7 +133,7 @@ describe('public viewport gesture settings', () => {
     expect(flow.viewport().x).toBe(0);
     drag(1);
     expect(flow.viewport().x).toBe(40);
-    flow.keyboardShortcuts = { selection: ['Space'], pan: ['Space'] };
+    flow.keyboardShortcuts = { modifiers: { selection: ['Space'], panActivation: ['Space'] } };
     key('keydown', 'Space');
     drag(1);
     expect(flow.viewport().x).toBe(40);
@@ -160,7 +160,7 @@ describe('public viewport gesture settings', () => {
 
   it('ignores activation from editable targets and clears activation on window blur', () => {
     flow.panOnScroll = true;
-    flow.keyboardShortcuts = { zoom: ['ControlLeft'] };
+    flow.keyboardShortcuts = { modifiers: { zoomActivation: ['ControlLeft'] } };
     const input = document.createElement('input');
     pane.appendChild(input);
     key('keydown', 'ControlLeft', input);
@@ -179,7 +179,7 @@ describe('public viewport gesture settings', () => {
     fixture.componentRef.setInput('nodes', [node]);
     fixture.detectChanges();
     await fixture.whenStable();
-    flow.keyboardShortcuts = { pan: ['Space'] };
+    flow.keyboardShortcuts = { modifiers: { panActivation: ['Space'] } };
     key('keydown', 'Space');
     drag(0, pane.querySelector('.vflow-node')!);
     expect(node.point()).toEqual({ x: 40, y: 0 });

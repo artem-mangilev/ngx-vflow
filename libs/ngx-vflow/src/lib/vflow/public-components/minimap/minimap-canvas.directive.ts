@@ -215,8 +215,8 @@ export class MinimapCanvasDirective {
     const buttons = this.settings.panOnDrag();
     return (
       this.pannable() &&
-      !this.keyboard.isActiveAction('selection') &&
-      (buttons !== false || this.keyboard.isActiveAction('pan')) &&
+      !this.keyboard.isActiveModifier('selection') &&
+      (buttons !== false || this.keyboard.isActiveModifier('panActivation')) &&
       (event.pointerType === 'touch' || !Array.isArray(buttons) || buttons.includes(event.button))
     );
   }
@@ -252,8 +252,8 @@ export class MinimapCanvasDirective {
     // Mouse move events have button=-1; the accepted button is checked on pointerdown.
     if (
       !this.pannable() ||
-      this.keyboard.isActiveAction('selection') ||
-      (this.settings.panOnDrag() === false && !this.keyboard.isActiveAction('pan'))
+      this.keyboard.isActiveModifier('selection') ||
+      (this.settings.panOnDrag() === false && !this.keyboard.isActiveModifier('panActivation'))
     ) {
       this.cancelDrag();
       return;
@@ -302,10 +302,10 @@ export class MinimapCanvasDirective {
     const viewport = this.viewport.readableViewport();
     const scrollPan =
       !event.ctrlKey &&
-      (this.settings.panOnScroll() || this.keyboard.isActiveAction('pan')) &&
-      !this.keyboard.isActiveAction('zoom');
+      (this.settings.panOnScroll() || this.keyboard.isActiveModifier('panActivation')) &&
+      !this.keyboard.isActiveModifier('zoomActivation');
     if (scrollPan) {
-      if (!this.pannable() || this.keyboard.isActiveAction('selection')) return;
+      if (!this.pannable() || this.keyboard.isActiveModifier('selection')) return;
       const unit = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? this.height() : 1;
       const scale = (unit * viewport.zoom) / this.graph().transform.zoom;
       this.viewport.writableViewport.set({
@@ -319,7 +319,7 @@ export class MinimapCanvasDirective {
       !this.zoomable() ||
       !(event.ctrlKey
         ? this.settings.zoomOnPinch()
-        : this.settings.zoomOnScroll() || this.keyboard.isActiveAction('zoom'))
+        : this.settings.zoomOnScroll() || this.keyboard.isActiveModifier('zoomActivation'))
     )
       return;
     const step = this.zoomStep();
