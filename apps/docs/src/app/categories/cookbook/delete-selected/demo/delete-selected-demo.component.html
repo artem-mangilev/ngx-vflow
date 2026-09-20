@@ -1,10 +1,6 @@
-<vflow view="auto" [nodes]="nodes" [edges]="edges">
+<vflow view="auto" [nodes]="nodes" [edges]="edges" (deleteRequest)="onDeleteRequest($event)">
   <ng-template let-ctx node>
-    <div
-      class="custom-node without-tab-index"
-      tabindex="0"
-      [class.custom-node_selected]="ctx.selected()"
-      (keydown.backspace)="ctx.selected() && deleteNode(ctx.node)">
+    <div class="custom-node" [class.custom-node_selected]="ctx.selected()">
       <button class="custom-node__button" selectable>Select here</button>
 
       <span vflowPort handleType="source" position="right"></span>
@@ -13,11 +9,7 @@
   </ng-template>
 
   <ng-template let-ctx edge>
-    <svg:g
-      edgeInteraction
-      class="without-tab-index custom-edge"
-      tabindex="0"
-      (keydown.backspace)="ctx.selected() && deleteEdge(ctx.edge)">
+    <svg:g edgeInteraction class="custom-edge">
       <svg:path
         fill="none"
         stroke-width="2"

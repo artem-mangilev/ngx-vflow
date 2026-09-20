@@ -8,13 +8,28 @@ Graph entities have readable names, relationships and state descriptions. This e
 
 `Tab` and `Shift+Tab` visit focusable nodes in the input `nodes` order, then edges in the input `edges` order. Parent relationships and visual elevation do not reorder the sequence. Embedded controls keep their DOM order and their own keyboard behavior. Tab leaves the graph normally; there is no focus trap. Focus has a separate visible indicator and does not change selection.
 
-| Command on an entity wrapper                | Behavior                                                                                                                               |
-| ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| `Enter` / `Space`                           | Select the entity and clear other selection.                                                                                           |
-| Multiselection modifier + `Enter` / `Space` | Toggle only the focused entity. The modifier follows `keyboardShortcuts.multiSelection` (Meta on macOS, Control elsewhere by default). |
-| `Escape`                                    | Clear selection and retain focus.                                                                                                      |
-| Arrow keys on a selected movable node       | Move all selected movable nodes by 5 flow-space units.                                                                                 |
-| `Shift` + arrow keys                        | Move by 20 flow-space units.                                                                                                           |
+| Command on an entity wrapper                | Behavior                                                                                                                                                                |
+| ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Enter` / `Space`                           | Select the entity and clear other selection.                                                                                                                            |
+| Multiselection modifier + `Enter` / `Space` | Toggle only the focused entity. The modifier follows `keyboardShortcuts.multiSelection` (Meta on macOS, Control elsewhere by default).                                  |
+| `Escape`                                    | Clear selection and retain focus.                                                                                                                                       |
+| Arrow keys on a selected movable node       | Move all selected movable nodes by 5 flow-space units.                                                                                                                  |
+| `Shift` + arrow keys                        | Move by 20 flow-space units.                                                                                                                                            |
+| `Delete` / `Backspace`                      | Emit `deleteRequest`: the whole selection when the focused entity is selected, otherwise only the focused entity. The application removes them, or ignores the request. |
+
+A deletion key on a focused node or edge emits `(deleteRequest)` with `{ nodeIds, edgeIds }`, once per press. The command acts at the point of focus: when the focused entity is selected, the request carries the whole selection; otherwise it carries only the focused entity, and a selection elsewhere stays untouched. The library does not remove anything or clear selection: apply the request with `removeNodes` and `removeEdges`, or ignore it. When the focused entity disappears, focus recovery moves focus to the next entity. The keys follow `keyboardShortcuts.delete` (`Delete` and `Backspace` by default, `null` disables the command and its instruction).
+
+```html
+<vflow [nodes]="nodes" [edges]="edges" (deleteRequest)="onDeleteRequest($event)" />
+```
+
+```typescript
+onDeleteRequest({ nodeIds, edgeIds }: DeleteRequest) {
+  const result = removeNodes(nodeIds, { nodes: this.nodes, edges: removeEdges(edgeIds, this.edges) });
+  this.nodes = result.nodes;
+  this.edges = result.edges;
+}
+```
 
 Keyboard commands report their outcome in the flow's own polite, atomic live region: `Child selected. 1 selected in total.`, `Selection cleared.` and `Moved node right. Position: 25, 20.` (the focused node's position after the move). Only a command that changes state is announced; pointer and programmatic changes stay silent. A key bound to a gesture action through `keyboardShortcuts`, such as `Space` for `pan`, is left to the gesture layer and does not select.
 
@@ -32,7 +47,7 @@ With virtualization enabled, CSS-hidden entities are skipped by native Tab navig
 
 ## Names and descriptions
 
-The flow is a named `region`. Nodes (including visual groups), edges and handles are named `group` elements. The minimap is one `img` named `Graph minimap`; its preview nodes do not form a second graph in the accessibility tree.
+The flow is a named `region`. Nodes (including visual groups) and edges are named `group` elements. The minimap is one `img` named `Graph minimap`; its preview nodes do not form a second graph in the accessibility tree. Handles are semantically transparent: no role, name or description, while their own content keeps its semantics and `domAttributes` still applies `data-*` metadata to the element.
 
 ```typescript
 import { AriaLabelConfig, createNodes, createEdges } from 'ngx-vflow';
@@ -46,17 +61,17 @@ const edges = createEdges([{ id: 'review', source: 'request', target: 'approval'
 nodes[0].ariaDescription!.set('Ready for approval.');
 ```
 
-`ariaLabel`, `ariaDescription` and `domAttributes` are optional writable signals on `Node` and `Edge`. Both factory modes preserve supplied values. Omitted metadata remains absent, allowing generated defaults. Handles expose ordinary Angular inputs:
+`ariaLabel`, `ariaDescription` and `domAttributes` are optional writable signals on `Node` and `Edge`. Both factory modes preserve supplied values. Omitted metadata remains absent, allowing generated defaults. A handle takes only `domAttributes`:
 
 ```html
-<span vflowHandle handleType="target" position="left" handleId="incoming" ariaLabel="Approve expense" ariaDescription="Inbound review route." [canStart]="false" [canAccept]="true" [domAttributes]="{ 'data-port': 'review' }"></span>
+<span vflowHandle handleType="target" position="left" handleId="incoming" [domAttributes]="{ 'data-port': 'review' }"></span>
 ```
 
-Names prefer a nonblank `ariaLabel`, then `Node {id}` or `Group {id}`. Custom templates/components need application-supplied names; the library does not inspect their descendants. An edge defaults to `Connection from {source name} to {target name}`. A handle defaults to `Source connection point [id] of {node name}` or its `Target` equivalent, omitting a missing ID.
+Names prefer a nonblank `ariaLabel`, then `Node {id}` or `Group {id}`. Custom templates/components need application-supplied names; the library does not inspect their descendants. An edge defaults to `Connection from {source name} to {target name}`.
 
 The graph remains flat. A child's description identifies its direct parent by accessible name, including ordinary parent nodes. A custom edge name retains endpoint information in its description. Application descriptions supplement these relationships and library state descriptions.
 
-Actual selection is described as `Selected.` even when acquiring selection is unavailable. Unavailable selection, movement, reconnection, connection start and connection acceptance are described separately. A restriction never sets whole-node `aria-disabled`, so embedded controls remain operable. `Valid connection target.` and `Invalid connection target.` apply only to the current checked connection candidate, and disappear when that check ends. Description changes are not announced; only keyboard commands report their outcome.
+Actual selection is described as `Selected.` even when acquiring selection is unavailable. Unavailable selection, movement and reconnection are described separately. A restriction never sets whole-node `aria-disabled`, so embedded controls remain operable. Description changes are not announced; only keyboard commands report their outcome.
 
 ## Localization
 
@@ -79,31 +94,27 @@ const labels: Partial<AriaLabelConfig> = {
 
 `DEFAULT_ARIA_LABEL_CONFIG` exports all defaults. Use the following keys to translate the complete library vocabulary; translate application-provided names and descriptions separately.
 
-| Key                            | Default / formatter arguments                                                    |
-| ------------------------------ | -------------------------------------------------------------------------------- |
-| `flowLabel`                    | `Graph`                                                                          |
-| `flowDescription`              | Empty string                                                                     |
-| `minimapLabel`                 | `Graph minimap`                                                                  |
-| `minimapDescription`           | Empty string                                                                     |
-| `nodeLabel`, `groupLabel`      | `(id: string) => string`                                                         |
-| `edgeLabel`                    | `({ source: string, target: string }) => string`                                 |
-| `handleLabel`                  | `({ type: 'source' \| 'target' \| 'any', id?: string, node: string }) => string` |
-| `parentDescription`            | `(parent: string) => string`, default `Parent: {parent}.`                        |
-| `selected`                     | `Selected.`                                                                      |
-| `selectionUnavailable`         | `Selection unavailable.`                                                         |
-| `movementUnavailable`          | `Movement unavailable.`                                                          |
-| `reconnectionUnavailable`      | `Reconnection unavailable.`                                                      |
-| `connectionStartUnavailable`   | `Starting connections unavailable.`                                              |
-| `connectionAcceptUnavailable`  | `Accepting connections unavailable.`                                             |
-| `connectionValid`              | `Valid connection target.`                                                       |
-| `connectionInvalid`            | `Invalid connection target.`                                                     |
-| `keyboardNavigation`           | Instructions for Tab and Shift+Tab traversal.                                    |
-| `keyboardSelect`               | Instructions for selection and the multiselection modifier.                      |
-| `keyboardDeselect`             | Instructions for clearing selection with Escape.                                 |
-| `keyboardMove`                 | Instructions for arrows and accelerated movement with Shift.                     |
-| `selectionAnnouncement`        | `({ label: string, selected: boolean, count: number }) => string`, live feedback |
-| `selectionClearedAnnouncement` | `Selection cleared.`                                                             |
-| `movedAnnouncement`            | `({ count, direction: 'left' \| 'right' \| 'up' \| 'down', x, y }) => string`    |
+| Key                            | Default / formatter arguments                                                             |
+| ------------------------------ | ----------------------------------------------------------------------------------------- |
+| `flowLabel`                    | `Graph`                                                                                   |
+| `flowDescription`              | Empty string                                                                              |
+| `minimapLabel`                 | `Graph minimap`                                                                           |
+| `minimapDescription`           | Empty string                                                                              |
+| `nodeLabel`, `groupLabel`      | `(id: string) => string`                                                                  |
+| `edgeLabel`                    | `({ source: string, target: string }) => string`                                          |
+| `parentDescription`            | `(parent: string) => string`, default `Parent: {parent}.`                                 |
+| `selected`                     | `Selected.`                                                                               |
+| `selectionUnavailable`         | `Selection unavailable.`                                                                  |
+| `movementUnavailable`          | `Movement unavailable.`                                                                   |
+| `reconnectionUnavailable`      | `Reconnection unavailable.`                                                               |
+| `keyboardNavigation`           | Instructions for Tab and Shift+Tab traversal.                                             |
+| `keyboardSelect`               | Instructions for selection and the multiselection modifier.                               |
+| `keyboardDeselect`             | Instructions for clearing selection with Escape.                                          |
+| `keyboardMove`                 | Instructions for arrows and accelerated movement with Shift.                              |
+| `keyboardDelete`               | Instructions for the deletion request; omitted when `keyboardShortcuts.delete` is `null`. |
+| `selectionAnnouncement`        | `({ label: string, selected: boolean, count: number }) => string`, live feedback          |
+| `selectionClearedAnnouncement` | `Selection cleared.`                                                                      |
+| `movedAnnouncement`            | `({ count, direction: 'left' \| 'right' \| 'up' \| 'down', x, y }) => string`             |
 
 Formatters receive plain text. Return plain text without HTML markup.
 
@@ -111,20 +122,20 @@ Formatters receive plain text. Return plain text without HTML markup.
 
 `DomAttributes` accepts `data-*`, `title`, `lang` and `dir`. Metadata is applied to the library-owned entity wrapper; setting a value to `null` or removing it removes the attribute. Public types reject other keys, and runtime filtering ignores unsupported keys. Roles, IDs, ARIA attributes, styles, focus attributes and event handlers are owned by the library and cannot be replaced through this object. Use the dedicated name/description inputs instead.
 
-Give domain-specific nodes and handles meaningful names. Give custom buttons, inputs, edge-label controls and handle contents their own labels, roles and keyboard behavior. The library keeps these descendants accessible, including content inside resizable wrappers. Mark your own decorative SVG paths `aria-hidden="true"`; library geometry and the auxiliary handle magnet are already excluded.
+Give domain-specific nodes meaningful names. Give custom buttons, inputs, edge-label controls and handle contents their own labels, roles and keyboard behavior. The library keeps these descendants accessible, including content inside resizable wrappers. Mark your own decorative SVG paths `aria-hidden="true"`; library geometry and the auxiliary handle magnet are already excluded.
 
 Each flow owns independent description references and one polite, atomic live region that receives only the keyboard command feedback described above. There is no public arbitrary-announcement API.
 
 ## Current limits
 
-Graph wrappers support the keyboard operations described above. Embedded application controls retain their native keyboard behavior. Handles and the minimap do not gain Tab stops. This does not establish full keyboard accessibility for every graph operation.
+Graph wrappers support the keyboard operations described above. Embedded application controls retain their native keyboard behavior. Handles are not exposed to assistive technology and the minimap has no Tab stop. This does not establish full keyboard accessibility for every graph operation.
 
-- Keyboard connection creation is currently unsupported. The issue 11 implementation was rolled back pending a new interaction design. Core deletion requests are also unavailable.
+- Keyboard connection creation is currently unsupported. The issue 11 implementation was rolled back pending a new interaction design.
 - Issues 12–13 own minimap interaction and keyboard navigation.
 - Issue 14 owns accessible resize/reconnect controls. Existing library resize and reconnect controls remain pointer-only; naming their owner does not make those controls accessible.
 
 ## Verification scenario
 
-Use the example above to read both graph regions, Request's parent/selection/restrictions, both edge relationships, and the minimap. Reach and activate `Review request` as an independent button. Toggle incoming connections and switch language. With a pointer, drag from Request's source handle to Accept request to inspect valid/invalid descriptions; uncheck validation to exercise the invalid case.
+Use the example above to read both graph regions, Request's parent/selection/restrictions, both edge relationships, and the minimap. Reach and activate `Review request` as an independent button and switch language. Handles are absent from the reading sequence; a pointer connection between them still works.
 
 The repository records automated checks and screen-reader availability in `docs/accessibility-verification.md`. Automated axe checks alone do not establish screen-reader usability or full keyboard operation.

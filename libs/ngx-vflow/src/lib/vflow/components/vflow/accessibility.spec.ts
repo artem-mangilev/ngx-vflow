@@ -20,8 +20,6 @@ import { DomAttributes } from '../../interfaces/dom-attributes.interface';
         handleId="incoming"
         [canStart]="canStart()"
         [canAccept]="canAccept()"
-        ariaLabel="Accept request"
-        ariaDescription="Inbound route."
         [domAttributes]="{ 'data-port': 'incoming' }"></span>
       <span vflowHandle handleType="source" position="right"></span>
     </ng-template>
@@ -85,7 +83,7 @@ describe('public graph accessibility', () => {
     expect(description(edge)).toContain('Connection from Node empty to Node custom');
   });
 
-  it('names the graph, entities, relationships, handles and minimap with entity Tab stops', async () => {
+  it('names the graph, entities, relationships and minimap with entity Tab stops', async () => {
     TestBed.configureTestingModule({
       imports: [AccessibilityHostComponent],
       providers: [provideZonelessChangeDetection()],
@@ -99,9 +97,6 @@ describe('public graph accessibility', () => {
     expect(root.querySelector('[role="group"][aria-label="Group parent"]')).not.toBeNull();
     expect(
       root.querySelector('[role="group"][aria-label="Connection from Request & review to Approval"]'),
-    ).not.toBeNull();
-    expect(
-      root.querySelector('[role="group"][aria-label="Source connection point of Request & review"]'),
     ).not.toBeNull();
     expect(root.querySelector('[role="img"][aria-label="Graph minimap"]')).not.toBeNull();
     expect(root.querySelectorAll('[tabindex="0"]').length).toBe(4);
@@ -212,7 +207,7 @@ describe('public graph accessibility', () => {
     expect(node.hasAttribute('lang')).toBeFalse();
   });
 
-  it('describes independent handle eligibility while preserving custom controls', async () => {
+  it('keeps handles transparent with their metadata while preserving custom controls', async () => {
     TestBed.configureTestingModule({
       imports: [AccessibilityHostComponent],
       providers: [provideZonelessChangeDetection()],
@@ -223,16 +218,19 @@ describe('public graph accessibility', () => {
     fixture.detectChanges();
     await fixture.whenStable();
     const root: HTMLElement = fixture.nativeElement;
-    const handle = root.querySelector('[role="group"][aria-label="Accept request"]')!;
-    expect(handle.getAttribute('data-port')).toBe('incoming');
-    expect(description(handle)).toBe('Inbound route. Starting connections unavailable.');
-    expect(handle.hasAttribute('aria-disabled')).toBeFalse();
-    expect(handle.hasAttribute('tabindex')).toBeFalse();
+    const handles = Array.from(root.querySelectorAll('[data-vflow-handle-type]'));
+    expect(handles.length).toBe(2);
+    expect(root.querySelector('[data-port="incoming"]')).toBe(handles[0]);
     host.canStart.set(true);
     host.canAccept.set(false);
     fixture.detectChanges();
     await fixture.whenStable();
-    expect(description(handle)).toBe('Inbound route. Accepting connections unavailable.');
+    for (const handle of handles) {
+      for (const name of ['role', 'aria-label', 'aria-describedby', 'aria-hidden', 'aria-disabled', 'tabindex']) {
+        expect(handle.hasAttribute(name)).withContext(name).toBeFalse();
+      }
+    }
+    expect(handles[0].getAttribute('data-vflow-handle-can-accept')).toBe('false');
     root.querySelector('button')!.click();
     expect(host.clicks).toBe(1);
   });

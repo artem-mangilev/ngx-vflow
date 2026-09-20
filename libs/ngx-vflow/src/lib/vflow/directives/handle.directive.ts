@@ -3,11 +3,10 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { filter, tap } from 'rxjs/operators';
 import { HandleService } from '../services/handle.service';
 import { HandleModel } from '../models/handle.model';
-import { FlowSettingsService } from '../services/flow-settings.service';
 import { FlowStatusService } from '../services/flow-status.service';
 import { ConnectionControllerDirective } from './connection-controller.directive';
 import { RootPointerDirective } from './root-pointer.directive';
-import { EntityAccessibility, bindEntityAccessibility } from './entity-accessibility.directive';
+import { bindDomAttributes } from './entity-accessibility.directive';
 import { DomAttributes } from '../interfaces/dom-attributes.interface';
 import { HandleLayout, HandlePosition, HandleType } from '../types/handle-type.type';
 import { isTouchEvent } from '../utils/event';
@@ -48,7 +47,6 @@ import { isTouchEvent } from '../utils/event';
 export class VflowHandleDirective {
   private readonly element = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
   private readonly handleService = inject(HandleService);
-  private readonly settings = inject(FlowSettingsService);
   private readonly flowStatus = inject(FlowStatusService);
   private readonly connectionController = inject(ConnectionControllerDirective, { optional: true });
   // Optional, so the directive also runs in unit tests of application components with `provideCustomNodeMocks()`.
@@ -75,8 +73,7 @@ export class VflowHandleDirective {
 
   public readonly canStart = input(true);
   public readonly canAccept = input(true);
-  public readonly ariaLabel = input<string>();
-  public readonly ariaDescription = input<string>();
+  /** `data-*`, `title`, `lang` and `dir` applied to the element. */
   public readonly domAttributes = input<DomAttributes>();
 
   private readonly model = new HandleModel(
@@ -110,32 +107,12 @@ export class VflowHandleDirective {
     };
   });
 
-  private readonly accessibility = computed<EntityAccessibility>(() => {
-    const labels = this.settings.ariaLabels();
-    const state = this.state();
-    const candidate = state === 'valid' ? labels.connectionValid : state === 'invalid' ? labels.connectionInvalid : '';
-
-    return {
-      label:
-        this.ariaLabel()?.trim() ||
-        labels.handleLabel({ type: this.handleType(), id: this.handleId(), node: this.model.parentNode.ariaLabel() }),
-      description: [
-        this.ariaDescription(),
-        !this.canStart() ? labels.connectionStartUnavailable : '',
-        !this.canAccept() ? labels.connectionAcceptUnavailable : '',
-        candidate,
-      ]
-        .filter(Boolean)
-        .join(' '),
-      domAttributes: this.domAttributes(),
-    };
-  });
-
   constructor() {
     this.handleService.createHandle(this.model);
     inject(DestroyRef).onDestroy(() => this.handleService.destroyHandle(this.model));
 
-    bindEntityAccessibility(this.accessibility);
+    // Handles have no keyboard operation and are not exposed to assistive technology; only metadata is applied.
+    bindDomAttributes(this.domAttributes);
 
     this.rootPointer?.touchEnd$
       ?.pipe(

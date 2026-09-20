@@ -180,7 +180,6 @@ interface StageData {
                   handleType="target"
                   position="left"
                   [handleId]="'in:' + port.id"
-                  [ariaLabel]="ctx.data().title + ' ' + port.name + ' input (' + port.type + ')'"
                   [attr.data-type]="port.type"
                   [vflowPortConnected]="connected().has(ctx.node.id + '/in:' + port.id)"></span>
                 <span vflowTitle>{{ port.name }}</span>
@@ -196,7 +195,6 @@ interface StageData {
                   handleType="source"
                   position="right"
                   [handleId]="'out:' + port.id"
-                  [ariaLabel]="ctx.data().title + ' ' + port.name + ' output (' + port.type + ')'"
                   [attr.data-type]="port.type"
                   [vflowPortConnected]="connected().has(ctx.node.id + '/out:' + port.id)"></span>
               </div>

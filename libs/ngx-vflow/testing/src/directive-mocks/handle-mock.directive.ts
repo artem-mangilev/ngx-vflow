@@ -19,8 +19,6 @@ export class HandleMockDirective implements AsInterface<VflowHandleDirective> {
   public readonly offsetY = input(0);
   public readonly canStart = input(true);
   public readonly canAccept = input(true);
-  public readonly ariaLabel = input<string>();
-  public readonly ariaDescription = input<string>();
   public readonly domAttributes = input<DomAttributes>();
 
   public readonly state = signal<HandleState>('idle').asReadonly();

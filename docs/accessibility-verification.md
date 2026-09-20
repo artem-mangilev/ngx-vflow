@@ -66,3 +66,9 @@ The user requested rolling back issue 11 after evaluating its interaction design
 - The node focus ring is divided by the new read-only `--vflow-zoom` variable of the zoomed viewport, so it stays 2px on screen. Verified in the browser at zoom 0.5: computed outline 4px, visible as a 2px ring.
 - A key bound to a `keyboardShortcuts` action (for example `Space` for `pan`) is no longer consumed as a selection command by a focused entity. Unit test covers Space passthrough with `Enter` still selecting.
 - Library suite: 269 tests passed; ESLint and Prettier passed for changed files. No new screen-reader session was run.
+
+## Deletion requests and transparent handles — 2026-09-20
+
+- `Delete` and `Backspace` on a focused node or edge emit `(deleteRequest)` once per press: the whole selection when the focused entity is selected, otherwise the focused entity alone (rule chosen after the research in `.scratch/core-platform-parity/keyboard-delete-focus-vs-selection.md`); `keyboardShortcuts.delete` configures or disables the keys and the matching instruction in entity descriptions. The library removes nothing. Unit tests cover the payload, auto-repeat, configured keys, `null` and the description; the Delete selected workshop applies the request with `removeNodes` and `removeEdges`.
+- Handles are no longer exposed to assistive technology at all: the handle `ariaLabel`/`ariaDescription` inputs and the five handle-related label keys are removed after checking React Flow (plain `div` with `data-*` only), Foblex (ports absent from its semantics layer, keyboard connection works at node level) and ng-diagram (no port semantics). `domAttributes` still applies `data-*`. The accessibility example and its Playwright scenario now assert the absence of handle semantics and a working pointer connection.
+- Library suite: 271 tests passed. Playwright `accessibility.spec.ts` and `keyboard-navigation.spec.ts`: 4 passed. No new screen-reader session was run.

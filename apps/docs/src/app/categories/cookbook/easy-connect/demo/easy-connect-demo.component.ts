@@ -48,7 +48,7 @@ export class EasyConnectSettings {
 @Component({
   selector: 'easy-connect-node',
   template: `
-    <div class="easy-node" vflowHandle handleType="any" [position]="settings.position()" [ariaLabel]="ctx.data().title">
+    <div class="easy-node" vflowHandle handleType="any" [position]="settings.position()">
       <div class="easy-node__title" dragHandle>{{ ctx.data().title }}</div>
       <div class="easy-node__body">Drag from here to connect</div>
     </div>

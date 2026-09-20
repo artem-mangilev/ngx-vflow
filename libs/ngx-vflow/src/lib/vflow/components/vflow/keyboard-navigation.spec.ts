@@ -441,6 +441,54 @@ describe('public keyboard graph navigation', () => {
     fixture.detectChanges();
   });
 
+  it('requests deletion at the point of focus once per press and follows the configured keys', async () => {
+    const { fixture, host, root } = await setup();
+    const requests: { nodeIds: string[]; edgeIds: string[] }[] = [];
+    const subscription = host.flow().deleteRequest.subscribe((request) => requests.push(request));
+    const child = root.querySelector<HTMLElement>('[aria-label="Child"]')!;
+    const edge = root.querySelector<SVGElement>('[aria-label="Route"]')!;
+    const description = () =>
+      child
+        .getAttribute('aria-describedby')!
+        .split(/\s+/)
+        .map((id) => document.getElementById(id)!.textContent)
+        .join(' ');
+    expect(description()).toContain('Press Delete or Backspace to request deletion of this item');
+    child.focus();
+    // Nothing selected: only the focused entity.
+    expect(key(child, 'Delete').defaultPrevented).toBeTrue();
+    expect(requests).toEqual([{ nodeIds: ['child'], edgeIds: [] }]);
+    // A selection elsewhere does not follow a focused entity outside of it.
+    host.nodes()[2].selected.set(true);
+    host.edges[0].selected.set(true);
+    key(child, 'Backspace');
+    expect(requests[1]).toEqual({ nodeIds: ['child'], edgeIds: [] });
+    // A focused entity inside the selection carries the whole selection.
+    host.nodes()[0].selected.set(true);
+    key(child, 'Backspace');
+    expect(requests[2]).toEqual({ nodeIds: ['child', 'other'], edgeIds: ['edge'] });
+    child.dispatchEvent(new KeyboardEvent('keydown', { key: 'Delete', code: 'Delete', repeat: true, bubbles: true }));
+    expect(requests.length).toBe(3);
+    expect(host.nodes().map((n) => n.selected())).toEqual([true, false, true]);
+    expect(host.nodes().length).toBe(3);
+    edge.focus();
+    key(edge, 'Delete');
+    expect(requests[3]).toEqual({ nodeIds: ['child', 'other'], edgeIds: ['edge'] });
+    host.flow().keyboardShortcuts = { delete: ['KeyX'] };
+    fixture.detectChanges();
+    await fixture.whenStable();
+    expect(key(edge, 'Delete').defaultPrevented).toBeFalse();
+    key(edge, 'x', 'KeyX');
+    expect(requests.length).toBe(5);
+    host.flow().keyboardShortcuts = { delete: null };
+    fixture.detectChanges();
+    await fixture.whenStable();
+    key(edge, 'x', 'KeyX');
+    expect(requests.length).toBe(5);
+    expect(description()).not.toContain('Press Delete or Backspace');
+    subscription.unsubscribe();
+  });
+
   it('does not restore stale graph focus after focus has left the graph', async () => {
     const { fixture, host, root } = await setup();
     root.querySelector<HTMLElement>('[aria-label="Child"]')!.focus();

@@ -4,7 +4,7 @@ import { HandleState, VflowHandleDirective } from 'ngx-vflow';
 /**
  * A handle with the standard connection point look: applies the core `vflowHandle` directive to its host, so the
  * element is registered, positioned and gets the handle state. The handle inputs `handleType`, `position`, `handleId`,
- * `layout`, offsets, connectability and accessibility are forwarded. `vflowPortState` overrides the handle feedback; `vflowPortConnected`
+ * `layout`, offsets, connectability and `domAttributes` are forwarded. `vflowPortState` overrides the handle feedback; `vflowPortConnected`
  * is application knowledge about existing edges.
  */
 @Directive({
@@ -21,8 +21,6 @@ import { HandleState, VflowHandleDirective } from 'ngx-vflow';
         'offsetY',
         'canStart',
         'canAccept',
-        'ariaLabel',
-        'ariaDescription',
         'domAttributes',
       ],
     },

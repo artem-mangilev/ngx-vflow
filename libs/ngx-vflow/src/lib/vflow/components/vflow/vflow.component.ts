@@ -460,6 +460,12 @@ export class VflowComponent {
    * Event that accumulates all custom edge events
    */
   public readonly componentEdgeEvent = outputFromObservable<any>(this.componentEventBusService.edgeEvent$);
+
+  /**
+   * A keyboard user pressed a deletion key on a focused node or edge while entities were selected. Carries the
+   * selected IDs only; apply it with `removeNodes` and `removeEdges` or ignore it.
+   */
+  public readonly deleteRequest = outputFromObservable(this.keyboardService.deleteRequest$);
   // #endregion
 
   // #region TEMPLATES

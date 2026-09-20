@@ -362,6 +362,10 @@ The `[resizable]` element is now the node's sizing box: for an explicitly sized 
 
 `nodesChanges.size` now carries `mode: 'auto' | 'explicit'`. Persist a size only when it is `explicit`; an `auto` size is a measurement of the node's content and must not be written back as data, or the node would stop following its content.
 
+### Accessibility defaults
+
+Handles are no longer exposed to assistive technology: the handle inputs `ariaLabel` and `ariaDescription` and the label keys `handleLabel`, `connectionStartUnavailable`, `connectionAcceptUnavailable`, `connectionValid` and `connectionInvalid` are removed. A handle gets no role, name or description; its content keeps its own semantics and `domAttributes` still applies `data-*`. Keyboard commands on focused nodes and edges now report their outcome in the flow's live region, `Delete` and `Backspace` emit `(deleteRequest)` for the focused entity or, when it is selected, for the whole selection, and a key bound through `keyboardShortcuts` is reserved for its action. See [Accessibility](../../interactions/accessibility).
+
 ### Removed APIs
 
 | Removed in v3                                      | Migration                                                                                              |

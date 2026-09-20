@@ -41,8 +41,7 @@ import { AriaLabelConfig, Vflow, createEdges, createNodes } from 'ngx-vflow';
                 handleType="target"
                 position="left"
                 handleId="incoming"
-                ariaLabel="Accept request"
-                ariaDescription="Inbound route."
+                [domAttributes]="{ 'data-port': 'incoming' }"
                 [canStart]="false"
                 [canAccept]="canAccept()"></span>
             </div>
@@ -120,17 +119,11 @@ export class AccessibilityDemoComponent {
           nodeLabel: (id) => `Узел ${id}`,
           groupLabel: (id) => `Группа ${id}`,
           edgeLabel: ({ source, target }) => `Связь от ${source} к ${target}`,
-          handleLabel: ({ type, id, node }) =>
-            `${type === 'source' ? 'Исходящая' : 'Входящая'} точка соединения${id ? ` ${id}` : ''} узла ${node}`,
           parentDescription: (parent) => `Родитель: ${parent}.`,
           selected: 'Выбран.',
           selectionUnavailable: 'Выбор недоступен.',
           movementUnavailable: 'Перемещение недоступно.',
           reconnectionUnavailable: 'Переподключение недоступно.',
-          connectionStartUnavailable: 'Начало соединения недоступно.',
-          connectionAcceptUnavailable: 'Приём соединения недоступен.',
-          connectionValid: 'Допустимая цель соединения.',
-          connectionInvalid: 'Недопустимая цель соединения.',
           keyboardNavigation: 'Переходите между объектами клавишами Tab и Shift+Tab.',
           keyboardSelect:
             'Нажмите Enter или пробел для выбора. Удерживайте модификатор множественного выбора для переключения выделения.',

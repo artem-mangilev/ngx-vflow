@@ -30,6 +30,7 @@ import {
   SelectionBoxSettings,
   AutoPanSettings,
   AriaLabelConfig,
+  DeleteRequest,
 } from 'ngx-vflow';
 import { toObservable } from '@angular/core/rxjs-interop';
 import {
@@ -174,6 +175,8 @@ export class VflowMockComponent implements AsInterface<VflowComponent>, OnInit {
 
   // eslint-disable-next-line @angular-eslint/no-output-on-prefix
   public readonly componentEdgeEvent = output<any>();
+
+  public readonly deleteRequest = output<DeleteRequest>();
 
   protected nodeTemplateDirective = contentChild(NodeTemplateMockDirective);
 

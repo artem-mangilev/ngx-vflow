@@ -52,6 +52,7 @@ export class KeyboardEntityDirective {
       selection && model.selectable() ? labels.keyboardSelect : '',
       selection ? labels.keyboardDeselect : '',
       model instanceof NodeModel && model.draggable() ? labels.keyboardMove : '',
+      this.keyboard.hasCommand('delete') ? labels.keyboardDelete : '',
     ]
       .filter(Boolean)
       .join(' ');
@@ -119,6 +120,23 @@ export class KeyboardEntityDirective {
               count: this.entities.entities().filter((entity) => entity.selected()).length,
             }),
       );
+    } else if (this.keyboard.isCommand('delete', event.code)) {
+      event.preventDefault();
+      event.stopPropagation();
+      if (event.repeat) return;
+      // The command acts at the point of focus: the whole selection when the focused entity belongs to it,
+      // otherwise only the focused entity, so a stale selection elsewhere is never deleted by surprise.
+      const target = (entity: NodeModel | EdgeModel) => (model.selected() ? entity.selected() : entity === model);
+      this.keyboard.deleteRequest$.next({
+        nodeIds: this.entities
+          .nodes()
+          .filter(target)
+          .map((node) => node.rawNode.id),
+        edgeIds: this.entities
+          .edges()
+          .filter(target)
+          .map((edge) => edge.edge.id),
+      });
     } else if (
       Object.hasOwn(ARROW_DIRECTIONS, event.key) &&
       model instanceof NodeModel &&

@@ -8,13 +8,14 @@ You can use keyboard shortcuts to control selection and temporarily activate vie
 | Viewport zoom activation | Disabled (`null`)                     |
 | Selection box            | `ShiftLeft` or `ShiftRight`           |
 | Node multi selection     | `CMD` (Mac) or `CTRL` (Other systems) |
+| Delete selected          | `Delete` or `Backspace`               |
 
 When `selection` is active (default: `Shift`), dragging on the canvas starts selection box mode instead of map pan.
 
 # Customization
 
 To customize shortcuts, pass a `[keyboardShortcuts]` input object to `VflowComponent`.
-Supported actions are `selection`, `multiSelection`, `pan`, and `zoom` (`KeyboardShortcuts` is a partial object, so you can override only one action if needed).
+Supported actions are `selection`, `multiSelection`, `pan`, `zoom` and the `delete` command (`KeyboardShortcuts` is a partial object, so you can override only one action if needed). The first four stay active while the key is held; `delete` fires once per press on a focused node or edge and emits `(deleteRequest)` with the whole selection when the focused entity is selected, otherwise with the focused entity alone, see [Accessibility](../accessibility).
 
 Key details:
 

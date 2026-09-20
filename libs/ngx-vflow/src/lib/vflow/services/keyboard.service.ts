@@ -1,13 +1,14 @@
-import { ElementRef, Injectable, inject } from '@angular/core';
-import { KeyboardAction, KeyboardShortcuts } from '../types/keyboard-action.type';
+import { ElementRef, Injectable, inject, signal } from '@angular/core';
+import { KeyboardAction, KeyboardCommand, KeyboardShortcuts } from '../types/keyboard-action.type';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { BehaviorSubject, fromEvent, merge } from 'rxjs';
+import { BehaviorSubject, Subject, fromEvent, merge } from 'rxjs';
+import { DeleteRequest } from '../interfaces/delete-request.interface';
 import { getOS } from '../utils/get-os';
 
 @Injectable()
 export class KeyboardService {
   private host = inject(ElementRef<HTMLElement>, { optional: true })?.nativeElement;
-  private actions: KeyboardShortcuts = {
+  private shortcuts = signal<KeyboardShortcuts>({
     selection: ['ShiftLeft', 'ShiftRight'],
     multiSelection: [
       getOS() === 'macos' ? 'MetaLeft' : 'ControlLeft',
@@ -15,7 +16,10 @@ export class KeyboardService {
     ],
     pan: null,
     zoom: null,
-  };
+    delete: ['Delete', 'Backspace'],
+  });
+  /** Keyboard deletion requests from focused entity wrappers; the flow exposes them as an output. */
+  public deleteRequest$ = new Subject<DeleteRequest>();
   private pressed = new Set<string>();
   private gestureKeys = new Set<string>();
   #actionsActive$ = new BehaviorSubject<Record<KeyboardAction, boolean>>({
@@ -71,13 +75,13 @@ export class KeyboardService {
     const active = { ...this.#actionsActive$.value };
     for (const action of Object.keys(active) as KeyboardAction[]) {
       const pressed = action === 'pan' || action === 'zoom' ? this.gestureKeys : this.pressed;
-      active[action] = (this.actions[action] ?? []).some((code) => pressed.has(code));
+      active[action] = (this.shortcuts()[action] ?? []).some((code) => pressed.has(code));
     }
     this.#actionsActive$.next(active);
   }
 
   public setShortcuts(newActions: KeyboardShortcuts) {
-    this.actions = { ...this.actions, ...newActions };
+    this.shortcuts.update((shortcuts) => ({ ...shortcuts, ...newActions }));
     this.updateActive();
   }
 
@@ -87,6 +91,16 @@ export class KeyboardService {
 
   /** Whether a physical key is bound to any action, so entity commands leave it to the gesture layer. */
   public hasShortcut(code: string) {
-    return Object.values(this.actions).some((codes) => codes?.includes(code));
+    return Object.values(this.shortcuts()).some((codes) => codes?.includes(code));
+  }
+
+  /** Whether a physical key is bound to the command. Reactive, so descriptions follow the configuration. */
+  public isCommand(command: KeyboardCommand, code: string) {
+    return (this.shortcuts()[command] ?? []).includes(code);
+  }
+
+  /** Whether the command has any key. Reactive. */
+  public hasCommand(command: KeyboardCommand) {
+    return (this.shortcuts()[command] ?? []).length > 0;
   }
 }

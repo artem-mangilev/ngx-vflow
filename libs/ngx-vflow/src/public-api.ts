@@ -12,6 +12,7 @@ export { getFloatingEdgeParams, FloatingEdgeParams, FloatingEdgeOptions } from '
 // Interfaces
 export * from './lib/vflow/interfaces/aria-label-config.interface';
 export * from './lib/vflow/interfaces/dom-attributes.interface';
+export * from './lib/vflow/interfaces/delete-request.interface';
 export * from './lib/vflow/interfaces/node.interface';
 export * from './lib/vflow/interfaces/point.interface';
 export * from './lib/vflow/interfaces/rect';

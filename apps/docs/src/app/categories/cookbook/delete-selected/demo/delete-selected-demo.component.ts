@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { DocsPresentations } from '@docs/shared';
 import { VflowPort } from '@vflow/ui';
-import { Edge, Node, Vflow, removeEdges, removeNodes, createNodes } from 'ngx-vflow';
+import { DeleteRequest, Edge, Node, Vflow, removeEdges, removeNodes, createNodes } from 'ngx-vflow';
 
 @Component({
   templateUrl: './delete-selected-demo.component.html',
@@ -38,13 +38,9 @@ export class DeleteSelectedDemoComponent {
     },
   ];
 
-  public deleteNode(node: Node) {
-    const result = removeNodes([node.id], { nodes: this.nodes, edges: this.edges });
+  public onDeleteRequest({ nodeIds, edgeIds }: DeleteRequest) {
+    const result = removeNodes(nodeIds, { nodes: this.nodes, edges: removeEdges(edgeIds, this.edges) });
     this.nodes = result.nodes;
     this.edges = result.edges;
-  }
-
-  public deleteEdge(edge: Edge) {
-    this.edges = removeEdges([edge.id], this.edges);
   }
 }
