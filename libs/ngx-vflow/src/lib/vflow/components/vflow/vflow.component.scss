@@ -1,3 +1,48 @@
+// Public theme tokens of core. Registration gives each one its default without declaring it on the flow
+// element, so a value set on any ancestor (for example a `vflowTheme` scope) still inherits into the flow and
+// its parts, and a value set on a descendant still wins for that subtree.
+@property --vflow-background {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #fff;
+}
+
+@property --vflow-surface {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #fff;
+}
+
+@property --vflow-foreground {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #1b262c;
+}
+
+@property --vflow-muted {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: rgb(177, 177, 183);
+}
+
+@property --vflow-border {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: rgb(200, 200, 200);
+}
+
+@property --vflow-selection {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #0f4c75;
+}
+
+@property --vflow-focus {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #005fcc;
+}
+
 :host {
   display: block;
   position: relative;
@@ -13,10 +58,24 @@
   }
 }
 
+// High contrast: the feedback parts keep their meaning through system colors. The minimap canvas paints the
+// same sampled tokens, so it follows too.
+@media (forced-colors: active) {
+  :host {
+    --vflow-background: Canvas;
+    --vflow-surface: Canvas;
+    --vflow-foreground: CanvasText;
+    --vflow-muted: GrayText;
+    --vflow-border: CanvasText;
+    --vflow-selection: Highlight;
+    --vflow-focus: Highlight;
+  }
+}
+
 .vflow-root {
   position: relative;
   overflow: hidden;
-  background-color: var(--vflow-background, #fff);
+  background-color: var(--vflow-background);
 }
 
 .vflow-a11y-live {

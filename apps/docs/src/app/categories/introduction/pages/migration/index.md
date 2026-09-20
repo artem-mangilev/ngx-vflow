@@ -85,6 +85,7 @@ Include `@vflow/ui/styles.css` in your global styles for path B. See the Design 
 Colors are CSS. Core reads the tokens `--vflow-background`, `--vflow-surface`, `--vflow-foreground`,
 `--vflow-muted`, `--vflow-border`, `--vflow-selection` and `--vflow-focus`, each with a built-in default.
 Set them on the `vflow` element or any ancestor; a `vflowTheme` scope from `@vflow/ui` maps its theme onto them.
+Under `forced-colors: active` core maps its tokens to system colors and keeps the feedback parts visible.
 
 | Removed input                                        | Replacement                                                                                  |
 | ---------------------------------------------------- | -------------------------------------------------------------------------------------------- |

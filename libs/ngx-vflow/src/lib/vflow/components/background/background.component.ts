@@ -20,8 +20,14 @@ const defaultRepeated = true;
   styles: [
     `
       .vflow-background-pattern {
-        fill: var(--vflow-muted, rgb(177, 177, 183));
-        stroke: var(--vflow-muted, rgb(177, 177, 183));
+        fill: var(--vflow-muted);
+        stroke: var(--vflow-muted);
+      }
+
+      @media (forced-colors: active) {
+        .vflow-background-pattern {
+          forced-color-adjust: none;
+        }
       }
     `,
   ],

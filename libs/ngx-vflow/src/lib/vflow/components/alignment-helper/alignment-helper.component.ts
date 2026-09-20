@@ -35,7 +35,13 @@ interface Intersection {
   styles: [
     `
       .vflow-alignment-line {
-        stroke: var(--vflow-foreground, #1b262c);
+        stroke: var(--vflow-foreground);
+      }
+
+      @media (forced-colors: active) {
+        .vflow-alignment-line {
+          forced-color-adjust: none;
+        }
       }
     `,
   ],

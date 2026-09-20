@@ -28,8 +28,8 @@
 .resize-control.handle {
   width: 6px;
   height: 6px;
-  background-color: var(--vflow-selection, #2e414c);
-  border: 1px solid var(--vflow-surface, #fff);
+  background-color: var(--vflow-selection);
+  border: 1px solid var(--vflow-surface);
   border-radius: 1px;
   translate: -50% -50%;
 }
@@ -48,7 +48,7 @@
 .resize-control.line {
   border-width: 0;
   border-style: solid;
-  border-color: var(--vflow-selection, #2e414c);
+  border-color: var(--vflow-selection);
 }
 
 .resize-control.line.left,
@@ -101,4 +101,11 @@
 .resize-control.handle.bottom,
 .resize-control.line.bottom {
   top: calc(100% + var(--resizer-gap));
+}
+
+@media (forced-colors: active) {
+  .resize-control.handle,
+  .resize-control.line {
+    forced-color-adjust: none;
+  }
 }

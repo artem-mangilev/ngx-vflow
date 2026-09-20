@@ -151,7 +151,8 @@ line width, is ordinary CSS on the public `.vui-*` selectors; the density of all
 Core has its own tokens with defaults for standalone use: `--vflow-background`, `--vflow-surface`,
 `--vflow-foreground`, `--vflow-muted`, `--vflow-border`, `--vflow-selection` and `--vflow-focus`.
 A theme scope maps the UI tokens onto them; set a `--vflow-*` token on the flow element or any
-descendant to override both. The canvas minimap samples the resolved tokens and repaints when an
+descendant to override both. Under `forced-colors: active` core maps its tokens to system colors
+regardless of the theme. The canvas minimap samples the resolved tokens and repaints when an
 attribute changes on any ancestor of the flow (for example `data-vui-theme` or a class) or when the
 `prefers-color-scheme` preference changes; edits to a stylesheet alone are not observed.
 
