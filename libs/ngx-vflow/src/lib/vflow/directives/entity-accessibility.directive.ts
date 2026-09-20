@@ -1,7 +1,7 @@
 import { Directive, ElementRef, effect, inject, input, Signal } from '@angular/core';
 import { AriaDescriber } from '@angular/cdk/a11y';
 import { DomAttributes } from '../interfaces/dom-attributes.interface';
-import { KeyboardEntityDirective } from './keyboard-navigation.directive';
+import { KeyboardEntityDirective } from './keyboard-entity.directive';
 
 /** Shared semantics for the library-owned HTML and SVG entity wrappers. */
 export type EntityAccessibility = {

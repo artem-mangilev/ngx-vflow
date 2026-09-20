@@ -1,5 +1,6 @@
 import { AutoPanSettings } from '../../interfaces/auto-pan-settings.interface';
-import { KeyboardEntityDirective, KeyboardNavigationDirective } from '../../directives/keyboard-navigation.directive';
+import { KeyboardNavigationDirective } from '../../directives/keyboard-navigation.directive';
+import { KeyboardEntityDirective } from '../../directives/keyboard-entity.directive';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -82,6 +83,8 @@ import { AriaDescriber } from '@angular/cdk/a11y';
 import { EntityAccessibilityDirective } from '../../directives/entity-accessibility.directive';
 import { LiveRegionDirective } from '../../directives/live-region.directive';
 import { AnnouncerService } from '../../services/announcer.service';
+import { KeyboardEntityCommandsService } from '../../services/keyboard-entity-commands.service';
+import { KeyboardViewportCommandsService } from '../../services/keyboard-viewport-commands.service';
 import { AriaLabelConfig, DEFAULT_ARIA_LABEL_CONFIG } from '../../interfaces/aria-label-config.interface';
 
 const changesControllerHostDirective = {
@@ -125,6 +128,8 @@ const nodeDragControllerHostDirective = {
     FlowSettingsService,
     ComponentEventBusService,
     KeyboardService,
+    KeyboardEntityCommandsService,
+    KeyboardViewportCommandsService,
     AnnouncerService,
     OverlaysService,
     FlowRenderingService,

@@ -41,3 +41,9 @@ Dispatch is split between `KeyboardEntityDirective` (select, clear, delete, move
 - Verified: 279 library tests, with every prior expectation unchanged; two were added, one proving the order and the
   fall-through on a key shared by `moveRight` and `panRight`, the other proving that a key bound as a modifier never
   reaches a command and that the overlap is reported. Full docs e2e 35 passed, lint clean.
+- 2026-09-20, follow-up: the 312-line directive file was split by responsibility on review. `utils/keyboard-commands.ts`
+  holds the shared arrow and zoom descriptors, `KeyboardEntityCommandsService` holds what select, clear, delete and
+  move do, `KeyboardViewportCommandsService` holds pan, zoom and fit view, `keyboard-entity.directive.ts` holds the
+  Tab stop with its description and focus pan, and the container directive keeps the ordered registry, the dispatch
+  guards and focus repair. The registry stayed with the dispatcher because the order is a dispatch decision, while the
+  implementations are not. No behavior changed: 279 library tests and 35 e2e passed unchanged.
