@@ -2,7 +2,7 @@
 
 Status: needs-triage
 Tier: 3.0-additive
-Depends on: 03, 04, 05
+Depends on: 03, 04
 
 ## Problem
 

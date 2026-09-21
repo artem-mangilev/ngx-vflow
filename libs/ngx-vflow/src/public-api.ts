@@ -56,9 +56,7 @@ export { VflowFeature, vflowFeature, provideVflow } from './lib/vflow/features/f
 export * from './lib/vflow/features/feature-entry.interface';
 export * from './lib/vflow/features/vflow-context';
 export * from './lib/vflow/features/geometry-intent.interface';
-export * from './lib/vflow/features/connection-policy.interface';
 export { VFLOW_GEOMETRY_TRANSFORMS, provideGeometryTransform } from './lib/vflow/features/provide-geometry-transform';
-export { VFLOW_CONNECTION_POLICIES, provideConnectionPolicy } from './lib/vflow/features/provide-connection-policy';
 
 // First-party features
 export { withSnapGrid } from './lib/features/snap-grid/with-snap-grid';

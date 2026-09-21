@@ -1,9 +1,7 @@
 import { DestroyRef, inject, Injectable, Injector, Type } from '@angular/core';
-import { ConnectionPolicy } from '../features/connection-policy.interface';
 import { VFLOW_CORE_GEOMETRY_TRANSFORMS } from '../features/core/core-geometry-transforms.token';
 import { VFLOW_PROVIDE_MARKER } from '../features/feature';
 import { GeometryTransform, IntentKind, IntentPhase } from '../features/geometry-intent.interface';
-import { VFLOW_CONNECTION_POLICIES } from '../features/provide-connection-policy';
 import { VFLOW_GEOMETRY_TRANSFORMS } from '../features/provide-geometry-transform';
 import { resolveFeatureEntries } from '../utils/resolve-feature-entries';
 
@@ -24,9 +22,6 @@ export class FeatureRegistryService {
     ...this.instances<GeometryTransform>(VFLOW_CORE_GEOMETRY_TRANSFORMS),
     ...this.instances<GeometryTransform>(VFLOW_GEOMETRY_TRANSFORMS),
   ]);
-  public readonly connectionPolicies: readonly ConnectionPolicy[] = resolveFeatureEntries(
-    this.instances(VFLOW_CONNECTION_POLICIES),
-  );
 
   private readonly transformsByKindAndPhase = new Map<string, readonly GeometryTransform[]>();
 
@@ -57,13 +52,12 @@ export class FeatureRegistryService {
     const entries: unknown[] = [
       ...this.injector.get(VFLOW_CORE_GEOMETRY_TRANSFORMS, [], { optional: true }),
       ...this.injector.get(VFLOW_GEOMETRY_TRANSFORMS, [], { optional: true }),
-      ...this.injector.get(VFLOW_CONNECTION_POLICIES, [], { optional: true }),
     ];
     return entries.filter(isClass);
   }
 
   private instances<T extends object>(
-    token: typeof VFLOW_CORE_GEOMETRY_TRANSFORMS | typeof VFLOW_GEOMETRY_TRANSFORMS | typeof VFLOW_CONNECTION_POLICIES,
+    token: typeof VFLOW_CORE_GEOMETRY_TRANSFORMS | typeof VFLOW_GEOMETRY_TRANSFORMS,
   ): T[] {
     return (this.injector.get(token, [], { optional: true }) as (T | Type<T>)[]).map((entry) =>
       isClass(entry) ? this.entryInjector.get(entry) : entry,

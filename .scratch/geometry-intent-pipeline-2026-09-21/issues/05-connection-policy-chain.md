@@ -1,6 +1,6 @@
 # Resolve connection validity through a policy chain
 
-Status: needs-triage
+Status: wontfix
 Tier: 3.0-additive
 Depends on: 01, 02
 
@@ -36,3 +36,12 @@ for all.
 ## Out of scope
 
 - Returning edge attributes from a policy; changing the `Connection` request shape.
+
+## Comments
+
+- 2026-09-21: Deferred (spec decision 15). Implemented once as `ConnectionPolicyService` plus a handle-type
+  invariant and reverted before commit: none of the target scenarios contributes a connection rule, proximity
+  connect only needs a `canConnect(candidate)` query, and read-only or per-handle restrictions are capability
+  policies already. `VFLOW_CONNECTION_POLICIES`, `provideConnectionPolicy`, `ConnectionPolicy` and
+  `ConnectionCandidate` were removed from issue 01's surface so no dead seam stays exported. Reopen when a real
+  feature needs to add a rule; the design above still holds.

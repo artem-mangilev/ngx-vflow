@@ -64,10 +64,11 @@ design ([ADR-0002](../../docs/adr/0002-application-owned-graph-state.md)); this 
    `vflowFeature(kind, providers)` is the public constructor. `provideVflow` flattens providers and, in dev mode,
    reports duplicate kinds and duplicate entry ids.
 3. Each seam is its own multi-provider token with its own small contract, not one `VflowPlugin` interface:
-   `VFLOW_GEOMETRY_TRANSFORMS` and `VFLOW_CONNECTION_POLICIES` in this spec, more tokens in later specs. A feature
+   `VFLOW_GEOMETRY_TRANSFORMS` in this spec, more tokens in later specs, each added when a feature needs it. A feature
    registers an entry with a multi-provider on the token inside its `vflowFeature(kind, providers)` list, so a feature
-   may contribute to several tokens and a flow may carry many entries of one seam under distinct feature kinds. The public `provideGeometryTransform(entry)` / `provideConnectionPolicy(entry)` helpers build that provider; they
-   return `Provider[]`, and `withX()` is reserved for functions that return a `VflowFeature`.
+   may contribute to several tokens and a flow may carry many entries of one seam under distinct feature kinds. The
+   public `provideGeometryTransform(entry)` helper builds that provider; it returns `Provider[]`, and `withX()` is
+   reserved for functions that return a `VflowFeature`.
 4. Every entry has a string `id` and an optional `precedence: 'highest' | 'high' | 'default' | 'low' | 'lowest'`
    (default `'default'`). Order is resolved **once** per `<vflow>` at creation: precedence category first, then position
    in the flattened provider array. Duplicate ids are a dev-mode error. Precedence is declared by the feature author in
@@ -144,9 +145,9 @@ design ([ADR-0002](../../docs/adr/0002-application-owned-graph-state.md)); this 
       choice: bounds restriction follows from `fNodeParentId`, configured per node, no `withX()`,
       [f-node docs](https://flow.foblex.com/docs/f-node-directive)). It reads the parent's pending size from the same
       batch when present, so a grown parent widens the allowed area in the same frame, and ignores claims.
-      Core entries carry the reserved `core:` prefix so a feature can order itself around them; today they are
-      `core:node-extent` and the policies the `connection` input registers. Without any feature a drag writes the
-      candidate point as computed, clamped by `core:node-extent` where the node asks for it.
+      Core entries carry the reserved `core:` prefix so a feature can order itself around them; today there is one,
+      `core:node-extent`. Without any feature a drag writes the candidate point as computed, clamped by
+      `core:node-extent` where the node asks for it.
 12. Measurement is **not** an intent. The ResizeObserver path stays observational and keeps writing `auto` sizes.
     Transforming a measured size is a non-goal; a feature that wants a different size writes an explicit one.
 13. Applying a change with `width` or `height` makes the node explicitly sized, exactly as the resizer does today,
@@ -155,19 +156,14 @@ design ([ADR-0002](../../docs/adr/0002-application-owned-graph-state.md)); this 
 14. The drag-start filter (`draggable.service.ts:176-205`, pointer-level rules on the DOM event) stays as it is. The
     `start` phase vetoes activation, not pointer routing.
 
-### Connection policies
+### Connection validity
 
-15. `ConnectionModel.validator` becomes a resolved chain of **three-valued policies**:
-    `{ id, precedence?, decide(connection: ConnectionCandidate, ctx): boolean | null }`. `true` allows, `false`
-    denies, `null` passes to the next entry; the chain result defaults to `true` when every policy passes. Core registers
-    no policy of its own; the `connection` input registers what it configures: `core:not-self` at `lowest` unless
-    `allowSelfConnections`, and `core:application` at `default` wrapping `ConnectionSettings.validator` (`false` when
-    the function returns `false`, else `null`). The typed-handles rule (`notSameTypedHandlesValidator`) is not a policy
-    but an invariant of the handle model, checked with `canStart`/`canAccept` before the chain. A feature registers its
-    policy on `VFLOW_CONNECTION_POLICIES`. Moving `ConnectionSettings` itself to a `withConnection()` feature is left to the
-    strategy-slot spec, which also owns the curve. `canStart`/`canAccept` remain entity eligibility gates evaluated before the chain, per the capability
-    policy language in `CONTEXT.md`. The chain runs for creation and reconnection; `ConnectionCandidate` carries the
-    edge being reconnected when there is one.
+15. Deferred. Connection validity stays where it is: `ConnectionSettings.validator` and `allowSelfConnections`,
+    evaluated after `canStart`/`canAccept`. A policy chain on a `VFLOW_CONNECTION_POLICIES` token was designed and
+    started, then dropped on 2026-09-21: none of the target scenarios adds a connection rule, proximity connect only
+    needs to _ask_ whether a candidate is valid, and read-only or per-handle restrictions are capability policies
+    already. The ephemeral-layer spec adds a `canConnect(candidate)` query to `VflowContext` for proximity connect;
+    a chain returns only when a real feature needs to contribute a rule.
 
 ### Metadata, revision and context
 
@@ -209,7 +205,7 @@ implement entity fields and existing inputs.
 | `autoPan` input + `AutoPanDirective` + `moveNodesOnAutoPan$`                          | `withAutoPan(options?)`, an opt-in feature that only pans the viewport; the pointer session follows the viewport itself; the input is removed and a `<vflow>` without the feature does not pan (3.0 is breaking; the options object from parity issue 08 is kept as the argument) | B     |
 | Keyboard `moveSelected`                                                               | one-shot keyboard sessions; commands unchanged                                                                                                                                                                                                                                    | A     |
 | Resizer `onChange` writes                                                             | `resize` intents; the resizer keeps its own drag math and snapping                                                                                                                                                                                                                | A     |
-| `notSelfValidator`, `ConnectionSettings.validator`                                    | `core:not-self` and `core:application` policies registered by the `connection` input; `notSameTypedHandlesValidator` becomes a handle-model invariant                                                                                                                             | A     |
+| `ConnectionSettings.validator`, `allowSelfConnections`                                | unchanged (decision 15)                                                                                                                                                                                                                                                           | —     |
 | `alignmentHelper` input + `AlignmentHelperComponent` snapping                         | `withAlignmentHelper({ tolerance })`: a transform at `phase: 'end'`, precedence `high` (guides snap before grid, as in diagram-js); the guide lines keep rendering from the core overlay until the ephemeral-layer spec lands; the input is removed (3.0 is breaking)             | B     |
 
 Candidates deliberately left for later specs, with the seam they need:
@@ -246,11 +242,11 @@ virtualization (a displayed-set concern of the renderer), accessibility wrappers
 
 ## Dependency order
 
-| Phase                     | Issues                                                                                                                                          | Release                                       |
-| ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
-| A — registration and seam | 01 `provideVflow`; 02 `VflowContext`; 03 move intents; 04 resize intents; 05 connection policies; 06 metadata and revision; 09 `withSnapGrid()` | 3.0, breaking where noted, must land together |
-| B — first-party features  | 07 `withAlignmentHelper()`; 08 `withAutoPan()`                                                                                                  | 3.0, breaking (inputs removed)                |
-| C — documentation         | 10 docs, testing helpers and e2e                                                                                                                | with each phase, finalized after 09           |
+| Phase                     | Issues                                                                                                                  | Release                                       |
+| ------------------------- | ----------------------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
+| A — registration and seam | 01 `provideVflow`; 02 `VflowContext`; 03 move intents; 04 resize intents; 06 metadata and revision; 09 `withSnapGrid()` | 3.0, breaking where noted, must land together |
+| B — first-party features  | 07 `withAlignmentHelper()`; 08 `withAutoPan()`                                                                          | 3.0, breaking (inputs removed)                |
+| C — documentation         | 10 docs, testing helpers and e2e                                                                                        | with each phase, finalized after 09           |
 
 ## Issues
 
@@ -258,7 +254,7 @@ virtualization (a displayed-set concern of the renderer), accessibility wrappers
 2. [Introduce the `VflowContext` token](issues/02-vflow-context-token.md)
 3. [Route every movement through move intents](issues/03-move-intents.md)
 4. [Route the resizer through resize intents](issues/04-resize-intents.md)
-5. [Resolve connection validity through a policy chain](issues/05-connection-policy-chain.md)
+5. [Resolve connection validity through a policy chain](issues/05-connection-policy-chain.md) — deferred, see decision 15
 6. [Tag writes with origin and gesture id and expose the revision](issues/06-write-metadata-and-revision.md)
 7. [Move the alignment helper onto the pipeline as `withAlignmentHelper()`](issues/07-with-alignment-helper.md)
 8. [Make auto-pan an opt-in feature, `withAutoPan()`](issues/08-with-auto-pan.md)

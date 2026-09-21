@@ -4,10 +4,8 @@ import { By } from '@angular/platform-browser';
 import { VflowComponent } from '../components/vflow/vflow.component';
 import { FeatureRegistryService } from '../services/feature-registry.service';
 import { FlowSettingsService } from '../services/flow-settings.service';
-import { ConnectionPolicy } from './connection-policy.interface';
 import { provideVflow, vflowFeature, VflowFeature } from './feature';
 import { GeometryTransform } from './geometry-intent.interface';
-import { provideConnectionPolicy } from './provide-connection-policy';
 import { provideGeometryTransform } from './provide-geometry-transform';
 
 const transform = (id: string, rest: Partial<GeometryTransform> = {}): GeometryTransform => ({
@@ -28,13 +26,6 @@ class ClassTransform implements GeometryTransform {
 
   public transform() {
     return undefined;
-  }
-}
-
-class DenyPolicy implements ConnectionPolicy {
-  public readonly id = 'deny';
-  public decide() {
-    return false;
   }
 }
 
@@ -60,13 +51,9 @@ function registryOf(features: VflowFeature[]) {
 
 describe('provideVflow', () => {
   it('shows a flow the features provided on its host component', () => {
-    const { registry } = registryOf([
-      vflowFeature('test:snap', provideGeometryTransform(transform('snap'))),
-      vflowFeature('test:deny', provideConnectionPolicy(new DenyPolicy())),
-    ]);
+    const { registry } = registryOf([vflowFeature('test:snap', provideGeometryTransform(transform('snap')))]);
 
     expect(featureIds(registry.geometryTransforms)).toEqual(['snap']);
-    expect(featureIds(registry.connectionPolicies)).toEqual(['deny']);
   });
 
   it('runs same-precedence entries in array order and higher categories first regardless of it', () => {
@@ -115,7 +102,6 @@ describe('provideVflow', () => {
     const registry = fixture.debugElement.query(By.directive(VflowComponent)).injector.get(FeatureRegistryService);
 
     expect(registry.geometryTransforms.map((t) => t.id)).toEqual(['core:node-extent']);
-    expect(registry.connectionPolicies).toEqual([]);
   });
 
   it('rejects a duplicate entry id when the flow resolves its entries', () => {
