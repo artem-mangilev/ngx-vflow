@@ -3,6 +3,7 @@ import { Point } from '../interfaces/point.interface';
 import { RootPointerDirective } from './root-pointer.directive';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ViewportService } from '../services/viewport.service';
+import { FlowContextService } from '../services/flow-context.service';
 import { clientToFlowPosition as toFlowPosition, flowToClientPosition as toClientPosition } from '../utils/coordinates';
 
 @Directive({
@@ -13,6 +14,11 @@ export class SpacePointContextDirective {
   private pointerMovementDirective = inject(RootPointerDirective);
   private host = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
   private viewportService = inject(ViewportService);
+
+  constructor() {
+    // The feature context measures flow space against this pane.
+    inject(FlowContextService, { optional: true })?.attachPane(this.host);
+  }
 
   /**
    * Signal with current mouse position in svg space

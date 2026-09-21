@@ -51,6 +51,15 @@ export * from './lib/vflow/types/keyboard-shortcuts.type';
 export * from './lib/vflow/types/selection-mode.type';
 export * from './lib/vflow/types/selection-box-mode.type';
 
+// Features
+export { VflowFeature, vflowFeature, provideVflow } from './lib/vflow/features/feature';
+export * from './lib/vflow/features/feature-entry.interface';
+export * from './lib/vflow/features/vflow-context';
+export * from './lib/vflow/features/geometry-intent.interface';
+export * from './lib/vflow/features/connection-policy.interface';
+export { VFLOW_GEOMETRY_TRANSFORMS, provideGeometryTransform } from './lib/vflow/features/provide-geometry-transform';
+export { VFLOW_CONNECTION_POLICIES, provideConnectionPolicy } from './lib/vflow/features/provide-connection-policy';
+
 // Components
 export * from './lib/vflow/components/vflow/vflow.component';
 export * from './lib/vflow/public-components/resizable/resizable.component';

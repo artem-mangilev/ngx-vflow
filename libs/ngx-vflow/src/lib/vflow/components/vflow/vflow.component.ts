@@ -75,6 +75,9 @@ import { AlignmentHelperSettings } from '../../interfaces/alignment-helper-setti
 import { AutoPanDirective } from '../../directives/auto-pan.directive';
 import { ResizeObserverService } from '../../services/resize-observer.service';
 import { RequestAnimationFrameBatchingService } from '../../services/request-animation-frame-batching.service';
+import { FeatureRegistryService } from '../../services/feature-registry.service';
+import { FlowContextService } from '../../services/flow-context.service';
+import { VflowContext } from '../../features/vflow-context';
 import { NodeDragControllerDirective } from '../../directives/node-drag-controller.directive';
 import { SelectionBoxComponent } from '../selection-box/selection-box.component';
 import { SelectionBoxContextDirective } from '../../directives/selection-box-context.directive';
@@ -137,6 +140,9 @@ const nodeDragControllerHostDirective = {
     FlowRenderingService,
     ResizeObserverService,
     RequestAnimationFrameBatchingService,
+    FeatureRegistryService,
+    FlowContextService,
+    { provide: VflowContext, useExisting: FlowContextService },
   ],
   hostDirectives: [changesControllerHostDirective, nodeDragControllerHostDirective],
   imports: [
