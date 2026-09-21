@@ -1,6 +1,6 @@
 # Route every movement through move intents
 
-Status: needs-triage
+Status: resolved
 Tier: 3.0-breaking
 Depends on: 01, 02
 
@@ -52,3 +52,24 @@ reaches the application's signal, and the set of dragged nodes lives in a closur
 
 - Resize intents (issue 04); metadata on change notifications (issue 06).
 - Changing the pointer-level drag filter.
+
+## Comments
+
+- 2026-09-21: Implemented. `services/geometry-pipeline.service.ts` runs an intent through the registry's transforms
+  and applies the surviving batch in one pass (`run`), and owns the session and revision signals the context
+  exposes; it looks the registry and the context up late through `Injector`, which breaks the cycle
+  registry → entry → context → pipeline → registry. `DraggableService` builds one session per activation, emits
+  `start` at activation (a veto leaves the gesture inactive for the rest of the pointer sequence), one `update` per
+  d3 drag event, and `end` on release (a veto re-applies `session.initial`); the three statuses carry `session`.
+  Auto-pan following is now the session re-evaluating its last client point on every viewport pan
+  (`viewportPans$`), so `moveNodesOnAutoPan$`, `moveNode` and `alignToGrid` are gone. Keyboard moves and
+  `VflowContext.propose()` go through `runOneShot`, which runs the `start` transforms on the current geometry and
+  the `update` and `end` transforms on the same proposal, then writes once, so a one-shot bumps the revision once and
+  a veto in any phase writes nothing.
+- Core entries: `<vflow>` provides `VFLOW_CORE_GEOMETRY_TRANSFORMS` (internal multi-token) with
+  `NodeExtentTransform` (`core:node-extent`, `lowest`); the registry resolves core and feature entries together.
+  A transitional `core:snap-grid` entry driven by the `snapGrid` input lived here for one commit and was removed by
+  issue 09 in the same session.
+- Verified: 308 library tests green (7 new in `features/move-intents.spec.ts` covering every acceptance bullet,
+  including the per-frame allocation check), the existing drag, keyboard-navigation and parent-extent specs pass
+  unchanged, ESLint and Prettier clean, `nx build ngx-vflow` succeeds. The docs e2e suite was not run.

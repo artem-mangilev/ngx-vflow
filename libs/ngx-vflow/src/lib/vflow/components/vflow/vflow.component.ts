@@ -78,6 +78,9 @@ import { RequestAnimationFrameBatchingService } from '../../services/request-ani
 import { FeatureRegistryService } from '../../services/feature-registry.service';
 import { FlowContextService } from '../../services/flow-context.service';
 import { VflowContext } from '../../features/vflow-context';
+import { GeometryPipelineService } from '../../services/geometry-pipeline.service';
+import { VFLOW_CORE_GEOMETRY_TRANSFORMS } from '../../features/core/core-geometry-transforms.token';
+import { NodeExtentTransform } from '../../features/core/node-extent.transform';
 import { NodeDragControllerDirective } from '../../directives/node-drag-controller.directive';
 import { SelectionBoxComponent } from '../selection-box/selection-box.component';
 import { SelectionBoxContextDirective } from '../../directives/selection-box-context.directive';
@@ -143,6 +146,8 @@ const nodeDragControllerHostDirective = {
     FeatureRegistryService,
     FlowContextService,
     { provide: VflowContext, useExisting: FlowContextService },
+    GeometryPipelineService,
+    { provide: VFLOW_CORE_GEOMETRY_TRANSFORMS, useValue: NodeExtentTransform, multi: true },
   ],
   hostDirectives: [changesControllerHostDirective, nodeDragControllerHostDirective],
   imports: [
@@ -380,14 +385,6 @@ export class VflowComponent {
 
   public get connection() {
     return this.flowEntitiesService.connection();
-  }
-
-  /**
-   * Snap grid for node movement. Passes as [x, y]
-   */
-  @Input()
-  public set snapGrid(value: [number, number]) {
-    this.flowSettingsService.snapGrid.set(value);
   }
 
   /**

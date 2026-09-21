@@ -60,6 +60,10 @@ export * from './lib/vflow/features/connection-policy.interface';
 export { VFLOW_GEOMETRY_TRANSFORMS, provideGeometryTransform } from './lib/vflow/features/provide-geometry-transform';
 export { VFLOW_CONNECTION_POLICIES, provideConnectionPolicy } from './lib/vflow/features/provide-connection-policy';
 
+// First-party features
+export { withSnapGrid } from './lib/features/snap-grid/with-snap-grid';
+export { SnapGridSettings } from './lib/features/snap-grid/snap-grid-settings';
+
 // Components
 export * from './lib/vflow/components/vflow/vflow.component';
 export * from './lib/vflow/public-components/resizable/resizable.component';

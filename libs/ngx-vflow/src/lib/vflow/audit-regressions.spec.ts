@@ -372,7 +372,6 @@ describe('Graph rendering and interaction regressions', () => {
       getStoreItems: () => ({
         model,
         viewport: { x: 0, y: 0, zoom: 1 },
-        snapGrid: [1, 1],
         nodeOrigin: [0, 0],
         paneDomNode: element,
       }),
@@ -415,7 +414,6 @@ describe('Graph rendering and interaction regressions', () => {
       getStoreItems: () => ({
         model,
         viewport: { x: 0, y: 0, zoom: 1 },
-        snapGrid: [1, 1],
         nodeOrigin: [0, 0],
         paneDomNode: element,
       }),

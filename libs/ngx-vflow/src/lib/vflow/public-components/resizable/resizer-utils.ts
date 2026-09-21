@@ -68,8 +68,8 @@ type StartValues = PrevValues & {
 };
 
 interface PointerPosition {
-  xSnapped: number;
-  ySnapped: number;
+  x: number;
+  y: number;
 }
 
 function getLowerExtentClamp(lowerExtent: number, lowerBound: number) {
@@ -107,12 +107,12 @@ export function getDimensionsAfterResize(
   const { isHorizontal, isVertical } = controlDirection;
   const isDiagonal = isHorizontal && isVertical;
 
-  const { xSnapped, ySnapped } = pointerPosition;
+  const { x: pointerX, y: pointerY } = pointerPosition;
   const { minWidth, maxWidth, minHeight, maxHeight } = boundaries;
 
   const { x: startX, y: startY, width: startWidth, height: startHeight, aspectRatio } = startValues;
-  let distX = Math.floor(isHorizontal ? xSnapped - startValues.pointerX : 0);
-  let distY = Math.floor(isVertical ? ySnapped - startValues.pointerY : 0);
+  let distX = Math.floor(isHorizontal ? pointerX - startValues.pointerX : 0);
+  let distY = Math.floor(isVertical ? pointerY - startValues.pointerY : 0);
 
   const newWidth = startWidth + (affectsX ? -distX : distX);
   const newHeight = startHeight + (affectsY ? -distY : distY);

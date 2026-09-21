@@ -1,15 +1,16 @@
-import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { DocsPresentations } from '@docs/shared';
 import { VflowPort } from '@vflow/ui';
-import { Vflow, createEdges, createNodes } from 'ngx-vflow';
+import { SnapGridSettings, Vflow, createEdges, createNodes, provideVflow, withSnapGrid } from 'ngx-vflow';
 
 @Component({
   imports: [DocsPresentations, Vflow, VflowPort],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: provideVflow(withSnapGrid(1)),
   template: `
     <section data-testid="keyboard-demo" aria-label="Keyboard navigation example">
       <p>Use Tab to visit objects, Enter to select, and arrow keys to move selected nodes.</p>
-      <label><input type="checkbox" [checked]="grid()" (change)="grid.set(!grid())" /> Snap to grid</label>
+      <label><input type="checkbox" [checked]="grid()" (change)="toggleGrid()" /> Snap to grid</label>
       <label
         ><input type="checkbox" [checked]="autoPan()" (change)="autoPan.set(!autoPan())" /> Pan on node focus</label
       >
@@ -23,7 +24,6 @@ import { Vflow, createEdges, createNodes } from 'ngx-vflow';
         [nodes]="nodes()"
         [edges]="edges()"
         [view]="[600, 300]"
-        [snapGrid]="grid() ? [20, 20] : [1, 1]"
         [autoPan]="false"
         [autoPanOnNodeFocus]="autoPan()"
         [selectionMode]="manual() ? 'manual' : 'default'"
@@ -88,9 +88,15 @@ import { Vflow, createEdges, createNodes } from 'ngx-vflow';
   `,
 })
 export class KeyboardNavigationDemoComponent {
-  protected grid = signal(false);
+  private snapGrid = inject(SnapGridSettings);
+  protected grid = computed(() => this.snapGrid.grid()[0] > 1);
   protected autoPan = signal(true);
   protected manual = signal(false);
+
+  protected toggleGrid() {
+    this.snapGrid.grid.set(this.grid() ? [1, 1] : [20, 20]);
+  }
+
   protected nodes = signal(
     createNodes([
       {

@@ -10,6 +10,7 @@ import { NodeModel } from '../models/node.model';
 import { createNode } from '../interfaces/node.interface';
 import { KeyboardService } from './keyboard.service';
 import { ResizeObserverService } from './resize-observer.service';
+import { GeometryPipelineService } from './geometry-pipeline.service';
 
 describe('DraggableService', () => {
   let service: DraggableService;
@@ -47,6 +48,7 @@ describe('DraggableService', () => {
     TestBed.configureTestingModule({
       providers: [
         DraggableService,
+        GeometryPipelineService,
         FlowEntitiesService,
         FlowSettingsService,
         FlowStatusService,

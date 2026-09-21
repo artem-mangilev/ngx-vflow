@@ -17,6 +17,12 @@ export type WriteOrigin = 'core' | (string & {});
 
 export type GestureSource = 'pointer' | 'keyboard' | 'resizer' | 'plugin';
 
+/**
+ * Pixels one arrow press proposes for a keyboard session, four times as many when accelerated. A grid feature turns
+ * every such step into one grid cell.
+ */
+export const KEYBOARD_MOVE_STEP = 5;
+
 /** One node's proposed geometry. `point` is in the node space of its parent, like `Node.point`. */
 export interface GeometryChange {
   readonly id: string;

@@ -6,6 +6,7 @@ import { createNode, Node } from '../interfaces/node.interface';
 import { FeatureRegistryService } from '../services/feature-registry.service';
 import { FlowEntitiesService } from '../services/flow-entities.service';
 import { FlowStatusService } from '../services/flow-status.service';
+import { GeometryPipelineService } from '../services/geometry-pipeline.service';
 import { injectNode } from '../utils/inject-node';
 import { provideVflow, vflowFeature } from './feature';
 import { GeometryTransform } from './geometry-intent.interface';
@@ -91,7 +92,9 @@ describe('VflowContext', () => {
 
   it('is injectable by a feature entry, whose proposal reaches the application node and bumps the revision', async () => {
     const { fixture, flow, context } = await setup();
-    const mover = flow.injector.get(FeatureRegistryService).geometryTransforms[0] as MoverTransform;
+    const mover = flow.injector
+      .get(FeatureRegistryService)
+      .geometryTransforms.find((t) => t.id === 'mover') as MoverTransform;
     const node = fixture.componentInstance.nodes().find((n) => n.id === 'free')!;
 
     expect(mover.context).toBe(context);
@@ -125,6 +128,7 @@ describe('VflowContext', () => {
     const { fixture, flow, context } = await setup();
     const status = flow.injector.get(FlowStatusService);
     const model = flow.injector.get(FlowEntitiesService).getNode('free')!;
+    const session = flow.injector.get(GeometryPipelineService).createSession('pointer', 'free', ['free']);
     const pane = fixture.nativeElement.querySelector('.vflow-pane') as HTMLElement;
     const rect = pane.getBoundingClientRect();
     const move = (x: number, y: number) =>
@@ -134,13 +138,13 @@ describe('VflowContext', () => {
     move(5, 5);
     expect(context.pointer()).toBeNull();
 
-    status.setNodeDragStartStatus(model);
+    status.setNodeDragStartStatus(model, session);
     fixture.detectChanges();
     expect(context.interaction()).toBe('node-drag');
     move(15, 25);
     expect(context.pointer()).toEqual({ x: 15, y: 25 });
 
-    status.setNodeDragEndStatus(model);
+    status.setNodeDragEndStatus(model, session);
     fixture.detectChanges();
     expect(context.interaction()).toBeNull();
     expect(context.pointer()).toBeNull();

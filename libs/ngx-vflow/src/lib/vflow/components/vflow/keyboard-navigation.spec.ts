@@ -5,10 +5,15 @@ import { createEdges } from '../../interfaces/edge.interface';
 import { Vflow } from '../../vflow';
 import { VflowComponent } from './vflow.component';
 import { filter, firstValueFrom, timeout } from 'rxjs';
+import { By } from '@angular/platform-browser';
+import { provideVflow } from '../../features/feature';
+import { withSnapGrid } from '../../../features/snap-grid/with-snap-grid';
+import { SnapGridSettings } from '../../../features/snap-grid/snap-grid-settings';
 
 @Component({
   imports: [Vflow],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: provideVflow(withSnapGrid([1, 1])),
   template: `<button>Before</button
     ><vflow [nodes]="nodes()" [edges]="edges" [view]="[600, 350]" [optimization]="{ detachedGroupsLayer: true }">
       <ng-template node>
@@ -190,7 +195,7 @@ describe('public keyboard graph navigation', () => {
     );
     key(parent, 'ArrowDown', 'ArrowDown', true);
     expect(host.nodes()[1].point()).toEqual({ x: 25, y: 40 });
-    host.flow().snapGrid = [25, 10];
+    fixture.debugElement.query(By.directive(VflowComponent)).injector.get(SnapGridSettings).grid.set([25, 10]);
     key(parent, 'ArrowRight');
     expect(host.nodes()[1].point()).toEqual({ x: 50, y: 40 });
     key(parent, 'ArrowDown', 'ArrowDown', true);

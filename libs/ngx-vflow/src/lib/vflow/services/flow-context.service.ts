@@ -4,7 +4,6 @@ import { FlowInteraction, ProposeOptions, RenderedNodeGeometry, VflowContext } f
 import { Node } from '../interfaces/node.interface';
 import { Point } from '../interfaces/point.interface';
 import { ViewportState } from '../interfaces/viewport.interface';
-import { NodeModel } from '../models/node.model';
 import {
   clientToFlowPosition,
   flowToClientPosition,
@@ -14,6 +13,7 @@ import {
 import { FlowEntitiesService } from './flow-entities.service';
 import { FlowSettingsService } from './flow-settings.service';
 import { FlowStatusService } from './flow-status.service';
+import { GeometryPipelineService } from './geometry-pipeline.service';
 import { ViewportService } from './viewport.service';
 
 /** The flow's implementation of {@link VflowContext}, provided on `<vflow>` under the abstract class. */
@@ -23,18 +23,17 @@ export class FlowContextService extends VflowContext {
   private readonly settings = inject(FlowSettingsService);
   private readonly status = inject(FlowStatusService);
   private readonly viewportService = inject(ViewportService);
+  private readonly pipeline = inject(GeometryPipelineService);
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
 
   /** The pane that positions flow space; the host stands in until the view attaches it. */
   private pane: HTMLElement | null = null;
 
-  private readonly gestureState = signal<GestureSession | null>(null);
-  private readonly revisionState = signal(0);
   private readonly pointerState = signal<Point | null>(null);
   private readonly rawNodeById = computed(() => new Map(this.entities.rawNodes().map((node) => [node.id, node])));
 
-  public readonly gesture: Signal<GestureSession | null> = this.gestureState.asReadonly();
-  public readonly revision: Signal<number> = this.revisionState.asReadonly();
+  public readonly gesture: Signal<GestureSession | null> = this.pipeline.session;
+  public readonly revision: Signal<number> = this.pipeline.revision;
   public readonly pointer: Signal<Point | null> = this.pointerState.asReadonly();
   public readonly viewport: Signal<ViewportState> = this.viewportService.readableViewport.asReadonly();
   public readonly size = computed(() => ({
@@ -92,27 +91,7 @@ export class FlowContextService extends VflowContext {
   }
 
   public propose(kind: IntentKind, changes: GeometryChange[], options: ProposeOptions = {}): boolean {
-    // Until the intent pipeline lands, a proposal is applied as given.
-    void kind;
-    void options;
-    let applied = false;
-    for (const change of changes) {
-      const model = this.entities.getNode(change.id);
-      if (!model || !isFinite(change)) {
-        if (typeof ngDevMode === 'undefined' || ngDevMode) {
-          console.error(
-            `[ngx-vflow] Dropped a geometry change for node "${change.id}": ${
-              model ? 'a value is not a finite number' : 'no such node'
-            }.`,
-          );
-        }
-        continue;
-      }
-      this.apply(model, change);
-      applied = true;
-    }
-    if (applied) this.revisionState.update((revision) => revision + 1);
-    return applied;
+    return this.pipeline.runOneShot(kind, 'plugin', changes, options.origin ?? 'application');
   }
 
   public panBy(delta: Point): void {
@@ -140,16 +119,6 @@ export class FlowContextService extends VflowContext {
     return flowToNodeSpacePosition(point, spaceNodeId, this.rawNodeById() as ReadonlyMap<string, Node>);
   }
 
-  private apply(model: NodeModel, change: GeometryChange): void {
-    if (change.width !== undefined || change.height !== undefined) {
-      // A written size is data, as after a resize gesture: the node stops following its content.
-      if (!model.resizedExplicitly()) model.resizedExplicitly.set(true);
-      if (change.width !== undefined) model.width.set(change.width);
-      if (change.height !== undefined) model.height.set(change.height);
-    }
-    if (change.point) model.setPoint({ x: change.point.x, y: change.point.y });
-  }
-
   private transformOptions() {
     const rect = (this.pane ?? this.host).getBoundingClientRect();
     return { viewport: this.viewportService.readableViewport(), containerPosition: { x: rect.left, y: rect.top } };
@@ -159,9 +128,4 @@ export class FlowContextService extends VflowContext {
     const rect = (this.pane ?? this.host).getBoundingClientRect();
     return { x: event.clientX - rect.left, y: event.clientY - rect.top };
   }
-}
-
-function isFinite(change: GeometryChange): boolean {
-  const values = [change.point?.x, change.point?.y, change.width, change.height];
-  return values.every((value) => value === undefined || Number.isFinite(value));
 }

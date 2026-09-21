@@ -51,8 +51,6 @@ export class FlowSettingsService {
   /** Pattern drawn over the token-colored canvas; `null` draws no pattern. */
   public background = signal<Background | null>(null);
 
-  public snapGrid = signal<[number, number]>([1, 1]);
-
   public optimization = signal<Required<Optimization>>(DEFAULT_OPTIMIZATION);
 
   public selectionMode = signal<SelectionMode>('default');

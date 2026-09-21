@@ -1,15 +1,10 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { DocsPresentations } from '@docs/shared';
 import { VflowPort } from '@vflow/ui';
-import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
+import { Edge, Node, Vflow, createNodes, provideVflow, withSnapGrid } from 'ngx-vflow';
 
 @Component({
-  template: `<vflow
-    view="auto"
-    [nodes]="nodes"
-    [edges]="edges"
-    [snapGrid]="[25, 25]"
-    [background]="{ type: 'dots', gap: 25 }">
+  template: `<vflow view="auto" [nodes]="nodes" [edges]="edges" [background]="{ type: 'dots', gap: 25 }">
     <ng-template let-ctx node>
       @if (ctx.data().type === 'group') {
         <div
@@ -46,6 +41,7 @@ import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
     `,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: provideVflow(withSnapGrid(25)),
   imports: [DocsPresentations, Vflow, VflowPort],
 })
 export class SubflowsDemoComponent {

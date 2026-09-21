@@ -155,9 +155,6 @@ export class VflowMockComponent implements AsInterface<VflowComponent>, OnInit {
   public readonly connection: ConnectionModel = new ConnectionModel({});
 
   @Input()
-  public readonly snapGrid!: [number, number];
-
-  @Input()
   public elevateNodesOnSelect!: boolean;
 
   @Input()

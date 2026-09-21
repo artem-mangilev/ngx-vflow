@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { DocsPresentations } from '@docs/shared';
-import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
+import { Edge, Node, Vflow, createNodes, provideVflow, withSnapGrid } from 'ngx-vflow';
 
 @Component({
-  template: `<vflow view="auto" [nodes]="nodes" [edges]="edges" [background]="{ type: 'grid' }" [snapGrid]="[20, 20]">
+  template: `<vflow view="auto" [nodes]="nodes" [edges]="edges" [background]="{ type: 'grid' }">
     <ng-template let-ctx node><docs-node [ctx]="ctx" /></ng-template>
     <ng-template let-ctx edge><svg:g docsEdge [ctx]="ctx" /></ng-template>
   </vflow>`,
@@ -16,6 +16,7 @@ import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
     `,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: provideVflow(withSnapGrid(20)),
   imports: [DocsPresentations, Vflow],
 })
 export class GridCustomBackgroundDemoComponent {

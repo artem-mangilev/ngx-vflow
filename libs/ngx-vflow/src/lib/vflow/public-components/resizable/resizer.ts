@@ -3,7 +3,6 @@ import { select } from 'd3-selection';
 import { NodeModel } from '../../models/node.model';
 import { Point } from '../../interfaces/point.interface';
 import { clientToFlowPosition } from '../../utils/coordinates';
-import { align } from '../../utils/align-number';
 import { getControlDirection, getDimensionsAfterResize, getResizeDirection } from './resizer-utils';
 import {
   ControlPosition,
@@ -41,7 +40,6 @@ export interface ResizerChildChange {
 export interface ResizerStoreItems {
   model: NodeModel;
   viewport: { x: number; y: number; zoom: number };
-  snapGrid: [number, number];
   nodeOrigin: NodeOrigin;
   paneDomNode: HTMLElement | null;
 }
@@ -88,29 +86,18 @@ function clientFromEvent(event: MouseEvent | TouchEvent): Point {
 }
 
 /**
- * Converts the pointer position of a drag source event into flow coordinates and snaps it to the grid.
+ * Converts the pointer position of a drag source event into flow coordinates. Snapping is a transform on the
+ * geometry pipeline, not the resizer's concern.
  */
 function getPointerPosition(
   event: MouseEvent | TouchEvent,
   viewport: { x: number; y: number; zoom: number },
-  snapGrid: [number, number],
   containerBounds: DOMRect | null,
-) {
-  const client = clientFromEvent(event);
-  const { x, y } = clientToFlowPosition(client, {
+): Point {
+  return clientToFlowPosition(clientFromEvent(event), {
     viewport,
     containerPosition: { x: containerBounds?.left ?? 0, y: containerBounds?.top ?? 0 },
   });
-
-  const [snapX, snapY] = snapGrid;
-  const shouldSnap = snapX > 1 || snapY > 1;
-
-  return {
-    x,
-    y,
-    xSnapped: shouldSnap ? align(x, snapX) : x,
-    ySnapped: shouldSnap ? align(y, snapY) : y,
-  };
 }
 
 function clamp(value: number, min: number, max: number) {
@@ -170,11 +157,11 @@ export function createResizer({ domNode, getStoreItems, onChange, onEnd }: Resiz
 
     const dragHandler = drag<Element, unknown>()
       .on('start', (event: ResizeDragEvent) => {
-        const { model, viewport, snapGrid, nodeOrigin, paneDomNode } = getStoreItems();
+        const { model, viewport, nodeOrigin, paneDomNode } = getStoreItems();
         node = model;
 
         containerBounds = paneDomNode?.getBoundingClientRect() ?? null;
-        const { xSnapped, ySnapped } = getPointerPosition(event.sourceEvent, viewport, snapGrid, containerBounds);
+        const pointer = getPointerPosition(event.sourceEvent, viewport, containerBounds);
 
         prevValues = {
           width: node.width(),
@@ -193,8 +180,8 @@ export function createResizer({ domNode, getStoreItems, onChange, onEnd }: Resiz
           ...prevValues,
           width: startWidth,
           height: startHeight,
-          pointerX: xSnapped,
-          pointerY: ySnapped,
+          pointerX: pointer.x,
+          pointerY: pointer.y,
           aspectRatio: startWidth / startHeight,
         };
 
@@ -235,8 +222,8 @@ export function createResizer({ domNode, getStoreItems, onChange, onEnd }: Resiz
         onResizeStart?.(event, { ...prevValues });
       })
       .on('drag', (event: ResizeDragEvent) => {
-        const { viewport, snapGrid, nodeOrigin } = getStoreItems();
-        const pointerPosition = getPointerPosition(event.sourceEvent, viewport, snapGrid, containerBounds);
+        const { viewport, nodeOrigin } = getStoreItems();
+        const pointerPosition = getPointerPosition(event.sourceEvent, viewport, containerBounds);
 
         const childChanges: ResizerChildChange[] = [];
 

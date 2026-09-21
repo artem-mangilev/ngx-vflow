@@ -25,7 +25,6 @@ import { VflowMocks } from './vflow-mocks';
       [edgesFocusable]="true"
       [keyboardShortcuts]="{ modifiers: { multiSelection: [] } }"
       [connection]="connection"
-      [snapGrid]="[1, 1]"
       [elevateNodesOnSelect]="true"
       (componentNodeEvent)="(null)"
       (connect)="(null)">

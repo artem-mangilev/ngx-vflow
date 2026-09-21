@@ -5,6 +5,7 @@ import { createNode } from './interfaces/node.interface';
 import { createEdge } from './interfaces/edge.interface';
 import { FlowStatusService } from './services/flow-status.service';
 import { FlowEntitiesService } from './services/flow-entities.service';
+import { GeometryPipelineService } from './services/geometry-pipeline.service';
 import { RequestAnimationFrameBatchingService } from './services/request-animation-frame-batching.service';
 import { VflowHandleDirective } from './directives/handle.directive';
 import { EdgeLabelTemplateDirective } from './directives/template.directive';
@@ -175,9 +176,12 @@ describe('Initial handle placement', () => {
     const attributes = spyOn(handle, 'setAttribute').and.callThrough();
     const model = fixture.debugElement.injector.get(FlowEntitiesService).nodes()[0];
     const status = fixture.debugElement.injector.get(FlowStatusService);
-    status.setNodeDragStartStatus(model);
+    const session = fixture.debugElement.injector
+      .get(GeometryPipelineService)
+      .createSession('pointer', model.rawNode.id, [model.rawNode.id]);
+    status.setNodeDragStartStatus(model, session);
     fixture.detectChanges();
-    status.setNodeDragStatus(model);
+    status.setNodeDragStatus(model, session);
     fixture.detectChanges();
     expect(attributes.calls.allArgs().filter(([name]) => name === 'aria-label')).toEqual([]);
   });

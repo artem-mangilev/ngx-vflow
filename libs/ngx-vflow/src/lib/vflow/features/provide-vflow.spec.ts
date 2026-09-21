@@ -45,6 +45,10 @@ class DenyPolicy implements ConnectionPolicy {
 })
 class HostComponent {}
 
+/** Ids of the entries a feature registered; the `core:` entries the flow registers itself are left out. */
+const featureIds = (entries: readonly { id: string }[]) =>
+  entries.filter((entry) => !entry.id.startsWith('core:')).map((entry) => entry.id);
+
 function registryOf(features: VflowFeature[]) {
   TestBed.configureTestingModule({ providers: [provideZonelessChangeDetection()] });
   TestBed.overrideComponent(HostComponent, { set: { providers: provideVflow(...features) } });
@@ -61,8 +65,8 @@ describe('provideVflow', () => {
       vflowFeature('test:deny', provideConnectionPolicy(new DenyPolicy())),
     ]);
 
-    expect(registry.geometryTransforms.map((t) => t.id)).toEqual(['snap']);
-    expect(registry.connectionPolicies.map((p) => p.id)).toEqual(['deny']);
+    expect(featureIds(registry.geometryTransforms)).toEqual(['snap']);
+    expect(featureIds(registry.connectionPolicies)).toEqual(['deny']);
   });
 
   it('runs same-precedence entries in array order and higher categories first regardless of it', () => {
@@ -73,7 +77,7 @@ describe('provideVflow', () => {
       vflowFeature('test:d', provideGeometryTransform(transform('d', { precedence: 'high' }))),
     ]);
 
-    expect(registry.geometryTransforms.map((t) => t.id)).toEqual(['d', 'a', 'c', 'b']);
+    expect(featureIds(registry.geometryTransforms)).toEqual(['d', 'a', 'c', 'b']);
   });
 
   it('filters transforms by kind and phase once per pair', () => {
@@ -86,15 +90,15 @@ describe('provideVflow', () => {
       vflowFeature('test:resize', provideGeometryTransform(transform('resize', { kinds: ['resize'] }))),
     ]);
 
-    expect(registry.transformsFor('move', 'end').map((t) => t.id)).toEqual(['all', 'move-end']);
-    expect(registry.transformsFor('move', 'update').map((t) => t.id)).toEqual(['all']);
-    expect(registry.transformsFor('resize', 'update').map((t) => t.id)).toEqual(['all', 'resize']);
+    expect(featureIds(registry.transformsFor('move', 'end'))).toEqual(['all', 'move-end']);
+    expect(featureIds(registry.transformsFor('move', 'update'))).toEqual(['all']);
+    expect(featureIds(registry.transformsFor('resize', 'update'))).toEqual(['all', 'resize']);
     expect(registry.transformsFor('move', 'end')).toBe(registry.transformsFor('move', 'end'));
   });
 
   it('creates class entries in the flow injector and destroys them with the flow', () => {
     const { fixture, registry } = registryOf([vflowFeature('test:class', provideGeometryTransform(ClassTransform))]);
-    const entry = registry.geometryTransforms[0] as ClassTransform;
+    const entry = registry.geometryTransforms.find((t) => t.id === 'class') as ClassTransform;
     const flowSettings = fixture.debugElement.query(By.directive(VflowComponent)).injector.get(FlowSettingsService);
 
     expect(entry).toBeInstanceOf(ClassTransform);
@@ -104,13 +108,13 @@ describe('provideVflow', () => {
     expect(entry.destroyed).toBeTrue();
   });
 
-  it('leaves a flow without provideVflow with empty registries', () => {
+  it('leaves a flow without provideVflow with only the core entries', () => {
     TestBed.configureTestingModule({ providers: [provideZonelessChangeDetection()] });
     const fixture = TestBed.createComponent(HostComponent);
     fixture.detectChanges();
     const registry = fixture.debugElement.query(By.directive(VflowComponent)).injector.get(FeatureRegistryService);
 
-    expect(registry.geometryTransforms).toEqual([]);
+    expect(registry.geometryTransforms.map((t) => t.id)).toEqual(['core:node-extent']);
     expect(registry.connectionPolicies).toEqual([]);
   });
 
