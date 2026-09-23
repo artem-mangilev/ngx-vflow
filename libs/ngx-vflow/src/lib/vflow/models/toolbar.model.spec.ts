@@ -34,53 +34,51 @@ describe('ToolbarModel', () => {
           ),
         ),
     );
+
+    model.offset.set(10);
+    model.node.width.set(100);
+    model.node.height.set(100);
   });
 
   it('should create', () => {
     expect(model).toBeTruthy();
   });
 
-  it('should provide correct point for top position', () => {
+  it('should attach above the node for top position', () => {
     model.position.set('top');
-    model.size.set({ width: 10, height: 10 });
-    model.offset.set(10);
 
-    model.node.width.set(100);
-    model.node.height.set(100);
-
-    expect(model.point()).toEqual({ x: 45, y: -20 });
+    expect(model.anchor()).toEqual({ x: 50, y: -10 });
+    expect(model.shift()).toEqual({ x: -50, y: -100 });
   });
 
-  it('should provide correct point for bottom position', () => {
+  it('should attach below the node for bottom position', () => {
     model.position.set('bottom');
-    model.size.set({ width: 10, height: 10 });
-    model.offset.set(10);
 
-    model.node.width.set(100);
-    model.node.height.set(100);
-
-    expect(model.point()).toEqual({ x: 45, y: 110 });
+    expect(model.anchor()).toEqual({ x: 50, y: 110 });
+    expect(model.shift()).toEqual({ x: -50, y: 0 });
   });
 
-  it('should provide correct point for left position', () => {
+  it('should attach to the left of the node for left position', () => {
     model.position.set('left');
-    model.size.set({ width: 10, height: 10 });
-    model.offset.set(10);
 
-    model.node.width.set(100);
-    model.node.height.set(100);
-
-    expect(model.point()).toEqual({ x: -20, y: 45 });
+    expect(model.anchor()).toEqual({ x: -10, y: 50 });
+    expect(model.shift()).toEqual({ x: -100, y: -50 });
   });
 
-  it('should provide correct point for right position', () => {
+  it('should attach to the right of the node for right position', () => {
     model.position.set('right');
-    model.size.set({ width: 10, height: 10 });
-    model.offset.set(10);
 
-    model.node.width.set(100);
-    model.node.height.set(100);
+    expect(model.anchor()).toEqual({ x: 110, y: 50 });
+    expect(model.shift()).toEqual({ x: 0, y: -50 });
+  });
 
-    expect(model.point()).toEqual({ x: 110, y: 45 });
+  it('should position the host from the node point without knowing the toolbar size', () => {
+    model.position.set('top');
+
+    expect(model.transform()).toBe('translate(65px, 5px) translate(-50%, -100%)');
+
+    model.node.point.set({ x: 100, y: 200 });
+
+    expect(model.transform()).toBe('translate(150px, 190px) translate(-50%, -100%)');
   });
 });

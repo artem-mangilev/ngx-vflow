@@ -10,18 +10,18 @@ import {
   viewChild,
   effect,
   forwardRef,
-  NgZone,
-  DestroyRef,
 } from '@angular/core';
 import { Directive } from '@angular/core';
 import { Position } from '../../types/position.type';
 import { ToolbarModel } from '../../models/toolbar.model';
 import { OverlaysService } from '../../services/overlays.service';
 import { NodeAccessorService } from '../../services/node-accessor.service';
-import { resizable } from '../../utils/resizable';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { tap } from 'rxjs/operators';
 
+/**
+ * Declares a toolbar next to the node presentation this component sits in.
+ * The flow renders the content in its toolbar layer; no component styles here,
+ * because they would be removed with this component while the flow still owns the rendered content.
+ */
 @Component({
   selector: 'node-toolbar',
   template: `
@@ -31,13 +31,6 @@ import { tap } from 'rxjs/operators';
       </div>
     </ng-template>
   `,
-  styles: [
-    `
-      .wrapper {
-        width: max-content;
-      }
-    `,
-  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [forwardRef(() => NodeToolbarWrapperDirective)],
 })
@@ -70,36 +63,16 @@ export class NodeToolbarComponent implements OnInit, OnDestroy {
   selector: '[nodeToolbarWrapper]',
   standalone: true,
 })
-export class NodeToolbarWrapperDirective implements OnInit {
+export class NodeToolbarWrapperDirective {
   private element = inject<ElementRef<HTMLElement>>(ElementRef);
-  private readonly zone = inject(NgZone);
-  private readonly destroyRef = inject(DestroyRef);
 
   public model = input.required<ToolbarModel>();
 
   constructor() {
     effect(() => {
-      const toolbar = this.model();
-      const { x, y } = toolbar.node.globalPoint();
-      const offset = toolbar.point();
       // This template is mounted inside the flow's positioned toolbar container.
-      this.element.nativeElement.parentElement!.style.transform = `translate(${x + offset.x}px, ${y + offset.y}px)`;
-    });
-  }
-
-  public ngOnInit(): void {
-    resizable([this.element.nativeElement], this.zone)
-      .pipe(
-        tap(() => this.setSize()),
-        takeUntilDestroyed(this.destroyRef),
-      )
-      .subscribe();
-  }
-
-  private setSize() {
-    this.model().size.set({
-      width: this.element.nativeElement.clientWidth,
-      height: this.element.nativeElement.clientHeight,
+      // The transform shifts the box by its own size, so no measurement is needed.
+      this.element.nativeElement.parentElement!.style.transform = this.model().transform();
     });
   }
 }

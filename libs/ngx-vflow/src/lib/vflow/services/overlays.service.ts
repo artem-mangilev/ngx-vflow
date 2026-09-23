@@ -1,12 +1,9 @@
-import { computed, inject, Injectable, signal } from '@angular/core';
+import { computed, Injectable, signal } from '@angular/core';
 import { ToolbarModel } from '../models/toolbar.model';
 import { NodeModel } from '../models/node.model';
-import { RequestAnimationFrameBatchingService } from './request-animation-frame-batching.service';
 
 @Injectable()
 export class OverlaysService {
-  private afService = inject(RequestAnimationFrameBatchingService);
-
   private readonly toolbars = signal<ToolbarModel[]>([]);
 
   public nodeToolbarsMap = computed(() => {
@@ -20,15 +17,16 @@ export class OverlaysService {
     return map;
   });
 
+  /**
+   * Registration is synchronous: the toolbar layer is refreshed in the same change detection pass
+   * as the node presentation that declares the toolbar. Deferring it to a frame would paint the node
+   * selected without its toolbar, and leave the projected content of a destroyed toolbar in the layer.
+   */
   public addToolbar(toolbar: ToolbarModel): void {
-    this.afService.batchAnimationFrame(() => {
-      this.toolbars.update((toolbars) => [...toolbars, toolbar]);
-    });
+    this.toolbars.update((toolbars) => [...toolbars, toolbar]);
   }
 
   public removeToolbar(toolbar: ToolbarModel): void {
-    this.afService.batchAnimationFrame(() => {
-      this.toolbars.update((toolbars) => toolbars.filter((t) => t !== toolbar));
-    });
+    this.toolbars.update((toolbars) => toolbars.filter((t) => t !== toolbar));
   }
 }
