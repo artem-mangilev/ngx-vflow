@@ -79,21 +79,6 @@
           }
         }
       </div>
-
-      <!-- HTML node toolbars -->
-      <div class="vflow-toolbars-layer">
-        @for (model of orderedNodes(); track trackNodes($index, model)) {
-          @for (toolbar of nodeToolbarsMap().get(model) ?? []; track toolbar) {
-            <div
-              class="vflow-toolbar"
-              [viewportVisibility]="model"
-              (focusin)="model.focused.set(true)"
-              (focusout)="model.focused.set(false)">
-              <ng-container [ngTemplateOutlet]="toolbar.template()" />
-            </div>
-          }
-        }
-      </div>
     </div>
   </div>
 

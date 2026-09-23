@@ -53,7 +53,6 @@ import { Optimization } from '../../interfaces/optimization.interface';
 import { KeyboardShortcuts } from '../../types/keyboard-shortcuts.type';
 import { SelectionMode } from '../../types/selection-mode.type';
 import { KeyboardService } from '../../services/keyboard.service';
-import { OverlaysService } from '../../services/overlays.service';
 import { NgTemplateOutlet } from '@angular/common';
 import { EdgeComponent } from '../edge/edge.component';
 import { EdgeLabelComponent } from '../edge-label/edge-label.component';
@@ -133,7 +132,6 @@ const nodeDragControllerHostDirective = {
     KeyboardLabelsService,
     KeyboardViewportCommandsService,
     AnnouncerService,
-    OverlaysService,
     FlowRenderingService,
     ResizeObserverService,
     RequestAnimationFrameBatchingService,
@@ -177,7 +175,6 @@ export class VflowComponent {
   private keyboardService = inject(KeyboardService);
   private injector = inject(Injector);
   private flowRenderingService = inject(FlowRenderingService);
-  private overlaysService = inject(OverlaysService);
 
   // #endregion
 
@@ -187,7 +184,7 @@ export class VflowComponent {
   constructor() {
     effect(() => {
       const { x, y, zoom } = this.viewportService.readableViewport();
-      // Camera movement must not reconcile every node, edge, label and toolbar.
+      // Camera movement must not reconcile every node, edge and label.
       const viewport = this.viewportElement().nativeElement;
       viewport.style.transform = `translate(${x}px, ${y}px) scale(${zoom})`;
       // Lets scaled content keep screen-sized details, such as the node focus ring.
@@ -195,7 +192,6 @@ export class VflowComponent {
     });
   }
 
-  protected nodeToolbarsMap = this.overlaysService.nodeToolbarsMap;
   // #endregion
 
   // #region SETTINGS

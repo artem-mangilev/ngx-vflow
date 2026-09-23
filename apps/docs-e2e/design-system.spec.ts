@@ -31,7 +31,7 @@ test('consumer DOM, scoped themes, selection and native workflow actions', async
   // Selection, application status and a model diagnostic are visible at the same time.
   await expect(review.locator('.vui-status')).toHaveText(['Waiting', 'Above limit']);
   await expect(review.locator('.vui-status').nth(1)).toHaveAttribute('data-tone', 'warning');
-  await expect(workflow.locator('.vflow-toolbar .vui-toolbar')).toBeAttached();
+  await expect(workflow.locator('node-toolbar .vui-toolbar')).toBeAttached();
   await expect(workflow.getByRole('button', { name: 'Details of Finance review', exact: true })).toBeVisible();
   // Activity is presentation only: the busy node keeps its action enabled.
   const paid = workflow.locator('article').filter({ hasText: 'Schedule payment' });
@@ -53,7 +53,7 @@ test('consumer DOM, scoped themes, selection and native workflow actions', async
   await expect(review).toHaveAttribute('data-vui-selected', 'true');
   await workflow.getByLabel('Dark theme', { exact: true }).check();
   await expect(review).toHaveCSS('background-color', 'rgb(27, 40, 59)');
-  await expect(workflow.locator('.vflow-toolbar .vui-toolbar')).toHaveCSS('background-color', 'rgb(27, 40, 59)');
+  await expect(workflow.locator('node-toolbar .vui-toolbar')).toHaveCSS('background-color', 'rgb(27, 40, 59)');
   await expect(workflow.locator('path.vui-edge').first()).toHaveCSS('stroke', 'rgb(175, 190, 209)');
   await expect(workflow.locator('marker polyline').first()).toHaveCSS('fill', 'context-stroke');
   await workflow.screenshot({ path: testInfo.outputPath('workflow.png') });

@@ -200,24 +200,6 @@
   z-index: 1000001;
 }
 
-.vflow-toolbars-layer {
-  position: absolute;
-  top: 0;
-  left: 0;
-  pointer-events: none;
-  z-index: 1000000;
-}
-
-.vflow-toolbar {
-  position: absolute;
-  top: 0;
-  left: 0;
-  // The layer has no width; the box must not shrink to its min-content.
-  width: max-content;
-  transform-origin: 0 0;
-  pointer-events: all;
-}
-
 .vflow-minimap {
   position: absolute;
   inset: 0;

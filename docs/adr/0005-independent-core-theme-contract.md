@@ -4,4 +4,4 @@ ngx-vflow owns overrideable CSS tokens with defaults for its standalone presenta
 
 CSS is the public styling contract: shared theme values use general semantic tokens, while part-specific details use ordinary CSS instead of a component-token catalogue. Programmatic presentation parameters such as `resizerColor` are removed during the major migration. User token overrides take precedence over UI theme mappings, which take precedence over core defaults; importing UI CSS alone must not theme a standalone flow outside an explicitly themed scope.
 
-Local CSS variables follow ordinary DOM inheritance. Toolbar and minimap use the editor theme; local node themes are not copied into separate rendering layers automatically.
+Local CSS variables follow ordinary DOM inheritance. The minimap uses the editor theme; local node themes are not copied into separate rendering layers automatically. A node toolbar sits inside the node DOM, so it inherits the node's local theme.

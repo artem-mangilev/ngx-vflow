@@ -1,78 +1,58 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  ElementRef,
-  inject,
-  OnDestroy,
-  OnInit,
-  TemplateRef,
-  input,
-  viewChild,
-  effect,
-  forwardRef,
-} from '@angular/core';
-import { Directive } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { Position } from '../../types/position.type';
-import { ToolbarModel } from '../../models/toolbar.model';
-import { OverlaysService } from '../../services/overlays.service';
-import { NodeAccessorService } from '../../services/node-accessor.service';
+import { NoDragDirective } from '../../directives/gesture-exclusions.directive';
 
 /**
- * Declares a toolbar next to the node presentation this component sits in.
- * The flow renders the content in its toolbar layer; no component styles here,
- * because they would be removed with this component while the flow still owns the rendered content.
+ * A toolbar attached to one side of the node presentation it sits in.
+ *
+ * The host is absolutely positioned against the nearest positioned ancestor, normally the node box itself,
+ * so it moves, zooms, elevates and culls with the node without any bookkeeping. Put it directly inside the
+ * presentation element and keep that element free of `overflow: hidden`. The gap to the node is
+ * `--vflow-toolbar-offset` (10px by default). Pointer gestures inside the toolbar never drag the node.
  */
 @Component({
   selector: 'node-toolbar',
-  template: `
-    <ng-template #toolbar>
-      <div class="wrapper" nodeToolbarWrapper [model]="model">
-        <ng-content />
-      </div>
-    </ng-template>
-  `,
+  template: `<ng-content />`,
+  styles: [
+    `
+      :host {
+        position: absolute;
+        width: max-content;
+        pointer-events: all;
+        --_gap: var(--vflow-toolbar-offset, 10px);
+      }
+
+      :host([data-position='top']) {
+        bottom: calc(100% + var(--_gap));
+        left: 50%;
+        transform: translateX(-50%);
+      }
+
+      :host([data-position='bottom']) {
+        top: calc(100% + var(--_gap));
+        left: 50%;
+        transform: translateX(-50%);
+      }
+
+      :host([data-position='left']) {
+        right: calc(100% + var(--_gap));
+        top: 50%;
+        transform: translateY(-50%);
+      }
+
+      :host([data-position='right']) {
+        left: calc(100% + var(--_gap));
+        top: 50%;
+        transform: translateY(-50%);
+      }
+    `,
+  ],
+  host: {
+    '[attr.data-position]': 'position()',
+  },
+  hostDirectives: [NoDragDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [forwardRef(() => NodeToolbarWrapperDirective)],
 })
-export class NodeToolbarComponent implements OnInit, OnDestroy {
-  private overlaysService = inject(OverlaysService);
-  private nodeService = inject(NodeAccessorService);
-
+export class NodeToolbarComponent {
   public position = input<Position>('top');
-
-  protected toolbarContentTemplate = viewChild.required<TemplateRef<unknown>>('toolbar');
-
-  protected model = new ToolbarModel(this.nodeService.model()!);
-
-  constructor() {
-    effect(() => this.model.position.set(this.position()));
-  }
-
-  public ngOnInit(): void {
-    this.model.template.set(this.toolbarContentTemplate());
-
-    this.overlaysService.addToolbar(this.model);
-  }
-
-  public ngOnDestroy(): void {
-    this.overlaysService.removeToolbar(this.model);
-  }
-}
-
-@Directive({
-  selector: '[nodeToolbarWrapper]',
-  standalone: true,
-})
-export class NodeToolbarWrapperDirective {
-  private element = inject<ElementRef<HTMLElement>>(ElementRef);
-
-  public model = input.required<ToolbarModel>();
-
-  constructor() {
-    effect(() => {
-      // This template is mounted inside the flow's positioned toolbar container.
-      // The transform shifts the box by its own size, so no measurement is needed.
-      this.element.nativeElement.parentElement!.style.transform = this.model().transform();
-    });
-  }
 }
