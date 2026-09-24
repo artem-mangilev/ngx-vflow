@@ -190,9 +190,16 @@ describe('EdgeModel', () => {
     const params = curve.calls.mostRecent().args[0];
     expect(params.sourceNode).toEqual({ id: '1', x: 15, y: 15, width: 0, height: 0 });
     expect(params.targetNode).toEqual({ id: '2', x: 15, y: 15, width: 0, height: 0 });
-    expect(params.markerInset).toEqual({ start: 0, end: 2 });
+    // A closed arrow of 20 flow units: the path ends 7 units before the tip, at the base of the arrowhead.
+    expect(params.markerInset).toEqual({ start: 0, end: 7 });
     // The left target handle point moves away from the node by the inset.
-    expect(params.targetPoint.x).toBe(params.sourcePoint.x - 2);
+    expect(params.targetPoint.x).toBe(params.sourcePoint.x - 7);
+
+    model.markers.set({ end: { type: 'arrow', width: 20 } });
+    model.path();
+
+    // An open arrow has no fill to hide the line, so the path runs through it to just short of the tip.
+    expect(curve.calls.mostRecent().args[0].markerInset).toEqual({ start: 0, end: 2 });
   });
 
   it('should resolve selection and focus defaults reactively', () => {

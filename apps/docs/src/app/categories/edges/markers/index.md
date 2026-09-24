@@ -8,8 +8,9 @@ selected edge colors its arrowheads automatically. Bind `ctx.markerStart()` / `c
 template. For other shapes or stroke widths, style the public `.vflow-marker` classes or define your own
 `<marker>` in the edge template.
 
-The arrow tip touches the connection point of the handle. The path itself ends a little earlier, under the
-arrowhead, so the square end of the line stays hidden: `sourcePoint` and `targetPoint` that a custom curve
-receives are already moved by that distance when the edge has a marker on that end.
+The arrow tip touches the connection point of the handle. The path itself ends earlier, so the square end of the
+line stays hidden: under a closed arrowhead it ends at the base of the arrow, which covers a line up to half the
+marker width; through an open arrow it runs to just short of the tip. `sourcePoint` and `targetPoint` that a custom
+curve receives are already moved by that distance when the edge has a marker on that end.
 
 {{ NgDocActions.demoPane("MarkersDemoComponent") }}

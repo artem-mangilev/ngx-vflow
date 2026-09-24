@@ -1,24 +1,25 @@
 <!--
   The tip vertex sits at -1 so that the round stroke (width 2) ends exactly at x = 0, the connection point on
-  the outer edge of the handle. The path ends at refX, before the tip, so its square end is hidden under the
-  arrowhead (see markerInset).
+  the outer edge of the handle. The path ends at refX, before the tip, so its square end is hidden: at the base of a
+  closed arrowhead, where the fill is widest, and just short of the tip of an open one (see markerTipInset).
 -->
 @for (marker of markers() | keyvalue; track marker) {
   <svg:marker
     viewBox="-10 -10 20 20"
     refY="0"
-    [attr.refX]="-tipInset"
+    [attr.refX]="-tipInset(marker.value)"
     [attr.id]="marker.key"
     [attr.markerWidth]="marker.value.width ?? defaultSize"
     [attr.markerHeight]="marker.value.height ?? defaultSize"
     [attr.orient]="marker.value.orient ?? 'auto-start-reverse'"
     [attr.markerUnits]="marker.value.markerUnits ?? 'userSpaceOnUse'">
-    @if (marker.value.type === 'arrow-closed' || !marker.value.type) {
-      <polyline class="vflow-marker vflow-marker--arrow-closed" points="-7,-4 -1,0 -7,4 -7,-4" />
-    }
-
-    @if (marker.value.type === 'arrow') {
-      <polyline class="vflow-marker vflow-marker--arrow" points="-6,-4 -1,0 -6,4" />
+    @switch (marker.value.type ?? defaultType) {
+      @case ('arrow-closed') {
+        <polyline class="vflow-marker vflow-marker--arrow-closed" points="-7,-4 -1,0 -7,4 -7,-4" />
+      }
+      @case ('arrow') {
+        <polyline class="vflow-marker vflow-marker--arrow" points="-6,-4 -1,0 -6,4" />
+      }
     }
   </svg:marker>
 }
