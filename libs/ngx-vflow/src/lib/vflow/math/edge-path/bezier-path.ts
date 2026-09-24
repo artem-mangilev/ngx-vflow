@@ -3,6 +3,8 @@ import { Point } from '../../interfaces/point.interface';
 import { Position } from '../../types/position.type';
 import { getPointOnLineByRatio } from '../point-on-line-by-ratio';
 import { getBoundsOfPoints } from '../../utils/rect';
+import { EdgeLabelPoint } from '../../interfaces/edge-label.interface';
+import { directionAngle } from '../direction-angle';
 
 /** Builds a cubic bezier SVG edge path and its label positions. */
 export function getBezierPath({
@@ -81,7 +83,8 @@ function getPathData(
 }
 
 /**
- * Get point on bezier curve by ratio
+ * Point on the bezier curve at `ratio` and the direction of the curve there, by de Casteljau: the last two
+ * intermediate points span the tangent.
  */
 function getPointOnBezier(
   sourcePoint: Point,
@@ -89,14 +92,15 @@ function getPointOnBezier(
   sourceControl: Point,
   targetControl: Point,
   ratio: number,
-): Point {
+): EdgeLabelPoint {
   const fromSourceToFirstControl: Point = getPointOnLineByRatio(sourcePoint, sourceControl, ratio);
   const fromFirstControlToSecond: Point = getPointOnLineByRatio(sourceControl, targetControl, ratio);
   const fromSecondControlToTarget: Point = getPointOnLineByRatio(targetControl, targetPoint, ratio);
+  const tangentStart = getPointOnLineByRatio(fromSourceToFirstControl, fromFirstControlToSecond, ratio);
+  const tangentEnd = getPointOnLineByRatio(fromFirstControlToSecond, fromSecondControlToTarget, ratio);
 
-  return getPointOnLineByRatio(
-    getPointOnLineByRatio(fromSourceToFirstControl, fromFirstControlToSecond, ratio),
-    getPointOnLineByRatio(fromFirstControlToSecond, fromSecondControlToTarget, ratio),
-    ratio,
-  );
+  return {
+    ...getPointOnLineByRatio(tangentStart, tangentEnd, ratio),
+    angle: directionAngle(tangentStart, tangentEnd),
+  };
 }

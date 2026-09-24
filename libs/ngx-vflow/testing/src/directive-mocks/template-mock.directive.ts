@@ -1,6 +1,7 @@
 import { Directive, TemplateRef, ViewContainerRef, inject, input } from '@angular/core';
 import type {
   ConnectionTemplateDirective,
+  EdgeLabelOrient,
   EdgeLabelPosition,
   EdgeLabelTemplateDirective,
   EdgeTemplateDirective,
@@ -32,6 +33,10 @@ export class ConnectionTemplateMockDirective implements AsInterface<ConnectionTe
 export class EdgeLabelTemplateMockDirective implements AsInterface<EdgeLabelTemplateDirective> {
   public edgeLabel = input<EdgeLabelPosition, EdgeLabelPosition | '' | null | undefined>('center', {
     transform: (position) => position || 'center',
+  });
+
+  public edgeLabelOrient = input<EdgeLabelOrient, EdgeLabelOrient | null | undefined>('horizontal', {
+    transform: (orient) => orient ?? 'horizontal',
   });
 
   constructor() {

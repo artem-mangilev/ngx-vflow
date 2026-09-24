@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars -- Angular template context guards use parameters only in type predicates. */
 import { Directive, TemplateRef, effect, inject, input, isDevMode, untracked } from '@angular/core';
 import { ConnectionContext, EdgeContext, NodeContext } from '../interfaces/template-context.interface';
-import { EdgeLabelPosition } from '../interfaces/edge-label.interface';
+import { EdgeLabelOrient, EdgeLabelPosition } from '../interfaces/edge-label.interface';
 import { EdgeComponent } from '../components/edge/edge.component';
 
 @Directive({
@@ -40,6 +40,13 @@ export class ConnectionTemplateDirective {
  * <ng-template edgeLabel="start"><b>Start</b> label</ng-template>
  * ```
  *
+ * `orient: 'path'` turns the label along the path at its point, kept readable left to right:
+ *
+ * ```html
+ * <span *edgeLabel="'center'; orient: 'path'">Along the curve</span>
+ * <ng-template edgeLabel="end" edgeLabelOrient="path">…</ng-template>
+ * ```
+ *
  * Declare it next to the SVG presentation of the edge, never inside an `svg:*` element: Angular compiles the children
  * of a template inside SVG in the SVG namespace, and such content does not render in the HTML layer.
  */
@@ -56,24 +63,33 @@ export class EdgeLabelTemplateDirective {
     transform: (position) => position || 'center',
   });
 
+  /** `horizontal` keeps the label level; `path` turns it along the path, when the curve provides the angle. */
+  public edgeLabelOrient = input<EdgeLabelOrient, EdgeLabelOrient | null | undefined>('horizontal', {
+    transform: (orient) => orient ?? 'horizontal',
+  });
+
   constructor() {
     effect((onCleanup) => {
       const position = this.edgeLabel();
+      const orient = this.edgeLabelOrient();
       const model = this.edge.model();
 
       untracked(() => {
         const current = model.labelTemplates()[position];
-        if (isDevMode() && current && current !== this.templateRef) {
+        if (isDevMode() && current && current.template !== this.templateRef) {
           console.warn(
             `[ngx-vflow] Edge "${model.edge.id}" declares more than one label at "${position}"; the last one wins.`,
           );
         }
-        model.labelTemplates.update((templates) => ({ ...templates, [position]: this.templateRef }));
+        model.labelTemplates.update((templates) => ({
+          ...templates,
+          [position]: { template: this.templateRef, orient },
+        }));
       });
 
       onCleanup(() =>
         model.labelTemplates.update((templates) => {
-          if (templates[position] !== this.templateRef) {
+          if (templates[position]?.template !== this.templateRef) {
             return templates;
           }
           const rest = { ...templates };

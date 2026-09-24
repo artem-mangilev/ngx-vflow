@@ -13,9 +13,21 @@ import {
 } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
 import { EdgeModel } from '../../models/edge.model';
-import { EdgeLabelPosition } from '../../interfaces/edge-label.interface';
+import { EdgeLabelOrient, EdgeLabelPosition } from '../../interfaces/edge-label.interface';
 
 const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
+
+/** Brings an angle into `(-90, 90]`, so that text turned by it reads left to right. */
+export function readableAngle(angle: number): number {
+  let readable = angle;
+  while (readable > 90) {
+    readable -= 180;
+  }
+  while (readable <= -90) {
+    readable += 180;
+  }
+  return readable;
+}
 
 /**
  * Renders one `ng-template[edgeLabel]` of an edge in the HTML label layer at its point of the path. The template has
@@ -58,6 +70,9 @@ export class EdgeLabelComponent {
 
   public template = input.required<TemplateRef<unknown>>();
 
+  /** With `path`, the label turns by the angle of its point; the wrapper is centered, so it turns in place. */
+  public orient = input<EdgeLabelOrient>('horizontal');
+
   protected point = computed(() => this.edgeModel().path().labelPoints?.[this.position()]);
 
   private wrapper = viewChild<ElementRef<HTMLElement>>('wrapper');
@@ -68,7 +83,12 @@ export class EdgeLabelComponent {
     });
     effect(() => {
       const point = this.point();
-      this.element.style.transform = point ? `translate(${point.x}px, ${point.y}px)` : '';
+      if (!point) {
+        this.element.style.transform = '';
+        return;
+      }
+      const angle = this.orient() === 'path' && point.angle !== undefined ? readableAngle(point.angle) : 0;
+      this.element.style.transform = `translate(${point.x}px, ${point.y}px)${angle ? ` rotate(${angle}deg)` : ''}`;
     });
 
     if (isDevMode()) {

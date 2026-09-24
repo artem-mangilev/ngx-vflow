@@ -4,7 +4,7 @@ import { By } from '@angular/platform-browser';
 import { VflowComponent } from '../vflow/vflow.component';
 import { createNodes } from '../../interfaces/node.interface';
 import { Edge, createEdges } from '../../interfaces/edge.interface';
-import { EdgeLabelPosition } from '../../interfaces/edge-label.interface';
+import { EdgeLabelOrient, EdgeLabelPosition } from '../../interfaces/edge-label.interface';
 import {
   EdgeLabelTemplateDirective,
   EdgeTemplateDirective,
@@ -66,6 +66,9 @@ class LabelledEdgeComponent {
           <span *edgeLabel class="first-duplicate">First</span>
           <span *edgeLabel class="second-duplicate">Second</span>
         }
+        @case ('along') {
+          <span *edgeLabel="'center'; orient: orient()" class="along-label">Along</span>
+        }
       }
     </ng-template>
   </vflow>`,
@@ -82,6 +85,7 @@ class LabelledEdgeComponent {
 class HostComponent {
   showCenter = signal(true);
   movable = signal<EdgeLabelPosition>('start');
+  orient = signal<EdgeLabelOrient | undefined>('path');
   nodes = createNodes([
     { id: 'a', point: { x: 0, y: 0 } },
     { id: 'b', point: { x: 300, y: 0 } },
@@ -94,6 +98,8 @@ class HostComponent {
     { id: 'long-form', source: 'd', target: 'c' },
     { id: 'inside-svg', source: 'b', target: 'd' },
     { id: 'duplicate', source: 'c', target: 'a' },
+    // A straight line down and to the left: its direction is past 90 degrees, so a readable label turns back.
+    { id: 'along', source: 'a', target: 'd', curve: 'straight' },
   ]);
 }
 
@@ -176,10 +182,40 @@ describe('Edge labels declared inside edge presentations', () => {
     expect(positions('template')).toEqual(['end']);
     expect(root.querySelector('.center-label')).toBeNull();
     expect(root.querySelectorAll('[edgeLabelHost]').length).toBe(
-      ['template', 'component', 'long-form', 'inside-svg', 'duplicate']
+      ['template', 'component', 'long-form', 'inside-svg', 'duplicate', 'along']
         .map((id) => positions(id).length)
         .reduce((sum, count) => sum + count, 0),
     );
+  });
+
+  it('turns a label along the path when its orient is path, kept readable, and levels it otherwise', async () => {
+    const host = labelHost('.along-label')!;
+    const angle = edgeModel('along').path().labelPoints!.center.angle!;
+
+    expect(angle).toBeGreaterThan(90);
+    expect(labelHost('.center-label')!.style.transform).not.toContain('rotate');
+    // The browser rounds the serialized angle.
+    const rotate = /rotate\(([-\d.e]+)deg\)/.exec(host.style.transform);
+    expect(rotate).withContext(host.style.transform).not.toBeNull();
+    expect(Number(rotate![1])).toBeCloseTo(angle - 180, 2);
+
+    fixture.componentInstance.orient.set('horizontal');
+    await settle();
+    expect(host.style.transform).not.toContain('rotate');
+
+    // No value means horizontal.
+    fixture.componentInstance.orient.set(undefined);
+    await settle();
+    expect(host.style.transform).not.toContain('rotate');
+
+    // A curve without angles renders the label horizontally.
+    fixture.componentInstance.orient.set('path');
+    fixture.componentInstance.edges[5].curve!.set(() => ({
+      path: 'M 0,0 L 100,0',
+      labelPoints: { start: { x: 0, y: 0 }, center: { x: 50, y: 0 }, end: { x: 100, y: 0 } },
+    }));
+    await settle();
+    expect(host.style.transform).not.toContain('rotate');
   });
 
   it('renders a label declared inside an edge component', () => {

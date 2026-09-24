@@ -1,5 +1,5 @@
 import { TemplateRef, computed, inject, signal } from '@angular/core';
-import { EdgeLabelPosition } from '../interfaces/edge-label.interface';
+import { EdgeLabelOrient, EdgeLabelPosition } from '../interfaces/edge-label.interface';
 import { Edge, Curve, EDGE_DEFAULTS } from '../interfaces/edge.interface';
 import { NodeModel } from './node.model';
 import { getStraightPath } from '../math/edge-path/straigh-path';
@@ -23,6 +23,12 @@ import { getSvgPathBounds } from '../utils/svg-path-bounds';
 import { insetPoint, markerInset } from '../utils/marker-inset';
 
 const LABEL_POSITIONS: EdgeLabelPosition[] = ['start', 'center', 'end'];
+
+/** A label declared at one position of the edge. */
+export interface EdgeLabelEntry {
+  template: TemplateRef<unknown>;
+  orient: EdgeLabelOrient;
+}
 
 export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
   private modelInjector = createModelInjector();
@@ -59,12 +65,12 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
   public interactionWidth = signal(EDGE_DEFAULTS.interactionWidth);
   public markers = signal<{ start?: Marker; end?: Marker }>(EDGE_DEFAULTS.markers);
   /** Label templates registered by `ng-template[edgeLabel]` inside the presentation of this edge. */
-  public labelTemplates = signal<Partial<Record<EdgeLabelPosition, TemplateRef<unknown>>>>({});
+  public labelTemplates = signal<Partial<Record<EdgeLabelPosition, EdgeLabelEntry>>>({});
   public labelEntries = computed(() => {
     const templates = this.labelTemplates();
     return LABEL_POSITIONS.flatMap((position) => {
-      const template = templates[position];
-      return template ? [{ position, template }] : [];
+      const entry = templates[position];
+      return entry ? [{ position, ...entry }] : [];
     });
   });
 

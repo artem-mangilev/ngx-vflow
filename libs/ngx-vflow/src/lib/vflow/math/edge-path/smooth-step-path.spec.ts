@@ -55,6 +55,38 @@ describe('getSmoothStepPath', () => {
     });
   });
 
+  describe('label point angles', () => {
+    it('should follow the segment of each label point', () => {
+      // Right to left, target below: horizontal, vertical, horizontal.
+      const { start, center, end } = getSmoothStepPath(
+        createParams({ x: 100, y: 200 }, { x: 400, y: 500 }),
+      ).labelPoints!;
+
+      expect(start.angle).toBe(0);
+      expect(center.angle).toBe(90);
+      expect(end.angle).toBe(0);
+    });
+
+    it('should point down along a vertical edge', () => {
+      const { start, center, end } = getSmoothStepPath(
+        createParams({ x: 100, y: 100 }, { x: 100, y: 400 }, 'bottom', 'top'),
+      ).labelPoints!;
+
+      expect(start.angle).toBe(90);
+      expect(center.angle).toBe(90);
+      expect(end.angle).toBe(90);
+    });
+
+    it('should point left along an edge drawn backwards', () => {
+      const { start, end } = getSmoothStepPath(
+        createParams({ x: 400, y: 200 }, { x: 100, y: 200 }, 'left', 'right'),
+      ).labelPoints!;
+
+      expect(start.angle).toBe(180);
+      expect(end.angle).toBe(180);
+    });
+  });
+
   describe('label positioning fix', () => {
     it('should position start and end labels at different points along the path', () => {
       const result = getSmoothStepPath(createParams());

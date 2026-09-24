@@ -1,13 +1,15 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { DocsPresentations } from '@docs/shared';
 import { VflowUi } from '@vflow/ui';
-import { Edge, Node, Vflow, createEdges, createNodes } from 'ngx-vflow';
+import { Edge, EdgeLabelOrient, Node, Vflow, createEdges, createNodes } from 'ngx-vflow';
 
 interface LabelData {
   start?: string;
   center?: string;
   end?: string;
   deletable?: boolean;
+  /** How the labels of the edge sit on the path; horizontal without it. */
+  orient?: EdgeLabelOrient;
 }
 
 @Component({
@@ -18,15 +20,15 @@ interface LabelData {
       <svg:g docsEdge [ctx]="ctx" />
 
       @if (ctx.data().start; as text) {
-        <span *edgeLabel="'start'" vflowEdgeLabel>{{ text }}</span>
+        <span *edgeLabel="'start'; orient: ctx.data().orient" vflowEdgeLabel>{{ text }}</span>
       }
       @if (ctx.data().deletable) {
         <button *edgeLabel class="delete" type="button" (click)="deleteEdge(ctx.edge)">Delete</button>
       } @else if (ctx.data().center; as text) {
-        <span *edgeLabel vflowEdgeLabel>{{ text }}</span>
+        <span *edgeLabel="'center'; orient: ctx.data().orient" vflowEdgeLabel>{{ text }}</span>
       }
       @if (ctx.data().end; as text) {
-        <span *edgeLabel="'end'" vflowEdgeLabel>{{ text }}</span>
+        <span *edgeLabel="'end'; orient: ctx.data().orient" vflowEdgeLabel>{{ text }}</span>
       }
     </ng-template>
   </vflow>`,
@@ -82,8 +84,8 @@ export class LabelsDemoComponent {
       id: '1 -> 3',
       source: '1',
       target: '3',
-      curve: 'smooth-step',
-      data: { center: 'Center Only' },
+      curve: 'bezier',
+      data: { center: 'Along the curve', orient: 'path' },
     },
   ]);
 

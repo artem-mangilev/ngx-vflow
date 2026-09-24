@@ -2,6 +2,8 @@ import { CurveLayout, SmoothStepPathParams } from '../../interfaces/curve-factor
 import { Point } from '../../interfaces/point.interface';
 import { Position } from '../../types/position.type';
 import { getBoundsOfPoints } from '../../utils/rect';
+import { EdgeLabelPoint } from '../../interfaces/edge-label.interface';
+import { directionAngle } from '../direction-angle';
 
 const handleDirections = {
   left: { x: -1, y: 0 },
@@ -242,13 +244,15 @@ export function getSmoothStepPath({
     cumulativeDistances[i + 1] = totalLength;
   }
 
+  const segmentAngle = (index: number) => directionAngle(points[index], points[index + 1]);
+
   // Optimized helper function using binary search
-  const getPointAtRatio = (ratio: number): Point => {
+  const getPointAtRatio = (ratio: number): EdgeLabelPoint => {
     const targetDistance = totalLength * ratio;
 
     // Edge cases
-    if (targetDistance <= 0) return points[0];
-    if (targetDistance >= totalLength) return points[n - 1];
+    if (targetDistance <= 0) return { ...points[0], angle: segmentAngle(0) };
+    if (targetDistance >= totalLength) return { ...points[n - 1], angle: segmentAngle(n - 2) };
 
     // Binary search for the correct segment
     let low = 0;
@@ -275,7 +279,23 @@ export function getSmoothStepPath({
     return {
       x: start.x + (end.x - start.x) * t,
       y: start.y + (end.y - start.y) * t,
+      angle: segmentAngle(low),
     };
+  };
+
+  // The center lies on a straight segment, never on a bend; its direction is that segment's.
+  const angleAt = (point: Point): number | undefined => {
+    const epsilon = 1e-6;
+    for (let i = 0; i < n - 1; i++) {
+      const a = points[i];
+      const b = points[i + 1];
+      const inX = point.x >= Math.min(a.x, b.x) - epsilon && point.x <= Math.max(a.x, b.x) + epsilon;
+      const inY = point.y >= Math.min(a.y, b.y) - epsilon && point.y <= Math.max(a.y, b.y) + epsilon;
+      if (inX && inY) {
+        return segmentAngle(i);
+      }
+    }
+    return undefined;
   };
 
   return {
@@ -283,7 +303,7 @@ export function getSmoothStepPath({
     bounds: getBoundsOfPoints(points),
     labelPoints: {
       start: getPointAtRatio(0.15),
-      center: { x: labelX, y: labelY },
+      center: { x: labelX, y: labelY, angle: angleAt({ x: labelX, y: labelY }) },
       end: getPointAtRatio(0.85),
     },
   };

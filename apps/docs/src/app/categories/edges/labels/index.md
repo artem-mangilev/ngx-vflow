@@ -32,8 +32,25 @@ together with the edge.
 Declare labels next to the SVG elements of the edge, never inside `svg:g` or another `svg:*` element. Angular compiles
 HTML inside SVG in the SVG namespace, such a label does not render, and development mode warns about it.
 
-Built-in curves provide the label points. A custom curve returns them as `labelPoints`; without them labels do not
-render.
+## Orientation
+
+A label is horizontal by default. `orient: 'path'` turns it along the path at its point, as the center label of the
+lower edge in the demo shows:
+
+{% raw %}
+
+```html
+<span *edgeLabel="'center'; orient: 'path'" vflowEdgeLabel>{{ ctx.data().label }}</span> <ng-template edgeLabel="end" edgeLabelOrient="path">…</ng-template>
+```
+
+{% endraw %}
+
+The label turns around its own center by the direction of the path there and stays readable: on an edge drawn
+right to left or upwards it turns back, so the text never reads upside down. On a step curve the label lies along
+its segment; on a straight or bezier curve it follows the tangent.
+
+Built-in curves provide the label points and their directions. A custom curve returns them as `labelPoints`; without
+them labels do not render, and a point without `angle` renders its label horizontally whatever its `orient`.
 
 ## Example
 

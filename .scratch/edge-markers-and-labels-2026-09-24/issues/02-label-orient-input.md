@@ -1,6 +1,6 @@
 # 02. `edgeLabelOrient` и поворот label
 
-Status: ready-for-agent
+Status: resolved
 Type: task
 Blocked by: 01
 
@@ -12,3 +12,10 @@ D2 из `spec.md`. Вход `edgeLabelOrient: 'horizontal' | 'path'` на `EdgeL
 Спеки компонента: угол 135 → поворот -45; угол -100 → 80; отсутствие угла → без `rotate`. Демо labels
 получает label с `orient: 'path'` на bezier и smooth-step; страница labels описывает вход, переворот для
 читаемости и поведение без `angle`. Страница curves упоминает `angle`.
+
+## Answer
+
+Сделано 2026-09-24. Вход `edgeLabelOrient` (с `transform`, `null`/`undefined` → `horizontal`) и в моке
+testing-пакета; `labelTemplates` хранит `EdgeLabelEntry { template, orient }`; `EdgeLabelComponent` пишет
+`rotate(readableAngle(angle))`. Спека в `edge-label.spec.ts` (ребро `along`). Демо labels: нижнее ребро bezier с
+`orient: 'path'` из `data`; страницы labels и curves описывают `orient` и `angle`.

@@ -1,5 +1,5 @@
 import { Position } from '../types/position.type';
-import { EdgeLabelPosition } from './edge-label.interface';
+import { EdgeLabelPoint, EdgeLabelPosition } from './edge-label.interface';
 import { Edge } from './edge.interface';
 import { Node } from './node.interface';
 import { Point } from './point.interface';
@@ -83,8 +83,11 @@ export interface CurveLayout {
   path: string;
   /** Conservative flow-space bounds for virtualization. Omit to measure custom paths using SVG. */
   bounds?: Rect;
-  /** Optional points for label placement along the curve */
-  labelPoints?: { [key in EdgeLabelPosition]: Point };
+  /**
+   * Optional points for label placement along the curve. A point may carry the direction of the path there as
+   * `angle`, which labels with `orient: 'path'` follow.
+   */
+  labelPoints?: { [key in EdgeLabelPosition]: EdgeLabelPoint };
 }
 
 export type CurveFactoryParams = ConnectionCurveFactoryParams | EdgeCurveFactoryParams;
