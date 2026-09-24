@@ -202,6 +202,25 @@ describe('EdgeModel', () => {
     expect(curve.calls.mostRecent().args[0].markerInset).toEqual({ start: 0, end: 2 });
   });
 
+  it('should share one marker element between equal markers and inset a declared shape', () => {
+    const curve = jasmine.createSpy('curve').and.returnValue({ path: 'M 0,0' });
+    model.curve.set(curve);
+    model.markers.set({ start: 'arrow-closed', end: {} });
+    model.path();
+
+    // The type alone, the empty marker and the default type are the same marker.
+    expect(model.markerStartUrl()).toBe(model.markerEndUrl());
+    expect(model.markerStartUrl()).toMatch(/^url\(#-?\d+\)$/);
+
+    TestBed.inject(FlowEntitiesService).markerShapes.set(
+      new Map([['diamond', { template: null as never, inset: 10 }]]),
+    );
+    model.markers.set({ start: { type: 'diamond', width: 20 }, end: { type: 'arrow', width: 20 } });
+    model.path();
+
+    expect(curve.calls.mostRecent().args[0].markerInset).toEqual({ start: 10, end: 2 });
+  });
+
   it('should resolve selection and focus defaults reactively', () => {
     expect(model.selectable()).toBeTrue();
     expect(model.focusable()).toBeTrue();

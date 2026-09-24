@@ -7,20 +7,20 @@ import { getBezierPath } from '../math/edge-path/bezier-path';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { FlowEntity } from '../interfaces/flow-entity.interface';
 import { getSmoothStepPath } from '../math/edge-path/smooth-step-path';
-import { hashCode } from '../utils/hash';
 import { Contextable } from '../interfaces/contextable.interface';
 import { EdgeContext } from '../interfaces/template-context.interface';
 import { HandleModel } from './handle.model';
 import { CurveFactoryParams, CurveLayout } from '../interfaces/curve-factory.interface';
 import { HandleType } from '../types/handle-type.type';
 import { FlowEntitiesService } from '../services/flow-entities.service';
-import { Marker } from '../interfaces/marker.interface';
+import { MarkerRef } from '../interfaces/marker.interface';
 import { FlowSettingsService } from '../services/flow-settings.service';
 import { createModelInjector } from '../utils/model-injector';
 import { Observable } from 'rxjs';
 import { DOCUMENT } from '@angular/common';
 import { getSvgPathBounds } from '../utils/svg-path-bounds';
 import { insetPoint, markerInset } from '../utils/marker-inset';
+import { markerUrl } from '../utils/marker-ref';
 
 const LABEL_POSITIONS: EdgeLabelPosition[] = ['start', 'center', 'end'];
 
@@ -63,7 +63,7 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
   public curve = signal<Curve>(EDGE_DEFAULTS.curve);
   public reconnectable = signal<boolean | 'source' | 'target'>(EDGE_DEFAULTS.reconnectable);
   public interactionWidth = signal(EDGE_DEFAULTS.interactionWidth);
-  public markers = signal<{ start?: Marker; end?: Marker }>(EDGE_DEFAULTS.markers);
+  public markers = signal<{ start?: MarkerRef; end?: MarkerRef }>(EDGE_DEFAULTS.markers);
   /** Label templates registered by `ng-template[edgeLabel]` inside the presentation of this edge. */
   public labelTemplates = signal<Partial<Record<EdgeLabelPosition, EdgeLabelEntry>>>({});
   public labelEntries = computed(() => {
@@ -161,17 +161,9 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
     return handles.find((handle) => handle.type() === type || handle.type() === 'any') ?? null;
   }
 
-  public markerStartUrl = computed(() => {
-    const marker = this.markers()?.start;
+  public markerStartUrl = computed(() => markerUrl(this.markers()?.start));
 
-    return marker ? `url(#${hashCode(JSON.stringify(marker))})` : '';
-  });
-
-  public markerEndUrl = computed(() => {
-    const marker = this.markers()?.end;
-
-    return marker ? `url(#${hashCode(JSON.stringify(marker))})` : '';
-  });
+  public markerEndUrl = computed(() => markerUrl(this.markers()?.end));
 
   public context: EdgeContext;
 
@@ -218,7 +210,8 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
 
   private getPathFactoryParams(source: HandleModel, target: HandleModel): CurveFactoryParams {
     const markers = this.markers();
-    const inset = { start: markerInset(markers?.start), end: markerInset(markers?.end) };
+    const shapes = this.flowEntitiesService.markerShapes();
+    const inset = { start: markerInset(markers?.start, shapes), end: markerInset(markers?.end, shapes) };
     // A dynamic handle resolves its point towards the reference point of the other end.
     const start = source.endpoint(target.pointAbsolute());
     const end = target.endpoint(source.pointAbsolute());

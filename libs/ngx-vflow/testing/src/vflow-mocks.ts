@@ -11,6 +11,7 @@ import {
   ConnectionTemplateMockDirective,
   EdgeLabelTemplateMockDirective,
   EdgeTemplateMockDirective,
+  MarkerTemplateMockDirective,
   NodeTemplateMockDirective,
 } from './directive-mocks/template-mock.directive';
 
@@ -29,4 +30,5 @@ export const VflowMocks = [
   EdgeLabelTemplateMockDirective,
   EdgeTemplateMockDirective,
   ConnectionTemplateMockDirective,
+  MarkerTemplateMockDirective,
 ] as const;

@@ -1,12 +1,18 @@
 <!--
-  The tip vertex sits at -1 so that the round stroke (width 2) ends exactly at x = 0, the connection point on
-  the outer edge of the handle. The path ends at refX, before the tip, so its square end is hidden: at the base of a
-  closed arrowhead, where the fill is widest, and just short of the tip of an open one (see markerTipInset).
+  Shapes draw in the viewBox with their tip at x = 0, the connection point on the outer edge of the handle, and
+  extend to negative x. The path ends at refX, before the tip, so its square end is hidden: at the base of a closed
+  arrowhead, where the fill is widest, just short of the tip of an open one, and at the inset a declared shape asks
+  for (see markerTipInset). Stroke properties inherit from the marker element to any shape.
 -->
-@for (marker of markers() | keyvalue; track marker) {
+@for (marker of markers() | keyvalue; track marker.key) {
   <svg:marker
     viewBox="-10 -10 20 20"
     refY="0"
+    stroke="context-stroke"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    [attr.class]="'vflow-marker vflow-marker--' + (marker.value.type ?? defaultType)"
     [attr.refX]="-tipInset(marker.value)"
     [attr.id]="marker.key"
     [attr.markerWidth]="marker.value.width ?? defaultSize"
@@ -15,10 +21,15 @@
     [attr.markerUnits]="marker.value.markerUnits ?? 'userSpaceOnUse'">
     @switch (marker.value.type ?? defaultType) {
       @case ('arrow-closed') {
-        <polyline class="vflow-marker vflow-marker--arrow-closed" points="-7,-4 -1,0 -7,4 -7,-4" />
+        <svg:polyline fill="context-stroke" points="-7,-4 -1,0 -7,4 -7,-4" />
       }
       @case ('arrow') {
-        <polyline class="vflow-marker vflow-marker--arrow" points="-6,-4 -1,0 -6,4" />
+        <svg:polyline fill="none" points="-6,-4 -1,0 -6,4" />
+      }
+      @default {
+        @if (shapes().get(marker.value.type ?? defaultType); as shape) {
+          <ng-container [ngTemplateOutlet]="shape.template" />
+        }
       }
     }
   </svg:marker>

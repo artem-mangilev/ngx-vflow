@@ -1,10 +1,11 @@
-import { Directive, TemplateRef, ViewContainerRef, inject, input } from '@angular/core';
+import { Directive, TemplateRef, ViewContainerRef, inject, input, numberAttribute } from '@angular/core';
 import type {
   ConnectionTemplateDirective,
   EdgeLabelOrient,
   EdgeLabelPosition,
   EdgeLabelTemplateDirective,
   EdgeTemplateDirective,
+  MarkerTemplateDirective,
   NodeTemplateDirective,
 } from 'ngx-vflow';
 import { AsInterface } from '../types';
@@ -42,6 +43,19 @@ export class EdgeLabelTemplateMockDirective implements AsInterface<EdgeLabelTemp
   constructor() {
     inject(ViewContainerRef).createEmbeddedView(inject(TemplateRef));
   }
+}
+
+/** A marker shape renders nowhere: the mock draws no SVG. */
+@Directive({
+  standalone: true,
+  selector: 'ng-template[marker]',
+})
+export class MarkerTemplateMockDirective implements AsInterface<MarkerTemplateDirective> {
+  public templateRef = inject(TemplateRef);
+
+  public marker = input.required<string>();
+
+  public inset = input(0, { transform: numberAttribute });
 }
 
 @Directive({

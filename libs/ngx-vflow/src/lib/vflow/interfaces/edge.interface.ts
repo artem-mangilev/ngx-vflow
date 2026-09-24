@@ -1,7 +1,7 @@
 import { signal, WritableSignal } from '@angular/core';
 import { Connection } from './connection.interface';
 import { CurveFactory } from './curve-factory.interface';
-import { Marker } from './marker.interface';
+import { MarkerRef } from './marker.interface';
 import { UnwrapSignal } from '../types/unwrap-signal.type';
 import { isDefined } from '../utils/is-defined';
 import { DomAttributes } from './dom-attributes.interface';
@@ -24,9 +24,10 @@ export interface Edge<T = unknown> extends Connection {
   component?: EntityComponentType;
   curve?: WritableSignal<Curve>;
   data?: WritableSignal<T>;
+  /** Markers of the edge ends: built-in arrows or shapes the application declares, see `MarkerRef`. */
   markers?: WritableSignal<{
-    start?: Marker;
-    end?: Marker;
+    start?: MarkerRef;
+    end?: MarkerRef;
   }>;
   reconnectable?: WritableSignal<boolean | 'source' | 'target'>;
   selected?: WritableSignal<boolean>;

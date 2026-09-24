@@ -56,6 +56,10 @@ import { VflowMocks } from './vflow-mocks';
         <svg:path fill="none" [attr.d]="ctx.path()" [attr.stroke]="ctx.marker()" />
       </ng-template>
 
+      <ng-template marker="all-mocks-circle" inset="9">
+        <svg:circle fill="none" cx="-5" cy="0" r="4" />
+      </ng-template>
+
       <mini-map [pannable]="true" [zoomable]="true" [zoomStep]="0.2" [position]="'bottom-right'" />
     </vflow>
   `,

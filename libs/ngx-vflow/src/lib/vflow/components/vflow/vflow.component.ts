@@ -9,6 +9,8 @@ import {
   inject,
   runInInjectionContext,
   contentChild,
+  contentChildren,
+  computed,
   viewChild,
   input,
   effect,
@@ -26,6 +28,7 @@ import { EdgeModel } from '../../models/edge.model';
 import {
   ConnectionTemplateDirective,
   EdgeTemplateDirective,
+  MarkerTemplateDirective,
   NodeTemplateDirective,
 } from '../../directives/template.directive';
 import { addNodesToEdges } from '../../utils/add-nodes-to-edges';
@@ -34,6 +37,7 @@ import { Point } from '../../interfaces/point.interface';
 import { ViewportState } from '../../interfaces/viewport.interface';
 import { FlowStatusService } from '../../services/flow-status.service';
 import { FlowEntitiesService } from '../../services/flow-entities.service';
+import { MarkerShapes } from '../../utils/marker-inset';
 import { ConnectionSettings } from '../../interfaces/connection-settings.interface';
 import { ConnectionModel } from '../../models/connection.model';
 import { ReferenceIdentityChecker } from '../../utils/identity-checker/reference-identity-checker';
@@ -182,6 +186,9 @@ export class VflowComponent {
   private viewportElement = viewChild.required<ElementRef<HTMLElement>>('viewportElement');
 
   constructor() {
+    // Curves read the inset of a declared shape through the service; the defs render the shape itself.
+    effect(() => this.flowEntitiesService.markerShapes.set(this.markerShapes()));
+
     effect(() => {
       const { x, y, zoom } = this.viewportService.readableViewport();
       // Camera movement must not reconcile every node, edge and label.
@@ -477,6 +484,19 @@ export class VflowComponent {
   protected edgeTemplateDirective = contentChild(EdgeTemplateDirective);
 
   protected connectionTemplateDirective = contentChild(ConnectionTemplateDirective);
+
+  private markerTemplateDirectives = contentChildren(MarkerTemplateDirective);
+
+  /** Marker shapes declared with `ng-template[marker]`, by type. */
+  protected markerShapes = computed<MarkerShapes>(
+    () =>
+      new Map(
+        this.markerTemplateDirectives().map((directive) => [
+          directive.marker(),
+          { template: directive.templateRef, inset: directive.inset() },
+        ]),
+      ),
+  );
   // #endregion
 
   // #region DIRECTIVES

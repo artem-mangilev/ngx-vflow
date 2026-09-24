@@ -4,7 +4,7 @@ import { getStraightPath } from '../../math/edge-path/straigh-path';
 import { SpacePointContextDirective } from '../../directives/space-point-context.directive';
 import { ConnectionModel } from '../../models/connection.model';
 import { getBezierPath } from '../../math/edge-path/bezier-path';
-import { hashCode } from '../../utils/hash';
+import { markerUrl } from '../../utils/marker-ref';
 import { Position } from '../../types/position.type';
 import { getSmoothStepPath } from '../../math/edge-path/smooth-step-path';
 import { NgTemplateOutlet } from '@angular/common';
@@ -83,15 +83,7 @@ export class ConnectionComponent {
     }
   });
 
-  protected markerUrl = computed(() => {
-    const marker = this.model().settings.marker;
-
-    if (marker) {
-      return `url(#${hashCode(JSON.stringify(marker))})`;
-    }
-
-    return '';
-  });
+  protected markerUrl = computed(() => markerUrl(this.model().settings.marker));
 
   protected readonly defaultColor = 'var(--vflow-muted)';
 
@@ -113,7 +105,7 @@ export class ConnectionComponent {
     sourceNode: NodeModel,
     targetNode?: NodeModel,
   ): CurveFactoryParams {
-    const inset = { start: 0, end: markerInset(this.model().settings.marker) };
+    const inset = { start: 0, end: markerInset(this.model().settings.marker, this.flowEntitiesService.markerShapes()) };
 
     return {
       mode: 'connection',

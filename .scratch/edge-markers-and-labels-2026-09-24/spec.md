@@ -1,17 +1,18 @@
 # Edges 3.0: label вдоль кривой и custom markers
 
 Дата: 2026-09-24. Итог обсуждения edges после фикса инсета маркера (`0cb0778c`). Ориентир по маркерам:
-React Flow (`markerEnd` — объект встроенного маркера или строка-id пользовательского `<marker>` из `<defs>`;
-обёртка в `url('#id')` делает библиотека). Ориентир по label вдоль пути: text-on-path в mermaid и dagre-d3
+React Flow (`markerEnd` — объект встроенного маркера или строка-id пользовательского `<marker>` из `<defs>`);
+в отличие от него `<marker>` здесь всегда рендерит библиотека, приложение даёт только фигуру. Ориентир по label вдоль пути: text-on-path в mermaid и dagre-d3
 (текст поворачивается по касательной и переворачивается, чтобы читаться слева направо).
 
 ## Принципы
 
 - Label — HTML в слое label, не `<textPath>`. Ориентация вдоль пути — поворот HTML-элемента на угол касательной.
 - Встроенные маркеры остаются двумя стрелками. Любая другая фигура (круг, ромб, черта, крест, логотип) —
-  пользовательский `<marker>`, на который edge ссылается по id. Библиотека не расширяет набор типов.
+  фигура, объявленная приложением по типу. Элемент `<marker>` всегда рендерит библиотека, поэтому встроенные и
+  объявленные фигуры используются одинаково.
 - Кастомная кривая без новых данных продолжает работать: угол опционален, без него label горизонтальный.
-- Один способ на задачу: строка-id для пользовательского маркера, объект `Marker` для встроенного.
+- Один тип маркера: `type` либо зарезервирован библиотекой, либо объявлен приложением.
 
 ## Решения
 
@@ -52,62 +53,66 @@ React Flow (`markerEnd` — объект встроенного маркера �
 
 Модель хранит ориентацию вместе с шаблоном: `labelTemplates` → `Record<EdgeLabelPosition, { template, orient }>`.
 
-### D3. Пользовательский маркер по id
+### D3. Один тип маркера: встроенные и объявленные фигуры
 
 ```ts
-markers: signal({ end: 'logo' }); // id элемента <marker id="logo">
-markers: signal({ start: { type: 'arrow' }, end: 'diamond' });
-connection: {
-  marker: 'circle';
+export type MarkerType = 'arrow' | 'arrow-closed' | (string & {});
+export interface Marker {
+  type?: MarkerType; // дефолт 'arrow-closed'
+  width?: number;
+  height?: number;
+  orient?: string;
+  markerUnits?: 'userSpaceOnUse' | 'strokeWidth';
 }
+export type MarkerRef = MarkerType | Marker; // строка равна { type }
 ```
 
-`Edge.markers.start/end` и `ConnectionSettings.marker` принимают `Marker | string`. Для строки:
+`Edge.markers.start/end` и `ConnectionSettings.marker` принимают `MarkerRef`. Зарезервированные типы `arrow` и
+`arrow-closed` рисует библиотека, любой другой `type` это фигура, объявленная приложением (D4). Все поля
+`Marker` работают для любого типа, потому что элемент `<marker>` всегда рендерит библиотека. `normalizeMarker`
+приводит ссылку к канонической форме (тип проставлен, фиксированный порядок полей), так что `'arrow-closed'`,
+`{}` и `{ type: 'arrow-closed' }` дают один хэш и один элемент. `createEdge`/`createEdges` не меняются.
 
-- `ctx.markerEnd()` / `ctx.markerStart()` / `ctx.marker()` возвращают `url(#<id>)` как есть; библиотека ничего
-  не экранирует и не проверяет наличие элемента.
-- В общий `<defs flowDefs>` строка не попадает; `FlowEntitiesService.markers` пропускает строки.
-- `markerInset` равен 0: путь заканчивается в точке соединения, геометрию задаёт `refX` пользовательского
-  маркера. Инсет для кастомного маркера не настраивается; кому нужен — сдвигает конец в кастомной кривой.
-- `createEdge`/`createEdges` не меняются: значение проходит в сигнал как есть.
+Отдельного типа для пользовательского маркера нет. Первая реализация (`CustomMarker = { id; inset }` плюс
+`ng-template[defs]` с полным `<svg:marker>` от приложения) отброшена 2026-09-24: два типа маркеров, инсет во
+flow-единицах и глобальные стили через `ViewEncapsulation.None`.
 
-Тип объекта `Marker` не меняется. Хэш-id встроенных маркеров не меняется.
-
-### D4. Слот `ng-template[defs]`
-
-`<marker>` ищется по id во всём документе, поэтому пользователь может держать его в любом `<svg>` на
-странице. Чтобы не заводить скрытый svg, `vflow` принимает шаблон:
+### D4. Фигура через `ng-template[marker]`
 
 ```html
-<vflow …>
-  <ng-template defs>
-    <svg:marker id="diamond" viewBox="-10 -10 20 20" refX="-8" refY="0" markerWidth="16" markerHeight="16" orient="auto-start-reverse" markerUnits="userSpaceOnUse">
-      <svg:polygon class="vflow-marker vflow-marker--arrow-closed" points="-8,0 -4,-4 0,0 -4,4" />
-    </svg:marker>
-  </ng-template>
-</vflow>
+<ng-template marker="diamond" inset="9">
+  <svg:polygon fill="context-stroke" points="0,0 -5,-5 -10,0 -5,5" />
+</ng-template>
 ```
 
-Директива `DefsTemplateDirective` (`ng-template[defs]`) рядом с `node`/`edge`/`connection`;
-`DefsComponent` получает `template` и рендерит его через `ngTemplateOutlet` после встроенных маркеров.
-Содержимое компилируется в SVG-пространстве имён (`svg:` префикс), как шаблоны edge. Публичные классы
-`.vflow-marker`, `.vflow-marker--arrow`, `.vflow-marker--arrow-closed` дают `context-stroke` и толщину
-штриха; пользовательский маркер может их переиспользовать.
+`MarkerTemplateDirective` (`ng-template[marker]`) с входами `marker` (тип) и `inset` (единицы маркера, дефолт 0).
+`VflowComponent` собирает `contentChildren` в карту `MarkerShapes` (тип → `{ template, inset }`), отдаёт её
+`DefsComponent` и кладёт в `FlowEntitiesService.markerShapes`, откуда `EdgeModel` и `ConnectionComponent` берут
+инсет через `markerTipInset(marker, shapes)`: встроенная таблица, иначе `inset` фигуры, иначе 0.
 
-### D5. Демо дополнительных фигур как custom markers
+Контракт фигуры: viewBox `-10 -10 20 20`, кончик в `x = 0`, тело в минус по `x`, `fill` задаёт автор
+(`none` или `context-stroke`). `DefsComponent` рендерит `<marker>` для всех типов одинаково: viewBox, `refX =
+-inset`, размер, `orient`, `markerUnits`, классы `vflow-marker` и `vflow-marker--<type>`, и презентационные
+атрибуты `stroke="context-stroke" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"`, которые
+наследуются фигурой. Стили компонента и `ViewEncapsulation.None` не нужны; CSS приложения переопределяет
+атрибуты через классы. Тип без фигуры рендерит пустой `<marker>` и предупреждает в dev-режиме.
+
+Свой `viewBox`, `refY` или полностью свой `<marker>` контрактом не предусмотрены.
+
+### D5. Демо дополнительных фигур
 
 Страница markers получает раздел «Custom markers» с демо `CustomMarkersDemoComponent`: `circle`,
-`circle-closed`, `diamond`, `diamond-closed`, `bar` в `ng-template defs`, edges со строковыми маркерами, один
-из них с `start` и `end` разных видов, и `connection.marker` со строкой. Это закрывает запрос на новые типы
-без расширения библиотеки. Раздел объясняет `refX` (где путь кончается относительно фигуры) и `context-stroke`.
+`circle-closed`, `diamond`, `diamond-closed`, `bar` как `ng-template marker`, edges со строковыми типами и с
+объектом `{ type: 'diamond', width: 24 }`, `connection.marker` строкой. Это закрывает запрос на новые типы без
+расширения библиотеки. Раздел объясняет контракт фигуры, `inset` и наследование stroke.
 
 Страница labels получает пример с `orient: 'path'` на bezier и smooth-step. Страница curves упоминает
 `angle` в `labelPoints`.
 
 ## Не меняется
 
-Встроенные типы `arrow` и `arrow-closed`, их геометрия и инсет (`markerTipInset`), `MARKER_DEFAULT_SIZE`,
-хэш-id, `Marker.markerUnits` (инсет при `strokeWidth` считается как для `userSpaceOnUse` — отдельная тема),
+Встроенные типы `arrow` и `arrow-closed`, их геометрия и инсет, `MARKER_DEFAULT_SIZE`, хэш-id,
+`Marker.markerUnits` (инсет при `strokeWidth` считается как для `userSpaceOnUse` — отдельная тема),
 контекст label (его по-прежнему нет), позиция label `start`/`center`/`end` и её точки на встроенных кривых.
 
 ## Миграция

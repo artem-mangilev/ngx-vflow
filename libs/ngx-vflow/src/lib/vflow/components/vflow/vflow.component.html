@@ -19,7 +19,7 @@
     <div #viewportElement class="vflow-viewport">
       <!-- Shared marker defs -->
       <svg class="vflow-defs-svg" aria-hidden="true">
-        <defs flowDefs [markers]="markers()" />
+        <defs flowDefs [markers]="markers()" [shapes]="markerShapes()" />
       </svg>
 
       <!-- Overlays: connection line, selection box, alignment helper (flow coords) -->

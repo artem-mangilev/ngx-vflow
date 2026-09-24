@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars -- Angular template context guards use parameters only in type predicates. */
-import { Directive, TemplateRef, effect, inject, input, isDevMode, untracked } from '@angular/core';
+import { Directive, TemplateRef, effect, inject, input, isDevMode, numberAttribute, untracked } from '@angular/core';
 import { ConnectionContext, EdgeContext, NodeContext } from '../interfaces/template-context.interface';
 import { EdgeLabelOrient, EdgeLabelPosition } from '../interfaces/edge-label.interface';
 import { EdgeComponent } from '../components/edge/edge.component';
@@ -116,6 +116,35 @@ export class EdgeLabelTemplateDirective {
       });
     }
   }
+}
+
+/**
+ * A marker shape of the application, by type. The flow renders one `<marker>` element per distinct marker of that
+ * type, with the size and orientation the marker asks for and the stroke of the edge; the template is the shape
+ * inside it. Draw in the viewBox `-10 -10 20 20` with the tip at `x = 0` and the body towards negative `x`; give
+ * `fill="none"` or `fill="context-stroke"` yourself, stroke properties inherit from the marker element.
+ *
+ * ```html
+ * <ng-template marker="diamond" inset="9">
+ *   <svg:polygon fill="context-stroke" points="0,0 -5,-5 -10,0 -5,5" />
+ * </ng-template>
+ * ```
+ *
+ * `inset` is where the path ends, in marker units before the tip: one unit inside the back of the shape, the line
+ * ends under its stroke.
+ */
+@Directive({
+  standalone: true,
+  selector: 'ng-template[marker]',
+})
+export class MarkerTemplateDirective {
+  public templateRef = inject<TemplateRef<void>>(TemplateRef);
+
+  /** Type of the markers that render this shape. */
+  public marker = input.required<string>();
+
+  /** Marker units between the path end and the tip of the shape. */
+  public inset = input(0, { transform: numberAttribute });
 }
 
 /** Presentation of every node without a `component`. */

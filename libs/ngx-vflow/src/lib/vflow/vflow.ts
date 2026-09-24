@@ -13,6 +13,7 @@ import {
   ConnectionTemplateDirective,
   EdgeLabelTemplateDirective,
   EdgeTemplateDirective,
+  MarkerTemplateDirective,
   NodeTemplateDirective,
 } from './directives/template.directive';
 import { ConnectionControllerDirective } from './directives/connection-controller.directive';
@@ -41,4 +42,5 @@ export const Vflow = [
   EdgeLabelTemplateDirective,
   EdgeTemplateDirective,
   ConnectionTemplateDirective,
+  MarkerTemplateDirective,
 ] as const;

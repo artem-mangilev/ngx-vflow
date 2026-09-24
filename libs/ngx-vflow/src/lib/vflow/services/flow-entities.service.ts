@@ -2,8 +2,9 @@ import { Injectable, Signal, WritableSignal, computed, signal } from '@angular/c
 import { NodeModel } from '../models/node.model';
 import { EdgeModel } from '../models/edge.model';
 import { ConnectionModel } from '../models/connection.model';
-import { Marker } from '../interfaces/marker.interface';
-import { hashCode } from '../utils/hash';
+import { Marker, MarkerRef } from '../interfaces/marker.interface';
+import { markerId, normalizeMarker } from '../utils/marker-ref';
+import { MarkerShapes } from '../utils/marker-inset';
 import { FlowEntity } from '../interfaces/flow-entity.interface';
 import { MinimapModel } from '../models/minimap.model';
 import { Node } from '../interfaces/node.interface';
@@ -58,27 +59,25 @@ export class FlowEntitiesService {
 
   public readonly connection = signal<ConnectionModel>(new ConnectionModel({}));
 
+  /** Marker shapes declared with `ng-template[marker]`, by type; set by the flow component. */
+  public readonly markerShapes = signal<MarkerShapes>(new Map());
+
+  /** Distinct markers of the edges and the connection line, by the id of their shared `<marker>` element. */
   public readonly markers = computed(() => {
     const markersMap = new Map<number, Marker>();
+    const add = (marker: MarkerRef | undefined) => {
+      if (marker) {
+        markersMap.set(markerId(marker), normalizeMarker(marker));
+      }
+    };
 
     this.validEdges().forEach((e) => {
       const markers = e.markers();
-      if (markers?.start) {
-        const hash = hashCode(JSON.stringify(markers.start));
-        markersMap.set(hash, markers.start);
-      }
-
-      if (markers?.end) {
-        const hash = hashCode(JSON.stringify(markers.end));
-        markersMap.set(hash, markers.end);
-      }
+      add(markers?.start);
+      add(markers?.end);
     });
 
-    const connectionMarker = this.connection().settings.marker;
-    if (connectionMarker) {
-      const hash = hashCode(JSON.stringify(connectionMarker));
-      markersMap.set(hash, connectionMarker);
-    }
+    add(this.connection().settings.marker);
 
     return markersMap;
   });

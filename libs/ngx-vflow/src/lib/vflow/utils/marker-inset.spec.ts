@@ -5,6 +5,19 @@ describe('markerInset', () => {
     expect(markerInset(undefined)).toBe(0);
   });
 
+  it('should take the inset of a declared shape and zero for an unknown type', () => {
+    const shapes = new Map([['diamond', { template: null as never, inset: 10 }]]);
+
+    expect(markerInset('diamond')).toBe(0);
+    expect(markerInset('diamond', shapes)).toBe((10 * 16.5) / 20);
+    expect(markerInset({ type: 'diamond', width: 20 }, shapes)).toBe(10);
+    expect(markerInset({ type: 'unknown', width: 20 }, shapes)).toBe(0);
+  });
+
+  it('should accept the type alone as a shorthand', () => {
+    expect(markerInset('arrow', new Map())).toBe(markerInset({ type: 'arrow' }));
+  });
+
   it('should end the path at the base of a closed arrow', () => {
     expect(markerTipInset({ type: 'arrow-closed' })).toBe(7);
     expect(markerTipInset({})).toBe(7);
