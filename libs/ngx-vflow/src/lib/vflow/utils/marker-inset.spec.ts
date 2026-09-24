@@ -1,4 +1,4 @@
-import { insetPoint, markerInset, markerTipInset } from './marker-inset';
+import { insetPoint, markerInset, markerScale, markerSize, markerStrokeWidth, markerTipInset } from './marker-inset';
 
 describe('markerInset', () => {
   it('should be zero without a marker', () => {
@@ -33,6 +33,22 @@ describe('markerInset', () => {
   it('should scale the inset with the marker width', () => {
     expect(markerInset({ type: 'arrow', width: 40 })).toBe(4);
     expect(markerInset({ type: 'arrow' })).toBeCloseTo(1.65);
+  });
+
+  it('should stroke shapes strokeWidth flow units wide at any marker size, 2 by default', () => {
+    expect(markerStrokeWidth({ width: 20 })).toBe(2);
+    expect(markerStrokeWidth({ width: 40 })).toBe(1);
+    expect(markerStrokeWidth({ width: 20, strokeWidth: 3 })).toBe(3);
+    expect(markerStrokeWidth({}) * 16.5).toBeCloseTo(40);
+  });
+
+  it('should scale by the smaller side of a marker that is not square, one side setting both', () => {
+    expect(markerSize({ width: 20 })).toEqual({ width: 20, height: 20 });
+    expect(markerSize({ height: 30 })).toEqual({ width: 30, height: 30 });
+    expect(markerSize({})).toEqual({ width: 16.5, height: 16.5 });
+    expect(markerScale({ width: 40, height: 20 })).toBe(1);
+    expect(markerStrokeWidth({ width: 40, height: 20 })).toBe(2);
+    expect(markerInset({ type: 'arrow', width: 40, height: 20 })).toBe(2);
   });
 
   it('should move a point away from its node along the handle side', () => {

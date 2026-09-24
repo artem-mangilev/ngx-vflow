@@ -1,15 +1,15 @@
 import { ChangeDetectionStrategy, Component, effect, input, isDevMode } from '@angular/core';
 import { KeyValuePipe, NgTemplateOutlet } from '@angular/common';
 import { MARKER_DEFAULT_TYPE, Marker } from '../../interfaces/marker.interface';
-import { MARKER_DEFAULT_SIZE, MarkerShapes, markerTipInset } from '../../utils/marker-inset';
+import { MarkerShapes, markerSize, markerStrokeWidth, markerTipInset } from '../../utils/marker-inset';
 
 const BUILT_IN_TYPES = new Set<string>(['arrow', 'arrow-closed']);
 
 /**
  * Shared `<marker>` elements of the flow, one per distinct marker of its edges and connection line. The element is
  * the library's for every type: it sets the viewBox, size, orientation, `refX` from the inset of the shape, and the
- * stroke of the edge as inherited presentation attributes, which application CSS may override through the
- * `vflow-marker` and `vflow-marker--<type>` classes. Built-in shapes render inline; other types render the shape
+ * stroke of the edge as inherited presentation attributes, `strokeWidth` flow units wide whatever the marker
+ * size; application CSS may override them through the `vflow-marker` and `vflow-marker--<type>` classes. Built-in shapes render inline; other types render the shape
  * the application declared with `ng-template[marker]`.
  */
 @Component({
@@ -23,12 +23,15 @@ export class DefsComponent {
 
   public shapes = input.required<MarkerShapes>();
 
-  protected readonly defaultSize = MARKER_DEFAULT_SIZE;
   protected readonly defaultType = MARKER_DEFAULT_TYPE;
+
+  protected readonly size = markerSize;
 
   protected tipInset(marker: Marker): number {
     return markerTipInset(marker, this.shapes());
   }
+
+  protected readonly strokeWidth = markerStrokeWidth;
 
   constructor() {
     if (isDevMode()) {

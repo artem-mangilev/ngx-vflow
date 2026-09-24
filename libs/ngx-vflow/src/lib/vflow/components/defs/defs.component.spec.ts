@@ -85,8 +85,11 @@ describe('Flow defs', () => {
     ]);
     for (const marker of markers) {
       expect(marker.getAttribute('stroke')).toBe('context-stroke');
-      expect(marker.getAttribute('stroke-width')).toBe('2');
       expect(marker.getAttribute('viewBox')).toBe('-10 -10 20 20');
+      // The stroke renders 2 flow units wide whatever the marker size.
+      const width = Number(marker.getAttribute('markerWidth'));
+      expect((Number(marker.getAttribute('stroke-width')) * width) / 20).toBeCloseTo(2);
+      expect(marker.getAttribute('markerUnits')).toBe('userSpaceOnUse');
     }
   });
 

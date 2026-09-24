@@ -18,6 +18,6 @@ test('declared marker shapes render in the shared defs and edges reference them 
   }));
   const edge = demo.locator(`svg[edge] path[marker-start="url(#${ids.bar})"]`).first();
   await expect(edge).toHaveAttribute('marker-end', `url(#${ids.diamond})`);
-  await expect(defs.locator('marker.vflow-marker--diamond')).toHaveAttribute('refX', '-9');
+  await expect(defs.locator('marker.vflow-marker--diamond')).toHaveAttribute('refX', '-8');
   await expect(defs.locator('marker.vflow-marker--diamond')).toHaveAttribute('stroke', 'context-stroke');
 });

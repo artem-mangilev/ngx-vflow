@@ -66,6 +66,7 @@ export class CustomEdgesDemoComponent {
           type: 'arrow-closed',
           width: 30,
           height: 30,
+          strokeWidth: 3,
         },
       }),
     },

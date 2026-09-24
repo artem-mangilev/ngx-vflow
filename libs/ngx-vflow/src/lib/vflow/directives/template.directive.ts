@@ -121,17 +121,18 @@ export class EdgeLabelTemplateDirective {
 /**
  * A marker shape of the application, by type. The flow renders one `<marker>` element per distinct marker of that
  * type, with the size and orientation the marker asks for and the stroke of the edge; the template is the shape
- * inside it. Draw in the viewBox `-10 -10 20 20` with the tip at `x = 0` and the body towards negative `x`; give
- * `fill="none"` or `fill="context-stroke"` yourself, stroke properties inherit from the marker element.
+ * inside it. Draw in the viewBox `-10 -10 20 20` with the tip vertex at `x = -1`, so that the stroke ends at `0`,
+ * and the body towards negative `x`; give `fill="none"` or `fill="context-stroke"` yourself, stroke properties
+ * inherit from the marker element.
  *
  * ```html
- * <ng-template marker="diamond" inset="9">
- *   <svg:polygon fill="context-stroke" points="0,0 -5,-5 -10,0 -5,5" />
+ * <ng-template marker="diamond" inset="8">
+ *   <svg:polygon fill="context-stroke" points="-1,0 -5,-4 -9,0 -5,4" />
  * </ng-template>
  * ```
  *
- * `inset` is where the path ends, in marker units before the tip: one unit inside the back of the shape, the line
- * ends under its stroke.
+ * `inset` is where the path ends, in marker units before the connection point: one unit inside the back vertex
+ * of the shape, the line ends under its stroke.
  */
 @Directive({
   standalone: true,

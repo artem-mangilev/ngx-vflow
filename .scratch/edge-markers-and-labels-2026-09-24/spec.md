@@ -62,7 +62,7 @@ export interface Marker {
   width?: number;
   height?: number;
   orient?: string;
-  markerUnits?: 'userSpaceOnUse' | 'strokeWidth';
+  strokeWidth?: number; // flow-единицы, дефолт 2
 }
 export type MarkerRef = MarkerType | Marker; // строка равна { type }
 ```
@@ -80,8 +80,8 @@ flow-единицах и глобальные стили через `ViewEncapsu
 ### D4. Фигура через `ng-template[marker]`
 
 ```html
-<ng-template marker="diamond" inset="9">
-  <svg:polygon fill="context-stroke" points="0,0 -5,-5 -10,0 -5,5" />
+<ng-template marker="diamond" inset="8">
+  <svg:polygon fill="context-stroke" points="-1,0 -5,-4 -9,0 -5,4" />
 </ng-template>
 ```
 
@@ -90,10 +90,16 @@ flow-единицах и глобальные стили через `ViewEncapsu
 `DefsComponent` и кладёт в `FlowEntitiesService.markerShapes`, откуда `EdgeModel` и `ConnectionComponent` берут
 инсет через `markerTipInset(marker, shapes)`: встроенная таблица, иначе `inset` фигуры, иначе 0.
 
-Контракт фигуры: viewBox `-10 -10 20 20`, кончик в `x = 0`, тело в минус по `x`, `fill` задаёт автор
-(`none` или `context-stroke`). `DefsComponent` рендерит `<marker>` для всех типов одинаково: viewBox, `refX =
--inset`, размер, `orient`, `markerUnits`, классы `vflow-marker` и `vflow-marker--<type>`, и презентационные
-атрибуты `stroke="context-stroke" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"`, которые
+Контракт фигуры: viewBox `-10 -10 20 20`, вершина кончика в `x = -1` (штрих доходит до 0, как у встроенных
+стрелок), тело в минус по `x`, `inset` на единицу внутри задней вершины, `fill` задаёт автор (`none` или
+`context-stroke`). Штрих маркера равен `strokeWidth` flow-единицам при любом размере (дефолт 2, толщина линии по
+умолчанию; `stroke-width = strokeWidth / scale` в единицах маркера, где `scale = min(width, height) / 20`), чтобы
+линия входила в фигуру без ступеньки; ребро с линией толще задаёт маркерам тот же `strokeWidth`. Инсет тоже
+считается через `scale`. `markerUnits` из `Marker` удалён: обёртка всегда `userSpaceOnUse`, режим `strokeWidth`
+не давал ничего, что не даёт `strokeWidth` маркера, и ломал расчёт инсета. `DefsComponent` рендерит `<marker>` для всех типов одинаково: viewBox, `refX =
+-inset`, размер, `orient`, `markerUnits="userSpaceOnUse"`, классы `vflow-marker` и `vflow-marker--<type>`, и
+презентационные
+атрибуты `stroke="context-stroke" stroke-width stroke-linecap="round" stroke-linejoin="round"`, которые
 наследуются фигурой. Стили компонента и `ViewEncapsulation.None` не нужны; CSS приложения переопределяет
 атрибуты через классы. Тип без фигуры рендерит пустой `<marker>` и предупреждает в dev-режиме.
 
@@ -112,7 +118,7 @@ flow-единицах и глобальные стили через `ViewEncapsu
 ## Не меняется
 
 Встроенные типы `arrow` и `arrow-closed`, их геометрия и инсет, `MARKER_DEFAULT_SIZE`, хэш-id,
-`Marker.markerUnits` (инсет при `strokeWidth` считается как для `userSpaceOnUse` — отдельная тема),
+
 контекст label (его по-прежнему нет), позиция label `start`/`center`/`end` и её точки на встроенных кривых.
 
 ## Миграция

@@ -5,9 +5,9 @@ import { ConnectionSettings, Edge, Node, Vflow, createEdges, createNodes } from 
 
 /**
  * Shapes the library does not ship, declared once per type and used like the built-in arrows. Every shape draws
- * in the marker viewBox with its tip at x = 0 and its body towards negative x; `inset` says how far before the tip
- * the path ends. One marker unit inside the back of the shape, the line ends under its stroke: no gap and no line
- * running through an open circle or diamond.
+ * in the marker viewBox with its tip vertex at x = -1, so that the stroke ends at the connection point, and its
+ * body towards negative x; `inset` says how far before the connection point the path ends. One marker unit
+ * inside the back vertex, the line ends under the stroke: no gap and no line running through an open shape.
  */
 @Component({
   template: `<vflow view="auto" [nodes]="nodes" [edges]="edges" [connection]="connectionSettings">
@@ -25,17 +25,17 @@ import { ConnectionSettings, Edge, Node, Vflow, createEdges, createNodes } from 
     </ng-template>
     <ng-template let-ctx edge><svg:g docsEdge [ctx]="ctx" /></ng-template>
 
-    <ng-template marker="circle" inset="9">
+    <ng-template marker="circle" inset="8">
       <svg:circle fill="none" cx="-5" cy="0" r="4" />
     </ng-template>
-    <ng-template marker="circle-closed" inset="9">
+    <ng-template marker="circle-closed" inset="8">
       <svg:circle fill="context-stroke" cx="-5" cy="0" r="4" />
     </ng-template>
-    <ng-template marker="diamond" inset="9">
-      <svg:polygon fill="none" points="0,0 -5,-5 -10,0 -5,5" />
+    <ng-template marker="diamond" inset="8">
+      <svg:polygon fill="none" points="-1,0 -5,-4 -9,0 -5,4" />
     </ng-template>
-    <ng-template marker="diamond-closed" inset="9">
-      <svg:polygon fill="context-stroke" points="0,0 -5,-5 -10,0 -5,5" />
+    <ng-template marker="diamond-closed" inset="8">
+      <svg:polygon fill="context-stroke" points="-1,0 -5,-4 -9,0 -5,4" />
     </ng-template>
     <ng-template marker="bar" inset="1">
       <svg:line x1="-1" y1="-6" x2="-1" y2="6" />

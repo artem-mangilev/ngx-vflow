@@ -4,10 +4,33 @@ import { Point } from '../interfaces/point.interface';
 import { Position } from '../types/position.type';
 
 /** Side of the marker viewBox (`-10 -10 20 20`), in marker units. */
-const MARKER_VIEWBOX_SIZE = 20;
+export const MARKER_VIEWBOX_SIZE = 20;
 
 /** Default `markerWidth` and `markerHeight` of the flow markers. */
 export const MARKER_DEFAULT_SIZE = 16.5;
+
+/** Default stroke width of the marker shapes in flow units: the width of the default edge line. */
+export const MARKER_DEFAULT_STROKE_WIDTH = 2;
+
+/** Rendered size of a marker in flow units: one given side sets both, none gives the default square. */
+export function markerSize(marker: Marker): { width: number; height: number } {
+  return {
+    width: marker.width ?? marker.height ?? MARKER_DEFAULT_SIZE,
+    height: marker.height ?? marker.width ?? MARKER_DEFAULT_SIZE,
+  };
+}
+
+/** Flow units per marker unit: the viewBox scales uniformly to the smaller side of the marker. */
+export function markerScale(marker: Marker): number {
+  const { width, height } = markerSize(marker);
+
+  return Math.min(width, height) / MARKER_VIEWBOX_SIZE;
+}
+
+/** `stroke-width` of the shapes of `marker` in marker units, so that it renders as `strokeWidth` flow units. */
+export function markerStrokeWidth(marker: Marker): number {
+  return (marker.strokeWidth ?? MARKER_DEFAULT_STROKE_WIDTH) / markerScale(marker);
+}
 
 /**
  * Marker units between the path end (`refX`) and the arrow tip, per built-in shape. The path stops this far before
@@ -43,7 +66,7 @@ export function markerInset(ref: MarkerRef | undefined, shapes?: MarkerShapes): 
 
   const marker = typeof ref === 'string' ? { type: ref } : ref;
 
-  return (markerTipInset(marker, shapes) * (marker.width ?? MARKER_DEFAULT_SIZE)) / MARKER_VIEWBOX_SIZE;
+  return markerTipInset(marker, shapes) * markerScale(marker);
 }
 
 /** Moves a handle point away from its node by `distance` along the axis of `position`. */

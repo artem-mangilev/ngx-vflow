@@ -9,7 +9,7 @@ export function normalizeMarker(ref: MarkerRef): Marker {
   if (source.width !== undefined) marker.width = source.width;
   if (source.height !== undefined) marker.height = source.height;
   if (source.orient !== undefined) marker.orient = source.orient;
-  if (source.markerUnits !== undefined) marker.markerUnits = source.markerUnits;
+  if (source.strokeWidth !== undefined) marker.strokeWidth = source.strokeWidth;
 
   return marker;
 }
