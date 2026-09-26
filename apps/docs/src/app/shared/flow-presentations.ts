@@ -60,7 +60,11 @@ interface EdgeCtx {
       </div>
     } @else {
       <div vflowNode class="card" selectable [vflowSelected]="ctx().selected() || ctx().preselected()">
-        <span [innerHTML]="text()"></span>
+        @if (html()) {
+          <span [innerHTML]="text()"></span>
+        } @else {
+          <span>{{ text() }}</span>
+        }
         <span vflowPort handleType="target" position="left"></span>
         <span vflowPort handleType="source" position="right"></span>
       </div>
@@ -72,6 +76,8 @@ export class DocsNodeComponent {
   protected readonly isGroup = computed(() => this.ctx().data()?.type === 'group');
   protected readonly title = computed(() => this.ctx().data()?.text ?? this.ctx().data()?.title ?? '');
   protected readonly text = computed(() => this.ctx().data()?.text ?? this.ctx().data()?.title ?? this.ctx().node.id);
+  /** Only markup goes through the HTML sanitizer: it parses every value with a DOM parser, which adds up in large graphs. */
+  protected readonly html = computed(() => /<[a-z!/]/i.test(this.text()));
 }
 
 /**

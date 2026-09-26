@@ -15,6 +15,7 @@ import {
   input,
   effect,
   ElementRef,
+  afterNextRender,
 } from '@angular/core';
 import { Node } from '../../interfaces/node.interface';
 import { ViewportGesturesDirective } from '../../directives/viewport-gestures.directive';
@@ -22,7 +23,7 @@ import { ViewportVisibilityDirective } from '../../directives/viewport-visibilit
 import { DraggableService } from '../../services/draggable.service';
 import { NodeModel } from '../../models/node.model';
 import { ViewportService } from '../../services/viewport.service';
-import { toObservable, outputFromObservable } from '@angular/core/rxjs-interop';
+import { toObservable, outputFromObservable, takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Edge } from '../../interfaces/edge.interface';
 import { EdgeModel } from '../../models/edge.model';
 import {
@@ -192,11 +193,19 @@ export class VflowComponent {
     effect(() => {
       const { x, y, zoom } = this.viewportService.readableViewport();
       // Camera movement must not reconcile every node, edge and label.
-      const viewport = this.viewportElement().nativeElement;
-      viewport.style.transform = `translate(${x}px, ${y}px) scale(${zoom})`;
-      // Lets scaled content keep screen-sized details, such as the node focus ring.
-      viewport.style.setProperty('--vflow-zoom', String(zoom));
+      this.viewportElement().nativeElement.style.transform = `translate(${x}px, ${y}px) scale(${zoom})`;
     });
+
+    // Lets scaled application content keep screen-sized details. The token is inherited by every element of the
+    // viewport, so a change recomputes the style of all of them; it is written once per gesture, not per frame.
+    // The node focus ring, which must follow every frame, reads the token from its own node instead.
+    afterNextRender(() => this.writeZoomToken());
+    this.viewportService.viewportChangeEnd$.pipe(takeUntilDestroyed()).subscribe(() => this.writeZoomToken());
+  }
+
+  private writeZoomToken() {
+    const zoom = this.viewportService.readableViewport().zoom;
+    this.viewportElement().nativeElement.style.setProperty('--vflow-zoom', String(zoom));
   }
 
   // #endregion
@@ -434,7 +443,7 @@ export class VflowComponent {
 
     this.flowEntitiesService.nodes.set(models);
 
-    models.forEach((model) => this.nodeRenderingService.pullNode(model));
+    this.nodeRenderingService.pullNodes(models);
   }
 
   public alignmentHelper = input<AlignmentHelperSettings | boolean>(false);

@@ -1,4 +1,4 @@
-import { Injectable, computed, effect, inject } from '@angular/core';
+import { Injectable, computed, effect, inject, untracked } from '@angular/core';
 import { FlowEntitiesService } from './flow-entities.service';
 import { NodeModel } from '../models/node.model';
 import { FlowSettingsService } from './flow-settings.service';
@@ -53,11 +53,25 @@ export class NodeRenderingService {
   }
 
   public pullNode(node: NodeModel) {
+    this.pull(node, (parent) => parent.children());
+  }
+
+  /**
+   * Pulls every node in order. The children map is read once: every `renderOrder` write invalidates the
+   * reactive epoch, so reading a computed with a producer per node after each write would poll all of them again.
+   */
+  public pullNodes(nodes: NodeModel[]) {
+    const byParent = untracked(() => this.flowEntitiesService.nodesByParentIdMap());
+    const children = (parent: NodeModel) => byParent.get(parent.rawNode.id) ?? [];
+    for (const node of nodes) this.pull(node, children);
+  }
+
+  private pull(node: NodeModel, children: (parent: NodeModel) => NodeModel[]) {
     this.maxOrder++;
     // pull node
     node.renderOrder.set(this.maxOrder);
 
     // pull children
-    node.children().forEach((n) => this.pullNode(n));
+    children(node).forEach((n) => this.pull(n, children));
   }
 }

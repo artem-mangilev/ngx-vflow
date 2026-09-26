@@ -12,6 +12,12 @@
       "runtimeExecutable": "npx",
       "runtimeArgs": ["nx", "serve", "docs", "--port", "4201"],
       "port": 4201
+    },
+    {
+      "name": "docs-prod",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["nx", "serve", "docs", "--configuration", "production", "--port", "4300"],
+      "port": 4300
     }
   ]
 }

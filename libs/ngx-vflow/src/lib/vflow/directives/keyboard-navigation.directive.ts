@@ -1,4 +1,4 @@
-import { Directive, ElementRef, afterRenderEffect, contentChildren, inject } from '@angular/core';
+import { Directive, ElementRef, afterRenderEffect, contentChildren, inject, signal, untracked } from '@angular/core';
 import { NodeModel } from '../models/node.model';
 import { EdgeModel } from '../models/edge.model';
 import { KeyboardService } from '../services/keyboard.service';
@@ -39,7 +39,7 @@ export class KeyboardNavigationDirective {
   private entityCommands = inject(KeyboardEntityCommandsService);
   private viewportCommands = inject(KeyboardViewportCommandsService);
   private previous: readonly KeyboardEntityDirective[] = [];
-  private focused?: { entity: KeyboardEntityDirective; target: Element };
+  private focused = signal<{ entity: KeyboardEntityDirective; target: Element } | undefined>(undefined);
 
   /** Every command in the order a press consults them. */
   private readonly commands: KeyboardCommand[] = [
@@ -69,25 +69,26 @@ export class KeyboardNavigationDirective {
   ];
 
   constructor() {
+    // Tracks the entity list and the focused entity only. Reading the eligibility of every entity here would
+    // subscribe one consumer to thousands of signals and rerun it on every culling change.
     afterRenderEffect(() => {
       const entities = this.entities();
-      const eligible = entities.filter(
-        (entity) => entity.vflowKeyboardEntity().focusable() && !entity.vflowKeyboardEntity().culled(),
-      );
+      const focused = this.focused();
       const previous = this.previous;
       this.previous = entities;
-      if (!this.focused) return;
-      const { entity, target } = this.focused;
-      if (entities.includes(entity) && (eligible.includes(entity) || target !== entity.element)) return;
-      const active = this.element.ownerDocument.activeElement;
-      this.focused = undefined;
-      if (active && active !== target && active !== this.element.ownerDocument.body) return;
-      const index = previous.indexOf(entity);
-      const next =
-        [...previous.slice(index + 1), ...previous.slice(0, index).reverse()].find((candidate) =>
-          eligible.includes(candidate),
-        ) ?? eligible[0];
-      (next?.element ?? this.element).focus({ preventScroll: true });
+      if (!focused) return;
+      const { entity, target } = focused;
+      if (entities.includes(entity) && (isEligible(entity) || target !== entity.element)) return;
+      untracked(() => {
+        const active = this.element.ownerDocument.activeElement;
+        this.focused.set(undefined);
+        if (active && active !== target && active !== this.element.ownerDocument.body) return;
+        const index = previous.indexOf(entity);
+        const next =
+          [...previous.slice(index + 1), ...previous.slice(0, index).reverse()].find(isEligible) ??
+          entities.find(isEligible);
+        (next?.element ?? this.element).focus({ preventScroll: true });
+      });
     });
   }
 
@@ -124,7 +125,7 @@ export class KeyboardNavigationDirective {
   protected onFocusIn(event: FocusEvent) {
     const target = event.composedPath()[0];
     const entity = this.entities().find((entry) => target instanceof Element && entry.element.contains(target));
-    this.focused = entity && target instanceof Element ? { entity, target } : undefined;
+    this.focused.set(entity && target instanceof Element ? { entity, target } : undefined);
   }
 
   protected resetScroll() {
@@ -135,7 +136,13 @@ export class KeyboardNavigationDirective {
 
   protected onFocusOut(event: FocusEvent) {
     if (event.relatedTarget instanceof Element && !this.element.contains(event.relatedTarget)) {
-      this.focused = undefined;
+      this.focused.set(undefined);
     }
   }
+}
+
+/** A Tab stop that keyboard focus may land on: focusable and, under virtualization, in layout. */
+function isEligible(entity: KeyboardEntityDirective): boolean {
+  const model = entity.vflowKeyboardEntity();
+  return model.focusable() && !model.culled();
 }
