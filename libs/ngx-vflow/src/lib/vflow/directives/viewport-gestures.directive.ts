@@ -13,8 +13,14 @@ import { wheelPanDelta, wheelZoomFactor } from '../gestures/wheel';
 import { ViewportAnimation, animateViewport } from '../gestures/viewport-animation';
 import { TouchAnchor, touchCenter, touchViewport } from '../gestures/pinch';
 
-/** A wheel gesture ends when no wheel event arrives for this long. */
+/** A wheel gesture ends when no wheel event arrives for this long and the zoom has settled. */
 const WHEEL_IDLE_MS = 150;
+/** Time constant of the wheel zoom easing: the remaining distance to the target shrinks by e every this many ms. */
+const WHEEL_ZOOM_TAU_MS = 60;
+/** Nominal age of the first easing step, so that a wheel event moves the viewport within its own frame. */
+const WHEEL_ZOOM_FIRST_STEP_MS = 16;
+/** The easing snaps to its target within this distance, in natural-log zoom units (0.1 %). */
+const WHEEL_ZOOM_EPSILON = 1e-3;
 /** Duration of the double-click zoom animation. */
 const DOUBLE_CLICK_DURATION_MS = 250;
 /** A second tap within this time after the first press is a double tap. */
@@ -24,6 +30,16 @@ const DOUBLE_TAP_DISTANCE = 10;
 
 const NO_WHEEL = '[data-vflow-no-wheel]';
 const NO_PAN = '[data-vflow-no-pan], [data-vflow-no-drag]';
+
+/** A wheel zoom in progress: the events set the target, animation frames move the viewport towards it. */
+interface WheelZoom {
+  target: number;
+  /** Pane point whose flow point stays in place: the pointer at the latest wheel event. */
+  anchor: Point;
+  /** Time of the previous easing step. */
+  last: number;
+  frame: number | null;
+}
 
 interface TouchGesture {
   /** At most two touches take part, in the order they joined. */
@@ -73,6 +89,8 @@ export class ViewportGesturesDirective implements OnInit, OnDestroy {
   private animation: ViewportAnimation | null = null;
 
   private wheelTimer: ReturnType<typeof setTimeout> | null = null;
+  private wheelZoom: WheelZoom | null = null;
+  private wheelTarget: EventTarget | null = null;
 
   private dragTarget: EventTarget | null = null;
   private dragPoint: Point | null = null;
@@ -126,6 +144,8 @@ export class ViewportGesturesDirective implements OnInit, OnDestroy {
     this.drag?.destroy();
     this.animation?.interrupt();
     if (this.wheelTimer !== null) clearTimeout(this.wheelTimer);
+    if (this.wheelZoom?.frame != null) cancelAnimationFrame(this.wheelZoom.frame);
+    this.wheelZoom = null;
     this.stopTrackingTouches();
   }
 
@@ -183,6 +203,7 @@ export class ViewportGesturesDirective implements OnInit, OnDestroy {
     const animation = this.animation;
     this.animation = null;
     animation?.interrupt();
+    this.stopWheelZoom();
   }
   // #endregion
 
@@ -222,12 +243,13 @@ export class ViewportGesturesDirective implements OnInit, OnDestroy {
       : this.keyboard.isActiveModifier('zoomActivation') || this.settings.zoomOnScroll();
     if (!allowed) return;
 
-    const current = this.current();
-    const zoom = this.clamp(current.zoom * wheelZoomFactor(event));
+    // Each event moves the target by its step; a zoom still easing towards its target accumulates.
+    const from = this.wheelZoom?.target ?? this.current().zoom;
+    const zoom = this.clamp(from * wheelZoomFactor(event));
 
     if (this.wheelTimer !== null) {
       clearTimeout(this.wheelTimer);
-    } else if (zoom === current.zoom) {
+    } else if (zoom === from) {
       // A new gesture that cannot zoom leaves the event to the page, which can scroll at a zoom limit.
       return;
     } else {
@@ -237,12 +259,77 @@ export class ViewportGesturesDirective implements OnInit, OnDestroy {
 
     event.preventDefault();
     event.stopImmediatePropagation();
-    const target = event.target;
+    this.wheelTarget = event.target;
     this.wheelTimer = setTimeout(() => {
       this.wheelTimer = null;
-      this.finish(target);
+      this.finishWheel();
     }, WHEEL_IDLE_MS);
-    this.set(zoomAround(current, zoom, this.panePoint(event)));
+    const anchor = this.panePoint(event);
+    if (event.ctrlKey) {
+      // A pinch is direct manipulation: it follows the fingers at once.
+      this.stopWheelZoom();
+      this.set(zoomAround(this.current(), zoom, anchor));
+    } else {
+      this.easeWheelZoom(zoom, anchor);
+    }
+  }
+
+  /**
+   * Wheel zoom eases towards its target: a mouse wheel notch glides instead of jumping, and a burst of trackpad
+   * events costs one viewport update per frame. The first step runs within the event, so the response is immediate.
+   */
+  private easeWheelZoom(target: number, anchor: Point) {
+    const state = this.wheelZoom;
+    if (state) {
+      state.target = target;
+      state.anchor = anchor;
+      return;
+    }
+    const now = performance.now();
+    this.wheelZoom = { target, anchor, last: now - WHEEL_ZOOM_FIRST_STEP_MS, frame: null };
+    this.stepWheelZoom(now);
+  }
+
+  private stepWheelZoom(now: number) {
+    const state = this.wheelZoom;
+    if (!state || this.destroyed) return;
+    const current = this.current();
+    const remaining = Math.log(state.target / current.zoom);
+    const zoom =
+      Math.abs(remaining) < WHEEL_ZOOM_EPSILON
+        ? state.target
+        : current.zoom * Math.exp(remaining * (1 - Math.exp(-(now - state.last) / WHEEL_ZOOM_TAU_MS)));
+    state.last = now;
+    this.set(zoomAround(current, zoom, state.anchor));
+    if (zoom === state.target) {
+      this.wheelZoom = null;
+      this.finishWheel();
+    } else {
+      state.frame = this.zone.runOutsideAngular(() =>
+        requestAnimationFrame((time) => {
+          state.frame = null;
+          this.stepWheelZoom(time);
+        }),
+      );
+    }
+  }
+
+  /** Lands the viewport where the wheel sent it; another gesture takes over from there. */
+  private stopWheelZoom() {
+    const state = this.wheelZoom;
+    if (!state) return;
+    if (state.frame !== null) cancelAnimationFrame(state.frame);
+    this.wheelZoom = null;
+    this.set(zoomAround(this.current(), state.target, state.anchor));
+    this.finishWheel();
+  }
+
+  /** The wheel gesture ends once the events stopped and the easing settled, whichever comes last. */
+  private finishWheel() {
+    if (this.wheelTimer !== null || this.wheelZoom !== null) return;
+    const target = this.wheelTarget;
+    this.wheelTarget = null;
+    this.finish(target);
   }
   // #endregion
 
