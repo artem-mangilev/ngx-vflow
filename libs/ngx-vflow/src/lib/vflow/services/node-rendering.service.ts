@@ -13,19 +13,11 @@ export class NodeRenderingService {
   private viewportService = inject(ViewportService);
   private maxOrder = 0;
 
-  public readonly nodes = computed(() => {
-    return this.flowEntitiesService
-      .nodes()
-      .filter((node) => !node.culled())
-      .sort((a, b) => a.renderOrder() - b.renderOrder());
-  });
+  public readonly nodes = computed(() =>
+    byRenderOrder(this.flowEntitiesService.nodes().filter((node) => !node.culled())),
+  );
 
-  public readonly groups = computed(() => {
-    return this.flowEntitiesService
-      .nodes()
-      .filter((n) => isGroupNode(n))
-      .sort((a, b) => a.renderOrder() - b.renderOrder());
-  });
+  public readonly groups = computed(() => byRenderOrder(this.flowEntitiesService.nodes().filter(isGroupNode)));
 
   public viewportNodes = computed(() => {
     const nodes = this.flowEntitiesService.nodes();
@@ -74,4 +66,15 @@ export class NodeRenderingService {
     // pull children
     children(node).forEach((n) => this.pull(n, children));
   }
+}
+
+/**
+ * Reads each order once before sorting. A comparator that reads signals reads each one many times out of order,
+ * and in a live consumer every such read walks all of its producers.
+ */
+function byRenderOrder(nodes: NodeModel[]): NodeModel[] {
+  return nodes
+    .map((node) => ({ node, order: node.renderOrder() }))
+    .sort((a, b) => a.order - b.order)
+    .map(({ node }) => node);
 }
