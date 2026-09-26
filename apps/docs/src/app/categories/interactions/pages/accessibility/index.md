@@ -1,26 +1,61 @@
-Graph entities have readable names, relationships and state descriptions. This example includes template nodes, a visual group, template edges, a minimap and a second graph.
+The graph can be read and operated without a pointer. The flow is a named region, every node and edge is a named `group` whose state sits in its description, and keyboard commands report what they did in a live region. The example mirrors as text what a screen reader receives: the name and description of the focused entity, and the last announcement. Switch its language to watch the labels follow.
 
 {{ NgDocActions.demoPane("AccessibilityDemoComponent") }}
 
-## Keyboard navigation
+## What the library renders
 
-{{ NgDocActions.demoPane("KeyboardNavigationDemoComponent") }}
+| Element | Role and name                                                                                                           | Description                                                                                                       |
+| ------- | ----------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| Flow    | `region` named `flowLabel`, `Graph` by default                                                                          | `flowDescription`                                                                                                 |
+| Node    | `group` named by `ariaLabel`, else `Node {id}`; read as a `node`, or a `group` while other nodes reference it as parent | `ariaDescription`, the parent's name, `Selected.`, unavailable interactions, key instructions                     |
+| Edge    | `group` named by `ariaLabel`, else `Connection from {source} to {target}`                                               | `ariaDescription`, the endpoints when the name is custom, `Selected.`, unavailable interactions, key instructions |
+| Minimap | `img` named `minimapLabel`, `Graph minimap` by default                                                                  |                                                                                                                   |
+| Handle  | none: transparent to assistive technology                                                                               |                                                                                                                   |
 
-`Tab` and `Shift+Tab` visit focusable nodes in the input `nodes` order, then edges in the input `edges` order. Parent relationships and visual elevation do not reorder the sequence. Embedded controls keep their DOM order and their own keyboard behavior. Tab leaves the graph normally; there is no focus trap. Focus has a separate visible indicator and does not change selection: a ring around the node wrapper, a dashed halo along the edge path, and an inner border on the graph container when it holds focus. The ring takes its color from `--vflow-focus`, its thickness from `--vflow-focus-width`, its distance from the node from `--vflow-focus-offset` and its corners from `--vflow-focus-radius`; set the radius to the corner radius of your node template so the ring follows its shape. The ring is drawn on the library wrapper around the template, so a value set inside the template does not reach it: set the tokens on the flow element for a uniform design, or per node from a global stylesheet, either on a `data-*` attribute the node carries through `domAttributes` (`.vflow-node[data-shape="pill"] { --vflow-focus-radius: 999px }`) or through `:has()` on a class of the template (`.vflow-node:has(.card) { --vflow-focus-radius: 12px }`).
+The tree is flat: a child names its parent in its description instead of nesting inside it, and the minimap's preview nodes do not form a second graph. Restrictions are described per interaction (`Selection unavailable.`, `Movement unavailable.`) and never as `aria-disabled` on the wrapper, so buttons and inputs inside a node stay operable. Library geometry, markers and the connection line are hidden from assistive technology; mark your own decorative SVG `aria-hidden="true"` the same way.
 
-Each row below is a command of `keyboardShortcuts.commands`. [Keyboard shortcuts](../keyboard-shortcuts) lists the keys they carry by default and how to change them; the descriptions read out with an entity name the keys that are bound at the time.
+## Naming nodes and edges
 
-| Command                         | Behavior                                                                                                                                                                                        |
-| ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `select`                        | Select the focused entity and clear the rest of the selection. While the multiselection modifier is held, toggle only the focused entity.                                                       |
-| `clearSelection`                | Clear the selection and keep focus where it is.                                                                                                                                                 |
-| `delete`                        | Emit `deleteRequest`: the whole selection when the focused entity is selected, otherwise only the focused entity. The application removes them, or ignores the request.                         |
-| `moveUp` and its three siblings | Move every selected movable node by 5 flow-space units, or 20 while Shift is held.                                                                                                              |
-| `panUp` and its three siblings  | Pan the view by 15 screen pixels in the reading direction, or 60 while Shift is held: panning right reveals what lies to the right. Runs on the graph container as well as on a focused entity. |
-| `zoomIn`, `zoomOut`             | Zoom by a factor of 1.2 around the view center, within `minZoom` and `maxZoom`.                                                                                                                 |
-| `fitView`                       | Fit the whole graph into the view.                                                                                                                                                              |
+```typescript
+import { createNodes, createEdges } from 'ngx-vflow';
 
-A deletion key on a focused node or edge emits `(deleteRequest)` with `{ nodeIds, edgeIds }`, once per press. The command acts at the point of focus: when the focused entity is selected, the request carries the whole selection; otherwise it carries only the focused entity, and a selection elsewhere stays untouched. The library does not remove anything or clear selection: apply the request with `removeNodes` and `removeEdges`, or ignore it. When the focused entity disappears, focus recovery moves focus to the next entity. The keys follow `keyboardShortcuts.commands.delete` (`Delete` and `Backspace` by default, an empty list disables the command and its instruction).
+const nodes = createNodes([
+  {
+    id: 'request',
+    point: { x: 20, y: 40 },
+    ariaLabel: 'Expense request',
+    ariaDescription: 'Requires approval.',
+    domAttributes: { 'data-record': 'request', lang: 'en' },
+  },
+  { id: 'approval', point: { x: 250, y: 40 }, ariaLabel: 'Approval' },
+]);
+const edges = createEdges([{ id: 'review', source: 'request', target: 'approval', ariaLabel: 'Review route' }]);
+
+nodes[0].ariaDescription!.set('Ready for approval.');
+```
+
+`ariaLabel`, `ariaDescription` and `domAttributes` are optional writable signals on `Node` and `Edge`. The library does not read names out of your templates, so give domain nodes a name; the fallback is the id. `domAttributes` accepts `data-*`, `title`, `lang` and `dir` and lands on the library wrapper; roles, ARIA state, ids, focus and event handlers stay library-owned, and other keys are ignored. A handle takes only `domAttributes`:
+
+```html
+<span vflowHandle handleType="target" position="left" handleId="incoming" [domAttributes]="{ 'data-port': 'review' }"></span>
+```
+
+Controls inside your templates keep their own semantics. Give custom buttons, inputs and edge-label controls labels and keyboard behavior as you would anywhere else; the library keeps them reachable, including inside resizable wrappers.
+
+## Keyboard
+
+`Tab` and `Shift+Tab` visit focusable nodes in `nodes` order, then edges in `edges` order, and leave the graph normally. Focus and selection are independent: focus has its own indicator and never changes selection by itself. Each focusable node and edge carries one short instruction in its description, written from the keys bound at that moment and naming only the commands that work for it:
+
+```text
+Press Enter or Space to select. Use arrow keys to move it while it is selected. Press Delete or Backspace to delete.
+```
+
+The keys are listed on [Keyboard shortcuts](../keyboard-shortcuts); this is what the commands do.
+
+- **Select** replaces the selection with the focused entity, or toggles it while the multiselection modifier is held. **Clear selection** empties it and keeps focus. Neither writes selection in `selectionMode="manual"`, and an entity with `selectable: false` can be deselected but not selected.
+- **Move** shifts every selected movable node by 5 flow units, 20 with Shift, or one grid cell, four with Shift, on an axis where `snapGrid` is above 1. The focused node must itself be selected and movable. Parent extents and snapping apply, position signals update and the usual position notifications fire.
+- **Delete** emits `(deleteRequest)` with `{ nodeIds, edgeIds }`: the whole selection when the focused entity is selected, otherwise only the focused entity. The library removes nothing.
+- **Pan, zoom in, zoom out and fit view** run from a focused entity and from the graph container. Arrows pan only when they do not move a node.
 
 ```html
 <vflow [nodes]="nodes" [edges]="edges" (deleteRequest)="onDeleteRequest($event)" />
@@ -34,59 +69,31 @@ onDeleteRequest({ nodeIds, edgeIds }: DeleteRequest) {
 }
 ```
 
-Viewport commands work on a focused node or edge and on the graph container itself, which receives focus after the last entity disappears. Arrow keys pan only when they do not move a node, so a selected movable node still moves. The keys follow `keyboardShortcuts.commands.zoomIn`, `zoomOut`, `fitView` and `panUp` and its three siblings; `Ctrl`, `Cmd` and `Alt` combinations are left to the browser. Panning is silent; zooming announces the resulting scale.
+A command that changes state reports it in the flow's own polite live region: `Draft selected. 1 selected in total.`, `Selection cleared.`, `Moved node right. Position: 25, 20.`, `Zoom 120%.`. Panning is silent, and so are pointer and programmatic changes. There is no public API for announcing your own messages.
 
-Keyboard commands report their outcome in the flow's own polite, atomic live region: `Child selected. 1 selected in total.`, `Selection cleared.` and `Moved node right. Position: 25, 20.` (the focused node's position after the move). Only a command that changes state is announced; pointer and programmatic changes stay silent. A key bound as a modifier through `keyboardShortcuts.modifiers`, such as `Space` for `panActivation`, is left to the gesture layer and runs no command.
+**Focus recovery.** When the focused entity is removed or stops being focusable, focus moves to the next entity, then the previous one, then the graph container. Nothing takes focus on page load.
 
-With snapping enabled on an axis (`snapGrid` value greater than 1), movement on that axis uses one cell, or four cells with Shift. The steps are fixed. Existing snapping and `extent: 'parent'` bounds apply. Selected descendants of a moving selected ancestor are not moved twice. Movement updates the application's writable position signals and emits the ordinary position change notifications; it does not synthesize pointer drag lifecycle events.
+**Focus pan.** A node that receives keyboard focus while fully offscreen is centered at the current zoom. `[autoPanOnNodeFocus]="false"` turns this off; edges and arrow movement never pan.
 
-Selection acquisition respects `selectable`; deselection remains allowed. In `selectionMode="manual"`, keyboard commands do not write selection. A focused node must itself be selected and movable to initiate movement of the selected set. Focus eligibility uses the existing node/edge `focusable` overrides and global `nodesFocusable` / `edgesFocusable` defaults. Denying wrapper focus does not disable embedded controls.
+**Opting out.** `nodesFocusable`, `edgesFocusable` and the per-entity `focusable` override remove Tab stops without affecting embedded controls. Keys pressed inside inputs, textareas, selects, contenteditable regions and buttons never run graph commands; `vflowNoKeyboard` on an element does the same for a whole area. With virtualization enabled, hidden entities are skipped by Tab and by focus recovery, so disable it where every entity must be reachable by keyboard.
 
-When a focused entity is removed or becomes non-focusable, focus moves to the next eligible entity, then the previous, then the graph container if none remain. Changes do not steal focus from elsewhere. No initial focus is taken on page load.
+## Focus ring
 
-`autoPanOnNodeFocus` defaults to `true`, independently of drag `autoPan`. A fully offscreen node receiving keyboard-visible focus is immediately centered at the current zoom. Any positive overlap with the viewport suppresses this pan, even for oversized nodes. Edge focus and movement with arrow keys do not pan. Set `[autoPanOnNodeFocus]="false"` to disable focus panning; it supports runtime changes.
+Focus is drawn as a ring around the node wrapper, a dashed halo along the edge path and an inner border on the graph container. Four tokens style it: `--vflow-focus` for the color, `--vflow-focus-width`, `--vflow-focus-offset` and `--vflow-focus-radius`. The ring stays the same size on screen at every zoom. It is drawn on the wrapper around your template, so set the tokens on the flow element, or per node from a global stylesheet:
 
-Commands from inputs, textareas, selects, contenteditable regions, buttons and other descendants do not trigger graph selection or movement. Add `vflowNoKeyboard` to an element or ancestor to opt an application area out of graph keyboard commands without changing native Tab behavior. The directive is included in `Vflow` and can also be imported as `NoKeyboardDirective`.
-
-With virtualization enabled, CSS-hidden entities are skipped by native Tab navigation and focus repair. The currently focused node or edge (including embedded node, toolbar and edge-label controls) stays in layout when the viewport moves. To reach every offscreen entity through Tab and focus auto-pan, leave virtualization disabled.
-
-## Names and descriptions
-
-The flow is a named `region`. Nodes (including visual groups) and edges are named `group` elements. The minimap is one `img` named `Graph minimap`; its preview nodes do not form a second graph in the accessibility tree. Handles are semantically transparent: no role, name or description, while their own content keeps its semantics and `domAttributes` still applies `data-*` metadata to the element.
-
-```typescript
-import { AriaLabelConfig, createNodes, createEdges } from 'ngx-vflow';
-
-const nodes = createNodes([
-  { id: 'request', point: { x: 20, y: 40 }, data: { text: 'Request' }, ariaLabel: 'Expense request', ariaDescription: 'Requires approval.', domAttributes: { 'data-record': 'request', lang: 'en' } },
-  { id: 'approval', point: { x: 250, y: 40 }, ariaLabel: 'Approval' },
-]);
-const edges = createEdges([{ id: 'review', source: 'request', target: 'approval', ariaLabel: 'Review route' }]);
-
-nodes[0].ariaDescription!.set('Ready for approval.');
+```css
+.vflow-node[data-shape='pill'] {
+  --vflow-focus-radius: 999px;
+}
 ```
-
-`ariaLabel`, `ariaDescription` and `domAttributes` are optional writable signals on `Node` and `Edge`. Both factory modes preserve supplied values. Omitted metadata remains absent, allowing generated defaults. A handle takes only `domAttributes`:
-
-```html
-<span vflowHandle handleType="target" position="left" handleId="incoming" [domAttributes]="{ 'data-port': 'review' }"></span>
-```
-
-Names prefer a nonblank `ariaLabel`, then `Node {id}` or `Group {id}`. Custom templates/components need application-supplied names; the library does not inspect their descendants. An edge defaults to `Connection from {source name} to {target name}`.
-
-The graph remains flat. A child's description identifies its direct parent by accessible name, including ordinary parent nodes. A custom edge name retains endpoint information in its description. Application descriptions supplement these relationships and library state descriptions.
-
-Actual selection is described as `Selected.` even when acquiring selection is unavailable. Unavailable selection, movement and reconnection are described separately. A restriction never sets whole-node `aria-disabled`, so embedded controls remain operable. Description changes are not announced; only keyboard commands report their outcome.
 
 ## Localization
 
-Bind a `Partial<AriaLabelConfig>` to `[ariaLabelConfig]`. Every omitted key uses its English default; replacing the configuration resets omitted overrides. Entity metadata and configuration changes update names and descriptions reactively.
+Bind a `Partial<AriaLabelConfig>` to `[ariaLabelConfig]`. Omitted keys keep their English defaults, exported as `DEFAULT_ARIA_LABEL_CONFIG`; names and descriptions update as soon as the configuration or the entity metadata changes.
 
 ```typescript
 const labels: Partial<AriaLabelConfig> = {
   flowLabel: 'Граф согласования',
-  flowDescription: 'Заявка и её согласование.',
-  minimapLabel: 'Мини-карта графа',
   selected: 'Выбран.',
   parentDescription: (parent) => `Родитель: ${parent}.`,
   edgeLabel: ({ source, target }) => `Связь от ${source} к ${target}`,
@@ -97,63 +104,32 @@ const labels: Partial<AriaLabelConfig> = {
 <vflow [nodes]="nodes" [edges]="edges" [ariaLabelConfig]="labels" />
 ```
 
-`DEFAULT_ARIA_LABEL_CONFIG` exports all defaults. Use the following keys to translate the complete library vocabulary; translate application-provided names and descriptions separately.
+| Key                                           | Default                                                                                      |
+| --------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| `flowLabel`, `flowDescription`                | `Graph`, empty                                                                               |
+| `minimapLabel`                                | `Graph minimap`                                                                              |
+| `nodeLabel`                                   | `(id) => 'Node {id}'`                                                                        |
+| `edgeLabel`                                   | `({ source, target }) => 'Connection from {source} to {target}'`                             |
+| `nodeRole`, `groupRole`, `edgeRole`           | `node`, `group`, `edge`: the `aria-roledescription` a screen reader says instead of the role |
+| `parentDescription`                           | `(parent) => 'Parent: {parent}.'`                                                            |
+| `selected`                                    | `Selected.`                                                                                  |
+| `selectionUnavailable`, `movementUnavailable` | `Selection unavailable.`, `Movement unavailable.`                                            |
+| `nodeInstructions`, `edgeInstructions`        | `(keys, state) => string`, the instruction sentences above                                   |
+| `selectionAnnouncement`                       | `({ label, selected, count }) => '{label} selected. {count} selected in total.'`             |
+| `selectionClearedAnnouncement`                | `Selection cleared.`                                                                         |
+| `movedAnnouncement`                           | `({ count, direction, x, y }) => 'Moved node {direction}. Position: {x}, {y}.'`              |
+| `zoomAnnouncement`                            | `(zoom) => 'Zoom {percent}%.'`                                                               |
 
-| Key                            | Default / formatter arguments                                                                       |
-| ------------------------------ | --------------------------------------------------------------------------------------------------- |
-| `flowLabel`                    | `Graph`                                                                                             |
-| `flowDescription`              | Empty string                                                                                        |
-| `minimapLabel`                 | `Graph minimap`                                                                                     |
-| `minimapDescription`           | Empty string                                                                                        |
-| `nodeLabel`, `groupLabel`      | `(id: string) => string`                                                                            |
-| `edgeLabel`                    | `({ source: string, target: string }) => string`                                                    |
-| `parentDescription`            | `(parent: string) => string`, default `Parent: {parent}.`                                           |
-| `selected`                     | `Selected.`                                                                                         |
-| `selectionUnavailable`         | `Selection unavailable.`                                                                            |
-| `movementUnavailable`          | `Movement unavailable.`                                                                             |
-| `reconnectionUnavailable`      | `Reconnection unavailable.`                                                                         |
-| `keyboardNavigation`           | Instructions for Tab and Shift+Tab traversal.                                                       |
-| `keyboardSelect`               | Written from `keys.select` and `keys.multiSelection`.                                               |
-| `keyboardDeselect`             | Written from `keys.clearSelection`.                                                                 |
-| `keyboardMove`                 | Written from `keys.move`; omitted when no movement command has a key.                               |
-| `keyboardDelete`               | Written from `keys.delete`; omitted when the command is disabled.                                   |
-| `keyboardPan`                  | Written from `keys.pan`; omitted when no panning command has a key.                                 |
-| `keyboardZoom`                 | Written from `keys.zoomIn`, `keys.zoomOut` and `keys.fitView`; omitted when all three are disabled. |
-| `zoomAnnouncement`             | `(zoom: number) => string`, default `Zoom {percent}%.`                                              |
-| `selectionAnnouncement`        | `({ label: string, selected: boolean, count: number }) => string`, live feedback                    |
-| `selectionClearedAnnouncement` | `Selection cleared.`                                                                                |
-| `movedAnnouncement`            | `({ count, direction: 'left' \| 'right' \| 'up' \| 'down', x, y }) => string`                       |
-
-Formatters receive plain text. Return plain text without HTML markup.
-
-Every `keyboard*` entry is either a sentence or a function of the keys that are bound right now, so an instruction follows a remap on its own:
+Formatters receive and return plain text. `nodeInstructions` and `edgeInstructions` are either a sentence or a function of the keys bound at that moment and of what the entity can do, so an instruction follows a remap on its own and never names a command that is disabled or unavailable:
 
 ```typescript
 const labels: Partial<AriaLabelConfig> = {
-  keyboardSelect: ({ select, multiSelection }) => `Press ${select} to select, or hold ${multiSelection} to toggle.`,
+  nodeInstructions: ({ select, move, delete: remove }, { selectable, movable }) => [selectable && select ? `Нажмите ${select} для выбора.` : '', movable && move ? `Перемещайте выбранный узел: ${move}.` : '', remove ? `Нажмите ${remove} для удаления.` : ''].filter(Boolean).join(' '),
 };
 ```
 
-`keys` carries `select`, `clearSelection`, `delete`, `move`, `pan`, `zoomIn`, `zoomOut`, `fitView` and `multiSelection`, each already formatted as a phrase such as `Enter or Space`. A modifier is named in words rather than glyphs, because a screen reader spells a glyph unpredictably. Key names are English; a translation that needs its own words for them supplies the whole sentence as a plain string instead, which then stays fixed whatever the keys are.
+`keys` carries `select`, `clearSelection`, `delete`, `move`, `pan`, `zoomIn`, `zoomOut`, `fitView` and `multiSelection`, each already formatted as a phrase such as `Enter or Space`, with modifiers spelled as words; a disabled command is an empty string. `state.selectable` is false for an unselectable entity and in `selectionMode="manual"`; `state.movable` is true for a draggable node that is selectable or already selected. Key names are English; a translation that wants its own words for them passes a plain string, which then stays fixed whatever the keys are.
 
-## Custom content and safe metadata
+## Limits
 
-`DomAttributes` accepts `data-*`, `title`, `lang` and `dir`. Metadata is applied to the library-owned entity wrapper; setting a value to `null` or removing it removes the attribute. Public types reject other keys, and runtime filtering ignores unsupported keys. Roles, IDs, ARIA attributes, styles, focus attributes and event handlers are owned by the library and cannot be replaced through this object. Use the dedicated name/description inputs instead.
-
-Give domain-specific nodes meaningful names. Give custom buttons, inputs, edge-label controls and handle contents their own labels, roles and keyboard behavior. The library keeps these descendants accessible, including content inside resizable wrappers. Mark your own decorative SVG paths `aria-hidden="true"`; library geometry and the auxiliary handle magnet are already excluded.
-
-Each flow owns independent description references and one polite, atomic live region that receives only the keyboard command feedback described above. There is no public arbitrary-announcement API.
-
-## Current limits
-
-Graph wrappers support the keyboard operations described above. Embedded application controls retain their native keyboard behavior. Handles are not exposed to assistive technology and the minimap has no Tab stop. This does not establish full keyboard accessibility for every graph operation.
-
-- Keyboard connection creation is currently unsupported. The issue 11 implementation was rolled back pending a new interaction design.
-- Issues 12–13 own minimap interaction and keyboard navigation.
-- Issue 14 owns accessible resize/reconnect controls. Existing library resize and reconnect controls remain pointer-only; naming their owner does not make those controls accessible.
-
-## Verification scenario
-
-Use the example above to read both graph regions, Request's parent/selection/restrictions, both edge relationships, and the minimap. Reach and activate `Review request` as an independent button and switch language. Handles are absent from the reading sequence; a pointer connection between them still works.
-
-The repository records automated checks and screen-reader availability in `docs/accessibility-verification.md`. Automated axe checks alone do not establish screen-reader usability or full keyboard operation.
+Handles are not exposed and cannot be operated from the keyboard, so creating and reconnecting edges needs a pointer. Resize controls are pointer-only and the minimap has no Tab stop. The checks that back this page, automated and with a screen reader, are recorded in `docs/accessibility-verification.md`; automated checks alone do not establish screen-reader usability.

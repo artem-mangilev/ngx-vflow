@@ -123,7 +123,7 @@ The optional `parentId` field may still be omitted from `Node` and `StaticNode`.
 | `<ng-template nodeHtml>`, `NodeHtmlTemplateDirective`                       | `<ng-template node>`, `NodeTemplateDirective`                                                     |
 | `<ng-template groupNode>`, `GroupNodeTemplateDirective`, `GroupNodeContext` | A branch of the `node` template; every node context has `width` and `height`                      |
 
-The library does not read a node kind. Keep your own discriminator in `data` and branch on it in the template. A group is any node with a size and children that reference it through `parentId`; its accessible name still defaults to `Group {id}` when it has children.
+The library does not read a node kind. Keep your own discriminator in `data` and branch on it in the template. A group is any node with a size and children that reference it through `parentId`; assistive technology reads it as a `group` while it has children.
 
 Before:
 

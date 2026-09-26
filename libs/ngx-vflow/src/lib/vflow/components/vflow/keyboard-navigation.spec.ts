@@ -5,6 +5,7 @@ import { createEdges } from '../../interfaces/edge.interface';
 import { Vflow } from '../../vflow';
 import { VflowComponent } from './vflow.component';
 import { filter, firstValueFrom, timeout } from 'rxjs';
+import { KeyboardInstructionKeys, KeyboardInstructionState } from '../../interfaces/aria-label-config.interface';
 
 @Component({
   imports: [Vflow],
@@ -279,10 +280,8 @@ describe('public keyboard graph navigation', () => {
     const { fixture, host, root } = await setup();
     const labels = {
       flowLabel: 'Граф',
-      keyboardNavigation: 'Переходите клавишей Tab.',
-      keyboardSelect: 'Выберите узел.',
-      keyboardDeselect: 'Снимите выделение.',
-      keyboardMove: 'Переместите узел.',
+      nodeInstructions: (_keys: KeyboardInstructionKeys, state: KeyboardInstructionState) =>
+        [state.selectable ? 'Выберите узел.' : '', state.movable ? 'Переместите узел.' : ''].filter(Boolean).join(' '),
     };
     host.flow().ariaLabelConfig = labels;
     fixture.detectChanges();
@@ -294,15 +293,11 @@ describe('public keyboard graph navigation', () => {
         .split(/\s+/)
         .map((id) => document.getElementById(id)!.textContent)
         .join(' ');
-    expect(description()).toContain('Переходите клавишей Tab.');
-    expect(description()).toContain('Выберите узел.');
-    expect(description()).toContain('Переместите узел.');
+    expect(description()).toBe('Parent: Parent. Выберите узел. Переместите узел.');
     host.flow().selectionMode = 'manual';
     fixture.detectChanges();
     await fixture.whenStable();
-    expect(description()).not.toContain('Выберите узел.');
-    expect(description()).not.toContain('Снимите выделение.');
-    expect(description()).toContain('Переместите узел.');
+    expect(description()).toBe('Parent: Parent. Переместите узел.');
   });
 
   it('honors eligibility, manual selection and existing parent movement extents', async () => {
@@ -453,7 +448,7 @@ describe('public keyboard graph navigation', () => {
         .split(/\s+/)
         .map((id) => document.getElementById(id)!.textContent)
         .join(' ');
-    expect(description()).toContain('Press Delete or Backspace to request deletion of this item');
+    expect(description()).toContain('Press Delete or Backspace to delete.');
     child.focus();
     // Nothing selected: only the focused entity.
     expect(key(child, 'Delete').defaultPrevented).toBeTrue();
@@ -568,12 +563,18 @@ describe('public keyboard graph navigation', () => {
         .split(/\s+/)
         .map((id) => document.getElementById(id)!.textContent)
         .join(' ');
-    expect(description()).toContain('Use arrow keys to pan the view');
-    expect(description()).toContain('Press +, = or NumpadAdd to zoom in');
+    expect(description()).not.toContain('pan');
+    expect(description()).not.toContain('zoom');
+    host.flow().ariaLabelConfig = {
+      nodeInstructions: ({ pan, zoomIn }) =>
+        [`Use ${pan} to pan.`, zoomIn ? `Press ${zoomIn} to zoom in.` : ''].filter(Boolean).join(' '),
+    };
+    await settle();
+    expect(description()).toBe('Parent: Parent. Selected. Use arrow keys to pan. Press +, = or NumpadAdd to zoom in.');
     host.flow().keyboardShortcuts = { commands: { zoomIn: [], zoomOut: [], fitView: [] } };
     await settle();
     expect(key(container, '=', 'Equal').defaultPrevented).toBeFalse();
-    expect(description()).not.toContain('Press Plus or Minus');
+    expect(description()).toBe('Parent: Parent. Selected. Use arrow keys to pan.');
   });
 
   it('merges sections and entries independently and disables an entry with an empty list', async () => {
@@ -694,18 +695,20 @@ describe('public keyboard graph navigation', () => {
         .map((id) => document.getElementById(id)!.textContent)
         .join(' ');
     // The defaults name their own keys.
-    expect(description()).toContain('Press Enter or Space to select.');
-    expect(description()).toContain('use arrow keys to move');
-    // A remap rewrites the sentence, and a group that is no longer the four arrows is spelled out.
-    host.flow().keyboardShortcuts = { commands: { select: ['x'], moveUp: ['w'], clearSelection: [] } };
+    expect(description()).toBe(
+      'Parent: Parent. Press Enter or Space to select. Use arrow keys to move it while it is selected. Press Delete or Backspace to delete.',
+    );
+    // A remap rewrites the sentence, a group that is no longer the four arrows is spelled out, and a disabled
+    // command drops its sentence.
+    host.flow().keyboardShortcuts = { commands: { select: ['x'], moveUp: ['w'], delete: [] } };
     await settle();
-    expect(description()).toContain('Press X to select.');
-    expect(description()).toContain('use W, ArrowDown, ArrowLeft or ArrowRight to move');
-    expect(description()).not.toContain('Press Escape');
+    expect(description()).toBe(
+      'Parent: Parent. Press X to select. Use W, ArrowDown, ArrowLeft or ArrowRight to move it while it is selected.',
+    );
     // A sentence of its own still wins.
-    host.flow().ariaLabelConfig = { keyboardSelect: 'Нажмите свою клавишу.' };
+    host.flow().ariaLabelConfig = { nodeInstructions: 'Нажмите свою клавишу.' };
     await settle();
-    expect(description()).toContain('Нажмите свою клавишу.');
+    expect(description()).toBe('Parent: Parent. Нажмите свою клавишу.');
   });
 
   it('does not restore stale graph focus after focus has left the graph', async () => {

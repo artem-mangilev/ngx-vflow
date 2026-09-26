@@ -7,6 +7,8 @@ import { KeyboardEntityDirective } from './keyboard-entity.directive';
 export type EntityAccessibility = {
   label: string;
   description?: string;
+  /** `aria-roledescription`, the word a screen reader says instead of the role. */
+  roleDescription?: string;
   domAttributes?: DomAttributes;
   role?: 'group' | 'region' | 'img';
 };
@@ -42,8 +44,10 @@ export function bindEntityAccessibility(source: () => EntityAccessibility): void
   const keyboard = inject(KeyboardEntityDirective, { self: true, optional: true });
 
   effect((onCleanup) => {
-    const { label, description: entityDescription = '', domAttributes, role = 'group' } = source();
+    const { label, description: entityDescription = '', roleDescription, domAttributes, role = 'group' } = source();
     element.setAttribute('role', role);
+    if (roleDescription) element.setAttribute('aria-roledescription', roleDescription);
+    else element.removeAttribute('aria-roledescription');
     const description = [entityDescription, keyboard?.description()].filter(Boolean).join(' ');
     element.setAttribute('aria-label', label);
     describer.describe(element, description);

@@ -1,185 +1,201 @@
-import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  ElementRef,
+  afterNextRender,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 import { DocsPresentations } from '@docs/shared';
-import { VflowPort } from '@vflow/ui';
-import { AriaLabelConfig, Vflow, createEdges, createNodes } from 'ngx-vflow';
+import { VflowUi } from '@vflow/ui';
+import { AriaLabelConfig, DeleteRequest, Vflow, createEdges, createNodes, removeEdges, removeNodes } from 'ngx-vflow';
 
+const SPANISH: Partial<AriaLabelConfig> = {
+  flowLabel: 'Grafo de aprobación',
+  nodeRole: 'nodo',
+  groupRole: 'grupo',
+  edgeRole: 'conexión',
+  parentDescription: (parent) => `Padre: ${parent}.`,
+  selected: 'Seleccionado.',
+  selectionUnavailable: 'Selección no disponible.',
+  movementUnavailable: 'Movimiento no disponible.',
+  nodeInstructions: ({ select, move, delete: remove }, { selectable, movable }) =>
+    [
+      selectable && select ? `Pulse ${select} para seleccionar.` : '',
+      movable && move ? `Use ${move} para moverlo mientras está seleccionado.` : '',
+      remove ? `Pulse ${remove} para eliminar.` : '',
+    ]
+      .filter(Boolean)
+      .join(' '),
+  edgeInstructions: ({ select, delete: remove }, { selectable }) =>
+    [selectable && select ? `Pulse ${select} para seleccionar.` : '', remove ? `Pulse ${remove} para eliminar.` : '']
+      .filter(Boolean)
+      .join(' '),
+  selectionAnnouncement: ({ label, selected, count }) =>
+    `${label} ${selected ? 'seleccionado' : 'deseleccionado'}. ${count} seleccionados en total.`,
+  selectionClearedAnnouncement: 'Selección borrada.',
+  movedAnnouncement: ({ count, direction, x, y }) => {
+    const where = { left: 'a la izquierda', right: 'a la derecha', up: 'hacia arriba', down: 'hacia abajo' }[direction];
+    return `${count === 1 ? 'Nodo movido' : `${count} nodos movidos`} ${where}. Posición: ${Math.round(x)}, ${Math.round(y)}.`;
+  },
+  zoomAnnouncement: (zoom) => `Zoom ${Math.round(zoom * 100)}%.`,
+};
+
+/**
+ * One graph operated from the keyboard, with what a screen reader receives mirrored as text: the name and
+ * description of the focused entity, and the last message of the live region.
+ */
 @Component({
-  imports: [DocsPresentations, Vflow, VflowPort],
+  imports: [DocsPresentations, Vflow, VflowUi],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  styles: `
+    vflow {
+      height: 320px;
+    }
+    .editor {
+      width: 220px;
+    }
+    .editor input {
+      flex: 1;
+      min-width: 0;
+      font: inherit;
+      padding: 4px 8px;
+      border: 1px solid var(--vui-border);
+      border-radius: 6px;
+      background: var(--vui-surface);
+      color: inherit;
+    }
+    .mirror {
+      display: grid;
+      grid-template-columns: max-content 1fr;
+      gap: 6px 14px;
+      margin: 0;
+      padding: 14px;
+      border-top: 1px solid var(--vui-border);
+      font-size: 13px;
+    }
+    .mirror dt {
+      color: var(--vui-muted);
+    }
+    .mirror dd {
+      margin: 0;
+    }
+  `,
   template: `
-    <section data-testid="accessibility-demo" aria-label="Accessibility example">
+    <section
+      class="demo"
+      data-testid="accessibility-demo"
+      aria-label="Accessibility example"
+      (focusin)="mirrorFocus($event)">
       <div class="controls">
-        <label
-          ><input type="checkbox" [checked]="canAccept()" (change)="canAccept.set(!canAccept())" /> Allow incoming
-          connections</label
-        >
-        <label
-          ><input type="checkbox" [checked]="valid()" (change)="valid.set(!valid())" /> Connection passes
-          validation</label
-        >
-        <button type="button" (click)="russian.set(!russian())">Switch graph language</button>
+        <p class="grow">
+          Press Tab to enter the graph, Enter to select, the arrow keys to move a selected node and Delete to remove the
+          focused node or edge. The Editor node keeps its own input and button.
+        </p>
+        <button vflowButton type="button" (click)="spanish.set(!spanish())">Switch graph language</button>
       </div>
-      <p>
-        Reviews: {{ reviews() }}. Accepted connections: {{ connections() }}. Completed connection attempts:
-        {{ attempts() }}.
-      </p>
       <vflow
-        [nodes]="nodes"
-        [edges]="edges"
-        [view]="[600, 300]"
+        view="auto"
+        [nodes]="nodes()"
+        [edges]="edges()"
         [ariaLabelConfig]="labels()"
-        [connection]="connection"
-        (connect)="connections.set(connections() + 1)"
-        (connectEnd)="attempts.set(attempts() + 1)">
-        <mini-map />
+        (deleteRequest)="onDeleteRequest($event)">
         <ng-template let-ctx node>
-          @if (ctx.node.id === 'approval') {
-            <div class="reviewer">
-              <button type="button" noDrag noPan (click)="reviews.set(reviews() + 1)">Review request</button>
-              <span
-                vflowPort
-                handleType="target"
-                position="left"
-                handleId="incoming"
-                [domAttributes]="{ 'data-port': 'incoming' }"
-                [canStart]="false"
-                [canAccept]="canAccept()"></span>
-            </div>
+          @if (ctx.node.id === 'editor') {
+            <article vflowNode selectable class="editor" [vflowSelected]="ctx.selected() || ctx.preselected()">
+              <header vflowNodeHeader><span vflowTitle>Editor</span></header>
+              <div vflowField>
+                <span vflowPort handleType="target" position="left"></span>
+                <input vflowNoDrag aria-label="Node title" placeholder="Node title" />
+              </div>
+              <footer vflowNodeFooter>
+                <button vflowButton vflowNoDrag type="button" (click)="removeEditor()">Remove editor</button>
+              </footer>
+            </article>
           } @else {
             <docs-node [ctx]="ctx" />
           }
         </ng-template>
-        <ng-template let-ctx edge>
-          <svg:g edgeInteraction>
-            <svg:path aria-hidden="true" fill="none" stroke="#345" stroke-width="2" [attr.d]="ctx.path()" />
-          </svg:g>
-        </ng-template>
-      </vflow>
-      <vflow [nodes]="referenceNodes" [view]="[600, 120]" [ariaLabelConfig]="{ flowLabel: 'Reference graph' }">
-        <ng-template let-ctx node><docs-node [ctx]="ctx" /></ng-template>
         <ng-template let-ctx edge><svg:g docsEdge [ctx]="ctx" /></ng-template>
       </vflow>
+      <dl class="mirror" aria-hidden="true">
+        <dt>Screen reader hears</dt>
+        <dd data-testid="focused">{{ focused() || 'nothing focused' }}</dd>
+        <dt>Last announcement</dt>
+        <dd data-testid="announced">{{ announced() || 'none yet' }}</dd>
+      </dl>
     </section>
-  `,
-  styles: `
-    :host {
-      display: block;
-    }
-    section {
-      background: white;
-      color: #1b262c;
-      padding: 12px;
-      overflow: auto;
-    }
-    .controls {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      align-items: center;
-    }
-    label {
-      display: flex;
-      gap: 6px;
-      align-items: center;
-    }
-    button {
-      background: #fff;
-      color: #1b262c;
-      border: 1px solid #345;
-      border-radius: 4px;
-      padding: 8px;
-    }
-    button:focus-visible,
-    input:focus-visible {
-      outline: 3px solid #005fcc;
-      outline-offset: 2px;
-    }
-    .reviewer {
-      position: relative;
-      padding: 14px;
-      border: 2px solid #345;
-      border-radius: 6px;
-    }
   `,
 })
 export class AccessibilityDemoComponent {
-  protected canAccept = signal(true);
-  protected valid = signal(true);
-  protected russian = signal(false);
-  protected reviews = signal(0);
-  protected attempts = signal(0);
-  protected connections = signal(0);
-  protected connection = { validator: () => this.valid() };
+  protected spanish = signal(false);
+  protected focused = signal('');
+  protected announced = signal('');
   protected labels = computed<Partial<AriaLabelConfig>>(() =>
-    this.russian()
-      ? {
-          flowLabel: 'Граф проверки',
-          flowDescription: 'Заявка и её проверка.',
-          minimapLabel: 'Мини-карта графа',
-          nodeLabel: (id) => `Узел ${id}`,
-          groupLabel: (id) => `Группа ${id}`,
-          edgeLabel: ({ source, target }) => `Связь от ${source} к ${target}`,
-          parentDescription: (parent) => `Родитель: ${parent}.`,
-          selected: 'Выбран.',
-          selectionUnavailable: 'Выбор недоступен.',
-          movementUnavailable: 'Перемещение недоступно.',
-          reconnectionUnavailable: 'Переподключение недоступно.',
-          keyboardNavigation: 'Переходите между объектами клавишами Tab и Shift+Tab.',
-          keyboardSelect:
-            'Нажмите Enter или пробел для выбора. Удерживайте модификатор множественного выбора для переключения выделения.',
-          keyboardDeselect: 'Нажмите Escape, чтобы снять выделение.',
-          keyboardMove: 'Перемещайте выбранные доступные узлы стрелками. Удерживайте Shift для ускорения.',
-        }
-      : { flowLabel: 'Review graph', flowDescription: 'Request and its review.' },
+    this.spanish() ? SPANISH : { flowLabel: 'Approval graph' },
   );
-  protected nodes = createNodes([
-    {
-      id: 'parent',
-      point: { x: 10, y: 20 },
-      width: 250,
-      height: 180,
-      ariaLabel: 'Review',
-      data: { type: 'group', resizable: true },
-    },
-    {
-      id: 'request',
-      point: { x: 40, y: 55 },
-      parentId: 'parent',
-      data: { text: '<b>Request</b>' },
-      ariaLabel: 'Request',
-      selected: true,
-      selectable: false,
-      draggable: false,
-      ariaDescription: 'Needs approval.',
-    },
-    { id: 'approval', point: { x: 340, y: 70 }, ariaLabel: 'Approval', selectable: false },
-    {
-      id: 'archive',
-      point: { x: 340, y: 210 },
-      data: { text: 'Archive' },
-      ariaLabel: 'Archive',
-    },
-  ]);
-  protected edges = createEdges([
-    { id: 'review', source: 'request', target: 'approval', targetHandle: 'incoming' },
-    {
-      id: 'archive',
-      source: 'request',
-      target: 'archive',
-      ariaLabel: 'Archive route',
-      ariaDescription: 'Keep a copy.',
-      selected: true,
-      selectable: false,
-    },
-  ]);
-  protected referenceNodes = createNodes([
-    { id: 'parent', point: { x: 20, y: 20 }, data: { text: 'Reference' } },
-    {
-      id: 'request',
-      point: { x: 220, y: 20 },
-      data: { text: 'Copy' },
-      parentId: 'parent',
-      extent: null,
-    },
-  ]);
+  protected nodes = signal(
+    createNodes([
+      { id: 'draft', parentId: 'stage', point: { x: 30, y: 40 }, data: { text: 'Draft' }, ariaLabel: 'Draft' },
+      {
+        id: 'stage',
+        point: { x: 20, y: 20 },
+        width: 240,
+        height: 150,
+        data: { type: 'group' },
+        ariaLabel: 'Stage',
+        selectable: false,
+        draggable: false,
+      },
+      { id: 'editor', point: { x: 330, y: 40 }, ariaLabel: 'Editor' },
+      { id: 'later', point: { x: 1000, y: 80 }, data: { text: 'Later' }, ariaLabel: 'Later' },
+    ]),
+  );
+  protected edges = signal(
+    createEdges([
+      { id: 'next', source: 'draft', target: 'later', ariaLabel: 'Next step' },
+      { id: 'edit', source: 'draft', target: 'editor', ariaLabel: 'Edit route', ariaDescription: 'Opens the editor.' },
+    ]),
+  );
+
+  constructor() {
+    const host = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
+    const destroyRef = inject(DestroyRef);
+    afterNextRender(() => {
+      const region = host.querySelector('[aria-live]');
+      if (!region) return;
+      const observer = new MutationObserver(() => {
+        const text = region.textContent?.trim();
+        if (text) this.announced.set(text);
+      });
+      observer.observe(region, { childList: true, characterData: true, subtree: true });
+      destroyRef.onDestroy(() => observer.disconnect());
+    });
+  }
+
+  protected onDeleteRequest({ nodeIds, edgeIds }: DeleteRequest) {
+    const result = removeNodes(nodeIds, { nodes: this.nodes(), edges: removeEdges(edgeIds, this.edges()) });
+    this.nodes.set(result.nodes);
+    this.edges.set(result.edges);
+  }
+
+  protected removeEditor() {
+    this.onDeleteRequest({ nodeIds: ['editor'], edgeIds: [] });
+  }
+
+  protected mirrorFocus(event: FocusEvent) {
+    const target = event.target;
+    if (!(target instanceof Element)) return;
+    const name = target.getAttribute('aria-label') ?? target.textContent?.trim() ?? '';
+    const role =
+      target.getAttribute('aria-roledescription') ?? target.getAttribute('role') ?? target.tagName.toLowerCase();
+    const description = (target.getAttribute('aria-describedby') ?? '')
+      .split(/\s+/)
+      .map((id) => target.ownerDocument.getElementById(id)?.textContent ?? '')
+      .join(' ')
+      .trim();
+    this.focused.set([`${name}, ${role}.`, description].filter(Boolean).join(' '));
+  }
 }

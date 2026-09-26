@@ -9,7 +9,7 @@ A subflow is a node that can contain child nodes. Key things about subflows:
 - Nodes within a subflow have coordinates _relative_ to that subflow.
 - A parent node draws its own handles like any other node, so it can take part in connections.
 - To draw groups differently from other nodes, mark them in `data` (the example uses `type: 'group'`) and branch on it in the `node` template. Size the top-level element with the `ctx.width()` and `ctx.height()` signals, as shown in the example.
-- A node with children gets the `Group {id}` accessible name by default.
+- A node with children is read out as a `group` by assistive technology; its name still defaults to `Node {id}`.
 
 {{ NgDocActions.demoPane("SubflowsDemoComponent") }}
 

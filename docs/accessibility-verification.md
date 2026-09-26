@@ -141,3 +141,32 @@ select`, and disabling a command removes its sentence. A plain string still over
   block as a scrollable region without keyboard access, which was fixed by giving it a Tab stop rather than by
   excluding the rule.
 - Verified by 283 library tests and 36 e2e. No new screen-reader session was run.
+
+## Shorter descriptions, role descriptions, no pointer-only restrictions — 2026-09-26
+
+- The seven `keyboard*` instruction entries became `nodeInstructions` and `edgeInstructions`, functions of the
+  bound keys and of `{ selectable, movable }`. A node now reads `Press Enter or Space to select. Use arrow keys to
+move it while it is selected. Press Delete or Backspace to delete.` instead of seven sentences (88 words); an
+  edge drops the movement sentence. Tab, clear-selection, pan and zoom are no longer described per entity; the
+  `pan`, `zoomIn`, `zoomOut` and `fitView` keys stay available to a custom instruction.
+- Wrappers carry `aria-roledescription` (`nodeRole`, `groupRole`, `edgeRole`; `node`, `group`, `edge` by default),
+  as React Flow, Svelte Flow, Vue Flow and Foblex do. `groupLabel` is gone: a parent is named `Node {id}` and
+  read as a `group`.
+- `reconnectionUnavailable` is removed because reconnection is pointer-only, and `minimapDescription` because nothing
+  set it. `AriaLabelConfig` went from 26 keys to 18.
+- An edge with a custom name now ends the endpoint sentence with a period (`Keep a copy. Connection from Request to
+Archive. Selected.`).
+- Survey of other libraries and the reasoning: `.scratch/accessibility-simplification-2026-09-26/research.md`.
+- Verified by 298 library tests and the docs e2e suite. No new screen-reader session was run.
+
+## One demo with a screen-reader mirror — 2026-09-26
+
+- The two accessibility examples were replaced by one: a graph with a parent, a child, a custom node holding an
+  input and a button, an offscreen node and two edges, a language switch, and a text mirror of what a screen reader
+  receives (name, role description and description of the focused entity; last live-region message). The previous
+  examples carried checkboxes and counters that existed only for the Playwright scenarios.
+- The e2e coverage of grid movement, manual selection mode and disabling focus auto-pan was dropped; the library
+  unit suite covers the same behavior. Tab order, embedded controls, selection and movement announcements, deletion
+  with focus recovery, focus auto-pan, viewport commands, the German layout keys, the language switch and axe stay,
+  in `apps/docs-e2e/accessibility.spec.ts`; the shortcut configuration scenario moved to `keyboard-shortcuts.spec.ts`.
+- Verified in Chromium: 6 targeted e2e tests and the full docs e2e suite. No new screen-reader session was run.

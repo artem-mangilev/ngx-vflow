@@ -28,27 +28,29 @@ export class NodeModel<T = unknown> implements FlowEntity, Contextable<NodeConte
   public ariaLabel = computed(() => {
     const override = this.rawNode.ariaLabel?.().trim();
     if (override) return override;
-    const labels = this.settingsService.ariaLabels();
-    return this.children().length > 0 ? labels.groupLabel(this.rawNode.id) : labels.nodeLabel(this.rawNode.id);
+    return this.settingsService.ariaLabels().nodeLabel(this.rawNode.id);
   });
 
-  public accessibility = computed((): { label: string; description: string; domAttributes?: DomAttributes } => {
-    const labels = this.settingsService.ariaLabels();
-    const parent = this.parent();
-    return {
-      label: this.ariaLabel(),
-      domAttributes: this.rawNode.domAttributes?.(),
-      description: [
-        this.rawNode.ariaDescription?.(),
-        parent ? labels.parentDescription(parent.ariaLabel()) : '',
-        this.selected() ? labels.selected : '',
-        !this.selectable() ? labels.selectionUnavailable : '',
-        !this.draggable() ? labels.movementUnavailable : '',
-      ]
-        .filter(Boolean)
-        .join(' '),
-    };
-  });
+  public accessibility = computed(
+    (): { label: string; description: string; roleDescription: string; domAttributes?: DomAttributes } => {
+      const labels = this.settingsService.ariaLabels();
+      const parent = this.parent();
+      return {
+        label: this.ariaLabel(),
+        roleDescription: this.children().length > 0 ? labels.groupRole : labels.nodeRole,
+        domAttributes: this.rawNode.domAttributes?.(),
+        description: [
+          this.rawNode.ariaDescription?.(),
+          parent ? labels.parentDescription(parent.ariaLabel()) : '',
+          this.selected() ? labels.selected : '',
+          !this.selectable() ? labels.selectionUnavailable : '',
+          !this.draggable() ? labels.movementUnavailable : '',
+        ]
+          .filter(Boolean)
+          .join(' '),
+      };
+    },
+  );
 
   public focused = signal(false);
   public dragging = signal(false);

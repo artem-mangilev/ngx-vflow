@@ -85,9 +85,7 @@
 
   <!-- Minimap (fixed overlay) -->
   @if (minimap(); as minimap) {
-    <div
-      class="vflow-minimap"
-      [vflowA11y]="{ role: 'img', label: ariaLabels().minimapLabel, description: ariaLabels().minimapDescription }">
+    <div class="vflow-minimap" [vflowA11y]="{ role: 'img', label: ariaLabels().minimapLabel }">
       <ng-container [ngTemplateOutlet]="minimap.template()" />
     </div>
   }

@@ -94,15 +94,22 @@ describe('public graph accessibility', () => {
     const root: HTMLElement = fixture.nativeElement;
     expect(root.querySelector('[role="region"]')?.getAttribute('aria-label')).toBe('Graph');
     expect(root.querySelector('[role="group"][aria-label="Request & review"]')).not.toBeNull();
-    expect(root.querySelector('[role="group"][aria-label="Group parent"]')).not.toBeNull();
+    const parent = root.querySelector('[role="group"][aria-label="Node parent"]')!;
+    expect(parent.getAttribute('aria-roledescription')).toBe('group');
+    expect(root.querySelector('[aria-label="Request & review"]')?.getAttribute('aria-roledescription')).toBe('node');
     expect(
       root.querySelector('[role="group"][aria-label="Connection from Request & review to Approval"]'),
     ).not.toBeNull();
+    expect(
+      root
+        .querySelector('[role="group"][aria-label="Connection from Request & review to Approval"]')
+        ?.getAttribute('aria-roledescription'),
+    ).toBe('edge');
     expect(root.querySelector('[role="img"][aria-label="Graph minimap"]')).not.toBeNull();
     expect(root.querySelectorAll('[tabindex="0"]').length).toBe(4);
     expect(root.querySelector('[role="img"]')?.hasAttribute('tabindex')).toBeFalse();
     const child = root.querySelector('[aria-label="Request & review"]')!;
-    expect(description(child)).toContain('Parent: Group parent.');
+    expect(description(child)).toContain('Parent: Node parent.');
   });
 
   it('reactively combines custom descriptions, relationships and actual selection despite denied eligibility', async () => {
@@ -140,7 +147,7 @@ describe('public graph accessibility', () => {
     expect(child.hasAttribute('aria-selected')).toBeFalse();
     expect(child.hasAttribute('aria-disabled')).toBeFalse();
     expect(description(root.querySelector('[aria-label="Approve"]')!)).toContain(
-      'Connection from Application to Approval',
+      'Review route. Connection from Application to Approval. Press Enter or Space to select.',
     );
     host.nodes[1].ariaLabel!.set('Заявка');
     host.nodes[1].ariaDescription!.set('Требует проверки.');
@@ -242,14 +249,19 @@ describe('public graph accessibility', () => {
     });
     const first = TestBed.createComponent(AccessibilityHostComponent);
     const second = TestBed.createComponent(AccessibilityHostComponent);
-    first.componentInstance.labels.set({ flowDescription: 'Review diagram.', minimapDescription: 'Overview.' });
+    first.componentInstance.labels.set({ flowDescription: 'Review diagram.', nodeRole: 'узел', groupRole: 'группа' });
     first.detectChanges();
     second.detectChanges();
     await first.whenStable();
     await second.whenStable();
     const root: HTMLElement = first.nativeElement;
     expect(description(root.querySelector('[role="region"]')!)).toBe('Review diagram.');
-    expect(description(root.querySelector('[role="img"]')!)).toBe('Overview.');
+    expect(root.querySelector('[role="img"]')!.hasAttribute('aria-describedby')).toBeFalse();
+    expect(root.querySelector('[aria-label="Node parent"]')?.getAttribute('aria-roledescription')).toBe('группа');
+    expect(root.querySelector('[aria-label="Request & review"]')?.getAttribute('aria-roledescription')).toBe('узел');
+    expect(second.nativeElement.querySelector('[aria-label="Node parent"]')?.getAttribute('aria-roledescription')).toBe(
+      'group',
+    );
     const firstChild = root.querySelector('[aria-label="Request & review"]')!;
     const secondChild: Element = second.nativeElement.querySelector('[aria-label="Request & review"]');
     const firstId = firstChild.getAttribute('aria-describedby')!;
@@ -267,7 +279,7 @@ describe('public graph accessibility', () => {
     expect(document.getElementById(updatedFirstId)).not.toBeNull();
     first.destroy();
     expect(document.getElementById(updatedFirstId)).toBeNull();
-    expect(document.getElementById(secondId)?.textContent).toContain('Parent: Group parent.');
+    expect(document.getElementById(secondId)?.textContent).toContain('Parent: Node parent.');
   });
 });
 

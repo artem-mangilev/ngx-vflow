@@ -1,6 +1,10 @@
 import { Injectable, computed, inject } from '@angular/core';
 import { KeyboardService } from './keyboard.service';
-import { KeyboardInstruction, KeyboardInstructionKeys } from '../interfaces/aria-label-config.interface';
+import {
+  KeyboardInstruction,
+  KeyboardInstructionKeys,
+  KeyboardInstructionState,
+} from '../interfaces/aria-label-config.interface';
 import { KeyboardCommandName } from '../types/keyboard-shortcuts.type';
 import { isMacPlatform } from '../utils/keyboard-binding';
 import { formatBindings } from '../utils/keyboard-format';
@@ -41,8 +45,8 @@ export class KeyboardLabelsService {
     };
   });
 
-  /** Reads one instruction entry, which is either a sentence or a function of the current keys. */
-  public text(instruction: KeyboardInstruction) {
-    return typeof instruction === 'function' ? instruction(this.keys()) : instruction;
+  /** Reads one instruction entry, which is either a sentence or a function of the current keys and the entity. */
+  public text(instruction: KeyboardInstruction, state: KeyboardInstructionState) {
+    return typeof instruction === 'function' ? instruction(this.keys(), state) : instruction;
   }
 }

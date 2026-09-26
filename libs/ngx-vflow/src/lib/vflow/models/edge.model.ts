@@ -45,13 +45,13 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
     const label = this.edge.ariaLabel?.().trim() || endpoints;
     return {
       label,
+      roleDescription: labels.edgeRole,
       domAttributes: this.edge.domAttributes?.(),
       description: [
         this.edge.ariaDescription?.(),
-        label !== endpoints ? endpoints : '',
+        label !== endpoints ? `${endpoints}.` : '',
         this.selected() ? labels.selected : '',
         !this.selectable() ? labels.selectionUnavailable : '',
-        !this.reconnectable() ? labels.reconnectionUnavailable : '',
       ]
         .filter(Boolean)
         .join(' '),

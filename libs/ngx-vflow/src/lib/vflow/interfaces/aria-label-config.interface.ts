@@ -14,30 +14,36 @@ export interface KeyboardInstructionKeys {
   multiSelection: string;
 }
 
-/** A sentence, or one written from the keys that are bound right now. */
-export type KeyboardInstruction = string | ((keys: KeyboardInstructionKeys) => string);
+/** What the focused entity can do from the keyboard, so an instruction names only the commands that work. */
+export interface KeyboardInstructionState {
+  /** Whether a select command acquires selection: the entity is selectable and the flow is not in manual mode. */
+  selectable: boolean;
+  /** Whether the movement keys can move it: a draggable node that is selectable or already selected. */
+  movable: boolean;
+}
+
+/** A sentence, or one written from the keys that are bound right now and what the entity can do. */
+export type KeyboardInstruction = string | ((keys: KeyboardInstructionKeys, state: KeyboardInstructionState) => string);
 
 /** Localizable graph names and descriptions. Formatters receive plain text. */
 export interface AriaLabelConfig {
   flowLabel: string;
   flowDescription: string;
   minimapLabel: string;
-  minimapDescription: string;
   nodeLabel: (id: string) => string;
-  groupLabel: (id: string) => string;
   edgeLabel: (endpoints: { source: string; target: string }) => string;
+  /** `aria-roledescription` of a node, of a node that other nodes reference as parent, and of an edge. */
+  nodeRole: string;
+  groupRole: string;
+  edgeRole: string;
   parentDescription: (parent: string) => string;
   selected: string;
   selectionUnavailable: string;
   movementUnavailable: string;
-  reconnectionUnavailable: string;
-  keyboardNavigation: KeyboardInstruction;
-  keyboardSelect: KeyboardInstruction;
-  keyboardDeselect: KeyboardInstruction;
-  keyboardMove: KeyboardInstruction;
-  keyboardDelete: KeyboardInstruction;
-  keyboardPan: KeyboardInstruction;
-  keyboardZoom: KeyboardInstruction;
+  /** Read out with a focusable node after its state. An empty key list means the command is disabled. */
+  nodeInstructions: KeyboardInstruction;
+  /** Read out with a focusable edge after its state. */
+  edgeInstructions: KeyboardInstruction;
   /** Live feedback after a keyboard selection change of one entity. */
   selectionAnnouncement: (selection: { label: string; selected: boolean; count: number }) => string;
   /** Live feedback after Escape clears the selection. */
@@ -57,25 +63,27 @@ export const DEFAULT_ARIA_LABEL_CONFIG: AriaLabelConfig = {
   flowLabel: 'Graph',
   flowDescription: '',
   minimapLabel: 'Graph minimap',
-  minimapDescription: '',
   nodeLabel: (id) => `Node ${id}`,
-  groupLabel: (id) => `Group ${id}`,
   edgeLabel: ({ source, target }) => `Connection from ${source} to ${target}`,
+  nodeRole: 'node',
+  groupRole: 'group',
+  edgeRole: 'edge',
   parentDescription: (parent) => `Parent: ${parent}.`,
   selected: 'Selected.',
   selectionUnavailable: 'Selection unavailable.',
   movementUnavailable: 'Movement unavailable.',
-  reconnectionUnavailable: 'Reconnection unavailable.',
-  keyboardNavigation: 'Use Tab and Shift+Tab to move focus.',
-  keyboardSelect: ({ select, multiSelection }) =>
-    `Press ${select} to select. Hold ${multiSelection} to toggle selection.`,
-  keyboardDeselect: ({ clearSelection }) => `Press ${clearSelection} to clear selection.`,
-  keyboardMove: ({ move }) => `When selected, use ${move} to move movable selected nodes. Hold Shift to move faster.`,
-  keyboardDelete: ({ delete: remove }) =>
-    `Press ${remove} to request deletion of this item, or of the whole selection when it is selected.`,
-  keyboardPan: ({ pan }) => `Use ${pan} to pan the view when they do not move a node. Hold Shift to pan faster.`,
-  keyboardZoom: ({ zoomIn, zoomOut, fitView }) =>
-    `Press ${zoomIn} to zoom in, ${zoomOut} to zoom out and ${fitView} to fit the graph.`,
+  nodeInstructions: ({ select, move, delete: remove }, { selectable, movable }) =>
+    [
+      selectable && select ? `Press ${select} to select.` : '',
+      movable && move ? `Use ${move} to move it while it is selected.` : '',
+      remove ? `Press ${remove} to delete.` : '',
+    ]
+      .filter(Boolean)
+      .join(' '),
+  edgeInstructions: ({ select, delete: remove }, { selectable }) =>
+    [selectable && select ? `Press ${select} to select.` : '', remove ? `Press ${remove} to delete.` : '']
+      .filter(Boolean)
+      .join(' '),
   selectionAnnouncement: ({ label, selected, count }) =>
     `${label} ${selected ? 'selected' : 'deselected'}. ${count} selected in total.`,
   selectionClearedAnnouncement: 'Selection cleared.',

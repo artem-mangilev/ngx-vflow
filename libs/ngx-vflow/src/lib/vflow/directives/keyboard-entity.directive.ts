@@ -1,15 +1,12 @@
 import { Directive, ElementRef, computed, inject, input } from '@angular/core';
 import { NodeModel } from '../models/node.model';
 import { EdgeModel } from '../models/edge.model';
-import { KeyboardService } from '../services/keyboard.service';
 import { KeyboardLabelsService } from '../services/keyboard-labels.service';
 import { FlowSettingsService } from '../services/flow-settings.service';
 import { ViewportService } from '../services/viewport.service';
 import { getViewportBounds, getViewportForBounds } from '../utils/viewport';
 import { getNodesFlowBounds } from '../utils/nodes';
 import { getOverlappingArea } from '../utils/rect';
-import { ARROW_COMMANDS, ZOOM_COMMANDS } from '../utils/keyboard-commands';
-import { KeyboardInstruction } from '../interfaces/aria-label-config.interface';
 
 /**
  * One entity as a Tab stop: its focusability, the description read out with it, and the pan that brings a node back
@@ -25,33 +22,20 @@ import { KeyboardInstruction } from '../interfaces/aria-label-config.interface';
 export class KeyboardEntityDirective {
   public vflowKeyboardEntity = input.required<NodeModel | EdgeModel>();
   public element = inject<ElementRef<HTMLElement | SVGElement>>(ElementRef).nativeElement;
-  private keyboard = inject(KeyboardService);
   private keyboardLabels = inject(KeyboardLabelsService);
   private settings = inject(FlowSettingsService);
   private viewport = inject(ViewportService);
 
   public description = computed(() => {
     const model = this.vflowKeyboardEntity();
-    if (!model.focusable()) return '';
+    if (!model.focusable() || this.element.closest('[data-vflow-no-keyboard]')) return '';
     const labels = this.settings.ariaLabels();
-    const text = (instruction: KeyboardInstruction) => this.keyboardLabels.text(instruction);
-    if (this.element.closest('[data-vflow-no-keyboard]')) return text(labels.keyboardNavigation);
-    const selection = this.settings.selectionMode() !== 'manual';
-    return [
-      text(labels.keyboardNavigation),
-      selection && model.selectable() && this.keyboard.hasCommand('select') ? text(labels.keyboardSelect) : '',
-      selection && this.keyboard.hasCommand('clearSelection') ? text(labels.keyboardDeselect) : '',
-      model instanceof NodeModel &&
-      model.draggable() &&
-      ARROW_COMMANDS.some((arrow) => this.keyboard.hasCommand(arrow.move))
-        ? text(labels.keyboardMove)
-        : '',
-      this.keyboard.hasCommand('delete') ? text(labels.keyboardDelete) : '',
-      ARROW_COMMANDS.some((arrow) => this.keyboard.hasCommand(arrow.pan)) ? text(labels.keyboardPan) : '',
-      ZOOM_COMMANDS.some((command) => this.keyboard.hasCommand(command)) ? text(labels.keyboardZoom) : '',
-    ]
-      .filter(Boolean)
-      .join(' ');
+    const node = model instanceof NodeModel;
+    return this.keyboardLabels.text(node ? labels.nodeInstructions : labels.edgeInstructions, {
+      selectable: this.settings.selectionMode() !== 'manual' && model.selectable(),
+      // Movement needs a selected node: promise it only where the keys, or the application, can select it.
+      movable: node && model.draggable() && (model.selectable() || model.selected()),
+    });
   });
 
   protected onFocus() {

@@ -164,15 +164,17 @@ describe('NodeModel', () => {
     expect(ctx.height()).toBe(120);
   });
 
-  it('names a node as a group only while other nodes reference it as parent', () => {
+  it('describes a node as a group only while other nodes reference it as parent', () => {
     expect(model.ariaLabel()).toBe('Node 1');
+    expect(model.accessibility().roleDescription).toBe('node');
     const child = TestBed.runInInjectionContext(
       () => new NodeModel(createNode({ id: '2', parentId: '1', point: { x: 0, y: 0 } })),
     );
     entitiesService.nodes.update((nodes) => [...nodes, child]);
-    expect(model.ariaLabel()).toBe('Group 1');
-    entitiesService.nodes.update((nodes) => nodes.filter((node) => node !== child));
     expect(model.ariaLabel()).toBe('Node 1');
+    expect(model.accessibility().roleDescription).toBe('group');
+    entitiesService.nodes.update((nodes) => nodes.filter((node) => node !== child));
+    expect(model.accessibility().roleDescription).toBe('node');
   });
 
   it('loads a component class immediately and waits for the viewport with a lazy factory', () => {
