@@ -1,4 +1,4 @@
-import { Directive, ElementRef, computed, inject, input } from '@angular/core';
+import { Directive, ElementRef, computed, effect, inject, input } from '@angular/core';
 import { NodeModel } from '../models/node.model';
 import { EdgeModel } from '../models/edge.model';
 import { KeyboardLabelsService } from '../services/keyboard-labels.service';
@@ -15,7 +15,6 @@ import { getOverlappingArea } from '../utils/rect';
 @Directive({
   selector: '[vflowKeyboardEntity]',
   host: {
-    '[attr.tabindex]': 'vflowKeyboardEntity().focusable() ? 0 : -1',
     '(focus)': 'onFocus()',
   },
 })
@@ -25,6 +24,14 @@ export class KeyboardEntityDirective {
   private keyboardLabels = inject(KeyboardLabelsService);
   private settings = inject(FlowSettingsService);
   private viewport = inject(ViewportService);
+
+  constructor() {
+    // An effect, not a host binding: a read in a host binding of a graph list view joins the reactive consumer of
+    // the whole list, and a change would refresh every entity view.
+    effect(() => {
+      this.element.setAttribute('tabindex', this.vflowKeyboardEntity().focusable() ? '0' : '-1');
+    });
+  }
 
   public description = computed(() => {
     const model = this.vflowKeyboardEntity();

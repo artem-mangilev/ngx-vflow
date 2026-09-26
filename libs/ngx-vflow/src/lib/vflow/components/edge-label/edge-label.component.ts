@@ -53,10 +53,10 @@ export function readableAngle(angle: number): number {
       }
     `,
   ],
+  // No signal reads in host bindings: see NodeComponent.
   host: {
     '(focusin)': 'edgeModel().focused.set(true)',
     '(focusout)': 'edgeModel().focused.set(false)',
-    '[style.visibility]': 'edgeModel().isReady() && !edgeModel().reconnecting() ? "visible" : "hidden"',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [NgTemplateOutlet],
@@ -80,6 +80,10 @@ export class EdgeLabelComponent {
   constructor() {
     effect(() => {
       this.element.style.zIndex = String(this.edgeModel().renderOrder());
+    });
+    effect(() => {
+      const model = this.edgeModel();
+      this.element.style.visibility = model.isReady() && !model.reconnecting() ? 'visible' : 'hidden';
     });
     effect(() => {
       const point = this.point();
