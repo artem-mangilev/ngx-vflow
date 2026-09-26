@@ -12,7 +12,6 @@ import { Contextable } from '../interfaces/contextable.interface';
 import { NodeContext } from '../interfaces/template-context.interface';
 import { Observable } from 'rxjs';
 import { FlowSettingsService } from '../services/flow-settings.service';
-import { NodeRenderingService } from '../services/node-rendering.service';
 import { extendedComputed } from '../utils/signals/extended-computed';
 import { observeSignal } from '../utils/signals/observe-signal';
 import { createModelInjector } from '../utils/model-injector';
@@ -22,7 +21,6 @@ export class NodeModel<T = unknown> implements FlowEntity, Contextable<NodeConte
   private modelInjector = createModelInjector();
   private entitiesService = inject(FlowEntitiesService);
   private settingsService = inject(FlowSettingsService);
-  private nodeRenderingService = inject(NodeRenderingService);
   private document = inject(DOCUMENT);
 
   public ariaLabel = computed(() => {
@@ -182,7 +180,7 @@ export class NodeModel<T = unknown> implements FlowEntity, Contextable<NodeConte
 
     if (this.settingsService.optimization().lazyLoadTrigger === 'viewport' && !this.isComponentClass) {
       // A lazy component factory or a template presentation loads once the node reaches the viewport.
-      return this.nodeRenderingService.viewportNodes().includes(this as NodeModel);
+      return this.inViewport();
     }
 
     return true;

@@ -1,16 +1,13 @@
-import { Injectable, computed, effect, inject, untracked } from '@angular/core';
+import { Injectable, computed, inject, untracked } from '@angular/core';
 import { FlowEntitiesService } from './flow-entities.service';
 import { NodeModel } from '../models/node.model';
 import { FlowSettingsService } from './flow-settings.service';
-import { isRectInViewport } from '../utils/viewport';
-import { ViewportService } from './viewport.service';
 import { isGroupNode } from '../utils/is-group-node';
 
 @Injectable()
 export class NodeRenderingService {
   private flowEntitiesService = inject(FlowEntitiesService);
   private flowSettingsService = inject(FlowSettingsService);
-  private viewportService = inject(ViewportService);
   private maxOrder = 0;
 
   public readonly nodes = computed(() =>
@@ -19,30 +16,11 @@ export class NodeRenderingService {
 
   public readonly groups = computed(() => byRenderOrder(this.flowEntitiesService.nodes().filter(isGroupNode)));
 
-  public viewportNodes = computed(() => {
-    const nodes = this.flowEntitiesService.nodes();
-    const viewport = this.viewportService.readableViewport();
-    const flowWidth = this.flowSettingsService.computedFlowWidth();
-    const flowHeight = this.flowSettingsService.computedFlowHeight();
-
-    return nodes.filter((n) => {
-      const { x, y } = n.globalPoint();
-      const width = n.width();
-      const height = n.height();
-
-      return isRectInViewport({ x, y, width, height }, viewport, flowWidth, flowHeight);
-    });
-  });
-
-  constructor() {
-    effect(() => {
-      if (!this.flowSettingsService.optimization().virtualization) return;
-      // ponytail: linear viewport scan; add a spatial index if this scan becomes the bottleneck.
-      const visible = new Set(this.viewportNodes());
-      // Only membership changes notify node views; camera movement alone must not.
-      for (const node of this.flowEntitiesService.nodes()) node.inViewport.set(visible.has(node));
-    });
-  }
+  /**
+   * Nodes whose rect intersects the viewport, as `ViewportCullingService` reports them. Read on demand only: a
+   * consumer of this list depends on every node, so nothing on the per-frame path should read it.
+   */
+  public viewportNodes = computed(() => this.flowEntitiesService.nodes().filter((node) => node.inViewport()));
 
   public pullNode(node: NodeModel) {
     this.pull(node, (parent) => parent.children());

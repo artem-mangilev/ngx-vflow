@@ -91,6 +91,7 @@ import { KeyboardEntityCommandsService } from '../../services/keyboard-entity-co
 import { KeyboardLabelsService } from '../../services/keyboard-labels.service';
 import { KeyboardViewportCommandsService } from '../../services/keyboard-viewport-commands.service';
 import { AriaLabelConfig, DEFAULT_ARIA_LABEL_CONFIG } from '../../interfaces/aria-label-config.interface';
+import { ViewportCullingService } from '../../services/viewport-culling.service';
 
 const changesControllerHostDirective = {
   directive: ChangesControllerDirective,
@@ -140,6 +141,7 @@ const nodeDragControllerHostDirective = {
     FlowRenderingService,
     ResizeObserverService,
     RequestAnimationFrameBatchingService,
+    ViewportCullingService,
   ],
   hostDirectives: [changesControllerHostDirective, nodeDragControllerHostDirective],
   imports: [
@@ -180,6 +182,8 @@ export class VflowComponent {
   private keyboardService = inject(KeyboardService);
   private injector = inject(Injector);
   private flowRenderingService = inject(FlowRenderingService);
+  // Instantiated here: its effects keep every entity's viewport membership current.
+  private viewportCullingService = inject(ViewportCullingService);
 
   // #endregion
 

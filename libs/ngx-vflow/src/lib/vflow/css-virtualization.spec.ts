@@ -13,7 +13,7 @@ import { VflowHandleDirective } from './directives/handle.directive';
 import { MiniMapComponent } from './public-components/minimap/minimap.component';
 import { NodeToolbarComponent } from './public-components/node-toolbar/node-toolbar.component';
 import { EdgeLabelTemplateDirective } from './directives/template.directive';
-import { mouseAsPointer } from './gestures/pointer-events.testing';
+import { dispatchPointer, mouseAsPointer } from './gestures/pointer-events.testing';
 
 /** An edge presentation that declares a center label, so the flow renders it in the label layer. */
 @Component({
@@ -379,6 +379,60 @@ describe('CSS viewport virtualization', () => {
     await settle(fixture);
     expect(getComputedStyle(host).display).not.toBe('none');
     expect(fixture.debugElement.query(By.directive(StatefulNodeComponent)).componentInstance).toBe(component);
+  });
+
+  it('shows entities entering the viewport at once and hides the ones a gesture moved out when it ends', async () => {
+    const fixture = setup(
+      [0, 1000].map((x, i) => createNode({ id: String(i), component: PlainNodeComponent, point: { x, y: 0 } })),
+    );
+    fixture.componentRef.setInput('edges', [
+      createEdge({ id: 'near', source: '0', target: '0' }),
+      createEdge({ id: 'far', source: '1', target: '1' }),
+    ]);
+    await settle(fixture);
+    const hosts = fixture.nativeElement.querySelectorAll('.vflow-node') as NodeListOf<HTMLElement>;
+    const edges = fixture.nativeElement.querySelectorAll('svg[edge]') as NodeListOf<SVGElement>;
+    expect(getComputedStyle(hosts[0]).display).not.toBe('none');
+    expect(getComputedStyle(hosts[1]).display).toBe('none');
+    expect(getComputedStyle(edges[1]).display).toBe('none');
+    const pane = fixture.nativeElement.querySelector('.vflow-pane') as HTMLElement;
+    dispatchPointer(pane, 'pointerdown', { x: 100, y: 100 });
+    dispatchPointer(window, 'pointermove', { x: -900, y: 100 });
+    await settle(fixture);
+    expect(getComputedStyle(hosts[1]).display).not.toBe('none');
+    expect(getComputedStyle(edges[1]).display).not.toBe('none');
+    // The node and edge that left stay in layout while the pan goes on.
+    expect(getComputedStyle(hosts[0]).display).not.toBe('none');
+    expect(getComputedStyle(edges[0]).display).not.toBe('none');
+    dispatchPointer(window, 'pointerup', { x: -900, y: 100 });
+    await settle(fixture);
+    expect(getComputedStyle(hosts[0]).display).toBe('none');
+    expect(getComputedStyle(edges[0]).display).toBe('none');
+    // A viewport that stops moving for a while hides them even before the gesture ends.
+    dispatchPointer(pane, 'pointerdown', { x: 100, y: 100 });
+    dispatchPointer(window, 'pointermove', { x: 1100, y: 100 });
+    await settle(fixture);
+    expect(getComputedStyle(hosts[0]).display).not.toBe('none');
+    expect(getComputedStyle(hosts[1]).display).not.toBe('none');
+    await new Promise((resolve) => setTimeout(resolve, 400));
+    await settle(fixture);
+    expect(getComputedStyle(hosts[1]).display).toBe('none');
+    dispatchPointer(window, 'pointerup', { x: 1100, y: 100 });
+    await settle(fixture);
+  });
+
+  it('hides and shows a node that moves without a viewport change', async () => {
+    const fixture = setup([createNode({ id: 'a', component: PlainNodeComponent, point: { x: 0, y: 0 } })]);
+    await settle(fixture);
+    const node = fixture.debugElement.injector.get(FlowEntitiesService).nodes()[0];
+    const host = fixture.nativeElement.querySelector('.vflow-node') as HTMLElement;
+    expect(getComputedStyle(host).display).not.toBe('none');
+    node.point.set({ x: 5000, y: 5000 });
+    await settle(fixture);
+    expect(getComputedStyle(host).display).toBe('none');
+    node.point.set({ x: 10, y: 10 });
+    await settle(fixture);
+    expect(getComputedStyle(host).display).not.toBe('none');
   });
 
   it('preserves focus outside the viewport but does not pin merely selected nodes', async () => {

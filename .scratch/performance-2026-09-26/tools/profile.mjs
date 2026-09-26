@@ -139,6 +139,8 @@ for (const s of scenarios) {
   if (s === 'drag') await measured('drag', '__perf.drag()');
   if (s === 'zoom') await measured('zoom', '__perf.zoom()');
   if (s === 'zoomout') await measured('zoomout', '__perf.zoom(40, 40)');
+  if (s === 'zoom3') await measured('zoom3', '__perf.zoom(20, -40)');
+  if (s === 'pan3') await measured('pan3', '__perf.pan(90, 6, 4, 7)');
   if (s === 'stress') await measured('stress-load', "__perf.gotoAndWait('/performance/stress-test', 1024)");
   if (s === 'stresspan') await measured('stress-pan', '__perf.pan()');
   if (s === 'stressdrag') await measured('stress-drag', '__perf.drag()');

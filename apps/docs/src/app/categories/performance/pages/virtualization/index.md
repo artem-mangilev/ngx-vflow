@@ -6,7 +6,7 @@ New nodes are loaded and measured even outside the viewport. Until their dimensi
 
 Edges are checked by their path bounds, so a path crossing the viewport can remain visible even when both endpoint nodes are outside it. Node toolbars and edge labels follow their owner's visibility. Focused nodes, toolbars and edge labels remain in layout; node dragging (including the dragged group), resizing and connection gestures also retain their participating nodes. Selection alone does not prevent culling.
 
-Viewport geometry is checked in shared passes; only changes in viewport membership notify entity views. Camera transforms and CSS culling are applied independently of the graph list template.
+Viewport membership comes from a spatial index, so a viewport change costs the entities near the viewport rather than a scan of the graph, and only membership changes notify entity views. Entities entering the viewport are shown at once. Entities that a pan or zoom moves out of view are hidden when the gesture ends, or after a short pause in the motion, so that a gesture in progress spends no style work on content that is already offscreen. Camera transforms and CSS culling are applied independently of the graph list template.
 
 This reduces layout and paint work for hidden content. It does not release DOM memory, stop subscriptions or component effects, or avoid initial component creation. When the entire graph fits in the viewport, all its visible content still needs to be drawn.
 
