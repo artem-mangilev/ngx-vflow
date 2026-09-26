@@ -1,5 +1,3 @@
-import type { D3DragEvent, SubjectPosition } from 'd3-drag';
-
 /**
  * Bounding box described by two corners: `[[minX, minY], [maxX, maxY]]`.
  */
@@ -50,7 +48,13 @@ export type ResizeControlDirection = 'horizontal' | 'vertical';
 export const RESIZER_HANDLE_POSITIONS: ControlPosition[] = ['top-left', 'top-right', 'bottom-left', 'bottom-right'];
 export const RESIZER_LINE_POSITIONS: ControlLinePosition[] = ['top', 'right', 'bottom', 'left'];
 
-export type ResizeDragEvent = D3DragEvent<HTMLElement, null, SubjectPosition>;
+/**
+ * Event passed to resize callbacks.
+ */
+export interface ResizeDragEvent {
+  /** The pointer event being handled: the press, a move or the release. */
+  sourceEvent: PointerEvent;
+}
 
 type ResizeHandler<Params = ResizeParams, Result = void> = (event: ResizeDragEvent, params: Params) => Result;
 

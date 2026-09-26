@@ -4,6 +4,13 @@
   left: 0;
   transform-origin: 0 0;
   pointer-events: all;
+  // A draggable node takes touch movement for its drag, also where the pane leaves touch scrolling to the page.
+  touch-action: none;
+}
+
+:host(.vflow-node--undraggable),
+:host(.vflow-node--drag-handles-only) {
+  touch-action: auto;
 }
 
 // The host is inside the zoomed viewport, so width and offset are divided by the zoom to stay screen-sized.

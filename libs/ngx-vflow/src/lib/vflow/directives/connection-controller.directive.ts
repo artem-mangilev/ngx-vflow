@@ -1,5 +1,4 @@
 import { FlowSettingsService } from '../services/flow-settings.service';
-import { eventClientPoint, isTouchEvent } from '../utils/event';
 import { DestroyRef, Directive, inject, output } from '@angular/core';
 import { Connection } from '../interfaces/connection.interface';
 import {
@@ -92,27 +91,29 @@ export class ConnectionControllerDirective {
 
   private afterDragThreshold(event: Event | undefined, start: () => void) {
     this.pendingDrag?.abort();
+    if (event instanceof PointerEvent) releaseImplicitCapture(event);
     const threshold = this.settings.connectionDragThreshold();
     if (!event || threshold === 0) {
       start();
       return;
     }
-    if (!(event instanceof MouseEvent) && !isTouchEvent(event)) return;
-    const origin = eventClientPoint(event);
+    if (!(event instanceof PointerEvent)) return;
+    const origin = { x: event.clientX, y: event.clientY };
     const pending = (this.pendingDrag = new AbortController());
-    const options = { signal: pending.signal, capture: true, passive: false };
-    const move = (next: MouseEvent | TouchEvent) => {
-      if (isTouchEvent(next)) next.preventDefault();
-      const point = eventClientPoint(next);
-      if (Math.hypot(point.x - origin.x, point.y - origin.y) > threshold) {
-        pending.abort();
-        start();
-      }
-    };
-    document.addEventListener('mousemove', move, options);
-    document.addEventListener('touchmove', move, options);
-    for (const type of ['mouseup', 'touchend', 'touchcancel']) {
-      document.addEventListener(type, () => pending.abort(), options);
+    const options = { signal: pending.signal, capture: true };
+    const matches = (next: PointerEvent) => next.pointerId === event.pointerId;
+    document.addEventListener(
+      'pointermove',
+      (next) => {
+        if (matches(next) && Math.hypot(next.clientX - origin.x, next.clientY - origin.y) > threshold) {
+          pending.abort();
+          start();
+        }
+      },
+      options,
+    );
+    for (const type of ['pointerup', 'pointercancel'] as const) {
+      document.addEventListener(type, (next) => matches(next) && pending.abort(), options);
     }
     window.addEventListener('blur', () => pending.abort(), options);
   }
@@ -281,4 +282,15 @@ function statusToConnection(
     sourceHandleType: sourceHandle.type(),
     targetHandleType: targetHandle.type(),
   };
+}
+
+/**
+ * A touch pointer is captured by the element it pressed. A connection gesture releases it, so that, like the mouse,
+ * the finger reports the handles and magnets it moves over and is released on.
+ */
+function releaseImplicitCapture(event: PointerEvent) {
+  const target = event.target;
+  if (event.pointerType === 'touch' && target instanceof Element && target.hasPointerCapture(event.pointerId)) {
+    target.releasePointerCapture(event.pointerId);
+  }
 }

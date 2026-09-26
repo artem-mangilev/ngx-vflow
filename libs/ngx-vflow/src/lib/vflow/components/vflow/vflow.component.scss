@@ -75,6 +75,14 @@
     * {
       box-sizing: border-box;
     }
+
+    // Touches on these start library gestures, so they must not scroll the page even where the pane lets it.
+    .vflow-handle,
+    .vflow-drag-handle,
+    .reconnect-handle,
+    .resize-control {
+      touch-action: none;
+    }
   }
 }
 
@@ -131,6 +139,7 @@
   width: 100%;
   height: 100%;
   z-index: 1;
+  -webkit-tap-highlight-color: transparent;
 }
 
 // Transformed layer (translate + scale). Must never block the pane.

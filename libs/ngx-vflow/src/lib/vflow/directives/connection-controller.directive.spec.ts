@@ -12,6 +12,7 @@ import { FlowSettingsService } from '../services/flow-settings.service';
 import { FlowStatusService } from '../services/flow-status.service';
 import { NodeRenderingService } from '../services/node-rendering.service';
 import { ViewportService } from '../services/viewport.service';
+import { dispatchPointer, pointerEvent } from '../gestures/pointer-events.testing';
 
 describe('ConnectionControllerDirective', () => {
   let flowEntitiesService: FlowEntitiesService;
@@ -66,12 +67,15 @@ describe('ConnectionControllerDirective', () => {
   it('delays connection and reconnection until the pointer crosses the configured threshold', () => {
     TestBed.inject(FlowSettingsService).connectionDragThreshold.set(10);
     const handle = createHandle(createNodeModel('source'), 'source');
-    const down = new MouseEvent('mousedown', { clientX: 100, clientY: 100 });
+    const down = pointerEvent('pointerdown', { x: 100 });
     controller.startConnection(handle, down);
     expect(statusService.status().state).toBe('idle');
-    document.dispatchEvent(new MouseEvent('mousemove', { clientX: 106, clientY: 100 }));
+    dispatchPointer(document, 'pointermove', { x: 106 });
     expect(statusService.status().state).toBe('idle');
-    document.dispatchEvent(new MouseEvent('mousemove', { clientX: 112, clientY: 100 }));
+    // Another pointer does not count.
+    dispatchPointer(document, 'pointermove', { x: 150, pointerId: 2 });
+    expect(statusService.status().state).toBe('idle');
+    dispatchPointer(document, 'pointermove', { x: 112 });
     expect(statusService.status().state).toBe('connection-start');
     statusService.setIdleStatus();
     const edge = TestBed.runInInjectionContext(
@@ -79,28 +83,28 @@ describe('ConnectionControllerDirective', () => {
     );
     controller.startReconnection(handle, edge, down);
     expect(statusService.status().state).toBe('idle');
-    document.dispatchEvent(new MouseEvent('mousemove', { clientX: 112, clientY: 100 }));
+    dispatchPointer(document, 'pointermove', { x: 112 });
     expect(statusService.status().state).toBe('reconnection-start');
   });
 
   it('uses the same client-space activation threshold for touch connections', () => {
     TestBed.inject(FlowSettingsService).connectionDragThreshold.set(10);
     const handle = createHandle(createNodeModel('source'), 'source');
-    const touch = (x: number) => new Touch({ identifier: 0, target: document.body, clientX: x, clientY: 100 });
-    controller.startConnection(handle, new TouchEvent('touchstart', { touches: [touch(100)] }));
-    document.dispatchEvent(new TouchEvent('touchmove', { touches: [touch(105)], cancelable: true }));
+    controller.startConnection(handle, pointerEvent('pointerdown', { x: 100, pointerType: 'touch' }));
+    dispatchPointer(document, 'pointermove', { x: 105, pointerType: 'touch' });
     expect(statusService.status().state).toBe('idle');
-    document.dispatchEvent(new TouchEvent('touchmove', { touches: [touch(112)], cancelable: true }));
+    dispatchPointer(document, 'pointermove', { x: 112, pointerType: 'touch' });
     expect(statusService.status().state).toBe('connection-start');
   });
 
   it('cancels a pending connection on pointer release or window blur', () => {
     TestBed.inject(FlowSettingsService).connectionDragThreshold.set(10);
     const handle = createHandle(createNodeModel('source'), 'source');
-    for (const cancel of ['mouseup', 'blur']) {
-      controller.startConnection(handle, new MouseEvent('mousedown', { clientX: 100, clientY: 100 }));
-      (cancel === 'blur' ? window : document).dispatchEvent(new Event(cancel));
-      document.dispatchEvent(new MouseEvent('mousemove', { clientX: 150, clientY: 100 }));
+    for (const cancel of ['pointerup', 'pointercancel', 'blur']) {
+      controller.startConnection(handle, pointerEvent('pointerdown', { x: 100 }));
+      if (cancel === 'blur') window.dispatchEvent(new Event('blur'));
+      else dispatchPointer(document, cancel, { x: 100 });
+      dispatchPointer(document, 'pointermove', { x: 150 });
       expect(statusService.status().state).toBe('idle');
     }
   });

@@ -10,6 +10,7 @@ import { NodeModel } from '../models/node.model';
 import { createNode } from '../interfaces/node.interface';
 import { KeyboardService } from './keyboard.service';
 import { ResizeObserverService } from './resize-observer.service';
+import { dispatchPointer, pointerEvent } from '../gestures/pointer-events.testing';
 
 describe('DraggableService', () => {
   let service: DraggableService;
@@ -142,16 +143,20 @@ describe('DraggableService', () => {
     return { pane, element, getPaneRect };
   }
 
+  const pointerTypes = { mousedown: 'pointerdown', mousemove: 'pointermove', mouseup: 'pointerup' } as const;
+
   function dispatchMouse(target: EventTarget, type: 'mousedown' | 'mousemove' | 'mouseup', x: number, y: number) {
-    target.dispatchEvent(
-      new MouseEvent(type, {
-        bubbles: true,
-        view: window,
-        button: 0,
-        clientX: x,
-        clientY: y,
-      }),
-    );
+    dispatchPointer(target, pointerTypes[type], { x, y });
+  }
+
+  function press(target: EventTarget | null, init: { button?: number; ctrlKey?: boolean } = {}) {
+    const event = pointerEvent('pointerdown', { x: 0, y: 0, ...init });
+    Object.defineProperty(event, 'target', { value: target });
+    return event;
+  }
+
+  function dragFilter(model: NodeModel): (event: PointerEvent) => boolean {
+    return (service as any).dragFilter(model);
   }
 
   function startNodeDrag(...paneRects: DOMRect[]) {
@@ -236,64 +241,104 @@ describe('DraggableService', () => {
   it('should block group drag when selection shortcut is active', () => {
     const group = createModel({ id: 'group' });
     createModel({ id: 'member', parentId: 'group' });
-    const dragFilter = (service as any).getDragBehavior(group).filter();
+    const filter = dragFilter(group);
     const target = document.createElement('div');
 
     keyboardServiceMock.selectionActive = true;
 
-    expect(dragFilter({ target } as unknown as Event)).toBe(false);
+    expect(filter(press(target))).toBe(false);
   });
 
   it('should keep regular node drag available when selection shortcut is active', () => {
     const node = createModel({ id: 'node' });
-    const dragFilter = (service as any).getDragBehavior(node).filter();
+    const filter = dragFilter(node);
     const target = document.createElement('div');
 
     keyboardServiceMock.selectionActive = true;
 
-    expect(dragFilter({ target } as unknown as Event)).toBe(true);
+    expect(filter(press(target))).toBe(true);
   });
 
-  it('should reject drag for non-primary mouse buttons (d3-drag default)', () => {
-    const node = createModel({ id: 'node' });
-    const dragFilter = (service as any).getDragBehavior(node).filter();
+  it('should reject drag for non-primary mouse buttons (primary button only)', () => {
+    const filter = dragFilter(createModel({ id: 'node' }));
 
-    expect(dragFilter(new MouseEvent('mousedown', { button: 1, bubbles: true, clientX: 0, clientY: 0 }))).toBe(false);
-    expect(dragFilter(new MouseEvent('mousedown', { button: 2, bubbles: true, clientX: 0, clientY: 0 }))).toBe(false);
+    expect(filter(press(null, { button: 1 }))).toBe(false);
+    expect(filter(press(null, { button: 2 }))).toBe(false);
   });
 
-  it('should reject drag when ctrlKey is set (d3-drag default)', () => {
-    const node = createModel({ id: 'node' });
-    const dragFilter = (service as any).getDragBehavior(node).filter();
+  it('should reject drag when ctrlKey is set (context menu on macOS)', () => {
+    const filter = dragFilter(createModel({ id: 'node' }));
 
-    expect(
-      dragFilter(new MouseEvent('mousedown', { button: 0, ctrlKey: true, bubbles: true, clientX: 0, clientY: 0 })),
-    ).toBe(false);
+    expect(filter(press(null, { ctrlKey: true }))).toBe(false);
   });
 
   it('should allow drag for primary mouse button with a null target', () => {
-    const node = createModel({ id: 'node' });
-    const dragFilter = (service as any).getDragBehavior(node).filter();
-    const event = new MouseEvent('mousedown', { button: 0, bubbles: true, clientX: 0, clientY: 0 });
+    const filter = dragFilter(createModel({ id: 'node' }));
+    const event = pointerEvent('pointerdown', { x: 0, y: 0 });
 
     expect(event.target).toBeNull();
-    expect(dragFilter(event)).toBe(true);
+    expect(filter(event)).toBe(true);
+  });
+
+  it('suppresses the click after a drag past the threshold and keeps it below', async () => {
+    TestBed.inject(FlowSettingsService).nodeDragThreshold.set(10);
+    const { element } = startNodeDrag(new DOMRect(0, 0, 400, 300));
+    let clicks = 0;
+    element.addEventListener('click', () => clicks++);
+    dispatchMouse(window, 'mousemove', 155, 100);
+    dispatchMouse(window, 'mouseup', 155, 100);
+    element.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(clicks).toBe(1);
+
+    dispatchMouse(element, 'mousedown', 150, 100);
+    dispatchMouse(window, 'mousemove', 175, 100);
+    dispatchMouse(window, 'mouseup', 175, 100);
+    element.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(clicks).toBe(1);
+    await new Promise((resolve) => setTimeout(resolve));
+    element.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(clicks).toBe(2);
+  });
+
+  it('ends the drag when the browser cancels the pointer and when the window loses focus', () => {
+    const status = TestBed.inject(FlowStatusService);
+    const { model, element } = startNodeDrag(new DOMRect(0, 0, 400, 300), new DOMRect(0, 0, 400, 300));
+    dispatchMouse(window, 'mousemove', 160, 100);
+    dispatchPointer(window, 'pointercancel', { x: 160, y: 100 });
+    expect(status.status().state).toBe('node-drag-end');
+    expect(model.dragging()).toBeFalse();
+    expect(model.point()).toEqual({ x: 20, y: 20 });
+
+    dispatchMouse(element, 'mousedown', 150, 100);
+    dispatchMouse(window, 'mousemove', 170, 100);
+    window.dispatchEvent(new Event('blur'));
+    expect(model.dragging()).toBeFalse();
+    dispatchMouse(window, 'mousemove', 190, 100);
+    expect(model.point()).toEqual({ x: 40, y: 20 });
+  });
+
+  it('ends a mouse drag whose release happened out of sight', () => {
+    const status = TestBed.inject(FlowStatusService);
+    startNodeDrag(new DOMRect(0, 0, 400, 300));
+    dispatchMouse(window, 'mousemove', 160, 100);
+    window.dispatchEvent(new PointerEvent('pointermove', { pointerId: 1, pointerType: 'mouse', buttons: 0 }));
+    expect(status.status().state).toBe('node-drag-end');
   });
 
   it('should reject drag from a descendant of a no-drag element', () => {
     const node = createModel({ id: 'node' });
-    const dragFilter = (service as any).getDragBehavior(node).filter();
+    const filter = dragFilter(node);
     const noDragElement = document.createElement('div');
     const target = document.createElement('span');
     noDragElement.setAttribute('data-vflow-no-drag', '');
     noDragElement.append(target);
 
-    expect(dragFilter({ target } as unknown as Event)).toBe(false);
+    expect(filter(press(target))).toBe(false);
   });
 
   it('should reject drag from inside a handle unless a drag handle inside it is the closer ancestor', () => {
     const node = createModel({ id: 'node' });
-    const dragFilter = (service as any).getDragBehavior(node).filter();
+    const filter = dragFilter(node);
     const handle = document.createElement('div');
     handle.classList.add('vflow-handle');
     const dragHandle = document.createElement('div');
@@ -303,20 +348,20 @@ describe('DraggableService', () => {
     handle.append(dragHandle, body);
     dragHandle.append(title);
 
-    expect(dragFilter({ target: body } as unknown as Event)).toBe(false);
+    expect(filter(press(body))).toBe(false);
     node.dragHandlesCount.set(1);
-    expect(dragFilter({ target: body } as unknown as Event)).toBe(false);
-    expect(dragFilter({ target: title } as unknown as Event)).toBe(true);
+    expect(filter(press(body))).toBe(false);
+    expect(filter(press(title))).toBe(true);
   });
 
   it('should allow drag from a valid drag handle target', () => {
     const node = createModel({ id: 'node' });
-    const dragFilter = (service as any).getDragBehavior(node).filter();
+    const filter = dragFilter(node);
     const target = document.createElement('div');
     target.classList.add('vflow-drag-handle');
     node.dragHandlesCount.set(1);
 
-    expect(dragFilter({ target } as unknown as Event)).toBe(true);
+    expect(filter(press(target))).toBe(true);
   });
 
   it('should reuse pane geometry while dragging at non-unit zoom', () => {

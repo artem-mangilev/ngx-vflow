@@ -17,7 +17,7 @@ import {
   ElementRef,
 } from '@angular/core';
 import { Node } from '../../interfaces/node.interface';
-import { MapContextDirective } from '../../directives/map-context.directive';
+import { ViewportGesturesDirective } from '../../directives/viewport-gestures.directive';
 import { ViewportVisibilityDirective } from '../../directives/viewport-visibility.directive';
 import { DraggableService } from '../../services/draggable.service';
 import { NodeModel } from '../../models/node.model';
@@ -152,7 +152,7 @@ const nodeDragControllerHostDirective = {
     FlowSizeControllerDirective,
     DefsComponent,
     BackgroundComponent,
-    MapContextDirective,
+    ViewportGesturesDirective,
     ViewportVisibilityDirective,
     SpacePointContextDirective,
     ConnectionComponent,
@@ -500,8 +500,6 @@ export class VflowComponent {
   // #endregion
 
   // #region DIRECTIVES
-  protected mapContext = viewChild(MapContextDirective);
-
   protected spacePointContext = viewChild.required(SpacePointContextDirective);
   // #endregion
 
@@ -578,7 +576,7 @@ export class VflowComponent {
   }
 
   /**
-   * Sets the D3 zoom **translation** (`x`, `y`) while keeping the current zoom — the same meaning as
+   * Sets the viewport **translation** (`x`, `y`) while keeping the current zoom — the same meaning as
    * `x` / `y` on the public {@link viewport} signal. This is not a node position in flow space; to
    * center on a world point, use {@link fitView} or compute translate from flow coordinates and current `zoom`.
    *

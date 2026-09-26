@@ -10,8 +10,8 @@ export class RootSvgContextDirective {
   private flowStatusService = inject(FlowStatusService);
 
   // TODO: check for multiple instances on page
-  @HostListener('document:mouseup')
-  @HostListener('document:touchend')
+  @HostListener('document:pointerup')
+  @HostListener('document:pointercancel')
   @HostListener('contextmenu')
   protected resetConnection() {
     const status = this.flowStatusService.status();

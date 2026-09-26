@@ -2,6 +2,9 @@ import { ChangeDetectionStrategy, Component, provideZonelessChangeDetection } fr
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { VflowComponent } from './vflow.component';
 import { Vflow } from '../../vflow';
+import { dispatchPointer, pointerDrag, touchPointers } from '../../gestures/pointer-events.testing';
+import { ViewportService } from '../../services/viewport.service';
+import { SelectionService } from '../../services/selection.service';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -23,7 +26,6 @@ describe('public viewport gesture settings', () => {
       imports: [VflowComponent, ControlsComponent],
       providers: [provideZonelessChangeDetection()],
     });
-    spyOnProperty(navigator, 'maxTouchPoints').and.returnValue(2);
     fixture = TestBed.createComponent(VflowComponent);
     fixture.componentRef.setInput('nodes', []);
     fixture.componentRef.setInput('view', [400, 300]);
@@ -35,7 +37,7 @@ describe('public viewport gesture settings', () => {
 
   afterEach(async () => {
     window.dispatchEvent(new Event('blur'));
-    await pause(); // Let D3 finish its wheel/touch gesture before destroying the fixture.
+    await pause(); // Let the wheel gesture end before destroying the fixture.
   });
 
   function wheel(target: Element = pane, ctrlKey = false) {
@@ -52,27 +54,23 @@ describe('public viewport gesture settings', () => {
     return event;
   }
 
-  function mouse(target: EventTarget, type: string, x: number, button = 0) {
-    target.dispatchEvent(
-      new MouseEvent(type, { bubbles: true, cancelable: true, clientX: x, clientY: 100, button, view: window }),
-    );
+  function drag(button = 0, target: Element = pane) {
+    pointerDrag(target, { x: 100 }, [{ x: 140 }], { button });
   }
 
-  function drag(button = 0, target: Element = pane) {
-    mouse(target, 'mousedown', 100, button);
-    mouse(window, 'mousemove', 140, button);
-    mouse(window, 'mouseup', 140, button);
+  function dblclick(x = 100, shiftKey = false) {
+    pane.dispatchEvent(
+      new MouseEvent('dblclick', { bubbles: true, cancelable: true, clientX: x, clientY: 100, shiftKey, view: window }),
+    );
   }
 
   function key(type: string, code: string, target: EventTarget = document) {
     target.dispatchEvent(new KeyboardEvent(type, { bubbles: true, code }));
   }
 
-  function touch(type: string, points: number[]) {
-    const touches = points.map((clientX, identifier) => new Touch({ identifier, target: pane, clientX, clientY: 100 }));
-    const event = new TouchEvent(type, { bubbles: true, cancelable: true, touches, changedTouches: touches });
-    pane.dispatchEvent(event);
-    return event;
+  async function settle() {
+    fixture.detectChanges();
+    await pause(50);
   }
 
   it('preserves ordinary wheel zoom and all-button drag defaults', () => {
@@ -105,25 +103,24 @@ describe('public viewport gesture settings', () => {
     flow.zoomOnPinch = false;
     flow.zoomOnDoubleClick = false;
     flow.keyboardShortcuts = { modifiers: { panActivation: [], zoomActivation: [] } };
+    fixture.detectChanges();
+    expect(pane.style.touchAction).toBe('auto');
     drag();
     expect(wheel().defaultPrevented).toBeFalse();
     expect(wheel(pane, true).defaultPrevented).toBeFalse();
-    mouse(pane, 'dblclick', 100);
-    touch('touchstart', [100, 150]);
-    expect(touch('touchmove', [80, 170]).defaultPrevented).toBeFalse();
-    touch('touchend', []);
+    dblclick();
+    touchPointers(pane, 'pointerdown', [{ x: 100 }, { x: 150 }]);
+    expect(touchPointers(pane, 'pointermove', [{ x: 80 }, { x: 170 }]).some((e) => e.defaultPrevented)).toBeFalse();
+    touchPointers(pane, 'pointerup', [{ x: 80 }, { x: 170 }]);
     expect(flow.viewport()).toEqual({ x: 0, y: 0, zoom: 1 });
     flow.viewportTo({ x: 20, y: 30, zoom: 2 });
-    fixture.detectChanges();
-    await pause(50);
+    await settle();
     expect(flow.viewport()).toEqual({ x: 20, y: 30, zoom: 2 });
     flow.panTo({ x: 40, y: 50 });
-    fixture.detectChanges();
-    await pause(50);
+    await settle();
     expect(flow.viewport()).toEqual({ x: 40, y: 50, zoom: 2 });
     flow.zoomTo(1);
-    fixture.detectChanges();
-    await pause(50);
+    await settle();
     expect(flow.viewport().zoom).toBe(1);
   });
 
@@ -186,26 +183,24 @@ describe('public viewport gesture settings', () => {
     expect(flow.viewport()).toEqual({ x: 0, y: 0, zoom: 1 });
   });
 
-  it('leaves touch scrolling available in an opted-out draggable-node control', async () => {
+  it('starts no gesture from an opted-out control inside a draggable node', async () => {
     const { createNode } = await import('../../interfaces/node.interface');
-    fixture.componentRef.setInput('nodes', [createNode({ id: 'node', point: { x: 0, y: 0 } })]);
+    const node = createNode({ id: 'node', point: { x: 0, y: 0 } });
+    fixture.componentRef.setInput('nodes', [node]);
     fixture.detectChanges();
     await fixture.whenStable();
     const controls = TestBed.createComponent(ControlsComponent);
     controls.detectChanges();
-    const node = pane.querySelector('.vflow-node') as HTMLElement;
-    node.appendChild(controls.nativeElement);
-    expect(node.style.touchAction).not.toBe('none');
+    const host = pane.querySelector('.vflow-node') as HTMLElement;
+    host.appendChild(controls.nativeElement);
     const input = controls.nativeElement.querySelector('input');
-    for (const type of ['touchstart', 'touchmove', 'touchend']) {
-      const touches =
-        type === 'touchend'
-          ? []
-          : [new Touch({ identifier: 0, target: input, clientX: 100, clientY: type === 'touchmove' ? 140 : 100 })];
-      const event = new TouchEvent(type, { bubbles: true, cancelable: true, touches, changedTouches: touches });
-      input.dispatchEvent(event);
-      expect(event.defaultPrevented).toBeFalse();
-    }
+    const events = [
+      dispatchPointer(input, 'pointerdown', { x: 100, pointerType: 'touch', pointerId: 10 }),
+      dispatchPointer(window, 'pointermove', { x: 100, y: 140, pointerType: 'touch', pointerId: 10 }),
+      dispatchPointer(window, 'pointerup', { x: 100, y: 140, pointerType: 'touch', pointerId: 10 }),
+    ];
+    expect(events.some((event) => event.defaultPrevented)).toBeFalse();
+    expect(node.point()).toEqual({ x: 0, y: 0 });
     expect(flow.viewport()).toEqual({ x: 0, y: 0, zoom: 1 });
     controls.destroy();
   });
@@ -215,24 +210,18 @@ describe('public viewport gesture settings', () => {
     controls.detectChanges();
     pane.appendChild(controls.nativeElement);
     const target = controls.nativeElement.querySelector('span');
-    for (const [type, points] of [
-      ['touchstart', [100, 200]],
-      ['touchmove', [90, 230]],
-    ] as const) {
-      const touches = points.map((clientX, identifier) => new Touch({ identifier, target, clientX, clientY: 100 }));
-      target.dispatchEvent(new TouchEvent(type, { bubbles: true, cancelable: true, touches, changedTouches: touches }));
-    }
+    touchPointers(target, 'pointerdown', [{ x: 100 }, { x: 200 }]);
+    touchPointers(target, 'pointermove', [{ x: 90 }, { x: 230 }]);
     expect(flow.viewport().zoom).toBeCloseTo(1.4);
     // Scale around the initial midpoint without the additional 10px pan.
     expect(flow.viewport().x).toBeCloseTo(-60);
-    target.dispatchEvent(new TouchEvent('touchend', { bubbles: true, touches: [] }));
+    touchPointers(target, 'pointerup', [{ x: 90 }, { x: 230 }]);
     controls.destroy();
   });
 
   it('preserves page scrolling for a new outward wheel gesture at the zoom limit', async () => {
     flow.zoomTo(3);
-    fixture.detectChanges();
-    await pause(50);
+    await settle();
     expect(wheel().defaultPrevented).toBeFalse();
     expect(flow.viewport().zoom).toBe(3);
   });
@@ -244,41 +233,149 @@ describe('public viewport gesture settings', () => {
     fixture.detectChanges();
     await fixture.whenStable();
     flow.paneClickDistance = 2;
-    mouse(pane, 'mousedown', 100);
-    mouse(pane, 'mousemove', 104);
-    mouse(pane, 'mouseup', 104);
+    pointerDrag(pane, { x: 100 }, [{ x: 104 }]);
     expect(node.selected()).toBeTrue();
     flow.paneClickDistance = 6;
-    mouse(pane, 'mousedown', 100);
-    mouse(pane, 'mousemove', 104);
-    mouse(pane, 'mouseup', 104);
+    pointerDrag(pane, { x: 100 }, [{ x: 104 }]);
     expect(node.selected()).toBeFalse();
   });
 
   it('allows touchscreen pinch with drag pan disabled', () => {
     flow.panOnDrag = false;
-    touch('touchstart', [100, 200]);
-    touch('touchmove', [80, 220]);
+    fixture.detectChanges();
+    expect(pane.style.touchAction).toBe('pan-x pan-y');
+    touchPointers(pane, 'pointerdown', [{ x: 100 }, { x: 200 }]);
+    touchPointers(pane, 'pointermove', [{ x: 80 }, { x: 220 }]);
     expect(flow.viewport().zoom).toBeCloseTo(1.4);
-    touch('touchend', []);
+    touchPointers(pane, 'pointerup', [{ x: 80 }, { x: 220 }]);
   });
 
   it('allows touchscreen pan while pinch zoom is disabled', () => {
     flow.zoomOnPinch = false;
-    touch('touchstart', [100, 200]);
-    touch('touchmove', [90, 230]);
+    fixture.detectChanges();
+    expect(pane.style.touchAction).toBe('none');
+    touchPointers(pane, 'pointerdown', [{ x: 100 }, { x: 200 }]);
+    touchPointers(pane, 'pointermove', [{ x: 90 }, { x: 230 }]);
     expect(flow.viewport().zoom).toBe(1);
     expect(flow.viewport().x).toBeCloseTo(10);
-    touch('touchend', []);
+    touchPointers(pane, 'pointerup', [{ x: 90 }, { x: 230 }]);
+  });
+
+  it('pans with one finger and zooms two fingers around their middle', () => {
+    touchPointers(pane, 'pointerdown', [{ x: 100 }]);
+    touchPointers(pane, 'pointermove', [{ x: 130, y: 120 }]);
+    expect(flow.viewport()).toEqual({ x: 30, y: 20, zoom: 1 });
+    touchPointers(pane, 'pointerup', [{ x: 130, y: 120 }]);
+    flow.viewportTo({ x: 0, y: 0, zoom: 1 });
+    fixture.detectChanges();
+    const { left, top } = pane.getBoundingClientRect();
+    touchPointers(pane, 'pointerdown', [{ x: 100 }, { x: 200 }]);
+    touchPointers(pane, 'pointermove', [{ x: 50 }, { x: 250 }]);
+    expect(flow.viewport().zoom).toBe(2);
+    expect(flow.viewport().x).toBeCloseTo(left - 150);
+    expect(flow.viewport().y).toBeCloseTo(top - 100);
+    // Lifting one finger keeps the other one holding the flow point under it.
+    touchPointers(pane, 'pointerup', [{ x: 50 }]);
+    dispatchPointer(window, 'pointermove', { x: 260, pointerType: 'touch', pointerId: 11 });
+    expect(flow.viewport().zoom).toBe(2);
+    expect(flow.viewport().x).toBeCloseTo(left - 140);
+    expect(flow.viewport().y).toBeCloseTo(top - 100);
+    dispatchPointer(window, 'pointerup', { x: 260, pointerType: 'touch', pointerId: 11 });
   });
 
   it('toggles double-click zoom after initialization', async () => {
-    mouse(pane, 'dblclick', 100);
+    dblclick();
     await pause(300);
     expect(flow.viewport().zoom).toBe(1);
     flow.zoomOnDoubleClick = true;
-    mouse(pane, 'dblclick', 100);
+    const { left, top } = pane.getBoundingClientRect();
+    dblclick();
     await pause(300);
-    expect(flow.viewport().zoom).toBe(2);
+    expect(flow.viewport()).toEqual({ x: left - 100, y: top - 100, zoom: 2 });
+    dblclick(100, true);
+    await pause(300);
+    expect(flow.viewport()).toEqual({ x: 0, y: 0, zoom: 1 });
+  });
+
+  it('zooms on a touch double tap when double-click zoom is enabled', async () => {
+    flow.zoomOnDoubleClick = true;
+    for (let tap = 0; tap < 2; tap++) {
+      touchPointers(pane, 'pointerdown', [{ x: 100 }]);
+      touchPointers(pane, 'pointerup', [{ x: 100 }]);
+    }
+    await pause(300);
+    const { left, top } = pane.getBoundingClientRect();
+    expect(flow.viewport()).toEqual({ x: left - 100, y: top - 100, zoom: 2 });
+  });
+
+  it('reports one gesture end per wheel gesture and per programmatic change', async () => {
+    const viewportService = fixture.debugElement.injector.get(ViewportService);
+    let ends = 0;
+    viewportService.viewportChangeEnd$.subscribe(() => ends++);
+    wheel();
+    wheel();
+    wheel();
+    expect(ends).toBe(0);
+    await pause(200);
+    expect(ends).toBe(1);
+    flow.zoomTo(2);
+    await settle();
+    expect(ends).toBe(2);
+  });
+
+  it('zooms programmatically around the pane center and clamps only zoomTo', async () => {
+    flow.zoomTo(2);
+    await settle();
+    expect(flow.viewport()).toEqual({ x: -200, y: -150, zoom: 2 });
+    flow.zoomTo(10);
+    await settle();
+    expect(flow.viewport().zoom).toBe(3);
+    flow.viewportTo({ x: 5, y: 6, zoom: 10 });
+    await settle();
+    expect(flow.viewport()).toEqual({ x: 5, y: 6, zoom: 10 });
+  });
+
+  it('animates programmatic changes to their exact end and lets a press interrupt them', async () => {
+    const viewportService = fixture.debugElement.injector.get(ViewportService);
+    viewportService.writableViewport.set({ changeType: 'absolute', state: { x: 100, y: 50, zoom: 2 }, duration: 200 });
+    fixture.detectChanges();
+    await pause(100);
+    const middle = flow.viewport();
+    expect(middle.zoom).toBeGreaterThan(1);
+    expect(middle.zoom).toBeLessThan(2);
+    await pause(250);
+    expect(flow.viewport()).toEqual({ x: 100, y: 50, zoom: 2 });
+
+    viewportService.writableViewport.set({ changeType: 'absolute', state: { x: 0, y: 0, zoom: 1 }, duration: 300 });
+    fixture.detectChanges();
+    await pause(100);
+    dispatchPointer(pane, 'pointerdown', { x: 100 });
+    const interrupted = flow.viewport();
+    await pause(300);
+    expect(flow.viewport()).toEqual(interrupted);
+    dispatchPointer(window, 'pointerup', { x: 100 });
+  });
+
+  it('reports the pressed element as the target of a pane click', () => {
+    const selection = fixture.debugElement.injector.get(SelectionService);
+    const setViewport = spyOn(selection, 'setViewport').and.callThrough();
+    const child = document.createElement('span');
+    pane.appendChild(child);
+    dispatchPointer(child, 'pointerdown', { x: 100 });
+    dispatchPointer(window, 'pointermove', { x: 101 });
+    dispatchPointer(window, 'pointerup', { x: 101 });
+    expect(setViewport).toHaveBeenCalledOnceWith(jasmine.objectContaining({ target: child }));
+  });
+
+  it('suppresses the click after a pan and keeps a plain click', async () => {
+    let clicks = 0;
+    pane.addEventListener('click', () => clicks++);
+    drag();
+    pane.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+    expect(clicks).toBe(0);
+    await pause(0);
+    pointerDrag(pane, { x: 100 }, []);
+    pane.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+    expect(clicks).toBe(1);
   });
 });

@@ -13,6 +13,7 @@ import { VflowHandleDirective } from './directives/handle.directive';
 import { MiniMapComponent } from './public-components/minimap/minimap.component';
 import { NodeToolbarComponent } from './public-components/node-toolbar/node-toolbar.component';
 import { EdgeLabelTemplateDirective } from './directives/template.directive';
+import { mouseAsPointer } from './gestures/pointer-events.testing';
 
 /** An edge presentation that declares a center label, so the flow renders it in the label layer. */
 @Component({
@@ -149,7 +150,7 @@ describe('CSS viewport virtualization', () => {
       .get(FlowStatusService)
       .status$.subscribe((status) => states.push(status.state));
     const mouse = (type: string, x: number) =>
-      new MouseEvent(type, { clientX: x, clientY: 70, buttons: 1, bubbles: true, view: window });
+      mouseAsPointer(type, { clientX: x, clientY: 70, buttons: 1, bubbles: true, view: window });
     host.dispatchEvent(mouse('mousedown', 20));
     await fixture.whenStable();
     trackNodes.calls.reset();
@@ -408,7 +409,7 @@ describe('CSS viewport virtualization', () => {
     await settle(fixture);
     const hosts = fixture.nativeElement.querySelectorAll('.vflow-node') as NodeListOf<HTMLElement>;
     const mouse = (type: string, x: number) =>
-      new MouseEvent(type, { clientX: x, clientY: 20, buttons: 1, bubbles: true, view: window });
+      mouseAsPointer(type, { clientX: x, clientY: 20, buttons: 1, bubbles: true, view: window });
     hosts[0].dispatchEvent(mouse('mousedown', 20));
     window.dispatchEvent(mouse('mousemove', -1000));
     await settle(fixture);

@@ -6,6 +6,7 @@ import { createEdge, Edge } from '../../interfaces/edge.interface';
 import { createNode, Node } from '../../interfaces/node.interface';
 import { Vflow } from '../../vflow';
 import { VflowComponent } from './vflow.component';
+import { dispatchMouse } from '../../gestures/pointer-events.testing';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -78,10 +79,8 @@ describe('public auto-pan settings', () => {
     await frame(0);
   }
 
-  function mouse(target: EventTarget, type: string, x: number, y: number) {
-    target.dispatchEvent(
-      new MouseEvent(type, { bubbles: true, cancelable: true, clientX: x, clientY: y, view: window }),
-    );
+  function mouse(target: EventTarget, type: 'mousedown' | 'mousemove' | 'mouseup', x: number, y: number) {
+    dispatchMouse(target, type, { x, y });
   }
 
   function drag(x = 0, y = 150) {
@@ -244,16 +243,8 @@ describe('auto-pan with real browser frames', () => {
     const root = fixture.nativeElement.querySelector('.vflow-root') as HTMLElement;
     const nodes = fixture.nativeElement.querySelectorAll('[node]') as NodeListOf<HTMLElement>;
     const rect = root.getBoundingClientRect();
-    const mouse = (target: EventTarget, type: string, x: number) =>
-      target.dispatchEvent(
-        new MouseEvent(type, {
-          bubbles: true,
-          cancelable: true,
-          clientX: rect.left + x,
-          clientY: rect.top + 150,
-          view: window,
-        }),
-      );
+    const mouse = (target: EventTarget, type: 'mousedown' | 'mousemove' | 'mouseup', x: number) =>
+      dispatchMouse(target, type, { x: rect.left + x, y: rect.top + 150 });
     const positions: number[] = [];
     try {
       mouse(nodes[0], 'mousedown', 110);
