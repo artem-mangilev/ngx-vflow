@@ -45,7 +45,7 @@ export class SelectionBoxContextDirective {
     )
     .subscribe();
 
-  protected moveSub = this.rootPointer.documentMouseMovement$
+  protected moveSub = this.rootPointer.documentPointerMove$
     .pipe(
       filter(() => this.model.active()),
       tap((event) => {

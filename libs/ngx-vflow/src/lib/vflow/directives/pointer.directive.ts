@@ -1,86 +1,25 @@
-import { Directive, ElementRef, HostListener, inject, output } from '@angular/core';
-import { filter, tap } from 'rxjs/operators';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { RootPointerDirective } from './root-pointer.directive';
-import { isTouchEvent } from '../utils/event';
+import { Directive, output } from '@angular/core';
 
+/**
+ * Pointer outputs of library elements: a press, a release, and the pointer entering or leaving the element or a
+ * descendant. Touch pointers of a connection gesture are not captured, so they report the element under the finger.
+ */
 @Directive({
   standalone: true,
   selector: '[pointerStart], [pointerEnd], [pointerOver], [pointerOut]',
+  host: {
+    '(pointerdown)': 'pointerStart.emit($event)',
+    '(pointerup)': 'pointerEnd.emit($event)',
+    '(pointerover)': 'pointerOver.emit($event)',
+    '(pointerout)': 'pointerOut.emit($event)',
+  },
 })
 export class PointerDirective {
-  protected hostElement = inject<ElementRef<Element>>(ElementRef).nativeElement;
-  protected pointerMovementDirective = inject(RootPointerDirective);
+  protected readonly pointerOver = output<PointerEvent>();
 
-  protected readonly pointerOver = output<Event>();
+  protected readonly pointerOut = output<PointerEvent>();
 
-  protected readonly pointerOut = output<Event>();
+  protected readonly pointerStart = output<PointerEvent>();
 
-  /**
-   * @todo the Angular may somehow ignore the event.
-   * reproduced here: https://www.ngx-vflow.org/workshops/layout/vizdom-layout
-   */
-  protected readonly pointerStart = output<Event>();
-
-  protected readonly pointerEnd = output<Event>();
-
-  @HostListener('mousedown', ['$event'])
-  @HostListener('touchstart', ['$event'])
-  protected onPointerStart(event: Event) {
-    this.pointerStart.emit(event);
-
-    if (isTouchEvent(event)) {
-      this.pointerMovementDirective.setInitialTouch(event);
-    }
-  }
-
-  @HostListener('mouseup', ['$event'])
-  protected onPointerEnd(event: Event) {
-    this.pointerEnd.emit(event);
-  }
-
-  @HostListener('mouseover', ['$event'])
-  protected onMouseOver(event: Event) {
-    this.pointerOver.emit(event);
-  }
-
-  @HostListener('mouseout', ['$event'])
-  protected onMouseOut(event: Event) {
-    this.pointerOut.emit(event);
-  }
-
-  private wasPointerOver = false;
-
-  // TODO check if i could avoid global touch end
-  protected touchEnd = this.pointerMovementDirective.touchEnd$
-    .pipe(
-      filter(({ target }) => target === this.hostElement),
-      tap(({ originalEvent }) => this.pointerEnd.emit(originalEvent)),
-      takeUntilDestroyed(),
-    )
-    .subscribe();
-
-  protected touchOverOut = this.pointerMovementDirective.touchMovement$
-    .pipe(
-      tap(({ target, originalEvent }) => {
-        this.handleTouchOverAndOut(target, originalEvent);
-      }),
-      takeUntilDestroyed(),
-    )
-    .subscribe();
-
-  // TODO: dirty imperative implementation
-  private handleTouchOverAndOut(target: Element | null, event: TouchEvent) {
-    if (target === this.hostElement) {
-      this.pointerOver.emit(event);
-      this.wasPointerOver = true;
-    } else {
-      // should not emit before pointerOver
-      if (this.wasPointerOver) {
-        this.pointerOut.emit(event);
-      }
-
-      this.wasPointerOver = false;
-    }
-  }
+  protected readonly pointerEnd = output<PointerEvent>();
 }

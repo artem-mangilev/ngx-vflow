@@ -29,6 +29,7 @@ import { VflowHandleDirective } from './directives/handle.directive';
 import { EdgeLabelComponent } from './components/edge-label/edge-label.component';
 import { ConnectionModel } from './models/connection.model';
 import { VflowComponent } from './components/vflow/vflow.component';
+import { mouseAsPointer } from './gestures/pointer-events.testing';
 
 /** Labels render a template declared by the edge presentation; this host supplies a minimal one. */
 @Component({
@@ -388,7 +389,7 @@ describe('Graph rendering and interaction regressions', () => {
       onResizeEnd: end,
     });
     const mouse = (type: string, x: number) =>
-      new MouseEvent(type, {
+      mouseAsPointer(type, {
         clientX: x,
         clientY: 25,
         bubbles: true,
@@ -430,7 +431,7 @@ describe('Graph rendering and interaction regressions', () => {
       keepAspectRatio: false,
     });
     const mouse = (type: string, x: number) =>
-      new MouseEvent(type, {
+      mouseAsPointer(type, {
         clientX: x,
         clientY: 25,
         bubbles: true,

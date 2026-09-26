@@ -12,6 +12,7 @@ import { ViewportService } from '../services/viewport.service';
 import { RootPointerDirective } from './root-pointer.directive';
 import { SelectionBoxContextDirective } from './selection-box-context.directive';
 import { SpacePointContextDirective } from './space-point-context.directive';
+import { dispatchPointer } from '../gestures/pointer-events.testing';
 
 @Component({
   template: `
@@ -74,7 +75,7 @@ describe('SelectionBoxContextDirective', () => {
     const root = fixture.nativeElement.querySelector('[rootPointer]') as HTMLElement;
     const pane = fixture.nativeElement.querySelector('[spacePointContext]') as HTMLElement;
     pane.getBoundingClientRect = () => ({ left: 0, top: 0, x: 0, y: 0 }) as DOMRect;
-    root.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, clientX: 0, clientY: 0 }));
+    dispatchPointer(root, 'pointerdown', { x: 0, y: 0 });
     await new Promise((resolve) => setTimeout(resolve, 30));
   }
 
@@ -105,7 +106,7 @@ describe('SelectionBoxContextDirective', () => {
 
     await startSelectionBox();
     expect(fixture.componentInstance.context.model.active()).toBeTrue();
-    document.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, clientX: 20, clientY: 20 }));
+    dispatchPointer(document, 'pointermove', { x: 20, y: 20 });
 
     expect(fixture.componentInstance.context.model.width()).toBeGreaterThan(2);
     expect(eligible.selectable()).toBeTrue();
@@ -115,7 +116,7 @@ describe('SelectionBoxContextDirective', () => {
 
     eligible.rawNode.selectable!.set(false);
 
-    document.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, clientX: 120, clientY: 120 }));
+    dispatchPointer(document, 'pointerup', { x: 120, y: 120 });
 
     expect(ineligible.selected()).toBeFalse();
     expect(eligible.selected()).toBeTrue();

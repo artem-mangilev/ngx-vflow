@@ -1,5 +1,9 @@
 Control viewport gestures with inputs on `<vflow>`. Existing behavior is preserved unless you change these settings.
 
+Toggle the settings in this demo, then drag, scroll, pinch or double-click the canvas. The readout shows the viewport the gestures produce.
+
+{{ NgDocActions.demoPane("ViewportGesturesDemoComponent") }}
+
 | Input                     | Default | Behavior                                                                                                                                                                               |
 | ------------------------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `panOnDrag`               | `true`  | Drag to pan with any mouse button or one finger. Use an array of mouse button numbers, such as `[0, 1]`, to restrict mouse buttons. Arrays do not disable touch panning; `false` does. |
@@ -36,7 +40,7 @@ Both entries default to an empty list. That disables their keyboard activation, 
 - A draggable node keeps its own drag behavior even while the pan key is held. Explicit no-pan regions are also respected.
 - New activation shortcuts ignore keydown events from inputs, textareas, selects, and contenteditable regions, including modifier keys. Pressed keys reset when the window loses focus.
 
-Settings are read when handling events. An already-started D3 mouse drag finishes normally; the activation threshold is captured at pointer down. Wheel routing responds to subsequent events. No special mid-gesture cancellation is performed.
+Settings are read when handling events. An already-started drag finishes normally; the activation threshold is captured at pointer down. Wheel routing responds to subsequent events. No special mid-gesture cancellation is performed.
 
 # Canvas configuration
 
@@ -80,7 +84,15 @@ Each directive applies to its element and descendants:
 
 Wheel zoom suppresses page scrolling when it consumes an event. A new outward wheel gesture at a reached zoom limit can scroll the page. Scroll panning consumes its events. Disabled wheel gestures and `vflowNoWheel` leave native scrolling available. There is no separate `preventScrolling` setting.
 
-Accepted touch pan/zoom gestures suppress native scrolling. Disabled gestures and opted-out controls do not have their touch movement unconditionally cancelled by the flow. Application CSS such as `touch-action: none` on an ancestor can still prevent native scrolling.
+The browser decides whether a touch scrolls the page from CSS `touch-action` when the finger lands, so the flow sets it on the pane:
+
+| Settings                                  | Pane `touch-action` | Effect                                                |
+| ----------------------------------------- | ------------------- | ----------------------------------------------------- |
+| `panOnDrag` is not `false`                | `none`              | Touches pan and pinch the flow; the page stays still. |
+| `panOnDrag` is `false`, `zoomOnPinch` on  | `pan-x pan-y`       | One finger scrolls the page; two fingers pinch.       |
+| `panOnDrag` is `false`, `zoomOnPinch` off | `auto`              | The flow leaves touches to the page.                  |
+
+Draggable nodes, drag handles, handles and resize controls use `none`, so they stay draggable wherever the pane lets the page scroll. Scrollable controls inside nodes, such as a `textarea` or an element with `overflow: auto`, keep their own finger scrolling. A finger on an opted-out region that does not scroll itself cannot scroll the page while touch panning is enabled. Application CSS such as `touch-action: none` on an ancestor can still prevent native scrolling.
 
 # Disable all user viewport gestures
 

@@ -1,9 +1,11 @@
+import { isPanPress, pressTarget } from './press-target';
+
 /**
- * Whether d3-zoom on the root SVG should handle this pointer-down event for pan/zoom
- * when the target may be inside a node that acts as a viewport pan surface.
+ * Whether a press may start a viewport gesture of the pane when the target may be inside a node that acts as a
+ * viewport pan surface. Events other than `pointerdown` are always allowed. See {@link pressTarget}.
  */
 export function allowRootZoomForNodeTarget(event: Event, isSelectionKeyboardMode: boolean): boolean {
-  if (event.type !== 'mousedown' && event.type !== 'touchstart') {
+  if (event.type !== 'pointerdown') {
     return true;
   }
 
@@ -11,34 +13,5 @@ export function allowRootZoomForNodeTarget(event: Event, isSelectionKeyboardMode
     return false;
   }
 
-  const target = event.target;
-  if (!(target instanceof Element)) {
-    return true;
-  }
-
-  // No-drag elements (e.g. resize controls) must not start a pan
-  if (target.closest('[data-vflow-no-drag], [data-vflow-no-pan]')) {
-    return false;
-  }
-
-  // A handle starts a connection, never a pan, unless a drag handle inside it is the closer ancestor
-  const nearest = target.closest('.vflow-handle, .vflow-drag-handle');
-  if (nearest?.classList.contains('vflow-handle')) {
-    return false;
-  }
-
-  const node = target.closest('.vflow-node');
-  if (!node) {
-    return true;
-  }
-
-  if (node.classList.contains('vflow-node--undraggable')) {
-    return true;
-  }
-
-  if (node.classList.contains('vflow-node--drag-handles-only')) {
-    return target.closest('.vflow-drag-handle') === null;
-  }
-
-  return false;
+  return isPanPress(pressTarget(event.target));
 }

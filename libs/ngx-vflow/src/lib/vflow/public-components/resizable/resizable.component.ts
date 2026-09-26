@@ -31,7 +31,7 @@ import {
 
 /**
  * Adds resize controls (four lines + four corner handles) to a node. The controls
- * mutate the node dimensions/position through a d3-drag based resize engine.
+ * mutate the node dimensions/position through a pointer-based resize engine.
  *
  * The host element is the node's sizing box: in `explicit` size mode it receives the node size as an inline
  * border-box width/height, while an `auto` node keeps its content size. Put it on the top-level element of the

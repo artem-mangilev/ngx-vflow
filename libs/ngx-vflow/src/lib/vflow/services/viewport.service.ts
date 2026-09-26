@@ -14,7 +14,7 @@ export class ViewportService {
   private flowSettingsService = inject(FlowSettingsService);
 
   /**
-   * The default value used by d3, just copy it here
+   * The identity viewport: no translation, zoom 1.
    *
    * @returns default viewport value
    */

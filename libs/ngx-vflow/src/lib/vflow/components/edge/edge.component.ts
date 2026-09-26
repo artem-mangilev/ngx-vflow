@@ -36,8 +36,7 @@ import { FlowStatusService, isSelectionBoxEndStatus } from '../../services/flow-
     '(focusout)': 'model().focused.set(false)',
     // Clicks from the interaction stroke and from presentation elements bubble here.
     '(click)': 'onClick($event)',
-    '(mousedown)': 'pull()',
-    '(touchstart)': 'pull()',
+    '(pointerdown)': 'pull()',
     class: 'selectable',
   },
   providers: [
@@ -101,8 +100,8 @@ export class EdgeComponent {
     this.componentEventBus.pushEdgeEvent({ edgeId: this.model().edge.id, eventName, eventPayload });
   }
 
-  protected startReconnection(event: Event, handle: HandleModel) {
-    // ignore drag by stopping propagation
+  protected startReconnection(event: PointerEvent, handle: HandleModel) {
+    // The press belongs to the reconnection, not to a pan of the pane.
     event.stopPropagation();
 
     this.connectionController?.startReconnection(handle, this.model(), event);

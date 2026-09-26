@@ -1,15 +1,12 @@
 import { DestroyRef, Directive, ElementRef, computed, inject, input } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { filter, tap } from 'rxjs/operators';
 import { HandleService } from '../services/handle.service';
 import { HandleModel } from '../models/handle.model';
 import { FlowStatusService } from '../services/flow-status.service';
 import { ConnectionControllerDirective } from './connection-controller.directive';
-import { RootPointerDirective } from './root-pointer.directive';
 import { bindDomAttributes } from './entity-accessibility.directive';
 import { DomAttributes } from '../interfaces/dom-attributes.interface';
 import { HandleLayout, HandlePosition, HandleType } from '../types/handle-type.type';
-import { isTouchEvent } from '../utils/event';
+import { pressTarget } from '../utils/press-target';
 
 /**
  * Makes an element of a node presentation a connection point: a port on a node side, or, with `position="auto"`
@@ -37,11 +34,10 @@ import { isTouchEvent } from '../utils/event';
     '[style.right]': 'placement()?.right ?? null',
     '[style.bottom]': 'placement()?.bottom ?? null',
     '[style.transform]': 'placement()?.transform ?? null',
-    '(mousedown)': 'startConnection($event)',
-    '(touchstart)': 'startConnection($event)',
-    '(mouseup)': 'endConnection()',
-    '(mouseenter)': 'pointerEnter()',
-    '(mouseleave)': 'pointerLeave()',
+    '(pointerdown)': 'startConnection($event)',
+    '(pointerup)': 'endConnection()',
+    '(pointerenter)': 'pointerEnter()',
+    '(pointerleave)': 'pointerLeave()',
   },
 })
 export class VflowHandleDirective {
@@ -49,8 +45,6 @@ export class VflowHandleDirective {
   private readonly handleService = inject(HandleService);
   private readonly flowStatus = inject(FlowStatusService);
   private readonly connectionController = inject(ConnectionControllerDirective, { optional: true });
-  // Optional, so the directive also runs in unit tests of application components with `provideCustomNodeMocks()`.
-  private readonly rootPointer = inject(RootPointerDirective, { optional: true });
 
   /** `source`, `target`, or `any` for both directions. */
   public readonly handleType = input<HandleType>('source');
@@ -113,42 +107,17 @@ export class VflowHandleDirective {
 
     // Handles have no keyboard operation and are not exposed to assistive technology; only metadata is applied.
     bindDomAttributes(this.domAttributes);
-
-    this.rootPointer?.touchEnd$
-      ?.pipe(
-        filter(({ target }) => target === this.element),
-        takeUntilDestroyed(),
-      )
-      .subscribe(() => this.endConnection());
-
-    // Touch has no enter and leave: the element under the finger decides.
-    let touchInside = false;
-    this.rootPointer?.touchMovement$
-      ?.pipe(
-        tap(({ target }) => {
-          const inside = !!target && this.element.contains(target);
-          if (inside && !touchInside) this.pointerEnter();
-          if (!inside && touchInside) this.pointerLeave();
-          touchInside = inside;
-        }),
-        takeUntilDestroyed(),
-      )
-      .subscribe();
   }
 
   /**
    * The event also reaches the node, whose drag and the pane's pan reject targets inside a handle. A drag handle
    * inside the handle element keeps dragging the node instead of starting a connection.
    */
-  protected startConnection(event: Event) {
-    const dragHandle = event.target instanceof Element ? event.target.closest('.vflow-drag-handle') : null;
+  protected startConnection(event: PointerEvent) {
+    const { dragHandle } = pressTarget(event.target);
     if (dragHandle && this.element.contains(dragHandle)) return;
 
     this.connectionController?.startConnection(this.model, event);
-
-    if (isTouchEvent(event)) {
-      this.rootPointer?.setInitialTouch(event);
-    }
   }
 
   protected endConnection() {

@@ -17,6 +17,7 @@ import { Position } from '../types/position.type';
 import { VflowHandleDirective } from './handle.directive';
 import { ConnectionControllerDirective } from './connection-controller.directive';
 import { DragHandleDirective } from './drag-handle.directive';
+import { dispatchMouse } from '../gestures/pointer-events.testing';
 
 const side = signal<Position>('right');
 
@@ -238,24 +239,23 @@ describe('VflowHandleDirective', () => {
     const status = flow.get(FlowStatusService);
     const elementOf = (node: typeof a) => node.handles()[0].element!;
 
-    // A mousedown on the drag handle drags the node instead of starting a connection.
-    const mousedown = () => new MouseEvent('mousedown', { bubbles: true, cancelable: true, view: window });
-    elementOf(a).querySelector('.title')!.dispatchEvent(mousedown());
+    // A press on the drag handle drags the node instead of starting a connection.
+    dispatchMouse(elementOf(a).querySelector('.title')!, 'mousedown', { x: 0, y: 0 });
     expect(status.status().state).toBe('node-drag-start');
-    window.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, view: window }));
+    dispatchMouse(window, 'mouseup', { x: 0, y: 0 });
     expect(status.status().state).toBe('node-drag-end');
 
-    elementOf(a).querySelector('.body')!.dispatchEvent(mousedown());
+    dispatchMouse(elementOf(a).querySelector('.body')!, 'mousedown', { x: 0, y: 0 });
     expect(status.status().state).toBe('connection-start');
     await settle(fixture);
     expect(elementOf(a).dataset['vflowHandleState']).toBe('connecting');
 
-    elementOf(b).dispatchEvent(new MouseEvent('mouseenter'));
+    elementOf(b).dispatchEvent(new PointerEvent('pointerenter'));
     await settle(fixture);
     expect(status.status().state).toBe('connection-validation');
     expect(elementOf(b).dataset['vflowHandleState']).toBe('valid');
 
-    elementOf(b).dispatchEvent(new MouseEvent('mouseleave'));
+    elementOf(b).dispatchEvent(new PointerEvent('pointerleave'));
     await settle(fixture);
     expect(status.status().state).toBe('connection-start');
     expect(elementOf(b).dataset['vflowHandleState']).toBe('idle');

@@ -404,6 +404,18 @@ them no longer runs while one of them is held: browser shortcuts such as `Ctrl+0
 a modifier itself, as in `Mod+0`. Shift is checked only when a binding names it, so accelerated movement with
 `Shift` and characters such as `+` still reach their commands.
 
+### Gestures without d3
+
+ngx-vflow no longer depends on `d3-zoom`, `d3-drag` and `d3-selection`. Pan, zoom, node dragging, resizing, connections and the selection box run on Pointer Events with the same settings, formulas and animations as before.
+
+- Remove `d3-zoom`, `d3-drag`, `d3-selection` and their `@types` packages from your dependencies unless your application uses them itself.
+- Resize callbacks (`shouldResize` and the resize control callbacks) receive `ResizeDragEvent`, now `{ sourceEvent: PointerEvent }` instead of a d3 drag event.
+- Tests that dispatch synthetic mouse or touch events to pan, drag, resize, connect or draw a selection box must dispatch `pointerdown`, `pointermove` and `pointerup` with `pointerId` and `pointerType`. Moves and the release may target `window` or `document`. Handles react to `pointerenter` and `pointerleave`. Wheel and `dblclick` events are unchanged.
+- A press that starts a library gesture does not propagate to ancestors, neither as `pointerdown` nor as its compatibility `mousedown` or `touchstart`.
+- The pane and draggable nodes set CSS `touch-action`; see [Viewport gestures](../../interactions/viewport-gestures) for how touch scrolling follows the settings.
+- Once a pan moves, the pane captures the pointer until release, so nodes under the cursor do not receive hover events during a pan.
+- A pinch that may zoom but not pan scales around the point where the fingers started, instead of drifting with them.
+
 ### Removed APIs
 
 | Removed in v3                                      | Migration                                                                                              |

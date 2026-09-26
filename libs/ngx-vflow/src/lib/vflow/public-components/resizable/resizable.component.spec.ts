@@ -15,6 +15,7 @@ import { FlowEntitiesService } from '../../services/flow-entities.service';
 import { VflowComponent } from '../../components/vflow/vflow.component';
 import { Vflow } from '../../vflow';
 import { ResizableComponent } from './resizable.component';
+import { mouseAsPointer } from '../../gestures/pointer-events.testing';
 
 @Component({
   template: `
@@ -136,7 +137,7 @@ async function createSizeTargetFixture(options: { withResizable?: boolean; nodes
 function drag(control: Element, dx: number, dy: number) {
   const { x, y } = center(control);
   const mouse = (type: string, clientX: number, clientY: number) =>
-    new MouseEvent(type, { clientX, clientY, bubbles: true, view: window, buttons: type === 'mouseup' ? 0 : 1 });
+    mouseAsPointer(type, { clientX, clientY, bubbles: true, view: window, buttons: type === 'mouseup' ? 0 : 1 });
 
   control.dispatchEvent(mouse('mousedown', x, y));
   window.dispatchEvent(mouse('mousemove', x + dx / 2, y + dy / 2));
