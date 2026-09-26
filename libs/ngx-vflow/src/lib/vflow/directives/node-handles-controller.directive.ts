@@ -1,4 +1,4 @@
-import { afterRenderEffect, DestroyRef, Directive, ElementRef, inject, OnInit } from '@angular/core';
+import { DestroyRef, Directive, ElementRef, effect, inject, OnInit } from '@angular/core';
 import { NodeAccessorService } from '../services/node-accessor.service';
 import { tap } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -26,7 +26,8 @@ export class NodeHandlesControllerDirective implements OnInit {
   private readonly resizeCallback = () => this.scheduleSync();
 
   constructor() {
-    afterRenderEffect(() => {
+    // The sync itself runs on an animation frame, after this pass has rendered; the effect only tracks its inputs.
+    effect(() => {
       const model = this.nodeAccessor.model();
       if (!model) return;
 

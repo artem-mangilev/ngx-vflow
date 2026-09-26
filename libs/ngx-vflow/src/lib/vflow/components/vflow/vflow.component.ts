@@ -92,6 +92,7 @@ import { KeyboardLabelsService } from '../../services/keyboard-labels.service';
 import { KeyboardViewportCommandsService } from '../../services/keyboard-viewport-commands.service';
 import { AriaLabelConfig, DEFAULT_ARIA_LABEL_CONFIG } from '../../interfaces/aria-label-config.interface';
 import { ViewportCullingService } from '../../services/viewport-culling.service';
+import { AfterRenderBatchService } from '../../services/after-render-batch.service';
 
 const changesControllerHostDirective = {
   directive: ChangesControllerDirective,
@@ -142,6 +143,7 @@ const nodeDragControllerHostDirective = {
     ResizeObserverService,
     RequestAnimationFrameBatchingService,
     ViewportCullingService,
+    AfterRenderBatchService,
   ],
   hostDirectives: [changesControllerHostDirective, nodeDragControllerHostDirective],
   imports: [

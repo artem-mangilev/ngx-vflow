@@ -1,6 +1,7 @@
-import { afterRenderEffect, Directive, ElementRef, inject, OnDestroy, OnInit } from '@angular/core';
+import { Directive, ElementRef, effect, inject, OnDestroy, OnInit, untracked } from '@angular/core';
 import { NodeAccessorService } from '../services/node-accessor.service';
 import { ResizeObserverService } from '../services/resize-observer.service';
+import { AfterRenderBatchService } from '../services/after-render-batch.service';
 
 /**
  * Only suitable for HTML nodes
@@ -13,18 +14,24 @@ export class NodeResizeControllerDirective implements OnInit, OnDestroy {
   private nodeAccessor = inject(NodeAccessorService);
   private resizeObserverService = inject(ResizeObserverService);
   private hostElementRef = inject<ElementRef<HTMLElement>>(ElementRef);
+  private afterRenderBatch = inject(AfterRenderBatchService);
   private resizeCallback: ((resizeEntry: ResizeObserverEntry) => void) | null = null;
+  private destroyed = false;
+  private readonly measureAfterRender = () => this.measure();
 
   constructor() {
-    afterRenderEffect(() => {
+    effect(() => {
       const model = this.nodeAccessor.model();
       // Reading resizing() re-runs the measurement when a gesture ends, reconciling the size the resizer wrote
       // with the size the browser rendered (CSS min/max can clamp it).
-      if (model && !model.resizing() && !model.culled()) this.measure();
+      if (model && !model.resizing() && !model.culled()) {
+        untracked(() => this.afterRenderBatch.read(this.measureAfterRender));
+      }
     });
   }
 
   private measure(): void {
+    if (this.destroyed) return;
     const model = this.nodeAccessor.model();
     const target = this.hostElementRef.nativeElement;
     // display:none notifications must not overwrite cached geometry with zeros.
@@ -43,6 +50,7 @@ export class NodeResizeControllerDirective implements OnInit, OnDestroy {
   }
 
   public ngOnDestroy(): void {
+    this.destroyed = true;
     if (this.resizeCallback) {
       this.resizeObserverService.removeObserver(this.hostElementRef.nativeElement, this.resizeCallback);
     }
