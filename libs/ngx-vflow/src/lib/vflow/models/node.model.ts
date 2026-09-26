@@ -1,10 +1,9 @@
-import { TemplateRef, computed, inject, signal } from '@angular/core';
+import { Signal, TemplateRef, computed, inject, signal } from '@angular/core';
 import { NodeGeometry } from '../interfaces/curve-factory.interface';
 import { DOCUMENT } from '@angular/common';
 import { DomAttributes } from '../interfaces/dom-attributes.interface';
 import { NODE_DEFAULTS, Node } from '../interfaces/node.interface';
 import { NodeSizeMode } from '../types/node-change.type';
-import { toObservable } from '@angular/core/rxjs-interop';
 import { HandleModel } from './handle.model';
 import { FlowEntity } from '../interfaces/flow-entity.interface';
 import { Point } from '../interfaces/point.interface';
@@ -15,6 +14,7 @@ import { Observable } from 'rxjs';
 import { FlowSettingsService } from '../services/flow-settings.service';
 import { NodeRenderingService } from '../services/node-rendering.service';
 import { extendedComputed } from '../utils/signals/extended-computed';
+import { observeSignal } from '../utils/signals/observe-signal';
 import { createModelInjector } from '../utils/model-injector';
 import { isComponentClass } from '../utils/is-component-class';
 
@@ -96,18 +96,14 @@ export class NodeModel<T = unknown> implements FlowEntity, Contextable<NodeConte
   );
 
   public point = signal<Point>({ x: 0, y: 0 });
-  public point$: Observable<Point>;
 
   public width = signal(NODE_DEFAULTS.width);
-  public width$: Observable<number>;
 
   public height = signal(NODE_DEFAULTS.height);
-  public height$: Observable<number>;
 
   public renderOrder = signal(0);
 
   public selected = signal(false);
-  public selected$: Observable<boolean>;
   public preselected = signal(false);
   public selectable = computed(() => this.rawNode.selectable?.() ?? this.settingsService.nodesSelectable());
   public focusable = computed(() => this.rawNode.focusable?.() ?? this.settingsService.nodesFocusable());
@@ -160,7 +156,6 @@ export class NodeModel<T = unknown> implements FlowEntity, Contextable<NodeConte
   });
 
   public handles = signal<HandleModel[]>([]);
-  public handles$: Observable<HandleModel[]>;
 
   public draggable = signal(true);
 
@@ -251,13 +246,38 @@ export class NodeModel<T = unknown> implements FlowEntity, Contextable<NodeConte
         shouldLoad: this.shouldLoad,
       },
     };
+  }
 
-    // Initialize Observables after all signal assignments
-    this.point$ = toObservable(this.point, { injector: this.modelInjector });
-    this.width$ = toObservable(this.width, { injector: this.modelInjector });
-    this.height$ = toObservable(this.height, { injector: this.modelInjector });
-    this.selected$ = toObservable(this.selected, { injector: this.modelInjector });
-    this.handles$ = toObservable(this.handles, { injector: this.modelInjector });
+  // Observables are created on first use: each one is an effect, and most flows never subscribe to them.
+  private observables = new Map<string, Observable<unknown>>();
+
+  public get point$(): Observable<Point> {
+    return this.observe('point', this.point);
+  }
+
+  public get width$(): Observable<number> {
+    return this.observe('width', this.width);
+  }
+
+  public get height$(): Observable<number> {
+    return this.observe('height', this.height);
+  }
+
+  public get selected$(): Observable<boolean> {
+    return this.observe('selected', this.selected);
+  }
+
+  public get handles$(): Observable<HandleModel[]> {
+    return this.observe('handles', this.handles);
+  }
+
+  private observe<V>(key: string, source: Signal<V>): Observable<V> {
+    let observable = this.observables.get(key) as Observable<V> | undefined;
+    if (!observable) {
+      observable = observeSignal(source, this.modelInjector.get());
+      this.observables.set(key, observable);
+    }
+    return observable;
   }
 
   public destroy() {

@@ -289,21 +289,26 @@ window.__perf = (() => {
     const t0 = performance.now();
     let firstNode = 0,
       allNodes = 0;
-    let stable = 0;
+    // Ready: every node in layout is measured, and stays so for 20 polls; the time is the start of that streak.
+    let stable = 0,
+      readyAt = 0;
     while (performance.now() - t0 < cap) {
       await sleep(25);
       const n = document.querySelectorAll('.vflow-node').length;
       if (n && !firstNode) firstNode = performance.now() - t0;
       if (n >= expected) {
         allNodes = allNodes || performance.now() - t0;
-        stable = counts().hiddenVisibility === 0 ? stable + 1 : 0;
+        if (counts().hiddenVisibility === 0) {
+          if (!stable) readyAt = performance.now() - t0;
+          stable++;
+        } else stable = 0;
         if (stable >= 20) break;
       }
     }
     return {
       firstNodeMs: Math.round(firstNode),
       allNodesMs: Math.round(allNodes),
-      readyMs: Math.round(performance.now() - t0),
+      readyMs: Math.round(readyAt),
       ...counts(),
       loaf: loafStop(),
       domReads: readsDelta(r0),
