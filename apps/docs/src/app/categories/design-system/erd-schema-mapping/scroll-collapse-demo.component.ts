@@ -41,7 +41,6 @@ const ALL_VISIBLE: Visibility = { visible: new Set(), above: [], below: [], key:
   selector: 'app-ui-scroll-collapse-demo',
   imports: [Vflow, VflowUi],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styleUrls: ['../demo.css'],
   styles: `
     article {
       width: 240px;

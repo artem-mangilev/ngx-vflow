@@ -51,7 +51,12 @@
             "output": "assets/vizdom"
           }
         ],
-        "styles": ["libs/ui/src/styles.css", "apps/docs/src/styles.scss", "node_modules/@ng-doc/app/styles/global.css"],
+        "styles": [
+          "libs/ui/src/styles.css",
+          "apps/docs/src/styles.scss",
+          "apps/docs/src/app/shared/demo.css",
+          "node_modules/@ng-doc/app/styles/global.css"
+        ],
         "scripts": []
       },
       "configurations": {
@@ -79,6 +84,7 @@
           "styles": [
             "dist/libs/ui/styles.css",
             "apps/docs/src/styles.scss",
+            "apps/docs/src/app/shared/demo.css",
             "node_modules/@ng-doc/app/styles/global.css"
           ]
         },

@@ -16,7 +16,6 @@ interface StepData {
   selector: 'app-ui-workflow-demo',
   imports: [Vflow, VflowUi],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styleUrls: ['../demo.css'],
   styles: `
     article {
       width: 230px;

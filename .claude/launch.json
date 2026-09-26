@@ -6,6 +6,12 @@
       "runtimeExecutable": "npx",
       "runtimeArgs": ["nx", "serve", "docs", "--port", "4200"],
       "port": 4200
+    },
+    {
+      "name": "docs-4201",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["nx", "serve", "docs", "--port", "4201"],
+      "port": 4201
     }
   ]
 }

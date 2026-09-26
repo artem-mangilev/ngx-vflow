@@ -1,14 +1,14 @@
-:host {
-  display: block;
-}
+/* Shell shared by the documentation demos: a bordered card with a control bar, a flow and optional stage overlays.
+   Registered as a global stylesheet of the docs app, so every rule is scoped to `.demo`. */
 .demo {
+  display: block;
   border: 1px solid var(--vui-border);
   border-radius: 14px;
   background: var(--vflow-background);
   color: var(--vui-foreground);
   overflow: hidden;
 }
-.controls {
+.demo .controls {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -16,34 +16,33 @@
   padding: 14px;
   border-bottom: 1px solid var(--vui-border);
 }
-.controls label {
+.demo .controls label {
   display: inline-flex;
   gap: 6px;
   align-items: center;
   font-size: 13px;
 }
-.controls p {
+.demo .controls p {
   margin: 0;
   color: var(--vui-muted);
   font-size: 13px;
 }
-vflow {
+.demo vflow {
   display: block;
   height: 480px;
 }
-.grow {
+.demo .grow {
   flex: 1;
   min-width: 0;
 }
-.muted {
+.demo .muted {
   color: var(--vui-muted);
   font-size: 12px;
 }
-
-.stage {
+.demo .stage {
   position: relative;
 }
-.stage-controls {
+.demo .stage-controls {
   position: absolute;
   left: 10px;
   bottom: 10px;

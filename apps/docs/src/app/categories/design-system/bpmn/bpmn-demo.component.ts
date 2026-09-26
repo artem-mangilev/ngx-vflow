@@ -10,7 +10,6 @@ type Flow = 'sequence' | 'message' | 'association';
   selector: 'app-ui-bpmn-demo',
   imports: [Vflow, VflowUi, VflowBpmn],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styleUrls: ['../demo.css'],
   template: `
     <section class="demo" aria-label="BPMN presentation demo" [vflowTheme]="dark() ? 'dark' : 'light'">
       <div class="controls">

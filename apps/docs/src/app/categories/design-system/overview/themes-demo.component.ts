@@ -7,7 +7,6 @@ import { createEdges, createNodes, Vflow } from 'ngx-vflow';
   selector: 'app-ui-themes-demo',
   imports: [Vflow, VflowUi],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styleUrls: ['../demo.css'],
   styles: `
     .editors {
       display: grid;

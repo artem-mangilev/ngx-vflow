@@ -41,7 +41,6 @@ interface StageData {
   selector: 'app-ui-pipeline-demo',
   imports: [Vflow, VflowUi],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styleUrls: ['../demo.css'],
   styles: `
     article {
       width: 230px;

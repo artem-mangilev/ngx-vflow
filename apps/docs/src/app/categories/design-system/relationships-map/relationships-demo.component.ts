@@ -32,7 +32,6 @@ type MapData = Person | Metric | Note | Team;
   selector: 'app-ui-relationships-demo',
   imports: [Vflow, VflowUi],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styleUrls: ['../demo.css'],
   styles: `
     vflow {
       height: 520px;
