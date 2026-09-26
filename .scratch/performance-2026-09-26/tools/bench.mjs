@@ -10,7 +10,10 @@ const demo = process.argv[5] ?? '/performance/virtualization';
 const expected = Number(process.argv[6] ?? 4900);
 const harness = readFileSync(new URL('./harness.js', import.meta.url), 'utf8');
 
-const browser = await chromium.launch({ headless: true, args: ['--disable-background-timer-throttling', '--disable-renderer-backgrounding'] });
+const browser = await chromium.launch({
+  headless: true,
+  args: ['--disable-background-timer-throttling', '--disable-renderer-backgrounding'],
+});
 const rows = [];
 for (let i = 0; i < iterations; i++) {
   const context = await browser.newContext({ viewport: { width: 1400, height: 900 } });
@@ -18,9 +21,12 @@ for (let i = 0; i < iterations; i++) {
   page.on('pageerror', (e) => console.error('pageerror', e.message));
   const cdp = await context.newCDPSession(page);
   await cdp.send('Performance.enable');
-  const metrics = async () => Object.fromEntries((await cdp.send('Performance.getMetrics')).metrics.map((m) => [m.name, m.value]));
+  const metrics = async () =>
+    Object.fromEntries((await cdp.send('Performance.getMetrics')).metrics.map((m) => [m.name, m.value]));
   await page.goto(base + '/introduction/overview', { waitUntil: 'networkidle' });
   await page.evaluate(harness);
+  // STABLE=1 pins the width of the docs demo pane, which ng-doc otherwise sets a few frames after the demo renders.
+  if (process.env.STABLE) await page.addStyleTag({ content: '.ng-doc-pane-content { width: 744px !important; }' });
   await page.evaluate(() => __perf.sleep(300));
   const row = {};
   for (const s of scenarios) {
@@ -55,8 +61,14 @@ for (let i = 0; i < iterations; i++) {
 }
 await browser.close();
 const keys = Object.keys(rows[0]);
-const med = (xs) => { const a = [...xs].sort((x, y) => x - y); return a[Math.floor(a.length / 2)]; };
+const med = (xs) => {
+  const a = [...xs].sort((x, y) => x - y);
+  return a[Math.floor(a.length / 2)];
+};
 const out = {};
-for (const k of keys) { const xs = rows.map((r) => r[k]); out[k] = { med: med(xs), min: Math.min(...xs), max: Math.max(...xs) }; }
+for (const k of keys) {
+  const xs = rows.map((r) => r[k]);
+  out[k] = { med: med(xs), min: Math.min(...xs), max: Math.max(...xs) };
+}
 console.log(JSON.stringify({ base, iterations, out }));
 for (const k of keys) console.log(k.padEnd(18), String(out[k].med).padStart(8), `  [${out[k].min} .. ${out[k].max}]`);
