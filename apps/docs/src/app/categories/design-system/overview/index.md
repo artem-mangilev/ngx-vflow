@@ -54,6 +54,8 @@ images, charts, notes, menus) is your content inside `vflowNodeBody` or a field 
 | Edge       | `vflowEdge` on the SVG path, `vflowEdgeLabel` for HTML labels                                           |
 | Extras     | `vflowStatus`, `vflowExternalLabel`, `vflowToolbar`, `vflowButton`                                      |
 
+The node shell's resting shadow has no blur (`0 1px 0`). A blurred shadow is rasterized again for every visible node on every zoom step and pan, which on a large flow at a high device pixel ratio costs more GPU time than the rest of the node; see the measurement on the Virtualization page. Keep blurred effects for hover and selection states.
+
 Three kinds of state stay separate so they can be shown at once:
 
 - **Interaction** is owned by core: bind `vflowSelected` to `ctx.selected() || ctx.preselected()`. Focus comes from the core wrapper.
@@ -155,9 +157,11 @@ ring) and `--vflow-focus-radius` (0px, the corner radius of the node itself; the
 the offset, so it stays concentric). A theme scope maps the UI tokens onto them, including `--vui-radius`
 onto the ring radius since the node part is rounded with it; set a `--vflow-*` token on the flow element or any
 descendant to override both. Under `forced-colors: active` core maps its tokens to system colors
-regardless of the theme. Core also sets the read-only `--vflow-zoom` on the zoomed viewport, so content
-inside it can keep screen-sized details (`calc(2px / var(--vflow-zoom, 1))`), as the node focus ring does
-with its width and offset. The canvas minimap samples the resolved tokens and repaints when an
+regardless of the theme. Core also sets the read-only `--vflow-zoom` on the flow element, so scaled content
+can keep screen-sized details (`calc(2px / var(--vflow-zoom, 1))`). The flow value is written when a
+viewport change ends, not on every frame of a gesture, because a change recomputes the style of every
+element of the flow. The node focus ring does not use it: its width and offset scale with the content, like
+the node's border. The canvas minimap samples the resolved tokens and repaints when an
 attribute changes on any ancestor of the flow (for example `data-vui-theme` or a class) or when the
 `prefers-color-scheme` preference changes; edits to a stylesheet alone are not observed.
 

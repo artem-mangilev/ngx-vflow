@@ -79,7 +79,7 @@ A command that changes state reports it in the flow's own polite live region: `D
 
 ## Focus ring
 
-Focus is drawn as a ring around the node wrapper, a dashed halo along the edge path and an inner border on the graph container. Four tokens style it: `--vflow-focus` for the color, `--vflow-focus-width`, `--vflow-focus-offset` and `--vflow-focus-radius`. The ring stays the same size on screen at every zoom. It is drawn on the wrapper around your template, so set the tokens on the flow element, or per node from a global stylesheet:
+Focus is drawn as a ring around the node wrapper, a dashed halo along the edge path and an inner border on the graph container. Four tokens style it: `--vflow-focus` for the color, `--vflow-focus-width`, `--vflow-focus-offset` and `--vflow-focus-radius`. The node ring is part of the zoomed content and scales with it, like the node's border. It is drawn on the wrapper around your template, so set the tokens on the flow element, or per node from a global stylesheet:
 
 ```css
 .vflow-node[data-shape='pill'] {

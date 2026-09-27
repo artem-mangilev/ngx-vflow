@@ -47,11 +47,10 @@ import { NodeResizeControllerDirective } from '../../directives/node-resize-cont
     // Resolved lazily by presentations, which are created after the node model is set in ngOnInit.
     { provide: NODE_REF, useFactory: () => inject(NodeAccessorService).model()!.context.$implicit },
   ],
+  // No signal reads in host bindings: the host lives in a view of the graph list, whose reads join the reactive
+  // consumer of the whole list, so one node becoming ready would refresh every entity view.
   host: {
     class: 'vflow-node',
-    '[class.vflow-node--undraggable]': 'hostUndraggable()',
-    '[class.vflow-node--drag-handles-only]': 'hostDragHandlesOnly()',
-    '[style.visibility]': "model().isReady() ? 'visible' : 'hidden'",
     '(focusin)': 'model().focused.set(true)',
     '(focusout)': 'model().focused.set(false)',
   },
@@ -101,6 +100,14 @@ export class NodeComponent implements OnInit, OnDestroy {
   public nodeTemplate = input<TemplateRef<any>>();
 
   constructor() {
+    effect(() => {
+      const classes = this.hostRef.nativeElement.classList;
+      classes.toggle('vflow-node--undraggable', this.hostUndraggable());
+      classes.toggle('vflow-node--drag-handles-only', this.hostDragHandlesOnly());
+    });
+    effect(() => {
+      this.hostRef.nativeElement.style.visibility = this.model().isReady() ? 'visible' : 'hidden';
+    });
     effect(() => {
       const model = this.model();
       const groups = this.flowSettingsService.optimization().detachedGroupsLayer

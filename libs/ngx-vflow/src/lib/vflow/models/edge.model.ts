@@ -4,7 +4,6 @@ import { Edge, Curve, EDGE_DEFAULTS } from '../interfaces/edge.interface';
 import { NodeModel } from './node.model';
 import { getStraightPath } from '../math/edge-path/straigh-path';
 import { getBezierPath } from '../math/edge-path/bezier-path';
-import { toObservable } from '@angular/core/rxjs-interop';
 import { FlowEntity } from '../interfaces/flow-entity.interface';
 import { getSmoothStepPath } from '../math/edge-path/smooth-step-path';
 import { Contextable } from '../interfaces/contextable.interface';
@@ -21,6 +20,7 @@ import { DOCUMENT } from '@angular/common';
 import { getSvgPathBounds } from '../utils/svg-path-bounds';
 import { insetPoint, markerInset } from '../utils/marker-inset';
 import { markerUrl } from '../utils/marker-ref';
+import { observeSignal } from '../utils/signals/observe-signal';
 
 const LABEL_POSITIONS: EdgeLabelPosition[] = ['start', 'center', 'end'];
 
@@ -82,7 +82,6 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
   );
 
   public selected = signal(EDGE_DEFAULTS.selected);
-  public selected$: Observable<boolean>;
   public preselected = signal(false);
   public selectable = computed(() => this.edge.selectable?.() ?? this.settingsService.edgesSelectable());
   public focusable = computed(() => this.edge.focusable?.() ?? this.settingsService.edgesFocusable());
@@ -110,8 +109,6 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
 
     return !this.sourceHandle() || !this.targetHandle();
   });
-
-  public detached$ = toObservable(this.detached, { injector: this.modelInjector });
 
   public path = computed<CurveLayout>(() => {
     const source = this.sourceHandle();
@@ -200,8 +197,13 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
         shouldLoad: this.shouldLoad,
       },
     };
+  }
 
-    this.selected$ = toObservable(this.selected, { injector: this.modelInjector });
+  private selectedObservable?: Observable<boolean>;
+
+  /** Created on first use: each observable is an effect, and most flows never subscribe to it. */
+  public get selected$(): Observable<boolean> {
+    return (this.selectedObservable ??= observeSignal(this.selected, this.modelInjector.get()));
   }
 
   public destroy() {

@@ -80,7 +80,7 @@ describe('public viewport gesture settings', () => {
     expect(flow.viewport().zoom).toBeGreaterThan(1);
   });
 
-  it('gives scroll pan priority, with opt-in zoom and pan activation keys', () => {
+  it('gives scroll pan priority, with opt-in zoom and pan activation keys', async () => {
     flow.panOnScroll = true;
     flow.keyboardShortcuts = { modifiers: { zoomActivation: ['KeyZ'], panActivation: ['Space'] } };
     wheel();
@@ -89,6 +89,7 @@ describe('public viewport gesture settings', () => {
     wheel();
     expect(flow.viewport().zoom).toBeGreaterThan(1);
     key('keyup', 'KeyZ');
+    await pause(500); // Let the wheel zoom settle before reading the translation.
     flow.panOnDrag = false;
     key('keydown', 'Space');
     const x = flow.viewport().x;
@@ -219,6 +220,23 @@ describe('public viewport gesture settings', () => {
     controls.destroy();
   });
 
+  it('eases wheel zoom to the accumulated target around the pointer and applies pinch at once', async () => {
+    const { left, top } = pane.getBoundingClientRect();
+    wheel();
+    wheel();
+    const target = 2 ** (0.002 * 40 * 2);
+    const first = flow.viewport().zoom;
+    expect(first).toBeGreaterThan(1);
+    expect(first).toBeLessThan(target);
+    await pause(500);
+    expect(flow.viewport().zoom).toBeCloseTo(target, 10);
+    expect(flow.viewport().x).toBeCloseTo((100 - left) * (1 - target), 6);
+    expect(flow.viewport().y).toBeCloseTo((100 - top) * (1 - target), 6);
+    wheel(pane, true);
+    expect(flow.viewport().zoom).toBeCloseTo(target * 2 ** (0.002 * 40 * 10), 10);
+    await pause(300);
+  });
+
   it('preserves page scrolling for a new outward wheel gesture at the zoom limit', async () => {
     flow.zoomTo(3);
     await settle();
@@ -316,7 +334,7 @@ describe('public viewport gesture settings', () => {
     wheel();
     wheel();
     expect(ends).toBe(0);
-    await pause(200);
+    await pause(500); // The gesture ends once the events stopped and the zoom settled.
     expect(ends).toBe(1);
     flow.zoomTo(2);
     await settle();

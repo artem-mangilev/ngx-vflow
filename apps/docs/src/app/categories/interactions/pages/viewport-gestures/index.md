@@ -80,6 +80,10 @@ Each directive applies to its element and descendants:
 
 **Major-release migration:** replace `class="nodrag"` with `vflowNoDrag` and import the directive or `Vflow`. The old class no longer disables gestures. Built-in resize controls already use the directive.
 
+# Wheel zoom easing
+
+Wheel zoom eases towards its target. Every wheel event moves the target by its step, and the viewport follows on animation frames with a short time constant, so a mouse wheel notch glides instead of jumping, and a burst of trackpad events costs one viewport update per frame. The first step runs within the event itself, so the response is immediate. Pinch follows the fingers at once. The gesture ends once the events have stopped and the zoom has settled.
+
 # Page scrolling
 
 Wheel zoom suppresses page scrolling when it consumes an event. A new outward wheel gesture at a reached zoom limit can scroll the page. Scroll panning consumes its events. Disabled wheel gestures and `vflowNoWheel` leave native scrolling available. There is no separate `preventScrolling` setting.

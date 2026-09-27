@@ -10,6 +10,7 @@ import { FlowEntitiesService } from './services/flow-entities.service';
 import { FlowSettingsService } from './services/flow-settings.service';
 import { NodeRenderingService } from './services/node-rendering.service';
 import { EdgeRenderingService } from './services/edge-rendering.service';
+import { ViewportCullingDirective } from './directives/viewport-culling.directive';
 import { ViewportService } from './services/viewport.service';
 import { EdgeChangesService } from './services/edge-changes.service';
 import { NodesChangeService } from './services/node-changes.service';
@@ -68,6 +69,7 @@ describe('Graph rendering and interaction regressions', () => {
         FlowSettingsService,
         NodeRenderingService,
         EdgeRenderingService,
+        ViewportCullingDirective,
         ViewportService,
         EdgeChangesService,
         NodesChangeService,
@@ -180,11 +182,16 @@ describe('Graph rendering and interaction regressions', () => {
     const { nodes, edges } = graph();
     const settings = TestBed.inject(FlowSettingsService);
     settings.optimization.update((v) => ({ ...v, virtualization: true }));
+    settings.computedFlowWidth.set(400);
+    settings.computedFlowHeight.set(300);
     edges[0].path();
-    nodes.forEach((n) => n.point.set({ x: 100000, y: 100000 }));
-    expect(TestBed.inject(NodeRenderingService).viewportNodes()).toEqual([]);
-    TestBed.inject(EdgeRenderingService);
+    TestBed.inject(ViewportCullingDirective);
     TestBed.flushEffects();
+    expect(TestBed.inject(NodeRenderingService).viewportNodes()).toEqual(nodes);
+    expect(edges[0].culled()).toBeFalse();
+    nodes.forEach((n) => n.point.set({ x: 100000, y: 100000 }));
+    TestBed.flushEffects();
+    expect(TestBed.inject(NodeRenderingService).viewportNodes()).toEqual([]);
     expect(edges[0].culled()).toBeTrue();
   });
 
@@ -196,13 +203,14 @@ describe('Graph rendering and interaction regressions', () => {
     settings.optimization.update((value) => ({ ...value, virtualization: true }));
     nodes[0].point.set({ x: -200, y: 0 });
     nodes[1].point.set({ x: 800, y: 0 });
-    TestBed.inject(EdgeRenderingService);
+    const culling = TestBed.inject(ViewportCullingDirective);
     const viewport = TestBed.inject(ViewportService).readableViewport;
     TestBed.flushEffects();
     expect(edges[0].culled()).toBeFalse();
     expect(edges[0].detached()).toBeFalse();
+    // A bare viewport write has no gesture end, which is when entities that left the viewport are reported.
     viewport.set({ x: 0, y: 1000, zoom: 1 });
-    TestBed.flushEffects();
+    culling.sync();
     expect(edges[0].culled()).toBeTrue();
     viewport.set({ x: 0, y: 0, zoom: 1 });
     TestBed.flushEffects();
@@ -262,7 +270,7 @@ describe('Graph rendering and interaction regressions', () => {
     settings.optimization.update((value) => ({ ...value, virtualization: true }));
     nodes.forEach((node) => node.point.set({ x: -1000, y: -1000 }));
     edges[0].curve.set(() => ({ path: 'M -1000,-1000 Q 2000,1500 -900,-1000' }));
-    TestBed.inject(EdgeRenderingService);
+    TestBed.inject(ViewportCullingDirective);
     TestBed.flushEffects();
     expect(edges[0].culled()).toBeFalse();
     edges[0].curve.set(() => ({ path: 'M -1000,-1000 l 100,0' }));
