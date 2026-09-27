@@ -4,12 +4,13 @@ Keyboard shortcuts come in two kinds. **Modifiers** change what a pointer gestur
 
 ## Modifiers
 
-| Entry            | Default key                                         | While held                                                          |
-| ---------------- | --------------------------------------------------- | ------------------------------------------------------------------- |
-| `selection`      | `Shift`                                             | Dragging the canvas draws a selection box instead of panning        |
-| `multiSelection` | `Mod`, which is Meta on macOS and Control elsewhere | Selecting an entity toggles it instead of replacing the selection   |
-| `panActivation`  | Disabled                                            | Drag and scroll pan the viewport                                    |
-| `zoomActivation` | Disabled                                            | The wheel zooms the viewport and takes priority over scroll panning |
+| Entry             | Default key                                         | While held                                                          |
+| ----------------- | --------------------------------------------------- | ------------------------------------------------------------------- |
+| `selection`       | `Shift`                                             | Dragging the canvas draws a selection box instead of panning        |
+| `multiSelection`  | `Mod`, which is Meta on macOS and Control elsewhere | Selecting an entity toggles it instead of replacing the selection   |
+| `panActivation`   | Disabled                                            | Drag and scroll pan the viewport                                    |
+| `zoomActivation`  | Disabled                                            | The wheel zooms the viewport and takes priority over scroll panning |
+| `alignmentBypass` | `Alt`                                               | A dragged node moves freely instead of snapping to alignment guides |
 
 ## Commands
 

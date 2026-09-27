@@ -404,6 +404,10 @@ them no longer runs while one of them is held: browser shortcuts such as `Ctrl+0
 a modifier itself, as in `Mod+0`. Shift is checked only when a binding names it, so accelerated movement with
 `Shift` and characters such as `+` still reach their commands.
 
+### Alignment helper
+
+The alignment helper snaps while the node is dragged instead of moving it once the pointer is released, so `(nodeDragEnd)` and the position change report where the node ends up. `tolerance` in `AlignmentHelperSettings` is now measured in screen pixels rather than flow units: at zoom 1 the default of `10` behaves as before, at other zooms the snapping distance on screen no longer changes. A dragged selection snaps as a whole, a child aligns with the center of its parent but not with its border, and nodes also snap to equal gaps and to straight edges. Holding `Alt` (the new `alignmentBypass` modifier) moves freely. See [Alignment helper](../../viewport/alignment-helper).
+
 ### Gestures without d3
 
 ngx-vflow no longer depends on `d3-zoom`, `d3-drag` and `d3-selection`. Pan, zoom, node dragging, resizing, connections and the selection box run on Pointer Events with the same settings, formulas and animations as before.

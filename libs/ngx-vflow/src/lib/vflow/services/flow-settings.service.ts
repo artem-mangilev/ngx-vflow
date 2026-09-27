@@ -5,6 +5,7 @@ import { DEFAULT_OPTIMIZATION, Optimization } from '../interfaces/optimization.i
 import { SelectionMode } from '../types/selection-mode.type';
 import { SelectionBoxSettings } from '../interfaces/selection-box-settings.interface';
 import { DEFAULT_ARIA_LABEL_CONFIG } from '../interfaces/aria-label-config.interface';
+import { AlignmentHelperSettings } from '../interfaces/alignment-helper-settings.interface';
 
 @Injectable()
 export class FlowSettingsService {
@@ -52,6 +53,9 @@ export class FlowSettingsService {
   public background = signal<Background | null>(null);
 
   public snapGrid = signal<[number, number]>([1, 1]);
+
+  /** @see {VflowComponent.alignmentHelper} */
+  public alignmentHelper = signal<AlignmentHelperSettings | boolean>(false);
 
   public optimization = signal<Required<Optimization>>(DEFAULT_OPTIMIZATION);
 
