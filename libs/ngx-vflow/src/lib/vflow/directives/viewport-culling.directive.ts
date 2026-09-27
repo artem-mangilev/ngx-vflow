@@ -1,8 +1,8 @@
-import { DestroyRef, EffectRef, Injectable, Injector, NgZone, effect, inject, untracked } from '@angular/core';
+import { DestroyRef, Directive, EffectRef, Injector, NgZone, effect, inject, untracked } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FlowEntitiesService } from './flow-entities.service';
-import { FlowSettingsService } from './flow-settings.service';
-import { ViewportService } from './viewport.service';
+import { FlowEntitiesService } from '../services/flow-entities.service';
+import { FlowSettingsService } from '../services/flow-settings.service';
+import { ViewportService } from '../services/viewport.service';
 import { NodeModel } from '../models/node.model';
 import { EdgeModel } from '../models/edge.model';
 import { SpatialIndex } from '../utils/spatial-index';
@@ -16,7 +16,7 @@ const LEAVE_DELAY_MS = 300;
 type Entity = NodeModel | EdgeModel;
 
 /**
- * Maintains `inViewport` of every node and edge from a spatial index, so that a viewport change costs the entities
+ * A host directive of the flow that maintains `inViewport` of every node and edge from a spatial index, so that a viewport change costs the entities
  * near the viewport rather than a scan of the whole graph. Each entity has one tracker effect for its own rect:
  * moving a node updates the index for that node and its edges only.
  *
@@ -25,8 +25,8 @@ type Entity = NodeModel | EdgeModel;
  * something already outside the viewport. A change of the entity's own geometry reports both directions at once,
  * because no gesture end follows it.
  */
-@Injectable()
-export class ViewportCullingService {
+@Directive({ selector: '[vflowViewportCulling]', standalone: true })
+export class ViewportCullingDirective {
   private readonly entities = inject(FlowEntitiesService);
   private readonly settings = inject(FlowSettingsService);
   private readonly viewport = inject(ViewportService);

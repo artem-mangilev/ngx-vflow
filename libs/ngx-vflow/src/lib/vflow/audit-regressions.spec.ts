@@ -10,7 +10,7 @@ import { FlowEntitiesService } from './services/flow-entities.service';
 import { FlowSettingsService } from './services/flow-settings.service';
 import { NodeRenderingService } from './services/node-rendering.service';
 import { EdgeRenderingService } from './services/edge-rendering.service';
-import { ViewportCullingService } from './services/viewport-culling.service';
+import { ViewportCullingDirective } from './directives/viewport-culling.directive';
 import { ViewportService } from './services/viewport.service';
 import { EdgeChangesService } from './services/edge-changes.service';
 import { NodesChangeService } from './services/node-changes.service';
@@ -69,7 +69,7 @@ describe('Graph rendering and interaction regressions', () => {
         FlowSettingsService,
         NodeRenderingService,
         EdgeRenderingService,
-        ViewportCullingService,
+        ViewportCullingDirective,
         ViewportService,
         EdgeChangesService,
         NodesChangeService,
@@ -185,7 +185,7 @@ describe('Graph rendering and interaction regressions', () => {
     settings.computedFlowWidth.set(400);
     settings.computedFlowHeight.set(300);
     edges[0].path();
-    TestBed.inject(ViewportCullingService);
+    TestBed.inject(ViewportCullingDirective);
     TestBed.flushEffects();
     expect(TestBed.inject(NodeRenderingService).viewportNodes()).toEqual(nodes);
     expect(edges[0].culled()).toBeFalse();
@@ -203,7 +203,7 @@ describe('Graph rendering and interaction regressions', () => {
     settings.optimization.update((value) => ({ ...value, virtualization: true }));
     nodes[0].point.set({ x: -200, y: 0 });
     nodes[1].point.set({ x: 800, y: 0 });
-    const culling = TestBed.inject(ViewportCullingService);
+    const culling = TestBed.inject(ViewportCullingDirective);
     const viewport = TestBed.inject(ViewportService).readableViewport;
     TestBed.flushEffects();
     expect(edges[0].culled()).toBeFalse();
@@ -270,7 +270,7 @@ describe('Graph rendering and interaction regressions', () => {
     settings.optimization.update((value) => ({ ...value, virtualization: true }));
     nodes.forEach((node) => node.point.set({ x: -1000, y: -1000 }));
     edges[0].curve.set(() => ({ path: 'M -1000,-1000 Q 2000,1500 -900,-1000' }));
-    TestBed.inject(ViewportCullingService);
+    TestBed.inject(ViewportCullingDirective);
     TestBed.flushEffects();
     expect(edges[0].culled()).toBeFalse();
     edges[0].curve.set(() => ({ path: 'M -1000,-1000 l 100,0' }));

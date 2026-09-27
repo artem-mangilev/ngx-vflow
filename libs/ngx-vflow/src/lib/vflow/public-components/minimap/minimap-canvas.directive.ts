@@ -63,26 +63,30 @@ export class MinimapCanvasDirective {
   /**
    * Canvas cannot read CSS variables, so the resolved `--vflow-*` tokens are sampled from computed style.
    * The sample is refreshed when an attribute changes on any ancestor of the flow (class, data-*, style)
-   * or when the color scheme preference changes; other stylesheet edits are not observed.
+   * or when the color scheme preference changes; other stylesheet edits are not observed. A sample with the
+   * same values, such as after the flow wrote `--vflow-zoom` at the end of a gesture, changes nothing downstream.
    */
-  private theme = computed(() => {
-    this.themeVersion();
-    const view = this.document.defaultView;
-    const style = view?.getComputedStyle(this.canvas);
-    const token = (name: string, fallback: string) => style?.getPropertyValue(name).trim() || fallback;
-    const surface = token('--vflow-surface', '#fff');
-    // The minimap template is projected by the consumer, so the flow root is found through the DOM.
-    const root = this.canvas.closest('.vflow-root');
-    const rootBackground = root && view ? view.getComputedStyle(root).backgroundColor : '';
-    return {
-      surface,
-      foreground: token('--vflow-foreground', '#1b262c'),
-      muted: token('--vflow-muted', 'rgb(177, 177, 183)'),
-      border: token('--vflow-border', 'rgb(200, 200, 200)'),
-      selection: token('--vflow-selection', '#0f4c75'),
-      background: TRANSPARENT.has(rootBackground) ? surface : rootBackground,
-    };
-  });
+  private theme = computed(
+    () => {
+      this.themeVersion();
+      const view = this.document.defaultView;
+      const style = view?.getComputedStyle(this.canvas);
+      const token = (name: string, fallback: string) => style?.getPropertyValue(name).trim() || fallback;
+      const surface = token('--vflow-surface', '#fff');
+      // The minimap template is projected by the consumer, so the flow root is found through the DOM.
+      const root = this.canvas.closest('.vflow-root');
+      const rootBackground = root && view ? view.getComputedStyle(root).backgroundColor : '';
+      return {
+        surface,
+        foreground: token('--vflow-foreground', '#1b262c'),
+        muted: token('--vflow-muted', 'rgb(177, 177, 183)'),
+        border: token('--vflow-border', 'rgb(200, 200, 200)'),
+        selection: token('--vflow-selection', '#0f4c75'),
+        background: TRANSPARENT.has(rootBackground) ? surface : rootBackground,
+      };
+    },
+    { equal: (a, b) => Object.keys(a).every((key) => a[key as keyof typeof a] === b[key as keyof typeof b]) },
+  );
 
   // The graph bitmap depends on geometry and selection, never on the camera.
   private graph = computed(() => {

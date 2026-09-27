@@ -17,7 +17,7 @@ export class NodeRenderingService {
   public readonly groups = computed(() => byRenderOrder(this.flowEntitiesService.nodes().filter(isGroupNode)));
 
   /**
-   * Nodes whose rect intersects the viewport, as `ViewportCullingService` reports them. Read on demand only: a
+   * Nodes whose rect intersects the viewport, as `ViewportCullingDirective` reports them. Read on demand only: a
    * consumer of this list depends on every node, so nothing on the per-frame path should read it.
    */
   public viewportNodes = computed(() => this.flowEntitiesService.nodes().filter((node) => node.inViewport()));

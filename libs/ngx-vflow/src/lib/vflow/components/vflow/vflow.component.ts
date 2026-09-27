@@ -15,7 +15,7 @@ import {
   input,
   effect,
   ElementRef,
-  afterNextRender,
+  signal,
 } from '@angular/core';
 import { Node } from '../../interfaces/node.interface';
 import { ViewportGesturesDirective } from '../../directives/viewport-gestures.directive';
@@ -91,7 +91,7 @@ import { KeyboardEntityCommandsService } from '../../services/keyboard-entity-co
 import { KeyboardLabelsService } from '../../services/keyboard-labels.service';
 import { KeyboardViewportCommandsService } from '../../services/keyboard-viewport-commands.service';
 import { AriaLabelConfig, DEFAULT_ARIA_LABEL_CONFIG } from '../../interfaces/aria-label-config.interface';
-import { ViewportCullingService } from '../../services/viewport-culling.service';
+import { ViewportCullingDirective } from '../../directives/viewport-culling.directive';
 import { AfterRenderBatchService } from '../../services/after-render-batch.service';
 
 const changesControllerHostDirective = {
@@ -142,10 +142,15 @@ const nodeDragControllerHostDirective = {
     FlowRenderingService,
     ResizeObserverService,
     RequestAnimationFrameBatchingService,
-    ViewportCullingService,
     AfterRenderBatchService,
   ],
-  hostDirectives: [changesControllerHostDirective, nodeDragControllerHostDirective],
+  hostDirectives: [changesControllerHostDirective, nodeDragControllerHostDirective, ViewportCullingDirective],
+  host: {
+    // Lets scaled application content keep screen-sized details. The token is inherited by every element of the
+    // flow, so a change recomputes the style of all of them: it follows the zoom once per gesture, not per frame.
+    // The node focus ring, which must follow every frame, reads the token from its own node instead.
+    '[style.--vflow-zoom]': 'settledZoom()',
+  },
   imports: [
     KeyboardEntityDirective,
     KeyboardNavigationDirective,
@@ -184,8 +189,6 @@ export class VflowComponent {
   private keyboardService = inject(KeyboardService);
   private injector = inject(Injector);
   private flowRenderingService = inject(FlowRenderingService);
-  // Instantiated here: its effects keep every entity's viewport membership current.
-  private viewportCullingService = inject(ViewportCullingService);
 
   // #endregion
 
@@ -202,17 +205,13 @@ export class VflowComponent {
       this.viewportElement().nativeElement.style.transform = `translate(${x}px, ${y}px) scale(${zoom})`;
     });
 
-    // Lets scaled application content keep screen-sized details. The token is inherited by every element of the
-    // viewport, so a change recomputes the style of all of them; it is written once per gesture, not per frame.
-    // The node focus ring, which must follow every frame, reads the token from its own node instead.
-    afterNextRender(() => this.writeZoomToken());
-    this.viewportService.viewportChangeEnd$.pipe(takeUntilDestroyed()).subscribe(() => this.writeZoomToken());
+    this.viewportService.viewportChangeEnd$
+      .pipe(takeUntilDestroyed())
+      .subscribe(() => this.settledZoom.set(this.viewportService.readableViewport().zoom));
   }
 
-  private writeZoomToken() {
-    const zoom = this.viewportService.readableViewport().zoom;
-    this.viewportElement().nativeElement.style.setProperty('--vflow-zoom', String(zoom));
-  }
+  /** The zoom at the end of the latest gesture, bound to `--vflow-zoom` on the host. */
+  protected readonly settledZoom = signal(1);
 
   // #endregion
 

@@ -155,11 +155,11 @@ ring) and `--vflow-focus-radius` (0px, the corner radius of the node itself; the
 the offset, so it stays concentric). A theme scope maps the UI tokens onto them, including `--vui-radius`
 onto the ring radius since the node part is rounded with it; set a `--vflow-*` token on the flow element or any
 descendant to override both. Under `forced-colors: active` core maps its tokens to system colors
-regardless of the theme. Core also sets the read-only `--vflow-zoom` on the zoomed viewport, so content
-inside it can keep screen-sized details (`calc(2px / var(--vflow-zoom, 1))`). The viewport value is written
-when a viewport change ends, not on every frame of a gesture, because a change recomputes the style of
-every element inside the viewport; the focused node carries its own per-frame value for its focus ring
-width and offset. The canvas minimap samples the resolved tokens and repaints when an
+regardless of the theme. Core also sets the read-only `--vflow-zoom` on the flow element, so scaled content
+can keep screen-sized details (`calc(2px / var(--vflow-zoom, 1))`). The flow value is written when a
+viewport change ends, not on every frame of a gesture, because a change recomputes the style of every
+element of the flow; the focused node carries its own per-frame value for its focus ring width and
+offset. The canvas minimap samples the resolved tokens and repaints when an
 attribute changes on any ancestor of the flow (for example `data-vui-theme` or a class) or when the
 `prefers-color-scheme` preference changes; edits to a stylesheet alone are not observed.
 

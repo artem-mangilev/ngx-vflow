@@ -179,10 +179,10 @@ test('pans, zooms and fits the viewport from the keyboard', async ({ page }) => 
 });
 
 test('zooms from a layout that puts plus and minus on other physical keys', async ({ page }) => {
-  const { graph } = await open(page);
-  const viewport = graph.locator('.vflow-viewport');
+  const { demo, graph } = await open(page);
+  const flow = demo.locator('vflow');
   const zoom = () =>
-    viewport.evaluate((element) => Number((element as HTMLElement).style.getPropertyValue('--vflow-zoom')));
+    flow.evaluate((element) => Number((element as HTMLElement).style.getPropertyValue('--vflow-zoom')));
   // A German layout reaches + on BracketRight and - on Slash; the binding names the character, not the position.
   const press = (detail: { key: string; code: string }) =>
     page.evaluate(

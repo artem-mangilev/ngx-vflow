@@ -1,7 +1,7 @@
 // Checks whether the running dev server serves a build containing a token, e.g. a new class name.
 // Usage: node probe-build.mjs <baseUrl> <token>
 const base = process.argv[2] ?? 'http://localhost:4200';
-const token = process.argv[3] ?? 'ViewportCullingService';
+const token = process.argv[3] ?? 'ViewportCullingDirective';
 const seen = new Set();
 async function fetchText(path) {
   const res = await fetch(base + path);
