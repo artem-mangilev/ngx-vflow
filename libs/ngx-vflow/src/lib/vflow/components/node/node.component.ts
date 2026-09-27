@@ -30,7 +30,6 @@ import { NODE_REF } from '../../utils/inject-node';
 import { PointerDirective } from '../../directives/pointer.directive';
 import { ConnectionControllerDirective } from '../../directives/connection-controller.directive';
 import { HandleModel } from '../../models/handle.model';
-import { ViewportService } from '../../services/viewport.service';
 
 // TODO: fix loading of these by @defer (should work in Angular 18+)
 // public components that uses in default node (loaded by defer)
@@ -75,7 +74,6 @@ export class NodeComponent implements OnInit, OnDestroy {
   private nodeAccessor = inject(NodeAccessorService);
   private componentEventBus = inject(ComponentEventBusService);
   private connectionController = inject(ConnectionControllerDirective, { optional: true });
-  private viewportService = inject(ViewportService);
 
   /** Every handle of every node gets a magnet while any connection is in progress. */
   protected readonly connectionActive = this.flowStatusService.connectionActive.asReadonly();
@@ -123,16 +121,6 @@ export class NodeComponent implements OnInit, OnDestroy {
     effect(() => {
       // Position updates belong to this node, not the enclosing graph list.
       this.hostRef.nativeElement.style.transform = this.model().pointTransformCss();
-    });
-    effect(() => {
-      // The focus ring divides its screen lengths by the zoom on every frame. Only the focused node follows the
-      // viewport: the flow-wide token is inherited by every element and is updated once per gesture.
-      const style = this.hostRef.nativeElement.style;
-      if (this.model().focused()) {
-        style.setProperty('--vflow-zoom', String(this.viewportService.readableViewport().zoom));
-      } else {
-        style.removeProperty('--vflow-zoom');
-      }
     });
   }
 

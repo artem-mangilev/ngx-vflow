@@ -160,8 +160,8 @@ descendant to override both. Under `forced-colors: active` core maps its tokens 
 regardless of the theme. Core also sets the read-only `--vflow-zoom` on the flow element, so scaled content
 can keep screen-sized details (`calc(2px / var(--vflow-zoom, 1))`). The flow value is written when a
 viewport change ends, not on every frame of a gesture, because a change recomputes the style of every
-element of the flow; the focused node carries its own per-frame value for its focus ring width and
-offset. The canvas minimap samples the resolved tokens and repaints when an
+element of the flow. The node focus ring does not use it: its width and offset scale with the content, like
+the node's border. The canvas minimap samples the resolved tokens and repaints when an
 attribute changes on any ancestor of the flow (for example `data-vui-theme` or a class) or when the
 `prefers-color-scheme` preference changes; edits to a stylesheet alone are not observed.
 

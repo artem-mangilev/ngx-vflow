@@ -13,13 +13,12 @@
   touch-action: auto;
 }
 
-// The host is inside the zoomed viewport, so width and offset are divided by the zoom to stay screen-sized.
-// The outline follows the host's corner radius, extended by the offset, so a radius equal to the node's own
-// keeps the ring concentric with it.
+// The ring is part of the zoomed content, like the node's border and selection outline. The outline follows the
+// host's corner radius, extended by the offset, so a radius equal to the node's own keeps the ring concentric.
 :host(:focus-visible) {
   border-radius: var(--vflow-focus-radius);
-  outline: calc(var(--vflow-focus-width) / var(--vflow-zoom, 1)) solid var(--vflow-focus);
-  outline-offset: calc(var(--vflow-focus-offset) / var(--vflow-zoom, 1));
+  outline: var(--vflow-focus-width) solid var(--vflow-focus);
+  outline-offset: var(--vflow-focus-offset);
 }
 
 .wrapper {

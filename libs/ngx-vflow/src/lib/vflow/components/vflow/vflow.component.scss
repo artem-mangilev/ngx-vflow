@@ -43,7 +43,7 @@
   initial-value: #005fcc;
 }
 
-// Geometry of the focus ring. Width and offset are screen lengths: the node ring divides them by the zoom.
+// Geometry of the focus ring. Width and offset are flow lengths on nodes, scaled with the content like borders.
 // The radius is the corner radius of the focused node itself, in flow units, so the ring follows its shape.
 @property --vflow-focus-width {
   syntax: '<length>';
