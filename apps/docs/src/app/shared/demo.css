@@ -46,6 +46,6 @@
   position: absolute;
   left: 10px;
   bottom: 10px;
-  /* Above the flow pane, which owns pointer events at z-index 1. */
+  /* Above the flow, which paints as one stacking context. */
   z-index: 2;
 }
