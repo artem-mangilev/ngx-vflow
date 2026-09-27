@@ -9,4 +9,6 @@ With virtualization enabled, offscreen views stay mounted and use `display: none
 
 Zooming and panning transform the shared viewport, keeping its HTML and SVG content in the same flow coordinate system.
 
+The `vflow` element is its own stacking context. The `z-index` of nodes, edges and the minimap orders them inside the flow only, so dialogs, menus and other overlays of the application stay above the flow. To layer the flow as a whole, set `z-index` on the `vflow` element or its container.
+
 Documented Angular APIs, CSS classes, and observable behavior are supported contracts. The exact private DOM structure and nesting of these layers are implementation details and can change between releases.

@@ -432,6 +432,8 @@ ngx-vflow no longer depends on `d3-zoom`, `d3-drag` and `d3-selection`. Pan, zoo
 
 Documented Angular APIs, CSS classes, and observable behavior remain supported contracts. Exact private DOM elements, nesting, and layer structure are not public contracts; avoid selectors or application logic that depend on them.
 
+The `vflow` element is now its own stacking context. The minimap no longer paints above application overlays, and positioned elements placed after the flow no longer need a `z-index` to appear above its pane. To keep the flow above or below other page elements, set `z-index` on the `vflow` element or its container.
+
 ## Migration to >= v2.0
 
 | Area                           | Change in v2.0                                                                            | What you need to do                                                                                                                                         | Notes / Examples                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |

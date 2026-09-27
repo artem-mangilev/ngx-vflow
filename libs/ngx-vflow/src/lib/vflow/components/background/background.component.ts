@@ -19,8 +19,13 @@ const defaultRepeated = true;
   templateUrl: './background.component.html',
   styles: [
     `
-      .vflow-background-pattern {
+      /* Dots are filled, grid lines are stroked. A fill on the grid path would close each cell into a triangle. */
+      circle.vflow-background-pattern {
         fill: var(--vflow-muted);
+      }
+
+      path.vflow-background-pattern {
+        fill: none;
         stroke: var(--vflow-muted);
       }
 
