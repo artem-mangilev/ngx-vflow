@@ -86,10 +86,13 @@ function aggregate(profile) {
 }
 
 const browser = await chromium.launch({
-  headless: true,
+  headless: !process.env.HEADED,
   args: ['--disable-background-timer-throttling', '--disable-renderer-backgrounding'],
 });
-const context = await browser.newContext({ viewport: { width: 1400, height: 900 } });
+const context = await browser.newContext({
+  viewport: { width: 1400, height: 900 },
+  deviceScaleFactor: Number(process.env.DPR || 1),
+});
 const page = await context.newPage();
 page.on('pageerror', (e) => console.error('pageerror', e.message));
 const cdp = await context.newCDPSession(page);
@@ -109,6 +112,9 @@ const delta = (a, b) => ({
 });
 
 await page.goto(base + '/introduction/overview', { waitUntil: 'networkidle' });
+const BIG_CSS =
+  'main { max-width: none !important; } .ng-doc-sidenav-wrapper, .ng-doc-sidenav-content, article.ngde, .ng-doc-page-wrapper, ng-doc-page { max-width: none !important; width: auto !important; } ng-doc-page-wrapper { display: block !important; } ng-doc-demo-pane, ng-doc-pane, .ng-doc-pane-front, .ng-doc-pane-content { height: 900px !important; }';
+if (process.env.BIG) await page.addStyleTag({ content: BIG_CSS });
 await page.evaluate(harness);
 await page.evaluate(() => __perf.sleep(500));
 console.log(JSON.stringify({ base, idleFrames: await page.evaluate(() => __perf.idle(500)) }));
@@ -141,6 +147,11 @@ for (const s of scenarios) {
   if (s === 'zoomout') await measured('zoomout', '__perf.zoom(40, 40)');
   if (s === 'zoom3') await measured('zoom3', '__perf.zoom(20, -40)');
   if (s === 'pan3') await measured('pan3', '__perf.pan(90, 6, 4, 7)');
+  if (s === 'out1') await measured('out1', '__perf.zoom(8, 100)');
+  if (s === 'out05') await measured('out05', '__perf.zoom(5, 100)');
+  if (s === 'pan1') await measured('pan1', '__perf.pan(90, 6, 4, 7)');
+  if (s === 'out13') await measured('out13', '__perf.zoom(13, 100)');
+  if (s === 'settle') await measured('settle', '__perf.sleep(700)');
   if (s === 'stress') await measured('stress-load', "__perf.gotoAndWait('/performance/stress-test', 1024)");
   if (s === 'stresspan') await measured('stress-pan', '__perf.pan()');
   if (s === 'stressdrag') await measured('stress-drag', '__perf.drag()');

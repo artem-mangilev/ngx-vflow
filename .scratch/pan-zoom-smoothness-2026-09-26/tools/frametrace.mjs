@@ -1,6 +1,6 @@
 // Frame-level trace of pan and zoom gestures with real (CDP) input.
 // Usage: node frametrace.mjs <baseUrl> <path> [scenario] [options as KEY=VALUE]
-//   scenario: zoompan (default) | pan | zoom | zoomout | wheelpan
+//   scenario: zoompan (default) | pan | zoom | zoomout | wheelpan | zoomoutpan (zoom in to ZOOM, out to ZOOM_OUT, pan)
 //   options: HEADED=1 (real GPU raster), ZOOM=3 (target zoom before pan), STEPS=90, INTERVAL=7 (ms between input
 //            events), DX=6 DY=4 (pan step, css px), WHEEL=-10 (deltaY per wheel event), BIG=1 (grow the demo pane),
 //            FLOW=<index of .vflow-pane on the page>, TRACE=path.json (keep the raw trace), CSS=<extra css>
@@ -14,6 +14,7 @@ const opt = Object.fromEntries(process.argv.slice(5).map((a) => a.split('=')));
 const env = (k, d) => (opt[k] ?? process.env[k] ?? d);
 const HEADED = !!env('HEADED', '');
 const ZOOM = Number(env('ZOOM', 3));
+const ZOOM_OUT = Number(env('ZOOM_OUT', 0.5));
 const STEPS = Number(env('STEPS', 90));
 const INTERVAL = Number(env('INTERVAL', 7));
 const DX = Number(env('DX', 6));
@@ -37,7 +38,11 @@ const context = await browser.newContext({ viewport: { width: VW, height: VH }, 
 const page = await context.newPage();
 page.on('pageerror', (e) => console.error('pageerror', e.message));
 await page.goto(base + path, { waitUntil: 'networkidle' });
-if (BIG) await page.addStyleTag({ content: '.ng-doc-demo-displayer-content, .ng-doc-demo-displayer { height: 800px !important; max-height: none !important; } vflow { height: 800px !important; }' });
+if (BIG)
+  await page.addStyleTag({
+    content:
+      'main { max-width: none !important; } .ng-doc-sidenav-wrapper, .ng-doc-sidenav-content, article.ngde, .ng-doc-page-wrapper, ng-doc-page { max-width: none !important; width: auto !important; } ng-doc-page-wrapper { display: block !important; } ng-doc-demo-pane, ng-doc-pane, .ng-doc-pane-front, .ng-doc-pane-content { height: 900px !important; }',
+  });
 if (CSS) await page.addStyleTag({ content: CSS });
 
 const pane = page.locator('.vflow-pane').nth(FLOW);
@@ -74,11 +79,21 @@ console.log(JSON.stringify({ base, path, scenario, pane: { w: box.width, h: box.
 
 // In-page frame recorder.
 await page.evaluate(() => {
-  window.__rec = { intervals: [], loaf: [], running: true, last: performance.now() };
+  window.__rec = { intervals: [], loaf: [], samples: [], running: true, last: performance.now(), frame: 0 };
   const tick = () => {
     const n = performance.now();
     window.__rec.intervals.push([n, n - window.__rec.last]);
     window.__rec.last = n;
+    if (window.__rec.frame++ % 6 === 0) {
+      let displayed = 0;
+      let hidden = 0;
+      for (const node of document.querySelectorAll('.vflow-node')) {
+        if (node.style.display === 'none') continue;
+        displayed++;
+        if (node.style.visibility === 'hidden') hidden++;
+      }
+      window.__rec.samples.push([n, displayed, hidden]);
+    }
     if (window.__rec.running) requestAnimationFrame(tick);
   };
   requestAnimationFrame(tick);
@@ -86,7 +101,7 @@ await page.evaluate(() => {
   window.__rec.obs.observe({ type: 'long-animation-frame', buffered: false });
 });
 await sleep(300);
-await page.evaluate(() => { window.__rec.intervals.length = 0; window.__rec.loaf.length = 0; });
+await page.evaluate(() => { window.__rec.intervals.length = 0; window.__rec.loaf.length = 0; window.__rec.samples.length = 0; });
 
 await browser.startTracing(page, {
   categories: [
@@ -118,11 +133,35 @@ async function wheelTo(zoomTarget, deltaY = WHEEL) {
   }
   return n;
 }
+/** A point of the pane near its center that hits neither a node nor an edge stroke, so a press pans the viewport. */
+async function emptyPoint() {
+  return page.evaluate(
+    ([i, cx, cy]) => {
+      const paneEl = document.querySelectorAll('.vflow-pane')[i];
+      const pr = paneEl.getBoundingClientRect();
+      const free = (x, y) => {
+        const el = document.elementFromPoint(x, y);
+        return !!el && !el.closest('.vflow-node') && !el.closest('svg[edge]') && !!el.closest('.vflow-pane');
+      };
+      for (let r = 0; r < 400; r += 6) {
+        for (let a = 0; a < 360; a += 30) {
+          const x = Math.round(cx + r * Math.cos((a * Math.PI) / 180));
+          const y = Math.round(cy + r * Math.sin((a * Math.PI) / 180));
+          if (x > pr.left + 20 && x < pr.right - 20 && y > pr.top + 20 && y < pr.bottom - 20 && free(x, y)) return { x, y };
+        }
+      }
+      return { x: cx, y: cy };
+    },
+    [FLOW, cx, cy],
+  );
+}
 async function pan(steps = STEPS) {
-  await page.mouse.move(cx, cy);
+  const from = await emptyPoint();
+  console.log(JSON.stringify({ pressAt: from, hit: await page.evaluate(([x, y]) => document.elementFromPoint(x, y)?.className?.toString().slice(0, 40), [from.x, from.y]) }));
+  await page.mouse.move(from.x, from.y);
   await page.mouse.down();
   for (let i = 1; i <= steps; i++) {
-    await page.mouse.move(cx + DX * i, cy + DY * i);
+    await page.mouse.move(from.x + DX * i, from.y + DY * i);
     await sleep(INTERVAL);
   }
   await page.mouse.up();
@@ -156,6 +195,33 @@ if (scenario === 'zoompan' || scenario === 'pan') {
   await wheelTo(1, -WHEEL);
   await sleep(400);
   await mark('end');
+} else if (scenario === 'zoomoutpan') {
+  await wheelTo(ZOOM);
+  await sleep(600);
+  await mark('zoomout');
+  const n = await wheelTo(ZOOM_OUT, -WHEEL);
+  await sleep(600);
+  // Displayed nodes against the nodes whose box really touches the pane: the index must not over-report.
+  const check = await page.evaluate((i) => {
+    const paneEl = document.querySelectorAll('.vflow-pane')[i];
+    const root = paneEl.closest('.vflow-root');
+    const pr = paneEl.getBoundingClientRect();
+    let displayed = 0;
+    let touching = 0;
+    for (const node of root.querySelectorAll('.vflow-node')) {
+      if (node.style.display === 'none') continue;
+      displayed++;
+      const r = node.getBoundingClientRect();
+      if (r.right >= pr.left && r.left <= pr.right && r.bottom >= pr.top && r.top <= pr.bottom) touching++;
+    }
+    const edges = [...root.querySelectorAll('svg[edge]')].filter((e) => e.style.display !== 'none').length;
+    return { displayedNodes: displayed, touchingNodes: touching, displayedEdges: edges };
+  }, FLOW);
+  console.log(JSON.stringify({ wheelEventsOut: n, ...check }));
+  await mark('pan');
+  await pan();
+  await sleep(300);
+  await mark('end');
 } else if (scenario === 'wheelpan') {
   await wheelTo(ZOOM);
   await sleep(400);
@@ -174,7 +240,7 @@ const buf = await browser.stopTracing();
 const rec = await page.evaluate(() => {
   window.__rec.running = false;
   window.__rec.obs.disconnect();
-  return { intervals: window.__rec.intervals, loaf: window.__rec.loaf, now: performance.now() };
+  return { intervals: window.__rec.intervals, loaf: window.__rec.loaf, samples: window.__rec.samples, now: performance.now() };
 });
 marks.stop = rec.now;
 const finalViewport = await page.evaluate((i) => document.querySelectorAll('.vflow-pane')[i].closest('.vflow-root').querySelector('.vflow-viewport').style.transform, FLOW);
@@ -213,9 +279,12 @@ console.log(
     const [a, b] = [marks[phaseNames[i]], marks[phaseNames[i + 1]]];
     const inPhase = ivt.filter(([t]) => t >= a && t < b);
     const bad = inPhase.filter(([, dt]) => dt > median * 1.6);
+    const samples = rec.samples.filter(([t]) => t >= a && t < b);
     out[phaseNames[i]] = {
       frames: inPhase.length,
       dropped: bad.length,
+      displayed: samples.length ? [samples[0][1], samples[samples.length - 1][1]] : null,
+      maxHiddenVisibility: samples.length ? Math.max(...samples.map((x) => x[2])) : null,
       worst: bad
         .sort((x, y) => y[1] - x[1])
         .slice(0, 8)
