@@ -1,45 +1,43 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
-import { nodeToRect } from '../../utils/nodes';
-import {
-  FlowStatusService,
-  isNodeDragEndStatus,
-  isNodeDragStartStatus,
-  isNodeDragStatus,
-} from '../../services/flow-status.service';
-import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
-import { filter, map, tap } from 'rxjs/operators';
-import { extendedComputed } from '../../utils/signals/extended-computed';
-import { NodeRenderingService } from '../../services/node-rendering.service';
-import { RectSides, rectToSides } from '../../utils/rect';
-import { Rect } from '../../interfaces/rect';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { AlignmentService } from '../../services/alignment.service';
+import { ViewportService } from '../../services/viewport.service';
 
-type RectWithSides = Rect & RectSides;
+/** Radius of the dot on an aligned point, in screen pixels. */
+const DOT = 2;
+/** Half the length of a tick on an equal gap, in screen pixels. */
+const TICK = 4;
 
-interface AlignmentLine {
-  x: number;
-  y: number;
-  x2: number;
-  y2: number;
-  isCenter: boolean;
-}
-
-interface Intersection {
-  lines: AlignmentLine[];
-  snappedX: number;
-  snappedY: number;
-}
-
+/** Draws the guides of the drag in progress: aligned lines, straight edges and equal gaps. */
 @Component({
   selector: 'g[alignmentHelper]',
   templateUrl: './alignment-helper.component.html',
+  // The whole group is faded at once, so crossings of lines, dots and ticks do not darken.
+  host: { class: 'vflow-alignment-guides' },
   styles: [
     `
+      :host {
+        color: var(--vflow-foreground);
+        opacity: 0.5;
+      }
+
       .vflow-alignment-line {
-        stroke: var(--vflow-foreground);
+        stroke: currentColor;
+        stroke-width: 1;
+        fill: none;
+        vector-effect: non-scaling-stroke;
+      }
+
+      .vflow-alignment-point {
+        fill: currentColor;
       }
 
       @media (forced-colors: active) {
-        .vflow-alignment-line {
+        :host {
+          opacity: 1;
+        }
+
+        .vflow-alignment-line,
+        .vflow-alignment-point {
           forced-color-adjust: none;
         }
       }
@@ -49,127 +47,45 @@ interface Intersection {
   standalone: true,
 })
 export class AlignmentHelperComponent {
-  private nodeRenderingService = inject(NodeRenderingService);
-  private flowStatus = inject(FlowStatusService);
+  private viewportService = inject(ViewportService);
 
-  readonly tolerance = input(10);
+  protected readonly guides = inject(AlignmentService).guides;
 
-  protected isNodeDragging = computed(
-    () => isNodeDragStartStatus(this.flowStatus.status()) || isNodeDragStatus(this.flowStatus.status()),
-  );
+  /** Dots on the aligned points, kept at a fixed screen size. */
+  protected readonly points = computed(() => {
+    const { lines } = this.guides();
+    if (!lines.length) return null;
 
-  protected readonly intersections = extendedComputed<Intersection>((lastValue) => {
-    const status = this.flowStatus.status();
+    const r = DOT / this.viewportService.readableViewport().zoom;
+    const seen = new Set<string>();
+    let d = '';
 
-    if (isNodeDragStartStatus(status) || isNodeDragStatus(status)) {
-      const node = status.payload.node;
-      const draggedRect = nodeToRect(node);
-
-      const d: RectWithSides = { ...draggedRect, ...rectToSides(draggedRect) };
-      const otherRects = this.nodeRenderingService
-        .viewportNodes()
-        .filter((n) => n !== node)
-        // do not check children of the dragged node
-        .filter((n) => !node.children().includes(n))
-        .map((n) => {
-          const rect = nodeToRect(n);
-          return { ...rect, ...rectToSides(rect) } as RectWithSides;
-        });
-
-      const lines: Intersection['lines'] = [];
-
-      let snappedX = d.x;
-      let snappedY = d.y;
-      let closestXDiff = Infinity;
-      let closestYDiff = Infinity;
-
-      otherRects.forEach((o) => {
-        const dCenterX = d.left + d.width / 2;
-        const oCenterX = o.left + o.width / 2;
-
-        for (const [dX, oX, snapX, isCenter] of [
-          // center check
-          [dCenterX, oCenterX, oCenterX - d.width / 2, true] as const,
-          [d.left, o.left, o.left, false] as const,
-          [d.left, o.right, o.right, false] as const,
-          [d.right, o.left, o.left - d.width, false] as const,
-          [d.right, o.right, o.right - d.width, false] as const,
-        ]) {
-          const diff = Math.abs(dX - oX);
-
-          if (diff <= this.tolerance()) {
-            const y = Math.min(d.top, o.top);
-            const y2 = Math.max(d.bottom, o.bottom);
-
-            lines.push({ x: oX, y, x2: oX, y2, isCenter });
-
-            if (diff < closestXDiff) {
-              closestXDiff = diff;
-              snappedX = snapX;
-            }
-
-            if (isCenter) break;
-          }
-        }
-
-        const dCenterY = d.top + d.height / 2;
-        const oCenterY = o.top + o.height / 2;
-
-        for (const [dY, oY, snapY, isCenter] of [
-          // center check
-          [dCenterY, oCenterY, oCenterY - d.height / 2, true] as const,
-          [d.top, o.top, o.top, false] as const,
-          [d.top, o.bottom, o.bottom, false] as const,
-          [d.bottom, o.top, o.top - d.height, false] as const,
-          [d.bottom, o.bottom, o.bottom - d.height, false] as const,
-        ]) {
-          const diff = Math.abs(dY - oY);
-
-          if (diff <= this.tolerance()) {
-            const x = Math.min(d.left, o.left);
-            const x2 = Math.max(d.right, o.right);
-
-            lines.push({ x, y: oY, x2, y2: oY, isCenter });
-
-            if (diff < closestYDiff) {
-              closestYDiff = diff;
-              snappedY = snapY;
-            }
-
-            if (isCenter) break;
-          }
-        }
-      });
-
-      return { lines, snappedX, snappedY };
+    for (const { x, y } of lines.flatMap((line) => line.points)) {
+      const key = `${x},${y}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      d += `M${x - r},${y}a${r},${r} 0 1,0 ${2 * r},0a${r},${r} 0 1,0 ${-2 * r},0`;
     }
 
-    return lastValue;
+    return d;
   });
 
-  constructor() {
-    toObservable(this.flowStatus.status)
-      .pipe(
-        filter(isNodeDragEndStatus),
-        map((status) => status.payload.node),
-        map((node) => [node, this.intersections()] as const),
-        tap(([node, intersections]) => {
-          if (intersections) {
-            const snapped = { x: intersections.snappedX, y: intersections.snappedY };
+  /** The ticked segments of equal gaps, kept at a fixed screen size. */
+  protected readonly gaps = computed(() => {
+    const { gaps } = this.guides();
+    if (!gaps.length) return null;
 
-            const parent = node.parent();
-            if (parent) {
-              node.setPoint({
-                x: snapped.x - parent.globalPoint().x,
-                y: snapped.y - parent.globalPoint().y,
-              });
-            } else {
-              node.setPoint(snapped);
-            }
-          }
-        }),
-        takeUntilDestroyed(),
-      )
-      .subscribe();
-  }
+    const tick = TICK / this.viewportService.readableViewport().zoom;
+    let d = '';
+
+    for (const { axis, from, to, at } of gaps) {
+      const middle = (from + to) / 2;
+      d +=
+        axis === 'x'
+          ? `M${from},${at}H${to}M${from},${at - tick}V${at + tick}M${to},${at - tick}V${at + tick}M${middle},${at - tick}V${at + tick}`
+          : `M${at},${from}V${to}M${at - tick},${from}H${at + tick}M${at - tick},${to}H${at + tick}M${at - tick},${middle}H${at + tick}`;
+    }
+
+    return d;
+  });
 }

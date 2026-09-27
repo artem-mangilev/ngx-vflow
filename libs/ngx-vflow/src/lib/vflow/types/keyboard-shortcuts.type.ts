@@ -1,5 +1,6 @@
 /** Keys held to change what a pointer gesture does while they are down. */
-export type KeyboardModifierName = 'selection' | 'multiSelection' | 'panActivation' | 'zoomActivation';
+export type KeyboardModifierName =
+  'selection' | 'multiSelection' | 'panActivation' | 'zoomActivation' | 'alignmentBypass';
 
 /** Commands that run once per key press on a focused entity wrapper or on the graph container. */
 export type KeyboardCommandName =

@@ -16,6 +16,7 @@ import { ResizeObserverService } from './resize-observer.service';
 import { clientToFlowPosition } from '../utils/coordinates';
 import { PointerDrag, createPointerDrag } from '../gestures/pointer-drag';
 import { isNodeDragPress, pressTarget } from '../utils/press-target';
+import { AlignmentService } from './alignment.service';
 
 @Injectable()
 export class DraggableService {
@@ -25,6 +26,7 @@ export class DraggableService {
   private viewportService = inject(ViewportService);
   private keyboardService = inject(KeyboardService);
   private resizeObserverService = inject(ResizeObserverService);
+  private alignmentService = inject(AlignmentService);
   private injector = inject(Injector);
   private drags = new WeakMap<Element, PointerDrag>();
 
@@ -85,6 +87,7 @@ export class DraggableService {
     let activated = false;
     let dragNodes: NodeModel[] = [];
     let initialPositions: Point[] = [];
+    let lastClient: Point = { x: 0, y: 0 };
     let moveNodesOnAutoPanSub: Subscription | null = null;
     let pane: Element | null = null;
     let paneRect: DOMRectReadOnly | null = null;
@@ -166,17 +169,20 @@ export class DraggableService {
     };
 
     const moveTo = (client: Point) => {
+      lastClient = client;
       const flow = this.getFlowPoint(client, getPaneRect());
+      const points = initialPositions.map((initial) => ({
+        x: round(flow.x + initial.x),
+        y: round(flow.y + initial.y),
+      }));
 
+      // An aligned axis keeps its alignment; the grid applies to the other one.
+      const aligned = this.alignmentService.snap(points);
       dragNodes.forEach((model, index) => {
-        const point = {
-          x: round(flow.x + initialPositions[index].x),
-          y: round(flow.y + initialPositions[index].y),
-        };
-
-        this.alignToGrid(point);
-        this.moveNode(model, point);
+        this.alignToGrid(points[index], aligned);
+        this.moveNode(model, points[index]);
       });
+      this.alignmentService.update();
     };
 
     const end = () => {
@@ -185,6 +191,7 @@ export class DraggableService {
       moveNodesOnAutoPanSub?.unsubscribe();
       moveNodesOnAutoPanSub = null;
       stopTrackingPaneGeometry();
+      this.alignmentService.end();
       dragNodes.forEach((node) => node.dragging.set(false));
       this.flowStatusService.setNodeDragEndStatus(model);
     };
@@ -195,9 +202,11 @@ export class DraggableService {
       stopCompatibilityEvents: true,
       onStart: ({ start, point }) => {
         activated = true;
+        lastClient = start;
         dragNodes = this.getDragNodes(model);
         dragNodes.forEach((node) => node.dragging.set(true));
         startTrackingPaneGeometry();
+        this.alignmentService.begin(dragNodes);
 
         this.flowStatusService.setNodeDragStartStatus(model);
 
@@ -209,8 +218,8 @@ export class DraggableService {
           y: node.point().y - flow.y,
         }));
 
-        // Subscribe to viewport changes during drag to sync node positions with auto-pan
-        moveNodesOnAutoPanSub = this.moveNodesOnAutoPan$(dragNodes);
+        // Auto-pan moves the flow under a still pointer, so the nodes follow the pointer again
+        moveNodesOnAutoPanSub = this.onViewportPan(() => moveTo(lastClient));
 
         // A drag that starts past the threshold moves the nodes right away.
         if (point.x !== start.x || point.y !== start.y) moveTo(point);
@@ -299,21 +308,21 @@ export class DraggableService {
   /**
    * @todo make it unit testable
    */
-  private alignToGrid(point: Point) {
+  private alignToGrid(point: Point, skip = { x: false, y: false }) {
     const [snapX, snapY] = this.settingsService.snapGrid();
 
-    if (snapX > 1) {
+    if (snapX > 1 && !skip.x) {
       point.x = align(point.x, snapX);
     }
 
-    if (snapY > 1) {
+    if (snapY > 1 && !skip.y) {
       point.y = align(point.y, snapY);
     }
 
     return point;
   }
 
-  private moveNodesOnAutoPan$(dragNodes: NodeModel[]) {
+  private onViewportPan(callback: () => void) {
     return toObservable(this.viewportService.readableViewport, { injector: this.injector })
       .pipe(
         skip(1), // Skip initial value
@@ -322,24 +331,6 @@ export class DraggableService {
           ([prev, next]) => prev.zoom === next.zoom && (prev.x !== next.x || prev.y !== next.y), // Pan only, not wheel zoom (x/y+k change together)
         ),
       )
-      .subscribe(([prev, next]) => {
-        const dx = next.x - prev.x;
-        const dy = next.y - prev.y;
-        const zoom = next.zoom;
-
-        // Calculate shift in flow space (inverse of viewport shift)
-        const shiftX = -dx / zoom;
-        const shiftY = -dy / zoom;
-
-        // Update each dragged node
-        dragNodes.forEach((node) => {
-          // Move node using existing pipeline (snap + parent bounds)
-          const newPoint = {
-            x: node.point().x + shiftX,
-            y: node.point().y + shiftY,
-          };
-          this.moveNode(node, newPoint);
-        });
-      });
+      .subscribe(callback);
   }
 }

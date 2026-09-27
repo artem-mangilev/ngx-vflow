@@ -76,6 +76,7 @@ import { toLazySignal } from '../../utils/signals/to-lazy-signal';
 import { FlowRenderingService } from '../../services/flow-rendering.service';
 import { AlignmentHelperComponent } from '../alignment-helper/alignment-helper.component';
 import { AlignmentHelperSettings } from '../../interfaces/alignment-helper-settings.interface';
+import { AlignmentService } from '../../services/alignment.service';
 import { AutoPanDirective } from '../../directives/auto-pan.directive';
 import { ResizeObserverService } from '../../services/resize-observer.service';
 import { RequestAnimationFrameBatchingService } from '../../services/request-animation-frame-batching.service';
@@ -143,6 +144,7 @@ const nodeDragControllerHostDirective = {
     ResizeObserverService,
     RequestAnimationFrameBatchingService,
     AfterRenderBatchService,
+    AlignmentService,
   ],
   hostDirectives: [changesControllerHostDirective, nodeDragControllerHostDirective, ViewportCullingDirective],
   host: {
@@ -201,6 +203,7 @@ export class VflowComponent {
   constructor() {
     // Curves read the inset of a declared shape through the service; the defs render the shape itself.
     effect(() => this.flowEntitiesService.markerShapes.set(this.markerShapes()));
+    effect(() => this.flowSettingsService.alignmentHelper.set(this.alignmentHelper()));
 
     effect(() => {
       const { x, y, zoom } = this.viewportService.readableViewport();
@@ -454,6 +457,11 @@ export class VflowComponent {
     this.nodeRenderingService.pullNodes(models);
   }
 
+  /**
+   * Snaps a dragged node, or a dragged selection as a whole, to other nodes and draws the guides that hold: aligned
+   * edges and centers, equal gaps between neighbours and straight edges to connected nodes. `true` enables it with
+   * default settings. Holding the `alignmentBypass` modifier (Alt) moves freely.
+   */
   public alignmentHelper = input<AlignmentHelperSettings | boolean>(false);
 
   protected nodeModels = this.nodeRenderingService.nodes;

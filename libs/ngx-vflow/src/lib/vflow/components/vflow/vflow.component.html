@@ -24,12 +24,8 @@
 
       <!-- Overlays: connection line, selection box, alignment helper (flow coords) -->
       <svg class="vflow-overlay-svg" aria-hidden="true">
-        @if (alignmentHelper(); as alignmentHelper) {
-          @if (alignmentHelper === true) {
-            <svg:g alignmentHelper />
-          } @else {
-            <svg:g alignmentHelper [tolerance]="alignmentHelper.tolerance" />
-          }
+        @if (alignmentHelper()) {
+          <svg:g alignmentHelper />
         }
 
         <svg:g selectionBox />

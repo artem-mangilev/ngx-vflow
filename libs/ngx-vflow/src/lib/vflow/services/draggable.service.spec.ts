@@ -11,6 +11,7 @@ import { createNode } from '../interfaces/node.interface';
 import { KeyboardService } from './keyboard.service';
 import { ResizeObserverService } from './resize-observer.service';
 import { dispatchPointer, pointerEvent } from '../gestures/pointer-events.testing';
+import { AlignmentService } from './alignment.service';
 
 describe('DraggableService', () => {
   let service: DraggableService;
@@ -39,7 +40,9 @@ describe('DraggableService', () => {
   };
   const keyboardServiceMock = {
     selectionActive: false,
-    isActiveModifier(action: 'selection' | 'multiSelection') {
+    bypassActive: false,
+    isActiveModifier(action: 'selection' | 'multiSelection' | 'alignmentBypass') {
+      if (action === 'alignmentBypass') return this.bypassActive;
       return action === 'selection' ? this.selectionActive : false;
     },
   };
@@ -53,6 +56,7 @@ describe('DraggableService', () => {
         FlowStatusService,
         ViewportService,
         NodeRenderingService,
+        AlignmentService,
         { provide: ResizeObserverService, useValue: resizeObserverMock },
         {
           provide: KeyboardService,
@@ -66,6 +70,7 @@ describe('DraggableService', () => {
     entitiesService = TestBed.inject(FlowEntitiesService);
     viewportService = TestBed.inject(ViewportService);
     keyboardServiceMock.selectionActive = false;
+    keyboardServiceMock.bypassActive = false;
     observedPane = null;
     paneResizeCallback = null;
     dragPanes = [];
@@ -446,5 +451,100 @@ describe('DraggableService', () => {
 
     expect(model.point()).toEqual({ x: 50, y: 50 });
     expect(getPaneRect).toHaveBeenCalledTimes(1);
+  });
+
+  describe('with the alignment helper', () => {
+    let alignment: AlignmentService;
+
+    beforeEach(() => {
+      TestBed.inject(FlowSettingsService).alignmentHelper.set(true);
+      alignment = TestBed.inject(AlignmentService);
+    });
+
+    function placed(params: Parameters<typeof createModel>[0], x: number, y: number) {
+      const model = createModel(params);
+      model.setPoint({ x, y });
+      model.width.set(100);
+      model.height.set(50);
+      model.inViewport.set(true);
+      return model;
+    }
+
+    /** Presses `model` at client (150, 100) on a pane at the origin and moves the pointer by `dx`, `dy`. */
+    function drag(model: NodeModel, dx: number, dy: number) {
+      const { element } = createDragSurface(new DOMRect(0, 0, 800, 600));
+      service.enable(element, model);
+      dispatchMouse(element, 'mousedown', 150, 100);
+      dispatchMouse(window, 'mousemove', 150 + dx, 100 + dy);
+    }
+
+    it('shifts the whole selection by one aligned offset while dragging', () => {
+      const a = placed({ id: 'a', selected: true }, 10, 20);
+      const b = placed({ id: 'b', selected: true }, 200, 20);
+      placed({ id: 'target' }, -300, 200);
+
+      drag(a, 0, 184);
+
+      expect(a.point()).toEqual({ x: 10, y: 200 });
+      expect(b.point()).toEqual({ x: 200, y: 200 });
+      expect(alignment.guides().lines.length).toBeGreaterThan(0);
+
+      dispatchMouse(window, 'mouseup', 150, 284);
+      expect(a.point()).toEqual({ x: 10, y: 200 });
+      expect(alignment.guides().lines).toEqual([]);
+    });
+
+    it('keeps a child inside its parent when the alignment lies outside', () => {
+      const parent = placed({ id: 'parent' }, 100, 100);
+      parent.width.set(300);
+      parent.height.set(300);
+      const child = placed({ id: 'child', parentId: 'parent' }, 0, 50);
+      child.extent.set('parent');
+      // Its right edge is at 95, just outside the parent's left wall at 100
+      placed({ id: 'outside' }, -5, 600);
+
+      drag(child, -3, 0);
+
+      expect(child.point()).toEqual({ x: 0, y: 50 });
+    });
+
+    it('does not align a child with the edges of its parent, only with its center', () => {
+      const parent = placed({ id: 'parent' }, 100, 100);
+      parent.width.set(300);
+      parent.height.set(300);
+      const child = placed({ id: 'child', parentId: 'parent' }, 20, 50);
+
+      drag(child, -16, 0);
+      expect(child.point()).toEqual({ x: 4, y: 50 });
+
+      // Center 100 + 102 + 50 = 252 is next to the parent's center 250
+      dispatchMouse(window, 'mousemove', 150 + 82, 100);
+      expect(child.point()).toEqual({ x: 100, y: 50 });
+    });
+
+    it('applies the grid only to the axis without an alignment', () => {
+      TestBed.inject(FlowSettingsService).snapGrid.set([10, 10]);
+      const a = placed({ id: 'a' }, 10, 20);
+      placed({ id: 'target' }, 500, 203);
+
+      drag(a, 3, 181);
+
+      expect(a.point()).toEqual({ x: 20, y: 203 });
+    });
+
+    it('moves freely while the bypass modifier is held', () => {
+      const a = placed({ id: 'a' }, 10, 20);
+      placed({ id: 'target' }, 0, 203);
+      keyboardServiceMock.bypassActive = true;
+
+      drag(a, 3, 181);
+
+      expect(a.point()).toEqual({ x: 13, y: 201 });
+      expect(alignment.guides().lines).toEqual([]);
+
+      keyboardServiceMock.bypassActive = false;
+      dispatchMouse(window, 'mousemove', 153, 281);
+      expect(a.point()).toEqual({ x: 13, y: 203 });
+    });
   });
 });

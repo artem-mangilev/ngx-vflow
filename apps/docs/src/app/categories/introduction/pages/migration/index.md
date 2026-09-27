@@ -94,7 +94,7 @@ Under `forced-colors: active` core maps its tokens to system colors and keeps th
 | Dots/grid `color`, `backgroundColor`                 | `--vflow-muted` and `--vflow-background`; the `.vflow-background-pattern` class              |
 | `resizerColor`, resize control `color`               | `--vflow-selection`, `--vflow-surface`; `.resize-control.handle` / `.resize-control.line`    |
 | `mini-map` `maskColor`, `strokeColor`                | `--vflow-muted` (mask) and `--vflow-border` (frame); the minimap samples the resolved tokens |
-| `lineColor` in `alignmentHelper` settings            | `--vflow-foreground`; `.vflow-alignment-line`. `tolerance` stays                             |
+| `lineColor` in `alignmentHelper` settings            | `--vflow-foreground`; `.vflow-alignment-guides`. `tolerance` stays                           |
 | `color` in `selectionBox` settings                   | `--vflow-selection`; `.selection-box`. `mode` stays                                          |
 
 Behavior parameters are untouched: node points, sizes, `extent`, resize constraints, drag thresholds,
@@ -403,6 +403,10 @@ What did change is how modifiers are read. Control, Meta and Alt must now match 
 them no longer runs while one of them is held: browser shortcuts such as `Ctrl+0` keep working, and a binding may name
 a modifier itself, as in `Mod+0`. Shift is checked only when a binding names it, so accelerated movement with
 `Shift` and characters such as `+` still reach their commands.
+
+### Alignment helper
+
+The alignment helper snaps while the node is dragged instead of moving it once the pointer is released, so `(nodeDragEnd)` and the position change report where the node ends up. `tolerance` in `AlignmentHelperSettings` is now measured in screen pixels rather than flow units: at zoom 1 the default of `10` behaves as before, at other zooms the snapping distance on screen no longer changes. A dragged selection snaps as a whole, a child aligns with the center of its parent but not with its border, and nodes also snap to equal gaps and to straight edges. Holding `Alt` (the new `alignmentBypass` modifier) moves freely. See [Alignment helper](../../viewport/alignment-helper).
 
 ### Gestures without d3
 

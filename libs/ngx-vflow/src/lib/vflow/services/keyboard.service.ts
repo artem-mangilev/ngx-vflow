@@ -50,6 +50,7 @@ function defaultShortcuts(): RawShortcuts {
       multiSelection: ['Mod'],
       panActivation: [],
       zoomActivation: [],
+      alignmentBypass: ['Alt'],
     },
     commands: {
       select: ['Enter', 'Space'],
@@ -177,6 +178,7 @@ export class KeyboardService {
     multiSelection: false,
     panActivation: false,
     zoomActivation: false,
+    alignmentBypass: false,
   });
   public modifiersActive$ = this.#modifiersActive$.asObservable();
 
