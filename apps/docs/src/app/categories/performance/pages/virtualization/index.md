@@ -10,6 +10,8 @@ Viewport membership comes from a spatial index, so a viewport change costs the e
 
 This reduces layout and paint work for hidden content. It does not release DOM memory, stop subscriptions or component effects, or avoid initial component creation. When the entire graph fits in the viewport, all its visible content still needs to be drawn.
 
+What remains is the raster cost of the visible content. On every zoom step, and on every pan of the non-composited viewport, the browser rasterizes every visible node again at the device pixel ratio, on the GPU. Styles that need a blur, such as `box-shadow` with a blur radius or `filter`, dominate that cost: on a 1000×900 pane at a device pixel ratio of 2 with 154 visible nodes, a `0 3px 10px` shadow on each node alone made zooming out drop 30 of 74 frames and the following pan 20 of 250, while without the blur both ran at the display's frame rate. Prefer borders or blur-free shadows for the resting state of a node and keep blurred effects for hover and selection.
+
 While a node is CSS-hidden, its cached dimensions may become stale if its custom content changes size. The library refreshes them on return; it cannot continuously measure content excluded from layout. Keep geometry in application-owned state when offscreen layout must remain exact.
 
 {{ NgDocActions.demoPane("VirtualizationDemoComponent") }}

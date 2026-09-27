@@ -54,6 +54,8 @@ images, charts, notes, menus) is your content inside `vflowNodeBody` or a field 
 | Edge       | `vflowEdge` on the SVG path, `vflowEdgeLabel` for HTML labels                                           |
 | Extras     | `vflowStatus`, `vflowExternalLabel`, `vflowToolbar`, `vflowButton`                                      |
 
+The node shell's resting shadow has no blur (`0 1px 0`). A blurred shadow is rasterized again for every visible node on every zoom step and pan, which on a large flow at a high device pixel ratio costs more GPU time than the rest of the node; see the measurement on the Virtualization page. Keep blurred effects for hover and selection states.
+
 Three kinds of state stay separate so they can be shown at once:
 
 - **Interaction** is owned by core: bind `vflowSelected` to `ctx.selected() || ctx.preselected()`. Focus comes from the core wrapper.

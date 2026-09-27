@@ -3,11 +3,15 @@ import { Directive } from '@angular/core';
 const SELECTED =
   'vui:data-[vui-selected=true]:outline-2 vui:data-[vui-selected=true]:outline-offset-2 vui:data-[vui-selected=true]:outline-accent vui:forced-colors:data-[vui-selected=true]:outline-[Highlight]';
 
-/** Card shell; dimensions, content, semantics and interaction belong to the consumer and core. */
+/**
+ * Card shell; dimensions, content, semantics and interaction belong to the consumer and core. The resting shadow has
+ * no blur: a blurred shadow is rasterized again on every zoom step and pan of every visible node, which on a large
+ * flow at a high pixel ratio costs more GPU time than the rest of the node.
+ */
 @Directive({
   selector: '[vflowNode]',
   host: {
-    class: `vui-node vui:relative vui:box-border vui:rounded-md vui:border vui:border-border vui:bg-surface vui:text-foreground vui:font-sans vui:text-base vui:shadow-[0_3px_10px_#0000000a] ${SELECTED}`,
+    class: `vui-node vui:relative vui:box-border vui:rounded-md vui:border vui:border-border vui:bg-surface vui:text-foreground vui:font-sans vui:text-base vui:shadow-[0_1px_0_#0000000f] ${SELECTED}`,
   },
 })
 export class VflowNode {}
