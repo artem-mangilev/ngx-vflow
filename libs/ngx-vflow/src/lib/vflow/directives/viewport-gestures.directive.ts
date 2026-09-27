@@ -38,7 +38,6 @@ interface WheelZoom {
   anchor: Point;
   /** Time of the previous easing step. */
   last: number;
-  frame: number | null;
 }
 
 interface TouchGesture {
@@ -90,6 +89,7 @@ export class ViewportGesturesDirective implements OnInit, OnDestroy {
 
   private wheelTimer: ReturnType<typeof setTimeout> | null = null;
   private wheelZoom: WheelZoom | null = null;
+  private wheelFrame: number | null = null;
   private wheelTarget: EventTarget | null = null;
 
   private dragTarget: EventTarget | null = null;
@@ -144,7 +144,7 @@ export class ViewportGesturesDirective implements OnInit, OnDestroy {
     this.drag?.destroy();
     this.animation?.interrupt();
     if (this.wheelTimer !== null) clearTimeout(this.wheelTimer);
-    if (this.wheelZoom?.frame != null) cancelAnimationFrame(this.wheelZoom.frame);
+    if (this.wheelFrame !== null) cancelAnimationFrame(this.wheelFrame);
     this.wheelZoom = null;
     this.stopTrackingTouches();
   }
@@ -203,7 +203,7 @@ export class ViewportGesturesDirective implements OnInit, OnDestroy {
     const animation = this.animation;
     this.animation = null;
     animation?.interrupt();
-    this.stopWheelZoom();
+    this.landWheelZoom();
   }
   // #endregion
 
@@ -267,58 +267,48 @@ export class ViewportGesturesDirective implements OnInit, OnDestroy {
     const anchor = this.panePoint(event);
     if (event.ctrlKey) {
       // A pinch is direct manipulation: it follows the fingers at once.
-      this.stopWheelZoom();
+      this.landWheelZoom();
       this.set(zoomAround(this.current(), zoom, anchor));
+    } else if (this.wheelZoom) {
+      Object.assign(this.wheelZoom, { target: zoom, anchor });
     } else {
-      this.easeWheelZoom(zoom, anchor);
+      // The first step runs within the event, so the response is immediate; the rest follow on animation frames.
+      this.wheelZoom = { target: zoom, anchor, last: performance.now() - WHEEL_ZOOM_FIRST_STEP_MS };
+      this.stepWheelZoom(performance.now());
     }
   }
 
   /**
-   * Wheel zoom eases towards its target: a mouse wheel notch glides instead of jumping, and a burst of trackpad
-   * events costs one viewport update per frame. The first step runs within the event, so the response is immediate.
+   * Wheel zoom eases towards its target, so a mouse wheel notch glides instead of jumping and a burst of trackpad
+   * events costs one viewport update per frame. Each step covers the share of the remaining distance that the
+   * elapsed time earns.
    */
-  private easeWheelZoom(target: number, anchor: Point) {
-    const state = this.wheelZoom;
-    if (state) {
-      state.target = target;
-      state.anchor = anchor;
-      return;
-    }
-    const now = performance.now();
-    this.wheelZoom = { target, anchor, last: now - WHEEL_ZOOM_FIRST_STEP_MS, frame: null };
-    this.stepWheelZoom(now);
-  }
-
   private stepWheelZoom(now: number) {
     const state = this.wheelZoom;
     if (!state || this.destroyed) return;
     const current = this.current();
     const remaining = Math.log(state.target / current.zoom);
-    const zoom =
-      Math.abs(remaining) < WHEEL_ZOOM_EPSILON
-        ? state.target
-        : current.zoom * Math.exp(remaining * (1 - Math.exp(-(now - state.last) / WHEEL_ZOOM_TAU_MS)));
+    if (Math.abs(remaining) < WHEEL_ZOOM_EPSILON) {
+      this.landWheelZoom();
+      return;
+    }
+    const zoom = current.zoom * Math.exp(remaining * (1 - Math.exp((state.last - now) / WHEEL_ZOOM_TAU_MS)));
     state.last = now;
     this.set(zoomAround(current, zoom, state.anchor));
-    if (zoom === state.target) {
-      this.wheelZoom = null;
-      this.finishWheel();
-    } else {
-      state.frame = this.zone.runOutsideAngular(() =>
-        requestAnimationFrame((time) => {
-          state.frame = null;
-          this.stepWheelZoom(time);
-        }),
-      );
-    }
+    this.wheelFrame = this.zone.runOutsideAngular(() =>
+      requestAnimationFrame((time) => {
+        this.wheelFrame = null;
+        this.stepWheelZoom(time);
+      }),
+    );
   }
 
-  /** Lands the viewport where the wheel sent it; another gesture takes over from there. */
-  private stopWheelZoom() {
+  /** Lands the viewport on the target, whether the easing got there or another gesture takes over. */
+  private landWheelZoom() {
     const state = this.wheelZoom;
     if (!state) return;
-    if (state.frame !== null) cancelAnimationFrame(state.frame);
+    if (this.wheelFrame !== null) cancelAnimationFrame(this.wheelFrame);
+    this.wheelFrame = null;
     this.wheelZoom = null;
     this.set(zoomAround(this.current(), state.target, state.anchor));
     this.finishWheel();
