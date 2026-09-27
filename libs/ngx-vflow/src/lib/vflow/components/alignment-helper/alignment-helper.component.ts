@@ -2,8 +2,8 @@ import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/c
 import { AlignmentService } from '../../services/alignment.service';
 import { ViewportService } from '../../services/viewport.service';
 
-/** Half the size of the cross on an aligned point, in screen pixels. */
-const CROSS = 3;
+/** Radius of the dot on an aligned point, in screen pixels. */
+const DOT = 2;
 /** Half the length of a tick on an equal gap, in screen pixels. */
 const TICK = 4;
 
@@ -11,17 +11,33 @@ const TICK = 4;
 @Component({
   selector: 'g[alignmentHelper]',
   templateUrl: './alignment-helper.component.html',
+  // The whole group is faded at once, so crossings of lines, dots and ticks do not darken.
+  host: { class: 'vflow-alignment-guides' },
   styles: [
     `
+      :host {
+        color: var(--vflow-foreground);
+        opacity: 0.5;
+      }
+
       .vflow-alignment-line {
-        stroke: var(--vflow-foreground);
+        stroke: currentColor;
         stroke-width: 1;
         fill: none;
         vector-effect: non-scaling-stroke;
       }
 
+      .vflow-alignment-point {
+        fill: currentColor;
+      }
+
       @media (forced-colors: active) {
-        .vflow-alignment-line {
+        :host {
+          opacity: 1;
+        }
+
+        .vflow-alignment-line,
+        .vflow-alignment-point {
           forced-color-adjust: none;
         }
       }
@@ -35,19 +51,32 @@ export class AlignmentHelperComponent {
 
   protected readonly guides = inject(AlignmentService).guides;
 
-  /** Crosses on the aligned points and the ticked segments of equal gaps, kept at a fixed screen size. */
-  protected readonly marks = computed(() => {
-    const { lines, gaps } = this.guides();
-    if (!lines.length && !gaps.length) return null;
+  /** Dots on the aligned points, kept at a fixed screen size. */
+  protected readonly points = computed(() => {
+    const { lines } = this.guides();
+    if (!lines.length) return null;
 
-    const zoom = this.viewportService.readableViewport().zoom;
-    const cross = CROSS / zoom;
-    const tick = TICK / zoom;
+    const r = DOT / this.viewportService.readableViewport().zoom;
+    const seen = new Set<string>();
     let d = '';
 
     for (const { x, y } of lines.flatMap((line) => line.points)) {
-      d += `M${x - cross},${y - cross}L${x + cross},${y + cross}M${x - cross},${y + cross}L${x + cross},${y - cross}`;
+      const key = `${x},${y}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      d += `M${x - r},${y}a${r},${r} 0 1,0 ${2 * r},0a${r},${r} 0 1,0 ${-2 * r},0`;
     }
+
+    return d;
+  });
+
+  /** The ticked segments of equal gaps, kept at a fixed screen size. */
+  protected readonly gaps = computed(() => {
+    const { gaps } = this.guides();
+    if (!gaps.length) return null;
+
+    const tick = TICK / this.viewportService.readableViewport().zoom;
+    let d = '';
 
     for (const { axis, from, to, at } of gaps) {
       const middle = (from + to) / 2;

@@ -94,7 +94,7 @@ Under `forced-colors: active` core maps its tokens to system colors and keeps th
 | Dots/grid `color`, `backgroundColor`                 | `--vflow-muted` and `--vflow-background`; the `.vflow-background-pattern` class              |
 | `resizerColor`, resize control `color`               | `--vflow-selection`, `--vflow-surface`; `.resize-control.handle` / `.resize-control.line`    |
 | `mini-map` `maskColor`, `strokeColor`                | `--vflow-muted` (mask) and `--vflow-border` (frame); the minimap samples the resolved tokens |
-| `lineColor` in `alignmentHelper` settings            | `--vflow-foreground`; `.vflow-alignment-line`. `tolerance` stays                             |
+| `lineColor` in `alignmentHelper` settings            | `--vflow-foreground`; `.vflow-alignment-guides`. `tolerance` stays                           |
 | `color` in `selectionBox` settings                   | `--vflow-selection`; `.selection-box`. `mode` stays                                          |
 
 Behavior parameters are untouched: node points, sizes, `extent`, resize constraints, drag thresholds,

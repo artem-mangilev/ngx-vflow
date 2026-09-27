@@ -13,6 +13,12 @@ async function open() {
   await page.waitForSelector('vflow [node]');
   await page.waitForFunction(() => document.querySelector('vflow').getBoundingClientRect().left < 600);
   await page.waitForTimeout(500);
+  // GUIDE_OPACITY=0.5 compares another fade of the guides in the screenshots
+  if (process.env.GUIDE_OPACITY) {
+    await page.addStyleTag({
+      content: `.vflow-alignment-guides { opacity: ${process.env.GUIDE_OPACITY} !important; }`,
+    });
+  }
   await page.evaluate(() => {
     const cmp = window.ng.getComponent(document.querySelector('vflow'));
     const viewport = () => cmp.viewportService.readableViewport();
@@ -28,14 +34,18 @@ async function open() {
         const { x, y } = model(id).globalPoint();
         return { x: Math.round(x * 100) / 100, y: Math.round(y * 100) / 100 };
       },
-      selected: () => cmp.flowEntitiesService.nodes().filter((n) => n.selected()).map((n) => n.rawNode.id),
+      selected: () =>
+        cmp.flowEntitiesService
+          .nodes()
+          .filter((n) => n.selected())
+          .map((n) => n.rawNode.id),
       guides: () => ({
         lines: [...document.querySelectorAll('line.vflow-alignment-line')].map(
           (l) =>
             ['x1', 'y1', 'x2', 'y2'].map((a) => Math.round(+l.getAttribute(a) * 100) / 100).join(',') +
             (l.getAttribute('stroke-dasharray') ? ' center' : ''),
         ),
-        marks: !!document.querySelector('path.vflow-alignment-line'),
+        marks: !!document.querySelector('path.vflow-alignment-line, path.vflow-alignment-point'),
         vectorEffect: document.querySelector('.vflow-alignment-line')
           ? getComputedStyle(document.querySelector('.vflow-alignment-line')).vectorEffect
           : null,
@@ -157,7 +167,11 @@ await open();
 {
   await page.evaluate(() => {
     const cmp = window.ng.getComponent(document.querySelector('vflow'));
-    cmp.viewportService.writableViewport.set({ changeType: 'absolute', state: { zoom: 2, x: -600, y: -400 }, duration: 0 });
+    cmp.viewportService.writableViewport.set({
+      changeType: 'absolute',
+      state: { zoom: 2, x: -600, y: -400 },
+      duration: 0,
+    });
   });
   await page.waitForTimeout(500);
   const zoom = await h('zoom');
@@ -168,7 +182,14 @@ await open();
   const nearPos = await h('pos', '7');
   await drag({ x: 500, y: 330 }, { x: 0, y: 6 });
   const farPos = await h('pos', '7');
-  results.zoomTolerance = { zoom, near: nearPos, expectedNear: 300, far: farPos, expectedFar: 306, guides: near.guides };
+  results.zoomTolerance = {
+    zoom,
+    near: nearPos,
+    expectedNear: 300,
+    far: farPos,
+    expectedFar: 306,
+    guides: near.guides,
+  };
 }
 
 console.log(JSON.stringify(results, null, 2));

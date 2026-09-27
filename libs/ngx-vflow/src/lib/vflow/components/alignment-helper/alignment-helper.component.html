@@ -8,6 +8,10 @@
     [attr.y2]="line.to.y" />
 }
 
-@if (marks(); as marks) {
-  <svg:path class="vflow-alignment-line" [attr.d]="marks" />
+@if (gaps(); as gaps) {
+  <svg:path class="vflow-alignment-line" [attr.d]="gaps" />
+}
+
+@if (points(); as points) {
+  <svg:path class="vflow-alignment-point" [attr.d]="points" />
 }
