@@ -106,7 +106,8 @@ export class NodeComponent implements OnInit, OnDestroy {
       classes.toggle('vflow-node--drag-handles-only', this.hostDragHandlesOnly());
     });
     effect(() => {
-      this.hostRef.nativeElement.style.visibility = this.model().isReady() ? 'visible' : 'hidden';
+      // A ready node inherits visibility, so the flow can keep it hidden until its first layout is complete.
+      this.hostRef.nativeElement.style.visibility = this.model().isReady() ? '' : 'hidden';
     });
     effect(() => {
       const model = this.model();

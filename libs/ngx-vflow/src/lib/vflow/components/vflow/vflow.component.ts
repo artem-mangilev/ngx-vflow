@@ -150,6 +150,9 @@ const nodeDragControllerHostDirective = {
     // flow, so a change recomputes the style of all of them: it follows the zoom once per gesture, not per frame.
     // The node focus ring, which must follow every frame, reads the token from its own node instead.
     '[style.--vflow-zoom]': 'settledZoom()',
+    // Nothing that follows the viewport is painted before the first layout, so the first painted frame already
+    // shows a viewport the application sets in reaction to `initialized`, such as a `fitView()` call.
+    '[class.vflow-initializing]': '!initialized()',
   },
   imports: [
     KeyboardEntityDirective,
@@ -537,7 +540,12 @@ export class VflowComponent {
     initialValue: [] as EdgeChange[],
   });
 
-  public readonly initialized = this.flowRenderingService.flowInitialized.asReadonly();
+  /**
+   * Becomes true once, when the first layout is complete: the flow has a size, and every node has its size and
+   * handle positions. The graph is not painted before that, so a viewport change made in reaction to it, such as
+   * `fitView()` in an effect, is the first viewport the user sees.
+   */
+  public readonly initialized = this.flowRenderingService.flowInitialized;
   // #endregion
 
   // #region RX_API

@@ -113,6 +113,16 @@
   }
 }
 
+// Until the first layout is complete only the canvas is painted: the layers below follow the viewport, which the
+// application may still change in reaction to `initialized`. Entities inherit this, they never force visible.
+:host(.vflow-initializing) {
+  .vflow-background-svg,
+  .vflow-viewport,
+  .vflow-minimap {
+    visibility: hidden;
+  }
+}
+
 .vflow-a11y-live {
   position: absolute;
   width: 1px;

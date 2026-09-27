@@ -83,7 +83,7 @@ export class EdgeLabelComponent {
     });
     effect(() => {
       const model = this.edgeModel();
-      this.element.style.visibility = model.isReady() && !model.reconnecting() ? 'visible' : 'hidden';
+      this.element.style.visibility = model.isReady() && !model.reconnecting() ? '' : 'hidden';
     });
     effect(() => {
       const point = this.point();

@@ -34,9 +34,12 @@ export class NodeResizeControllerDirective implements OnInit, OnDestroy {
     if (this.destroyed) return;
     const model = this.nodeAccessor.model();
     const target = this.hostElementRef.nativeElement;
-    // display:none notifications must not overwrite cached geometry with zeros.
     // During a gesture the resizer owns the size: writing a clamped DOM size would make the next move oscillate.
-    if (!model || model.culled() || model.resizing() || !target.getClientRects().length) return;
+    if (!model || model.culled() || model.resizing()) return;
+    // display:none notifications must not overwrite cached geometry with zeros.
+    const hasBox = target.getClientRects().length > 0;
+    model.hasBox.set(hasBox);
+    if (!hasBox) return;
     // Measure the layout box, excluding protruding ports and external labels.
     // scrollWidth/Height would feed their overflow back into the next edge geometry pass.
     model.width.set(target.offsetWidth);

@@ -63,7 +63,7 @@ export class EdgeComponent {
   constructor() {
     const element = inject<ElementRef<SVGElement>>(ElementRef).nativeElement;
     effect(() => {
-      element.style.visibility = !this.model().isReady() || this.model().reconnecting() ? 'hidden' : 'visible';
+      element.style.visibility = !this.model().isReady() || this.model().reconnecting() ? 'hidden' : '';
     });
     effect(() => {
       element.style.zIndex = String(this.model().renderOrder());

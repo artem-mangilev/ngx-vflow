@@ -87,6 +87,9 @@ export class NodeModel<T = unknown> implements FlowEntity, Contextable<NodeConte
    */
   public isMeasured = signal(false);
 
+  /** False while the rendered node has no layout box (display: none), so it cannot be measured. */
+  public hasBox = signal(true);
+
   /** The current view has both node dimensions and positioned handles. */
   public isReady = computed(
     // A handle without a layout box (display: none) never gets measured and must not keep the node hidden.
