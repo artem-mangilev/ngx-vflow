@@ -18,6 +18,8 @@ import {
   KeyboardShortcuts,
   ConnectionSettings,
   ViewportState,
+  ViewportOptions,
+  SetCenterOptions,
   NodeChange,
   EdgeChange,
   FitViewOptions,
@@ -39,6 +41,9 @@ import {
   NodeTemplateMockDirective,
 } from '../directive-mocks/template-mock.directive';
 import { AsInterface } from '../types';
+
+/** The zoom step of `VflowComponent.zoomIn` and `zoomOut`. */
+const MOCK_ZOOM_STEP = 1.2;
 
 @Component({
   selector: 'vflow',
@@ -202,20 +207,43 @@ export class VflowMockComponent implements AsInterface<VflowComponent>, OnInit {
   // eslint-disable-next-line @angular-eslint/no-empty-lifecycle-method
   public ngOnInit() {}
 
-  public viewportTo(viewport: ViewportState): void {
-    this.viewport.set(viewport);
+  // The viewport methods apply at once, keep the zoom to the limits and take the pane center at the flow origin.
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public setViewport(viewport: ViewportState, options?: ViewportOptions): Promise<boolean> {
+    this.viewport.set({ ...viewport, zoom: this.clampZoom(viewport.zoom) });
+    return Promise.resolve(true);
   }
 
-  public zoomTo(zoom: number): void {
-    this.viewport.update((prev) => ({ ...prev, zoom }));
+  public setCenter(point: Point, options?: SetCenterOptions): Promise<boolean> {
+    const zoom = this.clampZoom(options?.zoom ?? this.viewport().zoom);
+    this.viewport.set({ x: -point.x * zoom, y: -point.y * zoom, zoom });
+    return Promise.resolve(true);
   }
 
-  public panTo(point: Point): void {
-    this.viewport.update((prev) => ({ ...prev, x: point.x, y: point.y }));
+  /** Does not move the viewport: the mock does not lay out nodes. */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public fitView(options?: FitViewOptions): Promise<boolean> {
+    return Promise.resolve(true);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public fitView(options?: FitViewOptions): void {}
+  public zoomTo(zoom: number, options?: ViewportOptions): Promise<boolean> {
+    this.viewport.update((prev) => ({ ...prev, zoom: this.clampZoom(zoom) }));
+    return Promise.resolve(true);
+  }
+
+  public zoomIn(options?: ViewportOptions): Promise<boolean> {
+    return this.zoomTo(this.viewport().zoom * MOCK_ZOOM_STEP, options);
+  }
+
+  public zoomOut(options?: ViewportOptions): Promise<boolean> {
+    return this.zoomTo(this.viewport().zoom / MOCK_ZOOM_STEP, options);
+  }
+
+  private clampZoom(zoom: number) {
+    return Math.min(this.maxZoom, Math.max(this.minZoom, zoom));
+  }
 
   public clientToFlowPosition(point: Point): Point {
     return point;

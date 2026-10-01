@@ -22,7 +22,7 @@ export * from './lib/vflow/interfaces/connection.interface';
 export * from './lib/vflow/interfaces/connection.interface';
 export { ConnectionSettings, ConnectionValidatorFn } from './lib/vflow/interfaces/connection-settings.interface';
 export * from './lib/vflow/interfaces/marker.interface';
-export { ViewportState } from './lib/vflow/interfaces/viewport.interface';
+export { SetCenterOptions, ViewportOptions, ViewportState } from './lib/vflow/interfaces/viewport.interface';
 export * from './lib/vflow/interfaces/component-node-event.interface';
 export * from './lib/vflow/interfaces/component-edge-event.interface';
 export { NODE_REF, NodeRef, injectNode } from './lib/vflow/utils/inject-node';

@@ -114,10 +114,10 @@ describe('public viewport gesture settings', () => {
     expect(touchPointers(pane, 'pointermove', [{ x: 80 }, { x: 170 }]).some((e) => e.defaultPrevented)).toBeFalse();
     touchPointers(pane, 'pointerup', [{ x: 80 }, { x: 170 }]);
     expect(flow.viewport()).toEqual({ x: 0, y: 0, zoom: 1 });
-    flow.viewportTo({ x: 20, y: 30, zoom: 2 });
+    flow.setViewport({ x: 20, y: 30, zoom: 2 });
     await settle();
     expect(flow.viewport()).toEqual({ x: 20, y: 30, zoom: 2 });
-    flow.panTo({ x: 40, y: 50 });
+    flow.setViewport({ ...flow.viewport(), x: 40, y: 50 });
     await settle();
     expect(flow.viewport()).toEqual({ x: 40, y: 50, zoom: 2 });
     flow.zoomTo(1);
@@ -284,7 +284,7 @@ describe('public viewport gesture settings', () => {
     touchPointers(pane, 'pointermove', [{ x: 130, y: 120 }]);
     expect(flow.viewport()).toEqual({ x: 30, y: 20, zoom: 1 });
     touchPointers(pane, 'pointerup', [{ x: 130, y: 120 }]);
-    flow.viewportTo({ x: 0, y: 0, zoom: 1 });
+    flow.setViewport({ x: 0, y: 0, zoom: 1 });
     fixture.detectChanges();
     const { left, top } = pane.getBoundingClientRect();
     touchPointers(pane, 'pointerdown', [{ x: 100 }, { x: 200 }]);
@@ -348,10 +348,10 @@ describe('public viewport gesture settings', () => {
     flow.zoomTo(10);
     await settle();
     expect(flow.viewport().zoom).toBe(3);
-    flow.viewportTo({ x: 5, y: 6, zoom: 10 });
+    flow.setViewport({ x: 5, y: 6, zoom: 10 });
     await settle();
     expect(flow.viewport()).toEqual({ x: 5, y: 6, zoom: 3 });
-    flow.viewportTo({ x: 5, y: 6, zoom: 0.01 });
+    flow.setViewport({ x: 5, y: 6, zoom: 0.01 });
     expect(flow.viewport()).toEqual({ x: 5, y: 6, zoom: 0.5 });
   });
 
@@ -361,7 +361,7 @@ describe('public viewport gesture settings', () => {
     viewportService.viewportChangeEnd$.subscribe(() => ends++);
 
     flow.zoomTo(1.5);
-    flow.panTo({ x: 123, y: 45 });
+    flow.setViewport({ ...flow.viewport(), x: 123, y: 45 });
     expect(flow.viewport()).toEqual({ x: 123, y: 45, zoom: 1.5 });
     expect(ends).toBe(2);
 
@@ -375,7 +375,7 @@ describe('public viewport gesture settings', () => {
     TestBed.runInInjectionContext(() =>
       effect(() => {
         runs++;
-        flow.panTo({ x: 10, y: 10 });
+        flow.setViewport({ x: 10, y: 10, zoom: 1 });
       }),
     );
     TestBed.tick();
@@ -389,39 +389,85 @@ describe('public viewport gesture settings', () => {
   });
 
   it('continues a programmatic change from the target of an animation in progress', async () => {
-    const viewportService = fixture.debugElement.injector.get(ViewportService);
-    viewportService.change({ x: 100, y: 50, zoom: 2 }, 300);
+    const first = flow.setViewport({ x: 100, y: 50, zoom: 2 }, { duration: 300 });
     await pause(100);
     expect(flow.viewport().zoom).toBeLessThan(2);
 
-    flow.panTo({ x: 10, y: 20 });
-    expect(flow.viewport()).toEqual({ x: 10, y: 20, zoom: 2 });
+    // The zoom of the interrupted animation's target, not the zoom it had reached.
+    flow.setCenter({ x: 0, y: 0 });
+    expect(flow.viewport()).toEqual({ x: 200, y: 150, zoom: 2 });
+    expect(await first).toBeFalse();
     await pause(300);
-    expect(flow.viewport()).toEqual({ x: 10, y: 20, zoom: 2 });
+    expect(flow.viewport()).toEqual({ x: 200, y: 150, zoom: 2 });
 
     // A change requested in the same task as an animation builds on its target before its first frame.
-    viewportService.change({ x: 0, y: 0, zoom: 1 }, 300);
+    flow.setViewport({ x: 0, y: 0, zoom: 1 }, { duration: 300 });
     flow.zoomTo(2);
     expect(flow.viewport()).toEqual({ x: -200, y: -150, zoom: 2 });
   });
 
   it('animates programmatic changes to their exact end and lets a press interrupt them', async () => {
-    const viewportService = fixture.debugElement.injector.get(ViewportService);
-    viewportService.change({ x: 100, y: 50, zoom: 2 }, 200);
+    const reached = flow.setViewport({ x: 100, y: 50, zoom: 2 }, { duration: 200 });
     await pause(100);
     const middle = flow.viewport();
     expect(middle.zoom).toBeGreaterThan(1);
     expect(middle.zoom).toBeLessThan(2);
-    await pause(250);
+    expect(await reached).toBeTrue();
     expect(flow.viewport()).toEqual({ x: 100, y: 50, zoom: 2 });
 
-    viewportService.change({ x: 0, y: 0, zoom: 1 }, 300);
+    const interrupted = flow.zoomTo(1, { duration: 300 });
     await pause(100);
     dispatchPointer(pane, 'pointerdown', { x: 100 });
-    const interrupted = flow.viewport();
+    const stopped = flow.viewport();
+    expect(await interrupted).toBeFalse();
     await pause(300);
-    expect(flow.viewport()).toEqual(interrupted);
+    expect(flow.viewport()).toEqual(stopped);
     dispatchPointer(window, 'pointerup', { x: 100 });
+  });
+
+  it('settles every programmatic change with whether it reached its target', async () => {
+    expect(await flow.setViewport({ x: 1, y: 2, zoom: 1 })).toBeTrue();
+    expect(await flow.zoomTo(1)).toBeTrue();
+    // Nothing to fit: the flow has no nodes.
+    expect(await flow.fitView({ duration: 100 })).toBeFalse();
+    expect(flow.viewport()).toEqual({ x: 1, y: 2, zoom: 1 });
+  });
+
+  it('centers a flow point at the current or the given zoom, within the limits', async () => {
+    flow.setViewport({ x: 0, y: 0, zoom: 2 });
+    flow.setCenter({ x: 50, y: 25 });
+    expect(flow.viewport()).toEqual({ x: 100, y: 100, zoom: 2 });
+    flow.setCenter({ x: 50, y: 25 }, { zoom: 1 });
+    expect(flow.viewport()).toEqual({ x: 150, y: 125, zoom: 1 });
+    flow.setCenter({ x: 0, y: 0 }, { zoom: 10 });
+    expect(flow.viewport()).toEqual({ x: 200, y: 150, zoom: 3 });
+
+    expect(await flow.setCenter({ x: 100, y: 0 }, { zoom: 1, duration: 100 })).toBeTrue();
+    expect(flow.viewport()).toEqual({ x: 100, y: 150, zoom: 1 });
+  });
+
+  it('zooms in and out around the pane center by the zoom key step, within the limits', async () => {
+    flow.zoomIn();
+    expect(flow.viewport().zoom).toBeCloseTo(1.2, 10);
+    expect(flow.viewport().x).toBeCloseTo(-40, 10);
+    flow.zoomOut();
+    expect(flow.viewport().zoom).toBeCloseTo(1, 10);
+    expect(flow.viewport().x).toBeCloseTo(0, 10);
+
+    flow.zoomTo(2.9);
+    flow.zoomIn();
+    expect(flow.viewport().zoom).toBe(3);
+    flow.zoomTo(0.55);
+    flow.zoomOut();
+    expect(flow.viewport().zoom).toBe(0.5);
+
+    // Steps requested during an animation compose with its target.
+    flow.zoomTo(1);
+    const zoomedIn = flow.zoomIn({ duration: 100 });
+    flow.zoomIn({ duration: 100 });
+    expect(await zoomedIn).toBeFalse();
+    await pause(200);
+    expect(flow.viewport().zoom).toBeCloseTo(1.44, 10);
   });
 
   it('reports the pressed element as the target of a pane click', () => {

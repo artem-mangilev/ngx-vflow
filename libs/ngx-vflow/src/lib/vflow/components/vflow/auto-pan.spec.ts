@@ -205,7 +205,7 @@ describe('public auto-pan settings', () => {
 
   it('keeps viewport-pixel speed at non-unit zoom and stops after drag ends', async () => {
     await setup({ connectionDrag: false });
-    fixture.componentInstance.flow.viewportTo({ x: 0, y: 0, zoom: 2 });
+    fixture.componentInstance.flow.setViewport({ x: 0, y: 0, zoom: 2 });
     await frame(0);
     drag();
     await frame(100);

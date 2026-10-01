@@ -104,7 +104,7 @@ Draggable nodes, drag handles, handles and resize controls use `none`, so they s
 <vflow [nodes]="nodes" [panOnDrag]="false" [panOnScroll]="false" [zoomOnScroll]="false" [zoomOnPinch]="false" [zoomOnDoubleClick]="false" [keyboardShortcuts]="{ modifiers: { panActivation: [], zoomActivation: [] } }" />
 ```
 
-Explicit `panTo`, `zoomTo`, `viewportTo`, and `fitView` calls continue to work. These settings only control viewport gestures; configure node dragging and selection separately if needed.
+Programmatic calls such as `setViewport`, `setCenter`, `fitView`, `zoomTo`, `zoomIn` and `zoomOut` continue to work. These settings only control viewport gestures; configure node dragging and selection separately if needed.
 
 # Auto-pan during dragging
 

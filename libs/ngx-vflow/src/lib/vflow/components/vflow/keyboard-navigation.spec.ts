@@ -224,7 +224,7 @@ describe('public keyboard graph navigation', () => {
     host.nodes()[0].width!.set(100);
     host.nodes()[0].height!.set(50);
     host.nodes()[1].point.set({ x: 800, y: 400 });
-    host.flow().viewportTo({ x: 0, y: 0, zoom: 2 });
+    host.flow().setViewport({ x: 0, y: 0, zoom: 2 });
     fixture.detectChanges();
     await fixture.whenStable();
     const child = root.querySelector<HTMLElement>('[aria-label="Child"]')!;

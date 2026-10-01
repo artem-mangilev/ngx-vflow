@@ -104,7 +104,7 @@ describe('CSS viewport virtualization', () => {
     expect(trackEdges).toHaveBeenCalled();
     // Re-measuring an uncovered node refreshes the view; the graph lists must keep their DOM.
     const before = Array.from(fixture.nativeElement.querySelectorAll('.vflow-node, svg[edge]'));
-    fixture.componentInstance.panTo({ x: -1000, y: 0 });
+    fixture.componentInstance.setViewport({ ...fixture.componentInstance.viewport(), x: -1000, y: 0 });
     await fixture.whenStable();
     fixture.componentInstance.zoomTo(0.8);
     await fixture.whenStable();
@@ -283,7 +283,7 @@ describe('CSS viewport virtualization', () => {
     const initialImage = canvas.toDataURL();
     trackNodes.calls.reset();
     drawPreview.calls.reset();
-    component.panTo({ x: -200, y: 0 });
+    component.setViewport({ ...component.viewport(), x: -200, y: 0 });
     component.zoomTo(0.8);
     await fixture.whenStable();
     expect(canvas.toDataURL()).not.toBe(initialImage);
@@ -347,7 +347,7 @@ describe('CSS viewport virtualization', () => {
     input.dispatchEvent(new Event('input', { bubbles: true }));
     const handle = node.handles()[0];
     const oldPoint = handle.pointAbsolute();
-    fixture.componentInstance.panTo({ x: 1000, y: 0 });
+    fixture.componentInstance.setViewport({ ...fixture.componentInstance.viewport(), x: 1000, y: 0 });
     await settle(fixture);
     expect(getComputedStyle(host).display).toBe('none');
     expect([node.width(), node.height()]).toEqual([240, 80]);
@@ -356,7 +356,7 @@ describe('CSS viewport virtualization', () => {
     component.height.set(120);
     await settle(fixture);
     expect([node.width(), node.height()]).toEqual([240, 80]);
-    fixture.componentInstance.panTo({ x: 0, y: 0 });
+    fixture.componentInstance.setViewport({ ...fixture.componentInstance.viewport(), x: 0, y: 0 });
     fixture.detectChanges();
     for (let i = 0; i < 6; i++) {
       await new Promise(requestAnimationFrame);
@@ -373,7 +373,7 @@ describe('CSS viewport virtualization', () => {
     expect(input.value).toBe('unsaved draft');
     expect(node.isReady()).toBeTrue();
     // Turning virtualization off restores hidden views without recreating them.
-    fixture.componentInstance.panTo({ x: 1000, y: 0 });
+    fixture.componentInstance.setViewport({ ...fixture.componentInstance.viewport(), x: 1000, y: 0 });
     await settle(fixture);
     fixture.componentRef.setInput('optimization', { virtualization: false });
     await settle(fixture);
@@ -443,7 +443,7 @@ describe('CSS viewport virtualization', () => {
     const host = fixture.nativeElement.querySelector('.vflow-node') as HTMLElement;
     const input = host.querySelector('input')!;
     input.focus();
-    fixture.componentInstance.panTo({ x: 1000, y: 0 });
+    fixture.componentInstance.setViewport({ ...fixture.componentInstance.viewport(), x: 1000, y: 0 });
     await settle(fixture);
     expect(document.activeElement).toBe(input);
     expect(getComputedStyle(host).display).not.toBe('none');
@@ -495,7 +495,7 @@ describe('CSS viewport virtualization', () => {
     const node = fixture.debugElement.injector.get(FlowEntitiesService).nodes()[0];
     const host = fixture.nativeElement.querySelector('.vflow-node') as HTMLElement;
     node.resizing.set(true);
-    fixture.componentInstance.panTo({ x: 1000, y: 0 });
+    fixture.componentInstance.setViewport({ ...fixture.componentInstance.viewport(), x: 1000, y: 0 });
     await settle(fixture);
     expect(getComputedStyle(host).display).not.toBe('none');
     const status = fixture.debugElement.injector.get(FlowStatusService);

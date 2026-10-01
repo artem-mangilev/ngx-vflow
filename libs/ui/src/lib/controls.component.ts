@@ -35,7 +35,7 @@ export interface VflowControlsLabels {
       type="button"
       [attr.aria-label]="labels().zoomIn"
       [disabled]="!canZoomIn()"
-      (click)="zoomBy(1)">
+      (click)="flow().zoomIn()">
       <svg
         aria-hidden="true"
         width="16"
@@ -53,7 +53,7 @@ export interface VflowControlsLabels {
       type="button"
       [attr.aria-label]="labels().zoomOut"
       [disabled]="!canZoomOut()"
-      (click)="zoomBy(-1)">
+      (click)="flow().zoomOut()">
       <svg
         aria-hidden="true"
         width="16"
@@ -86,8 +86,6 @@ export interface VflowControlsLabels {
 export class VflowControls {
   /** The flow these controls operate on. */
   readonly flow = input.required<VflowComponent>();
-  /** Multiplicative zoom step per click. */
-  readonly step = input(1.2);
   readonly labels = input<VflowControlsLabels>({
     group: 'Viewport controls',
     zoomIn: 'Zoom in',
@@ -98,11 +96,4 @@ export class VflowControls {
   protected readonly zoom = computed(() => this.flow().viewport().zoom);
   protected readonly canZoomIn = computed(() => this.zoom() < this.flow().maxZoom - 1e-6);
   protected readonly canZoomOut = computed(() => this.zoom() > this.flow().minZoom + 1e-6);
-
-  protected zoomBy(direction: 1 | -1) {
-    const flow = this.flow();
-    const step = Number.isFinite(this.step()) && this.step() > 1 ? this.step() : 1.2;
-    const next = this.zoom() * step ** direction;
-    flow.zoomTo(Math.min(flow.maxZoom, Math.max(flow.minZoom, next)));
-  }
 }

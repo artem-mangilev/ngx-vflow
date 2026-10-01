@@ -121,4 +121,31 @@ describe('Initial viewport', () => {
       style.remove();
     }
   });
+
+  it('fits within the zoom bounds a call gives, inside the flow limits', async () => {
+    TestBed.configureTestingModule({ providers: [provideZonelessChangeDetection()] });
+    const fixture = TestBed.createComponent(FitOnInitComponent);
+    fixture.detectChanges();
+    await frames(8);
+    const flow = fixture.componentInstance.flow();
+    const unbounded = flow.viewport().zoom;
+    expect(unbounded).toBeGreaterThan(0.5);
+    expect(unbounded).toBeLessThan(1);
+
+    // A single node would fill the pane at the flow's maxZoom.
+    expect(await flow.fitView({ nodes: ['a'], maxZoom: 1.5 })).toBeTrue();
+    expect(flow.viewport().zoom).toBe(1.5);
+    expect(await flow.fitView({ minZoom: 1 })).toBeTrue();
+    expect(flow.viewport().zoom).toBe(1);
+    // maxZoom wins over a greater minZoom; both stay within the flow limits.
+    await flow.fitView({ minZoom: 2, maxZoom: 1.5 });
+    expect(flow.viewport().zoom).toBe(1.5);
+    await flow.fitView({ minZoom: 0.01 });
+    expect(flow.viewport().zoom).toBe(unbounded);
+    await flow.fitView({ nodes: ['a'], maxZoom: 10 });
+    expect(flow.viewport().zoom).toBe(3);
+
+    expect(() => flow.fitView({ maxZoom: 0 })).toThrowError(RangeError);
+    expect(await flow.fitView({ nodes: ['missing'] })).toBeFalse();
+  });
 });

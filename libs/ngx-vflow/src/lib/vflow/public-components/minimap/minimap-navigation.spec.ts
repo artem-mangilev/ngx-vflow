@@ -98,7 +98,7 @@ describe('minimap navigation through the public viewport API', () => {
 
   it('centers clicks at non-unit zoom and after resizing without redrawing cached nodes on navigation', async () => {
     host.pannable.set(true);
-    flow.viewportTo({ x: 0, y: 0, zoom: 1.5 });
+    flow.setViewport({ x: 0, y: 0, zoom: 1.5 });
     await settle();
     const draw = spyOn(CanvasRenderingContext2D.prototype, 'roundRect').and.callThrough();
     await click(60, 40);
@@ -167,7 +167,7 @@ describe('minimap navigation through the public viewport API', () => {
   it('zooms around the main center, clamps to limits, validates steps and respects wheel/pinch policy', async () => {
     host.zoomable.set(true);
     host.step.set(1);
-    flow.viewportTo({ x: -10200, y: 4950, zoom: 1 });
+    flow.setViewport({ x: -10200, y: 4950, zoom: 1 });
     await settle();
     expect((await wheel()).defaultPrevented).toBeTrue();
     expect(flow.viewport()).toEqual({ x: -20600, y: 9750, zoom: 2 });
@@ -188,7 +188,7 @@ describe('minimap navigation through the public viewport API', () => {
     flow.zoomOnScroll = true;
     for (const value of [0, -1, NaN, Infinity]) {
       host.step.set(value);
-      flow.viewportTo({ x: 0, y: 0, zoom: 1 });
+      flow.setViewport({ x: 0, y: 0, zoom: 1 });
       await settle();
       await wheel();
       expect(flow.viewport().zoom).toBeCloseTo(1.1);

@@ -1,13 +1,11 @@
 import { Injectable, inject } from '@angular/core';
-import { ViewportService } from './viewport.service';
+import { ViewportService, ZOOM_STEP } from './viewport.service';
 import { FlowSettingsService } from './flow-settings.service';
 import { AnnouncerService } from './announcer.service';
 import { ArrowCommand } from '../utils/keyboard-commands';
 
 /** Screen pixels per arrow press when panning; Shift multiplies by 4, as it does for node movement. */
 const PAN_STEP = 15;
-/** Multiplicative zoom step per press, the same as the `vflow-controls` buttons. */
-const ZOOM_STEP = 1.2;
 
 /** What the keyboard commands of the viewport do. They take every press they are given. */
 @Injectable()
@@ -25,18 +23,16 @@ export class KeyboardViewportCommandsService {
   }
 
   public zoom(step: 1 | -1) {
-    const zoom = Math.min(
-      this.settings.maxZoom(),
-      Math.max(this.settings.minZoom(), this.viewport.readableViewport().zoom * ZOOM_STEP ** step),
-    );
-    this.viewport.change({ zoom });
-    this.announcer.announce(this.settings.ariaLabels().zoomAnnouncement(zoom));
+    this.viewport.zoomBy(ZOOM_STEP ** step).then(() => this.announceZoom());
     return true;
   }
 
   public fitView() {
-    const state = this.viewport.fitView({ padding: 0.1, duration: 0 });
-    if (state) this.announcer.announce(this.settings.ariaLabels().zoomAnnouncement(state.zoom));
+    this.viewport.fitView({ padding: 0.1 }).then((fitted) => fitted && this.announceZoom());
     return true;
+  }
+
+  private announceZoom() {
+    this.announcer.announce(this.settings.ariaLabels().zoomAnnouncement(this.viewport.readableViewport().zoom));
   }
 }

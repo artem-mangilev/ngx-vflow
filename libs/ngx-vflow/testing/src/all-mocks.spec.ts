@@ -106,7 +106,7 @@ class VflowWrapperComponent {
 
       this.vflow()!.edgesChange$.subscribe();
 
-      this.vflow()!.viewportTo({
+      this.vflow()!.setViewport({
         x: 0,
         y: 0,
         zoom: 1,
@@ -114,10 +114,14 @@ class VflowWrapperComponent {
 
       this.vflow()!.zoomTo(1);
 
-      this.vflow()!.panTo({
+      this.vflow()!.setCenter({
         x: 0,
         y: 0,
       });
+
+      this.vflow()!.zoomIn();
+
+      this.vflow()!.zoomOut();
 
       this.vflow()!.fitView();
 

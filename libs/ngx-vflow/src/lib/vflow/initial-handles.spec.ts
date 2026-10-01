@@ -61,7 +61,7 @@ describe('Initial handle placement', () => {
       };
       await capture('initial mount');
       fixture.componentRef.setInput('optimization', { virtualization: true });
-      fixture.componentInstance.panTo({ x: 10000, y: 10000 });
+      fixture.componentInstance.setViewport({ ...fixture.componentInstance.viewport(), x: 10000, y: 10000 });
       fixture.detectChanges();
       await fixture.whenStable();
       expect(fixture.nativeElement.querySelectorAll('.vflow-node').length).toBe(count);
@@ -70,7 +70,7 @@ describe('Initial handle placement', () => {
           (node) => getComputedStyle(node).display === 'none',
         ),
       ).toBeTrue();
-      fixture.componentInstance.panTo({ x: 0, y: 0 });
+      fixture.componentInstance.setViewport({ ...fixture.componentInstance.viewport(), x: 0, y: 0 });
       await capture('CSS restore');
     }, 10000);
   }
@@ -110,7 +110,7 @@ describe('Initial handle placement', () => {
     expect(fixture.nativeElement.querySelector('[edgeLabelHost]')?.textContent).toContain('Connection');
     // An offscreen endpoint retains measured geometry for an edge crossing the viewport.
     fixture.componentRef.setInput('optimization', { virtualization: true });
-    fixture.componentInstance.panTo({ x: -120, y: 0 });
+    fixture.componentInstance.setViewport({ ...fixture.componentInstance.viewport(), x: -120, y: 0 });
     fixture.detectChanges();
     await fixture.whenStable();
     expect(fixture.nativeElement.querySelectorAll('.vflow-node').length).toBe(2);

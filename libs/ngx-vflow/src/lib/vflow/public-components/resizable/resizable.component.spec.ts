@@ -205,7 +205,7 @@ describe('ResizableComponent', () => {
     const fixture = await createFixture();
 
     const viewportChanged = firstValueFrom(fixture.componentInstance.vflow().viewportChange$);
-    fixture.componentInstance.vflow().viewportTo({ x: 0, y: 0, zoom: 0.5 });
+    fixture.componentInstance.vflow().setViewport({ x: 0, y: 0, zoom: 0.5 });
     await viewportChanged;
     fixture.detectChanges();
     await fixture.whenStable();

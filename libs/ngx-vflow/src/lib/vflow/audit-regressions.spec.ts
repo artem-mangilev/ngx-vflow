@@ -242,7 +242,7 @@ describe('Graph rendering and interaction regressions', () => {
     const host = fixture.nativeElement as HTMLElement;
     expect(host.querySelectorAll('.vflow-node').length).toBe(2);
     expect(host.querySelectorAll('svg[edge]').length).toBe(1);
-    fixture.componentInstance.panTo({ x: 1000, y: 0 });
+    fixture.componentInstance.setViewport({ ...fixture.componentInstance.viewport(), x: 1000, y: 0 });
     fixture.detectChanges();
     await fixture.whenStable();
     expect(host.querySelectorAll('.vflow-node').length).toBe(2);
@@ -252,7 +252,7 @@ describe('Graph rendering and interaction regressions', () => {
         (element) => getComputedStyle(element).display === 'none',
       ),
     ).toBeTrue();
-    fixture.componentInstance.panTo({ x: 0, y: 0 });
+    fixture.componentInstance.setViewport({ ...fixture.componentInstance.viewport(), x: 0, y: 0 });
     fixture.detectChanges();
     await fixture.whenStable();
     await settle();

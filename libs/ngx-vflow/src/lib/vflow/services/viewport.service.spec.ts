@@ -1,12 +1,14 @@
 import { TestBed } from '@angular/core/testing';
 import { provideZonelessChangeDetection } from '@angular/core';
-import { ViewportChange } from '../interfaces/viewport.interface';
+import { ViewportChange, ViewportState } from '../interfaces/viewport.interface';
 import { FlowEntitiesService } from './flow-entities.service';
 import { FlowSettingsService } from './flow-settings.service';
 import { ViewportService } from './viewport.service';
 
 describe('ViewportService', () => {
   let service: ViewportService;
+  const from: ViewportState = { x: 0, y: 0, zoom: 1 };
+  const center = { x: 100, y: 50 };
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -22,9 +24,9 @@ describe('ViewportService', () => {
     const applied: ViewportChange[] = [];
     service.connect((change) => applied.push(change));
 
-    expect(applied).toEqual([
-      { state: { zoom: 2 }, duration: 0 },
-      { state: { x: 10, y: 20 }, duration: 100 },
+    expect(applied.map(({ target, duration }) => [target(from, center), duration])).toEqual([
+      [{ x: -100, y: -50, zoom: 2 }, 0],
+      [{ x: 10, y: 20, zoom: 1 }, 100],
     ]);
   });
 
@@ -39,6 +41,17 @@ describe('ViewportService', () => {
     expect(applied.length).toBe(1);
 
     service.connect((change) => applied.push(change));
-    expect(applied.map(({ state }) => state)).toEqual([{ zoom: 2 }, { zoom: 3 }]);
+    expect(applied.map(({ target }) => target(from, center)?.zoom)).toEqual([2, 3]);
+  });
+
+  it('settles a change with what the pane reports, and a change that never applied with false', async () => {
+    service.connect((change) => change.done(true));
+    expect(await service.change({ zoom: 2 })).toBeTrue();
+
+    const disconnect = service.connect(() => undefined);
+    disconnect();
+    const pending = service.change({ zoom: 3 });
+    TestBed.resetTestingModule();
+    expect(await pending).toBeFalse();
   });
 });

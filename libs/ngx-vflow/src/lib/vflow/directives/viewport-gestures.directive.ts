@@ -1,6 +1,5 @@
 import { Directive, ElementRef, NgZone, OnDestroy, OnInit, computed, inject } from '@angular/core';
 import { ViewportService } from '../services/viewport.service';
-import { isDefined } from '../utils/is-defined';
 import { ViewportChange, ViewportState } from '../interfaces/viewport.interface';
 import { SelectionService } from '../services/selection.service';
 import { FlowSettingsService } from '../services/flow-settings.service';
@@ -88,6 +87,8 @@ export class ViewportGesturesDirective implements OnInit, OnDestroy {
   private animation: ViewportAnimation | null = null;
   /** Where the animation in progress leads; a programmatic change continues from there. */
   private animationTarget: ViewportState | null = null;
+  /** Reports the end of the programmatic change the animation in progress belongs to. */
+  private animationDone: ((reached: boolean) => void) | null = null;
 
   private wheelTimer: ReturnType<typeof setTimeout> | null = null;
   private wheelZoom: WheelZoom | null = null;
@@ -141,38 +142,44 @@ export class ViewportGesturesDirective implements OnInit, OnDestroy {
     this.disconnect();
     this.listeners.abort();
     this.drag?.destroy();
-    this.animation?.interrupt();
     if (this.wheelTimer !== null) clearTimeout(this.wheelTimer);
     if (this.wheelFrame !== null) cancelAnimationFrame(this.wheelFrame);
     this.wheelZoom = null;
+    this.interruptAnimation();
     this.stopTrackingTouches();
   }
 
   // #region Programmatic changes
   /**
    * A change continues from where the previous one leads: the target of an animation in progress, or the viewport.
-   * The values it omits keep theirs, zoom keeps to the limits, and zoom alone scales around the pane center.
+   * It reports that it reached its target once it lands there; an interrupted animation reports that it did not.
    */
-  private applyChange({ state, duration }: ViewportChange) {
+  private applyChange({ target, duration, done }: ViewportChange) {
     const previousTarget = this.animationTarget;
     this.interruptAnimation();
-    const from = previousTarget ?? this.current();
-    const zoom = this.clamp(state.zoom ?? from.zoom);
-    const to =
-      isDefined(state.x) || isDefined(state.y)
-        ? { x: state.x ?? from.x, y: state.y ?? from.y, zoom }
-        : zoomAround(from, zoom, this.paneCenter());
+    const to = target(previousTarget ?? this.current(), this.paneCenter());
+    if (!to) {
+      done(false);
+      return;
+    }
 
     if (duration > 0) {
-      this.animate(to, duration, () => this.paneCenter(), null);
+      this.animate(to, duration, () => this.paneCenter(), null, done);
     } else {
       this.begin();
       this.set(to);
       this.finish(null);
+      done(true);
     }
   }
 
-  private animate(to: ViewportState, duration: number, anchor: () => Point, eventTarget: EventTarget | null) {
+  private animate(
+    to: ViewportState,
+    duration: number,
+    anchor: () => Point,
+    eventTarget: EventTarget | null,
+    done: ((reached: boolean) => void) | null = null,
+  ) {
     this.interruptAnimation();
     const animation: ViewportAnimation = this.zone.runOutsideAngular(() =>
       animateViewport({
@@ -184,23 +191,30 @@ export class ViewportGesturesDirective implements OnInit, OnDestroy {
         onStart: () => this.begin(),
         onFrame: (state) => this.set(state),
         onEnd: () => {
-          if (this.animation === animation) {
+          const reached = this.animation === animation;
+          if (reached) {
             this.animation = null;
             this.animationTarget = null;
+            this.animationDone = null;
           }
           this.finish(eventTarget);
+          if (reached) done?.(true);
         },
       }),
     );
     this.animation = animation;
     this.animationTarget = to;
+    this.animationDone = done;
   }
 
   private interruptAnimation() {
     const animation = this.animation;
+    const done = this.animationDone;
     this.animation = null;
     this.animationTarget = null;
+    this.animationDone = null;
     animation?.interrupt();
+    done?.(false);
     this.landWheelZoom();
   }
   // #endregion

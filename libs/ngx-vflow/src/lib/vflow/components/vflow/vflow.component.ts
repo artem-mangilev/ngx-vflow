@@ -22,7 +22,7 @@ import { ViewportGesturesDirective } from '../../directives/viewport-gestures.di
 import { ViewportVisibilityDirective } from '../../directives/viewport-visibility.directive';
 import { DraggableService } from '../../services/draggable.service';
 import { NodeModel } from '../../models/node.model';
-import { ViewportService } from '../../services/viewport.service';
+import { ViewportService, ZOOM_STEP } from '../../services/viewport.service';
 import { toObservable, outputFromObservable, takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Edge } from '../../interfaces/edge.interface';
 import { EdgeModel } from '../../models/edge.model';
@@ -35,7 +35,7 @@ import {
 import { addNodesToEdges } from '../../utils/add-nodes-to-edges';
 import { skip } from 'rxjs/operators';
 import { Point } from '../../interfaces/point.interface';
-import { ViewportState } from '../../interfaces/viewport.interface';
+import { SetCenterOptions, ViewportOptions, ViewportState } from '../../interfaces/viewport.interface';
 import { FlowStatusService } from '../../services/flow-status.service';
 import { FlowEntitiesService } from '../../services/flow-entities.service';
 import { MarkerShapes } from '../../utils/marker-inset';
@@ -580,39 +580,53 @@ export class VflowComponent {
 
   // #region METHODS_API
   // Viewport methods apply at once and in order, each from where the previous one leads, so consecutive calls
-  // compose. Zoom keeps to `minZoom` and `maxZoom`.
+  // compose. Zoom keeps to `minZoom` and `maxZoom`. Each animates over `options.duration` ms and returns a promise
+  // that settles when the change ends: `true` when the viewport reached the target, `false` when there was nothing
+  // to change or another change or a gesture interrupted it first.
 
   /**
-   * Change viewport to specified state. A zoom outside the limits is clamped; `x` and `y` stay as given.
+   * Sets the viewport: the same `x`, `y` and `zoom` as on the {@link viewport} signal. A zoom outside the limits is
+   * clamped; `x` and `y` stay as given. To pan without zooming, pass `{ ...flow.viewport(), x, y }`.
    *
    * @param viewport viewport state
    */
-  public viewportTo(viewport: ViewportState): void {
-    this.viewportService.change(viewport);
+  public setViewport(viewport: ViewportState, options?: ViewportOptions): Promise<boolean> {
+    return this.viewportService.change(viewport, options?.duration);
   }
 
   /**
-   * Change zoom around the center of the flow, within the zoom limits.
+   * Puts a flow-space point in the center of the flow, at `options.zoom` or the current zoom.
+   *
+   * @param point flow-space point
+   */
+  public setCenter(point: Point, options?: SetCenterOptions): Promise<boolean> {
+    return this.viewportService.setCenter(point, options?.zoom, options?.duration);
+  }
+
+  /**
+   * Fits the given nodes, or all of them, into the flow. Settles with `false` when there is nothing to fit.
+   */
+  public fitView(options?: FitViewOptions): Promise<boolean> {
+    return this.viewportService.fitView(options);
+  }
+
+  /**
+   * Zooms around the center of the flow.
    *
    * @param zoom zoom value
    */
-  public zoomTo(zoom: number): void {
-    this.viewportService.change({ zoom });
+  public zoomTo(zoom: number, options?: ViewportOptions): Promise<boolean> {
+    return this.viewportService.change({ zoom }, options?.duration);
   }
 
-  /**
-   * Sets the viewport **translation** (`x`, `y`) while keeping the current zoom — the same meaning as
-   * `x` / `y` on the public {@link viewport} signal. This is not a node position in flow space; to
-   * center on a world point, use {@link fitView} or compute translate from flow coordinates and current `zoom`.
-   *
-   * @param point viewport translation `{ x, y }`
-   */
-  public panTo(point: Point): void {
-    this.viewportService.change(point);
+  /** Zooms in around the center of the flow by the step of the zoom-in key. */
+  public zoomIn(options?: ViewportOptions): Promise<boolean> {
+    return this.viewportService.zoomBy(ZOOM_STEP, options?.duration);
   }
 
-  public fitView(options?: FitViewOptions) {
-    this.viewportService.fitView(options);
+  /** Zooms out around the center of the flow by the step of the zoom-out key. */
+  public zoomOut(options?: ViewportOptions): Promise<boolean> {
+    return this.viewportService.zoomBy(1 / ZOOM_STEP, options?.duration);
   }
 
   /**
