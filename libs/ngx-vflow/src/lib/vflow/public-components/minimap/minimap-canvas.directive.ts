@@ -286,14 +286,10 @@ export class MinimapCanvasDirective {
   }
 
   private centerOn(point: Point, zoom = this.viewport.readableViewport().zoom) {
-    this.viewport.writableViewport.set({
-      changeType: 'absolute',
-      state: {
-        x: this.settings.computedFlowWidth() / 2 - point.x * zoom,
-        y: this.settings.computedFlowHeight() / 2 - point.y * zoom,
-        zoom,
-      },
-      duration: 0,
+    this.viewport.change({
+      x: this.settings.computedFlowWidth() / 2 - point.x * zoom,
+      y: this.settings.computedFlowHeight() / 2 - point.y * zoom,
+      zoom,
     });
   }
 
@@ -312,11 +308,7 @@ export class MinimapCanvasDirective {
       if (!this.pannable() || this.keyboard.isActiveModifier('selection')) return;
       const unit = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? this.height() : 1;
       const scale = (unit * viewport.zoom) / this.graph().transform.zoom;
-      this.viewport.writableViewport.set({
-        changeType: 'absolute',
-        state: { ...viewport, x: viewport.x - event.deltaX * scale, y: viewport.y - event.deltaY * scale },
-        duration: 0,
-      });
+      this.viewport.change({ ...viewport, x: viewport.x - event.deltaX * scale, y: viewport.y - event.deltaY * scale });
       return;
     }
     if (

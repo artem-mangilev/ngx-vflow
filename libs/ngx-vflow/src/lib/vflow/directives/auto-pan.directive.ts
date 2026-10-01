@@ -92,11 +92,7 @@ export class AutoPanDirective implements OnInit {
     const deltaY = distance * (edgeFactor(point.y, margin) - edgeFactor(height - point.y, margin));
 
     if (deltaX !== 0 || deltaY !== 0) {
-      this.viewportService.writableViewport.set({
-        changeType: 'absolute',
-        state: { x: x + deltaX, y: y + deltaY, zoom },
-        duration: 0,
-      });
+      this.viewportService.change({ x: x + deltaX, y: y + deltaY, zoom });
     }
   }
 }

@@ -1,7 +1,7 @@
-import { Directive, ElementRef, NgZone, OnDestroy, OnInit, computed, effect, inject, untracked } from '@angular/core';
+import { Directive, ElementRef, NgZone, OnDestroy, OnInit, computed, inject } from '@angular/core';
 import { ViewportService } from '../services/viewport.service';
 import { isDefined } from '../utils/is-defined';
-import { ViewportState } from '../interfaces/viewport.interface';
+import { ViewportChange, ViewportState } from '../interfaces/viewport.interface';
 import { SelectionService } from '../services/selection.service';
 import { FlowSettingsService } from '../services/flow-settings.service';
 import { KeyboardService } from '../services/keyboard.service';
@@ -86,6 +86,8 @@ export class ViewportGesturesDirective implements OnInit, OnDestroy {
   private activeGestures = 0;
   private gestureStart: ViewportState | null = null;
   private animation: ViewportAnimation | null = null;
+  /** Where the animation in progress leads; a programmatic change continues from there. */
+  private animationTarget: ViewportState | null = null;
 
   private wheelTimer: ReturnType<typeof setTimeout> | null = null;
   private wheelZoom: WheelZoom | null = null;
@@ -102,11 +104,7 @@ export class ViewportGesturesDirective implements OnInit, OnDestroy {
   private firstTap: Point | null = null;
   private lastTouchEndedAt = -Infinity;
 
-  protected readonly programmaticChange = effect(() => {
-    const viewport = this.viewportService.writableViewport();
-    if (viewport.changeType === 'initial') return;
-    untracked(() => this.applyChange(viewport.state, viewport.duration));
-  });
+  private readonly disconnect = this.viewportService.connect((change) => this.applyChange(change));
 
   public ngOnInit(): void {
     this.zone.runOutsideAngular(() => {
@@ -140,6 +138,7 @@ export class ViewportGesturesDirective implements OnInit, OnDestroy {
 
   public ngOnDestroy(): void {
     this.destroyed = true;
+    this.disconnect();
     this.listeners.abort();
     this.drag?.destroy();
     this.animation?.interrupt();
@@ -150,58 +149,57 @@ export class ViewportGesturesDirective implements OnInit, OnDestroy {
   }
 
   // #region Programmatic changes
-  private applyChange(state: Partial<ViewportState>, duration: number) {
-    let target: ((from: ViewportState) => ViewportState) | null = null;
-
-    if (isDefined(state.zoom) && !isDefined(state.x) && !isDefined(state.y)) {
-      // Zoom alone scales around the pane center and respects the zoom limits.
-      const zoom = state.zoom;
-      target = (from) => zoomAround(from, this.clamp(zoom), this.paneCenter());
-    } else if (isDefined(state.x) && isDefined(state.y)) {
-      const to = { x: state.x, y: state.y, zoom: state.zoom ?? this.current().zoom };
-      target = () => to;
-    }
-
-    if (!target) return;
+  /**
+   * A change continues from where the previous one leads: the target of an animation in progress, or the viewport.
+   * The values it omits keep theirs, zoom keeps to the limits, and zoom alone scales around the pane center.
+   */
+  private applyChange({ state, duration }: ViewportChange) {
+    const previousTarget = this.animationTarget;
+    this.interruptAnimation();
+    const from = previousTarget ?? this.current();
+    const zoom = this.clamp(state.zoom ?? from.zoom);
+    const to =
+      isDefined(state.x) || isDefined(state.y)
+        ? { x: state.x ?? from.x, y: state.y ?? from.y, zoom }
+        : zoomAround(from, zoom, this.paneCenter());
 
     if (duration > 0) {
-      this.animate(target, duration, () => this.paneCenter(), null);
+      this.animate(to, duration, () => this.paneCenter(), null);
     } else {
-      this.interruptAnimation();
       this.begin();
-      this.set(target(this.current()));
+      this.set(to);
       this.finish(null);
     }
   }
 
-  private animate(
-    target: (from: ViewportState) => ViewportState,
-    duration: number,
-    anchor: () => Point,
-    eventTarget: EventTarget | null,
-  ) {
+  private animate(to: ViewportState, duration: number, anchor: () => Point, eventTarget: EventTarget | null) {
     this.interruptAnimation();
     const animation: ViewportAnimation = this.zone.runOutsideAngular(() =>
       animateViewport({
         duration,
         current: () => this.current(),
-        target,
+        target: () => to,
         anchor,
         size: () => Math.max(this.host.clientWidth, this.host.clientHeight),
         onStart: () => this.begin(),
         onFrame: (state) => this.set(state),
         onEnd: () => {
-          if (this.animation === animation) this.animation = null;
+          if (this.animation === animation) {
+            this.animation = null;
+            this.animationTarget = null;
+          }
           this.finish(eventTarget);
         },
       }),
     );
     this.animation = animation;
+    this.animationTarget = to;
   }
 
   private interruptAnimation() {
     const animation = this.animation;
     this.animation = null;
+    this.animationTarget = null;
     animation?.interrupt();
     this.landWheelZoom();
   }
@@ -336,12 +334,7 @@ export class ViewportGesturesDirective implements OnInit, OnDestroy {
   private doubleClickZoom(point: Point, out: boolean, target: EventTarget | null) {
     const current = this.current();
     const to = zoomAround(current, this.clamp(current.zoom * (out ? 0.5 : 2)), point);
-    this.animate(
-      () => to,
-      DOUBLE_CLICK_DURATION_MS,
-      () => point,
-      target,
-    );
+    this.animate(to, DOUBLE_CLICK_DURATION_MS, () => point, target);
   }
   // #endregion
 

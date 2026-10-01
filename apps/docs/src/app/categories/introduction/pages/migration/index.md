@@ -419,6 +419,8 @@ ngx-vflow no longer depends on `d3-zoom`, `d3-drag` and `d3-selection`. Pan, zoo
 - The pane and draggable nodes set CSS `touch-action`; see [Viewport gestures](../../interactions/viewport-gestures) for how touch scrolling follows the settings.
 - Once a pan moves, the pane captures the pointer until release, so nodes under the cursor do not receive hover events during a pan.
 - A pinch that may zoom but not pan scales around the point where the fingers started, instead of drifting with them.
+- `viewportTo` keeps the zoom within `minZoom` and `maxZoom`, as `zoomTo` does; `x` and `y` stay as given.
+- `viewportTo`, `zoomTo`, `panTo` and `fitView` apply at once and in order, each from where the previous call leads. Consecutive calls such as `fitView()` followed by `zoomTo(1)` compose instead of the last one replacing the others.
 
 ### Removed APIs
 

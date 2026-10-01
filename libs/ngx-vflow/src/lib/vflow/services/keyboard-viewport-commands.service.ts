@@ -20,11 +20,7 @@ export class KeyboardViewportCommandsService {
     const { x, y } = this.viewport.readableViewport();
     const step = PAN_STEP * (fast ? 4 : 1);
     // Arrows scroll the view: pressing right reveals what lies to the right, so the content moves left.
-    this.viewport.writableViewport.set({
-      changeType: 'absolute',
-      state: { x: x - direction.vector.x * step, y: y - direction.vector.y * step },
-      duration: 0,
-    });
+    this.viewport.change({ x: x - direction.vector.x * step, y: y - direction.vector.y * step });
     return true;
   }
 
@@ -33,7 +29,7 @@ export class KeyboardViewportCommandsService {
       this.settings.maxZoom(),
       Math.max(this.settings.minZoom(), this.viewport.readableViewport().zoom * ZOOM_STEP ** step),
     );
-    this.viewport.writableViewport.set({ changeType: 'absolute', state: { zoom }, duration: 0 });
+    this.viewport.change({ zoom });
     this.announcer.announce(this.settings.ariaLabels().zoomAnnouncement(zoom));
     return true;
   }

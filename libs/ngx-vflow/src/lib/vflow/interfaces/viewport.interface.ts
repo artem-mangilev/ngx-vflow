@@ -1,12 +1,11 @@
-import { ViewportChangeType } from '../types/viewport-change-type.type';
 import { Point } from './point.interface';
 
 export interface ViewportState extends Point {
   zoom: number;
 }
 
-export interface WritableViewport {
-  changeType: ViewportChangeType;
+/** A programmatic viewport change: the values it gives replace the current ones, animated over `duration` ms. */
+export interface ViewportChange {
   state: Partial<ViewportState>;
   duration: number;
 }
