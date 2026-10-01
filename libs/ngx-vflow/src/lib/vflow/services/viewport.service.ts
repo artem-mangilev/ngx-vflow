@@ -1,5 +1,5 @@
-import { Injectable, WritableSignal, inject, signal } from '@angular/core';
-import { ViewportState, WritableViewport } from '../interfaces/viewport.interface';
+import { Injectable, WritableSignal, inject, signal, untracked } from '@angular/core';
+import { ViewportChange, ViewportState } from '../interfaces/viewport.interface';
 import { getNodesFlowBounds } from '../utils/nodes';
 import { FlowEntitiesService } from './flow-entities.service';
 import { getViewportForBounds } from '../utils/viewport';
@@ -23,25 +23,43 @@ export class ViewportService {
   }
 
   /**
-   * Internal signal that accepts value from user by lib api
-   * When this signal changes, lib sets new view state and update readableViewport signal
-   */
-  public readonly writableViewport: WritableSignal<WritableViewport> = signal({
-    changeType: 'initial',
-    state: ViewportService.getDefaultViewport(),
-    duration: 0,
-  });
-
-  /**
    * Public signal with viewport state. User can directly read from this signal. It's updated by:
    * - user events on flow
-   * - writableViewport signal
+   * - programmatic changes requested through {@link change}
    */
   public readonly readableViewport: WritableSignal<ViewportState> = signal(ViewportService.getDefaultViewport());
 
   public readonly viewportChangeEnd$ = new Subject<void>();
 
-  // TODO: add writableViewportWithConstraints (to apply min zoom/max zoom values)
+  private applyChange: ((change: ViewportChange) => void) | null = null;
+  private pendingChanges: ViewportChange[] = [];
+
+  /**
+   * Requests a programmatic viewport change. Changes apply at once and in order, each from where the previous one
+   * leads, so that consecutive calls compose; zoom keeps to the limits. Changes requested before the pane exists
+   * wait for it.
+   *
+   * Applying a change reads the viewport and the zoom limits untracked, so that a call from an effect does not make
+   * the effect depend on the viewport it changes.
+   */
+  public change(state: Partial<ViewportState>, duration = 0) {
+    const change = { state, duration };
+    const apply = this.applyChange;
+    if (apply) untracked(() => apply(change));
+    else this.pendingChanges.push(change);
+  }
+
+  /** Registers the pane that applies programmatic changes; returns the function that unregisters it. */
+  public connect(apply: (change: ViewportChange) => void): () => void {
+    this.applyChange = apply;
+    untracked(() => {
+      for (const change of this.pendingChanges.splice(0)) apply(change);
+    });
+
+    return () => {
+      if (this.applyChange === apply) this.applyChange = null;
+    };
+  }
 
   /** Returns the target state, or `undefined` when there is nothing to fit. */
   public fitView(options: FitViewOptions = { padding: 0.1, duration: 0, nodes: [] }): ViewportState | undefined {
@@ -60,9 +78,7 @@ export class ViewportService {
       options.padding ?? 0.1,
     );
 
-    const duration = options.duration ?? 0;
-
-    this.writableViewport.set({ changeType: 'absolute', state, duration });
+    this.change(state, options.duration ?? 0);
     return state;
   }
 

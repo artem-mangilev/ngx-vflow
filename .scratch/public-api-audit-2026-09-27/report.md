@@ -282,7 +282,7 @@ JSDoc: «the transparent stroke the flow draws» ([edge.interface.ts:34-40](../.
 
 | №   | Тикет                                                                                  | Приоритет | Status          | Blocked by |
 | --- | -------------------------------------------------------------------------------------- | --------- | --------------- | ---------- |
-| 01  | [Программные изменения viewport](issues/01-viewport-programmatic-pipeline.md)          | P1        | ready-for-agent | —          |
+| 01  | [Программные изменения viewport](issues/01-viewport-programmatic-pipeline.md)          | P1        | resolved        | —          |
 | 02  | [Форма viewport API](issues/02-viewport-api-shape.md)                                  | P1        | needs-triage    | 01         |
 | 03  | [Измеренный прямоугольник узла](issues/03-measured-node-rect.md)                       | P1        | needs-triage    | —          |
 | 04  | [Контракт опциональных сигналов узла](issues/04-node-optional-signals-contract.md)     | P1        | needs-triage    | —          |

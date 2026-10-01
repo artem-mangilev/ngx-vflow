@@ -1,6 +1,6 @@
 # 01. Программные изменения viewport: лимиты zoom и без потерь
 
-Status: ready-for-agent
+Status: resolved
 Type: task
 Priority: P1 (до 3.0)
 Blocked by: —
@@ -37,3 +37,21 @@ Blocked by: —
 - spec: `viewportTo({x:0, y:0, zoom:10})` при `maxZoom=2` → zoom 2.
 - spec: вызов до создания директивы применяется после неё.
 - Зелёные `viewport-gestures.spec`, `minimap-navigation.spec`, `keyboard-navigation.spec`, `auto-pan.spec`, `initial-viewport.spec`.
+
+## Answer
+
+Сделано 2026-10-01.
+
+- **Канал изменений.** Сигнал `writableViewport` и effect заменены на `ViewportService.change(state, duration)`. `ViewportGesturesDirective` регистрируется через `connect()` и применяет изменения синхронно. Изменения, пришедшие до регистрации, ждут в очереди и применяются по порядку. `WritableViewport`, `ViewportChangeType` и TODO про ограничения удалены; новый тип — `ViewportChange`.
+- **Композиция.** Изменение строится от цели анимации в процессе или от текущего viewport. Пропущенные `x`/`y` берутся оттуда же, zoom всегда проходит `clamp`. Zoom без `x`/`y` масштабирует вокруг центра pane, как раньше. Изменение без `duration`, запрошенное в той же задаче, что и анимация, строится от её цели ещё до первого кадра.
+- **Без лишних подписок.** Применение читает viewport и лимиты zoom `untracked`. Иначе `zoomTo()` из пользовательского `effect` подписывал бы этот effect на viewport, и тот зацикливался. Проверено мутацией: без `untracked` новый тест вешает браузер.
+- **Публичные сигнатуры не менялись.** `viewportTo`/`zoomTo`/`panTo` получили JSDoc про лимиты и порядок.
+- **Migration guide** (раздел «Gestures without d3»): `viewportTo` ограничивает zoom; вызовы складываются.
+- **Отклонение от тикета.** Отдельного spec `fitView(); zoomTo(1)` нет. Тот же механизм покрыт двумя specs: `zoomTo(1.5); panTo(…)` и «анимация → `zoomTo` от её цели». Spec «вызов до создания директивы» написан на уровне сервиса (`services/viewport.service.spec.ts`): в компоненте директива создаётся вместе с `vflow`.
+
+Тесты: `viewport-gestures.spec.ts` — 4 новых или изменённых, `services/viewport.service.spec.ts` — 2 новых. Полный набор `ngx-vflow` (372 spec) зелёный, кроме нестабильного `stacking-context.spec.ts` (см. ниже). Eslint и prettier по изменённым файлам чистые.
+
+Вне тикета, на `origin/3.0`:
+
+- **Сборка.** Production-сборка `ngx-vflow` сломана до этих изменений: NG3001 — `ViewportCullingDirective` подключён как host directive, но не экспортирован. С временным экспортом `ngx-vflow` и `ngx-vflow/testing` собираются; починка — отдельной задачей.
+- **Нестабильный тест.** `stacking-context.spec.ts` падает от порядка тестов, на чистой базе — 1 прогон из 3; тоже отдельной задачей.

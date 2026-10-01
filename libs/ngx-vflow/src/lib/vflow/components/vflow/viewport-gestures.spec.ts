@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, provideZonelessChangeDetection } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, provideZonelessChangeDetection } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { VflowComponent } from './vflow.component';
 import { Vflow } from '../../vflow';
@@ -341,7 +341,7 @@ describe('public viewport gesture settings', () => {
     expect(ends).toBe(2);
   });
 
-  it('zooms programmatically around the pane center and clamps only zoomTo', async () => {
+  it('zooms programmatically around the pane center and keeps every programmatic zoom to the limits', async () => {
     flow.zoomTo(2);
     await settle();
     expect(flow.viewport()).toEqual({ x: -200, y: -150, zoom: 2 });
@@ -350,13 +350,64 @@ describe('public viewport gesture settings', () => {
     expect(flow.viewport().zoom).toBe(3);
     flow.viewportTo({ x: 5, y: 6, zoom: 10 });
     await settle();
-    expect(flow.viewport()).toEqual({ x: 5, y: 6, zoom: 10 });
+    expect(flow.viewport()).toEqual({ x: 5, y: 6, zoom: 3 });
+    flow.viewportTo({ x: 5, y: 6, zoom: 0.01 });
+    expect(flow.viewport()).toEqual({ x: 5, y: 6, zoom: 0.5 });
+  });
+
+  it('applies consecutive programmatic changes in order, each from where the previous one leads', () => {
+    const viewportService = fixture.debugElement.injector.get(ViewportService);
+    let ends = 0;
+    viewportService.viewportChangeEnd$.subscribe(() => ends++);
+
+    flow.zoomTo(1.5);
+    flow.panTo({ x: 123, y: 45 });
+    expect(flow.viewport()).toEqual({ x: 123, y: 45, zoom: 1.5 });
+    expect(ends).toBe(2);
+
+    // Values a change omits keep theirs.
+    viewportService.change({ x: 7 });
+    expect(flow.viewport()).toEqual({ x: 7, y: 45, zoom: 1.5 });
+  });
+
+  it('keeps an effect that changes the viewport independent of the viewport', () => {
+    let runs = 0;
+    TestBed.runInInjectionContext(() =>
+      effect(() => {
+        runs++;
+        flow.panTo({ x: 10, y: 10 });
+      }),
+    );
+    TestBed.tick();
+    expect(runs).toBe(1);
+    expect(flow.viewport()).toEqual({ x: 10, y: 10, zoom: 1 });
+
+    flow.zoomTo(2);
+    TestBed.tick();
+    expect(runs).toBe(1);
+    expect(flow.viewport().zoom).toBe(2);
+  });
+
+  it('continues a programmatic change from the target of an animation in progress', async () => {
+    const viewportService = fixture.debugElement.injector.get(ViewportService);
+    viewportService.change({ x: 100, y: 50, zoom: 2 }, 300);
+    await pause(100);
+    expect(flow.viewport().zoom).toBeLessThan(2);
+
+    flow.panTo({ x: 10, y: 20 });
+    expect(flow.viewport()).toEqual({ x: 10, y: 20, zoom: 2 });
+    await pause(300);
+    expect(flow.viewport()).toEqual({ x: 10, y: 20, zoom: 2 });
+
+    // A change requested in the same task as an animation builds on its target before its first frame.
+    viewportService.change({ x: 0, y: 0, zoom: 1 }, 300);
+    flow.zoomTo(2);
+    expect(flow.viewport()).toEqual({ x: -200, y: -150, zoom: 2 });
   });
 
   it('animates programmatic changes to their exact end and lets a press interrupt them', async () => {
     const viewportService = fixture.debugElement.injector.get(ViewportService);
-    viewportService.writableViewport.set({ changeType: 'absolute', state: { x: 100, y: 50, zoom: 2 }, duration: 200 });
-    fixture.detectChanges();
+    viewportService.change({ x: 100, y: 50, zoom: 2 }, 200);
     await pause(100);
     const middle = flow.viewport();
     expect(middle.zoom).toBeGreaterThan(1);
@@ -364,8 +415,7 @@ describe('public viewport gesture settings', () => {
     await pause(250);
     expect(flow.viewport()).toEqual({ x: 100, y: 50, zoom: 2 });
 
-    viewportService.writableViewport.set({ changeType: 'absolute', state: { x: 0, y: 0, zoom: 1 }, duration: 300 });
-    fixture.detectChanges();
+    viewportService.change({ x: 0, y: 0, zoom: 1 }, 300);
     await pause(100);
     dispatchPointer(pane, 'pointerdown', { x: 100 });
     const interrupted = flow.viewport();

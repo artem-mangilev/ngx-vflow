@@ -579,30 +579,25 @@ export class VflowComponent {
   protected minimap = this.flowEntitiesService.minimap;
 
   // #region METHODS_API
+  // Viewport methods apply at once and in order, each from where the previous one leads, so consecutive calls
+  // compose. Zoom keeps to `minZoom` and `maxZoom`.
+
   /**
-   * Change viewport to specified state
+   * Change viewport to specified state. A zoom outside the limits is clamped; `x` and `y` stay as given.
    *
    * @param viewport viewport state
    */
   public viewportTo(viewport: ViewportState): void {
-    this.viewportService.writableViewport.set({
-      changeType: 'absolute',
-      state: viewport,
-      duration: 0,
-    });
+    this.viewportService.change(viewport);
   }
 
   /**
-   * Change zoom
+   * Change zoom around the center of the flow, within the zoom limits.
    *
    * @param zoom zoom value
    */
   public zoomTo(zoom: number): void {
-    this.viewportService.writableViewport.set({
-      changeType: 'absolute',
-      state: { zoom },
-      duration: 0,
-    });
+    this.viewportService.change({ zoom });
   }
 
   /**
@@ -613,11 +608,7 @@ export class VflowComponent {
    * @param point viewport translation `{ x, y }`
    */
   public panTo(point: Point): void {
-    this.viewportService.writableViewport.set({
-      changeType: 'absolute',
-      state: point,
-      duration: 0,
-    });
+    this.viewportService.change(point);
   }
 
   public fitView(options?: FitViewOptions) {
