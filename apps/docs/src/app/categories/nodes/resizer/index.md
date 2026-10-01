@@ -2,26 +2,30 @@ You might want to resize your node. The resizer is part of core's interaction fe
 
 ## Node size modes
 
-Every node has a size mode:
+Each axis of a node has its own size mode:
 
-- `auto` — the node follows its content. The library measures the rendered node and never writes inline dimensions. This is the default for nodes without `width` / `height` in their data.
-- `explicit` — the node has a fixed size that the library renders. A node is explicit when its data carries both `width` and `height`, or after the first resize gesture turns an `auto` node into an explicit one. A click on a resize control without movement doesn't change the mode.
+- `auto` — the axis follows the content. The library measures the rendered node and writes no inline size for this axis. This is the default for an axis without its `width` / `height` signal in the node data.
+- `explicit` — the axis has a fixed size that the library renders inline. An axis is explicit when the node data carries its signal, or after a resize gesture changes it. Content larger than an explicit size does not grow the node.
+
+The axes are independent: a node with only `width` has a fixed width and a height that follows its content.
+
+The `width` / `height` signals of a node hold the size your application asks for. Only a resize gesture writes them; measurement never does. A gesture on a node without the signal keeps the size inside the flow. The rendered size, which edges, handles and bounds use, is the measured box: it equals the explicit size unless CSS `min-*` / `max-*` on the element clamps it. Read it with `ctx.width()` / `ctx.height()` in the presentation, or with `getNodeRect(id)` / `getNodesBounds(ids?)` on the `<vflow />` component.
 
 ## Where the size is applied
 
 The element with the `resizable` directive is the node's sizing box:
 
 - Put `resizable` on the top-level element of the node template, without outer margins. Resize controls and handles are both positioned relative to the node box, so the controls stay visible around a card with `overflow: hidden`.
-- In `explicit` mode the library sets `width`, `height` and `box-sizing: border-box` inline on that element, so padding and border stay inside the size you drag to. You don't need to bind `[style.width.px]` / `[style.height.px]` yourself.
+- For each `explicit` axis the library sets `width` or `height` inline on that element, plus `box-sizing: border-box` while any axis is explicit, so padding and border stay inside the size you drag to. With border-box, CSS `min-*` / `max-*` of an `auto` axis also apply to the border box. You don't need to bind `[style.width.px]` / `[style.height.px]` yourself.
 - The resizer respects the element's `min-width` / `min-height` / `max-width` / `max-height` CSS, or explicit `[minWidth]` / `[minHeight]` / `[maxWidth]` / `[maxHeight]` inputs.
 - Size the element for `auto` mode with regular CSS, for example `width: 240px`. Avoid `width: 100%` / `height: 100%`: they resolve against the content-sized node wrapper.
 - `[resizable]="false"` hides the controls but keeps the element as the sizing box, so you can bind the controls to the selection state.
 
 ## Resize a group
 
-- Create a node with `width` and `height`, so the group starts `explicit`, and mark it in `data` to draw it as a group in the `node` template.
+- Create a node with `width` and `height`, so both axes of the group start `explicit`, and mark it in `data` to draw it as a group in the `node` template.
 - Add `resizable` (or `[resizable]="yourCondition"`) to the native HTML element representing your group. The library applies the group size to that element.
-- If other elements depend on the group size, read `ctx.width()` and `ctx.height()` from the context, not `ctx.node.width` and `ctx.node.height`: the latter are not reactive.
+- If other elements depend on the group size, read the rendered size from `ctx.width()` and `ctx.height()`, not `ctx.node.width` and `ctx.node.height`: the latter hold the requested size.
 - Optionally, keep the aspect ratio with `[keepAspectRatio]`, restrict resizing to one axis with `[resizeDirection]` (`horizontal` | `vertical`), toggle handle auto-scaling with `[autoScale]`, and react to `(resizeStart)` / `(resizeChange)` / `(resizeEnd)`.
 
 {{ NgDocActions.demoPane("GroupResizerDemoComponent") }}
@@ -29,8 +33,8 @@ The element with the `resizable` directive is the node's sizing box:
 ## Resize a template/component regular node
 
 - Create a node rendered by the `node` template or by a `component`.
-  - Leave out `width` / `height` to start content-sized; the first resize makes the node explicit.
-  - Provide both `width` and `height` to start with a fixed size.
+  - Leave out `width` / `height` to start content-sized. A resize makes explicit the axes the control drives: a corner both, a side one. With `[resizeDirection]`, only that axis.
+  - Provide `width` and / or `height` to start with a fixed size on those axes. A resize writes the new size into these signals.
 - Add `resizable` (or `[resizable]="yourCondition"`) to the top-level element of your node.
 - The same options and events as for groups are available.
 
@@ -42,9 +46,10 @@ The resize controls take their colors from the core tokens `--vflow-selection` a
 
 ## Resize event
 
-`(nodesChanges.size)` on the `<vflow />` component reports every size change with a `mode`:
+`(nodesChanges.size)` on the `<vflow />` component reports every change of the rendered size with the `mode` of each axis, `{ width, height }`:
 
-- Persist the size only when `mode` is `explicit`. An `auto` size is a measurement of the node's content; writing it back as `width` / `height` would stop the node from following its content.
+- Persist an axis only when its mode is `explicit`. An `auto` axis is a measurement of the node's content; writing it back as `width` / `height` would stop the node from following its content.
+- When the node data has the signal, the resizer has already written the new size into it.
 - To react to the gesture itself, use `(resizeStart)` / `(resizeChange)` / `(resizeEnd)` on the `resizable` element.
 
 ## See also

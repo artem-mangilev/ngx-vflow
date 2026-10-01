@@ -47,17 +47,19 @@ describe('NodeModel', () => {
     expect(model).toBeTruthy();
   });
 
-  describe('sizeMode', () => {
+  describe('size modes', () => {
     const make = (node: Parameters<typeof createNode>[0]) =>
       TestBed.runInInjectionContext(() => new NodeModel(createNode(node, { useDefaults: false })));
+    const modes = (model: NodeModel) => [model.widthMode(), model.heightMode()];
 
-    it('is auto for html and component nodes without application-provided size', () => {
-      expect(make({ id: 'a', point: { x: 0, y: 0 } }).sizeMode()).toBe('auto');
+    it('is auto on both axes for nodes without application-provided size', () => {
+      expect(modes(make({ id: 'a', point: { x: 0, y: 0 } }))).toEqual(['auto', 'auto']);
     });
 
-    it('is explicit when the application provides both width and height', () => {
-      expect(make({ id: 'b', point: { x: 0, y: 0 }, width: 10, height: 20 }).sizeMode()).toBe('explicit');
-      expect(make({ id: 'c', point: { x: 0, y: 0 }, width: 10 }).sizeMode()).toBe('auto');
+    it('decides each axis by its own application signal', () => {
+      expect(modes(make({ id: 'b', point: { x: 0, y: 0 }, width: 10, height: 20 }))).toEqual(['explicit', 'explicit']);
+      expect(modes(make({ id: 'c', point: { x: 0, y: 0 }, width: 10 }))).toEqual(['explicit', 'auto']);
+      expect(modes(make({ id: 'c2', point: { x: 0, y: 0 }, height: 10 }))).toEqual(['auto', 'explicit']);
     });
 
     it('does not become explicit because other nodes reference it as parent', () => {
@@ -65,13 +67,49 @@ describe('NodeModel', () => {
       const child = make({ id: 'd-child', parentId: 'd', point: { x: 0, y: 0 } });
       entitiesService.nodes.update((nodes) => [...nodes, parent, child]);
       expect(parent.children()).toEqual([child]);
-      expect(parent.sizeMode()).toBe('auto');
+      expect(modes(parent)).toEqual(['auto', 'auto']);
     });
 
-    it('switches to explicit once the resizer commits and never switches back', () => {
+    it('makes only the resized axis explicit when the application has no signal', () => {
       const auto = make({ id: 'e', point: { x: 0, y: 0 } });
-      auto.resizedExplicitly.set(true);
-      expect(auto.sizeMode()).toBe('explicit');
+      auto.setExplicitSize({ width: 240 });
+      expect(modes(auto)).toEqual(['explicit', 'auto']);
+      expect(auto.explicitWidth()).toBe(240);
+      expect(auto.rawNode.width).toBeUndefined();
+    });
+
+    it('writes a resized axis into the application signal when there is one', () => {
+      const sized = make({ id: 'f', point: { x: 0, y: 0 }, width: 100, height: 50 });
+      sized.setExplicitSize({ width: 180, height: 90 });
+      expect(sized.rawNode.width!()).toBe(180);
+      expect(sized.rawNode.height!()).toBe(90);
+    });
+  });
+
+  describe('rendered size', () => {
+    const make = (node: Parameters<typeof createNode>[0]) =>
+      TestBed.runInInjectionContext(() => new NodeModel(createNode(node, { useDefaults: false })));
+
+    it('starts from the explicit size and follows it', () => {
+      const sized = make({ id: 'a', point: { x: 0, y: 0 }, width: 100, height: 50 });
+      expect([sized.width(), sized.height()]).toEqual([100, 50]);
+
+      sized.rawNode.width!.set(300);
+      expect(sized.width()).toBe(300);
+    });
+
+    it('does not write measurement into the application signals', () => {
+      const sized = make({ id: 'b', point: { x: 0, y: 0 }, width: 100, height: 50 });
+      // CSS min-width clamped the rendered box.
+      sized.width.set(140);
+      expect(sized.width()).toBe(140);
+      expect(sized.rawNode.width!()).toBe(100);
+      expect(sized.explicitWidth()).toBe(100);
+    });
+
+    it('is not aliased to the application signals', () => {
+      const sized = make({ id: 'c', point: { x: 0, y: 0 }, width: 100, height: 50 });
+      expect(sized.width).not.toBe(sized.rawNode.width!);
     });
   });
 

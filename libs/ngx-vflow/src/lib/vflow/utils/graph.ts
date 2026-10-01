@@ -1,9 +1,4 @@
-import { isDevMode } from '@angular/core';
-import { Node } from '../interfaces/node.interface';
-import { Rect } from '../interfaces/rect';
 import { Connection } from '../interfaces/connection.interface';
-import { getBoundsOfRects } from './rect';
-import { getNodeFlowPosition } from './node-position';
 
 /**
  * Returns every edge incident to at least one supplied node, preserving edge order and duplicates.
@@ -54,37 +49,4 @@ export function getOutgoers<NodeType extends { id: string }, EdgeType extends Co
   const ids = new Set(edges.filter((edge) => edge.source === node.id).map((edge) => edge.target));
 
   return nodes.filter((candidate) => ids.has(candidate.id));
-}
-
-/**
- * Returns the bounds of the supplied nodes. A lookup makes its node snapshots and ancestry authoritative.
- *
- * @example
- * `getNodesBounds([child], { nodeLookup: new Map(nodes.map((item) => [item.id, item])) })`
- */
-export function getNodesBounds(
-  nodes: readonly Node[],
-  { nodeLookup }: { nodeLookup?: ReadonlyMap<string, Node> } = {},
-): Rect {
-  if (!nodeLookup && nodes.some((node) => node.parentId?.())) {
-    if (isDevMode()) console.warn('[ngx-vflow] Pass nodeLookup to get flow-space bounds for nested nodes.');
-  }
-
-  const rects = nodes.flatMap((requestedNode) => {
-    const node = nodeLookup?.get(requestedNode.id) ?? (nodeLookup ? undefined : requestedNode);
-    if (!node) return [];
-
-    const point = nodeLookup ? getNodeFlowPosition(node.id, nodeLookup) : node.point();
-    if (!point) return [];
-
-    return [
-      {
-        ...point,
-        width: node.width?.() ?? 0,
-        height: node.height?.() ?? 0,
-      },
-    ];
-  });
-
-  return getBoundsOfRects(rects);
 }

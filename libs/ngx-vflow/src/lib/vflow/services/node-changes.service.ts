@@ -38,7 +38,7 @@ export class NodesChangeService {
         type: 'size',
         id: changedNode.rawNode.id,
         size: { width: changedNode.width(), height: changedNode.height() },
-        mode: changedNode.sizeMode(),
+        mode: { width: changedNode.widthMode(), height: changedNode.heightMode() },
       },
     ]),
   ) satisfies Observable<NodeChange[]>;

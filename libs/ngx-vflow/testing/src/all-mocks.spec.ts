@@ -142,6 +142,10 @@ class VflowWrapperComponent {
 
       this.vflow()!.getNode('1');
 
+      this.vflow()!.getNodeRect('1');
+
+      this.vflow()!.getNodesBounds();
+
       this.vflow()!.getDetachedEdges();
 
       return true;

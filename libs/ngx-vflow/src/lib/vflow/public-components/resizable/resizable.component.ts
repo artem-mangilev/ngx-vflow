@@ -33,8 +33,8 @@ import {
  * Adds resize controls (four lines + four corner handles) to a node. The controls
  * mutate the node dimensions/position through a pointer-based resize engine.
  *
- * The host element is the node's sizing box: in `explicit` size mode it receives the node size as an inline
- * border-box width/height, while an `auto` node keeps its content size. Put it on the top-level element of the
+ * The host element is the node's sizing box: each `explicit` axis receives the node size as an inline border-box
+ * width or height, while an `auto` axis keeps its content size. Put it on the top-level element of the
  * node template so the node box, the controls and the handles describe the same rectangle.
  */
 @Component({
@@ -100,9 +100,12 @@ export class ResizableComponent implements OnInit, AfterViewInit, OnDestroy {
   /** `[resizable]="false"` hides the controls but keeps the element as the node's sizing box. */
   protected readonly enabled = computed(() => this.resizable() !== false);
 
+  /** Explicit axes only; `null` while both axes follow the content. */
   protected readonly explicitSize = computed(() => {
     const model = this.nodeAccessor.model();
-    return model?.sizeMode() === 'explicit' ? { width: model.width(), height: model.height() } : null;
+    const width = model?.explicitWidth();
+    const height = model?.explicitHeight();
+    return width === undefined && height === undefined ? null : { width, height };
   });
 
   private registeredTemplate: TemplateRef<unknown> | null = null;

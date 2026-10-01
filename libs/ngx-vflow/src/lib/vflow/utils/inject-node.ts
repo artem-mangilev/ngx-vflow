@@ -10,7 +10,7 @@ export interface NodeRef<T = any> {
   data: Signal<T>;
   selected: Signal<boolean>;
   preselected: Signal<boolean>;
-  /** Measured size for `auto` nodes; application or resizer size for `explicit` nodes. */
+  /** Rendered size: the measured box, which equals an explicit size unless CSS min/max clamps it. */
   width: Signal<number>;
   height: Signal<number>;
   shouldLoad: Signal<boolean>;

@@ -77,7 +77,7 @@ A node referenced by another node's parent relationship, establishing nested coo
 _Avoid_: Group node
 
 **Node size mode**:
-Whether a node's size follows its measured content (`auto`) or is a fixed size supplied by application data or a resize gesture (`explicit`), which the library renders on the node's resizable element.
+Per axis, whether a node's width or height follows its measured content (`auto`) or is a fixed size supplied by application data or a resize gesture (`explicit`), which the library renders on the node's resizable element. The application's `width`/`height` signals hold only that requested size; the rendered size is measured and read through the flow.
 _Avoid_: Autosize flag, controlled size
 
 **Container frame**:

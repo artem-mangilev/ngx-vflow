@@ -26,8 +26,12 @@ export interface Node<T = any> {
   point: WritableSignal<Point>;
   component?: EntityComponentType;
   data?: WritableSignal<T>;
-  /** With `height`, makes the size explicit; without both, the node follows its measured content. */
+  /**
+   * Fixed width; without it the width follows the content. Only a resize gesture writes it, never measurement:
+   * read the rendered size with `VflowComponent.getNodeRect()`.
+   */
   width?: WritableSignal<number>;
+  /** Fixed height; without it the height follows the content. Written like {@link width}. */
   height?: WritableSignal<number>;
   draggable?: WritableSignal<boolean>;
   parentId?: WritableSignal<string | null>;

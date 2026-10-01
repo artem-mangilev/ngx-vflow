@@ -1,4 +1,4 @@
-import { Signal, TemplateRef, computed, inject, signal } from '@angular/core';
+import { Signal, TemplateRef, computed, inject, linkedSignal, signal } from '@angular/core';
 import { NodeGeometry } from '../interfaces/curve-factory.interface';
 import { DOCUMENT } from '@angular/common';
 import { DomAttributes } from '../interfaces/dom-attributes.interface';
@@ -98,9 +98,31 @@ export class NodeModel<T = unknown> implements FlowEntity, Contextable<NodeConte
 
   public point = signal<Point>({ x: 0, y: 0 });
 
-  public width = signal(NODE_DEFAULTS.width);
+  /** Size the resizer set on an axis without an application signal. */
+  private resizedWidth = signal<number | undefined>(undefined);
+  private resizedHeight = signal<number | undefined>(undefined);
 
-  public height = signal(NODE_DEFAULTS.height);
+  /**
+   * Fixed size of an `explicit` axis: the application signal, or the resizer's value when the application has none.
+   * `undefined` on an `auto` axis. The library renders it inline; measurement never writes it.
+   */
+  public explicitWidth = computed(() => this.rawNode.width?.() ?? this.resizedWidth());
+  public explicitHeight = computed(() => this.rawNode.height?.() ?? this.resizedHeight());
+
+  public widthMode = computed<NodeSizeMode>(() => (this.explicitWidth() === undefined ? 'auto' : 'explicit'));
+  public heightMode = computed<NodeSizeMode>(() => (this.explicitHeight() === undefined ? 'auto' : 'explicit'));
+
+  /**
+   * Rendered size, used by edges, handles, the minimap and bounds. It starts from the explicit size, follows it when
+   * the explicit size changes, and is overwritten by measurement, so CSS min/max on the element win.
+   * `NODE_DEFAULTS` is a placeholder until an `auto` axis is first measured.
+   */
+  public width = linkedSignal(() => this.explicitWidth() ?? NODE_DEFAULTS.width);
+
+  public height = linkedSignal(() => this.explicitHeight() ?? NODE_DEFAULTS.height);
+
+  /** Set by the first measurement and never reset, unlike {@link isMeasured}, which a remount or culling clears. */
+  public hasMeasurement = signal(false);
 
   public renderOrder = signal(0);
 
@@ -110,22 +132,6 @@ export class NodeModel<T = unknown> implements FlowEntity, Contextable<NodeConte
   public focusable = computed(() => this.rawNode.focusable?.() ?? this.settingsService.nodesFocusable());
 
   public extent = signal<'parent' | null>(NODE_DEFAULTS.extent);
-
-  /**
-   * Set by the resizer on its first accepted change; never reset. Together with
-   * application-provided size signals it decides {@link sizeMode}.
-   */
-  public resizedExplicitly = signal(false);
-
-  /**
-   * `auto`: the size mirrors the measured DOM and no inline width/height is written.
-   * `explicit`: the size comes from application data or the resizer and is written to the DOM.
-   */
-  public sizeMode = computed<NodeSizeMode>(() =>
-    (this.rawNode.width !== undefined && this.rawNode.height !== undefined) || this.resizedExplicitly()
-      ? 'explicit'
-      : 'auto',
-  );
 
   public globalPoint = computed(() => {
     let parent = this.parent();
@@ -216,14 +222,6 @@ export class NodeModel<T = unknown> implements FlowEntity, Contextable<NodeConte
       this.point = rawNode.point;
     }
 
-    if (rawNode.width) {
-      this.width = rawNode.width;
-    }
-
-    if (rawNode.height) {
-      this.height = rawNode.height;
-    }
-
     if (rawNode.draggable) {
       this.draggable = rawNode.draggable;
     }
@@ -287,5 +285,14 @@ export class NodeModel<T = unknown> implements FlowEntity, Contextable<NodeConte
 
   public setPoint(point: Point) {
     this.point.set(point);
+  }
+
+  /**
+   * Fixes the given axes to a size: into the application signal when the node has one, otherwise into the model,
+   * which makes the axis `explicit`. The rendered size follows at once.
+   */
+  public setExplicitSize({ width, height }: { width?: number; height?: number }) {
+    if (width !== undefined) (this.rawNode.width ?? this.resizedWidth).set(width);
+    if (height !== undefined) (this.rawNode.height ?? this.resizedHeight).set(height);
   }
 }

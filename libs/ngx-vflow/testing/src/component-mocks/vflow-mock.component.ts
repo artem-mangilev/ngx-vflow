@@ -33,6 +33,8 @@ import {
   AutoPanSettings,
   AriaLabelConfig,
   DeleteRequest,
+  Rect,
+  getNodePositionInSpace,
 } from 'ngx-vflow';
 import { toObservable } from '@angular/core/rxjs-interop';
 import {
@@ -264,6 +266,31 @@ export class VflowMockComponent implements AsInterface<VflowComponent>, OnInit {
 
   public getNode<T = unknown>(id: string): Node<T> | undefined {
     return this.nodes.find((node) => node.id === id);
+  }
+
+  /** The mock does not measure: only a node with both `width` and `height` has a rectangle. */
+  public getNodeRect(id: string): Rect | undefined {
+    const node = this.getNode(id);
+    const width = node?.width?.();
+    const height = node?.height?.();
+    if (!node || width === undefined || height === undefined) return undefined;
+
+    const point = getNodePositionInSpace(id, null, this.nodes) ?? node.point();
+    return { ...point, width, height };
+  }
+
+  public getNodesBounds(ids?: string[]): Rect {
+    const rects = (ids ?? this.nodes.map((node) => node.id)).flatMap((id) => this.getNodeRect(id) ?? []);
+    if (!rects.length) return { x: 0, y: 0, width: 0, height: 0 };
+
+    const x = Math.min(...rects.map((rect) => rect.x));
+    const y = Math.min(...rects.map((rect) => rect.y));
+    return {
+      x,
+      y,
+      width: Math.max(...rects.map((rect) => rect.x + rect.width)) - x,
+      height: Math.max(...rects.map((rect) => rect.y + rect.height)) - y,
+    };
   }
 
   public getDetachedEdges(): Edge[] {

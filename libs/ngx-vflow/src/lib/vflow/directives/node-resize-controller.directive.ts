@@ -42,9 +42,11 @@ export class NodeResizeControllerDirective implements OnInit, OnDestroy {
     if (!hasBox) return;
     // Measure the layout box, excluding protruding ports and external labels.
     // scrollWidth/Height would feed their overflow back into the next edge geometry pass.
+    // Only the rendered size is written: the explicit size belongs to the application and the resizer.
     model.width.set(target.offsetWidth);
     model.height.set(target.offsetHeight);
     model.isMeasured.set(true);
+    model.hasMeasurement.set(true);
   }
 
   public ngOnInit(): void {

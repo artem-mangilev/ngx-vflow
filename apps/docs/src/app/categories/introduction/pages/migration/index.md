@@ -355,13 +355,15 @@ After:
 </ng-template>
 ```
 
-The `[resizable]` element is now the node's sizing box: for an explicitly sized node the library sets its `width`, `height` and `box-sizing: border-box` inline, so size bindings on that element are no longer needed. The node wrapper no longer receives an inline size when a `[resizable]` element exists, so put the directive on the top-level element of the node template. Content-sized nodes stay unsized until the first resize, as described in Node size modes above.
+The `[resizable]` element is now the node's sizing box: for each explicitly sized axis the library sets its `width` or `height` inline, with `box-sizing: border-box`, so size bindings on that element are no longer needed. The node wrapper no longer receives an inline size when a `[resizable]` element exists, so put the directive on the top-level element of the node template. Content-sized nodes stay unsized until the first resize, as described in Node size modes above.
 
 ### Node size modes
 
-`createNodes` / `createNode` no longer give nodes a default `width` / `height` of 100 x 50. A node without a size in its data is content-sized (`auto`): the library measures it and never writes inline dimensions. A node becomes explicitly sized (`explicit`) when its data carries both `width` and `height`, or after the first resize gesture. `NodeWithDefaults` reflects this: `width` and `height` are optional, so read them with optional chaining, for example `width?.()`.
+`createNodes` / `createNode` no longer give nodes a default `width` / `height` of 100 x 50. Each axis has its own mode. An axis without its signal in the node data is content-sized (`auto`): the library measures it and writes no inline size. An axis is explicitly sized (`explicit`) when the data carries its signal, or after a resize gesture changes it; a node with only `width` has a fixed width and a content-sized height. `NodeWithDefaults` reflects this: `width` and `height` are optional, so read them with optional chaining, for example `width?.()`.
 
-`nodesChanges.size` now carries `mode: 'auto' | 'explicit'`. Persist a size only when it is `explicit`; an `auto` size is a measurement of the node's content and must not be written back as data, or the node would stop following its content.
+The `width` / `height` signals now hold only the size the application asks for. The library no longer writes the measured size into them: only a resize gesture does. Read the rendered size with `ctx.width()` / `ctx.height()` in a presentation, or with `getNodeRect(id)` / `getNodesBounds(ids?)` on the flow component, for example to feed a layout library.
+
+`nodesChanges.size` now carries `mode: { width, height }`, each `'auto' | 'explicit'`. Persist an axis only when it is `explicit`; an `auto` axis is a measurement of the node's content and must not be written back as data, or the node would stop following its content.
 
 ### Accessibility defaults
 

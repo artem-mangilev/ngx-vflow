@@ -70,7 +70,13 @@ import { RootPointerDirective } from '../../directives/root-pointer.directive';
 import { RootSvgContextDirective } from '../../directives/root-svg-context.directive';
 import { RootSvgReferenceDirective } from '../../directives/reference.directive';
 import { EdgeRenderingService } from '../../services/edge-rendering.service';
-import { getIntersectingNodes, getNodesAtPoint as findNodesAtPoint } from '../../utils/nodes';
+import {
+  getIntersectingNodes,
+  getNodesAtPoint as findNodesAtPoint,
+  getNodesFlowBounds,
+  nodeToRect,
+} from '../../utils/nodes';
+import { Rect } from '../../interfaces/rect';
 import { IntersectingNodesOptions } from '../../interfaces/intersecting-nodes-options.interface';
 import { toLazySignal } from '../../utils/signals/to-lazy-signal';
 import { FlowRenderingService } from '../../services/flow-rendering.service';
@@ -636,6 +642,28 @@ export class VflowComponent {
    */
   public getNode<T = unknown>(id: string): Node<T> | undefined {
     return this.flowEntitiesService.getNode<T>(id)?.rawNode;
+  }
+
+  /**
+   * Rendered rectangle of a node in flow space: its absolute position and measured size, or the explicit size
+   * the browser rendered. `undefined` for an unknown node or one that has not been measured yet.
+   */
+  public getNodeRect(id: string): Rect | undefined {
+    const model = this.flowEntitiesService.getNode(id);
+    return model?.hasMeasurement() ? nodeToRect(model) : undefined;
+  }
+
+  /**
+   * Flow-space bounds of the rendered rectangles of the given nodes, or of all nodes. Unknown and unmeasured
+   * nodes are skipped; with nothing to bound the result is an empty rectangle at the origin.
+   */
+  public getNodesBounds(ids?: string[]): Rect {
+    const requested = ids ? new Set(ids) : null;
+    // Culled nodes keep their last geometry, so the entity list, not the rendered one, is bounded.
+    const models = this.flowEntitiesService
+      .nodes()
+      .filter((model) => model.hasMeasurement() && (!requested || requested.has(model.rawNode.id)));
+    return getNodesFlowBounds(models);
   }
 
   /**

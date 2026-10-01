@@ -67,6 +67,15 @@ export class NodeResizeControlComponent implements OnDestroy {
 
   protected isLine = computed(() => this.variant() === ResizeControlVariant.Line);
 
+  private drivenAxes = computed(() => {
+    const position = this.position();
+    const direction = this.resizeDirection();
+    return {
+      width: (position.includes('left') || position.includes('right')) && direction !== 'vertical',
+      height: (position.includes('top') || position.includes('bottom')) && direction !== 'horizontal',
+    };
+  });
+
   /**
    * Handle controls keep a constant on-screen size by counter-scaling against the zoom.
    */
@@ -99,23 +108,18 @@ export class NodeResizeControlComponent implements OnDestroy {
         model.resizing.set(true);
       }
 
-      // The first accepted change turns the node into an explicitly sized one before the size is written,
-      // so the inline dimensions appear in the same frame as the value.
-      if (!model.resizedExplicitly()) {
-        model.resizedExplicitly.set(true);
-      }
-
       if (change.x !== undefined && change.y !== undefined) {
         model.setPoint({ x: change.x, y: change.y });
       }
 
-      if (change.width !== undefined) {
-        model.width.set(change.width);
-      }
-
-      if (change.height !== undefined) {
-        model.height.set(change.height);
-      }
+      // The engine reports both axes; an axis becomes explicit only when this control drives it or its value
+      // changed (aspect ratio), so a side control leaves the other axis following the content.
+      const { width: drivesWidth, height: drivesHeight } = this.drivenAxes();
+      model.setExplicitSize({
+        width: change.width !== undefined && (drivesWidth || change.width !== model.width()) ? change.width : undefined,
+        height:
+          change.height !== undefined && (drivesHeight || change.height !== model.height()) ? change.height : undefined,
+      });
 
       for (const childChange of childChanges) {
         childChange.model.setPoint(childChange.position);

@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, provideZonelessChangeDetection, signal, viewChild } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { Node } from '../../interfaces/node.interface';
+import { Node, createNodes } from '../../interfaces/node.interface';
 import { Vflow } from '../../vflow';
 import { VflowComponent } from './vflow.component';
 
@@ -29,7 +29,87 @@ class VflowTestHostComponent {
   public readonly nodes = [this.parent, this.child];
 }
 
+@Component({
+  template: `
+    <vflow [view]="[800, 600]" [nodes]="nodes">
+      <ng-template node>
+        <div class="card"></div>
+      </ng-template>
+    </vflow>
+  `,
+  styles: `
+    .card {
+      width: 200px;
+      height: 100px;
+    }
+  `,
+  imports: [Vflow],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+class NodeRectHostComponent {
+  public readonly vflow = viewChild.required(VflowComponent);
+  public readonly nodes = createNodes([
+    { id: 'a', point: { x: 0, y: 0 } },
+    { id: 'b', point: { x: 400, y: 0 } },
+    { id: 'child', point: { x: 10, y: 20 }, parentId: 'b' },
+  ]);
+}
+
+async function settle(fixture: { detectChanges(): void; whenStable(): Promise<unknown> }) {
+  fixture.detectChanges();
+  for (let i = 0; i < 5; i++) await new Promise(requestAnimationFrame);
+  await fixture.whenStable();
+  fixture.detectChanges();
+}
+
 describe('VflowComponent', () => {
+  describe('rendered node rectangles', () => {
+    async function createFixture() {
+      TestBed.configureTestingModule({
+        imports: [NodeRectHostComponent],
+        providers: [provideZonelessChangeDetection()],
+      });
+      const fixture = TestBed.createComponent(NodeRectHostComponent);
+      await settle(fixture);
+      return fixture;
+    }
+
+    it('returns the measured size of a content-sized node without writing it into the node', async () => {
+      const fixture = await createFixture();
+      const { vflow, nodes } = fixture.componentInstance;
+
+      expect(vflow().getNodeRect('a')).toEqual({ x: 0, y: 0, width: 200, height: 100 });
+      expect(nodes[0].width).toBeUndefined();
+      expect(nodes[0].height).toBeUndefined();
+    });
+
+    it('returns a nested node in flow space', async () => {
+      const fixture = await createFixture();
+
+      expect(fixture.componentInstance.vflow().getNodeRect('child')).toEqual({
+        x: 410,
+        y: 20,
+        width: 200,
+        height: 100,
+      });
+    });
+
+    it('returns undefined for an unknown node', async () => {
+      const fixture = await createFixture();
+
+      expect(fixture.componentInstance.vflow().getNodeRect('missing')).toBeUndefined();
+    });
+
+    it('bounds the measured nodes, all of them by default', async () => {
+      const fixture = await createFixture();
+      const { vflow } = fixture.componentInstance;
+
+      expect(vflow().getNodesBounds(['a', 'b'])).toEqual({ x: 0, y: 0, width: 600, height: 100 });
+      expect(vflow().getNodesBounds()).toEqual({ x: 0, y: 0, width: 610, height: 120 });
+      expect(vflow().getNodesBounds(['missing'])).toEqual({ x: 0, y: 0, width: 0, height: 0 });
+    });
+  });
+
   it('returns shallow node copies with snapshot node-space points in topmost-first order', async () => {
     TestBed.configureTestingModule({
       imports: [VflowTestHostComponent],

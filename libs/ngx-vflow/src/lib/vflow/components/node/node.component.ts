@@ -88,13 +88,11 @@ export class NodeComponent implements OnInit, OnDestroy {
 
   /**
    * An explicit size goes to the `[resizable]` element when one exists, so its CSS min/max, padding and border
-   * apply to the box that is measured. Without one, the wrapper carries the application-provided size.
+   * apply to the box that is measured. Without one, the wrapper carries the explicit axes; an `auto` axis stays unset.
    */
   protected readonly wrapperSize = computed(() => {
     const model = this.model();
-    return model.sizeMode() === 'explicit' && !model.resizerTemplate()
-      ? { width: model.width(), height: model.height() }
-      : null;
+    return model.resizerTemplate() ? null : { width: model.explicitWidth(), height: model.explicitHeight() };
   });
 
   public nodeTemplate = input<TemplateRef<any>>();

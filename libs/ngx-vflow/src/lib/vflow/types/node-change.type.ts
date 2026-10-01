@@ -9,17 +9,18 @@ export interface NodePositionChange extends NodeChangeShared {
 }
 
 /**
- * `auto`: the size mirrors the measured DOM; `explicit`: the size was supplied by the
- * application or written by the resizer and the library renders it as inline width/height.
+ * Mode of one size axis. `auto`: the axis follows the rendered content; `explicit`: the axis is fixed by the node's
+ * `width`/`height` signal or by the resizer, and the library renders it as an inline size.
  */
 export type NodeSizeMode = 'auto' | 'explicit';
 
-/** Reports a size that has already been written to the node's size signals. */
+/** Reports a change of the rendered size. The node's `width`/`height` signals change only by resizing. */
 export interface NodeSizeChange extends NodeChangeShared {
   type: 'size';
+  /** Rendered size in flow units, as measured. */
   size: { width: number; height: number };
-  /** Persist the size only when `explicit`; an `auto` size is a measurement of content. */
-  mode: NodeSizeMode;
+  /** Persist an axis only when it is `explicit`; an `auto` axis is a measurement of content. */
+  mode: { width: NodeSizeMode; height: NodeSizeMode };
 }
 
 /** Reports that the node is already present in the application-provided collection. */

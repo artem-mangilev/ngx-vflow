@@ -244,7 +244,7 @@ describe('ResizableComponent', () => {
     it('leaves a content-sized node without inline size so the node box follows the element', async () => {
       const { model, card, wrapper, node } = await createSizeTargetFixture();
 
-      expect(model().sizeMode()).toBe('auto');
+      expect([model().widthMode(), model().heightMode()]).toEqual(['auto', 'auto']);
       expect(card().style.width).toBe('');
       expect(wrapper().style.width).toBe('');
       // content-box min-width 240 + padding 20 + border 4
@@ -267,9 +267,7 @@ describe('ResizableComponent', () => {
     it('moves the size onto the resizable element once the resizer commits', async () => {
       const { fixture, model, card, node } = await createSizeTargetFixture();
 
-      model().resizedExplicitly.set(true);
-      model().width.set(320);
-      model().height.set(200);
+      model().setExplicitSize({ width: 320, height: 200 });
       await settle(fixture);
 
       expect(card().style.width).toBe('320px');
@@ -307,14 +305,8 @@ describe('ResizableComponent', () => {
       expect(wrapper().style.width).toBe('300px');
     });
 
-    it('switches a content-sized node to explicit before the resizer writes its first size', async () => {
+    it('makes both axes explicit when a corner resizes a content-sized node', async () => {
       const { fixture, model, card, controls } = await createSizeTargetFixture();
-      const modesAtWrite: string[] = [];
-      const setWidth = model().width.set;
-      spyOn(model().width, 'set').and.callFake((value: number) => {
-        modesAtWrite.push(model().sizeMode());
-        setWidth.call(model().width, value);
-      });
 
       drag(
         controls().find((control) => control.matches('.handle.bottom.right'))!,
@@ -323,18 +315,87 @@ describe('ResizableComponent', () => {
       );
       await settle(fixture);
 
-      expect(modesAtWrite.length).toBeGreaterThan(0);
-      expect(modesAtWrite.every((mode) => mode === 'explicit')).toBeTrue();
+      expect([model().widthMode(), model().heightMode()]).toEqual(['explicit', 'explicit']);
       expect(model().width()).toBe(304);
       expect(card().style.width).toBe('304px');
       expect(card().offsetWidth).toBe(304);
+      expect(model().rawNode.width).toBeUndefined();
+    });
+
+    it('makes only the width explicit when a side control resizes a content-sized node', async () => {
+      const { fixture, model, card, controls } = await createSizeTargetFixture();
+
+      drag(
+        controls().find((control) => control.matches('.line.right'))!,
+        40,
+        0,
+      );
+      await settle(fixture);
+
+      expect([model().widthMode(), model().heightMode()]).toEqual(['explicit', 'auto']);
+      expect(card().style.width).toBe('304px');
+      expect(card().style.height).toBe('');
+      // An explicit axis makes the element border-box, so the auto height is now clamped by min-height alone.
+      expect(model().height()).toBe(120);
+    });
+
+    it('writes the resized size into the application signals', async () => {
+      const nodes = SIZED_NODES();
+      const { fixture, controls } = await createSizeTargetFixture({ nodes });
+
+      drag(
+        controls().find((control) => control.matches('.handle.bottom.right'))!,
+        40,
+        30,
+      );
+      await settle(fixture);
+
+      expect([nodes[0].width!(), nodes[0].height!()]).toEqual([340, 180]);
+    });
+
+    it('applies a programmatic size after a resize', async () => {
+      const nodes = SIZED_NODES();
+      const { fixture, model, card, controls } = await createSizeTargetFixture({ nodes });
+
+      drag(
+        controls().find((control) => control.matches('.line.right'))!,
+        40,
+        0,
+      );
+      await settle(fixture);
+      nodes[0].width!.set(260);
+      await settle(fixture);
+
+      expect(card().offsetWidth).toBe(260);
+      expect(model().width()).toBe(260);
+    });
+
+    it('keeps the application size when CSS clamps the rendered box', async () => {
+      const nodes = createNodes([{ id: 'node', point: { x: 20, y: 20 }, width: 100, height: 150 }]);
+      const { model, card } = await createSizeTargetFixture({ nodes });
+
+      // CSS min-width wins over the inline width.
+      expect(card().offsetWidth).toBe(240);
+      expect(model().width()).toBe(240);
+      expect(nodes[0].width!()).toBe(100);
+    });
+
+    it('fixes only the width when the application provides only a width', async () => {
+      const nodes = createNodes([{ id: 'node', point: { x: 20, y: 20 }, width: 300 }]);
+      const { model, card, wrapper } = await createSizeTargetFixture({ nodes, withResizable: false });
+
+      expect(wrapper().style.width).toBe('300px');
+      expect(wrapper().style.height).toBe('');
+      expect([model().width(), model().height()]).toEqual([300, card().offsetHeight]);
+      expect([model().widthMode(), model().heightMode()]).toEqual(['explicit', 'auto']);
     });
 
     it('ignores measurements during a gesture, then reconciles the size and moves the handles', async () => {
-      const { fixture, model, card, handle } = await createSizeTargetFixture({ nodes: SIZED_NODES() });
+      const nodes = SIZED_NODES();
+      const { fixture, model, card, handle } = await createSizeTargetFixture({ nodes });
 
       model().resizing.set(true);
-      model().width.set(100);
+      model().setExplicitSize({ width: 100 });
       await settle(fixture);
 
       // CSS min-width wins in the DOM, but the gesture still owns the model size.
@@ -345,6 +406,8 @@ describe('ResizableComponent', () => {
       await settle(fixture);
 
       expect(model().width()).toBe(240);
+      // Reconciliation updates the rendered size only; the application keeps the size the gesture wrote.
+      expect(nodes[0].width!()).toBe(100);
       const handleModel = model().handles()[0];
       expect(handleModel.pointAbsolute().x - model().globalPoint().x).toBeCloseTo(240 + handle().offsetWidth / 2, 1);
     });

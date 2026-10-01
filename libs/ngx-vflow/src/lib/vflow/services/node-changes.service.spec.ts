@@ -30,7 +30,7 @@ describe('NodesChangeService', () => {
 
   const settle = () => new Promise((resolve) => setTimeout(resolve, 60));
 
-  it('reports the size mode with every size change', async () => {
+  it('reports the mode of each axis with every size change', async () => {
     const model = TestBed.runInInjectionContext(
       () => new NodeModel(createNode({ id: '1', point: { x: 0, y: 0 } }, { useDefaults: false })),
     );
@@ -41,11 +41,20 @@ describe('NodesChangeService', () => {
 
     model.width.set(120);
     await settle();
-    expect(changes.at(-1)).toEqual({ type: 'size', id: '1', size: { width: 120, height: 50 }, mode: 'auto' });
+    expect(changes.at(-1)).toEqual({
+      type: 'size',
+      id: '1',
+      size: { width: 120, height: 50 },
+      mode: { width: 'auto', height: 'auto' },
+    });
 
-    model.resizedExplicitly.set(true);
-    model.height.set(80);
+    model.setExplicitSize({ height: 80 });
     await settle();
-    expect(changes.at(-1)).toEqual({ type: 'size', id: '1', size: { width: 120, height: 80 }, mode: 'explicit' });
+    expect(changes.at(-1)).toEqual({
+      type: 'size',
+      id: '1',
+      size: { width: 120, height: 80 },
+      mode: { width: 'auto', height: 'explicit' },
+    });
   });
 });
