@@ -21,7 +21,16 @@ import {
   ViewportOptions,
   SetCenterOptions,
   NodeChange,
+  NodePositionChange,
+  NodeSizeChange,
+  NodeAddChange,
+  NodeRemoveChange,
+  NodeSelectedChange,
   EdgeChange,
+  EdgeDetachedChange,
+  EdgeAddChange,
+  EdgeRemoveChange,
+  EdgeSelectChange,
   FitViewOptions,
   VflowComponent,
   IntersectingNodesOptions,
@@ -42,7 +51,6 @@ import {
   Rect,
   getNodePositionInSpace,
 } from 'ngx-vflow';
-import { toObservable } from '@angular/core/rxjs-interop';
 import {
   ConnectionTemplateMockDirective,
   EdgeTemplateMockDirective,
@@ -191,6 +199,22 @@ export class VflowMockComponent implements AsInterface<VflowComponent>, OnInit {
 
   public readonly deleteRequest = output<DeleteRequest>();
 
+  // The filtered outputs have dotted names, which only an alias can declare.
+  /* eslint-disable @angular-eslint/no-output-rename */
+  public readonly nodesChanges = output<NodeChange[]>();
+  public readonly nodesChangesPosition = output<NodePositionChange[]>({ alias: 'nodesChanges.position' });
+  public readonly nodesChangesSize = output<NodeSizeChange[]>({ alias: 'nodesChanges.size' });
+  public readonly nodesChangesAdd = output<NodeAddChange[]>({ alias: 'nodesChanges.add' });
+  public readonly nodesChangesRemove = output<NodeRemoveChange[]>({ alias: 'nodesChanges.remove' });
+  public readonly nodesChangesSelect = output<NodeSelectedChange[]>({ alias: 'nodesChanges.select' });
+
+  public readonly edgesChanges = output<EdgeChange[]>();
+  public readonly edgesChangesDetached = output<EdgeDetachedChange[]>({ alias: 'edgesChanges.detached' });
+  public readonly edgesChangesAdd = output<EdgeAddChange[]>({ alias: 'edgesChanges.add' });
+  public readonly edgesChangesRemove = output<EdgeRemoveChange[]>({ alias: 'edgesChanges.remove' });
+  public readonly edgesChangesSelect = output<EdgeSelectChange[]>({ alias: 'edgesChanges.select' });
+  /* eslint-enable @angular-eslint/no-output-rename */
+
   public readonly connectStart = output<ConnectStartEvent>();
   public readonly connect = output<Connection>();
   public readonly connectEnd = output<ConnectEndEvent>();
@@ -210,14 +234,7 @@ export class VflowMockComponent implements AsInterface<VflowComponent>, OnInit {
     zoom: 1,
   });
 
-  public nodesChange = signal<NodeChange[]>([]);
-  public edgesChange = signal<EdgeChange[]>([]);
   public initialized = signal(true);
-
-  public initialized$ = toObservable(this.initialized);
-  public viewportChange$ = toObservable(this.viewport);
-  public nodesChange$ = toObservable(this.nodesChange);
-  public edgesChange$ = toObservable(this.edgesChange);
 
   // eslint-disable-next-line @angular-eslint/no-empty-lifecycle-method
   public ngOnInit() {}

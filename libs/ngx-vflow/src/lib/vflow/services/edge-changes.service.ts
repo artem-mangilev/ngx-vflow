@@ -1,15 +1,22 @@
 import { Injectable, computed, inject } from '@angular/core';
 import { FlowEntitiesService } from './flow-entities.service';
-import { Observable, asyncScheduler, merge } from 'rxjs';
-import { distinctUntilChanged, filter, map, observeOn, pairwise, skip, switchMap } from 'rxjs/operators';
+import { Observable, merge } from 'rxjs';
+import { distinctUntilChanged, filter, map, pairwise, share, skip, switchMap } from 'rxjs/operators';
 import { toObservable } from '@angular/core/rxjs-interop';
-import { EdgeChange } from '../types/edge-change.type';
+import {
+  EdgeAddChange,
+  EdgeChange,
+  EdgeDetachedChange,
+  EdgeRemoveChange,
+  EdgeSelectChange,
+} from '../types/edge-change.type';
+import { batchChanges } from '../utils/batch-changes';
 
 @Injectable()
 export class EdgeChangesService {
   protected entitiesService = inject(FlowEntitiesService);
 
-  protected edgeDetachedChange$ = toObservable(
+  protected edgeDetachedChange$: Observable<EdgeDetachedChange[]> = toObservable(
     computed(() => {
       const nodes = new Set(this.entitiesService.nodes());
       return this.entitiesService
@@ -24,27 +31,27 @@ export class EdgeChangesService {
     }),
     filter((edges) => edges.length > 0),
     map((edges) => edges.map(({ edge }) => ({ type: 'detached', id: edge.id }))),
-  ) satisfies Observable<EdgeChange[]>;
+  );
 
-  protected edgeAddChange$ = toObservable(this.entitiesService.edges).pipe(
+  protected edgeAddChange$: Observable<EdgeAddChange[]> = toObservable(this.entitiesService.edges).pipe(
     pairwise(),
     map(([oldList, newList]) => {
       return newList.filter((edge) => !oldList.includes(edge));
     }),
     filter((edges) => !!edges.length),
     map((edges) => edges.map(({ edge }) => ({ type: 'add', id: edge.id }))),
-  ) satisfies Observable<EdgeChange[]>;
+  );
 
-  protected edgeRemoveChange$ = toObservable(this.entitiesService.edges).pipe(
+  protected edgeRemoveChange$: Observable<EdgeRemoveChange[]> = toObservable(this.entitiesService.edges).pipe(
     pairwise(),
     map(([oldList, newList]) => {
       return oldList.filter((edge) => !newList.includes(edge));
     }),
     filter((edges) => !!edges.length),
     map((edges) => edges.map(({ edge }) => ({ type: 'remove', id: edge.id }))),
-  ) satisfies Observable<EdgeChange[]>;
+  );
 
-  protected edgeSelectChange$ = toObservable(this.entitiesService.edges).pipe(
+  protected edgeSelectChange$: Observable<EdgeSelectChange[]> = toObservable(this.entitiesService.edges).pipe(
     switchMap((edges) =>
       merge(
         ...edges.map((edge) =>
@@ -57,18 +64,38 @@ export class EdgeChangesService {
       ),
     ),
     map((changedEdge) => [{ type: 'select', id: changedEdge.edge.id, selected: changedEdge.selected() }]),
-  ) satisfies Observable<EdgeChange[]>;
-
-  public readonly changes$: Observable<EdgeChange[]> = merge(
-    this.edgeDetachedChange$,
-    this.edgeAddChange$,
-    this.edgeRemoveChange$,
-    this.edgeSelectChange$,
-  ).pipe(
-    // this fixes the case when user gets 'deteched' changes
-    // and tries to delete these edges inside stream
-    // angular may ignore this change because [edges] input changed
-    // right after [nodes] input change
-    observeOn(asyncScheduler),
   );
+
+  /** Every change of one tick as a single array. */
+  public readonly changes$: Observable<EdgeChange[]> = this.deliver(
+    merge<EdgeChange[][]>(
+      this.edgeDetachedChange$,
+      this.edgeAddChange$,
+      this.edgeRemoveChange$,
+      this.edgeSelectChange$,
+    ),
+  );
+
+  private readonly changesByType: { [T in EdgeChange['type']]: Observable<Extract<EdgeChange, { type: T }>[]> } = {
+    detached: this.deliver(this.edgeDetachedChange$),
+    add: this.deliver(this.edgeAddChange$),
+    remove: this.deliver(this.edgeRemoveChange$),
+    select: this.deliver(this.edgeSelectChange$),
+  };
+
+  /** The changes of one type, one array per tick. It observes only what this type needs. */
+  public changesOfType<T extends EdgeChange['type']>(type: T) {
+    return this.changesByType[type];
+  }
+
+  private deliver<T>(changes$: Observable<T[]>): Observable<T[]> {
+    return changes$.pipe(
+      // the delivery in a later task fixes the case when user gets 'deteched' changes
+      // and tries to delete these edges inside stream
+      // angular may ignore this change because [edges] input changed
+      // right after [nodes] input change
+      batchChanges(),
+      share(),
+    );
+  }
 }

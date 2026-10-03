@@ -24,7 +24,7 @@ import { ViewportVisibilityDirective } from '../../directives/viewport-visibilit
 import { DraggableService } from '../../services/draggable.service';
 import { NodeModel } from '../../models/node.model';
 import { ViewportService, ZOOM_STEP } from '../../services/viewport.service';
-import { toObservable, outputFromObservable, takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { outputFromObservable, takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Edge } from '../../interfaces/edge.interface';
 import { EdgeModel } from '../../models/edge.model';
 import {
@@ -34,7 +34,6 @@ import {
   NodeTemplateDirective,
 } from '../../directives/template.directive';
 import { addNodesToEdges } from '../../utils/add-nodes-to-edges';
-import { skip } from 'rxjs/operators';
 import { Point } from '../../interfaces/point.interface';
 import { SetCenterOptions, ViewportOptions, ViewportState } from '../../interfaces/viewport.interface';
 import { FlowStatusService } from '../../services/flow-status.service';
@@ -45,10 +44,8 @@ import { ConnectionModel } from '../../models/connection.model';
 import { ReferenceIdentityChecker } from '../../utils/identity-checker/reference-identity-checker';
 import { NodesChangeService } from '../../services/node-changes.service';
 import { EdgeChangesService } from '../../services/edge-changes.service';
-import { NodeChange } from '../../types/node-change.type';
 import { ChangesControllerDirective } from '../../directives/changes-controller.directive';
 import { ConnectionControllerDirective } from '../../directives/connection-controller.directive';
-import { EdgeChange } from '../../types/edge-change.type';
 import { NodeRenderingService } from '../../services/node-rendering.service';
 import { SelectionService } from '../../services/selection.service';
 import { FlowSettingsService } from '../../services/flow-settings.service';
@@ -80,7 +77,6 @@ import {
 } from '../../utils/nodes';
 import { Rect } from '../../interfaces/rect';
 import { IntersectingNodesOptions } from '../../interfaces/intersecting-nodes-options.interface';
-import { toLazySignal } from '../../utils/signals/to-lazy-signal';
 import { FlowRenderingService } from '../../services/flow-rendering.service';
 import { AlignmentHelperComponent } from '../alignment-helper/alignment-helper.component';
 import { AlignmentHelperSettings } from '../../interfaces/alignment-helper-settings.interface';
@@ -106,13 +102,11 @@ import { AfterRenderBatchService } from '../../services/after-render-batch.servi
 const changesControllerHostDirective = {
   directive: ChangesControllerDirective,
   outputs: [
-    'nodesChanges',
     'nodesChanges.position',
     'nodesChanges.size',
     'nodesChanges.add',
     'nodesChanges.remove',
     'nodesChanges.select',
-    'edgesChanges',
     'edgesChanges.detached',
     'edgesChanges.add',
     'edgesChanges.remove',
@@ -523,6 +517,18 @@ export class VflowComponent {
 
   // #region OUTPUTS
   /**
+   * Changes of nodes that have already happened: position, size, add, remove and select. Every change of one tick
+   * comes in a single array. To subscribe in code, use `nodesChanges.subscribe()` or `outputToObservable()`.
+   */
+  public readonly nodesChanges = outputFromObservable(this.nodesChangeService.changes$);
+
+  /**
+   * Changes of edges that have already happened: detached, add, remove and select. Every change of one tick comes
+   * in a single array. To subscribe in code, use `edgesChanges.subscribe()` or `outputToObservable()`.
+   */
+  public readonly edgesChanges = outputFromObservable(this.edgesChangeService.changes$);
+
+  /**
    * Event that accumulates all custom node events
    */
   public readonly componentNodeEvent = outputFromObservable<any>(this.componentEventBusService.nodeEvent$); // TODO: research how to remove any
@@ -571,44 +577,11 @@ export class VflowComponent {
   public readonly viewport = this.viewportService.readableViewport.asReadonly();
 
   /**
-   * Signal for reading nodes change
-   */
-  public readonly nodesChange = toLazySignal(this.nodesChangeService.changes$, {
-    initialValue: [] as NodeChange[],
-  });
-
-  /**
-   * Signal to reading edges change
-   */
-  public readonly edgesChange = toLazySignal(this.edgesChangeService.changes$, {
-    initialValue: [] as EdgeChange[],
-  });
-
-  /**
    * Becomes true once, when the first layout is complete: the flow has a size, and every node has its size and
    * handle positions. The graph is not painted before that, so a viewport change made in reaction to it, such as
    * `fitView()` in an effect, is the first viewport the user sees.
    */
   public readonly initialized = this.flowRenderingService.flowInitialized;
-  // #endregion
-
-  // #region RX_API
-  /**
-   * Observable with viewport change
-   */
-  public readonly viewportChange$ = toObservable(this.viewportService.readableViewport).pipe(skip(1)); // skip default value that set by signal
-
-  /**
-   * Observable with nodes change
-   */
-  public readonly nodesChange$ = this.nodesChangeService.changes$;
-
-  /**
-   * Observable with edges change
-   */
-  public readonly edgesChange$ = this.edgesChangeService.changes$;
-
-  public readonly initialized$ = toObservable(this.flowRenderingService.flowInitialized);
   // #endregion
 
   protected markers = this.flowEntitiesService.markers;

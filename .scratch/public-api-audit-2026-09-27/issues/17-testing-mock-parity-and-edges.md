@@ -9,7 +9,7 @@ Blocked by: 16
 
 ## Проблема
 
-- **Нет host-directive outputs у `VflowMockComponent`.** `(nodesChanges*)`, `(edgesChanges*)` и `(nodeDrag*)` компилируются и молча становятся DOM-listener'ами. `AsInterface<VflowComponent>` этого не ловит: outputs host directives — не члены класса.
+- **Нет host-directive outputs у `VflowMockComponent`.** `(nodesChanges*)`, `(edgesChanges*)` и `(nodeDrag*)` компилируются и молча становятся DOM-listener'ами. `AsInterface<VflowComponent>` этого не ловит: outputs host directives — не члены класса. Тикет 07 добавляет в мок `(nodesChanges*)` и `(edgesChanges*)`; после него остаются `(nodeDrag*)`.
 - **Мок рендерит сущности не так, как реальный компонент:**
   - узлы с `component` не рендерятся (`component-mocks/vflow-mock.component.ts:49`);
   - рёбра с `component` рендерятся через `ng-template[edge]` (66-81);

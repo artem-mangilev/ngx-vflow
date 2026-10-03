@@ -443,6 +443,14 @@ A flow that relied on a missing handler to keep its handles inert sets `[canStar
 
 `ConnectionControllerDirective` is no longer a public export or part of the `Vflow` array. In `ngx-vflow/testing`, `ConnectionControllerMockDirective` is removed and `VflowMockComponent` declares the six outputs.
 
+### Change notifications
+
+- `(nodesChanges)` and `(edgesChanges)` are outputs of `vflow` itself. Code subscribes through a reference to the flow: `flow.nodesChanges.subscribe(...)`, or `outputToObservable(flow.nodesChanges)` for RxJS operators. The `nodesChange$` / `edgesChange$` observables and the `nodesChange` / `edgesChange` signals are removed.
+- Every change of one tick comes in a single array. In v2 each moved, resized or selected node came in an array of its own, so dragging several selected nodes called the handler once per node on every move. A handler that reads only `changes[0]` must go through the whole array.
+- A filtered output such as `(nodesChanges.position)` follows the same rule with the changes of its type.
+- `viewportChange$` and `initialized$` are removed: `viewport` and `initialized` are state, and the signals are the way to read them.
+- In `ngx-vflow/testing`, `VflowMockComponent` declares `(nodesChanges)`, `(edgesChanges)` and the nine filtered outputs.
+
 ### Removed APIs
 
 | Removed in v3                                      | Migration                                                                                              |
@@ -459,6 +467,10 @@ A flow that relied on a missing handler to keep its handles inert sets `[canStar
 | `step` input on `vflow-controls`                   | Remove the binding. The buttons zoom by the step of the zoom keys.                                     |
 | `useDefaults` option of the `create*` factories    | Remove it. The factories always create the default signals; write a literal for a bare object.         |
 | `ConnectionControllerDirective` and its mock       | Remove the imports. The connection outputs belong to `vflow` and `VflowMockComponent`.                 |
+| `nodesChange$` and `edgesChange$`                  | `flow.nodesChanges.subscribe(...)` and `flow.edgesChanges.subscribe(...)`, or `outputToObservable()`.  |
+| `nodesChange` and `edgesChange` signals            | Subscribe to the `nodesChanges` and `edgesChanges` outputs. A signal kept only the last array.         |
+| `viewportChange$`                                  | Read the `viewport` signal, or `toObservable(flow.viewport)` with `skip(1)` to drop the current value. |
+| `initialized$`                                     | Read the `initialized` signal, or `toObservable(flow.initialized)`.                                    |
 
 ### DOM compatibility
 

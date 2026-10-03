@@ -96,15 +96,11 @@ class VflowWrapperComponent {
     try {
       this.vflow()!.viewport();
 
-      this.vflow()!.nodesChange();
+      this.vflow()!.initialized();
 
-      this.vflow()!.edgesChange();
+      this.vflow()!.nodesChanges.subscribe(() => undefined);
 
-      this.vflow()!.viewportChange$.subscribe();
-
-      this.vflow()!.nodesChange$.subscribe();
-
-      this.vflow()!.edgesChange$.subscribe();
+      this.vflow()!.edgesChanges.subscribe(() => undefined);
 
       this.vflow()!.setViewport({
         x: 0,

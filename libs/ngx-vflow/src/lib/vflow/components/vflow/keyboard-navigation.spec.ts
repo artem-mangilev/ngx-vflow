@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, provideZonelessChangeDetection, viewChild, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
+import { outputToObservable } from '@angular/core/rxjs-interop';
 import { createNodes } from '../../interfaces/node.interface';
 import { createEdges } from '../../interfaces/edge.interface';
 import { Vflow } from '../../vflow';
@@ -172,7 +173,7 @@ describe('public keyboard graph navigation', () => {
     await fixture.whenStable();
     const parent = root.querySelector<HTMLElement>('[aria-label="Parent"]')!;
     const changes = firstValueFrom(
-      host.flow().nodesChange$.pipe(
+      outputToObservable(host.flow().nodesChanges).pipe(
         filter((items) => items.some((item) => item.type === 'position' && item.id === 'parent')),
         timeout(2000),
       ),

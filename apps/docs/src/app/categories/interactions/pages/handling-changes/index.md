@@ -26,10 +26,12 @@ There are a several ways to receive these changes:
 
 ## From (nodesChanges) and (edgesChanges) outputs
 
-This is a way to get every possible change. Changes came as non empty arrays:
+This is a way to get every possible change. Changes come as non-empty arrays:
 
 - `(nodesChanges)` emits `NodeChange[]`
 - `(edgesChanges)` emits `EdgeChange[]`
+
+One array holds every change of one tick. Dragging ten selected nodes emits one array with ten `position` changes on every move, not ten arrays.
 
 {{ NgDocActions.demoPane("HandlingChangesDemoComponent") }}
 
@@ -38,7 +40,7 @@ This is a way to get every possible change. Changes came as non empty arrays:
 For your convenience, here is the filtering scheme for changes based on the `(nodesChanges)` and `(edgesChanges)` events:
 
 - `(nodesChanges.[NodeChangeType])` - a list of node changes of a certain type
-- `(nodesChanges.[EdgeChangeType])` - a list of edge changes of a certain type
+- `(edgesChanges.[EdgeChangeType])` - a list of edge changes of a certain type
 
 Where:
 
@@ -65,7 +67,11 @@ List of all possible filter outputs:
 'edgesChanges.select',
 ```
 
-## From componenet itself
+A filtered output also emits one array per tick, with the changes of its type only. It observes only what its type needs, so prefer it when you handle a single type.
+
+## From the component itself
+
+`nodesChanges` and `edgesChanges` are outputs of `VflowComponent`, so code can subscribe to them through a reference to the flow. The subscription ends when the flow is destroyed.
 
 ```ts
 {
@@ -74,17 +80,19 @@ List of all possible filter outputs:
   vflow: VflowComponent
 
   ngAfterViewInit() {
-    this.vflow.nodesChange$.subscribe((changes) => {
+    this.vflow.nodesChanges.subscribe((changes) => {
       // handle node changes
     })
 
-    this.vflow.edgesChange$.subscribe((changes) => {
+    this.vflow.edgesChanges.subscribe((changes) => {
       // handle edges changes
     })
   }
   ...
 }
 ```
+
+For RxJS operators, wrap an output with `outputToObservable(this.vflow.nodesChanges)` from `@angular/core/rxjs-interop`. The filtered outputs are available only in the template.
 
 ## Which signals the flow writes
 

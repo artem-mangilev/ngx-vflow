@@ -236,7 +236,7 @@ describe('Graph rendering and interaction regressions', () => {
     await settle();
     await fixture.whenStable();
     const events: unknown[] = [];
-    const subscription = fixture.componentInstance.edgesChange$.subscribe((changes) => events.push(...changes));
+    const subscription = fixture.componentInstance.edgesChanges.subscribe((changes) => events.push(...changes));
     fixture.detectChanges();
     await fixture.whenStable();
     const host = fixture.nativeElement as HTMLElement;

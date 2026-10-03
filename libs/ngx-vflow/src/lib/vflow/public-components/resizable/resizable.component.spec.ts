@@ -9,7 +9,6 @@ import {
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { ResizableMockComponent } from 'ngx-vflow/testing';
-import { firstValueFrom } from 'rxjs';
 import { Node, createNodes } from '../../interfaces/node.interface';
 import { FlowEntitiesService } from '../../services/flow-entities.service';
 import { VflowComponent } from '../../components/vflow/vflow.component';
@@ -204,9 +203,7 @@ describe('ResizableComponent', () => {
   it('keeps every custom-gap control aligned at non-unit zoom with autoScale', async () => {
     const fixture = await createFixture();
 
-    const viewportChanged = firstValueFrom(fixture.componentInstance.vflow().viewportChange$);
-    fixture.componentInstance.vflow().setViewport({ x: 0, y: 0, zoom: 0.5 });
-    await viewportChanged;
+    await fixture.componentInstance.vflow().setViewport({ x: 0, y: 0, zoom: 0.5 });
     fixture.detectChanges();
     await fixture.whenStable();
 

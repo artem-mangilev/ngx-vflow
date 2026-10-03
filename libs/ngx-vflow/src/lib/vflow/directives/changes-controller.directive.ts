@@ -1,24 +1,12 @@
 import { Directive, inject } from '@angular/core';
-import {
-  NodeAddChange,
-  NodeChange,
-  NodePositionChange,
-  NodeRemoveChange,
-  NodeSelectedChange,
-  NodeSizeChange,
-} from '../types/node-change.type';
 import { EdgeChangesService } from '../services/edge-changes.service';
 import { NodesChangeService } from '../services/node-changes.service';
-import { filter, map } from 'rxjs/operators';
-import {
-  EdgeAddChange,
-  EdgeChange,
-  EdgeDetachedChange,
-  EdgeRemoveChange,
-  EdgeSelectChange,
-} from '../types/edge-change.type';
 import { outputFromObservable } from '@angular/core/rxjs-interop';
 
+/**
+ * The changes of one type as separate outputs. `(nodesChanges)` and `(edgesChanges)` with every type belong to the
+ * flow component itself.
+ */
 @Directive({
   selector: '[changesController]',
   standalone: true,
@@ -27,79 +15,39 @@ export class ChangesControllerDirective {
   protected nodesChangeService = inject(NodesChangeService);
   protected edgesChangeService = inject(EdgeChangesService);
 
-  /**
-   * Watch nodes changes
-   */
-  public readonly nodesChanges = outputFromObservable(this.nodesChangeService.changes$);
-
-  public readonly nodesChangesPosition = outputFromObservable(this.nodeChangesOfType('position'), {
+  public readonly nodesChangesPosition = outputFromObservable(this.nodesChangeService.changesOfType('position'), {
     alias: 'nodesChanges.position',
   });
 
-  public readonly nodesChangesSize = outputFromObservable(this.nodeChangesOfType('size'), {
+  public readonly nodesChangesSize = outputFromObservable(this.nodesChangeService.changesOfType('size'), {
     alias: 'nodesChanges.size',
   });
 
-  public readonly nodesChangesAdd = outputFromObservable(this.nodeChangesOfType('add'), {
+  public readonly nodesChangesAdd = outputFromObservable(this.nodesChangeService.changesOfType('add'), {
     alias: 'nodesChanges.add',
   });
 
-  public readonly nodesChangesRemove = outputFromObservable(this.nodeChangesOfType('remove'), {
+  public readonly nodesChangesRemove = outputFromObservable(this.nodesChangeService.changesOfType('remove'), {
     alias: 'nodesChanges.remove',
   });
 
-  public readonly nodesChangesSelect = outputFromObservable(this.nodeChangesOfType('select'), {
+  public readonly nodesChangesSelect = outputFromObservable(this.nodesChangeService.changesOfType('select'), {
     alias: 'nodesChanges.select',
   });
 
-  /**
-   * Watch edges change
-   */
-  public readonly edgesChanges = outputFromObservable(this.edgesChangeService.changes$);
-
-  public readonly edgesChangesDetached = outputFromObservable(this.edgeChangesOfType('detached'), {
+  public readonly edgesChangesDetached = outputFromObservable(this.edgesChangeService.changesOfType('detached'), {
     alias: 'edgesChanges.detached',
   });
 
-  public readonly edgesChangesAdd = outputFromObservable(this.edgeChangesOfType('add'), {
+  public readonly edgesChangesAdd = outputFromObservable(this.edgesChangeService.changesOfType('add'), {
     alias: 'edgesChanges.add',
   });
 
-  public readonly edgesChangesRemove = outputFromObservable(this.edgeChangesOfType('remove'), {
+  public readonly edgesChangesRemove = outputFromObservable(this.edgesChangeService.changesOfType('remove'), {
     alias: 'edgesChanges.remove',
   });
 
-  public readonly edgesChangesSelect = outputFromObservable(this.edgeChangesOfType('select'), {
+  public readonly edgesChangesSelect = outputFromObservable(this.edgesChangeService.changesOfType('select'), {
     alias: 'edgesChanges.select',
   });
-
-  private nodeChangesOfType<T extends NodeChange['type']>(type: T) {
-    return this.nodesChangeService.changes$.pipe(
-      map((changes) => changes.filter((c): c is NodeChangeMap[T] => c.type === type)),
-      filter((changes) => !!changes.length),
-    );
-  }
-
-  private edgeChangesOfType<T extends EdgeChange['type']>(type: T) {
-    return this.edgesChangeService.changes$.pipe(
-      map((changes) => changes.filter((c): c is EdgeChangeMap[T] => c.type === type)),
-      filter((changes) => !!changes.length),
-    );
-  }
 }
-
-// TODO: do not write this types manually
-type NodeChangeMap = {
-  position: NodePositionChange;
-  size: NodeSizeChange;
-  add: NodeAddChange;
-  remove: NodeRemoveChange;
-  select: NodeSelectedChange;
-};
-
-type EdgeChangeMap = {
-  detached: EdgeDetachedChange;
-  add: EdgeAddChange;
-  remove: EdgeRemoveChange;
-  select: EdgeSelectChange;
-};
