@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { createEdges, createNodes, Vflow } from 'ngx-vflow';
+import { addEdges, Connection, createEdges, createNodes, Edge, Vflow } from 'ngx-vflow';
 
 @Component({
   selector: 'app-root',
@@ -32,13 +32,18 @@ import { createEdges, createNodes, Vflow } from 'ngx-vflow';
     }
   `,
   template: `
-    <vflow view="auto" data-testid="core-flow" [nodes]="nodes" [edges]="edges">
+    <vflow view="auto" data-testid="core-flow" [nodes]="nodes" [edges]="edges" (connect)="createEdge($event)">
       <ng-template let-ctx node>
         <div class="card" selectable>
           {{ ctx.data().title }}
           <span vflowHandle handleType="target" position="left" class="dot"></span>
           <span vflowHandle handleType="source" position="right" class="dot"></span>
         </div>
+      </ng-template>
+      <ng-template let-ctx edge>
+        <svg:g edgeInteraction>
+          <svg:path class="line" [attr.d]="ctx.path()" [attr.marker-end]="ctx.markerEnd()" />
+        </svg:g>
       </ng-template>
       <mini-map />
     </vflow>
@@ -50,8 +55,12 @@ export class CoreAppComponent {
     { id: 'b', point: { x: 320, y: 160 }, data: { title: 'No UI package' } },
     { id: 'c', point: { x: 320, y: 20 }, data: { title: 'Third card' } },
   ]);
-  readonly edges = createEdges([
+  edges: Edge[] = createEdges([
     { id: 'a-b', source: 'a', target: 'b', markers: { end: {} } },
     { id: 'a-c', source: 'a', target: 'c' },
   ]);
+
+  createEdge(connection: Connection) {
+    this.edges = addEdges([{ id: crypto.randomUUID(), ...connection }], { nodes: this.nodes, edges: this.edges });
+  }
 }

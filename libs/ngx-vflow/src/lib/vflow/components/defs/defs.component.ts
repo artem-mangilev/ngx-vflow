@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, effect, input, isDevMode } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, input, isDevMode } from '@angular/core';
 import { KeyValuePipe, NgTemplateOutlet } from '@angular/common';
 import { MARKER_DEFAULT_TYPE, Marker } from '../../interfaces/marker.interface';
 import { MarkerShapes, markerSize, markerStrokeWidth, markerTipInset } from '../../utils/marker-inset';
@@ -35,20 +35,28 @@ export class DefsComponent {
 
   constructor() {
     if (isDevMode()) {
-      const warned = new Set<string>();
+      // The effect follows the set of types, not the markers, so it warns when the set changes.
+      const typesWithoutShape = computed(
+        () => {
+          const shapes = this.shapes();
+          const types = new Set<string>();
+          this.markers().forEach((marker) => {
+            const type = marker.type ?? MARKER_DEFAULT_TYPE;
+            if (!BUILT_IN_TYPES.has(type) && !shapes.has(type)) {
+              types.add(type);
+            }
+          });
+          return [...types];
+        },
+        { equal: (a, b) => a.length === b.length && a.every((type, index) => type === b[index]) },
+      );
       effect(() => {
-        const shapes = this.shapes();
-        this.markers().forEach((marker) => {
-          const type = marker.type ?? MARKER_DEFAULT_TYPE;
-          if (BUILT_IN_TYPES.has(type) || shapes.has(type) || warned.has(type)) {
-            return;
-          }
-          warned.add(type);
+        for (const type of typesWithoutShape()) {
           console.warn(
             `[ngx-vflow] Marker type "${type}" is not built in and no <ng-template marker="${type}"> declares its ` +
               'shape, so the marker renders empty.',
           );
-        });
+        }
       });
     }
   }

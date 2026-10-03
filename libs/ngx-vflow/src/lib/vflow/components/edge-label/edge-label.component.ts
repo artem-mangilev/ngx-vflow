@@ -96,14 +96,13 @@ export class EdgeLabelComponent {
     });
 
     if (isDevMode()) {
-      let warned = false;
+      // Runs again only for another template, so the label is reported once.
       afterRenderEffect(() => {
         this.template();
         const first = this.wrapper()?.nativeElement.firstElementChild;
-        if (warned || first?.namespaceURI !== SVG_NAMESPACE) {
+        if (first?.namespaceURI !== SVG_NAMESPACE) {
           return;
         }
-        warned = true;
         console.warn(
           `[ngx-vflow] The "${this.position()}" label of edge "${this.edgeModel().edge.id}" was compiled in the SVG ` +
             'namespace and does not render. Declare *edgeLabel next to the SVG presentation of the edge, ' +

@@ -283,16 +283,16 @@ JSDoc: «the transparent stroke the flow draws» ([edge.interface.ts:34-40](../.
 | №   | Тикет                                                                                  | Приоритет | Status          | Blocked by |
 | --- | -------------------------------------------------------------------------------------- | --------- | --------------- | ---------- |
 | 01  | [Программные изменения viewport](issues/01-viewport-programmatic-pipeline.md)          | P1        | resolved        | —          |
-| 02  | [Форма viewport API](issues/02-viewport-api-shape.md)                                  | P1        | needs-triage    | 01         |
+| 02  | [Форма viewport API](issues/02-viewport-api-shape.md)                                  | P1        | resolved        | 01         |
 | 03  | [Модель размера узла и измеренный прямоугольник](issues/03-measured-node-rect.md)      | P1        | resolved        | —          |
-| 04  | [Контракт опциональных сигналов узла](issues/04-node-optional-signals-contract.md)     | P1        | needs-triage    | —          |
-| 05  | [Соединения без подписки на output](issues/05-connection-controller-host-directive.md) | P1        | needs-triage    | —          |
+| 04  | [Контракт опциональных сигналов узла](issues/04-node-optional-signals-contract.md)     | P1        | resolved        | —          |
+| 05  | [Соединения без подписки на output](issues/05-connection-controller-host-directive.md) | P1        | resolved        | —          |
 | 06  | [Dev-предупреждения для тихих поломок](issues/06-silent-headless-failures.md)          | P1        | resolved        | —          |
 | 07  | [Каналы уведомлений об изменениях](issues/07-change-channels.md)                       | P1        | needs-triage    | —          |
 | 08  | [Публичный баррель](issues/08-public-barrel-cleanup.md)                                | P1        | needs-triage    | —          |
 | 09  | [Префиксы селекторов и классов](issues/09-selector-and-class-prefixes.md)              | P1        | needs-triage    | 05, 08     |
-| 10  | [`<mini-map>` снимает регистрацию](issues/10-minimap-unregister.md)                    | P1        | resolved        | —          |
-| 11  | [Документация: расхождения](issues/11-docs-drift.md)                                   | P1        | resolved        | —          |
+| 10  | [`<mini-map>` снимает регистрацию](issues/10-minimap-unregister.md)                    | P1        | ready-for-agent | —          |
+| 11  | [Документация: расхождения](issues/11-docs-drift.md)                                   | P1        | ready-for-agent | —          |
 | 12  | [Выбор кликом для узла и ребра](issues/12-selection-trigger-symmetry.md)               | P2        | needs-triage    | —          |
 | 13  | [Семантика объектных настроек](issues/13-object-settings-semantics.md)                 | P2        | needs-triage    | —          |
 | 14  | [Graph operations и события](issues/14-graph-operations-vs-events.md)                  | P2        | needs-triage    | —          |

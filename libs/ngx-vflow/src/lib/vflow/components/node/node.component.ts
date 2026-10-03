@@ -14,11 +14,10 @@ import {
 } from '@angular/core';
 import { DraggableService } from '../../services/draggable.service';
 import { NodeModel } from '../../models/node.model';
-import { FlowStatusService, isSelectionBoxEndStatus } from '../../services/flow-status.service';
+import { FlowStatusService } from '../../services/flow-status.service';
 import { HandleService } from '../../services/handle.service';
 import { NodeRenderingService } from '../../services/node-rendering.service';
 import { FlowSettingsService } from '../../services/flow-settings.service';
-import { SelectionService } from '../../services/selection.service';
 import { NodeAccessorService } from '../../services/node-accessor.service';
 import { NgTemplateOutlet } from '@angular/common';
 import { ComponentEventBusService } from '../../services/component-event-bus.service';
@@ -69,7 +68,6 @@ export class NodeComponent implements OnInit, OnDestroy {
   private flowStatusService = inject(FlowStatusService);
   private nodeRenderingService = inject(NodeRenderingService);
   private flowSettingsService = inject(FlowSettingsService);
-  private selectionService = inject(SelectionService);
   private hostRef = inject<ElementRef<HTMLElement>>(ElementRef);
   private nodeAccessor = inject(NodeAccessorService);
   private componentEventBus = inject(ComponentEventBusService);
@@ -186,17 +184,6 @@ export class NodeComponent implements OnInit, OnDestroy {
   protected pullNode() {
     if (this.flowSettingsService.elevateNodesOnSelect()) {
       this.nodeRenderingService.pullNode(this.model());
-    }
-  }
-
-  protected selectNode() {
-    // do not select node if selection is performed by selection box
-    if (isSelectionBoxEndStatus(this.flowStatusService.status())) {
-      return;
-    }
-
-    if (this.model().selectable()) {
-      this.selectionService.select(this.model());
     }
   }
 }

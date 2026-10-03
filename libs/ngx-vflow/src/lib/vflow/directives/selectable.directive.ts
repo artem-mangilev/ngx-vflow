@@ -1,4 +1,4 @@
-import { Directive, ElementRef, inject } from '@angular/core';
+import { Directive, ElementRef, inject, isDevMode } from '@angular/core';
 import { SelectionService } from '../services/selection.service';
 
 import { FlowEntity } from '../interfaces/flow-entity.interface';
@@ -18,6 +18,15 @@ export class SelectableDirective {
   private flowStatusService = inject(FlowStatusService);
 
   private host = inject<ElementRef<Element>>(ElementRef);
+
+  constructor() {
+    if (isDevMode() && !this.parentNode) {
+      console.warn(
+        '[ngx-vflow] [selectable] has no effect outside a node presentation. An edge is selected by a click on ' +
+          'its own presentation; give it a hit area with g[edgeInteraction].',
+      );
+    }
+  }
 
   protected selectOnEvent = this.getEvent$()
     .pipe(

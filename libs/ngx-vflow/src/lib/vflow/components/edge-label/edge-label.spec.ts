@@ -250,5 +250,12 @@ describe('Edge labels declared inside edge presentations', () => {
 
     expect(root.querySelector('.long-form-label')).toBeNull();
     expect(warn).toHaveBeenCalledWith(jasmine.stringContaining('Edge "long-form" uses a curve without labelPoints'));
+
+    // A recomputed path of the same curve is not reported again.
+    const reported = warn.calls.count();
+    fixture.componentInstance.nodes[3].point.set({ x: 20, y: 270 });
+    await settle();
+
+    expect(warn.calls.count()).toBe(reported);
   });
 });

@@ -1,5 +1,15 @@
 /* eslint-disable @typescript-eslint/no-unused-vars -- Angular template context guards use parameters only in type predicates. */
-import { Directive, TemplateRef, effect, inject, input, isDevMode, numberAttribute, untracked } from '@angular/core';
+import {
+  Directive,
+  TemplateRef,
+  computed,
+  effect,
+  inject,
+  input,
+  isDevMode,
+  numberAttribute,
+  untracked,
+} from '@angular/core';
 import { ConnectionContext, EdgeContext, NodeContext } from '../interfaces/template-context.interface';
 import { EdgeLabelOrient, EdgeLabelPosition } from '../interfaces/edge-label.interface';
 import { EdgeComponent } from '../components/edge/edge.component';
@@ -100,18 +110,16 @@ export class EdgeLabelTemplateDirective {
     });
 
     if (isDevMode()) {
-      let warned = false;
-      effect(() => {
-        if (warned) {
-          return;
-        }
+      // The effect follows this value, not the path, so it warns once and not on every recomputed path.
+      const edgeWithoutLabelPoints = computed(() => {
         const model = this.edge.model();
         const layout = model.path();
-        if (layout.path && !layout.labelPoints) {
-          warned = true;
-          console.warn(
-            `[ngx-vflow] Edge "${model.edge.id}" uses a curve without labelPoints, so its labels do not render.`,
-          );
+        return layout.path && !layout.labelPoints ? model.edge.id : undefined;
+      });
+      effect(() => {
+        const id = edgeWithoutLabelPoints();
+        if (id !== undefined) {
+          console.warn(`[ngx-vflow] Edge "${id}" uses a curve without labelPoints, so its labels do not render.`);
         }
       });
     }

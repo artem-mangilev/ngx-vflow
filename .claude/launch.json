@@ -18,6 +18,12 @@
       "runtimeExecutable": "npx",
       "runtimeArgs": ["nx", "serve", "docs", "--configuration", "production", "--port", "4300"],
       "port": 4300
+    },
+    {
+      "name": "consumer-core-only",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["nx", "serve", "consumer", "--buildTarget", "consumer:build:core-only", "--port", "4301"],
+      "port": 4301
     }
   ]
 }

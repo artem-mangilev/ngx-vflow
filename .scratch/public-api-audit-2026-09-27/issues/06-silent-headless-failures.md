@@ -1,6 +1,6 @@
 # 06. Dev-предупреждения для тихих поломок headless-презентаций
 
-Status: ready-for-agent
+Status: resolved
 Type: task
 Priority: P1 (до 3.0)
 Blocked by: —
@@ -31,3 +31,14 @@ Blocked by: —
 
 - spec: flow с ребром без шаблона → ровно один warn; с шаблоном → warn нет; вне dev-режима → warn нет.
 - spec: `[selectable]` в edge-шаблоне → warn.
+
+## Answer
+
+- **Ребро без шаблона:** `VflowComponent` в dev-режиме пишет `[ngx-vflow] Edge "<id>" has no component and the flow declares no <ng-template edge>, so edges without a component do not render.` Флага «уже предупреждали» нет: эффект читает `computed` с id первого такого ребра, поэтому warn один, пока это ребро на месте, и повторяется, только если первым стало другое ребро.
+- **`[selectable]` вне узла:** `SelectableDirective` в dev-режиме пишет warn в конструкторе, без дедупликации — по одному на каждый экземпляр директивы вне презентации узла. В тексте: директива там не действует, ребро выбирается кликом по своей презентации (hit area — `g[edgeInteraction]`).
+- **`NodeComponent.selectNode()`** удалён вместе с инжектом `SelectionService`.
+- **Consumer:** в `core-app.component.ts` добавлены `ng-template[edge]` с `g[edgeInteraction]` и `(connect)` с `addEdges`. `nx run consumer:check` проходит; в браузере рёбра видны, жест от handle к handle создаёт ребро, предупреждений в консоли нет. Для проверки добавлена конфигурация `consumer-core-only` в `.claude/launch.json`.
+- **Handle без connection controller:** не нужен — тикет 05 решён через host directive.
+- spec: `components/vflow/headless-warnings.spec.ts` — один warn на flow при нескольких рёбрах без component, нет warn с шаблоном, с component-рёбрами и вне dev-режима; `[selectable]` в edge-шаблоне → warn на каждое ребро, в node-шаблоне → нет.
+- Побочный эффект: существующие spec'и, где рёбра намеренно без презентации, теперь печатают этот warn в лог karma (106 строк на полный прогон).
+- **Флаги «уже предупреждали» убраны и в старых предупреждениях:** curve без `labelPoints` (`directives/template.directive.ts`) и маркер без формы (`components/defs/defs.component.ts`) читают `computed`; label в SVG-namespace (`components/edge-label/edge-label.component.ts`) — эффект и так перезапускается только при смене шаблона; handle без layout box (`models/handle.model.ts`) пишет warn при переходе `hasBox` из `true` в `false`. Следствие: warn повторяется, если условие ушло и вернулось; у маркеров при изменении набора типов без формы перечисляются все такие типы.

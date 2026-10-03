@@ -143,5 +143,14 @@ describe('HandleModel', () => {
     expect(parentNode.isReady()).toBeTrue();
     expect(warn).toHaveBeenCalledTimes(1);
     expect(warn.calls.mostRecent().args[0]).toContain('has no layout box');
+
+    // A handle that got its box back and lost it again is reported again.
+    mockRect(element, { left: 90, top: 15, width: 10, height: 10 });
+    model.sync();
+    expect(model.hasBox()).toBeTrue();
+    element.getClientRects = () => [] as unknown as DOMRectList;
+    model.sync();
+
+    expect(warn).toHaveBeenCalledTimes(2);
   });
 });

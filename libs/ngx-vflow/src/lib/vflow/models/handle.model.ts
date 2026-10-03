@@ -110,8 +110,6 @@ export class HandleModel {
     y: this.parentNode.globalPoint().y + this.local().y,
   }));
 
-  private warnedWithoutBox = false;
-
   constructor(
     options: HandleOptions,
     public readonly parentNode: NodeModel,
@@ -204,9 +202,12 @@ export class HandleModel {
     }
 
     if (geometry === HANDLE_WITHOUT_BOX) {
+      // Reported when the handle loses its box, not on every measurement without one.
+      if (this.hasBox()) {
+        this.warnWithoutBox();
+      }
       this.hasBox.set(false);
       this.isMeasured.set(false);
-      this.warnWithoutBox();
       return;
     }
 
@@ -222,8 +223,7 @@ export class HandleModel {
   }
 
   private warnWithoutBox() {
-    if (this.warnedWithoutBox || !isDevMode()) return;
-    this.warnedWithoutBox = true;
+    if (!isDevMode()) return;
     const id = this.id();
     console.warn(
       `[ngx-vflow] The ${this.type()} handle${id ? ` "${id}"` : ''} of node "${this.parentNode.rawNode.id}" ` +

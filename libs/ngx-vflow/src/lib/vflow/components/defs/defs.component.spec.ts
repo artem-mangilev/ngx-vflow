@@ -117,5 +117,16 @@ describe('Flow defs', () => {
     expect(hexagon.children.length).toBe(0);
     expect(hexagon.getAttribute('refX')).toBe('0');
     expect(warn).toHaveBeenCalledWith(jasmine.stringContaining('Marker type "hexagon" is not built in'));
+
+    // Another marker of the same type is a new marker element, not a new type to report.
+    const reported = warn.calls.count();
+    fixture.componentInstance.edges.update((edges) => [
+      ...edges,
+      ...createEdges([{ id: 'wide', source: 'b', target: 'a', markers: { end: { type: 'hexagon', width: 40 } } }]),
+    ]);
+    await settle();
+
+    expect(root.querySelectorAll('defs[flowDefs] marker.vflow-marker--hexagon').length).toBe(2);
+    expect(warn.calls.count()).toBe(reported);
   });
 });

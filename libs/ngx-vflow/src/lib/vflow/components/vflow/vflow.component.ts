@@ -16,6 +16,7 @@ import {
   effect,
   ElementRef,
   signal,
+  isDevMode,
 } from '@angular/core';
 import { Node } from '../../interfaces/node.interface';
 import { ViewportGesturesDirective } from '../../directives/viewport-gestures.directive';
@@ -231,6 +232,24 @@ export class VflowComponent {
     this.viewportService.viewportChangeEnd$
       .pipe(takeUntilDestroyed())
       .subscribe(() => this.settledZoom.set(this.viewportService.readableViewport().zoom));
+
+    if (isDevMode()) {
+      // The effect follows this value, not the edges, so it warns when the first such edge appears, not on every change.
+      const edgeWithoutPresentation = computed(() =>
+        this.edgeTemplateDirective()
+          ? undefined
+          : this.flowEntitiesService.edges().find(({ edge }) => !edge.component)?.edge.id,
+      );
+      effect(() => {
+        const id = edgeWithoutPresentation();
+        if (id !== undefined) {
+          console.warn(
+            `[ngx-vflow] Edge "${id}" has no component and the flow declares no <ng-template edge>, ` +
+              'so edges without a component do not render.',
+          );
+        }
+      });
+    }
   }
 
   /** The zoom at the end of the latest gesture, bound to `--vflow-zoom` on the host. */
