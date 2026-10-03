@@ -1,4 +1,4 @@
-import { Signal, TemplateRef, computed, inject, linkedSignal, signal } from '@angular/core';
+import { Signal, TemplateRef, computed, inject, linkedSignal, signal, untracked } from '@angular/core';
 import { NodeGeometry } from '../interfaces/curve-factory.interface';
 import { DOCUMENT } from '@angular/common';
 import { DomAttributes } from '../interfaces/dom-attributes.interface';
@@ -16,6 +16,8 @@ import { extendedComputed } from '../utils/signals/extended-computed';
 import { observeSignal } from '../utils/signals/observe-signal';
 import { createModelInjector } from '../utils/model-injector';
 import { isComponentClass } from '../utils/is-component-class';
+import { entitySnapshot } from '../utils/signals/entity-snapshot';
+import { forwardSignal } from '../utils/signals/forward-signal';
 
 export class NodeModel<T = unknown> implements FlowEntity, Contextable<NodeContext> {
   private modelInjector = createModelInjector();
@@ -23,8 +25,14 @@ export class NodeModel<T = unknown> implements FlowEntity, Contextable<NodeConte
   private settingsService = inject(FlowSettingsService);
   private document = inject(DOCUMENT);
 
+  /**
+   * The application's object as of the last nodes array. Optional signals are read through it, so a signal the
+   * application adds to the object later takes effect with the next array.
+   */
+  private raw = entitySnapshot(this.rawNode, this.entitiesService.nodes);
+
   public ariaLabel = computed(() => {
-    const override = this.rawNode.ariaLabel?.().trim();
+    const override = this.raw().ariaLabel?.().trim();
     if (override) return override;
     return this.settingsService.ariaLabels().nodeLabel(this.rawNode.id);
   });
@@ -36,9 +44,9 @@ export class NodeModel<T = unknown> implements FlowEntity, Contextable<NodeConte
       return {
         label: this.ariaLabel(),
         roleDescription: this.children().length > 0 ? labels.groupRole : labels.nodeRole,
-        domAttributes: this.rawNode.domAttributes?.(),
+        domAttributes: this.raw().domAttributes?.(),
         description: [
-          this.rawNode.ariaDescription?.(),
+          this.raw().ariaDescription?.(),
           parent ? labels.parentDescription(parent.ariaLabel()) : '',
           this.selected() ? labels.selected : '',
           !this.selectable() ? labels.selectionUnavailable : '',
@@ -106,8 +114,8 @@ export class NodeModel<T = unknown> implements FlowEntity, Contextable<NodeConte
    * Fixed size of an `explicit` axis: the application signal, or the resizer's value when the application has none.
    * `undefined` on an `auto` axis. The library renders it inline; measurement never writes it.
    */
-  public explicitWidth = computed(() => this.rawNode.width?.() ?? this.resizedWidth());
-  public explicitHeight = computed(() => this.rawNode.height?.() ?? this.resizedHeight());
+  public explicitWidth = computed(() => this.raw().width?.() ?? this.resizedWidth());
+  public explicitHeight = computed(() => this.raw().height?.() ?? this.resizedHeight());
 
   public widthMode = computed<NodeSizeMode>(() => (this.explicitWidth() === undefined ? 'auto' : 'explicit'));
   public heightMode = computed<NodeSizeMode>(() => (this.explicitHeight() === undefined ? 'auto' : 'explicit'));
@@ -126,12 +134,18 @@ export class NodeModel<T = unknown> implements FlowEntity, Contextable<NodeConte
 
   public renderOrder = signal(0);
 
-  public selected = signal(false);
+  /** Selection of a node without an application signal. */
+  private ownSelected = signal(NODE_DEFAULTS.selected);
+  public selected = forwardSignal(() => this.raw().selected ?? this.ownSelected);
   public preselected = signal(false);
-  public selectable = computed(() => this.rawNode.selectable?.() ?? this.settingsService.nodesSelectable());
-  public focusable = computed(() => this.rawNode.focusable?.() ?? this.settingsService.nodesFocusable());
+  public selectable = computed(() => this.raw().selectable?.() ?? this.settingsService.nodesSelectable());
+  public focusable = computed(() => this.raw().focusable?.() ?? this.settingsService.nodesFocusable());
 
-  public extent = signal<'parent' | null>(NODE_DEFAULTS.extent);
+  public extent = computed<'parent' | null>(() => {
+    const extent = this.raw().extent;
+    // `null` is a value of the signal, not its absence.
+    return extent ? extent() : NODE_DEFAULTS.extent;
+  });
 
   public globalPoint = computed(() => {
     let parent = this.parent();
@@ -164,7 +178,7 @@ export class NodeModel<T = unknown> implements FlowEntity, Contextable<NodeConte
 
   public handles = signal<HandleModel[]>([]);
 
-  public draggable = signal(true);
+  public draggable = computed(() => this.raw().draggable?.() ?? NODE_DEFAULTS.draggable);
 
   public dragHandlesCount = signal(0);
 
@@ -222,22 +236,12 @@ export class NodeModel<T = unknown> implements FlowEntity, Contextable<NodeConte
       this.point = rawNode.point;
     }
 
-    if (rawNode.draggable) {
-      this.draggable = rawNode.draggable;
-    }
-
-    if (rawNode.selected) {
-      this.selected = rawNode.selected;
-    }
-
-    if (rawNode.extent) {
-      this.extent = rawNode.extent;
-    }
+    const ownData = signal(NODE_DEFAULTS.data as T);
 
     this.context = {
       $implicit: {
         node: rawNode,
-        data: rawNode.data ?? signal(NODE_DEFAULTS.data as T),
+        data: computed(() => (this.raw().data ?? ownData)()),
         selected: this.selected.asReadonly(),
         preselected: this.preselected.asReadonly(),
         width: this.width.asReadonly(),
@@ -292,7 +296,8 @@ export class NodeModel<T = unknown> implements FlowEntity, Contextable<NodeConte
    * which makes the axis `explicit`. The rendered size follows at once.
    */
   public setExplicitSize({ width, height }: { width?: number; height?: number }) {
-    if (width !== undefined) (this.rawNode.width ?? this.resizedWidth).set(width);
-    if (height !== undefined) (this.rawNode.height ?? this.resizedHeight).set(height);
+    const raw = untracked(this.raw);
+    if (width !== undefined) (raw.width ?? this.resizedWidth).set(width);
+    if (height !== undefined) (raw.height ?? this.resizedHeight).set(height);
   }
 }

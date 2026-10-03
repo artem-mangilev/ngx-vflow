@@ -18,6 +18,5 @@ describe('createNode size defaults', () => {
     const factory = () => Promise.resolve(class {});
     expect(createNode({ id: 'c', component: factory, point: { x: 0, y: 0 } }).component).toBe(factory);
     expect(createNode({ id: 't', point: { x: 0, y: 0 } }).component).toBeUndefined();
-    expect(createNode({ id: 't', point: { x: 0, y: 0 } }, { useDefaults: false }).component).toBeUndefined();
   });
 });

@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { EdgeModel } from './edge.model';
 import { NodeModel } from './node.model';
 import { createNode } from '../interfaces/node.interface';
-import { createEdge } from '../interfaces/edge.interface';
+import { Curve, Edge, createEdge } from '../interfaces/edge.interface';
 import { FlowEntitiesService } from '../services/flow-entities.service';
 import { HandleModel } from './handle.model';
 import { FlowSettingsService } from '../services/flow-settings.service';
@@ -183,8 +183,8 @@ describe('EdgeModel', () => {
 
   it('should pass node geometry and the marker inset to a custom curve', () => {
     const curve = jasmine.createSpy('curve').and.returnValue({ path: 'M 0,0' });
-    model.curve.set(curve);
-    model.markers.set({ end: { type: 'arrow-closed', width: 20 } });
+    model.edge.curve!.set(curve);
+    model.edge.markers!.set({ end: { type: 'arrow-closed', width: 20 } });
     model.path();
 
     const params = curve.calls.mostRecent().args[0];
@@ -195,7 +195,7 @@ describe('EdgeModel', () => {
     // The left target handle point moves away from the node by the inset.
     expect(params.targetPoint.x).toBe(params.sourcePoint.x - 7);
 
-    model.markers.set({ end: { type: 'arrow', width: 20 } });
+    model.edge.markers!.set({ end: { type: 'arrow', width: 20 } });
     model.path();
 
     // An open arrow has no fill to hide the line, so the path runs through it to just short of the tip.
@@ -204,8 +204,8 @@ describe('EdgeModel', () => {
 
   it('should share one marker element between equal markers and inset a declared shape', () => {
     const curve = jasmine.createSpy('curve').and.returnValue({ path: 'M 0,0' });
-    model.curve.set(curve);
-    model.markers.set({ start: 'arrow-closed', end: {} });
+    model.edge.curve!.set(curve);
+    model.edge.markers!.set({ start: 'arrow-closed', end: {} });
     model.path();
 
     // The type alone, the empty marker and the default type are the same marker.
@@ -215,7 +215,7 @@ describe('EdgeModel', () => {
     TestBed.inject(FlowEntitiesService).markerShapes.set(
       new Map([['diamond', { template: null as never, inset: 10 }]]),
     );
-    model.markers.set({ start: { type: 'diamond', width: 20 }, end: { type: 'arrow', width: 20 } });
+    model.edge.markers!.set({ start: { type: 'diamond', width: 20 }, end: { type: 'arrow', width: 20 } });
     model.path();
 
     expect(curve.calls.mostRecent().args[0].markerInset).toEqual({ start: 10, end: 2 });
@@ -258,5 +258,60 @@ describe('EdgeModel', () => {
 
     expect(created.selectable).toBeUndefined();
     expect(created.focusable).toBeUndefined();
+  });
+
+  describe('signals added to the edge object later', () => {
+    const make = () => {
+      const edge: Edge = { id: 'late', source: '1', target: '2' };
+      const entities = TestBed.inject(FlowEntitiesService);
+      const late = TestBed.runInInjectionContext(() => new EdgeModel(edge));
+      entities.edges.update((edges) => [...edges, late]);
+      return { edge, late, passNewArray: () => entities.edges.update((edges) => [...edges]) };
+    };
+
+    it('reads them once the application passes a new array', () => {
+      const { edge, late, passNewArray } = make();
+      expect([late.curve(), late.reconnectable(), late.interactionWidth(), late.markers()]).toEqual([
+        'bezier',
+        false,
+        20,
+        {},
+      ]);
+      expect([late.selectable(), late.focusable()]).toEqual([true, true]);
+      expect(late.context.$implicit.data()).toEqual({});
+
+      edge.curve = signal<Curve>('straight');
+      edge.reconnectable = signal<boolean | 'source' | 'target'>('target');
+      edge.interactionWidth = signal(0);
+      edge.markers = signal({ end: 'arrow' as const });
+      edge.selectable = signal(false);
+      edge.focusable = signal(false);
+      edge.data = signal({ title: 'Late' });
+      expect(late.curve()).toBe('bezier');
+
+      passNewArray();
+      expect([late.curve(), late.reconnectable(), late.interactionWidth(), late.markers()]).toEqual([
+        'straight',
+        'target',
+        0,
+        { end: 'arrow' },
+      ]);
+      expect([late.selectable(), late.focusable()]).toEqual([false, false]);
+      expect(late.context.$implicit.data()).toEqual({ title: 'Late' });
+    });
+
+    it('selects through the application signal, which wins over the selection held by the model', () => {
+      const { edge, late, passNewArray } = make();
+      late.selected.set(true);
+      expect(Object.keys(edge)).toEqual(['id', 'source', 'target']);
+
+      edge.selected = signal(false);
+      passNewArray();
+      expect(late.selected()).toBeFalse();
+      expect(late.context.$implicit.selected()).toBeFalse();
+
+      late.selected.set(true);
+      expect(edge.selected()).toBeTrue();
+    });
   });
 });

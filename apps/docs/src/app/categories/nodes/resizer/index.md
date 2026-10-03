@@ -50,6 +50,31 @@ The resize controls take their colors from the core tokens `--vflow-selection` a
 
 - Persist an axis only when its mode is `explicit`. An `auto` axis is a measurement of the node's content; writing it back as `width` / `height` would stop the node from following its content.
 - When the node data has the signal, the resizer has already written the new size into it.
+- When it has none, the flow holds the resized size itself and never adds signals to your node. To keep the size in the node data, add the signal and pass a new array; the node keeps its view, and the resizer writes into the signal from then on:
+
+```ts
+protected keepResizedSize(changes: NodeSizeChange[]) {
+  let added = false;
+
+  for (const { id, size, mode } of changes) {
+    const node = this.nodes().find((node) => node.id === id);
+    if (!node) continue;
+
+    if (mode.width === 'explicit' && !node.width) {
+      node.width = signal(size.width);
+      added = true;
+    }
+    if (mode.height === 'explicit' && !node.height) {
+      node.height = signal(size.height);
+      added = true;
+    }
+  }
+
+  // The flow reads a signal added to a node once it receives a new array.
+  if (added) this.nodes.update((nodes) => [...nodes]);
+}
+```
+
 - To react to the gesture itself, use `(resizeStart)` / `(resizeChange)` / `(resizeEnd)` on the `resizable` element.
 
 ## See also

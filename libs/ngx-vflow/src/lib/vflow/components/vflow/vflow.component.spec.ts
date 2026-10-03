@@ -55,6 +55,29 @@ class NodeRectHostComponent {
   ]);
 }
 
+@Component({
+  template: `
+    <vflow [view]="[800, 600]" [nodes]="nodes()">
+      <ng-template node>
+        <div class="card"></div>
+      </ng-template>
+    </vflow>
+  `,
+  styles: `
+    .card {
+      width: 200px;
+      height: 100px;
+    }
+  `,
+  imports: [Vflow],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+class LateSignalHostComponent {
+  public readonly vflow = viewChild.required(VflowComponent);
+  public readonly node: Node = { id: 'a', point: signal({ x: 0, y: 0 }) };
+  public readonly nodes = signal([this.node]);
+}
+
 async function settle(fixture: { detectChanges(): void; whenStable(): Promise<unknown> }) {
   fixture.detectChanges();
   for (let i = 0; i < 5; i++) await new Promise(requestAnimationFrame);
@@ -108,6 +131,30 @@ describe('VflowComponent', () => {
       expect(vflow().getNodesBounds()).toEqual({ x: 0, y: 0, width: 610, height: 120 });
       expect(vflow().getNodesBounds(['missing'])).toEqual({ x: 0, y: 0, width: 0, height: 0 });
     });
+  });
+
+  it('reads a size signal added to a node object once the same object comes in a new array', async () => {
+    TestBed.configureTestingModule({
+      imports: [LateSignalHostComponent],
+      providers: [provideZonelessChangeDetection()],
+    });
+    const fixture = TestBed.createComponent(LateSignalHostComponent);
+    await settle(fixture);
+    const { vflow, node, nodes } = fixture.componentInstance;
+    const card = fixture.nativeElement.querySelector('.card');
+    expect(vflow().getNodeRect('a')).toEqual({ x: 0, y: 0, width: 200, height: 100 });
+
+    node.width = signal(320);
+    nodes.update((list) => [...list]);
+    await settle(fixture);
+
+    expect(vflow().getNodeRect('a')).toEqual({ x: 0, y: 0, width: 320, height: 100 });
+    // The same object keeps its model and its view.
+    expect(fixture.nativeElement.querySelector('.card')).toBe(card);
+
+    node.width.set(260);
+    await settle(fixture);
+    expect(vflow().getNodeRect('a')?.width).toBe(260);
   });
 
   it('returns shallow node copies with snapshot node-space points in topmost-first order', async () => {

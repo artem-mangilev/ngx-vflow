@@ -18,6 +18,10 @@ export const EDGE_DEFAULTS = {
 
 export type Curve = 'straight' | 'bezier' | 'smooth-step' | 'step' | CurveFactory;
 
+/**
+ * The flow never adds signals to an edge object. The application may add an optional signal to an existing edge
+ * later; the flow reads it once it receives a new edges array.
+ */
 export interface Edge<T = unknown> extends Connection {
   id: string;
   /** Component that draws the edge; without it the edge renders through `ng-template[edge]`. */
@@ -30,6 +34,7 @@ export interface Edge<T = unknown> extends Connection {
     end?: MarkerRef;
   }>;
   reconnectable?: WritableSignal<boolean | 'source' | 'target'>;
+  /** Without it the flow holds the selection itself and reports it through `edgesChanges`. */
   selected?: WritableSignal<boolean>;
   /**
    * Width in pixels of the transparent stroke the flow draws along the edge path to make the edge easy to click.
@@ -47,76 +52,33 @@ export interface Edge<T = unknown> extends Connection {
 
 export type StaticEdge<T = unknown> = UnwrapSignal<Edge<T>>;
 
-interface CreateEdgeOptions {
-  useDefaults: boolean;
-}
-
 type OptionalProperty = 'component' | 'selectable' | 'focusable' | 'ariaLabel' | 'ariaDescription' | 'domAttributes';
 
 export type EdgeWithDefaults<T = unknown> = Omit<Required<Edge<T>>, OptionalProperty> & Pick<Edge<T>, OptionalProperty>;
 
-export function createEdge<T>(edge: StaticEdge<T>): EdgeWithDefaults<T>;
-export function createEdge<T>(edge: StaticEdge<T>, options: { useDefaults: true }): EdgeWithDefaults<T>;
-export function createEdge<T>(edge: StaticEdge<T>, options: { useDefaults: false }): Edge<T>;
-export function createEdge<T>(
-  edge: StaticEdge<T>,
-  options: CreateEdgeOptions = { useDefaults: true },
-): Edge<T> | EdgeWithDefaults<T> {
-  if (options.useDefaults) {
-    return {
-      id: edge.id,
-      source: edge.source,
-      target: edge.target,
-      sourceHandle: isDefined(edge.sourceHandle) ? edge.sourceHandle : '',
-      targetHandle: isDefined(edge.targetHandle) ? edge.targetHandle : '',
-      ...(isDefined(edge.component) ? { component: edge.component } : {}),
-      curve: signal(isDefined(edge.curve) ? edge.curve : EDGE_DEFAULTS.curve),
-      data: signal(isDefined(edge.data) ? edge.data : EDGE_DEFAULTS.data) as WritableSignal<T>,
-      markers: signal(isDefined(edge.markers) ? edge.markers : EDGE_DEFAULTS.markers),
-      reconnectable: signal(isDefined(edge.reconnectable) ? edge.reconnectable : EDGE_DEFAULTS.reconnectable),
-      selected: signal(isDefined(edge.selected) ? edge.selected : EDGE_DEFAULTS.selected),
-      interactionWidth: signal(
-        isDefined(edge.interactionWidth) ? edge.interactionWidth : EDGE_DEFAULTS.interactionWidth,
-      ),
-      ...(isDefined(edge.selectable) ? { selectable: signal(edge.selectable) } : {}),
-      ...(isDefined(edge.focusable) ? { focusable: signal(edge.focusable) } : {}),
-      ...(isDefined(edge.ariaLabel) ? { ariaLabel: signal(edge.ariaLabel) } : {}),
-      ...(isDefined(edge.ariaDescription) ? { ariaDescription: signal(edge.ariaDescription) } : {}),
-      ...(isDefined(edge.domAttributes) ? { domAttributes: signal(edge.domAttributes) } : {}),
-    };
-  } else {
-    return {
-      id: edge.id,
-      source: edge.source,
-      target: edge.target,
-      sourceHandle: edge.sourceHandle,
-      targetHandle: edge.targetHandle,
-      ...(isDefined(edge.component) ? { component: edge.component } : {}),
-      curve: isDefined(edge.curve) ? signal(edge.curve) : undefined,
-      data: isDefined(edge.data) ? (signal(edge.data) as WritableSignal<T>) : undefined,
-      markers: isDefined(edge.markers) ? signal(edge.markers) : undefined,
-      reconnectable: isDefined(edge.reconnectable) ? signal(edge.reconnectable) : undefined,
-      selected: isDefined(edge.selected) ? signal(edge.selected) : undefined,
-      interactionWidth: isDefined(edge.interactionWidth) ? signal(edge.interactionWidth) : undefined,
-      ...(isDefined(edge.selectable) ? { selectable: signal(edge.selectable) } : {}),
-      ...(isDefined(edge.focusable) ? { focusable: signal(edge.focusable) } : {}),
-      ...(isDefined(edge.ariaLabel) ? { ariaLabel: signal(edge.ariaLabel) } : {}),
-      ...(isDefined(edge.ariaDescription) ? { ariaDescription: signal(edge.ariaDescription) } : {}),
-      ...(isDefined(edge.domAttributes) ? { domAttributes: signal(edge.domAttributes) } : {}),
-    };
-  }
+/** Wraps the values into signals and fills the defaults; inherited capabilities stay optional. */
+export function createEdge<T>(edge: StaticEdge<T>): EdgeWithDefaults<T> {
+  return {
+    id: edge.id,
+    source: edge.source,
+    target: edge.target,
+    sourceHandle: isDefined(edge.sourceHandle) ? edge.sourceHandle : '',
+    targetHandle: isDefined(edge.targetHandle) ? edge.targetHandle : '',
+    ...(isDefined(edge.component) ? { component: edge.component } : {}),
+    curve: signal(isDefined(edge.curve) ? edge.curve : EDGE_DEFAULTS.curve),
+    data: signal(isDefined(edge.data) ? edge.data : EDGE_DEFAULTS.data) as WritableSignal<T>,
+    markers: signal(isDefined(edge.markers) ? edge.markers : EDGE_DEFAULTS.markers),
+    reconnectable: signal(isDefined(edge.reconnectable) ? edge.reconnectable : EDGE_DEFAULTS.reconnectable),
+    selected: signal(isDefined(edge.selected) ? edge.selected : EDGE_DEFAULTS.selected),
+    interactionWidth: signal(isDefined(edge.interactionWidth) ? edge.interactionWidth : EDGE_DEFAULTS.interactionWidth),
+    ...(isDefined(edge.selectable) ? { selectable: signal(edge.selectable) } : {}),
+    ...(isDefined(edge.focusable) ? { focusable: signal(edge.focusable) } : {}),
+    ...(isDefined(edge.ariaLabel) ? { ariaLabel: signal(edge.ariaLabel) } : {}),
+    ...(isDefined(edge.ariaDescription) ? { ariaDescription: signal(edge.ariaDescription) } : {}),
+    ...(isDefined(edge.domAttributes) ? { domAttributes: signal(edge.domAttributes) } : {}),
+  };
 }
 
-export function createEdges<T>(edges: StaticEdge<T>[]): EdgeWithDefaults<T>[];
-export function createEdges<T>(edges: StaticEdge<T>[], options: { useDefaults: true }): EdgeWithDefaults<T>[];
-export function createEdges<T>(edges: StaticEdge<T>[], options: { useDefaults: false }): Edge<T>[];
-export function createEdges<T>(
-  edges: StaticEdge<T>[],
-  options: CreateEdgeOptions = { useDefaults: true },
-): Edge<T>[] | EdgeWithDefaults<T>[] {
-  if (options.useDefaults) {
-    return edges.map((edge) => createEdge(edge, { useDefaults: true }));
-  } else {
-    return edges.map((edge) => createEdge(edge, { useDefaults: false }));
-  }
+export function createEdges<T>(edges: StaticEdge<T>[]): EdgeWithDefaults<T>[] {
+  return edges.map((edge) => createEdge(edge));
 }

@@ -85,3 +85,20 @@ List of all possible filter outputs:
   ...
 }
 ```
+
+## Which signals the flow writes
+
+Most signals of a `Node` are optional, and they are of three kinds:
+
+- **The flow writes them**: `point`, `selected`, and `width` / `height` (only a resize gesture). With the signal in the node, the flow writes into it. Without `selected` or a size signal, the flow holds the value itself, and the change is the way to learn it.
+- **The flow only reads them**: `draggable`, `extent`, `parentId`, `data`, `selectable`, `focusable`, `ariaLabel`, `ariaDescription`, `domAttributes`. A missing signal means the default or the setting of the flow.
+- **`width` / `height` also choose the size mode**: an axis with the signal is `explicit`, an axis without it follows the content.
+
+Edges follow the same rule. The flow writes only `selected`; it only reads `curve`, `markers`, `reconnectable`, `interactionWidth`, `data`, `selectable`, `focusable`, `ariaLabel`, `ariaDescription` and `domAttributes`.
+
+The flow never adds signals to your node and edge objects. You can add one to an existing object later: assign it and pass a new array, and the flow reads it without recreating the node or the edge. A signal of the application wins over the value the flow held.
+
+```ts
+node.selected = signal(true);
+this.nodes.update((nodes) => [...nodes]);
+```

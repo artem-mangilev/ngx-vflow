@@ -85,7 +85,7 @@ describe('Graph rendering and interaction regressions', () => {
   it('centers an HTML label immediately after its content changes, including at non-unit zoom', () => {
     const fixture = TestBed.createComponent(LabelHostComponent);
     const edge = graph().edges[0];
-    edge.curve.set(() => ({
+    edge.edge.curve!.set(() => ({
       path: 'M 0,0 L 400,200',
       labelPoints: {
         start: { x: 0, y: 0 },
@@ -269,11 +269,11 @@ describe('Graph rendering and interaction regressions', () => {
     settings.computedFlowHeight.set(300);
     settings.optimization.update((value) => ({ ...value, virtualization: true }));
     nodes.forEach((node) => node.point.set({ x: -1000, y: -1000 }));
-    edges[0].curve.set(() => ({ path: 'M -1000,-1000 Q 2000,1500 -900,-1000' }));
+    edges[0].edge.curve!.set(() => ({ path: 'M -1000,-1000 Q 2000,1500 -900,-1000' }));
     TestBed.inject(ViewportCullingDirective);
     TestBed.flushEffects();
     expect(edges[0].culled()).toBeFalse();
-    edges[0].curve.set(() => ({ path: 'M -1000,-1000 l 100,0' }));
+    edges[0].edge.curve!.set(() => ({ path: 'M -1000,-1000 l 100,0' }));
     TestBed.flushEffects();
     expect(edges[0].culled()).toBeTrue();
   });

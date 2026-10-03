@@ -499,7 +499,7 @@ describe('DraggableService', () => {
       parent.width.set(300);
       parent.height.set(300);
       const child = placed({ id: 'child', parentId: 'parent' }, 0, 50);
-      child.extent.set('parent');
+      child.rawNode.extent!.set('parent');
       // Its right edge is at 95, just outside the parent's left wall at 100
       placed({ id: 'outside' }, -5, 600);
 

@@ -449,6 +449,7 @@ The programmatic viewport methods are `setViewport`, `setCenter`, `fitView`, `zo
 | `viewportTo(state)`                                | Rename to `setViewport(state)`.                                                                        |
 | `panTo({ x, y })`                                  | `setViewport({ ...flow.viewport(), x, y })`; to center on a flow-space point, `setCenter(point)`.      |
 | `step` input on `vflow-controls`                   | Remove the binding. The buttons zoom by the step of the zoom keys.                                     |
+| `useDefaults` option of the `create*` factories    | Remove it. The factories always create the default signals; write a literal for a bare object.         |
 
 ### DOM compatibility
 

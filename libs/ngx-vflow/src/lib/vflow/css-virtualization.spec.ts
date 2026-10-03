@@ -175,7 +175,7 @@ describe('CSS viewport virtualization', () => {
     fixture.debugElement.injector
       .get(FlowEntitiesService)
       .edges()[0]
-      .curve.set(() => ({ path: 'M 0,0 L 100,0' }));
+      .edge.curve!.set(() => ({ path: 'M 0,0 L 100,0' }));
     await fixture.whenStable();
     expect(label.querySelector('.edge-label-wrapper')).toBeNull();
     subscription.unsubscribe();

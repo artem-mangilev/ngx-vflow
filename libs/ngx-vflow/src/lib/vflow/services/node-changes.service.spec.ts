@@ -31,9 +31,7 @@ describe('NodesChangeService', () => {
   const settle = () => new Promise((resolve) => setTimeout(resolve, 60));
 
   it('reports the mode of each axis with every size change', async () => {
-    const model = TestBed.runInInjectionContext(
-      () => new NodeModel(createNode({ id: '1', point: { x: 0, y: 0 } }, { useDefaults: false })),
-    );
+    const model = TestBed.runInInjectionContext(() => new NodeModel(createNode({ id: '1', point: { x: 0, y: 0 } })));
     const changes: NodeChange[] = [];
     service.changes$.subscribe((c) => changes.push(...c));
     entities.nodes.set([model]);

@@ -21,6 +21,8 @@ import { getSvgPathBounds } from '../utils/svg-path-bounds';
 import { insetPoint, markerInset } from '../utils/marker-inset';
 import { markerUrl } from '../utils/marker-ref';
 import { observeSignal } from '../utils/signals/observe-signal';
+import { entitySnapshot } from '../utils/signals/entity-snapshot';
+import { forwardSignal } from '../utils/signals/forward-signal';
 
 const LABEL_POSITIONS: EdgeLabelPosition[] = ['start', 'center', 'end'];
 
@@ -36,19 +38,25 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
   private readonly flowEntitiesService = inject(FlowEntitiesService);
   private readonly settingsService = inject(FlowSettingsService);
 
+  /**
+   * The application's object as of the last edges array. Optional signals are read through it, so a signal the
+   * application adds to the object later takes effect with the next array.
+   */
+  private raw = entitySnapshot(this.edge, this.flowEntitiesService.edges);
+
   public accessibility = computed(() => {
     const labels = this.settingsService.ariaLabels();
     const endpoints = labels.edgeLabel({
       source: this.source()?.ariaLabel() ?? labels.nodeLabel(this.edge.source),
       target: this.target()?.ariaLabel() ?? labels.nodeLabel(this.edge.target),
     });
-    const label = this.edge.ariaLabel?.().trim() || endpoints;
+    const label = this.raw().ariaLabel?.().trim() || endpoints;
     return {
       label,
       roleDescription: labels.edgeRole,
-      domAttributes: this.edge.domAttributes?.(),
+      domAttributes: this.raw().domAttributes?.(),
       description: [
-        this.edge.ariaDescription?.(),
+        this.raw().ariaDescription?.(),
         label !== endpoints ? `${endpoints}.` : '',
         this.selected() ? labels.selected : '',
         !this.selectable() ? labels.selectionUnavailable : '',
@@ -60,10 +68,12 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
 
   public source = signal<NodeModel | undefined>(undefined);
   public target = signal<NodeModel | undefined>(undefined);
-  public curve = signal<Curve>(EDGE_DEFAULTS.curve);
-  public reconnectable = signal<boolean | 'source' | 'target'>(EDGE_DEFAULTS.reconnectable);
-  public interactionWidth = signal(EDGE_DEFAULTS.interactionWidth);
-  public markers = signal<{ start?: MarkerRef; end?: MarkerRef }>(EDGE_DEFAULTS.markers);
+  public curve = computed<Curve>(() => this.raw().curve?.() ?? EDGE_DEFAULTS.curve);
+  public reconnectable = computed(() => this.raw().reconnectable?.() ?? EDGE_DEFAULTS.reconnectable);
+  public interactionWidth = computed(() => this.raw().interactionWidth?.() ?? EDGE_DEFAULTS.interactionWidth);
+  public markers = computed<{ start?: MarkerRef; end?: MarkerRef }>(
+    () => this.raw().markers?.() ?? EDGE_DEFAULTS.markers,
+  );
   /** Label templates registered by `ng-template[edgeLabel]` inside the presentation of this edge. */
   public labelTemplates = signal<Partial<Record<EdgeLabelPosition, EdgeLabelEntry>>>({});
   public labelEntries = computed(() => {
@@ -81,10 +91,12 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
     () => !!this.settingsService.optimization().virtualization && !this.focused() && !this.inViewport(),
   );
 
-  public selected = signal(EDGE_DEFAULTS.selected);
+  /** Selection of an edge without an application signal. */
+  private ownSelected = signal(EDGE_DEFAULTS.selected);
+  public selected = forwardSignal(() => this.raw().selected ?? this.ownSelected);
   public preselected = signal(false);
-  public selectable = computed(() => this.edge.selectable?.() ?? this.settingsService.edgesSelectable());
-  public focusable = computed(() => this.edge.focusable?.() ?? this.settingsService.edgesFocusable());
+  public selectable = computed(() => this.raw().selectable?.() ?? this.settingsService.edgesSelectable());
+  public focusable = computed(() => this.raw().focusable?.() ?? this.settingsService.edgesFocusable());
 
   public shouldLoad = computed(() => (this.source()?.shouldLoad() ?? false) && (this.target()?.shouldLoad() ?? false));
 
@@ -165,30 +177,12 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
   public context: EdgeContext;
 
   constructor(public edge: Edge) {
-    if (edge.curve) {
-      this.curve = edge.curve;
-    }
-
-    if (edge.reconnectable) {
-      this.reconnectable = edge.reconnectable;
-    }
-
-    if (edge.interactionWidth) {
-      this.interactionWidth = edge.interactionWidth;
-    }
-
-    if (edge.selected) {
-      this.selected = edge.selected;
-    }
-
-    if (edge.markers) {
-      this.markers = edge.markers;
-    }
+    const ownData = signal({});
 
     this.context = {
       $implicit: {
         edge: this.edge,
-        data: this.edge.data ?? signal({}),
+        data: computed(() => (this.raw().data ?? ownData)()),
         path: computed(() => this.path().path),
         markerStart: this.markerStartUrl,
         markerEnd: this.markerEndUrl,

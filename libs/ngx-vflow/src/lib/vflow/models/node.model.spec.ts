@@ -1,11 +1,11 @@
 import { TestBed } from '@angular/core/testing';
 import { NodeModel } from './node.model';
-import { createNode } from '../interfaces/node.interface';
+import { Node, createNode } from '../interfaces/node.interface';
 import { FlowEntitiesService } from '../services/flow-entities.service';
 import { FlowSettingsService } from '../services/flow-settings.service';
 import { NodeRenderingService } from '../services/node-rendering.service';
 import { ViewportService } from '../services/viewport.service';
-import { ChangeDetectionStrategy, Component, provideZonelessChangeDetection } from '@angular/core';
+import { ChangeDetectionStrategy, Component, provideZonelessChangeDetection, signal } from '@angular/core';
 
 @Component({ template: '', changeDetection: ChangeDetectionStrategy.OnPush })
 class ProbeNodeComponent {}
@@ -49,7 +49,7 @@ describe('NodeModel', () => {
 
   describe('size modes', () => {
     const make = (node: Parameters<typeof createNode>[0]) =>
-      TestBed.runInInjectionContext(() => new NodeModel(createNode(node, { useDefaults: false })));
+      TestBed.runInInjectionContext(() => new NodeModel(createNode(node)));
     const modes = (model: NodeModel) => [model.widthMode(), model.heightMode()];
 
     it('is auto on both axes for nodes without application-provided size', () => {
@@ -88,7 +88,7 @@ describe('NodeModel', () => {
 
   describe('rendered size', () => {
     const make = (node: Parameters<typeof createNode>[0]) =>
-      TestBed.runInInjectionContext(() => new NodeModel(createNode(node, { useDefaults: false })));
+      TestBed.runInInjectionContext(() => new NodeModel(createNode(node)));
 
     it('starts from the explicit size and follows it', () => {
       const sized = make({ id: 'a', point: { x: 0, y: 0 }, width: 100, height: 50 });
@@ -110,6 +110,93 @@ describe('NodeModel', () => {
     it('is not aliased to the application signals', () => {
       const sized = make({ id: 'c', point: { x: 0, y: 0 }, width: 100, height: 50 });
       expect(sized.width).not.toBe(sized.rawNode.width!);
+    });
+  });
+
+  describe('signals added to the node object later', () => {
+    const make = (id: string) => {
+      const node: Node = { id, point: signal({ x: 0, y: 0 }) };
+      const model = TestBed.runInInjectionContext(() => new NodeModel(node));
+      entitiesService.nodes.update((nodes) => [...nodes, model]);
+      return { node, model };
+    };
+    const passNewArray = () => entitiesService.nodes.update((nodes) => [...nodes]);
+
+    it('reads a size signal once the application passes a new array, and resizes into it', () => {
+      const { node, model } = make('a');
+      model.setExplicitSize({ width: 300 });
+      expect(model.explicitWidth()).toBe(300);
+
+      node.width = signal(300);
+      passNewArray();
+      node.width.set(500);
+      expect(model.explicitWidth()).toBe(500);
+      expect(model.width()).toBe(500);
+
+      model.setExplicitSize({ width: 400 });
+      expect(node.width()).toBe(400);
+      expect(model.explicitWidth()).toBe(400);
+    });
+
+    it('keeps resizing into the model until the new array arrives', () => {
+      const { node, model } = make('b');
+      expect(model.widthMode()).toBe('auto');
+
+      node.width = signal(300);
+      expect(model.widthMode()).toBe('auto');
+      model.setExplicitSize({ width: 240 });
+      expect(node.width()).toBe(300);
+      expect(model.explicitWidth()).toBe(240);
+
+      passNewArray();
+      expect(model.explicitWidth()).toBe(300);
+    });
+
+    it('selects through the application signal, which wins over the selection held by the model', () => {
+      const { node, model } = make('c');
+      model.selected.set(true);
+      expect(model.selected()).toBeTrue();
+
+      node.selected = signal(false);
+      passNewArray();
+      expect(model.selected()).toBeFalse();
+      expect(model.context.$implicit.selected()).toBeFalse();
+
+      model.selected.set(true);
+      expect(node.selected()).toBeTrue();
+    });
+
+    it('reads the capabilities, the extent and the data', () => {
+      const { node, model } = make('d');
+      expect([model.draggable(), model.extent(), model.selectable(), model.focusable()]).toEqual([
+        true,
+        'parent',
+        true,
+        true,
+      ]);
+      expect(model.context.$implicit.data()).toEqual({});
+
+      node.draggable = signal(false);
+      node.extent = signal(null);
+      node.selectable = signal(false);
+      node.focusable = signal(false);
+      node.data = signal({ title: 'Late' });
+      passNewArray();
+
+      expect([model.draggable(), model.extent(), model.selectable(), model.focusable()]).toEqual([
+        false,
+        null,
+        false,
+        false,
+      ]);
+      expect(model.context.$implicit.data()).toEqual({ title: 'Late' });
+    });
+
+    it('adds no signals to the application object on resize and selection', () => {
+      const { node, model } = make('e');
+      model.setExplicitSize({ width: 240, height: 120 });
+      model.selected.set(true);
+      expect(Object.keys(node)).toEqual(['id', 'point']);
     });
   });
 

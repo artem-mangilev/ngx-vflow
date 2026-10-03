@@ -50,19 +50,16 @@ describe('public graph accessibility', () => {
       { id: 'empty', point: { x: 0, y: 0 }, ariaLabel: '  ' },
       { id: 'custom', point: { x: 250, y: 0 } },
     ]);
-    host.edges = createEdges(
-      [
-        {
-          id: 'route',
-          source: 'empty',
-          target: 'custom',
-          ariaLabel: 'Route',
-          ariaDescription: 'Review route.',
-          domAttributes: { 'data-route': 'sparse' },
-        },
-      ],
-      { useDefaults: false },
-    );
+    host.edges = createEdges([
+      {
+        id: 'route',
+        source: 'empty',
+        target: 'custom',
+        ariaLabel: 'Route',
+        ariaDescription: 'Review route.',
+        domAttributes: { 'data-route': 'sparse' },
+      },
+    ]);
     host.labels.set({ nodeLabel: (id) => `Узел ${id}`, flowLabel: 'Граф' });
     fixture.detectChanges();
     await fixture.whenStable();
@@ -133,10 +130,9 @@ describe('public graph accessibility', () => {
       },
       { id: 'b', point: { x: 350, y: 30 }, ariaLabel: 'Approval' },
     ]);
-    host.edges = createEdges(
-      [{ id: 'ab', source: 'a', target: 'b', ariaLabel: 'Approve', ariaDescription: 'Review route.' }],
-      { useDefaults: false },
-    );
+    host.edges = createEdges([
+      { id: 'ab', source: 'a', target: 'b', ariaLabel: 'Approve', ariaDescription: 'Review route.' },
+    ]);
     fixture.detectChanges();
     await fixture.whenStable();
     const root: HTMLElement = fixture.nativeElement;

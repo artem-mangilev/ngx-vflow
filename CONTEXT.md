@@ -57,7 +57,7 @@ A capability supplied as a core feature by a competing node-based UI engine but 
 _Avoid_: Ecosystem difference, missing example
 
 **Application-owned state**:
-The authoritative graph state supplied and retained by the application. ngx-vflow may update the application's writable signals for interactive properties, but it does not maintain a separate authoritative graph store.
+The authoritative graph state supplied and retained by the application. ngx-vflow may update the application's writable signals for interactive properties, but it does not maintain a separate authoritative graph store and never adds signals to the application's objects. An interactive property without an application signal is held by the flow and reported through change notifications.
 _Avoid_: Internal graph store, uncontrolled flow
 
 **Structural graph change**:
