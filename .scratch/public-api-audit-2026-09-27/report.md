@@ -289,7 +289,7 @@ JSDoc: «the transparent stroke the flow draws» ([edge.interface.ts:34-40](../.
 | 05  | [Соединения без подписки на output](issues/05-connection-controller-host-directive.md) | P1        | resolved        | —          |
 | 06  | [Dev-предупреждения для тихих поломок](issues/06-silent-headless-failures.md)          | P1        | resolved        | —          |
 | 07  | [Каналы уведомлений об изменениях](issues/07-change-channels.md)                       | P1        | resolved        | —          |
-| 08  | [Публичный баррель](issues/08-public-barrel-cleanup.md)                                | P1        | needs-triage    | —          |
+| 08  | [Публичный баррель](issues/08-public-barrel-cleanup.md)                                | P1        | resolved        | —          |
 | 09  | [Префиксы селекторов и классов](issues/09-selector-and-class-prefixes.md)              | P1        | needs-triage    | 05, 08     |
 | 10  | [`<mini-map>` снимает регистрацию](issues/10-minimap-unregister.md)                    | P1        | ready-for-agent | —          |
 | 11  | [Документация: расхождения](issues/11-docs-drift.md)                                   | P1        | ready-for-agent | —          |

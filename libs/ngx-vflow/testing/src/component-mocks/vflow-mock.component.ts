@@ -35,7 +35,7 @@ import {
   VflowComponent,
   IntersectingNodesOptions,
   ɵConnectionModel as ConnectionModel,
-  DEFAULT_OPTIMIZATION,
+  Optimization,
   AlignmentHelperSettings,
   SelectionMode,
   SelectionBoxSettings,
@@ -136,7 +136,11 @@ export class VflowMockComponent implements AsInterface<VflowComponent>, OnInit {
   public readonly background: Background | null = null;
 
   @Input()
-  public readonly optimization = DEFAULT_OPTIMIZATION;
+  public readonly optimization: Optimization = {
+    detachedGroupsLayer: false,
+    virtualization: false,
+    lazyLoadTrigger: 'immediate',
+  };
 
   @Input()
   public readonly nodesSelectable = true;

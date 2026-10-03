@@ -13,7 +13,7 @@ import { Node } from './node.interface';
 
 export interface ConnectStartEvent {
   node: Node;
-  handle: Handle;
+  handle: ConnectionEventHandle;
 }
 
 export interface ConnectEndEvent {
@@ -23,21 +23,21 @@ export interface ConnectEndEvent {
    */
   from: {
     node: Node;
-    handle: Handle;
+    handle: ConnectionEventHandle;
   };
   /**
    * The side where the connection ended to
    */
   to: {
     node: Node | null;
-    handle: Handle | null;
+    handle: ConnectionEventHandle | null;
   };
 }
 
 export interface ReconnectStartEvent {
   edge: Edge;
   node: Node;
-  handle: Handle;
+  handle: ConnectionEventHandle;
 }
 
 export interface ReconnectEvent {
@@ -53,18 +53,19 @@ export interface ReconnectEndEvent {
    */
   from: {
     node: Node;
-    handle: Handle;
+    handle: ConnectionEventHandle;
   };
   /**
    * The side where the edge was reconnected to
    */
   to: {
     node: Node | null;
-    handle: Handle | null;
+    handle: ConnectionEventHandle | null;
   };
 }
 
-interface Handle {
+/** A handle as the connection events describe it. */
+export interface ConnectionEventHandle {
   id?: string;
   type: HandleType;
   position: HandlePosition;

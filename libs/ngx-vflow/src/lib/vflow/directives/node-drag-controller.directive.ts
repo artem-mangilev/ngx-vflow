@@ -4,16 +4,8 @@ import { filter, map } from 'rxjs/operators';
 import { Node } from '../interfaces/node.interface';
 import { outputFromObservable } from '@angular/core/rxjs-interop';
 
-export interface NodeDragStartEvent {
-  // TODO: expose DOM event?
-  node: Node;
-}
-
 export interface NodeDragEvent {
-  node: Node;
-}
-
-export interface NodeDragEndEvent {
+  // TODO: expose DOM event?
   node: Node;
 }
 
@@ -24,7 +16,7 @@ export class NodeDragControllerDirective {
   readonly nodeDragStart = outputFromObservable(
     this.statusService.status$.pipe(
       filter((status) => status.state === 'node-drag-start'),
-      map((status) => ({ node: status.payload.node.rawNode }) as NodeDragStartEvent),
+      map((status) => ({ node: status.payload.node.rawNode }) as NodeDragEvent),
     ),
   );
 
@@ -38,7 +30,7 @@ export class NodeDragControllerDirective {
   readonly nodeDragEnd = outputFromObservable(
     this.statusService.status$.pipe(
       filter((status) => status.state === 'node-drag-end'),
-      map((status) => ({ node: status.payload.node.rawNode }) as NodeDragEndEvent),
+      map((status) => ({ node: status.payload.node.rawNode }) as NodeDragEvent),
     ),
   );
 }

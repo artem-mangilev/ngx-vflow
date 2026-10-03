@@ -7,10 +7,7 @@ import { outputFromObservable } from '@angular/core/rxjs-interop';
  * The changes of one type as separate outputs. `(nodesChanges)` and `(edgesChanges)` with every type belong to the
  * flow component itself.
  */
-@Directive({
-  selector: '[changesController]',
-  standalone: true,
-})
+@Directive()
 export class ChangesControllerDirective {
   protected nodesChangeService = inject(NodesChangeService);
   protected edgesChangeService = inject(EdgeChangesService);

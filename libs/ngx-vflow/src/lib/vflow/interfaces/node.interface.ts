@@ -49,10 +49,6 @@ export interface Node<T = any> {
   domAttributes?: WritableSignal<DomAttributes>;
 }
 
-export function isComponentNode<T>(node: Node<T>): boolean {
-  return node.component !== undefined;
-}
-
 export type StaticNode<T = unknown> = UnwrapSignal<Node<T>>;
 
 /** Properties that stay optional even with defaults; `width`/`height` decide the size mode. */

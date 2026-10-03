@@ -1,6 +1,6 @@
 # 08. Публичный баррель: убрать внутреннее, добавить недостающее
 
-Status: needs-triage
+Status: resolved
 Type: task
 Priority: P1 (до 3.0)
 Blocked by: —
@@ -35,3 +35,18 @@ Blocked by: —
 - `nx build ngx-vflow` (включая `ngx-vflow/testing`).
 - Поиск удалённых имён по `apps` и `libs`.
 - Migration guide: раздел Removed APIs.
+
+## Answer
+
+Решения (2026-10-03): `NodeResizeControlComponent` — внутренний; `isComponentNode` убран; все константы с дефолтами внутренние; тип handle — `ConnectionEventHandle`.
+
+- **Host-директивы.** `ChangesControllerDirective` и `NodeDragControllerDirective` убрать из `public-api.ts` нельзя: компилятор требует host directive в entry point (NG3001). Экспорт остался под `ɵChangesControllerDirective` и `ɵNodeDragControllerDirective`, как у `ɵConnectionControllerDirective` в тикете 05. Селектор `[changesController]` удалён.
+- **События drag.** Один `NodeDragEvent`; `NodeDragStartEvent` и `NodeDragEndEvent` удалены.
+- **Resizer.** `NodeResizeControlComponent` и `CoordinateExtent`, `NodeOrigin`, `ControlPosition`, `ControlLinePosition`, `ResizeControlVariant`, `RESIZER_HANDLE_POSITIONS`, `RESIZER_LINE_POSITIONS`, `OnResizeStart`, `OnResize`, `OnResizeEnd` больше не экспортируются. Публичными остались `ResizeParams`, `ResizeParamsWithDirection`, `ResizeControlDirection`, `ResizeDragEvent`, `ShouldResize`. Сам код resizer'а не менялся, `enum` остался внутри.
+- **Константы.** Не экспортируются `NODE_DEFAULTS`, `EDGE_DEFAULTS`, `MARKER_DEFAULT_TYPE`, а также `DEFAULT_OPTIMIZATION` и `DEFAULT_ARIA_LABEL_CONFIG` (в тикете их не было). `VflowMockComponent.optimization` — литерал с типом `Optimization` вместо `Required<Optimization>`, как у input'а настоящего компонента.
+- **`isComponentNode`** удалён из кода.
+- **Добавлено:** `ConnectionForValidation`, `NodeContext`, `EdgeContext`, `ConnectionContext`, `ConnectionEventHandle` (бывший неэкспортированный `interface Handle`). По собранному `index.d.ts` других неэкспортированных типов в пользовательских сигнатурах нет.
+- **Баррель.** Файлы с внутренними именами экспортируются поимённо вместо `export *`; двойной экспорт `connection.interface` убран; `gesture-exclusions` и `auto-pan-settings` перенесены из секции `Internals`.
+- **Migration guide.** Четыре строки в «Removed APIs» (в v2 существовали только host-директивы, `NodeDragStartEvent`/`NodeDragEndEvent`, `isComponentNode`, `NODE_DEFAULTS`/`EDGE_DEFAULTS`/`DEFAULT_OPTIMIZATION`); убраны «`isComponentNode` stays» и упоминание resize control callbacks.
+- **Проверки:** `nx build ngx-vflow` (с `ngx-vflow/testing`), `nx build ui`, `nx build docs`, lint `ngx-vflow` и `ui` — проходят. `nx test ngx-vflow`: 410 из 410 в двух прогонах из трёх; в одном упал `stacking-context.spec.ts` — известный order-flaky spec, к баррелю не относится. Specs `ngx-vflow/testing` не запускались (тикет 16).
+- **Следствия для других тикетов:** `[nodeResizeControl]` выпадает из тикета 09; мок для него в тикете 17 не нужен.

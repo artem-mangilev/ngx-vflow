@@ -119,7 +119,7 @@ The optional `parentId` field may still be omitted from `Node` and `StaticNode`.
 | `type: 'template-group'`                                                    | Remove the field, keep `width` and `height`; mark the group in `data` if its presentation differs |
 | `type: YourNodeComponent` or a lazy import function                         | `component: YourNodeComponent` or the same function                                               |
 | `HtmlTemplateNode`, `TemplateGroupNode`, `ComponentNode`                    | `Node`                                                                                            |
-| `isTemplateNode`, `isTemplateGroupNode`                                     | Check `component` or your own `data`; `isComponentNode` stays                                     |
+| `isTemplateNode`, `isTemplateGroupNode`                                     | Check `component` or your own `data`                                                              |
 | `<ng-template nodeHtml>`, `NodeHtmlTemplateDirective`                       | `<ng-template node>`, `NodeTemplateDirective`                                                     |
 | `<ng-template groupNode>`, `GroupNodeTemplateDirective`, `GroupNodeContext` | A branch of the `node` template; every node context has `width` and `height`                      |
 
@@ -415,7 +415,7 @@ The alignment helper snaps while the node is dragged instead of moving it once t
 ngx-vflow no longer depends on `d3-zoom`, `d3-drag` and `d3-selection`. Pan, zoom, node dragging, resizing, connections and the selection box run on Pointer Events with the same settings, formulas and animations as before.
 
 - Remove `d3-zoom`, `d3-drag`, `d3-selection` and their `@types` packages from your dependencies unless your application uses them itself.
-- Resize callbacks (`shouldResize` and the resize control callbacks) receive `ResizeDragEvent`, now `{ sourceEvent: PointerEvent }` instead of a d3 drag event.
+- The `shouldResize` callback receives `ResizeDragEvent`, now `{ sourceEvent: PointerEvent }` instead of a d3 drag event.
 - Tests that dispatch synthetic mouse or touch events to pan, drag, resize, connect or draw a selection box must dispatch `pointerdown`, `pointermove` and `pointerup` with `pointerId` and `pointerType`. Moves and the release may target `window` or `document`. Handles react to `pointerenter` and `pointerleave`. Wheel and `dblclick` events are unchanged.
 - A press that starts a library gesture does not propagate to ancestors, neither as `pointerdown` nor as its compatibility `mousedown` or `touchstart`.
 - The pane and draggable nodes set CSS `touch-action`; see [Viewport gestures](../../interactions/viewport-gestures) for how touch scrolling follows the settings.
@@ -453,24 +453,28 @@ A flow that relied on a missing handler to keep its handles inert sets `[canStar
 
 ### Removed APIs
 
-| Removed in v3                                      | Migration                                                                                              |
-| -------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| Node type `svg-template`                           | Remove `type` and provide native HTML through `<ng-template node>`.                                    |
-| `NodeSvgTemplateDirective` and `nodeSvgTemplate`   | Remove these imports/usages and use `NodeTemplateDirective` / `node`.                                  |
-| `scaleOnHover` input on `MiniMapComponent`         | Remove the input binding. The minimap remains at its default scale and does not capture pointer input. |
-| `documentPointToFlowPoint()`                       | Rename to `clientToFlowPosition()`. Use `flowToClientPosition()` for the inverse conversion.           |
-| `{ spaces: true }`, `SpacePoint`, `getSpacePoints` | Convert with `clientToFlowPosition()`, then call `getNodesAtPoint()` on the flow component.            |
-| VflowComponent.toNodeSpace()                       | Use the pure `getNodePositionInSpace()` utility.                                                       |
-| getIntesectingNodes()                              | Rename to `getIntersectingNodes()`.                                                                    |
-| `viewportTo(state)`                                | Rename to `setViewport(state)`.                                                                        |
-| `panTo({ x, y })`                                  | `setViewport({ ...flow.viewport(), x, y })`; to center on a flow-space point, `setCenter(point)`.      |
-| `step` input on `vflow-controls`                   | Remove the binding. The buttons zoom by the step of the zoom keys.                                     |
-| `useDefaults` option of the `create*` factories    | Remove it. The factories always create the default signals; write a literal for a bare object.         |
-| `ConnectionControllerDirective` and its mock       | Remove the imports. The connection outputs belong to `vflow` and `VflowMockComponent`.                 |
-| `nodesChange$` and `edgesChange$`                  | `flow.nodesChanges.subscribe(...)` and `flow.edgesChanges.subscribe(...)`, or `outputToObservable()`.  |
-| `nodesChange` and `edgesChange` signals            | Subscribe to the `nodesChanges` and `edgesChanges` outputs. A signal kept only the last array.         |
-| `viewportChange$`                                  | Read the `viewport` signal, or `toObservable(flow.viewport)` with `skip(1)` to drop the current value. |
-| `initialized$`                                     | Read the `initialized` signal, or `toObservable(flow.initialized)`.                                    |
+| Removed in v3                                               | Migration                                                                                                          |
+| ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| Node type `svg-template`                                    | Remove `type` and provide native HTML through `<ng-template node>`.                                                |
+| `NodeSvgTemplateDirective` and `nodeSvgTemplate`            | Remove these imports/usages and use `NodeTemplateDirective` / `node`.                                              |
+| `scaleOnHover` input on `MiniMapComponent`                  | Remove the input binding. The minimap remains at its default scale and does not capture pointer input.             |
+| `documentPointToFlowPoint()`                                | Rename to `clientToFlowPosition()`. Use `flowToClientPosition()` for the inverse conversion.                       |
+| `{ spaces: true }`, `SpacePoint`, `getSpacePoints`          | Convert with `clientToFlowPosition()`, then call `getNodesAtPoint()` on the flow component.                        |
+| VflowComponent.toNodeSpace()                                | Use the pure `getNodePositionInSpace()` utility.                                                                   |
+| getIntesectingNodes()                                       | Rename to `getIntersectingNodes()`.                                                                                |
+| `viewportTo(state)`                                         | Rename to `setViewport(state)`.                                                                                    |
+| `panTo({ x, y })`                                           | `setViewport({ ...flow.viewport(), x, y })`; to center on a flow-space point, `setCenter(point)`.                  |
+| `step` input on `vflow-controls`                            | Remove the binding. The buttons zoom by the step of the zoom keys.                                                 |
+| `useDefaults` option of the `create*` factories             | Remove it. The factories always create the default signals; write a literal for a bare object.                     |
+| `ConnectionControllerDirective` and its mock                | Remove the imports. The connection outputs belong to `vflow` and `VflowMockComponent`.                             |
+| `nodesChange$` and `edgesChange$`                           | `flow.nodesChanges.subscribe(...)` and `flow.edgesChanges.subscribe(...)`, or `outputToObservable()`.              |
+| `nodesChange` and `edgesChange` signals                     | Subscribe to the `nodesChanges` and `edgesChanges` outputs. A signal kept only the last array.                     |
+| `viewportChange$`                                           | Read the `viewport` signal, or `toObservable(flow.viewport)` with `skip(1)` to drop the current value.             |
+| `initialized$`                                              | Read the `initialized` signal, or `toObservable(flow.initialized)`.                                                |
+| `ChangesControllerDirective`, `NodeDragControllerDirective` | Remove the imports. They are host directives of `vflow`; their outputs are bound on `<vflow>`.                     |
+| `NodeDragStartEvent`, `NodeDragEndEvent`                    | Use `NodeDragEvent`: the three node drag outputs emit the same `{ node }`.                                         |
+| `isComponentNode()`                                         | Check the `component` field of the node.                                                                           |
+| `NODE_DEFAULTS`, `EDGE_DEFAULTS`, `DEFAULT_OPTIMIZATION`    | Remove the imports. Omitted fields and settings keep their defaults; write a literal where the code needs a value. |
 
 ### DOM compatibility
 

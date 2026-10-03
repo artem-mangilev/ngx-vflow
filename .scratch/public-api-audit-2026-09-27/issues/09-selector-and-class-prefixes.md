@@ -12,7 +12,7 @@ Blocked by: 05, 08
 **Селекторы:**
 
 - с префиксом: `vflow`, `[vflowHandle]`, `[vflowNoDrag|NoPan|NoWheel|NoKeyboard]`;
-- без префикса: `[selectable]`, `[dragHandle]`, `g[edgeInteraction]`, `[resizable]`, `[nodeResizeControl]`, `mini-map`, `node-toolbar`, `ng-template[node|edge|connection|marker|edgeLabel]`.
+- без префикса: `[selectable]`, `[dragHandle]`, `g[edgeInteraction]`, `[resizable]`, `mini-map`, `node-toolbar`, `ng-template[node|edge|connection|marker|edgeLabel]`.
 
 **Классы:**
 
