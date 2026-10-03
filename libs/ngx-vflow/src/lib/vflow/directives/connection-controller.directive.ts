@@ -27,10 +27,7 @@ import {
   reconnectStartEventFromReconnectionStartStatus,
 } from '../interfaces/connection-events.interface';
 
-@Directive({
-  selector: '[connectStart], [connect], [connectEnd], [reconnectStart], [reconnect], [reconnectEnd]',
-  standalone: true,
-})
+@Directive()
 export class ConnectionControllerDirective {
   private settings = inject(FlowSettingsService);
   private destroyRef = inject(DestroyRef);

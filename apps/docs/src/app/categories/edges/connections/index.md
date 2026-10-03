@@ -4,6 +4,8 @@ Edges are not created automatically. To create a new edge, follow these steps:
 2. This handler accepts a `Connection` argument. `Connection` is similar to an `Edge`, but it doesn't exist in the flow yet—you need to "convert" it into a new `Edge`
 3. Give the edge an ID and pass it to `addEdges` with the application-owned collections
 
+The connection gesture does not depend on the handler: a handle starts a connection whether or not `(connect)` or any other connection output is bound, and without a handler the gesture ends with no new edge. To stop a handle from starting or accepting connections, set its `canStart` or `canAccept` input to `false`.
+
 ## Typed handles
 
 Edges run from a `source` handle to a `target` handle: a connection dragged the other way round is reversed, and two handles of the same type do not connect.

@@ -3,7 +3,6 @@ import { MiniMapMockComponent } from './component-mocks/minimap-mock.component';
 import { NodeToolbarMockComponent } from './component-mocks/node-toolbar-mock.component';
 import { ResizableMockComponent } from './component-mocks/resizable-mock.component';
 import { VflowMockComponent } from './component-mocks/vflow-mock.component';
-import { ConnectionControllerMockDirective } from './directive-mocks/connection-controller-mock.directive';
 import { DragHandleMockDirective } from './directive-mocks/drag-handle-mock.directive';
 import { SelectableMockDirective } from './directive-mocks/selectable-mock.directive';
 import { EdgeInteractionMockDirective } from './directive-mocks/edge-interaction-mock.directive';
@@ -24,7 +23,6 @@ export const VflowMocks = [
   MiniMapMockComponent,
   NodeToolbarMockComponent,
   DragHandleMockDirective,
-  ConnectionControllerMockDirective,
 
   NodeTemplateMockDirective,
   EdgeLabelTemplateMockDirective,

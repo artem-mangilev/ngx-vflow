@@ -44,7 +44,7 @@ export class VflowHandleDirective {
   private readonly element = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
   private readonly handleService = inject(HandleService);
   private readonly flowStatus = inject(FlowStatusService);
-  private readonly connectionController = inject(ConnectionControllerDirective, { optional: true });
+  private readonly connectionController = inject(ConnectionControllerDirective);
 
   /** `source`, `target`, or `any` for both directions. */
   public readonly handleType = input<HandleType>('source');
@@ -117,20 +117,20 @@ export class VflowHandleDirective {
     const { dragHandle } = pressTarget(event.target);
     if (dragHandle && this.element.contains(dragHandle)) return;
 
-    this.connectionController?.startConnection(this.model, event);
+    this.connectionController.startConnection(this.model, event);
   }
 
   protected endConnection() {
-    this.connectionController?.endConnection();
+    this.connectionController.endConnection();
   }
 
   /** The element is a drop zone of the connection in progress, in addition to the magnet around its point. */
   protected pointerEnter() {
-    if (this.flowStatus.connectionActive()) this.connectionController?.validateConnection(this.model);
+    if (this.flowStatus.connectionActive()) this.connectionController.validateConnection(this.model);
   }
 
   protected pointerLeave() {
-    if (this.flowStatus.connectionActive()) this.connectionController?.resetValidateConnection(this.model);
+    if (this.flowStatus.connectionActive()) this.connectionController.resetValidateConnection(this.model);
   }
 
   private requireNode() {

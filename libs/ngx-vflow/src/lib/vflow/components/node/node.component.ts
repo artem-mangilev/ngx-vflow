@@ -73,7 +73,7 @@ export class NodeComponent implements OnInit, OnDestroy {
   private hostRef = inject<ElementRef<HTMLElement>>(ElementRef);
   private nodeAccessor = inject(NodeAccessorService);
   private componentEventBus = inject(ComponentEventBusService);
-  private connectionController = inject(ConnectionControllerDirective, { optional: true });
+  private connectionController = inject(ConnectionControllerDirective);
 
   /** Every handle of every node gets a magnet while any connection is in progress. */
   protected readonly connectionActive = this.flowStatusService.connectionActive.asReadonly();
@@ -172,15 +172,15 @@ export class NodeComponent implements OnInit, OnDestroy {
   }
 
   protected endConnection() {
-    this.connectionController?.endConnection();
+    this.connectionController.endConnection();
   }
 
   protected validateConnection(handle: HandleModel) {
-    this.connectionController?.validateConnection(handle);
+    this.connectionController.validateConnection(handle);
   }
 
   protected resetValidateConnection(handle: HandleModel) {
-    this.connectionController?.resetValidateConnection(handle);
+    this.connectionController.resetValidateConnection(handle);
   }
 
   protected pullNode() {

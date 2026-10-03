@@ -46,6 +46,7 @@ import { NodesChangeService } from '../../services/node-changes.service';
 import { EdgeChangesService } from '../../services/edge-changes.service';
 import { NodeChange } from '../../types/node-change.type';
 import { ChangesControllerDirective } from '../../directives/changes-controller.directive';
+import { ConnectionControllerDirective } from '../../directives/connection-controller.directive';
 import { EdgeChange } from '../../types/edge-change.type';
 import { NodeRenderingService } from '../../services/node-rendering.service';
 import { SelectionService } from '../../services/selection.service';
@@ -123,6 +124,11 @@ const nodeDragControllerHostDirective = {
   outputs: ['nodeDragStart', 'nodeDrag', 'nodeDragEnd'],
 };
 
+const connectionControllerHostDirective = {
+  directive: ConnectionControllerDirective,
+  outputs: ['connectStart', 'connect', 'connectEnd', 'reconnectStart', 'reconnect', 'reconnectEnd'],
+};
+
 @Component({
   selector: 'vflow',
   templateUrl: './vflow.component.html',
@@ -152,7 +158,12 @@ const nodeDragControllerHostDirective = {
     AfterRenderBatchService,
     AlignmentService,
   ],
-  hostDirectives: [changesControllerHostDirective, nodeDragControllerHostDirective, ViewportCullingDirective],
+  hostDirectives: [
+    changesControllerHostDirective,
+    nodeDragControllerHostDirective,
+    connectionControllerHostDirective,
+    ViewportCullingDirective,
+  ],
   host: {
     // Lets scaled application content keep screen-sized details. The token is inherited by every element of the
     // flow, so a change recomputes the style of all of them: it follows the zoom once per gesture, not per frame.

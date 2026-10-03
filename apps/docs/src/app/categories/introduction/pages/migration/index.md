@@ -435,6 +435,14 @@ The programmatic viewport methods are `setViewport`, `setCenter`, `fitView`, `zo
 - The methods apply at once and in order, each from where the previous call leads. Consecutive calls such as `fitView()` followed by `zoomTo(1)` compose instead of the last one replacing the others.
 - `vflow-controls` zooms through `zoomIn()` and `zoomOut()`; its `step` input is removed.
 
+### Connections without a subscription
+
+`vflow` now always handles the connection gesture. In v2 a handle started a connection only when `<vflow>` bound at least one of `(connectStart)`, `(connect)`, `(connectEnd)`, `(reconnectStart)`, `(reconnect)` or `(reconnectEnd)`, and only when the `Vflow` array was imported rather than `VflowComponent` alone. In v3 these six are outputs of `vflow` itself and the gesture works with none of them bound: without a `(connect)` handler it ends with no new edge.
+
+A flow that relied on a missing handler to keep its handles inert sets `[canStart]="false"` and `[canAccept]="false"` on them instead.
+
+`ConnectionControllerDirective` is no longer a public export or part of the `Vflow` array. In `ngx-vflow/testing`, `ConnectionControllerMockDirective` is removed and `VflowMockComponent` declares the six outputs.
+
 ### Removed APIs
 
 | Removed in v3                                      | Migration                                                                                              |
@@ -450,6 +458,7 @@ The programmatic viewport methods are `setViewport`, `setCenter`, `fitView`, `zo
 | `panTo({ x, y })`                                  | `setViewport({ ...flow.viewport(), x, y })`; to center on a flow-space point, `setCenter(point)`.      |
 | `step` input on `vflow-controls`                   | Remove the binding. The buttons zoom by the step of the zoom keys.                                     |
 | `useDefaults` option of the `create*` factories    | Remove it. The factories always create the default signals; write a literal for a bare object.         |
+| `ConnectionControllerDirective` and its mock       | Remove the imports. The connection outputs belong to `vflow` and `VflowMockComponent`.                 |
 
 ### DOM compatibility
 

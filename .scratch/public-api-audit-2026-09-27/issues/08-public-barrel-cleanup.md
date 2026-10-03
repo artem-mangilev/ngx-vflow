@@ -22,7 +22,7 @@ Blocked by: —
 - **Константы:** `NODE_DEFAULTS` (`width: 100, height: 50` с 3.0 к данным не применяются), `EDGE_DEFAULTS`, `MARKER_DEFAULT_TYPE` — внутренние.
 - **`isComponentNode`** — однострочник без пары для рёбер.
 - **Двойной `export * from connection.interface`** (`public-api.ts:20-21`).
-- **`ConnectionControllerDirective`** — по решению тикета 05.
+- ~~**`ConnectionControllerDirective`**~~ — убрана в тикете 05 (2026-10-03).
 
 ## Добавить
 

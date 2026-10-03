@@ -54,7 +54,7 @@ export class EdgeComponent {
   private flowStatusService = inject(FlowStatusService);
 
   // TODO remove dependency from this directive
-  private connectionController = inject(ConnectionControllerDirective, { optional: true });
+  private connectionController = inject(ConnectionControllerDirective);
 
   public model = input.required<EdgeModel>();
 
@@ -104,6 +104,6 @@ export class EdgeComponent {
     // The press belongs to the reconnection, not to a pan of the pane.
     event.stopPropagation();
 
-    this.connectionController?.startReconnection(handle, this.model(), event);
+    this.connectionController.startReconnection(handle, this.model(), event);
   }
 }

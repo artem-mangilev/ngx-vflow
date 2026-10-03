@@ -62,7 +62,6 @@ export * from './lib/vflow/public-components/node-toolbar/node-toolbar.component
 // Directives
 export * from './lib/vflow/directives/template.directive';
 export * from './lib/vflow/directives/handle.directive';
-export * from './lib/vflow/directives/connection-controller.directive';
 export * from './lib/vflow/directives/changes-controller.directive';
 export * from './lib/vflow/directives/selectable.directive';
 export * from './lib/vflow/directives/edge-interaction.directive';
@@ -85,6 +84,9 @@ export { SelectionService as ɵSelectionService } from './lib/vflow/services/sel
 export { NodeRenderingService as ɵNodeRenderingService } from './lib/vflow/services/node-rendering.service';
 
 export { RootPointerDirective as ɵRootPointerDirective } from './lib/vflow/directives/root-pointer.directive';
+// Host directives of `vflow`: the compiler requires them in the entry point.
+export { ConnectionControllerDirective as ɵConnectionControllerDirective } from './lib/vflow/directives/connection-controller.directive';
+export { ViewportCullingDirective as ɵViewportCullingDirective } from './lib/vflow/directives/viewport-culling.directive';
 export { SpacePointContextDirective as ɵSpacePointContextDirective } from './lib/vflow/directives/space-point-context.directive';
 
 export * from './lib/vflow/directives/gesture-exclusions.directive';

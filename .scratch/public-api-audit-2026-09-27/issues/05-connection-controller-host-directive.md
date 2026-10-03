@@ -1,6 +1,6 @@
 # 05. Соединения не зависят от подписки на output
 
-Status: needs-triage
+Status: resolved
 Type: task
 Priority: P1 (до 3.0)
 Blocked by: —
@@ -38,3 +38,12 @@ Blocked by: —
   - flow без подписок на connection-outputs: жест от handle к handle рисует линию и завершается;
   - при подписке только на `(connectEnd)` событие приходит;
   - если выбран `[nodesConnectable]="false"`, жест не начинается.
+
+## Answer
+
+- `ConnectionControllerDirective` — host directive `vflow`, все шесть outputs проброшены; селектора у директивы больше нет.
+- `[nodesConnectable]` не вводится: соединения выключают `canStart`/`canAccept` на handle.
+- Директива убрана из массива `Vflow`; optional-инжекты в handle, node и edge стали обязательными.
+- Полностью убрать её из `public-api.ts` нельзя: компилятор требует host directive в entry point (NG3001). Экспорт остался под внутренним именем `ɵConnectionControllerDirective`. Так же экспортирован `ɵViewportCullingDirective` — без него `nx build ngx-vflow` падал ещё до этого тикета.
+- `ConnectionControllerMockDirective` удалён, шесть outputs объявлены в `VflowMockComponent`.
+- spec в `directives/handle.directive.spec.ts`: жест без подписок рисует линию и завершается; подписка только на `(connectEnd)` получает событие.

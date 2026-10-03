@@ -16,7 +16,6 @@ import {
   MarkerTemplateDirective,
   NodeTemplateDirective,
 } from './directives/template.directive';
-import { ConnectionControllerDirective } from './directives/connection-controller.directive';
 
 import { MiniMapComponent } from './public-components/minimap/minimap.component';
 import { NodeToolbarComponent } from './public-components/node-toolbar/node-toolbar.component';
@@ -36,7 +35,6 @@ export const Vflow = [
   MiniMapComponent,
   NodeToolbarComponent,
   DragHandleDirective,
-  ConnectionControllerDirective,
 
   NodeTemplateDirective,
   EdgeLabelTemplateDirective,

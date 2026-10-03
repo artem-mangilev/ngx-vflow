@@ -33,6 +33,12 @@ import {
   AutoPanSettings,
   AriaLabelConfig,
   DeleteRequest,
+  Connection,
+  ConnectStartEvent,
+  ConnectEndEvent,
+  ReconnectStartEvent,
+  ReconnectEvent,
+  ReconnectEndEvent,
   Rect,
   getNodePositionInSpace,
 } from 'ngx-vflow';
@@ -184,6 +190,13 @@ export class VflowMockComponent implements AsInterface<VflowComponent>, OnInit {
   public readonly componentEdgeEvent = output<any>();
 
   public readonly deleteRequest = output<DeleteRequest>();
+
+  public readonly connectStart = output<ConnectStartEvent>();
+  public readonly connect = output<Connection>();
+  public readonly connectEnd = output<ConnectEndEvent>();
+  public readonly reconnectStart = output<ReconnectStartEvent>();
+  public readonly reconnect = output<ReconnectEvent>();
+  public readonly reconnectEnd = output<ReconnectEndEvent>();
 
   protected nodeTemplateDirective = contentChild(NodeTemplateMockDirective);
 
