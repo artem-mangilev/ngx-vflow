@@ -68,7 +68,7 @@ describe('Flow defs', () => {
   }
 
   beforeEach(async () => {
-    warn = vi.spyOn(console, 'warn');
+    warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     fixture = TestBed.createComponent(HostComponent);
     root = fixture.nativeElement;
     await settle();

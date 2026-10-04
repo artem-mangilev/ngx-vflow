@@ -48,9 +48,9 @@ describe('minimap navigation through the public viewport API', () => {
     flow = host.flow();
     canvas = fixture.nativeElement.querySelector('canvas');
     // Synthetic pointer events cannot acquire native capture; real capture is covered by Playwright.
-    vi.spyOn(canvas, 'setPointerCapture');
+    vi.spyOn(canvas, 'setPointerCapture').mockImplementation(() => {});
     vi.spyOn(canvas, 'hasPointerCapture').mockReturnValue(true);
-    vi.spyOn(canvas, 'releasePointerCapture');
+    vi.spyOn(canvas, 'releasePointerCapture').mockImplementation(() => {});
   });
 
   afterEach(() => window.dispatchEvent(new Event('blur')));
@@ -225,13 +225,13 @@ describe('minimap navigation through the public viewport API', () => {
     expect(fixture.nativeElement.querySelector('.v-minimap')).toBeNull();
     expect(fixture.nativeElement.querySelector('canvas')).toBeNull();
     // The detached canvas no longer owns wheel input.
-    expect((await wheel()).defaultPrevented).toBeFalse();
+    expect((await wheel()).defaultPrevented).toBe(false);
     expect(flow.viewport()).toEqual({ x: 0, y: 0, zoom: 1 });
     host.show.set(true);
     await settle();
     canvas = fixture.nativeElement.querySelector('.v-minimap canvas');
     expect(canvas).not.toBeNull();
-    spyOn(canvas, 'setPointerCapture');
+    vi.spyOn(canvas, 'setPointerCapture').mockImplementation(() => {});
     await click();
     expect(flow.viewport()).toEqual({ x: -10200, y: 4950, zoom: 1 });
     await wheel();
@@ -264,7 +264,6 @@ class WrappedMinimapHostComponent {
 
 describe('minimap projection', () => {
   async function render(projectAs: boolean) {
-    TestBed.configureTestingModule({ providers: [provideZonelessChangeDetection()] });
     const fixture = TestBed.createComponent(WrappedMinimapHostComponent);
     fixture.componentInstance.projectAs.set(projectAs);
     fixture.detectChanges();
@@ -273,16 +272,16 @@ describe('minimap projection', () => {
   }
 
   it('warns in dev mode when a wrapper hides the minimap from the flow slot', async () => {
-    const warn = spyOn(console, 'warn');
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const root = await render(false);
     expect(root.querySelector('.v-root canvas')).toBeNull();
-    expect(warn).toHaveBeenCalledWith(jasmine.stringContaining('ngProjectAs="v-minimap"'));
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('ngProjectAs="v-minimap"'));
   });
 
   it('renders a wrapper marked with ngProjectAs without a warning', async () => {
-    const warn = spyOn(console, 'warn');
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const root = await render(true);
     expect(root.querySelector('.v-root .v-minimap canvas')).not.toBeNull();
-    expect(warn).not.toHaveBeenCalledWith(jasmine.stringContaining('<v-minimap>'));
+    expect(warn).not.toHaveBeenCalledWith(expect.stringContaining('<v-minimap>'));
   });
 });

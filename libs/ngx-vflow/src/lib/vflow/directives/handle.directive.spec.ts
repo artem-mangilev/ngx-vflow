@@ -186,7 +186,7 @@ describe('VflowHandleDirective', () => {
   });
 
   it('shows the node without a display: none handle, hides its edges and measures a visibility: hidden handle', async () => {
-    const warn = vi.spyOn(console, 'warn');
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const fixture = setup(HiddenHandlesNodeComponent, ['a', 'b'], [{ source: 'a', target: 'b' }]);
     await settle(fixture);
     const [a, b] = nodes(fixture);

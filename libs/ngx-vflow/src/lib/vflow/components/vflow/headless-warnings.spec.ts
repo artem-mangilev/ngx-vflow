@@ -102,7 +102,7 @@ describe('headless dev warnings', () => {
   const warnings = (text: string) => warn.mock.calls.filter(([message]) => String(message).includes(text));
 
   beforeEach(() => {
-    warn = vi.spyOn(console, 'warn');
+    warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
   });
 
   describe('edge without a presentation', () => {

@@ -664,7 +664,7 @@ describe('public keyboard graph navigation', () => {
     };
     const requests: { nodeIds: string[]; edgeIds: string[] }[] = [];
     const subscription = host.flow().deleteRequest.subscribe((request) => requests.push(request));
-    const warn = vi.spyOn(console, 'warn');
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     host.flow().keyboardShortcuts = { modifiers: { selection: ['q'] }, commands: { delete: ['q'] } };
     await settle();
     expect(warn).toHaveBeenCalledWith(expect.stringContaining('commands.delete and modifiers.selection share a key'));

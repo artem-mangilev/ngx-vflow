@@ -119,7 +119,7 @@ describe('HandleModel', () => {
 
   it('should leave an element without a layout box unmeasured and warn once', () => {
     const { model, element, parentNode } = createModel({ left: 0, top: 0, width: 100, height: 40 });
-    const warn = vi.spyOn(console, 'warn');
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     mockRect(element, { left: 90, top: 15, width: 10, height: 10 });
     model.sync();
     parentNode.isMeasured.set(true);
