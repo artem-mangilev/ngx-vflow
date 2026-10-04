@@ -47,7 +47,8 @@ describe('edge path utilities', () => {
     };
 
     expect(getBezierPath({ ...params, curvature: 0 }).path).toBe('M0,0 C0,0 100,100 100,100');
-    expect(getBezierPath({ ...params, curvature: 0.5 }).path).not.toBe(getBezierPath(params).path);
+    expect(getBezierPath(params).path).toBe('M0,0 C62.5,0 37.5,100 100,100');
+    expect(getBezierPath({ ...params, curvature: 0.5 }).path).toBe('M0,0 C125,0 -25,100 100,100');
   });
 
   it('makes smooth-step offset configurable', () => {
@@ -58,6 +59,9 @@ describe('edge path utilities', () => {
       targetPosition: 'left' as const,
     };
 
-    expect(getSmoothStepPath({ ...params, offset: 40 }).path).not.toBe(getSmoothStepPath(params).path);
+    expect(getSmoothStepPath(params).path).toBe('M0 0L20 0L 45,0Q 50,0 50,5L 50,95Q 50,100 55,100L80 100L100 100');
+    expect(getSmoothStepPath({ ...params, offset: 40 }).path).toBe(
+      'M0 0L40 0L 45,0Q 50,0 50,5L 50,95Q 50,100 55,100L60 100L100 100',
+    );
   });
 });

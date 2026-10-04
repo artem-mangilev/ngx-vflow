@@ -21,7 +21,17 @@ describe('NodesChangeService', () => {
     entities = TestBed.inject(FlowEntitiesService);
   });
 
-  const settle = () => new Promise((resolve) => setTimeout(resolve, 60));
+  /**
+   * Runs the effects that read the signals, a few times over since observing a node starts effects of its own, and
+   * waits for the batch: the service delivers it 25 ms after the pass, before a timer started later for longer.
+   */
+  async function settle() {
+    for (let i = 0; i < 3; i++) {
+      TestBed.tick();
+      await new Promise((resolve) => setTimeout(resolve));
+    }
+    await new Promise((resolve) => setTimeout(resolve, 30));
+  }
 
   function node(id: string) {
     return TestBed.runInInjectionContext(() => new NodeModel(createNode({ id, point: { x: 0, y: 0 } })));

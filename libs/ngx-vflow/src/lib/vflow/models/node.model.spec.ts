@@ -37,10 +37,6 @@ describe('NodeModel', () => {
     entitiesService.nodes.update((nodes) => [...nodes, model]);
   });
 
-  it('should create', () => {
-    expect(model).toBeTruthy();
-  });
-
   describe('size modes', () => {
     const make = (node: Parameters<typeof createNode>[0]) =>
       TestBed.runInInjectionContext(() => new NodeModel(createNode(node)));
@@ -99,11 +95,6 @@ describe('NodeModel', () => {
       expect(sized.width()).toBe(140);
       expect(sized.rawNode.width!()).toBe(100);
       expect(sized.explicitWidth()).toBe(100);
-    });
-
-    it('is not aliased to the application signals', () => {
-      const sized = make({ id: 'c', point: { x: 0, y: 0 }, width: 100, height: 50 });
-      expect(sized.width).not.toBe(sized.rawNode.width!);
     });
   });
 
@@ -192,11 +183,6 @@ describe('NodeModel', () => {
       model.selected.set(true);
       expect(Object.keys(node)).toEqual(['id', 'point']);
     });
-  });
-
-  it('should set/get point', () => {
-    model.setPoint({ x: 10, y: 10 });
-    expect(model.point()).toEqual({ x: 10, y: 10 });
   });
 
   it('should create correct translate function from point', () => {

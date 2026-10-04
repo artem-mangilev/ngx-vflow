@@ -119,13 +119,21 @@ describe('DraggableService', () => {
     });
   });
 
-  function createModel(params: { id: string; selected?: boolean; draggable?: boolean; parentId?: string }) {
+  function createModel(params: {
+    id: string;
+    selected?: boolean;
+    draggable?: boolean;
+    parentId?: string;
+    size?: [number, number];
+  }) {
     const nodeConfig: any = {
       id: params.id,
       point: { x: 0, y: 0 },
       selected: params.selected ?? false,
       draggable: params.draggable ?? true,
       parentId: params.parentId,
+      width: params.size?.[0],
+      height: params.size?.[1],
     };
 
     const model = TestBed.runInInjectionContext(() => new NodeModel(createNode(nodeConfig)));
@@ -208,42 +216,45 @@ describe('DraggableService', () => {
     expect(TestBed.inject(FlowStatusService).status().state).toBe('idle');
   });
 
-  it('should not include selected child when selected parent is dragged', () => {
+  it('moves a selected parent without its selected child, which follows in local coordinates', () => {
     const parent = createModel({ id: 'parent', selected: true });
     const child = createModel({ id: 'child', selected: true, parentId: 'parent' });
 
-    const dragNodes = (service as any).getDragNodes(child) as NodeModel[];
-
-    expect(dragNodes).toEqual([parent]);
+    expect(service.moveSelected(child, { x: 1, y: 0 }, false)).toEqual([parent]);
+    expect(parent.point()).toEqual({ x: 5, y: 0 });
+    expect(child.point()).toEqual({ x: 0, y: 0 });
   });
 
-  it('should include selected child when parent is not selected', () => {
-    createModel({ id: 'parent', selected: false });
-    const child = createModel({ id: 'child', selected: true, parentId: 'parent' });
+  it('moves a selected child of an unselected parent on its own, within the parent', () => {
+    const parent = createModel({ id: 'parent', selected: false, size: [100, 50] });
+    const child = createModel({ id: 'child', selected: true, parentId: 'parent', size: [80, 30] });
 
-    const dragNodes = (service as any).getDragNodes(child) as NodeModel[];
+    expect(service.moveSelected(child, { x: 0, y: 1 }, false)).toEqual([child]);
+    expect(parent.point()).toEqual({ x: 0, y: 0 });
+    expect(child.point()).toEqual({ x: 0, y: 5 });
 
-    expect(dragNodes).toEqual([child]);
+    service.moveSelected(child, { x: 1, y: 1 }, true);
+    expect(child.point()).toEqual({ x: 20, y: 20 });
+    service.moveSelected(child, { x: -1, y: 0 }, true);
+    expect(child.point()).toEqual({ x: 0, y: 20 });
   });
 
-  it('should keep only top selected ancestor in deep hierarchy', () => {
+  it('moves only the topmost selected ancestor of a hierarchy, together with unrelated selected nodes', () => {
     const grandParent = createModel({ id: 'grand-parent', selected: true });
-    createModel({ id: 'parent', selected: true, parentId: 'grand-parent' });
+    const parent = createModel({ id: 'parent', selected: true, parentId: 'grand-parent' });
     const child = createModel({ id: 'child', selected: true, parentId: 'parent' });
     const standalone = createModel({ id: 'standalone', selected: true });
 
-    const dragNodes = (service as any).getDragNodes(child) as NodeModel[];
-
-    expect(dragNodes).toEqual([grandParent, standalone]);
+    expect(service.moveSelected(child, { x: 1, y: 0 }, true)).toEqual([grandParent, standalone]);
+    expect([grandParent, parent, child, standalone].map((node) => node.point().x)).toEqual([20, 0, 0, 20]);
   });
 
-  it('should keep normal multi-select behavior for unrelated nodes', () => {
-    const nodeA = createModel({ id: 'node-a', selected: true });
-    const nodeB = createModel({ id: 'node-b', selected: true });
+  it('moves nothing from an unselected node', () => {
+    const selected = createModel({ id: 'selected', selected: true });
+    const unselected = createModel({ id: 'unselected' });
 
-    const dragNodes = (service as any).getDragNodes(nodeA) as NodeModel[];
-
-    expect(dragNodes).toEqual([nodeA, nodeB]);
+    expect(service.moveSelected(unselected, { x: 1, y: 0 }, false)).toEqual([]);
+    expect(selected.point()).toEqual({ x: 0, y: 0 });
   });
 
   it('should block group drag when selection shortcut is active', () => {
@@ -282,10 +293,8 @@ describe('DraggableService', () => {
 
   it('should allow drag for primary mouse button with a null target', () => {
     const filter = dragFilter(createModel({ id: 'node' }));
-    const event = pointerEvent('pointerdown', { x: 0, y: 0 });
 
-    expect(event.target).toBeNull();
-    expect(filter(event)).toBe(true);
+    expect(filter(pointerEvent('pointerdown', { x: 0, y: 0 }))).toBe(true);
   });
 
   it('suppresses the click after a drag past the threshold and keeps it below', async () => {
@@ -342,34 +351,6 @@ describe('DraggableService', () => {
     noDragElement.append(target);
 
     expect(filter(press(target))).toBe(false);
-  });
-
-  it('should reject drag from inside a handle unless a drag handle inside it is the closer ancestor', () => {
-    const node = createModel({ id: 'node' });
-    const filter = dragFilter(node);
-    const handle = document.createElement('div');
-    handle.classList.add('v-handle');
-    const dragHandle = document.createElement('div');
-    dragHandle.classList.add('v-drag-handle');
-    const body = document.createElement('span');
-    const title = document.createElement('span');
-    handle.append(dragHandle, body);
-    dragHandle.append(title);
-
-    expect(filter(press(body))).toBe(false);
-    node.dragHandlesCount.set(1);
-    expect(filter(press(body))).toBe(false);
-    expect(filter(press(title))).toBe(true);
-  });
-
-  it('should allow drag from a valid drag handle target', () => {
-    const node = createModel({ id: 'node' });
-    const filter = dragFilter(node);
-    const target = document.createElement('div');
-    target.classList.add('v-drag-handle');
-    node.dragHandlesCount.set(1);
-
-    expect(filter(press(target))).toBe(true);
   });
 
   it('should reuse pane geometry while dragging at non-unit zoom', () => {

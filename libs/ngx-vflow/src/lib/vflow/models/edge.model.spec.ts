@@ -99,7 +99,7 @@ describe('EdgeModel', () => {
             createNode({
               id: '2',
 
-              point: { x: 15, y: 15 },
+              point: { x: 215, y: 115 },
               width: 0,
               height: 0,
             }),
@@ -128,15 +128,10 @@ describe('EdgeModel', () => {
     ]);
   });
 
-  it('should create', () => {
-    expect(model).toBeTruthy();
-  });
-
-  /**
-   * @todo add more path tests
-   */
-  it('should provide path', () => {
-    expect(model.path().path).toBe('M 15,15L 15,15');
+  it('draws the path between the handle points of its nodes', () => {
+    expect(model.path().path).toBe('M 15,15L 215,115');
+    model.target()!.setPoint({ x: 315, y: 15 });
+    expect(model.path().path).toBe('M 15,15L 315,15');
   });
 
   it('should set detached === true if there no source', () => {
@@ -150,12 +145,12 @@ describe('EdgeModel', () => {
   });
 
   it('should detached === true if there no source handle', () => {
-    model.source()?.handles().pop();
+    model.source()!.handles.set([]);
     expect(model.detached()).toEqual(true);
   });
 
   it('should detached === true if there no target handle', () => {
-    model.target()?.handles().pop();
+    model.target()!.handles.set([]);
     expect(model.detached()).toEqual(true);
   });
 
@@ -183,11 +178,11 @@ describe('EdgeModel', () => {
 
     const params = curve.mock.lastCall![0];
     expect(params.sourceNode).toEqual({ id: '1', x: 15, y: 15, width: 0, height: 0 });
-    expect(params.targetNode).toEqual({ id: '2', x: 15, y: 15, width: 0, height: 0 });
+    expect(params.targetNode).toEqual({ id: '2', x: 215, y: 115, width: 0, height: 0 });
     // A closed arrow of 20 flow units: the path ends 7 units before the tip, at the base of the arrowhead.
     expect(params.markerInset).toEqual({ start: 0, end: 7 });
-    // The left target handle point moves away from the node by the inset.
-    expect(params.targetPoint.x).toBe(params.sourcePoint.x - 7);
+    // The left target handle point at (215, 115) moves away from the node by the inset.
+    expect(params.targetPoint).toEqual({ x: 208, y: 115 });
 
     model.edge.markers!.set({ end: { type: 'arrow', width: 20 } });
     model.path();

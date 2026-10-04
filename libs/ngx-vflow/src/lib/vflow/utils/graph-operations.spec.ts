@@ -207,4 +207,39 @@ describe('graph operations', () => {
     expect(result[1].selected).toBe(selected);
     expect(reconnectEdges([{ id: 'edge', connection: edge }], { nodes, edges })).toBe(edges);
   });
+
+  it('rejects an edge whose id already exists and keeps the collection reference', () => {
+    const nodes = [node('a'), node('b')];
+    const edges: Edge[] = [{ id: 'edge', source: 'a', target: 'b' }];
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    expect(addEdges([{ id: 'edge', source: 'b', target: 'a' }], { nodes, edges })).toBe(edges);
+    expect(warn).toHaveBeenCalledWith('[ngx-vflow] Cannot add edge "edge" because its id already exists.');
+  });
+
+  it('reconnects nothing for an unknown edge or endpoint and keeps the collection reference', () => {
+    const nodes = [node('a'), node('b')];
+    const edges: Edge[] = [{ id: 'edge', source: 'a', target: 'b' }];
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    expect(reconnectEdges([{ id: 'missing', connection: { source: 'b', target: 'a' } }], { nodes, edges })).toBe(edges);
+    expect(reconnectEdges([{ id: 'edge', connection: { source: 'a', target: 'gone' } }], { nodes, edges })).toBe(edges);
+    expect(warn.mock.calls).toEqual([
+      ['[ngx-vflow] Cannot find edge "missing".'],
+      ['[ngx-vflow] Cannot find endpoint node "gone".'],
+    ]);
+  });
+
+  it('takes the handles of the new connection and clears the ones it omits', () => {
+    const nodes = [node('a'), node('b')];
+    const edges: Edge[] = [{ id: 'edge', source: 'a', target: 'b', sourceHandle: 'out', targetHandle: 'in' }];
+
+    const [edge] = reconnectEdges([{ id: 'edge', connection: { source: 'a', target: 'b', targetHandle: 'in-2' } }], {
+      nodes,
+      edges,
+    });
+
+    expect(edge.sourceHandle).toBeUndefined();
+    expect(edge.targetHandle).toBe('in-2');
+  });
 });

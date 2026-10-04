@@ -4,7 +4,7 @@ import { VflowComponent } from './vflow.component';
 import { Vflow } from '../../vflow';
 import { dispatchPointer, pointerDrag, touchPointers } from '../../gestures/pointer-events.testing';
 import { ViewportService } from '../../services/viewport.service';
-import { SelectionService } from '../../services/selection.service';
+import { createNode } from '../../interfaces/node.interface';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -469,15 +469,27 @@ describe('public viewport gesture settings', () => {
     expect(flow.viewport().zoom).toBeCloseTo(1.44, 10);
   });
 
-  it('reports the pressed element as the target of a pane click', () => {
-    const selection = fixture.debugElement.injector.get(SelectionService);
-    const setViewport = vi.spyOn(selection, 'setViewport');
-    const child = document.createElement('span');
-    pane.appendChild(child);
-    dispatchPointer(child, 'pointerdown', { x: 100 });
-    dispatchPointer(window, 'pointermove', { x: 101 });
-    dispatchPointer(window, 'pointerup', { x: 101 });
-    expect(setViewport).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({ target: child }));
+  it('clears the selection on a pane click unless the pressed element is selectable', async () => {
+    const node = createNode({ id: 'a', point: { x: 0, y: 0 }, selected: true });
+    fixture.componentRef.setInput('nodes', [node]);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    const click = (target: Element) => {
+      dispatchPointer(target, 'pointerdown', { x: 100 });
+      dispatchPointer(window, 'pointermove', { x: 101 });
+      dispatchPointer(window, 'pointerup', { x: 101 });
+    };
+
+    const selectable = document.createElement('span');
+    selectable.classList.add('v-selectable');
+    pane.appendChild(selectable);
+    click(selectable);
+    expect(node.selected!()).toBe(true);
+
+    const plain = document.createElement('span');
+    pane.appendChild(plain);
+    click(plain);
+    expect(node.selected!()).toBe(false);
   });
 
   it('suppresses the click after a pan and keeps a plain click', async () => {

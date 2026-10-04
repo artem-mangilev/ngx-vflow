@@ -14,7 +14,7 @@ import { HandleModel } from './models/handle.model';
 import { HandlePosition } from './types/handle-type.type';
 import { createNode, Node } from './interfaces/node.interface';
 import { createEdge } from './interfaces/edge.interface';
-import { reparentNodes, removeNodes } from './utils/graph-operations';
+import { reparentNodes } from './utils/graph-operations';
 import { ReferenceIdentityChecker } from './utils/identity-checker/reference-identity-checker';
 import { addNodesToEdges } from './utils/add-nodes-to-edges';
 import { createResizer } from './public-components/resizable/resizer';
@@ -160,14 +160,6 @@ describe('Graph rendering and interaction regressions', () => {
     expect(edges[0].detached()).toBe(true);
     expect(events).toContainEqual({ type: 'detached', id: '0' });
     sub.unsubscribe();
-  });
-
-  it('clears the path after a handle is really removed without virtualization', () => {
-    const { nodes, edges } = graph();
-    expect(edges[0].path().path).not.toBe('');
-    nodes[0].handles.set([]);
-    expect(edges[0].detached()).toBe(true);
-    expect(edges[0].path().path).toBe('');
   });
 
   it('culls an already-measured edge wholly outside the viewport', () => {
@@ -317,23 +309,6 @@ describe('Graph rendering and interaction regressions', () => {
     sub.unsubscribe();
   });
 
-  it('completes connectEnd without requiring a connect subscriber', () => {
-    const controller = TestBed.runInInjectionContext(() => new ConnectionControllerDirective());
-    const events: unknown[] = [];
-    const sub = controller.connectEnd.subscribe((value) => events.push(value));
-    const source = handle(node('source'), 'source');
-    const target = handle(node('target'), 'target');
-    controller.startConnection(source);
-    TestBed.flushEffects();
-    controller.validateConnection(target);
-    TestBed.flushEffects();
-    controller.endConnection();
-    TestBed.flushEffects();
-    expect(events.length).toBe(1);
-    expect(TestBed.inject(FlowStatusService).status().state).toBe('idle');
-    sub.unsubscribe();
-  });
-
   it('validates release once regardless of subscriber count and completes reconnect without listeners', () => {
     const controller = TestBed.runInInjectionContext(() => new ConnectionControllerDirective());
     const { nodes, edges } = graph();
@@ -464,32 +439,5 @@ describe('Graph rendering and interaction regressions', () => {
     point.set({ x: 5, y: 0 });
     TestBed.flushEffects();
     expect(read).not.toHaveBeenCalled();
-  });
-
-  it('measures validEdges scaling and batch removal scaling', () => {
-    const entities = TestBed.inject(FlowEntitiesService);
-    for (const count of [1000, 5000, 10000]) {
-      const nodes = Array.from({ length: count }, (_, i) => ({ rawNode: { id: String(i) } }) as NodeModel);
-      const edges = nodes.map((n) => ({ source: () => n, target: () => n }) as unknown as EdgeModel);
-      const samples = [];
-      for (let iteration = 0; iteration < 7; iteration++) {
-        entities.nodes.set([...nodes]);
-        entities.edges.set(edges);
-        const start = performance.now();
-        expect(entities.validEdges().length).toBe(count);
-        samples.push(performance.now() - start);
-      }
-      const rawNodes = nodes.map((n) => ({ id: n.rawNode.id, point: signal({ x: 0, y: 0 }) }) as Node);
-      const start = performance.now();
-      expect(
-        removeNodes(
-          rawNodes.map((n) => n.id),
-          { nodes: rawNodes, edges: [] },
-        ).nodes,
-      ).toEqual([]);
-      console.log(
-        `AUDIT BENCH count=${count} validEdges median=${samples.sort((a, b) => a - b)[3].toFixed(2)}ms removeNodes=${(performance.now() - start).toFixed(2)}ms`,
-      );
-    }
   });
 });

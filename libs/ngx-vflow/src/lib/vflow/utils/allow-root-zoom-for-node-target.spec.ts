@@ -1,96 +1,33 @@
 import { allowRootZoomForNodeTarget } from './allow-root-zoom-for-node-target';
 
+// Which node elements pan the pane is covered by press-target.spec.ts; this covers what the wrapper adds.
 describe('allowRootZoomForNodeTarget', () => {
-  it('returns true for wheel-like events', () => {
-    const ev = new WheelEvent('wheel');
-    expect(allowRootZoomForNodeTarget(ev, false)).toBe(true);
-  });
+  function pointerdownOn(target: Element) {
+    const event = new PointerEvent('pointerdown', { bubbles: true });
+    Object.defineProperty(event, 'target', { value: target });
+    return event;
+  }
 
-  it('returns false in selection keyboard mode for pointer down', () => {
-    const el = document.createElement('div');
-    const ev = new PointerEvent('pointerdown', { bubbles: true });
-    Object.defineProperty(ev, 'target', { value: el, enumerable: true });
-    expect(allowRootZoomForNodeTarget(ev, true)).toBe(false);
-  });
-
-  it('returns true when target is outside any node', () => {
-    const el = document.createElement('div');
-    const ev = new PointerEvent('pointerdown', { bubbles: true });
-    Object.defineProperty(ev, 'target', { value: el, enumerable: true });
-    expect(allowRootZoomForNodeTarget(ev, false)).toBe(true);
-  });
-
-  it('returns true for undraggable node body', () => {
-    const node = document.createElement('g');
-    node.classList.add('v-node', 'v-node--undraggable');
-    const inner = document.createElement('div');
-    node.appendChild(inner);
-    const ev = new PointerEvent('pointerdown', { bubbles: true });
-    Object.defineProperty(ev, 'target', { value: inner, enumerable: true });
-    expect(allowRootZoomForNodeTarget(ev, false)).toBe(true);
-  });
-
-  it('returns false for fully draggable node (no pan classes)', () => {
-    const node = document.createElement('g');
-    node.classList.add('v-node');
-    const inner = document.createElement('div');
-    node.appendChild(inner);
-    const ev = new PointerEvent('pointerdown', { bubbles: true });
-    Object.defineProperty(ev, 'target', { value: inner, enumerable: true });
-    expect(allowRootZoomForNodeTarget(ev, false)).toBe(false);
-  });
-
-  it('returns true for drag-handles-only node when not on a drag handle', () => {
-    const node = document.createElement('g');
-    node.classList.add('v-node', 'v-node--drag-handles-only');
-    const body = document.createElement('div');
-    node.appendChild(body);
-    const ev = new PointerEvent('pointerdown', { bubbles: true });
-    Object.defineProperty(ev, 'target', { value: body, enumerable: true });
-    expect(allowRootZoomForNodeTarget(ev, false)).toBe(true);
-  });
-
-  it('returns false for drag-handles-only node when on v-drag-handle', () => {
-    const node = document.createElement('g');
-    node.classList.add('v-node', 'v-node--drag-handles-only');
-    const handle = document.createElement('button');
-    handle.classList.add('v-drag-handle');
-    node.appendChild(handle);
-    const ev = new PointerEvent('pointerdown', { bubbles: true });
-    Object.defineProperty(ev, 'target', { value: handle, enumerable: true });
-    expect(allowRootZoomForNodeTarget(ev, false)).toBe(false);
-  });
-
-  it('returns false inside a handle of an undraggable node and true from a drag handle inside that handle', () => {
+  function nodeChild(...classes: string[]) {
     const node = document.createElement('div');
-    node.classList.add('v-node', 'v-node--drag-handles-only');
-    const handle = document.createElement('div');
-    handle.classList.add('v-handle');
-    const dragHandle = document.createElement('div');
-    dragHandle.classList.add('v-drag-handle');
-    const body = document.createElement('span');
-    node.append(handle);
-    handle.append(dragHandle, body);
-    document.body.append(node);
+    node.classList.add('v-node', ...classes);
+    const body = document.createElement('div');
+    node.append(body);
+    return body;
+  }
 
-    const onBody = new PointerEvent('pointerdown', { bubbles: true });
-    Object.defineProperty(onBody, 'target', { value: body, enumerable: true });
-    expect(allowRootZoomForNodeTarget(onBody, false)).toBe(false);
-
-    const onDragHandle = new PointerEvent('pointerdown', { bubbles: true });
-    Object.defineProperty(onDragHandle, 'target', { value: dragHandle, enumerable: true });
-    expect(allowRootZoomForNodeTarget(onDragHandle, false)).toBe(false);
-
-    node.remove();
+  it('allows every event other than a pointer press', () => {
+    expect(allowRootZoomForNodeTarget(new WheelEvent('wheel'), true)).toBe(true);
+    expect(allowRootZoomForNodeTarget(new Event('touchstart'), true)).toBe(true);
   });
 
-  it('handles touchstart like mousedown', () => {
-    const node = document.createElement('g');
-    node.classList.add('v-node', 'v-node--undraggable');
-    const inner = document.createElement('div');
-    node.appendChild(inner);
-    const ev = new Event('touchstart', { bubbles: true });
-    Object.defineProperty(ev, 'target', { value: inner, enumerable: true });
-    expect(allowRootZoomForNodeTarget(ev, false)).toBe(true);
+  it('rejects any press while the selection modifier is held', () => {
+    expect(allowRootZoomForNodeTarget(pointerdownOn(document.createElement('div')), true)).toBe(false);
+  });
+
+  it('allows a press on the pane or on a node that does not drag, and rejects one that drags a node', () => {
+    expect(allowRootZoomForNodeTarget(pointerdownOn(document.createElement('div')), false)).toBe(true);
+    expect(allowRootZoomForNodeTarget(pointerdownOn(nodeChild('v-node--undraggable')), false)).toBe(true);
+    expect(allowRootZoomForNodeTarget(pointerdownOn(nodeChild()), false)).toBe(false);
   });
 });

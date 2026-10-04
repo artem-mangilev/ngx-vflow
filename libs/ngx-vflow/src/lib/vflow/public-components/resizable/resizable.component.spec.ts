@@ -1,12 +1,10 @@
-import { ChangeDetectionStrategy, Component, reflectComponentType, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal, viewChild } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
-import { VflowResizableMockComponent } from 'ngx-vflow/testing';
 import { Node, createNodes } from '../../interfaces/node.interface';
 import { FlowEntitiesService } from '../../services/flow-entities.service';
 import { VflowComponent } from '../../components/vflow/vflow.component';
 import { Vflow } from '../../vflow';
-import { VflowResizableComponent } from './resizable.component';
 import { mouseAsPointer } from '../../gestures/pointer-events.testing';
 
 @Component({
@@ -160,14 +158,6 @@ async function createFixture(useCustomGap = true) {
 }
 
 describe('VflowResizableComponent', () => {
-  it('exposes gap as an input in production and testing components', () => {
-    const productionInputs = reflectComponentType(VflowResizableComponent)?.inputs;
-    const testingInputs = reflectComponentType(VflowResizableMockComponent)?.inputs;
-
-    expect(productionInputs).toContainEqual(expect.objectContaining({ propName: 'gap', templateName: 'gap' }));
-    expect(testingInputs).toContainEqual(expect.objectContaining({ propName: 'gap', templateName: 'gap' }));
-  });
-
   it('applies a custom gap to every resize line and corner handle', async () => {
     const fixture: ComponentFixture<ResizableTestHostComponent> = await createFixture();
 

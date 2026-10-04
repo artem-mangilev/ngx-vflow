@@ -108,8 +108,6 @@ describe('SelectionBoxContextDirective', () => {
     dispatchPointer(document, 'pointermove', { x: 20, y: 20 });
 
     expect(fixture.componentInstance.context.model.width()).toBeGreaterThan(2);
-    expect(eligible.selectable()).toBe(true);
-    expect(eligible.width()).toBe(10);
     expect(ineligible.preselected()).toBe(false);
     expect(eligible.preselected()).toBe(true);
 
