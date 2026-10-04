@@ -57,7 +57,6 @@ import { Optimization } from '../../interfaces/optimization.interface';
 import { KeyboardShortcuts } from '../../types/keyboard-shortcuts.type';
 import { SelectionMode } from '../../types/selection-mode.type';
 import { KeyboardService } from '../../services/keyboard.service';
-import { NgTemplateOutlet } from '@angular/common';
 import { EdgeComponent } from '../edge/edge.component';
 import { EdgeLabelComponent } from '../edge-label/edge-label.component';
 import { NodeComponent } from '../node/node.component';
@@ -186,7 +185,6 @@ const connectionControllerHostDirective = {
     NodeComponent,
     EdgeComponent,
     EdgeLabelComponent,
-    NgTemplateOutlet,
     AlignmentHelperComponent,
     SelectionBoxComponent,
     SelectionBoxContextDirective,
@@ -585,7 +583,6 @@ export class VflowComponent {
   // #endregion
 
   protected markers = this.flowEntitiesService.markers;
-  protected minimap = this.flowEntitiesService.minimap;
 
   // #region METHODS_API
   // Viewport methods apply at once and in order, each from where the previous one leads, so consecutive calls

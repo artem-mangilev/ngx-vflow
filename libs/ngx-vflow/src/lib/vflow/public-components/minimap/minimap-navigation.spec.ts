@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, provideZonelessChangeDetection, signal, viewChild } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Vflow } from '../../vflow';
+import { VflowMinimapComponent } from './minimap.component';
 import { VflowComponent } from '../../components/vflow/vflow.component';
 import { createNodes } from '../../interfaces/node.interface';
 
@@ -8,12 +9,15 @@ import { createNodes } from '../../interfaces/node.interface';
   imports: [Vflow],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `<vflow [view]="size()" [nodes]="nodes" [minZoom]="0.5" [maxZoom]="2">
-    <v-minimap [pannable]="pannable()" [zoomable]="zoomable()" [zoomStep]="step()" />
+    @if (show()) {
+      <v-minimap [pannable]="pannable()" [zoomable]="zoomable()" [zoomStep]="step()" />
+    }
   </vflow>`,
 })
 class MinimapHostComponent {
   flow = viewChild.required(VflowComponent);
   size = signal<[number, number]>([400, 300]);
+  show = signal(true);
   pannable = signal(false);
   zoomable = signal(false);
   step = signal(0.1);
@@ -210,5 +214,76 @@ describe('minimap navigation through the public viewport API', () => {
     await settle();
     await wheel();
     expect(flow.viewport().zoom).toBeCloseTo(1.1);
+  });
+
+  it('leaves the flow with its host and navigates again when shown back', async () => {
+    host.pannable.set(true);
+    host.zoomable.set(true);
+    await settle();
+    expect(fixture.nativeElement.querySelector('.v-minimap canvas')).toBe(canvas);
+    host.show.set(false);
+    await settle();
+    expect(fixture.nativeElement.querySelector('.v-minimap')).toBeNull();
+    expect(fixture.nativeElement.querySelector('canvas')).toBeNull();
+    // The detached canvas no longer owns wheel input.
+    expect((await wheel()).defaultPrevented).toBeFalse();
+    expect(flow.viewport()).toEqual({ x: 0, y: 0, zoom: 1 });
+    host.show.set(true);
+    await settle();
+    canvas = fixture.nativeElement.querySelector('.v-minimap canvas');
+    expect(canvas).not.toBeNull();
+    spyOn(canvas, 'setPointerCapture');
+    await click();
+    expect(flow.viewport()).toEqual({ x: -10200, y: 4950, zoom: 1 });
+    await wheel();
+    expect(flow.viewport().zoom).toBeCloseTo(1.1);
+  });
+});
+
+@Component({
+  selector: 'app-minimap',
+  imports: [VflowMinimapComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: `<v-minimap />`,
+})
+class WrappedMinimapComponent {}
+
+@Component({
+  imports: [Vflow, WrappedMinimapComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: `<vflow [view]="[400, 300]" [nodes]="[]">
+    @if (projectAs()) {
+      <app-minimap ngProjectAs="v-minimap" />
+    } @else {
+      <app-minimap />
+    }
+  </vflow>`,
+})
+class WrappedMinimapHostComponent {
+  projectAs = signal(false);
+}
+
+describe('minimap projection', () => {
+  async function render(projectAs: boolean) {
+    TestBed.configureTestingModule({ providers: [provideZonelessChangeDetection()] });
+    const fixture = TestBed.createComponent(WrappedMinimapHostComponent);
+    fixture.componentInstance.projectAs.set(projectAs);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    return fixture.nativeElement as HTMLElement;
+  }
+
+  it('warns in dev mode when a wrapper hides the minimap from the flow slot', async () => {
+    const warn = spyOn(console, 'warn');
+    const root = await render(false);
+    expect(root.querySelector('.v-root canvas')).toBeNull();
+    expect(warn).toHaveBeenCalledWith(jasmine.stringContaining('ngProjectAs="v-minimap"'));
+  });
+
+  it('renders a wrapper marked with ngProjectAs without a warning', async () => {
+    const warn = spyOn(console, 'warn');
+    const root = await render(true);
+    expect(root.querySelector('.v-root .v-minimap canvas')).not.toBeNull();
+    expect(warn).not.toHaveBeenCalledWith(jasmine.stringContaining('<v-minimap>'));
   });
 });

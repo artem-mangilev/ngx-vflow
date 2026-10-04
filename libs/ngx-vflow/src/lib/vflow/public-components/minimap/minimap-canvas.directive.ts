@@ -73,7 +73,7 @@ export class MinimapCanvasDirective {
       const style = view?.getComputedStyle(this.canvas);
       const token = (name: string, fallback: string) => style?.getPropertyValue(name).trim() || fallback;
       const surface = token('--v-surface', '#fff');
-      // The minimap template is projected by the consumer, so the flow root is found through the DOM.
+      // The minimap is content projected by the consumer, so the flow root is found through the DOM.
       const root = this.canvas.closest('.v-root');
       const rootBackground = root && view ? view.getComputedStyle(root).backgroundColor : '';
       return {
@@ -139,7 +139,7 @@ export class MinimapCanvasDirective {
     const refreshTheme = () => this.themeVersion.update((version) => version + 1);
     const scheme = view?.matchMedia?.('(prefers-color-scheme: dark)');
     const observer = view && 'MutationObserver' in view ? new view.MutationObserver(refreshTheme) : undefined;
-    // Ancestors are complete only once the projected template is attached to the document.
+    // Ancestors are complete only once the projected minimap is attached to the document.
     afterNextRender(() => {
       for (let element = this.canvas.parentElement; element; element = element.parentElement) {
         observer?.observe(element, { attributes: true });

@@ -515,6 +515,8 @@ Documented Angular APIs, CSS classes, and observable behavior remain supported c
 
 The `vflow` element is now its own stacking context. The minimap no longer paints above application overlays, and positioned elements placed after the flow no longer need a `z-index` to appear above its pane. To keep the flow above or below other page elements, set `z-index` on the `vflow` element or its container.
 
+`<v-minimap>` is projected into the flow by its selector, and the `v-minimap` element is now the overlay layer itself. A minimap inside a wrapper component is no longer rendered: mark the wrapper with `ngProjectAs="v-minimap"`. A minimap inside `@if` or `@for` keeps working while the block has the minimap as its single root element. In dev mode, a minimap that the flow does not render logs a warning.
+
 ## Migration to >= v2.0
 
 | Area                           | Change in v2.0                                                                            | What you need to do                                                                                                                                         | Notes / Examples                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |

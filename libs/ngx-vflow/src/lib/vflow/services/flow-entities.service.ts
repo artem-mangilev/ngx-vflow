@@ -1,4 +1,4 @@
-import { Injectable, Signal, WritableSignal, computed, signal } from '@angular/core';
+import { Injectable, Signal, computed, signal } from '@angular/core';
 import { NodeModel } from '../models/node.model';
 import { EdgeModel } from '../models/edge.model';
 import { ConnectionModel } from '../models/connection.model';
@@ -6,7 +6,6 @@ import { Marker, MarkerRef } from '../interfaces/marker.interface';
 import { markerId, normalizeMarker } from '../utils/marker-ref';
 import { MarkerShapes } from '../utils/marker-inset';
 import { FlowEntity } from '../interfaces/flow-entity.interface';
-import { MinimapModel } from '../models/minimap.model';
 import { Node } from '../interfaces/node.interface';
 
 @Injectable()
@@ -83,8 +82,6 @@ export class FlowEntitiesService {
   });
 
   public entities: Signal<FlowEntity[]> = computed(() => [...this.nodes(), ...this.edges()]);
-
-  public minimap: WritableSignal<MinimapModel | null> = signal(null);
 
   public getNode<T>(id: string) {
     return this.nodeByIdMap().get(id) as NodeModel<T> | undefined;

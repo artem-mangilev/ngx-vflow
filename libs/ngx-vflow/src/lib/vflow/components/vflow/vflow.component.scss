@@ -120,8 +120,7 @@
 // application may still change in reaction to `initialized`. Entities inherit this, they never force visible.
 :host(.v-initializing) {
   .v-background-svg,
-  .v-viewport,
-  .v-minimap {
+  .v-viewport {
     visibility: hidden;
   }
 }
@@ -220,14 +219,4 @@
   overflow: visible;
   pointer-events: none;
   z-index: 1000001;
-}
-
-.v-minimap {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  // Above the pane, the only other layer of the flow with a z-index.
-  z-index: 2;
 }

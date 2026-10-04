@@ -1,6 +1,15 @@
-import { Component, inject, OnInit, TemplateRef, input, viewChild, ChangeDetectionStrategy } from '@angular/core';
-import { FlowEntitiesService } from '../../services/flow-entities.service';
-import { MinimapModel } from '../../models/minimap.model';
+import {
+  Component,
+  ElementRef,
+  afterNextRender,
+  inject,
+  input,
+  isDevMode,
+  ChangeDetectionStrategy,
+} from '@angular/core';
+import { bindEntityAccessibility } from '../../directives/entity-accessibility.directive';
+import { FlowRenderingService } from '../../services/flow-rendering.service';
+import { FlowSettingsService } from '../../services/flow-settings.service';
 
 import { MinimapCanvasDirective } from './minimap-canvas.directive';
 
@@ -10,12 +19,29 @@ export type MinimapPosition = 'top-left' | 'top-right' | 'bottom-left' | 'bottom
   selector: 'v-minimap',
   imports: [MinimapCanvasDirective],
   templateUrl: './minimap.component.html',
-  styles: ['canvas { position: absolute; }'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
-})
-export class VflowMinimapComponent implements OnInit {
-  protected entitiesService = inject(FlowEntitiesService);
+  styles: [
+    `
+      :host {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        /* Above the pane, the only other layer of the flow with a z-index. */
+        z-index: 2;
+      }
 
+      canvas {
+        position: absolute;
+      }
+    `,
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    class: 'v-minimap',
+    // Hidden with the other viewport layers until the first layout is complete.
+    '[style.visibility]': 'initialized() ? null : "hidden"',
+  },
+})
+export class VflowMinimapComponent {
   /**
    * The corner of the flow where to render a minimap
    */
@@ -30,12 +56,21 @@ export class VflowMinimapComponent implements OnInit {
   /** Multiplicative wheel zoom increment; invalid values fall back to 0.1. */
   public zoomStep = input(0.1);
 
-  private minimap = viewChild.required<TemplateRef<unknown>>('minimap');
+  protected initialized = inject(FlowRenderingService).flowInitialized;
 
-  public ngOnInit(): void {
-    const model = new MinimapModel();
-    model.template.set(this.minimap());
+  constructor() {
+    const settings = inject(FlowSettingsService);
+    bindEntityAccessibility(() => ({ role: 'img', label: settings.ariaLabels().minimapLabel }));
 
-    this.entitiesService.minimap.set(model);
+    const host = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
+    afterNextRender(() => {
+      // Content that no slot selects is never attached, so the minimap would silently stay off screen.
+      if (isDevMode() && !host.closest('.v-root')) {
+        console.warn(
+          '[ngx-vflow] <v-minimap> renders only as a direct child of <vflow>. ' +
+            'Mark a wrapping component with ngProjectAs="v-minimap".',
+        );
+      }
+    });
   }
 }

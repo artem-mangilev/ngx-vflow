@@ -2,6 +2,14 @@ The library includes a minimap that offers an overview of the entire flow. To en
 
 The minimap uses canvas and caches node previews during pan and zoom. It updates the previews when node geometry or selection changes, and keeps the image sharp on high-DPI displays.
 
+The flow projects the minimap by its selector, so `@if (showMinimap) { <v-minimap /> }` adds and removes it. A wrapper component around the minimap needs `ngProjectAs`:
+
+```html
+<vflow [nodes]="nodes">
+  <app-minimap ngProjectAs="v-minimap" />
+</vflow>
+```
+
 Navigation is opt-in; `<v-minimap />` remains a read-only overview.
 
 ```html
