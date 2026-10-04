@@ -11,6 +11,7 @@ import { clampZoom, panePointFromClient, toFlowPoint, translateBy, zoomAround } 
 import { wheelPanDelta, wheelZoomFactor } from '../gestures/wheel';
 import { ViewportAnimation, animateViewport } from '../gestures/viewport-animation';
 import { TouchAnchor, touchCenter, touchViewport } from '../gestures/pinch';
+import { listen } from '../utils/listen';
 
 /** A wheel gesture ends when no wheel event arrives for this long and the zoom has settled. */
 const WHEEL_IDLE_MS = 150;
@@ -78,7 +79,7 @@ export class ViewportGesturesDirective implements OnInit, OnDestroy {
     this.settings.panOnDrag() !== false ? 'none' : this.settings.zoomOnPinch() ? 'pan-x pan-y' : 'auto',
   );
 
-  private readonly listeners = new AbortController();
+  private listeners: (() => void)[] = [];
   private drag?: PointerDrag;
   private destroyed = false;
 
@@ -109,10 +110,11 @@ export class ViewportGesturesDirective implements OnInit, OnDestroy {
 
   public ngOnInit(): void {
     this.zone.runOutsideAngular(() => {
-      const { signal } = this.listeners;
-      this.host.addEventListener('wheel', (event) => this.onWheel(event), { passive: false, signal });
-      this.host.addEventListener('dblclick', (event) => this.onDoubleClick(event), { signal });
-      this.host.addEventListener('pointerdown', (event) => this.onTouchDown(event), { signal });
+      this.listeners = [
+        listen(this.host, 'wheel', (event) => this.onWheel(event), { passive: false }),
+        listen(this.host, 'dblclick', (event) => this.onDoubleClick(event)),
+        listen(this.host, 'pointerdown', (event) => this.onTouchDown(event)),
+      ];
 
       this.drag = createPointerDrag(this.host, {
         filter: (event) => event.pointerType !== 'touch' && this.dragFilter(event),
@@ -140,7 +142,7 @@ export class ViewportGesturesDirective implements OnInit, OnDestroy {
   public ngOnDestroy(): void {
     this.destroyed = true;
     this.disconnect();
-    this.listeners.abort();
+    this.listeners.forEach((remove) => remove());
     this.drag?.destroy();
     if (this.wheelTimer !== null) clearTimeout(this.wheelTimer);
     if (this.wheelFrame !== null) cancelAnimationFrame(this.wheelFrame);

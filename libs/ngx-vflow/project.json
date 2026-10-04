@@ -24,7 +24,7 @@
     "test": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "tsc -p tsconfig.spec.json --noEmit && vitest run",
+        "command": "tsc -p tsconfig.spec.json --noEmit && vitest run && vitest run --config vitest.node-dom.config.mts",
         "cwd": "{projectRoot}"
       },
       "configurations": {

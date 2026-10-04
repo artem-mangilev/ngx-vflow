@@ -4,6 +4,7 @@ import { FlowEntitiesService } from './services/flow-entities.service';
 import { FlowSettingsService } from './services/flow-settings.service';
 import { NodeRenderingService } from './services/node-rendering.service';
 import { EdgeRenderingService } from './services/edge-rendering.service';
+import { FlowRenderingService } from './services/flow-rendering.service';
 import { ViewportCullingDirective } from './directives/viewport-culling.directive';
 import { ViewportService } from './services/viewport.service';
 import { EdgeChangesService } from './services/edge-changes.service';
@@ -61,6 +62,7 @@ describe('Graph rendering and interaction regressions', () => {
         FlowSettingsService,
         NodeRenderingService,
         EdgeRenderingService,
+        FlowRenderingService,
         ViewportCullingDirective,
         ViewportService,
         EdgeChangesService,

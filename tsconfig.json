@@ -27,8 +27,7 @@
       "@docs/shared": ["apps/docs/src/app/shared/flow-presentations.ts"],
       "@vflow/ui": ["libs/ui/src/public-api"],
       "@vflow/ui/bpmn": ["libs/ui/bpmn/src/public-api"],
-      "ngx-vflow": ["libs/ngx-vflow/src/public-api"],
-      "ngx-vflow/testing": ["libs/ngx-vflow/testing/src/public-api"]
+      "ngx-vflow": ["libs/ngx-vflow/src/public-api"]
     }
   },
   "angularCompilerOptions": {

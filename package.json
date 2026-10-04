@@ -62,7 +62,9 @@
     "@vitest/browser": "~3.2.4",
     "eslint": "8.57.0",
     "eslint-config-prettier": "^9.1.0",
+    "happy-dom": "^20.14.5",
     "husky": "^9.1.7",
+    "jsdom": "^29.1.1",
     "lint-staged": "^15.3.0",
     "ng-packagr": "^20.3.0",
     "nx": "21.6.11",
@@ -70,7 +72,8 @@
     "prettier": "^3.4.2",
     "tailwindcss": "^4.1.0",
     "typescript": "~5.8.3",
-    "vitest": "~3.2.4"
+    "vitest": "~3.2.4",
+    "zone.js": "^0.15.1"
   },
   "engines": {
     "node": ">=22.12.0 <23 || >=24.0.0 <25"

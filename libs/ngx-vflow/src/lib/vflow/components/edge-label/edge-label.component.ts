@@ -14,6 +14,7 @@ import {
 import { NgTemplateOutlet } from '@angular/common';
 import { EdgeModel } from '../../models/edge.model';
 import { EdgeLabelOrient, EdgeLabelPosition } from '../../interfaces/edge-label.interface';
+import { FlowRenderingService } from '../../services/flow-rendering.service';
 
 const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
 
@@ -78,12 +79,15 @@ export class EdgeLabelComponent {
   private wrapper = viewChild<ElementRef<HTMLElement>>('wrapper');
 
   constructor() {
+    const flowRendering = inject(FlowRenderingService);
+
     effect(() => {
       this.element.style.zIndex = String(this.edgeModel().renderOrder());
     });
     effect(() => {
       const model = this.edgeModel();
-      this.element.style.visibility = model.isReady() && !model.reconnecting() ? '' : 'hidden';
+      const hidden = flowRendering.hiddenUntil(model.isReady()) || model.reconnecting();
+      this.element.style.visibility = hidden ? 'hidden' : '';
     });
     effect(() => {
       const point = this.point();

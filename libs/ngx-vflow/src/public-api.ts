@@ -98,26 +98,8 @@ export * from './lib/vflow/directives/drag-handle.directive';
 export * from './lib/vflow/directives/gesture-exclusions.directive';
 export { NodeDragEvent } from './lib/vflow/directives/node-drag-controller.directive';
 
-// ! Internals
-export { ConnectionModel as ɵConnectionModel } from './lib/vflow/models/connection.model';
-export { HandleModel as ɵHandleModel } from './lib/vflow/models/handle.model';
-export { NodeModel as ɵNodeModel } from './lib/vflow/models/node.model';
-
-export { ComponentEventBusService as ɵComponentEventBusService } from './lib/vflow/services/component-event-bus.service';
-export { HandleService as ɵHandleService } from './lib/vflow/services/handle.service';
-export { FlowSettingsService as ɵFlowSettingsService } from './lib/vflow/services/flow-settings.service';
-export { FlowStatusService as ɵFlowStatusService } from './lib/vflow/services/flow-status.service';
-export { FlowEntitiesService as ɵFlowEntitiesService } from './lib/vflow/services/flow-entities.service';
-export { NodeAccessorService as ɵNodeAccessorService } from './lib/vflow/services/node-accessor.service';
-export { ViewportService as ɵViewportService } from './lib/vflow/services/viewport.service';
-export { SelectionService as ɵSelectionService } from './lib/vflow/services/selection.service';
-export { NodeRenderingService as ɵNodeRenderingService } from './lib/vflow/services/node-rendering.service';
-export { RequestAnimationFrameBatchingService as ɵRequestAnimationFrameBatchingService } from './lib/vflow/services/request-animation-frame-batching.service';
-
-export { RootPointerDirective as ɵRootPointerDirective } from './lib/vflow/directives/root-pointer.directive';
 // Host directives of `vflow`: the compiler requires them in the entry point.
 export { ConnectionControllerDirective as ɵConnectionControllerDirective } from './lib/vflow/directives/connection-controller.directive';
 export { ChangesControllerDirective as ɵChangesControllerDirective } from './lib/vflow/directives/changes-controller.directive';
 export { NodeDragControllerDirective as ɵNodeDragControllerDirective } from './lib/vflow/directives/node-drag-controller.directive';
 export { ViewportCullingDirective as ɵViewportCullingDirective } from './lib/vflow/directives/viewport-culling.directive';
-export { SpacePointContextDirective as ɵSpacePointContextDirective } from './lib/vflow/directives/space-point-context.directive';

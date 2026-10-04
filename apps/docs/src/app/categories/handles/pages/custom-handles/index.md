@@ -92,7 +92,7 @@ The directive is exported as `vHandle`. A template reference gives access to its
 
 ## Handle components
 
-A component can become a handle by applying the directive through `hostDirectives`. Forward the inputs that the places using the component bind, including `handleType` and `position`. Inject `VflowHandleDirective` to read its signals: `state`, `handleType`, `position`, `handleId`, `canStart`, `canAccept` and `layout`. The same works in any element inside a handle element, and in unit tests with `VflowMocks`, whose handle mock stands in for the directive.
+A component can become a handle by applying the directive through `hostDirectives`. Forward the inputs that the places using the component bind, including `handleType` and `position`. Inject `VflowHandleDirective` to read its signals: `state`, `handleType`, `position`, `handleId`, `canStart`, `canAccept` and `layout`. The same works in any element inside a handle element.
 
 ```ts
 @Component({

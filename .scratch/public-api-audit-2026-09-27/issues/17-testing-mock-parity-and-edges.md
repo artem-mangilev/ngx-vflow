@@ -1,6 +1,6 @@
 # 17. `ngx-vflow/testing`: паритет моков и component edges
 
-Status: needs-triage
+Status: wontfix
 Type: task
 Priority: P2
 Blocked by: 16
@@ -32,3 +32,9 @@ Blocked by: 16
 - **Docs:** страницы testing — сейчас там «mocks for every public component».
 
 Связано: набор моков меняют тикеты 05, 07, 08, 09.
+
+## Comments
+
+### 2026-10-04 — неактуален
+
+`ngx-vflow/testing` удалён в 3.0 (ADR-0009, `.scratch/testing-entry-2026-10-04/`): тесты используют настоящий `Vflow`, паритет моков поддерживать не нужно. Тестирование component edges покрывает настоящий flow.

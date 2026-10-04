@@ -125,7 +125,6 @@ Old names have no aliases.
 | `[resizable]`, `ResizableComponent`                                                                                                                                                                                                               | `[vResizable]`, `VflowResizableComponent`                                                                                                                                                                                                                                    |
 | `<mini-map>`, `MiniMapComponent`, `MiniMapPosition`                                                                                                                                                                                               | `<v-minimap>`, `VflowMinimapComponent`, `MinimapPosition`                                                                                                                                                                                                                    |
 | `<node-toolbar>`, `NodeToolbarComponent`                                                                                                                                                                                                          | `<v-node-toolbar>`, `VflowNodeToolbarComponent`                                                                                                                                                                                                                              |
-| `ngx-vflow/testing` mocks, for example `SelectableMockDirective`                                                                                                                                                                                  | The same names with the `Vflow` prefix, for example `VflowSelectableMockDirective`                                                                                                                                                                                           |
 | `@vflow/ui`: `[vflowNode]`, `<vflow-controls>`, `VflowNode`, `VflowUi`, `VflowBpmn` …                                                                                                                                                             | `[vuiNode]`, `<vui-controls>`, `VuiNode`, `Vui`, `VuiBpmn` …                                                                                                                                                                                                                 |
 | `.vflow-*` classes, for example `.vflow-node`, `.vflow-handle`, `.vflow-root`                                                                                                                                                                     | `.v-*`, for example `.v-node`, `.v-handle`, `.v-root`                                                                                                                                                                                                                        |
 | `--vflow-*` tokens, for example `--vflow-background`, `--vflow-focus`                                                                                                                                                                             | `--v-*`, for example `--v-background`, `--v-focus`                                                                                                                                                                                                                           |
@@ -255,7 +254,7 @@ export class TaskNodeComponent {
 
 {% endraw %}
 
-`(componentNodeEvent)` stays. It now collects every declared output of the component, including `@Output()`, `output()` and `outputFromObservable()`, and `eventName` is the property name of the output. `ComponentNodeEvent<[A, B]>` infers events from those outputs. In a component unit test, `provideCustomNodeMocks()` also provides a mock for `injectNode()`.
+`(componentNodeEvent)` stays. It now collects every declared output of the component, including `@Output()`, `output()` and `outputFromObservable()`, and `eventName` is the property name of the output. `ComponentNodeEvent<[A, B]>` infers events from those outputs.
 
 ### Edge presentations
 
@@ -333,7 +332,12 @@ Place a label next to the SVG elements of the edge, not inside `svg:g`: Angular 
 
 ### Testing mocks
 
-`ngx-vflow/testing` follows the new API. `VflowMocks` declare `ng-template[vNode]`, `ng-template[vEdge]`, `ng-template[vEdgeLabel]` and `ng-template[vConnection]`, plus mocks for `vHandle` and `vEdgeInteraction`. The `nodeHtml`, `groupNode`, `edgeLabelHtml` and `handle` template mocks, `HandleMockComponent` and `CustomTemplateEdgeMockComponent` are removed. The `vHandle` mock provides itself as `VflowHandleDirective`, and `provideCustomNodeMocks()` provides the node object returned by `injectNode()`.
+The `ngx-vflow/testing` entry point is removed, with `VflowMocks`, every mock component and directive, and `provideCustomNodeMocks()`. `vflow` renders in jsdom and happy-dom, so tests use the real `Vflow`:
+
+- Remove the `overrideComponent()` call that swapped `Vflow` for `VflowMocks`. `viewChild(VflowComponent)` works in tests again.
+- Instead of `provideCustomNodeMocks()`, render the component node in a flow of one node.
+
+A DOM without layout measures nothing: `initialized()` stays `false` and `fitView()` resolves to `false` there. Tests of geometry run in a browser, `ng test --browsers=chromiumHeadless`. See the Unit testing page.
 
 ### Custom handle templates
 
@@ -474,7 +478,7 @@ The programmatic viewport methods are `setViewport`, `setCenter`, `fitView`, `zo
 
 A flow that relied on a missing handler to keep its handles inert sets `[canStart]="false"` and `[canAccept]="false"` on them instead.
 
-`ConnectionControllerDirective` is no longer a public export or part of the `Vflow` array. In `ngx-vflow/testing`, `ConnectionControllerMockDirective` is removed and `VflowMockComponent` declares the six outputs.
+`ConnectionControllerDirective` is no longer a public export or part of the `Vflow` array.
 
 ### Change notifications
 
@@ -482,7 +486,6 @@ A flow that relied on a missing handler to keep its handles inert sets `[canStar
 - Every change of one tick comes in a single array. In v2 each moved, resized or selected node came in an array of its own, so dragging several selected nodes called the handler once per node on every move. A handler that reads only `changes[0]` must go through the whole array.
 - A filtered output such as `(nodesChanges.position)` follows the same rule with the changes of its type.
 - `viewportChange$` and `initialized$` are removed: `viewport` and `initialized` are state, and the signals are the way to read them.
-- In `ngx-vflow/testing`, `VflowMockComponent` declares `(nodesChanges)`, `(edgesChanges)` and the nine filtered outputs.
 
 ### Removed APIs
 
@@ -499,7 +502,8 @@ A flow that relied on a missing handler to keep its handles inert sets `[canStar
 | `panTo({ x, y })`                                           | `setViewport({ ...flow.viewport(), x, y })`; to center on a flow-space point, `setCenter(point)`.                  |
 | `step` input on `vui-controls`                              | Remove the binding. The buttons zoom by the step of the zoom keys.                                                 |
 | `useDefaults` option of the `create*` factories             | Remove it. The factories always create the default signals; write a literal for a bare object.                     |
-| `ConnectionControllerDirective` and its mock                | Remove the imports. The connection outputs belong to `vflow` and `VflowMockComponent`.                             |
+| `ConnectionControllerDirective`                             | Remove the import. The connection outputs belong to `vflow`.                                                       |
+| `ngx-vflow/testing`: `VflowMocks`, `provideCustomNodeMocks` | Test with the real `Vflow`. See Testing mocks above.                                                               |
 | `nodesChange$` and `edgesChange$`                           | `flow.nodesChanges.subscribe(...)` and `flow.edgesChanges.subscribe(...)`, or `outputToObservable()`.              |
 | `nodesChange` and `edgesChange` signals                     | Subscribe to the `nodesChanges` and `edgesChanges` outputs. A signal kept only the last array.                     |
 | `viewportChange$`                                           | Read the `viewport` signal, or `toObservable(flow.viewport)` with `skip(1)` to drop the current value.             |

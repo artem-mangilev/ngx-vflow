@@ -98,12 +98,13 @@ export class MinimapCanvasDirective {
     const image = this.previews;
     image.width = Math.max(0, Math.round(width * ratio));
     image.height = Math.max(0, Math.round(height * ratio));
-    const context = image.getContext('2d');
+    // An empty bitmap needs no context; jsdom reports every getContext call as not implemented.
+    const context = width > 0 && height > 0 ? image.getContext('2d') : null;
     const transform =
       nodes.length && width > 0 && height > 0
         ? getViewportForBounds(getNodesFlowBounds(nodes), width, height, Number.MIN_VALUE, 0.3, 0)
         : { x: 0, y: 0, zoom: 0.2 };
-    if (context && width > 0 && height > 0) {
+    if (context) {
       context.setTransform(
         ratio * transform.zoom,
         0,
@@ -138,7 +139,9 @@ export class MinimapCanvasDirective {
     const wheel = (event: WheelEvent) => this.onWheel(event);
     const refreshTheme = () => this.themeVersion.update((version) => version + 1);
     const scheme = view?.matchMedia?.('(prefers-color-scheme: dark)');
-    const observer = view && 'MutationObserver' in view ? new view.MutationObserver(refreshTheme) : undefined;
+    // zone.js in happy-dom replaces MutationObserver with a class without methods: the theme is then read once.
+    const created = view && 'MutationObserver' in view ? new view.MutationObserver(refreshTheme) : undefined;
+    const observer = typeof created?.observe === 'function' ? created : undefined;
     // Ancestors are complete only once the projected minimap is attached to the document.
     afterNextRender(() => {
       for (let element = this.canvas.parentElement; element; element = element.parentElement) {
@@ -174,8 +177,9 @@ export class MinimapCanvasDirective {
       const pixelHeight = Math.max(0, Math.round(height * ratio));
       if (this.canvas.width !== pixelWidth) this.canvas.width = pixelWidth;
       if (this.canvas.height !== pixelHeight) this.canvas.height = pixelHeight;
+      if (width <= 0 || height <= 0) return;
       const context = this.canvas.getContext('2d');
-      if (!context || width <= 0 || height <= 0) return;
+      if (!context) return;
       const { image, transform } = this.graph();
       const viewport = getViewportBounds(
         this.viewport.readableViewport(),
@@ -245,7 +249,7 @@ export class MinimapCanvasDirective {
         : { x: 0, y: 0 },
       moved: false,
     };
-    this.canvas.setPointerCapture(event.pointerId);
+    this.canvas.setPointerCapture?.(event.pointerId);
     if (!inside) this.centerOn(point);
   }
 
@@ -282,7 +286,7 @@ export class MinimapCanvasDirective {
     const drag = this.drag;
     if (event && drag?.id !== event.pointerId) return;
     this.drag = undefined;
-    if (drag && this.canvas.hasPointerCapture(drag.id)) this.canvas.releasePointerCapture(drag.id);
+    if (drag && this.canvas.hasPointerCapture?.(drag.id)) this.canvas.releasePointerCapture(drag.id);
   }
 
   private centerOn(point: Point, zoom = this.viewport.readableViewport().zoom) {

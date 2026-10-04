@@ -1,8 +1,8 @@
-A component node reads its node with `injectNode()` and uses directives such as `vHandle` and `vResizable`, which exist only inside a flow. Render the component in a flow of one node:
+import { ChangeDetectionStrategy, Component, output } from '@angular/core';
+import { TestBed } from '@angular/core/testing';
+import { ComponentNodeEvent, Vflow, createNodes, injectNode } from 'ngx-vflow';
 
-{% raw %}
-
-```ts
+// The example of the "Unit testing component nodes" docs page.
 @Component({
   selector: 'app-task-node',
   template: `<div vResizable>
@@ -11,6 +11,7 @@ A component node reads its node with `injectNode()` and uses directives such as 
     <span vHandle handleType="source" position="right"></span>
   </div>`,
   imports: [Vflow],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 class TaskNodeComponent {
   readonly done = output<string>();
@@ -20,19 +21,22 @@ class TaskNodeComponent {
 @Component({
   template: `<vflow [nodes]="nodes" (componentNodeEvent)="events.push($event)" />`,
   imports: [Vflow],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 class HostComponent {
-  readonly nodes = createNodes([{ id: 'task', component: TaskNodeComponent, point: { x: 0, y: 0 }, data: { title: 'Review' } }]);
+  readonly nodes = createNodes([
+    { id: 'task', component: TaskNodeComponent, point: { x: 0, y: 0 }, data: { title: 'Review' } },
+  ]);
   readonly events: ComponentNodeEvent<[TaskNodeComponent]>[] = [];
 }
 
-describe('TaskNodeComponent', () => {
+describe('a component node in a flow of one node', () => {
   async function render() {
     const fixture = TestBed.createComponent(HostComponent);
     fixture.detectChanges();
     await fixture.whenStable();
 
-    return { fixture, node: fixture.nativeElement.querySelector('app-task-node') };
+    return { fixture, node: (fixture.nativeElement as HTMLElement).querySelector('app-task-node')! };
   }
 
   it('renders the data of its node and follows its changes', async () => {
@@ -50,15 +54,8 @@ describe('TaskNodeComponent', () => {
   it('reports its outputs through the flow', async () => {
     const { fixture, node } = await render();
 
-    node.querySelector('button').click();
+    node.querySelector('button')!.click();
 
     expect(fixture.componentInstance.events).toEqual([{ nodeId: 'task', eventName: 'done', eventPayload: 'task' }]);
   });
 });
-```
-
-{% endraw %}
-
-The test needs no providers of the library.
-
-See [Unit testing](../unit-testing) for what a test can check without a browser.

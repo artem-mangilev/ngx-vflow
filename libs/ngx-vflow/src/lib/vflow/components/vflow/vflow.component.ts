@@ -165,7 +165,7 @@ const connectionControllerHostDirective = {
     '[style.--v-zoom]': 'settledZoom()',
     // Nothing that follows the viewport is painted before the first layout, so the first painted frame already
     // shows a viewport the application sets in reaction to `initialized`, such as a `fitView()` call.
-    '[class.v-initializing]': '!initialized()',
+    '[class.v-initializing]': 'awaitsFirstLayout()',
   },
   imports: [
     KeyboardEntityDirective,
@@ -580,6 +580,8 @@ export class VflowComponent {
    * `fitView()` in an effect, is the first viewport the user sees.
    */
   public readonly initialized = this.flowRenderingService.flowInitialized;
+
+  protected readonly awaitsFirstLayout = this.flowRenderingService.awaitsFirstLayout;
   // #endregion
 
   protected markers = this.flowEntitiesService.markers;

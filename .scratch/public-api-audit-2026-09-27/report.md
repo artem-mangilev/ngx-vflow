@@ -298,7 +298,7 @@ JSDoc: «the transparent stroke the flow draws» ([edge.interface.ts:34-40](../.
 | 14  | [Graph operations и события](issues/14-graph-operations-vs-events.md)                  | P2        | needs-triage    | —          |
 | 15  | [`(initialized)` и fit-on-load](issues/15-initialized-and-fit-on-load.md)              | P2        | needs-triage    | 01         |
 | 16  | [testing: CI и поломки](issues/16-testing-ci-and-fixes.md)                             | P2        | ready-for-agent | —          |
-| 17  | [testing: паритет моков и рёбра](issues/17-testing-mock-parity-and-edges.md)           | P2        | needs-triage    | 16         |
+| 17  | [testing: паритет моков и рёбра](issues/17-testing-mock-parity-and-edges.md)           | P2        | wontfix         | 16         |
 | 18  | [@vflow/ui: баги](issues/18-ui-bugs.md)                                                | P2        | ready-for-agent | —          |
 | 19  | [@vflow/ui: дублирование с core](issues/19-ui-core-duplication.md)                     | P2        | needs-triage    | 12         |
 | 20  | [Мелкие расхождения имён и типов](issues/20-naming-and-type-nits.md)                   | P2        | needs-triage    | —          |

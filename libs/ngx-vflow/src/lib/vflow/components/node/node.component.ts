@@ -18,6 +18,7 @@ import { FlowStatusService } from '../../services/flow-status.service';
 import { HandleService } from '../../services/handle.service';
 import { NodeRenderingService } from '../../services/node-rendering.service';
 import { FlowSettingsService } from '../../services/flow-settings.service';
+import { FlowRenderingService } from '../../services/flow-rendering.service';
 import { NodeAccessorService } from '../../services/node-accessor.service';
 import { NgTemplateOutlet } from '@angular/common';
 import { ComponentEventBusService } from '../../services/component-event-bus.service';
@@ -96,6 +97,8 @@ export class NodeComponent implements OnInit, OnDestroy {
   public nodeTemplate = input<TemplateRef<any>>();
 
   constructor() {
+    const flowRendering = inject(FlowRenderingService);
+
     effect(() => {
       const classes = this.hostRef.nativeElement.classList;
       classes.toggle('v-node--undraggable', this.hostUndraggable());
@@ -103,7 +106,7 @@ export class NodeComponent implements OnInit, OnDestroy {
     });
     effect(() => {
       // A ready node inherits visibility, so the flow can keep it hidden until its first layout is complete.
-      this.hostRef.nativeElement.style.visibility = this.model().isReady() ? '' : 'hidden';
+      this.hostRef.nativeElement.style.visibility = flowRendering.hiddenUntil(this.model().isReady()) ? 'hidden' : '';
     });
     effect(() => {
       const model = this.model();
