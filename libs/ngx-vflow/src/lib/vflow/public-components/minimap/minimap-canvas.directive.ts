@@ -139,7 +139,9 @@ export class MinimapCanvasDirective {
     const wheel = (event: WheelEvent) => this.onWheel(event);
     const refreshTheme = () => this.themeVersion.update((version) => version + 1);
     const scheme = view?.matchMedia?.('(prefers-color-scheme: dark)');
-    const observer = view && 'MutationObserver' in view ? new view.MutationObserver(refreshTheme) : undefined;
+    // zone.js in happy-dom replaces MutationObserver with a class without methods: the theme is then read once.
+    const created = view && 'MutationObserver' in view ? new view.MutationObserver(refreshTheme) : undefined;
+    const observer = typeof created?.observe === 'function' ? created : undefined;
     // Ancestors are complete only once the projected minimap is attached to the document.
     afterNextRender(() => {
       for (let element = this.canvas.parentElement; element; element = element.parentElement) {

@@ -72,16 +72,18 @@ it('connects two steps', async () => {
   const target = end.querySelector('[handleType="target"]');
 
   source.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, button: 0, pointerId: 1, isPrimary: true }));
+  fixture.detectChanges();
   await fixture.whenStable();
   target.dispatchEvent(new PointerEvent('pointerenter'));
   target.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, pointerId: 1 }));
+  fixture.detectChanges();
   await fixture.whenStable();
 
   expect(fixture.componentInstance.connections).toEqual([{ source: 'start', target: 'end', sourceHandleType: 'source', targetHandleType: 'target' }]);
 });
 ```
 
-The flow reacts to the press and to the release in separate change detection passes, as it does for a gesture that spans frames. Let the fixture settle after each of them.
+The flow reacts to the press and to the release in separate change detection passes, as it does for a gesture that spans frames. Let the fixture settle after each of them. In an application with zone.js `whenStable()` does not run change detection, so the examples call `fixture.detectChanges()` first; a zoneless application may leave it out.
 
 A click on an element with `vSelectable` selects its node. `(nodesChanges)` and `(edgesChanges)` emit one array per tick in a later task, so wait for them, for example with `vi.waitFor()`.
 

@@ -45,6 +45,7 @@ describe('a component node in a flow of one node', () => {
     expect(node.textContent).toContain('Review');
 
     fixture.componentInstance.nodes[0].data.set({ title: 'Approve' });
+    fixture.detectChanges();
     await fixture.whenStable();
 
     expect(node.textContent).toContain('Approve');

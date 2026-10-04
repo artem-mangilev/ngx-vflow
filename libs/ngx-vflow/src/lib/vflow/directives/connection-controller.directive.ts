@@ -13,6 +13,7 @@ import { adjustDirection } from '../utils/adjust-direction';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { EdgeModel } from '../models/edge.model';
 import { ConnectionForValidation } from '../interfaces/connection-settings.interface';
+import { listen } from '../utils/listen';
 import {
   ConnectEndEvent,
   connectEndEventFromConnectionDroppedStatus,
@@ -31,10 +32,11 @@ import {
 export class ConnectionControllerDirective {
   private settings = inject(FlowSettingsService);
   private destroyRef = inject(DestroyRef);
-  private pendingDrag?: AbortController;
+  /** Stops waiting for the pressed pointer to pass the drag threshold. */
+  private cancelPendingDrag?: () => void;
 
   constructor() {
-    this.destroyRef.onDestroy(() => this.pendingDrag?.abort());
+    this.destroyRef.onDestroy(() => this.cancelPendingDrag?.());
     this.statusService.status$.pipe(takeUntilDestroyed()).subscribe((status) => {
       switch (status.state) {
         case 'connection-start':
@@ -87,7 +89,7 @@ export class ConnectionControllerDirective {
   }
 
   private afterDragThreshold(event: Event | undefined, start: () => void) {
-    this.pendingDrag?.abort();
+    this.cancelPendingDrag?.();
     if (event instanceof PointerEvent) releaseImplicitCapture(event);
     const threshold = this.settings.connectionDragThreshold();
     if (!event || threshold === 0) {
@@ -96,23 +98,30 @@ export class ConnectionControllerDirective {
     }
     if (!(event instanceof PointerEvent)) return;
     const origin = { x: event.clientX, y: event.clientY };
-    const pending = (this.pendingDrag = new AbortController());
-    const options = { signal: pending.signal, capture: true };
+    const options = { capture: true };
     const matches = (next: PointerEvent) => next.pointerId === event.pointerId;
-    document.addEventListener(
-      'pointermove',
-      (next) => {
-        if (matches(next) && Math.hypot(next.clientX - origin.x, next.clientY - origin.y) > threshold) {
-          pending.abort();
-          start();
-        }
-      },
-      options,
-    );
-    for (const type of ['pointerup', 'pointercancel'] as const) {
-      document.addEventListener(type, (next) => matches(next) && pending.abort(), options);
-    }
-    window.addEventListener('blur', () => pending.abort(), options);
+    const cancel = () => {
+      listeners.forEach((remove) => remove());
+      if (this.cancelPendingDrag === cancel) this.cancelPendingDrag = undefined;
+    };
+    const listeners = [
+      listen(
+        document,
+        'pointermove',
+        (next) => {
+          if (matches(next) && Math.hypot(next.clientX - origin.x, next.clientY - origin.y) > threshold) {
+            cancel();
+            start();
+          }
+        },
+        options,
+      ),
+      ...(['pointerup', 'pointercancel'] as const).map((type) =>
+        listen(document, type, (next) => matches(next) && cancel(), options),
+      ),
+      listen(window, 'blur', cancel, options),
+    ];
+    this.cancelPendingDrag = cancel;
   }
 
   private statusService = inject(FlowStatusService);

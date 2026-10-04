@@ -55,12 +55,13 @@ export function defineAngularTestConfig(projectRoot: string, include: string[]):
 
 /**
  * Specs of a project in jsdom and happy-dom, the environments of `ng test` without `--browsers`: they have no
- * layout, so they only prove that the library renders and reacts there.
+ * layout, so they only prove that the library renders and reacts there. Each environment runs twice, zoneless
+ * and with zone.js, which patches listeners and observers differently in each of them.
  */
 export function defineAngularNodeDomTestConfig(projectRoot: string, include: string[]): ViteUserConfig {
   const { test, ...config } = defineAngularTestConfig(projectRoot, include);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { browser, ...shared } = test!;
+  const { browser, setupFiles, ...shared } = test!;
 
   return {
     ...config,
@@ -68,10 +69,16 @@ export function defineAngularNodeDomTestConfig(projectRoot: string, include: str
       ...shared,
       // Component styles decide what is visible, so they are processed as an application build does.
       css: true,
-      projects: ['jsdom', 'happy-dom'].map((environment) => ({
-        extends: true,
-        test: { name: environment, environment },
-      })),
+      projects: ['jsdom', 'happy-dom'].flatMap((environment) =>
+        ['test-setup.ts', 'test-setup.zone.ts'].map((setup) => ({
+          extends: true,
+          test: {
+            name: setup.includes('zone') ? `${environment} zone.js` : environment,
+            environment,
+            setupFiles: [resolve(workspaceRoot, setup)],
+          },
+        })),
+      ),
     },
   };
 }

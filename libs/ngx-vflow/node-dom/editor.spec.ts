@@ -51,9 +51,11 @@ describe('a component with a flow', () => {
     const target = end.querySelector('[handleType="target"]')!;
 
     source.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, button: 0, pointerId: 1, isPrimary: true }));
+    fixture.detectChanges();
     await fixture.whenStable();
     target.dispatchEvent(new PointerEvent('pointerenter'));
     target.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, pointerId: 1 }));
+    fixture.detectChanges();
     await fixture.whenStable();
 
     expect(fixture.componentInstance.connections).toEqual([

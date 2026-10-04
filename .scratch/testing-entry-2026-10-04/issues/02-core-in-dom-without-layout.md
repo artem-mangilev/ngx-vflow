@@ -20,3 +20,21 @@ Blocked by: —
 Что работает без layout: рендер презентаций узлов, рёбер и labels; реакция на изменения `nodes`/`edges`; выбор кликом; соединение pointer-событиями; `(componentNodeEvent)`; `setViewport`, `zoomTo`, `zoomIn`, `zoomOut`, `getNode`.
 
 Что честно не работает: `initialized()` остаётся `false`, `fitView()` резолвится в `false`, размеры и позиции handles — нули.
+
+## Comments
+
+### 2026-10-04 — проверка как потребитель
+
+Временное приложение вне репозитория: Angular 21.2, `@angular/build:unit-test`, Vitest 4.1, пакет из tarball, 11 тестов (сценарии из docs, Testing Library `getByRole`/`findByRole`, `viewChild(VflowComponent)`, первый layout и `fitView` в браузере). Матрица: jsdom 28, happy-dom 20, `--browsers=chromiumHeadless`; zoneless и zone.js. Все шесть прогонов проходят после правок ниже.
+
+Найдено и исправлено:
+
+- **zone.js + jsdom (Vitest 4):** `addEventListener` с опцией `signal` бросает — zone.js вызывает jsdom-слушатель на `AbortSignal` из Node. Воспроизводится без ngx-vflow. `viewport-gestures` и `connection-controller` снимают слушатели явно (`utils/listen.ts`).
+- **zone.js + happy-dom:** zone.js подменяет `MutationObserver` классом без методов. Воспроизводится без ngx-vflow. Minimap не наблюдает за темой, если у observer нет `observe`.
+- **Примеры в docs** не работали в приложении с zone.js: `whenStable()` там не запускает change detection. В примерах перед ним стоит `fixture.detectChanges()`.
+
+Node-DOM specs идут теперь в четырёх вариантах: jsdom и happy-dom, zoneless и zone.js (`test-setup.zone.ts`, `zone.js` в devDependencies). Вариант happy-dom + zone.js падает без правки minimap. Падение jsdom + zone.js в репозитории не воспроизводится: оно есть только на Vitest 4, а здесь Vitest 3.2.
+
+Найдено и не исправлено: без `@angular/cdk` импорт пакета падает (`Cannot find package '@angular/cdk'`) — его нет в `peerDependencies`.
+
+Не проверялось: Jest, Karma, Angular 20 как потребитель.
