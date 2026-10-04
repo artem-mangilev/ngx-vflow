@@ -14,6 +14,7 @@ import { EdgeModel } from '../../models/edge.model';
 import { EdgeContext } from '../../interfaces/template-context.interface';
 import { SelectionService } from '../../services/selection.service';
 import { FlowSettingsService } from '../../services/flow-settings.service';
+import { FlowRenderingService } from '../../services/flow-rendering.service';
 import { ConnectionControllerDirective } from '../../directives/connection-controller.directive';
 import { HandleModel } from '../../models/handle.model';
 import { EdgeRenderingService } from '../../services/edge-rendering.service';
@@ -62,8 +63,10 @@ export class EdgeComponent {
 
   constructor() {
     const element = inject<ElementRef<SVGElement>>(ElementRef).nativeElement;
+    const flowRendering = inject(FlowRenderingService);
     effect(() => {
-      element.style.visibility = !this.model().isReady() || this.model().reconnecting() ? 'hidden' : '';
+      const hidden = flowRendering.hiddenUntil(this.model().isReady()) || this.model().reconnecting();
+      element.style.visibility = hidden ? 'hidden' : '';
     });
     effect(() => {
       element.style.zIndex = String(this.model().renderOrder());

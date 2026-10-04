@@ -56,7 +56,7 @@ MIT © [Artem Mangilev](https://github.com/artem-mangilev)
 Use Node 22 (`nvm use`) and `npm ci`.
 
 - `apps/docs`: NgDoc application; `apps/docs-e2e`: Playwright tests.
-- `libs/ngx-vflow`: engine and `ngx-vflow/testing` entry point.
+- `libs/ngx-vflow`: engine.
 - `libs/ui`: optional `@vflow/ui` design system (Tailwind CSS 4).
 - `npm start`: docs dev server with source imports and live reload.
 - `npm run build:dev` / `npm run build`: all libraries and docs in development / production.

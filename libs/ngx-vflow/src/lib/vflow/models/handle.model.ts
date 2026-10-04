@@ -52,7 +52,9 @@ export type HandleMeasureContext = {
 /** `fallbackZoom` applies to a node that is rendered outside of a flow viewport, for example in a unit test. */
 export function createHandleMeasureContext(nodeElement: HTMLElement, fallbackZoom: number): HandleMeasureContext {
   const viewport = nodeElement.closest<HTMLElement>('.v-viewport');
-  const zoom = (viewport ? new DOMMatrixReadOnly(viewport.style.transform).a : fallbackZoom) || 1;
+  // jsdom has no DOMMatrixReadOnly; it has no layout either, so the zoom divides rectangles of zeros.
+  const rendered = viewport && typeof DOMMatrixReadOnly !== 'undefined';
+  const zoom = (rendered ? new DOMMatrixReadOnly(viewport.style.transform).a : fallbackZoom) || 1;
 
   return { nodeRect: nodeElement.getBoundingClientRect(), zoom, rects: new Map() };
 }
@@ -223,7 +225,8 @@ export class HandleModel {
   }
 
   private warnWithoutBox() {
-    if (!isDevMode()) return;
+    // A node without a box takes its handles with it: a hidden node, or a DOM without layout such as jsdom.
+    if (!isDevMode() || !this.parentNode.nodeElement()?.getClientRects().length) return;
     const id = this.id();
     console.warn(
       `[ngx-vflow] The ${this.type()} handle${id ? ` "${id}"` : ''} of node "${this.parentNode.rawNode.id}" ` +

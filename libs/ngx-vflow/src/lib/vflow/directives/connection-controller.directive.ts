@@ -287,7 +287,7 @@ function statusToConnection(
  */
 function releaseImplicitCapture(event: PointerEvent) {
   const target = event.target;
-  if (event.pointerType === 'touch' && target instanceof Element && target.hasPointerCapture(event.pointerId)) {
+  if (event.pointerType === 'touch' && target instanceof Element && target.hasPointerCapture?.(event.pointerId)) {
     target.releasePointerCapture(event.pointerId);
   }
 }

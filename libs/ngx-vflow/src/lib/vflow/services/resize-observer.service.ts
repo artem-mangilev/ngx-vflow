@@ -5,9 +5,12 @@ export class ResizeObserverService implements OnDestroy {
   private zone = inject(NgZone);
   private readonly thingsToObserve = new Map<Element, Set<(resizeEntry: ResizeObserverEntry) => void>>();
 
-  private resizeObserver: ResizeObserver;
+  // A DOM without layout, such as jsdom, has no ResizeObserver: nothing is measured there.
+  private resizeObserver: ResizeObserver | null = null;
 
   constructor() {
+    if (typeof ResizeObserver === 'undefined') return;
+
     this.resizeObserver = new ResizeObserver((entries) => {
       this.zone.run(() => {
         for (const entry of entries) {
@@ -24,7 +27,7 @@ export class ResizeObserverService implements OnDestroy {
     const callbacks = this.thingsToObserve.get(element);
     if (callbacks === undefined) {
       this.thingsToObserve.set(element, new Set([callback]));
-      this.resizeObserver.observe(element);
+      this.resizeObserver?.observe(element);
     } else {
       callbacks.add(callback);
     }
@@ -45,11 +48,11 @@ export class ResizeObserverService implements OnDestroy {
 
     if (callbacks.size === 0) {
       this.thingsToObserve.delete(element);
-      this.resizeObserver.unobserve(element);
+      this.resizeObserver?.unobserve(element);
     }
   }
 
   public ngOnDestroy(): void {
-    this.resizeObserver.disconnect();
+    this.resizeObserver?.disconnect();
   }
 }

@@ -52,3 +52,26 @@ export function defineAngularTestConfig(projectRoot: string, include: string[]):
     },
   });
 }
+
+/**
+ * Specs of a project in jsdom and happy-dom, the environments of `ng test` without `--browsers`: they have no
+ * layout, so they only prove that the library renders and reacts there.
+ */
+export function defineAngularNodeDomTestConfig(projectRoot: string, include: string[]): ViteUserConfig {
+  const { test, ...config } = defineAngularTestConfig(projectRoot, include);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { browser, ...shared } = test!;
+
+  return {
+    ...config,
+    test: {
+      ...shared,
+      // Component styles decide what is visible, so they are processed as an application build does.
+      css: true,
+      projects: ['jsdom', 'happy-dom'].map((environment) => ({
+        extends: true,
+        test: { name: environment, environment },
+      })),
+    },
+  };
+}
