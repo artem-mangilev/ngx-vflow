@@ -1,12 +1,42 @@
-import { ChangeDetectionStrategy, Component, provideZonelessChangeDetection, viewChild } from '@angular/core';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { VflowComponent } from '../../src/public-api';
-import { Vflow } from '../../src/public-api';
-import { Node } from '../../src/public-api';
-import { Edge } from '../../src/public-api';
-import { ConnectionSettings } from '../../src/public-api';
-import { createNodes, createEdges } from '../../src/public-api';
+import { ChangeDetectionStrategy, Component, Type, viewChild } from '@angular/core';
+import { TestBed } from '@angular/core/testing';
+import {
+  ConnectionSettings,
+  Edge,
+  Node,
+  Vflow,
+  VflowComponent,
+  VflowConnectionTemplateDirective,
+  VflowDragHandleDirective,
+  VflowEdgeInteractionDirective,
+  VflowEdgeLabelTemplateDirective,
+  VflowEdgeTemplateDirective,
+  VflowHandleDirective,
+  VflowMarkerTemplateDirective,
+  VflowMinimapComponent,
+  VflowNodeTemplateDirective,
+  VflowNodeToolbarComponent,
+  VflowResizableComponent,
+  VflowSelectableDirective,
+  createEdges,
+  createNodes,
+} from 'ngx-vflow';
 import { VflowMocks } from './vflow-mocks';
+import { VflowMockComponent } from './component-mocks/vflow-mock.component';
+import { VflowHandleMockDirective } from './directive-mocks/handle-mock.directive';
+import { VflowResizableMockComponent } from './component-mocks/resizable-mock.component';
+import { VflowSelectableMockDirective } from './directive-mocks/selectable-mock.directive';
+import { VflowEdgeInteractionMockDirective } from './directive-mocks/edge-interaction-mock.directive';
+import { VflowMinimapMockComponent } from './component-mocks/minimap-mock.component';
+import { VflowNodeToolbarMockComponent } from './component-mocks/node-toolbar-mock.component';
+import { VflowDragHandleMockDirective } from './directive-mocks/drag-handle-mock.directive';
+import {
+  VflowConnectionTemplateMockDirective,
+  VflowEdgeLabelTemplateMockDirective,
+  VflowEdgeTemplateMockDirective,
+  VflowMarkerTemplateMockDirective,
+  VflowNodeTemplateMockDirective,
+} from './directive-mocks/template-mock.directive';
 
 @Component({
   template: `
@@ -15,8 +45,8 @@ import { VflowMocks } from './vflow-mocks';
       [nodes]="nodes"
       [edges]="edges"
       [view]="'auto'"
-      [minZoom]="0"
-      [maxZoom]="0"
+      [minZoom]="0.5"
+      [maxZoom]="2"
       [background]="'#fff'"
       [optimization]="{ detachedGroupsLayer: true }"
       [nodesSelectable]="true"
@@ -28,9 +58,12 @@ import { VflowMocks } from './vflow-mocks';
       [snapGrid]="[1, 1]"
       [elevateNodesOnSelect]="true"
       (componentNodeEvent)="(null)"
-      (connect)="(null)">
-      <ng-template vNode>
-        <div vDragHandle vSelectable vResizable [gap]="2">
+      (nodesChanges)="(null)"
+      (edgesChanges.select)="(null)"
+      (connect)="connections.push($event)">
+      <ng-template let-ctx vNode>
+        <div class="node" vDragHandle vSelectable vResizable [gap]="2">
+          {{ ctx.node.id }}
           <span vHandle handleType="source" #handle="vHandle" [position]="'left'" [handleId]="'1'" [layout]="'manual'">
             {{ handle.state() }}
           </span>
@@ -42,8 +75,10 @@ import { VflowMocks } from './vflow-mocks';
       </ng-template>
 
       <ng-template let-ctx vEdge>
-        <svg:path fill="none" [attr.d]="ctx.path()" [attr.stroke-width]="4" [attr.marker-end]="ctx.markerEnd()" />
-        <div *vEdgeLabel="'start'">{{ ctx.edge.id }}</div>
+        <svg:g vEdgeInteraction>
+          <svg:path fill="none" [attr.d]="ctx.path()" [attr.marker-end]="ctx.markerEnd()" />
+        </svg:g>
+        <span class="edge-label" *vEdgeLabel="'start'">{{ ctx.edge.id }}</span>
       </ng-template>
 
       <ng-template let-ctx vConnection>
@@ -60,115 +95,149 @@ import { VflowMocks } from './vflow-mocks';
   imports: [Vflow],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-class VflowWrapperComponent {
-  public vflow = viewChild<VflowComponent>('vflow');
+class FlowHostComponent {
+  public readonly vflow = viewChild.required<VflowComponent>('vflow');
 
-  public nodes: Node[] = createNodes([
-    {
-      id: '1',
-      point: { x: 0, y: 0 },
-    },
-    {
-      id: '2',
-      point: { x: 0, y: 0 },
-      width: 100,
-      height: 100,
-    },
+  public readonly nodes: Node[] = createNodes([
+    { id: 'parent', point: { x: 10, y: 20 }, width: 200, height: 100 },
+    { id: 'child', point: { x: 5, y: 5 }, width: 50, height: 40, parentId: 'parent' },
+    { id: 'auto', point: { x: 400, y: 0 } },
   ]);
 
-  public edges: Edge[] = createEdges([
-    {
-      id: '1',
-      source: '1',
-      target: '2',
-    },
-  ]);
+  public readonly edges: Edge[] = createEdges([{ id: 'parent-auto', source: 'parent', target: 'auto' }]);
 
-  public connection: ConnectionSettings = {};
+  public readonly connection: ConnectionSettings = {};
 
-  callViewChildApis() {
-    try {
-      this.vflow()!.viewport();
-
-      this.vflow()!.initialized();
-
-      this.vflow()!.nodesChanges.subscribe(() => undefined);
-
-      this.vflow()!.edgesChanges.subscribe(() => undefined);
-
-      this.vflow()!.setViewport({
-        x: 0,
-        y: 0,
-        zoom: 1,
-      });
-
-      this.vflow()!.zoomTo(1);
-
-      this.vflow()!.setCenter({
-        x: 0,
-        y: 0,
-      });
-
-      this.vflow()!.zoomIn();
-
-      this.vflow()!.zoomOut();
-
-      this.vflow()!.fitView();
-
-      this.vflow()!.clientToFlowPosition({
-        x: 0,
-        y: 0,
-      });
-
-      this.vflow()!.flowToClientPosition({
-        x: 0,
-        y: 0,
-      });
-
-      this.vflow()!.getNodesAtPoint({
-        x: 0,
-        y: 0,
-      });
-
-      this.vflow()!.getNode('1');
-
-      this.vflow()!.getNodeRect('1');
-
-      this.vflow()!.getNodesBounds();
-
-      this.vflow()!.getDetachedEdges();
-
-      return true;
-    } catch {
-      return false;
-    }
-  }
+  public readonly connections: unknown[] = [];
 }
 
-describe('VflowMockComponent', () => {
-  let fixture: ComponentFixture<VflowWrapperComponent>;
-  let component: VflowWrapperComponent;
+function renderWithMocks() {
+  TestBed.configureTestingModule({
+    imports: [FlowHostComponent],
+    // A mock that lacks an input or a selector of the real directive fails the test instead of logging.
+    errorOnUnknownElements: true,
+    errorOnUnknownProperties: true,
+  }).overrideComponent(FlowHostComponent, { remove: { imports: [Vflow] }, add: { imports: [VflowMocks] } });
+  const fixture = TestBed.createComponent(FlowHostComponent);
+  fixture.detectChanges();
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      imports: [VflowWrapperComponent, provideZonelessChangeDetection()],
-    })
-      .overrideComponent(VflowWrapperComponent, {
-        remove: {
-          imports: [Vflow],
-        },
-        add: {
-          imports: [VflowMocks],
-        },
-      })
-      .compileComponents();
-    fixture = TestBed.createComponent(VflowWrapperComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+  return { fixture, flow: fixture.componentInstance.vflow() as unknown as VflowMockComponent };
+}
+
+describe('VflowMocks', () => {
+  it('render the presentations of a template written for Vflow', () => {
+    const { fixture } = renderWithMocks();
+    const root = fixture.nativeElement as HTMLElement;
+
+    expect(Array.from(root.querySelectorAll('.node'), (node) => node.textContent!.trim().split(/\s+/)[0])).toEqual([
+      'parent',
+      'child',
+      'auto',
+    ]);
+    expect(root.querySelector('.node [vHandle]')!.textContent!.trim()).toBe('idle');
+    expect(root.querySelector('.edge-label')!.textContent).toBe('parent-auto');
+    expect(root.querySelectorAll('v-node-toolbar button').length).toBe(3);
   });
 
-  it('should successfully create mock vflow component and run all view child apis', () => {
-    expect(component).toBeTruthy();
-    expect(component.callViewChildApis()).toBeTrue();
+  it('applies viewport changes at once within the zoom limits', async () => {
+    const { flow } = renderWithMocks();
+
+    expect(await flow.setViewport({ x: 10, y: 20, zoom: 5 })).toBe(true);
+    expect(flow.viewport()).toEqual({ x: 10, y: 20, zoom: 2 });
+
+    await flow.zoomTo(1);
+    await flow.zoomIn();
+    expect(flow.viewport().zoom).toBeCloseTo(1.2);
+    await flow.zoomOut();
+    await flow.zoomOut();
+    expect(flow.viewport().zoom).toBeCloseTo(1 / 1.2);
+
+    await flow.setCenter({ x: 100, y: 50 }, { zoom: 0.1 });
+    expect(flow.viewport()).toEqual({ x: -50, y: -25, zoom: 0.5 });
+  });
+
+  it('answers node queries from the nodes it was given', () => {
+    const { fixture, flow } = renderWithMocks();
+    const [parent, child] = fixture.componentInstance.nodes;
+
+    expect(flow.getNode('child')).toBe(child);
+    expect(flow.getNode('missing')).toBeUndefined();
+    expect(flow.getNodeRect('parent')).toEqual({ x: 10, y: 20, width: 200, height: 100 });
+    // A child rectangle is in flow coordinates, and a node without a size has no rectangle.
+    expect(flow.getNodeRect('child')).toEqual({ x: 15, y: 25, width: 50, height: 40 });
+    expect(flow.getNodeRect('auto')).toBeUndefined();
+    expect(flow.getNodesBounds()).toEqual(flow.getNodeRect(parent.id));
+    expect(flow.getNodesBounds(['auto'])).toEqual({ x: 0, y: 0, width: 0, height: 0 });
+    expect(flow.getNodesAtPoint({ x: 20, y: 30 })).toEqual([]);
+    expect(flow.getIntersectingNodes('child')).toEqual([]);
+    expect(flow.getDetachedEdges()).toEqual([]);
+    expect(flow.clientToFlowPosition({ x: 1, y: 2 })).toEqual({ x: 1, y: 2 });
+    expect(flow.initialized()).toBe(true);
+  });
+});
+
+describe('VflowMocks parity', () => {
+  // Decorated classes lose their names in the test build, so every pair carries its own.
+  const pairs: Array<[name: string, real: Type<unknown>, mock: Type<unknown>]> = [
+    ['VflowComponent', VflowComponent, VflowMockComponent],
+    ['VflowHandleDirective', VflowHandleDirective, VflowHandleMockDirective],
+    ['VflowResizableComponent', VflowResizableComponent, VflowResizableMockComponent],
+    ['VflowSelectableDirective', VflowSelectableDirective, VflowSelectableMockDirective],
+    ['VflowEdgeInteractionDirective', VflowEdgeInteractionDirective, VflowEdgeInteractionMockDirective],
+    ['VflowMinimapComponent', VflowMinimapComponent, VflowMinimapMockComponent],
+    ['VflowNodeToolbarComponent', VflowNodeToolbarComponent, VflowNodeToolbarMockComponent],
+    ['VflowDragHandleDirective', VflowDragHandleDirective, VflowDragHandleMockDirective],
+    ['VflowNodeTemplateDirective', VflowNodeTemplateDirective, VflowNodeTemplateMockDirective],
+    ['VflowEdgeLabelTemplateDirective', VflowEdgeLabelTemplateDirective, VflowEdgeLabelTemplateMockDirective],
+    ['VflowEdgeTemplateDirective', VflowEdgeTemplateDirective, VflowEdgeTemplateMockDirective],
+    ['VflowConnectionTemplateDirective', VflowConnectionTemplateDirective, VflowConnectionTemplateMockDirective],
+    ['VflowMarkerTemplateDirective', VflowMarkerTemplateDirective, VflowMarkerTemplateMockDirective],
+  ];
+
+  /** The selector, inputs and outputs a template sees; host directive outputs are not part of it. */
+  function templateApi(type: Type<unknown>) {
+    const def = (type as any).ɵcmp ?? (type as any).ɵdir;
+
+    return {
+      selectors: def.selectors,
+      exportAs: def.exportAs,
+      inputs: Object.keys(def.inputs).sort(),
+      outputs: Object.keys(def.outputs).sort(),
+    };
+  }
+
+  it.each(pairs)('the mock of %s has its selector and inputs, and at least its outputs', (_, real, mock) => {
+    const { outputs, ...api } = templateApi(real);
+    const { outputs: mockOutputs, ...mockApi } = templateApi(mock);
+
+    expect(mockApi).toEqual(api);
+    // The mock declares the outputs of the host directives of the real component as its own.
+    expect(mockOutputs).toEqual(expect.arrayContaining(outputs));
+  });
+
+  it('the mock of VflowComponent takes the parameters of every public method', () => {
+    type Methods<T> = {
+      -readonly [K in keyof T as T[K] extends (...args: any[]) => unknown ? K : never]: T[K] extends (
+        ...args: infer P
+      ) => unknown
+        ? P
+        : never;
+    };
+
+    expectTypeOf<Methods<VflowMockComponent>>().toEqualTypeOf<Methods<VflowComponent>>();
+  });
+
+  it('every directive of Vflow has a mock', () => {
+    const mocked = new Set(pairs.map(([, real]) => real));
+    const unmocked = Vflow.filter((type) => !mocked.has(type)).map((type) => templateApi(type).selectors);
+
+    // The gesture exclusions have no mocks yet.
+    expect(unmocked).toEqual([
+      [['', 'vNoKeyboard', '']],
+      [['', 'vNoDrag', '']],
+      [['', 'vNoPan', '']],
+      [['', 'vNoWheel', '']],
+    ]);
+    expect(VflowMocks.length).toBe(pairs.length);
   });
 });

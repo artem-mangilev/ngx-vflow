@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, provideZonelessChangeDetection } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { VflowHandleDirective } from 'ngx-vflow';
 import { VflowHandleMockDirective } from './handle-mock.directive';
@@ -23,7 +23,6 @@ describe('VflowHandleMockDirective', () => {
   it('stands in for the handle directive when content injects it', () => {
     TestBed.configureTestingModule({
       imports: [HandleHostComponent],
-      providers: [provideZonelessChangeDetection()],
     }).overrideComponent(HandleHostComponent, {
       remove: { imports: [VflowHandleDirective] },
       add: { imports: [VflowHandleMockDirective] },

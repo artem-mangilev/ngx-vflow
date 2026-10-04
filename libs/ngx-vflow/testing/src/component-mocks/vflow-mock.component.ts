@@ -6,7 +6,6 @@ import {
   output,
   signal,
   WritableSignal,
-  OnInit,
   input,
 } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
@@ -115,7 +114,7 @@ const MOCK_ZOOM_STEP = 1.2;
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [NgTemplateOutlet],
 })
-export class VflowMockComponent implements AsInterface<VflowComponent>, OnInit {
+export class VflowMockComponent implements AsInterface<VflowComponent> {
   @Input() public ariaLabelConfig: Partial<AriaLabelConfig> = {};
   @Input({ required: true })
   public readonly nodes!: Node[];
@@ -240,9 +239,6 @@ export class VflowMockComponent implements AsInterface<VflowComponent>, OnInit {
 
   public initialized = signal(true);
 
-  // eslint-disable-next-line @angular-eslint/no-empty-lifecycle-method
-  public ngOnInit() {}
-
   // The viewport methods apply at once, keep the zoom to the limits and take the pane center at the flow origin.
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -289,12 +285,15 @@ export class VflowMockComponent implements AsInterface<VflowComponent>, OnInit {
     return point;
   }
 
-  public getNodesAtPoint<T = unknown>(): Array<Node<T> & { nodeSpacePoint: Point }> {
+  /** The mock does not hit-test: no node is at any point. */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public getNodesAtPoint<T = unknown>(point: Point): Array<Node<T> & { nodeSpacePoint: Point }> {
     return [];
   }
 
+  /** The mock does not hit-test: no node intersects another. */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public getIntersectingNodes(nodeId: string, options?: IntersectingNodesOptions): Node[] {
+  public getIntersectingNodes<T>(nodeId: string, options?: IntersectingNodesOptions): Node<T>[] {
     return [];
   }
 

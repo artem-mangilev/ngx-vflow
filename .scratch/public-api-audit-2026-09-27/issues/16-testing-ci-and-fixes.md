@@ -1,6 +1,6 @@
 # 16. `ngx-vflow/testing`: specs в CI и явные поломки
 
-Status: ready-for-agent
+Status: resolved
 Type: task
 Priority: P2
 Blocked by: —
@@ -30,3 +30,13 @@ Blocked by: —
 - Провайдить `RequestAnimationFrameBatchingService` в `provideCustomNodeMocks`; добавить spec на пример из docs.
 - Выровнять сигнатуры мока и поведение `viewportChange$`.
 - Удалить мёртвые провайдеры, если specs остаются зелёными.
+
+## Comments
+
+### 2026-10-04 — сделано
+
+- **Specs в CI.** Тесты переведены с Karma/Jasmine на Vitest browser mode (Chromium через Playwright, `vitest.shared.mts`). `nx test ngx-vflow` гоняет `src/**` и `testing/**`, перед этим `tsc -p tsconfig.spec.json --noEmit` (JIT-сборка Vitest типы не проверяет). В CI Chromium ставится до `npm test`.
+- **`all-mocks.spec.ts`** переписан: шаблон для `Vflow` рендерится с `VflowMocks` при `errorOnUnknownElements/Properties`; поведение viewport- и node-методов мока; паритет селекторов, inputs и outputs каждой пары мок/директива; type-level паритет параметров публичных методов `VflowComponent`.
+- **`provideCustomNodeMocks`** даёт `RequestAnimationFrameBatchingService` (новый `ɵRequestAnimationFrameBatchingService`) и no-op `ConnectionControllerDirective`, который `vHandle` теперь инжектит обязательно. `NODE_REF`, `NodeAccessorService` и `HandleService` делят один `NodeModel`. Spec на пример из docs и на все node-директивы `Vflow`.
+- **Сигнатуры мока:** `getNodesAtPoint(point)`, generic `getIntersectingNodes<T>`; лишний `ngOnInit` удалён. `viewportChange$` и `startConnection`/`startReconnection` в моке больше нет — пункт неактуален.
+- **Мёртвые провайдеры** удалены: `ComponentEventBusService`, `RootPointerDirective`, `SpacePointContextDirective`, `NodeRenderingService`, TODO. Их `ɵ`-экспорты остались — это тикет 08.

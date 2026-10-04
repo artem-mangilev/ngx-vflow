@@ -1,85 +1,56 @@
-import { Provider, signal } from '@angular/core';
+import { InjectionToken, Provider, inject, signal } from '@angular/core';
 import {
   ɵNodeModel as NodeModel,
-  ɵComponentEventBusService as ComponentEventBusService,
   ɵHandleService as HandleService,
   ɵFlowSettingsService as FlowSettingsService,
   ɵFlowStatusService as FlowStatusService,
   ɵFlowEntitiesService as FlowEntitiesService,
   ɵNodeAccessorService as NodeAccessorService,
-  ɵRootPointerDirective as RootPointerDirective,
-  ɵSpacePointContextDirective as SpacePointContextDirective,
   ɵViewportService as ViewportService,
   ɵSelectionService as SelectionService,
-  ɵNodeRenderingService as NodeRenderingService,
+  ɵConnectionControllerDirective as ConnectionControllerDirective,
+  ɵRequestAnimationFrameBatchingService as RequestAnimationFrameBatchingService,
   NODE_REF,
-  Point,
 } from 'ngx-vflow';
-import { of } from 'rxjs';
 
-const mockModel = () => new NodeModel({ id: 'mock', point: signal({ x: 0, y: 0 }), parentId: signal(null) });
+/** The node every mock provider refers to, so `injectNode()`, handles and resizers share one model. */
+const MOCK_NODE = new InjectionToken<NodeModel>('MOCK_NODE');
 
+/**
+ * Providers that let a component node render outside of a `vflow`: `injectNode()` returns a node with the id
+ * `mock`, and the node-level directives of `Vflow` (`vHandle`, `vResizable`, `vSelectable`, `vDragHandle`,
+ * `v-node-toolbar`) render without starting connections or selecting anything.
+ */
 export function provideCustomNodeMocks(): Provider[] {
   return [
     {
-      provide: ComponentEventBusService,
-      useValue: {
-        pushNodeEvent: () => {},
-        pushEdgeEvent: () => {},
-      },
+      provide: MOCK_NODE,
+      useFactory: () => new NodeModel({ id: 'mock', point: signal({ x: 0, y: 0 }), parentId: signal(null) }),
     },
-    {
-      provide: NodeAccessorService,
-      useFactory: () => ({
-        model: signal(mockModel()),
-      }),
-    },
-    {
-      provide: NODE_REF,
-      useFactory: () => mockModel().context.$implicit,
-    },
-    FlowEntitiesService,
-
-    // TODO: mocks below should be removed after the major release
+    { provide: NODE_REF, useFactory: () => inject(MOCK_NODE).context.$implicit },
+    { provide: NodeAccessorService, useFactory: () => ({ model: signal(inject(MOCK_NODE)) }) },
     {
       provide: HandleService,
-      useFactory: () => ({
-        node: signal(mockModel()),
-        createHandle: () => {},
-        destroyHandle: () => {},
-      }),
-    },
-    {
-      provide: RootPointerDirective,
-      useValue: {
-        pointerMovement$: of({
-          x: 0,
-          y: 0,
-          movementX: 0,
-          movementY: 0,
-          target: null,
-          originalEvent: null,
-        }),
-        documentPointerEnd$: of(null),
+      useFactory: () => {
+        const handles = new HandleService();
+        handles.node.set(inject(MOCK_NODE));
+        return handles;
       },
     },
     {
-      provide: SpacePointContextDirective,
+      provide: ConnectionControllerDirective,
       useValue: {
-        clientToFlowPosition: (point: Point) => point,
-        flowToClientPosition: (point: Point) => point,
+        startConnection: () => {},
+        endConnection: () => {},
+        validateConnection: () => {},
+        resetValidateConnection: () => {},
       },
     },
-    {
-      provide: SelectionService,
-      useValue: {
-        select: () => {},
-      },
-    },
+    { provide: SelectionService, useValue: { select: () => {} } },
+    FlowEntitiesService,
     FlowSettingsService,
-    // The handle directive reads the connection state to act as a drop zone.
     FlowStatusService,
     ViewportService,
-    NodeRenderingService,
+    RequestAnimationFrameBatchingService,
   ];
 }

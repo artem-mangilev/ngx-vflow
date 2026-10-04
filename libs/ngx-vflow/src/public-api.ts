@@ -112,6 +112,7 @@ export { NodeAccessorService as ɵNodeAccessorService } from './lib/vflow/servic
 export { ViewportService as ɵViewportService } from './lib/vflow/services/viewport.service';
 export { SelectionService as ɵSelectionService } from './lib/vflow/services/selection.service';
 export { NodeRenderingService as ɵNodeRenderingService } from './lib/vflow/services/node-rendering.service';
+export { RequestAnimationFrameBatchingService as ɵRequestAnimationFrameBatchingService } from './lib/vflow/services/request-animation-frame-batching.service';
 
 export { RootPointerDirective as ɵRootPointerDirective } from './lib/vflow/directives/root-pointer.directive';
 // Host directives of `vflow`: the compiler requires them in the entry point.

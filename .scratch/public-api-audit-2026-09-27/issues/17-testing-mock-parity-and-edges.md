@@ -18,7 +18,7 @@ Blocked by: 16
 - **Component edges не тестируются.** Нет `EDGE_REF` и `EdgeComponent`, поэтому `injectEdge()`, `hostDirectives: [EdgeInteractionDirective]` и `*edgeLabel` падают с NG0201.
 - **`provideCustomNodeMocks()` без аргументов.**
   - `injectNode()` всегда отдаёт узел `'mock'`.
-  - Для `NODE_REF`, `NodeAccessorService` и `HandleService` создаются три разных `NodeModel`.
+  - ~~Для `NODE_REF`, `NodeAccessorService` и `HandleService` создаются три разных `NodeModel`.~~ Сделано в 16: один модельный узел.
 - **Неполные моки директив:**
   - нет моков `vflowNo*` — `VflowMocks` не надмножество `Vflow`;
   - у `HandleMockDirective` нет host-атрибутов `data-vflow-handle-*`;
