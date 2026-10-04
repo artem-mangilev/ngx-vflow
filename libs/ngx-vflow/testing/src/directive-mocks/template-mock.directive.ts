@@ -1,42 +1,42 @@
 import { Directive, TemplateRef, ViewContainerRef, inject, input, numberAttribute } from '@angular/core';
 import type {
-  ConnectionTemplateDirective,
+  VflowConnectionTemplateDirective,
   EdgeLabelOrient,
   EdgeLabelPosition,
-  EdgeLabelTemplateDirective,
-  EdgeTemplateDirective,
-  MarkerTemplateDirective,
-  NodeTemplateDirective,
+  VflowEdgeLabelTemplateDirective,
+  VflowEdgeTemplateDirective,
+  VflowMarkerTemplateDirective,
+  VflowNodeTemplateDirective,
 } from 'ngx-vflow';
 import { AsInterface } from '../types';
 
 @Directive({
   standalone: true,
-  selector: 'ng-template[edge]',
+  selector: 'ng-template[vEdge]',
 })
-export class EdgeTemplateMockDirective implements AsInterface<EdgeTemplateDirective> {
+export class VflowEdgeTemplateMockDirective implements AsInterface<VflowEdgeTemplateDirective> {
   public templateRef = inject(TemplateRef);
 }
 
 @Directive({
   standalone: true,
-  selector: 'ng-template[connection]',
+  selector: 'ng-template[vConnection]',
 })
-export class ConnectionTemplateMockDirective implements AsInterface<ConnectionTemplateDirective> {
+export class VflowConnectionTemplateMockDirective implements AsInterface<VflowConnectionTemplateDirective> {
   public templateRef = inject(TemplateRef);
 }
 
 /** Renders the label in place, next to the edge presentation that declares it. */
 @Directive({
   standalone: true,
-  selector: 'ng-template[edgeLabel]',
+  selector: 'ng-template[vEdgeLabel]',
 })
-export class EdgeLabelTemplateMockDirective implements AsInterface<EdgeLabelTemplateDirective> {
-  public edgeLabel = input<EdgeLabelPosition, EdgeLabelPosition | '' | null | undefined>('center', {
+export class VflowEdgeLabelTemplateMockDirective implements AsInterface<VflowEdgeLabelTemplateDirective> {
+  public vEdgeLabel = input<EdgeLabelPosition, EdgeLabelPosition | '' | null | undefined>('center', {
     transform: (position) => position || 'center',
   });
 
-  public edgeLabelOrient = input<EdgeLabelOrient, EdgeLabelOrient | null | undefined>('horizontal', {
+  public vEdgeLabelOrient = input<EdgeLabelOrient, EdgeLabelOrient | null | undefined>('horizontal', {
     transform: (orient) => orient ?? 'horizontal',
   });
 
@@ -48,20 +48,20 @@ export class EdgeLabelTemplateMockDirective implements AsInterface<EdgeLabelTemp
 /** A marker shape renders nowhere: the mock draws no SVG. */
 @Directive({
   standalone: true,
-  selector: 'ng-template[marker]',
+  selector: 'ng-template[vMarker]',
 })
-export class MarkerTemplateMockDirective implements AsInterface<MarkerTemplateDirective> {
+export class VflowMarkerTemplateMockDirective implements AsInterface<VflowMarkerTemplateDirective> {
   public templateRef = inject(TemplateRef);
 
-  public marker = input.required<string>();
+  public vMarker = input.required<string>();
 
   public inset = input(0, { transform: numberAttribute });
 }
 
 @Directive({
   standalone: true,
-  selector: 'ng-template[node]',
+  selector: 'ng-template[vNode]',
 })
-export class NodeTemplateMockDirective implements AsInterface<NodeTemplateDirective> {
+export class VflowNodeTemplateMockDirective implements AsInterface<VflowNodeTemplateDirective> {
   public templateRef = inject(TemplateRef);
 }

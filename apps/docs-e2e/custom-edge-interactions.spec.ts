@@ -32,11 +32,11 @@ async function hitTargetAtMidpoint(path: import('@playwright/test').Locator) {
 test('custom edge interaction stroke can select without blocking empty canvas', async ({ page }) => {
   await page.goto('/edges/custom-edges');
 
-  const interactionPath = page.locator('vflow svg[edge] path.interactive-edge').first();
+  const interactionPath = page.locator('vflow svg[edge] path.v-interactive-edge').first();
   await expect(interactionPath).toBeAttached();
   await interactionPath.scrollIntoViewIfNeeded();
 
-  await expect.poll(() => hitTargetAtMidpoint(interactionPath)).toContain('interactive-edge');
+  await expect.poll(() => hitTargetAtMidpoint(interactionPath)).toContain('v-interactive-edge');
 
   await expect
     .poll(() =>
@@ -62,7 +62,7 @@ test('custom edge interaction stroke can select without blocking empty canvas', 
         return document.elementFromPoint(outsideStroke.x, outsideStroke.y)?.getAttribute('class');
       }),
     )
-    .toContain('vflow-pane');
+    .toContain('v-pane');
 
   await clickMidpoint(interactionPath);
   await expect(page.locator('vflow svg[edge] path[stroke="#0f4c75"]')).toHaveCount(1);
@@ -72,11 +72,11 @@ test('custom edge can be selected and deleted by clicking its interaction stroke
   await page.goto('/cookbook/delete-selected');
 
   const edges = page.locator('vflow svg[edge]');
-  const interactionPath = edges.first().locator('path.interactive-edge');
+  const interactionPath = edges.first().locator('path.v-interactive-edge');
   await interactionPath.scrollIntoViewIfNeeded();
 
   await expect(page.locator('vflow svg[edge] path[stroke="#0f4c75"]')).toHaveCount(0);
-  await expect.poll(() => hitTargetAtMidpoint(interactionPath)).toContain('interactive-edge');
+  await expect.poll(() => hitTargetAtMidpoint(interactionPath)).toContain('v-interactive-edge');
   await clickMidpoint(interactionPath);
   await expect(page.locator('vflow svg[edge] path[stroke="#0f4c75"]')).toHaveCount(1);
 

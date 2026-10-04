@@ -20,17 +20,17 @@ const defaultRepeated = true;
   styles: [
     `
       /* Dots are filled, grid lines are stroked. A fill on the grid path would close each cell into a triangle. */
-      circle.vflow-background-pattern {
-        fill: var(--vflow-muted);
+      circle.v-background-pattern {
+        fill: var(--v-muted);
       }
 
-      path.vflow-background-pattern {
+      path.v-background-pattern {
         fill: none;
-        stroke: var(--vflow-muted);
+        stroke: var(--v-muted);
       }
 
       @media (forced-colors: active) {
-        .vflow-background-pattern {
+        .v-background-pattern {
           forced-color-adjust: none;
         }
       }

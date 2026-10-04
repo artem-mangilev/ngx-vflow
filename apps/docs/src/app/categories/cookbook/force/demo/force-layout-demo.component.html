@@ -4,14 +4,14 @@
 </label>
 
 <vflow view="auto" [nodes]="nodes" [edges]="edges">
-  <ng-template let-ctx edge><svg:g docsEdge [ctx]="ctx" /></ng-template>
+  <ng-template let-ctx vEdge><svg:g docsEdge [ctx]="ctx" /></ng-template>
 
-  <ng-template let-ctx node>
+  <ng-template let-ctx vNode>
     <div class="custom-node" [style.background-color]="ctx.data()">
       {{ ctx.data() }}
 
-      <span vflowPort handleType="source" position="bottom"></span>
-      <span vflowPort handleType="target" position="top"></span>
+      <span vuiPort handleType="source" position="bottom"></span>
+      <span vuiPort handleType="target" position="top"></span>
     </div>
   </ng-template>
 </vflow>

@@ -3,12 +3,12 @@ import { NodeAccessorService } from '../services/node-accessor.service';
 
 @Directive({
   standalone: true,
-  selector: '[dragHandle]',
+  selector: '[vDragHandle]',
   host: {
-    class: 'vflow-drag-handle',
+    class: 'v-drag-handle',
   },
 })
-export class DragHandleDirective {
+export class VflowDragHandleDirective {
   private nodeAccessor = inject(NodeAccessorService);
 
   private get model() {

@@ -1,6 +1,6 @@
 import { Directive } from '@angular/core';
 import { AsInterface } from '../types';
-import type { DragHandleDirective } from 'ngx-vflow';
+import type { VflowDragHandleDirective } from 'ngx-vflow';
 
-@Directive({ selector: '[dragHandle]', standalone: true })
-export class DragHandleMockDirective implements AsInterface<DragHandleDirective> {}
+@Directive({ selector: '[vDragHandle]', standalone: true })
+export class VflowDragHandleMockDirective implements AsInterface<VflowDragHandleDirective> {}

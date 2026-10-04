@@ -10,7 +10,7 @@ export type ConnectionForValidation = Connection & {
 
 export type ConnectionValidatorFn = (connection: ConnectionForValidation) => boolean;
 
-/** Settings of the connection gesture. The preview renders the `connection` template when one is declared. */
+/** Settings of the connection gesture. The preview renders the `vConnection` template when one is declared. */
 export interface ConnectionSettings {
   curve?: Curve;
   validator?: ConnectionValidatorFn;

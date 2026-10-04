@@ -4,15 +4,15 @@
  *
  * | Nearest element on the path                                   | Press starts        |
  * | ------------------------------------------------------------- | ------------------- |
- * | `[data-vflow-no-drag]` (application and resize controls)      | nothing of the flow |
- * | `.vflow-handle` or `.reconnect-handle` nearer than a drag handle | a connection     |
- * | `.vflow-drag-handle`, or a draggable node without drag handles | a node drag        |
- * | anything else, including edges and undraggable nodes          | a pan, unless inside `[data-vflow-no-pan]` |
+ * | `[data-v-no-drag]` (application and resize controls)      | nothing of the flow |
+ * | `.v-handle` or `.v-reconnect-handle` nearer than a drag handle | a connection     |
+ * | `.v-drag-handle`, or a draggable node without drag handles | a node drag        |
+ * | anything else, including edges and undraggable nodes          | a pan, unless inside `[data-v-no-pan]` |
  */
 export interface PressTarget {
-  /** Inside `[data-vflow-no-drag]`. */
+  /** Inside `[data-v-no-drag]`. */
   readonly control: boolean;
-  /** Inside `[data-vflow-no-pan]`. */
+  /** Inside `[data-v-no-pan]`. */
   readonly noPan: boolean;
   /** The handle or reconnection handle that is nearer than any drag handle. */
   readonly connection: Element | null;
@@ -27,15 +27,15 @@ const NO_TARGET: PressTarget = { control: false, noPan: false, connection: null,
 export function pressTarget(target: EventTarget | null): PressTarget {
   if (!(target instanceof Element)) return NO_TARGET;
 
-  const nearest = target.closest('.vflow-handle, .reconnect-handle, .vflow-drag-handle');
-  const isDragHandle = !!nearest?.classList.contains('vflow-drag-handle');
+  const nearest = target.closest('.v-handle, .v-reconnect-handle, .v-drag-handle');
+  const isDragHandle = !!nearest?.classList.contains('v-drag-handle');
 
   return {
-    control: !!target.closest('[data-vflow-no-drag]'),
-    noPan: !!target.closest('[data-vflow-no-pan]'),
+    control: !!target.closest('[data-v-no-drag]'),
+    noPan: !!target.closest('[data-v-no-pan]'),
     connection: nearest && !isDragHandle ? nearest : null,
     dragHandle: isDragHandle ? nearest : null,
-    node: target.closest('.vflow-node'),
+    node: target.closest('.v-node'),
   };
 }
 
@@ -43,8 +43,8 @@ export function pressTarget(target: EventTarget | null): PressTarget {
 export function isPanPress(press: PressTarget): boolean {
   if (press.control || press.noPan || press.connection) return false;
   const node = press.node;
-  if (!node || node.classList.contains('vflow-node--undraggable')) return true;
-  return node.classList.contains('vflow-node--drag-handles-only') && !press.dragHandle;
+  if (!node || node.classList.contains('v-node--undraggable')) return true;
+  return node.classList.contains('v-node--drag-handles-only') && !press.dragHandle;
 }
 
 /** Whether the press may drag its node, given whether the node has drag handles. */

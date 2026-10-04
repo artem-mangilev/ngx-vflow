@@ -49,7 +49,7 @@ import { NodeResizeControllerDirective } from '../../directives/node-resize-cont
   // No signal reads in host bindings: the host lives in a view of the graph list, whose reads join the reactive
   // consumer of the whole list, so one node becoming ready would refresh every entity view.
   host: {
-    class: 'vflow-node',
+    class: 'v-node',
     '(focusin)': 'model().focused.set(true)',
     '(focusout)': 'model().focused.set(false)',
   },
@@ -85,7 +85,7 @@ export class NodeComponent implements OnInit, OnDestroy {
   );
 
   /**
-   * An explicit size goes to the `[resizable]` element when one exists, so its CSS min/max, padding and border
+   * An explicit size goes to the `[vResizable]` element when one exists, so its CSS min/max, padding and border
    * apply to the box that is measured. Without one, the wrapper carries the explicit axes; an `auto` axis stays unset.
    */
   protected readonly wrapperSize = computed(() => {
@@ -98,8 +98,8 @@ export class NodeComponent implements OnInit, OnDestroy {
   constructor() {
     effect(() => {
       const classes = this.hostRef.nativeElement.classList;
-      classes.toggle('vflow-node--undraggable', this.hostUndraggable());
-      classes.toggle('vflow-node--drag-handles-only', this.hostDragHandlesOnly());
+      classes.toggle('v-node--undraggable', this.hostUndraggable());
+      classes.toggle('v-node--drag-handles-only', this.hostDragHandlesOnly());
     });
     effect(() => {
       // A ready node inherits visibility, so the flow can keep it hidden until its first layout is complete.

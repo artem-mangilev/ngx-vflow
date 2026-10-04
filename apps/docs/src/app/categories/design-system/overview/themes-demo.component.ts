@@ -1,11 +1,11 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import { VflowUi } from '@vflow/ui';
+import { Vui } from '@vflow/ui';
 import { createEdges, createNodes, Vflow } from 'ngx-vflow';
 
 /** Two editors with different themes next to a core-only flow that the UI stylesheet must not restyle. */
 @Component({
   selector: 'app-ui-themes-demo',
-  imports: [Vflow, VflowUi],
+  imports: [Vflow, Vui],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
     .editors {
@@ -19,7 +19,7 @@ import { createEdges, createNodes, Vflow } from 'ngx-vflow';
       border: 1px solid var(--vui-border);
       border-radius: 10px;
       overflow: hidden;
-      background: var(--vflow-background, #fff);
+      background: var(--v-background, #fff);
     }
     .editor p {
       margin: 0;
@@ -52,63 +52,63 @@ import { createEdges, createNodes, Vflow } from 'ngx-vflow';
     }
     .plain-edge {
       fill: none;
-      stroke: var(--vflow-muted, rgb(177, 177, 183));
+      stroke: var(--v-muted, rgb(177, 177, 183));
       stroke-width: 2;
     }
   `,
   template: `
-    <section class="demo" aria-label="Themes demo" vflowTheme="light">
+    <section class="demo" aria-label="Themes demo" vuiTheme="light">
       <div class="controls">
         <label><input type="checkbox" [checked]="dark()" (change)="dark.set(!dark())" /> Dark first editor</label>
         <p>Themes are scoped: each editor, its markers, toolbar and minimap follow its own ancestor.</p>
       </div>
       <div class="editors">
-        <div class="editor" data-testid="editor-a" [vflowTheme]="dark() ? 'dark' : 'light'">
+        <div class="editor" data-testid="editor-a" [vuiTheme]="dark() ? 'dark' : 'light'">
           <p>Editor A: {{ dark() ? 'dark' : 'light' }}</p>
           <vflow [nodes]="nodes" [edges]="edges">
-            <ng-template let-ctx node>
-              <article vflowNode selectable [vflowSelected]="ctx.selected() || ctx.preselected()">
-                <header vflowNodeHeader>
-                  <span vflowTitle>{{ ctx.data().title }}</span>
+            <ng-template let-ctx vNode>
+              <article vuiNode vSelectable [vuiSelected]="ctx.selected() || ctx.preselected()">
+                <header vuiNodeHeader>
+                  <span vuiTitle>{{ ctx.data().title }}</span>
                 </header>
-                <span vflowPort handleType="target" position="left"></span>
-                <span vflowPort handleType="source" position="right"></span>
+                <span vuiPort handleType="target" position="left"></span>
+                <span vuiPort handleType="source" position="right"></span>
               </article>
             </ng-template>
-            <ng-template let-ctx edge>
-              <svg:g edgeInteraction>
+            <ng-template let-ctx vEdge>
+              <svg:g vEdgeInteraction>
                 <svg:path
-                  vflowEdge
+                  vuiEdge
                   [attr.d]="ctx.path()"
                   [attr.marker-end]="ctx.markerEnd()"
-                  [vflowSelected]="ctx.selected() || ctx.preselected()" />
+                  [vuiSelected]="ctx.selected() || ctx.preselected()" />
               </svg:g>
             </ng-template>
-            <mini-map />
+            <v-minimap />
           </vflow>
         </div>
-        <div class="editor" data-testid="editor-b" vflowTheme="dark">
+        <div class="editor" data-testid="editor-b" vuiTheme="dark">
           <p>Editor B: dark</p>
           <vflow [nodes]="nodes" [edges]="edges">
-            <ng-template let-ctx node>
-              <article vflowNode selectable [vflowSelected]="ctx.selected() || ctx.preselected()">
-                <header vflowNodeHeader>
-                  <span vflowTitle>{{ ctx.data().title }}</span>
+            <ng-template let-ctx vNode>
+              <article vuiNode vSelectable [vuiSelected]="ctx.selected() || ctx.preselected()">
+                <header vuiNodeHeader>
+                  <span vuiTitle>{{ ctx.data().title }}</span>
                 </header>
-                <span vflowPort handleType="target" position="left"></span>
-                <span vflowPort handleType="source" position="right"></span>
+                <span vuiPort handleType="target" position="left"></span>
+                <span vuiPort handleType="source" position="right"></span>
               </article>
             </ng-template>
-            <ng-template let-ctx edge>
-              <svg:g edgeInteraction>
+            <ng-template let-ctx vEdge>
+              <svg:g vEdgeInteraction>
                 <svg:path
-                  vflowEdge
+                  vuiEdge
                   [attr.d]="ctx.path()"
                   [attr.marker-end]="ctx.markerEnd()"
-                  [vflowSelected]="ctx.selected() || ctx.preselected()" />
+                  [vuiSelected]="ctx.selected() || ctx.preselected()" />
               </svg:g>
             </ng-template>
-            <mini-map />
+            <v-minimap />
           </vflow>
         </div>
       </div>
@@ -117,19 +117,19 @@ import { createEdges, createNodes, Vflow } from 'ngx-vflow';
     <div class="editor" data-testid="editor-core" style="margin-top: 10px">
       <p>Core only: own node and edge templates without a theme scope; core tokens keep their defaults.</p>
       <vflow [nodes]="coreNodes" [edges]="coreEdges">
-        <ng-template let-ctx node>
-          <div class="plain-node" selectable>
+        <ng-template let-ctx vNode>
+          <div class="plain-node" vSelectable>
             {{ ctx.data().title }}
-            <span vflowHandle handleType="target" position="left" class="plain-handle"></span>
-            <span vflowHandle handleType="source" position="right" class="plain-handle"></span>
+            <span vHandle handleType="target" position="left" class="plain-handle"></span>
+            <span vHandle handleType="source" position="right" class="plain-handle"></span>
           </div>
         </ng-template>
-        <ng-template let-ctx edge>
-          <svg:g edgeInteraction>
+        <ng-template let-ctx vEdge>
+          <svg:g vEdgeInteraction>
             <svg:path class="plain-edge" [attr.d]="ctx.path()" [attr.marker-end]="ctx.markerEnd()" />
           </svg:g>
         </ng-template>
-        <mini-map />
+        <v-minimap />
       </vflow>
     </div>
   `,

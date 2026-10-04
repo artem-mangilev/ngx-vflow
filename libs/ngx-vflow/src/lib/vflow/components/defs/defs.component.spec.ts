@@ -4,36 +4,36 @@ import { VflowComponent } from '../vflow/vflow.component';
 import { createNodes } from '../../interfaces/node.interface';
 import { Edge, createEdges } from '../../interfaces/edge.interface';
 import {
-  EdgeTemplateDirective,
-  MarkerTemplateDirective,
-  NodeTemplateDirective,
+  VflowEdgeTemplateDirective,
+  VflowMarkerTemplateDirective,
+  VflowNodeTemplateDirective,
 } from '../../directives/template.directive';
 import { VflowHandleDirective } from '../../directives/handle.directive';
 
 @Component({
   template: `<vflow [view]="[600, 400]" [nodes]="nodes" [edges]="edges()" [connection]="{ marker: 'diamond' }">
-    <ng-template node>
+    <ng-template vNode>
       <div style="width: 60px; height: 30px">
-        <span vflowHandle handleType="target" position="left"></span
-        ><span vflowHandle handleType="source" position="right"></span>
+        <span vHandle handleType="target" position="left"></span
+        ><span vHandle handleType="source" position="right"></span>
       </div>
     </ng-template>
-    <ng-template let-ctx edge>
+    <ng-template let-ctx vEdge>
       <svg:path
         fill="none"
         [attr.d]="ctx.path()"
         [attr.marker-start]="ctx.markerStart()"
         [attr.marker-end]="ctx.markerEnd()" />
     </ng-template>
-    <ng-template marker="diamond" inset="10">
+    <ng-template vMarker="diamond" inset="10">
       <svg:polygon fill="context-stroke" points="0,0 -5,-4 -10,0 -5,4" />
     </ng-template>
   </vflow>`,
   imports: [
     VflowComponent,
-    NodeTemplateDirective,
-    EdgeTemplateDirective,
-    MarkerTemplateDirective,
+    VflowNodeTemplateDirective,
+    VflowEdgeTemplateDirective,
+    VflowMarkerTemplateDirective,
     VflowHandleDirective,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -79,9 +79,9 @@ describe('Flow defs', () => {
 
     // The diamond of the edge, the diamond of the connection line (default size) and the arrow.
     expect(markers.map((marker) => marker.getAttribute('class')).sort()).toEqual([
-      'vflow-marker vflow-marker--arrow',
-      'vflow-marker vflow-marker--diamond',
-      'vflow-marker vflow-marker--diamond',
+      'v-marker v-marker--arrow',
+      'v-marker v-marker--diamond',
+      'v-marker v-marker--diamond',
     ]);
     for (const marker of markers) {
       expect(marker.getAttribute('stroke')).toBe('context-stroke');
@@ -126,7 +126,7 @@ describe('Flow defs', () => {
     ]);
     await settle();
 
-    expect(root.querySelectorAll('defs[flowDefs] marker.vflow-marker--hexagon').length).toBe(2);
+    expect(root.querySelectorAll('defs[flowDefs] marker.v-marker--hexagon').length).toBe(2);
     expect(warn.calls.count()).toBe(reported);
   });
 });

@@ -10,7 +10,7 @@ import {
   viewChild,
   WritableSignal,
 } from '@angular/core';
-import { VflowUi } from '@vflow/ui';
+import { Vui } from '@vflow/ui';
 import { createEdges, createNodes, Node, Vflow, VflowComponent } from 'ngx-vflow';
 
 interface LongEntity {
@@ -39,7 +39,7 @@ const ALL_VISIBLE: Visibility = { visible: new Set(), above: [], below: [], key:
  */
 @Component({
   selector: 'app-ui-scroll-collapse-demo',
-  imports: [Vflow, VflowUi],
+  imports: [Vflow, Vui],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
     article {
@@ -70,25 +70,25 @@ const ALL_VISIBLE: Visibility = { visible: new Set(), above: [], below: [], key:
     }
   `,
   template: `
-    <section class="demo" aria-label="Scroll and collapse experiment" vflowTheme="light">
+    <section class="demo" aria-label="Scroll and collapse experiment" vuiTheme="light">
       <div class="controls">
-        <button vflowButton type="button" (click)="flow()?.fitView()">Fit</button>
+        <button vuiButton type="button" (click)="flow()?.fitView()">Fit</button>
         <p>Scroll the Product rows with the wheel; collapse a node to move its endpoints to the header.</p>
       </div>
       <vflow view="auto" [nodes]="nodes" [edges]="edges">
-        <ng-template let-ctx node>
+        <ng-template let-ctx vNode>
           @let view = visibility(ctx.node.id);
           <article
-            vflowNode
-            selectable
-            [vflowSelected]="ctx.selected() || ctx.preselected()"
+            vuiNode
+            vSelectable
+            [vuiSelected]="ctx.selected() || ctx.preselected()"
             [attr.data-entity]="ctx.node.id"
             [attr.data-collapsed]="ctx.data().collapsed">
-            <header vflowNodeHeader [class.proxy]="ctx.data().collapsed || view.above.length">
-              <span vflowTitle>{{ ctx.data().title }}</span>
-              <span vflowMeta>{{ ctx.data().fields.length }} fields</span>
+            <header vuiNodeHeader [class.proxy]="ctx.data().collapsed || view.above.length">
+              <span vuiTitle>{{ ctx.data().title }}</span>
+              <span vuiMeta>{{ ctx.data().fields.length }} fields</span>
               <button
-                vflowNoDrag
+                vNoDrag
                 class="toggle"
                 type="button"
                 [attr.aria-label]="(ctx.data().collapsed ? 'Expand ' : 'Collapse ') + ctx.data().title"
@@ -102,13 +102,13 @@ const ALL_VISIBLE: Visibility = { visible: new Set(), above: [], below: [], key:
                 track field.id
               ) {
                 <span
-                  vflowPort
+                  vuiPort
                   handleType="target"
                   position="left"
                   [handleId]="'in:' + field.id"
                   [canStart]="false"></span>
                 <span
-                  vflowPort
+                  vuiPort
                   handleType="source"
                   position="right"
                   [handleId]="'out:' + field.id"
@@ -116,20 +116,20 @@ const ALL_VISIBLE: Visibility = { visible: new Set(), above: [], below: [], key:
               }
             </header>
             @if (!ctx.data().collapsed) {
-              <div class="rows" vflowNoWheel [attr.data-rows]="ctx.node.id" (scroll)="onScroll(ctx.node.id, $event)">
+              <div class="rows" vNoWheel [attr.data-rows]="ctx.node.id" (scroll)="onScroll(ctx.node.id, $event)">
                 @for (row of rows(ctx.node.id, ctx.data()); track row.key) {
-                  <div vflowField [attr.data-field]="row.field.id">
-                    <span vflowTitle>{{ row.field.name }}</span>
-                    <span vflowMeta>{{ row.field.type }}</span>
+                  <div vuiField [attr.data-field]="row.field.id">
+                    <span vuiTitle>{{ row.field.name }}</span>
+                    <span vuiMeta>{{ row.field.type }}</span>
                     @if (row.handles) {
                       <span
-                        vflowPort
+                        vuiPort
                         handleType="target"
                         position="left"
                         [handleId]="'in:' + row.field.id"
                         [canStart]="false"></span>
                       <span
-                        vflowPort
+                        vuiPort
                         handleType="source"
                         position="right"
                         [handleId]="'out:' + row.field.id"
@@ -139,17 +139,17 @@ const ALL_VISIBLE: Visibility = { visible: new Set(), above: [], below: [], key:
                 }
               </div>
               @if (view.below.length) {
-                <footer vflowNodeFooter class="proxy edge-note">
-                  <span vflowMeta>{{ view.below.length }} more below</span>
+                <footer vuiNodeFooter class="proxy edge-note">
+                  <span vuiMeta>{{ view.below.length }} more below</span>
                   @for (field of hidden(ctx.data(), view.below); track field.id) {
                     <span
-                      vflowPort
+                      vuiPort
                       handleType="target"
                       position="left"
                       [handleId]="'in:' + field.id"
                       [canStart]="false"></span>
                     <span
-                      vflowPort
+                      vuiPort
                       handleType="source"
                       position="right"
                       [handleId]="'out:' + field.id"
@@ -160,9 +160,9 @@ const ALL_VISIBLE: Visibility = { visible: new Set(), above: [], below: [], key:
             }
           </article>
         </ng-template>
-        <ng-template let-ctx edge>
-          <svg:g edgeInteraction>
-            <svg:path vflowEdge [attr.d]="ctx.path()" [vflowSelected]="ctx.selected() || ctx.preselected()" />
+        <ng-template let-ctx vEdge>
+          <svg:g vEdgeInteraction>
+            <svg:path vuiEdge [attr.d]="ctx.path()" [vuiSelected]="ctx.selected() || ctx.preselected()" />
           </svg:g>
         </ng-template>
       </vflow>

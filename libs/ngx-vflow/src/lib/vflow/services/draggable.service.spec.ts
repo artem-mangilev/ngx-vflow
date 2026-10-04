@@ -135,7 +135,7 @@ describe('DraggableService', () => {
 
   function createDragSurface(...paneRects: DOMRect[]) {
     const pane = document.createElement('div');
-    pane.classList.add('vflow-pane');
+    pane.classList.add('v-pane');
     const nodesLayer = document.createElement('div');
     const element = document.createElement('div');
     nodesLayer.append(element);
@@ -335,7 +335,7 @@ describe('DraggableService', () => {
     const filter = dragFilter(node);
     const noDragElement = document.createElement('div');
     const target = document.createElement('span');
-    noDragElement.setAttribute('data-vflow-no-drag', '');
+    noDragElement.setAttribute('data-v-no-drag', '');
     noDragElement.append(target);
 
     expect(filter(press(target))).toBe(false);
@@ -345,9 +345,9 @@ describe('DraggableService', () => {
     const node = createModel({ id: 'node' });
     const filter = dragFilter(node);
     const handle = document.createElement('div');
-    handle.classList.add('vflow-handle');
+    handle.classList.add('v-handle');
     const dragHandle = document.createElement('div');
-    dragHandle.classList.add('vflow-drag-handle');
+    dragHandle.classList.add('v-drag-handle');
     const body = document.createElement('span');
     const title = document.createElement('span');
     handle.append(dragHandle, body);
@@ -363,7 +363,7 @@ describe('DraggableService', () => {
     const node = createModel({ id: 'node' });
     const filter = dragFilter(node);
     const target = document.createElement('div');
-    target.classList.add('vflow-drag-handle');
+    target.classList.add('v-drag-handle');
     node.dragHandlesCount.set(1);
 
     expect(filter(press(target))).toBe(true);

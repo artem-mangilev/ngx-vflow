@@ -1,6 +1,6 @@
 /**
  * Type of a marker: a shape the library ships (`arrow`, `arrow-closed`) or the id of a shape the application
- * declares with `ng-template[marker]`.
+ * declares with `ng-template[vMarker]`.
  */
 export type MarkerType = 'arrow' | 'arrow-closed' | (string & {});
 

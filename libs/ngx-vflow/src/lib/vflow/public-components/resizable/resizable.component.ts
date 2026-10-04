@@ -38,7 +38,7 @@ import {
  * node template so the node box, the controls and the handles describe the same rectangle.
  */
 @Component({
-  selector: '[resizable]',
+  selector: '[vResizable]',
   templateUrl: './resizable.component.html',
   styleUrls: ['./resizable.component.scss'],
   imports: [NodeResizeControlComponent],
@@ -50,12 +50,12 @@ import {
     '[style.box-sizing]': "explicitSize() ? 'border-box' : null",
   },
 })
-export class ResizableComponent implements OnInit, AfterViewInit, OnDestroy {
+export class VflowResizableComponent implements OnInit, AfterViewInit, OnDestroy {
   private nodeAccessor = inject(NodeAccessorService);
   private hostRef = inject<ElementRef<HTMLElement>>(ElementRef);
   private afService = inject(RequestAnimationFrameBatchingService);
 
-  public resizable = input<boolean | ''>();
+  public vResizable = input<boolean | ''>();
 
   public gap = input(1.5);
 
@@ -97,8 +97,8 @@ export class ResizableComponent implements OnInit, AfterViewInit, OnDestroy {
     return this.nodeAccessor.model()!;
   }
 
-  /** `[resizable]="false"` hides the controls but keeps the element as the node's sizing box. */
-  protected readonly enabled = computed(() => this.resizable() !== false);
+  /** `[vResizable]="false"` hides the controls but keeps the element as the node's sizing box. */
+  protected readonly enabled = computed(() => this.vResizable() !== false);
 
   /** Explicit axes only; `null` while both axes follow the content. */
   protected readonly explicitSize = computed(() => {

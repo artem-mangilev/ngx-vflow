@@ -5,8 +5,8 @@ import { Edge, Node, Vflow, createNodes, injectNode } from 'ngx-vflow';
 @Component({
   template: `
     <vflow view="auto" [nodes]="nodes" [edges]="edges">
-      <ng-template let-ctx node><docs-node [ctx]="ctx" /></ng-template>
-      <ng-template let-ctx edge><svg:g docsEdge [ctx]="ctx" /></ng-template>
+      <ng-template let-ctx vNode><docs-node [ctx]="ctx" /></ng-template>
+      <ng-template let-ctx vEdge><svg:g docsEdge [ctx]="ctx" /></ng-template>
     </vflow>
   `,
   styles: [
@@ -81,7 +81,7 @@ interface FloatingEdgesNodeData {
     {{ ctx.data().text }}
 
     <!-- One handle whose point follows the other end of each edge: the node has no ports. -->
-    <span vflowHandle handleType="any" position="auto"></span>
+    <span vHandle handleType="any" position="auto"></span>
   </div>`,
   styles: [
     `

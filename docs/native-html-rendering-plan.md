@@ -13,10 +13,10 @@ HTML renders natively (no `foreignObject`); SVG stays only for curves (edges, co
 
 ```mermaid
 flowchart TD
-  root["div.vflow-root (rootPointer, rootSvgContext, flowSizeController, resize)"]
+  root["div.v-root (rootPointer, rootSvgContext, flowSizeController, resize)"]
   bg["svg.background (g background, fixed, viewport-signal driven)"]
-  pane["div.vflow-pane (d3-zoom target, mapContext)"]
-  vp["div.vflow-viewport (style.transform = translate(px) scale(k))"]
+  pane["div.v-pane (d3-zoom target, mapContext)"]
+  vp["div.v-viewport (style.transform = translate(px) scale(k))"]
   edges["div.edges-layer (one svg per edge, each with its own z-index)"]
   edgesvg["svg per edge (overflow:visible, position:absolute, style.zIndex)"]
   defs["svg.defs (markers, shared)"]
@@ -48,10 +48,10 @@ Nodes are a flat list positioned by `globalPoint()` (group nesting already resol
 
 This is what keeps pan/zoom working through the full-size HTML/SVG layers. Get this wrong and the canvas stops panning.
 
-- `.vflow-pane` (d3-zoom target): `z-index: 1`, receives all wheel/drag events.
-- `.vflow-viewport`: `transform-origin: 0 0; pointer-events: none` (so the transformed layer never blocks the pane).
+- `.v-pane` (d3-zoom target): `z-index: 1`, receives all wheel/drag events.
+- `.v-viewport`: `transform-origin: 0 0; pointer-events: none` (so the transformed layer never blocks the pane).
 - `.edges-layer` container: `position: absolute; pointer-events: none` and NO `z-index` (must stay in the viewport's stacking context). Each edge `<svg>` carries its own `z-index`; the visible/interaction path uses `pointer-events: visibleStroke` (xyflow) so only the stroke is clickable and empty areas pass events through to nodes/pane behind.
-- `.nodes-layer`: `pointer-events: none; transform-origin: 0 0` and NO `z-index`; each `.vflow-node` `pointer-events: all` (xyflow sets `none` for nodes with no handlers) and carries its own `z-index`. Because neither `.edges-layer` nor `.nodes-layer` sets a `z-index`, per-edge and per-node `z-index` values interleave in one shared stacking context.
+- `.nodes-layer`: `pointer-events: none; transform-origin: 0 0` and NO `z-index`; each `.v-node` `pointer-events: all` (xyflow sets `none` for nodes with no handlers) and carries its own `z-index`. Because neither `.edges-layer` nor `.nodes-layer` sets a `z-index`, per-edge and per-node `z-index` values interleave in one shared stacking context.
 - `.edge-labels-layer` / `.toolbars-layer`: `pointer-events: none`, individual labels/toolbars opt back in with `pointer-events: all`.
 - background layer: `z-index: -1; pointer-events: none`.
 - Handles: `pointer-events: none` by default, `all` while connecting (matches xyflow `.handle.connectingfrom`).
@@ -148,7 +148,7 @@ DECISION (fixed): adopt the xyflow-style **per-edge `<svg>`** approach (not a si
 10. Render shared defs/markers as a standalone svg; move connection-line/selection-box/alignment-helper to a dedicated overlay svg (connection line high z-index).
 11. Convert edge labels to HTML divs in a dedicated edge-labels layer.
 12. Render node toolbars as HTML in a toolbars overlay layer.
-13. Rewrite `ResizableComponent` resizer from SVG to HTML handles.
+13. Rewrite `VflowResizableComponent` resizer from SVG to HTML handles.
 14. Keep background as fixed SVG layer; move minimap to fixed overlay svg and replace its foreignObject previews with rects.
 15. Remove `svg-template` type, `NodeSvgTemplateDirective`/`nodeSvgTemplate`, Chrome magic-number; update public-api and demos.
 16. Build lib + run demo; validate zoom/pan/drag/handles/edges/labels/groups/resize/toolbars/minimap/virtualization.

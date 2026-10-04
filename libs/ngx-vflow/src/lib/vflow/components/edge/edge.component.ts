@@ -37,7 +37,7 @@ import { FlowStatusService, isSelectionBoxEndStatus } from '../../services/flow-
     // Clicks from the interaction stroke and from presentation elements bubble here.
     '(click)': 'onClick($event)',
     '(pointerdown)': 'pull()',
-    class: 'selectable',
+    class: 'v-selectable',
   },
   providers: [
     // Resolved lazily by presentations, which are created after the model input is set.
@@ -89,7 +89,7 @@ export class EdgeComponent {
 
   protected onClick(event: Event) {
     // A click on a reconnection handle belongs to the reconnection gesture.
-    if ((event.target as Element | null)?.closest?.('.reconnect-handle')) {
+    if ((event.target as Element | null)?.closest?.('.v-reconnect-handle')) {
       return;
     }
 

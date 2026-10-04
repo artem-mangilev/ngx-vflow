@@ -1,44 +1,44 @@
 import {
-  NoDragDirective,
-  NoPanDirective,
-  NoWheelDirective,
-  NoKeyboardDirective,
+  VflowNoDragDirective,
+  VflowNoPanDirective,
+  VflowNoWheelDirective,
+  VflowNoKeyboardDirective,
 } from './directives/gesture-exclusions.directive';
 import { VflowComponent } from './components/vflow/vflow.component';
 
-import { DragHandleDirective } from './directives/drag-handle.directive';
-import { SelectableDirective } from './directives/selectable.directive';
-import { EdgeInteractionDirective } from './directives/edge-interaction.directive';
+import { VflowDragHandleDirective } from './directives/drag-handle.directive';
+import { VflowSelectableDirective } from './directives/selectable.directive';
+import { VflowEdgeInteractionDirective } from './directives/edge-interaction.directive';
 import {
-  ConnectionTemplateDirective,
-  EdgeLabelTemplateDirective,
-  EdgeTemplateDirective,
-  MarkerTemplateDirective,
-  NodeTemplateDirective,
+  VflowConnectionTemplateDirective,
+  VflowEdgeLabelTemplateDirective,
+  VflowEdgeTemplateDirective,
+  VflowMarkerTemplateDirective,
+  VflowNodeTemplateDirective,
 } from './directives/template.directive';
 
-import { MiniMapComponent } from './public-components/minimap/minimap.component';
-import { NodeToolbarComponent } from './public-components/node-toolbar/node-toolbar.component';
-import { ResizableComponent } from './public-components/resizable/resizable.component';
+import { VflowMinimapComponent } from './public-components/minimap/minimap.component';
+import { VflowNodeToolbarComponent } from './public-components/node-toolbar/node-toolbar.component';
+import { VflowResizableComponent } from './public-components/resizable/resizable.component';
 import { VflowHandleDirective } from './directives/handle.directive';
 
 export const Vflow = [
-  NoKeyboardDirective,
-  NoDragDirective,
-  NoPanDirective,
-  NoWheelDirective,
+  VflowNoKeyboardDirective,
+  VflowNoDragDirective,
+  VflowNoPanDirective,
+  VflowNoWheelDirective,
   VflowComponent,
   VflowHandleDirective,
-  ResizableComponent,
-  SelectableDirective,
-  EdgeInteractionDirective,
-  MiniMapComponent,
-  NodeToolbarComponent,
-  DragHandleDirective,
+  VflowResizableComponent,
+  VflowSelectableDirective,
+  VflowEdgeInteractionDirective,
+  VflowMinimapComponent,
+  VflowNodeToolbarComponent,
+  VflowDragHandleDirective,
 
-  NodeTemplateDirective,
-  EdgeLabelTemplateDirective,
-  EdgeTemplateDirective,
-  ConnectionTemplateDirective,
-  MarkerTemplateDirective,
+  VflowNodeTemplateDirective,
+  VflowEdgeLabelTemplateDirective,
+  VflowEdgeTemplateDirective,
+  VflowConnectionTemplateDirective,
+  VflowMarkerTemplateDirective,
 ] as const;

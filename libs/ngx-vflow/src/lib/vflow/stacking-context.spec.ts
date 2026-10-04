@@ -10,7 +10,7 @@ import { createNodes } from './interfaces/node.interface';
     <div data-testid="dialog" style="position: fixed; inset: 0; z-index: 10"></div>
     <div style="position: relative">
       <vflow [view]="[400, 300]" [nodes]="nodes">
-        <mini-map [pannable]="true" />
+        <v-minimap [pannable]="true" />
       </vflow>
       <div data-testid="panel" style="position: absolute; left: 0; top: 0; width: 40px; height: 40px"></div>
     </div>
@@ -56,7 +56,7 @@ describe('Flow stacking context', () => {
     const panel = root.querySelector('[data-testid="panel"]')!;
     const [x, y] = [panel.getBoundingClientRect().x + 20, panel.getBoundingClientRect().y + 20];
 
-    expect(document.elementsFromPoint(x, y)).toContain(root.querySelector('.vflow-pane')!);
+    expect(document.elementsFromPoint(x, y)).toContain(root.querySelector('.v-pane')!);
     expect(hit(panel)).toBe(panel);
   });
 });

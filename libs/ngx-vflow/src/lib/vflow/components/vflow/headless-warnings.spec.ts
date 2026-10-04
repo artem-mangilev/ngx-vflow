@@ -13,10 +13,10 @@ const nodes = () =>
   ]);
 
 const NODE_TEMPLATE = `
-  <ng-template node>
+  <ng-template vNode>
     <div style="width: 60px; height: 30px">
-      <span vflowHandle handleType="target" position="left"></span
-      ><span vflowHandle handleType="source" position="right"></span>
+      <span vHandle handleType="target" position="left"></span
+      ><span vHandle handleType="source" position="right"></span>
     </div>
   </ng-template>
 `;
@@ -47,7 +47,7 @@ class NoEdgeTemplateHostComponent {
 @Component({
   template: `<vflow [view]="[500, 300]" [nodes]="nodes" [edges]="edges">
     ${NODE_TEMPLATE}
-    <ng-template let-ctx edge>
+    <ng-template let-ctx vEdge>
       <svg:path fill="none" [attr.d]="ctx.path()" />
     </ng-template>
   </vflow>`,
@@ -61,14 +61,14 @@ class EdgeTemplateHostComponent {
 
 @Component({
   template: `<vflow [view]="[500, 300]" [nodes]="nodes" [edges]="edges">
-    <ng-template node>
-      <div selectable style="width: 60px; height: 30px">
-        <span vflowHandle handleType="target" position="left"></span
-        ><span vflowHandle handleType="source" position="right"></span>
+    <ng-template vNode>
+      <div vSelectable style="width: 60px; height: 30px">
+        <span vHandle handleType="target" position="left"></span
+        ><span vHandle handleType="source" position="right"></span>
       </div>
     </ng-template>
-    <ng-template let-ctx edge>
-      <svg:path selectable fill="none" [attr.d]="ctx.path()" />
+    <ng-template let-ctx vEdge>
+      <svg:path vSelectable fill="none" [attr.d]="ctx.path()" />
     </ng-template>
   </vflow>`,
   imports: [Vflow],
@@ -106,7 +106,7 @@ describe('headless dev warnings', () => {
   });
 
   describe('edge without a presentation', () => {
-    const NO_PRESENTATION = 'declares no <ng-template edge>';
+    const NO_PRESENTATION = 'declares no <ng-template vEdge>';
 
     it('warns once per flow, however many edges lack a component', async () => {
       const fixture = await render(NoEdgeTemplateHostComponent);
@@ -157,8 +157,8 @@ describe('headless dev warnings', () => {
     });
   });
 
-  describe('[selectable] outside a node presentation', () => {
-    const NO_EFFECT = '[selectable] has no effect outside a node presentation';
+  describe('[vSelectable] outside a node presentation', () => {
+    const NO_EFFECT = '[vSelectable] has no effect outside a node presentation';
 
     it('warns for every edge of the template and stays silent for the node template', async () => {
       await render(SelectableEdgeHostComponent);

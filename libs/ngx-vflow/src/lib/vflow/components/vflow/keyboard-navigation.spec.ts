@@ -13,10 +13,10 @@ import { KeyboardInstructionKeys, KeyboardInstructionState } from '../../interfa
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `<button>Before</button
     ><vflow [nodes]="nodes()" [edges]="edges" [view]="[600, 350]" [optimization]="{ detachedGroupsLayer: true }">
-      <ng-template node>
+      <ng-template vNode>
         <div style="width: 100px; height: 50px">
-          <span vflowHandle handleType="target" position="left"></span
-          ><span vflowHandle handleType="source" position="right"></span>
+          <span vHandle handleType="target" position="left"></span
+          ><span vHandle handleType="source" position="right"></span>
         </div>
       </ng-template> </vflow
     ><button>After</button>`,
@@ -44,7 +44,7 @@ class KeyboardHostComponent {
   imports: [Vflow],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `<vflow [nodes]="nodes" [view]="[600, 200]">
-      <ng-template node
+      <ng-template vNode
         ><button>Action</button><input aria-label="Name" /> <textarea aria-label="Notes"></textarea
         ><select aria-label="Choice">
           <option>One</option>
@@ -52,9 +52,9 @@ class KeyboardHostComponent {
         <div contenteditable="true" tabindex="0">Edit</div>
       </ng-template>
     </vflow>
-    <section vflowNoKeyboard>
+    <section vNoKeyboard>
       <vflow [nodes]="excluded" [view]="[600, 100]">
-        <ng-template node><div style="width: 100px; height: 50px"></div></ng-template>
+        <ng-template vNode><div style="width: 100px; height: 50px"></div></ng-template>
       </vflow>
     </section>`,
 })
@@ -126,7 +126,7 @@ describe('public keyboard graph navigation', () => {
     const elevation = (element: HTMLElement | SVGElement) => Number(element.style.zIndex);
     expect(elevation(child)).toBeGreaterThan(elevation(parent));
     expect(elevation(other)).toBeGreaterThan(elevation(parent));
-    parent.querySelector<HTMLElement>('.selectable')!.click();
+    parent.querySelector<HTMLElement>('.v-selectable')!.click();
     fixture.detectChanges();
     await fixture.whenStable();
     expect(elevation(parent)).toBeGreaterThan(elevation(other));
@@ -554,7 +554,7 @@ describe('public keyboard graph navigation', () => {
     await settle();
     expect(host.flow().viewport()).toEqual({ ...fitted, y: fitted.y - 15 });
     // Keys from embedded content are left alone; disabled commands drop their instruction.
-    const handle = root.querySelector<HTMLElement>('[data-vflow-handle-type="source"]')!;
+    const handle = root.querySelector<HTMLElement>('[data-v-handle-type="source"]')!;
     expect(key(handle, 'ArrowDown').defaultPrevented).toBeFalse();
     await settle();
     expect(host.flow().viewport()).toEqual({ ...fitted, y: fitted.y - 15 });

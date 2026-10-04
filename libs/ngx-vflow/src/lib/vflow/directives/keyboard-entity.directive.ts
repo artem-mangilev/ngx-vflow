@@ -35,7 +35,7 @@ export class KeyboardEntityDirective {
 
   public description = computed(() => {
     const model = this.vflowKeyboardEntity();
-    if (!model.focusable() || this.element.closest('[data-vflow-no-keyboard]')) return '';
+    if (!model.focusable() || this.element.closest('[data-v-no-keyboard]')) return '';
     const labels = this.settings.ariaLabels();
     const node = model instanceof NodeModel;
     return this.keyboardLabels.text(node ? labels.nodeInstructions : labels.edgeInstructions, {
@@ -52,7 +52,7 @@ export class KeyboardEntityDirective {
       !model.focusable() ||
       !this.settings.autoPanOnNodeFocus() ||
       !this.element.matches(':focus-visible') ||
-      this.element.closest('[data-vflow-no-keyboard]')
+      this.element.closest('[data-v-no-keyboard]')
     )
       return;
     const bounds = getNodesFlowBounds([model]);

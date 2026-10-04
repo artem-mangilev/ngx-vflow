@@ -34,14 +34,14 @@ For template nodes, the library provides a custom trigger for the `@defer` synta
 ```
 <!-- Eagerly loaded -->
 <vflow view="auto" [nodes]="nodes" [edges]="edges" [optimization]="{ lazyLoadTrigger: 'viewport' }">
-  <ng-template let-ctx node>
+  <ng-template let-ctx vNode>
     <your-node />
   </ng-template>
 </vflow>
 
 <!-- Lazy loaded -->
 <vflow view="auto" [nodes]="nodes" [edges]="edges" [optimization]="{ lazyLoadTrigger: 'viewport' }">
-  <ng-template let-ctx node>
+  <ng-template let-ctx vNode>
     @defer (when ctx.shouldLoad()) {
       <your-node />
     }

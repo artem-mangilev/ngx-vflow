@@ -15,22 +15,22 @@ graph needs templates. There are two working paths:
 <!-- prettier-ignore -->
 ```html
 <vflow [nodes]="nodes" [edges]="edges">
-  <ng-template let-ctx node>
+  <ng-template let-ctx vNode>
     @if (ctx.data().type === 'group') {
       <div class="frame" [style.width.px]="ctx.width()" [style.height.px]="ctx.height()"></div>
     } @else {
-      <div class="card" selectable>
+      <div class="card" vSelectable>
         {{ ctx.data().title }}
-        <span vflowHandle handleType="target" position="left" class="dot"></span>
-        <span vflowHandle handleType="source" position="right" class="dot"></span>
+        <span vHandle handleType="target" position="left" class="dot"></span>
+        <span vHandle handleType="source" position="right" class="dot"></span>
       </div>
     }
   </ng-template>
-  <ng-template let-ctx edge>
-    <svg:g edgeInteraction>
+  <ng-template let-ctx vEdge>
+    <svg:g vEdgeInteraction>
       <svg:path class="line" [attr.d]="ctx.path()" [attr.marker-end]="ctx.markerEnd()" />
     </svg:g>
-    <span *edgeLabel>{{ ctx.data().label }}</span>
+    <span *vEdgeLabel>{{ ctx.data().label }}</span>
   </ng-template>
 </vflow>
 ```
@@ -42,20 +42,20 @@ graph needs templates. There are two working paths:
 {% raw %}
 
 ```html
-<section vflowTheme="light">
+<section vuiTheme="light">
   <vflow [nodes]="nodes" [edges]="edges">
-    <ng-template let-ctx node>
-      <article vflowNode selectable [vflowSelected]="ctx.selected() || ctx.preselected()">
-        <header vflowNodeHeader><span vflowTitle>{{ ctx.data().title }}</span></header>
-        <span vflowPort handleType="target" position="left"></span>
-        <span vflowPort handleType="source" position="right"></span>
+    <ng-template let-ctx vNode>
+      <article vuiNode vSelectable [vuiSelected]="ctx.selected() || ctx.preselected()">
+        <header vuiNodeHeader><span vuiTitle>{{ ctx.data().title }}</span></header>
+        <span vuiPort handleType="target" position="left"></span>
+        <span vuiPort handleType="source" position="right"></span>
       </article>
     </ng-template>
-    <ng-template let-ctx edge>
-      <svg:g edgeInteraction>
-        <svg:path vflowEdge [attr.d]="ctx.path()" [attr.marker-end]="ctx.markerEnd()" [vflowSelected]="ctx.selected()" />
+    <ng-template let-ctx vEdge>
+      <svg:g vEdgeInteraction>
+        <svg:path vuiEdge [attr.d]="ctx.path()" [attr.marker-end]="ctx.markerEnd()" [vuiSelected]="ctx.selected()" />
       </svg:g>
-      <span *edgeLabel vflowEdgeLabel>{{ ctx.data().label }}</span>
+      <span *vEdgeLabel vuiEdgeLabel>{{ ctx.data().label }}</span>
     </ng-template>
   </vflow>
 </section>
@@ -65,43 +65,76 @@ graph needs templates. There are two working paths:
 
 Include `@vflow/ui/styles.css` in your global styles for path B. See the Design system section for the parts.
 
-| Removed                                                                  | Replacement                                                                                                                                                                              |
-| ------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Node `type: 'default'`, `text`                                           | A node without `type`, with `data` and a `node` template; standard handles become `[vflowHandle]` elements in the template. Use `ariaLabel` for the accessible name                      |
-| Node `type: 'default-group'`, `color`, `resizable`                       | A node with `width`, `height` and a group marker in `data`, drawn by a branch of the `node` template; put `resizable` on the template's element                                          |
-| `DefaultNode`, `DefaultGroupNode`, `isDefaultNode`, `isDefaultGroupNode` | `Node`; the application tells its node kinds apart by `data`                                                                                                                             |
-| Edge `type` (`'default'` / `'template'`)                                 | Removed; every edge renders through the `edge` template or its `component`                                                                                                               |
-| `EdgeLabel` `type: 'default'`, `text`, `style`                           | A label declared inside the edge presentation with the `edgeLabel` directive; see Edge labels below                                                                                      |
-| `color` and `markerUnits` fields of `Marker`                             | Markers follow the edge stroke (`context-stroke`); `strokeWidth` is now in flow units (default `2`), whatever the marker size                                                            |
-| Connection `type: 'default'` preview                                     | Unchanged: the default connection line and the `connection` template both remain                                                                                                         |
-| `mode: 'loose'` in `ConnectionSettings`                                  | `handleType="any"` on the handles that connect in either direction; `loose` no longer exists and handle ids are not required                                                             |
-| `type` in `ConnectionSettings`                                           | Removed: the preview renders `ng-template[connection]` when it is declared, the default line otherwise                                                                                   |
-| `floating` in `Edge`                                                     | `position="auto"` on a handle of the node: the edge meets the node on the side facing the other end                                                                                      |
-| `id` input of the handle                                                 | `handleId`; a static `id` attribute used to become the DOM id of the element                                                                                                             |
-| `<handle>`, `[template]`, `ng-template[handle]`, `HandleContext`         | `[vflowHandle]` on your own element; state via the `data-vflow-handle-state` attribute and its siblings or the directive's signals; `vflowPort` from `@vflow/ui` for the old default dot |
+| Removed                                                                  | Replacement                                                                                                                                                                    |
+| ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Node `type: 'default'`, `text`                                           | A node without `type`, with `data` and a `vNode` template; standard handles become `[vHandle]` elements in the template. Use `ariaLabel` for the accessible name               |
+| Node `type: 'default-group'`, `color`, `resizable`                       | A node with `width`, `height` and a group marker in `data`, drawn by a branch of the `vNode` template; put `vResizable` on the template's element                              |
+| `DefaultNode`, `DefaultGroupNode`, `isDefaultNode`, `isDefaultGroupNode` | `Node`; the application tells its node kinds apart by `data`                                                                                                                   |
+| Edge `type` (`'default'` / `'template'`)                                 | Removed; every edge renders through the `vEdge` template or its `component`                                                                                                    |
+| `EdgeLabel` `type: 'default'`, `text`, `style`                           | A label declared inside the edge presentation with the `vEdgeLabel` directive; see Edge labels below                                                                           |
+| `color` and `markerUnits` fields of `Marker`                             | Markers follow the edge stroke (`context-stroke`); `strokeWidth` is now in flow units (default `2`), whatever the marker size                                                  |
+| Connection `type: 'default'` preview                                     | Unchanged: the default connection line and the `vConnection` template both remain                                                                                              |
+| `mode: 'loose'` in `ConnectionSettings`                                  | `handleType="any"` on the handles that connect in either direction; `loose` no longer exists and handle ids are not required                                                   |
+| `type` in `ConnectionSettings`                                           | Removed: the preview renders `ng-template[vConnection]` when it is declared, the default line otherwise                                                                        |
+| `floating` in `Edge`                                                     | `position="auto"` on a handle of the node: the edge meets the node on the side facing the other end                                                                            |
+| `id` input of the handle                                                 | `handleId`; a static `id` attribute used to become the DOM id of the element                                                                                                   |
+| `<handle>`, `[template]`, `ng-template[handle]`, `HandleContext`         | `[vHandle]` on your own element; state via the `data-v-handle-state` attribute and its siblings or the directive's signals; `vuiPort` from `@vflow/ui` for the old default dot |
 
 ### Appearance inputs removed
 
-Colors are CSS. Core reads the tokens `--vflow-background`, `--vflow-surface`, `--vflow-foreground`,
-`--vflow-muted`, `--vflow-border`, `--vflow-selection` and `--vflow-focus`, each with a built-in default.
-The focus ring geometry is `--vflow-focus-width`, `--vflow-focus-offset` and `--vflow-focus-radius`.
-Set them on the `vflow` element or any ancestor; a `vflowTheme` scope from `@vflow/ui` maps its theme onto them.
+Colors are CSS. Core reads the tokens `--v-background`, `--v-surface`, `--v-foreground`,
+`--v-muted`, `--v-border`, `--v-selection` and `--v-focus`, each with a built-in default.
+The focus ring geometry is `--v-focus-width`, `--v-focus-offset` and `--v-focus-radius`.
+Set them on the `vflow` element or any ancestor; a `vuiTheme` scope from `@vflow/ui` maps its theme onto them.
 Under `forced-colors: active` core maps its tokens to system colors and keeps the feedback parts visible.
 
-| Removed input                                        | Replacement                                                                                  |
-| ---------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| `[background]="'#fff'"` / `{ type: 'solid', color }` | `--vflow-background` token; `[background]` now takes only `dots`, `grid` or `image` patterns |
-| Dots/grid `color`, `backgroundColor`                 | `--vflow-muted` and `--vflow-background`; the `.vflow-background-pattern` class              |
-| `resizerColor`, resize control `color`               | `--vflow-selection`, `--vflow-surface`; `.resize-control.handle` / `.resize-control.line`    |
-| `mini-map` `maskColor`, `strokeColor`                | `--vflow-muted` (mask) and `--vflow-border` (frame); the minimap samples the resolved tokens |
-| `lineColor` in `alignmentHelper` settings            | `--vflow-foreground`; `.vflow-alignment-guides`. `tolerance` stays                           |
-| `color` in `selectionBox` settings                   | `--vflow-selection`; `.selection-box`. `mode` stays                                          |
+| Removed input                                        | Replacement                                                                              |
+| ---------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| `[background]="'#fff'"` / `{ type: 'solid', color }` | `--v-background` token; `[background]` now takes only `dots`, `grid` or `image` patterns |
+| Dots/grid `color`, `backgroundColor`                 | `--v-muted` and `--v-background`; the `.v-background-pattern` class                      |
+| `resizerColor`, resize control `color`               | `--v-selection`, `--v-surface`; `.v-resize-control--handle` / `.v-resize-control--line`  |
+| `mini-map` `maskColor`, `strokeColor`                | `--v-muted` (mask) and `--v-border` (frame); the minimap samples the resolved tokens     |
+| `lineColor` in `alignmentHelper` settings            | `--v-foreground`; `.v-alignment-guides`. `tolerance` stays                               |
+| `color` in `selectionBox` settings                   | `--v-selection`; `.v-selection-box`. `mode` stays                                        |
 
 Behavior parameters are untouched: node points, sizes, `extent`, resize constraints, drag thresholds,
 snap grid, zoom limits, curves and connection validation keep their APIs. Handle `offsetX` and `offsetY` keep their
 names, but a positive value now moves the handle right and down; version 2 moved it the other way.
 
-Version 3 renders node-facing templates as native HTML in a CSS-transformed viewport. Edges and connection overlays still use SVG. SVG content passed to the node template or to `[resizable]` is no longer supported. The library does not inspect template roots or provide a compatibility fallback, so these templates must be rewritten explicitly.
+Version 3 renders node-facing templates as native HTML in a CSS-transformed viewport. Edges and connection overlays still use SVG. SVG content passed to the node template or to `[vResizable]` is no longer supported. The library does not inspect template roots or provide a compatibility fallback, so these templates must be rewritten explicitly.
+
+### Selector and class prefixes
+
+Core selectors, CSS classes, CSS tokens and data attributes use the `v` prefix and `@vflow/ui` the `vui` prefix,
+so short names such as `selectable` or `resizable` no longer collide with other libraries. The `vflow` element keeps
+its name. Public core classes are `Vflow*Directive` / `Vflow*Component`; `@vflow/ui` classes and types are `Vui*`.
+Old names have no aliases.
+
+| Before                                                                                                                                                                                                                                            | After                                                                                                                                                                                                                                                                        |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ng-template[node]`, `NodeTemplateDirective`                                                                                                                                                                                                      | `ng-template[vNode]`, `VflowNodeTemplateDirective`                                                                                                                                                                                                                           |
+| `ng-template[edge]`, `EdgeTemplateDirective`                                                                                                                                                                                                      | `ng-template[vEdge]`, `VflowEdgeTemplateDirective`                                                                                                                                                                                                                           |
+| `ng-template[connection]`, `ConnectionTemplateDirective`                                                                                                                                                                                          | `ng-template[vConnection]`, `VflowConnectionTemplateDirective`                                                                                                                                                                                                               |
+| `ng-template[marker]`, `MarkerTemplateDirective`                                                                                                                                                                                                  | `ng-template[vMarker]`, `VflowMarkerTemplateDirective`                                                                                                                                                                                                                       |
+| `edgeLabel` (structural and long form), `edgeLabelOrient`, `EdgeLabelTemplateDirective`                                                                                                                                                           | `vEdgeLabel`, `vEdgeLabelOrient`, `VflowEdgeLabelTemplateDirective`                                                                                                                                                                                                          |
+| `[vflowHandle]`, `#h="vflowHandle"`                                                                                                                                                                                                               | `[vHandle]`, `#h="vHandle"`; the class stays `VflowHandleDirective`                                                                                                                                                                                                          |
+| `[vflowNoDrag]`, `[vflowNoPan]`, `[vflowNoWheel]`, `[vflowNoKeyboard]`, `NoDragDirective` …                                                                                                                                                       | `[vNoDrag]`, `[vNoPan]`, `[vNoWheel]`, `[vNoKeyboard]`, `VflowNoDragDirective` …                                                                                                                                                                                             |
+| `[selectable]`, `SelectableDirective`                                                                                                                                                                                                             | `[vSelectable]`, `VflowSelectableDirective`                                                                                                                                                                                                                                  |
+| `[dragHandle]`, `DragHandleDirective`                                                                                                                                                                                                             | `[vDragHandle]`, `VflowDragHandleDirective`                                                                                                                                                                                                                                  |
+| `g[edgeInteraction]`, `EdgeInteractionDirective`                                                                                                                                                                                                  | `g[vEdgeInteraction]`, `VflowEdgeInteractionDirective`                                                                                                                                                                                                                       |
+| `[resizable]`, `ResizableComponent`                                                                                                                                                                                                               | `[vResizable]`, `VflowResizableComponent`                                                                                                                                                                                                                                    |
+| `<mini-map>`, `MiniMapComponent`, `MiniMapPosition`                                                                                                                                                                                               | `<v-minimap>`, `VflowMinimapComponent`, `MinimapPosition`                                                                                                                                                                                                                    |
+| `<node-toolbar>`, `NodeToolbarComponent`                                                                                                                                                                                                          | `<v-node-toolbar>`, `VflowNodeToolbarComponent`                                                                                                                                                                                                                              |
+| `ngx-vflow/testing` mocks, for example `SelectableMockDirective`                                                                                                                                                                                  | The same names with the `Vflow` prefix, for example `VflowSelectableMockDirective`                                                                                                                                                                                           |
+| `@vflow/ui`: `[vflowNode]`, `<vflow-controls>`, `VflowNode`, `VflowUi`, `VflowBpmn` …                                                                                                                                                             | `[vuiNode]`, `<vui-controls>`, `VuiNode`, `Vui`, `VuiBpmn` …                                                                                                                                                                                                                 |
+| `.vflow-*` classes, for example `.vflow-node`, `.vflow-handle`, `.vflow-root`                                                                                                                                                                     | `.v-*`, for example `.v-node`, `.v-handle`, `.v-root`                                                                                                                                                                                                                        |
+| `--vflow-*` tokens, for example `--vflow-background`, `--vflow-focus`                                                                                                                                                                             | `--v-*`, for example `--v-background`, `--v-focus`                                                                                                                                                                                                                           |
+| `data-vflow-*` attributes, for example `data-vflow-handle-state`, `data-vflow-no-drag`                                                                                                                                                            | `data-v-*`, for example `data-v-handle-state`, `data-v-no-drag`                                                                                                                                                                                                              |
+| Unprefixed classes `.resize-control` (with `.handle`, `.line`, `.top`, `.right`, `.bottom`, `.left`), `.selection-box`, `.reconnect-handle`, `.interactive-edge`, `.focus-indicator`, `.edge-label-wrapper`, `.selectable`, `.wrapper`, `.magnet` | `.v-resize-control` (with `.v-resize-control--handle`, `--line`, `--top`, `--right`, `--bottom`, `--left`), `.v-selection-box`, `.v-reconnect-handle`, `.v-interactive-edge`, `.v-focus-indicator`, `.v-edge-label-wrapper`, `.v-selectable`, `.v-node-wrapper`, `.v-magnet` |
+| `@vflow/ui` attributes `data-tone`, `data-busy`, `data-state`, `data-connected`, `data-event`, `data-gateway`, `data-flow`                                                                                                                        | `data-vui-tone`, `data-vui-busy`, `data-vui-state`, `data-vui-connected`, `data-vui-event`, `data-vui-gateway`, `data-vui-flow`                                                                                                                                              |
+
+`ng-template[vMarker]` takes the marker type as its value, `<ng-template vMarker="diamond" inset="8">`, and
+the structural `vEdgeLabel` keeps its microsyntax, with `'end'; orient: 'path'` as the value.
 
 ### Reparenting identity
 
@@ -120,8 +153,8 @@ The optional `parentId` field may still be omitted from `Node` and `StaticNode`.
 | `type: YourNodeComponent` or a lazy import function                         | `component: YourNodeComponent` or the same function                                               |
 | `HtmlTemplateNode`, `TemplateGroupNode`, `ComponentNode`                    | `Node`                                                                                            |
 | `isTemplateNode`, `isTemplateGroupNode`                                     | Check `component` or your own `data`                                                              |
-| `<ng-template nodeHtml>`, `NodeHtmlTemplateDirective`                       | `<ng-template node>`, `NodeTemplateDirective`                                                     |
-| `<ng-template groupNode>`, `GroupNodeTemplateDirective`, `GroupNodeContext` | A branch of the `node` template; every node context has `width` and `height`                      |
+| `<ng-template nodeHtml>`, `NodeHtmlTemplateDirective`                       | `<ng-template vNode>`, `VflowNodeTemplateDirective`                                               |
+| `<ng-template groupNode>`, `GroupNodeTemplateDirective`, `GroupNodeContext` | A branch of the `vNode` template; every node context has `width` and `height`                     |
 
 The library does not read a node kind. Keep your own discriminator in `data` and branch on it in the template. A group is any node with a size and children that reference it through `parentId`; assistive technology reads it as a `group` while it has children.
 
@@ -163,7 +196,7 @@ const nodes = createNodes([
 <!-- prettier-ignore -->
 ```html
 <vflow [nodes]="nodes">
-  <ng-template let-ctx node>
+  <ng-template let-ctx vNode>
     @if (ctx.data()?.type === 'group') {
       <div class="group-node" [style.width.px]="ctx.width()" [style.height.px]="ctx.height()"></div>
     } @else {
@@ -226,7 +259,7 @@ export class TaskNodeComponent {
 
 ### Edge presentations
 
-The `customTemplateEdge` selector and `CustomTemplateEdgeComponent` are removed. Wrap the path in `<svg:g edgeInteraction>` instead: the directive draws a transparent interaction stroke of `interactionWidth` (20 by default) as the first child of the group, and a click near the line selects the edge. Without it the edge has no hit area.
+The `customTemplateEdge` selector and `CustomTemplateEdgeComponent` are removed. Wrap the path in `<svg:g vEdgeInteraction>` instead: the directive draws a transparent interaction stroke of `interactionWidth` (20 by default) as the first child of the group, and a click near the line selects the edge. Without it the edge has no hit area.
 
 Before:
 
@@ -241,18 +274,18 @@ Before:
 After:
 
 ```html
-<ng-template let-ctx edge>
-  <svg:g edgeInteraction>
+<ng-template let-ctx vEdge>
+  <svg:g vEdgeInteraction>
     <svg:path [attr.d]="ctx.path()" />
   </svg:g>
 </ng-template>
 ```
 
-An edge can now be drawn by a component instead of the template: set `component` on the edge. The flow creates the component on an SVG group inside the edge, reads the edge through `injectEdge()`, and forwards its outputs to the new `(componentEdgeEvent)` output of `vflow`, typed with `ComponentEdgeEvent<[A, B]>`. Add `EdgeInteractionDirective` to the component's `hostDirectives` to give it a hit area.
+An edge can now be drawn by a component instead of the template: set `component` on the edge. The flow creates the component on an SVG group inside the edge, reads the edge through `injectEdge()`, and forwards its outputs to the new `(componentEdgeEvent)` output of `vflow`, typed with `ComponentEdgeEvent<[A, B]>`. Add `VflowEdgeInteractionDirective` to the component's `hostDirectives` to give it a hit area.
 
 ### Edge labels
 
-Labels are no longer edge data rendered by one global template. The `edgeLabels` field of `Edge`, the `EdgeLabel` and `HtmlTemplateEdgeLabel` types, `<ng-template edgeLabelHtml>`, `EdgeLabelHtmlTemplateDirective` and `HtmlEdgeLabelContext` are removed. Declare labels inside the edge presentation with the `edgeLabel` directive and keep their text in edge `data`. `EdgeLabelPosition` stays.
+Labels are no longer edge data rendered by one global template. The `edgeLabels` field of `Edge`, the `EdgeLabel` and `HtmlTemplateEdgeLabel` types, `<ng-template edgeLabelHtml>`, `EdgeLabelHtmlTemplateDirective` and `HtmlEdgeLabelContext` are removed. Declare labels inside the edge presentation with the `vEdgeLabel` directive and keep their text in edge `data`. `EdgeLabelPosition` stays.
 
 Before:
 
@@ -283,12 +316,12 @@ const edges = createEdges([{ id: '1 -> 2', source: '1', target: '2', data: { lab
 <!-- prettier-ignore -->
 ```html
 <vflow [nodes]="nodes" [edges]="edges">
-  <ng-template let-ctx edge>
-    <svg:g edgeInteraction>
+  <ng-template let-ctx vEdge>
+    <svg:g vEdgeInteraction>
       <svg:path [attr.d]="ctx.path()" />
     </svg:g>
     @if (ctx.data()?.label; as label) {
-      <span *edgeLabel class="label">{{ label }}</span>
+      <span *vEdgeLabel class="label">{{ label }}</span>
     }
   </ng-template>
 </vflow>
@@ -300,11 +333,11 @@ Place a label next to the SVG elements of the edge, not inside `svg:g`: Angular 
 
 ### Testing mocks
 
-`ngx-vflow/testing` follows the new API. `VflowMocks` declare `ng-template[node]`, `ng-template[edge]`, `ng-template[edgeLabel]` and `ng-template[connection]`, plus mocks for `vflowHandle` and `edgeInteraction`. The `nodeHtml`, `groupNode`, `edgeLabelHtml` and `handle` template mocks, `HandleMockComponent` and `CustomTemplateEdgeMockComponent` are removed. The `vflowHandle` mock provides itself as `VflowHandleDirective`, and `provideCustomNodeMocks()` provides the node object returned by `injectNode()`.
+`ngx-vflow/testing` follows the new API. `VflowMocks` declare `ng-template[vNode]`, `ng-template[vEdge]`, `ng-template[vEdgeLabel]` and `ng-template[vConnection]`, plus mocks for `vHandle` and `vEdgeInteraction`. The `nodeHtml`, `groupNode`, `edgeLabelHtml` and `handle` template mocks, `HandleMockComponent` and `CustomTemplateEdgeMockComponent` are removed. The `vHandle` mock provides itself as `VflowHandleDirective`, and `provideCustomNodeMocks()` provides the node object returned by `injectNode()`.
 
 ### Custom handle templates
 
-Custom handles are now your own native HTML elements with the `vflowHandle` directive, which positions them on the node side. The former SVG placement coordinate `ctx.point` and the handle template context have been removed; the validation state is exposed as the `data-vflow-handle-state` attribute and as the `state` signal of `VflowHandleDirective`. The handle type is the `handleType` input (`handleType="target"`),
+Custom handles are now your own native HTML elements with the `vHandle` directive, which positions them on the node side. The former SVG placement coordinate `ctx.point` and the handle template context have been removed; the validation state is exposed as the `data-v-handle-state` attribute and as the `state` signal of `VflowHandleDirective`. The handle type is the `handleType` input (`handleType="target"`),
 not `type`, so it never reaches the native `type` attribute of the element. See the Custom handles page.
 
 Before:
@@ -318,7 +351,7 @@ Before:
 After:
 
 ```html
-<span vflowHandle handleType="source" position="right" class="port"></span>
+<span vHandle handleType="source" position="right" class="port"></span>
 ```
 
 ```css
@@ -328,7 +361,7 @@ After:
   border-radius: 50%;
 }
 
-.port[data-vflow-handle-state='valid'] {
+.port[data-v-handle-state='valid'] {
   background: green;
 }
 ```
@@ -337,7 +370,7 @@ Do not calculate a replacement coordinate in the template: placement belongs to 
 
 ### Resizable templates
 
-Apply `[resizable]` to a native HTML element instead of an SVG shape. The directive name and its sizing inputs are unchanged.
+Apply `[vResizable]` (formerly `[resizable]`) to a native HTML element instead of an SVG shape. Its sizing inputs are unchanged.
 
 Before:
 
@@ -350,12 +383,12 @@ Before:
 After:
 
 ```html
-<ng-template let-ctx node>
-  <div [resizable]="ctx.selected()"></div>
+<ng-template let-ctx vNode>
+  <div [vResizable]="ctx.selected()"></div>
 </ng-template>
 ```
 
-The `[resizable]` element is now the node's sizing box: for each explicitly sized axis the library sets its `width` or `height` inline, with `box-sizing: border-box`, so size bindings on that element are no longer needed. The node wrapper no longer receives an inline size when a `[resizable]` element exists, so put the directive on the top-level element of the node template. Content-sized nodes stay unsized until the first resize, as described in Node size modes above.
+The `[vResizable]` element is now the node's sizing box: for each explicitly sized axis the library sets its `width` or `height` inline, with `box-sizing: border-box`, so size bindings on that element are no longer needed. The node wrapper no longer receives an inline size when a `[vResizable]` element exists, so put the directive on the top-level element of the node template. Content-sized nodes stay unsized until the first resize, as described in Node size modes above.
 
 ### Node size modes
 
@@ -433,7 +466,7 @@ The programmatic viewport methods are `setViewport`, `setCenter`, `fitView`, `zo
 - `FitViewOptions` gains `minZoom` and `maxZoom`, which narrow the flow limits for that call: `fitView({ nodes: [id], maxZoom: 1 })` focuses a node without zooming in past 100 %.
 - Every method keeps the zoom within `minZoom` and `maxZoom`; `setViewport` keeps `x` and `y` as given.
 - The methods apply at once and in order, each from where the previous call leads. Consecutive calls such as `fitView()` followed by `zoomTo(1)` compose instead of the last one replacing the others.
-- `vflow-controls` zooms through `zoomIn()` and `zoomOut()`; its `step` input is removed.
+- `vui-controls` zooms through `zoomIn()` and `zoomOut()`; its `step` input is removed.
 
 ### Connections without a subscription
 
@@ -455,8 +488,8 @@ A flow that relied on a missing handler to keep its handles inert sets `[canStar
 
 | Removed in v3                                               | Migration                                                                                                          |
 | ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| Node type `svg-template`                                    | Remove `type` and provide native HTML through `<ng-template node>`.                                                |
-| `NodeSvgTemplateDirective` and `nodeSvgTemplate`            | Remove these imports/usages and use `NodeTemplateDirective` / `node`.                                              |
+| Node type `svg-template`                                    | Remove `type` and provide native HTML through `<ng-template vNode>`.                                               |
+| `NodeSvgTemplateDirective` and `nodeSvgTemplate`            | Remove these imports/usages and use `VflowNodeTemplateDirective` / `vNode`.                                        |
 | `scaleOnHover` input on `MiniMapComponent`                  | Remove the input binding. The minimap remains at its default scale and does not capture pointer input.             |
 | `documentPointToFlowPoint()`                                | Rename to `clientToFlowPosition()`. Use `flowToClientPosition()` for the inverse conversion.                       |
 | `{ spaces: true }`, `SpacePoint`, `getSpacePoints`          | Convert with `clientToFlowPosition()`, then call `getNodesAtPoint()` on the flow component.                        |
@@ -464,7 +497,7 @@ A flow that relied on a missing handler to keep its handles inert sets `[canStar
 | getIntesectingNodes()                                       | Rename to `getIntersectingNodes()`.                                                                                |
 | `viewportTo(state)`                                         | Rename to `setViewport(state)`.                                                                                    |
 | `panTo({ x, y })`                                           | `setViewport({ ...flow.viewport(), x, y })`; to center on a flow-space point, `setCenter(point)`.                  |
-| `step` input on `vflow-controls`                            | Remove the binding. The buttons zoom by the step of the zoom keys.                                                 |
+| `step` input on `vui-controls`                              | Remove the binding. The buttons zoom by the step of the zoom keys.                                                 |
 | `useDefaults` option of the `create*` factories             | Remove it. The factories always create the default signals; write a literal for a bare object.                     |
 | `ConnectionControllerDirective` and its mock                | Remove the imports. The connection outputs belong to `vflow` and `VflowMockComponent`.                             |
 | `nodesChange$` and `edgesChange$`                           | `flow.nodesChanges.subscribe(...)` and `flow.edgesChanges.subscribe(...)`, or `outputToObservable()`.              |

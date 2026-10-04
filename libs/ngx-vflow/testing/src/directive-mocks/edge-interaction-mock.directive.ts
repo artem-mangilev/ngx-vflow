@@ -1,9 +1,9 @@
 import { Directive } from '@angular/core';
-import type { EdgeInteractionDirective } from 'ngx-vflow';
+import type { VflowEdgeInteractionDirective } from 'ngx-vflow';
 import { AsInterface } from '../types';
 
 @Directive({
   standalone: true,
-  selector: 'g[edgeInteraction]',
+  selector: 'g[vEdgeInteraction]',
 })
-export class EdgeInteractionMockDirective implements AsInterface<EdgeInteractionDirective> {}
+export class VflowEdgeInteractionMockDirective implements AsInterface<VflowEdgeInteractionDirective> {}

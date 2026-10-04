@@ -5,25 +5,25 @@
   rootSvgContext
   rootPointer
   flowSizeController
-  class="vflow-root"
+  class="v-root"
   [vflowA11y]="{ role: 'region', label: ariaLabels().flowLabel, description: ariaLabels().flowDescription }">
-  <div class="vflow-a11y-live" vflowLiveRegion></div>
+  <div class="v-a11y-live" vflowLiveRegion></div>
   <!-- Background (fixed, full-size svg behind everything) -->
-  <svg class="vflow-background-svg" aria-hidden="true">
+  <svg class="v-background-svg" aria-hidden="true">
     <g background />
   </svg>
 
   <!-- Pane: target of viewport gestures -->
-  <div class="vflow-pane" viewportGestures spacePointContext autoPan selectionBoxContext>
+  <div class="v-pane" viewportGestures spacePointContext autoPan selectionBoxContext>
     <!-- Viewport: transformed by zoom/pan -->
-    <div #viewportElement class="vflow-viewport">
+    <div #viewportElement class="v-viewport">
       <!-- Shared marker defs -->
-      <svg class="vflow-defs-svg" aria-hidden="true">
+      <svg class="v-defs-svg" aria-hidden="true">
         <defs flowDefs [markers]="markers()" [shapes]="markerShapes()" />
       </svg>
 
       <!-- Overlays: connection line, selection box, alignment helper (flow coords) -->
-      <svg class="vflow-overlay-svg" aria-hidden="true">
+      <svg class="v-overlay-svg" aria-hidden="true">
         @if (alignmentHelper()) {
           <svg:g alignmentHelper />
         }
@@ -32,12 +32,12 @@
       </svg>
 
       <!-- Connection line overlay (high z-index, above edges/nodes) -->
-      <svg class="vflow-connection-svg">
+      <svg class="v-connection-svg">
         <svg:g connection [model]="connection" [template]="connectionTemplateDirective()?.templateRef" />
       </svg>
 
       <!-- DOM order follows application input; z-index controls visual elevation. -->
-      <div class="vflow-nodes-layer">
+      <div class="v-nodes-layer">
         <!-- Read once: a read per item would re-link this signal to the template on every check of every item. -->
         @let nodeTemplate = nodeTemplateDirective()?.templateRef;
         @for (model of orderedNodes(); track trackNodes($index, model)) {
@@ -52,7 +52,7 @@
       </div>
 
       <!-- Edges -->
-      <div class="vflow-edges-layer">
+      <div class="v-edges-layer">
         @let edgeTemplate = edgeTemplateDirective()?.templateRef;
         @for (model of orderedEdges(); track trackEdges($index, model)) {
           <svg
@@ -65,8 +65,8 @@
         }
       </div>
 
-      <!-- HTML edge labels declared by ng-template[edgeLabel] inside edge presentations -->
-      <div class="vflow-edge-labels-layer">
+      <!-- HTML edge labels declared by ng-template[vEdgeLabel] inside edge presentations -->
+      <div class="v-edge-labels-layer">
         @for (model of orderedEdges(); track trackEdges($index, model)) {
           @for (label of model.labelEntries(); track label.position) {
             <div
@@ -84,7 +84,7 @@
 
   <!-- Minimap (fixed overlay) -->
   @if (minimap(); as minimap) {
-    <div class="vflow-minimap" [vflowA11y]="{ role: 'img', label: ariaLabels().minimapLabel }">
+    <div class="v-minimap" [vflowA11y]="{ role: 'img', label: ariaLabels().minimapLabel }">
       <ng-container [ngTemplateOutlet]="minimap.template()" />
     </div>
   }

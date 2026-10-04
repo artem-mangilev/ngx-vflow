@@ -48,8 +48,8 @@ export class EasyConnectSettings {
 @Component({
   selector: 'easy-connect-node',
   template: `
-    <div class="easy-node" vflowHandle handleType="any" [position]="settings.position()">
-      <div class="easy-node__title" dragHandle>{{ ctx.data().title }}</div>
+    <div class="easy-node" vHandle handleType="any" [position]="settings.position()">
+      <div class="easy-node__title" vDragHandle>{{ ctx.data().title }}</div>
       <div class="easy-node__body">Drag from here to connect</div>
     </div>
   `,
@@ -81,16 +81,16 @@ export class EasyConnectSettings {
         cursor: crosshair;
       }
 
-      .easy-node[data-vflow-handle-state='connecting'] {
+      .easy-node[data-v-handle-state='connecting'] {
         box-shadow: 0 0 0 3px rgba(67, 56, 202, 0.35);
       }
 
-      .easy-node[data-vflow-handle-state='valid'] {
+      .easy-node[data-v-handle-state='valid'] {
         border-color: #2e7d32;
         box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.3);
       }
 
-      .easy-node[data-vflow-handle-state='invalid'] {
+      .easy-node[data-v-handle-state='invalid'] {
         border-color: #c62828;
       }
     `,
@@ -117,7 +117,7 @@ export class EasyConnectNodeComponent {
       </label>
 
       <vflow view="auto" [nodes]="nodes" [edges]="edges()" [connection]="connection()" (connect)="connect($event)">
-        <ng-template let-ctx edge><svg:g docsEdge [ctx]="ctx" /></ng-template>
+        <ng-template let-ctx vEdge><svg:g docsEdge [ctx]="ctx" /></ng-template>
       </vflow>
     </div>
   `,

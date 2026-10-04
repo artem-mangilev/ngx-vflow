@@ -14,11 +14,11 @@ for (const [route, selector] of pages) {
     await page.goto(`/design-system/${route}`);
     const demo = page.locator(selector);
     await demo.evaluate((element) => element.scrollIntoView({ block: 'center' }));
-    await expect(demo.locator('.vflow-node').first()).toBeVisible();
+    await expect(demo.locator('.v-node').first()).toBeVisible();
     // Let the fit-view animation finish: axe samples backgrounds of moving elements unreliably.
     const viewportTransform = () =>
       demo
-        .locator('.vflow-viewport')
+        .locator('.v-viewport')
         .first()
         .evaluate((element) => element.style.transform);
     await expect
@@ -34,8 +34,8 @@ for (const [route, selector] of pages) {
         (violation) => `${violation.id}: ${violation.nodes.map((node) => node.target.join(' ')).join(', ')}`,
       ),
     ).toEqual([]);
-    // Core keeps focus on its wrappers; the theme maps --vflow-focus, so the outline is the accent color.
-    const wrapper = demo.locator('.vflow-node').first();
+    // Core keeps focus on its wrappers; the theme maps --v-focus, so the outline is the accent color.
+    const wrapper = demo.locator('.v-node').first();
     await wrapper.focus();
     await expect(wrapper).toBeFocused();
     await expect(wrapper).toHaveCSS('outline-color', /rgb\(67, 56, 202\)|rgb\(181, 172, 255\)/);
@@ -44,7 +44,7 @@ for (const [route, selector] of pages) {
 
 test('states: busy indicator stops animating under reduced motion and keeps its text', async ({ page }) => {
   await page.goto('/design-system/workflow');
-  const busy = page.locator('app-ui-workflow-demo .vui-status[data-busy="true"]').first();
+  const busy = page.locator('app-ui-workflow-demo .vui-status[data-vui-busy="true"]').first();
   await expect(busy).toHaveText('Scheduling');
   const animation = () => busy.evaluate((element) => getComputedStyle(element, '::before').animationName);
   await expect.poll(animation).not.toBe('none');
@@ -57,14 +57,10 @@ async function rowEndpointError(demo: Locator) {
   return demo.evaluate((root) => {
     const edge = root.querySelectorAll<SVGPathElement>('path.vui-edge')[1];
     const source = root
-      .querySelector(
-        '[data-entity="crm"] [data-field="email"] .vui-port.vflow-handle[data-vflow-handle-position="right"]',
-      )!
+      .querySelector('[data-entity="crm"] [data-field="email"] .vui-port.v-handle[data-v-handle-position="right"]')!
       .getBoundingClientRect();
     const target = root
-      .querySelector(
-        '[data-entity="erp"] [data-field="email"] .vui-port.vflow-handle[data-vflow-handle-position="left"]',
-      )!
+      .querySelector('[data-entity="erp"] [data-field="email"] .vui-port.v-handle[data-v-handle-position="left"]')!
       .getBoundingClientRect();
     const matrix = edge.getScreenCTM()!;
     const start = edge.getPointAtLength(0).matrixTransform(matrix);
@@ -107,14 +103,14 @@ test('geometry: endpoints stay on ports after zooming through the controls', asy
     workflow.evaluate((root) => {
       const edge = root.querySelectorAll<SVGPathElement>('path.vui-edge')[0];
       const port = root
-        .querySelector('.vflow-node .vui-port.vflow-handle[data-vflow-handle-position="right"]')!
+        .querySelector('.v-node .vui-port.v-handle[data-v-handle-position="right"]')!
         .getBoundingClientRect();
       const start = edge.getPointAtLength(0).matrixTransform(edge.getScreenCTM()!);
       return Math.max(Math.abs(start.x - port.right), Math.abs(start.y - port.y - port.height / 2));
     });
   await expect.poll(endpointError).toBeLessThan(1);
   const zoom = () =>
-    workflow.locator('.vflow-viewport').evaluate((element) => {
+    workflow.locator('.v-viewport').evaluate((element) => {
       const match = /scale\(([^)]+)\)/.exec(element.style.transform);
       return match ? Number(match[1]) : 1;
     });

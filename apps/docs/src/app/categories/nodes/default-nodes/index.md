@@ -3,7 +3,7 @@ keyword: 'FeaturesDefaultNodes'
 ---
 
 Core is headless: it owns geometry, interaction and accessibility, and renders a node through the
-template you provide. Pass a `nodes` array and an `<ng-template node>` to `vflow`. Nodes carry your `data`; the
+template you provide. Pass a `nodes` array and an `<ng-template vNode>` to `vflow`. Nodes carry your `data`; the
 template receives it through `ctx.data()` together with `ctx.selected()`, `ctx.preselected()`, `ctx.width()` and
 `ctx.height()`.
 
@@ -17,4 +17,4 @@ Copy them or write your own; see `*FeaturesCustomNodes` for templates and compon
 
 - `ariaLabel` gives the node its accessible name; without it core uses `Node {id}`.
 - `width` and `height` are optional initial dimensions; the rendered template is measured afterwards.
-- Handles are part of your template: put the `vflowHandle` directive on the elements where connections should attach.
+- Handles are part of your template: put the `vHandle` directive on the elements where connections should attach.

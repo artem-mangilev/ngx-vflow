@@ -45,8 +45,8 @@ const ZOOM_DEFAULTS = {
         [keyboardShortcuts]="shortcuts()"
         [ariaLabelConfig]="{ flowLabel: 'Configured graph' }"
         (deleteRequest)="onDeleteRequest($event)">
-        <ng-template let-ctx node><docs-node [ctx]="ctx" /></ng-template>
-        <ng-template let-ctx edge><svg:g docsEdge [ctx]="ctx" /></ng-template>
+        <ng-template let-ctx vNode><docs-node [ctx]="ctx" /></ng-template>
+        <ng-template let-ctx vEdge><svg:g docsEdge [ctx]="ctx" /></ng-template>
       </vflow>
     </section>
   `,

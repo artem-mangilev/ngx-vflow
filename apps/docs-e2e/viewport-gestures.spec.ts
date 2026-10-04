@@ -9,7 +9,7 @@ interface Viewport {
 }
 
 async function viewport(graph: Locator): Promise<Viewport> {
-  return graph.locator('.vflow-viewport').evaluate((element) => {
+  return graph.locator('.v-viewport').evaluate((element) => {
     const matrix = new DOMMatrix(getComputedStyle(element).transform);
     return { x: matrix.e, y: matrix.f, zoom: matrix.a };
   });
@@ -19,8 +19,8 @@ async function open(page: Page) {
   await page.goto('/interactions/viewport-gestures');
   const graph = page.locator('vflow').first();
   await graph.scrollIntoViewIfNeeded();
-  await expect(graph.locator('.vflow-node').first()).toBeVisible();
-  const pane = (await graph.locator('.vflow-pane').boundingBox())!;
+  await expect(graph.locator('.v-node').first()).toBeVisible();
+  const pane = (await graph.locator('.v-pane').boundingBox())!;
   return { graph, pane };
 }
 
@@ -31,7 +31,7 @@ function empty(pane: { x: number; y: number; width: number; height: number }) {
 
 /** Samples the viewport on every animation frame for `ms`. */
 async function record(graph: Locator, ms: number, start: () => Promise<unknown>) {
-  const samples = graph.locator('.vflow-viewport').evaluate(
+  const samples = graph.locator('.v-viewport').evaluate(
     (element, ms) =>
       new Promise<Viewport[]>((resolve) => {
         const samples: Viewport[] = [];
@@ -58,7 +58,7 @@ test('pans by the dragged distance, suppresses the click after a pan and clears 
   page,
 }) => {
   const { graph, pane } = await open(page);
-  const node = graph.locator('.vflow-node').first();
+  const node = graph.locator('.v-node').first();
   const presentation = node.locator('[data-vui-selected]');
   const point = empty(pane);
 
@@ -119,7 +119,7 @@ test('animates double-click zoom around the pointer and the animated fit view', 
   const fitted = fitting.at(-1)!;
   // Every node is visible after fitting.
   for (const box of await graph
-    .locator('.vflow-node')
+    .locator('.v-node')
     .evaluateAll((nodes) => nodes.map((node) => node.getBoundingClientRect().toJSON() as DOMRect))) {
     expect(box.left).toBeGreaterThanOrEqual(pane.x - 1);
     expect(box.right).toBeLessThanOrEqual(pane.x + pane.width + 1);
@@ -129,7 +129,7 @@ test('animates double-click zoom around the pointer and the animated fit view', 
 
 test('drags a node without panning and without the click that selects it', async ({ page }) => {
   const { graph } = await open(page);
-  const node = graph.locator('.vflow-node').first();
+  const node = graph.locator('.v-node').first();
   const box = (await node.boundingBox())!;
   const start = await viewport(graph);
 
@@ -152,8 +152,8 @@ test('pans with one finger and pinches with two, and sets touch-action from the 
     cdp.send('Input.dispatchTouchEvent', { type, touchPoints: points.map((p, id) => ({ ...p, id })) });
   const center = { x: pane.x + pane.width / 2, y: pane.y + pane.height - 40 };
 
-  await expect(graph.locator('.vflow-pane')).toHaveCSS('touch-action', 'none');
-  await expect(graph.locator('.vflow-node').first()).toHaveCSS('touch-action', 'none');
+  await expect(graph.locator('.v-pane')).toHaveCSS('touch-action', 'none');
+  await expect(graph.locator('.v-node').first()).toHaveCSS('touch-action', 'none');
 
   const start = await viewport(graph);
   await touch('touchStart', [center]);
@@ -177,16 +177,16 @@ test('pans with one finger and pinches with two, and sets touch-action from the 
   expect((cx - pinched.x) / pinched.zoom).toBeCloseTo((cx - panned.x) / panned.zoom, 1);
 
   await page.getByLabel('panOnDrag').uncheck();
-  await expect(graph.locator('.vflow-pane')).toHaveCSS('touch-action', 'pan-x pan-y');
+  await expect(graph.locator('.v-pane')).toHaveCSS('touch-action', 'pan-x pan-y');
   await page.getByLabel('zoomOnPinch').uncheck();
-  await expect(graph.locator('.vflow-pane')).toHaveCSS('touch-action', 'auto');
+  await expect(graph.locator('.v-pane')).toHaveCSS('touch-action', 'auto');
 });
 
 test('lazy loading moves smoothly to the next node and lands exactly on it', async ({ page }) => {
   await page.goto('/performance/lazy-loading');
   const graph = page.locator('vflow').first();
   await graph.scrollIntoViewIfNeeded();
-  await expect(graph.locator('.vflow-node').first()).toBeVisible();
+  await expect(graph.locator('.v-node').first()).toBeVisible();
   // Let the initial fit view animation finish.
   await expect.poll(async () => (await viewport(graph)).zoom, { timeout: 3000 }).toBeGreaterThan(0);
   await page.waitForTimeout(1000);
@@ -200,8 +200,8 @@ test('lazy loading moves smoothly to the next node and lands exactly on it', asy
   expect(Math.min(...samples.map((sample) => sample.zoom))).toBeLessThan(Math.min(initial.zoom, final.zoom));
 
   // The target node is centered in the pane.
-  const pane = (await graph.locator('.vflow-pane').boundingBox())!;
-  const target = (await graph.locator('.vflow-node').nth(1).boundingBox())!;
+  const pane = (await graph.locator('.v-pane').boundingBox())!;
+  const target = (await graph.locator('.v-node').nth(1).boundingBox())!;
   expect(target.x + target.width / 2).toBeCloseTo(pane.x + pane.width / 2, 0);
   expect(target.y + target.height / 2).toBeCloseTo(pane.y + pane.height / 2, 0);
 });

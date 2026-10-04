@@ -62,23 +62,23 @@ This configuration consumes ordinary scrolling over the flow. For an editor embe
 
 # Embedded controls
 
-Import the standalone `NoDragDirective`, `NoPanDirective`, and `NoWheelDirective`, or use the `Vflow` imports array, which includes all three.
+Import the standalone `VflowNoDragDirective`, `VflowNoPanDirective`, and `VflowNoWheelDirective`, or use the `Vflow` imports array, which includes all three.
 
 ```html
 <!-- Inside a node template: retain text editing and the textarea's own scrolling. -->
-<textarea vflowNoDrag vflowNoWheel></textarea>
+<textarea vNoDrag vNoWheel></textarea>
 
 <!-- Prevent viewport panning from an overlay and its descendants. -->
-<div vflowNoPan>...</div>
+<div vNoPan>...</div>
 ```
 
 Each directive applies to its element and descendants:
 
-- `vflowNoDrag` prevents node dragging and viewport panning.
-- `vflowNoPan` prevents viewport panning, including scroll panning; node dragging and zoom are unaffected.
-- `vflowNoWheel` leaves wheel events, including trackpad pinch, to the browser/control. It does not block touchscreen gestures; combine it with `vflowNoDrag` for scrollable controls inside draggable nodes.
+- `vNoDrag` prevents node dragging and viewport panning.
+- `vNoPan` prevents viewport panning, including scroll panning; node dragging and zoom are unaffected.
+- `vNoWheel` leaves wheel events, including trackpad pinch, to the browser/control. It does not block touchscreen gestures; combine it with `vNoDrag` for scrollable controls inside draggable nodes.
 
-**Major-release migration:** replace `class="nodrag"` with `vflowNoDrag` and import the directive or `Vflow`. The old class no longer disables gestures. Built-in resize controls already use the directive.
+**Major-release migration:** replace `class="nodrag"` with `vNoDrag` and import the directive or `Vflow`. The old class no longer disables gestures. Built-in resize controls already use the directive.
 
 # Wheel zoom easing
 
@@ -86,7 +86,7 @@ Wheel zoom eases towards its target. Every wheel event moves the target by its s
 
 # Page scrolling
 
-Wheel zoom suppresses page scrolling when it consumes an event. A new outward wheel gesture at a reached zoom limit can scroll the page. Scroll panning consumes its events. Disabled wheel gestures and `vflowNoWheel` leave native scrolling available. There is no separate `preventScrolling` setting.
+Wheel zoom suppresses page scrolling when it consumes an event. A new outward wheel gesture at a reached zoom limit can scroll the page. Scroll panning consumes its events. Disabled wheel gestures and `vNoWheel` leave native scrolling available. There is no separate `preventScrolling` setting.
 
 The browser decides whether a touch scrolls the page from CSS `touch-action` when the finger lands, so the flow sets it on the pane:
 

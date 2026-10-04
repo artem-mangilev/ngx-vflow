@@ -1,12 +1,12 @@
-The library includes a minimap that offers an overview of the entire flow. To enable it, simply add a `<mini-map />` component as a direct child of `<vflow />`. For customization options, see the available inputs in `MiniMapComponent`.
+The library includes a minimap that offers an overview of the entire flow. To enable it, simply add a `<v-minimap />` component as a direct child of `<vflow />`. For customization options, see the available inputs in `VflowMinimapComponent`.
 
 The minimap uses canvas and caches node previews during pan and zoom. It updates the previews when node geometry or selection changes, and keeps the image sharp on high-DPI displays.
 
-Navigation is opt-in; `<mini-map />` remains a read-only overview.
+Navigation is opt-in; `<v-minimap />` remains a read-only overview.
 
 ```html
 <vflow [nodes]="nodes" [edges]="edges">
-  <mini-map [pannable]="true" [zoomable]="true" [zoomStep]="0.1" />
+  <v-minimap [pannable]="true" [zoomable]="true" [zoomStep]="0.1" />
 </vflow>
 ```
 

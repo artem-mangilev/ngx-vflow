@@ -13,18 +13,18 @@ The `width` / `height` signals of a node hold the size your application asks for
 
 ## Where the size is applied
 
-The element with the `resizable` directive is the node's sizing box:
+The element with the `vResizable` directive is the node's sizing box:
 
-- Put `resizable` on the top-level element of the node template, without outer margins. Resize controls and handles are both positioned relative to the node box, so the controls stay visible around a card with `overflow: hidden`.
+- Put `vResizable` on the top-level element of the node template, without outer margins. Resize controls and handles are both positioned relative to the node box, so the controls stay visible around a card with `overflow: hidden`.
 - For each `explicit` axis the library sets `width` or `height` inline on that element, plus `box-sizing: border-box` while any axis is explicit, so padding and border stay inside the size you drag to. With border-box, CSS `min-*` / `max-*` of an `auto` axis also apply to the border box. You don't need to bind `[style.width.px]` / `[style.height.px]` yourself.
 - The resizer respects the element's `min-width` / `min-height` / `max-width` / `max-height` CSS, or explicit `[minWidth]` / `[minHeight]` / `[maxWidth]` / `[maxHeight]` inputs.
 - Size the element for `auto` mode with regular CSS, for example `width: 240px`. Avoid `width: 100%` / `height: 100%`: they resolve against the content-sized node wrapper.
-- `[resizable]="false"` hides the controls but keeps the element as the sizing box, so you can bind the controls to the selection state.
+- `[vResizable]="false"` hides the controls but keeps the element as the sizing box, so you can bind the controls to the selection state.
 
 ## Resize a group
 
-- Create a node with `width` and `height`, so both axes of the group start `explicit`, and mark it in `data` to draw it as a group in the `node` template.
-- Add `resizable` (or `[resizable]="yourCondition"`) to the native HTML element representing your group. The library applies the group size to that element.
+- Create a node with `width` and `height`, so both axes of the group start `explicit`, and mark it in `data` to draw it as a group in the `vNode` template.
+- Add `vResizable` (or `[vResizable]="yourCondition"`) to the native HTML element representing your group. The library applies the group size to that element.
 - If other elements depend on the group size, read the rendered size from `ctx.width()` and `ctx.height()`, not `ctx.node.width` and `ctx.node.height`: the latter hold the requested size.
 - Optionally, keep the aspect ratio with `[keepAspectRatio]`, restrict resizing to one axis with `[resizeDirection]` (`horizontal` | `vertical`), toggle handle auto-scaling with `[autoScale]`, and react to `(resizeStart)` / `(resizeChange)` / `(resizeEnd)`.
 
@@ -32,17 +32,17 @@ The element with the `resizable` directive is the node's sizing box:
 
 ## Resize a template/component regular node
 
-- Create a node rendered by the `node` template or by a `component`.
+- Create a node rendered by the `vNode` template or by a `component`.
   - Leave out `width` / `height` to start content-sized. A resize makes explicit the axes the control drives: a corner both, a side one. With `[resizeDirection]`, only that axis.
   - Provide `width` and / or `height` to start with a fixed size on those axes. A resize writes the new size into these signals.
-- Add `resizable` (or `[resizable]="yourCondition"`) to the top-level element of your node.
+- Add `vResizable` (or `[vResizable]="yourCondition"`) to the top-level element of your node.
 - The same options and events as for groups are available.
 
 {{ NgDocActions.demoPane("TemplateNodeResizerDemoComponent") }}
 
 ## Resizer appearance
 
-The resize controls take their colors from the core tokens `--vflow-selection` and `--vflow-surface`; the `.resize-control` class (with `.handle` / `.line` variants) is the public selector for size and shape overrides.
+The resize controls take their colors from the core tokens `--v-selection` and `--v-surface`; the `.v-resize-control` class (with `.v-resize-control--handle` / `.v-resize-control--line` modifiers) is the public selector for size and shape overrides.
 
 ## Resize event
 
@@ -75,7 +75,7 @@ protected keepResizedSize(changes: NodeSizeChange[]) {
 }
 ```
 
-- To react to the gesture itself, use `(resizeStart)` / `(resizeChange)` / `(resizeEnd)` on the `resizable` element.
+- To react to the gesture itself, use `(resizeStart)` / `(resizeChange)` / `(resizeEnd)` on the `vResizable` element.
 
 ## See also
 

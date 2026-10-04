@@ -12,7 +12,7 @@ import { addEdges, Connection, createEdges, createNodes, Edge, Vflow } from 'ngx
     }
     .line {
       fill: none;
-      stroke: var(--vflow-muted, rgb(177, 177, 183));
+      stroke: var(--v-muted, rgb(177, 177, 183));
       stroke-width: 2;
     }
     .card {
@@ -33,19 +33,19 @@ import { addEdges, Connection, createEdges, createNodes, Edge, Vflow } from 'ngx
   `,
   template: `
     <vflow view="auto" data-testid="core-flow" [nodes]="nodes" [edges]="edges" (connect)="createEdge($event)">
-      <ng-template let-ctx node>
-        <div class="card" selectable>
+      <ng-template let-ctx vNode>
+        <div class="card" vSelectable>
           {{ ctx.data().title }}
-          <span vflowHandle handleType="target" position="left" class="dot"></span>
-          <span vflowHandle handleType="source" position="right" class="dot"></span>
+          <span vHandle handleType="target" position="left" class="dot"></span>
+          <span vHandle handleType="source" position="right" class="dot"></span>
         </div>
       </ng-template>
-      <ng-template let-ctx edge>
-        <svg:g edgeInteraction>
+      <ng-template let-ctx vEdge>
+        <svg:g vEdgeInteraction>
           <svg:path class="line" [attr.d]="ctx.path()" [attr.marker-end]="ctx.markerEnd()" />
         </svg:g>
       </ng-template>
-      <mini-map />
+      <v-minimap />
     </vflow>
   `,
 })

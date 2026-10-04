@@ -70,7 +70,7 @@
 
   /*
    * Only an explicit theme scope maps the UI theme onto core tokens, so importing this file
-   * does not restyle a standalone flow. Override `--vflow-*` on the flow or a descendant to win.
+   * does not restyle a standalone flow. Override `--v-*` on the flow or a descendant to win.
    */
   /* Glyphs for the BPMN entry; ASCII-only class names keep both CSS entries identical. */
   :root {
@@ -79,19 +79,19 @@
   }
 
   [data-vui-theme] {
-    --vflow-surface: var(--vui-surface);
-    --vflow-foreground: var(--vui-foreground);
-    --vflow-muted: var(--vui-muted);
-    --vflow-border: var(--vui-border);
-    --vflow-selection: var(--vui-accent);
-    --vflow-focus: var(--vui-accent);
+    --v-surface: var(--vui-surface);
+    --v-foreground: var(--vui-foreground);
+    --v-muted: var(--vui-muted);
+    --v-border: var(--vui-border);
+    --v-selection: var(--vui-accent);
+    --v-focus: var(--vui-accent);
     /* The node part is rounded with --vui-radius, so the core focus ring follows the same corners. */
-    --vflow-focus-radius: var(--vui-radius);
+    --v-focus-radius: var(--vui-radius);
   }
   [data-vui-theme='light'] {
-    --vflow-background: #f4f6fa;
+    --v-background: #f4f6fa;
   }
   [data-vui-theme='dark'] {
-    --vflow-background: #101827;
+    --v-background: #101827;
   }
 }

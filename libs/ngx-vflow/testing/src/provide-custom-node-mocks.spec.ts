@@ -31,6 +31,6 @@ describe('provideCustomNodeMocks', () => {
     const port = fixture.nativeElement.querySelector('test-port') as HTMLElement;
 
     expect(port.textContent!.trim()).toBe('target idle');
-    expect(port.getAttribute('data-vflow-handle-position')).toBe('left');
+    expect(port.getAttribute('data-v-handle-position')).toBe('left');
   });
 });

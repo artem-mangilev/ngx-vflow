@@ -12,8 +12,8 @@ async function position(graph: Locator, id: string) {
 async function client(graph: Locator, x: number, y: number) {
   return graph.evaluate(
     (root, [x, y]) => {
-      const pane = root.querySelector('.vflow-pane')!.getBoundingClientRect();
-      const matrix = new DOMMatrix(getComputedStyle(root.querySelector('.vflow-viewport')!).transform);
+      const pane = root.querySelector('.v-pane')!.getBoundingClientRect();
+      const matrix = new DOMMatrix(getComputedStyle(root.querySelector('.v-viewport')!).transform);
       return { x: pane.x + matrix.e + x * matrix.a, y: pane.y + matrix.f + y * matrix.a };
     },
     [x, y],
@@ -38,7 +38,7 @@ async function demo(page: Page) {
   await page.goto('/viewport/alignment-helper');
   const graph = page.locator('vflow').first();
   await graph.scrollIntoViewIfNeeded();
-  await expect(graph.locator('.vflow-node')).toHaveCount(7);
+  await expect(graph.locator('.v-node')).toHaveCount(7);
   await expect.poll(() => position(graph, '7')).toEqual({ x: 450, y: 220 });
   return graph;
 }
@@ -50,9 +50,9 @@ test('snaps a node into the middle of the gap between two neighbours while it is
   await drag(page, graph, { x: 500, y: 250 }, { x: 208, y: 333 });
 
   expect(await position(graph, '7')).toEqual({ x: 155, y: 300 });
-  await expect(graph.locator('line.vflow-alignment-line')).not.toHaveCount(0);
+  await expect(graph.locator('line.v-alignment-line')).not.toHaveCount(0);
   await page.mouse.up();
-  await expect(graph.locator('.vflow-alignment-line')).toHaveCount(0);
+  await expect(graph.locator('.v-alignment-line')).toHaveCount(0);
   expect(await position(graph, '7')).toEqual({ x: 155, y: 300 });
 });
 
@@ -80,7 +80,7 @@ test('straightens an edge to a connected node', async ({ page }) => {
     ['Node 2', 'Node 4'].map((name, index) => {
       const node = root.querySelector(`[aria-label="${name}"]`)!;
       const side = index === 0 ? 'right' : 'left';
-      const box = node.querySelector(`.vflow-handle[data-vflow-handle-position="${side}"]`)!.getBoundingClientRect();
+      const box = node.querySelector(`.v-handle[data-v-handle-position="${side}"]`)!.getBoundingClientRect();
       return box.y + box.height / 2;
     }),
   );
@@ -96,7 +96,7 @@ test('moves freely while Alt is held', async ({ page }) => {
   await moveTo(page, graph, 208, 333);
 
   expect(await position(graph, '7')).toEqual({ x: 158, y: 303 });
-  await expect(graph.locator('.vflow-alignment-line')).toHaveCount(0);
+  await expect(graph.locator('.v-alignment-line')).toHaveCount(0);
   await page.keyboard.up('Alt');
   await page.mouse.up();
 });

@@ -3,7 +3,7 @@ import { expect, test, type Locator } from '@playwright/test';
 test.use({ hasTouch: true, deviceScaleFactor: 2 });
 
 async function viewport(graph: Locator) {
-  return graph.locator('.vflow-viewport').evaluate((element) => {
+  return graph.locator('.v-viewport').evaluate((element) => {
     const matrix = new DOMMatrix(getComputedStyle(element).transform);
     return { x: matrix.e, y: matrix.f, zoom: matrix.a };
   });
@@ -12,10 +12,10 @@ async function viewport(graph: Locator) {
 // Derive expected overview geometry from rendered node bounds, independently of the canvas directive.
 async function geometry(graph: Locator) {
   return graph.evaluate((element) => {
-    const pane = element.querySelector('.vflow-pane')!.getBoundingClientRect();
+    const pane = element.querySelector('.v-pane')!.getBoundingClientRect();
     const canvas = element.querySelector('canvas')!.getBoundingClientRect();
-    const matrix = new DOMMatrix(getComputedStyle(element.querySelector('.vflow-viewport')!).transform);
-    const nodes = Array.from(element.querySelectorAll('.vflow-node'), (node) => node.getBoundingClientRect());
+    const matrix = new DOMMatrix(getComputedStyle(element.querySelector('.v-viewport')!).transform);
+    const nodes = Array.from(element.querySelectorAll('.v-node'), (node) => node.getBoundingClientRect());
     const left = (Math.min(...nodes.map((node) => node.left)) - pane.left - matrix.e) / matrix.a;
     const top = (Math.min(...nodes.map((node) => node.top)) - pane.top - matrix.f) / matrix.a;
     const right = (Math.max(...nodes.map((node) => node.right)) - pane.left - matrix.e) / matrix.a;

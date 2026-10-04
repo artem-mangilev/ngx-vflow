@@ -7,24 +7,24 @@
   outline: none;
 }
 
-.focus-indicator {
+.v-focus-indicator {
   display: none;
   fill: none;
-  stroke: var(--vflow-focus);
+  stroke: var(--v-focus);
   // A halo around the path: the node ring width plus a margin on each side, kept on screen by non-scaling-stroke.
-  stroke-width: calc(var(--vflow-focus-width) * 2.5);
+  stroke-width: calc(var(--v-focus-width) * 2.5);
   stroke-dasharray: 4 4;
   vector-effect: non-scaling-stroke;
   pointer-events: none;
 }
 
 :host(:focus-visible) {
-  .focus-indicator {
+  .v-focus-indicator {
     display: block;
   }
 }
 
-.reconnect-handle {
+.v-reconnect-handle {
   fill: transparent;
   cursor: move;
   pointer-events: all;

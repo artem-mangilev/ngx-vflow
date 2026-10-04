@@ -1,16 +1,16 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { VflowPort } from '@vflow/ui';
+import { VuiPort } from '@vflow/ui';
 import { Vflow, injectNode } from 'ngx-vflow';
 
 @Component({
   selector: 'stress-test-node',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Vflow, VflowPort],
+  imports: [Vflow, VuiPort],
   template: `
-    <div class="stress-node" selectable [class.selected]="ctx.selected()">
+    <div class="stress-node" vSelectable [class.selected]="ctx.selected()">
       {{ ctx.data().label }}
-      <span vflowPort handleType="target" position="left"></span>
-      <span vflowPort handleType="source" position="right"></span>
+      <span vuiPort handleType="target" position="left"></span>
+      <span vuiPort handleType="source" position="right"></span>
     </div>
   `,
   styles: `

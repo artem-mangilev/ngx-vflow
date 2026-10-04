@@ -4,10 +4,10 @@ import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
 
 @Component({
   template: `<vflow view="auto" [nodes]="nodes" [edges]="edges">
-    <ng-template let-ctx node><docs-node [ctx]="ctx" /></ng-template>
+    <ng-template let-ctx vNode><docs-node [ctx]="ctx" /></ng-template>
 
-    <ng-template let-ctx edge>
-      <svg:g edgeInteraction class="edge">
+    <ng-template let-ctx vEdge>
+      <svg:g vEdgeInteraction class="edge">
         <svg:path
           fill="none"
           [attr.d]="ctx.path()"
@@ -25,7 +25,7 @@ import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
       }
 
       /* The interaction stroke sits inside the group, so hovering near the line counts as hovering the group. */
-      .edge:hover path:not(.interactive-edge) {
+      .edge:hover path:not(.v-interactive-edge) {
         filter: brightness(0.85);
       }
     `,

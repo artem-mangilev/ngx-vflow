@@ -74,7 +74,7 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
   public markers = computed<{ start?: MarkerRef; end?: MarkerRef }>(
     () => this.raw().markers?.() ?? EDGE_DEFAULTS.markers,
   );
-  /** Label templates registered by `ng-template[edgeLabel]` inside the presentation of this edge. */
+  /** Label templates registered by `ng-template[vEdgeLabel]` inside the presentation of this edge. */
   public labelTemplates = signal<Partial<Record<EdgeLabelPosition, EdgeLabelEntry>>>({});
   public labelEntries = computed(() => {
     const templates = this.labelTemplates();

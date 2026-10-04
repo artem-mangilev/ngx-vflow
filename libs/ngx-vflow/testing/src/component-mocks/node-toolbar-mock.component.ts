@@ -1,13 +1,13 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import type { Position, NodeToolbarComponent } from 'ngx-vflow';
+import type { Position, VflowNodeToolbarComponent } from 'ngx-vflow';
 import { AsInterface } from '../types';
 
 @Component({
-  selector: 'node-toolbar',
+  selector: 'v-node-toolbar',
   template: '<ng-content />',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class NodeToolbarMockComponent implements AsInterface<NodeToolbarComponent> {
+export class VflowNodeToolbarMockComponent implements AsInterface<VflowNodeToolbarComponent> {
   public position = input<Position>('top');
 }

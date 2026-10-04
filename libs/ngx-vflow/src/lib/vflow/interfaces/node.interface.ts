@@ -17,7 +17,7 @@ export const NODE_DEFAULTS = {
 
 /**
  * A component class, or a factory that lazily imports one. Nodes and edges without a component render
- * through the `ng-template[node]` or `ng-template[edge]` presentation of the flow.
+ * through the `ng-template[vNode]` or `ng-template[vEdge]` presentation of the flow.
  */
 export type EntityComponentType = Type<unknown> | (() => Promise<Type<unknown>>);
 

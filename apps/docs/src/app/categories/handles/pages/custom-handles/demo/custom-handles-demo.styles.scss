@@ -63,15 +63,15 @@ vflow {
   scale: 1.3;
 }
 
-.dot-handle[data-vflow-handle-state='valid'] {
+.dot-handle[data-v-handle-state='valid'] {
   background-color: green;
 }
 
-.dot-handle[data-vflow-handle-state='invalid'] {
+.dot-handle[data-v-handle-state='invalid'] {
   background-color: red;
 }
 
-.dot-handle[data-vflow-handle-can-start='false'] {
+.dot-handle[data-v-handle-can-start='false'] {
   background-color: #9e9e9e;
   opacity: 0.55;
 }

@@ -12,18 +12,18 @@
   (dndDrop)="createNode($event)"
   (connect)="connect($event)"
   (nodesChanges.position)="onPositionChange()">
-  <ng-template let-ctx node>
+  <ng-template let-ctx vNode>
     @if (ctx.data().type === 'group') {
       <docs-node [ctx]="ctx" />
     } @else {
       <div class="custom-node" [class.custom-node_selected]="ctx.selected()">
-        <button class="custom-node__button" selectable>Select here</button>
+        <button class="custom-node__button" vSelectable>Select here</button>
 
-        <span vflowPort handleType="source" position="right"></span>
-        <span vflowPort handleType="target" position="left"></span>
+        <span vuiPort handleType="source" position="right"></span>
+        <span vuiPort handleType="target" position="left"></span>
       </div>
 
-      <node-toolbar>
+      <v-node-toolbar>
         @if (ctx.data().canDetach) {
           <button (click)="detachNode(ctx.node.id)">Detach</button>
         }
@@ -31,12 +31,12 @@
         @if (ctx.data().canAttach) {
           <button (click)="attachNode(ctx.node.id)">Attach</button>
         }
-      </node-toolbar>
+      </v-node-toolbar>
     }
   </ng-template>
 
-  <ng-template let-ctx edge>
-    <svg:g edgeInteraction>
+  <ng-template let-ctx vEdge>
+    <svg:g vEdgeInteraction>
       <svg:path
         fill="none"
         stroke-width="2"

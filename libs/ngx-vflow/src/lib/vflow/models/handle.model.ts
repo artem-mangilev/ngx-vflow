@@ -26,7 +26,7 @@ export const HANDLE_WITHOUT_BOX = 'without-box';
 export type HandleMeasurement = HandleGeometry | typeof HANDLE_WITHOUT_BOX | null;
 
 export interface HandleOptions {
-  /** The element the `vflowHandle` directive is applied to. Its parent is the anchor in the `auto` layout. */
+  /** The element the `vHandle` directive is applied to. Its parent is the anchor in the `auto` layout. */
   element?: HTMLElement | null;
   type: Signal<HandleType>;
   position: Signal<HandlePosition>;
@@ -51,7 +51,7 @@ export type HandleMeasureContext = {
 
 /** `fallbackZoom` applies to a node that is rendered outside of a flow viewport, for example in a unit test. */
 export function createHandleMeasureContext(nodeElement: HTMLElement, fallbackZoom: number): HandleMeasureContext {
-  const viewport = nodeElement.closest<HTMLElement>('.vflow-viewport');
+  const viewport = nodeElement.closest<HTMLElement>('.v-viewport');
   const zoom = (viewport ? new DOMMatrixReadOnly(viewport.style.transform).a : fallbackZoom) || 1;
 
   return { nodeRect: nodeElement.getBoundingClientRect(), zoom, rects: new Map() };

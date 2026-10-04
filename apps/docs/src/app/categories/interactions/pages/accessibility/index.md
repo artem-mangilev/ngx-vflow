@@ -37,7 +37,7 @@ nodes[0].ariaDescription!.set('Ready for approval.');
 `ariaLabel`, `ariaDescription` and `domAttributes` are optional writable signals on `Node` and `Edge`. The library does not read names out of your templates, so give domain nodes a name; the fallback is the id. `domAttributes` accepts `data-*`, `title`, `lang` and `dir` and lands on the library wrapper; roles, ARIA state, ids, focus and event handlers stay library-owned, and other keys are ignored. A handle takes only `domAttributes`:
 
 ```html
-<span vflowHandle handleType="target" position="left" handleId="incoming" [domAttributes]="{ 'data-port': 'review' }"></span>
+<span vHandle handleType="target" position="left" handleId="incoming" [domAttributes]="{ 'data-port': 'review' }"></span>
 ```
 
 Controls inside your templates keep their own semantics. Give custom buttons, inputs and edge-label controls labels and keyboard behavior as you would anywhere else; the library keeps them reachable, including inside resizable wrappers.
@@ -75,15 +75,15 @@ A command that changes state reports it in the flow's own polite live region: `D
 
 **Focus pan.** A node that receives keyboard focus while fully offscreen is centered at the current zoom. `[autoPanOnNodeFocus]="false"` turns this off; edges and arrow movement never pan.
 
-**Opting out.** `nodesFocusable`, `edgesFocusable` and the per-entity `focusable` override remove Tab stops without affecting embedded controls. Keys pressed inside inputs, textareas, selects, contenteditable regions and buttons never run graph commands; `vflowNoKeyboard` on an element does the same for a whole area. With virtualization enabled, hidden entities are skipped by Tab and by focus recovery, so disable it where every entity must be reachable by keyboard.
+**Opting out.** `nodesFocusable`, `edgesFocusable` and the per-entity `focusable` override remove Tab stops without affecting embedded controls. Keys pressed inside inputs, textareas, selects, contenteditable regions and buttons never run graph commands; `vNoKeyboard` on an element does the same for a whole area. With virtualization enabled, hidden entities are skipped by Tab and by focus recovery, so disable it where every entity must be reachable by keyboard.
 
 ## Focus ring
 
-Focus is drawn as a ring around the node wrapper, a dashed halo along the edge path and an inner border on the graph container. Four tokens style it: `--vflow-focus` for the color, `--vflow-focus-width`, `--vflow-focus-offset` and `--vflow-focus-radius`. The node ring is part of the zoomed content and scales with it, like the node's border. It is drawn on the wrapper around your template, so set the tokens on the flow element, or per node from a global stylesheet:
+Focus is drawn as a ring around the node wrapper, a dashed halo along the edge path and an inner border on the graph container. Four tokens style it: `--v-focus` for the color, `--v-focus-width`, `--v-focus-offset` and `--v-focus-radius`. The node ring is part of the zoomed content and scales with it, like the node's border. It is drawn on the wrapper around your template, so set the tokens on the flow element, or per node from a global stylesheet:
 
 ```css
-.vflow-node[data-shape='pill'] {
-  --vflow-focus-radius: 999px;
+.v-node[data-shape='pill'] {
+  --v-focus-radius: 999px;
 }
 ```
 

@@ -1,17 +1,17 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { DocsPresentations } from '@docs/shared';
-import { VflowPort } from '@vflow/ui';
+import { VuiPort } from '@vflow/ui';
 import { Node, Edge, Vflow, createNodes } from 'ngx-vflow';
 
 @Component({
   template: `<vflow view="auto" [nodes]="nodes" [edges]="edges">
-    <ng-template let-ctx edge><svg:g docsEdge [ctx]="ctx" /></ng-template>
+    <ng-template let-ctx vEdge><svg:g docsEdge [ctx]="ctx" /></ng-template>
 
-    <ng-template let-ctx node>
-      <div class="custom-node" selectable [class.custom-node_selected]="ctx.selected()">
+    <ng-template let-ctx vNode>
+      <div class="custom-node" vSelectable [class.custom-node_selected]="ctx.selected()">
         {{ ctx.data().text }}
 
-        <span vflowPort handleType="source" position="right"></span>
+        <span vuiPort handleType="source" position="right"></span>
       </div>
     </ng-template>
   </vflow>`,
@@ -40,7 +40,7 @@ import { Node, Edge, Vflow, createNodes } from 'ngx-vflow';
     `,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DocsPresentations, Vflow, VflowPort],
+  imports: [DocsPresentations, Vflow, VuiPort],
 })
 export class CustomNodesDemoComponent {
   public nodes: Node[] = createNodes([

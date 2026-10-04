@@ -15,7 +15,7 @@ import { FlowSettingsService } from '../../services/flow-settings.service';
 import { ViewportService } from '../../services/viewport.service';
 import { getNodesFlowBounds } from '../../utils/nodes';
 import { clamp, getViewportBounds, getViewportForBounds } from '../../utils/viewport';
-import { MiniMapPosition } from './minimap.component';
+import { MinimapPosition } from './minimap.component';
 import { KeyboardService } from '../../services/keyboard.service';
 import { Point } from '../../interfaces/point.interface';
 import { clientToFlowPosition } from '../../utils/coordinates';
@@ -42,7 +42,7 @@ const TRANSPARENT = new Set(['', 'transparent', 'rgba(0, 0, 0, 0)']);
   },
 })
 export class MinimapCanvasDirective {
-  public position = input.required<MiniMapPosition>();
+  public position = input.required<MinimapPosition>();
   public pannable = input.required<boolean>();
   public zoomable = input.required<boolean>();
   public zoomStep = input.required<number>();
@@ -61,10 +61,10 @@ export class MinimapCanvasDirective {
   private themeVersion = signal(0);
 
   /**
-   * Canvas cannot read CSS variables, so the resolved `--vflow-*` tokens are sampled from computed style.
+   * Canvas cannot read CSS variables, so the resolved `--v-*` tokens are sampled from computed style.
    * The sample is refreshed when an attribute changes on any ancestor of the flow (class, data-*, style)
    * or when the color scheme preference changes; other stylesheet edits are not observed. A sample with the
-   * same values, such as after the flow wrote `--vflow-zoom` at the end of a gesture, changes nothing downstream.
+   * same values, such as after the flow wrote `--v-zoom` at the end of a gesture, changes nothing downstream.
    */
   private theme = computed(
     () => {
@@ -72,16 +72,16 @@ export class MinimapCanvasDirective {
       const view = this.document.defaultView;
       const style = view?.getComputedStyle(this.canvas);
       const token = (name: string, fallback: string) => style?.getPropertyValue(name).trim() || fallback;
-      const surface = token('--vflow-surface', '#fff');
+      const surface = token('--v-surface', '#fff');
       // The minimap template is projected by the consumer, so the flow root is found through the DOM.
-      const root = this.canvas.closest('.vflow-root');
+      const root = this.canvas.closest('.v-root');
       const rootBackground = root && view ? view.getComputedStyle(root).backgroundColor : '';
       return {
         surface,
-        foreground: token('--vflow-foreground', '#1b262c'),
-        muted: token('--vflow-muted', 'rgb(177, 177, 183)'),
-        border: token('--vflow-border', 'rgb(200, 200, 200)'),
-        selection: token('--vflow-selection', '#0f4c75'),
+        foreground: token('--v-foreground', '#1b262c'),
+        muted: token('--v-muted', 'rgb(177, 177, 183)'),
+        border: token('--v-border', 'rgb(200, 200, 200)'),
+        selection: token('--v-selection', '#0f4c75'),
         background: TRANSPARENT.has(rootBackground) ? surface : rootBackground,
       };
     },

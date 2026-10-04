@@ -32,7 +32,7 @@ export class DefaultSelectionStrategy implements SelectionStrategy {
     // click (not drag)
     const isClick = delta === 0 ? diffX === 0 && diffY === 0 : diffX < delta && diffY < delta;
     // do not reset if event chain contains selectable elems
-    const isNotSelectable = !target.closest('.selectable');
+    const isNotSelectable = !target.closest('.v-selectable');
 
     if (isClick && isNotSelectable) {
       this.select(null, context);

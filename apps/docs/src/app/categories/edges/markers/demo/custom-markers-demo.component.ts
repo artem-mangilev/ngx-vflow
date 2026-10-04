@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { DocsPresentations } from '@docs/shared';
-import { VflowUi } from '@vflow/ui';
+import { Vui } from '@vflow/ui';
 import { ConnectionSettings, Edge, Node, Vflow, createEdges, createNodes } from 'ngx-vflow';
 
 /**
@@ -11,33 +11,33 @@ import { ConnectionSettings, Edge, Node, Vflow, createEdges, createNodes } from 
  */
 @Component({
   template: `<vflow view="auto" [nodes]="nodes" [edges]="edges" [connection]="connectionSettings">
-    <ng-template let-ctx node>
+    <ng-template let-ctx vNode>
       @if (ctx.node.id === '1') {
-        <div vflowNode class="source" selectable [vflowSelected]="ctx.selected() || ctx.preselected()">
+        <div vuiNode class="source" vSelectable [vuiSelected]="ctx.selected() || ctx.preselected()">
           <span>1</span>
-          <span vflowPort handleType="source" position="right" handleId="top" [offsetY]="-30"></span>
-          <span vflowPort handleType="source" position="right" handleId="middle"></span>
-          <span vflowPort handleType="source" position="right" handleId="bottom" [offsetY]="30"></span>
+          <span vuiPort handleType="source" position="right" handleId="top" [offsetY]="-30"></span>
+          <span vuiPort handleType="source" position="right" handleId="middle"></span>
+          <span vuiPort handleType="source" position="right" handleId="bottom" [offsetY]="30"></span>
         </div>
       } @else {
         <docs-node [ctx]="ctx" />
       }
     </ng-template>
-    <ng-template let-ctx edge><svg:g docsEdge [ctx]="ctx" /></ng-template>
+    <ng-template let-ctx vEdge><svg:g docsEdge [ctx]="ctx" /></ng-template>
 
-    <ng-template marker="circle" inset="8">
+    <ng-template vMarker="circle" inset="8">
       <svg:circle fill="none" cx="-5" cy="0" r="4" />
     </ng-template>
-    <ng-template marker="circle-closed" inset="8">
+    <ng-template vMarker="circle-closed" inset="8">
       <svg:circle fill="context-stroke" cx="-5" cy="0" r="4" />
     </ng-template>
-    <ng-template marker="diamond" inset="8">
+    <ng-template vMarker="diamond" inset="8">
       <svg:polygon fill="none" points="-1,0 -5,-4 -9,0 -5,4" />
     </ng-template>
-    <ng-template marker="diamond-closed" inset="8">
+    <ng-template vMarker="diamond-closed" inset="8">
       <svg:polygon fill="context-stroke" points="-1,0 -5,-4 -9,0 -5,4" />
     </ng-template>
-    <ng-template marker="bar" inset="1">
+    <ng-template vMarker="bar" inset="1">
       <svg:line x1="-1" y1="-6" x2="-1" y2="6" />
     </ng-template>
   </vflow>`,
@@ -58,7 +58,7 @@ import { ConnectionSettings, Edge, Node, Vflow, createEdges, createNodes } from 
     `,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DocsPresentations, Vflow, VflowUi],
+  imports: [DocsPresentations, Vflow, Vui],
 })
 export class CustomMarkersDemoComponent {
   public nodes: Node[] = createNodes([

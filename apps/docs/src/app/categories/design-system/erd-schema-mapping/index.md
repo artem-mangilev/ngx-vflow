@@ -1,4 +1,4 @@
-The same `vflowField` structure serves both Customer/Order relationships and CRM/ERP mapping.
+The same `vuiField` structure serves both Customer/Order relationships and CRM/ERP mapping.
 Handles use stable field IDs, so renaming a field and reversing rows preserve endpoints.
 Input and output IDs are distinct (`in:field-id` and `out:field-id`) and independent of visible names.
 Drag between ports of matching types to add a connection; remove it using its label button.
@@ -15,7 +15,7 @@ Type compatibility and graph changes belong to this application, not to the UI d
 
 Long entities need a policy for endpoints of hidden rows. This experiment is local to the demo and is not a
 library contract. Collapsing moves every endpoint to the header by rendering proxy handles with the same IDs.
-Scrolling keeps rows mounted in an overflow container that owns the wheel through `vflowNoWheel`; rows scrolled
+Scrolling keeps rows mounted in an overflow container that owns the wheel through `vNoWheel`; rows scrolled
 out of view hand their endpoints to proxy handles at the nearest border, rows still in view are re-created so
 core measures them again.
 
@@ -34,6 +34,6 @@ Findings:
   drawn outside the node, and a visible row's handle stays where the row was before the scroll.
 - Re-creating visible rows on scroll makes core measure them again; it is a demo trick, not a recommended API.
 - Zoom does not change the picture: endpoints stay on the visible rows at any zoom level.
-- Without `vflowNoWheel` the wheel zooms the graph instead of scrolling the rows.
+- Without `vNoWheel` the wheel zooms the graph instead of scrolling the rows.
 
 The `1 → N` label illustrates cardinality; it is not SQL schema validation or a crow's-foot marker.

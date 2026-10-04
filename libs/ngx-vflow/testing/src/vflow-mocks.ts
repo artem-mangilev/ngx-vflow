@@ -1,32 +1,32 @@
-import { HandleMockDirective } from './directive-mocks/handle-mock.directive';
-import { MiniMapMockComponent } from './component-mocks/minimap-mock.component';
-import { NodeToolbarMockComponent } from './component-mocks/node-toolbar-mock.component';
-import { ResizableMockComponent } from './component-mocks/resizable-mock.component';
+import { VflowHandleMockDirective } from './directive-mocks/handle-mock.directive';
+import { VflowMinimapMockComponent } from './component-mocks/minimap-mock.component';
+import { VflowNodeToolbarMockComponent } from './component-mocks/node-toolbar-mock.component';
+import { VflowResizableMockComponent } from './component-mocks/resizable-mock.component';
 import { VflowMockComponent } from './component-mocks/vflow-mock.component';
-import { DragHandleMockDirective } from './directive-mocks/drag-handle-mock.directive';
-import { SelectableMockDirective } from './directive-mocks/selectable-mock.directive';
-import { EdgeInteractionMockDirective } from './directive-mocks/edge-interaction-mock.directive';
+import { VflowDragHandleMockDirective } from './directive-mocks/drag-handle-mock.directive';
+import { VflowSelectableMockDirective } from './directive-mocks/selectable-mock.directive';
+import { VflowEdgeInteractionMockDirective } from './directive-mocks/edge-interaction-mock.directive';
 import {
-  ConnectionTemplateMockDirective,
-  EdgeLabelTemplateMockDirective,
-  EdgeTemplateMockDirective,
-  MarkerTemplateMockDirective,
-  NodeTemplateMockDirective,
+  VflowConnectionTemplateMockDirective,
+  VflowEdgeLabelTemplateMockDirective,
+  VflowEdgeTemplateMockDirective,
+  VflowMarkerTemplateMockDirective,
+  VflowNodeTemplateMockDirective,
 } from './directive-mocks/template-mock.directive';
 
 export const VflowMocks = [
   VflowMockComponent,
-  HandleMockDirective,
-  ResizableMockComponent,
-  SelectableMockDirective,
-  EdgeInteractionMockDirective,
-  MiniMapMockComponent,
-  NodeToolbarMockComponent,
-  DragHandleMockDirective,
+  VflowHandleMockDirective,
+  VflowResizableMockComponent,
+  VflowSelectableMockDirective,
+  VflowEdgeInteractionMockDirective,
+  VflowMinimapMockComponent,
+  VflowNodeToolbarMockComponent,
+  VflowDragHandleMockDirective,
 
-  NodeTemplateMockDirective,
-  EdgeLabelTemplateMockDirective,
-  EdgeTemplateMockDirective,
-  ConnectionTemplateMockDirective,
-  MarkerTemplateMockDirective,
+  VflowNodeTemplateMockDirective,
+  VflowEdgeLabelTemplateMockDirective,
+  VflowEdgeTemplateMockDirective,
+  VflowConnectionTemplateMockDirective,
+  VflowMarkerTemplateMockDirective,
 ] as const;

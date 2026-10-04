@@ -23,7 +23,7 @@ export function attachEdgeInteractionArea(
 ): () => void {
   const path = renderer.createElement('path', 'svg') as SVGPathElement;
   renderer.setAttribute(path, 'aria-hidden', 'true');
-  renderer.addClass(path, 'interactive-edge');
+  renderer.addClass(path, 'v-interactive-edge');
   for (const [name, value] of Object.entries(HIT_AREA_STYLES)) {
     renderer.setStyle(path, name, value, RendererStyleFlags2.DashCase);
   }

@@ -1,6 +1,6 @@
 @for (line of guides().lines; track $index) {
   <svg:line
-    class="vflow-alignment-line"
+    class="v-alignment-line"
     [attr.stroke-dasharray]="line.center ? 4 : null"
     [attr.x1]="line.from.x"
     [attr.y1]="line.from.y"
@@ -9,9 +9,9 @@
 }
 
 @if (gaps(); as gaps) {
-  <svg:path class="vflow-alignment-line" [attr.d]="gaps" />
+  <svg:path class="v-alignment-line" [attr.d]="gaps" />
 }
 
 @if (points(); as points) {
-  <svg:path class="vflow-alignment-point" [attr.d]="points" />
+  <svg:path class="v-alignment-point" [attr.d]="points" />
 }

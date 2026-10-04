@@ -1,12 +1,12 @@
 <vflow view="auto" [minZoom]="0.1" [nodes]="nodes()" [edges]="edges()" (nodesChanges.add)="fitView()">
-  <ng-template let-ctx edge><svg:g docsEdge [ctx]="ctx" /></ng-template>
+  <ng-template let-ctx vEdge><svg:g docsEdge [ctx]="ctx" /></ng-template>
 
-  <ng-template let-ctx node>
+  <ng-template let-ctx vNode>
     <div class="custom-node" [style.background-color]="ctx.data().color" (click)="onNodeClick(ctx.node)">
       {{ ctx.data().color }}
 
-      <span vflowPort handleType="source" position="bottom"></span>
-      <span vflowPort handleType="target" position="top"></span>
+      <span vuiPort handleType="source" position="bottom"></span>
+      <span vuiPort handleType="target" position="top"></span>
     </div>
   </ng-template>
 </vflow>

@@ -1,6 +1,6 @@
 import { Point } from './point.interface';
 
-/** Point of the edge path where an `edgeLabel` template renders; a curve provides the points as `labelPoints`. */
+/** Point of the edge path where a `vEdgeLabel` template renders; a curve provides the points as `labelPoints`. */
 export type EdgeLabelPosition = 'start' | 'center' | 'end';
 
 /** How a label sits at its point: level with the screen, or turned along the path. */

@@ -18,10 +18,10 @@ import { dispatchMouse } from '../../gestures/pointer-events.testing';
     [autoPan]="autoPan"
     (connect)="(undefined)"
     (reconnect)="(undefined)">
-    <ng-template node>
+    <ng-template vNode>
       <div style="width: 100px; height: 50px">
-        <span vflowHandle handleType="target" position="left"></span>
-        <span vflowHandle handleType="source" position="right"></span>
+        <span vHandle handleType="target" position="left"></span>
+        <span vHandle handleType="source" position="right"></span>
       </div>
     </ng-template>
   </vflow>`,
@@ -84,7 +84,7 @@ describe('public auto-pan settings', () => {
   }
 
   function drag(x = 0, y = 150) {
-    const root = fixture.nativeElement.querySelector('.vflow-root') as HTMLElement;
+    const root = fixture.nativeElement.querySelector('.v-root') as HTMLElement;
     const rect = root.getBoundingClientRect();
     mouse(fixture.nativeElement.querySelector('[node]'), 'mousedown', rect.left + 110, rect.top + 110);
     mouse(window, 'mousemove', rect.left + x, rect.top + y);
@@ -173,10 +173,10 @@ describe('public auto-pan settings', () => {
       it(`${enabled ? 'enables' : 'disables'} auto-pan for ${reconnect ? 'reconnection' : 'connection creation'}`, async () => {
         await setup({ nodeDrag: false, connectionDrag: enabled });
         const target = fixture.nativeElement.querySelector(
-          reconnect ? '.reconnect-handle' : '.vflow-handle[data-vflow-handle-type="source"]',
+          reconnect ? '.v-reconnect-handle' : '.v-handle[data-v-handle-type="source"]',
         );
         expect(target).not.toBeNull();
-        const rect = fixture.nativeElement.querySelector('.vflow-root').getBoundingClientRect();
+        const rect = fixture.nativeElement.querySelector('.v-root').getBoundingClientRect();
         mouse(target, 'mousedown', rect.left + 200, rect.top + 150);
         fixture.detectChanges();
         TestBed.flushEffects();
@@ -240,7 +240,7 @@ describe('auto-pan with real browser frames', () => {
     fixture.detectChanges();
     await fixture.whenStable();
     await new Promise((resolve) => setTimeout(resolve, 100));
-    const root = fixture.nativeElement.querySelector('.vflow-root') as HTMLElement;
+    const root = fixture.nativeElement.querySelector('.v-root') as HTMLElement;
     const nodes = fixture.nativeElement.querySelectorAll('[node]') as NodeListOf<HTMLElement>;
     const rect = root.getBoundingClientRect();
     const mouse = (target: EventTarget, type: 'mousedown' | 'mousemove' | 'mouseup', x: number) =>

@@ -63,7 +63,7 @@ The user requested rolling back issue 11 after evaluating its interaction design
 ## Keyboard feedback, focus ring and shortcut keys — 2026-09-20
 
 - Keyboard selection, clearing and arrow movement now write localized feedback to the flow's own polite, atomic live region (`selectionAnnouncement`, `selectionClearedAnnouncement`, `movedAnnouncement`). Pointer and programmatic changes stay silent. Unit tests cover the messages, the no-change case and localization; the browser check on the documentation page showed `Draft selected. 1 selected in total.` in the region after Enter.
-- The node focus ring is divided by the new read-only `--vflow-zoom` variable of the zoomed viewport, so it stays 2px on screen. Verified in the browser at zoom 0.5: computed outline 4px, visible as a 2px ring.
+- The node focus ring is divided by the new read-only `--v-zoom` variable of the zoomed viewport, so it stays 2px on screen. Verified in the browser at zoom 0.5: computed outline 4px, visible as a 2px ring.
 - A key bound to a `keyboardShortcuts` action (for example `Space` for `pan`) is no longer consumed as a selection command by a focused entity. Unit test covers Space passthrough with `Enter` still selecting.
 - Library suite: 269 tests passed; ESLint and Prettier passed for changed files. No new screen-reader session was run.
 
@@ -109,7 +109,7 @@ The user requested rolling back issue 11 after evaluating its interaction design
   commands, each with the origin it accepts (a focused entity, the container, or either) and whether holding the key
   repeats it. The first command that carries the key and can act on the press takes it; one that cannot, such as
   movement on an edge, leaves the key to the next, which is how the same arrow pans the view.
-- A key bound as a gesture modifier is skipped before any command runs, and editable targets and `vflowNoKeyboard`
+- A key bound as a gesture modifier is skipped before any command runs, and editable targets and `vNoKeyboard`
   regions are filtered once for every command rather than per handler.
 - No keyboard behavior changed: all previous library expectations pass unchanged. Two tests were added for the
   command order and for the reserved modifier. 279 library tests and 35 e2e passed. No new screen-reader session was

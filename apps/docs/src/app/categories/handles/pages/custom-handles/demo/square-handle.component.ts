@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { VflowHandleDirective } from 'ngx-vflow';
 
 /**
- * A component that is a handle itself: `vflowHandle` is applied through `hostDirectives`, the role is bound
+ * A component that is a handle itself: `vHandle` is applied through `hostDirectives`, the role is bound
  * where the component is used and the look follows the signals of the injected directive.
  */
 @Component({

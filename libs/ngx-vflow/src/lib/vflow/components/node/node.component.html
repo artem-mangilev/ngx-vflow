@@ -1,8 +1,8 @@
-<div class="selectable" (click)="pullNode()">
+<div class="v-selectable" (click)="pullNode()">
   <div
     nodeHandlesController
     nodeResizeController
-    class="wrapper"
+    class="v-node-wrapper"
     [style.width.px]="wrapperSize()?.width ?? null"
     [style.height.px]="wrapperSize()?.height ?? null">
     @if (model().rawNode.component; as component) {
@@ -30,7 +30,7 @@
   @for (handle of model().handles(); track handle) {
     @if (handle.isMeasured() && !handle.dynamic()) {
       <div
-        class="magnet"
+        class="v-magnet"
         aria-hidden="true"
         [style.left.px]="handle.localPoint().x"
         [style.top.px]="handle.localPoint().y"

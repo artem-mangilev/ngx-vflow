@@ -1,13 +1,13 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { DocsPresentations } from '@docs/shared';
-import { VflowPort } from '@vflow/ui';
+import { VuiPort } from '@vflow/ui';
 import { Connection, Edge, Node, Vflow, addEdges, createNodes, injectNode } from 'ngx-vflow';
 
 @Component({
   template: `
     <vflow view="auto" [nodes]="nodes" [edges]="edges" (connect)="createEdge($event)">
-      <ng-template let-ctx node><docs-node [ctx]="ctx" /></ng-template>
-      <ng-template let-ctx edge><svg:g docsEdge [ctx]="ctx" /></ng-template>
+      <ng-template let-ctx vNode><docs-node [ctx]="ctx" /></ng-template>
+      <ng-template let-ctx vEdge><svg:g docsEdge [ctx]="ctx" /></ng-template>
     </vflow>
   `,
   styles: [
@@ -71,10 +71,10 @@ interface LooseConnectionNodeData {
   template: `<div class="node">
     {{ ctx.data().text }}
 
-    <span vflowPort handleType="any" position="top" handleId="a"></span>
-    <span vflowPort handleType="any" position="right" handleId="b"></span>
-    <span vflowPort handleType="any" position="bottom" handleId="c"></span>
-    <span vflowPort handleType="any" position="left" handleId="d"></span>
+    <span vuiPort handleType="any" position="top" handleId="a"></span>
+    <span vuiPort handleType="any" position="right" handleId="b"></span>
+    <span vuiPort handleType="any" position="bottom" handleId="c"></span>
+    <span vuiPort handleType="any" position="left" handleId="d"></span>
   </div>`,
   styles: [
     `
@@ -92,7 +92,7 @@ interface LooseConnectionNodeData {
     `,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Vflow, VflowPort],
+  imports: [Vflow, VuiPort],
 })
 export class LooseConnectionNodeComponent {
   protected readonly ctx = injectNode<LooseConnectionNodeData>();

@@ -98,7 +98,7 @@ export class KeyboardNavigationDirective {
       event.defaultPrevented ||
       !(target instanceof Element) ||
       target !== this.element.ownerDocument.activeElement ||
-      target.closest('[data-vflow-no-keyboard]') ||
+      target.closest('[data-v-no-keyboard]') ||
       target.closest('input, textarea, select, [contenteditable]:not([contenteditable="false"])') ||
       // A key held as a gesture modifier (for example Space for panning) belongs to the gesture layer.
       this.keyboard.isModifierKey(event)

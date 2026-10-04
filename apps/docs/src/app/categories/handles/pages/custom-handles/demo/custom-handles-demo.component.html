@@ -18,16 +18,16 @@
   </div>
 
   <vflow view="auto" [nodes]="nodes" [edges]="edges" (connect)="createEdge($event)">
-    <ng-template let-ctx edge><svg:g docsEdge [ctx]="ctx" /></ng-template>
+    <ng-template let-ctx vEdge><svg:g docsEdge [ctx]="ctx" /></ng-template>
 
-    <ng-template let-ctx node>
+    <ng-template let-ctx vNode>
       @if (ctx.data().type === 'output') {
-        <!-- Plain elements: the application styles them through data-vflow-handle attributes. -->
+        <!-- Plain elements: the application styles them through data-v-handle attributes. -->
         <div class="custom-node">
           <div class="data-block">
             Output 1
             <span
-              vflowHandle
+              vHandle
               handleType="source"
               position="right"
               class="dot-handle"
@@ -37,7 +37,7 @@
           <div class="data-block">
             Output 2
             <span
-              vflowHandle
+              vHandle
               handleType="source"
               position="right"
               class="dot-handle"

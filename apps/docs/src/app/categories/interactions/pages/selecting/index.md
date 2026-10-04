@@ -1,7 +1,7 @@
 Nodes and edges can be selected!
 
-1. Nodes and edges are selectable when the element that triggers selection carries the `selectable` directive; the shared documentation presentations do this for you.
-2. In your own templates, mark the element that triggers selection with `selectable`.
+1. Nodes and edges are selectable when the element that triggers selection carries the `vSelectable` directive; the shared documentation presentations do this for you.
+2. In your own templates, mark the element that triggers selection with `vSelectable`.
 
 > Both custom nodes and edges have the `selected()` signal in their template context for applying styles based on this state.
 

@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
-import { VflowPort } from '@vflow/ui';
+import { VuiPort } from '@vflow/ui';
 import { Vflow, injectNode } from 'ngx-vflow';
 import { FlowStoreService } from '../services/flow-store.service';
 
@@ -19,12 +19,12 @@ import { FlowStoreService } from '../services/flow-store.service';
           <div class="metric-row">
             <span class="metric-name">W:</span>
             <span class="metric-value">{{ connectedNodeWidth() }}px</span>
-            <span vflowPort handleType="target" position="left" handleId="width"></span>
+            <span vuiPort handleType="target" position="left" handleId="width"></span>
           </div>
           <div class="metric-row">
             <span class="metric-name">H:</span>
             <span class="metric-value">{{ connectedNodeHeight() }}px</span>
-            <span vflowPort handleType="target" position="left" handleId="height"></span>
+            <span vuiPort handleType="target" position="left" handleId="height"></span>
           </div>
         </div>
 
@@ -35,12 +35,12 @@ import { FlowStoreService } from '../services/flow-store.service';
           <div class="metric-row">
             <span class="metric-name">X:</span>
             <span class="metric-value">{{ connectedNodeX() }}</span>
-            <span vflowPort handleType="target" position="left" handleId="x"></span>
+            <span vuiPort handleType="target" position="left" handleId="x"></span>
           </div>
           <div class="metric-row">
             <span class="metric-name">Y:</span>
             <span class="metric-value">{{ connectedNodeY() }}</span>
-            <span vflowPort handleType="target" position="left" handleId="y"></span>
+            <span vuiPort handleType="target" position="left" handleId="y"></span>
           </div>
         </div>
       </div>
@@ -132,7 +132,7 @@ import { FlowStoreService } from '../services/flow-store.service';
     `,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Vflow, VflowPort],
+  imports: [Vflow, VuiPort],
 })
 export class OutputNodeComponent {
   protected readonly ctx = injectNode();

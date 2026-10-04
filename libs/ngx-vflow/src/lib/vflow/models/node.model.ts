@@ -223,7 +223,7 @@ export class NodeModel<T = unknown> implements FlowEntity, Contextable<NodeConte
   public resizing = signal(false);
 
   /**
-   * Registered by the `[resizable]` element while it exists. The node renders these controls in its own
+   * Registered by the `[vResizable]` element while it exists. The node renders these controls in its own
    * layer, so a clipping element (`overflow: hidden`) cannot hide them, and the registered element, not the
    * node wrapper, receives the explicit size.
    */

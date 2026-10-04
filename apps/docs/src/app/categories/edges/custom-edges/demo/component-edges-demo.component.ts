@@ -1,7 +1,15 @@
 import { ChangeDetectionStrategy, Component, output, signal } from '@angular/core';
 import { DocsPresentations } from '@docs/shared';
-import { VflowUi } from '@vflow/ui';
-import { ComponentEdgeEvent, Edge, EdgeInteractionDirective, Node, Vflow, createNodes, injectEdge } from 'ngx-vflow';
+import { Vui } from '@vflow/ui';
+import {
+  ComponentEdgeEvent,
+  Edge,
+  VflowEdgeInteractionDirective,
+  Node,
+  Vflow,
+  createNodes,
+  injectEdge,
+} from 'ngx-vflow';
 
 interface ColoredEdgeData {
   color: string;
@@ -17,8 +25,8 @@ interface ColoredEdgeData {
  */
 @Component({
   selector: 'g[docsColoredEdge]',
-  hostDirectives: [EdgeInteractionDirective],
-  imports: [Vflow, VflowUi],
+  hostDirectives: [VflowEdgeInteractionDirective],
+  imports: [Vflow, Vui],
   host: { '(click)': 'picked.emit(ctx.edge.id)' },
   styles: `
     :host(:hover) .line {
@@ -38,8 +46,8 @@ interface ColoredEdgeData {
       [attr.stroke]="ctx.selected() ? '#0f4c75' : ctx.data().color"
       [attr.marker-end]="ctx.markerEnd()" />
     <span
-      *edgeLabel
-      vflowEdgeLabel
+      *vEdgeLabel
+      vuiEdgeLabel
       class="label"
       [style.border-color]="ctx.data().color"
       (click)="picked.emit(ctx.edge.id)">
@@ -57,7 +65,7 @@ export class ColoredEdgeComponent {
   template: `
     <p class="picked">Last clicked edge: {{ picked() }}</p>
     <vflow view="auto" [nodes]="nodes" [edges]="edges" (componentEdgeEvent)="onEdgeEvent($event)">
-      <ng-template let-ctx node><docs-node [ctx]="ctx" /></ng-template>
+      <ng-template let-ctx vNode><docs-node [ctx]="ctx" /></ng-template>
     </vflow>
   `,
   styles: [

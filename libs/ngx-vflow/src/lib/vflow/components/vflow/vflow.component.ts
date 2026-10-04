@@ -28,10 +28,10 @@ import { outputFromObservable, takeUntilDestroyed } from '@angular/core/rxjs-int
 import { Edge } from '../../interfaces/edge.interface';
 import { EdgeModel } from '../../models/edge.model';
 import {
-  ConnectionTemplateDirective,
-  EdgeTemplateDirective,
-  MarkerTemplateDirective,
-  NodeTemplateDirective,
+  VflowConnectionTemplateDirective,
+  VflowEdgeTemplateDirective,
+  VflowMarkerTemplateDirective,
+  VflowNodeTemplateDirective,
 } from '../../directives/template.directive';
 import { addNodesToEdges } from '../../utils/add-nodes-to-edges';
 import { Point } from '../../interfaces/point.interface';
@@ -163,10 +163,10 @@ const connectionControllerHostDirective = {
     // Lets scaled application content keep screen-sized details. The token is inherited by every element of the
     // flow, so a change recomputes the style of all of them: it follows the zoom once per gesture, not per frame.
     // The node focus ring, which must follow every frame, reads the token from its own node instead.
-    '[style.--vflow-zoom]': 'settledZoom()',
+    '[style.--v-zoom]': 'settledZoom()',
     // Nothing that follows the viewport is painted before the first layout, so the first painted frame already
     // shows a viewport the application sets in reaction to `initialized`, such as a `fitView()` call.
-    '[class.vflow-initializing]': '!initialized()',
+    '[class.v-initializing]': '!initialized()',
   },
   imports: [
     KeyboardEntityDirective,
@@ -238,7 +238,7 @@ export class VflowComponent {
         const id = edgeWithoutPresentation();
         if (id !== undefined) {
           console.warn(
-            `[ngx-vflow] Edge "${id}" has no component and the flow declares no <ng-template edge>, ` +
+            `[ngx-vflow] Edge "${id}" has no component and the flow declares no <ng-template vEdge>, ` +
               'so edges without a component do not render.',
           );
         }
@@ -246,7 +246,7 @@ export class VflowComponent {
     }
   }
 
-  /** The zoom at the end of the latest gesture, bound to `--vflow-zoom` on the host. */
+  /** The zoom at the end of the latest gesture, bound to `--v-zoom` on the host. */
   protected readonly settledZoom = signal(1);
 
   // #endregion
@@ -546,20 +546,20 @@ export class VflowComponent {
   // #endregion
 
   // #region TEMPLATES
-  protected nodeTemplateDirective = contentChild(NodeTemplateDirective);
+  protected nodeTemplateDirective = contentChild(VflowNodeTemplateDirective);
 
-  protected edgeTemplateDirective = contentChild(EdgeTemplateDirective);
+  protected edgeTemplateDirective = contentChild(VflowEdgeTemplateDirective);
 
-  protected connectionTemplateDirective = contentChild(ConnectionTemplateDirective);
+  protected connectionTemplateDirective = contentChild(VflowConnectionTemplateDirective);
 
-  private markerTemplateDirectives = contentChildren(MarkerTemplateDirective);
+  private markerTemplateDirectives = contentChildren(VflowMarkerTemplateDirective);
 
-  /** Marker shapes declared with `ng-template[marker]`, by type. */
+  /** Marker shapes declared with `ng-template[vMarker]`, by type. */
   protected markerShapes = computed<MarkerShapes>(
     () =>
       new Map(
         this.markerTemplateDirectives().map((directive) => [
-          directive.marker(),
+          directive.vMarker(),
           { template: directive.templateRef, inset: directive.inset() },
         ]),
       ),

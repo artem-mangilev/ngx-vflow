@@ -1,11 +1,11 @@
 import { ChangeDetectionStrategy, Component, signal, viewChild } from '@angular/core';
-import { VflowUi } from '@vflow/ui';
-import { VflowBpmn } from '@vflow/ui/bpmn';
+import { Vui } from '@vflow/ui';
+import { VuiBpmn } from '@vflow/ui/bpmn';
 import { createEdges, createNodes, Vflow, VflowComponent } from 'ngx-vflow';
 
 @Component({
   selector: 'app-root',
-  imports: [Vflow, VflowUi, VflowBpmn],
+  imports: [Vflow, Vui, VuiBpmn],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
     :host {
@@ -16,7 +16,7 @@ import { createEdges, createNodes, Vflow, VflowComponent } from 'ngx-vflow';
       position: relative;
       height: 100%;
     }
-    vflow-controls {
+    vui-controls {
       position: absolute;
       left: 10px;
       bottom: 10px;
@@ -31,42 +31,42 @@ import { createEdges, createNodes, Vflow, VflowComponent } from 'ngx-vflow';
     }
   `,
   template: `
-    <div class="stage" [vflowTheme]="dark() ? 'dark' : 'light'">
+    <div class="stage" [vuiTheme]="dark() ? 'dark' : 'light'">
       <vflow view="auto" data-testid="ui-flow" [nodes]="nodes" [edges]="edges">
-        <ng-template let-ctx node>
+        <ng-template let-ctx vNode>
           @if (ctx.data().kind === 'task') {
-            <div vflowBpmnTask class="task" selectable [vflowSelected]="ctx.selected()">
+            <div vuiBpmnTask class="task" vSelectable [vuiSelected]="ctx.selected()">
               {{ ctx.data().title }}
-              <span vflowPort handleType="target" position="left"></span>
+              <span vuiPort handleType="target" position="left"></span>
             </div>
           } @else {
-            <article vflowNode selectable [vflowSelected]="ctx.selected()">
-              <header vflowNodeHeader>
-                <span vflowTitle>{{ ctx.data().title }}</span>
+            <article vuiNode vSelectable [vuiSelected]="ctx.selected()">
+              <header vuiNodeHeader>
+                <span vuiTitle>{{ ctx.data().title }}</span>
               </header>
-              <footer vflowNodeFooter>
-                <span vflowStatus="success" [vflowStatusBusy]="true">Running</span>
-                <span vflowActions>
-                  <button vflowButton vflowNoDrag type="button" (click)="dark.set(!dark())">Theme</button>
+              <footer vuiNodeFooter>
+                <span vuiStatus="success" [vuiStatusBusy]="true">Running</span>
+                <span vuiActions>
+                  <button vuiButton vNoDrag type="button" (click)="dark.set(!dark())">Theme</button>
                 </span>
               </footer>
-              <span vflowPort handleType="source" position="right"></span>
+              <span vuiPort handleType="source" position="right"></span>
             </article>
           }
         </ng-template>
-        <ng-template let-ctx edge>
-          <svg:g edgeInteraction>
+        <ng-template let-ctx vEdge>
+          <svg:g vEdgeInteraction>
             <svg:path
-              vflowEdge
+              vuiEdge
               [attr.d]="ctx.path()"
               [attr.marker-end]="ctx.markerEnd()"
-              [vflowSelected]="ctx.selected()" />
+              [vuiSelected]="ctx.selected()" />
           </svg:g>
         </ng-template>
-        <mini-map />
+        <v-minimap />
       </vflow>
       @if (flow(); as flow) {
-        <vflow-controls [flow]="flow" />
+        <vui-controls [flow]="flow" />
       }
     </div>
   `,

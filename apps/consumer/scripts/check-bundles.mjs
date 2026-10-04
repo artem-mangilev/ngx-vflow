@@ -19,14 +19,14 @@ const coreCss = read(core, '.css');
 const assert = (condition, message) => {
   if (!condition) throw new Error(message);
 };
-assert(coreJs.includes('vflow-root'), 'core-only build does not contain ngx-vflow');
+assert(coreJs.includes('v-root'), 'core-only build does not contain ngx-vflow');
 assert(!/vui-|vui\\:|@vflow\/ui/.test(coreJs + coreCss), 'core-only build contains @vflow/ui code or classes');
 
 const ui = join(root, 'dist/apps/consumer-ui/browser');
 const uiJs = read(ui, '.js');
 const uiCss = read(ui, '.css');
 assert(uiJs.includes('vui-bpmn-task'), 'ui build does not bundle @vflow/ui/bpmn');
-assert(uiJs.includes('vui-controls'), 'ui build does not bundle vflow-controls');
+assert(uiJs.includes('vui-controls'), 'ui build does not bundle vui-controls');
 assert(/\.vui\\:bg-surface/.test(uiCss), 'ui build stylesheet lacks the compiled utilities');
 assert(!/@theme|@source|@import ['"]tailwindcss/.test(uiCss), 'ui build stylesheet still contains Tailwind directives');
 console.log('Consumer builds verified: core-only without UI, ui with compiled CSS and the BPMN entry.');

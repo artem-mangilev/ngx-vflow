@@ -27,4 +27,4 @@ With `snapGrid`, an axis the node aligned on keeps its alignment, and the grid a
 
 Hold `Alt` to move a node freely: while the key is down the node follows the pointer without snapping and no guides are drawn. The key is the `alignmentBypass` entry of [Keyboard shortcuts](../../interactions/keyboard-shortcuts).
 
-The guides are drawn in `--vflow-foreground` at 50% opacity, so they stay in the background of the nodes. Restyle them with ordinary CSS: `.vflow-alignment-guides` is the group, which sets `color` and `opacity` for all of them, `.vflow-alignment-line` the lines and gap marks, and `.vflow-alignment-point` the dots on aligned points.
+The guides are drawn in `--v-foreground` at 50% opacity, so they stay in the background of the nodes. Restyle them with ordinary CSS: `.v-alignment-guides` is the group, which sets `color` and `opacity` for all of them, `.v-alignment-line` the lines and gap marks, and `.v-alignment-point` the dots on aligned points.

@@ -19,14 +19,14 @@ Each page in this section shows one reference composition, its code and its limi
 
 ## Setup
 
-Import individual directives or the `VflowUi` convenience array alongside `Vflow`:
+Import individual directives or the `Vui` convenience array alongside `Vflow`:
 
 ```typescript
-import { VflowUi } from '@vflow/ui';
+import { Vui } from '@vflow/ui';
 import { Vflow } from 'ngx-vflow';
 
 // In your standalone component:
-// imports: [Vflow, VflowUi]
+// imports: [Vflow, Vui]
 ```
 
 Then add one of the two stylesheet entries to your application:
@@ -44,83 +44,83 @@ UI rules live in Tailwind cascade layers, so unlayered application CSS overrides
 
 Directives add a public class to your own element and nothing else: no wrappers, no roles, no graph state.
 Compose the parts with plain HTML and content projection; anything not listed here (descriptions, forms,
-images, charts, notes, menus) is your content inside `vflowNodeBody` or a field row.
+images, charts, notes, menus) is your content inside `vuiNodeBody` or a field row.
 
-| Area       | Parts                                                                                                   |
-| ---------- | ------------------------------------------------------------------------------------------------------- |
-| Shells     | `vflowNode` with `vflowNodeHeader`, `vflowNodeBody`, `vflowNodeFooter`; `vflowField`; `vflowContainer`  |
-| Text roles | `vflowTitle`, `vflowMeta`, `vflowIcon`, `vflowActions`, usable in any shell, label or toolbar           |
-| Port       | `vflowPort` with `handleType`, `position` and the other handle inputs: a core handle with the port look |
-| Edge       | `vflowEdge` on the SVG path, `vflowEdgeLabel` for HTML labels                                           |
-| Extras     | `vflowStatus`, `vflowExternalLabel`, `vflowToolbar`, `vflowButton`                                      |
+| Area       | Parts                                                                                                 |
+| ---------- | ----------------------------------------------------------------------------------------------------- |
+| Shells     | `vuiNode` with `vuiNodeHeader`, `vuiNodeBody`, `vuiNodeFooter`; `vuiField`; `vuiContainer`            |
+| Text roles | `vuiTitle`, `vuiMeta`, `vuiIcon`, `vuiActions`, usable in any shell, label or toolbar                 |
+| Port       | `vuiPort` with `handleType`, `position` and the other handle inputs: a core handle with the port look |
+| Edge       | `vuiEdge` on the SVG path, `vuiEdgeLabel` for HTML labels                                             |
+| Extras     | `vuiStatus`, `vuiExternalLabel`, `vuiToolbar`, `vuiButton`                                            |
 
 The node shell's resting shadow has no blur (`0 1px 0`). A blurred shadow is rasterized again for every visible node on every zoom step and pan, which on a large flow at a high device pixel ratio costs more GPU time than the rest of the node; see the measurement on the Virtualization page. Keep blurred effects for hover and selection states.
 
 Three kinds of state stay separate so they can be shown at once:
 
-- **Interaction** is owned by core: bind `vflowSelected` to `ctx.selected() || ctx.preselected()`. Focus comes from the core wrapper.
-- **Diagnostics** about the model and **application status** are both your vocabulary. Each is one `vflowStatus` indicator with a tone and your text; place two side by side to show a warning next to a running status. `vflowStatusBusy` adds activity, which is presentation only and never disables anything.
+- **Interaction** is owned by core: bind `vuiSelected` to `ctx.selected() || ctx.preselected()`. Focus comes from the core wrapper.
+- **Diagnostics** about the model and **application status** are both your vocabulary. Each is one `vuiStatus` indicator with a tone and your text; place two side by side to show a warning next to a running status. `vuiStatusBusy` adds activity, which is presentation only and never disables anything.
 - **Action availability** is the native `disabled` attribute on your buttons, driven by your rules such as read-only.
 
 Ports mirror two independent facts: the core feedback for the connection in progress (`idle`, `valid`, `invalid`),
-read from the core handle that `vflowPort` applies to the same element (`vflowPortState` only overrides it); `vflowPortConnected` is your
+read from the core handle that `vuiPort` applies to the same element (`vuiPortState` only overrides it); `vuiPortConnected` is your
 knowledge about existing edges.
 
 ### Edges
 
-`vflowEdge` styles the visible SVG path of an edge; routing, hit targets and markers stay in core,
+`vuiEdge` styles the visible SVG path of an edge; routing, hit targets and markers stay in core,
 so attach `markers` in edge data and bind `ctx.markerEnd()`. Labels at `start`, `center` and `end` positions
-are declared with the core `edgeLabel` structural directive inside the edge template; `vflowEdgeLabel` is their surface and can hold
-`vflowActions` with native buttons.
+are declared with the core `vEdgeLabel` structural directive inside the edge template; `vuiEdgeLabel` is their surface and can hold
+`vuiActions` with native buttons.
 
 ### Viewport controls
 
-`<vflow-controls [flow]="flow">` renders zoom in, zoom out and fit view for the given `VflowComponent`
-instance, clamped to its `minZoom`/`maxZoom`, and projects your own `<button vflowControlButton>` elements.
+`<vui-controls [flow]="flow">` renders zoom in, zoom out and fit view for the given `VflowComponent`
+instance, clamped to its `minZoom`/`maxZoom`, and projects your own `<button vuiControlButton>` elements.
 Position the element yourself, above the flow pane. Editing toggles, form controls and business actions are
 not part of the library; `@vflow/ui` declares `ngx-vflow` as a peer dependency for this component.
 
 ### BPMN entry point
 
-`import { VflowBpmn } from '@vflow/ui/bpmn'` adds the agreed subset on top of the shared parts: task,
+`import { VuiBpmn } from '@vflow/ui/bpmn'` adds the agreed subset on top of the shared parts: task,
 start/intermediate/end events, exclusive and parallel gateways, pool and lane frames with a vertical
-`vflowTitle`, and `vflowBpmnFlow` for sequence, message and association paths. Pools and lanes are
+`vuiTitle`, and `vuiBpmnFlow` for sequence, message and association paths. Pools and lanes are
 sized nodes drawn as frames; their parent relationships stay in graph data, and a pool can carry its own handles
 for message flows. Execution semantics, BPMN XML and model validation belong to the application.
 
 ## Directive reference
 
-| Import                                                   | Attribute                                                                | Responsibility                                                                  |
-| -------------------------------------------------------- | ------------------------------------------------------------------------ | ------------------------------------------------------------------------------- |
-| `VflowTheme`                                             | `[vflowTheme]="'light'"`                                                 | Scoped light/dark semantic tokens                                               |
-| `VflowSelected`                                          | `[vflowSelected]="ctx.selected() \|\| ctx.preselected()"`                | Selection presentation; no interaction or ARIA changes                          |
-| `VflowNode`                                              | `vflowNode`                                                              | Node surface; consumer chooses size and content                                 |
-| `VflowNodeHeader`, `VflowNodeBody`, `VflowNodeFooter`    | `vflowNodeHeader`, `vflowNodeBody`, `vflowNodeFooter`                    | Optional anatomy on consumer elements                                           |
-| `VflowField`                                             | `vflowField`                                                             | Field row with room for text roles and core handles                             |
-| `VflowContainer`                                         | `vflowContainer`                                                         | Frame; parent relationships remain explicit in graph data                       |
-| `VflowTitle`, `VflowMeta`                                | `vflowTitle`, `vflowMeta`                                                | Primary wrapping text and secondary text in any shell                           |
-| `VflowIcon`, `VflowActions`                              | `vflowIcon`, `vflowActions`                                              | Icon slot and a group of controls; add `vflowNoDrag` to each                    |
-| `VflowPort`                                              | `vflowPort handleType="target" position="left" [vflowPortConnected]="…"` | A core handle with the port look: idle/valid/invalid from the handle, connected |
-| `VflowStatus`                                            | `[vflowStatus]="'warning'" [vflowStatusBusy]="true"`                     | Indicator: semantic tone, your text and optional activity                       |
-| `VflowEdge`                                              | `vflowEdge` on an SVG path                                               | Stroke; bind core path and marker URLs yourself                                 |
-| `VflowEdgeLabel`                                         | `vflowEdgeLabel`                                                         | HTML label surface, including optional native controls                          |
-| `VflowToolbar`                                           | `vflowToolbar`                                                           | Surface for `node-toolbar` content                                              |
-| `VflowExternalLabel`                                     | `vflowExternalLabel`                                                     | Label below a positioned shape                                                  |
-| `VflowControls`, `VflowControlButton`                    | `<vflow-controls [flow]="flow">`, `button[vflowControlButton]`           | Viewport controls for one flow instance and custom buttons                      |
-| `VflowBpmnEvent` (bpmn)                                  | `[vflowBpmnEvent]="'start'"`                                             | Start/intermediate/end event outlines                                           |
-| `VflowBpmnGateway` (bpmn)                                | `[vflowBpmnGateway]="'exclusive'"`                                       | Diamond with × or + marker; text goes in `vflowExternalLabel`                   |
-| `VflowBpmnTask`, `VflowBpmnPool`, `VflowBpmnLane` (bpmn) | `vflowBpmnTask`, `vflowBpmnPool`, `vflowBpmnLane`                        | Task card, participant frame and lane frame                                     |
-| `VflowBpmnFlow` (bpmn)                                   | `[vflowBpmnFlow]="'message'"` on an SVG path                             | Sequence, message or association line style                                     |
-| `VflowButton`                                            | `vflowButton` on a native button                                         | Button presentation with focus and disabled states                              |
+| Import                                             | Attribute                                                            | Responsibility                                                                  |
+| -------------------------------------------------- | -------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| `VuiTheme`                                         | `[vuiTheme]="'light'"`                                               | Scoped light/dark semantic tokens                                               |
+| `VuiSelected`                                      | `[vuiSelected]="ctx.selected() \|\| ctx.preselected()"`              | Selection presentation; no interaction or ARIA changes                          |
+| `VuiNode`                                          | `vuiNode`                                                            | Node surface; consumer chooses size and content                                 |
+| `VuiNodeHeader`, `VuiNodeBody`, `VuiNodeFooter`    | `vuiNodeHeader`, `vuiNodeBody`, `vuiNodeFooter`                      | Optional anatomy on consumer elements                                           |
+| `VuiField`                                         | `vuiField`                                                           | Field row with room for text roles and core handles                             |
+| `VuiContainer`                                     | `vuiContainer`                                                       | Frame; parent relationships remain explicit in graph data                       |
+| `VuiTitle`, `VuiMeta`                              | `vuiTitle`, `vuiMeta`                                                | Primary wrapping text and secondary text in any shell                           |
+| `VuiIcon`, `VuiActions`                            | `vuiIcon`, `vuiActions`                                              | Icon slot and a group of controls; add `vNoDrag` to each                        |
+| `VuiPort`                                          | `vuiPort handleType="target" position="left" [vuiPortConnected]="…"` | A core handle with the port look: idle/valid/invalid from the handle, connected |
+| `VuiStatus`                                        | `[vuiStatus]="'warning'" [vuiStatusBusy]="true"`                     | Indicator: semantic tone, your text and optional activity                       |
+| `VuiEdge`                                          | `vuiEdge` on an SVG path                                             | Stroke; bind core path and marker URLs yourself                                 |
+| `VuiEdgeLabel`                                     | `vuiEdgeLabel`                                                       | HTML label surface, including optional native controls                          |
+| `VuiToolbar`                                       | `vuiToolbar`                                                         | Surface for `v-node-toolbar` content                                            |
+| `VuiExternalLabel`                                 | `vuiExternalLabel`                                                   | Label below a positioned shape                                                  |
+| `VuiControls`, `VuiControlButton`                  | `<vui-controls [flow]="flow">`, `button[vuiControlButton]`           | Viewport controls for one flow instance and custom buttons                      |
+| `VuiBpmnEvent` (bpmn)                              | `[vuiBpmnEvent]="'start'"`                                           | Start/intermediate/end event outlines                                           |
+| `VuiBpmnGateway` (bpmn)                            | `[vuiBpmnGateway]="'exclusive'"`                                     | Diamond with × or + marker; text goes in `vuiExternalLabel`                     |
+| `VuiBpmnTask`, `VuiBpmnPool`, `VuiBpmnLane` (bpmn) | `vuiBpmnTask`, `vuiBpmnPool`, `vuiBpmnLane`                          | Task card, participant frame and lane frame                                     |
+| `VuiBpmnFlow` (bpmn)                               | `[vuiBpmnFlow]="'message'"` on an SVG path                           | Sequence, message or association line style                                     |
+| `VuiButton`                                        | `vuiButton` on a native button                                       | Button presentation with focus and disabled states                              |
 
-Each directive is independently importable. Apart from `vflow-controls`, none imports ngx-vflow; none owns
+Each directive is independently importable. Apart from `vui-controls`, none imports ngx-vflow; none owns
 graph state, adds wrapper elements, registers ports or changes accessibility roles. Public selectors are the
-`.vui-*` classes named after the attributes, for example `.vui-title` or `.vui-status[data-tone='warning']`;
+`.vui-*` classes named after the attributes, for example `.vui-title` or `.vui-status[data-vui-tone='warning']`;
 context rules such as `.vui-container > .vui-title` style a role inside a shell.
 
 ## Themes and composition
 
-Put `vflowTheme` on an ancestor of the whole flow so nodes, SVG edges, markers, labels, toolbars and
+Put `vuiTheme` on an ancestor of the whole flow so nodes, SVG edges, markers, labels, toolbars and
 the minimap share its tokens. Different editors can have different themes on the same page, and a flow
 outside every theme scope keeps the core defaults: importing the stylesheet never themes a flow by itself.
 
@@ -150,23 +150,23 @@ line width, is ordinary CSS on the public `.vui-*` selectors; the density of all
 | `--vui-font-family`, `--vui-font-size`, `--vui-line-height` | Typography                        |
 | `--vui-space`, `--vui-radius`                               | Spacing unit and corner radius    |
 
-Core has its own tokens with defaults for standalone use: the colors `--vflow-background`, `--vflow-surface`,
-`--vflow-foreground`, `--vflow-muted`, `--vflow-border`, `--vflow-selection` and `--vflow-focus`, and the
-focus ring geometry `--vflow-focus-width` (2px), `--vflow-focus-offset` (3px, the gap between a node and its
-ring) and `--vflow-focus-radius` (0px, the corner radius of the node itself; the ring follows it, widened by
+Core has its own tokens with defaults for standalone use: the colors `--v-background`, `--v-surface`,
+`--v-foreground`, `--v-muted`, `--v-border`, `--v-selection` and `--v-focus`, and the
+focus ring geometry `--v-focus-width` (2px), `--v-focus-offset` (3px, the gap between a node and its
+ring) and `--v-focus-radius` (0px, the corner radius of the node itself; the ring follows it, widened by
 the offset, so it stays concentric). A theme scope maps the UI tokens onto them, including `--vui-radius`
-onto the ring radius since the node part is rounded with it; set a `--vflow-*` token on the flow element or any
+onto the ring radius since the node part is rounded with it; set a `--v-*` token on the flow element or any
 descendant to override both. Under `forced-colors: active` core maps its tokens to system colors
-regardless of the theme. Core also sets the read-only `--vflow-zoom` on the flow element, so scaled content
-can keep screen-sized details (`calc(2px / var(--vflow-zoom, 1))`). The flow value is written when a
+regardless of the theme. Core also sets the read-only `--v-zoom` on the flow element, so scaled content
+can keep screen-sized details (`calc(2px / var(--v-zoom, 1))`). The flow value is written when a
 viewport change ends, not on every frame of a gesture, because a change recomputes the style of every
 element of the flow. The node focus ring does not use it: its width and offset scale with the content, like
 the node's border. The canvas minimap samples the resolved tokens and repaints when an
 attribute changes on any ancestor of the flow (for example `data-vui-theme` or a class) or when the
 `prefers-color-scheme` preference changes; edits to a stylesheet alone are not observed.
 
-Give custom edges their interaction stroke with core `edgeInteraction`; use core gesture
-exclusions such as `vflowNoDrag` for embedded controls. Do not shrink a hit area just to make
+Give custom edges their interaction stroke with core `vEdgeInteraction`; use core gesture
+exclusions such as `vNoDrag` for embedded controls. Do not shrink a hit area just to make
 its visual smaller. Keep status text alongside color and give icon-only buttons accessible names.
 
 Core is headless: it ships no ready-made node, group, edge or label presentation and no appearance

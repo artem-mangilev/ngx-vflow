@@ -30,7 +30,7 @@ export function readableAngle(angle: number): number {
 }
 
 /**
- * Renders one `ng-template[edgeLabel]` of an edge in the HTML label layer at its point of the path. The template has
+ * Renders one `ng-template[vEdgeLabel]` of an edge in the HTML label layer at its point of the path. The template has
  * no context: it closes over the edge presentation that declares it and resolves the edge through that declaration.
  */
 @Component({
@@ -46,7 +46,7 @@ export function readableAngle(angle: number): number {
         pointer-events: none;
       }
 
-      .edge-label-wrapper {
+      .v-edge-label-wrapper {
         width: max-content;
         transform: translate(-50%, -50%);
         pointer-events: all;
@@ -105,7 +105,7 @@ export class EdgeLabelComponent {
         }
         console.warn(
           `[ngx-vflow] The "${this.position()}" label of edge "${this.edgeModel().edge.id}" was compiled in the SVG ` +
-            'namespace and does not render. Declare *edgeLabel next to the SVG presentation of the edge, ' +
+            'namespace and does not render. Declare *vEdgeLabel next to the SVG presentation of the edge, ' +
             'not inside an svg:* element.',
         );
       });

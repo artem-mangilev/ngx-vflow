@@ -9,30 +9,30 @@ const SELECTED =
  * flow at a high pixel ratio costs more GPU time than the rest of the node.
  */
 @Directive({
-  selector: '[vflowNode]',
+  selector: '[vuiNode]',
   host: {
     class: `vui-node vui:relative vui:box-border vui:rounded-md vui:border vui:border-border vui:bg-surface vui:text-foreground vui:font-sans vui:text-base vui:shadow-[0_1px_0_#0000000f] ${SELECTED}`,
   },
 })
-export class VflowNode {}
+export class VuiNode {}
 
 @Directive({
-  selector: '[vflowNodeHeader]',
+  selector: '[vuiNodeHeader]',
   host: {
     class:
       'vui-node-header vui:flex vui:items-center vui:gap-2.5 vui:p-3.5 vui:font-semibold vui:rounded-t-md vui:border-b vui:border-border vui:bg-surface-muted',
   },
 })
-export class VflowNodeHeader {}
+export class VuiNodeHeader {}
 
-@Directive({ selector: '[vflowNodeBody]', host: { class: 'vui-node-body vui:p-3.5' } })
-export class VflowNodeBody {}
+@Directive({ selector: '[vuiNodeBody]', host: { class: 'vui-node-body vui:p-3.5' } })
+export class VuiNodeBody {}
 
 @Directive({
-  selector: '[vflowNodeFooter]',
+  selector: '[vuiNodeFooter]',
   host: {
     class:
       'vui-node-footer vui:flex vui:flex-wrap vui:items-center vui:gap-2.5 vui:p-3.5 vui:border-t vui:border-border',
   },
 })
-export class VflowNodeFooter {}
+export class VuiNodeFooter {}

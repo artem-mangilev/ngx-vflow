@@ -1,15 +1,15 @@
 import { ChangeDetectionStrategy, Component, input, OnInit } from '@angular/core';
-import type { MiniMapComponent, MiniMapPosition } from 'ngx-vflow';
+import type { VflowMinimapComponent, MinimapPosition } from 'ngx-vflow';
 import { AsInterface } from '../types';
 
 @Component({
-  selector: 'mini-map',
+  selector: 'v-minimap',
   template: '',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class MiniMapMockComponent implements AsInterface<MiniMapComponent>, OnInit {
-  public position = input<MiniMapPosition>('bottom-right');
+export class VflowMinimapMockComponent implements AsInterface<VflowMinimapComponent>, OnInit {
+  public position = input<MinimapPosition>('bottom-right');
 
   public pannable = input(false);
   public zoomable = input(false);

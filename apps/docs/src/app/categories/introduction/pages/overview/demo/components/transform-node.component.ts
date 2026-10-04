@@ -1,10 +1,10 @@
 import { ChangeDetectionStrategy, Component, output } from '@angular/core';
-import { VflowPort } from '@vflow/ui';
+import { VuiPort } from '@vflow/ui';
 import { Node, Vflow, injectNode } from 'ngx-vflow';
 
 @Component({
   template: `
-    <div class="transform-node" selectable [resizable]="ctx.selected()">
+    <div class="transform-node" vSelectable [vResizable]="ctx.selected()">
       <div class="node-header">
         <svg class="icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
           <path
@@ -26,7 +26,7 @@ import { Node, Vflow, injectNode } from 'ngx-vflow';
         <div class="section">
           <div class="section-label">Input</div>
           <div class="data-preview">You can attach handle to content inside node</div>
-          <span vflowPort handleType="target" position="left" handleId="input-1"></span>
+          <span vuiPort handleType="target" position="left" handleId="input-1"></span>
         </div>
         <div class="transform-indicator">
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
@@ -41,16 +41,16 @@ import { Node, Vflow, injectNode } from 'ngx-vflow';
         <div class="section">
           <div class="section-label">Output</div>
           <div class="data-preview">You can attach handle to content inside node</div>
-          <span vflowPort handleType="source" position="right" handleId="output-1"></span>
+          <span vuiPort handleType="source" position="right" handleId="output-1"></span>
         </div>
       </div>
     </div>
 
-    <node-toolbar position="top">
+    <v-node-toolbar position="top">
       <div class="toolbar-content">
         <button class="toolbar-btn" (click)="deleted.emit(ctx.node)">Delete</button>
       </div>
-    </node-toolbar>
+    </v-node-toolbar>
   `,
   styles: [
     `
@@ -173,7 +173,7 @@ import { Node, Vflow, injectNode } from 'ngx-vflow';
       }
     `,
   ],
-  imports: [Vflow, VflowPort],
+  imports: [Vflow, VuiPort],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TransformNodeComponent {

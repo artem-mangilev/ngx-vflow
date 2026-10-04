@@ -1,13 +1,13 @@
-.selection-box {
+.v-selection-box {
   pointer-events: none;
-  fill: var(--vflow-selection);
+  fill: var(--v-selection);
   fill-opacity: 0.12;
-  stroke: var(--vflow-selection);
+  stroke: var(--v-selection);
   stroke-width: 1;
 }
 
 @media (forced-colors: active) {
-  .selection-box {
+  .v-selection-box {
     forced-color-adjust: none;
   }
 }

@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, effect, signal, untracked, viewChild } from '@angular/core';
-import { VflowUi } from '@vflow/ui';
-import { VflowBpmn } from '@vflow/ui/bpmn';
+import { Vui } from '@vflow/ui';
+import { VuiBpmn } from '@vflow/ui/bpmn';
 import { createEdges, createNodes, Vflow, VflowComponent } from 'ngx-vflow';
 
 type Kind = 'pool' | 'lane' | 'task' | 'start' | 'intermediate' | 'end' | 'exclusive' | 'parallel' | 'annotation';
@@ -8,37 +8,37 @@ type Flow = 'sequence' | 'message' | 'association';
 
 @Component({
   selector: 'app-ui-bpmn-demo',
-  imports: [Vflow, VflowUi, VflowBpmn],
+  imports: [Vflow, Vui, VuiBpmn],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <section class="demo" aria-label="BPMN presentation demo" [vflowTheme]="dark() ? 'dark' : 'light'">
+    <section class="demo" aria-label="BPMN presentation demo" [vuiTheme]="dark() ? 'dark' : 'light'">
       <div class="controls">
-        <button vflowButton type="button" (click)="flow()?.fitView()">Fit process</button>
+        <button vuiButton type="button" (click)="flow()?.fitView()">Fit process</button>
         <label><input type="checkbox" [checked]="dark()" (change)="dark.set(!dark())" /> Dark theme</label>
         <p>Two pools with a message flow between them; drag tasks inside lanes. A visual subset without execution.</p>
       </div>
       <vflow view="auto" [nodes]="nodes" [edges]="edges">
-        <ng-template let-ctx node>
+        <ng-template let-ctx vNode>
           @if (ctx.data().kind === 'pool' || ctx.data().kind === 'lane') {
             @if (ctx.data().kind === 'pool') {
               <div
-                vflowBpmnPool
-                selectable
-                [vflowSelected]="ctx.selected() || ctx.preselected()"
+                vuiBpmnPool
+                vSelectable
+                [vuiSelected]="ctx.selected() || ctx.preselected()"
                 [style.width.px]="ctx.width()"
                 [style.height.px]="ctx.height()">
-                <strong vflowTitle>{{ ctx.data().title }}</strong>
+                <strong vuiTitle>{{ ctx.data().title }}</strong>
                 <!-- The supplier pool takes part in message flows through its own handles. -->
                 @if (ctx.node.id === 'supplier') {
                   <span
-                    vflowPort
+                    vuiPort
                     handleType="target"
                     position="bottom"
                     handleId="message-in"
                     [canStart]="false"
                     [offsetX]="ctx.width() * 0.4"></span>
                   <span
-                    vflowPort
+                    vuiPort
                     handleType="source"
                     position="bottom"
                     handleId="message-out"
@@ -48,86 +48,78 @@ type Flow = 'sequence' | 'message' | 'association';
               </div>
             } @else {
               <div
-                vflowBpmnLane
-                selectable
-                [vflowSelected]="ctx.selected() || ctx.preselected()"
+                vuiBpmnLane
+                vSelectable
+                [vuiSelected]="ctx.selected() || ctx.preselected()"
                 [style.width.px]="ctx.width()"
                 [style.height.px]="ctx.height()">
-                <strong vflowTitle>{{ ctx.data().title }}</strong>
+                <strong vuiTitle>{{ ctx.data().title }}</strong>
               </div>
             }
           } @else {
             @switch (ctx.data().kind) {
               @case ('task') {
-                <div vflowBpmnTask class="task" selectable [vflowSelected]="ctx.selected() || ctx.preselected()">
+                <div vuiBpmnTask class="task" vSelectable [vuiSelected]="ctx.selected() || ctx.preselected()">
                   {{ ctx.data().title }}
-                  <span vflowPort handleType="target" position="left" [canStart]="false" [canAccept]="false"></span>
-                  <span vflowPort handleType="source" position="right" [canStart]="false" [canAccept]="false"></span>
+                  <span vuiPort handleType="target" position="left" [canStart]="false" [canAccept]="false"></span>
+                  <span vuiPort handleType="source" position="right" [canStart]="false" [canAccept]="false"></span>
                   @if (ctx.node.id === 'notify') {
-                    <span
-                      vflowPort
-                      handleType="source"
-                      position="top"
-                      handleId="message-out"
-                      [canAccept]="false"></span>
+                    <span vuiPort handleType="source" position="top" handleId="message-out" [canAccept]="false"></span>
                   }
                 </div>
               }
               @case ('exclusive') {
-                <div vflowBpmnGateway="exclusive" selectable [vflowSelected]="ctx.selected() || ctx.preselected()">
-                  <span vflowExternalLabel>{{ ctx.data().title }}</span>
-                  <span vflowPort handleType="target" position="left" [canStart]="false" [canAccept]="false"></span>
-                  <span vflowPort handleType="target" position="top" handleId="association" [canStart]="false"></span>
-                  <span vflowPort handleType="source" position="right" handleId="yes" [canStart]="false"></span>
-                  <span vflowPort handleType="source" position="bottom" handleId="no" [canStart]="false"></span>
+                <div vuiBpmnGateway="exclusive" vSelectable [vuiSelected]="ctx.selected() || ctx.preselected()">
+                  <span vuiExternalLabel>{{ ctx.data().title }}</span>
+                  <span vuiPort handleType="target" position="left" [canStart]="false" [canAccept]="false"></span>
+                  <span vuiPort handleType="target" position="top" handleId="association" [canStart]="false"></span>
+                  <span vuiPort handleType="source" position="right" handleId="yes" [canStart]="false"></span>
+                  <span vuiPort handleType="source" position="bottom" handleId="no" [canStart]="false"></span>
                 </div>
               }
               @case ('parallel') {
-                <div vflowBpmnGateway="parallel" selectable [vflowSelected]="ctx.selected() || ctx.preselected()">
-                  <span vflowExternalLabel>{{ ctx.data().title }}</span>
-                  <span vflowPort handleType="target" position="left" [canStart]="false" [canAccept]="false"></span>
-                  <span vflowPort handleType="source" position="right" handleId="a" [canStart]="false"></span>
-                  <span vflowPort handleType="source" position="bottom" handleId="b" [canStart]="false"></span>
+                <div vuiBpmnGateway="parallel" vSelectable [vuiSelected]="ctx.selected() || ctx.preselected()">
+                  <span vuiExternalLabel>{{ ctx.data().title }}</span>
+                  <span vuiPort handleType="target" position="left" [canStart]="false" [canAccept]="false"></span>
+                  <span vuiPort handleType="source" position="right" handleId="a" [canStart]="false"></span>
+                  <span vuiPort handleType="source" position="bottom" handleId="b" [canStart]="false"></span>
                 </div>
               }
               @case ('annotation') {
-                <div class="annotation" selectable [vflowSelected]="ctx.selected() || ctx.preselected()">
+                <div class="annotation" vSelectable [vuiSelected]="ctx.selected() || ctx.preselected()">
                   {{ ctx.data().title }}
-                  <span vflowPort handleType="source" position="bottom" [canAccept]="false"></span>
+                  <span vuiPort handleType="source" position="bottom" [canAccept]="false"></span>
                 </div>
               }
               @default {
-                <div
-                  selectable
-                  [vflowBpmnEvent]="ctx.data().kind"
-                  [vflowSelected]="ctx.selected() || ctx.preselected()">
+                <div vSelectable [vuiBpmnEvent]="ctx.data().kind" [vuiSelected]="ctx.selected() || ctx.preselected()">
                   @if (ctx.data().kind === 'intermediate') {
                     <span class="symbol" aria-hidden="true">◷</span>
                   }
-                  <span vflowExternalLabel>{{ ctx.data().title }}</span>
+                  <span vuiExternalLabel>{{ ctx.data().title }}</span>
                   @if (ctx.data().kind === 'start') {
-                    <span vflowPort handleType="target" position="top" handleId="message-in" [canStart]="false"></span>
+                    <span vuiPort handleType="target" position="top" handleId="message-in" [canStart]="false"></span>
                   } @else {
-                    <span vflowPort handleType="target" position="left" [canStart]="false" [canAccept]="false"></span>
+                    <span vuiPort handleType="target" position="left" [canStart]="false" [canAccept]="false"></span>
                   }
                   @if (ctx.data().kind !== 'end') {
-                    <span vflowPort handleType="source" position="right" [canStart]="false" [canAccept]="false"></span>
+                    <span vuiPort handleType="source" position="right" [canStart]="false" [canAccept]="false"></span>
                   }
                 </div>
               }
             }
           }
         </ng-template>
-        <ng-template let-ctx edge>
-          <svg:g edgeInteraction>
+        <ng-template let-ctx vEdge>
+          <svg:g vEdgeInteraction>
             <svg:path
-              [vflowBpmnFlow]="ctx.data()?.flow ?? 'sequence'"
+              [vuiBpmnFlow]="ctx.data()?.flow ?? 'sequence'"
               [attr.d]="ctx.path()"
               [attr.marker-end]="ctx.markerEnd()"
-              [vflowSelected]="ctx.selected() || ctx.preselected()" />
+              [vuiSelected]="ctx.selected() || ctx.preselected()" />
           </svg:g>
           @if (ctx.data()?.label; as label) {
-            <span *edgeLabel vflowEdgeLabel>{{ label }}</span>
+            <span *vEdgeLabel vuiEdgeLabel>{{ label }}</span>
           }
         </ng-template>
       </vflow>

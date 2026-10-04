@@ -36,7 +36,7 @@ test('names entities, describes their state, keeps handles transparent and follo
   await expect(edit).toHaveAccessibleDescription(
     'Opens the editor. Connection from Draft to Editor. Press Enter or Space to select. Press Delete or Backspace to delete.',
   );
-  const handles = graph.locator('[data-vflow-handle-type]');
+  const handles = graph.locator('[data-v-handle-type]');
   expect(await handles.count()).toBeGreaterThan(0);
   for (const handle of await handles.all()) {
     for (const name of ['role', 'aria-label', 'aria-describedby', 'tabindex']) {
@@ -109,14 +109,14 @@ test('traverses nodes, controls and edges, selects, moves, announces, deletes an
       return node.x + node.width / 2 - pane.x - pane.width / 2;
     })
     .toBeCloseTo(0);
-  const viewport = graph.locator('.vflow-viewport');
+  const viewport = graph.locator('.v-viewport');
   const transform = await viewport.getAttribute('style');
   await page.keyboard.press('Tab');
   await expect(next).toBeFocused();
   await expect(viewport).toHaveAttribute('style', transform!);
   await page.keyboard.press('Tab');
   await expect(edit).toBeFocused();
-  await expect(edit.locator('.focus-indicator')).toHaveCSS('display', 'block');
+  await expect(edit.locator('.v-focus-indicator')).toHaveCSS('display', 'block');
   await page.keyboard.press('Escape');
   await expect(live).toHaveText('Selection cleared.');
   // Deleting the focused unselected edge removes only it, and focus recovers on a neighbor.
@@ -146,7 +146,7 @@ test('recovers focus when an embedded control removes its node', async ({ page }
 
 test('pans, zooms and fits the viewport from the keyboard', async ({ page }) => {
   const { graph, live } = await open(page);
-  const viewport = graph.locator('.vflow-viewport');
+  const viewport = graph.locator('.v-viewport');
   const transform = () => viewport.evaluate((element) => element.style.transform);
   await graph.getByRole('group', { name: 'Next step', exact: true }).focus();
   await page.keyboard.press('ArrowRight');
@@ -181,8 +181,7 @@ test('pans, zooms and fits the viewport from the keyboard', async ({ page }) => 
 test('zooms from a layout that puts plus and minus on other physical keys', async ({ page }) => {
   const { demo, graph } = await open(page);
   const flow = demo.locator('vflow');
-  const zoom = () =>
-    flow.evaluate((element) => Number((element as HTMLElement).style.getPropertyValue('--vflow-zoom')));
+  const zoom = () => flow.evaluate((element) => Number((element as HTMLElement).style.getPropertyValue('--v-zoom')));
   // A German layout reaches + on BracketRight and - on Slash; the binding names the character, not the position.
   const press = (detail: { key: string; code: string }) =>
     page.evaluate(

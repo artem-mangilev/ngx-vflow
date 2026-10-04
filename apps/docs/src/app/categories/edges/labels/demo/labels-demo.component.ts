@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { DocsPresentations } from '@docs/shared';
-import { VflowUi } from '@vflow/ui';
+import { Vui } from '@vflow/ui';
 import { Edge, EdgeLabelOrient, Node, Vflow, createEdges, createNodes } from 'ngx-vflow';
 
 interface LabelData {
@@ -14,21 +14,21 @@ interface LabelData {
 
 @Component({
   template: `<vflow view="auto" [nodes]="nodes" [edges]="edges">
-    <ng-template let-ctx node><docs-node [ctx]="ctx" /></ng-template>
+    <ng-template let-ctx vNode><docs-node [ctx]="ctx" /></ng-template>
 
-    <ng-template let-ctx edge>
+    <ng-template let-ctx vEdge>
       <svg:g docsEdge [ctx]="ctx" />
 
       @if (ctx.data().start; as text) {
-        <span *edgeLabel="'start'; orient: ctx.data().orient" vflowEdgeLabel>{{ text }}</span>
+        <span *vEdgeLabel="'start'; orient: ctx.data().orient" vuiEdgeLabel>{{ text }}</span>
       }
       @if (ctx.data().deletable) {
-        <button *edgeLabel class="delete" type="button" (click)="deleteEdge(ctx.edge)">Delete</button>
+        <button *vEdgeLabel class="delete" type="button" (click)="deleteEdge(ctx.edge)">Delete</button>
       } @else if (ctx.data().center; as text) {
-        <span *edgeLabel="'center'; orient: ctx.data().orient" vflowEdgeLabel>{{ text }}</span>
+        <span *vEdgeLabel="'center'; orient: ctx.data().orient" vuiEdgeLabel>{{ text }}</span>
       }
       @if (ctx.data().end; as text) {
-        <span *edgeLabel="'end'; orient: ctx.data().orient" vflowEdgeLabel>{{ text }}</span>
+        <span *vEdgeLabel="'end'; orient: ctx.data().orient" vuiEdgeLabel>{{ text }}</span>
       }
     </ng-template>
   </vflow>`,
@@ -51,7 +51,7 @@ interface LabelData {
     `,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DocsPresentations, Vflow, VflowUi],
+  imports: [DocsPresentations, Vflow, Vui],
 })
 export class LabelsDemoComponent {
   public nodes: Node[] = createNodes([

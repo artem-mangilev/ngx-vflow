@@ -4,11 +4,7 @@ import { VflowComponent } from '../vflow/vflow.component';
 import { Background } from '../../types/background.type';
 
 @Component({
-  template: `<vflow
-    style="--vflow-muted: rgb(1, 2, 3)"
-    [view]="[400, 300]"
-    [nodes]="[]"
-    [background]="background()" />`,
+  template: `<vflow style="--v-muted: rgb(1, 2, 3)" [view]="[400, 300]" [nodes]="[]" [background]="background()" />`,
   imports: [VflowComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -27,7 +23,7 @@ describe('Background pattern', () => {
   }
 
   it('strokes the grid lines without filling the cells', () => {
-    const line = render({ type: 'grid' }).querySelector('.vflow-background-pattern')!;
+    const line = render({ type: 'grid' }).querySelector('.v-background-pattern')!;
     const style = getComputedStyle(line);
 
     expect(line.tagName).toBe('path');
@@ -36,7 +32,7 @@ describe('Background pattern', () => {
   });
 
   it('fills the dots without a stroke around them', () => {
-    const dot = render({ type: 'dots' }).querySelector('.vflow-background-pattern')!;
+    const dot = render({ type: 'dots' }).querySelector('.v-background-pattern')!;
     const style = getComputedStyle(dot);
 
     expect(dot.tagName).toBe('circle');

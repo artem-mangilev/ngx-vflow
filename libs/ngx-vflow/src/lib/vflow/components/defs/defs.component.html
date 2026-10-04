@@ -13,7 +13,7 @@
     stroke-linecap="round"
     stroke-linejoin="round"
     markerUnits="userSpaceOnUse"
-    [attr.class]="'vflow-marker vflow-marker--' + (marker.value.type ?? defaultType)"
+    [attr.class]="'v-marker v-marker--' + (marker.value.type ?? defaultType)"
     [attr.refX]="-tipInset(marker.value)"
     [attr.stroke-width]="strokeWidth(marker.value)"
     [attr.id]="marker.key"

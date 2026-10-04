@@ -17,8 +17,8 @@ const IDENTITY = 'translate(0px, 0px) scale(1)';
 @Component({
   template: `<div style="width:100px;height:48px">
     Custom node
-    <span vflowHandle handleType="target" position="left"></span>
-    <span vflowHandle handleType="source" position="right"></span>
+    <span vHandle handleType="target" position="left"></span>
+    <span vHandle handleType="source" position="right"></span>
   </div>`,
   imports: [VflowHandleDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -68,11 +68,11 @@ describe('Initial viewport', () => {
     // Mutation callbacks run after every task, so they see every state the browser could paint.
     const check = () => {
       const flow = fixture.componentInstance.flow();
-      const nodes = Array.from(root.querySelectorAll<HTMLElement>('.vflow-node'));
-      const shown = [...nodes, ...Array.from(root.querySelectorAll('svg[edge], .vflow-background-svg'))].filter(
+      const nodes = Array.from(root.querySelectorAll<HTMLElement>('.v-node'));
+      const shown = [...nodes, ...Array.from(root.querySelectorAll('svg[edge], .v-background-svg'))].filter(
         (element) => getComputedStyle(element).visibility === 'visible',
       );
-      const transform = root.querySelector<HTMLElement>('.vflow-viewport')!.style.transform;
+      const transform = root.querySelector<HTMLElement>('.v-viewport')!.style.transform;
       const state = `initialized=${flow.initialized()} shown=${shown.length} transform=${transform}`;
       if (states.at(-1) !== state) states.push(state);
 
@@ -100,7 +100,7 @@ describe('Initial viewport', () => {
 
   it('does not keep the graph hidden for a node without a layout box', async () => {
     const style = document.createElement('style');
-    style.textContent = '.vflow-node:has(.no-box) { display: none; }';
+    style.textContent = '.v-node:has(.no-box) { display: none; }';
     document.head.append(style);
 
     try {
@@ -115,7 +115,7 @@ describe('Initial viewport', () => {
       await frames(8);
 
       expect(fixture.componentInstance.initialized()).toBeTrue();
-      const shown = fixture.nativeElement.querySelector('.vflow-node:not(:has(.no-box))');
+      const shown = fixture.nativeElement.querySelector('.v-node:not(:has(.no-box))');
       expect(getComputedStyle(shown).visibility).toBe('visible');
     } finally {
       style.remove();

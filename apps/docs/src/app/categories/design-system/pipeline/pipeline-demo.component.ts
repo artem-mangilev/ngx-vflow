@@ -8,7 +8,7 @@ import {
   viewChild,
   WritableSignal,
 } from '@angular/core';
-import { VflowUi } from '@vflow/ui';
+import { Vui } from '@vflow/ui';
 import {
   addEdges,
   Connection,
@@ -39,7 +39,7 @@ interface StageData {
 /** A media pipeline: typed, labeled ports as field rows, rich body content and native controls inside nodes. */
 @Component({
   selector: 'app-ui-pipeline-demo',
-  imports: [Vflow, VflowUi],
+  imports: [Vflow, Vui],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
     article {
@@ -94,44 +94,44 @@ interface StageData {
     }
   `,
   template: `
-    <section class="demo" aria-label="Media pipeline demo" [vflowTheme]="dark() ? 'dark' : 'light'">
+    <section class="demo" aria-label="Media pipeline demo" [vuiTheme]="dark() ? 'dark' : 'light'">
       <div class="controls">
-        <button vflowButton type="button" (click)="flow()?.fitView()">Fit pipeline</button>
+        <button vuiButton type="button" (click)="flow()?.fitView()">Fit pipeline</button>
         <label><input type="checkbox" [checked]="dark()" (change)="dark.set(!dark())" /> Dark theme</label>
         <p>Connect ports of the same type. Controls inside nodes do not drag or zoom the graph.</p>
       </div>
       <vflow view="auto" [nodes]="nodes" [edges]="edges()" [connection]="connection" (connect)="connect($event)">
-        <ng-template let-ctx node>
+        <ng-template let-ctx vNode>
           <article
-            vflowNode
-            selectable
-            [vflowSelected]="ctx.selected() || ctx.preselected()"
+            vuiNode
+            vSelectable
+            [vuiSelected]="ctx.selected() || ctx.preselected()"
             [attr.data-stage]="ctx.node.id">
-            <header vflowNodeHeader>
-              <span vflowIcon aria-hidden="true">{{ ctx.data().icon }}</span>
-              <span vflowTitle>{{ ctx.data().title }}</span>
+            <header vuiNodeHeader>
+              <span vuiIcon aria-hidden="true">{{ ctx.data().icon }}</span>
+              <span vuiTitle>{{ ctx.data().title }}</span>
               @if (ctx.node.id === 'transcode') {
-                <span [vflowStatus]="encoding() ? 'info' : 'neutral'" [vflowStatusBusy]="encoding()">{{
+                <span [vuiStatus]="encoding() ? 'info' : 'neutral'" [vuiStatusBusy]="encoding()">{{
                   encoding() ? 'Encoding' : 'Idle'
                 }}</span>
               }
             </header>
             @switch (ctx.data().kind) {
               @case ('source') {
-                <div vflowNodeBody>
+                <div vuiNodeBody>
                   <svg class="clip" viewBox="0 0 200 90" role="img" aria-label="Clip preview: sunset over hills">
                     <rect width="200" height="90" fill="#fde68a" />
                     <circle cx="150" cy="35" r="18" fill="#f97316" />
                     <path d="M0 90 L60 45 L110 75 L150 55 L200 80 L200 90 Z" fill="#65a30d" />
                   </svg>
-                  <p vflowMeta>sunset.mov · 00:42 · 1920×1080</p>
+                  <p vuiMeta>sunset.mov · 00:42 · 1920×1080</p>
                 </div>
               }
               @case ('transcode') {
-                <div vflowNodeBody>
+                <div vuiNodeBody>
                   <label class="setting">
                     Resolution
-                    <select vflowNoDrag [value]="resolution()" (change)="resolution.set($any($event.target).value)">
+                    <select vNoDrag [value]="resolution()" (change)="resolution.set($any($event.target).value)">
                       <option value="720p">720p</option>
                       <option value="1080p">1080p</option>
                       <option value="2160p">2160p</option>
@@ -140,8 +140,8 @@ interface StageData {
                   <label class="setting">
                     Bitrate: {{ bitrate() }} Mbit/s
                     <input
-                      vflowNoDrag
-                      vflowNoWheel
+                      vNoDrag
+                      vNoWheel
                       type="range"
                       min="2"
                       max="40"
@@ -150,64 +150,63 @@ interface StageData {
                   </label>
                   <label class="setting">
                     <span>
-                      <input vflowNoDrag type="checkbox" [checked]="advanced()" (change)="toggleAdvanced()" /> Poster
-                      output
+                      <input vNoDrag type="checkbox" [checked]="advanced()" (change)="toggleAdvanced()" /> Poster output
                     </span>
                   </label>
                 </div>
               }
               @case ('mix') {
-                <div vflowNodeBody>
+                <div vuiNodeBody>
                   <div class="bars" aria-hidden="true">
                     @for (level of levels; track $index) {
                       <span [style.height.%]="level"></span>
                     }
                   </div>
-                  <p vflowMeta>Loudness −14 LUFS</p>
+                  <p vuiMeta>Loudness −14 LUFS</p>
                 </div>
               }
               @default {
-                <div vflowNodeBody>
-                  <p vflowMeta>{{ resolution() }} · {{ bitrate() }} Mbit/s · {{ edges().length }} inputs wired</p>
+                <div vuiNodeBody>
+                  <p vuiMeta>{{ resolution() }} · {{ bitrate() }} Mbit/s · {{ edges().length }} inputs wired</p>
                 </div>
               }
             }
             @for (port of ctx.data().inputs; track port.id) {
-              <div vflowField [attr.data-port]="port.id">
+              <div vuiField [attr.data-port]="port.id">
                 <span
-                  vflowPort
+                  vuiPort
                   handleType="target"
                   position="left"
                   [handleId]="'in:' + port.id"
                   [attr.data-type]="port.type"
-                  [vflowPortConnected]="connected().has(ctx.node.id + '/in:' + port.id)"></span>
-                <span vflowTitle>{{ port.name }}</span>
-                <span vflowMeta>{{ port.type }}</span>
+                  [vuiPortConnected]="connected().has(ctx.node.id + '/in:' + port.id)"></span>
+                <span vuiTitle>{{ port.name }}</span>
+                <span vuiMeta>{{ port.type }}</span>
               </div>
             }
             @for (port of ctx.data().outputs; track port.id) {
-              <div vflowField class="output" [attr.data-port]="port.id">
-                <span vflowMeta>{{ port.type }}</span>
-                <span vflowTitle>{{ port.name }}</span>
+              <div vuiField class="output" [attr.data-port]="port.id">
+                <span vuiMeta>{{ port.type }}</span>
+                <span vuiTitle>{{ port.name }}</span>
                 <span
-                  vflowPort
+                  vuiPort
                   handleType="source"
                   position="right"
                   [handleId]="'out:' + port.id"
                   [attr.data-type]="port.type"
-                  [vflowPortConnected]="connected().has(ctx.node.id + '/out:' + port.id)"></span>
+                  [vuiPortConnected]="connected().has(ctx.node.id + '/out:' + port.id)"></span>
               </div>
             }
           </article>
         </ng-template>
-        <ng-template let-ctx edge>
-          <svg:g edgeInteraction>
-            <svg:path vflowEdge [attr.d]="ctx.path()" [vflowSelected]="ctx.selected() || ctx.preselected()" />
+        <ng-template let-ctx vEdge>
+          <svg:g vEdgeInteraction>
+            <svg:path vuiEdge [attr.d]="ctx.path()" [vuiSelected]="ctx.selected() || ctx.preselected()" />
           </svg:g>
         </ng-template>
-        <ng-template let-ctx connection>
+        <ng-template let-ctx vConnection>
           @if (ctx.path(); as path) {
-            <svg:path vflowEdge stroke-dasharray="5 4" [attr.d]="path" />
+            <svg:path vuiEdge stroke-dasharray="5 4" [attr.d]="path" />
           }
         </ng-template>
       </vflow>

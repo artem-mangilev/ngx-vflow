@@ -8,24 +8,24 @@
   touch-action: none;
 }
 
-:host(.vflow-node--undraggable),
-:host(.vflow-node--drag-handles-only) {
+:host(.v-node--undraggable),
+:host(.v-node--drag-handles-only) {
   touch-action: auto;
 }
 
 // The ring is part of the zoomed content, like the node's border and selection outline. The outline follows the
 // host's corner radius, extended by the offset, so a radius equal to the node's own keeps the ring concentric.
 :host(:focus-visible) {
-  border-radius: var(--vflow-focus-radius);
-  outline: var(--vflow-focus-width) solid var(--vflow-focus);
-  outline-offset: var(--vflow-focus-offset);
+  border-radius: var(--v-focus-radius);
+  outline: var(--v-focus-width) solid var(--v-focus);
+  outline-offset: var(--v-focus-offset);
 }
 
-.wrapper {
+.v-node-wrapper {
   width: max-content;
 }
 
-.magnet {
+.v-magnet {
   position: absolute;
   transform: translate(-50%, -50%);
   border-radius: 50%;

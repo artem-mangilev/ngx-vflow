@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, provideZonelessChangeDetection } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { VflowHandleDirective } from 'ngx-vflow';
-import { HandleMockDirective } from './handle-mock.directive';
+import { VflowHandleMockDirective } from './handle-mock.directive';
 
 @Component({
   selector: 'test-handle-state',
@@ -13,20 +13,20 @@ class HandleStateComponent {
 }
 
 @Component({
-  template: `<span vflowHandle handleType="target"><test-handle-state /></span>`,
+  template: `<span vHandle handleType="target"><test-handle-state /></span>`,
   imports: [VflowHandleDirective, HandleStateComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 class HandleHostComponent {}
 
-describe('HandleMockDirective', () => {
+describe('VflowHandleMockDirective', () => {
   it('stands in for the handle directive when content injects it', () => {
     TestBed.configureTestingModule({
       imports: [HandleHostComponent],
       providers: [provideZonelessChangeDetection()],
     }).overrideComponent(HandleHostComponent, {
       remove: { imports: [VflowHandleDirective] },
-      add: { imports: [HandleMockDirective] },
+      add: { imports: [VflowHandleMockDirective] },
     });
     const fixture = TestBed.createComponent(HandleHostComponent);
     fixture.detectChanges();

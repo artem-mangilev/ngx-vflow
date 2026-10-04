@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, effect, signal, untracked, viewChild } from '@angular/core';
-import { VflowUi } from '@vflow/ui';
+import { Vui } from '@vflow/ui';
 import { createEdges, createNodes, Vflow, VflowComponent } from 'ngx-vflow';
 
 interface Person {
@@ -30,7 +30,7 @@ type MapData = Person | Metric | Note | Team;
 /** Containers with their own connections, a note without ports, custom metrics and images, and a view mode. */
 @Component({
   selector: 'app-ui-relationships-demo',
-  imports: [Vflow, VflowUi],
+  imports: [Vflow, Vui],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
     vflow {
@@ -92,9 +92,9 @@ type MapData = Person | Metric | Note | Team;
     }
   `,
   template: `
-    <section class="demo" aria-label="Relationships and metrics map demo" [vflowTheme]="dark() ? 'dark' : 'light'">
+    <section class="demo" aria-label="Relationships and metrics map demo" [vuiTheme]="dark() ? 'dark' : 'light'">
       <div class="controls">
-        <button vflowButton type="button" (click)="flow()?.fitView()">Fit map</button>
+        <button vuiButton type="button" (click)="flow()?.fitView()">Fit map</button>
         <label><input type="checkbox" [checked]="dark()" (change)="dark.set(!dark())" /> Dark theme</label>
         <label><input type="checkbox" [checked]="viewMode()" (change)="toggleViewMode()" /> View mode</label>
         <p>
@@ -106,41 +106,41 @@ type MapData = Person | Metric | Note | Team;
         </p>
       </div>
       <vflow view="auto" [nodes]="nodes" [edges]="edges">
-        <ng-template let-ctx node>
+        <ng-template let-ctx vNode>
           @if (ctx.data().kind === 'team') {
             <div
-              vflowContainer
+              vuiContainer
               class="team"
-              selectable
-              [vflowSelected]="ctx.selected() || ctx.preselected()"
+              vSelectable
+              [vuiSelected]="ctx.selected() || ctx.preselected()"
               [style.width.px]="ctx.width()"
               [style.height.px]="ctx.height()">
-              <span vflowTitle
-                >{{ ctx.data().title }} <span vflowMeta>· {{ ctx.data().members }} people</span></span
+              <span vuiTitle
+                >{{ ctx.data().title }} <span vuiMeta>· {{ ctx.data().members }} people</span></span
               >
               <!-- The container has its own connections; it is not a parent of the other team. -->
               <span
-                vflowPort
+                vuiPort
                 handleType="source"
                 position="right"
-                vflowPortConnected
+                vuiPortConnected
                 [canStart]="!viewMode()"
                 [canAccept]="false"></span>
               <span
-                vflowPort
+                vuiPort
                 handleType="target"
                 position="left"
-                vflowPortConnected
+                vuiPortConnected
                 [canStart]="false"
                 [canAccept]="!viewMode()"></span>
             </div>
           } @else {
             @switch (ctx.data().kind) {
               @case ('person') {
-                <article vflowNode class="person" selectable [vflowSelected]="ctx.selected() || ctx.preselected()">
-                  <header vflowNodeHeader>
+                <article vuiNode class="person" vSelectable [vuiSelected]="ctx.selected() || ctx.preselected()">
+                  <header vuiNodeHeader>
                     <svg
-                      vflowIcon
+                      vuiIcon
                       class="avatar"
                       viewBox="0 0 28 28"
                       role="img"
@@ -150,36 +150,36 @@ type MapData = Person | Metric | Note | Team;
                         {{ ctx.data().initials }}
                       </text>
                     </svg>
-                    <span vflowTitle>{{ ctx.data().name }}</span>
+                    <span vuiTitle>{{ ctx.data().name }}</span>
                   </header>
-                  <div vflowNodeBody>
-                    <p vflowMeta>{{ ctx.data().role }} · {{ ctx.data().reviews }} reviews this month</p>
+                  <div vuiNodeBody>
+                    <p vuiMeta>{{ ctx.data().role }} · {{ ctx.data().reviews }} reviews this month</p>
                     <div class="meter" role="img" [attr.aria-label]="ctx.data().reviews + ' of 20 reviews'">
                       <span [style.width.%]="ctx.data().reviews * 5"></span>
                     </div>
                   </div>
                   <span
-                    vflowPort
+                    vuiPort
                     handleType="target"
                     position="left"
-                    vflowPortConnected
+                    vuiPortConnected
                     [canStart]="false"
                     [canAccept]="!viewMode()"></span>
                   <span
-                    vflowPort
+                    vuiPort
                     handleType="source"
                     position="right"
-                    vflowPortConnected
+                    vuiPortConnected
                     [canStart]="!viewMode()"
                     [canAccept]="false"></span>
                 </article>
               }
               @case ('metric') {
-                <article vflowNode class="metric" selectable [vflowSelected]="ctx.selected() || ctx.preselected()">
-                  <header vflowNodeHeader>
-                    <span vflowTitle>{{ ctx.data().title }}</span>
+                <article vuiNode class="metric" vSelectable [vuiSelected]="ctx.selected() || ctx.preselected()">
+                  <header vuiNodeHeader>
+                    <span vuiTitle>{{ ctx.data().title }}</span>
                   </header>
-                  <div vflowNodeBody>
+                  <div vuiNodeBody>
                     <div class="value">{{ ctx.data().value }}</div>
                     <div class="spark" role="img" aria-label="Weekly trend, rising">
                       @for (point of ctx.data().series; track $index) {
@@ -191,23 +191,23 @@ type MapData = Person | Metric | Note | Team;
               }
               @default {
                 <!-- A note has no ports: it is content on the canvas, not a participant of the graph. -->
-                <article vflowNode class="note" selectable [vflowSelected]="ctx.selected() || ctx.preselected()">
-                  <div vflowNodeBody>{{ ctx.data().text }}</div>
+                <article vuiNode class="note" vSelectable [vuiSelected]="ctx.selected() || ctx.preselected()">
+                  <div vuiNodeBody>{{ ctx.data().text }}</div>
                 </article>
               }
             }
           }
         </ng-template>
-        <ng-template let-ctx edge>
-          <svg:g edgeInteraction>
+        <ng-template let-ctx vEdge>
+          <svg:g vEdgeInteraction>
             <svg:path
-              vflowEdge
+              vuiEdge
               [attr.d]="ctx.path()"
               [attr.marker-end]="ctx.markerEnd()"
-              [vflowSelected]="ctx.selected() || ctx.preselected()" />
+              [vuiSelected]="ctx.selected() || ctx.preselected()" />
           </svg:g>
           @if (ctx.data()?.label; as label) {
-            <span *edgeLabel vflowEdgeLabel>{{ label }}</span>
+            <span *vEdgeLabel vuiEdgeLabel>{{ label }}</span>
           }
         </ng-template>
       </vflow>

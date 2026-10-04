@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
-import { VflowUi } from '@vflow/ui';
-import { EdgeInteractionDirective, Vflow } from 'ngx-vflow';
+import { Vui } from '@vflow/ui';
+import { VflowEdgeInteractionDirective, Vflow } from 'ngx-vflow';
 
 /**
  * Presentations shared by the documentation demos. Core is headless: every demo supplies
@@ -32,7 +32,7 @@ interface EdgeCtx {
 /** A card with the node's text and a target/source handle pair, or a titled container for `data.type === 'group'`. */
 @Component({
   selector: 'docs-node',
-  imports: [Vflow, VflowUi],
+  imports: [Vflow, Vui],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { style: 'display: block' },
   styles: `
@@ -49,24 +49,24 @@ interface EdgeCtx {
   template: `
     @if (isGroup()) {
       <div
-        vflowContainer
-        selectable
-        [vflowSelected]="ctx().selected() || ctx().preselected()"
+        vuiContainer
+        vSelectable
+        [vuiSelected]="ctx().selected() || ctx().preselected()"
         [style.width.px]="ctx().width()"
         [style.height.px]="ctx().height()">
         @if (title(); as title) {
-          <span vflowTitle>{{ title }}</span>
+          <span vuiTitle>{{ title }}</span>
         }
       </div>
     } @else {
-      <div vflowNode class="card" selectable [vflowSelected]="ctx().selected() || ctx().preselected()">
+      <div vuiNode class="card" vSelectable [vuiSelected]="ctx().selected() || ctx().preselected()">
         @if (html()) {
           <span [innerHTML]="text()"></span>
         } @else {
           <span>{{ text() }}</span>
         }
-        <span vflowPort handleType="target" position="left"></span>
-        <span vflowPort handleType="source" position="right"></span>
+        <span vuiPort handleType="target" position="left"></span>
+        <span vuiPort handleType="source" position="right"></span>
       </div>
     }
   `,
@@ -86,18 +86,18 @@ export class DocsNodeComponent {
  */
 @Component({
   selector: 'g[docsEdge]',
-  hostDirectives: [EdgeInteractionDirective],
-  imports: [Vflow, VflowUi],
+  hostDirectives: [VflowEdgeInteractionDirective],
+  imports: [Vflow, Vui],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <svg:path
-      vflowEdge
+      vuiEdge
       [attr.d]="ctx().path()"
       [attr.marker-start]="ctx().markerStart()"
       [attr.marker-end]="ctx().markerEnd()"
-      [vflowSelected]="ctx().selected() || ctx().preselected()" />
+      [vuiSelected]="ctx().selected() || ctx().preselected()" />
     @if (label(); as label) {
-      <span *edgeLabel vflowEdgeLabel>{{ label }}</span>
+      <span *vEdgeLabel vuiEdgeLabel>{{ label }}</span>
     }
   `,
 })

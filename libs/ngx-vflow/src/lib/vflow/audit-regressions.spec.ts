@@ -52,8 +52,7 @@ class LabelHostComponent {
 
 @Component({
   template: `<div style="width: 100px; height: 50px">
-    <span vflowHandle handleType="target" position="left"></span
-    ><span vflowHandle handleType="source" position="right"></span>
+    <span vHandle handleType="target" position="left"></span><span vHandle handleType="source" position="right"></span>
   </div>`,
   imports: [VflowHandleDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -102,7 +101,7 @@ describe('Graph rendering and interaction regressions', () => {
       fixture.componentInstance.text.set(text);
       fixture.detectChanges();
       const origin = container.getBoundingClientRect();
-      const rect = fixture.nativeElement.querySelector('.edge-label-wrapper').getBoundingClientRect();
+      const rect = fixture.nativeElement.querySelector('.v-edge-label-wrapper').getBoundingClientRect();
       expect(rect.left + rect.width / 2 - origin.left).toBeCloseTo(100, 1);
       expect(rect.top + rect.height / 2 - origin.top).toBeCloseTo(50, 1);
     }
@@ -240,15 +239,15 @@ describe('Graph rendering and interaction regressions', () => {
     fixture.detectChanges();
     await fixture.whenStable();
     const host = fixture.nativeElement as HTMLElement;
-    expect(host.querySelectorAll('.vflow-node').length).toBe(2);
+    expect(host.querySelectorAll('.v-node').length).toBe(2);
     expect(host.querySelectorAll('svg[edge]').length).toBe(1);
     fixture.componentInstance.setViewport({ ...fixture.componentInstance.viewport(), x: 1000, y: 0 });
     fixture.detectChanges();
     await fixture.whenStable();
-    expect(host.querySelectorAll('.vflow-node').length).toBe(2);
+    expect(host.querySelectorAll('.v-node').length).toBe(2);
     expect(host.querySelectorAll('svg[edge]').length).toBe(1);
     expect(
-      Array.from(host.querySelectorAll('.vflow-node, svg[edge]')).every(
+      Array.from(host.querySelectorAll('.v-node, svg[edge]')).every(
         (element) => getComputedStyle(element).display === 'none',
       ),
     ).toBeTrue();
@@ -256,7 +255,7 @@ describe('Graph rendering and interaction regressions', () => {
     fixture.detectChanges();
     await fixture.whenStable();
     await settle();
-    expect(host.querySelectorAll('.vflow-node').length).toBe(2);
+    expect(host.querySelectorAll('.v-node').length).toBe(2);
     expect(host.querySelectorAll('svg[edge]').length).toBe(1);
     expect(events).not.toContain({ type: 'detached', id: 'a-b' });
     subscription.unsubscribe();

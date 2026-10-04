@@ -195,7 +195,7 @@ export class KeyboardService {
           const editable =
             target instanceof Element &&
             !!target.closest(
-              'input, textarea, select, [contenteditable]:not([contenteditable="false"]), [data-vflow-no-keyboard]',
+              'input, textarea, select, [contenteditable]:not([contenteditable="false"]), [data-v-no-keyboard]',
             );
           const code = event.code?.toLowerCase() ?? '';
           if (event.type === 'keydown') {

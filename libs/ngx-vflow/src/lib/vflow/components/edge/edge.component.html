@@ -1,4 +1,4 @@
-<svg:path aria-hidden="true" class="focus-indicator" [attr.d]="model().path().path" />
+<svg:path aria-hidden="true" class="v-focus-indicator" [attr.d]="model().path().path" />
 
 @if (model().edge.component; as component) {
   <ng-container
@@ -17,7 +17,7 @@
 @if (model().sourceHandle() && model().targetHandle()) {
   @if (model().reconnectable() === true || model().reconnectable() === 'source') {
     <svg:circle
-      class="reconnect-handle"
+      class="v-reconnect-handle"
       r="10"
       [attr.cx]="model().sourceHandle()!.pointAbsolute().x"
       [attr.cy]="model().sourceHandle()!.pointAbsolute().y"
@@ -26,7 +26,7 @@
 
   @if (model().reconnectable() === true || model().reconnectable() === 'target') {
     <svg:circle
-      class="reconnect-handle"
+      class="v-reconnect-handle"
       r="10"
       [attr.cx]="model().targetHandle()!.pointAbsolute().x"
       [attr.cy]="model().targetHandle()!.pointAbsolute().y"

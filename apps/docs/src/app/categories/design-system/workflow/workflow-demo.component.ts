@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, effect, signal, untracked, viewChild } from '@angular/core';
-import { VflowTone, VflowUi } from '@vflow/ui';
+import { VuiTone, Vui } from '@vflow/ui';
 import { createEdges, createNodes, Vflow, VflowComponent } from 'ngx-vflow';
 
 interface StepData {
@@ -7,14 +7,14 @@ interface StepData {
   icon: string;
   description: string;
   /** Application status: a word of this application, not a library lifecycle. */
-  status: { tone: VflowTone; text: string; busy?: boolean };
+  status: { tone: VuiTone; text: string; busy?: boolean };
   /** Model diagnostic: a second indicator next to status, independent from selection. */
-  diagnostic?: { tone: VflowTone; text: string };
+  diagnostic?: { tone: VuiTone; text: string };
 }
 
 @Component({
   selector: 'app-ui-workflow-demo',
-  imports: [Vflow, VflowUi],
+  imports: [Vflow, Vui],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
     article {
@@ -37,42 +37,42 @@ interface StepData {
     }
   `,
   template: `
-    <section class="demo" aria-label="Approval workflow demo" [vflowTheme]="dark() ? 'dark' : 'light'">
+    <section class="demo" aria-label="Approval workflow demo" [vuiTheme]="dark() ? 'dark' : 'light'">
       <div class="controls">
-        <button vflowButton type="button" (click)="flow()?.fitView()">Fit workflow</button>
+        <button vuiButton type="button" (click)="flow()?.fitView()">Fit workflow</button>
         <label><input type="checkbox" [checked]="dark()" (change)="dark.set(!dark())" /> Dark theme</label>
         <label><input type="checkbox" [checked]="readOnly()" (change)="toggleReadOnly()" /> Read only</label>
         <p>Approve the invoice; select a node to inspect it.</p>
       </div>
       <div class="stage">
         <vflow view="auto" [nodes]="nodes" [edges]="edges" [minZoom]="0.5" [maxZoom]="2">
-          <ng-template let-ctx node>
-            <article vflowNode selectable [vflowSelected]="ctx.selected() || ctx.preselected()">
-              <header vflowNodeHeader>
-                <span vflowIcon aria-hidden="true">{{ ctx.data().icon }}</span>
-                <span vflowTitle>{{ ctx.data().title }}</span>
+          <ng-template let-ctx vNode>
+            <article vuiNode vSelectable [vuiSelected]="ctx.selected() || ctx.preselected()">
+              <header vuiNodeHeader>
+                <span vuiIcon aria-hidden="true">{{ ctx.data().icon }}</span>
+                <span vuiTitle>{{ ctx.data().title }}</span>
               </header>
-              <div vflowNodeBody>
+              <div vuiNodeBody>
                 <p class="description">{{ ctx.data().description }}</p>
               </div>
-              <footer vflowNodeFooter>
+              <footer vuiNodeFooter>
                 @if (ctx.node.id === 'review') {
-                  <span [vflowStatus]="approved() ? 'success' : 'warning'">{{
+                  <span [vuiStatus]="approved() ? 'success' : 'warning'">{{
                     approved() ? 'Approved' : 'Waiting'
                   }}</span>
                 } @else {
-                  <span [vflowStatus]="ctx.data().status.tone" [vflowStatusBusy]="ctx.data().status.busy ?? false">{{
+                  <span [vuiStatus]="ctx.data().status.tone" [vuiStatusBusy]="ctx.data().status.busy ?? false">{{
                     ctx.data().status.text
                   }}</span>
                 }
                 @if (ctx.data().diagnostic; as diagnostic) {
-                  <span [vflowStatus]="diagnostic.tone">{{ diagnostic.text }}</span>
+                  <span [vuiStatus]="diagnostic.tone">{{ diagnostic.text }}</span>
                 }
-                <span vflowActions>
+                <span vuiActions>
                   @if (ctx.node.id === 'review') {
                     <button
-                      vflowButton
-                      vflowNoDrag
+                      vuiButton
+                      vNoDrag
                       type="button"
                       [disabled]="readOnly() || approved()"
                       (click)="approved.set(true)">
@@ -80,8 +80,8 @@ interface StepData {
                     </button>
                   } @else {
                     <button
-                      vflowButton
-                      vflowNoDrag
+                      vuiButton
+                      vNoDrag
                       type="button"
                       [disabled]="readOnly()"
                       [attr.aria-label]="'Open ' + ctx.data().title"
@@ -93,64 +93,64 @@ interface StepData {
               </footer>
               @if (ctx.node.id !== 'received') {
                 <span
-                  vflowPort
+                  vuiPort
                   handleType="target"
                   position="left"
-                  vflowPortConnected
+                  vuiPortConnected
                   [canStart]="false"
                   [canAccept]="false"></span>
               }
               @if (ctx.node.id !== 'paid' && ctx.node.id !== 'fix') {
                 <span
-                  vflowPort
+                  vuiPort
                   handleType="source"
                   position="right"
-                  vflowPortConnected
+                  vuiPortConnected
                   [canStart]="false"
                   [canAccept]="false"></span>
               }
               @if (ctx.selected()) {
-                <node-toolbar>
-                  <div vflowToolbar>
+                <v-node-toolbar>
+                  <div vuiToolbar>
                     <span>{{ readOnly() ? 'View only' : 'Drag to move' }}</span>
                     <button
-                      vflowButton
-                      vflowNoDrag
+                      vuiButton
+                      vNoDrag
                       type="button"
                       [attr.aria-label]="'Details of ' + ctx.data().title"
                       (click)="opened.set(ctx.data().title)">
                       Details
                     </button>
                   </div>
-                </node-toolbar>
+                </v-node-toolbar>
               }
             </article>
           </ng-template>
-          <ng-template let-ctx edge>
-            <svg:g edgeInteraction>
+          <ng-template let-ctx vEdge>
+            <svg:g vEdgeInteraction>
               <svg:path
-                vflowEdge
+                vuiEdge
                 [attr.d]="ctx.path()"
                 [attr.marker-end]="ctx.markerEnd()"
-                [vflowSelected]="ctx.selected() || ctx.preselected()" />
+                [vuiSelected]="ctx.selected() || ctx.preselected()" />
             </svg:g>
             @if (ctx.data()?.start; as text) {
-              <span *edgeLabel="'start'" vflowEdgeLabel vflowMeta [attr.data-label]="text">{{ text }}</span>
+              <span *vEdgeLabel="'start'" vuiEdgeLabel vuiMeta [attr.data-label]="text">{{ text }}</span>
             }
             @if (ctx.data()?.center; as text) {
-              <span *edgeLabel vflowEdgeLabel [attr.data-label]="text">{{ text }}</span>
+              <span *vEdgeLabel vuiEdgeLabel [attr.data-label]="text">{{ text }}</span>
             }
             @if (ctx.data()?.end; as text) {
-              <span *edgeLabel="'end'" vflowEdgeLabel vflowMeta [attr.data-label]="text">{{ text }}</span>
+              <span *vEdgeLabel="'end'" vuiEdgeLabel vuiMeta [attr.data-label]="text">{{ text }}</span>
             }
           </ng-template>
         </vflow>
         @if (flow(); as flow) {
-          <vflow-controls class="stage-controls" [flow]="flow">
-            <button vflowControlButton type="button" aria-label="Reset demo" title="Reset demo" (click)="reset()">
+          <vui-controls class="stage-controls" [flow]="flow">
+            <button vuiControlButton type="button" aria-label="Reset demo" title="Reset demo" (click)="reset()">
               ↺
             </button>
-          </vflow-controls>
+          </vui-controls>
         }
       </div>
       <p class="footnote" aria-live="polite" data-testid="opened">{{ opened() ? 'Opened: ' + opened() : '' }}</p>

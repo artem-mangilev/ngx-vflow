@@ -16,7 +16,7 @@ import { FlowEntitiesService } from '../services/flow-entities.service';
 import { FlowStatusService } from '../services/flow-status.service';
 import { Position } from '../types/position.type';
 import { VflowHandleDirective } from './handle.directive';
-import { DragHandleDirective } from './drag-handle.directive';
+import { VflowDragHandleDirective } from './drag-handle.directive';
 import { dispatchMouse } from '../gestures/pointer-events.testing';
 
 const side = signal<Position>('right');
@@ -24,9 +24,9 @@ const side = signal<Position>('right');
 @Component({
   template: `<div style="width: 120px; height: 80px">
     <div style="height: 40px">
-      <span vflowHandle handleType="target" position="left" style="display: block; width: 10px; height: 10px"></span>
+      <span vHandle handleType="target" position="left" style="display: block; width: 10px; height: 10px"></span>
     </div>
-    <span vflowHandle handleType="source" [position]="side()" style="display: block; width: 10px; height: 10px"></span>
+    <span vHandle handleType="source" [position]="side()" style="display: block; width: 10px; height: 10px"></span>
   </div>`,
   imports: [VflowHandleDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -39,10 +39,10 @@ class PlainHandlesNodeComponent {
 @Component({
   template: `<div style="position: relative; box-sizing: border-box; width: 120px; height: 80px; border: 4px solid">
     <div style="margin-top: 20px; height: 20px">
-      <span vflowHandle handleType="source" position="right" style="display: block; width: 10px; height: 10px"></span>
+      <span vHandle handleType="source" position="right" style="display: block; width: 10px; height: 10px"></span>
     </div>
     <span
-      vflowHandle
+      vHandle
       handleType="target"
       position="left"
       layout="manual"
@@ -55,9 +55,9 @@ class PositionedContentNodeComponent {}
 
 @Component({
   template: `<div style="width: 100px; height: 40px">
-    <span vflowHandle handleType="target" position="left" style="display: none"></span>
+    <span vHandle handleType="target" position="left" style="display: none"></span>
     <span
-      vflowHandle
+      vHandle
       handleType="source"
       position="right"
       style="visibility: hidden; display: block; width: 0; height: 0"></span>
@@ -70,15 +70,15 @@ class HiddenHandlesNodeComponent {}
 /** The node is the handle; its title is a drag handle. */
 @Component({
   template: `<div
-    vflowHandle
+    vHandle
     handleType="any"
     position="right"
     layout="manual"
     style="display: block; width: 120px; height: 60px">
-    <div dragHandle class="title" style="height: 20px">Title</div>
+    <div vDragHandle class="title" style="height: 20px">Title</div>
     <div class="body" style="height: 40px"></div>
   </div>`,
-  imports: [VflowHandleDirective, DragHandleDirective],
+  imports: [VflowHandleDirective, VflowDragHandleDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 class NodeAsHandleComponent {}
@@ -141,10 +141,10 @@ describe('VflowHandleDirective', () => {
 
   const nodes = (fixture: ComponentFixture<unknown>) => fixture.debugElement.injector.get(FlowEntitiesService).nodes();
   const handleElement = (fixture: ComponentFixture<unknown>, position: Position) =>
-    fixture.nativeElement.querySelector(`.vflow-handle[data-vflow-handle-position="${position}"]`) as HTMLElement;
+    fixture.nativeElement.querySelector(`.v-handle[data-v-handle-position="${position}"]`) as HTMLElement;
 
   function centerInNode(element: HTMLElement) {
-    const node = element.closest('.vflow-node')!.getBoundingClientRect();
+    const node = element.closest('.v-node')!.getBoundingClientRect();
     const rect = element.getBoundingClientRect();
     return { x: rect.left + rect.width / 2 - node.left, y: rect.top + rect.height / 2 - node.top };
   }
@@ -204,7 +204,7 @@ describe('VflowHandleDirective', () => {
     expect(b.handles()[0].isMeasured()).toBeFalse();
     expect(a.handles()[1].isMeasured()).toBeTrue();
     expect(b.isReady()).toBeTrue();
-    expect(getComputedStyle(fixture.nativeElement.querySelector('.vflow-node')).visibility).toBe('visible');
+    expect(getComputedStyle(fixture.nativeElement.querySelector('.v-node')).visibility).toBe('visible');
     expect(edge.isReady()).toBeFalse();
     expect(getComputedStyle(fixture.nativeElement.querySelector('svg[edge]')).visibility).toBe('hidden');
     expect(warn.calls.allArgs().filter(([message]) => String(message).includes('has no layout box')).length).toBe(2);
@@ -219,16 +219,16 @@ describe('VflowHandleDirective', () => {
     expect(handle.type()).toBe('target');
     expect(handle.id()).toBe('in');
     expect(port.textContent!.trim()).toBe('target idle');
-    expect(port.getAttribute('data-vflow-handle-position')).toBe('left');
-    expect(port.getAttribute('data-vflow-handle-can-accept')).toBe('false');
-    expect(port.getAttribute('data-vflow-handle-can-start')).toBe('true');
+    expect(port.getAttribute('data-v-handle-position')).toBe('left');
+    expect(port.getAttribute('data-v-handle-can-accept')).toBe('false');
+    expect(port.getAttribute('data-v-handle-can-start')).toBe('true');
     expect(centerInNode(port)).toEqual({ x: 0, y: 20 });
 
     handle.state.set('valid');
     await settle(fixture);
 
     expect(port.textContent!.trim()).toBe('target valid');
-    expect(port.getAttribute('data-vflow-handle-state')).toBe('valid');
+    expect(port.getAttribute('data-v-handle-state')).toBe('valid');
   });
 
   it('validates a candidate when the pointer enters a handle element and drags the node only from a drag handle', async () => {
@@ -248,24 +248,24 @@ describe('VflowHandleDirective', () => {
     dispatchMouse(elementOf(a).querySelector('.body')!, 'mousedown', { x: 0, y: 0 });
     expect(status.status().state).toBe('connection-start');
     await settle(fixture);
-    expect(elementOf(a).dataset['vflowHandleState']).toBe('connecting');
+    expect(elementOf(a).dataset['vHandleState']).toBe('connecting');
 
     elementOf(b).dispatchEvent(new PointerEvent('pointerenter'));
     await settle(fixture);
     expect(status.status().state).toBe('connection-validation');
-    expect(elementOf(b).dataset['vflowHandleState']).toBe('valid');
+    expect(elementOf(b).dataset['vHandleState']).toBe('valid');
     expect(fixture.nativeElement.querySelector('g[connection] path')).not.toBeNull();
 
     elementOf(b).dispatchEvent(new PointerEvent('pointerleave'));
     await settle(fixture);
     expect(status.status().state).toBe('connection-start');
-    expect(elementOf(b).dataset['vflowHandleState']).toBe('idle');
+    expect(elementOf(b).dataset['vHandleState']).toBe('idle');
 
     elementOf(b).dispatchEvent(new PointerEvent('pointerenter'));
     elementOf(b).dispatchEvent(new PointerEvent('pointerup', { bubbles: true }));
     await settle(fixture);
     expect(status.status().state).toBe('idle');
-    expect(elementOf(a).dataset['vflowHandleState']).toBe('idle');
+    expect(elementOf(a).dataset['vHandleState']).toBe('idle');
     expect(fixture.nativeElement.querySelector('g[connection] path')).toBeNull();
   });
 
@@ -296,7 +296,7 @@ describe('VflowHandleDirective', () => {
     await settle(fixture);
     const [a] = nodes(fixture);
     const status = fixture.debugElement.injector.get(FlowStatusService);
-    const magnets = () => Array.from(fixture.nativeElement.querySelectorAll('.magnet')) as HTMLElement[];
+    const magnets = () => Array.from(fixture.nativeElement.querySelectorAll('.v-magnet')) as HTMLElement[];
 
     expect(magnets().length).toBe(0);
 
@@ -304,7 +304,7 @@ describe('VflowHandleDirective', () => {
     await settle(fixture);
 
     expect(magnets().length).toBe(4);
-    const magnet = magnets().find((element) => element.closest('.vflow-node') === a.nodeElement())!;
+    const magnet = magnets().find((element) => element.closest('.v-node') === a.nodeElement())!;
     expect(parseFloat(magnet.style.left)).toBe(a.handles()[0].localPoint().x);
     expect(parseFloat(magnet.style.top)).toBe(a.handles()[0].localPoint().y);
 

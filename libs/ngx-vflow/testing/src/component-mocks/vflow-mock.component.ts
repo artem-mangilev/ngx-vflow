@@ -52,9 +52,9 @@ import {
   getNodePositionInSpace,
 } from 'ngx-vflow';
 import {
-  ConnectionTemplateMockDirective,
-  EdgeTemplateMockDirective,
-  NodeTemplateMockDirective,
+  VflowConnectionTemplateMockDirective,
+  VflowEdgeTemplateMockDirective,
+  VflowNodeTemplateMockDirective,
 } from '../directive-mocks/template-mock.directive';
 import { AsInterface } from '../types';
 
@@ -226,11 +226,11 @@ export class VflowMockComponent implements AsInterface<VflowComponent>, OnInit {
   public readonly reconnect = output<ReconnectEvent>();
   public readonly reconnectEnd = output<ReconnectEndEvent>();
 
-  protected nodeTemplateDirective = contentChild(NodeTemplateMockDirective);
+  protected nodeTemplateDirective = contentChild(VflowNodeTemplateMockDirective);
 
-  protected edgeTemplateDirective = contentChild(EdgeTemplateMockDirective);
+  protected edgeTemplateDirective = contentChild(VflowEdgeTemplateMockDirective);
 
-  protected connectionTemplateDirective = contentChild(ConnectionTemplateMockDirective);
+  protected connectionTemplateDirective = contentChild(VflowConnectionTemplateMockDirective);
 
   public viewport = signal<ViewportState>({
     x: 0,

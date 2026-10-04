@@ -4,22 +4,22 @@ import { MinimapModel } from '../../models/minimap.model';
 
 import { MinimapCanvasDirective } from './minimap-canvas.directive';
 
-export type MiniMapPosition = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
+export type MinimapPosition = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
 
 @Component({
-  selector: 'mini-map',
+  selector: 'v-minimap',
   imports: [MinimapCanvasDirective],
   templateUrl: './minimap.component.html',
   styles: ['canvas { position: absolute; }'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class MiniMapComponent implements OnInit {
+export class VflowMinimapComponent implements OnInit {
   protected entitiesService = inject(FlowEntitiesService);
 
   /**
-   * The corner of the flow where to render a mini-map
+   * The corner of the flow where to render a minimap
    */
-  public position = input<MiniMapPosition>('bottom-right');
+  public position = input<MinimapPosition>('bottom-right');
 
   /** Enable click, drag and scroll panning, subject to the main flow gesture settings. */
   public pannable = input(false);

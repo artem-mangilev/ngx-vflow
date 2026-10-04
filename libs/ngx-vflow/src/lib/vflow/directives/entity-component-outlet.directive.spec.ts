@@ -15,7 +15,7 @@ import { VflowComponent } from '../components/vflow/vflow.component';
 import { AnyComponentNodeEvent } from '../interfaces/component-node-event.interface';
 import { Node, createNode } from '../interfaces/node.interface';
 import { injectNode } from '../utils/inject-node';
-import { NodeTemplateDirective } from './template.directive';
+import { VflowNodeTemplateDirective } from './template.directive';
 
 @Component({
   selector: 'emitter-node',
@@ -52,9 +52,9 @@ class TemplateChildComponent {
 
 @Component({
   template: `<vflow [view]="[400, 300]" [nodes]="nodes()" (componentNodeEvent)="events.push($event)">
-    <ng-template node><template-child /></ng-template>
+    <ng-template vNode><template-child /></ng-template>
   </vflow>`,
-  imports: [VflowComponent, NodeTemplateDirective, TemplateChildComponent],
+  imports: [VflowComponent, VflowNodeTemplateDirective, TemplateChildComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 class HostComponent {

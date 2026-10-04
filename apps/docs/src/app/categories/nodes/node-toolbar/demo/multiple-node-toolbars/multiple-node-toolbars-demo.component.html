@@ -1,13 +1,13 @@
 <vflow view="auto" [nodes]="nodes">
-  <ng-template let-ctx edge><svg:g docsEdge [ctx]="ctx" /></ng-template>
+  <ng-template let-ctx vEdge><svg:g docsEdge [ctx]="ctx" /></ng-template>
 
-  <ng-template let-ctx node>
+  <ng-template let-ctx vNode>
     <div class="custom-node"></div>
-    <node-toolbar position="top">
+    <v-node-toolbar position="top">
       <button (click)="deleteNode(ctx.node)">Delete</button>
-    </node-toolbar>
-    <node-toolbar position="right">
+    </v-node-toolbar>
+    <v-node-toolbar position="right">
       <button>Action</button>
-    </node-toolbar>
+    </v-node-toolbar>
   </ng-template>
 </vflow>

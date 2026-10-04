@@ -147,7 +147,7 @@ export class DraggableService {
 
     const startTrackingPaneGeometry = () => {
       stopTrackingPaneGeometry();
-      pane = element.closest('.vflow-pane') ?? element;
+      pane = element.closest('.v-pane') ?? element;
       paneRect = pane.getBoundingClientRect();
       observePanePosition();
       this.resizeObserverService.addObserver(pane, handlePaneResize);

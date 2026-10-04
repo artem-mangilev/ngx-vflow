@@ -85,7 +85,7 @@ export class ConnectionComponent {
 
   protected markerUrl = computed(() => markerUrl(this.model().settings.marker));
 
-  protected readonly defaultColor = 'var(--vflow-muted)';
+  protected readonly defaultColor = 'var(--v-muted)';
 
   // TODO: move context to model
   protected getContext(): ConnectionContext {

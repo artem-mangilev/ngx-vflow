@@ -1,4 +1,4 @@
-import { NoDragDirective } from '../../directives/gesture-exclusions.directive';
+import { VflowNoDragDirective } from '../../directives/gesture-exclusions.directive';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -31,16 +31,16 @@ import {
   selector: '[nodeResizeControl]',
   standalone: true,
   template: '',
-  hostDirectives: [NoDragDirective],
+  hostDirectives: [VflowNoDragDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
-    class: 'resize-control',
-    '[class.top]': "position().includes('top')",
-    '[class.right]': "position().includes('right')",
-    '[class.bottom]': "position().includes('bottom')",
-    '[class.left]': "position().includes('left')",
-    '[class.line]': 'isLine()',
-    '[class.handle]': '!isLine()',
+    class: 'v-resize-control',
+    '[class.v-resize-control--top]': "position().includes('top')",
+    '[class.v-resize-control--right]': "position().includes('right')",
+    '[class.v-resize-control--bottom]': "position().includes('bottom')",
+    '[class.v-resize-control--left]': "position().includes('left')",
+    '[class.v-resize-control--line]': 'isLine()',
+    '[class.v-resize-control--handle]': '!isLine()',
     '[style.scale]': 'scale()',
   },
 })
@@ -99,7 +99,7 @@ export class NodeResizeControlComponent implements OnDestroy {
       viewport: this.viewportService.readableViewport(),
       snapGrid: this.settingsService.snapGrid(),
       nodeOrigin: [0, 0],
-      paneDomNode: this.hostRef.nativeElement.closest('.vflow-pane'),
+      paneDomNode: this.hostRef.nativeElement.closest('.v-pane'),
     }),
     onChange: (change, childChanges) => {
       const model = this.model;

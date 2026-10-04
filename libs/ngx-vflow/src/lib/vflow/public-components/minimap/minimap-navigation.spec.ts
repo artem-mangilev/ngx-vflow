@@ -8,7 +8,7 @@ import { createNodes } from '../../interfaces/node.interface';
   imports: [Vflow],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `<vflow [view]="size()" [nodes]="nodes" [minZoom]="0.5" [maxZoom]="2">
-    <mini-map [pannable]="pannable()" [zoomable]="zoomable()" [zoomStep]="step()" />
+    <v-minimap [pannable]="pannable()" [zoomable]="zoomable()" [zoomStep]="step()" />
   </vflow>`,
 })
 class MinimapHostComponent {

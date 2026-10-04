@@ -1,18 +1,18 @@
 <vflow view="auto" [nodes]="nodes" [edges]="edges">
-  <ng-template let-ctx node>
+  <ng-template let-ctx vNode>
     @if (ctx.data()?.text) {
       <docs-node [ctx]="ctx" />
     } @else {
       <div class="custom-node" [class.custom-node_selected]="ctx.selected()">
-        <button class="custom-node__button" selectable>Select here</button>
+        <button class="custom-node__button" vSelectable>Select here</button>
 
-        <span vflowPort handleType="source" position="right"></span>
+        <span vuiPort handleType="source" position="right"></span>
       </div>
     }
   </ng-template>
 
-  <ng-template let-ctx edge>
-    <svg:g edgeInteraction>
+  <ng-template let-ctx vEdge>
+    <svg:g vEdgeInteraction>
       <svg:path
         fill="none"
         stroke-width="2"

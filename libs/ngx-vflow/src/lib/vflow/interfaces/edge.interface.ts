@@ -24,7 +24,7 @@ export type Curve = 'straight' | 'bezier' | 'smooth-step' | 'step' | CurveFactor
  */
 export interface Edge<T = unknown> extends Connection {
   id: string;
-  /** Component that draws the edge; without it the edge renders through `ng-template[edge]`. */
+  /** Component that draws the edge; without it the edge renders through `ng-template[vEdge]`. */
   component?: EntityComponentType;
   curve?: WritableSignal<Curve>;
   data?: WritableSignal<T>;

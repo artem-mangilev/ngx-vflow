@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { VflowPort } from '@vflow/ui';
+import { VuiPort } from '@vflow/ui';
 import { Vflow } from 'ngx-vflow';
 
 @Component({
@@ -8,8 +8,8 @@ import { Vflow } from 'ngx-vflow';
     <div class="custom-node">
       Node A
 
-      <span vflowPort handleType="source" position="right"></span>
-      <span vflowPort handleType="target" position="left"></span>
+      <span vuiPort handleType="source" position="right"></span>
+      <span vuiPort handleType="target" position="left"></span>
     </div>
   `,
   styles: `
@@ -25,6 +25,6 @@ import { Vflow } from 'ngx-vflow';
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Vflow, VflowPort],
+  imports: [Vflow, VuiPort],
 })
 export class NodeAComponent {}

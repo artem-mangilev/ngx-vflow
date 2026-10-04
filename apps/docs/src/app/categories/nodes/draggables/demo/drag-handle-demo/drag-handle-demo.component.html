@@ -1,13 +1,13 @@
 <vflow view="auto" [nodes]="nodes" [edges]="edges">
-  <ng-template let-ctx node><docs-node [ctx]="ctx" /></ng-template>
-  <ng-template let-ctx edge><svg:g docsEdge [ctx]="ctx" /></ng-template>
+  <ng-template let-ctx vNode><docs-node [ctx]="ctx" /></ng-template>
+  <ng-template let-ctx vEdge><svg:g docsEdge [ctx]="ctx" /></ng-template>
 
-  <ng-template let-ctx node>
+  <ng-template let-ctx vNode>
     <div class="custom-node" [class.custom-node_selected]="ctx.selected()">
-      <button class="custom-node__button" dragHandle selectable>Drag here</button>
+      <button class="custom-node__button" vDragHandle vSelectable>Drag here</button>
 
-      <span vflowPort handleType="source" position="right"></span>
-      <span vflowPort handleType="target" position="left"></span>
+      <span vuiPort handleType="source" position="right"></span>
+      <span vuiPort handleType="target" position="left"></span>
     </div>
   </ng-template> </vflow
 >`

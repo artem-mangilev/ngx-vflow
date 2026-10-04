@@ -9,8 +9,8 @@ import { Connection, ConnectionSettings, Edge, Node, Vflow, addEdges, createNode
     [edges]="edges"
     [connection]="conectionSettings"
     (connect)="createEdge($event)">
-    <ng-template let-ctx node><docs-node [ctx]="ctx" /></ng-template>
-    <ng-template let-ctx edge><svg:g docsEdge [ctx]="ctx" /></ng-template>
+    <ng-template let-ctx vNode><docs-node [ctx]="ctx" /></ng-template>
+    <ng-template let-ctx vEdge><svg:g docsEdge [ctx]="ctx" /></ng-template>
   </vflow> `,
   styles: [
     `

@@ -32,7 +32,7 @@ class VflowTestHostComponent {
 @Component({
   template: `
     <vflow [view]="[800, 600]" [nodes]="nodes">
-      <ng-template node>
+      <ng-template vNode>
         <div class="card"></div>
       </ng-template>
     </vflow>
@@ -58,7 +58,7 @@ class NodeRectHostComponent {
 @Component({
   template: `
     <vflow [view]="[800, 600]" [nodes]="nodes()">
-      <ng-template node>
+      <ng-template vNode>
         <div class="card"></div>
       </ng-template>
     </vflow>

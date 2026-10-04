@@ -16,24 +16,24 @@ import { EdgeComponent } from '../components/edge/edge.component';
 
 @Directive({
   standalone: true,
-  selector: 'ng-template[edge]',
+  selector: 'ng-template[vEdge]',
 })
-export class EdgeTemplateDirective {
+export class VflowEdgeTemplateDirective {
   public templateRef = inject<TemplateRef<EdgeContext>>(TemplateRef);
 
-  static ngTemplateContextGuard(dir: EdgeTemplateDirective, ctx: unknown): ctx is EdgeContext {
+  static ngTemplateContextGuard(dir: VflowEdgeTemplateDirective, ctx: unknown): ctx is EdgeContext {
     return true;
   }
 }
 
 @Directive({
   standalone: true,
-  selector: 'ng-template[connection]',
+  selector: 'ng-template[vConnection]',
 })
-export class ConnectionTemplateDirective {
+export class VflowConnectionTemplateDirective {
   public templateRef = inject(TemplateRef);
 
-  static ngTemplateContextGuard(dir: ConnectionTemplateDirective, ctx: unknown): ctx is ConnectionContext {
+  static ngTemplateContextGuard(dir: VflowConnectionTemplateDirective, ctx: unknown): ctx is ConnectionContext {
     return true;
   }
 }
@@ -45,16 +45,16 @@ export class ConnectionTemplateDirective {
  * Use the structural form on one element, without a value for the center; use the long form for several elements:
  *
  * ```html
- * <span *edgeLabel>Center</span>
- * <span *edgeLabel="'end'">End</span>
- * <ng-template edgeLabel="start"><b>Start</b> label</ng-template>
+ * <span *vEdgeLabel>Center</span>
+ * <span *vEdgeLabel="'end'">End</span>
+ * <ng-template vEdgeLabel="start"><b>Start</b> label</ng-template>
  * ```
  *
  * `orient: 'path'` turns the label along the path at its point, kept readable left to right:
  *
  * ```html
- * <span *edgeLabel="'center'; orient: 'path'">Along the curve</span>
- * <ng-template edgeLabel="end" edgeLabelOrient="path">…</ng-template>
+ * <span *vEdgeLabel="'center'; orient: 'path'">Along the curve</span>
+ * <ng-template vEdgeLabel="end" vEdgeLabelOrient="path">…</ng-template>
  * ```
  *
  * Declare it next to the SVG presentation of the edge, never inside an `svg:*` element: Angular compiles the children
@@ -62,26 +62,26 @@ export class ConnectionTemplateDirective {
  */
 @Directive({
   standalone: true,
-  selector: 'ng-template[edgeLabel]',
+  selector: 'ng-template[vEdgeLabel]',
 })
-export class EdgeLabelTemplateDirective {
+export class VflowEdgeLabelTemplateDirective {
   private templateRef = inject<TemplateRef<void>>(TemplateRef);
   private edge = inject(EdgeComponent);
 
   /** Point of the path where the label renders. The directive without a value means `center`. */
-  public edgeLabel = input<EdgeLabelPosition, EdgeLabelPosition | '' | null | undefined>('center', {
+  public vEdgeLabel = input<EdgeLabelPosition, EdgeLabelPosition | '' | null | undefined>('center', {
     transform: (position) => position || 'center',
   });
 
   /** `horizontal` keeps the label level; `path` turns it along the path, when the curve provides the angle. */
-  public edgeLabelOrient = input<EdgeLabelOrient, EdgeLabelOrient | null | undefined>('horizontal', {
+  public vEdgeLabelOrient = input<EdgeLabelOrient, EdgeLabelOrient | null | undefined>('horizontal', {
     transform: (orient) => orient ?? 'horizontal',
   });
 
   constructor() {
     effect((onCleanup) => {
-      const position = this.edgeLabel();
-      const orient = this.edgeLabelOrient();
+      const position = this.vEdgeLabel();
+      const orient = this.vEdgeLabelOrient();
       const model = this.edge.model();
 
       untracked(() => {
@@ -134,7 +134,7 @@ export class EdgeLabelTemplateDirective {
  * inherit from the marker element.
  *
  * ```html
- * <ng-template marker="diamond" inset="8">
+ * <ng-template vMarker="diamond" inset="8">
  *   <svg:polygon fill="context-stroke" points="-1,0 -5,-4 -9,0 -5,4" />
  * </ng-template>
  * ```
@@ -144,13 +144,13 @@ export class EdgeLabelTemplateDirective {
  */
 @Directive({
   standalone: true,
-  selector: 'ng-template[marker]',
+  selector: 'ng-template[vMarker]',
 })
-export class MarkerTemplateDirective {
+export class VflowMarkerTemplateDirective {
   public templateRef = inject<TemplateRef<void>>(TemplateRef);
 
   /** Type of the markers that render this shape. */
-  public marker = input.required<string>();
+  public vMarker = input.required<string>();
 
   /** Marker units between the path end and the tip of the shape. */
   public inset = input(0, { transform: numberAttribute });
@@ -159,12 +159,12 @@ export class MarkerTemplateDirective {
 /** Presentation of every node without a `component`. */
 @Directive({
   standalone: true,
-  selector: 'ng-template[node]',
+  selector: 'ng-template[vNode]',
 })
-export class NodeTemplateDirective {
+export class VflowNodeTemplateDirective {
   public templateRef = inject<TemplateRef<NodeContext>>(TemplateRef);
 
-  static ngTemplateContextGuard(dir: NodeTemplateDirective, ctx: unknown): ctx is NodeContext {
+  static ngTemplateContextGuard(dir: VflowNodeTemplateDirective, ctx: unknown): ctx is NodeContext {
     return true;
   }
 }

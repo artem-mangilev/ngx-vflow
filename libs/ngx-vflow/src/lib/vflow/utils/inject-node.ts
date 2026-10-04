@@ -3,7 +3,7 @@ import { Node } from '../interfaces/node.interface';
 
 /**
  * What a node presentation reads about its node. A component node gets it through {@link injectNode};
- * an `ng-template[node]` presentation gets the same object as its template context.
+ * an `ng-template[vNode]` presentation gets the same object as its template context.
  */
 export interface NodeRef<T = any> {
   node: Node<T>;

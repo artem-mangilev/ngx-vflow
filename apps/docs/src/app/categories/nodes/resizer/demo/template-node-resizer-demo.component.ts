@@ -1,36 +1,36 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { DocsPresentations } from '@docs/shared';
-import { VflowPort } from '@vflow/ui';
+import { VuiPort } from '@vflow/ui';
 import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
 
 @Component({
   template: `
     <vflow view="auto" [nodes]="nodes" [edges]="edges">
-      <ng-template let-ctx edge><svg:g docsEdge [ctx]="ctx" /></ng-template>
+      <ng-template let-ctx vEdge><svg:g docsEdge [ctx]="ctx" /></ng-template>
 
-      <ng-template let-ctx node>
+      <ng-template let-ctx vNode>
         @if (ctx.data().type === 'output') {
-          <div resizable class="custom-node">
+          <div vResizable class="custom-node">
             <div class="data-block">
               Output 1
-              <span vflowPort handleType="source" position="right" [handleId]="ctx.data().output1"></span>
+              <span vuiPort handleType="source" position="right" [handleId]="ctx.data().output1"></span>
             </div>
             <div class="data-block">
               Output 2
-              <span vflowPort handleType="source" position="right" [handleId]="ctx.data().output2"></span>
+              <span vuiPort handleType="source" position="right" [handleId]="ctx.data().output2"></span>
             </div>
           </div>
         }
 
         @if (ctx.data().type === 'input') {
-          <div resizable class="custom-node">
+          <div vResizable class="custom-node">
             <div class="data-block">
               Input 1
-              <span vflowPort handleType="target" position="left" [handleId]="ctx.data().input1"></span>
+              <span vuiPort handleType="target" position="left" [handleId]="ctx.data().input1"></span>
             </div>
             <div class="data-block">
               Input 2
-              <span vflowPort handleType="target" position="left" [handleId]="ctx.data().input2"></span>
+              <span vuiPort handleType="target" position="left" [handleId]="ctx.data().input2"></span>
             </div>
           </div>
         }
@@ -67,7 +67,7 @@ import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
     `,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DocsPresentations, Vflow, VflowPort],
+  imports: [DocsPresentations, Vflow, VuiPort],
 })
 export class TemplateNodeResizerDemoComponent {
   public nodes: Node[] = createNodes([

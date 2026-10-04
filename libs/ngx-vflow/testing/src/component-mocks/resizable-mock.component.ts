@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, input, output, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
 import type {
-  ResizableComponent,
+  VflowResizableComponent,
   ResizeControlDirection,
   ResizeParams,
   ResizeParamsWithDirection,
@@ -9,13 +9,15 @@ import type {
 import { AsInterface } from '../types';
 
 @Component({
-  selector: '[resizable]',
+  selector: '[vResizable]',
   template: '<ng-content />',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ResizableMockComponent implements AsInterface<ResizableComponent>, OnInit, OnDestroy, AfterViewInit {
-  public resizable = input<boolean | ''>();
+export class VflowResizableMockComponent
+  implements AsInterface<VflowResizableComponent>, OnInit, OnDestroy, AfterViewInit
+{
+  public vResizable = input<boolean | ''>();
   public gap = input(1.5);
   public minWidth = input<number>();
   public minHeight = input<number>();

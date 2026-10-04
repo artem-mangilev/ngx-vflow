@@ -15,9 +15,9 @@ import { TransformNodeComponent } from './components/transform-node.component';
     (connect)="createEdge($event)"
     (nodesChanges.size)="store.applySizeChanges($event)"
     (componentNodeEvent)="onComponentEvent($event)">
-    <ng-template let-ctx node><docs-node [ctx]="ctx" /></ng-template>
+    <ng-template let-ctx vNode><docs-node [ctx]="ctx" /></ng-template>
 
-    <ng-template let-ctx edge>
+    <ng-template let-ctx vEdge>
       @if (ctx.data().type === 'animated') {
         <svg:path
           class="animated-edge"
@@ -31,11 +31,11 @@ import { TransformNodeComponent } from './components/transform-node.component';
       }
 
       @if (ctx.data().text; as text) {
-        <div *edgeLabel class="label-text">{{ text }}</div>
+        <div *vEdgeLabel class="label-text">{{ text }}</div>
       }
 
       @if (ctx.data().deletable) {
-        <div *edgeLabel class="label-delete" (click)="deleteEdge(ctx.edge)">
+        <div *vEdgeLabel class="label-delete" (click)="deleteEdge(ctx.edge)">
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
             <path d="M9 3L3 9M3 3L9 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
           </svg>
@@ -43,7 +43,7 @@ import { TransformNodeComponent } from './components/transform-node.component';
       }
     </ng-template>
 
-    <mini-map />
+    <v-minimap />
   </vflow>`,
   styles: [
     `

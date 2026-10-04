@@ -5,17 +5,17 @@ import { createNodes } from '../../interfaces/node.interface';
 import { Edge, createEdges } from '../../interfaces/edge.interface';
 import { AnyComponentEdgeEvent } from '../../interfaces/component-edge-event.interface';
 import { AnyComponentNodeEvent } from '../../interfaces/component-node-event.interface';
-import { EdgeTemplateDirective, NodeTemplateDirective } from '../../directives/template.directive';
+import { VflowEdgeTemplateDirective, VflowNodeTemplateDirective } from '../../directives/template.directive';
 import { VflowHandleDirective } from '../../directives/handle.directive';
 import { injectEdge } from '../../utils/inject-edge';
-import { EdgeInteractionDirective } from '../../directives/edge-interaction.directive';
+import { VflowEdgeInteractionDirective } from '../../directives/edge-interaction.directive';
 
 const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
 
 @Component({
   // The flow creates the SVG host itself, so this selector is only documentation.
   selector: 'g[probeEdge]',
-  hostDirectives: [EdgeInteractionDirective],
+  hostDirectives: [VflowEdgeInteractionDirective],
   template: `<svg:path class="probe-path" fill="none" [attr.d]="ctx.path()" />`,
   host: { class: 'probe-edge', '[attr.data-edge]': 'ctx.edge.id', '(click)': 'clicks = clicks + 1' },
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -48,21 +48,21 @@ class TemplateEdgeChildComponent {
     [edges]="edges"
     (componentEdgeEvent)="edgeEvents.push($event)"
     (componentNodeEvent)="nodeEvents.push($event)">
-    <ng-template node>
+    <ng-template vNode>
       <div style="width: 60px; height: 30px">
-        <span vflowHandle handleType="target" position="left"></span
-        ><span vflowHandle handleType="source" position="right"></span>
+        <span vHandle handleType="target" position="left"></span
+        ><span vHandle handleType="source" position="right"></span>
       </div>
     </ng-template>
-    <ng-template let-ctx edge>
-      <svg:g edgeInteraction templateEdgeChild (click)="templateClicks.push(ctx.edge.id)" />
+    <ng-template let-ctx vEdge>
+      <svg:g vEdgeInteraction templateEdgeChild (click)="templateClicks.push(ctx.edge.id)" />
     </ng-template>
   </vflow>`,
   imports: [
     VflowComponent,
-    NodeTemplateDirective,
-    EdgeTemplateDirective,
-    EdgeInteractionDirective,
+    VflowNodeTemplateDirective,
+    VflowEdgeTemplateDirective,
+    VflowEdgeInteractionDirective,
     VflowHandleDirective,
     TemplateEdgeChildComponent,
   ],
@@ -118,14 +118,14 @@ describe('Component edges', () => {
     expect(path?.getAttribute('d')).toMatch(/^M/);
   });
 
-  it('puts the interaction stroke first inside component hosts and edgeInteraction groups', () => {
+  it('puts the interaction stroke first inside component hosts and vEdgeInteraction groups', () => {
     const svgs = Array.from(root.querySelectorAll<SVGSVGElement>('svg[edge]'));
 
     for (const svg of svgs.slice(0, 3)) {
-      expect(svg.querySelector(':scope > path.interactive-edge')).toBeNull();
+      expect(svg.querySelector(':scope > path.v-interactive-edge')).toBeNull();
       const presentationRoot = svg.querySelector<SVGGElement>(':scope > g')!;
       const stroke = presentationRoot.firstElementChild as SVGPathElement;
-      expect(stroke.classList.contains('interactive-edge')).toBeTrue();
+      expect(stroke.classList.contains('v-interactive-edge')).toBeTrue();
       expect(stroke.namespaceURI).toBe(SVG_NAMESPACE);
       expect(stroke.getAttribute('d')).toMatch(/^M/);
       expect(stroke.style.strokeWidth).toBe('20px');
@@ -137,11 +137,11 @@ describe('Component edges', () => {
     const svgs = Array.from(root.querySelectorAll<SVGSVGElement>('svg[edge]'));
     const { edges } = fixture.componentInstance;
 
-    svgs[2].querySelector('path.interactive-edge')!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    svgs[2].querySelector('path.v-interactive-edge')!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     expect(fixture.componentInstance.templateClicks).toEqual(['template']);
     expect(edges.map((edge) => edge.selected!())).toEqual([false, false, true, false]);
 
-    svgs[0].querySelector('path.interactive-edge')!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    svgs[0].querySelector('path.v-interactive-edge')!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     expect(ProbeEdgeComponent.instances.find((probe) => probe.ctx.edge.id === 'class')!.clicks).toBe(1);
     expect(edges[0].selected!()).toBeTrue();
   });
@@ -149,8 +149,8 @@ describe('Component edges', () => {
   it('hides the stroke at width 0 and still selects the edge from a presentation element', () => {
     const bare = Array.from(root.querySelectorAll<SVGSVGElement>('svg[edge]'))[3];
 
-    expect(bare.querySelector(':scope > path.interactive-edge')).toBeNull();
-    expect(bare.querySelector<SVGPathElement>('path.interactive-edge')!.style.display).toBe('none');
+    expect(bare.querySelector(':scope > path.v-interactive-edge')).toBeNull();
+    expect(bare.querySelector<SVGPathElement>('path.v-interactive-edge')!.style.display).toBe('none');
     bare.querySelector('path.template-edge-child')!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     expect(fixture.componentInstance.edges[3].selected!()).toBeTrue();
   });
@@ -192,15 +192,15 @@ class PlainEdgeComponent {
 
 @Component({
   template: `<vflow [view]="[400, 200]" [nodes]="nodes" [edges]="edges">
-    <ng-template node>
+    <ng-template vNode>
       <div style="width: 60px; height: 30px">
-        <span vflowHandle handleType="target" position="left"></span
-        ><span vflowHandle handleType="source" position="right"></span>
+        <span vHandle handleType="target" position="left"></span
+        ><span vHandle handleType="source" position="right"></span>
       </div>
     </ng-template>
-    <ng-template let-ctx edge><svg:path class="plain" fill="none" [attr.d]="ctx.path()" /></ng-template>
+    <ng-template let-ctx vEdge><svg:path class="plain" fill="none" [attr.d]="ctx.path()" /></ng-template>
   </vflow>`,
-  imports: [VflowComponent, NodeTemplateDirective, EdgeTemplateDirective, VflowHandleDirective],
+  imports: [VflowComponent, VflowNodeTemplateDirective, VflowEdgeTemplateDirective, VflowHandleDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 class PlainTemplateHostComponent {
@@ -215,8 +215,8 @@ class PlainTemplateHostComponent {
   ]);
 }
 
-describe('Edges without edgeInteraction', () => {
-  it('draws no interaction stroke without edgeInteraction and still selects from presentation elements', async () => {
+describe('Edges without vEdgeInteraction', () => {
+  it('draws no interaction stroke without vEdgeInteraction and still selects from presentation elements', async () => {
     PlainEdgeComponent.instances = [];
     TestBed.configureTestingModule({ providers: [provideZonelessChangeDetection()] });
     const fixture = TestBed.createComponent(PlainTemplateHostComponent);
@@ -227,7 +227,7 @@ describe('Edges without edgeInteraction', () => {
     const svgs = Array.from(fixture.nativeElement.querySelectorAll('svg[edge]')) as SVGSVGElement[];
     expect(svgs.length).toBe(2);
     for (const svg of svgs) {
-      expect(svg.querySelector('path.interactive-edge')).toBeNull();
+      expect(svg.querySelector('path.v-interactive-edge')).toBeNull();
     }
 
     svgs[0].querySelector('path.plain')!.dispatchEvent(new MouseEvent('click', { bubbles: true }));

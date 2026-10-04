@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { VflowPort } from '@vflow/ui';
+import { VuiPort } from '@vflow/ui';
 import { Vflow } from 'ngx-vflow';
 
 @Component({
@@ -15,7 +15,7 @@ import { Vflow } from 'ngx-vflow';
         <iframe width="100%" height="100%" src="https://www.youtube.com/embed/dQw4w9WgXcQ"> </iframe>
       </div>
 
-      <span vflowPort handleType="source" position="right"></span>
+      <span vuiPort handleType="source" position="right"></span>
     </div>
   `,
   styles: [
@@ -73,7 +73,7 @@ import { Vflow } from 'ngx-vflow';
       }
     `,
   ],
-  imports: [Vflow, VflowPort],
+  imports: [Vflow, VuiPort],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TriggerNodeComponent {}

@@ -4,11 +4,11 @@ import { VflowComponent } from 'ngx-vflow';
 const BUTTON =
   'vui-control-button vui:inline-grid vui:box-border vui:place-items-center vui:size-8 vui:rounded-md vui:border vui:border-border vui:bg-surface vui:text-foreground vui:cursor-pointer vui:enabled:hover:bg-surface-muted vui:disabled:opacity-45 vui:disabled:cursor-not-allowed vui:focus-visible:outline-2 vui:focus-visible:outline-offset-2 vui:focus-visible:outline-accent vui:forced-colors:border-[ButtonText]';
 
-/** Presentation for a consumer button placed inside `vflow-controls`; give it an accessible name. */
-@Directive({ selector: 'button[vflowControlButton]', host: { class: BUTTON } })
-export class VflowControlButton {}
+/** Presentation for a consumer button placed inside `vui-controls`; give it an accessible name. */
+@Directive({ selector: 'button[vuiControlButton]', host: { class: BUTTON } })
+export class VuiControlButton {}
 
-export interface VflowControlsLabels {
+export interface VuiControlsLabels {
   group: string;
   zoomIn: string;
   zoomOut: string;
@@ -17,11 +17,11 @@ export interface VflowControlsLabels {
 
 /**
  * Viewport controls: zoom in, zoom out and fit view for the given flow instance, plus a slot for your
- * own `vflowControlButton` buttons. Zoom respects the flow's `minZoom`/`maxZoom`; positioning is yours.
+ * own `vuiControlButton` buttons. Zoom respects the flow's `minZoom`/`maxZoom`; positioning is yours.
  */
 @Component({
-  selector: 'vflow-controls',
-  imports: [VflowControlButton],
+  selector: 'vui-controls',
+  imports: [VuiControlButton],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class:
@@ -31,7 +31,7 @@ export interface VflowControlsLabels {
   },
   template: `
     <button
-      vflowControlButton
+      vuiControlButton
       type="button"
       [attr.aria-label]="labels().zoomIn"
       [disabled]="!canZoomIn()"
@@ -49,7 +49,7 @@ export interface VflowControlsLabels {
       </svg>
     </button>
     <button
-      vflowControlButton
+      vuiControlButton
       type="button"
       [attr.aria-label]="labels().zoomOut"
       [disabled]="!canZoomOut()"
@@ -66,7 +66,7 @@ export interface VflowControlsLabels {
         <path d="M3 8h10" />
       </svg>
     </button>
-    <button vflowControlButton type="button" [attr.aria-label]="labels().fitView" (click)="flow().fitView()">
+    <button vuiControlButton type="button" [attr.aria-label]="labels().fitView" (click)="flow().fitView()">
       <svg
         aria-hidden="true"
         width="16"
@@ -83,10 +83,10 @@ export interface VflowControlsLabels {
     <ng-content />
   `,
 })
-export class VflowControls {
+export class VuiControls {
   /** The flow these controls operate on. */
   readonly flow = input.required<VflowComponent>();
-  readonly labels = input<VflowControlsLabels>({
+  readonly labels = input<VuiControlsLabels>({
     group: 'Viewport controls',
     zoomIn: 'Zoom in',
     zoomOut: 'Zoom out',

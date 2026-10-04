@@ -1,43 +1,43 @@
 // Public theme tokens of core. Registration gives each one its default without declaring it on the flow
-// element, so a value set on any ancestor (for example a `vflowTheme` scope) still inherits into the flow and
+// element, so a value set on any ancestor (for example a `vuiTheme` scope) still inherits into the flow and
 // its parts, and a value set on a descendant still wins for that subtree.
-@property --vflow-background {
+@property --v-background {
   syntax: '<color>';
   inherits: true;
   initial-value: #fff;
 }
 
-@property --vflow-surface {
+@property --v-surface {
   syntax: '<color>';
   inherits: true;
   initial-value: #fff;
 }
 
-@property --vflow-foreground {
+@property --v-foreground {
   syntax: '<color>';
   inherits: true;
   initial-value: #1b262c;
 }
 
-@property --vflow-muted {
+@property --v-muted {
   syntax: '<color>';
   inherits: true;
   initial-value: rgb(177, 177, 183);
 }
 
-@property --vflow-border {
+@property --v-border {
   syntax: '<color>';
   inherits: true;
   initial-value: rgb(200, 200, 200);
 }
 
-@property --vflow-selection {
+@property --v-selection {
   syntax: '<color>';
   inherits: true;
   initial-value: #0f4c75;
 }
 
-@property --vflow-focus {
+@property --v-focus {
   syntax: '<color>';
   inherits: true;
   initial-value: #005fcc;
@@ -45,19 +45,19 @@
 
 // Geometry of the focus ring. Width and offset are flow lengths on nodes, scaled with the content like borders.
 // The radius is the corner radius of the focused node itself, in flow units, so the ring follows its shape.
-@property --vflow-focus-width {
+@property --v-focus-width {
   syntax: '<length>';
   inherits: true;
   initial-value: 2px;
 }
 
-@property --vflow-focus-offset {
+@property --v-focus-offset {
   syntax: '<length>';
   inherits: true;
   initial-value: 3px;
 }
 
-@property --vflow-focus-radius {
+@property --v-focus-radius {
   syntax: '<length-percentage>';
   inherits: true;
   initial-value: 0px;
@@ -80,10 +80,10 @@
     }
 
     // Touches on these start library gestures, so they must not scroll the page even where the pane lets it.
-    .vflow-handle,
-    .vflow-drag-handle,
-    .reconnect-handle,
-    .resize-control {
+    .v-handle,
+    .v-drag-handle,
+    .v-reconnect-handle,
+    .v-resize-control {
       touch-action: none;
     }
   }
@@ -93,40 +93,40 @@
 // same sampled tokens, so it follows too.
 @media (forced-colors: active) {
   :host {
-    --vflow-background: Canvas;
-    --vflow-surface: Canvas;
-    --vflow-foreground: CanvasText;
-    --vflow-muted: GrayText;
-    --vflow-border: CanvasText;
-    --vflow-selection: Highlight;
-    --vflow-focus: Highlight;
+    --v-background: Canvas;
+    --v-surface: Canvas;
+    --v-foreground: CanvasText;
+    --v-muted: GrayText;
+    --v-border: CanvasText;
+    --v-selection: Highlight;
+    --v-focus: Highlight;
   }
 }
 
-.vflow-root {
+.v-root {
   position: relative;
   overflow: hidden;
-  background-color: var(--vflow-background);
+  background-color: var(--v-background);
 
   // The container is a keyboard target: it takes focus after the last entity disappears and runs the viewport
   // commands. The ring is drawn inside the box so it stays visible in a full-page canvas and adds no overflow.
   &:focus-visible {
-    outline: var(--vflow-focus-width) solid var(--vflow-focus);
-    outline-offset: calc(-1 * var(--vflow-focus-width));
+    outline: var(--v-focus-width) solid var(--v-focus);
+    outline-offset: calc(-1 * var(--v-focus-width));
   }
 }
 
 // Until the first layout is complete only the canvas is painted: the layers below follow the viewport, which the
 // application may still change in reaction to `initialized`. Entities inherit this, they never force visible.
-:host(.vflow-initializing) {
-  .vflow-background-svg,
-  .vflow-viewport,
-  .vflow-minimap {
+:host(.v-initializing) {
+  .v-background-svg,
+  .v-viewport,
+  .v-minimap {
     visibility: hidden;
   }
 }
 
-.vflow-a11y-live {
+.v-a11y-live {
   position: absolute;
   width: 1px;
   height: 1px;
@@ -136,7 +136,7 @@
 }
 
 // Background sits behind everything (first in DOM, painted before the pane)
-.vflow-background-svg {
+.v-background-svg {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -146,7 +146,7 @@
 }
 
 // d3-zoom target, receives all wheel/drag events
-.vflow-pane {
+.v-pane {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -156,7 +156,7 @@
 }
 
 // Transformed layer (translate + scale). Must never block the pane.
-.vflow-viewport {
+.v-viewport {
   position: absolute;
   top: 0;
   left: 0;
@@ -166,7 +166,7 @@
   pointer-events: none;
 }
 
-.vflow-defs-svg {
+.v-defs-svg {
   position: absolute;
   top: 0;
   left: 0;
@@ -177,7 +177,7 @@
 }
 
 // No z-index here so per-edge svg z-index competes with per-node z-index
-.vflow-edges-layer {
+.v-edges-layer {
   position: absolute;
   top: 0;
   left: 0;
@@ -185,7 +185,7 @@
 }
 
 // No z-index here so per-node z-index competes with per-edge z-index
-.vflow-nodes-layer {
+.v-nodes-layer {
   position: absolute;
   top: 0;
   left: 0;
@@ -193,14 +193,14 @@
   pointer-events: none;
 }
 
-.vflow-edge-labels-layer {
+.v-edge-labels-layer {
   position: absolute;
   top: 0;
   left: 0;
   pointer-events: none;
 }
 
-.vflow-overlay-svg {
+.v-overlay-svg {
   position: absolute;
   top: 0;
   left: 0;
@@ -211,7 +211,7 @@
   z-index: 1000000;
 }
 
-.vflow-connection-svg {
+.v-connection-svg {
   position: absolute;
   top: 0;
   left: 0;
@@ -222,7 +222,7 @@
   z-index: 1000001;
 }
 
-.vflow-minimap {
+.v-minimap {
   position: absolute;
   inset: 0;
   width: 100%;

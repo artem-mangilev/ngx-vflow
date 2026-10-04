@@ -9,8 +9,8 @@ const BUILT_IN_TYPES = new Set<string>(['arrow', 'arrow-closed']);
  * Shared `<marker>` elements of the flow, one per distinct marker of its edges and connection line. The element is
  * the library's for every type: it sets the viewBox, size, orientation, `refX` from the inset of the shape, and the
  * stroke of the edge as inherited presentation attributes, `strokeWidth` flow units wide whatever the marker
- * size; application CSS may override them through the `vflow-marker` and `vflow-marker--<type>` classes. Built-in shapes render inline; other types render the shape
- * the application declared with `ng-template[marker]`.
+ * size; application CSS may override them through the `v-marker` and `v-marker--<type>` classes. Built-in shapes render inline; other types render the shape
+ * the application declared with `ng-template[vMarker]`.
  */
 @Component({
   selector: 'defs[flowDefs]',
@@ -53,7 +53,7 @@ export class DefsComponent {
       effect(() => {
         for (const type of typesWithoutShape()) {
           console.warn(
-            `[ngx-vflow] Marker type "${type}" is not built in and no <ng-template marker="${type}"> declares its ` +
+            `[ngx-vflow] Marker type "${type}" is not built in and no <ng-template vMarker="${type}"> declares its ` +
               'shape, so the marker renders empty.',
           );
         }

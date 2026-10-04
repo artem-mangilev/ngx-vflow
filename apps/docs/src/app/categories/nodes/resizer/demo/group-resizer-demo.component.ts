@@ -4,18 +4,18 @@ import { Node, Vflow, createNodes } from 'ngx-vflow';
 
 @Component({
   template: `<vflow view="auto" [nodes]="nodes">
-    <ng-template let-ctx node>
+    <ng-template let-ctx vNode>
       @if (ctx.data().type === 'group') {
         <div
-          selectable
+          vSelectable
           class="group-node"
-          [resizable]="ctx.selected()"
+          [vResizable]="ctx.selected()"
           [class.group-node_selected]="ctx.selected()"></div>
       } @else {
         <docs-node [ctx]="ctx" />
       }
     </ng-template>
-    <ng-template let-ctx edge><svg:g docsEdge [ctx]="ctx" /></ng-template>
+    <ng-template let-ctx vEdge><svg:g docsEdge [ctx]="ctx" /></ng-template>
   </vflow>`,
   styles: [
     `

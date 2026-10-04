@@ -9,9 +9,9 @@ import { SelectionService } from '../../services/selection.service';
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [Vflow],
-  template: `<div vflowNoDrag><input /></div>
-    <div vflowNoPan><span></span></div>
-    <div vflowNoWheel><textarea></textarea></div>`,
+  template: `<div vNoDrag><input /></div>
+    <div vNoPan><span></span></div>
+    <div vNoWheel><textarea></textarea></div>`,
 })
 class ControlsComponent {}
 
@@ -32,7 +32,7 @@ describe('public viewport gesture settings', () => {
     fixture.detectChanges();
     await fixture.whenStable();
     flow = fixture.componentInstance;
-    pane = fixture.nativeElement.querySelector('.vflow-pane');
+    pane = fixture.nativeElement.querySelector('.v-pane');
   });
 
   afterEach(async () => {
@@ -179,7 +179,7 @@ describe('public viewport gesture settings', () => {
     await fixture.whenStable();
     flow.keyboardShortcuts = { modifiers: { panActivation: ['Space'] } };
     key('keydown', 'Space');
-    drag(0, pane.querySelector('.vflow-node')!);
+    drag(0, pane.querySelector('.v-node')!);
     expect(node.point()).toEqual({ x: 40, y: 0 });
     expect(flow.viewport()).toEqual({ x: 0, y: 0, zoom: 1 });
   });
@@ -192,7 +192,7 @@ describe('public viewport gesture settings', () => {
     await fixture.whenStable();
     const controls = TestBed.createComponent(ControlsComponent);
     controls.detectChanges();
-    const host = pane.querySelector('.vflow-node') as HTMLElement;
+    const host = pane.querySelector('.v-node') as HTMLElement;
     host.appendChild(controls.nativeElement);
     const input = controls.nativeElement.querySelector('input');
     const events = [

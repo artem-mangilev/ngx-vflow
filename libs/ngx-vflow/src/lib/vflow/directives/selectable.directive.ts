@@ -10,9 +10,9 @@ import { FlowStatusService, isSelectionBoxEndStatus } from '../services/flow-sta
 
 @Directive({
   standalone: true,
-  selector: '[selectable]',
+  selector: '[vSelectable]',
 })
-export class SelectableDirective {
+export class VflowSelectableDirective {
   private selectionService = inject(SelectionService);
   private parentNode = inject(NodeComponent, { optional: true });
   private flowStatusService = inject(FlowStatusService);
@@ -22,8 +22,8 @@ export class SelectableDirective {
   constructor() {
     if (isDevMode() && !this.parentNode) {
       console.warn(
-        '[ngx-vflow] [selectable] has no effect outside a node presentation. An edge is selected by a click on ' +
-          'its own presentation; give it a hit area with g[edgeInteraction].',
+        '[ngx-vflow] [vSelectable] has no effect outside a node presentation. An edge is selected by a click on ' +
+          'its own presentation; give it a hit area with g[vEdgeInteraction].',
       );
     }
   }

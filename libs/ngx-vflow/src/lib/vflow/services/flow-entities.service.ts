@@ -59,7 +59,7 @@ export class FlowEntitiesService {
 
   public readonly connection = signal<ConnectionModel>(new ConnectionModel({}));
 
-  /** Marker shapes declared with `ng-template[marker]`, by type; set by the flow component. */
+  /** Marker shapes declared with `ng-template[vMarker]`, by type; set by the flow component. */
   public readonly markerShapes = signal<MarkerShapes>(new Map());
 
   /** Distinct markers of the edges and the connection line, by the id of their shared `<marker>` element. */

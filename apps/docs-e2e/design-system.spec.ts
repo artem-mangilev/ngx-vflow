@@ -1,7 +1,7 @@
 import { expect, Locator, test } from '@playwright/test';
 
 async function rowAlignment(demo: Locator) {
-  return demo.locator('[vflowField]').evaluateAll((rows) =>
+  return demo.locator('[vuiField]').evaluateAll((rows) =>
     Math.max(
       ...rows.flatMap((row) => {
         const rect = row.getBoundingClientRect();
@@ -21,7 +21,7 @@ test('consumer DOM, scoped themes, selection and native workflow actions', async
   const workflow = page.locator('app-ui-workflow-demo');
   await expect(workflow.locator('article.vui-node')).toHaveCount(4);
   await expect(workflow.locator('path.vui-edge')).toHaveCount(3);
-  await expect(workflow.locator('.vflow-edge-labels-layer .vui-edge-label')).toHaveCount(4);
+  await expect(workflow.locator('.v-edge-labels-layer .vui-edge-label')).toHaveCount(4);
   await expect(workflow.locator('article.vui-node').first()).toHaveCSS('background-color', 'rgb(255, 255, 255)');
   // Directives add classes to the consumer article/header, without injecting wrapper elements.
   await expect(workflow.locator('article > header.vui-node-header')).toHaveCount(4);
@@ -30,12 +30,12 @@ test('consumer DOM, scoped themes, selection and native workflow actions', async
   await expect(review).toHaveAttribute('data-vui-selected', 'true');
   // Selection, application status and a model diagnostic are visible at the same time.
   await expect(review.locator('.vui-status')).toHaveText(['Waiting', 'Above limit']);
-  await expect(review.locator('.vui-status').nth(1)).toHaveAttribute('data-tone', 'warning');
-  await expect(workflow.locator('node-toolbar .vui-toolbar')).toBeAttached();
+  await expect(review.locator('.vui-status').nth(1)).toHaveAttribute('data-vui-tone', 'warning');
+  await expect(workflow.locator('v-node-toolbar .vui-toolbar')).toBeAttached();
   await expect(workflow.getByRole('button', { name: 'Details of Finance review', exact: true })).toBeVisible();
   // Activity is presentation only: the busy node keeps its action enabled.
   const paid = workflow.locator('article').filter({ hasText: 'Schedule payment' });
-  await expect(paid.locator('.vui-status')).toHaveAttribute('data-busy', 'true');
+  await expect(paid.locator('.vui-status')).toHaveAttribute('data-vui-busy', 'true');
   const open = paid.getByRole('button', { name: 'Open Schedule payment', exact: true });
   await expect(open).toBeEnabled();
   await open.click();
@@ -53,7 +53,7 @@ test('consumer DOM, scoped themes, selection and native workflow actions', async
   await expect(review).toHaveAttribute('data-vui-selected', 'true');
   await workflow.getByLabel('Dark theme', { exact: true }).check();
   await expect(review).toHaveCSS('background-color', 'rgb(27, 40, 59)');
-  await expect(workflow.locator('node-toolbar .vui-toolbar')).toHaveCSS('background-color', 'rgb(27, 40, 59)');
+  await expect(workflow.locator('v-node-toolbar .vui-toolbar')).toHaveCSS('background-color', 'rgb(27, 40, 59)');
   await expect(workflow.locator('path.vui-edge').first()).toHaveCSS('stroke', 'rgb(175, 190, 209)');
   await expect(workflow.locator('marker polyline').first()).toHaveCSS('fill', 'context-stroke');
   await workflow.screenshot({ path: testInfo.outputPath('workflow.png') });
@@ -70,12 +70,12 @@ test('field connections follow stable IDs through rename, reorder, density and r
   // This page opts into the dark theme while the workflow page stays light.
   await expect(demo.locator('article.vui-node').first()).toHaveCSS('background-color', 'rgb(27, 40, 59)');
   await expect(demo.locator('path.vui-edge')).toHaveCount(2);
-  await expect(demo.locator('.vui-port[data-connected="true"]')).toHaveCount(4);
+  await expect(demo.locator('.vui-port[data-vui-connected="true"]')).toHaveCount(4);
   await expect.poll(() => rowAlignment(demo)).toBeLessThan(1);
   await demo.getByRole('button', { name: 'Rename email', exact: true }).click();
   await expect(demo.locator('[data-entity="crm"] [data-field="email"]')).toContainText('primary_email');
   await demo.getByRole('button', { name: 'Reverse fields', exact: true }).click();
-  await expect(demo.locator('[data-entity="crm"] [vflowField]').first()).toHaveAttribute('data-field', 'name');
+  await expect(demo.locator('[data-entity="crm"] [vuiField]').first()).toHaveAttribute('data-field', 'name');
   await expect.poll(() => rowAlignment(demo)).toBeLessThan(1);
   await demo.getByLabel('Compact', { exact: true }).check();
   await expect.poll(() => rowAlignment(demo)).toBeLessThan(1);
@@ -85,14 +85,10 @@ test('field connections follow stable IDs through rename, reorder, density and r
     demo.evaluate((root) => {
       const edge = root.querySelectorAll<SVGPathElement>('path.vui-edge')[1];
       const source = root
-        .querySelector(
-          '[data-entity="crm"] [data-field="email"] .vui-port.vflow-handle[data-vflow-handle-position="right"]',
-        )!
+        .querySelector('[data-entity="crm"] [data-field="email"] .vui-port.v-handle[data-v-handle-position="right"]')!
         .getBoundingClientRect();
       const target = root
-        .querySelector(
-          '[data-entity="erp"] [data-field="email"] .vui-port.vflow-handle[data-vflow-handle-position="left"]',
-        )!
+        .querySelector('[data-entity="erp"] [data-field="email"] .vui-port.v-handle[data-v-handle-position="left"]')!
         .getBoundingClientRect();
       const matrix = edge.getScreenCTM()!;
       const start = edge.getPointAtLength(0).matrixTransform(matrix);
@@ -107,13 +103,9 @@ test('field connections follow stable IDs through rename, reorder, density and r
   await expect.poll(endpointError).toBeLessThan(1);
   await demo.getByRole('button', { name: 'Remove Copy email connection', exact: true }).click();
   await expect(demo.locator('path.vui-edge')).toHaveCount(1);
-  await expect(demo.locator('.vui-port[data-connected="true"]')).toHaveCount(2);
-  const source = demo.locator(
-    '[data-entity="crm"] [data-field="email"] .vflow-handle[data-vflow-handle-position="right"]',
-  );
-  const target = demo.locator(
-    '[data-entity="erp"] [data-field="email"] .vflow-handle[data-vflow-handle-position="left"]',
-  );
+  await expect(demo.locator('.vui-port[data-vui-connected="true"]')).toHaveCount(2);
+  const source = demo.locator('[data-entity="crm"] [data-field="email"] .v-handle[data-v-handle-position="right"]');
+  const target = demo.locator('[data-entity="erp"] [data-field="email"] .v-handle[data-v-handle-position="left"]');
   // Core intentionally overlays the target with its magnetic hit area during a connection.
   // Move the pointer through that real surface instead of asking locator.dragTo to bypass it.
   await source.scrollIntoViewIfNeeded();
@@ -122,11 +114,11 @@ test('field connections follow stable IDs through rename, reorder, density and r
   await page.mouse.move(from.x + from.width / 2, from.y + from.height / 2);
   await page.mouse.down();
   await page.mouse.move(to.x + to.width / 2, to.y + to.height / 2, { steps: 12 });
-  await expect(target).toHaveAttribute('data-state', 'valid');
+  await expect(target).toHaveAttribute('data-vui-state', 'valid');
   await page.mouse.up();
   await expect(demo.locator('path.vui-edge')).toHaveCount(2);
   await expect(demo.getByRole('button', { name: 'Remove Mapping connection', exact: true })).toBeVisible();
-  await expect(demo.locator('.vui-port[data-connected="true"]')).toHaveCount(4);
+  await expect(demo.locator('.vui-port[data-vui-connected="true"]')).toHaveCount(4);
   await expect.poll(endpointError).toBeLessThan(1);
   await demo.screenshot({ path: testInfo.outputPath('entities.png') });
 });
@@ -141,28 +133,28 @@ test('BPMN subset: pools with own message flows, lanes, gateways, flow kinds and
   await expect(demo.locator('.vui-bpmn-lane')).toHaveCount(2);
   await expect(demo.locator('.vui-bpmn-task')).toHaveCount(4);
   await expect(demo.locator('.vui-bpmn-event')).toHaveCount(3);
-  await expect(demo.locator('.vui-bpmn-gateway[data-gateway="exclusive"]')).toHaveCount(1);
-  await expect(demo.locator('.vui-bpmn-gateway[data-gateway="parallel"]')).toHaveCount(1);
+  await expect(demo.locator('.vui-bpmn-gateway[data-vui-gateway="exclusive"]')).toHaveCount(1);
+  await expect(demo.locator('.vui-bpmn-gateway[data-vui-gateway="parallel"]')).toHaveCount(1);
   await expect(demo.locator('.vui-external-label')).toHaveCount(5);
-  await expect(demo.locator('path.vui-bpmn-flow[data-flow="sequence"]')).toHaveCount(9);
-  await expect(demo.locator('path.vui-bpmn-flow[data-flow="message"]')).toHaveCount(2);
-  await expect(demo.locator('path.vui-bpmn-flow[data-flow="association"]')).toHaveCount(1);
-  await expect(demo.locator('path.vui-bpmn-flow[data-flow="message"]').first()).toHaveCSS(
+  await expect(demo.locator('path.vui-bpmn-flow[data-vui-flow="sequence"]')).toHaveCount(9);
+  await expect(demo.locator('path.vui-bpmn-flow[data-vui-flow="message"]')).toHaveCount(2);
+  await expect(demo.locator('path.vui-bpmn-flow[data-vui-flow="association"]')).toHaveCount(1);
+  await expect(demo.locator('path.vui-bpmn-flow[data-vui-flow="message"]').first()).toHaveCSS(
     'stroke-dasharray',
     '8px, 5px',
   );
-  await expect(demo.locator('[data-event="intermediate"]')).toHaveCSS('border-top-style', 'double');
-  await expect(demo.locator('[data-event="end"]')).toHaveCSS('border-top-width', '5px');
+  await expect(demo.locator('[data-vui-event="intermediate"]')).toHaveCSS('border-top-style', 'double');
+  await expect(demo.locator('[data-vui-event="end"]')).toHaveCSS('border-top-width', '5px');
   // The supplier pool is a container that takes part in flows through its own handles.
   const pool = demo.locator('.vui-bpmn-pool').first();
-  await expect(pool.locator('.vui-port.vflow-handle')).toHaveCount(2);
+  await expect(pool.locator('.vui-port.v-handle')).toHaveCount(2);
   const messageEndpoint = () =>
     demo.evaluate((root) => {
-      const edge = root.querySelector<SVGPathElement>('path.vui-bpmn-flow[data-flow="message"]')!;
+      const edge = root.querySelector<SVGPathElement>('path.vui-bpmn-flow[data-vui-flow="message"]')!;
       // The pool's second bottom handle is its message source; the first one receives messages.
       const source = root
         .querySelector('.vui-bpmn-pool')!
-        .querySelectorAll('.vui-port.vflow-handle[data-vflow-handle-position="bottom"]')[1]
+        .querySelectorAll('.vui-port.v-handle[data-v-handle-position="bottom"]')[1]
         .getBoundingClientRect();
       const start = edge.getPointAtLength(0).matrixTransform(edge.getScreenCTM()!);
       return Math.max(Math.abs(start.x - source.x - source.width / 2), Math.abs(start.y - source.bottom));
@@ -173,7 +165,7 @@ test('BPMN subset: pools with own message flows, lanes, gateways, flow kinds and
   await expect(gateway).toHaveAttribute('data-vui-selected', 'true');
   await expect(gateway).toHaveCSS('transform', 'none');
   await demo.getByLabel('Dark theme', { exact: true }).check();
-  await expect(demo.locator('[data-event="start"]')).toHaveCSS('background-color', 'rgb(27, 40, 59)');
+  await expect(demo.locator('[data-vui-event="start"]')).toHaveCSS('background-color', 'rgb(27, 40, 59)');
   await demo.screenshot({ path: testInfo.outputPath('bpmn.png') });
   await page.emulateMedia({ forcedColors: 'active' });
   await expect(demo.locator('path.vui-bpmn-flow').first()).toHaveCSS('stroke', 'rgb(0, 0, 0)');
@@ -188,7 +180,7 @@ test('viewport controls drive the given flow within its zoom limits, and edge la
   const zoomIn = controls.getByRole('button', { name: 'Zoom in', exact: true });
   const zoomOut = controls.getByRole('button', { name: 'Zoom out', exact: true });
   const zoom = () =>
-    workflow.locator('.vflow-viewport').evaluate((element) => {
+    workflow.locator('.v-viewport').evaluate((element) => {
       const match = /scale\(([^)]+)\)/.exec(element.style.transform);
       return match ? Number(match[1]) : 1;
     });
@@ -234,7 +226,7 @@ test('viewport controls drive the given flow within its zoom limits, and edge la
       });
     }, labels);
   // Fit view animates; wait for the camera to settle before dragging in screen coordinates.
-  const viewportTransform = () => workflow.locator('.vflow-viewport').evaluate((element) => element.style.transform);
+  const viewportTransform = () => workflow.locator('.v-viewport').evaluate((element) => element.style.transform);
   await expect
     .poll(async () => {
       const first = await viewportTransform();
@@ -245,7 +237,7 @@ test('viewport controls drive the given flow within its zoom limits, and edge la
   const before = await labelDistance();
   for (const label of before) expect(label.best, label.name).toBeLessThan(2);
   const paid = workflow.locator('article').filter({ hasText: 'Schedule payment' });
-  const wrapper = paid.locator('xpath=ancestor::*[contains(@class, "vflow-node")][1]');
+  const wrapper = paid.locator('xpath=ancestor::*[contains(concat(" ", normalize-space(@class), " "), " v-node ")][1]');
   const position = () => wrapper.evaluate((element: HTMLElement) => element.style.transform);
   const start = await position();
   // Center the node: the docs header is sticky and would cover an element scrolled to the top edge.
@@ -281,11 +273,11 @@ test('themes stay scoped per editor, reach every layer and leave core-only flows
   await expect(core.locator('.plain-edge').first()).toHaveCSS('stroke', 'rgb(177, 177, 183)');
   await expect(core.locator('.plain-node').first()).toHaveCSS('border-color', 'rgb(27, 38, 44)');
   await expect(core.locator('.plain-handle').first()).toHaveCSS('background-color', 'rgb(27, 38, 44)');
-  await expect(core.locator('.vflow-root')).toHaveCSS('background-color', 'rgb(255, 255, 255)');
+  await expect(core.locator('.v-root')).toHaveCSS('background-color', 'rgb(255, 255, 255)');
 
   const geometry = () =>
     a.evaluate((root) =>
-      Array.from(root.querySelectorAll<HTMLElement>('.vflow-node, .vflow-handle, path.vui-edge')).map(
+      Array.from(root.querySelectorAll<HTMLElement>('.v-node, .v-handle, path.vui-edge')).map(
         (element) =>
           element.getAttribute('d') ?? `${element.style.transform}|${element.style.top}|${element.style.left}`,
       ),
@@ -300,7 +292,7 @@ test('themes stay scoped per editor, reach every layer and leave core-only flows
   await page.getByLabel('Dark first editor', { exact: true }).check();
   await expect(a.locator('article.vui-node').first()).toHaveCSS('background-color', dark.node);
   await expect(a.locator('path.vui-edge')).toHaveCSS('stroke', dark.edge);
-  await expect(a.locator('.vflow-root')).toHaveCSS('background-color', 'rgb(16, 24, 39)');
+  await expect(a.locator('.v-root')).toHaveCSS('background-color', 'rgb(16, 24, 39)');
   await expect.poll(minimapPixel).not.toBe(pixelBefore);
   expect(await geometry()).toEqual(before);
   await expect(b.locator('article.vui-node').first()).toHaveCSS('background-color', dark.node);
@@ -317,7 +309,7 @@ test('pipeline: typed labeled ports, native controls inside nodes and geometry t
   await expect(demo.locator('path.vui-edge')).toHaveCount(4);
   await expect(demo.locator('.vui-port[data-type="video"]')).toHaveCount(4);
   await expect(demo.locator('[data-stage="publish"] [data-port="poster"] .vui-port')).toHaveAttribute(
-    'data-connected',
+    'data-vui-connected',
     'false',
   );
   const endpointError = () =>
@@ -325,13 +317,11 @@ test('pipeline: typed labeled ports, native controls inside nodes and geometry t
       const edge = root.querySelectorAll<SVGPathElement>('path.vui-edge')[2];
       const source = root
         .querySelector(
-          '[data-stage="transcode"] [data-port="video"].output .vui-port.vflow-handle[data-vflow-handle-position="right"]',
+          '[data-stage="transcode"] [data-port="video"].output .vui-port.v-handle[data-v-handle-position="right"]',
         )!
         .getBoundingClientRect();
       const target = root
-        .querySelector(
-          '[data-stage="publish"] [data-port="video"] .vui-port.vflow-handle[data-vflow-handle-position="left"]',
-        )!
+        .querySelector('[data-stage="publish"] [data-port="video"] .vui-port.v-handle[data-v-handle-position="left"]')!
         .getBoundingClientRect();
       const matrix = edge.getScreenCTM()!;
       const start = edge.getPointAtLength(0).matrixTransform(matrix);
@@ -345,45 +335,41 @@ test('pipeline: typed labeled ports, native controls inside nodes and geometry t
     });
   await expect.poll(endpointError).toBeLessThan(1);
   const transcode = demo.locator('[data-stage="transcode"]');
-  const wrapper = transcode.locator('xpath=ancestor::*[contains(@class, "vflow-node")][1]');
+  const wrapper = transcode.locator(
+    'xpath=ancestor::*[contains(concat(" ", normalize-space(@class), " "), " v-node ")][1]',
+  );
   const position = () => wrapper.evaluate((element: HTMLElement) => element.style.transform);
   const start = await position();
   // Native controls work and do not drag the node.
   await transcode.getByLabel('Resolution').selectOption('2160p');
   await expect(demo.locator('[data-stage="publish"] .vui-node-body .vui-meta')).toContainText('2160p');
   await transcode.getByLabel(/Bitrate/).fill('30');
-  await expect(transcode.locator('.vui-status')).toHaveAttribute('data-busy', 'true');
+  await expect(transcode.locator('.vui-status')).toHaveAttribute('data-vui-busy', 'true');
   expect(await position()).toBe(start);
   // An extra typed output row above the video output moves the port; the edge follows.
   await transcode.getByLabel('Poster output', { exact: true }).check();
   await expect(transcode.locator('[data-port="poster"]')).toBeVisible();
   await expect.poll(endpointError).toBeLessThan(1);
-  const source = transcode.locator('[data-port="poster"] .vflow-handle[data-vflow-handle-position="right"]');
-  const target = demo.locator(
-    '[data-stage="publish"] [data-port="poster"] .vflow-handle[data-vflow-handle-position="left"]',
-  );
+  const source = transcode.locator('[data-port="poster"] .v-handle[data-v-handle-position="right"]');
+  const target = demo.locator('[data-stage="publish"] [data-port="poster"] .v-handle[data-v-handle-position="left"]');
   const from = (await source.boundingBox())!;
   const to = (await target.boundingBox())!;
   await page.mouse.move(from.x + from.width / 2, from.y + from.height / 2);
   await page.mouse.down();
   await page.mouse.move(to.x + to.width / 2, to.y + to.height / 2, { steps: 12 });
-  await expect(target).toHaveAttribute('data-state', 'valid');
+  await expect(target).toHaveAttribute('data-vui-state', 'valid');
   await page.mouse.up();
   await expect(demo.locator('path.vui-edge')).toHaveCount(5);
-  await expect(target).toHaveAttribute('data-connected', 'true');
+  await expect(target).toHaveAttribute('data-vui-connected', 'true');
   // A type mismatch is rejected by the application's validator.
-  const audio = demo.locator(
-    '[data-stage="mix"] [data-port="audio"].output .vflow-handle[data-vflow-handle-position="right"]',
-  );
-  const video = demo.locator(
-    '[data-stage="publish"] [data-port="video"] .vflow-handle[data-vflow-handle-position="left"]',
-  );
+  const audio = demo.locator('[data-stage="mix"] [data-port="audio"].output .v-handle[data-v-handle-position="right"]');
+  const video = demo.locator('[data-stage="publish"] [data-port="video"] .v-handle[data-v-handle-position="left"]');
   const a = (await audio.boundingBox())!;
   const v = (await video.boundingBox())!;
   await page.mouse.move(a.x + a.width / 2, a.y + a.height / 2);
   await page.mouse.down();
   await page.mouse.move(v.x + v.width / 2, v.y + v.height / 2, { steps: 12 });
-  await expect(video).toHaveAttribute('data-state', 'invalid');
+  await expect(video).toHaveAttribute('data-vui-state', 'invalid');
   await page.mouse.up();
   await expect(demo.locator('path.vui-edge')).toHaveCount(5);
 });
@@ -398,21 +384,21 @@ test('relationships map: container connections, a note without ports, custom con
   await expect(demo.locator('article.vui-node')).toHaveCount(6);
   await expect(demo.locator('path.vui-edge')).toHaveCount(4);
   await expect(demo.locator('svg.avatar')).toHaveCount(4);
-  await expect(demo.locator('.note .vflow-handle')).toHaveCount(0);
+  await expect(demo.locator('.note .v-handle')).toHaveCount(0);
   // The edge between the two containers starts at the container's own handle.
   const containerEdgeError = () =>
     demo.evaluate((root) => {
       const edge = root.querySelectorAll<SVGPathElement>('path.vui-edge')[0];
       const source = root
-        .querySelector('.vui-container .vui-port.vflow-handle[data-vflow-handle-position="right"]')!
+        .querySelector('.vui-container .vui-port.v-handle[data-v-handle-position="right"]')!
         .getBoundingClientRect();
       const start = edge.getPointAtLength(0).matrixTransform(edge.getScreenCTM()!);
       return Math.max(Math.abs(start.x - source.right), Math.abs(start.y - source.y - source.height / 2));
     });
   await expect.poll(containerEdgeError).toBeLessThan(1.5);
-  await expect(demo.locator('.vflow-edge-labels-layer .vui-edge-label').first()).toHaveText('3 shared services');
+  await expect(demo.locator('.v-edge-labels-layer .vui-edge-label').first()).toHaveText('3 shared services');
   const ana = demo.locator('article').filter({ hasText: 'Ana Lima' });
-  const wrapper = ana.locator('xpath=ancestor::*[contains(@class, "vflow-node")][1]');
+  const wrapper = ana.locator('xpath=ancestor::*[contains(concat(" ", normalize-space(@class), " "), " v-node ")][1]');
   const position = () => wrapper.evaluate((element: HTMLElement) => element.style.transform);
   await demo.getByLabel('View mode', { exact: true }).check();
   await ana.evaluate((element) => element.scrollIntoView({ block: 'center' }));
@@ -445,7 +431,7 @@ test('scroll and collapse experiment: model kept, endpoints move to the header a
   await demo.evaluate((element) => element.scrollIntoView({ block: 'center' }));
   await expect(demo.locator('path.vui-edge')).toHaveCount(2);
   const rows = demo.locator('[data-rows="product"]');
-  await expect(rows.locator('[vflowField]')).toHaveCount(12);
+  await expect(rows.locator('[vuiField]')).toHaveCount(12);
   const edgeStart = (index: number) =>
     demo.evaluate((root, i) => {
       const edge = root.querySelectorAll<SVGPathElement>('path.vui-edge')[i];
@@ -457,9 +443,8 @@ test('scroll and collapse experiment: model kept, endpoints move to the header a
       const rect = root.querySelector(s)!.getBoundingClientRect();
       return { x: rect.right, y: rect.y + rect.height / 2 };
     }, selector);
-  const rowPort =
-    '[data-entity="product"] [data-field="brand-id"] .vui-port.vflow-handle[data-vflow-handle-position="right"]';
-  const footerPort = '[data-entity="product"] footer .vui-port.vflow-handle[data-vflow-handle-position="right"]';
+  const rowPort = '[data-entity="product"] [data-field="brand-id"] .vui-port.v-handle[data-v-handle-position="right"]';
+  const footerPort = '[data-entity="product"] footer .vui-port.v-handle[data-v-handle-position="right"]';
   const distance = (index: number, selector: string) => async () => {
     const start = await edgeStart(index);
     const port = await portCenter(selector);
@@ -469,7 +454,7 @@ test('scroll and collapse experiment: model kept, endpoints move to the header a
   await expect.poll(distance(1, rowPort)).toBeLessThan(1.5);
   await expect.poll(distance(0, footerPort)).toBeLessThan(1.5);
   // Wheel over the rows scrolls them instead of zooming the graph.
-  const zoom = () => demo.locator('.vflow-viewport').evaluate((element) => element.style.transform);
+  const zoom = () => demo.locator('.v-viewport').evaluate((element) => element.style.transform);
   const zoomBefore = await zoom();
   const box = (await rows.boundingBox())!;
   await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
@@ -484,12 +469,12 @@ test('scroll and collapse experiment: model kept, endpoints move to the header a
   await demo.getByRole('button', { name: 'Collapse Product', exact: true }).click();
   await expect(rows).toHaveCount(0);
   await expect(demo.locator('path.vui-edge')).toHaveCount(2);
-  const headerPort = '[data-entity="product"] header .vui-port.vflow-handle[data-vflow-handle-position="right"]';
+  const headerPort = '[data-entity="product"] header .vui-port.v-handle[data-v-handle-position="right"]';
   await expect.poll(distance(1, headerPort)).toBeLessThan(1.5);
   await expect.poll(distance(0, headerPort)).toBeLessThan(1.5);
   // Expand: the same field IDs restore the endpoints on the rows.
   await demo.getByRole('button', { name: 'Expand Product', exact: true }).click();
-  await expect(rows.locator('[vflowField]')).toHaveCount(12);
+  await expect(rows.locator('[vuiField]')).toHaveCount(12);
   await expect.poll(distance(1, rowPort)).toBeLessThan(1.5);
   await expect.poll(distance(0, footerPort)).toBeLessThan(1.5);
 });
@@ -500,7 +485,7 @@ test('ERD: deleting a field removes its edges and leaves no detached endpoints',
   await demo.scrollIntoViewIfNeeded();
   await expect(demo.locator('path.vui-edge')).toHaveCount(2);
   await demo.getByRole('button', { name: 'Delete CRM contact.email', exact: true }).click();
-  await expect(demo.locator('[data-entity="crm"] [vflowField]')).toHaveCount(1);
+  await expect(demo.locator('[data-entity="crm"] [vuiField]')).toHaveCount(1);
   await expect(demo.locator('path.vui-edge')).toHaveCount(1);
-  await expect(demo.locator('.vui-port[data-connected="true"]')).toHaveCount(2);
+  await expect(demo.locator('.vui-port[data-vui-connected="true"]')).toHaveCount(2);
 });

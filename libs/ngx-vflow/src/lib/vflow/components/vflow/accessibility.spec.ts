@@ -10,18 +10,18 @@ import { DomAttributes } from '../../interfaces/dom-attributes.interface';
   imports: [Vflow],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `<vflow [nodes]="nodes" [edges]="edges" [view]="[600, 350]" [ariaLabelConfig]="labels()">
-    <mini-map />
-    <ng-template node>
+    <v-minimap />
+    <ng-template vNode>
       <button type="button" noDrag (click)="clicks = clicks + 1">Review request</button>
       <span
-        vflowHandle
+        vHandle
         handleType="target"
         position="left"
         handleId="incoming"
         [canStart]="canStart()"
         [canAccept]="canAccept()"
         [domAttributes]="{ 'data-port': 'incoming' }"></span>
-      <span vflowHandle handleType="source" position="right"></span>
+      <span vHandle handleType="source" position="right"></span>
     </ng-template>
   </vflow>`,
 })
@@ -221,7 +221,7 @@ describe('public graph accessibility', () => {
     fixture.detectChanges();
     await fixture.whenStable();
     const root: HTMLElement = fixture.nativeElement;
-    const handles = Array.from(root.querySelectorAll('[data-vflow-handle-type]'));
+    const handles = Array.from(root.querySelectorAll('[data-v-handle-type]'));
     expect(handles.length).toBe(2);
     expect(root.querySelector('[data-port="incoming"]')).toBe(handles[0]);
     host.canStart.set(true);
@@ -233,7 +233,7 @@ describe('public graph accessibility', () => {
         expect(handle.hasAttribute(name)).withContext(name).toBeFalse();
       }
     }
-    expect(handles[0].getAttribute('data-vflow-handle-can-accept')).toBe('false');
+    expect(handles[0].getAttribute('data-v-handle-can-accept')).toBe('false');
     root.querySelector('button')!.click();
     expect(host.clicks).toBe(1);
   });

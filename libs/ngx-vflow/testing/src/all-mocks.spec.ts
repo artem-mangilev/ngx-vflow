@@ -29,38 +29,32 @@ import { VflowMocks } from './vflow-mocks';
       [elevateNodesOnSelect]="true"
       (componentNodeEvent)="(null)"
       (connect)="(null)">
-      <ng-template node>
-        <div dragHandle selectable resizable [gap]="2">
-          <span
-            vflowHandle
-            handleType="source"
-            #handle="vflowHandle"
-            [position]="'left'"
-            [handleId]="'1'"
-            [layout]="'manual'">
+      <ng-template vNode>
+        <div vDragHandle vSelectable vResizable [gap]="2">
+          <span vHandle handleType="source" #handle="vHandle" [position]="'left'" [handleId]="'1'" [layout]="'manual'">
             {{ handle.state() }}
           </span>
 
-          <node-toolbar position="left">
+          <v-node-toolbar position="left">
             <button>Delete</button>
-          </node-toolbar>
+          </v-node-toolbar>
         </div>
       </ng-template>
 
-      <ng-template let-ctx edge>
+      <ng-template let-ctx vEdge>
         <svg:path fill="none" [attr.d]="ctx.path()" [attr.stroke-width]="4" [attr.marker-end]="ctx.markerEnd()" />
-        <div *edgeLabel="'start'">{{ ctx.edge.id }}</div>
+        <div *vEdgeLabel="'start'">{{ ctx.edge.id }}</div>
       </ng-template>
 
-      <ng-template let-ctx connection>
+      <ng-template let-ctx vConnection>
         <svg:path fill="none" [attr.d]="ctx.path()" [attr.stroke]="ctx.marker()" />
       </ng-template>
 
-      <ng-template marker="all-mocks-circle" inset="9">
+      <ng-template vMarker="all-mocks-circle" inset="9">
         <svg:circle fill="none" cx="-5" cy="0" r="4" />
       </ng-template>
 
-      <mini-map [pannable]="true" [zoomable]="true" [zoomStep]="0.2" [position]="'bottom-right'" />
+      <v-minimap [pannable]="true" [zoomable]="true" [zoomStep]="0.2" [position]="'bottom-right'" />
     </vflow>
   `,
   imports: [Vflow],

@@ -3,7 +3,7 @@ import { expect, test, type Locator, type Page } from '@playwright/test';
 test.use({ hasTouch: true });
 
 async function viewport(graph: Locator) {
-  return graph.locator('.vflow-viewport').evaluate((element) => {
+  return graph.locator('.v-viewport').evaluate((element) => {
     const matrix = new DOMMatrix(getComputedStyle(element).transform);
     return { x: matrix.e, y: matrix.f, zoom: matrix.a };
   });
@@ -18,9 +18,9 @@ async function connectionGraph(page: Page) {
   await page.goto('/edges/connections');
   const graph = page.locator('vflow').first();
   await graph.scrollIntoViewIfNeeded();
-  await expect(graph.locator('.vflow-node')).toHaveCount(2);
-  const source = graph.locator('.vflow-node').nth(0).locator('.vflow-handle[data-vflow-handle-type="source"]');
-  const target = graph.locator('.vflow-node').nth(1).locator('.vflow-handle[data-vflow-handle-type="target"]');
+  await expect(graph.locator('.v-node')).toHaveCount(2);
+  const source = graph.locator('.v-node').nth(0).locator('.v-handle[data-v-handle-type="source"]');
+  const target = graph.locator('.v-node').nth(1).locator('.v-handle[data-v-handle-type="target"]');
   await expect(source).toBeVisible();
   return { graph, source, target };
 }
@@ -64,7 +64,7 @@ test('drops a reconnected edge on the canvas without panning the viewport', asyn
   await graph.scrollIntoViewIfNeeded();
   await expect(graph.locator('[edge]')).toHaveCount(2);
   const start = await viewport(graph);
-  const handle = graph.locator('.reconnect-handle').first();
+  const handle = graph.locator('.v-reconnect-handle').first();
   const from = await center(handle);
 
   await page.mouse.move(from.x, from.y);
@@ -81,8 +81,8 @@ test('selects nodes with a Shift selection box instead of panning', async ({ pag
   await page.goto('/interactions/selection-box');
   const graph = page.locator('vflow').first();
   await graph.scrollIntoViewIfNeeded();
-  await expect(graph.locator('.vflow-node').first()).toBeVisible();
-  const pane = (await graph.locator('.vflow-pane').boundingBox())!;
+  await expect(graph.locator('.v-node').first()).toBeVisible();
+  const pane = (await graph.locator('.v-pane').boundingBox())!;
   const start = await viewport(graph);
 
   await page.keyboard.down('Shift');
@@ -92,7 +92,7 @@ test('selects nodes with a Shift selection box instead of panning', async ({ pag
   await page.mouse.up();
   await page.keyboard.up('Shift');
 
-  const selected = graph.locator('.vflow-node [data-vui-selected="true"]');
+  const selected = graph.locator('.v-node [data-vui-selected="true"]');
   await expect(selected).not.toHaveCount(0);
   expect(await viewport(graph)).toEqual(start);
 });

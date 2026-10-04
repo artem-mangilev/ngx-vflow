@@ -1,15 +1,15 @@
 <vflow view="auto" [nodes]="nodes" [edges]="edges" (deleteRequest)="onDeleteRequest($event)">
-  <ng-template let-ctx node>
+  <ng-template let-ctx vNode>
     <div class="custom-node" [class.custom-node_selected]="ctx.selected()">
-      <button class="custom-node__button" selectable>Select here</button>
+      <button class="custom-node__button" vSelectable>Select here</button>
 
-      <span vflowPort handleType="source" position="right"></span>
-      <span vflowPort handleType="target" position="left"></span>
+      <span vuiPort handleType="source" position="right"></span>
+      <span vuiPort handleType="target" position="left"></span>
     </div>
   </ng-template>
 
-  <ng-template let-ctx edge>
-    <svg:g edgeInteraction class="custom-edge">
+  <ng-template let-ctx vEdge>
+    <svg:g vEdgeInteraction class="custom-edge">
       <svg:path
         fill="none"
         stroke-width="2"

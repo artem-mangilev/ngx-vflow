@@ -27,8 +27,8 @@ const DOUBLE_TAP_DELAY_MS = 500;
 /** A double tap ends within this pane distance of the first tap. */
 const DOUBLE_TAP_DISTANCE = 10;
 
-const NO_WHEEL = '[data-vflow-no-wheel]';
-const NO_PAN = '[data-vflow-no-pan], [data-vflow-no-drag]';
+const NO_WHEEL = '[data-v-no-wheel]';
+const NO_PAN = '[data-v-no-pan], [data-v-no-drag]';
 
 /** A wheel zoom in progress: the events set the target, animation frames move the viewport towards it. */
 interface WheelZoom {

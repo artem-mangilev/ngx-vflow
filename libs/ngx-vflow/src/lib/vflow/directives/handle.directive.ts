@@ -13,21 +13,21 @@ import { pressTarget } from '../utils/press-target';
  * or `"center"`, a surface such as the whole node whose edges meet the node wherever the other end is. The
  * library registers, measures and, in the `auto` layout, positions a port; its size and look belong to the
  * application. State is exposed as
- * `data-vflow-handle-*` attributes for CSS and as signals of this directive for code: `#h="vflowHandle"` in a
+ * `data-v-handle-*` attributes for CSS and as signals of this directive for code: `#h="vHandle"` in a
  * template, `inject(VflowHandleDirective)` in a component that applies it through `hostDirectives` or in content of
  * a handle element.
  */
 @Directive({
-  selector: '[vflowHandle]',
-  exportAs: 'vflowHandle',
+  selector: '[vHandle]',
+  exportAs: 'vHandle',
   standalone: true,
   host: {
-    class: 'vflow-handle',
-    '[attr.data-vflow-handle-type]': 'handleType()',
-    '[attr.data-vflow-handle-position]': 'position()',
-    '[attr.data-vflow-handle-state]': 'state()',
-    '[attr.data-vflow-handle-can-start]': 'canStart()',
-    '[attr.data-vflow-handle-can-accept]': 'canAccept()',
+    class: 'v-handle',
+    '[attr.data-v-handle-type]': 'handleType()',
+    '[attr.data-v-handle-position]': 'position()',
+    '[attr.data-v-handle-state]': 'state()',
+    '[attr.data-v-handle-can-start]': 'canStart()',
+    '[attr.data-v-handle-can-accept]': 'canAccept()',
     '[style.position]': "placement() ? 'absolute' : null",
     '[style.top]': 'placement()?.top ?? null',
     '[style.left]': 'placement()?.left ?? null',
@@ -137,7 +137,7 @@ export class VflowHandleDirective {
     const node = this.handleService.node();
 
     if (!node) {
-      throw new Error('[ngx-vflow] vflowHandle must be placed inside a node presentation.');
+      throw new Error('[ngx-vflow] vHandle must be placed inside a node presentation.');
     }
 
     return node;

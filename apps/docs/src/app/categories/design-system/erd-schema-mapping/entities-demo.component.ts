@@ -8,7 +8,7 @@ import {
   viewChild,
   WritableSignal,
 } from '@angular/core';
-import { VflowUi } from '@vflow/ui';
+import { Vui } from '@vflow/ui';
 import {
   addEdges,
   Connection,
@@ -30,7 +30,7 @@ interface EntityData {
 
 @Component({
   selector: 'app-ui-entities-demo',
-  imports: [Vflow, VflowUi],
+  imports: [Vflow, Vui],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
     article {
@@ -55,35 +55,35 @@ interface EntityData {
     <section
       class="demo"
       aria-label="Entity relationships and field mapping demo"
-      [vflowTheme]="dark() ? 'dark' : 'light'"
+      [vuiTheme]="dark() ? 'dark' : 'light'"
       [style.--vui-space]="compact() ? '3px' : '4px'">
       <div class="controls">
-        <button vflowButton type="button" (click)="flow()?.fitView()">Fit entities</button>
-        <button vflowButton type="button" (click)="reverseFields()">Reverse fields</button>
-        <button vflowButton type="button" (click)="renameField()">Rename email</button>
-        <button vflowButton type="button" (click)="toggleLongNames()">Long names</button>
+        <button vuiButton type="button" (click)="flow()?.fitView()">Fit entities</button>
+        <button vuiButton type="button" (click)="reverseFields()">Reverse fields</button>
+        <button vuiButton type="button" (click)="renameField()">Rename email</button>
+        <button vuiButton type="button" (click)="toggleLongNames()">Long names</button>
         <label><input type="checkbox" [checked]="compact()" (change)="compact.set(!compact())" /> Compact</label>
         <label><input type="checkbox" [checked]="dark()" (change)="dark.set(!dark())" /> Dark theme</label>
         <p>Connect matching field types; names and row order can change.</p>
       </div>
       <vflow view="auto" [nodes]="nodes" [edges]="edges()" [connection]="connection" (connect)="connect($event)">
-        <ng-template let-ctx node>
+        <ng-template let-ctx vNode>
           <article
-            vflowNode
-            selectable
-            [vflowSelected]="ctx.selected() || ctx.preselected()"
+            vuiNode
+            vSelectable
+            [vuiSelected]="ctx.selected() || ctx.preselected()"
             [attr.data-entity]="ctx.node.id">
-            <header vflowNodeHeader>
-              <span vflowTitle>{{ ctx.data().title }}</span>
-              <span vflowMeta>{{ ctx.data().category }}</span>
+            <header vuiNodeHeader>
+              <span vuiTitle>{{ ctx.data().title }}</span>
+              <span vuiMeta>{{ ctx.data().category }}</span>
             </header>
             @for (field of ctx.data().fields; track field.id) {
-              <div vflowField [attr.data-field]="field.id">
-                <span vflowMeta class="key">{{ field.key }}</span>
-                <span vflowTitle>{{ field.name }}</span>
-                <span vflowMeta>{{ field.type }}</span>
+              <div vuiField [attr.data-field]="field.id">
+                <span vuiMeta class="key">{{ field.key }}</span>
+                <span vuiTitle>{{ field.name }}</span>
+                <span vuiMeta>{{ field.type }}</span>
                 <button
-                  vflowNoDrag
+                  vNoDrag
                   class="remove"
                   type="button"
                   [attr.aria-label]="'Delete ' + ctx.data().title + '.' + field.name"
@@ -91,30 +91,30 @@ interface EntityData {
                   ×
                 </button>
                 <span
-                  vflowPort
+                  vuiPort
                   handleType="target"
                   position="left"
                   [handleId]="'in:' + field.id"
-                  [vflowPortConnected]="connected().has(ctx.node.id + '/in:' + field.id)"></span>
+                  [vuiPortConnected]="connected().has(ctx.node.id + '/in:' + field.id)"></span>
                 <span
-                  vflowPort
+                  vuiPort
                   handleType="source"
                   position="right"
                   [handleId]="'out:' + field.id"
-                  [vflowPortConnected]="connected().has(ctx.node.id + '/out:' + field.id)"></span>
+                  [vuiPortConnected]="connected().has(ctx.node.id + '/out:' + field.id)"></span>
               </div>
             }
           </article>
         </ng-template>
-        <ng-template let-ctx edge>
-          <svg:g edgeInteraction>
-            <svg:path vflowEdge [attr.d]="ctx.path()" [vflowSelected]="ctx.selected() || ctx.preselected()" />
+        <ng-template let-ctx vEdge>
+          <svg:g vEdgeInteraction>
+            <svg:path vuiEdge [attr.d]="ctx.path()" [vuiSelected]="ctx.selected() || ctx.preselected()" />
           </svg:g>
           @if (ctx.data()?.label; as label) {
-            <span *edgeLabel vflowEdgeLabel>
+            <span *vEdgeLabel vuiEdgeLabel>
               {{ label }}
               <button
-                vflowNoDrag
+                vNoDrag
                 class="remove"
                 type="button"
                 [attr.aria-label]="'Remove ' + label + ' connection'"
@@ -124,9 +124,9 @@ interface EntityData {
             </span>
           }
         </ng-template>
-        <ng-template let-ctx connection>
+        <ng-template let-ctx vConnection>
           @if (ctx.path(); as path) {
-            <svg:path vflowEdge stroke-dasharray="5 4" [attr.d]="path" />
+            <svg:path vuiEdge stroke-dasharray="5 4" [attr.d]="path" />
           }
         </ng-template>
       </vflow>

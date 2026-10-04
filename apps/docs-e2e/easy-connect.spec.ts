@@ -41,14 +41,14 @@ test('easy connect: connects from anywhere on a node, drags by the title and rou
   await page.mouse.move(from.x, from.y);
   await page.mouse.down();
   await page.mouse.move(from.x + 30, from.y + 30, { steps: 4 });
-  await expect(nodes.nth(1)).toHaveAttribute('data-vflow-handle-state', 'connecting');
+  await expect(nodes.nth(1)).toHaveAttribute('data-v-handle-state', 'connecting');
   // A node handle is its own drop zone: no magnets are rendered.
-  await expect(demo.locator('.magnet')).toHaveCount(0);
+  await expect(demo.locator('.v-magnet')).toHaveCount(0);
   await page.mouse.move(to.x, to.y, { steps: 8 });
-  await expect(nodes.nth(2)).toHaveAttribute('data-vflow-handle-state', 'valid');
+  await expect(nodes.nth(2)).toHaveAttribute('data-v-handle-state', 'valid');
   await page.mouse.up();
   await expect(edges).toHaveCount(2);
-  await expect(nodes.nth(1)).toHaveAttribute('data-vflow-handle-state', 'idle');
+  await expect(nodes.nth(1)).toHaveAttribute('data-v-handle-state', 'idle');
 
   // The title drags the node; the body does not.
   const before = (await nodes.nth(0).boundingBox())!;

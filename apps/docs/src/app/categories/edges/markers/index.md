@@ -20,7 +20,7 @@ curve receives are already moved by that distance when the edge has a marker on 
 
 ## Custom markers
 
-The built-in types are shapes the library ships; any other `type` is a shape you declare with `ng-template[marker]`.
+The built-in types are shapes the library ships; any other `type` is a shape you declare with `ng-template[vMarker]`.
 The flow renders one `<marker>` element per distinct marker for both, with the `width`, `height`, `orient` and
 `strokeWidth` the marker asks for and the stroke of the edge, so a declared shape is used exactly like an arrow:
 as the type alone, or as an object with a size. The connection line accepts it in `marker` as well.
@@ -29,7 +29,7 @@ as the type alone, or as an object with a size. The connection line accepts it i
 
 ```html
 <vflow [nodes]="nodes" [edges]="edges">
-  <ng-template marker="diamond" inset="8">
+  <ng-template vMarker="diamond" inset="8">
     <svg:polygon fill="context-stroke" points="-1,0 -5,-4 -9,0 -5,4" />
   </ng-template>
 </vflow>
@@ -48,8 +48,8 @@ reaches `x = -9`, so its inset is `8`. The line then neither leaves a gap at the
 circle or diamond; for a bar the inset is on the bar. Set `fill="none"` or `fill="context-stroke"` on the shape
 yourself. Stroke properties inherit from the marker element. The stroke is `strokeWidth` flow units wide at any
 marker size, `2` by default like the default edge line, so a line meets its marker without a step; give a marker
-of a thicker edge the same `strokeWidth`. Your CSS can still override the stroke through the `vflow-marker` and
-`vflow-marker--<type>` classes, in marker units. A type without a declared shape renders an empty marker, and
+of a thicker edge the same `strokeWidth`. Your CSS can still override the stroke through the `v-marker` and
+`v-marker--<type>` classes, in marker units. A type without a declared shape renders an empty marker, and
 development mode warns about it.
 
 {{ NgDocActions.demoPane("CustomMarkersDemoComponent") }}

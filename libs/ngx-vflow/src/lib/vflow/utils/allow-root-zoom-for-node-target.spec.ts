@@ -22,7 +22,7 @@ describe('allowRootZoomForNodeTarget', () => {
 
   it('returns true for undraggable node body', () => {
     const node = document.createElement('g');
-    node.classList.add('vflow-node', 'vflow-node--undraggable');
+    node.classList.add('v-node', 'v-node--undraggable');
     const inner = document.createElement('div');
     node.appendChild(inner);
     const ev = new PointerEvent('pointerdown', { bubbles: true });
@@ -32,7 +32,7 @@ describe('allowRootZoomForNodeTarget', () => {
 
   it('returns false for fully draggable node (no pan classes)', () => {
     const node = document.createElement('g');
-    node.classList.add('vflow-node');
+    node.classList.add('v-node');
     const inner = document.createElement('div');
     node.appendChild(inner);
     const ev = new PointerEvent('pointerdown', { bubbles: true });
@@ -42,7 +42,7 @@ describe('allowRootZoomForNodeTarget', () => {
 
   it('returns true for drag-handles-only node when not on a drag handle', () => {
     const node = document.createElement('g');
-    node.classList.add('vflow-node', 'vflow-node--drag-handles-only');
+    node.classList.add('v-node', 'v-node--drag-handles-only');
     const body = document.createElement('div');
     node.appendChild(body);
     const ev = new PointerEvent('pointerdown', { bubbles: true });
@@ -50,11 +50,11 @@ describe('allowRootZoomForNodeTarget', () => {
     expect(allowRootZoomForNodeTarget(ev, false)).toBe(true);
   });
 
-  it('returns false for drag-handles-only node when on vflow-drag-handle', () => {
+  it('returns false for drag-handles-only node when on v-drag-handle', () => {
     const node = document.createElement('g');
-    node.classList.add('vflow-node', 'vflow-node--drag-handles-only');
+    node.classList.add('v-node', 'v-node--drag-handles-only');
     const handle = document.createElement('button');
-    handle.classList.add('vflow-drag-handle');
+    handle.classList.add('v-drag-handle');
     node.appendChild(handle);
     const ev = new PointerEvent('pointerdown', { bubbles: true });
     Object.defineProperty(ev, 'target', { value: handle, enumerable: true });
@@ -63,11 +63,11 @@ describe('allowRootZoomForNodeTarget', () => {
 
   it('returns false inside a handle of an undraggable node and true from a drag handle inside that handle', () => {
     const node = document.createElement('div');
-    node.classList.add('vflow-node', 'vflow-node--drag-handles-only');
+    node.classList.add('v-node', 'v-node--drag-handles-only');
     const handle = document.createElement('div');
-    handle.classList.add('vflow-handle');
+    handle.classList.add('v-handle');
     const dragHandle = document.createElement('div');
-    dragHandle.classList.add('vflow-drag-handle');
+    dragHandle.classList.add('v-drag-handle');
     const body = document.createElement('span');
     node.append(handle);
     handle.append(dragHandle, body);
@@ -86,7 +86,7 @@ describe('allowRootZoomForNodeTarget', () => {
 
   it('handles touchstart like mousedown', () => {
     const node = document.createElement('g');
-    node.classList.add('vflow-node', 'vflow-node--undraggable');
+    node.classList.add('v-node', 'v-node--undraggable');
     const inner = document.createElement('div');
     node.appendChild(inner);
     const ev = new Event('touchstart', { bubbles: true });

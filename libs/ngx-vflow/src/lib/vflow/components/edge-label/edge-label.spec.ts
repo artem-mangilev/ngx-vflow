@@ -6,9 +6,9 @@ import { createNodes } from '../../interfaces/node.interface';
 import { Edge, createEdges } from '../../interfaces/edge.interface';
 import { EdgeLabelOrient, EdgeLabelPosition } from '../../interfaces/edge-label.interface';
 import {
-  EdgeLabelTemplateDirective,
-  EdgeTemplateDirective,
-  NodeTemplateDirective,
+  VflowEdgeLabelTemplateDirective,
+  VflowEdgeTemplateDirective,
+  VflowNodeTemplateDirective,
 } from '../../directives/template.directive';
 import { VflowHandleDirective } from '../../directives/handle.directive';
 import { FlowEntitiesService } from '../../services/flow-entities.service';
@@ -26,10 +26,10 @@ class LabelEdgeIdComponent {
 
 @Component({
   selector: 'g[labelledEdge]',
-  imports: [EdgeLabelTemplateDirective],
+  imports: [VflowEdgeLabelTemplateDirective],
   template: `
     <svg:path fill="none" [attr.d]="ctx.path()" />
-    <span *edgeLabel="'end'" class="component-label">{{ ctx.data().label }}</span>
+    <span *vEdgeLabel="'end'" class="component-label">{{ ctx.data().label }}</span>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -39,44 +39,44 @@ class LabelledEdgeComponent {
 
 @Component({
   template: `<vflow [view]="[600, 400]" [nodes]="nodes" [edges]="edges">
-    <ng-template node>
+    <ng-template vNode>
       <div style="width: 60px; height: 30px">
-        <span vflowHandle handleType="target" position="left"></span
-        ><span vflowHandle handleType="source" position="right"></span>
+        <span vHandle handleType="target" position="left"></span
+        ><span vHandle handleType="source" position="right"></span>
       </div>
     </ng-template>
-    <ng-template let-ctx edge>
+    <ng-template let-ctx vEdge>
       <svg:g><svg:path fill="none" [attr.d]="ctx.path()" /></svg:g>
       @switch (ctx.edge.id) {
         @case ('template') {
           @if (showCenter()) {
-            <span *edgeLabel class="center-label">{{ ctx.data().label }}</span>
+            <span *vEdgeLabel class="center-label">{{ ctx.data().label }}</span>
           }
-          <ng-template [edgeLabel]="movable()">
+          <ng-template [vEdgeLabel]="movable()">
             <span class="movable-label"><label-edge-id /></span>
           </ng-template>
         }
         @case ('long-form') {
-          <ng-template edgeLabel><span class="long-form-label">Long form</span></ng-template>
+          <ng-template vEdgeLabel><span class="long-form-label">Long form</span></ng-template>
         }
         @case ('inside-svg') {
-          <svg:g><span *edgeLabel class="svg-label">Inside SVG</span></svg:g>
+          <svg:g><span *vEdgeLabel class="svg-label">Inside SVG</span></svg:g>
         }
         @case ('duplicate') {
-          <span *edgeLabel class="first-duplicate">First</span>
-          <span *edgeLabel class="second-duplicate">Second</span>
+          <span *vEdgeLabel class="first-duplicate">First</span>
+          <span *vEdgeLabel class="second-duplicate">Second</span>
         }
         @case ('along') {
-          <span *edgeLabel="'center'; orient: orient()" class="along-label">Along</span>
+          <span *vEdgeLabel="'center'; orient: orient()" class="along-label">Along</span>
         }
       }
     </ng-template>
   </vflow>`,
   imports: [
     VflowComponent,
-    NodeTemplateDirective,
-    EdgeTemplateDirective,
-    EdgeLabelTemplateDirective,
+    VflowNodeTemplateDirective,
+    VflowEdgeTemplateDirective,
+    VflowEdgeLabelTemplateDirective,
     VflowHandleDirective,
     LabelEdgeIdComponent,
   ],
@@ -150,7 +150,7 @@ describe('Edge labels declared inside edge presentations', () => {
 
     expect(label instanceof HTMLElement).toBeTrue();
     expect(label.textContent).toBe('Hello');
-    expect(host.closest('.vflow-edge-labels-layer')).not.toBeNull();
+    expect(host.closest('.v-edge-labels-layer')).not.toBeNull();
     expect(host.closest('svg')).toBeNull();
     expectAt(host, point);
 
@@ -159,7 +159,7 @@ describe('Edge labels declared inside edge presentations', () => {
     expect(root.querySelector('.center-label')!.textContent).toBe('Changed');
   });
 
-  it('registers *edgeLabel and <ng-template edgeLabel> without a value at the center', () => {
+  it('registers *vEdgeLabel and <ng-template vEdgeLabel> without a value at the center', () => {
     expect(positions('template')).toEqual(['center', 'start']);
     expect(positions('long-form')).toEqual(['center']);
     expect(root.querySelector('.long-form-label')?.textContent).toBe('Long form');
@@ -224,7 +224,7 @@ describe('Edge labels declared inside edge presentations', () => {
     expect(positions('component')).toEqual(['end']);
     expect(label instanceof HTMLElement).toBeTrue();
     expect(label.textContent).toBe('From component');
-    expect(label.closest('.vflow-edge-labels-layer')).not.toBeNull();
+    expect(label.closest('.v-edge-labels-layer')).not.toBeNull();
   });
 
   it('warns about a label compiled in the SVG namespace', () => {

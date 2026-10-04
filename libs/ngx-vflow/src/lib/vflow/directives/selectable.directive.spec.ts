@@ -8,16 +8,16 @@ import { FlowSettingsService } from '../services/flow-settings.service';
 import { KeyboardService } from '../services/keyboard.service';
 import { NodeComponent } from '../components/node/node.component';
 import { SelectionService } from '../services/selection.service';
-import { SelectableDirective } from './selectable.directive';
+import { VflowSelectableDirective } from './selectable.directive';
 
 @Component({
-  template: '<button selectable>select</button>',
-  imports: [SelectableDirective],
+  template: '<button vSelectable>select</button>',
+  imports: [VflowSelectableDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 class SelectableHostComponent {}
 
-describe('SelectableDirective', () => {
+describe('VflowSelectableDirective', () => {
   let fixture: ComponentFixture<SelectableHostComponent>;
   let entity: FlowEntity;
 

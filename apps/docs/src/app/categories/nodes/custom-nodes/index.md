@@ -12,7 +12,7 @@ You can create custom nodes with `ng-template`
 
 Follow these steps to achieve this:
 
-1. Provide `ng-template` with the `node` selector inside `vflow`
+1. Provide `ng-template` with the `vNode` selector inside `vflow`
 2. Write your HTML inside this template
 3. Pass any data with the `data` field of the node and read it inside the template through `ctx.data()`
 
@@ -34,7 +34,7 @@ How to create component node:
 
 1. Create a regular angular standalone component. It does not extend any base class
 2. Read the node with `injectNode()`. Pass your data interface to its generic to get typed `data`. The returned object
-   is the same one a `node` template receives as `let-ctx`: `data`, `selected`, `preselected`, `width`, `height` and
+   is the same one a `vNode` template receives as `let-ctx`: `data`, `selected`, `preselected`, `width`, `height` and
    the node itself
 3. Put your component in the `component` field of `Node`. The library will render your node for you
 

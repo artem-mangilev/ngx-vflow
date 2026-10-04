@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { Position } from '../../types/position.type';
-import { NoDragDirective } from '../../directives/gesture-exclusions.directive';
+import { VflowNoDragDirective } from '../../directives/gesture-exclusions.directive';
 
 /**
  * A toolbar attached to one side of the node presentation it sits in.
@@ -8,10 +8,10 @@ import { NoDragDirective } from '../../directives/gesture-exclusions.directive';
  * The host is absolutely positioned against the nearest positioned ancestor, normally the node box itself,
  * so it moves, zooms, elevates and culls with the node without any bookkeeping. Put it directly inside the
  * presentation element and keep that element free of `overflow: hidden`. The gap to the node is
- * `--vflow-toolbar-offset` (10px by default). Pointer gestures inside the toolbar never drag the node.
+ * `--v-toolbar-offset` (10px by default). Pointer gestures inside the toolbar never drag the node.
  */
 @Component({
-  selector: 'node-toolbar',
+  selector: 'v-node-toolbar',
   template: `<ng-content />`,
   styles: [
     `
@@ -19,7 +19,7 @@ import { NoDragDirective } from '../../directives/gesture-exclusions.directive';
         position: absolute;
         width: max-content;
         pointer-events: all;
-        --_gap: var(--vflow-toolbar-offset, 10px);
+        --_gap: var(--v-toolbar-offset, 10px);
       }
 
       :host([data-position='top']) {
@@ -50,9 +50,9 @@ import { NoDragDirective } from '../../directives/gesture-exclusions.directive';
   host: {
     '[attr.data-position]': 'position()',
   },
-  hostDirectives: [NoDragDirective],
+  hostDirectives: [VflowNoDragDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class NodeToolbarComponent {
+export class VflowNodeToolbarComponent {
   public position = input<Position>('top');
 }

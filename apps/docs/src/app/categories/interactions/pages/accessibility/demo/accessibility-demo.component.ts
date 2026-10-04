@@ -9,7 +9,7 @@ import {
   signal,
 } from '@angular/core';
 import { DocsPresentations } from '@docs/shared';
-import { VflowUi } from '@vflow/ui';
+import { Vui } from '@vflow/ui';
 import { AriaLabelConfig, DeleteRequest, Vflow, createEdges, createNodes, removeEdges, removeNodes } from 'ngx-vflow';
 
 const SPANISH: Partial<AriaLabelConfig> = {
@@ -48,7 +48,7 @@ const SPANISH: Partial<AriaLabelConfig> = {
  * description of the focused entity, and the last message of the live region.
  */
 @Component({
-  imports: [DocsPresentations, Vflow, VflowUi],
+  imports: [DocsPresentations, Vflow, Vui],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
     vflow {
@@ -94,7 +94,7 @@ const SPANISH: Partial<AriaLabelConfig> = {
           Press Tab to enter the graph, Enter to select, the arrow keys to move a selected node and Delete to remove the
           focused node or edge. The Editor node keeps its own input and button.
         </p>
-        <button vflowButton type="button" (click)="spanish.set(!spanish())">Switch graph language</button>
+        <button vuiButton type="button" (click)="spanish.set(!spanish())">Switch graph language</button>
       </div>
       <vflow
         view="auto"
@@ -102,23 +102,23 @@ const SPANISH: Partial<AriaLabelConfig> = {
         [edges]="edges()"
         [ariaLabelConfig]="labels()"
         (deleteRequest)="onDeleteRequest($event)">
-        <ng-template let-ctx node>
+        <ng-template let-ctx vNode>
           @if (ctx.node.id === 'editor') {
-            <article vflowNode selectable class="editor" [vflowSelected]="ctx.selected() || ctx.preselected()">
-              <header vflowNodeHeader><span vflowTitle>Editor</span></header>
-              <div vflowField>
-                <span vflowPort handleType="target" position="left"></span>
-                <input vflowNoDrag aria-label="Node title" placeholder="Node title" />
+            <article vuiNode vSelectable class="editor" [vuiSelected]="ctx.selected() || ctx.preselected()">
+              <header vuiNodeHeader><span vuiTitle>Editor</span></header>
+              <div vuiField>
+                <span vuiPort handleType="target" position="left"></span>
+                <input vNoDrag aria-label="Node title" placeholder="Node title" />
               </div>
-              <footer vflowNodeFooter>
-                <button vflowButton vflowNoDrag type="button" (click)="removeEditor()">Remove editor</button>
+              <footer vuiNodeFooter>
+                <button vuiButton vNoDrag type="button" (click)="removeEditor()">Remove editor</button>
               </footer>
             </article>
           } @else {
             <docs-node [ctx]="ctx" />
           }
         </ng-template>
-        <ng-template let-ctx edge><svg:g docsEdge [ctx]="ctx" /></ng-template>
+        <ng-template let-ctx vEdge><svg:g docsEdge [ctx]="ctx" /></ng-template>
       </vflow>
       <dl class="mirror" aria-hidden="true">
         <dt>Screen reader hears</dt>

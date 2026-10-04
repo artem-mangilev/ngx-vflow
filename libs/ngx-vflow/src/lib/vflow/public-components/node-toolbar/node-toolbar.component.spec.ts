@@ -3,7 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { VflowComponent } from '../../components/vflow/vflow.component';
 import { createNode } from '../../interfaces/node.interface';
 import { Position } from '../../types/position.type';
-import { NodeToolbarComponent } from './node-toolbar.component';
+import { VflowNodeToolbarComponent } from './node-toolbar.component';
 
 const toolbarPosition = signal<Position | null>(null);
 
@@ -12,21 +12,21 @@ const toolbarPosition = signal<Position | null>(null);
   template: `<div class="box" style="width: 100px; height: 50px; position: relative">
     Node
     @if (toolbarPosition(); as position) {
-      <node-toolbar [position]="position"
+      <v-node-toolbar [position]="position"
         ><button class="tool" style="display: block; width: 30px; height: 20px; margin: 0; padding: 0; border: 0">
           Tool
-        </button></node-toolbar
+        </button></v-node-toolbar
       >
     }
   </div>`,
-  imports: [NodeToolbarComponent],
+  imports: [VflowNodeToolbarComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 class ToolbarNodeComponent {
   protected toolbarPosition = toolbarPosition;
 }
 
-describe('NodeToolbarComponent', () => {
+describe('VflowNodeToolbarComponent', () => {
   let fixture: ComponentFixture<VflowComponent>;
 
   beforeEach(async () => {
@@ -42,7 +42,7 @@ describe('NodeToolbarComponent', () => {
     await fixture.whenStable();
   });
 
-  const toolbar = () => fixture.nativeElement.querySelector('node-toolbar') as HTMLElement | null;
+  const toolbar = () => fixture.nativeElement.querySelector('v-node-toolbar') as HTMLElement | null;
   const box = () => (fixture.nativeElement.querySelector('.box') as HTMLElement).getBoundingClientRect();
 
   it('renders inside the node in the same change detection pass as the presentation that declares it', () => {
@@ -54,9 +54,9 @@ describe('NodeToolbarComponent', () => {
     const host = toolbar();
     expect(host).not.toBeNull();
     expect(host!.querySelector('.tool')).not.toBeNull();
-    expect(fixture.nativeElement.querySelector('.vflow-node')!.contains(host)).toBeTrue();
+    expect(fixture.nativeElement.querySelector('.v-node')!.contains(host)).toBeTrue();
     // Gestures inside the toolbar must not drag the node.
-    expect(host!.hasAttribute('data-vflow-no-drag')).toBeTrue();
+    expect(host!.hasAttribute('data-v-no-drag')).toBeTrue();
 
     toolbarPosition.set(null);
     fixture.detectChanges();

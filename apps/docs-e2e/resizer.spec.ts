@@ -11,7 +11,7 @@ async function box(locator: Locator) {
 
 function zoomOf(node: Locator) {
   return node.evaluate((element) => {
-    const viewport = element.closest<HTMLElement>('.vflow-viewport')!;
+    const viewport = element.closest<HTMLElement>('.v-viewport')!;
     return new DOMMatrixReadOnly(viewport.style.transform).a;
   });
 }
@@ -22,8 +22,8 @@ function offsetSize(element: Locator) {
 
 async function expectOutline(node: Locator, card: Locator) {
   const cardBox = await box(card);
-  const top = await box(node.locator('.resize-control.line.top'));
-  const left = await box(node.locator('.resize-control.line.left'));
+  const top = await box(node.locator('.v-resize-control.v-resize-control--line.v-resize-control--top'));
+  const left = await box(node.locator('.v-resize-control.v-resize-control--line.v-resize-control--left'));
 
   expect(Math.abs(top.x - cardBox.x)).toBeLessThanOrEqual(TOLERANCE);
   expect(Math.abs(top.width - cardBox.width)).toBeLessThanOrEqual(TOLERANCE);
@@ -33,7 +33,7 @@ async function expectOutline(node: Locator, card: Locator) {
 
 /** Distance between the right handle's center and the card's right edge, in screen pixels. */
 async function rightHandleOffset(node: Locator, card: Locator) {
-  const handle = await box(node.locator('.vflow-handle[data-vflow-handle-position="right"]').first());
+  const handle = await box(node.locator('.v-handle[data-v-handle-position="right"]').first());
   return Math.abs(handle.centerX - (await box(card)).right);
 }
 
@@ -59,12 +59,12 @@ test.describe('overview resizer', () => {
 
   test.beforeEach(async ({ page }) => {
     await page.goto('/introduction/overview');
-    node = page.locator('.vflow-node[aria-label="Node transform"]');
+    node = page.locator('.v-node[aria-label="Node transform"]');
     card = node.locator('.transform-node');
     await node.scrollIntoViewIfNeeded();
     await expect(node).toHaveCSS('visibility', 'visible');
     await card.click();
-    await expect(node.locator('.resize-control')).toHaveCount(8);
+    await expect(node.locator('.v-resize-control')).toHaveCount(8);
   });
 
   test('outlines a content-sized node and places its handles on the card edges', async () => {
@@ -74,12 +74,17 @@ test.describe('overview resizer', () => {
   });
 
   test('grows the node, its handles and the reported size by the dragged distance', async ({ page }) => {
-    const output = page.locator('.vflow-node[aria-label="Node output-size"]');
+    const output = page.locator('.v-node[aria-label="Node output-size"]');
     const zoom = await zoomOf(node);
     const before = await offsetSize(card);
     await expect.poll(() => reportedSize(output)).toEqual(before);
 
-    await dragControl(page, node.locator('.resize-control.handle.bottom.right'), 80, 60);
+    await dragControl(
+      page,
+      node.locator('.v-resize-control.v-resize-control--handle.v-resize-control--bottom.v-resize-control--right'),
+      80,
+      60,
+    );
 
     await expect(card).toHaveAttribute('style', /width: \d+px/);
     const after = await offsetSize(card);
@@ -93,12 +98,14 @@ test.describe('overview resizer', () => {
 
 test('resizer demo keeps a node at its CSS min-width while shrinking', async ({ page }) => {
   await page.goto('/nodes/resizer');
-  const node = page.locator('.vflow-node', { has: page.locator('.custom-node') }).first();
+  const node = page.locator('.v-node', { has: page.locator('.custom-node') }).first();
   const card = node.locator('.custom-node');
-  const corner = node.locator('.resize-control.handle.bottom.right');
+  const corner = node.locator(
+    '.v-resize-control.v-resize-control--handle.v-resize-control--bottom.v-resize-control--right',
+  );
   await node.scrollIntoViewIfNeeded();
   await expect(node).toHaveCSS('visibility', 'visible');
-  await expect(node.locator('.resize-control')).toHaveCount(8);
+  await expect(node.locator('.v-resize-control')).toHaveCount(8);
 
   await expect(card).not.toHaveAttribute('style', /width/);
   await expectOutline(node, card);

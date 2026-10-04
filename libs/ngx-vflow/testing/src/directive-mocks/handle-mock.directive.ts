@@ -5,12 +5,12 @@ import { AsInterface } from '../types';
 
 /** Accepts the handle inputs and stands in for the handle directive in DI; its state stays `idle`. */
 @Directive({
-  selector: '[vflowHandle]',
-  exportAs: 'vflowHandle',
+  selector: '[vHandle]',
+  exportAs: 'vHandle',
   standalone: true,
-  providers: [{ provide: VflowHandleDirective, useExisting: forwardRef(() => HandleMockDirective) }],
+  providers: [{ provide: VflowHandleDirective, useExisting: forwardRef(() => VflowHandleMockDirective) }],
 })
-export class HandleMockDirective implements AsInterface<VflowHandleDirective> {
+export class VflowHandleMockDirective implements AsInterface<VflowHandleDirective> {
   public readonly handleType = input<HandleType>('source');
   public readonly position = input<HandlePosition>('top');
   public readonly handleId = input<string>();

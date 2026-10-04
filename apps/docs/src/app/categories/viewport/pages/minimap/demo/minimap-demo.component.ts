@@ -1,27 +1,27 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { DocsPresentations } from '@docs/shared';
-import { VflowPort } from '@vflow/ui';
+import { VuiPort } from '@vflow/ui';
 import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
 
 @Component({
   template: `<vflow view="auto" [nodes]="nodes" [edges]="edges">
-    <ng-template let-ctx node>
+    <ng-template let-ctx vNode>
       @if (ctx.data().type === 'group') {
         <div
-          selectable
+          vSelectable
           class="group-node"
           [class.group-node_selected]="ctx.selected()"
           [style.width.px]="ctx.width()"
           [style.height.px]="ctx.height()">
-          <span vflowPort handleType="source" position="right"></span>
+          <span vuiPort handleType="source" position="right"></span>
         </div>
       } @else {
         <docs-node [ctx]="ctx" />
       }
     </ng-template>
-    <ng-template let-ctx edge><svg:g docsEdge [ctx]="ctx" /></ng-template>
+    <ng-template let-ctx vEdge><svg:g docsEdge [ctx]="ctx" /></ng-template>
 
-    <mini-map [pannable]="true" [zoomable]="true" />
+    <v-minimap [pannable]="true" [zoomable]="true" />
   </vflow>`,
   styles: [
     `
@@ -43,7 +43,7 @@ import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
     `,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DocsPresentations, Vflow, VflowPort],
+  imports: [DocsPresentations, Vflow, VuiPort],
 })
 export class MinimapDemoComponent {
   public nodes: Node[] = createNodes([

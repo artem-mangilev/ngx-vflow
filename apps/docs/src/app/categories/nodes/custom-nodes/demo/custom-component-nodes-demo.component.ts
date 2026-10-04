@@ -7,8 +7,8 @@ import { RedSquareNodeComponent, RedSquareData } from './components/red-square-n
 
 @Component({
   template: `<vflow view="auto" [nodes]="nodes" [edges]="edges" (componentNodeEvent)="handleComponentEvent($event)">
-    <ng-template let-ctx node><docs-node [ctx]="ctx" /></ng-template>
-    <ng-template let-ctx edge><svg:g docsEdge [ctx]="ctx" /></ng-template>
+    <ng-template let-ctx vNode><docs-node [ctx]="ctx" /></ng-template>
+    <ng-template let-ctx vEdge><svg:g docsEdge [ctx]="ctx" /></ng-template>
   </vflow>`,
   styles: [
     `
