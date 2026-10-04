@@ -5,7 +5,7 @@ import { FlowEntitiesService } from '../services/flow-entities.service';
 import { FlowSettingsService } from '../services/flow-settings.service';
 import { NodeRenderingService } from '../services/node-rendering.service';
 import { ViewportService } from '../services/viewport.service';
-import { ChangeDetectionStrategy, Component, provideZonelessChangeDetection, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 
 @Component({ template: '', changeDetection: ChangeDetectionStrategy.OnPush })
 class ProbeNodeComponent {}
@@ -17,13 +17,7 @@ describe('NodeModel', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [
-        FlowEntitiesService,
-        FlowSettingsService,
-        NodeRenderingService,
-        ViewportService,
-        provideZonelessChangeDetection(),
-      ],
+      providers: [FlowEntitiesService, FlowSettingsService, NodeRenderingService, ViewportService],
     });
 
     model = TestBed.runInInjectionContext(
@@ -155,15 +149,15 @@ describe('NodeModel', () => {
     it('selects through the application signal, which wins over the selection held by the model', () => {
       const { node, model } = make('c');
       model.selected.set(true);
-      expect(model.selected()).toBeTrue();
+      expect(model.selected()).toBe(true);
 
       node.selected = signal(false);
       passNewArray();
-      expect(model.selected()).toBeFalse();
-      expect(model.context.$implicit.selected()).toBeFalse();
+      expect(model.selected()).toBe(false);
+      expect(model.context.$implicit.selected()).toBe(false);
 
       model.selected.set(true);
-      expect(node.selected()).toBeTrue();
+      expect(node.selected()).toBe(true);
     });
 
     it('reads the capabilities, the extent and the data', () => {
@@ -245,14 +239,14 @@ describe('NodeModel', () => {
   });
 
   it('should resolve selection and focus defaults reactively', () => {
-    expect(model.selectable()).toBeTrue();
-    expect(model.focusable()).toBeTrue();
+    expect(model.selectable()).toBe(true);
+    expect(model.focusable()).toBe(true);
 
     settingsService.nodesSelectable.set(false);
     settingsService.nodesFocusable.set(false);
 
-    expect(model.selectable()).toBeFalse();
-    expect(model.focusable()).toBeFalse();
+    expect(model.selectable()).toBe(false);
+    expect(model.focusable()).toBe(false);
   });
 
   it('should let explicit capability overrides win over global settings', () => {
@@ -267,8 +261,8 @@ describe('NodeModel', () => {
     settingsService.nodesSelectable.set(true);
     settingsService.nodesFocusable.set(false);
 
-    expect(explicitModel.selectable()).toBeFalse();
-    expect(explicitModel.focusable()).toBeTrue();
+    expect(explicitModel.selectable()).toBe(false);
+    expect(explicitModel.focusable()).toBe(true);
   });
 
   it('should keep inherited capabilities absent when factories materialize defaults', () => {
@@ -309,7 +303,7 @@ describe('NodeModel', () => {
         () => new NodeModel(createNode({ id: 'c', component, point: { x: 5000, y: 5000 } })),
       );
 
-    expect(make(ProbeNodeComponent).shouldLoad()).toBeTrue();
-    expect(make(() => Promise.resolve(ProbeNodeComponent)).shouldLoad()).toBeFalse();
+    expect(make(ProbeNodeComponent).shouldLoad()).toBe(true);
+    expect(make(() => Promise.resolve(ProbeNodeComponent)).shouldLoad()).toBe(false);
   });
 });

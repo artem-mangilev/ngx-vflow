@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, provideZonelessChangeDetection, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal, viewChild } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Vflow } from '../../vflow';
 import { VflowMinimapComponent } from './minimap.component';
@@ -42,16 +42,15 @@ describe('minimap navigation through the public viewport API', () => {
   }
 
   beforeEach(async () => {
-    TestBed.configureTestingModule({ providers: [provideZonelessChangeDetection()] });
     fixture = TestBed.createComponent(MinimapHostComponent);
     host = fixture.componentInstance;
     await settle();
     flow = host.flow();
     canvas = fixture.nativeElement.querySelector('canvas');
     // Synthetic pointer events cannot acquire native capture; real capture is covered by Playwright.
-    spyOn(canvas, 'setPointerCapture');
-    spyOn(canvas, 'hasPointerCapture').and.returnValue(true);
-    spyOn(canvas, 'releasePointerCapture');
+    vi.spyOn(canvas, 'setPointerCapture');
+    vi.spyOn(canvas, 'hasPointerCapture').mockReturnValue(true);
+    vi.spyOn(canvas, 'releasePointerCapture');
   });
 
   afterEach(() => window.dispatchEvent(new Event('blur')));
@@ -97,14 +96,14 @@ describe('minimap navigation through the public viewport API', () => {
     await click();
     // Nested group bounds are [10000,-5000,800,400], not child-local coordinates.
     expect(flow.viewport()).toEqual({ x: -10200, y: 4950, zoom: 1 });
-    expect(host.nodes[0].selected()).toBeTrue();
+    expect(host.nodes[0].selected()).toBe(true);
   });
 
   it('centers clicks at non-unit zoom and after resizing without redrawing cached nodes on navigation', async () => {
     host.pannable.set(true);
     flow.setViewport({ x: 0, y: 0, zoom: 1.5 });
     await settle();
-    const draw = spyOn(CanvasRenderingContext2D.prototype, 'roundRect').and.callThrough();
+    const draw = vi.spyOn(CanvasRenderingContext2D.prototype, 'roundRect');
     await click(60, 40);
     expect(flow.viewport()).toEqual({ x: -15700, y: 7200, zoom: 1.5 });
     expect(draw).not.toHaveBeenCalled();
@@ -173,7 +172,7 @@ describe('minimap navigation through the public viewport API', () => {
     host.step.set(1);
     flow.setViewport({ x: -10200, y: 4950, zoom: 1 });
     await settle();
-    expect((await wheel()).defaultPrevented).toBeTrue();
+    expect((await wheel()).defaultPrevented).toBe(true);
     expect(flow.viewport()).toEqual({ x: -20600, y: 9750, zoom: 2 });
     await wheel();
     expect(flow.viewport().zoom).toBe(2);

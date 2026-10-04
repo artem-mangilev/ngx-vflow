@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Input, ViewChild, provideZonelessChangeDetection } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, ViewChild } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { animationFrameScheduler } from 'rxjs';
 import { AutoPanSettings } from '../../interfaces/auto-pan-settings.interface';
@@ -43,17 +43,16 @@ describe('public auto-pan settings', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [AutoPanHostComponent],
-      providers: [provideZonelessChangeDetection()],
     });
     frames = new Map();
     now = 0;
     nextId = 0;
-    spyOn(animationFrameScheduler, 'now').and.callFake(() => now);
-    spyOn(window, 'requestAnimationFrame').and.callFake((callback) => {
+    vi.spyOn(animationFrameScheduler, 'now').mockImplementation(() => now);
+    vi.spyOn(window, 'requestAnimationFrame').mockImplementation((callback) => {
       frames.set(++nextId, callback);
       return nextId;
     });
-    spyOn(window, 'cancelAnimationFrame').and.callFake((id) => frames.delete(id));
+    vi.spyOn(window, 'cancelAnimationFrame').mockImplementation((id) => frames.delete(id));
   });
 
   afterEach(() => {
@@ -132,7 +131,7 @@ describe('public auto-pan settings', () => {
   for (const field of ['speed', 'margin']) {
     for (const value of [-1, NaN, Infinity, -Infinity]) {
       it(`falls back and warns for invalid ${field}: ${value}`, async () => {
-        const warn = spyOn(console, 'warn');
+        const warn = vi.spyOn(console, 'warn');
         await setup({ [field]: value });
         drag(24);
         await frame(100);
@@ -230,7 +229,6 @@ describe('auto-pan with real browser frames', () => {
   it('moves stationary neighbouring nodes in one direction while a node is held at the left edge', async () => {
     TestBed.configureTestingModule({
       imports: [AutoPanHostComponent],
-      providers: [provideZonelessChangeDetection()],
     });
     const fixture = TestBed.createComponent(AutoPanHostComponent);
     fixture.componentRef.setInput('nodes', [
@@ -262,8 +260,6 @@ describe('auto-pan with real browser frames', () => {
     }
     const reversals = positions.slice(1).filter((x, i) => x < positions[i] - 0.1);
     expect(positions.at(-1)! - positions[0]).toBeGreaterThan(100);
-    expect(reversals)
-      .withContext(`Neighbour reversed ${reversals.length} times: ${positions.join(', ')}`)
-      .toEqual([]);
+    expect(reversals, `Neighbour reversed ${reversals.length} times: ${positions.join(', ')}`).toEqual([]);
   });
 });

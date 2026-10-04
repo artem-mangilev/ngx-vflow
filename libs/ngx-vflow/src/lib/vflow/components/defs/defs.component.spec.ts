@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, provideZonelessChangeDetection, signal } from '@angular/core';
+import type { MockInstance } from 'vitest';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { VflowComponent } from '../vflow/vflow.component';
 import { createNodes } from '../../interfaces/node.interface';
@@ -53,7 +54,7 @@ class HostComponent {
 describe('Flow defs', () => {
   let fixture: ComponentFixture<HostComponent>;
   let root: HTMLElement;
-  let warn: jasmine.Spy;
+  let warn: MockInstance<typeof console.warn>;
 
   function markerOf(url: string | null): SVGMarkerElement {
     const id = /^url\(#(.+)\)$/.exec(url ?? '')![1];
@@ -67,8 +68,7 @@ describe('Flow defs', () => {
   }
 
   beforeEach(async () => {
-    warn = spyOn(console, 'warn');
-    TestBed.configureTestingModule({ providers: [provideZonelessChangeDetection()] });
+    warn = vi.spyOn(console, 'warn');
     fixture = TestBed.createComponent(HostComponent);
     root = fixture.nativeElement;
     await settle();
@@ -116,10 +116,10 @@ describe('Flow defs', () => {
 
     expect(hexagon.children.length).toBe(0);
     expect(hexagon.getAttribute('refX')).toBe('0');
-    expect(warn).toHaveBeenCalledWith(jasmine.stringContaining('Marker type "hexagon" is not built in'));
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('Marker type "hexagon" is not built in'));
 
     // Another marker of the same type is a new marker element, not a new type to report.
-    const reported = warn.calls.count();
+    const reported = warn.mock.calls.length;
     fixture.componentInstance.edges.update((edges) => [
       ...edges,
       ...createEdges([{ id: 'wide', source: 'b', target: 'a', markers: { end: { type: 'hexagon', width: 40 } } }]),
@@ -127,6 +127,6 @@ describe('Flow defs', () => {
     await settle();
 
     expect(root.querySelectorAll('defs[flowDefs] marker.v-marker--hexagon').length).toBe(2);
-    expect(warn.calls.count()).toBe(reported);
+    expect(warn.mock.calls.length).toBe(reported);
   });
 });

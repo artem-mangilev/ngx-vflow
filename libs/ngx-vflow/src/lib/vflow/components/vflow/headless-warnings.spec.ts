@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, provideZonelessChangeDetection, signal } from '@angular/core';
+import type { MockInstance } from 'vitest';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { createNodes } from '../../interfaces/node.interface';
 import { Edge, createEdges } from '../../interfaces/edge.interface';
@@ -83,10 +84,9 @@ class SelectableEdgeHostComponent {
 }
 
 describe('headless dev warnings', () => {
-  let warn: jasmine.Spy;
+  let warn: MockInstance<typeof console.warn>;
 
   async function render<T>(host: new () => T, setup?: (instance: T) => void) {
-    TestBed.configureTestingModule({ providers: [provideZonelessChangeDetection()] });
     const fixture = TestBed.createComponent(host);
     setup?.(fixture.componentInstance);
     await settle(fixture);
@@ -99,10 +99,10 @@ describe('headless dev warnings', () => {
     await fixture.whenStable();
   }
 
-  const warnings = (text: string) => warn.calls.allArgs().filter(([message]) => String(message).includes(text));
+  const warnings = (text: string) => warn.mock.calls.filter(([message]) => String(message).includes(text));
 
   beforeEach(() => {
-    warn = spyOn(console, 'warn');
+    warn = vi.spyOn(console, 'warn');
   });
 
   describe('edge without a presentation', () => {

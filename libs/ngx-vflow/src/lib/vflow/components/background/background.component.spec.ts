@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, provideZonelessChangeDetection, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { VflowComponent } from '../vflow/vflow.component';
 import { Background } from '../../types/background.type';
@@ -14,7 +14,6 @@ class BackgroundHostComponent {
 
 describe('Background pattern', () => {
   function render(background: Background) {
-    TestBed.configureTestingModule({ providers: [provideZonelessChangeDetection()] });
     const fixture = TestBed.createComponent(BackgroundHostComponent);
     fixture.componentInstance.background.set(background);
     fixture.detectChanges();

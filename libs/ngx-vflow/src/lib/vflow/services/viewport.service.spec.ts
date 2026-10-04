@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { provideZonelessChangeDetection } from '@angular/core';
+
 import { ViewportChange, ViewportState } from '../interfaces/viewport.interface';
 import { FlowEntitiesService } from './flow-entities.service';
 import { FlowSettingsService } from './flow-settings.service';
@@ -12,7 +12,7 @@ describe('ViewportService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [FlowEntitiesService, FlowSettingsService, ViewportService, provideZonelessChangeDetection()],
+      providers: [FlowEntitiesService, FlowSettingsService, ViewportService],
     });
     service = TestBed.inject(ViewportService);
   });
@@ -46,12 +46,12 @@ describe('ViewportService', () => {
 
   it('settles a change with what the pane reports, and a change that never applied with false', async () => {
     service.connect((change) => change.done(true));
-    expect(await service.change({ zoom: 2 })).toBeTrue();
+    expect(await service.change({ zoom: 2 })).toBe(true);
 
     const disconnect = service.connect(() => undefined);
     disconnect();
     const pending = service.change({ zoom: 3 });
     TestBed.resetTestingModule();
-    expect(await pending).toBeFalse();
+    expect(await pending).toBe(false);
   });
 });

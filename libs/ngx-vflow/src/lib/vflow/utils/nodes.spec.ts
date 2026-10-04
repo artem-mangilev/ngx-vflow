@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { provideZonelessChangeDetection } from '@angular/core';
+
 import { createNode } from '../interfaces/node.interface';
 import { NodeModel } from '../models/node.model';
 import { FlowEntitiesService } from '../services/flow-entities.service';
@@ -11,13 +11,7 @@ import { getIntersectingNodes, getNodesAtPoint, getNodesBounds, getNodesFlowBoun
 describe('nodes utils', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [
-        FlowEntitiesService,
-        FlowSettingsService,
-        NodeRenderingService,
-        ViewportService,
-        provideZonelessChangeDetection(),
-      ],
+      providers: [FlowEntitiesService, FlowSettingsService, NodeRenderingService, ViewportService],
     });
   });
 

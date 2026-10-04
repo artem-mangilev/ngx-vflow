@@ -27,11 +27,11 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npx prettier . --check
-      - run: npm test -- --watch=false --browsers=ChromeHeadless
+      - run: npx playwright install --with-deps chromium
+      - run: npm test
       - run: npm run build:dev
       - run: npm run build
       - run: npm run release:dry-run
-      - run: npx playwright install --with-deps chromium
       - run: npm run e2e
       - name: Check the design system in production
         run: npm run e2e -- --grep "NgDoc uses"

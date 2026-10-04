@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, ViewChild } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideZonelessChangeDetection } from '@angular/core';
+
 import { createNode as createRawNode } from '../interfaces/node.interface';
 import { NodeModel } from '../models/node.model';
 import { FlowEntitiesService } from '../services/flow-entities.service';
@@ -46,7 +46,6 @@ describe('SelectionBoxContextDirective', () => {
         { provide: KeyboardService, useValue: { isActiveModifier: () => selectionShortcutActive } },
         NodeRenderingService,
         ViewportService,
-        provideZonelessChangeDetection(),
       ],
     });
 
@@ -90,13 +89,13 @@ describe('SelectionBoxContextDirective', () => {
 
     selectionShortcutActive = false;
     await startSelectionBox();
-    expect(fixture.componentInstance.context.model.active()).toBeFalse();
+    expect(fixture.componentInstance.context.model.active()).toBe(false);
 
     selectionShortcutActive = true;
     settingsService.selectionMode.set('manual');
     await startSelectionBox();
-    expect(fixture.componentInstance.context.model.active()).toBeFalse();
-    expect(node.selected()).toBeTrue();
+    expect(fixture.componentInstance.context.model.active()).toBe(false);
+    expect(node.selected()).toBe(true);
   });
 
   it('should preselect and apply only eligible nodes', async () => {
@@ -105,20 +104,20 @@ describe('SelectionBoxContextDirective', () => {
     entitiesService.nodes.set([ineligible, eligible]);
 
     await startSelectionBox();
-    expect(fixture.componentInstance.context.model.active()).toBeTrue();
+    expect(fixture.componentInstance.context.model.active()).toBe(true);
     dispatchPointer(document, 'pointermove', { x: 20, y: 20 });
 
     expect(fixture.componentInstance.context.model.width()).toBeGreaterThan(2);
-    expect(eligible.selectable()).toBeTrue();
+    expect(eligible.selectable()).toBe(true);
     expect(eligible.width()).toBe(10);
-    expect(ineligible.preselected()).toBeFalse();
-    expect(eligible.preselected()).toBeTrue();
+    expect(ineligible.preselected()).toBe(false);
+    expect(eligible.preselected()).toBe(true);
 
     eligible.rawNode.selectable!.set(false);
 
     dispatchPointer(document, 'pointerup', { x: 120, y: 120 });
 
-    expect(ineligible.selected()).toBeFalse();
-    expect(eligible.selected()).toBeTrue();
+    expect(ineligible.selected()).toBe(false);
+    expect(eligible.selected()).toBe(true);
   });
 });

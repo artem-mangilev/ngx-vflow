@@ -1,4 +1,4 @@
-import { provideZonelessChangeDetection, signal } from '@angular/core';
+import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { Node } from 'ngx-vflow';
 import { DragAndDropNodesDemoComponent } from './drag-and-drop-nodes-demo.component';
@@ -7,7 +7,6 @@ describe('DragAndDropNodesDemoComponent', () => {
   it('detaches a node in place and immediately exposes attach', async () => {
     await TestBed.configureTestingModule({
       imports: [DragAndDropNodesDemoComponent],
-      providers: [provideZonelessChangeDetection()],
     }).compileComponents();
     const component = TestBed.createComponent(DragAndDropNodesDemoComponent).componentInstance;
     const parent: Node = {

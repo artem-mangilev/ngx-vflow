@@ -1,10 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  provideZonelessChangeDetection,
-  signal,
-  WritableSignal,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal, WritableSignal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { FlowEntitiesService } from './services/flow-entities.service';
 import { FlowSettingsService } from './services/flow-settings.service';
@@ -63,7 +57,6 @@ describe('Graph rendering and interaction regressions', () => {
   beforeEach(() =>
     TestBed.configureTestingModule({
       providers: [
-        provideZonelessChangeDetection(),
         FlowEntitiesService,
         FlowSettingsService,
         NodeRenderingService,
@@ -150,7 +143,7 @@ describe('Graph rendering and interaction regressions', () => {
     edges[0].selected.set(true);
     TestBed.flushEffects();
     await settle();
-    expect(events).toContain({ type: 'select', id: '0', selected: true });
+    expect(events).toContainEqual({ type: 'select', id: '0', selected: true });
     sub.unsubscribe();
   });
 
@@ -164,8 +157,8 @@ describe('Graph rendering and interaction regressions', () => {
     nodes[0].handles.set([]);
     TestBed.flushEffects();
     await settle();
-    expect(edges[0].detached()).toBeTrue();
-    expect(events).toContain({ type: 'detached', id: '0' });
+    expect(edges[0].detached()).toBe(true);
+    expect(events).toContainEqual({ type: 'detached', id: '0' });
     sub.unsubscribe();
   });
 
@@ -173,7 +166,7 @@ describe('Graph rendering and interaction regressions', () => {
     const { nodes, edges } = graph();
     expect(edges[0].path().path).not.toBe('');
     nodes[0].handles.set([]);
-    expect(edges[0].detached()).toBeTrue();
+    expect(edges[0].detached()).toBe(true);
     expect(edges[0].path().path).toBe('');
   });
 
@@ -187,11 +180,11 @@ describe('Graph rendering and interaction regressions', () => {
     TestBed.inject(ViewportCullingDirective);
     TestBed.flushEffects();
     expect(TestBed.inject(NodeRenderingService).viewportNodes()).toEqual(nodes);
-    expect(edges[0].culled()).toBeFalse();
+    expect(edges[0].culled()).toBe(false);
     nodes.forEach((n) => n.point.set({ x: 100000, y: 100000 }));
     TestBed.flushEffects();
     expect(TestBed.inject(NodeRenderingService).viewportNodes()).toEqual([]);
-    expect(edges[0].culled()).toBeTrue();
+    expect(edges[0].culled()).toBe(true);
   });
 
   it('keeps crossing paths with offscreen endpoints at every zoom', () => {
@@ -205,20 +198,20 @@ describe('Graph rendering and interaction regressions', () => {
     const culling = TestBed.inject(ViewportCullingDirective);
     const viewport = TestBed.inject(ViewportService).readableViewport;
     TestBed.flushEffects();
-    expect(edges[0].culled()).toBeFalse();
-    expect(edges[0].detached()).toBeFalse();
+    expect(edges[0].culled()).toBe(false);
+    expect(edges[0].detached()).toBe(false);
     // A bare viewport write has no gesture end, which is when entities that left the viewport are reported.
     viewport.set({ x: 0, y: 1000, zoom: 1 });
     culling.sync();
-    expect(edges[0].culled()).toBeTrue();
+    expect(edges[0].culled()).toBe(true);
     viewport.set({ x: 0, y: 0, zoom: 1 });
     TestBed.flushEffects();
-    expect(edges[0].culled()).toBeFalse();
+    expect(edges[0].culled()).toBe(false);
     viewport.set({ x: 0, y: 0, zoom: 0.1 });
     TestBed.flushEffects();
-    expect(edges[0].culled()).toBeFalse();
+    expect(edges[0].culled()).toBe(false);
     nodes[0].handles.set([]);
-    expect(edges[0].detached()).toBeTrue();
+    expect(edges[0].detached()).toBe(true);
   });
 
   it('retains actual node views and edges while panning without detached notifications', async () => {
@@ -250,14 +243,14 @@ describe('Graph rendering and interaction regressions', () => {
       Array.from(host.querySelectorAll('.v-node, svg[edge]')).every(
         (element) => getComputedStyle(element).display === 'none',
       ),
-    ).toBeTrue();
+    ).toBe(true);
     fixture.componentInstance.setViewport({ ...fixture.componentInstance.viewport(), x: 0, y: 0 });
     fixture.detectChanges();
     await fixture.whenStable();
     await settle();
     expect(host.querySelectorAll('.v-node').length).toBe(2);
     expect(host.querySelectorAll('svg[edge]').length).toBe(1);
-    expect(events).not.toContain({ type: 'detached', id: 'a-b' });
+    expect(events).not.toContainEqual({ type: 'detached', id: 'a-b' });
     subscription.unsubscribe();
   });
 
@@ -271,10 +264,10 @@ describe('Graph rendering and interaction regressions', () => {
     edges[0].edge.curve!.set(() => ({ path: 'M -1000,-1000 Q 2000,1500 -900,-1000' }));
     TestBed.inject(ViewportCullingDirective);
     TestBed.flushEffects();
-    expect(edges[0].culled()).toBeFalse();
+    expect(edges[0].culled()).toBe(false);
     edges[0].edge.curve!.set(() => ({ path: 'M -1000,-1000 l 100,0' }));
     TestBed.flushEffects();
-    expect(edges[0].culled()).toBeTrue();
+    expect(edges[0].culled()).toBe(true);
   });
 
   for (const offscreenIndex of [0, 1]) {
@@ -287,11 +280,11 @@ describe('Graph rendering and interaction regressions', () => {
       const path = edge.path().path;
       expect(path).not.toBe('');
       nodes[offscreenIndex].point.set({ x: -1000, y: 0 });
-      expect(edge.detached()).toBeFalse();
+      expect(edge.detached()).toBe(false);
       expect(edge.path().path).not.toBe('');
       expect(edge.path().path).not.toBe(path);
       nodes[offscreenIndex].handles.set([]);
-      expect(edge.detached()).toBeTrue();
+      expect(edge.detached()).toBe(true);
       expect(edge.path().path).toBe('');
     });
   }
@@ -346,7 +339,7 @@ describe('Graph rendering and interaction regressions', () => {
     const { nodes, edges } = graph();
     const source = nodes[0].handles()[0];
     const target = nodes[1].handles()[0];
-    const validator = jasmine.createSpy('application validator').and.returnValue(true);
+    const validator = vi.fn().mockReturnValue(true);
     TestBed.inject(FlowEntitiesService).connection.set(new ConnectionModel({ validator }));
     const requests: unknown[] = [];
     controller.connect.subscribe((value) => requests.push(value));
@@ -355,7 +348,7 @@ describe('Graph rendering and interaction regressions', () => {
     TestBed.flushEffects();
     controller.validateConnection(target);
     TestBed.flushEffects();
-    validator.calls.reset();
+    validator.mockClear();
     controller.endConnection();
     TestBed.flushEffects();
     expect(validator).toHaveBeenCalledTimes(1);
@@ -374,7 +367,7 @@ describe('Graph rendering and interaction regressions', () => {
     const model = node('resize');
     const element = document.createElement('div');
     document.body.append(element);
-    const end = jasmine.createSpy('resizeEnd');
+    const end = vi.fn();
     const resizer = createResizer({
       domNode: element,
       getStoreItems: () => ({
@@ -408,7 +401,7 @@ describe('Graph rendering and interaction regressions', () => {
     window.dispatchEvent(mouse('mousemove', 120));
     window.dispatchEvent(mouse('mouseup', 120));
     expect(model.width()).toBe(110);
-    expect(end.calls.mostRecent().args[1].width).toBe(110);
+    expect(end.mock.lastCall![1].width).toBe(110);
     resizer.destroy();
     element.remove();
   });
@@ -459,7 +452,7 @@ describe('Graph rendering and interaction regressions', () => {
 
   it('stops observing a model after the node is removed from the graph', () => {
     const point = signal({ x: 0, y: 0 });
-    const read = jasmine.createSpy('removed node point').and.callFake(() => point());
+    const read = vi.fn(() => point());
     const observedPoint = Object.assign(read, point);
     const raw: Node = { id: 'removed', point: observedPoint };
     const entities = TestBed.inject(FlowEntitiesService);
@@ -467,7 +460,7 @@ describe('Graph rendering and interaction regressions', () => {
     TestBed.flushEffects();
     entities.nodes.set(TestBed.runInInjectionContext(() => ReferenceIdentityChecker.nodes([], entities.nodes())));
     TestBed.flushEffects();
-    read.calls.reset();
+    read.mockClear();
     point.set({ x: 5, y: 0 });
     TestBed.flushEffects();
     expect(read).not.toHaveBeenCalled();

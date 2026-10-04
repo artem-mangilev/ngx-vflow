@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, provideZonelessChangeDetection, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal, viewChild } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { Node, createNodes } from '../../interfaces/node.interface';
 import { Vflow } from '../../vflow';
@@ -90,7 +90,6 @@ describe('VflowComponent', () => {
     async function createFixture() {
       TestBed.configureTestingModule({
         imports: [NodeRectHostComponent],
-        providers: [provideZonelessChangeDetection()],
       });
       const fixture = TestBed.createComponent(NodeRectHostComponent);
       await settle(fixture);
@@ -136,7 +135,6 @@ describe('VflowComponent', () => {
   it('reads a size signal added to a node object once the same object comes in a new array', async () => {
     TestBed.configureTestingModule({
       imports: [LateSignalHostComponent],
-      providers: [provideZonelessChangeDetection()],
     });
     const fixture = TestBed.createComponent(LateSignalHostComponent);
     await settle(fixture);
@@ -160,7 +158,6 @@ describe('VflowComponent', () => {
   it('returns shallow node copies with snapshot node-space points in topmost-first order', async () => {
     TestBed.configureTestingModule({
       imports: [VflowTestHostComponent],
-      providers: [provideZonelessChangeDetection()],
     });
     const fixture = TestBed.createComponent(VflowTestHostComponent);
     fixture.detectChanges();
@@ -170,7 +167,7 @@ describe('VflowComponent', () => {
     const hits = fixture.componentInstance.vflow().getNodesAtPoint({ x: 115, y: 125 });
 
     expect(hits.map(({ id }) => id)).toEqual(['child', 'parent']);
-    expect(hits[0] === child).toBeFalse();
+    expect(hits[0] === child).toBe(false);
     expect(hits[0].point).toBe(child.point);
     expect(hits[0].parentId).toBe(child.parentId);
     expect(hits[0].nodeSpacePoint).toEqual({ x: 5, y: 5 });

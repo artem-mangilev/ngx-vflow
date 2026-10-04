@@ -1,11 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  provideZonelessChangeDetection,
-  reflectComponentType,
-  signal,
-  viewChild,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, reflectComponentType, signal, viewChild } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { VflowResizableMockComponent } from 'ngx-vflow/testing';
@@ -111,7 +104,6 @@ async function settle(fixture: ComponentFixture<unknown>) {
 async function createSizeTargetFixture(options: { withResizable?: boolean; nodes?: Node[] } = {}) {
   TestBed.configureTestingModule({
     imports: [SizeTargetHostComponent],
-    providers: [provideZonelessChangeDetection()],
   });
 
   const fixture = TestBed.createComponent(SizeTargetHostComponent);
@@ -157,7 +149,6 @@ function expectCloseTo(actual: number, expected: number) {
 async function createFixture(useCustomGap = true) {
   TestBed.configureTestingModule({
     imports: [ResizableTestHostComponent],
-    providers: [provideZonelessChangeDetection()],
   });
 
   const fixture = TestBed.createComponent(ResizableTestHostComponent);
@@ -173,8 +164,8 @@ describe('VflowResizableComponent', () => {
     const productionInputs = reflectComponentType(VflowResizableComponent)?.inputs;
     const testingInputs = reflectComponentType(VflowResizableMockComponent)?.inputs;
 
-    expect(productionInputs).toContain(jasmine.objectContaining({ propName: 'gap', templateName: 'gap' }));
-    expect(testingInputs).toContain(jasmine.objectContaining({ propName: 'gap', templateName: 'gap' }));
+    expect(productionInputs).toContainEqual(expect.objectContaining({ propName: 'gap', templateName: 'gap' }));
+    expect(testingInputs).toContainEqual(expect.objectContaining({ propName: 'gap', templateName: 'gap' }));
   });
 
   it('applies a custom gap to every resize line and corner handle', async () => {
@@ -292,8 +283,8 @@ describe('VflowResizableComponent', () => {
 
       expect(controls().length).toBe(8);
       controls().forEach((control) => {
-        expect(card().contains(control)).toBeFalse();
-        expect(node().contains(control)).toBeTrue();
+        expect(card().contains(control)).toBe(false);
+        expect(node().contains(control)).toBe(true);
       });
     });
 

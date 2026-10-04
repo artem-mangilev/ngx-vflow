@@ -126,8 +126,9 @@ describe('alignment', () => {
       // Centered exactly: the lines still cross the parent instead of shrinking to a point
       const guides = alignmentGuides(s, rect(150, 125));
 
+      expect(guides.lines).toHaveLength(2);
       expect(guides.lines.map((line) => [line.from, line.to])).toEqual(
-        jasmine.arrayWithExactContents([
+        expect.arrayContaining([
           [
             { x: 200, y: 0 },
             { x: 200, y: 300 },
@@ -147,8 +148,9 @@ describe('alignment', () => {
     it('marks both gaps of a centered node and chains equal gaps', () => {
       const guides = alignmentGuides(scene([rect(-150, 0), rect(0, 0), rect(300, 0)]), rect(150, 0));
 
+      expect(guides.gaps).toHaveLength(3);
       expect(guides.gaps.map((g) => [g.from, g.to])).toEqual(
-        jasmine.arrayWithExactContents([
+        expect.arrayContaining([
           [100, 150],
           [250, 300],
           [-50, 0],

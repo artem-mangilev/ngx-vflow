@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, provideZonelessChangeDetection } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { VflowComponent } from './components/vflow/vflow.component';
 import { createNode } from './interfaces/node.interface';
@@ -31,7 +31,6 @@ class SmallCustomNodeComponent {}
 describe('Initial handle placement', () => {
   for (const count of [1, 1024]) {
     it(`never shows unpositioned custom handles on initial mount or restore (${count} nodes)`, async () => {
-      TestBed.configureTestingModule({ providers: [provideZonelessChangeDetection()] });
       const fixture = TestBed.createComponent(VflowComponent);
       fixture.componentRef.setInput('view', [400, 300]);
       fixture.componentRef.setInput(
@@ -55,9 +54,10 @@ describe('Initial handle placement', () => {
         }
         const visible = frames.filter((frame) => frame.visibility === 'visible');
         expect(visible.length).toBeGreaterThan(0);
-        expect(visible.filter((frame) => frame.top !== '24px'))
-          .withContext(phase + ': ' + JSON.stringify(frames))
-          .toEqual([]);
+        expect(
+          visible.filter((frame) => frame.top !== '24px'),
+          phase + ': ' + JSON.stringify(frames),
+        ).toEqual([]);
       };
       await capture('initial mount');
       fixture.componentRef.setInput('optimization', { virtualization: true });
@@ -69,14 +69,13 @@ describe('Initial handle placement', () => {
         [...fixture.nativeElement.querySelectorAll('.v-node')].every(
           (node) => getComputedStyle(node).display === 'none',
         ),
-      ).toBeTrue();
+      ).toBe(true);
       fixture.componentInstance.setViewport({ ...fixture.componentInstance.viewport(), x: 0, y: 0 });
       await capture('CSS restore');
     }, 10000);
   }
 
   it('does not show an edge before its custom endpoints are measured', async () => {
-    TestBed.configureTestingModule({ providers: [provideZonelessChangeDetection()] });
     const fixture = TestBed.createComponent(VflowComponent);
     fixture.componentRef.setInput('view', [400, 300]);
     fixture.componentRef.setInput(
@@ -96,9 +95,10 @@ describe('Initial handle placement', () => {
       const nodes = Array.from(fixture.nativeElement.querySelectorAll('.v-node')) as HTMLElement[];
       const paths = Array.from(fixture.nativeElement.querySelectorAll('svg[edge], [edgeLabelHost]')) as Element[];
       if (nodes.some((node) => getComputedStyle(node).visibility === 'hidden')) {
-        expect(paths.filter((path) => getComputedStyle(path).visibility === 'visible'))
-          .withContext('visible edge while an endpoint is hidden')
-          .toEqual([]);
+        expect(
+          paths.filter((path) => getComputedStyle(path).visibility === 'visible'),
+          'visible edge while an endpoint is hidden',
+        ).toEqual([]);
       }
     };
     sample();
@@ -121,7 +121,6 @@ describe('Initial handle placement', () => {
   });
 
   it('keeps custom handles centered when zoom changes before a queued measurement', async () => {
-    TestBed.configureTestingModule({ providers: [provideZonelessChangeDetection()] });
     const fixture = TestBed.createComponent(VflowComponent);
     fixture.componentRef.setInput('view', [400, 300]);
     fixture.componentRef.setInput('nodes', [
@@ -132,7 +131,7 @@ describe('Initial handle placement', () => {
     const batching = fixture.debugElement.injector.get(RequestAnimationFrameBatchingService);
     const batch = batching.batchAnimationFrame.bind(batching);
     let zoomed = false;
-    spyOn(batching, 'batchAnimationFrame').and.callFake((callback) =>
+    vi.spyOn(batching, 'batchAnimationFrame').mockImplementation((callback) =>
       batch(() => {
         if (!zoomed) {
           zoomed = true;
@@ -152,13 +151,12 @@ describe('Initial handle placement', () => {
     const anchor = fixture.nativeElement.querySelector('.v-handle').parentElement as HTMLElement;
     anchor.style.height = '96px';
     for (let i = 0; i < 8; i++) await new Promise(requestAnimationFrame);
-    expect(zoomed).toBeTrue();
+    expect(zoomed).toBe(true);
     const handle = fixture.nativeElement.querySelector('.v-handle[data-v-handle-position="right"]') as HTMLElement;
     expect(parseFloat(handle.style.top)).toBeCloseTo(48, 1);
   });
 
   it('does not rewrite unchanged custom handle accessibility during node movement', async () => {
-    TestBed.configureTestingModule({ providers: [provideZonelessChangeDetection()] });
     const fixture = TestBed.createComponent(VflowComponent);
     fixture.componentRef.setInput('view', [400, 300]);
     fixture.componentRef.setInput('nodes', [
@@ -168,13 +166,13 @@ describe('Initial handle placement', () => {
     await fixture.whenStable();
     await new Promise((resolve) => setTimeout(resolve, 40));
     const handle = fixture.nativeElement.querySelector('.v-handle[data-v-handle-position="right"]') as HTMLElement;
-    const attributes = spyOn(handle, 'setAttribute').and.callThrough();
+    const attributes = vi.spyOn(handle, 'setAttribute');
     const model = fixture.debugElement.injector.get(FlowEntitiesService).nodes()[0];
     const status = fixture.debugElement.injector.get(FlowStatusService);
     status.setNodeDragStartStatus(model);
     fixture.detectChanges();
     status.setNodeDragStatus(model);
     fixture.detectChanges();
-    expect(attributes.calls.allArgs().filter(([name]) => name === 'aria-label')).toEqual([]);
+    expect(attributes.mock.calls.filter(([name]) => name === 'aria-label')).toEqual([]);
   });
 });

@@ -1,5 +1,6 @@
+import type { Mock } from 'vitest';
 import { TestBed } from '@angular/core/testing';
-import { provideZonelessChangeDetection } from '@angular/core';
+
 import { DraggableService } from './draggable.service';
 import { FlowEntitiesService } from './flow-entities.service';
 import { FlowSettingsService } from './flow-settings.service';
@@ -22,8 +23,8 @@ describe('DraggableService', () => {
   let dragPanes: HTMLElement[];
   let panePositionCallback: IntersectionObserverCallback | null;
   let intersectionObserverMock: {
-    observe: jasmine.Spy;
-    disconnect: jasmine.Spy;
+    observe: Mock;
+    disconnect: Mock;
   };
   let originalIntersectionObserver: typeof IntersectionObserver;
   const resizeObserverMock = {
@@ -62,7 +63,6 @@ describe('DraggableService', () => {
           provide: KeyboardService,
           useValue: keyboardServiceMock,
         },
-        provideZonelessChangeDetection(),
       ],
     });
 
@@ -76,8 +76,8 @@ describe('DraggableService', () => {
     dragPanes = [];
     panePositionCallback = null;
     intersectionObserverMock = {
-      observe: jasmine.createSpy('observe'),
-      disconnect: jasmine.createSpy('disconnect'),
+      observe: vi.fn(),
+      disconnect: vi.fn(),
     };
     originalIntersectionObserver = window.IntersectionObserver;
     class IntersectionObserverMock {
@@ -109,7 +109,9 @@ describe('DraggableService', () => {
     });
   });
 
-  afterEach(() => {
+  afterEach(async () => {
+    // A drag swallows the next click until the following macrotask; let it expire before the next test.
+    await new Promise((resolve) => setTimeout(resolve));
     dragPanes.forEach((pane) => pane.remove());
     Object.defineProperty(window, 'IntersectionObserver', {
       configurable: true,
@@ -143,7 +145,8 @@ describe('DraggableService', () => {
     document.body.append(pane);
     dragPanes.push(pane);
 
-    const getPaneRect = spyOn(pane, 'getBoundingClientRect').and.returnValues(...paneRects);
+    const getPaneRect = vi.spyOn(pane, 'getBoundingClientRect');
+    paneRects.forEach((rect) => getPaneRect.mockReturnValueOnce(rect));
 
     return { pane, element, getPaneRect };
   }
@@ -311,13 +314,13 @@ describe('DraggableService', () => {
     dispatchMouse(window, 'mousemove', 160, 100);
     dispatchPointer(window, 'pointercancel', { x: 160, y: 100 });
     expect(status.status().state).toBe('node-drag-end');
-    expect(model.dragging()).toBeFalse();
+    expect(model.dragging()).toBe(false);
     expect(model.point()).toEqual({ x: 20, y: 20 });
 
     dispatchMouse(element, 'mousedown', 150, 100);
     dispatchMouse(window, 'mousemove', 170, 100);
     window.dispatchEvent(new Event('blur'));
-    expect(model.dragging()).toBeFalse();
+    expect(model.dragging()).toBe(false);
     dispatchMouse(window, 'mousemove', 190, 100);
     expect(model.point()).toEqual({ x: 40, y: 20 });
   });

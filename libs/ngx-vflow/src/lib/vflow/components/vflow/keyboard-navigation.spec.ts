@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, provideZonelessChangeDetection, viewChild, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, viewChild, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { outputToObservable } from '@angular/core/rxjs-interop';
 import { createNodes } from '../../interfaces/node.interface';
@@ -67,7 +67,6 @@ describe('public keyboard graph navigation', () => {
   async function setup() {
     TestBed.configureTestingModule({
       imports: [KeyboardHostComponent],
-      providers: [provideZonelessChangeDetection()],
     });
     const fixture = TestBed.createComponent(KeyboardHostComponent);
     fixture.detectChanges();
@@ -155,12 +154,12 @@ describe('public keyboard graph navigation', () => {
     key(parent, ' ');
     expect(host.nodes().map((n) => n.selected())).toEqual([true, true, false]);
     key(parent, ' ');
-    expect(host.nodes()[1].selected()).toBeFalse();
+    expect(host.nodes()[1].selected()).toBe(false);
     edge.focus();
     key(edge, 'Enter');
-    expect(host.edges[0].selected()).toBeTrue();
+    expect(host.edges[0].selected()).toBe(true);
     key(edge, 'Escape');
-    expect([...host.nodes(), ...host.edges].every((n) => !n.selected())).toBeTrue();
+    expect([...host.nodes(), ...host.edges].every((n) => !n.selected())).toBe(true);
     expect(document.activeElement).toBe(edge);
     document.dispatchEvent(new KeyboardEvent('keyup', { key: 'Alt', code: 'AltLeft' }));
     fixture.detectChanges();
@@ -179,7 +178,7 @@ describe('public keyboard graph navigation', () => {
       ),
     );
     parent.focus();
-    expect(key(parent, 'ArrowRight').defaultPrevented).toBeTrue();
+    expect(key(parent, 'ArrowRight').defaultPrevented).toBe(true);
     fixture.detectChanges();
     await fixture.whenStable();
     expect(host.nodes().map((n) => n.point())).toEqual([
@@ -187,8 +186,8 @@ describe('public keyboard graph navigation', () => {
       { x: 25, y: 20 },
       { x: 405, y: 50 },
     ]);
-    expect(await changes).toContain(
-      jasmine.objectContaining({ type: 'position', id: 'parent', point: { x: 25, y: 20 } }),
+    expect(await changes).toContainEqual(
+      expect.objectContaining({ type: 'position', id: 'parent', point: { x: 25, y: 20 } }),
     );
     key(parent, 'ArrowDown', 'ArrowDown', true);
     expect(host.nodes()[1].point()).toEqual({ x: 25, y: 40 });
@@ -247,7 +246,6 @@ describe('public keyboard graph navigation', () => {
   it('preserves embedded controls and explicit keyboard opt-out', async () => {
     TestBed.configureTestingModule({
       imports: [KeyboardControlsHostComponent],
-      providers: [provideZonelessChangeDetection()],
     });
     const fixture = TestBed.createComponent(KeyboardControlsHostComponent);
     fixture.detectChanges();
@@ -269,10 +267,10 @@ describe('public keyboard graph navigation', () => {
       control.focus();
       expect(document.activeElement).toBe(control);
       for (const command of ['Enter', ' ', 'Escape', 'ArrowRight'])
-        expect(key(control, command).defaultPrevented).toBeFalse();
+        expect(key(control, command).defaultPrevented).toBe(false);
     }
     for (const node of [...fixture.componentInstance.nodes, ...fixture.componentInstance.excluded]) {
-      expect(node.selected()).toBeTrue();
+      expect(node.selected()).toBe(true);
       expect(node.point()).toEqual({ x: 0, y: 0 });
     }
   });
@@ -311,16 +309,16 @@ describe('public keyboard graph navigation', () => {
     key(child, 'Enter');
     edge.focus();
     key(edge, 'Enter');
-    expect([...host.nodes(), ...host.edges].some((entity) => entity.selected())).toBeFalse();
+    expect([...host.nodes(), ...host.edges].some((entity) => entity.selected())).toBe(false);
     host.nodes()[0].selected.set(true);
     host.edges[0].selected.set(true);
     key(edge, 'Escape');
-    expect([...host.nodes(), ...host.edges].some((entity) => entity.selected())).toBeFalse();
+    expect([...host.nodes(), ...host.edges].some((entity) => entity.selected())).toBe(false);
     host.nodes()[0].selected.set(true);
     host.flow().selectionMode = 'manual';
     child.focus();
     key(child, 'Escape');
-    expect(host.nodes()[0].selected()).toBeTrue();
+    expect(host.nodes()[0].selected()).toBe(true);
     host.nodes()[0].width!.set(100);
     host.nodes()[0].height!.set(50);
     host.nodes()[0].point.set({ x: 149, y: 149 });
@@ -424,16 +422,16 @@ describe('public keyboard graph navigation', () => {
     const child = root.querySelector<HTMLElement>('[aria-label="Child"]')!;
     child.focus();
     const space = key(child, ' ');
-    expect(host.nodes()[0].selected()).toBeFalse();
+    expect(host.nodes()[0].selected()).toBe(false);
     // The document-level gesture layer received the key and claimed it for panning.
-    expect(space.defaultPrevented).toBeTrue();
+    expect(space.defaultPrevented).toBe(true);
     document.dispatchEvent(new KeyboardEvent('keyup', { code: 'Space' }));
-    expect(key(child, 'Enter').defaultPrevented).toBeTrue();
-    expect(host.nodes()[0].selected()).toBeTrue();
+    expect(key(child, 'Enter').defaultPrevented).toBe(true);
+    expect(host.nodes()[0].selected()).toBe(true);
     host.flow().keyboardShortcuts = { modifiers: { panActivation: [] } };
     key(child, 'Escape');
     key(child, ' ');
-    expect(host.nodes()[0].selected()).toBeTrue();
+    expect(host.nodes()[0].selected()).toBe(true);
     fixture.detectChanges();
   });
 
@@ -452,7 +450,7 @@ describe('public keyboard graph navigation', () => {
     expect(description()).toContain('Press Delete or Backspace to delete.');
     child.focus();
     // Nothing selected: only the focused entity.
-    expect(key(child, 'Delete').defaultPrevented).toBeTrue();
+    expect(key(child, 'Delete').defaultPrevented).toBe(true);
     expect(requests).toEqual([{ nodeIds: ['child'], edgeIds: [] }]);
     // A selection elsewhere does not follow a focused entity outside of it.
     host.nodes()[2].selected.set(true);
@@ -473,7 +471,7 @@ describe('public keyboard graph navigation', () => {
     host.flow().keyboardShortcuts = { commands: { delete: ['x'] } };
     fixture.detectChanges();
     await fixture.whenStable();
-    expect(key(edge, 'Delete').defaultPrevented).toBeFalse();
+    expect(key(edge, 'Delete').defaultPrevented).toBe(false);
     key(edge, 'x', 'KeyX');
     expect(requests.length).toBe(5);
     host.flow().keyboardShortcuts = { commands: { delete: [] } };
@@ -504,7 +502,7 @@ describe('public keyboard graph navigation', () => {
     expect(host.flow().viewport()).toEqual({ x: 0, y: 0, zoom: 1 });
     // An edge never moves, so arrows scroll the view: right reveals the right side.
     edge.focus();
-    expect(key(edge, 'ArrowRight').defaultPrevented).toBeTrue();
+    expect(key(edge, 'ArrowRight').defaultPrevented).toBe(true);
     await settle();
     expect(host.flow().viewport()).toEqual({ x: -15, y: 0, zoom: 1 });
     key(edge, 'ArrowUp', 'ArrowUp', true);
@@ -522,7 +520,7 @@ describe('public keyboard graph navigation', () => {
     expect(host.nodes()[0].point()).toEqual({ x: 5, y: 10 });
     expect(host.flow().viewport()).toEqual({ x: 0, y: 60, zoom: 1 });
     // Zoom keys with announcements; browser zoom shortcuts stay untouched.
-    expect(key(child, '=', 'Equal').defaultPrevented).toBeTrue();
+    expect(key(child, '=', 'Equal').defaultPrevented).toBe(true);
     await settle();
     expect(host.flow().viewport().zoom).toBeCloseTo(1.2, 5);
     expect(await spoken()).toBe('Zoom 120%.');
@@ -534,7 +532,7 @@ describe('public keyboard graph navigation', () => {
       cancelable: true,
     });
     child.dispatchEvent(browserZoom);
-    expect(browserZoom.defaultPrevented).toBeFalse();
+    expect(browserZoom.defaultPrevented).toBe(false);
     key(child, '-', 'NumpadSubtract');
     await settle();
     expect(host.flow().viewport().zoom).toBeCloseTo(1, 5);
@@ -555,7 +553,7 @@ describe('public keyboard graph navigation', () => {
     expect(host.flow().viewport()).toEqual({ ...fitted, y: fitted.y - 15 });
     // Keys from embedded content are left alone; disabled commands drop their instruction.
     const handle = root.querySelector<HTMLElement>('[data-v-handle-type="source"]')!;
-    expect(key(handle, 'ArrowDown').defaultPrevented).toBeFalse();
+    expect(key(handle, 'ArrowDown').defaultPrevented).toBe(false);
     await settle();
     expect(host.flow().viewport()).toEqual({ ...fitted, y: fitted.y - 15 });
     const description = () =>
@@ -574,7 +572,7 @@ describe('public keyboard graph navigation', () => {
     expect(description()).toBe('Parent: Parent. Selected. Use arrow keys to pan. Press +, = or NumpadAdd to zoom in.');
     host.flow().keyboardShortcuts = { commands: { zoomIn: [], zoomOut: [], fitView: [] } };
     await settle();
-    expect(key(container, '=', 'Equal').defaultPrevented).toBeFalse();
+    expect(key(container, '=', 'Equal').defaultPrevented).toBe(false);
     expect(description()).toBe('Parent: Parent. Selected. Use arrow keys to pan.');
   });
 
@@ -596,13 +594,13 @@ describe('public keyboard graph navigation', () => {
     await settle();
     child.focus();
     // An entry is replaced, not extended.
-    expect(key(child, 'Enter').defaultPrevented).toBeFalse();
-    expect(host.nodes()[0].selected()).toBeFalse();
+    expect(key(child, 'Enter').defaultPrevented).toBe(false);
+    expect(host.nodes()[0].selected()).toBe(false);
     key(child, 's', 'KeyS');
-    expect(host.nodes()[0].selected()).toBeTrue();
+    expect(host.nodes()[0].selected()).toBe(true);
     // Entries left out of the update keep their defaults.
     key(child, 'Escape');
-    expect(host.nodes()[0].selected()).toBeFalse();
+    expect(host.nodes()[0].selected()).toBe(false);
     // A later update touches two command entries; the modifier set before it survives.
     host.flow().keyboardShortcuts = { commands: { clearSelection: [], delete: [] } };
     await settle();
@@ -613,8 +611,8 @@ describe('public keyboard graph navigation', () => {
     document.dispatchEvent(new KeyboardEvent('keyup', { code: 'AltLeft' }));
     expect(host.nodes().map((n) => n.selected())).toEqual([true, true, false]);
     // A disabled entry neither runs nor claims its key, and drops out of the instructions.
-    expect(key(parent, 'Escape').defaultPrevented).toBeFalse();
-    expect(key(parent, 'Delete').defaultPrevented).toBeFalse();
+    expect(key(parent, 'Escape').defaultPrevented).toBe(false);
+    expect(key(parent, 'Delete').defaultPrevented).toBe(false);
     expect(host.nodes().map((n) => n.selected())).toEqual([true, true, false]);
     expect(description()).not.toContain('Press Escape');
     expect(description()).not.toContain('Press Delete or Backspace');
@@ -635,7 +633,7 @@ describe('public keyboard graph navigation', () => {
     await settle();
     // An edge can never move, so the shared key falls through to panning.
     edge.focus();
-    expect(key(edge, 'd', 'KeyD').defaultPrevented).toBeTrue();
+    expect(key(edge, 'd', 'KeyD').defaultPrevented).toBe(true);
     await settle();
     expect(host.flow().viewport()).toEqual({ x: -15, y: 0, zoom: 1 });
     // An unselected node cannot move either.
@@ -652,7 +650,7 @@ describe('public keyboard graph navigation', () => {
     expect(host.nodes()[1].point()).toEqual({ x: 25, y: 20 });
     expect(host.flow().viewport()).toEqual({ x: -30, y: 0, zoom: 1 });
     // Each entry was replaced, so the arrow key now neither moves nor pans.
-    expect(key(parent, 'ArrowRight').defaultPrevented).toBeFalse();
+    expect(key(parent, 'ArrowRight').defaultPrevented).toBe(false);
     await settle();
     expect(host.nodes()[1].point()).toEqual({ x: 25, y: 20 });
     expect(host.flow().viewport()).toEqual({ x: -30, y: 0, zoom: 1 });
@@ -666,18 +664,18 @@ describe('public keyboard graph navigation', () => {
     };
     const requests: { nodeIds: string[]; edgeIds: string[] }[] = [];
     const subscription = host.flow().deleteRequest.subscribe((request) => requests.push(request));
-    const warn = spyOn(console, 'warn');
+    const warn = vi.spyOn(console, 'warn');
     host.flow().keyboardShortcuts = { modifiers: { selection: ['q'] }, commands: { delete: ['q'] } };
     await settle();
-    expect(warn).toHaveBeenCalledWith(jasmine.stringContaining('commands.delete and modifiers.selection share a key'));
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('commands.delete and modifiers.selection share a key'));
     const child = root.querySelector<HTMLElement>('[aria-label="Child"]')!;
     child.focus();
-    expect(key(child, 'q', 'KeyQ').defaultPrevented).toBeFalse();
+    expect(key(child, 'q', 'KeyQ').defaultPrevented).toBe(false);
     expect(requests).toEqual([]);
     // Releasing the key from the modifier hands it back to the command, which proves what blocked it.
     host.flow().keyboardShortcuts = { modifiers: { selection: [] } };
     await settle();
-    expect(key(child, 'q', 'KeyQ').defaultPrevented).toBeTrue();
+    expect(key(child, 'q', 'KeyQ').defaultPrevented).toBe(true);
     expect(requests).toEqual([{ nodeIds: ['child'], edgeIds: [] }]);
     subscription.unsubscribe();
   });

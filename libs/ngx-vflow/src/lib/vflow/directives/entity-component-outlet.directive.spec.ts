@@ -1,12 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  EventEmitter,
-  Output,
-  output,
-  provideZonelessChangeDetection,
-  signal,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Output, output, signal } from '@angular/core';
 import { outputFromObservable } from '@angular/core/rxjs-interop';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
@@ -114,7 +106,6 @@ describe('EntityComponentOutletDirective', () => {
   }
 
   beforeEach(async () => {
-    TestBed.configureTestingModule({ providers: [provideZonelessChangeDetection()] });
     fixture = TestBed.createComponent(HostComponent);
     await settle();
   });

@@ -1,11 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  effect,
-  provideZonelessChangeDetection,
-  untracked,
-  viewChild,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, untracked, viewChild } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { VflowComponent } from './components/vflow/vflow.component';
 import { createNode } from './interfaces/node.interface';
@@ -59,7 +52,6 @@ const frames = async (count: number) => {
 
 describe('Initial viewport', () => {
   it('paints the graph for the first time with the viewport set in reaction to initialized', async () => {
-    TestBed.configureTestingModule({ providers: [provideZonelessChangeDetection()] });
     const fixture = TestBed.createComponent(FitOnInitComponent);
     const root = fixture.nativeElement as HTMLElement;
     const states: string[] = [];
@@ -86,14 +78,14 @@ describe('Initial viewport', () => {
 
     fixture.detectChanges();
     check();
-    expect(fixture.componentInstance.flow().initialized()).toBeFalse();
+    expect(fixture.componentInstance.flow().initialized()).toBe(false);
 
     await frames(8);
     observer.disconnect();
     check();
 
-    expect(violations).withContext(states.join('\n')).toEqual([]);
-    expect(fixture.componentInstance.flow().initialized()).toBeTrue();
+    expect(violations, states.join('\n')).toEqual([]);
+    expect(fixture.componentInstance.flow().initialized()).toBe(true);
     expect(states.at(-1)).not.toContain(IDENTITY);
     expect(states.at(-1)).toContain('shown=4');
   });
@@ -104,7 +96,6 @@ describe('Initial viewport', () => {
     document.head.append(style);
 
     try {
-      TestBed.configureTestingModule({ providers: [provideZonelessChangeDetection()] });
       const fixture = TestBed.createComponent(VflowComponent);
       fixture.componentRef.setInput('view', [400, 300]);
       fixture.componentRef.setInput('nodes', [
@@ -114,7 +105,7 @@ describe('Initial viewport', () => {
       fixture.detectChanges();
       await frames(8);
 
-      expect(fixture.componentInstance.initialized()).toBeTrue();
+      expect(fixture.componentInstance.initialized()).toBe(true);
       const shown = fixture.nativeElement.querySelector('.v-node:not(:has(.no-box))');
       expect(getComputedStyle(shown).visibility).toBe('visible');
     } finally {
@@ -123,7 +114,6 @@ describe('Initial viewport', () => {
   });
 
   it('fits within the zoom bounds a call gives, inside the flow limits', async () => {
-    TestBed.configureTestingModule({ providers: [provideZonelessChangeDetection()] });
     const fixture = TestBed.createComponent(FitOnInitComponent);
     fixture.detectChanges();
     await frames(8);
@@ -133,9 +123,9 @@ describe('Initial viewport', () => {
     expect(unbounded).toBeLessThan(1);
 
     // A single node would fill the pane at the flow's maxZoom.
-    expect(await flow.fitView({ nodes: ['a'], maxZoom: 1.5 })).toBeTrue();
+    expect(await flow.fitView({ nodes: ['a'], maxZoom: 1.5 })).toBe(true);
     expect(flow.viewport().zoom).toBe(1.5);
-    expect(await flow.fitView({ minZoom: 1 })).toBeTrue();
+    expect(await flow.fitView({ minZoom: 1 })).toBe(true);
     expect(flow.viewport().zoom).toBe(1);
     // maxZoom wins over a greater minZoom; both stay within the flow limits.
     await flow.fitView({ minZoom: 2, maxZoom: 1.5 });
@@ -146,6 +136,6 @@ describe('Initial viewport', () => {
     expect(flow.viewport().zoom).toBe(3);
 
     expect(() => flow.fitView({ maxZoom: 0 })).toThrowError(RangeError);
-    expect(await flow.fitView({ nodes: ['missing'] })).toBeFalse();
+    expect(await flow.fitView({ nodes: ['missing'] })).toBe(false);
   });
 });

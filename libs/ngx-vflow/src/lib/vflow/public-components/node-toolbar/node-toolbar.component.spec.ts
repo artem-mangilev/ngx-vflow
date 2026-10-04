@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, provideZonelessChangeDetection, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { VflowComponent } from '../../components/vflow/vflow.component';
 import { createNode } from '../../interfaces/node.interface';
@@ -31,7 +31,6 @@ describe('VflowNodeToolbarComponent', () => {
 
   beforeEach(async () => {
     toolbarPosition.set(null);
-    TestBed.configureTestingModule({ providers: [provideZonelessChangeDetection()] });
     fixture = TestBed.createComponent(VflowComponent);
     fixture.componentRef.setInput('view', [400, 300]);
     fixture.componentRef.setInput('nodes', [
@@ -54,9 +53,9 @@ describe('VflowNodeToolbarComponent', () => {
     const host = toolbar();
     expect(host).not.toBeNull();
     expect(host!.querySelector('.tool')).not.toBeNull();
-    expect(fixture.nativeElement.querySelector('.v-node')!.contains(host)).toBeTrue();
+    expect(fixture.nativeElement.querySelector('.v-node')!.contains(host)).toBe(true);
     // Gestures inside the toolbar must not drag the node.
-    expect(host!.hasAttribute('data-v-no-drag')).toBeTrue();
+    expect(host!.hasAttribute('data-v-no-drag')).toBe(true);
 
     toolbarPosition.set(null);
     fixture.detectChanges();

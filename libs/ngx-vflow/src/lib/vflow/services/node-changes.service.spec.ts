@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { provideZonelessChangeDetection } from '@angular/core';
+
 import { NodesChangeService } from './node-changes.service';
 import { FlowEntitiesService } from './flow-entities.service';
 import { FlowSettingsService } from './flow-settings.service';
@@ -15,14 +15,7 @@ describe('NodesChangeService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [
-        NodesChangeService,
-        FlowEntitiesService,
-        FlowSettingsService,
-        NodeRenderingService,
-        ViewportService,
-        provideZonelessChangeDetection(),
-      ],
+      providers: [NodesChangeService, FlowEntitiesService, FlowSettingsService, NodeRenderingService, ViewportService],
     });
     service = TestBed.inject(NodesChangeService);
     entities = TestBed.inject(FlowEntitiesService);
@@ -50,8 +43,9 @@ describe('NodesChangeService', () => {
     await settle();
 
     expect(batches.length).toBe(1);
+    expect(batches[0]).toHaveLength(3);
     expect(batches[0]).toEqual(
-      jasmine.arrayWithExactContents([
+      expect.arrayContaining([
         { type: 'position', id: 'a', point: { x: 10, y: 0 } },
         { type: 'position', id: 'b', point: { x: 20, y: 0 } },
         { type: 'select', id: 'a', selected: true },

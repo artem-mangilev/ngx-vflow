@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, output, provideZonelessChangeDetection } from '@angular/core';
+import { ChangeDetectionStrategy, Component, output } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { VflowComponent } from '../vflow/vflow.component';
 import { createNodes } from '../../interfaces/node.interface';
@@ -92,7 +92,6 @@ describe('Component edges', () => {
 
   beforeEach(async () => {
     ProbeEdgeComponent.instances = [];
-    TestBed.configureTestingModule({ providers: [provideZonelessChangeDetection()] });
     fixture = TestBed.createComponent(HostComponent);
     root = fixture.nativeElement;
     fixture.detectChanges();
@@ -108,13 +107,13 @@ describe('Component edges', () => {
 
     expect(hosts.map((host) => host.getAttribute('data-edge'))).toEqual(['class', 'lazy']);
     for (const host of hosts) {
-      expect(host instanceof SVGGElement).toBeTrue();
+      expect(host instanceof SVGGElement).toBe(true);
       expect(host.namespaceURI).toBe(SVG_NAMESPACE);
       expect(host.closest('svg[edge]')).not.toBeNull();
     }
 
     const path = hosts[0].querySelector('path.probe-path');
-    expect(path instanceof SVGPathElement).toBeTrue();
+    expect(path instanceof SVGPathElement).toBe(true);
     expect(path?.getAttribute('d')).toMatch(/^M/);
   });
 
@@ -125,7 +124,7 @@ describe('Component edges', () => {
       expect(svg.querySelector(':scope > path.v-interactive-edge')).toBeNull();
       const presentationRoot = svg.querySelector<SVGGElement>(':scope > g')!;
       const stroke = presentationRoot.firstElementChild as SVGPathElement;
-      expect(stroke.classList.contains('v-interactive-edge')).toBeTrue();
+      expect(stroke.classList.contains('v-interactive-edge')).toBe(true);
       expect(stroke.namespaceURI).toBe(SVG_NAMESPACE);
       expect(stroke.getAttribute('d')).toMatch(/^M/);
       expect(stroke.style.strokeWidth).toBe('20px');
@@ -143,7 +142,7 @@ describe('Component edges', () => {
 
     svgs[0].querySelector('path.v-interactive-edge')!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     expect(ProbeEdgeComponent.instances.find((probe) => probe.ctx.edge.id === 'class')!.clicks).toBe(1);
-    expect(edges[0].selected!()).toBeTrue();
+    expect(edges[0].selected!()).toBe(true);
   });
 
   it('hides the stroke at width 0 and still selects the edge from a presentation element', () => {
@@ -152,7 +151,7 @@ describe('Component edges', () => {
     expect(bare.querySelector(':scope > path.v-interactive-edge')).toBeNull();
     expect(bare.querySelector<SVGPathElement>('path.v-interactive-edge')!.style.display).toBe('none');
     bare.querySelector('path.template-edge-child')!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-    expect(fixture.componentInstance.edges[3].selected!()).toBeTrue();
+    expect(fixture.componentInstance.edges[3].selected!()).toBe(true);
   });
 
   it('gives the edge context to edge components and to components inside an edge template', () => {
@@ -218,7 +217,6 @@ class PlainTemplateHostComponent {
 describe('Edges without vEdgeInteraction', () => {
   it('draws no interaction stroke without vEdgeInteraction and still selects from presentation elements', async () => {
     PlainEdgeComponent.instances = [];
-    TestBed.configureTestingModule({ providers: [provideZonelessChangeDetection()] });
     const fixture = TestBed.createComponent(PlainTemplateHostComponent);
     fixture.detectChanges();
     for (let i = 0; i < 5; i++) await new Promise(requestAnimationFrame);
@@ -231,10 +229,10 @@ describe('Edges without vEdgeInteraction', () => {
     }
 
     svgs[0].querySelector('path.plain')!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-    expect(fixture.componentInstance.edges[0].selected!()).toBeTrue();
+    expect(fixture.componentInstance.edges[0].selected!()).toBe(true);
 
     svgs[1].querySelector('path.plain-component')!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-    expect(fixture.componentInstance.edges[1].selected!()).toBeTrue();
+    expect(fixture.componentInstance.edges[1].selected!()).toBe(true);
     expect(PlainEdgeComponent.instances[0].clicks).toBe(1);
   });
 });

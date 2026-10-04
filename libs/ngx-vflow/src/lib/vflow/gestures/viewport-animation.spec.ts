@@ -11,12 +11,12 @@ describe('animateViewport', () => {
     now = 1000;
     frames = new Map();
     nextId = 0;
-    spyOn(performance, 'now').and.callFake(() => now);
-    spyOn(window, 'requestAnimationFrame').and.callFake((callback) => {
+    vi.spyOn(performance, 'now').mockImplementation(() => now);
+    vi.spyOn(window, 'requestAnimationFrame').mockImplementation((callback) => {
       frames.set(++nextId, callback);
       return nextId;
     });
-    spyOn(window, 'cancelAnimationFrame').and.callFake((id) => frames.delete(id));
+    vi.spyOn(window, 'cancelAnimationFrame').mockImplementation((id) => frames.delete(id));
   });
 
   function frame(ms: number) {

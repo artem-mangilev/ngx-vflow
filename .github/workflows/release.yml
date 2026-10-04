@@ -33,7 +33,8 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run lint
-      - run: npm test -- --watch=false --browsers=ChromeHeadless
+      - run: npx playwright install --with-deps chromium
+      - run: npm test
       - run: npm run build
       - name: Configure release author
         run: |

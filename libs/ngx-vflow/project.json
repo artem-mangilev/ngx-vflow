@@ -22,10 +22,16 @@
       "outputs": ["{workspaceRoot}/dist/libs/ngx-vflow"]
     },
     "test": {
+      "executor": "nx:run-commands",
       "options": {
-        "tsConfig": "libs/ngx-vflow/tsconfig.spec.json"
+        "command": "tsc -p tsconfig.spec.json --noEmit && vitest run",
+        "cwd": "{projectRoot}"
       },
-      "executor": "@angular-devkit/build-angular:karma"
+      "configurations": {
+        "watch": {
+          "command": "vitest"
+        }
+      }
     },
     "lint": {
       "options": {

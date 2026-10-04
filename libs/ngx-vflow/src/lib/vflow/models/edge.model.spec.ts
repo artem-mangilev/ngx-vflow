@@ -8,7 +8,7 @@ import { HandleModel } from './handle.model';
 import { FlowSettingsService } from '../services/flow-settings.service';
 import { NodeRenderingService } from '../services/node-rendering.service';
 import { ViewportService } from '../services/viewport.service';
-import { provideZonelessChangeDetection, signal } from '@angular/core';
+import { signal } from '@angular/core';
 
 function mockRect(element: Element, rect: { left: number; top: number; width: number; height: number }): void {
   const { left, top, width, height } = rect;
@@ -61,13 +61,7 @@ describe('EdgeModel', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [
-        FlowEntitiesService,
-        FlowSettingsService,
-        NodeRenderingService,
-        ViewportService,
-        provideZonelessChangeDetection(),
-      ],
+      providers: [FlowEntitiesService, FlowSettingsService, NodeRenderingService, ViewportService],
     });
 
     settingsService = TestBed.inject(FlowSettingsService);
@@ -182,12 +176,12 @@ describe('EdgeModel', () => {
   });
 
   it('should pass node geometry and the marker inset to a custom curve', () => {
-    const curve = jasmine.createSpy('curve').and.returnValue({ path: 'M 0,0' });
+    const curve = vi.fn().mockReturnValue({ path: 'M 0,0' });
     model.edge.curve!.set(curve);
     model.edge.markers!.set({ end: { type: 'arrow-closed', width: 20 } });
     model.path();
 
-    const params = curve.calls.mostRecent().args[0];
+    const params = curve.mock.lastCall![0];
     expect(params.sourceNode).toEqual({ id: '1', x: 15, y: 15, width: 0, height: 0 });
     expect(params.targetNode).toEqual({ id: '2', x: 15, y: 15, width: 0, height: 0 });
     // A closed arrow of 20 flow units: the path ends 7 units before the tip, at the base of the arrowhead.
@@ -199,11 +193,11 @@ describe('EdgeModel', () => {
     model.path();
 
     // An open arrow has no fill to hide the line, so the path runs through it to just short of the tip.
-    expect(curve.calls.mostRecent().args[0].markerInset).toEqual({ start: 0, end: 2 });
+    expect(curve.mock.lastCall![0].markerInset).toEqual({ start: 0, end: 2 });
   });
 
   it('should share one marker element between equal markers and inset a declared shape', () => {
-    const curve = jasmine.createSpy('curve').and.returnValue({ path: 'M 0,0' });
+    const curve = vi.fn().mockReturnValue({ path: 'M 0,0' });
     model.edge.curve!.set(curve);
     model.edge.markers!.set({ start: 'arrow-closed', end: {} });
     model.path();
@@ -218,18 +212,18 @@ describe('EdgeModel', () => {
     model.edge.markers!.set({ start: { type: 'diamond', width: 20 }, end: { type: 'arrow', width: 20 } });
     model.path();
 
-    expect(curve.calls.mostRecent().args[0].markerInset).toEqual({ start: 10, end: 2 });
+    expect(curve.mock.lastCall![0].markerInset).toEqual({ start: 10, end: 2 });
   });
 
   it('should resolve selection and focus defaults reactively', () => {
-    expect(model.selectable()).toBeTrue();
-    expect(model.focusable()).toBeTrue();
+    expect(model.selectable()).toBe(true);
+    expect(model.focusable()).toBe(true);
 
     settingsService.edgesSelectable.set(false);
     settingsService.edgesFocusable.set(false);
 
-    expect(model.selectable()).toBeFalse();
-    expect(model.focusable()).toBeFalse();
+    expect(model.selectable()).toBe(false);
+    expect(model.focusable()).toBe(false);
   });
 
   it('should let explicit capability overrides win over global settings', () => {
@@ -249,8 +243,8 @@ describe('EdgeModel', () => {
     settingsService.edgesSelectable.set(true);
     settingsService.edgesFocusable.set(false);
 
-    expect(explicitModel.selectable()).toBeFalse();
-    expect(explicitModel.focusable()).toBeTrue();
+    expect(explicitModel.selectable()).toBe(false);
+    expect(explicitModel.focusable()).toBe(true);
   });
 
   it('should keep inherited capabilities absent when factories materialize defaults', () => {
@@ -307,11 +301,11 @@ describe('EdgeModel', () => {
 
       edge.selected = signal(false);
       passNewArray();
-      expect(late.selected()).toBeFalse();
-      expect(late.context.$implicit.selected()).toBeFalse();
+      expect(late.selected()).toBe(false);
+      expect(late.context.$implicit.selected()).toBe(false);
 
       late.selected.set(true);
-      expect(edge.selected()).toBeTrue();
+      expect(edge.selected()).toBe(true);
     });
   });
 });

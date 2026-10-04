@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, provideZonelessChangeDetection, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BehaviorSubject } from 'rxjs';
 import { HandleModel } from '../models/handle.model';
@@ -32,9 +32,9 @@ describe('NodeHandlesControllerDirective', () => {
     observerCallbacks = [];
 
     const nodeElement = document.createElement('div');
-    nodeElement.getBoundingClientRect = jasmine
-      .createSpy('node rect')
-      .and.returnValue({ left: 0, top: 0, width: 100, height: 100 } as DOMRect);
+    nodeElement.getBoundingClientRect = vi
+      .fn()
+      .mockReturnValue({ left: 0, top: 0, width: 100, height: 100 } as DOMRect);
 
     const model = {
       culled: () => false,
@@ -50,7 +50,7 @@ describe('NodeHandlesControllerDirective', () => {
       addObserver: (element: Element, callback: (entry: ResizeObserverEntry) => void) => {
         observerCallbacks.push({ element, callback });
       },
-      removeObserver: jasmine.createSpy('removeObserver'),
+      removeObserver: vi.fn(),
     };
     const animationFrames = {
       batchAnimationFrame: (callback: () => void) => frameCallbacks.push(callback),
@@ -59,7 +59,6 @@ describe('NodeHandlesControllerDirective', () => {
     TestBed.configureTestingModule({
       imports: [TestHostComponent],
       providers: [
-        provideZonelessChangeDetection(),
         { provide: NodeAccessorService, useValue: nodeAccessor },
         { provide: ResizeObserverService, useValue: resizeObserver },
         { provide: RequestAnimationFrameBatchingService, useValue: animationFrames },
@@ -87,26 +86,20 @@ describe('NodeHandlesControllerDirective', () => {
       offsetY: signal(0),
       layout: signal<HandleLayout>('auto'),
     };
-    const first = jasmine.createSpyObj<HandleModel>('first handle', ['measure', 'applyGeometry'], {
-      element: firstElement,
-      ...handleSignals,
-    });
-    const second = jasmine.createSpyObj<HandleModel>('second handle', ['measure', 'applyGeometry'], {
-      element: secondElement,
-      ...handleSignals,
-    });
-    first.measure.and.callFake(() => {
+    const first = { measure: vi.fn(), applyGeometry: vi.fn(), element: firstElement, ...handleSignals };
+    const second = { measure: vi.fn(), applyGeometry: vi.fn(), element: secondElement, ...handleSignals };
+    first.measure.mockImplementation(() => {
       executionOrder.push('measure first');
       return geometry;
     });
-    second.measure.and.callFake(() => {
+    second.measure.mockImplementation(() => {
       executionOrder.push('measure second');
       return geometry;
     });
-    first.applyGeometry.and.callFake(() => executionOrder.push('apply first'));
-    second.applyGeometry.and.callFake(() => executionOrder.push('apply second'));
+    first.applyGeometry.mockImplementation(() => executionOrder.push('apply first'));
+    second.applyGeometry.mockImplementation(() => executionOrder.push('apply second'));
 
-    handles = [first, second];
+    handles = [first, second] as unknown as HandleModel[];
     handles$.next(handles);
 
     observerCallbacks.forEach(({ element, callback }) =>
@@ -120,8 +113,8 @@ describe('NodeHandlesControllerDirective', () => {
 
     expect(first.measure).toHaveBeenCalledTimes(1);
     expect(second.measure).toHaveBeenCalledTimes(1);
-    expect(first.applyGeometry).toHaveBeenCalledOnceWith(geometry);
-    expect(second.applyGeometry).toHaveBeenCalledOnceWith(geometry);
+    expect(first.applyGeometry).toHaveBeenCalledExactlyOnceWith(geometry);
+    expect(second.applyGeometry).toHaveBeenCalledExactlyOnceWith(geometry);
     expect(executionOrder).toEqual(['measure first', 'measure second', 'apply first', 'apply second']);
   });
 });

@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { provideZonelessChangeDetection } from '@angular/core';
+
 import { createNode } from '../interfaces/node.interface';
 import { NodeModel } from '../models/node.model';
 import { FlowEntitiesService } from './flow-entities.service';
@@ -23,7 +23,6 @@ describe('SelectionService', () => {
         NodeRenderingService,
         SelectionService,
         ViewportService,
-        provideZonelessChangeDetection(),
       ],
     });
 
@@ -51,7 +50,7 @@ describe('SelectionService', () => {
 
     selectionService.select(node);
 
-    expect(node.selected()).toBeFalse();
+    expect(node.selected()).toBe(false);
   });
 
   it('should allow deselection even when selection is disabled globally', () => {
@@ -62,7 +61,7 @@ describe('SelectionService', () => {
 
     selectionService.select(null);
 
-    expect(node.selected()).toBeFalse();
+    expect(node.selected()).toBe(false);
   });
 
   it('should clear an ineligible selected entity when replacing it with an eligible selection', () => {
@@ -73,8 +72,8 @@ describe('SelectionService', () => {
 
     selectionService.select(eligible);
 
-    expect(ineligible.selected()).toBeFalse();
-    expect(eligible.selected()).toBeTrue();
+    expect(ineligible.selected()).toBe(false);
+    expect(eligible.selected()).toBe(true);
   });
 
   it('should leave selection writes to the consumer in manual mode', () => {
@@ -84,6 +83,6 @@ describe('SelectionService', () => {
 
     selectionService.select(node);
 
-    expect(node.selected()).toBeFalse();
+    expect(node.selected()).toBe(false);
   });
 });

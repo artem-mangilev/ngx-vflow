@@ -1,15 +1,15 @@
-import { provideZonelessChangeDetection } from '@angular/core';
+import type { Mock } from 'vitest';
 import { TestBed } from '@angular/core/testing';
 import { ResizeObserverService } from './resize-observer.service';
 
 describe('ResizeObserverService', () => {
   let nativeCallback: ResizeObserverCallback;
-  let nativeObserver: jasmine.SpyObj<ResizeObserver>;
+  let nativeObserver: { observe: Mock; unobserve: Mock; disconnect: Mock };
   let originalResizeObserver: typeof ResizeObserver;
 
   beforeEach(() => {
     originalResizeObserver = window.ResizeObserver;
-    nativeObserver = jasmine.createSpyObj<ResizeObserver>('ResizeObserver', ['observe', 'unobserve', 'disconnect']);
+    nativeObserver = { observe: vi.fn(), unobserve: vi.fn(), disconnect: vi.fn() };
 
     window.ResizeObserver = class {
       constructor(callback: ResizeObserverCallback) {
@@ -22,7 +22,7 @@ describe('ResizeObserverService', () => {
     } as unknown as typeof ResizeObserver;
 
     TestBed.configureTestingModule({
-      providers: [ResizeObserverService, provideZonelessChangeDetection()],
+      providers: [ResizeObserverService],
     });
   });
 
@@ -33,19 +33,19 @@ describe('ResizeObserverService', () => {
   it('should observe each element once and retain independent subscribers', () => {
     const service = TestBed.inject(ResizeObserverService);
     const element = document.createElement('div');
-    const first = jasmine.createSpy('first subscriber');
-    const second = jasmine.createSpy('second subscriber');
+    const first = vi.fn();
+    const second = vi.fn();
     const entry = { target: element } as unknown as ResizeObserverEntry;
 
     service.addObserver(element, first);
     service.addObserver(element, second);
 
-    expect(nativeObserver.observe).toHaveBeenCalledOnceWith(element);
+    expect(nativeObserver.observe).toHaveBeenCalledExactlyOnceWith(element);
 
     nativeCallback([entry], nativeObserver);
 
-    expect(first).toHaveBeenCalledOnceWith(entry);
-    expect(second).toHaveBeenCalledOnceWith(entry);
+    expect(first).toHaveBeenCalledExactlyOnceWith(entry);
+    expect(second).toHaveBeenCalledExactlyOnceWith(entry);
 
     service.removeObserver(element, first);
     nativeCallback([entry], nativeObserver);
@@ -56,6 +56,6 @@ describe('ResizeObserverService', () => {
 
     service.removeObserver(element, second);
 
-    expect(nativeObserver.unobserve).toHaveBeenCalledOnceWith(element);
+    expect(nativeObserver.unobserve).toHaveBeenCalledExactlyOnceWith(element);
   });
 });

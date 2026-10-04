@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, provideZonelessChangeDetection, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal, viewChild } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { createNodes } from '../../interfaces/node.interface';
 import { createEdges } from '../../interfaces/edge.interface';
@@ -51,7 +51,6 @@ describe('change outputs of the flow', () => {
   async function setup() {
     TestBed.configureTestingModule({
       imports: [ChangesHostComponent],
-      providers: [provideZonelessChangeDetection()],
     });
     const fixture = TestBed.createComponent(ChangesHostComponent);
     const host = fixture.componentInstance;
@@ -102,8 +101,9 @@ describe('change outputs of the flow', () => {
     await stable();
 
     expect(host.all.length).toBe(1);
+    expect(host.all[0]).toHaveLength(2);
     expect(host.all[0]).toEqual(
-      jasmine.arrayWithExactContents([
+      expect.arrayContaining([
         { type: 'position', id: 'a', point: { x: 10, y: 10 } },
         { type: 'select', id: 'a', selected: true },
       ]),
@@ -118,8 +118,9 @@ describe('change outputs of the flow', () => {
     await stable();
 
     expect(host.detached.length).toBe(1);
+    expect(host.detached[0]).toHaveLength(2);
     expect(host.detached[0]).toEqual(
-      jasmine.arrayWithExactContents([
+      expect.arrayContaining([
         { type: 'detached', id: 'a-b' },
         { type: 'detached', id: 'a-c' },
       ]),

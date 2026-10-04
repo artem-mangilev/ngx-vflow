@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideZonelessChangeDetection, signal } from '@angular/core';
+import { signal } from '@angular/core';
 import { FlowEntity } from '../interfaces/flow-entity.interface';
 import { FlowStatusService } from '../services/flow-status.service';
 import { FlowEntitiesService } from '../services/flow-entities.service';
@@ -39,7 +39,6 @@ describe('VflowSelectableDirective', () => {
         KeyboardService,
         SelectionService,
         { provide: NodeComponent, useValue: { model: () => entity } },
-        provideZonelessChangeDetection(),
       ],
     });
 
@@ -52,12 +51,12 @@ describe('VflowSelectableDirective', () => {
 
     (fixture.nativeElement.querySelector('button') as HTMLButtonElement).click();
 
-    expect(entity.selected()).toBeFalse();
+    expect(entity.selected()).toBe(false);
   });
 
   it('should select the entity when the DOM selection trigger is eligible', () => {
     (fixture.nativeElement.querySelector('button') as HTMLButtonElement).click();
 
-    expect(entity.selected()).toBeTrue();
+    expect(entity.selected()).toBe(true);
   });
 });

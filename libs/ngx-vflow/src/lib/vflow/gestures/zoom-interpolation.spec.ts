@@ -133,9 +133,9 @@ describe('zoom interpolation', () => {
       const interpolate = interpolateViewport(from, to, anchor, size);
       for (const frame of frames) {
         const state = interpolate(frame.t);
-        expect(state.x).withContext(`x at ${frame.t}`).toBeCloseTo(frame.x, 6);
-        expect(state.y).withContext(`y at ${frame.t}`).toBeCloseTo(frame.y, 6);
-        expect(state.zoom).withContext(`zoom at ${frame.t}`).toBeCloseTo(frame.zoom, 9);
+        expect(state.x, `x at ${frame.t}`).toBeCloseTo(frame.x, 6);
+        expect(state.y, `y at ${frame.t}`).toBeCloseTo(frame.y, 6);
+        expect(state.zoom, `zoom at ${frame.t}`).toBeCloseTo(frame.zoom, 9);
       }
     }
   });

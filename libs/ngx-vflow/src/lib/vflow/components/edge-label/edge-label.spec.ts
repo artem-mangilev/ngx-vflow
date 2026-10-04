@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, provideZonelessChangeDetection, signal } from '@angular/core';
+import type { MockInstance } from 'vitest';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { VflowComponent } from '../vflow/vflow.component';
@@ -106,7 +107,7 @@ class HostComponent {
 describe('Edge labels declared inside edge presentations', () => {
   let fixture: ComponentFixture<HostComponent>;
   let root: HTMLElement;
-  let warn: jasmine.Spy;
+  let warn: MockInstance<typeof console.warn>;
 
   async function settle() {
     fixture.detectChanges();
@@ -130,14 +131,13 @@ describe('Edge labels declared inside edge presentations', () => {
   /** The browser rounds the serialized transform, so compare its numbers. */
   function expectAt(host: HTMLElement, point: { x: number; y: number }) {
     const match = /translate\(([-\d.e]+)px, ([-\d.e]+)px\)/.exec(host.style.transform);
-    expect(match).withContext(host.style.transform).not.toBeNull();
+    expect(match, host.style.transform).not.toBeNull();
     expect(Number(match![1])).toBeCloseTo(point.x, 2);
     expect(Number(match![2])).toBeCloseTo(point.y, 2);
   }
 
   beforeEach(async () => {
-    warn = spyOn(console, 'warn');
-    TestBed.configureTestingModule({ providers: [provideZonelessChangeDetection()] });
+    warn = vi.spyOn(console, 'warn');
     fixture = TestBed.createComponent(HostComponent);
     root = fixture.nativeElement;
     await settle();
@@ -148,7 +148,7 @@ describe('Edge labels declared inside edge presentations', () => {
     const host = labelHost('.center-label')!;
     const point = edgeModel('template').path().labelPoints!.center;
 
-    expect(label instanceof HTMLElement).toBeTrue();
+    expect(label instanceof HTMLElement).toBe(true);
     expect(label.textContent).toBe('Hello');
     expect(host.closest('.v-edge-labels-layer')).not.toBeNull();
     expect(host.closest('svg')).toBeNull();
@@ -196,7 +196,7 @@ describe('Edge labels declared inside edge presentations', () => {
     expect(labelHost('.center-label')!.style.transform).not.toContain('rotate');
     // The browser rounds the serialized angle.
     const rotate = /rotate\(([-\d.e]+)deg\)/.exec(host.style.transform);
-    expect(rotate).withContext(host.style.transform).not.toBeNull();
+    expect(rotate, host.style.transform).not.toBeNull();
     expect(Number(rotate![1])).toBeCloseTo(angle - 180, 2);
 
     fixture.componentInstance.orient.set('horizontal');
@@ -222,7 +222,7 @@ describe('Edge labels declared inside edge presentations', () => {
     const label = root.querySelector('.component-label')!;
 
     expect(positions('component')).toEqual(['end']);
-    expect(label instanceof HTMLElement).toBeTrue();
+    expect(label instanceof HTMLElement).toBe(true);
     expect(label.textContent).toBe('From component');
     expect(label.closest('.v-edge-labels-layer')).not.toBeNull();
   });
@@ -231,8 +231,8 @@ describe('Edge labels declared inside edge presentations', () => {
     const label = root.querySelector('.svg-label')!;
 
     expect(label.namespaceURI).toBe('http://www.w3.org/2000/svg');
-    expect(label instanceof HTMLElement).toBeFalse();
-    expect(warn).toHaveBeenCalledWith(jasmine.stringContaining('label of edge "inside-svg" was compiled in the SVG'));
+    expect(label instanceof HTMLElement).toBe(false);
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('label of edge "inside-svg" was compiled in the SVG'));
   });
 
   it('keeps the last label declared at a position and warns about the duplicate', () => {
@@ -240,7 +240,7 @@ describe('Edge labels declared inside edge presentations', () => {
     expect(root.querySelector('.second-duplicate')).not.toBeNull();
     expect(root.querySelector('.first-duplicate')).toBeNull();
     expect(warn).toHaveBeenCalledWith(
-      jasmine.stringContaining('Edge "duplicate" declares more than one label at "center"'),
+      expect.stringContaining('Edge "duplicate" declares more than one label at "center"'),
     );
   });
 
@@ -249,13 +249,13 @@ describe('Edge labels declared inside edge presentations', () => {
     await settle();
 
     expect(root.querySelector('.long-form-label')).toBeNull();
-    expect(warn).toHaveBeenCalledWith(jasmine.stringContaining('Edge "long-form" uses a curve without labelPoints'));
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('Edge "long-form" uses a curve without labelPoints'));
 
     // A recomputed path of the same curve is not reported again.
-    const reported = warn.calls.count();
+    const reported = warn.mock.calls.length;
     fixture.componentInstance.nodes[3].point.set({ x: 20, y: 270 });
     await settle();
 
-    expect(warn.calls.count()).toBe(reported);
+    expect(warn.mock.calls.length).toBe(reported);
   });
 });

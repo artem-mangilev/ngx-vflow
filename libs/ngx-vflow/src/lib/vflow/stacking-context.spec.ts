@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, provideZonelessChangeDetection } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Vflow } from './vflow';
 import { createNodes } from './interfaces/node.interface';
@@ -30,7 +30,6 @@ describe('Flow stacking context', () => {
   };
 
   beforeEach(async () => {
-    TestBed.configureTestingModule({ providers: [provideZonelessChangeDetection()] });
     fixture = TestBed.createComponent(PageComponent);
     root = fixture.nativeElement;
     fixture.detectChanges();

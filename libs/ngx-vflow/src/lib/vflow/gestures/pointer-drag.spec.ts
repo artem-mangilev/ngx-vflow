@@ -14,7 +14,11 @@ describe('createPointerDrag', () => {
     calls = [];
   });
 
-  afterEach(() => parent.remove());
+  afterEach(async () => {
+    parent.remove();
+    // A drag swallows the next click until the following macrotask; let it expire before the next test.
+    await new Promise((resolve) => setTimeout(resolve));
+  });
 
   function create(options: Parameters<typeof createPointerDrag>[1] = {}) {
     const record = (name: string) => (context: PointerDragContext) => calls.push(`${name}:${context.point.x}`);
@@ -36,7 +40,7 @@ describe('createPointerDrag', () => {
     dispatchPointer(window, 'pointermove', { x: 30 });
     dispatchPointer(window, 'pointerup', { x: 30 });
     expect(calls).toEqual(['start:10', 'move:30', 'end:30']);
-    expect(drag.pressed).toBeFalse();
+    expect(drag.pressed).toBe(false);
     drag.destroy();
   });
 
@@ -65,7 +69,7 @@ describe('createPointerDrag', () => {
     const press = dispatchPointer(element, 'pointerdown', { x: 0 });
     dispatchPointer(window, 'pointerup', { x: 0 });
     expect(reached).toBe(1);
-    expect(press.defaultPrevented).toBeFalse();
+    expect(press.defaultPrevented).toBe(false);
     drag.destroy();
   });
 

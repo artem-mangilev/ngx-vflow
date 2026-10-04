@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, provideZonelessChangeDetection, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { createNodes } from '../../interfaces/node.interface';
 import { Edge, createEdges } from '../../interfaces/edge.interface';
@@ -42,7 +42,6 @@ describe('public graph accessibility', () => {
   it('falls back for empty and custom content with sparse factories and resets omitted translations', async () => {
     TestBed.configureTestingModule({
       imports: [AccessibilityHostComponent],
-      providers: [provideZonelessChangeDetection()],
     });
     const fixture = TestBed.createComponent(AccessibilityHostComponent);
     const host = fixture.componentInstance;
@@ -83,7 +82,6 @@ describe('public graph accessibility', () => {
   it('names the graph, entities, relationships and minimap with entity Tab stops', async () => {
     TestBed.configureTestingModule({
       imports: [AccessibilityHostComponent],
-      providers: [provideZonelessChangeDetection()],
     });
     const fixture = TestBed.createComponent(AccessibilityHostComponent);
     fixture.detectChanges();
@@ -104,7 +102,7 @@ describe('public graph accessibility', () => {
     ).toBe('edge');
     expect(root.querySelector('[role="img"][aria-label="Graph minimap"]')).not.toBeNull();
     expect(root.querySelectorAll('[tabindex="0"]').length).toBe(4);
-    expect(root.querySelector('[role="img"]')?.hasAttribute('tabindex')).toBeFalse();
+    expect(root.querySelector('[role="img"]')?.hasAttribute('tabindex')).toBe(false);
     const child = root.querySelector('[aria-label="Request & review"]')!;
     expect(description(child)).toContain('Parent: Node parent.');
   });
@@ -112,7 +110,6 @@ describe('public graph accessibility', () => {
   it('reactively combines custom descriptions, relationships and actual selection despite denied eligibility', async () => {
     TestBed.configureTestingModule({
       imports: [AccessibilityHostComponent],
-      providers: [provideZonelessChangeDetection()],
     });
     const fixture = TestBed.createComponent(AccessibilityHostComponent);
     const host = fixture.componentInstance;
@@ -140,8 +137,8 @@ describe('public graph accessibility', () => {
     expect(description(child)).toContain(
       'Requires review. Parent: Processing. Selected. Selection unavailable. Movement unavailable.',
     );
-    expect(child.hasAttribute('aria-selected')).toBeFalse();
-    expect(child.hasAttribute('aria-disabled')).toBeFalse();
+    expect(child.hasAttribute('aria-selected')).toBe(false);
+    expect(child.hasAttribute('aria-disabled')).toBe(false);
     expect(description(root.querySelector('[aria-label="Approve"]')!)).toContain(
       'Review route. Connection from Application to Approval. Press Enter or Space to select.',
     );
@@ -152,7 +149,7 @@ describe('public graph accessibility', () => {
     await fixture.whenStable();
     expect(child.getAttribute('aria-label')).toBe('Заявка');
     expect(description(child)).toContain('Требует проверки. Родитель: Processing. Выбран.');
-    expect(host.nodes[1].selected()).toBeTrue();
+    expect(host.nodes[1].selected()).toBe(true);
     expect(root.querySelector('[role="region"]')?.getAttribute('aria-label')).toBe('Граф');
     expect(description(root.querySelector('[aria-label="Approve"]')!)).toContain('Connection from Заявка to Approval');
   });
@@ -177,7 +174,6 @@ describe('public graph accessibility', () => {
     };
     TestBed.configureTestingModule({
       imports: [AccessibilityHostComponent],
-      providers: [provideZonelessChangeDetection()],
     });
     const fixture = TestBed.createComponent(AccessibilityHostComponent);
     fixture.componentInstance.nodes = createNodes([
@@ -197,7 +193,7 @@ describe('public graph accessibility', () => {
     expect(node.getAttribute('lang')).toBe('en');
     expect(node.getAttribute('dir')).toBe('ltr');
     for (const attribute of ['id', 'aria-hidden', 'onclick', 'data-object']) {
-      expect(node.hasAttribute(attribute)).withContext(attribute).toBeFalse();
+      expect(node.hasAttribute(attribute), attribute).toBe(false);
     }
     expect(node.getAttribute('tabindex')).toBe('0');
     expect(node.getAttribute('style')).not.toContain('display: none');
@@ -206,14 +202,13 @@ describe('public graph accessibility', () => {
     await fixture.whenStable();
     expect(node.getAttribute('data-test')).toBe('updated');
     expect(node.getAttribute('data-count')).toBe('2');
-    expect(node.hasAttribute('title')).toBeFalse();
-    expect(node.hasAttribute('lang')).toBeFalse();
+    expect(node.hasAttribute('title')).toBe(false);
+    expect(node.hasAttribute('lang')).toBe(false);
   });
 
   it('keeps handles transparent with their metadata while preserving custom controls', async () => {
     TestBed.configureTestingModule({
       imports: [AccessibilityHostComponent],
-      providers: [provideZonelessChangeDetection()],
     });
     const fixture = TestBed.createComponent(AccessibilityHostComponent);
     const host = fixture.componentInstance;
@@ -230,7 +225,7 @@ describe('public graph accessibility', () => {
     await fixture.whenStable();
     for (const handle of handles) {
       for (const name of ['role', 'aria-label', 'aria-describedby', 'aria-hidden', 'aria-disabled', 'tabindex']) {
-        expect(handle.hasAttribute(name)).withContext(name).toBeFalse();
+        expect(handle.hasAttribute(name), name).toBe(false);
       }
     }
     expect(handles[0].getAttribute('data-v-handle-can-accept')).toBe('false');
@@ -241,7 +236,6 @@ describe('public graph accessibility', () => {
   it('keeps descriptions and quiet live regions independent across flows and cleans them up', async () => {
     TestBed.configureTestingModule({
       imports: [AccessibilityHostComponent],
-      providers: [provideZonelessChangeDetection()],
     });
     const first = TestBed.createComponent(AccessibilityHostComponent);
     const second = TestBed.createComponent(AccessibilityHostComponent);
@@ -252,7 +246,7 @@ describe('public graph accessibility', () => {
     await second.whenStable();
     const root: HTMLElement = first.nativeElement;
     expect(description(root.querySelector('[role="region"]')!)).toBe('Review diagram.');
-    expect(root.querySelector('[role="img"]')!.hasAttribute('aria-describedby')).toBeFalse();
+    expect(root.querySelector('[role="img"]')!.hasAttribute('aria-describedby')).toBe(false);
     expect(root.querySelector('[aria-label="Node parent"]')?.getAttribute('aria-roledescription')).toBe('группа');
     expect(root.querySelector('[aria-label="Request & review"]')?.getAttribute('aria-roledescription')).toBe('узел');
     expect(second.nativeElement.querySelector('[aria-label="Node parent"]')?.getAttribute('aria-roledescription')).toBe(

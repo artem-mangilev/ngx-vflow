@@ -115,22 +115,16 @@
       "executor": "@ng-doc/builder:dev-server"
     },
     "test": {
+      "executor": "nx:run-commands",
       "options": {
-        "tsConfig": "apps/docs/tsconfig.spec.json",
-        "inlineStyleLanguage": "scss",
-        "assets": [
-          "apps/docs/src/favicon.ico",
-          "apps/docs/src/assets",
-          {
-            "glob": "**/*.wasm",
-            "input": "node_modules/@vizdom/vizdom-ts-web/",
-            "output": "assets/vizdom"
-          }
-        ],
-        "styles": ["apps/docs/src/styles.scss"],
-        "scripts": []
+        "command": "tsc -p tsconfig.spec.json --noEmit && vitest run",
+        "cwd": "{projectRoot}"
       },
-      "executor": "@angular-devkit/build-angular:karma"
+      "configurations": {
+        "watch": {
+          "command": "vitest"
+        }
+      }
     },
     "lint": {
       "options": {

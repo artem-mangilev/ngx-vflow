@@ -38,6 +38,7 @@
     "tslib": "^2.3.0"
   },
   "devDependencies": {
+    "@analogjs/vite-plugin-angular": "^2.8.0",
     "@angular-devkit/build-angular": "^20.3.0",
     "@angular-eslint/builder": "^20.0.0",
     "@angular-eslint/eslint-plugin": "^20.0.0",
@@ -54,27 +55,22 @@
     "@tailwindcss/cli": "^4.1.0",
     "@tailwindcss/postcss": "^4.1.0",
     "@types/d3-force": "^3.0.10",
-    "@types/jasmine": "~4.3.0",
     "@types/node": "^22.10.5",
     "@typescript-eslint/eslint-plugin": "^8.0.0",
     "@typescript-eslint/parser": "^8.0.0",
     "@typescript-eslint/utils": "^8.0.0",
+    "@vitest/browser": "~3.2.4",
     "eslint": "8.57.0",
     "eslint-config-prettier": "^9.1.0",
     "husky": "^9.1.7",
-    "jasmine-core": "~4.6.0",
-    "karma": "~6.4.0",
-    "karma-chrome-launcher": "~3.2.0",
-    "karma-coverage": "~2.2.0",
-    "karma-jasmine": "~5.1.0",
-    "karma-jasmine-html-reporter": "~2.1.0",
     "lint-staged": "^15.3.0",
     "ng-packagr": "^20.3.0",
     "nx": "21.6.11",
     "postcss": "^8.5.0",
     "prettier": "^3.4.2",
     "tailwindcss": "^4.1.0",
-    "typescript": "~5.8.3"
+    "typescript": "~5.8.3",
+    "vitest": "~3.2.4"
   },
   "engines": {
     "node": ">=22.12.0 <23 || >=24.0.0 <25"

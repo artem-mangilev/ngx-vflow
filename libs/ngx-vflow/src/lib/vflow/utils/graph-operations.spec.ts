@@ -22,7 +22,7 @@ describe('graph operations', () => {
   it('adds nodes left-to-right without forward references or duplicate ids', () => {
     const parent = node('parent');
     const child = node('child', 0, 0, 'parent');
-    const warn = spyOn(console, 'warn');
+    const warn = vi.spyOn(console, 'warn');
 
     const forwardReference = addNodes([child, parent], []);
     expect(forwardReference).toEqual([parent]);
@@ -61,7 +61,7 @@ describe('graph operations', () => {
   it('rejects missing and ambiguous edge endpoints without throwing', () => {
     const nodes = [node('a'), node('a')];
     const edges: Edge[] = [];
-    const warn = spyOn(console, 'warn');
+    const warn = vi.spyOn(console, 'warn');
 
     expect(addEdges([{ id: 'edge', source: 'a', target: 'missing' }], { nodes, edges })).toBe(edges);
     expect(warn).toHaveBeenCalledWith('[ngx-vflow] Cannot target endpoint node "a" because its id is ambiguous.');
@@ -97,7 +97,7 @@ describe('graph operations', () => {
     const a = node('a', 0, 0, 'b');
     const b = node('b', 0, 0, 'a');
     const edge: Edge = { id: 'edge', source: 'a', target: 'b' };
-    const warn = spyOn(console, 'warn');
+    const warn = vi.spyOn(console, 'warn');
 
     const result = removeNodes(['a'], { nodes: [a, b], edges: [edge] });
     expect(result.removedNodes).toEqual([a, b]);
@@ -109,7 +109,7 @@ describe('graph operations', () => {
     const parent = node('parent');
     const child = node('duplicate', 0, 0, 'parent');
     const other = node('duplicate');
-    const warn = spyOn(console, 'warn');
+    const warn = vi.spyOn(console, 'warn');
     const nodes = [parent, child, other];
     const result = removeNodes(['duplicate', 'parent', 'duplicate'], { nodes, edges: [] });
     expect(result.nodes).toEqual([]);
@@ -150,7 +150,7 @@ describe('graph operations', () => {
     const cycleA = node('cycle-a', 0, 0, 'cycle-b');
     const cycleB = node('cycle-b', 0, 0, 'cycle-a');
     const nodes = [parent, child, cycleA, cycleB];
-    const warn = spyOn(console, 'warn');
+    const warn = vi.spyOn(console, 'warn');
 
     expect(reparentNodes([{ id: 'parent', parentId: 'child' }], nodes)).toBe(nodes);
     expect(reparentNodes([{ id: 'cycle-a', parentId: null }], nodes)).toBe(nodes);
@@ -174,7 +174,7 @@ describe('graph operations', () => {
     const duplicateB: Edge = { id: 'duplicate', source: 'b', target: 'a' };
     const keep: Edge = { id: 'keep', source: 'a', target: 'a' };
     const edges = [duplicateA, keep, duplicateB];
-    const warn = spyOn(console, 'warn');
+    const warn = vi.spyOn(console, 'warn');
 
     expect(removeEdges(['duplicate'], edges)).toBe(edges);
     expect(warn).toHaveBeenCalledWith('[ngx-vflow] Cannot target edge "duplicate" because its id is ambiguous.');

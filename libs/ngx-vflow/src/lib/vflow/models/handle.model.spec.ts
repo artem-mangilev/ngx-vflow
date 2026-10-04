@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { provideZonelessChangeDetection, signal } from '@angular/core';
+import { signal } from '@angular/core';
 import { FlowEntitiesService } from '../services/flow-entities.service';
 import { HANDLE_WITHOUT_BOX, HandleModel } from './handle.model';
 import { NodeModel } from './node.model';
@@ -33,13 +33,7 @@ describe('HandleModel', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [
-        FlowEntitiesService,
-        FlowSettingsService,
-        NodeRenderingService,
-        ViewportService,
-        provideZonelessChangeDetection(),
-      ],
+      providers: [FlowEntitiesService, FlowSettingsService, NodeRenderingService, ViewportService],
     });
 
     viewportService = TestBed.inject(ViewportService);
@@ -125,29 +119,29 @@ describe('HandleModel', () => {
 
   it('should leave an element without a layout box unmeasured and warn once', () => {
     const { model, element, parentNode } = createModel({ left: 0, top: 0, width: 100, height: 40 });
-    const warn = spyOn(console, 'warn');
+    const warn = vi.spyOn(console, 'warn');
     mockRect(element, { left: 90, top: 15, width: 10, height: 10 });
     model.sync();
     parentNode.isMeasured.set(true);
     parentNode.handles.set([model]);
-    expect(parentNode.isReady()).toBeTrue();
+    expect(parentNode.isReady()).toBe(true);
 
     element.getClientRects = () => [] as unknown as DOMRectList;
     expect(model.measure()).toBe(HANDLE_WITHOUT_BOX);
     model.sync();
     model.sync();
 
-    expect(model.isMeasured()).toBeFalse();
-    expect(model.hasBox()).toBeFalse();
+    expect(model.isMeasured()).toBe(false);
+    expect(model.hasBox()).toBe(false);
     // The node does not wait for a handle that cannot be measured.
-    expect(parentNode.isReady()).toBeTrue();
+    expect(parentNode.isReady()).toBe(true);
     expect(warn).toHaveBeenCalledTimes(1);
-    expect(warn.calls.mostRecent().args[0]).toContain('has no layout box');
+    expect(warn.mock.lastCall![0]).toContain('has no layout box');
 
     // A handle that got its box back and lost it again is reported again.
     mockRect(element, { left: 90, top: 15, width: 10, height: 10 });
     model.sync();
-    expect(model.hasBox()).toBeTrue();
+    expect(model.hasBox()).toBe(true);
     element.getClientRects = () => [] as unknown as DOMRectList;
     model.sync();
 

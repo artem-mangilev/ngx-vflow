@@ -21,8 +21,8 @@ describe('press target table', () => {
     expect(pressTarget(find('#drag-in-handle')).connection).toBeNull();
     expect(pressTarget(find('#drag-in-handle')).dragHandle).toBe(find('.v-drag-handle'));
     expect(pressTarget(find('#reconnect')).connection).toBe(find('#reconnect'));
-    expect(pressTarget(find('#control')).control).toBeTrue();
-    expect(pressTarget(find('#no-pan')).noPan).toBeTrue();
+    expect(pressTarget(find('#control')).control).toBe(true);
+    expect(pressTarget(find('#no-pan')).noPan).toBe(true);
     expect(pressTarget(find('#body')).node).toBe(find('.v-node'));
     expect(pressTarget(null).node).toBeNull();
   });
@@ -36,14 +36,14 @@ describe('press target table', () => {
       <div class="v-node v-node--drag-handles-only"><i id="handles-body"></i><div class="v-drag-handle"><i id="title"></i></div></div>`);
     const pan = (selector: string) => isPanPress(pressTarget(find(selector)));
 
-    expect(pan('#canvas')).toBeTrue();
-    expect(pan('#edge')).toBeTrue();
-    expect(pan('#reconnect')).toBeFalse();
-    expect(pan('#draggable-body')).toBeFalse();
-    expect(pan('#no-pan')).toBeFalse();
-    expect(pan('#undraggable-body')).toBeTrue();
-    expect(pan('#handles-body')).toBeTrue();
-    expect(pan('#title')).toBeFalse();
+    expect(pan('#canvas')).toBe(true);
+    expect(pan('#edge')).toBe(true);
+    expect(pan('#reconnect')).toBe(false);
+    expect(pan('#draggable-body')).toBe(false);
+    expect(pan('#no-pan')).toBe(false);
+    expect(pan('#undraggable-body')).toBe(true);
+    expect(pan('#handles-body')).toBe(true);
+    expect(pan('#title')).toBe(false);
   });
 
   it('drags a node from its body, or only from drag handles when it has them', () => {
@@ -57,11 +57,11 @@ describe('press target table', () => {
       </div>`);
     const drag = (selector: string, handles = false) => isNodeDragPress(pressTarget(find(selector)), handles);
 
-    expect(drag('#body')).toBeTrue();
-    expect(drag('#no-pan')).toBeTrue();
-    expect(drag('#body', true)).toBeFalse();
-    expect(drag('#title', true)).toBeTrue();
-    expect(drag('#control')).toBeFalse();
-    expect(drag('#port')).toBeFalse();
+    expect(drag('#body')).toBe(true);
+    expect(drag('#no-pan')).toBe(true);
+    expect(drag('#body', true)).toBe(false);
+    expect(drag('#title', true)).toBe(true);
+    expect(drag('#control')).toBe(false);
+    expect(drag('#port')).toBe(false);
   });
 });

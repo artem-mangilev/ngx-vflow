@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, provideZonelessChangeDetection, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { VflowComponent } from './components/vflow/vflow.component';
@@ -73,9 +73,13 @@ class MinimapHostComponent {
   ];
 }
 
-describe('CSS viewport virtualization', () => {
-  beforeEach(() => TestBed.configureTestingModule({ providers: [provideZonelessChangeDetection()] }));
+/** `toEqual` compares DOM nodes structurally; the lists must keep the very same elements. */
+function expectSameElements(actual: Element[], expected: Element[]) {
+  expect(actual).toHaveLength(expected.length);
+  actual.forEach((element, i) => expect(element).toBe(expected[i]));
+}
 
+describe('CSS viewport virtualization', () => {
   async function settle(fixture: ComponentFixture<unknown>) {
     fixture.detectChanges();
     for (let i = 0; i < 5; i++) await new Promise(requestAnimationFrame);
@@ -91,8 +95,8 @@ describe('CSS viewport virtualization', () => {
   }
 
   it('pans and zooms without reconciling the unchanged graph lists', async () => {
-    const trackNodes = spyOn<any>(VflowComponent.prototype, 'trackNodes').and.callThrough();
-    const trackEdges = spyOn<any>(VflowComponent.prototype, 'trackEdges').and.callThrough();
+    const trackNodes = vi.spyOn(VflowComponent.prototype as any, 'trackNodes');
+    const trackEdges = vi.spyOn(VflowComponent.prototype as any, 'trackEdges');
     const fixture = setup(
       [0, 1000].map((x, i) => createNode({ id: String(i), component: PlainNodeComponent, point: { x, y: 0 } })),
     );
@@ -101,12 +105,12 @@ describe('CSS viewport virtualization', () => {
     expect(trackNodes).toHaveBeenCalled();
     expect(trackEdges).toHaveBeenCalled();
     // Re-measuring an uncovered node refreshes the view; the graph lists must keep their DOM.
-    const before = Array.from(fixture.nativeElement.querySelectorAll('.v-node, svg[edge]'));
+    const before = Array.from<Element>(fixture.nativeElement.querySelectorAll('.v-node, svg[edge]'));
     fixture.componentInstance.setViewport({ ...fixture.componentInstance.viewport(), x: -1000, y: 0 });
     await fixture.whenStable();
     fixture.componentInstance.zoomTo(0.8);
     await fixture.whenStable();
-    expect(Array.from(fixture.nativeElement.querySelectorAll('.v-node, svg[edge]'))).toEqual(before);
+    expectSameElements(Array.from(fixture.nativeElement.querySelectorAll('.v-node, svg[edge]')), before);
     const viewport = fixture.nativeElement.querySelector('.v-viewport') as HTMLElement;
     expect(viewport.style.transform).toContain('scale(0.8)');
     const hosts = fixture.nativeElement.querySelectorAll('.v-node') as NodeListOf<HTMLElement>;
@@ -115,8 +119,8 @@ describe('CSS viewport virtualization', () => {
   });
 
   it('drags one node without reconciling unrelated graph lists and keeps drag events and the edge live', async () => {
-    const trackNodes = spyOn<any>(VflowComponent.prototype, 'trackNodes').and.callThrough();
-    const trackEdges = spyOn<any>(VflowComponent.prototype, 'trackEdges').and.callThrough();
+    const trackNodes = vi.spyOn(VflowComponent.prototype as any, 'trackNodes');
+    const trackEdges = vi.spyOn(VflowComponent.prototype as any, 'trackEdges');
     const fixture = setup(
       [0, 200, 1000].map((x, i) =>
         createNode({ id: String(i), component: i === 0 ? DragNodeComponent : PlainNodeComponent, point: { x, y: 50 } }),
@@ -142,7 +146,7 @@ describe('CSS viewport virtualization', () => {
     const toolbar = fixture.nativeElement.querySelector('v-node-toolbar') as HTMLElement;
     const oldToolbarX = toolbar.getBoundingClientRect().x;
     const hiddenNode = fixture.debugElement.injector.get(FlowEntitiesService).nodes()[2];
-    const connectionUpdates = spyOn(hiddenNode.connectionActive, 'set').and.callThrough();
+    const connectionUpdates = vi.spyOn(hiddenNode.connectionActive, 'set');
     const states: string[] = [];
     const subscription = fixture.debugElement.injector
       .get(FlowStatusService)
@@ -151,9 +155,9 @@ describe('CSS viewport virtualization', () => {
       mouseAsPointer(type, { clientX: x, clientY: 70, buttons: 1, bubbles: true, view: window });
     host.dispatchEvent(mouse('mousedown', 20));
     await fixture.whenStable();
-    trackNodes.calls.reset();
-    trackEdges.calls.reset();
-    connectionUpdates.calls.reset();
+    trackNodes.mockClear();
+    trackEdges.mockClear();
+    connectionUpdates.mockClear();
     for (const x of [40, 60, 80]) {
       window.dispatchEvent(mouse('mousemove', x));
       await fixture.whenStable();
@@ -180,8 +184,8 @@ describe('CSS viewport virtualization', () => {
   });
 
   it('updates selection semantics and elevation without reconciling graph lists', async () => {
-    const trackNodes = spyOn<any>(VflowComponent.prototype, 'trackNodes').and.callThrough();
-    const trackEdges = spyOn<any>(VflowComponent.prototype, 'trackEdges').and.callThrough();
+    const trackNodes = vi.spyOn(VflowComponent.prototype as any, 'trackNodes');
+    const trackEdges = vi.spyOn(VflowComponent.prototype as any, 'trackEdges');
     const fixture = setup(
       [0, 200].map((x, i) => createNode({ id: String(i), component: PlainNodeComponent, point: { x, y: 0 } })),
     );
@@ -197,8 +201,8 @@ describe('CSS viewport virtualization', () => {
     const injector = fixture.debugElement.injector;
     const node = injector.get(FlowEntitiesService).nodes()[0];
     const edge = injector.get(FlowEntitiesService).edges()[0];
-    trackNodes.calls.reset();
-    trackEdges.calls.reset();
+    trackNodes.mockClear();
+    trackEdges.mockClear();
     injector.get(SelectionService).select(node);
     injector.get(NodeRenderingService).pullNode(node);
     await fixture.whenStable();
@@ -231,11 +235,11 @@ describe('CSS viewport virtualization', () => {
     const sourceHandle = source.handles().find((handle) => handle.type() === 'source')!;
     const firstHandle = first.handles().find((handle) => handle.type() === 'target')!;
     const secondHandle = second.handles().find((handle) => handle.type() === 'target')!;
-    const unrelatedUpdates = spyOn(unrelated.connectionActive, 'set').and.callThrough();
+    const unrelatedUpdates = vi.spyOn(unrelated.connectionActive, 'set');
     status.setConnectionStartStatus(source, sourceHandle);
     await fixture.whenStable();
-    const rendered = Array.from(fixture.nativeElement.querySelectorAll('.v-node, svg[edge]'));
-    unrelatedUpdates.calls.reset();
+    const rendered = Array.from<Element>(fixture.nativeElement.querySelectorAll('.v-node, svg[edge]'));
+    unrelatedUpdates.mockClear();
     status.setConnectionValidationStatus(true, source, first, sourceHandle, firstHandle);
     await fixture.whenStable();
     expect(firstHandle.state()).toBe('valid');
@@ -243,27 +247,27 @@ describe('CSS viewport virtualization', () => {
     await fixture.whenStable();
     expect(firstHandle.state()).toBe('idle');
     expect(secondHandle.state()).toBe('invalid');
-    expect(first.connectionActive()).toBeFalse();
-    expect(second.connectionActive()).toBeTrue();
+    expect(first.connectionActive()).toBe(false);
+    expect(second.connectionActive()).toBe(true);
     expect(unrelatedUpdates).not.toHaveBeenCalled();
-    expect(Array.from(fixture.nativeElement.querySelectorAll('.v-node, svg[edge]'))).toEqual(rendered);
+    expectSameElements(Array.from(fixture.nativeElement.querySelectorAll('.v-node, svg[edge]')), rendered);
     status.setReconnectionStartStatus(first, firstHandle, edge);
     await fixture.whenStable();
-    expect(source.connectionActive()).toBeTrue();
-    expect(second.connectionActive()).toBeTrue();
+    expect(source.connectionActive()).toBe(true);
+    expect(second.connectionActive()).toBe(true);
     expect(secondHandle.state()).toBe('idle');
     const edgeHost = fixture.nativeElement.querySelector('svg[edge]') as SVGElement;
     expect(getComputedStyle(edgeHost).visibility).toBe('hidden');
     status.setIdleStatus();
     // Template handles are measured on the next animation frame, unlike the removed standard handles.
     await settle(fixture);
-    expect([source, first, second].every((node) => !node.connectionActive())).toBeTrue();
+    expect([source, first, second].every((node) => !node.connectionActive())).toBe(true);
     expect(getComputedStyle(edgeHost).visibility).toBe('visible');
   });
 
   it('draws the minimap on canvas, reuses previews during pan/zoom, and refreshes node changes', async () => {
-    const trackNodes = spyOn<any>(VflowComponent.prototype, 'trackNodes').and.callThrough();
-    const drawPreview = spyOn(CanvasRenderingContext2D.prototype, 'roundRect').and.callThrough();
+    const trackNodes = vi.spyOn(VflowComponent.prototype as any, 'trackNodes');
+    const drawPreview = vi.spyOn(CanvasRenderingContext2D.prototype, 'roundRect');
     const fixture = TestBed.createComponent(MinimapHostComponent);
     await settle(fixture);
     const flow = fixture.debugElement.query(By.directive(VflowComponent));
@@ -279,8 +283,8 @@ describe('CSS viewport virtualization', () => {
     expect(drawPreview).toHaveBeenCalled();
     expect(fixture.nativeElement.querySelector('.node-preview')).toBeNull();
     const initialImage = canvas.toDataURL();
-    trackNodes.calls.reset();
-    drawPreview.calls.reset();
+    trackNodes.mockClear();
+    drawPreview.mockClear();
     component.setViewport({ ...component.viewport(), x: -200, y: 0 });
     component.zoomTo(0.8);
     await fixture.whenStable();
@@ -356,18 +360,18 @@ describe('CSS viewport virtualization', () => {
     expect([node.width(), node.height()]).toEqual([240, 80]);
     fixture.componentInstance.setViewport({ ...fixture.componentInstance.viewport(), x: 0, y: 0 });
     fixture.detectChanges();
-    for (let i = 0; i < 6; i++) {
+    // The node shows only after it is remeasured, so its first visible frame already has the new geometry.
+    for (let i = 0; i < 6 && getComputedStyle(host).visibility !== 'visible'; i++) {
       await new Promise(requestAnimationFrame);
-      if (getComputedStyle(host).visibility === 'visible') {
-        expect([node.width(), node.height()]).toEqual([320, 120]);
-        expect(host.querySelector<HTMLElement>('.v-handle[data-v-handle-position="right"]')!.style.top).toBe('60px');
-      }
     }
+    expect(getComputedStyle(host).visibility).toBe('visible');
+    expect([node.width(), node.height()]).toEqual([320, 120]);
+    expect(host.querySelector<HTMLElement>('.v-handle[data-v-handle-position="right"]')!.style.top).toBe('60px');
     expect(fixture.debugElement.query(By.directive(StatefulNodeComponent)).componentInstance).toBe(component);
     expect(host.querySelector('input')).toBe(input);
     expect(component.draft).toBe('unsaved draft');
     expect(input.value).toBe('unsaved draft');
-    expect(node.isReady()).toBeTrue();
+    expect(node.isReady()).toBe(true);
     // Turning virtualization off restores hidden views without recreating them.
     fixture.componentInstance.setViewport({ ...fixture.componentInstance.viewport(), x: 1000, y: 0 });
     await settle(fixture);
@@ -464,11 +468,11 @@ describe('CSS viewport virtualization', () => {
     window.dispatchEvent(mouse('mousemove', -1000));
     await settle(fixture);
     const nodes = fixture.debugElement.injector.get(FlowEntitiesService).nodes();
-    expect(nodes.every((node) => node.dragging())).toBeTrue();
+    expect(nodes.every((node) => node.dragging())).toBe(true);
     hosts.forEach((host) => expect(getComputedStyle(host).display).not.toBe('none'));
     window.dispatchEvent(mouse('mouseup', -1000));
     await settle(fixture);
-    expect(nodes.every((node) => !node.dragging())).toBeTrue();
+    expect(nodes.every((node) => !node.dragging())).toBe(true);
     hosts.forEach((host) => expect(getComputedStyle(host).display).toBe('none'));
   });
 

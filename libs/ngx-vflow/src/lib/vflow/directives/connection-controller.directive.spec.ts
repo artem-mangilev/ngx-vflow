@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { provideZonelessChangeDetection, signal } from '@angular/core';
+import { signal } from '@angular/core';
 import { ConnectionControllerDirective } from './connection-controller.directive';
 import { ConnectionModel } from '../models/connection.model';
 import { EdgeModel } from '../models/edge.model';
@@ -21,14 +21,7 @@ describe('ConnectionControllerDirective', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [
-        FlowEntitiesService,
-        FlowSettingsService,
-        FlowStatusService,
-        NodeRenderingService,
-        ViewportService,
-        provideZonelessChangeDetection(),
-      ],
+      providers: [FlowEntitiesService, FlowSettingsService, FlowStatusService, NodeRenderingService, ViewportService],
     });
 
     flowEntitiesService = TestBed.inject(FlowEntitiesService);
@@ -145,7 +138,7 @@ describe('ConnectionControllerDirective', () => {
 
   it('should reject a new connection when its starting handle cannot start', () => {
     const source = createHandle(createNodeModel('source'), 'source', false);
-    const connectStart = jasmine.createSpy('connectStart');
+    const connectStart = vi.fn();
     const subscription = controller.connectStart.subscribe(connectStart);
 
     controller.startConnection(source);
@@ -157,7 +150,7 @@ describe('ConnectionControllerDirective', () => {
   });
 
   it('should reject a connection candidate before calling the application validator', () => {
-    const validator = jasmine.createSpy('validator').and.returnValue(true);
+    const validator = vi.fn().mockReturnValue(true);
     flowEntitiesService.connection.set(new ConnectionModel({ validator }));
 
     const source = createHandle(createNodeModel('source'), 'source');
@@ -177,7 +170,7 @@ describe('ConnectionControllerDirective', () => {
   });
 
   it('should allow reconnection to start from a retained handle without canStart and reject its candidate by canAccept', () => {
-    const validator = jasmine.createSpy('validator').and.returnValue(true);
+    const validator = vi.fn().mockReturnValue(true);
     flowEntitiesService.connection.set(new ConnectionModel({ validator }));
 
     const retained = createHandle(createNodeModel('source'), 'source', false);

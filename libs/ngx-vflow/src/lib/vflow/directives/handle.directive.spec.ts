@@ -1,11 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  provideZonelessChangeDetection,
-  signal,
-  Type,
-  inject,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal, Type, inject } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { VflowComponent } from '../components/vflow/vflow.component';
@@ -118,7 +111,6 @@ class PortNodeComponent {}
 
 describe('VflowHandleDirective', () => {
   function setup(component: Type<unknown>, ids = ['a'], edges: { source: string; target: string }[] = []) {
-    TestBed.configureTestingModule({ providers: [provideZonelessChangeDetection()] });
     const fixture = TestBed.createComponent(VflowComponent);
     fixture.componentRef.setInput('view', [400, 300]);
     fixture.componentRef.setInput(
@@ -157,7 +149,7 @@ describe('VflowHandleDirective', () => {
     const [node] = nodes(fixture);
     const [target, source] = node.handles();
 
-    expect(node.isReady()).toBeTrue();
+    expect(node.isReady()).toBe(true);
     expect(centerInNode(handleElement(fixture, 'left'))).toEqual({ x: 0, y: 20 });
     expect(centerInNode(handleElement(fixture, 'right'))).toEqual({ x: 120, y: 40 });
     expect(target.localPoint()).toEqual({ x: -5, y: 20 });
@@ -194,20 +186,20 @@ describe('VflowHandleDirective', () => {
   });
 
   it('shows the node without a display: none handle, hides its edges and measures a visibility: hidden handle', async () => {
-    const warn = spyOn(console, 'warn');
+    const warn = vi.spyOn(console, 'warn');
     const fixture = setup(HiddenHandlesNodeComponent, ['a', 'b'], [{ source: 'a', target: 'b' }]);
     await settle(fixture);
     const [a, b] = nodes(fixture);
     const edge = fixture.debugElement.injector.get(FlowEntitiesService).edges()[0];
 
-    expect(b.handles()[0].hasBox()).toBeFalse();
-    expect(b.handles()[0].isMeasured()).toBeFalse();
-    expect(a.handles()[1].isMeasured()).toBeTrue();
-    expect(b.isReady()).toBeTrue();
+    expect(b.handles()[0].hasBox()).toBe(false);
+    expect(b.handles()[0].isMeasured()).toBe(false);
+    expect(a.handles()[1].isMeasured()).toBe(true);
+    expect(b.isReady()).toBe(true);
     expect(getComputedStyle(fixture.nativeElement.querySelector('.v-node')).visibility).toBe('visible');
-    expect(edge.isReady()).toBeFalse();
+    expect(edge.isReady()).toBe(false);
     expect(getComputedStyle(fixture.nativeElement.querySelector('svg[edge]')).visibility).toBe('hidden');
-    expect(warn.calls.allArgs().filter(([message]) => String(message).includes('has no layout box')).length).toBe(2);
+    expect(warn.mock.calls.filter(([message]) => String(message).includes('has no layout box')).length).toBe(2);
   });
 
   it('exposes state, forwarded role and connectability to a component that applies the directive as a host directive', async () => {
@@ -270,7 +262,6 @@ describe('VflowHandleDirective', () => {
   });
 
   it('emits connectEnd to a flow that subscribes to no other connection output', async () => {
-    TestBed.configureTestingModule({ providers: [provideZonelessChangeDetection()] });
     const fixture = TestBed.createComponent(ConnectEndHostComponent);
     await settle(fixture);
     const flow = fixture.debugElement.query(By.directive(VflowComponent)).injector;
@@ -285,7 +276,7 @@ describe('VflowHandleDirective', () => {
 
     expect(fixture.componentInstance.ends.length).toBe(1);
     const [end] = fixture.componentInstance.ends;
-    expect(end.valid).toBeTrue();
+    expect(end.valid).toBe(true);
     expect(end.from.node.id).toBe('a');
     expect(end.to.node?.id).toBe('b');
     expect(flow.get(FlowStatusService).status().state).toBe('idle');

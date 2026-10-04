@@ -17,14 +17,14 @@ describe('SpatialIndex', () => {
 
   it('moves items between cells and drops removed ones', () => {
     const index = new SpatialIndex<string>();
-    expect(index.set('a', rect(0, 0))).toBeTrue();
-    expect(index.set('a', rect(0, 0))).toBeFalse();
-    expect(index.set('a', rect(5000, 5000))).toBeTrue();
+    expect(index.set('a', rect(0, 0))).toBe(true);
+    expect(index.set('a', rect(0, 0))).toBe(false);
+    expect(index.set('a', rect(5000, 5000))).toBe(true);
     expect(index.query(rect(0, 0, 200, 200))).toEqual([]);
     expect(index.query(rect(4990, 4990, 20, 20))).toEqual(['a']);
     expect(index.rectOf('a')).toEqual(rect(5000, 5000));
-    expect(index.delete('a')).toBeTrue();
-    expect(index.delete('a')).toBeFalse();
+    expect(index.delete('a')).toBe(true);
+    expect(index.delete('a')).toBe(false);
     expect(index.query(rect(4990, 4990, 20, 20))).toEqual([]);
     expect(index.size).toBe(0);
   });
@@ -46,7 +46,7 @@ describe('SpatialIndex', () => {
     index.set('inf', rect(0, Infinity));
     expect(index.query(rect(-1e9, -1e9, 2e9, 2e9))).toEqual([]);
     expect(index.size).toBe(2);
-    expect(index.delete('nan')).toBeTrue();
+    expect(index.delete('nan')).toBe(true);
   });
 
   it('answers an unbounded or enormous query by scanning the items', () => {
