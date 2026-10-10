@@ -294,7 +294,7 @@ JSDoc: «the transparent stroke the flow draws» ([edge.interface.ts:34-40](../.
 | 10  | [`<mini-map>` снимает регистрацию](issues/10-minimap-unregister.md)                    | P1        | ready-for-agent | —          |
 | 11  | [Документация: расхождения](issues/11-docs-drift.md)                                   | P1        | ready-for-agent | —          |
 | 12  | [Выбор кликом для узла и ребра](issues/12-selection-trigger-symmetry.md)               | P2        | needs-triage    | —          |
-| 13  | [Семантика объектных настроек](issues/13-object-settings-semantics.md)                 | P2        | needs-triage    | —          |
+| 13  | [Семантика объектных настроек](issues/13-object-settings-semantics.md)                 | P2        | resolved        | —          |
 | 14  | [Graph operations и события](issues/14-graph-operations-vs-events.md)                  | P2        | needs-triage    | —          |
 | 15  | [`(initialized)` и fit-on-load](issues/15-initialized-and-fit-on-load.md)              | P2        | needs-triage    | 01         |
 | 16  | [testing: CI и поломки](issues/16-testing-ci-and-fixes.md)                             | P2        | ready-for-agent | —          |

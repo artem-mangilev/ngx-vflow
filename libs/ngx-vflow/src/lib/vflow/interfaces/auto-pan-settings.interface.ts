@@ -1,4 +1,4 @@
-/** Auto-pan settings, captured when the editor is created. */
+/** Auto-pan settings. Omitted fields keep their defaults; the flow follows later changes of the binding. */
 export interface AutoPanSettings {
   /** Enable auto-pan during node dragging. Defaults to true. */
   nodeDrag?: boolean;

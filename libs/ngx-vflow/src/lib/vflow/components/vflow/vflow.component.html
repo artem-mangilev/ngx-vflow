@@ -33,7 +33,7 @@
 
       <!-- Connection line overlay (high z-index, above edges/nodes) -->
       <svg class="v-connection-svg">
-        <svg:g connection [model]="connection" [template]="connectionTemplateDirective()?.templateRef" />
+        <svg:g connection [model]="connectionModel()" [template]="connectionTemplateDirective()?.templateRef" />
       </svg>
 
       <!-- DOM order follows application input; z-index controls visual elevation. -->

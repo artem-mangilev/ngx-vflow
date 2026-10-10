@@ -243,13 +243,15 @@ export class KeyboardService {
     this.#modifiersActive$.next(active);
   }
 
+  /** Replaces the configuration: an omitted entry returns to its default rather than keeping the previous value. */
   public setShortcuts(shortcuts: KeyboardShortcuts) {
     if (isDevMode()) reportMovedEntries(shortcuts);
-    this.state.update(({ raw }) =>
+    const defaults = defaultShortcuts();
+    this.state.set(
       resolveShortcuts(
         {
-          modifiers: { ...raw.modifiers, ...suppliedEntries(shortcuts?.modifiers) },
-          commands: { ...raw.commands, ...suppliedEntries(shortcuts?.commands) },
+          modifiers: { ...defaults.modifiers, ...suppliedEntries(shortcuts?.modifiers) },
+          commands: { ...defaults.commands, ...suppliedEntries(shortcuts?.commands) },
         },
         this.mac,
       ),

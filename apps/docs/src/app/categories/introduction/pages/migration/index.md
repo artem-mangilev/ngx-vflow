@@ -515,32 +515,43 @@ A flow that relied on a missing handler to keep its handles inert sets `[canStar
 - A filtered output such as `(nodesChanges.position)` follows the same rule with the changes of its type.
 - `viewportChange$` and `initialized$` are removed: `viewport` and `initialized` are state, and the signals are the way to read them.
 
+### Settings inputs
+
+Every object input of `vflow` now reads the same way: the value is the defaults with the keys you pass on top, so a key you leave out returns to its default instead of keeping the value of the previous binding. This holds for `optimization`, `selectionBox`, `keyboardShortcuts` and `ariaLabelConfig`; code that built a setting over several bindings must pass the whole object each time. `autoPan` follows later changes of its binding instead of reading it once, and `tolerance` in `AlignmentHelperSettings` and `partially` in `IntersectingNodesOptions` are optional.
+
+`view` defaults to `'auto'` instead of `[400, 400]`: the flow fills its parent element, which therefore needs a width and a height. In dev mode the flow warns when one of them measures zero. Pass `[view]="[400, 400]"` to keep the former size.
+
+`optimization.detachedGroupsLayer` became the `parentsBelowEdges` input, and the `groupRole` label key became `parentRole`; both are about nodes that other nodes reference as parent. The getters `minZoom`, `maxZoom` and `connection` of `VflowComponent` are removed: they mirrored inputs, and `connection` returned an internal model.
+
 ### Removed APIs
 
-| Removed in v3                                               | Migration                                                                                                          |
-| ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| Node type `svg-template`                                    | Remove `type` and provide native HTML through `<ng-template vNode>`.                                               |
-| `NodeSvgTemplateDirective` and `nodeSvgTemplate`            | Remove these imports/usages and use `VflowNodeTemplateDirective` / `vNode`.                                        |
-| `scaleOnHover` input on `MiniMapComponent`                  | Remove the input binding. The minimap remains at its default scale and does not capture pointer input.             |
-| `documentPointToFlowPoint()`                                | Rename to `clientToFlowPosition()`. Use `flowToClientPosition()` for the inverse conversion.                       |
-| `{ spaces: true }`, `SpacePoint`, `getSpacePoints`          | Convert with `clientToFlowPosition()`, then call `getNodesAtPoint()` on the flow component.                        |
-| VflowComponent.toNodeSpace()                                | Use the pure `getNodePositionInSpace()` utility.                                                                   |
-| getIntesectingNodes()                                       | Rename to `getIntersectingNodes()`.                                                                                |
-| `viewportTo(state)`                                         | Rename to `setViewport(state)`.                                                                                    |
-| `panTo({ x, y })`                                           | `setViewport({ ...flow.viewport(), x, y })`; to center on a flow-space point, `setCenter(point)`.                  |
-| `step` input on `vui-controls`                              | Remove the binding. The buttons zoom by the step of the zoom keys.                                                 |
-| `useDefaults` option of the `create*` factories             | Remove it. The factories always create the default signals; write a literal for a bare object.                     |
-| `ConnectionControllerDirective`                             | Remove the import. The connection outputs belong to `vflow`.                                                       |
-| `[selectable]`, `SelectableDirective`                       | Remove them. A click on the presentation selects the node; `vNoSelect` excludes an embedded control.               |
-| `ngx-vflow/testing`: `VflowMocks`, `provideCustomNodeMocks` | Test with the real `Vflow`. See Testing mocks above.                                                               |
-| `nodesChange$` and `edgesChange$`                           | `flow.nodesChanges.subscribe(...)` and `flow.edgesChanges.subscribe(...)`, or `outputToObservable()`.              |
-| `nodesChange` and `edgesChange` signals                     | Subscribe to the `nodesChanges` and `edgesChanges` outputs. A signal kept only the last array.                     |
-| `viewportChange$`                                           | Read the `viewport` signal, or `toObservable(flow.viewport)` with `skip(1)` to drop the current value.             |
-| `initialized$`                                              | Read the `initialized` signal, or `toObservable(flow.initialized)`.                                                |
-| `ChangesControllerDirective`, `NodeDragControllerDirective` | Remove the imports. They are host directives of `vflow`; their outputs are bound on `<vflow>`.                     |
-| `NodeDragStartEvent`, `NodeDragEndEvent`                    | Use `NodeDragEvent`: the three node drag outputs emit the same `{ node }`.                                         |
-| `isComponentNode()`                                         | Check the `component` field of the node.                                                                           |
-| `NODE_DEFAULTS`, `EDGE_DEFAULTS`, `DEFAULT_OPTIMIZATION`    | Remove the imports. Omitted fields and settings keep their defaults; write a literal where the code needs a value. |
+| Removed in v3                                                     | Migration                                                                                                          |
+| ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| Node type `svg-template`                                          | Remove `type` and provide native HTML through `<ng-template vNode>`.                                               |
+| `NodeSvgTemplateDirective` and `nodeSvgTemplate`                  | Remove these imports/usages and use `VflowNodeTemplateDirective` / `vNode`.                                        |
+| `scaleOnHover` input on `MiniMapComponent`                        | Remove the input binding. The minimap remains at its default scale and does not capture pointer input.             |
+| `documentPointToFlowPoint()`                                      | Rename to `clientToFlowPosition()`. Use `flowToClientPosition()` for the inverse conversion.                       |
+| `{ spaces: true }`, `SpacePoint`, `getSpacePoints`                | Convert with `clientToFlowPosition()`, then call `getNodesAtPoint()` on the flow component.                        |
+| VflowComponent.toNodeSpace()                                      | Use the pure `getNodePositionInSpace()` utility.                                                                   |
+| getIntesectingNodes()                                             | Rename to `getIntersectingNodes()`.                                                                                |
+| `viewportTo(state)`                                               | Rename to `setViewport(state)`.                                                                                    |
+| `panTo({ x, y })`                                                 | `setViewport({ ...flow.viewport(), x, y })`; to center on a flow-space point, `setCenter(point)`.                  |
+| `step` input on `vui-controls`                                    | Remove the binding. The buttons zoom by the step of the zoom keys.                                                 |
+| `useDefaults` option of the `create*` factories                   | Remove it. The factories always create the default signals; write a literal for a bare object.                     |
+| `ConnectionControllerDirective`                                   | Remove the import. The connection outputs belong to `vflow`.                                                       |
+| `[selectable]`, `SelectableDirective`                             | Remove them. A click on the presentation selects the node; `vNoSelect` excludes an embedded control.               |
+| `ngx-vflow/testing`: `VflowMocks`, `provideCustomNodeMocks`       | Test with the real `Vflow`. See Testing mocks above.                                                               |
+| `nodesChange$` and `edgesChange$`                                 | `flow.nodesChanges.subscribe(...)` and `flow.edgesChanges.subscribe(...)`, or `outputToObservable()`.              |
+| `nodesChange` and `edgesChange` signals                           | Subscribe to the `nodesChanges` and `edgesChanges` outputs. A signal kept only the last array.                     |
+| `viewportChange$`                                                 | Read the `viewport` signal, or `toObservable(flow.viewport)` with `skip(1)` to drop the current value.             |
+| `initialized$`                                                    | Read the `initialized` signal, or `toObservable(flow.initialized)`.                                                |
+| `ChangesControllerDirective`, `NodeDragControllerDirective`       | Remove the imports. They are host directives of `vflow`; their outputs are bound on `<vflow>`.                     |
+| `NodeDragStartEvent`, `NodeDragEndEvent`                          | Use `NodeDragEvent`: the three node drag outputs emit the same `{ node }`.                                         |
+| `isComponentNode()`                                               | Check the `component` field of the node.                                                                           |
+| `NODE_DEFAULTS`, `EDGE_DEFAULTS`, `DEFAULT_OPTIMIZATION`          | Remove the imports. Omitted fields and settings keep their defaults; write a literal where the code needs a value. |
+| `optimization.detachedGroupsLayer`                                | `[parentsBelowEdges]="true"` on `vflow`.                                                                           |
+| `groupRole` in `AriaLabelConfig`                                  | Rename to `parentRole`.                                                                                            |
+| `minZoom`, `maxZoom` and `connection` getters of `VflowComponent` | Keep the bound values in the application; the inputs remain.                                                       |
 
 ### DOM compatibility
 

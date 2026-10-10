@@ -15,7 +15,7 @@ import { AriaLabelConfig, DeleteRequest, Vflow, createEdges, createNodes, remove
 const SPANISH: Partial<AriaLabelConfig> = {
   flowLabel: 'Grafo de aprobación',
   nodeRole: 'nodo',
-  groupRole: 'grupo',
+  parentRole: 'grupo',
   edgeRole: 'conexión',
   parentDescription: (parent) => `Padre: ${parent}.`,
   selected: 'Seleccionado.',

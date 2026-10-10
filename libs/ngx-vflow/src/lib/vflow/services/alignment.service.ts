@@ -76,7 +76,7 @@ export class AlignmentService {
   public snap(points: Point[]): { x: boolean; y: boolean } {
     const settings = this.settingsService.alignmentHelper();
     if (!this.scene || !settings || this.bypassed()) return { x: false, y: false };
-    const tolerance = settings === true ? DEFAULT_TOLERANCE : settings.tolerance;
+    const tolerance = settings === true ? DEFAULT_TOLERANCE : (settings.tolerance ?? DEFAULT_TOLERANCE);
 
     const bounds = getBoundsOfRects(
       points.map((point, index) => ({

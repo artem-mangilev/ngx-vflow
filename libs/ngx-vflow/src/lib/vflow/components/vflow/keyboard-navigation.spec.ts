@@ -12,7 +12,7 @@ import { KeyboardInstructionKeys, KeyboardInstructionState } from '../../interfa
   imports: [Vflow],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `<button>Before</button
-    ><vflow [nodes]="nodes()" [edges]="edges" [view]="[600, 350]" [optimization]="{ detachedGroupsLayer: true }">
+    ><vflow [nodes]="nodes()" [edges]="edges" [view]="[600, 350]" [parentsBelowEdges]="true">
       <ng-template vNode>
         <div style="width: 100px; height: 50px">
           <span vHandle handleType="target" position="left"></span
@@ -111,7 +111,7 @@ describe('public keyboard graph navigation', () => {
         },
         { id: 'parent', point: { x: 20, y: 20 }, width: 250, height: 200, ariaLabel: 'Parent' },
         { id: 'other', point: { x: 100, y: 50 }, width: 250, height: 200, ariaLabel: 'Other' },
-        // Non-focusable members keep child and other in the detached groups layer without joining traversal.
+        // Non-focusable members keep child and other in the parents layer below the edges without joining traversal.
         { id: 'child-member', parentId: 'child', point: { x: 10, y: 10 }, width: 20, height: 20, focusable: false },
         { id: 'other-member', parentId: 'other', point: { x: 10, y: 10 }, width: 20, height: 20, focusable: false },
       ]),
@@ -601,8 +601,11 @@ describe('public keyboard graph navigation', () => {
     // Entries left out of the update keep their defaults.
     key(child, 'Escape');
     expect(host.nodes()[0].selected()).toBe(false);
-    // A later update touches two command entries; the modifier set before it survives.
-    host.flow().keyboardShortcuts = { commands: { clearSelection: [], delete: [] } };
+    // A binding replaces the configuration, so the entries to keep are passed again with the two disabled ones.
+    host.flow().keyboardShortcuts = {
+      commands: { select: ['s'], clearSelection: [], delete: [] },
+      modifiers: { multiSelection: ['AltLeft'] },
+    };
     await settle();
     key(child, 's', 'KeyS');
     document.dispatchEvent(new KeyboardEvent('keydown', { code: 'AltLeft' }));
@@ -673,7 +676,7 @@ describe('public keyboard graph navigation', () => {
     expect(key(child, 'q', 'KeyQ').defaultPrevented).toBe(false);
     expect(requests).toEqual([]);
     // Releasing the key from the modifier hands it back to the command, which proves what blocked it.
-    host.flow().keyboardShortcuts = { modifiers: { selection: [] } };
+    host.flow().keyboardShortcuts = { modifiers: { selection: [] }, commands: { delete: ['q'] } };
     await settle();
     expect(key(child, 'q', 'KeyQ').defaultPrevented).toBe(true);
     expect(requests).toEqual([{ nodeIds: ['child'], edgeIds: [] }]);

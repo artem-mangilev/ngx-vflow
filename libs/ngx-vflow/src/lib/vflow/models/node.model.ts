@@ -43,7 +43,7 @@ export class NodeModel<T = unknown> implements FlowEntity, Contextable<NodeConte
       const parent = this.parent();
       return {
         label: this.ariaLabel(),
-        roleDescription: this.children().length > 0 ? labels.groupRole : labels.nodeRole,
+        roleDescription: this.children().length > 0 ? labels.parentRole : labels.nodeRole,
         domAttributes: this.raw().domAttributes?.(),
         description: [
           this.raw().ariaDescription?.(),

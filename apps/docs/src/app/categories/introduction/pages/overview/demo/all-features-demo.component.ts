@@ -10,7 +10,7 @@ import { TransformNodeComponent } from './components/transform-node.component';
     [nodes]="store.nodes()"
     [edges]="store.edges()"
     [background]="{ type: 'dots' }"
-    [optimization]="{ detachedGroupsLayer: true }"
+    [parentsBelowEdges]="true"
     [alignmentHelper]="true"
     (connect)="createEdge($event)"
     (nodesChanges.size)="store.applySizeChanges($event)"

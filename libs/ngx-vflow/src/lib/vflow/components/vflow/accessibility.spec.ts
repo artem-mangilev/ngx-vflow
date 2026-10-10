@@ -239,7 +239,7 @@ describe('public graph accessibility', () => {
     });
     const first = TestBed.createComponent(AccessibilityHostComponent);
     const second = TestBed.createComponent(AccessibilityHostComponent);
-    first.componentInstance.labels.set({ flowDescription: 'Review diagram.', nodeRole: 'узел', groupRole: 'группа' });
+    first.componentInstance.labels.set({ flowDescription: 'Review diagram.', nodeRole: 'узел', parentRole: 'группа' });
     first.detectChanges();
     second.detectChanges();
     await first.whenStable();

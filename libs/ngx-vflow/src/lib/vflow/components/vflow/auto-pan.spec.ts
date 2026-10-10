@@ -191,13 +191,39 @@ describe('public auto-pan settings', () => {
     }
   }
 
-  it('captures settings at creation, including values of a mutable options object', async () => {
+  it('reads the options object when it is bound, not when it mutates later', async () => {
     const options = { speed: 120, margin: 100 };
     await setup(options);
     options.speed = 600;
+    drag(50);
+    await frame(100);
+    expect(fixture.componentInstance.flow.viewport().x).toBeCloseTo(3, 8);
+  });
+
+  it('stops when the binding disables auto-pan during a drag', async () => {
+    await setup(true);
+    drag();
+    await frame(100);
+    expect(fixture.componentInstance.flow.viewport().x).toBe(60);
     fixture.componentRef.setInput('autoPan', false);
     fixture.detectChanges();
+    TestBed.flushEffects();
+    await frame(100);
+    await frame(100);
+    expect(fixture.componentInstance.flow.viewport().x).toBe(60);
+  });
+
+  it('starts when a later binding enables auto-pan during a drag', async () => {
+    await setup(false);
     drag(50);
+    await frame(100);
+    expect(fixture.componentInstance.flow.viewport().x).toBe(0);
+    fixture.componentRef.setInput('autoPan', { speed: 120, margin: 100 });
+    fixture.detectChanges();
+    TestBed.flushEffects();
+    await frame(0);
+    const rect = (fixture.nativeElement.querySelector('.v-root') as HTMLElement).getBoundingClientRect();
+    document.dispatchEvent(new PointerEvent('pointermove', { clientX: rect.left + 50, clientY: rect.top + 150 }));
     await frame(100);
     expect(fixture.componentInstance.flow.viewport().x).toBeCloseTo(3, 8);
   });

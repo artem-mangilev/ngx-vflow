@@ -115,9 +115,7 @@ export class NodeComponent implements OnInit, OnDestroy {
     });
     effect(() => {
       const model = this.model();
-      const groups = this.flowSettingsService.optimization().detachedGroupsLayer
-        ? this.nodeRenderingService.groups()
-        : [];
+      const groups = this.flowSettingsService.parentsBelowEdges() ? this.nodeRenderingService.groups() : [];
       const groupIndex = groups.indexOf(model);
       this.hostRef.nativeElement.style.zIndex = String(
         groupIndex >= 0 ? groupIndex - groups.length : model.renderOrder(),

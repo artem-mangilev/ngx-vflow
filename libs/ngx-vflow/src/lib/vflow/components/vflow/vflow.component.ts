@@ -53,7 +53,8 @@ import { ComponentEventBusService } from '../../services/component-event-bus.ser
 import { Background } from '../../types/background.type';
 import { SpacePointContextDirective } from '../../directives/space-point-context.directive';
 import { FitViewOptions } from '../../interfaces/fit-view-options.interface';
-import { Optimization } from '../../interfaces/optimization.interface';
+import { DEFAULT_OPTIMIZATION, Optimization } from '../../interfaces/optimization.interface';
+import { withDefaults } from '../../utils/with-defaults';
 import { KeyboardShortcuts } from '../../types/keyboard-shortcuts.type';
 import { SelectionMode } from '../../types/selection-mode.type';
 import { KeyboardService } from '../../services/keyboard.service';
@@ -86,7 +87,7 @@ import { RequestAnimationFrameBatchingService } from '../../services/request-ani
 import { NodeDragControllerDirective } from '../../directives/node-drag-controller.directive';
 import { SelectionBoxComponent } from '../selection-box/selection-box.component';
 import { SelectionBoxContextDirective } from '../../directives/selection-box-context.directive';
-import { SelectionBoxSettings } from '../../interfaces/selection-box-settings.interface';
+import { DEFAULT_SELECTION_BOX, SelectionBoxSettings } from '../../interfaces/selection-box-settings.interface';
 import { AriaDescriber } from '@angular/cdk/a11y';
 import { EntityAccessibilityDirective } from '../../directives/entity-accessibility.directive';
 import { LiveRegionDirective } from '../../directives/live-region.directive';
@@ -200,6 +201,7 @@ export class VflowComponent {
   private nodeRenderingService = inject(NodeRenderingService);
   private flowSettingsService = inject(FlowSettingsService);
   protected ariaLabels = this.flowSettingsService.ariaLabels;
+  protected connectionModel = this.flowEntitiesService.connection;
   private componentEventBusService = inject(ComponentEventBusService);
   private keyboardService = inject(KeyboardService);
   private injector = inject(Injector);
@@ -254,18 +256,12 @@ export class VflowComponent {
   /** Partial localization overrides; omitted entries use the English defaults. */
   @Input()
   public set ariaLabelConfig(value: Partial<AriaLabelConfig>) {
-    this.flowSettingsService.ariaLabels.set({
-      ...DEFAULT_ARIA_LABEL_CONFIG,
-      ...Object.fromEntries(Object.entries(value).filter(([, entry]) => entry !== undefined)),
-    });
+    this.flowSettingsService.ariaLabels.set(withDefaults(DEFAULT_ARIA_LABEL_CONFIG, value));
   }
 
   /**
-   * Size for flow view
-   *
-   * accepts
-   * - absolute size in format [width, height] or
-   * - 'auto' to compute size based on parent element size
+   * Size of the flow: `[width, height]` in pixels, or `'auto'` to fill the parent element. Default: `'auto'`, so
+   * the parent needs a size of its own.
    */
   @Input()
   public set view(view: [number, number] | 'auto') {
@@ -279,9 +275,6 @@ export class VflowComponent {
   public set minZoom(value: number) {
     this.flowSettingsService.minZoom.set(value);
   }
-  public get minZoom(): number {
-    return this.flowSettingsService.minZoom();
-  }
 
   /**
    * Maximum zoom value
@@ -289,9 +282,6 @@ export class VflowComponent {
   @Input()
   public set maxZoom(value: number) {
     this.flowSettingsService.maxZoom.set(value);
-  }
-  public get maxZoom(): number {
-    return this.flowSettingsService.maxZoom();
   }
 
   /** Zoom with ordinary wheel/trackpad scrolling. */
@@ -350,12 +340,19 @@ export class VflowComponent {
     this.flowSettingsService.background.set(value);
   }
 
+  /** Rendering optimizations; omitted keys keep their defaults. */
   @Input()
-  public set optimization(newOptimization: Optimization) {
-    this.flowSettingsService.optimization.update((optimization) => ({
-      ...optimization,
-      ...newOptimization,
-    }));
+  public set optimization(value: Optimization) {
+    this.flowSettingsService.optimization.set(withDefaults(DEFAULT_OPTIMIZATION, value));
+  }
+
+  /**
+   * Draws the nodes that other nodes reference as parent in a layer below the edges, so an edge inside a parent
+   * can be selected. Such a parent then also stays below every other node. Default: false.
+   */
+  @Input()
+  public set parentsBelowEdges(value: boolean) {
+    this.flowSettingsService.parentsBelowEdges.set(value);
   }
 
   /** Global default for node selection eligibility. */
@@ -393,19 +390,16 @@ export class VflowComponent {
   }
 
   /**
-   * Selection box behavior settings
+   * Selection box behavior settings; omitted keys keep their defaults.
    * - mode: 'full' selects only fully enclosed entities
    * - mode: 'partial' selects entities that intersect selection box
-   * - color: stroke/fill color for selection area (fill uses opacity)
    */
   @Input()
   public set selectionBox(value: SelectionBoxSettings) {
-    this.flowSettingsService.selectionBox.update((selectionBox) => ({
-      ...selectionBox,
-      ...value,
-    }));
+    this.flowSettingsService.selectionBox.set(withDefaults(DEFAULT_SELECTION_BOX, value));
   }
 
+  /** Keys of the graph; omitted entries keep their defaults and an empty list disables an entry. */
   @Input()
   public set keyboardShortcuts(value: KeyboardShortcuts) {
     this.keyboardService.setShortcuts(value);
@@ -421,10 +415,6 @@ export class VflowComponent {
   })
   public set connection(connection: ConnectionModel) {
     this.flowEntitiesService.connection.set(connection);
-  }
-
-  public get connection() {
-    return this.flowEntitiesService.connection();
   }
 
   /**
@@ -452,7 +442,8 @@ export class VflowComponent {
   }
 
   /**
-   * Configure auto-pan at editor creation. Later changes are ignored.
+   * Pans the viewport while a dragged node or connection is held near its edge. `true` enables it for node and
+   * connection drags with default speed and margin; `AutoPanSettings` tunes it. Default: true.
    */
   @Input()
   public set autoPan(value: boolean | AutoPanSettings) {

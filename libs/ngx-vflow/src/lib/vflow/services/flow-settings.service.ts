@@ -3,7 +3,7 @@ import { Injectable, WritableSignal, signal } from '@angular/core';
 import { Background } from '../types/background.type';
 import { DEFAULT_OPTIMIZATION, Optimization } from '../interfaces/optimization.interface';
 import { SelectionMode } from '../types/selection-mode.type';
-import { SelectionBoxSettings } from '../interfaces/selection-box-settings.interface';
+import { DEFAULT_SELECTION_BOX, SelectionBoxSettings } from '../interfaces/selection-box-settings.interface';
 import { DEFAULT_ARIA_LABEL_CONFIG } from '../interfaces/aria-label-config.interface';
 import { AlignmentHelperSettings } from '../interfaces/alignment-helper-settings.interface';
 
@@ -23,7 +23,7 @@ export class FlowSettingsService {
   /**
    * @see {VflowComponent.view}
    */
-  public view: WritableSignal<[number, number] | 'auto'> = signal([400, 400]);
+  public view: WritableSignal<[number, number] | 'auto'> = signal('auto');
 
   /**
    * Set based on view property. May change if view is 'auto'
@@ -57,9 +57,12 @@ export class FlowSettingsService {
   /** @see {VflowComponent.alignmentHelper} */
   public alignmentHelper = signal<AlignmentHelperSettings | boolean>(false);
 
+  /** @see {VflowComponent.parentsBelowEdges} */
+  public parentsBelowEdges = signal(false);
+
   public optimization = signal<Required<Optimization>>(DEFAULT_OPTIMIZATION);
 
   public selectionMode = signal<SelectionMode>('default');
 
-  public selectionBox = signal<Required<SelectionBoxSettings>>({ mode: 'full' });
+  public selectionBox = signal<Required<SelectionBoxSettings>>(DEFAULT_SELECTION_BOX);
 }

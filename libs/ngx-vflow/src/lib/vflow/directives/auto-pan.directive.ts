@@ -1,6 +1,6 @@
 import { DestroyRef, Directive, inject, Injector, OnInit, isDevMode } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
-import { EMPTY, merge, fromEvent } from 'rxjs';
+import { EMPTY, merge, fromEvent, Observable } from 'rxjs';
 import {
   switchMap,
   tap,
@@ -18,6 +18,7 @@ import { FlowSettingsService } from '../services/flow-settings.service';
 import { RootSvgReferenceDirective } from './reference.directive';
 import { Point } from '../interfaces/point.interface';
 import { animationFrames } from '../utils/animation-frames';
+import { AutoPanSettings } from '../interfaces/auto-pan-settings.interface';
 
 @Directive({ selector: '[autoPan]', standalone: true })
 export class AutoPanDirective implements OnInit {
@@ -38,7 +39,17 @@ export class AutoPanDirective implements OnInit {
   );
 
   ngOnInit() {
-    const value = this.flowSettingsService.autoPan();
+    // A new binding replaces the running configuration, including during a drag.
+    toObservable(this.flowSettingsService.autoPan, { injector: this.injector })
+      .pipe(
+        switchMap((value) => this.panning(value)),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe();
+  }
+
+  /** Pans while the status is one of the configured drags, or never when the settings disable auto-pan. */
+  private panning(value: boolean | AutoPanSettings): Observable<unknown> {
     const options = typeof value === 'boolean' ? { nodeDrag: value, connectionDrag: value } : value;
     const states = [
       ...((options.nodeDrag ?? true) ? ['node-drag'] : []),
@@ -46,31 +57,28 @@ export class AutoPanDirective implements OnInit {
     ];
     const speed = nonNegativeSetting('speed', options.speed, 600);
     const margin = nonNegativeSetting('margin', options.margin, 48);
-    if (states.length && speed > 0 && margin > 0) {
-      toObservable(this.statusService.status, { injector: this.injector })
-        .pipe(
-          distinctUntilKeyChanged('state'),
-          switchMap((status) =>
-            states.includes(status.state)
-              ? this.documentPoint$.pipe(
-                  take(1),
-                  switchMap(() =>
-                    animationFrames().pipe(
-                      startWith({ timestamp: 0, elapsed: 0 }),
-                      pairwise(),
-                      withLatestFrom(this.documentPoint$),
-                      tap(([[previous, current], point]) =>
-                        this.pan(point, (speed * (current.elapsed - previous.elapsed)) / 1000, margin),
-                      ),
-                    ),
+    if (!states.length || speed <= 0 || margin <= 0) return EMPTY;
+
+    return toObservable(this.statusService.status, { injector: this.injector }).pipe(
+      distinctUntilKeyChanged('state'),
+      switchMap((status) =>
+        states.includes(status.state)
+          ? this.documentPoint$.pipe(
+              take(1),
+              switchMap(() =>
+                animationFrames().pipe(
+                  startWith({ timestamp: 0, elapsed: 0 }),
+                  pairwise(),
+                  withLatestFrom(this.documentPoint$),
+                  tap(([[previous, current], point]) =>
+                    this.pan(point, (speed * (current.elapsed - previous.elapsed)) / 1000, margin),
                   ),
-                )
-              : EMPTY,
-          ),
-          takeUntilDestroyed(this.destroyRef),
-        )
-        .subscribe();
-    }
+                ),
+              ),
+            )
+          : EMPTY,
+      ),
+    );
   }
 
   private toViewportPoint(event: Point): Point {

@@ -34,7 +34,7 @@ export interface AriaLabelConfig {
   edgeLabel: (endpoints: { source: string; target: string }) => string;
   /** `aria-roledescription` of a node, of a node that other nodes reference as parent, and of an edge. */
   nodeRole: string;
-  groupRole: string;
+  parentRole: string;
   edgeRole: string;
   parentDescription: (parent: string) => string;
   selected: string;
@@ -66,7 +66,7 @@ export const DEFAULT_ARIA_LABEL_CONFIG: AriaLabelConfig = {
   nodeLabel: (id) => `Node ${id}`,
   edgeLabel: ({ source, target }) => `Connection from ${source} to ${target}`,
   nodeRole: 'node',
-  groupRole: 'group',
+  parentRole: 'group',
   edgeRole: 'edge',
   parentDescription: (parent) => `Parent: ${parent}.`,
   selected: 'Selected.',

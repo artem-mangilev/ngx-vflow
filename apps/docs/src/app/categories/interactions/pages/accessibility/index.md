@@ -104,21 +104,21 @@ const labels: Partial<AriaLabelConfig> = {
 <vflow [nodes]="nodes" [edges]="edges" [ariaLabelConfig]="labels" />
 ```
 
-| Key                                           | Default                                                                                      |
-| --------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| `flowLabel`, `flowDescription`                | `Graph`, empty                                                                               |
-| `minimapLabel`                                | `Graph minimap`                                                                              |
-| `nodeLabel`                                   | `(id) => 'Node {id}'`                                                                        |
-| `edgeLabel`                                   | `({ source, target }) => 'Connection from {source} to {target}'`                             |
-| `nodeRole`, `groupRole`, `edgeRole`           | `node`, `group`, `edge`: the `aria-roledescription` a screen reader says instead of the role |
-| `parentDescription`                           | `(parent) => 'Parent: {parent}.'`                                                            |
-| `selected`                                    | `Selected.`                                                                                  |
-| `selectionUnavailable`, `movementUnavailable` | `Selection unavailable.`, `Movement unavailable.`                                            |
-| `nodeInstructions`, `edgeInstructions`        | `(keys, state) => string`, the instruction sentences above                                   |
-| `selectionAnnouncement`                       | `({ label, selected, count }) => '{label} selected. {count} selected in total.'`             |
-| `selectionClearedAnnouncement`                | `Selection cleared.`                                                                         |
-| `movedAnnouncement`                           | `({ count, direction, x, y }) => 'Moved node {direction}. Position: {x}, {y}.'`              |
-| `zoomAnnouncement`                            | `(zoom) => 'Zoom {percent}%.'`                                                               |
+| Key                                           | Default                                                                                                                                                       |
+| --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `flowLabel`, `flowDescription`                | `Graph`, empty                                                                                                                                                |
+| `minimapLabel`                                | `Graph minimap`                                                                                                                                               |
+| `nodeLabel`                                   | `(id) => 'Node {id}'`                                                                                                                                         |
+| `edgeLabel`                                   | `({ source, target }) => 'Connection from {source} to {target}'`                                                                                              |
+| `nodeRole`, `parentRole`, `edgeRole`          | `node`, `group`, `edge`: the `aria-roledescription` a screen reader says instead of the role; `parentRole` is for a node that other nodes reference as parent |
+| `parentDescription`                           | `(parent) => 'Parent: {parent}.'`                                                                                                                             |
+| `selected`                                    | `Selected.`                                                                                                                                                   |
+| `selectionUnavailable`, `movementUnavailable` | `Selection unavailable.`, `Movement unavailable.`                                                                                                             |
+| `nodeInstructions`, `edgeInstructions`        | `(keys, state) => string`, the instruction sentences above                                                                                                    |
+| `selectionAnnouncement`                       | `({ label, selected, count }) => '{label} selected. {count} selected in total.'`                                                                              |
+| `selectionClearedAnnouncement`                | `Selection cleared.`                                                                                                                                          |
+| `movedAnnouncement`                           | `({ count, direction, x, y }) => 'Moved node {direction}. Position: {x}, {y}.'`                                                                               |
+| `zoomAnnouncement`                            | `(zoom) => 'Zoom {percent}%.'`                                                                                                                                |
 
 Formatters receive and return plain text. `nodeInstructions` and `edgeInstructions` are either a sentence or a function of the keys bound at that moment and of what the entity can do, so an instruction follows a remap on its own and never names a command that is disabled or unavailable:
 

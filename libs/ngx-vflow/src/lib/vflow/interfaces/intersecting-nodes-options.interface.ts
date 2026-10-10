@@ -1,3 +1,4 @@
 export interface IntersectingNodesOptions {
-  partially: boolean;
+  /** Whether a node that only partly overlaps the rect counts. Default: false. */
+  partially?: boolean;
 }

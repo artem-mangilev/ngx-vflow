@@ -1,6 +1,6 @@
 ## Auto size
 
-`vflow` automatically fits it container if you pass `view="auto"` input
+By default, or with `view="auto"`, `vflow` fills its parent element, so the parent needs a width and a height of its own. In dev mode the flow warns when one of them measures zero.
 
 {{ NgDocActions.demo("ViewSizeFullscreenDemoComponent", { fullscreenRoute: "view-size-auto" }) }}
 
