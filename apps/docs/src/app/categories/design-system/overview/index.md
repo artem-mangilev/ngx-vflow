@@ -165,8 +165,8 @@ the node's border. The canvas minimap samples the resolved tokens and repaints w
 attribute changes on any ancestor of the flow (for example `data-vui-theme` or a class) or when the
 `prefers-color-scheme` preference changes; edits to a stylesheet alone are not observed.
 
-Give custom edges their interaction stroke with core `vEdgeInteraction`; use core gesture
-exclusions such as `vNoDrag` for embedded controls. Do not shrink a hit area just to make
+Keep the interaction stroke of custom edges inside the presentation with core `vEdgeInteraction`; use core gesture
+exclusions such as `vNoDrag` and `vNoSelect` for embedded controls. Do not shrink a hit area just to make
 its visual smaller. Keep status text alongside color and give icon-only buttons accessible names.
 
 Core is headless: it ships no ready-made node, group, edge or label presentation and no appearance

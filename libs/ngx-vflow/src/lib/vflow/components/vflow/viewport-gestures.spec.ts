@@ -469,7 +469,7 @@ describe('public viewport gesture settings', () => {
     expect(flow.viewport().zoom).toBeCloseTo(1.44, 10);
   });
 
-  it('clears the selection on a pane click unless the pressed element is selectable', async () => {
+  it('clears the selection on a pane click unless the pressed element belongs to a node or an edge', async () => {
     const node = createNode({ id: 'a', point: { x: 0, y: 0 }, selected: true });
     fixture.componentRef.setInput('nodes', [node]);
     fixture.detectChanges();
@@ -481,7 +481,7 @@ describe('public viewport gesture settings', () => {
     };
 
     const selectable = document.createElement('span');
-    selectable.classList.add('v-selectable');
+    selectable.classList.add('v-node');
     pane.appendChild(selectable);
     click(selectable);
     expect(node.selected!()).toBe(true);

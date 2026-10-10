@@ -6,11 +6,7 @@ import { Node, Vflow, createNodes } from 'ngx-vflow';
   template: `<vflow view="auto" [nodes]="nodes">
     <ng-template let-ctx vNode>
       @if (ctx.data().type === 'group') {
-        <div
-          vSelectable
-          class="group-node"
-          [vResizable]="ctx.selected()"
-          [class.group-node_selected]="ctx.selected()"></div>
+        <div class="group-node" [vResizable]="ctx.selected()" [class.group-node_selected]="ctx.selected()"></div>
       } @else {
         <docs-node [ctx]="ctx" />
       }

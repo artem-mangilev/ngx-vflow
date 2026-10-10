@@ -6,7 +6,7 @@ Test a component that contains a flow with the real `Vflow`. The library ships n
 @Component({
   template: `<vflow [nodes]="nodes" [edges]="edges" (connect)="connections.push($event)">
     <ng-template vNode let-ctx>
-      <div class="step" vSelectable>
+      <div class="step">
         {{ ctx.node.id }}
         <span vHandle handleType="target" position="left"></span>
         <span vHandle handleType="source" position="right"></span>
@@ -85,6 +85,6 @@ it('connects two steps', async () => {
 
 The flow reacts to the press and to the release in separate change detection passes, as it does for a gesture that spans frames. Let the fixture settle after each of them. In an application with zone.js `whenStable()` does not run change detection, so the examples call `fixture.detectChanges()` first; a zoneless application may leave it out.
 
-A click on an element with `vSelectable` selects its node. `(nodesChanges)` and `(edgesChanges)` emit one array per tick in a later task, so wait for them, for example with `vi.waitFor()`.
+A click on the node presentation selects its node. `(nodesChanges)` and `(edgesChanges)` emit one array per tick in a later task, so wait for them, for example with `vi.waitFor()`.
 
 Gestures that depend on coordinates, such as a node drag, belong in a browser run or in an end-to-end test.

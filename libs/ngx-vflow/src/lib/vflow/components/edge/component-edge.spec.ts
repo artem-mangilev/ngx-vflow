@@ -215,7 +215,7 @@ class PlainTemplateHostComponent {
 }
 
 describe('Edges without vEdgeInteraction', () => {
-  it('draws no interaction stroke without vEdgeInteraction and still selects from presentation elements', async () => {
+  it('draws the interaction stroke in the host without vEdgeInteraction and selects from presentation elements', async () => {
     PlainEdgeComponent.instances = [];
     const fixture = TestBed.createComponent(PlainTemplateHostComponent);
     fixture.detectChanges();
@@ -225,7 +225,9 @@ describe('Edges without vEdgeInteraction', () => {
     const svgs = Array.from(fixture.nativeElement.querySelectorAll('svg[edge]')) as SVGSVGElement[];
     expect(svgs.length).toBe(2);
     for (const svg of svgs) {
-      expect(svg.querySelector('path.v-interactive-edge')).toBeNull();
+      const stroke = svg.querySelector<SVGPathElement>(':scope > path.v-interactive-edge')!;
+      expect(stroke).not.toBeNull();
+      expect(stroke.getAttribute('d')).toBe(svg.querySelector('path.v-focus-indicator')!.getAttribute('d'));
     }
 
     svgs[0].querySelector('path.plain')!.dispatchEvent(new MouseEvent('click', { bubbles: true }));

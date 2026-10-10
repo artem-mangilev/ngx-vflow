@@ -80,7 +80,6 @@ const ALL_VISIBLE: Visibility = { visible: new Set(), above: [], below: [], key:
           @let view = visibility(ctx.node.id);
           <article
             vuiNode
-            vSelectable
             [vuiSelected]="ctx.selected() || ctx.preselected()"
             [attr.data-entity]="ctx.node.id"
             [attr.data-collapsed]="ctx.data().collapsed">

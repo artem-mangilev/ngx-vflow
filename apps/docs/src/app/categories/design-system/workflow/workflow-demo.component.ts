@@ -47,7 +47,7 @@ interface StepData {
       <div class="stage">
         <vflow view="auto" [nodes]="nodes" [edges]="edges" [minZoom]="0.5" [maxZoom]="2">
           <ng-template let-ctx vNode>
-            <article vuiNode vSelectable [vuiSelected]="ctx.selected() || ctx.preselected()">
+            <article vuiNode [vuiSelected]="ctx.selected() || ctx.preselected()">
               <header vuiNodeHeader>
                 <span vuiIcon aria-hidden="true">{{ ctx.data().icon }}</span>
                 <span vuiTitle>{{ ctx.data().title }}</span>

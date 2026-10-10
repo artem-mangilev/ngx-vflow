@@ -32,8 +32,8 @@ The package includes card, field-row and container shells, text roles (title, me
 port visuals, status indicators, SVG edge strokes, HTML labels, toolbar surfaces, external labels,
 theme and selection directives, and `vui-controls` (zoom in/out, fit view, custom buttons) for a
 flow instance. The BPMN subset lives in the `@vflow/ui/bpmn` entry point.
-For flow interaction compose them with core `vSelectable`, `vHandle`
-and gesture-exclusion directives; `vEdgeInteraction` gives an edge its hit area and click selection. Bind `vuiSelected` to selection/preselection and put
+For flow interaction compose them with core `vHandle`
+and gesture-exclusion directives; a click on a presentation selects its node or edge, and `vEdgeInteraction` keeps the edge hit area inside the group for hover styles. Bind `vuiSelected` to selection/preselection and put
 `vuiPort` with the handle inputs `type`, `position`, `id`, `canStart`, `canAccept` on the element that
 is the connection point: it applies core `vHandle` as a host directive and shows its connection feedback. UI never changes roles, focus or graph state.
 

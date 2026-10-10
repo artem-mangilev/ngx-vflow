@@ -14,7 +14,9 @@ import {
 } from '@angular/core';
 import { DraggableService } from '../../services/draggable.service';
 import { NodeModel } from '../../models/node.model';
-import { FlowStatusService } from '../../services/flow-status.service';
+import { FlowStatusService, isSelectionBoxEndStatus } from '../../services/flow-status.service';
+import { SelectionService } from '../../services/selection.service';
+import { isNoSelectTarget } from '../../utils/no-select-target';
 import { HandleService } from '../../services/handle.service';
 import { NodeRenderingService } from '../../services/node-rendering.service';
 import { FlowSettingsService } from '../../services/flow-settings.service';
@@ -53,6 +55,8 @@ import { NodeResizeControllerDirective } from '../../directives/node-resize-cont
     class: 'v-node',
     '(focusin)': 'model().focused.set(true)',
     '(focusout)': 'model().focused.set(false)',
+    // Clicks from the presentation bubble here; a drag or a resize suppresses the click that follows it.
+    '(click)': 'onClick($event)',
   },
   imports: [
     NgTemplateOutlet,
@@ -73,6 +77,7 @@ export class NodeComponent implements OnInit, OnDestroy {
   private nodeAccessor = inject(NodeAccessorService);
   private componentEventBus = inject(ComponentEventBusService);
   private connectionController = inject(ConnectionControllerDirective);
+  private selectionService = inject(SelectionService);
 
   /** Every handle of every node gets a magnet while any connection is in progress. */
   protected readonly connectionActive = this.flowStatusService.connectionActive.asReadonly();
@@ -121,6 +126,13 @@ export class NodeComponent implements OnInit, OnDestroy {
     effect(() => {
       // Position updates belong to this node, not the enclosing graph list.
       this.hostRef.nativeElement.style.transform = this.model().pointTransformCss();
+    });
+    effect(() => {
+      // Elevation follows the selection itself, whether it came from a click, the keyboard, the selection box or
+      // the application.
+      if (this.flowSettingsService.elevateNodesOnSelect() && this.model().selected()) {
+        untracked(() => this.nodeRenderingService.pullNode(this.model()));
+      }
     });
   }
 
@@ -184,9 +196,18 @@ export class NodeComponent implements OnInit, OnDestroy {
     this.connectionController.resetValidateConnection(handle);
   }
 
-  protected pullNode() {
-    if (this.flowSettingsService.elevateNodesOnSelect()) {
-      this.nodeRenderingService.pullNode(this.model());
+  protected onClick(event: Event) {
+    if (isNoSelectTarget(event.target)) {
+      return;
+    }
+
+    // A selection box gesture ends with a click that must not select the node under the pointer.
+    if (isSelectionBoxEndStatus(this.flowStatusService.status())) {
+      return;
+    }
+
+    if (this.model().selectable()) {
+      this.selectionService.select(this.model());
     }
   }
 }

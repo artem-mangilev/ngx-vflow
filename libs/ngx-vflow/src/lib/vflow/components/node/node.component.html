@@ -1,23 +1,21 @@
-<div class="v-selectable" (click)="pullNode()">
-  <div
-    nodeHandlesController
-    nodeResizeController
-    class="v-node-wrapper"
-    [style.width.px]="wrapperSize()?.width ?? null"
-    [style.height.px]="wrapperSize()?.height ?? null">
-    @if (model().rawNode.component; as component) {
-      <ng-container
-        [entityComponentOutlet]="component"
-        [entityComponentOutletLoad]="model().shouldLoad()"
-        [entityComponentOutletInjector]="injector"
-        (entityComponentEvent)="pushComponentEvent($event)" />
-    } @else if (nodeTemplate(); as template) {
-      <ng-container
-        [ngTemplateOutlet]="template"
-        [ngTemplateOutletContext]="model().context"
-        [ngTemplateOutletInjector]="injector" />
-    }
-  </div>
+<div
+  nodeHandlesController
+  nodeResizeController
+  class="v-node-wrapper"
+  [style.width.px]="wrapperSize()?.width ?? null"
+  [style.height.px]="wrapperSize()?.height ?? null">
+  @if (model().rawNode.component; as component) {
+    <ng-container
+      [entityComponentOutlet]="component"
+      [entityComponentOutletLoad]="model().shouldLoad()"
+      [entityComponentOutletInjector]="injector"
+      (entityComponentEvent)="pushComponentEvent($event)" />
+  } @else if (nodeTemplate(); as template) {
+    <ng-container
+      [ngTemplateOutlet]="template"
+      [ngTemplateOutletContext]="model().context"
+      [ngTemplateOutletInjector]="injector" />
+  }
 </div>
 
 <!-- Resizer -->

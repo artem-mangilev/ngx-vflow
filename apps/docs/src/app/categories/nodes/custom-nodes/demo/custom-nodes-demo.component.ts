@@ -8,7 +8,7 @@ import { Node, Edge, Vflow, createNodes } from 'ngx-vflow';
     <ng-template let-ctx vEdge><svg:g docsEdge [ctx]="ctx" /></ng-template>
 
     <ng-template let-ctx vNode>
-      <div class="custom-node" vSelectable [class.custom-node_selected]="ctx.selected()">
+      <div class="custom-node" [class.custom-node_selected]="ctx.selected()">
         {{ ctx.data().text }}
 
         <span vuiPort handleType="source" position="right"></span>

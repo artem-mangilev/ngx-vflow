@@ -3,11 +3,11 @@ import {
   VflowNoPanDirective,
   VflowNoWheelDirective,
   VflowNoKeyboardDirective,
+  VflowNoSelectDirective,
 } from './directives/gesture-exclusions.directive';
 import { VflowComponent } from './components/vflow/vflow.component';
 
 import { VflowDragHandleDirective } from './directives/drag-handle.directive';
-import { VflowSelectableDirective } from './directives/selectable.directive';
 import { VflowEdgeInteractionDirective } from './directives/edge-interaction.directive';
 import {
   VflowConnectionTemplateDirective,
@@ -27,10 +27,10 @@ export const Vflow = [
   VflowNoDragDirective,
   VflowNoPanDirective,
   VflowNoWheelDirective,
+  VflowNoSelectDirective,
   VflowComponent,
   VflowHandleDirective,
   VflowResizableComponent,
-  VflowSelectableDirective,
   VflowEdgeInteractionDirective,
   VflowMinimapComponent,
   VflowNodeToolbarComponent,

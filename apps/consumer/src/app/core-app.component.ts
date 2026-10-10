@@ -34,7 +34,7 @@ import { addEdges, Connection, createEdges, createNodes, Edge, Vflow } from 'ngx
   template: `
     <vflow view="auto" data-testid="core-flow" [nodes]="nodes" [edges]="edges" (connect)="createEdge($event)">
       <ng-template let-ctx vNode>
-        <div class="card" vSelectable>
+        <div class="card">
           {{ ctx.data().title }}
           <span vHandle handleType="target" position="left" class="dot"></span>
           <span vHandle handleType="source" position="right" class="dot"></span>

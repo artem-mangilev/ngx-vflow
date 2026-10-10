@@ -102,11 +102,7 @@ interface StageData {
       </div>
       <vflow view="auto" [nodes]="nodes" [edges]="edges()" [connection]="connection" (connect)="connect($event)">
         <ng-template let-ctx vNode>
-          <article
-            vuiNode
-            vSelectable
-            [vuiSelected]="ctx.selected() || ctx.preselected()"
-            [attr.data-stage]="ctx.node.id">
+          <article vuiNode [vuiSelected]="ctx.selected() || ctx.preselected()" [attr.data-stage]="ctx.node.id">
             <header vuiNodeHeader>
               <span vuiIcon aria-hidden="true">{{ ctx.data().icon }}</span>
               <span vuiTitle>{{ ctx.data().title }}</span>

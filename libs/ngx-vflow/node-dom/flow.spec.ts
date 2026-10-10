@@ -3,7 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Connection, Edge, Node, NodeSelectedChange, Vflow, VflowComponent, injectNode } from 'ngx-vflow';
 
 @Component({
-  template: `<div vSelectable vResizable>
+  template: `<div vResizable>
     <span vDragHandle>{{ ctx.data().title }}</span>
     <span vHandle handleType="target" position="left"></span>
     <span vHandle handleType="source" position="right"></span>
@@ -24,7 +24,7 @@ class TaskNodeComponent {
     (connect)="connects.push($event)"
     (nodesChanges.select)="selectChanges.push($event)">
     <ng-template vNode let-ctx>
-      <div class="note" vSelectable [class.selected]="ctx.selected()">
+      <div class="note" [class.selected]="ctx.selected()">
         note {{ ctx.node.id }}
         <span vHandle handleType="target" position="left"></span>
       </div>

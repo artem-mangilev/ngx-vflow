@@ -4,7 +4,7 @@ import { Node, Vflow, injectNode } from 'ngx-vflow';
 
 @Component({
   template: `
-    <div class="transform-node" vSelectable [vResizable]="ctx.selected()">
+    <div class="transform-node" [vResizable]="ctx.selected()">
       <div class="node-header">
         <svg class="icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
           <path

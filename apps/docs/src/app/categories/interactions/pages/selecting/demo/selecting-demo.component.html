@@ -4,7 +4,7 @@
       <docs-node [ctx]="ctx" />
     } @else {
       <div class="custom-node" [class.custom-node_selected]="ctx.selected()">
-        <button class="custom-node__button" vSelectable>Select here</button>
+        <button class="custom-node__button" vNoSelect (click)="clicks.set(clicks() + 1)">Clicked {{ clicks() }}</button>
 
         <span vuiPort handleType="source" position="right"></span>
       </div>

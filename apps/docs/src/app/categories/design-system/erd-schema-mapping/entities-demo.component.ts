@@ -68,11 +68,7 @@ interface EntityData {
       </div>
       <vflow view="auto" [nodes]="nodes" [edges]="edges()" [connection]="connection" (connect)="connect($event)">
         <ng-template let-ctx vNode>
-          <article
-            vuiNode
-            vSelectable
-            [vuiSelected]="ctx.selected() || ctx.preselected()"
-            [attr.data-entity]="ctx.node.id">
+          <article vuiNode [vuiSelected]="ctx.selected() || ctx.preselected()" [attr.data-entity]="ctx.node.id">
             <header vuiNodeHeader>
               <span vuiTitle>{{ ctx.data().title }}</span>
               <span vuiMeta>{{ ctx.data().category }}</span>

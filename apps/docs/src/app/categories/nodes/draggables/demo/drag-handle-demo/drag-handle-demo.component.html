@@ -4,7 +4,7 @@
 
   <ng-template let-ctx vNode>
     <div class="custom-node" [class.custom-node_selected]="ctx.selected()">
-      <button class="custom-node__button" vDragHandle vSelectable>Drag here</button>
+      <button class="custom-node__button" vDragHandle>Drag here</button>
 
       <span vuiPort handleType="source" position="right"></span>
       <span vuiPort handleType="target" position="left"></span>

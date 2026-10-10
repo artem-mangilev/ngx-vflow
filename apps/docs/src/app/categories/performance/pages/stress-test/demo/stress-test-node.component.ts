@@ -7,7 +7,7 @@ import { Vflow, injectNode } from 'ngx-vflow';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [Vflow, VuiPort],
   template: `
-    <div class="stress-node" vSelectable [class.selected]="ctx.selected()">
+    <div class="stress-node" [class.selected]="ctx.selected()">
       {{ ctx.data().label }}
       <span vuiPort handleType="target" position="left"></span>
       <span vuiPort handleType="source" position="right"></span>

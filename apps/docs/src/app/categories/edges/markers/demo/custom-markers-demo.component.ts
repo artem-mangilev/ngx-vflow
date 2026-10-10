@@ -13,7 +13,7 @@ import { ConnectionSettings, Edge, Node, Vflow, createEdges, createNodes } from 
   template: `<vflow view="auto" [nodes]="nodes" [edges]="edges" [connection]="connectionSettings">
     <ng-template let-ctx vNode>
       @if (ctx.node.id === '1') {
-        <div vuiNode class="source" vSelectable [vuiSelected]="ctx.selected() || ctx.preselected()">
+        <div vuiNode class="source" [vuiSelected]="ctx.selected() || ctx.preselected()">
           <span>1</span>
           <span vuiPort handleType="source" position="right" handleId="top" [offsetY]="-30"></span>
           <span vuiPort handleType="source" position="right" handleId="middle"></span>

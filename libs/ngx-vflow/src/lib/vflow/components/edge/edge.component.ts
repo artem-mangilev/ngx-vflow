@@ -7,6 +7,7 @@ import {
   TemplateRef,
   inject,
   input,
+  untracked,
 } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
 
@@ -26,6 +27,7 @@ import {
 } from '../../directives/entity-component-outlet.directive';
 import { EDGE_REF } from '../../utils/inject-edge';
 import { FlowStatusService, isSelectionBoxEndStatus } from '../../services/flow-status.service';
+import { isNoSelectTarget } from '../../utils/no-select-target';
 
 @Component({
   selector: 'svg[edge]',
@@ -37,8 +39,7 @@ import { FlowStatusService, isSelectionBoxEndStatus } from '../../services/flow-
     '(focusout)': 'model().focused.set(false)',
     // Clicks from the interaction stroke and from presentation elements bubble here.
     '(click)': 'onClick($event)',
-    '(pointerdown)': 'pull()',
-    class: 'v-selectable',
+    class: 'v-edge',
   },
   providers: [
     // Resolved lazily by presentations, which are created after the model input is set.
@@ -71,6 +72,13 @@ export class EdgeComponent {
     effect(() => {
       element.style.zIndex = String(this.model().renderOrder());
     });
+    effect(() => {
+      // Elevation follows the selection itself, whether it came from a click, the keyboard, the selection box or
+      // the application.
+      if (this.flowSettingsService.elevateEdgesOnSelect() && this.model().selected()) {
+        untracked(() => this.edgeRenderingService.pull(this.model()));
+      }
+    });
   }
 
   public select() {
@@ -84,15 +92,8 @@ export class EdgeComponent {
     }
   }
 
-  public pull() {
-    if (this.flowSettingsService.elevateEdgesOnSelect()) {
-      this.edgeRenderingService.pull(this.model());
-    }
-  }
-
   protected onClick(event: Event) {
-    // A click on a reconnection handle belongs to the reconnection gesture.
-    if ((event.target as Element | null)?.closest?.('.v-reconnect-handle')) {
+    if (isNoSelectTarget(event.target)) {
       return;
     }
 

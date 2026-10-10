@@ -15,3 +15,7 @@ export class VflowNoWheelDirective {}
 /** Leave keyboard commands to this element and its descendants; native Tab traversal is preserved. */
 @Directive({ selector: '[vNoKeyboard]', standalone: true, host: { 'data-v-no-keyboard': '' } })
 export class VflowNoKeyboardDirective {}
+
+/** A click that starts on this element or its descendants does not select the node or edge around it. */
+@Directive({ selector: '[vNoSelect]', standalone: true, host: { 'data-v-no-select': '' } })
+export class VflowNoSelectDirective {}

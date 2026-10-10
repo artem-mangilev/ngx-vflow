@@ -1,7 +1,7 @@
 <vflow view="auto" [nodes]="nodes" [edges]="edges" (deleteRequest)="onDeleteRequest($event)">
   <ng-template let-ctx vNode>
     <div class="custom-node" [class.custom-node_selected]="ctx.selected()">
-      <button class="custom-node__button" vSelectable>Select here</button>
+      <span>Node</span>
 
       <span vuiPort handleType="source" position="right"></span>
       <span vuiPort handleType="target" position="left"></span>

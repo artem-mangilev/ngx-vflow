@@ -111,7 +111,6 @@ type MapData = Person | Metric | Note | Team;
             <div
               vuiContainer
               class="team"
-              vSelectable
               [vuiSelected]="ctx.selected() || ctx.preselected()"
               [style.width.px]="ctx.width()"
               [style.height.px]="ctx.height()">
@@ -137,7 +136,7 @@ type MapData = Person | Metric | Note | Team;
           } @else {
             @switch (ctx.data().kind) {
               @case ('person') {
-                <article vuiNode class="person" vSelectable [vuiSelected]="ctx.selected() || ctx.preselected()">
+                <article vuiNode class="person" [vuiSelected]="ctx.selected() || ctx.preselected()">
                   <header vuiNodeHeader>
                     <svg
                       vuiIcon
@@ -175,7 +174,7 @@ type MapData = Person | Metric | Note | Team;
                 </article>
               }
               @case ('metric') {
-                <article vuiNode class="metric" vSelectable [vuiSelected]="ctx.selected() || ctx.preselected()">
+                <article vuiNode class="metric" [vuiSelected]="ctx.selected() || ctx.preselected()">
                   <header vuiNodeHeader>
                     <span vuiTitle>{{ ctx.data().title }}</span>
                   </header>
@@ -191,7 +190,7 @@ type MapData = Person | Metric | Note | Team;
               }
               @default {
                 <!-- A note has no ports: it is content on the canvas, not a participant of the graph. -->
-                <article vuiNode class="note" vSelectable [vuiSelected]="ctx.selected() || ctx.preselected()">
+                <article vuiNode class="note" [vuiSelected]="ctx.selected() || ctx.preselected()">
                   <div vuiNodeBody>{{ ctx.data().text }}</div>
                 </article>
               }

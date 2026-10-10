@@ -6,7 +6,7 @@ import { Connection, Edge, Vflow, createNodes } from 'ngx-vflow';
 @Component({
   template: `<vflow [nodes]="nodes" [edges]="edges" (connect)="connections.push($event)">
     <ng-template vNode let-ctx>
-      <div class="step" vSelectable>
+      <div class="step">
         {{ ctx.node.id }}
         <span vHandle handleType="target" position="left"></span>
         <span vHandle handleType="source" position="right"></span>

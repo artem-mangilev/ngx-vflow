@@ -23,7 +23,6 @@ type Flow = 'sequence' | 'message' | 'association';
             @if (ctx.data().kind === 'pool') {
               <div
                 vuiBpmnPool
-                vSelectable
                 [vuiSelected]="ctx.selected() || ctx.preselected()"
                 [style.width.px]="ctx.width()"
                 [style.height.px]="ctx.height()">
@@ -49,7 +48,6 @@ type Flow = 'sequence' | 'message' | 'association';
             } @else {
               <div
                 vuiBpmnLane
-                vSelectable
                 [vuiSelected]="ctx.selected() || ctx.preselected()"
                 [style.width.px]="ctx.width()"
                 [style.height.px]="ctx.height()">
@@ -59,7 +57,7 @@ type Flow = 'sequence' | 'message' | 'association';
           } @else {
             @switch (ctx.data().kind) {
               @case ('task') {
-                <div vuiBpmnTask class="task" vSelectable [vuiSelected]="ctx.selected() || ctx.preselected()">
+                <div vuiBpmnTask class="task" [vuiSelected]="ctx.selected() || ctx.preselected()">
                   {{ ctx.data().title }}
                   <span vuiPort handleType="target" position="left" [canStart]="false" [canAccept]="false"></span>
                   <span vuiPort handleType="source" position="right" [canStart]="false" [canAccept]="false"></span>
@@ -69,7 +67,7 @@ type Flow = 'sequence' | 'message' | 'association';
                 </div>
               }
               @case ('exclusive') {
-                <div vuiBpmnGateway="exclusive" vSelectable [vuiSelected]="ctx.selected() || ctx.preselected()">
+                <div vuiBpmnGateway="exclusive" [vuiSelected]="ctx.selected() || ctx.preselected()">
                   <span vuiExternalLabel>{{ ctx.data().title }}</span>
                   <span vuiPort handleType="target" position="left" [canStart]="false" [canAccept]="false"></span>
                   <span vuiPort handleType="target" position="top" handleId="association" [canStart]="false"></span>
@@ -78,7 +76,7 @@ type Flow = 'sequence' | 'message' | 'association';
                 </div>
               }
               @case ('parallel') {
-                <div vuiBpmnGateway="parallel" vSelectable [vuiSelected]="ctx.selected() || ctx.preselected()">
+                <div vuiBpmnGateway="parallel" [vuiSelected]="ctx.selected() || ctx.preselected()">
                   <span vuiExternalLabel>{{ ctx.data().title }}</span>
                   <span vuiPort handleType="target" position="left" [canStart]="false" [canAccept]="false"></span>
                   <span vuiPort handleType="source" position="right" handleId="a" [canStart]="false"></span>
@@ -86,13 +84,13 @@ type Flow = 'sequence' | 'message' | 'association';
                 </div>
               }
               @case ('annotation') {
-                <div class="annotation" vSelectable [vuiSelected]="ctx.selected() || ctx.preselected()">
+                <div class="annotation" [vuiSelected]="ctx.selected() || ctx.preselected()">
                   {{ ctx.data().title }}
                   <span vuiPort handleType="source" position="bottom" [canAccept]="false"></span>
                 </div>
               }
               @default {
-                <div vSelectable [vuiBpmnEvent]="ctx.data().kind" [vuiSelected]="ctx.selected() || ctx.preselected()">
+                <div [vuiBpmnEvent]="ctx.data().kind" [vuiSelected]="ctx.selected() || ctx.preselected()">
                   @if (ctx.data().kind === 'intermediate') {
                     <span class="symbol" aria-hidden="true">◷</span>
                   }

@@ -92,7 +92,6 @@ export * from './lib/vflow/public-components/node-toolbar/node-toolbar.component
 // Directives
 export * from './lib/vflow/directives/template.directive';
 export * from './lib/vflow/directives/handle.directive';
-export * from './lib/vflow/directives/selectable.directive';
 export * from './lib/vflow/directives/edge-interaction.directive';
 export * from './lib/vflow/directives/drag-handle.directive';
 export * from './lib/vflow/directives/gesture-exclusions.directive';

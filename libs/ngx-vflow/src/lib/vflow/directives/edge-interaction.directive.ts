@@ -3,9 +3,10 @@ import { EdgeComponent } from '../components/edge/edge.component';
 import { attachEdgeInteractionArea } from '../utils/edge-interaction-area';
 
 /**
- * Draws the transparent interaction stroke of the edge as the first child of this group of an `ng-template[vEdge]`
- * presentation. Clicks, hover and other pointer events on the stroke reach the group, CSS `:hover` applies to it and a
- * click selects the edge. Without it the edge has no hit area. An edge component opts in with
+ * Moves the transparent interaction stroke of the edge into the presentation: it becomes the first child of this
+ * group of an `ng-template[vEdge]` presentation, so clicks, hover and other pointer events on the stroke reach the
+ * group and CSS `:hover` applies to it. Without it the flow draws the stroke in the edge host, where a click still
+ * selects the edge but the presentation cannot style its hover. An edge component opts in with
  * `hostDirectives: [VflowEdgeInteractionDirective]`, which puts the stroke into its host; the selector does not apply there.
  */
 @Directive({
@@ -14,12 +15,17 @@ import { attachEdgeInteractionArea } from '../utils/edge-interaction-area';
 })
 export class VflowEdgeInteractionDirective {
   constructor() {
+    const model = inject(EdgeComponent).model();
     const detach = attachEdgeInteractionArea(
       inject<ElementRef<Element>>(ElementRef).nativeElement,
-      inject(EdgeComponent).model(),
+      model,
       inject(Renderer2),
       inject(Injector),
     );
-    inject(DestroyRef).onDestroy(detach);
+    model.interactionAreasCount.update((count) => count + 1);
+    inject(DestroyRef).onDestroy(() => {
+      model.interactionAreasCount.update((count) => count - 1);
+      detach();
+    });
   }
 }

@@ -1,5 +1,14 @@
 <svg:path aria-hidden="true" class="v-focus-indicator" [attr.d]="model().path().path" />
 
+<!-- The hit area of an edge without g[vEdgeInteraction]; the directive draws it inside the presentation instead -->
+@if (model().interactionAreasCount() === 0 && model().interactionWidth() > 0) {
+  <svg:path
+    aria-hidden="true"
+    class="v-interactive-edge"
+    [attr.d]="model().path().path"
+    [style.stroke-width.px]="model().interactionWidth()" />
+}
+
 @if (model().edge.component; as component) {
   <ng-container
     [entityComponentOutlet]="component"
@@ -18,6 +27,7 @@
   @if (model().reconnectable() === true || model().reconnectable() === 'source') {
     <svg:circle
       class="v-reconnect-handle"
+      data-v-no-select
       r="10"
       [attr.cx]="model().sourceHandle()!.pointAbsolute().x"
       [attr.cy]="model().sourceHandle()!.pointAbsolute().y"
@@ -27,6 +37,7 @@
   @if (model().reconnectable() === true || model().reconnectable() === 'target') {
     <svg:circle
       class="v-reconnect-handle"
+      data-v-no-select
       r="10"
       [attr.cx]="model().targetHandle()!.pointAbsolute().x"
       [attr.cy]="model().targetHandle()!.pointAbsolute().y"

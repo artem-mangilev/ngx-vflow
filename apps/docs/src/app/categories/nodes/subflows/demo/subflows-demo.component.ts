@@ -8,7 +8,6 @@ import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
     <ng-template let-ctx vNode>
       @if (ctx.data().type === 'group') {
         <div
-          vSelectable
           class="group-node"
           [class.group-node_selected]="ctx.selected() || ctx.preselected()"
           [style.width.px]="ctx.width()"

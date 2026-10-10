@@ -125,7 +125,7 @@ describe('public keyboard graph navigation', () => {
     const elevation = (element: HTMLElement | SVGElement) => Number(element.style.zIndex);
     expect(elevation(child)).toBeGreaterThan(elevation(parent));
     expect(elevation(other)).toBeGreaterThan(elevation(parent));
-    parent.querySelector<HTMLElement>('.v-selectable')!.click();
+    parent.querySelector<HTMLElement>('.v-node-wrapper')!.click();
     fixture.detectChanges();
     await fixture.whenStable();
     expect(elevation(parent)).toBeGreaterThan(elevation(other));

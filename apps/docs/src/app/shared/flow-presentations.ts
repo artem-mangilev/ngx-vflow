@@ -50,7 +50,6 @@ interface EdgeCtx {
     @if (isGroup()) {
       <div
         vuiContainer
-        vSelectable
         [vuiSelected]="ctx().selected() || ctx().preselected()"
         [style.width.px]="ctx().width()"
         [style.height.px]="ctx().height()">
@@ -59,7 +58,7 @@ interface EdgeCtx {
         }
       </div>
     } @else {
-      <div vuiNode class="card" vSelectable [vuiSelected]="ctx().selected() || ctx().preselected()">
+      <div vuiNode class="card" [vuiSelected]="ctx().selected() || ctx().preselected()">
         @if (html()) {
           <span [innerHTML]="text()"></span>
         } @else {

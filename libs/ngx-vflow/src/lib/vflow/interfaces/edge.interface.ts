@@ -37,8 +37,9 @@ export interface Edge<T = unknown> extends Connection {
   /** Without it the flow holds the selection itself and reports it through `edgesChanges`. */
   selected?: WritableSignal<boolean>;
   /**
-   * Width in pixels of the transparent stroke the flow draws along the edge path to make the edge easy to click.
-   * `0` removes it; presentation elements can then opt into hit-testing with `pointer-events="stroke"`.
+   * Width in pixels of the transparent stroke along the edge path that makes the edge easy to click. The flow draws
+   * it in the edge host, or inside the presentation when it has a `g[vEdgeInteraction]` group. `0` removes it;
+   * presentation elements can then opt into hit-testing with `pointer-events="stroke"`.
    *
    * @default 20
    */

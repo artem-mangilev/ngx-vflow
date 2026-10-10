@@ -35,12 +35,12 @@ import { createEdges, createNodes, Vflow, VflowComponent } from 'ngx-vflow';
       <vflow view="auto" data-testid="ui-flow" [nodes]="nodes" [edges]="edges">
         <ng-template let-ctx vNode>
           @if (ctx.data().kind === 'task') {
-            <div vuiBpmnTask class="task" vSelectable [vuiSelected]="ctx.selected()">
+            <div vuiBpmnTask class="task" [vuiSelected]="ctx.selected()">
               {{ ctx.data().title }}
               <span vuiPort handleType="target" position="left"></span>
             </div>
           } @else {
-            <article vuiNode vSelectable [vuiSelected]="ctx.selected()">
+            <article vuiNode [vuiSelected]="ctx.selected()">
               <header vuiNodeHeader>
                 <span vuiTitle>{{ ctx.data().title }}</span>
               </header>

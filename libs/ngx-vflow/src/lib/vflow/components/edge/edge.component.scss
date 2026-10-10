@@ -24,6 +24,14 @@
   }
 }
 
+// Same styles as the stroke of g[vEdgeInteraction], which are inline because they live inside the presentation.
+.v-interactive-edge {
+  fill: none;
+  stroke: transparent;
+  pointer-events: stroke;
+  cursor: pointer;
+}
+
 .v-reconnect-handle {
   fill: transparent;
   cursor: move;

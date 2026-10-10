@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { DocsPresentations } from '@docs/shared';
 import { VuiPort } from '@vflow/ui';
 import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
@@ -10,6 +10,8 @@ import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
   imports: [DocsPresentations, Vflow, VuiPort],
 })
 export class SelectingDemoComponent {
+  public clicks = signal(0);
+
   public nodes: Node[] = createNodes([
     {
       id: '1',

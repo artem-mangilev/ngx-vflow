@@ -67,7 +67,7 @@ import { createEdges, createNodes, Vflow } from 'ngx-vflow';
           <p>Editor A: {{ dark() ? 'dark' : 'light' }}</p>
           <vflow [nodes]="nodes" [edges]="edges">
             <ng-template let-ctx vNode>
-              <article vuiNode vSelectable [vuiSelected]="ctx.selected() || ctx.preselected()">
+              <article vuiNode [vuiSelected]="ctx.selected() || ctx.preselected()">
                 <header vuiNodeHeader>
                   <span vuiTitle>{{ ctx.data().title }}</span>
                 </header>
@@ -91,7 +91,7 @@ import { createEdges, createNodes, Vflow } from 'ngx-vflow';
           <p>Editor B: dark</p>
           <vflow [nodes]="nodes" [edges]="edges">
             <ng-template let-ctx vNode>
-              <article vuiNode vSelectable [vuiSelected]="ctx.selected() || ctx.preselected()">
+              <article vuiNode [vuiSelected]="ctx.selected() || ctx.preselected()">
                 <header vuiNodeHeader>
                   <span vuiTitle>{{ ctx.data().title }}</span>
                 </header>
@@ -118,7 +118,7 @@ import { createEdges, createNodes, Vflow } from 'ngx-vflow';
       <p>Core only: own node and edge templates without a theme scope; core tokens keep their defaults.</p>
       <vflow [nodes]="coreNodes" [edges]="coreEdges">
         <ng-template let-ctx vNode>
-          <div class="plain-node" vSelectable>
+          <div class="plain-node">
             {{ ctx.data().title }}
             <span vHandle handleType="target" position="left" class="plain-handle"></span>
             <span vHandle handleType="source" position="right" class="plain-handle"></span>

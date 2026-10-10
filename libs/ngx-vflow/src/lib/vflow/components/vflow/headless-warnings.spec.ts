@@ -60,29 +60,6 @@ class EdgeTemplateHostComponent {
   readonly edges = createEdges([{ id: 'a-b', source: 'a', target: 'b' }]);
 }
 
-@Component({
-  template: `<vflow [view]="[500, 300]" [nodes]="nodes" [edges]="edges">
-    <ng-template vNode>
-      <div vSelectable style="width: 60px; height: 30px">
-        <span vHandle handleType="target" position="left"></span
-        ><span vHandle handleType="source" position="right"></span>
-      </div>
-    </ng-template>
-    <ng-template let-ctx vEdge>
-      <svg:path vSelectable fill="none" [attr.d]="ctx.path()" />
-    </ng-template>
-  </vflow>`,
-  imports: [Vflow],
-  changeDetection: ChangeDetectionStrategy.OnPush,
-})
-class SelectableEdgeHostComponent {
-  readonly nodes = nodes();
-  readonly edges = createEdges([
-    { id: 'a-b', source: 'a', target: 'b' },
-    { id: 'a-c', source: 'a', target: 'c' },
-  ]);
-}
-
 describe('headless dev warnings', () => {
   let warn: MockInstance<typeof console.warn>;
 
@@ -154,29 +131,6 @@ describe('headless dev warnings', () => {
       }
 
       expect(warnings(NO_PRESENTATION).length).toBe(0);
-    });
-  });
-
-  describe('[vSelectable] outside a node presentation', () => {
-    const NO_EFFECT = '[vSelectable] has no effect outside a node presentation';
-
-    it('warns for every edge of the template and stays silent for the node template', async () => {
-      await render(SelectableEdgeHostComponent);
-
-      expect(warnings(NO_EFFECT).length).toBe(2);
-    });
-
-    it('stays silent outside dev mode', async () => {
-      const scope = globalThis as { ngDevMode?: unknown };
-      const devMode = scope.ngDevMode;
-      scope.ngDevMode = false;
-      try {
-        await render(SelectableEdgeHostComponent);
-      } finally {
-        scope.ngDevMode = devMode;
-      }
-
-      expect(warnings(NO_EFFECT).length).toBe(0);
     });
   });
 });
