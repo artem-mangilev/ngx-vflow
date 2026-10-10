@@ -1,4 +1,4 @@
-import { Injectable, inject, computed } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { ViewportState } from '../interfaces/viewport.interface';
 import { FlowEntitiesService } from './flow-entities.service';
 import { FlowEntity } from '../interfaces/flow-entity.interface';
@@ -7,10 +7,6 @@ import { tap } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { KeyboardService } from './keyboard.service';
 import { FlowSettingsService } from './flow-settings.service';
-import { SelectionStrategy } from '../interfaces/selection-strategy.interface';
-import { SelectionMode } from '../types/selection-mode.type';
-import { DefaultSelectionStrategy } from '../strategies/default-selection.strategy';
-import { ManualSelectionStrategy } from '../strategies/manual-selection.strategy';
 
 export interface ViewportForSelection {
   start: ViewportState;
@@ -27,26 +23,13 @@ export class SelectionService {
   private keyboardService = inject(KeyboardService);
   private flowSettingsService = inject(FlowSettingsService);
 
-  private strategies: Record<SelectionMode, SelectionStrategy> = {
-    default: new DefaultSelectionStrategy(),
-    manual: new ManualSelectionStrategy(),
-  };
-
-  private currentStrategy = computed(() => this.strategies[this.flowSettingsService.selectionMode()]);
-
   protected viewport$ = new Subject<ViewportForSelection>();
 
   protected viewportChangeSub = this.viewport$
     .pipe(
       tap(({ start, end, target }) => {
         if (start && end && target) {
-          this.currentStrategy().handleViewportChange(
-            { start, end, target, delta: this.flowSettingsService.paneClickDistance() },
-            {
-              entities: this.flowEntitiesService.entities(),
-              isMultiSelectionActive: this.keyboardService.isActiveModifier('multiSelection'),
-            },
-          );
+          this.handlePaneGesture(start, end, target);
         }
       }),
       takeUntilDestroyed(),
@@ -57,16 +40,33 @@ export class SelectionService {
     this.viewport$.next(viewport);
   }
 
+  /** Selects an entity, or clears the selection for `null`. In manual mode the application owns every write. */
   public select(entity: FlowEntity | null) {
-    this.currentStrategy().select(entity, {
-      entities: this.flowEntitiesService.entities(),
-      isMultiSelectionActive: this.keyboardService.isActiveModifier('multiSelection'),
-    });
+    if (this.isManual()) return;
+
+    if (entity && !entity.selectable()) {
+      return;
+    }
+
+    // if entity already selected - do nothing
+    if (entity?.selected()) {
+      return;
+    }
+
+    if (!this.keyboardService.isActiveModifier('multiSelection')) {
+      // undo select for previously selected nodes
+      this.flowEntitiesService.entities().forEach((n) => n.selected.set(false));
+    }
+
+    if (entity) {
+      // select passed entity
+      entity.selected.set(true);
+    }
   }
 
   /** Returns whether any selection state changed. */
   public selectFromKeyboard(entity: FlowEntity | null, toggle: boolean): boolean {
-    if (this.flowSettingsService.selectionMode() === 'manual') return false;
+    if (this.isManual()) return false;
     // Denying selection acquisition must still allow deselection.
     if (entity && !entity.selectable() && !(toggle && entity.selected())) return false;
     if (entity && toggle) {
@@ -82,5 +82,24 @@ export class SelectionService {
       }
     }
     return changed;
+  }
+
+  /** A click on the pane, outside every node and edge, clears the selection; a pan keeps it. */
+  private handlePaneGesture(start: ViewportState, end: ViewportState, target: Element) {
+    const delta = this.flowSettingsService.paneClickDistance();
+    const diffX = Math.abs(end.x - start.x);
+    const diffY = Math.abs(end.y - start.y);
+
+    const isClick = delta === 0 ? diffX === 0 && diffY === 0 : diffX < delta && diffY < delta;
+    // A click on a node or an edge is handled by that entity, not by the pane.
+    const isOnPane = !target.closest('.v-node, .v-edge');
+
+    if (isClick && isOnPane) {
+      this.select(null);
+    }
+  }
+
+  private isManual() {
+    return this.flowSettingsService.selectionMode() === 'manual';
   }
 }

@@ -26,6 +26,6 @@ The former `[entitiesSelectable]` input was removed in v3. Use `[nodesSelectable
 
 ### Manual selection
 
-`[selectionMode]="'manual'"` is a different switch: the flow then never writes `selected`. Clicks, the selection box, the keyboard and pane clicks change nothing, and the application sets `selected` itself, for example from its own click handlers. With `selectable: false` the flow still clears the selection on a pane click or when another entity is selected; with `manual` it does not.
+`[selectionMode]="'manual'"` is a different switch: the flow then never writes `selected`. Clicks, the selection box, the keyboard and pane clicks change nothing, and the application sets `selected` itself, for example from its own click handlers. With `selectable: false` the flow still clears the selection on a pane click or when another entity is selected; with `manual` it does not. It is the counterpart of a controlled flow in React Flow whose `onNodesChange` drops the `select` changes.
 
 {{ NgDocActions.demoPane("SelectingDemoComponent") }}
