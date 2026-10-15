@@ -35,7 +35,8 @@ export class ViewportService implements OnDestroy {
    */
   public readonly readableViewport: WritableSignal<ViewportState> = signal(ViewportService.getDefaultViewport());
 
-  public readonly viewportChangeEnd$ = new Subject<void>();
+  /** Emits the viewport each time a gesture or a programmatic change ends. */
+  public readonly viewportChangeEnd$ = new Subject<ViewportState>();
 
   private applyChange: ((change: ViewportChange) => void) | null = null;
   private pendingChanges: ViewportChange[] = [];
@@ -114,10 +115,9 @@ export class ViewportService implements OnDestroy {
     for (const change of this.pendingChanges.splice(0)) change.done(false);
   }
 
-  public triggerViewportChangeEvent(type: 'end') {
-    if (type === 'end') {
-      this.viewportChangeEnd$.next();
-    }
+  /** Reports that a gesture or a programmatic change ended. */
+  public endChange() {
+    this.viewportChangeEnd$.next(untracked(this.readableViewport));
   }
 
   private request(target: ViewportChange['target'], duration: number): Promise<boolean> {

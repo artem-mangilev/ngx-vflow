@@ -2,11 +2,9 @@ import {
   afterEveryRender,
   ChangeDetectionStrategy,
   Component,
-  effect,
   ElementRef,
   inject,
   signal,
-  untracked,
   viewChild,
   WritableSignal,
 } from '@angular/core';
@@ -75,7 +73,7 @@ const ALL_VISIBLE: Visibility = { visible: new Set(), above: [], below: [], key:
         <button vuiButton type="button" (click)="flow()?.fitView()">Fit</button>
         <p>Scroll the Product rows with the wheel; collapse a node to move its endpoints to the header.</p>
       </div>
-      <vflow view="auto" [nodes]="nodes" [edges]="edges">
+      <vflow view="auto" [nodes]="nodes" [edges]="edges" (initialized)="flow()?.fitView()">
         <ng-template let-ctx vNode>
           @let view = visibility(ctx.node.id);
           <article
@@ -242,10 +240,6 @@ export class ScrollCollapseDemoComponent {
   ]);
 
   constructor() {
-    effect(() => {
-      const flow = this.flow();
-      if (flow?.initialized()) untracked(() => flow.fitView());
-    });
     // Classify each scroll box once it exists, so hidden rows start on the borders as well.
     afterEveryRender(() => {
       for (const box of Array.from(this.host.querySelectorAll<HTMLElement>('[data-rows]'))) {

@@ -5,6 +5,7 @@ import { Vflow } from '../../vflow';
 import { dispatchPointer, pointerDrag, touchPointers } from '../../gestures/pointer-events.testing';
 import { ViewportService } from '../../services/viewport.service';
 import { createNode } from '../../interfaces/node.interface';
+import { ViewportState } from '../../interfaces/viewport.interface';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -325,19 +326,57 @@ describe('public viewport gesture settings', () => {
     expect(flow.viewport()).toEqual({ x: left - 100, y: top - 100, zoom: 2 });
   });
 
-  it('reports one gesture end per wheel gesture and per programmatic change', async () => {
-    const viewportService = fixture.debugElement.injector.get(ViewportService);
-    let ends = 0;
-    viewportService.viewportChangeEnd$.subscribe(() => ends++);
+  it('reports one change end per wheel gesture and per programmatic change, with the viewport', async () => {
+    const ends: ViewportState[] = [];
+    flow.viewportChangeEnd.subscribe((state) => ends.push(state));
     wheel();
     wheel();
     wheel();
-    expect(ends).toBe(0);
+    expect(ends).toEqual([]);
     await pause(500); // The gesture ends once the events stopped and the zoom settled.
-    expect(ends).toBe(1);
+    expect(ends).toEqual([flow.viewport()]);
     flow.zoomTo(2);
-    await settle();
-    expect(ends).toBe(2);
+    expect(ends.length).toBe(2);
+    expect(ends[1]).toEqual(flow.viewport());
+    expect(ends[1].zoom).toBe(2);
+    drag();
+    expect(ends.length).toBe(3);
+    expect(ends[2]).toEqual(flow.viewport());
+  });
+
+  it('reports a series of wheel events as one gesture, whether it pans, zooms or both', async () => {
+    flow.panOnScroll = true;
+    const ends: ViewportState[] = [];
+    flow.viewportChangeEnd.subscribe((state) => ends.push(state));
+    for (let i = 0; i < 5; i++) wheel();
+    expect(flow.viewport().y).toBeGreaterThan(0);
+    expect(ends).toEqual([]);
+    await pause(300);
+    expect(ends).toEqual([flow.viewport()]);
+
+    wheel();
+    wheel(pane, true);
+    wheel();
+    await pause(500);
+    expect(ends.length).toBe(2);
+    expect(ends[1]).toEqual(flow.viewport());
+  });
+
+  it('reports the end of an animated change once it lands and once it is interrupted', async () => {
+    const ends: ViewportState[] = [];
+    flow.viewportChangeEnd.subscribe((state) => ends.push(state));
+    const landed = flow.setViewport({ x: 10, y: 20, zoom: 2 }, { duration: 100 });
+    expect(ends).toEqual([]);
+    expect(await landed).toBe(true);
+    expect(ends).toEqual([{ x: 10, y: 20, zoom: 2 }]);
+
+    const interrupted = flow.setViewport({ x: 0, y: 0, zoom: 1 }, { duration: 300 });
+    await pause(100);
+    drag();
+    expect(await interrupted).toBe(false);
+    // The interrupted animation stopped where it was, then the drag moved the viewport on.
+    expect(ends.length).toBe(3);
+    expect(ends[2]).toEqual(flow.viewport());
   });
 
   it('zooms programmatically around the pane center and keeps every programmatic zoom to the limits', async () => {

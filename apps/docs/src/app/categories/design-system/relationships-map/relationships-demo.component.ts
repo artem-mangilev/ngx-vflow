@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, effect, signal, untracked, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal, viewChild } from '@angular/core';
 import { Vui } from '@vflow/ui';
 import { createEdges, createNodes, Vflow, VflowComponent } from 'ngx-vflow';
 
@@ -105,7 +105,7 @@ type MapData = Person | Metric | Note | Team;
           }}
         </p>
       </div>
-      <vflow view="auto" [nodes]="nodes" [edges]="edges">
+      <vflow view="auto" [nodes]="nodes" [edges]="edges" (initialized)="flow()?.fitView()">
         <ng-template let-ctx vNode>
           @if (ctx.data().kind === 'team') {
             <div
@@ -265,13 +265,6 @@ export class RelationshipsDemoComponent {
     review('ben-chi', 'ben', 'chi', 'pairs with'),
     review('chi-dea', 'chi', 'dea', 'reviews'),
   ]);
-
-  constructor() {
-    effect(() => {
-      const flow = this.flow();
-      if (flow?.initialized()) untracked(() => flow.fitView());
-    });
-  }
 
   toggleViewMode() {
     this.viewMode.update((value) => !value);

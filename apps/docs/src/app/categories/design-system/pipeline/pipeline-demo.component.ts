@@ -1,13 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  effect,
-  signal,
-  untracked,
-  viewChild,
-  WritableSignal,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, signal, viewChild, WritableSignal } from '@angular/core';
 import { Vui } from '@vflow/ui';
 import {
   addEdges,
@@ -100,7 +91,13 @@ interface StageData {
         <label><input type="checkbox" [checked]="dark()" (change)="dark.set(!dark())" /> Dark theme</label>
         <p>Connect ports of the same type. Controls inside nodes do not drag or zoom the graph.</p>
       </div>
-      <vflow view="auto" [nodes]="nodes" [edges]="edges()" [connection]="connection" (connect)="connect($event)">
+      <vflow
+        view="auto"
+        [nodes]="nodes"
+        [edges]="edges()"
+        [connection]="connection"
+        (connect)="connect($event)"
+        (initialized)="flow()?.fitView()">
         <ng-template let-ctx vNode>
           <article vuiNode [vuiSelected]="ctx.selected() || ctx.preselected()" [attr.data-stage]="ctx.node.id">
             <header vuiNodeHeader>
@@ -285,13 +282,6 @@ export class PipelineDemoComponent {
       return !!source && !!target && source.type === target.type;
     },
   };
-
-  constructor() {
-    effect(() => {
-      const flow = this.flow();
-      if (flow?.initialized()) untracked(() => flow.fitView());
-    });
-  }
 
   /** The application decides what an option changes: here an extra typed output row appears above the video output. */
   toggleAdvanced() {

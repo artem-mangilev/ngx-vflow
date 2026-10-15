@@ -52,10 +52,10 @@ Query the elements of your own presentations, such as `.step` above. The element
 | Reaction to changes of `nodes`, `edges` and their signals                          | Yes                 | Yes     |
 | Outputs: selection by click, connections by pointer events, `(componentNodeEvent)` | Yes                 | Yes     |
 | `setViewport()`, `zoomTo()`, `zoomIn()`, `zoomOut()`, `getNode()`                  | Yes                 | Yes     |
-| `initialized`, `fitView()`, `getNodeRect()`, `getNodesBounds()`                    | No                  | Yes     |
+| `(initialized)`, `fitView()`, `getNodeRect()`, `getNodesBounds()`                  | No                  | Yes     |
 | Node sizes, handle positions, `getNodesAtPoint()`, `getIntersectingNodes()`        | No                  | Yes     |
 
-Where layout is missing, the flow reports it instead of failing: `initialized()` stays `false`, `fitView()` resolves to `false`, and an edge path runs between the positions of its nodes. Nothing stays hidden while it waits for a measurement: queries that skip hidden elements, such as `getByRole` of Testing Library, find the content of nodes.
+Where layout is missing, the flow reports it instead of failing: `(initialized)` is never emitted, `fitView()` resolves to `false`, and an edge path runs between the positions of its nodes. Nothing stays hidden while it waits for a measurement: queries that skip hidden elements, such as `getByRole` of Testing Library, find the content of nodes.
 
 ## Interactions
 

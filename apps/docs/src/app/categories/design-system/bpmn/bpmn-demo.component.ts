@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, effect, signal, untracked, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal, viewChild } from '@angular/core';
 import { Vui } from '@vflow/ui';
 import { VuiBpmn } from '@vflow/ui/bpmn';
 import { createEdges, createNodes, Vflow, VflowComponent } from 'ngx-vflow';
@@ -17,7 +17,7 @@ type Flow = 'sequence' | 'message' | 'association';
         <label><input type="checkbox" [checked]="dark()" (change)="dark.set(!dark())" /> Dark theme</label>
         <p>Two pools with a message flow between them; drag tasks inside lanes. A visual subset without execution.</p>
       </div>
-      <vflow view="auto" [nodes]="nodes" [edges]="edges">
+      <vflow view="auto" [nodes]="nodes" [edges]="edges" (initialized)="flow()?.fitView()">
         <ng-template let-ctx vNode>
           @if (ctx.data().kind === 'pool' || ctx.data().kind === 'lane') {
             @if (ctx.data().kind === 'pool') {
@@ -187,13 +187,6 @@ export class BpmnDemoComponent {
       data: { flow: 'association' as Flow },
     },
   ]);
-
-  constructor() {
-    effect(() => {
-      const flow = this.flow();
-      if (flow?.initialized()) untracked(() => flow.fitView());
-    });
-  }
 }
 
 function group(id: string, point: { x: number; y: number }, width: number, height: number, kind: Kind, title: string) {

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, effect, untracked, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, viewChild } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { VflowComponent } from './components/vflow/vflow.component';
 import { createNode } from './interfaces/node.interface';
@@ -25,7 +25,13 @@ class HandleNodeComponent {}
 class NoBoxNodeComponent {}
 
 @Component({
-  template: `<vflow [view]="[400, 300]" [nodes]="nodes" [edges]="edges" [background]="{ type: 'dots' }" />`,
+  template: `<vflow
+    #flow
+    [view]="[400, 300]"
+    [nodes]="nodes"
+    [edges]="edges"
+    [background]="{ type: 'dots' }"
+    (initialized)="initialized = initialized + 1; flow.fitView()" />`,
   imports: [VflowComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -39,11 +45,8 @@ class FitOnInitComponent {
 
   public readonly edges = [createEdge({ id: 'ab', source: 'a', target: 'b' })];
 
-  constructor() {
-    effect(() => {
-      if (this.flow().initialized()) untracked(() => this.flow().fitView());
-    });
-  }
+  /** How many times the flow emitted `initialized`. */
+  public initialized = 0;
 }
 
 const frames = async (count: number) => {
@@ -59,17 +62,17 @@ describe('Initial viewport', () => {
 
     // Mutation callbacks run after every task, so they see every state the browser could paint.
     const check = () => {
-      const flow = fixture.componentInstance.flow();
+      const initialized = fixture.componentInstance.initialized > 0;
       const nodes = Array.from(root.querySelectorAll<HTMLElement>('.v-node'));
       const shown = [...nodes, ...Array.from(root.querySelectorAll('svg[edge], .v-background-svg'))].filter(
         (element) => getComputedStyle(element).visibility === 'visible',
       );
       const transform = root.querySelector<HTMLElement>('.v-viewport')!.style.transform;
-      const state = `initialized=${flow.initialized()} shown=${shown.length} transform=${transform}`;
+      const state = `initialized=${initialized} shown=${shown.length} transform=${transform}`;
       if (states.at(-1) !== state) states.push(state);
 
       if (shown.length && transform === IDENTITY) violations.push(`painted before fitView: ${state}`);
-      if (flow.initialized() && nodes.some((node) => node.style.visibility === 'hidden')) {
+      if (initialized && nodes.some((node) => node.style.visibility === 'hidden')) {
         violations.push(`initialized before every node is laid out: ${state}`);
       }
     };
@@ -78,14 +81,14 @@ describe('Initial viewport', () => {
 
     fixture.detectChanges();
     check();
-    expect(fixture.componentInstance.flow().initialized()).toBe(false);
+    expect(fixture.componentInstance.initialized).toBe(0);
 
     await frames(8);
     observer.disconnect();
     check();
 
     expect(violations, states.join('\n')).toEqual([]);
-    expect(fixture.componentInstance.flow().initialized()).toBe(true);
+    expect(fixture.componentInstance.initialized).toBe(1);
     expect(states.at(-1)).not.toContain(IDENTITY);
     expect(states.at(-1)).toContain('shown=4');
   });
@@ -97,6 +100,8 @@ describe('Initial viewport', () => {
 
     try {
       const fixture = TestBed.createComponent(VflowComponent);
+      let initialized = false;
+      fixture.componentInstance.initialized.subscribe(() => (initialized = true));
       fixture.componentRef.setInput('view', [400, 300]);
       fixture.componentRef.setInput('nodes', [
         createNode({ id: 'shown', component: HandleNodeComponent, point: { x: 0, y: 0 } }),
@@ -105,12 +110,55 @@ describe('Initial viewport', () => {
       fixture.detectChanges();
       await frames(8);
 
-      expect(fixture.componentInstance.initialized()).toBe(true);
+      expect(initialized).toBe(true);
       const shown = fixture.nativeElement.querySelector('.v-node:not(:has(.no-box))');
       expect(getComputedStyle(shown).visibility).toBe('visible');
     } finally {
       style.remove();
     }
+  });
+
+  it('emits initialized once, for an empty graph too, and not again when the graph or its size change', async () => {
+    const fixture = TestBed.createComponent(VflowComponent);
+    let emissions = 0;
+    fixture.componentInstance.initialized.subscribe(() => emissions++);
+    fixture.componentRef.setInput('view', [400, 300]);
+    fixture.componentRef.setInput('nodes', []);
+    fixture.detectChanges();
+    await frames(8);
+    expect(emissions).toBe(1);
+
+    fixture.componentRef.setInput('nodes', [
+      createNode({ id: 'a', component: HandleNodeComponent, point: { x: 0, y: 0 } }),
+    ]);
+    fixture.componentRef.setInput('view', [500, 300]);
+    fixture.detectChanges();
+    await frames(8);
+    expect(emissions).toBe(1);
+  });
+
+  it('keeps an effect that fits the view independent of the nodes it fits', async () => {
+    const fixture = TestBed.createComponent(FitOnInitComponent);
+    fixture.detectChanges();
+    await frames(8);
+    const flow = fixture.componentInstance.flow();
+    let runs = 0;
+    TestBed.runInInjectionContext(() =>
+      effect(() => {
+        runs++;
+        flow.fitView();
+      }),
+    );
+    TestBed.tick();
+    expect(runs).toBe(1);
+    const zoom = flow.viewport().zoom;
+
+    fixture.componentInstance.nodes[1].point.set({ x: 1200, y: 800 });
+    fixture.detectChanges();
+    await frames(4);
+    TestBed.tick();
+    expect(runs).toBe(1);
+    expect(flow.viewport().zoom).toBe(zoom);
   });
 
   it('fits within the zoom bounds a call gives, inside the flow limits', async () => {

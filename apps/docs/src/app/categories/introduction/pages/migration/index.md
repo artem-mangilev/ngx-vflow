@@ -365,7 +365,7 @@ The `ngx-vflow/testing` entry point is removed, with `VflowMocks`, every mock co
 - Remove the `overrideComponent()` call that swapped `Vflow` for `VflowMocks`. `viewChild(VflowComponent)` works in tests again.
 - Instead of `provideCustomNodeMocks()`, render the component node in a flow of one node.
 
-A DOM without layout measures nothing: `initialized()` stays `false` and `fitView()` resolves to `false` there. Tests of geometry run in a browser, `ng test --browsers=chromiumHeadless`. See the Unit testing page.
+A DOM without layout measures nothing: `(initialized)` is never emitted and `fitView()` resolves to `false` there. Tests of geometry run in a browser, `ng test --browsers=chromiumHeadless`. See the Unit testing page.
 
 ### Custom handle templates
 
@@ -499,6 +499,13 @@ The programmatic viewport methods are `setViewport`, `setCenter`, `fitView`, `zo
 - Every method keeps the zoom within `minZoom` and `maxZoom`; `setViewport` keeps `x` and `y` as given.
 - The methods apply at once and in order, each from where the previous call leads. Consecutive calls such as `fitView()` followed by `zoomTo(1)` compose instead of the last one replacing the others.
 - `vui-controls` zooms through `zoomIn()` and `zoomOut()`; its `step` input is removed.
+- The methods read no signal in a tracked way, so an effect may call them without `untracked`.
+
+### Initialization and viewport events
+
+- `initialized` is an output instead of a signal. It is emitted once, when the first layout is complete, an empty graph included, and a viewport set in its handler is the first one painted. Replace `effect(() => { if (flow.initialized()) untracked(() => flow.fitView()); })` with `(initialized)="flow.fitView()"`.
+- A subscription made after the emission does not receive it. Code that asks later whether the flow is ready keeps a flag: `(initialized)="ready.set(true)"`.
+- `(viewportChangeEnd)` emits the viewport when a gesture or a programmatic change ends; it is the moment to save the viewport. A series of wheel events, panning or zooming, is one gesture that ends once the events stop.
 
 ### Connections without a subscription
 
@@ -519,7 +526,7 @@ A flow that relied on a missing handler to keep its handles inert sets `[canStar
 - `(nodesChanges)` and `(edgesChanges)` are outputs of `vflow` itself. Code subscribes through a reference to the flow: `flow.nodesChanges.subscribe(...)`, or `outputToObservable(flow.nodesChanges)` for RxJS operators. The `nodesChange$` / `edgesChange$` observables and the `nodesChange` / `edgesChange` signals are removed.
 - Every change of one tick comes in a single array. In v2 each moved, resized or selected node came in an array of its own, so dragging several selected nodes called the handler once per node on every move. A handler that reads only `changes[0]` must go through the whole array.
 - A filtered output such as `(nodesChanges.position)` follows the same rule with the changes of its type.
-- `viewportChange$` and `initialized$` are removed: `viewport` and `initialized` are state, and the signals are the way to read them.
+- `viewportChange$` is removed: `viewport` is state, and the signal is the way to read it; `(viewportChangeEnd)` reports the end of a change. `initialized$` is removed with the `initialized` signal: the first layout is a moment, reported by the `(initialized)` output.
 
 ### Settings inputs
 
@@ -549,8 +556,8 @@ Every object input of `vflow` now reads the same way: the value is the defaults 
 | `ngx-vflow/testing`: `VflowMocks`, `provideCustomNodeMocks` | Test with the real `Vflow`. See Testing mocks above.                                                               |
 | `nodesChange$` and `edgesChange$`                           | `flow.nodesChanges.subscribe(...)` and `flow.edgesChanges.subscribe(...)`, or `outputToObservable()`.              |
 | `nodesChange` and `edgesChange` signals                     | Subscribe to the `nodesChanges` and `edgesChanges` outputs. A signal kept only the last array.                     |
-| `viewportChange$`                                           | Read the `viewport` signal, or `toObservable(flow.viewport)` with `skip(1)` to drop the current value.             |
-| `initialized$`                                              | Read the `initialized` signal, or `toObservable(flow.initialized)`.                                                |
+| `viewportChange$`                                           | Read the `viewport` signal; to save the viewport after a change, bind `(viewportChangeEnd)`.                       |
+| `initialized$` and the `initialized` signal                 | Bind the `(initialized)` output; keep a flag set by it where code asks later.                                      |
 | `ChangesControllerDirective`, `NodeDragControllerDirective` | Remove the imports. They are host directives of `vflow`; their outputs are bound on `<vflow>`.                     |
 | `NodeDragStartEvent`, `NodeDragEndEvent`                    | Use `NodeDragEvent`: the three node drag outputs emit the same `{ node }`.                                         |
 | `isComponentNode()`                                         | Check the `component` field of the node.                                                                           |

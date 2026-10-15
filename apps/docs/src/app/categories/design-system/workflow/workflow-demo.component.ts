@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, effect, signal, untracked, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal, viewChild } from '@angular/core';
 import { VuiTone, Vui } from '@vflow/ui';
 import { createEdges, createNodes, Vflow, VflowComponent } from 'ngx-vflow';
 
@@ -45,7 +45,13 @@ interface StepData {
         <p>Approve the invoice; select a node to inspect it.</p>
       </div>
       <div class="stage">
-        <vflow view="auto" [nodes]="nodes" [edges]="edges" [minZoom]="0.5" [maxZoom]="2">
+        <vflow
+          view="auto"
+          [nodes]="nodes"
+          [edges]="edges"
+          [minZoom]="0.5"
+          [maxZoom]="2"
+          (initialized)="flow()?.fitView()">
           <ng-template let-ctx vNode>
             <article vuiNode [vuiSelected]="ctx.selected() || ctx.preselected()">
               <header vuiNodeHeader>
@@ -237,13 +243,6 @@ export class WorkflowDemoComponent {
       data: { center: 'Needs changes' },
     },
   ]);
-
-  constructor() {
-    effect(() => {
-      const flow = this.flow();
-      if (flow?.initialized()) untracked(() => flow.fitView());
-    });
-  }
 
   reset() {
     this.approved.set(false);

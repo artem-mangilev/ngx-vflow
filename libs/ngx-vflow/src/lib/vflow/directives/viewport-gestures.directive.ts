@@ -246,9 +246,9 @@ export class ViewportGesturesDirective implements OnInit, OnDestroy {
       event.preventDefault();
       const delta = wheelPanDelta(event, this.host.clientHeight);
       this.interruptAnimation();
-      this.begin();
+      // A pan moves the viewport, so it never reads as a click on the pane: it gives the gesture no target.
+      this.continueWheel(null);
       this.set(translateBy(this.current(), delta.x, delta.y));
-      this.finish(null);
       return;
     }
 
@@ -261,23 +261,15 @@ export class ViewportGesturesDirective implements OnInit, OnDestroy {
     const from = this.wheelZoom?.target ?? this.current().zoom;
     const zoom = this.clamp(from * wheelZoomFactor(event));
 
-    if (this.wheelTimer !== null) {
-      clearTimeout(this.wheelTimer);
-    } else if (zoom === from) {
+    if (this.wheelTimer === null) {
       // A new gesture that cannot zoom leaves the event to the page, which can scroll at a zoom limit.
-      return;
-    } else {
+      if (zoom === from) return;
       this.interruptAnimation();
-      this.begin();
     }
 
     event.preventDefault();
     event.stopImmediatePropagation();
-    this.wheelTarget = event.target;
-    this.wheelTimer = setTimeout(() => {
-      this.wheelTimer = null;
-      this.finishWheel();
-    }, WHEEL_IDLE_MS);
+    this.continueWheel(event.target);
     const anchor = this.panePoint(event);
     if (event.ctrlKey) {
       // A pinch is direct manipulation: it follows the fingers at once.
@@ -326,6 +318,20 @@ export class ViewportGesturesDirective implements OnInit, OnDestroy {
     this.wheelZoom = null;
     this.set(zoomAround(this.current(), state.target, state.anchor));
     this.finishWheel();
+  }
+
+  /**
+   * Wheel events come in series, and a series is one gesture whether it pans, zooms or both: it begins with the
+   * first event and lasts until the events stop.
+   */
+  private continueWheel(target: EventTarget | null) {
+    if (this.wheelTimer === null) this.begin();
+    else clearTimeout(this.wheelTimer);
+    if (target) this.wheelTarget = target;
+    this.wheelTimer = setTimeout(() => {
+      this.wheelTimer = null;
+      this.finishWheel();
+    }, WHEEL_IDLE_MS);
   }
 
   /** The wheel gesture ends once the events stopped and the easing settled, whichever comes last. */
@@ -495,7 +501,7 @@ export class ViewportGesturesDirective implements OnInit, OnDestroy {
     if (this.destroyed) return;
 
     this.zone.run(() => {
-      this.viewportService.triggerViewportChangeEvent('end');
+      this.viewportService.endChange();
       this.selectionService.setViewport({
         start,
         end: this.current(),

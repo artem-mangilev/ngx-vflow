@@ -1,11 +1,12 @@
-import { ChangeDetectionStrategy, Component, effect, inject, untracked, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { DocsPresentations } from '@docs/shared';
-import { Vflow, Connection, VflowComponent, Edge, createEdge, ComponentNodeEvent } from 'ngx-vflow';
+import { Vflow, Connection, Edge, createEdge, ComponentNodeEvent } from 'ngx-vflow';
 import { FlowStoreService } from './services/flow-store.service';
 import { TransformNodeComponent } from './components/transform-node.component';
 
 @Component({
   template: `<vflow
+    #flow
     view="auto"
     [nodes]="store.nodes()"
     [edges]="store.edges()"
@@ -14,7 +15,8 @@ import { TransformNodeComponent } from './components/transform-node.component';
     [alignmentHelper]="true"
     (connect)="createEdge($event)"
     (nodesChanges.size)="store.applySizeChanges($event)"
-    (componentNodeEvent)="onComponentEvent($event)">
+    (componentNodeEvent)="onComponentEvent($event)"
+    (initialized)="flow.fitView()">
     <ng-template let-ctx vNode><docs-node [ctx]="ctx" /></ng-template>
 
     <ng-template let-ctx vEdge>
@@ -117,16 +119,6 @@ import { TransformNodeComponent } from './components/transform-node.component';
 })
 export class AllFeaturesDemoComponent {
   protected store = inject(FlowStoreService);
-
-  protected vflow = viewChild.required(VflowComponent);
-
-  constructor() {
-    effect(() => {
-      if (this.vflow().initialized()) {
-        untracked(() => this.vflow().fitView());
-      }
-    });
-  }
 
   createEdge(connection: Connection) {
     const id = `${connection.source}${connection.sourceHandle ?? ''}-${connection.target}${connection.targetHandle ?? ''}`;

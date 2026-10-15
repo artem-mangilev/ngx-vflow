@@ -17,6 +17,7 @@ import {
   ElementRef,
   signal,
   isDevMode,
+  output,
 } from '@angular/core';
 import { Node } from '../../interfaces/node.interface';
 import { ViewportGesturesDirective } from '../../directives/viewport-gestures.directive';
@@ -225,7 +226,13 @@ export class VflowComponent {
 
     this.viewportService.viewportChangeEnd$
       .pipe(takeUntilDestroyed())
-      .subscribe(() => this.settledZoom.set(this.viewportService.readableViewport().zoom));
+      .subscribe(({ zoom }) => this.settledZoom.set(zoom));
+
+    // The output is emitted in the change detection pass that reveals the graph, so a viewport the application sets
+    // in reaction to it is the first one painted. `flowInitialized` latches, so it is emitted once.
+    effect(() => {
+      if (this.flowRenderingService.flowInitialized()) this.initialized.emit();
+    });
 
     if (isDevMode()) {
       // The effect follows this value, not the edges, so it warns when the first such edge appears, not on every change.
@@ -540,6 +547,24 @@ export class VflowComponent {
    * selected IDs only; apply it with `removeElements(request, graph)` or ignore it.
    */
   public readonly deleteRequest = outputFromObservable(this.keyboardService.deleteRequest$);
+
+  /**
+   * Emitted once, when the first layout is complete: the flow has a size, and every node has its size and handle
+   * positions. An empty graph completes it too. The graph is not painted before that, so a viewport set in reaction,
+   * such as `(initialized)="flow.fitView()"`, is the first viewport the user sees.
+   *
+   * A subscription made after the emission does not receive it; keep a flag, such as
+   * `(initialized)="ready.set(true)"`, to know later whether the flow is ready. A DOM without layout, such as jsdom,
+   * never emits it.
+   */
+  public readonly initialized = output<void>();
+
+  /**
+   * The viewport at the end of each change: when a gesture ends, a series of wheel events included, and when a
+   * programmatic change lands or is interrupted. The `viewport` signal follows every frame; this is the moment to
+   * save the viewport.
+   */
+  public readonly viewportChangeEnd = outputFromObservable(this.viewportService.viewportChangeEnd$);
   // #endregion
 
   // #region TEMPLATES
@@ -573,13 +598,6 @@ export class VflowComponent {
    */
   public readonly viewport = this.viewportService.readableViewport.asReadonly();
 
-  /**
-   * Becomes true once, when the first layout is complete: the flow has a size, and every node has its size and
-   * handle positions. The graph is not painted before that, so a viewport change made in reaction to it, such as
-   * `fitView()` in an effect, is the first viewport the user sees.
-   */
-  public readonly initialized = this.flowRenderingService.flowInitialized;
-
   protected readonly awaitsFirstLayout = this.flowRenderingService.awaitsFirstLayout;
   // #endregion
 
@@ -590,6 +608,11 @@ export class VflowComponent {
   // compose. Zoom keeps to `minZoom` and `maxZoom`. Each animates over `options.duration` ms and returns a promise
   // that settles when the change ends: `true` when the viewport reached the target, `false` when there was nothing
   // to change or another change or a gesture interrupted it first.
+  //
+  // Viewport methods write and read nothing tracked, so an effect may call them without `untracked`. The queries
+  // below them read signals like any signal read: `computed(() => flow.getNodesBounds())` follows the nodes, and
+  // an effect that reads a query reruns when its answer may change. Read a query in `untracked` when the effect
+  // must not follow it, for example before a `setCenter()` call that should not repeat on every node move.
 
   /**
    * Sets the viewport: the same `x`, `y` and `zoom` as on the {@link viewport} signal. A zoom outside the limits is

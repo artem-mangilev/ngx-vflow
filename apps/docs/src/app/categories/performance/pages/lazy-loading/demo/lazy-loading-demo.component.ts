@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, effect, signal, untracked, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, signal, viewChild } from '@angular/core';
 import { DocsPresentations } from '@docs/shared';
 import { Edge, Node, Vflow, VflowComponent, createNodes } from 'ngx-vflow';
 
@@ -6,7 +6,12 @@ import { Edge, Node, Vflow, VflowComponent, createNodes } from 'ngx-vflow';
   template: `
     <button (click)="nextNode()">Go To Next Node</button>
 
-    <vflow view="auto" [nodes]="nodes" [edges]="edges" [optimization]="{ lazyLoadTrigger: 'viewport' }">
+    <vflow
+      view="auto"
+      [nodes]="nodes"
+      [edges]="edges"
+      [optimization]="{ lazyLoadTrigger: 'viewport' }"
+      (initialized)="ready.set(true)">
       <ng-template let-ctx vNode><docs-node [ctx]="ctx" /></ng-template>
       <ng-template let-ctx vEdge><svg:g docsEdge [ctx]="ctx" /></ng-template>
     </vflow>
@@ -57,12 +62,11 @@ export class LazyLoadingDemoComponent {
 
   private currentNode = signal(this.nodes[0]);
 
+  protected ready = signal(false);
+
   constructor() {
     effect(() => {
-      if (this.vflow().initialized()) {
-        const currentNode = this.currentNode();
-        untracked(() => this.vflow().fitView({ nodes: [currentNode.id], duration: 800 }));
-      }
+      if (this.ready()) this.vflow().fitView({ nodes: [this.currentNode().id], duration: 800 });
     });
   }
 

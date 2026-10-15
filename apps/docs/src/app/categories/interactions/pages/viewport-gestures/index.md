@@ -106,6 +106,24 @@ Draggable nodes, drag handles, handles and resize controls use `none`, so they s
 
 Programmatic calls such as `setViewport`, `setCenter`, `fitView`, `zoomTo`, `zoomIn` and `zoomOut` continue to work. These settings only control viewport gestures; configure node dragging and selection separately if needed.
 
+# Fit on load and the end of a change
+
+`(initialized)` is emitted once, when the first layout is complete: the flow has a size, and every node has its size and handle positions. The graph is not painted before that, so a viewport set in the handler is the first one the user sees:
+
+```html
+<vflow #flow [nodes]="nodes" [edges]="edges" (initialized)="flow.fitView()" />
+```
+
+An empty graph completes the first layout too; fit nodes that load later when they arrive. A subscription made after the emission does not receive it, so code that asks later whether the flow is ready keeps a flag: `(initialized)="ready.set(true)"`.
+
+`(viewportChangeEnd)` emits the viewport when a change ends: a drag or a touch gesture is released, a double-click zoom lands, a series of wheel events stops for 150 ms, a programmatic call lands or is interrupted. The `viewport` signal follows every frame; `(viewportChangeEnd)` is the moment to save the viewport.
+
+```html
+<vflow [nodes]="nodes" (viewportChangeEnd)="saveViewport($event)" />
+```
+
+The viewport methods read no signal in a tracked way, so an effect may call them without `untracked`. Queries such as `getNodesBounds()`, `getNodeRect()` and `getNodesAtPoint()` are signal reads: `computed(() => flow.getNodesBounds())` follows the nodes, and an effect that reads a query reruns when its answer may change. Read the query in `untracked` when the effect must not repeat on every node move.
+
 # Auto-pan during dragging
 
 `autoPan` accepts a boolean or `AutoPanSettings`. The default `true` enables auto-pan for node dragging, connection creation, and reconnection; `false` disables all three.

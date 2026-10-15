@@ -22,7 +22,8 @@ class TaskNodeComponent {
     [nodes]="nodes()"
     [edges]="edges()"
     (connect)="connects.push($event)"
-    (nodesChanges.select)="selectChanges.push($event)">
+    (nodesChanges.select)="selectChanges.push($event)"
+    (initialized)="initialized = true">
     <ng-template vNode let-ctx>
       <div class="note" [class.selected]="ctx.selected()">
         note {{ ctx.node.id }}
@@ -48,6 +49,7 @@ class HostComponent {
   readonly edges = signal<Edge[]>([{ id: 'task-note', source: 'task', target: 'note' }]);
   readonly connects: Connection[] = [];
   readonly selectChanges: NodeSelectedChange[][] = [];
+  initialized = false;
 }
 
 // jsdom and happy-dom have no layout: these specs cover what an application test can rely on without a browser.
@@ -156,7 +158,7 @@ describe('Vflow in a DOM without layout', () => {
     expect(host.flow().viewport().zoom).toBeCloseTo(1);
     expect(host.flow().getNode('task')?.id).toBe('task');
 
-    expect(host.flow().initialized()).toBe(false);
+    expect(host.initialized).toBe(false);
     expect(await host.flow().fitView()).toBe(false);
   });
 });

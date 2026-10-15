@@ -1,13 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  effect,
-  signal,
-  untracked,
-  viewChild,
-  WritableSignal,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, signal, viewChild, WritableSignal } from '@angular/core';
 import { Vui } from '@vflow/ui';
 import {
   addEdges,
@@ -66,7 +57,13 @@ interface EntityData {
         <label><input type="checkbox" [checked]="dark()" (change)="dark.set(!dark())" /> Dark theme</label>
         <p>Connect matching field types; names and row order can change.</p>
       </div>
-      <vflow view="auto" [nodes]="nodes" [edges]="edges()" [connection]="connection" (connect)="connect($event)">
+      <vflow
+        view="auto"
+        [nodes]="nodes"
+        [edges]="edges()"
+        [connection]="connection"
+        (connect)="connect($event)"
+        (initialized)="flow()?.fitView()">
         <ng-template let-ctx vNode>
           <article vuiNode [vuiSelected]="ctx.selected() || ctx.preselected()" [attr.data-entity]="ctx.node.id">
             <header vuiNodeHeader>
@@ -230,13 +227,6 @@ export class EntitiesDemoComponent {
       return !!source && !!target && source.type === target.type;
     },
   };
-
-  constructor() {
-    effect(() => {
-      const flow = this.flow();
-      if (flow?.initialized()) untracked(() => flow.fitView());
-    });
-  }
 
   reverseFields() {
     this.nodes.forEach((node) => node.data.update((data) => ({ ...data, fields: [...data.fields].reverse() })));

@@ -1,6 +1,6 @@
 # 15. `(initialized)` и fit-on-load без boilerplate
 
-Status: ready-for-agent
+Status: resolved
 Type: task
 Priority: P2 (ломающее — дешевле до 3.0)
 Blocked by: —
@@ -101,3 +101,18 @@ public readonly viewportChangeEnd = output<ViewportState>();
   - серия из N событий wheel-pan → одно событие через `WHEEL_IDLE_MS`; серия pan + zoom → одно событие.
 - Spec: `effect(() => { if (ready()) flow.fitView(); })` без `untracked` не перезапускается при сдвиге узла (по образцу spec'а тикета 01 для `zoomTo`).
 - `nx test ngx-vflow --skip-nx-cache`, `nx build ngx-vflow`, typecheck docs, ui, bpmn; e2e virtualization и minimap (culling) — они нестабильны в dev mode, падения сравнивать с прогоном на базе.
+
+## Answer
+
+Сделано 2026-10-15.
+
+- **`(initialized)`** — `output<void>()` на `VflowComponent`. Emit из effect по `flowInitialized`: сигнал защёлкивается, поэтому emit один; `emit` сам вызывает слушателей вне контекста подписки. Публичный сигнал `initialized` удалён, `flowInitialized` в сервисе не менялся.
+- **Тайминг проверен мутацией:** emit через `setTimeout` роняет `initial-viewport.spec.ts` («painted before fitView»); с effect spec зелёный.
+- **`(viewportChangeEnd)`** — `outputFromObservable(viewportChangeEnd$)`; `Subject` теперь несёт `ViewportState`. `triggerViewportChangeEvent('end')` заменён на `ViewportService.endChange()`. `settledZoom` берёт zoom из payload.
+- **Колесо:** `continueWheel(target)` начинает жест на первом событии серии и продлевает таймер `WHEEL_IDLE_MS`; пан и зум колесом — один жест. Пан не задаёт target жеста, поэтому серия пана не читается как клик по pane.
+- **Запросы с подпиской:** правило записано в комментарий региона `METHODS_API` и на странице Viewport gestures. Отдельный JSDoc на каждый запрос не дописан: правило одно для всех и живёт в одном месте.
+- **Демо:** 6 демо design-system и all-features — `(initialized)="…fitView()"`, effect и лишние импорты удалены; lazy-loading — флаг `ready`.
+- **Docs:** migration guide (раздел «Initialization and viewport events», строки удалённых API, заметка о тестах), Unit testing, Viewport gestures (раздел «Fit on load and the end of a change»), ADR 0009 — формулировка про `(initialized)`.
+- **Specs:** `initial-viewport.spec.ts` — host на output, «один раз, в том числе для пустого графа», effect с `fitView()` без `untracked` не перезапускается при сдвиге узла; `viewport-gestures.spec.ts` — payload и конец после wheel, `zoomTo`, drag, серия wheel-pan и смешанная серия, конец анимации при достижении и при прерывании; `node-dom/flow.spec.ts` — в jsdom `(initialized)` не приходит.
+
+Прогон: `nx test ngx-vflow --skip-nx-cache` — 439 spec в браузере и 44 в node-dom, все зелёные; `nx build ngx-vflow`, `nx build ui`, `tsc` docs и eslint по изменённым файлам чистые. Docs dev server и e2e не запускались.
