@@ -269,19 +269,27 @@ export class VflowComponent {
   }
 
   /**
-   * Minimum zoom value
+   * Minimum zoom value. Reading it in a reactive context tracks changes.
    */
   @Input()
   public set minZoom(value: number) {
     this.flowSettingsService.minZoom.set(value);
   }
 
+  public get minZoom(): number {
+    return this.flowSettingsService.minZoom();
+  }
+
   /**
-   * Maximum zoom value
+   * Maximum zoom value. Reading it in a reactive context tracks changes.
    */
   @Input()
   public set maxZoom(value: number) {
     this.flowSettingsService.maxZoom.set(value);
+  }
+
+  public get maxZoom(): number {
+    return this.flowSettingsService.maxZoom();
   }
 
   /** Zoom with ordinary wheel/trackpad scrolling. */

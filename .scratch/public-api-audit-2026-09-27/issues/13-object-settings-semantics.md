@@ -46,3 +46,5 @@ Blocked by: —
 - **Signal `input()`:** отдельный тикет — [22](22-signal-inputs.md). Сеттеры пишут в сигналы `FlowSettingsService`; переход на `input()` — это либо effect на каждый input, либо переворот зависимости сервиса на компонент.
 
 Документация: раздел «Settings inputs» и три строки в «Removed APIs» на странице migration; страница view-size; таблица ключей accessibility. Тесты: `components/vflow/settings-inputs.spec.ts` (новый), `auto-pan.spec.ts` (тест «captures at creation» заменён на реактивность), `keyboard-navigation.spec.ts`, `accessibility.spec.ts`.
+
+Поправка (2026-10-15): геттеры `minZoom` и `maxZoom` возвращены (только чтение, читают сигналы `FlowSettingsService`, поэтому реактивны в `computed`). Их читает `vui-controls` (`libs/ui/src/lib/controls.component.ts`), чтобы выключать кнопки zoom на пределах; после удаления чтение давало `undefined`, и обе кнопки оставались выключенными (падали e2e `design-system.spec.ts` и `design-system-acceptance.spec.ts`). Геттер `connection` остаётся удалённым. Тикет [22](22-signal-inputs.md) потом сделает их signal `input()`.
