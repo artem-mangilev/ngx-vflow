@@ -220,7 +220,7 @@ describe('VflowComponent', () => {
     expect(vflow().getNodeRect('a')?.width).toBe(260);
   });
 
-  it('returns shallow node copies with snapshot node-space points in topmost-first order', async () => {
+  it('returns application nodes with snapshot node-space points in topmost-first order', async () => {
     TestBed.configureTestingModule({
       imports: [VflowTestHostComponent],
     });
@@ -231,12 +231,10 @@ describe('VflowComponent', () => {
     const { child, parent } = fixture.componentInstance;
     const hits = fixture.componentInstance.vflow().getNodesAtPoint({ x: 115, y: 125 });
 
-    expect(hits.map(({ id }) => id)).toEqual(['child', 'parent']);
-    expect(hits[0] === child).toBe(false);
-    expect(hits[0].point).toBe(child.point);
-    expect(hits[0].parentId).toBe(child.parentId);
+    expect(hits.map(({ node }) => node.id)).toEqual(['child', 'parent']);
+    expect(hits[0].node).toBe(child);
     expect(hits[0].nodeSpacePoint).toEqual({ x: 5, y: 5 });
-    expect(hits[1].point).toBe(parent.point);
+    expect(hits[1].node).toBe(parent);
     expect(hits[1].nodeSpacePoint).toEqual({ x: 15, y: 25 });
 
     child.point.set({ x: 20, y: 30 });
@@ -344,7 +342,7 @@ describe('VflowComponent', () => {
       dispatchMouse(window, 'mousemove', { x: left + 5 + dx, y: top + 5 });
       await settle(fixture);
     }
-    dispatchMouse(window, 'mouseup', { x: left + 38, y: top + 5 });
+    const release = dispatchMouse(window, 'mouseup', { x: left + 38, y: top + 5 });
     await settle(fixture);
 
     const [a] = host.nodes;
@@ -353,6 +351,9 @@ describe('VflowComponent', () => {
     expect(kinds.at(-1)).toBe('end');
     expect(kinds.filter((kind) => kind === 'drag').length).toBeGreaterThan(0);
     expect(host.drags.every(([, event]) => event.node === a)).toBe(true);
+    expect(host.drags.every(([, event]) => event.nodes.length === 1 && event.nodes[0] === a)).toBe(true);
+    expect(host.drags.every(([, event]) => event.sourceEvent.type.startsWith('pointer'))).toBe(true);
+    expect(host.drags.at(-1)?.[1].sourceEvent).toBe(release);
 
     const { x, y } = a.point();
     expect(x % 20).toBe(0);
@@ -360,5 +361,29 @@ describe('VflowComponent', () => {
     expect(y).toBe(0);
     expect(host.nodes[1].point()).toEqual({ x: 200, y: 0 });
     expect(host.positions.flat().at(-1)).toEqual({ type: 'position', id: 'a', point: { x, y } });
+  });
+
+  it('reports every node a drag of a selection moves', async () => {
+    const fixture = TestBed.createComponent(DragHostComponent);
+    await settle(fixture);
+    const host = fixture.componentInstance;
+    host.nodes.forEach((node) => node.selected?.set(true));
+    await settle(fixture);
+    const card = fixture.nativeElement.querySelector('.card') as HTMLElement;
+    const { left, top } = card.getBoundingClientRect();
+
+    dispatchMouse(card, 'mousedown', { x: left + 5, y: top + 5 });
+    await settle(fixture);
+    dispatchMouse(window, 'mousemove', { x: left + 45, y: top + 5 });
+    await settle(fixture);
+    dispatchMouse(window, 'mouseup', { x: left + 45, y: top + 5 });
+    await settle(fixture);
+
+    const [a, b] = host.nodes;
+    expect(host.drags.length).toBeGreaterThan(0);
+    expect(host.drags.every(([, event]) => event.node === a)).toBe(true);
+    expect(
+      host.drags.every(([, event]) => event.nodes.length === 2 && event.nodes.includes(a) && event.nodes.includes(b)),
+    ).toBe(true);
   });
 });

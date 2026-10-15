@@ -26,14 +26,14 @@ The element with the `vResizable` directive is the node's sizing box:
 - Create a node with `width` and `height`, so both axes of the group start `explicit`, and mark it in `data` to draw it as a group in the `vNode` template.
 - Add `vResizable` (or `[vResizable]="yourCondition"`) to the native HTML element representing your group. The library applies the group size to that element.
 - If other elements depend on the group size, read the rendered size from `ctx.width()` and `ctx.height()`, not `ctx.node.width` and `ctx.node.height`: the latter hold the requested size.
-- Optionally, keep the aspect ratio with `[keepAspectRatio]`, restrict resizing to one axis with `[resizeDirection]` (`horizontal` | `vertical`), toggle handle auto-scaling with `[autoScale]`, and react to `(resizeStart)` / `(resizeChange)` / `(resizeEnd)`.
+- Optionally, keep the aspect ratio with `[keepAspectRatio]`, restrict resizing to one axis with `[resizeAxis]` (`horizontal` | `vertical`), toggle handle auto-scaling with `[autoScale]`, and react to `(resizeStart)` / `(resize)` / `(resizeEnd)`.
 
 {{ NgDocActions.demoPane("GroupResizerDemoComponent") }}
 
 ## Resize a template/component regular node
 
 - Create a node rendered by the `vNode` template or by a `component`.
-  - Leave out `width` / `height` to start content-sized. A resize makes explicit the axes the control drives: a corner both, a side one. With `[resizeDirection]`, only that axis.
+  - Leave out `width` / `height` to start content-sized. A resize makes explicit the axes the control drives: a corner both, a side one. With `[resizeAxis]`, only that axis.
   - Provide `width` and / or `height` to start with a fixed size on those axes. A resize writes the new size into these signals.
 - Add `vResizable` (or `[vResizable]="yourCondition"`) to the top-level element of your node.
 - The same options and events as for groups are available.
@@ -75,7 +75,7 @@ protected keepResizedSize(changes: NodeSizeChange[]) {
 }
 ```
 
-- To react to the gesture itself, use `(resizeStart)` / `(resizeChange)` / `(resizeEnd)` on the `vResizable` element.
+- To react to the gesture itself, use `(resizeStart)` / `(resize)` / `(resizeEnd)` on the `vResizable` element. Each event carries the resized `node` with its position and size; `(resize)` adds `direction`, the sign of the last size change per axis: `{ x: 1, y: 0 }` while the node grows to the right.
 
 ## See also
 

@@ -40,7 +40,7 @@ export class MarkersDemoComponent {
   public edges: Edge[] = [];
 
   public connectionSettings: ConnectionSettings = {
-    marker: {
+    markerEnd: {
       type: 'arrow',
     },
   };

@@ -4,7 +4,6 @@ import {
   clientToFlowPosition,
   flowToClientPosition,
   flowToNodeSpacePosition,
-  getNodePositionInSpace,
   nodeSpaceToFlowPosition,
 } from './coordinates';
 
@@ -44,13 +43,15 @@ describe('coordinate utilities', () => {
     expect(nodeSpaceToFlowPosition({ x: 0, y: 0 }, 'missing', lookup)).toBeUndefined();
   });
 
-  it('gets a node position in flow or another node space', () => {
-    const nodes = [node('parent', 100, 50), node('child', 20, 30, 'parent'), node('target', 40, 10)];
+  it('composes the conversions into a node position in another node space', () => {
+    const lookup = new Map(
+      [node('parent', 100, 50), node('child', 20, 30, 'parent'), node('target', 40, 10)].map((n) => [n.id, n]),
+    );
+    const childInFlow = nodeSpaceToFlowPosition({ x: 0, y: 0 }, 'child', lookup)!;
 
-    expect(getNodePositionInSpace('child', null, nodes)).toEqual({ x: 120, y: 80 });
-    expect(getNodePositionInSpace('child', 'target', nodes)).toEqual({ x: 80, y: 70 });
-    expect(getNodePositionInSpace('missing', null, nodes)).toBeUndefined();
-    expect(getNodePositionInSpace('child', 'missing', nodes)).toBeUndefined();
+    expect(childInFlow).toEqual({ x: 120, y: 80 });
+    expect(flowToNodeSpacePosition(childInFlow, 'target', lookup)).toEqual({ x: 80, y: 70 });
+    expect(flowToNodeSpacePosition(childInFlow, 'missing', lookup)).toBeUndefined();
   });
 
   it('treats a missing ancestor as a root and rejects cyclic ancestry', () => {

@@ -10,20 +10,6 @@ export interface ClientTransformOptions {
   containerPosition: Point;
 }
 
-/** Gets a node's position relative to another node, or in flow space when `spaceNodeId` is null. */
-export function getNodePositionInSpace(
-  nodeId: string,
-  spaceNodeId: string | null,
-  nodes: readonly Node[],
-): Point | undefined {
-  const nodeLookup = new Map(nodes.map((node) => [node.id, node]));
-  const flowPosition = nodeSpaceToFlowPosition({ x: 0, y: 0 }, nodeId, nodeLookup);
-
-  if (!flowPosition || spaceNodeId === null) return flowPosition;
-
-  return flowToNodeSpacePosition(flowPosition, spaceNodeId, nodeLookup);
-}
-
 /** Converts a DOM client-space position to flow space. */
 export function clientToFlowPosition(point: Point, { viewport, containerPosition }: ClientTransformOptions): Point {
   validateZoom(viewport.zoom);

@@ -14,6 +14,6 @@ export interface NodeContext {
 export interface ConnectionContext {
   $implicit: {
     path: Signal<string | null>;
-    marker: Signal<string>;
+    markerEnd: Signal<string>;
   };
 }

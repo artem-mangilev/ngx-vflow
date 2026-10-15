@@ -1,4 +1,4 @@
-export type EdgeChange = EdgeDetachedChange | EdgeAddChange | EdgeRemoveChange | EdgeSelectChange;
+export type EdgeChange = EdgeDetachedChange | EdgeAddChange | EdgeRemoveChange | EdgeSelectedChange;
 
 /**
  * Reports that the edge is already detached from rendered endpoints.
@@ -20,7 +20,7 @@ export interface EdgeRemoveChange extends EdgeChangeShared {
 }
 
 /** Reports a selection value that has already been written to the edge's `selected` signal. */
-export interface EdgeSelectChange extends EdgeChangeShared {
+export interface EdgeSelectedChange extends EdgeChangeShared {
   type: 'select';
   selected: boolean;
 }

@@ -6,6 +6,7 @@ import { FlowEntitiesService } from '../../services/flow-entities.service';
 import { VflowComponent } from '../../components/vflow/vflow.component';
 import { Vflow } from '../../vflow';
 import { mouseAsPointer } from '../../gestures/pointer-events.testing';
+import { ResizeChangeEvent, ResizeEvent } from './resizer-types';
 
 @Component({
   template: `
@@ -46,7 +47,12 @@ class ResizableTestHostComponent {
     <vflow [view]="[400, 300]" [nodes]="nodes()">
       <ng-template vNode>
         @if (withResizable()) {
-          <div class="card" vResizable>
+          <div
+            class="card"
+            vResizable
+            (resizeStart)="resizes.push(['start', $event])"
+            (resize)="resizes.push(['resize', $event])"
+            (resizeEnd)="resizes.push(['end', $event])">
             <div class="content"></div>
             <span vHandle handleType="source" position="right"></span>
           </div>
@@ -88,6 +94,7 @@ class ResizableTestHostComponent {
 class SizeTargetHostComponent {
   public readonly withResizable = signal(true);
   public readonly nodes = signal<Node[]>(createNodes([{ id: 'node', point: { x: 20, y: 20 } }]));
+  public readonly resizes: Array<[string, ResizeEvent | ResizeChangeEvent]> = [];
 }
 
 const SIZED_NODES = () => createNodes([{ id: 'node', point: { x: 20, y: 20 }, width: 300, height: 150 }]);
@@ -332,6 +339,27 @@ describe('VflowResizableComponent', () => {
       expect(card().style.height).toBe('');
       // An explicit axis makes the element border-box, so the auto height is now clamped by min-height alone.
       expect(model().height()).toBe(120);
+    });
+
+    it('reports the resized node and the sign of the size change per axis', async () => {
+      const nodes = SIZED_NODES();
+      const { fixture, controls } = await createSizeTargetFixture({ nodes });
+      const resizes = fixture.componentInstance.resizes;
+      const corner = (selector: string) => controls().find((control) => control.matches(selector))!;
+
+      drag(corner('.v-resize-control--handle.v-resize-control--bottom.v-resize-control--right'), 40, 30);
+      await settle(fixture);
+
+      expect(resizes.map(([kind]) => kind)).toEqual(['start', 'resize', 'resize', 'end']);
+      expect(resizes.every(([, event]) => event.node === nodes[0])).toBe(true);
+      expect(resizes.at(-1)?.[1]).toMatchObject({ width: 340, height: 180 });
+      expect((resizes[1][1] as ResizeChangeEvent).direction).toEqual({ x: 1, y: 1 });
+
+      resizes.length = 0;
+      drag(corner('.v-resize-control--handle.v-resize-control--top.v-resize-control--left'), -20, 0);
+      await settle(fixture);
+
+      expect((resizes[1][1] as ResizeChangeEvent).direction).toEqual({ x: -1, y: 0 });
     });
 
     it('writes the resized size into the application signals', async () => {

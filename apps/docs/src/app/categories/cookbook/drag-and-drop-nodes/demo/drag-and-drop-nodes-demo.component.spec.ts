@@ -1,6 +1,5 @@
 import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { Node } from 'ngx-vflow';
 import { DragAndDropNodesDemoComponent } from './drag-and-drop-nodes-demo.component';
 
 describe('DragAndDropNodesDemoComponent', () => {
@@ -9,9 +8,9 @@ describe('DragAndDropNodesDemoComponent', () => {
       imports: [DragAndDropNodesDemoComponent],
     }).compileComponents();
     const component = TestBed.createComponent(DragAndDropNodesDemoComponent).componentInstance;
-    const parent: Node = {
+    const parent = {
       id: 'parent',
-      data: signal({ type: 'group' }),
+      data: signal({ type: 'group' as const }),
       point: signal({ x: 100, y: 100 }),
       width: signal(250),
       height: signal(250),

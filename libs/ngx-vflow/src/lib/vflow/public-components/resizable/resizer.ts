@@ -11,7 +11,7 @@ import {
   OnResize,
   OnResizeEnd,
   OnResizeStart,
-  ResizeControlDirection,
+  ResizeAxis,
   ResizeDragEvent,
   ShouldResize,
 } from './resizer-types';
@@ -61,7 +61,7 @@ export interface ResizerUpdateParams {
     maxHeight: number;
   };
   keepAspectRatio: boolean;
-  resizeDirection?: ResizeControlDirection;
+  resizeAxis?: ResizeAxis;
   onResizeStart?: OnResizeStart;
   onResize?: OnResize;
   onResizeEnd?: OnResizeEnd;
@@ -165,7 +165,7 @@ export function createResizer({ domNode, getStoreItems, onChange, onEnd }: Resiz
     controlPosition,
     boundaries,
     keepAspectRatio,
-    resizeDirection,
+    resizeAxis,
     onResizeStart,
     onResize,
     onResizeEnd,
@@ -317,10 +317,8 @@ export function createResizer({ domNode, getStoreItems, onChange, onEnd }: Resiz
           }
 
           if (isWidthChange || isHeightChange) {
-            change.width =
-              isWidthChange && (!resizeDirection || resizeDirection === 'horizontal') ? width : nextValues.width;
-            change.height =
-              isHeightChange && (!resizeDirection || resizeDirection === 'vertical') ? height : nextValues.height;
+            change.width = isWidthChange && (!resizeAxis || resizeAxis === 'horizontal') ? width : nextValues.width;
+            change.height = isHeightChange && (!resizeAxis || resizeAxis === 'vertical') ? height : nextValues.height;
             nextValues.width = change.width;
             nextValues.height = change.height;
           }

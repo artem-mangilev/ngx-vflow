@@ -5,7 +5,7 @@
 
 The library supports splitting a large flow into multiple chunks, where each chunk is loaded according to the provided `lazyLoadTrigger` in the `Optimization` object.
 
-To load nodes when the viewport changes, set `lazyLoadTrigger` to the value viewport. When `virtualization` is enabled, nodes are loaded immediately instead so the library can measure initial node and handle geometry.
+To load nodes when the viewport changes, set `lazyLoadTrigger` to the value viewport. The trigger applies to lazy presentations only: a component given as a `() => import(...)` factory, or a template that defers its content with `@defer (when ctx.shouldLoad())`. A component given as a class is already loaded and renders immediately. When `virtualization` is enabled, nodes are loaded immediately instead so the library can measure initial node and handle geometry.
 
 ## Lazy loading component nodes
 

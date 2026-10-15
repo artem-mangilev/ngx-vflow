@@ -43,10 +43,10 @@ const path = getBezierPath(params);
 ```ts
 import { getViewportForBounds } from 'ngx-vflow';
 
-const viewport = getViewportForBounds(bounds, width, height, 0.5, 2, 0.1);
+const viewport = getViewportForBounds(bounds, { width, height }, { minZoom: 0.5, maxZoom: 2, padding: 0.1 });
 ```
 
-`padding` is numeric and relative to the bounds. Bounds may have zero width or height, but sizes cannot be negative. The viewport dimensions and zoom limits must be positive and finite, and padding must be greater than `-1`.
+`width` and `height` are the size of the flow. `padding` is optional, `0` by default, and relative to the bounds. Bounds may have zero width or height, but sizes cannot be negative. The viewport dimensions and zoom limits must be positive and finite, and padding must be greater than `-1`.
 
 ## Client and flow space
 
@@ -57,7 +57,7 @@ const flowPoint = vflow.clientToFlowPosition({ x: event.clientX, y: event.client
 const clientPoint = vflow.flowToClientPosition(flowPoint);
 ```
 
-The pure functions accept the same viewport plus the flow container's client-space position:
+The pure functions of the same names take the viewport and the flow container's client-space position as arguments, where the methods read them from the component:
 
 ```ts
 import { clientToFlowPosition, flowToClientPosition } from 'ngx-vflow';
@@ -76,24 +76,27 @@ Both functions reject a non-positive or non-finite zoom. Results are not rounded
 When a rendered `VflowComponent` is available, query the nodes under a flow-space position directly:
 
 ```ts
-const nodes = vflow.getNodesAtPoint(flowPoint);
-const topmostNode = nodes[0];
-const pointInsideTopmostNode = topmostNode.nodeSpacePoint;
+const [topmost] = vflow.getNodesAtPoint(flowPoint);
+const node = topmost.node;
+const pointInsideTopmostNode = topmost.nodeSpacePoint;
 ```
 
-Each result is a shallow copy of the application node with a snapshot `nodeSpacePoint`: the queried point relative to that node's top-left corner. Signal-valued fields keep their original references. Results contain all rendered nodes at the point and are ordered from topmost to bottommost.
+Each result is a `NodeAtPoint`: `node` is the application node object itself (`topmost.node === node` in your collection), and `nodeSpacePoint` is a snapshot of the queried point relative to that node's top-left corner. Results contain all rendered nodes at the point and are ordered from topmost to bottommost.
 
 ## Nested node space
 
 Node points are relative to their parent. Supply a lookup containing the requested node and any available ancestors to convert through that hierarchy:
 
 ```ts
-import { flowToNodeSpacePosition, getNodePositionInSpace, nodeSpaceToFlowPosition } from 'ngx-vflow';
+import { flowToNodeSpacePosition, nodeSpaceToFlowPosition } from 'ngx-vflow';
 
 const nodeLookup = new Map(nodes.map((node) => [node.id, node]));
 const childPoint = flowToNodeSpacePosition(flowPoint, childId, nodeLookup);
 const flowPointAgain = nodeSpaceToFlowPosition(childPoint!, childId, nodeLookup);
-const childPositionInParent = getNodePositionInSpace(childId, parentId, nodes);
+
+// A node's position in the space of another node: its origin in flow space, then into the other space.
+const childInFlow = nodeSpaceToFlowPosition({ x: 0, y: 0 }, childId, nodeLookup);
+const childInOtherNode = childInFlow && flowToNodeSpacePosition(childInFlow, otherId, nodeLookup);
 ```
 
-A missing requested node, target space, or parent cycle returns `undefined`. A missing ancestor ends the traversal and treats the last available node as a root. `getNodePositionInSpace` accepts the node collection directly; pass `null` as its target space to get the node's flow-space position.
+A missing requested node, target space, or parent cycle returns `undefined`. A missing ancestor ends the traversal and treats the last available node as a root.

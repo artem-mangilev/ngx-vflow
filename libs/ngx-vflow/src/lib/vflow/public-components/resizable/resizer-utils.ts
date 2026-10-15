@@ -1,4 +1,4 @@
-import { ControlPosition, CoordinateExtent, NodeOrigin } from './resizer-types';
+import { ControlPosition, CoordinateExtent, NodeOrigin, ResizeChangeParams, ResizeSign } from './resizer-types';
 
 interface GetResizeDirectionParams {
   width: number;
@@ -12,7 +12,7 @@ interface GetResizeDirectionParams {
 /**
  * Computes the resize direction for each axis based on size delta.
  *
- * @returns array of two numbers: `0` = no change, `1` = increase, `-1` = decrease
+ * @returns sign per axis: `0` = no change, `1` = increase, `-1` = decrease
  */
 export function getResizeDirection({
   width,
@@ -21,20 +21,12 @@ export function getResizeDirection({
   prevHeight,
   affectsX,
   affectsY,
-}: GetResizeDirectionParams) {
-  const deltaWidth = width - prevWidth;
-  const deltaHeight = height - prevHeight;
+}: GetResizeDirectionParams): ResizeChangeParams['direction'] {
+  const x = Math.sign(width - prevWidth) as ResizeSign;
+  const y = Math.sign(height - prevHeight) as ResizeSign;
 
-  const direction = [deltaWidth > 0 ? 1 : deltaWidth < 0 ? -1 : 0, deltaHeight > 0 ? 1 : deltaHeight < 0 ? -1 : 0];
-
-  if (deltaWidth && affectsX) {
-    direction[0] = direction[0] * -1;
-  }
-
-  if (deltaHeight && affectsY) {
-    direction[1] = direction[1] * -1;
-  }
-  return direction;
+  // A control on the left or top edge moves the origin: growing the size moves that edge in the negative direction.
+  return { x: affectsX ? ((-x || 0) as ResizeSign) : x, y: affectsY ? ((-y || 0) as ResizeSign) : y };
 }
 
 /**

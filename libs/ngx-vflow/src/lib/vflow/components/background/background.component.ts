@@ -8,7 +8,7 @@ import { toLazySignal } from '../../utils/signals/to-lazy-signal';
 
 const defaultGap = 20;
 const defaultDotSize = 2;
-const defaultGridSize = 20;
+const defaultGridGap = 20;
 const defaultStrokeWidth = 2;
 const defaultImageScale = 0.1;
 const defaultRepeated = true;
@@ -60,7 +60,7 @@ export class BackgroundComponent {
     }
 
     if (background?.type === 'grid') {
-      return this.viewportService.readableViewport().zoom * (background.size ?? defaultGridSize);
+      return this.viewportService.readableViewport().zoom * (background.gap ?? defaultGridGap);
     }
 
     return 0;
@@ -75,7 +75,7 @@ export class BackgroundComponent {
     }
 
     if (background?.type === 'grid') {
-      return zoom * (background.size ?? defaultGridSize);
+      return zoom * (background.gap ?? defaultGridGap);
     }
 
     return 0;

@@ -14,7 +14,7 @@ import { KeyboardService } from './keyboard.service';
 import { isGroupNode } from '../utils/is-group-node';
 import { ResizeObserverService } from './resize-observer.service';
 import { clientToFlowPosition } from '../utils/coordinates';
-import { PointerDrag, createPointerDrag } from '../gestures/pointer-drag';
+import { PointerDrag, PointerDragContext, createPointerDrag } from '../gestures/pointer-drag';
 import { isNodeDragPress, pressTarget } from '../utils/press-target';
 import { AlignmentService } from './alignment.service';
 
@@ -185,7 +185,7 @@ export class DraggableService {
       this.alignmentService.update();
     };
 
-    const end = () => {
+    const end = ({ event }: PointerDragContext) => {
       if (!activated) return;
       activated = false;
       moveNodesOnAutoPanSub?.unsubscribe();
@@ -193,14 +193,14 @@ export class DraggableService {
       stopTrackingPaneGeometry();
       this.alignmentService.end();
       dragNodes.forEach((node) => node.dragging.set(false));
-      this.flowStatusService.setNodeDragEndStatus(model);
+      this.flowStatusService.setNodeDragEndStatus(model, dragNodes, event);
     };
 
     return createPointerDrag(element, {
       filter: this.dragFilter(model),
       threshold: () => this.settingsService.nodeDragThreshold(),
       stopCompatibilityEvents: true,
-      onStart: ({ start, point }) => {
+      onStart: ({ start, point, event }) => {
         activated = true;
         lastClient = start;
         dragNodes = this.getDragNodes(model);
@@ -208,7 +208,7 @@ export class DraggableService {
         startTrackingPaneGeometry();
         this.alignmentService.begin(dragNodes);
 
-        this.flowStatusService.setNodeDragStartStatus(model);
+        this.flowStatusService.setNodeDragStartStatus(model, dragNodes, event);
 
         // Offsets are taken at the press, so a drag past the threshold does not lose the distance it took.
         const flow = this.getFlowPoint(start, getPaneRect());
@@ -224,9 +224,9 @@ export class DraggableService {
         // A drag that starts past the threshold moves the nodes right away.
         if (point.x !== start.x || point.y !== start.y) moveTo(point);
       },
-      onMove: ({ point }) => {
+      onMove: ({ point, event }) => {
         moveTo(point);
-        this.flowStatusService.setNodeDragStatus(model);
+        this.flowStatusService.setNodeDragStatus(model, dragNodes, event);
       },
       onEnd: end,
       onCancel: end,

@@ -95,7 +95,7 @@ export class ViewportService implements OnDestroy {
 
       const maxZoom = this.clampZoom(options.maxZoom ?? Infinity);
       const minZoom = Math.min(this.clampZoom(options.minZoom ?? 0), maxZoom);
-      return getViewportForBounds(getNodesFlowBounds(nodes), width, height, minZoom, maxZoom, padding);
+      return getViewportForBounds(getNodesFlowBounds(nodes), { width, height }, { minZoom, maxZoom, padding });
     }, options.duration ?? 0);
   }
 

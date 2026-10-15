@@ -536,6 +536,14 @@ Every object input of `vflow` now reads the same way: the value is the defaults 
 
 `optimization.detachedGroupsLayer` became the `parentsBelowEdges` input, and the `groupRole` label key became `parentRole`; both are about nodes that other nodes reference as parent. The `connection` getter of `VflowComponent` is removed: it returned an internal model. The `minZoom` and `maxZoom` getters remain and track changes in a reactive context.
 
+### Renamed fields and types
+
+- `EdgeSelectChange` became `EdgeSelectedChange`, as `NodeSelectedChange`.
+- The end marker of the connection line is `markerEnd`, as on an edge: `[connection]="{ markerEnd: 'arrow' }"` instead of `{ marker: 'arrow' }`, and `ctx.markerEnd()` instead of `ctx.marker()` in a `vConnection` template.
+- `size` of a `grid` background became `gap`, the name the `dots` background uses for the step of its pattern. `size` of `dots` remains the dot diameter.
+- `Node`, `NodeWithDefaults`, `StaticNode`, `injectNode()` and `injectEdge()` default their data type to `unknown` instead of `any`, as `Edge` already did. Code that reads `node.data()` without a type argument now gets `unknown`: pass the type, as in `injectNode<MyData>()` or `Node<MyData>[]`. The `let-ctx` of a presentation template stays untyped, since a template cannot pass a type argument.
+- `NodeDragEvent` also carries `nodes`, every node the gesture moves, and `sourceEvent`, the pointer event.
+
 ### Removed APIs
 
 | Removed in v3                                               | Migration                                                                                                          |
@@ -545,7 +553,7 @@ Every object input of `vflow` now reads the same way: the value is the defaults 
 | `scaleOnHover` input on `MiniMapComponent`                  | Remove the input binding. The minimap remains at its default scale and does not capture pointer input.             |
 | `documentPointToFlowPoint()`                                | Rename to `clientToFlowPosition()`. Use `flowToClientPosition()` for the inverse conversion.                       |
 | `{ spaces: true }`, `SpacePoint`, `getSpacePoints`          | Convert with `clientToFlowPosition()`, then call `getNodesAtPoint()` on the flow component.                        |
-| VflowComponent.toNodeSpace()                                | Use the pure `getNodePositionInSpace()` utility.                                                                   |
+| VflowComponent.toNodeSpace()                                | Convert with the pure `nodeSpaceToFlowPosition()` and `flowToNodeSpacePosition()` utilities.                       |
 | getIntesectingNodes()                                       | Rename to `getIntersectingNodes()`.                                                                                |
 | `viewportTo(state)`                                         | Rename to `setViewport(state)`.                                                                                    |
 | `panTo({ x, y })`                                           | `setViewport({ ...flow.viewport(), x, y })`; to center on a flow-space point, `setCenter(point)`.                  |

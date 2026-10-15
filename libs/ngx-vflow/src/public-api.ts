@@ -3,7 +3,7 @@ export * from './lib/vflow/vflow';
 export * from './lib/vflow/utils/graph';
 export * from './lib/vflow/utils/graph-operations';
 export * from './lib/vflow/utils/coordinates';
-export { getViewportForBounds } from './lib/vflow/utils/viewport';
+export { getViewportForBounds, ViewportForBoundsOptions } from './lib/vflow/utils/viewport';
 export { getStraightPath } from './lib/vflow/math/edge-path/straigh-path';
 export { getBezierPath } from './lib/vflow/math/edge-path/bezier-path';
 export { getSmoothStepPath } from './lib/vflow/math/edge-path/smooth-step-path';
@@ -52,6 +52,7 @@ export { EDGE_REF, EdgeRef, injectEdge } from './lib/vflow/utils/inject-edge';
 export * from './lib/vflow/interfaces/fit-view-options.interface';
 export { Optimization } from './lib/vflow/interfaces/optimization.interface';
 export * from './lib/vflow/interfaces/intersecting-nodes-options.interface';
+export * from './lib/vflow/interfaces/node-at-point.interface';
 export * from './lib/vflow/interfaces/curve-factory.interface';
 export * from './lib/vflow/interfaces/alignment-helper-settings.interface';
 export * from './lib/vflow/interfaces/selection-box-settings.interface';
@@ -80,10 +81,13 @@ export * from './lib/vflow/types/selection-box-mode.type';
 export * from './lib/vflow/components/vflow/vflow.component';
 export * from './lib/vflow/public-components/resizable/resizable.component';
 export {
-  ResizeControlDirection,
+  ResizeAxis,
+  ResizeChangeEvent,
+  ResizeChangeParams,
   ResizeDragEvent,
+  ResizeEvent,
   ResizeParams,
-  ResizeParamsWithDirection,
+  ResizeSign,
   ShouldResize,
 } from './lib/vflow/public-components/resizable/resizer-types';
 export * from './lib/vflow/public-components/minimap/minimap.component';

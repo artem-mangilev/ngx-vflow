@@ -76,7 +76,7 @@ export class FlowEntitiesService {
       add(markers?.end);
     });
 
-    add(this.connection().settings.marker);
+    add(this.connection().settings.markerEnd);
 
     return markersMap;
   });

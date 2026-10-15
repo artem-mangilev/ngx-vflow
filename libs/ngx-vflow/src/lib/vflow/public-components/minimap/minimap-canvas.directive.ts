@@ -102,7 +102,11 @@ export class MinimapCanvasDirective {
     const context = width > 0 && height > 0 ? image.getContext('2d') : null;
     const transform =
       nodes.length && width > 0 && height > 0
-        ? getViewportForBounds(getNodesFlowBounds(nodes), width, height, Number.MIN_VALUE, 0.3, 0)
+        ? getViewportForBounds(
+            getNodesFlowBounds(nodes),
+            { width, height },
+            { minZoom: Number.MIN_VALUE, maxZoom: 0.3 },
+          )
         : { x: 0, y: 0, zoom: 0.2 };
     if (context) {
       context.setTransform(

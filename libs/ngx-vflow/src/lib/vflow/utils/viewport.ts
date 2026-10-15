@@ -2,17 +2,21 @@ import { Rect } from '../interfaces/rect';
 import { ViewportState } from '../interfaces/viewport.interface';
 import { rectsIntersect } from './rect';
 
+export interface ViewportForBoundsOptions {
+  minZoom: number;
+  maxZoom: number;
+  /** Share of the bounds added around them, `0.1` = 10 %. Default: `0`. */
+  padding?: number;
+}
+
 /**
- * Returns the translated and clamped viewport that centers the supplied bounds.
+ * Returns the translated and clamped viewport that centers the supplied bounds in a flow of the given size.
  * Zero-sized bounds are treated as a point and use `maxZoom`.
  */
 export function getViewportForBounds(
   bounds: Rect,
-  width: number,
-  height: number,
-  minZoom: number,
-  maxZoom: number,
-  padding: number,
+  { width, height }: { width: number; height: number },
+  { minZoom, maxZoom, padding = 0 }: ViewportForBoundsOptions,
 ): ViewportState {
   if (
     ![bounds.x, bounds.y, bounds.width, bounds.height, width, height, minZoom, maxZoom, padding].every(

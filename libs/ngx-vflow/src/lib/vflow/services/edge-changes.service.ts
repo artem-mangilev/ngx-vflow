@@ -8,7 +8,7 @@ import {
   EdgeChange,
   EdgeDetachedChange,
   EdgeRemoveChange,
-  EdgeSelectChange,
+  EdgeSelectedChange,
 } from '../types/edge-change.type';
 import { batchChanges } from '../utils/batch-changes';
 
@@ -51,7 +51,7 @@ export class EdgeChangesService {
     map((edges) => edges.map(({ edge }) => ({ type: 'remove', id: edge.id }))),
   );
 
-  protected edgeSelectChange$: Observable<EdgeSelectChange[]> = toObservable(this.entitiesService.edges).pipe(
+  protected edgeSelectChange$: Observable<EdgeSelectedChange[]> = toObservable(this.entitiesService.edges).pipe(
     switchMap((edges) =>
       merge(
         ...edges.map((edge) =>

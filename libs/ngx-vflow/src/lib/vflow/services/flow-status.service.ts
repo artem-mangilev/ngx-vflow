@@ -81,6 +81,8 @@ export interface FlowStatusNodeDragStart {
   state: 'node-drag-start';
   payload: {
     node: NodeModel;
+    nodes: NodeModel[];
+    event: PointerEvent;
   };
 }
 
@@ -88,6 +90,8 @@ export interface FlowStatusNodeDrag {
   state: 'node-drag';
   payload: {
     node: NodeModel;
+    nodes: NodeModel[];
+    event: PointerEvent;
   };
 }
 
@@ -95,6 +99,8 @@ export interface FlowStatusNodeDragEnd {
   state: 'node-drag-end';
   payload: {
     node: NodeModel;
+    nodes: NodeModel[];
+    event: PointerEvent;
   };
 }
 
@@ -271,16 +277,16 @@ export class FlowStatusService {
     this.status.set({ state: 'reconnection-dropped', payload: { source, sourceHandle, oldEdge } });
   }
 
-  public setNodeDragStartStatus(node: NodeModel) {
-    this.status.set({ state: 'node-drag-start', payload: { node } });
+  public setNodeDragStartStatus(node: NodeModel, nodes: NodeModel[], event: PointerEvent) {
+    this.status.set({ state: 'node-drag-start', payload: { node, nodes, event } });
   }
 
-  public setNodeDragStatus(node: NodeModel) {
-    this.status.set({ state: 'node-drag', payload: { node } });
+  public setNodeDragStatus(node: NodeModel, nodes: NodeModel[], event: PointerEvent) {
+    this.status.set({ state: 'node-drag', payload: { node, nodes, event } });
   }
 
-  public setNodeDragEndStatus(node: NodeModel) {
-    this.status.set({ state: 'node-drag-end', payload: { node } });
+  public setNodeDragEndStatus(node: NodeModel, nodes: NodeModel[], event: PointerEvent) {
+    this.status.set({ state: 'node-drag-end', payload: { node, nodes, event } });
   }
 
   public setSelectionBoxEndStatus() {

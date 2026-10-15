@@ -13,8 +13,9 @@ export interface Optimization {
   virtualization?: boolean;
 
   /**
-   * The trigger for lazy loading of entities. Virtualization loads nodes immediately
-   * to obtain their initial geometry, regardless of this setting.
+   * When lazy presentations load: a `() => import(...)` component factory or an `ng-template` presentation, which
+   * gates itself with `@defer (when ctx.shouldLoad())`. A component class is already loaded and always renders
+   * immediately. Virtualization loads nodes immediately to obtain their initial geometry, regardless of this setting.
    */
   lazyLoadTrigger?: 'immediate' | 'viewport';
 }

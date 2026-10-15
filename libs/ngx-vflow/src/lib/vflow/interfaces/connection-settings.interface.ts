@@ -14,8 +14,8 @@ export type ConnectionValidatorFn = (connection: ConnectionForValidation) => boo
 export interface ConnectionSettings {
   curve?: Curve;
   validator?: ConnectionValidatorFn;
-  /** End marker of the connection line, see `MarkerRef`. */
-  marker?: MarkerRef;
+  /** End marker of the connection line, see `MarkerRef`. The line has no start marker. */
+  markerEnd?: MarkerRef;
   /** Lets the gesture connect a node to itself. Default: false. */
   allowSelfConnections?: boolean;
   /**

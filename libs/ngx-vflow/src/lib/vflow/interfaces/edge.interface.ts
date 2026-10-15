@@ -58,7 +58,7 @@ type OptionalProperty = 'component' | 'selectable' | 'focusable' | 'ariaLabel' |
 export type EdgeWithDefaults<T = unknown> = Omit<Required<Edge<T>>, OptionalProperty> & Pick<Edge<T>, OptionalProperty>;
 
 /** Wraps the values into signals and fills the defaults; inherited capabilities stay optional. */
-export function createEdge<T>(edge: StaticEdge<T>): EdgeWithDefaults<T> {
+export function createEdge<T = unknown>(edge: StaticEdge<T>): EdgeWithDefaults<T> {
   return {
     id: edge.id,
     source: edge.source,
@@ -80,6 +80,6 @@ export function createEdge<T>(edge: StaticEdge<T>): EdgeWithDefaults<T> {
   };
 }
 
-export function createEdges<T>(edges: StaticEdge<T>[]): EdgeWithDefaults<T>[] {
+export function createEdges<T = unknown>(edges: StaticEdge<T>[]): EdgeWithDefaults<T>[] {
   return edges.map((edge) => createEdge(edge));
 }

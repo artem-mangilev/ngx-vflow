@@ -18,7 +18,7 @@ import {
   OnResize,
   OnResizeEnd,
   OnResizeStart,
-  ResizeControlDirection,
+  ResizeAxis,
   ResizeControlVariant,
   ShouldResize,
 } from './resizer-types';
@@ -57,7 +57,7 @@ export class NodeResizeControlComponent implements OnDestroy {
   public maxWidth = input(Infinity);
   public maxHeight = input(Infinity);
   public keepAspectRatio = input(false);
-  public resizeDirection = input<ResizeControlDirection>();
+  public resizeAxis = input<ResizeAxis>();
   public autoScale = input(true);
 
   public onResizeStart = input<OnResizeStart>();
@@ -69,10 +69,10 @@ export class NodeResizeControlComponent implements OnDestroy {
 
   private drivenAxes = computed(() => {
     const position = this.position();
-    const direction = this.resizeDirection();
+    const axis = this.resizeAxis();
     return {
-      width: (position.includes('left') || position.includes('right')) && direction !== 'vertical',
-      height: (position.includes('top') || position.includes('bottom')) && direction !== 'horizontal',
+      width: (position.includes('left') || position.includes('right')) && axis !== 'vertical',
+      height: (position.includes('top') || position.includes('bottom')) && axis !== 'horizontal',
     };
   });
 
@@ -139,7 +139,7 @@ export class NodeResizeControlComponent implements OnDestroy {
           maxHeight: this.maxHeight(),
         },
         keepAspectRatio: this.keepAspectRatio(),
-        resizeDirection: this.resizeDirection(),
+        resizeAxis: this.resizeAxis(),
         onResizeStart: this.onResizeStart(),
         onResize: this.onResize(),
         onResizeEnd: this.onResizeEnd(),

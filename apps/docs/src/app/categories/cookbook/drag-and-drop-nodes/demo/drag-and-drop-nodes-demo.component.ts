@@ -14,8 +14,14 @@ import {
   createNodes,
 } from 'ngx-vflow';
 
+interface DemoNodeData {
+  type?: 'group';
+  canDetach?: boolean;
+  canAttach?: boolean;
+}
+
 /** Containers are marked in application data; the flow itself has no group node type. */
-const isGroup = (node: Node) => node.data?.().type === 'group';
+const isGroup = (node: Node<DemoNodeData>) => node.data?.().type === 'group';
 
 @Component({
   templateUrl: './drag-and-drop-nodes-demo.component.html',
@@ -26,7 +32,7 @@ const isGroup = (node: Node) => node.data?.().type === 'group';
 export class DragAndDropNodesDemoComponent {
   public vflow = viewChild.required(VflowComponent);
 
-  public nodes: Node[] = createNodes([
+  public nodes: Node<DemoNodeData>[] = createNodes<DemoNodeData>([
     {
       id: '1',
       point: { x: 10, y: 10 },
@@ -40,14 +46,16 @@ export class DragAndDropNodesDemoComponent {
 
   public createNode({ event }: DndDropEvent) {
     const flowPoint = this.vflow().clientToFlowPosition({ x: event.x, y: event.y });
-    const parent = this.vflow().getNodesAtPoint(flowPoint).find(isGroup);
+    const parent = this.vflow()
+      .getNodesAtPoint<DemoNodeData>(flowPoint)
+      .find(({ node }) => isGroup(node));
 
     this.nodes = addNodes(
-      createNodes([
+      createNodes<DemoNodeData>([
         {
           id: crypto.randomUUID(),
           point: parent?.nodeSpacePoint ?? flowPoint,
-          parentId: parent?.id ?? null,
+          parentId: parent?.node.id ?? null,
           data: {
             canDetach: !!parent,
           },
@@ -79,7 +87,7 @@ export class DragAndDropNodesDemoComponent {
     this.nodes
       .filter((node) => !isGroup(node))
       .forEach((node) => {
-        const intersectingNodes = this.vflow().getIntersectingNodes(node.id).filter(isGroup);
+        const intersectingNodes = this.vflow().getIntersectingNodes<DemoNodeData>(node.id).filter(isGroup);
 
         const canAttach = intersectingNodes.length > 0 && !node.parentId?.();
         node.data?.update((state) => ({ ...state, canAttach }));
@@ -87,7 +95,7 @@ export class DragAndDropNodesDemoComponent {
   }
 
   attachNode(nodeId: string) {
-    const [intersectionNode] = this.vflow().getIntersectingNodes(nodeId).filter(isGroup);
+    const [intersectionNode] = this.vflow().getIntersectingNodes<DemoNodeData>(nodeId).filter(isGroup);
     if (!intersectionNode) return;
 
     const nodeToUpdate = this.nodes.find((node) => node.id === nodeId);

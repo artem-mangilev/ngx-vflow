@@ -25,7 +25,7 @@ export type EntityComponentType = Type<unknown> | (() => Promise<Type<unknown>>)
  * The flow never adds signals to a node object. The application may add an optional signal to an existing node
  * later; the flow reads it once it receives a new nodes array.
  */
-export interface Node<T = any> {
+export interface Node<T = unknown> {
   id: string;
   point: WritableSignal<Point>;
   component?: EntityComponentType;
@@ -55,10 +55,10 @@ export type StaticNode<T = unknown> = UnwrapSignal<Node<T>>;
 type OptionalProperty =
   'component' | 'width' | 'height' | 'selectable' | 'focusable' | 'ariaLabel' | 'ariaDescription' | 'domAttributes';
 
-export type NodeWithDefaults<T = any> = Omit<Required<Node<T>>, OptionalProperty> & Pick<Node<T>, OptionalProperty>;
+export type NodeWithDefaults<T = unknown> = Omit<Required<Node<T>>, OptionalProperty> & Pick<Node<T>, OptionalProperty>;
 
 /** Wraps the values into signals and fills the defaults; inherited capabilities stay optional. */
-export function createNode<T>(node: StaticNode<T>): NodeWithDefaults<T> {
+export function createNode<T = unknown>(node: StaticNode<T>): NodeWithDefaults<T> {
   return {
     id: node.id,
     point: signal(node.point),

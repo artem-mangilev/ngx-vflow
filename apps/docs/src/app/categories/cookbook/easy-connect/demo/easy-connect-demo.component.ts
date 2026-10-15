@@ -159,7 +159,7 @@ export class EasyConnectDemoComponent {
   protected readonly settings = inject(EasyConnectSettings);
 
   public readonly connection = computed<ConnectionSettings>(() => ({
-    marker: { type: 'arrow-closed' },
+    markerEnd: { type: 'arrow-closed' },
     curve: this.settings.curve(),
   }));
 

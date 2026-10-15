@@ -83,7 +83,7 @@ export class ConnectionComponent {
     }
   });
 
-  protected markerUrl = computed(() => markerUrl(this.model().settings.marker));
+  protected markerUrl = computed(() => markerUrl(this.model().settings.markerEnd));
 
   protected readonly defaultColor = 'var(--v-muted)';
 
@@ -92,7 +92,7 @@ export class ConnectionComponent {
     return {
       $implicit: {
         path: this.path,
-        marker: this.markerUrl,
+        markerEnd: this.markerUrl,
       },
     };
   }
@@ -105,7 +105,10 @@ export class ConnectionComponent {
     sourceNode: NodeModel,
     targetNode?: NodeModel,
   ): CurveFactoryParams {
-    const inset = { start: 0, end: markerInset(this.model().settings.marker, this.flowEntitiesService.markerShapes()) };
+    const inset = {
+      start: 0,
+      end: markerInset(this.model().settings.markerEnd, this.flowEntitiesService.markerShapes()),
+    };
 
     return {
       mode: 'connection',

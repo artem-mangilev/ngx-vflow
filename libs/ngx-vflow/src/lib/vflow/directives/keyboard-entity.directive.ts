@@ -67,6 +67,8 @@ export class KeyboardEntityDirective {
       getOverlappingArea(bounds, getViewportBounds(viewport, width, height)) > 0
     )
       return;
-    this.viewport.change(getViewportForBounds(bounds, width, height, viewport.zoom, viewport.zoom, 0));
+    this.viewport.change(
+      getViewportForBounds(bounds, { width, height }, { minZoom: viewport.zoom, maxZoom: viewport.zoom }),
+    );
   }
 }

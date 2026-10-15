@@ -169,9 +169,10 @@ describe('Initial handle placement', () => {
     const attributes = vi.spyOn(handle, 'setAttribute');
     const model = fixture.debugElement.injector.get(FlowEntitiesService).nodes()[0];
     const status = fixture.debugElement.injector.get(FlowStatusService);
-    status.setNodeDragStartStatus(model);
+    const event = new PointerEvent('pointermove');
+    status.setNodeDragStartStatus(model, [model], event);
     fixture.detectChanges();
-    status.setNodeDragStatus(model);
+    status.setNodeDragStatus(model, [model], event);
     fixture.detectChanges();
     expect(attributes.mock.calls.filter(([name]) => name === 'aria-label')).toEqual([]);
   });

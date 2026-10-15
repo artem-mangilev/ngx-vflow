@@ -36,6 +36,7 @@ import {
 } from '../../directives/template.directive';
 import { addNodesToEdges } from '../../utils/add-nodes-to-edges';
 import { Point } from '../../interfaces/point.interface';
+import { NodeAtPoint } from '../../interfaces/node-at-point.interface';
 import { SetCenterOptions, ViewportOptions, ViewportState } from '../../interfaces/viewport.interface';
 import { FlowStatusService } from '../../services/flow-status.service';
 import { FlowEntitiesService } from '../../services/flow-entities.service';
@@ -533,13 +534,14 @@ export class VflowComponent {
   public readonly edgesChanges = outputFromObservable(this.edgesChangeService.changes$);
 
   /**
-   * Event that accumulates all custom node events
+   * Outputs of component nodes, as `ComponentNodeEvent`.
+   *
+   * The payload is `any` on purpose: a handler declared as `ComponentNodeEvent<[A, B]>` narrows `eventName` to the
+   * output names of its components, and a `string`-typed `AnyComponentNodeEvent` would not be assignable to it.
    */
-  public readonly componentNodeEvent = outputFromObservable<any>(this.componentEventBusService.nodeEvent$); // TODO: research how to remove any
+  public readonly componentNodeEvent = outputFromObservable<any>(this.componentEventBusService.nodeEvent$);
 
-  /**
-   * Event that accumulates all custom edge events
-   */
+  /** Outputs of component edges, as `ComponentEdgeEvent`. The payload is `any` for the reason given above. */
   public readonly componentEdgeEvent = outputFromObservable<any>(this.componentEventBusService.edgeEvent$);
 
   /**
@@ -707,15 +709,18 @@ export class VflowComponent {
     return this.spacePointContext().flowToClientPosition(point);
   }
 
-  /** Gets rendered nodes containing a flow-space position, with the topmost node first. */
-  public getNodesAtPoint<T = unknown>(point: Point): Array<Node<T> & { nodeSpacePoint: Point }> {
+  /**
+   * Gets rendered nodes containing a flow-space position, with the topmost node first. `node` is the application
+   * object; `nodeSpacePoint` is a snapshot of the position relative to that node's top-left corner.
+   */
+  public getNodesAtPoint<T = unknown>(point: Point): NodeAtPoint<T>[] {
     return findNodesAtPoint(point, this.nodeModels())
       .reverse()
       .map((model) => {
         const globalPoint = model.globalPoint();
 
         return {
-          ...(model.rawNode as Node<T>),
+          node: model.rawNode as Node<T>,
           nodeSpacePoint: { x: point.x - globalPoint.x, y: point.y - globalPoint.y },
         };
       });
@@ -729,7 +734,10 @@ export class VflowComponent {
    * @param options.partially - If true, returns nodes that partially intersect. If false, only returns fully intersecting nodes
    * @returns An array of nodes that intersect with the specified node
    */
-  public getIntersectingNodes<T>(nodeId: string, options: IntersectingNodesOptions = { partially: true }): Node<T>[] {
+  public getIntersectingNodes<T = unknown>(
+    nodeId: string,
+    options: IntersectingNodesOptions = { partially: true },
+  ): Node<T>[] {
     return getIntersectingNodes(nodeId, this.nodeModels(), options).map((n) => n.rawNode) as Node<T>[];
   }
   // #endregion

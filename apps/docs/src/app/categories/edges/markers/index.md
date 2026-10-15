@@ -3,7 +3,7 @@ You can create markers for both edges and connections.
 - **Edges**: Specify `start` and `end` markers for corresponding parts of the edge. The built-in markers are two
   `type`s: `arrow` and `arrow-closed`. `width`, `height`, `orient` and `strokeWidth` are optional. Any other shape
   is a custom marker, see below.
-- **Connections**: You can specify an end marker using the `marker` property in `ConnectionSettings`.
+- **Connections**: You can specify an end marker using the `markerEnd` property in `ConnectionSettings`.
 
 A marker is an object with a `type` and optional size, or the type alone: `markers: { end: 'arrow' }`. Markers
 take the stroke color of the edge that references them (`context-stroke`), so a themed or selected edge colors its
@@ -23,7 +23,7 @@ curve receives are already moved by that distance when the edge has a marker on 
 The built-in types are shapes the library ships; any other `type` is a shape you declare with `ng-template[vMarker]`.
 The flow renders one `<marker>` element per distinct marker for both, with the `width`, `height`, `orient` and
 `strokeWidth` the marker asks for and the stroke of the edge, so a declared shape is used exactly like an arrow:
-as the type alone, or as an object with a size. The connection line accepts it in `marker` as well.
+as the type alone, or as an object with a size. The connection line accepts it in `markerEnd` as well.
 
 {% raw %}
 

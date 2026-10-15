@@ -49,9 +49,9 @@ export interface GridBackground {
   type: 'grid';
 
   /**
-   * Size of the grid squares
+   * Gap between grid lines, the side of a grid square
    */
-  size?: number;
+  gap?: number;
 
   /**
    * Width of the grid lines

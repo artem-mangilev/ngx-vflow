@@ -21,11 +21,13 @@ import {
   ControlPosition,
   RESIZER_HANDLE_POSITIONS,
   RESIZER_LINE_POSITIONS,
-  ResizeControlDirection,
+  ResizeAxis,
+  ResizeChangeEvent,
+  ResizeChangeParams,
   ResizeControlVariant,
   ResizeDragEvent,
+  ResizeEvent,
   ResizeParams,
-  ResizeParamsWithDirection,
   ShouldResize,
 } from './resizer-types';
 
@@ -66,13 +68,16 @@ export class VflowResizableComponent implements OnInit, AfterViewInit, OnDestroy
 
   public keepAspectRatio = input(false);
 
-  public resizeDirection = input<ResizeControlDirection>();
+  /** Restricts resizing to one axis; both axes resize without it. */
+  public resizeAxis = input<ResizeAxis>();
 
   public autoScale = input(true);
 
-  public readonly resizeStart = output<ResizeParams>();
-  public readonly resizeChange = output<ResizeParamsWithDirection>();
-  public readonly resizeEnd = output<ResizeParams>();
+  public readonly resizeStart = output<ResizeEvent>();
+  // Only `window` fires a native `resize` event, so the name does not collide on an element.
+  // eslint-disable-next-line @angular-eslint/no-output-native
+  public readonly resize = output<ResizeChangeEvent>();
+  public readonly resizeEnd = output<ResizeEvent>();
   public shouldResize = input<ShouldResize>();
 
   protected readonly linePositions: ControlLinePosition[] = RESIZER_LINE_POSITIONS;
@@ -110,9 +115,12 @@ export class VflowResizableComponent implements OnInit, AfterViewInit, OnDestroy
 
   private registeredTemplate: TemplateRef<unknown> | null = null;
 
-  protected emitResizeStart = (_: ResizeDragEvent, params: ResizeParams) => this.resizeStart.emit(params);
-  protected emitResize = (_: ResizeDragEvent, params: ResizeParamsWithDirection) => this.resizeChange.emit(params);
-  protected emitResizeEnd = (_: ResizeDragEvent, params: ResizeParams) => this.resizeEnd.emit(params);
+  protected emitResizeStart = (_: ResizeDragEvent, params: ResizeParams) =>
+    this.resizeStart.emit({ ...params, node: this.model.rawNode });
+  protected emitResize = (_: ResizeDragEvent, params: ResizeChangeParams) =>
+    this.resize.emit({ ...params, node: this.model.rawNode });
+  protected emitResizeEnd = (_: ResizeDragEvent, params: ResizeParams) =>
+    this.resizeEnd.emit({ ...params, node: this.model.rawNode });
 
   public ngOnInit(): void {
     this.registeredTemplate = this.resizer();

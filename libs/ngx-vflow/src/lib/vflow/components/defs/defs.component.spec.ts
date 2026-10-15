@@ -12,7 +12,7 @@ import {
 import { VflowHandleDirective } from '../../directives/handle.directive';
 
 @Component({
-  template: `<vflow [view]="[600, 400]" [nodes]="nodes" [edges]="edges()" [connection]="{ marker: 'diamond' }">
+  template: `<vflow [view]="[600, 400]" [nodes]="nodes" [edges]="edges()" [connection]="{ markerEnd: 'diamond' }">
     <ng-template vNode>
       <div style="width: 60px; height: 30px">
         <span vHandle handleType="target" position="left"></span

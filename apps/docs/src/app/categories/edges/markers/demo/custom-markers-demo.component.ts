@@ -92,5 +92,5 @@ export class CustomMarkersDemoComponent {
     },
   ]);
 
-  public connectionSettings: ConnectionSettings = { marker: 'circle-closed' };
+  public connectionSettings: ConnectionSettings = { markerEnd: 'circle-closed' };
 }
