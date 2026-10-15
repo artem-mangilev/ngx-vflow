@@ -4,10 +4,7 @@ import { KeyboardEntityDirective } from '../../directives/keyboard-entity.direct
 import {
   ChangeDetectionStrategy,
   Component,
-  Injector,
-  Input,
   inject,
-  runInInjectionContext,
   contentChild,
   contentChildren,
   computed,
@@ -34,7 +31,6 @@ import {
   VflowMarkerTemplateDirective,
   VflowNodeTemplateDirective,
 } from '../../directives/template.directive';
-import { addNodesToEdges } from '../../utils/add-nodes-to-edges';
 import { Point } from '../../interfaces/point.interface';
 import { NodeAtPoint } from '../../interfaces/node-at-point.interface';
 import { SetCenterOptions, ViewportOptions, ViewportState } from '../../interfaces/viewport.interface';
@@ -42,8 +38,6 @@ import { FlowStatusService } from '../../services/flow-status.service';
 import { FlowEntitiesService } from '../../services/flow-entities.service';
 import { MarkerShapes } from '../../utils/marker-inset';
 import { ConnectionSettings } from '../../interfaces/connection-settings.interface';
-import { ConnectionModel } from '../../models/connection.model';
-import { ReferenceIdentityChecker } from '../../utils/identity-checker/reference-identity-checker';
 import { NodesChangeService } from '../../services/node-changes.service';
 import { EdgeChangesService } from '../../services/edge-changes.service';
 import { ChangesControllerDirective } from '../../directives/changes-controller.directive';
@@ -100,6 +94,12 @@ import { KeyboardViewportCommandsService } from '../../services/keyboard-viewpor
 import { AriaLabelConfig, DEFAULT_ARIA_LABEL_CONFIG } from '../../interfaces/aria-label-config.interface';
 import { ViewportCullingDirective } from '../../directives/viewport-culling.directive';
 import { AfterRenderBatchService } from '../../services/after-render-batch.service';
+import { bindVflowInputs } from './bind-vflow-inputs';
+
+/** A distance in CSS pixels: negative and non-finite values read as 0. */
+function nonNegative(value: number): number {
+  return Number.isFinite(value) ? Math.max(0, value) : 0;
+}
 
 const changesControllerHostDirective = {
   directive: ChangesControllerDirective,
@@ -206,7 +206,6 @@ export class VflowComponent {
   protected connectionModel = this.flowEntitiesService.connection;
   private componentEventBusService = inject(ComponentEventBusService);
   private keyboardService = inject(KeyboardService);
-  private injector = inject(Injector);
   private flowRenderingService = inject(FlowRenderingService);
 
   // #endregion
@@ -215,9 +214,10 @@ export class VflowComponent {
   private viewportElement = viewChild.required<ElementRef<HTMLElement>>('viewportElement');
 
   constructor() {
+    bindVflowInputs(this);
+
     // Curves read the inset of a declared shape through the service; the defs render the shape itself.
     effect(() => this.flowEntitiesService.markerShapes.set(this.markerShapes()));
-    effect(() => this.flowSettingsService.alignmentHelper.set(this.alignmentHelper()));
 
     effect(() => {
       const { x, y, zoom } = this.viewportService.readableViewport();
@@ -262,242 +262,135 @@ export class VflowComponent {
   // #region SETTINGS
 
   /** Partial localization overrides; omitted entries use the English defaults. */
-  @Input()
-  public set ariaLabelConfig(value: Partial<AriaLabelConfig>) {
-    this.flowSettingsService.ariaLabels.set(withDefaults(DEFAULT_ARIA_LABEL_CONFIG, value));
-  }
+  public readonly ariaLabelConfig = input(DEFAULT_ARIA_LABEL_CONFIG, {
+    transform: (value: Partial<AriaLabelConfig>) => withDefaults(DEFAULT_ARIA_LABEL_CONFIG, value),
+  });
 
   /**
    * Size of the flow: `[width, height]` in pixels, or `'auto'` to fill the parent element. Default: `'auto'`, so
    * the parent needs a size of its own.
    */
-  @Input()
-  public set view(view: [number, number] | 'auto') {
-    this.flowSettingsService.view.set(view);
-  }
+  public readonly view = input<[number, number] | 'auto'>('auto');
 
-  /**
-   * Minimum zoom value. Reading it in a reactive context tracks changes.
-   */
-  @Input()
-  public set minZoom(value: number) {
-    this.flowSettingsService.minZoom.set(value);
-  }
+  /** Minimum zoom value. Default: 0.5. */
+  public readonly minZoom = input(0.5);
 
-  public get minZoom(): number {
-    return this.flowSettingsService.minZoom();
-  }
-
-  /**
-   * Maximum zoom value. Reading it in a reactive context tracks changes.
-   */
-  @Input()
-  public set maxZoom(value: number) {
-    this.flowSettingsService.maxZoom.set(value);
-  }
-
-  public get maxZoom(): number {
-    return this.flowSettingsService.maxZoom();
-  }
+  /** Maximum zoom value. Default: 3. */
+  public readonly maxZoom = input(3);
 
   /** Zoom with ordinary wheel/trackpad scrolling. */
-  @Input()
-  public set zoomOnScroll(value: boolean) {
-    this.flowSettingsService.zoomOnScroll.set(value);
-  }
+  public readonly zoomOnScroll = input(true);
 
   /** Zoom with trackpad or touchscreen pinch. */
-  @Input()
-  public set zoomOnPinch(value: boolean) {
-    this.flowSettingsService.zoomOnPinch.set(value);
-  }
+  public readonly zoomOnPinch = input(true);
 
   /** Zoom with double-click. */
-  @Input()
-  public set zoomOnDoubleClick(value: boolean) {
-    this.flowSettingsService.zoomOnDoubleClick.set(value);
-  }
+  public readonly zoomOnDoubleClick = input(false);
 
   /** Pan by dragging. true allows all mouse buttons; arrays restrict mouse buttons, not touch. */
-  @Input()
-  public set panOnDrag(value: boolean | number[]) {
-    this.flowSettingsService.panOnDrag.set(value);
-  }
+  public readonly panOnDrag = input<boolean | number[]>(true);
 
   /** Pan with scrolling, taking priority over ordinary wheel zoom. */
-  @Input()
-  public set panOnScroll(value: boolean) {
-    this.flowSettingsService.panOnScroll.set(value);
-  }
+  public readonly panOnScroll = input(false);
 
   /** Viewport click tolerance in CSS pixels. Default: 6. */
-  @Input()
-  public set paneClickDistance(value: number) {
-    this.flowSettingsService.paneClickDistance.set(Number.isFinite(value) ? Math.max(0, value) : 0);
-  }
+  public readonly paneClickDistance = input(6, { transform: nonNegative });
 
   /** Distance in CSS pixels before node drag starts. Default: 0. */
-  @Input()
-  public set nodeDragThreshold(value: number) {
-    this.flowSettingsService.nodeDragThreshold.set(Number.isFinite(value) ? Math.max(0, value) : 0);
-  }
+  public readonly nodeDragThreshold = input(0, { transform: nonNegative });
 
   /** Distance in CSS pixels before connection or reconnection starts. Default: 0. */
-  @Input()
-  public set connectionDragThreshold(value: number) {
-    this.flowSettingsService.connectionDragThreshold.set(Number.isFinite(value) ? Math.max(0, value) : 0);
-  }
+  public readonly connectionDragThreshold = input(0, { transform: nonNegative });
 
   /**
    * Background for flow
    */
-  @Input()
-  public set background(value: Background | null) {
-    this.flowSettingsService.background.set(value);
-  }
+  public readonly background = input<Background | null>(null);
 
   /** Rendering optimizations; omitted keys keep their defaults. */
-  @Input()
-  public set optimization(value: Optimization) {
-    this.flowSettingsService.optimization.set(withDefaults(DEFAULT_OPTIMIZATION, value));
-  }
+  public readonly optimization = input(DEFAULT_OPTIMIZATION, {
+    transform: (value: Optimization) => withDefaults(DEFAULT_OPTIMIZATION, value),
+  });
 
   /**
    * Draws the nodes that other nodes reference as parent in a layer below the edges, so an edge inside a parent
    * can be selected. Such a parent then also stays below every other node. Default: false.
    */
-  @Input()
-  public set parentsBelowEdges(value: boolean) {
-    this.flowSettingsService.parentsBelowEdges.set(value);
-  }
+  public readonly parentsBelowEdges = input(false);
 
   /** Global default for node selection eligibility. */
-  @Input()
-  public set nodesSelectable(value: boolean) {
-    this.flowSettingsService.nodesSelectable.set(value);
-  }
+  public readonly nodesSelectable = input(true);
 
   /** Global default for edge selection eligibility. */
-  @Input()
-  public set edgesSelectable(value: boolean) {
-    this.flowSettingsService.edgesSelectable.set(value);
-  }
+  public readonly edgesSelectable = input(true);
 
   /** Global default for node focus eligibility. */
-  @Input()
-  public set nodesFocusable(value: boolean) {
-    this.flowSettingsService.nodesFocusable.set(value);
-  }
+  public readonly nodesFocusable = input(true);
 
   /** Global default for edge focus eligibility. */
-  @Input()
-  public set edgesFocusable(value: boolean) {
-    this.flowSettingsService.edgesFocusable.set(value);
-  }
+  public readonly edgesFocusable = input(true);
 
   /**
    * Selection mode strategy
    * - 'default': library manages selection automatically
    * - 'manual': library does not manage selection, user controls it via node.selected signal
    */
-  @Input()
-  public set selectionMode(value: SelectionMode) {
-    this.flowSettingsService.selectionMode.set(value);
-  }
+  public readonly selectionMode = input<SelectionMode>('default');
 
   /**
    * Selection box behavior settings; omitted keys keep their defaults.
    * - mode: 'full' selects only fully enclosed entities
    * - mode: 'partial' selects entities that intersect selection box
    */
-  @Input()
-  public set selectionBox(value: SelectionBoxSettings) {
-    this.flowSettingsService.selectionBox.set(withDefaults(DEFAULT_SELECTION_BOX, value));
-  }
+  public readonly selectionBox = input(DEFAULT_SELECTION_BOX, {
+    transform: (value: SelectionBoxSettings) => withDefaults(DEFAULT_SELECTION_BOX, value),
+  });
 
   /** Keys of the graph; omitted entries keep their defaults and an empty list disables an entry. */
-  @Input()
-  public set keyboardShortcuts(value: KeyboardShortcuts) {
-    this.keyboardService.setShortcuts(value);
-  }
+  public readonly keyboardShortcuts = input<KeyboardShortcuts>({});
 
   /**
    * Settings for connection (it renders when user tries to create edge between nodes)
-   *
-   * You need to pass `ConnectionSettings` in this input.
    */
-  @Input({
-    transform: (settings: ConnectionSettings) => new ConnectionModel(settings),
-  })
-  public set connection(connection: ConnectionModel) {
-    this.flowEntitiesService.connection.set(connection);
-  }
+  public readonly connection = input<ConnectionSettings>({});
 
   /**
    * Snap grid for node movement. Passes as [x, y]
    */
-  @Input()
-  public set snapGrid(value: [number, number]) {
-    this.flowSettingsService.snapGrid.set(value);
-  }
+  public readonly snapGrid = input<[number, number]>([1, 1]);
 
   /**
    * Raizing z-index for selected node
    */
-  @Input()
-  public set elevateNodesOnSelect(value: boolean) {
-    this.flowSettingsService.elevateNodesOnSelect.set(value);
-  }
+  public readonly elevateNodesOnSelect = input(true);
 
   /**
    * Raizing z-index for selected edge
    */
-  @Input()
-  public set elevateEdgesOnSelect(value: boolean) {
-    this.flowSettingsService.elevateEdgesOnSelect.set(value);
-  }
+  public readonly elevateEdgesOnSelect = input(true);
 
   /**
    * Pans the viewport while a dragged node or connection is held near its edge. `true` enables it for node and
    * connection drags with default speed and margin; `AutoPanSettings` tunes it. Default: true.
    */
-  @Input()
-  public set autoPan(value: boolean | AutoPanSettings) {
-    this.flowSettingsService.autoPan.set(value);
-  }
+  public readonly autoPan = input<boolean | AutoPanSettings>(true);
 
   /** Center fully offscreen keyboard-focused nodes without changing zoom. Default: true. */
-  @Input()
-  public set autoPanOnNodeFocus(value: boolean) {
-    this.flowSettingsService.autoPanOnNodeFocus.set(value);
-  }
-  // #endregion
-
-  // #region MAIN_INPUTS
-  /**
-   * Nodes to render
-   */
-  @Input({ required: true })
-  public set nodes(newNodes: Node[]) {
-    const models = runInInjectionContext(this.injector, () =>
-      ReferenceIdentityChecker.nodes(newNodes, this.flowEntitiesService.nodes()),
-    );
-
-    // TODO: consider calling only fo new nodes
-    // quick and dirty binding nodes to edges
-    addNodesToEdges(models, this.flowEntitiesService.edges());
-
-    this.flowEntitiesService.nodes.set(models);
-
-    this.nodeRenderingService.pullNodes(models);
-  }
+  public readonly autoPanOnNodeFocus = input(true);
 
   /**
    * Snaps a dragged node, or a dragged selection as a whole, to other nodes and draws the guides that hold: aligned
    * edges and centers, equal gaps between neighbours and straight edges to connected nodes. `true` enables it with
    * default settings. Holding the `alignmentBypass` modifier (Alt) moves freely.
    */
-  public alignmentHelper = input<AlignmentHelperSettings | boolean>(false);
+  public readonly alignmentHelper = input<AlignmentHelperSettings | boolean>(false);
+  // #endregion
+
+  // #region MAIN_INPUTS
+  /**
+   * Nodes to render
+   */
+  public readonly nodes = input.required<Node[]>();
 
   protected nodeModels = this.nodeRenderingService.nodes;
   protected orderedNodes = this.flowEntitiesService.nodes;
@@ -505,17 +398,7 @@ export class VflowComponent {
   /**
    * Edges to render
    */
-  @Input()
-  public set edges(newEdges: Edge[]) {
-    const newModels = runInInjectionContext(this.injector, () =>
-      ReferenceIdentityChecker.edges(newEdges, this.flowEntitiesService.edges()),
-    );
-
-    // quick and dirty binding nodes to edges
-    addNodesToEdges(this.flowEntitiesService.nodes(), newModels);
-
-    this.flowEntitiesService.edges.set(newModels);
-  }
+  public readonly edges = input<Edge[]>([]);
 
   protected orderedEdges = this.flowEntitiesService.validEdges;
   // #endregion

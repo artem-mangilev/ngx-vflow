@@ -214,8 +214,8 @@ describe('EdgeModel', () => {
     expect(model.selectable()).toBe(true);
     expect(model.focusable()).toBe(true);
 
-    settingsService.edgesSelectable.set(false);
-    settingsService.edgesFocusable.set(false);
+    settingsService.bind({ edgesSelectable: signal(false) });
+    settingsService.bind({ edgesFocusable: signal(false) });
 
     expect(model.selectable()).toBe(false);
     expect(model.focusable()).toBe(false);
@@ -235,8 +235,8 @@ describe('EdgeModel', () => {
         ),
     );
 
-    settingsService.edgesSelectable.set(true);
-    settingsService.edgesFocusable.set(false);
+    settingsService.bind({ edgesSelectable: signal(true) });
+    settingsService.bind({ edgesFocusable: signal(false) });
 
     expect(explicitModel.selectable()).toBe(false);
     expect(explicitModel.focusable()).toBe(true);

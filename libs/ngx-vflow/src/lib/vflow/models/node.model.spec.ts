@@ -228,8 +228,8 @@ describe('NodeModel', () => {
     expect(model.selectable()).toBe(true);
     expect(model.focusable()).toBe(true);
 
-    settingsService.nodesSelectable.set(false);
-    settingsService.nodesFocusable.set(false);
+    settingsService.bind({ nodesSelectable: signal(false) });
+    settingsService.bind({ nodesFocusable: signal(false) });
 
     expect(model.selectable()).toBe(false);
     expect(model.focusable()).toBe(false);
@@ -244,8 +244,8 @@ describe('NodeModel', () => {
     });
     const explicitModel = TestBed.runInInjectionContext(() => new NodeModel(rawNode));
 
-    settingsService.nodesSelectable.set(true);
-    settingsService.nodesFocusable.set(false);
+    settingsService.bind({ nodesSelectable: signal(true) });
+    settingsService.bind({ nodesFocusable: signal(false) });
 
     expect(explicitModel.selectable()).toBe(false);
     expect(explicitModel.focusable()).toBe(true);
@@ -283,7 +283,7 @@ describe('NodeModel', () => {
   });
 
   it('loads a component class immediately and waits for the viewport with a lazy factory', () => {
-    settingsService.optimization.update((optimization) => ({ ...optimization, lazyLoadTrigger: 'viewport' }));
+    settingsService.bind({ optimization: signal({ ...settingsService.optimization(), lazyLoadTrigger: 'viewport' }) });
     const make = (component: Parameters<typeof createNode>[0]['component']) =>
       TestBed.runInInjectionContext(
         () => new NodeModel(createNode({ id: 'c', component, point: { x: 5000, y: 5000 } })),

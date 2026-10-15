@@ -94,6 +94,6 @@ export class VuiControls {
   });
 
   protected readonly zoom = computed(() => this.flow().viewport().zoom);
-  protected readonly canZoomIn = computed(() => this.zoom() < this.flow().maxZoom - 1e-6);
-  protected readonly canZoomOut = computed(() => this.zoom() > this.flow().minZoom + 1e-6);
+  protected readonly canZoomIn = computed(() => this.zoom() < this.flow().maxZoom() - 1e-6);
+  protected readonly canZoomOut = computed(() => this.zoom() > this.flow().minZoom() + 1e-6);
 }

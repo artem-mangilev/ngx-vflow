@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ViewChild, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { createNode as createRawNode } from '../interfaces/node.interface';
@@ -92,7 +92,7 @@ describe('SelectionBoxContextDirective', () => {
     expect(fixture.componentInstance.context.model.active()).toBe(false);
 
     selectionShortcutActive = true;
-    settingsService.selectionMode.set('manual');
+    settingsService.bind({ selectionMode: signal('manual') });
     await startSelectionBox();
     expect(fixture.componentInstance.context.model.active()).toBe(false);
     expect(node.selected()).toBe(true);

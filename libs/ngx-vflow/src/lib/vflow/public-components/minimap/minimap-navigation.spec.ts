@@ -4,11 +4,21 @@ import { Vflow } from '../../vflow';
 import { VflowMinimapComponent } from './minimap.component';
 import { VflowComponent } from '../../components/vflow/vflow.component';
 import { createNodes } from '../../interfaces/node.interface';
+import { KeyboardShortcuts } from '../../types/keyboard-shortcuts.type';
 
 @Component({
   imports: [Vflow],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `<vflow [view]="size()" [nodes]="nodes" [minZoom]="0.5" [maxZoom]="2">
+  template: `<vflow
+    [view]="size()"
+    [nodes]="nodes"
+    [minZoom]="0.5"
+    [maxZoom]="2"
+    [panOnDrag]="panOnDrag()"
+    [keyboardShortcuts]="keyboardShortcuts()"
+    [zoomOnScroll]="zoomOnScroll()"
+    [zoomOnPinch]="zoomOnPinch()"
+    [panOnScroll]="panOnScroll()">
     @if (show()) {
       <v-minimap [pannable]="pannable()" [zoomable]="zoomable()" [zoomStep]="step()" />
     }
@@ -16,6 +26,11 @@ import { createNodes } from '../../interfaces/node.interface';
 })
 class MinimapHostComponent {
   flow = viewChild.required(VflowComponent);
+  panOnDrag = signal<boolean | number[]>(true);
+  keyboardShortcuts = signal<KeyboardShortcuts>({});
+  zoomOnScroll = signal(true);
+  zoomOnPinch = signal(true);
+  panOnScroll = signal(false);
   size = signal<[number, number]>([400, 300]);
   show = signal(true);
   pannable = signal(false);
@@ -143,14 +158,15 @@ describe('minimap navigation through the public viewport API', () => {
 
   it('gates pan by buttons, selection and activation keys, and supports single-pointer touch', async () => {
     host.pannable.set(true);
-    flow.panOnDrag = [1];
-    flow.keyboardShortcuts = { modifiers: { panActivation: ['Space'] } };
+    host.panOnDrag.set([1]);
+    host.keyboardShortcuts.set({ modifiers: { panActivation: ['Space'] } });
     await settle();
     await click();
     expect(flow.viewport().x).toBe(0);
     await click(40, 30, { button: 1 });
     expect(flow.viewport().x).toBe(-10200);
-    flow.panOnDrag = false;
+    host.panOnDrag.set(false);
+    fixture.detectChanges();
     await click(50, 30, { pointerType: 'touch' });
     expect(flow.viewport().x).toBe(-10200);
     document.dispatchEvent(new KeyboardEvent('keydown', { code: 'Space' }));
@@ -180,15 +196,18 @@ describe('minimap navigation through the public viewport API', () => {
     await wheel(10);
     await wheel(10);
     expect(flow.viewport().zoom).toBe(0.5);
-    flow.zoomOnScroll = false;
+    host.zoomOnScroll.set(false);
+    fixture.detectChanges();
     await wheel();
     expect(flow.viewport().zoom).toBe(0.5);
     await wheel(-10, { ctrlKey: true });
     expect(flow.viewport().zoom).toBe(1);
-    flow.zoomOnPinch = false;
+    host.zoomOnPinch.set(false);
+    fixture.detectChanges();
     await wheel(-10, { ctrlKey: true });
     expect(flow.viewport().zoom).toBe(1);
-    flow.zoomOnScroll = true;
+    host.zoomOnScroll.set(true);
+    fixture.detectChanges();
     for (const value of [0, -1, NaN, Infinity]) {
       host.step.set(value);
       flow.setViewport({ x: 0, y: 0, zoom: 1 });
@@ -201,8 +220,8 @@ describe('minimap navigation through the public viewport API', () => {
   it('gives scroll pan priority and allows zoom activation without bypassing the minimap switches', async () => {
     host.pannable.set(true);
     host.zoomable.set(true);
-    flow.panOnScroll = true;
-    flow.keyboardShortcuts = { modifiers: { zoomActivation: ['KeyZ'] } };
+    host.panOnScroll.set(true);
+    host.keyboardShortcuts.set({ modifiers: { zoomActivation: ['KeyZ'] } });
     await settle();
     await wheel(10, { deltaX: 5 });
     expect(flow.viewport()).toEqual({ x: -50, y: -100, zoom: 1 });

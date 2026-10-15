@@ -1,7 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
 import { ConnectionControllerDirective } from './connection-controller.directive';
-import { ConnectionModel } from '../models/connection.model';
 import { EdgeModel } from '../models/edge.model';
 import { HandleModel } from '../models/handle.model';
 import { NodeModel } from '../models/node.model';
@@ -58,7 +57,7 @@ describe('ConnectionControllerDirective', () => {
   }
 
   it('delays connection and reconnection until the pointer crosses the configured threshold', () => {
-    TestBed.inject(FlowSettingsService).connectionDragThreshold.set(10);
+    TestBed.inject(FlowSettingsService).bind({ connectionDragThreshold: signal(10) });
     const handle = createHandle(createNodeModel('source'), 'source');
     const down = pointerEvent('pointerdown', { x: 100 });
     controller.startConnection(handle, down);
@@ -81,7 +80,7 @@ describe('ConnectionControllerDirective', () => {
   });
 
   it('uses the same client-space activation threshold for touch connections', () => {
-    TestBed.inject(FlowSettingsService).connectionDragThreshold.set(10);
+    TestBed.inject(FlowSettingsService).bind({ connectionDragThreshold: signal(10) });
     const handle = createHandle(createNodeModel('source'), 'source');
     controller.startConnection(handle, pointerEvent('pointerdown', { x: 100, pointerType: 'touch' }));
     dispatchPointer(document, 'pointermove', { x: 105, pointerType: 'touch' });
@@ -91,7 +90,7 @@ describe('ConnectionControllerDirective', () => {
   });
 
   it('cancels a pending connection on pointer release or window blur', () => {
-    TestBed.inject(FlowSettingsService).connectionDragThreshold.set(10);
+    TestBed.inject(FlowSettingsService).bind({ connectionDragThreshold: signal(10) });
     const handle = createHandle(createNodeModel('source'), 'source');
     for (const cancel of ['pointerup', 'pointercancel', 'blur']) {
       controller.startConnection(handle, pointerEvent('pointerdown', { x: 100 }));
@@ -151,7 +150,7 @@ describe('ConnectionControllerDirective', () => {
 
   it('should reject a connection candidate before calling the application validator', () => {
     const validator = vi.fn().mockReturnValue(true);
-    flowEntitiesService.connection.set(new ConnectionModel({ validator }));
+    flowEntitiesService.connectionSettings.bind(signal({ validator }));
 
     const source = createHandle(createNodeModel('source'), 'source');
     const target = createHandle(createNodeModel('target'), 'target', true, false);
@@ -171,7 +170,7 @@ describe('ConnectionControllerDirective', () => {
 
   it('should allow reconnection to start from a retained handle without canStart and reject its candidate by canAccept', () => {
     const validator = vi.fn().mockReturnValue(true);
-    flowEntitiesService.connection.set(new ConnectionModel({ validator }));
+    flowEntitiesService.connectionSettings.bind(signal({ validator }));
 
     const retained = createHandle(createNodeModel('source'), 'source', false);
     const candidate = createHandle(createNodeModel('target'), 'target', true, false);

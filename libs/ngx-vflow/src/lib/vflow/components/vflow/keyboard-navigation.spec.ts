@@ -6,13 +6,34 @@ import { createEdges } from '../../interfaces/edge.interface';
 import { Vflow } from '../../vflow';
 import { VflowComponent } from './vflow.component';
 import { filter, firstValueFrom, timeout } from 'rxjs';
-import { KeyboardInstructionKeys, KeyboardInstructionState } from '../../interfaces/aria-label-config.interface';
+import {
+  AriaLabelConfig,
+  KeyboardInstructionKeys,
+  KeyboardInstructionState,
+} from '../../interfaces/aria-label-config.interface';
+import { KeyboardShortcuts } from '../../types/keyboard-shortcuts.type';
+import { SelectionMode } from '../../types/selection-mode.type';
+import { AutoPanSettings } from '../../interfaces/auto-pan-settings.interface';
 
 @Component({
   imports: [Vflow],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `<button>Before</button
-    ><vflow [nodes]="nodes()" [edges]="edges" [view]="[600, 350]" [parentsBelowEdges]="true">
+    ><vflow
+      [nodes]="nodes()"
+      [edges]="edges"
+      [view]="[600, 350]"
+      [parentsBelowEdges]="true"
+      [keyboardShortcuts]="keyboardShortcuts()"
+      [snapGrid]="snapGrid()"
+      [nodesFocusable]="nodesFocusable()"
+      [ariaLabelConfig]="ariaLabelConfig()"
+      [selectionMode]="selectionMode()"
+      [nodesSelectable]="nodesSelectable()"
+      [edgesSelectable]="edgesSelectable()"
+      [autoPanOnNodeFocus]="autoPanOnNodeFocus()"
+      [autoPan]="autoPan()"
+      [minZoom]="minZoom()">
       <ng-template vNode>
         <div style="width: 100px; height: 50px">
           <span vHandle handleType="target" position="left"></span
@@ -23,6 +44,16 @@ import { KeyboardInstructionKeys, KeyboardInstructionState } from '../../interfa
 })
 class KeyboardHostComponent {
   flow = viewChild.required(VflowComponent);
+  keyboardShortcuts = signal<KeyboardShortcuts>({});
+  snapGrid = signal<[number, number]>([1, 1]);
+  nodesFocusable = signal(true);
+  ariaLabelConfig = signal<Partial<AriaLabelConfig>>({});
+  selectionMode = signal<SelectionMode>('default');
+  nodesSelectable = signal(true);
+  edgesSelectable = signal(true);
+  autoPanOnNodeFocus = signal(true);
+  autoPan = signal<boolean | AutoPanSettings>(true);
+  minZoom = signal(0.5);
   nodes = signal(
     createNodes([
       {
@@ -144,7 +175,8 @@ describe('public keyboard graph navigation', () => {
     const child = root.querySelector<HTMLElement>('[aria-label="Child"]')!;
     const parent = root.querySelector<HTMLElement>('[aria-label="Parent"]')!;
     const edge = root.querySelector<SVGElement>('[aria-label="Route"]')!;
-    host.flow().keyboardShortcuts = { modifiers: { multiSelection: ['Alt'] } };
+    host.keyboardShortcuts.set({ modifiers: { multiSelection: ['Alt'] } });
+    fixture.detectChanges();
     host.nodes()[1].selected.set(true);
     child.focus();
     key(child, 'Enter');
@@ -191,7 +223,8 @@ describe('public keyboard graph navigation', () => {
     );
     key(parent, 'ArrowDown', 'ArrowDown', true);
     expect(host.nodes()[1].point()).toEqual({ x: 25, y: 40 });
-    host.flow().snapGrid = [25, 10];
+    host.snapGrid.set([25, 10]);
+    fixture.detectChanges();
     key(parent, 'ArrowRight');
     expect(host.nodes()[1].point()).toEqual({ x: 50, y: 40 });
     key(parent, 'ArrowDown', 'ArrowDown', true);
@@ -206,7 +239,7 @@ describe('public keyboard graph navigation', () => {
     fixture.detectChanges();
     await fixture.whenStable();
     expect(document.activeElement?.getAttribute('aria-label')).toBe('Parent');
-    host.flow().nodesFocusable = false;
+    host.nodesFocusable.set(false);
     fixture.detectChanges();
     await fixture.whenStable();
     expect(document.activeElement).toBe(root.querySelector('[role="region"]'));
@@ -282,7 +315,7 @@ describe('public keyboard graph navigation', () => {
       nodeInstructions: (_keys: KeyboardInstructionKeys, state: KeyboardInstructionState) =>
         [state.selectable ? 'Выберите узел.' : '', state.movable ? 'Переместите узел.' : ''].filter(Boolean).join(' '),
     };
-    host.flow().ariaLabelConfig = labels;
+    host.ariaLabelConfig.set(labels);
     fixture.detectChanges();
     await fixture.whenStable();
     const child = root.querySelector<HTMLElement>('[aria-label="Child"]')!;
@@ -293,7 +326,7 @@ describe('public keyboard graph navigation', () => {
         .map((id) => document.getElementById(id)!.textContent)
         .join(' ');
     expect(description()).toBe('Parent: Parent. Выберите узел. Переместите узел.');
-    host.flow().selectionMode = 'manual';
+    host.selectionMode.set('manual');
     fixture.detectChanges();
     await fixture.whenStable();
     expect(description()).toBe('Parent: Parent. Переместите узел.');
@@ -303,8 +336,9 @@ describe('public keyboard graph navigation', () => {
     const { fixture, host, root } = await setup();
     const child = root.querySelector<HTMLElement>('[aria-label="Child"]')!;
     const edge = root.querySelector<SVGElement>('[aria-label="Route"]')!;
-    host.flow().nodesSelectable = false;
-    host.flow().edgesSelectable = false;
+    host.nodesSelectable.set(false);
+    host.edgesSelectable.set(false);
+    fixture.detectChanges();
     child.focus();
     key(child, 'Enter');
     edge.focus();
@@ -315,7 +349,8 @@ describe('public keyboard graph navigation', () => {
     key(edge, 'Escape');
     expect([...host.nodes(), ...host.edges].some((entity) => entity.selected())).toBe(false);
     host.nodes()[0].selected.set(true);
-    host.flow().selectionMode = 'manual';
+    host.selectionMode.set('manual');
+    fixture.detectChanges();
     child.focus();
     key(child, 'Escape');
     expect(host.nodes()[0].selected()).toBe(true);
@@ -330,7 +365,7 @@ describe('public keyboard graph navigation', () => {
     const parentPoint = host.nodes()[1].point();
     key(child, 'ArrowRight');
     expect(host.nodes()[1].point()).toEqual(parentPoint);
-    host.flow().nodesFocusable = false;
+    host.nodesFocusable.set(false);
     fixture.detectChanges();
     await fixture.whenStable();
     expect(child.tabIndex).toBe(-1);
@@ -358,7 +393,8 @@ describe('public keyboard graph navigation', () => {
     await fixture.whenStable();
     expect(host.flow().viewport()).toEqual({ x: 0, y: 0, zoom: 1 });
     before.focus();
-    host.flow().autoPanOnNodeFocus = false;
+    host.autoPanOnNodeFocus.set(false);
+    fixture.detectChanges();
     host.nodes()[0].point.set({ x: 1000, y: 0 });
     fixture.detectChanges();
     await fixture.whenStable();
@@ -367,8 +403,9 @@ describe('public keyboard graph navigation', () => {
     await fixture.whenStable();
     expect(host.flow().viewport()).toEqual({ x: 0, y: 0, zoom: 1 });
     before.focus();
-    host.flow().autoPanOnNodeFocus = true;
-    host.flow().autoPan = false;
+    host.autoPanOnNodeFocus.set(true);
+    host.autoPan.set(false);
+    fixture.detectChanges();
     child.focus();
     fixture.detectChanges();
     await fixture.whenStable();
@@ -388,7 +425,8 @@ describe('public keyboard graph navigation', () => {
     child.focus();
     key(child, 'Enter');
     expect(await spoken()).toBe('Child selected. 1 selected in total.');
-    host.flow().keyboardShortcuts = { modifiers: { multiSelection: ['AltLeft'] } };
+    host.keyboardShortcuts.set({ modifiers: { multiSelection: ['AltLeft'] } });
+    fixture.detectChanges();
     document.dispatchEvent(new KeyboardEvent('keydown', { code: 'AltLeft' }));
     parent.focus();
     key(parent, ' ');
@@ -404,10 +442,10 @@ describe('public keyboard graph navigation', () => {
     live.textContent = 'stale';
     key(parent, 'Escape');
     expect(await spoken()).toBe('stale');
-    host.flow().ariaLabelConfig = {
+    host.ariaLabelConfig.set({
       selectionAnnouncement: ({ label, count }) => `${label}: выбрано ${count}`,
       movedAnnouncement: ({ direction, x, y }) => `Сдвиг ${direction} в ${x}, ${y}`,
-    };
+    });
     fixture.detectChanges();
     await fixture.whenStable();
     key(parent, 'Enter');
@@ -418,7 +456,8 @@ describe('public keyboard graph navigation', () => {
 
   it('leaves keys bound to gesture shortcuts to the gesture layer', async () => {
     const { fixture, host, root } = await setup();
-    host.flow().keyboardShortcuts = { modifiers: { panActivation: ['Space'] } };
+    host.keyboardShortcuts.set({ modifiers: { panActivation: ['Space'] } });
+    fixture.detectChanges();
     const child = root.querySelector<HTMLElement>('[aria-label="Child"]')!;
     child.focus();
     const space = key(child, ' ');
@@ -428,7 +467,8 @@ describe('public keyboard graph navigation', () => {
     document.dispatchEvent(new KeyboardEvent('keyup', { code: 'Space' }));
     expect(key(child, 'Enter').defaultPrevented).toBe(true);
     expect(host.nodes()[0].selected()).toBe(true);
-    host.flow().keyboardShortcuts = { modifiers: { panActivation: [] } };
+    host.keyboardShortcuts.set({ modifiers: { panActivation: [] } });
+    fixture.detectChanges();
     key(child, 'Escape');
     key(child, ' ');
     expect(host.nodes()[0].selected()).toBe(true);
@@ -468,13 +508,13 @@ describe('public keyboard graph navigation', () => {
     edge.focus();
     key(edge, 'Delete');
     expect(requests[3]).toEqual({ nodeIds: ['child', 'other'], edgeIds: ['edge'] });
-    host.flow().keyboardShortcuts = { commands: { delete: ['x'] } };
+    host.keyboardShortcuts.set({ commands: { delete: ['x'] } });
     fixture.detectChanges();
     await fixture.whenStable();
     expect(key(edge, 'Delete').defaultPrevented).toBe(false);
     key(edge, 'x', 'KeyX');
     expect(requests.length).toBe(5);
-    host.flow().keyboardShortcuts = { commands: { delete: [] } };
+    host.keyboardShortcuts.set({ commands: { delete: [] } });
     fixture.detectChanges();
     await fixture.whenStable();
     key(edge, 'x', 'KeyX');
@@ -497,7 +537,8 @@ describe('public keyboard graph navigation', () => {
     const child = root.querySelector<HTMLElement>('[aria-label="Child"]')!;
     const edge = root.querySelector<SVGElement>('[aria-label="Route"]')!;
     const container = root.querySelector<HTMLElement>('[role="region"]')!;
-    host.flow().autoPanOnNodeFocus = false;
+    host.autoPanOnNodeFocus.set(false);
+    fixture.detectChanges();
     await settle();
     expect(host.flow().viewport()).toEqual({ x: 0, y: 0, zoom: 1 });
     // An edge never moves, so arrows scroll the view: right reveals the right side.
@@ -536,7 +577,8 @@ describe('public keyboard graph navigation', () => {
     key(child, '-', 'NumpadSubtract');
     await settle();
     expect(host.flow().viewport().zoom).toBeCloseTo(1, 5);
-    host.flow().minZoom = 0.9;
+    host.minZoom.set(0.9);
+    fixture.detectChanges();
     key(child, '-', 'Minus');
     await settle();
     expect(host.flow().viewport().zoom).toBeCloseTo(0.9, 5);
@@ -564,13 +606,15 @@ describe('public keyboard graph navigation', () => {
         .join(' ');
     expect(description()).not.toContain('pan');
     expect(description()).not.toContain('zoom');
-    host.flow().ariaLabelConfig = {
+    host.ariaLabelConfig.set({
       nodeInstructions: ({ pan, zoomIn }) =>
         [`Use ${pan} to pan.`, zoomIn ? `Press ${zoomIn} to zoom in.` : ''].filter(Boolean).join(' '),
-    };
+    });
+    fixture.detectChanges();
     await settle();
     expect(description()).toBe('Parent: Parent. Selected. Use arrow keys to pan. Press +, = or NumpadAdd to zoom in.');
-    host.flow().keyboardShortcuts = { commands: { zoomIn: [], zoomOut: [], fitView: [] } };
+    host.keyboardShortcuts.set({ commands: { zoomIn: [], zoomOut: [], fitView: [] } });
+    fixture.detectChanges();
     await settle();
     expect(key(container, '=', 'Equal').defaultPrevented).toBe(false);
     expect(description()).toBe('Parent: Parent. Selected. Use arrow keys to pan.');
@@ -590,7 +634,8 @@ describe('public keyboard graph navigation', () => {
         .split(/\s+/)
         .map((id) => document.getElementById(id)!.textContent)
         .join(' ');
-    host.flow().keyboardShortcuts = { commands: { select: ['s'] }, modifiers: { multiSelection: ['AltLeft'] } };
+    host.keyboardShortcuts.set({ commands: { select: ['s'] }, modifiers: { multiSelection: ['AltLeft'] } });
+    fixture.detectChanges();
     await settle();
     child.focus();
     // An entry is replaced, not extended.
@@ -602,10 +647,11 @@ describe('public keyboard graph navigation', () => {
     key(child, 'Escape');
     expect(host.nodes()[0].selected()).toBe(false);
     // A binding replaces the configuration, so the entries to keep are passed again with the two disabled ones.
-    host.flow().keyboardShortcuts = {
+    host.keyboardShortcuts.set({
       commands: { select: ['s'], clearSelection: [], delete: [] },
       modifiers: { multiSelection: ['AltLeft'] },
-    };
+    });
+    fixture.detectChanges();
     await settle();
     key(child, 's', 'KeyS');
     document.dispatchEvent(new KeyboardEvent('keydown', { code: 'AltLeft' }));
@@ -631,8 +677,9 @@ describe('public keyboard graph navigation', () => {
     };
     const parent = root.querySelector<HTMLElement>('[aria-label="Parent"]')!;
     const edge = root.querySelector<SVGElement>('[aria-label="Route"]')!;
-    host.flow().autoPanOnNodeFocus = false;
-    host.flow().keyboardShortcuts = { commands: { moveRight: ['d'], panRight: ['d'] } };
+    host.autoPanOnNodeFocus.set(false);
+    host.keyboardShortcuts.set({ commands: { moveRight: ['d'], panRight: ['d'] } });
+    fixture.detectChanges();
     await settle();
     // An edge can never move, so the shared key falls through to panning.
     edge.focus();
@@ -668,7 +715,8 @@ describe('public keyboard graph navigation', () => {
     const requests: { nodeIds: string[]; edgeIds: string[] }[] = [];
     const subscription = host.flow().deleteRequest.subscribe((request) => requests.push(request));
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
-    host.flow().keyboardShortcuts = { modifiers: { selection: ['q'] }, commands: { delete: ['q'] } };
+    host.keyboardShortcuts.set({ modifiers: { selection: ['q'] }, commands: { delete: ['q'] } });
+    fixture.detectChanges();
     await settle();
     expect(warn).toHaveBeenCalledWith(expect.stringContaining('commands.delete and modifiers.selection share a key'));
     const child = root.querySelector<HTMLElement>('[aria-label="Child"]')!;
@@ -676,7 +724,8 @@ describe('public keyboard graph navigation', () => {
     expect(key(child, 'q', 'KeyQ').defaultPrevented).toBe(false);
     expect(requests).toEqual([]);
     // Releasing the key from the modifier hands it back to the command, which proves what blocked it.
-    host.flow().keyboardShortcuts = { modifiers: { selection: [] }, commands: { delete: ['q'] } };
+    host.keyboardShortcuts.set({ modifiers: { selection: [] }, commands: { delete: ['q'] } });
+    fixture.detectChanges();
     await settle();
     expect(key(child, 'q', 'KeyQ').defaultPrevented).toBe(true);
     expect(requests).toEqual([{ nodeIds: ['child'], edgeIds: [] }]);
@@ -702,13 +751,15 @@ describe('public keyboard graph navigation', () => {
     );
     // A remap rewrites the sentence, a group that is no longer the four arrows is spelled out, and a disabled
     // command drops its sentence.
-    host.flow().keyboardShortcuts = { commands: { select: ['x'], moveUp: ['w'], delete: [] } };
+    host.keyboardShortcuts.set({ commands: { select: ['x'], moveUp: ['w'], delete: [] } });
+    fixture.detectChanges();
     await settle();
     expect(description()).toBe(
       'Parent: Parent. Press X to select. Use W, ArrowDown, ArrowLeft or ArrowRight to move it while it is selected.',
     );
     // A sentence of its own still wins.
-    host.flow().ariaLabelConfig = { nodeInstructions: 'Нажмите свою клавишу.' };
+    host.ariaLabelConfig.set({ nodeInstructions: 'Нажмите свою клавишу.' });
+    fixture.detectChanges();
     await settle();
     expect(description()).toBe('Parent: Parent. Нажмите свою клавишу.');
   });

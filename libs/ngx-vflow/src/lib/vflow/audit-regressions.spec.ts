@@ -23,7 +23,6 @@ import { FlowStatusService } from './services/flow-status.service';
 import { ConnectionControllerDirective } from './directives/connection-controller.directive';
 import { VflowHandleDirective } from './directives/handle.directive';
 import { EdgeLabelComponent } from './components/edge-label/edge-label.component';
-import { ConnectionModel } from './models/connection.model';
 import { VflowComponent } from './components/vflow/vflow.component';
 import { mouseAsPointer } from './gestures/pointer-events.testing';
 
@@ -167,7 +166,7 @@ describe('Graph rendering and interaction regressions', () => {
   it('culls an already-measured edge wholly outside the viewport', () => {
     const { nodes, edges } = graph();
     const settings = TestBed.inject(FlowSettingsService);
-    settings.optimization.update((v) => ({ ...v, virtualization: true }));
+    settings.bind({ optimization: signal({ ...settings.optimization(), virtualization: true }) });
     settings.computedFlowWidth.set(400);
     settings.computedFlowHeight.set(300);
     edges[0].path();
@@ -186,7 +185,7 @@ describe('Graph rendering and interaction regressions', () => {
     const settings = TestBed.inject(FlowSettingsService);
     settings.computedFlowWidth.set(400);
     settings.computedFlowHeight.set(300);
-    settings.optimization.update((value) => ({ ...value, virtualization: true }));
+    settings.bind({ optimization: signal({ ...settings.optimization(), virtualization: true }) });
     nodes[0].point.set({ x: -200, y: 0 });
     nodes[1].point.set({ x: 800, y: 0 });
     const culling = TestBed.inject(ViewportCullingDirective);
@@ -253,7 +252,7 @@ describe('Graph rendering and interaction regressions', () => {
     const settings = TestBed.inject(FlowSettingsService);
     settings.computedFlowWidth.set(400);
     settings.computedFlowHeight.set(300);
-    settings.optimization.update((value) => ({ ...value, virtualization: true }));
+    settings.bind({ optimization: signal({ ...settings.optimization(), virtualization: true }) });
     nodes.forEach((node) => node.point.set({ x: -1000, y: -1000 }));
     edges[0].edge.curve!.set(() => ({ path: 'M -1000,-1000 Q 2000,1500 -900,-1000' }));
     TestBed.inject(ViewportCullingDirective);
@@ -318,9 +317,7 @@ describe('Graph rendering and interaction regressions', () => {
     const target = nodes[1].handles()[0];
     const validator = vi.fn().mockReturnValue(true);
     // The fixture already connects these handles.
-    TestBed.inject(FlowEntitiesService).connection.set(
-      new ConnectionModel({ validator, allowDuplicateConnections: true }),
-    );
+    TestBed.inject(FlowEntitiesService).connectionSettings.bind(signal({ validator, allowDuplicateConnections: true }));
     const requests: unknown[] = [];
     controller.connect.subscribe((value) => requests.push(value));
     controller.connect.subscribe((value) => requests.push(value));

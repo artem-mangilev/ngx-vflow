@@ -1,3 +1,4 @@
+import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 
 import { createNode } from '../interfaces/node.interface';
@@ -57,7 +58,7 @@ describe('SelectionService', () => {
     const node = createModel('node');
     entitiesService.nodes.set([node]);
     node.selected.set(true);
-    settingsService.nodesSelectable.set(false);
+    settingsService.bind({ nodesSelectable: signal(false) });
 
     selectionService.select(null);
 
@@ -79,7 +80,7 @@ describe('SelectionService', () => {
   it('should leave selection writes to the consumer in manual mode', () => {
     const node = createModel('node');
     entitiesService.nodes.set([node]);
-    settingsService.selectionMode.set('manual');
+    settingsService.bind({ selectionMode: signal('manual') });
 
     selectionService.select(node);
 

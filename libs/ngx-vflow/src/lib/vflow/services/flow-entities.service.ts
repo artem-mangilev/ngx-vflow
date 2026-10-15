@@ -7,6 +7,8 @@ import { markerId, normalizeMarker } from '../utils/marker-ref';
 import { MarkerShapes } from '../utils/marker-inset';
 import { FlowEntity } from '../interfaces/flow-entity.interface';
 import { Node } from '../interfaces/node.interface';
+import { ConnectionSettings } from '../interfaces/connection-settings.interface';
+import { bindableSignal } from '../utils/signals/bindable-signal';
 
 @Injectable()
 export class FlowEntitiesService {
@@ -56,7 +58,10 @@ export class FlowEntitiesService {
     return this.edges().filter((e) => nodes.has(e.source()!) && nodes.has(e.target()!));
   });
 
-  public readonly connection = signal<ConnectionModel>(new ConnectionModel({}));
+  /** @see {VflowComponent.connection} */
+  public readonly connectionSettings = bindableSignal<ConnectionSettings>({});
+
+  public readonly connection = computed(() => new ConnectionModel(this.connectionSettings()));
 
   /** Marker shapes declared with `ng-template[vMarker]`, by type; set by the flow component. */
   public readonly markerShapes = signal<MarkerShapes>(new Map());

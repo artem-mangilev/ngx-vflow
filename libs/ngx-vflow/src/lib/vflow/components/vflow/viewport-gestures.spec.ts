@@ -81,8 +81,10 @@ describe('public viewport gesture settings', () => {
   });
 
   it('gives scroll pan priority, with opt-in zoom and pan activation keys', async () => {
-    flow.panOnScroll = true;
-    flow.keyboardShortcuts = { modifiers: { zoomActivation: ['KeyZ'], panActivation: ['Space'] } };
+    fixture.componentRef.setInput('panOnScroll', true);
+    fixture.componentRef.setInput('keyboardShortcuts', {
+      modifiers: { zoomActivation: ['KeyZ'], panActivation: ['Space'] },
+    });
     wheel();
     expect(flow.viewport()).toEqual({ x: 0, y: 40, zoom: 1 });
     key('keydown', 'KeyZ');
@@ -90,7 +92,7 @@ describe('public viewport gesture settings', () => {
     expect(flow.viewport().zoom).toBeGreaterThan(1);
     key('keyup', 'KeyZ');
     await pause(500); // Let the wheel zoom settle before reading the translation.
-    flow.panOnDrag = false;
+    fixture.componentRef.setInput('panOnDrag', false);
     key('keydown', 'Space');
     const x = flow.viewport().x;
     drag();
@@ -98,12 +100,12 @@ describe('public viewport gesture settings', () => {
   });
 
   it('disables every user gesture without disabling programmatic viewport operations', async () => {
-    flow.panOnDrag = false;
-    flow.panOnScroll = false;
-    flow.zoomOnScroll = false;
-    flow.zoomOnPinch = false;
-    flow.zoomOnDoubleClick = false;
-    flow.keyboardShortcuts = { modifiers: { panActivation: [], zoomActivation: [] } };
+    fixture.componentRef.setInput('panOnDrag', false);
+    fixture.componentRef.setInput('panOnScroll', false);
+    fixture.componentRef.setInput('zoomOnScroll', false);
+    fixture.componentRef.setInput('zoomOnPinch', false);
+    fixture.componentRef.setInput('zoomOnDoubleClick', false);
+    fixture.componentRef.setInput('keyboardShortcuts', { modifiers: { panActivation: [], zoomActivation: [] } });
     fixture.detectChanges();
     expect(pane.style.touchAction).toBe('auto');
     drag();
@@ -126,12 +128,14 @@ describe('public viewport gesture settings', () => {
   });
 
   it('restricts mouse buttons and gives selection priority over pan activation', () => {
-    flow.panOnDrag = [1];
+    fixture.componentRef.setInput('panOnDrag', [1]);
     drag();
     expect(flow.viewport().x).toBe(0);
     drag(1);
     expect(flow.viewport().x).toBe(40);
-    flow.keyboardShortcuts = { modifiers: { selection: ['Space'], panActivation: ['Space'] } };
+    fixture.componentRef.setInput('keyboardShortcuts', {
+      modifiers: { selection: ['Space'], panActivation: ['Space'] },
+    });
     key('keydown', 'Space');
     drag(1);
     expect(flow.viewport().x).toBe(40);
@@ -147,7 +151,7 @@ describe('public viewport gesture settings', () => {
     drag(0, input);
     drag(0, span);
     expect(flow.viewport().x).toBe(0);
-    flow.panOnScroll = true;
+    fixture.componentRef.setInput('panOnScroll', true);
     wheel(span);
     expect(flow.viewport().y).toBe(0);
     expect(wheel(textarea).defaultPrevented).toBe(false);
@@ -157,8 +161,8 @@ describe('public viewport gesture settings', () => {
   });
 
   it('ignores activation from editable targets and clears activation on window blur', () => {
-    flow.panOnScroll = true;
-    flow.keyboardShortcuts = { modifiers: { zoomActivation: ['ControlLeft'] } };
+    fixture.componentRef.setInput('panOnScroll', true);
+    fixture.componentRef.setInput('keyboardShortcuts', { modifiers: { zoomActivation: ['ControlLeft'] } });
     const input = document.createElement('input');
     pane.appendChild(input);
     key('keydown', 'ControlLeft', input);
@@ -177,7 +181,7 @@ describe('public viewport gesture settings', () => {
     fixture.componentRef.setInput('nodes', [node]);
     fixture.detectChanges();
     await fixture.whenStable();
-    flow.keyboardShortcuts = { modifiers: { panActivation: ['Space'] } };
+    fixture.componentRef.setInput('keyboardShortcuts', { modifiers: { panActivation: ['Space'] } });
     key('keydown', 'Space');
     drag(0, pane.querySelector('.v-node')!);
     expect(node.point()).toEqual({ x: 40, y: 0 });
@@ -250,16 +254,16 @@ describe('public viewport gesture settings', () => {
     fixture.componentRef.setInput('nodes', [node]);
     fixture.detectChanges();
     await fixture.whenStable();
-    flow.paneClickDistance = 2;
+    fixture.componentRef.setInput('paneClickDistance', 2);
     pointerDrag(pane, { x: 100 }, [{ x: 104 }]);
     expect(node.selected()).toBe(true);
-    flow.paneClickDistance = 6;
+    fixture.componentRef.setInput('paneClickDistance', 6);
     pointerDrag(pane, { x: 100 }, [{ x: 104 }]);
     expect(node.selected()).toBe(false);
   });
 
   it('allows touchscreen pinch with drag pan disabled', () => {
-    flow.panOnDrag = false;
+    fixture.componentRef.setInput('panOnDrag', false);
     fixture.detectChanges();
     expect(pane.style.touchAction).toBe('pan-x pan-y');
     touchPointers(pane, 'pointerdown', [{ x: 100 }, { x: 200 }]);
@@ -269,7 +273,7 @@ describe('public viewport gesture settings', () => {
   });
 
   it('allows touchscreen pan while pinch zoom is disabled', () => {
-    flow.zoomOnPinch = false;
+    fixture.componentRef.setInput('zoomOnPinch', false);
     fixture.detectChanges();
     expect(pane.style.touchAction).toBe('none');
     touchPointers(pane, 'pointerdown', [{ x: 100 }, { x: 200 }]);
@@ -305,7 +309,7 @@ describe('public viewport gesture settings', () => {
     dblclick();
     await pause(300);
     expect(flow.viewport().zoom).toBe(1);
-    flow.zoomOnDoubleClick = true;
+    fixture.componentRef.setInput('zoomOnDoubleClick', true);
     const { left, top } = pane.getBoundingClientRect();
     dblclick();
     await pause(300);
@@ -316,7 +320,7 @@ describe('public viewport gesture settings', () => {
   });
 
   it('zooms on a touch double tap when double-click zoom is enabled', async () => {
-    flow.zoomOnDoubleClick = true;
+    fixture.componentRef.setInput('zoomOnDoubleClick', true);
     for (let tap = 0; tap < 2; tap++) {
       touchPointers(pane, 'pointerdown', [{ x: 100 }]);
       touchPointers(pane, 'pointerup', [{ x: 100 }]);
@@ -345,7 +349,7 @@ describe('public viewport gesture settings', () => {
   });
 
   it('reports a series of wheel events as one gesture, whether it pans, zooms or both', async () => {
-    flow.panOnScroll = true;
+    fixture.componentRef.setInput('panOnScroll', true);
     const ends: ViewportState[] = [];
     flow.viewportChangeEnd.subscribe((state) => ends.push(state));
     for (let i = 0; i < 5; i++) wheel();

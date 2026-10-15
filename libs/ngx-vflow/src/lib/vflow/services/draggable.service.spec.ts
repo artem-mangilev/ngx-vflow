@@ -1,3 +1,4 @@
+import { signal } from '@angular/core';
 import type { Mock } from 'vitest';
 import { TestBed } from '@angular/core/testing';
 
@@ -194,7 +195,7 @@ describe('DraggableService', () => {
   }
 
   it('delays node drag until the client-space threshold is crossed at non-unit zoom', () => {
-    TestBed.inject(FlowSettingsService).nodeDragThreshold.set(10);
+    TestBed.inject(FlowSettingsService).bind({ nodeDragThreshold: signal(10) });
     viewportService.readableViewport.set({ x: 0, y: 0, zoom: 2 });
     const { model } = startNodeDrag(new DOMRect(0, 0, 400, 300));
     const status = TestBed.inject(FlowStatusService);
@@ -209,7 +210,7 @@ describe('DraggableService', () => {
   });
 
   it('does not emit node drag end for a release below the threshold', () => {
-    TestBed.inject(FlowSettingsService).nodeDragThreshold.set(10);
+    TestBed.inject(FlowSettingsService).bind({ nodeDragThreshold: signal(10) });
     const { model } = startNodeDrag(new DOMRect(0, 0, 400, 300));
     dispatchMouse(window, 'mouseup', 150, 100);
     expect(model.point()).toEqual({ x: 10, y: 20 });
@@ -298,7 +299,7 @@ describe('DraggableService', () => {
   });
 
   it('suppresses the click after a drag past the threshold and keeps it below', async () => {
-    TestBed.inject(FlowSettingsService).nodeDragThreshold.set(10);
+    TestBed.inject(FlowSettingsService).bind({ nodeDragThreshold: signal(10) });
     const { element } = startNodeDrag(new DOMRect(0, 0, 400, 300));
     let clicks = 0;
     element.addEventListener('click', () => clicks++);
@@ -441,7 +442,7 @@ describe('DraggableService', () => {
     let alignment: AlignmentService;
 
     beforeEach(() => {
-      TestBed.inject(FlowSettingsService).alignmentHelper.set(true);
+      TestBed.inject(FlowSettingsService).bind({ alignmentHelper: signal(true) });
       alignment = TestBed.inject(AlignmentService);
     });
 
@@ -507,7 +508,7 @@ describe('DraggableService', () => {
     });
 
     it('applies the grid only to the axis without an alignment', () => {
-      TestBed.inject(FlowSettingsService).snapGrid.set([10, 10]);
+      TestBed.inject(FlowSettingsService).bind({ snapGrid: signal([10, 10]) });
       const a = placed({ id: 'a' }, 10, 20);
       placed({ id: 'target' }, 500, 203);
 

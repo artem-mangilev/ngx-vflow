@@ -1,9 +1,10 @@
-import { ElementRef, Injectable, inject, isDevMode, signal } from '@angular/core';
+import { ElementRef, Injectable, Signal, computed, inject, isDevMode, untracked } from '@angular/core';
 import { KeyboardCommandName, KeyboardModifierName, KeyboardShortcuts } from '../types/keyboard-shortcuts.type';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { BehaviorSubject, Subject, fromEvent, merge } from 'rxjs';
+import { Subject, fromEvent, merge } from 'rxjs';
 import { DeleteRequest } from '../interfaces/delete-request.interface';
 import { getOS } from '../utils/get-os';
+import { bindableSignal } from '../utils/signals/bindable-signal';
 import {
   KeyboardModifierFlag,
   ParsedBinding,
@@ -166,21 +167,26 @@ function resolveShortcuts(raw: RawShortcuts, mac: boolean): ShortcutState {
 export class KeyboardService {
   private host = inject(ElementRef<HTMLElement>, { optional: true })?.nativeElement;
   private mac = getOS() === 'macos' || getOS() === 'ios';
-  private state = signal<ShortcutState>(resolveShortcuts(defaultShortcuts(), this.mac));
+  private shortcuts = bindableSignal<KeyboardShortcuts>({});
+  /** The configuration with defaults for omitted entries: an omitted entry never keeps a previous value. */
+  private state = computed<ShortcutState>(() => {
+    const shortcuts = this.shortcuts();
+    if (isDevMode()) reportMovedEntries(shortcuts);
+    const defaults = defaultShortcuts();
+    return resolveShortcuts(
+      {
+        modifiers: { ...defaults.modifiers, ...suppliedEntries(shortcuts?.modifiers) },
+        commands: { ...defaults.commands, ...suppliedEntries(shortcuts?.commands) },
+      },
+      this.mac,
+    );
+  });
   /** Keyboard deletion requests from focused entity wrappers; the flow exposes them as an output. */
   public deleteRequest$ = new Subject<DeleteRequest>();
   /** Keys currently down, as lowercased code to lowercased key. */
   private pressed = new Map<string, string>();
   /** Codes of the keys that may arm a viewport gesture, which excludes presses inside editable content. */
   private gesture = new Set<string>();
-  #modifiersActive$ = new BehaviorSubject<Record<KeyboardModifierName, boolean>>({
-    selection: false,
-    multiSelection: false,
-    panActivation: false,
-    zoomActivation: false,
-    alignmentBypass: false,
-  });
-  public modifiersActive$ = this.#modifiersActive$.asObservable();
 
   constructor() {
     merge(
@@ -206,7 +212,6 @@ export class KeyboardService {
             this.pressed.delete(code);
             this.gesture.delete(code);
           }
-          this.updateActive();
           if (
             event.type === 'keydown' &&
             code === 'space' &&
@@ -219,7 +224,6 @@ export class KeyboardService {
         } else {
           this.pressed.clear();
           this.gesture.clear();
-          this.updateActive();
         }
       });
   }
@@ -234,33 +238,15 @@ export class KeyboardService {
     return false;
   }
 
-  private updateActive() {
-    const { modifiers } = this.state();
-    const active = { ...this.#modifiersActive$.value };
-    for (const name of Object.keys(active) as KeyboardModifierName[]) {
-      active[name] = modifiers[name].some((binding) => this.isHeld(binding, GESTURE_MODIFIERS.includes(name)));
-    }
-    this.#modifiersActive$.next(active);
+  /** Reads the configuration from `shortcuts` from now on. */
+  public bindShortcuts(shortcuts: Signal<KeyboardShortcuts>) {
+    this.shortcuts.bind(shortcuts);
   }
 
-  /** Replaces the configuration: an omitted entry returns to its default rather than keeping the previous value. */
-  public setShortcuts(shortcuts: KeyboardShortcuts) {
-    if (isDevMode()) reportMovedEntries(shortcuts);
-    const defaults = defaultShortcuts();
-    this.state.set(
-      resolveShortcuts(
-        {
-          modifiers: { ...defaults.modifiers, ...suppliedEntries(shortcuts?.modifiers) },
-          commands: { ...defaults.commands, ...suppliedEntries(shortcuts?.commands) },
-        },
-        this.mac,
-      ),
-    );
-    this.updateActive();
-  }
-
+  /** Whether a key bound as the modifier is down. Not reactive: the pressed keys are not a signal. */
   public isActiveModifier(name: KeyboardModifierName) {
-    return this.#modifiersActive$.value[name];
+    const gestureOnly = GESTURE_MODIFIERS.includes(name);
+    return untracked(this.state).modifiers[name].some((binding) => this.isHeld(binding, gestureOnly));
   }
 
   /** Whether the pressed key is bound as a modifier, so entity commands leave it to the gesture layer. */

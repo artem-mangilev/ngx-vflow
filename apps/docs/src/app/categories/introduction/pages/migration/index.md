@@ -534,7 +534,9 @@ Every object input of `vflow` now reads the same way: the value is the defaults 
 
 `view` defaults to `'auto'` instead of `[400, 400]`: the flow fills its parent element, which therefore needs a width and a height. In dev mode the flow warns when one of them measures zero. Pass `[view]="[400, 400]"` to keep the former size.
 
-`optimization.detachedGroupsLayer` became the `parentsBelowEdges` input, and the `groupRole` label key became `parentRole`; both are about nodes that other nodes reference as parent. The `connection` getter of `VflowComponent` is removed: it returned an internal model. The `minZoom` and `maxZoom` getters remain and track changes in a reactive context.
+`optimization.detachedGroupsLayer` became the `parentsBelowEdges` input, and the `groupRole` label key became `parentRole`; both are about nodes that other nodes reference as parent. The `connection` getter of `VflowComponent` is removed: it returned an internal model.
+
+Every input of `vflow` is a signal input. Binding in a template is unchanged. Reading from a reference to the flow calls the signal: `flow.minZoom()` instead of `flow.minZoom`, and the read tracks changes in a reactive context. `flow.optimization()`, `flow.selectionBox()` and `flow.ariaLabelConfig()` return the value with the defaults filled in. Assigning in code, such as `flow.minZoom = 2`, no longer works: bind the input to a signal of your component and set that signal, or use `componentRef.setInput('minZoom', 2)` for a flow created dynamically.
 
 ### Renamed fields and types
 

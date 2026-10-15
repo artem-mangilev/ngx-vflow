@@ -1,29 +1,37 @@
 import { AutoPanSettings } from '../interfaces/auto-pan-settings.interface';
-import { Injectable, WritableSignal, signal } from '@angular/core';
+import { Injectable, Signal, signal } from '@angular/core';
 import { Background } from '../types/background.type';
 import { DEFAULT_OPTIMIZATION, Optimization } from '../interfaces/optimization.interface';
 import { SelectionMode } from '../types/selection-mode.type';
 import { DEFAULT_SELECTION_BOX, SelectionBoxSettings } from '../interfaces/selection-box-settings.interface';
 import { DEFAULT_ARIA_LABEL_CONFIG } from '../interfaces/aria-label-config.interface';
 import { AlignmentHelperSettings } from '../interfaces/alignment-helper-settings.interface';
+import { BindableSignal, bindableSignal } from '../utils/signals/bindable-signal';
+
+/** Source signals for the settings, by setting name; `VflowComponent` binds its inputs with them. */
+export type FlowSettingsSources = {
+  [
+    K in keyof FlowSettingsService as FlowSettingsService[K] extends BindableSignal<unknown> ? K : never
+  ]?: FlowSettingsService[K] extends BindableSignal<infer T> ? Signal<T> : never;
+};
 
 @Injectable()
 export class FlowSettingsService {
-  public ariaLabels = signal(DEFAULT_ARIA_LABEL_CONFIG);
-  public nodesSelectable = signal(true);
-  public edgesSelectable = signal(true);
-  public nodesFocusable = signal(true);
-  public edgesFocusable = signal(true);
+  public ariaLabels = bindableSignal(DEFAULT_ARIA_LABEL_CONFIG);
+  public nodesSelectable = bindableSignal(true);
+  public edgesSelectable = bindableSignal(true);
+  public nodesFocusable = bindableSignal(true);
+  public edgesFocusable = bindableSignal(true);
 
-  public elevateNodesOnSelect = signal(true);
-  public elevateEdgesOnSelect = signal(true);
-  public autoPan = signal<boolean | AutoPanSettings>(true);
-  public autoPanOnNodeFocus = signal(true);
+  public elevateNodesOnSelect = bindableSignal(true);
+  public elevateEdgesOnSelect = bindableSignal(true);
+  public autoPan = bindableSignal<boolean | AutoPanSettings>(true);
+  public autoPanOnNodeFocus = bindableSignal(true);
 
   /**
    * @see {VflowComponent.view}
    */
-  public view: WritableSignal<[number, number] | 'auto'> = signal('auto');
+  public view = bindableSignal<[number, number] | 'auto'>('auto');
 
   /**
    * Set based on view property. May change if view is 'auto'
@@ -35,34 +43,41 @@ export class FlowSettingsService {
    */
   public computedFlowHeight = signal(0);
 
-  public zoomOnScroll = signal(true);
-  public zoomOnPinch = signal(true);
-  public zoomOnDoubleClick = signal(false);
+  public zoomOnScroll = bindableSignal(true);
+  public zoomOnPinch = bindableSignal(true);
+  public zoomOnDoubleClick = bindableSignal(false);
   /** true preserves panning with any mouse button; arrays restrict mouse buttons only. */
-  public panOnDrag = signal<boolean | number[]>(true);
-  public panOnScroll = signal(false);
-  public paneClickDistance = signal(6);
-  public nodeDragThreshold = signal(0);
-  public connectionDragThreshold = signal(0);
+  public panOnDrag = bindableSignal<boolean | number[]>(true);
+  public panOnScroll = bindableSignal(false);
+  public paneClickDistance = bindableSignal(6);
+  public nodeDragThreshold = bindableSignal(0);
+  public connectionDragThreshold = bindableSignal(0);
 
-  public minZoom = signal(0.5);
+  public minZoom = bindableSignal(0.5);
 
-  public maxZoom = signal(3);
+  public maxZoom = bindableSignal(3);
 
   /** Pattern drawn over the token-colored canvas; `null` draws no pattern. */
-  public background = signal<Background | null>(null);
+  public background = bindableSignal<Background | null>(null);
 
-  public snapGrid = signal<[number, number]>([1, 1]);
+  public snapGrid = bindableSignal<[number, number]>([1, 1]);
 
   /** @see {VflowComponent.alignmentHelper} */
-  public alignmentHelper = signal<AlignmentHelperSettings | boolean>(false);
+  public alignmentHelper = bindableSignal<AlignmentHelperSettings | boolean>(false);
 
   /** @see {VflowComponent.parentsBelowEdges} */
-  public parentsBelowEdges = signal(false);
+  public parentsBelowEdges = bindableSignal(false);
 
-  public optimization = signal<Required<Optimization>>(DEFAULT_OPTIMIZATION);
+  public optimization = bindableSignal<Required<Optimization>>(DEFAULT_OPTIMIZATION);
 
-  public selectionMode = signal<SelectionMode>('default');
+  public selectionMode = bindableSignal<SelectionMode>('default');
 
-  public selectionBox = signal<Required<SelectionBoxSettings>>(DEFAULT_SELECTION_BOX);
+  public selectionBox = bindableSignal<Required<SelectionBoxSettings>>(DEFAULT_SELECTION_BOX);
+
+  /** Reads every given setting from its source signal from now on. */
+  public bind(sources: FlowSettingsSources) {
+    for (const [key, source] of Object.entries(sources) as [keyof FlowSettingsSources, Signal<unknown>][]) {
+      (this[key] as BindableSignal<unknown>).bind(source);
+    }
+  }
 }

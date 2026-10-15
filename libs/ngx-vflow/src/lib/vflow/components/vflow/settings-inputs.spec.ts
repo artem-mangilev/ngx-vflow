@@ -5,8 +5,9 @@ import { Vflow } from '../../vflow';
 import { VflowComponent } from './vflow.component';
 import { FlowSettingsService } from '../../services/flow-settings.service';
 import { KeyboardService } from '../../services/keyboard.service';
+import { FlowEntitiesService } from '../../services/flow-entities.service';
 import { createNodes, Node } from '../../interfaces/node.interface';
-import { Optimization } from '../../interfaces/optimization.interface';
+import { DEFAULT_OPTIMIZATION, Optimization } from '../../interfaces/optimization.interface';
 import { SelectionBoxSettings } from '../../interfaces/selection-box-settings.interface';
 import { KeyboardShortcuts } from '../../types/keyboard-shortcuts.type';
 import { AriaLabelConfig } from '../../interfaces/aria-label-config.interface';
@@ -130,5 +131,45 @@ describe('object settings of vflow', () => {
     expect(root.style.width).toBe('100%');
     expect(root.style.height).toBe('100%');
     bare.destroy();
+  });
+});
+
+describe('settings inputs of vflow', () => {
+  function setup() {
+    TestBed.configureTestingModule({ imports: [VflowComponent] });
+    const fixture = TestBed.createComponent(VflowComponent);
+    fixture.componentRef.setInput('nodes', []);
+    fixture.detectChanges();
+    const injector = fixture.debugElement.injector;
+    return {
+      fixture,
+      flow: fixture.componentInstance,
+      settings: injector.get(FlowSettingsService),
+      entities: injector.get(FlowEntitiesService),
+    };
+  }
+
+  it('binds every setting, with the defaults of the service', () => {
+    const { settings } = setup();
+    const unbound = new FlowSettingsService();
+    for (const key of Object.keys(unbound) as (keyof FlowSettingsService)[]) {
+      const value: unknown = unbound[key];
+      if (typeof value !== 'function' || !('bind' in value)) continue;
+      expect([key, (settings[key] as () => unknown)()]).toEqual([key, (value as () => unknown)()]);
+    }
+  });
+
+  it('normalizes values on the way in and reads them back from the flow', () => {
+    const { fixture, flow, settings, entities } = setup();
+    fixture.componentRef.setInput('minZoom', 0.2);
+    fixture.componentRef.setInput('paneClickDistance', -5);
+    fixture.componentRef.setInput('optimization', { virtualization: true });
+    fixture.componentRef.setInput('connection', { allowSelfConnections: true });
+
+    expect(flow.minZoom()).toBe(0.2);
+    expect(settings.minZoom()).toBe(0.2);
+    expect(settings.paneClickDistance()).toBe(0);
+    expect(flow.optimization()).toEqual({ ...DEFAULT_OPTIMIZATION, virtualization: true });
+    expect(entities.connection().allowSelfConnections).toBe(true);
   });
 });
