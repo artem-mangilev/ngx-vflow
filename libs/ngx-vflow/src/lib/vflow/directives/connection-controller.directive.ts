@@ -14,6 +14,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { EdgeModel } from '../models/edge.model';
 import { ConnectionForValidation } from '../interfaces/connection-settings.interface';
 import { listen } from '../utils/listen';
+import { sameConnection } from '../utils/same-connection';
 import {
   ConnectEndEvent,
   connectEndEventFromConnectionDroppedStatus,
@@ -47,7 +48,7 @@ export class ConnectionControllerDirective {
           break;
         case 'connection-release': {
           const connection = statusToConnection(status);
-          const valid = this.flowEntitiesService.connection().validator(connection);
+          const valid = this.isValid(connection);
           const { source, target, sourceHandle, targetHandle } = status.payload;
           this.statusService.setConnectionReleaseValidatedStatus(source, target, sourceHandle, targetHandle, valid);
           if (valid) this.connect.emit(connection);
@@ -55,7 +56,7 @@ export class ConnectionControllerDirective {
         }
         case 'reconnection-release': {
           const connection = statusToConnection(status);
-          const valid = this.flowEntitiesService.connection().validator(connection);
+          const valid = this.isValid(connection, status.payload.oldEdge);
           const { source, target, sourceHandle, targetHandle, oldEdge } = status.payload;
           this.statusService.setReconnectionReleaseValidatedStatus(
             source,
@@ -65,7 +66,7 @@ export class ConnectionControllerDirective {
             oldEdge,
             valid,
           );
-          if (valid) this.reconnect.emit({ connection, oldEdge: oldEdge.edge });
+          if (valid) this.reconnect.emit({ edge: oldEdge.edge, connection });
           break;
         }
         case 'connection-release-validated':
@@ -127,6 +128,21 @@ export class ConnectionControllerDirective {
   private statusService = inject(FlowStatusService);
   private flowEntitiesService = inject(FlowEntitiesService);
 
+  /**
+   * Rejects a duplicate before the validators run, so the application validator sees only connections the built-in
+   * rules accept. A reconnected edge is no duplicate of itself.
+   */
+  private isValid(connection: ConnectionForValidation, reconnectedEdge?: EdgeModel) {
+    const settings = this.flowEntitiesService.connection();
+    const duplicate =
+      !settings.allowDuplicateConnections &&
+      this.flowEntitiesService
+        .edges()
+        .some((model) => model !== reconnectedEdge && sameConnection(model.edge, connection));
+
+    return !duplicate && settings.validator(connection);
+  }
+
   public readonly connectStart = output<ConnectStartEvent>();
   /** Emits an application-owned structural connection request after validation. */
   public readonly connect = output<Connection>();
@@ -177,14 +193,17 @@ export class ConnectionControllerDirective {
         sourceHandle = adjusted.sourceHandle;
         targetHandle = adjusted.targetHandle;
 
-        valid = this.flowEntitiesService.connection().validator({
-          source: source.rawNode.id,
-          target: target.rawNode.id,
-          sourceHandle: sourceHandle.id(),
-          targetHandle: targetHandle.id(),
-          sourceHandleType: sourceHandle.type(),
-          targetHandleType: targetHandle.type(),
-        });
+        valid = this.isValid(
+          {
+            source: source.rawNode.id,
+            target: target.rawNode.id,
+            sourceHandle: sourceHandle.id(),
+            targetHandle: targetHandle.id(),
+            sourceHandleType: sourceHandle.type(),
+            targetHandleType: targetHandle.type(),
+          },
+          isReconnection ? status.payload.oldEdge : undefined,
+        );
       }
 
       // TODO: check how react flow handles highlight of handle

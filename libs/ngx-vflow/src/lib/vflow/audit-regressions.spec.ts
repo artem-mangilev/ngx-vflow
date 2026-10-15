@@ -317,7 +317,10 @@ describe('Graph rendering and interaction regressions', () => {
     const source = nodes[0].handles()[0];
     const target = nodes[1].handles()[0];
     const validator = vi.fn().mockReturnValue(true);
-    TestBed.inject(FlowEntitiesService).connection.set(new ConnectionModel({ validator }));
+    // The fixture already connects these handles.
+    TestBed.inject(FlowEntitiesService).connection.set(
+      new ConnectionModel({ validator, allowDuplicateConnections: true }),
+    );
     const requests: unknown[] = [];
     controller.connect.subscribe((value) => requests.push(value));
     controller.connect.subscribe((value) => requests.push(value));

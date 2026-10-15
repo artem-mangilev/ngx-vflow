@@ -5,10 +5,12 @@ export class ConnectionModel {
   public curve: Curve;
   public validator: ConnectionValidatorFn;
   public allowSelfConnections: boolean;
+  public allowDuplicateConnections: boolean;
 
   constructor(public settings: ConnectionSettings) {
     this.curve = settings.curve ?? 'bezier';
     this.allowSelfConnections = settings.allowSelfConnections ?? false;
+    this.allowDuplicateConnections = settings.allowDuplicateConnections ?? false;
 
     const validators: ConnectionValidatorFn[] = [notSameTypedHandlesValidator];
 

@@ -40,9 +40,11 @@ export interface ReconnectStartEvent {
   handle: ConnectionEventHandle;
 }
 
+/** Matches `EdgeReconnectOperation`, so `reconnectEdges([event], graph)` applies it. */
 export interface ReconnectEvent {
+  /** The edge as it was before the gesture. */
+  edge: Edge;
   connection: Connection;
-  oldEdge: Edge;
 }
 
 export interface ReconnectEndEvent {

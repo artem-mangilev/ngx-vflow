@@ -20,7 +20,9 @@ A handle with `handleType="any"` connects to any other handle in either directio
 
 ## Connection validation
 
-`ngx-vflow` supports real-time synchronous validation of connections. Validation occurs when a user attempts to create a new edge. By default, every connection is valid, but you can provide a `ConnectionSettings` with a `validator` callback where you specify the validation logic.
+`ngx-vflow` supports real-time synchronous validation of connections. Validation occurs when a user attempts to create a new edge. By default the gesture rejects two handles of the same type, a connection from a node to itself, and a connection between handles that an edge already connects. `ConnectionSettings` lifts the last two with `allowSelfConnections` and `allowDuplicateConnections`, and adds your own rule with a `validator` callback.
+
+A reconnected edge is not a duplicate of itself, so it can be dropped back on the handle it came from. `addEdges` accepts self-connections and duplicates: the rules belong to the gesture, not to the graph.
 
 For example, in this case, validation only passes connections from node 1 to node 2. If the `validator` returns `false`, the `(connect)` event won't be triggered because there is no valid connection.
 
@@ -32,7 +34,7 @@ Edges can be reconnected. To reconnect an edge, follow these steps:
 
 1. Mark the `Edge` object as `reconnectable`
 2. Create a handler for the `(reconnect)` event
-3. This handler accepts a `ReconnectionEvent` argument, which contains a new `Connection` and the `oldEdge` that you are trying to reconnect
-4. Pass the old edge ID and new `Connection` to `reconnectEdges`
+3. This handler accepts a `ReconnectEvent` argument, which contains the `edge` you are reconnecting and its new `Connection`
+4. Pass the event to `reconnectEdges`: `edges = reconnectEdges([event], { nodes, edges })`
 
 {{ NgDocActions.demoPane("ReconnectionDemoComponent") }}

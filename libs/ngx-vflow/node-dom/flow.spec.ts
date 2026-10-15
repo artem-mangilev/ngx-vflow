@@ -108,6 +108,9 @@ describe('Vflow in a DOM without layout', () => {
   it('emits a connection for a pointer press on a source handle released on a target handle', async () => {
     const source = element.querySelector('[vHandle][handleType="source"]')!;
     const target = element.querySelector('.note [vHandle]')!;
+    // The gesture rejects a duplicate of the fixture edge.
+    host.edges.set([]);
+    await settle();
 
     source.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, button: 0, pointerId: 1, isPrimary: true }));
     await settle();

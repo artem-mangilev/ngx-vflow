@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
 import { DocsPresentations } from '@docs/shared';
-import { DeleteRequest, KeyboardShortcuts, Vflow, createEdges, createNodes, removeEdges, removeNodes } from 'ngx-vflow';
+import { DeleteRequest, KeyboardShortcuts, Vflow, createEdges, createNodes, removeElements } from 'ngx-vflow';
 
 /** The zoom defaults, repeated because an entry is replaced whole rather than extended. */
 const ZOOM_DEFAULTS = {
@@ -114,9 +114,9 @@ export class ShortcutsConfigurationDemoComponent {
     return value ? value.split(',') : [];
   }
 
-  protected onDeleteRequest({ nodeIds, edgeIds }: DeleteRequest) {
+  protected onDeleteRequest(request: DeleteRequest) {
     this.requests.update((count) => count + 1);
-    const result = removeNodes(nodeIds, { nodes: this.nodes, edges: removeEdges(edgeIds, this.edges) });
+    const result = removeElements(request, { nodes: this.nodes, edges: this.edges });
     this.nodes = result.nodes;
     this.edges = result.edges;
   }

@@ -3,18 +3,31 @@ import { Connection } from '../interfaces/connection.interface';
 import { Edge } from '../interfaces/edge.interface';
 import { Node } from '../interfaces/node.interface';
 import { Point } from '../interfaces/point.interface';
+import { sameConnection } from './same-connection';
+
+/*
+ * Each helper takes what it reads and returns what it writes: a helper that changes one collection returns that
+ * array, so it fits `signal.update()`; a helper that changes both returns both.
+ */
 
 export interface NodeReparentOperation {
   id: string;
   parentId: string | null;
 }
 
+/** Matches `ReconnectEvent`, so `reconnectEdges([event], graph)` applies the gesture. */
 export interface EdgeReconnectOperation {
-  id: string;
+  edge: { id: string };
   connection: Connection;
 }
 
-export interface RemoveNodesResult<NodeType extends Node, EdgeType extends Edge> {
+/** Matches `DeleteRequest`, so `removeElements(request, graph)` applies the request. */
+export interface RemoveElementsRequest {
+  nodeIds?: readonly string[];
+  edgeIds?: readonly string[];
+}
+
+export interface RemoveElementsResult<NodeType extends Node, EdgeType extends Edge> {
   nodes: NodeType[];
   edges: EdgeType[];
   removedNodes: NodeType[];
@@ -60,11 +73,11 @@ export function addNodes<ExistingNodeType extends Node, AddedNodeType extends No
   return result as Array<ExistingNodeType | AddedNodeType>;
 }
 
-/** Removes nodes, their descendants, and every incident edge. */
-export function removeNodes<NodeType extends Node, EdgeType extends Edge>(
-  nodeIds: readonly string[],
+/** Removes the edges, the nodes with their descendants, and every edge incident to a removed node. */
+export function removeElements<NodeType extends Node, EdgeType extends Edge>(
+  { nodeIds = [], edgeIds = [] }: RemoveElementsRequest,
   { nodes, edges }: { nodes: readonly NodeType[]; edges: readonly EdgeType[] },
-): RemoveNodesResult<NodeType, EdgeType> {
+): RemoveElementsResult<NodeType, EdgeType> {
   const nodesById = new Map<string, NodeType[]>();
   const children = new Map<string, NodeType[]>();
   for (const node of nodes) {
@@ -122,7 +135,10 @@ export function removeNodes<NodeType extends Node, EdgeType extends Edge>(
     }
   }
 
-  const removedEdges = edges.filter((edge) => removedIds.has(edge.source) || removedIds.has(edge.target));
+  const keptEdges = new Set(removeEdges(edgeIds, edges));
+  const removedEdges = edges.filter(
+    (edge) => !keptEdges.has(edge) || removedIds.has(edge.source) || removedIds.has(edge.target),
+  );
   const removedEdgeSet = new Set(removedEdges);
   return {
     nodes: (removedNodeSet.size ? nodes.filter((node) => !removedNodeSet.has(node)) : nodes) as NodeType[],
@@ -180,7 +196,10 @@ export function reparentNodes<NodeType extends Node>(
   return (changed ? [...nodes] : nodes) as NodeType[];
 }
 
-/** Appends edges with valid endpoints and unique connection tuples. */
+/**
+ * Appends edges with unique ids and valid endpoints. Duplicate connections and self-connections are valid: the
+ * connection gesture rejects them by default, see `allowDuplicateConnections` and `allowSelfConnections`.
+ */
 export function addEdges<ExistingEdgeType extends Edge, AddedEdgeType extends Edge>(
   edgesToAdd: readonly AddedEdgeType[],
   { nodes, edges }: { nodes: readonly { id: string }[]; edges: readonly ExistingEdgeType[] },
@@ -197,7 +216,6 @@ export function addEdges<ExistingEdgeType extends Edge, AddedEdgeType extends Ed
       continue;
     }
     if (!hasUniqueEndpoint(nodes, edge.source) || !hasUniqueEndpoint(nodes, edge.target)) continue;
-    if (result.some((candidate) => sameConnection(candidate, edge))) continue;
 
     result = [...result, edge];
   }
@@ -229,10 +247,10 @@ export function reconnectEdges<EdgeType extends Edge>(
 ): EdgeType[] {
   let result: readonly EdgeType[] = edges;
 
-  for (const { id, connection } of operations) {
-    const match = findUniqueIndex(result, id);
+  for (const { edge: target, connection } of operations) {
+    const match = findUniqueIndex(result, target.id);
     if (match.count !== 1) {
-      warnTarget('edge', id, match.count);
+      warnTarget('edge', target.id, match.count);
       continue;
     }
     if (!hasUniqueEndpoint(nodes, connection.source) || !hasUniqueEndpoint(nodes, connection.target)) continue;
@@ -294,15 +312,6 @@ function getFlowPoint<NodeType extends Node>(
   }
 
   return { point: { x, y } };
-}
-
-function sameConnection(a: Connection, b: Connection): boolean {
-  return (
-    a.source === b.source &&
-    a.target === b.target &&
-    (a.sourceHandle ?? '') === (b.sourceHandle ?? '') &&
-    (a.targetHandle ?? '') === (b.targetHandle ?? '')
-  );
 }
 
 function hasUniqueEndpoint(nodes: readonly { id: string }[], id: string): boolean {

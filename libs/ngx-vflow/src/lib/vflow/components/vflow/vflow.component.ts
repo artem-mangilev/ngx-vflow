@@ -529,7 +529,7 @@ export class VflowComponent {
 
   /**
    * A keyboard user pressed a deletion key on a focused node or edge while entities were selected. Carries the
-   * selected IDs only; apply it with `removeNodes` and `removeEdges` or ignore it.
+   * selected IDs only; apply it with `removeElements(request, graph)` or ignore it.
    */
   public readonly deleteRequest = outputFromObservable(this.keyboardService.deleteRequest$);
   // #endregion

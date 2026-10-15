@@ -10,7 +10,7 @@ import {
 } from '@angular/core';
 import { DocsPresentations } from '@docs/shared';
 import { Vui } from '@vflow/ui';
-import { AriaLabelConfig, DeleteRequest, Vflow, createEdges, createNodes, removeEdges, removeNodes } from 'ngx-vflow';
+import { AriaLabelConfig, DeleteRequest, Vflow, createEdges, createNodes, removeElements } from 'ngx-vflow';
 
 const SPANISH: Partial<AriaLabelConfig> = {
   flowLabel: 'Grafo de aprobación',
@@ -175,8 +175,8 @@ export class AccessibilityDemoComponent {
     });
   }
 
-  protected onDeleteRequest({ nodeIds, edgeIds }: DeleteRequest) {
-    const result = removeNodes(nodeIds, { nodes: this.nodes(), edges: removeEdges(edgeIds, this.edges()) });
+  protected onDeleteRequest(request: DeleteRequest) {
+    const result = removeElements(request, { nodes: this.nodes(), edges: this.edges() });
     this.nodes.set(result.nodes);
     this.edges.set(result.edges);
   }

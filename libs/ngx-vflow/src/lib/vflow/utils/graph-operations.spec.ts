@@ -2,11 +2,12 @@ import { signal } from '@angular/core';
 import {
   Edge,
   Node,
+  ReconnectEvent,
   addEdges,
   addNodes,
   reconnectEdges,
   removeEdges,
-  removeNodes,
+  removeElements,
   reparentNodes,
 } from '../../../public-api';
 
@@ -33,17 +34,10 @@ describe('graph operations', () => {
     expect(addNodes([node('parent')], added)).toBe(added);
   });
 
-  it('adds valid self-connections and ignores duplicate connection tuples', () => {
+  it('appends edges in input order and keeps their objects', () => {
     const nodes = [node('a'), node('b')];
     const selected = signal(true);
-    const first: Edge = {
-      id: 'first',
-      source: 'a',
-      target: 'a',
-      sourceHandle: '',
-      selected,
-    };
-    const duplicate: Edge = { id: 'duplicate', source: 'a', target: 'a' };
+    const first: Edge = { id: 'first', source: 'a', target: 'b', selected };
     const customHandles: Edge = {
       id: 'handles',
       source: 'a',
@@ -52,10 +46,10 @@ describe('graph operations', () => {
       targetHandle: 'in',
     };
 
-    const added = addEdges([first, duplicate, customHandles], { nodes, edges: [] });
+    const added = addEdges([first, customHandles], { nodes, edges: [] });
     expect(added).toEqual([first, customHandles]);
+    expect(added[0]).toBe(first);
     expect(added[0].selected).toBe(selected);
-    expect(addEdges([duplicate], { nodes, edges: added })).toBe(added);
   });
 
   it('rejects missing and ambiguous edge endpoints without throwing', () => {
@@ -78,19 +72,42 @@ describe('graph operations', () => {
     const parentEdge: Edge = { id: 'parent-edge', source: 'unrelated', target: 'parent' };
     const edges = [keep, childEdge, parentEdge];
 
-    const result = removeNodes(['parent'], { nodes, edges });
+    const result = removeElements({ nodeIds: ['parent'] }, { nodes, edges });
 
     expect(result.nodes).toEqual([unrelated]);
     expect(result.edges).toEqual([keep]);
     expect(result.removedNodes).toEqual([child, parent, descendant]);
     expect(result.removedEdges).toEqual([childEdge, parentEdge]);
     expect(result.nodes[0]).toBe(unrelated);
-    expect(removeNodes(['missing'], { nodes, edges })).toEqual({
+    expect(removeElements({ nodeIds: ['missing'] }, { nodes, edges })).toEqual({
       nodes,
       edges,
       removedNodes: [],
       removedEdges: [],
     });
+  });
+
+  it('removes the requested edges together with the edges of the removed nodes, each once', () => {
+    const a = node('a');
+    const b = node('b');
+    const c = node('c');
+    const ab: Edge = { id: 'a-b', source: 'a', target: 'b' };
+    const bc: Edge = { id: 'b-c', source: 'b', target: 'c' };
+    const ca: Edge = { id: 'c-a', source: 'c', target: 'a' };
+    const nodes = [a, b, c];
+    const edges = [ab, bc, ca];
+
+    const result = removeElements({ nodeIds: ['a'], edgeIds: ['b-c', 'a-b'] }, { nodes, edges });
+
+    expect(result.nodes).toEqual([b, c]);
+    expect(result.edges).toEqual([]);
+    expect(result.removedNodes).toEqual([a]);
+    expect(result.removedEdges).toEqual([ab, bc, ca]);
+
+    const edgesOnly = removeElements({ edgeIds: ['b-c'] }, { nodes, edges });
+    expect(edgesOnly.nodes).toBe(nodes);
+    expect(edgesOnly.edges).toEqual([ab, ca]);
+    expect(edgesOnly.removedEdges).toEqual([bc]);
   });
 
   it('safely removes a reachable parent cycle', () => {
@@ -99,7 +116,7 @@ describe('graph operations', () => {
     const edge: Edge = { id: 'edge', source: 'a', target: 'b' };
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
-    const result = removeNodes(['a'], { nodes: [a, b], edges: [edge] });
+    const result = removeElements({ nodeIds: ['a'] }, { nodes: [a, b], edges: [edge] });
     expect(result.removedNodes).toEqual([a, b]);
     expect(result.removedEdges).toEqual([edge]);
     expect(warn).toHaveBeenCalledWith('[ngx-vflow] Removing node "a" and its cyclic descendant closure.');
@@ -111,11 +128,11 @@ describe('graph operations', () => {
     const other = node('duplicate');
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const nodes = [parent, child, other];
-    const result = removeNodes(['duplicate', 'parent', 'duplicate'], { nodes, edges: [] });
+    const result = removeElements({ nodeIds: ['duplicate', 'parent', 'duplicate'] }, { nodes, edges: [] });
     expect(result.nodes).toEqual([]);
     expect(result.removedNodes).toEqual(nodes);
     expect(warn).toHaveBeenCalledTimes(1);
-    const unchanged = removeNodes(['missing'], { nodes, edges: [] });
+    const unchanged = removeElements({ nodeIds: ['missing'] }, { nodes, edges: [] });
     expect(unchanged.nodes).toBe(nodes);
   });
 
@@ -190,7 +207,7 @@ describe('graph operations', () => {
     const nodes = [node('a'), node('b')];
 
     const result = reconnectEdges(
-      [{ id: 'edge', connection: { source: 'b', target: 'a', sourceHandle: 'out', targetHandle: 'in' } }],
+      [{ edge: { id: 'edge' }, connection: { source: 'b', target: 'a', sourceHandle: 'out', targetHandle: 'in' } }],
       { nodes, edges },
     );
 
@@ -205,7 +222,7 @@ describe('graph operations', () => {
     });
     expect(result[1].id).toBe('edge');
     expect(result[1].selected).toBe(selected);
-    expect(reconnectEdges([{ id: 'edge', connection: edge }], { nodes, edges })).toBe(edges);
+    expect(reconnectEdges([{ edge: { id: 'edge' }, connection: edge }], { nodes, edges })).toBe(edges);
   });
 
   it('rejects an edge whose id already exists and keeps the collection reference', () => {
@@ -217,13 +234,44 @@ describe('graph operations', () => {
     expect(warn).toHaveBeenCalledWith('[ngx-vflow] Cannot add edge "edge" because its id already exists.');
   });
 
+  it('adds duplicate connections and self-connections, which only the gesture rejects', () => {
+    const nodes = [node('a'), node('b')];
+    const edges: Edge[] = [{ id: 'first', source: 'a', target: 'b' }];
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    const result = addEdges(
+      [
+        { id: 'second', source: 'a', target: 'b' },
+        { id: 'loop', source: 'a', target: 'a' },
+      ],
+      { nodes, edges },
+    );
+
+    expect(result.map(({ id }) => id)).toEqual(['first', 'second', 'loop']);
+    expect(warn).not.toHaveBeenCalled();
+  });
+
+  it('applies a reconnect event as an operation', () => {
+    const nodes = [node('a'), node('b'), node('c')];
+    const edge: Edge = { id: 'edge', source: 'a', target: 'b' };
+    const event: ReconnectEvent = { edge, connection: { source: 'a', target: 'c' } };
+
+    const [reconnected] = reconnectEdges([event], { nodes, edges: [edge] });
+
+    expect(reconnected).toEqual({ ...edge, target: 'c' });
+  });
+
   it('reconnects nothing for an unknown edge or endpoint and keeps the collection reference', () => {
     const nodes = [node('a'), node('b')];
     const edges: Edge[] = [{ id: 'edge', source: 'a', target: 'b' }];
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
-    expect(reconnectEdges([{ id: 'missing', connection: { source: 'b', target: 'a' } }], { nodes, edges })).toBe(edges);
-    expect(reconnectEdges([{ id: 'edge', connection: { source: 'a', target: 'gone' } }], { nodes, edges })).toBe(edges);
+    expect(
+      reconnectEdges([{ edge: { id: 'missing' }, connection: { source: 'b', target: 'a' } }], { nodes, edges }),
+    ).toBe(edges);
+    expect(
+      reconnectEdges([{ edge: { id: 'edge' }, connection: { source: 'a', target: 'gone' } }], { nodes, edges }),
+    ).toBe(edges);
     expect(warn.mock.calls).toEqual([
       ['[ngx-vflow] Cannot find edge "missing".'],
       ['[ngx-vflow] Cannot find endpoint node "gone".'],
@@ -234,10 +282,13 @@ describe('graph operations', () => {
     const nodes = [node('a'), node('b')];
     const edges: Edge[] = [{ id: 'edge', source: 'a', target: 'b', sourceHandle: 'out', targetHandle: 'in' }];
 
-    const [edge] = reconnectEdges([{ id: 'edge', connection: { source: 'a', target: 'b', targetHandle: 'in-2' } }], {
-      nodes,
-      edges,
-    });
+    const [edge] = reconnectEdges(
+      [{ edge: { id: 'edge' }, connection: { source: 'a', target: 'b', targetHandle: 'in-2' } }],
+      {
+        nodes,
+        edges,
+      },
+    );
 
     expect(edge.sourceHandle).toBeUndefined();
     expect(edge.targetHandle).toBe('in-2');

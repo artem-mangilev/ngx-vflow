@@ -16,5 +16,11 @@ export interface ConnectionSettings {
   validator?: ConnectionValidatorFn;
   /** End marker of the connection line, see `MarkerRef`. */
   marker?: MarkerRef;
+  /** Lets the gesture connect a node to itself. Default: false. */
   allowSelfConnections?: boolean;
+  /**
+   * Lets the gesture create a connection between handles that an edge already connects. Default: false.
+   * `addEdges` accepts duplicates either way.
+   */
+  allowDuplicateConnections?: boolean;
 }

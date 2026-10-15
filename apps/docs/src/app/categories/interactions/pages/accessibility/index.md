@@ -62,8 +62,8 @@ The keys are listed on [Keyboard shortcuts](../keyboard-shortcuts); this is what
 ```
 
 ```typescript
-onDeleteRequest({ nodeIds, edgeIds }: DeleteRequest) {
-  const result = removeNodes(nodeIds, { nodes: this.nodes, edges: removeEdges(edgeIds, this.edges) });
+onDeleteRequest(request: DeleteRequest) {
+  const result = removeElements(request, { nodes: this.nodes, edges: this.edges });
   this.nodes = result.nodes;
   this.edges = result.edges;
 }

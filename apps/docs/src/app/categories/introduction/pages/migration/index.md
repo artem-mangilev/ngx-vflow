@@ -508,6 +508,12 @@ A flow that relied on a missing handler to keep its handles inert sets `[canStar
 
 `ConnectionControllerDirective` is no longer a public export or part of the `Vflow` array.
 
+### Graph operations take the event payloads
+
+- `removeNodes(nodeIds, graph)` became `removeElements({ nodeIds, edgeIds }, graph)`, which also removes the edges you list. Its first argument has the shape of `DeleteRequest`, so `removeElements(request, { nodes, edges })` replaces `removeNodes(nodeIds, { nodes, edges: removeEdges(edgeIds, edges) })`. `RemoveNodesResult` became `RemoveElementsResult`.
+- The `oldEdge` field of `ReconnectEvent` became `edge`, as in `ReconnectStartEvent` and `ReconnectEndEvent`. A reconnect operation is `{ edge: { id }, connection }` instead of `{ id, connection }`, so `reconnectEdges([event], { nodes, edges })` applies the event.
+- `addEdges` no longer drops an edge whose source, target and handles another edge already has. The connection gesture rejects such a connection instead, unless `ConnectionSettings.allowDuplicateConnections` is `true`; check before `addEdges` when you add edges from code and want no duplicates.
+
 ### Change notifications
 
 - `(nodesChanges)` and `(edgesChanges)` are outputs of `vflow` itself. Code subscribes through a reference to the flow: `flow.nodesChanges.subscribe(...)`, or `outputToObservable(flow.nodesChanges)` for RxJS operators. The `nodesChange$` / `edgesChange$` observables and the `nodesChange` / `edgesChange` signals are removed.

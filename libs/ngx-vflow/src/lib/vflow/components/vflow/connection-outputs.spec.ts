@@ -143,6 +143,35 @@ describe('connection outputs', () => {
     expect(host.connects).toMatchObject([{ source: 'a', target: 'a', sourceHandle: 'out', targetHandle: 'in' }]);
   });
 
+  it('emits no connection between handles that an edge already connects unless duplicates are allowed', async () => {
+    const edges = createEdges([{ id: 'a-b', source: 'a', target: 'b', sourceHandle: 'out', targetHandle: 'in' }]);
+    await setup({}, edges);
+
+    await connect(handle('a', 'out'), handle('b', 'in'));
+
+    expect(host.connects).toEqual([]);
+    expect(host.connectEnds.map(({ valid }) => valid)).toEqual([false]);
+
+    await setup({ allowDuplicateConnections: true }, edges);
+
+    await connect(handle('a', 'out'), handle('b', 'in'));
+
+    expect(host.connects).toMatchObject([{ source: 'a', target: 'b', sourceHandle: 'out', targetHandle: 'in' }]);
+  });
+
+  it('reconnects an edge back to its own handle, which is no duplicate of itself', async () => {
+    const [edge] = createEdges([
+      { id: 'a-b', source: 'a', target: 'b', sourceHandle: 'out', targetHandle: 'in', reconnectable: 'target' },
+    ]);
+    await setup({}, [edge]);
+
+    await connect(fixture.nativeElement.querySelector('.v-reconnect-handle'), handle('b', 'in'));
+
+    expect(host.reconnects).toMatchObject([
+      { connection: { source: 'a', target: 'b', sourceHandle: 'out', targetHandle: 'in' }, edge },
+    ]);
+  });
+
   it('reconnects the target end of an edge to another handle', async () => {
     const [edge] = createEdges([
       { id: 'a-b', source: 'a', target: 'b', sourceHandle: 'out', targetHandle: 'in', reconnectable: 'target' },
@@ -157,7 +186,7 @@ describe('connection outputs', () => {
       [edge, 'a', 'out'],
     ]);
     expect(host.reconnects).toMatchObject([
-      { connection: { source: 'a', target: 'c', sourceHandle: 'out', targetHandle: 'in' }, oldEdge: edge },
+      { connection: { source: 'a', target: 'c', sourceHandle: 'out', targetHandle: 'in' }, edge },
     ]);
     expect(host.reconnectEnds.map(({ edge, valid, to }) => [edge, valid, to.node?.id])).toEqual([[edge, true, 'c']]);
     // Reconnection reports the change; the application owns the edge.

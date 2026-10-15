@@ -88,8 +88,8 @@ export class ReconnectionDemoComponent {
     this.edgeReconnectSuccessful.set(true);
   }
 
-  public reconnect({ oldEdge, connection }: ReconnectEvent) {
-    this.edges = reconnectEdges([{ id: oldEdge.id, connection }], { nodes: this.nodes, edges: this.edges });
+  public reconnect(event: ReconnectEvent) {
+    this.edges = reconnectEdges([event], { nodes: this.nodes, edges: this.edges });
 
     this.edgeReconnectSuccessful.set(true);
   }
