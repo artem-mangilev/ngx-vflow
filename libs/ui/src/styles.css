@@ -36,9 +36,13 @@
   --color-vui-warning: var(--vui-warning);
   --color-vui-danger: var(--vui-danger);
   --color-vui-info: var(--vui-info);
+  /* A part-local tone (`--vui-tone`, set by the part from one of the tones above) as a tint and as text on it. */
+  --color-vui-tone: var(--vui-tone);
+  --color-vui-tone-ink: color-mix(in oklab, var(--vui-tone) 80%, var(--vui-foreground));
 
   --font-vui-sans: var(--vui-font-sans);
   --font-vui-mono: var(--vui-font-mono);
+  --font-weight-vui-medium: 500;
   --font-weight-vui-strong: 600;
 
   /* Type scale around the body size: 11/14, 13/18, 15/20 at the default 13px. */

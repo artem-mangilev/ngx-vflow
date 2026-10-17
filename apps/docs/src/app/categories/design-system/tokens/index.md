@@ -9,22 +9,22 @@ body text, hairline borders and concentric corners.
 
 Set these on a `vuiTheme` scope or any element inside it. Everything else is derived from them.
 
-| Variable                                                       | Light / dark            | Purpose                                                        |
-| -------------------------------------------------------------- | ----------------------- | -------------------------------------------------------------- |
-| `--vui-canvas`                                                 | `#f5f5f7` / `#1c1c1e`   | Flow background (`--v-background`)                             |
-| `--vui-surface`                                                | `#fff` / `#2c2c2e`      | Nodes, labels, floating surfaces                               |
-| `--vui-surface-muted`                                          | 12% / 24% gray fill     | Containers, pools, hover; translucent so it works on any layer |
-| `--vui-foreground`, `--vui-muted`                              | at least 12.8:1 / 4.6:1 | Primary and secondary text, edge strokes                       |
-| `--vui-border`                                                 | `#c6c6c8` / `#545458`   | Hairline borders and separators                                |
-| `--vui-accent`, `--vui-on-accent`                              | `#0071e3` on white      | Primary button fill and its text (4.7:1 in both themes)        |
-| `--vui-selection`                                              | `#0071e3` / `#0a84ff`   | Selection and focus rings, selected edges, connecting ports    |
-| `--vui-success`, `--vui-warning`, `--vui-danger`, `--vui-info` | text-safe tones         | Status tones and port validity, at least 4.5:1 on the surface  |
-| `--vui-font-sans`, `--vui-font-mono`                           | system stack            | Typefaces                                                      |
-| `--vui-font-size`                                              | `13px`                  | Body size; the type scale follows it                           |
-| `--vui-space`                                                  | `4px`                   | Grid unit; every padding, gap and control size follows it      |
-| `--vui-radius`                                                 | `6px`                   | Control radius; surfaces add one grid unit                     |
-| `--vui-shadow-node`, `--vui-shadow-floating`                   | per theme               | Resting node shadow (no blur) and floating layers              |
-| `--vui-duration`, `--vui-ease`                                 | `150ms`, standard curve | Hover and state transitions                                    |
+| Variable                                                       | Light / dark            | Purpose                                                                         |
+| -------------------------------------------------------------- | ----------------------- | ------------------------------------------------------------------------------- |
+| `--vui-canvas`                                                 | `#f5f5f7` / `#1c1c1e`   | Flow background (`--v-background`)                                              |
+| `--vui-surface`                                                | `#fff` / `#2c2c2e`      | Nodes, labels, floating surfaces                                                |
+| `--vui-surface-muted`                                          | 12% / 24% gray fill     | Containers, pools, hover; translucent so it works on any layer                  |
+| `--vui-foreground`, `--vui-muted`                              | at least 12.8:1 / 4.6:1 | Primary and secondary text, edge strokes                                        |
+| `--vui-border`                                                 | `#c6c6c8` / `#545458`   | Hairline borders and separators                                                 |
+| `--vui-accent`, `--vui-on-accent`                              | `#0071e3` on white      | Primary button fill and its text (4.7:1 in both themes)                         |
+| `--vui-selection`                                              | `#0071e3` / `#0a84ff`   | Selection and focus rings, selected edges, connecting ports                     |
+| `--vui-success`, `--vui-warning`, `--vui-danger`, `--vui-info` | text-safe tones         | Status tones and port validity, at least 4.5:1 on the surface and on their tint |
+| `--vui-font-sans`, `--vui-font-mono`                           | system stack            | Typefaces                                                                       |
+| `--vui-font-size`                                              | `13px`                  | Body size; the type scale follows it                                            |
+| `--vui-space`                                                  | `4px`                   | Grid unit; every padding, gap and control size follows it                       |
+| `--vui-radius`                                                 | `6px`                   | Control radius; surfaces add one grid unit                                      |
+| `--vui-shadow-node`, `--vui-shadow-floating`                   | per theme               | Resting node shadow (no blur) and floating layers                               |
+| `--vui-duration`, `--vui-ease`                                 | `150ms`, standard curve | Hover and state transitions                                                     |
 
 The system `#007aff` blue is not used for the accent fill: white text on it reaches only 4.0:1. The dark theme
 keeps the brighter `#0a84ff` for rings and lines, where it is a non-text indicator, which is why accent and
@@ -40,6 +40,11 @@ like `--vui-info`, which keeps 4.5:1 on the surface in both themes.
 | Controls  | 24, 28, 32px (6, 7, 8 units); buttons and viewport controls are 28px, field rows 32px, ports 16px |
 | Radius    | control `--vui-radius`, surface `--vui-radius + --vui-space`, full                                |
 | Elevation | nodes: hairline border and an unblurred shadow; toolbars and controls: translucent material       |
+
+A status badge is a tint of its tone (16%) with text of the same hue mixed 80/20 with the foreground, so it
+stays above 4.5:1 on its tint in both themes; it uses the control radius like buttons. An icon slot is four grid
+units wide and one text line high: a glyph sits on the baseline of the title beside it, and a 16px SVG is centered
+on that line.
 
 Corners are concentric: a toolbar wraps its buttons at one grid unit, so its radius is the button radius plus
 one unit. Change `--vui-radius` or `--vui-space` and the relation holds.

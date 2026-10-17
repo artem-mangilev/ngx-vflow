@@ -22,6 +22,8 @@ const sources = ['libs/ui/src/lib', 'libs/ui/bpmn/src/lib'].flatMap((dir) =>
 
 const SYSTEM_COLORS = /^\[(ButtonText|Canvas|CanvasText|Highlight)\]$/;
 const ARBITRARY_PROPERTIES = /^\[(stroke-linejoin|stroke-dasharray|writing-mode|forced-color-adjust):[^\]]+\]$/;
+// A part may point its local variable at a theme token, e.g. the status tone: `[--vui-tone:var(--vui-success)]`.
+const LOCAL_TOKENS = /^\[--vui-[\w-]+:var\(--vui-[\w-]+\)\]$/;
 const ALLOWED = new Map([
   ["content-['']", 'generated content of a pseudo-element'],
   ['size-[70.7107%]', 'BPMN gateway: a square rotated by 45° with side 1/√2 of its host'],
@@ -52,6 +54,7 @@ function utilityOf(token) {
 function arbitraryError(utility) {
   if (ALLOWED.has(utility)) return null;
   if (ARBITRARY_PROPERTIES.test(utility)) return null;
+  if (LOCAL_TOKENS.test(utility)) return null;
   const value = /^[\w-]*?-?(\[.*\])$/.exec(utility)?.[1];
   if (value && !SYSTEM_COLORS.test(value)) return 'arbitrary value outside the allowlist; use a vui scale';
   const variable = /-\((--[\w-]+)\)$/.exec(utility)?.[1];

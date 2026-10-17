@@ -17,10 +17,13 @@ export class VuiTitle {}
 @Directive({ selector: '[vuiMeta]', host: { class: 'vui-meta text-vui-muted text-vui-caption' } })
 export class VuiMeta {}
 
-/** Fixed-size icon slot; mark purely decorative icons with `aria-hidden` yourself. */
+/**
+ * Icon slot: four grid units wide and one text line high, so a glyph shares the baseline of the text next to it
+ * and a 16px SVG is centered on that line. Mark purely decorative icons with `aria-hidden` yourself.
+ */
 @Directive({
   selector: '[vuiIcon]',
-  host: { class: 'vui-icon inline-grid place-items-center flex-none size-vui-4' },
+  host: { class: 'vui-icon inline-flex items-center justify-center flex-none w-vui-4 h-lh' },
 })
 export class VuiIcon {}
 
