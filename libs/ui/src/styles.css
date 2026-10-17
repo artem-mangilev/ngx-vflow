@@ -36,6 +36,12 @@
   --color-vui-warning: var(--vui-warning);
   --color-vui-danger: var(--vui-danger);
   --color-vui-info: var(--vui-info);
+  /* Interaction steps derived from the theme: hover and pressed darken the accent and strengthen the neutral fill
+     toward the foreground, so they follow any theme without extra variables. */
+  --color-vui-accent-hover: color-mix(in oklab, var(--vui-accent), black 8%);
+  --color-vui-accent-pressed: color-mix(in oklab, var(--vui-accent), black 16%);
+  --color-vui-fill-hover: color-mix(in oklab, var(--vui-surface-muted), var(--vui-foreground) 6%);
+  --color-vui-fill-pressed: color-mix(in oklab, var(--vui-surface-muted), var(--vui-foreground) 12%);
   /* A part-local tone (`--vui-tone`, set by the part from one of the tones above) as a tint and as text on it. */
   --color-vui-tone: var(--vui-tone);
   --color-vui-tone-ink: color-mix(in oklab, var(--vui-tone) 80%, var(--vui-foreground));
@@ -155,6 +161,10 @@
     --v-focus: var(--vui-selection);
     /* Node parts are rounded with the surface radius, so the core focus ring follows the same corners. */
     --v-focus-radius: calc(var(--vui-radius) + var(--vui-space));
+  }
+  [data-vui-theme] {
+    /* Native checkboxes, radios, ranges and progress bars inside nodes take the accent. */
+    accent-color: var(--vui-accent);
   }
   [data-vui-theme='light'] {
     color-scheme: light;

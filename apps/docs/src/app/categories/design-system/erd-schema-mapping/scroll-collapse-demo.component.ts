@@ -9,6 +9,7 @@ import {
   WritableSignal,
 } from '@angular/core';
 import { Vui } from '@vflow/ui';
+import { DemoIconComponent } from '../../../shared/demo-icon.component';
 import { createEdges, createNodes, Node, Vflow, VflowComponent } from 'ngx-vflow';
 
 interface LongEntity {
@@ -37,7 +38,7 @@ const ALL_VISIBLE: Visibility = { visible: new Set(), above: [], below: [], key:
  */
 @Component({
   selector: 'app-ui-scroll-collapse-demo',
-  imports: [Vflow, Vui],
+  imports: [Vflow, Vui, DemoIconComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
     article {
@@ -51,13 +52,6 @@ const ALL_VISIBLE: Visibility = { visible: new Set(), above: [], below: [], key:
       overflow-y: auto;
       overscroll-behavior: contain;
     }
-    .toggle {
-      border: 0;
-      background: transparent;
-      color: inherit;
-      cursor: pointer;
-      font: inherit;
-    }
     .edge-note {
       min-height: 20px;
       padding-block: 4px;
@@ -70,7 +64,7 @@ const ALL_VISIBLE: Visibility = { visible: new Set(), above: [], below: [], key:
   template: `
     <section class="demo" aria-label="Scroll and collapse experiment" vuiTheme="light">
       <div class="controls">
-        <button vuiButton type="button" (click)="flow()?.fitView()">Fit</button>
+        <button vuiButton="secondary" type="button" (click)="flow()?.fitView()">Fit</button>
         <p>Scroll the Product rows with the wheel; collapse a node to move its endpoints to the header.</p>
       </div>
       <vflow view="auto" [nodes]="nodes" [edges]="edges" (initialized)="flow()?.fitView()">
@@ -85,13 +79,16 @@ const ALL_VISIBLE: Visibility = { visible: new Set(), above: [], below: [], key:
               <span vuiTitle>{{ ctx.data().title }}</span>
               <span vuiMeta>{{ ctx.data().fields.length }} fields</span>
               <button
+                vuiButton="plain"
+                vuiButtonSize="sm"
+                vuiButtonIcon
                 vNoDrag
                 class="toggle"
                 type="button"
                 [attr.aria-label]="(ctx.data().collapsed ? 'Expand ' : 'Collapse ') + ctx.data().title"
                 [attr.aria-expanded]="!ctx.data().collapsed"
                 (click)="toggle(ctx.node.id)">
-                {{ ctx.data().collapsed ? '▸' : '▾' }}
+                <app-demo-icon [name]="ctx.data().collapsed ? 'chevron-right' : 'chevron-down'" />
               </button>
               <!-- Proxy handles keep the same IDs, so edges stay attached while rows are hidden. -->
               @for (

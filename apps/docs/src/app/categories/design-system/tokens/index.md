@@ -33,18 +33,26 @@ like `--vui-info`, which keeps 4.5:1 on the surface in both themes.
 
 ## Scales
 
-| Scale     | Steps                                                                                             |
-| --------- | ------------------------------------------------------------------------------------------------- |
-| Type      | caption 11/14, body 13/18, headline 13/18 semibold, title 15/20 — body ± 2px                      |
-| Spacing   | multiples of `--vui-space`: 1–8, 10, 12, 14, 16 units                                             |
-| Controls  | 24, 28, 32px (6, 7, 8 units); buttons and viewport controls are 28px, field rows 32px, ports 16px |
-| Radius    | control `--vui-radius`, surface `--vui-radius + --vui-space`, full                                |
-| Elevation | nodes: hairline border and an unblurred shadow; toolbars and controls: translucent material       |
+| Scale     | Steps                                                                                                                              |
+| --------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| Type      | caption 11/14, body 13/18, headline 13/18 semibold, title 15/20 — body ± 2px                                                       |
+| Spacing   | multiples of `--vui-space`: 1–8, 10, 12, 14, 16 units                                                                              |
+| Controls  | 24, 28, 32px (6, 7, 8 units); buttons and viewport controls 28px (`sm` 24px), field rows 32px, ports 12px with a 28 by 20px target |
+| Radius    | control `--vui-radius`, surface `--vui-radius + --vui-space`, full                                                                 |
+| Elevation | nodes: hairline border and an unblurred shadow; toolbars and controls: translucent material                                        |
 
 A status badge is a tint of its tone (16%) with text of the same hue mixed 80/20 with the foreground, so it
 stays above 4.5:1 on its tint in both themes; it uses the control radius like buttons. An icon slot is four grid
 units wide and one text line high: a glyph sits on the baseline of the title beside it, and a 16px SVG is centered
 on that line.
+
+Buttons come in three variants on the same 28px (or 24px `sm`) geometry: the accent `primary` for the one main
+action of an area, a neutral `secondary` fill and a `plain` button without a fill at rest. Hover and pressed darken the
+accent or strengthen the neutral fill toward the foreground; the steps derive from the theme, so they need no
+variables of their own.
+
+Inside a card, the header, footer and field separators are half as strong as the card border, so the card reads as
+one surface. A container is a tinted group with a hairline, not a dashed frame.
 
 Corners are concentric: a toolbar wraps its buttons at one grid unit, so its radius is the button radius plus
 one unit. Change `--vui-radius` or `--vui-space` and the relation holds.

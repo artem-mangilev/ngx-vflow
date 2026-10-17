@@ -1,10 +1,11 @@
 import { ChangeDetectionStrategy, Component, signal, viewChild } from '@angular/core';
 import { VuiTone, Vui } from '@vflow/ui';
 import { createEdges, createNodes, Vflow, VflowComponent } from 'ngx-vflow';
+import { DemoIconComponent, DemoIconName } from '../../../shared/demo-icon.component';
 
 interface StepData {
   title: string;
-  icon: string;
+  icon: DemoIconName;
   description: string;
   /** Application status: a word of this application, not a library lifecycle. */
   status: { tone: VuiTone; text: string; busy?: boolean };
@@ -14,7 +15,7 @@ interface StepData {
 
 @Component({
   selector: 'app-ui-workflow-demo',
-  imports: [Vflow, Vui],
+  imports: [Vflow, Vui, DemoIconComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
     article {
@@ -39,7 +40,7 @@ interface StepData {
   template: `
     <section class="demo" aria-label="Approval workflow demo" [vuiTheme]="dark() ? 'dark' : 'light'">
       <div class="controls">
-        <button vuiButton type="button" (click)="flow()?.fitView()">Fit workflow</button>
+        <button vuiButton="secondary" type="button" (click)="flow()?.fitView()">Fit workflow</button>
         <label><input type="checkbox" [checked]="dark()" (change)="dark.set(!dark())" /> Dark theme</label>
         <label><input type="checkbox" [checked]="readOnly()" (change)="toggleReadOnly()" /> Read only</label>
         <p>Approve the invoice; select a node to inspect it.</p>
@@ -55,7 +56,7 @@ interface StepData {
           <ng-template let-ctx vNode>
             <article vuiNode [vuiSelected]="ctx.selected() || ctx.preselected()">
               <header vuiNodeHeader>
-                <span vuiIcon aria-hidden="true">{{ ctx.data().icon }}</span>
+                <span vuiIcon><app-demo-icon [name]="ctx.data().icon" /></span>
                 <span vuiTitle>{{ ctx.data().title }}</span>
               </header>
               <div vuiNodeBody>
@@ -86,7 +87,7 @@ interface StepData {
                     </button>
                   } @else {
                     <button
-                      vuiButton
+                      vuiButton="secondary"
                       vNoDrag
                       type="button"
                       [disabled]="readOnly()"
@@ -120,7 +121,8 @@ interface StepData {
                   <div vuiToolbar>
                     <span>{{ readOnly() ? 'View only' : 'Drag to move' }}</span>
                     <button
-                      vuiButton
+                      vuiButton="plain"
+                      vuiButtonSize="sm"
                       vNoDrag
                       type="button"
                       [attr.aria-label]="'Details of ' + ctx.data().title"
@@ -153,8 +155,14 @@ interface StepData {
         </vflow>
         @if (flow(); as flow) {
           <vui-controls class="stage-controls" [flow]="flow">
-            <button vuiControlButton type="button" aria-label="Reset demo" title="Reset demo" (click)="reset()">
-              ↺
+            <button
+              vuiButton="plain"
+              vuiButtonIcon
+              type="button"
+              aria-label="Reset demo"
+              title="Reset demo"
+              (click)="reset()">
+              <app-demo-icon name="reset" />
             </button>
           </vui-controls>
         }
@@ -176,7 +184,7 @@ export class WorkflowDemoComponent {
       ariaLabel: 'Invoice received',
       data: {
         title: 'Invoice received',
-        icon: '↓',
+        icon: 'arrow-down',
         description: 'A new invoice from the supplier.',
         status: { tone: 'success', text: 'Complete' },
       },
@@ -187,7 +195,7 @@ export class WorkflowDemoComponent {
       ariaLabel: 'Finance review',
       data: {
         title: 'Finance review',
-        icon: '✓',
+        icon: 'check',
         description: 'Check the amount and approve payment.',
         status: { tone: 'warning', text: 'Waiting' },
         diagnostic: { tone: 'warning', text: 'Above limit' },
@@ -199,7 +207,7 @@ export class WorkflowDemoComponent {
       ariaLabel: 'Schedule payment',
       data: {
         title: 'Schedule payment',
-        icon: '→',
+        icon: 'arrow-right',
         description: 'Send the approved invoice to accounting.',
         status: { tone: 'info', text: 'Scheduling', busy: true },
       },
@@ -210,7 +218,7 @@ export class WorkflowDemoComponent {
       ariaLabel: 'Request correction',
       data: {
         title: 'Request correction',
-        icon: '!',
+        icon: 'alert',
         description: 'The supplier must provide a purchase order.',
         status: { tone: 'neutral', text: 'Waiting for supplier' },
         diagnostic: { tone: 'danger', text: 'Missing PO' },

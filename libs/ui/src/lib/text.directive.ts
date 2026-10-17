@@ -8,7 +8,7 @@ import { Directive } from '@angular/core';
       flex-1 min-w-vui-0 wrap-anywhere in-[.vui-node-header]:font-vui-strong
       [.vui-container>&]:block [.vui-container>&]:py-vui-2 [.vui-container>&]:px-vui-3
       [.vui-container>&]:font-vui-strong [.vui-container>&]:text-vui-title
-      [.vui-container>&]:border-b [.vui-container>&]:border-dashed [.vui-container>&]:border-vui-border`,
+      [.vui-container>&]:border-b [.vui-container>&]:border-vui-border/50`,
   },
 })
 export class VuiTitle {}

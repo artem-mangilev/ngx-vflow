@@ -13,7 +13,7 @@ type Flow = 'sequence' | 'message' | 'association';
   template: `
     <section class="demo" aria-label="BPMN presentation demo" [vuiTheme]="dark() ? 'dark' : 'light'">
       <div class="controls">
-        <button vuiButton type="button" (click)="flow()?.fitView()">Fit process</button>
+        <button vuiButton="secondary" type="button" (click)="flow()?.fitView()">Fit process</button>
         <label><input type="checkbox" [checked]="dark()" (change)="dark.set(!dark())" /> Dark theme</label>
         <p>Two pools with a message flow between them; drag tasks inside lanes. A visual subset without execution.</p>
       </div>
@@ -31,6 +31,7 @@ type Flow = 'sequence' | 'message' | 'association';
                 @if (ctx.node.id === 'supplier') {
                   <span
                     vuiPort
+                    vuiPortReveal="interaction"
                     handleType="target"
                     position="bottom"
                     handleId="message-in"
@@ -38,6 +39,7 @@ type Flow = 'sequence' | 'message' | 'association';
                     [offsetX]="ctx.width() * 0.4"></span>
                   <span
                     vuiPort
+                    vuiPortReveal="interaction"
                     handleType="source"
                     position="bottom"
                     handleId="message-out"
@@ -59,34 +61,99 @@ type Flow = 'sequence' | 'message' | 'association';
               @case ('task') {
                 <div vuiBpmnTask class="task" [vuiSelected]="ctx.selected() || ctx.preselected()">
                   {{ ctx.data().title }}
-                  <span vuiPort handleType="target" position="left" [canStart]="false" [canAccept]="false"></span>
-                  <span vuiPort handleType="source" position="right" [canStart]="false" [canAccept]="false"></span>
+                  <span
+                    vuiPort
+                    vuiPortReveal="interaction"
+                    handleType="target"
+                    position="left"
+                    [canStart]="false"
+                    [canAccept]="false"></span>
+                  <span
+                    vuiPort
+                    vuiPortReveal="interaction"
+                    handleType="source"
+                    position="right"
+                    [canStart]="false"
+                    [canAccept]="false"></span>
                   @if (ctx.node.id === 'notify') {
-                    <span vuiPort handleType="source" position="top" handleId="message-out" [canAccept]="false"></span>
+                    <span
+                      vuiPort
+                      vuiPortReveal="interaction"
+                      handleType="source"
+                      position="top"
+                      handleId="message-out"
+                      [canAccept]="false"></span>
                   }
                 </div>
               }
               @case ('exclusive') {
                 <div vuiBpmnGateway="exclusive" [vuiSelected]="ctx.selected() || ctx.preselected()">
                   <span vuiExternalLabel>{{ ctx.data().title }}</span>
-                  <span vuiPort handleType="target" position="left" [canStart]="false" [canAccept]="false"></span>
-                  <span vuiPort handleType="target" position="top" handleId="association" [canStart]="false"></span>
-                  <span vuiPort handleType="source" position="right" handleId="yes" [canStart]="false"></span>
-                  <span vuiPort handleType="source" position="bottom" handleId="no" [canStart]="false"></span>
+                  <span
+                    vuiPort
+                    vuiPortReveal="interaction"
+                    handleType="target"
+                    position="left"
+                    [canStart]="false"
+                    [canAccept]="false"></span>
+                  <span
+                    vuiPort
+                    vuiPortReveal="interaction"
+                    handleType="target"
+                    position="top"
+                    handleId="association"
+                    [canStart]="false"></span>
+                  <span
+                    vuiPort
+                    vuiPortReveal="interaction"
+                    handleType="source"
+                    position="right"
+                    handleId="yes"
+                    [canStart]="false"></span>
+                  <span
+                    vuiPort
+                    vuiPortReveal="interaction"
+                    handleType="source"
+                    position="bottom"
+                    handleId="no"
+                    [canStart]="false"></span>
                 </div>
               }
               @case ('parallel') {
                 <div vuiBpmnGateway="parallel" [vuiSelected]="ctx.selected() || ctx.preselected()">
                   <span vuiExternalLabel>{{ ctx.data().title }}</span>
-                  <span vuiPort handleType="target" position="left" [canStart]="false" [canAccept]="false"></span>
-                  <span vuiPort handleType="source" position="right" handleId="a" [canStart]="false"></span>
-                  <span vuiPort handleType="source" position="bottom" handleId="b" [canStart]="false"></span>
+                  <span
+                    vuiPort
+                    vuiPortReveal="interaction"
+                    handleType="target"
+                    position="left"
+                    [canStart]="false"
+                    [canAccept]="false"></span>
+                  <span
+                    vuiPort
+                    vuiPortReveal="interaction"
+                    handleType="source"
+                    position="right"
+                    handleId="a"
+                    [canStart]="false"></span>
+                  <span
+                    vuiPort
+                    vuiPortReveal="interaction"
+                    handleType="source"
+                    position="bottom"
+                    handleId="b"
+                    [canStart]="false"></span>
                 </div>
               }
               @case ('annotation') {
                 <div class="annotation" [vuiSelected]="ctx.selected() || ctx.preselected()">
                   {{ ctx.data().title }}
-                  <span vuiPort handleType="source" position="bottom" [canAccept]="false"></span>
+                  <span
+                    vuiPort
+                    vuiPortReveal="interaction"
+                    handleType="source"
+                    position="bottom"
+                    [canAccept]="false"></span>
                 </div>
               }
               @default {
@@ -96,12 +163,30 @@ type Flow = 'sequence' | 'message' | 'association';
                   }
                   <span vuiExternalLabel>{{ ctx.data().title }}</span>
                   @if (ctx.data().kind === 'start') {
-                    <span vuiPort handleType="target" position="top" handleId="message-in" [canStart]="false"></span>
+                    <span
+                      vuiPort
+                      vuiPortReveal="interaction"
+                      handleType="target"
+                      position="top"
+                      handleId="message-in"
+                      [canStart]="false"></span>
                   } @else {
-                    <span vuiPort handleType="target" position="left" [canStart]="false" [canAccept]="false"></span>
+                    <span
+                      vuiPort
+                      vuiPortReveal="interaction"
+                      handleType="target"
+                      position="left"
+                      [canStart]="false"
+                      [canAccept]="false"></span>
                   }
                   @if (ctx.data().kind !== 'end') {
-                    <span vuiPort handleType="source" position="right" [canStart]="false" [canAccept]="false"></span>
+                    <span
+                      vuiPort
+                      vuiPortReveal="interaction"
+                      handleType="source"
+                      position="right"
+                      [canStart]="false"
+                      [canAccept]="false"></span>
                   }
                 </div>
               }

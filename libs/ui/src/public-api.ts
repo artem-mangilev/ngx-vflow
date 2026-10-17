@@ -1,4 +1,4 @@
-export { VuiButton } from './lib/button.directive';
+export { VuiButton, VuiButtonVariant, VuiButtonSize } from './lib/button.directive';
 export { VuiTheme, VuiSelected } from './lib/theme.directive';
 export { VuiNode, VuiNodeHeader, VuiNodeBody, VuiNodeFooter } from './lib/node.directive';
 export { VuiField } from './lib/field.directive';
@@ -8,7 +8,7 @@ export { VuiPort } from './lib/port.directive';
 export { VuiStatus, VuiTone } from './lib/indicator.directive';
 export { VuiEdge, VuiEdgeLabel } from './lib/edge.directive';
 export { VuiToolbar, VuiExternalLabel } from './lib/overlay.directive';
-export { VuiControls, VuiControlButton, VuiControlsLabels } from './lib/controls.component';
+export { VuiControls, VuiControlsLabels } from './lib/controls.component';
 
 import { VuiButton } from './lib/button.directive';
 import { VuiTheme, VuiSelected } from './lib/theme.directive';
@@ -20,7 +20,7 @@ import { VuiPort } from './lib/port.directive';
 import { VuiStatus } from './lib/indicator.directive';
 import { VuiEdge, VuiEdgeLabel } from './lib/edge.directive';
 import { VuiToolbar, VuiExternalLabel } from './lib/overlay.directive';
-import { VuiControls, VuiControlButton } from './lib/controls.component';
+import { VuiControls } from './lib/controls.component';
 
 /** Convenience imports; every directive is also independently importable. */
 export const Vui = [
@@ -44,5 +44,4 @@ export const Vui = [
   VuiToolbar,
   VuiExternalLabel,
   VuiControls,
-  VuiControlButton,
 ] as const;

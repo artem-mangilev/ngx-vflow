@@ -1,16 +1,6 @@
-import { ChangeDetectionStrategy, Component, Directive, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { VflowComponent } from 'ngx-vflow';
-
-const BUTTON = `vui-control-button
-  inline-grid box-border place-items-center size-vui-7 rounded-vui-control border-0 bg-transparent
-  text-vui-foreground cursor-pointer transition duration-(--vui-duration) ease-vui enabled:hover:bg-vui-surface-muted
-  disabled:opacity-40 disabled:cursor-not-allowed
-  focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-vui-selection
-  forced-colors:border forced-colors:border-[ButtonText]`;
-
-/** Presentation for a consumer button placed inside `vui-controls`; give it an accessible name. */
-@Directive({ selector: 'button[vuiControlButton]', host: { class: BUTTON } })
-export class VuiControlButton {}
+import { VuiButton } from './button.directive';
 
 export interface VuiControlsLabels {
   group: string;
@@ -21,11 +11,11 @@ export interface VuiControlsLabels {
 
 /**
  * Viewport controls: zoom in, zoom out and fit view for the given flow instance, plus a slot for your
- * own `vuiControlButton` buttons. Zoom respects the flow's `minZoom`/`maxZoom`; positioning is yours.
+ * own buttons, styled as `<button vuiButton="plain" vuiButtonIcon>`. Zoom respects the flow's `minZoom`/`maxZoom`; positioning is yours.
  */
 @Component({
   selector: 'vui-controls',
-  imports: [VuiControlButton],
+  imports: [VuiButton],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: `vui-controls
@@ -37,7 +27,8 @@ export interface VuiControlsLabels {
   },
   template: `
     <button
-      vuiControlButton
+      vuiButton="plain"
+      vuiButtonIcon
       type="button"
       [attr.aria-label]="labels().zoomIn"
       [disabled]="!canZoomIn()"
@@ -55,7 +46,8 @@ export interface VuiControlsLabels {
       </svg>
     </button>
     <button
-      vuiControlButton
+      vuiButton="plain"
+      vuiButtonIcon
       type="button"
       [attr.aria-label]="labels().zoomOut"
       [disabled]="!canZoomOut()"
@@ -72,7 +64,12 @@ export interface VuiControlsLabels {
         <path d="M3 8h10" />
       </svg>
     </button>
-    <button vuiControlButton type="button" [attr.aria-label]="labels().fitView" (click)="flow().fitView()">
+    <button
+      vuiButton="plain"
+      vuiButtonIcon
+      type="button"
+      [attr.aria-label]="labels().fitView"
+      (click)="flow().fitView()">
       <svg
         aria-hidden="true"
         width="16"

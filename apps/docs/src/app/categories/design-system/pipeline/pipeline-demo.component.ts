@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, signal, viewChild, WritableSignal } from '@angular/core';
 import { Vui } from '@vflow/ui';
+import { DemoIconComponent, DemoIconName } from '../../../shared/demo-icon.component';
 import {
   addEdges,
   Connection,
@@ -21,7 +22,7 @@ interface Port {
 }
 interface StageData {
   title: string;
-  icon: string;
+  icon: DemoIconName;
   kind: 'source' | 'transcode' | 'mix' | 'publish';
   inputs: Port[];
   outputs: Port[];
@@ -30,7 +31,7 @@ interface StageData {
 /** A media pipeline: typed, labeled ports as field rows, rich body content and native controls inside nodes. */
 @Component({
   selector: 'app-ui-pipeline-demo',
-  imports: [Vflow, Vui],
+  imports: [Vflow, Vui, DemoIconComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
     article {
@@ -39,15 +40,22 @@ interface StageData {
     vflow {
       height: 520px;
     }
-    /* Port color by type is application CSS on the public selector; the library knows nothing about media types. */
+    /* Port color by type is application CSS on the public selector; the library knows nothing about media types.
+       Only the idle look is recolored, so connection feedback (valid, invalid) keeps the library colors. */
     .vui-port[data-type='video'] {
-      background: #2563eb;
+      --type: #2563eb;
     }
     .vui-port[data-type='audio'] {
-      background: #16a34a;
+      --type: #16a34a;
     }
     .vui-port[data-type='image'] {
-      background: #d97706;
+      --type: #d97706;
+    }
+    .vui-port[data-type][data-vui-state='idle'] {
+      border-color: var(--type);
+    }
+    .vui-port[data-type][data-vui-state='idle'][data-vui-connected='true'] {
+      background: var(--type);
     }
     .vui-field.output {
       justify-content: flex-end;
@@ -65,6 +73,15 @@ interface StageData {
     .setting select,
     .setting input {
       width: 100%;
+    }
+    .setting.check {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .setting.check input {
+      width: auto;
+      margin: 0;
     }
     .clip {
       display: block;
@@ -87,7 +104,7 @@ interface StageData {
   template: `
     <section class="demo" aria-label="Media pipeline demo" [vuiTheme]="dark() ? 'dark' : 'light'">
       <div class="controls">
-        <button vuiButton type="button" (click)="flow()?.fitView()">Fit pipeline</button>
+        <button vuiButton="secondary" type="button" (click)="flow()?.fitView()">Fit pipeline</button>
         <label><input type="checkbox" [checked]="dark()" (change)="dark.set(!dark())" /> Dark theme</label>
         <p>Connect ports of the same type. Controls inside nodes do not drag or zoom the graph.</p>
       </div>
@@ -101,7 +118,7 @@ interface StageData {
         <ng-template let-ctx vNode>
           <article vuiNode [vuiSelected]="ctx.selected() || ctx.preselected()" [attr.data-stage]="ctx.node.id">
             <header vuiNodeHeader>
-              <span vuiIcon aria-hidden="true">{{ ctx.data().icon }}</span>
+              <span vuiIcon><app-demo-icon [name]="ctx.data().icon" /></span>
               <span vuiTitle>{{ ctx.data().title }}</span>
               @if (ctx.node.id === 'transcode') {
                 <span [vuiStatus]="encoding() ? 'info' : 'neutral'" [vuiStatusBusy]="encoding()">{{
@@ -117,7 +134,7 @@ interface StageData {
                     <circle cx="150" cy="35" r="18" fill="#f97316" />
                     <path d="M0 90 L60 45 L110 75 L150 55 L200 80 L200 90 Z" fill="#65a30d" />
                   </svg>
-                  <p vuiMeta>sunset.mov · 00:42 · 1920×1080</p>
+                  <p vuiMeta>sunset.mov, 1920×1080, 0:42</p>
                 </div>
               }
               @case ('transcode') {
@@ -141,10 +158,9 @@ interface StageData {
                       [value]="bitrate()"
                       (input)="bitrate.set(+$any($event.target).value)" />
                   </label>
-                  <label class="setting">
-                    <span>
-                      <input vNoDrag type="checkbox" [checked]="advanced()" (change)="toggleAdvanced()" /> Poster output
-                    </span>
+                  <label class="setting check">
+                    <input vNoDrag type="checkbox" [checked]="advanced()" (change)="toggleAdvanced()" />
+                    Poster output
                   </label>
                 </div>
               }
@@ -160,7 +176,7 @@ interface StageData {
               }
               @default {
                 <div vuiNodeBody>
-                  <p vuiMeta>{{ resolution() }} · {{ bitrate() }} Mbit/s · {{ edges().length }} inputs wired</p>
+                  <p vuiMeta>{{ resolution() }} at {{ bitrate() }} Mbit/s, {{ edges().length }} inputs wired</p>
                 </div>
               }
             }
@@ -220,7 +236,7 @@ export class PipelineDemoComponent {
       'source',
       { x: 20, y: 40 },
       'Source clip',
-      '▶',
+      'play',
       'source',
       [],
       [
@@ -232,7 +248,7 @@ export class PipelineDemoComponent {
       'transcode',
       { x: 330, y: 20 },
       'Transcode',
-      '⚙',
+      'sliders',
       'transcode',
       [{ id: 'video', name: 'Video', type: 'video' }],
       [{ id: 'video', name: 'Video', type: 'video' }],
@@ -241,7 +257,7 @@ export class PipelineDemoComponent {
       'mix',
       { x: 330, y: 340 },
       'Audio mix',
-      '♫',
+      'waveform',
       'mix',
       [{ id: 'audio', name: 'Audio', type: 'audio' }],
       [{ id: 'audio', name: 'Audio', type: 'audio' }],
@@ -250,7 +266,7 @@ export class PipelineDemoComponent {
       'publish',
       { x: 640, y: 150 },
       'Publish',
-      '☁',
+      'upload',
       'publish',
       [
         { id: 'video', name: 'Video', type: 'video' },
@@ -316,7 +332,7 @@ function stage(
   id: string,
   point: { x: number; y: number },
   title: string,
-  icon: string,
+  icon: DemoIconName,
   kind: StageData['kind'],
   inputs: Port[],
   outputs: Port[],

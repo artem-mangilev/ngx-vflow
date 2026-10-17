@@ -94,7 +94,7 @@ const SPANISH: Partial<AriaLabelConfig> = {
           Press Tab to enter the graph, Enter to select, the arrow keys to move a selected node and Delete to remove the
           focused node or edge. The Editor node keeps its own input and button.
         </p>
-        <button vuiButton type="button" (click)="spanish.set(!spanish())">Switch graph language</button>
+        <button vuiButton="secondary" type="button" (click)="spanish.set(!spanish())">Switch graph language</button>
       </div>
       <vflow
         view="auto"
@@ -111,7 +111,7 @@ const SPANISH: Partial<AriaLabelConfig> = {
                 <input vNoDrag aria-label="Node title" placeholder="Node title" />
               </div>
               <footer vuiNodeFooter>
-                <button vuiButton vNoDrag type="button" (click)="removeEditor()">Remove editor</button>
+                <button vuiButton="secondary" vNoDrag type="button" (click)="removeEditor()">Remove editor</button>
               </footer>
             </article>
           } @else {

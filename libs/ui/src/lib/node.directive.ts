@@ -1,7 +1,8 @@
 import { Directive } from '@angular/core';
 
 /**
- * Card shell; dimensions, content, semantics and interaction belong to the consumer and core. The resting shadow has
+ * Card shell. Its border is the edge of the surface; the separators inside (header, footer, field rows) are half as
+ * strong so the card reads as one surface. Dimensions, content, semantics and interaction belong to the consumer and core. The resting shadow has
  * no blur: a blurred shadow is rasterized again on every zoom step and pan of every visible node, which on a large
  * flow at a high pixel ratio costs more GPU time than the rest of the node.
  */
@@ -21,7 +22,7 @@ export class VuiNode {}
   selector: '[vuiNodeHeader]',
   host: {
     class: `vui-node-header
-      flex items-center gap-vui-2 p-vui-3 border-b border-vui-border
+      flex items-center gap-vui-2 p-vui-3 border-b border-vui-border/50
       font-vui-strong`,
   },
 })
@@ -34,7 +35,7 @@ export class VuiNodeBody {}
   selector: '[vuiNodeFooter]',
   host: {
     class: `vui-node-footer
-      flex flex-wrap items-center gap-vui-2 p-vui-3 border-t border-vui-border`,
+      flex flex-wrap items-center gap-vui-2 p-vui-3 border-t border-vui-border/50`,
   },
 })
 export class VuiNodeFooter {}

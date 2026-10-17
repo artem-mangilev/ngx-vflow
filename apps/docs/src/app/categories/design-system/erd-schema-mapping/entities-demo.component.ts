@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, signal, viewChild, WritableSignal } from '@angular/core';
 import { Vui } from '@vflow/ui';
+import { DemoIconComponent } from '../../../shared/demo-icon.component';
 import {
   addEdges,
   Connection,
@@ -21,7 +22,7 @@ interface EntityData {
 
 @Component({
   selector: 'app-ui-entities-demo',
-  imports: [Vflow, Vui],
+  imports: [Vflow, Vui, DemoIconComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
     article {
@@ -34,12 +35,6 @@ interface EntityData {
       min-width: 22px;
       color: var(--vui-info);
     }
-    .remove {
-      border: 0;
-      background: transparent;
-      color: inherit;
-      cursor: pointer;
-    }
   `,
   template: `
     <section
@@ -48,10 +43,10 @@ interface EntityData {
       [vuiTheme]="dark() ? 'dark' : 'light'"
       [style.--vui-space]="compact() ? '3px' : '4px'">
       <div class="controls">
-        <button vuiButton type="button" (click)="flow()?.fitView()">Fit entities</button>
-        <button vuiButton type="button" (click)="reverseFields()">Reverse fields</button>
-        <button vuiButton type="button" (click)="renameField()">Rename email</button>
-        <button vuiButton type="button" (click)="toggleLongNames()">Long names</button>
+        <button vuiButton="secondary" type="button" (click)="flow()?.fitView()">Fit entities</button>
+        <button vuiButton="secondary" type="button" (click)="reverseFields()">Reverse fields</button>
+        <button vuiButton="secondary" type="button" (click)="renameField()">Rename email</button>
+        <button vuiButton="secondary" type="button" (click)="toggleLongNames()">Long names</button>
         <label><input type="checkbox" [checked]="compact()" (change)="compact.set(!compact())" /> Compact</label>
         <label><input type="checkbox" [checked]="dark()" (change)="dark.set(!dark())" /> Dark theme</label>
         <p>Connect matching field types; names and row order can change.</p>
@@ -75,12 +70,14 @@ interface EntityData {
                 <span vuiTitle>{{ field.name }}</span>
                 <span vuiMeta>{{ field.type }}</span>
                 <button
+                  vuiButton="plain"
+                  vuiButtonSize="sm"
+                  vuiButtonIcon
                   vNoDrag
-                  class="remove"
                   type="button"
                   [attr.aria-label]="'Delete ' + ctx.data().title + '.' + field.name"
                   (click)="deleteField(ctx.node.id, field.id)">
-                  ×
+                  <app-demo-icon name="close" />
                 </button>
                 <span
                   vuiPort
@@ -106,12 +103,14 @@ interface EntityData {
             <span *vEdgeLabel vuiEdgeLabel>
               {{ label }}
               <button
+                vuiButton="plain"
+                vuiButtonSize="sm"
+                vuiButtonIcon
                 vNoDrag
-                class="remove"
                 type="button"
                 [attr.aria-label]="'Remove ' + label + ' connection'"
                 (click)="removeEdge(ctx.edge.id)">
-                ×
+                <app-demo-icon name="close" />
               </button>
             </span>
           }

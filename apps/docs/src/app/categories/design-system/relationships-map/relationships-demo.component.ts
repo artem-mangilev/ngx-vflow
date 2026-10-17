@@ -94,7 +94,7 @@ type MapData = Person | Metric | Note | Team;
   template: `
     <section class="demo" aria-label="Relationships and metrics map demo" [vuiTheme]="dark() ? 'dark' : 'light'">
       <div class="controls">
-        <button vuiButton type="button" (click)="flow()?.fitView()">Fit map</button>
+        <button vuiButton="secondary" type="button" (click)="flow()?.fitView()">Fit map</button>
         <label><input type="checkbox" [checked]="dark()" (change)="dark.set(!dark())" /> Dark theme</label>
         <label><input type="checkbox" [checked]="viewMode()" (change)="toggleViewMode()" /> View mode</label>
         <p>
@@ -115,7 +115,7 @@ type MapData = Person | Metric | Note | Team;
               [style.width.px]="ctx.width()"
               [style.height.px]="ctx.height()">
               <span vuiTitle
-                >{{ ctx.data().title }} <span vuiMeta>· {{ ctx.data().members }} people</span></span
+                >{{ ctx.data().title }} <span vuiMeta>{{ ctx.data().members }} people</span></span
               >
               <!-- The container has its own connections; it is not a parent of the other team. -->
               <span
@@ -152,7 +152,7 @@ type MapData = Person | Metric | Note | Team;
                     <span vuiTitle>{{ ctx.data().name }}</span>
                   </header>
                   <div vuiNodeBody>
-                    <p vuiMeta>{{ ctx.data().role }} · {{ ctx.data().reviews }} reviews this month</p>
+                    <p vuiMeta>{{ ctx.data().role }}, {{ ctx.data().reviews }} reviews this month</p>
                     <div class="meter" role="img" [attr.aria-label]="ctx.data().reviews + ' of 20 reviews'">
                       <span [style.width.%]="ctx.data().reviews * 5"></span>
                     </div>
@@ -221,23 +221,23 @@ export class RelationshipsDemoComponent {
     {
       id: 'platform',
       point: { x: 20, y: 20 },
-      width: 440,
+      width: 520,
       height: 300,
       ariaLabel: 'Platform team',
       data: { kind: 'team', title: 'Platform', members: 2 },
     },
     {
       id: 'growth',
-      point: { x: 560, y: 20 },
-      width: 440,
+      point: { x: 720, y: 20 },
+      width: 520,
       height: 300,
       ariaLabel: 'Growth team',
       data: { kind: 'team', title: 'Growth', members: 2 },
     },
     person('ana', { x: 20, y: 50 }, 'platform', 'Ana Lima', 'Lead', 'AL', 210, 14),
-    person('ben', { x: 230, y: 160 }, 'platform', 'Ben Osei', 'Engineer', 'BO', 150, 9),
-    person('chi', { x: 20, y: 50 }, 'growth', 'Chi Nguyen', 'Engineer', 'CN', 20, 6),
-    person('dea', { x: 230, y: 160 }, 'growth', 'Dea Rossi', 'Analyst', 'DR', 280, 11),
+    person('ben', { x: 310, y: 160 }, 'platform', 'Ben Osei', 'Engineer', 'BO', 150, 9),
+    person('chi', { x: 20, y: 170 }, 'growth', 'Chi Nguyen', 'Engineer', 'CN', 20, 6),
+    person('dea', { x: 310, y: 50 }, 'growth', 'Dea Rossi', 'Analyst', 'DR', 280, 11),
     {
       id: 'deploys',
       point: { x: 20, y: 360 },
@@ -246,7 +246,7 @@ export class RelationshipsDemoComponent {
     },
     {
       id: 'note',
-      point: { x: 560, y: 360 },
+      point: { x: 720, y: 360 },
       ariaLabel: 'Note',
       data: { kind: 'note', text: 'Q3 focus: fewer handoffs between the two teams.' },
     },

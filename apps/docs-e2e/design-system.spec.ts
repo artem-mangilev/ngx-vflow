@@ -493,3 +493,28 @@ test('ERD: deleting a field removes its edges and leaves no detached endpoints',
   await expect(demo.locator('path.vui-edge')).toHaveCount(1);
   await expect(demo.locator('.vui-port[data-vui-connected="true"]')).toHaveCount(2);
 });
+
+test('BPMN ports stay hidden until their node is hovered, also while a connection is drawn', async ({ page }) => {
+  await page.goto('/design-system/bpmn');
+  const demo = page.locator('app-ui-bpmn-demo');
+  await demo.scrollIntoViewIfNeeded();
+  const nodeWith = (text: string) =>
+    demo.locator('.v-node', { has: page.locator('.vui-bpmn-task', { hasText: text }) });
+  const port = nodeWith('Validate invoice').locator('.vui-port').first();
+  await expect(port).toHaveCSS('opacity', '0');
+
+  await nodeWith('Validate invoice').locator('.vui-bpmn-task').hover();
+  await expect(port).toHaveCSS('opacity', '1');
+
+  // A connection does not reveal every target: only the node under the pointer shows its ports.
+  const target = nodeWith('Manual approval');
+  const elsewhere = nodeWith('Notify supplier').locator('.vui-port').first();
+  const source = (await demo.locator('.vui-bpmn-pool .vui-port[handleid="message-out"]').boundingBox())!;
+  const over = (await target.locator('.vui-bpmn-task').boundingBox())!;
+  await page.mouse.move(source.x + source.width / 2, source.y + source.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(over.x + over.width / 2, over.y + over.height / 2, { steps: 10 });
+  await expect(target.locator('.vui-port').first()).toHaveCSS('opacity', '1');
+  await expect(elsewhere).toHaveCSS('opacity', '0');
+  await page.mouse.up();
+});

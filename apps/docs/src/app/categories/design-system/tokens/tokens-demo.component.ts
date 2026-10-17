@@ -1,10 +1,11 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { Vui } from '@vflow/ui';
+import { DemoIconComponent } from '../../../shared/demo-icon.component';
 
 /** The token scales of both shipped themes, drawn with the theme variables and the parts that use them. */
 @Component({
   selector: 'app-ui-tokens-demo',
-  imports: [Vui],
+  imports: [Vui, DemoIconComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
     .themes {
@@ -90,7 +91,7 @@ import { Vui } from '@vflow/ui';
       @for (theme of themes; track theme) {
         <div class="theme" [vuiTheme]="theme" [attr.data-testid]="'tokens-' + theme">
           <div>
-            <h3>Color · {{ theme }}</h3>
+            <h3>{{ theme === 'light' ? 'Light' : 'Dark' }} theme colors</h3>
             <div class="swatches">
               @for (color of colors; track color) {
                 <div class="swatch">
@@ -102,13 +103,13 @@ import { Vui } from '@vflow/ui';
           </div>
           <div>
             <h3>Type</h3>
-            <div class="caption">Caption 11/14 — meta, statuses, labels</div>
-            <div class="body">Body 13/18 — content, fields, buttons</div>
-            <div class="body"><strong>Headline 13/18 semibold — node titles</strong></div>
-            <div class="title">Title 15/20 — containers, pools</div>
+            <div class="caption">Caption 11/14: meta, statuses, labels</div>
+            <div class="body">Body 13/18: content, fields, buttons</div>
+            <div class="body"><strong>Headline 13/18 semibold: node titles</strong></div>
+            <div class="title">Title 15/20: containers, pools</div>
           </div>
           <div>
-            <h3>Spacing · 4pt grid</h3>
+            <h3>Spacing on a 4pt grid</h3>
             <div class="row">
               @for (units of spacing; track units) {
                 <div class="space" [style.--units]="units">
@@ -119,7 +120,7 @@ import { Vui } from '@vflow/ui';
             </div>
           </div>
           <div>
-            <h3>Radius · concentric</h3>
+            <h3>Concentric radius</h3>
             <div class="row">
               <div class="radius" style="border-radius: var(--vui-radius)">control</div>
               <div class="radius" style="border-radius: calc(var(--vui-radius) + var(--vui-space))">surface</div>
@@ -127,16 +128,33 @@ import { Vui } from '@vflow/ui';
             </div>
           </div>
           <div>
+            <h3>Buttons</h3>
+            <div class="row">
+              <button vuiButton type="button">Primary</button>
+              <button vuiButton="secondary" type="button">Secondary</button>
+              <button vuiButton="plain" type="button">Plain</button>
+              <button vuiButton="secondary" vuiButtonSize="sm" type="button">Small</button>
+              <button vuiButton="plain" vuiButtonSize="sm" vuiButtonIcon type="button" aria-label="Close">
+                <app-demo-icon name="close" />
+              </button>
+              <button vuiButton type="button" disabled>Disabled</button>
+            </div>
+          </div>
+          <div>
             <h3>Elevation and parts</h3>
             <div class="row" style="align-items: flex-start">
               <article vuiNode>
-                <header vuiNodeHeader><span vuiTitle>Node · flat</span></header>
+                <header vuiNodeHeader><span vuiTitle>Flat node</span></header>
                 <div vuiNodeBody><span vuiMeta>No blurred shadow on nodes</span></div>
               </article>
               <div vuiToolbar>
-                <button vuiControlButton type="button" aria-label="Zoom in">+</button>
-                <button vuiControlButton type="button" aria-label="Zoom out">−</button>
-                <button vuiButton type="button">Floating</button>
+                <button vuiButton="plain" vuiButtonIcon type="button" aria-label="Zoom in">
+                  <app-demo-icon name="plus" />
+                </button>
+                <button vuiButton="plain" vuiButtonIcon type="button" aria-label="Zoom out">
+                  <app-demo-icon name="minus" />
+                </button>
+                <button vuiButton="plain" type="button">Floating</button>
               </div>
             </div>
           </div>

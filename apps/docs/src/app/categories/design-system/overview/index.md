@@ -59,12 +59,24 @@ The node shell's resting shadow has no blur (`0 1px 0`). A blurred shadow is ras
 Three kinds of state stay separate so they can be shown at once:
 
 - **Interaction** is owned by core: bind `vuiSelected` to `ctx.selected() || ctx.preselected()`. Focus comes from the core wrapper.
-- **Diagnostics** about the model and **application status** are both your vocabulary. Each is one `vuiStatus` indicator with a tone and your text; place two side by side to show a warning next to a running status. `vuiStatusBusy` adds activity, which is presentation only and never disables anything.
+- **Diagnostics** about the model and **application status** are both your vocabulary. Each is one `vuiStatus` indicator with a tone and your text; place two side by side to show a warning next to a running status. `vuiStatusBusy` adds a pulsing dot, which is presentation only and never disables anything; the text must name the activity ("Running", "Syncing"), and an indicator that changes while the user works belongs in a `role="status"` region of yours so screen readers hear it.
 - **Action availability** is the native `disabled` attribute on your buttons, driven by your rules such as read-only.
 
 Ports mirror two independent facts: the core feedback for the connection in progress (`idle`, `valid`, `invalid`),
 read from the core handle that `vuiPort` applies to the same element (`vuiPortState` only overrides it); `vuiPortConnected` is your
-knowledge about existing edges.
+knowledge about existing edges. An idle port is a 12px ring, filled once connected; an invalid target is a dashed red ring,
+so the state does not depend on color alone. A pseudo-element widens the pointer target to 28px along the node side and
+8px into the node, never outward, where the end of a connected edge takes reconnection presses; the endpoint does not move. `vuiPortReveal="interaction"` keeps idle ports without edges invisible until their node is hovered,
+focused or selected, which suits notations such as BPMN that draw no connection points. While a connection is drawn,
+the ports of a node appear when the pointer reaches it; ports of other nodes stay hidden but remain targets. Hover does
+not follow a finger, so keep the default `always` where users connect by touch.
+
+### Buttons
+
+`vuiButton` takes a variant: `primary` (the default) for the one main action of an area, `secondary` for other
+actions, and `plain` for actions in rows, labels, toolbars and viewport controls. `vuiButtonSize="sm"` is 24px, the
+smallest target WCAG 2.2 accepts without spacing; `vuiButtonIcon` makes the button square for an icon, which then
+needs an accessible name. Hover and pressed states darken the accent or strengthen the neutral fill.
 
 ### Edges
 
@@ -76,7 +88,7 @@ are declared with the core `vEdgeLabel` structural directive inside the edge tem
 ### Viewport controls
 
 `<vui-controls [flow]="flow">` renders zoom in, zoom out and fit view for the given `VflowComponent`
-instance, clamped to its `minZoom`/`maxZoom`, and projects your own `<button vuiControlButton>` elements.
+instance, clamped to its `minZoom`/`maxZoom`, and projects your own buttons, styled as `<button vuiButton="plain" vuiButtonIcon>`.
 Position the element yourself, above the flow pane. Editing toggles, form controls and business actions are
 not part of the library; `@vflow/ui` declares `ngx-vflow` as a peer dependency for this component.
 
@@ -90,28 +102,28 @@ for message flows. Execution semantics, BPMN XML and model validation belong to 
 
 ## Directive reference
 
-| Import                                             | Attribute                                                            | Responsibility                                                                  |
-| -------------------------------------------------- | -------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
-| `VuiTheme`                                         | `[vuiTheme]="'light'"`                                               | Scoped light/dark semantic tokens                                               |
-| `VuiSelected`                                      | `[vuiSelected]="ctx.selected() \|\| ctx.preselected()"`              | Selection presentation; no interaction or ARIA changes                          |
-| `VuiNode`                                          | `vuiNode`                                                            | Node surface; consumer chooses size and content                                 |
-| `VuiNodeHeader`, `VuiNodeBody`, `VuiNodeFooter`    | `vuiNodeHeader`, `vuiNodeBody`, `vuiNodeFooter`                      | Optional anatomy on consumer elements                                           |
-| `VuiField`                                         | `vuiField`                                                           | Field row with room for text roles and core handles                             |
-| `VuiContainer`                                     | `vuiContainer`                                                       | Frame; parent relationships remain explicit in graph data                       |
-| `VuiTitle`, `VuiMeta`                              | `vuiTitle`, `vuiMeta`                                                | Primary wrapping text and secondary text in any shell                           |
-| `VuiIcon`, `VuiActions`                            | `vuiIcon`, `vuiActions`                                              | Icon slot and a group of controls; add `vNoDrag` to each                        |
-| `VuiPort`                                          | `vuiPort handleType="target" position="left" [vuiPortConnected]="…"` | A core handle with the port look: idle/valid/invalid from the handle, connected |
-| `VuiStatus`                                        | `[vuiStatus]="'warning'" [vuiStatusBusy]="true"`                     | Indicator: semantic tone, your text and optional activity                       |
-| `VuiEdge`                                          | `vuiEdge` on an SVG path                                             | Stroke; bind core path and marker URLs yourself                                 |
-| `VuiEdgeLabel`                                     | `vuiEdgeLabel`                                                       | HTML label surface, including optional native controls                          |
-| `VuiToolbar`                                       | `vuiToolbar`                                                         | Surface for `v-node-toolbar` content                                            |
-| `VuiExternalLabel`                                 | `vuiExternalLabel`                                                   | Label below a positioned shape                                                  |
-| `VuiControls`, `VuiControlButton`                  | `<vui-controls [flow]="flow">`, `button[vuiControlButton]`           | Viewport controls for one flow instance and custom buttons                      |
-| `VuiBpmnEvent` (bpmn)                              | `[vuiBpmnEvent]="'start'"`                                           | Start/intermediate/end event outlines                                           |
-| `VuiBpmnGateway` (bpmn)                            | `[vuiBpmnGateway]="'exclusive'"`                                     | Diamond with × or + marker; text goes in `vuiExternalLabel`                     |
-| `VuiBpmnTask`, `VuiBpmnPool`, `VuiBpmnLane` (bpmn) | `vuiBpmnTask`, `vuiBpmnPool`, `vuiBpmnLane`                          | Task card, participant frame and lane frame                                     |
-| `VuiBpmnFlow` (bpmn)                               | `[vuiBpmnFlow]="'message'"` on an SVG path                           | Sequence, message or association line style                                     |
-| `VuiButton`                                        | `vuiButton` on a native button                                       | Button presentation with focus and disabled states                              |
+| Import                                             | Attribute                                                                   | Responsibility                                                                                   |
+| -------------------------------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| `VuiTheme`                                         | `[vuiTheme]="'light'"`                                                      | Scoped light/dark semantic tokens                                                                |
+| `VuiSelected`                                      | `[vuiSelected]="ctx.selected() \|\| ctx.preselected()"`                     | Selection presentation; no interaction or ARIA changes                                           |
+| `VuiNode`                                          | `vuiNode`                                                                   | Node surface; consumer chooses size and content                                                  |
+| `VuiNodeHeader`, `VuiNodeBody`, `VuiNodeFooter`    | `vuiNodeHeader`, `vuiNodeBody`, `vuiNodeFooter`                             | Optional anatomy on consumer elements                                                            |
+| `VuiField`                                         | `vuiField`                                                                  | Field row with room for text roles and core handles                                              |
+| `VuiContainer`                                     | `vuiContainer`                                                              | Tinted group with a hairline; parent relationships remain explicit in graph data                 |
+| `VuiTitle`, `VuiMeta`                              | `vuiTitle`, `vuiMeta`                                                       | Primary wrapping text and secondary text in any shell                                            |
+| `VuiIcon`, `VuiActions`                            | `vuiIcon`, `vuiActions`                                                     | Icon slot and a group of controls; add `vNoDrag` to each                                         |
+| `VuiPort`                                          | `vuiPort handleType="target" position="left" [vuiPortConnected]="…"`        | A core handle with the port look: idle/valid/invalid from the handle, connected, `vuiPortReveal` |
+| `VuiStatus`                                        | `[vuiStatus]="'warning'" [vuiStatusBusy]="true"`                            | Indicator: semantic tone, your text and optional activity                                        |
+| `VuiEdge`                                          | `vuiEdge` on an SVG path                                                    | Stroke; bind core path and marker URLs yourself                                                  |
+| `VuiEdgeLabel`                                     | `vuiEdgeLabel`                                                              | HTML label surface, including optional native controls                                           |
+| `VuiToolbar`                                       | `vuiToolbar`                                                                | Surface for `v-node-toolbar` content                                                             |
+| `VuiExternalLabel`                                 | `vuiExternalLabel`                                                          | Label below a positioned shape                                                                   |
+| `VuiControls`                                      | `<vui-controls [flow]="flow">`                                              | Viewport controls for one flow instance; project plain icon buttons                              |
+| `VuiBpmnEvent` (bpmn)                              | `[vuiBpmnEvent]="'start'"`                                                  | Start/intermediate/end event outlines                                                            |
+| `VuiBpmnGateway` (bpmn)                            | `[vuiBpmnGateway]="'exclusive'"`                                            | Diamond with × or + marker; text goes in `vuiExternalLabel`                                      |
+| `VuiBpmnTask`, `VuiBpmnPool`, `VuiBpmnLane` (bpmn) | `vuiBpmnTask`, `vuiBpmnPool`, `vuiBpmnLane`                                 | Task card, participant frame and lane frame                                                      |
+| `VuiBpmnFlow` (bpmn)                               | `[vuiBpmnFlow]="'message'"` on an SVG path                                  | Sequence, message or association line style                                                      |
+| `VuiButton`                                        | `vuiButton="secondary" vuiButtonSize="sm" vuiButtonIcon` on a native button | Primary, secondary and plain variants, two sizes, focus, pressed and disabled states             |
 
 Each directive is independently importable. Apart from `vui-controls`, none imports ngx-vflow; none owns
 graph state, adds wrapper elements, registers ports or changes accessibility roles. Public selectors are the
