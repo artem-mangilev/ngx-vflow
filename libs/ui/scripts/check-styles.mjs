@@ -3,7 +3,9 @@
 //    imported, so `p-3`, `text-xs` or a typo fail here instead of silently doing nothing).
 // 2. Arbitrary values are limited to the allowlist below: system colors, SVG properties without utilities and
 //    named geometric constants. Everything else comes from a scale.
-// 3. dist/libs/ui/styles.source.css, compiled the way a consumer's Tailwind v4 pipeline would, generates
+// 3. The stylesheet generates nothing else: a word in a source comment that Tailwind takes for a utility
+//    (`grid`, `ring`) would ship as a global class, so it must be excluded with `@source not inline(...)`.
+// 4. dist/libs/ui/styles.source.css, compiled the way a consumer's Tailwind v4 pipeline would, generates
 //    every utility the parts use. Byte equality with styles.css is not expected: without a prefix Tailwind
 //    also picks words from source comments, which the published code no longer has.
 import { execFileSync } from 'node:child_process';
@@ -25,6 +27,8 @@ const ARBITRARY_PROPERTIES = /^\[(stroke-linejoin|forced-color-adjust):[^\]]+\]$
 // A part may point its local variable at a theme token, e.g. the status tone: `[--vui-tone:var(--vui-success)]`.
 const LOCAL_TOKENS = /^\[--vui-[\w-]+:var\(--vui-[\w-]+\)\]$/;
 const ALLOWED = new Map([["content-['']", 'generated content of a pseudo-element']]);
+// Classes of other packages that part selectors refer to, e.g. the core node host in the port reveal rule.
+const EXTERNAL_CLASSES = new Set(['v-node']);
 
 /** Class lists are the `class:` host values and the upper-case constants they interpolate. */
 function classTokens(file) {
@@ -59,8 +63,16 @@ function arbitraryError(utility) {
   return null;
 }
 
+/** Class names in the selectors of a stylesheet; comments, declarations and at-rule preludes are skipped. */
 function generatedClasses(css) {
-  return new Set([...css.matchAll(/\.((?:\\.|[\w-])+)/g)].map((m) => m[1].replace(/\\(.)/g, '$1')));
+  const selectors = [...css.replace(/\/\*[\s\S]*?\*\//g, '').matchAll(/(?:^|[{};])([^{};]+)(?=\{)/g)]
+    .map((m) => m[1].trim())
+    .filter((prelude) => !prelude.startsWith('@'));
+  return new Set(
+    selectors.flatMap((selector) =>
+      [...selector.matchAll(/\.((?:\\.|[\w-])+)/g)].map((m) => m[1].replace(/\\(.)/g, '$1')),
+    ),
+  );
 }
 
 const compiled = generatedClasses(readFileSync(join(dist, 'styles.css'), 'utf8'));
@@ -72,6 +84,12 @@ for (const file of sources) {
     const arbitrary = arbitraryError(utilityOf(token));
     if (arbitrary) errors.push(`${file}: ${token}: ${arbitrary}`);
     else if (!compiled.has(token)) errors.push(`${file}: ${token}: not generated, not a utility of the vui scales`);
+  }
+}
+
+for (const name of compiled) {
+  if (!used.has(name) && !name.startsWith('vui-') && !EXTERNAL_CLASSES.has(name)) {
+    errors.push(`styles.css: .${name}: generated but used by no part; exclude the word with @source not inline(...)`);
   }
 }
 

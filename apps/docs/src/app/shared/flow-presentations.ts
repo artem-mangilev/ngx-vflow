@@ -54,7 +54,9 @@ interface EdgeCtx {
         [style.width.px]="ctx().width()"
         [style.height.px]="ctx().height()">
         @if (title(); as title) {
-          <span vuiTitle>{{ title }}</span>
+          <header vuiContainerHeader>
+            <span vuiTitle>{{ title }}</span>
+          </header>
         }
       </div>
     } @else {

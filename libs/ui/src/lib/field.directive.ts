@@ -6,7 +6,7 @@ import { Directive } from '@angular/core';
   host: {
     class: `vui-field
       flex items-center gap-vui-2 min-h-vui-8 px-vui-3 py-vui-1
-      [.vui-field+&]:border-t [.vui-field+&]:border-vui-border/50`,
+      [.vui-field+&]:border-t [.vui-field+&]:border-vui-separator`,
   },
 })
 export class VuiField {}

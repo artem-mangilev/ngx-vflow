@@ -124,14 +124,14 @@ import { DemoIconComponent } from '../../../shared/demo-icon.component';
           <div>
             <h3>Buttons</h3>
             <div class="row">
-              <button vuiButton type="button">Primary</button>
+              <button vuiButton="primary" type="button">Primary</button>
               <button vuiButton="secondary" type="button">Secondary</button>
               <button vuiButton="plain" type="button">Plain</button>
               <button vuiButton="secondary" vuiButtonSize="sm" type="button">Small</button>
               <button vuiButton="plain" vuiButtonSize="sm" vuiButtonIcon type="button" aria-label="Close">
                 <app-demo-icon name="close" />
               </button>
-              <button vuiButton type="button" disabled>Disabled</button>
+              <button vuiButton="primary" type="button" disabled>Disabled</button>
             </div>
           </div>
           <div>
@@ -173,6 +173,7 @@ export class TokensDemoComponent {
     'foreground',
     'muted',
     'border',
+    'separator',
     'accent',
     'on-accent',
     'selection',

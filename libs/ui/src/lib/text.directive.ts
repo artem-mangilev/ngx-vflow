@@ -1,20 +1,14 @@
 import { Directive } from '@angular/core';
 
-/** Primary text of a card header, field row or container: takes the remaining width and wraps. */
+/** Primary text of a card header, field row or container header: takes the remaining width and wraps. */
 @Directive({
   selector: '[vuiTitle]',
-  host: {
-    class: `vui-title
-      flex-1 min-w-vui-0 wrap-anywhere in-[.vui-node-header]:font-vui-strong
-      [.vui-container>&]:block [.vui-container>&]:py-vui-2 [.vui-container>&]:px-vui-3
-      [.vui-container>&]:font-vui-strong
-      [.vui-container>&]:border-b [.vui-container>&]:border-vui-border/50`,
-  },
+  host: { class: 'vui-title flex-1 min-w-vui-0 wrap-anywhere' },
 })
 export class VuiTitle {}
 
-/** Secondary text such as a category, type, key or timestamp. */
-@Directive({ selector: '[vuiMeta]', host: { class: 'vui-meta text-vui-muted text-vui-caption' } })
+/** Secondary text such as a category, type, key or timestamp; regular weight even inside a header. */
+@Directive({ selector: '[vuiMeta]', host: { class: 'vui-meta text-vui-muted text-vui-caption font-vui-normal' } })
 export class VuiMeta {}
 
 /**
@@ -25,7 +19,7 @@ export class VuiMeta {}
   selector: '[vuiIcon]',
   host: {
     class: `vui-icon inline-flex items-center justify-center flex-none w-vui-4 h-lh
-      before:content-(--vui-baseline-strut)`,
+      before:content-vui-strut`,
   },
 })
 export class VuiIcon {}

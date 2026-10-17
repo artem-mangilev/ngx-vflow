@@ -114,9 +114,10 @@ type MapData = Person | Metric | Note | Team;
               [vuiSelected]="ctx.selected() || ctx.preselected()"
               [style.width.px]="ctx.width()"
               [style.height.px]="ctx.height()">
-              <span vuiTitle
-                >{{ ctx.data().title }} <span vuiMeta>{{ ctx.data().members }} people</span></span
-              >
+              <header vuiContainerHeader>
+                <span vuiTitle>{{ ctx.data().title }}</span>
+                <span vuiMeta>{{ ctx.data().members }} people</span>
+              </header>
               <!-- The container has its own connections; it is not a parent of the other team. -->
               <span
                 vuiPort

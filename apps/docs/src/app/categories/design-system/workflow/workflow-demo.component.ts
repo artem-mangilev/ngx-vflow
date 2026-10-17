@@ -78,7 +78,7 @@ interface StepData {
                 <span vuiActions>
                   @if (ctx.node.id === 'review') {
                     <button
-                      vuiButton
+                      vuiButton="primary"
                       vNoDrag
                       type="button"
                       [disabled]="readOnly() || approved()"

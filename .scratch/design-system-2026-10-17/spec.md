@@ -71,13 +71,13 @@
 | `body`     | 13 / 18px              | regular    | содержимое, поля, кнопки (semibold)       |
 | `headline` | 13 / 18px              | semibold   | заголовки нод и контейнеров               |
 
-`font-sans`: `system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`; `font-mono`: `ui-monospace, "SF Mono", Menlo, monospace` (типы полей ERD). Все размеры в px — граф масштабируется zoom, а не root font-size.
+`font-sans`: `system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`. `font-mono` удалён 2026-10-17: ни одна часть и ни одно демо его не использовали. Все размеры в px — граф масштабируется zoom, а не root font-size.
 
 Правила текста (2026-10-17): части сами задают семейство, размер, высоту строки и насыщенность и сбрасывают `letter-spacing` приложения; область темы включает `antialiased`. Элементы заголовка выравниваются по базовой линии первой строки title (слот иконки получает нулевую опорную строку). Роль `title` 15/20 удалена: заголовок контейнера — headline. Типографика контента внутри нод остаётся за потребителем; шрифт docs — системный, как у частей.
 
 ### Отступы и размеры
 
-- Сетка 4pt: именованные ключи `--spacing-vui-N = N × --vui-space` (N = 0–8, 10, 12, 14, 16), utilities `p-vui-3`, `size-vui-7`. Глобальный `--spacing` потребителя не переопределяется.
+- Сетка 4pt: именованные ключи `--spacing-vui-N = N × --vui-space` (N = 0–8; 10–16 удалены 2026-10-17 — их не использовала ни одна часть), utilities `p-vui-3`, `size-vui-7`. Глобальный `--spacing` потребителя не переопределяется.
 - Высота контролов: `sm` 24px (иконки в toolbar), `md` 28px (кнопки, controls), `lg` 32px.
 - Строка поля: 32px; внутренние отступы ноды 12px; gap 8px.
 - Порт: 16px (4 шага) с рамкой 2px цвета `surface`, видимая точка 12px. Порт — сама зона захвата (увеличенной hit area у core нет), поэтому меньше прежних 14px не делаем.
@@ -129,7 +129,7 @@
 
 - В манифест записываются версия и хэш каждого сгенерированного файла: будущий `update` сможет отличить нетронутые файлы от изменённых. Сам `update` в этот объём не входит.
 - Имена селекторов и классов остаются `vui*` / `Vui*` (ADR-0008); опции смены префикса нет.
-- Каталог для `add`: `theme`, `selected`, `node`, `field`, `container`, `text`, `port`, `status`, `edge`, `toolbar`, `external-label`, `button`, `controls`.
+- Каталог для `add`: `theme`, `selected`, `node`, `field`, `container` (с `vuiContainerHeader`), `text`, `port`, `status`, `edge`, `toolbar`, `button`, `controls`. `external-label` удалён 2026-10-17 (наследие BPMN).
 
 ## Источник истины в репозитории
 

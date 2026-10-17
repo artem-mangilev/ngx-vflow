@@ -15,11 +15,12 @@ Set these on a `vuiTheme` scope or any element inside it. Everything else is der
 | `--vui-surface`                                                | `#fff` / `#2c2c2e`      | Nodes, labels, floating surfaces                                                |
 | `--vui-surface-muted`                                          | 12% / 24% gray fill     | Containers, pools, hover; translucent so it works on any layer                  |
 | `--vui-foreground`, `--vui-muted`                              | at least 12.8:1 / 4.6:1 | Primary and secondary text, edge strokes                                        |
-| `--vui-border`                                                 | `#c6c6c8` / `#545458`   | Hairline borders and separators                                                 |
+| `--vui-border`                                                 | `#c6c6c8` / `#545458`   | Hairline border of a surface                                                    |
+| `--vui-separator`                                              | border at 50%           | Header, footer and row separators inside a surface                              |
 | `--vui-accent`, `--vui-on-accent`                              | `#0071e3` on white      | Primary button fill and its text (4.7:1 in both themes)                         |
 | `--vui-selection`                                              | `#0071e3` / `#0a84ff`   | Selection and focus rings, selected edges, connecting ports                     |
 | `--vui-success`, `--vui-warning`, `--vui-danger`, `--vui-info` | text-safe tones         | Status tones and port validity, at least 4.5:1 on the surface and on their tint |
-| `--vui-font-sans`, `--vui-font-mono`                           | system stack            | Typefaces                                                                       |
+| `--vui-font-sans`                                              | system stack            | Typeface                                                                        |
 | `--vui-font-size`                                              | `13px`                  | Body size; the type scale follows it                                            |
 | `--vui-space`                                                  | `4px`                   | Grid unit; every padding, gap and control size follows it                       |
 | `--vui-radius`                                                 | `6px`                   | Control radius; surfaces add one grid unit                                      |
@@ -36,7 +37,7 @@ like `--vui-info`, which keeps 4.5:1 on the surface in both themes.
 | Scale     | Steps                                                                                                                              |
 | --------- | ---------------------------------------------------------------------------------------------------------------------------------- |
 | Type      | caption 11/14 (body − 2px), body 13/18, headline 13/18 semibold                                                                    |
-| Spacing   | multiples of `--vui-space`: 1–8, 10, 12, 14, 16 units                                                                              |
+| Spacing   | multiples of `--vui-space`: 0–8 units                                                                                              |
 | Controls  | 24, 28, 32px (6, 7, 8 units); buttons and viewport controls 28px (`sm` 24px), field rows 32px, ports 12px with a 28 by 20px target |
 | Radius    | control `--vui-radius`, surface `--vui-radius + --vui-space`, full                                                                 |
 | Elevation | nodes: hairline border and an unblurred shadow; toolbars and controls: translucent material                                        |
@@ -46,17 +47,18 @@ stays above 4.5:1 on its tint in both themes; it uses the control radius like bu
 when the title wraps. The icon slot is four grid units wide and one line high, with a zero-width text strut that gives it
 the line's baseline, so a 16px SVG is centered on that line.
 
-Parts set their own font family, size, line height and weight, and reset the letter spacing an application may set on
-its body. A theme scope turns on grayscale antialiasing, as native macOS text does; without it light text on the dark
-theme renders heavier. Text inside your node content keeps your own typography.
+Parts set their own font family, size, line height and weight, reset the letter spacing an application may set on
+its body and use grayscale antialiasing, as native macOS text does; without it light text on the dark theme renders
+heavier. These settings are on the parts, not on the theme scope, so a `vuiTheme` on your application root does not
+change the rest of your page. Secondary text keeps the regular weight inside a header.
 
-Buttons come in three variants on the same 28px (or 24px `sm`) geometry: the accent `primary` for the one main
-action of an area, a neutral `secondary` fill and a `plain` button without a fill at rest. Hover and pressed darken the
+Buttons come in three variants on the same 28px (or 24px `sm`) geometry: a neutral `secondary` fill, the default,
+the accent `primary` for the one main action of an area and a `plain` button without a fill at rest. Hover and pressed darken the
 accent or strengthen the neutral fill toward the foreground; the steps derive from the theme, so they need no
 variables of their own.
 
-Inside a card, the header, footer and field separators are half as strong as the card border, so the card reads as
-one surface. A container is a tinted group with a hairline, not a dashed frame.
+Inside a card, the header, footer and field separators use `--vui-separator`, half as strong as the card border, so
+the card reads as one surface. A container is a tinted group with a hairline, not a dashed frame.
 
 Corners are concentric: a toolbar wraps its buttons at one grid unit, so its radius is the button radius plus
 one unit. Change `--vui-radius` or `--vui-space` and the relation holds.

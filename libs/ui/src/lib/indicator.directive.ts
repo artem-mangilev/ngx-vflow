@@ -12,7 +12,7 @@ export type VuiTone = 'neutral' | 'info' | 'success' | 'warning' | 'danger';
   host: {
     class: `vui-status
       inline-flex box-border items-center gap-vui-1 min-h-vui-5 px-vui-2 rounded-vui-control border border-transparent
-      bg-vui-tone/16 text-vui-tone-ink font-vui-sans tracking-vui-normal text-vui-caption font-vui-medium
+      bg-vui-tone/16 text-vui-tone-ink font-vui-sans tracking-vui-normal antialiased text-vui-caption font-vui-medium
       [--vui-tone:var(--vui-muted)] data-[vui-tone=info]:[--vui-tone:var(--vui-info)]
       data-[vui-tone=success]:[--vui-tone:var(--vui-success)] data-[vui-tone=warning]:[--vui-tone:var(--vui-warning)]
       data-[vui-tone=danger]:[--vui-tone:var(--vui-danger)]

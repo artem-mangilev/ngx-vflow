@@ -13,8 +13,9 @@
 @layer theme, vui, utilities;
 @import 'tailwindcss/utilities.css' layer(utilities) source(none);
 @source './lib';
-/* Words from doc comments that would otherwise become global utilities, e.g. `.container { width: 100% }`. */
-@source not inline('container visible outline transform');
+/* Words from doc comments that would otherwise become global utilities, e.g. `.grid { display: grid }`.
+   `check-styles` fails on any generated class that no part uses, so a new word shows up there. */
+@source not inline('container visible invisible outline transform grid ring');
 
 /*
  * Every value derives from the theme variables of the next layer. `inline` makes utilities use the
@@ -22,12 +23,12 @@
  * rescales the parts inside it.
  */
 @theme inline {
-  --color-vui-canvas: var(--vui-canvas);
   --color-vui-surface: var(--vui-surface);
   --color-vui-surface-muted: var(--vui-surface-muted);
   --color-vui-foreground: var(--vui-foreground);
   --color-vui-muted: var(--vui-muted);
   --color-vui-border: var(--vui-border);
+  --color-vui-separator: var(--vui-separator);
   --color-vui-accent: var(--vui-accent);
   --color-vui-on-accent: var(--vui-on-accent);
   --color-vui-selection: var(--vui-selection);
@@ -46,11 +47,11 @@
   --color-vui-tone-ink: color-mix(in oklab, var(--vui-tone) 80%, var(--vui-foreground));
 
   --font-vui-sans: var(--vui-font-sans);
-  --font-vui-mono: var(--vui-font-mono);
+  --font-weight-vui-normal: 400;
   --font-weight-vui-medium: 500;
+  --font-weight-vui-strong: 600;
   /* Parts reset the letter spacing an application may set on its body, so text keeps the font's own spacing. */
   --tracking-vui-normal: normal;
-  --font-weight-vui-strong: 600;
 
   /* Type scale around the body size: caption 11/14 and body 13/18 at the default 13px; headlines are body semibold. */
   --text-vui-caption: calc(var(--vui-font-size) - 2px);
@@ -68,10 +69,6 @@
   --spacing-vui-6: calc(var(--vui-space) * 6);
   --spacing-vui-7: calc(var(--vui-space) * 7);
   --spacing-vui-8: calc(var(--vui-space) * 8);
-  --spacing-vui-10: calc(var(--vui-space) * 10);
-  --spacing-vui-12: calc(var(--vui-space) * 12);
-  --spacing-vui-14: calc(var(--vui-space) * 14);
-  --spacing-vui-16: calc(var(--vui-space) * 16);
 
   /* Concentric corners: a surface wraps controls at one spacing unit, so its radius is one unit larger. */
   --radius-vui-control: var(--vui-radius);
@@ -91,6 +88,12 @@
   }
 }
 
+/* A zero-width space as generated content: gives an empty slot the text baseline of its line. */
+@utility content-vui-strut {
+  --tw-content: '\200b';
+  content: var(--tw-content);
+}
+
 @layer vui {
   /* Defaults let the parts render without a theme scope; they do not touch core tokens. */
   :root,
@@ -101,6 +104,8 @@
     --vui-foreground: #1d1d1f;
     --vui-muted: #6e6e73;
     --vui-border: #c6c6c8;
+    /* Separators inside a surface (header, footer, rows) are half as strong as its border. */
+    --vui-separator: rgb(198 198 200 / 0.5);
     --vui-accent: #0071e3;
     --vui-on-accent: #fff;
     --vui-selection: #0071e3;
@@ -112,14 +117,11 @@
     --vui-shadow-floating: 0 4px 16px rgb(0 0 0 / 0.12), 0 0 0 0.5px rgb(0 0 0 / 0.08);
 
     --vui-font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    --vui-font-mono: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, Consolas, monospace;
     --vui-font-size: 13px;
     --vui-space: 4px;
     --vui-radius: 6px;
     --vui-duration: 150ms;
     --vui-ease: cubic-bezier(0.25, 0.1, 0.25, 1);
-    /* A zero-width space: gives an icon slot a text baseline, so it aligns with the first line of a title. */
-    --vui-baseline-strut: '\200b';
   }
 
   [data-vui-theme='dark'] {
@@ -129,6 +131,7 @@
     --vui-foreground: #f5f5f7;
     --vui-muted: #aeaeb2;
     --vui-border: #545458;
+    --vui-separator: rgb(84 84 88 / 0.5);
     --vui-accent: #0071e3;
     --vui-on-accent: #fff;
     --vui-selection: #0a84ff;
@@ -153,14 +156,9 @@
     --v-selection: var(--vui-selection);
     --v-focus: var(--vui-selection);
     /* Node parts are rounded with the surface radius, so the core focus ring follows the same corners. */
-    --v-focus-radius: calc(var(--vui-radius) + var(--vui-space));
-  }
-  [data-vui-theme] {
-    /* Native checkboxes, radios, ranges and progress bars inside nodes take the accent. */
+    --v-focus-radius: --theme(--radius-vui-surface);
+    /* Native checkboxes, radios, ranges and progress bars inside the scope take the accent. */
     accent-color: var(--vui-accent);
-    /* Grayscale antialiasing as in native macOS: without it light text on the dark theme renders heavier. */
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
   }
   [data-vui-theme='light'] {
     color-scheme: light;
