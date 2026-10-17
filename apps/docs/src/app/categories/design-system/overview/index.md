@@ -12,7 +12,7 @@ Each page in this section shows one reference composition, its code and its limi
 
 - `Workflow` — cards, branching, edge labels, native actions, independent status and diagnostics, viewport controls.
 - `Data and media pipeline` — typed labeled ports, rich body content, native controls inside nodes.
-- `ERD and schema mapping` — field rows with ports, stable field IDs through rename, reorder and deletion, a scroll/collapse experiment.
+- `ERD and schema mapping` — rows with ports for entity fields, stable field IDs through rename, reorder and deletion, a scroll/collapse experiment.
 - `Relationships and metrics map` — containers with their own connections, a note without ports, metrics and images, view mode.
 
 ## Setup
@@ -42,15 +42,15 @@ UI rules live in Tailwind cascade layers, so unlayered application CSS overrides
 
 Directives add a public class to your own element and nothing else: no wrappers, no roles, no graph state.
 Compose the parts with plain HTML and content projection; anything not listed here (descriptions, forms,
-images, charts, notes, menus) is your content inside `vuiNodeBody` or a field row.
+images, charts, notes, menus) is your content inside `vuiNodeBody` or a row.
 
-| Area       | Parts                                                                                                                |
-| ---------- | -------------------------------------------------------------------------------------------------------------------- |
-| Shells     | `vuiNode` with `vuiNodeHeader`, `vuiNodeBody`, `vuiNodeFooter`; `vuiField`; `vuiContainer` with `vuiContainerHeader` |
-| Text roles | `vuiTitle`, `vuiMeta`, `vuiIcon`, `vuiActions`, usable in any shell, label or toolbar                                |
-| Port       | `vuiPort` with `handleType`, `position` and the other handle inputs: a core handle with the port look                |
-| Edge       | `vuiEdge` on the SVG path, `vuiEdgeLabel` for HTML labels                                                            |
-| Extras     | `vuiStatus`, `vuiToolbar`, `vuiButton`                                                                               |
+| Area       | Parts                                                                                                              |
+| ---------- | ------------------------------------------------------------------------------------------------------------------ |
+| Shells     | `vuiNode` with `vuiNodeHeader`, `vuiNodeBody`, `vuiNodeFooter`; `vuiRow`; `vuiContainer` with `vuiContainerHeader` |
+| Text roles | `vuiTitle`, `vuiMeta`, `vuiIcon`, `vuiActions`, usable in any shell, label or toolbar                              |
+| Port       | `vuiPort` with `handleType`, `position` and the other handle inputs: a core handle with the port look              |
+| Edge       | `vuiEdge` on the SVG path, `vuiEdgeLabel` for HTML labels                                                          |
+| Extras     | `vuiStatus`, `vuiToolbar`, `vuiButton`                                                                             |
 
 The node shell's resting shadow has no blur (`0 1px 0`). A blurred shadow is rasterized again for every visible node on every zoom step and pan, which on a large flow at a high device pixel ratio costs more GPU time than the rest of the node; see the measurement on the Virtualization page. Blurred shadows and translucent material are reserved for floating layers: toolbars and viewport controls.
 
@@ -99,7 +99,7 @@ not part of the library; `@vflow/ui` declares `ngx-vflow` as a peer dependency f
 | `VuiSelected`                                   | `[vuiSelected]="ctx.selected() \|\| ctx.preselected()"`                   | Selection presentation; no interaction or ARIA changes                                           |
 | `VuiNode`                                       | `vuiNode`                                                                 | Node surface; consumer chooses size and content                                                  |
 | `VuiNodeHeader`, `VuiNodeBody`, `VuiNodeFooter` | `vuiNodeHeader`, `vuiNodeBody`, `vuiNodeFooter`                           | Optional anatomy on consumer elements                                                            |
-| `VuiField`                                      | `vuiField`                                                                | Field row with room for text roles and core handles                                              |
+| `VuiRow`                                        | `vuiRow`                                                                  | Row (field, typed port, list item) with room for text roles and core handles                     |
 | `VuiContainer`                                  | `vuiContainer`                                                            | Tinted group with a hairline; parent relationships remain explicit in graph data                 |
 | `VuiContainerHeader`                            | `vuiContainerHeader`                                                      | Title row of a container with room for meta, an icon and actions                                 |
 | `VuiTitle`, `VuiMeta`                           | `vuiTitle`, `vuiMeta`                                                     | Primary wrapping text and secondary text in any shell                                            |

@@ -112,7 +112,7 @@ const ALL_VISIBLE: Visibility = { visible: new Set(), above: [], below: [], key:
             @if (!ctx.data().collapsed) {
               <div class="rows" vNoWheel [attr.data-rows]="ctx.node.id" (scroll)="onScroll(ctx.node.id, $event)">
                 @for (row of rows(ctx.node.id, ctx.data()); track row.key) {
-                  <div vuiField [attr.data-field]="row.field.id">
+                  <div vuiRow [attr.data-field]="row.field.id">
                     <span vuiTitle>{{ row.field.name }}</span>
                     <span vuiMeta>{{ row.field.type }}</span>
                     @if (row.handles) {

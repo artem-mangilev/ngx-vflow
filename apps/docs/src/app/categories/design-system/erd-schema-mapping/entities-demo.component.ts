@@ -65,7 +65,7 @@ interface EntityData {
               <span vuiMeta>{{ ctx.data().category }}</span>
             </header>
             @for (field of ctx.data().fields; track field.id) {
-              <div vuiField [attr.data-field]="field.id">
+              <div vuiRow [attr.data-field]="field.id">
                 <span vuiMeta class="key">{{ field.key }}</span>
                 <span vuiTitle>{{ field.name }}</span>
                 <span vuiMeta>{{ field.type }}</span>

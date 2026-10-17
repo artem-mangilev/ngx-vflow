@@ -28,7 +28,7 @@ interface StageData {
   outputs: Port[];
 }
 
-/** A media pipeline: typed, labeled ports as field rows, rich body content and native controls inside nodes. */
+/** A media pipeline: typed, labeled ports as rows, rich body content and native controls inside nodes. */
 @Component({
   selector: 'app-ui-pipeline-demo',
   imports: [Vflow, Vui, DemoIconComponent],
@@ -57,11 +57,11 @@ interface StageData {
     .vui-port[data-type][data-vui-state='idle'][data-vui-connected='true'] {
       background: var(--type);
     }
-    .vui-field.output {
+    .vui-row.output {
       justify-content: flex-end;
       text-align: end;
     }
-    .vui-field.output .vui-title {
+    .vui-row.output .vui-title {
       flex: none;
     }
     .setting {
@@ -181,7 +181,7 @@ interface StageData {
               }
             }
             @for (port of ctx.data().inputs; track port.id) {
-              <div vuiField [attr.data-port]="port.id">
+              <div vuiRow [attr.data-port]="port.id">
                 <span
                   vuiPort
                   handleType="target"
@@ -194,7 +194,7 @@ interface StageData {
               </div>
             }
             @for (port of ctx.data().outputs; track port.id) {
-              <div vuiField class="output" [attr.data-port]="port.id">
+              <div vuiRow class="output" [attr.data-port]="port.id">
                 <span vuiMeta>{{ port.type }}</span>
                 <span vuiTitle>{{ port.name }}</span>
                 <span

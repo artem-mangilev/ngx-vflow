@@ -29,18 +29,18 @@ Set these on a `vuiTheme` scope or any element inside it. Everything else is der
 
 The system `#007aff` blue is not used for the accent fill: white text on it reaches only 4.0:1. The dark theme
 keeps the brighter `#0a84ff` for rings and lines, where it is a non-text indicator, which is why accent and
-selection are separate variables. Accent is a fill: for colored text, such as a key badge in a field row, use a tone
+selection are separate variables. Accent is a fill: for colored text, such as a key badge in a row, use a tone
 like `--vui-info`, which keeps 4.5:1 on the surface in both themes.
 
 ## Scales
 
-| Scale     | Steps                                                                                                                              |
-| --------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| Type      | caption 11/14 (body − 2px), body 13/18, headline 13/18 semibold                                                                    |
-| Spacing   | multiples of `--vui-space`: 0–8 units                                                                                              |
-| Controls  | 24, 28, 32px (6, 7, 8 units); buttons and viewport controls 28px (`sm` 24px), field rows 32px, ports 12px with a 28 by 20px target |
-| Radius    | control `--vui-radius`, surface `--vui-radius + --vui-space`, full                                                                 |
-| Elevation | nodes: hairline border and an unblurred shadow; toolbars and controls: translucent material                                        |
+| Scale     | Steps                                                                                                                        |
+| --------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| Type      | caption 11/14 (body − 2px), body 13/18, headline 13/18 semibold                                                              |
+| Spacing   | multiples of `--vui-space`: 0–8 units                                                                                        |
+| Controls  | 24, 28, 32px (6, 7, 8 units); buttons and viewport controls 28px (`sm` 24px), rows 32px, ports 12px with a 28 by 20px target |
+| Radius    | control `--vui-radius`, surface `--vui-radius + --vui-space`, full                                                           |
+| Elevation | nodes: hairline border and an unblurred shadow; toolbars and controls: translucent material                                  |
 
 A status badge is a tint of its tone (16%) with text of the same hue mixed 80/20 with the foreground, so it
 stays above 4.5:1 on its tint in both themes; it uses the control radius like buttons. Headers align every item to the first line of the title: an icon, a meta label, a badge or a button stays beside it

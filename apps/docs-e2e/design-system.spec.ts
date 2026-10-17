@@ -1,7 +1,7 @@
 import { expect, Locator, test } from '@playwright/test';
 
 async function rowAlignment(demo: Locator) {
-  return demo.locator('[vuiField]').evaluateAll((rows) =>
+  return demo.locator('[vuiRow]').evaluateAll((rows) =>
     Math.max(
       ...rows.flatMap((row) => {
         const rect = row.getBoundingClientRect();
@@ -79,7 +79,7 @@ test('field connections follow stable IDs through rename, reorder, density and r
   await demo.getByRole('button', { name: 'Rename email', exact: true }).click();
   await expect(demo.locator('[data-entity="crm"] [data-field="email"]')).toContainText('primary_email');
   await demo.getByRole('button', { name: 'Reverse fields', exact: true }).click();
-  await expect(demo.locator('[data-entity="crm"] [vuiField]').first()).toHaveAttribute('data-field', 'name');
+  await expect(demo.locator('[data-entity="crm"] [vuiRow]').first()).toHaveAttribute('data-field', 'name');
   await expect.poll(() => rowAlignment(demo)).toBeLessThan(1);
   await demo.getByLabel('Compact', { exact: true }).check();
   await expect.poll(() => rowAlignment(demo)).toBeLessThan(1);
@@ -387,7 +387,7 @@ test('scroll and collapse experiment: model kept, endpoints move to the header a
   await demo.evaluate((element) => element.scrollIntoView({ block: 'center' }));
   await expect(demo.locator('path.vui-edge')).toHaveCount(2);
   const rows = demo.locator('[data-rows="product"]');
-  await expect(rows.locator('[vuiField]')).toHaveCount(12);
+  await expect(rows.locator('[vuiRow]')).toHaveCount(12);
   const edgeStart = (index: number) =>
     demo.evaluate((root, i) => {
       const edge = root.querySelectorAll<SVGPathElement>('path.vui-edge')[i];
@@ -430,7 +430,7 @@ test('scroll and collapse experiment: model kept, endpoints move to the header a
   await expect.poll(distance(0, headerPort)).toBeLessThan(1.5);
   // Expand: the same field IDs restore the endpoints on the rows.
   await demo.getByRole('button', { name: 'Expand Product', exact: true }).click();
-  await expect(rows.locator('[vuiField]')).toHaveCount(12);
+  await expect(rows.locator('[vuiRow]')).toHaveCount(12);
   await expect.poll(distance(1, rowPort)).toBeLessThan(1.5);
   await expect.poll(distance(0, footerPort)).toBeLessThan(1.5);
 });
@@ -441,7 +441,7 @@ test('ERD: deleting a field removes its edges and leaves no detached endpoints',
   await demo.scrollIntoViewIfNeeded();
   await expect(demo.locator('path.vui-edge')).toHaveCount(2);
   await demo.getByRole('button', { name: 'Delete CRM contact.email', exact: true }).click();
-  await expect(demo.locator('[data-entity="crm"] [vuiField]')).toHaveCount(1);
+  await expect(demo.locator('[data-entity="crm"] [vuiRow]')).toHaveCount(1);
   await expect(demo.locator('path.vui-edge')).toHaveCount(1);
   await expect(demo.locator('.vui-port[data-vui-connected="true"]')).toHaveCount(2);
 });

@@ -35,15 +35,15 @@ layers; unlayered application styles override them.
 
 ## Parts
 
-| Area       | Parts                                                                                                                |
-| ---------- | -------------------------------------------------------------------------------------------------------------------- |
-| Shells     | `vuiNode` with `vuiNodeHeader`, `vuiNodeBody`, `vuiNodeFooter`; `vuiField`; `vuiContainer` with `vuiContainerHeader` |
-| Text roles | `vuiTitle`, `vuiMeta`, `vuiIcon`, `vuiActions`                                                                       |
-| Port       | `vuiPort`: a core handle with the port look                                                                          |
-| Edge       | `vuiEdge` on the SVG path, `vuiEdgeLabel` for HTML labels                                                            |
-| Extras     | `vuiStatus`, `vuiToolbar`, `vuiButton` (`secondary` by default, `primary`, `plain`)                                  |
-| State      | `vuiTheme`, `vuiSelected`                                                                                            |
-| Viewport   | `<vui-controls [flow]="flow">`: zoom in/out, fit view and your own buttons for one flow                              |
+| Area       | Parts                                                                                                              |
+| ---------- | ------------------------------------------------------------------------------------------------------------------ |
+| Shells     | `vuiNode` with `vuiNodeHeader`, `vuiNodeBody`, `vuiNodeFooter`; `vuiRow`; `vuiContainer` with `vuiContainerHeader` |
+| Text roles | `vuiTitle`, `vuiMeta`, `vuiIcon`, `vuiActions`                                                                     |
+| Port       | `vuiPort`: a core handle with the port look                                                                        |
+| Edge       | `vuiEdge` on the SVG path, `vuiEdgeLabel` for HTML labels                                                          |
+| Extras     | `vuiStatus`, `vuiToolbar`, `vuiButton` (`secondary` by default, `primary`, `plain`)                                |
+| State      | `vuiTheme`, `vuiSelected`                                                                                          |
+| Viewport   | `<vui-controls [flow]="flow">`: zoom in/out, fit view and your own buttons for one flow                            |
 
 Bind `vuiSelected` to `ctx.selected() || ctx.preselected()`. Put `vuiPort` with the handle inputs `handleType`,
 `position`, `handleId`, `canStart` and `canAccept` on the element that is the connection point: it applies core

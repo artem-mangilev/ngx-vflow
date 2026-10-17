@@ -1,4 +1,4 @@
-The same `vuiField` structure serves both Customer/Order relationships and CRM/ERP mapping.
+The same `vuiRow` structure serves both Customer/Order relationships and CRM/ERP mapping.
 Handles use stable field IDs, so renaming a field and reversing rows preserve endpoints.
 Input and output IDs are distinct (`in:field-id` and `out:field-id`) and independent of visible names.
 Drag between ports of matching types to add a connection; remove it using its label button.

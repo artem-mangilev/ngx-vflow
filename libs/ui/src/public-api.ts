@@ -1,7 +1,7 @@
 export { VuiButton, VuiButtonVariant, VuiButtonSize } from './lib/button.directive';
 export { VuiTheme, VuiSelected } from './lib/theme.directive';
 export { VuiNode, VuiNodeHeader, VuiNodeBody, VuiNodeFooter } from './lib/node.directive';
-export { VuiField } from './lib/field.directive';
+export { VuiRow } from './lib/row.directive';
 export { VuiContainer, VuiContainerHeader } from './lib/container.directive';
 export { VuiTitle, VuiMeta, VuiIcon, VuiActions } from './lib/text.directive';
 export { VuiPort } from './lib/port.directive';
@@ -13,7 +13,7 @@ export { VuiControls, VuiControlsLabels } from './lib/controls.component';
 import { VuiButton } from './lib/button.directive';
 import { VuiTheme, VuiSelected } from './lib/theme.directive';
 import { VuiNode, VuiNodeHeader, VuiNodeBody, VuiNodeFooter } from './lib/node.directive';
-import { VuiField } from './lib/field.directive';
+import { VuiRow } from './lib/row.directive';
 import { VuiContainer, VuiContainerHeader } from './lib/container.directive';
 import { VuiTitle, VuiMeta, VuiIcon, VuiActions } from './lib/text.directive';
 import { VuiPort } from './lib/port.directive';
@@ -31,7 +31,7 @@ export const Vui = [
   VuiNodeHeader,
   VuiNodeBody,
   VuiNodeFooter,
-  VuiField,
+  VuiRow,
   VuiContainer,
   VuiContainerHeader,
   VuiTitle,

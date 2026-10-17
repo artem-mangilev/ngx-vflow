@@ -106,7 +106,7 @@ const SPANISH: Partial<AriaLabelConfig> = {
           @if (ctx.node.id === 'editor') {
             <article vuiNode class="editor" [vuiSelected]="ctx.selected() || ctx.preselected()">
               <header vuiNodeHeader><span vuiTitle>Editor</span></header>
-              <div vuiField>
+              <div vuiRow>
                 <span vuiPort handleType="target" position="left"></span>
                 <input vNoDrag aria-label="Node title" placeholder="Node title" />
               </div>

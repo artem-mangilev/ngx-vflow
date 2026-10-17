@@ -1,7 +1,7 @@
 import { Directive } from '@angular/core';
 
 /**
- * Card shell. Its border is the edge of the surface; the separators inside (header, footer, field rows) use the
+ * Card shell. Its border is the edge of the surface; the separators inside (header, footer, rows) use the
  * lighter `separator` color so the card reads as one surface. Dimensions, content, semantics and interaction belong to the consumer and core. The resting shadow has
  * no blur: a blurred shadow is rasterized again on every zoom step and pan of every visible node, which on a large
  * flow at a high pixel ratio costs more GPU time than the rest of the node.
