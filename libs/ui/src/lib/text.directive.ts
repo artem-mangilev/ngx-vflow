@@ -7,7 +7,7 @@ import { Directive } from '@angular/core';
     class: `vui-title
       flex-1 min-w-vui-0 wrap-anywhere in-[.vui-node-header]:font-vui-strong
       [.vui-container>&]:block [.vui-container>&]:py-vui-2 [.vui-container>&]:px-vui-3
-      [.vui-container>&]:font-vui-strong [.vui-container>&]:text-vui-title
+      [.vui-container>&]:font-vui-strong
       [.vui-container>&]:border-b [.vui-container>&]:border-vui-border/50`,
   },
 })
@@ -18,12 +18,15 @@ export class VuiTitle {}
 export class VuiMeta {}
 
 /**
- * Icon slot: four grid units wide and one text line high, so a glyph shares the baseline of the text next to it
- * and a 16px SVG is centered on that line. Mark purely decorative icons with `aria-hidden` yourself.
+ * Icon slot: four grid units wide and one text line high. A zero-width text strut gives it the baseline of that line, so
+ * in a header it sits on the first line of a wrapped title, and a 16px SVG is centered on that line. Mark purely decorative icons with `aria-hidden` yourself.
  */
 @Directive({
   selector: '[vuiIcon]',
-  host: { class: 'vui-icon inline-flex items-center justify-center flex-none w-vui-4 h-lh' },
+  host: {
+    class: `vui-icon inline-flex items-center justify-center flex-none w-vui-4 h-lh
+      before:content-(--vui-baseline-strut)`,
+  },
 })
 export class VuiIcon {}
 

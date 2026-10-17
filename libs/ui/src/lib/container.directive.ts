@@ -9,7 +9,7 @@ import { Directive } from '@angular/core';
   host: {
     class: `vui-container
       relative box-border rounded-vui-surface border border-vui-border
-      bg-vui-surface-muted text-vui-foreground font-vui-sans text-vui-body
+      bg-vui-surface-muted text-vui-foreground font-vui-sans tracking-vui-normal text-vui-body
       data-[vui-selected=true]:outline-2 data-[vui-selected=true]:outline-offset-2 data-[vui-selected=true]:outline-vui-selection
       forced-colors:data-[vui-selected=true]:outline-[Highlight]`,
   },

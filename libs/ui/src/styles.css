@@ -48,15 +48,15 @@
   --font-vui-sans: var(--vui-font-sans);
   --font-vui-mono: var(--vui-font-mono);
   --font-weight-vui-medium: 500;
+  /* Parts reset the letter spacing an application may set on its body, so text keeps the font's own spacing. */
+  --tracking-vui-normal: normal;
   --font-weight-vui-strong: 600;
 
-  /* Type scale around the body size: 11/14, 13/18, 15/20 at the default 13px. */
+  /* Type scale around the body size: caption 11/14 and body 13/18 at the default 13px; headlines are body semibold. */
   --text-vui-caption: calc(var(--vui-font-size) - 2px);
   --text-vui-caption--line-height: calc(var(--vui-font-size) + 1px);
   --text-vui-body: var(--vui-font-size);
   --text-vui-body--line-height: calc(var(--vui-font-size) + 5px);
-  --text-vui-title: calc(var(--vui-font-size) + 2px);
-  --text-vui-title--line-height: calc(var(--vui-font-size) + 7px);
 
   /* 4pt grid: `p-vui-3` is three spacing units. Control heights are 6/7/8 units (24/28/32px). */
   --spacing-vui-0: 0px;
@@ -118,6 +118,8 @@
     --vui-radius: 6px;
     --vui-duration: 150ms;
     --vui-ease: cubic-bezier(0.25, 0.1, 0.25, 1);
+    /* A zero-width space: gives an icon slot a text baseline, so it aligns with the first line of a title. */
+    --vui-baseline-strut: '\200b';
   }
 
   [data-vui-theme='dark'] {
@@ -156,6 +158,9 @@
   [data-vui-theme] {
     /* Native checkboxes, radios, ranges and progress bars inside nodes take the accent. */
     accent-color: var(--vui-accent);
+    /* Grayscale antialiasing as in native macOS: without it light text on the dark theme renders heavier. */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
   [data-vui-theme='light'] {
     color-scheme: light;

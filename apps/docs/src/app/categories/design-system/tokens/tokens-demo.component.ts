@@ -49,11 +49,6 @@ import { DemoIconComponent } from '../../../shared/demo-icon.component';
     .body {
       line-height: calc(var(--vui-font-size) + 5px);
     }
-    .title {
-      font-size: calc(var(--vui-font-size) + 2px);
-      line-height: calc(var(--vui-font-size) + 7px);
-      font-weight: 600;
-    }
     .row {
       display: flex;
       flex-wrap: wrap;
@@ -105,8 +100,7 @@ import { DemoIconComponent } from '../../../shared/demo-icon.component';
             <h3>Type</h3>
             <div class="caption">Caption 11/14: meta, statuses, labels</div>
             <div class="body">Body 13/18: content, fields, buttons</div>
-            <div class="body"><strong>Headline 13/18 semibold: node titles</strong></div>
-            <div class="title">Title 15/20: containers, pools</div>
+            <div class="body"><strong>Headline 13/18 semibold: node and container titles</strong></div>
           </div>
           <div>
             <h3>Spacing on a 4pt grid</h3>

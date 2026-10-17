@@ -10,7 +10,7 @@ import { Directive } from '@angular/core';
     class: `vui-toolbar
       inline-flex box-border items-center gap-vui-1 p-vui-1 rounded-vui-surface
       bg-vui-surface/85 backdrop-blur-vui-material backdrop-saturate-180 shadow-vui-floating
-      text-vui-foreground font-vui-sans text-vui-body
+      text-vui-foreground font-vui-sans tracking-vui-normal text-vui-body
       forced-colors:border forced-colors:border-[CanvasText]`,
   },
 })
@@ -22,7 +22,7 @@ export class VuiToolbar {}
   host: {
     class: `vui-external-label
       absolute top-full left-1/2 -translate-x-1/2 mt-vui-2 whitespace-nowrap
-      text-vui-foreground text-vui-caption`,
+      text-vui-foreground font-vui-sans tracking-vui-normal text-vui-caption`,
   },
 })
 export class VuiExternalLabel {}

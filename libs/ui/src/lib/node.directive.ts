@@ -11,18 +11,19 @@ import { Directive } from '@angular/core';
   host: {
     class: `vui-node
       relative box-border rounded-vui-surface border border-vui-border
-      bg-vui-surface text-vui-foreground font-vui-sans text-vui-body shadow-vui-node
+      bg-vui-surface text-vui-foreground font-vui-sans tracking-vui-normal text-vui-body shadow-vui-node
       data-[vui-selected=true]:outline-2 data-[vui-selected=true]:outline-offset-2 data-[vui-selected=true]:outline-vui-selection
       forced-colors:data-[vui-selected=true]:outline-[Highlight]`,
   },
 })
 export class VuiNode {}
 
+/** Header row: items share the baseline of the title's first line, so an icon, meta or badge stays beside it when it wraps. */
 @Directive({
   selector: '[vuiNodeHeader]',
   host: {
     class: `vui-node-header
-      flex items-center gap-vui-2 p-vui-3 border-b border-vui-border/50
+      flex items-baseline gap-vui-2 p-vui-3 border-b border-vui-border/50
       font-vui-strong`,
   },
 })

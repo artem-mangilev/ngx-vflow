@@ -18,7 +18,7 @@ export type VuiButtonSize = 'sm' | 'md';
   host: {
     class: `vui-button
       inline-flex box-border items-center justify-center gap-vui-1 rounded-vui-control border border-transparent
-      font-vui-sans font-vui-medium cursor-pointer select-none transition-colors duration-(--vui-duration) ease-vui
+      font-vui-sans tracking-vui-normal font-vui-medium cursor-pointer select-none transition-colors duration-(--vui-duration) ease-vui
       h-vui-7 px-vui-3 text-vui-body data-[vui-size=sm]:h-vui-6 data-[vui-size=sm]:px-vui-2 data-[vui-size=sm]:text-vui-caption
       data-[vui-icon=true]:px-vui-0 data-[vui-icon=true]:w-vui-7 data-[vui-icon=true]:data-[vui-size=sm]:px-vui-0 data-[vui-icon=true]:data-[vui-size=sm]:w-vui-6
       data-[vui-variant=primary]:bg-vui-accent data-[vui-variant=primary]:text-vui-on-accent
