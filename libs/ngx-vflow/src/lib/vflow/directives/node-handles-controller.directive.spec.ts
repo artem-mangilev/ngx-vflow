@@ -117,4 +117,31 @@ describe('NodeHandlesControllerDirective', () => {
     expect(second.applyGeometry).toHaveBeenCalledExactlyOnceWith(geometry);
     expect(executionOrder).toEqual(['measure first', 'measure second', 'apply first', 'apply second']);
   });
+
+  it('should measure handles again when node content moves without resizing', async () => {
+    const host: HTMLElement = fixture.nativeElement.querySelector('[nodeHandlesController]');
+    const rows = [document.createElement('div'), document.createElement('div')];
+    host.append(...rows);
+    const handle = {
+      measure: vi.fn().mockReturnValue(null),
+      applyGeometry: vi.fn(),
+      element: rows[0],
+      position: signal<Position>('left'),
+      offsetX: signal(0),
+      offsetY: signal(0),
+      layout: signal<HandleLayout>('auto'),
+    };
+    handles = [handle] as unknown as HandleModel[];
+    handles$.next(handles);
+    frameCallbacks.splice(0).forEach((callback) => callback());
+    handle.measure.mockClear();
+
+    // A reorder, as a keyed @for performs it: the same elements, a new order, no size change.
+    host.insertBefore(rows[1], rows[0]);
+    await Promise.resolve();
+
+    expect(frameCallbacks.length).toBe(1);
+    frameCallbacks[0]();
+    expect(handle.measure).toHaveBeenCalledTimes(1);
+  });
 });

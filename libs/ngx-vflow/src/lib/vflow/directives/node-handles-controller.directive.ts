@@ -61,7 +61,16 @@ export class NodeHandlesControllerDirective implements OnInit {
       )
       .subscribe();
 
+    // Reordering or inserting content, such as field rows, moves handles without resizing anything: a row of
+    // the same height moved up keeps every observed box. Only the structure is watched, not text or attributes.
+    // zone.js in happy-dom replaces MutationObserver with a class without methods; that DOM has no layout to sync.
+    const created =
+      typeof MutationObserver === 'undefined' ? undefined : new MutationObserver(() => this.scheduleSync());
+    const structure = typeof created?.observe === 'function' ? created : undefined;
+    structure?.observe(this.hostElementRef.nativeElement, { childList: true, subtree: true });
+
     this.destroyRef.onDestroy(() => {
+      structure?.disconnect();
       this.destroyed = true;
       this.observedElements.forEach((element) =>
         this.resizeObserverService.removeObserver(element, this.resizeCallback),
