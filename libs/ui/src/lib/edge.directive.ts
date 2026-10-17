@@ -4,8 +4,10 @@ import { Directive } from '@angular/core';
 @Directive({
   selector: 'path[vuiEdge]',
   host: {
-    class:
-      'vui-edge vui:fill-none vui:stroke-muted vui:stroke-2 vui:[stroke-linejoin:round] vui:data-[vui-selected=true]:stroke-accent vui:forced-colors:stroke-[CanvasText] vui:forced-colors:data-[vui-selected=true]:stroke-[Highlight]',
+    class: `vui-edge
+      fill-none stroke-2 [stroke-linejoin:round]
+      stroke-vui-muted data-[vui-selected=true]:stroke-vui-selection
+      forced-colors:stroke-[CanvasText] forced-colors:data-[vui-selected=true]:stroke-[Highlight]`,
   },
 })
 export class VuiEdge {}
@@ -14,8 +16,9 @@ export class VuiEdge {}
 @Directive({
   selector: '[vuiEdgeLabel]',
   host: {
-    class:
-      'vui-edge-label vui:inline-flex vui:box-border vui:items-center vui:gap-1.5 vui:px-2.25 vui:py-1 vui:rounded-sm vui:border vui:border-border vui:bg-surface vui:text-foreground vui:font-sans vui:text-xs vui:leading-normal',
+    class: `vui-edge-label
+      inline-flex box-border items-center gap-vui-1 px-vui-2 py-vui-1 rounded-vui-control border border-vui-border
+      bg-vui-surface text-vui-foreground font-vui-sans text-vui-caption`,
   },
 })
 export class VuiEdgeLabel {}

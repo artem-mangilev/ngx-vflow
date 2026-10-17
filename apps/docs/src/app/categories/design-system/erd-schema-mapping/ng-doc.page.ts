@@ -7,7 +7,7 @@ const page: NgDocPage = {
   title: 'ERD and schema mapping',
   mdFile: './index.md',
   category: DesignSystemCategory,
-  order: 4,
+  order: 5,
   demos: { EntitiesDemoComponent, ScrollCollapseDemoComponent },
 };
 

@@ -6,7 +6,7 @@ const page: NgDocPage = {
   title: 'Data and media pipeline',
   mdFile: './index.md',
   category: DesignSystemCategory,
-  order: 3,
+  order: 4,
   demos: { PipelineDemoComponent },
 };
 

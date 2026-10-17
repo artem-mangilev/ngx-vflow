@@ -1,13 +1,17 @@
 import { Directive, input } from '@angular/core';
 
-const SELECTED =
-  'vui:data-[vui-selected=true]:outline-2 vui:data-[vui-selected=true]:outline-offset-2 vui:data-[vui-selected=true]:outline-accent vui:forced-colors:data-[vui-selected=true]:outline-[Highlight]';
+const SELECTED = `data-[vui-selected=true]:outline-2 data-[vui-selected=true]:outline-offset-2
+  data-[vui-selected=true]:outline-vui-selection forced-colors:data-[vui-selected=true]:outline-[Highlight]`;
 
 /** A BPMN event outline. The consumer supplies its symbol and accessible name. */
 @Directive({
   selector: '[vuiBpmnEvent]',
   host: {
-    class: `vui-bpmn-event vui:relative vui:box-border vui:grid vui:place-items-center vui:size-14 vui:rounded-full vui:border-2 vui:border-foreground vui:bg-surface vui:text-foreground vui:font-sans vui:text-base vui:data-[vui-event=intermediate]:border-[5px] vui:data-[vui-event=intermediate]:border-double vui:data-[vui-event=end]:border-[5px] ${SELECTED}`,
+    class: `vui-bpmn-event
+      relative box-border grid place-items-center size-vui-14 rounded-full border-2 border-vui-foreground
+      data-[vui-event=intermediate]:border-4 data-[vui-event=intermediate]:border-double data-[vui-event=end]:border-4
+      bg-vui-surface text-vui-foreground font-vui-sans text-vui-body
+      ${SELECTED}`,
     '[attr.data-vui-event]': 'vuiBpmnEvent()',
   },
 })
@@ -18,11 +22,20 @@ export class VuiBpmnEvent {
 /**
  * A diamond outline that leaves the consumer's text and handle coordinates unrotated.
  * Renders the exclusive (×) or parallel (+) marker; put the decision text in `vuiExternalLabel`.
+ * The diamond is a square rotated by 45° whose side is 1/√2 of the host, so its corners touch the host's edges.
  */
 @Directive({
   selector: '[vuiBpmnGateway]',
   host: {
-    class: `vui-bpmn-gateway vui:relative vui:isolate vui:grid vui:place-items-center vui:size-16 vui:text-[28px] vui:leading-none vui:text-foreground vui:font-sans vui:before:content-[''] vui:before:absolute vui:before:-z-10 vui:before:box-border vui:before:size-[70.7107%] vui:before:rotate-45 vui:before:border-2 vui:before:border-foreground vui:before:bg-surface vui:data-[vui-gateway=exclusive]:after:content-(--vui-bpmn-exclusive) vui:data-[vui-gateway=parallel]:after:content-(--vui-bpmn-parallel) vui:after:font-semibold vui:data-[vui-selected=true]:before:outline-2 vui:data-[vui-selected=true]:before:outline-offset-2 vui:data-[vui-selected=true]:before:outline-accent vui:forced-colors:data-[vui-selected=true]:before:outline-[Highlight]`,
+    class: `vui-bpmn-gateway
+      relative isolate grid place-items-center size-vui-16
+      text-vui-foreground font-vui-sans text-vui-symbol
+      before:content-[''] before:absolute before:-z-10 before:box-border before:size-[70.7107%] before:rotate-45
+      before:border-2 before:border-vui-foreground before:bg-vui-surface
+      data-[vui-gateway=exclusive]:after:content-(--vui-bpmn-exclusive) data-[vui-gateway=parallel]:after:content-(--vui-bpmn-parallel)
+      after:font-vui-strong
+      data-[vui-selected=true]:before:outline-2 data-[vui-selected=true]:before:outline-offset-2
+      data-[vui-selected=true]:before:outline-vui-selection forced-colors:data-[vui-selected=true]:before:outline-[Highlight]`,
     '[attr.data-vui-gateway]': 'vuiBpmnGateway()',
   },
 })
@@ -34,13 +47,18 @@ export class VuiBpmnGateway {
 @Directive({
   selector: '[vuiBpmnTask]',
   host: {
-    class: `vui-bpmn-task vui:relative vui:box-border vui:grid vui:place-items-center vui:text-center vui:rounded-lg vui:border vui:border-foreground vui:bg-surface vui:text-foreground vui:font-sans vui:text-base vui:px-3 vui:py-2 ${SELECTED}`,
+    class: `vui-bpmn-task
+      relative box-border grid place-items-center text-center px-vui-3 py-vui-2 rounded-vui-surface border border-vui-foreground
+      bg-vui-surface text-vui-foreground font-vui-sans text-vui-body
+      ${SELECTED}`,
   },
 })
 export class VuiBpmnTask {}
 
-const PARTICIPANT_TITLE =
-  'vui:[&>.vui-title]:absolute vui:[&>.vui-title]:inset-y-0 vui:[&>.vui-title]:left-0 vui:[&>.vui-title]:w-8 vui:[&>.vui-title]:grid vui:[&>.vui-title]:place-items-center vui:[&>.vui-title]:px-1.5 vui:[&>.vui-title]:[writing-mode:vertical-rl] vui:[&>.vui-title]:rotate-180 vui:[&>.vui-title]:font-semibold vui:[&>.vui-title]:whitespace-nowrap';
+const PARTICIPANT_TITLE = `[&>.vui-title]:absolute [&>.vui-title]:inset-y-vui-0 [&>.vui-title]:left-vui-0 [&>.vui-title]:w-vui-8
+  [&>.vui-title]:grid [&>.vui-title]:place-items-center [&>.vui-title]:px-vui-1
+  [&>.vui-title]:[writing-mode:vertical-rl] [&>.vui-title]:rotate-180 [&>.vui-title]:whitespace-nowrap
+  [&>.vui-title]:font-vui-strong [&>.vui-title]:border-r`;
 
 /**
  * A pool: the frame of a participant with a vertical title strip. Lanes and elements are separate
@@ -49,7 +67,11 @@ const PARTICIPANT_TITLE =
 @Directive({
   selector: '[vuiBpmnPool]',
   host: {
-    class: `vui-bpmn-pool vui:relative vui:box-border vui:border vui:border-foreground vui:bg-[color-mix(in_srgb,var(--vui-surface-muted)_55%,transparent)] vui:text-foreground vui:font-sans vui:text-base ${PARTICIPANT_TITLE} vui:[&>.vui-title]:border-r vui:[&>.vui-title]:border-foreground vui:[&>.vui-title]:bg-surface ${SELECTED}`,
+    class: `vui-bpmn-pool
+      relative box-border border border-vui-foreground
+      bg-vui-surface-muted text-vui-foreground font-vui-sans text-vui-body
+      ${PARTICIPANT_TITLE} [&>.vui-title]:border-vui-foreground [&>.vui-title]:bg-vui-surface
+      ${SELECTED}`,
   },
 })
 export class VuiBpmnPool {}
@@ -58,7 +80,11 @@ export class VuiBpmnPool {}
 @Directive({
   selector: '[vuiBpmnLane]',
   host: {
-    class: `vui-bpmn-lane vui:relative vui:box-border vui:border vui:border-border vui:text-foreground vui:font-sans vui:text-base ${PARTICIPANT_TITLE} vui:[&>.vui-title]:border-r vui:[&>.vui-title]:border-border ${SELECTED}`,
+    class: `vui-bpmn-lane
+      relative box-border border border-vui-border
+      text-vui-foreground font-vui-sans text-vui-body
+      ${PARTICIPANT_TITLE} [&>.vui-title]:border-vui-border
+      ${SELECTED}`,
   },
 })
 export class VuiBpmnLane {}
@@ -70,8 +96,12 @@ export class VuiBpmnLane {}
 @Directive({
   selector: 'path[vuiBpmnFlow]',
   host: {
-    class:
-      'vui-bpmn-flow vui:fill-none vui:stroke-foreground vui:stroke-2 vui:[stroke-linejoin:round] vui:data-[vui-flow=message]:[stroke-dasharray:8_5] vui:data-[vui-flow=association]:[stroke-dasharray:2_4] vui:data-[vui-flow=association]:stroke-[1.5] vui:data-[vui-selected=true]:stroke-accent vui:forced-colors:stroke-[CanvasText] vui:forced-colors:data-[vui-selected=true]:stroke-[Highlight]',
+    class: `vui-bpmn-flow
+      fill-none stroke-2 [stroke-linejoin:round]
+      data-[vui-flow=message]:[stroke-dasharray:8_5] data-[vui-flow=association]:[stroke-dasharray:2_4]
+      data-[vui-flow=association]:stroke-1
+      stroke-vui-foreground data-[vui-selected=true]:stroke-vui-selection
+      forced-colors:stroke-[CanvasText] forced-colors:data-[vui-selected=true]:stroke-[Highlight]`,
     '[attr.data-vui-flow]': 'vuiBpmnFlow()',
   },
 })

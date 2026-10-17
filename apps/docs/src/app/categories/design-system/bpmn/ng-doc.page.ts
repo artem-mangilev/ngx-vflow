@@ -6,7 +6,7 @@ const page: NgDocPage = {
   title: 'BPMN',
   mdFile: './index.md',
   category: DesignSystemCategory,
-  order: 6,
+  order: 7,
   demos: { BpmnDemoComponent },
 };
 

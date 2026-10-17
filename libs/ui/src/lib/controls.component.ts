@@ -1,8 +1,12 @@
 import { ChangeDetectionStrategy, Component, Directive, computed, input } from '@angular/core';
 import { VflowComponent } from 'ngx-vflow';
 
-const BUTTON =
-  'vui-control-button vui:inline-grid vui:box-border vui:place-items-center vui:size-8 vui:rounded-md vui:border vui:border-border vui:bg-surface vui:text-foreground vui:cursor-pointer vui:enabled:hover:bg-surface-muted vui:disabled:opacity-45 vui:disabled:cursor-not-allowed vui:focus-visible:outline-2 vui:focus-visible:outline-offset-2 vui:focus-visible:outline-accent vui:forced-colors:border-[ButtonText]';
+const BUTTON = `vui-control-button
+  inline-grid box-border place-items-center size-vui-7 rounded-vui-control border-0 bg-transparent
+  text-vui-foreground cursor-pointer transition duration-(--vui-duration) ease-vui enabled:hover:bg-vui-surface-muted
+  disabled:opacity-40 disabled:cursor-not-allowed
+  focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-vui-selection
+  forced-colors:border forced-colors:border-[ButtonText]`;
 
 /** Presentation for a consumer button placed inside `vui-controls`; give it an accessible name. */
 @Directive({ selector: 'button[vuiControlButton]', host: { class: BUTTON } })
@@ -24,8 +28,10 @@ export interface VuiControlsLabels {
   imports: [VuiControlButton],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
-    class:
-      'vui-controls vui:inline-flex vui:box-border vui:items-center vui:gap-1 vui:p-1 vui:rounded-lg vui:border vui:border-border vui:bg-surface vui:font-sans vui:shadow-[0_3px_10px_#0000001a]',
+    class: `vui-controls
+      inline-flex box-border items-center gap-vui-1 p-vui-1 rounded-vui-surface
+      bg-vui-surface/85 backdrop-blur-vui-material backdrop-saturate-180 shadow-vui-floating font-vui-sans
+      forced-colors:border forced-colors:border-[CanvasText]`,
     role: 'group',
     '[attr.aria-label]': 'labels().group',
   },

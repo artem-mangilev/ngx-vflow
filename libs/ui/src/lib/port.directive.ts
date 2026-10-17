@@ -26,8 +26,11 @@ import { HandleState, VflowHandleDirective } from 'ngx-vflow';
     },
   ],
   host: {
-    class:
-      'vui-port vui:block vui:box-border vui:size-3.5 vui:rounded-full vui:border-2 vui:border-surface vui:bg-muted vui:data-[vui-connected=true]:bg-foreground vui:data-[vui-state=connecting]:bg-accent vui:data-[vui-state=valid]:bg-success vui:data-[vui-state=invalid]:bg-danger vui:data-[vui-state=invalid]:border-dashed vui:forced-colors:bg-[ButtonText] vui:forced-colors:border-[Canvas] vui:forced-colors:[forced-color-adjust:none]',
+    class: `vui-port
+      block box-border size-vui-4 rounded-full border-2 border-vui-surface
+      bg-vui-muted data-[vui-connected=true]:bg-vui-foreground data-[vui-state=connecting]:bg-vui-selection
+      data-[vui-state=valid]:bg-vui-success data-[vui-state=invalid]:bg-vui-danger data-[vui-state=invalid]:border-dashed
+      forced-colors:bg-[ButtonText] forced-colors:border-[Canvas] forced-colors:[forced-color-adjust:none]`,
     '[attr.data-vui-state]': 'state()',
     '[attr.data-vui-connected]': 'vuiPortConnected()',
   },

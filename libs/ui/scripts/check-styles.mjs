@@ -1,16 +1,81 @@
-// Verifies that both published CSS entries give the same stylesheet.
-// It compiles dist/libs/ui/styles.source.css the way a consumer's Tailwind v4 pipeline would,
-// from a directory outside the workspace sources, and compares the result with styles.css.
+// Checks the design-system discipline of the parts and that both published CSS entries style them.
+// 1. Every class in a part is a utility Tailwind generated from the `vui` scales (the default theme is not
+//    imported, so `p-3`, `text-xs` or a typo fail here instead of silently doing nothing).
+// 2. Arbitrary values are limited to the allowlist below: system colors, SVG properties without utilities and
+//    named geometric constants. Everything else comes from a scale.
+// 3. dist/libs/ui/styles.source.css, compiled the way a consumer's Tailwind v4 pipeline would, generates
+//    every utility the parts use. Byte equality with styles.css is not expected: without a prefix Tailwind
+//    also picks words from source comments, which the published code no longer has.
 import { execFileSync } from 'node:child_process';
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 const dist = join(root, 'dist/libs/ui');
-const consumer = mkdtempSync(join(tmpdir(), 'vflow-ui-consumer-'));
+const sources = ['libs/ui/src/lib', 'libs/ui/bpmn/src/lib'].flatMap((dir) =>
+  readdirSync(join(root, dir))
+    .filter((file) => file.endsWith('.ts') && !file.endsWith('.spec.ts'))
+    .map((file) => join(dir, file)),
+);
 
+const SYSTEM_COLORS = /^\[(ButtonText|Canvas|CanvasText|Highlight)\]$/;
+const ARBITRARY_PROPERTIES = /^\[(stroke-linejoin|stroke-dasharray|writing-mode|forced-color-adjust):[^\]]+\]$/;
+const ALLOWED = new Map([
+  ["content-['']", 'generated content of a pseudo-element'],
+  ['size-[70.7107%]', 'BPMN gateway: a square rotated by 45° with side 1/√2 of its host'],
+]);
+
+/** Class lists are the `class:` host values and the upper-case constants they interpolate. */
+function classTokens(file) {
+  const text = readFileSync(join(root, file), 'utf8');
+  const lists = [...text.matchAll(/(?:class:\s*|const [A-Z_]+ =\s*)([`'])([\s\S]*?)\1/g)].map((m) => m[2]);
+  return lists
+    .flatMap((list) => list.replace(/\$\{[^}]*\}/g, ' ').split(/\s+/))
+    .filter((token) => token && !token.startsWith('vui-'));
+}
+
+/** The utility after the variants: `data-[vui-selected=true]:outline-2` → `outline-2`. */
+function utilityOf(token) {
+  let depth = 0;
+  let start = 0;
+  for (let i = 0; i < token.length; i++) {
+    const char = token[i];
+    if (char === '[' || char === '(') depth++;
+    else if (char === ']' || char === ')') depth--;
+    else if (char === ':' && depth === 0) start = i + 1;
+  }
+  return token.slice(start);
+}
+
+function arbitraryError(utility) {
+  if (ALLOWED.has(utility)) return null;
+  if (ARBITRARY_PROPERTIES.test(utility)) return null;
+  const value = /^[\w-]*?-?(\[.*\])$/.exec(utility)?.[1];
+  if (value && !SYSTEM_COLORS.test(value)) return 'arbitrary value outside the allowlist; use a vui scale';
+  const variable = /-\((--[\w-]+)\)$/.exec(utility)?.[1];
+  if (variable && !variable.startsWith('--vui-')) return 'arbitrary variable outside the vui tokens';
+  return null;
+}
+
+function generatedClasses(css) {
+  return new Set([...css.matchAll(/\.((?:\\.|[\w-])+)/g)].map((m) => m[1].replace(/\\(.)/g, '$1')));
+}
+
+const compiled = generatedClasses(readFileSync(join(dist, 'styles.css'), 'utf8'));
+const errors = [];
+const used = new Set();
+for (const file of sources) {
+  for (const token of classTokens(file)) {
+    used.add(token);
+    const arbitrary = arbitraryError(utilityOf(token));
+    if (arbitrary) errors.push(`${file}: ${token}: ${arbitrary}`);
+    else if (!compiled.has(token)) errors.push(`${file}: ${token}: not generated, not a utility of the vui scales`);
+  }
+}
+
+const consumer = mkdtempSync(join(tmpdir(), 'vflow-ui-consumer-'));
 try {
   const entry = join(consumer, 'styles.css');
   writeFileSync(entry, `@import '${join(dist, 'styles.source.css')}';\n`);
@@ -18,19 +83,16 @@ try {
     cwd: root,
     stdio: 'inherit',
   });
-  const compiled = readFileSync(join(dist, 'styles.css'), 'utf8');
-  const fromSource = readFileSync(join(consumer, 'out.css'), 'utf8');
-  const classes = (css) => new Set(css.match(/\.vui\\:[^{,\s]+/g) ?? []);
-  const missing = [...classes(compiled)].filter((name) => !classes(fromSource).has(name));
-  if (missing.length) {
-    throw new Error(
-      `styles.source.css did not produce ${missing.length} utilities, e.g. ${missing.slice(0, 5).join(' ')}`,
-    );
+  const fromSource = generatedClasses(readFileSync(join(consumer, 'out.css'), 'utf8'));
+  for (const token of used) {
+    if (compiled.has(token) && !fromSource.has(token)) errors.push(`styles.source.css: ${token}: not generated`);
   }
-  if (compiled !== fromSource) {
-    throw new Error('styles.source.css compiles to a different stylesheet than styles.css');
-  }
-  console.log(`Both CSS entries match: ${classes(compiled).size} utilities, ${compiled.length} bytes.`);
 } finally {
   rmSync(consumer, { recursive: true, force: true });
 }
+
+if (errors.length) {
+  console.error(errors.join('\n'));
+  process.exit(1);
+}
+console.log(`Parts use ${used.size} utilities, all from the vui scales and generated by both CSS entries.`);

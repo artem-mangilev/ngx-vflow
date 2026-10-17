@@ -4,94 +4,158 @@
  *   and publishes the result as `@vflow/ui/styles.css` (no Tailwind needed by the consumer).
  * - Source entry: the same file is published as `@vflow/ui/styles.source.css` with `@source`
  *   pointing at the package's compiled code, for a consumer's own Tailwind v4 pipeline.
- * Parts are styled by `vui:` utility classes on the directives; this file holds tokens only.
+ * Parts are styled by utility classes on the directives; this file holds tokens only.
+ *
+ * Tailwind's default theme is not imported: the only scales are the `vui` keys below, so a part
+ * cannot reach for a value outside the design system (`text-xs`, `p-3`, `rounded-lg` do not exist).
+ * The keys are namespaced (`bg-vui-surface`, `p-vui-3`) to stay clear of an application's own theme.
  */
 @layer theme, vui, utilities;
-@import 'tailwindcss/theme.css' layer(theme) prefix(vui);
-@import 'tailwindcss/utilities.css' layer(utilities) prefix(vui) source(none);
+@import 'tailwindcss/utilities.css' layer(utilities) source(none);
 @source './lib';
 @source '../bpmn/src';
+/* Words from doc comments that would otherwise become global utilities, e.g. `.container { width: 100% }`. */
+@source not inline('container visible outline transform');
 
-/* Public tokens (see the Design system docs). Utilities reference them directly through `inline`. */
+/*
+ * Every value derives from the theme variables of the next layer. `inline` makes utilities use the
+ * expression itself, so an override of `--vui-space`, `--vui-radius` or `--vui-font-size` on any element
+ * rescales the parts inside it.
+ */
 @theme inline {
-  --color-surface: var(--vui-surface);
-  --color-surface-muted: var(--vui-surface-muted);
-  --color-foreground: var(--vui-foreground);
-  --color-muted: var(--vui-muted);
-  --color-border: var(--vui-border);
-  --color-accent: var(--vui-accent);
-  --color-on-accent: var(--vui-on-accent);
-  --font-sans: var(--vui-font-family);
-  --text-base: var(--vui-font-size);
-  --text-base--line-height: var(--vui-line-height);
-  --radius-md: var(--vui-radius);
-  --spacing: var(--vui-space);
-}
+  --color-vui-canvas: var(--vui-canvas);
+  --color-vui-surface: var(--vui-surface);
+  --color-vui-surface-muted: var(--vui-surface-muted);
+  --color-vui-foreground: var(--vui-foreground);
+  --color-vui-muted: var(--vui-muted);
+  --color-vui-border: var(--vui-border);
+  --color-vui-accent: var(--vui-accent);
+  --color-vui-on-accent: var(--vui-on-accent);
+  --color-vui-selection: var(--vui-selection);
+  --color-vui-success: var(--vui-success);
+  --color-vui-warning: var(--vui-warning);
+  --color-vui-danger: var(--vui-danger);
+  --color-vui-info: var(--vui-info);
 
-/* Tone colors are part details, not public tokens; the dark theme overrides them below. */
-@theme {
-  --color-success: #166534;
-  --color-warning: #854d0e;
-  --color-danger: #b91c1c;
-  --color-info: #1d4ed8;
+  --font-vui-sans: var(--vui-font-sans);
+  --font-vui-mono: var(--vui-font-mono);
+  --font-weight-vui-strong: 600;
+
+  /* Type scale around the body size: 11/14, 13/18, 15/20 at the default 13px. */
+  --text-vui-caption: calc(var(--vui-font-size) - 2px);
+  --text-vui-caption--line-height: calc(var(--vui-font-size) + 1px);
+  --text-vui-body: var(--vui-font-size);
+  --text-vui-body--line-height: calc(var(--vui-font-size) + 5px);
+  --text-vui-title: calc(var(--vui-font-size) + 2px);
+  --text-vui-title--line-height: calc(var(--vui-font-size) + 7px);
+  --text-vui-symbol: calc(var(--vui-font-size) * 2);
+  --text-vui-symbol--line-height: 1;
+
+  /* 4pt grid: `p-vui-3` is three spacing units. Control heights are 6/7/8 units (24/28/32px). */
+  --spacing-vui-0: 0px;
+  --spacing-vui-1: var(--vui-space);
+  --spacing-vui-2: calc(var(--vui-space) * 2);
+  --spacing-vui-3: calc(var(--vui-space) * 3);
+  --spacing-vui-4: calc(var(--vui-space) * 4);
+  --spacing-vui-5: calc(var(--vui-space) * 5);
+  --spacing-vui-6: calc(var(--vui-space) * 6);
+  --spacing-vui-7: calc(var(--vui-space) * 7);
+  --spacing-vui-8: calc(var(--vui-space) * 8);
+  --spacing-vui-10: calc(var(--vui-space) * 10);
+  --spacing-vui-12: calc(var(--vui-space) * 12);
+  --spacing-vui-14: calc(var(--vui-space) * 14);
+  --spacing-vui-16: calc(var(--vui-space) * 16);
+
+  /* Concentric corners: a surface wraps controls at one spacing unit, so its radius is one unit larger. */
+  --radius-vui-control: var(--vui-radius);
+  --radius-vui-surface: calc(var(--vui-radius) + var(--vui-space));
+
+  --shadow-vui-node: var(--vui-shadow-node);
+  --shadow-vui-floating: var(--vui-shadow-floating);
+  --blur-vui-material: 20px;
+
+  --ease-vui: var(--vui-ease);
+  --animate-vui-pulse: vui-pulse 2s var(--vui-ease) infinite;
+
+  @keyframes vui-pulse {
+    50% {
+      opacity: 0.4;
+    }
+  }
 }
 
 @layer vui {
   /* Defaults let the parts render without a theme scope; they do not touch core tokens. */
   :root,
   [data-vui-theme='light'] {
+    --vui-canvas: #f5f5f7;
     --vui-surface: #fff;
-    --vui-surface-muted: #f0f3f8;
-    --vui-foreground: #192638;
-    --vui-muted: #566579;
-    --vui-border: #b5bfce;
-    --vui-accent: #4338ca;
+    --vui-surface-muted: rgb(118 118 128 / 0.12);
+    --vui-foreground: #1d1d1f;
+    --vui-muted: #6e6e73;
+    --vui-border: #c6c6c8;
+    --vui-accent: #0071e3;
     --vui-on-accent: #fff;
-    --vui-font-family: system-ui, sans-serif;
-    --vui-font-size: 14px;
-    --vui-line-height: 1.4;
+    --vui-selection: #0071e3;
+    --vui-success: #1e7e34;
+    --vui-warning: #b25000;
+    --vui-danger: #d70015;
+    --vui-info: #0071e3;
+    --vui-shadow-node: 0 1px 0 rgb(0 0 0 / 0.04);
+    --vui-shadow-floating: 0 4px 16px rgb(0 0 0 / 0.12), 0 0 0 0.5px rgb(0 0 0 / 0.08);
+
+    --vui-font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --vui-font-mono: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, Consolas, monospace;
+    --vui-font-size: 13px;
     --vui-space: 4px;
-    --vui-radius: 12px;
+    --vui-radius: 6px;
+    --vui-duration: 150ms;
+    --vui-ease: cubic-bezier(0.25, 0.1, 0.25, 1);
   }
 
   [data-vui-theme='dark'] {
-    --vui-surface: #1b283b;
-    --vui-surface-muted: #243449;
-    --vui-foreground: #f1f5fb;
-    --vui-muted: #afbed1;
-    --vui-border: #6b7e96;
-    --vui-accent: #b5acff;
-    --vui-on-accent: #19143d;
-    --vui-color-success: #86efac;
-    --vui-color-warning: #fde047;
-    --vui-color-danger: #fca5a5;
-    --vui-color-info: #93c5fd;
+    --vui-canvas: #1c1c1e;
+    --vui-surface: #2c2c2e;
+    --vui-surface-muted: rgb(118 118 128 / 0.24);
+    --vui-foreground: #f5f5f7;
+    --vui-muted: #aeaeb2;
+    --vui-border: #545458;
+    --vui-accent: #0071e3;
+    --vui-on-accent: #fff;
+    --vui-selection: #0a84ff;
+    --vui-success: #30d158;
+    --vui-warning: #ff9f0a;
+    --vui-danger: #ff6961;
+    --vui-info: #409cff;
+    --vui-shadow-node: 0 1px 0 rgb(0 0 0 / 0.3);
+    --vui-shadow-floating: 0 4px 16px rgb(0 0 0 / 0.5), 0 0 0 0.5px rgb(255 255 255 / 0.1);
   }
 
-  /*
-   * Only an explicit theme scope maps the UI theme onto core tokens, so importing this file
-   * does not restyle a standalone flow. Override `--v-*` on the flow or a descendant to win.
-   */
   /* Glyphs for the BPMN entry; ASCII-only class names keep both CSS entries identical. */
   :root {
     --vui-bpmn-exclusive: '\00d7';
     --vui-bpmn-parallel: '+';
   }
 
+  /*
+   * Only an explicit theme scope maps the UI theme onto core tokens, so importing this file
+   * does not restyle a standalone flow. Override `--v-*` on the flow or a descendant to win.
+   */
   [data-vui-theme] {
+    --v-background: var(--vui-canvas);
     --v-surface: var(--vui-surface);
     --v-foreground: var(--vui-foreground);
     --v-muted: var(--vui-muted);
     --v-border: var(--vui-border);
-    --v-selection: var(--vui-accent);
-    --v-focus: var(--vui-accent);
-    /* The node part is rounded with --vui-radius, so the core focus ring follows the same corners. */
-    --v-focus-radius: var(--vui-radius);
+    --v-selection: var(--vui-selection);
+    --v-focus: var(--vui-selection);
+    /* Node parts are rounded with the surface radius, so the core focus ring follows the same corners. */
+    --v-focus-radius: calc(var(--vui-radius) + var(--vui-space));
   }
   [data-vui-theme='light'] {
-    --v-background: #f4f6fa;
+    color-scheme: light;
   }
   [data-vui-theme='dark'] {
-    --v-background: #101827;
+    color-scheme: dark;
   }
 }

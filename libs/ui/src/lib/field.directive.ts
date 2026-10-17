@@ -4,8 +4,9 @@ import { Directive } from '@angular/core';
 @Directive({
   selector: '[vuiField]',
   host: {
-    class:
-      'vui-field vui:flex vui:items-center vui:gap-2.5 vui:min-h-9.5 vui:px-3.5 vui:py-1.5 vui:[.vui-field+&]:border-t vui:[.vui-field+&]:border-border',
+    class: `vui-field
+      flex items-center gap-vui-2 min-h-vui-8 px-vui-3 py-vui-1
+      [.vui-field+&]:border-t [.vui-field+&]:border-vui-border`,
   },
 })
 export class VuiField {}

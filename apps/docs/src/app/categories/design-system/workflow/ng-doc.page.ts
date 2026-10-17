@@ -6,7 +6,7 @@ const page: NgDocPage = {
   title: 'Workflow',
   mdFile: './index.md',
   category: DesignSystemCategory,
-  order: 2,
+  order: 3,
   demos: { WorkflowDemoComponent },
 };
 

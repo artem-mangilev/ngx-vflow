@@ -6,7 +6,7 @@ const page: NgDocPage = {
   title: 'Relationships and metrics map',
   mdFile: './index.md',
   category: DesignSystemCategory,
-  order: 5,
+  order: 6,
   demos: { RelationshipsDemoComponent },
 };
 

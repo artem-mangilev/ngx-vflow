@@ -1,8 +1,5 @@
 import { Directive } from '@angular/core';
 
-const SELECTED =
-  'vui:data-[vui-selected=true]:outline-2 vui:data-[vui-selected=true]:outline-offset-2 vui:data-[vui-selected=true]:outline-accent vui:forced-colors:data-[vui-selected=true]:outline-[Highlight]';
-
 /**
  * Card shell; dimensions, content, semantics and interaction belong to the consumer and core. The resting shadow has
  * no blur: a blurred shadow is rasterized again on every zoom step and pan of every visible node, which on a large
@@ -11,7 +8,11 @@ const SELECTED =
 @Directive({
   selector: '[vuiNode]',
   host: {
-    class: `vui-node vui:relative vui:box-border vui:rounded-md vui:border vui:border-border vui:bg-surface vui:text-foreground vui:font-sans vui:text-base vui:shadow-[0_1px_0_#0000000f] ${SELECTED}`,
+    class: `vui-node
+      relative box-border rounded-vui-surface border border-vui-border
+      bg-vui-surface text-vui-foreground font-vui-sans text-vui-body shadow-vui-node
+      data-[vui-selected=true]:outline-2 data-[vui-selected=true]:outline-offset-2 data-[vui-selected=true]:outline-vui-selection
+      forced-colors:data-[vui-selected=true]:outline-[Highlight]`,
   },
 })
 export class VuiNode {}
@@ -19,20 +20,21 @@ export class VuiNode {}
 @Directive({
   selector: '[vuiNodeHeader]',
   host: {
-    class:
-      'vui-node-header vui:flex vui:items-center vui:gap-2.5 vui:p-3.5 vui:font-semibold vui:rounded-t-md vui:border-b vui:border-border vui:bg-surface-muted',
+    class: `vui-node-header
+      flex items-center gap-vui-2 p-vui-3 border-b border-vui-border
+      font-vui-strong`,
   },
 })
 export class VuiNodeHeader {}
 
-@Directive({ selector: '[vuiNodeBody]', host: { class: 'vui-node-body vui:p-3.5' } })
+@Directive({ selector: '[vuiNodeBody]', host: { class: 'vui-node-body p-vui-3' } })
 export class VuiNodeBody {}
 
 @Directive({
   selector: '[vuiNodeFooter]',
   host: {
-    class:
-      'vui-node-footer vui:flex vui:flex-wrap vui:items-center vui:gap-2.5 vui:p-3.5 vui:border-t vui:border-border',
+    class: `vui-node-footer
+      flex flex-wrap items-center gap-vui-2 p-vui-3 border-t border-vui-border`,
   },
 })
 export class VuiNodeFooter {}

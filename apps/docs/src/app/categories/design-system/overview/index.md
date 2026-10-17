@@ -36,8 +36,8 @@ Then add one of the two stylesheet entries to your application:
 | `@vflow/ui/styles.css`        | Default. Compiled and minified; no Tailwind or source scanning on your side.                   | Add it to the `styles` of your build, or `@import '@vflow/ui/styles.css';` in a global stylesheet.                                                                                                                                           |
 | `@vflow/ui/styles.source.css` | You run Tailwind v4 and want this CSS processed by your own pipeline (minification, bundling). | Create a separate global stylesheet containing only `@import '@vflow/ui/styles.source.css';` and let Tailwind process it. The file registers the package code with `@source`, so the utilities of the directives are generated on your side. |
 
-The source entry uses the `vui` prefix, so it has to be compiled as its own stylesheet, not inside the
-`@import 'tailwindcss'` of your application. Both entries produce the same rules; import only one.
+The source entry brings its own `vui` theme and utilities layer, so compile it as its own stylesheet, not inside
+the `@import 'tailwindcss'` of your application. Both entries produce the same rules; import only one.
 UI rules live in Tailwind cascade layers, so unlayered application CSS overrides them without `!important`.
 
 ## Anatomy and states
@@ -54,7 +54,7 @@ images, charts, notes, menus) is your content inside `vuiNodeBody` or a field ro
 | Edge       | `vuiEdge` on the SVG path, `vuiEdgeLabel` for HTML labels                                             |
 | Extras     | `vuiStatus`, `vuiExternalLabel`, `vuiToolbar`, `vuiButton`                                            |
 
-The node shell's resting shadow has no blur (`0 1px 0`). A blurred shadow is rasterized again for every visible node on every zoom step and pan, which on a large flow at a high device pixel ratio costs more GPU time than the rest of the node; see the measurement on the Virtualization page. Keep blurred effects for hover and selection states.
+The node shell's resting shadow has no blur (`0 1px 0`). A blurred shadow is rasterized again for every visible node on every zoom step and pan, which on a large flow at a high device pixel ratio costs more GPU time than the rest of the node; see the measurement on the Virtualization page. Blurred shadows and translucent material are reserved for floating layers: toolbars and viewport controls.
 
 Three kinds of state stay separate so they can be shown at once:
 
@@ -126,36 +126,41 @@ outside every theme scope keeps the core defaults: importing the stylesheet neve
 
 {{ NgDocActions.demo("ThemesDemoComponent", { container: false }) }}
 
-Shared values are the public tokens below. Everything else, such as card padding, row height, port size or
-line width, is ordinary CSS on the public `.vui-*` selectors; the density of all parts follows `--vui-space`.
+Shared values are the theme variables below; the **Tokens** page shows their scales in both themes. Everything
+else, such as card padding, row height or line width, derives from them or is ordinary CSS on the public
+`.vui-*` selectors. Density follows `--vui-space`, typography `--vui-font-size`, and corners `--vui-radius`
+with surfaces one grid unit rounder, so corners stay concentric.
 
 ```css
 .my-editor {
   --vui-accent: #0f766e;
-  --vui-on-accent: white;
-  --vui-radius: 6px;
+  --vui-selection: #0f766e;
+  --vui-radius: 4px;
   --vui-space: 3px;
 }
 .my-editor .vui-port {
-  width: 10px;
-  height: 10px;
+  width: 12px;
+  height: 12px;
 }
 ```
 
-| Tokens                                                      | Purpose                           |
-| ----------------------------------------------------------- | --------------------------------- |
-| `--vui-surface`, `--vui-surface-muted`                      | Card and header backgrounds       |
-| `--vui-foreground`, `--vui-muted`, `--vui-border`           | Text, secondary text and borders  |
-| `--vui-accent`, `--vui-on-accent`                           | Actions, selection and their text |
-| `--vui-font-family`, `--vui-font-size`, `--vui-line-height` | Typography                        |
-| `--vui-space`, `--vui-radius`                               | Spacing unit and corner radius    |
+| Variables                                                                    | Purpose                                   |
+| ---------------------------------------------------------------------------- | ----------------------------------------- |
+| `--vui-canvas`, `--vui-surface`, `--vui-surface-muted`                       | Flow background, card and secondary fills |
+| `--vui-foreground`, `--vui-muted`, `--vui-border`                            | Text, secondary text and hairlines        |
+| `--vui-accent`, `--vui-on-accent`                                            | Primary action fill and its text          |
+| `--vui-selection`                                                            | Selection and focus rings, selected edges |
+| `--vui-success`, `--vui-warning`, `--vui-danger`, `--vui-info`               | Status tones and port validity            |
+| `--vui-font-sans`, `--vui-font-mono`, `--vui-font-size`                      | Typefaces and body size of the type scale |
+| `--vui-space`, `--vui-radius`                                                | Grid unit and control radius              |
+| `--vui-shadow-node`, `--vui-shadow-floating`, `--vui-duration`, `--vui-ease` | Elevation and motion                      |
 
 Core has its own tokens with defaults for standalone use: the colors `--v-background`, `--v-surface`,
 `--v-foreground`, `--v-muted`, `--v-border`, `--v-selection` and `--v-focus`, and the
 focus ring geometry `--v-focus-width` (2px), `--v-focus-offset` (3px, the gap between a node and its
 ring) and `--v-focus-radius` (0px, the corner radius of the node itself; the ring follows it, widened by
-the offset, so it stays concentric). A theme scope maps the UI tokens onto them, including `--vui-radius`
-onto the ring radius since the node part is rounded with it; set a `--v-*` token on the flow element or any
+the offset, so it stays concentric). A theme scope maps the UI tokens onto them, `--vui-canvas` onto `--v-background`, `--vui-selection` onto
+selection and focus, and the surface radius onto the ring radius since the node part is rounded with it; set a `--v-*` token on the flow element or any
 descendant to override both. Under `forced-colors: active` core maps its tokens to system colors
 regardless of the theme. Core also sets the read-only `--v-zoom` on the flow element, so scaled content
 can keep screen-sized details (`calc(2px / var(--v-zoom, 1))`). The flow value is written when a

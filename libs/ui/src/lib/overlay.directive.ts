@@ -1,11 +1,17 @@
 import { Directive } from '@angular/core';
 
-/** Surface for toolbar content, for example inside core `v-node-toolbar`. */
+/**
+ * Surface for toolbar content, for example inside core `v-node-toolbar`. A floating layer: translucent material
+ * with a blurred shadow, which is affordable for one toolbar but never used on nodes.
+ */
 @Directive({
   selector: '[vuiToolbar]',
   host: {
-    class:
-      'vui-toolbar vui:inline-flex vui:box-border vui:items-center vui:gap-1.5 vui:px-1.5 vui:py-1 vui:rounded-lg vui:border vui:border-border vui:bg-surface vui:text-foreground vui:font-sans vui:text-xs vui:leading-normal vui:shadow-[0_3px_10px_#0000001a]',
+    class: `vui-toolbar
+      inline-flex box-border items-center gap-vui-1 p-vui-1 rounded-vui-surface
+      bg-vui-surface/85 backdrop-blur-vui-material backdrop-saturate-180 shadow-vui-floating
+      text-vui-foreground font-vui-sans text-vui-body
+      forced-colors:border forced-colors:border-[CanvasText]`,
   },
 })
 export class VuiToolbar {}
@@ -14,8 +20,9 @@ export class VuiToolbar {}
 @Directive({
   selector: '[vuiExternalLabel]',
   host: {
-    class:
-      'vui-external-label vui:absolute vui:top-[calc(100%+8px)] vui:left-1/2 vui:-translate-x-1/2 vui:whitespace-nowrap vui:text-xs vui:leading-snug vui:text-foreground',
+    class: `vui-external-label
+      absolute top-full left-1/2 -translate-x-1/2 mt-vui-2 whitespace-nowrap
+      text-vui-foreground text-vui-caption`,
   },
 })
 export class VuiExternalLabel {}

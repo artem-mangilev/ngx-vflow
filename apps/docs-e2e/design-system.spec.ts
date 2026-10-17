@@ -52,9 +52,13 @@ test('consumer DOM, scoped themes, selection and native workflow actions', async
   await expect(approve).toBeDisabled();
   await expect(review).toHaveAttribute('data-vui-selected', 'true');
   await workflow.getByLabel('Dark theme', { exact: true }).check();
-  await expect(review).toHaveCSS('background-color', 'rgb(27, 40, 59)');
-  await expect(workflow.locator('v-node-toolbar .vui-toolbar')).toHaveCSS('background-color', 'rgb(27, 40, 59)');
-  await expect(workflow.locator('path.vui-edge').first()).toHaveCSS('stroke', 'rgb(175, 190, 209)');
+  await expect(review).toHaveCSS('background-color', 'rgb(44, 44, 46)');
+  // Floating layers use the translucent dark surface (85%) as their material.
+  await expect(workflow.locator('v-node-toolbar .vui-toolbar')).toHaveCSS(
+    'background-color',
+    /^oklab\(0\.29\d* .* \/ 0\.85\)$/,
+  );
+  await expect(workflow.locator('path.vui-edge').first()).toHaveCSS('stroke', 'rgb(174, 174, 178)');
   await expect(workflow.locator('marker polyline').first()).toHaveCSS('fill', 'context-stroke');
   await workflow.screenshot({ path: testInfo.outputPath('workflow.png') });
   expect(errors).toEqual([]);
@@ -68,7 +72,7 @@ test('field connections follow stable IDs through rename, reorder, density and r
   await demo.scrollIntoViewIfNeeded();
   await expect(demo.locator('article')).toHaveCount(4);
   // This page opts into the dark theme while the workflow page stays light.
-  await expect(demo.locator('article.vui-node').first()).toHaveCSS('background-color', 'rgb(27, 40, 59)');
+  await expect(demo.locator('article.vui-node').first()).toHaveCSS('background-color', 'rgb(44, 44, 46)');
   await expect(demo.locator('path.vui-edge')).toHaveCount(2);
   await expect(demo.locator('.vui-port[data-vui-connected="true"]')).toHaveCount(4);
   await expect.poll(() => rowAlignment(demo)).toBeLessThan(1);
@@ -144,7 +148,7 @@ test('BPMN subset: pools with own message flows, lanes, gateways, flow kinds and
     '8px, 5px',
   );
   await expect(demo.locator('[data-vui-event="intermediate"]')).toHaveCSS('border-top-style', 'double');
-  await expect(demo.locator('[data-vui-event="end"]')).toHaveCSS('border-top-width', '5px');
+  await expect(demo.locator('[data-vui-event="end"]')).toHaveCSS('border-top-width', '4px');
   // The supplier pool is a container that takes part in flows through its own handles.
   const pool = demo.locator('.vui-bpmn-pool').first();
   await expect(pool.locator('.vui-port.v-handle')).toHaveCount(2);
@@ -165,7 +169,7 @@ test('BPMN subset: pools with own message flows, lanes, gateways, flow kinds and
   await expect(gateway).toHaveAttribute('data-vui-selected', 'true');
   await expect(gateway).toHaveCSS('transform', 'none');
   await demo.getByLabel('Dark theme', { exact: true }).check();
-  await expect(demo.locator('[data-vui-event="start"]')).toHaveCSS('background-color', 'rgb(27, 40, 59)');
+  await expect(demo.locator('[data-vui-event="start"]')).toHaveCSS('background-color', 'rgb(44, 44, 46)');
   await demo.screenshot({ path: testInfo.outputPath('bpmn.png') });
   await page.emulateMedia({ forcedColors: 'active' });
   await expect(demo.locator('path.vui-bpmn-flow').first()).toHaveCSS('stroke', 'rgb(0, 0, 0)');
@@ -261,8 +265,8 @@ test('themes stay scoped per editor, reach every layer and leave core-only flows
   const b = page.locator('[data-testid="editor-b"]');
   const core = page.locator('[data-testid="editor-core"]');
   await core.scrollIntoViewIfNeeded();
-  const light = { node: 'rgb(255, 255, 255)', edge: 'rgb(86, 101, 121)' };
-  const dark = { node: 'rgb(27, 40, 59)', edge: 'rgb(175, 190, 209)' };
+  const light = { node: 'rgb(255, 255, 255)', edge: 'rgb(110, 110, 115)' };
+  const dark = { node: 'rgb(44, 44, 46)', edge: 'rgb(174, 174, 178)' };
   await expect(a.locator('article.vui-node').first()).toHaveCSS('background-color', light.node);
   await expect(a.locator('path.vui-edge')).toHaveCSS('stroke', light.edge);
   // Markers take the edge stroke through context-stroke, so theming the edge themes its arrowhead.
@@ -292,7 +296,7 @@ test('themes stay scoped per editor, reach every layer and leave core-only flows
   await page.getByLabel('Dark first editor', { exact: true }).check();
   await expect(a.locator('article.vui-node').first()).toHaveCSS('background-color', dark.node);
   await expect(a.locator('path.vui-edge')).toHaveCSS('stroke', dark.edge);
-  await expect(a.locator('.v-root')).toHaveCSS('background-color', 'rgb(16, 24, 39)');
+  await expect(a.locator('.v-root')).toHaveCSS('background-color', 'rgb(28, 28, 30)');
   await expect.poll(minimapPixel).not.toBe(pixelBefore);
   expect(await geometry()).toEqual(before);
   await expect(b.locator('article.vui-node').first()).toHaveCSS('background-color', dark.node);

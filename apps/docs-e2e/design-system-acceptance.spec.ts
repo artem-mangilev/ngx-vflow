@@ -34,11 +34,11 @@ for (const [route, selector] of pages) {
         (violation) => `${violation.id}: ${violation.nodes.map((node) => node.target.join(' ')).join(', ')}`,
       ),
     ).toEqual([]);
-    // Core keeps focus on its wrappers; the theme maps --v-focus, so the outline is the accent color.
+    // Core keeps focus on its wrappers; the theme maps --v-focus, so the outline is the selection color.
     const wrapper = demo.locator('.v-node').first();
     await wrapper.focus();
     await expect(wrapper).toBeFocused();
-    await expect(wrapper).toHaveCSS('outline-color', /rgb\(67, 56, 202\)|rgb\(181, 172, 255\)/);
+    await expect(wrapper).toHaveCSS('outline-color', /rgb\(0, 113, 227\)|rgb\(10, 132, 255\)/);
   });
 }
 

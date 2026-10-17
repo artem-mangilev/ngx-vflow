@@ -4,26 +4,29 @@ import { Directive } from '@angular/core';
 @Directive({
   selector: '[vuiTitle]',
   host: {
-    class:
-      'vui-title vui:flex-1 vui:min-w-0 vui:wrap-anywhere vui:in-[.vui-node-header]:font-semibold vui:[.vui-container>&]:block vui:[.vui-container>&]:py-2 vui:[.vui-container>&]:px-3.5 vui:[.vui-container>&]:font-semibold vui:[.vui-container>&]:border-b vui:[.vui-container>&]:border-dashed vui:[.vui-container>&]:border-border',
+    class: `vui-title
+      flex-1 min-w-vui-0 wrap-anywhere in-[.vui-node-header]:font-vui-strong
+      [.vui-container>&]:block [.vui-container>&]:py-vui-2 [.vui-container>&]:px-vui-3
+      [.vui-container>&]:font-vui-strong [.vui-container>&]:text-vui-title
+      [.vui-container>&]:border-b [.vui-container>&]:border-dashed [.vui-container>&]:border-vui-border`,
   },
 })
 export class VuiTitle {}
 
 /** Secondary text such as a category, type, key or timestamp. */
-@Directive({ selector: '[vuiMeta]', host: { class: 'vui-meta vui:text-muted vui:text-xs vui:leading-snug' } })
+@Directive({ selector: '[vuiMeta]', host: { class: 'vui-meta text-vui-muted text-vui-caption' } })
 export class VuiMeta {}
 
 /** Fixed-size icon slot; mark purely decorative icons with `aria-hidden` yourself. */
 @Directive({
   selector: '[vuiIcon]',
-  host: { class: 'vui-icon vui:inline-grid vui:place-items-center vui:flex-none vui:size-5' },
+  host: { class: 'vui-icon inline-grid place-items-center flex-none size-vui-4' },
 })
 export class VuiIcon {}
 
 /** Group of consumer controls in a card, label or toolbar; add `vNoDrag` to controls inside nodes. */
 @Directive({
   selector: '[vuiActions]',
-  host: { class: 'vui-actions vui:inline-flex vui:flex-wrap vui:items-center vui:gap-1.5 vui:ms-auto' },
+  host: { class: 'vui-actions inline-flex flex-wrap items-center gap-vui-2 ms-auto' },
 })
 export class VuiActions {}

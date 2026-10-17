@@ -32,8 +32,7 @@ interface EntityData {
     }
     .key {
       min-width: 22px;
-      color: var(--vui-accent);
-      font-size: 11px;
+      color: var(--vui-info);
     }
     .remove {
       border: 0;
