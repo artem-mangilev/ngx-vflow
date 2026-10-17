@@ -39,7 +39,12 @@ type MapData = Person | Metric | Note | Team;
     .person {
       width: 190px;
     }
+    /* The avatar is taller than a text line, so the one-line name is centered on it instead of sharing a baseline. */
+    .person-header {
+      align-items: center;
+    }
     .avatar {
+      flex: none;
       width: 28px;
       height: 28px;
       border-radius: 50%;
@@ -138,9 +143,8 @@ type MapData = Person | Metric | Note | Team;
             @switch (ctx.data().kind) {
               @case ('person') {
                 <article vuiNode class="person" [vuiSelected]="ctx.selected() || ctx.preselected()">
-                  <header vuiNodeHeader>
+                  <header vuiNodeHeader class="person-header">
                     <svg
-                      vuiIcon
                       class="avatar"
                       viewBox="0 0 28 28"
                       role="img"

@@ -13,7 +13,8 @@ export class VuiMeta {}
 
 /**
  * Icon slot: four grid units wide and one text line high. A zero-width text strut gives it the baseline of that line, so
- * in a header it sits on the first line of a wrapped title, and a 16px SVG is centered on that line. Mark purely decorative icons with `aria-hidden` yourself.
+ * in a header it sits on the first line of a wrapped title, and a 16px SVG is centered on that line. Put it on a wrapper element, not on
+ * the `svg` or `img` itself: those render no strut and would align their bottom edge with the title. Mark purely decorative icons with `aria-hidden` yourself.
  */
 @Directive({
   selector: '[vuiIcon]',
