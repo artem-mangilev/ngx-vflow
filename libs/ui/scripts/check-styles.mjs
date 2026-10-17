@@ -14,20 +14,17 @@ import { fileURLToPath } from 'node:url';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 const dist = join(root, 'dist/libs/ui');
-const sources = ['libs/ui/src/lib', 'libs/ui/bpmn/src/lib'].flatMap((dir) =>
+const sources = ['libs/ui/src/lib'].flatMap((dir) =>
   readdirSync(join(root, dir))
     .filter((file) => file.endsWith('.ts') && !file.endsWith('.spec.ts'))
     .map((file) => join(dir, file)),
 );
 
 const SYSTEM_COLORS = /^\[(ButtonText|Canvas|CanvasText|Highlight)\]$/;
-const ARBITRARY_PROPERTIES = /^\[(stroke-linejoin|stroke-dasharray|writing-mode|forced-color-adjust):[^\]]+\]$/;
+const ARBITRARY_PROPERTIES = /^\[(stroke-linejoin|forced-color-adjust):[^\]]+\]$/;
 // A part may point its local variable at a theme token, e.g. the status tone: `[--vui-tone:var(--vui-success)]`.
 const LOCAL_TOKENS = /^\[--vui-[\w-]+:var\(--vui-[\w-]+\)\]$/;
-const ALLOWED = new Map([
-  ["content-['']", 'generated content of a pseudo-element'],
-  ['size-[70.7107%]', 'BPMN gateway: a square rotated by 45° with side 1/√2 of its host'],
-]);
+const ALLOWED = new Map([["content-['']", 'generated content of a pseudo-element']]);
 
 /** Class lists are the `class:` host values and the upper-case constants they interpolate. */
 function classTokens(file) {

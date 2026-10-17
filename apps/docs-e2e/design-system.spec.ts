@@ -127,54 +127,6 @@ test('field connections follow stable IDs through rename, reorder, density and r
   await demo.screenshot({ path: testInfo.outputPath('entities.png') });
 });
 
-test('BPMN subset: pools with own message flows, lanes, gateways, flow kinds and themes', async ({
-  page,
-}, testInfo) => {
-  await page.goto('/design-system/bpmn');
-  const demo = page.locator('app-ui-bpmn-demo');
-  await demo.scrollIntoViewIfNeeded();
-  await expect(demo.locator('.vui-bpmn-pool')).toHaveCount(2);
-  await expect(demo.locator('.vui-bpmn-lane')).toHaveCount(2);
-  await expect(demo.locator('.vui-bpmn-task')).toHaveCount(4);
-  await expect(demo.locator('.vui-bpmn-event')).toHaveCount(3);
-  await expect(demo.locator('.vui-bpmn-gateway[data-vui-gateway="exclusive"]')).toHaveCount(1);
-  await expect(demo.locator('.vui-bpmn-gateway[data-vui-gateway="parallel"]')).toHaveCount(1);
-  await expect(demo.locator('.vui-external-label')).toHaveCount(5);
-  await expect(demo.locator('path.vui-bpmn-flow[data-vui-flow="sequence"]')).toHaveCount(9);
-  await expect(demo.locator('path.vui-bpmn-flow[data-vui-flow="message"]')).toHaveCount(2);
-  await expect(demo.locator('path.vui-bpmn-flow[data-vui-flow="association"]')).toHaveCount(1);
-  await expect(demo.locator('path.vui-bpmn-flow[data-vui-flow="message"]').first()).toHaveCSS(
-    'stroke-dasharray',
-    '8px, 5px',
-  );
-  await expect(demo.locator('[data-vui-event="intermediate"]')).toHaveCSS('border-top-style', 'double');
-  await expect(demo.locator('[data-vui-event="end"]')).toHaveCSS('border-top-width', '4px');
-  // The supplier pool is a container that takes part in flows through its own handles.
-  const pool = demo.locator('.vui-bpmn-pool').first();
-  await expect(pool.locator('.vui-port.v-handle')).toHaveCount(2);
-  const messageEndpoint = () =>
-    demo.evaluate((root) => {
-      const edge = root.querySelector<SVGPathElement>('path.vui-bpmn-flow[data-vui-flow="message"]')!;
-      // The pool's second bottom handle is its message source; the first one receives messages.
-      const source = root
-        .querySelector('.vui-bpmn-pool')!
-        .querySelectorAll('.vui-port.v-handle[data-v-handle-position="bottom"]')[1]
-        .getBoundingClientRect();
-      const start = edge.getPointAtLength(0).matrixTransform(edge.getScreenCTM()!);
-      return Math.max(Math.abs(start.x - source.x - source.width / 2), Math.abs(start.y - source.bottom));
-    });
-  await expect.poll(messageEndpoint).toBeLessThan(1.5);
-  const gateway = demo.locator('.vui-bpmn-gateway').first();
-  await gateway.click();
-  await expect(gateway).toHaveAttribute('data-vui-selected', 'true');
-  await expect(gateway).toHaveCSS('transform', 'none');
-  await demo.getByLabel('Dark theme', { exact: true }).check();
-  await expect(demo.locator('[data-vui-event="start"]')).toHaveCSS('background-color', 'rgb(44, 44, 46)');
-  await demo.screenshot({ path: testInfo.outputPath('bpmn.png') });
-  await page.emulateMedia({ forcedColors: 'active' });
-  await expect(demo.locator('path.vui-bpmn-flow').first()).toHaveCSS('stroke', 'rgb(0, 0, 0)');
-});
-
 test('viewport controls drive the given flow within its zoom limits, and edge labels follow geometry', async ({
   page,
 }) => {
@@ -492,29 +444,4 @@ test('ERD: deleting a field removes its edges and leaves no detached endpoints',
   await expect(demo.locator('[data-entity="crm"] [vuiField]')).toHaveCount(1);
   await expect(demo.locator('path.vui-edge')).toHaveCount(1);
   await expect(demo.locator('.vui-port[data-vui-connected="true"]')).toHaveCount(2);
-});
-
-test('BPMN ports stay hidden until their node is hovered, also while a connection is drawn', async ({ page }) => {
-  await page.goto('/design-system/bpmn');
-  const demo = page.locator('app-ui-bpmn-demo');
-  await demo.scrollIntoViewIfNeeded();
-  const nodeWith = (text: string) =>
-    demo.locator('.v-node', { has: page.locator('.vui-bpmn-task', { hasText: text }) });
-  const port = nodeWith('Validate invoice').locator('.vui-port').first();
-  await expect(port).toHaveCSS('opacity', '0');
-
-  await nodeWith('Validate invoice').locator('.vui-bpmn-task').hover();
-  await expect(port).toHaveCSS('opacity', '1');
-
-  // A connection does not reveal every target: only the node under the pointer shows its ports.
-  const target = nodeWith('Manual approval');
-  const elsewhere = nodeWith('Notify supplier').locator('.vui-port').first();
-  const source = (await demo.locator('.vui-bpmn-pool .vui-port[handleid="message-out"]').boundingBox())!;
-  const over = (await target.locator('.vui-bpmn-task').boundingBox())!;
-  await page.mouse.move(source.x + source.width / 2, source.y + source.height / 2);
-  await page.mouse.down();
-  await page.mouse.move(over.x + over.width / 2, over.y + over.height / 2, { steps: 10 });
-  await expect(target.locator('.vui-port').first()).toHaveCSS('opacity', '1');
-  await expect(elsewhere).toHaveCSS('opacity', '0');
-  await page.mouse.up();
 });

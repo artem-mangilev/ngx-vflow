@@ -6,7 +6,6 @@ const pages = [
   ['pipeline', 'app-ui-pipeline-demo'],
   ['erd-schema-mapping', 'app-ui-entities-demo'],
   ['relationships-map', 'app-ui-relationships-demo'],
-  ['bpmn', 'app-ui-bpmn-demo'],
 ] as const;
 
 for (const [route, selector] of pages) {

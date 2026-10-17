@@ -1,6 +1,6 @@
 // Verifies the two consumer builds made from the published packages:
 // - core-only: no trace of @vflow/ui in scripts or styles, while the core is present;
-// - ui: the compiled stylesheet is included as-is (no Tailwind directives left) and the BPMN entry is bundled.
+// - ui: the compiled stylesheet is included as-is (no Tailwind directives left) and the UI parts are bundled.
 import { readdirSync, readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { dirname } from 'node:path';
@@ -25,8 +25,8 @@ assert(!/vui-|vui\\:|@vflow\/ui/.test(coreJs + coreCss), 'core-only build contai
 const ui = join(root, 'dist/apps/consumer-ui/browser');
 const uiJs = read(ui, '.js');
 const uiCss = read(ui, '.css');
-assert(uiJs.includes('vui-bpmn-task'), 'ui build does not bundle @vflow/ui/bpmn');
+assert(uiJs.includes('vui-node'), 'ui build does not bundle @vflow/ui');
 assert(uiJs.includes('vui-controls'), 'ui build does not bundle vui-controls');
-assert(/\.vui\\:bg-surface/.test(uiCss), 'ui build stylesheet lacks the compiled utilities');
+assert(/\.bg-vui-surface/.test(uiCss), 'ui build stylesheet lacks the compiled utilities');
 assert(!/@theme|@source|@import ['"]tailwindcss/.test(uiCss), 'ui build stylesheet still contains Tailwind directives');
-console.log('Consumer builds verified: core-only without UI, ui with compiled CSS and the BPMN entry.');
+console.log('Consumer builds verified: core-only without UI, ui with compiled CSS and the UI parts.');

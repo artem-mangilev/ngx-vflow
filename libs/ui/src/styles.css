@@ -13,7 +13,6 @@
 @layer theme, vui, utilities;
 @import 'tailwindcss/utilities.css' layer(utilities) source(none);
 @source './lib';
-@source '../bpmn/src';
 /* Words from doc comments that would otherwise become global utilities, e.g. `.container { width: 100% }`. */
 @source not inline('container visible outline transform');
 
@@ -58,8 +57,6 @@
   --text-vui-body--line-height: calc(var(--vui-font-size) + 5px);
   --text-vui-title: calc(var(--vui-font-size) + 2px);
   --text-vui-title--line-height: calc(var(--vui-font-size) + 7px);
-  --text-vui-symbol: calc(var(--vui-font-size) * 2);
-  --text-vui-symbol--line-height: 1;
 
   /* 4pt grid: `p-vui-3` is three spacing units. Control heights are 6/7/8 units (24/28/32px). */
   --spacing-vui-0: 0px;
@@ -139,12 +136,6 @@
     --vui-info: #409cff;
     --vui-shadow-node: 0 1px 0 rgb(0 0 0 / 0.3);
     --vui-shadow-floating: 0 4px 16px rgb(0 0 0 / 0.5), 0 0 0 0.5px rgb(255 255 255 / 0.1);
-  }
-
-  /* Glyphs for the BPMN entry; ASCII-only class names keep both CSS entries identical. */
-  :root {
-    --vui-bpmn-exclusive: '\00d7';
-    --vui-bpmn-parallel: '+';
   }
 
   /*

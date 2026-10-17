@@ -52,7 +52,7 @@ export class VuiPort {
   /**
    * `always` shows every port. `interaction` keeps an idle port without edges invisible (still a target) until its node
    * is hovered, focused or selected, which includes the node under the pointer while a connection is drawn; for
-   * notations such as BPMN. Hover does not follow a finger, so prefer `always` where users connect by touch.
+   * diagrams that draw no connection points. Hover does not follow a finger, so prefer `always` where users connect by touch.
    */
   readonly vuiPortReveal = input<'always' | 'interaction'>('always');
 

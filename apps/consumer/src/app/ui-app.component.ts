@@ -1,11 +1,10 @@
 import { ChangeDetectionStrategy, Component, signal, viewChild } from '@angular/core';
 import { Vui } from '@vflow/ui';
-import { VuiBpmn } from '@vflow/ui/bpmn';
 import { createEdges, createNodes, Vflow, VflowComponent } from 'ngx-vflow';
 
 @Component({
   selector: 'app-root',
-  imports: [Vflow, Vui, VuiBpmn],
+  imports: [Vflow, Vui],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
     :host {
@@ -25,34 +24,27 @@ import { createEdges, createNodes, Vflow, VflowComponent } from 'ngx-vflow';
     article {
       width: 200px;
     }
-    .task {
-      width: 150px;
-      min-height: 60px;
-    }
   `,
   template: `
     <div class="stage" [vuiTheme]="dark() ? 'dark' : 'light'">
       <vflow view="auto" data-testid="ui-flow" [nodes]="nodes" [edges]="edges">
         <ng-template let-ctx vNode>
-          @if (ctx.data().kind === 'task') {
-            <div vuiBpmnTask class="task" [vuiSelected]="ctx.selected()">
-              {{ ctx.data().title }}
+          <article vuiNode [vuiSelected]="ctx.selected()">
+            <header vuiNodeHeader>
+              <span vuiTitle>{{ ctx.data().title }}</span>
+            </header>
+            <footer vuiNodeFooter>
+              <span vuiStatus="success" [vuiStatusBusy]="true">Running</span>
+              <span vuiActions>
+                <button vuiButton="secondary" vNoDrag type="button" (click)="dark.set(!dark())">Theme</button>
+              </span>
+            </footer>
+            @if (ctx.node.id === 'target') {
               <span vuiPort handleType="target" position="left"></span>
-            </div>
-          } @else {
-            <article vuiNode [vuiSelected]="ctx.selected()">
-              <header vuiNodeHeader>
-                <span vuiTitle>{{ ctx.data().title }}</span>
-              </header>
-              <footer vuiNodeFooter>
-                <span vuiStatus="success" [vuiStatusBusy]="true">Running</span>
-                <span vuiActions>
-                  <button vuiButton vNoDrag type="button" (click)="dark.set(!dark())">Theme</button>
-                </span>
-              </footer>
+            } @else {
               <span vuiPort handleType="source" position="right"></span>
-            </article>
-          }
+            }
+          </article>
         </ng-template>
         <ng-template let-ctx vEdge>
           <svg:g vEdgeInteraction>
@@ -79,16 +71,16 @@ export class UiAppComponent {
       id: 'card',
       point: { x: 40, y: 60 },
       ariaLabel: 'Card',
-      data: { kind: 'card', title: 'Card from @vflow/ui' },
+      data: { title: 'Card from @vflow/ui' },
     },
     {
-      id: 'task',
+      id: 'target',
       point: { x: 360, y: 80 },
-      ariaLabel: 'Task',
-      data: { kind: 'task', title: 'BPMN task' },
+      ariaLabel: 'Target card',
+      data: { title: 'Target card' },
     },
   ]);
   readonly edges = createEdges([
-    { id: 'card-task', source: 'card', target: 'task', curve: 'smooth-step', markers: { end: {} } },
+    { id: 'card-target', source: 'card', target: 'target', curve: 'smooth-step', markers: { end: {} } },
   ]);
 }

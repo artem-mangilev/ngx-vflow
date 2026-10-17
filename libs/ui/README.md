@@ -31,7 +31,7 @@ pipeline compile it. Rules live in cascade layers; unlayered application styles 
 The package includes card, field-row and container shells, text roles (title, meta, icon, actions),
 port visuals, status indicators, SVG edge strokes, HTML labels, toolbar surfaces, external labels,
 theme and selection directives, and `vui-controls` (zoom in/out, fit view, custom buttons) for a
-flow instance. The BPMN subset lives in the `@vflow/ui/bpmn` entry point.
+flow instance.
 For flow interaction compose them with core `vHandle`
 and gesture-exclusion directives; a click on a presentation selects its node or edge, and `vEdgeInteraction` keeps the edge hit area inside the group for hover styles. Bind `vuiSelected` to selection/preselection and put
 `vuiPort` with the handle inputs `type`, `position`, `id`, `canStart`, `canAccept` on the element that
@@ -45,7 +45,7 @@ A theme scope also maps core feedback (`--v-*`) to the same values; a flow outsi
 keeps core defaults. States retain text/icons alongside their colors.
 
 See the **Design system** ng-doc section for the complete directive/token reference
-and interactive workflow, pipeline, ERD/mapping, relationships map and BPMN recipes. Core is headless:
+and interactive workflow, pipeline, ERD/mapping and relationships map recipes. Core is headless:
 it renders no presentation of its own, so every graph uses these parts or your own templates.
 
 Versions and releases are shared with ngx-vflow. See `docs/releasing.md` in the repository.
