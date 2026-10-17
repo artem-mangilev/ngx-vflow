@@ -96,24 +96,24 @@ not part of the library; `@vflow/ui` declares `ngx-vflow` as a peer dependency f
 
 ## Directive reference
 
-| Import                                          | Attribute                                                                 | Responsibility                                                                                   |
-| ----------------------------------------------- | ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| `VuiTheme`                                      | `[vuiTheme]="'light'"`                                                    | Scoped light/dark semantic tokens                                                                |
-| `VuiSelected`                                   | `[vuiSelected]="ctx.selected() \|\| ctx.preselected()"`                   | Selection presentation; no interaction or ARIA changes                                           |
-| `VuiNode`                                       | `vuiNode`                                                                 | Node surface; consumer chooses size and content                                                  |
-| `VuiNodeHeader`, `VuiNodeBody`, `VuiNodeFooter` | `vuiNodeHeader`, `vuiNodeBody`, `vuiNodeFooter`                           | Optional anatomy on consumer elements                                                            |
-| `VuiRow`                                        | `vuiRow`                                                                  | Row (field, typed port, list item) with room for text roles and core handles                     |
-| `VuiContainer`                                  | `vuiContainer`                                                            | Tinted group with a hairline; parent relationships remain explicit in graph data                 |
-| `VuiContainerHeader`                            | `vuiContainerHeader`                                                      | Title row of a container with room for meta, an icon and actions                                 |
-| `VuiTitle`, `VuiMeta`                           | `vuiTitle`, `vuiMeta`                                                     | Primary wrapping text and secondary text in any shell                                            |
-| `VuiIcon`, `VuiActions`                         | `vuiIcon`, `vuiActions`                                                   | Icon slot and a group of controls; add `vNoDrag` to each                                         |
-| `VuiPort`                                       | `vuiPort handleType="target" position="left" [vuiPortConnected]="…"`      | A core handle with the port look: idle/valid/invalid from the handle, connected, `vuiPortReveal` |
-| `VuiStatus`                                     | `[vuiStatus]="'warning'" [vuiStatusBusy]="true"`                          | Indicator: semantic tone, your text and optional activity                                        |
-| `VuiEdge`                                       | `vuiEdge` on an SVG path                                                  | Stroke; bind core path and marker URLs yourself                                                  |
-| `VuiEdgeLabel`                                  | `vuiEdgeLabel`                                                            | HTML label surface, including optional native controls                                           |
-| `VuiToolbar`                                    | `vuiToolbar`                                                              | Surface for `v-node-toolbar` content                                                             |
-| `VuiControls`                                   | `<vui-controls [flow]="flow">`                                            | Viewport controls for one flow instance; project plain icon buttons                              |
-| `VuiButton`                                     | `vuiButton="primary" vuiButtonSize="sm" vuiButtonIcon` on a native button | Secondary (default), primary and plain variants, two sizes, focus, pressed and disabled states   |
+| Import                                          | Attribute                                                                 | Responsibility                                                                                     |
+| ----------------------------------------------- | ------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| `VuiTheme`                                      | `[vuiTheme]="'light'"`                                                    | Scoped light/dark semantic tokens                                                                  |
+| `VuiSelected`                                   | `[vuiSelected]="ctx.selected() \|\| ctx.preselected()"`                   | Selection presentation; no interaction or ARIA changes                                             |
+| `VuiNode`                                       | `vuiNode`                                                                 | Node surface; consumer chooses size and content                                                    |
+| `VuiNodeHeader`, `VuiNodeBody`, `VuiNodeFooter` | `vuiNodeHeader`, `vuiNodeBody`, `vuiNodeFooter`                           | Optional anatomy on consumer elements                                                              |
+| `VuiRow`                                        | `vuiRow`                                                                  | Row (field, typed port, list item) with room for text roles and core handles                       |
+| `VuiContainer`                                  | `vuiContainer`                                                            | Tinted group with a hairline; parent relationships remain explicit in graph data                   |
+| `VuiContainerHeader`                            | `vuiContainerHeader`                                                      | Title row of a container with room for meta, an icon and actions                                   |
+| `VuiTitle`, `VuiMeta`                           | `vuiTitle`, `vuiMeta`                                                     | Primary wrapping text and secondary text in any shell                                              |
+| `VuiIcon`, `VuiActions`                         | `vuiIcon`, `vuiActions`                                                   | Leading slot for an icon or avatar of any size, and a group of controls; add `vNoDrag` to controls |
+| `VuiPort`                                       | `vuiPort handleType="target" position="left" [vuiPortConnected]="…"`      | A core handle with the port look: idle/valid/invalid from the handle, connected, `vuiPortReveal`   |
+| `VuiStatus`                                     | `[vuiStatus]="'warning'" [vuiStatusBusy]="true"`                          | Indicator: semantic tone, your text and optional activity                                          |
+| `VuiEdge`                                       | `vuiEdge` on an SVG path                                                  | Stroke; bind core path and marker URLs yourself                                                    |
+| `VuiEdgeLabel`                                  | `vuiEdgeLabel`                                                            | HTML label surface, including optional native controls                                             |
+| `VuiToolbar`                                    | `vuiToolbar`                                                              | Surface for `v-node-toolbar` content                                                               |
+| `VuiControls`                                   | `<vui-controls [flow]="flow">`                                            | Viewport controls for one flow instance; project plain icon buttons                                |
+| `VuiButton`                                     | `vuiButton="primary" vuiButtonSize="sm" vuiButtonIcon` on a native button | Secondary (default), primary and plain variants, two sizes, focus, pressed and disabled states     |
 
 Each directive is independently importable. Apart from `vui-controls`, none imports ngx-vflow; none owns
 graph state, adds wrapper elements, registers ports or changes accessibility roles. Public selectors are the

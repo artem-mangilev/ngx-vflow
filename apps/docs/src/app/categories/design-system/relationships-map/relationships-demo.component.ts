@@ -39,12 +39,8 @@ type MapData = Person | Metric | Note | Team;
     .person {
       width: 190px;
     }
-    /* The avatar is taller than a text line, so the one-line name is centered on it instead of sharing a baseline. */
-    .person-header {
-      align-items: center;
-    }
     .avatar {
-      flex: none;
+      display: block;
       width: 28px;
       height: 28px;
       border-radius: 50%;
@@ -143,17 +139,20 @@ type MapData = Person | Metric | Note | Team;
             @switch (ctx.data().kind) {
               @case ('person') {
                 <article vuiNode class="person" [vuiSelected]="ctx.selected() || ctx.preselected()">
-                  <header vuiNodeHeader class="person-header">
-                    <svg
-                      class="avatar"
-                      viewBox="0 0 28 28"
-                      role="img"
-                      [attr.aria-label]="'Avatar of ' + ctx.data().name">
-                      <circle cx="14" cy="14" r="14" [attr.fill]="'hsl(' + ctx.data().hue + ' 55% 45%)'" />
-                      <text x="14" y="18" text-anchor="middle" fill="#fff" font-size="11" font-weight="600">
-                        {{ ctx.data().initials }}
-                      </text>
-                    </svg>
+                  <header vuiNodeHeader>
+                    <!-- The slot centers the 28px avatar on the first line of the name. -->
+                    <span vuiIcon>
+                      <svg
+                        class="avatar"
+                        viewBox="0 0 28 28"
+                        role="img"
+                        [attr.aria-label]="'Avatar of ' + ctx.data().name">
+                        <circle cx="14" cy="14" r="14" [attr.fill]="'hsl(' + ctx.data().hue + ' 55% 45%)'" />
+                        <text x="14" y="18" text-anchor="middle" fill="#fff" font-size="11" font-weight="600">
+                          {{ ctx.data().initials }}
+                        </text>
+                      </svg>
+                    </span>
                     <span vuiTitle>{{ ctx.data().name }}</span>
                   </header>
                   <div vuiNodeBody>

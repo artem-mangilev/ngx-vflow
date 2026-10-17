@@ -12,14 +12,16 @@ export class VuiTitle {}
 export class VuiMeta {}
 
 /**
- * Icon slot: four grid units wide and one text line high. A zero-width text strut gives it the baseline of that line, so
- * in a header it sits on the first line of a wrapped title, and a 16px SVG is centered on that line. Put it on a wrapper element, not on
- * the `svg` or `img` itself: those render no strut and would align their bottom edge with the title. Mark purely decorative icons with `aria-hidden` yourself.
+ * Leading slot for an icon, an avatar or any other small view of an unknown size. It is at least four grid units wide
+ * and one text line high and grows with its content. A zero-width text strut, centered in the slot like the content,
+ * gives it the baseline of a line centered on it, so in a header the slot is centered on the first line of the title:
+ * a 16px icon sits on that line, and a 28px avatar is centered on a one-line title. Put it on a wrapper element, not
+ * on an `svg` or `img`: those render no strut. Mark purely decorative icons with `aria-hidden` yourself.
  */
 @Directive({
   selector: '[vuiIcon]',
   host: {
-    class: `vui-icon inline-flex items-center justify-center flex-none w-vui-4 h-lh
+    class: `vui-icon inline-flex items-center justify-center flex-none min-w-vui-4 min-h-lh
       before:content-vui-strut`,
   },
 })

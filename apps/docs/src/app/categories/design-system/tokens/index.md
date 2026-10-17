@@ -44,8 +44,9 @@ like `--vui-info`, which keeps 4.5:1 on the surface in both themes.
 
 A status badge is a tint of its tone (16%) with text of the same hue mixed 80/20 with the foreground, so it
 stays above 4.5:1 on its tint in both themes; it uses the control radius like buttons. Headers align every item to the first line of the title: an icon, a meta label, a badge or a button stays beside it
-when the title wraps. The icon slot is four grid units wide and one line high, with a zero-width text strut that gives it
-the line's baseline, so a 16px SVG is centered on that line.
+when the title wraps. The leading slot (`vuiIcon`) is at least four grid units wide and one line high and grows with
+its content; a zero-width text strut centered in it gives it a baseline, so an icon, an avatar or any other small view is
+centered on the first line of the title, whatever its size.
 
 Parts set their own font family, size, line height and weight, reset the letter spacing an application may set on
 its body and use grayscale antialiasing, as native macOS text does; without it light text on the dark theme renders
