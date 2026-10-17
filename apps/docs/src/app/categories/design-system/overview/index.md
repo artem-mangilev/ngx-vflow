@@ -62,9 +62,12 @@ Three kinds of state stay separate so they can be shown at once:
 
 Ports mirror two independent facts: the core feedback for the connection in progress (`idle`, `valid`, `invalid`),
 read from the core handle that `vuiPort` applies to the same element (`vuiPortState` only overrides it); `vuiPortConnected` is your
-knowledge about existing edges. An idle port is a 12px ring, filled once connected; an invalid target is a dashed red ring,
-so the state does not depend on color alone. A pseudo-element widens the pointer target to 28px along the node side and
-8px into the node, never outward, where the end of a connected edge takes reconnection presses; the endpoint does not move. `vuiPortReveal="interaction"` keeps idle ports without edges invisible until their node is hovered,
+knowledge about existing edges. An idle port is an 8px ring, filled once connected. A hovered port that can start a connection,
+the port a connection is drawn from and the candidate under the pointer get a halo in the state color (selection,
+success, danger) that draws the ring 2px larger without changing its box, so the endpoint never moves. A valid
+candidate is filled and an invalid one stays hollow, so the state does not depend on color alone. A pseudo-element
+widens the pointer target to about 30px along the node side and
+15px deep into the node, never outward, where the end of a connected edge takes reconnection presses; the endpoint does not move. `vuiPortReveal="interaction"` keeps idle ports without edges invisible until their node is hovered,
 focused or selected, which suits diagrams that draw no connection points. While a connection is drawn,
 the ports of a node appear when the pointer reaches it; ports of other nodes stay hidden but remain targets. Hover does
 not follow a finger, so keep the default `always` where users connect by touch.

@@ -41,7 +41,8 @@ interface StageData {
       height: 520px;
     }
     /* Port color by type is application CSS on the public selector; the library knows nothing about media types.
-       Only the idle look is recolored, so connection feedback (valid, invalid) keeps the library colors. */
+       Only the idle look is recolored, including the tone of the hover halo, so connection feedback (valid, invalid)
+       keeps the library colors. */
     .vui-port[data-type='video'] {
       --type: #2563eb;
     }
@@ -52,6 +53,7 @@ interface StageData {
       --type: #d97706;
     }
     .vui-port[data-type][data-vui-state='idle'] {
+      --vui-tone: var(--type);
       border-color: var(--type);
     }
     .vui-port[data-type][data-vui-state='idle'][data-vui-connected='true'] {

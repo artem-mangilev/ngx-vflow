@@ -76,6 +76,12 @@
 
   --shadow-vui-node: var(--vui-shadow-node);
   --shadow-vui-floating: var(--vui-shadow-floating);
+  /* Emphasis of a small part in its tone without changing its box: one solid pixel grows the part, a wider tint
+     surrounds it. The port uses it, so the measured handle and the edge endpoint never move. */
+  --shadow-vui-halo: 0 0 0 1px var(--vui-tone), 0 0 0 4px color-mix(in oklab, var(--vui-tone) 28%, transparent);
+
+  /* The port ring: thinner than the 2px edge stroke, so an 8px ring keeps an open center. */
+  --border-width-vui-port: 1.5px;
   --blur-vui-material: 20px;
 
   --ease-vui: var(--vui-ease);
