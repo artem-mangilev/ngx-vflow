@@ -15,7 +15,13 @@
           "tsc -p libs/cli/tsconfig.lib.json",
           "node libs/cli/scripts/copy-assets.mjs"
         ]
-      }
+      },
+      "dependsOn": [
+        {
+          "projects": ["ui"],
+          "target": "sync-cli"
+        }
+      ]
     },
     "lint": {
       "executor": "@angular-eslint/builder:lint",
@@ -33,25 +39,18 @@
         "watch": {
           "command": "vitest"
         }
-      }
+      },
+      "dependsOn": [
+        {
+          "projects": ["ui"],
+          "target": "sync-cli"
+        }
+      ]
     },
     "nx-release-publish": {
       "executor": "@nx/js:release-publish",
       "options": {
         "packageRoot": "dist/{projectRoot}"
-      }
-    },
-    "smoke": {
-      "executor": "nx:run-commands",
-      "dependsOn": [
-        {
-          "projects": ["ngx-vflow"],
-          "target": "build"
-        },
-        "build"
-      ],
-      "options": {
-        "command": "node libs/cli/scripts/smoke.mjs"
       }
     }
   }

@@ -12,6 +12,5 @@
 @import './ui-preset.css';
 @import './ui-theme.css' layer(base);
 @source './lib';
-/* Words from doc comments that would otherwise become global utilities, e.g. `.grid { display: grid }`.
-   `check-styles` fails on any generated class that no part uses, so a new word shows up there. */
+/* Words from doc comments that would otherwise become global utilities, e.g. `.grid { display: grid }`. */
 @source not inline('container visible invisible outline transform grid ring');

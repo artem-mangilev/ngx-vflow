@@ -21,14 +21,6 @@
       "options": {
         "command": "node libs/ui/scripts/sync-cli.mjs"
       }
-    },
-    "check-cli": {
-      "executor": "nx:run-commands",
-      "cache": true,
-      "inputs": ["{projectRoot}/src/**/*", "{workspaceRoot}/libs/cli/**/*"],
-      "options": {
-        "command": "node libs/ui/scripts/sync-cli.mjs --check"
-      }
     }
   }
 }
