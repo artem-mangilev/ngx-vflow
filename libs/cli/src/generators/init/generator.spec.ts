@@ -1,7 +1,7 @@
 import { addProjectConfiguration, readJson, readJsonFile, type Tree, updateJson } from '@nx/devkit';
 import { createTreeWithEmptyWorkspace } from '@nx/devkit/testing';
 import { join } from 'node:path';
-import { PRESET_IMPORT } from './theme';
+import { THEME_IMPORT } from './theme';
 import { initGenerator } from './generator';
 
 describe('init', () => {
@@ -19,7 +19,7 @@ describe('init', () => {
     await initGenerator(tree);
 
     expect(readJson(tree, 'package.json').dependencies['ngx-vflow']).toBe(`^${version}`);
-    expect(tree.read('apps/app/src/styles.css', 'utf-8')).toContain(PRESET_IMPORT);
+    expect(tree.read('apps/app/src/styles.css', 'utf-8')).toContain(THEME_IMPORT);
   });
 
   it.each(['dependencies', 'devDependencies'])('keeps ngx-vflow already in %s', async (field) => {

@@ -11,9 +11,12 @@ ng g @vflow/cli:init # or: nx g @vflow/cli:init
 ng g @vflow/cli:ui   # or: nx g @vflow/cli:ui
 ```
 
-| Generator | Does                                                                                                                                         |
-| --------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| `init`    | Adds `ngx-vflow` and `@angular/cdk` when missing, imports `@vflow/cli/ui-preset.css` after Tailwind and adds the light and dark theme values |
-| `ui`      | Asks for the `ui` section of `vflow.json` on the first run and copies the parts as `@vflow/ui`                                               |
+| Generator | Does                                                                                                                                               |
+| --------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `init`    | Adds `ngx-vflow` and `@angular/cdk` when missing, copies the tokens (`vflow-ui.css`) next to the global stylesheet and imports them after Tailwind |
+| `ui`      | Asks for the `ui` section of `vflow.json` on the first run and copies the parts as `@vflow/ui`                                                     |
 
 A later `ui` run, for example after an update, adds only the files that are missing.
+
+Nothing in your application imports `@vflow/cli`: the parts and the tokens are copied, so the package is only needed
+while you run the generators.

@@ -1,7 +1,11 @@
 import { addProjectConfiguration, type Tree, updateJson, writeJson } from '@nx/devkit';
 import { createTree, createTreeWithEmptyWorkspace } from '@nx/devkit/testing';
 import { prompt } from 'enquirer';
-import { addUiTheme, PRESET_IMPORT } from './theme';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { addUiTheme, THEME_IMPORT } from './theme';
+
+const TOKENS = readFileSync(join(__dirname, 'vflow-ui.css'), 'utf-8');
 
 vi.mock('enquirer', () => ({ prompt: vi.fn() }));
 
@@ -22,17 +26,18 @@ describe('theme of init', () => {
     updateJson(tree, 'package.json', (json) => ({ ...json, devDependencies: { tailwindcss: '^4.1.0' } }));
   });
 
-  it('imports the preset right after Tailwind and appends the theme values', async () => {
+  it('copies the tokens file next to the stylesheet and imports it right after Tailwind', async () => {
     addApp(tree, 'app');
     tree.write('apps/app/src/styles.css', "@import 'tailwindcss';\n\nbody {\n  margin: 0;\n}\n");
 
     await addUiTheme(tree);
 
-    const css = tree.read('apps/app/src/styles.css', 'utf-8')!;
-    expect(css.startsWith(`@import 'tailwindcss';\n${PRESET_IMPORT}\n\nbody {`)).toBe(true);
-    expect(css).toContain(":root,\n[data-vui-theme='light'] {");
-    expect(css.trimEnd().endsWith('}')).toBe(true);
-    expect(css.indexOf("[data-vui-theme='dark']")).toBeGreaterThan(css.indexOf('margin: 0'));
+    expect(tree.read('apps/app/src/styles.css', 'utf-8')).toBe(
+      `@import 'tailwindcss';\n${THEME_IMPORT}\n\nbody {\n  margin: 0;\n}\n`,
+    );
+    expect(tree.read('apps/app/src/vflow-ui.css', 'utf-8')).toBe(TOKENS);
+    expect(TOKENS).toContain('@theme inline');
+    expect(TOKENS).not.toMatch(/@import ['"]@vflow\/cli/);
   });
 
   it('skips a leading comment, @charset and layer statements', async () => {
@@ -44,7 +49,7 @@ describe('theme of init', () => {
 
     await addUiTheme(tree);
 
-    expect(tree.read('apps/app/src/styles.css', 'utf-8')).toContain(`@import 'tailwindcss';\n${PRESET_IMPORT}\n.a {`);
+    expect(tree.read('apps/app/src/styles.css', 'utf-8')).toContain(`@import 'tailwindcss';\n${THEME_IMPORT}\n.a {`);
   });
 
   it('requires Tailwind CSS 4', async () => {
@@ -66,24 +71,26 @@ describe('theme of init', () => {
     expect(tree.read('apps/app/src/styles.scss', 'utf-8')).toBe("@use 'sass:math';\n");
   });
 
-  it('puts the preset first in a stylesheet without leading imports', async () => {
+  it('puts the import first in a stylesheet without leading imports', async () => {
     addApp(tree, 'app');
     tree.write('apps/app/src/styles.css', '');
 
     await addUiTheme(tree);
 
-    expect(tree.read('apps/app/src/styles.css', 'utf-8')!.startsWith(`${PRESET_IMPORT}\n\n/*`)).toBe(true);
+    expect(tree.read('apps/app/src/styles.css', 'utf-8')).toBe(`${THEME_IMPORT}\n`);
   });
 
-  it('does not import the preset or append the values twice', async () => {
+  it('keeps an existing tokens file and does not import it twice', async () => {
     addApp(tree, 'app');
     tree.write('apps/app/src/styles.css', "@import 'tailwindcss';\n");
 
     await addUiTheme(tree);
     const once = tree.read('apps/app/src/styles.css', 'utf-8');
+    tree.write('apps/app/src/vflow-ui.css', ':root { --vui-accent: hotpink; }\n');
     await addUiTheme(tree);
 
     expect(tree.read('apps/app/src/styles.css', 'utf-8')).toBe(once);
+    expect(tree.read('apps/app/src/vflow-ui.css', 'utf-8')).toBe(':root { --vui-accent: hotpink; }\n');
   });
 
   it('finds the stylesheet in the build options', async () => {
@@ -93,7 +100,8 @@ describe('theme of init', () => {
 
     await addUiTheme(tree);
 
-    expect(tree.read('apps/app/src/global/theme.css', 'utf-8')).toContain(PRESET_IMPORT);
+    expect(tree.read('apps/app/src/global/theme.css', 'utf-8')).toContain(THEME_IMPORT);
+    expect(tree.exists('apps/app/src/global/vflow-ui.css')).toBe(true);
     expect(tree.read('node_modules/some-lib/styles.css', 'utf-8')).toBe('');
   });
 
@@ -104,7 +112,7 @@ describe('theme of init', () => {
 
     await addUiTheme(tree, { stylesEntryPoint: 'apps/app/src/flow.css' });
 
-    expect(tree.read('apps/app/src/flow.css', 'utf-8')).toContain(PRESET_IMPORT);
+    expect(tree.read('apps/app/src/flow.css', 'utf-8')).toContain(THEME_IMPORT);
     expect(tree.read('apps/app/src/styles.css', 'utf-8')).toBe('');
     await expect(addUiTheme(tree, { stylesEntryPoint: 'apps/app/src/missing.css' })).rejects.toThrow('does not exist');
   });
@@ -125,7 +133,7 @@ describe('theme of init', () => {
     await addUiTheme(tree);
 
     expect(vi.mocked(prompt)).toHaveBeenCalledWith(expect.objectContaining({ choices: ['admin', 'shop'] }));
-    expect(tree.read('apps/shop/src/styles.css', 'utf-8')).toContain(PRESET_IMPORT);
+    expect(tree.read('apps/shop/src/styles.css', 'utf-8')).toContain(THEME_IMPORT);
   });
 
   it('takes --project without asking and rejects an unknown one', async () => {
@@ -136,7 +144,7 @@ describe('theme of init', () => {
     await addUiTheme(tree, { project: 'admin' });
 
     expect(vi.mocked(prompt)).not.toHaveBeenCalled();
-    expect(tree.read('apps/admin/src/styles.css', 'utf-8')).toContain(PRESET_IMPORT);
+    expect(tree.read('apps/admin/src/styles.css', 'utf-8')).toContain(THEME_IMPORT);
     await expect(addUiTheme(tree, { project: 'shared' })).rejects.toThrow('Choose one of: admin, shop');
   });
 
@@ -158,6 +166,6 @@ describe('theme of init', () => {
 
     await addUiTheme(cli);
 
-    expect(cli.read('src/styles.css', 'utf-8')).toContain(`@import 'tailwindcss';\n${PRESET_IMPORT}`);
+    expect(cli.read('src/styles.css', 'utf-8')).toContain(`@import 'tailwindcss';\n${THEME_IMPORT}`);
   });
 });

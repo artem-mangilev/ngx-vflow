@@ -1,5 +1,5 @@
 // Copies the sources of @vflow/ui into the templates of @vflow/cli, like spartan's hlm-to-cli generator: the parts
-// become the files of the `ui` generator and the two stylesheets become the preset and the theme that `init` adds.
+// become the files of the `ui` generator and vflow-ui.css the tokens file that `init` copies.
 // The copies are verbatim (the parts import each other relatively), so a consumer gets the code docs and e2e run on.
 // `cli:build` and `cli:test` run it first, so the package and the tests always use the current parts.
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
@@ -15,8 +15,7 @@ const partsDir = join(cli, 'src/generators/ui/files');
 /** Target path → source path. Templates take the `.template` suffix so the CLI project does not compile them. */
 const expected = new Map([
   [join(partsDir, 'src/index.ts.template'), join(ui, 'public-api.ts')],
-  [join(cli, 'ui-preset.css'), join(ui, 'ui-preset.css')],
-  [join(cli, 'src/generators/init/ui-theme.css'), join(ui, 'ui-theme.css')],
+  [join(cli, 'src/generators/init/vflow-ui.css'), join(ui, 'vflow-ui.css')],
 ]);
 for (const file of readdirSync(join(ui, 'lib'))) {
   if (file.endsWith('.ts') && !file.endsWith('.spec.ts')) {

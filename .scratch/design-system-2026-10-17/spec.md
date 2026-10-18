@@ -13,12 +13,12 @@
 
 - **BPMN удалён** (решение пользователя после ревью): entry point `@vflow/ui/bpmn`, страница docs, e2e и стили глифов. Специализированные наборы нотаций в каталог не входят.
 
-- **Модель поставки.** На npm публикуется `@vflow/cli`: генераторы, шаблоны частей и Tailwind-пресет. Части копируются в репозиторий потребителя одной библиотекой и импортируются через alias `@vflow/ui`. Поведение (handle, selection, viewport API) остаётся в core ngx-vflow — это аналог spartan `brain`; копируемые части — аналог `helm`. В скопированном коде нет логики, которую пришлось бы мержить при обновлении.
+- **Модель поставки.** На npm публикуется `@vflow/cli`: генераторы и шаблоны частей и токенов; приложение ничего из него не импортирует (2026-10-18). Части копируются в репозиторий потребителя одной библиотекой и импортируются через alias `@vflow/ui`. Поведение (handle, selection, viewport API) остаётся в core ngx-vflow — это аналог spartan `brain`; копируемые части — аналог `helm`. В скопированном коде нет логики, которую пришлось бы мержить при обновлении.
 - **Стилизация — Tailwind utilities** в копируемом коде. Потребителю нужен Tailwind v4. Это отменяет двойную поставку `styles.css` / `styles.source.css` из решения 2026-09-12 и вариант «UI без Tailwind».
 - **Генераторы — Nx + Angular CLI.** Одна реализация на `@nx/devkit`; Angular schematics получаются через `convertNxGenerator`. Работают `nx g @vflow/cli:ui node` и `ng g @vflow/cli:ui node`.
-- **Значения токенов копируются** `init` в глобальный stylesheet потребителя; регистрация токенов в Tailwind (`@theme inline`, маппинг на core) — пресет из пакета. Значения и новые темы — код потребителя, пресет обновляется вместе с пакетом.
+- **Значения токенов копируются** `init` файлом `vflow-ui.css` рядом с глобальным stylesheet (значения, `@theme inline`, маппинг на core) и импортом после `@import 'tailwindcss'`; всё — код потребителя, как у shadcn.
 - **Плотность — macOS**: body 13px, caption 11px, контролы 24–28px.
-- **CLI повторяет spartan-ng (2026-10-18).** `@vflow/cli` и пресет в нём подтверждены пользователем; пакет общий для vflow (в будущем — генератор скиллов). Генераторы, конфиг, раскладка частей и синхронизация шаблонов скопированы с `@spartan-ng/cli` 1.8; отличия перечислены в разделе «Генераторы».
+- **CLI повторяет spartan-ng (2026-10-18).** `@vflow/cli` подтверждён пользователем; импорта из пакета нет (2026-10-18), CLI нужен только на время генерации; пакет общий для vflow (в будущем — генератор скиллов). Генераторы, конфиг, раскладка частей и синхронизация шаблонов скопированы с `@spartan-ng/cli` 1.8; отличия перечислены в разделе «Генераторы».
 - **Набор ставится целиком (2026-10-18).** Части — одна система в 11 файлах (~425 строк) без npm-зависимостей, поэтому выбора частей, таблицы зависимостей и entrypoint на часть нет. Конфиг — `vflow.json` с разделом `ui`: файл общий для будущих возможностей CLI (скиллы).
 - **Выделение — вход части (2026-10-18).** `vuiNode`, `vuiGroup`, `vuiEdge` принимают `selected`; потребитель передаёт `ctx.selected()` (и, если хочет, `ctx.preselected()`) или своё состояние. Части не читают `NODE_REF`/`EDGE_REF`. Директивы `VuiSelected` и `VuiTheme` удалены: тема — атрибут `data-vui-theme` на любом элементе, включая `<html>` в `index.html`.
 
@@ -116,7 +116,7 @@
 
 ## Tailwind в проекте потребителя
 
-- Пресет `@vflow/cli/ui-preset.css` регистрирует токены через `@theme inline` в собственном пространстве `vui`: `--color-vui-surface`, `--radius-vui-surface`, `--text-vui-body` и т.д. Utilities — `bg-vui-surface`, `rounded-vui-surface`, `text-vui-body`. Это исключает коллизии с темой приложения (`bg-surface`, `bg-background` у shadcn-подобных тем) и не требует глобального Tailwind `prefix()`, который настраивает потребитель.
+- `vflow-ui.css` регистрирует токены через `@theme inline` в собственном пространстве `vui`: `--color-vui-surface`, `--radius-vui-surface`, `--text-vui-body` и т.д. Utilities — `bg-vui-surface`, `rounded-vui-surface`, `text-vui-body`. Это исключает коллизии с темой приложения (`bg-surface`, `bg-background` у shadcn-подобных тем) и не требует глобального Tailwind `prefix()`, который настраивает потребитель.
 - Значения тем — CSS-переменные `--vui-*`: шкалы и motion один раз в `:root`, цвета и тени — одинаковым набором ключей в `[data-vui-theme='light'|'dark']` ; `@theme inline` ссылается на них, поэтому смена темы — только смена переменных.
 - Маппинг на core `--v-*` в области темы сохраняется (ADR-0005): импорт темы не перекрашивает flow вне `[data-vui-theme]`.
 - Скопированные части лежат в репозитории потребителя (`componentsPath`), Tailwind находит их автоматическим source detection; `@source` для `node_modules` не нужен.
@@ -137,10 +137,9 @@
 Публичного `ui-theme` нет (решение 2026-10-18): тема одна, выбирать нечего, а `init` так же идемпотентен. Логика — функция `addUiTheme` в `generators/init/theme.ts`; генератор другого набора частей (например, будущий `@vflow/bpmn`), которому нужны токены, вызывает её же. Приложение — из `--project`, вопроса или единственного в workspace; stylesheet — из `--stylesEntryPoint` или поиска.
 
 - Stylesheet ищется как у spartan: `styles.css|scss|sass|less` в `sourceRoot` проекта, затем первый файл проекта из `build.options.styles`; не нашёлся — ошибка с подсказкой про `--stylesEntryPoint`. Не `.css` (Sass, Less) — ошибка: Tailwind 4 компилирует только CSS, а вставка с `;` и `{}` ломает синтаксис Sass с отступами.
-- `@import '@vflow/cli/ui-preset.css';` вставляется сразу после ведущих `@charset` / `@import` / `@layer …;`, чтобы `@import 'tailwindcss'` шёл первым и CSS оставался валидным.
-- В конец файла пишутся блоки `:root, [data-vui-theme='light'] { --vui-*… }` и `[data-vui-theme='dark'] { --vui-*… }`.
-- Повторный запуск ничего не дублирует: импорт пресета и блок `[data-vui-theme='dark']` уже есть — `init` пишет об этом и оставляет файл; значения правят на месте.
-- Ведущие комментарии (`/* You can add global styles… */` из `ng new`) пропускаются, поэтому пресет встаёт после `@import 'tailwindcss'`, а не над ним.
+- `vflow-ui.css` копируется рядом со stylesheet, `@import './vflow-ui.css';` вставляется сразу после ведущих `@charset` / `@import` / `@layer …;`, чтобы `@import 'tailwindcss'` шёл первым и CSS оставался валидным.
+- Повторный запуск ничего не дублирует: существующий `vflow-ui.css` и импорт сохраняются — `init` пишет об этом; значения правят на месте.
+- Ведущие комментарии (`/* You can add global styles… */` из `ng new`) пропускаются, поэтому импорт встаёт после `@import 'tailwindcss'`, а не над ним.
 - Отличия от spartan: темы одна пара light/dark, поэтому нет выбора темы и опции `--theme`; нет `--prefix` (тема уже ограничена `[data-vui-theme]`); не переписываются Tailwind-импорты и не добавляется `@layer base` для `body` — части не зависят от слоёв и не стилизуют страницу.
 
 ### `ui`
@@ -168,15 +167,15 @@
 Раскладка как у spartan (`libs/helm` + `libs/cli` + `libs/tools`):
 
 - `libs/ui` — приватная библиотека `@vflow/ui` с одним entrypoint и без сборки; docs и e2e импортируют `@vflow/ui` — тот же путь, что у потребителя после `ui`.
-- `libs/cli` — публикуемый `@vflow/cli`: `generators.json` с секциями `generators` и `schematics`, `compat.ts` на генератор, шаблоны, `ui-preset.css`; релизится одной версией с `ngx-vflow` (тег `release`), так как `init` и `ui` ставят `ngx-vflow` в версии CLI.
-- Скрипт `libs/ui/scripts/sync-cli.mjs` (`nx run ui:sync-cli`, аналог `hlm-to-cli-generator`; скрипт, а не Nx-генератор, как остальные скрипты `libs/ui`) копирует `libs/ui/src` в `libs/cli/src/generators/ui/files` с суффиксом `.template` (`public-api.ts` → `src/index.ts`), `ui-preset.css` в корень `libs/cli` и `ui-theme.css` в `libs/cli/src/generators/init`. Копии дословные: импорты внутри набора относительные. Результат коммитится; `cli:build` и `cli:test` сначала запускают `ui:sync-cli`, поэтому отдельной проверки расхождения нет.
-- Пресет и значения тем — `libs/ui/src/ui-preset.css` и `ui-theme.css`; `styles.css` библиотеки импортирует оба. Правила пресета лежат в `@layer base` (у потребителя ниже utilities, неслоёные стили приложения побеждают).
+- `libs/cli` — публикуемый `@vflow/cli`: `generators.json` с секциями `generators` и `schematics`, `compat.ts` на генератор, шаблоны, `init/vflow-ui.css`; релизится одной версией с `ngx-vflow` (тег `release`), так как `init` и `ui` ставят `ngx-vflow` в версии CLI.
+- Скрипт `libs/ui/scripts/sync-cli.mjs` (`nx run ui:sync-cli`, аналог `hlm-to-cli-generator`; скрипт, а не Nx-генератор, как остальные скрипты `libs/ui`) копирует `libs/ui/src` в `libs/cli/src/generators/ui/files` с суффиксом `.template` (`public-api.ts` → `src/index.ts`), `vflow-ui.css` в `libs/cli/src/generators/init`. Копии дословные: импорты внутри набора относительные. Результат коммитится; `cli:build` и `cli:test` сначала запускают `ui:sync-cli`, поэтому отдельной проверки расхождения нет.
+- Токены — один файл `libs/ui/src/vflow-ui.css`, его импортирует `styles.css` библиотеки. Правила маппинга лежат в `@layer base` (у потребителя ниже utilities, неслоёные стили приложения побеждают).
 - Docs: у каждой части — исходник файла; страница конфига `vflow.json`; страница токенов показывает шкалы в обеих темах.
 
 ## Не входит
 
 - `healthcheck`, `info` и `migrate-*` генераторы spartan — появятся с первыми breaking changes частей.
-- Генератор скиллов для агентов — будущий генератор того же `@vflow/cli` (решение 2026-10-18: пакет общий для vflow, не только для UI; поэтому UI-генератор называется `ui`, а пресет — `ui-preset.css`).
+- Генератор скиллов для агентов — будущий генератор того же `@vflow/cli` (решение 2026-10-18: пакет общий для vflow, не только для UI; поэтому UI-генератор называется `ui`, а файл токенов — `vflow-ui.css`).
 - Дополнительные темы кроме light/dark.
 - Новые части каталога и изменения core-поведения.
 - Вариант без Tailwind.

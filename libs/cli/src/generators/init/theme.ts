@@ -1,15 +1,19 @@
 import { joinPathFragments, logger, type ProjectConfiguration, readJson, type Tree } from '@nx/devkit';
 import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
 import { resolveApplication } from '../../utils/applications';
 import type { InitGeneratorSchema } from './schema';
 
-export const PRESET_IMPORT = "@import '@vflow/cli/ui-preset.css';";
+/** The tokens file `init` copies next to the global stylesheet; see libs/ui/src/vflow-ui.css. */
+export const THEME_FILE = 'vflow-ui.css';
+export const THEME_IMPORT = `@import './${THEME_FILE}';`;
 
 /**
- * Adds the vflow UI theme to the global stylesheet of an application, like spartan's `ui-theme`: the preset import
- * right after the leading imports, so `@import 'tailwindcss'` stays first, and the light and dark values at the end,
- * where they become application code. Tailwind CSS 4 is a prerequisite: checked, not installed.
+ * Adds the vflow UI tokens to an application, like spartan's `ui-theme` but copied the way shadcn copies its theme:
+ * `vflow-ui.css` (values, Tailwind keys, the mapping onto core tokens) next to the global stylesheet, and its import
+ * right after the leading imports, so `@import 'tailwindcss'` stays first. Nothing is imported from @vflow/cli, so the
+ * application does not need the package after the generators ran. Tailwind CSS 4 is a prerequisite: checked, not
+ * installed.
  *
  * Not a generator of its own: with one theme there is nothing to choose, and `init` is as idempotent. A generator for
  * another set of parts that needs the tokens calls it the same way.
@@ -29,7 +33,7 @@ export async function addUiTheme(tree: Tree, options: InitGeneratorSchema = {}):
     );
   }
 
-  // Tailwind 4 compiles plain CSS only; the preset and the theme values would also break the indented Sass syntax.
+  // Tailwind 4 compiles plain CSS only; the import would also break the indented Sass syntax.
   if (!stylesheet.endsWith('.css')) {
     throw new Error(
       `${stylesheet} is not a CSS file, and Tailwind CSS 4 compiles CSS only. ` +
@@ -37,14 +41,19 @@ export async function addUiTheme(tree: Tree, options: InitGeneratorSchema = {}):
     );
   }
 
+  // An existing tokens file is the application's code by now and is kept.
+  const tokens = joinPathFragments(dirname(stylesheet), THEME_FILE);
+  if (tree.exists(tokens)) logger.info(`${tokens} already exists and is kept.`);
+  else tree.write(tokens, readFileSync(join(__dirname, THEME_FILE), 'utf-8'));
+
   const css = tree.read(stylesheet, 'utf-8') ?? '';
-  const themed = addTheme(css, stylesheet);
+  const imported = importTheme(css, stylesheet);
   // Angular CLI reports any write as an update, so an unchanged stylesheet is not written.
-  if (themed !== css) tree.write(stylesheet, themed);
+  if (imported !== css) tree.write(stylesheet, imported);
 }
 
 /**
- * The preset uses `@theme`, `@utility` and `--theme()`: Tailwind 3 fails on them and without Tailwind the parts lose
+ * The tokens use `@theme`, `@utility` and `--theme()`: Tailwind 3 fails on them and without Tailwind the parts lose
  * their styles silently. A range without a version number, such as `latest`, is trusted.
  */
 function requireTailwind4(tree: Tree): void {
@@ -58,31 +67,19 @@ function requireTailwind4(tree: Tree): void {
   }
 }
 
-/** Inserts the preset import and appends the theme values; a stylesheet that already has either keeps it. */
-export function addTheme(css: string, path = 'the stylesheet'): string {
-  let result = css;
-
-  if (result.includes('@vflow/cli/ui-preset.css')) {
-    logger.info(`${path} already imports the vflow UI preset.`);
-  } else {
-    const end = leadingStatementsEnd(result);
-    result =
-      end === 0 ? `${PRESET_IMPORT}\n${result}` : `${result.slice(0, end)}\n${PRESET_IMPORT}${result.slice(end)}`;
+/** Inserts the import of the tokens file after the leading statements, unless the stylesheet already has it. */
+export function importTheme(css: string, path = 'the stylesheet'): string {
+  if (css.includes(THEME_FILE)) {
+    logger.info(`${path} already imports ${THEME_FILE}.`);
+    return css;
   }
-
-  if (result.includes("[data-vui-theme='dark']")) {
-    logger.info(`${path} already has the vflow UI theme values; edit them in place.`);
-  } else {
-    const values = readFileSync(join(__dirname, 'ui-theme.css'), 'utf-8');
-    result = `${result.trimEnd()}\n\n${values}`;
-  }
-
-  return result;
+  const end = leadingStatementsEnd(css);
+  return end === 0 ? `${THEME_IMPORT}\n${css}` : `${css.slice(0, end)}\n${THEME_IMPORT}${css.slice(end)}`;
 }
 
 /**
  * End of the statements that must precede every rule: `@charset`, `@import` and `@layer a, b;`. Comments between them
- * are skipped, so a leading comment does not push the preset above `@import 'tailwindcss'`.
+ * are skipped, so a leading comment does not push the import above `@import 'tailwindcss'`.
  */
 function leadingStatementsEnd(css: string): number {
   let index = 0;

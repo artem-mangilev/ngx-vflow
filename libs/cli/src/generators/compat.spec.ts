@@ -47,7 +47,8 @@ describe('Angular CLI schematics', () => {
     await lastValueFrom(runner.callRule(init({}), tree));
 
     expect(JSON.parse(tree.readContent('package.json')).dependencies['ngx-vflow']).toMatch(/^\^\d/);
-    expect(tree.readContent('src/styles.css')).toContain("@import '@vflow/cli/ui-preset.css';");
+    expect(tree.readContent('src/styles.css')).toContain("@import './vflow-ui.css';");
+    expect(tree.readContent('src/vflow-ui.css')).toContain('@theme inline');
   });
 
   it('ui maps the alias in tsconfig instead of creating an Nx library', async () => {

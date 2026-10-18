@@ -1,11 +1,62 @@
 /*
- * Tailwind preset of @vflow/ui: the `vui` theme keys and the mapping of a `[data-vui-theme]` scope onto the core
- * tokens. Import it after Tailwind (`@import 'tailwindcss';`); the values of the themes are `ui-theme.css`, which
- * the CLI copies into the application's global styles.
+ * vflow UI tokens. `@vflow/cli init` copies this file next to the application's global stylesheet and imports it
+ * after Tailwind (`@import 'tailwindcss';`); from then on it is application code, like the parts.
  *
- * Every key derives from the theme variables. `inline` makes utilities use the expression itself, so an override of
- * `--vui-space`, `--vui-radius` or `--vui-font-size` on any element rescales the parts inside it.
+ * 1. Values. The scales and motion do not depend on the theme and are set once. Each theme sets the same colors and
+ *    shadows; `:root` carries the light ones, so the parts render without a theme scope. There is no typeface: the
+ *    parts use the application's.
+ * 2. Tailwind keys. Every `vui` key derives from the values; `inline` makes utilities use the expression itself, so an
+ *    override of `--vui-space`, `--vui-radius` or `--vui-font-size` on any element rescales the parts inside it.
+ * 3. A `[data-vui-theme]` scope maps the theme onto the core tokens.
  */
+:root {
+  --vui-font-size: 13px;
+  --vui-space: 4px;
+  --vui-radius: 6px;
+  --vui-duration: 150ms;
+  --vui-ease: cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+:root,
+[data-vui-theme='light'] {
+  --vui-canvas: #f5f5f7;
+  --vui-surface: #fff;
+  --vui-surface-muted: rgb(118 118 128 / 0.12);
+  --vui-foreground: #1d1d1f;
+  --vui-muted: #6e6e73;
+  --vui-border: #c6c6c8;
+  /* Separators inside a surface (header, footer, rows) are half as strong as its border. */
+  --vui-separator: rgb(198 198 200 / 0.5);
+  --vui-accent: #0071e3;
+  --vui-on-accent: #fff;
+  --vui-selection: #0071e3;
+  --vui-success: #1e7e34;
+  --vui-warning: #b25000;
+  --vui-danger: #d70015;
+  --vui-info: #0071e3;
+  --vui-shadow-node: 0 1px 0 rgb(0 0 0 / 0.04);
+  --vui-shadow-floating: 0 4px 16px rgb(0 0 0 / 0.12), 0 0 0 0.5px rgb(0 0 0 / 0.08);
+}
+
+[data-vui-theme='dark'] {
+  --vui-canvas: #1c1c1e;
+  --vui-surface: #2c2c2e;
+  --vui-surface-muted: rgb(118 118 128 / 0.24);
+  --vui-foreground: #f5f5f7;
+  --vui-muted: #aeaeb2;
+  --vui-border: #545458;
+  --vui-separator: rgb(84 84 88 / 0.5);
+  --vui-accent: #0071e3;
+  --vui-on-accent: #fff;
+  --vui-selection: #0a84ff;
+  --vui-success: #30d158;
+  --vui-warning: #ff9f0a;
+  --vui-danger: #ff6961;
+  --vui-info: #409cff;
+  --vui-shadow-node: 0 1px 0 rgb(0 0 0 / 0.3);
+  --vui-shadow-floating: 0 4px 16px rgb(0 0 0 / 0.5), 0 0 0 0.5px rgb(255 255 255 / 0.1);
+}
+
 @theme inline {
   --color-vui-surface: var(--vui-surface);
   --color-vui-surface-muted: var(--vui-surface-muted);
