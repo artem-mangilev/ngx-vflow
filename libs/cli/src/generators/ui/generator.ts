@@ -6,12 +6,12 @@ import {
   readNxJson,
   runTasksInSerial,
   type Tree,
-  updateJson,
 } from '@nx/devkit';
 import { readdirSync, readFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { loadOrInitUiConfig, type UiConfig } from '../../utils/config';
 import { addNgxVflow } from '../../utils/dependencies';
+import { setJsoncValue } from '../../utils/jsonc';
 import type { UiGeneratorSchema } from './schema';
 
 /** Templates of the whole set, copied from libs/ui by `ui:sync-cli`. */
@@ -31,6 +31,13 @@ export async function uiGenerator(tree: Tree, options: UiGeneratorSchema = {}): 
 
   const installed = config.importAlias in readTsConfigPaths(tree);
   if (!installed) {
+    // A first run writes the whole set; a folder of the application must not be overwritten or emptied. A thrown
+    // generator writes nothing, vflow.json included.
+    if (tree.exists(directory) && tree.children(directory).length) {
+      throw new Error(
+        `${directory} already has files. Pass --directory with a new or empty folder, or change componentsPath in vflow.json.`,
+      );
+    }
     if (angularCli) setupAngularCliProject(tree, config, directory);
     else tasks.push(await createNxLibrary(tree, config, directory));
   }
@@ -64,22 +71,16 @@ function readTsConfigPaths(tree: Tree): Record<string, string[]> {
 function setupAngularCliProject(tree: Tree, config: UiConfig, directory: string) {
   const tsconfig = rootTsConfig(tree);
   if (!tsconfig) throw new Error('Could not find tsconfig.json to map the import alias of the parts in.');
-  updateJson(tree, tsconfig, (json) => {
-    json.compilerOptions ??= {};
-    json.compilerOptions.paths = {
-      ...json.compilerOptions.paths,
-      [config.importAlias]: [`./${joinPathFragments(directory, 'src', 'index.ts')}`],
-    };
-    return json;
-  });
+  setJsoncValue(tree, tsconfig, ['compilerOptions', 'paths', config.importAlias], () => [
+    `./${joinPathFragments(directory, 'src', 'index.ts')}`,
+  ]);
 
   if (!tree.exists('tsconfig.app.json')) return;
   const glob = `${directory}/src/**/*.ts`;
-  updateJson(tree, 'tsconfig.app.json', (json) => {
+  setJsoncValue(tree, 'tsconfig.app.json', ['include'], (json) => {
     // Without `include` TypeScript compiles every file under the config; keep the app's own sources in it.
-    json.include = Array.isArray(json.include) ? json.include : ['src/**/*.ts'];
-    if (!json.include.includes(glob)) json.include.push(glob);
-    return json;
+    const include: string[] = Array.isArray(json?.include) ? json.include : ['src/**/*.ts'];
+    return include.includes(glob) ? include : [...include, glob];
   });
 }
 
@@ -111,9 +112,11 @@ async function createNxLibrary(tree: Tree, config: UiConfig, directory: string):
     unitTestRunner: UnitTestRunner.None,
   });
 
-  const lib = joinPathFragments(directory, 'src', 'lib');
-  for (const file of filesIn(tree, lib)) tree.delete(file);
-  tree.delete(joinPathFragments(directory, 'src', 'index.ts'));
+  // The parts replace the sample code of the new library: only what the library generator has just created.
+  const src = `${joinPathFragments(directory, 'src')}/`;
+  const created = tree.listChanges().filter((change) => change.type === 'CREATE' && change.path.startsWith(src));
+  const sample = created.filter(({ path }) => path.startsWith(`${src}lib/`) || path === `${src}index.ts`);
+  for (const { path } of sample) tree.delete(path);
   return callback;
 }
 
@@ -148,10 +151,4 @@ function templates(dir: string): string[] {
   return readdirSync(dir, { withFileTypes: true }).flatMap((entry) =>
     entry.isDirectory() ? templates(join(dir, entry.name)) : [join(dir, entry.name)],
   );
-}
-
-function filesIn(tree: Tree, dir: string): string[] {
-  return tree
-    .children(dir)
-    .flatMap((name) => (tree.isFile(join(dir, name)) ? [join(dir, name)] : filesIn(tree, join(dir, name))));
 }

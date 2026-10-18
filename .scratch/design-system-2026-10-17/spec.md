@@ -136,25 +136,26 @@
 
 Публичного `ui-theme` нет (решение 2026-10-18): тема одна, выбирать нечего, а `init` так же идемпотентен. Логика — функция `addUiTheme` в `generators/init/theme.ts`; генератор другого набора частей (например, будущий `@vflow/bpmn`), которому нужны токены, вызывает её же. Приложение — из `--project`, вопроса или единственного в workspace; stylesheet — из `--stylesEntryPoint` или поиска.
 
-- Stylesheet ищется как у spartan: `styles.css|scss|sass|less` в `sourceRoot` проекта, затем первый файл проекта из `build.options.styles`; не нашёлся — ошибка с подсказкой про `--stylesEntryPoint`.
+- Stylesheet ищется как у spartan: `styles.css|scss|sass|less` в `sourceRoot` проекта, затем первый файл проекта из `build.options.styles`; не нашёлся — ошибка с подсказкой про `--stylesEntryPoint`. Не `.css` (Sass, Less) — ошибка: Tailwind 4 компилирует только CSS, а вставка с `;` и `{}` ломает синтаксис Sass с отступами.
 - `@import '@vflow/cli/ui-preset.css';` вставляется сразу после ведущих `@charset` / `@import` / `@layer …;`, чтобы `@import 'tailwindcss'` шёл первым и CSS оставался валидным.
 - В конец файла пишутся блоки `:root, [data-vui-theme='light'] { --vui-*… }` и `[data-vui-theme='dark'] { --vui-*… }`.
 - Повторный запуск ничего не дублирует: импорт пресета и блок `[data-vui-theme='dark']` уже есть — `init` пишет об этом и оставляет файл; значения правят на месте.
-- Ведущие комментарии (`/* You can add global styles… */` из `ng new`, `//` в Sass) пропускаются, поэтому пресет встаёт после `@import 'tailwindcss'`, а не над ним.
+- Ведущие комментарии (`/* You can add global styles… */` из `ng new`) пропускаются, поэтому пресет встаёт после `@import 'tailwindcss'`, а не над ним.
 - Отличия от spartan: темы одна пара light/dark, поэтому нет выбора темы и опции `--theme`; нет `--prefix` (тема уже ограничена `[data-vui-theme]`); не переписываются Tailwind-импорты и не добавляется `@layer base` для `body` — части не зависят от слоёв и не стилизуют страницу.
 
 ### `ui`
 
-- **Конфиг `vflow.json`** — аналог `components.json`, общий для возможностей CLI; UI читает и валидирует только раздел `ui`, ошибки печатаются таблицей. Раздел создаёт первый запуск `ui` (не `init`) по вопросам: `componentsPath` (по умолчанию `libs/ui`, без вопроса при `--directory`), `importAlias` (по умолчанию `@vflow/ui`), в Nx ещё `buildable` (по умолчанию `true`).
+- **Конфиг `vflow.json`** — аналог `components.json`, общий для возможностей CLI; UI читает и валидирует только раздел `ui`, ошибки печатаются таблицей. Раздел создаёт первый запуск `ui` (не `init`) по вопросам: `componentsPath` (по умолчанию `libs/vflow-ui` — `libs/ui` слишком частое имя в Nx-монорепо; без вопроса при `--directory`), `importAlias` (по умолчанию `@vflow/ui`), в Nx ещё `buildable` (по умолчанию `true`).
 
   ```json
   { "ui": { "componentsPath": "libs/ui", "importAlias": "@vflow/ui", "buildable": true } }
   ```
 
 - **Набор целиком**: аргумента с именем части нет. Файлы ложатся в `<componentsPath>/src/index.ts` и `src/lib/*`; части импортируют друг друга относительно, как в `libs/ui`.
-  - Angular CLI: path `<importAlias>` → `./<componentsPath>/src/index.ts` в корневом tsconfig и `<componentsPath>/src/**/*.ts` в `include` `tsconfig.app.json`.
+  - Angular CLI: path `<importAlias>` → `./<componentsPath>/src/index.ts` в корневом tsconfig и `<componentsPath>/src/**/*.ts` в `include` `tsconfig.app.json`; файлы правятся через `jsonc-parser` с сохранением комментариев.
   - Nx: одна Angular-библиотека в `componentsPath` с import path `<importAlias>` (`buildable` из конфига). Файлы, которые пишет генератор библиотек Nx (`src/lib/*`, `src/index.ts`), заменяются набором; правила ESLint библиотеки не меняются — префикс селекторов `vui` задаётся при создании.
   - Режим Angular CLI включает флаг `angularCli`, который передаёт schematic-обёртка (05), как у spartan.
+- **Первый запуск в непустую папку** (`componentsPath` уже содержит файлы, alias ещё нет) — ошибка до любых записей, включая `vflow.json`: генератор не перезаписывает и не удаляет файлы приложения. В Nx после `libraryGenerator` удаляются только файлы, созданные им в этом же запуске (`tree.listChanges()`).
 - **Повторный запуск** (alias уже есть в tsconfig paths, как признак установки у spartan; например, после обновления `@vflow/cli`) создаёт недостающие файлы и не трогает существующие; `index.ts` не переписывается — генератор печатает части, которых в нём нет. Перезаписи и `--overwrite` нет.
 - **npm-зависимости** (`ngx-vflow`) добавляются в `package.json`, установка — задачей генератора.
 

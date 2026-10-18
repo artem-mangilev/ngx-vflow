@@ -14,14 +14,18 @@ const root = join(__dirname, '../..');
 function angularCliWorkspace(): UnitTestTree {
   const tree = new UnitTestTree(new HostTree());
   const json = (path: string, value: unknown) => tree.create(path, JSON.stringify(value));
-  json('package.json', { name: 'app', dependencies: { '@angular/core': '~20.3.0' } });
+  json('package.json', {
+    name: 'app',
+    dependencies: { '@angular/core': '~20.3.0' },
+    devDependencies: { tailwindcss: '^4.1.0' },
+  });
   json('angular.json', {
     version: 1,
     projects: { app: { root: '', sourceRoot: 'src', projectType: 'application', architect: {} } },
   });
   json('tsconfig.json', { compilerOptions: {} });
   json('tsconfig.app.json', { files: ['src/main.ts'] });
-  json('vflow.json', { ui: { componentsPath: 'libs/ui', importAlias: '@vflow/ui' } });
+  json('vflow.json', { ui: { componentsPath: 'libs/vflow-ui', importAlias: '@vflow/ui' } });
   tree.create('src/styles.css', "@import 'tailwindcss';\n");
   return tree;
 }
@@ -51,9 +55,9 @@ describe('Angular CLI schematics', () => {
     await lastValueFrom(runner.callRule(ui({}), tree));
 
     expect(JSON.parse(tree.readContent('tsconfig.json')).compilerOptions.paths['@vflow/ui']).toEqual([
-      './libs/ui/src/index.ts',
+      './libs/vflow-ui/src/index.ts',
     ]);
-    expect(tree.exists('libs/ui/src/lib/node.directive.ts')).toBe(true);
-    expect(tree.exists('libs/ui/project.json')).toBe(false);
+    expect(tree.exists('libs/vflow-ui/src/lib/node.directive.ts')).toBe(true);
+    expect(tree.exists('libs/vflow-ui/project.json')).toBe(false);
   });
 });

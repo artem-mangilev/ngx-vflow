@@ -10,6 +10,7 @@ describe('init', () => {
 
   beforeEach(() => {
     tree = createTreeWithEmptyWorkspace();
+    updateJson(tree, 'package.json', (json) => ({ ...json, devDependencies: { tailwindcss: '^4.1.0' } }));
     addProjectConfiguration(tree, 'app', { root: 'apps/app', sourceRoot: 'apps/app/src', projectType: 'application' });
     tree.write('apps/app/src/styles.css', "@import 'tailwindcss';\n");
   });

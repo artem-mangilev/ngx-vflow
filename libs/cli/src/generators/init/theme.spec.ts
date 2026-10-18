@@ -1,4 +1,4 @@
-import { addProjectConfiguration, type Tree, writeJson } from '@nx/devkit';
+import { addProjectConfiguration, type Tree, updateJson, writeJson } from '@nx/devkit';
 import { createTree, createTreeWithEmptyWorkspace } from '@nx/devkit/testing';
 import { prompt } from 'enquirer';
 import { addUiTheme, PRESET_IMPORT } from './theme';
@@ -19,6 +19,7 @@ describe('theme of init', () => {
 
   beforeEach(() => {
     tree = createTreeWithEmptyWorkspace();
+    updateJson(tree, 'package.json', (json) => ({ ...json, devDependencies: { tailwindcss: '^4.1.0' } }));
   });
 
   it('imports the preset right after Tailwind and appends the theme values', async () => {
@@ -34,17 +35,35 @@ describe('theme of init', () => {
     expect(css.indexOf("[data-vui-theme='dark']")).toBeGreaterThan(css.indexOf('margin: 0'));
   });
 
-  it('skips a leading comment, @charset, @use and layer statements', async () => {
+  it('skips a leading comment, @charset and layer statements', async () => {
     addApp(tree, 'app');
     tree.write(
-      'apps/app/src/styles.scss',
-      "/* You can add global styles to this file */\n@charset 'utf-8';\n@use 'sass:math';\n// layers\n@layer theme, base;\n@import 'tailwindcss';\n.a {\n  color: red;\n}\n",
+      'apps/app/src/styles.css',
+      "/* You can add global styles to this file */\n@charset 'utf-8';\n@layer theme, base;\n@import 'tailwindcss';\n.a {\n  color: red;\n}\n",
     );
 
     await addUiTheme(tree);
 
-    const css = tree.read('apps/app/src/styles.scss', 'utf-8')!;
-    expect(css).toContain(`@import 'tailwindcss';\n${PRESET_IMPORT}\n.a {`);
+    expect(tree.read('apps/app/src/styles.css', 'utf-8')).toContain(`@import 'tailwindcss';\n${PRESET_IMPORT}\n.a {`);
+  });
+
+  it('requires Tailwind CSS 4', async () => {
+    addApp(tree, 'app');
+    tree.write('apps/app/src/styles.css', '');
+
+    updateJson(tree, 'package.json', (json) => ({ ...json, devDependencies: { tailwindcss: '^3.4.17' } }));
+    await expect(addUiTheme(tree)).rejects.toThrow('this workspace has tailwindcss ^3.4.17');
+    updateJson(tree, 'package.json', (json) => ({ ...json, devDependencies: {} }));
+    await expect(addUiTheme(tree)).rejects.toThrow('needs Tailwind CSS 4');
+    expect(tree.read('apps/app/src/styles.css', 'utf-8')).toBe('');
+  });
+
+  it('refuses a Sass or Less stylesheet', async () => {
+    addApp(tree, 'app');
+    tree.write('apps/app/src/styles.scss', "@use 'sass:math';\n");
+
+    await expect(addUiTheme(tree)).rejects.toThrow('apps/app/src/styles.scss is not a CSS file');
+    expect(tree.read('apps/app/src/styles.scss', 'utf-8')).toBe("@use 'sass:math';\n");
   });
 
   it('puts the preset first in a stylesheet without leading imports', async () => {
@@ -123,7 +142,7 @@ describe('theme of init', () => {
 
   it('works in an Angular CLI workspace', async () => {
     const cli = createTree();
-    writeJson(cli, 'package.json', { name: 'app', dependencies: {} });
+    writeJson(cli, 'package.json', { name: 'app', dependencies: {}, devDependencies: { tailwindcss: '^4.1.0' } });
     writeJson(cli, 'angular.json', {
       version: 1,
       projects: {

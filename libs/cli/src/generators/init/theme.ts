@@ -1,4 +1,4 @@
-import { joinPathFragments, logger, type ProjectConfiguration, type Tree } from '@nx/devkit';
+import { joinPathFragments, logger, type ProjectConfiguration, readJson, type Tree } from '@nx/devkit';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { resolveApplication } from '../../utils/applications';
@@ -9,12 +9,13 @@ export const PRESET_IMPORT = "@import '@vflow/cli/ui-preset.css';";
 /**
  * Adds the vflow UI theme to the global stylesheet of an application, like spartan's `ui-theme`: the preset import
  * right after the leading imports, so `@import 'tailwindcss'` stays first, and the light and dark values at the end,
- * where they become application code. Tailwind itself is a prerequisite and is neither installed nor checked.
+ * where they become application code. Tailwind CSS 4 is a prerequisite: checked, not installed.
  *
  * Not a generator of its own: with one theme there is nothing to choose, and `init` is as idempotent. A generator for
  * another set of parts that needs the tokens calls it the same way.
  */
 export async function addUiTheme(tree: Tree, options: InitGeneratorSchema = {}): Promise<void> {
+  requireTailwind4(tree);
   const project = await resolveApplication(tree, options.project);
 
   if (options.stylesEntryPoint && !tree.exists(options.stylesEntryPoint)) {
@@ -28,10 +29,33 @@ export async function addUiTheme(tree: Tree, options: InitGeneratorSchema = {}):
     );
   }
 
+  // Tailwind 4 compiles plain CSS only; the preset and the theme values would also break the indented Sass syntax.
+  if (!stylesheet.endsWith('.css')) {
+    throw new Error(
+      `${stylesheet} is not a CSS file, and Tailwind CSS 4 compiles CSS only. ` +
+        "Add a .css stylesheet with @import 'tailwindcss' and pass it as --stylesEntryPoint.",
+    );
+  }
+
   const css = tree.read(stylesheet, 'utf-8') ?? '';
   const themed = addTheme(css, stylesheet);
   // Angular CLI reports any write as an update, so an unchanged stylesheet is not written.
   if (themed !== css) tree.write(stylesheet, themed);
+}
+
+/**
+ * The preset uses `@theme`, `@utility` and `--theme()`: Tailwind 3 fails on them and without Tailwind the parts lose
+ * their styles silently. A range without a version number, such as `latest`, is trusted.
+ */
+function requireTailwind4(tree: Tree): void {
+  const { dependencies = {}, devDependencies = {} } = readJson(tree, 'package.json');
+  const range: string | undefined = dependencies['tailwindcss'] ?? devDependencies['tailwindcss'];
+  const guide = 'https://tailwindcss.com/docs/installation/framework-guides/angular';
+  if (!range) throw new Error(`vflow UI needs Tailwind CSS 4. Set it up first: ${guide}`);
+  const major = /\d+/.exec(range)?.[0];
+  if (major && Number(major) < 4) {
+    throw new Error(`vflow UI needs Tailwind CSS 4, and this workspace has tailwindcss ${range}. See ${guide}`);
+  }
 }
 
 /** Inserts the preset import and appends the theme values; a stylesheet that already has either keeps it. */
@@ -57,9 +81,8 @@ export function addTheme(css: string, path = 'the stylesheet'): string {
 }
 
 /**
- * End of the statements that must precede every rule: `@charset`, `@import`, `@layer a, b;` and, in Sass,
- * `@use` / `@forward`. Comments between them are skipped, so a leading comment does not push the preset above
- * `@import 'tailwindcss'`.
+ * End of the statements that must precede every rule: `@charset`, `@import` and `@layer a, b;`. Comments between them
+ * are skipped, so a leading comment does not push the preset above `@import 'tailwindcss'`.
  */
 function leadingStatementsEnd(css: string): number {
   let index = 0;
@@ -77,12 +100,7 @@ function leadingStatementsEnd(css: string): number {
       index = close + 2;
       continue;
     }
-    if (rest.startsWith('//')) {
-      const newline = css.indexOf('\n', index);
-      index = newline === -1 ? css.length : newline;
-      continue;
-    }
-    const statement = /^@(charset|import|layer|use|forward)\b[^;{]*;/.exec(rest);
+    const statement = /^@(charset|import|layer)\b[^;{]*;/.exec(rest);
     if (!statement) break;
     index += statement[0].length;
     end = index;

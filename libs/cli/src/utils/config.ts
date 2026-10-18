@@ -11,7 +11,7 @@ export interface UiConfig {
   buildable?: boolean;
 }
 
-const DEFAULTS = { componentsPath: 'libs/ui', importAlias: '@vflow/ui', buildable: true };
+const DEFAULTS = { componentsPath: 'libs/vflow-ui', importAlias: '@vflow/ui', buildable: true };
 
 /**
  * Reads the `ui` section of vflow.json, or asks for it and writes it, as spartan's `ui` does with components.json.
@@ -31,7 +31,7 @@ export async function loadOrInitUiConfig(
           {
             type: 'input',
             name: 'componentsPath',
-            message: 'Choose a directory for the vflow UI parts, e.g. libs/ui',
+            message: 'Choose a directory for the vflow UI parts, e.g. libs/vflow-ui',
             initial: DEFAULTS.componentsPath,
           },
         ]),
