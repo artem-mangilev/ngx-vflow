@@ -1,5 +1,4 @@
 export { VuiButton, VuiButtonVariant, VuiButtonSize } from './lib/button.directive';
-export { VuiTheme, VuiSelected } from './lib/theme.directive';
 export { VuiNode, VuiNodeHeader, VuiNodeBody, VuiNodeFooter } from './lib/node.directive';
 export { VuiRow } from './lib/row.directive';
 export { VuiContainer, VuiContainerHeader } from './lib/container.directive';
@@ -11,7 +10,6 @@ export { VuiToolbar } from './lib/overlay.directive';
 export { VuiControls, VuiControlsLabels } from './lib/controls.component';
 
 import { VuiButton } from './lib/button.directive';
-import { VuiTheme, VuiSelected } from './lib/theme.directive';
 import { VuiNode, VuiNodeHeader, VuiNodeBody, VuiNodeFooter } from './lib/node.directive';
 import { VuiRow } from './lib/row.directive';
 import { VuiContainer, VuiContainerHeader } from './lib/container.directive';
@@ -25,8 +23,6 @@ import { VuiControls } from './lib/controls.component';
 /** Convenience imports; every directive is also independently importable. */
 export const Vui = [
   VuiButton,
-  VuiTheme,
-  VuiSelected,
   VuiNode,
   VuiNodeHeader,
   VuiNodeBody,

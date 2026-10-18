@@ -1,4 +1,4 @@
-import { Directive } from '@angular/core';
+import { booleanAttribute, Directive, input } from '@angular/core';
 
 /**
  * A visual group with a title around other nodes: a tinted surface with a hairline, like a macOS group box. Parent relationships and shared movement
@@ -12,9 +12,13 @@ import { Directive } from '@angular/core';
       bg-vui-surface-muted text-vui-foreground font-vui-sans tracking-vui-normal text-vui-body antialiased
       data-[vui-selected=true]:outline-2 data-[vui-selected=true]:outline-offset-2 data-[vui-selected=true]:outline-vui-selection
       forced-colors:data-[vui-selected=true]:outline-[Highlight]`,
+    '[attr.data-vui-selected]': 'selected()',
   },
 })
-export class VuiContainer {}
+export class VuiContainer {
+  /** Selection presentation: bind the core state, e.g. `ctx.selected() || ctx.preselected()`, or your own. */
+  readonly selected = input(false, { transform: booleanAttribute });
+}
 
 /**
  * Header row of a container, set in the headline weight like a card header: a title, meta, icon or actions share the

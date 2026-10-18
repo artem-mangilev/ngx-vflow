@@ -7,7 +7,7 @@ body text, hairline borders and concentric corners.
 
 ## Theme variables
 
-Set these on a `vuiTheme` scope or any element inside it. Everything else is derived from them.
+Set these on a `data-vui-theme` scope or any element inside it. Everything else is derived from them.
 
 | Variable                                                       | Light / dark            | Purpose                                                                         |
 | -------------------------------------------------------------- | ----------------------- | ------------------------------------------------------------------------------- |
@@ -50,7 +50,7 @@ centered on the first line of the title, whatever its size.
 
 Parts set their own font family, size, line height and weight, reset the letter spacing an application may set on
 its body and use grayscale antialiasing, as native macOS text does; without it light text on the dark theme renders
-heavier. These settings are on the parts, not on the theme scope, so a `vuiTheme` on your application root does not
+heavier. These settings are on the parts, not on the theme scope, so a `data-vui-theme` on your application root does not
 change the rest of your page. Secondary text keeps the regular weight inside a header.
 
 Buttons come in three variants on the same 28px (or 24px `sm`) geometry: a neutral `secondary` fill, the default,

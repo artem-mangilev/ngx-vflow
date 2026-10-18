@@ -40,7 +40,7 @@ interface EntityData {
     <section
       class="demo"
       aria-label="Entity relationships and field mapping demo"
-      [vuiTheme]="dark() ? 'dark' : 'light'"
+      [attr.data-vui-theme]="dark() ? 'dark' : 'light'"
       [style.--vui-space]="compact() ? '3px' : '4px'">
       <div class="controls">
         <button vuiButton="secondary" type="button" (click)="flow()?.fitView()">Fit entities</button>
@@ -59,7 +59,7 @@ interface EntityData {
         (connect)="connect($event)"
         (initialized)="flow()?.fitView()">
         <ng-template let-ctx vNode>
-          <article vuiNode [vuiSelected]="ctx.selected() || ctx.preselected()" [attr.data-entity]="ctx.node.id">
+          <article vuiNode [selected]="ctx.selected() || ctx.preselected()" [attr.data-entity]="ctx.node.id">
             <header vuiNodeHeader>
               <span vuiTitle>{{ ctx.data().title }}</span>
               <span vuiMeta>{{ ctx.data().category }}</span>
@@ -97,7 +97,7 @@ interface EntityData {
         </ng-template>
         <ng-template let-ctx vEdge>
           <svg:g vEdgeInteraction>
-            <svg:path vuiEdge [attr.d]="ctx.path()" [vuiSelected]="ctx.selected() || ctx.preselected()" />
+            <svg:path vuiEdge [attr.d]="ctx.path()" [selected]="ctx.selected() || ctx.preselected()" />
           </svg:g>
           @if (ctx.data()?.label; as label) {
             <span *vEdgeLabel vuiEdgeLabel>

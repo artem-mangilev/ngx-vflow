@@ -7,7 +7,7 @@ Import individual directives or the `Vui` array from `@vflow/ui` into your stand
 component. They style your own HTML/SVG without adding wrappers; `vuiPort` is itself a core handle.
 
 ```html
-<section vuiTheme="light">
+<section data-vui-theme="light">
   <article vuiNode>
     <header vuiNodeHeader>
       <span vuiIcon aria-hidden="true">✓</span>
@@ -42,10 +42,9 @@ layers; unlayered application styles override them.
 | Port       | `vuiPort`: a core handle with the port look                                                                        |
 | Edge       | `vuiEdge` on the SVG path, `vuiEdgeLabel` for HTML labels                                                          |
 | Extras     | `vuiStatus`, `vuiToolbar`, `vuiButton` (`secondary` by default, `primary`, `plain`)                                |
-| State      | `vuiTheme`, `vuiSelected`                                                                                          |
 | Viewport   | `<vui-controls [flow]="flow">`: zoom in/out, fit view and your own buttons for one flow                            |
 
-Bind `vuiSelected` to `ctx.selected() || ctx.preselected()`. Put `vuiPort` with the handle inputs `handleType`,
+Bind the `selected` input of `vuiNode`, `vuiContainer` and `vuiEdge` to `ctx.selected() || ctx.preselected()`. Put `vuiPort` with the handle inputs `handleType`,
 `position`, `handleId`, `canStart` and `canAccept` on the element that is the connection point: it applies core
 `vHandle` as a host directive and shows its connection feedback. For flow interaction compose the parts with core
 gesture exclusions (`vNoDrag`, `vNoSelect`); a click on a presentation selects its node or edge, and
@@ -53,7 +52,7 @@ gesture exclusions (`vNoDrag`, `vNoSelect`); a click on a presentation selects i
 
 ## Theme
 
-Use `vuiTheme="light"` or `vuiTheme="dark"` on the editor ancestor and override the theme variables to match your
+Put `data-vui-theme="light"` or `data-vui-theme="dark"` on the editor ancestor (any element, including `<html>`) and override the theme variables to match your
 application:
 
 - colors: `--vui-canvas`, `--vui-surface`, `--vui-surface-muted`, `--vui-foreground`, `--vui-muted`,

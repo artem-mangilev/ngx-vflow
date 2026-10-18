@@ -42,10 +42,10 @@ graph needs templates. There are two working paths:
 {% raw %}
 
 ```html
-<section vuiTheme="light">
+<section data-vui-theme="light">
   <vflow [nodes]="nodes" [edges]="edges">
     <ng-template let-ctx vNode>
-      <article vuiNode [vuiSelected]="ctx.selected() || ctx.preselected()">
+      <article vuiNode [selected]="ctx.selected() || ctx.preselected()">
         <header vuiNodeHeader><span vuiTitle>{{ ctx.data().title }}</span></header>
         <span vuiPort handleType="target" position="left"></span>
         <span vuiPort handleType="source" position="right"></span>
@@ -53,7 +53,7 @@ graph needs templates. There are two working paths:
     </ng-template>
     <ng-template let-ctx vEdge>
       <svg:g vEdgeInteraction>
-        <svg:path vuiEdge [attr.d]="ctx.path()" [attr.marker-end]="ctx.markerEnd()" [vuiSelected]="ctx.selected()" />
+        <svg:path vuiEdge [attr.d]="ctx.path()" [attr.marker-end]="ctx.markerEnd()" [selected]="ctx.selected()" />
       </svg:g>
       <span *vEdgeLabel vuiEdgeLabel>{{ ctx.data().label }}</span>
     </ng-template>
@@ -85,7 +85,7 @@ Include `@vflow/ui/styles.css` in your global styles for path B. See the Design 
 Colors are CSS. Core reads the tokens `--v-background`, `--v-surface`, `--v-foreground`,
 `--v-muted`, `--v-border`, `--v-selection` and `--v-focus`, each with a built-in default.
 The focus ring geometry is `--v-focus-width`, `--v-focus-offset` and `--v-focus-radius`.
-Set them on the `vflow` element or any ancestor; a `vuiTheme` scope from `@vflow/ui` maps its theme onto them.
+Set them on the `vflow` element or any ancestor; a `data-vui-theme` scope from `@vflow/ui` maps its theme onto them.
 Under `forced-colors: active` core maps its tokens to system colors and keeps the feedback parts visible.
 
 | Removed input                                        | Replacement                                                                              |

@@ -26,10 +26,10 @@ import { createEdges, createNodes, Vflow, VflowComponent } from 'ngx-vflow';
     }
   `,
   template: `
-    <div class="stage" [vuiTheme]="dark() ? 'dark' : 'light'">
+    <div class="stage" [attr.data-vui-theme]="dark() ? 'dark' : 'light'">
       <vflow view="auto" data-testid="ui-flow" [nodes]="nodes" [edges]="edges">
         <ng-template let-ctx vNode>
-          <article vuiNode [vuiSelected]="ctx.selected()">
+          <article vuiNode [selected]="ctx.selected()">
             <header vuiNodeHeader>
               <span vuiTitle>{{ ctx.data().title }}</span>
             </header>
@@ -48,11 +48,7 @@ import { createEdges, createNodes, Vflow, VflowComponent } from 'ngx-vflow';
         </ng-template>
         <ng-template let-ctx vEdge>
           <svg:g vEdgeInteraction>
-            <svg:path
-              vuiEdge
-              [attr.d]="ctx.path()"
-              [attr.marker-end]="ctx.markerEnd()"
-              [vuiSelected]="ctx.selected()" />
+            <svg:path vuiEdge [attr.d]="ctx.path()" [attr.marker-end]="ctx.markerEnd()" [selected]="ctx.selected()" />
           </svg:g>
         </ng-template>
         <v-minimap />

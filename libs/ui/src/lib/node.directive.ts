@@ -1,4 +1,4 @@
-import { Directive } from '@angular/core';
+import { booleanAttribute, Directive, input } from '@angular/core';
 
 /**
  * Card shell. Its border is the edge of the surface; the separators inside (header, footer, rows) use the
@@ -14,9 +14,13 @@ import { Directive } from '@angular/core';
       bg-vui-surface text-vui-foreground font-vui-sans tracking-vui-normal text-vui-body antialiased shadow-vui-node
       data-[vui-selected=true]:outline-2 data-[vui-selected=true]:outline-offset-2 data-[vui-selected=true]:outline-vui-selection
       forced-colors:data-[vui-selected=true]:outline-[Highlight]`,
+    '[attr.data-vui-selected]': 'selected()',
   },
 })
-export class VuiNode {}
+export class VuiNode {
+  /** Selection presentation: bind the core state, e.g. `ctx.selected() || ctx.preselected()`, or your own. */
+  readonly selected = input(false, { transform: booleanAttribute });
+}
 
 /**
  * Header row, set in the headline weight: items share the baseline of the title's first line, so an icon, meta or badge

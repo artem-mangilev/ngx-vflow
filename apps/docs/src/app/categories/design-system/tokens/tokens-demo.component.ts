@@ -84,7 +84,7 @@ import { DemoIconComponent } from '../../../shared/demo-icon.component';
   template: `
     <section class="demo themes" aria-label="Design tokens">
       @for (theme of themes; track theme) {
-        <div class="theme" [vuiTheme]="theme" [attr.data-testid]="'tokens-' + theme">
+        <div class="theme" [attr.data-vui-theme]="theme" [attr.data-testid]="'tokens-' + theme">
           <div>
             <h3>{{ theme === 'light' ? 'Light' : 'Dark' }} theme colors</h3>
             <div class="swatches">

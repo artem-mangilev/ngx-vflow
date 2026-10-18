@@ -62,7 +62,7 @@ const ALL_VISIBLE: Visibility = { visible: new Set(), above: [], below: [], key:
     }
   `,
   template: `
-    <section class="demo" aria-label="Scroll and collapse experiment" vuiTheme="light">
+    <section class="demo" aria-label="Scroll and collapse experiment" data-vui-theme="light">
       <div class="controls">
         <button vuiButton="secondary" type="button" (click)="flow()?.fitView()">Fit</button>
         <p>Scroll the Product rows with the wheel; collapse a node to move its endpoints to the header.</p>
@@ -72,7 +72,7 @@ const ALL_VISIBLE: Visibility = { visible: new Set(), above: [], below: [], key:
           @let view = visibility(ctx.node.id);
           <article
             vuiNode
-            [vuiSelected]="ctx.selected() || ctx.preselected()"
+            [selected]="ctx.selected() || ctx.preselected()"
             [attr.data-entity]="ctx.node.id"
             [attr.data-collapsed]="ctx.data().collapsed">
             <header vuiNodeHeader [class.proxy]="ctx.data().collapsed || view.above.length">
@@ -156,7 +156,7 @@ const ALL_VISIBLE: Visibility = { visible: new Set(), above: [], below: [], key:
         </ng-template>
         <ng-template let-ctx vEdge>
           <svg:g vEdgeInteraction>
-            <svg:path vuiEdge [attr.d]="ctx.path()" [vuiSelected]="ctx.selected() || ctx.preselected()" />
+            <svg:path vuiEdge [attr.d]="ctx.path()" [selected]="ctx.selected() || ctx.preselected()" />
           </svg:g>
         </ng-template>
       </vflow>

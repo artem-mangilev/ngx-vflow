@@ -57,17 +57,17 @@ import { createEdges, createNodes, Vflow } from 'ngx-vflow';
     }
   `,
   template: `
-    <section class="demo" aria-label="Themes demo" vuiTheme="light">
+    <section class="demo" aria-label="Themes demo" data-vui-theme="light">
       <div class="controls">
         <label><input type="checkbox" [checked]="dark()" (change)="dark.set(!dark())" /> Dark first editor</label>
         <p>Themes are scoped: each editor, its markers, toolbar and minimap follow its own ancestor.</p>
       </div>
       <div class="editors">
-        <div class="editor" data-testid="editor-a" [vuiTheme]="dark() ? 'dark' : 'light'">
+        <div class="editor" data-testid="editor-a" [attr.data-vui-theme]="dark() ? 'dark' : 'light'">
           <p>Editor A: {{ dark() ? 'dark' : 'light' }}</p>
           <vflow [nodes]="nodes" [edges]="edges">
             <ng-template let-ctx vNode>
-              <article vuiNode [vuiSelected]="ctx.selected() || ctx.preselected()">
+              <article vuiNode [selected]="ctx.selected() || ctx.preselected()">
                 <header vuiNodeHeader>
                   <span vuiTitle>{{ ctx.data().title }}</span>
                 </header>
@@ -81,17 +81,17 @@ import { createEdges, createNodes, Vflow } from 'ngx-vflow';
                   vuiEdge
                   [attr.d]="ctx.path()"
                   [attr.marker-end]="ctx.markerEnd()"
-                  [vuiSelected]="ctx.selected() || ctx.preselected()" />
+                  [selected]="ctx.selected() || ctx.preselected()" />
               </svg:g>
             </ng-template>
             <v-minimap />
           </vflow>
         </div>
-        <div class="editor" data-testid="editor-b" vuiTheme="dark">
+        <div class="editor" data-testid="editor-b" data-vui-theme="dark">
           <p>Editor B: dark</p>
           <vflow [nodes]="nodes" [edges]="edges">
             <ng-template let-ctx vNode>
-              <article vuiNode [vuiSelected]="ctx.selected() || ctx.preselected()">
+              <article vuiNode [selected]="ctx.selected() || ctx.preselected()">
                 <header vuiNodeHeader>
                   <span vuiTitle>{{ ctx.data().title }}</span>
                 </header>
@@ -105,7 +105,7 @@ import { createEdges, createNodes, Vflow } from 'ngx-vflow';
                   vuiEdge
                   [attr.d]="ctx.path()"
                   [attr.marker-end]="ctx.markerEnd()"
-                  [vuiSelected]="ctx.selected() || ctx.preselected()" />
+                  [selected]="ctx.selected() || ctx.preselected()" />
               </svg:g>
             </ng-template>
             <v-minimap />

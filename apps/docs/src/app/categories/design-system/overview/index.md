@@ -56,7 +56,7 @@ The node shell's resting shadow has no blur (`0 1px 0`). A blurred shadow is ras
 
 Three kinds of state stay separate so they can be shown at once:
 
-- **Interaction** is owned by core: bind `vuiSelected` to `ctx.selected() || ctx.preselected()`. Focus comes from the core wrapper.
+- **Interaction** is owned by core: bind the `selected` input of `vuiNode`, `vuiContainer` and `vuiEdge` to `ctx.selected() || ctx.preselected()`, or to a state of your own. Focus comes from the core wrapper.
 - **Diagnostics** about the model and **application status** are both your vocabulary. Each is one `vuiStatus` indicator with a tone and your text; place two side by side to show a warning next to a running status. `vuiStatusBusy` adds a pulsing dot, which is presentation only and never disables anything; the text must name the activity ("Running", "Syncing"), and an indicator that changes while the user works belongs in a `role="status"` region of yours so screen readers hear it.
 - **Action availability** is the native `disabled` attribute on your buttons, driven by your rules such as read-only.
 
@@ -98,18 +98,16 @@ not part of the library; `@vflow/ui` declares `ngx-vflow` as a peer dependency f
 
 | Import                                          | Attribute                                                                 | Responsibility                                                                                     |
 | ----------------------------------------------- | ------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
-| `VuiTheme`                                      | `[vuiTheme]="'light'"`                                                    | Scoped light/dark semantic tokens                                                                  |
-| `VuiSelected`                                   | `[vuiSelected]="ctx.selected() \|\| ctx.preselected()"`                   | Selection presentation; no interaction or ARIA changes                                             |
-| `VuiNode`                                       | `vuiNode`                                                                 | Node surface; consumer chooses size and content                                                    |
+| `VuiNode`                                       | `vuiNode [selected]="ctx.selected() \|\| ctx.preselected()"`              | Node surface; consumer chooses size and content                                                    |
 | `VuiNodeHeader`, `VuiNodeBody`, `VuiNodeFooter` | `vuiNodeHeader`, `vuiNodeBody`, `vuiNodeFooter`                           | Optional anatomy on consumer elements                                                              |
 | `VuiRow`                                        | `vuiRow`                                                                  | Row (field, typed port, list item) with room for text roles and core handles                       |
-| `VuiContainer`                                  | `vuiContainer`                                                            | Tinted group with a hairline; parent relationships remain explicit in graph data                   |
+| `VuiContainer`                                  | `vuiContainer [selected]="…"`                                             | Tinted group with a hairline; parent relationships remain explicit in graph data                   |
 | `VuiContainerHeader`                            | `vuiContainerHeader`                                                      | Title row of a container with room for meta, an icon and actions                                   |
 | `VuiTitle`, `VuiMeta`                           | `vuiTitle`, `vuiMeta`                                                     | Primary wrapping text and secondary text in any shell                                              |
 | `VuiIcon`, `VuiActions`                         | `vuiIcon`, `vuiActions`                                                   | Leading slot for an icon or avatar of any size, and a group of controls; add `vNoDrag` to controls |
 | `VuiPort`                                       | `vuiPort handleType="target" position="left" [vuiPortConnected]="…"`      | A core handle with the port look: idle/valid/invalid from the handle, connected, `vuiPortReveal`   |
 | `VuiStatus`                                     | `[vuiStatus]="'warning'" [vuiStatusBusy]="true"`                          | Indicator: semantic tone, your text and optional activity                                          |
-| `VuiEdge`                                       | `vuiEdge` on an SVG path                                                  | Stroke; bind core path and marker URLs yourself                                                    |
+| `VuiEdge`                                       | `vuiEdge [selected]="…"` on an SVG path                                   | Stroke; bind core path and marker URLs yourself                                                    |
 | `VuiEdgeLabel`                                  | `vuiEdgeLabel`                                                            | HTML label surface, including optional native controls                                             |
 | `VuiToolbar`                                    | `vuiToolbar`                                                              | Surface for `v-node-toolbar` content                                                               |
 | `VuiControls`                                   | `<vui-controls [flow]="flow">`                                            | Viewport controls for one flow instance; project plain icon buttons                                |
@@ -122,7 +120,7 @@ A role looks the same in every shell; a row that needs its own look, such as a c
 
 ## Themes and composition
 
-Put `vuiTheme` on an ancestor of the whole flow so nodes, SVG edges, markers, labels, toolbars and
+Put `data-vui-theme="light"` or `data-vui-theme="dark"` on an ancestor of the whole flow, up to `<html>` in `index.html`, so nodes, SVG edges, markers, labels, toolbars and
 the minimap share its tokens. Different editors can have different themes on the same page, and a flow
 outside every theme scope keeps the core defaults: importing the stylesheet never themes a flow by itself.
 Besides the tokens, a scope sets `color-scheme` to its theme and `accent-color` to `--vui-accent`, so native

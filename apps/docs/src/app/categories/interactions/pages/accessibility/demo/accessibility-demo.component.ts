@@ -104,7 +104,7 @@ const SPANISH: Partial<AriaLabelConfig> = {
         (deleteRequest)="onDeleteRequest($event)">
         <ng-template let-ctx vNode>
           @if (ctx.node.id === 'editor') {
-            <article vuiNode class="editor" [vuiSelected]="ctx.selected() || ctx.preselected()">
+            <article vuiNode class="editor" [selected]="ctx.selected() || ctx.preselected()">
               <header vuiNodeHeader><span vuiTitle>Editor</span></header>
               <div vuiRow>
                 <span vuiPort handleType="target" position="left"></span>

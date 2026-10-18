@@ -38,7 +38,7 @@ interface StepData {
     }
   `,
   template: `
-    <section class="demo" aria-label="Approval workflow demo" [vuiTheme]="dark() ? 'dark' : 'light'">
+    <section class="demo" aria-label="Approval workflow demo" [attr.data-vui-theme]="dark() ? 'dark' : 'light'">
       <div class="controls">
         <button vuiButton="secondary" type="button" (click)="flow()?.fitView()">Fit workflow</button>
         <label><input type="checkbox" [checked]="dark()" (change)="dark.set(!dark())" /> Dark theme</label>
@@ -54,7 +54,7 @@ interface StepData {
           [maxZoom]="2"
           (initialized)="flow()?.fitView()">
           <ng-template let-ctx vNode>
-            <article vuiNode [vuiSelected]="ctx.selected() || ctx.preselected()">
+            <article vuiNode [selected]="ctx.selected() || ctx.preselected()">
               <header vuiNodeHeader>
                 <span vuiIcon><app-demo-icon [name]="ctx.data().icon" /></span>
                 <span vuiTitle>{{ ctx.data().title }}</span>
@@ -140,7 +140,7 @@ interface StepData {
                 vuiEdge
                 [attr.d]="ctx.path()"
                 [attr.marker-end]="ctx.markerEnd()"
-                [vuiSelected]="ctx.selected() || ctx.preselected()" />
+                [selected]="ctx.selected() || ctx.preselected()" />
             </svg:g>
             @if (ctx.data()?.start; as text) {
               <span *vEdgeLabel="'start'" vuiEdgeLabel vuiMeta [attr.data-label]="text">{{ text }}</span>
