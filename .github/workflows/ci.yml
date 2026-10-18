@@ -27,6 +27,7 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npx prettier . --check
+      - run: npx nx run ui:check-cli
       - run: npx playwright install --with-deps chromium
       - run: npm test
       - run: npm run build:dev

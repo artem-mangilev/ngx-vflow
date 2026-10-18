@@ -164,8 +164,8 @@
 
 - `libs/ui` — приватная библиотека `@vflow/ui` с одним entrypoint, как сейчас; docs и e2e импортируют `@vflow/ui` — тот же путь, что у потребителя после `ui`.
 - `libs/cli` — публикуемый `@vflow/cli`: `generators.json` с секциями `generators` и `schematics`, `compat.ts` на генератор, шаблоны, `ui-preset.css`.
-- Генератор `tools:ui-to-cli` (аналог `hlm-to-cli-generator`) пересоздаёт `libs/cli/src/generators/ui/files` из `libs/ui/src` без подстановок: импорты внутри набора относительные. Результат коммитится; генератор входит в подготовку релиза, CI проверяет, что повторный запуск не даёт diff.
-- Пресет и значения тем — исходники в `libs/ui`; пресет публикуется в `@vflow/cli`, значения копирует `ui-theme`.
+- Скрипт `libs/ui/scripts/sync-cli.mjs` (`nx run ui:sync-cli`, аналог `hlm-to-cli-generator`; скрипт, а не Nx-генератор, как остальные скрипты `libs/ui`) копирует `libs/ui/src` в `libs/cli/src/generators/ui/files` с суффиксом `.template` (`public-api.ts` → `src/index.ts`), `ui-preset.css` в корень `libs/cli` и `ui-theme.css` в `libs/cli/src/generators/ui-theme`. Копии дословные: импорты внутри набора относительные. Результат коммитится; `ui:check-cli` в CI падает на расхождении и на шаблоне без исходника.
+- Пресет и значения тем — `libs/ui/src/ui-preset.css` и `ui-theme.css`; `styles.css` библиотеки импортирует оба. Правила пресета лежат в `@layer base` (у потребителя ниже utilities, неслоёные стили приложения побеждают). `check-styles` дополнительно собирает путь потребителя: полный `@import 'tailwindcss'`, пресет, значения и части.
 - Docs: у каждой части — исходник файла; страница конфига `vflow.json`; страница токенов показывает шкалы в обеих темах.
 
 ## Не входит

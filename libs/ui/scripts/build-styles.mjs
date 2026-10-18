@@ -1,9 +1,10 @@
 // Produces both CSS entries of @vflow/ui from the single source stylesheet.
 // - styles.css: compiled by Tailwind here; consumers need no Tailwind.
 // - styles.source.css: the same source with `@source` pointing at the published package code,
-//   for consumers who compile it with their own Tailwind v4 pipeline.
+//   for consumers who compile it with their own Tailwind v4 pipeline. It imports the preset and the theme
+//   values, which are copied next to it.
 import { execFileSync } from 'node:child_process';
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { copyFileSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -22,3 +23,4 @@ execFileSync('npx', ['tailwindcss', '-i', source, '-o', join(dist, 'styles.css')
 const css = readFileSync(source, 'utf8');
 if (!css.includes(workspaceSource)) throw new Error(`styles.css must contain ${workspaceSource}`);
 writeFileSync(join(dist, 'styles.source.css'), css.replace(workspaceSource, publishedSource));
+for (const file of ['ui-preset.css', 'ui-theme.css']) copyFileSync(join(root, 'libs/ui/src', file), join(dist, file));
