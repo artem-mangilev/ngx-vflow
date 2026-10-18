@@ -1,7 +1,7 @@
 import { addProjectConfiguration, type Tree, writeJson } from '@nx/devkit';
 import { createTree, createTreeWithEmptyWorkspace } from '@nx/devkit/testing';
 import { prompt } from 'enquirer';
-import { PRESET_IMPORT, uiThemeGenerator } from './generator';
+import { addUiTheme, PRESET_IMPORT } from './theme';
 
 vi.mock('enquirer', () => ({ prompt: vi.fn() }));
 
@@ -14,7 +14,7 @@ function addApp(tree: Tree, name: string, styles?: string[]) {
   });
 }
 
-describe('ui-theme', () => {
+describe('theme of init', () => {
   let tree: Tree;
 
   beforeEach(() => {
@@ -25,7 +25,7 @@ describe('ui-theme', () => {
     addApp(tree, 'app');
     tree.write('apps/app/src/styles.css', "@import 'tailwindcss';\n\nbody {\n  margin: 0;\n}\n");
 
-    await uiThemeGenerator(tree);
+    await addUiTheme(tree);
 
     const css = tree.read('apps/app/src/styles.css', 'utf-8')!;
     expect(css.startsWith(`@import 'tailwindcss';\n${PRESET_IMPORT}\n\nbody {`)).toBe(true);
@@ -41,7 +41,7 @@ describe('ui-theme', () => {
       "/* You can add global styles to this file */\n@charset 'utf-8';\n@use 'sass:math';\n// layers\n@layer theme, base;\n@import 'tailwindcss';\n.a {\n  color: red;\n}\n",
     );
 
-    await uiThemeGenerator(tree);
+    await addUiTheme(tree);
 
     const css = tree.read('apps/app/src/styles.scss', 'utf-8')!;
     expect(css).toContain(`@import 'tailwindcss';\n${PRESET_IMPORT}\n.a {`);
@@ -51,7 +51,7 @@ describe('ui-theme', () => {
     addApp(tree, 'app');
     tree.write('apps/app/src/styles.css', '');
 
-    await uiThemeGenerator(tree);
+    await addUiTheme(tree);
 
     expect(tree.read('apps/app/src/styles.css', 'utf-8')!.startsWith(`${PRESET_IMPORT}\n\n/*`)).toBe(true);
   });
@@ -60,9 +60,9 @@ describe('ui-theme', () => {
     addApp(tree, 'app');
     tree.write('apps/app/src/styles.css', "@import 'tailwindcss';\n");
 
-    await uiThemeGenerator(tree);
+    await addUiTheme(tree);
     const once = tree.read('apps/app/src/styles.css', 'utf-8');
-    await uiThemeGenerator(tree);
+    await addUiTheme(tree);
 
     expect(tree.read('apps/app/src/styles.css', 'utf-8')).toBe(once);
   });
@@ -72,7 +72,7 @@ describe('ui-theme', () => {
     tree.write('node_modules/some-lib/styles.css', '');
     tree.write('apps/app/src/global/theme.css', "@import 'tailwindcss';\n");
 
-    await uiThemeGenerator(tree);
+    await addUiTheme(tree);
 
     expect(tree.read('apps/app/src/global/theme.css', 'utf-8')).toContain(PRESET_IMPORT);
     expect(tree.read('node_modules/some-lib/styles.css', 'utf-8')).toBe('');
@@ -83,19 +83,17 @@ describe('ui-theme', () => {
     tree.write('apps/app/src/styles.css', '');
     tree.write('apps/app/src/flow.css', "@import 'tailwindcss';\n");
 
-    await uiThemeGenerator(tree, { stylesEntryPoint: 'apps/app/src/flow.css' });
+    await addUiTheme(tree, { stylesEntryPoint: 'apps/app/src/flow.css' });
 
     expect(tree.read('apps/app/src/flow.css', 'utf-8')).toContain(PRESET_IMPORT);
     expect(tree.read('apps/app/src/styles.css', 'utf-8')).toBe('');
-    await expect(uiThemeGenerator(tree, { stylesEntryPoint: 'apps/app/src/missing.css' })).rejects.toThrow(
-      'does not exist',
-    );
+    await expect(addUiTheme(tree, { stylesEntryPoint: 'apps/app/src/missing.css' })).rejects.toThrow('does not exist');
   });
 
   it('fails with a hint when the application has no stylesheet', async () => {
     addApp(tree, 'app');
 
-    await expect(uiThemeGenerator(tree)).rejects.toThrow('--stylesEntryPoint');
+    await expect(addUiTheme(tree)).rejects.toThrow('--stylesEntryPoint');
   });
 
   it('asks for the application when there are several and ignores libraries', async () => {
@@ -105,7 +103,7 @@ describe('ui-theme', () => {
     tree.write('apps/shop/src/styles.css', '');
     vi.mocked(prompt).mockResolvedValue({ project: 'shop' });
 
-    await uiThemeGenerator(tree);
+    await addUiTheme(tree);
 
     expect(vi.mocked(prompt)).toHaveBeenCalledWith(expect.objectContaining({ choices: ['admin', 'shop'] }));
     expect(tree.read('apps/shop/src/styles.css', 'utf-8')).toContain(PRESET_IMPORT);
@@ -116,11 +114,11 @@ describe('ui-theme', () => {
     addApp(tree, 'shop');
     tree.write('apps/admin/src/styles.css', '');
 
-    await uiThemeGenerator(tree, { project: 'admin' });
+    await addUiTheme(tree, { project: 'admin' });
 
     expect(vi.mocked(prompt)).not.toHaveBeenCalled();
     expect(tree.read('apps/admin/src/styles.css', 'utf-8')).toContain(PRESET_IMPORT);
-    await expect(uiThemeGenerator(tree, { project: 'shared' })).rejects.toThrow('Choose one of: admin, shop');
+    await expect(addUiTheme(tree, { project: 'shared' })).rejects.toThrow('Choose one of: admin, shop');
   });
 
   it('works in an Angular CLI workspace', async () => {
@@ -139,7 +137,7 @@ describe('ui-theme', () => {
     });
     cli.write('src/styles.css', "@import 'tailwindcss';\n");
 
-    await uiThemeGenerator(cli);
+    await addUiTheme(cli);
 
     expect(cli.read('src/styles.css', 'utf-8')).toContain(`@import 'tailwindcss';\n${PRESET_IMPORT}`);
   });

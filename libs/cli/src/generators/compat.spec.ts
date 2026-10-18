@@ -4,7 +4,6 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { lastValueFrom } from 'rxjs';
 import init from './init/compat';
-import uiTheme from './ui-theme/compat';
 import ui from './ui/compat';
 
 vi.mock('enquirer', () => ({ prompt: vi.fn() }));
@@ -45,13 +44,6 @@ describe('Angular CLI schematics', () => {
 
     expect(JSON.parse(tree.readContent('package.json')).dependencies['ngx-vflow']).toMatch(/^\^\d/);
     expect(tree.readContent('src/styles.css')).toContain("@import '@vflow/cli/ui-preset.css';");
-  });
-
-  it('ui-theme adds the theme', async () => {
-    const tree = angularCliWorkspace();
-    await lastValueFrom(runner.callRule(uiTheme({}), tree));
-
-    expect(tree.readContent('src/styles.css')).toContain("[data-vui-theme='dark']");
   });
 
   it('ui maps the alias in tsconfig instead of creating an Nx library', async () => {

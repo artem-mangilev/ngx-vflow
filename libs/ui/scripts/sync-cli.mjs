@@ -1,5 +1,5 @@
 // Copies the sources of @vflow/ui into the templates of @vflow/cli, like spartan's hlm-to-cli generator: the parts
-// become the files of the `ui` generator and the two stylesheets become the preset and the theme of `ui-theme`.
+// become the files of the `ui` generator and the two stylesheets become the preset and the theme that `init` adds.
 // The copies are verbatim (the parts import each other relatively), so a consumer gets the code docs and e2e run on.
 // `--check` writes nothing and fails when a template differs from its source or has no source, or when the parts do
 // not compile with `isolatedModules`, which a new Angular application turns on.
@@ -19,7 +19,7 @@ const check = process.argv.includes('--check');
 const expected = new Map([
   [join(partsDir, 'src/index.ts.template'), join(ui, 'public-api.ts')],
   [join(cli, 'ui-preset.css'), join(ui, 'ui-preset.css')],
-  [join(cli, 'src/generators/ui-theme/ui-theme.css'), join(ui, 'ui-theme.css')],
+  [join(cli, 'src/generators/init/ui-theme.css'), join(ui, 'ui-theme.css')],
 ]);
 for (const file of readdirSync(join(ui, 'lib'))) {
   if (file.endsWith('.ts') && !file.endsWith('.spec.ts')) {

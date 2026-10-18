@@ -6,7 +6,7 @@
   "properties": {
     "project": {
       "type": "string",
-      "description": "The application to add the theme to. Asked for when the workspace has several applications."
+      "description": "The application to set up. Asked for when the workspace has several applications."
     },
     "stylesEntryPoint": {
       "type": "string",

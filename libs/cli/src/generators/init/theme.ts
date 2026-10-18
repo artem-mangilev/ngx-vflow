@@ -2,7 +2,7 @@ import { joinPathFragments, logger, type ProjectConfiguration, type Tree } from 
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { resolveApplication } from '../../utils/applications';
-import type { UiThemeGeneratorSchema } from './schema';
+import type { InitGeneratorSchema } from './schema';
 
 export const PRESET_IMPORT = "@import '@vflow/cli/ui-preset.css';";
 
@@ -10,8 +10,11 @@ export const PRESET_IMPORT = "@import '@vflow/cli/ui-preset.css';";
  * Adds the vflow UI theme to the global stylesheet of an application, like spartan's `ui-theme`: the preset import
  * right after the leading imports, so `@import 'tailwindcss'` stays first, and the light and dark values at the end,
  * where they become application code. Tailwind itself is a prerequisite and is neither installed nor checked.
+ *
+ * Not a generator of its own: with one theme there is nothing to choose, and `init` is as idempotent. A generator for
+ * another set of parts that needs the tokens calls it the same way.
  */
-export async function uiThemeGenerator(tree: Tree, options: UiThemeGeneratorSchema = {}): Promise<void> {
+export async function addUiTheme(tree: Tree, options: InitGeneratorSchema = {}): Promise<void> {
   const project = await resolveApplication(tree, options.project);
 
   if (options.stylesEntryPoint && !tree.exists(options.stylesEntryPoint)) {
@@ -30,8 +33,6 @@ export async function uiThemeGenerator(tree: Tree, options: UiThemeGeneratorSche
   // Angular CLI reports any write as an update, so an unchanged stylesheet is not written.
   if (themed !== css) tree.write(stylesheet, themed);
 }
-
-export default uiThemeGenerator;
 
 /** Inserts the preset import and appends the theme values; a stylesheet that already has either keeps it. */
 export function addTheme(css: string, path = 'the stylesheet'): string {

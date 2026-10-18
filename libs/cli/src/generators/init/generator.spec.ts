@@ -1,7 +1,7 @@
 import { addProjectConfiguration, readJson, readJsonFile, type Tree, updateJson } from '@nx/devkit';
 import { createTreeWithEmptyWorkspace } from '@nx/devkit/testing';
 import { join } from 'node:path';
-import { PRESET_IMPORT } from '../ui-theme/generator';
+import { PRESET_IMPORT } from './theme';
 import { initGenerator } from './generator';
 
 describe('init', () => {

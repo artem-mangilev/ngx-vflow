@@ -11,10 +11,9 @@ ng g @vflow/cli:init # or: nx g @vflow/cli:init
 ng g @vflow/cli:ui   # or: nx g @vflow/cli:ui
 ```
 
-| Generator  | Does                                                                                           |
-| ---------- | ---------------------------------------------------------------------------------------------- |
-| `init`     | Adds `ngx-vflow` when missing and runs `ui-theme`                                              |
-| `ui-theme` | Imports `@vflow/cli/ui-preset.css` after Tailwind and adds the light and dark theme values     |
-| `ui`       | Asks for the `ui` section of `vflow.json` on the first run and copies the parts as `@vflow/ui` |
+| Generator | Does                                                                                                                                         |
+| --------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `init`    | Adds `ngx-vflow` and `@angular/cdk` when missing, imports `@vflow/cli/ui-preset.css` after Tailwind and adds the light and dark theme values |
+| `ui`      | Asks for the `ui` section of `vflow.json` on the first run and copies the parts as `@vflow/ui`                                               |
 
 A later `ui` run, for example after an update, adds only the files that are missing.

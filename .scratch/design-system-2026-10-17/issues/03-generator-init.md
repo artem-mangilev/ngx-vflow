@@ -31,3 +31,5 @@ Unit на `createTreeWithEmptyWorkspace`: Nx-проект, проект Angular 
 - `ui-theme`: поиск stylesheet как у spartan (`styles.*` в `sourceRoot`, затем `build.options.styles` своего проекта, `inject: false` пропускается); пресет после ведущих `@charset` / `@import` / `@layer …;` / `@use` / `@forward` с пропуском комментариев; значения из `ui-theme.css` в конец; повторный запуск ничего не дублирует.
 - `init`: `ngx-vflow` `^<версия @vflow/cli>` в `dependencies`, если его нет ни там, ни в `devDependencies`; затем `ui-theme`; `vflow.json` не создаёт.
 - 14 unit-тестов (Nx, Angular CLI, несколько приложений, build options, `--stylesEntryPoint`, нет stylesheet, Sass с комментариями, пустой файл, повторный запуск, `ngx-vflow` в обеих секциях). Проверено: `cli:test`, `cli:lint`, prettier, `ui:check-cli`, `release:dry-run`.
+
+2026-10-18: `ui-theme` перестал быть публичным генератором — функция `addUiTheme` в `generators/init/theme.ts`, её вызывает `init` (и вызовет будущий генератор другого набора частей).

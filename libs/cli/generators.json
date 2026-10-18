@@ -3,12 +3,7 @@
     "init": {
       "factory": "./src/generators/init/generator",
       "schema": "./src/generators/init/schema.json",
-      "description": "Add ngx-vflow to the dependencies and the vflow UI theme to an application."
-    },
-    "ui-theme": {
-      "factory": "./src/generators/ui-theme/generator",
-      "schema": "./src/generators/ui-theme/schema.json",
-      "description": "Add the vflow UI preset and the light and dark theme values to the global stylesheet of an application."
+      "description": "Add ngx-vflow, @angular/cdk and the vflow UI theme to an application."
     },
     "ui": {
       "factory": "./src/generators/ui/generator",
@@ -20,12 +15,7 @@
     "init": {
       "factory": "./src/generators/init/compat",
       "schema": "./src/generators/init/schema.json",
-      "description": "Add ngx-vflow to the dependencies and the vflow UI theme to an application."
-    },
-    "ui-theme": {
-      "factory": "./src/generators/ui-theme/compat",
-      "schema": "./src/generators/ui-theme/schema.json",
-      "description": "Add the vflow UI preset and the light and dark theme values to the global stylesheet of an application."
+      "description": "Add ngx-vflow, @angular/cdk and the vflow UI theme to an application."
     },
     "ui": {
       "factory": "./src/generators/ui/compat",
