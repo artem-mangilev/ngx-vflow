@@ -9,6 +9,7 @@
   },
   "type": "commonjs",
   "generators": "./generators.json",
+  "schematics": "./generators.json",
   "dependencies": {
     "@nx/angular": ">=21.0.0",
     "@nx/devkit": ">=21.0.0",

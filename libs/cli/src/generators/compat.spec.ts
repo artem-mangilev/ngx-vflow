@@ -1,0 +1,67 @@
+import { HostTree } from '@angular-devkit/schematics';
+import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { lastValueFrom } from 'rxjs';
+import init from './init/compat';
+import uiTheme from './ui-theme/compat';
+import ui from './ui/compat';
+
+vi.mock('enquirer', () => ({ prompt: vi.fn() }));
+
+const root = join(__dirname, '../..');
+
+/** An Angular CLI workspace without Nx: angular.json, one application and a vflow.json without questions. */
+function angularCliWorkspace(): UnitTestTree {
+  const tree = new UnitTestTree(new HostTree());
+  const json = (path: string, value: unknown) => tree.create(path, JSON.stringify(value));
+  json('package.json', { name: 'app', dependencies: { '@angular/core': '~20.3.0' } });
+  json('angular.json', {
+    version: 1,
+    projects: { app: { root: '', sourceRoot: 'src', projectType: 'application', architect: {} } },
+  });
+  json('tsconfig.json', { compilerOptions: {} });
+  json('tsconfig.app.json', { files: ['src/main.ts'] });
+  json('vflow.json', { ui: { componentsPath: 'libs/ui', importAlias: '@vflow/ui' } });
+  tree.create('src/styles.css', "@import 'tailwindcss';\n");
+  return tree;
+}
+
+describe('Angular CLI schematics', () => {
+  const runner = new SchematicTestRunner('@vflow/cli', join(root, 'generators.json'));
+
+  it('lists every generator as a schematic with the same schema', () => {
+    const { generators, schematics } = JSON.parse(readFileSync(join(root, 'generators.json'), 'utf-8'));
+    expect(Object.keys(schematics)).toEqual(Object.keys(generators));
+    for (const [name, schematic] of Object.entries<{ factory: string; schema: string }>(schematics)) {
+      expect(schematic.factory).toBe(`./src/generators/${name}/compat`);
+      expect(schematic.schema).toBe(generators[name].schema);
+    }
+  });
+
+  it('init adds ngx-vflow and the theme', async () => {
+    const tree = angularCliWorkspace();
+    await lastValueFrom(runner.callRule(init({}), tree));
+
+    expect(JSON.parse(tree.readContent('package.json')).dependencies['ngx-vflow']).toMatch(/^\^\d/);
+    expect(tree.readContent('src/styles.css')).toContain("@import '@vflow/cli/ui-preset.css';");
+  });
+
+  it('ui-theme adds the theme', async () => {
+    const tree = angularCliWorkspace();
+    await lastValueFrom(runner.callRule(uiTheme({}), tree));
+
+    expect(tree.readContent('src/styles.css')).toContain("[data-vui-theme='dark']");
+  });
+
+  it('ui maps the alias in tsconfig instead of creating an Nx library', async () => {
+    const tree = angularCliWorkspace();
+    await lastValueFrom(runner.callRule(ui({}), tree));
+
+    expect(JSON.parse(tree.readContent('tsconfig.json')).compilerOptions.paths['@vflow/ui']).toEqual([
+      './libs/ui/src/index.ts',
+    ]);
+    expect(tree.exists('libs/ui/src/lib/node.directive.ts')).toBe(true);
+    expect(tree.exists('libs/ui/project.json')).toBe(false);
+  });
+});

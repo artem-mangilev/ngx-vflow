@@ -25,7 +25,10 @@ export async function uiThemeGenerator(tree: Tree, options: UiThemeGeneratorSche
     );
   }
 
-  tree.write(stylesheet, addTheme(tree.read(stylesheet, 'utf-8') ?? '', stylesheet));
+  const css = tree.read(stylesheet, 'utf-8') ?? '';
+  const themed = addTheme(css, stylesheet);
+  // Angular CLI reports any write as an update, so an unchanged stylesheet is not written.
+  if (themed !== css) tree.write(stylesheet, themed);
 }
 
 export default uiThemeGenerator;

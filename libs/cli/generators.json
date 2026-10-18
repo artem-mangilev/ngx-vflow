@@ -15,5 +15,22 @@
       "schema": "./src/generators/ui/schema.json",
       "description": "Copy the vflow UI parts into the workspace."
     }
+  },
+  "schematics": {
+    "init": {
+      "factory": "./src/generators/init/compat",
+      "schema": "./src/generators/init/schema.json",
+      "description": "Add ngx-vflow to the dependencies and the vflow UI theme to an application."
+    },
+    "ui-theme": {
+      "factory": "./src/generators/ui-theme/compat",
+      "schema": "./src/generators/ui-theme/schema.json",
+      "description": "Add the vflow UI preset and the light and dark theme values to the global stylesheet of an application."
+    },
+    "ui": {
+      "factory": "./src/generators/ui/compat",
+      "schema": "./src/generators/ui/schema.json",
+      "description": "Copy the vflow UI parts into the workspace."
+    }
   }
 }
