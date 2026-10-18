@@ -20,7 +20,6 @@ Set these on a `data-vui-theme` scope or any element inside it. Everything else 
 | `--vui-accent`, `--vui-on-accent`                              | `#0071e3` on white      | Primary button fill and its text (4.7:1 in both themes)                         |
 | `--vui-selection`                                              | `#0071e3` / `#0a84ff`   | Selection and focus rings, selected edges, connecting ports                     |
 | `--vui-success`, `--vui-warning`, `--vui-danger`, `--vui-info` | text-safe tones         | Status tones and port validity, at least 4.5:1 on the surface and on their tint |
-| `--vui-font-sans`                                              | system stack            | Typeface                                                                        |
 | `--vui-font-size`                                              | `13px`                  | Body size; the type scale follows it                                            |
 | `--vui-space`                                                  | `4px`                   | Grid unit; every padding, gap and control size follows it                       |
 | `--vui-radius`                                                 | `6px`                   | Control radius; surfaces add one grid unit                                      |
@@ -48,8 +47,8 @@ when the title wraps. The leading slot (`vuiIcon`) is at least four grid units w
 its content; a zero-width text strut centered in it gives it a baseline, so an icon, an avatar or any other small view is
 centered on the first line of the title, whatever its size.
 
-Parts set their own font family, size, line height and weight, reset the letter spacing an application may set on
-its body and use grayscale antialiasing, as native macOS text does; without it light text on the dark theme renders
+Parts use the application's typeface and set their own size, line height and weight, reset the letter spacing an
+application may set on its body and use grayscale antialiasing, as native macOS text does; without it light text on the dark theme renders
 heavier. These settings are on the parts, not on the theme scope, so a `data-vui-theme` on your application root does not
 change the rest of your page. Secondary text keeps the regular weight inside a header.
 

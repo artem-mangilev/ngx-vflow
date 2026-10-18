@@ -18,7 +18,6 @@ import { DemoIconComponent } from '../../../shared/demo-icon.component';
       padding: 20px;
       background: var(--vui-canvas);
       color: var(--vui-foreground);
-      font-family: var(--vui-font-sans);
       font-size: var(--vui-font-size);
     }
     h3 {

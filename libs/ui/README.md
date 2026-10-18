@@ -58,7 +58,7 @@ application:
 - colors: `--vui-canvas`, `--vui-surface`, `--vui-surface-muted`, `--vui-foreground`, `--vui-muted`,
   `--vui-border`, `--vui-separator`, `--vui-accent`, `--vui-on-accent`, `--vui-selection`, and the tones
   `--vui-success`, `--vui-warning`, `--vui-danger`, `--vui-info`;
-- scales: `--vui-font-sans`, `--vui-font-size`, `--vui-space`, `--vui-radius`;
+- scales: `--vui-font-size`, `--vui-space`, `--vui-radius`;
 - elevation and motion: `--vui-shadow-node`, `--vui-shadow-floating`, `--vui-duration`, `--vui-ease`.
 
 Every size, padding and radius of the parts derives from `--vui-font-size`, `--vui-space` and `--vui-radius`. Part

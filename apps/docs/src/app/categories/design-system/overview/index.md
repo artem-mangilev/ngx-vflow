@@ -153,7 +153,7 @@ with surfaces one grid unit rounder, so corners stay concentric.
 | `--vui-accent`, `--vui-on-accent`                                            | Primary action fill and its text          |
 | `--vui-selection`                                                            | Selection and focus rings, selected edges |
 | `--vui-success`, `--vui-warning`, `--vui-danger`, `--vui-info`               | Status tones and port validity            |
-| `--vui-font-sans`, `--vui-font-size`                                         | Typeface and body size of the type scale  |
+| `--vui-font-size`                                                            | Body size of the type scale               |
 | `--vui-space`, `--vui-radius`                                                | Grid unit and control radius              |
 | `--vui-shadow-node`, `--vui-shadow-floating`, `--vui-duration`, `--vui-ease` | Elevation and motion                      |
 

@@ -1,12 +1,12 @@
 /*
  * Values of the vui tokens; every `vui` key of ui-preset.css derives from them. The CLI copies this file into the
- * application's global styles, where it becomes application code.
+ * application's global styles, where it becomes application code. There is no typeface: the parts use the
+ * application's.
  *
  * The scales and motion do not depend on the theme and are set once. Each theme sets the same colors and shadows;
  * `:root` carries the light ones, so the parts render without a theme scope, and it does not touch core tokens.
  */
 :root {
-  --vui-font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --vui-font-size: 13px;
   --vui-space: 4px;
   --vui-radius: 6px;

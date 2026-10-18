@@ -11,7 +11,7 @@ import { booleanAttribute, Directive, input } from '@angular/core';
   host: {
     class: `vui-node
       relative box-border rounded-vui-surface border border-vui-border
-      bg-vui-surface text-vui-foreground font-vui-sans tracking-vui-normal text-vui-body antialiased shadow-vui-node
+      bg-vui-surface text-vui-foreground tracking-vui-normal text-vui-body antialiased shadow-vui-node
       data-[vui-selected=true]:outline-2 data-[vui-selected=true]:outline-offset-2 data-[vui-selected=true]:outline-vui-selection
       forced-colors:data-[vui-selected=true]:outline-[Highlight]`,
     '[attr.data-vui-selected]': 'selected()',

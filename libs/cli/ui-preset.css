@@ -30,7 +30,6 @@
   --color-vui-tone: var(--vui-tone);
   --color-vui-tone-ink: color-mix(in oklab, var(--vui-tone) 80%, var(--vui-foreground));
 
-  --font-vui-sans: var(--vui-font-sans);
   --font-weight-vui-normal: 400;
   --font-weight-vui-medium: 500;
   --font-weight-vui-strong: 600;

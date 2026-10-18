@@ -20,7 +20,7 @@ export interface VuiControlsLabels {
   host: {
     class: `vui-controls
       inline-flex box-border items-center gap-vui-1 p-vui-1 rounded-vui-surface
-      bg-vui-surface/85 backdrop-blur-vui-material backdrop-saturate-180 shadow-vui-floating font-vui-sans tracking-vui-normal antialiased
+      bg-vui-surface/85 backdrop-blur-vui-material backdrop-saturate-180 shadow-vui-floating tracking-vui-normal antialiased
       forced-colors:border forced-colors:border-[CanvasText]`,
     role: 'group',
     '[attr.aria-label]': 'labels().group',
