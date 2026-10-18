@@ -7,6 +7,7 @@
 //    (`grid`, `ring`) would ship as a global class, so it must be excluded with `@source not inline(...)`.
 // 4. The stylesheets the CLI delivers, ui-preset.css and ui-theme.css after a full `@import 'tailwindcss'`, generate
 //    every utility the parts use: the path of an application that copies the parts.
+// 5. ui-theme.css sets the same tokens in the light and the dark theme, so a theme never falls back to the other.
 import { execFileSync } from 'node:child_process';
 import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
@@ -122,6 +123,21 @@ try {
   }
 } finally {
   rmSync(work, { recursive: true, force: true });
+}
+
+const themeCss = readFileSync(join(root, 'libs/ui/src/ui-theme.css'), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+const themeTokens = (theme) => {
+  const block = [...themeCss.matchAll(/([^{}]+)\{([^}]*)\}/g)].find(([, selector]) =>
+    selector.includes(`[data-vui-theme='${theme}']`),
+  );
+  return new Set([...(block?.[2] ?? '').matchAll(/(--[\w-]+)\s*:/g)].map((m) => m[1]));
+};
+const [light, dark] = [themeTokens('light'), themeTokens('dark')];
+for (const [theme, own, other] of [
+  ['dark', dark, light],
+  ['light', light, dark],
+]) {
+  for (const token of other) if (!own.has(token)) errors.push(`ui-theme.css: the ${theme} theme does not set ${token}`);
 }
 
 if (errors.length) {

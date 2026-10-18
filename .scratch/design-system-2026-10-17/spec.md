@@ -117,7 +117,7 @@
 ## Tailwind в проекте потребителя
 
 - Пресет `@vflow/cli/ui-preset.css` регистрирует токены через `@theme inline` в собственном пространстве `vui`: `--color-vui-surface`, `--radius-vui-surface`, `--text-vui-body` и т.д. Utilities — `bg-vui-surface`, `rounded-vui-surface`, `text-vui-body`. Это исключает коллизии с темой приложения (`bg-surface`, `bg-background` у shadcn-подобных тем) и не требует глобального Tailwind `prefix()`, который настраивает потребитель.
-- Значения тем — CSS-переменные `--vui-*` в `[data-vui-theme='light'|'dark']`; `@theme inline` ссылается на них, поэтому смена темы — только смена переменных.
+- Значения тем — CSS-переменные `--vui-*`: шкалы и motion один раз в `:root`, цвета и тени — одинаковым набором ключей в `[data-vui-theme='light'|'dark']` (`check-styles` сверяет наборы); `@theme inline` ссылается на них, поэтому смена темы — только смена переменных.
 - Маппинг на core `--v-*` в области темы сохраняется (ADR-0005): импорт темы не перекрашивает flow вне `[data-vui-theme]`.
 - Скопированные части лежат в репозитории потребителя (`componentsPath`), Tailwind находит их автоматическим source detection; `@source` для `node_modules` не нужен.
 - Tailwind `prefix()` потребителя не поддерживается, как и у spartan: пространство `vui` уже исключает коллизии.
