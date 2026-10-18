@@ -152,8 +152,9 @@
 
 - **Набор целиком**: аргумента с именем части нет. Файлы ложатся в `<componentsPath>/src/index.ts` и `src/lib/*`; части импортируют друг друга относительно, как в `libs/ui`.
   - Angular CLI: path `<importAlias>` → `./<componentsPath>/src/index.ts` в корневом tsconfig и `<componentsPath>/src/**/*.ts` в `include` `tsconfig.app.json`.
-  - Nx: одна Angular-библиотека в `componentsPath` с import path `<importAlias>` (`buildable` из конфига).
-- **Повторный запуск** (например, после обновления `@vflow/cli`) создаёт недостающие файлы и не трогает существующие; `index.ts` не переписывается — генератор печатает части, которых в нём нет. Перезаписи и `--overwrite` нет.
+  - Nx: одна Angular-библиотека в `componentsPath` с import path `<importAlias>` (`buildable` из конфига). Файлы, которые пишет генератор библиотек Nx (`src/lib/*`, `src/index.ts`), заменяются набором; правила ESLint библиотеки не меняются — префикс селекторов `vui` задаётся при создании.
+  - Режим Angular CLI включает флаг `angularCli`, который передаёт schematic-обёртка (05), как у spartan.
+- **Повторный запуск** (alias уже есть в tsconfig paths, как признак установки у spartan; например, после обновления `@vflow/cli`) создаёт недостающие файлы и не трогает существующие; `index.ts` не переписывается — генератор печатает части, которых в нём нет. Перезаписи и `--overwrite` нет.
 - **npm-зависимости** (`ngx-vflow`) добавляются в `package.json`, установка — задачей генератора.
 
 ### Каталог

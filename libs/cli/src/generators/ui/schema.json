@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "VflowUi",
+  "title": "Copy the vflow UI parts into the workspace",
+  "type": "object",
+  "properties": {
+    "directory": {
+      "type": "string",
+      "description": "A directory where the parts are placed. Overrides componentsPath of vflow.json.",
+      "x-priority": "important"
+    }
+  },
+  "required": []
+}

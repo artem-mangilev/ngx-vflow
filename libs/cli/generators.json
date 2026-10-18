@@ -9,6 +9,11 @@
       "factory": "./src/generators/ui-theme/generator",
       "schema": "./src/generators/ui-theme/schema.json",
       "description": "Add the vflow UI preset and the light and dark theme values to the global stylesheet of an application."
+    },
+    "ui": {
+      "factory": "./src/generators/ui/generator",
+      "schema": "./src/generators/ui/schema.json",
+      "description": "Copy the vflow UI parts into the workspace."
     }
   }
 }
