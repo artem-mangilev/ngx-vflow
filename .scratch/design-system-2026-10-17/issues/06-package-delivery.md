@@ -20,3 +20,7 @@ Blocked by: 04
 - Docs hybrid: `@vflow/ui` и стили — из исходников `libs/ui` (сборки больше нет, а потребитель компилирует части сам).
 - `apps/consumer`: target `generate-ui` (после `cli:build`) запускает собранные `init` и `ui` в Angular CLI-воркспейсе `tmp/consumer-ui` (`node_modules/@vflow/cli` — symlink на dist, `@source` на части, потому что `tmp/` в `.gitignore`); `ui` берёт `@vflow/ui` из сгенерированных частей и `tmp/consumer-ui/src/styles.css`. `apps/consumer/.postcssrc.json` включает `@tailwindcss/postcss` (раньше был пустым: потребитель готового CSS обходился без Tailwind). `consumer:check` зелёный.
 - Проверено: `nx run-many -t build`, docs `hybrid`, lint всех проектов, `cli:test` (28), `ui:check-styles`, `ui:check-cli`, `release:dry-run`. Тексты docs про `@vflow/ui/styles.css` и README `libs/ui` остаются для 08.
+
+## Comments
+
+2026-10-18: `apps/consumer` удалён по решению пользователя — интеграция проверяется на отдельных репозиториях; смоук перенесён в `libs/cli/scripts/smoke.mjs` (`nx run cli:smoke`).

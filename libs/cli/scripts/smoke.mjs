@@ -4,8 +4,8 @@
 // status renders in the light and the dark theme. It needs the network and takes minutes, so it is not part of CI;
 // Angular 22 targets need Node 22.22.3 or later.
 //
-//   nx run consumer:smoke                       every target
-//   node apps/consumer/scripts/smoke-generators.mjs angular@21 nx@21
+//   nx run cli:smoke                            every target
+//   node libs/cli/scripts/smoke.mjs angular@21 nx@21
 import { execFileSync } from 'node:child_process';
 import { mkdirSync, mkdtempSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { createServer } from 'node:http';

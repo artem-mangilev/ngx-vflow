@@ -24,3 +24,7 @@ Blocked by: 05, 06
 - Angular 22 (2026-10-18, решение пользователя «делать здесь»): peers `ngx-vflow` (`@angular/common`, `core`, `cdk`) и `libs/ui` — `^20.0.0 || ^21.0.0 || ^22.0.0` без апгрейда воркспейса: core собран partial-компиляцией Angular 20 и линкуется в 22, части компилируются приложением. Смоук: `ng new` на 22 и `create-nx-workspace@22` (ставит Nx 23 + Angular 22).
 - `create-nx-workspace` новых версий превращает preset `angular-monorepo` в демо-воркспейс «shop» (SSR, несколько приложений) и игнорирует `--appName`; смоук создаёт своё приложение `smoke` через `@nx/angular:application` в любом Nx.
 - Angular 22 требует Node ≥ 22.22.3 (локально 22.20 — смоук запускался на Node 24 из npm-пакета `node`); скрипт падает с понятной ошибкой на старом Node.
+
+## Comments
+
+2026-10-18: скрипт перенесён в `libs/cli/scripts/smoke.mjs` (`nx run cli:smoke`) вместе с удалением `apps/consumer`.

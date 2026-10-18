@@ -40,6 +40,19 @@
       "options": {
         "packageRoot": "dist/{projectRoot}"
       }
+    },
+    "smoke": {
+      "executor": "nx:run-commands",
+      "dependsOn": [
+        {
+          "projects": ["ngx-vflow"],
+          "target": "build"
+        },
+        "build"
+      ],
+      "options": {
+        "command": "node libs/cli/scripts/smoke.mjs"
+      }
     }
   }
 }
