@@ -1,0 +1,20 @@
+{
+  "name": "@vflow/cli",
+  "version": "2.7.0",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/artem-mangilev/ngx-vflow",
+    "directory": "libs/cli"
+  },
+  "type": "commonjs",
+  "generators": "./generators.json",
+  "dependencies": {
+    "@nx/devkit": ">=21.0.0",
+    "enquirer": "^2.3.6",
+    "nx": ">=21.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "VflowUiTheme",
+  "title": "Add the vflow UI theme to an application",
+  "type": "object",
+  "properties": {
+    "project": {
+      "type": "string",
+      "description": "The application to add the theme to. Asked for when the workspace has several applications."
+    },
+    "stylesEntryPoint": {
+      "type": "string",
+      "description": "Path to the global stylesheet relative to the workspace root. Found in the application when omitted."
+    }
+  },
+  "required": []
+}

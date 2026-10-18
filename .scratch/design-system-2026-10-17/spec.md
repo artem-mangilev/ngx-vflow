@@ -138,6 +138,8 @@
 - Stylesheet ищется как у spartan: `styles.css|scss|sass|less` в `sourceRoot` проекта, затем первый файл проекта из `build.options.styles`; не нашёлся — ошибка с подсказкой про `--stylesEntryPoint`.
 - `@import '@vflow/cli/ui-preset.css';` вставляется сразу после ведущих `@charset` / `@import` / `@layer …;`, чтобы `@import 'tailwindcss'` шёл первым и CSS оставался валидным.
 - В конец файла пишутся блоки `:root, [data-vui-theme='light'] { --vui-*… }` и `[data-vui-theme='dark'] { --vui-*… }`.
+- Повторный запуск ничего не дублирует: импорт пресета и блок `[data-vui-theme='dark']` уже есть — генератор пишет об этом и оставляет файл; значения правят на месте.
+- Ведущие комментарии (`/* You can add global styles… */` из `ng new`, `//` в Sass) пропускаются, поэтому пресет встаёт после `@import 'tailwindcss'`, а не над ним.
 - Отличия от spartan: темы одна пара light/dark, поэтому нет выбора темы и опции `--theme`; нет `--prefix` (тема уже ограничена `[data-vui-theme]`); не переписываются Tailwind-импорты и не добавляется `@layer base` для `body` — части не зависят от слоёв и не стилизуют страницу.
 
 ### `ui`
