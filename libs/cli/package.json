@@ -11,11 +11,17 @@
   "generators": "./generators.json",
   "schematics": "./generators.json",
   "dependencies": {
-    "@nx/angular": ">=21.0.0",
     "@nx/devkit": ">=21.0.0",
-    "@nx/js": ">=21.0.0",
     "enquirer": "^2.3.6",
     "nx": ">=21.0.0"
+  },
+  "peerDependencies": {
+    "@nx/angular": ">=21.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@nx/angular": {
+      "optional": true
+    }
   },
   "publishConfig": {
     "access": "public"

@@ -74,6 +74,18 @@
         "parallel": false,
         "commands": ["nx build consumer --configuration core-only", "node apps/consumer/scripts/check-bundles.mjs"]
       }
+    },
+    "smoke": {
+      "executor": "nx:run-commands",
+      "dependsOn": [
+        {
+          "projects": ["ngx-vflow", "cli"],
+          "target": "build"
+        }
+      ],
+      "options": {
+        "command": "node apps/consumer/scripts/smoke-generators.mjs"
+      }
     }
   }
 }

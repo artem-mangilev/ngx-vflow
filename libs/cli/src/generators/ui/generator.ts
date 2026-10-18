@@ -8,7 +8,6 @@ import {
   type Tree,
   updateJson,
 } from '@nx/devkit';
-import { addTsConfigPath, getRootTsConfigPathInTree } from '@nx/js';
 import { readdirSync, readFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { loadOrInitUiConfig, type UiConfig } from '../../utils/config';
@@ -46,8 +45,13 @@ export async function uiGenerator(tree: Tree, options: UiGeneratorSchema = {}): 
 
 export default uiGenerator;
 
+/** The tsconfig whose `paths` the workspace shares: tsconfig.base.json in Nx, tsconfig.json in Angular CLI. */
+function rootTsConfig(tree: Tree): string | undefined {
+  return ['tsconfig.base.json', 'tsconfig.json'].find((path) => tree.exists(path));
+}
+
 function readTsConfigPaths(tree: Tree): Record<string, string[]> {
-  const path = getRootTsConfigPathInTree(tree);
+  const path = rootTsConfig(tree);
   if (!path) return {};
   try {
     return readJson(tree, path).compilerOptions?.paths ?? {};
@@ -58,7 +62,16 @@ function readTsConfigPaths(tree: Tree): Record<string, string[]> {
 
 /** The parts live outside the app's `src`, so tsconfig.app.json must include them for the editor, as in spartan. */
 function setupAngularCliProject(tree: Tree, config: UiConfig, directory: string) {
-  addTsConfigPath(tree, config.importAlias, [`./${joinPathFragments(directory, 'src', 'index.ts')}`]);
+  const tsconfig = rootTsConfig(tree);
+  if (!tsconfig) throw new Error('Could not find tsconfig.json to map the import alias of the parts in.');
+  updateJson(tree, tsconfig, (json) => {
+    json.compilerOptions ??= {};
+    json.compilerOptions.paths = {
+      ...json.compilerOptions.paths,
+      [config.importAlias]: [`./${joinPathFragments(directory, 'src', 'index.ts')}`],
+    };
+    return json;
+  });
 
   if (!tree.exists('tsconfig.app.json')) return;
   const glob = `${directory}/src/**/*.ts`;
@@ -70,9 +83,21 @@ function setupAngularCliProject(tree: Tree, config: UiConfig, directory: string)
   });
 }
 
-/** One Angular library whose import path is the alias; the files the library generator writes are replaced. */
+/**
+ * One Angular library whose import path is the alias; the files the library generator writes are replaced.
+ * @nx/angular is an optional peer: every Nx Angular workspace has it, and installing it in Angular CLI is both
+ * unneeded and, with npm 10, fails to resolve.
+ */
 async function createNxLibrary(tree: Tree, config: UiConfig, directory: string): Promise<GeneratorCallback> {
-  const { libraryGenerator, UnitTestRunner } = await import('@nx/angular/generators');
+  let angular: typeof import('@nx/angular/generators');
+  try {
+    angular = await import('@nx/angular/generators');
+  } catch {
+    throw new Error(
+      'The ui generator creates an Nx library with @nx/angular. Install it, or run `ng g @vflow/cli:ui`.',
+    );
+  }
+  const { libraryGenerator, UnitTestRunner } = angular;
   const callback = await libraryGenerator(tree, {
     ...(readNxJson(tree)?.generators?.['@nx/angular:library'] ?? {}),
     directory,
