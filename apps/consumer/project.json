@@ -5,13 +5,27 @@
   "sourceRoot": "apps/consumer/src",
   "prefix": "app",
   "targets": {
+    "generate-ui": {
+      "executor": "nx:run-commands",
+      "dependsOn": [
+        {
+          "projects": ["cli"],
+          "target": "build"
+        }
+      ],
+      "outputs": ["{workspaceRoot}/tmp/consumer-ui"],
+      "options": {
+        "command": "node apps/consumer/scripts/generate-ui.mjs"
+      }
+    },
     "build": {
       "executor": "@angular/build:application",
       "dependsOn": [
         {
-          "projects": ["ngx-vflow", "ui"],
+          "projects": ["ngx-vflow"],
           "target": "build"
-        }
+        },
+        "generate-ui"
       ],
       "outputs": ["{options.outputPath}"],
       "options": {
@@ -19,7 +33,7 @@
         "index": "apps/consumer/src/index.html",
         "browser": "apps/consumer/src/main.ts",
         "tsConfig": "apps/consumer/tsconfig.app.json",
-        "styles": ["dist/libs/ui/styles.css"],
+        "styles": ["tmp/consumer-ui/src/styles.css"],
         "optimization": false,
         "sourceMap": false,
         "outputHashing": "none"
@@ -38,9 +52,10 @@
       "executor": "@angular/build:dev-server",
       "dependsOn": [
         {
-          "projects": ["ngx-vflow", "ui"],
+          "projects": ["ngx-vflow"],
           "target": "build"
-        }
+        },
+        "generate-ui"
       ],
       "options": {
         "buildTarget": "consumer:build:ui",

@@ -1,10 +1,7 @@
 /*
- * Library entry of @vflow/ui for the workspace: docs, e2e and the package build compile it with Tailwind.
- * - Library build: Tailwind compiles this file with `@source` pointing at the directive sources
- *   and publishes the result as `@vflow/ui/styles.css` (no Tailwind needed by the consumer).
- * - Source entry: the same file is published as `@vflow/ui/styles.source.css` with `@source`
- *   pointing at the package's compiled code, for a consumer's own Tailwind v4 pipeline.
- * The tokens live in `ui-preset.css` and `ui-theme.css`, the two stylesheets the CLI delivers to a consumer.
+ * Workspace entry of @vflow/ui: docs, e2e and `check-styles` compile it with Tailwind, with `@source` pointing at the
+ * directive sources. It is not published: consumers get the parts and the tokens through @vflow/cli, whose preset and
+ * theme values are `ui-preset.css` and `ui-theme.css` imported here.
  *
  * Tailwind's default theme is not imported: the only scales are the `vui` keys, so a part cannot reach for a value
  * outside the design system (`text-xs`, `p-3`, `rounded-lg` do not exist). The keys are namespaced

@@ -82,7 +82,7 @@
           "sourceMap": true,
           "namedChunks": true,
           "styles": [
-            "dist/libs/ui/styles.css",
+            "libs/ui/src/styles.css",
             "apps/docs/src/styles.scss",
             "apps/docs/src/app/shared/demo.css",
             "node_modules/@ng-doc/app/styles/global.css"

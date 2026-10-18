@@ -3,7 +3,20 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "projectType": "library",
   "sourceRoot": "libs/cli/src",
+  "tags": ["release"],
   "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "outputs": ["{workspaceRoot}/dist/libs/cli"],
+      "options": {
+        "parallel": false,
+        "commands": [
+          "rm -rf dist/libs/cli",
+          "tsc -p libs/cli/tsconfig.lib.json",
+          "node libs/cli/scripts/copy-assets.mjs"
+        ]
+      }
+    },
     "lint": {
       "executor": "@angular-eslint/builder:lint",
       "options": {
@@ -20,6 +33,12 @@
         "watch": {
           "command": "vitest"
         }
+      }
+    },
+    "nx-release-publish": {
+      "executor": "@nx/js:release-publish",
+      "options": {
+        "packageRoot": "dist/{projectRoot}"
       }
     }
   }

@@ -4,7 +4,7 @@
     "outDir": "../../out-tsc/consumer",
     "types": [],
     "paths": {
-      "@vflow/ui": ["dist/libs/ui"],
+      "@vflow/ui": ["tmp/consumer-ui/libs/ui/src/index.ts"],
       "ngx-vflow": ["dist/libs/ngx-vflow"]
     }
   }

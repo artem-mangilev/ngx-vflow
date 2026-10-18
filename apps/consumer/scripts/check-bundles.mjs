@@ -1,6 +1,6 @@
-// Verifies the two consumer builds made from the published packages:
+// Verifies the two consumer builds made from the built packages:
 // - core-only: no trace of @vflow/ui in scripts or styles, while the core is present;
-// - ui: the compiled stylesheet is included as-is (no Tailwind directives left) and the UI parts are bundled.
+// - ui: the parts the CLI copied are bundled and the application's Tailwind compiled the preset (no directives left).
 import { readdirSync, readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { dirname } from 'node:path';
@@ -29,4 +29,4 @@ assert(uiJs.includes('vui-node'), 'ui build does not bundle @vflow/ui');
 assert(uiJs.includes('vui-controls'), 'ui build does not bundle vui-controls');
 assert(/\.bg-vui-surface/.test(uiCss), 'ui build stylesheet lacks the compiled utilities');
 assert(!/@theme|@source|@import ['"]tailwindcss/.test(uiCss), 'ui build stylesheet still contains Tailwind directives');
-console.log('Consumer builds verified: core-only without UI, ui with compiled CSS and the UI parts.');
+console.log('Consumer builds verified: core-only without UI, ui with the generated parts and compiled CSS.');
