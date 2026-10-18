@@ -35,16 +35,16 @@ layers; unlayered application styles override them.
 
 ## Parts
 
-| Area       | Parts                                                                                                              |
-| ---------- | ------------------------------------------------------------------------------------------------------------------ |
-| Shells     | `vuiNode` with `vuiNodeHeader`, `vuiNodeBody`, `vuiNodeFooter`; `vuiRow`; `vuiContainer` with `vuiContainerHeader` |
-| Text roles | `vuiTitle`, `vuiMeta`, `vuiIcon`, `vuiActions`                                                                     |
-| Port       | `vuiPort`: a core handle with the port look                                                                        |
-| Edge       | `vuiEdge` on the SVG path, `vuiEdgeLabel` for HTML labels                                                          |
-| Extras     | `vuiStatus`, `vuiToolbar`, `vuiButton` (`secondary` by default, `primary`, `plain`)                                |
-| Viewport   | `<vui-controls [flow]="flow">`: zoom in/out, fit view and your own buttons for one flow                            |
+| Area       | Parts                                                                                                      |
+| ---------- | ---------------------------------------------------------------------------------------------------------- |
+| Shells     | `vuiNode` with `vuiNodeHeader`, `vuiNodeBody`, `vuiNodeFooter`; `vuiRow`; `vuiGroup` with `vuiGroupHeader` |
+| Text roles | `vuiTitle`, `vuiMeta`, `vuiIcon`, `vuiActions`                                                             |
+| Port       | `vuiPort`: a core handle with the port look                                                                |
+| Edge       | `vuiEdge` on the SVG path, `vuiEdgeLabel` for HTML labels                                                  |
+| Extras     | `vuiStatus`, `vuiToolbar`, `vuiButton` (`secondary` by default, `primary`, `plain`)                        |
+| Viewport   | `<vui-controls [flow]="flow">`: zoom in/out, fit view and your own buttons for one flow                    |
 
-Bind the `selected` input of `vuiNode`, `vuiContainer` and `vuiEdge` to `ctx.selected() || ctx.preselected()`. Put `vuiPort` with the handle inputs `handleType`,
+Bind the `selected` input of `vuiNode`, `vuiGroup` and `vuiEdge` to `ctx.selected() || ctx.preselected()`. Put `vuiPort` with the handle inputs `handleType`,
 `position`, `handleId`, `canStart` and `canAccept` on the element that is the connection point: it applies core
 `vHandle` as a host directive and shows its connection feedback. For flow interaction compose the parts with core
 gesture exclusions (`vNoDrag`, `vNoSelect`); a click on a presentation selects its node or edge, and

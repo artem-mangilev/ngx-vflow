@@ -159,7 +159,7 @@
 
 ### Каталог
 
-`node`, `row` (бывший `field`, переименован 2026-10-17), `container` (с `vuiContainerHeader`), `text`, `port`, `status`, `edge`, `toolbar`, `button`, `controls`. `external-label` удалён 2026-10-17 (наследие BPMN), `theme` и `selected` — 2026-10-18 (директивы заменены атрибутом темы и входом `selected`). Имена селекторов и классов остаются `vui*` / `Vui*` (ADR-0008); `index.ts` экспортирует директивы и массив `Vui`.
+`node`, `row` (бывший `field`, переименован 2026-10-17), `group` (с `vuiGroupHeader`; бывший `container`, переименован 2026-10-18 — название не говорило, что это группа нод), `text`, `port`, `status`, `edge`, `toolbar`, `button`, `controls`. `external-label` удалён 2026-10-17 (наследие BPMN), `theme` и `selected` — 2026-10-18 (директивы заменены атрибутом темы и входом `selected`). Имена селекторов и классов остаются `vui*` / `Vui*` (ADR-0008); `index.ts` экспортирует директивы и массив `Vui`.
 
 ## Источник истины в репозитории
 

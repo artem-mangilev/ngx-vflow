@@ -100,7 +100,7 @@ import { DemoIconComponent } from '../../../shared/demo-icon.component';
             <h3>Type</h3>
             <div class="caption">Caption 11/14: meta, statuses, labels</div>
             <div class="body">Body 13/18: content, fields, buttons</div>
-            <div class="body"><strong>Headline 13/18 semibold: node and container titles</strong></div>
+            <div class="body"><strong>Headline 13/18 semibold: node and group titles</strong></div>
           </div>
           <div>
             <h3>Spacing on a 4pt grid</h3>

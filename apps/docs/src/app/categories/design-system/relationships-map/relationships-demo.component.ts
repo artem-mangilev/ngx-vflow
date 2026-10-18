@@ -27,7 +27,7 @@ interface Team {
 }
 type MapData = Person | Metric | Note | Team;
 
-/** Containers with their own connections, a note without ports, custom metrics and images, and a view mode. */
+/** Groups with their own connections, a note without ports, custom metrics and images, and a view mode. */
 @Component({
   selector: 'app-ui-relationships-demo',
   imports: [Vflow, Vui],
@@ -113,16 +113,16 @@ type MapData = Person | Metric | Note | Team;
         <ng-template let-ctx vNode>
           @if (ctx.data().kind === 'team') {
             <div
-              vuiContainer
+              vuiGroup
               class="team"
               [selected]="ctx.selected() || ctx.preselected()"
               [style.width.px]="ctx.width()"
               [style.height.px]="ctx.height()">
-              <header vuiContainerHeader>
+              <header vuiGroupHeader>
                 <span vuiTitle>{{ ctx.data().title }}</span>
                 <span vuiMeta>{{ ctx.data().members }} people</span>
               </header>
-              <!-- The container has its own connections; it is not a parent of the other team. -->
+              <!-- The group has its own connections; it is not a parent of the other team. -->
               <span
                 vuiPort
                 handleType="source"
@@ -259,7 +259,7 @@ export class RelationshipsDemoComponent {
     },
   ]);
   readonly edges = createEdges([
-    // A connection between the two containers themselves.
+    // A connection between the two groups themselves.
     {
       id: 'platform-growth',
       source: 'platform',

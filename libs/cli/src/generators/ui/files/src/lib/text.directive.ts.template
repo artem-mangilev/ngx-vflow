@@ -1,6 +1,6 @@
 import { Directive } from '@angular/core';
 
-/** Primary text of a card header, row or container header: takes the remaining width and wraps. */
+/** Primary text of a card header, row or group header: takes the remaining width and wraps. */
 @Directive({
   selector: '[vuiTitle]',
   host: { class: 'vui-title flex-1 min-w-vui-0 wrap-anywhere' },

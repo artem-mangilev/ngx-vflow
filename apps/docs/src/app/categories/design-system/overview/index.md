@@ -6,14 +6,14 @@ The package is developed in this workspace and will first be published with the 
 
 Core owns positions, hit areas, focus, keyboard behavior, wrapper semantics and interaction eligibility.
 Business logic, node content and graph state belong to your application. `@vflow/ui` sits between them:
-stable anatomy, states and a CSS token contract for cards, fields, ports, edges, containers and toolbars.
+stable anatomy, states and a CSS token contract for cards, fields, ports, edges, groups and toolbars.
 
 Each page in this section shows one reference composition, its code and its limitations:
 
 - `Workflow` — cards, branching, edge labels, native actions, independent status and diagnostics, viewport controls.
 - `Data and media pipeline` — typed labeled ports, rich body content, native controls inside nodes.
 - `ERD and schema mapping` — rows with ports for entity fields, stable field IDs through rename, reorder and deletion, a scroll/collapse experiment.
-- `Relationships and metrics map` — containers with their own connections, a note without ports, metrics and images, view mode.
+- `Relationships and metrics map` — groups with their own connections, a note without ports, metrics and images, view mode.
 
 ## Setup
 
@@ -44,19 +44,19 @@ Directives add a public class to your own element and nothing else: no wrappers,
 Compose the parts with plain HTML and content projection; anything not listed here (descriptions, forms,
 images, charts, notes, menus) is your content inside `vuiNodeBody` or a row.
 
-| Area       | Parts                                                                                                              |
-| ---------- | ------------------------------------------------------------------------------------------------------------------ |
-| Shells     | `vuiNode` with `vuiNodeHeader`, `vuiNodeBody`, `vuiNodeFooter`; `vuiRow`; `vuiContainer` with `vuiContainerHeader` |
-| Text roles | `vuiTitle`, `vuiMeta`, `vuiIcon`, `vuiActions`, usable in any shell, label or toolbar                              |
-| Port       | `vuiPort` with `handleType`, `position` and the other handle inputs: a core handle with the port look              |
-| Edge       | `vuiEdge` on the SVG path, `vuiEdgeLabel` for HTML labels                                                          |
-| Extras     | `vuiStatus`, `vuiToolbar`, `vuiButton`                                                                             |
+| Area       | Parts                                                                                                      |
+| ---------- | ---------------------------------------------------------------------------------------------------------- |
+| Shells     | `vuiNode` with `vuiNodeHeader`, `vuiNodeBody`, `vuiNodeFooter`; `vuiRow`; `vuiGroup` with `vuiGroupHeader` |
+| Text roles | `vuiTitle`, `vuiMeta`, `vuiIcon`, `vuiActions`, usable in any shell, label or toolbar                      |
+| Port       | `vuiPort` with `handleType`, `position` and the other handle inputs: a core handle with the port look      |
+| Edge       | `vuiEdge` on the SVG path, `vuiEdgeLabel` for HTML labels                                                  |
+| Extras     | `vuiStatus`, `vuiToolbar`, `vuiButton`                                                                     |
 
 The node shell's resting shadow has no blur (`0 1px 0`). A blurred shadow is rasterized again for every visible node on every zoom step and pan, which on a large flow at a high device pixel ratio costs more GPU time than the rest of the node; see the measurement on the Virtualization page. Blurred shadows and translucent material are reserved for floating layers: toolbars and viewport controls.
 
 Three kinds of state stay separate so they can be shown at once:
 
-- **Interaction** is owned by core: bind the `selected` input of `vuiNode`, `vuiContainer` and `vuiEdge` to `ctx.selected() || ctx.preselected()`, or to a state of your own. Focus comes from the core wrapper.
+- **Interaction** is owned by core: bind the `selected` input of `vuiNode`, `vuiGroup` and `vuiEdge` to `ctx.selected() || ctx.preselected()`, or to a state of your own. Focus comes from the core wrapper.
 - **Diagnostics** about the model and **application status** are both your vocabulary. Each is one `vuiStatus` indicator with a tone and your text; place two side by side to show a warning next to a running status. `vuiStatusBusy` adds a pulsing dot, which is presentation only and never disables anything; the text must name the activity ("Running", "Syncing"), and an indicator that changes while the user works belongs in a `role="status"` region of yours so screen readers hear it.
 - **Action availability** is the native `disabled` attribute on your buttons, driven by your rules such as read-only.
 
@@ -101,8 +101,8 @@ not part of the library; `@vflow/ui` declares `ngx-vflow` as a peer dependency f
 | `VuiNode`                                       | `vuiNode [selected]="ctx.selected() \|\| ctx.preselected()"`              | Node surface; consumer chooses size and content                                                    |
 | `VuiNodeHeader`, `VuiNodeBody`, `VuiNodeFooter` | `vuiNodeHeader`, `vuiNodeBody`, `vuiNodeFooter`                           | Optional anatomy on consumer elements                                                              |
 | `VuiRow`                                        | `vuiRow`                                                                  | Row (field, typed port, list item) with room for text roles and core handles                       |
-| `VuiContainer`                                  | `vuiContainer [selected]="…"`                                             | Tinted group with a hairline; parent relationships remain explicit in graph data                   |
-| `VuiContainerHeader`                            | `vuiContainerHeader`                                                      | Title row of a container with room for meta, an icon and actions                                   |
+| `VuiGroup`                                      | `vuiGroup [selected]="…"`                                                 | Tinted group with a hairline; parent relationships remain explicit in graph data                   |
+| `VuiGroupHeader`                                | `vuiGroupHeader`                                                          | Title row of a group with room for meta, an icon and actions                                       |
 | `VuiTitle`, `VuiMeta`                           | `vuiTitle`, `vuiMeta`                                                     | Primary wrapping text and secondary text in any shell                                              |
 | `VuiIcon`, `VuiActions`                         | `vuiIcon`, `vuiActions`                                                   | Leading slot for an icon or avatar of any size, and a group of controls; add `vNoDrag` to controls |
 | `VuiPort`                                       | `vuiPort handleType="target" position="left" [vuiPortConnected]="…"`      | A core handle with the port look: idle/valid/invalid from the handle, connected, `vuiPortReveal`   |
@@ -116,7 +116,7 @@ not part of the library; `@vflow/ui` declares `ngx-vflow` as a peer dependency f
 Each directive is independently importable. Apart from `vui-controls`, none imports ngx-vflow; none owns
 graph state, adds wrapper elements, registers ports or changes accessibility roles. Public selectors are the
 `.vui-*` classes named after the attributes, for example `.vui-title` or `.vui-status[data-vui-tone='warning']`.
-A role looks the same in every shell; a row that needs its own look, such as a container title, is a part of its own.
+A role looks the same in every shell; a row that needs its own look, such as a group title, is a part of its own.
 
 ## Themes and composition
 

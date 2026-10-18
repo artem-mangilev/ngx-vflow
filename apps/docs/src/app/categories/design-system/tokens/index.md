@@ -13,7 +13,7 @@ Set these on a `data-vui-theme` scope or any element inside it. Everything else 
 | -------------------------------------------------------------- | ----------------------- | ------------------------------------------------------------------------------- |
 | `--vui-canvas`                                                 | `#f5f5f7` / `#1c1c1e`   | Flow background (`--v-background`)                                              |
 | `--vui-surface`                                                | `#fff` / `#2c2c2e`      | Nodes, labels, floating surfaces                                                |
-| `--vui-surface-muted`                                          | 12% / 24% gray fill     | Containers, pools, hover; translucent so it works on any layer                  |
+| `--vui-surface-muted`                                          | 12% / 24% gray fill     | Groups, pools, hover; translucent so it works on any layer                      |
 | `--vui-foreground`, `--vui-muted`                              | at least 12.8:1 / 4.6:1 | Primary and secondary text, edge strokes                                        |
 | `--vui-border`                                                 | `#c6c6c8` / `#545458`   | Hairline border of a surface                                                    |
 | `--vui-separator`                                              | border at 50%           | Header, footer and row separators inside a surface                              |
@@ -59,7 +59,7 @@ accent or strengthen the neutral fill toward the foreground; the steps derive fr
 variables of their own.
 
 Inside a card, the header, footer and field separators use `--vui-separator`, half as strong as the card border, so
-the card reads as one surface. A container is a tinted group with a hairline, not a dashed frame.
+the card reads as one surface. A group is a tinted surface with a hairline, not a dashed frame.
 
 Corners are concentric: a toolbar wraps its buttons at one grid unit, so its radius is the button radius plus
 one unit. Change `--vui-radius` or `--vui-space` and the relation holds.

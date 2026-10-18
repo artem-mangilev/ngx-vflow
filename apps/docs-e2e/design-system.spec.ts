@@ -330,28 +330,26 @@ test('pipeline: typed labeled ports, native controls inside nodes and geometry t
   await expect(demo.locator('path.vui-edge')).toHaveCount(5);
 });
 
-test('relationships map: container connections, a note without ports, custom content and view mode', async ({
-  page,
-}) => {
+test('relationships map: group connections, a note without ports, custom content and view mode', async ({ page }) => {
   await page.goto('/design-system/relationships-map');
   const demo = page.locator('app-ui-relationships-demo');
   await demo.scrollIntoViewIfNeeded();
-  await expect(demo.locator('.vui-container')).toHaveCount(2);
+  await expect(demo.locator('.vui-group')).toHaveCount(2);
   await expect(demo.locator('article.vui-node')).toHaveCount(6);
   await expect(demo.locator('path.vui-edge')).toHaveCount(4);
   await expect(demo.locator('svg.avatar')).toHaveCount(4);
   await expect(demo.locator('.note .v-handle')).toHaveCount(0);
-  // The edge between the two containers starts at the container's own handle.
-  const containerEdgeError = () =>
+  // The edge between the two groups starts at the group's own handle.
+  const groupEdgeError = () =>
     demo.evaluate((root) => {
       const edge = root.querySelectorAll<SVGPathElement>('path.vui-edge')[0];
       const source = root
-        .querySelector('.vui-container .vui-port.v-handle[data-v-handle-position="right"]')!
+        .querySelector('.vui-group .vui-port.v-handle[data-v-handle-position="right"]')!
         .getBoundingClientRect();
       const start = edge.getPointAtLength(0).matrixTransform(edge.getScreenCTM()!);
       return Math.max(Math.abs(start.x - source.right), Math.abs(start.y - source.y - source.height / 2));
     });
-  await expect.poll(containerEdgeError).toBeLessThan(1.5);
+  await expect.poll(groupEdgeError).toBeLessThan(1.5);
   await expect(demo.locator('.v-edge-labels-layer .vui-edge-label').first()).toHaveText('3 shared services');
   const ana = demo.locator('article').filter({ hasText: 'Ana Lima' });
   const wrapper = ana.locator('xpath=ancestor::*[contains(concat(" ", normalize-space(@class), " "), " v-node ")][1]');
