@@ -1,7 +1,8 @@
-// Smoke test of @vflow/cli on fresh projects, the path of a new consumer: `ng new` with Angular 20 and 21 and a fresh
-// Nx workspace, Tailwind v4 set up as its guide says, the local ngx-vflow and @vflow/cli tarballs, `init` + `ui`, a
-// production build, and a check in Chromium that a flow with nodes, ports, an edge, controls and a status renders in
-// the light and the dark theme. It needs the network and takes minutes, so it is not part of CI.
+// Smoke test of @vflow/cli on fresh projects, the path of a new consumer: `ng new` with Angular 20, 21 and 22 and
+// fresh Nx 21 and 22 workspaces, Tailwind v4 set up as its guide says, the local ngx-vflow and @vflow/cli tarballs,
+// `init` + `ui`, a production build, and a check in Chromium that a flow with nodes, ports, an edge, controls and a
+// status renders in the light and the dark theme. It needs the network and takes minutes, so it is not part of CI;
+// Angular 22 targets need Node 22.22.3 or later.
 //
 //   nx run consumer:smoke                       every target
 //   node apps/consumer/scripts/smoke-generators.mjs angular@21 nx@21
@@ -15,7 +16,15 @@ import { fileURLToPath } from 'node:url';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 const { chromium } = createRequire(join(root, 'package.json'))('@playwright/test');
-const targets = process.argv.slice(2).length ? process.argv.slice(2) : ['angular@20', 'angular@21', 'nx@21'];
+const targets = process.argv.slice(2).length
+  ? process.argv.slice(2)
+  : ['angular@20', 'angular@21', 'angular@22', 'nx@21', 'nx@22'];
+// Angular 22, which create-nx-workspace@22 installs too, refuses Node below 22.22.3.
+const [major, minor, patch] = process.versions.node.split('.').map(Number);
+const node22 = major > 22 || (major === 22 && (minor > 22 || (minor === 22 && patch >= 3)));
+if (!node22 && targets.some((target) => Number(target.split('@')[1]) >= 22)) {
+  throw new Error(`Angular 22 needs Node 22.22.3 or later; this is ${process.versions.node}.`);
+}
 const work = mkdtempSync(join(tmpdir(), 'vflow-smoke-'));
 // npm 10 (Node 22) fails with "Cannot read properties of null (reading 'edgesOut')" on a fresh Angular 21 or Nx 22
 // workspace, before vflow is involved, so the projects are created and installed with npm 11.
@@ -158,6 +167,8 @@ function angularCli(version) {
 
 function nx(version) {
   const cwd = join(work, `nx-${version}`);
+  // Newer create-nx-workspace releases turn this preset into a sample workspace with SSR apps and ignore --appName,
+  // so the smoke adds a plain application of its own; the preset only brings @nx/angular.
   run(
     work,
     'npx',
@@ -177,16 +188,31 @@ function nx(version) {
     '--interactive=false',
     '--skipGit=true',
   );
-  setupTailwind(cwd, join(cwd, 'apps/app'));
+  run(
+    cwd,
+    'npx',
+    'nx',
+    'g',
+    '@nx/angular:application',
+    'apps/smoke',
+    '--style=css',
+    '--ssr=false',
+    '--e2eTestRunner=none',
+    '--unitTestRunner=none',
+    '--bundler=esbuild',
+    '--routing=false',
+    '--no-interactive',
+  );
+  setupTailwind(cwd, join(cwd, 'apps/smoke'));
   installCore(cwd);
   run(cwd, 'npm', 'install', ...quiet, '-D', tarballs.cli);
   write(join(cwd, 'vflow.json'), VFLOW);
-  run(cwd, 'npx', 'nx', 'g', '@vflow/cli:init', '--project=app');
+  run(cwd, 'npx', 'nx', 'g', '@vflow/cli:init', '--project=smoke');
   run(cwd, 'npx', 'nx', 'g', '@vflow/cli:ui');
-  write(join(cwd, 'apps/app/src/main.ts'), MAIN);
-  write(join(cwd, 'apps/app/src/index.html'), INDEX);
-  run(cwd, 'npx', 'nx', 'build', 'app', '--skip-nx-cache');
-  return join(cwd, 'dist/apps/app/browser');
+  write(join(cwd, 'apps/smoke/src/main.ts'), MAIN);
+  write(join(cwd, 'apps/smoke/src/index.html'), INDEX);
+  run(cwd, 'npx', 'nx', 'build', 'smoke', '--skip-nx-cache');
+  return join(cwd, 'dist/apps/smoke/browser');
 }
 
 const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.ico': 'image/x-icon' };

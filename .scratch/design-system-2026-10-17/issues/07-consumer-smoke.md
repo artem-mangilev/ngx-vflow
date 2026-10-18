@@ -8,7 +8,7 @@ Blocked by: 05, 06
 
 - Скрипт: свежий проект Angular CLI и свежий Nx-workspace, установка Tailwind v4 и собранного `@vflow/cli`, `init` + `ui`, `build`.
 - Проверить в Chromium, что flow с нодой, портом, ребром, controls и badge рендерится в обеих темах.
-- Заявленная совместимость Angular 20/21.
+- Заявленная совместимость Angular 20/21 (расширена до 22, см. Answer).
 
 ## Answer
 
@@ -21,4 +21,6 @@ Blocked by: 05, 06
 - npm сам ставит этот peer в последней версии (cdk 21 требует Angular 21) — ERESOLVE на Angular 20. `init`/`ui` добавляют `@angular/cdk` `^<мажор @angular/core>.0.0`, как spartan.
 - `@nx/angular` в зависимостях `@vflow/cli` ломал установку на npm 10 (`Cannot read properties of null (reading 'edgesOut')`) в проекте Angular CLI. Теперь это optional peer (нужен только для Nx-библиотеки, в Nx Angular он есть), хелперы `@nx/js` заменены своими; зависимости CLI — `nx`, `@nx/devkit`, `enquirer`.
 - npm 10 не может установить и сами свежие проекты Angular 21 / Nx 22 (та же ошибка арбориста, без vflow) — смоук создаёт проекты через npm 11.
-- `create-nx-workspace@22` уже создаёт воркспейс на Angular 22, куда `ngx-vflow` (`^20 || ^21`) не ставится; смоук использует Nx 21. Поддержка Angular 22 — отдельное решение.
+- Angular 22 (2026-10-18, решение пользователя «делать здесь»): peers `ngx-vflow` (`@angular/common`, `core`, `cdk`) и `libs/ui` — `^20.0.0 || ^21.0.0 || ^22.0.0` без апгрейда воркспейса: core собран partial-компиляцией Angular 20 и линкуется в 22, части компилируются приложением. Смоук: `ng new` на 22 и `create-nx-workspace@22` (ставит Nx 23 + Angular 22).
+- `create-nx-workspace` новых версий превращает preset `angular-monorepo` в демо-воркспейс «shop» (SSR, несколько приложений) и игнорирует `--appName`; смоук создаёт своё приложение `smoke` через `@nx/angular:application` в любом Nx.
+- Angular 22 требует Node ≥ 22.22.3 (локально 22.20 — смоук запускался на Node 24 из npm-пакета `node`); скрипт падает с понятной ошибкой на старом Node.

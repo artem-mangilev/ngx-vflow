@@ -9,7 +9,7 @@
     "directory": "libs/ui"
   },
   "peerDependencies": {
-    "@angular/core": "^20.0.0 || ^21.0.0",
+    "@angular/core": "^20.0.0 || ^21.0.0 || ^22.0.0",
     "ngx-vflow": "^2.7.0 || ^3.0.0"
   }
 }

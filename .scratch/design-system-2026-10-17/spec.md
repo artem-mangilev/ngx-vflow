@@ -125,7 +125,7 @@
 
 ## Генераторы
 
-Поведение скопировано с `@spartan-ng/cli` 1.8 (`init`, `ui`, `ui-theme`, `components.json`). Потребитель ставит `npm i -D @vflow/cli` (зависимости — `nx`, `@nx/devkit`, `enquirer`; `@nx/angular` — optional peer, нужен только в Nx); Tailwind v4 — предусловие, генераторы его не ставят и не проверяют (как spartan: docs ссылаются на официальный гайд Tailwind для Angular). `ng-add` нет.
+Поведение скопировано с `@spartan-ng/cli` 1.8 (`init`, `ui`, `ui-theme`, `components.json`). Поддерживаются Angular 20, 21 и 22 (peers `ngx-vflow`; проверено `nx run consumer:smoke` на свежих Angular CLI 20–22 и Nx 21–22). Потребитель ставит `npm i -D @vflow/cli` (зависимости — `nx`, `@nx/devkit`, `enquirer`; `@nx/angular` — optional peer, нужен только в Nx); Tailwind v4 — предусловие, генераторы его не ставят и не проверяют (как spartan: docs ссылаются на официальный гайд Tailwind для Angular). `ng-add` нет.
 
 | Генератор  | spartan    | Что делает                                                                                                                                                                                     |
 | ---------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

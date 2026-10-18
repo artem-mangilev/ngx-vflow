@@ -1,6 +1,6 @@
 # @vflow/ui
 
-Optional, directive-first design-system primitives for ngx-vflow. Requires Angular 20 or 21.
+Optional, directive-first design-system primitives for ngx-vflow. Requires Angular 20, 21 or 22.
 This package is developed locally and will first be published with the next ngx-vflow major release.
 
 Import individual directives or the `Vui` array from `@vflow/ui` into your standalone
