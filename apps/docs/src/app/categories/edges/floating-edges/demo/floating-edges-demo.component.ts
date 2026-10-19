@@ -4,7 +4,7 @@ import { Edge, Node, Vflow, createNodes, injectNode } from 'ngx-vflow';
 
 @Component({
   template: `
-    <vflow view="auto" [nodes]="nodes" [edges]="edges">
+    <vflow data-vui-theme="light" view="auto" [nodes]="nodes" [edges]="edges">
       <ng-template let-ctx vNode><docs-node [ctx]="ctx" /></ng-template>
       <ng-template let-ctx vEdge><svg:g docsEdge [ctx]="ctx" /></ng-template>
     </vflow>

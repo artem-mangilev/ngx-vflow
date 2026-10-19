@@ -7,6 +7,7 @@ import { Edge, Node, Vflow, VflowComponent, createNodes } from 'ngx-vflow';
     <button (click)="nextNode()">Go To Next Node</button>
 
     <vflow
+      data-vui-theme="light"
       view="auto"
       [nodes]="nodes"
       [edges]="edges"

@@ -5,6 +5,7 @@ import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
 
 @Component({
   template: `<vflow
+    data-vui-theme="light"
     view="auto"
     [nodes]="nodes"
     [edges]="edges"

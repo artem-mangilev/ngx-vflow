@@ -62,9 +62,9 @@ const SPANISH: Partial<AriaLabelConfig> = {
       min-width: 0;
       font: inherit;
       padding: 4px 8px;
-      border: 1px solid var(--vui-border);
+      border: 1px solid var(--v-border);
       border-radius: 6px;
-      background: var(--vui-surface);
+      background: var(--v-surface);
       color: inherit;
     }
     .mirror {
@@ -73,11 +73,11 @@ const SPANISH: Partial<AriaLabelConfig> = {
       gap: 6px 14px;
       margin: 0;
       padding: 14px;
-      border-top: 1px solid var(--vui-border);
+      border-top: 1px solid var(--v-border);
       font-size: 13px;
     }
     .mirror dt {
-      color: var(--vui-muted);
+      color: var(--v-muted);
     }
     .mirror dd {
       margin: 0;
@@ -85,6 +85,7 @@ const SPANISH: Partial<AriaLabelConfig> = {
   `,
   template: `
     <section
+      data-vui-theme="light"
       class="demo"
       data-testid="accessibility-demo"
       aria-label="Accessibility example"

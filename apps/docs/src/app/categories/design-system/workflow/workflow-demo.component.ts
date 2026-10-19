@@ -34,7 +34,7 @@ interface StepData {
       min-height: 20px;
       padding: 8px 14px;
       font-size: 13px;
-      color: var(--vui-muted);
+      color: var(--v-muted);
     }
   `,
   template: `

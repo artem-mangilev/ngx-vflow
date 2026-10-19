@@ -9,6 +9,11 @@
 @layer theme, base, utilities;
 @import 'tailwindcss/utilities.css' layer(utilities) source(none);
 @import './vflow-ui.css';
+/* Transitions take the application's Tailwind defaults; these are the values `@import 'tailwindcss'` gives it. */
+@theme {
+  --default-transition-duration: 150ms;
+  --default-transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
 @source './lib';
 /* Words from doc comments that would otherwise become global utilities, e.g. `.grid { display: grid }`. */
 @source not inline('container visible invisible outline transform grid ring');

@@ -2,10 +2,10 @@
    Registered as a global stylesheet of the docs app, so every rule is scoped to `.demo`. */
 .demo {
   display: block;
-  border: 1px solid var(--vui-border);
+  border: 1px solid var(--v-border);
   border-radius: 14px;
   background: var(--v-background);
-  color: var(--vui-foreground);
+  color: var(--v-foreground);
   overflow: hidden;
 }
 .demo .controls {
@@ -14,7 +14,7 @@
   align-items: center;
   gap: 10px;
   padding: 14px;
-  border-bottom: 1px solid var(--vui-border);
+  border-bottom: 1px solid var(--v-border);
 }
 .demo .controls label {
   display: inline-flex;
@@ -24,7 +24,7 @@
 }
 .demo .controls p {
   margin: 0;
-  color: var(--vui-muted);
+  color: var(--v-muted);
   font-size: 13px;
 }
 .demo vflow {
@@ -36,7 +36,7 @@
   min-width: 0;
 }
 .demo .muted {
-  color: var(--vui-muted);
+  color: var(--v-muted);
   font-size: 12px;
 }
 .demo .stage {

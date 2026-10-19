@@ -1,4 +1,4 @@
-<vflow view="auto" [nodes]="nodes" [edges]="edges" (deleteRequest)="onDeleteRequest($event)">
+<vflow data-vui-theme="light" view="auto" [nodes]="nodes" [edges]="edges" (deleteRequest)="onDeleteRequest($event)">
   <ng-template let-ctx vNode>
     <div class="custom-node" [class.custom-node_selected]="ctx.selected()">
       <span>Node</span>

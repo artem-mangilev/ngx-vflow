@@ -128,7 +128,7 @@ A role looks the same in every shell; a row that needs its own look, such as a g
 Put `data-vui-theme="light"` or `data-vui-theme="dark"` on an ancestor of the whole flow, up to `<html>` in `index.html`, so nodes, SVG edges, markers, labels, toolbars and
 the minimap share its tokens. Different editors can have different themes on the same page, and a flow
 outside every theme scope keeps the core defaults: importing the stylesheet never themes a flow by itself.
-Besides the tokens, a scope sets `color-scheme` to its theme and `accent-color` to `--vui-accent`, so native
+Besides the colors, a scope sets `color-scheme` to its theme and `accent-color` to `--vui-accent`, so native
 checkboxes, radios and ranges inside it take the accent; both apply to all of your content in the scope.
 
 {{ NgDocActions.demo("ThemesDemoComponent", { container: false }) }}
@@ -141,7 +141,8 @@ with surfaces one grid unit rounder, so corners stay concentric.
 ```css
 .my-editor {
   --vui-accent: #0f766e;
-  --vui-selection: #0f766e;
+  --v-selection: #0f766e;
+  --v-focus: #0f766e;
   --vui-radius: 4px;
   --vui-space: 3px;
 }
@@ -151,24 +152,24 @@ with surfaces one grid unit rounder, so corners stay concentric.
 }
 ```
 
-| Variables                                                                    | Purpose                                   |
-| ---------------------------------------------------------------------------- | ----------------------------------------- |
-| `--vui-canvas`, `--vui-surface`, `--vui-surface-muted`                       | Flow background, card and secondary fills |
-| `--vui-foreground`, `--vui-muted`, `--vui-border`, `--vui-separator`         | Text, secondary text, borders, separators |
-| `--vui-accent`, `--vui-on-accent`                                            | Primary action fill and its text          |
-| `--vui-selection`                                                            | Selection and focus rings, selected edges |
-| `--vui-success`, `--vui-warning`, `--vui-danger`, `--vui-info`               | Status tones and port validity            |
-| `--vui-font-size`                                                            | Body size of the type scale               |
-| `--vui-space`, `--vui-radius`                                                | Grid unit and control radius              |
-| `--vui-shadow-node`, `--vui-shadow-floating`, `--vui-duration`, `--vui-ease` | Elevation and motion                      |
+| Variables                                                      | Purpose                                   |
+| -------------------------------------------------------------- | ----------------------------------------- |
+| `--v-background`, `--v-surface`, `--vui-surface-muted`         | Flow background, card and secondary fills |
+| `--v-foreground`, `--v-muted`, `--v-border`                    | Text, secondary text and edges, borders   |
+| `--vui-accent`, `--vui-on-accent`                              | Primary action fill and its text          |
+| `--v-selection`, `--v-focus`                                   | Selection and focus rings, selected edges |
+| `--vui-success`, `--vui-warning`, `--vui-danger`, `--vui-info` | Status tones and port validity            |
+| `--vui-font-size`                                              | Body size of the type scale               |
+| `--vui-space`, `--vui-radius`                                  | Grid unit and control radius              |
+| `--vui-shadow-node`, `--vui-shadow-floating`                   | Elevation                                 |
 
-Core has its own tokens with defaults for standalone use: the colors `--v-background`, `--v-surface`,
+The `--v-*` colors are core's own tokens, with defaults for standalone use: the colors `--v-background`, `--v-surface`,
 `--v-foreground`, `--v-muted`, `--v-border`, `--v-selection` and `--v-focus`, and the
 focus ring geometry `--v-focus-width` (2px), `--v-focus-offset` (3px, the gap between a node and its
 ring) and `--v-focus-radius` (0px, the corner radius of the node itself; the ring follows it, widened by
-the offset, so it stays concentric). A theme scope maps the UI tokens onto them, `--vui-canvas` onto `--v-background`, `--vui-selection` onto
-selection and focus, and the surface radius onto the ring radius since the node part is rounded with it; set a `--v-*` token on the flow element or any
-descendant to override both. Under `forced-colors: active` core maps its tokens to system colors
+the offset, so it stays concentric). A theme scope sets them, and the parts read them too, so one value
+colors the flow and the parts; the scope also sets the ring radius to the surface radius since the node part is rounded with it. Set a `--v-*` token on the flow element or any
+descendant to override both there. UI parts outside every theme scope take these core defaults as well. Under `forced-colors: active` core maps its tokens to system colors
 regardless of the theme. Core also sets the read-only `--v-zoom` on the flow element, so scaled content
 can keep screen-sized details (`calc(2px / var(--v-zoom, 1))`). The flow value is written when a
 viewport change ends, not on every frame of a gesture, because a change recomputes the style of every

@@ -74,7 +74,7 @@ type MapData = Person | Metric | Note | Team;
     }
     .spark span {
       flex: 1;
-      background: var(--vui-muted);
+      background: var(--v-muted);
       border-radius: 1px;
     }
     .note {

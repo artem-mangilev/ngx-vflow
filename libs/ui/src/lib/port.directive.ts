@@ -33,8 +33,8 @@ import { HandleState, VflowHandleDirective } from 'ngx-vflow';
   ],
   host: {
     class: `vui-port
-      relative block box-border size-vui-2 rounded-full border-vui-port [--vui-tone:var(--vui-selection)]
-      transition duration-(--vui-duration) ease-vui
+      relative block box-border size-vui-2 rounded-full border-vui-port [--vui-tone:var(--v-selection)]
+      transition
       before:absolute before:inset-vui-0 before:rounded-full before:content-['']
       data-[v-handle-position=left]:before:-inset-y-vui-3 data-[v-handle-position=left]:before:-right-vui-2 data-[v-handle-position=left]:before:left-vui-0
       data-[v-handle-position=right]:before:-inset-y-vui-3 data-[v-handle-position=right]:before:-left-vui-2 data-[v-handle-position=right]:before:right-vui-0

@@ -10,7 +10,7 @@ import { Edge, Node, SelectionBoxMode, SelectionBoxSettings, Vflow, createNodes 
       <span class="hint">Hold Shift and drag on canvas</span>
     </div>
 
-    <vflow view="auto" [nodes]="nodes" [edges]="edges" [selectionBox]="selectionBox()">
+    <vflow data-vui-theme="light" view="auto" [nodes]="nodes" [edges]="edges" [selectionBox]="selectionBox()">
       <ng-template let-ctx vNode><docs-node [ctx]="ctx" /></ng-template>
       <ng-template let-ctx vEdge><svg:g docsEdge [ctx]="ctx" /></ng-template>
     </vflow>

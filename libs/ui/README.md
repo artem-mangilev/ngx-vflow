@@ -54,15 +54,18 @@ gesture exclusions (`vNoDrag`, `vNoSelect`); a click on a presentation selects i
 Put `data-vui-theme="light"` or `data-vui-theme="dark"` on the editor ancestor (any element, including `<html>`) and override the theme variables to match your
 application:
 
-- colors: `--vui-canvas`, `--vui-surface`, `--vui-surface-muted`, `--vui-foreground`, `--vui-muted`,
-  `--vui-border`, `--vui-separator`, `--vui-accent`, `--vui-on-accent`, `--vui-selection`, and the tones
-  `--vui-success`, `--vui-warning`, `--vui-danger`, `--vui-info`;
+- colors shared with core: `--v-background`, `--v-surface`, `--v-foreground`, `--v-muted`, `--v-border`,
+  `--v-selection`, `--v-focus`;
+- UI colors: `--vui-surface-muted`, `--vui-accent`, `--vui-on-accent`, and the tones `--vui-success`,
+  `--vui-warning`, `--vui-danger`, `--vui-info`;
 - scales: `--vui-font-size`, `--vui-space`, `--vui-radius`;
-- elevation and motion: `--vui-shadow-node`, `--vui-shadow-floating`, `--vui-duration`, `--vui-ease`.
+- elevation: `--vui-shadow-node`, `--vui-shadow-floating`.
+
+Typeface, letter spacing and transition timing come from the application.
 
 Every size, padding and radius of the parts derives from `--vui-font-size`, `--vui-space` and `--vui-radius`. Part
-details are ordinary CSS on the `.vui-*` selectors. A theme scope also maps core feedback (`--v-*`) to the same
-values and sets `color-scheme` and `accent-color`; a flow outside a theme scope keeps core defaults. States retain
+details are ordinary CSS on the `.vui-*` selectors. The parts read the core `--v-*` colors, so core feedback and the parts
+share one value; a theme scope also sets `color-scheme` and `accent-color`. A flow, and the parts, outside a theme scope keep core defaults. States retain
 text/icons alongside their colors.
 
 See the **Design system** ng-doc section for the complete directive/token reference and the workflow, pipeline,

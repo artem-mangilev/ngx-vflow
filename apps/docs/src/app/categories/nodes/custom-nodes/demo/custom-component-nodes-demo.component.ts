@@ -6,7 +6,12 @@ import { BlueSquareNodeComponent, BlueSquareData } from './components/blue-squar
 import { RedSquareNodeComponent, RedSquareData } from './components/red-square-node.component';
 
 @Component({
-  template: `<vflow view="auto" [nodes]="nodes" [edges]="edges" (componentNodeEvent)="handleComponentEvent($event)">
+  template: `<vflow
+    data-vui-theme="light"
+    view="auto"
+    [nodes]="nodes"
+    [edges]="edges"
+    (componentNodeEvent)="handleComponentEvent($event)">
     <ng-template let-ctx vNode><docs-node [ctx]="ctx" /></ng-template>
     <ng-template let-ctx vEdge><svg:g docsEdge [ctx]="ctx" /></ng-template>
   </vflow>`,

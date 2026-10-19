@@ -10,7 +10,12 @@ import { ConnectionSettings, Edge, Node, Vflow, createEdges, createNodes } from 
  * inside the back vertex, the line ends under the stroke: no gap and no line running through an open shape.
  */
 @Component({
-  template: `<vflow view="auto" [nodes]="nodes" [edges]="edges" [connection]="connectionSettings">
+  template: `<vflow
+    data-vui-theme="light"
+    view="auto"
+    [nodes]="nodes"
+    [edges]="edges"
+    [connection]="connectionSettings">
     <ng-template let-ctx vNode>
       @if (ctx.node.id === '1') {
         <div vuiNode class="source" [selected]="ctx.selected() || ctx.preselected()">

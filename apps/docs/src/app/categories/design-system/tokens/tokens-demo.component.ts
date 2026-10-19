@@ -16,15 +16,15 @@ import { DemoIconComponent } from '../../../shared/demo-icon.component';
       display: grid;
       gap: 20px;
       padding: 20px;
-      background: var(--vui-canvas);
-      color: var(--vui-foreground);
+      background: var(--v-background);
+      color: var(--v-foreground);
       font-size: var(--vui-font-size);
     }
     h3 {
       margin: 0 0 8px;
       font-size: calc(var(--vui-font-size) - 2px);
       font-weight: 600;
-      color: var(--vui-muted);
+      color: var(--v-muted);
     }
     .swatches {
       display: grid;
@@ -39,7 +39,7 @@ import { DemoIconComponent } from '../../../shared/demo-icon.component';
     .chip {
       height: 28px;
       border-radius: var(--vui-radius);
-      border: 1px solid var(--vui-border);
+      border: 1px solid var(--v-border);
     }
     .caption {
       font-size: calc(var(--vui-font-size) - 2px);
@@ -59,12 +59,12 @@ import { DemoIconComponent } from '../../../shared/demo-icon.component';
       justify-items: center;
       gap: 4px;
       font-size: calc(var(--vui-font-size) - 2px);
-      color: var(--vui-muted);
+      color: var(--v-muted);
     }
     .space span {
       width: calc(var(--vui-space) * var(--units));
       height: calc(var(--vui-space) * var(--units));
-      background: var(--vui-selection);
+      background: var(--v-selection);
       border-radius: 2px;
     }
     .radius {
@@ -72,8 +72,8 @@ import { DemoIconComponent } from '../../../shared/demo-icon.component';
       place-items: center;
       width: 72px;
       height: 44px;
-      border: 1px solid var(--vui-border);
-      background: var(--vui-surface);
+      border: 1px solid var(--v-border);
+      background: var(--v-surface);
       font-size: calc(var(--vui-font-size) - 2px);
     }
     article {
@@ -89,7 +89,7 @@ import { DemoIconComponent } from '../../../shared/demo-icon.component';
             <div class="swatches">
               @for (color of colors; track color) {
                 <div class="swatch">
-                  <span class="chip" [style.background]="'var(--vui-' + color + ')'"></span>
+                  <span class="chip" [style.background]="'var(' + color + ')'"></span>
                   <code>{{ color }}</code>
                 </div>
               }
@@ -166,20 +166,19 @@ import { DemoIconComponent } from '../../../shared/demo-icon.component';
 export class TokensDemoComponent {
   readonly themes = ['light', 'dark'] as const;
   readonly colors = [
-    'canvas',
-    'surface',
-    'surface-muted',
-    'foreground',
-    'muted',
-    'border',
-    'separator',
-    'accent',
-    'on-accent',
-    'selection',
-    'success',
-    'warning',
-    'danger',
-    'info',
+    '--v-background',
+    '--v-surface',
+    '--vui-surface-muted',
+    '--v-foreground',
+    '--v-muted',
+    '--v-border',
+    '--vui-accent',
+    '--vui-on-accent',
+    '--v-selection',
+    '--vui-success',
+    '--vui-warning',
+    '--vui-danger',
+    '--vui-info',
   ];
   readonly spacing = [1, 2, 3, 4, 5, 6, 7, 8];
 }

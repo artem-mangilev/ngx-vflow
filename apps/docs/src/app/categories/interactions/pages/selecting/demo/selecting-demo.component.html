@@ -1,4 +1,4 @@
-<vflow view="auto" [nodes]="nodes" [edges]="edges">
+<vflow data-vui-theme="light" view="auto" [nodes]="nodes" [edges]="edges">
   <ng-template let-ctx vNode>
     @if (ctx.data()?.text) {
       <docs-node [ctx]="ctx" />

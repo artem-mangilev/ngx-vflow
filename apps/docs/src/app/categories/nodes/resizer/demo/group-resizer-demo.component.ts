@@ -3,7 +3,7 @@ import { DocsPresentations } from '@docs/shared';
 import { Node, Vflow, createNodes } from 'ngx-vflow';
 
 @Component({
-  template: `<vflow view="auto" [nodes]="nodes">
+  template: `<vflow data-vui-theme="light" view="auto" [nodes]="nodes">
     <ng-template let-ctx vNode>
       @if (ctx.data().type === 'group') {
         <div class="group-node" [vResizable]="ctx.selected()" [class.group-node_selected]="ctx.selected()"></div>

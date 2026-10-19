@@ -85,7 +85,7 @@ For path B, copy the parts and their tokens with `ng g @vflow/cli:ui` (Tailwind 
 Colors are CSS. Core reads the tokens `--v-background`, `--v-surface`, `--v-foreground`,
 `--v-muted`, `--v-border`, `--v-selection` and `--v-focus`, each with a built-in default.
 The focus ring geometry is `--v-focus-width`, `--v-focus-offset` and `--v-focus-radius`.
-Set them on the `vflow` element or any ancestor; a `data-vui-theme` scope from `@vflow/ui` maps its theme onto them.
+Set them on the `vflow` element or any ancestor; a `data-vui-theme` scope from `@vflow/ui` sets them to its theme, and its parts read them too.
 Under `forced-colors: active` core maps its tokens to system colors and keeps the feedback parts visible.
 
 | Removed input                                        | Replacement                                                                              |

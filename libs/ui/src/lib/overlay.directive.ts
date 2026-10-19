@@ -10,7 +10,7 @@ import { Directive } from '@angular/core';
     class: `vui-toolbar
       inline-flex box-border items-center gap-vui-1 p-vui-1 rounded-vui-surface
       bg-vui-surface/85 backdrop-blur-vui-material backdrop-saturate-180 shadow-vui-floating
-      text-vui-foreground tracking-vui-normal text-vui-body antialiased
+      text-vui-foreground text-vui-body antialiased
       forced-colors:border forced-colors:border-[CanvasText]`,
   },
 })
