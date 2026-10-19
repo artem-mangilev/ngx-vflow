@@ -18,6 +18,7 @@ describe('ui in Nx', () => {
   let tree: Tree;
 
   beforeEach(() => {
+    vi.stubEnv('NX_INTERACTIVE', 'true');
     tree = createTreeWithEmptyWorkspace();
     updateJson(tree, 'package.json', (json) => ({
       ...json,
@@ -76,6 +77,32 @@ describe('ui in Nx', () => {
     expect(tree.exists('libs/shared/flow/src/lib/node.directive.ts')).toBe(true);
   });
 
+  it('takes --importAlias and --buildable without asking for them', async () => {
+    answer({ componentsPath: 'libs/vflow-ui' });
+
+    await uiGenerator(tree, { importAlias: '@acme/flow-ui', buildable: false });
+
+    expect(vi.mocked(prompt).mock.calls[0][0]).toEqual([expect.objectContaining({ name: 'componentsPath' })]);
+    expect(readJson(tree, 'vflow.json').ui).toEqual({
+      componentsPath: 'libs/vflow-ui',
+      importAlias: '@acme/flow-ui',
+      buildable: false,
+    });
+  });
+
+  it('asks nothing without an interactive terminal and takes the defaults', async () => {
+    vi.stubEnv('NX_INTERACTIVE', 'false');
+
+    await uiGenerator(tree, { importAlias: '@acme/flow-ui' });
+
+    expect(vi.mocked(prompt)).not.toHaveBeenCalled();
+    expect(readJson(tree, 'vflow.json').ui).toEqual({
+      componentsPath: 'libs/vflow-ui',
+      importAlias: '@acme/flow-ui',
+      buildable: true,
+    });
+  });
+
   it('reads an existing ui section without asking', async () => {
     writeJson(tree, 'vflow.json', { ui: { componentsPath: 'libs/parts', importAlias: '@acme/parts' } });
 
@@ -104,6 +131,17 @@ describe('ui in Nx', () => {
     expect(readJson(tree, 'package.json').dependencies['ngx-vflow']).toMatch(/^\^\d/);
   });
 
+  it('refuses a later run into another folder than the installed set', async () => {
+    answer({ componentsPath: 'libs/vflow-ui', importAlias: '@vflow/ui', buildable: true });
+    await uiGenerator(tree);
+
+    await expect(uiGenerator(tree, { directory: 'libs/other' })).rejects.toThrow(
+      '@vflow/ui is already installed in libs/vflow-ui',
+    );
+    expect(tree.exists('libs/other')).toBe(false);
+    await uiGenerator(tree, { directory: './libs/vflow-ui/' });
+  });
+
   it('refuses a first run into a folder that already has files', async () => {
     answer({ componentsPath: 'libs/vflow-ui', importAlias: '@vflow/ui', buildable: true });
     tree.write('libs/vflow-ui/src/index.ts', 'export const mine = 1;\n');
@@ -129,12 +167,26 @@ describe('ui in Nx', () => {
     expect(warn).toHaveBeenCalledWith(expect.stringContaining('./lib/edge.directive'));
     expect(warn).not.toHaveBeenCalledWith(expect.stringContaining('./lib/button.directive'));
   });
+
+  it('accepts double-quoted exports and ignores files of the application', async () => {
+    answer({ componentsPath: 'libs/vflow-ui', importAlias: '@vflow/ui', buildable: true });
+    await uiGenerator(tree);
+    const exports = PARTS.map((part) => `export * from "./${part.replace(/\.ts$/, '')}";`).join('\n');
+    tree.write('libs/vflow-ui/src/index.ts', exports);
+    tree.write('libs/vflow-ui/src/lib/helpers.ts', 'export const mine = 1;\n');
+    const warn = vi.spyOn(logger, 'warn').mockImplementation(() => undefined);
+
+    await uiGenerator(tree);
+
+    expect(warn).not.toHaveBeenCalled();
+  });
 });
 
 describe('ui in Angular CLI', () => {
   let tree: Tree;
 
   beforeEach(() => {
+    vi.stubEnv('NX_INTERACTIVE', 'true');
     tree = createTree();
     writeJson(tree, 'package.json', { name: 'app', dependencies: { '@angular/core': '~20.3.0' } });
     writeJson(tree, 'angular.json', {

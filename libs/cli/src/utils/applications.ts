@@ -1,5 +1,6 @@
 import { getProjects, type ProjectConfiguration, type Tree } from '@nx/devkit';
 import { prompt } from 'enquirer';
+import { isInteractive } from './config';
 
 /**
  * The application a generator works on: `--project`, the only application of the workspace, or the answer to a
@@ -22,6 +23,9 @@ export async function resolveApplication(
   }
 
   let name = project ?? (names.length === 1 ? names[0] : undefined);
+  if (!name && !isInteractive()) {
+    throw new Error(`This workspace has several applications. Pass --project with one of: ${names.join(', ')}.`);
+  }
   if (!name) {
     const answer = await prompt<{ project: string }>({
       type: 'select',

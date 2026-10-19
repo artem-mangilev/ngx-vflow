@@ -8,7 +8,7 @@ import {
   type Tree,
 } from '@nx/devkit';
 import { readdirSync, readFileSync } from 'node:fs';
-import { join, relative } from 'node:path';
+import { join, posix, relative } from 'node:path';
 import { loadOrInitUiConfig, type UiConfig } from '../../utils/config';
 import { addNgxVflow } from '../../utils/dependencies';
 import { setJsoncValue } from '../../utils/jsonc';
@@ -25,11 +25,18 @@ const FILES = join(__dirname, 'files');
  */
 export async function uiGenerator(tree: Tree, options: UiGeneratorSchema = {}): Promise<GeneratorCallback> {
   const angularCli = options.angularCli ?? false;
-  const config = await loadOrInitUiConfig(tree, { directory: options.directory, angularCli });
+  const config = await loadOrInitUiConfig(tree, { ...options, angularCli });
   const directory = options.directory ?? config.componentsPath;
   const tasks: (GeneratorCallback | undefined)[] = [];
 
   const installed = config.importAlias in readTsConfigPaths(tree);
+  if (installed && normalizePath(directory) !== normalizePath(config.componentsPath)) {
+    // A later run adds missing files to the installed set; written elsewhere, nothing would import them.
+    throw new Error(
+      `${config.importAlias} is already installed in ${config.componentsPath}. ` +
+        'Run without --directory to add missing parts, or change componentsPath in vflow.json after moving it.',
+    );
+  }
   if (!installed) {
     // A first run writes the whole set; a folder of the application must not be overwritten or emptied. A thrown
     // generator writes nothing, vflow.json included.
@@ -135,16 +142,28 @@ function copyParts(tree: Tree, directory: string, installed: boolean): string[] 
   return kept;
 }
 
-/** A new part added by a later run is not exported until the application adds it to its index.ts. */
+/**
+ * A new part added by a later run is not exported until the application adds it to its index.ts. Only the parts of
+ * the set are checked: other files in the folder are the application's own.
+ */
 function reportUnexported(tree: Tree, directory: string) {
   const index = tree.read(joinPathFragments(directory, 'src', 'index.ts'), 'utf-8') ?? '';
-  const missing = tree
-    .children(joinPathFragments(directory, 'src', 'lib'))
-    .map((file) => `./lib/${file.replace(/\.ts$/, '')}`)
-    .filter((path) => !index.includes(`'${path}'`));
+  const lib = join(FILES, 'src', 'lib');
+  const missing = templates(lib)
+    .map((template) => `./lib/${relative(lib, template).replace(/\.ts\.template$/, '')}`)
+    .filter((path) => tree.exists(joinPathFragments(directory, 'src', `${path}.ts`)))
+    .filter((path) => !new RegExp(`['"]${escapeRegExp(path)}(\\.js)?['"]`).test(index));
   if (missing.length) {
     logger.warn(`index.ts of the parts does not export ${missing.join(', ')}; add them if you use them.`);
   }
+}
+
+function normalizePath(path: string): string {
+  return posix.normalize(path).replace(/^\.\//, '').replace(/\/$/, '');
+}
+
+function escapeRegExp(text: string): string {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 function templates(dir: string): string[] {

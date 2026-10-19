@@ -54,17 +54,35 @@ export async function addUiTheme(tree: Tree, options: InitGeneratorSchema = {}):
 
 /**
  * The tokens use `@theme`, `@utility` and `--theme()`: Tailwind 3 fails on them and without Tailwind the parts lose
- * their styles silently. A range without a version number, such as `latest`, is trusted.
+ * their styles silently. The installed version decides; without node_modules the range does, and a range that
+ * allows 4 (`>=3.4`, `^3 || ^4`) or has no version number (`latest`) is trusted.
  */
 function requireTailwind4(tree: Tree): void {
   const { dependencies = {}, devDependencies = {} } = readJson(tree, 'package.json');
   const range: string | undefined = dependencies['tailwindcss'] ?? devDependencies['tailwindcss'];
   const guide = 'https://tailwindcss.com/docs/installation/framework-guides/angular';
   if (!range) throw new Error(`vflow UI needs Tailwind CSS 4. Set it up first: ${guide}`);
-  const major = /\d+/.exec(range)?.[0];
-  if (major && Number(major) < 4) {
-    throw new Error(`vflow UI needs Tailwind CSS 4, and this workspace has tailwindcss ${range}. See ${guide}`);
+  const manifest = 'node_modules/tailwindcss/package.json';
+  const installed: string | undefined = tree.exists(manifest) ? readJson(tree, manifest).version : undefined;
+  if (installed ? Number(/\d+/.exec(installed)?.[0]) < 4 : !allowsTailwind4(range)) {
+    throw new Error(
+      `vflow UI needs Tailwind CSS 4, and this workspace has tailwindcss ${installed ?? range}. See ${guide}`,
+    );
   }
+}
+
+/** Whether one of the alternatives of a range has a major of at least 4 or is open up to at least 4. */
+export function allowsTailwind4(range: string): boolean {
+  return range.split('||').some((alternative) => {
+    const comparator = alternative.trim();
+    const major = /\d+/.exec(comparator)?.[0];
+    if (!major || Number(major) >= 4) return true;
+    if (!comparator.startsWith('>')) return false;
+    const upper = /<(=?)\s*v?(\d+)((?:\.\d+)*)/.exec(comparator);
+    if (!upper) return true;
+    const [, inclusive, upperMajor, rest] = upper;
+    return Number(upperMajor) > 4 || (Number(upperMajor) === 4 && (!!inclusive || /[1-9]/.test(rest)));
+  });
 }
 
 /** Inserts the import of the tokens file after the leading statements, unless the stylesheet already has it. */
@@ -107,19 +125,24 @@ function leadingStatementsEnd(css: string): number {
 
 /**
  * The global stylesheet of a project, found like spartan does: `styles.{css,scss,sass,less}` in its source root,
- * then the first stylesheet of the project in the build options.
+ * then the stylesheets of the project in the build options. A CSS file wins over an earlier Sass or Less one, since
+ * Tailwind 4 compiles CSS only; without one the first stylesheet is returned, and the caller explains the problem.
  */
 export function findStylesEntryPoint(tree: Tree, project: ProjectConfiguration): string | undefined {
   const sourceRoot = project.sourceRoot ?? project.root;
-  const conventional = ['css', 'scss', 'sass', 'less']
-    .map((extension) => joinPathFragments(sourceRoot, `styles.${extension}`))
-    .find((path) => tree.exists(path));
-  if (conventional) return conventional;
-
+  const conventional = ['css', 'scss', 'sass', 'less'].map((extension) =>
+    joinPathFragments(sourceRoot, `styles.${extension}`),
+  );
   const styles: Array<string | { input: string; inject?: boolean }> = project.targets?.['build']?.options?.styles ?? [];
-  for (const style of styles) {
-    const path = typeof style === 'string' ? style : style.inject === false ? undefined : style.input;
-    if (path && path.startsWith(project.root) && tree.exists(path)) return path;
-  }
-  return undefined;
+  const built = styles
+    .map((style) => (typeof style === 'string' ? style : style.inject === false ? undefined : style.input))
+    .filter((path): path is string => !!path && isInProject(path, project.root));
+
+  const candidates = [...conventional, ...built].filter((path) => tree.exists(path));
+  return candidates.find((path) => path.endsWith('.css')) ?? candidates[0];
+}
+
+/** `apps/shop-admin/x.css` is not in `apps/shop`; an empty root is the Angular CLI workspace root. */
+function isInProject(path: string, root: string): boolean {
+  return !root || root === '.' || path.startsWith(`${root.replace(/\/$/, '')}/`);
 }

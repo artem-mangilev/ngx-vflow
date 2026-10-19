@@ -8,6 +8,14 @@
       "type": "string",
       "description": "A directory where the parts are placed. Overrides componentsPath of vflow.json.",
       "x-priority": "important"
+    },
+    "importAlias": {
+      "type": "string",
+      "description": "The import alias of the parts on the first run, e.g. @acme/flow-ui. Asked for when omitted."
+    },
+    "buildable": {
+      "type": "boolean",
+      "description": "Nx only: whether the library of the parts gets a build target on the first run. Asked for when omitted."
     }
   },
   "required": []

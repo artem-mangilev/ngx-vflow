@@ -3,7 +3,7 @@ import { createTree, createTreeWithEmptyWorkspace } from '@nx/devkit/testing';
 import { prompt } from 'enquirer';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { addUiTheme, THEME_IMPORT } from './theme';
+import { addUiTheme, allowsTailwind4, THEME_IMPORT } from './theme';
 
 const TOKENS = readFileSync(join(__dirname, 'vflow-ui.css'), 'utf-8');
 
@@ -61,6 +61,49 @@ describe('theme of init', () => {
     updateJson(tree, 'package.json', (json) => ({ ...json, devDependencies: {} }));
     await expect(addUiTheme(tree)).rejects.toThrow('needs Tailwind CSS 4');
     expect(tree.read('apps/app/src/styles.css', 'utf-8')).toBe('');
+  });
+
+  it.each([
+    ['^4.1.0', true],
+    ['>=3.4.0', true],
+    ['>=3.0.0 <5', true],
+    ['^3.4.0 || ^4.0.0', true],
+    ['latest', true],
+    ['^3.4.17', false],
+    ['>=3 <4', false],
+    ['~3.4.0', false],
+  ])('reads the range %s as allowing Tailwind 4: %s', (range, allowed) => {
+    expect(allowsTailwind4(range)).toBe(allowed);
+  });
+
+  it('trusts the installed Tailwind over the range', async () => {
+    addApp(tree, 'app');
+    tree.write('apps/app/src/styles.css', '');
+    updateJson(tree, 'package.json', (json) => ({ ...json, devDependencies: { tailwindcss: '>=3.4.0' } }));
+    writeJson(tree, 'node_modules/tailwindcss/package.json', { version: '3.4.17' });
+
+    await expect(addUiTheme(tree)).rejects.toThrow('this workspace has tailwindcss 3.4.17');
+    writeJson(tree, 'node_modules/tailwindcss/package.json', { version: '4.1.3' });
+    await addUiTheme(tree);
+    expect(tree.read('apps/app/src/styles.css', 'utf-8')).toBe(`${THEME_IMPORT}\n`);
+  });
+
+  it('prefers a CSS stylesheet of the build options over a conventional Sass one', async () => {
+    addApp(tree, 'app', ['apps/app/src/styles.scss', 'apps/app/src/tailwind.css']);
+    tree.write('apps/app/src/styles.scss', "@use 'sass:math';\n");
+    tree.write('apps/app/src/tailwind.css', "@import 'tailwindcss';\n");
+
+    await addUiTheme(tree);
+
+    expect(tree.read('apps/app/src/tailwind.css', 'utf-8')).toContain(THEME_IMPORT);
+    expect(tree.read('apps/app/src/styles.scss', 'utf-8')).toBe("@use 'sass:math';\n");
+  });
+
+  it('ignores a stylesheet of a sibling project whose root starts the same', async () => {
+    addApp(tree, 'shop', ['apps/shop-admin/src/styles.css']);
+    tree.write('apps/shop-admin/src/styles.css', '');
+
+    await expect(addUiTheme(tree)).rejects.toThrow('--stylesEntryPoint');
   });
 
   it('refuses a Sass or Less stylesheet', async () => {
@@ -124,6 +167,7 @@ describe('theme of init', () => {
   });
 
   it('asks for the application when there are several and ignores libraries', async () => {
+    vi.stubEnv('NX_INTERACTIVE', 'true');
     addApp(tree, 'admin');
     addApp(tree, 'shop');
     addProjectConfiguration(tree, 'shared', { root: 'libs/shared', projectType: 'library' });
@@ -134,6 +178,15 @@ describe('theme of init', () => {
 
     expect(vi.mocked(prompt)).toHaveBeenCalledWith(expect.objectContaining({ choices: ['admin', 'shop'] }));
     expect(tree.read('apps/shop/src/styles.css', 'utf-8')).toContain(THEME_IMPORT);
+  });
+
+  it('requires --project for several applications without an interactive terminal', async () => {
+    vi.stubEnv('NX_INTERACTIVE', 'false');
+    addApp(tree, 'admin');
+    addApp(tree, 'shop');
+
+    await expect(addUiTheme(tree)).rejects.toThrow('Pass --project with one of: admin, shop');
+    expect(vi.mocked(prompt)).not.toHaveBeenCalled();
   });
 
   it('takes --project without asking and rejects an unknown one', async () => {

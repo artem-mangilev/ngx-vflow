@@ -15,11 +15,12 @@ const DEFAULTS = { componentsPath: 'libs/vflow-ui', importAlias: '@vflow/ui', bu
 
 /**
  * Reads the `ui` section of vflow.json, or asks for it and writes it, as spartan's `ui` does with components.json.
- * Other sections of the file belong to other CLI features and are kept as they are.
+ * Supplied options are not asked for; without an interactive terminal (`--no-interactive`, CI) nothing is asked and
+ * the defaults fill the rest. Other sections of the file belong to other CLI features and are kept as they are.
  */
 export async function loadOrInitUiConfig(
   tree: Tree,
-  options: { directory?: string; angularCli: boolean },
+  options: { directory?: string; importAlias?: string; buildable?: boolean; angularCli: boolean },
 ): Promise<UiConfig> {
   const file: Record<string, unknown> = tree.exists(CONFIG_PATH) ? readJson(tree, CONFIG_PATH) : {};
   if (file['ui'] !== undefined) return validateUiConfig(file['ui'], options.angularCli);
@@ -35,28 +36,38 @@ export async function loadOrInitUiConfig(
             initial: DEFAULTS.componentsPath,
           },
         ]),
-    {
-      type: 'input',
-      name: 'importAlias',
-      message: 'What import alias should be used for the parts?',
-      initial: DEFAULTS.importAlias,
-    },
-    ...(options.angularCli
+    ...(options.importAlias
+      ? []
+      : [
+          {
+            type: 'input',
+            name: 'importAlias',
+            message: 'What import alias should be used for the parts?',
+            initial: DEFAULTS.importAlias,
+          },
+        ]),
+    ...(options.angularCli || options.buildable !== undefined
       ? []
       : [{ type: 'confirm', name: 'buildable', message: 'Should the library be buildable?', initial: true }]),
   ];
-  const answers = await prompt<Partial<UiConfig>>(questions);
+  const answers = questions.length && isInteractive() ? await prompt<Partial<UiConfig>>(questions) : {};
   const ui = validateUiConfig(
     {
       componentsPath: options.directory ?? answers.componentsPath ?? DEFAULTS.componentsPath,
-      importAlias: answers.importAlias ?? DEFAULTS.importAlias,
-      ...(options.angularCli ? {} : { buildable: answers.buildable ?? DEFAULTS.buildable }),
+      importAlias: options.importAlias ?? answers.importAlias ?? DEFAULTS.importAlias,
+      ...(options.angularCli ? {} : { buildable: options.buildable ?? answers.buildable ?? DEFAULTS.buildable }),
     },
     options.angularCli,
   );
 
   writeJson(tree, CONFIG_PATH, { ...file, ui });
   return ui;
+}
+
+/** `nx g` sets NX_INTERACTIVE from `--interactive`; Angular CLI does not, so a terminal decides there. */
+export function isInteractive(): boolean {
+  const nx = process.env['NX_INTERACTIVE'];
+  return nx === undefined ? !!process.stdin.isTTY : nx === 'true';
 }
 
 /** Checks the section like spartan's zod schema: missing fields take defaults, wrong ones are printed as a table. */

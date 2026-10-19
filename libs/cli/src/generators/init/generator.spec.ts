@@ -7,6 +7,7 @@ import { initGenerator } from './generator';
 describe('init', () => {
   let tree: Tree;
   const { version } = readJsonFile<{ version: string }>(join(__dirname, '../../../package.json'));
+  const major = Number(version.split('.')[0]);
 
   beforeEach(() => {
     tree = createTreeWithEmptyWorkspace();
@@ -23,15 +24,25 @@ describe('init', () => {
   });
 
   it.each(['dependencies', 'devDependencies'])('keeps ngx-vflow already in %s', async (field) => {
-    updateJson(tree, 'package.json', (json) => ({ ...json, [field]: { ...json[field], 'ngx-vflow': '~2.6.0' } }));
+    const range = `~${major}.0.0`;
+    updateJson(tree, 'package.json', (json) => ({ ...json, [field]: { ...json[field], 'ngx-vflow': range } }));
 
     await initGenerator(tree);
 
     const json = readJson(tree, 'package.json');
-    expect(json[field]['ngx-vflow']).toBe('~2.6.0');
+    expect(json[field]['ngx-vflow']).toBe(range);
     expect(field === 'dependencies' ? json.devDependencies['ngx-vflow'] : json.dependencies['ngx-vflow']).toBe(
       undefined,
     );
+  });
+
+  it('refuses ngx-vflow of an older major and keeps one without a version number', async () => {
+    updateJson(tree, 'package.json', (json) => ({ ...json, dependencies: { 'ngx-vflow': `^${major - 1}.4.0` } }));
+    await expect(initGenerator(tree)).rejects.toThrow(`need ngx-vflow ${major}`);
+
+    updateJson(tree, 'package.json', (json) => ({ ...json, dependencies: { 'ngx-vflow': 'latest' } }));
+    await initGenerator(tree);
+    expect(readJson(tree, 'package.json').dependencies['ngx-vflow']).toBe('latest');
   });
 
   it('adds @angular/cdk in the major of the application Angular, and keeps an existing one', async () => {
