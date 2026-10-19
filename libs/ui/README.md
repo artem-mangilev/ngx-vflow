@@ -29,8 +29,9 @@ The application needs Tailwind CSS v4. `ng g @vflow/cli:ui` copies the tokens (`
 stylesheet, imports them after Tailwind and copies the parts, whose utilities your Tailwind pipeline then generates. In this workspace `src/styles.css` compiles the parts for docs and e2e.
 
 The parts use Tailwind utilities from the package's own `vui` theme keys (`bg-vui-surface`, `p-vui-3`,
-`rounded-vui-surface`), without a Tailwind prefix and without Tailwind's default theme. Rules live in cascade
-layers; unlayered application styles override them.
+`rounded-vui-surface`), without a Tailwind prefix, and the application's type utilities (`text-xs`, `text-sm`,
+`font-medium`, `font-semibold`). A detail of one part is an arbitrary value in that part, not a key. Rules live in
+cascade layers; unlayered application styles override them.
 
 ## Parts
 
@@ -51,22 +52,23 @@ gesture exclusions (`vNoDrag`, `vNoSelect`); a click on a presentation selects i
 
 ## Theme
 
-Put `data-vui-theme="light"` or `data-vui-theme="dark"` on the editor ancestor (any element, including `<html>`) and override the theme variables to match your
-application:
+The light theme is the default on `:root`, like shadcn's. Put `data-vui-theme="dark"` on the editor ancestor (any element,
+including `<html>`), or `data-vui-theme="light"` to force light inside a dark scope, and override the theme variables to
+match your application:
 
 - colors shared with core: `--v-background`, `--v-surface`, `--v-foreground`, `--v-muted`, `--v-border`,
   `--v-selection`, `--v-focus`;
 - UI colors: `--vui-surface-muted`, `--vui-accent`, `--vui-on-accent`, and the tones `--vui-success`,
   `--vui-warning`, `--vui-danger`, `--vui-info`;
-- scales: `--vui-font-size`, `--vui-space`, `--vui-radius`;
+- scales: `--vui-space`, `--vui-radius`;
 - elevation: `--vui-shadow-node`, `--vui-shadow-floating`.
 
-Typeface, letter spacing and transition timing come from the application.
+Text (typeface, size, line height, letter spacing) and transition timing come from the application.
 
-Every size, padding and radius of the parts derives from `--vui-font-size`, `--vui-space` and `--vui-radius`. Part
-details are ordinary CSS on the `.vui-*` selectors. The parts read the core `--v-*` colors, so core feedback and the parts
-share one value; a theme scope also sets `color-scheme` and `accent-color`. A flow, and the parts, outside a theme scope keep core defaults. States retain
-text/icons alongside their colors.
+Every size, padding and radius of the parts derives from `--vui-space` and `--vui-radius`. Part details are ordinary
+CSS on the `.vui-*` selectors. The parts read the core `--v-*` colors, so core feedback and the parts share one value;
+an explicit `data-vui-theme` scope also sets `color-scheme` and `accent-color`. States retain text/icons alongside their
+colors.
 
 See the **Design system** ng-doc section for the complete directive/token reference and the workflow, pipeline,
 ERD/mapping and relationships map recipes. Core is headless: it renders no presentation of its own, so every graph

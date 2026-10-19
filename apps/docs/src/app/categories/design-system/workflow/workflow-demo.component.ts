@@ -8,7 +8,7 @@ interface StepData {
   icon: DemoIconName;
   description: string;
   /** Application status: a word of this application, not a library lifecycle. */
-  status: { tone: VuiTone; text: string; busy?: boolean };
+  status: { tone: VuiTone; text: string };
   /** Model diagnostic: a second indicator next to status, independent from selection. */
   diagnostic?: { tone: VuiTone; text: string };
 }
@@ -68,9 +68,7 @@ interface StepData {
                     approved() ? 'Approved' : 'Waiting'
                   }}</span>
                 } @else {
-                  <span [vuiStatus]="ctx.data().status.tone" [vuiStatusBusy]="ctx.data().status.busy ?? false">{{
-                    ctx.data().status.text
-                  }}</span>
+                  <span [vuiStatus]="ctx.data().status.tone">{{ ctx.data().status.text }}</span>
                 }
                 @if (ctx.data().diagnostic; as diagnostic) {
                   <span [vuiStatus]="diagnostic.tone">{{ diagnostic.text }}</span>
@@ -209,7 +207,7 @@ export class WorkflowDemoComponent {
         title: 'Schedule payment',
         icon: 'arrow-right',
         description: 'Send the approved invoice to accounting.',
-        status: { tone: 'info', text: 'Scheduling', busy: true },
+        status: { tone: 'info', text: 'Scheduling' },
       },
     },
     {

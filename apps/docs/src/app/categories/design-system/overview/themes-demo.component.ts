@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { Vui } from '@vflow/ui';
 import { createEdges, createNodes, Vflow } from 'ngx-vflow';
 
-/** Two editors with different themes next to a core-only flow that the UI stylesheet must not restyle. */
+/** Two editors with different themes on one page: each follows its own `data-vui-theme` ancestor. */
 @Component({
   selector: 'app-ui-themes-demo',
   imports: [Vflow, Vui],
@@ -10,7 +10,7 @@ import { createEdges, createNodes, Vflow } from 'ngx-vflow';
   styles: `
     .editors {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 10px;
       padding: 10px;
     }
@@ -32,28 +32,6 @@ import { createEdges, createNodes, Vflow } from 'ngx-vflow';
     }
     article {
       width: 150px;
-    }
-    .plain-node {
-      width: 130px;
-      padding: 8px;
-      border: 1.5px solid rgb(27, 38, 44);
-      border-radius: 4px;
-      background: #fff;
-      color: #1b262c;
-      font-size: 13px;
-    }
-    .plain-handle {
-      width: 14px;
-      height: 14px;
-      box-sizing: border-box;
-      border-radius: 50%;
-      border: 2px solid #fff;
-      background: rgb(27, 38, 44);
-    }
-    .plain-edge {
-      fill: none;
-      stroke: var(--v-muted, rgb(177, 177, 183));
-      stroke-width: 2;
     }
   `,
   template: `
@@ -113,25 +91,6 @@ import { createEdges, createNodes, Vflow } from 'ngx-vflow';
         </div>
       </div>
     </section>
-    <!-- Outside every theme scope and without @vflow/ui: own templates on the headless core. -->
-    <div class="editor" data-testid="editor-core" style="margin-top: 10px">
-      <p>Core only: own node and edge templates without a theme scope; core tokens keep their defaults.</p>
-      <vflow [nodes]="coreNodes" [edges]="coreEdges">
-        <ng-template let-ctx vNode>
-          <div class="plain-node">
-            {{ ctx.data().title }}
-            <span vHandle handleType="target" position="left" class="plain-handle"></span>
-            <span vHandle handleType="source" position="right" class="plain-handle"></span>
-          </div>
-        </ng-template>
-        <ng-template let-ctx vEdge>
-          <svg:g vEdgeInteraction>
-            <svg:path class="plain-edge" [attr.d]="ctx.path()" [attr.marker-end]="ctx.markerEnd()" />
-          </svg:g>
-        </ng-template>
-        <v-minimap />
-      </vflow>
-    </div>
   `,
 })
 export class ThemesDemoComponent {
@@ -141,11 +100,4 @@ export class ThemesDemoComponent {
     { id: 'b', point: { x: 240, y: 120 }, ariaLabel: 'Target', data: { title: 'Target' } },
   ]);
   readonly edges = createEdges([{ id: 'a-b', source: 'a', target: 'b', curve: 'smooth-step', markers: { end: {} } }]);
-  readonly coreNodes = createNodes([
-    { id: 'c1', point: { x: 20, y: 40 }, data: { title: 'Own template' } },
-    { id: 'c2', point: { x: 240, y: 120 }, data: { title: 'Headless core' } },
-  ]);
-  readonly coreEdges = createEdges([
-    { id: 'c1-c2', source: 'c1', target: 'c2', curve: 'smooth-step', markers: { end: {} } },
-  ]);
 }

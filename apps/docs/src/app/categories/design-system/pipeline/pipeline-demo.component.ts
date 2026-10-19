@@ -123,9 +123,7 @@ interface StageData {
               <span vuiIcon><app-demo-icon [name]="ctx.data().icon" /></span>
               <span vuiTitle>{{ ctx.data().title }}</span>
               @if (ctx.node.id === 'transcode') {
-                <span [vuiStatus]="encoding() ? 'info' : 'neutral'" [vuiStatusBusy]="encoding()">{{
-                  encoding() ? 'Encoding' : 'Idle'
-                }}</span>
+                <span [vuiStatus]="encoding() ? 'info' : 'neutral'">{{ encoding() ? 'Encoding' : 'Idle' }}</span>
               }
             </header>
             @switch (ctx.data().kind) {

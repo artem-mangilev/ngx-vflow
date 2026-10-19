@@ -11,7 +11,7 @@ import { booleanAttribute, Directive, input } from '@angular/core';
   host: {
     class: `vui-node
       relative box-border rounded-vui-surface border border-vui-border
-      bg-vui-surface text-vui-foreground text-vui-body antialiased shadow-vui-node
+      bg-vui-surface text-vui-foreground antialiased shadow-vui-node
       data-[vui-selected=true]:outline-2 data-[vui-selected=true]:outline-offset-2 data-[vui-selected=true]:outline-vui-selection
       forced-colors:data-[vui-selected=true]:outline-[Highlight]`,
     '[attr.data-vui-selected]': 'selected()',
@@ -23,7 +23,7 @@ export class VuiNode {
 }
 
 /**
- * Header row, set in the headline weight: items share the baseline of the title's first line, so an icon, meta or badge
+ * Header row, set in semibold: items share the baseline of the title's first line, so an icon, meta or badge
  * stays beside it when it wraps. Meta, status and buttons keep their own weights.
  */
 @Directive({
@@ -31,7 +31,7 @@ export class VuiNode {
   host: {
     class: `vui-node-header
       flex items-baseline gap-vui-2 p-vui-3 border-b border-vui-separator
-      font-vui-strong`,
+      font-semibold`,
   },
 })
 export class VuiNodeHeader {}

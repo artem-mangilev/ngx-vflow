@@ -62,7 +62,7 @@ The node shell's resting shadow has no blur (`0 1px 0`). A blurred shadow is ras
 Three kinds of state stay separate so they can be shown at once:
 
 - **Interaction** is owned by core: bind the `selected` input of `vuiNode`, `vuiGroup` and `vuiEdge` to `ctx.selected() || ctx.preselected()`, or to a state of your own. Focus comes from the core wrapper.
-- **Diagnostics** about the model and **application status** are both your vocabulary. Each is one `vuiStatus` indicator with a tone and your text; place two side by side to show a warning next to a running status. `vuiStatusBusy` adds a pulsing dot, which is presentation only and never disables anything; the text must name the activity ("Running", "Syncing"), and an indicator that changes while the user works belongs in a `role="status"` region of yours so screen readers hear it.
+- **Diagnostics** about the model and **application status** are both your vocabulary. Each is one `vuiStatus` indicator with a tone and your text; place two side by side to show a warning next to a running status. A status is presentation only and never disables anything; for work in progress put your own spinner icon inside it, let the text name the activity ("Running", "Syncing"), and an indicator that changes while the user works belongs in a `role="status"` region of yours so screen readers hear it.
 - **Action availability** is the native `disabled` attribute on your buttons, driven by your rules such as read-only.
 
 Ports mirror two independent facts: the core feedback for the connection in progress (`idle`, `valid`, `invalid`),
@@ -111,7 +111,7 @@ not part of the library; `@vflow/ui` declares `ngx-vflow` as a peer dependency f
 | `VuiTitle`, `VuiMeta`                           | `vuiTitle`, `vuiMeta`                                                     | Primary wrapping text and secondary text in any shell                                              |
 | `VuiIcon`, `VuiActions`                         | `vuiIcon`, `vuiActions`                                                   | Leading slot for an icon or avatar of any size, and a group of controls; add `vNoDrag` to controls |
 | `VuiPort`                                       | `vuiPort handleType="target" position="left" [vuiPortConnected]="…"`      | A core handle with the port look: idle/valid/invalid from the handle, connected, `vuiPortReveal`   |
-| `VuiStatus`                                     | `[vuiStatus]="'warning'" [vuiStatusBusy]="true"`                          | Indicator: semantic tone, your text and optional activity                                          |
+| `VuiStatus`                                     | `[vuiStatus]="'warning'"`                                                 | Indicator: semantic tone with your text and icon                                                   |
 | `VuiEdge`                                       | `vuiEdge [selected]="…"` on an SVG path                                   | Stroke; bind core path and marker URLs yourself                                                    |
 | `VuiEdgeLabel`                                  | `vuiEdgeLabel`                                                            | HTML label surface, including optional native controls                                             |
 | `VuiToolbar`                                    | `vuiToolbar`                                                              | Surface for `v-node-toolbar` content                                                               |
@@ -125,18 +125,20 @@ A role looks the same in every shell; a row that needs its own look, such as a g
 
 ## Themes and composition
 
-Put `data-vui-theme="light"` or `data-vui-theme="dark"` on an ancestor of the whole flow, up to `<html>` in `index.html`, so nodes, SVG edges, markers, labels, toolbars and
-the minimap share its tokens. Different editors can have different themes on the same page, and a flow
-outside every theme scope keeps the core defaults: importing the stylesheet never themes a flow by itself.
-Besides the colors, a scope sets `color-scheme` to its theme and `accent-color` to `--vui-accent`, so native
+The light theme is the default: `vflow-ui.css` sets it on `:root`, like shadcn, so every flow of your application
+takes it once the generator has copied the file in. Put `data-vui-theme="dark"` on an ancestor of the whole flow, up to
+`<html>` in `index.html`, so nodes, SVG edges, markers, labels, toolbars and the minimap share the dark tokens;
+`data-vui-theme="light"` forces light inside a dark scope. Different editors can have different themes on the same
+page. Only an explicit scope sets `color-scheme` to its theme and `accent-color` to `--vui-accent`, so native
 checkboxes, radios and ranges inside it take the accent; both apply to all of your content in the scope.
 
 {{ NgDocActions.demo("ThemesDemoComponent", { container: false }) }}
 
 Shared values are the theme variables below; the **Tokens** page shows their scales in both themes. Everything
 else, such as card padding, row height or line width, derives from them or is ordinary CSS on the public
-`.vui-*` selectors. Density follows `--vui-space`, typography `--vui-font-size`, and corners `--vui-radius`
-with surfaces one grid unit rounder, so corners stay concentric.
+`.vui-*` selectors. Density follows `--vui-space` and corners `--vui-radius` with surfaces one grid unit rounder,
+so corners stay concentric. Text is yours: the parts inherit your typeface and size and use your Tailwind type
+utilities (`text-xs`, `text-sm`, `font-medium`, `font-semibold`) for labels, buttons and titles.
 
 ```css
 .my-editor {
@@ -159,7 +161,6 @@ with surfaces one grid unit rounder, so corners stay concentric.
 | `--vui-accent`, `--vui-on-accent`                              | Primary action fill and its text          |
 | `--v-selection`, `--v-focus`                                   | Selection and focus rings, selected edges |
 | `--vui-success`, `--vui-warning`, `--vui-danger`, `--vui-info` | Status tones and port validity            |
-| `--vui-font-size`                                              | Body size of the type scale               |
 | `--vui-space`, `--vui-radius`                                  | Grid unit and control radius              |
 | `--vui-shadow-node`, `--vui-shadow-floating`                   | Elevation                                 |
 
@@ -167,9 +168,9 @@ The `--v-*` colors are core's own tokens, with defaults for standalone use: the 
 `--v-foreground`, `--v-muted`, `--v-border`, `--v-selection` and `--v-focus`, and the
 focus ring geometry `--v-focus-width` (2px), `--v-focus-offset` (3px, the gap between a node and its
 ring) and `--v-focus-radius` (0px, the corner radius of the node itself; the ring follows it, widened by
-the offset, so it stays concentric). A theme scope sets them, and the parts read them too, so one value
-colors the flow and the parts; the scope also sets the ring radius to the surface radius since the node part is rounded with it. Set a `--v-*` token on the flow element or any
-descendant to override both there. UI parts outside every theme scope take these core defaults as well. Under `forced-colors: active` core maps its tokens to system colors
+the offset, so it stays concentric). The UI theme sets them, and the parts read them too, so one value
+colors the flow and the parts; it also sets the ring radius to the surface radius since the node part is rounded with it. Set a `--v-*` token on the flow element or any
+descendant to override both there. Without the UI tokens, a flow keeps core's defaults. Under `forced-colors: active` core maps its tokens to system colors
 regardless of the theme. Core also sets the read-only `--v-zoom` on the flow element, so scaled content
 can keep screen-sized details (`calc(2px / var(--v-zoom, 1))`). The flow value is written when a
 viewport change ends, not on every frame of a gesture, because a change recomputes the style of every

@@ -22,7 +22,7 @@ test('consumer DOM, scoped themes, selection and native workflow actions', async
   await expect(workflow.locator('article.vui-node')).toHaveCount(4);
   await expect(workflow.locator('path.vui-edge')).toHaveCount(3);
   await expect(workflow.locator('.v-edge-labels-layer .vui-edge-label')).toHaveCount(4);
-  await expect(workflow.locator('article.vui-node').first()).toHaveCSS('background-color', 'rgb(255, 255, 255)');
+  await expect(workflow.locator('article.vui-node').first()).toHaveCSS('background-color', 'oklch(1 0 0)');
   // Directives add classes to the consumer article/header, without injecting wrapper elements.
   await expect(workflow.locator('article > header.vui-node-header')).toHaveCount(4);
   const review = workflow.locator('article').filter({ hasText: 'Finance review' });
@@ -33,9 +33,9 @@ test('consumer DOM, scoped themes, selection and native workflow actions', async
   await expect(review.locator('.vui-status').nth(1)).toHaveAttribute('data-vui-tone', 'warning');
   await expect(workflow.locator('v-node-toolbar .vui-toolbar')).toBeAttached();
   await expect(workflow.getByRole('button', { name: 'Details of Finance review', exact: true })).toBeVisible();
-  // Activity is presentation only: the busy node keeps its action enabled.
+  // A status is presentation only: the node keeps its action enabled.
   const paid = workflow.locator('article').filter({ hasText: 'Schedule payment' });
-  await expect(paid.locator('.vui-status')).toHaveAttribute('data-vui-busy', 'true');
+  await expect(paid.locator('.vui-status')).toHaveText('Scheduling');
   const open = paid.getByRole('button', { name: 'Open Schedule payment', exact: true });
   await expect(open).toBeEnabled();
   await open.click();
@@ -52,13 +52,13 @@ test('consumer DOM, scoped themes, selection and native workflow actions', async
   await expect(approve).toBeDisabled();
   await expect(review).toHaveAttribute('data-vui-selected', 'true');
   await workflow.getByLabel('Dark theme', { exact: true }).check();
-  await expect(review).toHaveCSS('background-color', 'rgb(44, 44, 46)');
+  await expect(review).toHaveCSS('background-color', 'oklch(0.294 0.004 286.2)');
   // Floating layers use the translucent dark surface (85%) as their material.
   await expect(workflow.locator('v-node-toolbar .vui-toolbar')).toHaveCSS(
     'background-color',
     /^oklab\(0\.29\d* .* \/ 0\.85\)$/,
   );
-  await expect(workflow.locator('path.vui-edge').first()).toHaveCSS('stroke', 'rgb(174, 174, 178)');
+  await expect(workflow.locator('path.vui-edge').first()).toHaveCSS('stroke', 'oklch(0.752 0.006 286.3)');
   await expect(workflow.locator('marker polyline').first()).toHaveCSS('fill', 'context-stroke');
   await workflow.screenshot({ path: testInfo.outputPath('workflow.png') });
   expect(errors).toEqual([]);
@@ -72,7 +72,7 @@ test('field connections follow stable IDs through rename, reorder, density and r
   await demo.scrollIntoViewIfNeeded();
   await expect(demo.locator('article')).toHaveCount(4);
   // This page opts into the dark theme while the workflow page stays light.
-  await expect(demo.locator('article.vui-node').first()).toHaveCSS('background-color', 'rgb(44, 44, 46)');
+  await expect(demo.locator('article.vui-node').first()).toHaveCSS('background-color', 'oklch(0.294 0.004 286.2)');
   await expect(demo.locator('path.vui-edge')).toHaveCount(2);
   await expect(demo.locator('.vui-port[data-vui-connected="true"]')).toHaveCount(4);
   await expect.poll(() => rowAlignment(demo)).toBeLessThan(1);
@@ -209,27 +209,19 @@ test('viewport controls drive the given flow within its zoom limits, and edge la
   expect(after.map((label) => label.y)).not.toEqual(before.map((label) => label.y));
 });
 
-test('themes stay scoped per editor, reach every layer and leave core-only flows and geometry alone', async ({
-  page,
-}) => {
+test('themes stay scoped per editor, reach every layer and leave geometry alone', async ({ page }) => {
   await page.goto('/design-system/overview');
   const a = page.locator('[data-testid="editor-a"]');
   const b = page.locator('[data-testid="editor-b"]');
-  const core = page.locator('[data-testid="editor-core"]');
-  await core.scrollIntoViewIfNeeded();
-  const light = { node: 'rgb(255, 255, 255)', edge: 'rgb(110, 110, 115)' };
-  const dark = { node: 'rgb(44, 44, 46)', edge: 'rgb(174, 174, 178)' };
+  await b.scrollIntoViewIfNeeded();
+  const light = { node: 'oklch(1 0 0)', edge: 'oklch(0.54 0.008 286.1)' };
+  const dark = { node: 'oklch(0.294 0.004 286.2)', edge: 'oklch(0.752 0.006 286.3)' };
   await expect(a.locator('article.vui-node').first()).toHaveCSS('background-color', light.node);
   await expect(a.locator('path.vui-edge')).toHaveCSS('stroke', light.edge);
   // Markers take the edge stroke through context-stroke, so theming the edge themes its arrowhead.
   await expect(a.locator('marker polyline')).toHaveCSS('fill', 'context-stroke');
   await expect(b.locator('article.vui-node').first()).toHaveCSS('background-color', dark.node);
   await expect(b.locator('path.vui-edge')).toHaveCSS('stroke', dark.edge);
-  // Core-only flow keeps its own defaults although the UI stylesheet is loaded on the page.
-  await expect(core.locator('.plain-edge').first()).toHaveCSS('stroke', 'rgb(177, 177, 183)');
-  await expect(core.locator('.plain-node').first()).toHaveCSS('border-color', 'rgb(27, 38, 44)');
-  await expect(core.locator('.plain-handle').first()).toHaveCSS('background-color', 'rgb(27, 38, 44)');
-  await expect(core.locator('.v-root')).toHaveCSS('background-color', 'rgb(255, 255, 255)');
 
   const geometry = () =>
     a.evaluate((root) =>
@@ -248,11 +240,10 @@ test('themes stay scoped per editor, reach every layer and leave core-only flows
   await page.getByLabel('Dark first editor', { exact: true }).check();
   await expect(a.locator('article.vui-node').first()).toHaveCSS('background-color', dark.node);
   await expect(a.locator('path.vui-edge')).toHaveCSS('stroke', dark.edge);
-  await expect(a.locator('.v-root')).toHaveCSS('background-color', 'rgb(28, 28, 30)');
+  await expect(a.locator('.v-root')).toHaveCSS('background-color', 'oklch(0.227 0.004 286.1)');
   await expect.poll(minimapPixel).not.toBe(pixelBefore);
   expect(await geometry()).toEqual(before);
   await expect(b.locator('article.vui-node').first()).toHaveCSS('background-color', dark.node);
-  await expect(core.locator('.plain-edge').first()).toHaveCSS('stroke', 'rgb(177, 177, 183)');
 });
 
 test('pipeline: typed labeled ports, native controls inside nodes and geometry that follows content', async ({
@@ -300,7 +291,7 @@ test('pipeline: typed labeled ports, native controls inside nodes and geometry t
   await transcode.getByLabel('Resolution').selectOption('2160p');
   await expect(demo.locator('[data-stage="publish"] .vui-node-body .vui-meta')).toContainText('2160p');
   await transcode.getByLabel(/Bitrate/).fill('30');
-  await expect(transcode.locator('.vui-status')).toHaveAttribute('data-vui-busy', 'true');
+  await expect(transcode.locator('.vui-status')).toHaveAttribute('data-vui-tone', 'info');
   expect(await position()).toBe(start);
   // An extra typed output row above the video output moves the port; the edge follows.
   await transcode.getByLabel('Poster output', { exact: true }).check();

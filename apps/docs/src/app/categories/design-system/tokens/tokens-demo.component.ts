@@ -18,11 +18,11 @@ import { DemoIconComponent } from '../../../shared/demo-icon.component';
       padding: 20px;
       background: var(--v-background);
       color: var(--v-foreground);
-      font-size: var(--vui-font-size);
+      font-size: 13px;
     }
     h3 {
       margin: 0 0 8px;
-      font-size: calc(var(--vui-font-size) - 2px);
+      font-size: 11px;
       font-weight: 600;
       color: var(--v-muted);
     }
@@ -34,19 +34,20 @@ import { DemoIconComponent } from '../../../shared/demo-icon.component';
     .swatch {
       display: grid;
       gap: 4px;
-      font-size: calc(var(--vui-font-size) - 2px);
+      font-size: 11px;
     }
     .chip {
       height: 28px;
       border-radius: var(--vui-radius);
       border: 1px solid var(--v-border);
     }
-    .caption {
-      font-size: calc(var(--vui-font-size) - 2px);
-      line-height: calc(var(--vui-font-size) + 1px);
+    .xs {
+      font-size: var(--text-xs);
+      line-height: var(--text-xs--line-height);
     }
-    .body {
-      line-height: calc(var(--vui-font-size) + 5px);
+    .sm {
+      font-size: var(--text-sm);
+      line-height: var(--text-sm--line-height);
     }
     .row {
       display: flex;
@@ -58,7 +59,7 @@ import { DemoIconComponent } from '../../../shared/demo-icon.component';
       display: grid;
       justify-items: center;
       gap: 4px;
-      font-size: calc(var(--vui-font-size) - 2px);
+      font-size: 11px;
       color: var(--v-muted);
     }
     .space span {
@@ -74,7 +75,7 @@ import { DemoIconComponent } from '../../../shared/demo-icon.component';
       height: 44px;
       border: 1px solid var(--v-border);
       background: var(--v-surface);
-      font-size: calc(var(--vui-font-size) - 2px);
+      font-size: 11px;
     }
     article {
       width: 180px;
@@ -96,10 +97,11 @@ import { DemoIconComponent } from '../../../shared/demo-icon.component';
             </div>
           </div>
           <div>
-            <h3>Type</h3>
-            <div class="caption">Caption 11/14: meta, statuses, labels</div>
-            <div class="body">Body 13/18: content, fields, buttons</div>
-            <div class="body"><strong>Headline 13/18 semibold: node and group titles</strong></div>
+            <h3>Type: yours</h3>
+            <div>Inherited: node, row and group content</div>
+            <div><strong>font-semibold: node and group titles</strong></div>
+            <div class="sm">text-sm: buttons</div>
+            <div class="xs">text-xs: meta, statuses, edge labels</div>
           </div>
           <div>
             <h3>Spacing on a 4pt grid</h3>
@@ -155,7 +157,7 @@ import { DemoIconComponent } from '../../../shared/demo-icon.component';
             <span vuiStatus="neutral">Neutral</span>
             <span vuiStatus="info">Info</span>
             <span vuiStatus="success">Valid</span>
-            <span vuiStatus="warning" vuiStatusBusy>Running</span>
+            <span vuiStatus="warning">Running</span>
             <span vuiStatus="danger">Failed</span>
           </div>
         </div>

@@ -13,7 +13,7 @@ const ZOOM_DEFAULTS = {
   imports: [DocsPresentations, Vflow],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <section data-vui-theme="light" data-testid="shortcuts-demo" aria-label="Shortcut configuration example">
+    <section data-testid="shortcuts-demo" aria-label="Shortcut configuration example">
       <p>Tab into the graph, then press the keys below. Change a binding and the graph follows it at once.</p>
       <div class="controls">
         <label>

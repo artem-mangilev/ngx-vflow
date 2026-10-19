@@ -85,7 +85,6 @@ const SPANISH: Partial<AriaLabelConfig> = {
   `,
   template: `
     <section
-      data-vui-theme="light"
       class="demo"
       data-testid="accessibility-demo"
       aria-label="Accessibility example"

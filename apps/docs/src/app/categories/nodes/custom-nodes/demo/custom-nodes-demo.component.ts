@@ -4,7 +4,7 @@ import { VuiPort } from '@vflow/ui';
 import { Node, Edge, Vflow, createNodes } from 'ngx-vflow';
 
 @Component({
-  template: `<vflow data-vui-theme="light" view="auto" [nodes]="nodes" [edges]="edges">
+  template: `<vflow view="auto" [nodes]="nodes" [edges]="edges">
     <ng-template let-ctx vEdge><svg:g docsEdge [ctx]="ctx" /></ng-template>
 
     <ng-template let-ctx vNode>

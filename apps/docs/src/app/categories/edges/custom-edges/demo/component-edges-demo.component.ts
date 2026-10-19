@@ -64,12 +64,7 @@ export class ColoredEdgeComponent {
 @Component({
   template: `
     <p class="picked">Last clicked edge: {{ picked() }}</p>
-    <vflow
-      data-vui-theme="light"
-      view="auto"
-      [nodes]="nodes"
-      [edges]="edges"
-      (componentEdgeEvent)="onEdgeEvent($event)">
+    <vflow view="auto" [nodes]="nodes" [edges]="edges" (componentEdgeEvent)="onEdgeEvent($event)">
       <ng-template let-ctx vNode><docs-node [ctx]="ctx" /></ng-template>
     </vflow>
   `,

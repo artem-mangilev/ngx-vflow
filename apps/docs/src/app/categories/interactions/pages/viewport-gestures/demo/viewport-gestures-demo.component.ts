@@ -22,7 +22,6 @@ type GestureSetting = 'panOnDrag' | 'panOnScroll' | 'zoomOnScroll' | 'zoomOnPinc
     </div>
 
     <vflow
-      data-vui-theme="light"
       view="auto"
       [nodes]="nodes"
       [edges]="edges"

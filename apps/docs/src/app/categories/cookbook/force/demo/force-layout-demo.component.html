@@ -3,7 +3,7 @@
   <input type="range" min="0" step="1" max="200" value="50" (input)="onDistanceChange($event)" />
 </label>
 
-<vflow data-vui-theme="light" view="auto" [nodes]="nodes" [edges]="edges">
+<vflow view="auto" [nodes]="nodes" [edges]="edges">
   <ng-template let-ctx vEdge><svg:g docsEdge [ctx]="ctx" /></ng-template>
 
   <ng-template let-ctx vNode>

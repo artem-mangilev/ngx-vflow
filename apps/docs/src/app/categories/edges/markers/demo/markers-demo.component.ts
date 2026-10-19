@@ -4,7 +4,6 @@ import { Connection, ConnectionSettings, Edge, Node, Vflow, createNodes } from '
 
 @Component({
   template: `<vflow
-    data-vui-theme="light"
     view="auto"
     [nodes]="nodes"
     [edges]="edges"

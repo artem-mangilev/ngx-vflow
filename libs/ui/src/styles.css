@@ -2,18 +2,14 @@
  * Workspace entry of @vflow/ui: docs and e2e compile it with Tailwind, with `@source` pointing at the
  * directive sources. It is not published: consumers get the parts and `vflow-ui.css`, imported here, through @vflow/cli.
  *
- * Tailwind's default theme is not imported: the only scales are the `vui` keys, so a part cannot reach for a value
- * outside the design system (`text-xs`, `p-3`, `rounded-lg` do not exist). The keys are namespaced
- * (`bg-vui-surface`, `p-vui-3`) to stay clear of an application's own theme.
+ * Tailwind's default theme stands in for the application's: parts take its type utilities (`text-xs`, `font-semibold`)
+ * and transition defaults, as they do from `@import 'tailwindcss'` in an application. Everything else comes from the
+ * `vui` keys, namespaced (`bg-vui-surface`, `p-vui-3`) to stay clear of an application's own theme.
  */
 @layer theme, base, utilities;
+@import 'tailwindcss/theme.css' layer(theme);
 @import 'tailwindcss/utilities.css' layer(utilities) source(none);
 @import './vflow-ui.css';
-/* Transitions take the application's Tailwind defaults; these are the values `@import 'tailwindcss'` gives it. */
-@theme {
-  --default-transition-duration: 150ms;
-  --default-transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-}
 @source './lib';
 /* Words from doc comments that would otherwise become global utilities, e.g. `.grid { display: grid }`. */
-@source not inline('container visible invisible outline transform grid ring');
+@source not inline('container visible invisible outline transform grid ring shadow blur');

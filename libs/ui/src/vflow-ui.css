@@ -2,71 +2,83 @@
  * vflow UI tokens. `@vflow/cli ui` copies this file next to the application's global stylesheet and imports it
  * after Tailwind (`@import 'tailwindcss';`); from then on it is application code, like the parts.
  *
- * 1. Values. The scales do not depend on the theme and are set once. A `[data-vui-theme]` scope sets the colors and
- *    shadows: the ones core shares (`--v-background`, `--v-surface`, `--v-foreground`, `--v-muted`, `--v-border`,
- *    `--v-selection`, `--v-focus`) under their core names, so the flow and the parts read one value and an override
- *    on any element recolors both; the rest under `--vui-*`. Outside a scope the parts take core's own defaults.
- *    There is no typeface, letter spacing or transition timing: the parts use the application's. Values live in the
- *    `base` cascade layer, so an override in unlayered application CSS wins regardless of specificity and source order.
+ * 1. Values. The scales do not depend on the theme and are set once. A theme sets the colors and shadows: the ones
+ *    core shares (`--v-background`, `--v-surface`, `--v-foreground`, `--v-muted`, `--v-border`, `--v-selection`,
+ *    `--v-focus`) under their core names, so the flow and the parts read one value and an override on any element
+ *    recolors both; the rest under `--vui-*`. Text is the application's: the parts inherit its typeface, size and
+ *    letter spacing and use its Tailwind type utilities, as do transitions. Values live in the `base` cascade layer,
+ *    so an override in unlayered application CSS wins regardless of specificity and source order.
  * 2. Tailwind keys. Every `vui` key derives from the values; `inline` makes utilities use the expression itself, so an
  *    override of a value on any element restyles the parts inside it.
+ *
+ * Colors are oklch, the space the derived steps below are mixed in.
  */
 @layer base {
   :root {
-    --vui-font-size: 13px;
     --vui-space: 4px;
     --vui-radius: 6px;
   }
 
-  /* Only colors core does not have get a light value outside a scope; importing this file does not restyle a flow. */
   :root,
-  [data-vui-theme='light'] {
-    --vui-surface-muted: rgb(118 118 128 / 0.12);
-    --vui-accent: #0071e3;
-    --vui-on-accent: #fff;
-    --vui-success: #1e7e34;
-    --vui-warning: #b25000;
-    --vui-danger: #d70015;
-    --vui-info: #0071e3;
-    --vui-shadow-node: 0 1px 0 rgb(0 0 0 / 0.04);
-    --vui-shadow-floating: 0 4px 16px rgb(0 0 0 / 0.12), 0 0 0 0.5px rgb(0 0 0 / 0.08);
+  [data-vui-theme] {
+    /* Node parts are rounded with the surface radius, so the core focus ring follows the same corners. Restated
+       on every scope, so a radius or space override there reaches the ring. */
+    --v-focus-radius: --theme(--radius-vui-surface);
   }
 
+  /*
+   * Light is the default: copying this file into the application is the opt-in, so every flow takes the theme
+   * without an attribute, as with shadcn's `:root` and `.dark`. `data-vui-theme='light'` forces light inside a dark
+   * scope; `data-vui-theme='dark'` switches any subtree, up to `<html>`.
+   */
+  :root,
   [data-vui-theme='light'] {
-    --v-background: #f5f5f7;
-    --v-surface: #fff;
-    --v-foreground: #1d1d1f;
-    --v-muted: #6e6e73;
-    --v-border: #c6c6c8;
-    --v-selection: #0071e3;
-    --v-focus: #0071e3;
-    color-scheme: light;
+    --v-background: oklch(0.971 0.003 286.4);
+    --v-surface: oklch(1 0 0);
+    --v-foreground: oklch(0.232 0.004 286.1);
+    --v-muted: oklch(0.54 0.008 286.1);
+    --v-border: oklch(0.827 0.003 286.3);
+    --v-selection: oklch(0.563 0.193 256.2);
+    --v-focus: oklch(0.563 0.193 256.2);
+    --vui-surface-muted: oklch(0.569 0.015 285.9 / 0.12);
+    --vui-accent: oklch(0.563 0.193 256.2);
+    --vui-on-accent: oklch(1 0 0);
+    --vui-success: oklch(0.522 0.14 146.9);
+    --vui-warning: oklch(0.547 0.147 48.9);
+    --vui-danger: oklch(0.553 0.225 27.3);
+    --vui-info: oklch(0.563 0.193 256.2);
+    --vui-shadow-node: 0 1px 0 oklch(0 0 0 / 0.04);
+    --vui-shadow-floating: 0 4px 16px oklch(0 0 0 / 0.12), 0 0 0 0.5px oklch(0 0 0 / 0.08);
   }
 
   [data-vui-theme='dark'] {
-    --v-background: #1c1c1e;
-    --v-surface: #2c2c2e;
-    --v-foreground: #f5f5f7;
-    --v-muted: #aeaeb2;
-    --v-border: #545458;
-    --v-selection: #0a84ff;
-    --v-focus: #0a84ff;
-    --vui-surface-muted: rgb(118 118 128 / 0.24);
-    --vui-accent: #0071e3;
-    --vui-on-accent: #fff;
-    --vui-success: #30d158;
-    --vui-warning: #ff9f0a;
-    --vui-danger: #ff6961;
-    --vui-info: #409cff;
-    --vui-shadow-node: 0 1px 0 rgb(0 0 0 / 0.3);
-    --vui-shadow-floating: 0 4px 16px rgb(0 0 0 / 0.5), 0 0 0 0.5px rgb(255 255 255 / 0.1);
-    color-scheme: dark;
+    --v-background: oklch(0.227 0.004 286.1);
+    --v-surface: oklch(0.294 0.004 286.2);
+    --v-foreground: oklch(0.971 0.003 286.4);
+    --v-muted: oklch(0.752 0.006 286.3);
+    --v-border: oklch(0.447 0.006 286.1);
+    --v-selection: oklch(0.624 0.206 255.5);
+    --v-focus: oklch(0.624 0.206 255.5);
+    --vui-surface-muted: oklch(0.569 0.015 285.9 / 0.24);
+    --vui-accent: oklch(0.563 0.193 256.2);
+    --vui-on-accent: oklch(1 0 0);
+    --vui-success: oklch(0.756 0.208 147);
+    --vui-warning: oklch(0.782 0.171 67.2);
+    --vui-danger: oklch(0.707 0.185 25.9);
+    --vui-info: oklch(0.685 0.17 253);
+    --vui-shadow-node: 0 1px 0 oklch(0 0 0 / 0.3);
+    --vui-shadow-floating: 0 4px 16px oklch(0 0 0 / 0.5), 0 0 0 0.5px oklch(1 0 0 / 0.1);
   }
 
+  /* Only an explicit scope touches the rest of your content in it: the application keeps its own color scheme. */
+  [data-vui-theme='light'] {
+    color-scheme: light;
+  }
+  [data-vui-theme='dark'] {
+    color-scheme: dark;
+  }
   [data-vui-theme] {
-    /* Node parts are rounded with the surface radius, so the core focus ring follows the same corners. */
-    --v-focus-radius: --theme(--radius-vui-surface);
-    /* Native checkboxes, radios, ranges and progress bars inside the scope take the accent. */
+    /* Native checkboxes, radios, ranges and progress bars take the accent. */
     accent-color: var(--vui-accent);
   }
 }
@@ -96,16 +108,6 @@
   --color-vui-tone: var(--vui-tone);
   --color-vui-tone-ink: color-mix(in oklab, var(--vui-tone) 80%, var(--v-foreground));
 
-  --font-weight-vui-normal: 400;
-  --font-weight-vui-medium: 500;
-  --font-weight-vui-strong: 600;
-
-  /* Type scale around the body size: caption 11/14 and body 13/18 at the default 13px; headlines are body semibold. */
-  --text-vui-caption: calc(var(--vui-font-size) - 2px);
-  --text-vui-caption--line-height: calc(var(--vui-font-size) + 1px);
-  --text-vui-body: var(--vui-font-size);
-  --text-vui-body--line-height: calc(var(--vui-font-size) + 5px);
-
   /* 4pt grid: `p-vui-3` is three spacing units. Control heights are 6/7/8 units (24/28/32px). */
   --spacing-vui-0: 0px;
   --spacing-vui-1: var(--vui-space);
@@ -123,25 +125,5 @@
 
   --shadow-vui-node: var(--vui-shadow-node);
   --shadow-vui-floating: var(--vui-shadow-floating);
-  /* Emphasis of a small part in its tone without changing its box: one solid pixel grows the part, a wider tint
-     surrounds it. The port uses it, so the measured handle and the edge endpoint never move. */
-  --shadow-vui-halo: 0 0 0 1px var(--vui-tone), 0 0 0 4px color-mix(in oklab, var(--vui-tone) 28%, transparent);
-
-  /* The port ring: thinner than the 2px edge stroke, so an 8px ring keeps an open center. */
-  --border-width-vui-port: 1.5px;
   --blur-vui-material: 20px;
-
-  --animate-vui-pulse: vui-pulse 2s ease infinite;
-
-  @keyframes vui-pulse {
-    50% {
-      opacity: 0.4;
-    }
-  }
-}
-
-/* A zero-width space as generated content: gives an empty slot the text baseline of its line. */
-@utility content-vui-strut {
-  --tw-content: '\200b';
-  content: var(--tw-content);
 }
