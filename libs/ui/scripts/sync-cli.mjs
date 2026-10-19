@@ -1,7 +1,8 @@
 // Copies the sources of @vflow/ui into the templates of @vflow/cli, like spartan's hlm-to-cli generator: the parts
 // become the files of the `ui` generator and vflow-ui.css the tokens file that `init` copies.
 // The copies are verbatim (the parts import each other relatively), so a consumer gets the code docs and e2e run on.
-// `cli:build` and `cli:test` run it first, so the package and the tests always use the current parts.
+// `cli:build` and `cli:test` run it first, so the package and the tests always use the current parts; the copies are
+// gitignored, so libs/ui stays the only source to edit and review.
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';

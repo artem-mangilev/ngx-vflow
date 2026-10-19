@@ -10,12 +10,6 @@
         "lintFilePatterns": ["libs/ui/src/**/*.ts"]
       }
     },
-    "check-styles": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "node libs/ui/scripts/check-styles.mjs"
-      }
-    },
     "sync-cli": {
       "executor": "nx:run-commands",
       "options": {

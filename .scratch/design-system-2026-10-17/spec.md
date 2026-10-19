@@ -112,7 +112,7 @@
 
 Все шкалы выводятся в `@theme inline` из `--vui-font-size` (13px), `--vui-space` (4px) и `--vui-radius` (6px): caption/title = body ∓ 2px, высоты строк = размер + 1/5/7px, `radius-surface` = `--vui-radius + --vui-space` (концентричность сохраняется при любом переопределении). `inline` вставляет выражение в utility, поэтому переопределение на любом элементе пересчитывает части внутри него.
 
-Дефолтная тема Tailwind не импортируется: `p-3`, `text-xs`, `rounded-lg`, `min-w-0` не генерируются. `check-styles` проверяет, что каждый класс каждой части есть в собранном CSS, и запрещает arbitrary values вне белого списка (системные цвета, SVG-свойства без utilities, локальные переменные частей из токенов темы).
+Дефолтная тема Tailwind не импортируется: `p-3`, `text-xs`, `rounded-lg`, `min-w-0` не генерируются. Это проверяется на ревью, без скрипта (`check-styles` удалён 2026-10-19): каждый класс части — utility из шкал `vui`, arbitrary values только из белого списка (системные цвета, SVG-свойства без utilities, локальные переменные частей из токенов темы).
 
 ## Tailwind в проекте потребителя
 
@@ -168,7 +168,7 @@
 
 - `libs/ui` — приватная библиотека `@vflow/ui` с одним entrypoint и без сборки; docs и e2e импортируют `@vflow/ui` — тот же путь, что у потребителя после `ui`.
 - `libs/cli` — публикуемый `@vflow/cli`: `generators.json` с секциями `generators` и `schematics`, `compat.ts` на генератор, шаблоны, `init/vflow-ui.css`; релизится одной версией с `ngx-vflow` (тег `release`), так как `init` и `ui` ставят `ngx-vflow` в версии CLI.
-- Скрипт `libs/ui/scripts/sync-cli.mjs` (`nx run ui:sync-cli`, аналог `hlm-to-cli-generator`; скрипт, а не Nx-генератор, как остальные скрипты `libs/ui`) копирует `libs/ui/src` в `libs/cli/src/generators/ui/files` с суффиксом `.template` (`public-api.ts` → `src/index.ts`), `vflow-ui.css` в `libs/cli/src/generators/init`. Копии дословные: импорты внутри набора относительные. Результат коммитится; `cli:build` и `cli:test` сначала запускают `ui:sync-cli`, поэтому отдельной проверки расхождения нет.
+- Скрипт `libs/ui/scripts/sync-cli.mjs` (`nx run ui:sync-cli`, аналог `hlm-to-cli-generator`; скрипт, а не Nx-генератор, как остальные скрипты `libs/ui`) копирует `libs/ui/src` в `libs/cli/src/generators/ui/files` с суффиксом `.template` (`public-api.ts` → `src/index.ts`), `vflow-ui.css` в `libs/cli/src/generators/init`. Копии дословные: импорты внутри набора относительные. Результат в `.gitignore` (единственный источник — `libs/ui`); `cli:build` и `cli:test` сначала запускают `ui:sync-cli`, поэтому отдельной проверки расхождения нет.
 - Токены — один файл `libs/ui/src/vflow-ui.css`, его импортирует `styles.css` библиотеки. Правила маппинга лежат в `@layer base` (у потребителя ниже utilities, неслоёные стили приложения побеждают).
 - Docs: у каждой части — исходник файла; страница конфига `vflow.json`; страница токенов показывает шкалы в обеих темах.
 

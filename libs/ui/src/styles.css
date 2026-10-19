@@ -1,5 +1,5 @@
 /*
- * Workspace entry of @vflow/ui: docs, e2e and `check-styles` compile it with Tailwind, with `@source` pointing at the
+ * Workspace entry of @vflow/ui: docs and e2e compile it with Tailwind, with `@source` pointing at the
  * directive sources. It is not published: consumers get the parts and `vflow-ui.css`, imported here, through @vflow/cli.
  *
  * Tailwind's default theme is not imported: the only scales are the `vui` keys, so a part cannot reach for a value
