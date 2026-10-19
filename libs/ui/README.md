@@ -1,7 +1,7 @@
 # @vflow/ui
 
 Optional, directive-first design-system primitives for ngx-vflow. Requires Angular 20, 21 or 22.
-This package is developed locally and will first be published with the next ngx-vflow major release.
+It is not published as a package: `@vflow/cli` copies these sources and their tokens into your workspace.
 
 Import individual directives or the `Vui` array from `@vflow/ui` into your standalone
 component. They style your own HTML/SVG without adding wrappers; `vuiPort` is itself a core handle.
@@ -25,9 +25,9 @@ component. They style your own HTML/SVG without adding wrappers; `vuiPort` is it
 
 ## Styles
 
-Include `@vflow/ui/styles.css` in your application's global styles. It is compiled with Tailwind 4 (utilities
-only, no Preflight) and needs no Tailwind on your side. If you run Tailwind v4 yourself, import
-`@vflow/ui/styles.source.css` as a separate global stylesheet instead and let your pipeline compile it.
+The application needs Tailwind CSS v4. `ng g @vflow/cli:init` copies the tokens (`vflow-ui.css`) next to its global
+stylesheet and imports them after Tailwind; `ng g @vflow/cli:ui` copies the parts, whose utilities your Tailwind
+pipeline then generates. In this workspace `src/styles.css` compiles the parts for docs and e2e.
 
 The parts use Tailwind utilities from the package's own `vui` theme keys (`bg-vui-surface`, `p-vui-3`,
 `rounded-vui-surface`), without a Tailwind prefix and without Tailwind's default theme. Rules live in cascade

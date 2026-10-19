@@ -27,15 +27,20 @@ import { Vflow } from 'ngx-vflow';
 // imports: [Vflow, Vui]
 ```
 
-Then add one of the two stylesheet entries to your application:
+The parts and their tokens are copied into your workspace by `@vflow/cli`, in the way of shadcn/ui and spartan-ng,
+so the code is yours to edit. The application needs Tailwind CSS v4
+([setup for Angular](https://tailwindcss.com/docs/installation/framework-guides/angular)):
 
-| Entry                         | Use when                                                                                       | How                                                                                                                                                                                                                                          |
-| ----------------------------- | ---------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `@vflow/ui/styles.css`        | Default. Compiled and minified; no Tailwind or source scanning on your side.                   | Add it to the `styles` of your build, or `@import '@vflow/ui/styles.css';` in a global stylesheet.                                                                                                                                           |
-| `@vflow/ui/styles.source.css` | You run Tailwind v4 and want this CSS processed by your own pipeline (minification, bundling). | Create a separate global stylesheet containing only `@import '@vflow/ui/styles.source.css';` and let Tailwind process it. The file registers the package code with `@source`, so the utilities of the directives are generated on your side. |
+```bash
+npm i -D @vflow/cli
+ng g @vflow/cli:init # or: nx g @vflow/cli:init
+ng g @vflow/cli:ui   # or: nx g @vflow/cli:ui
+```
 
-The source entry brings its own `vui` theme and utilities layer, so compile it as its own stylesheet, not inside
-the `@import 'tailwindcss'` of your application. Both entries produce the same rules; import only one.
+`init` adds `ngx-vflow` and `@angular/cdk` when they are missing, copies `vflow-ui.css` next to the global stylesheet
+and imports it after `@import 'tailwindcss'`. `ui` copies the parts and maps them to the `@vflow/ui` import alias:
+an Nx library in Nx, a tsconfig path in Angular CLI. Your Tailwind pipeline generates their utilities.
+
 UI rules live in Tailwind cascade layers, so unlayered application CSS overrides them without `!important`.
 
 ## Anatomy and states

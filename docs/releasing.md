@@ -81,9 +81,9 @@ The package manifests specify `publishConfig.access: public`.
 5. Run the development/production builds and release dry-run. The tag selector automatically
    includes the new package in CI builds and the shared release; no workflow package list is needed.
 
-Use `libs/ui` as the example for packages shipping precompiled Tailwind CSS.
-Consumers import `@vflow/ui/styles.css`; they do not need to install or configure Tailwind.
-The docs app compiles the source stylesheet with PostCSS for development.
+`libs/ui` is not published: `libs/cli` (`@vflow/cli`) ships its sources as generator templates, copied by
+`ui:sync-cli` before `cli:build`, and consumers compile the copied parts with their own Tailwind v4.
+The docs app compiles `libs/ui/src/styles.css` with PostCSS.
 
 ## Documentation deployment
 
