@@ -1,9 +1,17 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema",
   "$id": "VflowUi",
-  "title": "Copy the vflow UI parts into the workspace",
+  "title": "Set up vflow UI: ngx-vflow, the tokens in an application and the parts in the workspace",
   "type": "object",
   "properties": {
+    "project": {
+      "type": "string",
+      "description": "The application that gets the tokens. Asked for when the workspace has several applications."
+    },
+    "stylesEntryPoint": {
+      "type": "string",
+      "description": "Path to the global stylesheet relative to the workspace root. Found in the application when omitted."
+    },
     "directory": {
       "type": "string",
       "description": "A directory where the parts are placed. Overrides componentsPath of vflow.json.",
@@ -15,7 +23,7 @@
     },
     "buildable": {
       "type": "boolean",
-      "description": "Nx only: whether the library of the parts gets a build target on the first run. Asked for when omitted."
+      "description": "Nx only: whether the library of the parts gets a build target on the first run. The nx.json default of @nx/angular:library when omitted, then true."
     }
   },
   "required": []

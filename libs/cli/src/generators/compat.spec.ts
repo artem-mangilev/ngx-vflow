@@ -3,7 +3,6 @@ import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/te
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { lastValueFrom } from 'rxjs';
-import init from './init/compat';
 import ui from './ui/compat';
 
 vi.mock('enquirer', () => ({ prompt: vi.fn() }));
@@ -42,18 +41,13 @@ describe('Angular CLI schematics', () => {
     }
   });
 
-  it('init adds ngx-vflow and the theme', async () => {
+  it('ui adds ngx-vflow and the tokens, and maps the alias in tsconfig instead of creating an Nx library', async () => {
     const tree = angularCliWorkspace();
-    await lastValueFrom(runner.callRule(init({}), tree));
+    await lastValueFrom(runner.callRule(ui({}), tree));
 
     expect(JSON.parse(tree.readContent('package.json')).dependencies['ngx-vflow']).toMatch(/^\^\d/);
     expect(tree.readContent('src/styles.css')).toContain("@import './vflow-ui.css';");
     expect(tree.readContent('src/vflow-ui.css')).toContain('@theme inline');
-  });
-
-  it('ui maps the alias in tsconfig instead of creating an Nx library', async () => {
-    const tree = angularCliWorkspace();
-    await lastValueFrom(runner.callRule(ui({}), tree));
 
     expect(JSON.parse(tree.readContent('tsconfig.json')).compilerOptions.paths['@vflow/ui']).toEqual([
       './libs/vflow-ui/src/index.ts',

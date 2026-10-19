@@ -1,26 +1,16 @@
 {
   "generators": {
-    "init": {
-      "factory": "./src/generators/init/generator",
-      "schema": "./src/generators/init/schema.json",
-      "description": "Add ngx-vflow, @angular/cdk and the vflow UI theme to an application."
-    },
     "ui": {
       "factory": "./src/generators/ui/generator",
       "schema": "./src/generators/ui/schema.json",
-      "description": "Copy the vflow UI parts into the workspace."
+      "description": "Set up vflow UI: ngx-vflow, the tokens in an application and the parts in the workspace."
     }
   },
   "schematics": {
-    "init": {
-      "factory": "./src/generators/init/compat",
-      "schema": "./src/generators/init/schema.json",
-      "description": "Add ngx-vflow, @angular/cdk and the vflow UI theme to an application."
-    },
     "ui": {
       "factory": "./src/generators/ui/compat",
       "schema": "./src/generators/ui/schema.json",
-      "description": "Copy the vflow UI parts into the workspace."
+      "description": "Set up vflow UI: ngx-vflow, the tokens in an application and the parts in the workspace."
     }
   }
 }

@@ -1,24 +1,34 @@
 import { joinPathFragments, logger, type ProjectConfiguration, readJson, type Tree } from '@nx/devkit';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
-import { resolveApplication } from '../../utils/applications';
-import type { InitGeneratorSchema } from './schema';
+import { getApplications, resolveApplication } from '../utils/applications';
 
-/** The tokens file `init` copies next to the global stylesheet; see libs/ui/src/vflow-ui.css. */
+/** The tokens file copied next to the global stylesheet; see libs/ui/src/vflow-ui.css. */
 export const THEME_FILE = 'vflow-ui.css';
 export const THEME_IMPORT = `@import './${THEME_FILE}';`;
 
+export interface TokensOptions {
+  /** The application whose global stylesheet gets the tokens. Asked for when the workspace has several. */
+  project?: string;
+  /** Path of the global stylesheet relative to the workspace root. Found in the application when omitted. */
+  stylesEntryPoint?: string;
+}
+
 /**
- * Adds the vflow UI tokens to an application, like spartan's `ui-theme` but copied the way shadcn copies its theme:
- * `vflow-ui.css` (values, Tailwind keys, the mapping onto core tokens) next to the global stylesheet, and its import
- * right after the leading imports, so `@import 'tailwindcss'` stays first. Nothing is imported from @vflow/cli, so the
- * application does not need the package after the generators ran. Tailwind CSS 4 is a prerequisite: checked, not
- * installed.
+ * Step: adds the vflow UI tokens to an application, like spartan's `ui-theme` but copied the way shadcn copies its
+ * theme: `vflow-ui.css` (values, Tailwind keys, the mapping onto core tokens) next to the global stylesheet, and its
+ * import right after the leading imports, so `@import 'tailwindcss'` stays first. Nothing is imported from @vflow/cli,
+ * so the application does not need the package after the generators ran. Tailwind CSS 4 is a prerequisite: checked,
+ * not installed.
  *
- * Not a generator of its own: with one theme there is nothing to choose, and `init` is as idempotent. A generator for
- * another set of parts that needs the tokens calls it the same way.
+ * Idempotent, so every generator whose parts need the tokens runs it; with one theme there is nothing to choose. A
+ * workspace without applications, such as one that only publishes libraries, is skipped with a hint.
  */
-export async function addUiTheme(tree: Tree, options: InitGeneratorSchema = {}): Promise<void> {
+export async function ensureUiTokens(tree: Tree, options: TokensOptions = {}): Promise<void> {
+  if (!options.project && getApplications(tree).size === 0) {
+    logger.warn(`This workspace has no application: add ${THEME_FILE} by running the generator again with --project.`);
+    return;
+  }
   requireTailwind4(tree);
   const project = await resolveApplication(tree, options.project);
 
@@ -44,7 +54,7 @@ export async function addUiTheme(tree: Tree, options: InitGeneratorSchema = {}):
   // An existing tokens file is the application's code by now and is kept.
   const tokens = joinPathFragments(dirname(stylesheet), THEME_FILE);
   if (tree.exists(tokens)) logger.info(`${tokens} already exists and is kept.`);
-  else tree.write(tokens, readFileSync(join(__dirname, THEME_FILE), 'utf-8'));
+  else tree.write(tokens, readFileSync(join(__dirname, 'templates', THEME_FILE), 'utf-8'));
 
   const css = tree.read(stylesheet, 'utf-8') ?? '';
   const imported = importTheme(css, stylesheet);

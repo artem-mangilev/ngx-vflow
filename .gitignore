@@ -56,5 +56,4 @@ Thumbs.db
 .nx
 
 # @vflow/cli templates, generated from libs/ui by `ui:sync-cli` before cli:build and cli:test
-/libs/cli/src/generators/ui/files/
-/libs/cli/src/generators/init/vflow-ui.css
+/libs/cli/src/steps/templates/

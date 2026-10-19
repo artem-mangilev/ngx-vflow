@@ -1,5 +1,5 @@
 // Copies the sources of @vflow/ui into the templates of @vflow/cli, like spartan's hlm-to-cli generator: the parts
-// become the files of the `ui` generator and vflow-ui.css the tokens file that `init` copies.
+// become the templates of the ui-parts step and vflow-ui.css the tokens file of the tokens step.
 // The copies are verbatim (the parts import each other relatively), so a consumer gets the code docs and e2e run on.
 // `cli:build` and `cli:test` run it first, so the package and the tests always use the current parts; the copies are
 // gitignored, so libs/ui stays the only source to edit and review.
@@ -11,12 +11,12 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 const ui = join(root, 'libs/ui/src');
 const cli = join(root, 'libs/cli');
 // Directories owned by this script: a file in them without a source is stale.
-const partsDir = join(cli, 'src/generators/ui/files');
+const partsDir = join(cli, 'src/steps/templates/ui');
 
 /** Target path → source path. Templates take the `.template` suffix so the CLI project does not compile them. */
 const expected = new Map([
   [join(partsDir, 'src/index.ts.template'), join(ui, 'public-api.ts')],
-  [join(cli, 'src/generators/init/vflow-ui.css'), join(ui, 'vflow-ui.css')],
+  [join(cli, 'src/steps/templates/vflow-ui.css'), join(ui, 'vflow-ui.css')],
 ]);
 for (const file of readdirSync(join(ui, 'lib'))) {
   if (file.endsWith('.ts') && !file.endsWith('.spec.ts')) {

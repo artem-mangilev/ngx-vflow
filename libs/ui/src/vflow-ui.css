@@ -1,5 +1,5 @@
 /*
- * vflow UI tokens. `@vflow/cli init` copies this file next to the application's global stylesheet and imports it
+ * vflow UI tokens. `@vflow/cli ui` copies this file next to the application's global stylesheet and imports it
  * after Tailwind (`@import 'tailwindcss';`); from then on it is application code, like the parts.
  *
  * 1. Values. The scales and motion do not depend on the theme and are set once. Each theme sets the same colors and

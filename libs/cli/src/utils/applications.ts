@@ -10,9 +10,7 @@ export async function resolveApplication(
   tree: Tree,
   project: string | undefined,
 ): Promise<ProjectConfiguration & { name: string }> {
-  const applications = new Map(
-    [...getProjects(tree)].filter(([, configuration]) => configuration.projectType === 'application'),
-  );
+  const applications = getApplications(tree);
   const names = [...applications.keys()];
 
   if (project && !applications.has(project)) {
@@ -37,4 +35,9 @@ export async function resolveApplication(
   }
 
   return { ...applications.get(name)!, name };
+}
+
+/** The applications of the workspace by name; libraries are left out. */
+export function getApplications(tree: Tree): Map<string, ProjectConfiguration> {
+  return new Map([...getProjects(tree)].filter(([, configuration]) => configuration.projectType === 'application'));
 }

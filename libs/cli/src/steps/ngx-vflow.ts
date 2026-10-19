@@ -2,7 +2,7 @@ import { addDependenciesToPackageJson, type GeneratorCallback, readJson, readJso
 import { join } from 'node:path';
 
 /**
- * Adds ngx-vflow, the behavior the parts build on (spartan's brain), when the workspace does not have it in
+ * Step: adds ngx-vflow, the behavior the parts build on (spartan's brain), when the workspace does not have it in
  * `dependencies` or `devDependencies`. ngx-vflow and @vflow/cli are released together under one version, so an
  * ngx-vflow of an older major is refused: the parts are written against the API of the CLI's major, and the
  * application has to migrate before it gets them.
@@ -10,7 +10,7 @@ import { join } from 'node:path';
  * Its peer @angular/cdk is added in the major of the application's Angular, as spartan does: left to npm, the peer
  * resolves to the newest cdk, which requires a newer Angular than an application on the previous major has.
  */
-export function addNgxVflow(tree: Tree): GeneratorCallback | undefined {
+export function ensureNgxVflow(tree: Tree): GeneratorCallback | undefined {
   const { dependencies = {}, devDependencies = {} } = readJson(tree, 'package.json');
   const version = (name: string): string | undefined => dependencies[name] ?? devDependencies[name];
   const missing: Record<string, string> = {};

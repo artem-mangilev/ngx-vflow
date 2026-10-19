@@ -1,14 +1,26 @@
-import { logger, readJson, readProjectConfiguration, type Tree, updateJson, writeJson } from '@nx/devkit';
+import {
+  addProjectConfiguration,
+  logger,
+  readJson,
+  readProjectConfiguration,
+  type Tree,
+  updateJson,
+  updateNxJson,
+  writeJson,
+} from '@nx/devkit';
 import { createTree, createTreeWithEmptyWorkspace } from '@nx/devkit/testing';
 import { prompt } from 'enquirer';
 import { readdirSync } from 'node:fs';
 import { join } from 'node:path';
+import { THEME_IMPORT } from '../../steps/tokens';
 import { uiGenerator } from './generator';
 
 vi.mock('enquirer', () => ({ prompt: vi.fn() }));
 
 /** Every template of the set, as paths inside `src`: `index.ts`, `lib/node.directive.ts`, … */
-const PARTS = readdirSync(join(__dirname, 'files/src/lib')).map((file) => `lib/${file.replace(/\.template$/, '')}`);
+const PARTS = readdirSync(join(__dirname, '../../steps/templates/ui/src/lib')).map(
+  (file) => `lib/${file.replace(/\.template$/, '')}`,
+);
 
 function answer(values: Record<string, unknown>) {
   vi.mocked(prompt).mockResolvedValue(values);
@@ -28,23 +40,22 @@ describe('ui in Nx', () => {
 
   it('asks for the ui section, writes vflow.json and keeps other sections', async () => {
     writeJson(tree, 'vflow.json', { skills: { path: '.claude' } });
-    answer({ componentsPath: 'libs/flow-ui', importAlias: '@acme/flow-ui', buildable: false });
+    answer({ componentsPath: 'libs/flow-ui', importAlias: '@acme/flow-ui' });
 
     await uiGenerator(tree);
 
     expect(readJson(tree, 'vflow.json')).toEqual({
       skills: { path: '.claude' },
-      ui: { componentsPath: 'libs/flow-ui', importAlias: '@acme/flow-ui', buildable: false },
+      ui: { componentsPath: 'libs/flow-ui', importAlias: '@acme/flow-ui' },
     });
     expect(vi.mocked(prompt).mock.calls[0][0]).toEqual([
       expect.objectContaining({ name: 'componentsPath', initial: 'libs/vflow-ui' }),
       expect.objectContaining({ name: 'importAlias' }),
-      expect.objectContaining({ name: 'buildable' }),
     ]);
   });
 
   it('creates one library with the alias as import path and the whole set', async () => {
-    answer({ componentsPath: 'libs/vflow-ui', importAlias: '@vflow/ui', buildable: true });
+    answer({ componentsPath: 'libs/vflow-ui', importAlias: '@vflow/ui' });
 
     await uiGenerator(tree);
 
@@ -59,16 +70,68 @@ describe('ui in Nx', () => {
     expect(tree.children('libs/vflow-ui/src/lib').sort()).toEqual(PARTS.map((part) => part.slice(4)).sort());
   });
 
-  it('creates a library without a build target when not buildable', async () => {
-    answer({ componentsPath: 'libs/vflow-ui', importAlias: '@vflow/ui', buildable: false });
+  it('creates a library without a build target with --buildable=false or the nx.json default', async () => {
+    answer({ componentsPath: 'libs/vflow-ui', importAlias: '@vflow/ui' });
+    await uiGenerator(tree, { buildable: false });
+    expect(readProjectConfiguration(tree, 'vflow-ui').targets?.['build']).toBeUndefined();
+
+    const other = createTreeWithEmptyWorkspace();
+    updateNxJson(other, { generators: { '@nx/angular': { library: { buildable: false } } } });
+    await uiGenerator(other);
+    expect(readProjectConfiguration(other, 'vflow-ui').targets?.['build']).toBeUndefined();
+  });
+
+  it('adds the tokens to the application and the parts to the workspace', async () => {
+    answer({ componentsPath: 'libs/vflow-ui', importAlias: '@vflow/ui' });
+    updateJson(tree, 'package.json', (json) => ({ ...json, devDependencies: { tailwindcss: '^4.1.0' } }));
+    addProjectConfiguration(tree, 'shop', {
+      root: 'apps/shop',
+      sourceRoot: 'apps/shop/src',
+      projectType: 'application',
+    });
+    tree.write('apps/shop/src/styles.css', "@import 'tailwindcss';\n");
 
     await uiGenerator(tree);
 
-    expect(readProjectConfiguration(tree, 'vflow-ui').targets?.['build']).toBeUndefined();
+    expect(tree.read('apps/shop/src/styles.css', 'utf-8')).toContain(THEME_IMPORT);
+    expect(tree.exists('apps/shop/src/vflow-ui.css')).toBe(true);
+    expect(tree.exists('libs/vflow-ui/src/lib/node.directive.ts')).toBe(true);
+  });
+
+  it('adds the tokens to another application on a later run', async () => {
+    answer({ componentsPath: 'libs/vflow-ui', importAlias: '@vflow/ui' });
+    updateJson(tree, 'package.json', (json) => ({ ...json, devDependencies: { tailwindcss: '^4.1.0' } }));
+    for (const app of ['shop', 'admin']) {
+      addProjectConfiguration(tree, app, {
+        root: `apps/${app}`,
+        sourceRoot: `apps/${app}/src`,
+        projectType: 'application',
+      });
+      tree.write(`apps/${app}/src/styles.css`, "@import 'tailwindcss';\n");
+    }
+
+    await uiGenerator(tree, { project: 'shop' });
+    await uiGenerator(tree, { project: 'admin' });
+
+    expect(tree.read('apps/admin/src/styles.css', 'utf-8')).toContain(THEME_IMPORT);
+    expect(vi.mocked(prompt)).toHaveBeenCalledTimes(1);
+  });
+
+  it('fails before writing anything when the application has no Tailwind 4', async () => {
+    answer({ componentsPath: 'libs/vflow-ui', importAlias: '@vflow/ui' });
+    addProjectConfiguration(tree, 'shop', {
+      root: 'apps/shop',
+      sourceRoot: 'apps/shop/src',
+      projectType: 'application',
+    });
+    tree.write('apps/shop/src/styles.css', '');
+
+    await expect(uiGenerator(tree)).rejects.toThrow('needs Tailwind CSS 4');
+    expect(vi.mocked(prompt)).not.toHaveBeenCalled();
   });
 
   it('takes --directory without asking for it', async () => {
-    answer({ importAlias: '@vflow/ui', buildable: true });
+    answer({ importAlias: '@vflow/ui' });
 
     await uiGenerator(tree, { directory: 'libs/shared/flow' });
 
@@ -83,11 +146,8 @@ describe('ui in Nx', () => {
     await uiGenerator(tree, { importAlias: '@acme/flow-ui', buildable: false });
 
     expect(vi.mocked(prompt).mock.calls[0][0]).toEqual([expect.objectContaining({ name: 'componentsPath' })]);
-    expect(readJson(tree, 'vflow.json').ui).toEqual({
-      componentsPath: 'libs/vflow-ui',
-      importAlias: '@acme/flow-ui',
-      buildable: false,
-    });
+    expect(readJson(tree, 'vflow.json').ui).toEqual({ componentsPath: 'libs/vflow-ui', importAlias: '@acme/flow-ui' });
+    expect(readProjectConfiguration(tree, 'vflow-ui').targets?.['build']).toBeUndefined();
   });
 
   it('asks nothing without an interactive terminal and takes the defaults', async () => {
@@ -96,11 +156,7 @@ describe('ui in Nx', () => {
     await uiGenerator(tree, { importAlias: '@acme/flow-ui' });
 
     expect(vi.mocked(prompt)).not.toHaveBeenCalled();
-    expect(readJson(tree, 'vflow.json').ui).toEqual({
-      componentsPath: 'libs/vflow-ui',
-      importAlias: '@acme/flow-ui',
-      buildable: true,
-    });
+    expect(readJson(tree, 'vflow.json').ui).toEqual({ componentsPath: 'libs/vflow-ui', importAlias: '@acme/flow-ui' });
   });
 
   it('reads an existing ui section without asking', async () => {
@@ -124,7 +180,7 @@ describe('ui in Nx', () => {
   });
 
   it('adds ngx-vflow when it is missing', async () => {
-    answer({ componentsPath: 'libs/vflow-ui', importAlias: '@vflow/ui', buildable: true });
+    answer({ componentsPath: 'libs/vflow-ui', importAlias: '@vflow/ui' });
 
     await uiGenerator(tree);
 
@@ -132,7 +188,7 @@ describe('ui in Nx', () => {
   });
 
   it('refuses a later run into another folder than the installed set', async () => {
-    answer({ componentsPath: 'libs/vflow-ui', importAlias: '@vflow/ui', buildable: true });
+    answer({ componentsPath: 'libs/vflow-ui', importAlias: '@vflow/ui' });
     await uiGenerator(tree);
 
     await expect(uiGenerator(tree, { directory: 'libs/other' })).rejects.toThrow(
@@ -143,7 +199,7 @@ describe('ui in Nx', () => {
   });
 
   it('refuses a first run into a folder that already has files', async () => {
-    answer({ componentsPath: 'libs/vflow-ui', importAlias: '@vflow/ui', buildable: true });
+    answer({ componentsPath: 'libs/vflow-ui', importAlias: '@vflow/ui' });
     tree.write('libs/vflow-ui/src/index.ts', 'export const mine = 1;\n');
 
     await expect(uiGenerator(tree)).rejects.toThrow('libs/vflow-ui already has files');
@@ -152,7 +208,7 @@ describe('ui in Nx', () => {
   });
 
   it('on a later run adds missing files only and keeps edited ones and the index', async () => {
-    answer({ componentsPath: 'libs/vflow-ui', importAlias: '@vflow/ui', buildable: true });
+    answer({ componentsPath: 'libs/vflow-ui', importAlias: '@vflow/ui' });
     await uiGenerator(tree);
     tree.write('libs/vflow-ui/src/lib/node.directive.ts', '// edited');
     tree.write('libs/vflow-ui/src/index.ts', "export * from './lib/button.directive';\n");
@@ -169,7 +225,7 @@ describe('ui in Nx', () => {
   });
 
   it('accepts double-quoted exports and ignores files of the application', async () => {
-    answer({ componentsPath: 'libs/vflow-ui', importAlias: '@vflow/ui', buildable: true });
+    answer({ componentsPath: 'libs/vflow-ui', importAlias: '@vflow/ui' });
     await uiGenerator(tree);
     const exports = PARTS.map((part) => `export * from "./${part.replace(/\.ts$/, '')}";`).join('\n');
     tree.write('libs/vflow-ui/src/index.ts', exports);
@@ -178,7 +234,7 @@ describe('ui in Nx', () => {
 
     await uiGenerator(tree);
 
-    expect(warn).not.toHaveBeenCalled();
+    expect(warn).not.toHaveBeenCalledWith(expect.stringContaining('does not export'));
   });
 });
 
@@ -188,7 +244,12 @@ describe('ui in Angular CLI', () => {
   beforeEach(() => {
     vi.stubEnv('NX_INTERACTIVE', 'true');
     tree = createTree();
-    writeJson(tree, 'package.json', { name: 'app', dependencies: { '@angular/core': '~20.3.0' } });
+    writeJson(tree, 'package.json', {
+      name: 'app',
+      dependencies: { '@angular/core': '~20.3.0' },
+      devDependencies: { tailwindcss: '^4.1.0' },
+    });
+    tree.write('src/styles.css', "@import 'tailwindcss';\n");
     writeJson(tree, 'angular.json', {
       version: 1,
       projects: { app: { root: '', sourceRoot: 'src', projectType: 'application', architect: {} } },
@@ -206,6 +267,7 @@ describe('ui in Angular CLI', () => {
     expect(readJson(tree, 'tsconfig.json').compilerOptions.paths['@vflow/ui']).toEqual([
       './libs/vflow-ui/src/index.ts',
     ]);
+    expect(tree.read('src/styles.css', 'utf-8')).toContain(THEME_IMPORT);
     for (const part of PARTS) expect(tree.exists(`libs/vflow-ui/src/${part}`)).toBe(true);
   });
 

@@ -7,16 +7,17 @@ Requires Tailwind CSS v4 in the application.
 
 ```bash
 npm i -D @vflow/cli
-ng g @vflow/cli:init # or: nx g @vflow/cli:init
-ng g @vflow/cli:ui   # or: nx g @vflow/cli:ui
+ng g @vflow/cli:ui # or: nx g @vflow/cli:ui
 ```
 
-| Generator | Does                                                                                                                                               |
-| --------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `init`    | Adds `ngx-vflow` and `@angular/cdk` when missing, copies the tokens (`vflow-ui.css`) next to the global stylesheet and imports them after Tailwind |
-| `ui`      | Asks for the `ui` section of `vflow.json` on the first run and copies the parts as `@vflow/ui`                                                     |
+`ui` adds what is missing and never overwrites your files:
 
-A later `ui` run, for example after an update, adds only the files that are missing.
+- `ngx-vflow` and `@angular/cdk` in `package.json`;
+- the tokens (`vflow-ui.css`) next to the global stylesheet of an application, imported after Tailwind;
+- the parts as `@vflow/ui`: an Nx library or, in Angular CLI, a tsconfig path. The first run asks for the `ui` section
+  of `vflow.json`.
+
+Run it again with `--project` to add the tokens to another application, or after an update to add new parts.
 
 Nothing in your application imports `@vflow/cli`: the parts and the tokens are copied, so the package is only needed
 while you run the generators.
