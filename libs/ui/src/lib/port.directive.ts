@@ -35,7 +35,7 @@ import { HandleState, VflowHandleDirective } from 'ngx-vflow';
   ],
   host: {
     class: `vui-port
-      relative block box-border size-vui-2 rounded-full border-[1.5px] [--vui-tone:var(--v-selection)]
+      relative block box-border size-vui-2 rounded-full border-[1.5px] [--vui-tone:var(--vui-accent)]
       [--vui-port-halo:0_0_0_1px_var(--vui-tone),0_0_0_4px_color-mix(in_oklab,var(--vui-tone)_28%,transparent)]
       transition
       before:absolute before:inset-vui-0 before:rounded-full before:content-['']
@@ -44,9 +44,9 @@ import { HandleState, VflowHandleDirective } from 'ngx-vflow';
       data-[v-handle-position=top]:before:-inset-x-vui-3 data-[v-handle-position=top]:before:-bottom-vui-2 data-[v-handle-position=top]:before:top-vui-0
       data-[v-handle-position=bottom]:before:-inset-x-vui-3 data-[v-handle-position=bottom]:before:-top-vui-2 data-[v-handle-position=bottom]:before:bottom-vui-0
       border-vui-muted bg-vui-surface data-[vui-connected=true]:bg-vui-muted
-      data-[vui-state=idle]:data-[v-handle-can-start=true]:hover:border-vui-selection
+      data-[vui-state=idle]:data-[v-handle-can-start=true]:hover:border-vui-accent
       data-[vui-state=idle]:data-[v-handle-can-start=true]:hover:shadow-(--vui-port-halo)
-      data-[vui-state=connecting]:border-vui-selection data-[vui-state=connecting]:bg-vui-selection data-[vui-state=connecting]:shadow-(--vui-port-halo)
+      data-[vui-state=connecting]:border-vui-accent data-[vui-state=connecting]:bg-vui-accent data-[vui-state=connecting]:shadow-(--vui-port-halo)
       data-[vui-state=valid]:[--vui-tone:var(--vui-success)] data-[vui-state=valid]:border-vui-success data-[vui-state=valid]:bg-vui-success data-[vui-state=valid]:shadow-(--vui-port-halo)
       data-[vui-state=invalid]:[--vui-tone:var(--vui-danger)] data-[vui-state=invalid]:border-vui-danger data-[vui-state=invalid]:bg-vui-surface data-[vui-state=invalid]:shadow-(--vui-port-halo)
       [&[data-vui-reveal=interaction][data-vui-state=idle]:not([data-vui-connected=true],.v-node:hover_*,.v-node:focus-within_*,[data-vui-selected=true]_*)]:opacity-0

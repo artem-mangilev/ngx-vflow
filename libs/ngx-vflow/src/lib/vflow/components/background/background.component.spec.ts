@@ -4,7 +4,11 @@ import { VflowComponent } from '../vflow/vflow.component';
 import { Background } from '../../types/background.type';
 
 @Component({
-  template: `<vflow style="--v-muted: rgb(1, 2, 3)" [view]="[400, 300]" [nodes]="[]" [background]="background()" />`,
+  template: `<vflow
+    style="--v-background-pattern: rgb(1, 2, 3)"
+    [view]="[400, 300]"
+    [nodes]="[]"
+    [background]="background()" />`,
   imports: [VflowComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

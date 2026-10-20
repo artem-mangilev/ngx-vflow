@@ -106,7 +106,7 @@ interface StageData {
   template: `
     <section class="demo" aria-label="Media pipeline demo" [attr.data-vui-theme]="dark() ? 'dark' : 'light'">
       <div class="controls">
-        <button vuiButton="secondary" type="button" (click)="flow()?.fitView()">Fit pipeline</button>
+        <button class="button" type="button" (click)="flow()?.fitView()">Fit pipeline</button>
         <label><input type="checkbox" [checked]="dark()" (change)="dark.set(!dark())" /> Dark theme</label>
         <p>Connect ports of the same type. Controls inside nodes do not drag or zoom the graph.</p>
       </div>
@@ -123,7 +123,9 @@ interface StageData {
               <span vuiIcon><app-demo-icon [name]="ctx.data().icon" /></span>
               <span vuiTitle>{{ ctx.data().title }}</span>
               @if (ctx.node.id === 'transcode') {
-                <span [vuiStatus]="encoding() ? 'info' : 'neutral'">{{ encoding() ? 'Encoding' : 'Idle' }}</span>
+                <span class="badge" [attr.data-tone]="encoding() ? 'info' : 'neutral'">{{
+                  encoding() ? 'Encoding' : 'Idle'
+                }}</span>
               }
             </header>
             @switch (ctx.data().kind) {

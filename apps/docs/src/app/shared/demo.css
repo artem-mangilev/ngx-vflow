@@ -2,10 +2,10 @@
    Registered as a global stylesheet of the docs app, so every rule is scoped to `.demo`. */
 .demo {
   display: block;
-  border: 1px solid var(--v-border);
+  border: 1px solid var(--vui-border);
   border-radius: 14px;
-  background: var(--v-background);
-  color: var(--v-foreground);
+  background: var(--vui-background);
+  color: var(--vui-foreground);
   overflow: hidden;
 }
 .demo .controls {
@@ -14,7 +14,7 @@
   align-items: center;
   gap: 10px;
   padding: 14px;
-  border-bottom: 1px solid var(--v-border);
+  border-bottom: 1px solid var(--vui-border);
 }
 .demo .controls label {
   display: inline-flex;
@@ -24,7 +24,7 @@
 }
 .demo .controls p {
   margin: 0;
-  color: var(--v-muted);
+  color: var(--vui-muted);
   font-size: 13px;
 }
 .demo vflow {
@@ -36,7 +36,7 @@
   min-width: 0;
 }
 .demo .muted {
-  color: var(--v-muted);
+  color: var(--vui-muted);
   font-size: 12px;
 }
 .demo .stage {
@@ -48,4 +48,99 @@
   bottom: 10px;
   /* Above the flow, which paints as one stacking context. */
   z-index: 2;
+}
+
+/* The application's own button and badge, standing in for the components of your design system: the vflow UI parts
+   ship neither. They read the theme colors, so they follow the light and dark scopes of a demo. */
+.demo {
+  --demo-primary: oklch(0.546 0.245 262.881);
+  --demo-warning: oklch(0.555 0.163 48.998);
+}
+[data-vui-theme='dark'].demo,
+[data-vui-theme='dark'] .demo,
+.demo [data-vui-theme='dark'] {
+  --demo-warning: oklch(0.828 0.189 84.429);
+}
+.demo .button {
+  display: inline-flex;
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  height: 28px;
+  padding: 0 12px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: var(--vui-surface-muted);
+  color: var(--vui-foreground);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.demo .button:enabled:hover {
+  background: color-mix(in oklab, var(--vui-surface-muted), var(--vui-foreground) 6%);
+}
+/* A fixed blue under white text (5.3:1) in both themes; the lighter dark accent is for rings and lines. */
+.demo .button.primary {
+  background: var(--demo-primary);
+  color: white;
+}
+.demo .button.primary:enabled:hover {
+  background: color-mix(in oklab, var(--demo-primary), black 8%);
+}
+.demo .button.plain {
+  background: transparent;
+  color: var(--vui-muted);
+}
+.demo .button.plain:enabled:hover {
+  background: var(--vui-surface-muted);
+  color: var(--vui-foreground);
+}
+.demo .button.small {
+  height: 24px;
+  padding: 0 8px;
+  font-size: 12px;
+}
+.demo .button.icon {
+  width: 28px;
+  padding: 0;
+}
+.demo .button.icon.small {
+  width: 24px;
+}
+.demo .button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.demo .button:focus-visible {
+  outline: 2px solid var(--vui-accent);
+  outline-offset: 2px;
+}
+/* A tint of the tone with text of the same hue mixed 70/30 with the foreground: at least 4.5:1 in both themes. */
+.demo .badge {
+  --tone: var(--vui-muted);
+  display: inline-flex;
+  box-sizing: border-box;
+  align-items: center;
+  gap: 4px;
+  min-height: 20px;
+  padding: 0 8px;
+  border-radius: 6px;
+  background: color-mix(in oklab, var(--tone) 16%, transparent);
+  color: color-mix(in oklab, var(--tone) 70%, var(--vui-foreground));
+  font-size: 12px;
+  font-weight: 500;
+}
+.demo .badge[data-tone='info'] {
+  --tone: var(--vui-accent);
+}
+.demo .badge[data-tone='success'] {
+  --tone: var(--vui-success);
+}
+.demo .badge[data-tone='warning'] {
+  --tone: var(--demo-warning);
+}
+.demo .badge[data-tone='danger'] {
+  --tone: var(--vui-danger);
 }

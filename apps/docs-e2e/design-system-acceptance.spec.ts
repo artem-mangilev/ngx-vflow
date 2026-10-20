@@ -37,7 +37,7 @@ for (const [route, selector] of pages) {
     const wrapper = demo.locator('.v-node').first();
     await wrapper.focus();
     await expect(wrapper).toBeFocused();
-    await expect(wrapper).toHaveCSS('outline-color', /oklch\(0\.563 0\.193 256\.2\)|oklch\(0\.624 0\.206 255\.5\)/);
+    await expect(wrapper).toHaveCSS('outline-color', /oklch\(0\.546 0\.245 262\.881\)|oklch\(0\.623 0\.214 259\.815\)/);
   });
 }
 

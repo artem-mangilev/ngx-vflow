@@ -1,42 +1,69 @@
-// Public theme tokens of core. Registration gives each one its default without declaring it on the flow
-// element, so a value set on any ancestor (for example a `data-vui-theme` scope) still inherits into the flow and
-// its parts, and a value set on a descendant still wins for that subtree.
+// Public theme tokens of core: one per part that core draws itself, named after its public class. A theme maps its
+// own roles onto them (see @vflow/ui), core only reads them. Registration gives each one its default without declaring
+// it on the flow element, so a value set on any ancestor still inherits into the flow and its parts, and a value set
+// on a descendant still wins for that subtree.
 @property --v-background {
   syntax: '<color>';
   inherits: true;
   initial-value: #fff;
 }
 
-@property --v-surface {
-  syntax: '<color>';
-  inherits: true;
-  initial-value: #fff;
-}
-
-@property --v-foreground {
-  syntax: '<color>';
-  inherits: true;
-  initial-value: #1b262c;
-}
-
-@property --v-muted {
+// Dots and grid lines of `.v-background-pattern`.
+@property --v-background-pattern {
   syntax: '<color>';
   inherits: true;
   initial-value: rgb(177, 177, 183);
 }
 
-@property --v-border {
-  syntax: '<color>';
-  inherits: true;
-  initial-value: rgb(200, 200, 200);
-}
-
-@property --v-selection {
+// Stroke of `.v-selection-box`; its fill is the same color at 12%.
+@property --v-selection-box {
   syntax: '<color>';
   inherits: true;
   initial-value: #0f4c75;
 }
 
+// Handles and lines of `.v-resize-control`, and the border that separates a handle from the node under it.
+@property --v-resize-control {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #0f4c75;
+}
+
+@property --v-resize-control-border {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #fff;
+}
+
+// `.v-alignment-guides`, drawn at 50%.
+@property --v-alignment-guides {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #1b262c;
+}
+
+// The line of a connection in progress when the flow has no connection template.
+@property --v-connection {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: rgb(177, 177, 183);
+}
+
+// Minimap: the mask outside the viewport (at 35%), which also outlines nodes, groups and the frame, and the outline
+// of selected nodes. Nodes are filled with the flow background.
+@property --v-minimap-mask {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: rgb(177, 177, 183);
+}
+
+@property --v-minimap-selected {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #0f4c75;
+}
+
+// Focus ring of nodes, edges and the flow container.
 @property --v-focus {
   syntax: '<color>';
   inherits: true;
@@ -94,11 +121,14 @@
 @media (forced-colors: active) {
   :host {
     --v-background: Canvas;
-    --v-surface: Canvas;
-    --v-foreground: CanvasText;
-    --v-muted: GrayText;
-    --v-border: CanvasText;
-    --v-selection: Highlight;
+    --v-background-pattern: GrayText;
+    --v-selection-box: Highlight;
+    --v-resize-control: Highlight;
+    --v-resize-control-border: Canvas;
+    --v-alignment-guides: CanvasText;
+    --v-connection: GrayText;
+    --v-minimap-mask: GrayText;
+    --v-minimap-selected: Highlight;
     --v-focus: Highlight;
   }
 }

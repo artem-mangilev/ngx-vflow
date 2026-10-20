@@ -12,7 +12,7 @@ import { booleanAttribute, Directive, input } from '@angular/core';
     class: `vui-node
       relative box-border rounded-vui-surface border border-vui-border
       bg-vui-surface text-vui-foreground antialiased shadow-vui-node
-      data-[vui-selected=true]:outline-2 data-[vui-selected=true]:outline-offset-2 data-[vui-selected=true]:outline-vui-selection
+      data-[vui-selected=true]:outline-2 data-[vui-selected=true]:outline-offset-2 data-[vui-selected=true]:outline-vui-accent
       forced-colors:data-[vui-selected=true]:outline-[Highlight]`,
     '[attr.data-vui-selected]': 'selected()',
   },

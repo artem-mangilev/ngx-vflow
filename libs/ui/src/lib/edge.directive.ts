@@ -6,7 +6,7 @@ import { booleanAttribute, Directive, input } from '@angular/core';
   host: {
     class: `vui-edge
       fill-none stroke-2 [stroke-linejoin:round]
-      stroke-vui-muted data-[vui-selected=true]:stroke-vui-selection
+      stroke-vui-muted data-[vui-selected=true]:stroke-vui-accent
       forced-colors:stroke-[CanvasText] forced-colors:data-[vui-selected=true]:stroke-[Highlight]`,
     '[attr.data-vui-selected]': 'selected()',
   },

@@ -33,7 +33,7 @@ interface EntityData {
     }
     .key {
       min-width: 22px;
-      color: var(--vui-info);
+      color: var(--vui-accent);
     }
   `,
   template: `
@@ -43,10 +43,10 @@ interface EntityData {
       [attr.data-vui-theme]="dark() ? 'dark' : 'light'"
       [style.--vui-space]="compact() ? '3px' : '4px'">
       <div class="controls">
-        <button vuiButton="secondary" type="button" (click)="flow()?.fitView()">Fit entities</button>
-        <button vuiButton="secondary" type="button" (click)="reverseFields()">Reverse fields</button>
-        <button vuiButton="secondary" type="button" (click)="renameField()">Rename email</button>
-        <button vuiButton="secondary" type="button" (click)="toggleLongNames()">Long names</button>
+        <button class="button" type="button" (click)="flow()?.fitView()">Fit entities</button>
+        <button class="button" type="button" (click)="reverseFields()">Reverse fields</button>
+        <button class="button" type="button" (click)="renameField()">Rename email</button>
+        <button class="button" type="button" (click)="toggleLongNames()">Long names</button>
         <label><input type="checkbox" [checked]="compact()" (change)="compact.set(!compact())" /> Compact</label>
         <label><input type="checkbox" [checked]="dark()" (change)="dark.set(!dark())" /> Dark theme</label>
         <p>Connect matching field types; names and row order can change.</p>
@@ -70,9 +70,7 @@ interface EntityData {
                 <span vuiTitle>{{ field.name }}</span>
                 <span vuiMeta>{{ field.type }}</span>
                 <button
-                  vuiButton="plain"
-                  vuiButtonSize="sm"
-                  vuiButtonIcon
+                  class="button plain small icon"
                   vNoDrag
                   type="button"
                   [attr.aria-label]="'Delete ' + ctx.data().title + '.' + field.name"
@@ -103,9 +101,7 @@ interface EntityData {
             <span *vEdgeLabel vuiEdgeLabel>
               {{ label }}
               <button
-                vuiButton="plain"
-                vuiButtonSize="sm"
-                vuiButtonIcon
+                class="button plain small icon"
                 vNoDrag
                 type="button"
                 [attr.aria-label]="'Remove ' + label + ' connection'"

@@ -211,17 +211,17 @@ describe('ui in Nx', () => {
     answer({ componentsPath: 'libs/vflow-ui', importAlias: '@vflow/ui' });
     await uiGenerator(tree);
     tree.write('libs/vflow-ui/src/lib/node.directive.ts', '// edited');
-    tree.write('libs/vflow-ui/src/index.ts', "export * from './lib/button.directive';\n");
+    tree.write('libs/vflow-ui/src/index.ts', "export * from './lib/node.directive';\n");
     tree.delete('libs/vflow-ui/src/lib/edge.directive.ts');
     const warn = vi.spyOn(logger, 'warn').mockImplementation(() => undefined);
 
     await uiGenerator(tree);
 
     expect(tree.read('libs/vflow-ui/src/lib/node.directive.ts', 'utf-8')).toBe('// edited');
-    expect(tree.read('libs/vflow-ui/src/index.ts', 'utf-8')).toBe("export * from './lib/button.directive';\n");
+    expect(tree.read('libs/vflow-ui/src/index.ts', 'utf-8')).toBe("export * from './lib/node.directive';\n");
     expect(tree.read('libs/vflow-ui/src/lib/edge.directive.ts', 'utf-8')).toContain('VuiEdge');
     expect(warn).toHaveBeenCalledWith(expect.stringContaining('./lib/edge.directive'));
-    expect(warn).not.toHaveBeenCalledWith(expect.stringContaining('./lib/button.directive'));
+    expect(warn).not.toHaveBeenCalledWith(expect.stringContaining('./lib/node.directive'));
   });
 
   it('accepts double-quoted exports and ignores files of the application', async () => {

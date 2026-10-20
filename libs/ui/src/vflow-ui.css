@@ -1,29 +1,29 @@
 /*
- * vflow UI tokens. `@vflow/cli ui` copies this file next to the application's global stylesheet and imports it
+ * vflow UI theme. `@vflow/cli ui` copies this file next to the application's global stylesheet and imports it
  * after Tailwind (`@import 'tailwindcss';`); from then on it is application code, like the parts.
  *
- * 1. Values. The scales do not depend on the theme and are set once. A theme sets the colors and shadows: the ones
- *    core shares (`--v-background`, `--v-surface`, `--v-foreground`, `--v-muted`, `--v-border`, `--v-selection`,
- *    `--v-focus`) under their core names, so the flow and the parts read one value and an override on any element
- *    recolors both; the rest under `--vui-*`. Text is the application's: the parts inherit its typeface, size and
- *    letter spacing and use its Tailwind type utilities, as do transitions. Values live in the `base` cascade layer,
- *    so an override in unlayered application CSS wins regardless of specificity and source order.
- * 2. Tailwind keys. Every `vui` key derives from the values; `inline` makes utilities use the expression itself, so an
- *    override of a value on any element restyles the parts inside it.
+ * Three levels, each with one owner:
+ * 1. Theme roles, `--vui-*`: colors, shadows and scales, as shadcn's `--background`, `--card` or `--primary`. The parts
+ *    read only these. Text is the application's: the parts inherit its typeface, size and letter spacing and use its
+ *    Tailwind type utilities, as do transitions.
+ * 2. Core tokens, `--v-*`: one per part core draws itself (selection box, resize controls, focus ring, minimap…),
+ *    named after its public class. The mapping block below sets them from the roles.
+ * 3. Tailwind keys: every `vui` key derives from the roles; `inline` makes utilities use the expression itself.
  *
- * Colors are oklch, the space the derived steps below are mixed in.
+ * As with shadcn, a theme is a scope: `:root` or an element with `data-vui-theme`. The mapping resolves on the scope
+ * element, so override roles there (`.my-editor[data-vui-theme] { --vui-accent: teal }`) for core parts to follow;
+ * an override on an element without the attribute restyles the parts only. Core tokens can be overridden on any
+ * element inside the scope. Everything lives in the `base` cascade layer, so unlayered application CSS wins regardless
+ * of specificity and source order.
+ *
+ * Colors are oklch values of the Tailwind palette, as in shadcn's zinc base with its blue theme: zinc neutrals and one
+ * accent, `--vui-accent`, for selection, focus, the connection in progress and native controls. Light `--vui-muted`
+ * sits a step darker than zinc-500, so secondary text keeps 4.5:1 on the group fill.
  */
 @layer base {
   :root {
     --vui-space: 4px;
     --vui-radius: 6px;
-  }
-
-  :root,
-  [data-vui-theme] {
-    /* Node parts are rounded with the surface radius, so the core focus ring follows the same corners. Restated
-       on every scope, so a radius or space override there reaches the ring. */
-    --v-focus-radius: --theme(--radius-vui-surface);
   }
 
   /*
@@ -33,41 +33,49 @@
    */
   :root,
   [data-vui-theme='light'] {
-    --v-background: oklch(0.971 0.003 286.4);
-    --v-surface: oklch(1 0 0);
-    --v-foreground: oklch(0.232 0.004 286.1);
-    --v-muted: oklch(0.54 0.008 286.1);
-    --v-border: oklch(0.827 0.003 286.3);
-    --v-selection: oklch(0.563 0.193 256.2);
-    --v-focus: oklch(0.563 0.193 256.2);
-    --vui-surface-muted: oklch(0.569 0.015 285.9 / 0.12);
-    --vui-accent: oklch(0.563 0.193 256.2);
-    --vui-on-accent: oklch(1 0 0);
-    --vui-success: oklch(0.522 0.14 146.9);
-    --vui-warning: oklch(0.547 0.147 48.9);
-    --vui-danger: oklch(0.553 0.225 27.3);
-    --vui-info: oklch(0.563 0.193 256.2);
+    --vui-background: oklch(0.985 0 0);
+    --vui-surface: oklch(1 0 0);
+    --vui-surface-muted: oklch(0.53 0.016 285.938 / 0.1);
+    --vui-foreground: oklch(0.141 0.005 285.823);
+    --vui-muted: oklch(0.53 0.016 285.938);
+    --vui-border: oklch(0.92 0.004 286.32);
+    --vui-accent: oklch(0.546 0.245 262.881);
+    --vui-success: oklch(0.627 0.194 149.214);
+    --vui-danger: oklch(0.577 0.245 27.325);
     --vui-shadow-node: 0 1px 0 oklch(0 0 0 / 0.04);
     --vui-shadow-floating: 0 4px 16px oklch(0 0 0 / 0.12), 0 0 0 0.5px oklch(0 0 0 / 0.08);
   }
 
   [data-vui-theme='dark'] {
-    --v-background: oklch(0.227 0.004 286.1);
-    --v-surface: oklch(0.294 0.004 286.2);
-    --v-foreground: oklch(0.971 0.003 286.4);
-    --v-muted: oklch(0.752 0.006 286.3);
-    --v-border: oklch(0.447 0.006 286.1);
-    --v-selection: oklch(0.624 0.206 255.5);
-    --v-focus: oklch(0.624 0.206 255.5);
-    --vui-surface-muted: oklch(0.569 0.015 285.9 / 0.24);
-    --vui-accent: oklch(0.563 0.193 256.2);
-    --vui-on-accent: oklch(1 0 0);
-    --vui-success: oklch(0.756 0.208 147);
-    --vui-warning: oklch(0.782 0.171 67.2);
-    --vui-danger: oklch(0.707 0.185 25.9);
-    --vui-info: oklch(0.685 0.17 253);
+    --vui-background: oklch(0.141 0.005 285.823);
+    --vui-surface: oklch(0.21 0.006 285.885);
+    --vui-surface-muted: oklch(0.705 0.015 286.067 / 0.08);
+    --vui-foreground: oklch(0.985 0 0);
+    --vui-muted: oklch(0.705 0.015 286.067);
+    --vui-border: oklch(0.274 0.006 286.033);
+    --vui-accent: oklch(0.623 0.214 259.815);
+    --vui-success: oklch(0.723 0.219 149.579);
+    --vui-danger: oklch(0.704 0.191 22.216);
     --vui-shadow-node: 0 1px 0 oklch(0 0 0 / 0.3);
     --vui-shadow-floating: 0 4px 16px oklch(0 0 0 / 0.5), 0 0 0 0.5px oklch(1 0 0 / 0.1);
+  }
+
+  /* The core tokens from the roles, resolved on every scope. */
+  :root,
+  [data-vui-theme] {
+    --v-background: var(--vui-background);
+    /* Dots and grid lines are quieter than secondary text. */
+    --v-background-pattern: var(--vui-border);
+    --v-selection-box: var(--vui-accent);
+    --v-resize-control: var(--vui-accent);
+    --v-resize-control-border: var(--vui-surface);
+    --v-alignment-guides: var(--vui-foreground);
+    --v-connection: var(--vui-muted);
+    --v-minimap-mask: var(--vui-muted);
+    --v-minimap-selected: var(--vui-accent);
+    --v-focus: var(--vui-accent);
+    /* Node parts are rounded with the surface radius, so the core focus ring follows the same corners. */
+    --v-focus-radius: --theme(--radius-vui-surface);
   }
 
   /* Only an explicit scope touches the rest of your content in it: the application keeps its own color scheme. */
@@ -84,29 +92,18 @@
 }
 
 @theme inline {
-  --color-vui-surface: var(--v-surface);
+  --color-vui-surface: var(--vui-surface);
   --color-vui-surface-muted: var(--vui-surface-muted);
-  --color-vui-foreground: var(--v-foreground);
-  --color-vui-muted: var(--v-muted);
-  --color-vui-border: var(--v-border);
+  --color-vui-foreground: var(--vui-foreground);
+  --color-vui-muted: var(--vui-muted);
+  --color-vui-border: var(--vui-border);
   /* Separators inside a surface (header, footer, rows) are half as strong as its border. */
-  --color-vui-separator: color-mix(in oklab, var(--v-border) 50%, transparent);
+  --color-vui-separator: color-mix(in oklab, var(--vui-border) 50%, transparent);
   --color-vui-accent: var(--vui-accent);
-  --color-vui-on-accent: var(--vui-on-accent);
-  --color-vui-selection: var(--v-selection);
   --color-vui-success: var(--vui-success);
-  --color-vui-warning: var(--vui-warning);
   --color-vui-danger: var(--vui-danger);
-  --color-vui-info: var(--vui-info);
-  /* Interaction steps derived from the theme: hover and pressed darken the accent and strengthen the neutral fill
-     toward the foreground, so they follow any theme without extra variables. */
-  --color-vui-accent-hover: color-mix(in oklab, var(--vui-accent), black 8%);
-  --color-vui-accent-pressed: color-mix(in oklab, var(--vui-accent), black 16%);
-  --color-vui-fill-hover: color-mix(in oklab, var(--vui-surface-muted), var(--v-foreground) 6%);
-  --color-vui-fill-pressed: color-mix(in oklab, var(--vui-surface-muted), var(--v-foreground) 12%);
-  /* A part-local tone (`--vui-tone`, set by the part from one of the tones above) as a tint and as text on it. */
+  /* A part-local tone (`--vui-tone`, set by the part from the accent or one of the tones above). */
   --color-vui-tone: var(--vui-tone);
-  --color-vui-tone-ink: color-mix(in oklab, var(--vui-tone) 80%, var(--v-foreground));
 
   /* 4pt grid: `p-vui-3` is three spacing units. Control heights are 6/7/8 units (24/28/32px). */
   --spacing-vui-0: 0px;

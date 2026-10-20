@@ -74,7 +74,7 @@ type MapData = Person | Metric | Note | Team;
     }
     .spark span {
       flex: 1;
-      background: var(--v-muted);
+      background: var(--vui-muted);
       border-radius: 1px;
     }
     .note {
@@ -98,7 +98,7 @@ type MapData = Person | Metric | Note | Team;
       aria-label="Relationships and metrics map demo"
       [attr.data-vui-theme]="dark() ? 'dark' : 'light'">
       <div class="controls">
-        <button vuiButton="secondary" type="button" (click)="flow()?.fitView()">Fit map</button>
+        <button class="button" type="button" (click)="flow()?.fitView()">Fit map</button>
         <label><input type="checkbox" [checked]="dark()" (change)="dark.set(!dark())" /> Dark theme</label>
         <label><input type="checkbox" [checked]="viewMode()" (change)="toggleViewMode()" /> View mode</label>
         <p>

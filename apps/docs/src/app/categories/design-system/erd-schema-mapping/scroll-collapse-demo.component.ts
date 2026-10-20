@@ -64,7 +64,7 @@ const ALL_VISIBLE: Visibility = { visible: new Set(), above: [], below: [], key:
   template: `
     <section class="demo" aria-label="Scroll and collapse experiment" data-vui-theme="light">
       <div class="controls">
-        <button vuiButton="secondary" type="button" (click)="flow()?.fitView()">Fit</button>
+        <button class="button" type="button" (click)="flow()?.fitView()">Fit</button>
         <p>Scroll the Product rows with the wheel; collapse a node to move its endpoints to the header.</p>
       </div>
       <vflow view="auto" [nodes]="nodes" [edges]="edges" (initialized)="flow()?.fitView()">
@@ -79,9 +79,7 @@ const ALL_VISIBLE: Visibility = { visible: new Set(), above: [], below: [], key:
               <span vuiTitle>{{ ctx.data().title }}</span>
               <span vuiMeta>{{ ctx.data().fields.length }} fields</span>
               <button
-                vuiButton="plain"
-                vuiButtonSize="sm"
-                vuiButtonIcon
+                class="button plain small icon"
                 vNoDrag
                 class="toggle"
                 type="button"

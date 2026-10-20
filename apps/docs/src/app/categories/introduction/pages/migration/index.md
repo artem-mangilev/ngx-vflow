@@ -82,20 +82,21 @@ For path B, copy the parts and their tokens with `ng g @vflow/cli:ui` (Tailwind 
 
 ### Appearance inputs removed
 
-Colors are CSS. Core reads the tokens `--v-background`, `--v-surface`, `--v-foreground`,
-`--v-muted`, `--v-border`, `--v-selection` and `--v-focus`, each with a built-in default.
+Colors are CSS. Core has one token per part it draws, each with a built-in default: `--v-background`,
+`--v-background-pattern`, `--v-selection-box`, `--v-resize-control`, `--v-resize-control-border`,
+`--v-alignment-guides`, `--v-connection`, `--v-minimap-mask`, `--v-minimap-selected` and `--v-focus`.
 The focus ring geometry is `--v-focus-width`, `--v-focus-offset` and `--v-focus-radius`.
-Set them on the `vflow` element or any ancestor; a `data-vui-theme` scope from `@vflow/ui` sets them to its theme, and its parts read them too.
+Set them on the `vflow` element or any ancestor; the `@vflow/ui` theme sets them from its `--vui-*` roles on every scope.
 Under `forced-colors: active` core maps its tokens to system colors and keeps the feedback parts visible.
 
-| Removed input                                        | Replacement                                                                              |
-| ---------------------------------------------------- | ---------------------------------------------------------------------------------------- |
-| `[background]="'#fff'"` / `{ type: 'solid', color }` | `--v-background` token; `[background]` now takes only `dots`, `grid` or `image` patterns |
-| Dots/grid `color`, `backgroundColor`                 | `--v-muted` and `--v-background`; the `.v-background-pattern` class                      |
-| `resizerColor`, resize control `color`               | `--v-selection`, `--v-surface`; `.v-resize-control--handle` / `.v-resize-control--line`  |
-| `mini-map` `maskColor`, `strokeColor`                | `--v-muted` (mask) and `--v-border` (frame); the minimap samples the resolved tokens     |
-| `lineColor` in `alignmentHelper` settings            | `--v-foreground`; `.v-alignment-guides`. `tolerance` stays                               |
-| `color` in `selectionBox` settings                   | `--v-selection`; `.v-selection-box`. `mode` stays                                        |
+| Removed input                                        | Replacement                                                                               |
+| ---------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| `[background]="'#fff'"` / `{ type: 'solid', color }` | `--v-background` token; `[background]` now takes only `dots`, `grid` or `image` patterns  |
+| Dots/grid `color`, `backgroundColor`                 | `--v-background-pattern` and `--v-background`; the `.v-background-pattern` class          |
+| `resizerColor`, resize control `color`               | `--v-resize-control`, `--v-resize-control-border`; `.v-resize-control--handle` / `--line` |
+| `mini-map` `maskColor`, `strokeColor`                | `--v-minimap-mask` (mask and outlines), `--v-minimap-selected`; sampled from CSS          |
+| `lineColor` in `alignmentHelper` settings            | `--v-alignment-guides`; `.v-alignment-guides`. `tolerance` stays                          |
+| `color` in `selectionBox` settings                   | `--v-selection-box`; `.v-selection-box`. `mode` stays                                     |
 
 Behavior parameters are untouched: node points, sizes, `extent`, resize constraints, drag thresholds,
 snap grid, zoom limits, curves and connection validation keep their APIs. Handle `offsetX` and `offsetY` keep their
@@ -130,7 +131,8 @@ Old names have no aliases.
 | `data-vflow-*` attributes, for example `data-vflow-handle-state`, `data-vflow-no-drag`                                                                                                                                             | `data-v-*`, for example `data-v-handle-state`, `data-v-no-drag`                                                                                                                                                                                             |
 | Unprefixed classes `.resize-control` (with `.handle`, `.line`, `.top`, `.right`, `.bottom`, `.left`), `.selection-box`, `.reconnect-handle`, `.interactive-edge`, `.focus-indicator`, `.edge-label-wrapper`, `.wrapper`, `.magnet` | `.v-resize-control` (with `.v-resize-control--handle`, `--line`, `--top`, `--right`, `--bottom`, `--left`), `.v-selection-box`, `.v-reconnect-handle`, `.v-interactive-edge`, `.v-focus-indicator`, `.v-edge-label-wrapper`, `.v-node-wrapper`, `.v-magnet` |
 | `@vflow/ui` attributes `data-tone`, `data-state`, `data-connected`, `data-event`, `data-gateway`, `data-flow`                                                                                                                      | `data-vui-tone`, `data-vui-state`, `data-vui-connected`, `data-vui-event`, `data-vui-gateway`, `data-vui-flow`                                                                                                                                              |
-| `@vflow/ui` busy status (`data-busy`)                                                                                                                                                                                              | Removed: a status has a tone only; for work in progress put your own spinner icon inside `vuiStatus`                                                                                                                                                        |
+| `@vflow/ui` busy status (`data-busy`), `vuiStatus`, `vuiButton`, the tokens `--vui-on-accent`, `--vui-warning`, `--vui-info`                                                                                                       | Removed: use the badge and button of your design system; `vui-controls` styles the buttons you project into it                                                                                                                                              |
+| `@vflow/ui` colors on core names: `--v-surface`, `--v-foreground`, `--v-muted`, `--v-border`, `--v-selection`                                                                                                                      | Theme roles `--vui-surface`, `--vui-foreground`, `--vui-muted`, `--vui-border`, `--vui-accent`; core keeps one token per part it draws                                                                                                                      |
 
 `ng-template[vMarker]` takes the marker type as its value, `<ng-template vMarker="diamond" inset="8">`, and
 the structural `vEdgeLabel` keeps its microsyntax, with `'end'; orient: 'path'` as the value.

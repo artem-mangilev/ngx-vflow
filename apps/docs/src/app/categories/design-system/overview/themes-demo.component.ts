@@ -16,16 +16,16 @@ import { createEdges, createNodes, Vflow } from 'ngx-vflow';
     }
     .editor {
       min-width: 0;
-      border: 1px solid var(--v-border);
+      border: 1px solid var(--vui-border);
       border-radius: 10px;
       overflow: hidden;
-      background: var(--v-background, #fff);
+      background: var(--vui-background, #fff);
     }
     .editor p {
       margin: 0;
       padding: 8px 10px;
       font-size: 12px;
-      color: var(--v-muted);
+      color: var(--vui-muted);
     }
     vflow {
       height: 220px;
