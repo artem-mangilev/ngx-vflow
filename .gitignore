@@ -54,3 +54,6 @@ Thumbs.db
 /playwright/.cache/
 
 .nx
+
+# @vflow/cli templates, generated from libs/ui by `ui:sync-cli` before cli:build and cli:test
+/libs/cli/src/steps/templates/

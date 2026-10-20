@@ -16,8 +16,9 @@
     "type": "git"
   },
   "peerDependencies": {
-    "@angular/common": "^20.0.0 || ^21.0.0",
-    "@angular/core": "^20.0.0 || ^21.0.0",
+    "@angular/cdk": "^20.0.0 || ^21.0.0 || ^22.0.0",
+    "@angular/common": "^20.0.0 || ^21.0.0 || ^22.0.0",
+    "@angular/core": "^20.0.0 || ^21.0.0 || ^22.0.0",
     "rxjs": ">=6.0.0"
   },
   "dependencies": {

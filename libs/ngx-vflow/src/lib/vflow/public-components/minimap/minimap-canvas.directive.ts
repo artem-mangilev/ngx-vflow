@@ -72,17 +72,14 @@ export class MinimapCanvasDirective {
       const view = this.document.defaultView;
       const style = view?.getComputedStyle(this.canvas);
       const token = (name: string, fallback: string) => style?.getPropertyValue(name).trim() || fallback;
-      const surface = token('--v-surface', '#fff');
+      const fallback = token('--v-background', '#fff');
       // The minimap is content projected by the consumer, so the flow root is found through the DOM.
       const root = this.canvas.closest('.v-root');
       const rootBackground = root && view ? view.getComputedStyle(root).backgroundColor : '';
       return {
-        surface,
-        foreground: token('--v-foreground', '#1b262c'),
-        muted: token('--v-muted', 'rgb(177, 177, 183)'),
-        border: token('--v-border', 'rgb(200, 200, 200)'),
-        selection: token('--v-selection', '#0f4c75'),
-        background: TRANSPARENT.has(rootBackground) ? surface : rootBackground,
+        mask: token('--v-minimap-mask', 'rgb(177, 177, 183)'),
+        selected: token('--v-minimap-selected', '#0f4c75'),
+        background: TRANSPARENT.has(rootBackground) ? fallback : rootBackground,
       };
     },
     { equal: (a, b) => Object.keys(a).every((key) => a[key as keyof typeof a] === b[key as keyof typeof b]) },
@@ -124,11 +121,11 @@ export class MinimapCanvasDirective {
         const selected = node.selected();
         context.beginPath();
         context.roundRect(x, y, node.width(), node.height(), group ? 5 : 2);
-        context.fillStyle = group ? theme.muted : theme.surface;
+        context.fillStyle = group ? theme.mask : theme.background;
         context.globalAlpha = group ? 0.08 : 1;
         context.fill();
         context.globalAlpha = 1;
-        context.strokeStyle = selected ? theme.selection : group ? theme.border : theme.foreground;
+        context.strokeStyle = selected ? theme.selected : theme.mask;
         context.lineWidth = group && !selected ? 1.5 : 2;
         context.stroke();
       }
@@ -193,7 +190,7 @@ export class MinimapCanvasDirective {
       const theme = this.theme();
       context.setTransform(ratio, 0, 0, ratio, 0, 0);
       context.clearRect(0, 0, width, height);
-      context.fillStyle = theme.muted;
+      context.fillStyle = theme.mask;
       context.globalAlpha = 0.35;
       context.fillRect(0, 0, width, height);
       context.globalAlpha = 1;
@@ -205,7 +202,7 @@ export class MinimapCanvasDirective {
         viewport.height * transform.zoom,
       );
       if (image.width && image.height) context.drawImage(image, 0, 0, width, height);
-      context.strokeStyle = theme.border;
+      context.strokeStyle = theme.mask;
       context.lineWidth = 1;
       context.strokeRect(0.5, 0.5, width - 1, height - 1);
     });

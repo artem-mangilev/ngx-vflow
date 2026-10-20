@@ -1,8 +1,8 @@
 .v-selection-box {
   pointer-events: none;
-  fill: var(--v-selection);
+  fill: var(--v-selection-box);
   fill-opacity: 0.12;
-  stroke: var(--v-selection);
+  stroke: var(--v-selection-box);
   stroke-width: 1;
 }
 

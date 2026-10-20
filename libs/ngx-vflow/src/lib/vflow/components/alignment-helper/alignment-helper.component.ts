@@ -16,7 +16,7 @@ const TICK = 4;
   styles: [
     `
       :host {
-        color: var(--v-foreground);
+        color: var(--v-alignment-guides);
         opacity: 0.5;
       }
 

@@ -104,9 +104,9 @@ interface StageData {
     }
   `,
   template: `
-    <section class="demo" aria-label="Media pipeline demo" [vuiTheme]="dark() ? 'dark' : 'light'">
+    <section class="demo" aria-label="Media pipeline demo" [attr.data-vui-theme]="dark() ? 'dark' : 'light'">
       <div class="controls">
-        <button vuiButton="secondary" type="button" (click)="flow()?.fitView()">Fit pipeline</button>
+        <button class="button" type="button" (click)="flow()?.fitView()">Fit pipeline</button>
         <label><input type="checkbox" [checked]="dark()" (change)="dark.set(!dark())" /> Dark theme</label>
         <p>Connect ports of the same type. Controls inside nodes do not drag or zoom the graph.</p>
       </div>
@@ -118,12 +118,12 @@ interface StageData {
         (connect)="connect($event)"
         (initialized)="flow()?.fitView()">
         <ng-template let-ctx vNode>
-          <article vuiNode [vuiSelected]="ctx.selected() || ctx.preselected()" [attr.data-stage]="ctx.node.id">
+          <article vuiNode [selected]="ctx.selected() || ctx.preselected()" [attr.data-stage]="ctx.node.id">
             <header vuiNodeHeader>
               <span vuiIcon><app-demo-icon [name]="ctx.data().icon" /></span>
               <span vuiTitle>{{ ctx.data().title }}</span>
               @if (ctx.node.id === 'transcode') {
-                <span [vuiStatus]="encoding() ? 'info' : 'neutral'" [vuiStatusBusy]="encoding()">{{
+                <span class="badge" [attr.data-tone]="encoding() ? 'info' : 'neutral'">{{
                   encoding() ? 'Encoding' : 'Idle'
                 }}</span>
               }
@@ -212,7 +212,7 @@ interface StageData {
         </ng-template>
         <ng-template let-ctx vEdge>
           <svg:g vEdgeInteraction>
-            <svg:path vuiEdge [attr.d]="ctx.path()" [vuiSelected]="ctx.selected() || ctx.preselected()" />
+            <svg:path vuiEdge [attr.d]="ctx.path()" [selected]="ctx.selected() || ctx.preselected()" />
           </svg:g>
         </ng-template>
         <ng-template let-ctx vConnection>

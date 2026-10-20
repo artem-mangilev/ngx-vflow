@@ -1,11 +1,10 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { Vui } from '@vflow/ui';
-import { DemoIconComponent } from '../../../shared/demo-icon.component';
 
 /** The token scales of both shipped themes, drawn with the theme variables and the parts that use them. */
 @Component({
   selector: 'app-ui-tokens-demo',
-  imports: [Vui, DemoIconComponent],
+  imports: [Vui],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
     .themes {
@@ -16,14 +15,13 @@ import { DemoIconComponent } from '../../../shared/demo-icon.component';
       display: grid;
       gap: 20px;
       padding: 20px;
-      background: var(--vui-canvas);
+      background: var(--vui-background);
       color: var(--vui-foreground);
-      font-family: var(--vui-font-sans);
-      font-size: var(--vui-font-size);
+      font-size: 13px;
     }
     h3 {
       margin: 0 0 8px;
-      font-size: calc(var(--vui-font-size) - 2px);
+      font-size: 11px;
       font-weight: 600;
       color: var(--vui-muted);
     }
@@ -35,19 +33,16 @@ import { DemoIconComponent } from '../../../shared/demo-icon.component';
     .swatch {
       display: grid;
       gap: 4px;
-      font-size: calc(var(--vui-font-size) - 2px);
+      font-size: 11px;
     }
     .chip {
       height: 28px;
       border-radius: var(--vui-radius);
       border: 1px solid var(--vui-border);
     }
-    .caption {
-      font-size: calc(var(--vui-font-size) - 2px);
-      line-height: calc(var(--vui-font-size) + 1px);
-    }
-    .body {
-      line-height: calc(var(--vui-font-size) + 5px);
+    .xs {
+      font-size: var(--text-xs);
+      line-height: var(--text-xs--line-height);
     }
     .row {
       display: flex;
@@ -59,13 +54,13 @@ import { DemoIconComponent } from '../../../shared/demo-icon.component';
       display: grid;
       justify-items: center;
       gap: 4px;
-      font-size: calc(var(--vui-font-size) - 2px);
+      font-size: 11px;
       color: var(--vui-muted);
     }
     .space span {
       width: calc(var(--vui-space) * var(--units));
       height: calc(var(--vui-space) * var(--units));
-      background: var(--vui-selection);
+      background: var(--vui-accent);
       border-radius: 2px;
     }
     .radius {
@@ -75,7 +70,7 @@ import { DemoIconComponent } from '../../../shared/demo-icon.component';
       height: 44px;
       border: 1px solid var(--vui-border);
       background: var(--vui-surface);
-      font-size: calc(var(--vui-font-size) - 2px);
+      font-size: 11px;
     }
     article {
       width: 180px;
@@ -84,23 +79,23 @@ import { DemoIconComponent } from '../../../shared/demo-icon.component';
   template: `
     <section class="demo themes" aria-label="Design tokens">
       @for (theme of themes; track theme) {
-        <div class="theme" [vuiTheme]="theme" [attr.data-testid]="'tokens-' + theme">
+        <div class="theme" [attr.data-vui-theme]="theme" [attr.data-testid]="'tokens-' + theme">
           <div>
             <h3>{{ theme === 'light' ? 'Light' : 'Dark' }} theme colors</h3>
             <div class="swatches">
               @for (color of colors; track color) {
                 <div class="swatch">
-                  <span class="chip" [style.background]="'var(--vui-' + color + ')'"></span>
+                  <span class="chip" [style.background]="'var(' + color + ')'"></span>
                   <code>{{ color }}</code>
                 </div>
               }
             </div>
           </div>
           <div>
-            <h3>Type</h3>
-            <div class="caption">Caption 11/14: meta, statuses, labels</div>
-            <div class="body">Body 13/18: content, fields, buttons</div>
-            <div class="body"><strong>Headline 13/18 semibold: node and container titles</strong></div>
+            <h3>Type: yours</h3>
+            <div>Inherited: node, row and group content</div>
+            <div><strong>font-semibold: node and group titles</strong></div>
+            <div class="xs">text-xs: meta and edge labels</div>
           </div>
           <div>
             <h3>Spacing on a 4pt grid</h3>
@@ -122,42 +117,14 @@ import { DemoIconComponent } from '../../../shared/demo-icon.component';
             </div>
           </div>
           <div>
-            <h3>Buttons</h3>
-            <div class="row">
-              <button vuiButton="primary" type="button">Primary</button>
-              <button vuiButton="secondary" type="button">Secondary</button>
-              <button vuiButton="plain" type="button">Plain</button>
-              <button vuiButton="secondary" vuiButtonSize="sm" type="button">Small</button>
-              <button vuiButton="plain" vuiButtonSize="sm" vuiButtonIcon type="button" aria-label="Close">
-                <app-demo-icon name="close" />
-              </button>
-              <button vuiButton="primary" type="button" disabled>Disabled</button>
-            </div>
-          </div>
-          <div>
             <h3>Elevation and parts</h3>
             <div class="row" style="align-items: flex-start">
               <article vuiNode>
                 <header vuiNodeHeader><span vuiTitle>Flat node</span></header>
                 <div vuiNodeBody><span vuiMeta>No blurred shadow on nodes</span></div>
               </article>
-              <div vuiToolbar>
-                <button vuiButton="plain" vuiButtonIcon type="button" aria-label="Zoom in">
-                  <app-demo-icon name="plus" />
-                </button>
-                <button vuiButton="plain" vuiButtonIcon type="button" aria-label="Zoom out">
-                  <app-demo-icon name="minus" />
-                </button>
-                <button vuiButton="plain" type="button">Floating</button>
-              </div>
+              <div vuiToolbar>Floating toolbar</div>
             </div>
-          </div>
-          <div class="row">
-            <span vuiStatus="neutral">Neutral</span>
-            <span vuiStatus="info">Info</span>
-            <span vuiStatus="success">Valid</span>
-            <span vuiStatus="warning" vuiStatusBusy>Running</span>
-            <span vuiStatus="danger">Failed</span>
           </div>
         </div>
       }
@@ -167,20 +134,15 @@ import { DemoIconComponent } from '../../../shared/demo-icon.component';
 export class TokensDemoComponent {
   readonly themes = ['light', 'dark'] as const;
   readonly colors = [
-    'canvas',
-    'surface',
-    'surface-muted',
-    'foreground',
-    'muted',
-    'border',
-    'separator',
-    'accent',
-    'on-accent',
-    'selection',
-    'success',
-    'warning',
-    'danger',
-    'info',
+    '--vui-background',
+    '--vui-surface',
+    '--vui-surface-muted',
+    '--vui-foreground',
+    '--vui-muted',
+    '--vui-border',
+    '--vui-accent',
+    '--vui-success',
+    '--vui-danger',
   ];
   readonly spacing = [1, 2, 3, 4, 5, 6, 7, 8];
 }

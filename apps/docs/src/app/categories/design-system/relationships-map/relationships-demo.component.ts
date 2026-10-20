@@ -27,7 +27,7 @@ interface Team {
 }
 type MapData = Person | Metric | Note | Team;
 
-/** Containers with their own connections, a note without ports, custom metrics and images, and a view mode. */
+/** Groups with their own connections, a note without ports, custom metrics and images, and a view mode. */
 @Component({
   selector: 'app-ui-relationships-demo',
   imports: [Vflow, Vui],
@@ -93,9 +93,12 @@ type MapData = Person | Metric | Note | Team;
     }
   `,
   template: `
-    <section class="demo" aria-label="Relationships and metrics map demo" [vuiTheme]="dark() ? 'dark' : 'light'">
+    <section
+      class="demo"
+      aria-label="Relationships and metrics map demo"
+      [attr.data-vui-theme]="dark() ? 'dark' : 'light'">
       <div class="controls">
-        <button vuiButton="secondary" type="button" (click)="flow()?.fitView()">Fit map</button>
+        <button class="button" type="button" (click)="flow()?.fitView()">Fit map</button>
         <label><input type="checkbox" [checked]="dark()" (change)="dark.set(!dark())" /> Dark theme</label>
         <label><input type="checkbox" [checked]="viewMode()" (change)="toggleViewMode()" /> View mode</label>
         <p>
@@ -110,16 +113,16 @@ type MapData = Person | Metric | Note | Team;
         <ng-template let-ctx vNode>
           @if (ctx.data().kind === 'team') {
             <div
-              vuiContainer
+              vuiGroup
               class="team"
-              [vuiSelected]="ctx.selected() || ctx.preselected()"
+              [selected]="ctx.selected() || ctx.preselected()"
               [style.width.px]="ctx.width()"
               [style.height.px]="ctx.height()">
-              <header vuiContainerHeader>
+              <header vuiGroupHeader>
                 <span vuiTitle>{{ ctx.data().title }}</span>
                 <span vuiMeta>{{ ctx.data().members }} people</span>
               </header>
-              <!-- The container has its own connections; it is not a parent of the other team. -->
+              <!-- The group has its own connections; it is not a parent of the other team. -->
               <span
                 vuiPort
                 handleType="source"
@@ -138,7 +141,7 @@ type MapData = Person | Metric | Note | Team;
           } @else {
             @switch (ctx.data().kind) {
               @case ('person') {
-                <article vuiNode class="person" [vuiSelected]="ctx.selected() || ctx.preselected()">
+                <article vuiNode class="person" [selected]="ctx.selected() || ctx.preselected()">
                   <header vuiNodeHeader>
                     <!-- The slot centers the 28px avatar on the first line of the name. -->
                     <span vuiIcon>
@@ -178,7 +181,7 @@ type MapData = Person | Metric | Note | Team;
                 </article>
               }
               @case ('metric') {
-                <article vuiNode class="metric" [vuiSelected]="ctx.selected() || ctx.preselected()">
+                <article vuiNode class="metric" [selected]="ctx.selected() || ctx.preselected()">
                   <header vuiNodeHeader>
                     <span vuiTitle>{{ ctx.data().title }}</span>
                   </header>
@@ -194,7 +197,7 @@ type MapData = Person | Metric | Note | Team;
               }
               @default {
                 <!-- A note has no ports: it is content on the canvas, not a participant of the graph. -->
-                <article vuiNode class="note" [vuiSelected]="ctx.selected() || ctx.preselected()">
+                <article vuiNode class="note" [selected]="ctx.selected() || ctx.preselected()">
                   <div vuiNodeBody>{{ ctx.data().text }}</div>
                 </article>
               }
@@ -207,7 +210,7 @@ type MapData = Person | Metric | Note | Team;
               vuiEdge
               [attr.d]="ctx.path()"
               [attr.marker-end]="ctx.markerEnd()"
-              [vuiSelected]="ctx.selected() || ctx.preselected()" />
+              [selected]="ctx.selected() || ctx.preselected()" />
           </svg:g>
           @if (ctx.data()?.label; as label) {
             <span *vEdgeLabel vuiEdgeLabel>{{ label }}</span>
@@ -256,7 +259,7 @@ export class RelationshipsDemoComponent {
     },
   ]);
   readonly edges = createEdges([
-    // A connection between the two containers themselves.
+    // A connection between the two groups themselves.
     {
       id: 'platform-growth',
       source: 'platform',

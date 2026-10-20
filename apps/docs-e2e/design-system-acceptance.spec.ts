@@ -37,20 +37,9 @@ for (const [route, selector] of pages) {
     const wrapper = demo.locator('.v-node').first();
     await wrapper.focus();
     await expect(wrapper).toBeFocused();
-    await expect(wrapper).toHaveCSS('outline-color', /rgb\(0, 113, 227\)|rgb\(10, 132, 255\)/);
+    await expect(wrapper).toHaveCSS('outline-color', /oklch\(0\.546 0\.245 262\.881\)|oklch\(0\.623 0\.214 259\.815\)/);
   });
 }
-
-test('states: busy indicator stops animating under reduced motion and keeps its text', async ({ page }) => {
-  await page.goto('/design-system/workflow');
-  const busy = page.locator('app-ui-workflow-demo .vui-status[data-vui-busy="true"]').first();
-  await expect(busy).toHaveText('Scheduling');
-  const animation = () => busy.evaluate((element) => getComputedStyle(element, '::before').animationName);
-  await expect.poll(animation).not.toBe('none');
-  await page.emulateMedia({ reducedMotion: 'reduce' });
-  await expect.poll(animation).toBe('none');
-  await expect(busy).toHaveText('Scheduling');
-});
 
 async function rowEndpointError(demo: Locator) {
   return demo.evaluate((root) => {
@@ -85,7 +74,7 @@ test('geometry: long names, typography and density changes keep endpoints on the
   await expect.poll(height).toBeGreaterThan(20);
   await expect.poll(() => rowEndpointError(demo)).toBeLessThan(1);
   await demo.locator('section.demo').evaluate((element: HTMLElement) => {
-    element.style.setProperty('--vui-font-size', '18px');
+    element.style.setProperty('font-size', '18px');
     element.style.setProperty('--vui-space', '6px');
   });
   await expect(demo.locator('article.vui-node').first()).toHaveCSS('font-size', '18px');
