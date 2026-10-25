@@ -5,6 +5,9 @@ import { booleanAttribute, Directive, input } from '@angular/core';
  * lighter `separator` color so the card reads as one surface. Dimensions, content, semantics and interaction belong to the consumer and core. The resting shadow has
  * no blur: a blurred shadow is rasterized again on every zoom step and pan of every visible node, which on a large
  * flow at a high pixel ratio costs more GPU time than the rest of the node.
+ * Selection colors the edge itself: the border and a 1px box-shadow ring outside it, with no gap. A box shadow is painted
+ * under the content, so ports on the edge stay on top of it, as on the resting border; an outline would cross them.
+ * Forced colors drop box shadows, so there the selection is an offset outline in `Highlight`.
  */
 @Directive({
   selector: '[vuiNode]',
@@ -12,7 +15,8 @@ import { booleanAttribute, Directive, input } from '@angular/core';
     class: `vui-node
       relative box-border rounded-vui-surface border border-vui-border
       bg-vui-surface text-vui-foreground antialiased shadow-vui-node
-      data-[vui-selected=true]:outline-2 data-[vui-selected=true]:outline-offset-2 data-[vui-selected=true]:outline-vui-accent
+      data-[vui-selected=true]:border-vui-accent data-[vui-selected=true]:ring-1 data-[vui-selected=true]:ring-vui-accent
+      forced-colors:data-[vui-selected=true]:outline-2 forced-colors:data-[vui-selected=true]:outline-offset-2
       forced-colors:data-[vui-selected=true]:outline-[Highlight]`,
     '[attr.data-vui-selected]': 'selected()',
   },

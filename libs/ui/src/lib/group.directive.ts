@@ -2,7 +2,7 @@ import { booleanAttribute, Directive, input } from '@angular/core';
 
 /**
  * A visual group with a title around other nodes: a tinted surface with a hairline, like a macOS group box. Parent relationships and shared movement
- * stay in graph data (ADR-0003); this directive does not create them.
+ * stay in graph data (ADR-0003); this directive does not create them. Selection colors the edge like `vuiNode`'s.
  */
 @Directive({
   selector: '[vuiGroup]',
@@ -10,7 +10,8 @@ import { booleanAttribute, Directive, input } from '@angular/core';
     class: `vui-group
       relative box-border rounded-vui-surface border border-vui-border
       bg-vui-surface-muted text-vui-foreground antialiased
-      data-[vui-selected=true]:outline-2 data-[vui-selected=true]:outline-offset-2 data-[vui-selected=true]:outline-vui-accent
+      data-[vui-selected=true]:border-vui-accent data-[vui-selected=true]:ring-1 data-[vui-selected=true]:ring-vui-accent
+      forced-colors:data-[vui-selected=true]:outline-2 forced-colors:data-[vui-selected=true]:outline-offset-2
       forced-colors:data-[vui-selected=true]:outline-[Highlight]`,
     '[attr.data-vui-selected]': 'selected()',
   },
