@@ -33,11 +33,11 @@ for (const [route, selector] of pages) {
         (violation) => `${violation.id}: ${violation.nodes.map((node) => node.target.join(' ')).join(', ')}`,
       ),
     ).toEqual([]);
-    // Core keeps focus on its wrappers; the theme maps --v-focus, so the outline is the selection color.
+    // Core keeps focus on its wrappers; the theme maps --v-focus, so the halo is the selection color, tinted.
     const wrapper = demo.locator('.v-node').first();
     await wrapper.focus();
     await expect(wrapper).toBeFocused();
-    await expect(wrapper).toHaveCSS('outline-color', /oklch\(0\.546 0\.245 262\.881\)|oklch\(0\.623 0\.214 259\.815\)/);
+    await expect(wrapper).toHaveCSS('box-shadow', /^oklab\((0\.546 .* \/ 0\.28|0\.623 .* \/ 0\.5)\) 0px 0px 0px 4px$/);
   });
 }
 

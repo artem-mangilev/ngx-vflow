@@ -71,7 +71,7 @@ test('traverses nodes, controls and edges, selects, moves, announces, deletes an
   await demo.getByRole('button', { name: 'Switch graph language' }).focus();
   await page.keyboard.press('Tab');
   await expect(draft).toBeFocused();
-  await expect(draft).toHaveCSS('outline-style', 'solid');
+  await expect(draft).not.toHaveCSS('box-shadow', 'none');
   await expect(demo.getByTestId('focused')).toHaveText(`Draft, node. Parent: Stage. ${DRAFT_INSTRUCTIONS}`);
   await page.keyboard.press('Enter');
   await expect(live).toHaveText('Draft selected. 1 selected in total.');

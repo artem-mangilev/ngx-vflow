@@ -13,12 +13,26 @@
   touch-action: auto;
 }
 
-// The ring is part of the zoomed content, like the node's border and selection outline. The outline follows the
-// host's corner radius, extended by the offset, so a radius equal to the node's own keeps the ring concentric.
+// The halo is part of the zoomed content, like the node's border. A box shadow follows the host's corner radius, so a
+// radius equal to the node's own keeps it concentric, and it is painted under the content: handles on the border and
+// a selection drawn by the template stay on top. A dark color scheme takes a stronger tint, which a dark canvas
+// otherwise swallows. Forced colors drop box shadows, so there it is a solid outline.
 :host(:focus-visible) {
   border-radius: var(--v-focus-radius);
-  outline: var(--v-focus-width) solid var(--v-focus);
-  outline-offset: var(--v-focus-offset);
+  outline: none;
+  box-shadow: 0 0 0 var(--v-focus-halo)
+    light-dark(
+      color-mix(in oklab, var(--v-focus) 28%, transparent),
+      color-mix(in oklab, var(--v-focus) 50%, transparent)
+    );
+}
+
+@media (forced-colors: active) {
+  :host(:focus-visible) {
+    outline: var(--v-focus-halo) solid var(--v-focus);
+    // Outside the band where the halo was: an outline is painted over the content, and handles reach into that band.
+    outline-offset: var(--v-focus-halo);
+  }
 }
 
 .v-node-wrapper {

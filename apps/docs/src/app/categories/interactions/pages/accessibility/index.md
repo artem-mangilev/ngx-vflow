@@ -77,9 +77,9 @@ A command that changes state reports it in the flow's own polite live region: `D
 
 **Opting out.** `nodesFocusable`, `edgesFocusable` and the per-entity `focusable` override remove Tab stops without affecting embedded controls. Keys pressed inside inputs, textareas, selects, contenteditable regions and buttons never run graph commands; `vNoKeyboard` on an element does the same for a whole area. With virtualization enabled, hidden entities are skipped by Tab and by focus recovery, so disable it where every entity must be reachable by keyboard.
 
-## Focus ring
+## Focus indicator
 
-Focus is drawn as a ring around the node wrapper, a dashed halo along the edge path and an inner border on the graph container. Four tokens style it: `--v-focus` for the color, `--v-focus-width`, `--v-focus-offset` and `--v-focus-radius`. The node ring is part of the zoomed content and scales with it, like the node's border. It is drawn on the wrapper around your template, so set the tokens on the flow element, or per node from a global stylesheet:
+Focus is drawn as a translucent halo around the node wrapper, along the edge path and inside the edge of the graph container. Three tokens style it: `--v-focus` for the color, `--v-focus-halo` for how far the halo reaches beyond the node, to each side of the edge and into the container, and `--v-focus-radius` for the node's corners. On nodes and edges the halo is part of the zoomed content and scales with it, like the node's border, and it is painted under the content, so handles on the border and a selection drawn by your template stay on top. Its tint is stronger under a dark `color-scheme`, where a light tint would disappear into the canvas. Under `forced-colors: active` the halo is opaque, and on nodes it becomes an outline just outside the handles. The halo is drawn on the wrapper around your template, so set the tokens on the flow element, or per node from a global stylesheet:
 
 ```css
 .v-node[data-shape='pill'] {

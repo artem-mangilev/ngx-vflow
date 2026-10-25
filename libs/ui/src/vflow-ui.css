@@ -74,10 +74,8 @@
     --v-minimap-mask: var(--vui-muted);
     --v-minimap-selected: var(--vui-accent);
     --v-focus: var(--vui-accent);
-    /* Node parts are rounded with the surface radius, so the core focus ring follows the same corners. */
+    /* Node parts are rounded with the surface radius, so the core focus halo follows the same corners. */
     --v-focus-radius: --theme(--radius-vui-surface);
-    /* Ports are centered on the border and reach half their size (one unit) outside it: the ring passes 1px beyond. */
-    --v-focus-offset: calc(var(--vui-space) + 1px);
   }
 
   /* Only an explicit scope touches the rest of your content in it: the application keeps its own color scheme. */

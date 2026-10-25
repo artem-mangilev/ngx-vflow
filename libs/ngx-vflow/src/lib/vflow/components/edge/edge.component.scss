@@ -7,15 +7,26 @@
   outline: none;
 }
 
+// The node halo along the path, drawn under the presentation: a band 2.5 halos wide, so one halo on each side of a
+// stroke half a halo wide (2px by default). It is in flow units and scales with the content, and its tint follows the
+// color scheme, as the node halo does.
 .v-focus-indicator {
   display: none;
   fill: none;
-  stroke: var(--v-focus);
-  // A halo around the path: the node ring width plus a margin on each side, kept on screen by non-scaling-stroke.
-  stroke-width: calc(var(--v-focus-width) * 2.5);
-  stroke-dasharray: 4 4;
-  vector-effect: non-scaling-stroke;
+  stroke: light-dark(
+    color-mix(in oklab, var(--v-focus) 28%, transparent),
+    color-mix(in oklab, var(--v-focus) 50%, transparent)
+  );
+  stroke-width: calc(var(--v-focus-halo) * 2.5);
+  stroke-linecap: round;
+  stroke-linejoin: round;
   pointer-events: none;
+}
+
+@media (forced-colors: active) {
+  .v-focus-indicator {
+    stroke: var(--v-focus);
+  }
 }
 
 :host(:focus-visible) {
