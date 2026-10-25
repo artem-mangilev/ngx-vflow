@@ -9,7 +9,7 @@ vi.mock('enquirer', () => ({ prompt: vi.fn() }));
 
 const root = join(__dirname, '../..');
 
-/** An Angular CLI workspace without Nx: angular.json, one application and a vflow.json without questions. */
+/** An Angular CLI workspace without Nx: angular.json and one application; no terminal, so nothing is asked. */
 function angularCliWorkspace(): UnitTestTree {
   const tree = new UnitTestTree(new HostTree());
   const json = (path: string, value: unknown) => tree.create(path, JSON.stringify(value));
@@ -24,12 +24,12 @@ function angularCliWorkspace(): UnitTestTree {
   });
   json('tsconfig.json', { compilerOptions: {} });
   json('tsconfig.app.json', { files: ['src/main.ts'] });
-  json('vflow.json', { ui: { componentsPath: 'libs/vflow-ui', importAlias: '@vflow/ui' } });
   tree.create('src/styles.css', "@import 'tailwindcss';\n");
   return tree;
 }
 
 describe('Angular CLI schematics', () => {
+  beforeEach(() => vi.stubEnv('NX_INTERACTIVE', 'false'));
   const runner = new SchematicTestRunner('@vflow/cli', join(root, 'generators.json'));
 
   it('lists every generator as a schematic with the same schema', () => {

@@ -1,6 +1,6 @@
 import { getProjects, type ProjectConfiguration, type Tree } from '@nx/devkit';
 import { prompt } from 'enquirer';
-import { isInteractive } from './config';
+import { isInteractive } from './install';
 
 /**
  * The application a generator works on: `--project`, the only application of the workspace, or the answer to a

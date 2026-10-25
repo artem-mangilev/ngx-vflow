@@ -14,8 +14,8 @@ ng g @vflow/cli:ui # or: nx g @vflow/cli:ui
 
 - `ngx-vflow` and `@angular/cdk` in `package.json`;
 - the tokens (`vflow-ui.css`) next to the global stylesheet of an application, imported after Tailwind;
-- the parts as `@vflow/ui`: an Nx library or, in Angular CLI, a tsconfig path. The first run asks for the `ui` section
-  of `vflow.json`.
+- the parts as `@vflow/ui`: an Nx library or, in Angular CLI, a tsconfig path. The first run asks for the folder and
+  the import alias; a later run finds the parts through that tsconfig path, so nothing else is stored.
 
 Run it again with `--project` to add the tokens to another application, or after an update to add new parts.
 

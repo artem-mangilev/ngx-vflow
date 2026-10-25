@@ -14,7 +14,7 @@
     },
     "directory": {
       "type": "string",
-      "description": "A directory where the parts are placed. Overrides componentsPath of vflow.json.",
+      "description": "A directory for the parts on the first run, or the installed set to update when there are several.",
       "x-priority": "important"
     },
     "importAlias": {

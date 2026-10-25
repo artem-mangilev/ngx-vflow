@@ -1,14 +1,23 @@
-import { type GeneratorCallback, joinPathFragments, logger, readJson, readNxJson, type Tree } from '@nx/devkit';
+import { type GeneratorCallback, joinPathFragments, logger, readNxJson, type Tree } from '@nx/devkit';
 import { readdirSync, readFileSync } from 'node:fs';
-import { join, posix, relative } from 'node:path';
-import { loadOrInitUiConfig, type UiConfig } from '../utils/config';
+import { join, relative } from 'node:path';
+import {
+  chooseUiInstall,
+  findInstalledUi,
+  normalizePath,
+  readTsConfigPaths,
+  rootTsConfig,
+  type UiInstall,
+} from '../utils/install';
 import { setJsoncValue } from '../utils/jsonc';
 
 /** Templates of the whole set, copied from libs/ui by `ui:sync-cli`. */
 const FILES = join(__dirname, 'templates', 'ui');
+/** File names of the parts, by which a later run recognizes an installed set. */
+const PART_FILES = readdirSync(join(FILES, 'src', 'lib')).map((file) => file.replace(/\.template$/, ''));
 
 export interface UiPartsOptions {
-  /** Directory of the parts; overrides `componentsPath` of vflow.json and skips its question. */
+  /** Directory of the parts on the first run, or the installed set to update when there are several. */
   directory?: string;
   /** Import alias of the parts on the first run; skips its question. */
   importAlias?: string;
@@ -20,62 +29,61 @@ export interface UiPartsOptions {
 
 /**
  * Step: copies the vflow UI parts into the workspace, like spartan's `ui` but as one set: the parts are one design
- * system in a handful of small files, so there is nothing to choose. The first run creates the `ui` section of
- * vflow.json, then an Nx library or, in Angular CLI, a tsconfig path. A later run, for example after an update of
- * @vflow/cli, only adds the files that are missing: the copied code belongs to the application.
+ * system in a handful of small files, so there is nothing to choose. The first run creates an Nx library or, in
+ * Angular CLI, a tsconfig path. A later run, for example after an update of @vflow/cli, finds the set through that
+ * path and only adds the files that are missing: the copied code belongs to the application. Nothing else is stored.
  */
 export async function ensureUiParts(tree: Tree, options: UiPartsOptions = {}): Promise<GeneratorCallback | undefined> {
   const angularCli = options.angularCli ?? false;
-  const config = await loadOrInitUiConfig(tree, options);
-  const directory = options.directory ?? config.componentsPath;
+  const installs = findInstalledUi(tree, PART_FILES);
+  const wanted = options.directory && normalizePath(options.directory);
+  let install = wanted ? installs.find(({ componentsPath }) => componentsPath === wanted) : installs[0];
   let task: GeneratorCallback | undefined;
 
-  const installed = config.importAlias in readTsConfigPaths(tree);
-  if (installed && normalizePath(directory) !== normalizePath(config.componentsPath)) {
-    // A later run adds missing files to the installed set; written elsewhere, nothing would import them.
+  if (!wanted && installs.length > 1) {
     throw new Error(
-      `${config.importAlias} is already installed in ${config.componentsPath}. ` +
-        'Run without --directory to add missing parts, or change componentsPath in vflow.json after moving it.',
+      `vflow UI is installed more than once: ${installs.map(({ componentsPath }) => componentsPath).join(', ')}. ` +
+        'Pass --directory to choose the set to update.',
     );
   }
-  if (!installed) {
-    // A first run writes the whole set; a folder of the application must not be overwritten or emptied. A thrown
-    // generator writes nothing, vflow.json included.
-    if (tree.exists(directory) && tree.children(directory).length) {
-      throw new Error(
-        `${directory} already has files. Pass --directory with a new or empty folder, or change componentsPath in vflow.json.`,
-      );
-    }
-    if (angularCli) setupAngularCliProject(tree, config, directory);
-    else task = await createNxLibrary(tree, config, directory, options.buildable);
+  if (!install && installs.length) {
+    // A later run adds missing files to the installed set; written elsewhere, nothing would import them.
+    const [{ componentsPath, importAlias }] = installs;
+    throw new Error(
+      `${importAlias} is already installed in ${componentsPath}. Run without --directory to add missing parts.`,
+    );
   }
 
+  const installed = !!install;
+  if (!install) {
+    install = await chooseUiInstall(options);
+    const taken = readTsConfigPaths(tree)[install.importAlias];
+    if (taken) {
+      throw new Error(
+        `${install.importAlias} already maps to ${taken.join(', ')}. Pass --importAlias with another alias.`,
+      );
+    }
+    // A first run writes the whole set; a folder of the application must not be overwritten or emptied. A thrown
+    // generator writes nothing.
+    if (tree.exists(install.componentsPath) && tree.children(install.componentsPath).length) {
+      throw new Error(`${install.componentsPath} already has files. Pass --directory with a new or empty folder.`);
+    }
+    if (angularCli) setupAngularCliProject(tree, install);
+    else task = await createNxLibrary(tree, install, options.buildable);
+  }
+
+  const directory = install.componentsPath;
   const skipped = copyParts(tree, directory, installed);
   if (installed) reportUnexported(tree, directory);
-  if (skipped.length) logger.info(`Kept ${skipped.length} existing files of ${config.importAlias}.`);
+  if (skipped.length) logger.info(`Kept ${skipped.length} existing files of ${install.importAlias}.`);
   return task;
 }
 
-/** The tsconfig whose `paths` the workspace shares: tsconfig.base.json in Nx, tsconfig.json in Angular CLI. */
-function rootTsConfig(tree: Tree): string | undefined {
-  return ['tsconfig.base.json', 'tsconfig.json'].find((path) => tree.exists(path));
-}
-
-function readTsConfigPaths(tree: Tree): Record<string, string[]> {
-  const path = rootTsConfig(tree);
-  if (!path) return {};
-  try {
-    return readJson(tree, path).compilerOptions?.paths ?? {};
-  } catch {
-    return {};
-  }
-}
-
 /** The parts live outside the app's `src`, so tsconfig.app.json must include them for the editor, as in spartan. */
-function setupAngularCliProject(tree: Tree, config: UiConfig, directory: string) {
+function setupAngularCliProject(tree: Tree, { componentsPath: directory, importAlias }: UiInstall) {
   const tsconfig = rootTsConfig(tree);
   if (!tsconfig) throw new Error('Could not find tsconfig.json to map the import alias of the parts in.');
-  setJsoncValue(tree, tsconfig, ['compilerOptions', 'paths', config.importAlias], () => [
+  setJsoncValue(tree, tsconfig, ['compilerOptions', 'paths', importAlias], () => [
     `./${joinPathFragments(directory, 'src', 'index.ts')}`,
   ]);
 
@@ -95,8 +103,7 @@ function setupAngularCliProject(tree: Tree, config: UiConfig, directory: string)
  */
 async function createNxLibrary(
   tree: Tree,
-  config: UiConfig,
-  directory: string,
+  { componentsPath: directory, importAlias }: UiInstall,
   buildable: boolean | undefined,
 ): Promise<GeneratorCallback> {
   let angular: typeof import('@nx/angular/generators');
@@ -114,7 +121,7 @@ async function createNxLibrary(
   const callback = await libraryGenerator(tree, {
     ...defaults,
     directory,
-    importPath: config.importAlias,
+    importPath: importAlias,
     buildable: buildable ?? defaults.buildable ?? true,
     prefix: 'vui',
     skipModule: true,
@@ -161,10 +168,6 @@ function reportUnexported(tree: Tree, directory: string) {
   if (missing.length) {
     logger.warn(`index.ts of the parts does not export ${missing.join(', ')}; add them if you use them.`);
   }
-}
-
-function normalizePath(path: string): string {
-  return posix.normalize(path).replace(/^\.\//, '').replace(/\/$/, '');
 }
 
 function escapeRegExp(text: string): string {
