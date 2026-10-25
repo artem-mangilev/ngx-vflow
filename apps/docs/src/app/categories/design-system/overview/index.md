@@ -170,21 +170,22 @@ typeface and size and use your Tailwind type utilities (`text-xs`, `font-semibol
 | `--vui-space`, `--vui-radius`                              | Grid unit and control radius                                  |
 | `--vui-shadow-node`, `--vui-shadow-floating`               | Elevation                                                     |
 
-| Core token                                                | Part                                                                     | Theme sets              |
-| --------------------------------------------------------- | ------------------------------------------------------------------------ | ----------------------- |
-| `--v-background`                                          | Flow canvas (`.v-root`); also fills nodes in the minimap                 | `--vui-background`      |
-| `--v-background-pattern`                                  | Dots and grid lines (`.v-background-pattern`)                            | `--vui-border`          |
-| `--v-selection-box`                                       | `.v-selection-box` stroke; its fill is the color at 12%                  | `--vui-accent`          |
-| `--v-resize-control`, `--v-resize-control-border`         | `.v-resize-control` handles and lines; the handle border                 | accent, surface         |
-| `--v-alignment-guides`                                    | `.v-alignment-guides`, at 50%                                            | `--vui-foreground`      |
-| `--v-connection`                                          | The line of a connection in progress without a template                  | `--vui-muted`           |
-| `--v-minimap-mask`, `--v-minimap-selected`                | Minimap mask (35%) and outlines; selected node outline                   | muted, accent           |
-| `--v-focus`                                               | Focus ring of nodes, edges and the flow container                        | `--vui-accent`          |
-| `--v-focus-width`, `--v-focus-offset`, `--v-focus-radius` | Focus ring geometry: 2px, 3px (the gap between a node and its ring), 0px | radius = surface radius |
-| `--v-node-toolbar-offset`                                 | Gap between a node and `<v-node-toolbar>`, 10px                          | —                       |
+| Core token                                                | Part                                                                     | Theme sets                          |
+| --------------------------------------------------------- | ------------------------------------------------------------------------ | ----------------------------------- |
+| `--v-background`                                          | Flow canvas (`.v-root`); also fills nodes in the minimap                 | `--vui-background`                  |
+| `--v-background-pattern`                                  | Dots and grid lines (`.v-background-pattern`)                            | `--vui-border`                      |
+| `--v-selection-box`                                       | `.v-selection-box` stroke; its fill is the color at 12%                  | `--vui-accent`                      |
+| `--v-resize-control`, `--v-resize-control-border`         | `.v-resize-control` handles and lines; the handle border                 | accent, surface                     |
+| `--v-alignment-guides`                                    | `.v-alignment-guides`, at 50%                                            | `--vui-foreground`                  |
+| `--v-connection`                                          | The line of a connection in progress without a template                  | `--vui-muted`                       |
+| `--v-minimap-mask`, `--v-minimap-selected`                | Minimap mask (35%) and outlines; selected node outline                   | muted, accent                       |
+| `--v-focus`                                               | Focus ring of nodes, edges and the flow container                        | `--vui-accent`                      |
+| `--v-focus-width`, `--v-focus-offset`, `--v-focus-radius` | Focus ring geometry: 2px, 3px (the gap between a node and its ring), 0px | offset 5px, radius = surface radius |
+| `--v-node-toolbar-offset`                                 | Gap between a node and `<v-node-toolbar>`, 10px                          | —                                   |
 
 The focus radius is the corner radius of the node itself; the ring follows it, widened by the offset, so it stays
-concentric, and the theme sets it to the surface radius since the node part is rounded with it. Without the UI theme a
+concentric, and the theme sets it to the surface radius since the node part is rounded with it. The theme also widens the
+offset to 5px, so the ring passes outside the ports centered on the border. Without the UI theme a
 flow keeps core's defaults, and a core token set on any ancestor reaches the flow. Under `forced-colors: active` core
 maps its tokens to system colors regardless of the theme. Core also sets the read-only `--v-zoom` on the flow element,
 so scaled content can keep screen-sized details (`calc(2px / var(--v-zoom, 1))`). The flow value is written when a
