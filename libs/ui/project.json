@@ -3,47 +3,17 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "projectType": "library",
   "sourceRoot": "libs/ui/src",
-  "tags": ["release"],
   "targets": {
-    "build": {
-      "executor": "nx:run-commands",
-      "outputs": ["{workspaceRoot}/dist/libs/ui"],
-      "options": {
-        "parallel": false,
-        "commands": [
-          "ng-packagr -p libs/ui/ng-package.json -c libs/ui/tsconfig.lib.prod.json",
-          "node libs/ui/scripts/build-styles.mjs"
-        ]
-      },
-      "configurations": {
-        "production": {},
-        "development": {
-          "commands": [
-            "ng-packagr -p libs/ui/ng-package.json -c libs/ui/tsconfig.lib.json",
-            "node libs/ui/scripts/build-styles.mjs"
-          ]
-        }
-      },
-      "defaultConfiguration": "production",
-      "dependsOn": ["^build"]
-    },
     "lint": {
       "executor": "@angular-eslint/builder:lint",
       "options": {
         "lintFilePatterns": ["libs/ui/src/**/*.ts"]
       }
     },
-    "nx-release-publish": {
-      "executor": "@nx/js:release-publish",
-      "options": {
-        "packageRoot": "dist/{projectRoot}"
-      }
-    },
-    "check-styles": {
+    "sync-cli": {
       "executor": "nx:run-commands",
-      "dependsOn": ["build"],
       "options": {
-        "command": "node libs/ui/scripts/check-styles.mjs"
+        "command": "node libs/ui/scripts/sync-cli.mjs"
       }
     }
   }

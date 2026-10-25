@@ -1,0 +1,30 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "VflowUi",
+  "title": "Set up vflow UI: ngx-vflow, the tokens in an application and the parts in the workspace",
+  "type": "object",
+  "properties": {
+    "project": {
+      "type": "string",
+      "description": "The application that gets the tokens. Asked for when the workspace has several applications."
+    },
+    "stylesEntryPoint": {
+      "type": "string",
+      "description": "Path to the global stylesheet relative to the workspace root. Found in the application when omitted."
+    },
+    "directory": {
+      "type": "string",
+      "description": "A directory for the parts on the first run, or the installed set to update when there are several.",
+      "x-priority": "important"
+    },
+    "importAlias": {
+      "type": "string",
+      "description": "The import alias of the parts on the first run, e.g. @acme/flow-ui. Asked for when omitted."
+    },
+    "buildable": {
+      "type": "boolean",
+      "description": "Nx only: whether the library of the parts gets a build target on the first run. The nx.json default of @nx/angular:library when omitted, then true."
+    }
+  },
+  "required": []
+}

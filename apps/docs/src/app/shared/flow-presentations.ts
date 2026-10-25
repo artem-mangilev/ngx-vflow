@@ -10,7 +10,7 @@ import { VflowEdgeInteractionDirective, Vflow } from 'ngx-vflow';
 
 interface NodeCtx {
   node: { id: string };
-  /** `type: 'group'` marks a container; the application owns this discriminator. */
+  /** `type: 'group'` marks a group; the application owns this discriminator. */
   data: () => { text?: string; title?: string; type?: string } | undefined;
   selected: () => boolean;
   preselected: () => boolean;
@@ -29,7 +29,7 @@ interface EdgeCtx {
   data: () => { label?: string } | undefined;
 }
 
-/** A card with the node's text and a target/source handle pair, or a titled container for `data.type === 'group'`. */
+/** A card with the node's text and a target/source handle pair, or a titled group for `data.type === 'group'`. */
 @Component({
   selector: 'docs-node',
   imports: [Vflow, Vui],
@@ -49,18 +49,18 @@ interface EdgeCtx {
   template: `
     @if (isGroup()) {
       <div
-        vuiContainer
-        [vuiSelected]="ctx().selected() || ctx().preselected()"
+        vuiGroup
+        [selected]="ctx().selected() || ctx().preselected()"
         [style.width.px]="ctx().width()"
         [style.height.px]="ctx().height()">
         @if (title(); as title) {
-          <header vuiContainerHeader>
+          <header vuiGroupHeader>
             <span vuiTitle>{{ title }}</span>
           </header>
         }
       </div>
     } @else {
-      <div vuiNode class="card" [vuiSelected]="ctx().selected() || ctx().preselected()">
+      <div vuiNode class="card" [selected]="ctx().selected() || ctx().preselected()">
         @if (html()) {
           <span [innerHTML]="text()"></span>
         } @else {
@@ -96,7 +96,7 @@ export class DocsNodeComponent {
       [attr.d]="ctx().path()"
       [attr.marker-start]="ctx().markerStart()"
       [attr.marker-end]="ctx().markerEnd()"
-      [vuiSelected]="ctx().selected() || ctx().preselected()" />
+      [selected]="ctx().selected() || ctx().preselected()" />
     @if (label(); as label) {
       <span *vEdgeLabel vuiEdgeLabel>{{ label }}</span>
     }

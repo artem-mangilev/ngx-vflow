@@ -94,7 +94,7 @@ const SPANISH: Partial<AriaLabelConfig> = {
           Press Tab to enter the graph, Enter to select, the arrow keys to move a selected node and Delete to remove the
           focused node or edge. The Editor node keeps its own input and button.
         </p>
-        <button vuiButton="secondary" type="button" (click)="spanish.set(!spanish())">Switch graph language</button>
+        <button class="button" type="button" (click)="spanish.set(!spanish())">Switch graph language</button>
       </div>
       <vflow
         view="auto"
@@ -104,14 +104,14 @@ const SPANISH: Partial<AriaLabelConfig> = {
         (deleteRequest)="onDeleteRequest($event)">
         <ng-template let-ctx vNode>
           @if (ctx.node.id === 'editor') {
-            <article vuiNode class="editor" [vuiSelected]="ctx.selected() || ctx.preselected()">
+            <article vuiNode class="editor" [selected]="ctx.selected() || ctx.preselected()">
               <header vuiNodeHeader><span vuiTitle>Editor</span></header>
               <div vuiRow>
                 <span vuiPort handleType="target" position="left"></span>
                 <input vNoDrag aria-label="Node title" placeholder="Node title" />
               </div>
               <footer vuiNodeFooter>
-                <button vuiButton="secondary" vNoDrag type="button" (click)="removeEditor()">Remove editor</button>
+                <button class="button" vNoDrag type="button" (click)="removeEditor()">Remove editor</button>
               </footer>
             </article>
           } @else {

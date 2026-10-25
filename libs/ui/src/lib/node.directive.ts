@@ -1,4 +1,4 @@
-import { Directive } from '@angular/core';
+import { booleanAttribute, Directive, input } from '@angular/core';
 
 /**
  * Card shell. Its border is the edge of the surface; the separators inside (header, footer, rows) use the
@@ -11,15 +11,19 @@ import { Directive } from '@angular/core';
   host: {
     class: `vui-node
       relative box-border rounded-vui-surface border border-vui-border
-      bg-vui-surface text-vui-foreground font-vui-sans tracking-vui-normal text-vui-body antialiased shadow-vui-node
-      data-[vui-selected=true]:outline-2 data-[vui-selected=true]:outline-offset-2 data-[vui-selected=true]:outline-vui-selection
+      bg-vui-surface text-vui-foreground antialiased shadow-vui-node
+      data-[vui-selected=true]:outline-2 data-[vui-selected=true]:outline-offset-2 data-[vui-selected=true]:outline-vui-accent
       forced-colors:data-[vui-selected=true]:outline-[Highlight]`,
+    '[attr.data-vui-selected]': 'selected()',
   },
 })
-export class VuiNode {}
+export class VuiNode {
+  /** Selection presentation: bind the core state, e.g. `ctx.selected() || ctx.preselected()`, or your own. */
+  readonly selected = input(false, { transform: booleanAttribute });
+}
 
 /**
- * Header row, set in the headline weight: items share the baseline of the title's first line, so an icon, meta or badge
+ * Header row, set in semibold: items share the baseline of the title's first line, so an icon, meta or badge
  * stays beside it when it wraps. Meta, status and buttons keep their own weights.
  */
 @Directive({
@@ -27,7 +31,7 @@ export class VuiNode {}
   host: {
     class: `vui-node-header
       flex items-baseline gap-vui-2 p-vui-3 border-b border-vui-separator
-      font-vui-strong`,
+      font-semibold`,
   },
 })
 export class VuiNodeHeader {}

@@ -1,16 +1,19 @@
 import { ChangeDetectionStrategy, Component, signal, viewChild } from '@angular/core';
-import { VuiTone, Vui } from '@vflow/ui';
+import { Vui } from '@vflow/ui';
 import { createEdges, createNodes, Vflow, VflowComponent } from 'ngx-vflow';
 import { DemoIconComponent, DemoIconName } from '../../../shared/demo-icon.component';
+
+/** Tones of the application's own badge; the vflow UI parts ship none. */
+type Tone = 'neutral' | 'info' | 'success' | 'warning' | 'danger';
 
 interface StepData {
   title: string;
   icon: DemoIconName;
   description: string;
   /** Application status: a word of this application, not a library lifecycle. */
-  status: { tone: VuiTone; text: string; busy?: boolean };
+  status: { tone: Tone; text: string };
   /** Model diagnostic: a second indicator next to status, independent from selection. */
-  diagnostic?: { tone: VuiTone; text: string };
+  diagnostic?: { tone: Tone; text: string };
 }
 
 @Component({
@@ -25,10 +28,6 @@ interface StepData {
       margin: 0;
       min-height: 58px;
     }
-    .controls {
-      --vui-accent: #0f766e;
-      --vui-on-accent: white;
-    }
     .footnote {
       margin: 0;
       min-height: 20px;
@@ -38,9 +37,9 @@ interface StepData {
     }
   `,
   template: `
-    <section class="demo" aria-label="Approval workflow demo" [vuiTheme]="dark() ? 'dark' : 'light'">
+    <section class="demo" aria-label="Approval workflow demo" [attr.data-vui-theme]="dark() ? 'dark' : 'light'">
       <div class="controls">
-        <button vuiButton="secondary" type="button" (click)="flow()?.fitView()">Fit workflow</button>
+        <button class="button" type="button" (click)="flow()?.fitView()">Fit workflow</button>
         <label><input type="checkbox" [checked]="dark()" (change)="dark.set(!dark())" /> Dark theme</label>
         <label><input type="checkbox" [checked]="readOnly()" (change)="toggleReadOnly()" /> Read only</label>
         <p>Approve the invoice; select a node to inspect it.</p>
@@ -54,7 +53,7 @@ interface StepData {
           [maxZoom]="2"
           (initialized)="flow()?.fitView()">
           <ng-template let-ctx vNode>
-            <article vuiNode [vuiSelected]="ctx.selected() || ctx.preselected()">
+            <article vuiNode [selected]="ctx.selected() || ctx.preselected()">
               <header vuiNodeHeader>
                 <span vuiIcon><app-demo-icon [name]="ctx.data().icon" /></span>
                 <span vuiTitle>{{ ctx.data().title }}</span>
@@ -64,21 +63,19 @@ interface StepData {
               </div>
               <footer vuiNodeFooter>
                 @if (ctx.node.id === 'review') {
-                  <span [vuiStatus]="approved() ? 'success' : 'warning'">{{
+                  <span class="badge" [attr.data-tone]="approved() ? 'success' : 'warning'">{{
                     approved() ? 'Approved' : 'Waiting'
                   }}</span>
                 } @else {
-                  <span [vuiStatus]="ctx.data().status.tone" [vuiStatusBusy]="ctx.data().status.busy ?? false">{{
-                    ctx.data().status.text
-                  }}</span>
+                  <span class="badge" [attr.data-tone]="ctx.data().status.tone">{{ ctx.data().status.text }}</span>
                 }
                 @if (ctx.data().diagnostic; as diagnostic) {
-                  <span [vuiStatus]="diagnostic.tone">{{ diagnostic.text }}</span>
+                  <span class="badge" [attr.data-tone]="diagnostic.tone">{{ diagnostic.text }}</span>
                 }
                 <span vuiActions>
                   @if (ctx.node.id === 'review') {
                     <button
-                      vuiButton="primary"
+                      class="button primary"
                       vNoDrag
                       type="button"
                       [disabled]="readOnly() || approved()"
@@ -87,7 +84,7 @@ interface StepData {
                     </button>
                   } @else {
                     <button
-                      vuiButton="secondary"
+                      class="button"
                       vNoDrag
                       type="button"
                       [disabled]="readOnly()"
@@ -121,8 +118,7 @@ interface StepData {
                   <div vuiToolbar>
                     <span>{{ readOnly() ? 'View only' : 'Drag to move' }}</span>
                     <button
-                      vuiButton="plain"
-                      vuiButtonSize="sm"
+                      class="button plain small"
                       vNoDrag
                       type="button"
                       [attr.aria-label]="'Details of ' + ctx.data().title"
@@ -140,7 +136,7 @@ interface StepData {
                 vuiEdge
                 [attr.d]="ctx.path()"
                 [attr.marker-end]="ctx.markerEnd()"
-                [vuiSelected]="ctx.selected() || ctx.preselected()" />
+                [selected]="ctx.selected() || ctx.preselected()" />
             </svg:g>
             @if (ctx.data()?.start; as text) {
               <span *vEdgeLabel="'start'" vuiEdgeLabel vuiMeta [attr.data-label]="text">{{ text }}</span>
@@ -155,13 +151,7 @@ interface StepData {
         </vflow>
         @if (flow(); as flow) {
           <vui-controls class="stage-controls" [flow]="flow">
-            <button
-              vuiButton="plain"
-              vuiButtonIcon
-              type="button"
-              aria-label="Reset demo"
-              title="Reset demo"
-              (click)="reset()">
+            <button type="button" aria-label="Reset demo" title="Reset demo" (click)="reset()">
               <app-demo-icon name="reset" />
             </button>
           </vui-controls>
@@ -209,7 +199,7 @@ export class WorkflowDemoComponent {
         title: 'Schedule payment',
         icon: 'arrow-right',
         description: 'Send the approved invoice to accounting.',
-        status: { tone: 'info', text: 'Scheduling', busy: true },
+        status: { tone: 'info', text: 'Scheduling' },
       },
     },
     {

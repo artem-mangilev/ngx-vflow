@@ -1,6 +1,6 @@
 /**
  * Optional pattern drawn over the flow canvas. The canvas color itself and the pattern color are CSS:
- * `--v-background` and `--v-muted` (or the `.v-background-pattern` class).
+ * `--v-background` and `--v-background-pattern` (or the `.v-background-pattern` class).
  */
 export type Background = DotsBackground | ImageBackground | GridBackground;
 

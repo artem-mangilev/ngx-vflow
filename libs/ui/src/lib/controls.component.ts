@@ -1,6 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { VflowComponent } from 'ngx-vflow';
-import { VuiButton } from './button.directive';
 
 export interface VuiControlsLabels {
   group: string;
@@ -10,29 +9,31 @@ export interface VuiControlsLabels {
 }
 
 /**
- * Viewport controls: zoom in, zoom out and fit view for the given flow instance, plus a slot for your
- * own buttons, styled as `<button vuiButton="plain" vuiButtonIcon>`. Zoom respects the flow's `minZoom`/`maxZoom`; positioning is yours.
+ * Viewport controls: zoom in, zoom out and fit view for the given flow instance, plus a slot for your own buttons.
+ * Every button child, built-in or projected, is a square icon button without a fill at rest; give a projected one an
+ * accessible name. Zoom respects the flow's `minZoom`/`maxZoom`; positioning is yours.
  */
 @Component({
   selector: 'vui-controls',
-  imports: [VuiButton],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: `vui-controls
       inline-flex box-border items-center gap-vui-1 p-vui-1 rounded-vui-surface
-      bg-vui-surface/85 backdrop-blur-vui-material backdrop-saturate-180 shadow-vui-floating font-vui-sans tracking-vui-normal antialiased
-      forced-colors:border forced-colors:border-[CanvasText]`,
+      bg-vui-surface/85 backdrop-blur-vui-material backdrop-saturate-180 shadow-vui-floating antialiased
+      forced-colors:border forced-colors:border-[CanvasText]
+      [&>button]:inline-flex [&>button]:box-border [&>button]:items-center [&>button]:justify-center [&>button]:size-vui-7
+      [&>button]:rounded-vui-control [&>button]:border [&>button]:border-transparent [&>button]:bg-transparent [&>button]:text-vui-muted
+      [&>button]:cursor-pointer [&>button]:select-none [&>button]:transition-colors
+      [&>button:enabled:hover]:bg-vui-surface-muted [&>button:enabled:hover]:text-vui-foreground
+      [&>button:enabled:active]:bg-[color-mix(in_oklab,var(--vui-surface-muted),var(--vui-foreground)_12%)]
+      [&>button:disabled]:opacity-40 [&>button:disabled]:cursor-not-allowed
+      [&>button:focus-visible]:outline-2 [&>button:focus-visible]:outline-offset-2 [&>button:focus-visible]:outline-vui-accent
+      forced-colors:[&>button]:border-[ButtonText]`,
     role: 'group',
     '[attr.aria-label]': 'labels().group',
   },
   template: `
-    <button
-      vuiButton="plain"
-      vuiButtonIcon
-      type="button"
-      [attr.aria-label]="labels().zoomIn"
-      [disabled]="!canZoomIn()"
-      (click)="flow().zoomIn()">
+    <button type="button" [attr.aria-label]="labels().zoomIn" [disabled]="!canZoomIn()" (click)="flow().zoomIn()">
       <svg
         aria-hidden="true"
         width="16"
@@ -45,13 +46,7 @@ export interface VuiControlsLabels {
         <path d="M8 3v10M3 8h10" />
       </svg>
     </button>
-    <button
-      vuiButton="plain"
-      vuiButtonIcon
-      type="button"
-      [attr.aria-label]="labels().zoomOut"
-      [disabled]="!canZoomOut()"
-      (click)="flow().zoomOut()">
+    <button type="button" [attr.aria-label]="labels().zoomOut" [disabled]="!canZoomOut()" (click)="flow().zoomOut()">
       <svg
         aria-hidden="true"
         width="16"
@@ -64,12 +59,7 @@ export interface VuiControlsLabels {
         <path d="M3 8h10" />
       </svg>
     </button>
-    <button
-      vuiButton="plain"
-      vuiButtonIcon
-      type="button"
-      [attr.aria-label]="labels().fitView"
-      (click)="flow().fitView()">
+    <button type="button" [attr.aria-label]="labels().fitView" (click)="flow().fitView()">
       <svg
         aria-hidden="true"
         width="16"

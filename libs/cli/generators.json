@@ -1,0 +1,16 @@
+{
+  "generators": {
+    "ui": {
+      "factory": "./src/generators/ui/generator",
+      "schema": "./src/generators/ui/schema.json",
+      "description": "Set up vflow UI: ngx-vflow, the tokens in an application and the parts in the workspace."
+    }
+  },
+  "schematics": {
+    "ui": {
+      "factory": "./src/generators/ui/compat",
+      "schema": "./src/generators/ui/schema.json",
+      "description": "Set up vflow UI: ngx-vflow, the tokens in an application and the parts in the workspace."
+    }
+  }
+}

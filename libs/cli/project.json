@@ -1,0 +1,57 @@
+{
+  "name": "cli",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "library",
+  "sourceRoot": "libs/cli/src",
+  "tags": ["release"],
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "outputs": ["{workspaceRoot}/dist/libs/cli"],
+      "options": {
+        "parallel": false,
+        "commands": [
+          "rm -rf dist/libs/cli",
+          "tsc -p libs/cli/tsconfig.lib.json",
+          "node libs/cli/scripts/copy-assets.mjs"
+        ]
+      },
+      "dependsOn": [
+        {
+          "projects": ["ui"],
+          "target": "sync-cli"
+        }
+      ]
+    },
+    "lint": {
+      "executor": "@angular-eslint/builder:lint",
+      "options": {
+        "lintFilePatterns": ["libs/cli/src/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc -p tsconfig.spec.json --noEmit && vitest run",
+        "cwd": "{projectRoot}"
+      },
+      "configurations": {
+        "watch": {
+          "command": "vitest"
+        }
+      },
+      "dependsOn": [
+        {
+          "projects": ["ui"],
+          "target": "sync-cli"
+        }
+      ]
+    },
+    "nx-release-publish": {
+      "executor": "@nx/js:release-publish",
+      "options": {
+        "packageRoot": "dist/{projectRoot}"
+      }
+    }
+  }
+}
