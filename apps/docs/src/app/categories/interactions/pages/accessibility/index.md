@@ -55,7 +55,7 @@ The keys are listed on [Keyboard shortcuts](../keyboard-shortcuts); this is what
 - **Select** replaces the selection with the focused entity, or toggles it while the multiselection modifier is held. **Clear selection** empties it and keeps focus. Neither writes selection in `selectionMode="manual"`, and an entity with `selectable: false` can be deselected but not selected.
 - **Move** shifts every selected movable node by 5 flow units, 20 with Shift, or one grid cell, four with Shift, on an axis where `snapGrid` is above 1. The focused node must itself be selected and movable. Parent extents and snapping apply, position signals update and the usual position notifications fire.
 - **Delete** emits `(deleteRequest)` with `{ nodeIds, edgeIds }`: the whole selection when the focused entity is selected, otherwise only the focused entity. The library removes nothing.
-- **Pan, zoom in, zoom out and fit view** run from a focused entity and from the graph container. Arrows pan only when they do not move a node.
+- **Pan, zoom in, zoom out and fit view** run from a focused entity. Arrows pan only when they do not move a node.
 
 ```html
 <vflow [nodes]="nodes" [edges]="edges" (deleteRequest)="onDeleteRequest($event)" />
@@ -71,7 +71,7 @@ onDeleteRequest(request: DeleteRequest) {
 
 A command that changes state reports it in the flow's own polite live region: `Draft selected. 1 selected in total.`, `Selection cleared.`, `Moved node right. Position: 25, 20.`, `Zoom 120%.`. Panning is silent, and so are pointer and programmatic changes. There is no public API for announcing your own messages.
 
-**Focus recovery.** When the focused entity is removed or stops being focusable, focus moves to the next entity, then the previous one, then the graph container. Nothing takes focus on page load.
+**Focus recovery.** When the focused entity is removed or stops being focusable, focus moves to the next entity, then the previous one; when there is none, focus returns to the page. The graph container is not a focus target, so a click on the empty pane does not take focus either. Nothing takes focus on page load.
 
 **Focus pan.** A node that receives keyboard focus while fully offscreen is centered at the current zoom. `[autoPanOnNodeFocus]="false"` turns this off; edges and arrow movement never pan.
 
@@ -79,7 +79,7 @@ A command that changes state reports it in the flow's own polite live region: `D
 
 ## Focus indicator
 
-Focus is drawn as a translucent halo around the node wrapper, along the edge path and inside the edge of the graph container. Three tokens style it: `--v-focus` for the color, `--v-focus-halo` for how far the halo reaches beyond the node, to each side of the edge and into the container, and `--v-focus-radius` for the node's corners. On nodes and edges the halo is part of the zoomed content and scales with it, like the node's border, and it is painted under the content, so handles on the border and a selection drawn by your template stay on top. Its tint is stronger under a dark `color-scheme`, where a light tint would disappear into the canvas. Under `forced-colors: active` the halo is opaque, and on nodes it becomes an outline just outside the handles. The halo is drawn on the wrapper around your template, so set the tokens on the flow element, or per node from a global stylesheet:
+Focus is drawn as a translucent halo around the node wrapper and along the edge path. Three tokens style it: `--v-focus` for the color, `--v-focus-halo` for how far the halo reaches beyond the node and to each side of the edge, and `--v-focus-radius` for the node's corners. On nodes and edges the halo is part of the zoomed content and scales with it, like the node's border, and it is painted under the content, so handles on the border and a selection drawn by your template stay on top. Its tint is stronger under a dark `color-scheme`, where a light tint would disappear into the canvas. Under `forced-colors: active` the halo is opaque, and on nodes it becomes an outline just outside the handles. The halo is drawn on the wrapper around your template, so set the tokens on the flow element, or per node from a global stylesheet:
 
 ```css
 .v-node[data-shape='pill'] {

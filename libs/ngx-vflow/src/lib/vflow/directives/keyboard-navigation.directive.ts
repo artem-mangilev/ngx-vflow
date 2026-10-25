@@ -5,27 +5,25 @@ import { KeyboardService } from '../services/keyboard.service';
 import { KeyboardEntityCommandsService } from '../services/keyboard-entity-commands.service';
 import { KeyboardViewportCommandsService } from '../services/keyboard-viewport-commands.service';
 import { KeyboardCommandName } from '../types/keyboard-shortcuts.type';
-import { ARROW_COMMANDS, KeyboardCommandScope } from '../utils/keyboard-commands';
+import { ARROW_COMMANDS } from '../utils/keyboard-commands';
 import { KeyboardEntityDirective } from './keyboard-entity.directive';
 
 interface KeyboardCommand {
   name: KeyboardCommandName;
-  scope: KeyboardCommandScope;
   /** Whether holding the key runs the command again. */
   repeat: boolean;
   /** Whether the command took the press. Declining leaves the key to the commands behind it. */
-  run: (model: NodeModel | EdgeModel | null, event: KeyboardEvent) => boolean;
+  run: (model: NodeModel | EdgeModel, event: KeyboardEvent) => boolean;
 }
 
 /**
- * Native Tab traversal, focus repair when an entity disappears, and the one listener that turns a key press into a
- * command. A press is answered by the first command whose key it carries, that its origin allows, and that accepts
- * it.
+ * Native Tab traversal, focus repair when an entity disappears, and the one listener that turns a key press on a
+ * focused entity wrapper into a command. A press is answered by the first command whose key it carries and that accepts
+ * it. The container itself is not focusable: a click on the pane leaves focus to the page, as in other flow libraries.
  */
 @Directive({
   selector: '[vflowKeyboard]',
   host: {
-    tabindex: '-1',
     '(focusin)': 'onFocusIn($event)',
     '(focusout)': 'onFocusOut($event)',
     '(keydown)': 'onKeydown($event)',
@@ -43,29 +41,22 @@ export class KeyboardNavigationDirective {
 
   /** Every command in the order a press consults them. */
   private readonly commands: KeyboardCommand[] = [
-    { name: 'select', scope: 'entity', repeat: false, run: (model) => !!model && this.entityCommands.select(model) },
-    { name: 'clearSelection', scope: 'entity', repeat: false, run: () => this.entityCommands.clearSelection() },
-    {
-      name: 'delete',
-      scope: 'entity',
-      repeat: false,
-      run: (model) => !!model && this.entityCommands.requestDeletion(model),
-    },
+    { name: 'select', repeat: false, run: (model) => this.entityCommands.select(model) },
+    { name: 'clearSelection', repeat: false, run: () => this.entityCommands.clearSelection() },
+    { name: 'delete', repeat: false, run: (model) => this.entityCommands.requestDeletion(model) },
     ...ARROW_COMMANDS.map((arrow): KeyboardCommand => ({
       name: arrow.move,
-      scope: 'entity',
       repeat: true,
-      run: (model, event) => !!model && this.entityCommands.move(model, arrow, event.shiftKey),
+      run: (model, event) => this.entityCommands.move(model, arrow, event.shiftKey),
     })),
     ...ARROW_COMMANDS.map((arrow): KeyboardCommand => ({
       name: arrow.pan,
-      scope: 'both',
       repeat: true,
       run: (_model, event) => this.viewportCommands.pan(arrow, event.shiftKey),
     })),
-    { name: 'zoomIn', scope: 'both', repeat: true, run: () => this.viewportCommands.zoom(1) },
-    { name: 'zoomOut', scope: 'both', repeat: true, run: () => this.viewportCommands.zoom(-1) },
-    { name: 'fitView', scope: 'both', repeat: false, run: () => this.viewportCommands.fitView() },
+    { name: 'zoomIn', repeat: true, run: () => this.viewportCommands.zoom(1) },
+    { name: 'zoomOut', repeat: true, run: () => this.viewportCommands.zoom(-1) },
+    { name: 'fitView', repeat: false, run: () => this.viewportCommands.fitView() },
   ];
 
   constructor() {
@@ -87,7 +78,10 @@ export class KeyboardNavigationDirective {
         const next =
           [...previous.slice(index + 1), ...previous.slice(0, index).reverse()].find(isEligible) ??
           entities.find(isEligible);
-        (next?.element ?? this.element).focus({ preventScroll: true });
+        if (next) next.element.focus({ preventScroll: true });
+        // Without one, focus goes back to the page: the container is not a focus target, and a wrapper that stopped
+        // being focusable must not keep it.
+        else if (active === target && (target instanceof HTMLElement || target instanceof SVGElement)) target.blur();
       });
     });
   }
@@ -105,14 +99,12 @@ export class KeyboardNavigationDirective {
     )
       return;
 
-    // Embedded application content keeps its own keys: only a library wrapper and the container issue commands.
+    // Embedded application content keeps its own keys: only a library wrapper issues commands.
     const entity = this.entities().find((candidate) => candidate.element === target);
-    const origin: KeyboardCommandScope | null = entity ? 'entity' : target === this.element ? 'container' : null;
-    if (!origin || (entity && !entity.vflowKeyboardEntity().focusable())) return;
-    const model = entity?.vflowKeyboardEntity() ?? null;
+    if (!entity || !entity.vflowKeyboardEntity().focusable()) return;
+    const model = entity.vflowKeyboardEntity();
 
     for (const command of this.commands) {
-      if (command.scope !== 'both' && command.scope !== origin) continue;
       if (!this.keyboard.isCommand(command.name, event)) continue;
       // Auto-repeat holds the key for its command while only the repeating ones run again.
       if (!(event.repeat && !command.repeat) && !command.run(model, event)) continue;

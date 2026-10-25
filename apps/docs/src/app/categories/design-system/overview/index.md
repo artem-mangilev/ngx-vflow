@@ -179,7 +179,7 @@ typeface and size and use your Tailwind type utilities (`text-xs`, `font-semibol
 | `--v-alignment-guides`                            | `.v-alignment-guides`, at 50%                            | `--vui-foreground`      |
 | `--v-connection`                                  | The line of a connection in progress without a template  | `--vui-muted`           |
 | `--v-minimap-mask`, `--v-minimap-selected`        | Minimap mask (35%) and outlines; selected node outline   | muted, accent           |
-| `--v-focus`                                       | Focus halo of nodes, edges and the flow container        | `--vui-accent`          |
+| `--v-focus`                                       | Focus halo of nodes and edges                            | `--vui-accent`          |
 | `--v-focus-halo`, `--v-focus-radius`              | Focus geometry: halo 4px, node radius 0px                | radius = surface radius |
 | `--v-node-toolbar-offset`                         | Gap between a node and `<v-node-toolbar>`, 10px          | —                       |
 

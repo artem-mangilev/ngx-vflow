@@ -2,7 +2,7 @@
 export type KeyboardModifierName =
   'selection' | 'multiSelection' | 'panActivation' | 'zoomActivation' | 'alignmentBypass';
 
-/** Commands that run once per key press on a focused entity wrapper or on the graph container. */
+/** Commands that run once per key press on a focused entity wrapper. */
 export type KeyboardCommandName =
   | 'select'
   | 'clearSelection'

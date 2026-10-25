@@ -1,9 +1,6 @@
 import { Point } from '../interfaces/point.interface';
 import { KeyboardCommandName } from '../types/keyboard-shortcuts.type';
 
-/** Where a press must come from: a focused entity wrapper, the graph container, or either of them. */
-export type KeyboardCommandScope = 'entity' | 'container' | 'both';
-
 export type ArrowDirection = 'left' | 'right' | 'up' | 'down';
 
 /** A direction with the command that moves a node and the command that pans the view in it. */

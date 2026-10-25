@@ -242,7 +242,9 @@ describe('public keyboard graph navigation', () => {
     host.nodesFocusable.set(false);
     fixture.detectChanges();
     await fixture.whenStable();
-    expect(document.activeElement).toBe(root.querySelector('[role="region"]'));
+    // With no focusable entity left, focus goes back to the page: the container is not a focus target.
+    expect(document.activeElement).toBe(document.body);
+    expect(root.querySelector('[role="region"]')!.hasAttribute('tabindex')).toBe(false);
     const outside = root.querySelector('button')!;
     outside.focus();
     host.nodes.set([]);
@@ -523,7 +525,7 @@ describe('public keyboard graph navigation', () => {
     subscription.unsubscribe();
   });
 
-  it('pans and zooms the viewport from wrappers that do not consume the keys and from the container', async () => {
+  it('pans and zooms the viewport from wrappers that do not consume the keys', async () => {
     const { fixture, host, root } = await setup();
     const live = root.querySelector('[aria-live="polite"]')!;
     const spoken = async () => {
@@ -536,7 +538,6 @@ describe('public keyboard graph navigation', () => {
     };
     const child = root.querySelector<HTMLElement>('[aria-label="Child"]')!;
     const edge = root.querySelector<SVGElement>('[aria-label="Route"]')!;
-    const container = root.querySelector<HTMLElement>('[role="region"]')!;
     host.autoPanOnNodeFocus.set(false);
     fixture.detectChanges();
     await settle();
@@ -583,14 +584,14 @@ describe('public keyboard graph navigation', () => {
     await settle();
     expect(host.flow().viewport().zoom).toBeCloseTo(0.9, 5);
     expect(await spoken()).toBe('Zoom 90%.');
-    // Fit view announces the resulting zoom; the container itself accepts the same commands.
-    container.focus();
-    key(container, '0', 'Digit0');
+    // Fit view announces the resulting zoom.
+    key(child, '0', 'Digit0');
     await settle();
     const fitted = host.flow().viewport();
     expect(fitted.zoom).not.toBeCloseTo(0.9, 5);
     expect(await spoken()).toBe(`Zoom ${Math.round(fitted.zoom * 100)}%.`);
-    key(container, 'ArrowDown');
+    edge.focus();
+    key(edge, 'ArrowDown');
     await settle();
     expect(host.flow().viewport()).toEqual({ ...fitted, y: fitted.y - 15 });
     // Keys from embedded content are left alone; disabled commands drop their instruction.
@@ -616,7 +617,7 @@ describe('public keyboard graph navigation', () => {
     host.keyboardShortcuts.set({ commands: { zoomIn: [], zoomOut: [], fitView: [] } });
     fixture.detectChanges();
     await settle();
-    expect(key(container, '=', 'Equal').defaultPrevented).toBe(false);
+    expect(key(edge, '=', 'Equal').defaultPrevented).toBe(false);
     expect(description()).toBe('Parent: Parent. Selected. Use arrow keys to pan.');
   });
 

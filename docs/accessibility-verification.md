@@ -170,3 +170,15 @@ Archive. Selected.`).
   with focus recovery, focus auto-pan, viewport commands, the German layout keys, the language switch and axe stay,
   in `apps/docs-e2e/accessibility.spec.ts`; the shortcut configuration scenario moved to `keyboard-shortcuts.spec.ts`.
 - Verified in Chromium: 6 targeted e2e tests and the full docs e2e suite. No new screen-reader session was run.
+
+## Non-focusable container and focus halo — 2026-10-25
+
+- The flow container no longer has a `tabindex`, as in React Flow: Tab traverses nodes and edges only, a click on the
+  empty pane leaves focus to the page, and viewport commands run from a focused entity. Focus recovery moves to the next
+  entity, then the previous one; with none left, a wrapper that stopped being focusable is blurred and focus returns to
+  the page.
+- Focus on nodes and edges is a translucent halo (`--v-focus-halo`, 28% tint, 50% under a dark `color-scheme`) painted
+  under the content; forced colors get an opaque outline or band. A translucent tint does not reach the 3:1 contrast of
+  WCAG 1.4.11; accepted as a design trade-off.
+- Verified in Chromium on the relationships map: pane click focuses `body`, arrows then leave the viewport alone, halos
+  render in light and dark. Library suite 444 passed; full docs e2e suite 47 passed. No new screen-reader session was run.

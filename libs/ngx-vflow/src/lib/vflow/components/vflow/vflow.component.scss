@@ -63,17 +63,16 @@
   initial-value: #0f4c75;
 }
 
-// Focus of nodes, edges and the flow container: a translucent halo of this color around nodes, along edges and inside
-// the container's edge.
+// Focus of nodes and edges: a translucent halo of this color around nodes and along edges.
 @property --v-focus {
   syntax: '<color>';
   inherits: true;
   initial-value: #005fcc;
 }
 
-// How far the halo reaches beyond the node's border box, to each side of an edge and into the container. On nodes and
-// edges a flow length: the halo is part of the zoomed content, like borders. The radius is the corner radius of the
-// focused node itself, in flow units, so the halo follows its shape.
+// How far the halo reaches beyond the node's border box and to each side of an edge. A flow length: the halo is part
+// of the zoomed content, like borders. The radius is the corner radius of the focused node itself, in flow units, so
+// the halo follows its shape.
 @property --v-focus-halo {
   syntax: '<length>';
   inherits: true;
@@ -133,24 +132,6 @@
   position: relative;
   overflow: hidden;
   background-color: var(--v-background);
-
-  // The container is a keyboard target: it takes focus after the last entity disappears and runs the viewport
-  // commands. The halo is drawn inside the box so it stays visible in a full-page canvas and adds no overflow. It is an
-  // outline, which is painted over the layers inside, where an inset box shadow would be covered by them.
-  &:focus-visible {
-    outline: var(--v-focus-halo) solid
-      light-dark(
-        color-mix(in oklab, var(--v-focus) 28%, transparent),
-        color-mix(in oklab, var(--v-focus) 50%, transparent)
-      );
-    outline-offset: calc(-1 * var(--v-focus-halo));
-  }
-
-  @media (forced-colors: active) {
-    &:focus-visible {
-      outline-color: var(--v-focus);
-    }
-  }
 }
 
 // Until the first layout is complete only the canvas is painted: the layers below follow the viewport, which the

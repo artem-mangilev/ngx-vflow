@@ -1,4 +1,4 @@
-Keyboard shortcuts come in two kinds. **Modifiers** change what a pointer gesture does while they are held. **Commands** run once per key press on a focused node or edge, or on the graph container.
+Keyboard shortcuts come in two kinds. **Modifiers** change what a pointer gesture does while they are held. **Commands** run once per key press on a focused node or edge.
 
 # Defaults
 
@@ -20,10 +20,10 @@ Keyboard shortcuts come in two kinds. **Modifiers** change what a pointer gestur
 | `clearSelection`                              | `Escape`              | a focused node or edge                      |
 | `delete`                                      | `Delete`, `Backspace` | a focused node or edge                      |
 | `moveUp`, `moveDown`, `moveLeft`, `moveRight` | the arrow keys        | a focused node that is selected and movable |
-| `panUp`, `panDown`, `panLeft`, `panRight`     | the arrow keys        | a focused entity or the graph container     |
-| `zoomIn`                                      | `+`, `=`, `NumpadAdd` | a focused entity or the graph container     |
-| `zoomOut`                                     | `-`, `NumpadSubtract` | a focused entity or the graph container     |
-| `fitView`                                     | `0`, `Numpad0`        | a focused entity or the graph container     |
+| `panUp`, `panDown`, `panLeft`, `panRight`     | the arrow keys        | a focused entity                            |
+| `zoomIn`                                      | `+`, `=`, `NumpadAdd` | a focused entity                            |
+| `zoomOut`                                     | `-`, `NumpadSubtract` | a focused entity                            |
+| `fitView`                                     | `0`, `Numpad0`        | a focused entity                            |
 
 When two commands share a key, the one listed first takes it, and a command that cannot act on the press leaves the key to the next one. That is why an arrow moves a node while the focused node is selected and movable, and pans the view otherwise. `Shift` makes movement and panning four times faster; that multiplier is fixed. Holding a key repeats movement, panning and zooming, while selection, deletion and fit view run once per press.
 
