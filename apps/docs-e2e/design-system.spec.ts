@@ -44,7 +44,15 @@ test('consumer DOM, scoped themes, selection and native workflow actions', async
   await expect(workflow.locator('v-node-toolbar .vui-toolbar')).toBeAttached();
   await expect(workflow.getByRole('button', { name: 'Zoom to Finance review', exact: true })).toBeVisible();
   const paid = workflow.locator('article').filter({ hasText: 'Schedule payment' });
-  await expect(paid.locator('.badge')).toHaveText('Scheduling');
+  const fix = workflow.locator('article').filter({ hasText: 'Request correction' });
+  await expect(paid.locator('.badge')).toHaveText('Pending');
+  await expect(fix.locator('.badge')).toHaveText('Missing PO');
+  await expect(workflow.locator('path.vui-edge[data-state="taken"]')).toHaveCount(1);
+  // Every card is as tall as the one with a button, so the straight edge between them has no step.
+  const heights = await workflow
+    .locator('article.vui-node')
+    .evaluateAll((cards) => cards.map((card) => Math.round(card.getBoundingClientRect().height)));
+  expect(new Set(heights).size).toBe(1);
   // A status is presentation only: the node keeps its action enabled.
   const approve = review.getByRole('button', { name: 'Approve', exact: true });
   await expect(approve).toBeEnabled();
@@ -53,6 +61,12 @@ test('consumer DOM, scoped themes, selection and native workflow actions', async
   await page.keyboard.press('Enter');
   await expect(review.locator('.badge')).toHaveText('Approved');
   await expect(approve).toBeDisabled();
+  // The decision shows on the graph: the approved branch is taken, the other one is ruled out.
+  await expect(paid.locator('.badge')).toHaveText('Scheduled');
+  await expect(fix.locator('.badge')).toHaveText('Not needed');
+  await expect(workflow.locator('path.vui-edge[data-state="taken"]')).toHaveCount(2);
+  await expect(workflow.locator('path.vui-edge').nth(2)).toHaveAttribute('data-state', 'skipped');
+  await expect(workflow.locator('[data-label="Needs changes"]')).toHaveAttribute('data-state', 'skipped');
   await expect(review).toHaveAttribute('data-vui-selected', 'true');
   // The demo follows the docs theme toggle.
   await setDocsTheme(page, 'dark');
@@ -62,7 +76,7 @@ test('consumer DOM, scoped themes, selection and native workflow actions', async
     'background-color',
     /^oklab\(0\.21\d* .* \/ 0\.85\)$/,
   );
-  await expect(workflow.locator('path.vui-edge').first()).toHaveCSS('stroke', 'oklch(0.705 0.015 286.067)');
+  await expect(workflow.locator('path.vui-edge').nth(2)).toHaveCSS('stroke', 'oklch(0.705 0.015 286.067)');
   await expect(workflow.locator('marker polyline').first()).toHaveCSS('fill', 'context-stroke');
   await workflow.screenshot({ path: testInfo.outputPath('workflow.png') });
   expect(errors).toEqual([]);
@@ -174,14 +188,19 @@ test('viewport controls drive the given flow within its zoom limits, and edge la
   await controls.getByRole('button', { name: 'Fit view', exact: true }).click();
   await expect(zoomOut).toBeEnabled();
 
-  // Start, center and end labels of one edge sit on its path and move with the target node.
-  const labels = ['review', 'Approved', 'accounting'];
+  // Start, center and end labels sit on the path of their edge and move with its target node.
+  const labels: [string, number][] = [
+    ['€12,400', 0],
+    ['Approved', 1],
+    ['within 1 day', 1],
+    ['Needs changes', 2],
+  ];
   const labelDistance = () =>
-    workflow.evaluate((root, names) => {
-      const edge = root.querySelectorAll<SVGPathElement>('path.vui-edge')[1];
-      const matrix = edge.getScreenCTM()!;
-      const total = edge.getTotalLength();
-      return names.map((name) => {
+    workflow.evaluate((root, labels) => {
+      return labels.map(([name, index]) => {
+        const edge = root.querySelectorAll<SVGPathElement>('path.vui-edge')[index];
+        const matrix = edge.getScreenCTM()!;
+        const total = edge.getTotalLength();
         const rect = root.querySelector(`[data-label="${name}"]`)!.getBoundingClientRect();
         const center = { x: rect.x + rect.width / 2, y: rect.y + rect.height / 2 };
         let best = Infinity;
@@ -217,7 +236,10 @@ test('viewport controls drive the given flow within its zoom limits, and edge la
   await expect.poll(position).not.toBe(start);
   const after = await labelDistance();
   for (const label of after) expect(label.best, label.name).toBeLessThan(2);
-  expect(after.map((label) => label.y)).not.toEqual(before.map((label) => label.y));
+  // The labels of the edge into the dragged node move with it.
+  expect(after.filter(({ name }) => ['Approved', 'within 1 day'].includes(name)).map(({ y }) => y)).not.toEqual(
+    before.filter(({ name }) => ['Approved', 'within 1 day'].includes(name)).map(({ y }) => y),
+  );
 });
 
 test('themes stay scoped per editor, reach every layer and leave geometry alone', async ({ page }) => {

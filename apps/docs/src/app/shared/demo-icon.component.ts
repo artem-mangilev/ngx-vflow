@@ -17,7 +17,8 @@ export type DemoIconName =
   | 'image'
   | 'layers'
   | 'download'
-  | 'pause';
+  | 'pause'
+  | 'search';
 
 /**
  * One 16px outline icon set for the design-system demos, so icons share size, stroke and optical weight.
@@ -95,6 +96,10 @@ export type DemoIconName =
         }
         @case ('pause') {
           <path d="M5.5 3.5v9M10.5 3.5v9" />
+        }
+        @case ('search') {
+          <circle cx="7" cy="7" r="4" />
+          <path d="M10 10l3 3" />
         }
       }
     </svg>
