@@ -353,27 +353,37 @@ test('image lab: typed ports, previews that follow the wiring, native controls a
   expect((await download).suggestedFilename()).toBe('image-lab.png');
 });
 
-test('relationships map: nested resizable teams, people moving between teams, group connections', async ({ page }) => {
+test('relationships map: floating edges, people moving into free spots, connecting people, resizable teams', async ({
+  page,
+}) => {
   await page.goto('/design-system/relationships-map');
   const demo = page.locator('app-ui-relationships-demo');
   await demo.evaluate((element) => element.scrollIntoView({ block: 'center' }));
   await expect(demo.locator('.vui-group')).toHaveCount(3);
   await expect(demo.locator('article.vui-node')).toHaveCount(7);
-  await expect(demo.locator('path.vui-edge')).toHaveCount(5);
+  await expect(demo.locator('path.vui-edge')).toHaveCount(6);
   await expect(demo.locator('svg.avatar')).toHaveCount(5);
+  // Floating edges: no ports are drawn, and a note has no handle at all.
+  await expect(demo.locator('.vui-port')).toHaveCount(0);
   await expect(demo.locator('.note .v-handle')).toHaveCount(0);
-  // The edge between the two top-level groups starts at the group's own handle.
+  // The edge between the two teams leaves Platform on the side facing Growth and enters Growth on the facing side.
   const groupEdgeError = () =>
     demo.evaluate((root) => {
       const edge = root.querySelectorAll<SVGPathElement>('path.vui-edge')[0];
-      const source = root
-        .querySelector('[data-team="platform"] .vui-port.v-handle[data-v-handle-position="right"]')!
-        .getBoundingClientRect();
-      const start = edge.getPointAtLength(0).matrixTransform(edge.getScreenCTM()!);
-      return Math.max(Math.abs(start.x - source.right), Math.abs(start.y - source.y - source.height / 2));
+      const platform = root.querySelector('[data-team="platform"]')!.getBoundingClientRect();
+      const growth = root.querySelector('[data-team="growth"]')!.getBoundingClientRect();
+      const matrix = edge.getScreenCTM()!;
+      const start = edge.getPointAtLength(0).matrixTransform(matrix);
+      const end = edge.getPointAtLength(edge.getTotalLength()).matrixTransform(matrix);
+      return Math.max(Math.abs(start.x - platform.right), Math.abs(end.x - growth.left));
     });
-  await expect.poll(groupEdgeError).toBeLessThan(1.5);
+  await expect.poll(groupEdgeError).toBeLessThan(8);
   await expect(demo.locator('.v-edge-labels-layer .vui-edge-label').first()).toHaveText('3 shared services');
+  // A mutual relation has no arrowhead.
+  const markers = await demo
+    .locator('path.vui-edge')
+    .evaluateAll((paths) => paths.map((path) => !!path.getAttribute('marker-end')));
+  expect(markers).toEqual([true, false, true, false, true, true]);
 
   const members = (team: string) => demo.locator(`[data-team="${team}"] [data-testid="members"]`);
   const team = (id: string) => demo.locator(`[data-team="${id}"]`);
@@ -390,35 +400,63 @@ test('relationships map: nested resizable teams, people moving between teams, gr
       },
       [name, id],
     );
-  // A nested team counts toward its parent.
+  const overlaps = (name: string) =>
+    demo.evaluate((root, name) => {
+      const cards = Array.from(root.querySelectorAll('article.person')).map((element) => ({
+        name: element.textContent!,
+        rect: element.getBoundingClientRect(),
+      }));
+      const me = cards.find((card) => card.name.includes(name))!.rect;
+      return cards
+        .filter((card) => !card.name.includes(name))
+        .filter(
+          ({ rect }) => rect.left < me.right && me.left < rect.right && rect.top < me.bottom && me.top < rect.bottom,
+        ).length;
+    }, name);
   await expect(members('platform')).toHaveText('3 people');
   await expect(members('infra')).toHaveText('2 people');
   await expect(members('growth')).toHaveText('2 people');
-  for (const [name, id] of [
-    ['Ana Lima', 'platform'],
-    ['Ben Osei', 'infra'],
-    ['Eli Park', 'infra'],
-    ['Chi Nguyen', 'growth'],
-    ['Dea Rossi', 'growth'],
-  ]) {
-    expect(await overflow(name, id), name).toBeLessThanOrEqual(0.5);
-  }
 
-  // Dropping a person on a team moves them there; the innermost team wins.
+  // Dropping a person on a team moves them into its nearest free spot: between Ben and Eli, over neither.
   await dragTo(page, person('Dea Rossi').locator('header'), await center(team('infra')));
   await expect(members('infra')).toHaveText('3 people');
   await expect(members('platform')).toHaveText('4 people');
   await expect(members('growth')).toHaveText('1 person');
   await expect.poll(() => overflow('Dea Rossi', 'infra')).toBeLessThanOrEqual(0.5);
+  expect(await overlaps('Dea Rossi')).toBe(0);
 
-  // Dropping outside every team returns the person into their own team.
-  const growth = (await team('growth').boundingBox())!;
-  await dragTo(page, person('Chi Nguyen').locator('header'), {
-    x: growth.x + growth.width / 2,
-    y: growth.y + growth.height + 70,
-  });
+  // A team without room shows it during the drag and refuses the drop: the person returns where they were.
+  const chi = person('Chi Nguyen');
+  const chiBefore = (await chi.boundingBox())!;
+  const from = await center(chi.locator('header'));
+  const infra = await center(team('infra'));
+  await page.mouse.move(from.x, from.y);
+  await page.mouse.down();
+  await page.mouse.move(infra.x, infra.y, { steps: 15 });
+  await expect(team('infra')).toHaveAttribute('data-drop-target', 'full');
+  await page.mouse.up();
   await expect(members('growth')).toHaveText('1 person');
-  await expect.poll(() => overflow('Chi Nguyen', 'growth')).toBeLessThanOrEqual(0.5);
+  await expect(members('infra')).toHaveText('3 people');
+  await expect.poll(async () => (await chi.boundingBox())!.x).toBeCloseTo(chiBefore.x, 0);
+
+  // Dragging from the body of one card to another connects the two people.
+  await dragTo(page, chi.locator('.vui-node-body'), await center(person('Eli Park').locator('.vui-node-body')));
+  await expect(demo.locator('path.vui-edge')).toHaveCount(7);
+  await expect(demo.locator('.v-edge-labels-layer .vui-edge-label').last()).toHaveText('reviews');
+  // People connect once: a second connection between Ana and Chi is refused.
+  await dragTo(page, chi.locator('.vui-node-body'), await center(person('Ana Lima').locator('.vui-node-body')));
+  await expect(demo.locator('path.vui-edge')).toHaveCount(7);
+  // Delete removes a selected connection.
+  const middle = await demo.evaluate((root) => {
+    const edges = root.querySelectorAll<SVGPathElement>('path.vui-edge');
+    const edge = edges[edges.length - 1];
+    const point = edge.getPointAtLength(edge.getTotalLength() / 4).matrixTransform(edge.getScreenCTM()!);
+    return { x: point.x, y: point.y };
+  });
+  await page.mouse.click(middle.x, middle.y);
+  await expect(demo.locator('path.vui-edge').last()).toHaveAttribute('data-vui-selected', 'true');
+  await page.keyboard.press('Delete');
+  await expect(demo.locator('path.vui-edge')).toHaveCount(6);
 
   // A selected team resizes; it cannot shrink past its members.
   await team('growth').locator('header').click();
@@ -426,9 +464,7 @@ test('relationships map: nested resizable teams, people moving between teams, gr
   await expect(handle).toHaveCount(1);
   const before = (await team('growth').boundingBox())!;
   await dragTo(page, handle, { x: before.x + 20, y: before.y + 20 });
-  // Chi was dropped below the team and sits at its bottom: the width shrinks, the height stays for Chi.
   await expect.poll(async () => (await team('growth').boundingBox())!.width).toBeLessThan(before.width - 20);
-  expect((await team('growth').boundingBox())!.height).toBeCloseTo(before.height, 0);
   expect(await overflow('Chi Nguyen', 'growth')).toBeLessThanOrEqual(0.5);
 });
 
