@@ -89,8 +89,20 @@ test('field connections follow stable IDs through rename, reorder, density and r
   const demo = page.locator('app-ui-entities-demo');
   await demo.scrollIntoViewIfNeeded();
   await expect(demo.locator('article')).toHaveCount(4);
+  // Two diagrams on one canvas, each in its titled frame.
+  await expect(demo.locator('[data-frame] .vui-title')).toHaveText(['Relationships', 'Field mapping']);
   await expect(demo.locator('path.vui-edge')).toHaveCount(2);
   await expect(demo.locator('.vui-port[data-vui-connected="true"]')).toHaveCount(4);
+  // Free ports and row actions show on interaction; connected ports always do.
+  const freePort = demo.locator(
+    '[data-entity="customer"] [data-field="email"] .vui-port[data-v-handle-position="left"]',
+  );
+  const deleteEmail = demo.getByRole('button', { name: 'Delete Customer.email', exact: true });
+  await expect(freePort).toHaveCSS('opacity', '0');
+  await expect(deleteEmail).toHaveCSS('opacity', '0');
+  await demo.locator('[data-entity="customer"] [data-field="email"]').hover();
+  await expect(freePort).toHaveCSS('opacity', '1');
+  await expect(deleteEmail).toHaveCSS('opacity', '1');
   await expect.poll(() => rowAlignment(demo)).toBeLessThan(1);
   // Rename and reorder the rows in the DOM, as a re-render of changed field data does: core observes the node content.
   await demo
@@ -131,6 +143,8 @@ test('field connections follow stable IDs through rename, reorder, density and r
       );
     });
   await expect.poll(endpointError).toBeLessThan(1);
+  // The remove button of a label shows on hover.
+  await demo.locator('.vui-edge-label').filter({ hasText: 'Copy email' }).hover();
   await demo.getByRole('button', { name: 'Remove Copy email connection', exact: true }).click();
   await expect(demo.locator('path.vui-edge')).toHaveCount(1);
   await expect(demo.locator('.vui-port[data-vui-connected="true"]')).toHaveCount(2);
@@ -147,9 +161,20 @@ test('field connections follow stable IDs through rename, reorder, density and r
   await expect(target).toHaveAttribute('data-vui-state', 'valid');
   await page.mouse.up();
   await expect(demo.locator('path.vui-edge')).toHaveCount(2);
-  await expect(demo.getByRole('button', { name: 'Remove Mapping connection', exact: true })).toBeVisible();
+  // The label says what the new mapping does.
+  await expect(demo.locator('.vui-edge-label').filter({ hasText: 'Copy email' })).toBeVisible();
   await expect(demo.locator('.vui-port[data-vui-connected="true"]')).toHaveCount(4);
   await expect.poll(endpointError).toBeLessThan(1);
+  // Delete removes a selected connection.
+  const middle = await demo.evaluate((root) => {
+    const edge = root.querySelector<SVGPathElement>('path.vui-edge')!;
+    const point = edge.getPointAtLength(edge.getTotalLength() / 4).matrixTransform(edge.getScreenCTM()!);
+    return { x: point.x, y: point.y };
+  });
+  await page.mouse.click(middle.x, middle.y);
+  await expect(demo.locator('path.vui-edge').first()).toHaveAttribute('data-vui-selected', 'true');
+  await page.keyboard.press('Delete');
+  await expect(demo.locator('path.vui-edge')).toHaveCount(1);
   await demo.screenshot({ path: testInfo.outputPath('entities.png') });
 });
 
@@ -511,6 +536,7 @@ test('scroll and collapse experiment: model kept, endpoints move to the header a
   await expect.poll(distance(1, rowPort)).toBeLessThan(1.5);
   await rows.evaluate((element) => (element.scrollTop = 0));
   // Collapse: rows leave the DOM, proxy handles keep both edges attached to the header.
+  await expect(demo.getByRole('button', { name: 'Collapse Product', exact: true })).toHaveClass(/\bbutton\b/);
   await demo.getByRole('button', { name: 'Collapse Product', exact: true }).click();
   await expect(rows).toHaveCount(0);
   await expect(demo.locator('path.vui-edge')).toHaveCount(2);

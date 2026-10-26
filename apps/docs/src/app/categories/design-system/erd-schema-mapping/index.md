@@ -1,9 +1,12 @@
-The same `vuiRow` structure serves both Customer/Order relationships and CRM/ERP mapping.
-Handles use stable field IDs, so renaming a field or reordering rows preserves endpoints.
+Two diagrams on one canvas, each in a titled frame: Customer/Order relationships and CRM/ERP field mapping use the
+same `vuiRow` structure. Handles use stable field IDs, so renaming a field or reordering rows preserves endpoints.
 Input and output IDs are distinct (`in:field-id` and `out:field-id`) and independent of visible names.
-Drag between ports of matching types to add a connection; remove it using its label button.
-Deleting a field is handled by the application: the field and every edge on it go together.
-Type compatibility and graph changes belong to this application, not to the UI directive.
+
+Free ports and row actions show when a row is hovered or focused, or its table is selected; connected ports always
+show. Drag between ports of matching types to add a connection, labelled by what it does. Remove a connection with
+its label button or select it and press Delete. Deleting a field is handled by the application: the field and every
+edge on it go together. Type compatibility and graph changes belong to this application, not to the UI directive.
+Frames are parents drawn below the edges (`parentsBelowEdges`), so connections inside them stay selectable.
 
 {{ NgDocActions.demo("EntitiesDemoComponent", { container: false }) }}
 

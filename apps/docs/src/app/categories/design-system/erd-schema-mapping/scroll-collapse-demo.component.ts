@@ -44,6 +44,7 @@ const ALL_VISIBLE: Visibility = { visible: new Set(), above: [], below: [], key:
   styles: `
     article {
       width: 240px;
+      font-size: 14px;
     }
     vflow {
       height: 420px;
@@ -53,12 +54,26 @@ const ALL_VISIBLE: Visibility = { visible: new Set(), above: [], below: [], key:
       overflow-y: auto;
       overscroll-behavior: contain;
     }
+    /* Rows cut by the scroll box fade into the footer, so the box reads as scrollable rather than clipped. A mask on
+       the box would also cut the ports, which sit across its border. */
+    .edge-note {
+      position: relative;
+    }
+    .edge-note::before {
+      content: '';
+      position: absolute;
+      inset-inline: 0;
+      bottom: 100%;
+      height: 24px;
+      background: linear-gradient(to bottom, transparent, var(--vui-surface));
+      pointer-events: none;
+    }
     .edge-note {
       min-height: 20px;
       padding-block: 4px;
     }
-    /* Proxy handles share one point per border; their ports are visually merged. */
-    .proxy .vui-port {
+    /* Proxy handles share one point per border; their connected ports are visually merged. */
+    .proxy .vui-port[data-vui-connected='true'] {
       opacity: 0.6;
     }
   `,
@@ -78,7 +93,6 @@ const ALL_VISIBLE: Visibility = { visible: new Set(), above: [], below: [], key:
               <button
                 class="button plain small icon"
                 vNoDrag
-                class="toggle"
                 type="button"
                 [attr.aria-label]="(ctx.data().collapsed ? 'Expand ' : 'Collapse ') + ctx.data().title"
                 [attr.aria-expanded]="!ctx.data().collapsed"
@@ -92,15 +106,19 @@ const ALL_VISIBLE: Visibility = { visible: new Set(), above: [], below: [], key:
               ) {
                 <span
                   vuiPort
+                  vuiPortReveal="interaction"
                   handleType="target"
                   position="left"
                   [handleId]="'in:' + field.id"
+                  [vuiPortConnected]="connected.has(ctx.node.id + '/in:' + field.id)"
                   [canStart]="false"></span>
                 <span
                   vuiPort
+                  vuiPortReveal="interaction"
                   handleType="source"
                   position="right"
                   [handleId]="'out:' + field.id"
+                  [vuiPortConnected]="connected.has(ctx.node.id + '/out:' + field.id)"
                   [canAccept]="false"></span>
               }
             </header>
@@ -113,15 +131,19 @@ const ALL_VISIBLE: Visibility = { visible: new Set(), above: [], below: [], key:
                     @if (row.handles) {
                       <span
                         vuiPort
+                        vuiPortReveal="interaction"
                         handleType="target"
                         position="left"
                         [handleId]="'in:' + row.field.id"
+                        [vuiPortConnected]="connected.has(ctx.node.id + '/in:' + row.field.id)"
                         [canStart]="false"></span>
                       <span
                         vuiPort
+                        vuiPortReveal="interaction"
                         handleType="source"
                         position="right"
                         [handleId]="'out:' + row.field.id"
+                        [vuiPortConnected]="connected.has(ctx.node.id + '/out:' + row.field.id)"
                         [canAccept]="false"></span>
                     }
                   </div>
@@ -133,15 +155,19 @@ const ALL_VISIBLE: Visibility = { visible: new Set(), above: [], below: [], key:
                   @for (field of hidden(ctx.data(), view.below); track field.id) {
                     <span
                       vuiPort
+                      vuiPortReveal="interaction"
                       handleType="target"
                       position="left"
                       [handleId]="'in:' + field.id"
+                      [vuiPortConnected]="connected.has(ctx.node.id + '/in:' + field.id)"
                       [canStart]="false"></span>
                     <span
                       vuiPort
+                      vuiPortReveal="interaction"
                       handleType="source"
                       position="right"
                       [handleId]="'out:' + field.id"
+                      [vuiPortConnected]="connected.has(ctx.node.id + '/out:' + field.id)"
                       [canAccept]="false"></span>
                   }
                 </footer>
@@ -190,7 +216,7 @@ export class ScrollCollapseDemoComponent {
     },
     {
       id: 'supplier',
-      point: { x: 420, y: 60 },
+      point: { x: 420, y: 260 },
       ariaLabel: 'Supplier entity',
       data: {
         title: 'Supplier',
@@ -203,7 +229,7 @@ export class ScrollCollapseDemoComponent {
     },
     {
       id: 'brand',
-      point: { x: 420, y: 260 },
+      point: { x: 420, y: 60 },
       ariaLabel: 'Brand entity',
       data: {
         title: 'Brand',
@@ -231,6 +257,10 @@ export class ScrollCollapseDemoComponent {
       targetHandle: 'in:id',
     },
   ]);
+  /** `${nodeId}/${handleId}` for every endpoint of an edge; proxies carry the same IDs, so they count too. */
+  readonly connected = new Set(
+    this.edges.flatMap((edge) => [`${edge.source}/${edge.sourceHandle}`, `${edge.target}/${edge.targetHandle}`]),
+  );
 
   constructor() {
     // Classify each scroll box once it exists, so hidden rows start on the borders as well.

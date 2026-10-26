@@ -75,10 +75,13 @@ test('geometry: long names, typography and density changes keep endpoints on the
   const height = () => name.evaluate((element) => element.getBoundingClientRect().height);
   await expect.poll(height).toBeGreaterThan(20);
   await expect.poll(() => rowEndpointError(demo)).toBeLessThan(1);
-  await demo.locator('section.demo').evaluate((element: HTMLElement) => {
-    element.style.setProperty('font-size', '18px');
-    element.style.setProperty('--vui-space', '6px');
-  });
+  // Typography and density of the cards change; endpoints follow.
+  await demo
+    .locator('section.demo')
+    .evaluate((element: HTMLElement) => element.style.setProperty('--vui-space', '6px'));
+  await demo
+    .locator('article.vui-node')
+    .evaluateAll((cards: HTMLElement[]) => cards.forEach((card) => card.style.setProperty('font-size', '18px')));
   await expect(demo.locator('article.vui-node').first()).toHaveCSS('font-size', '18px');
   await expect.poll(() => rowEndpointError(demo)).toBeLessThan(1);
   await name.evaluate((element, text) => (element.textContent = text), original);

@@ -160,6 +160,7 @@ const LAYOUT = { inset: 16, header: 52, gap: 16, step: 8 };
         [nodes]="nodes"
         [edges]="edges()"
         [connection]="connection"
+        [parentsBelowEdges]="true"
         (connect)="connect($event)"
         (deleteRequest)="remove($event)"
         (nodeDragStart)="dragStart($event)"
