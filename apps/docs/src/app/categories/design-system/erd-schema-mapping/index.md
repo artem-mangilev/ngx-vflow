@@ -1,5 +1,5 @@
 The same `vuiRow` structure serves both Customer/Order relationships and CRM/ERP mapping.
-Handles use stable field IDs, so renaming a field and reversing rows preserve endpoints.
+Handles use stable field IDs, so renaming a field or reordering rows preserves endpoints.
 Input and output IDs are distinct (`in:field-id` and `out:field-id`) and independent of visible names.
 Drag between ports of matching types to add a connection; remove it using its label button.
 Deleting a field is handled by the application: the field and every edge on it go together.
@@ -13,7 +13,8 @@ Type compatibility and graph changes belong to this application, not to the UI d
 
 ## Scroll and collapse experiment
 
-Long entities need a policy for endpoints of hidden rows. This experiment is local to the demo and is not a
+Long entities need a policy for endpoints of hidden rows. Scroll the Product rows with the wheel; collapse a node
+to move its endpoints to the header. This experiment is local to the demo and is not a
 library contract. Collapsing moves every endpoint to the header by rendering proxy handles with the same IDs.
 Scrolling keeps rows mounted in an overflow container that owns the wheel through `vNoWheel`; rows scrolled
 out of view hand their endpoints to proxy handles at the nearest border, rows still in view are re-created so

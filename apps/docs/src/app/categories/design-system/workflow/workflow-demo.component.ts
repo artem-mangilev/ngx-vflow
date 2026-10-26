@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, signal, viewChild } from '@angular/
 import { Vui } from '@vflow/ui';
 import { createEdges, createNodes, Vflow, VflowComponent } from 'ngx-vflow';
 import { DemoIconComponent, DemoIconName } from '../../../shared/demo-icon.component';
+import { injectDocsTheme } from '../../../shared/docs-theme';
 
 /** Tones of the application's own badge; the vflow UI parts ship none. */
 type Tone = 'neutral' | 'info' | 'success' | 'warning' | 'danger';
@@ -12,8 +13,6 @@ interface StepData {
   description: string;
   /** Application status: a word of this application, not a library lifecycle. */
   status: { tone: Tone; text: string };
-  /** Model diagnostic: a second indicator next to status, independent from selection. */
-  diagnostic?: { tone: Tone; text: string };
 }
 
 @Component({
@@ -28,22 +27,9 @@ interface StepData {
       margin: 0;
       min-height: 58px;
     }
-    .footnote {
-      margin: 0;
-      min-height: 20px;
-      padding: 8px 14px;
-      font-size: 13px;
-      color: var(--vui-muted);
-    }
   `,
   template: `
-    <section class="demo" aria-label="Approval workflow demo" [attr.data-vui-theme]="dark() ? 'dark' : 'light'">
-      <div class="controls">
-        <button class="button" type="button" (click)="flow()?.fitView()">Fit workflow</button>
-        <label><input type="checkbox" [checked]="dark()" (change)="dark.set(!dark())" /> Dark theme</label>
-        <label><input type="checkbox" [checked]="readOnly()" (change)="toggleReadOnly()" /> Read only</label>
-        <p>Approve the invoice; select a node to inspect it.</p>
-      </div>
+    <section class="demo" aria-label="Approval workflow demo" [attr.data-vui-theme]="theme()">
       <div class="stage">
         <vflow
           view="auto"
@@ -66,34 +52,19 @@ interface StepData {
                   <span class="badge" [attr.data-tone]="approved() ? 'success' : 'warning'">{{
                     approved() ? 'Approved' : 'Waiting'
                   }}</span>
-                } @else {
-                  <span class="badge" [attr.data-tone]="ctx.data().status.tone">{{ ctx.data().status.text }}</span>
-                }
-                @if (ctx.data().diagnostic; as diagnostic) {
-                  <span class="badge" [attr.data-tone]="diagnostic.tone">{{ diagnostic.text }}</span>
-                }
-                <span vuiActions>
-                  @if (ctx.node.id === 'review') {
+                  <span vuiActions>
                     <button
                       class="button primary"
                       vNoDrag
                       type="button"
-                      [disabled]="readOnly() || approved()"
+                      [disabled]="approved()"
                       (click)="approved.set(true)">
                       Approve
                     </button>
-                  } @else {
-                    <button
-                      class="button"
-                      vNoDrag
-                      type="button"
-                      [disabled]="readOnly()"
-                      [attr.aria-label]="'Open ' + ctx.data().title"
-                      (click)="opened.set(ctx.data().title)">
-                      Open
-                    </button>
-                  }
-                </span>
+                  </span>
+                } @else {
+                  <span class="badge" [attr.data-tone]="ctx.data().status.tone">{{ ctx.data().status.text }}</span>
+                }
               </footer>
               @if (ctx.node.id !== 'received') {
                 <span
@@ -116,14 +87,14 @@ interface StepData {
               @if (ctx.selected()) {
                 <v-node-toolbar>
                   <div vuiToolbar>
-                    <span>{{ readOnly() ? 'View only' : 'Drag to move' }}</span>
+                    <span>Drag to move</span>
                     <button
                       class="button plain small"
                       vNoDrag
                       type="button"
-                      [attr.aria-label]="'Details of ' + ctx.data().title"
-                      (click)="opened.set(ctx.data().title)">
-                      Details
+                      [attr.aria-label]="'Zoom to ' + ctx.data().title"
+                      (click)="flow()?.fitView({ nodes: [ctx.node.id], padding: 0.5 })">
+                      Zoom to
                     </button>
                   </div>
                 </v-node-toolbar>
@@ -150,27 +121,20 @@ interface StepData {
           </ng-template>
         </vflow>
         @if (flow(); as flow) {
-          <vui-controls class="stage-controls" [flow]="flow">
-            <button type="button" aria-label="Reset demo" title="Reset demo" (click)="reset()">
-              <app-demo-icon name="reset" />
-            </button>
-          </vui-controls>
+          <vui-controls class="stage-controls" [flow]="flow" />
         }
       </div>
-      <p class="footnote" aria-live="polite" data-testid="opened">{{ opened() ? 'Opened: ' + opened() : '' }}</p>
     </section>
   `,
 })
 export class WorkflowDemoComponent {
   readonly flow = viewChild(VflowComponent);
-  readonly dark = signal(false);
-  readonly readOnly = signal(false);
+  readonly theme = injectDocsTheme();
   readonly approved = signal(false);
-  readonly opened = signal('');
   readonly nodes = createNodes<StepData>([
     {
       id: 'received',
-      point: { x: 20, y: 110 },
+      point: { x: 0, y: 150 },
       ariaLabel: 'Invoice received',
       data: {
         title: 'Invoice received',
@@ -181,19 +145,18 @@ export class WorkflowDemoComponent {
     },
     {
       id: 'review',
-      point: { x: 330, y: 110 },
+      point: { x: 400, y: 150 },
       ariaLabel: 'Finance review',
       data: {
         title: 'Finance review',
         icon: 'check',
         description: 'Check the amount and approve payment.',
         status: { tone: 'warning', text: 'Waiting' },
-        diagnostic: { tone: 'warning', text: 'Above limit' },
       },
     },
     {
       id: 'paid',
-      point: { x: 650, y: 10 },
+      point: { x: 840, y: 0 },
       ariaLabel: 'Schedule payment',
       data: {
         title: 'Schedule payment',
@@ -204,14 +167,13 @@ export class WorkflowDemoComponent {
     },
     {
       id: 'fix',
-      point: { x: 650, y: 250 },
+      point: { x: 840, y: 320 },
       ariaLabel: 'Request correction',
       data: {
         title: 'Request correction',
         icon: 'alert',
         description: 'The supplier must provide a purchase order.',
-        status: { tone: 'neutral', text: 'Waiting for supplier' },
-        diagnostic: { tone: 'danger', text: 'Missing PO' },
+        status: { tone: 'danger', text: 'Missing PO' },
       },
     },
   ]);
@@ -241,15 +203,4 @@ export class WorkflowDemoComponent {
       data: { center: 'Needs changes' },
     },
   ]);
-
-  reset() {
-    this.approved.set(false);
-    this.opened.set('');
-    this.flow()?.fitView();
-  }
-
-  toggleReadOnly() {
-    this.readOnly.update((value) => !value);
-    this.nodes.forEach((node) => node.draggable.set(!this.readOnly()));
-  }
 }

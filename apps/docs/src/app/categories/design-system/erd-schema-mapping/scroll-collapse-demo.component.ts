@@ -10,6 +10,7 @@ import {
 } from '@angular/core';
 import { Vui } from '@vflow/ui';
 import { DemoIconComponent } from '../../../shared/demo-icon.component';
+import { injectDocsTheme } from '../../../shared/docs-theme';
 import { createEdges, createNodes, Node, Vflow, VflowComponent } from 'ngx-vflow';
 
 interface LongEntity {
@@ -62,11 +63,7 @@ const ALL_VISIBLE: Visibility = { visible: new Set(), above: [], below: [], key:
     }
   `,
   template: `
-    <section class="demo" aria-label="Scroll and collapse experiment" data-vui-theme="light">
-      <div class="controls">
-        <button class="button" type="button" (click)="flow()?.fitView()">Fit</button>
-        <p>Scroll the Product rows with the wheel; collapse a node to move its endpoints to the header.</p>
-      </div>
+    <section class="demo" aria-label="Scroll and collapse experiment" [attr.data-vui-theme]="theme()">
       <vflow view="auto" [nodes]="nodes" [edges]="edges" (initialized)="flow()?.fitView()">
         <ng-template let-ctx vNode>
           @let view = visibility(ctx.node.id);
@@ -163,6 +160,7 @@ const ALL_VISIBLE: Visibility = { visible: new Set(), above: [], below: [], key:
 })
 export class ScrollCollapseDemoComponent {
   readonly flow = viewChild(VflowComponent);
+  readonly theme = injectDocsTheme();
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
   private readonly views = signal<Record<string, Visibility>>({});
   private readonly lastTop: Record<string, number> = {};

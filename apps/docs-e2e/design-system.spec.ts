@@ -1,4 +1,14 @@
-import { expect, Locator, test } from '@playwright/test';
+import { expect, Locator, Page, test } from '@playwright/test';
+
+/** Demos follow the docs theme: cycle the ng-doc toggle (auto, light, dark) until the page has the theme. */
+async function setDocsTheme(page: Page, theme: 'light' | 'dark') {
+  const expected = theme === 'dark' ? 'dark' : null;
+  for (let index = 0; index < 3; index += 1) {
+    if ((await page.locator('html').getAttribute('data-theme')) === expected) return;
+    await page.locator('ng-doc-theme-toggle button').click();
+  }
+  await expect(page.locator('html')).toHaveAttribute('data-theme', theme);
+}
 
 async function rowAlignment(demo: Locator) {
   return demo.locator('[vuiRow]').evaluateAll((rows) =>
@@ -28,30 +38,24 @@ test('consumer DOM, scoped themes, selection and native workflow actions', async
   const review = workflow.locator('article').filter({ hasText: 'Finance review' });
   await review.locator('header').click();
   await expect(review).toHaveAttribute('data-vui-selected', 'true');
-  // Selection, application status and a model diagnostic are visible at the same time.
-  await expect(review.locator('.badge')).toHaveText(['Waiting', 'Above limit']);
-  await expect(review.locator('.badge').nth(1)).toHaveAttribute('data-tone', 'warning');
+  // Selection and application status are visible at the same time.
+  await expect(review.locator('.badge')).toHaveText('Waiting');
+  await expect(review.locator('.badge')).toHaveAttribute('data-tone', 'warning');
   await expect(workflow.locator('v-node-toolbar .vui-toolbar')).toBeAttached();
-  await expect(workflow.getByRole('button', { name: 'Details of Finance review', exact: true })).toBeVisible();
-  // A status is presentation only: the node keeps its action enabled.
+  await expect(workflow.getByRole('button', { name: 'Zoom to Finance review', exact: true })).toBeVisible();
   const paid = workflow.locator('article').filter({ hasText: 'Schedule payment' });
   await expect(paid.locator('.badge')).toHaveText('Scheduling');
-  const open = paid.getByRole('button', { name: 'Open Schedule payment', exact: true });
-  await expect(open).toBeEnabled();
-  await open.click();
-  await expect(workflow.getByTestId('opened')).toHaveText('Opened: Schedule payment');
-  await workflow.getByLabel('Read only', { exact: true }).check();
+  // A status is presentation only: the node keeps its action enabled.
   const approve = review.getByRole('button', { name: 'Approve', exact: true });
-  await expect(approve).toBeDisabled();
-  await workflow.getByLabel('Read only', { exact: true }).uncheck();
   await expect(approve).toBeEnabled();
   await approve.focus();
   await expect(approve).toBeFocused();
   await page.keyboard.press('Enter');
-  await expect(review.locator('.badge').first()).toHaveText('Approved');
+  await expect(review.locator('.badge')).toHaveText('Approved');
   await expect(approve).toBeDisabled();
   await expect(review).toHaveAttribute('data-vui-selected', 'true');
-  await workflow.getByLabel('Dark theme', { exact: true }).check();
+  // The demo follows the docs theme toggle.
+  await setDocsTheme(page, 'dark');
   await expect(review).toHaveCSS('background-color', 'oklch(0.21 0.006 285.885)');
   // Floating layers use the translucent dark surface (85%) as their material.
   await expect(workflow.locator('v-node-toolbar .vui-toolbar')).toHaveCSS(
@@ -71,17 +75,25 @@ test('field connections follow stable IDs through rename, reorder, density and r
   const demo = page.locator('app-ui-entities-demo');
   await demo.scrollIntoViewIfNeeded();
   await expect(demo.locator('article')).toHaveCount(4);
-  // This page opts into the dark theme while the workflow page stays light.
-  await expect(demo.locator('article.vui-node').first()).toHaveCSS('background-color', 'oklch(0.21 0.006 285.885)');
   await expect(demo.locator('path.vui-edge')).toHaveCount(2);
   await expect(demo.locator('.vui-port[data-vui-connected="true"]')).toHaveCount(4);
   await expect.poll(() => rowAlignment(demo)).toBeLessThan(1);
-  await demo.getByRole('button', { name: 'Rename email', exact: true }).click();
-  await expect(demo.locator('[data-entity="crm"] [data-field="email"]')).toContainText('primary_email');
-  await demo.getByRole('button', { name: 'Reverse fields', exact: true }).click();
+  // Rename and reorder the rows in the DOM, as a re-render of changed field data does: core observes the node content.
+  await demo
+    .locator('[data-entity="crm"] [data-field="email"] .vui-title')
+    .evaluate((element) => (element.textContent = 'primary_email'));
+  await demo.locator('article.vui-node').evaluateAll((entities) =>
+    entities.forEach((entity) => {
+      const rows = Array.from(entity.querySelectorAll('[vuiRow]'));
+      entity.append(...rows.reverse());
+    }),
+  );
   await expect(demo.locator('[data-entity="crm"] [vuiRow]').first()).toHaveAttribute('data-field', 'name');
   await expect.poll(() => rowAlignment(demo)).toBeLessThan(1);
-  await demo.getByLabel('Compact', { exact: true }).check();
+  // Density follows the theme spacing.
+  await demo
+    .locator('section.demo')
+    .evaluate((element: HTMLElement) => element.style.setProperty('--vui-space', '3px'));
   await expect.poll(() => rowAlignment(demo)).toBeLessThan(1);
 
   // The actual SVG endpoints must meet the outer rim of their original field ports.
@@ -140,7 +152,6 @@ test('viewport controls drive the given flow within its zoom limits, and edge la
       const match = /scale\(([^)]+)\)/.exec(element.style.transform);
       return match ? Number(match[1]) : 1;
     });
-  await expect(controls.getByRole('button', { name: 'Reset demo', exact: true })).toBeVisible();
   const initial = await zoom();
   await zoomIn.click();
   await expect.poll(zoom).toBeGreaterThan(initial);
@@ -246,126 +257,156 @@ test('themes stay scoped per editor, reach every layer and leave geometry alone'
   await expect(b.locator('article.vui-node').first()).toHaveCSS('background-color', dark.node);
 });
 
-test('pipeline: typed labeled ports, native controls inside nodes and geometry that follows content', async ({
-  page,
-}) => {
+/** Drags with real pointer events from the center of one element to a point; the page must not scroll in between. */
+async function dragTo(page: Page, from: Locator, to: { x: number; y: number }) {
+  const box = (await from.boundingBox())!;
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(to.x, to.y, { steps: 15 });
+  await page.mouse.up();
+}
+
+async function center(locator: Locator) {
+  const box = (await locator.boundingBox())!;
+  return { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+}
+
+test('image lab: typed ports, previews that follow the wiring, native controls and export', async ({ page }) => {
   await page.goto('/design-system/pipeline');
   const demo = page.locator('app-ui-pipeline-demo');
-  await demo.scrollIntoViewIfNeeded();
-  await expect(demo.locator('article.vui-node')).toHaveCount(4);
-  await expect(demo.locator('path.vui-edge')).toHaveCount(4);
-  await expect(demo.locator('.vui-port[data-type="video"]')).toHaveCount(4);
-  await expect(demo.locator('[data-stage="publish"] [data-port="poster"] .vui-port')).toHaveAttribute(
-    'data-vui-connected',
-    'false',
-  );
-  const endpointError = () =>
-    demo.evaluate((root) => {
-      const edge = root.querySelectorAll<SVGPathElement>('path.vui-edge')[2];
-      const source = root
-        .querySelector(
-          '[data-stage="transcode"] [data-port="video"].output .vui-port.v-handle[data-v-handle-position="right"]',
-        )!
-        .getBoundingClientRect();
-      const target = root
-        .querySelector('[data-stage="publish"] [data-port="video"] .vui-port.v-handle[data-v-handle-position="left"]')!
-        .getBoundingClientRect();
-      const matrix = edge.getScreenCTM()!;
-      const start = edge.getPointAtLength(0).matrixTransform(matrix);
-      const end = edge.getPointAtLength(edge.getTotalLength()).matrixTransform(matrix);
-      return Math.max(
-        Math.abs(start.x - source.right),
-        Math.abs(start.y - source.y - source.height / 2),
-        Math.abs(end.x - target.left),
-        Math.abs(end.y - target.y - target.height / 2),
-      );
-    });
-  await expect.poll(endpointError).toBeLessThan(1);
-  const transcode = demo.locator('[data-stage="transcode"]');
-  const wrapper = transcode.locator(
-    'xpath=ancestor::*[contains(concat(" ", normalize-space(@class), " "), " v-node ")][1]',
-  );
+  await demo.evaluate((element) => element.scrollIntoView({ block: 'center' }));
+  await expect(demo.locator('article.vui-node')).toHaveCount(7);
+  await expect(demo.locator('path.vui-edge')).toHaveCount(6);
+  await expect(demo.locator('path.vui-edge[data-type="number"]')).toHaveCount(1);
+  // The output preview is the whole tree: the hue-rotated photo blended with the blurred texture.
+  const output = demo.locator('[data-preview="output"]');
+  await expect(output.locator('.stack')).toHaveCount(1);
+  await expect(output.locator('img')).toHaveCount(2);
+  const filterOf = (stage: string) =>
+    demo
+      .locator(`[data-preview="${stage}"] > app-picture > .layer`)
+      .evaluate((element: HTMLElement) => element.style.filter);
+  // The number wired into Hue owns its amount, so the slider of the node is disabled.
+  const hue = demo.locator('[data-stage="hue"]');
+  await expect(hue.getByLabel('Hue amount', { exact: true })).toBeDisabled();
+  await expect.poll(() => filterOf('hue')).toBe('hue-rotate(90deg)');
+  await demo.getByLabel('Number value', { exact: true }).fill('0.5');
+  await expect.poll(() => filterOf('hue')).toBe('hue-rotate(180deg)');
+  // Native controls inside a node work and do not drag it.
+  const blur = demo.locator('[data-stage="blur"]');
+  const wrapper = blur.locator('xpath=ancestor::*[contains(concat(" ", normalize-space(@class), " "), " v-node ")][1]');
   const position = () => wrapper.evaluate((element: HTMLElement) => element.style.transform);
   const start = await position();
-  // Native controls work and do not drag the node.
-  await transcode.getByLabel('Resolution').selectOption('2160p');
-  await expect(demo.locator('[data-stage="publish"] .vui-node-body .vui-meta')).toContainText('2160p');
-  await transcode.getByLabel(/Bitrate/).fill('30');
-  await expect(transcode.locator('.badge')).toHaveAttribute('data-tone', 'info');
+  await blur.getByLabel('Blur amount', { exact: true }).fill('0.8');
+  await expect.poll(() => filterOf('blur')).toBe('blur(7.8px)');
   expect(await position()).toBe(start);
-  // An extra typed output row above the video output moves the port; the edge follows.
-  await transcode.getByLabel('Poster output', { exact: true }).check();
-  await expect(transcode.locator('[data-port="poster"]')).toBeVisible();
-  await expect.poll(endpointError).toBeLessThan(1);
-  const source = transcode.locator('[data-port="poster"] .v-handle[data-v-handle-position="right"]');
-  const target = demo.locator('[data-stage="publish"] [data-port="poster"] .v-handle[data-v-handle-position="left"]');
-  const from = (await source.boundingBox())!;
-  const to = (await target.boundingBox())!;
-  await page.mouse.move(from.x + from.width / 2, from.y + from.height / 2);
+  // A new source picture reaches every preview downstream.
+  await demo.locator('[data-stage="photo"] select').selectOption('lake');
+  const photo = await demo.locator('[data-preview="photo"] img').getAttribute('src');
+  await expect(output.locator('img').first()).toHaveAttribute('src', photo!);
+  // Types must match: a number does not connect to an image input.
+  const blendB = demo.locator('[data-stage="blend"] [data-port="b"] .v-handle');
+  const value = await center(demo.locator('[data-stage="wave"] .output .v-handle'));
+  const b = await center(blendB);
+  await page.mouse.move(value.x, value.y);
   await page.mouse.down();
-  await page.mouse.move(to.x + to.width / 2, to.y + to.height / 2, { steps: 12 });
-  await expect(target).toHaveAttribute('data-vui-state', 'valid');
+  await page.mouse.move(b.x, b.y, { steps: 12 });
+  await expect(blendB).toHaveAttribute('data-vui-state', 'invalid');
   await page.mouse.up();
-  await expect(demo.locator('path.vui-edge')).toHaveCount(5);
-  await expect(target).toHaveAttribute('data-vui-connected', 'true');
-  // A type mismatch is rejected by the application's validator.
-  const audio = demo.locator('[data-stage="mix"] [data-port="audio"].output .v-handle[data-v-handle-position="right"]');
-  const video = demo.locator('[data-stage="publish"] [data-port="video"] .v-handle[data-v-handle-position="left"]');
-  const a = (await audio.boundingBox())!;
-  const v = (await video.boundingBox())!;
-  await page.mouse.move(a.x + a.width / 2, a.y + a.height / 2);
-  await page.mouse.down();
-  await page.mouse.move(v.x + v.width / 2, v.y + v.height / 2, { steps: 12 });
-  await expect(video).toHaveAttribute('data-vui-state', 'invalid');
-  await page.mouse.up();
-  await expect(demo.locator('path.vui-edge')).toHaveCount(5);
+  await expect(demo.locator('path.vui-edge')).toHaveCount(6);
+  // An input takes one edge: wiring the photo into B replaces the texture branch.
+  await dragTo(page, demo.locator('[data-stage="photo"] .output .v-handle'), await center(blendB));
+  await expect(demo.locator('path.vui-edge')).toHaveCount(6);
+  await expect(demo.locator('[data-stage="blur"] .output .vui-port')).toHaveAttribute('data-vui-connected', 'false');
+  await expect(output.locator('img')).toHaveCount(2);
+  await expect(output.locator('img').last()).toHaveAttribute('src', photo!);
+  // The palette adds a node; an unwired filter shows an empty state.
+  await demo.getByLabel('Add a node', { exact: true }).selectOption('sepia');
+  await expect(demo.locator('article.vui-node')).toHaveCount(8);
+  await expect(demo.locator('article').filter({ hasText: 'Sepia' }).locator('.empty')).toHaveText('Connect an image');
+  // Only the export rasterizes the picture.
+  const download = page.waitForEvent('download');
+  await demo.getByRole('button', { name: 'Download', exact: true }).click();
+  expect((await download).suggestedFilename()).toBe('image-lab.png');
 });
 
-test('relationships map: group connections, a note without ports, custom content and view mode', async ({ page }) => {
+test('relationships map: nested resizable teams, people moving between teams, group connections', async ({ page }) => {
   await page.goto('/design-system/relationships-map');
   const demo = page.locator('app-ui-relationships-demo');
-  await demo.scrollIntoViewIfNeeded();
-  await expect(demo.locator('.vui-group')).toHaveCount(2);
-  await expect(demo.locator('article.vui-node')).toHaveCount(6);
-  await expect(demo.locator('path.vui-edge')).toHaveCount(4);
-  await expect(demo.locator('svg.avatar')).toHaveCount(4);
+  await demo.evaluate((element) => element.scrollIntoView({ block: 'center' }));
+  await expect(demo.locator('.vui-group')).toHaveCount(3);
+  await expect(demo.locator('article.vui-node')).toHaveCount(7);
+  await expect(demo.locator('path.vui-edge')).toHaveCount(5);
+  await expect(demo.locator('svg.avatar')).toHaveCount(5);
   await expect(demo.locator('.note .v-handle')).toHaveCount(0);
-  // The edge between the two groups starts at the group's own handle.
+  // The edge between the two top-level groups starts at the group's own handle.
   const groupEdgeError = () =>
     demo.evaluate((root) => {
       const edge = root.querySelectorAll<SVGPathElement>('path.vui-edge')[0];
       const source = root
-        .querySelector('.vui-group .vui-port.v-handle[data-v-handle-position="right"]')!
+        .querySelector('[data-team="platform"] .vui-port.v-handle[data-v-handle-position="right"]')!
         .getBoundingClientRect();
       const start = edge.getPointAtLength(0).matrixTransform(edge.getScreenCTM()!);
       return Math.max(Math.abs(start.x - source.right), Math.abs(start.y - source.y - source.height / 2));
     });
   await expect.poll(groupEdgeError).toBeLessThan(1.5);
   await expect(demo.locator('.v-edge-labels-layer .vui-edge-label').first()).toHaveText('3 shared services');
-  const ana = demo.locator('article').filter({ hasText: 'Ana Lima' });
-  const wrapper = ana.locator('xpath=ancestor::*[contains(concat(" ", normalize-space(@class), " "), " v-node ")][1]');
-  const position = () => wrapper.evaluate((element: HTMLElement) => element.style.transform);
-  await demo.getByLabel('View mode', { exact: true }).check();
-  await ana.evaluate((element) => element.scrollIntoView({ block: 'center' }));
-  const start = await position();
-  const box = (await ana.locator('header').boundingBox())!;
-  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
-  await page.mouse.down();
-  await page.mouse.move(box.x + box.width / 2 + 80, box.y + box.height / 2 + 40, { steps: 10 });
-  await page.mouse.up();
-  await page.waitForTimeout(200);
-  expect(await position()).toBe(start);
-  // Selection still works in view mode.
-  await ana.locator('header').click();
-  await expect(ana).toHaveAttribute('data-vui-selected', 'true');
-  await demo.getByLabel('View mode', { exact: true }).uncheck();
-  await ana.evaluate((element) => element.scrollIntoView({ block: 'center' }));
-  const again = (await ana.locator('header').boundingBox())!;
-  await page.mouse.move(again.x + again.width / 2, again.y + again.height / 2);
-  await page.mouse.down();
-  await page.mouse.move(again.x + again.width / 2 + 80, again.y + again.height / 2 + 40, { steps: 10 });
-  await page.mouse.up();
-  await expect.poll(position).not.toBe(start);
+
+  const members = (team: string) => demo.locator(`[data-team="${team}"] [data-testid="members"]`);
+  const team = (id: string) => demo.locator(`[data-team="${id}"]`);
+  const person = (name: string) => demo.locator('article').filter({ hasText: name });
+  // How far a person sticks out of a team; at most zero means inside.
+  const overflow = (name: string, id: string) =>
+    demo.evaluate(
+      (root, [name, id]) => {
+        const box = root.querySelector(`[data-team="${id}"]`)!.getBoundingClientRect();
+        const rect = Array.from(root.querySelectorAll('article.person'))
+          .find((element) => element.textContent!.includes(name))!
+          .getBoundingClientRect();
+        return Math.max(box.left - rect.left, box.top - rect.top, rect.right - box.right, rect.bottom - box.bottom);
+      },
+      [name, id],
+    );
+  // A nested team counts toward its parent.
+  await expect(members('platform')).toHaveText('3 people');
+  await expect(members('infra')).toHaveText('2 people');
+  await expect(members('growth')).toHaveText('2 people');
+  for (const [name, id] of [
+    ['Ana Lima', 'platform'],
+    ['Ben Osei', 'infra'],
+    ['Eli Park', 'infra'],
+    ['Chi Nguyen', 'growth'],
+    ['Dea Rossi', 'growth'],
+  ]) {
+    expect(await overflow(name, id), name).toBeLessThanOrEqual(0.5);
+  }
+
+  // Dropping a person on a team moves them there; the innermost team wins.
+  await dragTo(page, person('Dea Rossi').locator('header'), await center(team('infra')));
+  await expect(members('infra')).toHaveText('3 people');
+  await expect(members('platform')).toHaveText('4 people');
+  await expect(members('growth')).toHaveText('1 person');
+  await expect.poll(() => overflow('Dea Rossi', 'infra')).toBeLessThanOrEqual(0.5);
+
+  // Dropping outside every team returns the person into their own team.
+  const growth = (await team('growth').boundingBox())!;
+  await dragTo(page, person('Chi Nguyen').locator('header'), {
+    x: growth.x + growth.width / 2,
+    y: growth.y + growth.height + 70,
+  });
+  await expect(members('growth')).toHaveText('1 person');
+  await expect.poll(() => overflow('Chi Nguyen', 'growth')).toBeLessThanOrEqual(0.5);
+
+  // A selected team resizes; it cannot shrink past its members.
+  await team('growth').locator('header').click();
+  const handle = demo.locator('.v-resize-control--handle.v-resize-control--bottom.v-resize-control--right');
+  await expect(handle).toHaveCount(1);
+  const before = (await team('growth').boundingBox())!;
+  await dragTo(page, handle, { x: before.x + 20, y: before.y + 20 });
+  // Chi was dropped below the team and sits at its bottom: the width shrinks, the height stays for Chi.
+  await expect.poll(async () => (await team('growth').boundingBox())!.width).toBeLessThan(before.width - 20);
+  expect((await team('growth').boundingBox())!.height).toBeCloseTo(before.height, 0);
+  expect(await overflow('Chi Nguyen', 'growth')).toBeLessThanOrEqual(0.5);
 });
 
 test('scroll and collapse experiment: model kept, endpoints move to the header and back, wheel scrolls rows', async ({

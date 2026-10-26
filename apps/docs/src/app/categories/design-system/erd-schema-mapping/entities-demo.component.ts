@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, signal, viewChild, WritableSignal } from '@angular/core';
 import { Vui } from '@vflow/ui';
 import { DemoIconComponent } from '../../../shared/demo-icon.component';
+import { injectDocsTheme } from '../../../shared/docs-theme';
 import {
   addEdges,
   Connection,
@@ -37,20 +38,7 @@ interface EntityData {
     }
   `,
   template: `
-    <section
-      class="demo"
-      aria-label="Entity relationships and field mapping demo"
-      [attr.data-vui-theme]="dark() ? 'dark' : 'light'"
-      [style.--vui-space]="compact() ? '3px' : '4px'">
-      <div class="controls">
-        <button class="button" type="button" (click)="flow()?.fitView()">Fit entities</button>
-        <button class="button" type="button" (click)="reverseFields()">Reverse fields</button>
-        <button class="button" type="button" (click)="renameField()">Rename email</button>
-        <button class="button" type="button" (click)="toggleLongNames()">Long names</button>
-        <label><input type="checkbox" [checked]="compact()" (change)="compact.set(!compact())" /> Compact</label>
-        <label><input type="checkbox" [checked]="dark()" (change)="dark.set(!dark())" /> Dark theme</label>
-        <p>Connect matching field types; names and row order can change.</p>
-      </div>
+    <section class="demo" aria-label="Entity relationships and field mapping demo" [attr.data-vui-theme]="theme()">
       <vflow
         view="auto"
         [nodes]="nodes"
@@ -122,9 +110,7 @@ interface EntityData {
 })
 export class EntitiesDemoComponent {
   readonly flow = viewChild(VflowComponent);
-  readonly dark = signal(true);
-  readonly compact = signal(false);
-  readonly longNames = signal(false);
+  readonly theme = injectDocsTheme();
   readonly nodes = createNodes<EntityData>([
     {
       id: 'customer',
@@ -221,36 +207,6 @@ export class EntitiesDemoComponent {
       return !!source && !!target && source.type === target.type;
     },
   };
-
-  reverseFields() {
-    this.nodes.forEach((node) => node.data.update((data) => ({ ...data, fields: [...data.fields].reverse() })));
-  }
-
-  /** Long identifiers wrap inside the row; endpoints must stay on the rows. */
-  toggleLongNames() {
-    const long = !this.longNames();
-    this.longNames.set(long);
-    const erp = this.nodes.find((node) => node.id === 'erp')!;
-    erp.data.update((data) => ({
-      ...data,
-      fields: data.fields.map((field) => ({
-        ...field,
-        name: long
-          ? `${field.name}_of_the_primary_business_contact_record`
-          : field.name.replace('_of_the_primary_business_contact_record', ''),
-      })),
-    }));
-  }
-
-  renameField() {
-    const crm = this.nodes.find((node) => node.id === 'crm')!;
-    crm.data.update((data) => ({
-      ...data,
-      fields: data.fields.map((field) =>
-        field.id === 'email' ? { ...field, name: field.name === 'email' ? 'primary_email' : 'email' } : field,
-      ),
-    }));
-  }
 
   connect(connection: Connection) {
     const edge = createEdge({

@@ -1,5 +1,5 @@
 Cards, headers, footers, status badges, edge labels and a node toolbar all use consumer DOM.
-Approve is an ordinary native button; read-only disables editing while preserving navigation.
+Approve is an ordinary native button inside a node; the toolbar of a selected node drives the viewport.
 This recipe displays application state and does not execute a workflow.
 
 {{ NgDocActions.demo("WorkflowDemoComponent", { container: false }) }}

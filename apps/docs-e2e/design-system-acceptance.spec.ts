@@ -67,8 +67,10 @@ test('geometry: long names, typography and density changes keep endpoints on the
   const demo = page.locator('app-ui-entities-demo');
   await demo.scrollIntoViewIfNeeded();
   await expect.poll(() => rowEndpointError(demo)).toBeLessThan(1);
-  await demo.getByRole('button', { name: 'Long names', exact: true }).click();
+  // A long identifier, written as a re-render of the field data would: core observes the node content.
   const name = demo.locator('[data-entity="erp"] [data-field="email"] .vui-title');
+  const original = await name.textContent();
+  await name.evaluate((element) => (element.textContent += '_of_the_primary_business_contact_record'));
   await expect(name).toContainText('primary_business_contact');
   const height = () => name.evaluate((element) => element.getBoundingClientRect().height);
   await expect.poll(height).toBeGreaterThan(20);
@@ -79,7 +81,7 @@ test('geometry: long names, typography and density changes keep endpoints on the
   });
   await expect(demo.locator('article.vui-node').first()).toHaveCSS('font-size', '18px');
   await expect.poll(() => rowEndpointError(demo)).toBeLessThan(1);
-  await demo.getByRole('button', { name: 'Long names', exact: true }).click();
+  await name.evaluate((element, text) => (element.textContent = text), original);
   await expect.poll(() => rowEndpointError(demo)).toBeLessThan(1);
 });
 

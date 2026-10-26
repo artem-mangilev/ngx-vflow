@@ -10,11 +10,14 @@ export type DemoIconName =
   | 'upload'
   | 'waveform'
   | 'close'
-  | 'reset'
   | 'chevron-right'
   | 'chevron-down'
   | 'plus'
-  | 'minus';
+  | 'minus'
+  | 'image'
+  | 'layers'
+  | 'download'
+  | 'pause';
 
 /**
  * One 16px outline icon set for the design-system demos, so icons share size, stroke and optical weight.
@@ -78,8 +81,20 @@ export type DemoIconName =
         @case ('minus') {
           <path d="M3 8h10" />
         }
-        @case ('reset') {
-          <path d="M3.5 8a4.5 4.5 0 1 0 1.3-3.2M3.5 2.5v2.5H6" />
+        @case ('image') {
+          <rect x="2.5" y="3" width="11" height="10" rx="1.5" />
+          <circle cx="6" cy="6.5" r="1" />
+          <path d="M3 12l3.5-3.5 2.5 2.5 1.5-1.5 2.5 2.5" />
+        }
+        @case ('layers') {
+          <path d="M8 2.5l5.5 3-5.5 3-5.5-3z" />
+          <path d="M2.5 9l5.5 3 5.5-3" />
+        }
+        @case ('download') {
+          <path d="M8 3v7M5 7l3 3 3-3M3 10v2.5h10V10" />
+        }
+        @case ('pause') {
+          <path d="M5.5 3.5v9M10.5 3.5v9" />
         }
       }
     </svg>

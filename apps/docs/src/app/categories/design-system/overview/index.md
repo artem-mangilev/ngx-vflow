@@ -11,9 +11,9 @@ stable anatomy, states and a CSS token contract for cards, fields, ports, edges,
 Each page in this section shows one reference composition, its code and its limitations:
 
 - `Workflow` — cards, branching, edge labels, native actions, independent status and diagnostics, viewport controls.
-- `Data and media pipeline` — typed labeled ports, rich body content, native controls inside nodes.
+- `Image pipeline` — a small image editor: typed labeled ports, previews that follow the wiring, native controls inside nodes.
 - `ERD and schema mapping` — rows with ports for entity fields, stable field IDs through rename, reorder and deletion, a scroll/collapse experiment.
-- `Relationships and metrics map` — groups with their own connections, a note without ports, metrics and images, view mode.
+- `Relationships and metrics map` — nested, resizable groups with their own connections, people moving between teams, a note without ports, metrics and images.
 
 ## Setup
 
