@@ -363,6 +363,23 @@ describe('VflowComponent', () => {
     expect(host.positions.flat().at(-1)).toEqual({ type: 'position', id: 'a', point: { x, y } });
   });
 
+  it('reports every drag event when pointer events come within one frame', async () => {
+    const fixture = TestBed.createComponent(DragHostComponent);
+    await settle(fixture);
+    const host = fixture.componentInstance;
+    const card = fixture.nativeElement.querySelector('.card') as HTMLElement;
+    const { left, top } = card.getBoundingClientRect();
+
+    // No flush between the events: a fast pointer or an automated drag.
+    dispatchMouse(card, 'mousedown', { x: left + 5, y: top + 5 });
+    dispatchMouse(window, 'mousemove', { x: left + 15, y: top + 5 });
+    dispatchMouse(window, 'mousemove', { x: left + 25, y: top + 5 });
+    dispatchMouse(window, 'mouseup', { x: left + 25, y: top + 5 });
+    await settle(fixture);
+
+    expect(host.drags.map(([kind]) => kind)).toEqual(['start', 'drag', 'drag', 'end']);
+  });
+
   it('reports every node a drag of a selection moves', async () => {
     const fixture = TestBed.createComponent(DragHostComponent);
     await settle(fixture);

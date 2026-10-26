@@ -27,7 +27,7 @@ export class NodeDragControllerDirective {
   readonly nodeDragEnd = outputFromObservable(this.dragEvents('node-drag-end'));
 
   private dragEvents(state: DragState) {
-    return this.statusService.status$.pipe(
+    return this.statusService.nodeDragStatus$.pipe(
       filter((status): status is Extract<FlowStatus, { state: DragState }> => status.state === state),
       map(({ payload }): NodeDragEvent => ({
         node: payload.node.rawNode,

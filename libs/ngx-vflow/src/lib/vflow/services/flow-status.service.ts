@@ -4,6 +4,7 @@ import { HandleModel } from '../models/handle.model';
 import { ConnectionInternal } from '../interfaces/connection.internal.interface';
 import { EdgeModel } from '../models/edge.model';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { Subject } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
 
 export interface FlowStatusIdle {
@@ -129,6 +130,13 @@ export type FlowStatus =
 export class FlowStatusService {
   public readonly status = signal<FlowStatus>({ state: 'idle', payload: null });
   public readonly status$ = toObservable(this.status).pipe(shareReplay({ bufferSize: 1, refCount: true }));
+
+  // Drag statuses are events: `status$` keeps only the last status of a tick, so a start followed by a move before the
+  // next flush would never be reported.
+  private readonly nodeDragStatuses = new Subject<
+    FlowStatusNodeDragStart | FlowStatusNodeDrag | FlowStatusNodeDragEnd
+  >();
+  public readonly nodeDragStatus$ = this.nodeDragStatuses.asObservable();
 
   // Publish only connection changes to entity views. A computed projection would
   // still propagate every drag invalidation to all its consumers before equality is checked.
@@ -278,15 +286,20 @@ export class FlowStatusService {
   }
 
   public setNodeDragStartStatus(node: NodeModel, nodes: NodeModel[], event: PointerEvent) {
-    this.status.set({ state: 'node-drag-start', payload: { node, nodes, event } });
+    this.setNodeDragStatusOf({ state: 'node-drag-start', payload: { node, nodes, event } });
   }
 
   public setNodeDragStatus(node: NodeModel, nodes: NodeModel[], event: PointerEvent) {
-    this.status.set({ state: 'node-drag', payload: { node, nodes, event } });
+    this.setNodeDragStatusOf({ state: 'node-drag', payload: { node, nodes, event } });
   }
 
   public setNodeDragEndStatus(node: NodeModel, nodes: NodeModel[], event: PointerEvent) {
-    this.status.set({ state: 'node-drag-end', payload: { node, nodes, event } });
+    this.setNodeDragStatusOf({ state: 'node-drag-end', payload: { node, nodes, event } });
+  }
+
+  private setNodeDragStatusOf(status: FlowStatusNodeDragStart | FlowStatusNodeDrag | FlowStatusNodeDragEnd) {
+    this.status.set(status);
+    this.nodeDragStatuses.next(status);
   }
 
   public setSelectionBoxEndStatus() {
