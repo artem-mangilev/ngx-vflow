@@ -148,6 +148,29 @@
   background-color: transparent;
   font-size: 13px;
 }
+/* The application's text input, sized and drawn like the select. */
+.demo .input {
+  box-sizing: border-box;
+  height: 24px;
+  padding: 0 8px;
+  border: 1px solid var(--vui-border);
+  border-radius: 6px;
+  background: var(--vui-surface);
+  color: var(--vui-foreground);
+  font: inherit;
+  font-size: 12px;
+}
+.demo .input::placeholder {
+  color: var(--vui-muted);
+}
+.demo .input:focus-visible {
+  outline: 2px solid var(--vui-accent);
+  outline-offset: 1px;
+}
+.demo .input[aria-invalid='true'] {
+  border-color: var(--vui-danger);
+}
+
 /* The application's slider: a theme track filled up to the value, which the template passes as `--fill`. */
 .demo .range {
   --fill: 0%;

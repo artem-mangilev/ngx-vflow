@@ -560,3 +560,57 @@ test('ERD: deleting a field removes its edges and leaves no detached endpoints',
   await expect(demo.locator('path.vui-edge')).toHaveCount(1);
   await expect(demo.locator('.vui-port[data-vui-connected="true"]')).toHaveCount(2);
 });
+
+test('ERD: adding a field with a name and a type, refusing a taken name, cancelling with Escape', async ({ page }) => {
+  await page.goto('/design-system/erd-schema-mapping');
+  const demo = page.locator('app-ui-entities-demo');
+  await demo.evaluate((element) => element.scrollIntoView({ block: 'center' }));
+  const order = demo.locator('[data-entity="order"]');
+  const addButton = order.getByRole('button', { name: 'Add a field to Order', exact: true });
+  const name = order.getByLabel('Name of the new field of Order', { exact: true });
+  const rows = order.locator('[vuiRow][data-field]');
+  await expect(rows).toHaveCount(3);
+
+  // The draft opens with the name focused; Enter adds the field with the chosen type and its own ports.
+  await addButton.click();
+  await expect(name).toBeFocused();
+  await name.fill('status');
+  await order.getByLabel('Type of the new field of Order', { exact: true }).selectOption('timestamp');
+  await name.press('Enter');
+  const row = order.locator('[data-field="status"]');
+  await expect(row).toContainText('status');
+  await expect(row).toContainText('timestamp');
+  await expect(row.locator('.v-handle')).toHaveCount(2);
+  await expect(rows).toHaveCount(4);
+  await expect(addButton).toBeVisible();
+
+  // The existing connection stays on its rows; the frame wraps the taller table and the frames do not overlap.
+  const layout = () =>
+    demo.evaluate((root) => {
+      const rect = (selector: string) => root.querySelector(selector)!.getBoundingClientRect();
+      const edge = root.querySelector<SVGPathElement>('path.vui-edge')!;
+      const matrix = edge.getScreenCTM()!;
+      const end = edge.getPointAtLength(edge.getTotalLength()).matrixTransform(matrix);
+      const port = rect('[data-entity="order"] [data-field="customer-id"] .vui-port[data-v-handle-position="left"]');
+      return {
+        endpoint: Math.abs(end.y - port.y - port.height / 2),
+        inside: rect('[data-frame="relationships"]').bottom - rect('[data-entity="order"]').bottom,
+        between: rect('[data-frame="mapping"]').top - rect('[data-frame="relationships"]').bottom,
+      };
+    });
+  await expect.poll(async () => (await layout()).endpoint).toBeLessThan(1);
+  await expect.poll(async () => (await layout()).inside).toBeGreaterThan(8);
+  await expect.poll(async () => (await layout()).between).toBeGreaterThan(8);
+
+  // A taken name is refused and the draft stays open.
+  await addButton.click();
+  await name.fill('total');
+  await name.press('Enter');
+  await expect(name).toHaveAttribute('aria-invalid', 'true');
+  await expect(rows).toHaveCount(4);
+
+  // Escape drops the draft.
+  await name.press('Escape');
+  await expect(order.locator('[data-draft]')).toHaveCount(0);
+  await expect(rows).toHaveCount(4);
+});

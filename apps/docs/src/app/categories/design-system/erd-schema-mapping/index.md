@@ -4,9 +4,13 @@ Input and output IDs are distinct (`in:field-id` and `out:field-id`) and indepen
 
 Free ports and row actions show when a row is hovered or focused, or its table is selected; connected ports always
 show. Drag between ports of matching types to add a connection, labelled by what it does. Remove a connection with
-its label button or select it and press Delete. Deleting a field is handled by the application: the field and every
-edge on it go together. Type compatibility and graph changes belong to this application, not to the UI directive.
-Frames are parents drawn below the edges (`parentsBelowEdges`), so connections inside them stay selectable.
+its label button or select it and press Delete.
+
+Add a field from the last row of a table: type a name, pick a type and press Enter, or press Escape to drop the
+draft; a taken name is refused. The new row gets its own ports at once, and the frame grows with the table. Deleting
+a field is handled by the application: the field and every edge on it go together. Type compatibility and graph
+changes belong to this application, not to the UI directive. Frames are parents drawn below the edges
+(`parentsBelowEdges`), so connections inside them stay selectable.
 
 {{ NgDocActions.demo("EntitiesDemoComponent", { container: false }) }}
 

@@ -1,4 +1,17 @@
-import { ChangeDetectionStrategy, Component, computed, signal, viewChild, WritableSignal } from '@angular/core';
+import {
+  afterNextRender,
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  ElementRef,
+  inject,
+  Injector,
+  signal,
+  untracked,
+  viewChild,
+  WritableSignal,
+} from '@angular/core';
 import { Vui } from '@vflow/ui';
 import { DemoIconComponent } from '../../../shared/demo-icon.component';
 import { injectDocsTheme } from '../../../shared/docs-theme';
@@ -34,6 +47,10 @@ interface FrameData {
   title: string;
 }
 type SchemaData = EntityData | FrameData;
+
+const TYPES = ['uuid', 'text', 'decimal', 'timestamp'];
+/** Room of a frame around its tables, and between two frames. */
+const FRAME = { inset: 24, gap: 52 };
 
 @Component({
   selector: 'app-ui-entities-demo',
@@ -71,6 +88,36 @@ type SchemaData = EntityData | FrameData;
     .vui-edge-label:hover .row-action,
     .vui-edge-label[data-selected='true'] .row-action {
       display: inline-flex;
+    }
+    /* A quiet last row of every table; it turns into the draft of a new field. */
+    .add-field {
+      display: flex;
+      box-sizing: border-box;
+      align-items: center;
+      gap: 6px;
+      width: 100%;
+      padding: 6px 12px;
+      border: 0;
+      border-top: 1px solid color-mix(in oklab, var(--vui-border) 50%, transparent);
+      /* The bottom corners of the card: its radius is the control radius plus one spacing unit. */
+      border-radius: 0 0 calc(var(--vui-radius) + var(--vui-space)) calc(var(--vui-radius) + var(--vui-space));
+      background: transparent;
+      color: var(--vui-muted);
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .add-field:hover {
+      background: var(--vui-surface-muted);
+      color: var(--vui-foreground);
+    }
+    .add-field:focus-visible {
+      outline: 2px solid var(--vui-accent);
+      outline-offset: -2px;
+    }
+    .draft .input {
+      flex: 1;
+      min-width: 0;
     }
   `,
   template: `
@@ -132,6 +179,41 @@ type SchemaData = EntityData | FrameData;
                     [vuiPortConnected]="connected().has(ctx.node.id + '/out:' + field.id)"></span>
                 </div>
               }
+              @if (draft()?.entity === ctx.node.id) {
+                <!-- Enter adds the field, Escape drops the draft; core leaves keys typed in inputs alone. -->
+                <div vuiRow class="draft" data-draft>
+                  <input
+                    class="input"
+                    vNoDrag
+                    placeholder="field_name"
+                    [attr.aria-label]="'Name of the new field of ' + ctx.data().title"
+                    [attr.aria-invalid]="draftError()"
+                    [value]="draft()!.name"
+                    (input)="editDraft({ name: $any($event.target).value })"
+                    (keydown.enter)="commitDraft()"
+                    (keydown.escape)="cancelDraft()" />
+                  <select
+                    class="select"
+                    vNoDrag
+                    [attr.aria-label]="'Type of the new field of ' + ctx.data().title"
+                    (change)="editDraft({ type: $any($event.target).value })"
+                    (keydown.enter)="commitDraft()"
+                    (keydown.escape)="cancelDraft()">
+                    @for (type of types; track type) {
+                      <option [value]="type" [selected]="type === draft()!.type">{{ type }}</option>
+                    }
+                  </select>
+                </div>
+              } @else {
+                <button
+                  class="add-field"
+                  vNoDrag
+                  type="button"
+                  [attr.aria-label]="'Add a field to ' + ctx.data().title"
+                  (click)="startDraft(ctx.node.id)">
+                  <app-demo-icon name="plus" /> Add field
+                </button>
+              }
             </article>
           }
         </ng-template>
@@ -165,6 +247,14 @@ type SchemaData = EntityData | FrameData;
 export class EntitiesDemoComponent {
   readonly flow = viewChild(VflowComponent);
   readonly theme = injectDocsTheme();
+  readonly types = TYPES;
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
+  private readonly injector = inject(Injector);
+
+  /** The field being added: one table at a time. */
+  readonly draft = signal<{ entity: string; name: string; type: string } | null>(null);
+  /** The draft name is empty or taken. */
+  readonly draftError = signal(false);
   readonly nodes = createNodes<SchemaData>([
     frame('relationships', { x: 0, y: 0 }, 'Relationships', 238),
     frame('mapping', { x: 0, y: 290 }, 'Field mapping', 200),
@@ -234,6 +324,40 @@ export class EntitiesDemoComponent {
     this.edges.update((edges) => addEdges([edge], { nodes: this.nodes, edges }));
   }
 
+  startDraft(entity: string) {
+    this.draft.set({ entity, name: '', type: 'text' });
+    this.draftError.set(false);
+    afterNextRender(() => this.host.querySelector<HTMLInputElement>('[data-draft] input')?.focus(), {
+      injector: this.injector,
+    });
+  }
+
+  editDraft(change: { name?: string; type?: string }) {
+    this.draft.update((draft) => draft && { ...draft, ...change });
+    this.draftError.set(false);
+  }
+
+  /** Adds the field with an ID made from its name; the new row gets its own ports, ready to connect. */
+  commitDraft() {
+    const draft = this.draft();
+    if (!draft) return;
+    const name = draft.name.trim().replace(/\s+/g, '_');
+    const node = this.nodes.find((entity) => entity.id === draft.entity)!;
+    const data = node.data();
+    if (data.kind !== 'entity' || !name || data.fields.some((field) => field.name === name)) {
+      this.draftError.set(true);
+      return;
+    }
+    const id = name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    node.data.set({ ...data, fields: [...data.fields, { id, name, type: draft.type, key: '' }] });
+    this.draft.set(null);
+  }
+
+  cancelDraft() {
+    this.draft.set(null);
+    this.draftError.set(false);
+  }
+
   /** Delete removes the selected connections; tables and frames stay. */
   remove({ edgeIds }: DeleteRequest) {
     this.edges.update((edges) => edges.filter((edge) => !edgeIds.includes(edge.id)));
@@ -252,6 +376,31 @@ export class EntitiesDemoComponent {
           !(edge.target === nodeId && edge.targetHandle === 'in:' + fieldId),
       ),
     );
+  }
+
+  constructor() {
+    // Tables grow and shrink with their fields: every frame wraps its tables, and the frames stack without overlap.
+    // Measured sizes arrive after render, so this follows them instead of running once after a change.
+    effect(() => {
+      const flow = this.flow();
+      if (!flow) return;
+      let top = 0;
+      for (const frame of this.nodes.filter((node) => node.data().kind === 'frame')) {
+        const bottoms = this.nodes
+          .filter((node) => node.parentId?.() === frame.id)
+          .map((node) => {
+            const rect = flow.getNodeRect(node.id);
+            return rect ? node.point().y + rect.height : 0;
+          });
+        const height = Math.max(...bottoms) + FRAME.inset;
+        const y = top;
+        untracked(() => {
+          if (frame.point().y !== y) frame.point.set({ ...frame.point(), y });
+          if (frame.height!() !== height) frame.height!.set(height);
+        });
+        top += height + FRAME.gap;
+      }
+    });
   }
 
   removeEdge(id: string) {
