@@ -117,6 +117,78 @@
   outline: 2px solid var(--vui-accent);
   outline-offset: 2px;
 }
+/* The application's select, sized like a small button; the chevron is drawn in the text color, so it follows the theme. */
+.demo .select {
+  box-sizing: border-box;
+  height: 24px;
+  padding: 0 24px 0 8px;
+  border: 1px solid var(--vui-border);
+  border-radius: 6px;
+  background:
+    linear-gradient(45deg, transparent 50%, currentColor 50%) calc(100% - 13px) 50% / 4px 4px no-repeat,
+    linear-gradient(135deg, currentColor 50%, transparent 50%) calc(100% - 9px) 50% / 4px 4px no-repeat,
+    var(--vui-surface);
+  color: var(--vui-foreground);
+  font: inherit;
+  font-size: 12px;
+  appearance: none;
+  cursor: pointer;
+}
+.demo .select:hover {
+  border-color: color-mix(in oklab, var(--vui-border), var(--vui-foreground) 20%);
+}
+.demo .select:focus-visible {
+  outline: 2px solid var(--vui-accent);
+  outline-offset: 2px;
+}
+/* Borderless, for a toolbar. */
+.demo .select.plain {
+  height: 28px;
+  border-color: transparent;
+  background-color: transparent;
+  font-size: 13px;
+}
+/* The application's slider: a theme track filled up to the value, which the template passes as `--fill`. */
+.demo .range {
+  --fill: 0%;
+  height: 16px;
+  margin: 0;
+  background: transparent;
+  appearance: none;
+  cursor: pointer;
+}
+.demo .range::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 2px;
+  background: linear-gradient(to right, var(--vui-accent) var(--fill), var(--vui-border) var(--fill));
+}
+.demo .range::-moz-range-track {
+  height: 4px;
+  border-radius: 2px;
+  background: linear-gradient(to right, var(--vui-accent) var(--fill), var(--vui-border) var(--fill));
+}
+.demo .range::-webkit-slider-thumb {
+  width: 14px;
+  height: 14px;
+  margin-top: -5px;
+  border: 2px solid var(--vui-accent);
+  border-radius: 50%;
+  background: var(--vui-surface);
+  appearance: none;
+}
+.demo .range::-moz-range-thumb {
+  box-sizing: border-box;
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--vui-accent);
+  border-radius: 50%;
+  background: var(--vui-surface);
+}
+.demo .range:focus-visible {
+  outline: 2px solid var(--vui-accent);
+  outline-offset: 2px;
+}
+
 /* A tint of the tone with text of the same hue mixed 70/30 with the foreground: at least 4.5:1 in both themes. */
 .demo .badge {
   --tone: var(--vui-muted);

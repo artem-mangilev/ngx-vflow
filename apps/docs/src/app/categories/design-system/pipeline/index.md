@@ -22,7 +22,7 @@ Play the Number node to drive the hue with a wave.
 
 ## What this page proves
 
-- Typed, labeled ports without a dedicated port-label part: a `vuiRow` with `vuiTitle` and `vuiMeta` next to the core handle, colored by type through application CSS on the public `.vui-port` selector. A port row can hold a control, like the amount slider that a connected number disables.
+- Typed, labeled ports without a dedicated port-label part: a `vuiRow` with `vuiTitle` and `vuiMeta` next to the core handle, colored by type through application CSS on the public `.vui-port` selector. A port row can hold a control: the amount slider, which a connected number replaces with the name of its source.
 - Rich body content: images, selects, ranges and buttons. `vNoDrag` keeps them from moving the node and `vNoWheel` lets a range own the wheel.
 - Type compatibility, cycles and one edge per input belong to the application: the validator compares port types and rejects an edge that would close a loop, `connect` replaces the edge into the same input.
 - The graph is the program: the application evaluates its own data along the edges, the library only draws and edits the graph.

@@ -52,8 +52,10 @@ const EXPORT = { width: 1200, height: 780 };
     vflow {
       height: 600px;
     }
+    /* A dense editor scale: 13px for titles and rows, 12px for labels and meta. */
     article {
       width: 220px;
+      font-size: 13px;
     }
     article[data-kind='output'] {
       width: 320px;
@@ -112,9 +114,10 @@ const EXPORT = { width: 1200, height: 780 };
       display: grid;
       gap: 4px;
       margin-top: 8px;
+      color: var(--vui-muted);
       font-size: 12px;
     }
-    .setting select {
+    .setting .select {
       width: 100%;
     }
     .number {
@@ -124,12 +127,18 @@ const EXPORT = { width: 1200, height: 780 };
     }
     .number .big {
       flex: 1;
-      font-size: 22px;
+      font-size: 20px;
       font-weight: 600;
       font-variant-numeric: tabular-nums;
     }
-    .number input {
+    .slider {
+      display: block;
       width: 100%;
+      margin: 6px 0 0;
+    }
+    .linked {
+      flex: 1;
+      text-align: end;
     }
     .palette {
       position: absolute;
@@ -137,13 +146,8 @@ const EXPORT = { width: 1200, height: 780 };
       left: 10px;
       z-index: 2;
     }
-    .palette select {
-      height: 28px;
-      border: 0;
-      background: transparent;
-      color: inherit;
-      font: inherit;
-      font-size: 13px;
+    .palette {
+      padding-left: 8px;
     }
   `,
   template: `
@@ -193,6 +197,7 @@ const EXPORT = { width: 1200, height: 780 };
                     </button>
                   </div>
                   <input
+                    class="range slider"
                     vNoDrag
                     vNoWheel
                     type="range"
@@ -200,6 +205,7 @@ const EXPORT = { width: 1200, height: 780 };
                     max="1"
                     step="0.01"
                     aria-label="Number value"
+                    [style.--fill.%]="data.value * 100"
                     [value]="data.value"
                     (input)="patch(ctx.node.id, { value: +$any($event.target).value, playing: false })" />
                 } @else {
@@ -214,7 +220,7 @@ const EXPORT = { width: 1200, height: 780 };
                 @if (data.kind === 'source') {
                   <label class="setting">
                     Picture
-                    <select vNoDrag (change)="pick(ctx.node.id, $any($event.target).value)">
+                    <select class="select" vNoDrag (change)="pick(ctx.node.id, $any($event.target).value)">
                       @for (sample of samples; track sample.id) {
                         <option [value]="sample.id" [selected]="sample.id === data.sample">{{ sample.name }}</option>
                       }
@@ -227,7 +233,7 @@ const EXPORT = { width: 1200, height: 780 };
                 @if (data.kind === 'blend') {
                   <label class="setting">
                     Mode
-                    <select vNoDrag (change)="patch(ctx.node.id, { mode: $any($event.target).value })">
+                    <select class="select" vNoDrag (change)="patch(ctx.node.id, { mode: $any($event.target).value })">
                       @for (mode of modes; track mode) {
                         <option [value]="mode" [selected]="mode === data.mode">{{ mode }}</option>
                       }
@@ -246,21 +252,24 @@ const EXPORT = { width: 1200, height: 780 };
                     [vuiPortConnected]="connected().has(ctx.node.id + '/in:' + port.id)"></span>
                   <span vuiTitle>{{ port.name }}</span>
                   @if (port.id === 'amount') {
-                    @let linked = connected().has(ctx.node.id + '/in:amount');
-                    <input
-                      vNoDrag
-                      vNoWheel
-                      type="range"
-                      min="0"
-                      max="1"
-                      step="0.01"
-                      [attr.aria-label]="title(data) + ' amount'"
-                      [disabled]="linked"
-                      [value]="amounts().get(ctx.node.id)"
-                      (input)="patch(ctx.node.id, { amount: +$any($event.target).value })" />
+                    <!-- A connected number owns the amount: the row names it instead of offering a dead slider. -->
+                    @if (amountSource(ctx.node.id); as source) {
+                      <span vuiMeta class="linked" data-testid="linked">from {{ source }}</span>
+                    } @else {
+                      <input
+                        vNoDrag
+                        vNoWheel
+                        type="range"
+                        min="0"
+                        max="1"
+                        step="0.01"
+                        class="range"
+                        [style.--fill.%]="(amounts().get(ctx.node.id) ?? 0) * 100"
+                        [attr.aria-label]="title(data) + ' amount'"
+                        [value]="amounts().get(ctx.node.id)"
+                        (input)="patch(ctx.node.id, { amount: +$any($event.target).value })" />
+                    }
                     <span vuiMeta class="value">{{ percent(amounts().get(ctx.node.id) ?? 0) }}</span>
-                  } @else if (port.name !== 'Image') {
-                    <span vuiMeta>{{ port.type }}</span>
                   }
                 </div>
               }
@@ -310,7 +319,11 @@ const EXPORT = { width: 1200, height: 780 };
         </vflow>
         <div vuiToolbar class="palette">
           <app-demo-icon name="plus" />
-          <select #palette aria-label="Add a node" (change)="add(palette.value); palette.value = ''">
+          <select
+            #palette
+            class="select plain"
+            aria-label="Add a node"
+            (change)="add(palette.value); palette.value = ''">
             <option value="" disabled selected>Add node</option>
             @for (fn of filters; track fn) {
               <option [value]="fn">{{ filterLabel(fn) }}</option>
@@ -529,7 +542,7 @@ export class PipelineDemoComponent {
           outputs: [image('image')],
         };
       case 'blend':
-        return { inputs: [image('a', 'A'), image('b', 'B')], outputs: [image('image')] };
+        return { inputs: [image('a', 'Image A'), image('b', 'Image B')], outputs: [image('image')] };
       case 'number':
         return { inputs: [], outputs: [{ id: 'value', name: 'Value', type: 'number' }] };
       case 'output':
@@ -547,6 +560,12 @@ export class PipelineDemoComponent {
 
   filterLabel(fn: FilterFn) {
     return FILTERS[fn].label;
+  }
+
+  /** Title of the node wired into a filter's amount. */
+  amountSource(id: string) {
+    const data = this.data(this.source(id, 'amount'));
+    return data && title(data);
   }
 
   percent(value: number) {

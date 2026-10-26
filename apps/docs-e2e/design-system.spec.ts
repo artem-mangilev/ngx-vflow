@@ -286,9 +286,10 @@ test('image lab: typed ports, previews that follow the wiring, native controls a
     demo
       .locator(`[data-preview="${stage}"] > app-picture > .layer`)
       .evaluate((element: HTMLElement) => element.style.filter);
-  // The number wired into Hue owns its amount, so the slider of the node is disabled.
+  // The number wired into Hue owns its amount: the row names the source instead of offering a slider.
   const hue = demo.locator('[data-stage="hue"]');
-  await expect(hue.getByLabel('Hue amount', { exact: true })).toBeDisabled();
+  await expect(hue.getByLabel('Hue amount', { exact: true })).toHaveCount(0);
+  await expect(hue.getByTestId('linked')).toHaveText('from Number');
   await expect.poll(() => filterOf('hue')).toBe('hue-rotate(90deg)');
   await demo.getByLabel('Number value', { exact: true }).fill('0.5');
   await expect.poll(() => filterOf('hue')).toBe('hue-rotate(180deg)');
