@@ -111,7 +111,7 @@ test('field connections follow stable IDs through rename, reorder, density and r
   await demo.locator('article.vui-node').evaluateAll((entities) =>
     entities.forEach((entity) => {
       const rows = Array.from(entity.querySelectorAll('[vuiRow]'));
-      entity.append(...rows.reverse());
+      rows[0].parentElement!.append(...rows.reverse());
     }),
   );
   await expect(demo.locator('[data-entity="crm"] [vuiRow]').first()).toHaveAttribute('data-field', 'name');
@@ -613,4 +613,63 @@ test('ERD: adding a field with a name and a type, refusing a taken name, cancell
   await name.press('Escape');
   await expect(order.locator('[data-draft]')).toHaveCount(0);
   await expect(rows).toHaveCount(4);
+});
+
+test('ERD: a table longer than seven fields scrolls, and hidden rows keep their edges on the borders', async ({
+  page,
+}) => {
+  await page.goto('/design-system/erd-schema-mapping');
+  const demo = page.locator('app-ui-entities-demo');
+  await demo.evaluate((element) => element.scrollIntoView({ block: 'center' }));
+  const order = demo.locator('[data-entity="order"]');
+  const box = demo.locator('[data-rows="order"]');
+  // Up to seven fields the table does not scroll.
+  for (const name of ['status', 'placed_at', 'shipped_at', 'note']) {
+    await order.getByRole('button', { name: 'Add a field to Order', exact: true }).click();
+    await order.getByLabel('Name of the new field of Order', { exact: true }).fill(name);
+    await order.getByLabel('Name of the new field of Order', { exact: true }).press('Enter');
+  }
+  await expect(order.locator('[vuiRow][data-field]')).toHaveCount(7);
+  await expect(box).toHaveCount(0);
+  // The eighth field makes it scroll, scrolled to the new last row.
+  await order.getByRole('button', { name: 'Add a field to Order', exact: true }).click();
+  await order.getByLabel('Name of the new field of Order', { exact: true }).fill('currency');
+  await order.getByLabel('Name of the new field of Order', { exact: true }).press('Enter');
+  await expect(box).toHaveCount(1);
+  await expect.poll(() => box.evaluate((element) => element.scrollHeight > element.clientHeight)).toBe(true);
+  await expect.poll(() => box.evaluate((element) => element.scrollTop)).toBeGreaterThan(0);
+  await expect(order.locator('[data-field="currency"]')).toBeInViewport();
+  // Two more fields push the foreign key row out above: its edge ends on the header proxy, not inside the scroll box.
+  for (const name of ['paid_at', 'refunded_at']) {
+    await order.getByRole('button', { name: 'Add a field to Order', exact: true }).click();
+    await order.getByLabel('Name of the new field of Order', { exact: true }).fill(name);
+    await order.getByLabel('Name of the new field of Order', { exact: true }).press('Enter');
+  }
+  await expect(order.locator('[data-field="refunded-at"]')).toBeInViewport();
+  const endpointToHeader = () =>
+    demo.evaluate((root) => {
+      const edge = root.querySelector<SVGPathElement>('path.vui-edge')!;
+      const end = edge.getPointAtLength(edge.getTotalLength()).matrixTransform(edge.getScreenCTM()!);
+      // Rows are re-created on scroll: a port can be missing for a moment.
+      const port = root
+        .querySelector('[data-entity="order"] header .vui-port.v-handle[data-v-handle-position="left"]')
+        ?.getBoundingClientRect();
+      return port ? Math.hypot(end.x - port.left, end.y - port.y - port.height / 2) : Infinity;
+    });
+  await expect.poll(endpointToHeader).toBeLessThan(1.5);
+  // Scrolling back to the top puts the endpoint on its row again.
+  await box.evaluate((element) => (element.scrollTop = 0));
+  const endpointToRow = () =>
+    demo.evaluate((root) => {
+      const edge = root.querySelector<SVGPathElement>('path.vui-edge')!;
+      const end = edge.getPointAtLength(edge.getTotalLength()).matrixTransform(edge.getScreenCTM()!);
+      const port = root
+        .querySelector(
+          '[data-entity="order"] [data-field="customer-id"] .vui-port.v-handle[data-v-handle-position="left"]',
+        )
+        ?.getBoundingClientRect();
+      return port ? Math.hypot(end.x - port.left, end.y - port.y - port.height / 2) : Infinity;
+    });
+  await expect.poll(endpointToRow).toBeLessThan(1.5);
+  await expect(order.locator('footer')).toContainText('more below');
 });

@@ -1,17 +1,9 @@
-import {
-  afterEveryRender,
-  ChangeDetectionStrategy,
-  Component,
-  ElementRef,
-  inject,
-  signal,
-  viewChild,
-  WritableSignal,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, viewChild, WritableSignal } from '@angular/core';
 import { Vui } from '@vflow/ui';
 import { DemoIconComponent } from '../../../shared/demo-icon.component';
 import { injectDocsTheme } from '../../../shared/docs-theme';
 import { createEdges, createNodes, Node, Vflow, VflowComponent } from 'ngx-vflow';
+import { ScrollRows } from './scroll-rows';
 
 interface LongEntity {
   title: string;
@@ -19,23 +11,10 @@ interface LongEntity {
   fields: { id: string; name: string; type: string }[];
 }
 
-interface Visibility {
-  /** Field IDs whose rows are at least partly visible in the scroll box. */
-  visible: Set<string>;
-  above: string[];
-  below: string[];
-  /** Changes on every scroll so visible rows are re-created and their handles re-measured. */
-  key: number;
-}
-
-const ALL_VISIBLE: Visibility = { visible: new Set(), above: [], below: [], key: 0 };
-
 /**
  * Local experiment, not a library contract. Two application policies for hidden endpoints:
  * - collapse moves every endpoint to proxy handles in the header;
- * - scroll keeps visible rows' handles on the rows and moves hidden ones to the nearest border
- *   (header or footer). Core measures handles after render and resize, not on scroll, so visible
- *   rows are re-created on scroll to be measured again.
+ * - scroll keeps visible rows' handles on the rows and moves hidden ones to the nearest border (see `ScrollRows`).
  */
 @Component({
   selector: 'app-ui-scroll-collapse-demo',
@@ -81,7 +60,7 @@ const ALL_VISIBLE: Visibility = { visible: new Set(), above: [], below: [], key:
     <section class="demo" aria-label="Scroll and collapse experiment" [attr.data-vui-theme]="theme()">
       <vflow view="auto" [nodes]="nodes" [edges]="edges" (initialized)="flow()?.fitView()">
         <ng-template let-ctx vNode>
-          @let view = visibility(ctx.node.id);
+          @let view = scroll.visibility(ctx.node.id);
           <article
             vuiNode
             [selected]="ctx.selected() || ctx.preselected()"
@@ -101,7 +80,7 @@ const ALL_VISIBLE: Visibility = { visible: new Set(), above: [], below: [], key:
               </button>
               <!-- Proxy handles keep the same IDs, so edges stay attached while rows are hidden. -->
               @for (
-                field of ctx.data().collapsed ? ctx.data().fields : hidden(ctx.data(), view.above);
+                field of ctx.data().collapsed ? ctx.data().fields : scroll.hidden(ctx.data().fields, view.above);
                 track field.id
               ) {
                 <span
@@ -123,8 +102,8 @@ const ALL_VISIBLE: Visibility = { visible: new Set(), above: [], below: [], key:
               }
             </header>
             @if (!ctx.data().collapsed) {
-              <div class="rows" vNoWheel [attr.data-rows]="ctx.node.id" (scroll)="onScroll(ctx.node.id, $event)">
-                @for (row of rows(ctx.node.id, ctx.data()); track row.key) {
+              <div class="rows" vNoWheel [attr.data-rows]="ctx.node.id" (scroll)="scroll.onScroll(ctx.node.id, $event)">
+                @for (row of scroll.rows(ctx.node.id, ctx.data().fields); track row.key) {
                   <div vuiRow [attr.data-field]="row.field.id">
                     <span vuiTitle>{{ row.field.name }}</span>
                     <span vuiMeta>{{ row.field.type }}</span>
@@ -152,7 +131,7 @@ const ALL_VISIBLE: Visibility = { visible: new Set(), above: [], below: [], key:
               @if (view.below.length) {
                 <footer vuiNodeFooter class="proxy edge-note">
                   <span vuiMeta>{{ view.below.length }} more below</span>
-                  @for (field of hidden(ctx.data(), view.below); track field.id) {
+                  @for (field of scroll.hidden(ctx.data().fields, view.below); track field.id) {
                     <span
                       vuiPort
                       vuiPortReveal="interaction"
@@ -187,9 +166,7 @@ const ALL_VISIBLE: Visibility = { visible: new Set(), above: [], below: [], key:
 export class ScrollCollapseDemoComponent {
   readonly flow = viewChild(VflowComponent);
   readonly theme = injectDocsTheme();
-  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
-  private readonly views = signal<Record<string, Visibility>>({});
-  private readonly lastTop: Record<string, number> = {};
+  readonly scroll = new ScrollRows<LongEntity['fields'][number]>();
   readonly nodes = createNodes<LongEntity>([
     {
       id: 'product',
@@ -262,63 +239,8 @@ export class ScrollCollapseDemoComponent {
     this.edges.flatMap((edge) => [`${edge.source}/${edge.sourceHandle}`, `${edge.target}/${edge.targetHandle}`]),
   );
 
-  constructor() {
-    // Classify each scroll box once it exists, so hidden rows start on the borders as well.
-    afterEveryRender(() => {
-      for (const box of Array.from(this.host.querySelectorAll<HTMLElement>('[data-rows]'))) {
-        const id = box.dataset['rows']!;
-        if (!(id in this.lastTop)) this.classify(id, box);
-      }
-    });
-  }
-
-  visibility(nodeId: string): Visibility {
-    return this.views()[nodeId] ?? ALL_VISIBLE;
-  }
-
-  /** Rows with a key that changes on scroll for visible rows, so they are re-created and measured again. */
-  rows(nodeId: string, data: LongEntity) {
-    const view = this.visibility(nodeId);
-    return data.fields.map((field) => {
-      const handles = view.key === 0 || view.visible.has(field.id);
-      return { field, handles, key: `${field.id}:${handles ? view.key : 0}` };
-    });
-  }
-
-  hidden(data: LongEntity, ids: string[]) {
-    return data.fields.filter((field) => ids.includes(field.id));
-  }
-
   toggle(id: string) {
     this.nodes.find((node) => node.id === id)!.data.update((data) => ({ ...data, collapsed: !data.collapsed }));
-    delete this.lastTop[id];
-    this.views.update((views) => ({ ...views, [id]: ALL_VISIBLE }));
-  }
-
-  onScroll(nodeId: string, event: Event) {
-    this.classify(nodeId, event.target as HTMLElement);
-  }
-
-  /** Classify rows by their position in the scroll box; the application decides where hidden endpoints go. */
-  private classify(nodeId: string, box: HTMLElement) {
-    const top = box.scrollTop;
-    // Re-creating rows can emit scroll events; only a real scroll offset change re-classifies.
-    if (this.lastTop[nodeId] === top) return;
-    this.lastTop[nodeId] = top;
-    const frame = box.getBoundingClientRect();
-    const visible = new Set<string>();
-    const above: string[] = [];
-    const below: string[] = [];
-    for (const row of Array.from(box.querySelectorAll<HTMLElement>('[data-field]'))) {
-      const id = row.dataset['field']!;
-      const rect = row.getBoundingClientRect();
-      if (rect.bottom <= frame.top) above.push(id);
-      else if (rect.top >= frame.bottom) below.push(id);
-      else visible.add(id);
-    }
-    this.views.update((views) => ({
-      ...views,
-      [nodeId]: { visible, above, below, key: (views[nodeId]?.key ?? 0) + 1 },
-    }));
+    this.scroll.reset(id);
   }
 }
