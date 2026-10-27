@@ -28,6 +28,7 @@ import { pressTarget } from '../utils/press-target';
     '[attr.data-v-handle-state]': 'state()',
     '[attr.data-v-handle-can-start]': 'canStart()',
     '[attr.data-v-handle-can-accept]': 'canAccept()',
+    '[attr.data-v-handle-pending]': "pending() ? '' : null",
     '[style.position]': "placement() ? 'absolute' : null",
     '[style.top]': 'placement()?.top ?? null',
     '[style.left]': 'placement()?.left ?? null',
@@ -86,6 +87,9 @@ export class VflowHandleDirective {
   );
 
   public readonly state = this.model.state.asReadonly();
+
+  /** Rendered but not measured yet, so not placed: the flow stylesheet hides it until the next measurement. */
+  protected readonly pending = computed(() => this.model.hasBox() && !this.model.isMeasured());
 
   protected readonly placement = computed(() => {
     if (this.layout() !== 'auto' || this.model.dynamic()) return null;

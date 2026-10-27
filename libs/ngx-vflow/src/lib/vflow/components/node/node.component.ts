@@ -109,9 +109,14 @@ export class NodeComponent implements OnInit, OnDestroy {
       classes.toggle('v-node--undraggable', this.hostUndraggable());
       classes.toggle('v-node--drag-handles-only', this.hostDragHandlesOnly());
     });
+    // A ready node inherits visibility, so the flow can keep it hidden until its first layout is complete. Once shown it
+    // stays shown: a handle added later hides itself until it is measured, instead of blinking the whole node. A node
+    // whose own measurement is reset (a remount, a restore from CSS culling) waits for every handle again.
+    let shown = false;
     effect(() => {
-      // A ready node inherits visibility, so the flow can keep it hidden until its first layout is complete.
-      this.hostRef.nativeElement.style.visibility = flowRendering.hiddenUntil(this.model().isReady()) ? 'hidden' : '';
+      const model = this.model();
+      shown = model.isMeasured() && (shown || model.isReady());
+      this.hostRef.nativeElement.style.visibility = flowRendering.hiddenUntil(shown) ? 'hidden' : '';
     });
     effect(() => {
       const model = this.model();

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { VflowComponent } from './components/vflow/vflow.component';
 import { createNode } from './interfaces/node.interface';
@@ -28,7 +28,61 @@ class LabelEdgeComponent {}
 })
 class SmallCustomNodeComponent {}
 
+/** A node whose second handle appears later, like a row added to a table. */
+const extraHandle = signal(false);
+
+@Component({
+  template: `<div style="width:100px;height:48px">
+    <span vHandle handleType="target" position="left"></span>
+    @if (extra()) {
+      <span vHandle handleType="source" position="right" handleId="extra"></span>
+    }
+  </div>`,
+  imports: [VflowHandleDirective],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+class GrowingNodeComponent {
+  readonly extra = extraHandle;
+}
+
 describe('Initial handle placement', () => {
+  it('keeps a shown node visible when a handle is added, and shows the new handle only once placed', async () => {
+    extraHandle.set(false);
+    const fixture = TestBed.createComponent(VflowComponent);
+    fixture.componentRef.setInput('view', [400, 300]);
+    fixture.componentRef.setInput('nodes', [
+      createNode({ id: 'a', component: GrowingNodeComponent, point: { x: 0, y: 0 } }),
+    ]);
+    fixture.detectChanges();
+    const node = () => fixture.nativeElement.querySelector('.v-node') as HTMLElement;
+    for (let i = 0; i < 8 && getComputedStyle(node()).visibility !== 'visible'; i++) {
+      await new Promise(requestAnimationFrame);
+    }
+    expect(getComputedStyle(node()).visibility).toBe('visible');
+
+    extraHandle.set(true);
+    fixture.detectChanges();
+    const frames: { node: string; handle: string; top: string }[] = [];
+    for (let i = 0; i < 6; i++) {
+      const handle = node().querySelector('.v-handle[data-v-handle-position="right"]') as HTMLElement | null;
+      frames.push({
+        node: getComputedStyle(node()).visibility,
+        handle: handle ? getComputedStyle(handle).visibility : 'absent',
+        top: handle?.style.top ?? '',
+      });
+      await new Promise(requestAnimationFrame);
+    }
+    expect(
+      frames.every((frame) => frame.node === 'visible'),
+      JSON.stringify(frames),
+    ).toBe(true);
+    expect(
+      frames.filter((frame) => frame.handle === 'visible' && frame.top !== '24px'),
+      JSON.stringify(frames),
+    ).toEqual([]);
+    expect(frames.at(-1)?.handle).toBe('visible');
+  });
+
   for (const count of [1, 1024]) {
     it(`never shows unpositioned custom handles on initial mount or restore (${count} nodes)`, async () => {
       const fixture = TestBed.createComponent(VflowComponent);

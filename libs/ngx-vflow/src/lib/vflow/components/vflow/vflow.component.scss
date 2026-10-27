@@ -108,6 +108,11 @@
     .v-resize-control {
       touch-action: none;
     }
+
+    // A handle added to a node that is already shown waits for its first measurement, which places it.
+    .v-handle[data-v-handle-pending] {
+      visibility: hidden;
+    }
   }
 }
 
