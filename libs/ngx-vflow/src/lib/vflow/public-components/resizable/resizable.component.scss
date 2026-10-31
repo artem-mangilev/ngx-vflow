@@ -1,3 +1,10 @@
+// The controls sit on the node box; the container is only their frame and takes no pointer itself.
+.v-resize-controls {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
 .v-resize-control {
   position: absolute;
   pointer-events: all;
@@ -24,7 +31,7 @@
   cursor: nesw-resize;
 }
 
-// Corner handles
+// Corner handles keep a constant on-screen size: the scale counters the zoom.
 .v-resize-control.v-resize-control--handle {
   width: 6px;
   height: 6px;
@@ -32,6 +39,7 @@
   border: 1px solid var(--v-resize-control-border);
   border-radius: 1px;
   translate: -50% -50%;
+  scale: var(--resizer-scale, 1);
 }
 
 .v-resize-control.v-resize-control--handle.v-resize-control--left,

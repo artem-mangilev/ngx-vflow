@@ -1,4 +1,28 @@
-import { ControlPosition, CoordinateExtent, NodeOrigin, ResizeChangeParams, ResizeSign } from './resizer-types';
+import { Point } from '../../interfaces/point.interface';
+import { ControlPosition, CoordinateExtent, ResizeAxis, ResizeChangeParams, ResizeSign } from './resizer-types';
+
+/** The axes a control drags and the sides it moves. */
+export interface ControlDirection {
+  isHorizontal: boolean;
+  isVertical: boolean;
+  /** The control is on the left side: growing moves the node origin. */
+  affectsX: boolean;
+  /** The control is on the top side. */
+  affectsY: boolean;
+}
+
+/** Parses the dragged control position into the dimensions it drives; a restricted axis does not exist to it. */
+export function getControlDirection(position: ControlPosition, axis?: ResizeAxis): ControlDirection {
+  const horizontal = axis !== 'vertical';
+  const vertical = axis !== 'horizontal';
+
+  return {
+    isHorizontal: horizontal && (position.includes('right') || position.includes('left')),
+    isVertical: vertical && (position.includes('bottom') || position.includes('top')),
+    affectsX: horizontal && position.includes('left'),
+    affectsY: vertical && position.includes('top'),
+  };
+}
 
 interface GetResizeDirectionParams {
   width: number;
@@ -29,39 +53,21 @@ export function getResizeDirection({
   return { x: affectsX ? ((-x || 0) as ResizeSign) : x, y: affectsY ? ((-y || 0) as ResizeSign) : y };
 }
 
-/**
- * Parses the dragged control position into the dimensions/edges it affects.
- */
-export function getControlDirection(controlPosition: ControlPosition) {
-  const isHorizontal = controlPosition.includes('right') || controlPosition.includes('left');
-  const isVertical = controlPosition.includes('bottom') || controlPosition.includes('top');
-  const affectsX = controlPosition.includes('left');
-  const affectsY = controlPosition.includes('top');
-
-  return {
-    isHorizontal,
-    isVertical,
-    affectsX,
-    affectsY,
-  };
+export interface ResizeBounds {
+  minWidth: number;
+  minHeight: number;
+  maxWidth: number;
+  maxHeight: number;
 }
 
-interface PrevValues {
-  width: number;
-  height: number;
+/** The node and the pointer at the press, in flow units. */
+export interface ResizeStart {
   x: number;
   y: number;
-}
-
-type StartValues = PrevValues & {
-  pointerX: number;
-  pointerY: number;
+  width: number;
+  height: number;
+  pointer: Point;
   aspectRatio: number;
-};
-
-interface PointerPosition {
-  xSnapped: number;
-  ySnapped: number;
 }
 
 function getLowerExtentClamp(lowerExtent: number, lowerBound: number) {
@@ -81,36 +87,31 @@ function xor(a: boolean, b: boolean) {
 }
 
 /**
- * Calculates the new width/height and x/y of a node after a resize, applying every
- * restriction (min/max size, parent extent, child extent, aspect ratio and node origin)
- * by computing the strongest "clamp" and applying it to the pointer-movement distance.
+ * Calculates the new width/height and x/y of a node after a resize, applying every restriction (min/max size, parent
+ * extent, child extent and aspect ratio) by computing the strongest "clamp" and applying it to the pointer-movement
+ * distance.
  */
 export function getDimensionsAfterResize(
-  startValues: StartValues,
-  controlDirection: ReturnType<typeof getControlDirection>,
-  pointerPosition: PointerPosition,
-  boundaries: { minWidth: number; maxWidth: number; minHeight: number; maxHeight: number },
+  start: ResizeStart,
+  direction: ControlDirection,
+  pointer: Point,
+  bounds: ResizeBounds,
   keepAspectRatio: boolean,
-  nodeOrigin: NodeOrigin,
   extent?: CoordinateExtent,
   childExtent?: CoordinateExtent,
 ) {
-  let { affectsX, affectsY } = controlDirection;
-  const { isHorizontal, isVertical } = controlDirection;
+  let { affectsX, affectsY } = direction;
+  const { isHorizontal, isVertical } = direction;
   const isDiagonal = isHorizontal && isVertical;
 
-  const { xSnapped, ySnapped } = pointerPosition;
-  const { minWidth, maxWidth, minHeight, maxHeight } = boundaries;
+  const { minWidth, maxWidth, minHeight, maxHeight } = bounds;
 
-  const { x: startX, y: startY, width: startWidth, height: startHeight, aspectRatio } = startValues;
-  let distX = Math.floor(isHorizontal ? xSnapped - startValues.pointerX : 0);
-  let distY = Math.floor(isVertical ? ySnapped - startValues.pointerY : 0);
+  const { x: startX, y: startY, width: startWidth, height: startHeight, aspectRatio } = start;
+  let distX = Math.floor(isHorizontal ? pointer.x - start.pointer.x : 0);
+  let distY = Math.floor(isVertical ? pointer.y - start.pointer.y : 0);
 
   const newWidth = startWidth + (affectsX ? -distX : distX);
   const newHeight = startHeight + (affectsY ? -distY : distY);
-
-  const originOffsetX = -nodeOrigin[0] * startWidth;
-  const originOffsetY = -nodeOrigin[1] * startHeight;
 
   // Check if min/max width/height are restricting the resize
   let clampX = getSizeClamp(newWidth, minWidth, maxWidth);
@@ -121,15 +122,15 @@ export function getDimensionsAfterResize(
     let xExtentClamp = 0;
     let yExtentClamp = 0;
     if (affectsX && distX < 0) {
-      xExtentClamp = getLowerExtentClamp(startX + distX + originOffsetX, extent[0][0]);
+      xExtentClamp = getLowerExtentClamp(startX + distX, extent[0][0]);
     } else if (!affectsX && distX > 0) {
-      xExtentClamp = getUpperExtentClamp(startX + newWidth + originOffsetX, extent[1][0]);
+      xExtentClamp = getUpperExtentClamp(startX + newWidth, extent[1][0]);
     }
 
     if (affectsY && distY < 0) {
-      yExtentClamp = getLowerExtentClamp(startY + distY + originOffsetY, extent[0][1]);
+      yExtentClamp = getLowerExtentClamp(startY + distY, extent[0][1]);
     } else if (!affectsY && distY > 0) {
-      yExtentClamp = getUpperExtentClamp(startY + newHeight + originOffsetY, extent[1][1]);
+      yExtentClamp = getUpperExtentClamp(startY + newHeight, extent[1][1]);
     }
 
     clampX = Math.max(clampX, xExtentClamp);
@@ -165,12 +166,10 @@ export function getDimensionsAfterResize(
       if (extent) {
         let aspectExtentClamp = 0;
         if ((!affectsX && !affectsY) || (affectsX && !affectsY && isDiagonal)) {
-          aspectExtentClamp =
-            getUpperExtentClamp(startY + originOffsetY + newWidth / aspectRatio, extent[1][1]) * aspectRatio;
+          aspectExtentClamp = getUpperExtentClamp(startY + newWidth / aspectRatio, extent[1][1]) * aspectRatio;
         } else {
           aspectExtentClamp =
-            getLowerExtentClamp(startY + originOffsetY + (affectsX ? distX : -distX) / aspectRatio, extent[0][1]) *
-            aspectRatio;
+            getLowerExtentClamp(startY + (affectsX ? distX : -distX) / aspectRatio, extent[0][1]) * aspectRatio;
         }
         clampX = Math.max(clampX, aspectExtentClamp);
       }
@@ -194,12 +193,10 @@ export function getDimensionsAfterResize(
       if (extent) {
         let aspectExtentClamp = 0;
         if ((!affectsX && !affectsY) || (affectsY && !affectsX && isDiagonal)) {
-          aspectExtentClamp =
-            getUpperExtentClamp(startX + newHeight * aspectRatio + originOffsetX, extent[1][0]) / aspectRatio;
+          aspectExtentClamp = getUpperExtentClamp(startX + newHeight * aspectRatio, extent[1][0]) / aspectRatio;
         } else {
           aspectExtentClamp =
-            getLowerExtentClamp(startX + (affectsY ? distY : -distY) * aspectRatio + originOffsetX, extent[0][0]) /
-            aspectRatio;
+            getLowerExtentClamp(startX + (affectsY ? distY : -distY) * aspectRatio, extent[0][0]) / aspectRatio;
         }
         clampY = Math.max(clampY, aspectExtentClamp);
       }
@@ -238,13 +235,10 @@ export function getDimensionsAfterResize(
     }
   }
 
-  const x = affectsX ? startX + distX : startX;
-  const y = affectsY ? startY + distY : startY;
-
   return {
     width: startWidth + (affectsX ? -distX : distX),
     height: startHeight + (affectsY ? -distY : distY),
-    x: nodeOrigin[0] * distX * (!affectsX ? 1 : -1) + x,
-    y: nodeOrigin[1] * distY * (!affectsY ? 1 : -1) + y,
+    x: affectsX ? startX + distX : startX,
+    y: affectsY ? startY + distY : startY,
   };
 }

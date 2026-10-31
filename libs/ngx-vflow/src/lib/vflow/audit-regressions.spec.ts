@@ -18,12 +18,11 @@ import { createEdge } from './interfaces/edge.interface';
 import { reparentNodes } from './utils/graph-operations';
 import { ReferenceIdentityChecker } from './utils/identity-checker/reference-identity-checker';
 import { addNodesToEdges } from './utils/add-nodes-to-edges';
-import { createResizer } from './public-components/resizable/resizer';
+import { startResize } from './public-components/resizable/resizer';
 import { ConnectionService } from './services/connection.service';
 import { VflowHandleDirective } from './directives/handle.directive';
 import { EdgeLabelComponent } from './components/edge-label/edge-label.component';
 import { VflowComponent } from './components/vflow/vflow.component';
-import { mouseAsPointer } from './gestures/pointer-events.testing';
 
 /** Labels render a template declared by the edge presentation; this host supplies a minimal one. */
 @Component({
@@ -340,89 +339,53 @@ describe('Graph rendering and interaction regressions', () => {
 
   it('reports the last accepted size at resizeEnd after a rejected move', () => {
     const model = node('resize');
-    const element = document.createElement('div');
-    document.body.append(element);
     const end = vi.fn();
-    const resizer = createResizer({
-      domNode: element,
-      getStoreItems: () => ({
-        model,
-        viewport: { x: 0, y: 0, zoom: 1 },
-        snapGrid: [1, 1],
-        nodeOrigin: [0, 0],
-        paneDomNode: element,
-      }),
-      onChange: (change) => {
-        if (change.width !== undefined) model.width.set(change.width);
+    const event = { sourceEvent: new PointerEvent('pointermove') };
+    const gesture = startResize(
+      {
+        node: model,
+        position: 'right',
+        bounds: { minWidth: 0, minHeight: 0, maxWidth: Infinity, maxHeight: Infinity },
+        keepAspectRatio: false,
+        shouldResize: (_, size) => size.width <= 110,
+        onStart: vi.fn(),
+        onResize: vi.fn(),
+        onEnd: end,
       },
-    });
-    resizer.update({
-      controlPosition: 'right',
-      boundaries: { minWidth: 0, minHeight: 0, maxWidth: Infinity, maxHeight: Infinity },
-      keepAspectRatio: false,
-      shouldResize: (_, size) => size.width <= 110,
-      onResizeEnd: end,
-    });
-    const mouse = (type: string, x: number) =>
-      mouseAsPointer(type, {
-        clientX: x,
-        clientY: 25,
-        bubbles: true,
-        view: window,
-        buttons: type === 'mouseup' ? 0 : 1,
-      });
-    element.dispatchEvent(mouse('mousedown', 100));
-    window.dispatchEvent(mouse('mousemove', 110));
-    window.dispatchEvent(mouse('mousemove', 120));
-    window.dispatchEvent(mouse('mouseup', 120));
+      event,
+      { x: 100, y: 25 },
+    );
+    gesture.move(event, { x: 110, y: 25 });
+    gesture.move(event, { x: 120, y: 25 });
+    gesture.end(event);
     expect(model.width()).toBe(110);
     expect(end.mock.lastCall![1].width).toBe(110);
-    resizer.destroy();
-    element.remove();
   });
 
   it('grows a node that starts below its min size from the min size instead of shrinking it', () => {
     const model = node('resize-below-min');
     model.width.set(100);
-    const element = document.createElement('div');
-    document.body.append(element);
-    const resizer = createResizer({
-      domNode: element,
-      getStoreItems: () => ({
-        model,
-        viewport: { x: 0, y: 0, zoom: 1 },
-        snapGrid: [1, 1],
-        nodeOrigin: [0, 0],
-        paneDomNode: element,
-      }),
-      onChange: (change) => {
-        if (change.width !== undefined) model.width.set(change.width);
-        if (change.x !== undefined && change.y !== undefined) model.setPoint({ x: change.x, y: change.y });
-      },
-    });
-    resizer.update({
-      controlPosition: 'right',
-      boundaries: { minWidth: 240, minHeight: 0, maxWidth: Infinity, maxHeight: Infinity },
-      keepAspectRatio: false,
-    });
-    const mouse = (type: string, x: number) =>
-      mouseAsPointer(type, {
-        clientX: x,
-        clientY: 25,
-        bubbles: true,
-        view: window,
-        buttons: type === 'mouseup' ? 0 : 1,
-      });
+    const event = { sourceEvent: new PointerEvent('pointermove') };
     const pointBefore = model.point();
 
-    element.dispatchEvent(mouse('mousedown', 100));
-    window.dispatchEvent(mouse('mousemove', 140));
-    window.dispatchEvent(mouse('mouseup', 140));
+    const gesture = startResize(
+      {
+        node: model,
+        position: 'right',
+        bounds: { minWidth: 240, minHeight: 0, maxWidth: Infinity, maxHeight: Infinity },
+        keepAspectRatio: false,
+        onStart: vi.fn(),
+        onResize: vi.fn(),
+        onEnd: vi.fn(),
+      },
+      event,
+      { x: 100, y: 25 },
+    );
+    gesture.move(event, { x: 140, y: 25 });
+    gesture.end(event);
 
     expect(model.width()).toBe(280);
     expect(model.point()).toEqual(pointBefore);
-    resizer.destroy();
-    element.remove();
   });
 
   it('stops observing a model after the node is removed from the graph', () => {

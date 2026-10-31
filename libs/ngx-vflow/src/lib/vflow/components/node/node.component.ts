@@ -29,7 +29,7 @@ import { NODE_REF } from '../../utils/inject-node';
 import { NODE_MODEL } from '../../utils/node-model.token';
 import { HandleModel } from '../../models/handle.model';
 import { NodeHandlesControllerDirective } from '../../directives/node-handles-controller.directive';
-import { NodeResizeControllerDirective } from '../../directives/node-resize-controller.directive';
+import { NodeMeasureDirective } from '../../directives/node-measure.directive';
 
 @Component({
   selector: 'div[node]',
@@ -50,12 +50,7 @@ import { NodeResizeControllerDirective } from '../../directives/node-resize-cont
     // Clicks from the presentation bubble here; a drag or a resize suppresses the click that follows it.
     '(click)': 'onClick($event)',
   },
-  imports: [
-    NgTemplateOutlet,
-    EntityComponentOutletDirective,
-    NodeHandlesControllerDirective,
-    NodeResizeControllerDirective,
-  ],
+  imports: [NgTemplateOutlet, EntityComponentOutletDirective, NodeHandlesControllerDirective, NodeMeasureDirective],
 })
 export class NodeComponent implements OnInit, OnDestroy {
   protected injector = inject(Injector);
@@ -130,7 +125,7 @@ export class NodeComponent implements OnInit, OnDestroy {
   }
 
   public ngOnInit() {
-    // Every node is measured by nodeResizeController and stays hidden until then; an explicit size is measured
+    // Every node is measured by nodeMeasure and stays hidden until then; an explicit size is measured
     // from the wrapper or the resizable element that carries it. A remounted view must measure its new DOM.
     this.model().isMeasured.set(false);
     this.model().nodeElement.set(this.hostRef.nativeElement);

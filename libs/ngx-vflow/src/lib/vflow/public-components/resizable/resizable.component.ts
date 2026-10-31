@@ -1,5 +1,4 @@
 import {
-  AfterViewInit,
   ChangeDetectionStrategy,
   Component,
   ElementRef,
@@ -10,30 +9,51 @@ import {
   inject,
   input,
   output,
-  signal,
   viewChild,
 } from '@angular/core';
 import { NODE_MODEL } from '../../utils/node-model.token';
-import { AfterRenderBatchService } from '../../services/after-render-batch.service';
-import { NodeResizeControlComponent } from './node-resize-control.component';
+import { ViewportService } from '../../services/viewport.service';
+import { FlowSettingsService } from '../../services/flow-settings.service';
+import { SpacePointContextDirective } from '../../directives/space-point-context.directive';
+import { VflowNoDragDirective } from '../../directives/gesture-exclusions.directive';
+import { PointerTracker, createPointerTracker } from '../../gestures/pointer-drag';
+import { Point } from '../../interfaces/point.interface';
+import { align } from '../../utils/align-number';
+import { ResizeGesture, startResize } from './resizer';
+import { ResizeBounds } from './resizer-utils';
 import {
-  ControlLinePosition,
   ControlPosition,
-  RESIZER_HANDLE_POSITIONS,
-  RESIZER_LINE_POSITIONS,
   ResizeAxis,
   ResizeChangeEvent,
-  ResizeChangeParams,
-  ResizeControlVariant,
   ResizeDragEvent,
   ResizeEvent,
-  ResizeParams,
   ShouldResize,
 } from './resizer-types';
 
+const CONTROL_POSITIONS: ControlPosition[] = [
+  'top',
+  'right',
+  'bottom',
+  'left',
+  'top-left',
+  'top-right',
+  'bottom-left',
+  'bottom-right',
+];
+
+/** The four lines and the four corner handles, each with its public classes. */
+const CONTROLS = CONTROL_POSITIONS.map((position) => ({
+  position,
+  classes: [
+    'v-resize-control',
+    position.includes('-') ? 'v-resize-control--handle' : 'v-resize-control--line',
+    ...position.split('-').map((side) => `v-resize-control--${side}`),
+  ].join(' '),
+}));
+
 /**
- * Adds resize controls (four lines + four corner handles) to a node. The controls
- * mutate the node dimensions/position through a pointer-based resize engine.
+ * Adds resize controls (four lines + four corner handles) to a node. A drag on a control resizes the node and moves
+ * it when a left or top side is dragged.
  *
  * The host element is the node's sizing box: each `explicit` axis receives the node size as an inline border-box
  * width or height, while an `auto` axis keeps its content size. Put it on the top-level element of the
@@ -43,7 +63,7 @@ import {
   selector: '[vResizable]',
   templateUrl: './resizable.component.html',
   styleUrls: ['./resizable.component.scss'],
-  imports: [NodeResizeControlComponent],
+  imports: [VflowNoDragDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     '[style.width.px]': 'explicitSize()?.width ?? null',
@@ -52,10 +72,12 @@ import {
     '[style.box-sizing]': "explicitSize() ? 'border-box' : null",
   },
 })
-export class VflowResizableComponent implements OnInit, AfterViewInit, OnDestroy {
+export class VflowResizableComponent implements OnInit, OnDestroy {
   private model = inject(NODE_MODEL);
   private hostRef = inject<ElementRef<HTMLElement>>(ElementRef);
-  private afterRenderBatch = inject(AfterRenderBatchService);
+  private viewportService = inject(ViewportService);
+  private settingsService = inject(FlowSettingsService);
+  private spacePointContext = inject(SpacePointContextDirective);
 
   public vResizable = input<boolean | ''>();
 
@@ -80,26 +102,17 @@ export class VflowResizableComponent implements OnInit, AfterViewInit, OnDestroy
   public readonly resizeEnd = output<ResizeEvent>();
   public shouldResize = input<ShouldResize>();
 
-  protected readonly linePositions: ControlLinePosition[] = RESIZER_LINE_POSITIONS;
-  protected readonly handlePositions: ControlPosition[] = RESIZER_HANDLE_POSITIONS;
-  protected readonly lineVariant = ResizeControlVariant.Line;
-  protected readonly handleVariant = ResizeControlVariant.Handle;
+  protected readonly controls = CONTROLS;
 
   private resizer = viewChild.required<TemplateRef<unknown>>('resizer');
 
-  // Min/max read from the element's computed style; used as a fallback when no explicit input is given.
-  private cssMinWidth = signal(0);
-  private cssMinHeight = signal(0);
-  private cssMaxWidth = signal(Infinity);
-  private cssMaxHeight = signal(Infinity);
-
-  protected effectiveMinWidth = computed(() => this.minWidth() ?? this.cssMinWidth());
-  protected effectiveMinHeight = computed(() => this.minHeight() ?? this.cssMinHeight());
-  protected effectiveMaxWidth = computed(() => this.maxWidth() ?? this.cssMaxWidth());
-  protected effectiveMaxHeight = computed(() => this.maxHeight() ?? this.cssMaxHeight());
-
   /** `[vResizable]="false"` hides the controls but keeps the element as the node's sizing box. */
   protected readonly enabled = computed(() => this.vResizable() !== false);
+
+  /** Counter-scale of the corner handles, so they keep their on-screen size while the viewport zooms out. */
+  protected readonly scale = computed(() =>
+    this.autoScale() ? Math.max(1 / this.viewportService.readableViewport().zoom, 1) : null,
+  );
 
   /** Explicit axes only; `null` while both axes follow the content. */
   protected readonly explicitSize = computed(() => {
@@ -109,13 +122,8 @@ export class VflowResizableComponent implements OnInit, AfterViewInit, OnDestroy
   });
 
   private registeredTemplate: TemplateRef<unknown> | null = null;
-
-  protected emitResizeStart = (_: ResizeDragEvent, params: ResizeParams) =>
-    this.resizeStart.emit({ ...params, node: this.model.rawNode });
-  protected emitResize = (_: ResizeDragEvent, params: ResizeChangeParams) =>
-    this.resize.emit({ ...params, node: this.model.rawNode });
-  protected emitResizeEnd = (_: ResizeDragEvent, params: ResizeParams) =>
-    this.resizeEnd.emit({ ...params, node: this.model.rawNode });
+  private tracker: PointerTracker | null = null;
+  private gesture: ResizeGesture | null = null;
 
   public ngOnInit(): void {
     this.registeredTemplate = this.resizer();
@@ -123,19 +131,85 @@ export class VflowResizableComponent implements OnInit, AfterViewInit, OnDestroy
   }
 
   public ngOnDestroy(): void {
+    this.tracker?.destroy();
     // A replacement element may already have registered its own controls.
     if (this.model.resizerTemplate() === this.registeredTemplate) {
       this.model.resizerTemplate.set(null);
     }
   }
 
-  public ngAfterViewInit() {
-    this.afterRenderBatch.read(() => {
-      const style = getComputedStyle(this.hostRef.nativeElement);
-      this.cssMinWidth.set(+style.minWidth.replace('px', '') || 0);
-      this.cssMinHeight.set(+style.minHeight.replace('px', '') || 0);
-      this.cssMaxWidth.set(+style.maxWidth.replace('px', '') || Infinity);
-      this.cssMaxHeight.set(+style.maxHeight.replace('px', '') || Infinity);
-    });
+  /** A press on one of the controls; the controls container is the element the pointer is captured on. */
+  protected press(event: PointerEvent): void {
+    // Primary button only, no ctrl+click (context menu on macOS)
+    if (this.gesture || event.button !== 0 || event.ctrlKey) return;
+
+    const control = (event.target as Element).closest<HTMLElement>('[data-v-resize-control]');
+    if (!control) return;
+
+    const position = control.dataset['vResizeControl'] as ControlPosition;
+    event.stopPropagation();
+
+    this.tracker?.destroy();
+    this.tracker = createPointerTracker(
+      {
+        capture: true,
+        stopCompatibilityEvents: true,
+        clickDistance: () => 0,
+        onStart: ({ event, point }) => this.start(position, { sourceEvent: event }, point),
+        onMove: ({ event, point }) => this.gesture?.move({ sourceEvent: event }, this.toFlowPoint(point)),
+        onEnd: ({ event }) => this.finish({ sourceEvent: event }),
+        onCancel: ({ event }) => this.finish({ sourceEvent: event }),
+      },
+      event.currentTarget as Element,
+    );
+    this.tracker.press(event);
+  }
+
+  private start(position: ControlPosition, event: ResizeDragEvent, client: Point): void {
+    const node = this.model.rawNode;
+
+    this.gesture = startResize(
+      {
+        node: this.model,
+        position,
+        bounds: this.bounds(),
+        keepAspectRatio: this.keepAspectRatio(),
+        resizeAxis: this.resizeAxis(),
+        shouldResize: this.shouldResize(),
+        onStart: (_, params) => this.resizeStart.emit({ ...params, node }),
+        onResize: (_, params) => this.resize.emit({ ...params, node }),
+        onEnd: (_, params) => this.resizeEnd.emit({ ...params, node }),
+      },
+      event,
+      this.toFlowPoint(client),
+    );
+  }
+
+  private finish(event: ResizeDragEvent): void {
+    const gesture = this.gesture;
+    this.gesture = null;
+    this.tracker = null;
+    gesture?.end(event);
+  }
+
+  /** The inputs win; the CSS min/max of the element are the fallback, read at the press so a class change counts. */
+  private bounds(): ResizeBounds {
+    const style = getComputedStyle(this.hostRef.nativeElement);
+    const px = (value: string) => +value.replace('px', '');
+
+    return {
+      minWidth: this.minWidth() ?? (px(style.minWidth) || 0),
+      minHeight: this.minHeight() ?? (px(style.minHeight) || 0),
+      maxWidth: this.maxWidth() ?? (px(style.maxWidth) || Infinity),
+      maxHeight: this.maxHeight() ?? (px(style.maxHeight) || Infinity),
+    };
+  }
+
+  /** The pointer in flow units, snapped to the grid. */
+  private toFlowPoint(client: Point): Point {
+    const point = this.spacePointContext.clientToFlowPosition(client);
+    const [snapX, snapY] = this.settingsService.snapGrid();
+
+    return snapX > 1 || snapY > 1 ? { x: align(point.x, snapX), y: align(point.y, snapY) } : point;
   }
 }

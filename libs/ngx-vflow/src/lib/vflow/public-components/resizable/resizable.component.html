@@ -1,42 +1,15 @@
 <ng-template #resizer>
   @if (enabled()) {
-    @for (position of linePositions; track position) {
-      <div
-        nodeResizeControl
-        [position]="position"
-        [variant]="lineVariant"
-        [style.--resizer-gap.px]="gap()"
-        [minWidth]="effectiveMinWidth()"
-        [minHeight]="effectiveMinHeight()"
-        [maxWidth]="effectiveMaxWidth()"
-        [maxHeight]="effectiveMaxHeight()"
-        [keepAspectRatio]="keepAspectRatio()"
-        [resizeAxis]="resizeAxis()"
-        [autoScale]="autoScale()"
-        [onResizeStart]="emitResizeStart"
-        [onResize]="emitResize"
-        [onResizeEnd]="emitResizeEnd"
-        [shouldResize]="shouldResize()"></div>
-    }
-
-    @for (position of handlePositions; track position) {
-      <div
-        nodeResizeControl
-        [position]="position"
-        [variant]="handleVariant"
-        [style.--resizer-gap.px]="gap()"
-        [minWidth]="effectiveMinWidth()"
-        [minHeight]="effectiveMinHeight()"
-        [maxWidth]="effectiveMaxWidth()"
-        [maxHeight]="effectiveMaxHeight()"
-        [keepAspectRatio]="keepAspectRatio()"
-        [resizeAxis]="resizeAxis()"
-        [autoScale]="autoScale()"
-        [onResizeStart]="emitResizeStart"
-        [onResize]="emitResize"
-        [onResizeEnd]="emitResizeEnd"
-        [shouldResize]="shouldResize()"></div>
-    }
+    <div
+      vNoDrag
+      class="v-resize-controls"
+      [style.--resizer-gap.px]="gap()"
+      [style.--resizer-scale]="scale()"
+      (pointerdown)="press($event)">
+      @for (control of controls; track control.position) {
+        <div [class]="control.classes" [attr.data-v-resize-control]="control.position"></div>
+      }
+    </div>
   }
 </ng-template>
 

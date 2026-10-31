@@ -7,10 +7,10 @@ import { AfterRenderBatchService } from '../services/after-render-batch.service'
  * Only suitable for HTML nodes
  */
 @Directive({
-  selector: '[nodeResizeController]',
+  selector: '[nodeMeasure]',
   standalone: true,
 })
-export class NodeResizeControllerDirective implements OnInit, OnDestroy {
+export class NodeMeasureDirective implements OnInit, OnDestroy {
   // An input, not the NODE_MODEL token: the directive is created with the node view, before the node input is set.
   public readonly model = input.required<NodeModel>();
   private resizeObserverService = inject(ResizeObserverService);
