@@ -7,7 +7,9 @@ show. Drag between ports of matching types to add a connection, labelled by what
 its label button or select it and press Delete.
 
 Add a field from the last row of a table: type a name, pick a type and press Enter, or press Escape to drop the
-draft; a taken name is refused. The new row gets its own ports at once, and the frame grows with the table. After
+draft; a taken name is refused. The new row gets its own ports at once, and the frame grows with the table. Tables and
+frames are dragged freely, like any node: a frame moves its tables along and is not a boundary for them (`extent` is
+lifted), and it grows only with their fields, not with where they are dragged. After
 seven fields a table scrolls and shows its new last row; rows scrolled out hand their endpoints to the header or to
 the "more below" border, as in the experiment below, which shares the same scroll policy. Deleting
 a field is handled by the application: the field and every edge on it go together. Type compatibility and graph

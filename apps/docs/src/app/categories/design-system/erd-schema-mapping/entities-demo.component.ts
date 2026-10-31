@@ -51,8 +51,6 @@ interface FrameData {
 type SchemaData = EntityData | FrameData;
 
 const TYPES = ['uuid', 'text', 'decimal', 'timestamp'];
-/** Room of a frame around its tables, and between two frames. */
-const FRAME = { inset: 24, gap: 52 };
 
 @Component({
   selector: 'app-ui-entities-demo',
@@ -239,8 +237,9 @@ const FRAME = { inset: 24, gap: 52 };
                 </footer>
               }
               @if (draft()?.entity === ctx.node.id) {
-                <!-- Enter adds the field, Escape drops the draft; core leaves keys typed in inputs alone. -->
-                <div vuiRow class="draft" data-draft>
+                <!-- Enter adds the field, Escape drops the draft; core leaves keys typed in inputs alone.
+                     Editing a draft is not selecting the table: the row and the button opt out of click selection. -->
+                <div vuiRow vNoSelect class="draft" data-draft>
                   <input
                     class="input"
                     vNoDrag
@@ -267,6 +266,7 @@ const FRAME = { inset: 24, gap: 52 };
                 <button
                   class="add-field"
                   vNoDrag
+                  vNoSelect
                   type="button"
                   [attr.aria-label]="'Add a field to ' + ctx.data().title"
                   (click)="startDraft(ctx.node.id)">
@@ -317,9 +317,13 @@ export class EntitiesDemoComponent {
   readonly draft = signal<{ entity: string; name: string; type: string } | null>(null);
   /** The draft name is empty or taken. */
   readonly draftError = signal(false);
+  /** The height a frame was created with: its minimum. */
+  private readonly frameHeight: Record<string, number> = { relationships: 266, mapping: 234 };
+  /** The first measured height of every table, which its frame's growth is counted from. */
+  private readonly tableHeight: Record<string, number> = {};
   readonly nodes = createNodes<SchemaData>([
-    frame('relationships', { x: 0, y: 0 }, 'Relationships', 238),
-    frame('mapping', { x: 0, y: 290 }, 'Field mapping', 200),
+    frame('relationships', { x: 0, y: 0 }, 'Relationships', this.frameHeight['relationships']),
+    frame('mapping', { x: 0, y: 480 }, 'Field mapping', this.frameHeight['mapping']),
     entity('customer', 'relationships', { x: 24, y: 56 }, 'Customer', 'table', [
       ['id', 'id', 'uuid', 'PK'],
       ['email', 'email', 'text'],
@@ -451,26 +455,25 @@ export class EntitiesDemoComponent {
   }
 
   constructor() {
-    // Tables grow and shrink with their fields: every frame wraps its tables, and the frames stack without overlap.
+    // A frame grows with the fields of its tables, by as much as its tallest table grew since the first render, and
+    // never shrinks below its own height. Where a table is dragged does not matter: tables and frames move freely.
     // Measured sizes arrive after render, so this follows them instead of running once after a change.
     effect(() => {
       const flow = this.flow();
       if (!flow) return;
-      let top = 0;
       for (const frame of this.nodes.filter((node) => node.data().kind === 'frame')) {
-        const bottoms = this.nodes
+        const growth = this.nodes
           .filter((node) => node.parentId?.() === frame.id)
           .map((node) => {
             const rect = flow.getNodeRect(node.id);
-            return rect ? node.point().y + rect.height : 0;
+            if (!rect) return 0;
+            this.tableHeight[node.id] ??= rect.height;
+            return rect.height - this.tableHeight[node.id];
           });
-        const height = Math.max(...bottoms) + FRAME.inset;
-        const y = top;
+        const height = this.frameHeight[frame.id] + Math.max(0, ...growth);
         untracked(() => {
-          if (frame.point().y !== y) frame.point.set({ ...frame.point(), y });
           if (frame.height!() !== height) frame.height!.set(height);
         });
-        top += height + FRAME.gap;
       }
     });
   }

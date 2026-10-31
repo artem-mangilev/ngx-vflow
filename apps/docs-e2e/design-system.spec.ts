@@ -571,9 +571,11 @@ test('ERD: adding a field with a name and a type, refusing a taken name, cancell
   const rows = order.locator('[vuiRow][data-field]');
   await expect(rows).toHaveCount(3);
 
-  // The draft opens with the name focused; Enter adds the field with the chosen type and its own ports.
+  // The draft opens with the name focused; editing it is not selecting the table.
+  // Enter adds the field with the chosen type and its own ports.
   await addButton.click();
   await expect(name).toBeFocused();
+  await expect(order).toHaveAttribute('data-vui-selected', 'false');
   await name.fill('status');
   await order.getByLabel('Type of the new field of Order', { exact: true }).selectOption('timestamp');
   await name.press('Enter');
@@ -585,6 +587,7 @@ test('ERD: adding a field with a name and a type, refusing a taken name, cancell
   await expect(addButton).toBeVisible();
 
   // The existing connection stays on its rows; the frame wraps the taller table and the frames do not overlap.
+  // Tables and frames are dragged freely: nothing moves a node back.
   const layout = () =>
     demo.evaluate((root) => {
       const rect = (selector: string) => root.querySelector(selector)!.getBoundingClientRect();
@@ -601,6 +604,14 @@ test('ERD: adding a field with a name and a type, refusing a taken name, cancell
   await expect.poll(async () => (await layout()).endpoint).toBeLessThan(1);
   await expect.poll(async () => (await layout()).inside).toBeGreaterThan(8);
   await expect.poll(async () => (await layout()).between).toBeGreaterThan(8);
+  const before = (await order.boundingBox())!;
+  const grip = (await order.locator('header').boundingBox())!;
+  await page.mouse.move(grip.x + grip.width / 2, grip.y + grip.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(grip.x + grip.width / 2 + 120, grip.y + grip.height / 2 + 90, { steps: 10 });
+  await page.mouse.up();
+  await expect.poll(async () => (await order.boundingBox())!.x).toBeGreaterThan(before.x + 80);
+  await expect.poll(async () => (await order.boundingBox())!.y).toBeGreaterThan(before.y + 60);
 
   // A taken name is refused and the draft stays open.
   await addButton.click();

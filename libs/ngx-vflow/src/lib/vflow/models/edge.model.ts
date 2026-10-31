@@ -104,13 +104,16 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
 
   public renderOrder = signal(0);
 
+  /**
+   * Both endpoint nodes are measured and the edge's own endpoint handles are placed. Other handles of those nodes do
+   * not matter: a handle added to a node that is already shown must not hide the edges drawn to its other handles.
+   */
   public isReady = computed(
     () =>
-      !!this.source()?.isReady() &&
-      !!this.target()?.isReady() &&
-      // An endpoint handle without a layout box has no point to draw to.
-      this.sourceHandle()?.hasBox() !== false &&
-      this.targetHandle()?.hasBox() !== false,
+      !!this.source()?.isMeasured() &&
+      !!this.target()?.isMeasured() &&
+      endpointPlaced(this.sourceHandle()) &&
+      endpointPlaced(this.targetHandle()),
   );
 
   public detached = computed(() => {
@@ -229,4 +232,9 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
       allNodes: this.flowEntitiesService.rawNodes(),
     };
   }
+}
+
+/** A found endpoint handle must be measured; one without a layout box has no point to draw to. */
+function endpointPlaced(handle: HandleModel | null): boolean {
+  return !handle || (handle.hasBox() && handle.isMeasured());
 }

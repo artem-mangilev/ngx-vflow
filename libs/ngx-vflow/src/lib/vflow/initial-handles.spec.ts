@@ -83,6 +83,34 @@ describe('Initial handle placement', () => {
     expect(frames.at(-1)?.handle).toBe('visible');
   });
 
+  it('keeps an edge visible when another handle is added to one of its nodes', async () => {
+    extraHandle.set(false);
+    const fixture = TestBed.createComponent(VflowComponent);
+    fixture.componentRef.setInput('view', [400, 300]);
+    fixture.componentRef.setInput('nodes', [
+      createNode({ id: 'a', component: SmallCustomNodeComponent, point: { x: 0, y: 0 } }),
+      createNode({ id: 'b', component: GrowingNodeComponent, point: { x: 150, y: 0 } }),
+    ]);
+    fixture.componentRef.setInput('edges', [
+      createEdge({ id: 'ab', source: 'a', target: 'b', component: LabelEdgeComponent }),
+    ]);
+    fixture.detectChanges();
+    const edge = () => fixture.nativeElement.querySelector('svg[edge]') as SVGElement;
+    for (let i = 0; i < 8 && getComputedStyle(edge()).visibility !== 'visible'; i++) {
+      await new Promise(requestAnimationFrame);
+    }
+    expect(getComputedStyle(edge()).visibility).toBe('visible');
+
+    extraHandle.set(true);
+    fixture.detectChanges();
+    const frames: string[] = [];
+    for (let i = 0; i < 6; i++) {
+      frames.push(getComputedStyle(edge()).visibility);
+      await new Promise(requestAnimationFrame);
+    }
+    expect(frames, JSON.stringify(frames)).toEqual(Array(6).fill('visible'));
+  });
+
   for (const count of [1, 1024]) {
     it(`never shows unpositioned custom handles on initial mount or restore (${count} nodes)`, async () => {
       const fixture = TestBed.createComponent(VflowComponent);
