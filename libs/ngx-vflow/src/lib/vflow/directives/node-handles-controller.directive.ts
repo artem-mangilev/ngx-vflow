@@ -1,71 +1,48 @@
-import { DestroyRef, Directive, ElementRef, effect, inject, input, OnInit } from '@angular/core';
+import { DestroyRef, Directive, ElementRef, effect, inject, input, untracked } from '@angular/core';
 import { NodeModel } from '../models/node.model';
-import { tap } from 'rxjs/operators';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ResizeObserverService } from '../services/resize-observer.service';
-import { RequestAnimationFrameBatchingService } from '../services/request-animation-frame-batching.service';
+import { AfterRenderBatchService } from '../services/after-render-batch.service';
 import { createHandleMeasureContext, HandleModel } from '../models/handle.model';
 import { ViewportService } from '../services/viewport.service';
 
+/**
+ * Measures the handles of the node whenever their DOM may have changed: a handle is added, an observed element is
+ * resized, or the content of the node is restructured. Everything else that moves a handle, such as a side, an
+ * offset or the node size, is derived by the handle model without a measurement.
+ */
 @Directive({
   selector: '[nodeHandlesController]',
   standalone: true,
 })
-export class NodeHandlesControllerDirective implements OnInit {
+export class NodeHandlesControllerDirective {
   // An input, not the NODE_MODEL token: the directive is created with the node view, before the node input is set.
   public readonly model = input.required<NodeModel>();
-  private destroyRef = inject(DestroyRef);
-  private hostElementRef = inject<ElementRef<Element>>(ElementRef);
-  private resizeObserverService = inject(ResizeObserverService);
-  private requestAnimationFrameBatchingService = inject(RequestAnimationFrameBatchingService);
-  private viewportService = inject(ViewportService);
-  private observedElements = new Set<Element>();
-  private syncScheduled = false;
+  private readonly host = inject<ElementRef<Element>>(ElementRef).nativeElement;
+  private readonly resizeObserverService = inject(ResizeObserverService);
+  private readonly afterRenderBatch = inject(AfterRenderBatchService);
+  private readonly viewportService = inject(ViewportService);
+  private readonly observedElements = new Set<Element>();
   private destroyed = false;
   private readonly resizeCallback = () => this.scheduleSync();
+  private readonly sync = () => this.measureHandles();
 
   constructor() {
-    // The sync itself runs on an animation frame, after this pass has rendered; the effect only tracks its inputs.
     effect(() => {
-      const model = this.model();
-
-      // Changing a handle's side, offset or layout moves its point without resizing any observed element.
-      for (const handle of model.handles()) {
-        handle.position();
-        handle.offsetX();
-        handle.offsetY();
-        handle.layout();
-      }
-
-      // Right/bottom handle points use the model size, which reconciliation can change after a gesture without
-      // resizing any observed element, so the size is a dependency of the sync.
-      const hasSize = model.width() >= 0 && model.height() >= 0;
-      if (hasSize && !model.culled()) {
+      const handles = this.model().handles();
+      untracked(() => {
+        this.updateObservedElements(handles);
         this.scheduleSync();
-      }
+      });
     });
-  }
-
-  public ngOnInit(): void {
-    this.model()
-      .handles$.pipe(
-        tap((handles) => {
-          this.updateObservedElements(handles);
-          this.scheduleSync();
-        }),
-        takeUntilDestroyed(this.destroyRef),
-      )
-      .subscribe();
 
     // Reordering or inserting content, such as field rows, moves handles without resizing anything: a row of
     // the same height moved up keeps every observed box. Only the structure is watched, not text or attributes.
     // zone.js in happy-dom replaces MutationObserver with a class without methods; that DOM has no layout to sync.
-    const created =
-      typeof MutationObserver === 'undefined' ? undefined : new MutationObserver(() => this.scheduleSync());
+    const created = typeof MutationObserver === 'undefined' ? undefined : new MutationObserver(this.resizeCallback);
     const structure = typeof created?.observe === 'function' ? created : undefined;
-    structure?.observe(this.hostElementRef.nativeElement, { childList: true, subtree: true });
+    structure?.observe(this.host, { childList: true, subtree: true });
 
-    this.destroyRef.onDestroy(() => {
+    inject(DestroyRef).onDestroy(() => {
       structure?.disconnect();
       this.destroyed = true;
       this.observedElements.forEach((element) =>
@@ -76,7 +53,7 @@ export class NodeHandlesControllerDirective implements OnInit {
   }
 
   private updateObservedElements(handles: HandleModel[]): void {
-    const nextElements = new Set<Element>([this.hostElementRef.nativeElement]);
+    const nextElements = new Set<Element>([this.host]);
 
     handles.forEach(({ element }) => {
       if (element) {
@@ -101,29 +78,23 @@ export class NodeHandlesControllerDirective implements OnInit {
     });
   }
 
+  /** One measurement after the next render, however many changes asked for it. */
   private scheduleSync(): void {
-    if (this.syncScheduled || this.destroyed || !this.model().handles().length) {
-      return;
-    }
+    if (this.destroyed || !this.model().handles().length) return;
+    this.afterRenderBatch.read(this.sync);
+  }
 
-    this.syncScheduled = true;
-    this.requestAnimationFrameBatchingService.batchAnimationFrame(() => {
-      this.syncScheduled = false;
+  private measureHandles(): void {
+    if (this.destroyed) return;
+    const model = this.model();
+    const nodeElement = model.nodeElement();
+    if (model.culled() || !nodeElement) return;
 
-      if (this.destroyed) {
-        return;
-      }
+    // The node rectangle, the rendered zoom and shared anchors are read once for every handle of the node.
+    const handles = model.handles();
+    const context = createHandleMeasureContext(nodeElement, this.viewportService.readableViewport().zoom);
+    const measurements = handles.map((handle) => handle.measure(context));
 
-      const handles = this.model().handles();
-      const nodeElement = this.model().nodeElement();
-      // The node rectangle, the rendered zoom and shared anchors are read once for every handle of the node.
-      const context =
-        !this.model().culled() && nodeElement
-          ? createHandleMeasureContext(nodeElement, this.viewportService.readableViewport().zoom)
-          : null;
-      const measurements = handles.map((handle) => (context ? handle.measure(context) : null));
-
-      handles.forEach((handle, index) => handle.applyGeometry(measurements[index]));
-    });
+    handles.forEach((handle, index) => handle.applyMeasurement(measurements[index]));
   }
 }

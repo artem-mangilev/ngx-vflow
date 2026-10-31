@@ -144,7 +144,7 @@ export class NodeComponent implements OnInit, OnDestroy {
           // Restore layout hidden, then refresh dimensions and handles before painting.
           untracked(() => {
             model.isMeasured.set(false);
-            model.handles().forEach((handle) => handle.isMeasured.set(false));
+            model.handles().forEach((handle) => handle.reset());
           });
         }
         wasCulled = culled;

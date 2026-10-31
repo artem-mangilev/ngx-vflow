@@ -14,7 +14,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { NODE_MODEL } from '../../utils/node-model.token';
-import { RequestAnimationFrameBatchingService } from '../../services/request-animation-frame-batching.service';
+import { AfterRenderBatchService } from '../../services/after-render-batch.service';
 import { NodeResizeControlComponent } from './node-resize-control.component';
 import {
   ControlLinePosition,
@@ -55,7 +55,7 @@ import {
 export class VflowResizableComponent implements OnInit, AfterViewInit, OnDestroy {
   private model = inject(NODE_MODEL);
   private hostRef = inject<ElementRef<HTMLElement>>(ElementRef);
-  private afService = inject(RequestAnimationFrameBatchingService);
+  private afterRenderBatch = inject(AfterRenderBatchService);
 
   public vResizable = input<boolean | ''>();
 
@@ -130,7 +130,7 @@ export class VflowResizableComponent implements OnInit, AfterViewInit, OnDestroy
   }
 
   public ngAfterViewInit() {
-    this.afService.batchAnimationFrame(() => {
+    this.afterRenderBatch.read(() => {
       const style = getComputedStyle(this.hostRef.nativeElement);
       this.cssMinWidth.set(+style.minWidth.replace('px', '') || 0);
       this.cssMinHeight.set(+style.minHeight.replace('px', '') || 0);

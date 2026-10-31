@@ -1,7 +1,6 @@
-import { Signal, computed, inject, signal } from '@angular/core';
+import { Signal, computed, signal } from '@angular/core';
 import { NodeModel } from './node.model';
 import { Point } from '../interfaces/point.interface';
-import { ViewportService } from '../services/viewport.service';
 import { Position } from '../types/position.type';
 import { HandleLayout, HandlePosition, HandleState, HandleType } from '../types/handle-type.type';
 import { NodeEndpoint, getNodeEndpoint } from '../math/node-endpoint';
@@ -20,10 +19,23 @@ export type HandleGeometry = {
   localPoint: Point;
 };
 
+type Box = { left: number; top: number; width: number; height: number };
+
+/** What one measurement reads from the DOM, in node units: the geometry is derived from it and the inputs. */
+export interface HandleBoxes {
+  /** The box of the element. */
+  handle: Box;
+  /** The box of the parent element, which anchors the `auto` layout; `null` without a parent, which the node box replaces. */
+  anchor: Box | null;
+  /** Origin of the containing block of the element, when it is not the node; see {@link containingBlockOrigin}. */
+  origin: Point | null;
+}
+
 /** Measurement of an element that is rendered without a layout box, for example under `display: none`. */
 export const HANDLE_WITHOUT_BOX = 'without-box';
 
-export type HandleMeasurement = HandleGeometry | typeof HANDLE_WITHOUT_BOX | null;
+/** `null` is nothing to apply: a dynamic handle, or an element that is not rendered. */
+export type HandleMeasurement = HandleBoxes | typeof HANDLE_WITHOUT_BOX | null;
 
 export interface HandleOptions {
   /** The element the `vHandle` directive is applied to. Its parent is the anchor in the `auto` layout. */
@@ -37,8 +49,6 @@ export interface HandleOptions {
   canStart?: Signal<boolean>;
   canAccept?: Signal<boolean>;
 }
-
-type Box = { left: number; top: number; width: number; height: number };
 
 /** Reads shared by every handle of a node in one measurement pass. */
 export type HandleMeasureContext = {
@@ -71,10 +81,14 @@ function clientRect(context: HandleMeasureContext, element: Element): DOMRect {
 }
 
 const UNPLACED: HandleLayoutStyles = { top: 'auto', left: 'auto', right: 'auto', bottom: 'auto' };
+const UNMEASURED: HandleGeometry = { layoutStyles: UNPLACED, localPoint: { x: 0, y: 0 } };
 
+/**
+ * A connection point of a node. The DOM is read in {@link measure}, a pure read of the element's boxes; the layout
+ * styles and the connection point are computed from those boxes, the inputs and the node size, so a change of a
+ * side, an offset, the layout or the node size needs no new measurement.
+ */
 export class HandleModel {
-  private viewportService = inject(ViewportService);
-
   public readonly element: HTMLElement | null;
   public readonly type: Signal<HandleType>;
   public readonly position: Signal<HandlePosition>;
@@ -86,15 +100,12 @@ export class HandleModel {
   public readonly canAccept: Signal<boolean>;
 
   public readonly state = signal<HandleState>('idle');
-  public readonly isMeasured = signal(false);
 
   /** False while the element has no layout box. Such a handle does not keep its node hidden, but its edges are. */
   public readonly hasBox = signal(true);
 
-  /** Styles of the `auto` layout, relative to the containing block of the element. */
-  public readonly layoutStyles = signal<HandleLayoutStyles>(UNPLACED);
-
-  private readonly local = signal<Point>({ x: 0, y: 0 });
+  /** The last measurement; `null` until the first one, and again after {@link reset}. */
+  private readonly boxes = signal<HandleBoxes | null>(null);
 
   /** `auto` or `center`: the point is resolved per edge on the node, the element is only the surface. */
   public readonly dynamic = computed(() => {
@@ -102,14 +113,43 @@ export class HandleModel {
     return position === 'auto' || position === 'center';
   });
 
+  /** A dynamic handle needs no measurement; any other is measured once its boxes are read. */
+  public readonly isMeasured = computed(() => this.dynamic() || this.boxes() !== null);
+
+  private readonly geometry = computed<HandleGeometry>(() => {
+    const position = this.position();
+    const node = { width: this.parentNode.width(), height: this.parentNode.height() };
+
+    if (position === 'auto' || position === 'center') {
+      return { layoutStyles: UNPLACED, localPoint: { x: node.width / 2, y: node.height / 2 } };
+    }
+
+    const boxes = this.boxes();
+    if (!boxes) return UNMEASURED;
+
+    if (this.layout() === 'manual') {
+      return { layoutStyles: UNPLACED, localPoint: sidePoint(position, boxes.handle) };
+    }
+
+    return computeAutoGeometry({
+      position,
+      node,
+      handle: boxes.handle,
+      anchor: boxes.anchor ?? { left: 0, top: 0, ...node },
+      offset: { x: this.offsetX(), y: this.offsetY() },
+      origin: boxes.origin,
+    });
+  });
+
+  /** Styles of the `auto` layout, relative to the containing block of the element. */
+  public readonly layoutStyles = computed(() => this.geometry().layoutStyles);
+
   /** Connection point relative to the node origin, in flow units; the node center for a dynamic position. */
-  public readonly localPoint = computed<Point>(() =>
-    this.dynamic() ? { x: this.parentNode.width() / 2, y: this.parentNode.height() / 2 } : this.local(),
-  );
+  public readonly localPoint = computed(() => this.geometry().localPoint);
 
   public readonly pointAbsolute = computed<Point>(() => ({
-    x: this.parentNode.globalPoint().x + this.local().x,
-    y: this.parentNode.globalPoint().y + this.local().y,
+    x: this.parentNode.globalPoint().x + this.localPoint().x,
+    y: this.parentNode.globalPoint().y + this.localPoint().y,
   }));
 
   constructor(
@@ -128,21 +168,12 @@ export class HandleModel {
   }
 
   /** Read phase: reads the element, its anchor and its containing block without changing styles. */
-  public measure(context = this.createMeasureContext()): HandleMeasurement {
-    if (this.parentNode.culled()) return null;
-
+  public measure(context: HandleMeasureContext): HandleMeasurement {
     const element = this.element;
     const nodeElement = this.parentNode.nodeElement();
 
-    if (!element || !nodeElement || !context) {
+    if (!element || !nodeElement || this.dynamic()) {
       return null;
-    }
-
-    const position = this.position();
-
-    // A dynamic position follows the node size and needs no layout box of the element.
-    if (position === 'auto' || position === 'center') {
-      return { layoutStyles: UNPLACED, localPoint: this.localPoint() };
     }
 
     if (!element.getClientRects().length) {
@@ -157,25 +188,32 @@ export class HandleModel {
       height: rect.height / zoom,
     });
 
-    const handle = toLocal(element.getBoundingClientRect());
+    return {
+      handle: toLocal(element.getBoundingClientRect()),
+      anchor: element.parentElement ? toLocal(clientRect(context, element.parentElement)) : null,
+      origin: containingBlockOrigin(element, nodeElement, context),
+    };
+  }
 
-    if (this.layout() === 'manual') {
-      return { layoutStyles: UNPLACED, localPoint: sidePoint(position, handle) };
+  /** Write phase. Called only after every handle in the node has been measured. */
+  public applyMeasurement(measurement: HandleMeasurement): void {
+    if (!measurement) {
+      return;
     }
 
-    const node = { width: this.parentNode.width(), height: this.parentNode.height() };
-    const anchor = element.parentElement
-      ? toLocal(clientRect(context, element.parentElement))
-      : { left: 0, top: 0, ...node };
+    if (measurement === HANDLE_WITHOUT_BOX) {
+      this.hasBox.set(false);
+      this.boxes.set(null);
+      return;
+    }
 
-    return computeAutoGeometry({
-      position,
-      node,
-      handle,
-      anchor,
-      offset: { x: this.offsetX(), y: this.offsetY() },
-      origin: containingBlockOrigin(element, nodeElement, context),
-    });
+    this.hasBox.set(true);
+    this.boxes.set(measurement);
+  }
+
+  /** Forgets the measurement, so the handle waits for the next one: a remount, or a restore from CSS culling. */
+  public reset(): void {
+    this.boxes.set(null);
   }
 
   /**
@@ -188,36 +226,6 @@ export class HandleModel {
     return position === 'auto' || position === 'center'
       ? getNodeEndpoint(this.parentNode.geometry(), towards, position)
       : { point: this.pointAbsolute(), position };
-  }
-
-  /** Isolated model use. Node rendering shares one context between the handles of the node. */
-  private createMeasureContext(): HandleMeasureContext | null {
-    const nodeElement = this.parentNode.nodeElement();
-
-    return nodeElement ? createHandleMeasureContext(nodeElement, this.viewportService.readableViewport().zoom) : null;
-  }
-
-  /** Write phase. Called only after every handle in the node has been measured. */
-  public applyGeometry(geometry: HandleMeasurement): void {
-    if (!geometry) {
-      return;
-    }
-
-    if (geometry === HANDLE_WITHOUT_BOX) {
-      this.hasBox.set(false);
-      this.isMeasured.set(false);
-      return;
-    }
-
-    this.hasBox.set(true);
-    this.layoutStyles.set(geometry.layoutStyles);
-    this.local.set(geometry.localPoint);
-    this.isMeasured.set(true);
-  }
-
-  /** Synchronous convenience for isolated model use. Node rendering uses the coalesced controller pass. */
-  public sync(): void {
-    this.applyGeometry(this.measure());
   }
 }
 
@@ -242,7 +250,7 @@ function sidePoint(position: Position, box: Box): Point {
 function containingBlockOrigin(
   element: HTMLElement,
   nodeElement: HTMLElement,
-  { nodeRect, zoom, ...context }: HandleMeasureContext,
+  context: HandleMeasureContext,
 ): Point | null {
   const container = element.offsetParent;
 
@@ -250,7 +258,8 @@ function containingBlockOrigin(
     return null;
   }
 
-  const rect = clientRect({ nodeRect, zoom, ...context }, container);
+  const { nodeRect, zoom } = context;
+  const rect = clientRect(context, container);
 
   return {
     x: (rect.left - nodeRect.left) / zoom + container.clientLeft - container.scrollLeft,

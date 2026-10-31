@@ -5,7 +5,7 @@ import { createNode } from './interfaces/node.interface';
 import { createEdge } from './interfaces/edge.interface';
 import { DraggableService } from './services/draggable.service';
 import { FlowEntitiesService } from './services/flow-entities.service';
-import { RequestAnimationFrameBatchingService } from './services/request-animation-frame-batching.service';
+import { AfterRenderBatchService } from './services/after-render-batch.service';
 import { VflowHandleDirective } from './directives/handle.directive';
 import { VflowEdgeLabelTemplateDirective } from './directives/template.directive';
 
@@ -210,11 +210,11 @@ describe('Initial handle placement', () => {
     ]);
     fixture.detectChanges();
     for (let i = 0; i < 5; i++) await new Promise(requestAnimationFrame);
-    const batching = fixture.debugElement.injector.get(RequestAnimationFrameBatchingService);
-    const batch = batching.batchAnimationFrame.bind(batching);
+    const batching = fixture.debugElement.injector.get(AfterRenderBatchService);
+    const read = batching.read.bind(batching);
     let zoomed = false;
-    vi.spyOn(batching, 'batchAnimationFrame').mockImplementation((callback) =>
-      batch(() => {
+    vi.spyOn(batching, 'read').mockImplementation((callback) =>
+      read(() => {
         if (!zoomed) {
           zoomed = true;
           fixture.nativeElement.querySelector('.v-pane').dispatchEvent(

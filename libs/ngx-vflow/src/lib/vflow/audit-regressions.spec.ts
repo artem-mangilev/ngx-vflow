@@ -105,7 +105,6 @@ describe('Graph rendering and interaction regressions', () => {
     const value = TestBed.runInInjectionContext(
       () => new HandleModel({ type: signal(type), position: signal('right') }, parent),
     );
-    value.sync();
     parent.handles.update((values) => [...values, value]);
     return value;
   }

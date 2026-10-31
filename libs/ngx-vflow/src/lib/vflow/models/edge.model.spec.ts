@@ -5,6 +5,7 @@ import { createNode } from '../interfaces/node.interface';
 import { Curve, Edge, createEdge } from '../interfaces/edge.interface';
 import { FlowEntitiesService } from '../services/flow-entities.service';
 import { HandleModel } from './handle.model';
+import { syncHandle } from './handle.testing';
 import { FlowSettingsService } from '../services/flow-settings.service';
 import { NodeRenderingService } from '../services/node-rendering.service';
 import { ViewportService } from '../services/viewport.service';
@@ -50,7 +51,7 @@ function createHandle(
     () => new HandleModel({ type: signal(type), position: signal(position), element: handleElement }, parentNode),
   );
 
-  handle.sync();
+  syncHandle(handle);
 
   return handle;
 }

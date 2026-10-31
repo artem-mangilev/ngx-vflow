@@ -74,7 +74,6 @@ import { AlignmentHelperSettings } from '../../interfaces/alignment-helper-setti
 import { AlignmentService } from '../../services/alignment.service';
 import { AutoPanDirective } from '../../directives/auto-pan.directive';
 import { ResizeObserverService } from '../../services/resize-observer.service';
-import { RequestAnimationFrameBatchingService } from '../../services/request-animation-frame-batching.service';
 import { NodeDragControllerDirective } from '../../directives/node-drag-controller.directive';
 import { SelectionBoxComponent } from '../selection-box/selection-box.component';
 import { SelectionBoxContextDirective } from '../../directives/selection-box-context.directive';
@@ -146,7 +145,6 @@ const connectionControllerHostDirective = {
     AnnouncerService,
     FlowRenderingService,
     ResizeObserverService,
-    RequestAnimationFrameBatchingService,
     AfterRenderBatchService,
     AlignmentService,
   ],
