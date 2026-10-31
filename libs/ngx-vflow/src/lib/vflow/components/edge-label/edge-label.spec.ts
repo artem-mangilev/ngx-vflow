@@ -1,4 +1,3 @@
-import type { MockInstance } from 'vitest';
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
@@ -107,7 +106,6 @@ class HostComponent {
 describe('Edge labels declared inside edge presentations', () => {
   let fixture: ComponentFixture<HostComponent>;
   let root: HTMLElement;
-  let warn: MockInstance<typeof console.warn>;
 
   async function settle() {
     fixture.detectChanges();
@@ -137,7 +135,6 @@ describe('Edge labels declared inside edge presentations', () => {
   }
 
   beforeEach(async () => {
-    warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     fixture = TestBed.createComponent(HostComponent);
     root = fixture.nativeElement;
     await settle();
@@ -227,35 +224,23 @@ describe('Edge labels declared inside edge presentations', () => {
     expect(label.closest('.v-edge-labels-layer')).not.toBeNull();
   });
 
-  it('warns about a label compiled in the SVG namespace', () => {
+  it('does not render a label compiled in the SVG namespace', () => {
     const label = root.querySelector('.svg-label')!;
 
     expect(label.namespaceURI).toBe('http://www.w3.org/2000/svg');
     expect(label instanceof HTMLElement).toBe(false);
-    expect(warn).toHaveBeenCalledWith(expect.stringContaining('label of edge "inside-svg" was compiled in the SVG'));
   });
 
-  it('keeps the last label declared at a position and warns about the duplicate', () => {
+  it('keeps the last label declared at a position', () => {
     expect(positions('duplicate')).toEqual(['center']);
     expect(root.querySelector('.second-duplicate')).not.toBeNull();
     expect(root.querySelector('.first-duplicate')).toBeNull();
-    expect(warn).toHaveBeenCalledWith(
-      expect.stringContaining('Edge "duplicate" declares more than one label at "center"'),
-    );
   });
 
-  it('warns and renders nothing for a curve without labelPoints', async () => {
+  it('renders nothing for a curve without labelPoints', async () => {
     fixture.componentInstance.edges[2].curve!.set(() => ({ path: 'M 0,0 L 100,0' }));
     await settle();
 
     expect(root.querySelector('.long-form-label')).toBeNull();
-    expect(warn).toHaveBeenCalledWith(expect.stringContaining('Edge "long-form" uses a curve without labelPoints'));
-
-    // A recomputed path of the same curve is not reported again.
-    const reported = warn.mock.calls.length;
-    fixture.componentInstance.nodes[3].point.set({ x: 20, y: 270 });
-    await settle();
-
-    expect(warn.mock.calls.length).toBe(reported);
   });
 });

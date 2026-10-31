@@ -117,9 +117,8 @@ describe('HandleModel', () => {
     expect(model.localPoint()).toEqual({ x: 35, y: 30 });
   });
 
-  it('should leave an element without a layout box unmeasured and warn once', () => {
+  it('should leave an element without a layout box unmeasured', () => {
     const { model, element, parentNode } = createModel({ left: 0, top: 0, width: 100, height: 40 });
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     mockRect(element, { left: 90, top: 15, width: 10, height: 10 });
     model.sync();
     parentNode.isMeasured.set(true);
@@ -135,16 +134,13 @@ describe('HandleModel', () => {
     expect(model.hasBox()).toBe(false);
     // The node does not wait for a handle that cannot be measured.
     expect(parentNode.isReady()).toBe(true);
-    expect(warn).toHaveBeenCalledTimes(1);
-    expect(warn.mock.lastCall![0]).toContain('has no layout box');
 
-    // A handle that got its box back and lost it again is reported again.
+    // A handle that gets its box back is measured again.
     mockRect(element, { left: 90, top: 15, width: 10, height: 10 });
     model.sync();
     expect(model.hasBox()).toBe(true);
     element.getClientRects = () => [] as unknown as DOMRectList;
     model.sync();
-
-    expect(warn).toHaveBeenCalledTimes(2);
+    expect(model.hasBox()).toBe(false);
   });
 });

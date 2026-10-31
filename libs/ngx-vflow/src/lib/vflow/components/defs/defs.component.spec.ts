@@ -1,4 +1,3 @@
-import type { MockInstance } from 'vitest';
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { VflowComponent } from '../vflow/vflow.component';
@@ -54,7 +53,6 @@ class HostComponent {
 describe('Flow defs', () => {
   let fixture: ComponentFixture<HostComponent>;
   let root: HTMLElement;
-  let warn: MockInstance<typeof console.warn>;
 
   function markerOf(url: string | null): SVGMarkerElement {
     const id = /^url\(#(.+)\)$/.exec(url ?? '')![1];
@@ -68,7 +66,6 @@ describe('Flow defs', () => {
   }
 
   beforeEach(async () => {
-    warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     fixture = TestBed.createComponent(HostComponent);
     root = fixture.nativeElement;
     await settle();
@@ -105,7 +102,7 @@ describe('Flow defs', () => {
     expect(arrow.querySelector('polyline')).not.toBeNull();
   });
 
-  it('warns about a marker type without a shape and renders it empty', async () => {
+  it('renders a marker type without a shape empty', async () => {
     fixture.componentInstance.edges.set(
       createEdges([{ id: 'unknown', source: 'a', target: 'b', markers: { end: 'hexagon' } }]),
     );
@@ -116,10 +113,8 @@ describe('Flow defs', () => {
 
     expect(hexagon.children.length).toBe(0);
     expect(hexagon.getAttribute('refX')).toBe('0');
-    expect(warn).toHaveBeenCalledWith(expect.stringContaining('Marker type "hexagon" is not built in'));
 
-    // Another marker of the same type is a new marker element, not a new type to report.
-    const reported = warn.mock.calls.length;
+    // Another marker of the same type is a new marker element.
     fixture.componentInstance.edges.update((edges) => [
       ...edges,
       ...createEdges([{ id: 'wide', source: 'b', target: 'a', markers: { end: { type: 'hexagon', width: 40 } } }]),
@@ -127,6 +122,5 @@ describe('Flow defs', () => {
     await settle();
 
     expect(root.querySelectorAll('defs[flowDefs] marker.v-marker--hexagon').length).toBe(2);
-    expect(warn.mock.calls.length).toBe(reported);
   });
 });

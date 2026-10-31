@@ -23,11 +23,9 @@ describe('graph operations', () => {
   it('adds nodes left-to-right without forward references or duplicate ids', () => {
     const parent = node('parent');
     const child = node('child', 0, 0, 'parent');
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
     const forwardReference = addNodes([child, parent], []);
     expect(forwardReference).toEqual([parent]);
-    expect(warn).toHaveBeenCalledWith('[ngx-vflow] Cannot find parent node "parent".');
 
     const added = addNodes([child], forwardReference);
     expect(added).toEqual([parent, child]);
@@ -55,10 +53,8 @@ describe('graph operations', () => {
   it('rejects missing and ambiguous edge endpoints without throwing', () => {
     const nodes = [node('a'), node('a')];
     const edges: Edge[] = [];
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
     expect(addEdges([{ id: 'edge', source: 'a', target: 'missing' }], { nodes, edges })).toBe(edges);
-    expect(warn).toHaveBeenCalledWith('[ngx-vflow] Cannot target endpoint node "a" because its id is ambiguous.');
   });
 
   it('removes descendants and incident edges in original collection order', () => {
@@ -114,24 +110,20 @@ describe('graph operations', () => {
     const a = node('a', 0, 0, 'b');
     const b = node('b', 0, 0, 'a');
     const edge: Edge = { id: 'edge', source: 'a', target: 'b' };
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
     const result = removeElements({ nodeIds: ['a'] }, { nodes: [a, b], edges: [edge] });
     expect(result.removedNodes).toEqual([a, b]);
     expect(result.removedEdges).toEqual([edge]);
-    expect(warn).toHaveBeenCalledWith('[ngx-vflow] Removing node "a" and its cyclic descendant closure.');
   });
 
   it('resolves duplicate ids against the survivors of earlier removals in the same batch', () => {
     const parent = node('parent');
     const child = node('duplicate', 0, 0, 'parent');
     const other = node('duplicate');
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const nodes = [parent, child, other];
     const result = removeElements({ nodeIds: ['duplicate', 'parent', 'duplicate'] }, { nodes, edges: [] });
     expect(result.nodes).toEqual([]);
     expect(result.removedNodes).toEqual(nodes);
-    expect(warn).toHaveBeenCalledTimes(1);
     const unchanged = removeElements({ nodeIds: ['missing'] }, { nodes, edges: [] });
     expect(unchanged.nodes).toBe(nodes);
   });
@@ -167,12 +159,9 @@ describe('graph operations', () => {
     const cycleA = node('cycle-a', 0, 0, 'cycle-b');
     const cycleB = node('cycle-b', 0, 0, 'cycle-a');
     const nodes = [parent, child, cycleA, cycleB];
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
     expect(reparentNodes([{ id: 'parent', parentId: 'child' }], nodes)).toBe(nodes);
     expect(reparentNodes([{ id: 'cycle-a', parentId: null }], nodes)).toBe(nodes);
-    expect(warn).toHaveBeenCalledWith('[ngx-vflow] Cannot update node "parent" because of descendant parent.');
-    expect(warn).toHaveBeenCalledWith('[ngx-vflow] Cannot update node "cycle-a" because of cyclic ancestry.');
   });
 
   it('adds a parent signal without replacing a node that did not have one', () => {
@@ -191,10 +180,8 @@ describe('graph operations', () => {
     const duplicateB: Edge = { id: 'duplicate', source: 'b', target: 'a' };
     const keep: Edge = { id: 'keep', source: 'a', target: 'a' };
     const edges = [duplicateA, keep, duplicateB];
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
     expect(removeEdges(['duplicate'], edges)).toBe(edges);
-    expect(warn).toHaveBeenCalledWith('[ngx-vflow] Cannot target edge "duplicate" because its id is ambiguous.');
     expect(removeEdges(['keep'], edges)).toEqual([duplicateA, duplicateB]);
   });
 
@@ -228,16 +215,13 @@ describe('graph operations', () => {
   it('rejects an edge whose id already exists and keeps the collection reference', () => {
     const nodes = [node('a'), node('b')];
     const edges: Edge[] = [{ id: 'edge', source: 'a', target: 'b' }];
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
     expect(addEdges([{ id: 'edge', source: 'b', target: 'a' }], { nodes, edges })).toBe(edges);
-    expect(warn).toHaveBeenCalledWith('[ngx-vflow] Cannot add edge "edge" because its id already exists.');
   });
 
   it('adds duplicate connections and self-connections, which only the gesture rejects', () => {
     const nodes = [node('a'), node('b')];
     const edges: Edge[] = [{ id: 'first', source: 'a', target: 'b' }];
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
     const result = addEdges(
       [
@@ -248,7 +232,6 @@ describe('graph operations', () => {
     );
 
     expect(result.map(({ id }) => id)).toEqual(['first', 'second', 'loop']);
-    expect(warn).not.toHaveBeenCalled();
   });
 
   it('applies a reconnect event as an operation', () => {
@@ -264,7 +247,6 @@ describe('graph operations', () => {
   it('reconnects nothing for an unknown edge or endpoint and keeps the collection reference', () => {
     const nodes = [node('a'), node('b')];
     const edges: Edge[] = [{ id: 'edge', source: 'a', target: 'b' }];
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
     expect(
       reconnectEdges([{ edge: { id: 'missing' }, connection: { source: 'b', target: 'a' } }], { nodes, edges }),
@@ -272,10 +254,6 @@ describe('graph operations', () => {
     expect(
       reconnectEdges([{ edge: { id: 'edge' }, connection: { source: 'a', target: 'gone' } }], { nodes, edges }),
     ).toBe(edges);
-    expect(warn.mock.calls).toEqual([
-      ['[ngx-vflow] Cannot find edge "missing".'],
-      ['[ngx-vflow] Cannot find endpoint node "gone".'],
-    ]);
   });
 
   it('takes the handles of the new connection and clears the ones it omits', () => {

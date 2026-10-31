@@ -50,7 +50,7 @@ An element with `vDragHandle` inside the handle keeps dragging the node. The edg
 
 In the `auto` layout the directive owns `transform` on the element. For hover effects use the CSS `scale` or `translate` properties, or animate an inner element.
 
-A handle must stay in layout. An element with `display: none`, or inside one, is not measured: edges attached to it are hidden and a warning is logged in development mode. Hide a handle with `visibility: hidden` or `opacity: 0` instead, and give an invisible handle a size if users must be able to drag from it.
+A handle must stay in layout. An element with `display: none`, or inside one, is not measured: edges attached to it are hidden. Hide a handle with `visibility: hidden` or `opacity: 0` instead, and give an invisible handle a size if users must be able to drag from it.
 
 ## State
 

@@ -3,20 +3,15 @@ import {
   Component,
   ElementRef,
   TemplateRef,
-  afterRenderEffect,
   computed,
   effect,
   inject,
   input,
-  isDevMode,
-  viewChild,
 } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
 import { EdgeModel } from '../../models/edge.model';
 import { EdgeLabelOrient, EdgeLabelPosition } from '../../interfaces/edge-label.interface';
 import { FlowRenderingService } from '../../services/flow-rendering.service';
-
-const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
 
 /** Brings an angle into `(-90, 90]`, so that text turned by it reads left to right. */
 export function readableAngle(angle: number): number {
@@ -76,8 +71,6 @@ export class EdgeLabelComponent {
 
   protected point = computed(() => this.edgeModel().path().labelPoints?.[this.position()]);
 
-  private wrapper = viewChild<ElementRef<HTMLElement>>('wrapper');
-
   constructor() {
     const flowRendering = inject(FlowRenderingService);
 
@@ -98,21 +91,5 @@ export class EdgeLabelComponent {
       const angle = this.orient() === 'path' && point.angle !== undefined ? readableAngle(point.angle) : 0;
       this.element.style.transform = `translate(${point.x}px, ${point.y}px)${angle ? ` rotate(${angle}deg)` : ''}`;
     });
-
-    if (isDevMode()) {
-      // Runs again only for another template, so the label is reported once.
-      afterRenderEffect(() => {
-        this.template();
-        const first = this.wrapper()?.nativeElement.firstElementChild;
-        if (first?.namespaceURI !== SVG_NAMESPACE) {
-          return;
-        }
-        console.warn(
-          `[ngx-vflow] The "${this.position()}" label of edge "${this.edgeModel().edge.id}" was compiled in the SVG ` +
-            'namespace and does not render. Declare *vEdgeLabel next to the SVG presentation of the edge, ' +
-            'not inside an svg:* element.',
-        );
-      });
-    }
   }
 }

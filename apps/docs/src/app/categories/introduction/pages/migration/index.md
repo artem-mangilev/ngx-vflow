@@ -535,7 +535,7 @@ A flow that relied on a missing handler to keep its handles inert sets `[canStar
 
 Every object input of `vflow` now reads the same way: the value is the defaults with the keys you pass on top, so a key you leave out returns to its default instead of keeping the value of the previous binding. This holds for `optimization`, `selectionBox`, `keyboardShortcuts` and `ariaLabelConfig`; code that built a setting over several bindings must pass the whole object each time. `autoPan` follows later changes of its binding instead of reading it once, and `tolerance` in `AlignmentHelperSettings` and `partially` in `IntersectingNodesOptions` are optional.
 
-`view` defaults to `'auto'` instead of `[400, 400]`: the flow fills its parent element, which therefore needs a width and a height. In dev mode the flow warns when one of them measures zero. Pass `[view]="[400, 400]"` to keep the former size.
+`view` defaults to `'auto'` instead of `[400, 400]`: the flow fills its parent element, which therefore needs a width and a height. Pass `[view]="[400, 400]"` to keep the former size.
 
 `optimization.detachedGroupsLayer` became the `parentsBelowEdges` input, and the `groupRole` label key became `parentRole`; both are about nodes that other nodes reference as parent. The `connection` getter of `VflowComponent` is removed: it returned an internal model.
 
@@ -585,7 +585,7 @@ Documented Angular APIs, CSS classes, and observable behavior remain supported c
 
 The `vflow` element is now its own stacking context. The minimap no longer paints above application overlays, and positioned elements placed after the flow no longer need a `z-index` to appear above its pane. To keep the flow above or below other page elements, set `z-index` on the `vflow` element or its container.
 
-`<v-minimap>` is projected into the flow by its selector, and the `v-minimap` element is now the overlay layer itself. A minimap inside a wrapper component is no longer rendered: mark the wrapper with `ngProjectAs="v-minimap"`. A minimap inside `@if` or `@for` keeps working while the block has the minimap as its single root element. In dev mode, a minimap that the flow does not render logs a warning.
+`<v-minimap>` is projected into the flow by its selector, and the `v-minimap` element is now the overlay layer itself. A minimap inside a wrapper component is no longer rendered: mark the wrapper with `ngProjectAs="v-minimap"`. A minimap inside `@if` or `@for` keeps working while the block has the minimap as its single root element.
 
 ## Migration to >= v2.0
 

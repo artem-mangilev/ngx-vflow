@@ -60,7 +60,7 @@ Key details:
 - Setting an entry replaces its whole list. To add a key, repeat the defaults you want to keep.
 - An empty list disables an entry. A disabled command stops running and disappears from the instructions that assistive technology reads.
 - A key bound as a modifier is reserved for the gesture layer: a focused node or edge no longer treats it as a command. With `panActivation: ['Space']`, Space pans while `Enter` still selects.
-- A binding that the grammar cannot read is dropped with a message in development mode, and the entry keeps its other keys.
+- A binding that the grammar cannot read is dropped, and the entry keeps its other keys.
 - Commands run only while focus is inside the graph, so single-character keys never interfere with typing elsewhere on the page.
 
 In the following example `selection` is remapped from `Shift` to `Alt` and `multiSelection` from `CMD`/`CTRL` to `Shift`:

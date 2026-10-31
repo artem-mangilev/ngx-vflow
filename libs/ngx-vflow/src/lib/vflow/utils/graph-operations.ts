@@ -1,4 +1,4 @@
-import { isDevMode, signal } from '@angular/core';
+import { signal } from '@angular/core';
 import { Connection } from '../interfaces/connection.interface';
 import { Edge } from '../interfaces/edge.interface';
 import { Node } from '../interfaces/node.interface';
@@ -42,29 +42,17 @@ export function addNodes<ExistingNodeType extends Node, AddedNodeType extends No
   let result: readonly (ExistingNodeType | AddedNodeType)[] = nodes;
 
   for (const node of nodesToAdd) {
-    if (!node.id) {
-      warn('Cannot add a node without an id.');
-      continue;
-    }
+    if (!node.id) continue;
 
-    if (findUniqueIndex(result, node.id).count) {
-      warn(`Cannot add node "${node.id}" because its id already exists.`);
-      continue;
-    }
+    if (findUniqueIndex(result, node.id).count) continue;
 
     const parentId = node.parentId?.() ?? null;
     if (parentId) {
       const parent = findUniqueIndex(result, parentId);
-      if (parent.count !== 1) {
-        warnTarget('parent node', parentId, parent.count);
-        continue;
-      }
+      if (parent.count !== 1) continue;
 
       const ancestry = getFlowPoint(result[parent.index], result, node.id);
-      if ('error' in ancestry) {
-        warnAncestry(node.id, ancestry.error);
-        continue;
-      }
+      if ('error' in ancestry) continue;
     }
 
     result = [...result, node];
@@ -97,30 +85,22 @@ export function removeElements<NodeType extends Node, EdgeType extends Edge>(
   for (const id of nodeIds) {
     const matches = nodesById.get(id);
     if (!matches?.length) continue;
-    if (matches.length > 1) {
-      warnTarget('node', id, matches.length);
-      continue;
-    }
+    if (matches.length > 1) continue;
 
     const descendants = new Set<NodeType>(matches);
     const pending = [...matches];
     const expandedIds = new Set<string>();
-    let cyclic = false;
     while (pending.length) {
       const parent = pending.pop()!;
       if (expandedIds.has(parent.id)) continue;
       expandedIds.add(parent.id);
       for (const child of children.get(parent.id) ?? []) {
         if (removedNodeSet.has(child)) continue;
-        if (descendants.has(child)) {
-          cyclic = true;
-          continue;
-        }
+        if (descendants.has(child)) continue;
         descendants.add(child);
         pending.push(child);
       }
     }
-    if (cyclic) warn(`Removing node "${id}" and its cyclic descendant closure.`);
 
     const ids = new Set<string>();
     for (const node of descendants) {
@@ -157,33 +137,21 @@ export function reparentNodes<NodeType extends Node>(
 
   for (const { id, parentId } of operations) {
     const source = findUniqueIndex(nodes, id);
-    if (source.count !== 1) {
-      warnTarget('node', id, source.count);
-      continue;
-    }
+    if (source.count !== 1) continue;
 
     const node = nodes[source.index];
     if ((node.parentId?.() ?? null) === parentId) continue;
 
     const sourcePoint = getFlowPoint(node, nodes);
-    if ('error' in sourcePoint) {
-      warnAncestry(id, sourcePoint.error);
-      continue;
-    }
+    if ('error' in sourcePoint) continue;
 
     let parentPoint: Point = { x: 0, y: 0 };
     if (parentId) {
       const parent = findUniqueIndex(nodes, parentId);
-      if (parent.count !== 1) {
-        warnTarget('parent node', parentId, parent.count);
-        continue;
-      }
+      if (parent.count !== 1) continue;
 
       const resolvedParentPoint = getFlowPoint(nodes[parent.index], nodes, id);
-      if ('error' in resolvedParentPoint) {
-        warnAncestry(id, resolvedParentPoint.error);
-        continue;
-      }
+      if ('error' in resolvedParentPoint) continue;
       parentPoint = resolvedParentPoint.point;
     }
 
@@ -207,14 +175,8 @@ export function addEdges<ExistingEdgeType extends Edge, AddedEdgeType extends Ed
   let result: readonly (ExistingEdgeType | AddedEdgeType)[] = edges;
 
   for (const edge of edgesToAdd) {
-    if (!edge.id) {
-      warn('Cannot add an edge without an id.');
-      continue;
-    }
-    if (findUniqueIndex(result, edge.id).count) {
-      warn(`Cannot add edge "${edge.id}" because its id already exists.`);
-      continue;
-    }
+    if (!edge.id) continue;
+    if (findUniqueIndex(result, edge.id).count) continue;
     if (!hasUniqueEndpoint(nodes, edge.source) || !hasUniqueEndpoint(nodes, edge.target)) continue;
 
     result = [...result, edge];
@@ -230,10 +192,7 @@ export function removeEdges<EdgeType extends Edge>(edgeIds: readonly string[], e
   for (const id of edgeIds) {
     const match = findUniqueIndex(result, id);
     if (!match.count) continue;
-    if (match.count > 1) {
-      warnTarget('edge', id, match.count);
-      continue;
-    }
+    if (match.count > 1) continue;
     result = result.filter((_, index) => index !== match.index);
   }
 
@@ -249,10 +208,7 @@ export function reconnectEdges<EdgeType extends Edge>(
 
   for (const { edge: target, connection } of operations) {
     const match = findUniqueIndex(result, target.id);
-    if (match.count !== 1) {
-      warnTarget('edge', target.id, match.count);
-      continue;
-    }
+    if (match.count !== 1) continue;
     if (!hasUniqueEndpoint(nodes, connection.source) || !hasUniqueEndpoint(nodes, connection.target)) continue;
 
     const edge = result[match.index];
@@ -315,20 +271,5 @@ function getFlowPoint<NodeType extends Node>(
 }
 
 function hasUniqueEndpoint(nodes: readonly { id: string }[], id: string): boolean {
-  const endpoint = findUniqueIndex(nodes, id);
-  if (endpoint.count === 1) return true;
-  warnTarget('endpoint node', id, endpoint.count);
-  return false;
-}
-
-function warnTarget(target: string, id: string, count: number): void {
-  warn(count ? `Cannot target ${target} "${id}" because its id is ambiguous.` : `Cannot find ${target} "${id}".`);
-}
-
-function warnAncestry(id: string, error: string): void {
-  warn(`Cannot update node "${id}" because of ${error}.`);
-}
-
-function warn(message: string): void {
-  if (isDevMode()) console.warn(`[ngx-vflow] ${message}`);
+  return findUniqueIndex(nodes, id).count === 1;
 }

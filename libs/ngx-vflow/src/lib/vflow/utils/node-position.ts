@@ -1,4 +1,3 @@
-import { isDevMode } from '@angular/core';
 import { Node } from '../interfaces/node.interface';
 import { Point } from '../interfaces/point.interface';
 
@@ -12,10 +11,8 @@ export function getNodeFlowPosition(nodeId: string, nodeLookup: ReadonlyMap<stri
   if (!requestedNode) return undefined;
 
   while (current) {
-    if (visited.has(current.id)) {
-      if (isDevMode()) console.warn(`[ngx-vflow] Skipping node "${nodeId}" with cyclic parent ancestry.`);
-      return undefined;
-    }
+    // Cyclic parent ancestry has no position.
+    if (visited.has(current.id)) return undefined;
 
     visited.add(current.id);
     const point = current.point();

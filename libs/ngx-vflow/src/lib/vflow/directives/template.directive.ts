@@ -1,15 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars -- Angular template context guards use parameters only in type predicates. */
-import {
-  Directive,
-  TemplateRef,
-  computed,
-  effect,
-  inject,
-  input,
-  isDevMode,
-  numberAttribute,
-  untracked,
-} from '@angular/core';
+import { Directive, TemplateRef, effect, inject, input, numberAttribute, untracked } from '@angular/core';
 import { ConnectionContext, EdgeContext, NodeContext } from '../interfaces/template-context.interface';
 import { EdgeLabelOrient, EdgeLabelPosition } from '../interfaces/edge-label.interface';
 import { EdgeComponent } from '../components/edge/edge.component';
@@ -84,18 +74,13 @@ export class VflowEdgeLabelTemplateDirective {
       const orient = this.vEdgeLabelOrient();
       const model = this.edge.model();
 
-      untracked(() => {
-        const current = model.labelTemplates()[position];
-        if (isDevMode() && current && current.template !== this.templateRef) {
-          console.warn(
-            `[ngx-vflow] Edge "${model.edge.id}" declares more than one label at "${position}"; the last one wins.`,
-          );
-        }
+      // Of several labels declared at one position the last one wins.
+      untracked(() =>
         model.labelTemplates.update((templates) => ({
           ...templates,
           [position]: { template: this.templateRef, orient },
-        }));
-      });
+        })),
+      );
 
       onCleanup(() =>
         model.labelTemplates.update((templates) => {
@@ -108,21 +93,6 @@ export class VflowEdgeLabelTemplateDirective {
         }),
       );
     });
-
-    if (isDevMode()) {
-      // The effect follows this value, not the path, so it warns once and not on every recomputed path.
-      const edgeWithoutLabelPoints = computed(() => {
-        const model = this.edge.model();
-        const layout = model.path();
-        return layout.path && !layout.labelPoints ? model.edge.id : undefined;
-      });
-      effect(() => {
-        const id = edgeWithoutLabelPoints();
-        if (id !== undefined) {
-          console.warn(`[ngx-vflow] Edge "${id}" uses a curve without labelPoints, so its labels do not render.`);
-        }
-      });
-    }
   }
 }
 

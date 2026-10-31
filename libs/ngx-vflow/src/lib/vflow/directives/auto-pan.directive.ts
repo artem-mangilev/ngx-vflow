@@ -1,4 +1,4 @@
-import { DestroyRef, Directive, inject, Injector, OnInit, isDevMode } from '@angular/core';
+import { DestroyRef, Directive, inject, Injector, OnInit } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { EMPTY, merge, fromEvent, Observable } from 'rxjs';
 import {
@@ -55,8 +55,8 @@ export class AutoPanDirective implements OnInit {
       ...((options.nodeDrag ?? true) ? ['node-drag'] : []),
       ...((options.connectionDrag ?? true) ? ['connection-start', 'reconnection-start'] : []),
     ];
-    const speed = nonNegativeSetting('speed', options.speed, 600);
-    const margin = nonNegativeSetting('margin', options.margin, 48);
+    const speed = nonNegativeSetting(options.speed, 600);
+    const margin = nonNegativeSetting(options.margin, 48);
     if (!states.length || speed <= 0 || margin <= 0) return EMPTY;
 
     return toObservable(this.statusService.status, { injector: this.injector }).pipe(
@@ -114,9 +114,7 @@ function edgeFactor(distance: number, margin: number): number {
   return t * t; // ease-in: t^2
 }
 
-function nonNegativeSetting(name: string, value: number | undefined, fallback: number): number {
-  if (value === undefined) return fallback;
-  if (Number.isFinite(value) && value >= 0) return value;
-  if (isDevMode()) console.warn(`[ngx-vflow] autoPan.${name} must be finite and non-negative; using ${fallback}.`);
-  return fallback;
+/** A finite, non-negative setting; anything else takes the fallback. */
+function nonNegativeSetting(value: number | undefined, fallback: number): number {
+  return value !== undefined && Number.isFinite(value) && value >= 0 ? value : fallback;
 }

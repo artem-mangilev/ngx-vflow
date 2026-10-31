@@ -27,10 +27,10 @@ together with the edge.
 - A label has no template context of its own. It reads the edge context or the state of the component that declares
   it, so label text belongs to the edge `data`.
 - An edge component declares labels in its own template the same way and reads its edge through `injectEdge()`.
-- A position holds one label. A second label at the same position replaces the first, and development mode warns.
+- A position holds one label. A second label at the same position replaces the first.
 
 Declare labels next to the SVG elements of the edge, never inside `svg:g` or another `svg:*` element. Angular compiles
-HTML inside SVG in the SVG namespace, such a label does not render, and development mode warns about it.
+HTML inside SVG in the SVG namespace, such a label does not render.
 
 ## Orientation
 

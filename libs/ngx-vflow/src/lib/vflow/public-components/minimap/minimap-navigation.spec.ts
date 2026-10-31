@@ -290,17 +290,13 @@ describe('minimap projection', () => {
     return fixture.nativeElement as HTMLElement;
   }
 
-  it('warns in dev mode when a wrapper hides the minimap from the flow slot', async () => {
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+  it('does not render a minimap that a wrapper hides from the flow slot', async () => {
     const root = await render(false);
     expect(root.querySelector('.v-root canvas')).toBeNull();
-    expect(warn).toHaveBeenCalledWith(expect.stringContaining('ngProjectAs="v-minimap"'));
   });
 
-  it('renders a wrapper marked with ngProjectAs without a warning', async () => {
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+  it('renders a wrapper marked with ngProjectAs', async () => {
     const root = await render(true);
     expect(root.querySelector('.v-root .v-minimap canvas')).not.toBeNull();
-    expect(warn).not.toHaveBeenCalledWith(expect.stringContaining('<v-minimap>'));
   });
 });

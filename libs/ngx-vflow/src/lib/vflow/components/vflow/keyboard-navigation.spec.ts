@@ -707,7 +707,7 @@ describe('public keyboard graph navigation', () => {
     expect(host.flow().viewport()).toEqual({ x: -30, y: 0, zoom: 1 });
   });
 
-  it('keeps a key bound as a modifier out of the commands and reports the overlap', async () => {
+  it('keeps a key bound as a modifier out of the commands', async () => {
     const { fixture, host, root } = await setup();
     const settle = async () => {
       fixture.detectChanges();
@@ -715,11 +715,9 @@ describe('public keyboard graph navigation', () => {
     };
     const requests: { nodeIds: string[]; edgeIds: string[] }[] = [];
     const subscription = host.flow().deleteRequest.subscribe((request) => requests.push(request));
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     host.keyboardShortcuts.set({ modifiers: { selection: ['q'] }, commands: { delete: ['q'] } });
     fixture.detectChanges();
     await settle();
-    expect(warn).toHaveBeenCalledWith(expect.stringContaining('commands.delete and modifiers.selection share a key'));
     const child = root.querySelector<HTMLElement>('[aria-label="Child"]')!;
     child.focus();
     expect(key(child, 'q', 'KeyQ').defaultPrevented).toBe(false);

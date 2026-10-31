@@ -13,7 +13,6 @@ import {
   effect,
   ElementRef,
   signal,
-  isDevMode,
   output,
 } from '@angular/core';
 import { Node } from '../../interfaces/node.interface';
@@ -234,24 +233,6 @@ export class VflowComponent {
     effect(() => {
       if (this.flowRenderingService.flowInitialized()) this.initialized.emit();
     });
-
-    if (isDevMode()) {
-      // The effect follows this value, not the edges, so it warns when the first such edge appears, not on every change.
-      const edgeWithoutPresentation = computed(() =>
-        this.edgeTemplateDirective()
-          ? undefined
-          : this.flowEntitiesService.edges().find(({ edge }) => !edge.component)?.edge.id,
-      );
-      effect(() => {
-        const id = edgeWithoutPresentation();
-        if (id !== undefined) {
-          console.warn(
-            `[ngx-vflow] Edge "${id}" has no component and the flow declares no <ng-template vEdge>, ` +
-              'so edges without a component do not render.',
-          );
-        }
-      });
-    }
   }
 
   /** The zoom at the end of the latest gesture, bound to `--v-zoom` on the host. */

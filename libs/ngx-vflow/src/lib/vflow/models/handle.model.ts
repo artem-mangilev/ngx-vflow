@@ -1,4 +1,4 @@
-import { Signal, computed, inject, isDevMode, signal } from '@angular/core';
+import { Signal, computed, inject, signal } from '@angular/core';
 import { NodeModel } from './node.model';
 import { Point } from '../interfaces/point.interface';
 import { ViewportService } from '../services/viewport.service';
@@ -204,10 +204,6 @@ export class HandleModel {
     }
 
     if (geometry === HANDLE_WITHOUT_BOX) {
-      // Reported when the handle loses its box, not on every measurement without one.
-      if (this.hasBox()) {
-        this.warnWithoutBox();
-      }
       this.hasBox.set(false);
       this.isMeasured.set(false);
       return;
@@ -222,17 +218,6 @@ export class HandleModel {
   /** Synchronous convenience for isolated model use. Node rendering uses the coalesced controller pass. */
   public sync(): void {
     this.applyGeometry(this.measure());
-  }
-
-  private warnWithoutBox() {
-    // A node without a box takes its handles with it: a hidden node, or a DOM without layout such as jsdom.
-    if (!isDevMode() || !this.parentNode.nodeElement()?.getClientRects().length) return;
-    const id = this.id();
-    console.warn(
-      `[ngx-vflow] The ${this.type()} handle${id ? ` "${id}"` : ''} of node "${this.parentNode.rawNode.id}" ` +
-        'has no layout box (display: none?), so it is not measured and its edges are hidden. ' +
-        'Keep the element in layout; hide it with visibility: hidden or opacity: 0 instead.',
-    );
   }
 }
 

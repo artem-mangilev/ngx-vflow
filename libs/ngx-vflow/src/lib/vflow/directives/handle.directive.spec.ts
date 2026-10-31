@@ -186,7 +186,6 @@ describe('VflowHandleDirective', () => {
   });
 
   it('shows the node without a display: none handle, hides its edges and measures a visibility: hidden handle', async () => {
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const fixture = setup(HiddenHandlesNodeComponent, ['a', 'b'], [{ source: 'a', target: 'b' }]);
     await settle(fixture);
     const [a, b] = nodes(fixture);
@@ -199,7 +198,6 @@ describe('VflowHandleDirective', () => {
     expect(getComputedStyle(fixture.nativeElement.querySelector('.v-node')).visibility).toBe('visible');
     expect(edge.isReady()).toBe(false);
     expect(getComputedStyle(fixture.nativeElement.querySelector('svg[edge]')).visibility).toBe('hidden');
-    expect(warn.mock.calls.filter(([message]) => String(message).includes('has no layout box')).length).toBe(2);
   });
 
   it('exposes state, forwarded role and connectability to a component that applies the directive as a host directive', async () => {

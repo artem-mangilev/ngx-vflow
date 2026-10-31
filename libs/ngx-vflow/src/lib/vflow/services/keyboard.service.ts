@@ -1,4 +1,4 @@
-import { ElementRef, Injectable, Signal, computed, inject, isDevMode, untracked } from '@angular/core';
+import { ElementRef, Injectable, Signal, computed, inject, untracked } from '@angular/core';
 import { KeyboardCommandName, KeyboardModifierName, KeyboardShortcuts } from '../types/keyboard-shortcuts.type';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Subject, fromEvent, merge } from 'rxjs';
@@ -9,7 +9,6 @@ import {
   KeyboardModifierFlag,
   ParsedBinding,
   bindingModifierFlag,
-  canonicalBinding,
   matchesBinding,
   matchesBindingKey,
   parseBinding,
@@ -31,18 +30,6 @@ interface ShortcutState {
 
 /** Modifiers armed only outside editable content, so typing in a field cannot start a viewport gesture. */
 const GESTURE_MODIFIERS: KeyboardModifierName[] = ['panActivation', 'zoomActivation'];
-
-/** Entries of the former flat object and where they moved, for the dev-mode report. */
-const MOVED_ENTRIES: Record<string, string> = {
-  selection: 'modifiers.selection',
-  multiSelection: 'modifiers.multiSelection',
-  pan: 'modifiers.panActivation',
-  zoom: 'modifiers.zoomActivation',
-  delete: 'commands.delete',
-  zoomIn: 'commands.zoomIn',
-  zoomOut: 'commands.zoomOut',
-  fitView: 'commands.fitView',
-};
 
 function defaultShortcuts(): RawShortcuts {
   return {
@@ -81,77 +68,32 @@ function suppliedEntries(section: Partial<Record<string, string[]>> = {}): Recor
   );
 }
 
-function reportMovedEntries(shortcuts: KeyboardShortcuts) {
-  for (const name of Object.keys(shortcuts ?? {})) {
-    if (name === 'modifiers' || name === 'commands') continue;
-    const moved = MOVED_ENTRIES[name];
-    console.error(
-      moved
-        ? `[ngx-vflow] keyboardShortcuts.${name} moved to keyboardShortcuts.${moved}; an empty list now disables an entry.`
-        : `[ngx-vflow] keyboardShortcuts.${name} is not a shortcut entry; supply the modifiers and commands sections.`,
-    );
-  }
-}
-
-/** Parses one entry, dropping bindings that do not read as `[<Modifier>+]*<Key>` and reporting them in dev mode. */
-function parseEntry(section: string, name: string, bindings: string[], held: boolean, report: boolean) {
+/** Parses one entry, dropping bindings that do not read as `[<Modifier>+]*<Key>`. */
+function parseEntry(bindings: string[], held: boolean) {
   return bindings.flatMap((binding) => {
     const parsed = parseBinding(binding);
-    if (!parsed) {
-      if (report) {
-        console.warn(
-          `[ngx-vflow] keyboardShortcuts.${section}.${name}: "${binding}" is not a binding; before the key only Mod, Control, Meta, Alt and Shift are allowed.`,
-        );
-      }
-      return [];
-    }
-    if (held && (parsed.mod || parsed.modifiers.length > 0)) {
-      // A modifier entry names one key that is held, so a prefix on it would have nothing to qualify.
-      if (report) {
-        console.warn(
-          `[ngx-vflow] keyboardShortcuts.${section}.${name}: "${binding}" names a held key; its prefixes are ignored.`,
-        );
-      }
-      return [{ ...parsed, mod: false, modifiers: [] }];
-    }
+    if (!parsed) return [];
+    // A modifier entry names one key that is held, so a prefix on it would have nothing to qualify.
+    if (held) return [{ ...parsed, mod: false, modifiers: [] }];
     return [parsed];
   });
 }
 
 function mapSection<Name extends string>(
   section: Record<Name, string[]>,
-  parse: (name: Name, bindings: string[]) => ParsedBinding[],
+  held: boolean,
 ): Record<Name, ParsedBinding[]> {
   const entries = Object.entries(section) as [Name, string[]][];
-  return Object.fromEntries(entries.map(([name, bindings]) => [name, parse(name, bindings)])) as Record<
+  return Object.fromEntries(entries.map(([name, bindings]) => [name, parseEntry(bindings, held)])) as Record<
     Name,
     ParsedBinding[]
   >;
 }
 
+/** A key bound both as a modifier and in a command stays with the modifier. */
 function resolveShortcuts(raw: RawShortcuts, mac: boolean): ShortcutState {
-  const report = isDevMode();
-  const modifiers = mapSection(raw.modifiers, (name, bindings) =>
-    parseEntry('modifiers', name, bindings, true, report),
-  );
-  const commands = mapSection(raw.commands, (name, bindings) => parseEntry('commands', name, bindings, false, report));
-
-  if (report) {
-    const held = new Map<string, string>();
-    for (const [name, bindings] of Object.entries(modifiers) as [string, ParsedBinding[]][]) {
-      for (const binding of bindings) held.set(canonicalBinding(binding), name);
-    }
-    for (const [name, bindings] of Object.entries(commands) as [string, ParsedBinding[]][]) {
-      for (const binding of bindings) {
-        const owner = held.get(canonicalBinding(binding));
-        if (owner) {
-          console.warn(
-            `[ngx-vflow] keyboardShortcuts: commands.${name} and modifiers.${owner} share a key; the modifier keeps it.`,
-          );
-        }
-      }
-    }
-  }
+  const modifiers = mapSection(raw.modifiers, true);
+  const commands = mapSection(raw.commands, false);
 
   return {
     raw,
@@ -171,7 +113,6 @@ export class KeyboardService {
   /** The configuration with defaults for omitted entries: an omitted entry never keeps a previous value. */
   private state = computed<ShortcutState>(() => {
     const shortcuts = this.shortcuts();
-    if (isDevMode()) reportMovedEntries(shortcuts);
     const defaults = defaultShortcuts();
     return resolveShortcuts(
       {

@@ -146,10 +146,3 @@ export function bindingModifierFlag(binding: ParsedBinding, mac?: boolean): Keyb
   if (!flag) return null;
   return flag === 'mod' ? (onMac(mac) ? 'meta' : 'control') : flag;
 }
-
-/** A stable spelling of a binding, for comparing two entries. */
-export function canonicalBinding(binding: ParsedBinding): string {
-  const modifiers = [...binding.modifiers].sort();
-  if (binding.mod) modifiers.unshift('mod' as KeyboardModifierFlag);
-  return `${modifiers.join('+')}|${binding.key}`;
-}

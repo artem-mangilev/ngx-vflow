@@ -130,13 +130,11 @@ describe('public auto-pan settings', () => {
 
   for (const field of ['speed', 'margin']) {
     for (const value of [-1, NaN, Infinity, -Infinity]) {
-      it(`falls back and warns for invalid ${field}: ${value}`, async () => {
-        const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      it(`falls back for invalid ${field}: ${value}`, async () => {
         await setup({ [field]: value });
         drag(24);
         await frame(100);
         expect(fixture.componentInstance.flow.viewport().x).toBeCloseTo(15, 8);
-        expect(warn).toHaveBeenCalled();
       });
     }
   }

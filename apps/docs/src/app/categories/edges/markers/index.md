@@ -49,7 +49,6 @@ circle or diamond; for a bar the inset is on the bar. Set `fill="none"` or `fill
 yourself. Stroke properties inherit from the marker element. The stroke is `strokeWidth` flow units wide at any
 marker size, `2` by default like the default edge line, so a line meets its marker without a step; give a marker
 of a thicker edge the same `strokeWidth`. Your CSS can still override the stroke through the `v-marker` and
-`v-marker--<type>` classes, in marker units. A type without a declared shape renders an empty marker, and
-development mode warns about it.
+`v-marker--<type>` classes, in marker units. A type without a declared shape renders an empty marker.
 
 {{ NgDocActions.demoPane("CustomMarkersDemoComponent") }}

@@ -60,10 +60,8 @@ describe('coordinate utilities', () => {
       ['a', node('a', 1, 2, 'b')],
       ['b', node('b', 3, 4, 'a')],
     ]);
-    vi.spyOn(console, 'warn').mockImplementation(() => {});
 
     expect(nodeSpaceToFlowPosition({ x: 1, y: 1 }, 'orphan', orphanLookup)).toEqual({ x: 6, y: 7 });
     expect(nodeSpaceToFlowPosition({ x: 0, y: 0 }, 'a', cycleLookup)).toBeUndefined();
-    expect(console.warn).toHaveBeenCalledWith('[ngx-vflow] Skipping node "a" with cyclic parent ancestry.');
   });
 });
