@@ -72,12 +72,16 @@ describe('Initial viewport', () => {
       if (states.at(-1) !== state) states.push(state);
 
       if (shown.length && transform === IDENTITY) violations.push(`painted before fitView: ${state}`);
-      if (initialized && nodes.some((node) => node.style.visibility === 'hidden')) {
+      if (initialized && nodes.some((node) => getComputedStyle(node).visibility === 'hidden')) {
         violations.push(`initialized before every node is laid out: ${state}`);
       }
     };
     const observer = new MutationObserver(check);
-    observer.observe(root, { subtree: true, attributes: true, attributeFilter: ['style', 'class'] });
+    observer.observe(root, {
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['style', 'class', 'data-v-pending'],
+    });
 
     fixture.detectChanges();
     check();

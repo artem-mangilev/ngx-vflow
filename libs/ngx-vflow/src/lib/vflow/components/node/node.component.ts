@@ -19,7 +19,6 @@ import { SelectionService } from '../../services/selection.service';
 import { isNoSelectTarget } from '../../utils/no-select-target';
 import { NodeRenderingService } from '../../services/node-rendering.service';
 import { FlowSettingsService } from '../../services/flow-settings.service';
-import { FlowRenderingService } from '../../services/flow-rendering.service';
 import { NgTemplateOutlet } from '@angular/common';
 import { ComponentEventBusService } from '../../services/component-event-bus.service';
 import {
@@ -93,21 +92,23 @@ export class NodeComponent implements OnInit, OnDestroy {
   public nodeTemplate = input<TemplateRef<any>>();
 
   constructor() {
-    const flowRendering = inject(FlowRenderingService);
-
     effect(() => {
       const classes = this.hostRef.nativeElement.classList;
       classes.toggle('v-node--undraggable', this.hostUndraggable());
       classes.toggle('v-node--drag-handles-only', this.hostDragHandlesOnly());
     });
-    // A ready node inherits visibility, so the flow can keep it hidden until its first layout is complete. Once shown it
-    // stays shown: a handle added later hides itself until it is measured, instead of blinking the whole node. A node
-    // whose own measurement is reset (a remount, a restore from CSS culling) waits for every handle again.
+    // The node is pending until it is measured and every handle is placed (the flow stylesheet hides it). Once shown
+    // it stays shown: a handle added later hides itself until it is measured, instead of blinking the whole node. A
+    // node whose own measurement is reset (a remount, a restore from CSS culling) waits for every handle again.
     let shown = false;
     effect(() => {
       const model = this.model();
       shown = model.isMeasured() && (shown || model.isReady());
-      this.hostRef.nativeElement.style.visibility = flowRendering.hiddenUntil(shown) ? 'hidden' : '';
+      this.hostRef.nativeElement.toggleAttribute('data-v-pending', !shown);
+    });
+    effect(() => {
+      // CSS culling retains the view; an effect, not a template binding, so the graph list does not follow it.
+      this.hostRef.nativeElement.style.display = this.model().culled() ? 'none' : '';
     });
     effect(() => {
       const model = this.model();

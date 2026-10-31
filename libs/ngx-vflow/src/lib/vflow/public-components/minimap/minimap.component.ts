@@ -30,7 +30,7 @@ export type MinimapPosition = 'top-left' | 'top-right' | 'bottom-left' | 'bottom
   host: {
     class: 'v-minimap',
     // Hidden with the other viewport layers until the first layout is complete.
-    '[style.visibility]': 'awaitsFirstLayout() ? "hidden" : null',
+    '[attr.data-v-pending]': "flowInitialized() ? null : ''",
   },
 })
 export class VflowMinimapComponent {
@@ -48,7 +48,7 @@ export class VflowMinimapComponent {
   /** Multiplicative wheel zoom increment; invalid values fall back to 0.1. */
   public zoomStep = input(0.1);
 
-  protected awaitsFirstLayout = inject(FlowRenderingService).awaitsFirstLayout;
+  protected flowInitialized = inject(FlowRenderingService).flowInitialized;
 
   constructor() {
     const settings = inject(FlowSettingsService);

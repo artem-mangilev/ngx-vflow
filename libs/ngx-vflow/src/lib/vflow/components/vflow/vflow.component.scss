@@ -108,12 +108,14 @@
     .v-resize-control {
       touch-action: none;
     }
-
-    // A handle added to a node that is already shown waits for its first measurement, which places it.
-    .v-handle[data-v-handle-pending] {
-      visibility: hidden;
-    }
   }
+}
+
+// A node, edge, label, handle or minimap waits for its first measurement with `data-v-pending`, and an edge
+// being reconnected hides the same way. A DOM without layout, such as jsdom, never measures anything: there the
+// host carries `v-no-layout`, nothing waits, and the content stays visible to a test with sizes of zero.
+:host(:not(.v-no-layout)) ::ng-deep [data-v-pending] {
+  visibility: hidden;
 }
 
 // High contrast: the feedback parts keep their meaning through system colors. The minimap canvas paints the
@@ -141,7 +143,7 @@
 
 // Until the first layout is complete only the canvas is painted: the layers below follow the viewport, which the
 // application may still change in reaction to `initialized`. Entities inherit this, they never force visible.
-:host(.v-initializing) {
+:host(.v-initializing:not(.v-no-layout)) {
   .v-background-svg,
   .v-viewport {
     visibility: hidden;

@@ -17,7 +17,6 @@ import {
 } from '@angular/core';
 import { Node } from '../../interfaces/node.interface';
 import { ViewportGesturesDirective } from '../../directives/viewport-gestures.directive';
-import { ViewportVisibilityDirective } from '../../directives/viewport-visibility.directive';
 import { DraggableService } from '../../services/draggable.service';
 import { NodeModel } from '../../models/node.model';
 import { ViewportService, ZOOM_STEP } from '../../services/viewport.service';
@@ -166,7 +165,9 @@ const connectionControllerHostDirective = {
     '[style.--v-zoom]': 'settledZoom()',
     // Nothing that follows the viewport is painted before the first layout, so the first painted frame already
     // shows a viewport the application sets in reaction to `initialized`, such as a `fitView()` call.
-    '[class.v-initializing]': 'awaitsFirstLayout()',
+    '[class.v-initializing]': '!flowInitialized()',
+    // A DOM without layout never measures anything, so there nothing waits for a measurement (see the stylesheet).
+    '[class.v-no-layout]': '!hasLayout',
   },
   imports: [
     KeyboardEntityDirective,
@@ -179,7 +180,6 @@ const connectionControllerHostDirective = {
     DefsComponent,
     BackgroundComponent,
     ViewportGesturesDirective,
-    ViewportVisibilityDirective,
     SpacePointContextDirective,
     ConnectionComponent,
     NodeComponent,
@@ -462,7 +462,8 @@ export class VflowComponent {
    */
   public readonly viewport = this.viewportService.readableViewport.asReadonly();
 
-  protected readonly awaitsFirstLayout = this.flowRenderingService.awaitsFirstLayout;
+  protected readonly flowInitialized = this.flowRenderingService.flowInitialized;
+  protected readonly hasLayout = this.flowRenderingService.hasLayout;
   // #endregion
 
   protected markers = this.flowEntitiesService.markers;

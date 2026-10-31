@@ -28,7 +28,7 @@ import { pressTarget } from '../utils/press-target';
     '[attr.data-v-handle-state]': 'state()',
     '[attr.data-v-handle-can-start]': 'canStart()',
     '[attr.data-v-handle-can-accept]': 'canAccept()',
-    '[attr.data-v-handle-pending]': "pending() ? '' : null",
+    '[attr.data-v-pending]': "pending() ? '' : null",
     '[style.position]': "placement() ? 'absolute' : null",
     '[style.top]': 'placement()?.top ?? null',
     '[style.left]': 'placement()?.left ?? null',

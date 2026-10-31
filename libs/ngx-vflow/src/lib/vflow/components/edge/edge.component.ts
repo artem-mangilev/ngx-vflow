@@ -15,11 +15,9 @@ import { EdgeModel } from '../../models/edge.model';
 import { EdgeContext } from '../../interfaces/template-context.interface';
 import { SelectionService } from '../../services/selection.service';
 import { FlowSettingsService } from '../../services/flow-settings.service';
-import { FlowRenderingService } from '../../services/flow-rendering.service';
 import { ConnectionControllerDirective } from '../../directives/connection-controller.directive';
 import { HandleModel } from '../../models/handle.model';
 import { EdgeRenderingService } from '../../services/edge-rendering.service';
-import { PointerDirective } from '../../directives/pointer.directive';
 import { ComponentEventBusService } from '../../services/component-event-bus.service';
 import {
   EntityComponentOutletDirective,
@@ -45,7 +43,7 @@ import { isNoSelectTarget } from '../../utils/no-select-target';
     // Resolved lazily by presentations, which are created after the model input is set.
     { provide: EDGE_REF, useFactory: () => inject(EdgeComponent).model().context.$implicit },
   ],
-  imports: [NgTemplateOutlet, PointerDirective, EntityComponentOutletDirective],
+  imports: [NgTemplateOutlet, EntityComponentOutletDirective],
 })
 export class EdgeComponent {
   protected injector = inject(Injector);
@@ -64,14 +62,20 @@ export class EdgeComponent {
 
   constructor() {
     const element = inject<ElementRef<SVGElement>>(ElementRef).nativeElement;
-    const flowRendering = inject(FlowRenderingService);
     effect(() => {
-      const hidden = flowRendering.hiddenUntil(this.model().isReady()) || this.model().reconnecting();
-      element.style.visibility = hidden ? 'hidden' : '';
+      // Pending until both endpoints are placed, and while the edge is being reconnected (the stylesheet hides it).
+      element.toggleAttribute('data-v-pending', !this.model().isReady() || this.model().reconnecting());
     });
+
+    effect(() => {
+      // CSS culling retains the view; an effect, not a template binding, so the graph list does not follow it.
+      element.style.display = this.model().culled() ? 'none' : '';
+    });
+
     effect(() => {
       element.style.zIndex = String(this.model().renderOrder());
     });
+
     effect(() => {
       // Elevation follows the selection itself, whether it came from a click, the keyboard, the selection box or
       // the application.

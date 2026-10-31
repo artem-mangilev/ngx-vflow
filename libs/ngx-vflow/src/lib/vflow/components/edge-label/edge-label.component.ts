@@ -11,7 +11,6 @@ import {
 import { NgTemplateOutlet } from '@angular/common';
 import { EdgeModel } from '../../models/edge.model';
 import { EdgeLabelOrient, EdgeLabelPosition } from '../../interfaces/edge-label.interface';
-import { FlowRenderingService } from '../../services/flow-rendering.service';
 
 /** Brings an angle into `(-90, 90]`, so that text turned by it reads left to right. */
 export function readableAngle(angle: number): number {
@@ -72,15 +71,16 @@ export class EdgeLabelComponent {
   protected point = computed(() => this.edgeModel().path().labelPoints?.[this.position()]);
 
   constructor() {
-    const flowRendering = inject(FlowRenderingService);
-
     effect(() => {
       this.element.style.zIndex = String(this.edgeModel().renderOrder());
     });
     effect(() => {
+      // Pending with its edge: until the endpoints are placed, and while the edge is being reconnected.
       const model = this.edgeModel();
-      const hidden = flowRendering.hiddenUntil(model.isReady()) || model.reconnecting();
-      this.element.style.visibility = hidden ? 'hidden' : '';
+      this.element.toggleAttribute('data-v-pending', !model.isReady() || model.reconnecting());
+    });
+    effect(() => {
+      this.element.style.display = this.edgeModel().culled() ? 'none' : '';
     });
     effect(() => {
       const point = this.point();

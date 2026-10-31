@@ -54,11 +54,9 @@ type ConnectionGesture = {
 
 `FlowRenderingService.hiddenUntil(ready) = hasLayout && !ready` вызывается в node, edge, edge-label, minimap, плюс `v-initializing` на корне. `hasLayout` нужен только для jsdom/happy-dom, где ничего не измеряется и без него всё навсегда `visibility: hidden`. При этом handle уже решает скрытие иначе: атрибут `data-v-handle-pending` и одно правило в `vflow.component.scss`.
 
-Предложение:
+Сделано (2026-10-31, шаг 3): нода, ребро, label, minimap и handle ставят `data-v-pending`, пока не готовы; одно правило `:host(:not(.v-no-layout)) [data-v-pending] { visibility: hidden }` в `vflow.component.scss`, класс `v-no-layout` на корне в DOM без layout. `hiddenUntil` и `awaitsFirstLayout` удалены, `hasLayout` читается в одном месте. `ViewportVisibilityDirective` перенесена по строке в host-эффекты `NodeComponent`, `EdgeComponent`, `EdgeLabelComponent`.
 
-1. В DOM без layout считать ноду измеренной: в `NodeResizeControllerDirective.measure()` пропускать только настоящий `display: none` (`!hasBox && domHasLayout`), иначе писать 0×0 и `isMeasured = true`; `flowInitialized = !hasLayout || (...)`. Тогда `initialized` срабатывает и в jsdom, и тесты могут его ждать.
-2. Нода, ребро, label ставят `data-v-pending` пока не готовы; одно правило `[data-v-pending] { visibility: hidden }` рядом с правилом для handle. `hiddenUntil` удаляется, `hasLayout` остаётся в одном месте.
-3. `ViewportVisibilityDirective` (один эффект `display: none` по `culled`) переносится по строке в уже существующие host-эффекты `NodeComponent`, `EdgeComponent`, `EdgeLabelComponent`; директива и три привязки в шаблоне flow удаляются.
+Отвергнуто: считать ноды измеренными в DOM без layout, чтобы `initialized` срабатывал в jsdom. Контракт «в jsdom `initialized` не эмитится, `fitView()` даёт `false`, ничего не скрыто» задокументирован на странице Unit testing и покрыт `node-dom/flow.spec.ts`; менять его ради упрощения не стоит.
 
 ### F. Резайзер: порт XYResizer с лишней общностью и 8 экземплярами на ноду
 
@@ -115,7 +113,7 @@ type ConnectionGesture = {
 
 ### `node.component.ts`
 
-- **Логика `culled`** (эффект `wasCulled`, сбрасывающий `isMeasured` ноды и handles при возврате в viewport): скорее всего лишняя. ResizeObserver и так срабатывает на `display: none` → показ (размер 0 → N) и для обёртки ноды, и для элементов handle, которые наблюдает `nodeHandlesController`; измерение произойдёт без сброса. Сброс добавляет только кадр `visibility: hidden` на каждой ноде, въезжающей в viewport, то есть мерцание при панорамировании. Удалить, проверить `css-virtualization.spec.ts` и e2e виртуализации.
+- **Логика `culled`** (эффект `wasCulled`, сбрасывающий `isMeasured` ноды и handles при возврате в viewport): нужна, первоначальный вывод «лишняя» был ошибкой. Пока нода под `display: none`, ResizeObserver не сообщает об изменениях её контента, и без сброса первый кадр после возврата показал бы старую геометрию и handles не на месте. Это покрыто тестами `css-virtualization.spec.ts` («retains … then remeasures before showing») и `initial-handles.spec.ts` («never shows unpositioned custom handles on … restore»). Оставить.
 - **`classes.toggle`**: эффект нужен из-за запрета на чтение сигналов в host-привязках (объяснено в комментарии компонента, причина настоящая). Но сами классы существуют только ради `touch-action: auto` и `isPanPress`. Писать `style.touchAction` в том же эффекте, а в pan-фильтре `ViewportGesturesDirective` брать модель по элементу (`WeakMap<Element, NodeModel>` в `FlowEntitiesService`, заполняется из `nodeElement`). Тогда эффект остаётся, но классы и DOM-как-состояние уходят.
 - Магниты используют `PointerDirective`; заменить на нативные `(pointerup)`, `(pointerover)`, `(pointerout)`.
 - Зависимость от `ConnectionControllerDirective` уходит с решением A.
@@ -188,7 +186,7 @@ Culling: нужен и обоснован замерами; оставить к�
 
 1. Предупреждения: удалить `console.*` и обвязку. Самый дешёвый и безопасный.
 2. Токен `NODE_MODEL` вместо `NodeAccessorService` + `HandleService`; `PointerDirective` → нативные события; `RootSvgReferenceDirective` удалить; мёртвый код в `NodeModel`.
-3. Готовность через `data-v-pending`, `hasLayout` только в `flowInitialized`, `ViewportVisibilityDirective` в компоненты, сброс `isMeasured` при un-cull убрать.
+3. Готовность через `data-v-pending` с одним CSS-гейтом `v-no-layout`, `ViewportVisibilityDirective` в компоненты. Сделано; сброс `isMeasured` при un-cull остаётся (см. выше).
 4. `ConnectionService` вместо `FlowStatusService` (+ `RootSvgContextDirective`), connection и рамка на `createPointerDrag`, `RootPointerDirective` удалить, клик по панели в директиве жестов. Самый большой шаг; покрыт `connection-outputs.spec`, `click-selection.spec`, e2e соединений.
 5. Handles: разделить measure/derive, один батчер.
 6. Один резайзер на ноду; переименование `NodeMeasureDirective`.
