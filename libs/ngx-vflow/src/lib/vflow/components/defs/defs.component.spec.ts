@@ -7,8 +7,8 @@ import {
   VflowEdgeTemplateDirective,
   VflowMarkerTemplateDirective,
   VflowNodeTemplateDirective,
-} from '../../directives/template.directive';
-import { VflowHandleDirective } from '../../directives/handle.directive';
+} from '../../public-directives/template.directive';
+import { VflowHandleDirective } from '../../public-directives/handle.directive';
 
 @Component({
   template: `<vflow [view]="[600, 400]" [nodes]="nodes" [edges]="edges()" [connection]="{ markerEnd: 'diamond' }">

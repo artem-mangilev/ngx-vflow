@@ -3,7 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { VflowComponent } from './components/vflow/vflow.component';
 import { createNode } from './interfaces/node.interface';
 import { createEdge } from './interfaces/edge.interface';
-import { VflowHandleDirective } from './directives/handle.directive';
+import { VflowHandleDirective } from './public-directives/handle.directive';
 
 const IDENTITY = 'translate(0px, 0px) scale(1)';
 

@@ -9,8 +9,8 @@ import {
   VflowEdgeLabelTemplateDirective,
   VflowEdgeTemplateDirective,
   VflowNodeTemplateDirective,
-} from '../../directives/template.directive';
-import { VflowHandleDirective } from '../../directives/handle.directive';
+} from '../../public-directives/template.directive';
+import { VflowHandleDirective } from '../../public-directives/handle.directive';
 import { FlowEntitiesService } from '../../services/flow-entities.service';
 import { injectEdge } from '../../utils/inject-edge';
 

@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { VflowComponent } from './vflow.component';
-import { VflowHandleDirective } from '../../directives/handle.directive';
+import { VflowHandleDirective } from '../../public-directives/handle.directive';
 import { createNodes } from '../../interfaces/node.interface';
 import { Edge, createEdges } from '../../interfaces/edge.interface';
 import { Connection } from '../../interfaces/connection.interface';

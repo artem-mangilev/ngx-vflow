@@ -5,10 +5,10 @@ import { createNodes } from '../../interfaces/node.interface';
 import { Edge, createEdges } from '../../interfaces/edge.interface';
 import { AnyComponentEdgeEvent } from '../../interfaces/component-edge-event.interface';
 import { AnyComponentNodeEvent } from '../../interfaces/component-node-event.interface';
-import { VflowEdgeTemplateDirective, VflowNodeTemplateDirective } from '../../directives/template.directive';
-import { VflowHandleDirective } from '../../directives/handle.directive';
+import { VflowEdgeTemplateDirective, VflowNodeTemplateDirective } from '../../public-directives/template.directive';
+import { VflowHandleDirective } from '../../public-directives/handle.directive';
 import { injectEdge } from '../../utils/inject-edge';
-import { VflowEdgeInteractionDirective } from '../../directives/edge-interaction.directive';
+import { VflowEdgeInteractionDirective } from '../../public-directives/edge-interaction.directive';
 
 const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
 

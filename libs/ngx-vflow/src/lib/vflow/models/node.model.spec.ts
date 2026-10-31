@@ -5,6 +5,7 @@ import { FlowEntitiesService } from '../services/flow-entities.service';
 import { FlowSettingsService } from '../services/flow-settings.service';
 import { NodeRenderingService } from '../services/node-rendering.service';
 import { ViewportService } from '../services/viewport.service';
+import { FlowRenderingService } from '../services/flow-rendering.service';
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 
 @Component({ template: '', changeDetection: ChangeDetectionStrategy.OnPush })
@@ -17,7 +18,13 @@ describe('NodeModel', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [FlowEntitiesService, FlowSettingsService, NodeRenderingService, ViewportService],
+      providers: [
+        FlowEntitiesService,
+        FlowSettingsService,
+        NodeRenderingService,
+        ViewportService,
+        FlowRenderingService,
+      ],
     });
 
     model = TestBed.runInInjectionContext(

@@ -7,7 +7,7 @@ import { VflowComponent } from '../components/vflow/vflow.component';
 import { AnyComponentNodeEvent } from '../interfaces/component-node-event.interface';
 import { Node, createNode } from '../interfaces/node.interface';
 import { injectNode } from '../utils/inject-node';
-import { VflowNodeTemplateDirective } from './template.directive';
+import { VflowNodeTemplateDirective } from '../public-directives/template.directive';
 
 @Component({
   selector: 'emitter-node',

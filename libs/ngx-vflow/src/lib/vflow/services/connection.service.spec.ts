@@ -10,6 +10,7 @@ import { FlowEntitiesService } from './flow-entities.service';
 import { FlowSettingsService } from './flow-settings.service';
 import { NodeRenderingService } from './node-rendering.service';
 import { ViewportService } from './viewport.service';
+import { FlowRenderingService } from './flow-rendering.service';
 import { dispatchPointer, pointerEvent } from '../gestures/pointer-events.testing';
 
 describe('ConnectionService', () => {
@@ -18,7 +19,14 @@ describe('ConnectionService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [FlowEntitiesService, FlowSettingsService, ConnectionService, NodeRenderingService, ViewportService],
+      providers: [
+        FlowEntitiesService,
+        FlowSettingsService,
+        ConnectionService,
+        NodeRenderingService,
+        ViewportService,
+        FlowRenderingService,
+      ],
     });
 
     flowEntitiesService = TestBed.inject(FlowEntitiesService);

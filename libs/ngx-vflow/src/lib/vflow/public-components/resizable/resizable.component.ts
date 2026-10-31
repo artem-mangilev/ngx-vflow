@@ -15,7 +15,7 @@ import { NODE_MODEL } from '../../utils/node-model.token';
 import { ViewportService } from '../../services/viewport.service';
 import { FlowSettingsService } from '../../services/flow-settings.service';
 import { SpacePointContextDirective } from '../../directives/space-point-context.directive';
-import { VflowNoDragDirective } from '../../directives/gesture-exclusions.directive';
+import { VflowNoDragDirective } from '../../public-directives/gesture-exclusions.directive';
 import { PointerTracker, createPointerTracker } from '../../gestures/pointer-drag';
 import { Point } from '../../interfaces/point.interface';
 import { align } from '../../utils/align-number';

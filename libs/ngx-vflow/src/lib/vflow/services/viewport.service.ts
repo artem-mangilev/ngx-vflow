@@ -1,7 +1,8 @@
-import { Injectable, OnDestroy, WritableSignal, inject, signal, untracked } from '@angular/core';
-import { ViewportChange, ViewportState } from '../interfaces/viewport.interface';
+import { Injectable, NgZone, OnDestroy, WritableSignal, effect, inject, signal, untracked } from '@angular/core';
+import { ViewportState } from '../interfaces/viewport.interface';
 import { getNodesFlowBounds } from '../utils/nodes';
 import { FlowEntitiesService } from './flow-entities.service';
+import { FlowRenderingService } from './flow-rendering.service';
 import { clamp, getViewportForBounds } from '../utils/viewport';
 import { FlowSettingsService } from './flow-settings.service';
 import { FitViewOptions } from '../interfaces/fit-view-options.interface';
@@ -10,14 +11,40 @@ import { Subject } from 'rxjs';
 import { isDefined } from '../utils/is-defined';
 import { Point } from '../interfaces/point.interface';
 import { placeFlowPoint, zoomAround } from '../gestures/viewport-transform';
+import { ViewportAnimation, animateViewport } from '../gestures/viewport-animation';
 
 /** Multiplicative zoom step of the zoom keys and of `zoomIn` / `zoomOut`. */
 export const ZOOM_STEP = 1.2;
 
+/**
+ * A programmatic viewport change. `target` gives the state it leads to from `from`, the state where the previous
+ * change leads, with `center` the pane center; `null` when there is nothing to change. `done` reports whether the
+ * viewport reached the target.
+ */
+interface ViewportChange {
+  target: (from: ViewportState, center: Point) => ViewportState | null;
+  duration: number;
+  done: (reached: boolean) => void;
+}
+
+/** Where a gesture of the viewport started and ended. */
+export interface ViewportGesture {
+  start: ViewportState;
+  end: ViewportState;
+}
+
+/**
+ * The viewport: its state, the programmatic changes and their animation, and the lifecycle of the gestures that
+ * change it. The pane's input gestures (`viewportGestures`) write the state and report their gestures here; every
+ * change of the viewport belongs to a gesture, and nested gestures, such as a programmatic change during a drag,
+ * report one start and one end.
+ */
 @Injectable()
 export class ViewportService implements OnDestroy {
   private entitiesService = inject(FlowEntitiesService);
   private flowSettingsService = inject(FlowSettingsService);
+  private flowRendering = inject(FlowRenderingService);
+  private zone = inject(NgZone);
 
   /**
    * The identity viewport: no translation, zoom 1.
@@ -38,8 +65,29 @@ export class ViewportService implements OnDestroy {
   /** Emits the viewport each time a gesture or a programmatic change ends. */
   public readonly viewportChangeEnd$ = new Subject<ViewportState>();
 
-  private applyChange: ((change: ViewportChange) => void) | null = null;
+  /** Changes requested before the pane exists wait for it. */
   private pendingChanges: ViewportChange[] = [];
+  private destroyed = false;
+
+  private activeGestures = 0;
+  private gestureStart: ViewportState | null = null;
+
+  private animation: ViewportAnimation | null = null;
+  /** Where the animation in progress leads; a programmatic change continues from there. */
+  private animationTarget: ViewportState | null = null;
+  /** Reports the end of the programmatic change the animation in progress belongs to. */
+  private animationDone: ((reached: boolean) => void) | null = null;
+  /** What an input gesture in progress does when a change takes over; see {@link onTakeOver}. */
+  private yieldInput: (() => void) | null = null;
+
+  constructor() {
+    effect(() => {
+      if (!this.flowRendering.pane()) return;
+      untracked(() => {
+        for (const change of this.pendingChanges.splice(0)) this.apply(change);
+      });
+    });
+  }
 
   /**
    * Requests a programmatic viewport change. The values it gives replace the current ones; zoom alone scales around
@@ -99,34 +147,129 @@ export class ViewportService implements OnDestroy {
     }, options.duration ?? 0);
   }
 
-  /** Registers the pane that applies programmatic changes; returns the function that unregisters it. */
-  public connect(apply: (change: ViewportChange) => void): () => void {
-    this.applyChange = apply;
-    untracked(() => {
-      for (const change of this.pendingChanges.splice(0)) apply(change);
-    });
+  /**
+   * Registers what an input gesture in progress does when a programmatic change takes over, for example the wheel
+   * zoom landing on its target; returns the function that unregisters it.
+   */
+  public onTakeOver(land: () => void): () => void {
+    this.yieldInput = land;
 
     return () => {
-      if (this.applyChange === apply) this.applyChange = null;
+      if (this.yieldInput === land) this.yieldInput = null;
     };
   }
 
-  public ngOnDestroy(): void {
-    for (const change of this.pendingChanges.splice(0)) change.done(false);
+  /** Begins a gesture of the viewport; a gesture within another one is part of it. */
+  public beginGesture(): void {
+    if (this.activeGestures++ === 0) this.gestureStart = untracked(this.readableViewport);
   }
 
-  /** Reports that a gesture or a programmatic change ended. */
-  public endChange() {
-    this.viewportChangeEnd$.next(untracked(this.readableViewport));
+  /**
+   * Ends a gesture. Once the outermost one ends, reports the end of the change and returns where the gesture
+   * started and ended; `null` while an enclosing gesture goes on.
+   */
+  public endGesture(): ViewportGesture | null {
+    if (this.activeGestures === 0 || --this.activeGestures > 0) return null;
+    const end = untracked(this.readableViewport);
+    const start = this.gestureStart ?? end;
+    this.gestureStart = null;
+    if (this.destroyed) return null;
+
+    // Gestures run outside Angular; the end of a change reaches the application.
+    this.zone.run(() => this.viewportChangeEnd$.next(end));
+
+    return { start, end };
+  }
+
+  /**
+   * Animates the viewport to `to`; `anchor` is the pane point the zoom animates around. Resolves with whether the
+   * viewport reached the target, `false` when another change or a gesture interrupted the animation first.
+   */
+  public animate(to: ViewportState, duration: number, anchor: () => Point): Promise<boolean> {
+    return new Promise((done) => this.run(to, duration, anchor, done));
+  }
+
+  /** Stops the animation in progress, which reports that it did not reach its target, and lands the input gesture. */
+  public interruptAnimation(): void {
+    const animation = this.animation;
+    const done = this.animationDone;
+    this.animation = null;
+    this.animationTarget = null;
+    this.animationDone = null;
+    animation?.interrupt();
+    done?.(false);
+    this.yieldInput?.();
+  }
+
+  public ngOnDestroy(): void {
+    this.destroyed = true;
+    this.interruptAnimation();
+    for (const change of this.pendingChanges.splice(0)) change.done(false);
   }
 
   private request(target: ViewportChange['target'], duration: number): Promise<boolean> {
     return new Promise((done) => {
       const change = { target, duration, done };
-      const apply = this.applyChange;
-      if (apply) untracked(() => apply(change));
+      if (untracked(this.flowRendering.pane)) untracked(() => this.apply(change));
       else this.pendingChanges.push(change);
     });
+  }
+
+  /**
+   * A change continues from where the previous one leads: the target of an animation in progress, or the viewport.
+   * It reports that it reached its target once it lands there; an interrupted animation reports that it did not.
+   */
+  private apply({ target, duration, done }: ViewportChange) {
+    const previousTarget = this.animationTarget;
+    this.interruptAnimation();
+    const to = target(previousTarget ?? untracked(this.readableViewport), this.paneCenter());
+    if (!to) {
+      done(false);
+      return;
+    }
+
+    if (duration > 0) {
+      this.run(to, duration, () => this.paneCenter(), done);
+    } else {
+      this.beginGesture();
+      this.readableViewport.set(to);
+      this.endGesture();
+      done(true);
+    }
+  }
+
+  private run(to: ViewportState, duration: number, anchor: () => Point, done: (reached: boolean) => void) {
+    this.interruptAnimation();
+    const pane = untracked(this.flowRendering.pane);
+    const animation: ViewportAnimation = this.zone.runOutsideAngular(() =>
+      animateViewport({
+        duration,
+        current: () => untracked(this.readableViewport),
+        target: () => to,
+        anchor,
+        size: () => (pane ? Math.max(pane.clientWidth, pane.clientHeight) : 0),
+        onStart: () => this.beginGesture(),
+        onFrame: (state) => this.readableViewport.set(state),
+        onEnd: () => {
+          const reached = this.animation === animation;
+          if (reached) {
+            this.animation = null;
+            this.animationTarget = null;
+            this.animationDone = null;
+          }
+          this.endGesture();
+          if (reached) done(true);
+        },
+      }),
+    );
+    this.animation = animation;
+    this.animationTarget = to;
+    this.animationDone = done;
+  }
+
+  private paneCenter(): Point {
+    const pane = untracked(this.flowRendering.pane);
+    return pane ? { x: pane.clientWidth / 2, y: pane.clientHeight / 2 } : { x: 0, y: 0 };
   }
 
   private clampZoom(zoom: number) {

@@ -10,10 +10,10 @@ import { NodeRenderingService } from './services/node-rendering.service';
 import { EdgeRenderingService } from './services/edge-rendering.service';
 import { ConnectionService } from './services/connection.service';
 import { DraggableService } from './services/draggable.service';
-import { VflowHandleDirective } from './directives/handle.directive';
+import { VflowHandleDirective } from './public-directives/handle.directive';
 import { VflowMinimapComponent } from './public-components/minimap/minimap.component';
 import { VflowNodeToolbarComponent } from './public-components/node-toolbar/node-toolbar.component';
-import { VflowEdgeLabelTemplateDirective } from './directives/template.directive';
+import { VflowEdgeLabelTemplateDirective } from './public-directives/template.directive';
 import { dispatchPointer, mouseAsPointer } from './gestures/pointer-events.testing';
 
 /** An edge presentation that declares a center label, so the flow renders it in the label layer. */

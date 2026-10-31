@@ -28,7 +28,7 @@ import {
   VflowEdgeTemplateDirective,
   VflowMarkerTemplateDirective,
   VflowNodeTemplateDirective,
-} from '../../directives/template.directive';
+} from '../../public-directives/template.directive';
 import { Point } from '../../interfaces/point.interface';
 import { NodeAtPoint } from '../../interfaces/node-at-point.interface';
 import { SetCenterOptions, ViewportOptions, ViewportState } from '../../interfaces/viewport.interface';

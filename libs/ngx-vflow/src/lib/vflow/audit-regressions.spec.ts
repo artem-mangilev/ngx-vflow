@@ -20,7 +20,7 @@ import { ReferenceIdentityChecker } from './utils/identity-checker/reference-ide
 import { addNodesToEdges } from './utils/add-nodes-to-edges';
 import { startResize } from './public-components/resizable/resizer';
 import { ConnectionService } from './services/connection.service';
-import { VflowHandleDirective } from './directives/handle.directive';
+import { VflowHandleDirective } from './public-directives/handle.directive';
 import { EdgeLabelComponent } from './components/edge-label/edge-label.component';
 import { VflowComponent } from './components/vflow/vflow.component';
 

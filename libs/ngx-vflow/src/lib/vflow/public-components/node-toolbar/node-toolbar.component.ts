@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { Position } from '../../types/position.type';
-import { VflowNoDragDirective } from '../../directives/gesture-exclusions.directive';
+import { VflowNoDragDirective } from '../../public-directives/gesture-exclusions.directive';
 
 /**
  * A toolbar attached to one side of the node presentation it sits in.

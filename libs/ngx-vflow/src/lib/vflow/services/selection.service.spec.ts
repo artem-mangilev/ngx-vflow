@@ -9,6 +9,7 @@ import { KeyboardService } from './keyboard.service';
 import { NodeRenderingService } from './node-rendering.service';
 import { SelectionService } from './selection.service';
 import { ViewportService } from './viewport.service';
+import { FlowRenderingService } from './flow-rendering.service';
 
 describe('SelectionService', () => {
   let entitiesService: FlowEntitiesService;
@@ -24,6 +25,7 @@ describe('SelectionService', () => {
         NodeRenderingService,
         SelectionService,
         ViewportService,
+        FlowRenderingService,
       ],
     });
 

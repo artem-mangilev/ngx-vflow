@@ -2,7 +2,7 @@ import { DestroyRef, Directive, ElementRef, computed, inject, input } from '@ang
 import { NODE_MODEL } from '../utils/node-model.token';
 import { HandleModel } from '../models/handle.model';
 import { ConnectionService } from '../services/connection.service';
-import { bindDomAttributes } from './entity-accessibility.directive';
+import { bindDomAttributes } from '../directives/entity-accessibility.directive';
 import { DomAttributes } from '../interfaces/dom-attributes.interface';
 import { HandleLayout, HandlePosition, HandleType } from '../types/handle-type.type';
 import { pressTarget } from '../utils/press-target';

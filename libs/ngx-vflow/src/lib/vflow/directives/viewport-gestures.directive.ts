@@ -1,6 +1,6 @@
 import { Directive, ElementRef, NgZone, OnDestroy, OnInit, computed, inject } from '@angular/core';
-import { ViewportService } from '../services/viewport.service';
-import { ViewportChange, ViewportState } from '../interfaces/viewport.interface';
+import { ViewportGesture, ViewportService } from '../services/viewport.service';
+import { ViewportState } from '../interfaces/viewport.interface';
 import { SelectionService } from '../services/selection.service';
 import { FlowSettingsService } from '../services/flow-settings.service';
 import { KeyboardService } from '../services/keyboard.service';
@@ -9,7 +9,6 @@ import { Point } from '../interfaces/point.interface';
 import { PointerDrag, createPointerDrag } from '../gestures/pointer-drag';
 import { clampZoom, panePointFromClient, toFlowPoint, translateBy, zoomAround } from '../gestures/viewport-transform';
 import { wheelPanDelta, wheelZoomFactor } from '../gestures/wheel';
-import { ViewportAnimation, animateViewport } from '../gestures/viewport-animation';
 import { TouchAnchor, touchCenter, touchViewport } from '../gestures/pinch';
 import { listen } from '../utils/listen';
 
@@ -50,11 +49,9 @@ interface TouchGesture {
 }
 
 /**
- * Viewport gestures of the pane: drag panning with a mouse or pen, touch panning and pinch, wheel zoom, scroll
- * panning and double-click zoom, and the programmatic viewport changes requested through {@link ViewportService}.
- *
- * Every change of the viewport belongs to a gesture. Nested gestures, such as a programmatic change during a drag,
- * report one start and one end, the way the gesture policy and pane-click selection expect them.
+ * Input gestures of the pane: drag panning with a mouse or pen, touch panning and pinch, wheel zoom, scroll panning
+ * and double-click zoom. They write the viewport and report their gestures to {@link ViewportService}, which owns
+ * the programmatic changes and their animation; a click on the pane clears the selection.
  */
 @Directive({
   standalone: true,
@@ -83,14 +80,6 @@ export class ViewportGesturesDirective implements OnInit, OnDestroy {
   private drag?: PointerDrag;
   private destroyed = false;
 
-  private activeGestures = 0;
-  private gestureStart: ViewportState | null = null;
-  private animation: ViewportAnimation | null = null;
-  /** Where the animation in progress leads; a programmatic change continues from there. */
-  private animationTarget: ViewportState | null = null;
-  /** Reports the end of the programmatic change the animation in progress belongs to. */
-  private animationDone: ((reached: boolean) => void) | null = null;
-
   private wheelTimer: ReturnType<typeof setTimeout> | null = null;
   private wheelZoom: WheelZoom | null = null;
   private wheelFrame: number | null = null;
@@ -106,7 +95,8 @@ export class ViewportGesturesDirective implements OnInit, OnDestroy {
   private firstTap: Point | null = null;
   private lastTouchEndedAt = -Infinity;
 
-  private readonly disconnect = this.viewportService.connect((change) => this.applyChange(change));
+  /** A programmatic change takes over from a wheel zoom still easing: the zoom lands on its target first. */
+  private readonly yield = this.viewportService.onTakeOver(() => this.landWheelZoom());
 
   public ngOnInit(): void {
     this.zone.runOutsideAngular(() => {
@@ -122,7 +112,7 @@ export class ViewportGesturesDirective implements OnInit, OnDestroy {
         clickDistance: () => 0,
         stopCompatibilityEvents: true,
         onStart: ({ event }) => {
-          this.interruptAnimation();
+          this.interrupt();
           this.begin();
           this.dragTarget = event.target;
           this.dragPoint = this.panePoint(event);
@@ -141,85 +131,14 @@ export class ViewportGesturesDirective implements OnInit, OnDestroy {
 
   public ngOnDestroy(): void {
     this.destroyed = true;
-    this.disconnect();
+    this.yield();
     this.listeners.forEach((remove) => remove());
     this.drag?.destroy();
     if (this.wheelTimer !== null) clearTimeout(this.wheelTimer);
     if (this.wheelFrame !== null) cancelAnimationFrame(this.wheelFrame);
     this.wheelZoom = null;
-    this.interruptAnimation();
     this.stopTrackingTouches();
   }
-
-  // #region Programmatic changes
-  /**
-   * A change continues from where the previous one leads: the target of an animation in progress, or the viewport.
-   * It reports that it reached its target once it lands there; an interrupted animation reports that it did not.
-   */
-  private applyChange({ target, duration, done }: ViewportChange) {
-    const previousTarget = this.animationTarget;
-    this.interruptAnimation();
-    const to = target(previousTarget ?? this.current(), this.paneCenter());
-    if (!to) {
-      done(false);
-      return;
-    }
-
-    if (duration > 0) {
-      this.animate(to, duration, () => this.paneCenter(), null, done);
-    } else {
-      this.begin();
-      this.set(to);
-      this.finish(null);
-      done(true);
-    }
-  }
-
-  private animate(
-    to: ViewportState,
-    duration: number,
-    anchor: () => Point,
-    eventTarget: EventTarget | null,
-    done: ((reached: boolean) => void) | null = null,
-  ) {
-    this.interruptAnimation();
-    const animation: ViewportAnimation = this.zone.runOutsideAngular(() =>
-      animateViewport({
-        duration,
-        current: () => this.current(),
-        target: () => to,
-        anchor,
-        size: () => Math.max(this.host.clientWidth, this.host.clientHeight),
-        onStart: () => this.begin(),
-        onFrame: (state) => this.set(state),
-        onEnd: () => {
-          const reached = this.animation === animation;
-          if (reached) {
-            this.animation = null;
-            this.animationTarget = null;
-            this.animationDone = null;
-          }
-          this.finish(eventTarget);
-          if (reached) done?.(true);
-        },
-      }),
-    );
-    this.animation = animation;
-    this.animationTarget = to;
-    this.animationDone = done;
-  }
-
-  private interruptAnimation() {
-    const animation = this.animation;
-    const done = this.animationDone;
-    this.animation = null;
-    this.animationTarget = null;
-    this.animationDone = null;
-    animation?.interrupt();
-    done?.(false);
-    this.landWheelZoom();
-  }
-  // #endregion
 
   // #region Mouse and pen drag
   private dragFilter(event: PointerEvent) {
@@ -245,7 +164,7 @@ export class ViewportGesturesDirective implements OnInit, OnDestroy {
       if (this.keyboard.isActiveModifier('selection') || this.excluded(event, NO_PAN)) return;
       event.preventDefault();
       const delta = wheelPanDelta(event, this.host.clientHeight);
-      this.interruptAnimation();
+      this.interrupt();
       // A pan moves the viewport, so it never reads as a click on the pane: it gives the gesture no target.
       this.continueWheel(null);
       this.set(translateBy(this.current(), delta.x, delta.y));
@@ -264,7 +183,7 @@ export class ViewportGesturesDirective implements OnInit, OnDestroy {
     if (this.wheelTimer === null) {
       // A new gesture that cannot zoom leaves the event to the page, which can scroll at a zoom limit.
       if (zoom === from) return;
-      this.interruptAnimation();
+      this.interrupt();
     }
 
     event.preventDefault();
@@ -350,13 +269,13 @@ export class ViewportGesturesDirective implements OnInit, OnDestroy {
     if (performance.now() - this.lastTouchEndedAt < DOUBLE_TAP_DELAY_MS) return;
     event.preventDefault();
     event.stopImmediatePropagation();
-    this.doubleClickZoom(this.panePoint(event), event.shiftKey, event.target);
+    this.doubleClickZoom(this.panePoint(event), event.shiftKey);
   }
 
-  private doubleClickZoom(point: Point, out: boolean, target: EventTarget | null) {
+  private doubleClickZoom(point: Point, out: boolean) {
     const current = this.current();
     const to = zoomAround(current, this.clamp(current.zoom * (out ? 0.5 : 2)), point);
-    this.animate(to, DOUBLE_CLICK_DURATION_MS, () => point, target);
+    this.viewportService.animate(to, DOUBLE_CLICK_DURATION_MS, () => point);
   }
   // #endregion
 
@@ -398,7 +317,7 @@ export class ViewportGesturesDirective implements OnInit, OnDestroy {
         this.tapStartedAt = now;
         this.firstTap = this.touches.get(event.pointerId)!.pane;
       }
-      this.interruptAnimation();
+      this.interrupt();
       this.begin();
     }
   }
@@ -452,7 +371,7 @@ export class ViewportGesturesDirective implements OnInit, OnDestroy {
       !this.keyboard.isActiveModifier('selection') &&
       this.dragPanning()
     ) {
-      this.doubleClickZoom(point, false, event.target);
+      this.doubleClickZoom(point, false);
     }
   };
 
@@ -490,24 +409,33 @@ export class ViewportGesturesDirective implements OnInit, OnDestroy {
   // #endregion
 
   // #region Gesture lifecycle
-  private begin() {
-    if (this.activeGestures++ === 0) this.gestureStart = this.current();
+  /** An input gesture takes over from an animation and from a wheel zoom still easing. */
+  private interrupt() {
+    this.viewportService.interruptAnimation();
   }
 
-  private finish(target: EventTarget | null) {
-    if (this.activeGestures === 0 || --this.activeGestures > 0) return;
-    const start = this.gestureStart ?? this.current();
-    this.gestureStart = null;
-    if (this.destroyed) return;
+  private begin() {
+    this.viewportService.beginGesture();
+  }
 
-    this.zone.run(() => {
-      this.viewportService.endChange();
-      this.selectionService.setViewport({
-        start,
-        end: this.current(),
-        target: target instanceof Element ? target : undefined,
-      });
-    });
+  /** `target` is the element the gesture pressed; a programmatic change or a pan has none. */
+  private finish(target: EventTarget | null) {
+    const gesture = this.viewportService.endGesture();
+    if (!gesture || this.destroyed || !(target instanceof Element)) return;
+
+    // A click on the pane, outside every node and edge, clears the selection; a pan keeps it. A click on a node or
+    // an edge is handled by that entity, not by the pane.
+    if (this.isClick(gesture) && !target.closest('.v-node, .v-edge')) {
+      this.zone.run(() => this.selectionService.select(null));
+    }
+  }
+
+  private isClick({ start, end }: ViewportGesture) {
+    const delta = this.settings.paneClickDistance();
+    const diffX = Math.abs(end.x - start.x);
+    const diffY = Math.abs(end.y - start.y);
+
+    return delta === 0 ? diffX === 0 && diffY === 0 : diffX < delta && diffY < delta;
   }
 
   private set(state: ViewportState) {

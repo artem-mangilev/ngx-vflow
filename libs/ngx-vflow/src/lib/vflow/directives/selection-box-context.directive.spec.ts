@@ -8,6 +8,7 @@ import { FlowSettingsService } from '../services/flow-settings.service';
 import { NodeRenderingService } from '../services/node-rendering.service';
 import { KeyboardService } from '../services/keyboard.service';
 import { ViewportService } from '../services/viewport.service';
+import { FlowRenderingService } from '../services/flow-rendering.service';
 import { SelectionBoxContextDirective } from './selection-box-context.directive';
 import { SpacePointContextDirective } from './space-point-context.directive';
 import { dispatchPointer } from '../gestures/pointer-events.testing';
@@ -39,6 +40,7 @@ describe('SelectionBoxContextDirective', () => {
         { provide: KeyboardService, useValue: { isActiveModifier: () => selectionShortcutActive } },
         NodeRenderingService,
         ViewportService,
+        FlowRenderingService,
       ],
     });
 

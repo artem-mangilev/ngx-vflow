@@ -5,6 +5,7 @@ import { FlowEntitiesService } from './flow-entities.service';
 import { FlowSettingsService } from './flow-settings.service';
 import { NodeRenderingService } from './node-rendering.service';
 import { ViewportService } from './viewport.service';
+import { FlowRenderingService } from './flow-rendering.service';
 import { NodeModel } from '../models/node.model';
 import { createNode } from '../interfaces/node.interface';
 import { NodeChange } from '../types/node-change.type';
@@ -15,7 +16,14 @@ describe('NodesChangeService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [NodesChangeService, FlowEntitiesService, FlowSettingsService, NodeRenderingService, ViewportService],
+      providers: [
+        NodesChangeService,
+        FlowEntitiesService,
+        FlowSettingsService,
+        NodeRenderingService,
+        ViewportService,
+        FlowRenderingService,
+      ],
     });
     service = TestBed.inject(NodesChangeService);
     entities = TestBed.inject(FlowEntitiesService);

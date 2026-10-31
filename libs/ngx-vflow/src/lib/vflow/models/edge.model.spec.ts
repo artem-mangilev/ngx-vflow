@@ -9,6 +9,7 @@ import { syncHandle } from './handle.testing';
 import { FlowSettingsService } from '../services/flow-settings.service';
 import { NodeRenderingService } from '../services/node-rendering.service';
 import { ViewportService } from '../services/viewport.service';
+import { FlowRenderingService } from '../services/flow-rendering.service';
 import { signal } from '@angular/core';
 
 function mockRect(element: Element, rect: { left: number; top: number; width: number; height: number }): void {
@@ -62,7 +63,13 @@ describe('EdgeModel', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [FlowEntitiesService, FlowSettingsService, NodeRenderingService, ViewportService],
+      providers: [
+        FlowEntitiesService,
+        FlowSettingsService,
+        NodeRenderingService,
+        ViewportService,
+        FlowRenderingService,
+      ],
     });
 
     settingsService = TestBed.inject(FlowSettingsService);

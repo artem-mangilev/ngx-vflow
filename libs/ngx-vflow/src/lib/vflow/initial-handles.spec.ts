@@ -6,8 +6,8 @@ import { createEdge } from './interfaces/edge.interface';
 import { DraggableService } from './services/draggable.service';
 import { FlowEntitiesService } from './services/flow-entities.service';
 import { AfterRenderBatchService } from './services/after-render-batch.service';
-import { VflowHandleDirective } from './directives/handle.directive';
-import { VflowEdgeLabelTemplateDirective } from './directives/template.directive';
+import { VflowHandleDirective } from './public-directives/handle.directive';
+import { VflowEdgeLabelTemplateDirective } from './public-directives/template.directive';
 
 /** An edge presentation that declares a center label, so the flow renders it in the label layer. */
 @Component({
