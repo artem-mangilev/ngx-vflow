@@ -3,7 +3,6 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BehaviorSubject } from 'rxjs';
 import { HandleModel } from '../models/handle.model';
 import { NodeModel } from '../models/node.model';
-import { NodeAccessorService } from '../services/node-accessor.service';
 import { RequestAnimationFrameBatchingService } from '../services/request-animation-frame-batching.service';
 import { ResizeObserverService } from '../services/resize-observer.service';
 import { ViewportService } from '../services/viewport.service';
@@ -12,11 +11,13 @@ import { Position } from '../types/position.type';
 import { HandleLayout } from '../types/handle-type.type';
 
 @Component({
-  template: '<div nodeHandlesController></div>',
+  template: '<div nodeHandlesController [model]="model"></div>',
   imports: [NodeHandlesControllerDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-class TestHostComponent {}
+class TestHostComponent {
+  model!: NodeModel;
+}
 
 describe('NodeHandlesControllerDirective', () => {
   let fixture: ComponentFixture<TestHostComponent>;
@@ -45,7 +46,6 @@ describe('NodeHandlesControllerDirective', () => {
       handles: () => handles,
       nodeElement: () => nodeElement,
     } as unknown as NodeModel;
-    const nodeAccessor = { model: () => model };
     const resizeObserver = {
       addObserver: (element: Element, callback: (entry: ResizeObserverEntry) => void) => {
         observerCallbacks.push({ element, callback });
@@ -59,7 +59,6 @@ describe('NodeHandlesControllerDirective', () => {
     TestBed.configureTestingModule({
       imports: [TestHostComponent],
       providers: [
-        { provide: NodeAccessorService, useValue: nodeAccessor },
         { provide: ResizeObserverService, useValue: resizeObserver },
         { provide: RequestAnimationFrameBatchingService, useValue: animationFrames },
         { provide: ViewportService, useValue: { readableViewport: () => ({ zoom: 1, x: 0, y: 0 }) } },
@@ -67,6 +66,7 @@ describe('NodeHandlesControllerDirective', () => {
     });
 
     fixture = TestBed.createComponent(TestHostComponent);
+    fixture.componentInstance.model = model;
     fixture.detectChanges();
   });
 

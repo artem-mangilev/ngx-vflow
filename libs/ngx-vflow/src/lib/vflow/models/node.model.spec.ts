@@ -187,7 +187,7 @@ describe('NodeModel', () => {
 
   it('should create correct translate function from point', () => {
     model.setPoint({ x: 10, y: 10 });
-    expect(model.pointTransform()).toEqual('translate(10, 10)');
+    expect(model.pointTransformCss()).toEqual('translate(10px, 10px)');
   });
 
   it('should create correct parent/children links', () => {

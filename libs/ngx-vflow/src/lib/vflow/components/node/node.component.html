@@ -2,6 +2,7 @@
   nodeHandlesController
   nodeResizeController
   class="v-node-wrapper"
+  [model]="model()"
   [style.width.px]="wrapperSize()?.width ?? null"
   [style.height.px]="wrapperSize()?.height ?? null">
   @if (model().rawNode.component; as component) {
@@ -34,9 +35,9 @@
         [style.top.px]="handle.localPoint().y"
         [style.width.px]="model().magnetRadius * 2"
         [style.height.px]="model().magnetRadius * 2"
-        (pointerEnd)="endConnection(); resetValidateConnection(handle)"
-        (pointerOver)="validateConnection(handle)"
-        (pointerOut)="resetValidateConnection(handle)"></div>
+        (pointerup)="endConnection(); resetValidateConnection(handle)"
+        (pointerover)="validateConnection(handle)"
+        (pointerout)="resetValidateConnection(handle)"></div>
     }
   }
 }

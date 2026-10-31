@@ -9,7 +9,7 @@ import {
   inject,
   input,
 } from '@angular/core';
-import { NodeAccessorService } from '../../services/node-accessor.service';
+import { NODE_MODEL } from '../../utils/node-model.token';
 import { ViewportService } from '../../services/viewport.service';
 import { FlowSettingsService } from '../../services/flow-settings.service';
 import { ResizerInstance, createResizer } from './resizer';
@@ -45,7 +45,7 @@ import {
   },
 })
 export class NodeResizeControlComponent implements OnDestroy {
-  private nodeAccessor = inject(NodeAccessorService);
+  private model = inject(NODE_MODEL);
   private viewportService = inject(ViewportService);
   private settingsService = inject(FlowSettingsService);
   private hostRef = inject<ElementRef<HTMLElement>>(ElementRef);
@@ -87,10 +87,6 @@ export class NodeResizeControlComponent implements OnDestroy {
     const zoom = this.viewportService.readableViewport().zoom;
     return `${Math.max(1 / zoom, 1)}`;
   });
-
-  private get model() {
-    return this.nodeAccessor.model()!;
-  }
 
   private resizer: ResizerInstance = createResizer({
     domNode: this.hostRef.nativeElement,

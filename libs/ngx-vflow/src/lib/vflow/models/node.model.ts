@@ -1,6 +1,5 @@
 import { Signal, TemplateRef, computed, inject, linkedSignal, signal, untracked } from '@angular/core';
 import { NodeGeometry } from '../interfaces/curve-factory.interface';
-import { DOCUMENT } from '@angular/common';
 import { DomAttributes } from '../interfaces/dom-attributes.interface';
 import { NODE_DEFAULTS, Node } from '../interfaces/node.interface';
 import { NodeSizeMode } from '../types/node-change.type';
@@ -23,7 +22,6 @@ export class NodeModel<T = unknown> implements FlowEntity, Contextable<NodeConte
   private modelInjector = createModelInjector();
   private entitiesService = inject(FlowEntitiesService);
   private settingsService = inject(FlowSettingsService);
-  private document = inject(DOCUMENT);
 
   /**
    * The application's object as of the last nodes array. Optional signals are read through it, so a signal the
@@ -161,8 +159,6 @@ export class NodeModel<T = unknown> implements FlowEntity, Contextable<NodeConte
 
     return { x, y };
   });
-
-  public pointTransform = computed(() => `translate(${this.globalPoint().x}, ${this.globalPoint().y})`);
 
   /**
    * CSS transform for positioning the node div in the (transformed) viewport.

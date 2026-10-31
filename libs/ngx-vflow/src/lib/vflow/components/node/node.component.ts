@@ -17,11 +17,9 @@ import { NodeModel } from '../../models/node.model';
 import { FlowStatusService, isSelectionBoxEndStatus } from '../../services/flow-status.service';
 import { SelectionService } from '../../services/selection.service';
 import { isNoSelectTarget } from '../../utils/no-select-target';
-import { HandleService } from '../../services/handle.service';
 import { NodeRenderingService } from '../../services/node-rendering.service';
 import { FlowSettingsService } from '../../services/flow-settings.service';
 import { FlowRenderingService } from '../../services/flow-rendering.service';
-import { NodeAccessorService } from '../../services/node-accessor.service';
 import { NgTemplateOutlet } from '@angular/common';
 import { ComponentEventBusService } from '../../services/component-event-bus.service';
 import {
@@ -29,12 +27,9 @@ import {
   EntityComponentOutputEvent,
 } from '../../directives/entity-component-outlet.directive';
 import { NODE_REF } from '../../utils/inject-node';
-import { PointerDirective } from '../../directives/pointer.directive';
+import { NODE_MODEL } from '../../utils/node-model.token';
 import { ConnectionControllerDirective } from '../../directives/connection-controller.directive';
 import { HandleModel } from '../../models/handle.model';
-
-// TODO: fix loading of these by @defer (should work in Angular 18+)
-// public components that uses in default node (loaded by defer)
 import { NodeHandlesControllerDirective } from '../../directives/node-handles-controller.directive';
 import { NodeResizeControllerDirective } from '../../directives/node-resize-controller.directive';
 
@@ -44,10 +39,9 @@ import { NodeResizeControllerDirective } from '../../directives/node-resize-cont
   styleUrls: ['./node.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
-    HandleService,
-    NodeAccessorService,
-    // Resolved lazily by presentations, which are created after the node model is set in ngOnInit.
-    { provide: NODE_REF, useFactory: () => inject(NodeAccessorService).model()!.context.$implicit },
+    // Resolved lazily by the content of the node, which is created after the model input is set.
+    { provide: NODE_MODEL, useFactory: () => inject(NodeComponent).model() },
+    { provide: NODE_REF, useFactory: () => inject(NODE_MODEL).context.$implicit },
   ],
   // No signal reads in host bindings: the host lives in a view of the graph list, whose reads join the reactive
   // consumer of the whole list, so one node becoming ready would refresh every entity view.
@@ -63,18 +57,15 @@ import { NodeResizeControllerDirective } from '../../directives/node-resize-cont
     EntityComponentOutletDirective,
     NodeHandlesControllerDirective,
     NodeResizeControllerDirective,
-    PointerDirective,
   ],
 })
 export class NodeComponent implements OnInit, OnDestroy {
   protected injector = inject(Injector);
-  private handleService = inject(HandleService);
   private draggableService = inject(DraggableService);
   private flowStatusService = inject(FlowStatusService);
   private nodeRenderingService = inject(NodeRenderingService);
   private flowSettingsService = inject(FlowSettingsService);
   private hostRef = inject<ElementRef<HTMLElement>>(ElementRef);
-  private nodeAccessor = inject(NodeAccessorService);
   private componentEventBus = inject(ComponentEventBusService);
   private connectionController = inject(ConnectionControllerDirective);
   private selectionService = inject(SelectionService);
@@ -143,9 +134,6 @@ export class NodeComponent implements OnInit, OnDestroy {
     // Every node is measured by nodeResizeController and stays hidden until then; an explicit size is measured
     // from the wrapper or the resizable element that carries it. A remounted view must measure its new DOM.
     this.model().isMeasured.set(false);
-
-    this.nodeAccessor.model.set(this.model());
-    this.handleService.node.set(this.model());
     this.model().nodeElement.set(this.hostRef.nativeElement);
 
     let wasCulled = false;

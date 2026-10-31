@@ -62,7 +62,6 @@ import { DefsComponent } from '../defs/defs.component';
 import { FlowSizeControllerDirective } from '../../directives/flow-size-controller.directive';
 import { RootPointerDirective } from '../../directives/root-pointer.directive';
 import { RootSvgContextDirective } from '../../directives/root-svg-context.directive';
-import { RootSvgReferenceDirective } from '../../directives/reference.directive';
 import { EdgeRenderingService } from '../../services/edge-rendering.service';
 import {
   getIntersectingNodes,
@@ -174,7 +173,6 @@ const connectionControllerHostDirective = {
     KeyboardNavigationDirective,
     EntityAccessibilityDirective,
     LiveRegionDirective,
-    RootSvgReferenceDirective,
     RootSvgContextDirective,
     RootPointerDirective,
     FlowSizeControllerDirective,

@@ -1,4 +1,4 @@
-import { DestroyRef, Directive, inject, Injector, OnInit } from '@angular/core';
+import { DestroyRef, Directive, ElementRef, inject, Injector, OnInit } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { EMPTY, merge, fromEvent, Observable } from 'rxjs';
 import {
@@ -15,7 +15,6 @@ import {
 import { FlowStatusService } from '../services/flow-status.service';
 import { ViewportService } from '../services/viewport.service';
 import { FlowSettingsService } from '../services/flow-settings.service';
-import { RootSvgReferenceDirective } from './reference.directive';
 import { Point } from '../interfaces/point.interface';
 import { animationFrames } from '../utils/animation-frames';
 import { AutoPanSettings } from '../interfaces/auto-pan-settings.interface';
@@ -25,7 +24,8 @@ export class AutoPanDirective implements OnInit {
   private readonly statusService = inject(FlowStatusService);
   private readonly viewportService = inject(ViewportService);
   private readonly flowSettingsService = inject(FlowSettingsService);
-  private readonly rootSvg = inject(RootSvgReferenceDirective).element;
+  /** The pane, which covers the whole flow. */
+  private readonly pane = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
   private readonly injector = inject(Injector);
   private readonly destroyRef = inject(DestroyRef);
 
@@ -82,7 +82,7 @@ export class AutoPanDirective implements OnInit {
   }
 
   private toViewportPoint(event: Point): Point {
-    const rect = this.rootSvg.getBoundingClientRect();
+    const rect = this.pane.getBoundingClientRect();
     return {
       x: event.x - rect.left,
       y: event.y - rect.top,

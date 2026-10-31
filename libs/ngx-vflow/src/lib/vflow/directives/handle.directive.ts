@@ -1,5 +1,5 @@
 import { DestroyRef, Directive, ElementRef, computed, inject, input } from '@angular/core';
-import { HandleService } from '../services/handle.service';
+import { NODE_MODEL } from '../utils/node-model.token';
 import { HandleModel } from '../models/handle.model';
 import { FlowStatusService } from '../services/flow-status.service';
 import { ConnectionControllerDirective } from './connection-controller.directive';
@@ -43,7 +43,6 @@ import { pressTarget } from '../utils/press-target';
 })
 export class VflowHandleDirective {
   private readonly element = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
-  private readonly handleService = inject(HandleService);
   private readonly flowStatus = inject(FlowStatusService);
   private readonly connectionController = inject(ConnectionControllerDirective);
 
@@ -106,8 +105,11 @@ export class VflowHandleDirective {
   });
 
   constructor() {
-    this.handleService.createHandle(this.model);
-    inject(DestroyRef).onDestroy(() => this.handleService.destroyHandle(this.model));
+    const node = this.model.parentNode;
+    node.handles.update((handles) => [...handles, this.model]);
+    inject(DestroyRef).onDestroy(() =>
+      node.handles.update((handles) => handles.filter((handle) => handle !== this.model)),
+    );
 
     // Handles have no keyboard operation and are not exposed to assistive technology; only metadata is applied.
     bindDomAttributes(this.domAttributes);
@@ -138,7 +140,7 @@ export class VflowHandleDirective {
   }
 
   private requireNode() {
-    const node = this.handleService.node();
+    const node = inject(NODE_MODEL, { optional: true });
 
     if (!node) {
       throw new Error('[ngx-vflow] vHandle must be placed inside a node presentation.');

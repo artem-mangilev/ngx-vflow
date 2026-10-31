@@ -1,10 +1,9 @@
-import { DestroyRef, Directive, ElementRef, effect, inject, OnInit } from '@angular/core';
-import { NodeAccessorService } from '../services/node-accessor.service';
+import { DestroyRef, Directive, ElementRef, effect, inject, input, OnInit } from '@angular/core';
+import { NodeModel } from '../models/node.model';
 import { tap } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ResizeObserverService } from '../services/resize-observer.service';
 import { RequestAnimationFrameBatchingService } from '../services/request-animation-frame-batching.service';
-import { NodeModel } from '../models/node.model';
 import { createHandleMeasureContext, HandleModel } from '../models/handle.model';
 import { ViewportService } from '../services/viewport.service';
 
@@ -13,14 +12,14 @@ import { ViewportService } from '../services/viewport.service';
   standalone: true,
 })
 export class NodeHandlesControllerDirective implements OnInit {
-  private nodeAccessor = inject(NodeAccessorService);
+  // An input, not the NODE_MODEL token: the directive is created with the node view, before the node input is set.
+  public readonly model = input.required<NodeModel>();
   private destroyRef = inject(DestroyRef);
   private hostElementRef = inject<ElementRef<Element>>(ElementRef);
   private resizeObserverService = inject(ResizeObserverService);
   private requestAnimationFrameBatchingService = inject(RequestAnimationFrameBatchingService);
   private viewportService = inject(ViewportService);
   private observedElements = new Set<Element>();
-  private model: NodeModel | null = null;
   private syncScheduled = false;
   private destroyed = false;
   private readonly resizeCallback = () => this.scheduleSync();
@@ -28,8 +27,7 @@ export class NodeHandlesControllerDirective implements OnInit {
   constructor() {
     // The sync itself runs on an animation frame, after this pass has rendered; the effect only tracks its inputs.
     effect(() => {
-      const model = this.nodeAccessor.model();
-      if (!model) return;
+      const model = this.model();
 
       // Changing a handle's side, offset or layout moves its point without resizing any observed element.
       for (const handle of model.handles()) {
@@ -49,10 +47,8 @@ export class NodeHandlesControllerDirective implements OnInit {
   }
 
   public ngOnInit(): void {
-    this.model = this.nodeAccessor.model()!;
-
-    this.model.handles$
-      .pipe(
+    this.model()
+      .handles$.pipe(
         tap((handles) => {
           this.updateObservedElements(handles);
           this.scheduleSync();
@@ -106,7 +102,7 @@ export class NodeHandlesControllerDirective implements OnInit {
   }
 
   private scheduleSync(): void {
-    if (this.syncScheduled || this.destroyed || !this.model?.handles().length) {
+    if (this.syncScheduled || this.destroyed || !this.model().handles().length) {
       return;
     }
 
@@ -114,15 +110,15 @@ export class NodeHandlesControllerDirective implements OnInit {
     this.requestAnimationFrameBatchingService.batchAnimationFrame(() => {
       this.syncScheduled = false;
 
-      if (this.destroyed || !this.model) {
+      if (this.destroyed) {
         return;
       }
 
-      const handles = this.model.handles();
-      const nodeElement = this.model.nodeElement();
+      const handles = this.model().handles();
+      const nodeElement = this.model().nodeElement();
       // The node rectangle, the rendered zoom and shared anchors are read once for every handle of the node.
       const context =
-        !this.model.culled() && nodeElement
+        !this.model().culled() && nodeElement
           ? createHandleMeasureContext(nodeElement, this.viewportService.readableViewport().zoom)
           : null;
       const measurements = handles.map((handle) => (context ? handle.measure(context) : null));

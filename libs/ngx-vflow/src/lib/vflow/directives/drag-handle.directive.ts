@@ -1,5 +1,5 @@
 import { DestroyRef, Directive, inject } from '@angular/core';
-import { NodeAccessorService } from '../services/node-accessor.service';
+import { NODE_MODEL } from '../utils/node-model.token';
 
 @Directive({
   standalone: true,
@@ -9,17 +9,12 @@ import { NodeAccessorService } from '../services/node-accessor.service';
   },
 })
 export class VflowDragHandleDirective {
-  private nodeAccessor = inject(NodeAccessorService);
-
-  private get model() {
-    return this.nodeAccessor.model()!;
-  }
-
   constructor() {
-    this.model.dragHandlesCount.update((count) => count + 1);
+    const model = inject(NODE_MODEL);
+    model.dragHandlesCount.update((count) => count + 1);
 
     inject(DestroyRef).onDestroy(() => {
-      this.model.dragHandlesCount.update((count) => count - 1);
+      model.dragHandlesCount.update((count) => count - 1);
     });
   }
 }

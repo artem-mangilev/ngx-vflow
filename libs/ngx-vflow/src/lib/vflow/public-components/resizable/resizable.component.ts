@@ -13,7 +13,7 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { NodeAccessorService } from '../../services/node-accessor.service';
+import { NODE_MODEL } from '../../utils/node-model.token';
 import { RequestAnimationFrameBatchingService } from '../../services/request-animation-frame-batching.service';
 import { NodeResizeControlComponent } from './node-resize-control.component';
 import {
@@ -53,7 +53,7 @@ import {
   },
 })
 export class VflowResizableComponent implements OnInit, AfterViewInit, OnDestroy {
-  private nodeAccessor = inject(NodeAccessorService);
+  private model = inject(NODE_MODEL);
   private hostRef = inject<ElementRef<HTMLElement>>(ElementRef);
   private afService = inject(RequestAnimationFrameBatchingService);
 
@@ -98,18 +98,13 @@ export class VflowResizableComponent implements OnInit, AfterViewInit, OnDestroy
   protected effectiveMaxWidth = computed(() => this.maxWidth() ?? this.cssMaxWidth());
   protected effectiveMaxHeight = computed(() => this.maxHeight() ?? this.cssMaxHeight());
 
-  protected get model() {
-    return this.nodeAccessor.model()!;
-  }
-
   /** `[vResizable]="false"` hides the controls but keeps the element as the node's sizing box. */
   protected readonly enabled = computed(() => this.vResizable() !== false);
 
   /** Explicit axes only; `null` while both axes follow the content. */
   protected readonly explicitSize = computed(() => {
-    const model = this.nodeAccessor.model();
-    const width = model?.explicitWidth();
-    const height = model?.explicitHeight();
+    const width = this.model.explicitWidth();
+    const height = this.model.explicitHeight();
     return width === undefined && height === undefined ? null : { width, height };
   });
 

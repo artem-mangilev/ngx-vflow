@@ -1,5 +1,5 @@
-import { Directive, ElementRef, effect, inject, OnDestroy, OnInit, untracked } from '@angular/core';
-import { NodeAccessorService } from '../services/node-accessor.service';
+import { Directive, ElementRef, effect, inject, input, OnDestroy, OnInit, untracked } from '@angular/core';
+import { NodeModel } from '../models/node.model';
 import { ResizeObserverService } from '../services/resize-observer.service';
 import { AfterRenderBatchService } from '../services/after-render-batch.service';
 
@@ -11,7 +11,8 @@ import { AfterRenderBatchService } from '../services/after-render-batch.service'
   standalone: true,
 })
 export class NodeResizeControllerDirective implements OnInit, OnDestroy {
-  private nodeAccessor = inject(NodeAccessorService);
+  // An input, not the NODE_MODEL token: the directive is created with the node view, before the node input is set.
+  public readonly model = input.required<NodeModel>();
   private resizeObserverService = inject(ResizeObserverService);
   private hostElementRef = inject<ElementRef<HTMLElement>>(ElementRef);
   private afterRenderBatch = inject(AfterRenderBatchService);
@@ -21,10 +22,9 @@ export class NodeResizeControllerDirective implements OnInit, OnDestroy {
 
   constructor() {
     effect(() => {
-      const model = this.nodeAccessor.model();
       // Reading resizing() re-runs the measurement when a gesture ends, reconciling the size the resizer wrote
       // with the size the browser rendered (CSS min/max can clamp it).
-      if (model && !model.resizing() && !model.culled()) {
+      if (!this.model().resizing() && !this.model().culled()) {
         untracked(() => this.afterRenderBatch.read(this.measureAfterRender));
       }
     });
@@ -32,10 +32,10 @@ export class NodeResizeControllerDirective implements OnInit, OnDestroy {
 
   private measure(): void {
     if (this.destroyed) return;
-    const model = this.nodeAccessor.model();
+    const model = this.model();
     const target = this.hostElementRef.nativeElement;
     // During a gesture the resizer owns the size: writing a clamped DOM size would make the next move oscillate.
-    if (!model || model.culled() || model.resizing()) return;
+    if (model.culled() || model.resizing()) return;
     // display:none notifications must not overwrite cached geometry with zeros.
     const hasBox = target.getClientRects().length > 0;
     model.hasBox.set(hasBox);
