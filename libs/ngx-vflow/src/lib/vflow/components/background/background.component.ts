@@ -1,17 +1,19 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
-import { toObservable } from '@angular/core/rxjs-interop';
-import { map, switchMap } from 'rxjs/operators';
+import { ChangeDetectionStrategy, Component, computed, inject, resource } from '@angular/core';
 import { FlowSettingsService } from '../../services/flow-settings.service';
 import { ViewportService } from '../../services/viewport.service';
 import { id } from '../../utils/id';
-import { toLazySignal } from '../../utils/signals/to-lazy-signal';
 
-const defaultGap = 20;
-const defaultDotSize = 2;
-const defaultGridGap = 20;
-const defaultStrokeWidth = 2;
-const defaultImageScale = 0.1;
-const defaultRepeated = true;
+const DEFAULT_GAP = 20;
+const DEFAULT_DOT_SIZE = 2;
+const DEFAULT_STROKE_WIDTH = 2;
+const DEFAULT_IMAGE_SCALE = 0.1;
+const DEFAULT_REPEAT = true;
+
+/** What the template draws, in screen pixels: the tile of the pattern and its offset, which follows the viewport. */
+type Pattern =
+  | { type: 'dots'; x: number; y: number; gap: number; radius: number }
+  | { type: 'grid'; x: number; y: number; gap: number; strokeWidth: number }
+  | { type: 'image'; x: number; y: number; width: number; height: number; src: string; repeat: boolean };
 
 @Component({
   standalone: true,
@@ -42,128 +44,48 @@ export class BackgroundComponent {
   private viewportService = inject(ViewportService);
   private settingsService = inject(FlowSettingsService);
 
-  protected backgroundSignal = this.settingsService.background;
-
-  protected x = computed(() => {
-    return this.viewportService.readableViewport().x % this.scaledGap();
+  /** The natural size of the image background, once it has loaded; a failed load draws nothing. */
+  private imageSize = resource({
+    params: () => {
+      const background = this.settingsService.background();
+      return background?.type === 'image' ? background.src : null;
+    },
+    loader: ({ params: src }) => (src ? loadImageSize(src) : Promise.resolve(null)),
   });
 
-  protected y = computed(() => {
-    return this.viewportService.readableViewport().y % this.scaledGap();
-  });
+  protected readonly pattern = computed<Pattern | null>(() => {
+    const background = this.settingsService.background();
+    if (!background) return null;
+    const { x, y, zoom } = this.viewportService.readableViewport();
 
-  protected patternSize = computed(() => {
-    const background = this.backgroundSignal();
-
-    if (background?.type === 'dots') {
-      return (this.viewportService.readableViewport().zoom * (background.size ?? defaultDotSize)) / 2;
-    }
-
-    if (background?.type === 'grid') {
-      return this.viewportService.readableViewport().zoom * (background.gap ?? defaultGridGap);
-    }
-
-    return 0;
-  });
-
-  protected scaledGap = computed(() => {
-    const background = this.backgroundSignal();
-    const zoom = this.viewportService.readableViewport().zoom;
-
-    if (background?.type === 'dots') {
-      return zoom * (background.gap ?? defaultGap);
-    }
-
-    if (background?.type === 'grid') {
-      return zoom * (background.gap ?? defaultGridGap);
-    }
-
-    return 0;
-  });
-
-  // GRID PATTERN
-  protected strokeWidth = computed(() => {
-    const background = this.backgroundSignal();
-
-    if (background?.type === 'grid') {
-      const zoom = this.viewportService.readableViewport().zoom;
-      return zoom * ((background.strokeWidth ?? defaultStrokeWidth) / 2);
-    }
-
-    return 0;
-  });
-
-  // IMAGE PATTERN
-  protected bgImageSrc = computed(() => {
-    const background = this.backgroundSignal();
-
-    return background?.type === 'image' ? background.src : '';
-  });
-
-  protected imageSize = toLazySignal(
-    toObservable(this.backgroundSignal).pipe(
-      switchMap(() => createImage(this.bgImageSrc())),
-      map((image) => ({ width: image.naturalWidth, height: image.naturalHeight })),
-    ),
-    { initialValue: { width: 0, height: 0 } },
-  );
-
-  protected scaledImageWidth = computed(() => {
-    const background = this.backgroundSignal();
-
-    if (background?.type === 'image') {
-      const zoom = background.fixed ? 1 : this.viewportService.readableViewport().zoom;
-
-      return this.imageSize().width * zoom * (background.scale ?? defaultImageScale);
-    }
-
-    return 0;
-  });
-
-  protected scaledImageHeight = computed(() => {
-    const background = this.backgroundSignal();
-
-    if (background?.type === 'image') {
-      const zoom = background.fixed ? 1 : this.viewportService.readableViewport().zoom;
-
-      return this.imageSize().height * zoom * (background.scale ?? defaultImageScale);
-    }
-
-    return 0;
-  });
-
-  protected imageX = computed(() => {
-    const background = this.backgroundSignal();
-
-    if (background?.type === 'image') {
-      if (!background.repeat) {
-        return background.fixed ? 0 : this.viewportService.readableViewport().x;
+    switch (background.type) {
+      case 'dots': {
+        const gap = zoom * (background.gap ?? DEFAULT_GAP);
+        return {
+          type: 'dots',
+          x: x % gap,
+          y: y % gap,
+          gap,
+          radius: (zoom * (background.size ?? DEFAULT_DOT_SIZE)) / 2,
+        };
       }
-
-      return background.fixed ? 0 : this.viewportService.readableViewport().x % this.scaledImageWidth();
-    }
-
-    return 0;
-  });
-
-  protected imageY = computed(() => {
-    const background = this.backgroundSignal();
-
-    if (background?.type === 'image') {
-      if (!background.repeat) {
-        return background.fixed ? 0 : this.viewportService.readableViewport().y;
+      case 'grid': {
+        const gap = zoom * (background.gap ?? DEFAULT_GAP);
+        const strokeWidth = (zoom * (background.strokeWidth ?? DEFAULT_STROKE_WIDTH)) / 2;
+        return { type: 'grid', x: x % gap, y: y % gap, gap, strokeWidth };
       }
-
-      return background.fixed ? 0 : this.viewportService.readableViewport().y % this.scaledImageHeight();
+      case 'image': {
+        const size = this.imageSize.value();
+        if (!size) return null;
+        // A fixed image neither moves with the flow nor zooms with it.
+        const scale = (background.fixed ? 1 : zoom) * (background.scale ?? DEFAULT_IMAGE_SCALE);
+        const width = size.width * scale;
+        const height = size.height * scale;
+        const repeat = background.repeat ?? DEFAULT_REPEAT;
+        const offset = (value: number, period: number) => (background.fixed ? 0 : repeat ? value % period : value);
+        return { type: 'image', src: background.src, repeat, width, height, x: offset(x, width), y: offset(y, height) };
+      }
     }
-
-    return 0;
-  });
-
-  protected repeated = computed(() => {
-    const background = this.backgroundSignal();
-
-    return background?.type === 'image' && (background.repeat ?? defaultRepeated);
   });
 
   // Without ID there will be pattern collision for several flows on the page
@@ -172,12 +94,11 @@ export class BackgroundComponent {
   protected patternUrl = `url(#${this.patternId})`;
 }
 
-function createImage(url: string) {
-  const image = new Image();
-
-  image.src = url;
-
-  return new Promise<HTMLImageElement>((resolve) => {
-    image.onload = () => resolve(image);
+function loadImageSize(src: string): Promise<{ width: number; height: number }> {
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    image.onload = () => resolve({ width: image.naturalWidth, height: image.naturalHeight });
+    image.onerror = () => reject(new Error(`The background image ${src} did not load`));
+    image.src = src;
   });
 }
