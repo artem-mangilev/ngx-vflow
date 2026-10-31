@@ -5,7 +5,6 @@ import { TestBed } from '@angular/core/testing';
 import { DraggableService } from './draggable.service';
 import { FlowEntitiesService } from './flow-entities.service';
 import { FlowSettingsService } from './flow-settings.service';
-import { FlowStatusService } from './flow-status.service';
 import { ViewportService } from './viewport.service';
 import { NodeRenderingService } from './node-rendering.service';
 import { NodeModel } from '../models/node.model';
@@ -55,7 +54,6 @@ describe('DraggableService', () => {
         DraggableService,
         FlowEntitiesService,
         FlowSettingsService,
-        FlowStatusService,
         ViewportService,
         NodeRenderingService,
         AlignmentService,
@@ -176,6 +174,13 @@ describe('DraggableService', () => {
     return (service as any).dragFilter(model);
   }
 
+  /** The types of the drag events reported from now on. */
+  function dragEvents(): string[] {
+    const types: string[] = [];
+    service.events$.subscribe((event) => types.push(event.type));
+    return types;
+  }
+
   function startNodeDrag(...paneRects: DOMRect[]) {
     const model = createModel({ id: 'node' });
     model.setPoint({ x: 10, y: 20 });
@@ -198,23 +203,24 @@ describe('DraggableService', () => {
     TestBed.inject(FlowSettingsService).bind({ nodeDragThreshold: signal(10) });
     viewportService.readableViewport.set({ x: 0, y: 0, zoom: 2 });
     const { model } = startNodeDrag(new DOMRect(0, 0, 400, 300));
-    const status = TestBed.inject(FlowStatusService);
-    expect(status.status().state).toBe('idle');
+    const drags = dragEvents();
+    expect(drags).toEqual([]);
     dispatchMouse(window, 'mousemove', 156, 100);
     expect(model.point()).toEqual({ x: 10, y: 20 });
-    expect(status.status().state).toBe('idle');
+    expect(drags).toEqual([]);
     dispatchMouse(window, 'mousemove', 162, 100);
     expect(model.point()).toEqual({ x: 16, y: 20 });
-    expect(status.status().state).toBe('node-drag-start');
+    expect(drags).toEqual(['start']);
     dispatchMouse(window, 'mouseup', 162, 100);
   });
 
   it('does not emit node drag end for a release below the threshold', () => {
     TestBed.inject(FlowSettingsService).bind({ nodeDragThreshold: signal(10) });
+    const drags = dragEvents();
     const { model } = startNodeDrag(new DOMRect(0, 0, 400, 300));
     dispatchMouse(window, 'mouseup', 150, 100);
     expect(model.point()).toEqual({ x: 10, y: 20 });
-    expect(TestBed.inject(FlowStatusService).status().state).toBe('idle');
+    expect(drags).toEqual([]);
   });
 
   it('moves a selected parent without its selected child, which follows in local coordinates', () => {
@@ -319,11 +325,11 @@ describe('DraggableService', () => {
   });
 
   it('ends the drag when the browser cancels the pointer and when the window loses focus', () => {
-    const status = TestBed.inject(FlowStatusService);
+    const drags = dragEvents();
     const { model, element } = startNodeDrag(new DOMRect(0, 0, 400, 300), new DOMRect(0, 0, 400, 300));
     dispatchMouse(window, 'mousemove', 160, 100);
     dispatchPointer(window, 'pointercancel', { x: 160, y: 100 });
-    expect(status.status().state).toBe('node-drag-end');
+    expect(drags.at(-1)).toBe('end');
     expect(model.dragging()).toBe(false);
     expect(model.point()).toEqual({ x: 20, y: 20 });
 
@@ -336,11 +342,11 @@ describe('DraggableService', () => {
   });
 
   it('ends a mouse drag whose release happened out of sight', () => {
-    const status = TestBed.inject(FlowStatusService);
+    const drags = dragEvents();
     startNodeDrag(new DOMRect(0, 0, 400, 300));
     dispatchMouse(window, 'mousemove', 160, 100);
     window.dispatchEvent(new PointerEvent('pointermove', { pointerId: 1, pointerType: 'mouse', buttons: 0 }));
-    expect(status.status().state).toBe('node-drag-end');
+    expect(drags.at(-1)).toBe('end');
   });
 
   it('should reject drag from a descendant of a no-drag element', () => {

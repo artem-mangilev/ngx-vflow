@@ -6,21 +6,15 @@ import { NodeModel } from '../models/node.model';
 import { FlowEntitiesService } from '../services/flow-entities.service';
 import { FlowSettingsService } from '../services/flow-settings.service';
 import { NodeRenderingService } from '../services/node-rendering.service';
-import { FlowStatusService } from '../services/flow-status.service';
 import { KeyboardService } from '../services/keyboard.service';
 import { ViewportService } from '../services/viewport.service';
-import { RootPointerDirective } from './root-pointer.directive';
 import { SelectionBoxContextDirective } from './selection-box-context.directive';
 import { SpacePointContextDirective } from './space-point-context.directive';
 import { dispatchPointer } from '../gestures/pointer-events.testing';
 
 @Component({
-  template: `
-    <div rootPointer>
-      <div spacePointContext selectionBoxContext></div>
-    </div>
-  `,
-  imports: [RootPointerDirective, SpacePointContextDirective, SelectionBoxContextDirective],
+  template: `<div spacePointContext selectionBoxContext></div>`,
+  imports: [SpacePointContextDirective, SelectionBoxContextDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 class SelectionBoxHostComponent {
@@ -42,7 +36,6 @@ describe('SelectionBoxContextDirective', () => {
       providers: [
         FlowEntitiesService,
         FlowSettingsService,
-        FlowStatusService,
         { provide: KeyboardService, useValue: { isActiveModifier: () => selectionShortcutActive } },
         NodeRenderingService,
         ViewportService,
@@ -70,12 +63,10 @@ describe('SelectionBoxContextDirective', () => {
     );
   }
 
-  async function startSelectionBox() {
-    const root = fixture.nativeElement.querySelector('[rootPointer]') as HTMLElement;
+  function startSelectionBox() {
     const pane = fixture.nativeElement.querySelector('[spacePointContext]') as HTMLElement;
     pane.getBoundingClientRect = () => ({ left: 0, top: 0, x: 0, y: 0 }) as DOMRect;
-    dispatchPointer(root, 'pointerdown', { x: 0, y: 0 });
-    await new Promise((resolve) => setTimeout(resolve, 30));
+    dispatchPointer(pane, 'pointerdown', { x: 0, y: 0 });
   }
 
   afterEach(() => {
@@ -88,12 +79,12 @@ describe('SelectionBoxContextDirective', () => {
     entitiesService.nodes.set([node]);
 
     selectionShortcutActive = false;
-    await startSelectionBox();
+    startSelectionBox();
     expect(fixture.componentInstance.context.model.active()).toBe(false);
 
     selectionShortcutActive = true;
     settingsService.bind({ selectionMode: signal('manual') });
-    await startSelectionBox();
+    startSelectionBox();
     expect(fixture.componentInstance.context.model.active()).toBe(false);
     expect(node.selected()).toBe(true);
   });
@@ -103,7 +94,7 @@ describe('SelectionBoxContextDirective', () => {
     const eligible = createNode('eligible', true);
     entitiesService.nodes.set([ineligible, eligible]);
 
-    await startSelectionBox();
+    startSelectionBox();
     expect(fixture.componentInstance.context.model.active()).toBe(true);
     dispatchPointer(document, 'pointermove', { x: 20, y: 20 });
 

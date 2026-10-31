@@ -19,8 +19,7 @@ import { reparentNodes } from './utils/graph-operations';
 import { ReferenceIdentityChecker } from './utils/identity-checker/reference-identity-checker';
 import { addNodesToEdges } from './utils/add-nodes-to-edges';
 import { createResizer } from './public-components/resizable/resizer';
-import { FlowStatusService } from './services/flow-status.service';
-import { ConnectionControllerDirective } from './directives/connection-controller.directive';
+import { ConnectionService } from './services/connection.service';
 import { VflowHandleDirective } from './directives/handle.directive';
 import { EdgeLabelComponent } from './components/edge-label/edge-label.component';
 import { VflowComponent } from './components/vflow/vflow.component';
@@ -66,7 +65,7 @@ describe('Graph rendering and interaction regressions', () => {
         ViewportService,
         EdgeChangesService,
         NodesChangeService,
-        FlowStatusService,
+        ConnectionService,
       ],
     }),
   );
@@ -311,7 +310,7 @@ describe('Graph rendering and interaction regressions', () => {
   });
 
   it('validates release once regardless of subscriber count and completes reconnect without listeners', () => {
-    const controller = TestBed.runInInjectionContext(() => new ConnectionControllerDirective());
+    const connection = TestBed.inject(ConnectionService);
     const { nodes, edges } = graph();
     const source = nodes[0].handles()[0];
     const target = nodes[1].handles()[0];
@@ -319,25 +318,25 @@ describe('Graph rendering and interaction regressions', () => {
     // The fixture already connects these handles.
     TestBed.inject(FlowEntitiesService).connectionSettings.bind(signal({ validator, allowDuplicateConnections: true }));
     const requests: unknown[] = [];
-    controller.connect.subscribe((value) => requests.push(value));
-    controller.connect.subscribe((value) => requests.push(value));
-    controller.startConnection(source);
+    connection.connect$.subscribe((value) => requests.push(value));
+    connection.connect$.subscribe((value) => requests.push(value));
+    connection.start(source);
     TestBed.flushEffects();
-    controller.validateConnection(target);
+    connection.hover(target);
     TestBed.flushEffects();
     validator.mockClear();
-    controller.endConnection();
+    connection.end();
     TestBed.flushEffects();
     expect(validator).toHaveBeenCalledTimes(1);
     expect(requests.length).toBe(2);
-    expect(TestBed.inject(FlowStatusService).status().state).toBe('idle');
-    controller.startReconnection(source, edges[0]);
+    expect(connection.gesture()).toBeNull();
+    connection.start(source, undefined, edges[0]);
     TestBed.flushEffects();
-    controller.validateConnection(target);
+    connection.hover(target);
     TestBed.flushEffects();
-    controller.endConnection();
+    connection.end();
     TestBed.flushEffects();
-    expect(TestBed.inject(FlowStatusService).status().state).toBe('idle');
+    expect(connection.gesture()).toBeNull();
   });
 
   it('reports the last accepted size at resizeEnd after a rejected move', () => {

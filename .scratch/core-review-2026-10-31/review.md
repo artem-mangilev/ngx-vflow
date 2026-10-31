@@ -27,7 +27,9 @@ type ConnectionGesture = {
 } | null;
 ```
 
-и четырьмя методами `start(handle, event, oldEdge?)`, `hover(handle)`, `leave(handle)`, `end()`. Позиция указателя держится отдельным сигналом, чтобы движение не инвалидировало все ноды. Валидация в `end()` синхронная. `node.connectionActive`, `handle.state`, `edge.reconnecting` становятся `computed` от сигнала жеста: переходов мало (start, hover, leave, end), стоимость O(n) тривиальных computed на переход. Drag-события уходят в `DraggableService.events$`, их потребляет `NodeDragControllerDirective` как сейчас. `selection-box-end` исчезает после решения B. `FlowStatusService` удаляется целиком, вместе с `RootSvgContextDirective` (document `pointerup` → drop, живёт в отдельном файле с чужим именем и TODO).
+и четырьмя методами `start(handle, event, oldEdge?)`, `hover(handle)`, `leave(handle)`, `end()`. Позиция указателя держится отдельным сигналом, чтобы движение не инвалидировало все ноды. Валидация в `end()` синхронная. Drag-события уходят в `DraggableService.events$`, их потребляет `NodeDragControllerDirective` как сейчас. `selection-box-end` исчезает после решения B. `FlowStatusService` удаляется целиком, вместе с `RootSvgContextDirective` (document `pointerup` → drop, живёт в отдельном файле с чужим именем и TODO).
+
+Сделано (шаг 4). Отличие от плана: `node.connectionActive`, `handle.state`, `edge.reconnecting` остались сигналами, которые сервис пишет на каждом переходе (`setGesture` считает разницу участников). Вариант с `computed` от сигнала жеста инвалидировал бы `culled` всех нод на каждом hover, а `css-virtualization.spec` специально проверяет, что переход касается только участников.
 
 ### B. Указательные жесты не везде на `createPointerDrag`
 
@@ -187,7 +189,7 @@ Culling: нужен и обоснован замерами; оставить к�
 1. Предупреждения: удалить `console.*` и обвязку. Самый дешёвый и безопасный.
 2. Токен `NODE_MODEL` вместо `NodeAccessorService` + `HandleService`; `PointerDirective` → нативные события; `RootSvgReferenceDirective` удалить; мёртвый код в `NodeModel`.
 3. Готовность через `data-v-pending` с одним CSS-гейтом `v-no-layout`, `ViewportVisibilityDirective` в компоненты. Сделано; сброс `isMeasured` при un-cull остаётся (см. выше).
-4. `ConnectionService` вместо `FlowStatusService` (+ `RootSvgContextDirective`), connection и рамка на `createPointerDrag`, `RootPointerDirective` удалить, клик по панели в директиве жестов. Самый большой шаг; покрыт `connection-outputs.spec`, `click-selection.spec`, e2e соединений.
+4. `ConnectionService` вместо `FlowStatusService` (+ `RootSvgContextDirective`), connection и рамка на трекере указателя, `RootPointerDirective` удалена. Сделано: `gestures/pointer-drag.ts` получил `createPointerTracker` (пресс, принятый в другом месте), на нём работают и соединение, и рамка; релиз соединения ловится трекером по id указателя, поэтому `(pointerup)` на handle и магнитах больше не нужен, а тесты, эмулирующие релиз, обязаны передавать тот же `pointerId`, что и нажатие, как в рецепте на странице Unit testing. События drag живут в `DraggableService.events$`, флаг `dragging` там же. Клик по панели пока остаётся в `SelectionService.setViewport` (шаг 8, решение G).
 5. Handles: разделить measure/derive, один батчер.
 6. Один резайзер на ноду; переименование `NodeMeasureDirective`.
 7. Классы: data-атрибуты для ролей в `press-target`, регистрация элементов панели/viewport, модификаторы ноды из модели; поправить migration-таблицу и ADR-0008.

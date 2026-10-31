@@ -1,31 +1,28 @@
 import { TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
-import { ConnectionControllerDirective } from './connection-controller.directive';
+import { ConnectionService } from './connection.service';
 import { EdgeModel } from '../models/edge.model';
 import { HandleModel } from '../models/handle.model';
 import { NodeModel } from '../models/node.model';
 import { createEdge } from '../interfaces/edge.interface';
 import { createNode } from '../interfaces/node.interface';
-import { FlowEntitiesService } from '../services/flow-entities.service';
-import { FlowSettingsService } from '../services/flow-settings.service';
-import { FlowStatusService } from '../services/flow-status.service';
-import { NodeRenderingService } from '../services/node-rendering.service';
-import { ViewportService } from '../services/viewport.service';
+import { FlowEntitiesService } from './flow-entities.service';
+import { FlowSettingsService } from './flow-settings.service';
+import { NodeRenderingService } from './node-rendering.service';
+import { ViewportService } from './viewport.service';
 import { dispatchPointer, pointerEvent } from '../gestures/pointer-events.testing';
 
-describe('ConnectionControllerDirective', () => {
+describe('ConnectionService', () => {
   let flowEntitiesService: FlowEntitiesService;
-  let statusService: FlowStatusService;
-  let controller: ConnectionControllerDirective;
+  let connection: ConnectionService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [FlowEntitiesService, FlowSettingsService, FlowStatusService, NodeRenderingService, ViewportService],
+      providers: [FlowEntitiesService, FlowSettingsService, ConnectionService, NodeRenderingService, ViewportService],
     });
 
     flowEntitiesService = TestBed.inject(FlowEntitiesService);
-    statusService = TestBed.inject(FlowStatusService);
-    controller = TestBed.runInInjectionContext(() => new ConnectionControllerDirective());
+    connection = TestBed.inject(ConnectionService);
   });
 
   function createNodeModel(id: string) {
@@ -56,93 +53,131 @@ describe('ConnectionControllerDirective', () => {
     );
   }
 
+  function createEdgeModel(id: string) {
+    return TestBed.runInInjectionContext(() => new EdgeModel(createEdge({ id, source: 'source', target: 'target' })));
+  }
+
   it('delays connection and reconnection until the pointer crosses the configured threshold', () => {
     TestBed.inject(FlowSettingsService).bind({ connectionDragThreshold: signal(10) });
     const handle = createHandle(createNodeModel('source'), 'source');
     const down = pointerEvent('pointerdown', { x: 100 });
-    controller.startConnection(handle, down);
-    expect(statusService.status().state).toBe('idle');
+    connection.start(handle, down);
+    expect(connection.gesture()).toBeNull();
     dispatchPointer(document, 'pointermove', { x: 106 });
-    expect(statusService.status().state).toBe('idle');
+    expect(connection.gesture()).toBeNull();
     // Another pointer does not count.
     dispatchPointer(document, 'pointermove', { x: 150, pointerId: 2 });
-    expect(statusService.status().state).toBe('idle');
+    expect(connection.gesture()).toBeNull();
     dispatchPointer(document, 'pointermove', { x: 112 });
-    expect(statusService.status().state).toBe('connection-start');
-    statusService.setIdleStatus();
-    const edge = TestBed.runInInjectionContext(
-      () => new EdgeModel(createEdge({ id: 'edge', source: 'source', target: 'target' })),
-    );
-    controller.startReconnection(handle, edge, down);
-    expect(statusService.status().state).toBe('idle');
+    expect(connection.gesture()?.oldEdge).toBeUndefined();
+    expect(connection.pointer()).toEqual({ x: 112, y: 100 });
+    connection.end();
+    expect(connection.gesture()).toBeNull();
+    const edge = createEdgeModel('edge');
+    connection.start(handle, down, edge);
+    expect(connection.gesture()).toBeNull();
     dispatchPointer(document, 'pointermove', { x: 112 });
-    expect(statusService.status().state).toBe('reconnection-start');
+    expect(connection.gesture()?.oldEdge).toBe(edge);
+    expect(edge.reconnecting()).toBe(true);
   });
 
   it('uses the same client-space activation threshold for touch connections', () => {
     TestBed.inject(FlowSettingsService).bind({ connectionDragThreshold: signal(10) });
     const handle = createHandle(createNodeModel('source'), 'source');
-    controller.startConnection(handle, pointerEvent('pointerdown', { x: 100, pointerType: 'touch' }));
+    connection.start(handle, pointerEvent('pointerdown', { x: 100, pointerType: 'touch' }));
     dispatchPointer(document, 'pointermove', { x: 105, pointerType: 'touch' });
-    expect(statusService.status().state).toBe('idle');
+    expect(connection.gesture()).toBeNull();
     dispatchPointer(document, 'pointermove', { x: 112, pointerType: 'touch' });
-    expect(statusService.status().state).toBe('connection-start');
+    expect(connection.gesture()).not.toBeNull();
   });
 
   it('cancels a pending connection on pointer release or window blur', () => {
     TestBed.inject(FlowSettingsService).bind({ connectionDragThreshold: signal(10) });
     const handle = createHandle(createNodeModel('source'), 'source');
     for (const cancel of ['pointerup', 'pointercancel', 'blur']) {
-      controller.startConnection(handle, pointerEvent('pointerdown', { x: 100 }));
+      connection.start(handle, pointerEvent('pointerdown', { x: 100 }));
       if (cancel === 'blur') window.dispatchEvent(new Event('blur'));
       else dispatchPointer(document, cancel, { x: 100 });
       dispatchPointer(document, 'pointermove', { x: 150 });
-      expect(statusService.status().state).toBe('idle');
+      expect(connection.gesture()).toBeNull();
     }
+  });
+
+  it('ends a started gesture on the release of its pointer, on the candidate it hovers', () => {
+    const source = createHandle(createNodeModel('source'), 'source');
+    const target = createHandle(createNodeModel('target'), 'target');
+    const ends: unknown[] = [];
+    connection.connectEnd$.subscribe((end) => ends.push(end));
+    const connects: unknown[] = [];
+    connection.connect$.subscribe((request) => connects.push(request));
+
+    connection.start(source, pointerEvent('pointerdown', { x: 100 }));
+    dispatchPointer(document, 'pointermove', { x: 150 });
+    expect(connection.pointer()).toEqual({ x: 150, y: 100 });
+    connection.hover(target);
+    dispatchPointer(document, 'pointerup', { x: 150 });
+
+    expect(connection.gesture()).toBeNull();
+    expect(connects).toEqual([
+      {
+        source: 'source',
+        target: 'target',
+        sourceHandle: undefined,
+        targetHandle: undefined,
+        sourceHandleType: 'source',
+        targetHandleType: 'target',
+      },
+    ]);
+    expect(ends).toEqual([
+      {
+        valid: true,
+        from: { node: source.parentNode.rawNode, handle: { id: undefined, type: 'source', position: 'right' } },
+        to: { node: target.parentNode.rawNode, handle: { id: undefined, type: 'target', position: 'left' } },
+      },
+    ]);
   });
 
   it('should mark the origin handle connecting and keep it while leaving it or resetting other handles', () => {
     const source = createHandle(createNodeModel('source'), 'source');
     const target = createHandle(createNodeModel('target'), 'target');
 
-    controller.startConnection(source);
-    TestBed.flushEffects();
+    connection.start(source);
     expect(source.state()).toBe('connecting');
+    expect(source.parentNode.connectionActive()).toBe(true);
 
     // Leaving the origin, or a handle that is not the candidate, changes nothing.
-    controller.resetValidateConnection(source);
-    controller.resetValidateConnection(target);
-    TestBed.flushEffects();
+    connection.leave(source);
+    connection.leave(target);
     expect(source.state()).toBe('connecting');
-    expect(statusService.status().state).toBe('connection-start');
+    expect(connection.gesture()?.candidate).toBeNull();
 
-    controller.validateConnection(target);
-    TestBed.flushEffects();
+    connection.hover(target);
     expect(target.state()).toBe('valid');
     expect(source.state()).toBe('connecting');
+    expect(target.parentNode.connectionActive()).toBe(true);
 
     // The origin can be its own candidate; leaving it restores connecting.
-    controller.resetValidateConnection(target);
-    controller.validateConnection(source);
-    TestBed.flushEffects();
+    connection.leave(target);
+    expect(target.state()).toBe('idle');
+    expect(target.parentNode.connectionActive()).toBe(false);
+    connection.hover(source);
     expect(source.state()).toBe('invalid');
-    controller.resetValidateConnection(source);
-    TestBed.flushEffects();
+    connection.leave(source);
     expect(source.state()).toBe('connecting');
 
-    statusService.setIdleStatus();
-    TestBed.flushEffects();
+    connection.end();
     expect(source.state()).toBe('idle');
+    expect(source.parentNode.connectionActive()).toBe(false);
   });
 
   it('should reject a new connection when its starting handle cannot start', () => {
     const source = createHandle(createNodeModel('source'), 'source', false);
     const connectStart = vi.fn();
-    const subscription = controller.connectStart.subscribe(connectStart);
+    const subscription = connection.connectStart$.subscribe(connectStart);
 
-    controller.startConnection(source);
+    connection.start(source);
 
-    expect(statusService.status().state).toBe('idle');
+    expect(connection.gesture()).toBeNull();
     expect(connectStart).not.toHaveBeenCalled();
 
     subscription.unsubscribe();
@@ -154,17 +189,20 @@ describe('ConnectionControllerDirective', () => {
 
     const source = createHandle(createNodeModel('source'), 'source');
     const target = createHandle(createNodeModel('target'), 'target', true, false);
+    const ends: { valid: boolean | null }[] = [];
+    connection.connectEnd$.subscribe((end) => ends.push(end));
 
-    controller.startConnection(source);
-    controller.validateConnection(target);
+    connection.start(source);
+    connection.hover(target);
 
     expect(target.state()).toBe('invalid');
-    expect(statusService.status().state).toBe('connection-validation');
+    expect(connection.gesture()?.candidate?.valid).toBe(false);
     expect(validator).not.toHaveBeenCalled();
 
-    controller.endConnection();
+    connection.end();
 
-    expect(statusService.status().state).toBe('connection-dropped');
+    expect(connection.gesture()).toBeNull();
+    expect(ends.map((end) => end.valid)).toEqual([null]);
     expect(validator).not.toHaveBeenCalled();
   });
 
@@ -174,19 +212,22 @@ describe('ConnectionControllerDirective', () => {
 
     const retained = createHandle(createNodeModel('source'), 'source', false);
     const candidate = createHandle(createNodeModel('target'), 'target', true, false);
-    const oldEdge = TestBed.runInInjectionContext(
-      () => new EdgeModel(createEdge({ id: 'old', source: 'source', target: 'target' })),
-    );
+    const oldEdge = createEdgeModel('old');
+    const ends: { valid: boolean | null }[] = [];
+    connection.reconnectEnd$.subscribe((end) => ends.push(end));
 
-    controller.startReconnection(retained, oldEdge);
+    connection.start(retained, undefined, oldEdge);
 
-    expect(statusService.status().state).toBe('reconnection-start');
+    expect(connection.gesture()?.oldEdge).toBe(oldEdge);
 
-    controller.validateConnection(candidate);
-    controller.endConnection();
-
+    connection.hover(candidate);
     expect(candidate.state()).toBe('invalid');
-    expect(statusService.status().state).toBe('reconnection-dropped');
+
+    connection.end();
+    expect(candidate.state()).toBe('idle');
+    expect(connection.gesture()).toBeNull();
+    expect(oldEdge.reconnecting()).toBe(false);
+    expect(ends.map((end) => end.valid)).toEqual([null]);
     expect(validator).not.toHaveBeenCalled();
   });
 });

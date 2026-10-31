@@ -1,8 +1,7 @@
 import { DestroyRef, Directive, ElementRef, computed, inject, input } from '@angular/core';
 import { NODE_MODEL } from '../utils/node-model.token';
 import { HandleModel } from '../models/handle.model';
-import { FlowStatusService } from '../services/flow-status.service';
-import { ConnectionControllerDirective } from './connection-controller.directive';
+import { ConnectionService } from '../services/connection.service';
 import { bindDomAttributes } from './entity-accessibility.directive';
 import { DomAttributes } from '../interfaces/dom-attributes.interface';
 import { HandleLayout, HandlePosition, HandleType } from '../types/handle-type.type';
@@ -36,15 +35,13 @@ import { pressTarget } from '../utils/press-target';
     '[style.bottom]': 'placement()?.bottom ?? null',
     '[style.transform]': 'placement()?.transform ?? null',
     '(pointerdown)': 'startConnection($event)',
-    '(pointerup)': 'endConnection()',
     '(pointerenter)': 'pointerEnter()',
     '(pointerleave)': 'pointerLeave()',
   },
 })
 export class VflowHandleDirective {
   private readonly element = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
-  private readonly flowStatus = inject(FlowStatusService);
-  private readonly connectionController = inject(ConnectionControllerDirective);
+  private readonly connection = inject(ConnectionService);
 
   /** `source`, `target`, or `any` for both directions. */
   public readonly handleType = input<HandleType>('source');
@@ -123,20 +120,16 @@ export class VflowHandleDirective {
     const { dragHandle } = pressTarget(event.target);
     if (dragHandle && this.element.contains(dragHandle)) return;
 
-    this.connectionController.startConnection(this.model, event);
-  }
-
-  protected endConnection() {
-    this.connectionController.endConnection();
+    this.connection.start(this.model, event);
   }
 
   /** The element is a drop zone of the connection in progress, in addition to the magnet around its point. */
   protected pointerEnter() {
-    if (this.flowStatus.connectionActive()) this.connectionController.validateConnection(this.model);
+    this.connection.hover(this.model);
   }
 
   protected pointerLeave() {
-    if (this.flowStatus.connectionActive()) this.connectionController.resetValidateConnection(this.model);
+    this.connection.leave(this.model);
   }
 
   private requireNode() {

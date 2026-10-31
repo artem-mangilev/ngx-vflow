@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, TemplateRef, computed, inject, input } from '@angular/core';
-import { FlowStatusService } from '../../services/flow-status.service';
+import { ConnectionService } from '../../services/connection.service';
 import { getStraightPath } from '../../math/edge-path/straigh-path';
 import { SpacePointContextDirective } from '../../directives/space-point-context.directive';
 import { ConnectionModel } from '../../models/connection.model';
@@ -34,7 +34,7 @@ import { NodeModel } from '../../models/node.model';
   imports: [NgTemplateOutlet],
 })
 export class ConnectionComponent {
-  private readonly flowStatusService = inject(FlowStatusService);
+  private readonly connection = inject(ConnectionService);
   private readonly spacePointContext = inject(SpacePointContextDirective);
   private readonly flowEntitiesService = inject(FlowEntitiesService);
 
@@ -43,17 +43,15 @@ export class ConnectionComponent {
   public template = input<TemplateRef<any>>();
 
   protected path = computed(() => {
-    const status = this.flowStatusService.connectionStatus();
-    if (!status) return null;
+    const gesture = this.connection.gesture();
+    if (!gesture) return null;
     const curve = this.model().curve;
 
-    const sourceHandle = status.payload.sourceHandle;
-    const pointer = this.spacePointContext.svgCurrentSpacePoint();
+    const sourceHandle = gesture.sourceHandle;
+    // Follows the pointer and the viewport, which auto-pan moves under a still pointer.
+    const pointer = this.spacePointContext.clientToFlowPosition(this.connection.pointer());
     // The candidate is the end only while valid; otherwise the preview follows the pointer.
-    const candidate =
-      (status.state === 'connection-validation' || status.state === 'reconnection-validation') && status.payload.valid
-        ? { node: status.payload.target, handle: status.payload.targetHandle }
-        : null;
+    const candidate = gesture.candidate?.valid ? gesture.candidate : null;
 
     const source = sourceHandle.endpoint(candidate ? candidate.handle.pointAbsolute() : pointer);
     const target = candidate
@@ -65,7 +63,7 @@ export class ConnectionComponent {
       target.point,
       source.position,
       target.position,
-      status.payload.source,
+      gesture.source,
       candidate?.node,
     );
 

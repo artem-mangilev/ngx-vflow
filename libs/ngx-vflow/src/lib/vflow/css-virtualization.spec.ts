@@ -8,7 +8,8 @@ import { FlowEntitiesService } from './services/flow-entities.service';
 import { SelectionService } from './services/selection.service';
 import { NodeRenderingService } from './services/node-rendering.service';
 import { EdgeRenderingService } from './services/edge-rendering.service';
-import { FlowStatusService } from './services/flow-status.service';
+import { ConnectionService } from './services/connection.service';
+import { DraggableService } from './services/draggable.service';
 import { VflowHandleDirective } from './directives/handle.directive';
 import { VflowMinimapComponent } from './public-components/minimap/minimap.component';
 import { VflowNodeToolbarComponent } from './public-components/node-toolbar/node-toolbar.component';
@@ -149,8 +150,8 @@ describe('CSS viewport virtualization', () => {
     const connectionUpdates = vi.spyOn(hiddenNode.connectionActive, 'set');
     const states: string[] = [];
     const subscription = fixture.debugElement.injector
-      .get(FlowStatusService)
-      .status$.subscribe((status) => states.push(status.state));
+      .get(DraggableService)
+      .events$.subscribe((event) => states.push(event.type));
     const mouse = (type: string, x: number) =>
       mouseAsPointer(type, { clientX: x, clientY: 70, buttons: 1, bubbles: true, view: window });
     host.dispatchEvent(mouse('mousedown', 20));
@@ -171,9 +172,7 @@ describe('CSS viewport virtualization', () => {
     expect(toolbar.getBoundingClientRect().x - oldToolbarX).toBeCloseTo(60);
     window.dispatchEvent(mouse('mouseup', 80));
     await fixture.whenStable();
-    expect(states.filter((state) => state === 'node-drag').length).toBe(3);
-    expect(states).toContain('node-drag-start');
-    expect(states).toContain('node-drag-end');
+    expect(states).toEqual(['start', 'move', 'move', 'move', 'end']);
     fixture.debugElement.injector
       .get(FlowEntitiesService)
       .edges()[0]
@@ -231,19 +230,20 @@ describe('CSS viewport virtualization', () => {
     const injector = fixture.debugElement.injector;
     const [source, first, second, unrelated] = injector.get(FlowEntitiesService).nodes();
     const edge = injector.get(FlowEntitiesService).edges()[0];
-    const status = injector.get(FlowStatusService);
+    const connection = injector.get(ConnectionService);
     const sourceHandle = source.handles().find((handle) => handle.type() === 'source')!;
     const firstHandle = first.handles().find((handle) => handle.type() === 'target')!;
     const secondHandle = second.handles().find((handle) => handle.type() === 'target')!;
     const unrelatedUpdates = vi.spyOn(unrelated.connectionActive, 'set');
-    status.setConnectionStartStatus(source, sourceHandle);
+    connection.start(sourceHandle);
     await fixture.whenStable();
     const rendered = Array.from<Element>(fixture.nativeElement.querySelectorAll('.v-node, svg[edge]'));
     unrelatedUpdates.mockClear();
-    status.setConnectionValidationStatus(true, source, first, sourceHandle, firstHandle);
+    connection.hover(firstHandle);
     await fixture.whenStable();
     expect(firstHandle.state()).toBe('valid');
-    status.setConnectionValidationStatus(false, source, second, sourceHandle, secondHandle);
+    // The fixture edge already connects the source to the second node, so this candidate is a duplicate.
+    connection.hover(secondHandle);
     await fixture.whenStable();
     expect(firstHandle.state()).toBe('idle');
     expect(secondHandle.state()).toBe('invalid');
@@ -251,14 +251,15 @@ describe('CSS viewport virtualization', () => {
     expect(second.connectionActive()).toBe(true);
     expect(unrelatedUpdates).not.toHaveBeenCalled();
     expectSameElements(Array.from(fixture.nativeElement.querySelectorAll('.v-node, svg[edge]')), rendered);
-    status.setReconnectionStartStatus(first, firstHandle, edge);
+    connection.end();
+    connection.start(firstHandle, undefined, edge);
     await fixture.whenStable();
     expect(source.connectionActive()).toBe(true);
     expect(second.connectionActive()).toBe(true);
     expect(secondHandle.state()).toBe('idle');
     const edgeHost = fixture.nativeElement.querySelector('svg[edge]') as SVGElement;
     expect(getComputedStyle(edgeHost).visibility).toBe('hidden');
-    status.setIdleStatus();
+    connection.end();
     // Template handles are measured on the next animation frame, unlike the removed standard handles.
     await settle(fixture);
     expect([source, first, second].every((node) => !node.connectionActive())).toBe(true);
@@ -498,12 +499,12 @@ describe('CSS viewport virtualization', () => {
     fixture.componentInstance.setViewport({ ...fixture.componentInstance.viewport(), x: 1000, y: 0 });
     await settle(fixture);
     expect(getComputedStyle(host).display).not.toBe('none');
-    const status = fixture.debugElement.injector.get(FlowStatusService);
-    status.setConnectionStartStatus(node, node.handles()[0]);
+    const connection = fixture.debugElement.injector.get(ConnectionService);
+    connection.start(node.handles()[0]);
     node.resizing.set(false);
     await settle(fixture);
     expect(getComputedStyle(host).display).not.toBe('none');
-    status.setIdleStatus();
+    connection.end();
     await settle(fixture);
     expect(getComputedStyle(host).display).toBe('none');
   });

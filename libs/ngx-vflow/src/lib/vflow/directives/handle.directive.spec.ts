@@ -6,7 +6,8 @@ import { createNode } from '../interfaces/node.interface';
 import { createEdge } from '../interfaces/edge.interface';
 import { ConnectEndEvent } from '../interfaces/connection-events.interface';
 import { FlowEntitiesService } from '../services/flow-entities.service';
-import { FlowStatusService } from '../services/flow-status.service';
+import { ConnectionService } from '../services/connection.service';
+import { DraggableService } from '../services/draggable.service';
 import { Position } from '../types/position.type';
 import { VflowHandleDirective } from './handle.directive';
 import { VflowDragHandleDirective } from './drag-handle.directive';
@@ -226,35 +227,37 @@ describe('VflowHandleDirective', () => {
     const fixture = setup(NodeAsHandleComponent, ['a', 'b']);
     await settle(fixture);
     const [a, b] = nodes(fixture);
-    const status = fixture.debugElement.injector.get(FlowStatusService);
+    const connection = fixture.debugElement.injector.get(ConnectionService);
+    const drags: string[] = [];
+    fixture.debugElement.injector.get(DraggableService).events$.subscribe((event) => drags.push(event.type));
     const elementOf = (node: typeof a) => node.handles()[0].element!;
 
     // A press on the drag handle drags the node instead of starting a connection.
     dispatchMouse(elementOf(a).querySelector('.title')!, 'mousedown', { x: 0, y: 0 });
-    expect(status.status().state).toBe('node-drag-start');
+    expect(drags).toEqual(['start']);
     dispatchMouse(window, 'mouseup', { x: 0, y: 0 });
-    expect(status.status().state).toBe('node-drag-end');
+    expect(drags).toEqual(['start', 'end']);
 
     dispatchMouse(elementOf(a).querySelector('.body')!, 'mousedown', { x: 0, y: 0 });
-    expect(status.status().state).toBe('connection-start');
+    expect(connection.gesture()?.sourceHandle).toBe(a.handles()[0]);
     await settle(fixture);
     expect(elementOf(a).dataset['vHandleState']).toBe('connecting');
 
     elementOf(b).dispatchEvent(new PointerEvent('pointerenter'));
     await settle(fixture);
-    expect(status.status().state).toBe('connection-validation');
+    expect(connection.gesture()?.candidate?.handle).toBe(b.handles()[0]);
     expect(elementOf(b).dataset['vHandleState']).toBe('valid');
     expect(fixture.nativeElement.querySelector('g[connection] path')).not.toBeNull();
 
     elementOf(b).dispatchEvent(new PointerEvent('pointerleave'));
     await settle(fixture);
-    expect(status.status().state).toBe('connection-start');
+    expect(connection.gesture()?.candidate).toBeNull();
     expect(elementOf(b).dataset['vHandleState']).toBe('idle');
 
     elementOf(b).dispatchEvent(new PointerEvent('pointerenter'));
-    elementOf(b).dispatchEvent(new PointerEvent('pointerup', { bubbles: true }));
+    elementOf(b).dispatchEvent(new PointerEvent('pointerup', { bubbles: true, pointerId: 1 }));
     await settle(fixture);
-    expect(status.status().state).toBe('idle');
+    expect(connection.gesture()).toBeNull();
     expect(elementOf(a).dataset['vHandleState']).toBe('idle');
     expect(fixture.nativeElement.querySelector('g[connection] path')).toBeNull();
   });
@@ -269,7 +272,7 @@ describe('VflowHandleDirective', () => {
     dispatchMouse(elementOf(a).querySelector('.body')!, 'mousedown', { x: 0, y: 0 });
     await settle(fixture);
     elementOf(b).dispatchEvent(new PointerEvent('pointerenter'));
-    elementOf(b).dispatchEvent(new PointerEvent('pointerup', { bubbles: true }));
+    elementOf(b).dispatchEvent(new PointerEvent('pointerup', { bubbles: true, pointerId: 1 }));
     await settle(fixture);
 
     expect(fixture.componentInstance.ends.length).toBe(1);
@@ -277,19 +280,19 @@ describe('VflowHandleDirective', () => {
     expect(end.valid).toBe(true);
     expect(end.from.node.id).toBe('a');
     expect(end.to.node?.id).toBe('b');
-    expect(flow.get(FlowStatusService).status().state).toBe('idle');
+    expect(flow.get(ConnectionService).gesture()).toBeNull();
   });
 
   it('renders a magnet at every measured handle only while a connection is in progress', async () => {
     const fixture = setup(PlainHandlesNodeComponent, ['a', 'b']);
     await settle(fixture);
     const [a] = nodes(fixture);
-    const status = fixture.debugElement.injector.get(FlowStatusService);
+    const connection = fixture.debugElement.injector.get(ConnectionService);
     const magnets = () => Array.from(fixture.nativeElement.querySelectorAll('.v-magnet')) as HTMLElement[];
 
     expect(magnets().length).toBe(0);
 
-    status.setConnectionStartStatus(a, a.handles()[1]);
+    connection.start(a.handles()[1]);
     await settle(fixture);
 
     expect(magnets().length).toBe(4);
@@ -297,7 +300,7 @@ describe('VflowHandleDirective', () => {
     expect(parseFloat(magnet.style.left)).toBe(a.handles()[0].localPoint().x);
     expect(parseFloat(magnet.style.top)).toBe(a.handles()[0].localPoint().y);
 
-    status.setIdleStatus();
+    connection.end();
     await settle(fixture);
 
     expect(magnets().length).toBe(0);

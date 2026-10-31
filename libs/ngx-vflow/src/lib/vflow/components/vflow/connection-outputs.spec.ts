@@ -91,7 +91,8 @@ describe('connection outputs', () => {
     dispatchMouse(from, 'mousedown', { x: 0, y: 0 });
     await settle();
     to.dispatchEvent(new PointerEvent('pointerenter'));
-    to.dispatchEvent(new PointerEvent('pointerup', { bubbles: true }));
+    // The release of the pointer that pressed: the gesture follows it by pointer id.
+    to.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, pointerId: 1 }));
     await settle();
   }
 

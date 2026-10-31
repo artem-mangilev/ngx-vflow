@@ -1,4 +1,4 @@
-import { DestroyRef, Directive, ElementRef, inject, Injector, OnInit } from '@angular/core';
+import { computed, DestroyRef, Directive, ElementRef, inject, Injector, OnInit } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { EMPTY, merge, fromEvent, Observable } from 'rxjs';
 import {
@@ -8,20 +8,22 @@ import {
   map,
   shareReplay,
   take,
-  distinctUntilKeyChanged,
+  distinctUntilChanged,
   startWith,
   pairwise,
 } from 'rxjs/operators';
-import { FlowStatusService } from '../services/flow-status.service';
 import { ViewportService } from '../services/viewport.service';
 import { FlowSettingsService } from '../services/flow-settings.service';
+import { DraggableService } from '../services/draggable.service';
+import { ConnectionService } from '../services/connection.service';
 import { Point } from '../interfaces/point.interface';
 import { animationFrames } from '../utils/animation-frames';
 import { AutoPanSettings } from '../interfaces/auto-pan-settings.interface';
 
 @Directive({ selector: '[autoPan]', standalone: true })
 export class AutoPanDirective implements OnInit {
-  private readonly statusService = inject(FlowStatusService);
+  private readonly draggable = inject(DraggableService);
+  private readonly connection = inject(ConnectionService);
   private readonly viewportService = inject(ViewportService);
   private readonly flowSettingsService = inject(FlowSettingsService);
   /** The pane, which covers the whole flow. */
@@ -48,21 +50,23 @@ export class AutoPanDirective implements OnInit {
       .subscribe();
   }
 
-  /** Pans while the status is one of the configured drags, or never when the settings disable auto-pan. */
+  /** Pans while one of the configured drags is in progress, or never when the settings disable auto-pan. */
   private panning(value: boolean | AutoPanSettings): Observable<unknown> {
     const options = typeof value === 'boolean' ? { nodeDrag: value, connectionDrag: value } : value;
-    const states = [
-      ...((options.nodeDrag ?? true) ? ['node-drag'] : []),
-      ...((options.connectionDrag ?? true) ? ['connection-start', 'reconnection-start'] : []),
-    ];
+    const nodeDrag = options.nodeDrag ?? true;
+    const connectionDrag = options.connectionDrag ?? true;
     const speed = nonNegativeSetting(options.speed, 600);
     const margin = nonNegativeSetting(options.margin, 48);
-    if (!states.length || speed <= 0 || margin <= 0) return EMPTY;
+    if ((!nodeDrag && !connectionDrag) || speed <= 0 || margin <= 0) return EMPTY;
 
-    return toObservable(this.statusService.status, { injector: this.injector }).pipe(
-      distinctUntilKeyChanged('state'),
-      switchMap((status) =>
-        states.includes(status.state)
+    const active = computed(
+      () => (nodeDrag && this.draggable.dragging()) || (connectionDrag && this.connection.active()),
+    );
+
+    return toObservable(active, { injector: this.injector }).pipe(
+      distinctUntilChanged(),
+      switchMap((panning) =>
+        panning
           ? this.documentPoint$.pipe(
               take(1),
               switchMap(() =>

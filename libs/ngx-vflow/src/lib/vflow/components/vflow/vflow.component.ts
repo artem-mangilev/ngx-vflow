@@ -32,7 +32,7 @@ import {
 import { Point } from '../../interfaces/point.interface';
 import { NodeAtPoint } from '../../interfaces/node-at-point.interface';
 import { SetCenterOptions, ViewportOptions, ViewportState } from '../../interfaces/viewport.interface';
-import { FlowStatusService } from '../../services/flow-status.service';
+import { ConnectionService } from '../../services/connection.service';
 import { FlowEntitiesService } from '../../services/flow-entities.service';
 import { MarkerShapes } from '../../utils/marker-inset';
 import { ConnectionSettings } from '../../interfaces/connection-settings.interface';
@@ -59,8 +59,6 @@ import { ConnectionComponent } from '../connection/connection.component';
 import { BackgroundComponent } from '../background/background.component';
 import { DefsComponent } from '../defs/defs.component';
 import { FlowSizeControllerDirective } from '../../directives/flow-size-controller.directive';
-import { RootPointerDirective } from '../../directives/root-pointer.directive';
-import { RootSvgContextDirective } from '../../directives/root-svg-context.directive';
 import { EdgeRenderingService } from '../../services/edge-rendering.service';
 import {
   getIntersectingNodes,
@@ -132,7 +130,7 @@ const connectionControllerHostDirective = {
     AriaDescriber,
     DraggableService,
     ViewportService,
-    FlowStatusService,
+    ConnectionService,
     FlowEntitiesService,
     NodesChangeService,
     EdgeChangesService,
@@ -174,8 +172,6 @@ const connectionControllerHostDirective = {
     KeyboardNavigationDirective,
     EntityAccessibilityDirective,
     LiveRegionDirective,
-    RootSvgContextDirective,
-    RootPointerDirective,
     FlowSizeControllerDirective,
     DefsComponent,
     BackgroundComponent,

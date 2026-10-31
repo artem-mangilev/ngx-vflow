@@ -1,8 +1,8 @@
 import { Directive, inject } from '@angular/core';
-import { FlowStatus, FlowStatusService } from '../services/flow-status.service';
 import { filter, map } from 'rxjs/operators';
 import { Node } from '../interfaces/node.interface';
 import { outputFromObservable } from '@angular/core/rxjs-interop';
+import { DraggableService, NodeDragGestureEvent } from '../services/draggable.service';
 
 /** Payload of `(nodeDragStart)`, `(nodeDrag)` and `(nodeDragEnd)`. */
 export interface NodeDragEvent {
@@ -14,25 +14,24 @@ export interface NodeDragEvent {
   sourceEvent: PointerEvent;
 }
 
-type DragState = 'node-drag-start' | 'node-drag' | 'node-drag-end';
-
+/** The node drag outputs of the flow; the gesture itself is {@link DraggableService}. */
 @Directive()
 export class NodeDragControllerDirective {
-  private statusService = inject(FlowStatusService);
+  private draggable = inject(DraggableService);
 
-  readonly nodeDragStart = outputFromObservable(this.dragEvents('node-drag-start'));
+  readonly nodeDragStart = outputFromObservable(this.dragEvents('start'));
 
-  readonly nodeDrag = outputFromObservable(this.dragEvents('node-drag'));
+  readonly nodeDrag = outputFromObservable(this.dragEvents('move'));
 
-  readonly nodeDragEnd = outputFromObservable(this.dragEvents('node-drag-end'));
+  readonly nodeDragEnd = outputFromObservable(this.dragEvents('end'));
 
-  private dragEvents(state: DragState) {
-    return this.statusService.nodeDragStatus$.pipe(
-      filter((status): status is Extract<FlowStatus, { state: DragState }> => status.state === state),
-      map(({ payload }): NodeDragEvent => ({
-        node: payload.node.rawNode,
-        nodes: payload.nodes.map((model) => model.rawNode),
-        sourceEvent: payload.event,
+  private dragEvents(type: NodeDragGestureEvent['type']) {
+    return this.draggable.events$.pipe(
+      filter((event) => event.type === type),
+      map(({ node, nodes, event }): NodeDragEvent => ({
+        node: node.rawNode,
+        nodes: nodes.map((model) => model.rawNode),
+        sourceEvent: event,
       })),
     );
   }

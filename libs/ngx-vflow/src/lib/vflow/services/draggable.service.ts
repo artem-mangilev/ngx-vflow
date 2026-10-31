@@ -1,14 +1,13 @@
-import { Injectable, Injector, inject } from '@angular/core';
+import { Injectable, Injector, inject, signal } from '@angular/core';
 import { NodeModel } from '../models/node.model';
 import { round } from '../utils/round';
 import { FlowEntitiesService } from './flow-entities.service';
 import { Point } from '../interfaces/point.interface';
 import { FlowSettingsService } from './flow-settings.service';
 import { align } from '../utils/align-number';
-import { FlowStatusService } from './flow-status.service';
 import { ViewportService } from './viewport.service';
 import { toObservable } from '@angular/core/rxjs-interop';
-import type { Subscription } from 'rxjs';
+import { Subject, type Subscription } from 'rxjs';
 import { pairwise, filter, skip } from 'rxjs/operators';
 import { KeyboardService } from './keyboard.service';
 import { isGroupNode } from '../utils/is-group-node';
@@ -18,17 +17,32 @@ import { PointerDrag, PointerDragContext, createPointerDrag } from '../gestures/
 import { isNodeDragPress, pressTarget } from '../utils/press-target';
 import { AlignmentService } from './alignment.service';
 
+/** A node drag gesture, as the flow reports it: the start, each move and the end. */
+export interface NodeDragGestureEvent {
+  type: 'start' | 'move' | 'end';
+  /** The node the pointer grabbed. */
+  node: NodeModel;
+  /** Every node the gesture moves. */
+  nodes: NodeModel[];
+  event: PointerEvent;
+}
+
 @Injectable()
 export class DraggableService {
   private entitiesService = inject(FlowEntitiesService);
   private settingsService = inject(FlowSettingsService);
-  private flowStatusService = inject(FlowStatusService);
   private viewportService = inject(ViewportService);
   private keyboardService = inject(KeyboardService);
   private resizeObserverService = inject(ResizeObserverService);
   private alignmentService = inject(AlignmentService);
   private injector = inject(Injector);
   private drags = new WeakMap<Element, PointerDrag>();
+
+  /** Whether a node drag is in progress. */
+  public readonly dragging = signal(false);
+
+  /** The node drag gestures, as events: a start followed by a move in the same tick is reported as both. */
+  public readonly events$ = new Subject<NodeDragGestureEvent>();
 
   /**
    * Enable draggable behavior for element.
@@ -193,7 +207,8 @@ export class DraggableService {
       stopTrackingPaneGeometry();
       this.alignmentService.end();
       dragNodes.forEach((node) => node.dragging.set(false));
-      this.flowStatusService.setNodeDragEndStatus(model, dragNodes, event);
+      this.dragging.set(false);
+      this.events$.next({ type: 'end', node: model, nodes: dragNodes, event });
     };
 
     return createPointerDrag(element, {
@@ -208,7 +223,8 @@ export class DraggableService {
         startTrackingPaneGeometry();
         this.alignmentService.begin(dragNodes);
 
-        this.flowStatusService.setNodeDragStartStatus(model, dragNodes, event);
+        this.dragging.set(true);
+        this.events$.next({ type: 'start', node: model, nodes: dragNodes, event });
 
         // Offsets are taken at the press, so a drag past the threshold does not lose the distance it took.
         const flow = this.getFlowPoint(start, getPaneRect());
@@ -226,7 +242,7 @@ export class DraggableService {
       },
       onMove: ({ point, event }) => {
         moveTo(point);
-        this.flowStatusService.setNodeDragStatus(model, dragNodes, event);
+        this.events$.next({ type: 'move', node: model, nodes: dragNodes, event });
       },
       onEnd: end,
       onCancel: end,

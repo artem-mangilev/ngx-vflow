@@ -14,7 +14,7 @@ import {
 } from '@angular/core';
 import { DraggableService } from '../../services/draggable.service';
 import { NodeModel } from '../../models/node.model';
-import { FlowStatusService, isSelectionBoxEndStatus } from '../../services/flow-status.service';
+import { ConnectionService } from '../../services/connection.service';
 import { SelectionService } from '../../services/selection.service';
 import { isNoSelectTarget } from '../../utils/no-select-target';
 import { NodeRenderingService } from '../../services/node-rendering.service';
@@ -27,7 +27,6 @@ import {
 } from '../../directives/entity-component-outlet.directive';
 import { NODE_REF } from '../../utils/inject-node';
 import { NODE_MODEL } from '../../utils/node-model.token';
-import { ConnectionControllerDirective } from '../../directives/connection-controller.directive';
 import { HandleModel } from '../../models/handle.model';
 import { NodeHandlesControllerDirective } from '../../directives/node-handles-controller.directive';
 import { NodeResizeControllerDirective } from '../../directives/node-resize-controller.directive';
@@ -61,16 +60,15 @@ import { NodeResizeControllerDirective } from '../../directives/node-resize-cont
 export class NodeComponent implements OnInit, OnDestroy {
   protected injector = inject(Injector);
   private draggableService = inject(DraggableService);
-  private flowStatusService = inject(FlowStatusService);
+  private connection = inject(ConnectionService);
   private nodeRenderingService = inject(NodeRenderingService);
   private flowSettingsService = inject(FlowSettingsService);
   private hostRef = inject<ElementRef<HTMLElement>>(ElementRef);
   private componentEventBus = inject(ComponentEventBusService);
-  private connectionController = inject(ConnectionControllerDirective);
   private selectionService = inject(SelectionService);
 
   /** Every handle of every node gets a magnet while any connection is in progress. */
-  protected readonly connectionActive = this.flowStatusService.connectionActive.asReadonly();
+  protected readonly connectionActive = this.connection.active;
 
   public model = input.required<NodeModel>();
 
@@ -176,25 +174,16 @@ export class NodeComponent implements OnInit, OnDestroy {
     this.componentEventBus.pushNodeEvent({ nodeId: this.model().rawNode.id, eventName, eventPayload });
   }
 
-  protected endConnection() {
-    this.connectionController.endConnection();
+  protected hoverHandle(handle: HandleModel) {
+    this.connection.hover(handle);
   }
 
-  protected validateConnection(handle: HandleModel) {
-    this.connectionController.validateConnection(handle);
-  }
-
-  protected resetValidateConnection(handle: HandleModel) {
-    this.connectionController.resetValidateConnection(handle);
+  protected leaveHandle(handle: HandleModel) {
+    this.connection.leave(handle);
   }
 
   protected onClick(event: Event) {
     if (isNoSelectTarget(event.target)) {
-      return;
-    }
-
-    // A selection box gesture ends with a click that must not select the node under the pointer.
-    if (isSelectionBoxEndStatus(this.flowStatusService.status())) {
       return;
     }
 

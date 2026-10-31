@@ -15,7 +15,7 @@ import { EdgeModel } from '../../models/edge.model';
 import { EdgeContext } from '../../interfaces/template-context.interface';
 import { SelectionService } from '../../services/selection.service';
 import { FlowSettingsService } from '../../services/flow-settings.service';
-import { ConnectionControllerDirective } from '../../directives/connection-controller.directive';
+import { ConnectionService } from '../../services/connection.service';
 import { HandleModel } from '../../models/handle.model';
 import { EdgeRenderingService } from '../../services/edge-rendering.service';
 import { ComponentEventBusService } from '../../services/component-event-bus.service';
@@ -24,7 +24,6 @@ import {
   EntityComponentOutputEvent,
 } from '../../directives/entity-component-outlet.directive';
 import { EDGE_REF } from '../../utils/inject-edge';
-import { FlowStatusService, isSelectionBoxEndStatus } from '../../services/flow-status.service';
 import { isNoSelectTarget } from '../../utils/no-select-target';
 
 @Component({
@@ -51,10 +50,8 @@ export class EdgeComponent {
   private flowSettingsService = inject(FlowSettingsService);
   private edgeRenderingService = inject(EdgeRenderingService);
   private componentEventBus = inject(ComponentEventBusService);
-  private flowStatusService = inject(FlowStatusService);
 
-  // TODO remove dependency from this directive
-  private connectionController = inject(ConnectionControllerDirective);
+  private connection = inject(ConnectionService);
 
   public model = input.required<EdgeModel>();
 
@@ -86,11 +83,6 @@ export class EdgeComponent {
   }
 
   public select() {
-    // A selection box gesture ends with a click that must not select the edge under the pointer.
-    if (isSelectionBoxEndStatus(this.flowStatusService.status())) {
-      return;
-    }
-
     if (this.model().selectable()) {
       this.selectionService.select(this.model());
     }
@@ -112,6 +104,6 @@ export class EdgeComponent {
     // The press belongs to the reconnection, not to a pan of the pane.
     event.stopPropagation();
 
-    this.connectionController.startReconnection(handle, this.model(), event);
+    this.connection.start(handle, event, this.model());
   }
 }

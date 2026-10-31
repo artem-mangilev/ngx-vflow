@@ -1,22 +1,23 @@
-import { Directive, inject } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { filter, tap } from 'rxjs/operators';
+import { DestroyRef, Directive, ElementRef, inject } from '@angular/core';
 import { SelectionBoxModel } from '../models/selection-box.model';
 import { FlowEntitiesService } from '../services/flow-entities.service';
 import { FlowSettingsService } from '../services/flow-settings.service';
 import { KeyboardService } from '../services/keyboard.service';
-import { RootPointerDirective } from './root-pointer.directive';
 import { SpacePointContextDirective } from './space-point-context.directive';
 import { NodeModel } from '../models/node.model';
 import { EdgeModel } from '../models/edge.model';
 import { Point } from '../interfaces/point.interface';
 import { Rect } from '../interfaces/rect';
 import { isPointInRect, rectContains, rectsIntersect } from '../utils/rect';
-import { FlowStatusService } from '../services/flow-status.service';
 import { nodeToRect } from '../utils/nodes';
+import { createPointerDrag } from '../gestures/pointer-drag';
 
 const minSelectionSize = 2;
 
+/**
+ * The selection box: a drag on the pane while the selection modifier is held. The drag suppresses the click that
+ * follows it, so the release does not select the entity under the pointer.
+ */
 @Directive({
   standalone: true,
   selector: 'div[selectionBoxContext]',
@@ -26,59 +27,30 @@ export class SelectionBoxContextDirective {
   private flowSettingsService = inject(FlowSettingsService);
   private keyboardService = inject(KeyboardService);
   private spacePointContext = inject(SpacePointContextDirective);
-  private rootPointer = inject(RootPointerDirective);
-  private flowStatusService = inject(FlowStatusService);
 
   public model = new SelectionBoxModel();
 
-  protected startSub = this.rootPointer.pointerStart$
-    .pipe(
-      filter(() => this.flowSettingsService.selectionMode() !== 'manual'),
-      filter(() => this.keyboardService.isActiveModifier('selection')),
-      tap(({ x, y, originalEvent }) => {
-        originalEvent.preventDefault();
+  constructor() {
+    const drag = createPointerDrag(inject<ElementRef<HTMLElement>>(ElementRef).nativeElement, {
+      filter: () =>
+        this.flowSettingsService.selectionMode() !== 'manual' && this.keyboardService.isActiveModifier('selection'),
+      onStart: ({ start }) => {
         this.clearPreselection();
-        const point = this.clientToFlowPosition({ x, y });
-        this.model.setStart(point);
-      }),
-      takeUntilDestroyed(),
-    )
-    .subscribe();
-
-  protected moveSub = this.rootPointer.documentPointerMove$
-    .pipe(
-      filter(() => this.model.active()),
-      tap((event) => {
-        const point = this.clientToFlowPosition({ x: event.x, y: event.y });
-        this.model.setEnd(point);
+        this.model.setStart(this.clientToFlowPosition(start));
+      },
+      onMove: ({ point }) => {
+        this.model.setEnd(this.clientToFlowPosition(point));
         this.updatePreselection();
-      }),
-      takeUntilDestroyed(),
-    )
-    .subscribe();
-
-  protected endSub = this.rootPointer.documentPointerEnd$
-    .pipe(
-      filter(() => this.model.active()),
-      tap(() => this.finish()),
-      tap(() => {
-        this.flowStatusService.setSelectionBoxEndStatus();
-
-        setTimeout(() => this.flowStatusService.setIdleStatus());
-      }),
-      takeUntilDestroyed(),
-    )
-    .subscribe();
+      },
+      onEnd: () => this.finish(),
+      onCancel: () => this.finish(),
+    });
+    inject(DestroyRef).onDestroy(() => drag.destroy());
+  }
 
   private finish() {
     const rect = this.getSelectionRect();
-    if (!rect) {
-      this.clearPreselection();
-      this.model.reset();
-      return;
-    }
-
-    if (this.flowSettingsService.selectionMode() === 'manual') {
+    if (!rect || this.flowSettingsService.selectionMode() === 'manual') {
       this.clearPreselection();
       this.model.reset();
       return;
