@@ -202,6 +202,8 @@ export class VflowComponent {
   // #endregion
 
   // #region VIEWPORT
+  private rootElement = viewChild.required<ElementRef<HTMLElement>>('flow');
+  private paneElement = viewChild.required<ElementRef<HTMLElement>>('pane');
   private viewportElement = viewChild.required<ElementRef<HTMLElement>>('viewportElement');
 
   constructor() {
@@ -214,6 +216,13 @@ export class VflowComponent {
       const { x, y, zoom } = this.viewportService.readableViewport();
       // Camera movement must not reconcile every node, edge and label.
       this.viewportElement().nativeElement.style.transform = `translate(${x}px, ${y}px) scale(${zoom})`;
+    });
+
+    // The services that read the DOM get the elements from here, not from a class lookup.
+    effect(() => {
+      this.flowRenderingService.root.set(this.rootElement().nativeElement);
+      this.flowRenderingService.pane.set(this.paneElement().nativeElement);
+      this.flowRenderingService.viewport.set(this.viewportElement().nativeElement);
     });
 
     this.viewportService.viewportChangeEnd$

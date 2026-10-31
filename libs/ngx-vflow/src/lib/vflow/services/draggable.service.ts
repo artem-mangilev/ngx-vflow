@@ -15,6 +15,7 @@ import { ResizeObserverService } from './resize-observer.service';
 import { clientToFlowPosition } from '../utils/coordinates';
 import { PointerDrag, PointerDragContext, createPointerDrag } from '../gestures/pointer-drag';
 import { isNodeDragPress, pressTarget } from '../utils/press-target';
+import { FlowRenderingService } from './flow-rendering.service';
 import { AlignmentService } from './alignment.service';
 
 /** A node drag gesture, as the flow reports it: the start, each move and the end. */
@@ -35,6 +36,7 @@ export class DraggableService {
   private keyboardService = inject(KeyboardService);
   private resizeObserverService = inject(ResizeObserverService);
   private alignmentService = inject(AlignmentService);
+  private flowRenderingService = inject(FlowRenderingService);
   private injector = inject(Injector);
   private drags = new WeakMap<Element, PointerDrag>();
 
@@ -161,7 +163,7 @@ export class DraggableService {
 
     const startTrackingPaneGeometry = () => {
       stopTrackingPaneGeometry();
-      pane = element.closest('.v-pane') ?? element;
+      pane = this.flowRenderingService.pane() ?? element;
       paneRect = pane.getBoundingClientRect();
       observePanePosition();
       this.resizeObserverService.addObserver(pane, handlePaneResize);

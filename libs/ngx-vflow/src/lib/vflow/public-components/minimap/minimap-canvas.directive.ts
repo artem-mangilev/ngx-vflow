@@ -13,6 +13,7 @@ import {
 import { FlowEntitiesService } from '../../services/flow-entities.service';
 import { FlowSettingsService } from '../../services/flow-settings.service';
 import { ViewportService } from '../../services/viewport.service';
+import { FlowRenderingService } from '../../services/flow-rendering.service';
 import { getNodesFlowBounds } from '../../utils/nodes';
 import { clamp, getViewportBounds, getViewportForBounds } from '../../utils/viewport';
 import { MinimapPosition } from './minimap.component';
@@ -52,6 +53,7 @@ export class MinimapCanvasDirective {
   private entities = inject(FlowEntitiesService);
   private settings = inject(FlowSettingsService);
   private viewport = inject(ViewportService);
+  private flowRendering = inject(FlowRenderingService);
   private keyboard = inject(KeyboardService);
   private drag?: { id: number; start: Point; offset: Point; moved: boolean };
   private pixelRatio = signal(this.document.defaultView?.devicePixelRatio || 1);
@@ -73,8 +75,7 @@ export class MinimapCanvasDirective {
       const style = view?.getComputedStyle(this.canvas);
       const token = (name: string, fallback: string) => style?.getPropertyValue(name).trim() || fallback;
       const fallback = token('--v-background', '#fff');
-      // The minimap is content projected by the consumer, so the flow root is found through the DOM.
-      const root = this.canvas.closest('.v-root');
+      const root = this.flowRendering.root();
       const rootBackground = root && view ? view.getComputedStyle(root).backgroundColor : '';
       return {
         mask: token('--v-minimap-mask', 'rgb(177, 177, 183)'),

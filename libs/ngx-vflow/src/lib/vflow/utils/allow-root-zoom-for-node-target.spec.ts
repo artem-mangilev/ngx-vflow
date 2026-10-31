@@ -1,6 +1,6 @@
 import { allowRootZoomForNodeTarget } from './allow-root-zoom-for-node-target';
 
-// Which node elements pan the pane is covered by press-target.spec.ts; this covers what the wrapper adds.
+// Which elements pan the pane is covered by press-target.spec.ts; this covers what the wrapper adds.
 describe('allowRootZoomForNodeTarget', () => {
   function pointerdownOn(target: Element) {
     const event = new PointerEvent('pointerdown', { bubbles: true });
@@ -8,11 +8,11 @@ describe('allowRootZoomForNodeTarget', () => {
     return event;
   }
 
-  function nodeChild(...classes: string[]) {
-    const node = document.createElement('div');
-    node.classList.add('v-node', ...classes);
+  function child(parentAttribute?: string) {
+    const parent = document.createElement('div');
+    if (parentAttribute) parent.setAttribute(parentAttribute, '');
     const body = document.createElement('div');
-    node.append(body);
+    parent.append(body);
     return body;
   }
 
@@ -22,12 +22,12 @@ describe('allowRootZoomForNodeTarget', () => {
   });
 
   it('rejects any press while the selection modifier is held', () => {
-    expect(allowRootZoomForNodeTarget(pointerdownOn(document.createElement('div')), true)).toBe(false);
+    expect(allowRootZoomForNodeTarget(pointerdownOn(child()), true)).toBe(false);
   });
 
-  it('allows a press on the pane or on a node that does not drag, and rejects one that drags a node', () => {
-    expect(allowRootZoomForNodeTarget(pointerdownOn(document.createElement('div')), false)).toBe(true);
-    expect(allowRootZoomForNodeTarget(pointerdownOn(nodeChild('v-node--undraggable')), false)).toBe(true);
-    expect(allowRootZoomForNodeTarget(pointerdownOn(nodeChild()), false)).toBe(false);
+  it('allows a press that no control or handle keeps, and rejects one inside a no-pan part', () => {
+    expect(allowRootZoomForNodeTarget(pointerdownOn(child()), false)).toBe(true);
+    expect(allowRootZoomForNodeTarget(pointerdownOn(child('data-v-no-pan')), false)).toBe(false);
+    expect(allowRootZoomForNodeTarget(pointerdownOn(child('data-v-handle-type')), false)).toBe(false);
   });
 });

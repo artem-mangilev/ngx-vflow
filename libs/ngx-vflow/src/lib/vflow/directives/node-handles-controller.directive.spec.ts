@@ -5,6 +5,7 @@ import { NodeModel } from '../models/node.model';
 import { AfterRenderBatchService } from '../services/after-render-batch.service';
 import { ResizeObserverService } from '../services/resize-observer.service';
 import { ViewportService } from '../services/viewport.service';
+import { FlowRenderingService } from '../services/flow-rendering.service';
 import { NodeHandlesControllerDirective } from './node-handles-controller.directive';
 
 @Component({
@@ -59,6 +60,7 @@ describe('NodeHandlesControllerDirective', () => {
         { provide: ResizeObserverService, useValue: resizeObserver },
         { provide: AfterRenderBatchService, useValue: afterRender },
         { provide: ViewportService, useValue: { readableViewport: () => ({ zoom: 1, x: 0, y: 0 }) } },
+        { provide: FlowRenderingService, useValue: { viewport: () => null } },
       ],
     });
 

@@ -27,6 +27,7 @@
   @if (model().reconnectable() === true || model().reconnectable() === 'source') {
     <svg:circle
       class="v-reconnect-handle"
+      data-v-reconnect-handle
       data-v-no-select
       r="10"
       [attr.cx]="model().sourceHandle()!.pointAbsolute().x"
@@ -37,6 +38,7 @@
   @if (model().reconnectable() === true || model().reconnectable() === 'target') {
     <svg:circle
       class="v-reconnect-handle"
+      data-v-reconnect-handle
       data-v-no-select
       r="10"
       [attr.cx]="model().targetHandle()!.pointAbsolute().x"

@@ -59,9 +59,16 @@ export type HandleMeasureContext = {
   rects: Map<Element, DOMRect>;
 };
 
-/** `fallbackZoom` applies to a node that is rendered outside of a flow viewport, for example in a unit test. */
-export function createHandleMeasureContext(nodeElement: HTMLElement, fallbackZoom: number): HandleMeasureContext {
-  const viewport = nodeElement.closest<HTMLElement>('.v-viewport');
+/**
+ * `viewportElement` is the element that carries the zoom transform; `fallbackZoom` applies without one, for a node
+ * that is rendered outside of a flow, as in a unit test.
+ */
+export function createHandleMeasureContext(
+  nodeElement: HTMLElement,
+  viewportElement: HTMLElement | null,
+  fallbackZoom: number,
+): HandleMeasureContext {
+  const viewport = viewportElement;
   // jsdom has no DOMMatrixReadOnly; it has no layout either, so the zoom divides rectangles of zeros.
   const rendered = viewport && typeof DOMMatrixReadOnly !== 'undefined';
   const zoom = (rendered ? new DOMMatrixReadOnly(viewport.style.transform).a : fallbackZoom) || 1;

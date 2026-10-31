@@ -5,7 +5,7 @@ import { NODE_MODEL } from '../utils/node-model.token';
   standalone: true,
   selector: '[vDragHandle]',
   host: {
-    class: 'v-drag-handle',
+    'data-v-drag-handle': '',
   },
 })
 export class VflowDragHandleDirective {

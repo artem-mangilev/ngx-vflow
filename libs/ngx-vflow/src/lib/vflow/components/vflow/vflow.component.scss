@@ -102,9 +102,9 @@
     }
 
     // Touches on these start library gestures, so they must not scroll the page even where the pane lets it.
-    .v-handle,
-    .v-drag-handle,
-    .v-reconnect-handle,
+    [data-v-handle-type],
+    [data-v-drag-handle],
+    [data-v-reconnect-handle],
     .v-resize-control {
       touch-action: none;
     }

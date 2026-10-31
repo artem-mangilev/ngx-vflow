@@ -4,13 +4,9 @@
   left: 0;
   transform-origin: 0 0;
   pointer-events: all;
-  // A draggable node takes touch movement for its drag, also where the pane leaves touch scrolling to the page.
+  // A draggable node takes touch movement for its drag, also where the pane leaves touch scrolling to the page;
+  // the component writes `auto` on a node that does not drag from its body.
   touch-action: none;
-}
-
-:host(.v-node--undraggable),
-:host(.v-node--drag-handles-only) {
-  touch-action: auto;
 }
 
 // The halo is part of the zoomed content, like the node's border. A box shadow follows the host's corner radius, so a

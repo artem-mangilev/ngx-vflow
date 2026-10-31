@@ -13,6 +13,7 @@ import { KeyboardService } from './keyboard.service';
 import { ResizeObserverService } from './resize-observer.service';
 import { dispatchPointer, pointerEvent } from '../gestures/pointer-events.testing';
 import { AlignmentService } from './alignment.service';
+import { FlowRenderingService } from './flow-rendering.service';
 
 describe('DraggableService', () => {
   let service: DraggableService;
@@ -57,6 +58,7 @@ describe('DraggableService', () => {
         ViewportService,
         NodeRenderingService,
         AlignmentService,
+        { provide: FlowRenderingService, useValue: { pane: signal<HTMLElement | null>(null) } },
         { provide: ResizeObserverService, useValue: resizeObserverMock },
         {
           provide: KeyboardService,
@@ -144,7 +146,8 @@ describe('DraggableService', () => {
 
   function createDragSurface(...paneRects: DOMRect[]) {
     const pane = document.createElement('div');
-    pane.classList.add('v-pane');
+    // The flow registers its pane; a drag surface without one is the element itself.
+    TestBed.inject(FlowRenderingService).pane.set(pane);
     const nodesLayer = document.createElement('div');
     const element = document.createElement('div');
     nodesLayer.append(element);

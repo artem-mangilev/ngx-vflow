@@ -4,6 +4,7 @@ import { ResizeObserverService } from '../services/resize-observer.service';
 import { AfterRenderBatchService } from '../services/after-render-batch.service';
 import { createHandleMeasureContext, HandleModel } from '../models/handle.model';
 import { ViewportService } from '../services/viewport.service';
+import { FlowRenderingService } from '../services/flow-rendering.service';
 
 /**
  * Measures the handles of the node whenever their DOM may have changed: a handle is added, an observed element is
@@ -21,6 +22,7 @@ export class NodeHandlesControllerDirective {
   private readonly resizeObserverService = inject(ResizeObserverService);
   private readonly afterRenderBatch = inject(AfterRenderBatchService);
   private readonly viewportService = inject(ViewportService);
+  private readonly flowRenderingService = inject(FlowRenderingService);
   private readonly observedElements = new Set<Element>();
   private destroyed = false;
   private readonly resizeCallback = () => this.scheduleSync();
@@ -92,7 +94,11 @@ export class NodeHandlesControllerDirective {
 
     // The node rectangle, the rendered zoom and shared anchors are read once for every handle of the node.
     const handles = model.handles();
-    const context = createHandleMeasureContext(nodeElement, this.viewportService.readableViewport().zoom);
+    const context = createHandleMeasureContext(
+      nodeElement,
+      this.flowRenderingService.viewport(),
+      this.viewportService.readableViewport().zoom,
+    );
     const measurements = handles.map((handle) => handle.measure(context));
 
     handles.forEach((handle, index) => handle.applyMeasurement(measurements[index]));

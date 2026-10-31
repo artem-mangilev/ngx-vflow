@@ -124,7 +124,7 @@ describe('HandleModel', () => {
 
     expect(model.isMeasured()).toBe(true);
     expect(model.localPoint()).toEqual({ x: parentNode.width() / 2, y: parentNode.height() / 2 });
-    expect(model.measure(createHandleMeasureContext(parentNode.nodeElement()!, 1))).toBeNull();
+    expect(model.measure(createHandleMeasureContext(parentNode.nodeElement()!, null, 1))).toBeNull();
 
     // A side waits for a measurement again.
     position.set('right');
@@ -140,7 +140,7 @@ describe('HandleModel', () => {
     expect(parentNode.isReady()).toBe(true);
 
     element.getClientRects = () => [] as unknown as DOMRectList;
-    expect(model.measure(createHandleMeasureContext(parentNode.nodeElement()!, 1))).toBe(HANDLE_WITHOUT_BOX);
+    expect(model.measure(createHandleMeasureContext(parentNode.nodeElement()!, null, 1))).toBe(HANDLE_WITHOUT_BOX);
     syncHandle(model);
     syncHandle(model);
 

@@ -67,12 +67,6 @@ export class NodeComponent implements OnInit, OnDestroy {
 
   public model = input.required<NodeModel>();
 
-  protected readonly hostUndraggable = computed(() => !this.model().draggable());
-
-  protected readonly hostDragHandlesOnly = computed(
-    () => this.model().draggable() && this.model().dragHandlesCount() > 0,
-  );
-
   /**
    * An explicit size goes to the `[vResizable]` element when one exists, so its CSS min/max, padding and border
    * apply to the box that is measured. Without one, the wrapper carries the explicit axes; an `auto` axis stays unset.
@@ -86,9 +80,11 @@ export class NodeComponent implements OnInit, OnDestroy {
 
   constructor() {
     effect(() => {
-      const classes = this.hostRef.nativeElement.classList;
-      classes.toggle('v-node--undraggable', this.hostUndraggable());
-      classes.toggle('v-node--drag-handles-only', this.hostDragHandlesOnly());
+      // A node that drags takes touch movement for its drag, also where the pane leaves touch scrolling to the
+      // page; one that does not, or drags only from its drag handles, leaves the touch to the page.
+      const model = this.model();
+      const dragsFromBody = model.draggable() && model.dragHandlesCount() === 0;
+      this.hostRef.nativeElement.style.touchAction = dragsFromBody ? '' : 'auto';
     });
     // The node is pending until it is measured and every handle is placed (the flow stylesheet hides it). Once shown
     // it stays shown: a handle added later hides itself until it is measured, instead of blinking the whole node. A

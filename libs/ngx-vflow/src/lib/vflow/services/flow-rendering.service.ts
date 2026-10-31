@@ -1,5 +1,5 @@
 import { DOCUMENT } from '@angular/common';
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import { FlowEntitiesService } from './flow-entities.service';
 import { FlowSettingsService } from './flow-settings.service';
 import { extendedComputed } from '../utils/signals/extended-computed';
@@ -28,6 +28,15 @@ export class FlowRenderingService {
    * check forces a layout.
    */
   public readonly hasLayout = domHasLayout(inject(DOCUMENT));
+
+  /**
+   * The elements the flow renders into, registered by the flow component once its view exists: the root, the pane
+   * (the target of viewport gestures and the origin of flow coordinates) and the viewport (the element that carries
+   * the zoom transform). `null` before that, and for a node rendered outside of a flow, as in a unit test.
+   */
+  public readonly root = signal<HTMLElement | null>(null);
+  public readonly pane = signal<HTMLElement | null>(null);
+  public readonly viewport = signal<HTMLElement | null>(null);
 }
 
 /** A DOM without layout gives the window a size and the root element none. */
