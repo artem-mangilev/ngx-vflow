@@ -14,7 +14,7 @@ import { booleanAttribute, Directive, input } from '@angular/core';
   host: {
     class: `vui-node
       relative box-border rounded-vui-surface border border-vui-border
-      bg-vui-surface text-vui-foreground antialiased shadow-vui-node
+      bg-vui-surface text-vui-foreground shadow-vui-node
       data-[vui-selected=true]:border-vui-accent data-[vui-selected=true]:ring-1 data-[vui-selected=true]:ring-vui-accent
       forced-colors:data-[vui-selected=true]:outline-2 forced-colors:data-[vui-selected=true]:outline-offset-2
       forced-colors:data-[vui-selected=true]:outline-[Highlight]`,

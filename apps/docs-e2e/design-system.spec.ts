@@ -158,7 +158,7 @@ test('field connections follow stable IDs through rename, reorder, density and r
   await page.mouse.move(from.x + from.width / 2, from.y + from.height / 2);
   await page.mouse.down();
   await page.mouse.move(to.x + to.width / 2, to.y + to.height / 2, { steps: 12 });
-  await expect(target).toHaveAttribute('data-vui-state', 'valid');
+  await expect(target).toHaveAttribute('data-v-handle-state', 'valid');
   await page.mouse.up();
   await expect(demo.locator('path.vui-edge')).toHaveCount(2);
   // The label says what the new mapping does.
@@ -359,7 +359,7 @@ test('image lab: typed ports, previews that follow the wiring, native controls a
   await page.mouse.move(value.x, value.y);
   await page.mouse.down();
   await page.mouse.move(b.x, b.y, { steps: 12 });
-  await expect(blendB).toHaveAttribute('data-vui-state', 'invalid');
+  await expect(blendB).toHaveAttribute('data-v-handle-state', 'invalid');
   await page.mouse.up();
   await expect(demo.locator('path.vui-edge')).toHaveCount(6);
   // An input takes one edge: wiring the photo into B replaces the texture branch.

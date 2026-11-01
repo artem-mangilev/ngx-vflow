@@ -1,6 +1,6 @@
 /*
- * Workspace entry of @vflow/ui: docs and e2e compile it with Tailwind, with `@source` pointing at the
- * directive sources. It is not published: consumers get the parts and `vflow-ui.css`, imported here, through @vflow/cli.
+ * Tailwind entry of the docs for the @vflow/ui parts, with `@source` pointing at their sources in libs/ui. A consumer
+ * never gets it: the parts and `vflow-ui.css`, imported here, are copied into the application through @vflow/cli.
  *
  * Tailwind's default theme stands in for the application's: parts take its type utilities (`text-xs`, `font-semibold`)
  * and transition defaults, as they do from `@import 'tailwindcss'` in an application. Everything else comes from the
@@ -9,7 +9,7 @@
 @layer theme, base, utilities;
 @import 'tailwindcss/theme.css' layer(theme);
 @import 'tailwindcss/utilities.css' layer(utilities) source(none);
-@import './vflow-ui.css';
-@source './lib';
+@import '../../../libs/ui/src/vflow-ui.css';
+@source '../../../libs/ui/src/lib';
 /* Words from doc comments that would otherwise become global utilities, e.g. `.grid { display: grid }`. */
 @source not inline('container visible invisible outline transform grid ring shadow blur');

@@ -9,7 +9,7 @@ import { booleanAttribute, Directive, input } from '@angular/core';
   host: {
     class: `vui-group
       relative box-border rounded-vui-surface border border-vui-border
-      bg-vui-surface-muted text-vui-foreground antialiased
+      bg-vui-surface-muted text-vui-foreground
       data-[vui-selected=true]:border-vui-accent data-[vui-selected=true]:ring-1 data-[vui-selected=true]:ring-vui-accent
       forced-colors:data-[vui-selected=true]:outline-2 forced-colors:data-[vui-selected=true]:outline-offset-2
       forced-colors:data-[vui-selected=true]:outline-[Highlight]`,

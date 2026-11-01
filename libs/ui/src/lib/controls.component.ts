@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { VflowComponent } from 'ngx-vflow';
+import { VuiToolbar } from './overlay.directive';
 
 export interface VuiControlsLabels {
   group: string;
@@ -10,25 +11,23 @@ export interface VuiControlsLabels {
 
 /**
  * Viewport controls: zoom in, zoom out and fit view for the given flow instance, plus a slot for your own buttons.
- * Every button child, built-in or projected, is a square icon button without a fill at rest; give a projected one an
- * accessible name. Zoom respects the flow's `minZoom`/`maxZoom`; positioning is yours.
+ * The surface is `vuiToolbar`'s. Every button child, built-in or projected, is a square icon button without a fill at
+ * rest; give a projected one an accessible name. Zoom respects the flow's `minZoom`/`maxZoom`; positioning is yours.
  */
 @Component({
   selector: 'vui-controls',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  hostDirectives: [VuiToolbar],
   host: {
     class: `vui-controls
-      inline-flex box-border items-center gap-vui-1 p-vui-1 rounded-vui-surface
-      bg-vui-surface/85 backdrop-blur-vui-material backdrop-saturate-180 shadow-vui-floating antialiased
-      forced-colors:border forced-colors:border-[CanvasText]
       [&>button]:inline-flex [&>button]:box-border [&>button]:items-center [&>button]:justify-center [&>button]:size-vui-7
-      [&>button]:rounded-vui-control [&>button]:border [&>button]:border-transparent [&>button]:bg-transparent [&>button]:text-vui-muted
-      [&>button]:cursor-pointer [&>button]:select-none [&>button]:transition-colors
+      [&>button]:rounded-vui-control [&>button]:border-0 [&>button]:bg-transparent [&>button]:text-vui-muted
+      [&>button]:cursor-pointer [&>button]:transition-colors
       [&>button:enabled:hover]:bg-vui-surface-muted [&>button:enabled:hover]:text-vui-foreground
       [&>button:enabled:active]:bg-[color-mix(in_oklab,var(--vui-surface-muted),var(--vui-foreground)_12%)]
       [&>button:disabled]:opacity-40 [&>button:disabled]:cursor-not-allowed
       [&>button:focus-visible]:outline-2 [&>button:focus-visible]:outline-offset-2 [&>button:focus-visible]:outline-vui-accent
-      forced-colors:[&>button]:border-[ButtonText]`,
+      forced-colors:[&>button]:border forced-colors:[&>button]:border-[ButtonText]`,
     role: 'group',
     '[attr.aria-label]': 'labels().group',
   },

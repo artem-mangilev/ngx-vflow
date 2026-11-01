@@ -102,11 +102,8 @@
   --color-vui-accent: var(--vui-accent);
   --color-vui-success: var(--vui-success);
   --color-vui-danger: var(--vui-danger);
-  /* A part-local tone (`--vui-tone`, set by the part from the accent or one of the tones above). */
-  --color-vui-tone: var(--vui-tone);
 
   /* 4pt grid: `p-vui-3` is three spacing units. Control heights are 6/7/8 units (24/28/32px). */
-  --spacing-vui-0: 0px;
   --spacing-vui-1: var(--vui-space);
   --spacing-vui-2: calc(var(--vui-space) * 2);
   --spacing-vui-3: calc(var(--vui-space) * 3);

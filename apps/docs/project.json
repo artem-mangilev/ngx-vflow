@@ -52,7 +52,7 @@
           }
         ],
         "styles": [
-          "libs/ui/src/styles.css",
+          "apps/docs/src/vflow-ui-parts.css",
           "apps/docs/src/styles.scss",
           "apps/docs/src/app/shared/demo.css",
           "node_modules/@ng-doc/app/styles/global.css"
@@ -82,7 +82,7 @@
           "sourceMap": true,
           "namedChunks": true,
           "styles": [
-            "libs/ui/src/styles.css",
+            "apps/docs/src/vflow-ui-parts.css",
             "apps/docs/src/styles.scss",
             "apps/docs/src/app/shared/demo.css",
             "node_modules/@ng-doc/app/styles/global.css"

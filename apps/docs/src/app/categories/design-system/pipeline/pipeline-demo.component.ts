@@ -69,11 +69,11 @@ const EXPORT = { width: 1200, height: 780 };
     .vui-port[data-type='number'] {
       --type: #16a34a;
     }
-    .vui-port[data-type][data-vui-state='idle'] {
+    .vui-port[data-type][data-v-handle-state='idle'] {
       --vui-tone: var(--type);
       border-color: var(--type);
     }
-    .vui-port[data-type][data-vui-state='idle'][data-vui-connected='true'] {
+    .vui-port[data-type][data-v-handle-state='idle'][data-vui-connected='true'] {
       background: var(--type);
     }
     .vui-edge[data-type='number'] {

@@ -25,7 +25,7 @@ component. They style your own HTML/SVG without adding wrappers; `vuiPort` is it
 ## Styles
 
 The application needs Tailwind CSS v4. `ng g @vflow/cli:ui` copies the tokens (`vflow-ui.css`) next to its global
-stylesheet, imports them after Tailwind and copies the parts, whose utilities your Tailwind pipeline then generates. In this workspace `src/styles.css` compiles the parts for docs and e2e.
+stylesheet, imports them after Tailwind and copies the parts, whose utilities your Tailwind pipeline then generates. In this workspace `apps/docs/src/vflow-ui-parts.css` compiles the parts for docs and e2e.
 
 The parts use Tailwind utilities from the package's own `vui` theme keys (`bg-vui-surface`, `p-vui-3`,
 `rounded-vui-surface`), without a Tailwind prefix, and the application's type utilities (`text-xs`,

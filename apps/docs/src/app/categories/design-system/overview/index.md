@@ -66,7 +66,7 @@ Three kinds of state stay separate so they can be shown at once:
 - **Action availability** is the native `disabled` attribute on your buttons, driven by your rules such as read-only.
 
 Ports mirror two independent facts: the core feedback for the connection in progress (`idle`, `valid`, `invalid`),
-read from the core handle that `vuiPort` applies to the same element (`vuiPortState` only overrides it); `vuiPortConnected` is your
+read from the core `data-v-handle-state` attribute of the handle that `vuiPort` applies to the same element; `vuiPortConnected` is your
 knowledge about existing edges. An idle port is an 8px ring, filled once connected. A hovered port that can start a connection,
 the port a connection is drawn from and the candidate under the pointer get a halo in the state color (selection,
 success, danger) that draws the ring 2px larger without changing its box, so the endpoint never moves. A valid
@@ -118,7 +118,7 @@ not part of the library; `@vflow/ui` declares `ngx-vflow` as a peer dependency f
 
 Each directive is independently importable. Apart from `vui-controls`, none imports ngx-vflow; none owns
 graph state, adds wrapper elements, registers ports or changes accessibility roles. Public selectors are the
-`.vui-*` classes named after the attributes, for example `.vui-title` or `.vui-port[data-vui-state='valid']`.
+`.vui-*` classes named after the attributes, for example `.vui-title` or `.vui-port[data-v-handle-state='valid']`.
 A role looks the same in every shell; a row that needs its own look, such as a group title, is a part of its own.
 
 ## Themes and composition
