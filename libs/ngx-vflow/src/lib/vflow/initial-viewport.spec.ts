@@ -63,7 +63,7 @@ describe('Initial viewport', () => {
     // Mutation callbacks run after every task, so they see every state the browser could paint.
     const check = () => {
       const initialized = fixture.componentInstance.initialized > 0;
-      const nodes = Array.from(root.querySelectorAll<HTMLElement>('.v-node'));
+      const nodes = Array.from(root.querySelectorAll<HTMLElement>('[data-v-node]'));
       const shown = [...nodes, ...Array.from(root.querySelectorAll('svg[edge], .v-background-svg'))].filter(
         (element) => getComputedStyle(element).visibility === 'visible',
       );
@@ -99,7 +99,7 @@ describe('Initial viewport', () => {
 
   it('does not keep the graph hidden for a node without a layout box', async () => {
     const style = document.createElement('style');
-    style.textContent = '.v-node:has(.no-box) { display: none; }';
+    style.textContent = '[data-v-node]:has(.no-box) { display: none; }';
     document.head.append(style);
 
     try {
@@ -115,7 +115,7 @@ describe('Initial viewport', () => {
       await frames(8);
 
       expect(initialized).toBe(true);
-      const shown = fixture.nativeElement.querySelector('.v-node:not(:has(.no-box))');
+      const shown = fixture.nativeElement.querySelector('[data-v-node]:not(:has(.no-box))');
       expect(getComputedStyle(shown).visibility).toBe('visible');
     } finally {
       style.remove();

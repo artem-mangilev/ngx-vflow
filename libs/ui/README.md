@@ -46,7 +46,7 @@ cascade layers; unlayered application styles override them.
 Buttons and badges come from your design system, as React Flow UI takes them from shadcn/ui; `vui-controls` gives
 its projected buttons the look of its own.
 
-Bind the `selected` input of `vuiNode`, `vuiGroup` and `vuiEdge` to `ctx.selected() || ctx.preselected()`. Put `vuiPort` with the handle inputs `handleType`,
+`vuiNode`, `vuiGroup` and `vuiEdge` show the selection of their core host (`data-v-selected`, `data-v-preselected`); nothing to bind. Put `vuiPort` with the handle inputs `handleType`,
 `position`, `handleId`, `canStart` and `canAccept` on the element that is the connection point: it applies core
 `vHandle` as a host directive and shows its connection feedback. For flow interaction compose the parts with core
 gesture exclusions (`vNoDrag`, `vNoSelect`); a click on a presentation selects its node or edge, and

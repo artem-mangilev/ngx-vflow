@@ -82,7 +82,7 @@ describe('Vflow in a DOM without layout', () => {
   });
 
   it('renders component and template node presentations with their data', () => {
-    const nodes = Array.from(element.querySelectorAll('.v-node'));
+    const nodes = Array.from(element.querySelectorAll('[data-v-node]'));
 
     expect(nodes.map((node) => node.textContent?.replace(/\s+/g, ' ').trim())).toEqual([
       'ReviewDelete',
@@ -96,7 +96,7 @@ describe('Vflow in a DOM without layout', () => {
     const visibility = (selector: string) => getComputedStyle(element.querySelector(selector)!).visibility;
 
     expect(
-      ['.v-node button', '.note', '.edge-path', '.v-edge-labels-layer > *', '.v-viewport', 'v-minimap'].filter(
+      ['[data-v-node] button', '.note', '.edge-path', '.v-edge-labels-layer > *', '.v-viewport', 'v-minimap'].filter(
         (selector) => visibility(selector) === 'hidden',
       ),
     ).toEqual([]);

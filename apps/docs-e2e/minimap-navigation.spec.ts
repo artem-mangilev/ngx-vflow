@@ -15,7 +15,7 @@ async function geometry(graph: Locator) {
     const pane = element.querySelector('.v-pane')!.getBoundingClientRect();
     const canvas = element.querySelector('canvas')!.getBoundingClientRect();
     const matrix = new DOMMatrix(getComputedStyle(element.querySelector('.v-viewport')!).transform);
-    const nodes = Array.from(element.querySelectorAll('.v-node'), (node) => node.getBoundingClientRect());
+    const nodes = Array.from(element.querySelectorAll('[data-v-node]'), (node) => node.getBoundingClientRect());
     const left = (Math.min(...nodes.map((node) => node.left)) - pane.left - matrix.e) / matrix.a;
     const top = (Math.min(...nodes.map((node) => node.top)) - pane.top - matrix.f) / matrix.a;
     const right = (Math.max(...nodes.map((node) => node.right)) - pane.left - matrix.e) / matrix.a;

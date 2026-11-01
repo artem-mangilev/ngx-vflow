@@ -56,8 +56,8 @@ describe('selection by click', () => {
 
   const node = (id: string) => host.nodes().find((n) => n.id === id)!;
   const edge = (id: string) => host.edges().find((e) => e.id === id)!;
-  const nodeElement = (id: string) => root.querySelectorAll<HTMLElement>('.v-node')[['a', 'b', 'c'].indexOf(id)];
-  const edgeElement = (id: string) => root.querySelectorAll<SVGElement>('.v-edge')[['a-b', 'a-c'].indexOf(id)];
+  const nodeElement = (id: string) => root.querySelectorAll<HTMLElement>('[data-v-node]')[['a', 'b', 'c'].indexOf(id)];
+  const edgeElement = (id: string) => root.querySelectorAll<SVGElement>('[data-v-edge]')[['a-b', 'a-c'].indexOf(id)];
   const click = (target: Element) => target.dispatchEvent(new MouseEvent('click', { bubbles: true }));
 
   async function settle() {

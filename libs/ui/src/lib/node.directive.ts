@@ -1,11 +1,12 @@
-import { booleanAttribute, Directive, input } from '@angular/core';
+import { Directive } from '@angular/core';
 
 /**
  * Card shell. Its border is the edge of the surface; the separators inside (header, footer, rows) use the
  * lighter `separator` color so the card reads as one surface. Dimensions, content, semantics and interaction belong to the consumer and core. The resting shadow has
  * no blur: a blurred shadow is rasterized again on every zoom step and pan of every visible node, which on a large
  * flow at a high pixel ratio costs more GPU time than the rest of the node.
- * Selection colors the edge itself: the border and a 1px box-shadow ring outside it, with no gap. A box shadow is painted
+ * Selection is read from the core node host (`data-v-selected`, or `data-v-preselected` inside the selection box) and
+ * colors the edge itself: the border and a 1px box-shadow ring outside it, with no gap. A box shadow is painted
  * under the content, so ports on the edge stay on top of it, as on the resting border; an outline would cross them.
  * Forced colors drop box shadows, so there the selection is an offset outline in `Highlight`.
  */
@@ -15,16 +16,15 @@ import { booleanAttribute, Directive, input } from '@angular/core';
     class: `vui-node
       relative box-border rounded-vui-surface border border-vui-border
       bg-vui-surface text-vui-foreground shadow-vui-node
-      data-[vui-selected=true]:border-vui-accent data-[vui-selected=true]:ring-1 data-[vui-selected=true]:ring-vui-accent
-      forced-colors:data-[vui-selected=true]:outline-2 forced-colors:data-[vui-selected=true]:outline-offset-2
-      forced-colors:data-[vui-selected=true]:outline-[Highlight]`,
-    '[attr.data-vui-selected]': 'selected()',
+      [&:is([data-v-selected]_*,[data-v-preselected]_*)]:border-vui-accent
+      [&:is([data-v-selected]_*,[data-v-preselected]_*)]:ring-1
+      [&:is([data-v-selected]_*,[data-v-preselected]_*)]:ring-vui-accent
+      forced-colors:[&:is([data-v-selected]_*,[data-v-preselected]_*)]:outline-2
+      forced-colors:[&:is([data-v-selected]_*,[data-v-preselected]_*)]:outline-offset-2
+      forced-colors:[&:is([data-v-selected]_*,[data-v-preselected]_*)]:outline-[Highlight]`,
   },
 })
-export class VuiNode {
-  /** Selection presentation: bind the core state, e.g. `ctx.selected() || ctx.preselected()`, or your own. */
-  readonly selected = input(false, { transform: booleanAttribute });
-}
+export class VuiNode {}
 
 /**
  * Header row, set in semibold: items share the baseline of the title's first line, so an icon, meta or badge

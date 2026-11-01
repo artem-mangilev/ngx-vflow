@@ -42,7 +42,7 @@ import { VflowHandleDirective } from 'ngx-vflow';
       data-[v-handle-state=connecting]:border-vui-accent data-[v-handle-state=connecting]:bg-vui-accent data-[v-handle-state=connecting]:shadow-(--vui-port-halo)
       data-[v-handle-state=valid]:[--vui-tone:var(--vui-success)] data-[v-handle-state=valid]:border-vui-success data-[v-handle-state=valid]:bg-vui-success data-[v-handle-state=valid]:shadow-(--vui-port-halo)
       data-[v-handle-state=invalid]:[--vui-tone:var(--vui-danger)] data-[v-handle-state=invalid]:border-vui-danger data-[v-handle-state=invalid]:bg-vui-surface data-[v-handle-state=invalid]:shadow-(--vui-port-halo)
-      [&[data-vui-reveal=interaction][data-v-handle-state=idle]:not([data-vui-connected=true],.v-node:hover_*,.v-node:focus-within_*,[data-vui-selected=true]_*)]:opacity-0
+      [&[data-vui-reveal=interaction][data-v-handle-state=idle]:not([data-vui-connected=true],[data-v-node]:hover_*,[data-v-node]:focus-within_*,[data-v-selected]_*,[data-v-preselected]_*)]:opacity-0
       forced-colors:bg-[ButtonText] forced-colors:border-[Canvas] forced-colors:opacity-100 forced-colors:shadow-none forced-colors:[forced-color-adjust:none]`,
     '[attr.data-vui-connected]': 'vuiPortConnected()',
     '[attr.data-vui-reveal]': 'vuiPortReveal()',

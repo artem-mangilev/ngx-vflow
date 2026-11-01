@@ -170,7 +170,7 @@ describe('public auto-pan settings', () => {
       it(`${enabled ? 'enables' : 'disables'} auto-pan for ${reconnect ? 'reconnection' : 'connection creation'}`, async () => {
         await setup({ nodeDrag: false, connectionDrag: enabled });
         const target = fixture.nativeElement.querySelector(
-          reconnect ? '.v-reconnect-handle' : '.v-handle[data-v-handle-type="source"]',
+          reconnect ? '.v-reconnect-handle' : '[data-v-handle][data-v-handle-type="source"]',
         );
         expect(target).not.toBeNull();
         const rect = fixture.nativeElement.querySelector('.v-root').getBoundingClientRect();

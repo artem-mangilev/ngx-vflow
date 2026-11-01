@@ -21,7 +21,7 @@ import { pressTarget } from '../utils/press-target';
   exportAs: 'vHandle',
   standalone: true,
   host: {
-    class: 'v-handle',
+    'data-v-handle': '',
     '[attr.data-v-handle-type]': 'handleType()',
     '[attr.data-v-handle-position]': 'position()',
     '[attr.data-v-handle-state]': 'state()',

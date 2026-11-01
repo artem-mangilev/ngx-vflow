@@ -83,7 +83,7 @@ describe('connection outputs', () => {
 
   function handle(node: string, id: 'in' | 'out') {
     const index = ['a', 'b', 'c'].indexOf(node);
-    return fixture.nativeElement.querySelectorAll('.v-node')[index].querySelector(`[vHandle][handleId="${id}"]`);
+    return fixture.nativeElement.querySelectorAll('[data-v-node]')[index].querySelector(`[vHandle][handleId="${id}"]`);
   }
 
   /** Presses on `from`, enters `to` and releases on it, as a pointer drag between two handles does. */

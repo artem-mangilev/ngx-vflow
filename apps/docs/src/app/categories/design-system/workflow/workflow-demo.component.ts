@@ -35,10 +35,10 @@ type EdgeState = 'taken' | 'open' | 'skipped';
       min-height: calc(28px + 6 * var(--vui-space) + 1px);
     }
     /* The process state is application CSS on the public selectors; selection keeps the library color. */
-    .vui-edge[data-state='taken']:not([data-vui-selected='true']) {
+    [data-v-edge]:not([data-v-selected]) .vui-edge[data-state='taken'] {
       stroke: var(--vui-success);
     }
-    .vui-edge[data-state='skipped']:not([data-vui-selected='true']) {
+    [data-v-edge]:not([data-v-selected]) .vui-edge[data-state='skipped'] {
       stroke-dasharray: 4 4;
       opacity: 0.45;
     }
@@ -58,7 +58,7 @@ type EdgeState = 'taken' | 'open' | 'skipped';
           [maxZoom]="2"
           (initialized)="flow()?.fitView()">
           <ng-template let-ctx vNode>
-            <article vuiNode [selected]="ctx.selected() || ctx.preselected()" [attr.data-step]="ctx.node.id">
+            <article vuiNode [attr.data-step]="ctx.node.id">
               <header vuiNodeHeader>
                 <span vuiIcon><app-demo-icon [name]="ctx.data().icon" /></span>
                 <span vuiTitle>{{ ctx.data().title }}</span>
@@ -125,12 +125,7 @@ type EdgeState = 'taken' | 'open' | 'skipped';
           <ng-template let-ctx vEdge>
             @let state = edgeState(ctx.edge.id);
             <svg:g vEdgeInteraction>
-              <svg:path
-                vuiEdge
-                [attr.d]="ctx.path()"
-                [attr.marker-end]="ctx.markerEnd()"
-                [attr.data-state]="state"
-                [selected]="ctx.selected() || ctx.preselected()" />
+              <svg:path vuiEdge [attr.d]="ctx.path()" [attr.marker-end]="ctx.markerEnd()" [attr.data-state]="state" />
             </svg:g>
             @if (ctx.data()?.start; as text) {
               <span *vEdgeLabel="'start'" vuiEdgeLabel [attr.data-label]="text" [attr.data-state]="state">{{

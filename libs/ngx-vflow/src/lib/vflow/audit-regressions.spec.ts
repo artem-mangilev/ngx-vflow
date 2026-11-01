@@ -222,15 +222,15 @@ describe('Graph rendering and interaction regressions', () => {
     fixture.detectChanges();
     await fixture.whenStable();
     const host = fixture.nativeElement as HTMLElement;
-    expect(host.querySelectorAll('.v-node').length).toBe(2);
+    expect(host.querySelectorAll('[data-v-node]').length).toBe(2);
     expect(host.querySelectorAll('svg[edge]').length).toBe(1);
     fixture.componentInstance.setViewport({ ...fixture.componentInstance.viewport(), x: 1000, y: 0 });
     fixture.detectChanges();
     await fixture.whenStable();
-    expect(host.querySelectorAll('.v-node').length).toBe(2);
+    expect(host.querySelectorAll('[data-v-node]').length).toBe(2);
     expect(host.querySelectorAll('svg[edge]').length).toBe(1);
     expect(
-      Array.from(host.querySelectorAll('.v-node, svg[edge]')).every(
+      Array.from(host.querySelectorAll('[data-v-node], svg[edge]')).every(
         (element) => getComputedStyle(element).display === 'none',
       ),
     ).toBe(true);
@@ -238,7 +238,7 @@ describe('Graph rendering and interaction regressions', () => {
     fixture.detectChanges();
     await fixture.whenStable();
     await settle();
-    expect(host.querySelectorAll('.v-node').length).toBe(2);
+    expect(host.querySelectorAll('[data-v-node]').length).toBe(2);
     expect(host.querySelectorAll('svg[edge]').length).toBe(1);
     expect(events).not.toContainEqual({ type: 'detached', id: 'a-b' });
     subscription.unsubscribe();

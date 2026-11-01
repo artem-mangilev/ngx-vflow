@@ -61,7 +61,7 @@ The node shell's resting shadow has no blur (`0 1px 0`). A blurred shadow is ras
 
 Three kinds of state stay separate so they can be shown at once:
 
-- **Interaction** is owned by core: bind the `selected` input of `vuiNode`, `vuiGroup` and `vuiEdge` to `ctx.selected() || ctx.preselected()`, or to a state of your own. Focus comes from the core wrapper.
+- **Interaction** is owned by core and read from its DOM: `vuiNode`, `vuiGroup` and `vuiEdge` show the selection of the node or edge host they are in (`data-v-selected`, or `data-v-preselected` inside the selection box). Focus comes from the core wrapper.
 - **Diagnostics** about the model and **application status** are both your vocabulary and your components: one badge of your design system per message, so a warning and a running status sit side by side. A status is presentation only and never disables anything; let the text name the activity ("Running", "Syncing"), and put an indicator that changes while the user works in a `role="status"` region of yours so screen readers hear it.
 - **Action availability** is the native `disabled` attribute on your buttons, driven by your rules such as read-only.
 
@@ -103,15 +103,15 @@ not part of the library; `@vflow/ui` declares `ngx-vflow` as a peer dependency f
 
 | Import                                          | Attribute                                                            | Responsibility                                                                                     |
 | ----------------------------------------------- | -------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
-| `VuiNode`                                       | `vuiNode [selected]="ctx.selected() \|\| ctx.preselected()"`         | Node surface; consumer chooses size and content                                                    |
+| `VuiNode`                                       | `vuiNode`                                                            | Node surface; consumer chooses size and content                                                    |
 | `VuiNodeHeader`, `VuiNodeBody`, `VuiNodeFooter` | `vuiNodeHeader`, `vuiNodeBody`, `vuiNodeFooter`                      | Optional anatomy on consumer elements                                                              |
 | `VuiRow`                                        | `vuiRow`                                                             | Row (field, typed port, list item) with room for text roles and core handles                       |
-| `VuiGroup`                                      | `vuiGroup [selected]="…"`                                            | Tinted group with a hairline; parent relationships remain explicit in graph data                   |
+| `VuiGroup`                                      | `vuiGroup`                                                           | Tinted group with a hairline; parent relationships remain explicit in graph data                   |
 | `VuiGroupHeader`                                | `vuiGroupHeader`                                                     | Title row of a group with room for meta, an icon and actions                                       |
 | `VuiTitle`, `VuiMeta`                           | `vuiTitle`, `vuiMeta`                                                | Primary wrapping text and secondary text in any shell                                              |
 | `VuiIcon`, `VuiActions`                         | `vuiIcon`, `vuiActions`                                              | Leading slot for an icon or avatar of any size, and a group of controls; add `vNoDrag` to controls |
 | `VuiPort`                                       | `vuiPort handleType="target" position="left" [vuiPortConnected]="…"` | A core handle with the port look: idle/valid/invalid from the handle, connected, `vuiPortReveal`   |
-| `VuiEdge`                                       | `vuiEdge [selected]="…"` on an SVG path                              | Stroke; bind core path and marker URLs yourself                                                    |
+| `VuiEdge`                                       | `vuiEdge` on an SVG path                                             | Stroke; bind core path and marker URLs yourself                                                    |
 | `VuiEdgeLabel`                                  | `vuiEdgeLabel`                                                       | HTML label surface, including optional native controls                                             |
 | `VuiToolbar`                                    | `vuiToolbar`                                                         | Surface for `v-node-toolbar` content                                                               |
 | `VuiControls`                                   | `<vui-controls [flow]="flow">`                                       | Viewport controls for one flow instance; project plain icon buttons                                |

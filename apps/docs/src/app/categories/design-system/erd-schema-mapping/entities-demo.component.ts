@@ -77,7 +77,7 @@ const TYPES = ['uuid', 'text', 'decimal', 'timestamp'];
     }
     .vui-row:hover .row-action,
     .vui-row:focus-within .row-action,
-    article[data-vui-selected='true'] .row-action {
+    [data-v-selected] .row-action {
       opacity: 1;
     }
     /* The remove button of a label shows on hover and while its edge is selected; Delete removes it as well. */
@@ -160,7 +160,6 @@ const TYPES = ['uuid', 'text', 'decimal', 'timestamp'];
           @if (ctx.data().kind === 'frame') {
             <div
               vuiGroup
-              [selected]="ctx.selected() || ctx.preselected()"
               [attr.data-frame]="ctx.node.id"
               [style.width.px]="ctx.width()"
               [style.height.px]="ctx.height()">
@@ -170,7 +169,7 @@ const TYPES = ['uuid', 'text', 'decimal', 'timestamp'];
             </div>
           } @else {
             @let view = scroll.visibility(ctx.node.id);
-            <article vuiNode [selected]="ctx.selected() || ctx.preselected()" [attr.data-entity]="ctx.node.id">
+            <article vuiNode [attr.data-entity]="ctx.node.id">
               <header vuiNodeHeader [class.proxy]="view.above.length > 0">
                 <span vuiTitle>{{ ctx.data().title }}</span>
                 <span vuiMeta>{{ ctx.data().category }}</span>
@@ -278,7 +277,7 @@ const TYPES = ['uuid', 'text', 'decimal', 'timestamp'];
         </ng-template>
         <ng-template let-ctx vEdge>
           <svg:g vEdgeInteraction>
-            <svg:path vuiEdge [attr.d]="ctx.path()" [selected]="ctx.selected() || ctx.preselected()" />
+            <svg:path vuiEdge [attr.d]="ctx.path()" />
           </svg:g>
           @if (ctx.data()?.label; as label) {
             <span *vEdgeLabel vuiEdgeLabel [attr.data-selected]="ctx.selected()">

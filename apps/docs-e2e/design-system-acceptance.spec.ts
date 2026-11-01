@@ -13,7 +13,7 @@ for (const [route, selector] of pages) {
     await page.goto(`/design-system/${route}`);
     const demo = page.locator(selector);
     await demo.evaluate((element) => element.scrollIntoView({ block: 'center' }));
-    await expect(demo.locator('.v-node').first()).toBeVisible();
+    await expect(demo.locator('[data-v-node]').first()).toBeVisible();
     // Let the fit-view animation finish: axe samples backgrounds of moving elements unreliably.
     const viewportTransform = () =>
       demo
@@ -34,7 +34,7 @@ for (const [route, selector] of pages) {
       ),
     ).toEqual([]);
     // Core keeps focus on its wrappers; the theme maps --v-focus, so the halo is the selection color, tinted.
-    const wrapper = demo.locator('.v-node').first();
+    const wrapper = demo.locator('[data-v-node]').first();
     await wrapper.focus();
     await expect(wrapper).toBeFocused();
     await expect(wrapper).toHaveCSS('box-shadow', /^oklab\((0\.546 .* \/ 0\.28|0\.623 .* \/ 0\.5)\) 0px 0px 0px 4px$/);
@@ -45,10 +45,14 @@ async function rowEndpointError(demo: Locator) {
   return demo.evaluate((root) => {
     const edge = root.querySelectorAll<SVGPathElement>('path.vui-edge')[1];
     const source = root
-      .querySelector('[data-entity="crm"] [data-field="email"] .vui-port.v-handle[data-v-handle-position="right"]')!
+      .querySelector(
+        '[data-entity="crm"] [data-field="email"] .vui-port[data-v-handle][data-v-handle-position="right"]',
+      )!
       .getBoundingClientRect();
     const target = root
-      .querySelector('[data-entity="erp"] [data-field="email"] .vui-port.v-handle[data-v-handle-position="left"]')!
+      .querySelector(
+        '[data-entity="erp"] [data-field="email"] .vui-port[data-v-handle][data-v-handle-position="left"]',
+      )!
       .getBoundingClientRect();
     const matrix = edge.getScreenCTM()!;
     const start = edge.getPointAtLength(0).matrixTransform(matrix);
@@ -95,7 +99,9 @@ test('geometry: endpoints stay on ports after zooming through the controls', asy
   const endpointError = () =>
     workflow.evaluate((root) => {
       const edge = root.querySelectorAll<SVGPathElement>('path.vui-edge')[0];
-      const port = root.querySelector('.v-node .v-handle[data-v-handle-position="right"]')!.getBoundingClientRect();
+      const port = root
+        .querySelector('[data-v-node] [data-v-handle][data-v-handle-position="right"]')!
+        .getBoundingClientRect();
       const start = edge.getPointAtLength(0).matrixTransform(edge.getScreenCTM()!);
       return Math.max(Math.abs(start.x - port.right), Math.abs(start.y - port.y - port.height / 2));
     });

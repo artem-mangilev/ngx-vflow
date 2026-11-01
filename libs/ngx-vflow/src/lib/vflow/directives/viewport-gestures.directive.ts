@@ -425,7 +425,7 @@ export class ViewportGesturesDirective implements OnInit, OnDestroy {
 
     // A click on the pane, outside every node and edge, clears the selection; a pan keeps it. A click on a node or
     // an edge is handled by that entity, not by the pane.
-    if (this.isClick(gesture) && !target.closest('.v-node, .v-edge')) {
+    if (this.isClick(gesture) && !target.closest('[data-v-node], [data-v-edge]')) {
       this.zone.run(() => this.selectionService.select(null));
     }
   }

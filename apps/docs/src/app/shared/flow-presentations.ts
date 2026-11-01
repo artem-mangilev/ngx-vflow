@@ -48,11 +48,7 @@ interface EdgeCtx {
   `,
   template: `
     @if (isGroup()) {
-      <div
-        vuiGroup
-        [selected]="ctx().selected() || ctx().preselected()"
-        [style.width.px]="ctx().width()"
-        [style.height.px]="ctx().height()">
+      <div vuiGroup [style.width.px]="ctx().width()" [style.height.px]="ctx().height()">
         @if (title(); as title) {
           <header vuiGroupHeader>
             <span vuiTitle>{{ title }}</span>
@@ -60,7 +56,7 @@ interface EdgeCtx {
         }
       </div>
     } @else {
-      <div vuiNode class="card" [selected]="ctx().selected() || ctx().preselected()">
+      <div vuiNode class="card">
         @if (html()) {
           <span [innerHTML]="text()"></span>
         } @else {
@@ -95,8 +91,7 @@ export class DocsNodeComponent {
       vuiEdge
       [attr.d]="ctx().path()"
       [attr.marker-start]="ctx().markerStart()"
-      [attr.marker-end]="ctx().markerEnd()"
-      [selected]="ctx().selected() || ctx().preselected()" />
+      [attr.marker-end]="ctx().markerEnd()" />
     @if (label(); as label) {
       <span *vEdgeLabel vuiEdgeLabel>{{ label }}</span>
     }

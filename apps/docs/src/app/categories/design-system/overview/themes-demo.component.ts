@@ -45,7 +45,7 @@ import { createEdges, createNodes, Vflow } from 'ngx-vflow';
           <p>Editor A: {{ dark() ? 'dark' : 'light' }}</p>
           <vflow [nodes]="nodes" [edges]="edges">
             <ng-template let-ctx vNode>
-              <article vuiNode [selected]="ctx.selected() || ctx.preselected()">
+              <article vuiNode>
                 <header vuiNodeHeader>
                   <span vuiTitle>{{ ctx.data().title }}</span>
                 </header>
@@ -55,11 +55,7 @@ import { createEdges, createNodes, Vflow } from 'ngx-vflow';
             </ng-template>
             <ng-template let-ctx vEdge>
               <svg:g vEdgeInteraction>
-                <svg:path
-                  vuiEdge
-                  [attr.d]="ctx.path()"
-                  [attr.marker-end]="ctx.markerEnd()"
-                  [selected]="ctx.selected() || ctx.preselected()" />
+                <svg:path vuiEdge [attr.d]="ctx.path()" [attr.marker-end]="ctx.markerEnd()" />
               </svg:g>
             </ng-template>
             <v-minimap />
@@ -69,7 +65,7 @@ import { createEdges, createNodes, Vflow } from 'ngx-vflow';
           <p>Editor B: dark</p>
           <vflow [nodes]="nodes" [edges]="edges">
             <ng-template let-ctx vNode>
-              <article vuiNode [selected]="ctx.selected() || ctx.preselected()">
+              <article vuiNode>
                 <header vuiNodeHeader>
                   <span vuiTitle>{{ ctx.data().title }}</span>
                 </header>
@@ -79,11 +75,7 @@ import { createEdges, createNodes, Vflow } from 'ngx-vflow';
             </ng-template>
             <ng-template let-ctx vEdge>
               <svg:g vEdgeInteraction>
-                <svg:path
-                  vuiEdge
-                  [attr.d]="ctx.path()"
-                  [attr.marker-end]="ctx.markerEnd()"
-                  [selected]="ctx.selected() || ctx.preselected()" />
+                <svg:path vuiEdge [attr.d]="ctx.path()" [attr.marker-end]="ctx.markerEnd()" />
               </svg:g>
             </ng-template>
             <v-minimap />

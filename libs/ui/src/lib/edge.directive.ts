@@ -1,20 +1,19 @@
-import { booleanAttribute, Directive, input } from '@angular/core';
+import { Directive } from '@angular/core';
 
-/** SVG presentation only. Put it inside a core `vEdgeInteraction` group for the hit area and selection. */
+/**
+ * SVG presentation only. Put it inside a core `vEdgeInteraction` group for the hit area and selection, which is read
+ * from the core edge host (`data-v-selected`, `data-v-preselected`).
+ */
 @Directive({
   selector: 'path[vuiEdge]',
   host: {
     class: `vui-edge
       fill-none stroke-2 [stroke-linejoin:round]
-      stroke-vui-muted data-[vui-selected=true]:stroke-vui-accent
-      forced-colors:stroke-[CanvasText] forced-colors:data-[vui-selected=true]:stroke-[Highlight]`,
-    '[attr.data-vui-selected]': 'selected()',
+      stroke-vui-muted [&:is([data-v-selected]_*,[data-v-preselected]_*)]:stroke-vui-accent
+      forced-colors:stroke-[CanvasText] forced-colors:[&:is([data-v-selected]_*,[data-v-preselected]_*)]:stroke-[Highlight]`,
   },
 })
-export class VuiEdge {
-  /** Selection presentation: bind the core state, e.g. `ctx.selected() || ctx.preselected()`, or your own. */
-  readonly selected = input(false, { transform: booleanAttribute });
-}
+export class VuiEdge {}
 
 /** HTML label surface for an edge label template. */
 @Directive({

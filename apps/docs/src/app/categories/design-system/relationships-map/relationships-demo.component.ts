@@ -176,7 +176,6 @@ const LAYOUT = { inset: 16, header: 52, gap: 16, step: 8 };
               [class.nested]="!!ctx.node.parentId?.()"
               [attr.data-team]="ctx.node.id"
               [attr.data-drop-target]="dropTarget()?.team === ctx.node.id ? dropTarget()!.state : null"
-              [selected]="ctx.selected() || ctx.preselected()"
               [vResizable]="ctx.selected()"
               [minWidth]="240"
               [minHeight]="120">
@@ -190,13 +189,7 @@ const LAYOUT = { inset: 16, header: 52, gap: 16, step: 8 };
           } @else {
             @switch (ctx.data().kind) {
               @case ('person') {
-                <article
-                  vuiNode
-                  vHandle
-                  handleType="any"
-                  position="auto"
-                  class="person"
-                  [selected]="ctx.selected() || ctx.preselected()">
+                <article vuiNode vHandle handleType="any" position="auto" class="person">
                   <header vuiNodeHeader vDragHandle>
                     <!-- The slot centers the 28px avatar on the first line of the name. -->
                     <span vuiIcon>
@@ -222,7 +215,7 @@ const LAYOUT = { inset: 16, header: 52, gap: 16, step: 8 };
                 </article>
               }
               @case ('metric') {
-                <article vuiNode class="metric" [selected]="ctx.selected() || ctx.preselected()">
+                <article vuiNode class="metric">
                   <header vuiNodeHeader>
                     <span vuiTitle>{{ ctx.data().title }}</span>
                   </header>
@@ -240,7 +233,7 @@ const LAYOUT = { inset: 16, header: 52, gap: 16, step: 8 };
               }
               @default {
                 <!-- A note has no handle: it is content on the canvas, not a participant of the graph. -->
-                <article vuiNode class="note" [selected]="ctx.selected() || ctx.preselected()">
+                <article vuiNode class="note">
                   <div vuiNodeBody>{{ ctx.data().text }}</div>
                 </article>
               }
@@ -253,8 +246,7 @@ const LAYOUT = { inset: 16, header: 52, gap: 16, step: 8 };
               vuiEdge
               [attr.d]="ctx.path()"
               [attr.marker-end]="ctx.markerEnd()"
-              [attr.data-link]="!!ctx.data()?.link"
-              [selected]="ctx.selected() || ctx.preselected()" />
+              [attr.data-link]="!!ctx.data()?.link" />
           </svg:g>
           @if (ctx.data()?.label; as label) {
             <span *vEdgeLabel vuiEdgeLabel>{{ label }}</span>

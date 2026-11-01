@@ -53,7 +53,7 @@ describe('VflowNodeToolbarComponent', () => {
     const host = toolbar();
     expect(host).not.toBeNull();
     expect(host!.querySelector('.tool')).not.toBeNull();
-    expect(fixture.nativeElement.querySelector('.v-node')!.contains(host)).toBe(true);
+    expect(fixture.nativeElement.querySelector('[data-v-node]')!.contains(host)).toBe(true);
     // Gestures inside the toolbar must not drag the node.
     expect(host!.hasAttribute('data-v-no-drag')).toBe(true);
 

@@ -106,15 +106,15 @@ describe('CSS viewport virtualization', () => {
     expect(trackNodes).toHaveBeenCalled();
     expect(trackEdges).toHaveBeenCalled();
     // Re-measuring an uncovered node refreshes the view; the graph lists must keep their DOM.
-    const before = Array.from<Element>(fixture.nativeElement.querySelectorAll('.v-node, svg[edge]'));
+    const before = Array.from<Element>(fixture.nativeElement.querySelectorAll('[data-v-node], svg[edge]'));
     fixture.componentInstance.setViewport({ ...fixture.componentInstance.viewport(), x: -1000, y: 0 });
     await fixture.whenStable();
     fixture.componentInstance.zoomTo(0.8);
     await fixture.whenStable();
-    expectSameElements(Array.from(fixture.nativeElement.querySelectorAll('.v-node, svg[edge]')), before);
+    expectSameElements(Array.from(fixture.nativeElement.querySelectorAll('[data-v-node], svg[edge]')), before);
     const viewport = fixture.nativeElement.querySelector('.v-viewport') as HTMLElement;
     expect(viewport.style.transform).toContain('scale(0.8)');
-    const hosts = fixture.nativeElement.querySelectorAll('.v-node') as NodeListOf<HTMLElement>;
+    const hosts = fixture.nativeElement.querySelectorAll('[data-v-node]') as NodeListOf<HTMLElement>;
     expect(getComputedStyle(hosts[0]).display).toBe('none');
     expect(getComputedStyle(hosts[1]).display).not.toBe('none');
   });
@@ -138,7 +138,7 @@ describe('CSS viewport virtualization', () => {
     fixture.componentRef.setInput('autoPan', false);
     fixture.componentRef.setInput('nodeDragThreshold', 0);
     await settle(fixture);
-    const host = fixture.nativeElement.querySelector('.v-node') as HTMLElement;
+    const host = fixture.nativeElement.querySelector('[data-v-node]') as HTMLElement;
     const edgeModel = fixture.debugElement.injector.get(FlowEntitiesService).edges()[0];
     const edge = { getAttribute: (name: string) => (name === 'd' ? edgeModel.path().path : null) };
     const oldPath = edge.getAttribute('d');
@@ -182,7 +182,7 @@ describe('CSS viewport virtualization', () => {
     subscription.unsubscribe();
   });
 
-  it('updates selection semantics and elevation without reconciling graph lists', async () => {
+  it('elevates without reconciling graph lists and writes the selection to the hosts', async () => {
     const trackNodes = vi.spyOn(VflowComponent.prototype as any, 'trackNodes');
     const trackEdges = vi.spyOn(VflowComponent.prototype as any, 'trackEdges');
     const fixture = setup(
@@ -202,21 +202,30 @@ describe('CSS viewport virtualization', () => {
     const edge = injector.get(FlowEntitiesService).edges()[0];
     trackNodes.mockClear();
     trackEdges.mockClear();
-    injector.get(SelectionService).select(node);
+    // Elevation is written by effects on the hosts: no pass over the graph lists.
     injector.get(NodeRenderingService).pullNode(node);
-    await fixture.whenStable();
-    const host = fixture.nativeElement.querySelector('.v-node') as HTMLElement;
-    expect(host.getAttribute('aria-label')).toBe(node.accessibility().label);
-    expect(host.style.zIndex).toBe(String(node.renderOrder()));
-    injector.get(SelectionService).select(edge);
     injector.get(EdgeRenderingService).pull(edge);
     await fixture.whenStable();
+    const host = fixture.nativeElement.querySelector('[data-v-node]') as HTMLElement;
     const edgeHost = fixture.nativeElement.querySelector('svg[edge]') as SVGElement;
-    expect(edgeHost.getAttribute('aria-label')).toBe(edge.accessibility().label);
+    expect(host.style.zIndex).toBe(String(node.renderOrder()));
     expect(edgeHost.style.zIndex).toBe(String(edge.renderOrder()));
     expect(fixture.nativeElement.querySelector('[edgeLabelHost]').style.zIndex).toBe(String(edge.renderOrder()));
     expect(trackNodes).not.toHaveBeenCalled();
     expect(trackEdges).not.toHaveBeenCalled();
+    // Selection is a host binding by decision (2026-11-01), so it costs one pass over the lists; the hosts carry
+    // it as `data-v-selected` for CSS and in their accessible names.
+    injector.get(SelectionService).select(node);
+    await fixture.whenStable();
+    expect(host.getAttribute('aria-label')).toBe(node.accessibility().label);
+    expect(host.hasAttribute('data-v-selected')).toBe(true);
+    expect(host.getAttribute('data-v-node')).toBe('0');
+    injector.get(SelectionService).select(edge);
+    await fixture.whenStable();
+    expect(host.hasAttribute('data-v-selected')).toBe(false);
+    expect(edgeHost.getAttribute('aria-label')).toBe(edge.accessibility().label);
+    expect(edgeHost.hasAttribute('data-v-selected')).toBe(true);
+    expect(edgeHost.getAttribute('data-v-edge')).toBe('edge');
   });
 
   it('switches connection targets locally and clears validation and reconnection state', async () => {
@@ -237,7 +246,7 @@ describe('CSS viewport virtualization', () => {
     const unrelatedUpdates = vi.spyOn(unrelated.connectionActive, 'set');
     connection.start(sourceHandle);
     await fixture.whenStable();
-    const rendered = Array.from<Element>(fixture.nativeElement.querySelectorAll('.v-node, svg[edge]'));
+    const rendered = Array.from<Element>(fixture.nativeElement.querySelectorAll('[data-v-node], svg[edge]'));
     unrelatedUpdates.mockClear();
     connection.hover(firstHandle);
     await fixture.whenStable();
@@ -250,7 +259,7 @@ describe('CSS viewport virtualization', () => {
     expect(first.connectionActive()).toBe(false);
     expect(second.connectionActive()).toBe(true);
     expect(unrelatedUpdates).not.toHaveBeenCalled();
-    expectSameElements(Array.from(fixture.nativeElement.querySelectorAll('.v-node, svg[edge]')), rendered);
+    expectSameElements(Array.from(fixture.nativeElement.querySelectorAll('[data-v-node], svg[edge]')), rendered);
     connection.end();
     connection.start(firstHandle, undefined, edge);
     await fixture.whenStable();
@@ -293,15 +302,19 @@ describe('CSS viewport virtualization', () => {
     expect(drawPreview).not.toHaveBeenCalled();
     const pannedImage = canvas.toDataURL();
     node.point.set({ x: 50, y: 20 });
-    node.selected.set(true);
     group.point.set({ x: 2000, y: 100 });
     group.width.set(300);
-    group.selected.set(true);
     await fixture.whenStable();
     expect(drawPreview).toHaveBeenCalledWith(50, 20, node.width(), node.height(), 2);
     expect(drawPreview).toHaveBeenCalledWith(2000, 100, 300, group.height(), 5);
     expect(canvas.toDataURL()).not.toBe(pannedImage);
     expect(trackNodes).not.toHaveBeenCalled();
+    // A selection change reconciles the lists (host binding by decision, 2026-11-01); the minimap follows it.
+    const movedImage = canvas.toDataURL();
+    node.selected.set(true);
+    group.selected.set(true);
+    await fixture.whenStable();
+    expect(canvas.toDataURL()).not.toBe(movedImage);
     fixture.componentInstance.position.set('top-left');
     await fixture.whenStable();
     expect(canvas.style.left).toBe('10px');
@@ -327,7 +340,7 @@ describe('CSS viewport virtualization', () => {
       [240, 80, true],
       [240, 80, true],
     ]);
-    const hosts = fixture.nativeElement.querySelectorAll('.v-node') as NodeListOf<HTMLElement>;
+    const hosts = fixture.nativeElement.querySelectorAll('[data-v-node]') as NodeListOf<HTMLElement>;
     hosts.forEach((host) => expect(getComputedStyle(host).display).toBe('none'));
     const edge = fixture.nativeElement.querySelector('svg[edge]') as SVGElement;
     expect(getComputedStyle(edge).display).not.toBe('none');
@@ -344,7 +357,7 @@ describe('CSS viewport virtualization', () => {
     const node = fixture.debugElement.injector.get(FlowEntitiesService).nodes()[0];
     const component = fixture.debugElement.query(By.directive(StatefulNodeComponent))
       .componentInstance as StatefulNodeComponent;
-    const host = fixture.nativeElement.querySelector('.v-node') as HTMLElement;
+    const host = fixture.nativeElement.querySelector('[data-v-node]') as HTMLElement;
     const input = host.querySelector('input')!;
     input.value = 'unsaved draft';
     input.dispatchEvent(new Event('input', { bubbles: true }));
@@ -367,7 +380,7 @@ describe('CSS viewport virtualization', () => {
     }
     expect(getComputedStyle(host).visibility).toBe('visible');
     expect([node.width(), node.height()]).toEqual([320, 120]);
-    expect(host.querySelector<HTMLElement>('.v-handle[data-v-handle-position="right"]')!.style.top).toBe('60px');
+    expect(host.querySelector<HTMLElement>('[data-v-handle][data-v-handle-position="right"]')!.style.top).toBe('60px');
     expect(fixture.debugElement.query(By.directive(StatefulNodeComponent)).componentInstance).toBe(component);
     expect(host.querySelector('input')).toBe(input);
     expect(component.draft).toBe('unsaved draft');
@@ -391,7 +404,7 @@ describe('CSS viewport virtualization', () => {
       createEdge({ id: 'far', source: '1', target: '1' }),
     ]);
     await settle(fixture);
-    const hosts = fixture.nativeElement.querySelectorAll('.v-node') as NodeListOf<HTMLElement>;
+    const hosts = fixture.nativeElement.querySelectorAll('[data-v-node]') as NodeListOf<HTMLElement>;
     const edges = fixture.nativeElement.querySelectorAll('svg[edge]') as NodeListOf<SVGElement>;
     expect(getComputedStyle(hosts[0]).display).not.toBe('none');
     expect(getComputedStyle(hosts[1]).display).toBe('none');
@@ -426,7 +439,7 @@ describe('CSS viewport virtualization', () => {
     const fixture = setup([createNode({ id: 'a', component: PlainNodeComponent, point: { x: 0, y: 0 } })]);
     await settle(fixture);
     const node = fixture.debugElement.injector.get(FlowEntitiesService).nodes()[0];
-    const host = fixture.nativeElement.querySelector('.v-node') as HTMLElement;
+    const host = fixture.nativeElement.querySelector('[data-v-node]') as HTMLElement;
     expect(getComputedStyle(host).display).not.toBe('none');
     node.point.set({ x: 5000, y: 5000 });
     await settle(fixture);
@@ -441,7 +454,7 @@ describe('CSS viewport virtualization', () => {
       createNode({ id: 'a', component: StatefulNodeComponent, point: { x: 0, y: 0 }, selected: true }),
     ]);
     await settle(fixture);
-    const host = fixture.nativeElement.querySelector('.v-node') as HTMLElement;
+    const host = fixture.nativeElement.querySelector('[data-v-node]') as HTMLElement;
     const input = host.querySelector('input')!;
     input.focus();
     fixture.componentInstance.setViewport({ ...fixture.componentInstance.viewport(), x: 1000, y: 0 });
@@ -462,7 +475,7 @@ describe('CSS viewport virtualization', () => {
     fixture.componentRef.setInput('nodeDragThreshold', 0);
     fixture.componentRef.setInput('autoPan', false);
     await settle(fixture);
-    const hosts = fixture.nativeElement.querySelectorAll('.v-node') as NodeListOf<HTMLElement>;
+    const hosts = fixture.nativeElement.querySelectorAll('[data-v-node]') as NodeListOf<HTMLElement>;
     const mouse = (type: string, x: number) =>
       mouseAsPointer(type, { clientX: x, clientY: 20, buttons: 1, bubbles: true, view: window });
     hosts[0].dispatchEvent(mouse('mousedown', 20));
@@ -483,7 +496,7 @@ describe('CSS viewport virtualization', () => {
     );
     const fixture = setup(nodes);
     await settle(fixture);
-    const hosts = fixture.nativeElement.querySelectorAll('.v-node') as NodeListOf<HTMLElement>;
+    const hosts = fixture.nativeElement.querySelectorAll('[data-v-node]') as NodeListOf<HTMLElement>;
     hosts[0].focus();
     fixture.componentRef.setInput('nodes', nodes.slice(1));
     await settle(fixture);
@@ -494,7 +507,7 @@ describe('CSS viewport virtualization', () => {
     const fixture = setup([createNode({ id: 'a', component: PlainNodeComponent, point: { x: 0, y: 0 } })]);
     await settle(fixture);
     const node = fixture.debugElement.injector.get(FlowEntitiesService).nodes()[0];
-    const host = fixture.nativeElement.querySelector('.v-node') as HTMLElement;
+    const host = fixture.nativeElement.querySelector('[data-v-node]') as HTMLElement;
     node.resizing.set(true);
     fixture.componentInstance.setViewport({ ...fixture.componentInstance.viewport(), x: 1000, y: 0 });
     await settle(fixture);

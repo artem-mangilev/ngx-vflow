@@ -38,7 +38,7 @@ async function demo(page: Page) {
   await page.goto('/viewport/alignment-helper');
   const graph = page.locator('vflow').first();
   await graph.scrollIntoViewIfNeeded();
-  await expect(graph.locator('.v-node')).toHaveCount(7);
+  await expect(graph.locator('[data-v-node]')).toHaveCount(7);
   await expect.poll(() => position(graph, '7')).toEqual({ x: 450, y: 220 });
   return graph;
 }
@@ -80,7 +80,7 @@ test('straightens an edge to a connected node', async ({ page }) => {
     ['Node 2', 'Node 4'].map((name, index) => {
       const node = root.querySelector(`[aria-label="${name}"]`)!;
       const side = index === 0 ? 'right' : 'left';
-      const box = node.querySelector(`.v-handle[data-v-handle-position="${side}"]`)!.getBoundingClientRect();
+      const box = node.querySelector(`[data-v-handle][data-v-handle-position="${side}"]`)!.getBoundingClientRect();
       return box.y + box.height / 2;
     }),
   );

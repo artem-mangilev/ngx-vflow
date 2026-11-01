@@ -183,7 +183,7 @@ describe('public viewport gesture settings', () => {
     await fixture.whenStable();
     fixture.componentRef.setInput('keyboardShortcuts', { modifiers: { panActivation: ['Space'] } });
     key('keydown', 'Space');
-    drag(0, pane.querySelector('.v-node')!);
+    drag(0, pane.querySelector('[data-v-node]')!);
     expect(node.point()).toEqual({ x: 40, y: 0 });
     expect(flow.viewport()).toEqual({ x: 0, y: 0, zoom: 1 });
   });
@@ -196,7 +196,7 @@ describe('public viewport gesture settings', () => {
     await fixture.whenStable();
     const controls = TestBed.createComponent(ControlsComponent);
     controls.detectChanges();
-    const host = pane.querySelector('.v-node') as HTMLElement;
+    const host = pane.querySelector('[data-v-node]') as HTMLElement;
     host.appendChild(controls.nativeElement);
     const input = controls.nativeElement.querySelector('input');
     const events = [
@@ -524,7 +524,7 @@ describe('public viewport gesture settings', () => {
     };
 
     const selectable = document.createElement('span');
-    selectable.classList.add('v-node');
+    selectable.setAttribute('data-v-node', '');
     pane.appendChild(selectable);
     click(selectable);
     expect(node.selected!()).toBe(true);

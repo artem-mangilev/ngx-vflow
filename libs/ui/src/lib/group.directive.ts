@@ -1,8 +1,9 @@
-import { booleanAttribute, Directive, input } from '@angular/core';
+import { Directive } from '@angular/core';
 
 /**
  * A visual group with a title around other nodes: a tinted surface with a hairline, like a macOS group box. Parent relationships and shared movement
- * stay in graph data (ADR-0003); this directive does not create them. Selection colors the edge like `vuiNode`'s.
+ * stay in graph data (ADR-0003); this directive does not create them. Selection is read from the core node host and
+ * colors the edge like `vuiNode`'s.
  */
 @Directive({
   selector: '[vuiGroup]',
@@ -10,16 +11,15 @@ import { booleanAttribute, Directive, input } from '@angular/core';
     class: `vui-group
       relative box-border rounded-vui-surface border border-vui-border
       bg-vui-surface-muted text-vui-foreground
-      data-[vui-selected=true]:border-vui-accent data-[vui-selected=true]:ring-1 data-[vui-selected=true]:ring-vui-accent
-      forced-colors:data-[vui-selected=true]:outline-2 forced-colors:data-[vui-selected=true]:outline-offset-2
-      forced-colors:data-[vui-selected=true]:outline-[Highlight]`,
-    '[attr.data-vui-selected]': 'selected()',
+      [&:is([data-v-selected]_*,[data-v-preselected]_*)]:border-vui-accent
+      [&:is([data-v-selected]_*,[data-v-preselected]_*)]:ring-1
+      [&:is([data-v-selected]_*,[data-v-preselected]_*)]:ring-vui-accent
+      forced-colors:[&:is([data-v-selected]_*,[data-v-preselected]_*)]:outline-2
+      forced-colors:[&:is([data-v-selected]_*,[data-v-preselected]_*)]:outline-offset-2
+      forced-colors:[&:is([data-v-selected]_*,[data-v-preselected]_*)]:outline-[Highlight]`,
   },
 })
-export class VuiGroup {
-  /** Selection presentation: bind the core state, e.g. `ctx.selected() || ctx.preselected()`, or your own. */
-  readonly selected = input(false, { transform: booleanAttribute });
-}
+export class VuiGroup {}
 
 /**
  * Header row of a group, set in semibold like a card header: a title, meta, icon or actions share the

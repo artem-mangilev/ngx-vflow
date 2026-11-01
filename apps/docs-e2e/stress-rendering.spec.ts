@@ -2,13 +2,13 @@ import { expect, test } from '@playwright/test';
 
 test('virtualization demo retains node DOM and geometry through viewport pan', async ({ page }) => {
   await page.goto('/performance/virtualization');
-  const nodes = page.locator('.v-node');
+  const nodes = page.locator('[data-v-node]');
   await expect(nodes).toHaveCount(4900);
   await expect(nodes.first()).toHaveCSS('visibility', 'visible');
   await page.locator('.v-pane').scrollIntoViewIfNeeded();
   const first = await nodes.first().elementHandle();
   const handleTop = await first!.evaluate(
-    (node) => node.querySelector<HTMLElement>('.v-handle[data-v-handle-position="right"]')!.style.top,
+    (node) => node.querySelector<HTMLElement>('[data-v-handle][data-v-handle-position="right"]')!.style.top,
   );
   await expect
     .poll(() => nodes.evaluateAll((items) => items.filter((node) => getComputedStyle(node).display === 'none').length))
@@ -25,7 +25,7 @@ test('virtualization demo retains node DOM and geometry through viewport pan', a
   expect(await first!.evaluate((node) => node.isConnected)).toBe(true);
   expect(
     await first!.evaluate(
-      (node) => node.querySelector<HTMLElement>('.v-handle[data-v-handle-position="right"]')!.style.top,
+      (node) => node.querySelector<HTMLElement>('[data-v-handle][data-v-handle-position="right"]')!.style.top,
     ),
   ).toBe(handleTop);
   const pane = (await page.locator('.v-pane').boundingBox())!;
@@ -45,7 +45,7 @@ test('stress demo reveals custom nodes and edges with positioned handles', async
     const samples: { hidden: number; visibleEdges: number; misplaced: string[] }[] = [];
     Object.assign(window, { stressRenderingSamples: samples });
     const sample = () => {
-      const nodes = Array.from(document.querySelectorAll<HTMLElement>('.v-node'));
+      const nodes = Array.from(document.querySelectorAll<HTMLElement>('[data-v-node]'));
       if (nodes.length) {
         const hidden = nodes.filter((node) => getComputedStyle(node).visibility === 'hidden').length;
         const misplaced: string[] = [];
@@ -53,7 +53,7 @@ test('stress demo reveals custom nodes and edges with positioned handles', async
           if (getComputedStyle(node).visibility !== 'visible') continue;
           const anchor = node.querySelector('.stress-node')?.getBoundingClientRect();
           if (!anchor) continue;
-          for (const handle of node.querySelectorAll<HTMLElement>('.v-handle')) {
+          for (const handle of node.querySelectorAll<HTMLElement>('[data-v-handle]')) {
             const rect = handle.getBoundingClientRect();
             if (Math.abs(rect.y + rect.height / 2 - anchor.y - anchor.height / 2) > 0.2) {
               misplaced.push(handle.style.top);
@@ -81,7 +81,7 @@ test('stress demo reveals custom nodes and edges with positioned handles', async
   await expect(page.getByRole('checkbox', { name: 'Enable virtualization' })).toHaveCount(0);
   expect(
     await page
-      .locator('.v-node')
+      .locator('[data-v-node]')
       .evaluateAll((nodes) => nodes.filter((node) => getComputedStyle(node).display === 'none').length),
   ).toBe(0);
   await expect(page.locator('.stress-node')).toHaveCount(1024);

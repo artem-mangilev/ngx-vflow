@@ -31,12 +31,15 @@ import { isNoSelectTarget } from '../../utils/no-select-target';
   templateUrl: './edge.component.html',
   styleUrls: ['./edge.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  // Identity and selection are host bindings by decision, as in NodeComponent; the rest stays in effects.
   host: {
+    '[attr.data-v-edge]': 'model().edge.id',
+    '[attr.data-v-selected]': "model().selected() ? '' : null",
+    '[attr.data-v-preselected]': "model().preselected() ? '' : null",
     '(focusin)': 'model().focused.set(true)',
     '(focusout)': 'model().focused.set(false)',
     // Clicks from the interaction stroke and from presentation elements bubble here.
     '(click)': 'onClick($event)',
-    class: 'v-edge',
   },
   providers: [
     // Resolved lazily by presentations, which are created after the model input is set.

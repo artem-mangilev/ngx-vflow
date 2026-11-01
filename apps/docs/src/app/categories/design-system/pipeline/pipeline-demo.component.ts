@@ -163,11 +163,7 @@ const EXPORT = { width: 1200, height: 780 };
           (initialized)="flow()?.fitView()">
           <ng-template let-ctx vNode>
             @let data = ctx.data();
-            <article
-              vuiNode
-              [attr.data-kind]="data.kind"
-              [selected]="ctx.selected() || ctx.preselected()"
-              [attr.data-stage]="ctx.node.id">
+            <article vuiNode [attr.data-kind]="data.kind" [attr.data-stage]="ctx.node.id">
               <header vuiNodeHeader>
                 <span vuiIcon><app-demo-icon [name]="icon(data)" /></span>
                 <span vuiTitle>{{ title(data) }}</span>
@@ -304,11 +300,7 @@ const EXPORT = { width: 1200, height: 780 };
           </ng-template>
           <ng-template let-ctx vEdge>
             <svg:g vEdgeInteraction>
-              <svg:path
-                vuiEdge
-                [attr.d]="ctx.path()"
-                [attr.data-type]="ctx.data()?.type"
-                [selected]="ctx.selected() || ctx.preselected()" />
+              <svg:path vuiEdge [attr.d]="ctx.path()" [attr.data-type]="ctx.data()?.type" />
             </svg:g>
           </ng-template>
           <ng-template let-ctx vConnection>

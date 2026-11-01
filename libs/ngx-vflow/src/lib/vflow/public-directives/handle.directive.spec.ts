@@ -134,10 +134,10 @@ describe('VflowHandleDirective', () => {
 
   const nodes = (fixture: ComponentFixture<unknown>) => fixture.debugElement.injector.get(FlowEntitiesService).nodes();
   const handleElement = (fixture: ComponentFixture<unknown>, position: Position) =>
-    fixture.nativeElement.querySelector(`.v-handle[data-v-handle-position="${position}"]`) as HTMLElement;
+    fixture.nativeElement.querySelector(`[data-v-handle][data-v-handle-position="${position}"]`) as HTMLElement;
 
   function centerInNode(element: HTMLElement) {
-    const node = element.closest('.v-node')!.getBoundingClientRect();
+    const node = element.closest('[data-v-node]')!.getBoundingClientRect();
     const rect = element.getBoundingClientRect();
     return { x: rect.left + rect.width / 2 - node.left, y: rect.top + rect.height / 2 - node.top };
   }
@@ -196,7 +196,7 @@ describe('VflowHandleDirective', () => {
     expect(b.handles()[0].isMeasured()).toBe(false);
     expect(a.handles()[1].isMeasured()).toBe(true);
     expect(b.isReady()).toBe(true);
-    expect(getComputedStyle(fixture.nativeElement.querySelector('.v-node')).visibility).toBe('visible');
+    expect(getComputedStyle(fixture.nativeElement.querySelector('[data-v-node]')).visibility).toBe('visible');
     expect(edge.isReady()).toBe(false);
     expect(getComputedStyle(fixture.nativeElement.querySelector('svg[edge]')).visibility).toBe('hidden');
   });
@@ -296,7 +296,7 @@ describe('VflowHandleDirective', () => {
     await settle(fixture);
 
     expect(magnets().length).toBe(4);
-    const magnet = magnets().find((element) => element.closest('.v-node') === a.nodeElement())!;
+    const magnet = magnets().find((element) => element.closest('[data-v-node]') === a.nodeElement())!;
     expect(parseFloat(magnet.style.left)).toBe(a.handles()[0].localPoint().x);
     expect(parseFloat(magnet.style.top)).toBe(a.handles()[0].localPoint().y);
 

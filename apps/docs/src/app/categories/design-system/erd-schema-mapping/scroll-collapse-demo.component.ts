@@ -61,11 +61,7 @@ interface LongEntity {
       <vflow view="auto" [nodes]="nodes" [edges]="edges" (initialized)="flow()?.fitView()">
         <ng-template let-ctx vNode>
           @let view = scroll.visibility(ctx.node.id);
-          <article
-            vuiNode
-            [selected]="ctx.selected() || ctx.preselected()"
-            [attr.data-entity]="ctx.node.id"
-            [attr.data-collapsed]="ctx.data().collapsed">
+          <article vuiNode [attr.data-entity]="ctx.node.id" [attr.data-collapsed]="ctx.data().collapsed">
             <header vuiNodeHeader [class.proxy]="ctx.data().collapsed || view.above.length">
               <span vuiTitle>{{ ctx.data().title }}</span>
               <span vuiMeta>{{ ctx.data().fields.length }} fields</span>
@@ -156,7 +152,7 @@ interface LongEntity {
         </ng-template>
         <ng-template let-ctx vEdge>
           <svg:g vEdgeInteraction>
-            <svg:path vuiEdge [attr.d]="ctx.path()" [selected]="ctx.selected() || ctx.preselected()" />
+            <svg:path vuiEdge [attr.d]="ctx.path()" />
           </svg:g>
         </ng-template>
       </vflow>

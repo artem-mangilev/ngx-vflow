@@ -54,7 +54,7 @@ A handle must stay in layout. An element with `display: none`, or inside one, is
 
 ## State
 
-The element gets the `v-handle` class and these attributes:
+The element gets the `data-v-handle` attribute, its identity as a handle, and these:
 
 | Attribute                  | Values                                                                                                |
 | -------------------------- | ----------------------------------------------------------------------------------------------------- |

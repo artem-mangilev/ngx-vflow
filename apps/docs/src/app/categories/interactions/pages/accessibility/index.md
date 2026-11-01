@@ -82,7 +82,7 @@ A command that changes state reports it in the flow's own polite live region: `D
 Focus is drawn as a translucent halo around the node wrapper and along the edge path. Three tokens style it: `--v-focus` for the color, `--v-focus-halo` for how far the halo reaches beyond the node and to each side of the edge, and `--v-focus-radius` for the node's corners. On nodes and edges the halo is part of the zoomed content and scales with it, like the node's border, and it is painted under the content, so handles on the border and a selection drawn by your template stay on top. Its tint is stronger under a dark `color-scheme`, where a light tint would disappear into the canvas. Under `forced-colors: active` the halo is opaque, and on nodes it becomes an outline just outside the handles. The halo is drawn on the wrapper around your template, so set the tokens on the flow element, or per node from a global stylesheet:
 
 ```css
-.v-node[data-shape='pill'] {
+[data-v-node][data-shape='pill'] {
   --v-focus-radius: 999px;
 }
 ```

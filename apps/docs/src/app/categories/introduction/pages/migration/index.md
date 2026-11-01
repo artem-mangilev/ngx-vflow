@@ -45,7 +45,7 @@ graph needs templates. There are two working paths:
 <section data-vui-theme="light">
   <vflow [nodes]="nodes" [edges]="edges">
     <ng-template let-ctx vNode>
-      <article vuiNode [selected]="ctx.selected() || ctx.preselected()">
+      <article vuiNode>
         <header vuiNodeHeader><span vuiTitle>{{ ctx.data().title }}</span></header>
         <span vuiPort handleType="target" position="left"></span>
         <span vuiPort handleType="source" position="right"></span>
@@ -53,7 +53,7 @@ graph needs templates. There are two working paths:
     </ng-template>
     <ng-template let-ctx vEdge>
       <svg:g vEdgeInteraction>
-        <svg:path vuiEdge [attr.d]="ctx.path()" [attr.marker-end]="ctx.markerEnd()" [selected]="ctx.selected()" />
+        <svg:path vuiEdge [attr.d]="ctx.path()" [attr.marker-end]="ctx.markerEnd()" />
       </svg:g>
       <span *vEdgeLabel vuiEdgeLabel>{{ ctx.data().label }}</span>
     </ng-template>
@@ -126,7 +126,7 @@ Old names have no aliases.
 | `<mini-map>`, `MiniMapComponent`, `MiniMapPosition`                                                                                                              | `<v-minimap>`, `VflowMinimapComponent`, `MinimapPosition`                                                                                                                                    |
 | `<node-toolbar>`, `NodeToolbarComponent`                                                                                                                         | `<v-node-toolbar>`, `VflowNodeToolbarComponent`                                                                                                                                              |
 | `@vflow/ui`: `[vflowNode]`, `<vflow-controls>`, `VflowNode`, `VflowUi` …                                                                                         | `[vuiNode]`, `<vui-controls>`, `VuiNode`, `Vui` …                                                                                                                                            |
-| `.vflow-*` classes, for example `.vflow-node`, `.vflow-handle`, `.vflow-root`                                                                                    | `.v-*`, for example `.v-node`, `.v-handle`, `.v-root`                                                                                                                                        |
+| `.vflow-*` classes, for example `.vflow-node`, `.vflow-handle`, `.vflow-root`                                                                                    | `.v-*` for the parts core draws, for example `.v-root`, `.v-selection-box`; the entity hosts are the attributes `data-v-node`, `data-v-edge` and `data-v-handle`                             |
 | `--vflow-*` tokens, for example `--vflow-background`, `--vflow-focus`                                                                                            | `--v-*`, for example `--v-background`, `--v-focus`                                                                                                                                           |
 | `data-vflow-*` attributes, for example `data-vflow-handle-state`, `data-vflow-no-drag`                                                                           | `data-v-*`, for example `data-v-handle-state`, `data-v-no-drag`                                                                                                                              |
 | Unprefixed classes `.resize-control` (with `.handle`, `.line`, `.top`, `.right`, `.bottom`, `.left`), `.selection-box`, `.reconnect-handle`, `.interactive-edge` | `.v-resize-control` (with `.v-resize-control--handle`, `--line`, `--top`, `--right`, `--bottom`, `--left`), `.v-selection-box`, `.v-reconnect-handle`, `.v-interactive-edge`                 |
@@ -261,6 +261,8 @@ export class TaskNodeComponent {
 `(componentNodeEvent)` stays. It now collects every declared output of the component, including `@Output()`, `output()` and `outputFromObservable()`, and `eventName` is the property name of the output. `ComponentNodeEvent<[A, B]>` infers events from those outputs.
 
 ### Selection by click
+
+Core writes the selection to the DOM: a node host carries `data-v-node="<id>"`, `data-v-selected` while the node is selected and `data-v-preselected` while the selection box covers it; an edge host carries `data-v-edge="<id>"` and the same two. Style your presentation from them (`[data-v-selected] .card { … }`). The `selected` input of `vuiNode`, `vuiGroup` and `vuiEdge` is removed: they read these attributes.
 
 A click on a node presentation selects the node; the `[selectable]` directive and `SelectableDirective` are removed. Edges already worked this way. A press that becomes a drag, a resize, a pan or a selection box does not select. Mark an embedded control with `vNoSelect` to keep its clicks from selecting the entity, as `vNoDrag` keeps them from dragging. `Node.selectable`, `Edge.selectable`, `[nodesSelectable]` and `[edgesSelectable]` still decide whether an entity may be selected at all.
 
@@ -565,6 +567,7 @@ Every input of `vflow` is a signal input. Binding in a template is unchanged. Re
 | `viewportTo(state)`                                         | Rename to `setViewport(state)`.                                                                                    |
 | `panTo({ x, y })`                                           | `setViewport({ ...flow.viewport(), x, y })`; to center on a flow-space point, `setCenter(point)`.                  |
 | `step` input on `vui-controls`                              | Remove the binding. The buttons zoom by the step of the zoom keys.                                                 |
+| `selected` input of `vuiNode`, `vuiGroup`, `vuiEdge`        | Remove the binding. The parts read `data-v-selected` and `data-v-preselected` from the core host.                  |
 | `useDefaults` option of the `create*` factories             | Remove it. The factories always create the default signals; write a literal for a bare object.                     |
 | `ConnectionControllerDirective`                             | Remove the import. The connection outputs belong to `vflow`.                                                       |
 | `[selectable]`, `SelectableDirective`                       | Remove them. A click on the presentation selects the node; `vNoSelect` excludes an embedded control.               |

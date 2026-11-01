@@ -41,10 +41,14 @@ import { NodeMeasureDirective } from '../../directives/node-measure.directive';
     { provide: NODE_MODEL, useFactory: () => inject(NodeComponent).model() },
     { provide: NODE_REF, useFactory: () => inject(NODE_MODEL).context.$implicit },
   ],
-  // No signal reads in host bindings: the host lives in a view of the graph list, whose reads join the reactive
-  // consumer of the whole list, so one node becoming ready would refresh every entity view.
+  // The host lives in a view of the graph list, so a signal read in a host binding joins the reactive consumer of
+  // the whole list: a change refreshes every entity view. Rendering state (pending, culling, order, position) is
+  // therefore written by effects. The public identity and selection attributes are host bindings by decision
+  // (2026-11-01): a selection change is rare next to a pan, and one pass over the list is accepted for it.
   host: {
-    class: 'v-node',
+    '[attr.data-v-node]': 'model().rawNode.id',
+    '[attr.data-v-selected]': "model().selected() ? '' : null",
+    '[attr.data-v-preselected]': "model().preselected() ? '' : null",
     '(focusin)': 'model().focused.set(true)',
     '(focusout)': 'model().focused.set(false)',
     // Clicks from the presentation bubble here; a drag or a resize suppresses the click that follows it.

@@ -33,7 +33,7 @@ async function expectOutline(node: Locator, card: Locator) {
 
 /** Distance between the right handle's center and the card's right edge, in screen pixels. */
 async function rightHandleOffset(node: Locator, card: Locator) {
-  const handle = await box(node.locator('.v-handle[data-v-handle-position="right"]').first());
+  const handle = await box(node.locator('[data-v-handle][data-v-handle-position="right"]').first());
   return Math.abs(handle.centerX - (await box(card)).right);
 }
 
@@ -59,7 +59,7 @@ test.describe('overview resizer', () => {
 
   test.beforeEach(async ({ page }) => {
     await page.goto('/introduction/overview');
-    node = page.locator('.v-node[aria-label="Node transform"]');
+    node = page.locator('[data-v-node][aria-label="Node transform"]');
     card = node.locator('.transform-node');
     await node.scrollIntoViewIfNeeded();
     await expect(node).toHaveCSS('visibility', 'visible');
@@ -74,7 +74,7 @@ test.describe('overview resizer', () => {
   });
 
   test('grows the node, its handles and the reported size by the dragged distance', async ({ page }) => {
-    const output = page.locator('.v-node[aria-label="Node output-size"]');
+    const output = page.locator('[data-v-node][aria-label="Node output-size"]');
     const zoom = await zoomOf(node);
     const before = await offsetSize(card);
     await expect.poll(() => reportedSize(output)).toEqual(before);
@@ -98,7 +98,7 @@ test.describe('overview resizer', () => {
 
 test('resizer demo keeps a node at its CSS min-width while shrinking', async ({ page }) => {
   await page.goto('/nodes/resizer');
-  const node = page.locator('.v-node', { has: page.locator('.custom-node') }).first();
+  const node = page.locator('[data-v-node]', { has: page.locator('.custom-node') }).first();
   const card = node.locator('.custom-node');
   const corner = node.locator(
     '.v-resize-control.v-resize-control--handle.v-resize-control--bottom.v-resize-control--right',

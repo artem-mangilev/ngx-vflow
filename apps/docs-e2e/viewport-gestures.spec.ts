@@ -19,7 +19,7 @@ async function open(page: Page) {
   await page.goto('/interactions/viewport-gestures');
   const graph = page.locator('vflow').first();
   await graph.scrollIntoViewIfNeeded();
-  await expect(graph.locator('.v-node').first()).toBeVisible();
+  await expect(graph.locator('[data-v-node]').first()).toBeVisible();
   const pane = (await graph.locator('.v-pane').boundingBox())!;
   return { graph, pane };
 }
@@ -58,12 +58,11 @@ test('pans by the dragged distance, suppresses the click after a pan and clears 
   page,
 }) => {
   const { graph, pane } = await open(page);
-  const node = graph.locator('.v-node').first();
-  const presentation = node.locator('[data-vui-selected]');
+  const node = graph.locator('[data-v-node]').first();
   const point = empty(pane);
 
   await node.click();
-  await expect(presentation).toHaveAttribute('data-vui-selected', 'true');
+  await expect(node).toHaveAttribute('data-v-selected', '');
 
   const start = await viewport(graph);
   await page.mouse.move(point.x, point.y);
@@ -74,10 +73,10 @@ test('pans by the dragged distance, suppresses the click after a pan and clears 
   expect(panned.x - start.x).toBeCloseTo(-120, 0);
   expect(panned.y - start.y).toBeCloseTo(-40, 0);
   // A pan is not a click on the canvas, so the selection stays.
-  await expect(presentation).toHaveAttribute('data-vui-selected', 'true');
+  await expect(node).toHaveAttribute('data-v-selected', '');
 
   await page.mouse.click(point.x, point.y);
-  await expect(presentation).toHaveAttribute('data-vui-selected', 'false');
+  await expect(node).not.toHaveAttribute('data-v-selected', '');
   expect(await viewport(graph)).toEqual(panned);
 });
 
@@ -119,7 +118,7 @@ test('animates double-click zoom around the pointer and the animated fit view', 
   const fitted = fitting.at(-1)!;
   // Every node is visible after fitting.
   for (const box of await graph
-    .locator('.v-node')
+    .locator('[data-v-node]')
     .evaluateAll((nodes) => nodes.map((node) => node.getBoundingClientRect().toJSON() as DOMRect))) {
     expect(box.left).toBeGreaterThanOrEqual(pane.x - 1);
     expect(box.right).toBeLessThanOrEqual(pane.x + pane.width + 1);
@@ -129,7 +128,7 @@ test('animates double-click zoom around the pointer and the animated fit view', 
 
 test('drags a node without panning and without the click that selects it', async ({ page }) => {
   const { graph } = await open(page);
-  const node = graph.locator('.v-node').first();
+  const node = graph.locator('[data-v-node]').first();
   const box = (await node.boundingBox())!;
   const start = await viewport(graph);
 
@@ -142,7 +141,7 @@ test('drags a node without panning and without the click that selects it', async
   expect(moved.x - box.x).toBeCloseTo(60, 0);
   expect(moved.y - box.y).toBeCloseTo(30, 0);
   expect(await viewport(graph)).toEqual(start);
-  await expect(node.locator('[data-vui-selected]')).toHaveAttribute('data-vui-selected', 'false');
+  await expect(node).not.toHaveAttribute('data-v-selected', '');
 });
 
 test('pans with one finger and pinches with two, and sets touch-action from the settings', async ({ page }) => {
@@ -153,7 +152,7 @@ test('pans with one finger and pinches with two, and sets touch-action from the 
   const center = { x: pane.x + pane.width / 2, y: pane.y + pane.height - 40 };
 
   await expect(graph.locator('.v-pane')).toHaveCSS('touch-action', 'none');
-  await expect(graph.locator('.v-node').first()).toHaveCSS('touch-action', 'none');
+  await expect(graph.locator('[data-v-node]').first()).toHaveCSS('touch-action', 'none');
 
   const start = await viewport(graph);
   await touch('touchStart', [center]);
@@ -186,7 +185,7 @@ test('lazy loading moves smoothly to the next node and lands exactly on it', asy
   await page.goto('/performance/lazy-loading');
   const graph = page.locator('vflow').first();
   await graph.scrollIntoViewIfNeeded();
-  await expect(graph.locator('.v-node').first()).toBeVisible();
+  await expect(graph.locator('[data-v-node]').first()).toBeVisible();
   // Let the initial fit view animation finish.
   await expect.poll(async () => (await viewport(graph)).zoom, { timeout: 3000 }).toBeGreaterThan(0);
   await page.waitForTimeout(1000);
@@ -201,7 +200,7 @@ test('lazy loading moves smoothly to the next node and lands exactly on it', asy
 
   // The target node is centered in the pane.
   const pane = (await graph.locator('.v-pane').boundingBox())!;
-  const target = (await graph.locator('.v-node').nth(1).boundingBox())!;
+  const target = (await graph.locator('[data-v-node]').nth(1).boundingBox())!;
   expect(target.x + target.width / 2).toBeCloseTo(pane.x + pane.width / 2, 0);
   expect(target.y + target.height / 2).toBeCloseTo(pane.y + pane.height / 2, 0);
 });

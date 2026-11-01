@@ -124,9 +124,9 @@ async function createSizeTargetFixture(options: { withResizable?: boolean; nodes
     model: () => entities.nodes()[0],
     card: () => root.querySelector<HTMLElement>('.card')!,
     wrapper: () => root.querySelector<HTMLElement>('.v-node-wrapper')!,
-    node: () => root.querySelector<HTMLElement>('.v-node')!,
+    node: () => root.querySelector<HTMLElement>('[data-v-node]')!,
     controls: () => Array.from(root.querySelectorAll<HTMLElement>('.v-resize-control')),
-    handle: () => root.querySelector<HTMLElement>('.v-handle')!,
+    handle: () => root.querySelector<HTMLElement>('[data-v-handle]')!,
   };
 }
 
@@ -179,7 +179,7 @@ describe('VflowResizableComponent', () => {
     const fixture = await createFixture(false);
 
     const host = fixture.nativeElement as HTMLElement;
-    const node = host.querySelector('.v-node')!;
+    const node = host.querySelector('[data-v-node]')!;
     const topLeft = host.querySelector(
       '.v-resize-control.v-resize-control--handle.v-resize-control--top.v-resize-control--left',
     )!;
@@ -198,7 +198,7 @@ describe('VflowResizableComponent', () => {
     await fixture.whenStable();
 
     const host = fixture.nativeElement as HTMLElement;
-    const nodeRect = host.querySelector('.v-node')!.getBoundingClientRect();
+    const nodeRect = host.querySelector('[data-v-node]')!.getBoundingClientRect();
     const expectedScreenGap = fixture.componentInstance.gap() * 0.5;
 
     const top = center(host.querySelector('.v-resize-control.v-resize-control--line.v-resize-control--top')!);
