@@ -1,16 +1,16 @@
 import { Point } from '../interfaces/point.interface';
 import { Rect } from '../interfaces/rect';
 
-export type AlignmentAxis = 'x' | 'y';
+type AlignmentAxis = 'x' | 'y';
 
 /** A node the moving selection may align with. An ancestor of the selection offers only its center axes. */
-export interface AlignmentTarget {
+interface AlignmentTarget {
   rect: Rect;
   centerOnly: boolean;
 }
 
 /** Free space between two targets side by side on `axis` that overlap on the other axis, with no target between. */
-export interface AlignmentGap {
+interface AlignmentGap {
   axis: AlignmentAxis;
   start: Rect;
   end: Rect;
@@ -35,7 +35,7 @@ export interface AlignmentScene {
   handles: AlignmentHandlePair[];
 }
 
-export interface AlignmentLine {
+interface AlignmentLine {
   from: Point;
   to: Point;
   /** The aligned points on the line. */
@@ -44,7 +44,7 @@ export interface AlignmentLine {
 }
 
 /** One of equal gaps: a segment along `axis` from `from` to `to`, drawn at `at` on the other axis. */
-export interface AlignmentGapMark {
+interface AlignmentGapMark {
   axis: AlignmentAxis;
   from: number;
   to: number;
@@ -59,7 +59,7 @@ export interface AlignmentGuides {
 export const NO_GUIDES: AlignmentGuides = { lines: [], gaps: [] };
 
 /** How far from exact a position still counts as aligned when guides are drawn, in flow units. */
-export const ALIGNMENT_EPSILON = 0.01;
+const ALIGNMENT_EPSILON = 0.01;
 
 /** How much farther than the nearest alignment a straight edge may be and still win, in flow units. */
 const HANDLE_PREFERENCE = 1;

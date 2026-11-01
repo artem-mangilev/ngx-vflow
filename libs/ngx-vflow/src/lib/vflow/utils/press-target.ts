@@ -13,7 +13,7 @@
  * A node keeps the presses that drag it (its gesture stops their propagation), so a press that reaches the pane
  * from inside a node is one the node declined, and the pane needs no knowledge of the node.
  */
-export interface PressTarget {
+interface PressTarget {
   /** Inside `[data-v-no-drag]`. */
   readonly control: boolean;
   /** Inside `[data-v-no-pan]`. */

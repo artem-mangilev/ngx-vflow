@@ -1,27 +1,6 @@
 import { Point } from '../interfaces/point.interface';
 import { Rect } from '../interfaces/rect';
 
-export interface RectSides {
-  left: number;
-  right: number;
-  top: number;
-  bottom: number;
-}
-
-export interface RectSize {
-  width: number;
-  height: number;
-}
-
-export function rectToSides(rect: Rect): RectSides {
-  return {
-    left: rect.x,
-    right: rect.x + rect.width,
-    top: rect.y,
-    bottom: rect.y + rect.height,
-  };
-}
-
 export function rectsIntersect(rectA: Rect, rectB: Rect): boolean {
   return !(
     rectA.x + rectA.width < rectB.x ||

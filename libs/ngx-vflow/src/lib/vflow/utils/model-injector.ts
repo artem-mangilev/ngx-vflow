@@ -1,6 +1,6 @@
 import { createEnvironmentInjector, DestroyRef, EnvironmentInjector, inject } from '@angular/core';
 
-export interface ModelInjector {
+interface ModelInjector {
   /** The injector for effects of the model, created on first use: most models never need one. */
   get(): EnvironmentInjector;
   destroy(): void;

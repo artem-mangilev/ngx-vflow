@@ -18,6 +18,7 @@ import { DraggableService } from '../services/draggable.service';
 import { ConnectionService } from '../services/connection.service';
 import { Point } from '../interfaces/point.interface';
 import { animationFrames } from '../utils/animation-frames';
+import { clamp } from '../utils/viewport';
 import { AutoPanSettings } from '../interfaces/auto-pan-settings.interface';
 
 @Directive({ selector: '[autoPan]', standalone: true })
@@ -109,12 +110,8 @@ export class AutoPanDirective implements OnInit {
   }
 }
 
-function clamp01(n: number): number {
-  return Math.max(0, Math.min(1, n));
-}
-
 function edgeFactor(distance: number, margin: number): number {
-  const t = clamp01((margin - distance) / margin);
+  const t = clamp((margin - distance) / margin);
   return t * t; // ease-in: t^2
 }
 

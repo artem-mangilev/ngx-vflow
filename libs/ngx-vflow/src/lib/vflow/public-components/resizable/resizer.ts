@@ -1,4 +1,5 @@
 import { NodeModel } from '../../models/node.model';
+import { clamp } from '../../utils/viewport';
 import { Point } from '../../interfaces/point.interface';
 import { ResizeBounds, getControlDirection, getDimensionsAfterResize, getResizeDirection } from './resizer-utils';
 import {
@@ -28,10 +29,6 @@ export interface ResizeOptions {
 export interface ResizeGesture {
   move(event: ResizeDragEvent, pointer: Point): void;
   end(event: ResizeDragEvent): void;
-}
-
-function clamp(value: number, min: number, max: number) {
-  return Math.min(Math.max(value, min), max);
 }
 
 /** The smallest box in the node that keeps every child of a `parent` extent inside. */

@@ -4,13 +4,13 @@ import { Point } from '../interfaces/point.interface';
 import { Position } from '../types/position.type';
 
 /** Side of the marker viewBox (`-10 -10 20 20`), in marker units. */
-export const MARKER_VIEWBOX_SIZE = 20;
+const MARKER_VIEWBOX_SIZE = 20;
 
 /** Default `markerWidth` and `markerHeight` of the flow markers. */
-export const MARKER_DEFAULT_SIZE = 16.5;
+const MARKER_DEFAULT_SIZE = 16.5;
 
 /** Default stroke width of the marker shapes in flow units: the width of the default edge line. */
-export const MARKER_DEFAULT_STROKE_WIDTH = 2;
+const MARKER_DEFAULT_STROKE_WIDTH = 2;
 
 /** Rendered size of a marker in flow units: one given side sets both, none gives the default square. */
 export function markerSize(marker: Marker): { width: number; height: number } {

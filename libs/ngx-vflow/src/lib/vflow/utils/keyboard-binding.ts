@@ -15,7 +15,7 @@ export interface ParsedBinding {
   mod: boolean;
 }
 
-export interface MatchBindingOptions {
+interface MatchBindingOptions {
   /** Defaults to the platform of the current document. */
   mac?: boolean;
   /** Modifiers the binding tolerates in any state, whatever the event carries. */

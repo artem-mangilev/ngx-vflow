@@ -1,6 +1,5 @@
 import { Rect } from '../interfaces/rect';
 import { ViewportState } from '../interfaces/viewport.interface';
-import { rectsIntersect } from './rect';
 
 export interface ViewportForBoundsOptions {
   minZoom: number;
@@ -66,19 +65,4 @@ export function getViewportBounds(viewport: ViewportState, flowWidth: number, fl
     width: flowWidth / zoom,
     height: flowHeight / zoom,
   };
-}
-
-/**
- * Checks if a rectangle intersects with the viewport's visible area
- *
- * @param rect Rectangle to check (in world coordinates)
- * @param viewport Current viewport state
- * @param flowWidth Width of the flow container
- * @param flowHeight Height of the flow container
- * @returns true if the rectangle intersects with the viewport, false otherwise
- */
-export function isRectInViewport(rect: Rect, viewport: ViewportState, flowWidth: number, flowHeight: number): boolean {
-  const viewportBounds = getViewportBounds(viewport, flowWidth, flowHeight);
-
-  return rectsIntersect(rect, viewportBounds);
 }

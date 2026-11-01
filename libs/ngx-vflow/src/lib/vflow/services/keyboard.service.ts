@@ -3,12 +3,12 @@ import { KeyboardCommandName, KeyboardModifierName, KeyboardShortcuts } from '..
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Subject, fromEvent, merge } from 'rxjs';
 import { DeleteRequest } from '../interfaces/delete-request.interface';
-import { getOS } from '../utils/get-os';
 import { bindableSignal } from '../utils/signals/bindable-signal';
 import {
   KeyboardModifierFlag,
   ParsedBinding,
   bindingModifierFlag,
+  isMacPlatform,
   matchesBinding,
   matchesBindingKey,
   parseBinding,
@@ -108,7 +108,7 @@ function resolveShortcuts(raw: RawShortcuts, mac: boolean): ShortcutState {
 @Injectable()
 export class KeyboardService {
   private host = inject(ElementRef<HTMLElement>, { optional: true })?.nativeElement;
-  private mac = getOS() === 'macos' || getOS() === 'ios';
+  private mac = isMacPlatform();
   private shortcuts = bindableSignal<KeyboardShortcuts>({});
   /** The configuration with defaults for omitted entries: an omitted entry never keeps a previous value. */
   private state = computed<ShortcutState>(() => {
