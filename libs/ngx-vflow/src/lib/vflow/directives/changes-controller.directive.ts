@@ -6,6 +6,8 @@ import { outputFromObservable } from '@angular/core/rxjs-interop';
 /**
  * The changes of one type as separate outputs. `(nodesChanges)` and `(edgesChanges)` with every type belong to the
  * flow component itself.
+ *
+ * @internal A host directive of `vflow`, exported only because the compiler requires it in the entry point.
  */
 @Directive()
 export class ChangesControllerDirective {

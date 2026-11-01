@@ -101,8 +101,8 @@ export * from './lib/vflow/public-directives/drag-handle.directive';
 export * from './lib/vflow/public-directives/gesture-exclusions.directive';
 export { NodeDragEvent } from './lib/vflow/directives/node-drag-controller.directive';
 
-// Host directives of `vflow`: the compiler requires them in the entry point.
-export { ConnectionControllerDirective as ɵConnectionControllerDirective } from './lib/vflow/directives/connection-controller.directive';
-export { ChangesControllerDirective as ɵChangesControllerDirective } from './lib/vflow/directives/changes-controller.directive';
-export { NodeDragControllerDirective as ɵNodeDragControllerDirective } from './lib/vflow/directives/node-drag-controller.directive';
-export { ViewportCullingDirective as ɵViewportCullingDirective } from './lib/vflow/directives/viewport-culling.directive';
+// Host directives of `vflow` (`@internal`): the compiler requires them in the entry point.
+export { ConnectionControllerDirective } from './lib/vflow/directives/connection-controller.directive';
+export { ChangesControllerDirective } from './lib/vflow/directives/changes-controller.directive';
+export { NodeDragControllerDirective } from './lib/vflow/directives/node-drag-controller.directive';
+export { ViewportCullingDirective } from './lib/vflow/directives/viewport-culling.directive';

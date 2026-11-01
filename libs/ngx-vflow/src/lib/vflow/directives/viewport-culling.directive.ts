@@ -24,8 +24,10 @@ type Entity = NodeModel | EdgeModel;
  * when the gesture ends: hiding it earlier would spend a style recalculation in the middle of the motion on
  * something already outside the viewport. A change of the entity's own geometry reports both directions at once,
  * because no gesture end follows it.
+ *
+ * @internal A host directive of `vflow`, exported only because the compiler requires it in the entry point.
  */
-@Directive({ selector: '[vflowViewportCulling]', standalone: true })
+@Directive()
 export class ViewportCullingDirective {
   private readonly entities = inject(FlowEntitiesService);
   private readonly settings = inject(FlowSettingsService);

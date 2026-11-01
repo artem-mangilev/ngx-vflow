@@ -5,6 +5,8 @@
     "outDir": "../../out-tsc/lib",
     "declaration": true,
     "declarationMap": true,
+    // `@internal` marks exports the compiler requires in the entry point, such as host directives of `vflow`: they must stay in the typings.
+    "stripInternal": false,
     "inlineSources": true,
     "types": []
   },

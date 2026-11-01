@@ -14,7 +14,11 @@ export interface NodeDragEvent {
   sourceEvent: PointerEvent;
 }
 
-/** The node drag outputs of the flow; the gesture itself is {@link DraggableService}. */
+/**
+ * The node drag outputs of the flow; the gesture itself is {@link DraggableService}.
+ *
+ * @internal A host directive of `vflow`, exported only because the compiler requires it in the entry point.
+ */
 @Directive()
 export class NodeDragControllerDirective {
   private draggable = inject(DraggableService);
