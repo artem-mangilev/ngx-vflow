@@ -271,7 +271,7 @@ describe('VflowComponent', () => {
     it('fits the nodes into the view, centered and inside the padding', async () => {
       const fixture = await createFixture();
       const vflow = fixture.componentInstance.vflow();
-      const root = (fixture.nativeElement.querySelector('.v-root') as HTMLElement).getBoundingClientRect();
+      const root = (fixture.nativeElement.querySelector('[data-v-root]') as HTMLElement).getBoundingClientRect();
 
       expect(await vflow.fitView({ padding: 0.2 })).toBe(true);
       const bounds = vflow.getNodesBounds();

@@ -125,7 +125,7 @@ async function createSizeTargetFixture(options: { withResizable?: boolean; nodes
     card: () => root.querySelector<HTMLElement>('.card')!,
     wrapper: () => root.querySelector<HTMLElement>('.v-node-wrapper')!,
     node: () => root.querySelector<HTMLElement>('[data-v-node]')!,
-    controls: () => Array.from(root.querySelectorAll<HTMLElement>('.v-resize-control')),
+    controls: () => Array.from(root.querySelectorAll<HTMLElement>('[data-v-resize-control]')),
     handle: () => root.querySelector<HTMLElement>('[data-v-handle]')!,
   };
 }
@@ -169,7 +169,7 @@ describe('VflowResizableComponent', () => {
     const fixture: ComponentFixture<ResizableTestHostComponent> = await createFixture();
 
     const host = fixture.nativeElement as HTMLElement;
-    const controls = Array.from(host.querySelectorAll<HTMLElement>('.v-resize-control'));
+    const controls = Array.from(host.querySelectorAll<HTMLElement>('[data-v-resize-control]'));
 
     expect(controls.length).toBe(8);
     controls.forEach((control) => expect(getComputedStyle(control).getPropertyValue('--resizer-gap')).toBe('4px'));
@@ -180,9 +180,7 @@ describe('VflowResizableComponent', () => {
 
     const host = fixture.nativeElement as HTMLElement;
     const node = host.querySelector('[data-v-node]')!;
-    const topLeft = host.querySelector(
-      '.v-resize-control.v-resize-control--handle.v-resize-control--top.v-resize-control--left',
-    )!;
+    const topLeft = host.querySelector('[data-v-resize-control=handle][data-v-resize-control-position=top-left]')!;
     const nodeRect = node.getBoundingClientRect();
     const handleCenter = center(topLeft);
 
@@ -201,23 +199,21 @@ describe('VflowResizableComponent', () => {
     const nodeRect = host.querySelector('[data-v-node]')!.getBoundingClientRect();
     const expectedScreenGap = fixture.componentInstance.gap() * 0.5;
 
-    const top = center(host.querySelector('.v-resize-control.v-resize-control--line.v-resize-control--top')!);
-    const right = center(host.querySelector('.v-resize-control.v-resize-control--line.v-resize-control--right')!);
-    const bottom = center(host.querySelector('.v-resize-control.v-resize-control--line.v-resize-control--bottom')!);
-    const left = center(host.querySelector('.v-resize-control.v-resize-control--line.v-resize-control--left')!);
+    const top = center(host.querySelector('[data-v-resize-control=line][data-v-resize-control-position=top]')!);
+    const right = center(host.querySelector('[data-v-resize-control=line][data-v-resize-control-position=right]')!);
+    const bottom = center(host.querySelector('[data-v-resize-control=line][data-v-resize-control-position=bottom]')!);
+    const left = center(host.querySelector('[data-v-resize-control=line][data-v-resize-control-position=left]')!);
     const topLeft = center(
-      host.querySelector('.v-resize-control.v-resize-control--handle.v-resize-control--top.v-resize-control--left')!,
+      host.querySelector('[data-v-resize-control=handle][data-v-resize-control-position=top-left]')!,
     );
     const topRight = center(
-      host.querySelector('.v-resize-control.v-resize-control--handle.v-resize-control--top.v-resize-control--right')!,
+      host.querySelector('[data-v-resize-control=handle][data-v-resize-control-position=top-right]')!,
     );
     const bottomLeft = center(
-      host.querySelector('.v-resize-control.v-resize-control--handle.v-resize-control--bottom.v-resize-control--left')!,
+      host.querySelector('[data-v-resize-control=handle][data-v-resize-control-position=bottom-left]')!,
     );
     const bottomRight = center(
-      host.querySelector(
-        '.v-resize-control.v-resize-control--handle.v-resize-control--bottom.v-resize-control--right',
-      )!,
+      host.querySelector('[data-v-resize-control=handle][data-v-resize-control-position=bottom-right]')!,
     );
 
     expectCloseTo(nodeRect.top - top.y, expectedScreenGap);
@@ -234,10 +230,7 @@ describe('VflowResizableComponent', () => {
     expectCloseTo(bottomRight.x - nodeRect.right, expectedScreenGap);
     expectCloseTo(bottomRight.y - nodeRect.bottom, expectedScreenGap);
 
-    expect(host.querySelector('.v-resize-control.v-resize-control--handle')!.getBoundingClientRect().width).toBeCloseTo(
-      6,
-      1,
-    );
+    expect(host.querySelector('[data-v-resize-control=handle]')!.getBoundingClientRect().width).toBeCloseTo(6, 1);
   });
 
   describe('size target', () => {
@@ -310,7 +303,7 @@ describe('VflowResizableComponent', () => {
 
       drag(
         controls().find((control) =>
-          control.matches('.v-resize-control--handle.v-resize-control--bottom.v-resize-control--right'),
+          control.matches('[data-v-resize-control=handle][data-v-resize-control-position=bottom-right]'),
         )!,
         40,
         30,
@@ -328,7 +321,9 @@ describe('VflowResizableComponent', () => {
       const { fixture, model, card, controls } = await createSizeTargetFixture();
 
       drag(
-        controls().find((control) => control.matches('.v-resize-control--line.v-resize-control--right'))!,
+        controls().find((control) =>
+          control.matches('[data-v-resize-control=line][data-v-resize-control-position=right]'),
+        )!,
         40,
         0,
       );
@@ -347,7 +342,7 @@ describe('VflowResizableComponent', () => {
       const resizes = fixture.componentInstance.resizes;
       const corner = (selector: string) => controls().find((control) => control.matches(selector))!;
 
-      drag(corner('.v-resize-control--handle.v-resize-control--bottom.v-resize-control--right'), 40, 30);
+      drag(corner('[data-v-resize-control=handle][data-v-resize-control-position=bottom-right]'), 40, 30);
       await settle(fixture);
 
       expect(resizes.map(([kind]) => kind)).toEqual(['start', 'resize', 'resize', 'end']);
@@ -356,7 +351,7 @@ describe('VflowResizableComponent', () => {
       expect((resizes[1][1] as ResizeChangeEvent).direction).toEqual({ x: 1, y: 1 });
 
       resizes.length = 0;
-      drag(corner('.v-resize-control--handle.v-resize-control--top.v-resize-control--left'), -20, 0);
+      drag(corner('[data-v-resize-control=handle][data-v-resize-control-position=top-left]'), -20, 0);
       await settle(fixture);
 
       expect((resizes[1][1] as ResizeChangeEvent).direction).toEqual({ x: -1, y: 0 });
@@ -368,7 +363,7 @@ describe('VflowResizableComponent', () => {
 
       drag(
         controls().find((control) =>
-          control.matches('.v-resize-control--handle.v-resize-control--bottom.v-resize-control--right'),
+          control.matches('[data-v-resize-control=handle][data-v-resize-control-position=bottom-right]'),
         )!,
         40,
         30,
@@ -383,7 +378,9 @@ describe('VflowResizableComponent', () => {
       const { fixture, model, card, controls } = await createSizeTargetFixture({ nodes });
 
       drag(
-        controls().find((control) => control.matches('.v-resize-control--line.v-resize-control--right'))!,
+        controls().find((control) =>
+          control.matches('[data-v-resize-control=line][data-v-resize-control-position=right]'),
+        )!,
         40,
         0,
       );

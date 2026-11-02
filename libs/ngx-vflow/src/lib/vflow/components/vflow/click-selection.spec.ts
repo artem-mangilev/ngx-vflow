@@ -97,9 +97,9 @@ describe('selection by click', () => {
   it('draws the hit area of an edge in its host unless the presentation has g[vEdgeInteraction]', async () => {
     const withGroup = edgeElement('a-b');
     const plain = edgeElement('a-c');
-    expect(withGroup.querySelector(':scope > .v-interactive-edge')).toBeNull();
-    expect(withGroup.querySelector('g > .v-interactive-edge:first-child')).not.toBeNull();
-    const stroke = plain.querySelector<SVGPathElement>(':scope > .v-interactive-edge')!;
+    expect(withGroup.querySelector(':scope > [data-v-interactive-edge]')).toBeNull();
+    expect(withGroup.querySelector('g > [data-v-interactive-edge]:first-child')).not.toBeNull();
+    const stroke = plain.querySelector<SVGPathElement>(':scope > [data-v-interactive-edge]')!;
     expect(stroke).not.toBeNull();
     expect(stroke.style.strokeWidth).toBe('20px');
     // The presentation stays on top of the stroke.
@@ -109,13 +109,13 @@ describe('selection by click', () => {
 
     click(stroke);
     expect(edge('a-c').selected!()).toBe(true);
-    click(withGroup.querySelector('.v-interactive-edge')!);
+    click(withGroup.querySelector('[data-v-interactive-edge]')!);
     expect(edge('a-b').selected!()).toBe(true);
     expect(edge('a-c').selected!()).toBe(false);
 
     edge('a-c').interactionWidth!.set(0);
     await settle();
-    expect(plain.querySelector(':scope > .v-interactive-edge')).toBeNull();
+    expect(plain.querySelector(':scope > [data-v-interactive-edge]')).toBeNull();
   });
 
   it('elevates a node and an edge when they become selected, however the selection is made', async () => {

@@ -71,14 +71,14 @@ describe('Flow defs', () => {
     await settle();
   });
 
-  it('renders one marker element per distinct marker, with the stroke of the edge and a class per type', () => {
+  it('renders one marker element per distinct marker, with the stroke of the edge and its type as an attribute', () => {
     const markers = Array.from(root.querySelectorAll('defs[flowDefs] marker'));
 
     // The diamond of the edge, the diamond of the connection line (default size) and the arrow.
-    expect(markers.map((marker) => marker.getAttribute('class')).sort()).toEqual([
-      'v-marker v-marker--arrow',
-      'v-marker v-marker--diamond',
-      'v-marker v-marker--diamond',
+    expect(markers.map((marker) => marker.getAttribute('data-v-marker')).sort()).toEqual([
+      'arrow',
+      'diamond',
+      'diamond',
     ]);
     for (const marker of markers) {
       expect(marker.getAttribute('stroke')).toBe('context-stroke');
@@ -121,6 +121,6 @@ describe('Flow defs', () => {
     ]);
     await settle();
 
-    expect(root.querySelectorAll('defs[flowDefs] marker.v-marker--hexagon').length).toBe(2);
+    expect(root.querySelectorAll('defs[flowDefs] marker[data-v-marker=hexagon]').length).toBe(2);
   });
 });

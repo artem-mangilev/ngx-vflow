@@ -64,7 +64,7 @@ test('drops a reconnected edge on the canvas without panning the viewport', asyn
   await graph.scrollIntoViewIfNeeded();
   await expect(graph.locator('[edge]')).toHaveCount(2);
   const start = await viewport(graph);
-  const handle = graph.locator('.v-reconnect-handle').first();
+  const handle = graph.locator('[data-v-reconnect-handle]').first();
   const from = await center(handle);
 
   await page.mouse.move(from.x, from.y);

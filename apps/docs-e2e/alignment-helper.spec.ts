@@ -50,9 +50,9 @@ test('snaps a node into the middle of the gap between two neighbours while it is
   await drag(page, graph, { x: 500, y: 250 }, { x: 208, y: 333 });
 
   expect(await position(graph, '7')).toEqual({ x: 155, y: 300 });
-  await expect(graph.locator('line.v-alignment-line')).not.toHaveCount(0);
+  await expect(graph.locator('line[data-v-alignment-guide=line]')).not.toHaveCount(0);
   await page.mouse.up();
-  await expect(graph.locator('.v-alignment-line')).toHaveCount(0);
+  await expect(graph.locator('[data-v-alignment-guide=line]')).toHaveCount(0);
   expect(await position(graph, '7')).toEqual({ x: 155, y: 300 });
 });
 
@@ -96,7 +96,7 @@ test('moves freely while Alt is held', async ({ page }) => {
   await moveTo(page, graph, 208, 333);
 
   expect(await position(graph, '7')).toEqual({ x: 158, y: 303 });
-  await expect(graph.locator('.v-alignment-line')).toHaveCount(0);
+  await expect(graph.locator('[data-v-alignment-guide=line]')).toHaveCount(0);
   await page.keyboard.up('Alt');
   await page.mouse.up();
 });

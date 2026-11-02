@@ -4,7 +4,7 @@
 @if (model().interactionAreasCount() === 0 && model().interactionWidth() > 0) {
   <svg:path
     aria-hidden="true"
-    class="v-interactive-edge"
+    data-v-interactive-edge
     [attr.d]="model().path().path"
     [style.stroke-width.px]="model().interactionWidth()" />
 }
@@ -26,7 +26,6 @@
 @if (model().sourceHandle() && model().targetHandle()) {
   @if (model().reconnectable() === true || model().reconnectable() === 'source') {
     <svg:circle
-      class="v-reconnect-handle"
       data-v-reconnect-handle
       data-v-no-select
       r="10"
@@ -37,7 +36,6 @@
 
   @if (model().reconnectable() === true || model().reconnectable() === 'target') {
     <svg:circle
-      class="v-reconnect-handle"
       data-v-reconnect-handle
       data-v-no-select
       r="10"

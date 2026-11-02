@@ -9,7 +9,7 @@
         [attr.width]="pattern.gap"
         [attr.height]="pattern.gap">
         <svg:circle
-          class="v-background-pattern"
+          data-v-background-pattern
           [attr.cx]="pattern.radius"
           [attr.cy]="pattern.radius"
           [attr.r]="pattern.radius" />
@@ -27,7 +27,7 @@
         [attr.width]="pattern.gap"
         [attr.height]="pattern.gap">
         <svg:path
-          class="v-background-pattern"
+          data-v-background-pattern
           [attr.d]="'M ' + pattern.gap + ' 0 L 0 0 0 ' + pattern.gap"
           [attr.stroke-width]="pattern.strokeWidth" />
       </svg:pattern>

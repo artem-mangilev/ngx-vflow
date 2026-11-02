@@ -135,7 +135,7 @@ Tokens come in three levels, each with one owner:
 
 1. **Theme roles**, `--vui-*`, in your copy of `vflow-ui.css`: colors, shadows and scales, as shadcn's `--background`,
    `--card` or `--primary`. The parts read only these.
-2. **Core tokens**, `--v-*`: one per part core draws itself, named after its public class, with defaults for a flow
+2. **Core tokens**, `--v-*`: one per part core draws itself, named after its public attribute (`--v-selection-box` for `[data-v-selection-box]`), with defaults for a flow
    without the UI theme. Core reads only these.
 3. **The mapping**: a block in `vflow-ui.css` sets the core tokens from the roles, for example
    `--v-selection-box: var(--vui-accent)`.
@@ -170,18 +170,18 @@ typeface and size and use your Tailwind type utilities (`text-xs`, `font-semibol
 | `--vui-space`, `--vui-radius`                              | Grid unit and control radius                                  |
 | `--vui-shadow-node`, `--vui-shadow-floating`               | Elevation                                                     |
 
-| Core token                                        | Part                                                     | Theme sets              |
-| ------------------------------------------------- | -------------------------------------------------------- | ----------------------- |
-| `--v-background`                                  | Flow canvas (`.v-root`); also fills nodes in the minimap | `--vui-background`      |
-| `--v-background-pattern`                          | Dots and grid lines (`.v-background-pattern`)            | `--vui-border`          |
-| `--v-selection-box`                               | `.v-selection-box` stroke; its fill is the color at 12%  | `--vui-accent`          |
-| `--v-resize-control`, `--v-resize-control-border` | `.v-resize-control` handles and lines; the handle border | accent, surface         |
-| `--v-alignment-guides`                            | `.v-alignment-guides`, at 50%                            | `--vui-foreground`      |
-| `--v-connection`                                  | The line of a connection in progress without a template  | `--vui-muted`           |
-| `--v-minimap-mask`, `--v-minimap-selected`        | Minimap mask (35%) and outlines; selected node outline   | muted, accent           |
-| `--v-focus`                                       | Focus halo of nodes and edges                            | `--vui-accent`          |
-| `--v-focus-halo`, `--v-focus-radius`              | Focus geometry: halo 4px, node radius 0px                | radius = surface radius |
-| `--v-node-toolbar-offset`                         | Gap between a node and `<v-node-toolbar>`, 10px          | —                       |
+| Core token                                        | Part                                                           | Theme sets              |
+| ------------------------------------------------- | -------------------------------------------------------------- | ----------------------- |
+| `--v-background`                                  | Flow canvas (`[data-v-root]`); also fills nodes in the minimap | `--vui-background`      |
+| `--v-background-pattern`                          | Dots and grid lines (`[data-v-background-pattern]`)            | `--vui-border`          |
+| `--v-selection-box`                               | `[data-v-selection-box]` stroke; its fill is the color at 12%  | `--vui-accent`          |
+| `--v-resize-control`, `--v-resize-control-border` | `[data-v-resize-control]` handles and lines; the handle border | accent, surface         |
+| `--v-alignment-guides`                            | `[data-v-alignment-guides]`, at 50%                            | `--vui-foreground`      |
+| `--v-connection`                                  | The line of a connection in progress without a template        | `--vui-muted`           |
+| `--v-minimap-mask`, `--v-minimap-selected`        | Minimap mask (35%) and outlines; selected node outline         | muted, accent           |
+| `--v-focus`                                       | Focus halo of nodes and edges                                  | `--vui-accent`          |
+| `--v-focus-halo`, `--v-focus-radius`              | Focus geometry: halo 4px, node radius 0px                      | radius = surface radius |
+| `--v-node-toolbar-offset`                         | Gap between a node and `<v-node-toolbar>`, 10px                | —                       |
 
 The focus radius is the corner radius of the node itself; the halo follows it, so it stays concentric, and the theme
 sets it to the surface radius since the node part is rounded with it. Without the UI theme a

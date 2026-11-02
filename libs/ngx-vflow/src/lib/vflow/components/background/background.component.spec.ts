@@ -26,7 +26,7 @@ describe('Background pattern', () => {
   }
 
   it('strokes the grid lines without filling the cells', () => {
-    const line = render({ type: 'grid' }).querySelector('.v-background-pattern')!;
+    const line = render({ type: 'grid' }).querySelector('[data-v-background-pattern]')!;
     const style = getComputedStyle(line);
 
     expect(line.tagName).toBe('path');
@@ -35,7 +35,7 @@ describe('Background pattern', () => {
   });
 
   it('fills the dots without a stroke around them', () => {
-    const dot = render({ type: 'dots' }).querySelector('.v-background-pattern')!;
+    const dot = render({ type: 'dots' }).querySelector('[data-v-background-pattern]')!;
     const style = getComputedStyle(dot);
 
     expect(dot.tagName).toBe('circle');

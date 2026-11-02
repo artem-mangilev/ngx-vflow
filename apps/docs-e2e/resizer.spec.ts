@@ -22,8 +22,8 @@ function offsetSize(element: Locator) {
 
 async function expectOutline(node: Locator, card: Locator) {
   const cardBox = await box(card);
-  const top = await box(node.locator('.v-resize-control.v-resize-control--line.v-resize-control--top'));
-  const left = await box(node.locator('.v-resize-control.v-resize-control--line.v-resize-control--left'));
+  const top = await box(node.locator('[data-v-resize-control=line][data-v-resize-control-position=top]'));
+  const left = await box(node.locator('[data-v-resize-control=line][data-v-resize-control-position=left]'));
 
   expect(Math.abs(top.x - cardBox.x)).toBeLessThanOrEqual(TOLERANCE);
   expect(Math.abs(top.width - cardBox.width)).toBeLessThanOrEqual(TOLERANCE);
@@ -64,7 +64,7 @@ test.describe('overview resizer', () => {
     await node.scrollIntoViewIfNeeded();
     await expect(node).toHaveCSS('visibility', 'visible');
     await card.click();
-    await expect(node.locator('.v-resize-control')).toHaveCount(8);
+    await expect(node.locator('[data-v-resize-control]')).toHaveCount(8);
   });
 
   test('outlines a content-sized node and places its handles on the card edges', async () => {
@@ -81,7 +81,7 @@ test.describe('overview resizer', () => {
 
     await dragControl(
       page,
-      node.locator('.v-resize-control.v-resize-control--handle.v-resize-control--bottom.v-resize-control--right'),
+      node.locator('[data-v-resize-control=handle][data-v-resize-control-position=bottom-right]'),
       80,
       60,
     );
@@ -100,12 +100,10 @@ test('resizer demo keeps a node at its CSS min-width while shrinking', async ({ 
   await page.goto('/nodes/resizer');
   const node = page.locator('[data-v-node]', { has: page.locator('.custom-node') }).first();
   const card = node.locator('.custom-node');
-  const corner = node.locator(
-    '.v-resize-control.v-resize-control--handle.v-resize-control--bottom.v-resize-control--right',
-  );
+  const corner = node.locator('[data-v-resize-control=handle][data-v-resize-control-position=bottom-right]');
   await node.scrollIntoViewIfNeeded();
   await expect(node).toHaveCSS('visibility', 'visible');
-  await expect(node.locator('.v-resize-control')).toHaveCount(8);
+  await expect(node.locator('[data-v-resize-control]')).toHaveCount(8);
 
   await expect(card).not.toHaveAttribute('style', /width/);
   await expectOutline(node, card);

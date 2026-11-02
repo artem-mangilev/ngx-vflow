@@ -121,10 +121,10 @@ describe('Component edges', () => {
     const svgs = Array.from(root.querySelectorAll<SVGSVGElement>('svg[edge]'));
 
     for (const svg of svgs.slice(0, 3)) {
-      expect(svg.querySelector(':scope > path.v-interactive-edge')).toBeNull();
+      expect(svg.querySelector(':scope > path[data-v-interactive-edge]')).toBeNull();
       const presentationRoot = svg.querySelector<SVGGElement>(':scope > g')!;
       const stroke = presentationRoot.firstElementChild as SVGPathElement;
-      expect(stroke.classList.contains('v-interactive-edge')).toBe(true);
+      expect(stroke.hasAttribute('data-v-interactive-edge')).toBe(true);
       expect(stroke.namespaceURI).toBe(SVG_NAMESPACE);
       expect(stroke.getAttribute('d')).toMatch(/^M/);
       expect(stroke.style.strokeWidth).toBe('20px');
@@ -136,11 +136,11 @@ describe('Component edges', () => {
     const svgs = Array.from(root.querySelectorAll<SVGSVGElement>('svg[edge]'));
     const { edges } = fixture.componentInstance;
 
-    svgs[2].querySelector('path.v-interactive-edge')!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    svgs[2].querySelector('path[data-v-interactive-edge]')!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     expect(fixture.componentInstance.templateClicks).toEqual(['template']);
     expect(edges.map((edge) => edge.selected!())).toEqual([false, false, true, false]);
 
-    svgs[0].querySelector('path.v-interactive-edge')!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    svgs[0].querySelector('path[data-v-interactive-edge]')!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     expect(ProbeEdgeComponent.instances.find((probe) => probe.ctx.edge.id === 'class')!.clicks).toBe(1);
     expect(edges[0].selected!()).toBe(true);
   });
@@ -148,8 +148,8 @@ describe('Component edges', () => {
   it('hides the stroke at width 0 and still selects the edge from a presentation element', () => {
     const bare = Array.from(root.querySelectorAll<SVGSVGElement>('svg[edge]'))[3];
 
-    expect(bare.querySelector(':scope > path.v-interactive-edge')).toBeNull();
-    expect(bare.querySelector<SVGPathElement>('path.v-interactive-edge')!.style.display).toBe('none');
+    expect(bare.querySelector(':scope > path[data-v-interactive-edge]')).toBeNull();
+    expect(bare.querySelector<SVGPathElement>('path[data-v-interactive-edge]')!.style.display).toBe('none');
     bare.querySelector('path.template-edge-child')!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     expect(fixture.componentInstance.edges[3].selected!()).toBe(true);
   });
@@ -225,7 +225,7 @@ describe('Edges without vEdgeInteraction', () => {
     const svgs = Array.from(fixture.nativeElement.querySelectorAll('svg[edge]')) as SVGSVGElement[];
     expect(svgs.length).toBe(2);
     for (const svg of svgs) {
-      const stroke = svg.querySelector<SVGPathElement>(':scope > path.v-interactive-edge')!;
+      const stroke = svg.querySelector<SVGPathElement>(':scope > path[data-v-interactive-edge]')!;
       expect(stroke).not.toBeNull();
       expect(stroke.getAttribute('d')).toBe(svg.querySelector('path.v-focus-indicator')!.getAttribute('d'));
     }

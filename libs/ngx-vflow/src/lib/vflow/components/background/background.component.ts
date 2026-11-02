@@ -22,17 +22,17 @@ type Pattern =
   styles: [
     `
       /* Dots are filled, grid lines are stroked. A fill on the grid path would close each cell into a triangle. */
-      circle.v-background-pattern {
+      circle[data-v-background-pattern] {
         fill: var(--v-background-pattern);
       }
 
-      path.v-background-pattern {
+      path[data-v-background-pattern] {
         fill: none;
         stroke: var(--v-background-pattern);
       }
 
       @media (forced-colors: active) {
-        .v-background-pattern {
+        [data-v-background-pattern] {
           forced-color-adjust: none;
         }
       }

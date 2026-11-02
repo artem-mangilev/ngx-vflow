@@ -8,21 +8,21 @@
   initial-value: #fff;
 }
 
-// Dots and grid lines of `.v-background-pattern`.
+// Dots and grid lines of `[data-v-background-pattern]`.
 @property --v-background-pattern {
   syntax: '<color>';
   inherits: true;
   initial-value: rgb(177, 177, 183);
 }
 
-// Stroke of `.v-selection-box`; its fill is the same color at 12%.
+// Stroke of `[data-v-selection-box]`; its fill is the same color at 12%.
 @property --v-selection-box {
   syntax: '<color>';
   inherits: true;
   initial-value: #0f4c75;
 }
 
-// Handles and lines of `.v-resize-control`, and the border that separates a handle from the node under it.
+// Handles and lines of `[data-v-resize-control]`, and the border that separates a handle from the node under it.
 @property --v-resize-control {
   syntax: '<color>';
   inherits: true;
@@ -35,7 +35,7 @@
   initial-value: #fff;
 }
 
-// `.v-alignment-guides`, drawn at 50%.
+// `[data-v-alignment-guides]`, drawn at 50%.
 @property --v-alignment-guides {
   syntax: '<color>';
   inherits: true;
@@ -105,7 +105,7 @@
     [data-v-handle-type],
     [data-v-drag-handle],
     [data-v-reconnect-handle],
-    .v-resize-control {
+    [data-v-resize-control] {
       touch-action: none;
     }
   }
@@ -135,7 +135,7 @@
   }
 }
 
-.v-root {
+[data-v-root] {
   position: relative;
   overflow: hidden;
   background-color: var(--v-background);

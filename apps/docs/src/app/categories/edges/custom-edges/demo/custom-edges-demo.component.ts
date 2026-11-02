@@ -25,7 +25,7 @@ import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
       }
 
       /* The interaction stroke sits inside the group, so hovering near the line counts as hovering the group. */
-      .edge:hover path:not(.v-interactive-edge) {
+      .edge:hover path:not([data-v-interactive-edge]) {
         filter: brightness(0.85);
       }
     `,

@@ -7,7 +7,7 @@
       [style.--resizer-scale]="scale()"
       (pointerdown)="press($event)">
       @for (control of controls; track control.position) {
-        <div [class]="control.classes" [attr.data-v-resize-control]="control.position"></div>
+        <div [attr.data-v-resize-control]="control.kind" [attr.data-v-resize-control-position]="control.position"></div>
       }
     </div>
   }

@@ -7,7 +7,7 @@
  *    read only these. Text is the application's: the parts inherit its typeface, size and letter spacing and use its
  *    Tailwind type utilities, as do transitions.
  * 2. Core tokens, `--v-*`: one per part core draws itself (selection box, resize controls, focus ring, minimap…),
- *    named after its public class. The mapping block below sets them from the roles.
+ *    named after its public data attribute. The mapping block below sets them from the roles.
  * 3. Tailwind keys: every `vui` key derives from the roles; `inline` makes utilities use the expression itself.
  *
  * As with shadcn, a theme is a scope: `:root` or an element with `data-vui-theme`. The mapping resolves on the scope

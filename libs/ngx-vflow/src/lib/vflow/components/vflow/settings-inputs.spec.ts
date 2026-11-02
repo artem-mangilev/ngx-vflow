@@ -127,7 +127,7 @@ describe('object settings of vflow', () => {
     bare.detectChanges();
     const injector = bare.debugElement.query(By.directive(VflowComponent)).injector;
     expect(injector.get(FlowSettingsService).view()).toBe('auto');
-    const root = bare.nativeElement.querySelector('.v-root') as HTMLElement;
+    const root = bare.nativeElement.querySelector('[data-v-root]') as HTMLElement;
     expect(root.style.width).toBe('100%');
     expect(root.style.height).toBe('100%');
     bare.destroy();

@@ -312,7 +312,7 @@ test('themes stay scoped per editor, reach every layer and leave geometry alone'
   await page.getByLabel('Dark first editor', { exact: true }).check();
   await expect(a.locator('article.vui-node').first()).toHaveCSS('background-color', dark.node);
   await expect(a.locator('path.vui-edge')).toHaveCSS('stroke', dark.edge);
-  await expect(a.locator('.v-root')).toHaveCSS('background-color', 'oklch(0.141 0.005 285.823)');
+  await expect(a.locator('[data-v-root]')).toHaveCSS('background-color', 'oklch(0.141 0.005 285.823)');
   await expect.poll(minimapPixel).not.toBe(pixelBefore);
   expect(await geometry()).toEqual(before);
   await expect(b.locator('article.vui-node').first()).toHaveCSS('background-color', dark.node);
@@ -499,7 +499,7 @@ test('relationships map: floating edges, people moving into free spots, connecti
 
   // A selected team resizes; it cannot shrink past its members.
   await team('growth').locator('header').click();
-  const handle = demo.locator('.v-resize-control--handle.v-resize-control--bottom.v-resize-control--right');
+  const handle = demo.locator('[data-v-resize-control=handle][data-v-resize-control-position=bottom-right]');
   await expect(handle).toHaveCount(1);
   const before = (await team('growth').boundingBox())!;
   await dragTo(page, handle, { x: before.x + 20, y: before.y + 20 });

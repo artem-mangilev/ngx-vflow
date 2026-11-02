@@ -5,34 +5,36 @@
   pointer-events: none;
 }
 
-.v-resize-control {
+// `data-v-resize-control` is the kind (`handle` on a corner, `line` on a side), `data-v-resize-control-position`
+// the side or corner (`top`, `right`, `bottom`, `left`, `top-left`, `top-right`, `bottom-left`, `bottom-right`).
+[data-v-resize-control] {
   position: absolute;
   pointer-events: all;
 }
 
 // Cursors per position
-.v-resize-control.v-resize-control--left,
-.v-resize-control.v-resize-control--right {
+[data-v-resize-control-position='left'],
+[data-v-resize-control-position='right'] {
   cursor: ew-resize;
 }
 
-.v-resize-control.v-resize-control--top,
-.v-resize-control.v-resize-control--bottom {
+[data-v-resize-control-position='top'],
+[data-v-resize-control-position='bottom'] {
   cursor: ns-resize;
 }
 
-.v-resize-control.v-resize-control--top.v-resize-control--left,
-.v-resize-control.v-resize-control--bottom.v-resize-control--right {
+[data-v-resize-control-position='top-left'],
+[data-v-resize-control-position='bottom-right'] {
   cursor: nwse-resize;
 }
 
-.v-resize-control.v-resize-control--bottom.v-resize-control--left,
-.v-resize-control.v-resize-control--top.v-resize-control--right {
+[data-v-resize-control-position='bottom-left'],
+[data-v-resize-control-position='top-right'] {
   cursor: nesw-resize;
 }
 
 // Corner handles keep a constant on-screen size: the scale counters the zoom.
-.v-resize-control.v-resize-control--handle {
+[data-v-resize-control='handle'] {
   width: 6px;
   height: 6px;
   background-color: var(--v-resize-control);
@@ -42,78 +44,66 @@
   scale: var(--resizer-scale, 1);
 }
 
-.v-resize-control.v-resize-control--handle.v-resize-control--left,
-.v-resize-control.v-resize-control--handle.v-resize-control--right {
-  top: 50%;
-}
-
-.v-resize-control.v-resize-control--handle.v-resize-control--top,
-.v-resize-control.v-resize-control--handle.v-resize-control--bottom {
-  left: 50%;
-}
-
-// Edge lines
-.v-resize-control.v-resize-control--line {
+// Side lines
+[data-v-resize-control='line'] {
   border-width: 0;
   border-style: solid;
   border-color: var(--v-resize-control);
 }
 
-.v-resize-control.v-resize-control--line.v-resize-control--left,
-.v-resize-control.v-resize-control--line.v-resize-control--right {
+[data-v-resize-control='line'][data-v-resize-control-position='left'],
+[data-v-resize-control='line'][data-v-resize-control-position='right'] {
   width: 1px;
   transform: translate(-50%, 0);
   top: 0;
   height: 100%;
 }
 
-.v-resize-control.v-resize-control--line.v-resize-control--left {
+[data-v-resize-control='line'][data-v-resize-control-position='left'] {
   border-left-width: 1px;
 }
 
-.v-resize-control.v-resize-control--line.v-resize-control--right {
+[data-v-resize-control='line'][data-v-resize-control-position='right'] {
   border-right-width: 1px;
 }
 
-.v-resize-control.v-resize-control--line.v-resize-control--top,
-.v-resize-control.v-resize-control--line.v-resize-control--bottom {
+[data-v-resize-control='line'][data-v-resize-control-position='top'],
+[data-v-resize-control='line'][data-v-resize-control-position='bottom'] {
   height: 1px;
   transform: translate(0, -50%);
   left: 0;
   width: 100%;
 }
 
-.v-resize-control.v-resize-control--line.v-resize-control--top {
+[data-v-resize-control='line'][data-v-resize-control-position='top'] {
   border-top-width: 1px;
 }
 
-.v-resize-control.v-resize-control--line.v-resize-control--bottom {
+[data-v-resize-control='line'][data-v-resize-control-position='bottom'] {
   border-bottom-width: 1px;
 }
 
-.v-resize-control.v-resize-control--handle.v-resize-control--left,
-.v-resize-control.v-resize-control--line.v-resize-control--left {
+// Placement on the gap outside the node box: a side, or the sides a corner is named after.
+[data-v-resize-control-position='left'],
+[data-v-resize-control-position$='-left'] {
   left: calc(0px - var(--resizer-gap));
 }
 
-.v-resize-control.v-resize-control--handle.v-resize-control--right,
-.v-resize-control.v-resize-control--line.v-resize-control--right {
+[data-v-resize-control-position='right'],
+[data-v-resize-control-position$='-right'] {
   left: calc(100% + var(--resizer-gap));
 }
 
-.v-resize-control.v-resize-control--handle.v-resize-control--top,
-.v-resize-control.v-resize-control--line.v-resize-control--top {
+[data-v-resize-control-position^='top'] {
   top: calc(0px - var(--resizer-gap));
 }
 
-.v-resize-control.v-resize-control--handle.v-resize-control--bottom,
-.v-resize-control.v-resize-control--line.v-resize-control--bottom {
+[data-v-resize-control-position^='bottom'] {
   top: calc(100% + var(--resizer-gap));
 }
 
 @media (forced-colors: active) {
-  .v-resize-control.v-resize-control--handle,
-  .v-resize-control.v-resize-control--line {
+  [data-v-resize-control] {
     forced-color-adjust: none;
   }
 }

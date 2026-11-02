@@ -42,7 +42,7 @@ The element with the `vResizable` directive is the node's sizing box:
 
 ## Resizer appearance
 
-The resize controls take their colors from the core tokens `--v-resize-control` (handles and lines) and `--v-resize-control-border` (the border that separates a handle from the node); the `.v-resize-control` class (with `.v-resize-control--handle` / `.v-resize-control--line` modifiers) is the public selector for size and shape overrides.
+The resize controls take their colors from the core tokens `--v-resize-control` (handles and lines) and `--v-resize-control-border` (the border that separates a handle from the node); the `data-v-resize-control` attribute (`handle` on a corner, `line` on a side, with the side or corner in `data-v-resize-control-position`) is the public selector for size and shape overrides.
 
 ## Resize event
 

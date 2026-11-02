@@ -166,7 +166,7 @@ describe('connection outputs', () => {
     ]);
     await setup({}, [edge]);
 
-    await connect(fixture.nativeElement.querySelector('.v-reconnect-handle'), handle('b', 'in'));
+    await connect(fixture.nativeElement.querySelector('[data-v-reconnect-handle]'), handle('b', 'in'));
 
     expect(host.reconnects).toMatchObject([
       { connection: { source: 'a', target: 'b', sourceHandle: 'out', targetHandle: 'in' }, edge },
@@ -178,7 +178,7 @@ describe('connection outputs', () => {
       { id: 'a-b', source: 'a', target: 'b', sourceHandle: 'out', targetHandle: 'in', reconnectable: 'target' },
     ]);
     await setup({}, [edge]);
-    const reconnectHandles = fixture.nativeElement.querySelectorAll('.v-reconnect-handle');
+    const reconnectHandles = fixture.nativeElement.querySelectorAll('[data-v-reconnect-handle]');
     expect(reconnectHandles.length).toBe(1);
 
     await connect(reconnectHandles[0], handle('c', 'in'));
@@ -202,6 +202,6 @@ describe('connection outputs', () => {
     ]);
     await setup({}, edges);
 
-    expect(fixture.nativeElement.querySelectorAll('.v-reconnect-handle').length).toBe(2);
+    expect(fixture.nativeElement.querySelectorAll('[data-v-reconnect-handle]').length).toBe(2);
   });
 });

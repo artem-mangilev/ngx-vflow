@@ -41,14 +41,10 @@ const CONTROL_POSITIONS: ControlPosition[] = [
   'bottom-right',
 ];
 
-/** The four lines and the four corner handles, each with its public classes. */
+/** The four lines and the four corner handles; `data-v-resize-control` is the kind, `-position` the side or corner. */
 const CONTROLS = CONTROL_POSITIONS.map((position) => ({
   position,
-  classes: [
-    'v-resize-control',
-    position.includes('-') ? 'v-resize-control--handle' : 'v-resize-control--line',
-    ...position.split('-').map((side) => `v-resize-control--${side}`),
-  ].join(' '),
+  kind: position.includes('-') ? 'handle' : 'line',
 }));
 
 /**
@@ -146,7 +142,7 @@ export class VflowResizableComponent implements OnInit, OnDestroy {
     const control = (event.target as Element).closest<HTMLElement>('[data-v-resize-control]');
     if (!control) return;
 
-    const position = control.dataset['vResizeControl'] as ControlPosition;
+    const position = control.dataset['vResizeControlPosition'] as ControlPosition;
     event.stopPropagation();
 
     this.tracker?.destroy();

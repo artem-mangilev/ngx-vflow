@@ -292,11 +292,11 @@ describe('minimap projection', () => {
 
   it('does not render a minimap that a wrapper hides from the flow slot', async () => {
     const root = await render(false);
-    expect(root.querySelector('.v-root canvas')).toBeNull();
+    expect(root.querySelector('[data-v-root] canvas')).toBeNull();
   });
 
   it('renders a wrapper marked with ngProjectAs', async () => {
     const root = await render(true);
-    expect(root.querySelector('.v-root .v-minimap canvas')).not.toBeNull();
+    expect(root.querySelector('[data-v-root] .v-minimap canvas')).not.toBeNull();
   });
 });
