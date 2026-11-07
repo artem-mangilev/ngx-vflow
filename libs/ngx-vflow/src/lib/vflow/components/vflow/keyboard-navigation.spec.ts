@@ -231,18 +231,26 @@ describe('public keyboard graph navigation', () => {
     expect(host.nodes()[1].point()).toEqual({ x: 50, y: 80 });
   });
 
-  it('recovers focus after removal or policy changes without stealing focus from outside', async () => {
+  it('returns focus to the page after removal or policy changes without stealing focus from outside', async () => {
     const { fixture, host, root } = await setup();
+    root.querySelector<SVGElement>('[aria-label="Route"]')!.focus();
+    host.edges = [];
+    fixture.changeDetectorRef.markForCheck();
+    fixture.detectChanges();
+    await fixture.whenStable();
+    // Focus does not jump to another entity: the container is not a focus target either.
+    expect(document.activeElement).toBe(document.body);
     root.querySelector<HTMLElement>('[aria-label="Child"]')!.focus();
     host.nodes.set(host.nodes().slice(1));
     fixture.changeDetectorRef.markForCheck();
     fixture.detectChanges();
     await fixture.whenStable();
-    expect(document.activeElement?.getAttribute('aria-label')).toBe('Parent');
+    expect(document.activeElement).toBe(document.body);
+    root.querySelector<HTMLElement>('[aria-label="Parent"]')!.focus();
     host.nodesFocusable.set(false);
     fixture.detectChanges();
     await fixture.whenStable();
-    // With no focusable entity left, focus goes back to the page: the container is not a focus target.
+    // A wrapper that stopped being focusable does not keep focus.
     expect(document.activeElement).toBe(document.body);
     expect(root.querySelector('[role="region"]')!.hasAttribute('tabindex')).toBe(false);
     const outside = root.querySelector('button')!;

@@ -71,7 +71,7 @@ onDeleteRequest(request: DeleteRequest) {
 
 A command that changes state reports it in the flow's own polite live region: `Draft selected. 1 selected in total.`, `Selection cleared.`, `Moved node right. Position: 25, 20.`, `Zoom 120%.`. Panning is silent, and so are pointer and programmatic changes. There is no public API for announcing your own messages.
 
-**Focus recovery.** When the focused entity is removed or stops being focusable, focus moves to the next entity, then the previous one; when there is none, focus returns to the page. The graph container is not a focus target, so a click on the empty pane does not take focus either. Nothing takes focus on page load.
+**Focus after removal.** When the focused entity is removed or stops being focusable, focus returns to the page; it does not move to another node or edge. The graph container is not a focus target, so a click on the empty pane does not take focus either. Nothing takes focus on page load.
 
 **Focus pan.** A node that receives keyboard focus while fully offscreen is centered at the current zoom. `[autoPanOnNodeFocus]="false"` turns this off; edges and arrow movement never pan.
 

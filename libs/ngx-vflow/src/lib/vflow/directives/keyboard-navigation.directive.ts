@@ -17,7 +17,7 @@ interface KeyboardCommand {
 }
 
 /**
- * Native Tab traversal, focus repair when an entity disappears, and the one listener that turns a key press on a
+ * Native Tab traversal, focus release when the focused entity disappears, and the one listener that turns a key press on a
  * focused entity wrapper into a command. A press is answered by the first command whose key it carries and that accepts
  * it. The container itself is not focusable: a click on the pane leaves focus to the page, as in other flow libraries.
  */
@@ -36,7 +36,6 @@ export class KeyboardNavigationDirective {
   private keyboard = inject(KeyboardService);
   private entityCommands = inject(KeyboardEntityCommandsService);
   private viewportCommands = inject(KeyboardViewportCommandsService);
-  private previous: readonly KeyboardEntityDirective[] = [];
   private focused = signal<{ entity: KeyboardEntityDirective; target: Element } | undefined>(undefined);
 
   /** Every command in the order a press consults them. */
@@ -65,23 +64,19 @@ export class KeyboardNavigationDirective {
     afterRenderEffect(() => {
       const entities = this.entities();
       const focused = this.focused();
-      const previous = this.previous;
-      this.previous = entities;
       if (!focused) return;
       const { entity, target } = focused;
       if (entities.includes(entity) && (isEligible(entity) || target !== entity.element)) return;
       untracked(() => {
-        const active = this.element.ownerDocument.activeElement;
         this.focused.set(undefined);
-        if (active && active !== target && active !== this.element.ownerDocument.body) return;
-        const index = previous.indexOf(entity);
-        const next =
-          [...previous.slice(index + 1), ...previous.slice(0, index).reverse()].find(isEligible) ??
-          entities.find(isEligible);
-        if (next) next.element.focus({ preventScroll: true });
-        // Without one, focus goes back to the page: the container is not a focus target, and a wrapper that stopped
-        // being focusable must not keep it.
-        else if (active === target && (target instanceof HTMLElement || target instanceof SVGElement)) target.blur();
+        // Focus goes back to the page rather than to another entity, so a removal does not move the keyboard user
+        // onto a node or edge they did not choose. A removed wrapper has already lost focus; one that stopped being
+        // focusable must not keep it. The container is not a focus target.
+        if (
+          this.element.ownerDocument.activeElement === target &&
+          (target instanceof HTMLElement || target instanceof SVGElement)
+        )
+          target.blur();
       });
     });
   }

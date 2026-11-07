@@ -490,19 +490,6 @@ describe('CSS viewport virtualization', () => {
     hosts.forEach((host) => expect(getComputedStyle(host).display).toBe('none'));
   });
 
-  it('skips CSS-hidden entities when repairing focus after node removal', async () => {
-    const nodes = [0, 1000, 200].map((x, i) =>
-      createNode({ id: String(i), component: PlainNodeComponent, point: { x, y: 0 } }),
-    );
-    const fixture = setup(nodes);
-    await settle(fixture);
-    const hosts = fixture.nativeElement.querySelectorAll('[data-v-node]') as NodeListOf<HTMLElement>;
-    hosts[0].focus();
-    fixture.componentRef.setInput('nodes', nodes.slice(1));
-    await settle(fixture);
-    expect(document.activeElement).toBe(hosts[2]);
-  });
-
   it('keeps resize and connection participants in layout and releases them afterwards', async () => {
     const fixture = setup([createNode({ id: 'a', component: PlainNodeComponent, point: { x: 0, y: 0 } })]);
     await settle(fixture);
