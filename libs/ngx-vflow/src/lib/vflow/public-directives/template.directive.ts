@@ -126,7 +126,18 @@ export class VflowMarkerTemplateDirective {
   public inset = input(0, { transform: numberAttribute });
 }
 
-/** Presentation of every node without a `component`. */
+/**
+ * Presentation of every node without a `component`. Use the structural form on one root element; use the long form
+ * when the template has several roots or starts with control flow:
+ *
+ * ```html
+ * <div *vNode="let ctx" class="node">{{ ctx.data().text }}</div>
+ *
+ * <ng-template let-ctx vNode>
+ *   @if (ctx.data().kind === 'group') { … } @else { … }
+ * </ng-template>
+ * ```
+ */
 @Directive({
   standalone: true,
   selector: 'ng-template[vNode]',

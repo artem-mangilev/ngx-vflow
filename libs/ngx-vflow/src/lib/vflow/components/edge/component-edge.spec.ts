@@ -48,12 +48,10 @@ class TemplateEdgeChildComponent {
     [edges]="edges"
     (componentEdgeEvent)="edgeEvents.push($event)"
     (componentNodeEvent)="nodeEvents.push($event)">
-    <ng-template vNode>
-      <div style="width: 60px; height: 30px">
-        <span vHandle handleType="target" position="left"></span
-        ><span vHandle handleType="source" position="right"></span>
-      </div>
-    </ng-template>
+    <div *vNode style="width: 60px; height: 30px">
+      <span vHandle handleType="target" position="left"></span
+      ><span vHandle handleType="source" position="right"></span>
+    </div>
     <ng-template let-ctx vEdge>
       <svg:g vEdgeInteraction templateEdgeChild (click)="templateClicks.push(ctx.edge.id)" />
     </ng-template>
@@ -191,12 +189,10 @@ class PlainEdgeComponent {
 
 @Component({
   template: `<vflow [view]="[400, 200]" [nodes]="nodes" [edges]="edges">
-    <ng-template vNode>
-      <div style="width: 60px; height: 30px">
-        <span vHandle handleType="target" position="left"></span
-        ><span vHandle handleType="source" position="right"></span>
-      </div>
-    </ng-template>
+    <div *vNode style="width: 60px; height: 30px">
+      <span vHandle handleType="target" position="left"></span
+      ><span vHandle handleType="source" position="right"></span>
+    </div>
     <ng-template let-ctx vEdge><svg:path class="plain" fill="none" [attr.d]="ctx.path()" /></ng-template>
   </vflow>`,
   imports: [VflowComponent, VflowNodeTemplateDirective, VflowEdgeTemplateDirective, VflowHandleDirective],

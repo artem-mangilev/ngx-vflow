@@ -14,7 +14,7 @@ interface LabelData {
 
 @Component({
   template: `<vflow view="auto" [nodes]="nodes" [edges]="edges">
-    <ng-template let-ctx vNode><docs-node [ctx]="ctx" /></ng-template>
+    <docs-node *vNode="let ctx" [ctx]="ctx" />
 
     <ng-template let-ctx vEdge>
       <svg:g docsEdge [ctx]="ctx" />

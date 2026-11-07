@@ -12,12 +12,10 @@ import { VflowHandleDirective } from '../../public-directives/handle.directive';
 
 @Component({
   template: `<vflow [view]="[600, 400]" [nodes]="nodes" [edges]="edges()" [connection]="{ markerEnd: 'diamond' }">
-    <ng-template vNode>
-      <div style="width: 60px; height: 30px">
-        <span vHandle handleType="target" position="left"></span
-        ><span vHandle handleType="source" position="right"></span>
-      </div>
-    </ng-template>
+    <div *vNode style="width: 60px; height: 30px">
+      <span vHandle handleType="target" position="left"></span
+      ><span vHandle handleType="source" position="right"></span>
+    </div>
     <ng-template let-ctx vEdge>
       <svg:path
         fill="none"

@@ -44,7 +44,7 @@ class TemplateChildComponent {
 
 @Component({
   template: `<vflow [view]="[400, 300]" [nodes]="nodes()" (componentNodeEvent)="events.push($event)">
-    <ng-template vNode><template-child /></ng-template>
+    <template-child *vNode />
   </vflow>`,
   imports: [VflowComponent, VflowNodeTemplateDirective, TemplateChildComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,

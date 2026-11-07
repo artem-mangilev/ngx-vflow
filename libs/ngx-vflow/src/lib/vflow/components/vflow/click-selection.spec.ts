@@ -11,13 +11,11 @@ import { createEdges } from '../../interfaces/edge.interface';
     [edges]="edges()"
     [elevateNodesOnSelect]="elevateNodes()"
     [elevateEdgesOnSelect]="elevateEdges()">
-    <ng-template let-ctx vNode>
-      <div class="card" style="width: 60px; height: 30px">
-        <button type="button" class="action" vNoSelect>act</button>
-        <span vHandle handleType="target" position="left"></span>
-        <span vHandle handleType="source" position="right"></span>
-      </div>
-    </ng-template>
+    <div *vNode="let ctx" class="card" style="width: 60px; height: 30px">
+      <button type="button" class="action" vNoSelect>act</button>
+      <span vHandle handleType="target" position="left"></span>
+      <span vHandle handleType="source" position="right"></span>
+    </div>
     <ng-template let-ctx vEdge>
       @if (ctx.edge.id === 'a-b') {
         <svg:g vEdgeInteraction>

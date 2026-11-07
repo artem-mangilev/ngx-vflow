@@ -7,13 +7,11 @@ import { Node, Edge, Vflow, createNodes } from 'ngx-vflow';
   template: `<vflow view="auto" [nodes]="nodes" [edges]="edges">
     <ng-template let-ctx vEdge><svg:g docsEdge [ctx]="ctx" /></ng-template>
 
-    <ng-template let-ctx vNode>
-      <div class="custom-node" [class.custom-node_selected]="ctx.selected()">
-        {{ ctx.data().text }}
+    <div *vNode="let ctx" class="custom-node" [class.custom-node_selected]="ctx.selected()">
+      {{ ctx.data().text }}
 
-        <span vuiPort handleType="source" position="right"></span>
-      </div>
-    </ng-template>
+      <span vuiPort handleType="source" position="right"></span>
+    </div>
   </vflow>`,
   styles: [
     `

@@ -9,8 +9,13 @@ to remove it. Head counts follow every move. Select a team to resize it; it cann
 
 ```
 
+```typescript file="./relationship-nodes.ts"
+
+```
+
 ## What this page proves
 
+- Every kind of node is a component node (`component` on the node): each one reads its node with `injectNode` and keeps its own styles. The application tells kinds apart by `node.component`, so the data carries no `kind` field. A team reads the drop target and head counts through DI: the demo provides itself as `TeamBoard`, and a component node injects what the components around the flow provide.
 - A `vuiGroup` on a group node (a node with a size and children) carries its own edges; membership of people in a team is graph data (`parentId`), not a visual rule.
 - Groups nest: a child group is positioned in its parent and stays inside it like any child.
 - Floating edges: `vHandle` with `position="auto"` meets every node on the side facing the other end, so edges stay clean as people move. The card is the handle; `vDragHandle` on its name row keeps dragging the node.

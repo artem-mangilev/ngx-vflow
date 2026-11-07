@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, forwardRef, signal, viewChild } from '@angular/core';
 import { Vui } from '@vflow/ui';
 import {
   addEdges,
@@ -6,42 +6,25 @@ import {
   ConnectionSettings,
   createEdge,
   createEdges,
-  createNodes,
+  createNode,
   DeleteRequest,
   Edge,
   NodeDragEvent,
+  NodeWithDefaults,
   Point,
   removeElements,
   Vflow,
   VflowComponent,
 } from 'ngx-vflow';
 import { injectDocsTheme } from '../../../shared/docs-theme';
-
-interface Person {
-  kind: 'person';
-  name: string;
-  role: string;
-  initials: string;
-  /** Avatar fill, chosen for 4.5:1 with the white initials. */
-  color: string;
-  reviews: number;
-}
-interface Metric {
-  kind: 'metric';
-  title: string;
-  value: string;
-  delta: string;
-  series: number[];
-}
-interface Note {
-  kind: 'note';
-  text: string;
-}
-interface Team {
-  kind: 'team';
-  title: string;
-}
-type MapData = Person | Metric | Note | Team;
+import {
+  DropTarget,
+  MetricNodeComponent,
+  NoteNodeComponent,
+  PersonNodeComponent,
+  TeamBoard,
+  TeamNodeComponent,
+} from './relationship-nodes';
 
 interface Relation {
   label?: string;
@@ -62,92 +45,11 @@ const LAYOUT = { inset: 16, header: 52, gap: 16, step: 8 };
   selector: 'app-ui-relationships-demo',
   imports: [Vflow, Vui],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  // Node components inject the map from here: they are created inside the flow, under this component.
+  providers: [{ provide: TeamBoard, useExisting: forwardRef(() => RelationshipsDemoComponent) }],
   styles: `
     vflow {
       height: 560px;
-    }
-    article {
-      font-size: 14px;
-    }
-    .person {
-      width: 170px;
-    }
-    /* The card is the handle: the name row drags the person, the rest starts or accepts a connection. */
-    .person header {
-      cursor: grab;
-    }
-    .person .vui-node-body {
-      cursor: crosshair;
-    }
-    .person[data-v-handle-state='valid'] {
-      outline: 2px solid var(--vui-accent);
-      outline-offset: 2px;
-    }
-    .avatar {
-      display: block;
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-    }
-    .meter {
-      height: 6px;
-      border-radius: 3px;
-      background: var(--vui-surface-muted);
-      overflow: hidden;
-    }
-    /* Neutral: the accent belongs to selection. */
-    .meter span {
-      display: block;
-      height: 100%;
-      background: var(--vui-muted);
-    }
-    .metric {
-      width: 170px;
-    }
-    .value {
-      font-size: 22px;
-      font-weight: 600;
-    }
-    .spark {
-      display: flex;
-      align-items: flex-end;
-      gap: 2px;
-      height: 28px;
-      margin-top: 6px;
-    }
-    .spark span {
-      flex: 1;
-      background: var(--vui-muted);
-      border-radius: 1px;
-    }
-    .note {
-      width: 180px;
-      background: #fef9c3;
-      color: #713f12;
-      border-color: #fde047;
-    }
-    [data-vui-theme='dark'] .note {
-      background: #3f3b1f;
-      color: #fef08a;
-      border-color: #a16207;
-    }
-    .team {
-      --vui-space: 4px;
-      transition:
-        border-color 120ms,
-        background-color 120ms;
-    }
-    /* A nested team sits a step darker than its parent. */
-    .team.nested {
-      background: color-mix(in oklab, var(--vui-surface-muted), var(--vui-foreground) 4%);
-    }
-    /* Drop feedback is application CSS: the team under a dragged person, or a team without room. */
-    .team[data-drop-target='ok'] {
-      border-color: var(--vui-accent);
-      background: color-mix(in oklab, var(--vui-surface-muted), var(--vui-accent) 10%);
-    }
-    .team[data-drop-target='full'] {
-      border-color: var(--vui-danger);
     }
     .vui-edge[data-link='true'] {
       stroke-dasharray: 4 4;
@@ -167,79 +69,6 @@ const LAYOUT = { inset: 16, header: 52, gap: 16, step: 8 };
         (nodeDrag)="drag($event)"
         (nodeDragEnd)="dragEnd($event)"
         (initialized)="flow()?.fitView()">
-        <ng-template let-ctx vNode>
-          @if (ctx.data().kind === 'team') {
-            <!-- Selecting a team shows its resize controls; core keeps the children inside while it shrinks. -->
-            <div
-              vuiGroup
-              class="team"
-              [class.nested]="!!ctx.node.parentId?.()"
-              [attr.data-team]="ctx.node.id"
-              [attr.data-drop-target]="dropTarget()?.team === ctx.node.id ? dropTarget()!.state : null"
-              [vResizable]="ctx.selected()"
-              [minWidth]="240"
-              [minHeight]="120">
-              <header vuiGroupHeader>
-                <span vuiTitle>{{ ctx.data().title }}</span>
-                <span vuiMeta data-testid="members">{{ headCount(members().get(ctx.node.id) ?? 0) }}</span>
-              </header>
-              <!-- The group has its own connections, which float to the side facing the other end. -->
-              <span vHandle handleType="any" position="auto" [canStart]="false" [canAccept]="false"></span>
-            </div>
-          } @else {
-            @switch (ctx.data().kind) {
-              @case ('person') {
-                <article vuiNode vHandle handleType="any" position="auto" class="person">
-                  <header vuiNodeHeader vDragHandle>
-                    <!-- The slot centers the 28px avatar on the first line of the name. -->
-                    <span vuiIcon>
-                      <svg
-                        class="avatar"
-                        viewBox="0 0 28 28"
-                        role="img"
-                        [attr.aria-label]="'Avatar of ' + ctx.data().name">
-                        <circle cx="14" cy="14" r="14" [attr.fill]="ctx.data().color" />
-                        <text x="14" y="18" text-anchor="middle" fill="#fff" font-size="11" font-weight="600">
-                          {{ ctx.data().initials }}
-                        </text>
-                      </svg>
-                    </span>
-                    <span vuiTitle>{{ ctx.data().name }}</span>
-                  </header>
-                  <div vuiNodeBody>
-                    <p vuiMeta>{{ ctx.data().role }}, {{ ctx.data().reviews }} reviews this month</p>
-                    <div class="meter" role="img" [attr.aria-label]="ctx.data().reviews + ' of 20 reviews'">
-                      <span [style.width.%]="ctx.data().reviews * 5"></span>
-                    </div>
-                  </div>
-                </article>
-              }
-              @case ('metric') {
-                <article vuiNode class="metric">
-                  <header vuiNodeHeader>
-                    <span vuiTitle>{{ ctx.data().title }}</span>
-                  </header>
-                  <div vuiNodeBody>
-                    <div class="value">{{ ctx.data().value }}</div>
-                    <p vuiMeta>{{ ctx.data().delta }}</p>
-                    <div class="spark" role="img" aria-label="Weekly trend, rising">
-                      @for (point of ctx.data().series; track $index) {
-                        <span [style.height.%]="point"></span>
-                      }
-                    </div>
-                  </div>
-                  <span vHandle handleType="any" position="auto" [canStart]="false" [canAccept]="false"></span>
-                </article>
-              }
-              @default {
-                <!-- A note has no handle: it is content on the canvas, not a participant of the graph. -->
-                <article vuiNode class="note">
-                  <div vuiNodeBody>{{ ctx.data().text }}</div>
-                </article>
-              }
-            }
-          }
-        </ng-template>
         <ng-template let-ctx vEdge>
           <svg:g vEdgeInteraction>
             <svg:path
@@ -261,10 +90,11 @@ const LAYOUT = { inset: 16, header: 52, gap: 16, step: 8 };
     </section>
   `,
 })
-export class RelationshipsDemoComponent {
+export class RelationshipsDemoComponent implements TeamBoard {
   readonly flow = viewChild(VflowComponent);
   readonly theme = injectDocsTheme();
-  readonly nodes = createNodes<MapData>([
+  /** Every kind of node is its own component; the demo tells them apart by `component`, not by data. */
+  readonly nodes: NodeWithDefaults[] = [
     team('platform', { x: 0, y: 0 }, 606, 510, 'Platform'),
     // A team inside a team: its point is relative to Platform, and it stays inside it like any child.
     team('infra', { x: 16, y: 260 }, 574, 234, 'Infra', 'platform'),
@@ -274,25 +104,26 @@ export class RelationshipsDemoComponent {
     person('eli', { x: 388, y: 52 }, 'infra', 'Eli Park', 'SRE', 'EP', '#4d7c0f', 5),
     person('chi', { x: 16, y: 52 }, 'growth', 'Chi Nguyen', 'Engineer', 'CN', '#c2410c', 6),
     person('dea', { x: 214, y: 280 }, 'growth', 'Dea Rossi', 'Analyst', 'DR', '#7e22ce', 11),
-    {
+    createNode({
       id: 'deploys',
       point: { x: 0, y: 560 },
       ariaLabel: 'Deploys per week metric',
+      component: MetricNodeComponent,
       data: {
-        kind: 'metric',
         title: 'Deploys / week',
         value: '14',
         delta: '+27% in 6 weeks',
         series: [30, 45, 40, 60, 55, 80, 100],
       },
-    },
-    {
+    }),
+    createNode({
       id: 'note',
       point: { x: 576, y: 560 },
       ariaLabel: 'Note',
-      data: { kind: 'note', text: 'Q3 focus: fewer handoffs between the two teams.' },
-    },
-  ]);
+      component: NoteNodeComponent,
+      data: { text: 'Q3 focus: fewer handoffs between the two teams.' },
+    }),
+  ];
   readonly edges = signal<Edge<Relation>[]>(
     createEdges<Relation>([
       // A connection between the two groups themselves.
@@ -318,13 +149,13 @@ export class RelationshipsDemoComponent {
   };
 
   /** The team under the dragged person, and whether it has room; the drop lands there. */
-  readonly dropTarget = signal<{ team: string; state: 'ok' | 'full' } | null>(null);
+  readonly dropTarget = signal<DropTarget | null>(null);
 
   /** Head count of every team, nested teams included: membership is `parentId`, so it follows every move. */
   readonly members = computed(() => {
     const counts = new Map<string, number>();
     for (const node of this.nodes) {
-      if (node.data().kind !== 'person') continue;
+      if (node.component !== PersonNodeComponent) continue;
       for (let id = node.parentId(); id; id = this.node(id).parentId()) {
         counts.set(id, (counts.get(id) ?? 0) + 1);
       }
@@ -334,10 +165,6 @@ export class RelationshipsDemoComponent {
 
   /** Where each dragged person came from, to return there when the drop has no room. */
   private origins = new Map<string, { parentId: string; point: Point }>();
-
-  headCount(count: number) {
-    return count === 1 ? '1 person' : `${count} people`;
-  }
 
   connect(connection: Connection) {
     const edge = createEdge<Relation>(
@@ -436,9 +263,9 @@ export class RelationshipsDemoComponent {
     const center = { x: rect.x + rect.width / 2, y: rect.y + rect.height / 2 };
     // Selection elevates a node, so the topmost team is not always the innermost one: compare depths instead.
     return flow
-      .getNodesAtPoint<MapData>(center)
+      .getNodesAtPoint(center)
       .map(({ node }) => node.id)
-      .filter((nodeId) => this.node(nodeId).data().kind === 'team')
+      .filter((nodeId) => this.node(nodeId).component === TeamNodeComponent)
       .sort((a, b) => this.depth(b) - this.depth(a))[0];
   }
 
@@ -452,7 +279,7 @@ export class RelationshipsDemoComponent {
   }
 
   private isPerson(id: string) {
-    return this.node(id)?.data().kind === 'person';
+    return this.node(id)?.component === PersonNodeComponent;
   }
 
   private movedPeople(nodes: { id: string }[]) {
@@ -468,7 +295,16 @@ function team(
   title: string,
   parentId?: string,
 ) {
-  return { id, point, width, height, parentId, ariaLabel: `${title} team`, data: { kind: 'team' as const, title } };
+  return createNode({
+    id,
+    point,
+    width,
+    height,
+    parentId,
+    ariaLabel: `${title} team`,
+    component: TeamNodeComponent,
+    data: { title },
+  });
 }
 
 function person(
@@ -481,13 +317,14 @@ function person(
   color: string,
   reviews: number,
 ) {
-  return {
+  return createNode({
     id,
     point,
     parentId,
     ariaLabel: name,
-    data: { kind: 'person' as const, name, role, initials, color, reviews },
-  };
+    component: PersonNodeComponent,
+    data: { name, role, initials, color, reviews },
+  });
 }
 
 /** Floating edges: every end meets its node on the side facing the other end. */

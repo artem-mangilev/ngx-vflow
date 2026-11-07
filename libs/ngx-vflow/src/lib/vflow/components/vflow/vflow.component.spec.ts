@@ -36,9 +36,7 @@ class VflowTestHostComponent {
 @Component({
   template: `
     <vflow [view]="[800, 600]" [nodes]="nodes">
-      <ng-template vNode>
-        <div class="card"></div>
-      </ng-template>
+      <div *vNode class="card"></div>
     </vflow>
   `,
   styles: `
@@ -62,9 +60,7 @@ class NodeRectHostComponent {
 @Component({
   template: `
     <vflow [view]="[800, 600]" [nodes]="nodes()">
-      <ng-template vNode>
-        <div class="card"></div>
-      </ng-template>
+      <div *vNode class="card"></div>
     </vflow>
   `,
   styles: `
@@ -85,12 +81,10 @@ class LateSignalHostComponent {
 @Component({
   template: `
     <vflow [view]="[600, 400]" [nodes]="nodes" [edges]="edges">
-      <ng-template vNode>
-        <div style="width: 100px; height: 50px">
-          <span vHandle handleType="target" position="left"></span>
-          <span vHandle handleType="source" position="right"></span>
-        </div>
-      </ng-template>
+      <div *vNode style="width: 100px; height: 50px">
+        <span vHandle handleType="target" position="left"></span>
+        <span vHandle handleType="source" position="right"></span>
+      </div>
     </vflow>
   `,
   imports: [Vflow],
@@ -120,9 +114,7 @@ class HandlesHostComponent {
       (nodeDrag)="drags.push(['drag', $event])"
       (nodeDragEnd)="drags.push(['end', $event])"
       (nodesChanges.position)="positions.push($event)">
-      <ng-template vNode>
-        <div class="card"></div>
-      </ng-template>
+      <div *vNode class="card"></div>
     </vflow>
   `,
   styles: `

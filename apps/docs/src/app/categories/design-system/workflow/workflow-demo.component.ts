@@ -57,71 +57,69 @@ type EdgeState = 'taken' | 'open' | 'skipped';
           [minZoom]="0.5"
           [maxZoom]="2"
           (initialized)="flow()?.fitView()">
-          <ng-template let-ctx vNode>
-            <article vuiNode [attr.data-step]="ctx.node.id">
-              <header vuiNodeHeader>
-                <span vuiIcon><app-demo-icon [name]="ctx.data().icon" /></span>
-                <span vuiTitle>{{ ctx.data().title }}</span>
-              </header>
-              <div vuiNodeBody>
-                <p class="description">{{ ctx.data().description }}</p>
-              </div>
-              <footer vuiNodeFooter>
-                @let status = statusOf(ctx.node.id);
-                <span class="badge" [attr.data-tone]="status.tone">{{ status.text }}</span>
-                @if (ctx.node.id === 'review') {
-                  <span vuiActions>
-                    <button
-                      class="button primary"
-                      vNoDrag
-                      type="button"
-                      [disabled]="approved()"
-                      (click)="approved.set(true)">
-                      Approve
-                    </button>
-                  </span>
-                }
-              </footer>
-              <!-- Display only: plain core handles anchor the edges, with no port drawn under the arrowheads. -->
-              @if (ctx.node.id !== 'received') {
-                <span vHandle handleType="target" position="left" [canStart]="false" [canAccept]="false"></span>
-              }
-              @if (ctx.node.id === 'received') {
-                <span vHandle handleType="source" position="right" [canStart]="false" [canAccept]="false"></span>
-              }
+          <article *vNode="let ctx" vuiNode [attr.data-step]="ctx.node.id">
+            <header vuiNodeHeader>
+              <span vuiIcon><app-demo-icon [name]="ctx.data().icon" /></span>
+              <span vuiTitle>{{ ctx.data().title }}</span>
+            </header>
+            <div vuiNodeBody>
+              <p class="description">{{ ctx.data().description }}</p>
+            </div>
+            <footer vuiNodeFooter>
+              @let status = statusOf(ctx.node.id);
+              <span class="badge" [attr.data-tone]="status.tone">{{ status.text }}</span>
               @if (ctx.node.id === 'review') {
-                <!-- One exit per branch, so each branch starts apart and its condition sits at its start. -->
-                <span
-                  vHandle
-                  handleType="source"
-                  position="right"
-                  handleId="approved"
-                  [canStart]="false"
-                  [canAccept]="false"></span>
-                <span
-                  vHandle
-                  handleType="source"
-                  position="bottom"
-                  handleId="changes"
-                  [canStart]="false"
-                  [canAccept]="false"></span>
+                <span vuiActions>
+                  <button
+                    class="button primary"
+                    vNoDrag
+                    type="button"
+                    [disabled]="approved()"
+                    (click)="approved.set(true)">
+                    Approve
+                  </button>
+                </span>
               }
-              @if (ctx.selected()) {
-                <v-node-toolbar>
-                  <div vuiToolbar>
-                    <button
-                      class="button plain small"
-                      vNoDrag
-                      type="button"
-                      [attr.aria-label]="'Zoom to ' + ctx.data().title"
-                      (click)="flow()?.fitView({ nodes: [ctx.node.id], padding: 0.5 })">
-                      Zoom to node
-                    </button>
-                  </div>
-                </v-node-toolbar>
-              }
-            </article>
-          </ng-template>
+            </footer>
+            <!-- Display only: plain core handles anchor the edges, with no port drawn under the arrowheads. -->
+            @if (ctx.node.id !== 'received') {
+              <span vHandle handleType="target" position="left" [canStart]="false" [canAccept]="false"></span>
+            }
+            @if (ctx.node.id === 'received') {
+              <span vHandle handleType="source" position="right" [canStart]="false" [canAccept]="false"></span>
+            }
+            @if (ctx.node.id === 'review') {
+              <!-- One exit per branch, so each branch starts apart and its condition sits at its start. -->
+              <span
+                vHandle
+                handleType="source"
+                position="right"
+                handleId="approved"
+                [canStart]="false"
+                [canAccept]="false"></span>
+              <span
+                vHandle
+                handleType="source"
+                position="bottom"
+                handleId="changes"
+                [canStart]="false"
+                [canAccept]="false"></span>
+            }
+            @if (ctx.selected()) {
+              <v-node-toolbar>
+                <div vuiToolbar>
+                  <button
+                    class="button plain small"
+                    vNoDrag
+                    type="button"
+                    [attr.aria-label]="'Zoom to ' + ctx.data().title"
+                    (click)="flow()?.fitView({ nodes: [ctx.node.id], padding: 0.5 })">
+                    Zoom to node
+                  </button>
+                </div>
+              </v-node-toolbar>
+            }
+          </article>
           <ng-template let-ctx vEdge>
             @let state = edgeState(ctx.edge.id);
             <svg:g vEdgeInteraction>

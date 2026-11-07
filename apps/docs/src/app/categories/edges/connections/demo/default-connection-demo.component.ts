@@ -4,7 +4,7 @@ import { Connection, Edge, Node, Vflow, addEdges, createNodes } from 'ngx-vflow'
 
 @Component({
   template: `<vflow view="auto" [nodes]="nodes" [edges]="edges" (connect)="createEdge($event)">
-    <ng-template let-ctx vNode><docs-node [ctx]="ctx" /></ng-template>
+    <docs-node *vNode="let ctx" [ctx]="ctx" />
     <ng-template let-ctx vEdge><svg:g docsEdge [ctx]="ctx" /></ng-template>
   </vflow> `,
   styles: [

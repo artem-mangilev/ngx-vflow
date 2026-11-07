@@ -19,7 +19,7 @@ import {
     (reconnectStart)="onReconnectStart()"
     (reconnectEnd)="onReconnectEnd($event)"
     (reconnect)="reconnect($event)">
-    <ng-template let-ctx vNode><docs-node [ctx]="ctx" /></ng-template>
+    <docs-node *vNode="let ctx" [ctx]="ctx" />
     <ng-template let-ctx vEdge><svg:g docsEdge [ctx]="ctx" /></ng-template>
   </vflow> `,
   styles: [

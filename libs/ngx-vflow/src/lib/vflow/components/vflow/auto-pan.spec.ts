@@ -18,12 +18,10 @@ import { dispatchMouse } from '../../gestures/pointer-events.testing';
     [autoPan]="autoPan"
     (connect)="(undefined)"
     (reconnect)="(undefined)">
-    <ng-template vNode>
-      <div style="width: 100px; height: 50px">
-        <span vHandle handleType="target" position="left"></span>
-        <span vHandle handleType="source" position="right"></span>
-      </div>
-    </ng-template>
+    <div *vNode style="width: 100px; height: 50px">
+      <span vHandle handleType="target" position="left"></span>
+      <span vHandle handleType="source" position="right"></span>
+    </div>
   </vflow>`,
 })
 class AutoPanHostComponent {

@@ -17,12 +17,10 @@ import { EdgeDetachedChange } from '../../types/edge-change.type';
     (nodesChanges)="all.push($event)"
     (nodesChanges.position)="positions.push($event)"
     (edgesChanges.detached)="detached.push($event)">
-    <ng-template vNode>
-      <div style="width: 100px; height: 50px">
-        <span vHandle handleType="target" position="left"></span
-        ><span vHandle handleType="source" position="right"></span>
-      </div>
-    </ng-template>
+    <div *vNode style="width: 100px; height: 50px">
+      <span vHandle handleType="target" position="left"></span
+      ><span vHandle handleType="source" position="right"></span>
+    </div>
     <ng-template vEdge let-ctx><svg:path [attr.d]="ctx.path()" /></ng-template>
   </vflow>`,
 })

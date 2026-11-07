@@ -4,7 +4,7 @@ import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
 
 @Component({
   template: `<vflow [nodes]="nodes" [edges]="edges" [view]="[600, 600]">
-    <ng-template let-ctx vNode><docs-node [ctx]="ctx" /></ng-template>
+    <docs-node *vNode="let ctx" [ctx]="ctx" />
     <ng-template let-ctx vEdge><svg:g docsEdge [ctx]="ctx" /></ng-template>
   </vflow>`,
   changeDetection: ChangeDetectionStrategy.OnPush,

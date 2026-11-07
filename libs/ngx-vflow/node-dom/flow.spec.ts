@@ -24,12 +24,10 @@ class TaskNodeComponent {
     (connect)="connects.push($event)"
     (nodesChanges.select)="selectChanges.push($event)"
     (initialized)="initialized = true">
-    <ng-template vNode let-ctx>
-      <div class="note" [class.selected]="ctx.selected()">
-        note {{ ctx.node.id }}
-        <span vHandle handleType="target" position="left"></span>
-      </div>
-    </ng-template>
+    <div *vNode="let ctx" class="note" [class.selected]="ctx.selected()">
+      note {{ ctx.node.id }}
+      <span vHandle handleType="target" position="left"></span>
+    </div>
     <ng-template vEdge let-ctx>
       <svg:g vEdgeInteraction><svg:path class="edge-path" [attr.d]="ctx.path()" /></svg:g>
       <ng-template vEdgeLabel>{{ ctx.edge.id }}</ng-template>

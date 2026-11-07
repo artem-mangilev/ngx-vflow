@@ -44,13 +44,11 @@ graph needs templates. There are two working paths:
 ```html
 <section data-vui-theme="light">
   <vflow [nodes]="nodes" [edges]="edges">
-    <ng-template let-ctx vNode>
-      <article vuiNode>
-        <header vuiNodeHeader><span vuiTitle>{{ ctx.data().title }}</span></header>
-        <span vuiPort handleType="target" position="left"></span>
-        <span vuiPort handleType="source" position="right"></span>
-      </article>
-    </ng-template>
+    <article *vNode="let ctx" vuiNode>
+      <header vuiNodeHeader><span vuiTitle>{{ ctx.data().title }}</span></header>
+      <span vuiPort handleType="target" position="left"></span>
+      <span vuiPort handleType="source" position="right"></span>
+    </article>
     <ng-template let-ctx vEdge>
       <svg:g vEdgeInteraction>
         <svg:path vuiEdge [attr.d]="ctx.path()" [attr.marker-end]="ctx.markerEnd()" />
@@ -156,7 +154,7 @@ The optional `parentId` field may still be omitted from `Node` and `StaticNode`.
 | `type: YourNodeComponent` or a lazy import function                         | `component: YourNodeComponent` or the same function                                               |
 | `HtmlTemplateNode`, `TemplateGroupNode`, `ComponentNode`                    | `Node`                                                                                            |
 | `isTemplateNode`, `isTemplateGroupNode`                                     | Check `component` or your own `data`                                                              |
-| `<ng-template nodeHtml>`, `NodeHtmlTemplateDirective`                       | `<ng-template vNode>`, `VflowNodeTemplateDirective`                                               |
+| `<ng-template nodeHtml>`, `NodeHtmlTemplateDirective`                       | `*vNode="let ctx"` or `<ng-template vNode>`, `VflowNodeTemplateDirective`                         |
 | `<ng-template groupNode>`, `GroupNodeTemplateDirective`, `GroupNodeContext` | A branch of the `vNode` template; every node context has `width` and `height`                     |
 
 The library does not read a node kind. Keep your own discriminator in `data` and branch on it in the template. A group is any node with a size and children that reference it through `parentId`; assistive technology reads it as a `group` while it has children.
@@ -223,7 +221,7 @@ SVG group content from version 2 becomes a native HTML element in that branch:
 
 ### Component nodes
 
-A component node no longer extends a base class. Any standalone component works, and it reads its node through `injectNode()`, which returns the same object a `node` template receives as `let-ctx`. The `node` input is no longer set on the component.
+A component node no longer extends a base class. Any standalone component works, and it reads its node through `injectNode()`, which returns the same object a `vNode` template receives as `ctx`. The `node` input is no longer set on the component.
 
 | Removed                                                 | Replacement                                                                           |
 | ------------------------------------------------------- | ------------------------------------------------------------------------------------- |
@@ -281,12 +279,10 @@ Before:
 After:
 
 ```html
-<ng-template let-ctx vNode>
-  <div class="card">
-    {{ ctx.data().title }}
-    <button vNoSelect (click)="open(ctx.node)">Open</button>
-  </div>
-</ng-template>
+<div *vNode="let ctx" class="card">
+  {{ ctx.data().title }}
+  <button vNoSelect (click)="open(ctx.node)">Open</button>
+</div>
 ```
 
 {% endraw %}
@@ -422,9 +418,7 @@ Before:
 After:
 
 ```html
-<ng-template let-ctx vNode>
-  <div [vResizable]="ctx.selected()"></div>
-</ng-template>
+<div *vNode="let ctx" [vResizable]="ctx.selected()"></div>
 ```
 
 The `[vResizable]` element is now the node's sizing box: for each explicitly sized axis the library sets its `width` or `height` inline, with `box-sizing: border-box`, so size bindings on that element are no longer needed. The node wrapper no longer receives an inline size when a `[vResizable]` element exists, so put the directive on the top-level element of the node template. Content-sized nodes stay unsized until the first resize, as described in Node size modes above.
@@ -557,7 +551,7 @@ Every input of `vflow` is a signal input. Binding in a template is unchanged. Re
 
 | Removed in v3                                               | Migration                                                                                                          |
 | ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| Node type `svg-template`                                    | Remove `type` and provide native HTML through `<ng-template vNode>`.                                               |
+| Node type `svg-template`                                    | Remove `type` and provide native HTML through a `*vNode` template.                                                 |
 | `NodeSvgTemplateDirective` and `nodeSvgTemplate`            | Remove these imports/usages and use `VflowNodeTemplateDirective` / `vNode`.                                        |
 | `scaleOnHover` input on `MiniMapComponent`                  | Remove the input binding. The minimap remains at its default scale and does not capture pointer input.             |
 | `documentPointToFlowPoint()`                                | Rename to `clientToFlowPosition()`. Use `flowToClientPosition()` for the inverse conversion.                       |

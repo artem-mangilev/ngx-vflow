@@ -17,7 +17,7 @@ import { TransformNodeComponent } from './components/transform-node.component';
     (nodesChanges.size)="store.applySizeChanges($event)"
     (componentNodeEvent)="onComponentEvent($event)"
     (initialized)="flow.fitView()">
-    <ng-template let-ctx vNode><docs-node [ctx]="ctx" /></ng-template>
+    <docs-node *vNode="let ctx" [ctx]="ctx" />
 
     <ng-template let-ctx vEdge>
       @if (ctx.data().type === 'animated') {

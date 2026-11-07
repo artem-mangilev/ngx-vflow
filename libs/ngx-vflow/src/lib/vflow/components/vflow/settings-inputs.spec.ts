@@ -22,7 +22,7 @@ import { AriaLabelConfig } from '../../interfaces/aria-label-config.interface';
     [keyboardShortcuts]="keyboardShortcuts"
     [ariaLabelConfig]="ariaLabelConfig"
     [parentsBelowEdges]="parentsBelowEdges">
-    <ng-template vNode><div style="width: 100px; height: 50px"></div></ng-template>
+    <div *vNode style="width: 100px; height: 50px"></div>
   </vflow>`,
 })
 class SettingsHostComponent {
@@ -37,9 +37,7 @@ class SettingsHostComponent {
 @Component({
   imports: [Vflow],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `<vflow [nodes]="[]"
-    ><ng-template vNode><div></div></ng-template
-  ></vflow>`,
+  template: `<vflow [nodes]="[]"><div *vNode></div></vflow>`,
 })
 class BareHostComponent {}
 

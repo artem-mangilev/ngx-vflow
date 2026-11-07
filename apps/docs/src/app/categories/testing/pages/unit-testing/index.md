@@ -5,13 +5,11 @@ Test a component that contains a flow with the real `Vflow`. The library ships n
 ```ts
 @Component({
   template: `<vflow [nodes]="nodes" [edges]="edges" (connect)="connections.push($event)">
-    <ng-template vNode let-ctx>
-      <div class="step">
-        {{ ctx.node.id }}
-        <span vHandle handleType="target" position="left"></span>
-        <span vHandle handleType="source" position="right"></span>
-      </div>
-    </ng-template>
+    <div *vNode="let ctx" class="step">
+      {{ ctx.node.id }}
+      <span vHandle handleType="target" position="left"></span>
+      <span vHandle handleType="source" position="right"></span>
+    </div>
   </vflow>`,
   imports: [Vflow],
 })

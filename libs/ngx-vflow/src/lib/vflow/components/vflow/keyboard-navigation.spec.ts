@@ -34,12 +34,10 @@ import { AutoPanSettings } from '../../interfaces/auto-pan-settings.interface';
       [autoPanOnNodeFocus]="autoPanOnNodeFocus()"
       [autoPan]="autoPan()"
       [minZoom]="minZoom()">
-      <ng-template vNode>
-        <div style="width: 100px; height: 50px">
-          <span vHandle handleType="target" position="left"></span
-          ><span vHandle handleType="source" position="right"></span>
-        </div>
-      </ng-template> </vflow
+      <div *vNode style="width: 100px; height: 50px">
+        <span vHandle handleType="target" position="left"></span
+        ><span vHandle handleType="source" position="right"></span>
+      </div> </vflow
     ><button>After</button>`,
 })
 class KeyboardHostComponent {
@@ -85,7 +83,7 @@ class KeyboardHostComponent {
     </vflow>
     <section vNoKeyboard>
       <vflow [nodes]="excluded" [view]="[600, 100]">
-        <ng-template vNode><div style="width: 100px; height: 50px"></div></ng-template>
+        <div *vNode style="width: 100px; height: 50px"></div>
       </vflow>
     </section>`,
 })

@@ -44,15 +44,13 @@ import { createEdges, createNodes, Vflow } from 'ngx-vflow';
         <div class="editor" data-testid="editor-a" [attr.data-vui-theme]="dark() ? 'dark' : 'light'">
           <p>Editor A: {{ dark() ? 'dark' : 'light' }}</p>
           <vflow [nodes]="nodes" [edges]="edges">
-            <ng-template let-ctx vNode>
-              <article vuiNode>
-                <header vuiNodeHeader>
-                  <span vuiTitle>{{ ctx.data().title }}</span>
-                </header>
-                <span vuiPort handleType="target" position="left"></span>
-                <span vuiPort handleType="source" position="right"></span>
-              </article>
-            </ng-template>
+            <article *vNode="let ctx" vuiNode>
+              <header vuiNodeHeader>
+                <span vuiTitle>{{ ctx.data().title }}</span>
+              </header>
+              <span vuiPort handleType="target" position="left"></span>
+              <span vuiPort handleType="source" position="right"></span>
+            </article>
             <ng-template let-ctx vEdge>
               <svg:g vEdgeInteraction>
                 <svg:path vuiEdge [attr.d]="ctx.path()" [attr.marker-end]="ctx.markerEnd()" />
@@ -64,15 +62,13 @@ import { createEdges, createNodes, Vflow } from 'ngx-vflow';
         <div class="editor" data-testid="editor-b" data-vui-theme="dark">
           <p>Editor B: dark</p>
           <vflow [nodes]="nodes" [edges]="edges">
-            <ng-template let-ctx vNode>
-              <article vuiNode>
-                <header vuiNodeHeader>
-                  <span vuiTitle>{{ ctx.data().title }}</span>
-                </header>
-                <span vuiPort handleType="target" position="left"></span>
-                <span vuiPort handleType="source" position="right"></span>
-              </article>
-            </ng-template>
+            <article *vNode="let ctx" vuiNode>
+              <header vuiNodeHeader>
+                <span vuiTitle>{{ ctx.data().title }}</span>
+              </header>
+              <span vuiPort handleType="target" position="left"></span>
+              <span vuiPort handleType="source" position="right"></span>
+            </article>
             <ng-template let-ctx vEdge>
               <svg:g vEdgeInteraction>
                 <svg:path vuiEdge [attr.d]="ctx.path()" [attr.marker-end]="ctx.markerEnd()" />
