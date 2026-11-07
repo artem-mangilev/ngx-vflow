@@ -44,11 +44,6 @@
             "glob": "**/*",
             "input": "ng-doc/docs/assets",
             "output": "assets/ng-doc"
-          },
-          {
-            "glob": "**/*.wasm",
-            "input": "node_modules/@vizdom/vizdom-ts-web/",
-            "output": "assets/vizdom"
           }
         ],
         "styles": [

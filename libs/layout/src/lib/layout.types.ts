@@ -29,6 +29,8 @@ export interface LayoutGraph {
 /** Positions of the nodes in flow space, by node id. A node the result leaves out stays where it is. */
 export interface LayoutResult {
   positions: ReadonlyMap<string, Point>;
+  /** Sizes an algorithm gives to parents it lays out around their children; applied to nodes with explicit sizes. */
+  sizes?: ReadonlyMap<string, { width: number; height: number }>;
 }
 
 /**

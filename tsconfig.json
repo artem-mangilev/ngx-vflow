@@ -29,6 +29,9 @@
       "@vflow/routing": ["libs/routing/src/public-api"],
       "@vflow/auto-size": ["libs/auto-size/src/public-api"],
       "@vflow/layout": ["libs/layout/src/public-api"],
+      "@vflow/layout/dagre": ["libs/layout/dagre/src/public-api"],
+      "@vflow/layout/elk": ["libs/layout/elk/src/public-api"],
+      "@vflow/layout/d3-force": ["libs/layout/d3-force/src/public-api"],
       "ngx-vflow": ["libs/ngx-vflow/src/public-api"]
     }
   },

@@ -144,6 +144,11 @@ export class VxLayout {
   private async apply(result: LayoutResult, animation: LayoutAnimation = false): Promise<boolean> {
     const nodes = this.flow.nodes();
     const byId = new Map(nodes.map((node) => [node.id, node]));
+    for (const [id, size] of result.sizes ?? []) {
+      const node = byId.get(id);
+      node?.width?.set(size.width);
+      node?.height?.set(size.height);
+    }
     const targets = new Map<string, Point>();
     for (const [id, position] of result.positions) {
       const node = byId.get(id);

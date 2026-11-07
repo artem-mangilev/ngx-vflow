@@ -1,135 +1,38 @@
-import { ChangeDetectionStrategy, Component, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
 import { DocsPresentations } from '@docs/shared';
 import { VuiPort } from '@vflow/ui';
-import * as d3 from 'd3-force';
-import { Node, Edge, VflowComponent, Vflow, createNodes } from 'ngx-vflow';
+import { VxLayout } from '@vflow/layout';
+import { forceLayout } from '@vflow/layout/d3-force';
+import { Vflow, createEdges, createNodes } from 'ngx-vflow';
 
 @Component({
   templateUrl: './force-layout-demo.component.html',
   styleUrls: ['./force-layout-demo.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DocsPresentations, Vflow, VuiPort],
+  imports: [DocsPresentations, Vflow, VuiPort, VxLayout],
 })
 export class ForceLayoutDemoComponent {
-  vflow = viewChild.required(VflowComponent);
+  protected readonly distance = signal(50);
+  // A new simulation per distance: the layout host restarts it and applies every tick.
+  protected readonly layout = computed(() =>
+    forceLayout({ linkDistance: this.distance(), chargeStrength: -100, center: { x: 200, y: 200 }, collide: 4 }),
+  );
 
-  protected nodes: Node[] = createNodes([
-    {
-      id: '0',
-      point: { x: 0, y: 0 },
+  protected readonly nodes = createNodes(
+    ['0', '1', '2', '3', '4', '5'].map((id) => ({
+      id,
+      point: { x: 200, y: 200 },
       data: randomHex(),
       draggable: false,
-    },
-    {
-      id: '1',
-      point: { x: 0, y: 0 },
-      data: randomHex(),
-      draggable: false,
-    },
-    {
-      id: '2',
-      point: { x: 0, y: 0 },
-      data: randomHex(),
-      draggable: false,
-    },
-    {
-      id: '3',
-      point: { x: 0, y: 0 },
-      data: randomHex(),
-      draggable: false,
-    },
-    {
-      id: '4',
-      point: { x: 0, y: 0 },
-      data: randomHex(),
-      draggable: false,
-    },
-    {
-      id: '5',
-      point: { x: 0, y: 0 },
-      data: randomHex(),
-      draggable: false,
-    },
-  ]);
+    })),
+  );
 
-  protected edges: Edge[] = [
-    {
-      source: '0',
-      target: '1',
-      id: '0 -> 1',
-    },
-    {
-      source: '0',
-      target: '2',
-      id: '0 -> 2',
-    },
-    {
-      source: '0',
-      target: '3',
-      id: '0 -> 3',
-    },
-    {
-      source: '0',
-      target: '4',
-      id: '0 -> 4',
-    },
-    {
-      source: '0',
-      target: '5',
-      id: '0 -> 5',
-    },
-  ];
-
-  // d3-force internally reads/writes to x and y properties
-  // so to link d3-force state with ngx-vflow state, we just
-  // proxy these properties to point signal
-  private simulationNodes = this.nodes.map((n) => {
-    return {
-      id: n.id,
-
-      get x() {
-        return n.point().x;
-      },
-
-      set x(x: number) {
-        n.point.update((state) => ({ ...state, x }));
-      },
-
-      get y() {
-        return n.point().y;
-      },
-
-      set y(y: number) {
-        n.point.update((state) => ({ ...state, y }));
-      },
-    };
-  });
-
-  private linkForce = d3
-    .forceLink(this.edges.map((e) => ({ source: e.source, target: e.target })))
-    // @ts-expect-error id may not exist
-    .id((d) => d.id)
-    .distance(50);
-
-  private simulation = d3
-    .forceSimulation()
-    .force('charge', d3.forceManyBody().strength(-100))
-    .force('x', d3.forceX())
-    .force('y', d3.forceY())
-    // center of viewport
-    .force('center', d3.forceCenter(200, 200))
-    .nodes(this.simulationNodes)
-    .force('link', this.linkForce);
+  protected readonly edges = createEdges(
+    ['1', '2', '3', '4', '5'].map((target) => ({ id: `0 -> ${target}`, source: '0', target })),
+  );
 
   protected onDistanceChange(event: Event) {
-    const distance = +(event.target as HTMLInputElement).value;
-
-    this.linkForce.distance(distance);
-    this.simulation.alpha(0.5).restart();
-
-    setTimeout(() => {
-      this.vflow().fitView({ duration: 500 });
-    }, 250);
+    this.distance.set(+(event.target as HTMLInputElement).value);
   }
 }
 

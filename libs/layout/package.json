@@ -21,7 +21,21 @@
   "peerDependencies": {
     "@angular/core": "^20.0.0 || ^21.0.0 || ^22.0.0",
     "ngx-vflow": "^3.0.0",
-    "rxjs": ">=6.0.0"
+    "rxjs": ">=6.0.0",
+    "@dagrejs/dagre": "^3.0.0",
+    "elkjs": "^0.9.0",
+    "d3-force": "^3.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@dagrejs/dagre": {
+      "optional": true
+    },
+    "elkjs": {
+      "optional": true
+    },
+    "d3-force": {
+      "optional": true
+    }
   },
   "dependencies": {
     "tslib": "^2.3.0"

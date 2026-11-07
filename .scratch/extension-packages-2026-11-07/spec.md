@@ -142,7 +142,7 @@ export class VxLayout {
 - `@vflow/layout/elk`: `elkLayout(options: ElkOptions): LayoutAlgorithm` — `layoutOptions` ELK как есть (`elk.algorithm`, `elk.direction`, …), вложенные ноды → children ELK; ELK считает в Web Worker (`elkjs/lib/elk.bundled.js` или `elk-api` + worker — решить в тикете 06). Peer `elkjs`.
 - `@vflow/layout/d3-force`: `forceLayout(options): LayoutAlgorithm` возвращает Observable, прокидывает `tick`; заменяет ручной прокси `x/y` из cookbook. Peer `d3-force`.
 
-Vizdom не адаптируется (wasm-инициализация и копирование `.wasm` — оставить рецептом, который теперь использует `VxLayout` с инлайн-алгоритмом).
+Vizdom не адаптируется; страница Cookbook `vizdom-layout` и зависимость `@vizdom/vizdom-ts-web` удалены (решение пользователя 2026-11-07). Страница `expand-collapse` тоже удалена, а не переписана.
 
 ## Ход работ
 
@@ -151,6 +151,7 @@ Vizdom не адаптируется (wasm-инициализация и коп�
 - 2026-11-07: алгоритм routing проверен стендом и доработан в ближней зоне (17 % → 2.5 % рёбер с нарушениями на случайных графах, пересечений нод и самопересечений нет; см. тикет 03).
 - 2026-11-07: тикет 04 — `@vflow/auto-size` (директива `vxAutoSize`), тесты, docs, e2e; dry-run группы из четырёх пакетов.
 - 2026-11-07: тикет 05 — `@vflow/layout` ядро: контракт, хост `vxLayout`, аниматор; готовность завязана на `initialized` флоу.
+- 2026-11-07: тикет 06 — адаптеры dagre/elk/d3-force, docs Layout, cookbook `force` на пакете; `expand-collapse` и `vizdom-layout` удалены; `LayoutResult.sizes` для родителей; у ELK типизированный фасад опций без сырых `LayoutOptions`.
 
 ## Порядок
 

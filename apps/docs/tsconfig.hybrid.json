@@ -14,6 +14,9 @@
       "@vflow/routing": ["dist/libs/routing"],
       "@vflow/auto-size": ["dist/libs/auto-size"],
       "@vflow/layout": ["dist/libs/layout"],
+      "@vflow/layout/dagre": ["dist/libs/layout/dagre"],
+      "@vflow/layout/elk": ["dist/libs/layout/elk"],
+      "@vflow/layout/d3-force": ["dist/libs/layout/d3-force"],
       "ngx-vflow": ["dist/libs/ngx-vflow"],
       "ngx-vflow/testing": ["dist/libs/ngx-vflow/testing"]
     }

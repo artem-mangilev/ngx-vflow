@@ -1,9 +1,9 @@
 <label class="slider">
   <span>Distance</span>
-  <input type="range" min="0" step="1" max="200" value="50" (input)="onDistanceChange($event)" />
+  <input type="range" min="0" step="1" max="200" [value]="distance()" (input)="onDistanceChange($event)" />
 </label>
 
-<vflow view="auto" [nodes]="nodes" [edges]="edges">
+<vflow view="auto" [vxLayout]="layout()" [nodes]="nodes" [edges]="edges">
   <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
 
   <div *vNode="let ctx" class="custom-node" [style.background-color]="ctx.data()">
