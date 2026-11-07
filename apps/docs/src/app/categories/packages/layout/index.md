@@ -33,12 +33,12 @@ export class FlowComponent {
 
 The host runs the algorithm once every node is measured, so content-sized nodes count with their real size, and before the flow paints: it holds the initialization of the flow until the first positions are in, so the graph appears laid out, `(initialized)` sees it that way and a `fitView()` there fits the layout. The first layout never animates; `vxLayoutAnimate` applies to the layouts that follow. The host runs again when the algorithm or the set of nodes and edges changes; a move or a resize does not count. A result that arrives after a newer run started is dropped, and a node being dragged keeps its position. Positions are converted into the node space of each parent, so nested nodes work with every adapter that understands them.
 
-| Input / output    | Default  | Meaning                                                                                                                                         |
-| ----------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| `vxLayout`        | required | A `LayoutAlgorithm`.                                                                                                                            |
-| `vxLayoutTrigger` | `'auto'` | `'manual'` runs the layout only through `run()` of the directive, for example from a button.                                                    |
-| `vxLayoutAnimate` | `false`  | `true` or the options of the animator: `duration`, or `speed` with `minDuration` and `maxDuration`.                                             |
-| `vxLayoutEnd`     |          | Emits the result once the positions are applied, after any animation, or when a continuous layout completes; a good moment to call `fitView()`. |
+| Input / output    | Default  | Meaning                                                                                                                                                                                                                                       |
+| ----------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `vxLayout`        | required | A `LayoutAlgorithm`.                                                                                                                                                                                                                          |
+| `vxLayoutTrigger` | `'auto'` | `'manual'` runs the layout only through `run()` of the directive, for example from a button.                                                                                                                                                  |
+| `vxLayoutAnimate` | `false`  | `true` or the options of the animator: `duration`, or `speed` with `minDuration` and `maxDuration`.                                                                                                                                           |
+| `vxLayoutEnd`     |          | Emits the result once the positions are applied, after any animation, or when a continuous layout completes; a good moment to call `fitView()`. The first one comes before the flow paints, so fit without a duration there, as the demos do. |
 
 ## Dagre
 

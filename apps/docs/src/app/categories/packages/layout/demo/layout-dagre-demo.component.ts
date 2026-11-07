@@ -21,7 +21,8 @@ import { demoEdges, demoNodes } from './graph';
       [nodes]="nodes"
       [edges]="edges"
       [background]="{ type: 'dots' }"
-      (vxLayoutEnd)="flow().fitView({ padding: 0.1, duration: 300 })">
+      (vxLayoutEnd)="flow().fitView({ padding: 0.1, duration: painted ? 300 : 0 })"
+      (initialized)="painted = true">
       <docs-node *vNode="let ctx" [ctx]="ctx" [connectable]="false" />
       <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
     </vflow>
@@ -50,6 +51,8 @@ import { demoEdges, demoNodes } from './graph';
 })
 export class LayoutDagreDemoComponent {
   protected readonly flow = viewChild.required(VflowComponent);
+  // The first layout ends before the flow paints: fit it at once, and animate the fits that follow.
+  protected painted = false;
   protected readonly directions = ['TB', 'LR', 'BT', 'RL'] as const;
   protected readonly rankdir = signal<'TB' | 'LR' | 'BT' | 'RL'>('LR');
   // A new algorithm per direction: the host lays the graph out again when it changes.
