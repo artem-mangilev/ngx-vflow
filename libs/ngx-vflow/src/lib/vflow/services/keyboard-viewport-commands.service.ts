@@ -14,7 +14,7 @@ export class KeyboardViewportCommandsService {
   private settings = inject(FlowSettingsService);
   private announcer = inject(AnnouncerService);
 
-  public pan(direction: ArrowCommand, fast: boolean) {
+  public pan(direction: ArrowCommand, fast: boolean): boolean {
     const { x, y } = this.viewport.readableViewport();
     const step = PAN_STEP * (fast ? 4 : 1);
     // Arrows scroll the view: pressing right reveals what lies to the right, so the content moves left.
@@ -22,12 +22,12 @@ export class KeyboardViewportCommandsService {
     return true;
   }
 
-  public zoom(step: 1 | -1) {
+  public zoom(step: 1 | -1): boolean {
     this.viewport.zoomBy(ZOOM_STEP ** step).then(() => this.announceZoom());
     return true;
   }
 
-  public fitView() {
+  public fitView(): boolean {
     this.viewport.fitView({ padding: 0.1 }).then((fitted) => fitted && this.announceZoom());
     return true;
   }

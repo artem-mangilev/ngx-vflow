@@ -10,11 +10,11 @@ export class AnnouncerService {
     inject(DestroyRef).onDestroy(() => this.clearTimer());
   }
 
-  public register(element: HTMLElement) {
+  public register(element: HTMLElement): void {
     this.element = element;
   }
 
-  public announce(message: string) {
+  public announce(message: string): void {
     const element = this.element;
     if (!element) return;
     this.clearTimer();

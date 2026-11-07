@@ -10,6 +10,7 @@ import { Node } from '../interfaces/node.interface';
  */
 export interface NodeRef<T = any> {
   node: Node<T>;
+  /** The node's `data` signal; a node without one reads as an empty object. */
   data: Signal<T>;
   selected: Signal<boolean>;
   preselected: Signal<boolean>;

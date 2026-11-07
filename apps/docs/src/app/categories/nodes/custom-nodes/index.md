@@ -29,6 +29,18 @@ Follow these steps to achieve this:
 The structural form is short for `<ng-template let-ctx vNode>`. Use the long form when the template has no single root
 element, for example when it starts with `@if` or `@switch`.
 
+A template cannot take a type argument, so `ctx` is a `NodeRef<any>` by default. To type `ctx.data()`, name the nodes
+the template renders with `of`; the flow never reads this input, it only tells the type checker the data type:
+
+{% raw %}
+
+```html
+<div *vNode="let ctx; of: nodes" class="node">{{ ctx.data().text }}</div>
+<ng-template let-ctx vNode [vNodeOf]="nodes">…</ng-template>
+```
+
+{% endraw %}
+
 Every node without `component` renders through this template. The library does not read a node kind: if your flow has
 several kinds of nodes, keep a discriminator in `data` and branch on it with `@if` or `@switch` in the template.
 
@@ -70,30 +82,34 @@ There is a `(componentNodeEvent)` event on `VflowComponent`. Here is how it work
    `outputFromObservable()`
 2. It emits on every emit of those outputs and stops listening when the node is destroyed
 
-The shape of this accumulator-event contains following useful info:
+The event carries the node, the component class and the output:
 
 ```ts
-export type AnyComponentNodeEvent = {
-  nodeId: string; // Id of node where event occurs
+export interface AnyComponentNodeEvent {
+  nodeId: string; // Id of the node where the event occurs
+  component: Type<unknown>; // The component class that emitted it
   eventName: string; // Property name of the output
   eventPayload: unknown;
-};
+}
 ```
 
-The Library also includes `ComponentNodeEvent` helper type to get type-safe event, where you just need to pass an array of your custom components in generic, and this type will infer proper types for `eventName` and `eventPayload` from their outputs:
+`isComponentNodeEvent(event, Cmp)` checks the component class and narrows the event to `ComponentNodeEvent<[Cmp]>`: the
+union of the outputs of that class, where `eventName` is one of their names and `eventPayload` has its type.
 
 ```ts
   ...
 
-  handleComponentEvent(event: ComponentNodeEvent<[RedSquareNodeComponent, BlueSquareNodeComponent]>) {
-    if (event.eventName === 'redSquareEvent') {
+  handleComponentEvent(event: AnyComponentNodeEvent) {
+    if (isComponentNodeEvent(event, RedSquareNodeComponent) && event.eventName === 'redSquareEvent') {
       console.log(event.eventPayload)
     }
 
-    if (event.eventName === 'blueSquareEvent') {
+    if (isComponentNodeEvent(event, BlueSquareNodeComponent) && event.eventName === 'blueSquareEvent') {
       console.log(event.eventPayload.x + event.eventPayload.y)
     }
   }
 
   ..
 ```
+
+Only public outputs appear in the narrowed type; a `protected` output is forwarded at runtime all the same.

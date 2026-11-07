@@ -54,7 +54,16 @@ export interface Edge<T = unknown> extends Connection {
 
 export type StaticEdge<T = unknown> = UnwrapSignal<Edge<T>>;
 
-type OptionalProperty = 'component' | 'selectable' | 'focusable' | 'ariaLabel' | 'ariaDescription' | 'domAttributes';
+/** Properties that stay optional even with defaults; an edge without handle ids connects to the first handles of its nodes. */
+type OptionalProperty =
+  | 'component'
+  | 'sourceHandle'
+  | 'targetHandle'
+  | 'selectable'
+  | 'focusable'
+  | 'ariaLabel'
+  | 'ariaDescription'
+  | 'domAttributes';
 
 export type EdgeWithDefaults<T = unknown> = Omit<Required<Edge<T>>, OptionalProperty> & Pick<Edge<T>, OptionalProperty>;
 
@@ -64,8 +73,8 @@ export function createEdge<T = unknown>(edge: StaticEdge<T>): EdgeWithDefaults<T
     id: edge.id,
     source: edge.source,
     target: edge.target,
-    sourceHandle: isDefined(edge.sourceHandle) ? edge.sourceHandle : '',
-    targetHandle: isDefined(edge.targetHandle) ? edge.targetHandle : '',
+    ...(isDefined(edge.sourceHandle) ? { sourceHandle: edge.sourceHandle } : {}),
+    ...(isDefined(edge.targetHandle) ? { targetHandle: edge.targetHandle } : {}),
     ...(isDefined(edge.component) ? { component: edge.component } : {}),
     curve: signal(isDefined(edge.curve) ? edge.curve : EDGE_DEFAULTS.curve),
     data: signal(isDefined(edge.data) ? edge.data : EDGE_DEFAULTS.data) as WritableSignal<T>,

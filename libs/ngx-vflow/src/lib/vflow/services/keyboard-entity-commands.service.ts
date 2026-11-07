@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { NodeModel } from '../models/node.model';
-import { EdgeModel } from '../models/edge.model';
+import { FlowEntity } from '../interfaces/flow-entity.interface';
 import { SelectionService } from './selection.service';
 import { DraggableService } from './draggable.service';
 import { KeyboardService } from './keyboard.service';
@@ -22,7 +22,7 @@ export class KeyboardEntityCommandsService {
   private entities = inject(FlowEntitiesService);
   private announcer = inject(AnnouncerService);
 
-  public select(model: NodeModel | EdgeModel) {
+  public select(model: FlowEntity): boolean {
     const labels = this.settings.ariaLabels();
     if (this.selection.selectFromKeyboard(model, this.keyboard.isActiveModifier('multiSelection'))) {
       this.announcer.announce(
@@ -36,17 +36,17 @@ export class KeyboardEntityCommandsService {
     return true;
   }
 
-  public clearSelection() {
+  public clearSelection(): boolean {
     if (this.selection.selectFromKeyboard(null, this.keyboard.isActiveModifier('multiSelection'))) {
       this.announcer.announce(this.settings.ariaLabels().selectionClearedAnnouncement);
     }
     return true;
   }
 
-  public requestDeletion(model: NodeModel | EdgeModel) {
+  public requestDeletion(model: FlowEntity): boolean {
     // The command acts at the point of focus: the whole selection when the focused entity belongs to it,
     // otherwise only the focused entity, so a stale selection elsewhere is never deleted by surprise.
-    const target = (entity: NodeModel | EdgeModel) => (model.selected() ? entity.selected() : entity === model);
+    const target = (entity: FlowEntity) => (model.selected() ? entity.selected() : entity === model);
     this.keyboard.deleteRequest$.next({
       nodeIds: this.entities
         .nodes()
@@ -61,7 +61,7 @@ export class KeyboardEntityCommandsService {
   }
 
   /** Declines unless the focused entity is a node that is selected and movable, which is what lets its key pan. */
-  public move(model: NodeModel | EdgeModel, direction: ArrowCommand, fast: boolean) {
+  public move(model: FlowEntity, direction: ArrowCommand, fast: boolean): boolean {
     if (!(model instanceof NodeModel) || !model.selected() || !model.draggable()) return false;
     const moved = this.draggable.moveSelected(model, direction.vector, fast);
     if (moved.length > 0) {

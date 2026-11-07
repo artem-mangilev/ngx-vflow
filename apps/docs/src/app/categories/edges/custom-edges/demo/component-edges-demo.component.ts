@@ -2,7 +2,8 @@ import { ChangeDetectionStrategy, Component, output, signal } from '@angular/cor
 import { DocsPresentations } from '@docs/shared';
 import { Vui } from '@vflow/ui';
 import {
-  ComponentEdgeEvent,
+  AnyComponentEdgeEvent,
+  isComponentEdgeEvent,
   Edge,
   VflowEdgeInteractionAreaDirective,
   Node,
@@ -113,8 +114,8 @@ export class ComponentEdgesDemoComponent {
     },
   ];
 
-  protected onEdgeEvent(event: ComponentEdgeEvent<[ColoredEdgeComponent]>) {
-    if (event.eventName === 'picked') {
+  protected onEdgeEvent(event: AnyComponentEdgeEvent) {
+    if (isComponentEdgeEvent(event, ColoredEdgeComponent) && event.eventName === 'picked') {
       this.picked.set(event.eventPayload);
     }
   }

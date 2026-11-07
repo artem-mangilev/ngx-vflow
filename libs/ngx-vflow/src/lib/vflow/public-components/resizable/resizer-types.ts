@@ -1,12 +1,8 @@
 import type { Node } from '../../interfaces/node.interface';
+import type { Rect } from '../../interfaces/rect';
 
 /** Position and size of the node during a resize, in flow units. */
-export interface ResizeParams {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-}
+export type ResizeParams = Rect;
 
 /** Sign of the size change on one axis: `1` = increase, `-1` = decrease, `0` = no change. */
 export type ResizeSign = -1 | 0 | 1;

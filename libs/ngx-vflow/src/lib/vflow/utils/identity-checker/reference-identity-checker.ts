@@ -7,7 +7,7 @@ export class ReferenceIdentityChecker {
   /**
    * Create new models for new node references and keep old models for old node references
    */
-  public static nodes(newNodes: Node[], oldNodeModels: NodeModel[]) {
+  public static nodes(newNodes: readonly Node[], oldNodeModels: readonly NodeModel[]): NodeModel[] {
     const oldNodesMap: Map<Node, NodeModel> = new Map();
     oldNodeModels.forEach((model) => oldNodesMap.set(model.rawNode, model));
 
@@ -23,7 +23,7 @@ export class ReferenceIdentityChecker {
   /**
    * Create new models for new edge references and keep old models for old edge references
    */
-  public static edges(newEdges: Edge[], oldEdgeModels: EdgeModel[]): EdgeModel[] {
+  public static edges(newEdges: readonly Edge[], oldEdgeModels: readonly EdgeModel[]): EdgeModel[] {
     const oldEdgesMap: Map<Edge, EdgeModel> = new Map();
     oldEdgeModels.forEach((model) => oldEdgesMap.set(model.edge, model));
 

@@ -40,7 +40,7 @@ export class ConnectionComponent {
 
   public model = input.required<ConnectionModel>();
 
-  public template = input<TemplateRef<any>>();
+  public template = input<TemplateRef<ConnectionContext>>();
 
   protected path = computed(() => {
     const gesture = this.connection.gesture();

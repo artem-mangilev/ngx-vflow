@@ -18,7 +18,7 @@ import { MarkerShapes, markerSize, markerStrokeWidth, markerTipInset } from '../
   imports: [KeyValuePipe, NgTemplateOutlet],
 })
 export class DefsComponent {
-  public markers = input.required<Map<number, Marker>>();
+  public markers = input.required<ReadonlyMap<number, Marker>>();
 
   public shapes = input.required<MarkerShapes>();
 

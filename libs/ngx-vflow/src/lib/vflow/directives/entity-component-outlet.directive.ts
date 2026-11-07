@@ -19,6 +19,8 @@ import { EntityComponentType } from '../interfaces/node.interface';
 import { isComponentClass } from '../utils/is-component-class';
 
 export interface EntityComponentOutputEvent {
+  /** The component class that emitted the event. */
+  component: Type<unknown>;
   /** Property name of the output on the component class. */
   eventName: string;
   eventPayload: unknown;
@@ -85,7 +87,7 @@ export class EntityComponentOutletDirective {
       return;
     }
 
-    void (component as () => Promise<Type<unknown>>)().then((type) => {
+    void component().then((type) => {
       if (request === this.request) this.create(type, injector, svgHost);
     });
   }
@@ -110,7 +112,7 @@ export class EntityComponentOutletDirective {
     for (const { propName } of reflectComponentType(type)?.outputs ?? []) {
       const emitter = (ref.instance as Record<string, OutputSubscribable | undefined>)[propName];
       const subscription = emitter?.subscribe((eventPayload) =>
-        this.entityComponentEvent.emit({ eventName: propName, eventPayload }),
+        this.entityComponentEvent.emit({ component: type, eventName: propName, eventPayload }),
       );
       if (subscription) this.subscriptions.push(subscription);
     }

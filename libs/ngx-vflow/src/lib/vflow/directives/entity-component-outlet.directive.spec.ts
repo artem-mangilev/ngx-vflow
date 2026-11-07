@@ -126,14 +126,14 @@ describe('EntityComponentOutletDirective', () => {
     emitter('lazy').emitAll();
 
     expect(fixture.componentInstance.events).toEqual([
-      { nodeId: 'emitter', eventName: 'legacy', eventPayload: 'a' },
-      { nodeId: 'emitter', eventName: 'modern', eventPayload: 1 },
-      { nodeId: 'emitter', eventName: 'streamed', eventPayload: true },
-      { nodeId: 'emitter', eventName: 'aliased', eventPayload: 'b' },
-      { nodeId: 'lazy', eventName: 'legacy', eventPayload: 'a' },
-      { nodeId: 'lazy', eventName: 'modern', eventPayload: 1 },
-      { nodeId: 'lazy', eventName: 'streamed', eventPayload: true },
-      { nodeId: 'lazy', eventName: 'aliased', eventPayload: 'b' },
+      { nodeId: 'emitter', component: EmitterNodeComponent, eventName: 'legacy', eventPayload: 'a' },
+      { nodeId: 'emitter', component: EmitterNodeComponent, eventName: 'modern', eventPayload: 1 },
+      { nodeId: 'emitter', component: EmitterNodeComponent, eventName: 'streamed', eventPayload: true },
+      { nodeId: 'emitter', component: EmitterNodeComponent, eventName: 'aliased', eventPayload: 'b' },
+      { nodeId: 'lazy', component: EmitterNodeComponent, eventName: 'legacy', eventPayload: 'a' },
+      { nodeId: 'lazy', component: EmitterNodeComponent, eventName: 'modern', eventPayload: 1 },
+      { nodeId: 'lazy', component: EmitterNodeComponent, eventName: 'streamed', eventPayload: true },
+      { nodeId: 'lazy', component: EmitterNodeComponent, eventName: 'aliased', eventPayload: 'b' },
     ]);
   });
 

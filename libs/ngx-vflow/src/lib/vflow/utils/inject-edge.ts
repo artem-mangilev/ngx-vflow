@@ -10,6 +10,7 @@ import type { Edge } from '../interfaces/edge.interface';
  */
 export interface EdgeRef<T = any> {
   edge: Edge<T>;
+  /** The edge's `data` signal; an edge without one reads as an empty object. */
   data: Signal<T>;
   path: Signal<string>;
   markerStart: Signal<string>;

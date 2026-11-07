@@ -1,6 +1,6 @@
 import { Directive, ElementRef, computed, effect, inject, input } from '@angular/core';
 import { NodeModel } from '../models/node.model';
-import { EdgeModel } from '../models/edge.model';
+import { FlowEntity } from '../interfaces/flow-entity.interface';
 import { KeyboardLabelsService } from '../services/keyboard-labels.service';
 import { FlowSettingsService } from '../services/flow-settings.service';
 import { ViewportService } from '../services/viewport.service';
@@ -19,7 +19,7 @@ import { getOverlappingArea } from '../utils/rect';
   },
 })
 export class KeyboardEntityDirective {
-  public vflowKeyboardEntity = input.required<NodeModel | EdgeModel>();
+  public vflowKeyboardEntity = input.required<FlowEntity>();
   public element = inject<ElementRef<HTMLElement | SVGElement>>(ElementRef).nativeElement;
   private keyboardLabels = inject(KeyboardLabelsService);
   private settings = inject(FlowSettingsService);

@@ -99,8 +99,8 @@ export class EdgeComponent {
     this.select();
   }
 
-  protected pushComponentEvent({ eventName, eventPayload }: EntityComponentOutputEvent) {
-    this.componentEventBus.pushEdgeEvent({ edgeId: this.model().edge.id, eventName, eventPayload });
+  protected pushComponentEvent(event: EntityComponentOutputEvent): void {
+    this.componentEventBus.pushEdgeEvent({ edgeId: this.model().edge.id, ...event });
   }
 
   protected startReconnection(event: PointerEvent, handle: HandleModel) {

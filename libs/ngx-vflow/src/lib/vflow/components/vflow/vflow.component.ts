@@ -38,8 +38,17 @@ import { MarkerShapes } from '../../utils/marker-inset';
 import { ConnectionSettings } from '../../interfaces/connection-settings.interface';
 import { NodesChangeService } from '../../services/node-changes.service';
 import { EdgeChangesService } from '../../services/edge-changes.service';
-import { ChangesControllerDirective } from '../../directives/changes-controller.directive';
-import { ConnectionControllerDirective } from '../../directives/connection-controller.directive';
+import { Observable } from 'rxjs';
+import { filter, map } from 'rxjs/operators';
+import { NodeDragEvent } from '../../interfaces/node-drag-event.interface';
+import { NodeDragGestureEvent } from '../../services/draggable.service';
+import {
+  ConnectEndEvent,
+  ConnectStartEvent,
+  ReconnectEndEvent,
+  ReconnectEvent,
+  ReconnectStartEvent,
+} from '../../interfaces/connection-events.interface';
 import { NodeRenderingService } from '../../services/node-rendering.service';
 import { SelectionService } from '../../services/selection.service';
 import { FlowSettingsService } from '../../services/flow-settings.service';
@@ -74,7 +83,6 @@ import { AlignmentHelperSettings } from '../../interfaces/alignment-helper-setti
 import { AlignmentService } from '../../services/alignment.service';
 import { AutoPanDirective } from '../../directives/auto-pan.directive';
 import { ResizeObserverService } from '../../services/resize-observer.service';
-import { NodeDragControllerDirective } from '../../directives/node-drag-controller.directive';
 import { SelectionBoxComponent } from '../selection-box/selection-box.component';
 import { SelectionBoxContextDirective } from '../../directives/selection-box-context.directive';
 import { DEFAULT_SELECTION_BOX, SelectionBoxSettings } from '../../interfaces/selection-box-settings.interface';
@@ -95,31 +103,11 @@ function nonNegative(value: number): number {
   return Number.isFinite(value) ? Math.max(0, value) : 0;
 }
 
-const changesControllerHostDirective = {
-  directive: ChangesControllerDirective,
-  outputs: [
-    'nodesChanges.position',
-    'nodesChanges.size',
-    'nodesChanges.add',
-    'nodesChanges.remove',
-    'nodesChanges.select',
-    'edgesChanges.detached',
-    'edgesChanges.add',
-    'edgesChanges.remove',
-    'edgesChanges.select',
-  ],
-};
-
-const nodeDragControllerHostDirective = {
-  directive: NodeDragControllerDirective,
-  outputs: ['nodeDragStart', 'nodeDrag', 'nodeDragEnd'],
-};
-
-const connectionControllerHostDirective = {
-  directive: ConnectionControllerDirective,
-  outputs: ['connectStart', 'connect', 'connectEnd', 'reconnectStart', 'reconnect', 'reconnectEnd'],
-};
-
+/**
+ * The flow. `N` and `E` are the node and edge types of the `nodes` and `edges` inputs; a template infers them from
+ * the bindings, so `$event` of the node, connection and component events carries the application's own types. In
+ * code, name them: `viewChild.required<VflowComponent<MyNode, MyEdge>>(VflowComponent)`.
+ */
 @Component({
   selector: 'vflow',
   templateUrl: './vflow.component.html',
@@ -148,12 +136,7 @@ const connectionControllerHostDirective = {
     AfterRenderBatchService,
     AlignmentService,
   ],
-  hostDirectives: [
-    changesControllerHostDirective,
-    nodeDragControllerHostDirective,
-    connectionControllerHostDirective,
-    ViewportCullingDirective,
-  ],
+  hostDirectives: [ViewportCullingDirective],
   host: {
     // Lets scaled application content keep screen-sized details. The token is inherited by every element of the
     // flow, so a change recomputes the style of all of them: it follows the zoom once per gesture, not per frame.
@@ -185,10 +168,12 @@ const connectionControllerHostDirective = {
     AutoPanDirective,
   ],
 })
-export class VflowComponent {
+export class VflowComponent<N extends Node = Node, E extends Edge = Edge> {
   // #region DI
   private viewportService = inject(ViewportService);
   private flowEntitiesService = inject(FlowEntitiesService);
+  private connectionService = inject(ConnectionService);
+  private draggableService = inject(DraggableService);
   private nodesChangeService = inject(NodesChangeService);
   private edgesChangeService = inject(EdgeChangesService);
   private nodeRenderingService = inject(NodeRenderingService);
@@ -270,7 +255,7 @@ export class VflowComponent {
   public readonly zoomOnDoubleClick = input(false);
 
   /** Pan by dragging. true allows all mouse buttons; arrays restrict mouse buttons, not touch. */
-  public readonly panOnDrag = input<boolean | number[]>(true);
+  public readonly panOnDrag = input<boolean | readonly number[]>(true);
 
   /** Pan with scrolling, taking priority over ordinary wheel zoom. */
   public readonly panOnScroll = input(false);
@@ -372,7 +357,7 @@ export class VflowComponent {
   /**
    * Nodes to render
    */
-  public readonly nodes = input.required<Node[]>();
+  public readonly nodes = input.required<readonly N[]>();
 
   protected nodeModels = this.nodeRenderingService.nodes;
   protected orderedNodes = this.flowEntitiesService.nodes;
@@ -380,7 +365,7 @@ export class VflowComponent {
   /**
    * Edges to render
    */
-  public readonly edges = input<Edge[]>([]);
+  public readonly edges = input<readonly E[]>([]);
 
   protected orderedEdges = this.flowEntitiesService.validEdges;
   // #endregion
@@ -398,16 +383,72 @@ export class VflowComponent {
    */
   public readonly edgesChanges = outputFromObservable(this.edgesChangeService.changes$);
 
-  /**
-   * Outputs of component nodes, as `ComponentNodeEvent`.
-   *
-   * The payload is `any` on purpose: a handler declared as `ComponentNodeEvent<[A, B]>` narrows `eventName` to the
-   * output names of its components, and a `string`-typed `AnyComponentNodeEvent` would not be assignable to it.
-   */
-  public readonly componentNodeEvent = outputFromObservable<any>(this.componentEventBusService.nodeEvent$);
+  // The changes of one type as separate outputs: `(nodesChanges.position)` and so on.
+  public readonly nodesChangesPosition = outputFromObservable(this.nodesChangeService.changesOfType('position'), {
+    alias: 'nodesChanges.position',
+  });
+  public readonly nodesChangesSize = outputFromObservable(this.nodesChangeService.changesOfType('size'), {
+    alias: 'nodesChanges.size',
+  });
+  public readonly nodesChangesAdd = outputFromObservable(this.nodesChangeService.changesOfType('add'), {
+    alias: 'nodesChanges.add',
+  });
+  public readonly nodesChangesRemove = outputFromObservable(this.nodesChangeService.changesOfType('remove'), {
+    alias: 'nodesChanges.remove',
+  });
+  public readonly nodesChangesSelect = outputFromObservable(this.nodesChangeService.changesOfType('select'), {
+    alias: 'nodesChanges.select',
+  });
+  public readonly edgesChangesDetached = outputFromObservable(this.edgesChangeService.changesOfType('detached'), {
+    alias: 'edgesChanges.detached',
+  });
+  public readonly edgesChangesAdd = outputFromObservable(this.edgesChangeService.changesOfType('add'), {
+    alias: 'edgesChanges.add',
+  });
+  public readonly edgesChangesRemove = outputFromObservable(this.edgesChangeService.changesOfType('remove'), {
+    alias: 'edgesChanges.remove',
+  });
+  public readonly edgesChangesSelect = outputFromObservable(this.edgesChangeService.changesOfType('select'), {
+    alias: 'edgesChanges.select',
+  });
 
-  /** Outputs of component edges, as `ComponentEdgeEvent`. The payload is `any` for the reason given above. */
-  public readonly componentEdgeEvent = outputFromObservable<any>(this.componentEventBusService.edgeEvent$);
+  // The models hold the objects of the `nodes` and `edges` inputs, so the events of the services are events of `N`
+  // and `E`; the services do not know the types, hence the casts.
+
+  /** The pointer passed the drag threshold on a draggable node. */
+  public readonly nodeDragStart = outputFromObservable(this.dragEvents('start'));
+  /** A move of the node drag gesture, after the nodes moved. */
+  public readonly nodeDrag = outputFromObservable(this.dragEvents('move'));
+  /** The release of the node drag gesture. */
+  public readonly nodeDragEnd = outputFromObservable(this.dragEvents('end'));
+
+  public readonly connectStart = outputFromObservable(
+    this.connectionService.connectStart$.pipe(map((event) => event as ConnectStartEvent<N>)),
+  );
+  /** An application-owned structural connection request, after validation. */
+  public readonly connect = outputFromObservable(this.connectionService.connect$);
+  public readonly connectEnd = outputFromObservable(
+    this.connectionService.connectEnd$.pipe(map((event) => event as ConnectEndEvent<N>)),
+  );
+  public readonly reconnectStart = outputFromObservable(
+    this.connectionService.reconnectStart$.pipe(map((event) => event as ReconnectStartEvent<N, E>)),
+  );
+  /** A reconnection of an existing edge, after validation; apply it with `reconnectEdges([event], graph)`. */
+  public readonly reconnect = outputFromObservable(
+    this.connectionService.reconnect$.pipe(map((event) => event as ReconnectEvent<E>)),
+  );
+  public readonly reconnectEnd = outputFromObservable(
+    this.connectionService.reconnectEnd$.pipe(map((event) => event as ReconnectEndEvent<N, E>)),
+  );
+
+  /**
+   * Every output of every component node: the node id, the component class, the property name of the output and
+   * its payload. `isComponentNodeEvent(event, Cmp)` narrows the event to the outputs of one class.
+   */
+  public readonly componentNodeEvent = outputFromObservable(this.componentEventBusService.nodeEvent$);
+
+  /** Every output of every component edge; `isComponentEdgeEvent(event, Cmp)` narrows it to one class. */
+  public readonly componentEdgeEvent = outputFromObservable(this.componentEventBusService.edgeEvent$);
 
   /**
    * A keyboard user pressed a deletion key on a focused node or edge while entities were selected. Carries the
@@ -532,8 +573,8 @@ export class VflowComponent {
    *
    * @param id node id
    */
-  public getNode<T = unknown>(id: string): Node<T> | undefined {
-    return this.flowEntitiesService.getNode<T>(id)?.rawNode;
+  public getNode(id: string): N | undefined {
+    return this.flowEntitiesService.getNode(id)?.rawNode as N | undefined;
   }
 
   /**
@@ -549,7 +590,7 @@ export class VflowComponent {
    * Flow-space bounds of the rendered rectangles of the given nodes, or of all nodes. Unknown and unmeasured
    * nodes are skipped; with nothing to bound the result is an empty rectangle at the origin.
    */
-  public getNodesBounds(ids?: string[]): Rect {
+  public getNodesBounds(ids?: readonly string[]): Rect {
     const requested = ids ? new Set(ids) : null;
     // Culled nodes keep their last geometry, so the entity list, not the rendered one, is bounded.
     const models = this.flowEntitiesService
@@ -561,8 +602,8 @@ export class VflowComponent {
   /**
    * Sync method to get detached edges
    */
-  public getDetachedEdges(): Edge[] {
-    return this.flowEntitiesService.getDetachedEdges().map((e) => e.edge);
+  public getDetachedEdges(): E[] {
+    return this.flowEntitiesService.getDetachedEdges().map((e) => e.edge as E);
   }
 
   /** Converts a DOM client-space position to flow space. */
@@ -579,34 +620,38 @@ export class VflowComponent {
    * Gets rendered nodes containing a flow-space position, with the topmost node first. `node` is the application
    * object; `nodeSpacePoint` is a snapshot of the position relative to that node's top-left corner.
    */
-  public getNodesAtPoint<T = unknown>(point: Point): NodeAtPoint<T>[] {
+  public getNodesAtPoint(point: Point): NodeAtPoint<N>[] {
     return findNodesAtPoint(point, this.nodeModels())
       .reverse()
       .map((model) => {
         const globalPoint = model.globalPoint();
 
         return {
-          node: model.rawNode as Node<T>,
+          node: model.rawNode as N,
           nodeSpacePoint: { x: point.x - globalPoint.x, y: point.y - globalPoint.y },
         };
       });
   }
 
   /**
-   * Gets nodes that intersect with the specified node
-   *
-   * @template T - The type of data associated with the nodes
-   * @param nodeId - The ID of the node to check intersections for
-   * @param options.partially - If true, returns nodes that partially intersect. If false, only returns fully intersecting nodes
-   * @returns An array of nodes that intersect with the specified node
+   * Gets the rendered nodes whose rectangle overlaps the rectangle of the node. With `partially: false` only nodes
+   * that contain the whole rectangle count.
    */
-  public getIntersectingNodes<T = unknown>(
-    nodeId: string,
-    options: IntersectingNodesOptions = { partially: true },
-  ): Node<T>[] {
-    return getIntersectingNodes(nodeId, this.nodeModels(), options).map((n) => n.rawNode) as Node<T>[];
+  public getIntersectingNodes(nodeId: string, options?: IntersectingNodesOptions): N[] {
+    return getIntersectingNodes(nodeId, this.nodeModels(), options).map((n) => n.rawNode as N);
   }
   // #endregion
+
+  private dragEvents(type: NodeDragGestureEvent['type']): Observable<NodeDragEvent<N>> {
+    return this.draggableService.events$.pipe(
+      filter((event) => event.type === type),
+      map(({ node, nodes, event }) => ({
+        node: node.rawNode as N,
+        nodes: nodes.map((model) => model.rawNode as N),
+        sourceEvent: event,
+      })),
+    );
+  }
 
   protected trackNodes(idx: number, { rawNode: node }: NodeModel) {
     return node;

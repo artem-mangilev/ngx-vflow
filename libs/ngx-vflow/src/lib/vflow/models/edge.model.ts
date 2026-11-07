@@ -44,7 +44,7 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
    */
   private raw = entitySnapshot(this.edge, this.flowEntitiesService.edges);
 
-  public accessibility = computed(() => {
+  public readonly accessibility = computed(() => {
     const labels = this.settingsService.ariaLabels();
     const endpoints = labels.edgeLabel({
       source: this.source()?.ariaLabel() ?? labels.nodeLabel(this.edge.source),
@@ -66,19 +66,19 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
     };
   });
 
-  public source = signal<NodeModel | undefined>(undefined);
-  public target = signal<NodeModel | undefined>(undefined);
-  public curve = computed<Curve>(() => this.raw().curve?.() ?? EDGE_DEFAULTS.curve);
-  public reconnectable = computed(() => this.raw().reconnectable?.() ?? EDGE_DEFAULTS.reconnectable);
-  public interactionWidth = computed(() => this.raw().interactionWidth?.() ?? EDGE_DEFAULTS.interactionWidth);
+  public readonly source = signal<NodeModel | null>(null);
+  public readonly target = signal<NodeModel | null>(null);
+  public readonly curve = computed<Curve>(() => this.raw().curve?.() ?? EDGE_DEFAULTS.curve);
+  public readonly reconnectable = computed(() => this.raw().reconnectable?.() ?? EDGE_DEFAULTS.reconnectable);
+  public readonly interactionWidth = computed(() => this.raw().interactionWidth?.() ?? EDGE_DEFAULTS.interactionWidth);
   /** `g[vEdgeInteractionArea]` groups and host directives drawing the interaction stroke inside the presentation. */
-  public interactionAreasCount = signal(0);
-  public markers = computed<{ start?: MarkerRef; end?: MarkerRef }>(
+  public readonly interactionAreasCount = signal(0);
+  public readonly markers = computed<{ start?: MarkerRef; end?: MarkerRef }>(
     () => this.raw().markers?.() ?? EDGE_DEFAULTS.markers,
   );
   /** Label templates registered by `ng-template[vEdgeLabel]` inside the presentation of this edge. */
-  public labelTemplates = signal<Partial<Record<EdgeLabelPosition, EdgeLabelEntry>>>({});
-  public labelEntries = computed(() => {
+  public readonly labelTemplates = signal<Partial<Record<EdgeLabelPosition, EdgeLabelEntry>>>({});
+  public readonly labelEntries = computed(() => {
     const templates = this.labelTemplates();
     return LABEL_POSITIONS.flatMap((position) => {
       const entry = templates[position];
@@ -86,29 +86,31 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
     });
   });
 
-  public focused = signal(false);
-  public reconnecting = signal(false);
-  public inViewport = signal(false);
-  public culled = computed(
+  public readonly focused = signal(false);
+  public readonly reconnecting = signal(false);
+  public readonly inViewport = signal(false);
+  public readonly culled = computed(
     () => !!this.settingsService.optimization().virtualization && !this.focused() && !this.inViewport(),
   );
 
   /** Selection of an edge without an application signal. */
   private ownSelected = signal(EDGE_DEFAULTS.selected);
-  public selected = forwardSignal(() => this.raw().selected ?? this.ownSelected);
-  public preselected = signal(false);
-  public selectable = computed(() => this.raw().selectable?.() ?? this.settingsService.edgesSelectable());
-  public focusable = computed(() => this.raw().focusable?.() ?? this.settingsService.edgesFocusable());
+  public readonly selected = forwardSignal(() => this.raw().selected ?? this.ownSelected);
+  public readonly preselected = signal(false);
+  public readonly selectable = computed(() => this.raw().selectable?.() ?? this.settingsService.edgesSelectable());
+  public readonly focusable = computed(() => this.raw().focusable?.() ?? this.settingsService.edgesFocusable());
 
-  public shouldLoad = computed(() => (this.source()?.shouldLoad() ?? false) && (this.target()?.shouldLoad() ?? false));
+  public readonly shouldLoad = computed(
+    () => (this.source()?.shouldLoad() ?? false) && (this.target()?.shouldLoad() ?? false),
+  );
 
-  public renderOrder = signal(0);
+  public readonly renderOrder = signal(0);
 
   /**
    * Both endpoint nodes are measured and the edge's own endpoint handles are placed. Other handles of those nodes do
    * not matter: a handle added to a node that is already shown must not hide the edges drawn to its other handles.
    */
-  public isReady = computed(
+  public readonly isReady = computed(
     () =>
       !!this.source()?.isMeasured() &&
       !!this.target()?.isMeasured() &&
@@ -116,7 +118,7 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
       endpointPlaced(this.targetHandle()),
   );
 
-  public detached = computed(() => {
+  public readonly detached = computed(() => {
     const source = this.source();
     const target = this.target();
 
@@ -127,7 +129,7 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
     return !this.sourceHandle() || !this.targetHandle();
   });
 
-  public path = computed<CurveLayout>(() => {
+  public readonly path = computed<CurveLayout>(() => {
     const source = this.sourceHandle();
     const target = this.targetHandle();
 
@@ -153,16 +155,16 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
     }
   });
 
-  public bounds = computed(() => {
+  public readonly bounds = computed(() => {
     const layout = this.path();
     return layout.path ? (layout.bounds ?? getSvgPathBounds(this.document, layout.path)) : null;
   });
 
-  public sourceHandle = computed<HandleModel | null>(() =>
+  public readonly sourceHandle = computed<HandleModel | null>(() =>
     this.findHandle(this.source()?.handles() ?? [], 'source', this.edge.sourceHandle),
   );
 
-  public targetHandle = computed<HandleModel | null>(() =>
+  public readonly targetHandle = computed<HandleModel | null>(() =>
     this.findHandle(this.target()?.handles() ?? [], 'target', this.edge.targetHandle),
   );
 
@@ -175,11 +177,11 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
     return handles.find((handle) => handle.type() === type || handle.type() === 'any') ?? null;
   }
 
-  public markerStartUrl = computed(() => markerUrl(this.markers()?.start));
+  public readonly markerStartUrl = computed(() => markerUrl(this.markers()?.start));
 
-  public markerEndUrl = computed(() => markerUrl(this.markers()?.end));
+  public readonly markerEndUrl = computed(() => markerUrl(this.markers()?.end));
 
-  public context: EdgeContext;
+  public readonly context: EdgeContext;
 
   constructor(public edge: Edge) {
     const ownData = signal({});
@@ -205,7 +207,7 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
     return (this.selectedObservable ??= observeSignal(this.selected, this.modelInjector.get()));
   }
 
-  public destroy() {
+  public destroy(): void {
     this.modelInjector.destroy();
   }
 

@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, output } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { ComponentNodeEvent, Vflow, createNodes, injectNode } from 'ngx-vflow';
+import { AnyComponentNodeEvent, Vflow, createNodes, injectNode } from 'ngx-vflow';
 
 // The example of the "Unit testing component nodes" docs page.
 @Component({
@@ -27,7 +27,7 @@ class HostComponent {
   readonly nodes = createNodes([
     { id: 'task', component: TaskNodeComponent, point: { x: 0, y: 0 }, data: { title: 'Review' } },
   ]);
-  readonly events: ComponentNodeEvent<[TaskNodeComponent]>[] = [];
+  readonly events: AnyComponentNodeEvent[] = [];
 }
 
 describe('a component node in a flow of one node', () => {
@@ -56,6 +56,8 @@ describe('a component node in a flow of one node', () => {
 
     node.querySelector('button')!.click();
 
-    expect(fixture.componentInstance.events).toEqual([{ nodeId: 'task', eventName: 'done', eventPayload: 'task' }]);
+    expect(fixture.componentInstance.events).toEqual([
+      { nodeId: 'task', component: TaskNodeComponent, eventName: 'done', eventPayload: 'task' },
+    ]);
   });
 });

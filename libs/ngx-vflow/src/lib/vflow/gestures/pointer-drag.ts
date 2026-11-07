@@ -92,23 +92,29 @@ function suppressNextClick(view: Window) {
  * `element` is where the pointer is captured and the compatibility events are stopped; without it both options are
  * off, and the window of the document is used.
  */
+/** An element whose pointer events are typed: every HTML and SVG element. */
+export type GestureElement = Element & GlobalEventHandlers;
+
+/** The press a tracker follows, from the press event to the release. */
+interface TrackedPress {
+  press: PointerEvent;
+  start: Point;
+  threshold: number;
+  clickDistance: number;
+  started: boolean;
+  moved: boolean;
+  captured: boolean;
+}
+
 export function createPointerTracker(options: PointerTrackerOptions, element?: Element): PointerTracker {
   const doc = element?.ownerDocument ?? document;
   const view = doc.defaultView ?? window;
-  let gesture: {
-    press: PointerEvent;
-    start: Point;
-    threshold: number;
-    clickDistance: number;
-    started: boolean;
-    moved: boolean;
-    captured: boolean;
-  } | null = null;
+  let gesture: TrackedPress | null = null;
 
-  const context = (event: PointerEvent): PointerDragContext => ({
+  const context = (event: PointerEvent, current: TrackedPress): PointerDragContext => ({
     event,
-    press: gesture!.press,
-    start: gesture!.start,
+    press: current.press,
+    start: current.start,
     point: clientPoint(event),
   });
 
@@ -129,8 +135,7 @@ export function createPointerTracker(options: PointerTrackerOptions, element?: E
     }
   };
 
-  const track = (event: PointerEvent) => {
-    const current = gesture!;
+  const track = (event: PointerEvent, current: TrackedPress) => {
     const point = clientPoint(event);
     const distance = Math.hypot(point.x - current.start.x, point.y - current.start.y);
     if (distance > current.clickDistance) current.moved = true;
@@ -146,14 +151,13 @@ export function createPointerTracker(options: PointerTrackerOptions, element?: E
     // The event that crosses the threshold starts the drag and is delivered to onStart only.
     if (distance > current.threshold) {
       current.started = true;
-      options.onStart?.(context(event));
+      options.onStart?.(context(event, current));
     }
     return false;
   };
 
-  const end = (event: PointerEvent) => {
-    const current = gesture!;
-    const ctx = context(event);
+  const end = (event: PointerEvent, current: TrackedPress) => {
+    const ctx = context(event, current);
     const suppressClick = current.started && current.moved && event.pointerType !== 'touch';
     release();
     if (current.started) {
@@ -162,34 +166,34 @@ export function createPointerTracker(options: PointerTrackerOptions, element?: E
     }
   };
 
-  const cancel = (event: PointerEvent) => {
-    const current = gesture!;
-    const ctx = context(event);
+  const cancel = (event: PointerEvent, current: TrackedPress) => {
+    const ctx = context(event, current);
     release();
     if (current.started) options.onCancel?.(ctx);
   };
 
   function onPointerMove(event: PointerEvent) {
-    if (!gesture || event.pointerId !== gesture.press.pointerId) return;
+    const current = gesture;
+    if (!current || event.pointerId !== current.press.pointerId) return;
     if (event.pointerType === 'mouse' && event.buttons === 0) {
-      end(event);
+      end(event, current);
       return;
     }
-    if (track(event)) options.onMove?.(context(event));
+    if (track(event, current)) options.onMove?.(context(event, current));
   }
 
   function onPointerUp(event: PointerEvent) {
     if (!gesture || event.pointerId !== gesture.press.pointerId) return;
-    end(event);
+    end(event, gesture);
   }
 
   function onPointerCancel(event: PointerEvent) {
     if (!gesture || event.pointerId !== gesture.press.pointerId) return;
-    cancel(event);
+    cancel(event, gesture);
   }
 
   function onBlur() {
-    if (gesture) cancel(gesture.press);
+    if (gesture) cancel(gesture.press, gesture);
   }
 
   function press(event: PointerEvent) {
@@ -219,7 +223,7 @@ export function createPointerTracker(options: PointerTrackerOptions, element?: E
 
     if (threshold === 0) {
       gesture.started = true;
-      options.onStart?.(context(event));
+      options.onStart?.(context(event, gesture));
     }
   }
 
@@ -230,7 +234,7 @@ export function createPointerTracker(options: PointerTrackerOptions, element?: E
     press,
     release,
     destroy() {
-      if (gesture) cancel(gesture.press);
+      if (gesture) cancel(gesture.press, gesture);
     },
   };
 }
@@ -239,7 +243,7 @@ export function createPointerTracker(options: PointerTrackerOptions, element?: E
  * Turns presses on an element into drag gestures of a single pointer; see {@link createPointerTracker}. An accepted
  * press stops propagating, so that the ancestors of the element do not start a gesture of their own on it.
  */
-export function createPointerDrag(element: Element, options: PointerDragOptions): PointerDrag {
+export function createPointerDrag(element: GestureElement, options: PointerDragOptions): PointerDrag {
   const tracker = createPointerTracker(options, element);
 
   function onPointerDown(event: PointerEvent) {
@@ -250,7 +254,7 @@ export function createPointerDrag(element: Element, options: PointerDragOptions)
     tracker.press(event);
   }
 
-  element.addEventListener('pointerdown', onPointerDown as EventListener);
+  element.addEventListener('pointerdown', onPointerDown);
 
   return {
     get pressed() {
@@ -258,7 +262,7 @@ export function createPointerDrag(element: Element, options: PointerDragOptions)
     },
     destroy() {
       tracker.destroy();
-      element.removeEventListener('pointerdown', onPointerDown as EventListener);
+      element.removeEventListener('pointerdown', onPointerDown);
     },
   };
 }

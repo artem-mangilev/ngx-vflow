@@ -11,7 +11,7 @@ export class SelectionService {
   private flowSettingsService = inject(FlowSettingsService);
 
   /** Selects an entity, or clears the selection for `null`. In manual mode the application owns every write. */
-  public select(entity: FlowEntity | null) {
+  public select(entity: FlowEntity | null): void {
     if (this.isManual()) return;
 
     if (entity && !entity.selectable()) {

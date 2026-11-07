@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, signal, viewChild } from '@angular/
 import { TestBed } from '@angular/core/testing';
 import { Node, createNodes } from '../../interfaces/node.interface';
 import { createEdges } from '../../interfaces/edge.interface';
-import { NodeDragEvent } from '../../directives/node-drag-controller.directive';
+import { NodeDragEvent } from '../../interfaces/node-drag-event.interface';
 import { NodePositionChange } from '../../types/node-change.type';
 import { dispatchMouse } from '../../gestures/pointer-events.testing';
 import { Vflow } from '../../vflow';

@@ -1,6 +1,14 @@
 import { getSmoothStepPath } from './smooth-step-path';
-import { CurveFactoryParams } from '../../interfaces/curve-factory.interface';
+import { CurveFactoryParams, CurveLayout } from '../../interfaces/curve-factory.interface';
+import { EdgeLabelPoint, EdgeLabelPosition } from '../../interfaces/edge-label.interface';
 import { createEdge } from '../../interfaces/edge.interface';
+
+/** The three label points of a layout, which the smooth step path always provides. */
+function labelPointsOf(labelPoints: CurveLayout['labelPoints']): Record<EdgeLabelPosition, EdgeLabelPoint> {
+  const { start, center, end } = labelPoints ?? {};
+  if (!start || !center || !end) throw new Error('label points missing');
+  return { start, center, end };
+}
 
 describe('getSmoothStepPath', () => {
   const createParams = (
@@ -61,7 +69,7 @@ describe('getSmoothStepPath', () => {
         { x: 201, y: 201 },
       ]) {
         const { path, labelPoints } = getSmoothStepPath(createParams({ x: 200, y: 200 }, target));
-        const { start, center, end } = labelPoints!;
+        const { start, center, end } = labelPointsOf(labelPoints);
 
         expect(path).not.toContain('NaN');
         expect([start, center, end].flatMap(({ x, y }) => [x, y]).every(Number.isFinite)).toBe(true);
@@ -72,9 +80,9 @@ describe('getSmoothStepPath', () => {
   describe('label point angles', () => {
     it('should follow the segment of each label point', () => {
       // Right to left, target below: horizontal, vertical, horizontal.
-      const { start, center, end } = getSmoothStepPath(
-        createParams({ x: 100, y: 200 }, { x: 400, y: 500 }),
-      ).labelPoints!;
+      const { start, center, end } = labelPointsOf(
+        getSmoothStepPath(createParams({ x: 100, y: 200 }, { x: 400, y: 500 })).labelPoints,
+      );
 
       expect(start.angle).toBe(0);
       expect(center.angle).toBe(90);
@@ -82,9 +90,9 @@ describe('getSmoothStepPath', () => {
     });
 
     it('should point down along a vertical edge', () => {
-      const { start, center, end } = getSmoothStepPath(
-        createParams({ x: 100, y: 100 }, { x: 100, y: 400 }, 'bottom', 'top'),
-      ).labelPoints!;
+      const { start, center, end } = labelPointsOf(
+        getSmoothStepPath(createParams({ x: 100, y: 100 }, { x: 100, y: 400 }, 'bottom', 'top')).labelPoints,
+      );
 
       expect(start.angle).toBe(90);
       expect(center.angle).toBe(90);
@@ -92,9 +100,9 @@ describe('getSmoothStepPath', () => {
     });
 
     it('should point left along an edge drawn backwards', () => {
-      const { start, end } = getSmoothStepPath(
-        createParams({ x: 400, y: 200 }, { x: 100, y: 200 }, 'left', 'right'),
-      ).labelPoints!;
+      const { start, end } = labelPointsOf(
+        getSmoothStepPath(createParams({ x: 400, y: 200 }, { x: 100, y: 200 }, 'left', 'right')).labelPoints,
+      );
 
       expect(start.angle).toBe(180);
       expect(end.angle).toBe(180);
@@ -107,7 +115,7 @@ describe('getSmoothStepPath', () => {
       const targetPoint = { x: 400, y: 200 };
       const result = getSmoothStepPath(createParams(sourcePoint, targetPoint));
 
-      const { start, center, end } = result.labelPoints!;
+      const { start, center, end } = labelPointsOf(result.labelPoints);
 
       // For left-to-right path, start should be leftmost, end should be rightmost
       expect(start.x).toBeLessThan(center.x);

@@ -98,7 +98,9 @@ describe('NodesChangeService', () => {
   });
 
   it('observes no node for a listener of added and removed nodes only', async () => {
-    const observables = (model: NodeModel) => (model as unknown as { observables: Map<string, unknown> }).observables;
+    // The model creates each observable, an effect, on first use and keeps it in a private field.
+    const observables = (model: NodeModel) =>
+      Object.entries(model).filter(([key, value]) => key.endsWith('Observable') && value !== undefined).length;
     const a = node('a');
     const added: NodeChange[][] = [];
     service.changesOfType('add').subscribe((changes) => added.push(changes));
@@ -108,11 +110,11 @@ describe('NodesChangeService', () => {
     await settle();
 
     expect(added).toEqual([[{ type: 'add', id: 'a' }]]);
-    expect(observables(a).size).toBe(0);
+    expect(observables(a)).toBe(0);
 
     service.changes$.subscribe();
     await settle();
-    expect(observables(a).size).toBeGreaterThan(0);
+    expect(observables(a)).toBeGreaterThan(0);
   });
 
   it('reports the mode of each axis with every size change', async () => {

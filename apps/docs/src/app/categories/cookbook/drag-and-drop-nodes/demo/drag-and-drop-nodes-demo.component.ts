@@ -30,7 +30,7 @@ const isGroup = (node: Node<DemoNodeData>) => node.data?.().type === 'group';
   imports: [DocsPresentations, Vflow, DndModule, VuiPort],
 })
 export class DragAndDropNodesDemoComponent {
-  public vflow = viewChild.required(VflowComponent);
+  public vflow = viewChild.required<VflowComponent<Node<DemoNodeData>>>(VflowComponent);
 
   public nodes: Node<DemoNodeData>[] = createNodes<DemoNodeData>([
     {
@@ -47,7 +47,7 @@ export class DragAndDropNodesDemoComponent {
   public createNode({ event }: DndDropEvent) {
     const flowPoint = this.vflow().clientToFlowPosition({ x: event.x, y: event.y });
     const parent = this.vflow()
-      .getNodesAtPoint<DemoNodeData>(flowPoint)
+      .getNodesAtPoint(flowPoint)
       .find(({ node }) => isGroup(node));
 
     this.nodes = addNodes(
@@ -87,7 +87,7 @@ export class DragAndDropNodesDemoComponent {
     this.nodes
       .filter((node) => !isGroup(node))
       .forEach((node) => {
-        const intersectingNodes = this.vflow().getIntersectingNodes<DemoNodeData>(node.id).filter(isGroup);
+        const intersectingNodes = this.vflow().getIntersectingNodes(node.id).filter(isGroup);
 
         const canAttach = intersectingNodes.length > 0 && !node.parentId?.();
         node.data?.update((state) => ({ ...state, canAttach }));
@@ -95,7 +95,7 @@ export class DragAndDropNodesDemoComponent {
   }
 
   attachNode(nodeId: string) {
-    const [intersectionNode] = this.vflow().getIntersectingNodes<DemoNodeData>(nodeId).filter(isGroup);
+    const [intersectionNode] = this.vflow().getIntersectingNodes(nodeId).filter(isGroup);
     if (!intersectionNode) return;
 
     const nodeToUpdate = this.nodes.find((node) => node.id === nodeId);

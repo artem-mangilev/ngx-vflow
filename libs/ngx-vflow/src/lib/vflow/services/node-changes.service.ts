@@ -103,7 +103,7 @@ export class NodesChangeService {
    * The changes of one type, one array per tick. It observes only what this type needs: `add` and `remove` create
    * no per-node observables.
    */
-  public changesOfType<T extends NodeChange['type']>(type: T) {
+  public changesOfType<T extends NodeChange['type']>(type: T): Observable<Extract<NodeChange, { type: T }>[]> {
     return this.changesByType[type];
   }
 

@@ -13,7 +13,7 @@ import { KeyboardService } from './keyboard.service';
 import { isGroupNode } from '../utils/is-group-node';
 import { ResizeObserverService } from './resize-observer.service';
 import { clientToFlowPosition } from '../utils/coordinates';
-import { PointerDrag, PointerDragContext, createPointerDrag } from '../gestures/pointer-drag';
+import { GestureElement, PointerDrag, PointerDragContext, createPointerDrag } from '../gestures/pointer-drag';
 import { isNodeDragPress, pressTarget } from '../utils/press-target';
 import { FlowRenderingService } from './flow-rendering.service';
 import { AlignmentService } from './alignment.service';
@@ -52,7 +52,7 @@ export class DraggableService {
    * @param element target element for toggling draggable
    * @param model model with data for this element
    */
-  public enable(element: Element, model: NodeModel) {
+  public enable(element: GestureElement, model: NodeModel): void {
     this.clearDrag(element);
     this.drags.set(element, this.getDragBehavior(model, element));
   }
@@ -62,7 +62,7 @@ export class DraggableService {
    *
    * @param element target element for toggling draggable
    */
-  public disable(element: Element) {
+  public disable(element: GestureElement): void {
     this.clearDrag(element);
   }
 
@@ -84,11 +84,11 @@ export class DraggableService {
   }
 
   /** Removes the drag listeners of the element and cancels a drag in progress. */
-  public destroy(element: Element) {
+  public destroy(element: GestureElement): void {
     this.clearDrag(element);
   }
 
-  private clearDrag(element: Element) {
+  private clearDrag(element: GestureElement) {
     this.drags.get(element)?.destroy();
     this.drags.delete(element);
   }
@@ -99,7 +99,7 @@ export class DraggableService {
    * @param model
    * @returns
    */
-  private getDragBehavior(model: NodeModel, element: Element): PointerDrag {
+  private getDragBehavior(model: NodeModel, element: GestureElement): PointerDrag {
     let activated = false;
     let dragNodes: NodeModel[] = [];
     let initialPositions: Point[] = [];

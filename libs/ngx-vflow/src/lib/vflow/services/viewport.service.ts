@@ -276,8 +276,8 @@ export class ViewportService implements OnDestroy {
     return clamp(zoom, this.flowSettingsService.minZoom(), this.flowSettingsService.maxZoom());
   }
 
-  private getBoundsNodes(nodeIds: string[]) {
-    return !nodeIds?.length
+  private getBoundsNodes(nodeIds: readonly string[]): NodeModel[] {
+    return !nodeIds.length
       ? // If nodes option not passed or the list is empty, then get fit the whole view
         this.entitiesService.nodes()
       : // Otherwise fit to specific nodes

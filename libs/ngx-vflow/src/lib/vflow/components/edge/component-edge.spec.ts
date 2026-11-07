@@ -162,7 +162,7 @@ describe('Component edges', () => {
     ProbeEdgeComponent.instances.find((probe) => probe.ctx.edge.id === 'class')!.picked.emit('hello');
 
     expect(fixture.componentInstance.edgeEvents).toEqual([
-      { edgeId: 'class', eventName: 'picked', eventPayload: 'hello' },
+      { edgeId: 'class', component: ProbeEdgeComponent, eventName: 'picked', eventPayload: 'hello' },
     ]);
     expect(fixture.componentInstance.nodeEvents).toEqual([]);
   });

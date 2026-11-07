@@ -24,7 +24,7 @@ interface MatchBindingOptions {
 
 const FLAGS: KeyboardModifierFlag[] = ['control', 'meta', 'alt', 'shift'];
 
-const MODIFIER_TOKENS: Record<string, KeyboardModifierFlag | 'mod'> = {
+const MODIFIER_TOKENS: Partial<Record<string, KeyboardModifierFlag | 'mod'>> = {
   control: 'control',
   meta: 'meta',
   alt: 'alt',
@@ -33,7 +33,7 @@ const MODIFIER_TOKENS: Record<string, KeyboardModifierFlag | 'mod'> = {
 };
 
 /** Modifier keys by `KeyboardEvent.key` and by `KeyboardEvent.code`, for bindings that name a modifier itself. */
-const MODIFIER_KEYS: Record<string, KeyboardModifierFlag | 'mod'> = {
+const MODIFIER_KEYS: Partial<Record<string, KeyboardModifierFlag | 'mod'>> = {
   ...MODIFIER_TOKENS,
   controlleft: 'control',
   controlright: 'control',
@@ -110,7 +110,7 @@ export function resolveBindingKey(binding: ParsedBinding, mac?: boolean): string
  */
 export function matchesBindingKey(binding: ParsedBinding, event: KeyboardEvent, mac?: boolean): boolean {
   const wanted = resolveBindingKey(binding, mac);
-  return event.key?.toLowerCase() === wanted || event.code?.toLowerCase() === wanted;
+  return event.key.toLowerCase() === wanted || event.code.toLowerCase() === wanted;
 }
 
 /**

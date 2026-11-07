@@ -19,7 +19,7 @@ export function getNodesFlowBounds(nodes: NodeModel[]): Rect {
 export function getIntersectingNodes(
   nodeId: string,
   nodes: NodeModel[],
-  options?: IntersectingNodesOptions,
+  { partially = true }: IntersectingNodesOptions = {},
 ): NodeModel[] {
   const node = nodes.find((n) => n.rawNode.id === nodeId);
   if (!node) return [];
@@ -32,7 +32,7 @@ export function getIntersectingNodes(
     const currentRect = nodeToRect(currentNode);
     const overlappingArea = getOverlappingArea(currentRect, nodeRect);
 
-    if (options?.partially) {
+    if (partially) {
       return overlappingArea > 0;
     }
 

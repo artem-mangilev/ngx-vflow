@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { DocsPresentations } from '@docs/shared';
 import { NgDocNotifyService } from '@ng-doc/ui-kit';
-import { ComponentNodeEvent, Edge, Vflow, createNodes } from 'ngx-vflow';
+import { AnyComponentNodeEvent, Edge, Vflow, createNodes, isComponentNodeEvent } from 'ngx-vflow';
 import { BlueSquareNodeComponent, BlueSquareData } from './components/blue-square-node.component';
 import { RedSquareNodeComponent, RedSquareData } from './components/red-square-node.component';
 
@@ -52,13 +52,13 @@ export class CustomComponentNodesDemoComponent {
     },
   ];
 
-  // Type-safe!
-  handleComponentEvent(event: ComponentNodeEvent<[RedSquareNodeComponent, BlueSquareNodeComponent]>) {
-    if (event.eventName === 'redSquareEvent') {
+  // The guard narrows the event to the outputs of one component class, so the payload is typed.
+  handleComponentEvent(event: AnyComponentNodeEvent) {
+    if (isComponentNodeEvent(event, RedSquareNodeComponent) && event.eventName === 'redSquareEvent') {
       this.notifyService.notify(event.eventPayload);
     }
 
-    if (event.eventName === 'blueSquareEvent') {
+    if (isComponentNodeEvent(event, BlueSquareNodeComponent) && event.eventName === 'blueSquareEvent') {
       this.notifyService.notify(`${event.eventPayload.x + event.eventPayload.y}`);
     }
   }

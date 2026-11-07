@@ -143,12 +143,12 @@ describe('EdgeModel', () => {
   });
 
   it('should set detached === true if there no source', () => {
-    model.source.set(undefined);
+    model.source.set(null);
     expect(model.detached()).toEqual(true);
   });
 
   it('should detached === true if there no target', () => {
-    model.target.set(undefined);
+    model.target.set(null);
     expect(model.detached()).toEqual(true);
   });
 

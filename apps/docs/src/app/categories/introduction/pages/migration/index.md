@@ -256,7 +256,7 @@ export class TaskNodeComponent {
 
 {% endraw %}
 
-`(componentNodeEvent)` stays. It now collects every declared output of the component, including `@Output()`, `output()` and `outputFromObservable()`, and `eventName` is the property name of the output. `ComponentNodeEvent<[A, B]>` infers events from those outputs.
+`(componentNodeEvent)` stays. It now collects every declared output of the component, including `@Output()`, `output()` and `outputFromObservable()`, and `eventName` is the property name of the output. The event is an `AnyComponentNodeEvent` and carries the component class; `isComponentNodeEvent(event, A)` narrows it to `ComponentNodeEvent<[A]>`, the outputs of that class. A handler declared with the parameter type `ComponentNodeEvent<[A, B]>` no longer compiles: take `AnyComponentNodeEvent` and narrow with the guard.
 
 ### Selection by click
 
@@ -309,7 +309,7 @@ After:
 </svg:g>
 ```
 
-An edge can now be drawn by a component instead of the template: set `component` on the edge. The flow creates the component on an SVG group inside the edge, reads the edge through `injectEdge()`, and forwards its outputs to the new `(componentEdgeEvent)` output of `vflow`, typed with `ComponentEdgeEvent<[A, B]>`. Add `VflowEdgeInteractionAreaDirective` to the component's `hostDirectives` to move the interaction stroke into the component host.
+An edge can now be drawn by a component instead of the template: set `component` on the edge. The flow creates the component on an SVG group inside the edge, reads the edge through `injectEdge()`, and forwards its outputs to the new `(componentEdgeEvent)` output of `vflow`, as `AnyComponentEdgeEvent`; `isComponentEdgeEvent(event, A)` narrows an event to `ComponentEdgeEvent<[A]>`. Add `VflowEdgeInteractionAreaDirective` to the component's `hostDirectives` to move the interaction stroke into the component host.
 
 ### Edge labels
 
@@ -544,6 +544,22 @@ Every input of `vflow` is a signal input. Binding in a template is unchanged. Re
 - `size` of a `grid` background became `gap`, the name the `dots` background uses for the step of its pattern. `size` of `dots` remains the dot diameter.
 - `Node`, `NodeWithDefaults`, `StaticNode`, `injectNode()` and `injectEdge()` default their data type to `unknown` instead of `any`, as `Edge` already did. Code that reads `node.data()` without a type argument now gets `unknown`: pass the type, as in `injectNode<MyData>()` or `Node<MyData>[]`. `createNodes()` and `createEdges()` without a type argument infer the union of the data types of their nodes or edges. The `let-ctx` of a presentation template stays untyped, since a template cannot pass a type argument.
 - `NodeDragEvent` also carries `nodes`, every node the gesture moves, and `sourceEvent`, the pointer event.
+
+### Types flow through the component
+
+`VflowComponent<N, E>` is generic in its node and edge types, which a template infers from the `[nodes]` and `[edges]` bindings. `$event` of `(nodeDrag*)`, `(connect*)` and `(reconnect*)` then carries the application's own node and edge types, and `getNode()`, `getNodesAtPoint()`, `getIntersectingNodes()` and `getDetachedEdges()` return them: their type arguments are gone (`getNode<T>(id)` becomes `getNode(id)`, `NodeAtPoint<T>` becomes `NodeAtPoint<N>`). In code, name the types on the query: `viewChild.required<VflowComponent<MyNode>>(VflowComponent)`. The `nodes` and `edges` inputs accept `readonly` arrays.
+
+A `vNode` or `vEdge` template types its `ctx` with `of`, a type witness the flow never reads; without it `ctx` stays `any`:
+
+{% raw %}
+
+```html
+<div *vNode="let ctx; of: nodes">{{ ctx.data().text }}</div>
+```
+
+{% endraw %}
+
+`ConnectEndEvent` and `ReconnectEndEvent` report the release as one outcome: `to` is `{ node, handle }` and `valid` a boolean when the connection was released on a handle, and both are `null` otherwise, so a check of `to` narrows `valid`. `createEdge()` no longer fills missing handle ids with `''`: `sourceHandle` and `targetHandle` stay absent, as `undefined`.
 
 ### Removed APIs
 

@@ -8,6 +8,7 @@ import {
   computed,
   inject,
   input,
+  booleanAttribute,
   output,
   viewChild,
 } from '@angular/core';
@@ -75,7 +76,8 @@ export class VflowResizableComponent implements OnInit, OnDestroy {
   private settingsService = inject(FlowSettingsService);
   private spacePointContext = inject(SpacePointContextDirective);
 
-  public vResizable = input<boolean | ''>();
+  /** `[vResizable]="false"` hides the controls but keeps the element as the node's sizing box. */
+  public readonly vResizable = input(true, { transform: booleanAttribute });
 
   public gap = input(1.5);
 
@@ -102,8 +104,7 @@ export class VflowResizableComponent implements OnInit, OnDestroy {
 
   private resizer = viewChild.required<TemplateRef<unknown>>('resizer');
 
-  /** `[vResizable]="false"` hides the controls but keeps the element as the node's sizing box. */
-  protected readonly enabled = computed(() => this.vResizable() !== false);
+  protected readonly enabled = this.vResizable;
 
   /** Counter-scale of the corner handles, so they keep their on-screen size while the viewport zooms out. */
   protected readonly scale = computed(() =>

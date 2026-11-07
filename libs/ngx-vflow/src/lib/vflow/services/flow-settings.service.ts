@@ -47,7 +47,7 @@ export class FlowSettingsService {
   public zoomOnPinch = bindableSignal(true);
   public zoomOnDoubleClick = bindableSignal(false);
   /** true preserves panning with any mouse button; arrays restrict mouse buttons only. */
-  public panOnDrag = bindableSignal<boolean | number[]>(true);
+  public panOnDrag = bindableSignal<boolean | readonly number[]>(true);
   public panOnScroll = bindableSignal(false);
   public paneClickDistance = bindableSignal(6);
   public nodeDragThreshold = bindableSignal(0);
@@ -75,7 +75,7 @@ export class FlowSettingsService {
   public selectionBox = bindableSignal<Required<SelectionBoxSettings>>(DEFAULT_SELECTION_BOX);
 
   /** Reads every given setting from its source signal from now on. */
-  public bind(sources: FlowSettingsSources) {
+  public bind(sources: FlowSettingsSources): void {
     for (const [key, source] of Object.entries(sources) as [keyof FlowSettingsSources, Signal<unknown>][]) {
       (this[key] as BindableSignal<unknown>).bind(source);
     }

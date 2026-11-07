@@ -141,7 +141,7 @@ describe('Edge labels declared inside edge presentations', () => {
   it('renders a label in the label layer at its point of the path and closes over the edge context', async () => {
     const label = root.querySelector('.center-label')!;
     const host = labelHost('.center-label')!;
-    const point = edgeModel('template').path().labelPoints!.center;
+    const point = edgeModel('template').path().labelPoints!.center!;
 
     expect(label instanceof HTMLElement).toBe(true);
     expect(label.textContent).toBe('Hello');
@@ -168,7 +168,7 @@ describe('Edge labels declared inside edge presentations', () => {
   it('moves a label when its position changes and unregisters it when its template is destroyed', async () => {
     fixture.componentInstance.movable.set('end');
     await settle();
-    const end = edgeModel('template').path().labelPoints!.end;
+    const end = edgeModel('template').path().labelPoints!.end!;
     expect(positions('template')).toEqual(['center', 'end']);
     expectAt(labelHost('.movable-label')!, end);
 
@@ -185,7 +185,7 @@ describe('Edge labels declared inside edge presentations', () => {
 
   it('turns a label along the path when its orient is path, kept readable, and levels it otherwise', async () => {
     const host = labelHost('.along-label')!;
-    const angle = edgeModel('along').path().labelPoints!.center.angle!;
+    const angle = edgeModel('along').path().labelPoints!.center!.angle!;
 
     expect(angle).toBeGreaterThan(90);
     expect(labelHost('.center-label')!.style.transform).not.toContain('rotate');

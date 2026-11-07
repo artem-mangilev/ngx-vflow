@@ -106,7 +106,7 @@ describe('connection outputs', () => {
       { source: 'a', target: 'b', sourceHandle: 'out', targetHandle: 'in' },
       { source: 'b', target: 'c', sourceHandle: 'out', targetHandle: 'in' },
     ]);
-    expect(host.connectEnds.map(({ valid, from, to }) => [valid, from.node.id, to.node?.id])).toEqual([
+    expect(host.connectEnds.map(({ valid, from, to }) => [valid, from.node.id, to?.node.id])).toEqual([
       [true, 'a', 'b'],
       [true, 'c', 'b'],
     ]);
@@ -189,7 +189,7 @@ describe('connection outputs', () => {
     expect(host.reconnects).toMatchObject([
       { connection: { source: 'a', target: 'c', sourceHandle: 'out', targetHandle: 'in' }, edge },
     ]);
-    expect(host.reconnectEnds.map(({ edge, valid, to }) => [edge, valid, to.node?.id])).toEqual([[edge, true, 'c']]);
+    expect(host.reconnectEnds.map(({ edge, valid, to }) => [edge, valid, to?.node.id])).toEqual([[edge, true, 'c']]);
     // Reconnection reports the change; the application owns the edge.
     expect(host.connects).toEqual([]);
     expect(edge.target).toBe('b');

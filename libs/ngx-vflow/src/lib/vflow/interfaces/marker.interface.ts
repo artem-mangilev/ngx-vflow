@@ -19,8 +19,8 @@ export interface Marker {
   /** Size of the marker in flow units; one side given sets both, the shape scales uniformly to the smaller. @default 16.5 */
   width?: number;
   height?: number;
-  /** @default 'auto-start-reverse' */
-  orient?: string;
+  /** Orientation of the shape: along the path, along it with the start marker reversed, or a fixed angle in degrees. @default 'auto-start-reverse' */
+  orient?: 'auto' | 'auto-start-reverse' | number;
   /** Stroke width of the shape in flow units, whatever the marker size; match it to the edge line. @default 2 */
   strokeWidth?: number;
 }

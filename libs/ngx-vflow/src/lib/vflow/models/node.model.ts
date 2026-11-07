@@ -1,4 +1,4 @@
-import { Signal, TemplateRef, computed, inject, linkedSignal, signal, untracked } from '@angular/core';
+import { Signal, TemplateRef, WritableSignal, computed, inject, linkedSignal, signal, untracked } from '@angular/core';
 import { NodeGeometry } from '../interfaces/curve-factory.interface';
 import { DomAttributes } from '../interfaces/dom-attributes.interface';
 import { NODE_DEFAULTS, Node } from '../interfaces/node.interface';
@@ -29,13 +29,13 @@ export class NodeModel<T = unknown> implements FlowEntity, Contextable<NodeConte
    */
   private raw = entitySnapshot(this.rawNode, this.entitiesService.nodes);
 
-  public ariaLabel = computed(() => {
+  public readonly ariaLabel = computed(() => {
     const override = this.raw().ariaLabel?.().trim();
     if (override) return override;
     return this.settingsService.ariaLabels().nodeLabel(this.rawNode.id);
   });
 
-  public accessibility = computed(
+  public readonly accessibility = computed(
     (): { label: string; description: string; roleDescription: string; domAttributes?: DomAttributes } => {
       const labels = this.settingsService.ariaLabels();
       const parent = this.parent();
@@ -56,13 +56,13 @@ export class NodeModel<T = unknown> implements FlowEntity, Contextable<NodeConte
     },
   );
 
-  public focused = signal(false);
-  public dragging = signal(false);
-  public connectionActive = signal(false);
-  public inViewport = signal(false);
+  public readonly focused = signal(false);
+  public readonly dragging = signal(false);
+  public readonly connectionActive = signal(false);
+  public readonly inViewport = signal(false);
 
   /** CSS culling retains the view and its last measured geometry. */
-  public culled = computed(() => {
+  public readonly culled = computed(() => {
     if (
       !this.settingsService.optimization().virtualization ||
       !this.isReady() ||
@@ -84,25 +84,26 @@ export class NodeModel<T = unknown> implements FlowEntity, Contextable<NodeConte
    * Reference to the rendered node host element. Set by `NodeComponent` and used
    * by handles to measure their connection point relative to the node origin.
    */
-  public nodeElement = signal<HTMLElement | null>(null);
+  public readonly nodeElement = signal<HTMLElement | null>(null);
 
   /**
    * Whether the node dimensions have been measured at least once.
    * Until then the node is rendered hidden to avoid flicker and wrong
    * edge endpoints.
    */
-  public isMeasured = signal(false);
+  public readonly isMeasured = signal(false);
 
   /** False while the rendered node has no layout box (display: none), so it cannot be measured. */
-  public hasBox = signal(true);
+  public readonly hasBox = signal(true);
 
   /** The current view has both node dimensions and positioned handles. */
-  public isReady = computed(
+  public readonly isReady = computed(
     // A handle without a layout box (display: none) never gets measured and must not keep the node hidden.
     () => this.isMeasured() && this.handles().every((handle) => handle.isMeasured() || !handle.hasBox()),
   );
 
-  public point = signal<Point>({ x: 0, y: 0 });
+  /** The application's position signal. */
+  public readonly point: WritableSignal<Point> = this.rawNode.point;
 
   /** Size the resizer set on an axis without an application signal. */
   private resizedWidth = signal<number | undefined>(undefined);
@@ -112,40 +113,42 @@ export class NodeModel<T = unknown> implements FlowEntity, Contextable<NodeConte
    * Fixed size of an `explicit` axis: the application signal, or the resizer's value when the application has none.
    * `undefined` on an `auto` axis. The library renders it inline; measurement never writes it.
    */
-  public explicitWidth = computed(() => this.raw().width?.() ?? this.resizedWidth());
-  public explicitHeight = computed(() => this.raw().height?.() ?? this.resizedHeight());
+  public readonly explicitWidth = computed(() => this.raw().width?.() ?? this.resizedWidth());
+  public readonly explicitHeight = computed(() => this.raw().height?.() ?? this.resizedHeight());
 
-  public widthMode = computed<NodeSizeMode>(() => (this.explicitWidth() === undefined ? 'auto' : 'explicit'));
-  public heightMode = computed<NodeSizeMode>(() => (this.explicitHeight() === undefined ? 'auto' : 'explicit'));
+  public readonly widthMode = computed<NodeSizeMode>(() => (this.explicitWidth() === undefined ? 'auto' : 'explicit'));
+  public readonly heightMode = computed<NodeSizeMode>(() =>
+    this.explicitHeight() === undefined ? 'auto' : 'explicit',
+  );
 
   /**
    * Rendered size, used by edges, handles, the minimap and bounds. It starts from the explicit size, follows it when
    * the explicit size changes, and is overwritten by measurement, so CSS min/max on the element win.
    * `NODE_DEFAULTS` is a placeholder until an `auto` axis is first measured.
    */
-  public width = linkedSignal(() => this.explicitWidth() ?? NODE_DEFAULTS.width);
+  public readonly width = linkedSignal(() => this.explicitWidth() ?? NODE_DEFAULTS.width);
 
-  public height = linkedSignal(() => this.explicitHeight() ?? NODE_DEFAULTS.height);
+  public readonly height = linkedSignal(() => this.explicitHeight() ?? NODE_DEFAULTS.height);
 
   /** Set by the first measurement and never reset, unlike {@link isMeasured}, which a remount or culling clears. */
-  public hasMeasurement = signal(false);
+  public readonly hasMeasurement = signal(false);
 
-  public renderOrder = signal(0);
+  public readonly renderOrder = signal(0);
 
   /** Selection of a node without an application signal. */
   private ownSelected = signal(NODE_DEFAULTS.selected);
-  public selected = forwardSignal(() => this.raw().selected ?? this.ownSelected);
-  public preselected = signal(false);
-  public selectable = computed(() => this.raw().selectable?.() ?? this.settingsService.nodesSelectable());
-  public focusable = computed(() => this.raw().focusable?.() ?? this.settingsService.nodesFocusable());
+  public readonly selected = forwardSignal(() => this.raw().selected ?? this.ownSelected);
+  public readonly preselected = signal(false);
+  public readonly selectable = computed(() => this.raw().selectable?.() ?? this.settingsService.nodesSelectable());
+  public readonly focusable = computed(() => this.raw().focusable?.() ?? this.settingsService.nodesFocusable());
 
-  public extent = computed<'parent' | null>(() => {
+  public readonly extent = computed<'parent' | null>(() => {
     const extent = this.raw().extent;
     // `null` is a value of the signal, not its absence.
     return extent ? extent() : NODE_DEFAULTS.extent;
   });
 
-  public globalPoint = computed(() => {
+  public readonly globalPoint = computed(() => {
     let parent = this.parent();
     let x = this.point().x;
     let y = this.point().y;
@@ -163,20 +166,20 @@ export class NodeModel<T = unknown> implements FlowEntity, Contextable<NodeConte
   /**
    * CSS transform for positioning the node div in the (transformed) viewport.
    */
-  public pointTransformCss = computed(() => `translate(${this.globalPoint().x}px, ${this.globalPoint().y}px)`);
+  public readonly pointTransformCss = computed(() => `translate(${this.globalPoint().x}px, ${this.globalPoint().y}px)`);
 
   /** Absolute position and measured size, as curve factories receive them. */
-  public geometry = computed<NodeGeometry>(() => {
+  public readonly geometry = computed<NodeGeometry>(() => {
     const { x, y } = this.globalPoint();
 
     return { id: this.rawNode.id, x, y, width: this.width(), height: this.height() };
   });
 
-  public handles = signal<HandleModel[]>([]);
+  public readonly handles = signal<HandleModel[]>([]);
 
-  public draggable = computed(() => this.raw().draggable?.() ?? NODE_DEFAULTS.draggable);
+  public readonly draggable = computed(() => this.raw().draggable?.() ?? NODE_DEFAULTS.draggable);
 
-  public dragHandlesCount = signal(0);
+  public readonly dragHandlesCount = signal(0);
 
   // disabled for configuration for now
   public readonly magnetRadius = 20;
@@ -184,7 +187,7 @@ export class NodeModel<T = unknown> implements FlowEntity, Contextable<NodeConte
   /** A component class renders immediately; a lazy factory or a template waits for the viewport. */
   private isComponentClass = isComponentClass(this.rawNode.component);
 
-  public shouldLoad = extendedComputed<boolean>((previousShouldLoad) => {
+  public readonly shouldLoad = extendedComputed<boolean>((previousShouldLoad) => {
     if (previousShouldLoad) {
       return true;
     }
@@ -205,7 +208,7 @@ export class NodeModel<T = unknown> implements FlowEntity, Contextable<NodeConte
     return true;
   });
 
-  public parent = computed<NodeModel | null>(() => {
+  public readonly parent = computed<NodeModel | null>(() => {
     // Re-read optional signals when application-owned graph structure changes.
     const nodes = this.entitiesService.nodeByIdMap();
     const parentId = this.rawNode.parentId?.();
@@ -214,24 +217,20 @@ export class NodeModel<T = unknown> implements FlowEntity, Contextable<NodeConte
     return nodes.get(parentId) ?? null;
   });
 
-  public children = computed(() => this.entitiesService.nodesByParentIdMap().get(this.rawNode.id) ?? []);
+  public readonly children = computed(() => this.entitiesService.nodesByParentIdMap().get(this.rawNode.id) ?? []);
 
-  public resizing = signal(false);
+  public readonly resizing = signal(false);
 
   /**
    * Registered by the `[vResizable]` element while it exists. The node renders these controls in its own
    * layer, so a clipping element (`overflow: hidden`) cannot hide them, and the registered element, not the
    * node wrapper, receives the explicit size.
    */
-  public resizerTemplate = signal<TemplateRef<unknown> | null>(null);
+  public readonly resizerTemplate = signal<TemplateRef<unknown> | null>(null);
 
-  public context: NodeContext;
+  public readonly context: NodeContext;
 
   constructor(public rawNode: Node<T>) {
-    if (rawNode.point) {
-      this.point = rawNode.point;
-    }
-
     const ownData = signal(NODE_DEFAULTS.data as T);
 
     this.context = {
@@ -248,42 +247,41 @@ export class NodeModel<T = unknown> implements FlowEntity, Contextable<NodeConte
   }
 
   // Observables are created on first use: each one is an effect, and most flows never subscribe to them.
-  private observables = new Map<string, Observable<unknown>>();
+  private pointObservable?: Observable<Point>;
+  private widthObservable?: Observable<number>;
+  private heightObservable?: Observable<number>;
+  private selectedObservable?: Observable<boolean>;
+  private handlesObservable?: Observable<HandleModel[]>;
 
   public get point$(): Observable<Point> {
-    return this.observe('point', this.point);
+    return (this.pointObservable ??= this.observe(this.point));
   }
 
   public get width$(): Observable<number> {
-    return this.observe('width', this.width);
+    return (this.widthObservable ??= this.observe(this.width));
   }
 
   public get height$(): Observable<number> {
-    return this.observe('height', this.height);
+    return (this.heightObservable ??= this.observe(this.height));
   }
 
   public get selected$(): Observable<boolean> {
-    return this.observe('selected', this.selected);
+    return (this.selectedObservable ??= this.observe(this.selected));
   }
 
   public get handles$(): Observable<HandleModel[]> {
-    return this.observe('handles', this.handles);
+    return (this.handlesObservable ??= this.observe(this.handles));
   }
 
-  private observe<V>(key: string, source: Signal<V>): Observable<V> {
-    let observable = this.observables.get(key) as Observable<V> | undefined;
-    if (!observable) {
-      observable = observeSignal(source, this.modelInjector.get());
-      this.observables.set(key, observable);
-    }
-    return observable;
+  private observe<V>(source: Signal<V>): Observable<V> {
+    return observeSignal(source, this.modelInjector.get());
   }
 
-  public destroy() {
+  public destroy(): void {
     this.modelInjector.destroy();
   }
 
-  public setPoint(point: Point) {
+  public setPoint(point: Point): void {
     this.point.set(point);
   }
 
@@ -291,7 +289,7 @@ export class NodeModel<T = unknown> implements FlowEntity, Contextable<NodeConte
    * Fixes the given axes to a size: into the application signal when the node has one, otherwise into the model,
    * which makes the axis `explicit`. The rendered size follows at once.
    */
-  public setExplicitSize({ width, height }: { width?: number; height?: number }) {
+  public setExplicitSize({ width, height }: { width?: number; height?: number }): void {
     const raw = untracked(this.raw);
     if (width !== undefined) (raw.width ?? this.resizedWidth).set(width);
     if (height !== undefined) (raw.height ?? this.resizedHeight).set(height);

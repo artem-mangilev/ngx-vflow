@@ -26,6 +26,7 @@ import {
   EntityComponentOutputEvent,
 } from '../../directives/entity-component-outlet.directive';
 import { NODE_REF } from '../../utils/inject-node';
+import { NodeContext } from '../../interfaces/template-context.interface';
 import { NODE_MODEL } from '../../utils/node-model.token';
 import { HandleModel } from '../../models/handle.model';
 import { NodeHandlesControllerDirective } from '../../directives/node-handles-controller.directive';
@@ -80,7 +81,7 @@ export class NodeComponent implements OnInit, OnDestroy {
     return model.resizerTemplate() ? null : { width: model.explicitWidth(), height: model.explicitHeight() };
   });
 
-  public nodeTemplate = input<TemplateRef<any>>();
+  public nodeTemplate = input<TemplateRef<NodeContext>>();
 
   constructor() {
     effect(() => {
@@ -165,8 +166,8 @@ export class NodeComponent implements OnInit, OnDestroy {
     this.draggableService.destroy(this.hostRef.nativeElement);
   }
 
-  protected pushComponentEvent({ eventName, eventPayload }: EntityComponentOutputEvent) {
-    this.componentEventBus.pushNodeEvent({ nodeId: this.model().rawNode.id, eventName, eventPayload });
+  protected pushComponentEvent(event: EntityComponentOutputEvent): void {
+    this.componentEventBus.pushNodeEvent({ nodeId: this.model().rawNode.id, ...event });
   }
 
   protected hoverHandle(handle: HandleModel) {

@@ -27,14 +27,14 @@ import { computed as ngComputed } from '@angular/core';
  * @todo Use `linkedSignal` after Angular update
  */
 export function extendedComputed<TValue>(
-  computedCallback: (currentValue: TValue) => TValue,
+  computedCallback: (previousValue: TValue | undefined) => TValue,
   options?: CreateComputedOptions<TValue>,
 ) {
   if (!options) {
     options = { equal: Object.is };
   }
 
-  let currentValue: TValue = undefined!;
+  let currentValue: TValue | undefined = undefined;
   return ngComputed(() => {
     return (currentValue = computedCallback(currentValue));
   }, options);

@@ -6,12 +6,14 @@ import { KeyboardService } from '../../services/keyboard.service';
 import { NodeRenderingService } from '../../services/node-rendering.service';
 import { ReferenceIdentityChecker } from '../../utils/identity-checker/reference-identity-checker';
 import { addNodesToEdges } from '../../utils/add-nodes-to-edges';
+import type { Node } from '../../interfaces/node.interface';
+import type { Edge } from '../../interfaces/edge.interface';
 
 /**
  * Makes the services of the flow read its inputs. Settings are bound once, so readers follow the inputs without an
  * effect; nodes and edges are reconciled with their previous models. Called in the constructor of the flow.
  */
-export function bindVflowInputs(flow: VflowComponent) {
+export function bindVflowInputs<N extends Node, E extends Edge>(flow: VflowComponent<N, E>): void {
   const injector = inject(Injector);
   const settings = inject(FlowSettingsService);
   const entities = inject(FlowEntitiesService);

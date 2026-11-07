@@ -10,7 +10,7 @@ export class EdgeRenderingService {
     return Math.max(...this.flowEntitiesService.validEdges().map((n) => n.renderOrder()));
   });
 
-  public pull(edge: EdgeModel) {
+  public pull(edge: EdgeModel): void {
     const isAlreadyOnTop = edge.renderOrder() !== 0 && this.maxOrder() === edge.renderOrder();
 
     if (isAlreadyOnTop) {

@@ -1,6 +1,9 @@
 import { WritableSignal, computed, untracked } from '@angular/core';
 
-/** A writable signal that reads and writes the signal `target` currently returns. */
+/**
+ * A writable signal that reads and writes the signal `target` currently returns. The cast adds the writable brand,
+ * which is private to Angular.
+ */
 export function forwardSignal<T>(target: () => WritableSignal<T>): WritableSignal<T> {
   const read = computed(() => target()());
 

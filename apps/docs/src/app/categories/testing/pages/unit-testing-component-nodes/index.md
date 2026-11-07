@@ -23,7 +23,7 @@ class TaskNodeComponent {
 })
 class HostComponent {
   readonly nodes = createNodes([{ id: 'task', component: TaskNodeComponent, point: { x: 0, y: 0 }, data: { title: 'Review' } }]);
-  readonly events: ComponentNodeEvent<[TaskNodeComponent]>[] = [];
+  readonly events: AnyComponentNodeEvent[] = [];
 }
 
 describe('TaskNodeComponent', () => {

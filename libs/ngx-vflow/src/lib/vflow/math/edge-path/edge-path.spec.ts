@@ -27,15 +27,15 @@ describe('edge path utilities', () => {
 
     // Without curvature the control points sit on the endpoints and the curve is the diagonal.
     const flat = getBezierPath({ ...params, curvature: 0 }).labelPoints!;
-    expect(flat.start.angle).toBeCloseTo(45);
-    expect(flat.center.angle).toBeCloseTo(45);
-    expect(flat.end.angle).toBeCloseTo(45);
+    expect(flat.start!.angle).toBeCloseTo(45);
+    expect(flat.center!.angle).toBeCloseTo(45);
+    expect(flat.end!.angle).toBeCloseTo(45);
 
     // The S-curve leaves and arrives flatter than its middle, symmetrically.
     const curved = getBezierPath(params).labelPoints!;
-    expect(curved.start.angle).toBeCloseTo(curved.end.angle!);
-    expect(curved.start.angle).toBeGreaterThan(0);
-    expect(curved.center.angle).toBeGreaterThan(curved.start.angle!);
+    expect(curved.start!.angle).toBeCloseTo(curved.end!.angle!);
+    expect(curved.start!.angle).toBeGreaterThan(0);
+    expect(curved.center!.angle).toBeGreaterThan(curved.start!.angle!);
   });
 
   it('makes bezier curvature configurable', () => {

@@ -6,7 +6,6 @@ import { Marker, MarkerRef } from '../interfaces/marker.interface';
 import { markerId, normalizeMarker } from '../utils/marker-ref';
 import { MarkerShapes } from '../utils/marker-inset';
 import { FlowEntity } from '../interfaces/flow-entity.interface';
-import { Node } from '../interfaces/node.interface';
 import { ConnectionSettings } from '../interfaces/connection-settings.interface';
 import { bindableSignal } from '../utils/signals/bindable-signal';
 
@@ -17,7 +16,7 @@ export class FlowEntitiesService {
     equal: (a, b) => (!a.length && !b.length ? true : a === b),
   });
 
-  public readonly nodeByIdMap = computed(() => {
+  public readonly nodeByIdMap: Signal<ReadonlyMap<string, NodeModel>> = computed(() => {
     const result = new Map<string, NodeModel>();
     this.nodes().forEach((x) => {
       result.set(x.rawNode.id, x);
@@ -25,7 +24,7 @@ export class FlowEntitiesService {
     return result;
   });
 
-  public readonly nodesByParentIdMap = computed(() => {
+  public readonly nodesByParentIdMap: Signal<ReadonlyMap<string, readonly NodeModel[]>> = computed(() => {
     const result = new Map<string, NodeModel[]>();
     this.nodes().forEach((x) => {
       if (!x.rawNode.parentId) return;
@@ -43,7 +42,7 @@ export class FlowEntitiesService {
     return result;
   });
 
-  public readonly rawNodes = computed(() => this.nodes().map((n) => n.rawNode) as Node[]);
+  public readonly rawNodes = computed(() => this.nodes().map((n) => n.rawNode));
 
   public readonly edges = signal<EdgeModel[]>([], {
     // empty arrays considered equal, other arrays may not be equal
@@ -55,7 +54,7 @@ export class FlowEntitiesService {
   public readonly validEdges = computed(() => {
     const nodes = new Set(this.nodes());
 
-    return this.edges().filter((e) => nodes.has(e.source()!) && nodes.has(e.target()!));
+    return this.edges().filter((e) => hasEndpoints(e, nodes));
   });
 
   /** @see {VflowComponent.connection} */
@@ -67,7 +66,7 @@ export class FlowEntitiesService {
   public readonly markerShapes = signal<MarkerShapes>(new Map());
 
   /** Distinct markers of the edges and the connection line, by the id of their shared `<marker>` element. */
-  public readonly markers = computed(() => {
+  public readonly markers: Signal<ReadonlyMap<number, Marker>> = computed(() => {
     const markersMap = new Map<number, Marker>();
     const add = (marker: MarkerRef | undefined) => {
       if (marker) {
@@ -86,13 +85,20 @@ export class FlowEntitiesService {
     return markersMap;
   });
 
-  public entities: Signal<FlowEntity[]> = computed(() => [...this.nodes(), ...this.edges()]);
+  public readonly entities: Signal<readonly FlowEntity[]> = computed(() => [...this.nodes(), ...this.edges()]);
 
-  public getNode<T>(id: string) {
-    return this.nodeByIdMap().get(id) as NodeModel<T> | undefined;
+  public getNode(id: string): NodeModel | undefined {
+    return this.nodeByIdMap().get(id);
   }
 
-  public getDetachedEdges() {
+  public getDetachedEdges(): EdgeModel[] {
     return this.edges().filter((e) => e.detached());
   }
+}
+
+/** Whether both endpoint nodes of the edge are among `nodes`. */
+export function hasEndpoints(edge: EdgeModel, nodes: ReadonlySet<NodeModel>): boolean {
+  const source = edge.source();
+  const target = edge.target();
+  return source !== null && target !== null && nodes.has(source) && nodes.has(target);
 }

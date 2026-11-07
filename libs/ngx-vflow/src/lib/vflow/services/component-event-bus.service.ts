@@ -11,11 +11,11 @@ export class ComponentEventBusService {
   public readonly nodeEvent$ = this.nodeEvents.asObservable();
   public readonly edgeEvent$ = this.edgeEvents.asObservable();
 
-  public pushNodeEvent(event: AnyComponentNodeEvent) {
+  public pushNodeEvent(event: AnyComponentNodeEvent): void {
     this.nodeEvents.next(event);
   }
 
-  public pushEdgeEvent(event: AnyComponentEdgeEvent) {
+  public pushEdgeEvent(event: AnyComponentEdgeEvent): void {
     this.edgeEvents.next(event);
   }
 }

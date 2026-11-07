@@ -10,6 +10,7 @@ import { ConnectionInternal } from '../interfaces/connection.internal.interface'
 import {
   ConnectEndEvent,
   ConnectionEventHandle,
+  ConnectionEventOutcome,
   ConnectStartEvent,
   ReconnectEndEvent,
   ReconnectEvent,
@@ -94,13 +95,13 @@ export class ConnectionService {
    * a pointer event the gesture begins once the pointer passes the drag threshold and follows it to the release;
    * without one it begins at once and ends with {@link end}.
    */
-  public start(handle: HandleModel, event?: Event, oldEdge?: EdgeModel) {
+  public start(handle: HandleModel, event?: PointerEvent, oldEdge?: EdgeModel): void {
     if (!oldEdge && !handle.canStart()) return;
 
     this.tracker.release();
     this.pendingStart = null;
 
-    if (!(event instanceof PointerEvent)) {
+    if (!event) {
       this.begin(handle, oldEdge);
       return;
     }
@@ -111,7 +112,7 @@ export class ConnectionService {
   }
 
   /** The pointer entered a handle, or the magnet around it: the handle becomes the candidate. */
-  public hover(handle: HandleModel) {
+  public hover(handle: HandleModel): void {
     const gesture = this.gesture();
     if (!gesture) return;
 
@@ -124,7 +125,7 @@ export class ConnectionService {
   }
 
   /** The pointer left the candidate; leaving any other handle, the origin included, changes nothing. */
-  public leave(handle: HandleModel) {
+  public leave(handle: HandleModel): void {
     const gesture = this.gesture();
     if (!gesture || gesture.candidate?.handle !== handle) return;
 
@@ -135,7 +136,7 @@ export class ConnectionService {
    * The release: on a candidate that accepts, the connection is validated again and reported; anywhere else the
    * gesture is dropped. Either way the end is reported with the sides it connected, or `null` for a drop.
    */
-  public end() {
+  public end(): void {
     this.tracker.release();
     this.pendingStart = null;
     this.stopContextMenu?.();
@@ -146,24 +147,25 @@ export class ConnectionService {
 
     const { source, sourceHandle, oldEdge, candidate } = gesture;
     const from = { node: source.rawNode, handle: eventHandle(sourceHandle) };
-    let valid: boolean | null = null;
-    let to: ConnectEndEvent['to'] = { node: null, handle: null };
+    let outcome: ConnectionEventOutcome = { valid: null, to: null };
     let connection: ConnectionForValidation | null = null;
 
     if (candidate && candidate.handle.canAccept()) {
       connection = this.toConnection(gesture, candidate.handle);
-      valid = this.isValid(connection, oldEdge);
-      to = { node: candidate.node.rawNode, handle: eventHandle(candidate.handle) };
+      outcome = {
+        valid: this.isValid(connection, oldEdge),
+        to: { node: candidate.node.rawNode, handle: eventHandle(candidate.handle) },
+      };
     }
 
     this.setGesture(null);
 
     if (oldEdge) {
-      if (valid && connection) this.reconnect$.next({ edge: oldEdge.edge, connection });
-      this.reconnectEnd$.next({ edge: oldEdge.edge, valid, from, to });
+      if (outcome.valid && connection) this.reconnect$.next({ edge: oldEdge.edge, connection });
+      this.reconnectEnd$.next({ edge: oldEdge.edge, from, ...outcome });
     } else {
-      if (valid && connection) this.connect$.next(connection);
-      this.connectEnd$.next({ valid, from, to });
+      if (outcome.valid && connection) this.connect$.next(connection);
+      this.connectEnd$.next({ from, ...outcome });
     }
   }
 
@@ -192,7 +194,7 @@ export class ConnectionService {
     const previousCandidate = previous?.candidate?.handle;
     const nextCandidate = next?.candidate?.handle;
     if (previousCandidate && previousCandidate !== nextCandidate) previousCandidate.state.set('idle');
-    if (next?.candidate) nextCandidate!.state.set(next.candidate.valid ? 'valid' : 'invalid');
+    if (next?.candidate) next.candidate.handle.state.set(next.candidate.valid ? 'valid' : 'invalid');
 
     // The handle a connection is dragged from is `connecting`, unless it is also the candidate.
     const previousOrigin = previous?.sourceHandle;

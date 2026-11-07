@@ -1,5 +1,5 @@
 import { Injectable, computed, inject } from '@angular/core';
-import { FlowEntitiesService } from './flow-entities.service';
+import { FlowEntitiesService, hasEndpoints } from './flow-entities.service';
 import { Observable, merge } from 'rxjs';
 import { distinctUntilChanged, filter, map, pairwise, share, skip, switchMap } from 'rxjs/operators';
 import { toObservable } from '@angular/core/rxjs-interop';
@@ -19,9 +19,7 @@ export class EdgeChangesService {
   protected edgeDetachedChange$: Observable<EdgeDetachedChange[]> = toObservable(
     computed(() => {
       const nodes = new Set(this.entitiesService.nodes());
-      return this.entitiesService
-        .edges()
-        .filter((edge) => !nodes.has(edge.source()!) || !nodes.has(edge.target()!) || edge.detached());
+      return this.entitiesService.edges().filter((edge) => !hasEndpoints(edge, nodes) || edge.detached());
     }),
   ).pipe(
     pairwise(),
@@ -84,7 +82,7 @@ export class EdgeChangesService {
   };
 
   /** The changes of one type, one array per tick. It observes only what this type needs. */
-  public changesOfType<T extends EdgeChange['type']>(type: T) {
+  public changesOfType<T extends EdgeChange['type']>(type: T): Observable<Extract<EdgeChange, { type: T }>[]> {
     return this.changesByType[type];
   }
 

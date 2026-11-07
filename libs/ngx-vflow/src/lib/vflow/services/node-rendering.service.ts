@@ -22,7 +22,7 @@ export class NodeRenderingService {
    */
   public viewportNodes = computed(() => this.flowEntitiesService.nodes().filter((node) => node.inViewport()));
 
-  public pullNode(node: NodeModel) {
+  public pullNode(node: NodeModel): void {
     this.pull(node, (parent) => parent.children());
   }
 
@@ -30,13 +30,13 @@ export class NodeRenderingService {
    * Pulls every node in order. The children map is read once: every `renderOrder` write invalidates the
    * reactive epoch, so reading a computed with a producer per node after each write would poll all of them again.
    */
-  public pullNodes(nodes: NodeModel[]) {
+  public pullNodes(nodes: readonly NodeModel[]): void {
     const byParent = untracked(() => this.flowEntitiesService.nodesByParentIdMap());
     const children = (parent: NodeModel) => byParent.get(parent.rawNode.id) ?? [];
     for (const node of nodes) this.pull(node, children);
   }
 
-  private pull(node: NodeModel, children: (parent: NodeModel) => NodeModel[]) {
+  private pull(node: NodeModel, children: (parent: NodeModel) => readonly NodeModel[]): void {
     this.maxOrder++;
     // pull node
     node.renderOrder.set(this.maxOrder);

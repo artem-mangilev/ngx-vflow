@@ -1,18 +1,12 @@
 import { EdgeModel } from '../models/edge.model';
 import { NodeModel } from '../models/node.model';
 
-export function addNodesToEdges(nodes: NodeModel[], edges: EdgeModel[]): void {
-  const nodesById = nodes.reduce(
-    (acc, n) => {
-      acc[n.rawNode.id] = n;
+/** Links every edge to the models of its endpoint nodes; an endpoint that is not among `nodes` is `null`. */
+export function addNodesToEdges(nodes: readonly NodeModel[], edges: readonly EdgeModel[]): void {
+  const nodesById = new Map(nodes.map((node) => [node.rawNode.id, node]));
 
-      return acc;
-    },
-    {} as { [nodeId: string]: NodeModel },
-  );
-
-  edges.forEach((e) => {
-    e.source.set(nodesById[e.edge.source]);
-    e.target.set(nodesById[e.edge.target]);
-  });
+  for (const edge of edges) {
+    edge.source.set(nodesById.get(edge.edge.source) ?? null);
+    edge.target.set(nodesById.get(edge.edge.target) ?? null);
+  }
 }

@@ -1,6 +1,5 @@
 import { Directive, ElementRef, afterRenderEffect, contentChildren, inject, signal, untracked } from '@angular/core';
-import { NodeModel } from '../models/node.model';
-import { EdgeModel } from '../models/edge.model';
+import { FlowEntity } from '../interfaces/flow-entity.interface';
 import { KeyboardService } from '../services/keyboard.service';
 import { KeyboardEntityCommandsService } from '../services/keyboard-entity-commands.service';
 import { KeyboardViewportCommandsService } from '../services/keyboard-viewport-commands.service';
@@ -13,7 +12,7 @@ interface KeyboardCommand {
   /** Whether holding the key runs the command again. */
   repeat: boolean;
   /** Whether the command took the press. Declining leaves the key to the commands behind it. */
-  run: (model: NodeModel | EdgeModel, event: KeyboardEvent) => boolean;
+  run: (model: FlowEntity, event: KeyboardEvent) => boolean;
 }
 
 /**

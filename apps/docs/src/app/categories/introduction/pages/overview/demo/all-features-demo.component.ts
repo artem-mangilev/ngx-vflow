@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { DocsPresentations } from '@docs/shared';
-import { Vflow, Connection, Edge, createEdge, ComponentNodeEvent } from 'ngx-vflow';
+import { Vflow, Connection, Edge, createEdge, AnyComponentNodeEvent, isComponentNodeEvent } from 'ngx-vflow';
 import { FlowStoreService } from './services/flow-store.service';
 import { TransformNodeComponent } from './components/transform-node.component';
 
@@ -146,8 +146,8 @@ export class AllFeaturesDemoComponent {
     });
   }
 
-  onComponentEvent(event: ComponentNodeEvent<[TransformNodeComponent]>) {
-    if (event.eventName === 'deleted') {
+  onComponentEvent(event: AnyComponentNodeEvent) {
+    if (isComponentNodeEvent(event, TransformNodeComponent) && event.eventName === 'deleted') {
       this.store.nodes.update((nodes) => nodes.filter((node) => node !== event.eventPayload));
     }
   }

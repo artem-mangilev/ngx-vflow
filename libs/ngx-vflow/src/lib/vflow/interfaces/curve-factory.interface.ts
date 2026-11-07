@@ -24,10 +24,10 @@ export interface CurveFactorySharedParams {
   sourcePosition: Position;
   /** Position of the target handle relative to the target node */
   targetPosition: Position;
-  /** Array of all edges in the flow */
-  allEdges: Edge[];
-  /** Array of all nodes in the flow */
-  allNodes: Node[];
+  /** Every edge of the flow */
+  allEdges: readonly Edge[];
+  /** Every node of the flow */
+  allNodes: readonly Node[];
 }
 
 /** Parameters required to build a straight edge path. */
@@ -84,10 +84,10 @@ export interface CurveLayout {
   /** Conservative flow-space bounds for virtualization. Omit to measure custom paths using SVG. */
   bounds?: Rect;
   /**
-   * Optional points for label placement along the curve. A point may carry the direction of the path there as
-   * `angle`, which labels with `orient: 'path'` follow.
+   * Points for label placement along the curve; a `vEdgeLabel` at a position the curve omits does not render. A
+   * point may carry the direction of the path there as `angle`, which labels with `orient: 'path'` follow.
    */
-  labelPoints?: { [key in EdgeLabelPosition]: EdgeLabelPoint };
+  labelPoints?: Partial<Record<EdgeLabelPosition, EdgeLabelPoint>>;
 }
 
 export type CurveFactoryParams = ConnectionCurveFactoryParams | EdgeCurveFactoryParams;

@@ -3,6 +3,8 @@ import { Directive, TemplateRef, effect, inject, input, numberAttribute, untrack
 import { ConnectionContext, EdgeContext, NodeContext } from '../interfaces/template-context.interface';
 import { EdgeLabelOrient, EdgeLabelPosition } from '../interfaces/edge-label.interface';
 import { EdgeComponent } from '../components/edge/edge.component';
+import { Edge } from '../interfaces/edge.interface';
+import { Node } from '../interfaces/node.interface';
 
 /**
  * Presentation of every edge without a `component`, drawn inside the edge SVG. Use the structural form on one root
@@ -19,15 +21,26 @@ import { EdgeComponent } from '../components/edge/edge.component';
  *   <span *vEdgeLabel>{{ ctx.data().label }}</span>
  * </ng-template>
  * ```
+ *
+ * `of` names the edges the template renders, so that `ctx.data()` has their data type; it is read by the type
+ * checker only. Without it `ctx` is an `EdgeRef<any>`.
+ *
+ * ```html
+ * <svg:g *vEdge="let ctx; of: edges()">{{ ctx.data().weight }}</svg:g>
+ * <ng-template let-ctx vEdge [vEdgeOf]="edges()">…</ng-template>
+ * ```
  */
 @Directive({
   standalone: true,
   selector: 'ng-template[vEdge]',
 })
-export class VflowEdgeTemplateDirective {
-  public templateRef = inject<TemplateRef<EdgeContext>>(TemplateRef);
+export class VflowEdgeTemplateDirective<T = any> {
+  public readonly templateRef = inject<TemplateRef<EdgeContext<T>>>(TemplateRef);
 
-  static ngTemplateContextGuard(dir: VflowEdgeTemplateDirective, ctx: unknown): ctx is EdgeContext {
+  /** Type witness: the edges the template renders. The flow never reads it. */
+  public readonly vEdgeOf = input<readonly Edge<T>[]>();
+
+  static ngTemplateContextGuard<T>(dir: VflowEdgeTemplateDirective<T>, ctx: unknown): ctx is EdgeContext<T> {
     return true;
   }
 }
@@ -37,7 +50,7 @@ export class VflowEdgeTemplateDirective {
   selector: 'ng-template[vConnection]',
 })
 export class VflowConnectionTemplateDirective {
-  public templateRef = inject(TemplateRef);
+  public readonly templateRef = inject<TemplateRef<ConnectionContext>>(TemplateRef);
 
   static ngTemplateContextGuard(dir: VflowConnectionTemplateDirective, ctx: unknown): ctx is ConnectionContext {
     return true;
@@ -153,15 +166,26 @@ export class VflowMarkerTemplateDirective {
  *   @if (ctx.data().kind === 'group') { … } @else { … }
  * </ng-template>
  * ```
+ *
+ * `of` names the nodes the template renders, so that `ctx.data()` has their data type; it is read by the type
+ * checker only. Without it `ctx` is a `NodeRef<any>`.
+ *
+ * ```html
+ * <div *vNode="let ctx; of: nodes()">{{ ctx.data().text }}</div>
+ * <ng-template let-ctx vNode [vNodeOf]="nodes()">…</ng-template>
+ * ```
  */
 @Directive({
   standalone: true,
   selector: 'ng-template[vNode]',
 })
-export class VflowNodeTemplateDirective {
-  public templateRef = inject<TemplateRef<NodeContext>>(TemplateRef);
+export class VflowNodeTemplateDirective<T = any> {
+  public readonly templateRef = inject<TemplateRef<NodeContext<T>>>(TemplateRef);
 
-  static ngTemplateContextGuard(dir: VflowNodeTemplateDirective, ctx: unknown): ctx is NodeContext {
+  /** Type witness: the nodes the template renders. The flow never reads it. */
+  public readonly vNodeOf = input<readonly Node<T>[]>();
+
+  static ngTemplateContextGuard<T>(dir: VflowNodeTemplateDirective<T>, ctx: unknown): ctx is NodeContext<T> {
     return true;
   }
 }

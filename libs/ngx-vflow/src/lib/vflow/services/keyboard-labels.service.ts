@@ -46,7 +46,7 @@ export class KeyboardLabelsService {
   });
 
   /** Reads one instruction entry, which is either a sentence or a function of the current keys and the entity. */
-  public text(instruction: KeyboardInstruction, state: KeyboardInstructionState) {
+  public text(instruction: KeyboardInstruction, state: KeyboardInstructionState): string {
     return typeof instruction === 'function' ? instruction(this.keys(), state) : instruction;
   }
 }

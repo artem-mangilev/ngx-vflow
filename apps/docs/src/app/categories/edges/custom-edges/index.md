@@ -21,16 +21,31 @@ If your template draws geometry that differs from the edge path, set `interactio
 
 ## Context
 
-It's tricky to infer type for `ctx`, so here is an interface with available fields for this context.
+`ctx` is the `EdgeRef` of the edge, the same object an edge component gets from `injectEdge()`:
 
 ```ts
-export interface EdgeContext {
-  edge: Edge;
+export interface EdgeRef<T = any> {
+  edge: Edge<T>;
+  data: Signal<T>;
   path: Signal<string>;
   markerStart: Signal<string>;
   markerEnd: Signal<string>;
+  selected: Signal<boolean>;
+  preselected: Signal<boolean>;
+  shouldLoad: Signal<boolean>;
 }
 ```
+
+A template cannot take a type argument, so `data` is `any` by default. Name the edges the template renders with `of`
+to type it; the flow never reads this input:
+
+{% raw %}
+
+```html
+<svg:g *vEdge="let ctx; of: edges" vEdgeInteractionArea>{{ ctx.data().label }}</svg:g>
+```
+
+{% endraw %}
 
 ## Example
 
@@ -45,6 +60,6 @@ elements, the same way as an edge template; see `*FeaturesEdgeLabels`. A label r
 flow, outside the component host, so host listeners and `:host(:hover)` do not see it. Put listeners on the label
 element itself; the demo below emits the same output from a click on the line and on the label.
 
-Outputs of an edge component reach the `componentEdgeEvent` output of `vflow` with the edge id, the property name of the output and its payload. The `ComponentEdgeEvent` type narrows these events for a list of edge component classes.
+Outputs of an edge component reach the `componentEdgeEvent` output of `vflow` with the edge id, the component class, the property name of the output and its payload. `isComponentEdgeEvent(event, Cmp)` narrows an event to the outputs of one edge component class, as `ComponentEdgeEvent<[Cmp]>`.
 
 {{ NgDocActions.demoPane("ComponentEdgesDemoComponent") }}

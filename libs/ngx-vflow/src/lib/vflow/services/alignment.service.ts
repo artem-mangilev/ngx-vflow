@@ -38,7 +38,7 @@ export class AlignmentService {
   private parentOrigins: Point[] = [];
 
   /** Collects what the dragged nodes may align with. Does nothing while the helper is off. */
-  public begin(nodes: NodeModel[]) {
+  public begin(nodes: NodeModel[]): void {
     this.end();
     if (!this.settingsService.alignmentHelper()) return;
 
@@ -97,13 +97,13 @@ export class AlignmentService {
   }
 
   /** Publishes the guides for where the dragged nodes are now. */
-  public update() {
+  public update(): void {
     this.guides.set(
       this.scene && !this.bypassed() ? alignmentGuides(this.scene, getNodesFlowBounds(this.nodes)) : NO_GUIDES,
     );
   }
 
-  public end() {
+  public end(): void {
     this.scene = null;
     this.nodes = [];
     this.parentOrigins = [];

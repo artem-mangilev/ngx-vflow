@@ -279,7 +279,7 @@ describe('VflowHandleDirective', () => {
     const [end] = fixture.componentInstance.ends;
     expect(end.valid).toBe(true);
     expect(end.from.node.id).toBe('a');
-    expect(end.to.node?.id).toBe('b');
+    expect(end.to?.node.id).toBe('b');
     expect(flow.get(ConnectionService).gesture()).toBeNull();
   });
 

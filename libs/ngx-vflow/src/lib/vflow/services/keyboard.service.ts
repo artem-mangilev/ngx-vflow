@@ -60,12 +60,12 @@ function defaultShortcuts(): RawShortcuts {
 }
 
 /** Keeps the supplied entries of one section, drops omitted ones and tolerates a non-array from JavaScript. */
-function suppliedEntries(section: Partial<Record<string, string[]>> = {}): Record<string, string[]> {
-  return Object.fromEntries(
-    Object.entries(section)
-      .filter(([, keys]) => keys !== undefined)
-      .map(([name, keys]) => [name, Array.isArray(keys) ? keys : []]),
-  );
+function suppliedEntries<K extends string>(section: Partial<Record<K, string[]>> = {}): Partial<Record<K, string[]>> {
+  const entries: Partial<Record<K, string[]>> = {};
+  for (const [name, keys] of Object.entries<string[] | undefined>(section)) {
+    if (keys !== undefined) entries[name as K] = Array.isArray(keys) ? keys : [];
+  }
+  return entries;
 }
 
 /** Parses one entry, dropping bindings that do not read as `[<Modifier>+]*<Key>`. */
@@ -116,8 +116,8 @@ export class KeyboardService {
     const defaults = defaultShortcuts();
     return resolveShortcuts(
       {
-        modifiers: { ...defaults.modifiers, ...suppliedEntries(shortcuts?.modifiers) },
-        commands: { ...defaults.commands, ...suppliedEntries(shortcuts?.commands) },
+        modifiers: { ...defaults.modifiers, ...suppliedEntries(shortcuts.modifiers) },
+        commands: { ...defaults.commands, ...suppliedEntries(shortcuts.commands) },
       },
       this.mac,
     );
@@ -139,14 +139,13 @@ export class KeyboardService {
       .subscribe((event) => {
         if (event instanceof KeyboardEvent) {
           const target = event.composedPath()[0] ?? event.target;
-          const editable =
-            target instanceof Element &&
-            !!target.closest(
-              'input, textarea, select, [contenteditable]:not([contenteditable="false"]), [data-v-no-keyboard]',
-            );
-          const code = event.code?.toLowerCase() ?? '';
+          const element = target instanceof Element ? target : null;
+          const editable = !!element?.closest(
+            'input, textarea, select, [contenteditable]:not([contenteditable="false"]), [data-v-no-keyboard]',
+          );
+          const code = event.code.toLowerCase();
           if (event.type === 'keydown') {
-            this.pressed.set(code, event.key?.toLowerCase() ?? '');
+            this.pressed.set(code, event.key.toLowerCase());
             if (!editable) this.gesture.add(code);
             else this.gesture.clear();
           } else {
@@ -157,8 +156,8 @@ export class KeyboardService {
             event.type === 'keydown' &&
             code === 'space' &&
             this.isActiveModifier('panActivation') &&
-            (this.host?.contains(target as Node) || this.host?.matches(':hover')) &&
-            !(target instanceof Element && target.closest('button, a'))
+            (this.host?.contains(element) || this.host?.matches(':hover')) &&
+            !element?.closest('button, a')
           ) {
             event.preventDefault();
           }
@@ -180,25 +179,25 @@ export class KeyboardService {
   }
 
   /** Reads the configuration from `shortcuts` from now on. */
-  public bindShortcuts(shortcuts: Signal<KeyboardShortcuts>) {
+  public bindShortcuts(shortcuts: Signal<KeyboardShortcuts>): void {
     this.shortcuts.bind(shortcuts);
   }
 
   /** Whether a key bound as the modifier is down. Not reactive: the pressed keys are not a signal. */
-  public isActiveModifier(name: KeyboardModifierName) {
+  public isActiveModifier(name: KeyboardModifierName): boolean {
     const gestureOnly = GESTURE_MODIFIERS.includes(name);
     return untracked(this.state).modifiers[name].some((binding) => this.isHeld(binding, gestureOnly));
   }
 
   /** Whether the pressed key is bound as a modifier, so entity commands leave it to the gesture layer. */
-  public isModifierKey(event: KeyboardEvent) {
+  public isModifierKey(event: KeyboardEvent): boolean {
     return Object.values(this.state().modifiers).some((bindings) =>
       bindings.some((binding) => matchesBindingKey(binding, event, this.mac)),
     );
   }
 
   /** Whether the event runs the command. Reactive, so descriptions follow the configuration. */
-  public isCommand(command: KeyboardCommandName, event: KeyboardEvent) {
+  public isCommand(command: KeyboardCommandName, event: KeyboardEvent): boolean {
     const state = this.state();
     // Holding the multiselection modifier turns selection into a toggle, so it must not block the select command.
     const ignoreModifiers = command === 'select' ? state.selectTolerates : undefined;
@@ -208,7 +207,7 @@ export class KeyboardService {
   }
 
   /** Whether the command has any key. Reactive. */
-  public hasCommand(command: KeyboardCommandName) {
+  public hasCommand(command: KeyboardCommandName): boolean {
     return this.state().commands[command].length > 0;
   }
 
