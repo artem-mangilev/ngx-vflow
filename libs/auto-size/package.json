@@ -1,0 +1,31 @@
+{
+  "name": "@vflow/auto-size",
+  "version": "2.7.0",
+  "description": "Parent nodes that grow around their children for ngx-vflow",
+  "license": "MIT",
+  "homepage": "https://www.ngx-vflow.org/",
+  "author": "Artem Mangilev",
+  "keywords": [
+    "angular",
+    "ngx-vflow",
+    "group",
+    "auto size",
+    "diagram"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/artem-mangilev/ngx-vflow",
+    "directory": "libs/auto-size"
+  },
+  "peerDependencies": {
+    "@angular/core": "^20.0.0 || ^21.0.0 || ^22.0.0",
+    "ngx-vflow": "^3.0.0"
+  },
+  "dependencies": {
+    "tslib": "^2.3.0"
+  },
+  "sideEffects": false,
+  "publishConfig": {
+    "access": "public"
+  }
+}

@@ -1,6 +1,6 @@
 # 04. `@vflow/auto-size`
 
-Status: ready-for-agent
+Status: resolved
 Type: task
 Blocked by: 02, 03
 
@@ -23,3 +23,16 @@ Blocked by: 02, 03
 ## Готово, когда
 
 - Сборка/тесты/lint пакета зелёные, страница `Packages → Auto size` с демо, cookbook `group-auto-scaling` не iframe (замена в 07).
+
+## Comments
+
+2026-11-07, сделано:
+
+- `libs/auto-size` по каркасу 03 (конфиги скопированы, сборка против `dist/libs/ngx-vflow`). Директива `VxAutoSize`, селектор `vflow[vxAutoSize]`, входы `vxAutoSizePadding` (число или по сторонам), `vxAutoSizeShouldResize`, `vxAutoSizeShrink`. Имена входов без alias — правило `@angular-eslint/no-input-rename` в репозитории.
+- Подписки через `OutputRef.subscribe` на `nodeDrag` (рост), `nodeDragEnd` (рост, и сжатие при `shrink`) и `nodesChanges.size` (ресайз ребёнка ресайзером; при первом измерении тоже — родитель сразу подгоняется под переполняющих детей). Отписка в `DestroyRef`.
+- Алгоритм `fit`: bounds детей через `getNodeRect` в node space родителя (`getNodeRect(parent)` как origin), с padding; без `shrink` объединяется с текущим прямоугольником родителя. Сдвиг origin на `(left, top)` с компенсацией всех детей в том же обработчике, `width.set`/`height.set` только при наличии signal; ось без signal не трогается ни по сдвигу, ни по размеру. Предки обрабатываются от самого глубокого (`Map<Node, depth>` по всем тянущимся нодам, сортировка), поэтому выросший родитель учитывается своим родителем в том же тике.
+- Хак `data.offset` и коммит на `dragEnd` из Studio не нужны: ядро после тикета 02 держит тянущуюся ноду под курсором при сдвиге origin предка (проверено spec «grows to the left and top…»: экранное смещение ребёнка относительно родителя остаётся 10 px).
+- Spec (browser, 6 тестов): рост вправо/вниз, влево/вверх со сдвигом origin, два уровня вложенности, `shouldResize` и auto-ось, `shrink` на dragEnd, padding по сторонам. Drag симулируется `dispatchMouse` из `pointer-events.testing` ядра (относительный импорт в spec; файл не в публичном API).
+- Docs `Packages → Auto size` (`/packages/auto-size`) с демо «Team / Squad / Dev»; e2e `auto-size.spec.ts` сравнивает позиции относительно верхнего родителя, потому что auto-pan во время drag у края панели сдвигает весь viewport.
+- Release dry-run: группа из четырёх пакетов, все 3.0.0.
+- Ограничения в docs: `extent: null` у детей, явные `width`/`height` у родителя на растущих осях. Cookbook `group-auto-scaling` остаётся iframe до 07.

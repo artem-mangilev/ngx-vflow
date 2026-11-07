@@ -1,0 +1,50 @@
+{
+  "projectType": "library",
+  "sourceRoot": "libs/auto-size/src",
+  "prefix": "vx",
+  "name": "auto-size",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "targets": {
+    "build": {
+      "options": {
+        "project": "libs/auto-size/ng-package.json"
+      },
+      "configurations": {
+        "production": {
+          "tsConfig": "libs/auto-size/tsconfig.lib.prod.json"
+        },
+        "development": {
+          "tsConfig": "libs/auto-size/tsconfig.lib.json"
+        }
+      },
+      "defaultConfiguration": "production",
+      "executor": "@angular-devkit/build-angular:ng-packagr",
+      "outputs": ["{workspaceRoot}/dist/libs/auto-size"]
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc -p tsconfig.spec.json --noEmit && vitest run",
+        "cwd": "{projectRoot}"
+      },
+      "configurations": {
+        "watch": {
+          "command": "vitest"
+        }
+      }
+    },
+    "lint": {
+      "options": {
+        "lintFilePatterns": ["libs/auto-size/**/*.ts"]
+      },
+      "executor": "@angular-eslint/builder:lint"
+    },
+    "nx-release-publish": {
+      "executor": "@nx/js:release-publish",
+      "options": {
+        "packageRoot": "dist/{projectRoot}"
+      }
+    }
+  },
+  "tags": ["release"]
+}

@@ -12,6 +12,7 @@
       // @vflow/ui has no build: applications compile the parts from source, like docs
       "@vflow/ui": ["libs/ui/src/public-api"],
       "@vflow/routing": ["dist/libs/routing"],
+      "@vflow/auto-size": ["dist/libs/auto-size"],
       "ngx-vflow": ["dist/libs/ngx-vflow"],
       "ngx-vflow/testing": ["dist/libs/ngx-vflow/testing"]
     }
