@@ -70,7 +70,7 @@ const LAYOUT = { inset: 16, header: 52, gap: 16, step: 8 };
         (nodeDragEnd)="dragEnd($event)"
         (initialized)="flow()?.fitView()">
         <ng-template let-ctx vEdge>
-          <svg:g vEdgeInteraction>
+          <svg:g vEdgeInteractionArea>
             <svg:path
               vuiEdge
               [attr.d]="ctx.path()"

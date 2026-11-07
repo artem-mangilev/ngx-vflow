@@ -27,7 +27,7 @@ graph needs templates. There are two working paths:
     }
   </ng-template>
   <ng-template let-ctx vEdge>
-    <svg:g vEdgeInteraction>
+    <svg:g vEdgeInteractionArea>
       <svg:path class="line" [attr.d]="ctx.path()" [attr.marker-end]="ctx.markerEnd()" />
     </svg:g>
     <span *vEdgeLabel>{{ ctx.data().label }}</span>
@@ -50,7 +50,7 @@ graph needs templates. There are two working paths:
       <span vuiPort handleType="source" position="right"></span>
     </article>
     <ng-template let-ctx vEdge>
-      <svg:g vEdgeInteraction>
+      <svg:g vEdgeInteractionArea>
         <svg:path vuiEdge [attr.d]="ctx.path()" [attr.marker-end]="ctx.markerEnd()" />
       </svg:g>
       <span *vEdgeLabel vuiEdgeLabel>{{ ctx.data().label }}</span>
@@ -119,7 +119,7 @@ Old names have no aliases.
 | `[vflowHandle]`, `#h="vflowHandle"`                                                                                                                              | `[vHandle]`, `#h="vHandle"`; the class stays `VflowHandleDirective`                                                                                                                                               |
 | `[vflowNoDrag]`, `[vflowNoPan]`, `[vflowNoWheel]`, `[vflowNoKeyboard]`, `NoDragDirective` …                                                                      | `[vNoDrag]`, `[vNoPan]`, `[vNoWheel]`, `[vNoKeyboard]`, `VflowNoDragDirective` …                                                                                                                                  |
 | `[dragHandle]`, `DragHandleDirective`                                                                                                                            | `[vDragHandle]`, `VflowDragHandleDirective`                                                                                                                                                                       |
-| `g[edgeInteraction]`, `EdgeInteractionDirective`                                                                                                                 | `g[vEdgeInteraction]`, `VflowEdgeInteractionDirective`                                                                                                                                                            |
+| `g[edgeInteraction]`, `EdgeInteractionDirective`                                                                                                                 | `g[vEdgeInteractionArea]`, `VflowEdgeInteractionAreaDirective`                                                                                                                                                    |
 | `[resizable]`, `ResizableComponent`                                                                                                                              | `[vResizable]`, `VflowResizableComponent`                                                                                                                                                                         |
 | `<mini-map>`, `MiniMapComponent`, `MiniMapPosition`                                                                                                              | `<v-minimap>`, `VflowMinimapComponent`, `MinimapPosition`                                                                                                                                                         |
 | `<node-toolbar>`, `NodeToolbarComponent`                                                                                                                         | `<v-node-toolbar>`, `VflowNodeToolbarComponent`                                                                                                                                                                   |
@@ -289,7 +289,7 @@ After:
 
 ### Edge presentations
 
-The `customTemplateEdge` selector and `CustomTemplateEdgeComponent` are removed. The flow draws a transparent interaction stroke of `interactionWidth` (20 by default) in the edge host, so a click near the line selects the edge. Wrap the path in `<svg:g vEdgeInteraction>` to move the stroke into the group as its first child, where the group's CSS `:hover` and listeners see it.
+The `customTemplateEdge` selector and `CustomTemplateEdgeComponent` are removed. The flow draws a transparent interaction stroke of `interactionWidth` (20 by default) in the edge host, so a click near the line selects the edge. Wrap the path in `<svg:g vEdgeInteractionArea>` to move the stroke into the group as its first child, where the group's CSS `:hover` and listeners see it.
 
 Before:
 
@@ -304,12 +304,12 @@ Before:
 After:
 
 ```html
-<svg:g *vEdge="let ctx" vEdgeInteraction>
+<svg:g *vEdge="let ctx" vEdgeInteractionArea>
   <svg:path [attr.d]="ctx.path()" />
 </svg:g>
 ```
 
-An edge can now be drawn by a component instead of the template: set `component` on the edge. The flow creates the component on an SVG group inside the edge, reads the edge through `injectEdge()`, and forwards its outputs to the new `(componentEdgeEvent)` output of `vflow`, typed with `ComponentEdgeEvent<[A, B]>`. Add `VflowEdgeInteractionDirective` to the component's `hostDirectives` to move the interaction stroke into the component host.
+An edge can now be drawn by a component instead of the template: set `component` on the edge. The flow creates the component on an SVG group inside the edge, reads the edge through `injectEdge()`, and forwards its outputs to the new `(componentEdgeEvent)` output of `vflow`, typed with `ComponentEdgeEvent<[A, B]>`. Add `VflowEdgeInteractionAreaDirective` to the component's `hostDirectives` to move the interaction stroke into the component host.
 
 ### Edge labels
 
@@ -345,7 +345,7 @@ const edges = createEdges([{ id: '1 -> 2', source: '1', target: '2', data: { lab
 ```html
 <vflow [nodes]="nodes" [edges]="edges">
   <ng-template let-ctx vEdge>
-    <svg:g vEdgeInteraction>
+    <svg:g vEdgeInteractionArea>
       <svg:path [attr.d]="ctx.path()" />
     </svg:g>
     @if (ctx.data()?.label; as label) {

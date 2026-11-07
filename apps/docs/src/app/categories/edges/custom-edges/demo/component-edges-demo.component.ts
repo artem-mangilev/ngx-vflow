@@ -4,7 +4,7 @@ import { Vui } from '@vflow/ui';
 import {
   ComponentEdgeEvent,
   Edge,
-  VflowEdgeInteractionDirective,
+  VflowEdgeInteractionAreaDirective,
   Node,
   Vflow,
   createNodes,
@@ -25,7 +25,7 @@ interface ColoredEdgeData {
  */
 @Component({
   selector: 'g[docsColoredEdge]',
-  hostDirectives: [VflowEdgeInteractionDirective],
+  hostDirectives: [VflowEdgeInteractionAreaDirective],
   imports: [Vflow, Vui],
   host: { '(click)': 'picked.emit(ctx.edge.id)' },
   styles: `

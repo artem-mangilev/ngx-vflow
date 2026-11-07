@@ -1,6 +1,6 @@
 <svg:path aria-hidden="true" class="v-focus-indicator" [attr.d]="model().path().path" />
 
-<!-- The hit area of an edge without g[vEdgeInteraction]; the directive draws it inside the presentation instead -->
+<!-- The hit area of an edge without g[vEdgeInteractionArea]; the directive draws it inside the presentation instead -->
 @if (model().interactionAreasCount() === 0 && model().interactionWidth() > 0) {
   <svg:path
     aria-hidden="true"

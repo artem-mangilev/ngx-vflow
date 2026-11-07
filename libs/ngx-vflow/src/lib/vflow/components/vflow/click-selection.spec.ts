@@ -18,7 +18,7 @@ import { createEdges } from '../../interfaces/edge.interface';
     </div>
     <ng-template let-ctx vEdge>
       @if (ctx.edge.id === 'a-b') {
-        <svg:g vEdgeInteraction>
+        <svg:g vEdgeInteractionArea>
           <svg:path class="line" fill="none" [attr.d]="ctx.path()" />
         </svg:g>
       } @else {
@@ -92,7 +92,7 @@ describe('selection by click', () => {
     expect(node('a').selected!()).toBe(true);
   });
 
-  it('draws the hit area of an edge in its host unless the presentation has g[vEdgeInteraction]', async () => {
+  it('draws the hit area of an edge in its host unless the presentation has g[vEdgeInteractionArea]', async () => {
     const withGroup = edgeElement('a-b');
     const plain = edgeElement('a-c');
     expect(withGroup.querySelector(':scope > [data-v-interactive-edge]')).toBeNull();

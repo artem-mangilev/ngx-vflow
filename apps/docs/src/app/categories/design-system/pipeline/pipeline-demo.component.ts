@@ -298,7 +298,7 @@ const EXPORT = { width: 1200, height: 780 };
               }
             </article>
           </ng-template>
-          <svg:g *vEdge="let ctx" vEdgeInteraction>
+          <svg:g *vEdge="let ctx" vEdgeInteractionArea>
             <svg:path vuiEdge [attr.d]="ctx.path()" [attr.data-type]="ctx.data()?.type" />
           </svg:g>
           <ng-template let-ctx vConnection>

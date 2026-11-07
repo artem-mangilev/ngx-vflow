@@ -274,7 +274,7 @@ const TYPES = ['uuid', 'text', 'decimal', 'timestamp'];
           }
         </ng-template>
         <ng-template let-ctx vEdge>
-          <svg:g vEdgeInteraction>
+          <svg:g vEdgeInteractionArea>
             <svg:path vuiEdge [attr.d]="ctx.path()" />
           </svg:g>
           @if (ctx.data()?.label; as label) {

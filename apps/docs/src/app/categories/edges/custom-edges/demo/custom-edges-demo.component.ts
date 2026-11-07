@@ -6,7 +6,7 @@ import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
   template: `<vflow view="auto" [nodes]="nodes" [edges]="edges">
     <docs-node *vNode="let ctx" [ctx]="ctx" />
 
-    <svg:g *vEdge="let ctx" vEdgeInteraction class="edge">
+    <svg:g *vEdge="let ctx" vEdgeInteractionArea class="edge">
       <svg:path
         fill="none"
         [attr.d]="ctx.path()"

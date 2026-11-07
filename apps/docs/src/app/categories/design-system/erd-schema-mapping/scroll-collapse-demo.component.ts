@@ -150,7 +150,7 @@ interface LongEntity {
             }
           </article>
         </ng-template>
-        <svg:g *vEdge="let ctx" vEdgeInteraction>
+        <svg:g *vEdge="let ctx" vEdgeInteractionArea>
           <svg:path vuiEdge [attr.d]="ctx.path()" />
         </svg:g>
       </vflow>

@@ -8,7 +8,7 @@ import {
 import { VflowComponent } from './components/vflow/vflow.component';
 
 import { VflowDragHandleDirective } from './public-directives/drag-handle.directive';
-import { VflowEdgeInteractionDirective } from './public-directives/edge-interaction.directive';
+import { VflowEdgeInteractionAreaDirective } from './public-directives/edge-interaction-area.directive';
 import {
   VflowConnectionTemplateDirective,
   VflowEdgeLabelTemplateDirective,
@@ -31,7 +31,7 @@ export const Vflow = [
   VflowComponent,
   VflowHandleDirective,
   VflowResizableComponent,
-  VflowEdgeInteractionDirective,
+  VflowEdgeInteractionAreaDirective,
   VflowMinimapComponent,
   VflowNodeToolbarComponent,
   VflowDragHandleDirective,

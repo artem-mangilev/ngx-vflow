@@ -10,12 +10,12 @@ import { EdgeComponent } from '../components/edge/edge.component';
  * with control flow:
  *
  * ```html
- * <svg:g *vEdge="let ctx" vEdgeInteraction>
+ * <svg:g *vEdge="let ctx" vEdgeInteractionArea>
  *   <svg:path [attr.d]="ctx.path()" />
  * </svg:g>
  *
  * <ng-template let-ctx vEdge>
- *   <svg:g vEdgeInteraction><svg:path [attr.d]="ctx.path()" /></svg:g>
+ *   <svg:g vEdgeInteractionArea><svg:path [attr.d]="ctx.path()" /></svg:g>
  *   <span *vEdgeLabel>{{ ctx.data().label }}</span>
  * </ng-template>
  * ```

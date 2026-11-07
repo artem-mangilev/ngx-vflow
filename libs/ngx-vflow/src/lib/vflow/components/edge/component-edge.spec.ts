@@ -8,14 +8,14 @@ import { AnyComponentNodeEvent } from '../../interfaces/component-node-event.int
 import { VflowEdgeTemplateDirective, VflowNodeTemplateDirective } from '../../public-directives/template.directive';
 import { VflowHandleDirective } from '../../public-directives/handle.directive';
 import { injectEdge } from '../../utils/inject-edge';
-import { VflowEdgeInteractionDirective } from '../../public-directives/edge-interaction.directive';
+import { VflowEdgeInteractionAreaDirective } from '../../public-directives/edge-interaction-area.directive';
 
 const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
 
 @Component({
   // The flow creates the SVG host itself, so this selector is only documentation.
   selector: 'g[probeEdge]',
-  hostDirectives: [VflowEdgeInteractionDirective],
+  hostDirectives: [VflowEdgeInteractionAreaDirective],
   template: `<svg:path class="probe-path" fill="none" [attr.d]="ctx.path()" />`,
   host: { class: 'probe-edge', '[attr.data-edge]': 'ctx.edge.id', '(click)': 'clicks = clicks + 1' },
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -52,13 +52,13 @@ class TemplateEdgeChildComponent {
       <span vHandle handleType="target" position="left"></span
       ><span vHandle handleType="source" position="right"></span>
     </div>
-    <svg:g *vEdge="let ctx" vEdgeInteraction templateEdgeChild (click)="templateClicks.push(ctx.edge.id)" />
+    <svg:g *vEdge="let ctx" vEdgeInteractionArea templateEdgeChild (click)="templateClicks.push(ctx.edge.id)" />
   </vflow>`,
   imports: [
     VflowComponent,
     VflowNodeTemplateDirective,
     VflowEdgeTemplateDirective,
-    VflowEdgeInteractionDirective,
+    VflowEdgeInteractionAreaDirective,
     VflowHandleDirective,
     TemplateEdgeChildComponent,
   ],
@@ -113,7 +113,7 @@ describe('Component edges', () => {
     expect(path?.getAttribute('d')).toMatch(/^M/);
   });
 
-  it('puts the interaction stroke first inside component hosts and vEdgeInteraction groups', () => {
+  it('puts the interaction stroke first inside component hosts and vEdgeInteractionArea groups', () => {
     const svgs = Array.from(root.querySelectorAll<SVGSVGElement>('svg[edge]'));
 
     for (const svg of svgs.slice(0, 3)) {
@@ -208,8 +208,8 @@ class PlainTemplateHostComponent {
   ]);
 }
 
-describe('Edges without vEdgeInteraction', () => {
-  it('draws the interaction stroke in the host without vEdgeInteraction and selects from presentation elements', async () => {
+describe('Edges without vEdgeInteractionArea', () => {
+  it('draws the interaction stroke in the host without vEdgeInteractionArea and selects from presentation elements', async () => {
     PlainEdgeComponent.instances = [];
     const fixture = TestBed.createComponent(PlainTemplateHostComponent);
     fixture.detectChanges();

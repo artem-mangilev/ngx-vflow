@@ -50,7 +50,7 @@ its projected buttons the look of its own.
 `position`, `handleId`, `canStart` and `canAccept` on the element that is the connection point: it applies core
 `vHandle` as a host directive and shows its connection feedback. For flow interaction compose the parts with core
 gesture exclusions (`vNoDrag`, `vNoSelect`); a click on a presentation selects its node or edge, and
-`vEdgeInteraction` keeps the edge hit area inside the group. UI never changes roles, focus or graph state.
+`vEdgeInteractionArea` keeps the edge hit area inside the group. UI never changes roles, focus or graph state.
 
 ## Theme
 

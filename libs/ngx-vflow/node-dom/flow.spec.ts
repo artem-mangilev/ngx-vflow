@@ -29,7 +29,7 @@ class TaskNodeComponent {
       <span vHandle handleType="target" position="left"></span>
     </div>
     <ng-template vEdge let-ctx>
-      <svg:g vEdgeInteraction><svg:path class="edge-path" [attr.d]="ctx.path()" /></svg:g>
+      <svg:g vEdgeInteractionArea><svg:path class="edge-path" [attr.d]="ctx.path()" /></svg:g>
       <ng-template vEdgeLabel>{{ ctx.edge.id }}</ng-template>
     </ng-template>
     <v-minimap />

@@ -122,7 +122,7 @@ type EdgeState = 'taken' | 'open' | 'skipped';
           </article>
           <ng-template let-ctx vEdge>
             @let state = edgeState(ctx.edge.id);
-            <svg:g vEdgeInteraction>
+            <svg:g vEdgeInteractionArea>
               <svg:path vuiEdge [attr.d]="ctx.path()" [attr.marker-end]="ctx.markerEnd()" [attr.data-state]="state" />
             </svg:g>
             @if (ctx.data()?.start; as text) {
