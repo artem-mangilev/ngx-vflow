@@ -544,7 +544,7 @@ Every input of `vflow` is a signal input. Binding in a template is unchanged. Re
 - `EdgeSelectChange` became `EdgeSelectedChange`, as `NodeSelectedChange`.
 - The end marker of the connection line is `markerEnd`, as on an edge: `[connection]="{ markerEnd: 'arrow' }"` instead of `{ marker: 'arrow' }`, and `ctx.markerEnd()` instead of `ctx.marker()` in a `vConnection` template.
 - `size` of a `grid` background became `gap`, the name the `dots` background uses for the step of its pattern. `size` of `dots` remains the dot diameter.
-- `Node`, `NodeWithDefaults`, `StaticNode`, `injectNode()` and `injectEdge()` default their data type to `unknown` instead of `any`, as `Edge` already did. Code that reads `node.data()` without a type argument now gets `unknown`: pass the type, as in `injectNode<MyData>()` or `Node<MyData>[]`. The `let-ctx` of a presentation template stays untyped, since a template cannot pass a type argument.
+- `Node`, `NodeWithDefaults`, `StaticNode`, `injectNode()` and `injectEdge()` default their data type to `unknown` instead of `any`, as `Edge` already did. Code that reads `node.data()` without a type argument now gets `unknown`: pass the type, as in `injectNode<MyData>()` or `Node<MyData>[]`. `createNodes()` without a type argument infers the union of the data types of its nodes. The `let-ctx` of a presentation template stays untyped, since a template cannot pass a type argument.
 - `NodeDragEvent` also carries `nodes`, every node the gesture moves, and `sourceEvent`, the pointer event.
 
 ### Removed APIs

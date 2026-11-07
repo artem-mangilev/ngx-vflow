@@ -47,6 +47,10 @@ How to create component node:
    the node itself
 3. Put your component in the `component` field of `Node`. The library will render your node for you
 
+Nodes of different components usually carry different data. `createNodes()` without a type argument types the result
+with the union of their data types, so the nodes need no shared data type or discriminator: each component reads its
+own data through `injectNode<T>()`.
+
 A lazy import function in `component` loads the component only when it is needed; see the Lazy loading page.
 
 {{ NgDocActions.demoPane("CustomComponentNodesDemoComponent") }}

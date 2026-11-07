@@ -79,6 +79,26 @@ export function createNode<T = unknown>(node: StaticNode<T>): NodeWithDefaults<T
   };
 }
 
-export function createNodes<T = unknown>(nodes: StaticNode<T>[]): NodeWithDefaults<T>[] {
+/** Data type of one static node; a node without `data` adds nothing to a union. */
+type StaticNodeData<N> = N extends { data?: infer D } ? (unknown extends D ? never : D) : never;
+
+/** Union of the data types of the nodes, or `unknown` when none of them has `data`. */
+type StaticNodesData<N> = [StaticNodeData<N>] extends [never] ? unknown : StaticNodeData<N>;
+
+/**
+ * Wraps the values of every node into signals and fills the defaults.
+ *
+ * Without a type argument the data type is the union of the data of the nodes, so nodes of different kinds, such as
+ * component nodes with their own data, need no shared type. A type argument names the data type of every node and
+ * checks each `data` against it:
+ *
+ * ```ts
+ * createNodes([team, person]); // NodeWithDefaults<Team | Person>[]
+ * createNodes<Step>([{ id: '1', point: { x: 0, y: 0 }, data: { title: 'Draft' } }]);
+ * ```
+ */
+export function createNodes<N extends StaticNode>(nodes: N[]): NodeWithDefaults<StaticNodesData<N>>[];
+export function createNodes<T>(nodes: StaticNode<T>[]): NodeWithDefaults<T>[];
+export function createNodes(nodes: StaticNode[]): NodeWithDefaults[] {
   return nodes.map((node) => createNode(node));
 }

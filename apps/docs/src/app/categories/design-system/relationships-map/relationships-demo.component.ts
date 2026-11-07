@@ -6,11 +6,10 @@ import {
   ConnectionSettings,
   createEdge,
   createEdges,
-  createNode,
+  createNodes,
   DeleteRequest,
   Edge,
   NodeDragEvent,
-  NodeWithDefaults,
   Point,
   removeElements,
   Vflow,
@@ -94,7 +93,7 @@ export class RelationshipsDemoComponent implements TeamBoard {
   readonly flow = viewChild(VflowComponent);
   readonly theme = injectDocsTheme();
   /** Every kind of node is its own component; the demo tells them apart by `component`, not by data. */
-  readonly nodes: NodeWithDefaults[] = [
+  readonly nodes = createNodes([
     team('platform', { x: 0, y: 0 }, 606, 510, 'Platform'),
     // A team inside a team: its point is relative to Platform, and it stays inside it like any child.
     team('infra', { x: 16, y: 260 }, 574, 234, 'Infra', 'platform'),
@@ -104,7 +103,7 @@ export class RelationshipsDemoComponent implements TeamBoard {
     person('eli', { x: 388, y: 52 }, 'infra', 'Eli Park', 'SRE', 'EP', '#4d7c0f', 5),
     person('chi', { x: 16, y: 52 }, 'growth', 'Chi Nguyen', 'Engineer', 'CN', '#c2410c', 6),
     person('dea', { x: 214, y: 280 }, 'growth', 'Dea Rossi', 'Analyst', 'DR', '#7e22ce', 11),
-    createNode({
+    {
       id: 'deploys',
       point: { x: 0, y: 560 },
       ariaLabel: 'Deploys per week metric',
@@ -115,15 +114,15 @@ export class RelationshipsDemoComponent implements TeamBoard {
         delta: '+27% in 6 weeks',
         series: [30, 45, 40, 60, 55, 80, 100],
       },
-    }),
-    createNode({
+    },
+    {
       id: 'note',
       point: { x: 576, y: 560 },
       ariaLabel: 'Note',
       component: NoteNodeComponent,
       data: { text: 'Q3 focus: fewer handoffs between the two teams.' },
-    }),
-  ];
+    },
+  ]);
   readonly edges = signal<Edge<Relation>[]>(
     createEdges<Relation>([
       // A connection between the two groups themselves.
@@ -295,7 +294,7 @@ function team(
   title: string,
   parentId?: string,
 ) {
-  return createNode({
+  return {
     id,
     point,
     width,
@@ -304,7 +303,7 @@ function team(
     ariaLabel: `${title} team`,
     component: TeamNodeComponent,
     data: { title },
-  });
+  };
 }
 
 function person(
@@ -317,14 +316,14 @@ function person(
   color: string,
   reviews: number,
 ) {
-  return createNode({
+  return {
     id,
     point,
     parentId,
     ariaLabel: name,
     component: PersonNodeComponent,
     data: { name, role, initials, color, reviews },
-  });
+  };
 }
 
 /** Floating edges: every end meets its node on the side facing the other end. */
