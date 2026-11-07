@@ -44,6 +44,9 @@ export class FlowEntitiesService {
 
   public readonly rawNodes = computed(() => this.nodes().map((n) => n.rawNode));
 
+  /** Rendered geometry of every node, in the order of {@link rawNodes}; follows every node position and size. */
+  public readonly nodeGeometries = computed(() => this.nodes().map((n) => n.geometry()));
+
   public readonly edges = signal<EdgeModel[]>([], {
     // empty arrays considered equal, other arrays may not be equal
     equal: (a, b) => (!a.length && !b.length ? true : a === b),

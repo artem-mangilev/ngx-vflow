@@ -2,10 +2,8 @@ import { TemplateRef, computed, inject, signal } from '@angular/core';
 import { EdgeLabelOrient, EdgeLabelPosition } from '../interfaces/edge-label.interface';
 import { Edge, Curve, EDGE_DEFAULTS } from '../interfaces/edge.interface';
 import { NodeModel } from './node.model';
-import { getStraightPath } from '../math/edge-path/straigh-path';
-import { getBezierPath } from '../math/edge-path/bezier-path';
 import { FlowEntity } from '../interfaces/flow-entity.interface';
-import { getSmoothStepPath } from '../math/edge-path/smooth-step-path';
+import { resolveCurve } from '../math/edge-path/resolve-curve';
 import { Contextable } from '../interfaces/contextable.interface';
 import { EdgeContext } from '../interfaces/template-context.interface';
 import { HandleModel } from './handle.model';
@@ -138,21 +136,7 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
       return { path: '' };
     }
 
-    const params = this.getPathFactoryParams(source, target);
-
-    const curve = this.curve();
-    switch (curve) {
-      case 'straight':
-        return getStraightPath(params);
-      case 'bezier':
-        return getBezierPath(params);
-      case 'smooth-step':
-        return getSmoothStepPath(params);
-      case 'step':
-        return getSmoothStepPath({ ...params, borderRadius: 0 });
-      default:
-        return curve(params);
-    }
+    return resolveCurve(this.curve(), this.getPathFactoryParams(source, target));
   });
 
   public readonly bounds = computed(() => {
@@ -218,6 +202,7 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
     // A dynamic handle resolves its point towards the reference point of the other end.
     const start = source.endpoint(target.pointAbsolute());
     const end = target.endpoint(source.pointAbsolute());
+    const entities = this.flowEntitiesService;
 
     return {
       mode: 'edge',
@@ -230,8 +215,12 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
       targetNode: target.parentNode.geometry(),
       sourcePosition: start.position,
       targetPosition: end.position,
-      allEdges: this.flowEntitiesService.rawEdges(),
-      allNodes: this.flowEntitiesService.rawNodes(),
+      allEdges: entities.rawEdges(),
+      allNodes: entities.rawNodes(),
+      // Read inside the factory, so only a factory that routes around nodes follows every node.
+      get nodeGeometries() {
+        return entities.nodeGeometries();
+      },
     };
   }
 }

@@ -169,10 +169,17 @@ export class NodeModel<T = unknown> implements FlowEntity, Contextable<NodeConte
   public readonly pointTransformCss = computed(() => `translate(${this.globalPoint().x}px, ${this.globalPoint().y}px)`);
 
   /** Absolute position and measured size, as curve factories receive them. */
-  public readonly geometry = computed<NodeGeometry>(() => {
+  public readonly geometry: Signal<NodeGeometry> = computed(() => {
     const { x, y } = this.globalPoint();
 
-    return { id: this.rawNode.id, x, y, width: this.width(), height: this.height() };
+    return {
+      id: this.rawNode.id,
+      parentId: this.parent()?.rawNode.id ?? null,
+      x,
+      y,
+      width: this.width(),
+      height: this.height(),
+    };
   });
 
   public readonly handles = signal<HandleModel[]>([]);
@@ -208,7 +215,7 @@ export class NodeModel<T = unknown> implements FlowEntity, Contextable<NodeConte
     return true;
   });
 
-  public readonly parent = computed<NodeModel | null>(() => {
+  public readonly parent: Signal<NodeModel | null> = computed(() => {
     // Re-read optional signals when application-owned graph structure changes.
     const nodes = this.entitiesService.nodeByIdMap();
     const parentId = this.rawNode.parentId?.();

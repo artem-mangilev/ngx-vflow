@@ -185,8 +185,8 @@ describe('EdgeModel', () => {
     model.path();
 
     const params = curve.mock.lastCall![0];
-    expect(params.sourceNode).toEqual({ id: '1', x: 15, y: 15, width: 0, height: 0 });
-    expect(params.targetNode).toEqual({ id: '2', x: 215, y: 115, width: 0, height: 0 });
+    expect(params.sourceNode).toEqual({ id: '1', parentId: null, x: 15, y: 15, width: 0, height: 0 });
+    expect(params.targetNode).toEqual({ id: '2', parentId: null, x: 215, y: 115, width: 0, height: 0 });
     // A closed arrow of 20 flow units: the path ends 7 units before the tip, at the base of the arrowhead.
     expect(params.markerInset).toEqual({ start: 0, end: 7 });
     // The left target handle point at (215, 115) moves away from the node by the inset.

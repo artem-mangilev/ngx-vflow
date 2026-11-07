@@ -34,8 +34,6 @@ export class AlignmentService {
 
   private scene: AlignmentScene | null = null;
   private nodes: NodeModel[] = [];
-  /** Flow position of each dragged node's parent, which stays put during the drag. */
-  private parentOrigins: Point[] = [];
 
   /** Collects what the dragged nodes may align with. Does nothing while the helper is off. */
   public begin(nodes: NodeModel[]): void {
@@ -61,10 +59,6 @@ export class AlignmentService {
     const origin = getNodesFlowBounds(nodes);
 
     this.nodes = nodes;
-    this.parentOrigins = nodes.map((node) => ({
-      x: node.globalPoint().x - node.point().x,
-      y: node.globalPoint().y - node.point().y,
-    }));
     this.scene = {
       targets,
       gaps: findAlignmentGaps(targets.filter((target) => !target.centerOnly).map((target) => target.rect)),
@@ -72,7 +66,7 @@ export class AlignmentService {
     };
   }
 
-  /** Shifts the proposed node-space points of the dragged nodes onto the nearest alignment. Returns the snapped axes. */
+  /** Shifts the proposed flow-space points of the dragged nodes onto the nearest alignment. Returns the snapped axes. */
   public snap(points: Point[]): { x: boolean; y: boolean } {
     const settings = this.settingsService.alignmentHelper();
     if (!this.scene || !settings || this.bypassed()) return { x: false, y: false };
@@ -80,8 +74,8 @@ export class AlignmentService {
 
     const bounds = getBoundsOfRects(
       points.map((point, index) => ({
-        x: point.x + this.parentOrigins[index].x,
-        y: point.y + this.parentOrigins[index].y,
+        x: point.x,
+        y: point.y,
         width: this.nodes[index].width(),
         height: this.nodes[index].height(),
       })),
@@ -106,7 +100,6 @@ export class AlignmentService {
   public end(): void {
     this.scene = null;
     this.nodes = [];
-    this.parentOrigins = [];
     this.guides.set(NO_GUIDES);
   }
 

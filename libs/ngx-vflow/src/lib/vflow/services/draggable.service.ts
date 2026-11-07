@@ -73,12 +73,13 @@ export class DraggableService {
     const factor = accelerated ? 4 : 1;
     const nodes = this.getDragNodes(model);
     for (const node of nodes) {
+      const { x, y } = node.globalPoint();
       const point = {
-        x: node.point().x + direction.x * (gridX > 1 ? gridX : 5) * factor,
-        y: node.point().y + direction.y * (gridY > 1 ? gridY : 5) * factor,
+        x: x + direction.x * (gridX > 1 ? gridX : 5) * factor,
+        y: y + direction.y * (gridY > 1 ? gridY : 5) * factor,
       };
       this.alignToGrid(point);
-      this.moveNode(node, point);
+      this.moveNode(node, this.toNodeSpace(node, point));
     }
     return nodes;
   }
@@ -102,7 +103,8 @@ export class DraggableService {
   private getDragBehavior(model: NodeModel, element: GestureElement): PointerDrag {
     let activated = false;
     let dragNodes: NodeModel[] = [];
-    let initialPositions: Point[] = [];
+    /** From the pointer to the origin of each node, in flow space. */
+    let offsets: Point[] = [];
     let lastClient: Point = { x: 0, y: 0 };
     let moveNodesOnAutoPanSub: Subscription | null = null;
     let pane: Element | null = null;
@@ -187,16 +189,15 @@ export class DraggableService {
     const moveTo = (client: Point) => {
       lastClient = client;
       const flow = this.getFlowPoint(client, getPaneRect());
-      const points = initialPositions.map((initial) => ({
-        x: round(flow.x + initial.x),
-        y: round(flow.y + initial.y),
-      }));
+      // The nodes keep their flow-space offsets from the pointer, so a node stays under it even while the origin
+      // of an ancestor moves during the drag, for example when a parent grows around its children.
+      const points = offsets.map((offset) => ({ x: flow.x + offset.x, y: flow.y + offset.y }));
 
       // An aligned axis keeps its alignment; the grid applies to the other one.
       const aligned = this.alignmentService.snap(points);
       dragNodes.forEach((model, index) => {
         this.alignToGrid(points[index], aligned);
-        this.moveNode(model, points[index]);
+        this.moveNode(model, this.toNodeSpace(model, points[index]));
       });
       this.alignmentService.update();
     };
@@ -231,10 +232,10 @@ export class DraggableService {
         // Offsets are taken at the press, so a drag past the threshold does not lose the distance it took.
         const flow = this.getFlowPoint(start, getPaneRect());
 
-        initialPositions = dragNodes.map((node) => ({
-          x: node.point().x - flow.x,
-          y: node.point().y - flow.y,
-        }));
+        offsets = dragNodes.map((node) => {
+          const { x, y } = node.globalPoint();
+          return { x: x - flow.x, y: y - flow.y };
+        });
 
         // Auto-pan moves the flow under a still pointer, so the nodes follow the pointer again
         moveNodesOnAutoPanSub = this.onViewportPan(() => moveTo(lastClient));
@@ -305,6 +306,14 @@ export class DraggableService {
     return false;
   }
 
+  /** The node-space point at which the node's origin is at `flowPoint`. */
+  private toNodeSpace(model: NodeModel, flowPoint: Point): Point {
+    const parent = model.parent();
+    const origin = parent ? parent.globalPoint() : { x: 0, y: 0 };
+
+    return { x: round(flowPoint.x - origin.x), y: round(flowPoint.y - origin.y) };
+  }
+
   /**
    * @todo make it unit testable
    */
@@ -323,9 +332,7 @@ export class DraggableService {
     model.setPoint(point);
   }
 
-  /**
-   * @todo make it unit testable
-   */
+  /** Snaps a flow-space point to the grid, which is drawn in flow space, so nested nodes snap to the same cells. */
   private alignToGrid(point: Point, skip = { x: false, y: false }) {
     const [snapX, snapY] = this.settingsService.snapGrid();
 

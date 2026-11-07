@@ -249,6 +249,49 @@ describe('DraggableService', () => {
     expect(child.point()).toEqual({ x: 0, y: 20 });
   });
 
+  it('keeps the dragged node under the pointer while the origin of its parent moves', () => {
+    const parent = createModel({ id: 'parent', size: [300, 300] });
+    parent.setPoint({ x: 100, y: 100 });
+    const child = createModel({ id: 'child', parentId: 'parent', size: [50, 50] });
+    child.rawNode.extent!.set(null);
+    child.setPoint({ x: 50, y: 50 });
+    const { element } = createDragSurface(new DOMRect(0, 0, 800, 600));
+    service.enable(element, child);
+
+    dispatchMouse(element, 'mousedown', 150, 100);
+    dispatchMouse(window, 'mousemove', 160, 100);
+    expect(child.point()).toEqual({ x: 60, y: 50 });
+
+    // The parent grows to the left by 20 and keeps the child in place, as a parent auto-size would.
+    parent.setPoint({ x: 80, y: 100 });
+    child.setPoint({ x: 80, y: 50 });
+    dispatchMouse(window, 'mousemove', 170, 100);
+    expect(child.point()).toEqual({ x: 90, y: 50 });
+    expect(child.globalPoint()).toEqual({ x: 170, y: 150 });
+    dispatchMouse(window, 'mouseup', 170, 100);
+  });
+
+  it('snaps a nested node to the grid of the flow, not of its parent', () => {
+    TestBed.inject(FlowSettingsService).bind({ snapGrid: signal([10, 10]) });
+    const parent = createModel({ id: 'parent', size: [300, 300] });
+    parent.setPoint({ x: 5, y: 5 });
+    const child = createModel({ id: 'child', parentId: 'parent', size: [50, 50] });
+    child.setPoint({ x: 10, y: 10 });
+    const { element } = createDragSurface(new DOMRect(0, 0, 800, 600));
+    service.enable(element, child);
+
+    dispatchMouse(element, 'mousedown', 150, 100);
+    dispatchMouse(window, 'mousemove', 153, 101);
+    expect(child.globalPoint()).toEqual({ x: 20, y: 20 });
+    expect(child.point()).toEqual({ x: 15, y: 15 });
+    dispatchMouse(window, 'mouseup', 153, 101);
+
+    expect(service.moveSelected(child, { x: 1, y: 0 }, false)).toEqual([]);
+    child.rawNode.selected!.set(true);
+    expect(service.moveSelected(child, { x: 1, y: 0 }, false)).toEqual([child]);
+    expect(child.globalPoint()).toEqual({ x: 30, y: 20 });
+  });
+
   it('moves only the topmost selected ancestor of a hierarchy, together with unrelated selected nodes', () => {
     const grandParent = createModel({ id: 'grand-parent', selected: true });
     const parent = createModel({ id: 'parent', selected: true, parentId: 'grand-parent' });

@@ -8,6 +8,8 @@ import { Rect } from './rect';
 /** Rendered geometry of a node in flow space: its absolute position and measured size. */
 export interface NodeGeometry extends Rect {
   id: string;
+  /** The parent node, so a factory can tell the ancestors of an edge from the nodes it must route around. */
+  parentId: string | null;
 }
 
 export interface CurveFactorySharedParams {
@@ -28,6 +30,12 @@ export interface CurveFactorySharedParams {
   allEdges: readonly Edge[];
   /** Every node of the flow */
   allNodes: readonly Node[];
+  /**
+   * Rendered geometry of every node, in the order of `allNodes`: the measured size of a content-sized node, which
+   * `allNodes` lacks. Resolved on read, so only a factory that reads it follows every node of the flow; a factory
+   * that routes around nodes recomputes when any node moves.
+   */
+  readonly nodeGeometries: readonly NodeGeometry[];
 }
 
 /** Parameters required to build a straight edge path. */

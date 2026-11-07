@@ -28,10 +28,11 @@ describe('getSmoothStepPath', () => {
     sourcePosition,
     targetPosition,
     markerInset: { start: 0, end: 0 },
-    sourceNode: { id: 'source', x: 0, y: 150, width: 100, height: 100 },
-    targetNode: { id: 'target', x: 400, y: 150, width: 100, height: 100 },
+    sourceNode: { id: 'source', parentId: null, x: 0, y: 150, width: 100, height: 100 },
+    targetNode: { id: 'target', parentId: null, x: 400, y: 150, width: 100, height: 100 },
     allEdges: [],
     allNodes: [],
+    nodeGeometries: [],
   });
 
   describe('path', () => {

@@ -1,12 +1,10 @@
 import { ChangeDetectionStrategy, Component, TemplateRef, computed, inject, input } from '@angular/core';
 import { ConnectionService } from '../../services/connection.service';
-import { getStraightPath } from '../../math/edge-path/straigh-path';
 import { SpacePointContextDirective } from '../../directives/space-point-context.directive';
 import { ConnectionModel } from '../../models/connection.model';
-import { getBezierPath } from '../../math/edge-path/bezier-path';
 import { markerUrl } from '../../utils/marker-ref';
 import { Position } from '../../types/position.type';
-import { getSmoothStepPath } from '../../math/edge-path/smooth-step-path';
+import { resolveCurve } from '../../math/edge-path/resolve-curve';
 import { NgTemplateOutlet } from '@angular/common';
 import { ConnectionContext } from '../../interfaces/template-context.interface';
 import { Point } from '../../interfaces/point.interface';
@@ -45,7 +43,6 @@ export class ConnectionComponent {
   protected path = computed(() => {
     const gesture = this.connection.gesture();
     if (!gesture) return null;
-    const curve = this.model().curve;
 
     const sourceHandle = gesture.sourceHandle;
     // Follows the pointer and the viewport, which auto-pan moves under a still pointer.
@@ -58,27 +55,17 @@ export class ConnectionComponent {
       ? candidate.handle.endpoint(sourceHandle.pointAbsolute())
       : { point: pointer, position: getOppositePostion(source.position) };
 
-    const params = this.getPathFactoryParams(
-      source.point,
-      target.point,
-      source.position,
-      target.position,
-      gesture.source,
-      candidate?.node,
-    );
-
-    switch (curve) {
-      case 'straight':
-        return getStraightPath(params).path;
-      case 'bezier':
-        return getBezierPath(params).path;
-      case 'smooth-step':
-        return getSmoothStepPath(params).path;
-      case 'step':
-        return getSmoothStepPath({ ...params, borderRadius: 0 }).path;
-      default:
-        return curve(params).path;
-    }
+    return resolveCurve(
+      this.model().curve,
+      this.getPathFactoryParams(
+        source.point,
+        target.point,
+        source.position,
+        target.position,
+        gesture.source,
+        candidate?.node,
+      ),
+    ).path;
   });
 
   protected markerUrl = computed(() => markerUrl(this.model().settings.markerEnd));
@@ -103,10 +90,8 @@ export class ConnectionComponent {
     sourceNode: NodeModel,
     targetNode?: NodeModel,
   ): CurveFactoryParams {
-    const inset = {
-      start: 0,
-      end: markerInset(this.model().settings.markerEnd, this.flowEntitiesService.markerShapes()),
-    };
+    const entities = this.flowEntitiesService;
+    const inset = { start: 0, end: markerInset(this.model().settings.markerEnd, entities.markerShapes()) };
 
     return {
       mode: 'connection',
@@ -118,8 +103,12 @@ export class ConnectionComponent {
       targetNode: targetNode?.geometry(),
       sourcePosition,
       targetPosition,
-      allEdges: this.flowEntitiesService.rawEdges(),
-      allNodes: this.flowEntitiesService.rawNodes(),
+      allEdges: entities.rawEdges(),
+      allNodes: entities.rawNodes(),
+      // Read inside the factory, so only a factory that routes around nodes follows every node.
+      get nodeGeometries() {
+        return entities.nodeGeometries();
+      },
     };
   }
 }
