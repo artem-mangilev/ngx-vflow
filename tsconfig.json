@@ -26,6 +26,7 @@
       "@ng-doc/generated/*": ["ng-doc/docs/*"],
       "@docs/shared": ["apps/docs/src/app/shared/flow-presentations.ts"],
       "@vflow/ui": ["libs/ui/src/public-api"],
+      "@vflow/routing": ["libs/routing/src/public-api"],
       "ngx-vflow": ["libs/ngx-vflow/src/public-api"]
     }
   },

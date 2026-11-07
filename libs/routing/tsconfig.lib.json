@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "../../out-tsc/lib",
+    "declaration": true,
+    "declarationMap": true,
+    "inlineSources": true,
+    "types": [],
+    // The package compiles against the built core, which `build` depends on: only its public API is reachable, and
+    // ng-packagr accepts no source files outside the package. Specs and the docs use the source alias of the root.
+    "paths": {
+      "ngx-vflow": ["dist/libs/ngx-vflow"]
+    }
+  },
+  "exclude": ["**/*.spec.ts"]
+}

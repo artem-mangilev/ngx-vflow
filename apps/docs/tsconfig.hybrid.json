@@ -11,6 +11,7 @@
       // alias to production build of the library instead of building it as part of application;
       // @vflow/ui has no build: applications compile the parts from source, like docs
       "@vflow/ui": ["libs/ui/src/public-api"],
+      "@vflow/routing": ["dist/libs/routing"],
       "ngx-vflow": ["dist/libs/ngx-vflow"],
       "ngx-vflow/testing": ["dist/libs/ngx-vflow/testing"]
     }

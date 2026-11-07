@@ -1,7 +1,8 @@
 # Releases
 
-`ngx-vflow` and `@vflow/ui` belong to one Nx Release fixed group, selected by the
-`release` project tag. They always receive the same version and one `v{version}` Git tag.
+`ngx-vflow`, `@vflow/cli` and the extension packages (`@vflow/routing`) belong to one Nx Release
+fixed group, selected by the `release` project tag. They always receive the same version and one
+`v{version}` Git tag. `@vflow/ui` is not published (see below).
 Existing `v2.7.0` history is retained. Nx determines the next shared version from conventional commits since that tag. Source versions remain at the last release until release time.
 
 ## Automatic version selection
@@ -71,15 +72,20 @@ The package manifests specify `publishConfig.access: public`.
 
 ## Add a package
 
-1. Add an Angular package in `libs/<name>` with a `package.json`, `ng-package.json`,
-   TypeScript configs and `project.json` (copy `libs/ngx-vflow`'s build configuration).
-2. Set its source version to the current shared release version, set `publishConfig.access`
-   to `public`, and add the project tag `release`.
-3. Build to `dist/libs/<name>` and add `nx-release-publish` using executor
-   `@nx/js:release-publish` and `packageRoot: "dist/{projectRoot}"`.
-4. Add source and hybrid aliases to the root and docs hybrid tsconfigs. Add a docs example.
-5. Run the development/production builds and release dry-run. The tag selector automatically
-   includes the new package in CI builds and the shared release; no workflow package list is needed.
+`libs/routing` is the template: copy its `package.json`, `ng-package.json`, `project.json`,
+`tsconfig.lib.json`, `tsconfig.lib.prod.json`, `tsconfig.spec.json`, `vitest.config.mts`, `LICENSE` and
+`src/public-api.ts`, then:
+
+1. In `package.json` set the name, the description and the source version to the current shared release
+   version, keep `publishConfig.access: public`, `sideEffects: false` and the peer ranges of `ngx-vflow`
+   and `@angular/core`. An extension package imports only the public API of `ngx-vflow`.
+2. Keep the project tag `release` and the `nx-release-publish` target with `packageRoot: "dist/{projectRoot}"`.
+3. Add the alias to the root `tsconfig.json` (`libs/<name>/src/public-api`) and to
+   `apps/docs/tsconfig.hybrid.json` (`dist/libs/<name>`), so the hybrid docs build checks the built package.
+   `vitest.shared.mts` reads the root aliases, so specs import `ngx-vflow` from source.
+4. Add a page under the **Packages** docs category with a live demo, and an e2e spec in `apps/docs-e2e`.
+5. Run `nx build <name>`, `nx test <name>`, `nx lint <name>`, the docs builds and the release dry-run. The tag
+   selector includes the new package in CI builds and the shared release; no workflow package list is needed.
 
 `libs/ui` is not published: `libs/cli` (`@vflow/cli`) ships its sources as generator templates, copied by
 `ui:sync-cli` before `cli:build`, and consumers compile the copied parts with their own Tailwind v4.
