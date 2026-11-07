@@ -1,0 +1,33 @@
+{
+  "name": "@vflow/layout",
+  "version": "2.7.0",
+  "description": "Automatic layouts for ngx-vflow: a layout contract, a host that applies positions, and adapters",
+  "license": "MIT",
+  "homepage": "https://www.ngx-vflow.org/",
+  "author": "Artem Mangilev",
+  "keywords": [
+    "angular",
+    "ngx-vflow",
+    "layout",
+    "dagre",
+    "elk",
+    "diagram"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/artem-mangilev/ngx-vflow",
+    "directory": "libs/layout"
+  },
+  "peerDependencies": {
+    "@angular/core": "^20.0.0 || ^21.0.0 || ^22.0.0",
+    "ngx-vflow": "^3.0.0",
+    "rxjs": ">=6.0.0"
+  },
+  "dependencies": {
+    "tslib": "^2.3.0"
+  },
+  "sideEffects": false,
+  "publishConfig": {
+    "access": "public"
+  }
+}

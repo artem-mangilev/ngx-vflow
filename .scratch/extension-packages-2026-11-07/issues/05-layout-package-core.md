@@ -1,6 +1,6 @@
 # 05. `@vflow/layout`: контракт, хост, аниматор
 
-Status: ready-for-agent
+Status: resolved
 Type: task
 Blocked by: 03
 
@@ -24,3 +24,17 @@ Blocked by: 03
 
 - Unit (browser mode): алгоритм получает измеренные размеры `auto`-нод; не запускается до измерения; stale-результат отброшен; тянущаяся нода не перезаписана; позиции вложенной ноды переведены в node space; `animate` доходит до цели и эмитит `layoutEnd`.
 - node-dom: в jsdom `initialized` не эмитится (контракт Unit testing) — директива не падает и ничего не пишет.
+
+## Comments
+
+2026-11-07, сделано:
+
+- `libs/layout` по каркасу 03; peer `rxjs` добавлен (хост различает Observable через `isObservable`). `project.json` гоняет и node-dom конфиг.
+- Контракт (`layout.types.ts`): `LayoutNode { id, width, height, parentId, x, y }` — к плану добавлены текущие `x`/`y` во flow space, чтобы непрерывные алгоритмы (force) стартовали с имеющихся позиций; `LayoutEdge`, `LayoutGraph`, `LayoutResult { positions: Map<id, Point> }` во flow space; `LayoutAlgorithm = (graph) => result | Promise | Observable`. Входа `options` у хоста нет: адаптер принимает опции при создании (`dagreLayout({ rankdir })`) и возвращает функцию; новая функция = новый запуск, поэтому создавать её в компоненте, а не в шаблоне.
+- Хост `VxLayout` (`vflow[vxLayout]`): входы `vxLayout`, `vxLayoutTrigger` (`auto` | `manual`), `vxLayoutAnimate` (boolean | опции аниматора); выход `vxLayoutEnd`; `run(): Promise<LayoutResult | null>`. Ноды и рёбра читаются из входов самого `vflow` (`inject(VflowComponent).nodes()/edges()`), отдельных входов нет.
+- Готовность = `initialized` флоу (подписка на output) **и** `getNodeRect` у всех нод: одних `getNodeRect` мало — в jsdom модели получают измерение с нулями, и алгоритм запускался; с `initialized` в jsdom/happy-dom запуска нет (node-dom spec).
+- Триггер `auto`: effect по алгоритму, строке id нод и рёбер, готовности; движение/ресайз не перезапускают. Устаревший результат отбрасывается по счётчику поколения и по той же строке структуры. Тянущиеся ноды (между `nodeDragStart`/`nodeDragEnd`) не перезаписываются.
+- Применение: flow space → node space через позицию родителя из результата, иначе через `getNodeRect(parent)`. Observable: каждое значение мгновенно, `vxLayoutEnd` по `complete` с последним значением; sync/Promise — с анимацией по `vxLayoutAnimate`.
+- Аниматор `createNodePositionAnimator(nodes, options)` экспортируется: длительность от дистанции (`speed`, `minDuration`, `maxDuration`) или фиксированная `duration`, easing in-out cubic, `queued`, `cancel`, `animate()` резолвится `true` по прибытию и `false` при замене.
+- Spec (browser, 7): измеренный граф и node-space позиции вложенной ноды, перезапуск по алгоритму и набору нод (не по движению), stale-результат, пиннинг при drag, анимация с `vxLayoutEnd` после, Observable, `manual`. node-dom (jsdom/happy-dom × zoneless/zone): директива рендерится и не запускается.
+- Docs-страница и демо — в 06 вместе с адаптерами.

@@ -1,0 +1,50 @@
+{
+  "projectType": "library",
+  "sourceRoot": "libs/layout/src",
+  "prefix": "vx",
+  "name": "layout",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "targets": {
+    "build": {
+      "options": {
+        "project": "libs/layout/ng-package.json"
+      },
+      "configurations": {
+        "production": {
+          "tsConfig": "libs/layout/tsconfig.lib.prod.json"
+        },
+        "development": {
+          "tsConfig": "libs/layout/tsconfig.lib.json"
+        }
+      },
+      "defaultConfiguration": "production",
+      "executor": "@angular-devkit/build-angular:ng-packagr",
+      "outputs": ["{workspaceRoot}/dist/libs/layout"]
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc -p tsconfig.spec.json --noEmit && vitest run && vitest run --config vitest.node-dom.config.mts",
+        "cwd": "{projectRoot}"
+      },
+      "configurations": {
+        "watch": {
+          "command": "vitest"
+        }
+      }
+    },
+    "lint": {
+      "options": {
+        "lintFilePatterns": ["libs/layout/**/*.ts"]
+      },
+      "executor": "@angular-eslint/builder:lint"
+    },
+    "nx-release-publish": {
+      "executor": "@nx/js:release-publish",
+      "options": {
+        "packageRoot": "dist/{projectRoot}"
+      }
+    }
+  },
+  "tags": ["release"]
+}

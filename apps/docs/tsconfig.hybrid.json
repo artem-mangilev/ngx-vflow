@@ -13,6 +13,7 @@
       "@vflow/ui": ["libs/ui/src/public-api"],
       "@vflow/routing": ["dist/libs/routing"],
       "@vflow/auto-size": ["dist/libs/auto-size"],
+      "@vflow/layout": ["dist/libs/layout"],
       "ngx-vflow": ["dist/libs/ngx-vflow"],
       "ngx-vflow/testing": ["dist/libs/ngx-vflow/testing"]
     }
