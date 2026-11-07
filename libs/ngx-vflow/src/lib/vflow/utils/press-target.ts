@@ -10,6 +10,9 @@
  * | `[data-v-drag-handle]`, or a draggable node without drag handles                  | a node drag                            |
  * | anything else, including edges and undraggable nodes                              | a pan, unless inside `[data-v-no-pan]` |
  *
+ * A handle that cannot start a connection (`canStart` false) is not a connection target: a press on it belongs to
+ * the node, as on any part of the node body, so a node that is a handle as a whole still drags.
+ *
  * A node keeps the presses that drag it (its gesture stops their propagation), so a press that reaches the pane
  * from inside a node is one the node declined, and the pane needs no knowledge of the node.
  */
@@ -29,7 +32,9 @@ const NO_TARGET: PressTarget = { control: false, noPan: false, connection: null,
 export function pressTarget(target: EventTarget | null): PressTarget {
   if (!(target instanceof Element)) return NO_TARGET;
 
-  const nearest = target.closest('[data-v-handle-type], [data-v-reconnect-handle], [data-v-drag-handle]');
+  const nearest = target.closest(
+    '[data-v-handle-type]:not([data-v-handle-can-start="false"]), [data-v-reconnect-handle], [data-v-drag-handle]',
+  );
   const isDragHandle = !!nearest?.hasAttribute('data-v-drag-handle');
 
   return {

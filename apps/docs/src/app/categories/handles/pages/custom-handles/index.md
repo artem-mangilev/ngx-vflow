@@ -16,7 +16,7 @@ A handle is an element of your node presentation with the `vHandle` directive. T
 | `handleId`           |          | Identifies the handle when a node has more than one of a role; `Edge.sourceHandle` and `targetHandle` refer to it |
 | `layout`             | `auto`   | `auto` or `manual`, for the side positions, see below                                                             |
 | `offsetX`, `offsetY` | `0`      | Shift of the element and its connection point in the `auto` layout, in flow units; positive is right and down     |
-| `canStart`           | `true`   | Whether a new connection may start from this handle                                                               |
+| `canStart`           | `true`   | Whether a new connection may start from this handle; a press on a handle that cannot start drags the node instead |
 | `canAccept`          | `true`   | Whether the handle may accept a connection or reconnection candidate                                              |
 | `domAttributes`      |          | `data-*`, `title`, `lang` and `dir` applied to the element; handles carry no ARIA semantics                       |
 

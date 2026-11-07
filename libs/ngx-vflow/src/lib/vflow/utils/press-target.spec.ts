@@ -27,6 +27,22 @@ describe('press target table', () => {
     expect(pressTarget(null).control).toBe(false);
   });
 
+  it('leaves a press on a handle that cannot start a connection to the node, like the node body', () => {
+    const find = tree(`
+      <div data-v-node data-v-handle-type="any" data-v-handle-can-start="false" id="ball">
+        <i id="label"></i>
+        <div data-v-handle-type="source" data-v-handle-can-start="true" id="port"></div>
+        <div data-v-drag-handle id="grip"></div>
+      </div>`);
+
+    expect(pressTarget(find('#label')).connection).toBeNull();
+    expect(isNodeDragPress(pressTarget(find('#label')), false)).toBe(true);
+    expect(isPanPress(pressTarget(find('#label')))).toBe(true);
+    // A port inside it that can start keeps its press, and so does a drag handle.
+    expect(pressTarget(find('#port')).connection).toBe(find('#port'));
+    expect(pressTarget(find('#grip')).dragHandle).toBe(find('#grip'));
+  });
+
   it('pans from the canvas, edges and node bodies, not from handles, controls and no-pan parts', () => {
     const find = tree(`
       <i id="canvas"></i>

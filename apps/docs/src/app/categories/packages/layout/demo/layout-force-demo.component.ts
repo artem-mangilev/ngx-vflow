@@ -19,7 +19,7 @@ import { Vflow, createEdges, createNodes } from 'ngx-vflow';
     <vflow view="auto" [vxLayout]="layout()" [nodes]="nodes" [edges]="edges" [background]="{ type: 'dots' }">
       <!--
         A ball whose whole surface is the handle, so the edges meet it at its center. It neither starts nor accepts
-        connections, and the drag handle inside it keeps the press for the node drag.
+        connections, so a press on it drags the node.
       -->
       <div
         *vNode="let ctx"
@@ -30,7 +30,7 @@ import { Vflow, createEdges, createNodes } from 'ngx-vflow';
         [canStart]="false"
         [canAccept]="false"
         [class.hub]="ctx.node.id === 'n0'">
-        <span class="surface" vDragHandle>{{ ctx.data().text }}</span>
+        {{ ctx.data().text }}
       </div>
       <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
     </vflow>
@@ -52,14 +52,6 @@ import { Vflow, createEdges, createNodes } from 'ngx-vflow';
       align-items: center;
       font-size: 13px;
     }
-    .surface {
-      display: grid;
-      place-items: center;
-      width: 100%;
-      height: 100%;
-      border-radius: 50%;
-      cursor: grab;
-    }
     .ball {
       display: grid;
       place-items: center;
@@ -70,6 +62,7 @@ import { Vflow, createEdges, createNodes } from 'ngx-vflow';
       background: var(--vui-surface);
       color: var(--vui-foreground);
       font-size: 12px;
+      cursor: grab;
     }
     .ball.hub {
       width: 60px;
