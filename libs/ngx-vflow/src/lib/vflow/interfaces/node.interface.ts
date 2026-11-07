@@ -3,6 +3,7 @@ import { Point } from './point.interface';
 import { UnwrapSignal } from '../types/unwrap-signal.type';
 import { isDefined } from '../utils/is-defined';
 import { DomAttributes } from './dom-attributes.interface';
+import { StaticData } from '../types/static-data.type';
 
 export const NODE_DEFAULTS = {
   point: { x: 0, y: 0 },
@@ -79,12 +80,6 @@ export function createNode<T = unknown>(node: StaticNode<T>): NodeWithDefaults<T
   };
 }
 
-/** Data type of one static node; a node without `data` adds nothing to a union. */
-type StaticNodeData<N> = N extends { data?: infer D } ? (unknown extends D ? never : D) : never;
-
-/** Union of the data types of the nodes, or `unknown` when none of them has `data`. */
-type StaticNodesData<N> = [StaticNodeData<N>] extends [never] ? unknown : StaticNodeData<N>;
-
 /**
  * Wraps the values of every node into signals and fills the defaults.
  *
@@ -97,7 +92,7 @@ type StaticNodesData<N> = [StaticNodeData<N>] extends [never] ? unknown : Static
  * createNodes<Step>([{ id: '1', point: { x: 0, y: 0 }, data: { title: 'Draft' } }]);
  * ```
  */
-export function createNodes<N extends StaticNode>(nodes: N[]): NodeWithDefaults<StaticNodesData<N>>[];
+export function createNodes<N extends StaticNode>(nodes: N[]): NodeWithDefaults<StaticData<N>>[];
 export function createNodes<T>(nodes: StaticNode<T>[]): NodeWithDefaults<T>[];
 export function createNodes(nodes: StaticNode[]): NodeWithDefaults[] {
   return nodes.map((node) => createNode(node));

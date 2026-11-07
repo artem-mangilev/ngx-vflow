@@ -1,8 +1,8 @@
-import { ChangeDetectionStrategy, Component, viewChild, WritableSignal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, viewChild } from '@angular/core';
 import { Vui } from '@vflow/ui';
 import { DemoIconComponent } from '../../../shared/demo-icon.component';
 import { injectDocsTheme } from '../../../shared/docs-theme';
-import { createEdges, createNodes, Node, Vflow, VflowComponent } from 'ngx-vflow';
+import { createEdges, createNodes, Vflow, VflowComponent } from 'ngx-vflow';
 import { ScrollRows } from './scroll-rows';
 
 interface LongEntity {
@@ -213,7 +213,7 @@ export class ScrollCollapseDemoComponent {
         ],
       },
     },
-  ]) as (Node<LongEntity> & { data: WritableSignal<LongEntity> })[];
+  ]);
   readonly edges = createEdges([
     {
       id: 'supplier',

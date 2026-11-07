@@ -10,7 +10,6 @@ import {
   signal,
   untracked,
   viewChild,
-  WritableSignal,
 } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
 import { Vui } from '@vflow/ui';
@@ -26,7 +25,7 @@ import {
   createNodes,
   DeleteRequest,
   Edge,
-  Node,
+  StaticNode,
   Vflow,
   VflowComponent,
 } from 'ngx-vflow';
@@ -48,7 +47,6 @@ interface FrameData {
   kind: 'frame';
   title: string;
 }
-type SchemaData = EntityData | FrameData;
 
 const TYPES = ['uuid', 'text', 'decimal', 'timestamp'];
 
@@ -320,7 +318,7 @@ export class EntitiesDemoComponent {
   private readonly frameHeight: Record<string, number> = { relationships: 266, mapping: 234 };
   /** The first measured height of every table, which its frame's growth is counted from. */
   private readonly tableHeight: Record<string, number> = {};
-  readonly nodes = createNodes<SchemaData>([
+  readonly nodes = createNodes([
     frame('relationships', { x: 0, y: 0 }, 'Relationships', this.frameHeight['relationships']),
     frame('mapping', { x: 0, y: 480 }, 'Field mapping', this.frameHeight['mapping']),
     entity('customer', 'relationships', { x: 24, y: 56 }, 'Customer', 'table', [
@@ -341,7 +339,7 @@ export class EntitiesDemoComponent {
       ['email', 'contact_email', 'text'],
       ['name', 'display_name', 'text'],
     ]),
-  ]) as (Node<SchemaData> & { data: WritableSignal<SchemaData> })[];
+  ]);
   readonly edges = signal<Edge[]>(
     createEdges([
       {
@@ -487,8 +485,8 @@ export class EntitiesDemoComponent {
   }
 }
 
-function frame(id: string, point: { x: number; y: number }, title: string, height: number) {
-  return { id, point, width: 728, height, ariaLabel: title, data: { kind: 'frame' as const, title } };
+function frame(id: string, point: { x: number; y: number }, title: string, height: number): StaticNode<FrameData> {
+  return { id, point, width: 728, height, ariaLabel: title, data: { kind: 'frame', title } };
 }
 
 function entity(
@@ -498,14 +496,14 @@ function entity(
   title: string,
   category: string,
   fields: [string, string, string, string?][],
-) {
+): StaticNode<EntityData> {
   return {
     id,
     parentId,
     point,
     ariaLabel: `${title} ${category === 'table' ? 'entity' : category.toLowerCase() + ' schema'}`,
     data: {
-      kind: 'entity' as const,
+      kind: 'entity',
       title,
       category,
       fields: fields.map(([fieldId, name, type, key = '']) => ({ id: fieldId, name, type, key })),

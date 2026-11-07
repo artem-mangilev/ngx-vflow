@@ -12,6 +12,7 @@ import {
   NodeDragEvent,
   Point,
   removeElements,
+  StaticEdge,
   Vflow,
   VflowComponent,
 } from 'ngx-vflow';
@@ -124,7 +125,7 @@ export class RelationshipsDemoComponent implements TeamBoard {
     },
   ]);
   readonly edges = signal<Edge<Relation>[]>(
-    createEdges<Relation>([
+    createEdges([
       // A connection between the two groups themselves.
       relation('platform-growth', 'platform', 'growth', { label: '3 shared services' }),
       relation('platform-deploys', 'platform', 'deploys', { link: true }),
@@ -166,9 +167,7 @@ export class RelationshipsDemoComponent implements TeamBoard {
   private origins = new Map<string, { parentId: string; point: Point }>();
 
   connect(connection: Connection) {
-    const edge = createEdge<Relation>(
-      relation(crypto.randomUUID(), connection.source, connection.target, { label: 'reviews' }),
-    );
+    const edge = createEdge(relation(crypto.randomUUID(), connection.source, connection.target, { label: 'reviews' }));
     this.edges.update((edges) => addEdges([edge], { nodes: this.nodes, edges }));
   }
 
@@ -327,12 +326,12 @@ function person(
 }
 
 /** Floating edges: every end meets its node on the side facing the other end. */
-function relation(id: string, source: string, target: string, data: Relation) {
+function relation(id: string, source: string, target: string, data: Relation): StaticEdge<Relation> {
   return {
     id,
     source,
     target,
-    curve: 'bezier' as const,
+    curve: 'bezier',
     markers: data.mutual || data.link ? {} : { end: {} },
     data,
   };

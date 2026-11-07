@@ -22,7 +22,7 @@ export class StressTestDemoComponent {
 
 export function initialElements(xNodes = 10, yNodes = 10): { nodes: Node[]; edges: Edge[] } {
   const nodes: StaticNode<{ label: string }>[] = [];
-  const edges = [] as Edge[];
+  const edges: Edge[] = [];
 
   let nodeId = 1;
   let recentNodeId = null;

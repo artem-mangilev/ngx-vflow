@@ -6,6 +6,7 @@ import { UnwrapSignal } from '../types/unwrap-signal.type';
 import { isDefined } from '../utils/is-defined';
 import { DomAttributes } from './dom-attributes.interface';
 import { EntityComponentType } from './node.interface';
+import { StaticData } from '../types/static-data.type';
 
 export const EDGE_DEFAULTS = {
   curve: 'bezier' as Curve,
@@ -80,6 +81,20 @@ export function createEdge<T = unknown>(edge: StaticEdge<T>): EdgeWithDefaults<T
   };
 }
 
-export function createEdges<T = unknown>(edges: StaticEdge<T>[]): EdgeWithDefaults<T>[] {
+/**
+ * Wraps the values of every edge into signals and fills the defaults.
+ *
+ * Without a type argument the data type is the union of the data of the edges, so edges of different kinds, such as
+ * component edges with their own data, need no shared type. A type argument names the data type of every edge and
+ * checks each `data` against it:
+ *
+ * ```ts
+ * createEdges([dependency, label]); // EdgeWithDefaults<Dependency | Label>[]
+ * createEdges<Label>([{ id: 'a-b', source: 'a', target: 'b', data: { text: 'reviews' } }]);
+ * ```
+ */
+export function createEdges<E extends StaticEdge>(edges: E[]): EdgeWithDefaults<StaticData<E>>[];
+export function createEdges<T>(edges: StaticEdge<T>[]): EdgeWithDefaults<T>[];
+export function createEdges(edges: StaticEdge[]): EdgeWithDefaults[] {
   return edges.map((edge) => createEdge(edge));
 }
