@@ -504,6 +504,7 @@ The programmatic viewport methods are `setViewport`, `setCenter`, `fitView`, `zo
 
 - `initialized` is an output instead of a signal. It is emitted once, when the first layout is complete, an empty graph included, and a viewport set in its handler is the first one painted. Replace `effect(() => { if (flow.initialized()) untracked(() => flow.fitView()); })` with `(initialized)="flow.fitView()"`.
 - A subscription made after the emission does not receive it. Code that asks later whether the flow is ready keeps a flag: `(initialized)="ready.set(true)"`.
+- A directive on the `vflow` element may hold the initialization back with `VFLOW_INITIALIZATION_GATE`, for example `vxLayout` of `@vflow/layout` until it has placed the nodes; the flow hands such a directive its `measured` signal, which tells when every node has its size.
 - `(viewportChangeEnd)` emits the viewport when a gesture or a programmatic change ends; it is the moment to save the viewport. A series of wheel events, panning or zooming, is one gesture that ends once the events stop.
 
 ### Connections without a subscription

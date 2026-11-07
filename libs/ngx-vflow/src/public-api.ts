@@ -74,6 +74,10 @@ export type * from './lib/vflow/interfaces/fit-view-options.interface';
 export { DEFAULT_OPTIMIZATION, type Optimization } from './lib/vflow/interfaces/optimization.interface';
 export type * from './lib/vflow/interfaces/intersecting-nodes-options.interface';
 export type * from './lib/vflow/interfaces/node-at-point.interface';
+export {
+  VFLOW_INITIALIZATION_GATE,
+  type VflowInitializationGate,
+} from './lib/vflow/interfaces/initialization-gate.interface';
 export type * from './lib/vflow/interfaces/curve-factory.interface';
 export type * from './lib/vflow/interfaces/alignment-helper-settings.interface';
 export {

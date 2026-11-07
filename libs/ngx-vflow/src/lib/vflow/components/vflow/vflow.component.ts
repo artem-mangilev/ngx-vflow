@@ -459,7 +459,8 @@ export class VflowComponent<N extends Node = Node, E extends Edge = Edge> {
   /**
    * Emitted once, when the first layout is complete: the flow has a size, and every node has its size and handle
    * positions. An empty graph completes it too. The graph is not painted before that, so a viewport set in reaction,
-   * such as `(initialized)="flow.fitView()"`, is the first viewport the user sees.
+   * such as `(initialized)="flow.fitView()"`, is the first viewport the user sees. A directive on the flow element
+   * may hold it back with a `VFLOW_INITIALIZATION_GATE`, for example until a layout has placed the nodes.
    *
    * A subscription made after the emission does not receive it; keep a flag, such as
    * `(initialized)="ready.set(true)"`, to know later whether the flow is ready. A DOM without layout, such as jsdom,

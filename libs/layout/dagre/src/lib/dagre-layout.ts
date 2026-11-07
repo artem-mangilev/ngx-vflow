@@ -18,6 +18,8 @@ export interface DagreLayoutOptions {
   marginy?: number;
   acyclicer?: 'greedy';
   ranker?: 'network-simplex' | 'tight-tree' | 'longest-path';
+  /** Space a parent keeps around its children, which dagre itself places at the very edge of a compound node. */
+  padding?: number;
 }
 
 /**
@@ -28,7 +30,7 @@ export interface DagreLayoutOptions {
  * readonly layout = dagreLayout({ rankdir: 'LR', ranksep: 80 });
  * ```
  */
-export function dagreLayout(options: DagreLayoutOptions = {}): LayoutAlgorithm {
+export function dagreLayout({ padding = 20, ...options }: DagreLayoutOptions = {}): LayoutAlgorithm {
   return (graph) => {
     const ids = new Set(graph.nodes.map((node) => node.id));
     const dagreGraph = new graphlib.Graph({ compound: true });
@@ -51,9 +53,10 @@ export function dagreLayout(options: DagreLayoutOptions = {}): LayoutAlgorithm {
     const sizes = new Map<string, { width: number; height: number }>();
     for (const node of graph.nodes) {
       const { x, y, width, height } = dagreGraph.node(node.id);
-      // dagre positions the centers.
-      positions.set(node.id, { x: x - width / 2, y: y - height / 2 });
-      if (parents.has(node.id)) sizes.set(node.id, { width, height });
+      // dagre positions the centers; a parent grows by the padding around the children dagre packed into it.
+      const inflate = parents.has(node.id) ? padding : 0;
+      positions.set(node.id, { x: x - width / 2 - inflate, y: y - height / 2 - inflate });
+      if (parents.has(node.id)) sizes.set(node.id, { width: width + inflate * 2, height: height + inflate * 2 });
     }
 
     return { positions, sizes };

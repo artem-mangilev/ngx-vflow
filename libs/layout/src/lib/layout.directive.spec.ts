@@ -14,6 +14,7 @@ import { LayoutAlgorithm, LayoutGraph, LayoutResult } from './layout.types';
       [vxLayoutTrigger]="trigger()"
       [vxLayoutAnimate]="animate()"
       (vxLayoutEnd)="ended.push($event)"
+      (initialized)="initializedAt.push(nodes()[0].point())"
       [view]="[1200, 800]"
       [nodes]="nodes()"
       [edges]="edges"
@@ -41,6 +42,8 @@ class LayoutHostComponent {
   public readonly layout = viewChild.required(VxLayout);
   public readonly graphs: LayoutGraph[] = [];
   public readonly ended: LayoutResult[] = [];
+  /** The position of the first node when the flow initialized. */
+  public readonly initializedAt: { x: number; y: number }[] = [];
   public readonly trigger = signal<'auto' | 'manual'>('auto');
   public readonly animate = signal<boolean | { duration: number }>(false);
   public readonly algorithm = signal<LayoutAlgorithm>((graph) => {
@@ -98,6 +101,38 @@ describe('VxLayout', () => {
     // The child's flow position (450, 300) is relative to the new position of its parent.
     expect(node(fixture, 'c').point()).toEqual({ x: 150, y: 0 });
     expect(host.ended).toHaveLength(1);
+  });
+
+  it('lays the graph out before the first paint, without animation, and initializes the flow after', async () => {
+    TestBed.configureTestingModule({ imports: [LayoutHostComponent] });
+    const fixture = TestBed.createComponent(LayoutHostComponent);
+    const host = fixture.componentInstance;
+    host.animate.set(true);
+    let resolve!: (result: LayoutResult) => void;
+    host.algorithm.set(() => new Promise((result) => (resolve = result)));
+    await settle(fixture);
+    const root = fixture.nativeElement.querySelector('vflow') as HTMLElement;
+
+    // Measured, laid out asynchronously: not painted and not initialized yet.
+    expect(root.getAttribute('class')).toContain('v-initializing');
+    expect(root.classList.contains('v-initializing')).toBe(true);
+    expect(host.initializedAt).toEqual([]);
+
+    resolve({ positions: new Map([['a', { x: 640, y: 480 }]]) });
+    await settle(fixture);
+    // At once, although animation is on: the first positions land before anything is visible.
+    expect(node(fixture, 'a').point()).toEqual({ x: 640, y: 480 });
+    expect(root.classList.contains('v-initializing')).toBe(false);
+    expect(host.initializedAt).toEqual([{ x: 640, y: 480 }]);
+  });
+
+  it('does not hold the initialization of the flow with the manual trigger', async () => {
+    TestBed.configureTestingModule({ imports: [LayoutHostComponent] });
+    const fixture = TestBed.createComponent(LayoutHostComponent);
+    fixture.componentInstance.trigger.set('manual');
+    await settle(fixture);
+
+    expect(fixture.componentInstance.initializedAt).toEqual([{ x: 0, y: 0 }]);
   });
 
   it('runs again for a new algorithm or a new set of nodes, not for a move', async () => {

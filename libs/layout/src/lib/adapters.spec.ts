@@ -57,6 +57,9 @@ describe('layout adapters', () => {
     expect(inside(lr, 'd', 'group')).toBe(true);
     expect(inside(lr, 'e', 'group')).toBe(true);
     expect(lr.sizes!.has('a')).toBe(false);
+    // The padding keeps the children off the sides of their parent.
+    expect(lr.positions.get('d')!.x - lr.positions.get('group')!.x).toBeGreaterThanOrEqual(20);
+    expect(lr.positions.get('d')!.y - lr.positions.get('group')!.y).toBeGreaterThanOrEqual(20);
 
     const tb = await once(dagreLayout(), graph());
     expect(tb.positions.get('b')!.y).toBeGreaterThan(tb.positions.get('a')!.y + 50);
