@@ -6,16 +6,14 @@ import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
   template: `<vflow view="auto" [nodes]="nodes" [edges]="edges">
     <docs-node *vNode="let ctx" [ctx]="ctx" />
 
-    <ng-template let-ctx vEdge>
-      <svg:g vEdgeInteraction class="edge">
-        <svg:path
-          fill="none"
-          [attr.d]="ctx.path()"
-          [attr.stroke-width]="ctx.edge.data?.().strokeWidth"
-          [attr.stroke]="ctx.selected() ? '#0f4c75' : ctx.edge.data?.().color"
-          [attr.marker-end]="ctx.markerEnd()" />
-      </svg:g>
-    </ng-template>
+    <svg:g *vEdge="let ctx" vEdgeInteraction class="edge">
+      <svg:path
+        fill="none"
+        [attr.d]="ctx.path()"
+        [attr.stroke-width]="ctx.edge.data?.().strokeWidth"
+        [attr.stroke]="ctx.selected() ? '#0f4c75' : ctx.edge.data?.().color"
+        [attr.marker-end]="ctx.markerEnd()" />
+    </svg:g>
   </vflow>`,
   styles: [
     `

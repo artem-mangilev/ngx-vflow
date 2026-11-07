@@ -117,7 +117,7 @@ export class EasyConnectNodeComponent {
       </label>
 
       <vflow view="auto" [nodes]="nodes" [edges]="edges()" [connection]="connection()" (connect)="connect($event)">
-        <ng-template let-ctx vEdge><svg:g docsEdge [ctx]="ctx" /></ng-template>
+        <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
       </vflow>
     </div>
   `,

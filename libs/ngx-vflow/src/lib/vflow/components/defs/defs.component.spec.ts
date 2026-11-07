@@ -16,13 +16,12 @@ import { VflowHandleDirective } from '../../public-directives/handle.directive';
       <span vHandle handleType="target" position="left"></span
       ><span vHandle handleType="source" position="right"></span>
     </div>
-    <ng-template let-ctx vEdge>
-      <svg:path
-        fill="none"
-        [attr.d]="ctx.path()"
-        [attr.marker-start]="ctx.markerStart()"
-        [attr.marker-end]="ctx.markerEnd()" />
-    </ng-template>
+    <svg:path
+      *vEdge="let ctx"
+      fill="none"
+      [attr.d]="ctx.path()"
+      [attr.marker-start]="ctx.markerStart()"
+      [attr.marker-end]="ctx.markerEnd()" />
     <ng-template vMarker="diamond" inset="10">
       <svg:polygon fill="context-stroke" points="0,0 -5,-4 -10,0 -5,4" />
     </ng-template>

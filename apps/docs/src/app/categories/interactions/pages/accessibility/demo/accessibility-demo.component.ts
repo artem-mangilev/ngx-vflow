@@ -118,7 +118,7 @@ const SPANISH: Partial<AriaLabelConfig> = {
             <docs-node [ctx]="ctx" />
           }
         </ng-template>
-        <ng-template let-ctx vEdge><svg:g docsEdge [ctx]="ctx" /></ng-template>
+        <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
       </vflow>
       <dl class="mirror" aria-hidden="true">
         <dt>Screen reader hears</dt>

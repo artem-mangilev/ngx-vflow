@@ -31,7 +31,7 @@ type GestureSetting = 'panOnDrag' | 'panOnScroll' | 'zoomOnScroll' | 'zoomOnPinc
       [zoomOnPinch]="enabled().zoomOnPinch"
       [zoomOnDoubleClick]="enabled().zoomOnDoubleClick">
       <docs-node *vNode="let ctx" [ctx]="ctx" />
-      <ng-template let-ctx vEdge><svg:g docsEdge [ctx]="ctx" /></ng-template>
+      <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
     </vflow>
   `,
   styles: [

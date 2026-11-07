@@ -6,13 +6,11 @@
     <span vuiPort handleType="target" position="left"></span>
   </div>
 
-  <ng-template let-ctx vEdge>
-    <svg:g vEdgeInteraction class="custom-edge">
-      <svg:path
-        fill="none"
-        stroke-width="2"
-        [attr.d]="ctx.path()"
-        [attr.stroke]="ctx.selected() ? '#0f4c75' : '#bbe1fa'" />
-    </svg:g>
-  </ng-template>
+  <svg:g *vEdge="let ctx" vEdgeInteraction class="custom-edge">
+    <svg:path
+      fill="none"
+      stroke-width="2"
+      [attr.d]="ctx.path()"
+      [attr.stroke]="ctx.selected() ? '#0f4c75' : '#bbe1fa'" />
+  </svg:g>
 </vflow>

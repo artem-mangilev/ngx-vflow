@@ -3,9 +3,9 @@ import type { Edge } from '../interfaces/edge.interface';
 
 /**
  * What an edge presentation reads about its edge. An edge component gets it through {@link injectEdge};
- * an `ng-template[vEdge]` presentation gets the same object as its template context.
+ * a `vEdge` template presentation gets the same object as its template context.
  *
- * The data type defaults to `any` because a template context cannot take a type argument: `let-ctx` reads
+ * The data type defaults to `any` because a template context cannot take a type argument: `let ctx` reads
  * `ctx.data()` untyped. Code passes the type to `injectEdge<T>()`, which defaults to `unknown`.
  */
 export interface EdgeRef<T = any> {

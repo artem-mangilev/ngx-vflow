@@ -5,7 +5,7 @@ import { Node, Edge, Vflow, createNodes } from 'ngx-vflow';
 
 @Component({
   template: `<vflow view="auto" [nodes]="nodes" [edges]="edges">
-    <ng-template let-ctx vEdge><svg:g docsEdge [ctx]="ctx" /></ng-template>
+    <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
 
     <div *vNode="let ctx" class="custom-node" [class.custom-node_selected]="ctx.selected()">
       {{ ctx.data().text }}

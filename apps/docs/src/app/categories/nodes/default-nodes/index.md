@@ -3,7 +3,7 @@ keyword: 'FeaturesDefaultNodes'
 ---
 
 Core is headless: it owns geometry, interaction and accessibility, and renders a node through the
-template you provide. Pass a `nodes` array and a `*vNode` template to `vflow`. Nodes carry your `data`; the
+template you provide. Pass a `nodes` array and a `vNode` template to `vflow`. Nodes carry your `data`; the
 template receives it through `ctx.data()` together with `ctx.selected()`, `ctx.preselected()`, `ctx.width()` and
 `ctx.height()`.
 

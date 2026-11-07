@@ -9,7 +9,7 @@ import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
     [edges]="edges"
     [background]="{ type: 'image', src: 'assets/logo.svg', scale: 0.05 }">
     <docs-node *vNode="let ctx" [ctx]="ctx" />
-    <ng-template let-ctx vEdge><svg:g docsEdge [ctx]="ctx" /></ng-template>
+    <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
   </vflow>`,
   styles: [
     `

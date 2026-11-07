@@ -154,7 +154,7 @@ The optional `parentId` field may still be omitted from `Node` and `StaticNode`.
 | `type: YourNodeComponent` or a lazy import function                         | `component: YourNodeComponent` or the same function                                               |
 | `HtmlTemplateNode`, `TemplateGroupNode`, `ComponentNode`                    | `Node`                                                                                            |
 | `isTemplateNode`, `isTemplateGroupNode`                                     | Check `component` or your own `data`                                                              |
-| `<ng-template nodeHtml>`, `NodeHtmlTemplateDirective`                       | `*vNode="let ctx"` or `<ng-template vNode>`, `VflowNodeTemplateDirective`                         |
+| `<ng-template nodeHtml>`, `NodeHtmlTemplateDirective`                       | The structural `vNode` directive or `<ng-template vNode>`, `VflowNodeTemplateDirective`           |
 | `<ng-template groupNode>`, `GroupNodeTemplateDirective`, `GroupNodeContext` | A branch of the `vNode` template; every node context has `width` and `height`                     |
 
 The library does not read a node kind. Keep your own discriminator in `data` and branch on it in the template. A group is any node with a size and children that reference it through `parentId`; assistive technology reads it as a `group` while it has children.
@@ -304,11 +304,9 @@ Before:
 After:
 
 ```html
-<ng-template let-ctx vEdge>
-  <svg:g vEdgeInteraction>
-    <svg:path [attr.d]="ctx.path()" />
-  </svg:g>
-</ng-template>
+<svg:g *vEdge="let ctx" vEdgeInteraction>
+  <svg:path [attr.d]="ctx.path()" />
+</svg:g>
 ```
 
 An edge can now be drawn by a component instead of the template: set `component` on the edge. The flow creates the component on an SVG group inside the edge, reads the edge through `injectEdge()`, and forwards its outputs to the new `(componentEdgeEvent)` output of `vflow`, typed with `ComponentEdgeEvent<[A, B]>`. Add `VflowEdgeInteractionDirective` to the component's `hostDirectives` to move the interaction stroke into the component host.
@@ -551,7 +549,7 @@ Every input of `vflow` is a signal input. Binding in a template is unchanged. Re
 
 | Removed in v3                                               | Migration                                                                                                          |
 | ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| Node type `svg-template`                                    | Remove `type` and provide native HTML through a `*vNode` template.                                                 |
+| Node type `svg-template`                                    | Remove `type` and provide native HTML through a `vNode` template.                                                  |
 | `NodeSvgTemplateDirective` and `nodeSvgTemplate`            | Remove these imports/usages and use `VflowNodeTemplateDirective` / `vNode`.                                        |
 | `scaleOnHover` input on `MiniMapComponent`                  | Remove the input binding. The minimap remains at its default scale and does not capture pointer input.             |
 | `documentPointToFlowPoint()`                                | Rename to `clientToFlowPosition()`. Use `flowToClientPosition()` for the inverse conversion.                       |

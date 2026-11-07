@@ -1,15 +1,27 @@
 You can customize your edges. To achieve this, follow these steps:
 
-1. Create an `ng-template` with the `vEdge` selector inside `vflow`
-2. Wrap the `<svg:path>` you customize in a `<svg:g vEdgeInteraction>`. The flow draws a transparent 20px interaction stroke along the edge path, so a click near the line selects the edge. Without the group the stroke lives in the edge host; the directive moves it into the group as its first child, so the group's listeners and CSS `:hover` see the whole clickable area, and elements you place after it stay on top. Set `interactionWidth` on the edge to change the width.
+1. Put an SVG element with the structural `vEdge` directive inside `vflow`, usually a `<svg:g vEdgeInteraction>` group, as in the example below
+2. The `vEdgeInteraction` group wraps the `<svg:path>` you customize. The flow draws a transparent 20px interaction stroke along the edge path, so a click near the line selects the edge. Without the group the stroke lives in the edge host; the directive moves it into the group as its first child, so the group's listeners and CSS `:hover` see the whole clickable area, and elements you place after it stay on top. Set `interactionWidth` on the edge to change the width.
 3. Draw the visible `<svg:path>` inside the group.
-4. In the `ng-template`, the library provides `let-ctx` with important data for you, such as the `path` signal with current path. Additionally, the `edge` field contains current edge from one the `[edges]`, from which you can retrieve custom `data`. Furthermore, you can access `markerStart` and `markerEnd` signals with markers for current `edge`.
+4. The library provides `ctx` to the template with important data for you, such as the `path` signal with current path. Additionally, the `edge` field contains current edge from one the `[edges]`, from which you can retrieve custom `data`. Furthermore, you can access `markerStart` and `markerEnd` signals with markers for current `edge`.
+
+```html
+<vflow [nodes]="nodes" [edges]="edges">
+  <svg:g *vEdge="let ctx" vEdgeInteraction>
+    <svg:path class="edge" [attr.d]="ctx.path()" [attr.marker-end]="ctx.markerEnd()" />
+  </svg:g>
+</vflow>
+```
+
+The structural form is short for `<ng-template let-ctx vEdge>`. Use the long form when the template has no single root
+element: an edge with a label declares the label next to its SVG group, see `*FeaturesEdgeLabels`, or a template that
+starts with `@if` or `@let`.
 
 If your template draws geometry that differs from the edge path, set `interactionWidth` to `0` and opt your own element into hit-testing with `pointer-events="stroke"`; clicks on it still select the edge. Do not enable pointer events on the whole edge SVG because its bounds would block nodes and canvas panning.
 
 ## Context
 
-It's tricky to infer type for `let-ctx`, so here is an interface with available fields for this context.
+It's tricky to infer type for `ctx`, so here is an interface with available fields for this context.
 
 ```ts
 export interface EdgeContext {

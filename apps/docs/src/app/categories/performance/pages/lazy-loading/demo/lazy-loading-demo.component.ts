@@ -13,7 +13,7 @@ import { Edge, Node, Vflow, VflowComponent, createNodes } from 'ngx-vflow';
       [optimization]="{ lazyLoadTrigger: 'viewport' }"
       (initialized)="ready.set(true)">
       <docs-node *vNode="let ctx" [ctx]="ctx" />
-      <ng-template let-ctx vEdge><svg:g docsEdge [ctx]="ctx" /></ng-template>
+      <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
     </vflow>
   `,
   styleUrls: ['./lazy-loading-demo.component.scss'],

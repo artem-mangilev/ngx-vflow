@@ -21,7 +21,7 @@ import { EdgeDetachedChange } from '../../types/edge-change.type';
       <span vHandle handleType="target" position="left"></span
       ><span vHandle handleType="source" position="right"></span>
     </div>
-    <ng-template vEdge let-ctx><svg:path [attr.d]="ctx.path()" /></ng-template>
+    <svg:path *vEdge="let ctx" [attr.d]="ctx.path()" />
   </vflow>`,
 })
 class ChangesHostComponent {

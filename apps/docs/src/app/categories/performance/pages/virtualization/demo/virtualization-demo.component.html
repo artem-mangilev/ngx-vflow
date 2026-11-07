@@ -1,4 +1,4 @@
 <vflow #vflow view="auto" [nodes]="nodes" [edges]="edges" [minZoom]="0.1" [optimization]="{ virtualization: true }">
   <docs-node *vNode="let ctx" [ctx]="ctx" />
-  <ng-template let-ctx vEdge><svg:g docsEdge [ctx]="ctx" /></ng-template>
+  <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
 </vflow>

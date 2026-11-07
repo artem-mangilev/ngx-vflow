@@ -4,6 +4,22 @@ import { ConnectionContext, EdgeContext, NodeContext } from '../interfaces/templ
 import { EdgeLabelOrient, EdgeLabelPosition } from '../interfaces/edge-label.interface';
 import { EdgeComponent } from '../components/edge/edge.component';
 
+/**
+ * Presentation of every edge without a `component`, drawn inside the edge SVG. Use the structural form on one root
+ * SVG element; use the long form when the template has several roots, such as a label next to the group, or starts
+ * with control flow:
+ *
+ * ```html
+ * <svg:g *vEdge="let ctx" vEdgeInteraction>
+ *   <svg:path [attr.d]="ctx.path()" />
+ * </svg:g>
+ *
+ * <ng-template let-ctx vEdge>
+ *   <svg:g vEdgeInteraction><svg:path [attr.d]="ctx.path()" /></svg:g>
+ *   <span *vEdgeLabel>{{ ctx.data().label }}</span>
+ * </ng-template>
+ * ```
+ */
 @Directive({
   standalone: true,
   selector: 'ng-template[vEdge]',

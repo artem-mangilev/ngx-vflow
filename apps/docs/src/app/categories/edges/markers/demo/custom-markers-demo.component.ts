@@ -23,7 +23,7 @@ import { ConnectionSettings, Edge, Node, Vflow, createEdges, createNodes } from 
         <docs-node [ctx]="ctx" />
       }
     </ng-template>
-    <ng-template let-ctx vEdge><svg:g docsEdge [ctx]="ctx" /></ng-template>
+    <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
 
     <ng-template vMarker="circle" inset="8">
       <svg:circle fill="none" cx="-5" cy="0" r="4" />

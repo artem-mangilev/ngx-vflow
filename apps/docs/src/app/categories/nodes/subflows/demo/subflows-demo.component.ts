@@ -18,7 +18,7 @@ import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
         <docs-node [ctx]="ctx" />
       }
     </ng-template>
-    <ng-template let-ctx vEdge><svg:g docsEdge [ctx]="ctx" /></ng-template>
+    <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
   </vflow>`,
   styles: [
     `

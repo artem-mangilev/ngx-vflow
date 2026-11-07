@@ -3,7 +3,7 @@ import { Node } from '../interfaces/node.interface';
 
 /**
  * What a node presentation reads about its node. A component node gets it through {@link injectNode};
- * a `*vNode` template presentation gets the same object as its template context.
+ * a `vNode` template presentation gets the same object as its template context.
  *
  * The data type defaults to `any` because a template context cannot take a type argument: `let ctx` reads
  * `ctx.data()` untyped. Code passes the type to `injectNode<T>()`, which defaults to `unknown`.

@@ -51,11 +51,9 @@ import { createEdges, createNodes, Vflow } from 'ngx-vflow';
               <span vuiPort handleType="target" position="left"></span>
               <span vuiPort handleType="source" position="right"></span>
             </article>
-            <ng-template let-ctx vEdge>
-              <svg:g vEdgeInteraction>
-                <svg:path vuiEdge [attr.d]="ctx.path()" [attr.marker-end]="ctx.markerEnd()" />
-              </svg:g>
-            </ng-template>
+            <svg:g *vEdge="let ctx" vEdgeInteraction>
+              <svg:path vuiEdge [attr.d]="ctx.path()" [attr.marker-end]="ctx.markerEnd()" />
+            </svg:g>
             <v-minimap />
           </vflow>
         </div>
@@ -69,11 +67,9 @@ import { createEdges, createNodes, Vflow } from 'ngx-vflow';
               <span vuiPort handleType="target" position="left"></span>
               <span vuiPort handleType="source" position="right"></span>
             </article>
-            <ng-template let-ctx vEdge>
-              <svg:g vEdgeInteraction>
-                <svg:path vuiEdge [attr.d]="ctx.path()" [attr.marker-end]="ctx.markerEnd()" />
-              </svg:g>
-            </ng-template>
+            <svg:g *vEdge="let ctx" vEdgeInteraction>
+              <svg:path vuiEdge [attr.d]="ctx.path()" [attr.marker-end]="ctx.markerEnd()" />
+            </svg:g>
             <v-minimap />
           </vflow>
         </div>

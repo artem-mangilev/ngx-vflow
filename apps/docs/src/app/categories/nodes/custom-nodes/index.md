@@ -12,9 +12,11 @@ You can create custom nodes with a `vNode` template
 
 Follow these steps to achieve this:
 
-1. Put an element with the structural `*vNode="let ctx"` directive inside `vflow`
+1. Put an element with the structural `vNode` directive inside `vflow`, as in the example below
 2. Write your HTML inside this element
 3. Pass any data with the `data` field of the node and read it inside the template through `ctx.data()`
+
+{% raw %}
 
 ```html
 <vflow [nodes]="nodes" [edges]="edges">
@@ -22,7 +24,9 @@ Follow these steps to achieve this:
 </vflow>
 ```
 
-`*vNode` is the short form of `<ng-template let-ctx vNode>`. Use the long form when the template has no single root
+{% endraw %}
+
+The structural form is short for `<ng-template let-ctx vNode>`. Use the long form when the template has no single root
 element, for example when it starts with `@if` or `@switch`.
 
 Every node without `component` renders through this template. The library does not read a node kind: if your flow has

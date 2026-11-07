@@ -1,5 +1,5 @@
 <vflow view="auto" [nodes]="nodes">
-  <ng-template let-ctx vEdge><svg:g docsEdge [ctx]="ctx" /></ng-template>
+  <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
 
   <ng-template let-ctx vNode>
     <div class="custom-node"></div>

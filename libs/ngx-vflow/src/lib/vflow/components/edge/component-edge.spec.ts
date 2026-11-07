@@ -52,9 +52,7 @@ class TemplateEdgeChildComponent {
       <span vHandle handleType="target" position="left"></span
       ><span vHandle handleType="source" position="right"></span>
     </div>
-    <ng-template let-ctx vEdge>
-      <svg:g vEdgeInteraction templateEdgeChild (click)="templateClicks.push(ctx.edge.id)" />
-    </ng-template>
+    <svg:g *vEdge="let ctx" vEdgeInteraction templateEdgeChild (click)="templateClicks.push(ctx.edge.id)" />
   </vflow>`,
   imports: [
     VflowComponent,
@@ -193,7 +191,7 @@ class PlainEdgeComponent {
       <span vHandle handleType="target" position="left"></span
       ><span vHandle handleType="source" position="right"></span>
     </div>
-    <ng-template let-ctx vEdge><svg:path class="plain" fill="none" [attr.d]="ctx.path()" /></ng-template>
+    <svg:path *vEdge="let ctx" class="plain" fill="none" [attr.d]="ctx.path()" />
   </vflow>`,
   imports: [VflowComponent, VflowNodeTemplateDirective, VflowEdgeTemplateDirective, VflowHandleDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
