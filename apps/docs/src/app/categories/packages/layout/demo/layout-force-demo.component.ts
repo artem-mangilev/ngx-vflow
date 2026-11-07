@@ -17,7 +17,21 @@ import { Vflow, createEdges, createNodes } from 'ngx-vflow';
         (input)="distance.set(+$any($event.target).value)" />
     </label>
     <vflow view="auto" [vxLayout]="layout()" [nodes]="nodes" [edges]="edges" [background]="{ type: 'dots' }">
-      <docs-node *vNode="let ctx" [ctx]="ctx" />
+      <!--
+        A ball whose whole surface is the handle, so the edges meet it at its center. It neither starts nor accepts
+        connections, and the drag handle inside it keeps the press for the node drag.
+      -->
+      <div
+        *vNode="let ctx"
+        class="ball"
+        vHandle
+        handleType="any"
+        position="center"
+        [canStart]="false"
+        [canAccept]="false"
+        [class.hub]="ctx.node.id === 'n0'">
+        <span class="surface" vDragHandle>{{ ctx.data().text }}</span>
+      </div>
       <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
     </vflow>
   `,
@@ -38,13 +52,38 @@ import { Vflow, createEdges, createNodes } from 'ngx-vflow';
       align-items: center;
       font-size: 13px;
     }
+    .surface {
+      display: grid;
+      place-items: center;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      cursor: grab;
+    }
+    .ball {
+      display: grid;
+      place-items: center;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 2px solid var(--vui-accent);
+      background: var(--vui-surface);
+      color: var(--vui-foreground);
+      font-size: 12px;
+    }
+    .ball.hub {
+      width: 60px;
+      height: 60px;
+      background: var(--vui-accent);
+      color: white;
+    }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [DocsPresentations, Vflow, VxLayout],
 })
 export class LayoutForceDemoComponent {
   protected readonly distance = signal(120);
-  // A continuous layout: every tick of the simulation moves the nodes, until it settles.
+  // A continuous layout: every tick of the simulation moves the nodes; a dragged ball pins and reheats it.
   protected readonly layout = computed(() =>
     forceLayout({ linkDistance: this.distance(), chargeStrength: -500, center: { x: 400, y: 250 } }),
   );
@@ -52,12 +91,13 @@ export class LayoutForceDemoComponent {
     Array.from({ length: 12 }, (_, i) => ({
       id: `n${i}`,
       point: { x: 300 + (i % 4) * 60, y: 200 + Math.floor(i / 4) * 60 },
-      data: { text: `N${i}` },
+      data: { text: `${i}` },
     })),
   );
   protected readonly edges = createEdges(
-    Array.from({ length: 11 }, (_, i) => ({ id: `e${i}`, source: 'n0', target: `n${i + 1}` })).concat(
-      Array.from({ length: 5 }, (_, i) => ({ id: `r${i}`, source: `n${i + 1}`, target: `n${i + 6}` })),
-    ),
+    [
+      ...Array.from({ length: 11 }, (_, i) => ({ id: `e${i}`, source: 'n0', target: `n${i + 1}` })),
+      ...Array.from({ length: 5 }, (_, i) => ({ id: `r${i}`, source: `n${i + 1}`, target: `n${i + 6}` })),
+    ].map((edge) => ({ ...edge, curve: 'straight' as const })),
   );
 }

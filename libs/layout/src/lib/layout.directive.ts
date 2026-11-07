@@ -1,7 +1,7 @@
 import { DestroyRef, Directive, computed, effect, inject, input, output, signal, untracked } from '@angular/core';
 import { Node, Point, VflowComponent } from 'ngx-vflow';
-import { Observable, Subscription, isObservable, lastValueFrom } from 'rxjs';
-import { LayoutAlgorithm, LayoutGraph, LayoutResult } from './layout.types';
+import { Observable, Subject, Subscription, isObservable, lastValueFrom } from 'rxjs';
+import { LayoutAlgorithm, LayoutDragEvent, LayoutGraph, LayoutNode, LayoutResult } from './layout.types';
 import {
   NodePositionAnimator,
   NodePositionAnimatorOptions,
@@ -60,6 +60,7 @@ export class VxLayout {
   );
 
   private readonly dragging = new Set<string>();
+  private readonly drags = new Subject<LayoutDragEvent>();
   private animator: NodePositionAnimator | null = null;
   private subscription: Subscription | null = null;
   private generation = 0;
@@ -67,8 +68,15 @@ export class VxLayout {
   constructor() {
     const subscriptions = [
       this.flow.initialized.subscribe(() => this.initialized.set(true)),
-      this.flow.nodeDragStart.subscribe((event) => event.nodes.forEach((node) => this.dragging.add(node.id))),
-      this.flow.nodeDragEnd.subscribe((event) => event.nodes.forEach((node) => this.dragging.delete(node.id))),
+      this.flow.nodeDragStart.subscribe((event) => {
+        event.nodes.forEach((node) => this.dragging.add(node.id));
+        this.drags.next({ type: 'start', nodes: this.layoutNodes(event.nodes) });
+      }),
+      this.flow.nodeDrag.subscribe((event) => this.drags.next({ type: 'move', nodes: this.layoutNodes(event.nodes) })),
+      this.flow.nodeDragEnd.subscribe((event) => {
+        event.nodes.forEach((node) => this.dragging.delete(node.id));
+        this.drags.next({ type: 'end', nodes: this.layoutNodes(event.nodes) });
+      }),
     ];
     effect(() => {
       const algorithm = this.vxLayout();
@@ -92,7 +100,7 @@ export class VxLayout {
     const generation = ++this.generation;
     const current = () => generation === this.generation && this.structure() === structure;
     const graph = this.buildGraph();
-    const produced = algorithm(graph);
+    const produced = algorithm(graph, { drags: this.drags.asObservable() });
 
     if (isObservable(produced)) {
       // A continuous layout: every value lands at once, and the last one is the result.
@@ -128,16 +136,18 @@ export class VxLayout {
   }
 
   private buildGraph(): LayoutGraph {
-    const nodes = this.flow.nodes();
-    const edges = this.flow.edges();
-
     return {
-      nodes: nodes.flatMap((node) => {
-        const rect = this.flow.getNodeRect(node.id);
-        return rect ? [{ id: node.id, parentId: node.parentId?.() ?? null, ...rect }] : [];
-      }),
-      edges: edges.map((edge) => ({ id: edge.id, source: edge.source, target: edge.target })),
+      nodes: this.layoutNodes(this.flow.nodes()),
+      edges: this.flow.edges().map((edge) => ({ id: edge.id, source: edge.source, target: edge.target })),
     };
+  }
+
+  /** The nodes as an algorithm sees them, with their rendered rectangles; unmeasured nodes are left out. */
+  private layoutNodes(nodes: readonly Node[]): LayoutNode[] {
+    return nodes.flatMap((node) => {
+      const rect = this.flow.getNodeRect(node.id);
+      return rect ? [{ id: node.id, parentId: node.parentId?.() ?? null, ...rect }] : [];
+    });
   }
 
   /** Writes the flow-space positions into the node-space `point` signals, at once or animated. */

@@ -1,16 +1,30 @@
 import { createEdges, createNodes } from 'ngx-vflow';
 
-/** A small pipeline with a nested stage, shared by the layout demos. */
+/** A small pipeline with a nested stage, shared by the one-shot layout demos; the layout owns the positions. */
 export function demoNodes() {
   return createNodes([
-    { id: 'source', point: { x: 0, y: 0 }, data: { text: 'Source' } },
-    { id: 'parse', point: { x: 0, y: 0 }, data: { text: 'Parse' } },
-    { id: 'validate', point: { x: 0, y: 0 }, data: { text: 'Validate' } },
-    { id: 'stage', point: { x: 0, y: 0 }, width: 300, height: 200, data: { text: 'Transform', type: 'group' } },
-    { id: 'map', point: { x: 0, y: 0 }, parentId: 'stage', extent: null, data: { text: 'Map' } },
-    { id: 'reduce', point: { x: 0, y: 0 }, parentId: 'stage', extent: null, data: { text: 'Reduce' } },
-    { id: 'store', point: { x: 0, y: 0 }, data: { text: 'Store' } },
-    { id: 'report', point: { x: 0, y: 0 }, data: { text: 'Report' } },
+    { id: 'source', point: { x: 0, y: 0 }, draggable: false, data: { text: 'Source' } },
+    { id: 'parse', point: { x: 0, y: 0 }, draggable: false, data: { text: 'Parse' } },
+    { id: 'validate', point: { x: 0, y: 0 }, draggable: false, data: { text: 'Validate' } },
+    {
+      id: 'stage',
+      point: { x: 0, y: 0 },
+      draggable: false,
+      width: 300,
+      height: 200,
+      data: { text: 'Transform', type: 'group' },
+    },
+    { id: 'map', point: { x: 0, y: 0 }, draggable: false, parentId: 'stage', extent: null, data: { text: 'Map' } },
+    {
+      id: 'reduce',
+      point: { x: 0, y: 0 },
+      draggable: false,
+      parentId: 'stage',
+      extent: null,
+      data: { text: 'Reduce' },
+    },
+    { id: 'store', point: { x: 0, y: 0 }, draggable: false, data: { text: 'Store' } },
+    { id: 'report', point: { x: 0, y: 0 }, draggable: false, data: { text: 'Report' } },
   ]);
 }
 

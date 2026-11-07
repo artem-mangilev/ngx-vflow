@@ -26,7 +26,7 @@ import { demoEdges, demoNodes } from './graph';
       [edges]="edges"
       [background]="{ type: 'dots' }"
       (vxLayoutEnd)="flow().fitView({ padding: 0.1, duration: 300 })">
-      <docs-node *vNode="let ctx" [ctx]="ctx" />
+      <docs-node *vNode="let ctx" [ctx]="ctx" [connectable]="false" />
       <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
     </vflow>
   `,

@@ -1,12 +1,12 @@
-import { firstValueFrom, isObservable, lastValueFrom, take, toArray } from 'rxjs';
+import { Subject, isObservable } from 'rxjs';
 import { dagreLayout } from '@vflow/layout/dagre';
 import { elkLayout } from '@vflow/layout/elk';
 import { forceLayout } from '@vflow/layout/d3-force';
-import { LayoutAlgorithm, LayoutGraph, LayoutResult } from './layout.types';
+import { LayoutAlgorithm, LayoutDragEvent, LayoutGraph, LayoutResult } from './layout.types';
 
 /** The result of a one-shot algorithm. */
 async function once(algorithm: LayoutAlgorithm, graph: LayoutGraph): Promise<LayoutResult> {
-  const produced = algorithm(graph);
+  const produced = algorithm(graph, { drags: new Subject<LayoutDragEvent>() });
   if (isObservable(produced)) throw new Error('expected a one-shot layout');
   return produced;
 }
@@ -74,20 +74,37 @@ describe('layout adapters', () => {
     expect(result.positions.get('e')!.x).toBeGreaterThan(result.positions.get('d')!.x + 100);
   });
 
-  it('force emits the positions on every tick, stops on unsubscribe and completes when it settles', async () => {
-    const produced = forceLayout({ linkDistance: 60, alphaDecay: 0.2 })(graph());
+  it('force emits the positions on every tick, pins a dragged node and stops on unsubscribe', async () => {
+    const drags = new Subject<LayoutDragEvent>();
+    // alphaDecay 0.5 settles the simulation within about ten ticks.
+    const produced = forceLayout({ linkDistance: 60, alphaDecay: 0.5 })(graph(), { drags });
     expect(isObservable(produced)).toBe(true);
     if (!isObservable(produced)) return;
 
-    const first = await firstValueFrom(produced);
-    expect(first.positions.size).toBe(6);
-    const ticks = await lastValueFrom(produced.pipe(take(3), toArray()));
-    expect(ticks).toHaveLength(3);
-    expect(ticks[2].positions.get('a')).not.toEqual(ticks[0].positions.get('a'));
+    const ticks: LayoutResult[] = [];
+    const subscription = produced.subscribe((result) => ticks.push(result));
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    expect(ticks.length).toBeGreaterThan(2);
+    expect(ticks[0].positions.size).toBe(6);
+    expect(ticks.at(-1)!.positions.get('a')).not.toEqual(ticks[0].positions.get('a'));
+    // The simulation has settled: no more ticks, but no completion either.
+    const settled = ticks.length;
+    await new Promise((resolve) => setTimeout(resolve, 150));
+    expect(ticks.length).toBe(settled);
+    expect(subscription.closed).toBe(false);
 
-    const settled = await lastValueFrom(produced);
-    const a = settled.positions.get('a')!;
-    const b = settled.positions.get('b')!;
-    expect(Math.hypot(a.x - b.x, a.y - b.y)).toBeGreaterThan(30);
+    // A drag pins the node at the pointer and warms the simulation up again.
+    const dragged = { id: 'a', parentId: null, width: 100, height: 50, x: 700, y: 700 };
+    drags.next({ type: 'start', nodes: [dragged] });
+    drags.next({ type: 'move', nodes: [dragged] });
+    await new Promise((resolve) => setTimeout(resolve, 150));
+    expect(ticks.length).toBeGreaterThan(settled);
+    expect(ticks.at(-1)!.positions.get('a')).toEqual({ x: 700, y: 700 });
+    drags.next({ type: 'end', nodes: [dragged] });
+
+    subscription.unsubscribe();
+    const afterUnsubscribe = ticks.length;
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    expect(ticks.length).toBe(afterUnsubscribe);
   });
 });

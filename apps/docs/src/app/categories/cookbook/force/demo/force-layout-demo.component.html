@@ -9,7 +9,7 @@
   <div *vNode="let ctx" class="custom-node" [style.background-color]="ctx.data()">
     {{ ctx.data() }}
 
-    <span vuiPort handleType="source" position="bottom"></span>
-    <span vuiPort handleType="target" position="top"></span>
+    <span vuiPort handleType="source" position="bottom" [canStart]="false" [canAccept]="false"></span>
+    <span vuiPort handleType="target" position="top" [canStart]="false" [canAccept]="false"></span>
   </div>
 </vflow>

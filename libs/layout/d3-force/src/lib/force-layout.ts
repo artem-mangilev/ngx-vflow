@@ -20,13 +20,18 @@ interface SimulationNode {
   id: string;
   x: number;
   y: number;
+  /** Fixed position while the node is dragged. */
+  fx?: number | null;
+  fy?: number | null;
   width: number;
   height: number;
 }
 
 /**
  * Lays out a graph continuously with a [d3-force](https://github.com/d3/d3-force) simulation: the nodes move on
- * every tick until the simulation settles. Nodes start where they are; nested nodes are laid out like the others.
+ * every tick until the simulation settles, and a dragged node is pinned under the pointer and reheats it. Nodes
+ * start where they are; nested nodes are laid out like the others. The layout never completes: the simulation stays
+ * ready for the next drag.
  *
  * ```ts
  * readonly layout = forceLayout({ linkDistance: 120, chargeStrength: -400 });
@@ -35,7 +40,7 @@ interface SimulationNode {
 export function forceLayout(options: ForceLayoutOptions = {}): LayoutAlgorithm {
   const { linkDistance = 100, chargeStrength = -300, center = { x: 0, y: 0 }, collide = 8, alphaDecay } = options;
 
-  return (graph) =>
+  return (graph, context) =>
     new Observable<LayoutResult>((subscriber) => {
       const ids = new Set(graph.nodes.map((node) => node.id));
       // The simulation moves the centers of the nodes.
@@ -73,8 +78,29 @@ export function forceLayout(options: ForceLayoutOptions = {}): LayoutAlgorithm {
             nodes.map((node) => [node.id, { x: node.x - node.width / 2, y: node.y - node.height / 2 }]),
           ),
         });
-      simulation.on('tick', emit).on('end', () => subscriber.complete());
+      simulation.on('tick', emit);
 
-      return () => simulation.stop();
+      // A dragged node is fixed at the pointer, as with d3-drag, and the simulation warms up to follow it.
+      const byId = new Map(nodes.map((node) => [node.id, node]));
+      const drags = context.drags.subscribe((event) => {
+        for (const dragged of event.nodes) {
+          const node = byId.get(dragged.id);
+          if (!node) continue;
+          if (event.type === 'end') {
+            node.fx = null;
+            node.fy = null;
+          } else {
+            node.fx = dragged.x + dragged.width / 2;
+            node.fy = dragged.y + dragged.height / 2;
+          }
+        }
+        if (event.type === 'start') simulation.alphaTarget(0.3).restart();
+        if (event.type === 'end') simulation.alphaTarget(0);
+      });
+
+      return () => {
+        drags.unsubscribe();
+        simulation.stop();
+      };
     });
 }

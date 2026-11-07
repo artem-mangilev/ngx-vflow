@@ -33,9 +33,24 @@ export interface LayoutResult {
   sizes?: ReadonlyMap<string, { width: number; height: number }>;
 }
 
+/** A drag of nodes in the flow, with the nodes as they are at that moment, for continuous layouts to follow. */
+export interface LayoutDragEvent {
+  type: 'start' | 'move' | 'end';
+  nodes: LayoutNode[];
+}
+
+/** What the host offers an algorithm while it runs. */
+export interface LayoutContext {
+  /** The drags of nodes while the layout runs; a continuous layout pins a dragged node where the pointer puts it. */
+  drags: Observable<LayoutDragEvent>;
+}
+
 /**
  * Lays out a graph: at once, after a promise, or continuously through an observable whose every value is applied
  * and whose completion ends the layout. An adapter takes its options when it is created, such as
  * `dagreLayout({ rankdir: 'LR' })`, and returns a function of this type.
  */
-export type LayoutAlgorithm = (graph: LayoutGraph) => LayoutResult | Promise<LayoutResult> | Observable<LayoutResult>;
+export type LayoutAlgorithm = (
+  graph: LayoutGraph,
+  context: LayoutContext,
+) => LayoutResult | Promise<LayoutResult> | Observable<LayoutResult>;

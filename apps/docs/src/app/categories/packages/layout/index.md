@@ -33,12 +33,12 @@ export class FlowComponent {
 
 The host runs the algorithm once the flow is initialized and every node is measured, so content-sized nodes count with their real size. It runs again when the algorithm or the set of nodes and edges changes; a move or a resize does not count. A result that arrives after a newer run started is dropped, and a node being dragged keeps its position. Positions are converted into the node space of each parent, so nested nodes work with every adapter that understands them.
 
-| Input / output    | Default  | Meaning                                                                                                  |
-| ----------------- | -------- | -------------------------------------------------------------------------------------------------------- |
-| `vxLayout`        | required | A `LayoutAlgorithm`.                                                                                     |
-| `vxLayoutTrigger` | `'auto'` | `'manual'` runs the layout only through `run()` of the directive, for example from a button.             |
-| `vxLayoutAnimate` | `false`  | `true` or the options of the animator: `duration`, or `speed` with `minDuration` and `maxDuration`.      |
-| `vxLayoutEnd`     |          | Emits the result once the positions are applied, after any animation; a good moment to call `fitView()`. |
+| Input / output    | Default  | Meaning                                                                                                                                         |
+| ----------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `vxLayout`        | required | A `LayoutAlgorithm`.                                                                                                                            |
+| `vxLayoutTrigger` | `'auto'` | `'manual'` runs the layout only through `run()` of the directive, for example from a button.                                                    |
+| `vxLayoutAnimate` | `false`  | `true` or the options of the animator: `duration`, or `speed` with `minDuration` and `maxDuration`.                                             |
+| `vxLayoutEnd`     |          | Emits the result once the positions are applied, after any animation, or when a continuous layout completes; a good moment to call `fitView()`. |
 
 ## Dagre
 
@@ -54,13 +54,13 @@ The host runs the algorithm once the flow is initialized and every node is measu
 
 ## d3-force
 
-`forceLayout(options)` is a continuous layout: a [d3-force](https://github.com/d3/d3-force) simulation moves the nodes on every tick until it settles, starting from where they are. `linkDistance`, `chargeStrength`, `center`, `collide` and `alphaDecay` tune it. A continuous layout always applies at once; `vxLayoutEnd` emits when the simulation ends.
+`forceLayout(options)` is a continuous layout: a [d3-force](https://github.com/d3/d3-force) simulation moves the nodes on every tick until it settles, starting from where they are. `linkDistance`, `chargeStrength`, `center`, `collide` and `alphaDecay` tune it. Drag a ball: the host reports the drag to the algorithm, which pins the node under the pointer and warms the simulation up again, as d3-drag does. The simulation stays ready for the next drag, so this layout never completes and `vxLayoutEnd` does not fire for it. The balls of the demo are plain nodes whose whole surface is a handle with `position="center"`, so the straight edges meet them at their centers.
 
 {{ NgDocActions.demoPane("LayoutForceDemoComponent") }}
 
 ## Your own algorithm
 
-A `LayoutAlgorithm` is a function of the graph: the nodes with their rendered `width` and `height`, their `parentId` and their current `x` and `y` in flow space, and the edges. It returns `positions` in flow space, at once, as a promise or as an observable, and may return `sizes` for the parents it lays out around their children. `createNodePositionAnimator` from the package moves nodes between positions on its own, outside the host.
+A `LayoutAlgorithm` is a function of the graph and a context: the nodes with their rendered `width` and `height`, their `parentId` and their current `x` and `y` in flow space, and the edges; the context carries the drags of nodes while the layout runs, for continuous layouts to follow. It returns `positions` in flow space, at once, as a promise or as an observable, and may return `sizes` for the parents it lays out around their children. `createNodePositionAnimator` from the package moves nodes between positions on its own, outside the host.
 
 ```ts
 const columns: LayoutAlgorithm = (graph) => ({

@@ -62,14 +62,21 @@ interface EdgeCtx {
         } @else {
           <span>{{ text() }}</span>
         }
-        <span vuiPort handleType="target" position="left"></span>
-        <span vuiPort handleType="source" position="right"></span>
+        <span vuiPort handleType="target" position="left" [canStart]="connectable()" [canAccept]="connectable()"></span>
+        <span
+          vuiPort
+          handleType="source"
+          position="right"
+          [canStart]="connectable()"
+          [canAccept]="connectable()"></span>
       </div>
     }
   `,
 })
 export class DocsNodeComponent {
   readonly ctx = input.required<NodeCtx>();
+  /** Whether the ports start and accept connections; a demo whose edges are fixed turns it off. */
+  readonly connectable = input(true);
   protected readonly isGroup = computed(() => this.ctx().data()?.type === 'group');
   protected readonly title = computed(() => this.ctx().data()?.text ?? this.ctx().data()?.title ?? '');
   protected readonly text = computed(() => this.ctx().data()?.text ?? this.ctx().data()?.title ?? this.ctx().node.id);

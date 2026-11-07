@@ -1,4 +1,12 @@
-export type { LayoutAlgorithm, LayoutEdge, LayoutGraph, LayoutNode, LayoutResult } from './lib/layout.types';
+export type {
+  LayoutAlgorithm,
+  LayoutContext,
+  LayoutDragEvent,
+  LayoutEdge,
+  LayoutGraph,
+  LayoutNode,
+  LayoutResult,
+} from './lib/layout.types';
 export { VxLayout, type LayoutAnimation, type LayoutTrigger } from './lib/layout.directive';
 export {
   createNodePositionAnimator,
