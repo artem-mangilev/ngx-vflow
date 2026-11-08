@@ -14,11 +14,16 @@ import {
 
 const STORAGE_KEY = 'ngx-vflow-docs:persisted-graph';
 
-const INITIAL: { nodes: StaticNode[]; edges: StaticEdge[] } = {
+interface Snapshot {
+  nodes: StaticNode[];
+  edges: StaticEdge[];
+}
+
+const INITIAL: Snapshot = {
   nodes: [
     { id: 'draft', point: { x: 40, y: 40 }, data: { text: 'Draft' } },
-    { id: 'review', point: { x: 280, y: 120 }, data: { text: 'Review' } },
-    { id: 'done', point: { x: 520, y: 40 }, data: { text: 'Done' } },
+    { id: 'review', point: { x: 240, y: 130 }, data: { text: 'Review' } },
+    { id: 'done', point: { x: 440, y: 40 }, data: { text: 'Done' } },
   ],
   edges: [
     { id: 'draft-review', source: 'draft', target: 'review', curve: 'smooth-step' },
@@ -26,77 +31,93 @@ const INITIAL: { nodes: StaticNode[]; edges: StaticEdge[] } = {
   ],
 };
 
+/** The graph is restored from `localStorage` when the demo loads, so a reload is the check that a save worked. */
 @Component({
   imports: [DocsPresentations, Vflow],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
+    :host {
+      display: block;
+      width: 100%;
+    }
+    .demo {
+      container-type: inline-size;
+    }
+    /* Both columns have a fixed height and their own scrolling, so saving never moves the flow. */
+    .pair {
+      display: grid;
+      grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+      height: 300px;
+    }
+    .pair > * + * {
+      border-left: 1px solid var(--vui-border);
+    }
+    @container (max-width: 560px) {
+      .pair {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-rows: 1fr 1fr;
+        height: 440px;
+      }
+      .pair > * + * {
+        border-left: 0;
+        border-top: 1px solid var(--vui-border);
+      }
+    }
     vflow {
-      height: 260px;
+      height: 100%;
     }
     pre {
       margin: 0;
       padding: 12px 14px;
-      border-top: 1px solid var(--vui-border);
-      font-size: 12px;
-      max-height: 180px;
+      height: 100%;
+      box-sizing: border-box;
       overflow: auto;
+      font-size: 12px;
+      color: var(--vui-muted);
     }
   `,
   template: `
     <section class="demo" data-testid="persisting-graph-demo">
       <div class="controls">
         <button class="button" type="button" (click)="save()">Save</button>
-        <button class="button" type="button" (click)="restore()">Restore</button>
-        <button class="button" type="button" (click)="reset()">Reset</button>
         <p>{{ status() }}</p>
       </div>
-      <vflow [nodes]="nodes()" [edges]="edges()">
-        <docs-node *vNode="let ctx" [ctx]="ctx" />
-        <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
-      </vflow>
-      <pre aria-label="Saved graph" data-testid="snapshot">{{ snapshot() || 'Nothing saved yet.' }}</pre>
+      <div class="pair">
+        <vflow [nodes]="nodes()" [edges]="edges()">
+          <docs-node *vNode="let ctx" [ctx]="ctx" />
+          <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
+        </vflow>
+        <pre aria-label="Saved graph" data-testid="snapshot">{{ snapshot() || 'Nothing saved yet.' }}</pre>
+      </div>
     </section>
   `,
 })
 export class PersistingGraphDemoComponent {
-  protected readonly nodes = signal<Node[]>(createNodes(INITIAL.nodes));
-  protected readonly edges = signal<Edge[]>(createEdges(INITIAL.edges));
-  protected readonly snapshot = signal(readStorage() ?? '');
+  private readonly saved = readStorage();
+
+  protected readonly nodes = signal<Node[]>(createNodes(this.saved?.nodes ?? INITIAL.nodes));
+  protected readonly edges = signal<Edge[]>(createEdges(this.saved?.edges ?? INITIAL.edges));
+  protected readonly snapshot = signal(this.saved ? print(this.saved) : '');
   protected readonly status = signal(
-    readStorage() ? 'A saved graph is waiting in localStorage.' : 'Drag a node, then save.',
+    this.saved ? 'Restored from localStorage on load.' : 'Drag a node, save, then reload the page.',
   );
 
   protected save(): void {
-    const text = JSON.stringify({ nodes: toStaticNodes(this.nodes()), edges: toStaticEdges(this.edges()) }, null, 2);
-    localStorage.setItem(STORAGE_KEY, text);
-    this.snapshot.set(text);
-    this.status.set('Saved. Reload the page and restore.');
-  }
-
-  protected restore(): void {
-    const text = readStorage();
-    if (!text) {
-      this.status.set('Nothing to restore.');
-      return;
-    }
-    const { nodes, edges } = JSON.parse(text) as { nodes: StaticNode[]; edges: StaticEdge[] };
-    this.nodes.set(createNodes(nodes));
-    this.edges.set(createEdges(edges));
-    this.status.set('Restored from localStorage.');
-  }
-
-  protected reset(): void {
-    localStorage.removeItem(STORAGE_KEY);
-    this.nodes.set(createNodes(INITIAL.nodes));
-    this.edges.set(createEdges(INITIAL.edges));
-    this.snapshot.set('');
-    this.status.set('Back to the initial graph.');
+    const snapshot: Snapshot = { nodes: toStaticNodes(this.nodes()), edges: toStaticEdges(this.edges()) };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(snapshot));
+    this.snapshot.set(print(snapshot));
+    this.status.set('Saved. Reload the page: the graph comes back as it is now.');
   }
 }
 
-function readStorage(): string | null {
+function print(snapshot: Snapshot): string {
+  return JSON.stringify(snapshot, null, 2);
+}
+
+function readStorage(): Snapshot | null {
   try {
-    return localStorage.getItem(STORAGE_KEY);
+    const text = localStorage.getItem(STORAGE_KEY);
+    return text ? (JSON.parse(text) as Snapshot) : null;
   } catch {
     return null;
   }

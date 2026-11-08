@@ -34,6 +34,6 @@ A `size` change with `mode: 'auto'` on an axis is a measurement of the content, 
 
 ## Example
 
-Drag the nodes, save, reload the page and restore: the graph comes back from `localStorage` as it was. The snapshot is printed as it is saved.
+Drag the nodes and save, then reload the page: the demo restores the graph from `localStorage` when it loads, so it comes back as you left it. The snapshot is printed next to the flow as it is saved.
 
 {{ NgDocActions.demoPane("PersistingGraphDemoComponent") }}
