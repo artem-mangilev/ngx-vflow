@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { Vflow, createNodes } from 'ngx-vflow';
 import { VxLayout, LayoutAlgorithm } from '@vflow/layout';
+import { of } from 'rxjs';
 
 @Component({
   template: `<vflow [vxLayout]="algorithm" [nodes]="nodes"><div *vNode class="card"></div></vflow>`,
@@ -12,7 +13,7 @@ class HostComponent {
   public readonly runs: number[] = [];
   public readonly algorithm: LayoutAlgorithm = (graph) => {
     this.runs.push(graph.nodes.length);
-    return { positions: new Map() };
+    return of({ positions: new Map() });
   };
   public readonly nodes = createNodes([{ id: 'a', point: { x: 0, y: 0 } }]);
 }

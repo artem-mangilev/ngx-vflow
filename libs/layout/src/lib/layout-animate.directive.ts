@@ -1,14 +1,12 @@
 import { DestroyRef, Directive, computed, inject, input } from '@angular/core';
 import { Node, Point } from 'ngx-vflow';
 import { NodePositionAnimatorOptions, createNodePositionAnimator } from './node-position-animator';
-import { LayoutPositionWriter, VX_LAYOUT_POSITION_WRITER, placeNodes } from './position-writer';
-
-/** Whether the nodes move to their new positions animated, with the options of the animator, or at once. */
-export type LayoutAnimation = boolean | NodePositionAnimatorOptions;
+import { LayoutPositionWriter, VX_LAYOUT_POSITION_WRITER } from './position-writer';
 
 /**
  * Animates the nodes into the layouts of `VxLayout` instead of placing them at once. The first layout, which lands
- * before the flow paints, and the values of a continuous layout are placed at once regardless.
+ * before the flow paints, is placed at once regardless. Meant for layouts with one result: a continuous layout moves
+ * the nodes itself.
  *
  * ```html
  * <vflow [vxLayout]="layout" vxLayoutAnimate [nodes]="nodes" [edges]="edges" />
@@ -20,25 +18,20 @@ export type LayoutAnimation = boolean | NodePositionAnimatorOptions;
   providers: [{ provide: VX_LAYOUT_POSITION_WRITER, useExisting: VxLayoutAnimate }],
 })
 export class VxLayoutAnimate implements LayoutPositionWriter {
-  /** `true`, or the options of the animator: `duration`, or `speed` within `minDuration` and `maxDuration`. */
-  public readonly vxLayoutAnimate = input<LayoutAnimation, LayoutAnimation | ''>(true, {
-    transform: (value) => value === '' || value,
-  });
+  /** The options of the animator: `duration`, or `speed` within `minDuration` and `maxDuration`. */
+  public readonly vxLayoutAnimate = input<NodePositionAnimatorOptions, NodePositionAnimatorOptions | ''>(
+    {},
+    { transform: (value) => value || {} },
+  );
 
-  private readonly animator = computed(() => {
-    const animation = this.vxLayoutAnimate();
-    return createNodePositionAnimator(typeof animation === 'object' ? animation : {});
-  });
+  /** One animator per set of options; an animation in progress finishes with the animator it started with. */
+  private readonly animator = computed(() => createNodePositionAnimator(this.vxLayoutAnimate()));
 
   constructor() {
     inject(DestroyRef).onDestroy(() => this.cancel());
   }
 
-  public write(targets: ReadonlyMap<Node, Point>): Promise<boolean> {
-    if (!this.vxLayoutAnimate()) {
-      placeNodes(targets);
-      return Promise.resolve(true);
-    }
+  public write(targets: ReadonlyMap<Node, Point>): Promise<void> {
     return this.animator().animate(targets);
   }
 

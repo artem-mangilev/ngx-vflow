@@ -1,6 +1,7 @@
 import { graphlib, layout } from '@dagrejs/dagre';
 import { LayoutAlgorithm } from '@vflow/layout';
 import { Point } from 'ngx-vflow';
+import { of } from 'rxjs';
 
 /** The graph options of dagre; see https://github.com/dagrejs/dagre/wiki#configuring-the-layout. */
 export interface DagreLayoutOptions {
@@ -59,6 +60,6 @@ export function dagreLayout({ padding = 20, ...options }: DagreLayoutOptions = {
       if (parents.has(node.id)) sizes.set(node.id, { width: width + inflate * 2, height: height + inflate * 2 });
     }
 
-    return { positions, sizes };
+    return of({ positions, sizes });
   };
 }

@@ -46,11 +46,9 @@ export interface LayoutContext {
 }
 
 /**
- * Lays out a graph: at once, after a promise, or continuously through an observable whose every value is applied
- * and whose completion ends the layout. An adapter takes its options when it is created, such as
- * `dagreLayout({ rankdir: 'LR' })`, and returns a function of this type.
+ * Lays out a graph: an observable whose every value is applied and whose completion ends the layout. A one-shot
+ * layout emits one result (`of(result)`, or `defer` around a promise); a continuous one emits a result per step and
+ * may never complete. An adapter takes its options when it is created, such as `dagreLayout({ rankdir: 'LR' })`,
+ * and returns a function of this type.
  */
-export type LayoutAlgorithm = (
-  graph: LayoutGraph,
-  context: LayoutContext,
-) => LayoutResult | Promise<LayoutResult> | Observable<LayoutResult>;
+export type LayoutAlgorithm = (graph: LayoutGraph, context: LayoutContext) => Observable<LayoutResult>;

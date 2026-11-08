@@ -6,8 +6,8 @@ import { Node, Point } from 'ngx-vflow';
  * on the flow element provides a writer through {@link VX_LAYOUT_POSITION_WRITER}, as `VxLayoutAnimate` does.
  */
 export interface LayoutPositionWriter {
-  /** Moves the nodes to the targets; resolves `true` once they are there, `false` when a later write replaced it. */
-  write(targets: ReadonlyMap<Node, Point>): Promise<boolean>;
+  /** Moves the nodes to the targets; resolves once they are there, or once a later write or `cancel` replaced it. */
+  write(targets: ReadonlyMap<Node, Point>): Promise<void>;
   /** Stops a write in progress, before a new layout starts. */
   cancel(): void;
 }

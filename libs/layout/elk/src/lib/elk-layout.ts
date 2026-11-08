@@ -1,6 +1,7 @@
 import ELK, { ElkNode, LayoutOptions } from 'elkjs/lib/elk.bundled.js';
 import { LayoutAlgorithm, LayoutNode } from '@vflow/layout';
 import { Point } from 'ngx-vflow';
+import { defer } from 'rxjs';
 
 /** The ELK algorithms the adapter offers; `layered` suits directed graphs, `mrtree` trees, `stress` and `force` undirected ones. */
 export type ElkAlgorithm = 'layered' | 'mrtree' | 'stress' | 'force' | 'radial' | 'box' | 'rectpacking';
@@ -88,43 +89,44 @@ export function elkLayout(options: ElkLayoutOptions = {}): LayoutAlgorithm {
   const elk = new ELK();
   const layoutOptions = toLayoutOptions(options);
 
-  return async (graph) => {
-    const ids = new Set(graph.nodes.map((node) => node.id));
-    const childrenOf = new Map<string | null, LayoutNode[]>();
-    for (const node of graph.nodes) {
-      const parent = node.parentId && ids.has(node.parentId) ? node.parentId : null;
-      childrenOf.set(parent, [...(childrenOf.get(parent) ?? []), node]);
-    }
-    const toElk = (node: LayoutNode): ElkNode => ({
-      id: node.id,
-      width: node.width,
-      height: node.height,
-      children: (childrenOf.get(node.id) ?? []).map(toElk),
-    });
-    const root: ElkNode = {
-      id: 'root',
-      layoutOptions,
-      children: (childrenOf.get(null) ?? []).map(toElk),
-      edges: graph.edges
-        .filter((edge) => edge.source !== edge.target && ids.has(edge.source) && ids.has(edge.target))
-        .map((edge) => ({ id: edge.id, sources: [edge.source], targets: [edge.target] })),
-    };
-
-    const laidOut = await elk.layout(root);
-
-    // ELK positions children relative to their parent; the result is in flow space.
-    const positions = new Map<string, Point>();
-    const sizes = new Map<string, { width: number; height: number }>();
-    const collect = (node: ElkNode, origin: Point) => {
-      for (const child of node.children ?? []) {
-        const position = { x: origin.x + (child.x ?? 0), y: origin.y + (child.y ?? 0) };
-        positions.set(child.id, position);
-        if (child.children?.length) sizes.set(child.id, { width: child.width ?? 0, height: child.height ?? 0 });
-        collect(child, position);
+  return (graph) =>
+    defer(async () => {
+      const ids = new Set(graph.nodes.map((node) => node.id));
+      const childrenOf = new Map<string | null, LayoutNode[]>();
+      for (const node of graph.nodes) {
+        const parent = node.parentId && ids.has(node.parentId) ? node.parentId : null;
+        childrenOf.set(parent, [...(childrenOf.get(parent) ?? []), node]);
       }
-    };
-    collect(laidOut, { x: 0, y: 0 });
+      const toElk = (node: LayoutNode): ElkNode => ({
+        id: node.id,
+        width: node.width,
+        height: node.height,
+        children: (childrenOf.get(node.id) ?? []).map(toElk),
+      });
+      const root: ElkNode = {
+        id: 'root',
+        layoutOptions,
+        children: (childrenOf.get(null) ?? []).map(toElk),
+        edges: graph.edges
+          .filter((edge) => edge.source !== edge.target && ids.has(edge.source) && ids.has(edge.target))
+          .map((edge) => ({ id: edge.id, sources: [edge.source], targets: [edge.target] })),
+      };
 
-    return { positions, sizes };
-  };
+      const laidOut = await elk.layout(root);
+
+      // ELK positions children relative to their parent; the result is in flow space.
+      const positions = new Map<string, Point>();
+      const sizes = new Map<string, { width: number; height: number }>();
+      const collect = (node: ElkNode, origin: Point) => {
+        for (const child of node.children ?? []) {
+          const position = { x: origin.x + (child.x ?? 0), y: origin.y + (child.y ?? 0) };
+          positions.set(child.id, position);
+          if (child.children?.length) sizes.set(child.id, { width: child.width ?? 0, height: child.height ?? 0 });
+          collect(child, position);
+        }
+      };
+      collect(laidOut, { x: 0, y: 0 });
+
+      return { positions, sizes };
+    });
 }

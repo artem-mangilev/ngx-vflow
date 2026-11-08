@@ -66,10 +66,8 @@ The animation is a position writer: a directive that provides `VX_LAYOUT_POSITIO
 
 ## Your own algorithm
 
-A `LayoutAlgorithm` is a function of the graph and a context: the nodes with their rendered `width` and `height`, their `parentId` and their current `x` and `y` in flow space, and the edges; the context carries the drags of nodes while the layout runs, for continuous layouts to follow. It returns `positions` in flow space, at once, as a promise or as an observable, and may return `sizes` for the parents it lays out around their children. `createNodePositionAnimator` from the package moves nodes between positions on its own, outside the host: `animate(targets)` takes a map of nodes to node-space positions.
+A `LayoutAlgorithm` is a function of the graph and a context: the nodes with their rendered `width` and `height`, their `parentId` and their current `x` and `y` in flow space, and the edges; the context carries the drags of nodes while the layout runs, for continuous layouts to follow. It returns an observable of results, `positions` in flow space and optional `sizes` for the parents it lays out around their children: one value for a one-shot layout (`of(result)`, or `defer` around a promise), a value per step for a continuous one. `createNodePositionAnimator` from the package moves nodes between positions on its own, outside the host: `animate(targets)` takes a map of nodes to node-space positions.
 
 ```ts
-const columns: LayoutAlgorithm = (graph) => ({
-  positions: new Map(graph.nodes.map((node, i) => [node.id, { x: i * (node.width + 40), y: 0 }])),
-});
+const columns: LayoutAlgorithm = (graph) => of({ positions: new Map(graph.nodes.map((node, i) => [node.id, { x: i * (node.width + 40), y: 0 }])) });
 ```

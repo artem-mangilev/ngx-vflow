@@ -1,14 +1,12 @@
-import { Subject, isObservable } from 'rxjs';
+import { Subject, lastValueFrom } from 'rxjs';
 import { dagreLayout } from '@vflow/layout/dagre';
 import { elkLayout } from '@vflow/layout/elk';
 import { forceLayout } from '@vflow/layout/d3-force';
 import { LayoutAlgorithm, LayoutDragEvent, LayoutGraph, LayoutResult } from './layout.types';
 
 /** The result of a one-shot algorithm. */
-async function once(algorithm: LayoutAlgorithm, graph: LayoutGraph): Promise<LayoutResult> {
-  const produced = algorithm(graph, { drags: new Subject<LayoutDragEvent>() });
-  if (isObservable(produced)) throw new Error('expected a one-shot layout');
-  return produced;
+function once(algorithm: LayoutAlgorithm, graph: LayoutGraph): Promise<LayoutResult> {
+  return lastValueFrom(algorithm(graph, { drags: new Subject<LayoutDragEvent>() }));
 }
 
 function graph(): LayoutGraph {
@@ -81,8 +79,6 @@ describe('layout adapters', () => {
     const drags = new Subject<LayoutDragEvent>();
     // alphaDecay 0.5 settles the simulation within about ten ticks.
     const produced = forceLayout({ linkDistance: 60, alphaDecay: 0.5 })(graph(), { drags });
-    expect(isObservable(produced)).toBe(true);
-    if (!isObservable(produced)) return;
 
     const ticks: LayoutResult[] = [];
     const subscription = produced.subscribe((result) => ticks.push(result));

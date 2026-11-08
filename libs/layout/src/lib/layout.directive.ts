@@ -11,14 +11,14 @@ import {
   untracked,
 } from '@angular/core';
 import { Node, Point, VFLOW_INITIALIZATION_GATE, VflowComponent, VflowInitializationGate } from 'ngx-vflow';
-import { Observable, Subject, Subscription, concatMap, finalize, from, isObservable, of } from 'rxjs';
+import { Subject, Subscription, concatMap, finalize } from 'rxjs';
 import { LayoutAlgorithm, LayoutDragEvent, LayoutGraph, LayoutNode, LayoutResult } from './layout.types';
 import { LayoutPositionWriter, VX_LAYOUT_POSITION_WRITER, placeNodes } from './position-writer';
 
 const IMMEDIATE_WRITER: LayoutPositionWriter = {
   write: (targets) => {
     placeNodes(targets);
-    return Promise.resolve(true);
+    return Promise.resolve();
   },
   cancel: () => void 0,
 };
@@ -26,8 +26,8 @@ const IMMEDIATE_WRITER: LayoutPositionWriter = {
 /**
  * Lays out the nodes of the flow with a `LayoutAlgorithm` and writes the positions into their `point` signals. The
  * layout runs once every node is measured, so content-sized nodes count with their real size, and again when the
- * algorithm or the set of nodes and edges changes. A node being dragged keeps its position, and a run that a newer
- * one replaces is dropped.
+ * algorithm or the set of nodes and edges changes, or on `run()`. A node being dragged keeps its position, and a run
+ * that a newer one replaces is dropped.
  *
  * The first layout happens before the first paint: the directive holds the initialization of the flow until the
  * positions are in, so the graph appears laid out and `(initialized)` sees it that way. Positions are placed at
@@ -46,13 +46,8 @@ export class VxLayout implements VflowInitializationGate {
   private readonly errors = inject(ErrorHandler);
   private readonly writer = inject(VX_LAYOUT_POSITION_WRITER, { optional: true, self: true }) ?? IMMEDIATE_WRITER;
 
-  /**
-   * The algorithm, such as `dagreLayout({ rankdir: 'LR' })`. Create it once: a new function starts a new layout.
-   * Without one (`<vflow vxLayout>`) the layout runs only through `run(algorithm)`, for example from a button.
-   */
-  public readonly vxLayout = input<LayoutAlgorithm | null, LayoutAlgorithm | null | ''>(null, {
-    transform: (value) => value || null,
-  });
+  /** The algorithm, such as `dagreLayout({ rankdir: 'LR' })`. Create it once: a new function starts a new layout. */
+  public readonly vxLayout = input.required<LayoutAlgorithm>();
 
   /** The result of a finished layout, after any animation. */
   public readonly vxLayoutEnd = output<LayoutResult>();
@@ -96,13 +91,9 @@ export class VxLayout implements VflowInitializationGate {
       }),
     ];
     effect(() => {
-      const algorithm = this.vxLayout();
+      this.vxLayout();
       this.structure();
-      if (!this.ready()) return;
-      // Without an algorithm there is nothing to wait for before the flow paints.
-      untracked(() =>
-        algorithm ? this.run(algorithm).catch(this.errors.handleError.bind(this.errors)) : this.paint(),
-      );
+      if (this.ready()) untracked(() => this.run());
     });
     inject(DestroyRef).onDestroy(() => {
       subscriptions.forEach((subscription) => subscription.unsubscribe());
@@ -116,43 +107,21 @@ export class VxLayout implements VflowInitializationGate {
     this.measured.set(true);
   }
 
-  /**
-   * Runs the layout now, with the bound algorithm or the given one. Resolves with the result once applied, with the
-   * last value of a continuous layout once it completes, or with `null` when a newer run replaced it.
-   */
-  public run(algorithm: LayoutAlgorithm | null = untracked(this.vxLayout)): Promise<LayoutResult | null> {
-    if (!algorithm) throw new Error('VxLayout: no algorithm to run; bind [vxLayout] or pass one to run()');
+  /** Runs the layout now, for example from a button after the nodes were moved. `vxLayoutEnd` tells when it is in. */
+  public run(): void {
     this.stop();
-    const produced = algorithm(this.graph(), { drags: this.drags.asObservable() });
-    // A continuous layout places every value at once; a single result may animate.
-    const continuous = isObservable(produced);
-    const results: Observable<LayoutResult> = continuous ? produced : from(Promise.resolve(produced));
-
-    return new Promise((resolve, reject) => {
-      let last: LayoutResult | null = null;
-      let outcome: 'replaced' | 'completed' | Error = 'replaced';
-      this.running = results
-        .pipe(
-          concatMap((result) => {
-            const applied = this.apply(result, !continuous);
-            return applied instanceof Promise ? applied : of(applied);
-          }),
-          finalize(() => {
-            // A layout that fails or ends empty must not keep the flow hidden.
-            this.paint();
-            if (outcome instanceof Error) reject(outcome);
-            else resolve(outcome === 'completed' ? last : null);
-          }),
-        )
-        .subscribe({
-          next: (result) => (last = result ?? last),
-          error: (error) => (outcome = error instanceof Error ? error : new Error(String(error))),
-          complete: () => {
-            outcome = 'completed';
-            if (last) this.vxLayoutEnd.emit(last);
-          },
-        });
-    });
+    let last: LayoutResult | null = null;
+    this.running = untracked(this.vxLayout)(this.graph(), { drags: this.drags.asObservable() })
+      .pipe(
+        concatMap((result) => this.apply(result)),
+        // However the layout ends, the flow paints.
+        finalize(() => this.paint()),
+      )
+      .subscribe({
+        next: (result) => (last = result),
+        error: (error) => this.errors.handleError(error),
+        complete: () => last && this.vxLayoutEnd.emit(last),
+      });
   }
 
   private stop(): void {
@@ -182,10 +151,10 @@ export class VxLayout implements VflowInitializationGate {
   }
 
   /**
-   * Writes the flow-space positions into the node-space `point` signals. Resolves with the result once it is in
-   * place, or `null` when a later write replaced it. The first positions land at once, before the first paint.
+   * Writes the flow-space positions into the node-space `point` signals and resolves once they are in. Before the
+   * first paint they are placed at once, whatever the writer; the flow then paints laid out.
    */
-  private apply(result: LayoutResult, animate: boolean): LayoutResult | Promise<LayoutResult | null> {
+  private async apply(result: LayoutResult): Promise<LayoutResult> {
     const nodes = this.flow.nodes();
     const byId = new Map(nodes.map((node) => [node.id, node]));
     for (const [id, size] of result.sizes ?? []) {
@@ -201,11 +170,12 @@ export class VxLayout implements VflowInitializationGate {
       targets.set(node, { x: position.x - origin.x, y: position.y - origin.y });
     }
 
-    if (animate && this.release === null) {
-      return this.writer.write(targets).then((arrived) => (arrived ? result : null));
+    if (this.release) {
+      placeNodes(targets);
+      this.paint();
+    } else {
+      await this.writer.write(targets);
     }
-    placeNodes(targets);
-    this.paint();
     return result;
   }
 
