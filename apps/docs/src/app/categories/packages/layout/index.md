@@ -2,7 +2,7 @@
 keyword: 'PackagesLayout'
 ---
 
-`@vflow/layout` lays the nodes of a flow out automatically. The package has three parts: a layout contract, a host directive that measures the nodes, runs an algorithm and writes the positions back, and adapters for layout engines in secondary entry points, each with an optional dependency.
+`@vflow/layout` lays the nodes of a flow out automatically. The package has three parts: a layout contract, a host directive that measures the nodes, runs an algorithm and writes the positions back, with a companion directive that animates them, and adapters for layout engines in secondary entry points, each with an optional dependency.
 
 ## Installation
 
@@ -18,11 +18,11 @@ The package depends on `ngx-vflow` 3 and `rxjs`. Install only the engines you im
 ## Usage
 
 ```html
-<vflow [vxLayout]="layout" [vxLayoutAnimate]="true" [nodes]="nodes" [edges]="edges" />
+<vflow [vxLayout]="layout" vxLayoutAnimate [nodes]="nodes" [edges]="edges" />
 ```
 
 ```ts
-import { VxLayout } from '@vflow/layout';
+import { VxLayout, VxLayoutAnimate } from '@vflow/layout';
 import { dagreLayout } from '@vflow/layout/dagre';
 
 export class FlowComponent {
@@ -31,14 +31,20 @@ export class FlowComponent {
 }
 ```
 
-The host runs the algorithm once every node is measured, so content-sized nodes count with their real size, and before the flow paints: it holds the initialization of the flow until the first positions are in, so the graph appears laid out, `(initialized)` sees it that way and a `fitView()` there fits the layout. The first layout never animates; `vxLayoutAnimate` applies to the layouts that follow. The host runs again when the algorithm or the set of nodes and edges changes; a move or a resize does not count. A result that arrives after a newer run started is dropped, and a node being dragged keeps its position. Positions are converted into the node space of each parent, so nested nodes work with every adapter that understands them.
+The host runs the algorithm once every node is measured, so content-sized nodes count with their real size, and before the flow paints: it holds the initialization of the flow until the first positions are in, so the graph appears laid out, `(initialized)` sees it that way and a `fitView()` there fits the layout. The host runs again when the algorithm or the set of nodes and edges changes; a move or a resize does not count. A run that a newer one replaces is dropped, and a node being dragged keeps its position. Positions are converted into the node space of each parent, so nested nodes work with every adapter that understands them.
 
-| Input / output    | Default  | Meaning                                                                                                                                                                                                                                       |
-| ----------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `vxLayout`        | required | A `LayoutAlgorithm`.                                                                                                                                                                                                                          |
-| `vxLayoutTrigger` | `'auto'` | `'manual'` runs the layout only through `run()` of the directive, for example from a button.                                                                                                                                                  |
-| `vxLayoutAnimate` | `false`  | `true` or the options of the animator: `duration`, or `speed` with `minDuration` and `maxDuration`.                                                                                                                                           |
-| `vxLayoutEnd`     |          | Emits the result once the positions are applied, after any animation, or when a continuous layout completes; a good moment to call `fitView()`. The first one comes before the flow paints, so fit without a duration there, as the demos do. |
+| `VxLayout`    | Default | Meaning                                                                                                                                                                                                                                       |
+| ------------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `vxLayout`    | `null`  | A `LayoutAlgorithm`. Without one (`<vflow vxLayout>`) the layout runs only through `run(algorithm)` of the directive, for example from a button.                                                                                              |
+| `vxLayoutEnd` |         | Emits the result once the positions are applied, after any animation, or when a continuous layout completes; a good moment to call `fitView()`. The first one comes before the flow paints, so fit without a duration there, as the demos do. |
+
+The host places the positions at once. `VxLayoutAnimate` on the same element animates the nodes into the layouts instead, except the first one, which lands before the flow paints, and the values of a continuous layout.
+
+| `VxLayoutAnimate` | Default | Meaning                                                                                             |
+| ----------------- | ------- | --------------------------------------------------------------------------------------------------- |
+| `vxLayoutAnimate` | `true`  | `true` or the options of the animator: `duration`, or `speed` with `minDuration` and `maxDuration`. |
+
+The animation is a position writer: a directive that provides `VX_LAYOUT_POSITION_WRITER` on the flow element writes the positions in place of the host, so a different transition takes the same route.
 
 ## Dagre
 
@@ -60,7 +66,7 @@ The host runs the algorithm once every node is measured, so content-sized nodes 
 
 ## Your own algorithm
 
-A `LayoutAlgorithm` is a function of the graph and a context: the nodes with their rendered `width` and `height`, their `parentId` and their current `x` and `y` in flow space, and the edges; the context carries the drags of nodes while the layout runs, for continuous layouts to follow. It returns `positions` in flow space, at once, as a promise or as an observable, and may return `sizes` for the parents it lays out around their children. `createNodePositionAnimator` from the package moves nodes between positions on its own, outside the host.
+A `LayoutAlgorithm` is a function of the graph and a context: the nodes with their rendered `width` and `height`, their `parentId` and their current `x` and `y` in flow space, and the edges; the context carries the drags of nodes while the layout runs, for continuous layouts to follow. It returns `positions` in flow space, at once, as a promise or as an observable, and may return `sizes` for the parents it lays out around their children. `createNodePositionAnimator` from the package moves nodes between positions on its own, outside the host: `animate(targets)` takes a map of nodes to node-space positions.
 
 ```ts
 const columns: LayoutAlgorithm = (graph) => ({

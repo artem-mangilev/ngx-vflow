@@ -1,8 +1,9 @@
-import { ChangeDetectionStrategy, Component, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ErrorHandler, signal, viewChild } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { Vflow, createEdges, createNodes } from 'ngx-vflow';
 import { Subject } from 'rxjs';
 import { dispatchMouse } from '../../../ngx-vflow/src/lib/vflow/gestures/pointer-events.testing';
+import { VxLayoutAnimate } from './layout-animate.directive';
 import { VxLayout } from './layout.directive';
 import { LayoutAlgorithm, LayoutGraph, LayoutResult } from './layout.types';
 
@@ -11,7 +12,6 @@ import { LayoutAlgorithm, LayoutGraph, LayoutResult } from './layout.types';
   template: `
     <vflow
       [vxLayout]="algorithm()"
-      [vxLayoutTrigger]="trigger()"
       [vxLayoutAnimate]="animate()"
       (vxLayoutEnd)="ended.push($event)"
       (initialized)="initializedAt.push(nodes()[0].point())"
@@ -35,7 +35,7 @@ import { LayoutAlgorithm, LayoutGraph, LayoutResult } from './layout.types';
       height: 50px;
     }
   `,
-  imports: [Vflow, VxLayout],
+  imports: [Vflow, VxLayout, VxLayoutAnimate],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 class LayoutHostComponent {
@@ -44,12 +44,13 @@ class LayoutHostComponent {
   public readonly ended: LayoutResult[] = [];
   /** The position of the first node when the flow initialized. */
   public readonly initializedAt: { x: number; y: number }[] = [];
-  public readonly trigger = signal<'auto' | 'manual'>('auto');
   public readonly animate = signal<boolean | { duration: number }>(false);
-  public readonly algorithm = signal<LayoutAlgorithm>((graph) => {
+  public readonly columns: LayoutAlgorithm = (graph) => {
     this.graphs.push(graph);
     return { positions: new Map(graph.nodes.map((node, i) => [node.id, { x: i * 150, y: 300 }])) };
-  });
+  };
+  /** `null` binds no algorithm: the layout then runs only through `run(algorithm)`. */
+  public readonly algorithm = signal<LayoutAlgorithm | null>(this.columns);
   public readonly nodes = signal(
     createNodes([
       { id: 'a', point: { x: 0, y: 0 }, data: {} },
@@ -126,10 +127,26 @@ describe('VxLayout', () => {
     expect(host.initializedAt).toEqual([{ x: 640, y: 480 }]);
   });
 
-  it('does not hold the initialization of the flow with the manual trigger', async () => {
+  it('lets the flow paint when the layout fails, and reports the error', async () => {
+    const errors: unknown[] = [];
+    TestBed.configureTestingModule({
+      imports: [LayoutHostComponent],
+      providers: [{ provide: ErrorHandler, useValue: { handleError: (error: unknown) => errors.push(error) } }],
+    });
+    const fixture = TestBed.createComponent(LayoutHostComponent);
+    fixture.componentInstance.algorithm.set(() => Promise.reject(new Error('no layout')));
+    await settle(fixture);
+    const root = fixture.nativeElement.querySelector('vflow') as HTMLElement;
+
+    expect(root.classList.contains('v-initializing')).toBe(false);
+    expect(fixture.componentInstance.initializedAt).toEqual([{ x: 0, y: 0 }]);
+    expect(errors.map((error) => (error as Error).message)).toEqual(['no layout']);
+  });
+
+  it('does not hold the initialization of the flow without an algorithm', async () => {
     TestBed.configureTestingModule({ imports: [LayoutHostComponent] });
     const fixture = TestBed.createComponent(LayoutHostComponent);
-    fixture.componentInstance.trigger.set('manual');
+    fixture.componentInstance.algorithm.set(null);
     await settle(fixture);
 
     expect(fixture.componentInstance.initializedAt).toEqual([{ x: 0, y: 0 }]);
@@ -245,17 +262,18 @@ describe('VxLayout', () => {
     expect(host.ended.at(-1)!.positions.get('a')).toEqual({ x: 2, y: 2 });
   });
 
-  it('runs only on demand with the manual trigger', async () => {
+  it('runs only on demand, with the given algorithm, when none is bound', async () => {
     TestBed.configureTestingModule({ imports: [LayoutHostComponent] });
     const fixture = TestBed.createComponent(LayoutHostComponent);
-    fixture.componentInstance.trigger.set('manual');
+    fixture.componentInstance.algorithm.set(null);
     await settle(fixture);
     const host = fixture.componentInstance;
 
     expect(host.graphs).toHaveLength(0);
     expect(node(fixture, 'a').point()).toEqual({ x: 0, y: 0 });
+    expect(() => host.layout().run()).toThrow();
 
-    const result = await host.layout().run();
+    const result = await host.layout().run(host.columns);
     expect(result?.positions.get('a')).toEqual({ x: 0, y: 300 });
     expect(node(fixture, 'a').point()).toEqual({ x: 0, y: 300 });
     expect(host.graphs).toHaveLength(1);

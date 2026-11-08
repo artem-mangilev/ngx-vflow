@@ -1,7 +1,7 @@
 import { Node, Point } from 'ngx-vflow';
 
-/** Node-space target positions, by node id. */
-export type NodePositionTargets = ReadonlyMap<string, Point>;
+/** Node-space target positions, by node. */
+export type NodePositionTargets = ReadonlyMap<Node, Point>;
 
 export interface NodePositionAnimatorOptions {
   /** Speed of the node that travels farthest, in flow units per second; it sets the duration within the limits. */
@@ -35,14 +35,10 @@ const easeInOutCubic = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2
 
 /**
  * Animates the `point` signals of nodes towards target positions with `requestAnimationFrame`, over a duration that
- * follows the longest distance. Use it to move nodes into a new layout, as `VxLayout` does with `vxLayoutAnimate`.
+ * follows the longest distance. `VxLayoutAnimate` moves nodes into a new layout with it; it works as well on its own.
  */
-export function createNodePositionAnimator(
-  nodes: readonly Node[],
-  options: NodePositionAnimatorOptions = {},
-): NodePositionAnimator {
+export function createNodePositionAnimator(options: NodePositionAnimatorOptions = {}): NodePositionAnimator {
   const settings = { ...DEFAULTS, ...options };
-  const byId = new Map(nodes.map((node) => [node.id, node]));
   const queue: { targets: NodePositionTargets; resolve: (arrived: boolean) => void }[] = [];
   let frame: number | null = null;
   let current: { resolve: (arrived: boolean) => void } | null = null;
@@ -55,9 +51,7 @@ export function createNodePositionAnimator(
   };
 
   const start = (targets: NodePositionTargets, resolve: (arrived: boolean) => void) => {
-    const moves = [...targets]
-      .map(([id, target]) => ({ node: byId.get(id), start: byId.get(id)?.point(), target }))
-      .filter((move): move is { node: Node; start: Point; target: Point } => !!move.node && !!move.start);
+    const moves = [...targets].map(([node, target]) => ({ node, start: node.point(), target }));
     const farthest = Math.max(
       0,
       ...moves.map(({ start, target }) => Math.hypot(target.x - start.x, target.y - start.y)),

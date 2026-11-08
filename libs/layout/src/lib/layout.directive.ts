@@ -1,30 +1,40 @@
-import { DestroyRef, Directive, computed, effect, inject, input, output, signal, untracked } from '@angular/core';
-import { Node, Point, VFLOW_INITIALIZATION_GATE, VflowComponent, VflowInitializationGate } from 'ngx-vflow';
-import { Observable, Subject, Subscription, isObservable, lastValueFrom } from 'rxjs';
-import { LayoutAlgorithm, LayoutDragEvent, LayoutGraph, LayoutNode, LayoutResult } from './layout.types';
 import {
-  NodePositionAnimator,
-  NodePositionAnimatorOptions,
-  createNodePositionAnimator,
-} from './node-position-animator';
+  DestroyRef,
+  Directive,
+  ErrorHandler,
+  computed,
+  effect,
+  inject,
+  input,
+  output,
+  signal,
+  untracked,
+} from '@angular/core';
+import { Node, Point, VFLOW_INITIALIZATION_GATE, VflowComponent, VflowInitializationGate } from 'ngx-vflow';
+import { Observable, Subject, Subscription, concatMap, finalize, from, isObservable, of } from 'rxjs';
+import { LayoutAlgorithm, LayoutDragEvent, LayoutGraph, LayoutNode, LayoutResult } from './layout.types';
+import { LayoutPositionWriter, VX_LAYOUT_POSITION_WRITER, placeNodes } from './position-writer';
 
-/** When the layout runs: on every change of the algorithm or of the set of nodes and edges, or only on `run()`. */
-export type LayoutTrigger = 'auto' | 'manual';
-
-/** Whether the nodes move to their new positions at once or animated, with the animator's options. */
-export type LayoutAnimation = boolean | NodePositionAnimatorOptions;
+const IMMEDIATE_WRITER: LayoutPositionWriter = {
+  write: (targets) => {
+    placeNodes(targets);
+    return Promise.resolve(true);
+  },
+  cancel: () => void 0,
+};
 
 /**
  * Lays out the nodes of the flow with a `LayoutAlgorithm` and writes the positions into their `point` signals. The
  * layout runs once every node is measured, so content-sized nodes count with their real size, and again when the
- * algorithm or the set of nodes and edges changes. A node being dragged keeps its position, and a result that
- * arrives after a newer run started is dropped.
+ * algorithm or the set of nodes and edges changes. A node being dragged keeps its position, and a run that a newer
+ * one replaces is dropped.
  *
  * The first layout happens before the first paint: the directive holds the initialization of the flow until the
- * positions are in, so the graph appears laid out and `(initialized)` sees it that way. Only later layouts animate.
+ * positions are in, so the graph appears laid out and `(initialized)` sees it that way. Positions are placed at
+ * once; `VxLayoutAnimate` on the same element animates the layouts that follow the first.
  *
  * ```html
- * <vflow [vxLayout]="layout" [vxLayoutAnimate]="true" [nodes]="nodes" [edges]="edges" />
+ * <vflow [vxLayout]="layout" [nodes]="nodes" [edges]="edges" />
  * ```
  */
 @Directive({
@@ -33,30 +43,26 @@ export type LayoutAnimation = boolean | NodePositionAnimatorOptions;
 })
 export class VxLayout implements VflowInitializationGate {
   private readonly flow = inject(VflowComponent);
+  private readonly errors = inject(ErrorHandler);
+  private readonly writer = inject(VX_LAYOUT_POSITION_WRITER, { optional: true, self: true }) ?? IMMEDIATE_WRITER;
 
-  /** The algorithm, such as `dagreLayout({ rankdir: 'LR' })`. Create it once: a new function starts a new layout. */
-  public readonly vxLayout = input.required<LayoutAlgorithm>();
-
-  public readonly vxLayoutTrigger = input<LayoutTrigger>('auto');
-
-  /** Animates the nodes into the layout. A continuous layout, from an observable, always applies at once. */
-  public readonly vxLayoutAnimate = input<LayoutAnimation>(false);
+  /**
+   * The algorithm, such as `dagreLayout({ rankdir: 'LR' })`. Create it once: a new function starts a new layout.
+   * Without one (`<vflow vxLayout>`) the layout runs only through `run(algorithm)`, for example from a button.
+   */
+  public readonly vxLayout = input<LayoutAlgorithm | null, LayoutAlgorithm | null | ''>(null, {
+    transform: (value) => value || null,
+  });
 
   /** The result of a finished layout, after any animation. */
   public readonly vxLayoutEnd = output<LayoutResult>();
 
-  /** The first positions are in; the flow may paint. */
-  private readonly placed = signal(false);
-
   /** The flow told the directive that it is measured; a DOM without layout never does. */
-  private readonly flowMeasured = signal(false);
-
-  /** Lets the flow paint, once the first automatic layout is applied or at once with the manual trigger. */
-  private readonly ready = signal<(() => void) | null>(null);
+  private readonly measured = signal(false);
 
   /** Every node is measured, so the graph can be laid out. */
-  private readonly measured = computed(
-    () => this.flowMeasured() && this.flow.nodes().every((node) => this.flow.getNodeRect(node.id)),
+  private readonly ready = computed(
+    () => this.measured() && this.flow.nodes().every((node) => this.flow.getNodeRect(node.id)),
   );
 
   /** The set of nodes and edges, so a move or a resize does not count as a change. */
@@ -71,11 +77,11 @@ export class VxLayout implements VflowInitializationGate {
         .join('\u0000')}`,
   );
 
+  /** Lets the flow paint; `null` once it was called, so a layout that runs afterwards may animate. */
+  private release: (() => void) | null = null;
+  private running: Subscription | null = null;
   private readonly dragging = new Set<string>();
   private readonly drags = new Subject<LayoutDragEvent>();
-  private animator: NodePositionAnimator | null = null;
-  private subscription: Subscription | null = null;
-  private generation = 0;
 
   constructor() {
     const subscriptions = [
@@ -91,14 +97,12 @@ export class VxLayout implements VflowInitializationGate {
     ];
     effect(() => {
       const algorithm = this.vxLayout();
-      const structure = this.structure();
-      if (this.vxLayoutTrigger() !== 'auto' || !this.measured()) return;
-      untracked(() => void this.start(algorithm, structure));
-    });
-    // The flow paints once the first automatic layout is in, or at once with the manual trigger.
-    effect(() => {
-      const ready = this.ready();
-      if (ready && (this.vxLayoutTrigger() !== 'auto' || this.placed())) ready();
+      this.structure();
+      if (!this.ready()) return;
+      // Without an algorithm there is nothing to wait for before the flow paints.
+      untracked(() =>
+        algorithm ? this.run(algorithm).catch(this.errors.handleError.bind(this.errors)) : this.paint(),
+      );
     });
     inject(DestroyRef).onDestroy(() => {
       subscriptions.forEach((subscription) => subscription.unsubscribe());
@@ -108,66 +112,61 @@ export class VxLayout implements VflowInitializationGate {
 
   /** The flow is measured: the layout runs now, before the flow paints, and `ready` lets it paint afterwards. */
   public onMeasured(ready: () => void): void {
-    this.ready.set(ready);
-    this.flowMeasured.set(true);
+    this.release = ready;
+    this.measured.set(true);
   }
 
-  /** Runs the layout now; resolves with its result once applied, or `null` when a newer run replaced it. */
-  public run(): Promise<LayoutResult | null> {
-    return untracked(() => this.start(this.vxLayout(), this.structure()));
-  }
-
-  private async start(algorithm: LayoutAlgorithm, structure: string): Promise<LayoutResult | null> {
+  /**
+   * Runs the layout now, with the bound algorithm or the given one. Resolves with the result once applied, with the
+   * last value of a continuous layout once it completes, or with `null` when a newer run replaced it.
+   */
+  public run(algorithm: LayoutAlgorithm | null = untracked(this.vxLayout)): Promise<LayoutResult | null> {
+    if (!algorithm) throw new Error('VxLayout: no algorithm to run; bind [vxLayout] or pass one to run()');
     this.stop();
-    const generation = ++this.generation;
-    const current = () => generation === this.generation && this.structure() === structure;
-    try {
-      const graph = this.buildGraph();
-      const produced = algorithm(graph, { drags: this.drags.asObservable() });
+    const produced = algorithm(this.graph(), { drags: this.drags.asObservable() });
+    // A continuous layout places every value at once; a single result may animate.
+    const continuous = isObservable(produced);
+    const results: Observable<LayoutResult> = continuous ? produced : from(Promise.resolve(produced));
 
-      if (isObservable(produced)) {
-        // A continuous layout: every value lands at once, and the last one is the result.
-        const values = new Observable<LayoutResult>((subscriber) => {
-          this.subscription = produced.subscribe({
-            next: (result) => {
-              if (current()) {
-                this.apply(result);
-                this.placed.set(true);
-              }
-              subscriber.next(result);
-            },
-            error: (error) => subscriber.error(error),
-            complete: () => subscriber.complete(),
-          });
+    return new Promise((resolve, reject) => {
+      let last: LayoutResult | null = null;
+      let outcome: 'replaced' | 'completed' | Error = 'replaced';
+      this.running = results
+        .pipe(
+          concatMap((result) => {
+            const applied = this.apply(result, !continuous);
+            return applied instanceof Promise ? applied : of(applied);
+          }),
+          finalize(() => {
+            // A layout that fails or ends empty must not keep the flow hidden.
+            this.paint();
+            if (outcome instanceof Error) reject(outcome);
+            else resolve(outcome === 'completed' ? last : null);
+          }),
+        )
+        .subscribe({
+          next: (result) => (last = result ?? last),
+          error: (error) => (outcome = error instanceof Error ? error : new Error(String(error))),
+          complete: () => {
+            outcome = 'completed';
+            if (last) this.vxLayoutEnd.emit(last);
+          },
         });
-        const result = await lastValueFrom(values, { defaultValue: null });
-        if (!current() || !result) return null;
-        this.vxLayoutEnd.emit(result);
-        return result;
-      }
-
-      const result = await produced;
-      if (!current()) return null;
-      // The first positions land before the first paint; only later layouts animate.
-      const arrived = await this.apply(result, this.placed() ? this.vxLayoutAnimate() : false);
-      this.placed.set(true);
-      if (!arrived || !current()) return null;
-      this.vxLayoutEnd.emit(result);
-      return result;
-    } finally {
-      // A failed layout must not keep the flow hidden.
-      if (current()) this.placed.set(true);
-    }
+    });
   }
 
   private stop(): void {
-    this.subscription?.unsubscribe();
-    this.subscription = null;
-    this.animator?.cancel();
-    this.animator = null;
+    this.running?.unsubscribe();
+    this.running = null;
+    this.writer.cancel();
   }
 
-  private buildGraph(): LayoutGraph {
+  private paint(): void {
+    this.release?.();
+    this.release = null;
+  }
+
+  private graph(): LayoutGraph {
     return {
       nodes: this.layoutNodes(this.flow.nodes()),
       edges: this.flow.edges().map((edge) => ({ id: edge.id, source: edge.source, target: edge.target })),
@@ -182,8 +181,11 @@ export class VxLayout implements VflowInitializationGate {
     });
   }
 
-  /** Writes the flow-space positions into the node-space `point` signals, at once or animated. */
-  private async apply(result: LayoutResult, animation: LayoutAnimation = false): Promise<boolean> {
+  /**
+   * Writes the flow-space positions into the node-space `point` signals. Resolves with the result once it is in
+   * place, or `null` when a later write replaced it. The first positions land at once, before the first paint.
+   */
+  private apply(result: LayoutResult, animate: boolean): LayoutResult | Promise<LayoutResult | null> {
     const nodes = this.flow.nodes();
     const byId = new Map(nodes.map((node) => [node.id, node]));
     for (const [id, size] of result.sizes ?? []) {
@@ -191,21 +193,20 @@ export class VxLayout implements VflowInitializationGate {
       node?.width?.set(size.width);
       node?.height?.set(size.height);
     }
-    const targets = new Map<string, Point>();
+    const targets = new Map<Node, Point>();
     for (const [id, position] of result.positions) {
       const node = byId.get(id);
       if (!node || this.dragging.has(id)) continue;
       const origin = this.flowOrigin(node, byId, result);
-      targets.set(id, { x: position.x - origin.x, y: position.y - origin.y });
+      targets.set(node, { x: position.x - origin.x, y: position.y - origin.y });
     }
 
-    if (!animation) {
-      for (const [id, point] of targets) byId.get(id)?.point.set(point);
-      return true;
+    if (animate && this.release === null) {
+      return this.writer.write(targets).then((arrived) => (arrived ? result : null));
     }
-    this.animator?.cancel();
-    this.animator = createNodePositionAnimator(nodes, animation === true ? {} : animation);
-    return this.animator.animate(targets);
+    placeNodes(targets);
+    this.paint();
+    return result;
   }
 
   /** Flow position of the parent of a node: from the result when it moves the parent, else as rendered now. */

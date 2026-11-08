@@ -38,3 +38,17 @@ Blocked by: 03
 - Аниматор `createNodePositionAnimator(nodes, options)` экспортируется: длительность от дистанции (`speed`, `minDuration`, `maxDuration`) или фиксированная `duration`, easing in-out cubic, `queued`, `cancel`, `animate()` резолвится `true` по прибытию и `false` при замене.
 - Spec (browser, 7): измеренный граф и node-space позиции вложенной ноды, перезапуск по алгоритму и набору нод (не по движению), stale-результат, пиннинг при drag, анимация с `vxLayoutEnd` после, Observable, `manual`. node-dom (jsdom/happy-dom × zoneless/zone): директива рендерится и не запускается.
 - Docs-страница и демо — в 06 вместе с адаптерами.
+
+2026-11-08, разбор ответственностей `VxLayout` (обсуждение с Артёмом):
+
+- Анимация вынесена из хоста: `VxLayoutAnimate` (`vflow[vxLayout][vxLayoutAnimate]`) предоставляет себя как
+  `VX_LAYOUT_POSITION_WRITER` (`LayoutPositionWriter { write(targets), cancel() }`), хост берёт писателя через
+  `inject(..., { optional: true, self: true })` и иначе ставит позиции сразу. Правила «первый лейаут без анимации» и
+  «непрерывный лейаут пишет сразу» остались в хосте. Тот же приём, что ворота инициализации в core.
+- `vxLayoutTrigger` удалён: `vxLayout` стал необязательным (`<vflow vxLayout>` без значения = только
+  `run(algorithm)`); пустой атрибут превращается в `null` через `transform`. `run()` без алгоритма бросает ошибку.
+- Ядро: промис и observable сведены в один поток (`from(Promise.resolve(x))`), одна подписка, `finalize` отпускает
+  ворота и резолвит промис `run()`; `generation` и проверка структуры внутри прогона не нужны — отписка нового прогона
+  гарантирует, что старый результат не придёт. Три сигнала ворот заменены полем `release`: пока оно не `null`,
+  первый paint ещё впереди и лейаут ставится сразу. Ошибка лейаута в авто-режиме уходит в `ErrorHandler`.
+- Аниматор принимает `Map<Node, Point>` в `animate()` и создаётся без списка нод.

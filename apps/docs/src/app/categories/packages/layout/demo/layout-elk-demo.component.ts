@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, signal, viewChild } from '@angular/core';
 import { DocsPresentations } from '@docs/shared';
-import { VxLayout } from '@vflow/layout';
+import { VxLayout, VxLayoutAnimate } from '@vflow/layout';
 import { elkLayout } from '@vflow/layout/elk';
 import { Vflow, VflowComponent } from 'ngx-vflow';
 import { demoEdges, demoNodes } from './graph';
@@ -20,8 +20,8 @@ import { demoEdges, demoNodes } from './graph';
     </div>
     <vflow
       view="auto"
+      vxLayoutAnimate
       [vxLayout]="layout()"
-      [vxLayoutAnimate]="true"
       [nodes]="nodes"
       [edges]="edges"
       [background]="{ type: 'dots' }"
@@ -51,7 +51,7 @@ import { demoEdges, demoNodes } from './graph';
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DocsPresentations, Vflow, VxLayout],
+  imports: [DocsPresentations, Vflow, VxLayout, VxLayoutAnimate],
 })
 export class LayoutElkDemoComponent {
   protected readonly flow = viewChild.required(VflowComponent);

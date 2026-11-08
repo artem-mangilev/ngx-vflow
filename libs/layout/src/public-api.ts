@@ -7,7 +7,9 @@ export type {
   LayoutNode,
   LayoutResult,
 } from './lib/layout.types';
-export { VxLayout, type LayoutAnimation, type LayoutTrigger } from './lib/layout.directive';
+export { VxLayout } from './lib/layout.directive';
+export { VxLayoutAnimate, type LayoutAnimation } from './lib/layout-animate.directive';
+export { VX_LAYOUT_POSITION_WRITER, type LayoutPositionWriter } from './lib/position-writer';
 export {
   createNodePositionAnimator,
   type NodePositionAnimator,
