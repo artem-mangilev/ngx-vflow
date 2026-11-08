@@ -114,6 +114,13 @@ export type { FeatureValue } from './lib/vflow/features/merged-feature-value';
 export { VFLOW_SETTINGS, withSettings } from './lib/vflow/features/with-settings';
 export { VFLOW_ARIA_LABELS, withAccessibility } from './lib/vflow/features/with-accessibility';
 export { VFLOW_SHORTCUTS, withShortcuts } from './lib/vflow/features/with-shortcuts';
+export { VFLOW_CURVES, withCurves, type CurveRegistry } from './lib/vflow/features/with-curves';
+export {
+  BUILT_IN_CURVES,
+  type BuiltInCurve,
+  type CurveKey,
+  type VflowCurves,
+} from './lib/vflow/interfaces/curves.interface';
 export {
   VFLOW_EDGE_COMPONENTS,
   VFLOW_NODE_COMPONENTS,

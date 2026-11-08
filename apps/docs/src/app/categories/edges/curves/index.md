@@ -18,3 +18,29 @@ it. Without `angle` the label stays horizontal.
 With virtualization enabled, the library uses the complete path bounds to decide whether an edge can appear in the viewport. A custom factory may return an optional `bounds: { x, y, width, height }` in flow coordinates to avoid SVG measurement. These bounds must contain the whole curve, including any detours or control points. Without `bounds`, the library measures the SVG path when it changes and caches the result for viewport changes.
 
 {{ NgDocActions.demoPane("CurveFactoryDemoComponent") }}
+
+## Curves by key
+
+A factory in `curve` is a function in the graph data, which a store cannot serialize. Register the factory once under a key with `withCurves()` inside `provideVflow()`, in the providers of the application, a route or a component, and name the key in `curve`, as for the built-in curves:
+
+```typescript
+@Component({
+  providers: [provideVflow(withCurves({ avoid: avoidNodesCurve }))],
+  ...
+})
+export class EditorComponent {
+  edges = createEdges([{ id: 'a-b', source: 'a', target: 'b', curve: 'avoid' }]);
+}
+```
+
+A registration closer to the flow adds its keys to one further up; see [Configuration](../../introduction/configuration). The built-in names cannot be registered. A key that nothing registers throws when the edge lays out its path, with the key in the message. The connection preview takes the same keys in `[connection]="{ curve: 'avoid' }"`.
+
+A key is any string by default. To have the compiler check it, augment the `VflowCurves` interface of the library with your keys; then a typo in `curve` or in `withCurves()` is a compile error, and the built-in names stay available:
+
+```typescript
+declare module 'ngx-vflow' {
+  interface VflowCurves {
+    avoid: typeof avoidNodesCurve;
+  }
+}
+```

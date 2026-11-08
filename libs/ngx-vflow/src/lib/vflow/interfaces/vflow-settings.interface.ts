@@ -7,13 +7,11 @@ import { Background } from '../types/background.type';
 import { SelectionMode } from '../types/selection-mode.type';
 
 /**
- * The settings of a flow, named and typed as the inputs of `vflow`. A value bound to an input wins over one given
+ * The settings of a flow, named and typed as the inputs of `vflow`; `view`, the size of one flow, stays an input only. A value bound to an input wins over one given
  * with `withSettings()`, which wins over the default in {@link VFLOW_SETTINGS_DEFAULTS}; an object setting merges
  * its keys through those three layers.
  */
 export interface VflowSettings {
-  /** @see {VflowComponent.view} */
-  view: [number, number] | 'auto';
   /** @see {VflowComponent.minZoom} */
   minZoom: number;
   /** @see {VflowComponent.maxZoom} */
@@ -70,7 +68,6 @@ export interface VflowSettings {
 
 /** The value of every setting of a flow that neither an input nor `withSettings()` sets. */
 export const VFLOW_SETTINGS_DEFAULTS: Readonly<VflowSettings> = {
-  view: 'auto',
   minZoom: 0.5,
   maxZoom: 3,
   zoomOnScroll: true,

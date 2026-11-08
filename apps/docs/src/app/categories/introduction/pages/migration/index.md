@@ -536,7 +536,7 @@ Settings, labels and component registrations can be given once for many flows wi
 - `[ariaLabelConfig]` is removed. Provide the labels with `provideVflow(withAccessibility(labels))` in the providers of the component that hosts the flow, or higher up. Where the labels were a signal of the component, give `withAccessibility()` a factory that reads it: `withAccessibility(() => inject(MyComponent).labels)`.
 - The settings inputs no longer carry their default in the input: an unbound input reads `undefined`, so that it does not override a provided value. Reading `flow.minZoom()` from a reference to the flow therefore returns what is bound, or `undefined`; read the settings in effect from `flow.settings`, one signal per setting, such as `flow.settings.minZoom()` or `flow.settings.optimization()`.
 
-`Node.component` and `Edge.component` additionally accept a string: the key of a component registered with `withNodeComponents()` or `withEdgeComponents()`. Component classes and lazy factories in `component` keep working.
+`Node.component` and `Edge.component` additionally accept a string: the key of a component registered with `withNodeComponents()` or `withEdgeComponents()`. Component classes and lazy factories in `component` keep working. Likewise `Edge.curve` and `ConnectionSettings.curve` accept the key of a factory registered with `withCurves()`, next to the built-in names; a factory in `curve` keeps working.
 
 ### Settings inputs
 

@@ -32,7 +32,7 @@ describe('createEdges data type', () => {
     ).toEqualTypeOf<Dependency>();
     // @ts-expect-error a label is not a dependency
     createEdges<Dependency>([dependency('a-b'), label('b-c')]);
-    // @ts-expect-error the curve is still checked without a type argument
-    createEdges([{ id: 'a-b', source: 'a', target: 'b', curve: 'bezir' }]);
+    // @ts-expect-error the curve is still checked without a type argument; a string is a key until `VflowCurves` is augmented
+    createEdges([{ id: 'a-b', source: 'a', target: 'b', curve: 42 }]);
   });
 });

@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { DocsPresentations } from '@docs/shared';
 import { avoidNodesCurve } from '@vflow/routing';
-import { Vflow, createEdges, createNodes } from 'ngx-vflow';
+import { Vflow, createEdges, createNodes, provideVflow, withCurves } from 'ngx-vflow';
 
 @Component({
   template: `<vflow view="auto" [nodes]="nodes" [edges]="edges" [background]="{ type: 'dots' }" [snapGrid]="[10, 10]">
@@ -17,6 +17,8 @@ import { Vflow, createEdges, createNodes } from 'ngx-vflow';
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [DocsPresentations, Vflow],
+  // The curve is registered once and the edges name it, so the graph holds no functions.
+  providers: [provideVflow(withCurves({ avoid: avoidNodesCurve }))],
 })
 export class RoutingDemoComponent {
   protected readonly nodes = createNodes([
@@ -36,6 +38,6 @@ export class RoutingDemoComponent {
       { id: 'a -> b', source: 'a', target: 'b' },
       { id: 'b -> d', source: 'b', target: 'd' },
       { id: 'c -> d', source: 'c', target: 'd' },
-    ].map((edge) => ({ ...edge, curve: avoidNodesCurve, markers: { end: { type: 'arrow-closed' as const } } })),
+    ].map((edge) => ({ ...edge, curve: 'avoid', markers: { end: { type: 'arrow-closed' as const } } })),
   );
 }

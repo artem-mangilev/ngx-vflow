@@ -61,7 +61,6 @@ export function resolveSettings(
     computed(() => layerBooleanOrObject(VFLOW_SETTINGS_DEFAULTS[key], [providedValue(key), inputs[key]()]));
 
   return {
-    view: scalar('view'),
     minZoom: scalar('minZoom'),
     maxZoom: scalar('maxZoom'),
     zoomOnScroll: scalar('zoomOnScroll'),

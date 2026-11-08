@@ -18,18 +18,27 @@ The package depends on `ngx-vflow` 3 and ships no styles.
 
 ## Usage
 
-Set `avoidNodesCurve` as the curve of an edge, or build a curve with your own options:
+Register `avoidNodesCurve`, or a curve built with your own options, under a key with `withCurves()` inside `provideVflow()`, and name the key as the curve of an edge, next to the built-in `'bezier'` or `'smooth-step'`:
 
 ```ts
 import { avoidNodesCurve, createAvoidNodesCurve } from '@vflow/routing';
+import { provideVflow, withCurves } from 'ngx-vflow';
 
-const edges = createEdges([
-  { id: 'a-b', source: 'a', target: 'b', curve: avoidNodesCurve },
-  { id: 'b-c', source: 'b', target: 'c', curve: createAvoidNodesCurve({ nodePadding: 24, cornerRadius: 0 }) },
-]);
+@Component({
+  providers: [
+    provideVflow(withCurves({ avoid: avoidNodesCurve, tight: createAvoidNodesCurve({ nodePadding: 24, cornerRadius: 0 }) })),
+  ],
+  ...
+})
+export class EditorComponent {
+  edges = createEdges([
+    { id: 'a-b', source: 'a', target: 'b', curve: 'avoid' },
+    { id: 'b-c', source: 'b', target: 'c', curve: 'tight' },
+  ]);
+}
 ```
 
-The connection preview takes the same curve: `[connection]="{ curve: avoidNodesCurve }"`.
+The graph then holds no functions and serializes as data. A factory still works directly in `curve` where a graph is built in code. The connection preview takes the same keys: `[connection]="{ curve: 'avoid' }"`. See [Curves](../../edges/curves#curves-by-key) for the keys and their type checking.
 
 ## Options
 

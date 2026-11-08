@@ -8,6 +8,7 @@ import { DomAttributes } from './dom-attributes.interface';
 import { EntityComponentType } from './node.interface';
 import { StaticData } from '../types/static-data.type';
 import { EdgeComponentKey } from './entity-components.interface';
+import { BuiltInCurve, CurveKey } from './curves.interface';
 
 export const EDGE_DEFAULTS = {
   curve: 'bezier' as Curve,
@@ -18,7 +19,8 @@ export const EDGE_DEFAULTS = {
   interactionWidth: 20,
 };
 
-export type Curve = 'straight' | 'bezier' | 'smooth-step' | 'step' | CurveFactory;
+/** A built-in curve by name, a factory, or the key of a curve registered with `withCurves()`. */
+export type Curve = BuiltInCurve | CurveFactory | CurveKey;
 
 /**
  * The flow never adds signals to an edge object. The application may add an optional signal to an existing edge

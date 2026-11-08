@@ -46,8 +46,8 @@ setting: `flow.settings.minZoom()`.
 
 ### `withSettings(settings)`
 
-Takes a `Partial<VflowSettings>`: the inputs of `vflow` by their names, `nodes` and `edges` excepted. The labels and
-the keys of the graph are not inputs; they have features of their own below. Instead of an
+Takes a `Partial<VflowSettings>`: the inputs of `vflow` by their names, except `nodes`, `edges` and `view`, the
+size of one flow. The labels and the keys of the graph are not inputs; they have features of their own below. Instead of an
 object, pass a factory run in the injector that returns the settings or a signal of them, so the settings can come
 from a service and follow its changes:
 
@@ -67,6 +67,12 @@ Takes a `KeyboardShortcuts` object: the `modifiers` held during pointer gestures
 press, each section merged entry by entry with the defaults and with the levels above. A factory works as for
 `withSettings()`, so the keys can come from the preferences of the user. See
 [Keyboard shortcuts](../../interactions/keyboard-shortcuts).
+
+### `withCurves(curves)`
+
+Registers curve factories under keys, so an edge names its curve as `curve: 'avoid'` next to the built-in names and
+the graph holds no functions. The built-in names cannot be registered; a key nothing registers is an error when the
+edge lays out its path. See [Curves](../../edges/curves#curves-by-key).
 
 ### `withNodeComponents(components)` and `withEdgeComponents(components)`
 

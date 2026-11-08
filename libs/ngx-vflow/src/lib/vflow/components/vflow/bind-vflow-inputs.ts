@@ -33,7 +33,12 @@ export function bindVflowInputs<N extends Node, E extends Edge>(
   const { connection, ...sources } = resolved;
   // The labels have no input: they come from `withAccessibility()`, else they are the English defaults.
   const labels = inject(VFLOW_ARIA_LABELS, { optional: true });
-  settings.bind({ ...sources, ariaLabels: computed(() => withDefaults(DEFAULT_ARIA_LABEL_CONFIG, labels?.())) });
+  settings.bind({
+    ...sources,
+    // The size of one flow is not an application-wide setting: the input, else 'auto'.
+    view: computed(() => flow.view() ?? 'auto'),
+    ariaLabels: computed(() => withDefaults(DEFAULT_ARIA_LABEL_CONFIG, labels?.())),
+  });
   entities.connectionSettings.bind(connection);
   // The keys have no input either: `withShortcuts()`, else the defaults of the keyboard service.
   const shortcuts = inject(VFLOW_SHORTCUTS, { optional: true });

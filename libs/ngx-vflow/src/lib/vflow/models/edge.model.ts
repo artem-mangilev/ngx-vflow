@@ -1,4 +1,4 @@
-import { TemplateRef, computed, inject, signal } from '@angular/core';
+import { TemplateRef, computed, inject, signal, untracked } from '@angular/core';
 import { EdgeLabelOrient, EdgeLabelPosition } from '../interfaces/edge-label.interface';
 import { Edge, Curve, EDGE_DEFAULTS } from '../interfaces/edge.interface';
 import { NodeModel } from './node.model';
@@ -23,6 +23,7 @@ import { entitySnapshot } from '../utils/signals/entity-snapshot';
 import { forwardSignal } from '../utils/signals/forward-signal';
 import { resolveEntityComponent } from '../utils/resolve-entity-component';
 import { VFLOW_EDGE_COMPONENTS } from '../features/with-entity-components';
+import { VFLOW_CURVES } from '../features/with-curves';
 
 const LABEL_POSITIONS: EdgeLabelPosition[] = ['start', 'center', 'end'];
 
@@ -76,6 +77,8 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
   public readonly source = signal<NodeModel | null>(null);
   public readonly target = signal<NodeModel | null>(null);
   public readonly curve = computed<Curve>(() => this.raw().curve?.() ?? EDGE_DEFAULTS.curve);
+  /** The curves registered with `withCurves()`; a key in `curve` is looked up on every layout, since `curve` is a signal. */
+  private readonly curves = inject(VFLOW_CURVES, { optional: true });
   public readonly reconnectable = computed(() => this.raw().reconnectable?.() ?? EDGE_DEFAULTS.reconnectable);
   public readonly interactionWidth = computed(() => this.raw().interactionWidth?.() ?? EDGE_DEFAULTS.interactionWidth);
   /** `g[vEdgeInteractionArea]` groups and host directives drawing the interaction stroke inside the presentation. */
@@ -145,7 +148,11 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
       return { path: '' };
     }
 
-    return resolveCurve(this.curve(), this.getPathFactoryParams(source, target));
+    return resolveCurve(
+      this.curve(),
+      this.getPathFactoryParams(source, target),
+      untracked(() => this.curves?.()),
+    );
   });
 
   public readonly bounds = computed(() => {

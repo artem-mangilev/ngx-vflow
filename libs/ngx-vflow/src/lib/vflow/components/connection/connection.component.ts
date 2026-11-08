@@ -1,10 +1,11 @@
-import { ChangeDetectionStrategy, Component, TemplateRef, computed, inject, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, TemplateRef, computed, inject, input, untracked } from '@angular/core';
 import { ConnectionService } from '../../services/connection.service';
 import { SpacePointContextDirective } from '../../directives/space-point-context.directive';
 import { ConnectionModel } from '../../models/connection.model';
 import { markerUrl } from '../../utils/marker-ref';
 import { Position } from '../../types/position.type';
 import { resolveCurve } from '../../math/edge-path/resolve-curve';
+import { VFLOW_CURVES } from '../../features/with-curves';
 import { NgTemplateOutlet } from '@angular/common';
 import { ConnectionContext } from '../../interfaces/template-context.interface';
 import { Point } from '../../interfaces/point.interface';
@@ -40,6 +41,8 @@ export class ConnectionComponent {
 
   public template = input<TemplateRef<ConnectionContext>>();
 
+  private readonly curves = inject(VFLOW_CURVES, { optional: true });
+
   protected path = computed(() => {
     const gesture = this.connection.gesture();
     if (!gesture) return null;
@@ -65,6 +68,7 @@ export class ConnectionComponent {
         gesture.source,
         candidate?.node,
       ),
+      untracked(() => this.curves?.()),
     ).path;
   });
 
