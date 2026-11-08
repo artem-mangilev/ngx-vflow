@@ -1,17 +1,23 @@
-import {
-  DestroyRef,
-  Directive,
-  ErrorHandler,
-  computed,
-  effect,
-  inject,
-  input,
-  output,
-  signal,
-  untracked,
-} from '@angular/core';
+import { Directive, ErrorHandler, computed, inject, input, output, signal } from '@angular/core';
+import { outputToObservable, takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { Node, Point, VFLOW_INITIALIZATION_GATE, VflowComponent, VflowInitializationGate } from 'ngx-vflow';
-import { Subject, Subscription, concatMap, finalize } from 'rxjs';
+import {
+  EMPTY,
+  Observable,
+  catchError,
+  combineLatest,
+  concatMap,
+  defer,
+  filter,
+  finalize,
+  map,
+  merge,
+  share,
+  switchMap,
+  take,
+  takeLast,
+  tap,
+} from 'rxjs';
 import { LayoutAlgorithm, LayoutDragEvent, LayoutGraph, LayoutNode, LayoutResult } from './layout.types';
 import { LayoutPositionWriter, VX_LAYOUT_POSITION_WRITER, placeNodes } from './position-writer';
 
@@ -75,31 +81,39 @@ export class VxLayout implements VflowInitializationGate {
 
   /** Lets the flow paint; `null` once it was called, so a layout that runs afterwards may animate. */
   private release: (() => void) | null = null;
-  private running: Subscription | null = null;
   private readonly dragging = new Set<string>();
-  private readonly drags = new Subject<LayoutDragEvent>();
+
+  /** The drags of nodes as an algorithm sees them, with the nodes as they are at that moment. */
+  private readonly drags: Observable<LayoutDragEvent> = merge(
+    outputToObservable(this.flow.nodeDragStart).pipe(map((event) => ({ type: 'start' as const, ...event }))),
+    outputToObservable(this.flow.nodeDrag).pipe(map((event) => ({ type: 'move' as const, ...event }))),
+    outputToObservable(this.flow.nodeDragEnd).pipe(map((event) => ({ type: 'end' as const, ...event }))),
+  ).pipe(
+    map(({ type, nodes }) => ({ type, nodes: this.layoutNodes(nodes) })),
+    share(),
+  );
 
   constructor() {
-    const subscriptions = [
-      this.flow.nodeDragStart.subscribe((event) => {
-        event.nodes.forEach((node) => this.dragging.add(node.id));
-        this.drags.next({ type: 'start', nodes: this.layoutNodes(event.nodes) });
-      }),
-      this.flow.nodeDrag.subscribe((event) => this.drags.next({ type: 'move', nodes: this.layoutNodes(event.nodes) })),
-      this.flow.nodeDragEnd.subscribe((event) => {
-        event.nodes.forEach((node) => this.dragging.delete(node.id));
-        this.drags.next({ type: 'end', nodes: this.layoutNodes(event.nodes) });
-      }),
-    ];
-    effect(() => {
-      this.vxLayout();
-      this.structure();
-      if (this.ready()) untracked(() => this.run());
+    this.drags.pipe(takeUntilDestroyed()).subscribe(({ type, nodes }) => {
+      for (const node of nodes) type === 'end' ? this.dragging.delete(node.id) : this.dragging.add(node.id);
     });
-    inject(DestroyRef).onDestroy(() => {
-      subscriptions.forEach((subscription) => subscription.unsubscribe());
-      this.stop();
-    });
+
+    // A run for every algorithm and every set of nodes and edges, once every node is measured; a newer run replaces
+    // the one before it.
+    const ready = toObservable(this.ready);
+    combineLatest([toObservable(this.vxLayout), toObservable(this.structure)])
+      .pipe(
+        switchMap(([algorithm]) =>
+          ready.pipe(
+            filter(Boolean),
+            take(1),
+            map(() => algorithm),
+          ),
+        ),
+        switchMap((algorithm) => this.layout(algorithm)),
+        takeUntilDestroyed(),
+      )
+      .subscribe();
   }
 
   /** The flow is measured: the layout runs now, before the flow paints, and `ready` lets it paint afterwards. */
@@ -108,26 +122,21 @@ export class VxLayout implements VflowInitializationGate {
     this.measured.set(true);
   }
 
-  private run(): void {
-    this.stop();
-    let last: LayoutResult | null = null;
-    this.running = untracked(this.vxLayout)(this.graph(), { drags: this.drags.asObservable() })
-      .pipe(
-        concatMap((result) => this.apply(result)),
-        // However the layout ends, the flow paints.
-        finalize(() => this.paint()),
-      )
-      .subscribe({
-        next: (result) => (last = result),
-        error: (error) => this.errors.handleError(error),
-        complete: () => last && this.vxLayoutEnd.emit(last),
-      });
-  }
-
-  private stop(): void {
-    this.running?.unsubscribe();
-    this.running = null;
-    this.writer.cancel();
+  /** One run: every result is applied in order and the last one reported. However it ends, the flow paints. */
+  private layout(algorithm: LayoutAlgorithm): Observable<LayoutResult> {
+    return defer(() => algorithm(this.graph(), { drags: this.drags })).pipe(
+      concatMap((result) => this.apply(result)),
+      takeLast(1),
+      tap((result) => this.vxLayoutEnd.emit(result)),
+      catchError((error: unknown) => {
+        this.errors.handleError(error);
+        return EMPTY;
+      }),
+      finalize(() => {
+        this.writer.cancel();
+        this.paint();
+      }),
+    );
   }
 
   private paint(): void {

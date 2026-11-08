@@ -64,3 +64,7 @@ Blocked by: 03
 - `LayoutPositionWriter.write` и `animate()` резолвятся `void` (замена/отмена тоже резолвит), булев результат никто
   не использовал.
 - `run()` удалён: новая функция алгоритма и есть «разложить заново», императивный вход дублировал её.
+- Триггер переписан на rx: `combineLatest(toObservable(vxLayout), toObservable(structure))` →
+  `switchMap(ждать ready)` → `switchMap(прогон)`; `switchMap` даёт «новый прогон заменяет старый», `finalize`
+  открывает ворота и отменяет писателя, `catchError` → `ErrorHandler`. Эффекта-триггера и полей `running`/`stop()`
+  нет. Драги — `merge(outputToObservable(...))` с `share()`, без Subject.
