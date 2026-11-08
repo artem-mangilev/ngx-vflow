@@ -57,7 +57,6 @@ import { Background } from '../../types/background.type';
 import { SpacePointContextDirective } from '../../directives/space-point-context.directive';
 import { FitViewOptions } from '../../interfaces/fit-view-options.interface';
 import { Optimization } from '../../interfaces/optimization.interface';
-import { withDefaults } from '../../utils/with-defaults';
 import { KeyboardShortcuts } from '../../types/keyboard-shortcuts.type';
 import { SelectionMode } from '../../types/selection-mode.type';
 import { KeyboardService } from '../../services/keyboard.service';
@@ -93,10 +92,10 @@ import { AnnouncerService } from '../../services/announcer.service';
 import { KeyboardEntityCommandsService } from '../../services/keyboard-entity-commands.service';
 import { KeyboardLabelsService } from '../../services/keyboard-labels.service';
 import { KeyboardViewportCommandsService } from '../../services/keyboard-viewport-commands.service';
-import { AriaLabelConfig, DEFAULT_ARIA_LABEL_CONFIG } from '../../interfaces/aria-label-config.interface';
 import { ViewportCullingDirective } from '../../directives/viewport-culling.directive';
 import { AfterRenderBatchService } from '../../services/after-render-batch.service';
 import { bindVflowInputs } from './bind-vflow-inputs';
+import { ResolvedVflowSettingSignals } from './resolve-settings';
 
 /**
  * The flow. `N` and `E` are the node and edge types of the `nodes` and `edges` inputs; a template infers them from
@@ -186,8 +185,14 @@ export class VflowComponent<N extends Node = Node, E extends Edge = Edge> {
   private paneElement = viewChild.required<ElementRef<HTMLElement>>('pane');
   private viewportElement = viewChild.required<ElementRef<HTMLElement>>('viewportElement');
 
+  /**
+   * The settings in effect, one signal each: a bound input, else the value given with `withSettings()`, else the
+   * default. The inputs themselves hold only what is bound.
+   */
+  public readonly settings: ResolvedVflowSettingSignals;
+
   constructor() {
-    bindVflowInputs(this);
+    this.settings = bindVflowInputs(this);
 
     // Curves read the inset of a declared shape through the service; the defs render the shape itself.
     effect(() => this.flowEntitiesService.markerShapes.set(this.markerShapes()));
@@ -222,11 +227,6 @@ export class VflowComponent<N extends Node = Node, E extends Edge = Edge> {
   // #endregion
 
   // #region SETTINGS
-
-  /** Partial localization overrides; omitted entries use the English defaults. */
-  public readonly ariaLabelConfig = input(DEFAULT_ARIA_LABEL_CONFIG, {
-    transform: (value: Partial<AriaLabelConfig>) => withDefaults(DEFAULT_ARIA_LABEL_CONFIG, value),
-  });
 
   /**
    * Size of the flow: `[width, height]` in pixels, or `'auto'` to fill the parent element. Default: `'auto'`, so

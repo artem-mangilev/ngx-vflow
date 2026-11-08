@@ -8,13 +8,16 @@ import { suppliedEntries, withDefaults } from '../../utils/with-defaults';
 /** The inputs of the flow that are settings: `undefined` while an input is not bound. */
 export type SettingInputs = { readonly [K in keyof VflowSettings]: Signal<VflowSettings[K] | undefined> };
 
-/** The settings as the services read them: every object setting is complete. */
-export type ResolvedSettings = Omit<VflowSettings, 'optimization' | 'selectionBox'> & {
+/** The settings in effect, as the services read them: every object setting is complete. */
+export type ResolvedVflowSettings = Omit<VflowSettings, 'optimization' | 'selectionBox'> & {
   optimization: Required<Optimization>;
   selectionBox: Required<SelectionBoxSettings>;
 };
 
-export type ResolvedSettingSignals = { readonly [K in keyof ResolvedSettings]: Signal<ResolvedSettings[K]> };
+/** One signal per setting in effect. */
+export type ResolvedVflowSettingSignals = {
+  readonly [K in keyof ResolvedVflowSettings]: Signal<ResolvedVflowSettings[K]>;
+};
 
 /** A distance in CSS pixels: negative and non-finite values read as 0. */
 function nonNegative(value: number): number {
@@ -38,7 +41,7 @@ function layerBooleanOrObject<T extends object>(below: boolean | T, layers: (boo
 export function resolveSettings(
   inputs: SettingInputs,
   provided: Signal<Partial<VflowSettings>> | null,
-): ResolvedSettingSignals {
+): ResolvedVflowSettingSignals {
   const providedValue = <K extends keyof VflowSettings>(key: K): VflowSettings[K] | undefined => provided?.()[key];
 
   const scalar = <K extends keyof VflowSettings>(key: K): Signal<VflowSettings[K]> =>

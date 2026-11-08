@@ -1,15 +1,18 @@
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { createNodes } from '../../interfaces/node.interface';
 import { Edge, createEdges } from '../../interfaces/edge.interface';
 import { Vflow } from '../../vflow';
 import { AriaLabelConfig } from '../../interfaces/aria-label-config.interface';
 import { DomAttributes } from '../../interfaces/dom-attributes.interface';
+import { provideVflow } from '../../features/feature';
+import { withAccessibility } from '../../features/with-accessibility';
 
 @Component({
   imports: [Vflow],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `<vflow [nodes]="nodes" [edges]="edges" [view]="[600, 350]" [ariaLabelConfig]="labels()">
+  providers: [provideVflow(withAccessibility(() => inject(AccessibilityHostComponent).labels))],
+  template: `<vflow [nodes]="nodes" [edges]="edges" [view]="[600, 350]">
     <v-minimap />
     <ng-template vNode>
       <button type="button" noDrag (click)="clicks = clicks + 1">Review request</button>

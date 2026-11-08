@@ -112,10 +112,12 @@ export type * from './lib/vflow/types/selection-box-mode.type';
 export { VflowFeature, provideVflow, vflowFeature } from './lib/vflow/features/feature';
 export type { FeatureValue } from './lib/vflow/features/merged-feature-value';
 export { VFLOW_SETTINGS, withSettings } from './lib/vflow/features/with-settings';
+export { VFLOW_ARIA_LABELS, withAccessibility } from './lib/vflow/features/with-accessibility';
 export { VFLOW_SETTINGS_DEFAULTS, type VflowSettings } from './lib/vflow/interfaces/vflow-settings.interface';
 
 // Components
 export * from './lib/vflow/components/vflow/vflow.component';
+export type { ResolvedVflowSettingSignals, ResolvedVflowSettings } from './lib/vflow/components/vflow/resolve-settings';
 export * from './lib/vflow/public-components/resizable/resizable.component';
 export type {
   ResizeAxis,

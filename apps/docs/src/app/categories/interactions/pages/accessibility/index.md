@@ -89,7 +89,7 @@ Focus is drawn as a translucent halo around the node wrapper and along the edge 
 
 ## Localization
 
-Bind a `Partial<AriaLabelConfig>` to `[ariaLabelConfig]`. Omitted keys keep their English defaults, exported as `DEFAULT_ARIA_LABEL_CONFIG`; names and descriptions update as soon as the configuration or the entity metadata changes.
+Provide a `Partial<AriaLabelConfig>` with `withAccessibility()` inside `provideVflow()`: in the providers of `bootstrapApplication` for the whole application, of a route, or of the component that hosts the flow, where a closer `withAccessibility()` adds its keys to one further up. Omitted keys keep their English defaults, exported as `DEFAULT_ARIA_LABEL_CONFIG`; names and descriptions update as soon as the labels or the entity metadata change.
 
 ```typescript
 const labels: Partial<AriaLabelConfig> = {
@@ -100,8 +100,17 @@ const labels: Partial<AriaLabelConfig> = {
 };
 ```
 
-```html
-<vflow [nodes]="nodes" [edges]="edges" [ariaLabelConfig]="labels" />
+```typescript
+@Component({
+  providers: [provideVflow(withAccessibility(labels))],
+  ...
+})
+```
+
+The value may also be a factory run in the injector, returning the labels or a signal of them, so they can come from a translation service and follow a change of language:
+
+```typescript
+provideVflow(withAccessibility(() => inject(TranslocoService).selectTranslateObject('vflow')));
 ```
 
 | Key                                           | Default                                                                                                                                                       |

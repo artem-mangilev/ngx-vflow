@@ -1,6 +1,15 @@
 import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
 import { DocsPresentations } from '@docs/shared';
-import { DeleteRequest, KeyboardShortcuts, Vflow, createEdges, createNodes, removeElements } from 'ngx-vflow';
+import {
+  DeleteRequest,
+  KeyboardShortcuts,
+  Vflow,
+  createEdges,
+  createNodes,
+  provideVflow,
+  removeElements,
+  withAccessibility,
+} from 'ngx-vflow';
 
 /** The zoom defaults, repeated because an entry is replaced whole rather than extended. */
 const ZOOM_DEFAULTS = {
@@ -12,6 +21,7 @@ const ZOOM_DEFAULTS = {
 @Component({
   imports: [DocsPresentations, Vflow],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: [provideVflow(withAccessibility({ flowLabel: 'Configured graph' }))],
   template: `
     <section data-testid="shortcuts-demo" aria-label="Shortcut configuration example">
       <p>Tab into the graph, then press the keys below. Change a binding and the graph follows it at once.</p>
@@ -43,7 +53,6 @@ const ZOOM_DEFAULTS = {
         [edges]="edges"
         [view]="[600, 240]"
         [keyboardShortcuts]="shortcuts()"
-        [ariaLabelConfig]="{ flowLabel: 'Configured graph' }"
         (deleteRequest)="onDeleteRequest($event)">
         <docs-node *vNode="let ctx" [ctx]="ctx" />
         <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />

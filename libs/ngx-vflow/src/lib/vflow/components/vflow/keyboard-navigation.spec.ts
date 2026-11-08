@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, viewChild, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, viewChild, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { outputToObservable } from '@angular/core/rxjs-interop';
 import { createNodes } from '../../interfaces/node.interface';
@@ -14,10 +14,13 @@ import {
 import { KeyboardShortcuts } from '../../types/keyboard-shortcuts.type';
 import { SelectionMode } from '../../types/selection-mode.type';
 import { AutoPanSettings } from '../../interfaces/auto-pan-settings.interface';
+import { provideVflow } from '../../features/feature';
+import { withAccessibility } from '../../features/with-accessibility';
 
 @Component({
   imports: [Vflow],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: [provideVflow(withAccessibility(() => inject(KeyboardHostComponent).ariaLabelConfig))],
   template: `<button>Before</button
     ><vflow
       [nodes]="nodes()"
@@ -27,7 +30,6 @@ import { AutoPanSettings } from '../../interfaces/auto-pan-settings.interface';
       [keyboardShortcuts]="keyboardShortcuts()"
       [snapGrid]="snapGrid()"
       [nodesFocusable]="nodesFocusable()"
-      [ariaLabelConfig]="ariaLabelConfig()"
       [selectionMode]="selectionMode()"
       [nodesSelectable]="nodesSelectable()"
       [edgesSelectable]="edgesSelectable()"

@@ -89,6 +89,9 @@ ADR-0004, ADR-0007, `@angular/router` (`provideRouter(routes, ...features)`), Fo
   `alignmentHelper`-объект) сливаются по ключам в три слоя: дефолт ← провайдер ← инпут (семантика
   `withDefaults`, memory «Object settings semantics»). `FlowSettingsService.bind()` остаётся, в него уходят уже
   резолвленные сигналы; `FlowSettingsSources` не меняется.
+- `VflowComponent.settings: ResolvedVflowSettingSignals` — публичные сигналы настроек в действии; инпуты держат
+  только привязанное. Пакеты (`vuiControls`) и приложения читают эффективные значения отсюда (добавлено при
+  реализации, 2026-11-08).
 - Токен `VFLOW_SETTINGS: InjectionToken<Signal<Partial<VflowSettings>>>` экспортируется (чтение в тестах и пакетах);
   документированный способ задать — `withSettings`.
 - Документация инпутов: JSDoc «Default: …» остаётся, ng-doc показывает тип `number | undefined` — приемлемо.

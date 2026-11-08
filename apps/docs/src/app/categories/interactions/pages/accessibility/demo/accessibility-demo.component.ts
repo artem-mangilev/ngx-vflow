@@ -10,7 +10,16 @@ import {
 } from '@angular/core';
 import { DocsPresentations } from '@docs/shared';
 import { Vui } from '@vflow/ui';
-import { AriaLabelConfig, DeleteRequest, Vflow, createEdges, createNodes, removeElements } from 'ngx-vflow';
+import {
+  AriaLabelConfig,
+  DeleteRequest,
+  Vflow,
+  createEdges,
+  createNodes,
+  provideVflow,
+  removeElements,
+  withAccessibility,
+} from 'ngx-vflow';
 
 const SPANISH: Partial<AriaLabelConfig> = {
   flowLabel: 'Grafo de aprobación',
@@ -50,6 +59,7 @@ const SPANISH: Partial<AriaLabelConfig> = {
 @Component({
   imports: [DocsPresentations, Vflow, Vui],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: [provideVflow(withAccessibility(() => inject(AccessibilityDemoComponent).labels))],
   styles: `
     vflow {
       height: 320px;
@@ -96,12 +106,7 @@ const SPANISH: Partial<AriaLabelConfig> = {
         </p>
         <button class="button" type="button" (click)="spanish.set(!spanish())">Switch graph language</button>
       </div>
-      <vflow
-        view="auto"
-        [nodes]="nodes()"
-        [edges]="edges()"
-        [ariaLabelConfig]="labels()"
-        (deleteRequest)="onDeleteRequest($event)">
+      <vflow view="auto" [nodes]="nodes()" [edges]="edges()" (deleteRequest)="onDeleteRequest($event)">
         <ng-template let-ctx vNode>
           @if (ctx.node.id === 'editor') {
             <article vuiNode class="editor">
@@ -133,7 +138,7 @@ export class AccessibilityDemoComponent {
   protected spanish = signal(false);
   protected focused = signal('');
   protected announced = signal('');
-  protected labels = computed<Partial<AriaLabelConfig>>(() =>
+  readonly labels = computed<Partial<AriaLabelConfig>>(() =>
     this.spanish() ? SPANISH : { flowLabel: 'Approval graph' },
   );
   protected nodes = signal(

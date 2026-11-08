@@ -10,7 +10,6 @@ import { createNodes, Node } from '../../interfaces/node.interface';
 import { DEFAULT_OPTIMIZATION, Optimization } from '../../interfaces/optimization.interface';
 import { SelectionBoxSettings } from '../../interfaces/selection-box-settings.interface';
 import { KeyboardShortcuts } from '../../types/keyboard-shortcuts.type';
-import { AriaLabelConfig } from '../../interfaces/aria-label-config.interface';
 
 @Component({
   imports: [Vflow],
@@ -20,7 +19,6 @@ import { AriaLabelConfig } from '../../interfaces/aria-label-config.interface';
     [optimization]="optimization"
     [selectionBox]="selectionBox"
     [keyboardShortcuts]="keyboardShortcuts"
-    [ariaLabelConfig]="ariaLabelConfig"
     [parentsBelowEdges]="parentsBelowEdges">
     <div *vNode style="width: 100px; height: 50px"></div>
   </vflow>`,
@@ -30,7 +28,6 @@ class SettingsHostComponent {
   @Input() optimization: Optimization = {};
   @Input() selectionBox: SelectionBoxSettings = {};
   @Input() keyboardShortcuts: KeyboardShortcuts = {};
-  @Input() ariaLabelConfig: Partial<AriaLabelConfig> = {};
   @Input() parentsBelowEdges = false;
 }
 
@@ -80,14 +77,6 @@ describe('object settings of vflow', () => {
     expect(settings.selectionBox()).toEqual({ mode: 'partial' });
     bind('selectionBox', {});
     expect(settings.selectionBox()).toEqual({ mode: 'full' });
-  });
-
-  it('reads ariaLabelConfig as the defaults plus the supplied keys', () => {
-    bind('ariaLabelConfig', { flowLabel: 'Approval graph' });
-    expect(settings.ariaLabels().flowLabel).toBe('Approval graph');
-    bind('ariaLabelConfig', { parentRole: 'frame' });
-    expect(settings.ariaLabels().flowLabel).toBe('Graph');
-    expect(settings.ariaLabels().parentRole).toBe('frame');
   });
 
   it('returns an omitted keyboard shortcut entry to its default', () => {
@@ -168,6 +157,8 @@ describe('settings inputs of vflow', () => {
     expect(settings.minZoom()).toBe(0.2);
     expect(settings.paneClickDistance()).toBe(0);
     expect(flow.optimization()).toEqual({ virtualization: true });
+    expect(flow.settings.optimization()).toEqual({ ...DEFAULT_OPTIMIZATION, virtualization: true });
+    expect(flow.settings.paneClickDistance()).toBe(0);
     expect(settings.optimization()).toEqual({ ...DEFAULT_OPTIMIZATION, virtualization: true });
     expect(entities.connection().allowSelfConnections).toBe(true);
   });
