@@ -157,7 +157,7 @@ describe('settings inputs of vflow', () => {
     }
   });
 
-  it('normalizes values on the way in and reads them back from the flow', () => {
+  it('normalizes values on the way in; the inputs keep what was bound', () => {
     const { fixture, flow, settings, entities } = setup();
     fixture.componentRef.setInput('minZoom', 0.2);
     fixture.componentRef.setInput('paneClickDistance', -5);
@@ -167,7 +167,8 @@ describe('settings inputs of vflow', () => {
     expect(flow.minZoom()).toBe(0.2);
     expect(settings.minZoom()).toBe(0.2);
     expect(settings.paneClickDistance()).toBe(0);
-    expect(flow.optimization()).toEqual({ ...DEFAULT_OPTIMIZATION, virtualization: true });
+    expect(flow.optimization()).toEqual({ virtualization: true });
+    expect(settings.optimization()).toEqual({ ...DEFAULT_OPTIMIZATION, virtualization: true });
     expect(entities.connection().allowSelfConnections).toBe(true);
   });
 });

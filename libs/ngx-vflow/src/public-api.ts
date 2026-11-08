@@ -108,6 +108,12 @@ export type * from './lib/vflow/types/keyboard-shortcuts.type';
 export type * from './lib/vflow/types/selection-mode.type';
 export type * from './lib/vflow/types/selection-box-mode.type';
 
+// Features
+export { VflowFeature, provideVflow, vflowFeature } from './lib/vflow/features/feature';
+export type { FeatureValue } from './lib/vflow/features/merged-feature-value';
+export { VFLOW_SETTINGS, withSettings } from './lib/vflow/features/with-settings';
+export { VFLOW_SETTINGS_DEFAULTS, type VflowSettings } from './lib/vflow/interfaces/vflow-settings.interface';
+
 // Components
 export * from './lib/vflow/components/vflow/vflow.component';
 export * from './lib/vflow/public-components/resizable/resizable.component';

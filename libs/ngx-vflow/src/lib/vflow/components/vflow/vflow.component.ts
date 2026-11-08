@@ -56,7 +56,7 @@ import { ComponentEventBusService } from '../../services/component-event-bus.ser
 import { Background } from '../../types/background.type';
 import { SpacePointContextDirective } from '../../directives/space-point-context.directive';
 import { FitViewOptions } from '../../interfaces/fit-view-options.interface';
-import { DEFAULT_OPTIMIZATION, Optimization } from '../../interfaces/optimization.interface';
+import { Optimization } from '../../interfaces/optimization.interface';
 import { withDefaults } from '../../utils/with-defaults';
 import { KeyboardShortcuts } from '../../types/keyboard-shortcuts.type';
 import { SelectionMode } from '../../types/selection-mode.type';
@@ -85,7 +85,7 @@ import { AutoPanDirective } from '../../directives/auto-pan.directive';
 import { ResizeObserverService } from '../../services/resize-observer.service';
 import { SelectionBoxComponent } from '../selection-box/selection-box.component';
 import { SelectionBoxContextDirective } from '../../directives/selection-box-context.directive';
-import { DEFAULT_SELECTION_BOX, SelectionBoxSettings } from '../../interfaces/selection-box-settings.interface';
+import { SelectionBoxSettings } from '../../interfaces/selection-box-settings.interface';
 import { AriaDescriber } from '@angular/cdk/a11y';
 import { EntityAccessibilityDirective } from '../../directives/entity-accessibility.directive';
 import { LiveRegionDirective } from '../../directives/live-region.directive';
@@ -97,11 +97,6 @@ import { AriaLabelConfig, DEFAULT_ARIA_LABEL_CONFIG } from '../../interfaces/ari
 import { ViewportCullingDirective } from '../../directives/viewport-culling.directive';
 import { AfterRenderBatchService } from '../../services/after-render-batch.service';
 import { bindVflowInputs } from './bind-vflow-inputs';
-
-/** A distance in CSS pixels: negative and non-finite values read as 0. */
-function nonNegative(value: number): number {
-  return Number.isFinite(value) ? Math.max(0, value) : 0;
-}
 
 /**
  * The flow. `N` and `E` are the node and edge types of the `nodes` and `edges` inputs; a template infers them from
@@ -237,120 +232,116 @@ export class VflowComponent<N extends Node = Node, E extends Edge = Edge> {
    * Size of the flow: `[width, height]` in pixels, or `'auto'` to fill the parent element. Default: `'auto'`, so
    * the parent needs a size of its own.
    */
-  public readonly view = input<[number, number] | 'auto'>('auto');
+  public readonly view = input<[number, number] | 'auto'>();
 
   /** Minimum zoom value. Default: 0.5. */
-  public readonly minZoom = input(0.5);
+  public readonly minZoom = input<number>();
 
   /** Maximum zoom value. Default: 3. */
-  public readonly maxZoom = input(3);
+  public readonly maxZoom = input<number>();
 
   /** Zoom with ordinary wheel/trackpad scrolling. */
-  public readonly zoomOnScroll = input(true);
+  public readonly zoomOnScroll = input<boolean>();
 
   /** Zoom with trackpad or touchscreen pinch. */
-  public readonly zoomOnPinch = input(true);
+  public readonly zoomOnPinch = input<boolean>();
 
   /** Zoom with double-click. */
-  public readonly zoomOnDoubleClick = input(false);
+  public readonly zoomOnDoubleClick = input<boolean>();
 
   /** Pan by dragging. true allows all mouse buttons; arrays restrict mouse buttons, not touch. */
-  public readonly panOnDrag = input<boolean | readonly number[]>(true);
+  public readonly panOnDrag = input<boolean | readonly number[]>();
 
   /** Pan with scrolling, taking priority over ordinary wheel zoom. */
-  public readonly panOnScroll = input(false);
+  public readonly panOnScroll = input<boolean>();
 
   /** Viewport click tolerance in CSS pixels. Default: 6. */
-  public readonly paneClickDistance = input(6, { transform: nonNegative });
+  public readonly paneClickDistance = input<number>();
 
   /** Distance in CSS pixels before node drag starts. Default: 0. */
-  public readonly nodeDragThreshold = input(0, { transform: nonNegative });
+  public readonly nodeDragThreshold = input<number>();
 
   /** Distance in CSS pixels before connection or reconnection starts. Default: 0. */
-  public readonly connectionDragThreshold = input(0, { transform: nonNegative });
+  public readonly connectionDragThreshold = input<number>();
 
   /**
    * Background for flow
    */
-  public readonly background = input<Background | null>(null);
+  public readonly background = input<Background | null>();
 
   /** Rendering optimizations; omitted keys keep their defaults. */
-  public readonly optimization = input(DEFAULT_OPTIMIZATION, {
-    transform: (value: Optimization) => withDefaults(DEFAULT_OPTIMIZATION, value),
-  });
+  public readonly optimization = input<Optimization>();
 
   /**
    * Draws the nodes that other nodes reference as parent in a layer below the edges, so an edge inside a parent
    * can be selected. Such a parent then also stays below every other node. Default: false.
    */
-  public readonly parentsBelowEdges = input(false);
+  public readonly parentsBelowEdges = input<boolean>();
 
   /** Global default for node selection eligibility. */
-  public readonly nodesSelectable = input(true);
+  public readonly nodesSelectable = input<boolean>();
 
   /** Global default for edge selection eligibility. */
-  public readonly edgesSelectable = input(true);
+  public readonly edgesSelectable = input<boolean>();
 
   /** Global default for node focus eligibility. */
-  public readonly nodesFocusable = input(true);
+  public readonly nodesFocusable = input<boolean>();
 
   /** Global default for edge focus eligibility. */
-  public readonly edgesFocusable = input(true);
+  public readonly edgesFocusable = input<boolean>();
 
   /**
    * Selection mode strategy
    * - 'default': library manages selection automatically
    * - 'manual': library does not manage selection, user controls it via node.selected signal
    */
-  public readonly selectionMode = input<SelectionMode>('default');
+  public readonly selectionMode = input<SelectionMode>();
 
   /**
    * Selection box behavior settings; omitted keys keep their defaults.
    * - mode: 'full' selects only fully enclosed entities
    * - mode: 'partial' selects entities that intersect selection box
    */
-  public readonly selectionBox = input(DEFAULT_SELECTION_BOX, {
-    transform: (value: SelectionBoxSettings) => withDefaults(DEFAULT_SELECTION_BOX, value),
-  });
+  public readonly selectionBox = input<SelectionBoxSettings>();
 
   /** Keys of the graph; omitted entries keep their defaults and an empty list disables an entry. */
-  public readonly keyboardShortcuts = input<KeyboardShortcuts>({});
+  public readonly keyboardShortcuts = input<KeyboardShortcuts>();
 
   /**
    * Settings for connection (it renders when user tries to create edge between nodes)
    */
-  public readonly connection = input<ConnectionSettings>({});
+  public readonly connection = input<ConnectionSettings>();
 
   /**
    * Snap grid for node movement. Passes as [x, y]
    */
-  public readonly snapGrid = input<[number, number]>([1, 1]);
+  public readonly snapGrid = input<[number, number]>();
 
   /**
    * Raizing z-index for selected node
    */
-  public readonly elevateNodesOnSelect = input(true);
+  public readonly elevateNodesOnSelect = input<boolean>();
 
   /**
    * Raizing z-index for selected edge
    */
-  public readonly elevateEdgesOnSelect = input(true);
+  public readonly elevateEdgesOnSelect = input<boolean>();
 
   /**
    * Pans the viewport while a dragged node or connection is held near its edge. `true` enables it for node and
    * connection drags with default speed and margin; `AutoPanSettings` tunes it. Default: true.
    */
-  public readonly autoPan = input<boolean | AutoPanSettings>(true);
+  public readonly autoPan = input<boolean | AutoPanSettings>();
 
   /** Center fully offscreen keyboard-focused nodes without changing zoom. Default: true. */
-  public readonly autoPanOnNodeFocus = input(true);
+  public readonly autoPanOnNodeFocus = input<boolean>();
 
   /**
    * Snaps a dragged node, or a dragged selection as a whole, to other nodes and draws the guides that hold: aligned
    * edges and centers, equal gaps between neighbours and straight edges to connected nodes. `true` enables it with
    * default settings. Holding the `alignmentBypass` modifier (Alt) moves freely.
    */
-  public readonly alignmentHelper = input<AlignmentHelperSettings | boolean>(false);
+  public readonly alignmentHelper = input<AlignmentHelperSettings | boolean>();
   // #endregion
 
   // #region MAIN_INPUTS
