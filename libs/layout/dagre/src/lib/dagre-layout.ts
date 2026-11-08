@@ -33,18 +33,15 @@ export interface DagreLayoutOptions {
  */
 export function dagreLayout({ padding = 20, ...options }: DagreLayoutOptions = {}): LayoutAlgorithm {
   return (graph) => {
-    const ids = new Set(graph.nodes.map((node) => node.id));
     const dagreGraph = new graphlib.Graph({ compound: true });
     dagreGraph.setGraph({ ...options });
     dagreGraph.setDefaultEdgeLabel(() => ({}));
     for (const node of graph.nodes) dagreGraph.setNode(node.id, { width: node.width, height: node.height });
     for (const node of graph.nodes) {
-      if (node.parentId && ids.has(node.parentId)) dagreGraph.setParent(node.id, node.parentId);
+      if (node.parentId) dagreGraph.setParent(node.id, node.parentId);
     }
     for (const edge of graph.edges) {
-      if (edge.source !== edge.target && ids.has(edge.source) && ids.has(edge.target)) {
-        dagreGraph.setEdge(edge.source, edge.target);
-      }
+      if (edge.source !== edge.target) dagreGraph.setEdge(edge.source, edge.target);
     }
 
     layout(dagreGraph);

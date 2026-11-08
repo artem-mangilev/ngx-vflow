@@ -27,7 +27,6 @@ function graph(): LayoutGraph {
       { id: 'b-d', source: 'b', target: 'd' },
       { id: 'd-e', source: 'd', target: 'e' },
       { id: 'loop', source: 'c', target: 'c' },
-      { id: 'dangling', source: 'c', target: 'missing' },
     ],
   };
 }

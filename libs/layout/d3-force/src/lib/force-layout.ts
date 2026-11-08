@@ -42,7 +42,6 @@ export function forceLayout(options: ForceLayoutOptions = {}): LayoutAlgorithm {
 
   return (graph, context) =>
     new Observable<LayoutResult>((subscriber) => {
-      const ids = new Set(graph.nodes.map((node) => node.id));
       // The simulation moves the centers of the nodes.
       const nodes: SimulationNode[] = graph.nodes.map((node) => ({
         id: node.id,
@@ -52,7 +51,7 @@ export function forceLayout(options: ForceLayoutOptions = {}): LayoutAlgorithm {
         height: node.height,
       }));
       const links = graph.edges
-        .filter((edge) => edge.source !== edge.target && ids.has(edge.source) && ids.has(edge.target))
+        .filter((edge) => edge.source !== edge.target)
         .map((edge) => ({ source: edge.source, target: edge.target }));
 
       const simulation = forceSimulation(nodes)

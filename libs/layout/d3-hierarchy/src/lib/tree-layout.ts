@@ -37,7 +37,7 @@ function forest(graph: LayoutGraph): Tree[] {
   const childrenOf = new Map<string, string[]>();
   const hasParent = new Set<string>();
   for (const { source, target } of graph.edges) {
-    if (source === target || !byId.has(source) || !byId.has(target) || hasParent.has(target)) continue;
+    if (source === target || hasParent.has(target)) continue;
     hasParent.add(target);
     childrenOf.set(source, [...(childrenOf.get(source) ?? []), target]);
   }

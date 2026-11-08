@@ -5,18 +5,29 @@ import { NodeTarget } from './position-writer';
 /** The rendered rectangle of a node in flow space, or `undefined` for a node that is not measured. */
 export type RectOf = (id: string) => Rect | undefined;
 
-/** The nodes as an algorithm sees them, with their rendered rectangles; unmeasured nodes are left out. */
+/**
+ * The nodes as an algorithm sees them, with their rendered rectangles. Unmeasured nodes are left out, and a parent
+ * that is left out is no parent.
+ */
 export function toLayoutNodes(nodes: readonly Node[], rectOf: RectOf): LayoutNode[] {
+  const measured = new Set(nodes.filter((node) => rectOf(node.id)).map((node) => node.id));
   return nodes.flatMap((node) => {
     const rect = rectOf(node.id);
-    return rect ? [{ id: node.id, parentId: node.parentId?.() ?? null, ...rect }] : [];
+    if (!rect) return [];
+    const parentId = node.parentId?.();
+    return [{ id: node.id, parentId: parentId && measured.has(parentId) ? parentId : null, ...rect }];
   });
 }
 
+/** The graph as an algorithm sees it: the measured nodes, and the edges between them. */
 export function toLayoutGraph(nodes: readonly Node[], edges: readonly Edge[], rectOf: RectOf): LayoutGraph {
+  const layoutNodes = toLayoutNodes(nodes, rectOf);
+  const ids = new Set(layoutNodes.map((node) => node.id));
   return {
-    nodes: toLayoutNodes(nodes, rectOf),
-    edges: edges.map((edge) => ({ id: edge.id, source: edge.source, target: edge.target })),
+    nodes: layoutNodes,
+    edges: edges
+      .filter((edge) => ids.has(edge.source) && ids.has(edge.target))
+      .map((edge) => ({ id: edge.id, source: edge.source, target: edge.target })),
   };
 }
 

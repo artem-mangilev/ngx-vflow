@@ -91,11 +91,9 @@ export function elkLayout(options: ElkLayoutOptions = {}): LayoutAlgorithm {
 
   return (graph) =>
     defer(async () => {
-      const ids = new Set(graph.nodes.map((node) => node.id));
       const childrenOf = new Map<string | null, LayoutNode[]>();
       for (const node of graph.nodes) {
-        const parent = node.parentId && ids.has(node.parentId) ? node.parentId : null;
-        childrenOf.set(parent, [...(childrenOf.get(parent) ?? []), node]);
+        childrenOf.set(node.parentId, [...(childrenOf.get(node.parentId) ?? []), node]);
       }
       const toElk = (node: LayoutNode): ElkNode => ({
         id: node.id,
@@ -108,7 +106,7 @@ export function elkLayout(options: ElkLayoutOptions = {}): LayoutAlgorithm {
         layoutOptions,
         children: (childrenOf.get(null) ?? []).map(toElk),
         edges: graph.edges
-          .filter((edge) => edge.source !== edge.target && ids.has(edge.source) && ids.has(edge.target))
+          .filter((edge) => edge.source !== edge.target)
           .map((edge) => ({ id: edge.id, sources: [edge.source], targets: [edge.target] })),
       };
 

@@ -5,6 +5,7 @@ const rects: Record<string, Rect> = {
   a: { x: 0, y: 0, width: 100, height: 50 },
   group: { x: 400, y: 0, width: 300, height: 200 },
   c: { x: 420, y: 20, width: 100, height: 50 },
+  orphan: { x: 0, y: 100, width: 100, height: 50 },
 };
 const rectOf = (id: string) => rects[id];
 
@@ -13,6 +14,7 @@ const nodes = createNodes([
   { id: 'unmeasured', point: { x: 0, y: 0 } },
   { id: 'group', point: { x: 400, y: 0 }, width: 300, height: 200 },
   { id: 'c', point: { x: 20, y: 20 }, parentId: 'group' },
+  { id: 'orphan', point: { x: 0, y: 100 }, parentId: 'unmeasured' },
 ]);
 const edges = createEdges([
   { id: 'a-c', source: 'a', target: 'c' },
@@ -20,18 +22,18 @@ const edges = createEdges([
 ]);
 
 describe('layout graph', () => {
-  it('describes the measured nodes with their rectangles and parents, and the edges by their ends', () => {
+  it('describes the measured nodes with their rectangles and parents, and the edges between them', () => {
     const graph = toLayoutGraph(nodes, edges, rectOf);
 
     expect(graph.nodes).toEqual([
       { id: 'a', parentId: null, x: 0, y: 0, width: 100, height: 50 },
       { id: 'group', parentId: null, x: 400, y: 0, width: 300, height: 200 },
       { id: 'c', parentId: 'group', x: 420, y: 20, width: 100, height: 50 },
+      // An unmeasured parent is no parent.
+      { id: 'orphan', parentId: null, x: 0, y: 100, width: 100, height: 50 },
     ]);
-    expect(graph.edges).toEqual([
-      { id: 'a-c', source: 'a', target: 'c' },
-      { id: 'a-x', source: 'a', target: 'unmeasured' },
-    ]);
+    // An edge to an unmeasured node is left out.
+    expect(graph.edges).toEqual([{ id: 'a-c', source: 'a', target: 'c' }]);
   });
 
   it('turns flow-space positions into node space, relative to the laid-out or rendered parent, with the sizes', () => {

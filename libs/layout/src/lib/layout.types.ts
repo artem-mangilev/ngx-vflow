@@ -21,6 +21,7 @@ export interface LayoutEdge {
   target: string;
 }
 
+/** Every edge joins two nodes of the graph, and a `parentId` names one; an algorithm checks neither. */
 export interface LayoutGraph {
   nodes: LayoutNode[];
   edges: LayoutEdge[];
