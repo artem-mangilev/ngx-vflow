@@ -1,6 +1,6 @@
 # 09. `toStaticNodes` / `toStaticEdges` и рецепт «Persisting a graph»
 
-Status: ready-for-agent
+Status: resolved
 Type: task
 Blocked by: 08
 
@@ -21,3 +21,13 @@ Blocked by: 08
 - Спек в `node-dom` (без DOM-зависимостей): `toStaticNodes(createNodes(static))` даёт глубоко равный `static` для нод с явным и без явного размера, с `component`-ключом, с `parentId`; то же для рёбер с `curve`-ключом и маркерами; класс в `component` — предупреждение в dev и поле на месте; вызов внутри `effect` не создаёт зависимостей (счётчик запусков эффекта).
 - `JSON.parse(JSON.stringify(toStaticNodes(nodes)))` проходит через `createNodes` без потерь в демо.
 - `nx test ngx-vflow`, lint, builds зелёные; e2e на странице рецепта: сохранить, перезагрузить, граф на месте.
+
+## Comments
+
+2026-11-08, сделано:
+
+- `toStaticNode` / `toStaticNodes` в `node.interface.ts`, `toStaticEdge` / `toStaticEdges` в `edge.interface.ts` — зеркало фабрик: сигналы читаются в `untracked`, поле без сигнала не появляется (auto-ось остаётся без размера), `component` / `curve` копируются как есть; класс, lazy-фабрика или функция кривой в dev-режиме — `console.warn` с id и подсказкой про `with*()`. Общий хелпер `read(key, signal)` живёт в `node.interface.ts` (внутренний экспорт модуля). `data` не трогается.
+- Типы: `toStaticNodes<T>(nodes: readonly Node<T>[]): StaticNode<T>[]` — `T` выводится из нод, для union-данных из `createNodes` получается union.
+- Спек `node-dom/static-entities.spec.ts` (jsdom и happy-dom, с zone и без — 16 прогонов): круг нод (явный/неявный размер, ключ компонента, parentId, extent), круг рёбер (ключ кривой, встроенная кривая, маркеры, sourceHandle), `JSON.parse(JSON.stringify(...))` без потерь, предупреждения для класса/фабрики, эффект со снимком не следит за сигналами нод.
+- Docs: Cookbook «Persisting a graph» (order 1) с демо Save / Restore / Reset в `localStorage` и печатью снимка; абзацы-ссылки на Default nodes и Custom nodes (Component keys).
+- Проверено в dev-сервере: драг → Save пишет новую точку в снимок и `localStorage`; Reset возвращает граф и чистит хранилище; Restore с изменённым в хранилище снимком переставляет ноду (`translate(200px, 20px)`), рёбра на месте, консоль без ошибок. `nx lint ngx-vflow`, `nx lint docs`; `nx build ngx-vflow` (четыре функции в `index.d.ts`, `ɵ` не прибавилось); `nx build docs`. e2e страницы — тикет 06.

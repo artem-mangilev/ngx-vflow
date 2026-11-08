@@ -93,7 +93,7 @@ providers of the application, a route or a component, and a registration closer 
 further up; see [Configuration](../../introduction/configuration). A key that nothing registers throws when the node
 is created, with the key in the message.
 
-A key is any string by default. To have the compiler check it, augment the `VflowNodeComponents` interface of the
+`toStaticNodes()` keeps the key in the snapshot of a graph, so the graph serializes; see [Persisting a graph](../../cookbook/persisting-graph). A key is any string by default. To have the compiler check it, augment the `VflowNodeComponents` interface of the
 library with your keys; then a typo in `component` or in `withNodeComponents()` is a compile error:
 
 ```typescript

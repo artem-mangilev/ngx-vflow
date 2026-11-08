@@ -18,3 +18,7 @@ Copy them or write your own; see `*FeaturesCustomNodes` for templates and compon
 - `ariaLabel` gives the node its accessible name; without it core uses `Node {id}`.
 - `width` and `height` are optional initial dimensions; the rendered template is measured afterwards.
 - Handles are part of your template: put the `vHandle` directive on the elements where connections should attach.
+
+## Saving the graph
+
+`createNodes()` wraps plain objects into the signals a flow reads; `toStaticNodes()` reads them back into the same plain shape, which `JSON.stringify` and a store can take. See [Persisting a graph](../../cookbook/persisting-graph).

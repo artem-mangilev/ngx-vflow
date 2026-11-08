@@ -1,4 +1,4 @@
-import { signal, Type, WritableSignal } from '@angular/core';
+import { Signal, signal, Type, WritableSignal, untracked } from '@angular/core';
 import { Point } from './point.interface';
 import { UnwrapSignal } from '../types/unwrap-signal.type';
 import { isDefined } from '../utils/is-defined';
@@ -98,4 +98,50 @@ export function createNodes<N extends StaticNode>(nodes: N[]): NodeWithDefaults<
 export function createNodes<T>(nodes: StaticNode<T>[]): NodeWithDefaults<T>[];
 export function createNodes(nodes: StaticNode[]): NodeWithDefaults[] {
   return nodes.map((node) => createNode(node));
+}
+
+/**
+ * The node as data: every signal read once, outside any reactive context, so the result goes to `JSON.stringify`
+ * or a store, and back through `createNode()`. A field without a signal stays absent, so a content-sized node keeps
+ * no measured size. `component` is kept as given: a key serializes, while a class or a factory is dropped by JSON,
+ * which a development build warns about.
+ */
+export function toStaticNode<T>(node: Node<T>): StaticNode<T> {
+  return untracked(() => ({
+    id: node.id,
+    point: node.point(),
+    ...(node.component !== undefined ? { component: node.component } : {}),
+    ...read('data', node.data),
+    ...read('width', node.width),
+    ...read('height', node.height),
+    ...read('draggable', node.draggable),
+    ...read('parentId', node.parentId),
+    ...read('extent', node.extent),
+    ...read('selected', node.selected),
+    ...read('selectable', node.selectable),
+    ...read('focusable', node.focusable),
+    ...read('ariaLabel', node.ariaLabel),
+    ...read('ariaDescription', node.ariaDescription),
+    ...read('domAttributes', node.domAttributes),
+    ...warnUnserializable(node),
+  }));
+}
+
+/** Every node as data, see {@link toStaticNode}. */
+export function toStaticNodes<T>(nodes: readonly Node<T>[]): StaticNode<T>[] {
+  return nodes.map((node) => toStaticNode(node));
+}
+
+/** `{ [key]: value }` when the signal exists, nothing otherwise. */
+export function read<K extends string, V>(key: K, source: Signal<V> | undefined): { [P in K]?: V } {
+  return source ? ({ [key]: source() } as { [P in K]: V }) : {};
+}
+
+function warnUnserializable(node: Node): Record<string, never> {
+  if ((typeof ngDevMode === 'undefined' || ngDevMode) && typeof node.component === 'function') {
+    console.warn(
+      `[ngx-vflow] Node "${node.id}" names its component as a class or a factory, which JSON drops. Register it with provideVflow(withNodeComponents({ key: … })) and name the key.`,
+    );
+  }
+  return {};
 }

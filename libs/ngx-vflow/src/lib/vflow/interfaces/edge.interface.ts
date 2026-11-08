@@ -1,11 +1,11 @@
-import { signal, WritableSignal } from '@angular/core';
+import { signal, untracked, WritableSignal } from '@angular/core';
 import { Connection } from './connection.interface';
 import { CurveFactory } from './curve-factory.interface';
 import { MarkerRef } from './marker.interface';
 import { UnwrapSignal } from '../types/unwrap-signal.type';
 import { isDefined } from '../utils/is-defined';
 import { DomAttributes } from './dom-attributes.interface';
-import { EntityComponentType } from './node.interface';
+import { EntityComponentType, read } from './node.interface';
 import { StaticData } from '../types/static-data.type';
 import { EdgeComponentKey } from './entity-components.interface';
 import { BuiltInCurve, CurveKey } from './curves.interface';
@@ -112,4 +112,52 @@ export function createEdges<E extends StaticEdge>(edges: E[]): EdgeWithDefaults<
 export function createEdges<T>(edges: StaticEdge<T>[]): EdgeWithDefaults<T>[];
 export function createEdges(edges: StaticEdge[]): EdgeWithDefaults[] {
   return edges.map((edge) => createEdge(edge));
+}
+
+/**
+ * The edge as data: every signal read once, outside any reactive context, so the result goes to `JSON.stringify`
+ * or a store, and back through `createEdge()`. `component` and `curve` are kept as given: a key or a built-in name
+ * serializes, while a class, a factory or a curve function is dropped by JSON, which a development build warns about.
+ */
+export function toStaticEdge<T>(edge: Edge<T>): StaticEdge<T> {
+  return untracked(() => ({
+    id: edge.id,
+    source: edge.source,
+    target: edge.target,
+    ...(edge.sourceHandle !== undefined ? { sourceHandle: edge.sourceHandle } : {}),
+    ...(edge.targetHandle !== undefined ? { targetHandle: edge.targetHandle } : {}),
+    ...(edge.component !== undefined ? { component: edge.component } : {}),
+    ...read('curve', edge.curve),
+    ...read('data', edge.data),
+    ...read('markers', edge.markers),
+    ...read('reconnectable', edge.reconnectable),
+    ...read('selected', edge.selected),
+    ...read('interactionWidth', edge.interactionWidth),
+    ...read('selectable', edge.selectable),
+    ...read('focusable', edge.focusable),
+    ...read('ariaLabel', edge.ariaLabel),
+    ...read('ariaDescription', edge.ariaDescription),
+    ...read('domAttributes', edge.domAttributes),
+    ...warnUnserializable(edge),
+  }));
+}
+
+/** Every edge as data, see {@link toStaticEdge}. */
+export function toStaticEdges<T>(edges: readonly Edge<T>[]): StaticEdge<T>[] {
+  return edges.map((edge) => toStaticEdge(edge));
+}
+
+function warnUnserializable(edge: Edge): Record<string, never> {
+  if (typeof ngDevMode !== 'undefined' && !ngDevMode) return {};
+  if (typeof edge.component === 'function') {
+    console.warn(
+      `[ngx-vflow] Edge "${edge.id}" names its component as a class or a factory, which JSON drops. Register it with provideVflow(withEdgeComponents({ key: … })) and name the key.`,
+    );
+  }
+  if (typeof untracked(() => edge.curve?.()) === 'function') {
+    console.warn(
+      `[ngx-vflow] Edge "${edge.id}" has a curve factory, which JSON drops. Register it with provideVflow(withCurves({ key: … })) and name the key.`,
+    );
+  }
+  return {};
 }
