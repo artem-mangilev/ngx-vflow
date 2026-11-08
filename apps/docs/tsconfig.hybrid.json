@@ -14,6 +14,7 @@
       "@vflow/routing": ["dist/libs/routing"],
       "@vflow/auto-size": ["dist/libs/auto-size"],
       "@vflow/layout": ["dist/libs/layout"],
+      "@vflow/layout/d3-hierarchy": ["dist/libs/layout/d3-hierarchy"],
       "@vflow/layout/dagre": ["dist/libs/layout/dagre"],
       "@vflow/layout/elk": ["dist/libs/layout/elk"],
       "@vflow/layout/d3-force": ["dist/libs/layout/d3-force"],

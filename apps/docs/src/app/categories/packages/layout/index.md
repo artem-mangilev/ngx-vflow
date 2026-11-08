@@ -10,6 +10,7 @@ keyword: 'PackagesLayout'
 npm i @vflow/layout
 npm i @dagrejs/dagre   # for @vflow/layout/dagre
 npm i elkjs            # for @vflow/layout/elk
+npm i d3-hierarchy     # for @vflow/layout/d3-hierarchy
 npm i d3-force         # for @vflow/layout/d3-force
 ```
 
@@ -57,6 +58,12 @@ The animation is a position writer: a directive that provides `VX_LAYOUT_POSITIO
 `elkLayout(options)` runs the [Eclipse Layout Kernel](https://eclipse.dev/elk/) through `elkjs` in the main thread. The options are typed, so no ELK option keys reach your code: `algorithm` (`layered`, `mrtree`, `stress`, `force`, `radial`, `box`, `rectpacking`), `direction`, `nodeSpacing`, `layerSpacing`, `edgeNodeSpacing`, `padding`, `nodePlacement`, `edgeRouting`, `separateConnectedComponents` and `aspectRatio`. Nested nodes are ELK children, laid out with their parents.
 
 {{ NgDocActions.demoPane("LayoutElkDemoComponent") }}
+
+## d3-hierarchy
+
+`treeLayout(options)` lays a tree, or a forest, out level by level with the tidy tree of [d3-hierarchy](https://github.com/d3/d3-hierarchy): siblings side by side, each subtree under its parent, in a `direction` with `nodeSpacing` between siblings and `levelSpacing` between levels. Every node counts with its own size, so cards of different widths do not overlap, and the levels are aligned at their start. A node's parent is the source of its first incoming edge, a node without one is a root. `radialTreeLayout(options)` puts the root at the `center` and the levels on rings `levelSpacing` apart, as a mind map.
+
+{{ NgDocActions.demoPane("LayoutTreeDemoComponent") }}
 
 ## d3-force
 

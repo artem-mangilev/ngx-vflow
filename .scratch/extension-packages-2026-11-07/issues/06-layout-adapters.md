@@ -49,3 +49,9 @@ Blocked by: 05
 2026-11-07: `measured` убран с `VflowComponent` (решение пользователя): контракт ворот — один колбэк (решение пользователя: `prepare`/сигналы неочевидны): `onMeasured(ready: () => void)`, флоу вызывает его один раз, когда измерен (effect в `FlowRenderingService`, ворота считаются по счётчику `pendingGates`), ворота зовут `ready()`, когда граф можно показывать; повторные вызовы игнорируются. Публичная поверхность компонента не растёт; `multi` оставлен.
 
 2026-11-07: `multi` убран окончательно (решение пользователя: обработка в ядре с счётчиком усложнилась) — один гейт на флоу, `injector.get(token, null, { self: true })`, `gateOpen` вместо `pendingGates`.
+
+2026-11-08, `@vflow/layout/d3-hierarchy` (peer `d3-hierarchy`, optional): `treeLayout({ direction, nodeSpacing,
+levelSpacing })` — tidy tree с единичным `nodeSize` и separation в flow-единицах (полусуммы размеров + зазор), уровни
+выровнены по началу и считаются по самой глубокой ноде уровня; лес через виртуальный корень, родитель — источник
+первого входящего ребра, узлы из циклов становятся корнями. `radialTreeLayout({ levelSpacing, center })` — кольца по
+глубине, углы из единичных separation с замыкающим зазором. Демо «org chart» с кнопками down/right/radial.

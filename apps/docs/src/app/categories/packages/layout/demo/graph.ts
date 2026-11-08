@@ -38,3 +38,37 @@ export function demoEdges() {
     { id: 'reduce -> report', source: 'reduce', target: 'report' },
   ]);
 }
+
+/** An org chart for the tree demo, with content-sized cards of different widths. */
+export function treeNodes() {
+  const people = [
+    ['ceo', 'Chief executive'],
+    ['cto', 'CTO'],
+    ['cfo', 'Chief financial officer'],
+    ['coo', 'COO'],
+    ['eng', 'Engineering'],
+    ['design', 'Design'],
+    ['acct', 'Accounting'],
+    ['ops', 'Operations'],
+    ['fe', 'Frontend'],
+    ['be', 'Backend'],
+    ['sre', 'Site reliability'],
+  ] as const;
+  return createNodes(people.map(([id, text]) => ({ id, point: { x: 0, y: 0 }, draggable: false, data: { text } })));
+}
+
+export function treeEdges() {
+  const reports = [
+    ['ceo', 'cto'],
+    ['ceo', 'cfo'],
+    ['ceo', 'coo'],
+    ['cto', 'eng'],
+    ['cto', 'design'],
+    ['cfo', 'acct'],
+    ['coo', 'ops'],
+    ['eng', 'fe'],
+    ['eng', 'be'],
+    ['eng', 'sre'],
+  ] as const;
+  return createEdges(reports.map(([source, target]) => ({ id: `${source} -> ${target}`, source, target })));
+}
