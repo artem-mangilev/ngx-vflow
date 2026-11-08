@@ -20,7 +20,7 @@ import {
   tap,
 } from 'rxjs';
 import { LayoutAlgorithm, LayoutDragEvent, LayoutGraph, LayoutNode, LayoutResult } from './layout.types';
-import { VX_LAYOUT_POSITION_WRITER, placeNodes } from './position-writer';
+import { VX_LAYOUT_POSITION_WRITER } from './position-writer';
 
 /**
  * Lays out the nodes of the flow with a `LayoutAlgorithm` and writes the positions into their `point` signals. The
@@ -31,7 +31,7 @@ import { VX_LAYOUT_POSITION_WRITER, placeNodes } from './position-writer';
  *
  * The first layout happens before the first paint: the directive holds the initialization of the flow until the
  * positions are in, so the graph appears laid out and `(initialized)` sees it that way. Positions are placed at
- * once; `VxLayoutAnimate` on the same element animates the layouts that follow the first.
+ * once; `VxLayoutAnimate` on the same element animates them once the flow has painted.
  *
  * ```html
  * <vflow [vxLayout]="layout" [nodes]="nodes" [edges]="edges" />
@@ -73,7 +73,7 @@ export class VxLayout implements VflowInitializationGate {
         .join('\u0000')}`,
   );
 
-  /** The first positions are in: the flow may paint, and the layouts after this one may animate. */
+  /** The first positions are in: the flow may paint. */
   private readonly placed = signal(false);
   private readonly placed$ = toObservable(this.placed);
   private readonly dragging = new Set<string>();
@@ -175,12 +175,8 @@ export class VxLayout implements VflowInitializationGate {
       targets.set(node, { x: position.x - origin.x, y: position.y - origin.y });
     }
 
-    if (this.placed()) {
-      await this.writer.write(targets);
-    } else {
-      placeNodes(targets);
-      this.placed.set(true);
-    }
+    await this.writer.write(targets);
+    this.placed.set(true);
     return result;
   }
 

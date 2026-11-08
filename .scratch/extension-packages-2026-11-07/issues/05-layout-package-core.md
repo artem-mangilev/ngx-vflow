@@ -75,3 +75,5 @@ Blocked by: 03
   settled (resolve или reject). В хосте вместо `release: (() => void) | null` один сигнал `placed` («первые позиции
   на месте»): по нему `apply` ставит сразу или через писателя, `onMeasured` возвращает
   `firstValueFrom(placed$.pipe(filter(Boolean)))`, `finalize` ставит `placed` на случай пустого или упавшего прогона.
+- Хост всегда пишет через писателя и не зовёт `placeNodes` сам; «до первого paint ставить сразу» — правило
+  `VxLayoutAnimate` (флаг `painted` по `initialized` флоу).
