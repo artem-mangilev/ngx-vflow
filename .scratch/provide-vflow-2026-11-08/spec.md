@@ -161,6 +161,20 @@ ADR-0004, ADR-0007, `@angular/router` (`provideRouter(routes, ...features)`), Fo
 - `@vflow/ui`: `vuiControls` держит свои `labels` инпутом; подхватывать их из `withAccessibility` — возможный
   follow-up, в `AriaLabelConfig` таких ключей пока нет.
 
+## Сериализуемость (дополнение 2026-11-08)
+
+Аудит по просьбе пользователя. Формат хранения уже есть: `StaticNode` / `StaticEdge` (сигналы развёрнуты), ссылки
+`parentId`, `source`, `target`, `sourceHandle` по id, маркеры по id шаблона, компоненты по ключу (тикет 04). Мешают:
+
+1. `Edge.curve` с фабрикой — функция в данных → **`withCurves`** (тикет 08): реестр по образцу компонентов, интерфейс
+   `VflowCurves` для аугментации, ключ разрешается внутри `computed` пути (кривая — сигнал), встроенные имена не
+   переопределяются, `ConnectionSettings.curve` принимает те же ключи.
+2. Обратного пути из сигналов нет: `JSON.stringify(node)` молча теряет `point`, `data`, `width` → **`toStaticNodes`
+   / `toStaticEdges`** (тикет 09), зеркало `createNodes` / `createEdges`, плюс рецепт «Persisting a graph».
+3. `data` принадлежит приложению — документируется правило «JSON-совместимо, без сигналов и функций».
+
+Попутно: `view` уходит из `VflowSettings` (тикет 08).
+
 ## Тикеты
 
 1. **01-feature-record** — `VflowFeature`, `vflowFeature`, `provideVflow` с dev-проверками (перенос из
@@ -181,4 +195,9 @@ ADR-0004, ADR-0007, `@angular/router` (`provideRouter(routes, ...features)`), Fo
 6. **06-release-smoke** — `nx build ngx-vflow`, `index.d.ts` содержит все новые символы и ничего под `ɵ`, гибридная
    сборка docs, e2e на страницах accessibility и custom nodes.
 
-Зависимости: 02, 03, 04 зависят от 01 и независимы между собой; 05 — после 02–04; 06 — последним.
+7. **07-shortcuts** — `withShortcuts`, инпут `keyboardShortcuts` удалён (сделано).
+8. **08-curves** — `withCurves`, `VflowCurves`, разрешение ключа в пути ребра и соединения, `view` из `VflowSettings`.
+9. **09-static-entities** — `toStaticNodes` / `toStaticEdges`, рецепт «Persisting a graph».
+
+Зависимости: 02, 03, 04 зависят от 01 и независимы между собой; 05 — после 02–04; 07 — после 02; 08 — после 04;
+09 — после 08; 06 (release smoke) — последним, после 08 и 09.
