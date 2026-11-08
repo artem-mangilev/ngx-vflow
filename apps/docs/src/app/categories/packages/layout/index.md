@@ -61,7 +61,7 @@ The animation is a position writer: a directive that provides `VX_LAYOUT_POSITIO
 
 ## d3-hierarchy
 
-`treeLayout(options)` lays a tree, or a forest, out level by level with the tidy tree of [d3-hierarchy](https://github.com/d3/d3-hierarchy): siblings side by side, each subtree under its parent, in a `direction` with `nodeSpacing` between siblings and `levelSpacing` between levels. Every node counts with its own size, so cards of different widths do not overlap, and the levels are aligned at their start. A node's parent is the source of its first incoming edge, a node without one is a root. `radialTreeLayout(options)` puts the root at the `center` and the levels on rings `levelSpacing` apart, as a mind map.
+`treeLayout(options)` lays a tree, or a forest, out level by level with the tidy tree of [d3-hierarchy](https://github.com/d3/d3-hierarchy): siblings side by side, each subtree under its parent, in a `direction` with `nodeSpacing` between siblings and `levelSpacing` between levels. Every node counts with its own size, so cards of different widths do not overlap, and the levels are aligned at their start. A node's parent is the source of its first incoming edge, a node without one is a root. `radialTreeLayout(options)` puts the root at the `center` and the levels on rings `levelSpacing` apart, as a mind map. The cards of the demo carry one floating handle, `position="auto"`, so an edge meets a card on the side that faces the other end, whichever way the tree grows.
 
 {{ NgDocActions.demoPane("LayoutTreeDemoComponent") }}
 

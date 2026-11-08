@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, booleanAttribute, computed, input } from '@angular/core';
 import { Vui } from '@vflow/ui';
 import { VflowEdgeInteractionAreaDirective, Vflow } from 'ngx-vflow';
 
@@ -62,13 +62,23 @@ interface EdgeCtx {
         } @else {
           <span>{{ text() }}</span>
         }
-        <span vuiPort handleType="target" position="left" [canStart]="connectable()" [canAccept]="connectable()"></span>
-        <span
-          vuiPort
-          handleType="source"
-          position="right"
-          [canStart]="connectable()"
-          [canAccept]="connectable()"></span>
+        @if (floating()) {
+          <!-- One handle whose point faces the other end of each edge: the card has no ports. -->
+          <span vHandle handleType="any" position="auto" [canStart]="connectable()" [canAccept]="connectable()"></span>
+        } @else {
+          <span
+            vuiPort
+            handleType="target"
+            position="left"
+            [canStart]="connectable()"
+            [canAccept]="connectable()"></span>
+          <span
+            vuiPort
+            handleType="source"
+            position="right"
+            [canStart]="connectable()"
+            [canAccept]="connectable()"></span>
+        }
       </div>
     }
   `,
@@ -77,6 +87,8 @@ export class DocsNodeComponent {
   readonly ctx = input.required<NodeCtx>();
   /** Whether the ports start and accept connections; a demo whose edges are fixed turns it off. */
   readonly connectable = input(true);
+  /** One floating handle instead of the left and right ports: the edges meet the side that faces the other end. */
+  readonly floating = input(false, { transform: booleanAttribute });
   protected readonly isGroup = computed(() => this.ctx().data()?.type === 'group');
   protected readonly title = computed(() => this.ctx().data()?.text ?? this.ctx().data()?.title ?? '');
   protected readonly text = computed(() => this.ctx().data()?.text ?? this.ctx().data()?.title ?? this.ctx().node.id);

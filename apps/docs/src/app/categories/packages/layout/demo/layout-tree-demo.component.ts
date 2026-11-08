@@ -25,7 +25,7 @@ type Shape = 'down' | 'right' | 'radial';
       [background]="{ type: 'dots' }"
       (vxLayoutEnd)="flow().fitView({ padding: 0.1, duration: painted ? 300 : 0 })"
       (initialized)="painted = true">
-      <docs-node *vNode="let ctx" [ctx]="ctx" [connectable]="false" />
+      <docs-node *vNode="let ctx" floating [ctx]="ctx" [connectable]="false" />
       <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
     </vflow>
   `,
