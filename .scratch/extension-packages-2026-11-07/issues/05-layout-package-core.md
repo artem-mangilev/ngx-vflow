@@ -79,3 +79,7 @@ Blocked by: 03
   `VxLayoutAnimate` (флаг `painted` по `initialized` флоу).
 - `write(targets, { first })`: хост сообщает писателю, что это первые позиции (`!placed()`); `VxLayoutAnimate` при
   `first` ставит сразу и больше не зависит от `VflowComponent`/`initialized`.
+- Геометрия вынесена в `layout-graph.ts` (`toLayoutNodes`, `toLayoutGraph`, `toNodeSpaceTargets` с бывшим
+  `flowOrigin`), спека без TestBed. В директиве `graph` — `computed` на утилите, `dragging` — `toSignal(scan)` по
+  потоку драгов вместо ручной подписки и мутируемого Set, `structure` переименован в `graphIds` (сырые массивы в
+  `combineLatest` перезапускали бы лейаут при каждом новом массиве с теми же id и откатывали бы позиции пользователя).

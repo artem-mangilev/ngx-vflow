@@ -1,6 +1,6 @@
 import { Directive, ErrorHandler, computed, inject, input, output, signal } from '@angular/core';
-import { outputToObservable, takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
-import { Node, Point, VFLOW_INITIALIZATION_GATE, VflowComponent, VflowInitializationGate } from 'ngx-vflow';
+import { outputToObservable, takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { VFLOW_INITIALIZATION_GATE, VflowComponent, VflowInitializationGate } from 'ngx-vflow';
 import {
   EMPTY,
   Observable,
@@ -13,13 +13,15 @@ import {
   firstValueFrom,
   map,
   merge,
+  scan,
   share,
   switchMap,
   take,
   takeLast,
   tap,
 } from 'rxjs';
-import { LayoutAlgorithm, LayoutDragEvent, LayoutGraph, LayoutNode, LayoutResult } from './layout.types';
+import { toLayoutGraph, toLayoutNodes, toNodeSpaceTargets } from './layout-graph';
+import { LayoutAlgorithm, LayoutDragEvent, LayoutResult } from './layout.types';
 import { VX_LAYOUT_POSITION_WRITER } from './position-writer';
 
 /**
@@ -61,8 +63,8 @@ export class VxLayout implements VflowInitializationGate {
     () => this.measured() && this.flow.nodes().every((node) => this.flow.getNodeRect(node.id)),
   );
 
-  /** The set of nodes and edges, so a move or a resize does not count as a change. */
-  private readonly structure = computed(
+  /** The ids of the nodes and edges: a new array with the same graph, a move or a resize is not a change. */
+  private readonly graphIds = computed(
     () =>
       `${this.flow
         .nodes()
@@ -73,10 +75,14 @@ export class VxLayout implements VflowInitializationGate {
         .join('\u0000')}`,
   );
 
+  private readonly rectOf = (id: string) => this.flow.getNodeRect(id);
+
+  /** The graph as an algorithm sees it, read when a run starts. */
+  private readonly graph = computed(() => toLayoutGraph(this.flow.nodes(), this.flow.edges(), this.rectOf));
+
   /** The first positions are in: the flow may paint. */
   private readonly placed = signal(false);
   private readonly placed$ = toObservable(this.placed);
-  private readonly dragging = new Set<string>();
 
   /** The drags of nodes as an algorithm sees them, with the nodes as they are at that moment. */
   private readonly drags: Observable<LayoutDragEvent> = merge(
@@ -84,19 +90,29 @@ export class VxLayout implements VflowInitializationGate {
     outputToObservable(this.flow.nodeDrag).pipe(map((event) => ({ type: 'move' as const, ...event }))),
     outputToObservable(this.flow.nodeDragEnd).pipe(map((event) => ({ type: 'end' as const, ...event }))),
   ).pipe(
-    map(({ type, nodes }) => ({ type, nodes: this.layoutNodes(nodes) })),
+    map(({ type, nodes }) => ({ type, nodes: toLayoutNodes(nodes, this.rectOf) })),
     share(),
   );
 
-  constructor() {
-    this.drags.pipe(takeUntilDestroyed()).subscribe(({ type, nodes }) => {
-      for (const node of nodes) type === 'end' ? this.dragging.delete(node.id) : this.dragging.add(node.id);
-    });
+  /** The nodes being dragged, which a layout leaves where they are. */
+  private readonly dragging = toSignal(
+    this.drags.pipe(
+      scan((ids, { type, nodes }) => {
+        const next = new Set(ids);
+        for (const node of nodes)
+          if (type === 'end') next.delete(node.id);
+          else next.add(node.id);
+        return next;
+      }, new Set<string>()),
+    ),
+    { initialValue: new Set<string>() },
+  );
 
+  constructor() {
     // A run for every algorithm and every set of nodes and edges, once every node is measured; a newer run replaces
     // the one before it.
     const ready = toObservable(this.ready);
-    combineLatest([toObservable(this.vxLayout), toObservable(this.structure)])
+    combineLatest([toObservable(this.vxLayout), toObservable(this.graphIds)])
       .pipe(
         switchMap(([algorithm]) =>
           ready.pipe(
@@ -140,55 +156,17 @@ export class VxLayout implements VflowInitializationGate {
     );
   }
 
-  private graph(): LayoutGraph {
-    return {
-      nodes: this.layoutNodes(this.flow.nodes()),
-      edges: this.flow.edges().map((edge) => ({ id: edge.id, source: edge.source, target: edge.target })),
-    };
-  }
-
-  /** The nodes as an algorithm sees them, with their rendered rectangles; unmeasured nodes are left out. */
-  private layoutNodes(nodes: readonly Node[]): LayoutNode[] {
-    return nodes.flatMap((node) => {
-      const rect = this.flow.getNodeRect(node.id);
-      return rect ? [{ id: node.id, parentId: node.parentId?.() ?? null, ...rect }] : [];
-    });
-  }
-
-  /**
-   * Writes the flow-space positions into the node-space `point` signals and resolves once they are in. Before the
-   * first paint they are placed at once, whatever the writer; the flow then paints laid out.
-   */
+  /** Writes the sizes and the node-space positions of a result; resolves once the positions are in. */
   private async apply(result: LayoutResult): Promise<LayoutResult> {
     const nodes = this.flow.nodes();
-    const byId = new Map(nodes.map((node) => [node.id, node]));
     for (const [id, size] of result.sizes ?? []) {
-      const node = byId.get(id);
+      const node = nodes.find((node) => node.id === id);
       node?.width?.set(size.width);
       node?.height?.set(size.height);
     }
-    const targets = new Map<Node, Point>();
-    for (const [id, position] of result.positions) {
-      const node = byId.get(id);
-      if (!node || this.dragging.has(id)) continue;
-      const origin = this.flowOrigin(node, byId, result);
-      targets.set(node, { x: position.x - origin.x, y: position.y - origin.y });
-    }
-
+    const targets = toNodeSpaceTargets(result, nodes, this.rectOf, this.dragging());
     await this.writer.write(targets, { first: !this.placed() });
     this.placed.set(true);
     return result;
-  }
-
-  /** Flow position of the parent of a node: from the result when it moves the parent, else as rendered now. */
-  private flowOrigin(node: Node, byId: ReadonlyMap<string, Node>, result: LayoutResult): Point {
-    const parentId = node.parentId?.();
-    if (!parentId) return { x: 0, y: 0 };
-    const laidOut = result.positions.get(parentId);
-    if (laidOut) return laidOut;
-    const parent = byId.get(parentId);
-    const rect = parent && this.flow.getNodeRect(parent.id);
-
-    return rect ? { x: rect.x, y: rect.y } : { x: 0, y: 0 };
   }
 }
