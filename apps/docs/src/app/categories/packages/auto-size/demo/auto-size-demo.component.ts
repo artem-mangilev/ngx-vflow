@@ -4,7 +4,14 @@ import { VxAutoSize } from '@vflow/auto-size';
 import { Vflow, createEdges, createNodes } from 'ngx-vflow';
 
 @Component({
-  template: `<vflow vxAutoSize view="auto" [nodes]="nodes" [edges]="edges" [background]="{ type: 'dots' }">
+  template: `<vflow
+    vxAutoSize
+    view="auto"
+    [vxAutoSizePadding]="padding"
+    [vxAutoSizeShrink]="true"
+    [nodes]="nodes"
+    [edges]="edges"
+    [background]="{ type: 'dots' }">
     <docs-node *vNode="let ctx" [ctx]="ctx" />
     <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
   </vflow>`,
@@ -19,6 +26,9 @@ import { Vflow, createEdges, createNodes } from 'ngx-vflow';
   imports: [DocsPresentations, Vflow, VxAutoSize],
 })
 export class AutoSizeDemoComponent {
+  // The top side keeps the group header clear when a parent shrinks.
+  protected readonly padding = { top: 56, right: 24, bottom: 24, left: 24 };
+
   // Parents size themselves through `width` and `height`; children may leave them, so their extent is `null`.
   protected readonly nodes = createNodes([
     { id: 'team', point: { x: 40, y: 40 }, width: 560, height: 300, data: { text: 'Team', type: 'group' } },

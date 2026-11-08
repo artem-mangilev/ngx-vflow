@@ -55,6 +55,9 @@ class AutoSizeHostComponent {
     // Only the width is explicit: the height follows the content.
     { id: 'wide', point: { x: 100, y: 500 }, width: 300, data: { parent: true } },
     { id: 'wide-child', point: { x: 50, y: 20 }, parentId: 'wide', extent: null, data: {} },
+    // The child overflows the right and bottom sides from the start.
+    { id: 'tight', point: { x: 600, y: 600 }, width: 100, height: 50, data: { parent: true } },
+    { id: 'tight-child', point: { x: 80, y: 10 }, parentId: 'tight', extent: null, data: {} },
   ]);
 }
 
@@ -66,9 +69,10 @@ async function settle(fixture: { detectChanges(): void; whenStable(): Promise<un
 }
 
 describe('VxAutoSize', () => {
-  async function createFixture() {
+  async function createFixture({ shrink = false } = {}) {
     TestBed.configureTestingModule({ imports: [AutoSizeHostComponent] });
     const fixture = TestBed.createComponent(AutoSizeHostComponent);
+    fixture.componentInstance.shrink.set(shrink);
     await settle(fixture);
     return fixture;
   }
@@ -150,7 +154,57 @@ describe('VxAutoSize', () => {
     expect(wide.point()).toEqual({ x: 100, y: 500 });
   });
 
-  it('shrinks a parent to its children when the drag ends, if asked to', async () => {
+  it('grows a parent around its children when the flow is initialized', async () => {
+    const fixture = await createFixture();
+    const tight = node(fixture, 'tight');
+
+    expect(tight.point()).toEqual({ x: 600, y: 600 });
+    expect(tight.width!()).toBe(190);
+    expect(tight.height!()).toBe(70);
+    // A parent with room to spare keeps its size unless it may shrink.
+    expect(node(fixture, 'group').width!()).toBe(300);
+  });
+
+  it('fits a parent to its children when the flow is initialized, if it may shrink', async () => {
+    const fixture = await createFixture({ shrink: true });
+    const group = node(fixture, 'group');
+
+    expect(group.point()).toEqual({ x: 140, y: 140 });
+    expect(group.width!()).toBe(120);
+    expect(group.height!()).toBe(70);
+    expect(node(fixture, 'child').point()).toEqual({ x: 10, y: 10 });
+  });
+
+  it('shrinks a parent on every frame of a drag, so nothing changes when the drag ends', async () => {
+    const fixture = await createFixture({ shrink: true });
+    const outer = node(fixture, 'outer');
+    const inner = node(fixture, 'inner');
+    const card = fixture.nativeElement.querySelector('[data-card="leaf"]') as HTMLElement;
+    const start = card.getBoundingClientRect();
+    const at = { x: start.left + 5, y: start.top + 5 };
+
+    dispatchMouse(card, 'mousedown', at);
+    await settle(fixture);
+    dispatchMouse(window, 'mousemove', { x: at.x + 30, y: at.y + 20 });
+    await settle(fixture);
+
+    // The only leaf moves its parents along: their origins follow it and the leaf stays under the pointer.
+    const during = { outer: outer.point(), inner: inner.point(), leaf: node(fixture, 'leaf').point() };
+    expect(during.outer).toEqual({ x: 640, y: 130 });
+    expect(during.inner).toEqual({ x: 10, y: 10 });
+    expect(during.leaf).toEqual({ x: 10, y: 10 });
+    expect(card.getBoundingClientRect().left - start.left).toBe(30);
+    expect(card.getBoundingClientRect().top - start.top).toBe(20);
+
+    dispatchMouse(window, 'mouseup', { x: at.x + 30, y: at.y + 20 });
+    await settle(fixture);
+
+    expect({ outer: outer.point(), inner: inner.point(), leaf: node(fixture, 'leaf').point() }).toEqual(during);
+    expect(outer.width!()).toBe(140);
+    expect(inner.width!()).toBe(120);
+  });
+
+  it('shrinks a parent to its children once it may shrink', async () => {
     const fixture = await createFixture();
     fixture.componentInstance.shrink.set(true);
     await settle(fixture);

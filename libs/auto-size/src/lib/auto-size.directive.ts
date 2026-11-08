@@ -15,9 +15,10 @@ interface Sides {
 }
 
 /**
- * Grows a parent node around its children while they are dragged or resized, through every level of nesting. A
- * parent grows on the axes it sizes explicitly: a `width` signal for the horizontal axis, a `height` signal for the
- * vertical one. Growth to the left or the top moves the origin of the parent and keeps the children where they are.
+ * Grows a parent node around its children when the flow is initialized and while they are dragged or resized,
+ * through every level of nesting; with `vxAutoSizeShrink`, the parent also shrinks and always fits its children. A
+ * parent is sized on the axes it sizes explicitly: a `width` signal for the horizontal axis, a `height` signal for the
+ * vertical one. A change on the left or the top moves the origin of the parent and keeps the children where they are.
  * Children that may leave their parent need `extent: null`, since `extent: 'parent'` holds them inside before the
  * parent can grow.
  *
@@ -35,12 +36,17 @@ export class VxAutoSize {
   /** Which parents grow; every parent by default. */
   public readonly vxAutoSizeShouldResize = input<AutoSizeShouldResize>(() => true);
 
-  /** Whether a parent also shrinks to its children once a drag ends or a child is resized; it only grows by default. */
+  /**
+   * Whether a parent also shrinks, so it always fits its children: from the first paint, and on every frame of a drag,
+   * so nothing jumps when the drag ends. A parent only grows by default.
+   */
   public readonly vxAutoSizeShrink = input(false);
 
   constructor() {
     const subscriptions = [
-      this.flow.nodeDrag.subscribe((event) => this.fitAncestors(event.nodes, false)),
+      // Emitted before the first paint, so the parents already fit their children in the first frame.
+      this.flow.initialized.subscribe(() => this.fitAncestors(this.flow.nodes(), this.vxAutoSizeShrink())),
+      this.flow.nodeDrag.subscribe((event) => this.fitAncestors(event.nodes, this.vxAutoSizeShrink())),
       this.flow.nodeDragEnd.subscribe((event) => this.fitAncestors(event.nodes, this.vxAutoSizeShrink())),
       this.flow.nodesChangesSize.subscribe((changes) =>
         this.fitAncestors(

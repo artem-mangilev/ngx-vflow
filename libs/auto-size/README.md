@@ -1,6 +1,6 @@
 # @vflow/auto-size
 
-Parent nodes that grow around their children for [ngx-vflow](https://www.ngx-vflow.org/): drag or resize a child past the side of its parent and the parent grows to keep it, through every level of nesting.
+Parent nodes that grow around their children for [ngx-vflow](https://www.ngx-vflow.org/): drag or resize a child past the side of its parent and the parent grows to keep it, through every level of nesting. With `vxAutoSizeShrink` the parent also shrinks and always fits its children.
 
 ```bash
 npm i @vflow/auto-size
