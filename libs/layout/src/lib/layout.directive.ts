@@ -175,7 +175,7 @@ export class VxLayout implements VflowInitializationGate {
       targets.set(node, { x: position.x - origin.x, y: position.y - origin.y });
     }
 
-    await this.writer.write(targets);
+    await this.writer.write(targets, { first: !this.placed() });
     this.placed.set(true);
     return result;
   }

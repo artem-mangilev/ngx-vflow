@@ -6,8 +6,11 @@ import { Node, Point } from 'ngx-vflow';
  * directive such as `VxLayoutAnimate` may provide one; by default the positions are placed at once.
  */
 export interface LayoutPositionWriter {
-  /** Moves the nodes to the targets; resolves once they are there, or once a later write or `cancel` replaced it. */
-  write(targets: ReadonlyMap<Node, Point>): Promise<void>;
+  /**
+   * Moves the nodes to the targets; resolves once they are there, or once a later write or `cancel` replaced it.
+   * `first` marks the first positions of the flow, which land before it paints.
+   */
+  write(targets: ReadonlyMap<Node, Point>, context: { first: boolean }): Promise<void>;
   /** Stops a write in progress, before a new layout starts. */
   cancel(): void;
 }

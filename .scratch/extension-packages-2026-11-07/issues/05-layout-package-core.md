@@ -77,3 +77,5 @@ Blocked by: 03
   `firstValueFrom(placed$.pipe(filter(Boolean)))`, `finalize` ставит `placed` на случай пустого или упавшего прогона.
 - Хост всегда пишет через писателя и не зовёт `placeNodes` сам; «до первого paint ставить сразу» — правило
   `VxLayoutAnimate` (флаг `painted` по `initialized` флоу).
+- `write(targets, { first })`: хост сообщает писателю, что это первые позиции (`!placed()`); `VxLayoutAnimate` при
+  `first` ставит сразу и больше не зависит от `VflowComponent`/`initialized`.

@@ -38,13 +38,13 @@ The host runs the algorithm once every node is measured, so content-sized nodes 
 | `vxLayout`    | `null`  | A `LayoutAlgorithm`. Without one (`<vflow vxLayout>`) the layout runs only through `run(algorithm)` of the directive, for example from a button.                                                                                              |
 | `vxLayoutEnd` |         | Emits the result once the positions are applied, after any animation, or when a continuous layout completes; a good moment to call `fitView()`. The first one comes before the flow paints, so fit without a duration there, as the demos do. |
 
-The host places the positions at once. `VxLayoutAnimate` on the same element animates the nodes into the layouts instead, except the first one, which lands before the flow paints, and the values of a continuous layout.
+The host places the positions at once. `VxLayoutAnimate` on the same element animates the nodes into the layouts instead, except the first positions, which land before the flow paints. It is meant for layouts with one result: a continuous layout moves the nodes itself.
 
 | `VxLayoutAnimate` | Default | Meaning                                                                                             |
 | ----------------- | ------- | --------------------------------------------------------------------------------------------------- |
 | `vxLayoutAnimate` | `true`  | `true` or the options of the animator: `duration`, or `speed` with `minDuration` and `maxDuration`. |
 
-The animation is a position writer: a directive that provides `VX_LAYOUT_POSITION_WRITER` on the flow element writes the positions in place of the host, so a different transition takes the same route.
+The animation is a position writer: a directive that provides `VX_LAYOUT_POSITION_WRITER` on the flow element writes the positions in place of the host, told whether they are the first, so a different transition takes the same route.
 
 ## Dagre
 
