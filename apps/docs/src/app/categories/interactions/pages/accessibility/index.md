@@ -89,7 +89,7 @@ Focus is drawn as a translucent halo around the node wrapper and along the edge 
 
 ## Localization
 
-Provide a `Partial<AriaLabelConfig>` with `withAccessibility()` inside `provideVflow()`: in the providers of `bootstrapApplication` for the whole application, of a route, or of the component that hosts the flow, where a closer `withAccessibility()` adds its keys to one further up. Omitted keys keep their English defaults, exported as `DEFAULT_ARIA_LABEL_CONFIG`; names and descriptions update as soon as the labels or the entity metadata change.
+Provide a `Partial<AriaLabelConfig>` with `withAccessibility()` inside `provideVflow()`: in the providers of `bootstrapApplication` for the whole application, of a route, or of the component that hosts the flow, where a closer `withAccessibility()` adds its keys to one further up. See [Configuration](../../introduction/configuration). Omitted keys keep their English defaults, exported as `DEFAULT_ARIA_LABEL_CONFIG`; names and descriptions update as soon as the labels or the entity metadata change.
 
 ```typescript
 const labels: Partial<AriaLabelConfig> = {

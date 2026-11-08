@@ -528,15 +528,24 @@ A flow that relied on a missing handler to keep its handles inert sets `[canStar
 - A filtered output such as `(nodesChanges.position)` follows the same rule with the changes of its type.
 - `viewportChange$` is removed: `viewport` is state, and the signal is the way to read it; `(viewportChangeEnd)` reports the end of a change. `initialized$` is removed with the `initialized` signal: the first layout is a moment, reported by the `(initialized)` output.
 
+### Configuration through `provideVflow()`
+
+Settings, labels and component registrations can be given once for many flows with `provideVflow()` and its features, in the providers of the application, a route or a component; see [Configuration](../configuration). Two inputs changed with it:
+
+- `[ariaLabelConfig]` is removed. Provide the labels with `provideVflow(withAccessibility(labels))` in the providers of the component that hosts the flow, or higher up. Where the labels were a signal of the component, give `withAccessibility()` a factory that reads it: `withAccessibility(() => inject(MyComponent).labels)`.
+- The settings inputs no longer carry their default in the input: an unbound input reads `undefined`, so that it does not override a provided value. Reading `flow.minZoom()` from a reference to the flow therefore returns what is bound, or `undefined`; read the settings in effect from `flow.settings`, one signal per setting, such as `flow.settings.minZoom()` or `flow.settings.optimization()`.
+
+`Node.component` and `Edge.component` additionally accept a string: the key of a component registered with `withNodeComponents()` or `withEdgeComponents()`. Component classes and lazy factories in `component` keep working.
+
 ### Settings inputs
 
-Every object input of `vflow` now reads the same way: the value is the defaults with the keys you pass on top, so a key you leave out returns to its default instead of keeping the value of the previous binding. This holds for `optimization`, `selectionBox`, `keyboardShortcuts` and `ariaLabelConfig`; code that built a setting over several bindings must pass the whole object each time. `autoPan` follows later changes of its binding instead of reading it once, and `tolerance` in `AlignmentHelperSettings` and `partially` in `IntersectingNodesOptions` are optional.
+Every object input of `vflow` now reads the same way: the value is the defaults with the keys you pass on top, so a key you leave out returns to its default instead of keeping the value of the previous binding. This holds for `optimization`, `selectionBox` and `keyboardShortcuts`; code that built a setting over several bindings must pass the whole object each time. `autoPan` follows later changes of its binding instead of reading it once, and `tolerance` in `AlignmentHelperSettings` and `partially` in `IntersectingNodesOptions` are optional.
 
 `view` defaults to `'auto'` instead of `[400, 400]`: the flow fills its parent element, which therefore needs a width and a height. Pass `[view]="[400, 400]"` to keep the former size.
 
 `optimization.detachedGroupsLayer` became the `parentsBelowEdges` input, and the `groupRole` label key became `parentRole`; both are about nodes that other nodes reference as parent. The `connection` getter of `VflowComponent` is removed: it returned an internal model.
 
-Every input of `vflow` is a signal input. Binding in a template is unchanged. Reading from a reference to the flow calls the signal: `flow.minZoom()` instead of `flow.minZoom`, and the read tracks changes in a reactive context. `flow.optimization()`, `flow.selectionBox()` and `flow.ariaLabelConfig()` return the value with the defaults filled in. Assigning in code, such as `flow.minZoom = 2`, no longer works: bind the input to a signal of your component and set that signal, or use `componentRef.setInput('minZoom', 2)` for a flow created dynamically.
+Every input of `vflow` is a signal input. Binding in a template is unchanged. Reading from a reference to the flow calls the signal: `flow.minZoom()` instead of `flow.minZoom`, and the read tracks changes in a reactive context; it returns what is bound, and `flow.settings.minZoom()` the value in effect (see above). Assigning in code, such as `flow.minZoom = 2`, no longer works: bind the input to a signal of your component and set that signal, or use `componentRef.setInput('minZoom', 2)` for a flow created dynamically.
 
 ### Renamed fields and types
 
@@ -592,6 +601,7 @@ A `vNode` or `vEdge` template types its `ctx` with `of`, a type witness the flow
 | `optimization.detachedGroupsLayer`                          | `[parentsBelowEdges]="true"` on `vflow`.                                                                           |
 | `groupRole` in `AriaLabelConfig`                            | Rename to `parentRole`.                                                                                            |
 | `connection` getter of `VflowComponent`                     | Keep the bound value in the application; the input remains.                                                        |
+| `[ariaLabelConfig]` input                                   | `provideVflow(withAccessibility(labels))` in the providers of the host component or the application.               |
 
 ### DOM compatibility
 

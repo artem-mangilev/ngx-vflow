@@ -9,7 +9,7 @@ To load nodes when the viewport changes, set `lazyLoadTrigger` to the value view
 
 ## Lazy loading component nodes
 
-To adapt your existing component nodes, replace component classes in the `component` field with dynamic import factories:
+To adapt your existing component nodes, replace component classes in the `component` field with dynamic import factories: A component registered under a key with `withNodeComponents()` is lazy in the same way when its registration is a factory.
 
 ```ts
 // Eagerly loaded

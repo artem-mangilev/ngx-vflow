@@ -5,7 +5,7 @@ const TestPage: NgDocPage = {
   title: `Architecture`,
   mdFile: './index.md',
   category: IntroductionCategory,
-  order: 2,
+  order: 3,
 };
 
 export default TestPage;

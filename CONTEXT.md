@@ -32,6 +32,10 @@ _Avoid_: Node actions, form controls
 An optional capability maintained by the package authors but distributed outside the main package contract.
 _Avoid_: Core feature, third-party integration
 
+**Flow feature**:
+An optional capability installed on the flows below an injector through `provideVflow()`, as a `with*()` call that provides its own tokens and merges with the same feature of the levels above.
+_Avoid_: Plugin, module, global option
+
 **Official recipe**:
 A documented composition of package primitives that application code must implement and own.
 _Avoid_: Core feature, built-in feature

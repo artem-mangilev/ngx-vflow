@@ -69,6 +69,42 @@ own data through `injectNode<T>()`.
 
 A lazy import function in `component` loads the component only when it is needed; see the Lazy loading page.
 
+### Component keys
+
+The code that builds a graph often should not import component classes: it lives in a store, it loads the graph from
+a server, or it serializes it. Register the components once, under keys, with `withNodeComponents()` inside
+`provideVflow()`, and name the key in `component`:
+
+```typescript
+@Component({
+  providers: [provideVflow(withNodeComponents({ red: RedSquareNodeComponent, blue: BlueSquareNodeComponent }))],
+  ...
+})
+export class DemoComponent {
+  nodes = createNodes([
+    { id: '1', point: { x: 100, y: 100 }, component: 'red', data: { redSquareText: 'Red' } },
+    { id: '2', point: { x: 250, y: 250 }, component: 'blue', data: { blueSquareText: 'Blue' } },
+  ]);
+}
+```
+
+A value is a class or a `() => import(...)` factory, as in `component` itself. `provideVflow()` goes into the
+providers of the application, a route or a component, and a registration closer to the flow adds its keys to one
+further up; see [Configuration](../../introduction/configuration). A key that nothing registers throws when the node
+is created, with the key in the message.
+
+A key is any string by default. To have the compiler check it, augment the `VflowNodeComponents` interface of the
+library with your keys; then a typo in `component` or in `withNodeComponents()` is a compile error:
+
+```typescript
+declare module 'ngx-vflow' {
+  interface VflowNodeComponents {
+    red: typeof RedSquareNodeComponent;
+    blue: typeof BlueSquareNodeComponent;
+  }
+}
+```
+
 {{ NgDocActions.demoPane("CustomComponentNodesDemoComponent") }}
 
 ### Handling events
