@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { DocsPresentations } from '@docs/shared';
 import {
   DeleteRequest,
@@ -9,6 +9,7 @@ import {
   provideVflow,
   removeElements,
   withAccessibility,
+  withShortcuts,
 } from 'ngx-vflow';
 
 /** The zoom defaults, repeated because an entry is replaced whole rather than extended. */
@@ -21,7 +22,13 @@ const ZOOM_DEFAULTS = {
 @Component({
   imports: [DocsPresentations, Vflow],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [provideVflow(withAccessibility({ flowLabel: 'Configured graph' }))],
+  providers: [
+    provideVflow(
+      withAccessibility({ flowLabel: 'Configured graph' }),
+      // The form changes the keys at runtime, so the factory hands the flow the signal of the demo.
+      withShortcuts(() => inject(ShortcutsConfigurationDemoComponent).shortcuts),
+    ),
+  ],
   template: `
     <section data-testid="shortcuts-demo" aria-label="Shortcut configuration example">
       <p>Tab into the graph, then press the keys below. Change a binding and the graph follows it at once.</p>
@@ -48,12 +55,7 @@ const ZOOM_DEFAULTS = {
       </div>
       <p>Deletion requests: {{ requests() }}. Nodes left: {{ nodes.length }}.</p>
       <pre tabindex="0" aria-label="Current shortcut configuration" data-testid="shortcuts-config">{{ printed() }}</pre>
-      <vflow
-        [nodes]="nodes"
-        [edges]="edges"
-        [view]="[600, 240]"
-        [keyboardShortcuts]="shortcuts()"
-        (deleteRequest)="onDeleteRequest($event)">
+      <vflow [nodes]="nodes" [edges]="edges" [view]="[600, 240]" (deleteRequest)="onDeleteRequest($event)">
         <docs-node *vNode="let ctx" [ctx]="ctx" />
         <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
       </vflow>
@@ -88,7 +90,7 @@ export class ShortcutsConfigurationDemoComponent {
   protected zoom = signal(true);
   protected requests = signal(0);
 
-  protected shortcuts = computed<KeyboardShortcuts>(() => ({
+  readonly shortcuts = computed<KeyboardShortcuts>(() => ({
     commands: {
       select: this.keys(this.select()),
       delete: this.keys(this.remove()),

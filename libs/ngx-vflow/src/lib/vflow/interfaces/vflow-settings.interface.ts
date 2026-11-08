@@ -4,7 +4,6 @@ import { ConnectionSettings } from './connection-settings.interface';
 import { DEFAULT_OPTIMIZATION, Optimization } from './optimization.interface';
 import { DEFAULT_SELECTION_BOX, SelectionBoxSettings } from './selection-box-settings.interface';
 import { Background } from '../types/background.type';
-import { KeyboardShortcuts } from '../types/keyboard-shortcuts.type';
 import { SelectionMode } from '../types/selection-mode.type';
 
 /**
@@ -53,8 +52,6 @@ export interface VflowSettings {
   selectionMode: SelectionMode;
   /** @see {VflowComponent.selectionBox} */
   selectionBox: SelectionBoxSettings;
-  /** @see {VflowComponent.keyboardShortcuts} */
-  keyboardShortcuts: KeyboardShortcuts;
   /** @see {VflowComponent.connection} */
   connection: ConnectionSettings;
   /** @see {VflowComponent.snapGrid} */
@@ -93,7 +90,6 @@ export const VFLOW_SETTINGS_DEFAULTS: Readonly<VflowSettings> = {
   edgesFocusable: true,
   selectionMode: 'default',
   selectionBox: DEFAULT_SELECTION_BOX,
-  keyboardShortcuts: {},
   connection: {},
   snapGrid: [1, 1],
   elevateNodesOnSelect: true,

@@ -46,7 +46,8 @@ setting: `flow.settings.minZoom()`.
 
 ### `withSettings(settings)`
 
-Takes a `Partial<VflowSettings>`: the inputs of `vflow` by their names, `nodes` and `edges` excepted. Instead of an
+Takes a `Partial<VflowSettings>`: the inputs of `vflow` by their names, `nodes` and `edges` excepted. The labels and
+the keys of the graph are not inputs; they have features of their own below. Instead of an
 object, pass a factory run in the injector that returns the settings or a signal of them, so the settings can come
 from a service and follow its changes:
 
@@ -59,6 +60,13 @@ provideVflow(withSettings(() => inject(Preferences).flowSettings));
 Takes a `Partial<AriaLabelConfig>` with the names, descriptions and announcements of the graph; omitted keys keep
 their English defaults. A factory works as for `withSettings()`, so the labels can follow the language of the
 application. See [Accessibility](../../interactions/accessibility) for the keys.
+
+### `withShortcuts(shortcuts)`
+
+Takes a `KeyboardShortcuts` object: the `modifiers` held during pointer gestures and the `commands` run on a key
+press, each section merged entry by entry with the defaults and with the levels above. A factory works as for
+`withSettings()`, so the keys can come from the preferences of the user. See
+[Keyboard shortcuts](../../interactions/keyboard-shortcuts).
 
 ### `withNodeComponents(components)` and `withEdgeComponents(components)`
 

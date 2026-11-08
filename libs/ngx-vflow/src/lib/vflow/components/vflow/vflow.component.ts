@@ -57,7 +57,6 @@ import { Background } from '../../types/background.type';
 import { SpacePointContextDirective } from '../../directives/space-point-context.directive';
 import { FitViewOptions } from '../../interfaces/fit-view-options.interface';
 import { Optimization } from '../../interfaces/optimization.interface';
-import { KeyboardShortcuts } from '../../types/keyboard-shortcuts.type';
 import { SelectionMode } from '../../types/selection-mode.type';
 import { KeyboardService } from '../../services/keyboard.service';
 import { EdgeComponent } from '../edge/edge.component';
@@ -303,9 +302,6 @@ export class VflowComponent<N extends Node = Node, E extends Edge = Edge> {
    * - mode: 'partial' selects entities that intersect selection box
    */
   public readonly selectionBox = input<SelectionBoxSettings>();
-
-  /** Keys of the graph; omitted entries keep their defaults and an empty list disables an entry. */
-  public readonly keyboardShortcuts = input<KeyboardShortcuts>();
 
   /**
    * Settings for connection (it renders when user tries to create edge between nodes)

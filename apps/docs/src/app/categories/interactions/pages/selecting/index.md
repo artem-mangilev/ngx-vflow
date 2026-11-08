@@ -22,7 +22,7 @@ These policies gate library-originated interactions only. The application still 
 
 Selection and deselection are separate: making an entity non-selectable does not clear its existing `selected` signal, and pane clicks or replace-selection may still deselect it.
 
-The former `[entitiesSelectable]` input was removed in v3. Use `[nodesSelectable]`, `[edgesSelectable]`, and `[keyboardShortcuts]="{ modifiers: { selection: [] } }"` as needed.
+The former `[entitiesSelectable]` input was removed in v3. Use `[nodesSelectable]`, `[edgesSelectable]`, and `withShortcuts({ modifiers: { selection: [] } })` in `provideVflow()` as needed.
 
 ### Manual selection
 

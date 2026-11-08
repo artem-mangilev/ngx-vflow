@@ -19,15 +19,19 @@ Positive activation thresholds must be exceeded to start a drag. They are indepe
 
 # Keyboard activation and priority
 
-Use the existing `keyboardShortcuts` input for all activation keys:
+Bind all activation keys with `withShortcuts()` inside `provideVflow()`, see [Keyboard shortcuts](../keyboard-shortcuts):
 
 ```typescript
-shortcuts: KeyboardShortcuts = {
-  modifiers: {
-    panActivation: ['Space'],
-    zoomActivation: ['Mod'], // Meta on macOS, Control elsewhere
-  },
-};
+providers: [
+  provideVflow(
+    withShortcuts({
+      modifiers: {
+        panActivation: ['Space'],
+        zoomActivation: ['Mod'], // Meta on macOS, Control elsewhere
+      },
+    }),
+  ),
+];
 ```
 
 Both entries default to an empty list. That disables their keyboard activation, **not** ordinary pan/zoom gestures. A list holds alternative keys, not a chord; see [Keyboard shortcuts](../keyboard-shortcuts) for the binding grammar.
@@ -52,10 +56,10 @@ This retains the current canvas behavior and adds optional double-click zoom:
 
 # Embedded editor configuration
 
-Scroll to navigate, pinch to zoom, and use an explicitly configured Space shortcut to temporarily enable drag panning:
+Scroll to navigate, pinch to zoom, and use a Space shortcut, provided with `withShortcuts({ modifiers: { panActivation: ['Space'] } })`, to temporarily enable drag panning:
 
 ```html
-<vflow [nodes]="nodes" [panOnDrag]="false" [panOnScroll]="true" [keyboardShortcuts]="shortcuts" [nodeDragThreshold]="3" [connectionDragThreshold]="3" />
+<vflow [nodes]="nodes" [panOnDrag]="false" [panOnScroll]="true" [nodeDragThreshold]="3" [connectionDragThreshold]="3" />
 ```
 
 This configuration consumes ordinary scrolling over the flow. For an editor embedded in a scrolling page where scrolling should navigate the page, disable both `panOnScroll` and `zoomOnScroll` and leave their activation shortcuts disabled. Pinch can remain enabled independently.
@@ -101,8 +105,10 @@ Draggable nodes, drag handles, handles and resize controls use `none`, so they s
 # Disable all user viewport gestures
 
 ```html
-<vflow [nodes]="nodes" [panOnDrag]="false" [panOnScroll]="false" [zoomOnScroll]="false" [zoomOnPinch]="false" [zoomOnDoubleClick]="false" [keyboardShortcuts]="{ modifiers: { panActivation: [], zoomActivation: [] } }" />
+<vflow [nodes]="nodes" [panOnDrag]="false" [panOnScroll]="false" [zoomOnScroll]="false" [zoomOnPinch]="false" [zoomOnDoubleClick]="false" />
 ```
+
+and, in the providers, `withShortcuts({ modifiers: { panActivation: [], zoomActivation: [] } })`, so that no key enables a gesture.
 
 Programmatic calls such as `setViewport`, `setCenter`, `fitView`, `zoomTo`, `zoomIn` and `zoomOut` continue to work. These settings only control viewport gestures; configure node dragging and selection separately if needed.
 

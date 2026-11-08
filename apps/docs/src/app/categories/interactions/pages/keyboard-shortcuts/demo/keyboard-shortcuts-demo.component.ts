@@ -1,9 +1,9 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { DocsPresentations } from '@docs/shared';
-import { KeyboardShortcuts, Node, Vflow, createNodes } from 'ngx-vflow';
+import { KeyboardShortcuts, Node, Vflow, createNodes, provideVflow, withShortcuts } from 'ngx-vflow';
 
 @Component({
-  template: `<vflow view="auto" [nodes]="nodes" [keyboardShortcuts]="shortcuts">
+  template: `<vflow view="auto" [nodes]="nodes">
     <docs-node *vNode="let ctx" [ctx]="ctx" />
     <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
   </vflow>`,
@@ -17,6 +17,7 @@ import { KeyboardShortcuts, Node, Vflow, createNodes } from 'ngx-vflow';
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [DocsPresentations, Vflow],
+  providers: [provideVflow(withShortcuts(() => inject(KeyboardShortcutsDemoComponent).shortcuts))],
 })
 export class KeyboardShortcutsDemoComponent {
   public shortcuts: KeyboardShortcuts = {

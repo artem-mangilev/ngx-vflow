@@ -115,6 +115,14 @@ ADR-0004, ADR-0007, `@angular/router` (`provideRouter(routes, ...features)`), Fo
 **[?]** Имя: `withAccessibility` (общее, как у Foblex) или `withAriaLabels` (точнее по типу). Предложение —
 `withAccessibility`, тип переименовать не нужно.
 
+### 3a. `withShortcuts(shortcuts)` — клавиши через DI, инпут `keyboardShortcuts` удаляется
+
+Решение пользователя 2026-11-08 (тикет 07): шорткаты — каталог, как метки, со своим правилом слияния (по секциям
+`modifiers` / `commands`), поэтому своя фича `withShortcuts` и токен `VFLOW_SHORTCUTS`; ключ `keyboardShortcuts`
+уходит из `VflowSettings`, инпут удаляется. Правило для `withSettings` уточнено: в нём инпуты-настройки; каталог с
+собственной семантикой слияния получает свою фичу и теряет инпут, чтобы у значения был один источник. Имя
+`withShortcuts` выбрано вместо `withKeyboardShortcuts` / `withKeyboard` (последнее обещает больше, чем даёт).
+
 ### 4. `withNodeComponents(map)` / `withEdgeComponents(map)` — строковые ключи компонентов
 
 - `withNodeComponents(map: Record<string, EntityComponentType>)`, `kind: 'node-components'`, токен

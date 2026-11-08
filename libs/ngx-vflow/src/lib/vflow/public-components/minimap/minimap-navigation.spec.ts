@@ -1,21 +1,23 @@
-import { ChangeDetectionStrategy, Component, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal, viewChild } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Vflow } from '../../vflow';
 import { VflowMinimapComponent } from './minimap.component';
 import { VflowComponent } from '../../components/vflow/vflow.component';
 import { createNodes } from '../../interfaces/node.interface';
 import { KeyboardShortcuts } from '../../types/keyboard-shortcuts.type';
+import { provideVflow } from '../../features/feature';
+import { withShortcuts } from '../../features/with-shortcuts';
 
 @Component({
   imports: [Vflow],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: [provideVflow(withShortcuts(() => inject(MinimapHostComponent).keyboardShortcuts))],
   template: `<vflow
     [view]="size()"
     [nodes]="nodes"
     [minZoom]="0.5"
     [maxZoom]="2"
     [panOnDrag]="panOnDrag()"
-    [keyboardShortcuts]="keyboardShortcuts()"
     [zoomOnScroll]="zoomOnScroll()"
     [zoomOnPinch]="zoomOnPinch()"
     [panOnScroll]="panOnScroll()">

@@ -42,20 +42,29 @@ Naming the character makes `zoomIn: ['+', '=']` work on a layout that puts those
 
 # Customization
 
-Pass a `[keyboardShortcuts]` input with either section, or both:
+Provide a `KeyboardShortcuts` object with either section, or both, through `withShortcuts()` inside `provideVflow()`: in the providers of `bootstrapApplication` for every flow of the application, of a route, or of the component that hosts the flow, where a closer `withShortcuts()` adds its entries to one further up. See [Configuration](../../introduction/configuration).
 
 ```typescript
-import { KeyboardShortcuts } from 'ngx-vflow';
+import { provideVflow, withShortcuts } from 'ngx-vflow';
 
-shortcuts: KeyboardShortcuts = {
-  modifiers: { selection: ['Alt'], panActivation: ['Space'] },
-  commands: { delete: ['x'], fitView: ['Shift+f'] },
-};
+@Component({
+  providers: [
+    provideVflow(
+      withShortcuts({
+        modifiers: { selection: ['Alt'], panActivation: ['Space'] },
+        commands: { delete: ['x'], fitView: ['Shift+f'] },
+      }),
+    ),
+  ],
+  ...
+})
 ```
+
+The value may also be a factory run in the injector, returning the shortcuts or a signal of them, so the keys can come from the preferences of the user and change at runtime, as the second demo below does.
 
 Key details:
 
-- Each section merges entry by entry with the current configuration. Setting `commands.delete` leaves every other command and every modifier untouched.
+- Each section merges entry by entry with the defaults and with the levels above. Setting `commands.delete` leaves every other command and every modifier untouched.
 - An entry holds alternative keys, not a chord. `['Delete', 'Backspace']` fires on either key, never on both together; a chord is one binding, as in `Mod+0`.
 - Setting an entry replaces its whole list. To add a key, repeat the defaults you want to keep.
 - An empty list disables an entry. A disabled command stops running and disappears from the instructions that assistive technology reads.
@@ -67,7 +76,7 @@ In the following example `selection` is remapped from `Shift` to `Alt` and `mult
 
 {{ NgDocActions.demoPane("KeyboardShortcutsDemoComponent") }}
 
-The following example rebinds selection and deletion and turns the zoom commands off and on again. The object it passes is printed as you change it:
+The following example rebinds selection and deletion and turns the zoom commands off and on again. The object it provides is printed as you change it:
 
 {{ NgDocActions.demoPane("ShortcutsConfigurationDemoComponent") }}
 

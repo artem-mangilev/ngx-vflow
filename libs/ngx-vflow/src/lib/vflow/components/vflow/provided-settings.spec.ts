@@ -5,7 +5,6 @@ import { Vflow } from '../../vflow';
 import { VflowComponent } from './vflow.component';
 import { FlowSettingsService } from '../../services/flow-settings.service';
 import { FlowEntitiesService } from '../../services/flow-entities.service';
-import { KeyboardService } from '../../services/keyboard.service';
 import { provideVflow } from '../../features/feature';
 import { withSettings } from '../../features/with-settings';
 import { VFLOW_SETTINGS_DEFAULTS, VflowSettings } from '../../interfaces/vflow-settings.interface';
@@ -20,12 +19,7 @@ class Preferences {
 @Component({
   imports: [Vflow],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `<vflow
-    [nodes]="[]"
-    [minZoom]="minZoom()"
-    [optimization]="optimization()"
-    [autoPan]="autoPan()"
-    [keyboardShortcuts]="{ commands: { delete: ['x'] } }">
+  template: `<vflow [nodes]="[]" [minZoom]="minZoom()" [optimization]="optimization()" [autoPan]="autoPan()">
     <div *vNode></div>
   </vflow>`,
 })
@@ -39,7 +33,6 @@ describe('settings of vflow through withSettings', () => {
   let fixture: ComponentFixture<HostComponent>;
   let settings: FlowSettingsService;
   let entities: FlowEntitiesService;
-  let keyboard: KeyboardService;
 
   function render(root: Provider[] = [], host: Provider[] = []) {
     TestBed.configureTestingModule({ providers: root });
@@ -49,7 +42,6 @@ describe('settings of vflow through withSettings', () => {
     const injector = fixture.debugElement.query(By.directive(VflowComponent)).injector;
     settings = injector.get(FlowSettingsService);
     entities = injector.get(FlowEntitiesService);
-    keyboard = injector.get(KeyboardService);
   }
 
   function bind(name: string, value: unknown) {
@@ -69,23 +61,10 @@ describe('settings of vflow through withSettings', () => {
   });
 
   it('reads settings provided at the root', () => {
-    render(
-      provideVflow(
-        withSettings({
-          minZoom: 0.2,
-          selectionMode: 'manual',
-          keyboardShortcuts: { modifiers: { panActivation: ['Space'] } },
-        }),
-      ),
-    );
+    render(provideVflow(withSettings({ minZoom: 0.2, selectionMode: 'manual' })));
 
     expect(settings.minZoom()).toBe(0.2);
     expect(settings.selectionMode()).toBe('manual');
-    document.dispatchEvent(new KeyboardEvent('keydown', { code: 'Space', key: ' ' }));
-    expect(keyboard.isActiveModifier('panActivation')).toBe(true);
-    document.dispatchEvent(new KeyboardEvent('keyup', { code: 'Space', key: ' ' }));
-    // The command section of the input is laid over the modifier section of the provider.
-    expect(keyboard.isCommand('delete', new KeyboardEvent('keydown', { code: 'KeyX', key: 'x' }))).toBe(true);
   });
 
   it('lays the keys of a host-level withSettings over those of the root', () => {

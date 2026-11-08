@@ -4,12 +4,10 @@ import { By } from '@angular/platform-browser';
 import { Vflow } from '../../vflow';
 import { VflowComponent } from './vflow.component';
 import { FlowSettingsService } from '../../services/flow-settings.service';
-import { KeyboardService } from '../../services/keyboard.service';
 import { FlowEntitiesService } from '../../services/flow-entities.service';
 import { createNodes, Node } from '../../interfaces/node.interface';
 import { DEFAULT_OPTIMIZATION, Optimization } from '../../interfaces/optimization.interface';
 import { SelectionBoxSettings } from '../../interfaces/selection-box-settings.interface';
-import { KeyboardShortcuts } from '../../types/keyboard-shortcuts.type';
 
 @Component({
   imports: [Vflow],
@@ -18,7 +16,6 @@ import { KeyboardShortcuts } from '../../types/keyboard-shortcuts.type';
     [nodes]="nodes"
     [optimization]="optimization"
     [selectionBox]="selectionBox"
-    [keyboardShortcuts]="keyboardShortcuts"
     [parentsBelowEdges]="parentsBelowEdges">
     <div *vNode style="width: 100px; height: 50px"></div>
   </vflow>`,
@@ -27,7 +24,6 @@ class SettingsHostComponent {
   @Input() nodes: Node[] = [];
   @Input() optimization: Optimization = {};
   @Input() selectionBox: SelectionBoxSettings = {};
-  @Input() keyboardShortcuts: KeyboardShortcuts = {};
   @Input() parentsBelowEdges = false;
 }
 
@@ -41,7 +37,6 @@ class BareHostComponent {}
 describe('object settings of vflow', () => {
   let fixture: ComponentFixture<SettingsHostComponent>;
   let settings: FlowSettingsService;
-  let keyboard: KeyboardService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({ imports: [SettingsHostComponent, BareHostComponent] });
@@ -49,13 +44,9 @@ describe('object settings of vflow', () => {
     fixture.detectChanges();
     const injector = fixture.debugElement.query(By.directive(VflowComponent)).injector;
     settings = injector.get(FlowSettingsService);
-    keyboard = injector.get(KeyboardService);
   });
 
-  afterEach(() => {
-    document.dispatchEvent(new KeyboardEvent('keyup', { code: 'Space', key: ' ' }));
-    fixture.destroy();
-  });
+  afterEach(() => fixture.destroy());
 
   function bind(name: string, value: unknown) {
     fixture.componentRef.setInput(name, value);
@@ -77,19 +68,6 @@ describe('object settings of vflow', () => {
     expect(settings.selectionBox()).toEqual({ mode: 'partial' });
     bind('selectionBox', {});
     expect(settings.selectionBox()).toEqual({ mode: 'full' });
-  });
-
-  it('returns an omitted keyboard shortcut entry to its default', () => {
-    bind('keyboardShortcuts', { modifiers: { panActivation: ['Space'] } });
-    document.dispatchEvent(new KeyboardEvent('keydown', { code: 'Space', key: ' ' }));
-    expect(keyboard.isActiveModifier('panActivation')).toBe(true);
-    document.dispatchEvent(new KeyboardEvent('keyup', { code: 'Space', key: ' ' }));
-
-    bind('keyboardShortcuts', { commands: { delete: ['x'] } });
-    document.dispatchEvent(new KeyboardEvent('keydown', { code: 'Space', key: ' ' }));
-    expect(keyboard.isActiveModifier('panActivation')).toBe(false);
-    expect(keyboard.isCommand('delete', new KeyboardEvent('keydown', { code: 'KeyX', key: 'x' }))).toBe(true);
-    expect(keyboard.isCommand('delete', new KeyboardEvent('keydown', { code: 'Delete', key: 'Delete' }))).toBe(false);
   });
 
   it('puts parents below the edges only while parentsBelowEdges is set', async () => {

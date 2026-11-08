@@ -16,18 +16,23 @@ import { SelectionMode } from '../../types/selection-mode.type';
 import { AutoPanSettings } from '../../interfaces/auto-pan-settings.interface';
 import { provideVflow } from '../../features/feature';
 import { withAccessibility } from '../../features/with-accessibility';
+import { withShortcuts } from '../../features/with-shortcuts';
 
 @Component({
   imports: [Vflow],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [provideVflow(withAccessibility(() => inject(KeyboardHostComponent).ariaLabelConfig))],
+  providers: [
+    provideVflow(
+      withAccessibility(() => inject(KeyboardHostComponent).ariaLabelConfig),
+      withShortcuts(() => inject(KeyboardHostComponent).keyboardShortcuts),
+    ),
+  ],
   template: `<button>Before</button
     ><vflow
       [nodes]="nodes()"
       [edges]="edges"
       [view]="[600, 350]"
       [parentsBelowEdges]="true"
-      [keyboardShortcuts]="keyboardShortcuts()"
       [snapGrid]="snapGrid()"
       [nodesFocusable]="nodesFocusable()"
       [selectionMode]="selectionMode()"

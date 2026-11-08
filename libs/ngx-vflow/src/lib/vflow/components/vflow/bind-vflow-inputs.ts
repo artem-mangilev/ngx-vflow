@@ -10,6 +10,7 @@ import type { Node } from '../../interfaces/node.interface';
 import type { Edge } from '../../interfaces/edge.interface';
 import { VFLOW_SETTINGS } from '../../features/with-settings';
 import { VFLOW_ARIA_LABELS } from '../../features/with-accessibility';
+import { VFLOW_SHORTCUTS } from '../../features/with-shortcuts';
 import { DEFAULT_ARIA_LABEL_CONFIG } from '../../interfaces/aria-label-config.interface';
 import { withDefaults } from '../../utils/with-defaults';
 import { ResolvedVflowSettingSignals, resolveSettings } from './resolve-settings';
@@ -29,12 +30,14 @@ export function bindVflowInputs<N extends Node, E extends Edge>(
 
   // Every setting is read from its input when bound, else from `withSettings()`, else from the defaults.
   const resolved = resolveSettings(flow, inject(VFLOW_SETTINGS, { optional: true }));
-  const { keyboardShortcuts, connection, ...sources } = resolved;
+  const { connection, ...sources } = resolved;
   // The labels have no input: they come from `withAccessibility()`, else they are the English defaults.
   const labels = inject(VFLOW_ARIA_LABELS, { optional: true });
   settings.bind({ ...sources, ariaLabels: computed(() => withDefaults(DEFAULT_ARIA_LABEL_CONFIG, labels?.())) });
   entities.connectionSettings.bind(connection);
-  inject(KeyboardService).bindShortcuts(keyboardShortcuts);
+  // The keys have no input either: `withShortcuts()`, else the defaults of the keyboard service.
+  const shortcuts = inject(VFLOW_SHORTCUTS, { optional: true });
+  inject(KeyboardService).bindShortcuts(computed(() => shortcuts?.() ?? {}));
 
   // Reconciliation reuses the models of the previous list and links edges to nodes, so it writes and cannot be
   // a computed. Component effects run before the template is checked, so the template sees the new models.

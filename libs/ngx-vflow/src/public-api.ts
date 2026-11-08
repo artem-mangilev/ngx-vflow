@@ -113,6 +113,7 @@ export { VflowFeature, provideVflow, vflowFeature } from './lib/vflow/features/f
 export type { FeatureValue } from './lib/vflow/features/merged-feature-value';
 export { VFLOW_SETTINGS, withSettings } from './lib/vflow/features/with-settings';
 export { VFLOW_ARIA_LABELS, withAccessibility } from './lib/vflow/features/with-accessibility';
+export { VFLOW_SHORTCUTS, withShortcuts } from './lib/vflow/features/with-shortcuts';
 export {
   VFLOW_EDGE_COMPONENTS,
   VFLOW_NODE_COMPONENTS,

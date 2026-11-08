@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, effect } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { VflowComponent } from './vflow.component';
 import { Vflow } from '../../vflow';
@@ -6,6 +6,12 @@ import { dispatchPointer, pointerDrag, touchPointers } from '../../gestures/poin
 import { ViewportService } from '../../services/viewport.service';
 import { createNode } from '../../interfaces/node.interface';
 import { ViewportState } from '../../interfaces/viewport.interface';
+import { provideVflow } from '../../features/feature';
+import { withShortcuts } from '../../features/with-shortcuts';
+import { KeyboardShortcuts } from '../../types/keyboard-shortcuts.type';
+
+/** The keys of the flow under test, provided once; each test sets what it needs. */
+const shortcuts = signal<KeyboardShortcuts>({});
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -23,8 +29,10 @@ describe('public viewport gesture settings', () => {
   const pause = (ms = 200) => new Promise((resolve) => setTimeout(resolve, ms));
 
   beforeEach(async () => {
+    shortcuts.set({});
     TestBed.configureTestingModule({
       imports: [VflowComponent, ControlsComponent],
+      providers: provideVflow(withShortcuts(shortcuts)),
     });
     fixture = TestBed.createComponent(VflowComponent);
     fixture.componentRef.setInput('nodes', []);
@@ -82,7 +90,7 @@ describe('public viewport gesture settings', () => {
 
   it('gives scroll pan priority, with opt-in zoom and pan activation keys', async () => {
     fixture.componentRef.setInput('panOnScroll', true);
-    fixture.componentRef.setInput('keyboardShortcuts', {
+    shortcuts.set({
       modifiers: { zoomActivation: ['KeyZ'], panActivation: ['Space'] },
     });
     wheel();
@@ -105,7 +113,7 @@ describe('public viewport gesture settings', () => {
     fixture.componentRef.setInput('zoomOnScroll', false);
     fixture.componentRef.setInput('zoomOnPinch', false);
     fixture.componentRef.setInput('zoomOnDoubleClick', false);
-    fixture.componentRef.setInput('keyboardShortcuts', { modifiers: { panActivation: [], zoomActivation: [] } });
+    shortcuts.set({ modifiers: { panActivation: [], zoomActivation: [] } });
     fixture.detectChanges();
     expect(pane.style.touchAction).toBe('auto');
     drag();
@@ -133,7 +141,7 @@ describe('public viewport gesture settings', () => {
     expect(flow.viewport().x).toBe(0);
     drag(1);
     expect(flow.viewport().x).toBe(40);
-    fixture.componentRef.setInput('keyboardShortcuts', {
+    shortcuts.set({
       modifiers: { selection: ['Space'], panActivation: ['Space'] },
     });
     key('keydown', 'Space');
@@ -162,7 +170,7 @@ describe('public viewport gesture settings', () => {
 
   it('ignores activation from editable targets and clears activation on window blur', () => {
     fixture.componentRef.setInput('panOnScroll', true);
-    fixture.componentRef.setInput('keyboardShortcuts', { modifiers: { zoomActivation: ['ControlLeft'] } });
+    shortcuts.set({ modifiers: { zoomActivation: ['ControlLeft'] } });
     const input = document.createElement('input');
     pane.appendChild(input);
     key('keydown', 'ControlLeft', input);
@@ -181,7 +189,7 @@ describe('public viewport gesture settings', () => {
     fixture.componentRef.setInput('nodes', [node]);
     fixture.detectChanges();
     await fixture.whenStable();
-    fixture.componentRef.setInput('keyboardShortcuts', { modifiers: { panActivation: ['Space'] } });
+    shortcuts.set({ modifiers: { panActivation: ['Space'] } });
     key('keydown', 'Space');
     drag(0, pane.querySelector('[data-v-node]')!);
     expect(node.point()).toEqual({ x: 40, y: 0 });

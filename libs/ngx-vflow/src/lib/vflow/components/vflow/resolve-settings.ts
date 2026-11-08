@@ -2,7 +2,6 @@ import { Signal, computed } from '@angular/core';
 import { VFLOW_SETTINGS_DEFAULTS, VflowSettings } from '../../interfaces/vflow-settings.interface';
 import { DEFAULT_OPTIMIZATION, Optimization } from '../../interfaces/optimization.interface';
 import { DEFAULT_SELECTION_BOX, SelectionBoxSettings } from '../../interfaces/selection-box-settings.interface';
-import { KeyboardShortcuts } from '../../types/keyboard-shortcuts.type';
 import { suppliedEntries, withDefaults } from '../../utils/with-defaults';
 
 /** The inputs of the flow that are settings: `undefined` while an input is not bound. */
@@ -61,17 +60,6 @@ export function resolveSettings(
   const booleanOrObject = <K extends 'autoPan' | 'alignmentHelper'>(key: K): Signal<VflowSettings[K]> =>
     computed(() => layerBooleanOrObject(VFLOW_SETTINGS_DEFAULTS[key], [providedValue(key), inputs[key]()]));
 
-  const keyboardShortcuts = computed<KeyboardShortcuts>(() => {
-    const layers = [providedValue('keyboardShortcuts'), inputs.keyboardShortcuts()];
-    return layers.reduce<KeyboardShortcuts>(
-      (below, layer) => ({
-        modifiers: { ...below.modifiers, ...suppliedEntries(layer?.modifiers) },
-        commands: { ...below.commands, ...suppliedEntries(layer?.commands) },
-      }),
-      {},
-    );
-  });
-
   return {
     view: scalar('view'),
     minZoom: scalar('minZoom'),
@@ -93,7 +81,6 @@ export function resolveSettings(
     edgesFocusable: scalar('edgesFocusable'),
     selectionMode: scalar('selectionMode'),
     selectionBox: merged('selectionBox', DEFAULT_SELECTION_BOX),
-    keyboardShortcuts,
     connection: merged('connection', {}),
     snapGrid: scalar('snapGrid'),
     elevateNodesOnSelect: scalar('elevateNodesOnSelect'),
