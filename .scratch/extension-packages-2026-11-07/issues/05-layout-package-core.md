@@ -71,3 +71,7 @@ Blocked by: 03
 - Писатель по умолчанию — фабрика токена `VX_LAYOUT_POSITION_WRITER` (`providedIn: 'root'`), хост делает простой
   `inject(VX_LAYOUT_POSITION_WRITER)`: директива на элементе перекрывает, иначе корневой. Перенос правила «до
   первого paint ставить сразу» в `VxLayoutAnimate` Артём откатил: `release: (() => void) | null` остаётся в хосте.
+- Контракт ворот: `onMeasured(): Promise<void>` вместо колбэка `ready`; core открывает ворота, когда промис
+  settled (resolve или reject). В хосте вместо `release: (() => void) | null` один сигнал `placed` («первые позиции
+  на месте»): по нему `apply` ставит сразу или через писателя, `onMeasured` возвращает
+  `firstValueFrom(placed$.pipe(filter(Boolean)))`, `finalize` ставит `placed` на случай пустого или упавшего прогона.

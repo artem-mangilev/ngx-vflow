@@ -26,9 +26,10 @@ export class FlowRenderingService {
 
   /** The gate on the flow element has let the flow paint, or there is no gate; `null` until the flow is measured. */
   private readonly gateOpen = signal<boolean | null>(null);
+  private readonly openGate = () => this.gateOpen.set(true);
 
   /**
-   * The flow is measured and the initialization gate on its element, if any, has called `ready`: the graph may be
+   * The flow is measured and the initialization gate on its element, if any, has let it paint: the graph may be
    * painted and `initialized` emitted. Once true it stays true.
    */
   public flowInitialized = extendedComputed<boolean>(
@@ -37,13 +38,13 @@ export class FlowRenderingService {
 
   constructor() {
     // The gate is a directive on the flow element, resolved once the element is built, not while the flow is. It is
-    // told once that the flow is measured and opens when it calls `ready`.
+    // told once that the flow is measured and opens when the promise it returns settles.
     effect(() => {
       if (!this.measured() || untracked(this.gateOpen) !== null) return;
       untracked(() => {
         const gate = this.injector.get(VFLOW_INITIALIZATION_GATE, null, { self: true });
         this.gateOpen.set(gate === null);
-        gate?.onMeasured(() => this.gateOpen.set(true));
+        gate?.onMeasured().then(this.openGate, this.openGate);
       });
     });
   }

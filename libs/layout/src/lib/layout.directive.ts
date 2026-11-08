@@ -10,6 +10,7 @@ import {
   defer,
   filter,
   finalize,
+  firstValueFrom,
   map,
   merge,
   share,
@@ -72,8 +73,9 @@ export class VxLayout implements VflowInitializationGate {
         .join('\u0000')}`,
   );
 
-  /** Lets the flow paint; `null` once it was called, so a layout that runs afterwards may animate. */
-  private release: (() => void) | null = null;
+  /** The first positions are in: the flow may paint, and the layouts after this one may animate. */
+  private readonly placed = signal(false);
+  private readonly placed$ = toObservable(this.placed);
   private readonly dragging = new Set<string>();
 
   /** The drags of nodes as an algorithm sees them, with the nodes as they are at that moment. */
@@ -109,10 +111,15 @@ export class VxLayout implements VflowInitializationGate {
       .subscribe();
   }
 
-  /** The flow is measured: the layout runs now, before the flow paints, and `ready` lets it paint afterwards. */
-  public onMeasured(ready: () => void): void {
-    this.release = ready;
+  /** The flow is measured: the layout runs now, and the flow paints once the first positions are in. */
+  public onMeasured(): Promise<void> {
     this.measured.set(true);
+    return firstValueFrom(
+      this.placed$.pipe(
+        filter(Boolean),
+        map(() => undefined),
+      ),
+    );
   }
 
   /** One run: every result is applied in order and the last one reported. However it ends, the flow paints. */
@@ -127,14 +134,10 @@ export class VxLayout implements VflowInitializationGate {
       }),
       finalize(() => {
         this.writer.cancel();
-        this.paint();
+        // A failed or empty first run must not keep the flow hidden.
+        this.placed.set(true);
       }),
     );
-  }
-
-  private paint(): void {
-    this.release?.();
-    this.release = null;
   }
 
   private graph(): LayoutGraph {
@@ -172,11 +175,11 @@ export class VxLayout implements VflowInitializationGate {
       targets.set(node, { x: position.x - origin.x, y: position.y - origin.y });
     }
 
-    if (this.release) {
-      placeNodes(targets);
-      this.paint();
-    } else {
+    if (this.placed()) {
       await this.writer.write(targets);
+    } else {
+      placeNodes(targets);
+      this.placed.set(true);
     }
     return result;
   }

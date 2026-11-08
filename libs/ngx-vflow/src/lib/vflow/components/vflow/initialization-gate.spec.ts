@@ -11,10 +11,13 @@ import { VflowComponent } from './vflow.component';
   providers: [{ provide: VFLOW_INITIALIZATION_GATE, useExisting: GateDirective }],
 })
 class GateDirective implements VflowInitializationGate {
-  public ready: (() => void) | null = null;
+  public measured = false;
+  public open!: () => void;
+  private readonly opened = new Promise<void>((resolve) => (this.open = resolve));
 
-  public onMeasured(ready: () => void): void {
-    this.ready = ready;
+  public onMeasured(): Promise<void> {
+    this.measured = true;
+    return this.opened;
   }
 }
 
@@ -55,20 +58,14 @@ describe('initialization gates', () => {
     const host = fixture.componentInstance;
     const root = fixture.nativeElement.querySelector('vflow') as HTMLElement;
 
-    expect(host.gate().ready).not.toBeNull();
+    expect(host.gate().measured).toBe(true);
     expect(host.vflow().getNodeRect('a')).toEqual({ x: 0, y: 0, width: 100, height: 50 });
     expect(host.initializations).toBe(0);
     expect(root.classList.contains('v-initializing')).toBe(true);
 
-    host.gate().ready!();
+    host.gate().open();
     await settle(fixture);
 
-    expect(host.initializations).toBe(1);
-    expect(root.classList.contains('v-initializing')).toBe(false);
-
-    // A second call changes nothing.
-    host.gate().ready!();
-    await settle(fixture);
     expect(host.initializations).toBe(1);
     expect(root.classList.contains('v-initializing')).toBe(false);
   });

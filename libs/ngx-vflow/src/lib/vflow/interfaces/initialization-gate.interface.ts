@@ -10,19 +10,19 @@ import { InjectionToken } from '@angular/core';
  *   providers: [{ provide: VFLOW_INITIALIZATION_GATE, useExisting: MyLayout }],
  * })
  * export class MyLayout implements VflowInitializationGate {
- *   onMeasured(ready: () => void): void {
- *     this.placeNodes().then(ready, ready);
+ *   onMeasured(): Promise<void> {
+ *     return this.placeNodes();
  *   }
  * }
  * ```
  */
 export interface VflowInitializationGate {
   /**
-   * Called once by the flow, when it has a size and every node is measured. Until `ready` is called the graph
-   * stays unpainted and `initialized` is not emitted, so call it on failure too. A DOM without layout, such as
+   * Called once by the flow, when it has a size and every node is measured. Until the returned promise settles,
+   * resolved or rejected, the graph stays unpainted and `initialized` is not emitted. A DOM without layout, such as
    * jsdom, never calls this.
    */
-  onMeasured(ready: () => void): void;
+  onMeasured(): Promise<void>;
 }
 
 /** The gate of a flow, provided on its element. */
