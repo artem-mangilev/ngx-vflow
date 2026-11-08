@@ -9,10 +9,10 @@ export type {
 } from './lib/layout.types';
 export { VxLayout } from './lib/layout.directive';
 export { VxLayoutAnimate } from './lib/layout-animate.directive';
-export { VX_LAYOUT_POSITION_WRITER, type LayoutPositionWriter } from './lib/position-writer';
 export {
-  createNodePositionAnimator,
-  type NodePositionAnimator,
-  type NodePositionAnimatorOptions,
-  type NodePositionTargets,
-} from './lib/node-position-animator';
+  VX_LAYOUT_POSITION_WRITER,
+  type LayoutPositionWriter,
+  type NodeTarget,
+  type NodeTargets,
+} from './lib/position-writer';
+export { createNodeAnimator, type NodeAnimator, type NodeAnimatorOptions } from './lib/node-animator';

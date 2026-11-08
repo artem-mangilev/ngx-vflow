@@ -38,7 +38,7 @@ The host runs the algorithm once every node is measured, so content-sized nodes 
 | `vxLayout`    | `null`  | A `LayoutAlgorithm`. Without one (`<vflow vxLayout>`) the layout runs only through `run(algorithm)` of the directive, for example from a button.                                                                                              |
 | `vxLayoutEnd` |         | Emits the result once the positions are applied, after any animation, or when a continuous layout completes; a good moment to call `fitView()`. The first one comes before the flow paints, so fit without a duration there, as the demos do. |
 
-The host places the positions at once. `VxLayoutAnimate` on the same element animates the nodes into the layouts instead, except the first positions, which land before the flow paints. It is meant for layouts with one result: a continuous layout moves the nodes itself.
+The host places the positions, and the sizes an algorithm gives to parents, at once. `VxLayoutAnimate` on the same element animates the nodes into the layouts instead, positions and sizes together, except the first positions, which land before the flow paints. It is meant for layouts with one result: a continuous layout moves the nodes itself.
 
 | `VxLayoutAnimate` | Default | Meaning                                                                                             |
 | ----------------- | ------- | --------------------------------------------------------------------------------------------------- |
@@ -66,7 +66,7 @@ The animation is a position writer: a directive that provides `VX_LAYOUT_POSITIO
 
 ## Your own algorithm
 
-A `LayoutAlgorithm` is a function of the graph and a context: the nodes with their rendered `width` and `height`, their `parentId` and their current `x` and `y` in flow space, and the edges; the context carries the drags of nodes while the layout runs, for continuous layouts to follow. It returns an observable of results, `positions` in flow space and optional `sizes` for the parents it lays out around their children: one value for a one-shot layout (`of(result)`, or `defer` around a promise), a value per step for a continuous one. `createNodePositionAnimator` from the package moves nodes between positions on its own, outside the host: `animate(targets)` takes a map of nodes to node-space positions.
+A `LayoutAlgorithm` is a function of the graph and a context: the nodes with their rendered `width` and `height`, their `parentId` and their current `x` and `y` in flow space, and the edges; the context carries the drags of nodes while the layout runs, for continuous layouts to follow. It returns an observable of results, `positions` in flow space and optional `sizes` for the parents it lays out around their children: one value for a one-shot layout (`of(result)`, or `defer` around a promise), a value per step for a continuous one. `createNodeAnimator` from the package moves nodes between positions and sizes on its own, outside the host: `animate(targets)` takes a map of nodes to their node-space `point` and optional `size`.
 
 ```ts
 const columns: LayoutAlgorithm = (graph) => of({ positions: new Map(graph.nodes.map((node, i) => [node.id, { x: i * (node.width + 40), y: 0 }])) });

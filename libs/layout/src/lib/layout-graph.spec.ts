@@ -34,20 +34,21 @@ describe('layout graph', () => {
     ]);
   });
 
-  it('turns flow-space positions into node space, relative to the laid-out or rendered parent', () => {
+  it('turns flow-space positions into node space, relative to the laid-out or rendered parent, with the sizes', () => {
     const laidOutParent = toNodeSpaceTargets(
       {
         positions: new Map([
           ['group', { x: 300, y: 300 }],
           ['c', { x: 450, y: 300 }],
         ]),
+        sizes: new Map([['group', { width: 320, height: 220 }]]),
       },
       nodes,
       rectOf,
       new Set(),
     );
-    expect(laidOutParent.get(nodes[2])).toEqual({ x: 300, y: 300 });
-    expect(laidOutParent.get(nodes[3])).toEqual({ x: 150, y: 0 });
+    expect(laidOutParent.get(nodes[2])).toEqual({ point: { x: 300, y: 300 }, size: { width: 320, height: 220 } });
+    expect(laidOutParent.get(nodes[3])).toEqual({ point: { x: 150, y: 0 } });
 
     const renderedParent = toNodeSpaceTargets(
       { positions: new Map([['c', { x: 450, y: 100 }]]) },
@@ -55,7 +56,7 @@ describe('layout graph', () => {
       rectOf,
       new Set(),
     );
-    expect(renderedParent.get(nodes[3])).toEqual({ x: 50, y: 100 });
+    expect(renderedParent.get(nodes[3])).toEqual({ point: { x: 50, y: 100 } });
   });
 
   it('leaves out unknown and skipped nodes', () => {

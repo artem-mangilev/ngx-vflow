@@ -156,15 +156,9 @@ export class VxLayout implements VflowInitializationGate {
     );
   }
 
-  /** Writes the sizes and the node-space positions of a result; resolves once the positions are in. */
+  /** Writes the positions and sizes of a result through the writer; resolves once they are in. */
   private async apply(result: LayoutResult): Promise<LayoutResult> {
-    const nodes = this.flow.nodes();
-    for (const [id, size] of result.sizes ?? []) {
-      const node = nodes.find((node) => node.id === id);
-      node?.width?.set(size.width);
-      node?.height?.set(size.height);
-    }
-    const targets = toNodeSpaceTargets(result, nodes, this.rectOf, this.dragging());
+    const targets = toNodeSpaceTargets(result, this.flow.nodes(), this.rectOf, this.dragging());
     await this.writer.write(targets, { first: !this.placed() });
     this.placed.set(true);
     return result;

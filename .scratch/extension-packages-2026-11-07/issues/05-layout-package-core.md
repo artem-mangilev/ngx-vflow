@@ -83,3 +83,7 @@ Blocked by: 03
   `flowOrigin`), спека без TestBed. В директиве `graph` — `computed` на утилите, `dragging` — `toSignal(scan)` по
   потоку драгов вместо ручной подписки и мутируемого Set, `structure` переименован в `graphIds` (сырые массивы в
   `combineLatest` перезапускали бы лейаут при каждом новом массиве с теми же id и откатывали бы позиции пользователя).
+- Анимация размера: цель ноды `NodeTarget { point, size? }` для писателя и аниматора; `toNodeSpaceTargets` кладёт в
+  цель размер из `result.sizes`, `placeNodes` ставит точку и размер, аниматор интерполирует `width`/`height` вместе с
+  `point` (изменение размера входит в расчёт длительности). Аниматор переименован: `createNodeAnimator`,
+  `NodeAnimator`, `NodeAnimatorOptions`; из `apply` ушёл отдельный цикл по размерам.

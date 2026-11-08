@@ -6,7 +6,7 @@ import { dispatchMouse } from '../../../ngx-vflow/src/lib/vflow/gestures/pointer
 import { VxLayoutAnimate } from './layout-animate.directive';
 import { VxLayout } from './layout.directive';
 import { LayoutAlgorithm, LayoutGraph, LayoutResult } from './layout.types';
-import { NodePositionAnimatorOptions } from './node-position-animator';
+import { NodeAnimatorOptions } from './node-animator';
 
 /** Content-sized cards of 100×50 and one explicit parent; the algorithm is a spy the test controls. */
 const template = (animate: string) => `
@@ -77,7 +77,7 @@ class LayoutHostComponent extends LayoutHost {}
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 class AnimatedLayoutHostComponent extends LayoutHost {
-  public readonly animate = signal<NodePositionAnimatorOptions>({ duration: 120 });
+  public readonly animate = signal<NodeAnimatorOptions>({ duration: 120 });
 }
 
 async function settle(fixture: { detectChanges(): void; whenStable(): Promise<unknown> }) {
@@ -264,16 +264,30 @@ describe('VxLayout with VxLayoutAnimate', () => {
     expect(host.initializedAt).toEqual([{ x: 640, y: 480 }]);
     expect(host.ended).toHaveLength(1);
 
-    host.algorithm.set(() => of({ positions: new Map([['a', { x: 0, y: 0 }]]) }));
+    host.algorithm.set(() =>
+      of({
+        positions: new Map([
+          ['a', { x: 0, y: 0 }],
+          ['group', { x: 400, y: 0 }],
+        ]),
+        sizes: new Map([['group', { width: 500, height: 400 }]]),
+      }),
+    );
     fixture.detectChanges();
     await new Promise((resolve) => setTimeout(resolve, 60));
     const midway = node(fixture, 'a').point();
     expect(midway.x).toBeGreaterThan(0);
     expect(midway.x).toBeLessThan(640);
+    // The size of the group travels with the positions.
+    const width = node(fixture, 'group').width!();
+    expect(width).toBeGreaterThan(300);
+    expect(width).toBeLessThan(500);
     expect(host.ended).toHaveLength(1);
 
     await new Promise((resolve) => setTimeout(resolve, 200));
     expect(node(fixture, 'a').point()).toEqual({ x: 0, y: 0 });
+    expect(node(fixture, 'group').width!()).toBe(500);
+    expect(node(fixture, 'group').height!()).toBe(400);
     expect(host.ended).toHaveLength(2);
   });
 });
