@@ -31,7 +31,7 @@ import { withShortcuts } from '../../features/with-shortcuts';
     ><vflow
       [nodes]="nodes()"
       [edges]="edges"
-      [view]="[600, 350]"
+      style="width: 600px; height: 350px"
       [parentsBelowEdges]="true"
       [snapGrid]="snapGrid()"
       [nodesFocusable]="nodesFocusable()"
@@ -79,7 +79,7 @@ class KeyboardHostComponent {
 @Component({
   imports: [Vflow],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `<vflow [nodes]="nodes" [view]="[600, 200]">
+  template: `<vflow [nodes]="nodes" style="width: 600px; height: 200px">
       <ng-template vNode
         ><button>Action</button><input aria-label="Name" /> <textarea aria-label="Notes"></textarea
         ><select aria-label="Choice">
@@ -89,7 +89,7 @@ class KeyboardHostComponent {
       </ng-template>
     </vflow>
     <section vNoKeyboard>
-      <vflow [nodes]="excluded" [view]="[600, 100]">
+      <vflow [nodes]="excluded" style="width: 600px; height: 100px">
         <div *vNode style="width: 100px; height: 50px"></div>
       </vflow>
     </section>`,

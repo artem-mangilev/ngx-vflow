@@ -4,7 +4,7 @@ import { Edge, Node, Vflow, createNodes, injectNode } from 'ngx-vflow';
 
 @Component({
   template: `
-    <vflow view="auto" [nodes]="nodes" [edges]="edges">
+    <vflow [nodes]="nodes" [edges]="edges">
       <docs-node *vNode="let ctx" [ctx]="ctx" />
       <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
     </vflow>

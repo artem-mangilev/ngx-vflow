@@ -7,7 +7,6 @@ import { TransformNodeComponent } from './components/transform-node.component';
 @Component({
   template: `<vflow
     #flow
-    view="auto"
     [nodes]="store.nodes()"
     [edges]="store.edges()"
     [background]="{ type: 'dots' }"

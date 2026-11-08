@@ -227,12 +227,6 @@ export class VflowComponent<N extends Node = Node, E extends Edge = Edge> {
 
   // #region SETTINGS
 
-  /**
-   * Size of the flow: `[width, height]` in pixels, or `'auto'` to fill the parent element. Default: `'auto'`, so
-   * the parent needs a size of its own.
-   */
-  public readonly view = input<[number, number] | 'auto'>();
-
   /** Minimum zoom value. Default: 0.5. */
   public readonly minZoom = input<number>();
 

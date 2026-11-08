@@ -28,19 +28,10 @@ export class FlowSettingsService {
   public autoPan = bindableSignal<boolean | AutoPanSettings>(true);
   public autoPanOnNodeFocus = bindableSignal(true);
 
-  /**
-   * @see {VflowComponent.view}
-   */
-  public view = bindableSignal<[number, number] | 'auto'>('auto');
-
-  /**
-   * Set based on view property. May change if view is 'auto'
-   */
+  /** Measured width of the flow element in CSS pixels; the application sizes the element with CSS. */
   public computedFlowWidth = signal(0);
 
-  /**
-   * Set based on view property. May change if view is 'auto'
-   */
+  /** Measured height of the flow element in CSS pixels. */
   public computedFlowHeight = signal(0);
 
   public zoomOnScroll = bindableSignal(true);

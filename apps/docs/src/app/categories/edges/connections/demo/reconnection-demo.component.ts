@@ -13,7 +13,6 @@ import {
 
 @Component({
   template: `<vflow
-    view="auto"
     [nodes]="nodes"
     [edges]="edges"
     (reconnectStart)="onReconnectStart()"

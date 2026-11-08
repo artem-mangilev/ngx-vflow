@@ -17,7 +17,9 @@ class Translations {
 @Component({
   imports: [Vflow],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `<vflow [nodes]="nodes" [view]="[400, 300]"><div *vNode style="width: 100px; height: 50px"></div></vflow>`,
+  template: `<vflow [nodes]="nodes" style="width: 400px; height: 300px"
+    ><div *vNode style="width: 100px; height: 50px"></div
+  ></vflow>`,
 })
 class HostComponent {
   public readonly nodes = createNodes([{ id: 'a', point: { x: 0, y: 0 }, ariaLabel: 'Alpha' }]);

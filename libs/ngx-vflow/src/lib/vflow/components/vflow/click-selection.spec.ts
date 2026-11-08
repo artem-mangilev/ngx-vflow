@@ -6,7 +6,7 @@ import { createEdges } from '../../interfaces/edge.interface';
 
 @Component({
   template: `<vflow
-    [view]="[500, 300]"
+    style="width: 500px; height: 300px"
     [nodes]="nodes()"
     [edges]="edges()"
     [elevateNodesOnSelect]="elevateNodes()"

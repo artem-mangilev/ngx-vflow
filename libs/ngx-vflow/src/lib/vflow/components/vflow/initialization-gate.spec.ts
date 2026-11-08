@@ -23,7 +23,11 @@ class GateDirective implements VflowInitializationGate {
 
 @Component({
   template: `
-    <vflow gate [view]="[400, 300]" [nodes]="nodes" (initialized)="initializations = initializations + 1">
+    <vflow
+      gate
+      style="width: 400px; height: 300px"
+      [nodes]="nodes"
+      (initialized)="initializations = initializations + 1">
       <div *vNode class="card"></div>
     </vflow>
   `,

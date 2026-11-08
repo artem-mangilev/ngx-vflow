@@ -16,7 +16,7 @@ import { Vflow, createEdges, createNodes } from 'ngx-vflow';
         [value]="distance()"
         (input)="distance.set(+$any($event.target).value)" />
     </label>
-    <vflow view="auto" [vxLayout]="layout()" [nodes]="nodes" [edges]="edges" [background]="{ type: 'dots' }">
+    <vflow [vxLayout]="layout()" [nodes]="nodes" [edges]="edges" [background]="{ type: 'dots' }">
       <!--
         A ball whose whole surface is the handle, so the edges meet it at its center. It neither starts nor accepts
         connections, so a press on it drags the node.

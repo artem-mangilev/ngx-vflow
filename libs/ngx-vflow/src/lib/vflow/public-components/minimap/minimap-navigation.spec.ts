@@ -13,7 +13,8 @@ import { withShortcuts } from '../../features/with-shortcuts';
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [provideVflow(withShortcuts(() => inject(MinimapHostComponent).keyboardShortcuts))],
   template: `<vflow
-    [view]="size()"
+    [style.width.px]="size()[0]"
+    [style.height.px]="size()[1]"
     [nodes]="nodes"
     [minZoom]="0.5"
     [maxZoom]="2"
@@ -271,7 +272,7 @@ class WrappedMinimapComponent {}
 @Component({
   imports: [Vflow, WrappedMinimapComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `<vflow [view]="[400, 300]" [nodes]="[]">
+  template: `<vflow style="width: 400px; height: 300px" [nodes]="[]">
     @if (projectAs()) {
       <app-minimap ngProjectAs="v-minimap" />
     } @else {

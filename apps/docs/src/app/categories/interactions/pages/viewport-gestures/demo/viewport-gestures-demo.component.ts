@@ -22,7 +22,6 @@ type GestureSetting = 'panOnDrag' | 'panOnScroll' | 'zoomOnScroll' | 'zoomOnPinc
     </div>
 
     <vflow
-      view="auto"
       [nodes]="nodes"
       [edges]="edges"
       [panOnDrag]="enabled().panOnDrag"

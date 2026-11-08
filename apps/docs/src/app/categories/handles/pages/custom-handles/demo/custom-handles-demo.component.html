@@ -17,7 +17,7 @@
     </label>
   </div>
 
-  <vflow view="auto" [nodes]="nodes" [edges]="edges" (connect)="createEdge($event)">
+  <vflow [nodes]="nodes" [edges]="edges" (connect)="createEdge($event)">
     <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
 
     <ng-template let-ctx vNode>

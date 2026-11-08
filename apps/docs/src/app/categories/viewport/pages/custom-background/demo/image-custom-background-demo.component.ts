@@ -4,7 +4,6 @@ import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
 
 @Component({
   template: `<vflow
-    view="auto"
     [nodes]="nodes"
     [edges]="edges"
     [background]="{ type: 'image', src: 'assets/logo.svg', scale: 0.05 }">

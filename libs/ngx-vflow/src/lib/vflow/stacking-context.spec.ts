@@ -9,7 +9,7 @@ import { createNodes } from './interfaces/node.interface';
   template: `
     <div data-testid="dialog" style="position: fixed; inset: 0; z-index: 10"></div>
     <div style="position: relative">
-      <vflow [view]="[400, 300]" [nodes]="nodes">
+      <vflow style="width: 400px; height: 300px" [nodes]="nodes">
         <v-minimap [pannable]="true" />
       </vflow>
       <div data-testid="panel" style="position: absolute; left: 0; top: 0; width: 40px; height: 40px"></div>

@@ -14,7 +14,7 @@ import { dispatchMouse } from '../../gestures/pointer-events.testing';
   template: `<vflow
     [nodes]="nodes"
     [edges]="edges"
-    [view]="view"
+    style="width: 400px; height: 300px"
     [autoPan]="autoPan"
     (connect)="(undefined)"
     (reconnect)="(undefined)">
@@ -60,7 +60,7 @@ describe('public auto-pan settings', () => {
 
   async function setup(autoPan: boolean | AutoPanSettings) {
     fixture = TestBed.createComponent(AutoPanHostComponent);
-    fixture.componentRef.setInput('view', [400, 300]);
+    Object.assign(fixture.nativeElement.style, { width: '400px', height: '300px' });
     fixture.componentRef.setInput('nodes', [
       createNode({ id: 'node', point: { x: 100, y: 100 }, data: { text: 'Node' } }),
       createNode({ id: 'target', point: { x: 250, y: 100 }, data: { text: 'Target' } }),

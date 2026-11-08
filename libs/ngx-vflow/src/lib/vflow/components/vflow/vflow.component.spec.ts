@@ -9,7 +9,7 @@ import { Vflow } from '../../vflow';
 import { VflowComponent } from './vflow.component';
 
 @Component({
-  template: `<vflow [view]="[400, 300]" [nodes]="nodes" />`,
+  template: `<vflow style="width: 400px; height: 300px" [nodes]="nodes" />`,
   imports: [Vflow],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -35,7 +35,7 @@ class VflowTestHostComponent {
 
 @Component({
   template: `
-    <vflow [view]="[800, 600]" [nodes]="nodes">
+    <vflow style="width: 800px; height: 600px" [nodes]="nodes">
       <div *vNode class="card"></div>
     </vflow>
   `,
@@ -59,7 +59,7 @@ class NodeRectHostComponent {
 
 @Component({
   template: `
-    <vflow [view]="[800, 600]" [nodes]="nodes()">
+    <vflow style="width: 800px; height: 600px" [nodes]="nodes()">
       <div *vNode class="card"></div>
     </vflow>
   `,
@@ -80,7 +80,7 @@ class LateSignalHostComponent {
 
 @Component({
   template: `
-    <vflow [view]="[600, 400]" [nodes]="nodes" [edges]="edges">
+    <vflow style="width: 600px; height: 400px" [nodes]="nodes" [edges]="edges">
       <div *vNode style="width: 100px; height: 50px">
         <span vHandle handleType="target" position="left"></span>
         <span vHandle handleType="source" position="right"></span>
@@ -105,7 +105,7 @@ class HandlesHostComponent {
 @Component({
   template: `
     <vflow
-      [view]="[600, 400]"
+      style="width: 600px; height: 400px"
       [nodes]="nodes"
       [snapGrid]="[20, 20]"
       [nodeDragThreshold]="0"

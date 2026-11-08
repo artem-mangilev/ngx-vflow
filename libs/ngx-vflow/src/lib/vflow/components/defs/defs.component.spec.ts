@@ -11,7 +11,11 @@ import {
 import { VflowHandleDirective } from '../../public-directives/handle.directive';
 
 @Component({
-  template: `<vflow [view]="[600, 400]" [nodes]="nodes" [edges]="edges()" [connection]="{ markerEnd: 'diamond' }">
+  template: `<vflow
+    style="width: 600px; height: 400px"
+    [nodes]="nodes"
+    [edges]="edges()"
+    [connection]="{ markerEnd: 'diamond' }">
     <div *vNode style="width: 60px; height: 30px">
       <span vHandle handleType="target" position="left"></span
       ><span vHandle handleType="source" position="right"></span>

@@ -79,7 +79,7 @@ class NodeAsHandleComponent {}
 
 /** Subscribes to `connectEnd` only. */
 @Component({
-  template: `<vflow [view]="[400, 300]" [nodes]="nodes" (connectEnd)="ends.push($event)" />`,
+  template: `<vflow style="width: 400px; height: 300px" [nodes]="nodes" (connectEnd)="ends.push($event)" />`,
   imports: [VflowComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -113,7 +113,7 @@ class PortNodeComponent {}
 describe('VflowHandleDirective', () => {
   function setup(component: Type<unknown>, ids = ['a'], edges: { source: string; target: string }[] = []) {
     const fixture = TestBed.createComponent(VflowComponent);
-    fixture.componentRef.setInput('view', [400, 300]);
+    Object.assign(fixture.nativeElement.style, { width: '400px', height: '300px' });
     fixture.componentRef.setInput(
       'nodes',
       ids.map((id, i) => createNode({ id, component, point: { x: i * 200, y: 0 } })),

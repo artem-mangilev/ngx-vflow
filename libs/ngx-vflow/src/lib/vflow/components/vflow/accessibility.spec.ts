@@ -12,7 +12,7 @@ import { withAccessibility } from '../../features/with-accessibility';
   imports: [Vflow],
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [provideVflow(withAccessibility(() => inject(AccessibilityHostComponent).labels))],
-  template: `<vflow [nodes]="nodes" [edges]="edges" [view]="[600, 350]">
+  template: `<vflow [nodes]="nodes" [edges]="edges" style="width: 600px; height: 350px">
     <v-minimap />
     <ng-template vNode>
       <button type="button" noDrag (click)="clicks = clicks + 1">Review request</button>

@@ -116,7 +116,7 @@ export class EasyConnectNodeComponent {
         </select>
       </label>
 
-      <vflow view="auto" [nodes]="nodes" [edges]="edges()" [connection]="connection()" (connect)="connect($event)">
+      <vflow [nodes]="nodes" [edges]="edges()" [connection]="connection()" (connect)="connect($event)">
         <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
       </vflow>
     </div>

@@ -106,7 +106,7 @@ const SPANISH: Partial<AriaLabelConfig> = {
         </p>
         <button class="button" type="button" (click)="spanish.set(!spanish())">Switch graph language</button>
       </div>
-      <vflow view="auto" [nodes]="nodes()" [edges]="edges()" (deleteRequest)="onDeleteRequest($event)">
+      <vflow [nodes]="nodes()" [edges]="edges()" (deleteRequest)="onDeleteRequest($event)">
         <ng-template let-ctx vNode>
           @if (ctx.node.id === 'editor') {
             <article vuiNode class="editor">

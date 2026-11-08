@@ -1,7 +1,6 @@
 <button (click)="addNodes()">Add nodes</button>
 
 <vflow
-  view="auto"
   [nodes]="nodes"
   [edges]="edges"
   (connect)="createEdge($event)"

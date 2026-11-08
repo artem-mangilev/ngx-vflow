@@ -10,7 +10,7 @@ import { ResizeChangeEvent, ResizeEvent } from './resizer-types';
 
 @Component({
   template: `
-    <vflow [view]="[400, 300]" [nodes]="nodes">
+    <vflow style="width: 400px; height: 300px" [nodes]="nodes">
       <ng-template vNode>
         @if (useCustomGap()) {
           <div class="resizable-host" vResizable [gap]="gap()"></div>
@@ -44,7 +44,7 @@ class ResizableTestHostComponent {
 
 @Component({
   template: `
-    <vflow [view]="[400, 300]" [nodes]="nodes()">
+    <vflow style="width: 400px; height: 300px" [nodes]="nodes()">
       <ng-template vNode>
         @if (withResizable()) {
           <div

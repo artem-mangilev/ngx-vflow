@@ -206,7 +206,7 @@ describe('Graph rendering and interaction regressions', () => {
 
   it('retains actual node views and edges while panning without detached notifications', async () => {
     const fixture = TestBed.createComponent(VflowComponent);
-    fixture.componentRef.setInput('view', [400, 300]);
+    Object.assign(fixture.nativeElement.style, { width: '400px', height: '300px' });
     fixture.componentRef.setInput('optimization', { virtualization: true });
     fixture.componentRef.setInput('nodes', [
       createNode({ id: 'a', component: BoxNodeComponent, point: { x: 10, y: 20 } }),

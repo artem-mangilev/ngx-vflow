@@ -50,13 +50,7 @@ type EdgeState = 'taken' | 'open' | 'skipped';
   template: `
     <section class="demo" aria-label="Approval workflow demo" [attr.data-vui-theme]="theme()">
       <div class="stage">
-        <vflow
-          view="auto"
-          [nodes]="nodes"
-          [edges]="edges"
-          [minZoom]="0.5"
-          [maxZoom]="2"
-          (initialized)="flow()?.fitView()">
+        <vflow [nodes]="nodes" [edges]="edges" [minZoom]="0.5" [maxZoom]="2" (initialized)="flow()?.fitView()">
           <article *vNode="let ctx" vuiNode [attr.data-step]="ctx.node.id">
             <header vuiNodeHeader>
               <span vuiIcon><app-demo-icon [name]="ctx.data().icon" /></span>

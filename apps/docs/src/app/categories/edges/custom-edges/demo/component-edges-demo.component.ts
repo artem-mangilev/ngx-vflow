@@ -67,7 +67,7 @@ export class ColoredEdgeComponent {
 @Component({
   template: `
     <p class="picked">Last clicked edge: {{ picked() }}</p>
-    <vflow view="auto" [nodes]="nodes" [edges]="edges" (componentEdgeEvent)="onEdgeEvent($event)">
+    <vflow [nodes]="nodes" [edges]="edges" (componentEdgeEvent)="onEdgeEvent($event)">
       <docs-node *vNode="let ctx" [ctx]="ctx" />
     </vflow>
   `,

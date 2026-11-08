@@ -9,7 +9,7 @@ import { Vflow, createNodes, provideVflow, withAccessibility, withSettings } fro
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { style: 'display: block' },
   template: `
-    <vflow #flow view="auto" [nodes]="nodes">
+    <vflow #flow [nodes]="nodes">
       <docs-node *vNode="let ctx" [ctx]="ctx" />
     </vflow>
     <dl class="effective">

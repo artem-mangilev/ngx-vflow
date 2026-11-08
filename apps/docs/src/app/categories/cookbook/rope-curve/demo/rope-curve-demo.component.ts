@@ -39,7 +39,7 @@ const HANDLE_RADIUS_WITH_STROKE = 7;
 const ropeCurve = createRopeCurveFactory();
 
 @Component({
-  template: `<vflow view="auto" [nodes]="nodes" [edges]="edges">
+  template: `<vflow [nodes]="nodes" [edges]="edges">
     <docs-node *vNode="let ctx" [ctx]="ctx" />
     <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
   </vflow>`,

@@ -12,7 +12,7 @@ import { VxAutoSize } from './auto-size.directive';
       [vxAutoSizePadding]="padding()"
       [vxAutoSizeShouldResize]="shouldResize()"
       [vxAutoSizeShrink]="shrink()"
-      [view]="[1200, 800]"
+      style="width: 1200px; height: 800px"
       [nodes]="nodes"
       [nodeDragThreshold]="0"
       [autoPan]="false">

@@ -7,7 +7,6 @@ import { Edge, Node, Vflow, VflowComponent, createNodes } from 'ngx-vflow';
     <button (click)="nextNode()">Go To Next Node</button>
 
     <vflow
-      view="auto"
       [nodes]="nodes"
       [edges]="edges"
       [optimization]="{ lazyLoadTrigger: 'viewport' }"

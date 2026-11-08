@@ -3,7 +3,7 @@ import { DocsPresentations } from '@docs/shared';
 import { KeyboardShortcuts, Node, Vflow, createNodes, provideVflow, withShortcuts } from 'ngx-vflow';
 
 @Component({
-  template: `<vflow view="auto" [nodes]="nodes">
+  template: `<vflow [nodes]="nodes">
     <docs-node *vNode="let ctx" [ctx]="ctx" />
     <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
   </vflow>`,

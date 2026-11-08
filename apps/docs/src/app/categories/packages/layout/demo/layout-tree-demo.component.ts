@@ -17,7 +17,6 @@ type Shape = 'down' | 'right' | 'radial';
       }
     </div>
     <vflow
-      view="auto"
       vxLayoutAnimate
       [vxLayout]="layout()"
       [nodes]="nodes"

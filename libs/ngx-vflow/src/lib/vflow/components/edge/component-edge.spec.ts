@@ -43,7 +43,7 @@ class TemplateEdgeChildComponent {
 
 @Component({
   template: `<vflow
-    [view]="[500, 300]"
+    style="width: 500px; height: 300px"
     [nodes]="nodes"
     [edges]="edges"
     (componentEdgeEvent)="edgeEvents.push($event)"
@@ -186,7 +186,7 @@ class PlainEdgeComponent {
 }
 
 @Component({
-  template: `<vflow [view]="[400, 200]" [nodes]="nodes" [edges]="edges">
+  template: `<vflow style="width: 400px; height: 200px" [nodes]="nodes" [edges]="edges">
     <div *vNode style="width: 60px; height: 30px">
       <span vHandle handleType="target" position="left"></span
       ><span vHandle handleType="source" position="right"></span>

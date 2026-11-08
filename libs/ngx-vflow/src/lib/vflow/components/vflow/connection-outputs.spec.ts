@@ -36,7 +36,7 @@ class PortsNodeComponent {}
 
 @Component({
   template: `<vflow
-    [view]="[700, 300]"
+    style="width: 700px; height: 300px"
     [nodes]="nodes"
     [edges]="edges()"
     [connection]="connection()"

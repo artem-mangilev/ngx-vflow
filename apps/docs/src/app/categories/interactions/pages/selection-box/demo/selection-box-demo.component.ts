@@ -10,7 +10,7 @@ import { Edge, Node, SelectionBoxMode, SelectionBoxSettings, Vflow, createNodes 
       <span class="hint">Hold Shift and drag on canvas</span>
     </div>
 
-    <vflow view="auto" [nodes]="nodes" [edges]="edges" [selectionBox]="selectionBox()">
+    <vflow [nodes]="nodes" [edges]="edges" [selectionBox]="selectionBox()">
       <docs-node *vNode="let ctx" [ctx]="ctx" />
       <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
     </vflow>

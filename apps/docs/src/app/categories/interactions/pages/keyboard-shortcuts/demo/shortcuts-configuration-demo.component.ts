@@ -55,7 +55,11 @@ const ZOOM_DEFAULTS = {
       </div>
       <p>Deletion requests: {{ requests() }}. Nodes left: {{ nodes.length }}.</p>
       <pre tabindex="0" aria-label="Current shortcut configuration" data-testid="shortcuts-config">{{ printed() }}</pre>
-      <vflow [nodes]="nodes" [edges]="edges" [view]="[600, 240]" (deleteRequest)="onDeleteRequest($event)">
+      <vflow
+        style="width: 600px; height: 240px"
+        [nodes]="nodes"
+        [edges]="edges"
+        (deleteRequest)="onDeleteRequest($event)">
         <docs-node *vNode="let ctx" [ctx]="ctx" />
         <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
       </vflow>

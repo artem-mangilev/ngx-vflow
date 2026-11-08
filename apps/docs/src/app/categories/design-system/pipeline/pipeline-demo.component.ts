@@ -154,7 +154,6 @@ const EXPORT = { width: 1200, height: 780 };
     <section class="demo" aria-label="Image lab demo" [attr.data-vui-theme]="theme()">
       <div class="stage">
         <vflow
-          view="auto"
           [nodes]="nodes()"
           [edges]="edges()"
           [connection]="connection"

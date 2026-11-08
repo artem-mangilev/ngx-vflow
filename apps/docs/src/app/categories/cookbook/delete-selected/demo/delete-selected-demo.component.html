@@ -1,4 +1,4 @@
-<vflow view="auto" [nodes]="nodes" [edges]="edges" (deleteRequest)="onDeleteRequest($event)">
+<vflow [nodes]="nodes" [edges]="edges" (deleteRequest)="onDeleteRequest($event)">
   <div *vNode="let ctx" class="custom-node" [class.custom-node_selected]="ctx.selected()">
     <span>Node</span>
 

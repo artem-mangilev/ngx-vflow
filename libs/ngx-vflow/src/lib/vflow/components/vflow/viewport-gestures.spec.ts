@@ -36,7 +36,7 @@ describe('public viewport gesture settings', () => {
     });
     fixture = TestBed.createComponent(VflowComponent);
     fixture.componentRef.setInput('nodes', []);
-    fixture.componentRef.setInput('view', [400, 300]);
+    Object.assign(fixture.nativeElement.style, { width: '400px', height: '300px' });
     fixture.detectChanges();
     await fixture.whenStable();
     flow = fixture.componentInstance;

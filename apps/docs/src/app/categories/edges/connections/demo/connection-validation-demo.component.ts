@@ -3,12 +3,7 @@ import { DocsPresentations } from '@docs/shared';
 import { Connection, ConnectionSettings, Edge, Node, Vflow, addEdges, createNodes } from 'ngx-vflow';
 
 @Component({
-  template: `<vflow
-    view="auto"
-    [nodes]="nodes"
-    [edges]="edges"
-    [connection]="conectionSettings"
-    (connect)="createEdge($event)">
+  template: `<vflow [nodes]="nodes" [edges]="edges" [connection]="conectionSettings" (connect)="createEdge($event)">
     <docs-node *vNode="let ctx" [ctx]="ctx" />
     <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
   </vflow> `,

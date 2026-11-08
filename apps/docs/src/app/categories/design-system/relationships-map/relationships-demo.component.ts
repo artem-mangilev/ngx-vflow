@@ -58,7 +58,6 @@ const LAYOUT = { inset: 16, header: 52, gap: 16, step: 8 };
   template: `
     <section class="demo" aria-label="Relationships and metrics map demo" [attr.data-vui-theme]="theme()">
       <vflow
-        view="auto"
         [nodes]="nodes"
         [edges]="edges()"
         [connection]="connection"

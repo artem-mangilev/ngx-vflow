@@ -46,8 +46,8 @@ setting: `flow.settings.minZoom()`.
 
 ### `withSettings(settings)`
 
-Takes a `Partial<VflowSettings>`: the inputs of `vflow` by their names, except `nodes`, `edges` and `view`, the
-size of one flow. The labels and the keys of the graph are not inputs; they have features of their own below. Instead of an
+Takes a `Partial<VflowSettings>`: the inputs of `vflow` by their names, `nodes` and `edges` excepted. The labels and
+the keys of the graph are not inputs; they have features of their own below. Instead of an
 object, pass a factory run in the injector that returns the settings or a signal of them, so the settings can come
 from a service and follow its changes:
 

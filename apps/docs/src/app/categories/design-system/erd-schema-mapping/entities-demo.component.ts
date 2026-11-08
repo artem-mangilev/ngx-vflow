@@ -146,7 +146,6 @@ const TYPES = ['uuid', 'text', 'decimal', 'timestamp'];
   template: `
     <section class="demo" aria-label="Entity relationships and field mapping demo" [attr.data-vui-theme]="theme()">
       <vflow
-        view="auto"
         [nodes]="nodes"
         [edges]="edges()"
         [connection]="connection"

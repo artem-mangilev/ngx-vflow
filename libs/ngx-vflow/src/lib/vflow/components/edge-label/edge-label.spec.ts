@@ -38,7 +38,7 @@ class LabelledEdgeComponent {
 }
 
 @Component({
-  template: `<vflow [view]="[600, 400]" [nodes]="nodes" [edges]="edges">
+  template: `<vflow style="width: 600px; height: 400px" [nodes]="nodes" [edges]="edges">
     <div *vNode style="width: 60px; height: 30px">
       <span vHandle handleType="target" position="left"></span
       ><span vHandle handleType="source" position="right"></span>

@@ -1,32 +1,17 @@
-import { Directive, ElementRef, NgZone, Signal, computed, inject } from '@angular/core';
+import { Directive, ElementRef, NgZone, inject } from '@angular/core';
 import { resizable } from '../utils/resizable';
 import { tap } from 'rxjs/operators';
 import { FlowSettingsService } from '../services/flow-settings.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
+/** Measures the root of the flow, which the application sizes with CSS, for the parts that need its size. */
 @Directive({
   standalone: true,
   selector: 'div[flowSizeController]',
-  host: {
-    '[style.width]': 'flowWidth()',
-    '[style.height]': 'flowHeight()',
-  },
 })
 export class FlowSizeControllerDirective {
   private host = inject<ElementRef<HTMLElement>>(ElementRef);
   private flowSettingsService = inject(FlowSettingsService);
-
-  public flowWidth: Signal<string> = computed(() => {
-    const view = this.flowSettingsService.view();
-
-    return view === 'auto' ? '100%' : `${view[0]}px`;
-  });
-
-  public flowHeight: Signal<string> = computed(() => {
-    const view = this.flowSettingsService.view();
-
-    return view === 'auto' ? '100%' : `${view[1]}px`;
-  });
 
   constructor() {
     resizable([this.host.nativeElement], inject(NgZone))

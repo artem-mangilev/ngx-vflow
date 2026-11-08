@@ -90,11 +90,11 @@ describe('object settings of vflow', () => {
   it('fills the parent element by default', () => {
     const bare = TestBed.createComponent(BareHostComponent);
     bare.detectChanges();
-    const injector = bare.debugElement.query(By.directive(VflowComponent)).injector;
-    expect(injector.get(FlowSettingsService).view()).toBe('auto');
-    const root = bare.nativeElement.querySelector('[data-v-root]') as HTMLElement;
-    expect(root.style.width).toBe('100%');
-    expect(root.style.height).toBe('100%');
+    const flow = bare.nativeElement.querySelector('vflow') as HTMLElement;
+    const root = flow.querySelector('[data-v-root]') as HTMLElement;
+    expect(root.getBoundingClientRect().width).toBeGreaterThan(0);
+    expect(root.getBoundingClientRect().width).toBe(flow.getBoundingClientRect().width);
+    expect(getComputedStyle(root).height).toBe(getComputedStyle(flow).height);
     bare.destroy();
   });
 });

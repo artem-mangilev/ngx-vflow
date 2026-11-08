@@ -32,7 +32,7 @@ describe('VflowNodeToolbarComponent', () => {
   beforeEach(async () => {
     toolbarPosition.set(null);
     fixture = TestBed.createComponent(VflowComponent);
-    fixture.componentRef.setInput('view', [400, 300]);
+    Object.assign(fixture.nativeElement.style, { width: '400px', height: '300px' });
     fixture.componentRef.setInput('nodes', [
       createNode({ id: 'node', component: ToolbarNodeComponent, point: { x: 20, y: 30 } }),
     ]);

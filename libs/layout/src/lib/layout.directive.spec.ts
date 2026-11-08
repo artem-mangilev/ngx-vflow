@@ -14,8 +14,7 @@ const template = (animate: string) => `
     [vxLayout]="algorithm()"
     ${animate}
     (vxLayoutEnd)="ended.push($event)"
-    (initialized)="initializedAt.push(nodes()[0].point())"
-    [view]="[1200, 800]"
+    (initialized)="initializedAt.push(nodes()[0].point())" style="width: 1200px; height: 800px"
     [nodes]="nodes()"
     [edges]="edges"
     [nodeDragThreshold]="0"

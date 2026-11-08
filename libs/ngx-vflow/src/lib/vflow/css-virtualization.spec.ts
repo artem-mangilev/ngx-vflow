@@ -58,7 +58,7 @@ class DragNodeComponent {}
 class PlainNodeComponent {}
 
 @Component({
-  template: `<vflow [view]="[400, 300]" [nodes]="nodes" [optimization]="{ virtualization: true }"
+  template: `<vflow style="width: 400px; height: 300px" [nodes]="nodes" [optimization]="{ virtualization: true }"
     ><v-minimap [position]="position()"
   /></vflow>`,
   imports: [VflowComponent, VflowMinimapComponent],
@@ -89,7 +89,7 @@ describe('CSS viewport virtualization', () => {
 
   function setup(nodes: Node[]) {
     const fixture = TestBed.createComponent(VflowComponent);
-    fixture.componentRef.setInput('view', [400, 300]);
+    Object.assign(fixture.nativeElement.style, { width: '400px', height: '300px' });
     fixture.componentRef.setInput('optimization', { virtualization: true });
     fixture.componentRef.setInput('nodes', nodes);
     return fixture;

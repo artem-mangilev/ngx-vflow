@@ -5,7 +5,7 @@ import { Connection, Edge, Node, Vflow, addEdges, createNodes, injectNode } from
 
 @Component({
   template: `
-    <vflow view="auto" [nodes]="nodes" [edges]="edges" (connect)="createEdge($event)">
+    <vflow [nodes]="nodes" [edges]="edges" (connect)="createEdge($event)">
       <docs-node *vNode="let ctx" [ctx]="ctx" />
       <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
     </vflow>

@@ -49,7 +49,7 @@ describe('Initial handle placement', () => {
   it('keeps a shown node visible when a handle is added, and shows the new handle only once placed', async () => {
     extraHandle.set(false);
     const fixture = TestBed.createComponent(VflowComponent);
-    fixture.componentRef.setInput('view', [400, 300]);
+    Object.assign(fixture.nativeElement.style, { width: '400px', height: '300px' });
     fixture.componentRef.setInput('nodes', [
       createNode({ id: 'a', component: GrowingNodeComponent, point: { x: 0, y: 0 } }),
     ]);
@@ -86,7 +86,7 @@ describe('Initial handle placement', () => {
   it('keeps an edge visible when another handle is added to one of its nodes', async () => {
     extraHandle.set(false);
     const fixture = TestBed.createComponent(VflowComponent);
-    fixture.componentRef.setInput('view', [400, 300]);
+    Object.assign(fixture.nativeElement.style, { width: '400px', height: '300px' });
     fixture.componentRef.setInput('nodes', [
       createNode({ id: 'a', component: SmallCustomNodeComponent, point: { x: 0, y: 0 } }),
       createNode({ id: 'b', component: GrowingNodeComponent, point: { x: 150, y: 0 } }),
@@ -114,7 +114,7 @@ describe('Initial handle placement', () => {
   for (const count of [1, 1024]) {
     it(`never shows unpositioned custom handles on initial mount or restore (${count} nodes)`, async () => {
       const fixture = TestBed.createComponent(VflowComponent);
-      fixture.componentRef.setInput('view', [400, 300]);
+      Object.assign(fixture.nativeElement.style, { width: '400px', height: '300px' });
       fixture.componentRef.setInput(
         'nodes',
         Array.from({ length: count }, (_, i) =>
@@ -159,7 +159,7 @@ describe('Initial handle placement', () => {
 
   it('does not show an edge before its custom endpoints are measured', async () => {
     const fixture = TestBed.createComponent(VflowComponent);
-    fixture.componentRef.setInput('view', [400, 300]);
+    Object.assign(fixture.nativeElement.style, { width: '400px', height: '300px' });
     fixture.componentRef.setInput(
       'nodes',
       ['a', 'b'].map((id, i) => createNode({ id, component: SmallCustomNodeComponent, point: { x: i * 150, y: 0 } })),
@@ -204,7 +204,7 @@ describe('Initial handle placement', () => {
 
   it('keeps custom handles centered when zoom changes before a queued measurement', async () => {
     const fixture = TestBed.createComponent(VflowComponent);
-    fixture.componentRef.setInput('view', [400, 300]);
+    Object.assign(fixture.nativeElement.style, { width: '400px', height: '300px' });
     fixture.componentRef.setInput('nodes', [
       createNode({ id: 'a', component: SmallCustomNodeComponent, point: { x: 0, y: 0 } }),
     ]);
@@ -242,7 +242,7 @@ describe('Initial handle placement', () => {
 
   it('does not rewrite unchanged custom handle accessibility during node movement', async () => {
     const fixture = TestBed.createComponent(VflowComponent);
-    fixture.componentRef.setInput('view', [400, 300]);
+    Object.assign(fixture.nativeElement.style, { width: '400px', height: '300px' });
     fixture.componentRef.setInput('nodes', [
       createNode({ id: 'a', component: SmallCustomNodeComponent, point: { x: 0, y: 0 } }),
     ]);

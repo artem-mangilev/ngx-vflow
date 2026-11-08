@@ -5,8 +5,7 @@ import { Background } from '../../types/background.type';
 
 @Component({
   template: `<vflow
-    style="--v-background-pattern: rgb(1, 2, 3)"
-    [view]="[400, 300]"
+    style="--v-background-pattern: rgb(1, 2, 3); width: 400px; height: 300px"
     [nodes]="[]"
     [background]="background()" />`,
   imports: [VflowComponent],

@@ -4,12 +4,7 @@ import { VuiPort } from '@vflow/ui';
 import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
 
 @Component({
-  template: `<vflow
-    view="auto"
-    [nodes]="nodes"
-    [edges]="edges"
-    [snapGrid]="[25, 25]"
-    [background]="{ type: 'dots', gap: 25 }">
+  template: `<vflow [nodes]="nodes" [edges]="edges" [snapGrid]="[25, 25]" [background]="{ type: 'dots', gap: 25 }">
     <ng-template let-ctx vNode>
       @if (ctx.data().type === 'group') {
         <div

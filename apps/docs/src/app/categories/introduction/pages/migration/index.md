@@ -542,7 +542,7 @@ Settings, labels and component registrations can be given once for many flows wi
 
 Every object input of `vflow` now reads the same way: the value is the defaults with the keys you pass on top, so a key you leave out returns to its default instead of keeping the value of the previous binding. This holds for `optimization` and `selectionBox`; code that built a setting over several bindings must pass the whole object each time. `autoPan` follows later changes of its binding instead of reading it once, and `tolerance` in `AlignmentHelperSettings` and `partially` in `IntersectingNodesOptions` are optional.
 
-`view` defaults to `'auto'` instead of `[400, 400]`: the flow fills its parent element, which therefore needs a width and a height. Pass `[view]="[400, 400]"` to keep the former size.
+The `view` input is removed: the size of a flow is CSS. By default `vflow` fills its parent element, which therefore needs a width and a height; for a fixed size, style the element, `style="width: 400px; height: 400px"`, where v2 took `[view]="[400, 400]"`. See [View size](../../viewport/view-size).
 
 `optimization.detachedGroupsLayer` became the `parentsBelowEdges` input, and the `groupRole` label key became `parentRole`; both are about nodes that other nodes reference as parent. The `connection` getter of `VflowComponent` is removed: it returned an internal model.
 
@@ -604,6 +604,7 @@ A `vNode` or `vEdge` template types its `ctx` with `of`, a type witness the flow
 | `connection` getter of `VflowComponent`                     | Keep the bound value in the application; the input remains.                                                        |
 | `[ariaLabelConfig]` input                                   | `provideVflow(withAccessibility(labels))` in the providers of the host component or the application.               |
 | `[keyboardShortcuts]` input                                 | `provideVflow(withShortcuts(shortcuts))` in the providers of the host component or the application.                |
+| `[view]` input                                              | Size the `vflow` element with CSS; it fills its parent by default.                                                 |
 
 ### DOM compatibility
 

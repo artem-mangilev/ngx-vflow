@@ -21,7 +21,11 @@ const diagonal: CurveFactory = ({ sourcePoint, targetPoint }) => ({
 @Component({
   imports: [Vflow],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `<vflow [view]="[500, 300]" [nodes]="nodes" [edges]="edges" [connection]="{ curve: 'custom' }">
+  template: `<vflow
+    style="width: 500px; height: 300px"
+    [nodes]="nodes"
+    [edges]="edges"
+    [connection]="{ curve: 'custom' }">
     <div *vNode style="width: 60px; height: 30px">
       <span vHandle handleType="target" position="left"></span
       ><span vHandle handleType="source" position="right"></span>

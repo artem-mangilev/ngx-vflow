@@ -8,7 +8,7 @@ import { Vflow } from '../../vflow';
 /** Content-sized cards: their size is measured, not written into the node. */
 @Component({
   template: `
-    <vflow [view]="[800, 600]" [nodes]="nodes" [edges]="edges()">
+    <vflow style="width: 800px; height: 600px" [nodes]="nodes" [edges]="edges()">
       <div *vNode class="card">
         <span vHandle handleType="target" position="left"></span>
         <span vHandle handleType="source" position="right"></span>

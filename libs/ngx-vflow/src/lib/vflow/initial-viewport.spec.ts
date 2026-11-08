@@ -27,7 +27,7 @@ class NoBoxNodeComponent {}
 @Component({
   template: `<vflow
     #flow
-    [view]="[400, 300]"
+    style="width: 400px; height: 300px"
     [nodes]="nodes"
     [edges]="edges"
     [background]="{ type: 'dots' }"
@@ -106,7 +106,7 @@ describe('Initial viewport', () => {
       const fixture = TestBed.createComponent(VflowComponent);
       let initialized = false;
       fixture.componentInstance.initialized.subscribe(() => (initialized = true));
-      fixture.componentRef.setInput('view', [400, 300]);
+      Object.assign(fixture.nativeElement.style, { width: '400px', height: '300px' });
       fixture.componentRef.setInput('nodes', [
         createNode({ id: 'shown', component: HandleNodeComponent, point: { x: 0, y: 0 } }),
         createNode({ id: 'collapsed', component: NoBoxNodeComponent, point: { x: 200, y: 0 } }),
@@ -126,7 +126,7 @@ describe('Initial viewport', () => {
     const fixture = TestBed.createComponent(VflowComponent);
     let emissions = 0;
     fixture.componentInstance.initialized.subscribe(() => emissions++);
-    fixture.componentRef.setInput('view', [400, 300]);
+    Object.assign(fixture.nativeElement.style, { width: '400px', height: '300px' });
     fixture.componentRef.setInput('nodes', []);
     fixture.detectChanges();
     await frames(8);
@@ -135,7 +135,7 @@ describe('Initial viewport', () => {
     fixture.componentRef.setInput('nodes', [
       createNode({ id: 'a', component: HandleNodeComponent, point: { x: 0, y: 0 } }),
     ]);
-    fixture.componentRef.setInput('view', [500, 300]);
+    Object.assign(fixture.nativeElement.style, { width: '500px', height: '300px' });
     fixture.detectChanges();
     await frames(8);
     expect(emissions).toBe(1);

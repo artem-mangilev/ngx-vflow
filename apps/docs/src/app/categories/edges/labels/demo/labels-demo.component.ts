@@ -13,7 +13,7 @@ interface LabelData {
 }
 
 @Component({
-  template: `<vflow view="auto" [nodes]="nodes" [edges]="edges">
+  template: `<vflow [nodes]="nodes" [edges]="edges">
     <docs-node *vNode="let ctx" [ctx]="ctx" />
 
     <ng-template let-ctx vEdge>

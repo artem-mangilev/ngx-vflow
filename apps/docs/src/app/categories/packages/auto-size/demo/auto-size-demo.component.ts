@@ -6,7 +6,6 @@ import { Vflow, createEdges, createNodes } from 'ngx-vflow';
 @Component({
   template: `<vflow
     vxAutoSize
-    view="auto"
     [vxAutoSizePadding]="padding"
     [vxAutoSizeShrink]="true"
     [nodes]="nodes"

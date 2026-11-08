@@ -58,7 +58,7 @@ interface LongEntity {
   `,
   template: `
     <section class="demo" aria-label="Scroll and collapse experiment" [attr.data-vui-theme]="theme()">
-      <vflow view="auto" [nodes]="nodes" [edges]="edges" (initialized)="flow()?.fitView()">
+      <vflow [nodes]="nodes" [edges]="edges" (initialized)="flow()?.fitView()">
         <ng-template let-ctx vNode>
           @let view = scroll.visibility(ctx.node.id);
           <article vuiNode [attr.data-entity]="ctx.node.id" [attr.data-collapsed]="ctx.data().collapsed">

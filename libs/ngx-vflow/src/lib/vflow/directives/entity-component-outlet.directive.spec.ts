@@ -43,7 +43,7 @@ class TemplateChildComponent {
 }
 
 @Component({
-  template: `<vflow [view]="[400, 300]" [nodes]="nodes()" (componentNodeEvent)="events.push($event)">
+  template: `<vflow style="width: 400px; height: 300px" [nodes]="nodes()" (componentNodeEvent)="events.push($event)">
     <template-child *vNode />
   </vflow>`,
   imports: [VflowComponent, VflowNodeTemplateDirective, TemplateChildComponent],
@@ -64,7 +64,10 @@ class HostComponent {
 }
 
 @Component({
-  template: `<vflow [view]="[400, 300]" [nodes]="nodes" [optimization]="{ lazyLoadTrigger: 'viewport' }" />`,
+  template: `<vflow
+    style="width: 400px; height: 300px"
+    [nodes]="nodes"
+    [optimization]="{ lazyLoadTrigger: 'viewport' }" />`,
   imports: [VflowComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

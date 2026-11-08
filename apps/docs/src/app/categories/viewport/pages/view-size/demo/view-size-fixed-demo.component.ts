@@ -3,7 +3,7 @@ import { DocsPresentations } from '@docs/shared';
 import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
 
 @Component({
-  template: `<vflow [nodes]="nodes" [edges]="edges" [view]="[600, 600]">
+  template: `<vflow style="width: 600px; height: 600px" [nodes]="nodes" [edges]="edges">
     <docs-node *vNode="let ctx" [ctx]="ctx" />
     <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
   </vflow>`,

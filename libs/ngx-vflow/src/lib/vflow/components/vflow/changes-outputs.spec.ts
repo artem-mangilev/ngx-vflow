@@ -13,7 +13,7 @@ import { EdgeDetachedChange } from '../../types/edge-change.type';
   template: `<vflow
     [nodes]="nodes()"
     [edges]="edges"
-    [view]="[600, 350]"
+    style="width: 600px; height: 350px"
     (nodesChanges)="all.push($event)"
     (nodesChanges.position)="positions.push($event)"
     (edgesChanges.detached)="detached.push($event)">

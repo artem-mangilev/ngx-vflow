@@ -19,7 +19,6 @@ import { demoEdges, demoNodes } from './graph';
       }
     </div>
     <vflow
-      view="auto"
       vxLayoutAnimate
       [vxLayout]="layout()"
       [nodes]="nodes"

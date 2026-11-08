@@ -14,7 +14,7 @@ import { BlueSquareNodeComponent, BlueSquareData } from './components/blue-squar
 import { RedSquareNodeComponent, RedSquareData } from './components/red-square-node.component';
 
 @Component({
-  template: `<vflow view="auto" [nodes]="nodes" [edges]="edges" (componentNodeEvent)="handleComponentEvent($event)">
+  template: `<vflow [nodes]="nodes" [edges]="edges" (componentNodeEvent)="handleComponentEvent($event)">
     <docs-node *vNode="let ctx" [ctx]="ctx" />
     <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
   </vflow>`,

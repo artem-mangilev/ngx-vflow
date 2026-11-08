@@ -1,4 +1,4 @@
-<vflow #vflow view="auto" [nodes]="nodes" [edges]="edges" [minZoom]="0.1" [optimization]="{ virtualization: true }">
+<vflow #vflow [nodes]="nodes" [edges]="edges" [minZoom]="0.1" [optimization]="{ virtualization: true }">
   <docs-node *vNode="let ctx" [ctx]="ctx" />
   <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
 </vflow>

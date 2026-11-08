@@ -40,7 +40,11 @@ class LinkEdge {
 @Component({
   imports: [Vflow],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `<vflow [view]="[500, 300]" [nodes]="nodes" [edges]="edges" (componentNodeEvent)="events.push($event)">
+  template: `<vflow
+    style="width: 500px; height: 300px"
+    [nodes]="nodes"
+    [edges]="edges"
+    (componentNodeEvent)="events.push($event)">
     <div *vNode class="template-node" style="width: 60px; height: 30px"></div>
   </vflow>`,
 })

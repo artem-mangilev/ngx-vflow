@@ -35,8 +35,6 @@ export function bindVflowInputs<N extends Node, E extends Edge>(
   const labels = inject(VFLOW_ARIA_LABELS, { optional: true });
   settings.bind({
     ...sources,
-    // The size of one flow is not an application-wide setting: the input, else 'auto'.
-    view: computed(() => flow.view() ?? 'auto'),
     ariaLabels: computed(() => withDefaults(DEFAULT_ARIA_LABEL_CONFIG, labels?.())),
   });
   entities.connectionSettings.bind(connection);
