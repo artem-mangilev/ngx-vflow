@@ -1,4 +1,4 @@
-import { TemplateRef, computed, inject, signal, untracked } from '@angular/core';
+import { TemplateRef, computed, inject, signal } from '@angular/core';
 import { EdgeLabelOrient, EdgeLabelPosition } from '../interfaces/edge-label.interface';
 import { Edge, Curve, EDGE_DEFAULTS } from '../interfaces/edge.interface';
 import { NodeModel } from './node.model';
@@ -21,9 +21,7 @@ import { markerUrl } from '../utils/marker-ref';
 import { observeSignal } from '../utils/signals/observe-signal';
 import { entitySnapshot } from '../utils/signals/entity-snapshot';
 import { forwardSignal } from '../utils/signals/forward-signal';
-import { resolveEntityComponent } from '../utils/resolve-entity-component';
-import { VFLOW_EDGE_COMPONENTS } from '../features/with-entity-components';
-import { VFLOW_CURVES } from '../features/with-curves';
+import { FlowRegistriesService } from '../services/flow-registries.service';
 
 const LABEL_POSITIONS: EdgeLabelPosition[] = ['start', 'center', 'end'];
 
@@ -38,6 +36,7 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
   private document = inject(DOCUMENT);
   private readonly flowEntitiesService = inject(FlowEntitiesService);
   private readonly settingsService = inject(FlowSettingsService);
+  private readonly registries = inject(FlowRegistriesService);
 
   /**
    * The application's object as of the last edges array. Optional signals are read through it, so a signal the
@@ -46,11 +45,7 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
   private raw = entitySnapshot(this.edge, this.flowEntitiesService.edges);
 
   /** The component that draws the edge, a key resolved through `withEdgeComponents()`; `undefined` for a template edge. */
-  public readonly component = resolveEntityComponent(
-    'edge',
-    this.edge.component,
-    inject(VFLOW_EDGE_COMPONENTS, { optional: true }),
-  );
+  public readonly component = this.registries.edgeComponent(this.edge.component);
 
   public readonly accessibility = computed(() => {
     const labels = this.settingsService.ariaLabels();
@@ -77,8 +72,6 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
   public readonly source = signal<NodeModel | null>(null);
   public readonly target = signal<NodeModel | null>(null);
   public readonly curve = computed<Curve>(() => this.raw().curve?.() ?? EDGE_DEFAULTS.curve);
-  /** The curves registered with `withCurves()`; a key in `curve` is looked up on every layout, since `curve` is a signal. */
-  private readonly curves = inject(VFLOW_CURVES, { optional: true });
   public readonly reconnectable = computed(() => this.raw().reconnectable?.() ?? EDGE_DEFAULTS.reconnectable);
   public readonly interactionWidth = computed(() => this.raw().interactionWidth?.() ?? EDGE_DEFAULTS.interactionWidth);
   /** `g[vEdgeInteractionArea]` groups and host directives drawing the interaction stroke inside the presentation. */
@@ -148,11 +141,7 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
       return { path: '' };
     }
 
-    return resolveCurve(
-      this.curve(),
-      this.getPathFactoryParams(source, target),
-      untracked(() => this.curves?.()),
-    );
+    return resolveCurve(this.registries.curve(this.curve()), this.getPathFactoryParams(source, target));
   });
 
   public readonly bounds = computed(() => {

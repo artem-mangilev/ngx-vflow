@@ -15,8 +15,7 @@ import { extendedComputed } from '../utils/signals/extended-computed';
 import { observeSignal } from '../utils/signals/observe-signal';
 import { createModelInjector } from '../utils/model-injector';
 import { isComponentClass } from '../utils/is-component-class';
-import { resolveEntityComponent } from '../utils/resolve-entity-component';
-import { VFLOW_NODE_COMPONENTS } from '../features/with-entity-components';
+import { FlowRegistriesService } from '../services/flow-registries.service';
 import { entitySnapshot } from '../utils/signals/entity-snapshot';
 import { forwardSignal } from '../utils/signals/forward-signal';
 
@@ -194,11 +193,7 @@ export class NodeModel<T = unknown> implements FlowEntity, Contextable<NodeConte
   public readonly magnetRadius = 20;
 
   /** The component that draws the node, a key resolved through `withNodeComponents()`; `undefined` for a template node. */
-  public readonly component = resolveEntityComponent(
-    'node',
-    this.rawNode.component,
-    inject(VFLOW_NODE_COMPONENTS, { optional: true }),
-  );
+  public readonly component = inject(FlowRegistriesService).nodeComponent(this.rawNode.component);
 
   /** A component class renders immediately; a lazy factory or a template waits for the viewport. */
   private isComponentClass = isComponentClass(this.component);

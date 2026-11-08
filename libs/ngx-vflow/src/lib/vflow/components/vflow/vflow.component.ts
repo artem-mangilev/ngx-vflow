@@ -52,6 +52,7 @@ import {
 import { NodeRenderingService } from '../../services/node-rendering.service';
 import { SelectionService } from '../../services/selection.service';
 import { FlowSettingsService } from '../../services/flow-settings.service';
+import { FlowRegistriesService } from '../../services/flow-registries.service';
 import { ComponentEventBusService } from '../../services/component-event-bus.service';
 import { Background } from '../../types/background.type';
 import { SpacePointContextDirective } from '../../directives/space-point-context.directive';
@@ -118,6 +119,7 @@ import { ResolvedVflowSettingSignals } from './resolve-settings';
     EdgeRenderingService,
     SelectionService,
     FlowSettingsService,
+    FlowRegistriesService,
     ComponentEventBusService,
     KeyboardService,
     KeyboardEntityCommandsService,
