@@ -5,7 +5,7 @@
   [model]="model()"
   [style.width.px]="wrapperSize()?.width ?? null"
   [style.height.px]="wrapperSize()?.height ?? null">
-  @if (model().rawNode.component; as component) {
+  @if (model().component; as component) {
     <ng-container
       [entityComponentOutlet]="component"
       [entityComponentOutletLoad]="model().shouldLoad()"

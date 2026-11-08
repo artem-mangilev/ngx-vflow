@@ -1,7 +1,15 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { DocsPresentations } from '@docs/shared';
 import { NgDocNotifyService } from '@ng-doc/ui-kit';
-import { AnyComponentNodeEvent, Edge, Vflow, createNodes, isComponentNodeEvent } from 'ngx-vflow';
+import {
+  AnyComponentNodeEvent,
+  Edge,
+  Vflow,
+  createNodes,
+  isComponentNodeEvent,
+  provideVflow,
+  withNodeComponents,
+} from 'ngx-vflow';
 import { BlueSquareNodeComponent, BlueSquareData } from './components/blue-square-node.component';
 import { RedSquareNodeComponent, RedSquareData } from './components/red-square-node.component';
 
@@ -20,6 +28,8 @@ import { RedSquareNodeComponent, RedSquareData } from './components/red-square-n
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [DocsPresentations, Vflow],
+  // The nodes name their components by key; the classes are imported once, here.
+  providers: [provideVflow(withNodeComponents({ red: RedSquareNodeComponent, blue: BlueSquareNodeComponent }))],
 })
 export class CustomComponentNodesDemoComponent {
   private notifyService = inject(NgDocNotifyService);
@@ -29,7 +39,7 @@ export class CustomComponentNodesDemoComponent {
     {
       id: '1',
       point: { x: 100, y: 100 },
-      component: RedSquareNodeComponent,
+      component: 'red',
       data: {
         redSquareText: 'Red',
       } satisfies RedSquareData,
@@ -37,7 +47,7 @@ export class CustomComponentNodesDemoComponent {
     {
       id: '2',
       point: { x: 250, y: 250 },
-      component: BlueSquareNodeComponent,
+      component: 'blue',
       data: {
         blueSquareText: 'Blue',
       } satisfies BlueSquareData,

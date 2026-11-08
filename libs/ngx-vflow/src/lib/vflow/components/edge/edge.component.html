@@ -9,7 +9,7 @@
     [style.stroke-width.px]="model().interactionWidth()" />
 }
 
-@if (model().edge.component; as component) {
+@if (model().component; as component) {
   <ng-container
     [entityComponentOutlet]="component"
     [entityComponentOutletLoad]="model().shouldLoad()"

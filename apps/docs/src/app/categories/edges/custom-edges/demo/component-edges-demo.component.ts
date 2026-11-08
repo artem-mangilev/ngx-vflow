@@ -10,6 +10,8 @@ import {
   Vflow,
   createNodes,
   injectEdge,
+  provideVflow,
+  withEdgeComponents,
 } from 'ngx-vflow';
 
 interface ColoredEdgeData {
@@ -86,6 +88,7 @@ export class ColoredEdgeComponent {
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [DocsPresentations, Vflow],
+  providers: [provideVflow(withEdgeComponents({ colored: ColoredEdgeComponent }))],
 })
 export class ComponentEdgesDemoComponent {
   protected readonly picked = signal('none');
@@ -101,7 +104,7 @@ export class ComponentEdgesDemoComponent {
       id: '1 -> 2',
       source: '1',
       target: '2',
-      component: ColoredEdgeComponent,
+      component: 'colored',
       data: signal<ColoredEdgeData>({ color: '#e0a100', label: 'Amber' }),
       markers: signal({ end: { type: 'arrow-closed' } }),
     },
@@ -109,7 +112,7 @@ export class ComponentEdgesDemoComponent {
       id: '1 -> 3',
       source: '1',
       target: '3',
-      component: ColoredEdgeComponent,
+      component: 'colored',
       data: signal<ColoredEdgeData>({ color: '#ec586e', label: 'Rose' }),
     },
   ];

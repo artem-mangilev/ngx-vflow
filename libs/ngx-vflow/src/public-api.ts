@@ -113,6 +113,19 @@ export { VflowFeature, provideVflow, vflowFeature } from './lib/vflow/features/f
 export type { FeatureValue } from './lib/vflow/features/merged-feature-value';
 export { VFLOW_SETTINGS, withSettings } from './lib/vflow/features/with-settings';
 export { VFLOW_ARIA_LABELS, withAccessibility } from './lib/vflow/features/with-accessibility';
+export {
+  VFLOW_EDGE_COMPONENTS,
+  VFLOW_NODE_COMPONENTS,
+  withEdgeComponents,
+  withNodeComponents,
+  type EntityComponentRegistry,
+} from './lib/vflow/features/with-entity-components';
+export type {
+  EdgeComponentKey,
+  NodeComponentKey,
+  VflowEdgeComponents,
+  VflowNodeComponents,
+} from './lib/vflow/interfaces/entity-components.interface';
 export { VFLOW_SETTINGS_DEFAULTS, type VflowSettings } from './lib/vflow/interfaces/vflow-settings.interface';
 
 // Components

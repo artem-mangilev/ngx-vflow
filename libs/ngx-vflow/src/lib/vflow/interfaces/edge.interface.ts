@@ -7,6 +7,7 @@ import { isDefined } from '../utils/is-defined';
 import { DomAttributes } from './dom-attributes.interface';
 import { EntityComponentType } from './node.interface';
 import { StaticData } from '../types/static-data.type';
+import { EdgeComponentKey } from './entity-components.interface';
 
 export const EDGE_DEFAULTS = {
   curve: 'bezier' as Curve,
@@ -25,8 +26,11 @@ export type Curve = 'straight' | 'bezier' | 'smooth-step' | 'step' | CurveFactor
  */
 export interface Edge<T = unknown> extends Connection {
   id: string;
-  /** Component that draws the edge; without it the edge renders through the `vEdge` template. */
-  component?: EntityComponentType;
+  /**
+   * The component that draws the edge, or the key it is registered under with `withEdgeComponents()`; without it
+   * the edge renders through the `vEdge` template.
+   */
+  component?: EntityComponentType | EdgeComponentKey;
   curve?: WritableSignal<Curve>;
   data?: WritableSignal<T>;
   /** Markers of the edge ends: built-in arrows or shapes the application declares, see `MarkerRef`. */

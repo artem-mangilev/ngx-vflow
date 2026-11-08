@@ -21,6 +21,8 @@ import { markerUrl } from '../utils/marker-ref';
 import { observeSignal } from '../utils/signals/observe-signal';
 import { entitySnapshot } from '../utils/signals/entity-snapshot';
 import { forwardSignal } from '../utils/signals/forward-signal';
+import { resolveEntityComponent } from '../utils/resolve-entity-component';
+import { VFLOW_EDGE_COMPONENTS } from '../features/with-entity-components';
 
 const LABEL_POSITIONS: EdgeLabelPosition[] = ['start', 'center', 'end'];
 
@@ -41,6 +43,13 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
    * application adds to the object later takes effect with the next array.
    */
   private raw = entitySnapshot(this.edge, this.flowEntitiesService.edges);
+
+  /** The component that draws the edge, a key resolved through `withEdgeComponents()`; `undefined` for a template edge. */
+  public readonly component = resolveEntityComponent(
+    'edge',
+    this.edge.component,
+    inject(VFLOW_EDGE_COMPONENTS, { optional: true }),
+  );
 
   public readonly accessibility = computed(() => {
     const labels = this.settingsService.ariaLabels();

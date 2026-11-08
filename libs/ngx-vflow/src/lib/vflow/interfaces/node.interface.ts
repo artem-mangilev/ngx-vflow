@@ -4,6 +4,7 @@ import { UnwrapSignal } from '../types/unwrap-signal.type';
 import { isDefined } from '../utils/is-defined';
 import { DomAttributes } from './dom-attributes.interface';
 import { StaticData } from '../types/static-data.type';
+import { NodeComponentKey } from './entity-components.interface';
 
 export const NODE_DEFAULTS = {
   point: { x: 0, y: 0 },
@@ -29,7 +30,8 @@ export type EntityComponentType = Type<unknown> | (() => Promise<Type<unknown>>)
 export interface Node<T = unknown> {
   id: string;
   point: WritableSignal<Point>;
-  component?: EntityComponentType;
+  /** The component that draws the node, or the key it is registered under with `withNodeComponents()`. */
+  component?: EntityComponentType | NodeComponentKey;
   data?: WritableSignal<T>;
   /**
    * Fixed width; without it the width follows the content. Only a resize gesture writes it, never measurement:
