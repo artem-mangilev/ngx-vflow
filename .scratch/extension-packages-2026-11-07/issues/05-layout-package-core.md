@@ -68,3 +68,6 @@ Blocked by: 03
   `switchMap(ждать ready)` → `switchMap(прогон)`; `switchMap` даёт «новый прогон заменяет старый», `finalize`
   открывает ворота и отменяет писателя, `catchError` → `ErrorHandler`. Эффекта-триггера и полей `running`/`stop()`
   нет. Драги — `merge(outputToObservable(...))` с `share()`, без Subject.
+- Писатель по умолчанию — фабрика токена `VX_LAYOUT_POSITION_WRITER` (`providedIn: 'root'`), хост делает простой
+  `inject(VX_LAYOUT_POSITION_WRITER)`: директива на элементе перекрывает, иначе корневой. Перенос правила «до
+  первого paint ставить сразу» в `VxLayoutAnimate` Артём откатил: `release: (() => void) | null` остаётся в хосте.

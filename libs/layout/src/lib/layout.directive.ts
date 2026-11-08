@@ -19,15 +19,7 @@ import {
   tap,
 } from 'rxjs';
 import { LayoutAlgorithm, LayoutDragEvent, LayoutGraph, LayoutNode, LayoutResult } from './layout.types';
-import { LayoutPositionWriter, VX_LAYOUT_POSITION_WRITER, placeNodes } from './position-writer';
-
-const IMMEDIATE_WRITER: LayoutPositionWriter = {
-  write: (targets) => {
-    placeNodes(targets);
-    return Promise.resolve();
-  },
-  cancel: () => void 0,
-};
+import { VX_LAYOUT_POSITION_WRITER, placeNodes } from './position-writer';
 
 /**
  * Lays out the nodes of the flow with a `LayoutAlgorithm` and writes the positions into their `point` signals. The
@@ -51,7 +43,8 @@ const IMMEDIATE_WRITER: LayoutPositionWriter = {
 export class VxLayout implements VflowInitializationGate {
   private readonly flow = inject(VflowComponent);
   private readonly errors = inject(ErrorHandler);
-  private readonly writer = inject(VX_LAYOUT_POSITION_WRITER, { optional: true, self: true }) ?? IMMEDIATE_WRITER;
+  /** Provided on the flow element by `VxLayoutAnimate`; by default the positions are placed at once. */
+  private readonly writer = inject(VX_LAYOUT_POSITION_WRITER);
 
   /** The algorithm, such as `dagreLayout({ rankdir: 'LR' })`. Create it once: a new function starts a new layout. */
   public readonly vxLayout = input.required<LayoutAlgorithm>();
