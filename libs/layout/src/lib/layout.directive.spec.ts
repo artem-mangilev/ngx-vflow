@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Directive, ErrorHandler, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Directive, ErrorHandler, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { Vflow, createEdges, createNodes } from 'ngx-vflow';
 import { Subject, of, throwError } from 'rxjs';
@@ -32,7 +32,6 @@ const template = (animate: string) => `
 
 @Directive()
 class LayoutHost {
-  public readonly layout = viewChild.required(VxLayout);
   public readonly graphs: LayoutGraph[] = [];
   public readonly ended: LayoutResult[] = [];
   /** The position of the first node when the flow initialized. */
@@ -141,7 +140,7 @@ describe('VxLayout', () => {
     expect(errors.map((error) => (error as Error).message)).toEqual(['no layout']);
   });
 
-  it('runs again for a new algorithm, a new set of nodes or run(), not for a move', async () => {
+  it('runs again for a new algorithm function or a new set of nodes, not for a move', async () => {
     const fixture = await createFixture();
     const host = fixture.componentInstance;
 
@@ -149,7 +148,8 @@ describe('VxLayout', () => {
     await settle(fixture);
     expect(host.graphs).toHaveLength(1);
 
-    host.layout().run();
+    // The same layout as a new function: the way to lay the graph out anew after the nodes were moved.
+    host.algorithm.set((graph) => host.columns(graph, { drags: new Subject() }));
     await settle(fixture);
     expect(host.graphs).toHaveLength(2);
     expect(node(fixture, 'a').point()).toEqual({ x: 0, y: 300 });
@@ -215,7 +215,7 @@ describe('VxLayout', () => {
 
     dispatchMouse(window, 'mouseup', { x: left + 25, y: top + 5 });
     await settle(fixture);
-    host.layout().run();
+    host.algorithm.set(() => of({ positions: new Map([['b', { x: 8, y: 8 }]]) }));
     await settle(fixture);
     expect(node(fixture, 'b').point()).toEqual({ x: 8, y: 8 });
   });

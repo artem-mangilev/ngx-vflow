@@ -26,8 +26,9 @@ const IMMEDIATE_WRITER: LayoutPositionWriter = {
 /**
  * Lays out the nodes of the flow with a `LayoutAlgorithm` and writes the positions into their `point` signals. The
  * layout runs once every node is measured, so content-sized nodes count with their real size, and again when the
- * algorithm or the set of nodes and edges changes, or on `run()`. A node being dragged keeps its position, and a run
- * that a newer one replaces is dropped.
+ * algorithm or the set of nodes and edges changes; a new algorithm function lays the graph out anew, for example from a
+ * button after the nodes were moved. A node being dragged keeps its position, and a run that a newer one replaces is
+ * dropped.
  *
  * The first layout happens before the first paint: the directive holds the initialization of the flow until the
  * positions are in, so the graph appears laid out and `(initialized)` sees it that way. Positions are placed at
@@ -107,8 +108,7 @@ export class VxLayout implements VflowInitializationGate {
     this.measured.set(true);
   }
 
-  /** Runs the layout now, for example from a button after the nodes were moved. `vxLayoutEnd` tells when it is in. */
-  public run(): void {
+  private run(): void {
     this.stop();
     let last: LayoutResult | null = null;
     this.running = untracked(this.vxLayout)(this.graph(), { drags: this.drags.asObservable() })
