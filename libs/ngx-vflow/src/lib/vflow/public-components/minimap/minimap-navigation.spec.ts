@@ -7,6 +7,7 @@ import { createNodes } from '../../interfaces/node.interface';
 import { KeyboardShortcuts } from '../../types/keyboard-shortcuts.type';
 import { provideVflow } from '../../features/feature';
 import { withShortcuts } from '../../features/with-shortcuts';
+import { ZOOM_STEP } from '../../services/viewport.service';
 
 @Component({
   imports: [Vflow],
@@ -23,7 +24,7 @@ import { withShortcuts } from '../../features/with-shortcuts';
     [zoomOnPinch]="zoomOnPinch()"
     [panOnScroll]="panOnScroll()">
     @if (show()) {
-      <v-minimap [pannable]="pannable()" [zoomable]="zoomable()" [zoomStep]="step()" />
+      <v-minimap [pannable]="pannable()" [zoomable]="zoomable()" />
     }
   </vflow>`,
 })
@@ -38,7 +39,6 @@ class MinimapHostComponent {
   show = signal(true);
   pannable = signal(false);
   zoomable = signal(false);
-  step = signal(0.1);
   nodes = createNodes([
     { id: 'parent', point: { x: 10000, y: -5000 }, width: 400, height: 300, selected: true },
     { id: 'child', parentId: 'parent', point: { x: 600, y: 200 }, width: 200, height: 200 },
@@ -186,38 +186,29 @@ describe('minimap navigation through the public viewport API', () => {
     expect(flow.viewport().x).toBe(-10500);
   });
 
-  it('zooms around the main center, clamps to limits, validates steps and respects wheel/pinch policy', async () => {
+  it('zooms around the main center by half a key step, clamps to limits and respects wheel/pinch policy', async () => {
+    const step = Math.sqrt(ZOOM_STEP);
     host.zoomable.set(true);
-    host.step.set(1);
     flow.setViewport({ x: -10200, y: 4950, zoom: 1 });
     await settle();
     expect((await wheel()).defaultPrevented).toBe(true);
-    expect(flow.viewport()).toEqual({ x: -20600, y: 9750, zoom: 2 });
-    await wheel();
+    expect(flow.viewport().zoom).toBeCloseTo(step);
+    for (let i = 0; i < 10; i++) await wheel();
     expect(flow.viewport().zoom).toBe(2);
-    await wheel(10);
-    await wheel(10);
-    await wheel(10);
+    expect(flow.viewport().x).toBeCloseTo(-20600);
+    expect(flow.viewport().y).toBeCloseTo(9750);
+    for (let i = 0; i < 20; i++) await wheel(10);
     expect(flow.viewport().zoom).toBe(0.5);
     host.zoomOnScroll.set(false);
     fixture.detectChanges();
     await wheel();
     expect(flow.viewport().zoom).toBe(0.5);
     await wheel(-10, { ctrlKey: true });
-    expect(flow.viewport().zoom).toBe(1);
+    expect(flow.viewport().zoom).toBeCloseTo(0.5 * step);
     host.zoomOnPinch.set(false);
     fixture.detectChanges();
     await wheel(-10, { ctrlKey: true });
-    expect(flow.viewport().zoom).toBe(1);
-    host.zoomOnScroll.set(true);
-    fixture.detectChanges();
-    for (const value of [0, -1, NaN, Infinity]) {
-      host.step.set(value);
-      flow.setViewport({ x: 0, y: 0, zoom: 1 });
-      await settle();
-      await wheel();
-      expect(flow.viewport().zoom).toBeCloseTo(1.1);
-    }
+    expect(flow.viewport().zoom).toBeCloseTo(0.5 * step);
   });
 
   it('gives scroll pan priority and allows zoom activation without bypassing the minimap switches', async () => {
@@ -230,11 +221,11 @@ describe('minimap navigation through the public viewport API', () => {
     expect(flow.viewport()).toEqual({ x: -50, y: -100, zoom: 1 });
     document.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyZ' }));
     await wheel();
-    expect(flow.viewport().zoom).toBeCloseTo(1.1);
+    expect(flow.viewport().zoom).toBeCloseTo(Math.sqrt(ZOOM_STEP));
     host.zoomable.set(false);
     await settle();
     await wheel();
-    expect(flow.viewport().zoom).toBeCloseTo(1.1);
+    expect(flow.viewport().zoom).toBeCloseTo(Math.sqrt(ZOOM_STEP));
   });
 
   it('leaves the flow with its host and navigates again when shown back', async () => {
@@ -257,7 +248,7 @@ describe('minimap navigation through the public viewport API', () => {
     await click();
     expect(flow.viewport()).toEqual({ x: -10200, y: 4950, zoom: 1 });
     await wheel();
-    expect(flow.viewport().zoom).toBeCloseTo(1.1);
+    expect(flow.viewport().zoom).toBeCloseTo(Math.sqrt(ZOOM_STEP));
   });
 });
 

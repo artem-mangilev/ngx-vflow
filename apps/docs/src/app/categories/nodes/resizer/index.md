@@ -75,7 +75,12 @@ protected keepResizedSize(changes: NodeSizeChange[]) {
 }
 ```
 
-- To react to the gesture itself, use `(resizeStart)` / `(resize)` / `(resizeEnd)` on the `vResizable` element. Each event carries the resized `node` with its position and size; `(resize)` adds `direction`, the sign of the last size change per axis: `{ x: 1, y: 0 }` while the node grows to the right.
+- To react to the gesture itself, use `(resizeStart)` / `(resize)` / `(resizeEnd)` on the `vResizable` element. All three emit one `ResizeEvent`, shaped like `NodeDragEvent`: the resized `node`, its `x`, `y`, `width` and `height`, `direction` and the `sourceEvent` pointer event. `direction` is the direction the dragged side moved in the last step on each axis: `{ x: 1, y: 0 }` while the node grows to the right, `{ x: -1, y: 0 }` while it grows from its left side. `(resizeStart)` and `(resizeEnd)` report a state rather than a step, so their `direction` is `{ x: 0, y: 0 }`.
+- `[shouldResize]` takes the same `ResizeEvent` before a step is applied; return `false` to skip the step:
+
+```ts
+protected readonly notTooWide: ShouldResize = (event) => event.width <= 600;
+```
 
 ## See also
 

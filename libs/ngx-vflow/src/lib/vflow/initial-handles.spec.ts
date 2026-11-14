@@ -142,7 +142,7 @@ describe('Initial handle placement', () => {
         ).toEqual([]);
       };
       await capture('initial mount');
-      fixture.componentRef.setInput('optimization', { virtualization: true });
+      fixture.componentRef.setInput('virtualization', true);
       fixture.componentInstance.setViewport({ ...fixture.componentInstance.viewport(), x: 10000, y: 10000 });
       fixture.detectChanges();
       await fixture.whenStable();
@@ -191,7 +191,7 @@ describe('Initial handle placement', () => {
     expect(fixture.debugElement.injector.get(FlowEntitiesService).edges()[0].path().path).toBeTruthy();
     expect(fixture.nativeElement.querySelector('[edgeLabelHost]')?.textContent).toContain('Connection');
     // An offscreen endpoint retains measured geometry for an edge crossing the viewport.
-    fixture.componentRef.setInput('optimization', { virtualization: true });
+    fixture.componentRef.setInput('virtualization', true);
     fixture.componentInstance.setViewport({ ...fixture.componentInstance.viewport(), x: -120, y: 0 });
     fixture.detectChanges();
     await fixture.whenStable();

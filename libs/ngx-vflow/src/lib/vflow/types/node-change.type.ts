@@ -1,6 +1,10 @@
 import { Point } from '../interfaces/point.interface';
 
-export type NodeChange = NodePositionChange | NodeSizeChange | NodeAddChange | NodeRemoveChange | NodeSelectedChange;
+/**
+ * A change of a node that has already happened. Adding and removing nodes is not reported: the application owns the
+ * array and makes those changes itself.
+ */
+export type NodeChange = NodePositionChange | NodeSizeChange | NodeSelectedChange;
 
 /** Reports a position that has already been written to the node's `point` signal. */
 export interface NodePositionChange extends NodeChangeShared {
@@ -21,16 +25,6 @@ export interface NodeSizeChange extends NodeChangeShared {
   size: { width: number; height: number };
   /** Persist an axis only when it is `explicit`; an `auto` axis is a measurement of content. */
   mode: { width: NodeSizeMode; height: NodeSizeMode };
-}
-
-/** Reports that the node is already present in the application-provided collection. */
-export interface NodeAddChange extends NodeChangeShared {
-  type: 'add';
-}
-
-/** Reports that the node is already absent from the application-provided collection. */
-export interface NodeRemoveChange extends NodeChangeShared {
-  type: 'remove';
 }
 
 /** Reports a selection value that has already been written to the node's `selected` signal. */

@@ -5,7 +5,7 @@ import { createEdges } from '../../interfaces/edge.interface';
 import { Vflow } from '../../vflow';
 import { VflowComponent } from './vflow.component';
 import { NodeChange, NodePositionChange } from '../../types/node-change.type';
-import { EdgeDetachedChange } from '../../types/edge-change.type';
+import { EdgeChange, EdgeDetachedChange } from '../../types/edge-change.type';
 
 @Component({
   imports: [Vflow],
@@ -16,6 +16,7 @@ import { EdgeDetachedChange } from '../../types/edge-change.type';
     style="width: 600px; height: 350px"
     (nodesChanges)="all.push($event)"
     (nodesChanges.position)="positions.push($event)"
+    (edgesChanges)="edgeChanges.push($event)"
     (edgesChanges.detached)="detached.push($event)">
     <div *vNode style="width: 100px; height: 50px">
       <span vHandle handleType="target" position="left"></span
@@ -40,6 +41,7 @@ class ChangesHostComponent {
 
   all: NodeChange[][] = [];
   positions: NodePositionChange[][] = [];
+  edgeChanges: EdgeChange[][] = [];
   detached: EdgeDetachedChange[][] = [];
 }
 
@@ -66,7 +68,7 @@ describe('change outputs of the flow', () => {
 
     // The first layout reports the measured sizes.
     await stable();
-    host.all.length = host.positions.length = host.detached.length = code.length = 0;
+    host.all.length = host.positions.length = host.edgeChanges.length = host.detached.length = code.length = 0;
 
     return { host, code, stable };
   }
@@ -109,12 +111,13 @@ describe('change outputs of the flow', () => {
     expect(host.positions).toEqual([[{ type: 'position', id: 'a', point: { x: 10, y: 10 } }]]);
   });
 
-  it('reports the edges detached by a removed node as one array', async () => {
+  it('reports the edges detached by a removed node as one array, and no change of the node itself', async () => {
     const { host, stable } = await setup();
 
     host.nodes.update((nodes) => nodes.filter((node) => node.id !== 'a'));
     await stable();
 
+    expect(host.all).toEqual([]);
     expect(host.detached.length).toBe(1);
     expect(host.detached[0]).toHaveLength(2);
     expect(host.detached[0]).toEqual(
@@ -123,5 +126,15 @@ describe('change outputs of the flow', () => {
         { type: 'detached', id: 'a-c' },
       ]),
     );
+    expect(host.edgeChanges).toEqual(host.detached);
+  });
+
+  it('reports a selection change of an edge', async () => {
+    const { host, stable } = await setup();
+
+    host.edges[1].selected.set(true);
+    await stable();
+
+    expect(host.edgeChanges).toEqual([[{ type: 'select', id: 'a-c', selected: true }]]);
   });
 });

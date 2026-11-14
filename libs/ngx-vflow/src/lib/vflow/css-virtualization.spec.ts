@@ -58,7 +58,7 @@ class DragNodeComponent {}
 class PlainNodeComponent {}
 
 @Component({
-  template: `<vflow style="width: 400px; height: 300px" [nodes]="nodes" [optimization]="{ virtualization: true }"
+  template: `<vflow style="width: 400px; height: 300px" [nodes]="nodes" [virtualization]="true"
     ><v-minimap [position]="position()"
   /></vflow>`,
   imports: [VflowComponent, VflowMinimapComponent],
@@ -90,7 +90,7 @@ describe('CSS viewport virtualization', () => {
   function setup(nodes: Node[]) {
     const fixture = TestBed.createComponent(VflowComponent);
     Object.assign(fixture.nativeElement.style, { width: '400px', height: '300px' });
-    fixture.componentRef.setInput('optimization', { virtualization: true });
+    fixture.componentRef.setInput('virtualization', true);
     fixture.componentRef.setInput('nodes', nodes);
     return fixture;
   }
@@ -329,10 +329,8 @@ describe('CSS viewport virtualization', () => {
     const fixture = setup(
       [-400, 800].map((x, i) => createNode({ id: String(i), component: StatefulNodeComponent, point: { x, y: 0 } })),
     );
-    fixture.componentRef.setInput('optimization', {
-      virtualization: true,
-      lazyLoadTrigger: 'viewport',
-    });
+    fixture.componentRef.setInput('virtualization', true);
+    fixture.componentRef.setInput('lazyLoadTrigger', 'viewport');
     fixture.componentRef.setInput('edges', [createEdge({ id: 'edge', source: '0', target: '1' })]);
     await settle(fixture);
     const entities = fixture.debugElement.injector.get(FlowEntitiesService);
@@ -389,7 +387,7 @@ describe('CSS viewport virtualization', () => {
     // Turning virtualization off restores hidden views without recreating them.
     fixture.componentInstance.setViewport({ ...fixture.componentInstance.viewport(), x: 1000, y: 0 });
     await settle(fixture);
-    fixture.componentRef.setInput('optimization', { virtualization: false });
+    fixture.componentRef.setInput('virtualization', false);
     await settle(fixture);
     expect(getComputedStyle(host).display).not.toBe('none');
     expect(fixture.debugElement.query(By.directive(StatefulNodeComponent)).componentInstance).toBe(component);

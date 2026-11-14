@@ -3,9 +3,9 @@
 > **Note**
 > Open the network tab in DevTools to see components being loaded dynamically.
 
-The library supports splitting a large flow into multiple chunks, where each chunk is loaded according to the provided `lazyLoadTrigger` in the `Optimization` object.
+The library supports splitting a large flow into multiple chunks, where each chunk is loaded according to the `lazyLoadTrigger` input (`'immediate'` by default).
 
-To load nodes when the viewport changes, set `lazyLoadTrigger` to the value viewport. The trigger applies to lazy presentations only: a component given as a `() => import(...)` factory, or a template that defers its content with `@defer (when ctx.shouldLoad())`. A component given as a class is already loaded and renders immediately. When `virtualization` is enabled, nodes are loaded immediately instead so the library can measure initial node and handle geometry.
+To load nodes when the viewport changes, set `lazyLoadTrigger` to `'viewport'`. The trigger applies to lazy presentations only: a component given as a `() => import(...)` factory, or a template that defers its content with `@defer (when ctx.shouldLoad())`. A component given as a class is already loaded and renders immediately. When `virtualization` is enabled, nodes are loaded immediately instead so the library can measure initial node and handle geometry.
 
 ## Lazy loading component nodes
 
@@ -33,12 +33,12 @@ For template nodes, the library provides a custom trigger for the `@defer` synta
 
 ```
 <!-- Eagerly loaded -->
-<vflow [nodes]="nodes" [edges]="edges" [optimization]="{ lazyLoadTrigger: 'viewport' }">
+<vflow lazyLoadTrigger="viewport" [nodes]="nodes" [edges]="edges">
   <your-node *vNode="let ctx" />
 </vflow>
 
 <!-- Lazy loaded -->
-<vflow [nodes]="nodes" [edges]="edges" [optimization]="{ lazyLoadTrigger: 'viewport' }">
+<vflow lazyLoadTrigger="viewport" [nodes]="nodes" [edges]="edges">
   <ng-template let-ctx vNode>
     @defer (when ctx.shouldLoad()) {
       <your-node />

@@ -154,7 +154,12 @@ describe('Vflow in a DOM without layout', () => {
     expect(host.flow().viewport().zoom).toBeGreaterThan(1);
     await host.flow().zoomOut();
     expect(host.flow().viewport().zoom).toBeCloseTo(1);
-    expect(host.flow().getNode('task')?.id).toBe('task');
+    expect(
+      host
+        .flow()
+        .nodes()
+        .map((node) => node.id),
+    ).toContain('task');
 
     expect(host.initialized).toBe(false);
     expect(await host.flow().fitView()).toBe(false);

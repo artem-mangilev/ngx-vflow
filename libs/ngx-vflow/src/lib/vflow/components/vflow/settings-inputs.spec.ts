@@ -6,24 +6,26 @@ import { VflowComponent } from './vflow.component';
 import { FlowSettingsService } from '../../services/flow-settings.service';
 import { FlowEntitiesService } from '../../services/flow-entities.service';
 import { createNodes, Node } from '../../interfaces/node.interface';
-import { DEFAULT_OPTIMIZATION, Optimization } from '../../interfaces/optimization.interface';
-import { SelectionBoxSettings } from '../../interfaces/selection-box-settings.interface';
+import { LazyLoadTrigger } from '../../types/lazy-load-trigger.type';
+import { SelectionBoxMode } from '../../types/selection-box-mode.type';
 
 @Component({
   imports: [Vflow],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `<vflow
     [nodes]="nodes"
-    [optimization]="optimization"
-    [selectionBox]="selectionBox"
+    [virtualization]="virtualization"
+    [lazyLoadTrigger]="lazyLoadTrigger"
+    [selectionBoxMode]="selectionBoxMode"
     [parentsBelowEdges]="parentsBelowEdges">
     <div *vNode style="width: 100px; height: 50px"></div>
   </vflow>`,
 })
 class SettingsHostComponent {
   @Input() nodes: Node[] = [];
-  @Input() optimization: Optimization = {};
-  @Input() selectionBox: SelectionBoxSettings = {};
+  @Input() virtualization?: boolean;
+  @Input() lazyLoadTrigger?: LazyLoadTrigger;
+  @Input() selectionBoxMode?: SelectionBoxMode;
   @Input() parentsBelowEdges = false;
 }
 
@@ -34,7 +36,7 @@ class SettingsHostComponent {
 })
 class BareHostComponent {}
 
-describe('object settings of vflow', () => {
+describe('settings of vflow bound from a host', () => {
   let fixture: ComponentFixture<SettingsHostComponent>;
   let settings: FlowSettingsService;
 
@@ -54,20 +56,21 @@ describe('object settings of vflow', () => {
     TestBed.flushEffects();
   }
 
-  it('reads optimization as the defaults plus the supplied keys', () => {
-    bind('optimization', { virtualization: true });
-    expect(settings.optimization()).toEqual({ virtualization: true, lazyLoadTrigger: 'immediate' });
-    bind('optimization', { lazyLoadTrigger: 'viewport' });
-    expect(settings.optimization()).toEqual({ virtualization: false, lazyLoadTrigger: 'viewport' });
-    bind('optimization', { virtualization: undefined, lazyLoadTrigger: undefined });
-    expect(settings.optimization()).toEqual({ virtualization: false, lazyLoadTrigger: 'immediate' });
+  it('reads virtualization and lazyLoadTrigger, each falling back to its default when unbound', () => {
+    bind('virtualization', true);
+    expect([settings.virtualization(), settings.lazyLoadTrigger()]).toEqual([true, 'immediate']);
+    bind('lazyLoadTrigger', 'viewport');
+    expect([settings.virtualization(), settings.lazyLoadTrigger()]).toEqual([true, 'viewport']);
+    bind('virtualization', undefined);
+    bind('lazyLoadTrigger', undefined);
+    expect([settings.virtualization(), settings.lazyLoadTrigger()]).toEqual([false, 'immediate']);
   });
 
-  it('reads selectionBox as the defaults plus the supplied keys', () => {
-    bind('selectionBox', { mode: 'partial' });
-    expect(settings.selectionBox()).toEqual({ mode: 'partial' });
-    bind('selectionBox', {});
-    expect(settings.selectionBox()).toEqual({ mode: 'full' });
+  it('reads selectionBoxMode, falling back to full when unbound', () => {
+    bind('selectionBoxMode', 'partial');
+    expect(settings.selectionBoxMode()).toBe('partial');
+    bind('selectionBoxMode', undefined);
+    expect(settings.selectionBoxMode()).toBe('full');
   });
 
   it('puts parents below the edges only while parentsBelowEdges is set', async () => {
@@ -128,16 +131,18 @@ describe('settings inputs of vflow', () => {
     const { fixture, flow, settings, entities } = setup();
     fixture.componentRef.setInput('minZoom', 0.2);
     fixture.componentRef.setInput('paneClickDistance', -5);
-    fixture.componentRef.setInput('optimization', { virtualization: true });
+    fixture.componentRef.setInput('virtualization', true);
     fixture.componentRef.setInput('connection', { allowSelfConnections: true });
 
     expect(flow.minZoom()).toBe(0.2);
     expect(settings.minZoom()).toBe(0.2);
     expect(settings.paneClickDistance()).toBe(0);
-    expect(flow.optimization()).toEqual({ virtualization: true });
-    expect(flow.settings.optimization()).toEqual({ ...DEFAULT_OPTIMIZATION, virtualization: true });
+    expect(flow.virtualization()).toBe(true);
+    expect(flow.lazyLoadTrigger()).toBeUndefined();
+    expect(flow.settings.virtualization()).toBe(true);
+    expect(flow.settings.lazyLoadTrigger()).toBe('immediate');
     expect(flow.settings.paneClickDistance()).toBe(0);
-    expect(settings.optimization()).toEqual({ ...DEFAULT_OPTIMIZATION, virtualization: true });
+    expect(settings.virtualization()).toBe(true);
     expect(entities.connection().allowSelfConnections).toBe(true);
   });
 });

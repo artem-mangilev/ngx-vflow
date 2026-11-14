@@ -3,7 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { Vflow } from '../vflow';
 import { VflowComponent } from '../components/vflow/vflow.component';
-import { provideVflow, vflowFeature, VflowFeature } from './feature';
+import { provideVflow, vflowFeature, type VflowFeature } from './feature';
 
 const TOKEN = new InjectionToken<string>('TOKEN');
 
@@ -53,7 +53,7 @@ describe('provideVflow', () => {
       /"test:a" was provided twice/,
     );
     expect(() => provideVflow({ kind: 'test:a', providers: [] } as unknown as VflowFeature)).toThrowError(
-      /vflowFeature\(\)/,
+      /with\*\(\) function/,
     );
   });
 
@@ -62,6 +62,6 @@ describe('provideVflow', () => {
     const kind: 'acme:proximity' = feature.kind;
 
     expect(kind).toBe('acme:proximity');
-    expect(feature).toBeInstanceOf(VflowFeature);
+    expect(provideVflow(feature)).toEqual([]);
   });
 });

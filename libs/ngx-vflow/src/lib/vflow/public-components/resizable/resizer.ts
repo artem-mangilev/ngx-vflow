@@ -2,15 +2,8 @@ import { NodeModel } from '../../models/node.model';
 import { clamp } from '../../utils/viewport';
 import { Point } from '../../interfaces/point.interface';
 import { ResizeBounds, getControlDirection, getDimensionsAfterResize, getResizeDirection } from './resizer-utils';
-import {
-  ControlPosition,
-  CoordinateExtent,
-  ResizeAxis,
-  ResizeChangeParams,
-  ResizeDragEvent,
-  ResizeParams,
-  ShouldResize,
-} from './resizer-types';
+import { Rect } from '../../interfaces/rect';
+import { ControlPosition, CoordinateExtent, ResizeAxis, ResizeEvent, ShouldResize } from './resizer-types';
 
 export interface ResizeOptions {
   node: NodeModel;
@@ -19,16 +12,16 @@ export interface ResizeOptions {
   keepAspectRatio: boolean;
   resizeAxis?: ResizeAxis;
   shouldResize?: ShouldResize;
-  onStart: (event: ResizeDragEvent, params: ResizeParams) => void;
-  onResize: (event: ResizeDragEvent, params: ResizeChangeParams) => void;
+  onStart: (event: ResizeEvent) => void;
+  onResize: (event: ResizeEvent) => void;
   /** Runs only after a change was applied. */
-  onEnd: (event: ResizeDragEvent, params: ResizeParams) => void;
+  onEnd: (event: ResizeEvent) => void;
 }
 
 /** One resize in progress; `pointer` is the pointer in flow units, snapped to the grid. */
 export interface ResizeGesture {
-  move(event: ResizeDragEvent, pointer: Point): void;
-  end(event: ResizeDragEvent): void;
+  move(sourceEvent: PointerEvent, pointer: Point): void;
+  end(sourceEvent: PointerEvent): void;
 }
 
 /** The smallest box in the node that keeps every child of a `parent` extent inside. */
@@ -61,11 +54,12 @@ function getChildExtent(node: NodeModel): CoordinateExtent | undefined {
  * the positions of its children, which stay in place when the origin moves; the callbacks report the resize to the
  * application. The options are read once, at the press.
  */
-export function startResize(options: ResizeOptions, event: ResizeDragEvent, pointer: Point): ResizeGesture {
+export function startResize(options: ResizeOptions, sourceEvent: PointerEvent, pointer: Point): ResizeGesture {
   const { node, bounds, keepAspectRatio, resizeAxis, shouldResize } = options;
   const direction = getControlDirection(options.position, resizeAxis);
 
-  let prev: ResizeParams = { x: node.point().x, y: node.point().y, width: node.width(), height: node.height() };
+  const rawNode = node.rawNode;
+  let prev: Rect = { x: node.point().x, y: node.point().y, width: node.width(), height: node.height() };
   // A node can start outside its boundaries, e.g. an explicit size below the CSS min-size. The resize math assumes
   // an in-range start; growing from the unclamped size would subtract the gap from the pointer distance. `prev`
   // keeps the real size so the first move always writes the clamped result.
@@ -86,10 +80,10 @@ export function startResize(options: ResizeOptions, event: ResizeDragEvent, poin
   let resized = false;
 
   node.resizing.set(true);
-  options.onStart(event, { ...prev });
+  options.onStart({ node: rawNode, ...prev, direction: { x: 0, y: 0 }, sourceEvent });
 
   return {
-    move(event, pointer) {
+    move(sourceEvent, pointer) {
       const next = getDimensionsAfterResize(
         start,
         direction,
@@ -111,13 +105,14 @@ export function startResize(options: ResizeOptions, event: ResizeDragEvent, poin
         return;
       }
 
-      const values: ResizeParams = {
+      const values: Rect = {
         x: widthChanged ? next.x : prev.x,
         y: heightChanged ? next.y : prev.y,
         width: next.width,
         height: next.height,
       };
-      const params: ResizeChangeParams = {
+      const resizeEvent: ResizeEvent = {
+        node: rawNode,
         ...values,
         direction: getResizeDirection({
           width: values.width,
@@ -127,9 +122,10 @@ export function startResize(options: ResizeOptions, event: ResizeDragEvent, poin
           affectsX: direction.affectsX,
           affectsY: direction.affectsY,
         }),
+        sourceEvent,
       };
 
-      if (shouldResize?.(event, params) === false) {
+      if (shouldResize?.(resizeEvent) === false) {
         return;
       }
 
@@ -152,13 +148,13 @@ export function startResize(options: ResizeOptions, event: ResizeDragEvent, poin
         height: direction.isVertical || values.height !== node.height() ? values.height : undefined,
       });
 
-      options.onResize(event, params);
+      options.onResize(resizeEvent);
     },
-    end(event) {
+    end(sourceEvent) {
       node.resizing.set(false);
 
       if (resized) {
-        options.onEnd(event, { ...prev });
+        options.onEnd({ node: rawNode, ...prev, direction: { x: 0, y: 0 }, sourceEvent });
       }
     },
   };

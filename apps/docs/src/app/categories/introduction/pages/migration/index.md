@@ -94,7 +94,7 @@ Under `forced-colors: active` core maps its tokens to system colors and keeps th
 | `resizerColor`, resize control `color`               | `--v-resize-control`, `--v-resize-control-border`; `data-v-resize-control` (`handle` / `line`) |
 | `mini-map` `maskColor`, `strokeColor`                | `--v-minimap-mask` (mask and outlines), `--v-minimap-selected`; sampled from CSS               |
 | `lineColor` in `alignmentHelper` settings            | `--v-alignment-guides`; `[data-v-alignment-guides]`. `tolerance` stays                         |
-| `color` in `selectionBox` settings                   | `--v-selection-box`; `[data-v-selection-box]`. `mode` stays                                    |
+| `color` in `selectionBox` settings                   | `--v-selection-box`; `[data-v-selection-box]`. `mode` became the `selectionBoxMode` input      |
 
 Behavior parameters are untouched: node points, sizes, `extent`, resize constraints, drag thresholds,
 snap grid, zoom limits, curves and connection validation keep their APIs. Handle `offsetX` and `offsetY` keep their
@@ -256,7 +256,7 @@ export class TaskNodeComponent {
 
 {% endraw %}
 
-`(componentNodeEvent)` stays. It now collects every declared output of the component, including `@Output()`, `output()` and `outputFromObservable()`, and `eventName` is the property name of the output. The event is an `AnyComponentNodeEvent` and carries the component class; `isComponentNodeEvent(event, A)` narrows it to `ComponentNodeEvent<[A]>`, the outputs of that class. A handler declared with the parameter type `ComponentNodeEvent<[A, B]>` no longer compiles: take `AnyComponentNodeEvent` and narrow with the guard.
+`(componentNodeEvent)` stays. It now collects every declared output of the component, including `@Output()`, `output()` and `outputFromObservable()`, and `eventName` is the property name of the output. The event is an `AnyComponentNodeEvent` and carries the component class; `isComponentNodeEvent(event, A)` narrows it to `ComponentNodeEvent<A>`, the outputs of that class. `ComponentNodeEvent` takes one component class instead of a tuple, so a handler declared with the parameter type `ComponentNodeEvent<[A, B]>` no longer compiles: take `AnyComponentNodeEvent` and narrow with the guard.
 
 ### Selection by click
 
@@ -309,7 +309,7 @@ After:
 </svg:g>
 ```
 
-An edge can now be drawn by a component instead of the template: set `component` on the edge. The flow creates the component on an SVG group inside the edge, reads the edge through `injectEdge()`, and forwards its outputs to the new `(componentEdgeEvent)` output of `vflow`, as `AnyComponentEdgeEvent`; `isComponentEdgeEvent(event, A)` narrows an event to `ComponentEdgeEvent<[A]>`. Add `VflowEdgeInteractionAreaDirective` to the component's `hostDirectives` to move the interaction stroke into the component host.
+An edge can now be drawn by a component instead of the template: set `component` on the edge. The flow creates the component on an SVG group inside the edge, reads the edge through `injectEdge()`, and forwards its outputs to the new `(componentEdgeEvent)` output of `vflow`, as `AnyComponentEdgeEvent`; `isComponentEdgeEvent(event, A)` narrows an event to `ComponentEdgeEvent<A>`. Add `VflowEdgeInteractionAreaDirective` to the component's `hostDirectives` to move the interaction stroke into the component host.
 
 ### Edge labels
 
@@ -479,7 +479,6 @@ The alignment helper snaps while the node is dragged instead of moving it once t
 ngx-vflow no longer depends on `d3-zoom`, `d3-drag` and `d3-selection`. Pan, zoom, node dragging, resizing, connections and the selection box run on Pointer Events with the same settings, formulas and animations as before.
 
 - Remove `d3-zoom`, `d3-drag`, `d3-selection` and their `@types` packages from your dependencies unless your application uses them itself.
-- The `shouldResize` callback receives `ResizeDragEvent`, now `{ sourceEvent: PointerEvent }` instead of a d3 drag event.
 - Tests that dispatch synthetic mouse or touch events to pan, drag, resize, connect or draw a selection box must dispatch `pointerdown`, `pointermove` and `pointerup` with `pointerId` and `pointerType`. Moves and the release may target `window` or `document`. Handles react to `pointerenter` and `pointerleave`. Wheel and `dblclick` events are unchanged.
 - A press that starts a library gesture does not propagate to ancestors, neither as `pointerdown` nor as its compatibility `mousedown` or `touchstart`.
 - The pane and draggable nodes set CSS `touch-action`; see [Viewport gestures](../../interactions/viewport-gestures) for how touch scrolling follows the settings.
@@ -526,6 +525,8 @@ A flow that relied on a missing handler to keep its handles inert sets `[canStar
 - `(nodesChanges)` and `(edgesChanges)` are outputs of `vflow` itself. Code subscribes through a reference to the flow: `flow.nodesChanges.subscribe(...)`, or `outputToObservable(flow.nodesChanges)` for RxJS operators. The `nodesChange$` / `edgesChange$` observables and the `nodesChange` / `edgesChange` signals are removed.
 - Every change of one tick comes in a single array. In v2 each moved, resized or selected node came in an array of its own, so dragging several selected nodes called the handler once per node on every move. A handler that reads only `changes[0]` must go through the whole array.
 - A filtered output such as `(nodesChanges.position)` follows the same rule with the changes of its type.
+- Adding and removing nodes and edges is no longer reported: the application owns the `nodes` and `edges` arrays, so these changes only echoed its own actions. The `add` and `remove` change types (`NodeAddChange`, `NodeRemoveChange`, `EdgeAddChange`, `EdgeRemoveChange`) and the `(nodesChanges.add)`, `(nodesChanges.remove)`, `(edgesChanges.add)` and `(edgesChanges.remove)` outputs are removed; react where the application changes its arrays instead.
+- `NodeChange` is now `position | size | select` and `EdgeChange` is `detached | select`. The experimental `detached` change and `(edgesChanges.detached)` stay; `getDetachedEdges()` became the `detachedEdges` signal of the flow, read as `flow.detachedEdges()`.
 - `viewportChange$` is removed: `viewport` is state, and the signal is the way to read it; `(viewportChangeEnd)` reports the end of a change. `initialized$` is removed with the `initialized` signal: the first layout is a moment, reported by the `(initialized)` output.
 
 ### Configuration through `provideVflow()`
@@ -534,13 +535,21 @@ Settings, labels and component registrations can be given once for many flows wi
 
 - `[keyboardShortcuts]` is removed. Provide the keys with `provideVflow(withShortcuts(shortcuts))`; sections merge entry by entry across the levels, as they did with the defaults. Where the keys were a signal of the component, give `withShortcuts()` a factory that reads it.
 - `[ariaLabelConfig]` is removed. Provide the labels with `provideVflow(withAccessibility(labels))` in the providers of the component that hosts the flow, or higher up. Where the labels were a signal of the component, give `withAccessibility()` a factory that reads it: `withAccessibility(() => inject(MyComponent).labels)`.
-- The settings inputs no longer carry their default in the input: an unbound input reads `undefined`, so that it does not override a provided value. Reading `flow.minZoom()` from a reference to the flow therefore returns what is bound, or `undefined`; read the settings in effect from `flow.settings`, one signal per setting, such as `flow.settings.minZoom()` or `flow.settings.optimization()`.
+- The settings inputs no longer carry their default in the input: an unbound input reads `undefined`, so that it does not override a provided value. Reading `flow.minZoom()` from a reference to the flow therefore returns what is bound, or `undefined`; read the settings in effect from `flow.settings`, one signal per setting, such as `flow.settings.minZoom()` or `flow.settings.virtualization()`.
 
 `Node.component` and `Edge.component` additionally accept a string: the key of a component registered with `withNodeComponents()` or `withEdgeComponents()`. Component classes and lazy factories in `component` keep working. Likewise `Edge.curve` and `ConnectionSettings.curve` accept the key of a factory registered with `withCurves()`, next to the built-in names; a factory in `curve` keeps working.
 
 ### Settings inputs
 
-Every object input of `vflow` now reads the same way: the value is the defaults with the keys you pass on top, so a key you leave out returns to its default instead of keeping the value of the previous binding. This holds for `optimization` and `selectionBox`; code that built a setting over several bindings must pass the whole object each time. `autoPan` follows later changes of its binding instead of reading it once, and `tolerance` in `AlignmentHelperSettings` and `partially` in `IntersectingNodesOptions` are optional.
+The object inputs `optimization` and `selectionBox` are flattened into plain inputs, each with its own default:
+
+| v2                                                 | v3                                                                           |
+| -------------------------------------------------- | ---------------------------------------------------------------------------- |
+| `[optimization]="{ virtualization: true }"`        | `[virtualization]="true"` (default `false`)                                  |
+| `[optimization]="{ lazyLoadTrigger: 'viewport' }"` | `lazyLoadTrigger="viewport"` (default `'immediate'`, type `LazyLoadTrigger`) |
+| `[selectionBox]="{ mode: 'partial' }"`             | `selectionBoxMode="partial"` (default `'full'`)                              |
+
+The `Optimization` and `SelectionBoxSettings` interfaces are removed; `SelectionBoxMode` stays. The remaining object input, `connection`, reads as the defaults with the keys you pass on top, so a key you leave out returns to its default instead of keeping the value of the previous binding; code that built it over several bindings must pass the whole object each time. `autoPan` follows later changes of its binding instead of reading it once, and `tolerance` in `AlignmentHelperSettings` and `partially` in `IntersectingNodesOptions` are optional.
 
 The `view` input is removed: the size of a flow is CSS. By default `vflow` fills its parent element, which therefore needs a width and a height; for a fixed size, style the element, `style="width: 400px; height: 400px"`, where v2 took `[view]="[400, 400]"`. See [View size](../../viewport/view-size).
 
@@ -558,7 +567,7 @@ Every input of `vflow` is a signal input. Binding in a template is unchanged. Re
 
 ### Types flow through the component
 
-`VflowComponent<N, E>` is generic in its node and edge types, which a template infers from the `[nodes]` and `[edges]` bindings. `$event` of `(nodeDrag*)`, `(connect*)` and `(reconnect*)` then carries the application's own node and edge types, and `getNode()`, `getNodesAtPoint()`, `getIntersectingNodes()` and `getDetachedEdges()` return them: their type arguments are gone (`getNode<T>(id)` becomes `getNode(id)`, `NodeAtPoint<T>` becomes `NodeAtPoint<N>`). In code, name the types on the query: `viewChild.required<VflowComponent<MyNode>>(VflowComponent)`. The `nodes` and `edges` inputs accept `readonly` arrays.
+`VflowComponent<N, E>` is generic in its node and edge types, which a template infers from the `[nodes]` and `[edges]` bindings. `$event` of `(nodeDrag*)`, `(connect*)` and `(reconnect*)` then carries the application's own node and edge types, and `getNodesAtPoint()`, `getIntersectingNodes()` and the `detachedEdges` signal return them: their type arguments are gone (`getIntesectingNodes<T>()` becomes `getIntersectingNodes()`, `NodeAtPoint<T>` becomes `NodeAtPoint<N>`). In code, name the types on the query: `viewChild.required<VflowComponent<MyNode>>(VflowComponent)`. The `nodes` and `edges` inputs accept `readonly` arrays.
 
 A `vNode` or `vEdge` template types its `ctx` with `of`, a type witness the flow never reads; without it `ctx` stays `any`:
 
@@ -574,37 +583,42 @@ A `vNode` or `vEdge` template types its `ctx` with `of`, a type witness the flow
 
 ### Removed APIs
 
-| Removed in v3                                               | Migration                                                                                                          |
-| ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| Node type `svg-template`                                    | Remove `type` and provide native HTML through a `vNode` template.                                                  |
-| `NodeSvgTemplateDirective` and `nodeSvgTemplate`            | Remove these imports/usages and use `VflowNodeTemplateDirective` / `vNode`.                                        |
-| `scaleOnHover` input on `MiniMapComponent`                  | Remove the input binding. The minimap remains at its default scale and does not capture pointer input.             |
-| `documentPointToFlowPoint()`                                | Rename to `clientToFlowPosition()`. Use `flowToClientPosition()` for the inverse conversion.                       |
-| `{ spaces: true }`, `SpacePoint`, `getSpacePoints`          | Convert with `clientToFlowPosition()`, then call `getNodesAtPoint()` on the flow component.                        |
-| VflowComponent.toNodeSpace()                                | Convert with the pure `nodeSpaceToFlowPosition()` and `flowToNodeSpacePosition()` utilities.                       |
-| getIntesectingNodes()                                       | Rename to `getIntersectingNodes()`.                                                                                |
-| `viewportTo(state)`                                         | Rename to `setViewport(state)`.                                                                                    |
-| `panTo({ x, y })`                                           | `setViewport({ ...flow.viewport(), x, y })`; to center on a flow-space point, `setCenter(point)`.                  |
-| `step` input on `vui-controls`                              | Remove the binding. The buttons zoom by the step of the zoom keys.                                                 |
-| `selected` input of `vuiNode`, `vuiGroup`, `vuiEdge`        | Remove the binding. The parts read `data-v-selected` and `data-v-preselected` from the core host.                  |
-| `useDefaults` option of the `create*` factories             | Remove it. The factories always create the default signals; write a literal for a bare object.                     |
-| `ConnectionControllerDirective`                             | Remove the import. The connection outputs belong to `vflow`.                                                       |
-| `[selectable]`, `SelectableDirective`                       | Remove them. A click on the presentation selects the node; `vNoSelect` excludes an embedded control.               |
-| `ngx-vflow/testing`: `VflowMocks`, `provideCustomNodeMocks` | Test with the real `Vflow`. See Testing mocks above.                                                               |
-| `nodesChange$` and `edgesChange$`                           | `flow.nodesChanges.subscribe(...)` and `flow.edgesChanges.subscribe(...)`, or `outputToObservable()`.              |
-| `nodesChange` and `edgesChange` signals                     | Subscribe to the `nodesChanges` and `edgesChanges` outputs. A signal kept only the last array.                     |
-| `viewportChange$`                                           | Read the `viewport` signal; to save the viewport after a change, bind `(viewportChangeEnd)`.                       |
-| `initialized$` and the `initialized` signal                 | Bind the `(initialized)` output; keep a flag set by it where code asks later.                                      |
-| `ChangesControllerDirective`, `NodeDragControllerDirective` | Remove the imports. They are host directives of `vflow`; their outputs are bound on `<vflow>`.                     |
-| `NodeDragStartEvent`, `NodeDragEndEvent`                    | Use `NodeDragEvent`: the three node drag outputs emit the same `{ node }`.                                         |
-| `isComponentNode()`                                         | Check the `component` field of the node.                                                                           |
-| `NODE_DEFAULTS`, `EDGE_DEFAULTS`, `DEFAULT_OPTIMIZATION`    | Remove the imports. Omitted fields and settings keep their defaults; write a literal where the code needs a value. |
-| `optimization.detachedGroupsLayer`                          | `[parentsBelowEdges]="true"` on `vflow`.                                                                           |
-| `groupRole` in `AriaLabelConfig`                            | Rename to `parentRole`.                                                                                            |
-| `connection` getter of `VflowComponent`                     | Keep the bound value in the application; the input remains.                                                        |
-| `[ariaLabelConfig]` input                                   | `provideVflow(withAccessibility(labels))` in the providers of the host component or the application.               |
-| `[keyboardShortcuts]` input                                 | `provideVflow(withShortcuts(shortcuts))` in the providers of the host component or the application.                |
-| `[view]` input                                              | Size the `vflow` element with CSS; it fills its parent by default.                                                 |
+| Removed in v3                                                                                                       | Migration                                                                                                          |
+| ------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| Node type `svg-template`                                                                                            | Remove `type` and provide native HTML through a `vNode` template.                                                  |
+| `NodeSvgTemplateDirective` and `nodeSvgTemplate`                                                                    | Remove these imports/usages and use `VflowNodeTemplateDirective` / `vNode`.                                        |
+| `scaleOnHover` input on `MiniMapComponent`                                                                          | Remove the input binding. The minimap remains at its default scale and does not capture pointer input.             |
+| `documentPointToFlowPoint()`                                                                                        | Rename to `clientToFlowPosition()`. Use `flowToClientPosition()` for the inverse conversion.                       |
+| `{ spaces: true }`, `SpacePoint`, `getSpacePoints`                                                                  | Convert with `clientToFlowPosition()`, then call `getNodesAtPoint()` on the flow component.                        |
+| VflowComponent.toNodeSpace()                                                                                        | Subtract the absolute position from `flow.getNodeRect(id)`: `{ x: point.x - rect.x, y: point.y - rect.y }`.        |
+| getIntesectingNodes()                                                                                               | Rename to `getIntersectingNodes()`.                                                                                |
+| `viewportTo(state)`                                                                                                 | Rename to `setViewport(state)`.                                                                                    |
+| `panTo({ x, y })`                                                                                                   | `setViewport({ ...flow.viewport(), x, y })`; to center on a flow-space point, `setCenter(point)`.                  |
+| `step` input on `vui-controls`                                                                                      | Remove the binding. The buttons zoom by the step of the zoom keys.                                                 |
+| `selected` input of `vuiNode`, `vuiGroup`, `vuiEdge`                                                                | Remove the binding. The parts read `data-v-selected` and `data-v-preselected` from the core host.                  |
+| `useDefaults` option of the `create*` factories                                                                     | Remove it. The factories always create the default signals; write a literal for a bare object.                     |
+| `ConnectionControllerDirective`                                                                                     | Remove the import. The connection outputs belong to `vflow`.                                                       |
+| `[selectable]`, `SelectableDirective`                                                                               | Remove them. A click on the presentation selects the node; `vNoSelect` excludes an embedded control.               |
+| `ngx-vflow/testing`: `VflowMocks`, `provideCustomNodeMocks`                                                         | Test with the real `Vflow`. See Testing mocks above.                                                               |
+| `nodesChange$` and `edgesChange$`                                                                                   | `flow.nodesChanges.subscribe(...)` and `flow.edgesChanges.subscribe(...)`, or `outputToObservable()`.              |
+| `nodesChange` and `edgesChange` signals                                                                             | Subscribe to the `nodesChanges` and `edgesChanges` outputs. A signal kept only the last array.                     |
+| `viewportChange$`                                                                                                   | Read the `viewport` signal; to save the viewport after a change, bind `(viewportChangeEnd)`.                       |
+| `initialized$` and the `initialized` signal                                                                         | Bind the `(initialized)` output; keep a flag set by it where code asks later.                                      |
+| `ChangesControllerDirective`, `NodeDragControllerDirective`                                                         | Remove the imports. They are host directives of `vflow`; their outputs are bound on `<vflow>`.                     |
+| `NodeDragStartEvent`, `NodeDragEndEvent`                                                                            | Use `NodeDragEvent`: the three node drag outputs emit the same `{ node }`.                                         |
+| `isComponentNode()`                                                                                                 | Check the `component` field of the node.                                                                           |
+| `NODE_DEFAULTS`, `EDGE_DEFAULTS`, `DEFAULT_OPTIMIZATION`                                                            | Remove the imports. Omitted fields and settings keep their defaults; write a literal where the code needs a value. |
+| `optimization.detachedGroupsLayer`                                                                                  | `[parentsBelowEdges]="true"` on `vflow`.                                                                           |
+| `groupRole` in `AriaLabelConfig`                                                                                    | Rename to `parentRole`.                                                                                            |
+| `connection` getter of `VflowComponent`                                                                             | Keep the bound value in the application; the input remains.                                                        |
+| `[ariaLabelConfig]` input                                                                                           | `provideVflow(withAccessibility(labels))` in the providers of the host component or the application.               |
+| `[keyboardShortcuts]` input                                                                                         | `provideVflow(withShortcuts(shortcuts))` in the providers of the host component or the application.                |
+| `[view]` input                                                                                                      | Size the `vflow` element with CSS; it fills its parent by default.                                                 |
+| `getNode(id)`                                                                                                       | Find the node in the `nodes` array the application binds: `nodes.find((node) => node.id === id)`.                  |
+| `getDetachedEdges()`                                                                                                | Read the `detachedEdges` signal: `flow.detachedEdges()`.                                                           |
+| `(nodesChanges.add)`, `(nodesChanges.remove)`, `(edgesChanges.add)`, `(edgesChanges.remove)` and their change types | React where the application changes its `nodes` and `edges` arrays.                                                |
+| `[optimization]`, `Optimization`                                                                                    | `[virtualization]` and `[lazyLoadTrigger]`; see Settings inputs.                                                   |
+| `[selectionBox]`, `SelectionBoxSettings`                                                                            | `[selectionBoxMode]`; see Settings inputs.                                                                         |
 
 ### DOM compatibility
 

@@ -1,27 +1,30 @@
 import { Provider } from '@angular/core';
 
+// A brand only the library can name: an object literal of the same shape is not a feature.
+declare const FEATURE_BRAND: unique symbol;
+
 /**
  * An optional capability of the flows below an injector: a kind, unique per `provideVflow` call, and the providers
- * that install it. Built by a `with*()` function of the library or by {@link vflowFeature}, passed to
- * {@link provideVflow}.
+ * that install it. Built only by a `with*()` function of the library and passed to {@link provideVflow}. It is a
+ * type: an application cannot build one.
  */
-export class VflowFeature<K extends string = string> {
-  // A private member keeps the type nominal: an object literal of the same shape is not a feature.
-  declare private readonly brand: never;
+export interface VflowFeature<K extends string = string> {
+  readonly kind: K;
+  readonly providers: readonly Provider[];
+  readonly [FEATURE_BRAND]: K;
+}
 
-  // The typings keep `@internal` members (see tsconfig.lib.json), so a public constructor is the honest choice.
+/** The runtime class of every feature, so `provideVflow` can tell a feature from anything else. */
+class Feature<K extends string> {
   constructor(
     public readonly kind: K,
     public readonly providers: readonly Provider[],
   ) {}
 }
 
-/**
- * Builds a feature for {@link provideVflow}. Library features use documented kinds such as `'settings'`; a package or
- * an application picks a namespaced one such as `'acme:proximity-connect'`.
- */
+/** Builds a feature for {@link provideVflow}. Internal: the library's `with*()` functions are the only callers. */
 export function vflowFeature<K extends string>(kind: K, providers: readonly Provider[]): VflowFeature<K> {
-  return new VflowFeature(kind, providers);
+  return new Feature(kind, providers) as unknown as VflowFeature<K>;
 }
 
 /**
@@ -40,8 +43,8 @@ export function provideVflow(...features: VflowFeature[]): Provider[] {
   if (typeof ngDevMode === 'undefined' || ngDevMode) {
     const kinds = new Set<string>();
     for (const feature of features) {
-      if (!(feature instanceof VflowFeature)) {
-        throw new Error('[ngx-vflow] provideVflow() takes features built with a with*() function or vflowFeature().');
+      if (!(feature instanceof Feature)) {
+        throw new Error('[ngx-vflow] provideVflow() takes features built with a with*() function.');
       }
       if (kinds.has(feature.kind)) {
         throw new Error(`[ngx-vflow] The feature "${feature.kind}" was provided twice in one provideVflow() call.`);

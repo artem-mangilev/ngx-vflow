@@ -163,7 +163,7 @@ describe('Graph rendering and interaction regressions', () => {
   it('culls an already-measured edge wholly outside the viewport', () => {
     const { nodes, edges } = graph();
     const settings = TestBed.inject(FlowSettingsService);
-    settings.bind({ optimization: signal({ ...settings.optimization(), virtualization: true }) });
+    settings.bind({ virtualization: signal(true) });
     settings.computedFlowWidth.set(400);
     settings.computedFlowHeight.set(300);
     edges[0].path();
@@ -182,7 +182,7 @@ describe('Graph rendering and interaction regressions', () => {
     const settings = TestBed.inject(FlowSettingsService);
     settings.computedFlowWidth.set(400);
     settings.computedFlowHeight.set(300);
-    settings.bind({ optimization: signal({ ...settings.optimization(), virtualization: true }) });
+    settings.bind({ virtualization: signal(true) });
     nodes[0].point.set({ x: -200, y: 0 });
     nodes[1].point.set({ x: 800, y: 0 });
     const culling = TestBed.inject(ViewportCullingDirective);
@@ -207,7 +207,7 @@ describe('Graph rendering and interaction regressions', () => {
   it('retains actual node views and edges while panning without detached notifications', async () => {
     const fixture = TestBed.createComponent(VflowComponent);
     Object.assign(fixture.nativeElement.style, { width: '400px', height: '300px' });
-    fixture.componentRef.setInput('optimization', { virtualization: true });
+    fixture.componentRef.setInput('virtualization', true);
     fixture.componentRef.setInput('nodes', [
       createNode({ id: 'a', component: BoxNodeComponent, point: { x: 10, y: 20 } }),
       createNode({ id: 'b', component: BoxNodeComponent, point: { x: 250, y: 20 } }),
@@ -249,7 +249,7 @@ describe('Graph rendering and interaction regressions', () => {
     const settings = TestBed.inject(FlowSettingsService);
     settings.computedFlowWidth.set(400);
     settings.computedFlowHeight.set(300);
-    settings.bind({ optimization: signal({ ...settings.optimization(), virtualization: true }) });
+    settings.bind({ virtualization: signal(true) });
     nodes.forEach((node) => node.point.set({ x: -1000, y: -1000 }));
     edges[0].edge.curve!.set(() => ({ path: 'M -1000,-1000 Q 2000,1500 -900,-1000' }));
     TestBed.inject(ViewportCullingDirective);
@@ -340,14 +340,14 @@ describe('Graph rendering and interaction regressions', () => {
   it('reports the last accepted size at resizeEnd after a rejected move', () => {
     const model = node('resize');
     const end = vi.fn();
-    const event = { sourceEvent: new PointerEvent('pointermove') };
+    const event = new PointerEvent('pointermove');
     const gesture = startResize(
       {
         node: model,
         position: 'right',
         bounds: { minWidth: 0, minHeight: 0, maxWidth: Infinity, maxHeight: Infinity },
         keepAspectRatio: false,
-        shouldResize: (_, size) => size.width <= 110,
+        shouldResize: (resize) => resize.width <= 110,
         onStart: vi.fn(),
         onResize: vi.fn(),
         onEnd: end,
@@ -359,13 +359,13 @@ describe('Graph rendering and interaction regressions', () => {
     gesture.move(event, { x: 120, y: 25 });
     gesture.end(event);
     expect(model.width()).toBe(110);
-    expect(end.mock.lastCall![1].width).toBe(110);
+    expect(end.mock.lastCall![0].width).toBe(110);
   });
 
   it('grows a node that starts below its min size from the min size instead of shrinking it', () => {
     const model = node('resize-below-min');
     model.width.set(100);
-    const event = { sourceEvent: new PointerEvent('pointermove') };
+    const event = new PointerEvent('pointermove');
     const pointBefore = model.point();
 
     const gesture = startResize(

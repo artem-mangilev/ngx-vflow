@@ -31,7 +31,7 @@ A setting is resolved per flow, from the closest source:
 3. The default of the library, exported as `VFLOW_SETTINGS_DEFAULTS`.
 
 An input that is not bound does not take part, so `[minZoom]="zoom()"` overrides the providers only while `zoom()`
-is not `undefined`. An object setting such as `optimization` merges its keys through the three layers.
+is not `undefined`. An object setting such as `connection` merges its keys through the three layers.
 
 Two `provideVflow()` calls on the path to a flow do not replace each other: every feature provides its own token, and
 a feature closer to the flow lays its keys over the same feature further up. A route can therefore set the zoom range
@@ -85,6 +85,6 @@ data. A key that no `provideVflow()` on the path registers is an error when the 
 
 `provideVflow()` returns plain providers, so it works at every level. It provides values only: nothing of the flow is
 created until a `vflow` renders, and the services of a flow stay with its element, so two flows on one page never
-share state. A feature of your own, for a package or an application, is built with `vflowFeature(kind, providers)`
-and passed to the same `provideVflow()`; its kind is a string, namespaced for a third party, and one kind appears at
-most once per call.
+share state. `provideVflow()` takes only the features of the `with*()` functions, each at most once per call;
+`VflowFeature` is their type, not something an application builds. Providers of your own go next to it in the same
+`providers` array.

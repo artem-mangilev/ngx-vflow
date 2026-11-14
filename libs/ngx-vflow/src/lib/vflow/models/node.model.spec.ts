@@ -290,7 +290,7 @@ describe('NodeModel', () => {
   });
 
   it('loads a component class immediately and waits for the viewport with a lazy factory', () => {
-    settingsService.bind({ optimization: signal({ ...settingsService.optimization(), lazyLoadTrigger: 'viewport' }) });
+    settingsService.bind({ lazyLoadTrigger: signal('viewport') });
     const make = (component: Parameters<typeof createNode>[0]['component']) =>
       TestBed.runInInjectionContext(
         () => new NodeModel(createNode({ id: 'c', component, point: { x: 5000, y: 5000 } })),

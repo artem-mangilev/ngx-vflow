@@ -45,9 +45,6 @@ export class VflowMinimapComponent {
   /** Enable wheel and trackpad pinch zoom, subject to the main flow gesture settings. */
   public zoomable = input(false);
 
-  /** Multiplicative wheel zoom increment; invalid values fall back to 0.1. */
-  public zoomStep = input(0.1);
-
   protected flowInitialized = inject(FlowRenderingService).flowInitialized;
 
   constructor() {

@@ -11,16 +11,14 @@ Types of `NodeChange`s:
 
 - `position` - new node position after drag and drop
 - `size` - new rendered node size; `mode` tells for each axis (`{ width, height }`) whether it is `explicit` (set by the application or the resizer, worth persisting) or an `auto` measurement of the node's content
-- `add` - when node was created
-- `remove` - when node was removed
 - `select` - when node was selected (also triggers for unselected nodes)
 
 Types of `EdgeChange`s:
 
-- `add` - when edge was created
-- `remove` - when edge was removed
 - `select` - when edge was selected (also triggers for unselected edges)
-- `detached` - when edge became invisible due to the absence of the source or target node. Use this to delete such edges from the edges list
+- `detached` - when edge became invisible because its source or target node is absent, or the handle it names is not rendered on that node. Use this to delete such edges from the edges list. Experimental
+
+Adding and removing nodes and edges is not reported: your application owns the `nodes` and `edges` arrays and makes those changes itself. `removeElements()` removes a node together with its edges, so nothing is left detached.
 
 There are a several ways to receive these changes:
 
@@ -45,9 +43,9 @@ For your convenience, here is the filtering scheme for changes based on the `(no
 Where:
 
 ```ts
-type NodeChangeType = 'position' | 'size' | 'add' | 'remove' | 'select';
+type NodeChangeType = 'position' | 'size' | 'select';
 
-type EdgeChangeType = 'detached' | 'add' | 'remove' | 'select';
+type EdgeChangeType = 'detached' | 'select';
 ```
 
 {{ NgDocActions.demoPane("HandlingChangesFilteredDemoComponent") }}
@@ -57,13 +55,9 @@ List of all possible filter outputs:
 ```
 'nodesChanges.position',
 'nodesChanges.size',
-'nodesChanges.add',
-'nodesChanges.remove',
 'nodesChanges.select',
 
 'edgesChanges.detached',
-'edgesChanges.add',
-'edgesChanges.remove',
 'edgesChanges.select',
 ```
 

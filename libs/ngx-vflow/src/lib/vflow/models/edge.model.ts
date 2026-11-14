@@ -93,7 +93,7 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
   public readonly reconnecting = signal(false);
   public readonly inViewport = signal(false);
   public readonly culled = computed(
-    () => !!this.settingsService.optimization().virtualization && !this.focused() && !this.inViewport(),
+    () => !!this.settingsService.virtualization() && !this.focused() && !this.inViewport(),
   );
 
   /** Selection of an edge without an application signal. */

@@ -50,28 +50,14 @@ const viewport = getViewportForBounds(bounds, { width, height }, { minZoom: 0.5,
 
 ## Client and flow space
 
-Use the component methods when a `VflowComponent` is available. The component measures its own container:
+Client space and flow space are converted by the flow, which measures its own container:
 
 ```ts
 const flowPoint = vflow.clientToFlowPosition({ x: event.clientX, y: event.clientY });
 const clientPoint = vflow.flowToClientPosition(flowPoint);
 ```
 
-The pure functions of the same names take the viewport and the flow container's client-space position as arguments, where the methods read them from the component:
-
-```ts
-import { clientToFlowPosition, flowToClientPosition } from 'ngx-vflow';
-
-const options = {
-  viewport: { x: -100, y: 40, zoom: 1.5 },
-  containerPosition: { x: containerRect.left, y: containerRect.top },
-};
-
-const flowPoint = clientToFlowPosition(clientPoint, options);
-const clientPointAgain = flowToClientPosition(flowPoint, options);
-```
-
-Both functions reject a non-positive or non-finite zoom. Results are not rounded; a round trip may differ only by JavaScript floating-point error.
+Results are not rounded; a round trip may differ only by JavaScript floating-point error.
 
 When a rendered `VflowComponent` is available, query the nodes under a flow-space position directly:
 
@@ -85,18 +71,20 @@ Each result is a `NodeAtPoint`: `node` is the application node object itself (`t
 
 ## Nested node space
 
-Node points are relative to their parent. Supply a lookup containing the requested node and any available ancestors to convert through that hierarchy:
+Node points are relative to their parent. `flow.getNodeRect(id)` returns the rendered rectangle of a node in flow space, its absolute position included, so converting between flow space and the space of a node is a subtraction or an addition:
 
 ```ts
-import { flowToNodeSpacePosition, nodeSpaceToFlowPosition } from 'ngx-vflow';
+const rect = vflow.getNodeRect(childId);
+if (rect) {
+  // A flow-space point in the space of the node, and back.
+  const childPoint = { x: flowPoint.x - rect.x, y: flowPoint.y - rect.y };
+  const flowPointAgain = { x: childPoint.x + rect.x, y: childPoint.y + rect.y };
+}
 
-const nodeLookup = new Map(nodes.map((node) => [node.id, node]));
-const childPoint = flowToNodeSpacePosition(flowPoint, childId, nodeLookup);
-const flowPointAgain = nodeSpaceToFlowPosition(childPoint!, childId, nodeLookup);
-
-// A node's position in the space of another node: its origin in flow space, then into the other space.
-const childInFlow = nodeSpaceToFlowPosition({ x: 0, y: 0 }, childId, nodeLookup);
-const childInOtherNode = childInFlow && flowToNodeSpacePosition(childInFlow, otherId, nodeLookup);
+// A node's position in the space of another node: subtract the absolute position of the other node.
+const child = vflow.getNodeRect(childId);
+const other = vflow.getNodeRect(otherId);
+const childInOtherNode = child && other && { x: child.x - other.x, y: child.y - other.y };
 ```
 
-A missing requested node, target space, or parent cycle returns `undefined`. A missing ancestor ends the traversal and treats the last available node as a root.
+`getNodeRect` returns `undefined` for an unknown node or one that has not been measured yet.

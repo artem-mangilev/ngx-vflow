@@ -6,7 +6,7 @@ import { FlowEntitiesService } from '../../services/flow-entities.service';
 import { VflowComponent } from '../../components/vflow/vflow.component';
 import { Vflow } from '../../vflow';
 import { mouseAsPointer } from '../../gestures/pointer-events.testing';
-import { ResizeChangeEvent, ResizeEvent } from './resizer-types';
+import { ResizeEvent } from './resizer-types';
 
 @Component({
   template: `
@@ -94,7 +94,7 @@ class ResizableTestHostComponent {
 class SizeTargetHostComponent {
   public readonly withResizable = signal(true);
   public readonly nodes = signal<Node[]>(createNodes([{ id: 'node', point: { x: 20, y: 20 } }]));
-  public readonly resizes: Array<[string, ResizeEvent | ResizeChangeEvent]> = [];
+  public readonly resizes: Array<[string, ResizeEvent]> = [];
 }
 
 const SIZED_NODES = () => createNodes([{ id: 'node', point: { x: 20, y: 20 }, width: 300, height: 150 }]);
@@ -336,7 +336,7 @@ describe('VflowResizableComponent', () => {
       expect(model().height()).toBe(120);
     });
 
-    it('reports the resized node and the sign of the size change per axis', async () => {
+    it('reports the resized node, the pointer event and the direction of each step per axis', async () => {
       const nodes = SIZED_NODES();
       const { fixture, controls } = await createSizeTargetFixture({ nodes });
       const resizes = fixture.componentInstance.resizes;
@@ -348,13 +348,16 @@ describe('VflowResizableComponent', () => {
       expect(resizes.map(([kind]) => kind)).toEqual(['start', 'resize', 'resize', 'end']);
       expect(resizes.every(([, event]) => event.node === nodes[0])).toBe(true);
       expect(resizes.at(-1)?.[1]).toMatchObject({ width: 340, height: 180 });
-      expect((resizes[1][1] as ResizeChangeEvent).direction).toEqual({ x: 1, y: 1 });
+      expect(resizes[1][1].direction).toEqual({ x: 1, y: 1 });
+      expect(resizes[0][1].direction).toEqual({ x: 0, y: 0 });
+      expect(resizes.at(-1)?.[1].direction).toEqual({ x: 0, y: 0 });
+      expect(resizes.every(([, event]) => event.sourceEvent instanceof PointerEvent)).toBe(true);
 
       resizes.length = 0;
       drag(corner('[data-v-resize-control=handle][data-v-resize-control-position=top-left]'), -20, 0);
       await settle(fixture);
 
-      expect((resizes[1][1] as ResizeChangeEvent).direction).toEqual({ x: -1, y: 0 });
+      expect(resizes[1][1].direction).toEqual({ x: -1, y: 0 });
     });
 
     it('writes the resized size into the application signals', async () => {

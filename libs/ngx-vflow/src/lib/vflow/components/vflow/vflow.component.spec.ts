@@ -315,8 +315,8 @@ describe('VflowComponent', () => {
       await settle(fixture);
       const { vflow, edges } = fixture.componentInstance;
 
-      expect(vflow().getDetachedEdges()).toEqual([edges[1]]);
-      expect(vflow().getDetachedEdges()[0]).toBe(edges[1]);
+      expect(vflow().detachedEdges()).toEqual([edges[1]]);
+      expect(vflow().detachedEdges()[0]).toBe(edges[1]);
     });
   });
 

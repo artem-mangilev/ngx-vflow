@@ -58,23 +58,9 @@ describe('EdgeChangesService', () => {
   async function record(type: EdgeChange['type']) {
     const batches: EdgeChange[][] = [];
     (service.changesOfType(type) as Observable<EdgeChange[]>).subscribe((changes) => batches.push(changes));
-    // The edges of the first read are not reported as added.
     await settle();
     return batches;
   }
-
-  it('reports the edges added and removed in one tick as one array', async () => {
-    const [ab, bc, ca] = [edge('a-b', 'a', 'b'), edge('b-c', 'b', 'c'), edge('c-a', 'c', 'a')];
-    entities.edges.set([ab, bc]);
-    const added = await record('add');
-    const removed = await record('remove');
-
-    entities.edges.set([bc, ca]);
-    await settle();
-
-    expect(added).toEqual([[{ type: 'add', id: 'c-a' }]]);
-    expect(removed).toEqual([[{ type: 'remove', id: 'a-b' }]]);
-  });
 
   it('reports a selection change of an edge, and only the edges that changed', async () => {
     const [ab, bc] = [edge('a-b', 'a', 'b'), edge('b-c', 'b', 'c')];

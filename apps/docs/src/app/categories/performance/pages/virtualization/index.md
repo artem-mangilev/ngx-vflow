@@ -1,4 +1,4 @@
-Enable viewport virtualization with `[optimization]="{ virtualization: true }"`.
+Enable viewport virtualization with `[virtualization]="true"`, or `virtualization: true` in `withSettings()`.
 
 Nodes and edges outside the viewport use `display: none`. Their DOM and Angular components remain mounted, so local component state survives panning away and back. Nodes and edges keep their original appearance at every zoom; there is no canvas preview layer.
 

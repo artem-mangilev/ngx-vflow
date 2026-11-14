@@ -1,5 +1,8 @@
 import { Point } from '../../interfaces/point.interface';
-import { ControlPosition, CoordinateExtent, ResizeAxis, ResizeChangeParams, ResizeSign } from './resizer-types';
+import { ControlPosition, CoordinateExtent, ResizeAxis, ResizeEvent } from './resizer-types';
+
+type ResizeDirection = ResizeEvent['direction'];
+type ResizeSign = ResizeDirection['x'];
 
 /** The axes a control drags and the sides it moves. */
 export interface ControlDirection {
@@ -45,7 +48,7 @@ export function getResizeDirection({
   prevHeight,
   affectsX,
   affectsY,
-}: GetResizeDirectionParams): ResizeChangeParams['direction'] {
+}: GetResizeDirectionParams): ResizeDirection {
   const x = Math.sign(width - prevWidth) as ResizeSign;
   const y = Math.sign(height - prevHeight) as ResizeSign;
 

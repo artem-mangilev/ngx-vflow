@@ -22,14 +22,7 @@ import { Point } from '../../interfaces/point.interface';
 import { align } from '../../utils/align-number';
 import { ResizeGesture, startResize } from './resizer';
 import { ResizeBounds } from './resizer-utils';
-import {
-  ControlPosition,
-  ResizeAxis,
-  ResizeChangeEvent,
-  ResizeDragEvent,
-  ResizeEvent,
-  ShouldResize,
-} from './resizer-types';
+import { ControlPosition, ResizeAxis, ResizeEvent, ShouldResize } from './resizer-types';
 
 const CONTROL_POSITIONS: ControlPosition[] = [
   'top',
@@ -96,7 +89,7 @@ export class VflowResizableComponent implements OnInit, OnDestroy {
   public readonly resizeStart = output<ResizeEvent>();
   // Only `window` fires a native `resize` event, so the name does not collide on an element.
   // eslint-disable-next-line @angular-eslint/no-output-native
-  public readonly resize = output<ResizeChangeEvent>();
+  public readonly resize = output<ResizeEvent>();
   public readonly resizeEnd = output<ResizeEvent>();
   public shouldResize = input<ShouldResize>();
 
@@ -152,19 +145,17 @@ export class VflowResizableComponent implements OnInit, OnDestroy {
         capture: true,
         stopCompatibilityEvents: true,
         clickDistance: () => 0,
-        onStart: ({ event, point }) => this.start(position, { sourceEvent: event }, point),
-        onMove: ({ event, point }) => this.gesture?.move({ sourceEvent: event }, this.toFlowPoint(point)),
-        onEnd: ({ event }) => this.finish({ sourceEvent: event }),
-        onCancel: ({ event }) => this.finish({ sourceEvent: event }),
+        onStart: ({ event, point }) => this.start(position, event, point),
+        onMove: ({ event, point }) => this.gesture?.move(event, this.toFlowPoint(point)),
+        onEnd: ({ event }) => this.finish(event),
+        onCancel: ({ event }) => this.finish(event),
       },
       event.currentTarget as Element,
     );
     this.tracker.press(event);
   }
 
-  private start(position: ControlPosition, event: ResizeDragEvent, client: Point): void {
-    const node = this.model.rawNode;
-
+  private start(position: ControlPosition, event: PointerEvent, client: Point): void {
     this.gesture = startResize(
       {
         node: this.model,
@@ -173,16 +164,16 @@ export class VflowResizableComponent implements OnInit, OnDestroy {
         keepAspectRatio: this.keepAspectRatio(),
         resizeAxis: this.resizeAxis(),
         shouldResize: this.shouldResize(),
-        onStart: (_, params) => this.resizeStart.emit({ ...params, node }),
-        onResize: (_, params) => this.resize.emit({ ...params, node }),
-        onEnd: (_, params) => this.resizeEnd.emit({ ...params, node }),
+        onStart: (resizeEvent) => this.resizeStart.emit(resizeEvent),
+        onResize: (resizeEvent) => this.resize.emit(resizeEvent),
+        onEnd: (resizeEvent) => this.resizeEnd.emit(resizeEvent),
       },
       event,
       this.toFlowPoint(client),
     );
   }
 
-  private finish(event: ResizeDragEvent): void {
+  private finish(event: PointerEvent): void {
     const gesture = this.gesture;
     this.gesture = null;
     this.tracker = null;

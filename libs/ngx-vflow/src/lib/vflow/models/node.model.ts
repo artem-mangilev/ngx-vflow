@@ -65,7 +65,7 @@ export class NodeModel<T = unknown> implements FlowEntity, Contextable<NodeConte
   /** CSS culling retains the view and its last measured geometry. */
   public readonly culled = computed(() => {
     if (
-      !this.settingsService.optimization().virtualization ||
+      !this.settingsService.virtualization() ||
       !this.isReady() ||
       this.focused() ||
       this.connectionActive() ||
@@ -204,14 +204,11 @@ export class NodeModel<T = unknown> implements FlowEntity, Contextable<NodeConte
     }
 
     // Culling needs initial node and handle geometry, including offscreen nodes.
-    if (
-      this.settingsService.optimization().virtualization ||
-      this.settingsService.optimization().lazyLoadTrigger === 'immediate'
-    ) {
+    if (this.settingsService.virtualization() || this.settingsService.lazyLoadTrigger() === 'immediate') {
       return true;
     }
 
-    if (this.settingsService.optimization().lazyLoadTrigger === 'viewport' && !this.isComponentClass) {
+    if (this.settingsService.lazyLoadTrigger() === 'viewport' && !this.isComponentClass) {
       // A lazy component factory or a template presentation loads once the node reaches the viewport.
       return this.inViewport();
     }

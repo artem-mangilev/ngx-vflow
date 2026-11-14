@@ -48,12 +48,13 @@ export class VxAutoSize {
       this.flow.initialized.subscribe(() => this.fitAncestors(this.flow.nodes(), this.vxAutoSizeShrink())),
       this.flow.nodeDrag.subscribe((event) => this.fitAncestors(event.nodes, this.vxAutoSizeShrink())),
       this.flow.nodeDragEnd.subscribe((event) => this.fitAncestors(event.nodes, this.vxAutoSizeShrink())),
-      this.flow.nodesChangesSize.subscribe((changes) =>
+      this.flow.nodesChangesSize.subscribe((changes) => {
+        const resized = new Set(changes.map((change) => change.id));
         this.fitAncestors(
-          changes.map((change) => this.flow.getNode(change.id)).filter((node): node is Node => !!node),
+          this.flow.nodes().filter((node) => resized.has(node.id)),
           this.vxAutoSizeShrink(),
-        ),
-      ),
+        );
+      }),
     ];
     inject(DestroyRef).onDestroy(() => subscriptions.forEach((subscription) => subscription.unsubscribe()));
   }

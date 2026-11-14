@@ -8,18 +8,16 @@ If you need to remap this shortcut, see [Keyboard shortcuts](../keyboard-shortcu
 
 # Configuration
 
-Use the `[selectionBox]` input:
+Use the `[selectionBoxMode]` input, or `selectionBoxMode` in `withSettings()`:
 
-```typescript
-selectionBox: SelectionBoxSettings = {
-  mode: 'full',
-  color: '#ff8a65',
-};
+```html
+<vflow selectionBoxMode="partial" [nodes]="nodes" [edges]="edges" />
 ```
 
-- `mode: 'full'` selects only entities fully enclosed by the box.
-- `mode: 'partial'` selects entities that intersect the box.
-- `color` controls selection box stroke/fill color.
+- `'full'` (default) selects only entities fully enclosed by the box.
+- `'partial'` selects entities that intersect the box.
+
+The color of the box is the core token `--v-selection-box`: its stroke, and its fill at 12%.
 
 To disable the selection-box gesture, provide `withShortcuts({ modifiers: { selection: [] } })` in `provideVflow()`, see [Keyboard shortcuts](../keyboard-shortcuts).
 

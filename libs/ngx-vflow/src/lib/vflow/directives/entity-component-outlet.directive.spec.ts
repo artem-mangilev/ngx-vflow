@@ -64,10 +64,7 @@ class HostComponent {
 }
 
 @Component({
-  template: `<vflow
-    style="width: 400px; height: 300px"
-    [nodes]="nodes"
-    [optimization]="{ lazyLoadTrigger: 'viewport' }" />`,
+  template: `<vflow style="width: 400px; height: 300px" [nodes]="nodes" lazyLoadTrigger="viewport" />`,
   imports: [VflowComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

@@ -14,6 +14,7 @@ import {
   ElementRef,
   signal,
   output,
+  Signal,
 } from '@angular/core';
 import { Node } from '../../interfaces/node.interface';
 import { ViewportGesturesDirective } from '../../directives/viewport-gestures.directive';
@@ -57,7 +58,6 @@ import { ComponentEventBusService } from '../../services/component-event-bus.ser
 import { Background } from '../../types/background.type';
 import { SpacePointContextDirective } from '../../directives/space-point-context.directive';
 import { FitViewOptions } from '../../interfaces/fit-view-options.interface';
-import { Optimization } from '../../interfaces/optimization.interface';
 import { SelectionMode } from '../../types/selection-mode.type';
 import { KeyboardService } from '../../services/keyboard.service';
 import { EdgeComponent } from '../edge/edge.component';
@@ -84,7 +84,8 @@ import { AutoPanDirective } from '../../directives/auto-pan.directive';
 import { ResizeObserverService } from '../../services/resize-observer.service';
 import { SelectionBoxComponent } from '../selection-box/selection-box.component';
 import { SelectionBoxContextDirective } from '../../directives/selection-box-context.directive';
-import { SelectionBoxSettings } from '../../interfaces/selection-box-settings.interface';
+import { SelectionBoxMode } from '../../types/selection-box-mode.type';
+import { LazyLoadTrigger } from '../../types/lazy-load-trigger.type';
 import { AriaDescriber } from '@angular/cdk/a11y';
 import { EntityAccessibilityDirective } from '../../directives/entity-accessibility.directive';
 import { LiveRegionDirective } from '../../directives/live-region.directive';
@@ -264,8 +265,20 @@ export class VflowComponent<N extends Node = Node, E extends Edge = Edge> {
    */
   public readonly background = input<Background | null>();
 
-  /** Rendering optimizations; omitted keys keep their defaults. */
-  public readonly optimization = input<Optimization>();
+  /**
+   * Hides offscreen nodes and edges with `display: none` while keeping their views and component state. Nodes are
+   * initially loaded and measured even offscreen; focused elements and nodes in active gestures stay in layout.
+   * Applies at every zoom; does not reduce DOM memory or stop component effects. Default: false.
+   */
+  public readonly virtualization = input<boolean>();
+
+  /**
+   * When lazy presentations load: a `() => import(...)` component factory or an `ng-template` presentation, which
+   * gates itself with `@defer (when ctx.shouldLoad())`. `'immediate'` loads them at once, `'viewport'` when the node
+   * first enters the viewport. A component class is already loaded and always renders immediately. Virtualization
+   * loads nodes immediately to obtain their initial geometry, regardless of this setting. Default: `'immediate'`.
+   */
+  public readonly lazyLoadTrigger = input<LazyLoadTrigger>();
 
   /**
    * Draws the nodes that other nodes reference as parent in a layer below the edges, so an edge inside a parent
@@ -293,11 +306,10 @@ export class VflowComponent<N extends Node = Node, E extends Edge = Edge> {
   public readonly selectionMode = input<SelectionMode>();
 
   /**
-   * Selection box behavior settings; omitted keys keep their defaults.
-   * - mode: 'full' selects only fully enclosed entities
-   * - mode: 'partial' selects entities that intersect selection box
+   * Which entities the selection box selects: `'full'` only fully enclosed ones, `'partial'` those that intersect
+   * the box. Default: `'full'`.
    */
-  public readonly selectionBox = input<SelectionBoxSettings>();
+  public readonly selectionBoxMode = input<SelectionBoxMode>();
 
   /**
    * Settings for connection (it renders when user tries to create edge between nodes)
@@ -355,14 +367,16 @@ export class VflowComponent<N extends Node = Node, E extends Edge = Edge> {
 
   // #region OUTPUTS
   /**
-   * Changes of nodes that have already happened: position, size, add, remove and select. Every change of one tick
-   * comes in a single array. To subscribe in code, use `nodesChanges.subscribe()` or `outputToObservable()`.
+   * Changes of nodes that have already happened: position, size and select. Every change of one tick comes in a
+   * single array. Adding and removing nodes is not reported: the application owns the array. To subscribe in code,
+   * use `nodesChanges.subscribe()` or `outputToObservable()`.
    */
   public readonly nodesChanges = outputFromObservable(this.nodesChangeService.changes$);
 
   /**
-   * Changes of edges that have already happened: detached, add, remove and select. Every change of one tick comes
-   * in a single array. To subscribe in code, use `edgesChanges.subscribe()` or `outputToObservable()`.
+   * Changes of edges that have already happened: detached and select. Every change of one tick comes in a single
+   * array. Adding and removing edges is not reported: the application owns the array. To subscribe in code, use
+   * `edgesChanges.subscribe()` or `outputToObservable()`.
    */
   public readonly edgesChanges = outputFromObservable(this.edgesChangeService.changes$);
 
@@ -373,23 +387,11 @@ export class VflowComponent<N extends Node = Node, E extends Edge = Edge> {
   public readonly nodesChangesSize = outputFromObservable(this.nodesChangeService.changesOfType('size'), {
     alias: 'nodesChanges.size',
   });
-  public readonly nodesChangesAdd = outputFromObservable(this.nodesChangeService.changesOfType('add'), {
-    alias: 'nodesChanges.add',
-  });
-  public readonly nodesChangesRemove = outputFromObservable(this.nodesChangeService.changesOfType('remove'), {
-    alias: 'nodesChanges.remove',
-  });
   public readonly nodesChangesSelect = outputFromObservable(this.nodesChangeService.changesOfType('select'), {
     alias: 'nodesChanges.select',
   });
   public readonly edgesChangesDetached = outputFromObservable(this.edgesChangeService.changesOfType('detached'), {
     alias: 'edgesChanges.detached',
-  });
-  public readonly edgesChangesAdd = outputFromObservable(this.edgesChangeService.changesOfType('add'), {
-    alias: 'edgesChanges.add',
-  });
-  public readonly edgesChangesRemove = outputFromObservable(this.edgesChangeService.changesOfType('remove'), {
-    alias: 'edgesChanges.remove',
   });
   public readonly edgesChangesSelect = outputFromObservable(this.edgesChangeService.changesOfType('select'), {
     alias: 'edgesChanges.select',
@@ -490,6 +492,16 @@ export class VflowComponent<N extends Node = Node, E extends Edge = Edge> {
    */
   public readonly viewport = this.viewportService.readableViewport.asReadonly();
 
+  /**
+   * The edges of the `edges` input that are not drawn: the source or target node is absent, or the handle the edge
+   * names is not rendered on that node. `(edgesChanges.detached)` reports the moment an edge becomes one.
+   *
+   * @experimental
+   */
+  public readonly detachedEdges: Signal<E[]> = computed(() =>
+    this.flowEntitiesService.detachedEdges().map((model) => model.edge as E),
+  );
+
   protected readonly flowInitialized = this.flowRenderingService.flowInitialized;
   protected readonly hasLayout = this.flowRenderingService.hasLayout;
   // #endregion
@@ -553,15 +565,6 @@ export class VflowComponent<N extends Node = Node, E extends Edge = Edge> {
   }
 
   /**
-   * Get node by id
-   *
-   * @param id node id
-   */
-  public getNode(id: string): N | undefined {
-    return this.flowEntitiesService.getNode(id)?.rawNode as N | undefined;
-  }
-
-  /**
    * Rendered rectangle of a node in flow space: its absolute position and measured size, or the explicit size
    * the browser rendered. `undefined` for an unknown node or one that has not been measured yet.
    */
@@ -581,13 +584,6 @@ export class VflowComponent<N extends Node = Node, E extends Edge = Edge> {
       .nodes()
       .filter((model) => model.hasMeasurement() && (!requested || requested.has(model.rawNode.id)));
     return getNodesFlowBounds(models);
-  }
-
-  /**
-   * Sync method to get detached edges
-   */
-  public getDetachedEdges(): E[] {
-    return this.flowEntitiesService.getDetachedEdges().map((e) => e.edge as E);
   }
 
   /** Converts a DOM client-space position to flow space. */

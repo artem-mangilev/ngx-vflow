@@ -114,7 +114,7 @@ export class SelectionBoxContextDirective {
 
   private isNodeInside(node: NodeModel, rect: Rect) {
     const nodeRect = nodeToRect(node);
-    const mode = this.flowSettingsService.selectionBox().mode;
+    const mode = this.flowSettingsService.selectionBoxMode();
 
     if (mode === 'partial') {
       return rectsIntersect(nodeRect, rect);
@@ -126,7 +126,7 @@ export class SelectionBoxContextDirective {
   private isEdgeInside(edge: EdgeModel, rect: Rect) {
     const source = edge.sourceHandle()?.pointAbsolute();
     const target = edge.targetHandle()?.pointAbsolute();
-    const mode = this.flowSettingsService.selectionBox().mode;
+    const mode = this.flowSettingsService.selectionBoxMode();
 
     if (!source || !target) {
       return false;

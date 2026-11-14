@@ -1,9 +1,9 @@
 import { AutoPanSettings } from '../interfaces/auto-pan-settings.interface';
 import { Injectable, Signal, signal } from '@angular/core';
 import { Background } from '../types/background.type';
-import { DEFAULT_OPTIMIZATION, Optimization } from '../interfaces/optimization.interface';
 import { SelectionMode } from '../types/selection-mode.type';
-import { DEFAULT_SELECTION_BOX, SelectionBoxSettings } from '../interfaces/selection-box-settings.interface';
+import { SelectionBoxMode } from '../types/selection-box-mode.type';
+import { LazyLoadTrigger } from '../types/lazy-load-trigger.type';
 import { DEFAULT_ARIA_LABEL_CONFIG } from '../interfaces/aria-label-config.interface';
 import { AlignmentHelperSettings } from '../interfaces/alignment-helper-settings.interface';
 import { BindableSignal, bindableSignal } from '../utils/signals/bindable-signal';
@@ -59,11 +59,15 @@ export class FlowSettingsService {
   /** @see {VflowComponent.parentsBelowEdges} */
   public parentsBelowEdges = bindableSignal(false);
 
-  public optimization = bindableSignal<Required<Optimization>>(DEFAULT_OPTIMIZATION);
+  /** @see {VflowComponent.virtualization} */
+  public virtualization = bindableSignal(false);
+
+  /** @see {VflowComponent.lazyLoadTrigger} */
+  public lazyLoadTrigger = bindableSignal<LazyLoadTrigger>('immediate');
 
   public selectionMode = bindableSignal<SelectionMode>('default');
 
-  public selectionBox = bindableSignal<Required<SelectionBoxSettings>>(DEFAULT_SELECTION_BOX);
+  public selectionBoxMode = bindableSignal<SelectionBoxMode>('full');
 
   /** Reads every given setting from its source signal from now on. */
   public bind(sources: FlowSettingsSources): void {

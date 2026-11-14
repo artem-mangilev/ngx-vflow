@@ -12,7 +12,7 @@ import {
 } from '@angular/core';
 import { FlowEntitiesService } from '../../services/flow-entities.service';
 import { FlowSettingsService } from '../../services/flow-settings.service';
-import { ViewportService } from '../../services/viewport.service';
+import { ViewportService, ZOOM_STEP } from '../../services/viewport.service';
 import { FlowRenderingService } from '../../services/flow-rendering.service';
 import { getNodesFlowBounds } from '../../utils/nodes';
 import { clamp, getViewportBounds, getViewportForBounds } from '../../utils/viewport';
@@ -22,6 +22,12 @@ import { Point } from '../../interfaces/point.interface';
 import { clientToFlowPosition } from '../../utils/coordinates';
 import { isPointInRect } from '../../utils/rect';
 import { isGroupNode } from '../../utils/is-group-node';
+
+/**
+ * Zoom factor of one wheel event on the minimap: half a zoom-key step (`ZOOM_STEP` 1.2, so about 1.095 per event),
+ * because a trackpad sends many wheel events per gesture where a key sends one.
+ */
+const MINIMAP_WHEEL_ZOOM = Math.sqrt(ZOOM_STEP);
 
 const TRANSPARENT = new Set(['', 'transparent', 'rgba(0, 0, 0, 0)']);
 
@@ -46,7 +52,6 @@ export class MinimapCanvasDirective {
   public position = input.required<MinimapPosition>();
   public pannable = input.required<boolean>();
   public zoomable = input.required<boolean>();
-  public zoomStep = input.required<number>();
 
   private document = inject(DOCUMENT);
   private canvas = inject<ElementRef<HTMLCanvasElement>>(ElementRef).nativeElement;
@@ -324,10 +329,8 @@ export class MinimapCanvasDirective {
         : this.settings.zoomOnScroll() || this.keyboard.isActiveModifier('zoomActivation'))
     )
       return;
-    const step = this.zoomStep();
-    const factor = 1 + (Number.isFinite(step) && step > 0 ? step : 0.1);
     const zoom = clamp(
-      viewport.zoom * factor ** -Math.sign(event.deltaY),
+      viewport.zoom * MINIMAP_WHEEL_ZOOM ** -Math.sign(event.deltaY),
       this.settings.minZoom(),
       this.settings.maxZoom(),
     );

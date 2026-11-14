@@ -1,13 +1,10 @@
-<button (click)="addNodes()">Add nodes</button>
-
 <vflow
   [nodes]="nodes"
   [edges]="edges"
   (connect)="createEdge($event)"
   (nodesChanges.position)="handleNodePositionChange($event)"
   (nodesChanges.select)="handleNodeSelectChange($event)"
-  (nodesChanges.add)="handleNodesAddChange($event)"
-  (edgesChanges.add)="handleEdgesAddChange($event)">
+  (edgesChanges.select)="handleEdgeSelectChange($event)">
   <docs-node *vNode="let ctx" [ctx]="ctx" />
   <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
 </vflow>

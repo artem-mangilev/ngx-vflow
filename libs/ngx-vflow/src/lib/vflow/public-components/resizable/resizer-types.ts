@@ -1,27 +1,28 @@
 import type { Node } from '../../interfaces/node.interface';
-import type { Rect } from '../../interfaces/rect';
 
-/** Position and size of the node during a resize, in flow units. */
-export type ResizeParams = Rect;
+/** Direction of a resize on one axis: `1` = right or down, `-1` = left or up, `0` = no change. */
+type ResizeDirectionSign = -1 | 0 | 1;
 
-/** Sign of the size change on one axis: `1` = increase, `-1` = decrease, `0` = no change. */
-export type ResizeSign = -1 | 0 | 1;
-
-export interface ResizeChangeParams extends ResizeParams {
-  /** Sign of the last size change per axis. */
-  direction: { x: ResizeSign; y: ResizeSign };
-}
-
-/** Payload of `(resizeStart)` and `(resizeEnd)`. */
-export interface ResizeEvent extends ResizeParams {
+/**
+ * Payload of `(resizeStart)`, `(resize)` and `(resizeEnd)`, and the argument of {@link ShouldResize}. The rect is the
+ * node's position and size in flow units: at the start the size before the gesture, during it the size about to be
+ * written (or just written, for `(resize)`), at the end the last size written.
+ */
+export interface ResizeEvent<N extends Node = Node> {
   /** The application node being resized. */
-  node: Node;
-}
-
-/** Payload of `(resize)`. */
-export interface ResizeChangeEvent extends ResizeChangeParams {
-  /** The application node being resized. */
-  node: Node;
+  node: N;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  /**
+   * The direction the dragged side moved on each axis since the previous resize step: `x` is `1` right, `-1` left,
+   * `y` is `1` down, `-1` up, `0` no change. Growing from a left or top control is `-1`. Always `{ x: 0, y: 0 }` in
+   * `(resizeStart)` and `(resizeEnd)`, which report a state rather than a step.
+   */
+  direction: { x: ResizeDirectionSign; y: ResizeDirectionSign };
+  /** The pointer event being handled: the press, a move or the release. */
+  sourceEvent: PointerEvent;
 }
 
 /**
@@ -30,17 +31,9 @@ export interface ResizeChangeEvent extends ResizeChangeParams {
 export type ResizeAxis = 'horizontal' | 'vertical';
 
 /**
- * Event passed to resize callbacks.
+ * Called before a resize step is applied; return `false` to skip it.
  */
-export interface ResizeDragEvent {
-  /** The pointer event being handled: the press, a move or the release. */
-  sourceEvent: PointerEvent;
-}
-
-/**
- * Called before a resize is applied; return `false` to prevent it.
- */
-export type ShouldResize = (event: ResizeDragEvent, params: ResizeChangeParams) => boolean;
+export type ShouldResize = (event: ResizeEvent) => boolean;
 
 /** Side or corner of the node that a resize control drags. */
 export type ControlPosition =

@@ -88,33 +88,29 @@ describe('NodesChangeService', () => {
     const second: NodeChange[][] = [];
     service.changes$.subscribe((changes) => first.push(changes));
     service.changes$.subscribe((changes) => second.push(changes));
-    // The nodes of the first read are not reported as added.
-    await settle();
     entities.nodes.set([a]);
     await settle();
+    first.length = second.length = 0;
 
-    expect(first).toEqual([[{ type: 'add', id: 'a' }]]);
+    a.point.set({ x: 10, y: 0 });
+    await settle();
+
+    expect(first).toEqual([[{ type: 'position', id: 'a', point: { x: 10, y: 0 } }]]);
     expect(second[0]).toBe(first[0]);
   });
 
-  it('observes no node for a listener of added and removed nodes only', async () => {
-    // The model creates each observable, an effect, on first use and keeps it in a private field.
-    const observables = (model: NodeModel) =>
-      Object.entries(model).filter(([key, value]) => key.endsWith('Observable') && value !== undefined).length;
-    const a = node('a');
-    const added: NodeChange[][] = [];
-    service.changesOfType('add').subscribe((changes) => added.push(changes));
-    service.changesOfType('remove').subscribe();
-    await settle();
+  it('reports nothing when the application adds or removes a node', async () => {
+    const [a, b] = [node('a'), node('b')];
+    const batches: NodeChange[][] = [];
+    service.changes$.subscribe((changes) => batches.push(changes));
     entities.nodes.set([a]);
     await settle();
+    batches.length = 0;
 
-    expect(added).toEqual([[{ type: 'add', id: 'a' }]]);
-    expect(observables(a)).toBe(0);
-
-    service.changes$.subscribe();
+    entities.nodes.set([b]);
     await settle();
-    expect(observables(a)).toBeGreaterThan(0);
+
+    expect(batches.flat().filter((change) => change.type !== 'size')).toEqual([]);
   });
 
   it('reports the mode of each axis with every size change', async () => {

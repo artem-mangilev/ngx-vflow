@@ -2,7 +2,6 @@
 export * from './lib/vflow/vflow';
 export * from './lib/vflow/utils/graph';
 export * from './lib/vflow/utils/graph-operations';
-export * from './lib/vflow/utils/coordinates';
 export { getViewportForBounds, type ViewportForBoundsOptions } from './lib/vflow/utils/viewport';
 export { getStraightPath } from './lib/vflow/math/edge-path/straigh-path';
 export { getBezierPath } from './lib/vflow/math/edge-path/bezier-path';
@@ -24,7 +23,6 @@ export {
 export type * from './lib/vflow/interfaces/dom-attributes.interface';
 export type * from './lib/vflow/interfaces/delete-request.interface';
 export {
-  NODE_DEFAULTS,
   createNode,
   createNodes,
   toStaticNode,
@@ -37,7 +35,6 @@ export {
 export type * from './lib/vflow/interfaces/point.interface';
 export type * from './lib/vflow/interfaces/rect';
 export {
-  EDGE_DEFAULTS,
   createEdge,
   createEdges,
   toStaticEdge,
@@ -54,28 +51,21 @@ export type {
   ConnectionSettings,
   ConnectionValidatorFn,
 } from './lib/vflow/interfaces/connection-settings.interface';
-export {
-  MARKER_DEFAULT_TYPE,
-  type Marker,
-  type MarkerRef,
-  type MarkerType,
-} from './lib/vflow/interfaces/marker.interface';
+export type { Marker, MarkerRef, MarkerType } from './lib/vflow/interfaces/marker.interface';
 export type { SetCenterOptions, ViewportOptions, ViewportState } from './lib/vflow/interfaces/viewport.interface';
 export {
   isComponentNodeEvent,
   type AnyComponentNodeEvent,
   type ComponentNodeEvent,
-  type ComponentOutputEvent,
 } from './lib/vflow/interfaces/component-node-event.interface';
 export {
   isComponentEdgeEvent,
   type AnyComponentEdgeEvent,
   type ComponentEdgeEvent,
 } from './lib/vflow/interfaces/component-edge-event.interface';
-export { NODE_REF, injectNode, type NodeRef } from './lib/vflow/utils/inject-node';
-export { EDGE_REF, injectEdge, type EdgeRef } from './lib/vflow/utils/inject-edge';
+export { injectNode, type NodeRef } from './lib/vflow/utils/inject-node';
+export { injectEdge, type EdgeRef } from './lib/vflow/utils/inject-edge';
 export type * from './lib/vflow/interfaces/fit-view-options.interface';
-export { DEFAULT_OPTIMIZATION, type Optimization } from './lib/vflow/interfaces/optimization.interface';
 export type * from './lib/vflow/interfaces/intersecting-nodes-options.interface';
 export type * from './lib/vflow/interfaces/node-at-point.interface';
 export {
@@ -84,10 +74,6 @@ export {
 } from './lib/vflow/interfaces/initialization-gate.interface';
 export type * from './lib/vflow/interfaces/curve-factory.interface';
 export type * from './lib/vflow/interfaces/alignment-helper-settings.interface';
-export {
-  DEFAULT_SELECTION_BOX,
-  type SelectionBoxSettings,
-} from './lib/vflow/interfaces/selection-box-settings.interface';
 export type * from './lib/vflow/interfaces/auto-pan-settings.interface';
 export type * from './lib/vflow/interfaces/template-context.interface';
 export type {
@@ -111,27 +97,18 @@ export type * from './lib/vflow/types/background.type';
 export type * from './lib/vflow/types/keyboard-shortcuts.type';
 export type * from './lib/vflow/types/selection-mode.type';
 export type * from './lib/vflow/types/selection-box-mode.type';
+export type * from './lib/vflow/types/lazy-load-trigger.type';
 
 // Features
-export { VflowFeature, provideVflow, vflowFeature } from './lib/vflow/features/feature';
+// `VflowFeature` is a type only: the with*() functions are the only way to build a feature.
+export { provideVflow, type VflowFeature } from './lib/vflow/features/feature';
 export type { FeatureValue } from './lib/vflow/features/merged-feature-value';
-export { VFLOW_SETTINGS, withSettings } from './lib/vflow/features/with-settings';
-export { VFLOW_ARIA_LABELS, withAccessibility } from './lib/vflow/features/with-accessibility';
-export { VFLOW_SHORTCUTS, withShortcuts } from './lib/vflow/features/with-shortcuts';
-export { VFLOW_CURVES, withCurves, type CurveRegistry } from './lib/vflow/features/with-curves';
-export {
-  BUILT_IN_CURVES,
-  type BuiltInCurve,
-  type CurveKey,
-  type VflowCurves,
-} from './lib/vflow/interfaces/curves.interface';
-export {
-  VFLOW_EDGE_COMPONENTS,
-  VFLOW_NODE_COMPONENTS,
-  withEdgeComponents,
-  withNodeComponents,
-  type EntityComponentRegistry,
-} from './lib/vflow/features/with-entity-components';
+export { withSettings } from './lib/vflow/features/with-settings';
+export { withAccessibility } from './lib/vflow/features/with-accessibility';
+export { withShortcuts } from './lib/vflow/features/with-shortcuts';
+export { withCurves } from './lib/vflow/features/with-curves';
+export type { BuiltInCurve, CurveKey, VflowCurves } from './lib/vflow/interfaces/curves.interface';
+export { withEdgeComponents, withNodeComponents } from './lib/vflow/features/with-entity-components';
 export type {
   EdgeComponentKey,
   NodeComponentKey,
@@ -142,18 +119,9 @@ export { VFLOW_SETTINGS_DEFAULTS, type VflowSettings } from './lib/vflow/interfa
 
 // Components
 export * from './lib/vflow/components/vflow/vflow.component';
-export type { ResolvedVflowSettingSignals, ResolvedVflowSettings } from './lib/vflow/components/vflow/resolve-settings';
+export type { ResolvedVflowSettingSignals } from './lib/vflow/components/vflow/resolve-settings';
 export * from './lib/vflow/public-components/resizable/resizable.component';
-export type {
-  ResizeAxis,
-  ResizeChangeEvent,
-  ResizeChangeParams,
-  ResizeDragEvent,
-  ResizeEvent,
-  ResizeParams,
-  ResizeSign,
-  ShouldResize,
-} from './lib/vflow/public-components/resizable/resizer-types';
+export type { ResizeAxis, ResizeEvent, ShouldResize } from './lib/vflow/public-components/resizable/resizer-types';
 export * from './lib/vflow/public-components/minimap/minimap.component';
 export * from './lib/vflow/public-components/node-toolbar/node-toolbar.component';
 

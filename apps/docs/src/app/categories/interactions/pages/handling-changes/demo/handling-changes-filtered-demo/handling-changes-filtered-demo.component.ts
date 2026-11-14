@@ -4,9 +4,8 @@ import { NgDocNotifyService } from '@ng-doc/ui-kit';
 import {
   Connection,
   Edge,
-  EdgeChange,
+  EdgeSelectedChange,
   Node,
-  NodeAddChange,
   NodePositionChange,
   NodeSelectedChange,
   Vflow,
@@ -77,39 +76,12 @@ export class HandlingChangesFilteredDemoComponent {
     this.notifyService.notify(this.toastTemplate());
   }
 
-  public handleNodesAddChange(changes: NodeAddChange[]) {
+  public handleEdgeSelectChange(changes: EdgeSelectedChange[]) {
     this.toastData = {
-      title: '(nodesChanges.add)',
+      title: '(edgesChanges.select)',
       json: JSON.stringify(changes, null, 2),
     };
 
     this.notifyService.notify(this.toastTemplate());
-  }
-
-  public handleEdgesAddChange(changes: EdgeChange[]) {
-    this.toastData = {
-      title: '(edgesChanges.add)',
-      json: JSON.stringify(changes, null, 2),
-    };
-
-    this.notifyService.notify(this.toastTemplate());
-  }
-
-  public addNodes() {
-    this.nodes = [
-      ...this.nodes,
-      ...createNodes([
-        {
-          id: crypto.randomUUID(),
-          point: { x: 0, y: 0 },
-          data: { text: `random` },
-        },
-        {
-          id: crypto.randomUUID(),
-          point: { x: 300, y: 300 },
-          data: { text: `random` },
-        },
-      ]),
-    ];
   }
 }

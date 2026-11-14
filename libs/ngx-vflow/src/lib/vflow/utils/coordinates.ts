@@ -1,8 +1,7 @@
-import { Node } from '../interfaces/node.interface';
 import { Point } from '../interfaces/point.interface';
 import { ViewportState } from '../interfaces/viewport.interface';
-import { getNodeFlowPosition } from './node-position';
 
+/** Internal: the flow converts with `VflowComponent.clientToFlowPosition()` / `flowToClientPosition()`. */
 export interface ClientTransformOptions {
   /** Current flow translation and zoom. */
   viewport: ViewportState;
@@ -28,26 +27,6 @@ export function flowToClientPosition(point: Point, { viewport, containerPosition
     x: containerPosition.x + viewport.x + point.x * viewport.zoom,
     y: containerPosition.y + viewport.y + point.y * viewport.zoom,
   };
-}
-
-/** Converts a position relative to `spaceNodeId` into flow space. */
-export function nodeSpaceToFlowPosition(
-  point: Point,
-  spaceNodeId: string,
-  nodeLookup: ReadonlyMap<string, Node>,
-): Point | undefined {
-  const origin = getNodeFlowPosition(spaceNodeId, nodeLookup);
-  return origin ? { x: origin.x + point.x, y: origin.y + point.y } : undefined;
-}
-
-/** Converts a flow-space position into coordinates relative to `spaceNodeId`. */
-export function flowToNodeSpacePosition(
-  point: Point,
-  spaceNodeId: string,
-  nodeLookup: ReadonlyMap<string, Node>,
-): Point | undefined {
-  const origin = getNodeFlowPosition(spaceNodeId, nodeLookup);
-  return origin ? { x: point.x - origin.x, y: point.y - origin.y } : undefined;
 }
 
 function validateZoom(zoom: number): void {

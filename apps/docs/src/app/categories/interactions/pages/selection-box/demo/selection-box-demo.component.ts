@@ -1,6 +1,6 @@
-import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { DocsPresentations } from '@docs/shared';
-import { Edge, Node, SelectionBoxMode, SelectionBoxSettings, Vflow, createNodes } from 'ngx-vflow';
+import { Edge, Node, SelectionBoxMode, Vflow, createNodes } from 'ngx-vflow';
 
 @Component({
   template: `
@@ -10,7 +10,7 @@ import { Edge, Node, SelectionBoxMode, SelectionBoxSettings, Vflow, createNodes 
       <span class="hint">Hold Shift and drag on canvas</span>
     </div>
 
-    <vflow [nodes]="nodes" [edges]="edges" [selectionBox]="selectionBox()">
+    <vflow [nodes]="nodes" [edges]="edges" [selectionBoxMode]="mode()">
       <docs-node *vNode="let ctx" [ctx]="ctx" />
       <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
     </vflow>
@@ -56,11 +56,6 @@ import { Edge, Node, SelectionBoxMode, SelectionBoxSettings, Vflow, createNodes 
 })
 export class SelectionBoxDemoComponent {
   public mode = signal<SelectionBoxMode>('full');
-
-  public selectionBox = computed<SelectionBoxSettings>(() => ({
-    mode: this.mode(),
-    color: '#ff8a65',
-  }));
 
   public setMode(mode: SelectionBoxMode) {
     this.mode.set(mode);

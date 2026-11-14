@@ -1,15 +1,16 @@
 import { AlignmentHelperSettings } from './alignment-helper-settings.interface';
 import { AutoPanSettings } from './auto-pan-settings.interface';
 import { ConnectionSettings } from './connection-settings.interface';
-import { DEFAULT_OPTIMIZATION, Optimization } from './optimization.interface';
-import { DEFAULT_SELECTION_BOX, SelectionBoxSettings } from './selection-box-settings.interface';
 import { Background } from '../types/background.type';
+import { LazyLoadTrigger } from '../types/lazy-load-trigger.type';
+import { SelectionBoxMode } from '../types/selection-box-mode.type';
 import { SelectionMode } from '../types/selection-mode.type';
 
 /**
- * The settings of a flow, named and typed as the inputs of `vflow`; `view`, the size of one flow, stays an input only. A value bound to an input wins over one given
- * with `withSettings()`, which wins over the default in {@link VFLOW_SETTINGS_DEFAULTS}; an object setting merges
- * its keys through those three layers.
+ * The settings of a flow, named and typed as the inputs of `vflow` (the size of a flow is its CSS, not a setting).
+ * A value bound to an input wins over one given with `withSettings()`, which wins over the default in
+ * {@link VFLOW_SETTINGS_DEFAULTS}; the object setting `connection` and the object form of `autoPan` and
+ * `alignmentHelper` merge their keys through those three layers.
  */
 export interface VflowSettings {
   /** @see {VflowComponent.minZoom} */
@@ -34,8 +35,10 @@ export interface VflowSettings {
   connectionDragThreshold: number;
   /** @see {VflowComponent.background} */
   background: Background | null;
-  /** @see {VflowComponent.optimization} */
-  optimization: Optimization;
+  /** @see {VflowComponent.virtualization} */
+  virtualization: boolean;
+  /** @see {VflowComponent.lazyLoadTrigger} */
+  lazyLoadTrigger: LazyLoadTrigger;
   /** @see {VflowComponent.parentsBelowEdges} */
   parentsBelowEdges: boolean;
   /** @see {VflowComponent.nodesSelectable} */
@@ -48,8 +51,8 @@ export interface VflowSettings {
   edgesFocusable: boolean;
   /** @see {VflowComponent.selectionMode} */
   selectionMode: SelectionMode;
-  /** @see {VflowComponent.selectionBox} */
-  selectionBox: SelectionBoxSettings;
+  /** @see {VflowComponent.selectionBoxMode} */
+  selectionBoxMode: SelectionBoxMode;
   /** @see {VflowComponent.connection} */
   connection: ConnectionSettings;
   /** @see {VflowComponent.snapGrid} */
@@ -79,14 +82,15 @@ export const VFLOW_SETTINGS_DEFAULTS: Readonly<VflowSettings> = {
   nodeDragThreshold: 0,
   connectionDragThreshold: 0,
   background: null,
-  optimization: DEFAULT_OPTIMIZATION,
+  virtualization: false,
+  lazyLoadTrigger: 'immediate',
   parentsBelowEdges: false,
   nodesSelectable: true,
   edgesSelectable: true,
   nodesFocusable: true,
   edgesFocusable: true,
   selectionMode: 'default',
-  selectionBox: DEFAULT_SELECTION_BOX,
+  selectionBoxMode: 'full',
   connection: {},
   snapGrid: [1, 1],
   elevateNodesOnSelect: true,

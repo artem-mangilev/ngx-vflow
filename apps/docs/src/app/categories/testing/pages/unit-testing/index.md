@@ -49,7 +49,7 @@ Query the elements of your own presentations, such as `.step` above. The element
 | Node, edge and edge label presentations, their context and data                    | Yes                 | Yes     |
 | Reaction to changes of `nodes`, `edges` and their signals                          | Yes                 | Yes     |
 | Outputs: selection by click, connections by pointer events, `(componentNodeEvent)` | Yes                 | Yes     |
-| `setViewport()`, `zoomTo()`, `zoomIn()`, `zoomOut()`, `getNode()`                  | Yes                 | Yes     |
+| `setViewport()`, `zoomTo()`, `zoomIn()`, `zoomOut()`                               | Yes                 | Yes     |
 | `(initialized)`, `fitView()`, `getNodeRect()`, `getNodesBounds()`                  | No                  | Yes     |
 | Node sizes, handle positions, `getNodesAtPoint()`, `getIntersectingNodes()`        | No                  | Yes     |
 

@@ -1,21 +1,13 @@
 import { Signal, computed } from '@angular/core';
 import { VFLOW_SETTINGS_DEFAULTS, VflowSettings } from '../../interfaces/vflow-settings.interface';
-import { DEFAULT_OPTIMIZATION, Optimization } from '../../interfaces/optimization.interface';
-import { DEFAULT_SELECTION_BOX, SelectionBoxSettings } from '../../interfaces/selection-box-settings.interface';
 import { suppliedEntries, withDefaults } from '../../utils/with-defaults';
 
 /** The inputs of the flow that are settings: `undefined` while an input is not bound. */
 export type SettingInputs = { readonly [K in keyof VflowSettings]: Signal<VflowSettings[K] | undefined> };
 
-/** The settings in effect, as the services read them: every object setting is complete. */
-export type ResolvedVflowSettings = Omit<VflowSettings, 'optimization' | 'selectionBox'> & {
-  optimization: Required<Optimization>;
-  selectionBox: Required<SelectionBoxSettings>;
-};
-
-/** One signal per setting in effect. */
+/** One signal per setting in effect, as `VflowComponent.settings` exposes them. */
 export type ResolvedVflowSettingSignals = {
-  readonly [K in keyof ResolvedVflowSettings]: Signal<ResolvedVflowSettings[K]>;
+  readonly [K in keyof VflowSettings]: Signal<VflowSettings[K]>;
 };
 
 /** A distance in CSS pixels: negative and non-finite values read as 0. */
@@ -51,11 +43,8 @@ export function resolveSettings(
     return computed(() => nonNegative(value()));
   };
 
-  const merged = <K extends 'optimization' | 'selectionBox' | 'connection', T extends object>(
-    key: K,
-    defaults: T,
-  ): Signal<T> =>
-    computed(() => withDefaults(withDefaults(defaults, providedValue(key) as Partial<T>), inputs[key]() as Partial<T>));
+  const merged = <K extends 'connection'>(key: K): Signal<VflowSettings[K]> =>
+    computed(() => withDefaults(withDefaults(VFLOW_SETTINGS_DEFAULTS[key], providedValue(key)), inputs[key]()));
 
   const booleanOrObject = <K extends 'autoPan' | 'alignmentHelper'>(key: K): Signal<VflowSettings[K]> =>
     computed(() => layerBooleanOrObject(VFLOW_SETTINGS_DEFAULTS[key], [providedValue(key), inputs[key]()]));
@@ -72,15 +61,16 @@ export function resolveSettings(
     nodeDragThreshold: distance('nodeDragThreshold'),
     connectionDragThreshold: distance('connectionDragThreshold'),
     background: scalar('background'),
-    optimization: merged('optimization', DEFAULT_OPTIMIZATION),
+    virtualization: scalar('virtualization'),
+    lazyLoadTrigger: scalar('lazyLoadTrigger'),
     parentsBelowEdges: scalar('parentsBelowEdges'),
     nodesSelectable: scalar('nodesSelectable'),
     edgesSelectable: scalar('edgesSelectable'),
     nodesFocusable: scalar('nodesFocusable'),
     edgesFocusable: scalar('edgesFocusable'),
     selectionMode: scalar('selectionMode'),
-    selectionBox: merged('selectionBox', DEFAULT_SELECTION_BOX),
-    connection: merged('connection', {}),
+    selectionBoxMode: scalar('selectionBoxMode'),
+    connection: merged('connection'),
     snapGrid: scalar('snapGrid'),
     elevateNodesOnSelect: scalar('elevateNodesOnSelect'),
     elevateEdgesOnSelect: scalar('elevateEdgesOnSelect'),

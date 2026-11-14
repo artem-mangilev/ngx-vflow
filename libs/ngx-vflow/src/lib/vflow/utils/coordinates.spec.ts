@@ -1,19 +1,4 @@
-import { signal } from '@angular/core';
-import { Node } from '../interfaces/node.interface';
-import {
-  clientToFlowPosition,
-  flowToClientPosition,
-  flowToNodeSpacePosition,
-  nodeSpaceToFlowPosition,
-} from './coordinates';
-
-function node(id: string, x: number, y: number, parentId?: string): Node {
-  return {
-    id,
-    point: signal({ x, y }),
-    parentId: signal(parentId ?? null),
-  };
-}
+import { clientToFlowPosition, flowToClientPosition } from './coordinates';
 
 describe('coordinate utilities', () => {
   it('round-trips client and flow positions with translation and non-unit zoom', () => {
@@ -30,38 +15,5 @@ describe('coordinate utilities', () => {
     expect(() => clientToFlowPosition(client, { ...options, viewport: { x: 0, y: 0, zoom: 0 } })).toThrowError(
       RangeError,
     );
-  });
-
-  it('converts positions through nested node spaces', () => {
-    const lookup = new Map([
-      ['parent', node('parent', 100, 50)],
-      ['child', node('child', 20, 30, 'parent')],
-    ]);
-
-    expect(nodeSpaceToFlowPosition({ x: 10, y: 5 }, 'child', lookup)).toEqual({ x: 130, y: 85 });
-    expect(flowToNodeSpacePosition({ x: 150, y: 100 }, 'child', lookup)).toEqual({ x: 30, y: 20 });
-    expect(nodeSpaceToFlowPosition({ x: 0, y: 0 }, 'missing', lookup)).toBeUndefined();
-  });
-
-  it('composes the conversions into a node position in another node space', () => {
-    const lookup = new Map(
-      [node('parent', 100, 50), node('child', 20, 30, 'parent'), node('target', 40, 10)].map((n) => [n.id, n]),
-    );
-    const childInFlow = nodeSpaceToFlowPosition({ x: 0, y: 0 }, 'child', lookup)!;
-
-    expect(childInFlow).toEqual({ x: 120, y: 80 });
-    expect(flowToNodeSpacePosition(childInFlow, 'target', lookup)).toEqual({ x: 80, y: 70 });
-    expect(flowToNodeSpacePosition(childInFlow, 'missing', lookup)).toBeUndefined();
-  });
-
-  it('treats a missing ancestor as a root and rejects cyclic ancestry', () => {
-    const orphanLookup = new Map([['orphan', node('orphan', 5, 6, 'missing')]]);
-    const cycleLookup = new Map([
-      ['a', node('a', 1, 2, 'b')],
-      ['b', node('b', 3, 4, 'a')],
-    ]);
-
-    expect(nodeSpaceToFlowPosition({ x: 1, y: 1 }, 'orphan', orphanLookup)).toEqual({ x: 6, y: 7 });
-    expect(nodeSpaceToFlowPosition({ x: 0, y: 0 }, 'a', cycleLookup)).toBeUndefined();
   });
 });

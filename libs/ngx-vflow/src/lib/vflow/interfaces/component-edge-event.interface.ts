@@ -2,13 +2,11 @@ import { Type } from '@angular/core';
 import { ComponentOutputEvent } from './component-node-event.interface';
 
 /**
- * Event of a component edge, narrowed to the outputs of the given component classes: `eventName` is the property
- * name of one of their outputs and `eventPayload` its type. {@link isComponentEdgeEvent} narrows an
+ * Event of a component edge, narrowed to the outputs of the component class `C`: `eventName` is the property name of
+ * one of its outputs and `eventPayload` its type. {@link isComponentEdgeEvent} narrows an
  * {@link AnyComponentEdgeEvent} to it.
  */
-export type ComponentEdgeEvent<T extends object[]> = { edgeId: string } & {
-  [I in keyof T]: ComponentOutputEvent<T[I]>;
-}[number];
+export type ComponentEdgeEvent<C extends object> = { edgeId: string } & ComponentOutputEvent<C>;
 
 /** Payload of `(componentEdgeEvent)`: an output of a component edge, before narrowing. */
 export interface AnyComponentEdgeEvent {
@@ -24,6 +22,6 @@ export interface AnyComponentEdgeEvent {
 export function isComponentEdgeEvent<C extends object>(
   event: AnyComponentEdgeEvent,
   component: Type<C>,
-): event is ComponentEdgeEvent<[C]> {
+): event is ComponentEdgeEvent<C> {
   return event.component === component;
 }

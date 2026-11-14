@@ -60,6 +60,6 @@ elements, the same way as an edge template; see `*FeaturesEdgeLabels`. A label r
 flow, outside the component host, so host listeners and `:host(:hover)` do not see it. Put listeners on the label
 element itself; the demo below emits the same output from a click on the line and on the label.
 
-Outputs of an edge component reach the `componentEdgeEvent` output of `vflow` with the edge id, the component class, the property name of the output and its payload. `isComponentEdgeEvent(event, Cmp)` narrows an event to the outputs of one edge component class, as `ComponentEdgeEvent<[Cmp]>`.
+Outputs of an edge component reach the `componentEdgeEvent` output of `vflow` with the edge id, the component class, the property name of the output and its payload. `isComponentEdgeEvent(event, Cmp)` narrows an event to the outputs of one edge component class, as `ComponentEdgeEvent<Cmp>`.
 
 {{ NgDocActions.demoPane("ComponentEdgesDemoComponent") }}

@@ -3,13 +3,7 @@ import { FlowEntitiesService, hasEndpoints } from './flow-entities.service';
 import { Observable, merge } from 'rxjs';
 import { distinctUntilChanged, filter, map, pairwise, share, skip, switchMap } from 'rxjs/operators';
 import { toObservable } from '@angular/core/rxjs-interop';
-import {
-  EdgeAddChange,
-  EdgeChange,
-  EdgeDetachedChange,
-  EdgeRemoveChange,
-  EdgeSelectedChange,
-} from '../types/edge-change.type';
+import { EdgeChange, EdgeDetachedChange, EdgeSelectedChange } from '../types/edge-change.type';
 import { batchChanges } from '../utils/batch-changes';
 
 @Injectable()
@@ -31,24 +25,6 @@ export class EdgeChangesService {
     map((edges) => edges.map(({ edge }) => ({ type: 'detached', id: edge.id }))),
   );
 
-  protected edgeAddChange$: Observable<EdgeAddChange[]> = toObservable(this.entitiesService.edges).pipe(
-    pairwise(),
-    map(([oldList, newList]) => {
-      return newList.filter((edge) => !oldList.includes(edge));
-    }),
-    filter((edges) => !!edges.length),
-    map((edges) => edges.map(({ edge }) => ({ type: 'add', id: edge.id }))),
-  );
-
-  protected edgeRemoveChange$: Observable<EdgeRemoveChange[]> = toObservable(this.entitiesService.edges).pipe(
-    pairwise(),
-    map(([oldList, newList]) => {
-      return oldList.filter((edge) => !newList.includes(edge));
-    }),
-    filter((edges) => !!edges.length),
-    map((edges) => edges.map(({ edge }) => ({ type: 'remove', id: edge.id }))),
-  );
-
   protected edgeSelectChange$: Observable<EdgeSelectedChange[]> = toObservable(this.entitiesService.edges).pipe(
     switchMap((edges) =>
       merge(
@@ -66,18 +42,11 @@ export class EdgeChangesService {
 
   /** Every change of one tick as a single array. */
   public readonly changes$: Observable<EdgeChange[]> = this.deliver(
-    merge<EdgeChange[][]>(
-      this.edgeDetachedChange$,
-      this.edgeAddChange$,
-      this.edgeRemoveChange$,
-      this.edgeSelectChange$,
-    ),
+    merge<EdgeChange[][]>(this.edgeDetachedChange$, this.edgeSelectChange$),
   );
 
   private readonly changesByType: { [T in EdgeChange['type']]: Observable<Extract<EdgeChange, { type: T }>[]> } = {
     detached: this.deliver(this.edgeDetachedChange$),
-    add: this.deliver(this.edgeAddChange$),
-    remove: this.deliver(this.edgeRemoveChange$),
     select: this.deliver(this.edgeSelectChange$),
   };
 

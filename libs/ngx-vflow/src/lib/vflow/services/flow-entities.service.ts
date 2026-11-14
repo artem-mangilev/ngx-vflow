@@ -94,9 +94,8 @@ export class FlowEntitiesService {
     return this.nodeByIdMap().get(id);
   }
 
-  public getDetachedEdges(): EdgeModel[] {
-    return this.edges().filter((e) => e.detached());
-  }
+  /** The edges that lost a node or a handle, see `EdgeModel.detached`. */
+  public readonly detachedEdges = computed(() => this.edges().filter((edge) => edge.detached()));
 }
 
 /** Whether both endpoint nodes of the edge are among `nodes`. */

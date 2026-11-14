@@ -129,7 +129,7 @@ export interface AnyComponentNodeEvent {
 }
 ```
 
-`isComponentNodeEvent(event, Cmp)` checks the component class and narrows the event to `ComponentNodeEvent<[Cmp]>`: the
+`isComponentNodeEvent(event, Cmp)` checks the component class and narrows the event to `ComponentNodeEvent<Cmp>`: the
 union of the outputs of that class, where `eventName` is one of their names and `eventPayload` has its type.
 
 ```ts

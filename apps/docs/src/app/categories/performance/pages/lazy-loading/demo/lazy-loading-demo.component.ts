@@ -6,11 +6,7 @@ import { Edge, Node, Vflow, VflowComponent, createNodes } from 'ngx-vflow';
   template: `
     <button (click)="nextNode()">Go To Next Node</button>
 
-    <vflow
-      [nodes]="nodes"
-      [edges]="edges"
-      [optimization]="{ lazyLoadTrigger: 'viewport' }"
-      (initialized)="ready.set(true)">
+    <vflow lazyLoadTrigger="viewport" [nodes]="nodes" [edges]="edges" (initialized)="ready.set(true)">
       <docs-node *vNode="let ctx" [ctx]="ctx" />
       <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
     </vflow>

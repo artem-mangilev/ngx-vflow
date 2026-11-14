@@ -2,15 +2,8 @@ import { Injectable, inject } from '@angular/core';
 import { FlowEntitiesService } from './flow-entities.service';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { Observable, merge } from 'rxjs';
-import { distinctUntilChanged, filter, map, pairwise, share, skip, switchMap } from 'rxjs/operators';
-import {
-  NodeAddChange,
-  NodeChange,
-  NodePositionChange,
-  NodeRemoveChange,
-  NodeSelectedChange,
-  NodeSizeChange,
-} from '../types/node-change.type';
+import { distinctUntilChanged, map, share, skip, switchMap } from 'rxjs/operators';
+import { NodeChange, NodePositionChange, NodeSelectedChange, NodeSizeChange } from '../types/node-change.type';
 import { batchChanges } from '../utils/batch-changes';
 
 // this delay fixes the cases when change triggered
@@ -51,20 +44,6 @@ export class NodesChangeService {
     ]),
   );
 
-  protected nodeAddChange$: Observable<NodeAddChange[]> = toObservable(this.entitiesService.nodes).pipe(
-    pairwise(),
-    map(([oldList, newList]) => newList.filter((node) => !oldList.includes(node))),
-    filter((nodes) => !!nodes.length),
-    map((nodes) => nodes.map((node) => ({ type: 'add', id: node.rawNode.id }))),
-  );
-
-  protected nodeRemoveChange$: Observable<NodeRemoveChange[]> = toObservable(this.entitiesService.nodes).pipe(
-    pairwise(),
-    map(([oldList, newList]) => oldList.filter((node) => !newList.includes(node))),
-    filter((nodes) => !!nodes.length),
-    map((nodes) => nodes.map((node) => ({ type: 'remove', id: node.rawNode.id }))),
-  );
-
   protected nodeSelectedChange$: Observable<NodeSelectedChange[]> = toObservable(this.entitiesService.nodes).pipe(
     switchMap((nodes) =>
       merge(
@@ -82,35 +61,23 @@ export class NodesChangeService {
 
   /** Every change of one tick as a single array. */
   public readonly changes$: Observable<NodeChange[]> = this.deliver(
-    merge<NodeChange[][]>(
-      this.nodesPositionChange$,
-      this.nodeSizeChange$,
-      this.nodeAddChange$,
-      this.nodeRemoveChange$,
-      this.nodeSelectedChange$,
-    ),
+    merge<NodeChange[][]>(this.nodesPositionChange$, this.nodeSizeChange$, this.nodeSelectedChange$),
   );
 
   private readonly changesByType: { [T in NodeChange['type']]: Observable<Extract<NodeChange, { type: T }>[]> } = {
     position: this.deliver(this.nodesPositionChange$),
     size: this.deliver(this.nodeSizeChange$),
-    add: this.deliver(this.nodeAddChange$),
-    remove: this.deliver(this.nodeRemoveChange$),
     select: this.deliver(this.nodeSelectedChange$),
   };
 
-  /**
-   * The changes of one type, one array per tick. It observes only what this type needs: `add` and `remove` create
-   * no per-node observables.
-   */
+  /** The changes of one type, one array per tick. It observes only what this type needs. */
   public changesOfType<T extends NodeChange['type']>(type: T): Observable<Extract<NodeChange, { type: T }>[]> {
     return this.changesByType[type];
   }
 
   private deliver<T>(changes$: Observable<T[]>): Observable<T[]> {
     return changes$.pipe(
-      // the delay fixes a bug when on fire node event change,
-      // you can't get valid list of detached edges
+      // The delay lets the flow finish rendering the change before the application hears of it.
       batchChanges(DELAY_FOR_SCHEDULER),
       share(),
     );

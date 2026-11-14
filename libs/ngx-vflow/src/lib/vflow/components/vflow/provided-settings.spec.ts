@@ -8,7 +8,7 @@ import { FlowEntitiesService } from '../../services/flow-entities.service';
 import { provideVflow } from '../../features/feature';
 import { withSettings } from '../../features/with-settings';
 import { VFLOW_SETTINGS_DEFAULTS, VflowSettings } from '../../interfaces/vflow-settings.interface';
-import { Optimization } from '../../interfaces/optimization.interface';
+import { ConnectionSettings } from '../../interfaces/connection-settings.interface';
 import { AutoPanSettings } from '../../interfaces/auto-pan-settings.interface';
 
 @Injectable({ providedIn: 'root' })
@@ -19,13 +19,13 @@ class Preferences {
 @Component({
   imports: [Vflow],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `<vflow [nodes]="[]" [minZoom]="minZoom()" [optimization]="optimization()" [autoPan]="autoPan()">
+  template: `<vflow [nodes]="[]" [minZoom]="minZoom()" [connection]="connection()" [autoPan]="autoPan()">
     <div *vNode></div>
   </vflow>`,
 })
 class HostComponent {
   public readonly minZoom = input<number>();
-  public readonly optimization = input<Optimization>();
+  public readonly connection = input<ConnectionSettings>();
   public readonly autoPan = input<boolean | AutoPanSettings>();
 }
 
@@ -55,7 +55,9 @@ describe('settings of vflow through withSettings', () => {
     render();
 
     expect(settings.minZoom()).toBe(VFLOW_SETTINGS_DEFAULTS.minZoom);
-    expect(settings.optimization()).toEqual({ virtualization: false, lazyLoadTrigger: 'immediate' });
+    expect(settings.virtualization()).toBe(false);
+    expect(settings.lazyLoadTrigger()).toBe('immediate');
+    expect(settings.selectionBoxMode()).toBe('full');
     expect(settings.autoPan()).toBe(true);
     expect(settings.paneClickDistance()).toBe(6);
   });
@@ -89,13 +91,13 @@ describe('settings of vflow through withSettings', () => {
   });
 
   it('merges an object setting through the defaults, the provider and the input', () => {
-    render(provideVflow(withSettings({ optimization: { virtualization: true } })));
-    expect(settings.optimization()).toEqual({ virtualization: true, lazyLoadTrigger: 'immediate' });
+    render(provideVflow(withSettings({ connection: { allowSelfConnections: true } })));
+    expect(entities.connectionSettings()).toEqual({ allowSelfConnections: true });
 
-    bind('optimization', { lazyLoadTrigger: 'viewport' });
-    expect(settings.optimization()).toEqual({ virtualization: true, lazyLoadTrigger: 'viewport' });
-    bind('optimization', { virtualization: false });
-    expect(settings.optimization()).toEqual({ virtualization: false, lazyLoadTrigger: 'immediate' });
+    bind('connection', { allowDuplicateConnections: true });
+    expect(entities.connectionSettings()).toEqual({ allowSelfConnections: true, allowDuplicateConnections: true });
+    bind('connection', { allowSelfConnections: false });
+    expect(entities.connectionSettings()).toEqual({ allowSelfConnections: false });
   });
 
   it('merges objects of a boolean-or-object setting and lets a boolean replace them', () => {
