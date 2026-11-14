@@ -20,7 +20,7 @@ export interface VuiControlsLabels {
   hostDirectives: [VuiToolbar],
   host: {
     class: `vui-controls
-      [&>button]:inline-flex [&>button]:box-border [&>button]:items-center [&>button]:justify-center [&>button]:size-vui-7
+      [&>button]:inline-flex [&>button]:items-center [&>button]:justify-center [&>button]:size-vui-7
       [&>button]:rounded-vui-control [&>button]:border-0 [&>button]:bg-transparent [&>button]:text-vui-muted
       [&>button]:cursor-pointer [&>button]:transition-colors
       [&>button:enabled:hover]:bg-vui-surface-muted [&>button:enabled:hover]:text-vui-foreground

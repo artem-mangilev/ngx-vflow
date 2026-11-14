@@ -136,6 +136,23 @@ const TYPES = ['uuid', 'text', 'decimal', 'timestamp'];
       background: linear-gradient(to bottom, transparent, var(--vui-surface));
       pointer-events: none;
     }
+    /* Free ports show on interaction, connected ones always: an idle port without an edge is invisible, though still
+       a target, until its table is hovered, focused or selected. The table host is an element of core, so its state
+       is read from the port itself. */
+    .vui-port {
+      transition-property: border-color, background-color, box-shadow, opacity;
+    }
+    .vui-port[data-v-handle-state='idle']:not([data-vui-connected='true']) {
+      opacity: 0;
+    }
+    .vui-port:is([data-v-node]:hover *, [data-v-node]:focus-within *, [data-v-selected] *, [data-v-preselected] *) {
+      opacity: 1;
+    }
+    @media (forced-colors: active) {
+      .vui-port[data-v-handle-state='idle']:not([data-vui-connected='true']) {
+        opacity: 1;
+      }
+    }
     /* Proxy handles share one point per border; their connected ports are visually merged. */
     .proxy .vui-port[data-vui-connected='true'] {
       opacity: 0.6;
@@ -181,14 +198,12 @@ const TYPES = ['uuid', 'text', 'decimal', 'timestamp'];
                 <!-- Free ports show on interaction; connected ones always do. -->
                 <span
                   vuiPort
-                  vuiPortReveal="interaction"
                   handleType="target"
                   position="left"
                   [handleId]="'in:' + field.id"
                   [vuiPortConnected]="connected().has(ctx.node.id + '/in:' + field.id)"></span>
                 <span
                   vuiPort
-                  vuiPortReveal="interaction"
                   handleType="source"
                   position="right"
                   [handleId]="'out:' + field.id"

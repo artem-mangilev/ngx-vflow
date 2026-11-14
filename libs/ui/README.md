@@ -10,13 +10,12 @@ component. They style your own HTML/SVG without adding wrappers; `vuiPort` is it
 <section data-vui-theme="light">
   <article vuiNode>
     <header vuiNodeHeader>
-      <span vuiIcon aria-hidden="true">✓</span>
       <span vuiTitle>Review invoice</span>
     </header>
-    <div vuiNodeBody>Your content and controls</div>
+    <div class="p-vui-3">Your content and controls</div>
     <footer vuiNodeFooter>
       <span vuiMeta>Waiting for approval</span>
-      <span vuiActions><button type="button" vNoDrag>Approve</button></span>
+      <button type="button" class="ms-auto" vNoDrag>Approve</button>
     </footer>
   </article>
 </section>
@@ -34,14 +33,14 @@ cascade layers; unlayered application styles override them.
 
 ## Parts
 
-| Area       | Parts                                                                                                      |
-| ---------- | ---------------------------------------------------------------------------------------------------------- |
-| Shells     | `vuiNode` with `vuiNodeHeader`, `vuiNodeBody`, `vuiNodeFooter`; `vuiRow`; `vuiGroup` with `vuiGroupHeader` |
-| Text roles | `vuiTitle`, `vuiMeta`, `vuiIcon`, `vuiActions`                                                             |
-| Port       | `vuiPort`: a core handle with the port look                                                                |
-| Edge       | `vuiEdge` on the SVG path, `vuiEdgeLabel` for HTML labels                                                  |
-| Overlay    | `vuiToolbar`                                                                                               |
-| Viewport   | `<vui-controls [flow]="flow">`: zoom in/out, fit view and your own buttons for one flow                    |
+| Area       | Parts                                                                                       |
+| ---------- | ------------------------------------------------------------------------------------------- |
+| Shells     | `vuiNode` with `vuiNodeHeader`, `vuiNodeFooter`; `vuiRow`; `vuiGroup` with `vuiGroupHeader` |
+| Text roles | `vuiTitle`, `vuiMeta`                                                                       |
+| Port       | `vuiPort`: a core handle with the port look                                                 |
+| Edge       | `vuiEdge` on the SVG path, `vuiEdgeLabel` for HTML labels                                   |
+| Overlay    | `vuiToolbar`                                                                                |
+| Viewport   | `<vui-controls [flow]="flow">`: zoom in/out, fit view and your own buttons for one flow     |
 
 Buttons and badges come from your design system, as React Flow UI takes them from shadcn/ui; `vui-controls` gives
 its projected buttons the look of its own.

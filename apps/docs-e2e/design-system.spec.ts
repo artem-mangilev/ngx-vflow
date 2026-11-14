@@ -538,11 +538,11 @@ test('relationships map: floating edges, people moving into free spots, connecti
   await expect.poll(async () => (await chi.boundingBox())!.x).toBeCloseTo(chiBefore.x, 0);
 
   // Dragging from the body of one card to another connects the two people.
-  await dragTo(page, chi.locator('.vui-node-body'), await center(person('Eli Park').locator('.vui-node-body')));
+  await dragTo(page, chi.locator('.node-body'), await center(person('Eli Park').locator('.node-body')));
   await expect(demo.locator('path.vui-edge')).toHaveCount(7);
   await expect(demo.locator('.v-edge-labels-layer .vui-edge-label').last()).toHaveText('reviews');
   // People connect once: a second connection between Ana and Chi is refused.
-  await dragTo(page, chi.locator('.vui-node-body'), await center(person('Ana Lima').locator('.vui-node-body')));
+  await dragTo(page, chi.locator('.node-body'), await center(person('Ana Lima').locator('.node-body')));
   await expect(demo.locator('path.vui-edge')).toHaveCount(7);
   // Delete removes a selected connection.
   const middle = await demo.evaluate((root) => {

@@ -51,6 +51,23 @@ interface LongEntity {
       min-height: 20px;
       padding-block: 4px;
     }
+    /* Free ports show on interaction, connected ones always: an idle port without an edge is invisible, though still
+       a target, until its table is hovered, focused or selected. The table host is an element of core, so its state
+       is read from the port itself. */
+    .vui-port {
+      transition-property: border-color, background-color, box-shadow, opacity;
+    }
+    .vui-port[data-v-handle-state='idle']:not([data-vui-connected='true']) {
+      opacity: 0;
+    }
+    .vui-port:is([data-v-node]:hover *, [data-v-node]:focus-within *, [data-v-selected] *, [data-v-preselected] *) {
+      opacity: 1;
+    }
+    @media (forced-colors: active) {
+      .vui-port[data-v-handle-state='idle']:not([data-vui-connected='true']) {
+        opacity: 1;
+      }
+    }
     /* Proxy handles share one point per border; their connected ports are visually merged. */
     .proxy .vui-port[data-vui-connected='true'] {
       opacity: 0.6;
@@ -81,7 +98,6 @@ interface LongEntity {
               ) {
                 <span
                   vuiPort
-                  vuiPortReveal="interaction"
                   handleType="target"
                   position="left"
                   [handleId]="'in:' + field.id"
@@ -89,7 +105,6 @@ interface LongEntity {
                   [canStart]="false"></span>
                 <span
                   vuiPort
-                  vuiPortReveal="interaction"
                   handleType="source"
                   position="right"
                   [handleId]="'out:' + field.id"
@@ -106,7 +121,6 @@ interface LongEntity {
                     @if (row.handles) {
                       <span
                         vuiPort
-                        vuiPortReveal="interaction"
                         handleType="target"
                         position="left"
                         [handleId]="'in:' + row.field.id"
@@ -114,7 +128,6 @@ interface LongEntity {
                         [canStart]="false"></span>
                       <span
                         vuiPort
-                        vuiPortReveal="interaction"
                         handleType="source"
                         position="right"
                         [handleId]="'out:' + row.field.id"
@@ -130,7 +143,6 @@ interface LongEntity {
                   @for (field of scroll.hidden(ctx.data().fields, view.below); track field.id) {
                     <span
                       vuiPort
-                      vuiPortReveal="interaction"
                       handleType="target"
                       position="left"
                       [handleId]="'in:' + field.id"
@@ -138,7 +150,6 @@ interface LongEntity {
                       [canStart]="false"></span>
                     <span
                       vuiPort
-                      vuiPortReveal="interaction"
                       handleType="source"
                       position="right"
                       [handleId]="'out:' + field.id"

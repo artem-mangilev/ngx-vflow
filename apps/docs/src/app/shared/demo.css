@@ -50,6 +50,31 @@
   z-index: 2;
 }
 
+/* Layout inside a node is the application's, in its own classes: with Tailwind these would be utilities. */
+.demo .node-body {
+  padding: calc(var(--vui-space) * 3);
+}
+.demo .node-actions {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: calc(var(--vui-space) * 2);
+  margin-inline-start: auto;
+}
+/* A leading icon or avatar in a header, whose items share the baseline of the title. A zero-width strut gives the
+   slot the baseline of a line centered on it, so the picture is centered on the first line of the title. */
+.demo .node-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  min-width: calc(var(--vui-space) * 4);
+  min-height: 1lh;
+}
+.demo .node-icon::before {
+  content: '\200b';
+}
+
 /* The application's own button and badge, standing in for the components of your design system: the vflow UI parts
    ship neither. They read the theme colors, so they follow the light and dark scopes of a demo. */
 .demo {

@@ -109,7 +109,7 @@ export class TeamNodeComponent {
     .person header {
       cursor: grab;
     }
-    .person .vui-node-body {
+    .person .node-body {
       cursor: crosshair;
     }
     .person[data-v-handle-state='valid'] {
@@ -140,7 +140,7 @@ export class TeamNodeComponent {
     <article vuiNode vHandle handleType="any" position="auto" class="person">
       <header vuiNodeHeader vDragHandle>
         <!-- The slot centers the 28px avatar on the first line of the name. -->
-        <span vuiIcon>
+        <span class="node-icon">
           <svg class="avatar" viewBox="0 0 28 28" role="img" [attr.aria-label]="'Avatar of ' + person.name">
             <circle cx="14" cy="14" r="14" [attr.fill]="person.color" />
             <text x="14" y="18" text-anchor="middle" fill="#fff" font-size="11" font-weight="600">
@@ -150,7 +150,7 @@ export class TeamNodeComponent {
         </span>
         <span vuiTitle>{{ person.name }}</span>
       </header>
-      <div vuiNodeBody>
+      <div class="node-body">
         <p vuiMeta>{{ person.role }}, {{ person.reviews }} reviews this month</p>
         <div class="meter" role="img" [attr.aria-label]="person.reviews + ' of 20 reviews'">
           <span [style.width.%]="person.reviews * 5"></span>
@@ -196,7 +196,7 @@ export class PersonNodeComponent {
       <header vuiNodeHeader>
         <span vuiTitle>{{ metric.title }}</span>
       </header>
-      <div vuiNodeBody>
+      <div class="node-body">
         <div class="value">{{ metric.value }}</div>
         <p vuiMeta>{{ metric.delta }}</p>
         <div class="spark" role="img" aria-label="Weekly trend, rising">
@@ -234,7 +234,7 @@ export class MetricNodeComponent {
   `,
   template: `
     <article vuiNode class="note">
-      <div vuiNodeBody>{{ ctx.data().text }}</div>
+      <div class="node-body">{{ ctx.data().text }}</div>
     </article>
   `,
 })

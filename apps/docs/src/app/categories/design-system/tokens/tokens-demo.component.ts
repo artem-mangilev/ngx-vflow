@@ -121,7 +121,7 @@ import { Vui } from '@vflow/ui';
             <div class="row" style="align-items: flex-start">
               <article vuiNode>
                 <header vuiNodeHeader><span vuiTitle>Flat node</span></header>
-                <div vuiNodeBody><span vuiMeta>No blurred shadow on nodes</span></div>
+                <div class="node-body"><span vuiMeta>No blurred shadow on nodes</span></div>
               </article>
               <div vuiToolbar>Floating toolbar</div>
             </div>

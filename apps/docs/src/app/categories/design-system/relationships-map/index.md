@@ -22,4 +22,4 @@ to remove it. Head counts follow every move. Select a team to resize it; it cann
 - Moving between groups is application policy built on drag events: `extent` is lifted while a person is dragged, and on release the application picks the team with `getNodesAtPoint` and a free spot from `getNodeRect`, then writes `parentId` and the point.
 - `vResizable` on the group resizes it; children with `extent: 'parent'` (the default with a parent) set the smallest size.
 - A note is a `vuiNode` without a handle: canvas content that takes part in selection but not in the graph. A metric links to its team with a dashed edge.
-- Images and metrics are plain SVG and HTML inside `vuiNodeBody`; the library ships no chart or image component.
+- Images and metrics are plain SVG and HTML in the body of a node; the library ships no chart or image component.

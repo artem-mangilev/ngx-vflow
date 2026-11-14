@@ -166,7 +166,7 @@ const EXPORT = { width: 1200, height: 780 };
             @let data = ctx.data();
             <article vuiNode [attr.data-kind]="data.kind" [attr.data-stage]="ctx.node.id">
               <header vuiNodeHeader>
-                <span vuiIcon><app-demo-icon [name]="icon(data)" /></span>
+                <span class="node-icon"><app-demo-icon [name]="icon(data)" /></span>
                 <span vuiTitle>{{ title(data) }}</span>
                 @if (data.kind === 'source') {
                   <input #file type="file" accept="image/*" hidden (change)="upload(ctx.node.id, file)" />
@@ -180,7 +180,7 @@ const EXPORT = { width: 1200, height: 780 };
                   </button>
                 }
               </header>
-              <div vuiNodeBody>
+              <div class="node-body">
                 @if (data.kind === 'number') {
                   <div class="number">
                     <span class="big">{{ percent(data.value) }}</span>
@@ -285,7 +285,7 @@ const EXPORT = { width: 1200, height: 780 };
               @if (data.kind === 'output') {
                 <footer vuiNodeFooter>
                   <span vuiMeta>{{ exportSize.width }}×{{ exportSize.height }} PNG</span>
-                  <span vuiActions>
+                  <span class="node-actions">
                     <button
                       class="button primary small"
                       vNoDrag

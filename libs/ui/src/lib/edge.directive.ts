@@ -20,7 +20,7 @@ export class VuiEdge {}
   selector: '[vuiEdgeLabel]',
   host: {
     class: `vui-edge-label
-      inline-flex box-border items-center gap-vui-1 px-vui-2 py-vui-1 rounded-vui-control border border-vui-border
+      inline-flex items-center gap-vui-1 px-vui-2 py-vui-1 rounded-vui-control border border-vui-border
       bg-vui-surface text-vui-foreground text-xs`,
   },
 })

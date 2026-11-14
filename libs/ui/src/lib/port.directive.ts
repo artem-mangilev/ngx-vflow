@@ -29,9 +29,9 @@ import { VflowHandleDirective } from 'ngx-vflow';
   ],
   host: {
     class: `vui-port
-      relative block box-border size-vui-2 rounded-full border-[1.5px] [--vui-tone:var(--vui-accent)]
+      relative block size-vui-2 rounded-full border-[1.5px] [--vui-tone:var(--vui-accent)]
       [--vui-port-halo:0_0_0_1px_var(--vui-tone),0_0_0_4px_color-mix(in_oklab,var(--vui-tone)_28%,transparent)]
-      transition-[border-color,background-color,box-shadow,opacity]
+      transition-[border-color,background-color,box-shadow]
       before:absolute before:inset-0 before:rounded-full before:content-['']
       data-[v-handle-position=left]:before:-inset-y-vui-3 data-[v-handle-position=left]:before:-right-vui-2 data-[v-handle-position=left]:before:left-0
       data-[v-handle-position=right]:before:-inset-y-vui-3 data-[v-handle-position=right]:before:-left-vui-2 data-[v-handle-position=right]:before:right-0
@@ -43,18 +43,10 @@ import { VflowHandleDirective } from 'ngx-vflow';
       data-[v-handle-state=connecting]:border-vui-accent data-[v-handle-state=connecting]:bg-vui-accent data-[v-handle-state=connecting]:shadow-(--vui-port-halo)
       data-[v-handle-state=valid]:[--vui-tone:var(--vui-success)] data-[v-handle-state=valid]:border-vui-success data-[v-handle-state=valid]:bg-vui-success data-[v-handle-state=valid]:shadow-(--vui-port-halo)
       data-[v-handle-state=invalid]:[--vui-tone:var(--vui-danger)] data-[v-handle-state=invalid]:border-vui-danger data-[v-handle-state=invalid]:bg-vui-surface data-[v-handle-state=invalid]:shadow-(--vui-port-halo)
-      [&[data-vui-reveal=interaction][data-v-handle-state=idle]:not([data-vui-connected=true],[data-v-node]:hover_*,[data-v-node]:focus-within_*,[data-v-selected]_*,[data-v-preselected]_*)]:opacity-0
-      forced-colors:bg-[ButtonText] forced-colors:border-[Canvas] forced-colors:opacity-100 forced-colors:shadow-none forced-colors:[forced-color-adjust:none]`,
+      forced-colors:bg-[ButtonText] forced-colors:border-[Canvas] forced-colors:shadow-none forced-colors:[forced-color-adjust:none]`,
     '[attr.data-vui-connected]': 'vuiPortConnected()',
-    '[attr.data-vui-reveal]': 'vuiPortReveal()',
   },
 })
 export class VuiPort {
   readonly vuiPortConnected = input(false, { transform: booleanAttribute });
-  /**
-   * `always` shows every port. `interaction` keeps an idle port without edges invisible (still a target) until its node
-   * is hovered, focused or selected, which includes the node under the pointer while a connection is drawn; for
-   * diagrams that draw no connection points. Hover does not follow a finger, so prefer `always` where users connect by touch.
-   */
-  readonly vuiPortReveal = input<'always' | 'interaction'>('always');
 }

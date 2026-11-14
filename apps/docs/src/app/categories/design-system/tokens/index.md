@@ -40,9 +40,8 @@ on the group fill.
 | Elevation | nodes: hairline border and an unblurred shadow; toolbars and controls: translucent material                  |
 
 Headers align every item to the first line of the title: an icon, a meta label, a badge or a button stays beside it
-when the title wraps. The leading slot (`vuiIcon`) is at least four grid units wide and one line high and grows with
-its content; a zero-width text strut centered in it gives it a baseline, so an icon, an avatar or any other small view is
-centered on the first line of the title, whatever its size.
+when the title wraps. A picture has no baseline of its own: the demos wrap an icon or an avatar in a slot with a
+zero-width text strut centered in it, which centers the picture on the first line of the title, whatever its size.
 
 Text is your application's, as in React Flow UI: parts inherit its typeface, size, line height and letter spacing
 and use its Tailwind type utilities, `text-xs` for meta and edge labels and `font-semibold` for headers. Secondary text keeps the regular weight

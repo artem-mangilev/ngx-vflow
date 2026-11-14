@@ -55,17 +55,17 @@ type EdgeState = 'taken' | 'open' | 'skipped';
         <vflow [nodes]="nodes" [edges]="edges" [minZoom]="0.5" [maxZoom]="2" (initialized)="flow()?.fitView()">
           <article *vNode="let ctx" vuiNode [attr.data-step]="ctx.node.id">
             <header vuiNodeHeader>
-              <span vuiIcon><app-demo-icon [name]="ctx.data().icon" /></span>
+              <span class="node-icon"><app-demo-icon [name]="ctx.data().icon" /></span>
               <span vuiTitle>{{ ctx.data().title }}</span>
             </header>
-            <div vuiNodeBody>
+            <div class="node-body">
               <p class="description">{{ ctx.data().description }}</p>
             </div>
             <footer vuiNodeFooter>
               @let status = statusOf(ctx.node.id);
               <span class="badge" [attr.data-tone]="status.tone">{{ status.text }}</span>
               @if (ctx.node.id === 'review') {
-                <span vuiActions>
+                <span class="node-actions">
                   <button
                     class="button primary"
                     vNoDrag

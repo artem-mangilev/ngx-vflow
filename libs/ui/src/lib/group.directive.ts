@@ -9,7 +9,7 @@ import { Directive } from '@angular/core';
   selector: '[vuiGroup]',
   host: {
     class: `vui-group
-      relative box-border rounded-vui-surface border border-vui-border
+      relative rounded-vui-surface border border-vui-border
       bg-vui-surface-muted text-vui-foreground
       [&:is([data-v-selected]_*,[data-v-preselected]_*)]:border-vui-accent
       [&:is([data-v-selected]_*,[data-v-preselected]_*)]:ring-1

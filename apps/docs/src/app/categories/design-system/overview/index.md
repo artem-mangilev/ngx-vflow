@@ -47,15 +47,16 @@ UI rules live in Tailwind cascade layers, so unlayered application CSS overrides
 
 Directives add a public class to your own element and nothing else: no wrappers, no roles, no graph state.
 Compose the parts with plain HTML and content projection; anything not listed here (descriptions, forms,
-images, charts, notes, menus) is your content inside `vuiNodeBody` or a row.
+images, charts, notes, menus) is your content between the header and the footer or in a row, laid out with your own
+classes: the body padding of the demos is `calc(var(--vui-space) * 3)`, `p-vui-3` in a Tailwind class.
 
-| Area       | Parts                                                                                                      |
-| ---------- | ---------------------------------------------------------------------------------------------------------- |
-| Shells     | `vuiNode` with `vuiNodeHeader`, `vuiNodeBody`, `vuiNodeFooter`; `vuiRow`; `vuiGroup` with `vuiGroupHeader` |
-| Text roles | `vuiTitle`, `vuiMeta`, `vuiIcon`, `vuiActions`, usable in any shell, label or toolbar                      |
-| Port       | `vuiPort` with `handleType`, `position` and the other handle inputs: a core handle with the port look      |
-| Edge       | `vuiEdge` on the SVG path, `vuiEdgeLabel` for HTML labels                                                  |
-| Overlay    | `vuiToolbar`                                                                                               |
+| Area       | Parts                                                                                                 |
+| ---------- | ----------------------------------------------------------------------------------------------------- |
+| Shells     | `vuiNode` with `vuiNodeHeader`, `vuiNodeFooter`; `vuiRow`; `vuiGroup` with `vuiGroupHeader`           |
+| Text roles | `vuiTitle`, `vuiMeta`, usable in any shell, label or toolbar                                          |
+| Port       | `vuiPort` with `handleType`, `position` and the other handle inputs: a core handle with the port look |
+| Edge       | `vuiEdge` on the SVG path, `vuiEdgeLabel` for HTML labels                                             |
+| Overlay    | `vuiToolbar`                                                                                          |
 
 The node shell's resting shadow has no blur (`0 1px 0`). A blurred shadow is rasterized again for every visible node on every zoom step and pan, which on a large flow at a high device pixel ratio costs more GPU time than the rest of the node; see the measurement on the Virtualization page. Blurred shadows and translucent material are reserved for floating layers: toolbars and viewport controls.
 
@@ -72,15 +73,14 @@ the port a connection is drawn from and the candidate under the pointer get a ha
 success, danger) that draws the ring 2px larger without changing its box, so the endpoint never moves. A valid
 candidate is filled and an invalid one stays hollow, so the state does not depend on color alone. A pseudo-element
 widens the pointer target to about 30px along the node side and
-15px deep into the node, never outward, where the end of a connected edge takes reconnection presses; the endpoint does not move. `vuiPortReveal="interaction"` keeps idle ports without edges invisible until their node is hovered,
-focused or selected, which suits diagrams that draw no connection points. While a connection is drawn,
-the ports of a node appear when the pointer reaches it; ports of other nodes stay hidden but remain targets. Hover does
-not follow a finger, so keep the default `always` where users connect by touch.
+15px deep into the node, never outward, where the end of a connected edge takes reconnection presses; the endpoint does not move. To show ports only on interaction, as the ERD demo
+does for a diagram that draws no connection points, hide idle ports without edges in your CSS; hover does not follow a
+finger, so keep them visible where users connect by touch.
 
 ### Buttons and badges
 
 The parts ship no button and no badge: those already exist in your design system (spartan-ng, Angular Material or
-your own), as React Flow UI takes them from shadcn/ui. Put them in `vuiActions`, rows, labels and toolbars, add
+your own), as React Flow UI takes them from shadcn/ui. Put them in footers, rows, labels and toolbars, add
 `vNoDrag` to controls inside a node, and give icon-only buttons accessible names. The demos in this section style a
 button and a badge of their own with the theme variables, so they follow light and dark scopes.
 
@@ -89,7 +89,7 @@ button and a badge of their own with the theme variables, so they follow light a
 `vuiEdge` styles the visible SVG path of an edge; routing, hit targets and markers stay in core,
 so attach `markers` in edge data and bind `ctx.markerEnd()`. Labels at `start`, `center` and `end` positions
 are declared with the core `vEdgeLabel` structural directive inside the edge template; `vuiEdgeLabel` is their surface and can hold
-`vuiActions` with native buttons.
+native buttons.
 
 ### Viewport controls
 
@@ -101,20 +101,19 @@ not part of the library; `@vflow/ui` declares `ngx-vflow` as a peer dependency f
 
 ## Directive reference
 
-| Import                                          | Attribute                                                            | Responsibility                                                                                     |
-| ----------------------------------------------- | -------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
-| `VuiNode`                                       | `vuiNode`                                                            | Node surface; consumer chooses size and content                                                    |
-| `VuiNodeHeader`, `VuiNodeBody`, `VuiNodeFooter` | `vuiNodeHeader`, `vuiNodeBody`, `vuiNodeFooter`                      | Optional anatomy on consumer elements                                                              |
-| `VuiRow`                                        | `vuiRow`                                                             | Row (field, typed port, list item) with room for text roles and core handles                       |
-| `VuiGroup`                                      | `vuiGroup`                                                           | Tinted group with a hairline; parent relationships remain explicit in graph data                   |
-| `VuiGroupHeader`                                | `vuiGroupHeader`                                                     | Title row of a group with room for meta, an icon and actions                                       |
-| `VuiTitle`, `VuiMeta`                           | `vuiTitle`, `vuiMeta`                                                | Primary wrapping text and secondary text in any shell                                              |
-| `VuiIcon`, `VuiActions`                         | `vuiIcon`, `vuiActions`                                              | Leading slot for an icon or avatar of any size, and a group of controls; add `vNoDrag` to controls |
-| `VuiPort`                                       | `vuiPort handleType="target" position="left" [vuiPortConnected]="…"` | A core handle with the port look: idle/valid/invalid from the handle, connected, `vuiPortReveal`   |
-| `VuiEdge`                                       | `vuiEdge` on an SVG path                                             | Stroke; bind core path and marker URLs yourself                                                    |
-| `VuiEdgeLabel`                                  | `vuiEdgeLabel`                                                       | HTML label surface, including optional native controls                                             |
-| `VuiToolbar`                                    | `vuiToolbar`                                                         | Surface for `v-node-toolbar` content                                                               |
-| `VuiControls`                                   | `<vui-controls [flow]="flow">`                                       | Viewport controls for one flow instance; project plain icon buttons                                |
+| Import                           | Attribute                                                            | Responsibility                                                                   |
+| -------------------------------- | -------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| `VuiNode`                        | `vuiNode`                                                            | Node surface; consumer chooses size and content                                  |
+| `VuiNodeHeader`, `VuiNodeFooter` | `vuiNodeHeader`, `vuiNodeFooter`                                     | Optional anatomy on consumer elements                                            |
+| `VuiRow`                         | `vuiRow`                                                             | Row (field, typed port, list item) with room for text roles and core handles     |
+| `VuiGroup`                       | `vuiGroup`                                                           | Tinted group with a hairline; parent relationships remain explicit in graph data |
+| `VuiGroupHeader`                 | `vuiGroupHeader`                                                     | Title row of a group with room for meta and your controls                        |
+| `VuiTitle`, `VuiMeta`            | `vuiTitle`, `vuiMeta`                                                | Primary wrapping text and secondary text in any shell                            |
+| `VuiPort`                        | `vuiPort handleType="target" position="left" [vuiPortConnected]="…"` | A core handle with the port look: idle/valid/invalid from the handle, connected  |
+| `VuiEdge`                        | `vuiEdge` on an SVG path                                             | Stroke; bind core path and marker URLs yourself                                  |
+| `VuiEdgeLabel`                   | `vuiEdgeLabel`                                                       | HTML label surface, including optional native controls                           |
+| `VuiToolbar`                     | `vuiToolbar`                                                         | Surface for `v-node-toolbar` content                                             |
+| `VuiControls`                    | `<vui-controls [flow]="flow">`                                       | Viewport controls for one flow instance; project plain icon buttons              |
 
 Each directive is independently importable. Apart from `vui-controls`, none imports ngx-vflow; none owns
 graph state, adds wrapper elements, registers ports or changes accessibility roles. Public selectors are the

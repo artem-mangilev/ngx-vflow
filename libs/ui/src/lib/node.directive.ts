@@ -14,7 +14,7 @@ import { Directive } from '@angular/core';
   selector: '[vuiNode]',
   host: {
     class: `vui-node
-      relative box-border rounded-vui-surface border border-vui-border
+      relative rounded-vui-surface border border-vui-border
       bg-vui-surface text-vui-foreground shadow-vui-node
       [&:is([data-v-selected]_*,[data-v-preselected]_*)]:border-vui-accent
       [&:is([data-v-selected]_*,[data-v-preselected]_*)]:ring-1
@@ -39,9 +39,6 @@ export class VuiNode {}
   },
 })
 export class VuiNodeHeader {}
-
-@Directive({ selector: '[vuiNodeBody]', host: { class: 'vui-node-body p-vui-3' } })
-export class VuiNodeBody {}
 
 @Directive({
   selector: '[vuiNodeFooter]',
