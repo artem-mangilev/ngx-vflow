@@ -18,9 +18,13 @@ for (const theme of ['light', 'dark']) {
   await demo.scrollIntoViewIfNeeded();
   await page.mouse.move(0, 0);
   await page.waitForTimeout(1500);
-  const zoom = await demo.locator('.vui-node').first().evaluate((n) => n.getBoundingClientRect().width / n.offsetWidth);
-  const box = await demo.locator('vflow').first().boundingBox();
   await demo.screenshot({ path: `${prefix}-${theme}.png` });
-  console.log(theme, 'zoom', zoom.toFixed(3), 'canvas', Math.round(box.width) + 'x' + Math.round(box.height));
+  // A page without a flow, such as Tokens, has no zoom to report.
+  const flow = demo.locator('vflow').first();
+  if (await flow.count()) {
+    const zoom = await demo.locator('.vui-node').first().evaluate((n) => n.getBoundingClientRect().width / n.offsetWidth);
+    const box = await flow.boundingBox();
+    console.log(theme, 'zoom', zoom.toFixed(3), 'canvas', Math.round(box.width) + 'x' + Math.round(box.height));
+  }
 }
 await browser.close();
