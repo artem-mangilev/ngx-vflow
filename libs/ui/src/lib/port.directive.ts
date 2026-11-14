@@ -2,7 +2,8 @@ import { booleanAttribute, Directive, input } from '@angular/core';
 import { VflowHandleDirective } from 'ngx-vflow';
 
 /**
- * A handle with the standard connection point look: an 8px ring, filled once connected, with a larger pointer target
+ * A handle with the standard connection point look: an 8px ring, filled once connected (the idle look only, so the
+ * fill never overrides the connection feedback of a connected port), with a larger pointer target
  * drawn by a pseudo-element along the node side and into the node, never outward. It applies the core `vHandle`
  * directive to its host and forwards its inputs; the connection feedback (`connecting`, `valid`, `invalid`) is read
  * from the core `data-v-handle-state` attribute, `vuiPortConnected` is application knowledge about existing edges.
@@ -36,7 +37,7 @@ import { VflowHandleDirective } from 'ngx-vflow';
       data-[v-handle-position=right]:before:-inset-y-vui-3 data-[v-handle-position=right]:before:-left-vui-2 data-[v-handle-position=right]:before:right-0
       data-[v-handle-position=top]:before:-inset-x-vui-3 data-[v-handle-position=top]:before:-bottom-vui-2 data-[v-handle-position=top]:before:top-0
       data-[v-handle-position=bottom]:before:-inset-x-vui-3 data-[v-handle-position=bottom]:before:-top-vui-2 data-[v-handle-position=bottom]:before:bottom-0
-      border-vui-muted bg-vui-surface data-[vui-connected=true]:bg-vui-muted
+      border-vui-muted bg-vui-surface data-[v-handle-state=idle]:data-[vui-connected=true]:bg-vui-muted
       data-[v-handle-state=idle]:data-[v-handle-can-start=true]:hover:border-vui-accent
       data-[v-handle-state=idle]:data-[v-handle-can-start=true]:hover:shadow-(--vui-port-halo)
       data-[v-handle-state=connecting]:border-vui-accent data-[v-handle-state=connecting]:bg-vui-accent data-[v-handle-state=connecting]:shadow-(--vui-port-halo)
