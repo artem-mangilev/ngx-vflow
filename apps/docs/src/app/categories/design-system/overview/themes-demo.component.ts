@@ -2,7 +2,10 @@ import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { Vui } from '@vflow/ui';
 import { createEdges, createNodes, Vflow } from 'ngx-vflow';
 
-/** Two editors with different themes on one page: each follows its own `data-vui-theme` ancestor. */
+/**
+ * Two editors with different themes on one page: each follows its own `data-vui-theme` ancestor. The flow runs from
+ * the top left to the bottom right, so the minimap takes the top right corner, which the nodes leave free.
+ */
 @Component({
   selector: 'app-ui-themes-demo',
   imports: [Vflow, Vui],
@@ -31,7 +34,7 @@ import { createEdges, createNodes, Vflow } from 'ngx-vflow';
       height: 220px;
     }
     article {
-      width: 150px;
+      width: 120px;
     }
   `,
   template: `
@@ -54,7 +57,7 @@ import { createEdges, createNodes, Vflow } from 'ngx-vflow';
             <svg:g *vEdge="let ctx" vEdgeInteractionArea>
               <svg:path vuiEdge [attr.d]="ctx.path()" [attr.marker-end]="ctx.markerEnd()" />
             </svg:g>
-            <v-minimap />
+            <v-minimap position="top-right" />
           </vflow>
         </div>
         <div class="editor" data-testid="editor-b" data-vui-theme="dark">
@@ -70,7 +73,7 @@ import { createEdges, createNodes, Vflow } from 'ngx-vflow';
             <svg:g *vEdge="let ctx" vEdgeInteractionArea>
               <svg:path vuiEdge [attr.d]="ctx.path()" [attr.marker-end]="ctx.markerEnd()" />
             </svg:g>
-            <v-minimap />
+            <v-minimap position="top-right" />
           </vflow>
         </div>
       </div>
@@ -81,7 +84,7 @@ export class ThemesDemoComponent {
   readonly dark = signal(false);
   readonly nodes = createNodes([
     { id: 'a', point: { x: 20, y: 40 }, ariaLabel: 'Source', data: { title: 'Source' } },
-    { id: 'b', point: { x: 240, y: 120 }, ariaLabel: 'Target', data: { title: 'Target' } },
+    { id: 'b', point: { x: 220, y: 120 }, ariaLabel: 'Target', data: { title: 'Target' } },
   ]);
   readonly edges = createEdges([{ id: 'a-b', source: 'a', target: 'b', curve: 'smooth-step', markers: { end: {} } }]);
 }

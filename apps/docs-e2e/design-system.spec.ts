@@ -50,7 +50,10 @@ test('consumer DOM, scoped themes, selection and native workflow actions', async
   const fix = workflow.locator('article').filter({ hasText: 'Request correction' });
   await expect(paid.locator('.badge')).toHaveText('Pending');
   await expect(fix.locator('.badge')).toHaveText('Missing PO');
-  await expect(workflow.locator('path.vui-edge[data-state="taken"]')).toHaveCount(1);
+  const taken = workflow.locator('path.vui-edge[data-state="taken"]');
+  await expect(taken).toHaveCount(1);
+  // The state is drawn, not only declared: computed styles catch a rule that matches nothing.
+  await expect(taken).toHaveCSS('stroke', 'oklch(0.627 0.194 149.214)');
   // Every card is as tall as the one with a button, so the straight edge between them has no step.
   const heights = await workflow
     .locator('article.vui-node')
@@ -67,8 +70,11 @@ test('consumer DOM, scoped themes, selection and native workflow actions', async
   // The decision shows on the graph: the approved branch is taken, the other one is ruled out.
   await expect(paid.locator('.badge')).toHaveText('Scheduled');
   await expect(fix.locator('.badge')).toHaveText('Not needed');
-  await expect(workflow.locator('path.vui-edge[data-state="taken"]')).toHaveCount(2);
-  await expect(workflow.locator('path.vui-edge').nth(2)).toHaveAttribute('data-state', 'skipped');
+  await expect(taken).toHaveCount(2);
+  const skipped = workflow.locator('path.vui-edge').nth(2);
+  await expect(skipped).toHaveAttribute('data-state', 'skipped');
+  await expect(skipped).toHaveCSS('stroke-dasharray', '4px, 4px');
+  await expect(skipped).toHaveCSS('opacity', '0.45');
   await expect(workflow.locator('[data-label="Needs changes"]')).toHaveAttribute('data-state', 'skipped');
   await expect(workflow.locator('[data-v-node]').filter({ hasText: 'Finance review' })).toHaveAttribute(
     'data-v-selected',
@@ -85,6 +91,14 @@ test('consumer DOM, scoped themes, selection and native workflow actions', async
   await expect(workflow.locator('path.vui-edge').nth(2)).toHaveCSS('stroke', 'oklch(0.705 0.015 286.067)');
   await expect(workflow.locator('marker polyline').first()).toHaveCSS('fill', 'context-stroke');
   await workflow.screenshot({ path: testInfo.outputPath('workflow.png') });
+  // Selection keeps the library color over the process state.
+  const onTaken = await taken.first().evaluate((edge: SVGPathElement) => {
+    const point = edge.getPointAtLength(edge.getTotalLength() / 4).matrixTransform(edge.getScreenCTM()!);
+    return { x: point.x, y: point.y };
+  });
+  await page.mouse.click(onTaken.x, onTaken.y);
+  await expect(workflow.locator('[data-v-edge]').first()).toHaveAttribute('data-v-selected', '');
+  await expect(taken.first()).toHaveCSS('stroke', 'oklch(0.623 0.214 259.815)');
   expect(errors).toEqual([]);
 });
 
@@ -109,6 +123,10 @@ test('field connections follow stable IDs through rename, reorder, density and r
   await demo.locator('[data-entity="customer"] [data-field="email"]').hover();
   await expect(freePort).toHaveCSS('opacity', '1');
   await expect(deleteEmail).toHaveCSS('opacity', '1');
+  // A selected table shows the actions of all its rows, which is how touch reaches them.
+  await demo.locator('[data-entity="order"] header').click();
+  await expect(demo.getByRole('button', { name: 'Delete Order.total', exact: true })).toHaveCSS('opacity', '1');
+  await expect(deleteEmail).toHaveCSS('opacity', '0');
   await expect.poll(() => rowAlignment(demo)).toBeLessThan(1);
   // Rename and reorder the rows in the DOM, as a re-render of changed field data does: core observes the node content.
   await demo
@@ -316,6 +334,40 @@ test('themes stay scoped per editor, reach every layer and leave geometry alone'
   await expect.poll(minimapPixel).not.toBe(pixelBefore);
   expect(await geometry()).toEqual(before);
   await expect(b.locator('article.vui-node').first()).toHaveCSS('background-color', dark.node);
+  // The minimap sits in a corner the nodes leave free.
+  await expect(a.locator('canvas')).toBeVisible();
+  expect(await overlapping(a, 'canvas')).toBe(0);
+});
+
+/** How many of the floating layers matching the selector cover a node of the demo. */
+function overlapping(demo: Locator, chrome: string) {
+  return demo.evaluate((root, selector) => {
+    const boxes = (of: string) =>
+      Array.from(root.querySelectorAll(of)).map((element) => element.getBoundingClientRect());
+    const nodes = boxes('article.vui-node');
+    return boxes(selector).filter((layer) =>
+      nodes.some(
+        (node) =>
+          node.left < layer.right && layer.left < node.right && node.top < layer.bottom && layer.top < node.bottom,
+      ),
+    ).length;
+  }, chrome);
+}
+
+test('image lab: the palette and the viewport controls leave the fitted scene free', async ({ page }) => {
+  // Up to 1024px ng-doc drops its sidebars and the flow is at its widest, where the fitted scene is at its tallest.
+  await page.setViewportSize({ width: 1024, height: 768 });
+  await page.goto('/design-system/pipeline');
+  const demo = page.locator('app-ui-pipeline-demo');
+  await demo.evaluate((element) => element.scrollIntoView({ block: 'center' }));
+  await expect(demo.locator('article.vui-node')).toHaveCount(7);
+  // Before the fit the first node lies under the palette, so this also waits for the fit.
+  await expect.poll(() => overlapping(demo, '.palette, vui-controls')).toBe(0);
+  const zoom = await demo
+    .locator('article.vui-node')
+    .first()
+    .evaluate((node: HTMLElement) => node.getBoundingClientRect().width / node.offsetWidth);
+  expect(zoom).toBeLessThan(1);
 });
 
 /** Drags with real pointer events from the center of one element to a point; the page must not scroll in between. */
@@ -374,6 +426,13 @@ test('image lab: typed ports, previews that follow the wiring, native controls a
   await page.mouse.down();
   await page.mouse.move(b.x, b.y, { steps: 12 });
   await expect(blendB).toHaveAttribute('data-v-handle-state', 'invalid');
+  // Both ends already have edges, and the feedback still wins over the connected fill: the invalid target is hollow
+  // and the port the connection is drawn from takes the accent.
+  await expect(blendB).toHaveCSS('background-color', 'oklch(1 0 0)');
+  await expect(demo.locator('[data-stage="wave"] .output [data-v-handle]')).toHaveCSS(
+    'background-color',
+    'oklch(0.546 0.245 262.881)',
+  );
   await page.mouse.up();
   await expect(demo.locator('path.vui-edge')).toHaveCount(6);
   // An input takes one edge: wiring the photo into B replaces the texture branch.

@@ -121,6 +121,17 @@ graph state, adds wrapper elements, registers ports or changes accessibility rol
 `.vui-*` classes named after the attributes, for example `.vui-title` or `.vui-port[data-v-handle-state='valid']`.
 A role looks the same in every shell; a row that needs its own look, such as a group title, is a part of its own.
 
+In the stylesheet of a component, read the state of a core host from your own element, as the parts do. The node and
+edge hosts are elements of core, outside the style scope of your component, so a selector that starts at one of them
+matches nothing there:
+
+```css
+/* The path is yours; the selected edge host around it is core's. */
+.vui-edge[data-state='done']:not([data-v-selected] *) {
+  stroke: var(--vui-success);
+}
+```
+
 ## Themes and composition
 
 The light theme is the default: `vflow-ui.css` sets it on `:root`, like shadcn, so every flow of your application

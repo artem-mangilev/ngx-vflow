@@ -34,11 +34,13 @@ type EdgeState = 'taken' | 'open' | 'skipped';
     footer {
       min-height: calc(28px + 6 * var(--vui-space) + 1px);
     }
-    /* The process state is application CSS on the public selectors; selection keeps the library color. */
-    [data-v-edge]:not([data-v-selected]) .vui-edge[data-state='taken'] {
+    /* The process state is application CSS on the public selectors; selection keeps the library color. The edge host
+       is an element of core, outside this component's style scope, so its state is read from the path itself, as the
+       parts do: a selector that starts at the host would never match here. */
+    .vui-edge[data-state='taken']:not([data-v-selected] *) {
       stroke: var(--vui-success);
     }
-    [data-v-edge]:not([data-v-selected]) .vui-edge[data-state='skipped'] {
+    .vui-edge[data-state='skipped']:not([data-v-selected] *) {
       stroke-dasharray: 4 4;
       opacity: 0.45;
     }

@@ -49,8 +49,10 @@ const EXPORT = { width: 1200, height: 780 };
   imports: [Vflow, Vui, DemoIconComponent, PictureComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
+    /* Tall enough for the scene to fit by its width on every docs layout (the flow is at most 959px wide), which
+       leaves the palette and the viewport controls a free band above and below the nodes. */
     vflow {
-      height: 600px;
+      height: 700px;
     }
     /* A dense editor scale: 13px for titles and rows, 12px for labels and meta. */
     article {

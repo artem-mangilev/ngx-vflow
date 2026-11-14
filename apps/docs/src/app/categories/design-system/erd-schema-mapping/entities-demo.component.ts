@@ -73,9 +73,11 @@ const TYPES = ['uuid', 'text', 'decimal', 'timestamp'];
       opacity: 0;
       transition: opacity 120ms;
     }
+    /* The node host is an element of core, outside this component's style scope: its selection is read from the
+       button itself, since a selector that starts at the host would never match here. */
     .vui-row:hover .row-action,
     .vui-row:focus-within .row-action,
-    [data-v-selected] .row-action {
+    .row-action:is([data-v-selected] *) {
       opacity: 1;
     }
     /* The remove button of a label shows on hover and while its edge is selected; Delete removes it as well. */
