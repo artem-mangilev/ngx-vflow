@@ -35,9 +35,16 @@
   flex: 1;
   min-width: 0;
 }
-.demo .muted {
+/* The application's small type: a caption for secondary text outside a node, where the parts' `vuiMeta` does not
+   reach, and a figure for a number that is the content of a node. */
+.demo .caption {
   color: var(--vui-muted);
   font-size: 12px;
+}
+.demo .stat {
+  font-size: 20px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
 }
 .demo .stage {
   position: relative;
@@ -74,9 +81,21 @@
 .demo .node-icon::before {
   content: '\200b';
 }
+/* With a color of the application's, set as `--icon-color`, the slot is a tile: a 16% tint of the color under a
+   glyph of the color mixed with the text color, at least 4.5:1 in both themes for the colors the demos use. The
+   color says what kind of thing the node is; the parts ship no palette, so it is the demo's. */
+.demo .node-icon.tile {
+  min-width: calc(var(--vui-space) * 6);
+  min-height: calc(var(--vui-space) * 6);
+  border-radius: var(--vui-radius);
+  background: color-mix(in oklab, var(--icon-color) 16%, transparent);
+  color: color-mix(in oklab, var(--icon-color) 75%, currentColor);
+}
 
 /* The application's own button and badge, standing in for the components of your design system: the vflow UI parts
-   ship neither. They read the theme colors, so they follow the light and dark scopes of a demo. */
+   ship neither. They read the theme colors, so they follow the light and dark scopes of a demo, and the control
+   radius of the theme, so a control inside a node is as round as the node's own parts. Transitions in the demos take
+   the application's default duration, as the parts do. */
 .demo {
   --demo-primary: oklch(0.546 0.245 262.881);
   --demo-warning: oklch(0.555 0.163 48.998);
@@ -95,7 +114,7 @@
   height: 28px;
   padding: 0 12px;
   border: 1px solid transparent;
-  border-radius: 6px;
+  border-radius: var(--vui-radius);
   background: var(--vui-surface-muted);
   color: var(--vui-foreground);
   font: inherit;
@@ -148,7 +167,7 @@
   height: 24px;
   padding: 0 24px 0 8px;
   border: 1px solid var(--vui-border);
-  border-radius: 6px;
+  border-radius: var(--vui-radius);
   background:
     linear-gradient(45deg, transparent 50%, currentColor 50%) calc(100% - 13px) 50% / 4px 4px no-repeat,
     linear-gradient(135deg, currentColor 50%, transparent 50%) calc(100% - 9px) 50% / 4px 4px no-repeat,
@@ -179,7 +198,7 @@
   height: 24px;
   padding: 0 8px;
   border: 1px solid var(--vui-border);
-  border-radius: 6px;
+  border-radius: var(--vui-radius);
   background: var(--vui-surface);
   color: var(--vui-foreground);
   font: inherit;
@@ -246,7 +265,7 @@
   gap: 4px;
   min-height: 20px;
   padding: 0 8px;
-  border-radius: 6px;
+  border-radius: var(--vui-radius);
   background: color-mix(in oklab, var(--tone) 16%, transparent);
   color: color-mix(in oklab, var(--tone) 70%, var(--vui-foreground));
   font-size: 12px;

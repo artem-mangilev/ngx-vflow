@@ -8,8 +8,12 @@ import { injectDocsTheme } from '../../../shared/docs-theme';
 /** Tones of the application's own badge; the vflow UI parts ship none. */
 type Tone = 'neutral' | 'info' | 'success' | 'warning' | 'danger';
 
+/** What a step is, shown by the color of its icon: where the process starts, a decision of a person, an action. */
+type StepKind = 'trigger' | 'review' | 'action';
+
 interface StepData {
   title: string;
+  kind: StepKind;
   icon: DemoIconName;
   description: string;
 }
@@ -26,7 +30,17 @@ type EdgeState = 'taken' | 'open' | 'skipped';
        real size; the height is the demo's to give. The scene fits by its width, which leaves a band above and below
        the cards for the viewport controls. */
     vflow {
-      height: 730px;
+      height: 740px;
+    }
+    /* The kind of a step is the color of its icon tile, the application's own: the parts ship no palette. */
+    article[data-kind='trigger'] .node-icon {
+      --icon-color: oklch(0.609 0.126 221.723);
+    }
+    article[data-kind='review'] .node-icon {
+      --icon-color: oklch(0.606 0.25 292.717);
+    }
+    article[data-kind='action'] .node-icon {
+      --icon-color: oklch(0.6 0.118 184.704);
     }
     article {
       width: 230px;
@@ -66,9 +80,9 @@ type EdgeState = 'taken' | 'open' | 'skipped';
           [minZoom]="0.5"
           [maxZoom]="2"
           (initialized)="flow()?.fitView()">
-          <article *vNode="let ctx" vuiNode [attr.data-step]="ctx.node.id">
+          <article *vNode="let ctx" vuiNode [attr.data-step]="ctx.node.id" [attr.data-kind]="ctx.data().kind">
             <header vuiNodeHeader>
-              <span class="node-icon"><app-demo-icon [name]="ctx.data().icon" /></span>
+              <span class="node-icon tile"><app-demo-icon [name]="ctx.data().icon" /></span>
               <span vuiTitle>{{ ctx.data().title }}</span>
             </header>
             <div class="node-body">
@@ -162,10 +176,24 @@ export class WorkflowDemoComponent {
   readonly approved = signal(false);
   readonly background = SCENE_BACKGROUND;
   readonly nodes = createNodes<StepData>([
-    step('received', { x: 265, y: 0 }, 'Invoice received', 'arrow-down', 'A new invoice from the supplier.'),
-    step('review', { x: 265, y: 236 }, 'Finance review', 'search', 'Check the amount and approve payment.'),
-    step('paid', { x: 0, y: 472 }, 'Schedule payment', 'arrow-right', 'Send the approved invoice to accounting.'),
-    step('fix', { x: 530, y: 472 }, 'Request correction', 'alert', 'The supplier must provide a purchase order.'),
+    step('received', { x: 265, y: 0 }, 'trigger', 'Invoice received', 'arrow-down', 'A new invoice from the supplier.'),
+    step('review', { x: 265, y: 236 }, 'review', 'Finance review', 'search', 'Check the amount and approve payment.'),
+    step(
+      'paid',
+      { x: 0, y: 472 },
+      'action',
+      'Schedule payment',
+      'arrow-right',
+      'Send the approved invoice to accounting.',
+    ),
+    step(
+      'fix',
+      { x: 530, y: 472 },
+      'action',
+      'Request correction',
+      'alert',
+      'The supplier must provide a purchase order.',
+    ),
   ]);
   readonly edges = createEdges([
     {
@@ -219,6 +247,13 @@ export class WorkflowDemoComponent {
   }
 }
 
-function step(id: string, point: { x: number; y: number }, title: string, icon: DemoIconName, description: string) {
-  return { id, point, ariaLabel: title, data: { title, icon, description } };
+function step(
+  id: string,
+  point: { x: number; y: number },
+  kind: StepKind,
+  title: string,
+  icon: DemoIconName,
+  description: string,
+) {
+  return { id, point, ariaLabel: title, data: { title, kind, icon, description } };
 }

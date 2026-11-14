@@ -445,7 +445,9 @@ test('image lab: typed ports, previews that follow the wiring, native controls a
   // The palette adds a node; an unwired filter shows an empty state.
   await demo.getByLabel('Add a node', { exact: true }).selectOption('sepia');
   await expect(demo.locator('article.vui-node')).toHaveCount(8);
-  await expect(demo.locator('article').filter({ hasText: 'Sepia' }).locator('.empty')).toHaveText('Connect an image');
+  await expect(demo.locator('article').filter({ hasText: 'Sepia' }).locator('.preview .vui-meta')).toHaveText(
+    'Connect an image',
+  );
   // Only the export rasterizes the picture.
   const download = page.waitForEvent('download');
   await demo.getByRole('button', { name: 'Download', exact: true }).click();

@@ -46,8 +46,8 @@ export abstract class TeamBoard {
       --vui-space: 4px;
       font-size: 14px;
       transition:
-        border-color 120ms,
-        background-color 120ms;
+        border-color var(--default-transition-duration, 150ms),
+        background-color var(--default-transition-duration, 150ms);
     }
     /* A nested team sits a step darker than its parent. */
     .team.nested {
@@ -173,10 +173,6 @@ export class PersonNodeComponent {
       width: 170px;
       font-size: 14px;
     }
-    .value {
-      font-size: 22px;
-      font-weight: 600;
-    }
     .spark {
       display: flex;
       align-items: flex-end;
@@ -197,7 +193,7 @@ export class PersonNodeComponent {
         <span vuiTitle>{{ metric.title }}</span>
       </header>
       <div class="node-body">
-        <div class="value">{{ metric.value }}</div>
+        <div class="stat">{{ metric.value }}</div>
         <p vuiMeta>{{ metric.delta }}</p>
         <div class="spark" role="img" aria-label="Weekly trend, rising">
           @for (point of metric.series; track $index) {

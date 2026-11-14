@@ -21,15 +21,13 @@ import { SCENE_BACKGROUND } from '../../../shared/demo-scene';
     .editor {
       min-width: 0;
       border: 1px solid var(--vui-border);
-      border-radius: 10px;
+      border-radius: calc(var(--vui-radius) + var(--vui-space));
       overflow: hidden;
       background: var(--vui-background, #fff);
     }
     .editor p {
       margin: 0;
       padding: 8px 10px;
-      font-size: 12px;
-      color: var(--vui-muted);
     }
     vflow {
       height: 220px;
@@ -47,7 +45,7 @@ import { SCENE_BACKGROUND } from '../../../shared/demo-scene';
       </div>
       <div class="editors">
         <div class="editor" data-testid="editor-a" [attr.data-vui-theme]="dark() ? 'dark' : 'light'">
-          <p>Editor A: {{ dark() ? 'dark' : 'light' }}</p>
+          <p class="caption">Editor A: {{ dark() ? 'dark' : 'light' }}</p>
           <vflow [nodes]="nodes" [edges]="edges" [background]="background">
             <article *vNode="let ctx" vuiNode>
               <header vuiNodeHeader>
@@ -63,7 +61,7 @@ import { SCENE_BACKGROUND } from '../../../shared/demo-scene';
           </vflow>
         </div>
         <div class="editor" data-testid="editor-b" data-vui-theme="dark">
-          <p>Editor B: dark</p>
+          <p class="caption">Editor B: dark</p>
           <vflow [nodes]="nodes" [edges]="edges" [background]="background">
             <article *vNode="let ctx" vuiNode>
               <header vuiNodeHeader>

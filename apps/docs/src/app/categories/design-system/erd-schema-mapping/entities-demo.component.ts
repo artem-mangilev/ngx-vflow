@@ -73,7 +73,7 @@ const TYPES = ['uuid', 'text', 'decimal', 'timestamp'];
     /* Row actions appear on the row a pointer or the focus is on, and on every row of a selected table (touch). */
     .row-action {
       opacity: 0;
-      transition: opacity 120ms;
+      transition: opacity var(--default-transition-duration, 150ms);
     }
     /* The node host is an element of core, outside this component's style scope: its selection is read from the
        button itself, since a selector that starts at the host would never match here. */

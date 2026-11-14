@@ -66,11 +66,30 @@ const EXPORT = { width: 1200, height: 780 };
     /* Port color by type is application CSS on the public selector; the library knows nothing about images.
        Only the idle look is recolored, including the tone of the hover halo, so connection feedback (valid, invalid)
        keeps the library colors. */
+    :host {
+      --type-image: #8b5cf6;
+      --type-number: #16a34a;
+    }
     .vui-port[data-type='image'] {
-      --type: #8b5cf6;
+      --type: var(--type-image);
     }
     .vui-port[data-type='number'] {
-      --type: #16a34a;
+      --type: var(--type-number);
+    }
+    /* The icon of a node says what it does: a source has the color of what it produces, processing and the result
+       have their own. */
+    article[data-kind='source'] .node-icon {
+      --icon-color: var(--type-image);
+    }
+    article[data-kind='number'] .node-icon {
+      --icon-color: var(--type-number);
+    }
+    article[data-kind='filter'] .node-icon,
+    article[data-kind='blend'] .node-icon {
+      --icon-color: oklch(0.646 0.222 41.116);
+    }
+    article[data-kind='output'] .node-icon {
+      --icon-color: oklch(0.609 0.126 221.723);
     }
     .vui-port[data-type][data-v-handle-state='idle'] {
       --vui-tone: var(--type);
@@ -106,19 +125,13 @@ const EXPORT = { width: 1200, height: 780 };
       place-items: center;
       aspect-ratio: 20 / 13;
       overflow: hidden;
-      border-radius: 6px;
+      border-radius: var(--vui-radius);
       background: var(--vui-surface-muted);
-    }
-    .empty {
-      color: var(--vui-muted);
-      font-size: 12px;
     }
     .setting {
       display: grid;
       gap: 4px;
       margin-top: 8px;
-      color: var(--vui-muted);
-      font-size: 12px;
     }
     .setting .select {
       width: 100%;
@@ -128,11 +141,8 @@ const EXPORT = { width: 1200, height: 780 };
       align-items: center;
       gap: 8px;
     }
-    .number .big {
+    .number .stat {
       flex: 1;
-      font-size: 20px;
-      font-weight: 600;
-      font-variant-numeric: tabular-nums;
     }
     .slider {
       display: block;
@@ -168,7 +178,7 @@ const EXPORT = { width: 1200, height: 780 };
             @let data = ctx.data();
             <article vuiNode [attr.data-kind]="data.kind" [attr.data-stage]="ctx.node.id">
               <header vuiNodeHeader>
-                <span class="node-icon"><app-demo-icon [name]="icon(data)" /></span>
+                <span class="node-icon tile"><app-demo-icon [name]="icon(data)" /></span>
                 <span vuiTitle>{{ title(data) }}</span>
                 @if (data.kind === 'source') {
                   <input #file type="file" accept="image/*" hidden (change)="upload(ctx.node.id, file)" />
@@ -185,7 +195,7 @@ const EXPORT = { width: 1200, height: 780 };
               <div class="node-body">
                 @if (data.kind === 'number') {
                   <div class="number">
-                    <span class="big">{{ percent(data.value) }}</span>
+                    <span class="stat">{{ percent(data.value) }}</span>
                     <button
                       class="button small icon"
                       vNoDrag
@@ -212,12 +222,12 @@ const EXPORT = { width: 1200, height: 780 };
                     @if (pictures().get(ctx.node.id); as picture) {
                       <app-picture [picture]="picture" [width]="data.kind === 'output' ? 296 : 196" />
                     } @else {
-                      <span class="empty">Connect an image</span>
+                      <span vuiMeta>Connect an image</span>
                     }
                   </div>
                 }
                 @if (data.kind === 'source') {
-                  <label class="setting">
+                  <label class="setting caption">
                     Picture
                     <select class="select" vNoDrag (change)="pick(ctx.node.id, $any($event.target).value)">
                       @for (sample of samples; track sample.id) {
@@ -230,7 +240,7 @@ const EXPORT = { width: 1200, height: 780 };
                   </label>
                 }
                 @if (data.kind === 'blend') {
-                  <label class="setting">
+                  <label class="setting caption">
                     Mode
                     <select class="select" vNoDrag (change)="patch(ctx.node.id, { mode: $any($event.target).value })">
                       @for (mode of modes; track mode) {

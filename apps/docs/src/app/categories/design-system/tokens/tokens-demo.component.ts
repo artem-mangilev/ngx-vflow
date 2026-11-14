@@ -17,11 +17,11 @@ import { Vui } from '@vflow/ui';
       padding: 20px;
       background: var(--vui-background);
       color: var(--vui-foreground);
-      font-size: 13px;
+      font-size: 14px;
     }
     h3 {
       margin: 0 0 8px;
-      font-size: 11px;
+      font-size: 12px;
       font-weight: 600;
       color: var(--vui-muted);
     }
@@ -33,7 +33,7 @@ import { Vui } from '@vflow/ui';
     .swatch {
       display: grid;
       gap: 4px;
-      font-size: 11px;
+      font-size: 12px;
     }
     .chip {
       height: 28px;
@@ -54,7 +54,7 @@ import { Vui } from '@vflow/ui';
       display: grid;
       justify-items: center;
       gap: 4px;
-      font-size: 11px;
+      font-size: 12px;
       color: var(--vui-muted);
     }
     .space span {
@@ -70,7 +70,7 @@ import { Vui } from '@vflow/ui';
       height: 44px;
       border: 1px solid var(--vui-border);
       background: var(--vui-surface);
-      font-size: 11px;
+      font-size: 12px;
     }
     article {
       width: 180px;
