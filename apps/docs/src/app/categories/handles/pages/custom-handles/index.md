@@ -64,7 +64,7 @@ The element gets the `data-v-handle` attribute, its identity as a handle, and th
 | `data-v-handle-can-start`  | `true`, `false`                                                                                       |
 | `data-v-handle-can-accept` | `true`, `false`                                                                                       |
 
-The state follows `ConnectionSettings.validator()`, so plain CSS is enough for connection feedback. While a connection is in progress the handle element is a drop zone in addition to the magnet around its point, so a handle of any size, even a whole node, validates the candidate under the pointer:
+The state follows `ConnectionSettings.validator()`, so plain CSS is enough for connection feedback. The handle a connection is dragged from stays `connecting` for the whole gesture: it is never its own candidate, and a release on it is a drop. While a connection is in progress the handle element is a drop zone in addition to the magnet around its point, so a handle of any size, even a whole node, validates the candidate under the pointer:
 
 ```css
 .dot[data-v-handle-state='valid'] {

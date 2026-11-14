@@ -579,7 +579,7 @@ A `vNode` or `vEdge` template types its `ctx` with `of`, a type witness the flow
 
 {% endraw %}
 
-`ConnectEndEvent` and `ReconnectEndEvent` report the release as one outcome: `to` is `{ node, handle }` and `valid` a boolean when the connection was released on a handle, and both are `null` otherwise, so a check of `to` narrows `valid`. `createEdge()` no longer fills missing handle ids with `''`: `sourceHandle` and `targetHandle` stay absent, as `undefined`.
+`ConnectEndEvent` and `ReconnectEndEvent` report the release as one outcome: `to` is `{ node, handle }` and `valid` a boolean when the connection was released on a handle, and both are `null` otherwise, so a check of `to` narrows `valid`. A release on the handle the connection started from is such a drop: that handle is never a candidate, and the validator is not asked about it. `createEdge()` no longer fills missing handle ids with `''`: `sourceHandle` and `targetHandle` stay absent, as `undefined`.
 
 ### Removed APIs
 

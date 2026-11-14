@@ -164,18 +164,40 @@ describe('ConnectionService', () => {
     expect(source.state()).toBe('connecting');
     expect(target.parentNode.connectionActive()).toBe(true);
 
-    // The origin can be its own candidate; leaving it restores connecting.
+    // The origin is never its own candidate: the pointer is over it when the gesture begins, and it stays connecting.
     connection.leave(target);
     expect(target.state()).toBe('idle');
     expect(target.parentNode.connectionActive()).toBe(false);
     connection.hover(source);
-    expect(source.state()).toBe('invalid');
+    expect(source.state()).toBe('connecting');
+    expect(connection.gesture()?.candidate).toBeNull();
     connection.leave(source);
     expect(source.state()).toBe('connecting');
 
     connection.end();
     expect(source.state()).toBe('idle');
     expect(source.parentNode.connectionActive()).toBe(false);
+  });
+
+  it('should treat a release on the origin handle as a drop, without asking the application validator', () => {
+    const validator = vi.fn().mockReturnValue(true);
+    flowEntitiesService.connectionSettings.bind(signal({ validator }));
+
+    const source = createHandle(createNodeModel('source'), 'source');
+    const ends: { valid: boolean | null; to: unknown }[] = [];
+    const connections: unknown[] = [];
+    connection.connectEnd$.subscribe((end) => ends.push(end));
+    connection.connect$.subscribe((made) => connections.push(made));
+
+    connection.start(source);
+    // The pointer is over the origin, and its magnet, when the gesture begins.
+    connection.hover(source);
+    connection.end();
+
+    expect(validator).not.toHaveBeenCalled();
+    expect(connections).toEqual([]);
+    expect(ends).toEqual([expect.objectContaining({ valid: null, to: null })]);
+    expect(source.state()).toBe('idle');
   });
 
   it('should reject a new connection when its starting handle cannot start', () => {

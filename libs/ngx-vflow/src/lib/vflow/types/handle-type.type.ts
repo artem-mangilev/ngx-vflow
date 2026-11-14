@@ -11,8 +11,8 @@ export type HandleType = 'source' | 'target' | 'any';
 export type HandlePosition = Position | 'auto' | 'center';
 
 /**
- * Feedback for the connection in progress: `connecting` on the handle it is dragged from, `valid` or `invalid`
- * while the handle is the candidate.
+ * Feedback for the connection in progress: `connecting` on the handle it is dragged from, for the whole gesture, and
+ * `valid` or `invalid` while another handle is the candidate under the pointer.
  */
 export type HandleState = 'connecting' | 'valid' | 'invalid' | 'idle';
 

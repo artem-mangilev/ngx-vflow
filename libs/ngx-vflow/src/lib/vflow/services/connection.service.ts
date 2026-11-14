@@ -111,10 +111,14 @@ export class ConnectionService {
     this.tracker.press(event);
   }
 
-  /** The pointer entered a handle, or the magnet around it: the handle becomes the candidate. */
+  /**
+   * The pointer entered a handle, or the magnet around it: the handle becomes the candidate. The handle the
+   * connection is dragged from never does: a connection of a handle to itself means nothing, and the pointer is over
+   * that handle when the gesture begins. Releasing there is a drop.
+   */
   public hover(handle: HandleModel): void {
     const gesture = this.gesture();
-    if (!gesture) return;
+    if (!gesture || handle === gesture.sourceHandle) return;
 
     let valid = false;
     if (handle.canAccept()) {
@@ -196,11 +200,11 @@ export class ConnectionService {
     if (previousCandidate && previousCandidate !== nextCandidate) previousCandidate.state.set('idle');
     if (next?.candidate) next.candidate.handle.state.set(next.candidate.valid ? 'valid' : 'invalid');
 
-    // The handle a connection is dragged from is `connecting`, unless it is also the candidate.
+    // The handle a connection is dragged from is `connecting` for the whole gesture: it is never the candidate.
     const previousOrigin = previous?.sourceHandle;
     const nextOrigin = next?.sourceHandle;
     if (previousOrigin && previousOrigin !== nextOrigin) previousOrigin.state.set('idle');
-    if (nextOrigin && nextOrigin !== nextCandidate) nextOrigin.state.set('connecting');
+    if (nextOrigin) nextOrigin.state.set('connecting');
 
     if (previous?.oldEdge !== next?.oldEdge) {
       previous?.oldEdge?.reconnecting.set(false);
