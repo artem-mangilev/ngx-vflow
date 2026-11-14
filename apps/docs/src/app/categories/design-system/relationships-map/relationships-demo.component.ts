@@ -17,6 +17,7 @@ import {
   VflowComponent,
 } from 'ngx-vflow';
 import { injectDocsTheme } from '../../../shared/docs-theme';
+import { SCENE_BACKGROUND } from '../../../shared/demo-scene';
 import {
   DropTarget,
   MetricNodeComponent,
@@ -48,8 +49,9 @@ const LAYOUT = { inset: 16, header: 52, gap: 16, step: 8 };
   // Node components inject the map from here: they are created inside the flow, under this component.
   providers: [{ provide: TeamBoard, useExisting: forwardRef(() => RelationshipsDemoComponent) }],
   styles: `
+    /* The scene fits by its width; the height leaves a band below the metric for the viewport controls. */
     vflow {
-      height: 560px;
+      height: 580px;
     }
     .vui-edge[data-link='true'] {
       stroke-dasharray: 4 4;
@@ -57,41 +59,48 @@ const LAYOUT = { inset: 16, header: 52, gap: 16, step: 8 };
   `,
   template: `
     <section class="demo" aria-label="Relationships and metrics map demo" [attr.data-vui-theme]="theme()">
-      <vflow
-        [nodes]="nodes"
-        [edges]="edges()"
-        [connection]="connection"
-        [parentsBelowEdges]="true"
-        (connect)="connect($event)"
-        (deleteRequest)="remove($event)"
-        (nodeDragStart)="dragStart($event)"
-        (nodeDrag)="drag($event)"
-        (nodeDragEnd)="dragEnd($event)"
-        (initialized)="flow()?.fitView()">
-        <ng-template let-ctx vEdge>
-          <svg:g vEdgeInteractionArea>
-            <svg:path
-              vuiEdge
-              [attr.d]="ctx.path()"
-              [attr.marker-end]="ctx.markerEnd()"
-              [attr.data-link]="!!ctx.data()?.link" />
-          </svg:g>
-          @if (ctx.data()?.label; as label) {
-            <span *vEdgeLabel vuiEdgeLabel>{{ label }}</span>
-          }
-        </ng-template>
-        <ng-template let-ctx vConnection>
-          @if (ctx.path(); as path) {
-            <svg:path vuiEdge stroke-dasharray="5 4" [attr.d]="path" />
-          }
-        </ng-template>
-      </vflow>
+      <div class="stage">
+        <vflow
+          [nodes]="nodes"
+          [edges]="edges()"
+          [background]="background"
+          [connection]="connection"
+          [parentsBelowEdges]="true"
+          (connect)="connect($event)"
+          (deleteRequest)="remove($event)"
+          (nodeDragStart)="dragStart($event)"
+          (nodeDrag)="drag($event)"
+          (nodeDragEnd)="dragEnd($event)"
+          (initialized)="flow()?.fitView()">
+          <ng-template let-ctx vEdge>
+            <svg:g vEdgeInteractionArea>
+              <svg:path
+                vuiEdge
+                [attr.d]="ctx.path()"
+                [attr.marker-end]="ctx.markerEnd()"
+                [attr.data-link]="!!ctx.data()?.link" />
+            </svg:g>
+            @if (ctx.data()?.label; as label) {
+              <span *vEdgeLabel vuiEdgeLabel>{{ label }}</span>
+            }
+          </ng-template>
+          <ng-template let-ctx vConnection>
+            @if (ctx.path(); as path) {
+              <svg:path vuiEdge stroke-dasharray="4 4" [attr.d]="path" />
+            }
+          </ng-template>
+        </vflow>
+        @if (flow(); as flow) {
+          <vui-controls class="stage-controls" [flow]="flow" />
+        }
+      </div>
     </section>
   `,
 })
 export class RelationshipsDemoComponent implements TeamBoard {
   readonly flow = viewChild(VflowComponent);
   readonly theme = injectDocsTheme();
+  readonly background = SCENE_BACKGROUND;
   /** Every kind of node is its own component; the demo tells them apart by `component`, not by data. */
   readonly nodes = createNodes([
     team('platform', { x: 0, y: 0 }, 606, 510, 'Platform'),

@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { Vui } from '@vflow/ui';
 import { createEdges, createNodes, Vflow } from 'ngx-vflow';
+import { SCENE_BACKGROUND } from '../../../shared/demo-scene';
 
 /**
  * Two editors with different themes on one page: each follows its own `data-vui-theme` ancestor. The flow runs from
@@ -35,6 +36,7 @@ import { createEdges, createNodes, Vflow } from 'ngx-vflow';
     }
     article {
       width: 120px;
+      font-size: 14px;
     }
   `,
   template: `
@@ -46,7 +48,7 @@ import { createEdges, createNodes, Vflow } from 'ngx-vflow';
       <div class="editors">
         <div class="editor" data-testid="editor-a" [attr.data-vui-theme]="dark() ? 'dark' : 'light'">
           <p>Editor A: {{ dark() ? 'dark' : 'light' }}</p>
-          <vflow [nodes]="nodes" [edges]="edges">
+          <vflow [nodes]="nodes" [edges]="edges" [background]="background">
             <article *vNode="let ctx" vuiNode>
               <header vuiNodeHeader>
                 <span vuiTitle>{{ ctx.data().title }}</span>
@@ -62,7 +64,7 @@ import { createEdges, createNodes, Vflow } from 'ngx-vflow';
         </div>
         <div class="editor" data-testid="editor-b" data-vui-theme="dark">
           <p>Editor B: dark</p>
-          <vflow [nodes]="nodes" [edges]="edges">
+          <vflow [nodes]="nodes" [edges]="edges" [background]="background">
             <article *vNode="let ctx" vuiNode>
               <header vuiNodeHeader>
                 <span vuiTitle>{{ ctx.data().title }}</span>
@@ -82,6 +84,7 @@ import { createEdges, createNodes, Vflow } from 'ngx-vflow';
 })
 export class ThemesDemoComponent {
   readonly dark = signal(false);
+  readonly background = SCENE_BACKGROUND;
   readonly nodes = createNodes([
     { id: 'a', point: { x: 20, y: 40 }, ariaLabel: 'Source', data: { title: 'Source' } },
     { id: 'b', point: { x: 220, y: 120 }, ariaLabel: 'Target', data: { title: 'Target' } },

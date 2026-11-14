@@ -15,6 +15,7 @@ import { NgTemplateOutlet } from '@angular/common';
 import { Vui } from '@vflow/ui';
 import { DemoIconComponent } from '../../../shared/demo-icon.component';
 import { injectDocsTheme } from '../../../shared/docs-theme';
+import { SCENE_BACKGROUND } from '../../../shared/demo-scene';
 import { ScrollRows } from './scroll-rows';
 import {
   addEdges,
@@ -59,8 +60,9 @@ const TYPES = ['uuid', 'text', 'decimal', 'timestamp'];
       width: 250px;
       font-size: 14px;
     }
+    /* Tall enough for the two frames to fit at nearly their real size. */
     vflow {
-      height: 560px;
+      height: 700px;
     }
     /* Keys are structure, not state: the accent belongs to selection. */
     .key {
@@ -164,161 +166,168 @@ const TYPES = ['uuid', 'text', 'decimal', 'timestamp'];
   `,
   template: `
     <section class="demo" aria-label="Entity relationships and field mapping demo" [attr.data-vui-theme]="theme()">
-      <vflow
-        [nodes]="nodes"
-        [edges]="edges()"
-        [connection]="connection"
-        [parentsBelowEdges]="true"
-        (connect)="connect($event)"
-        (deleteRequest)="remove($event)"
-        (initialized)="flow()?.fitView()">
-        <ng-template let-ctx vNode>
-          @if (ctx.data().kind === 'frame') {
-            <div
-              vuiGroup
-              [attr.data-frame]="ctx.node.id"
-              [style.width.px]="ctx.width()"
-              [style.height.px]="ctx.height()">
-              <header vuiGroupHeader>
-                <span vuiTitle>{{ ctx.data().title }}</span>
-              </header>
-            </div>
-          } @else {
-            @let view = scroll.visibility(ctx.node.id);
-            <article vuiNode [attr.data-entity]="ctx.node.id">
-              <header vuiNodeHeader [class.proxy]="view.above.length > 0">
-                <span vuiTitle>{{ ctx.data().title }}</span>
-                <span vuiMeta>{{ ctx.data().category }}</span>
-                <!-- Rows scrolled out above hand their endpoints to proxies with the same IDs on the header. -->
-                @for (field of scroll.hidden(ctx.data().fields, view.above); track field.id) {
-                  <ng-container *ngTemplateOutlet="ports; context: { $implicit: field }" />
-                }
-              </header>
-              <ng-template #ports let-field>
-                <!-- Free ports show on interaction; connected ones always do. -->
-                <span
-                  vuiPort
-                  handleType="target"
-                  position="left"
-                  [handleId]="'in:' + field.id"
-                  [vuiPortConnected]="connected().has(ctx.node.id + '/in:' + field.id)"></span>
-                <span
-                  vuiPort
-                  handleType="source"
-                  position="right"
-                  [handleId]="'out:' + field.id"
-                  [vuiPortConnected]="connected().has(ctx.node.id + '/out:' + field.id)"></span>
-              </ng-template>
-              <ng-template #rows>
-                @for (row of scroll.rows(ctx.node.id, ctx.data().fields); track row.key) {
-                  <div vuiRow [attr.data-field]="row.field.id">
-                    <span vuiMeta class="key">{{ row.field.key }}</span>
-                    <span vuiTitle>{{ row.field.name }}</span>
-                    <span vuiMeta>{{ row.field.type }}</span>
-                    <button
-                      class="button plain small icon row-action"
-                      vNoDrag
-                      type="button"
-                      [attr.aria-label]="'Delete ' + ctx.data().title + '.' + row.field.name"
-                      (click)="deleteField(ctx.node.id, row.field.id)">
-                      <app-demo-icon name="close" />
-                    </button>
-                    @if (row.handles) {
-                      <ng-container *ngTemplateOutlet="ports; context: { $implicit: row.field }" />
-                    }
-                  </div>
-                }
-              </ng-template>
-              @if (ctx.data().fields.length > maxRows) {
-                <!-- A long table scrolls; the wheel scrolls its rows instead of zooming the graph. -->
-                <div
-                  class="rows scrolling"
-                  vNoWheel
-                  [attr.data-rows]="ctx.node.id"
-                  (scroll)="scroll.onScroll(ctx.node.id, $event)">
-                  <ng-container *ngTemplateOutlet="rows" />
-                </div>
-              } @else {
-                <div class="rows"><ng-container *ngTemplateOutlet="rows" /></div>
-              }
-              @if (view.below.length) {
-                <footer vuiNodeFooter class="proxy edge-note">
-                  <span vuiMeta>{{ view.below.length }} more below</span>
-                  @for (field of scroll.hidden(ctx.data().fields, view.below); track field.id) {
+      <div class="stage">
+        <vflow
+          [nodes]="nodes"
+          [edges]="edges()"
+          [background]="background"
+          [connection]="connection"
+          [parentsBelowEdges]="true"
+          (connect)="connect($event)"
+          (deleteRequest)="remove($event)"
+          (initialized)="flow()?.fitView()">
+          <ng-template let-ctx vNode>
+            @if (ctx.data().kind === 'frame') {
+              <div
+                vuiGroup
+                [attr.data-frame]="ctx.node.id"
+                [style.width.px]="ctx.width()"
+                [style.height.px]="ctx.height()">
+                <header vuiGroupHeader>
+                  <span vuiTitle>{{ ctx.data().title }}</span>
+                </header>
+              </div>
+            } @else {
+              @let view = scroll.visibility(ctx.node.id);
+              <article vuiNode [attr.data-entity]="ctx.node.id">
+                <header vuiNodeHeader [class.proxy]="view.above.length > 0">
+                  <span vuiTitle>{{ ctx.data().title }}</span>
+                  <span vuiMeta>{{ ctx.data().category }}</span>
+                  <!-- Rows scrolled out above hand their endpoints to proxies with the same IDs on the header. -->
+                  @for (field of scroll.hidden(ctx.data().fields, view.above); track field.id) {
                     <ng-container *ngTemplateOutlet="ports; context: { $implicit: field }" />
                   }
-                </footer>
-              }
-              @if (draft()?.entity === ctx.node.id) {
-                <!-- Enter adds the field, Escape drops the draft; core leaves keys typed in inputs alone.
-                     Editing a draft is not selecting the table: the row and the button opt out of click selection. -->
-                <div vuiRow vNoSelect class="draft" data-draft>
-                  <input
-                    class="input"
-                    vNoDrag
-                    placeholder="field_name"
-                    [attr.aria-label]="'Name of the new field of ' + ctx.data().title"
-                    [attr.aria-invalid]="draftError()"
-                    [value]="draft()!.name"
-                    (input)="editDraft({ name: $any($event.target).value })"
-                    (keydown.enter)="commitDraft()"
-                    (keydown.escape)="cancelDraft()" />
-                  <select
-                    class="select"
-                    vNoDrag
-                    [attr.aria-label]="'Type of the new field of ' + ctx.data().title"
-                    (change)="editDraft({ type: $any($event.target).value })"
-                    (keydown.enter)="commitDraft()"
-                    (keydown.escape)="cancelDraft()">
-                    @for (type of types; track type) {
-                      <option [value]="type" [selected]="type === draft()!.type">{{ type }}</option>
+                </header>
+                <ng-template #ports let-field>
+                  <!-- Free ports show on interaction; connected ones always do. -->
+                  <span
+                    vuiPort
+                    handleType="target"
+                    position="left"
+                    [handleId]="'in:' + field.id"
+                    [vuiPortConnected]="connected().has(ctx.node.id + '/in:' + field.id)"></span>
+                  <span
+                    vuiPort
+                    handleType="source"
+                    position="right"
+                    [handleId]="'out:' + field.id"
+                    [vuiPortConnected]="connected().has(ctx.node.id + '/out:' + field.id)"></span>
+                </ng-template>
+                <ng-template #rows>
+                  @for (row of scroll.rows(ctx.node.id, ctx.data().fields); track row.key) {
+                    <div vuiRow [attr.data-field]="row.field.id">
+                      <span vuiMeta class="key">{{ row.field.key }}</span>
+                      <span vuiTitle>{{ row.field.name }}</span>
+                      <span vuiMeta>{{ row.field.type }}</span>
+                      <button
+                        class="button plain small icon row-action"
+                        vNoDrag
+                        type="button"
+                        [attr.aria-label]="'Delete ' + ctx.data().title + '.' + row.field.name"
+                        (click)="deleteField(ctx.node.id, row.field.id)">
+                        <app-demo-icon name="close" />
+                      </button>
+                      @if (row.handles) {
+                        <ng-container *ngTemplateOutlet="ports; context: { $implicit: row.field }" />
+                      }
+                    </div>
+                  }
+                </ng-template>
+                @if (ctx.data().fields.length > maxRows) {
+                  <!-- A long table scrolls; the wheel scrolls its rows instead of zooming the graph. -->
+                  <div
+                    class="rows scrolling"
+                    vNoWheel
+                    [attr.data-rows]="ctx.node.id"
+                    (scroll)="scroll.onScroll(ctx.node.id, $event)">
+                    <ng-container *ngTemplateOutlet="rows" />
+                  </div>
+                } @else {
+                  <div class="rows"><ng-container *ngTemplateOutlet="rows" /></div>
+                }
+                @if (view.below.length) {
+                  <footer vuiNodeFooter class="proxy edge-note">
+                    <span vuiMeta>{{ view.below.length }} more below</span>
+                    @for (field of scroll.hidden(ctx.data().fields, view.below); track field.id) {
+                      <ng-container *ngTemplateOutlet="ports; context: { $implicit: field }" />
                     }
-                  </select>
-                </div>
-              } @else {
+                  </footer>
+                }
+                @if (draft()?.entity === ctx.node.id) {
+                  <!-- Enter adds the field, Escape drops the draft; core leaves keys typed in inputs alone.
+                     Editing a draft is not selecting the table: the row and the button opt out of click selection. -->
+                  <div vuiRow vNoSelect class="draft" data-draft>
+                    <input
+                      class="input"
+                      vNoDrag
+                      placeholder="field_name"
+                      [attr.aria-label]="'Name of the new field of ' + ctx.data().title"
+                      [attr.aria-invalid]="draftError()"
+                      [value]="draft()!.name"
+                      (input)="editDraft({ name: $any($event.target).value })"
+                      (keydown.enter)="commitDraft()"
+                      (keydown.escape)="cancelDraft()" />
+                    <select
+                      class="select"
+                      vNoDrag
+                      [attr.aria-label]="'Type of the new field of ' + ctx.data().title"
+                      (change)="editDraft({ type: $any($event.target).value })"
+                      (keydown.enter)="commitDraft()"
+                      (keydown.escape)="cancelDraft()">
+                      @for (type of types; track type) {
+                        <option [value]="type" [selected]="type === draft()!.type">{{ type }}</option>
+                      }
+                    </select>
+                  </div>
+                } @else {
+                  <button
+                    class="add-field"
+                    vNoDrag
+                    vNoSelect
+                    type="button"
+                    [attr.aria-label]="'Add a field to ' + ctx.data().title"
+                    (click)="startDraft(ctx.node.id)">
+                    <app-demo-icon name="plus" /> Add field
+                  </button>
+                }
+              </article>
+            }
+          </ng-template>
+          <ng-template let-ctx vEdge>
+            <svg:g vEdgeInteractionArea>
+              <svg:path vuiEdge [attr.d]="ctx.path()" />
+            </svg:g>
+            @if (ctx.data()?.label; as label) {
+              <span *vEdgeLabel vuiEdgeLabel [attr.data-selected]="ctx.selected()">
+                {{ label }}
                 <button
-                  class="add-field"
+                  class="button plain small icon row-action"
                   vNoDrag
-                  vNoSelect
                   type="button"
-                  [attr.aria-label]="'Add a field to ' + ctx.data().title"
-                  (click)="startDraft(ctx.node.id)">
-                  <app-demo-icon name="plus" /> Add field
+                  [attr.aria-label]="'Remove ' + label + ' connection'"
+                  (click)="removeEdge(ctx.edge.id)">
+                  <app-demo-icon name="close" />
                 </button>
-              }
-            </article>
-          }
-        </ng-template>
-        <ng-template let-ctx vEdge>
-          <svg:g vEdgeInteractionArea>
-            <svg:path vuiEdge [attr.d]="ctx.path()" />
-          </svg:g>
-          @if (ctx.data()?.label; as label) {
-            <span *vEdgeLabel vuiEdgeLabel [attr.data-selected]="ctx.selected()">
-              {{ label }}
-              <button
-                class="button plain small icon row-action"
-                vNoDrag
-                type="button"
-                [attr.aria-label]="'Remove ' + label + ' connection'"
-                (click)="removeEdge(ctx.edge.id)">
-                <app-demo-icon name="close" />
-              </button>
-            </span>
-          }
-        </ng-template>
-        <ng-template let-ctx vConnection>
-          @if (ctx.path(); as path) {
-            <svg:path vuiEdge stroke-dasharray="5 4" [attr.d]="path" />
-          }
-        </ng-template>
-      </vflow>
+              </span>
+            }
+          </ng-template>
+          <ng-template let-ctx vConnection>
+            @if (ctx.path(); as path) {
+              <svg:path vuiEdge stroke-dasharray="4 4" [attr.d]="path" />
+            }
+          </ng-template>
+        </vflow>
+        @if (flow(); as flow) {
+          <vui-controls class="stage-controls" [flow]="flow" />
+        }
+      </div>
     </section>
   `,
 })
 export class EntitiesDemoComponent {
   readonly flow = viewChild(VflowComponent);
   readonly theme = injectDocsTheme();
+  readonly background = SCENE_BACKGROUND;
   readonly types = TYPES;
   /** Rows a table shows before it scrolls. */
   readonly maxRows = 7;
@@ -336,7 +345,7 @@ export class EntitiesDemoComponent {
   private readonly tableHeight: Record<string, number> = {};
   readonly nodes = createNodes([
     frame('relationships', { x: 0, y: 0 }, 'Relationships', this.frameHeight['relationships']),
-    frame('mapping', { x: 0, y: 480 }, 'Field mapping', this.frameHeight['mapping']),
+    frame('mapping', { x: 0, y: 446 }, 'Field mapping', this.frameHeight['mapping']),
     entity('customer', 'relationships', { x: 24, y: 56 }, 'Customer', 'table', [
       ['id', 'id', 'uuid', 'PK'],
       ['email', 'email', 'text'],

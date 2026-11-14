@@ -75,7 +75,7 @@ test('consumer DOM, scoped themes, selection and native workflow actions', async
   await expect(skipped).toHaveAttribute('data-state', 'skipped');
   await expect(skipped).toHaveCSS('stroke-dasharray', '4px, 4px');
   await expect(skipped).toHaveCSS('opacity', '0.45');
-  await expect(workflow.locator('[data-label="Needs changes"]')).toHaveAttribute('data-state', 'skipped');
+  await expect(workflow.locator('[data-label="Rejected"]')).toHaveAttribute('data-state', 'skipped');
   await expect(workflow.locator('[data-v-node]').filter({ hasText: 'Finance review' })).toHaveAttribute(
     'data-v-selected',
     '',
@@ -91,14 +91,15 @@ test('consumer DOM, scoped themes, selection and native workflow actions', async
   await expect(workflow.locator('path.vui-edge').nth(2)).toHaveCSS('stroke', 'oklch(0.705 0.015 286.067)');
   await expect(workflow.locator('marker polyline').first()).toHaveCSS('fill', 'context-stroke');
   await workflow.screenshot({ path: testInfo.outputPath('workflow.png') });
-  // Selection keeps the library color over the process state.
-  const onTaken = await taken.first().evaluate((edge: SVGPathElement) => {
-    const point = edge.getPointAtLength(edge.getTotalLength() / 4).matrixTransform(edge.getScreenCTM()!);
+  // Selection keeps the library color over the process state. The approved branch is long enough to click between
+  // its labels, which sit at its start and its end.
+  const onTaken = await taken.last().evaluate((edge: SVGPathElement) => {
+    const point = edge.getPointAtLength(edge.getTotalLength() / 2).matrixTransform(edge.getScreenCTM()!);
     return { x: point.x, y: point.y };
   });
   await page.mouse.click(onTaken.x, onTaken.y);
-  await expect(workflow.locator('[data-v-edge]').first()).toHaveAttribute('data-v-selected', '');
-  await expect(taken.first()).toHaveCSS('stroke', 'oklch(0.623 0.214 259.815)');
+  await expect(workflow.locator('[data-v-edge]').nth(1)).toHaveAttribute('data-v-selected', '');
+  await expect(taken.last()).toHaveCSS('stroke', 'oklch(0.623 0.214 259.815)');
   expect(errors).toEqual([]);
 });
 
@@ -250,7 +251,7 @@ test('viewport controls drive the given flow within its zoom limits, and edge la
     ['€12,400', 0],
     ['Approved', 1],
     ['within 1 day', 1],
-    ['Needs changes', 2],
+    ['Rejected', 2],
   ];
   const labelDistance = () =>
     workflow.evaluate((root, labels) => {

@@ -99,11 +99,12 @@ test('geometry: endpoints stay on ports after zooming through the controls', asy
   const endpointError = () =>
     workflow.evaluate((root) => {
       const edge = root.querySelectorAll<SVGPathElement>('path.vui-edge')[0];
+      // The process runs from the top down: the first edge leaves the bottom handle of the first card.
       const port = root
-        .querySelector('[data-v-node] [data-v-handle][data-v-handle-position="right"]')!
+        .querySelector('[data-v-node] [data-v-handle][data-v-handle-position="bottom"]')!
         .getBoundingClientRect();
       const start = edge.getPointAtLength(0).matrixTransform(edge.getScreenCTM()!);
-      return Math.max(Math.abs(start.x - port.right), Math.abs(start.y - port.y - port.height / 2));
+      return Math.max(Math.abs(start.x - port.x - port.width / 2), Math.abs(start.y - port.bottom));
     });
   await expect.poll(endpointError).toBeLessThan(1);
   const zoom = () =>

@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, viewChild } from '@angular/core';
 import { Vui } from '@vflow/ui';
 import { DemoIconComponent } from '../../../shared/demo-icon.component';
 import { injectDocsTheme } from '../../../shared/docs-theme';
+import { SCENE_BACKGROUND } from '../../../shared/demo-scene';
 import { createEdges, createNodes, Vflow, VflowComponent } from 'ngx-vflow';
 import { ScrollRows } from './scroll-rows';
 
@@ -75,102 +76,112 @@ interface LongEntity {
   `,
   template: `
     <section class="demo" aria-label="Scroll and collapse experiment" [attr.data-vui-theme]="theme()">
-      <vflow [nodes]="nodes" [edges]="edges" (initialized)="flow()?.fitView()">
-        <ng-template let-ctx vNode>
-          @let view = scroll.visibility(ctx.node.id);
-          <article vuiNode [attr.data-entity]="ctx.node.id" [attr.data-collapsed]="ctx.data().collapsed">
-            <header vuiNodeHeader [class.proxy]="ctx.data().collapsed || view.above.length">
-              <span vuiTitle>{{ ctx.data().title }}</span>
-              <span vuiMeta>{{ ctx.data().fields.length }} fields</span>
-              <button
-                class="button plain small icon"
-                vNoDrag
-                type="button"
-                [attr.aria-label]="(ctx.data().collapsed ? 'Expand ' : 'Collapse ') + ctx.data().title"
-                [attr.aria-expanded]="!ctx.data().collapsed"
-                (click)="toggle(ctx.node.id)">
-                <app-demo-icon [name]="ctx.data().collapsed ? 'chevron-right' : 'chevron-down'" />
-              </button>
-              <!-- Proxy handles keep the same IDs, so edges stay attached while rows are hidden. -->
-              @for (
-                field of ctx.data().collapsed ? ctx.data().fields : scroll.hidden(ctx.data().fields, view.above);
-                track field.id
-              ) {
-                <span
-                  vuiPort
-                  handleType="target"
-                  position="left"
-                  [handleId]="'in:' + field.id"
-                  [vuiPortConnected]="connected.has(ctx.node.id + '/in:' + field.id)"
-                  [canStart]="false"></span>
-                <span
-                  vuiPort
-                  handleType="source"
-                  position="right"
-                  [handleId]="'out:' + field.id"
-                  [vuiPortConnected]="connected.has(ctx.node.id + '/out:' + field.id)"
-                  [canAccept]="false"></span>
-              }
-            </header>
-            @if (!ctx.data().collapsed) {
-              <div class="rows" vNoWheel [attr.data-rows]="ctx.node.id" (scroll)="scroll.onScroll(ctx.node.id, $event)">
-                @for (row of scroll.rows(ctx.node.id, ctx.data().fields); track row.key) {
-                  <div vuiRow [attr.data-field]="row.field.id">
-                    <span vuiTitle>{{ row.field.name }}</span>
-                    <span vuiMeta>{{ row.field.type }}</span>
-                    @if (row.handles) {
+      <div class="stage">
+        <vflow [nodes]="nodes" [edges]="edges" [background]="background" (initialized)="flow()?.fitView()">
+          <ng-template let-ctx vNode>
+            @let view = scroll.visibility(ctx.node.id);
+            <article vuiNode [attr.data-entity]="ctx.node.id" [attr.data-collapsed]="ctx.data().collapsed">
+              <header vuiNodeHeader [class.proxy]="ctx.data().collapsed || view.above.length">
+                <span vuiTitle>{{ ctx.data().title }}</span>
+                <span vuiMeta>{{ ctx.data().fields.length }} fields</span>
+                <button
+                  class="button plain small icon"
+                  vNoDrag
+                  type="button"
+                  [attr.aria-label]="(ctx.data().collapsed ? 'Expand ' : 'Collapse ') + ctx.data().title"
+                  [attr.aria-expanded]="!ctx.data().collapsed"
+                  (click)="toggle(ctx.node.id)">
+                  <app-demo-icon [name]="ctx.data().collapsed ? 'chevron-right' : 'chevron-down'" />
+                </button>
+                <!-- Proxy handles keep the same IDs, so edges stay attached while rows are hidden. -->
+                @for (
+                  field of ctx.data().collapsed ? ctx.data().fields : scroll.hidden(ctx.data().fields, view.above);
+                  track field.id
+                ) {
+                  <span
+                    vuiPort
+                    handleType="target"
+                    position="left"
+                    [handleId]="'in:' + field.id"
+                    [vuiPortConnected]="connected.has(ctx.node.id + '/in:' + field.id)"
+                    [canStart]="false"></span>
+                  <span
+                    vuiPort
+                    handleType="source"
+                    position="right"
+                    [handleId]="'out:' + field.id"
+                    [vuiPortConnected]="connected.has(ctx.node.id + '/out:' + field.id)"
+                    [canAccept]="false"></span>
+                }
+              </header>
+              @if (!ctx.data().collapsed) {
+                <div
+                  class="rows"
+                  vNoWheel
+                  [attr.data-rows]="ctx.node.id"
+                  (scroll)="scroll.onScroll(ctx.node.id, $event)">
+                  @for (row of scroll.rows(ctx.node.id, ctx.data().fields); track row.key) {
+                    <div vuiRow [attr.data-field]="row.field.id">
+                      <span vuiTitle>{{ row.field.name }}</span>
+                      <span vuiMeta>{{ row.field.type }}</span>
+                      @if (row.handles) {
+                        <span
+                          vuiPort
+                          handleType="target"
+                          position="left"
+                          [handleId]="'in:' + row.field.id"
+                          [vuiPortConnected]="connected.has(ctx.node.id + '/in:' + row.field.id)"
+                          [canStart]="false"></span>
+                        <span
+                          vuiPort
+                          handleType="source"
+                          position="right"
+                          [handleId]="'out:' + row.field.id"
+                          [vuiPortConnected]="connected.has(ctx.node.id + '/out:' + row.field.id)"
+                          [canAccept]="false"></span>
+                      }
+                    </div>
+                  }
+                </div>
+                @if (view.below.length) {
+                  <footer vuiNodeFooter class="proxy edge-note">
+                    <span vuiMeta>{{ view.below.length }} more below</span>
+                    @for (field of scroll.hidden(ctx.data().fields, view.below); track field.id) {
                       <span
                         vuiPort
                         handleType="target"
                         position="left"
-                        [handleId]="'in:' + row.field.id"
-                        [vuiPortConnected]="connected.has(ctx.node.id + '/in:' + row.field.id)"
+                        [handleId]="'in:' + field.id"
+                        [vuiPortConnected]="connected.has(ctx.node.id + '/in:' + field.id)"
                         [canStart]="false"></span>
                       <span
                         vuiPort
                         handleType="source"
                         position="right"
-                        [handleId]="'out:' + row.field.id"
-                        [vuiPortConnected]="connected.has(ctx.node.id + '/out:' + row.field.id)"
+                        [handleId]="'out:' + field.id"
+                        [vuiPortConnected]="connected.has(ctx.node.id + '/out:' + field.id)"
                         [canAccept]="false"></span>
                     }
-                  </div>
+                  </footer>
                 }
-              </div>
-              @if (view.below.length) {
-                <footer vuiNodeFooter class="proxy edge-note">
-                  <span vuiMeta>{{ view.below.length }} more below</span>
-                  @for (field of scroll.hidden(ctx.data().fields, view.below); track field.id) {
-                    <span
-                      vuiPort
-                      handleType="target"
-                      position="left"
-                      [handleId]="'in:' + field.id"
-                      [vuiPortConnected]="connected.has(ctx.node.id + '/in:' + field.id)"
-                      [canStart]="false"></span>
-                    <span
-                      vuiPort
-                      handleType="source"
-                      position="right"
-                      [handleId]="'out:' + field.id"
-                      [vuiPortConnected]="connected.has(ctx.node.id + '/out:' + field.id)"
-                      [canAccept]="false"></span>
-                  }
-                </footer>
               }
-            }
-          </article>
-        </ng-template>
-        <svg:g *vEdge="let ctx" vEdgeInteractionArea>
-          <svg:path vuiEdge [attr.d]="ctx.path()" />
-        </svg:g>
-      </vflow>
+            </article>
+          </ng-template>
+          <svg:g *vEdge="let ctx" vEdgeInteractionArea>
+            <svg:path vuiEdge [attr.d]="ctx.path()" />
+          </svg:g>
+        </vflow>
+        @if (flow(); as flow) {
+          <vui-controls class="stage-controls" [flow]="flow" />
+        }
+      </div>
     </section>
   `,
 })
 export class ScrollCollapseDemoComponent {
   readonly flow = viewChild(VflowComponent);
   readonly theme = injectDocsTheme();
+  readonly background = SCENE_BACKGROUND;
   readonly scroll = new ScrollRows<LongEntity['fields'][number]>();
   readonly nodes = createNodes<LongEntity>([
     {

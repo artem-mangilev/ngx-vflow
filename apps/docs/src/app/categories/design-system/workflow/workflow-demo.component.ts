@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, signal, viewChild } from '@angular/
 import { Vui } from '@vflow/ui';
 import { createEdges, createNodes, Vflow, VflowComponent } from 'ngx-vflow';
 import { DemoIconComponent, DemoIconName } from '../../../shared/demo-icon.component';
+import { SCENE_BACKGROUND } from '../../../shared/demo-scene';
 import { injectDocsTheme } from '../../../shared/docs-theme';
 
 /** Tones of the application's own badge; the vflow UI parts ship none. */
@@ -21,6 +22,12 @@ type EdgeState = 'taken' | 'open' | 'skipped';
   imports: [Vflow, Vui, DemoIconComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
+    /* The process runs from the top down, so the scene is about as wide as the docs column and fits it at nearly its
+       real size; the height is the demo's to give. The scene fits by its width, which leaves a band above and below
+       the cards for the viewport controls. */
+    vflow {
+      height: 730px;
+    }
     article {
       width: 230px;
       font-size: 14px;
@@ -52,7 +59,13 @@ type EdgeState = 'taken' | 'open' | 'skipped';
   template: `
     <section class="demo" aria-label="Approval workflow demo" [attr.data-vui-theme]="theme()">
       <div class="stage">
-        <vflow [nodes]="nodes" [edges]="edges" [minZoom]="0.5" [maxZoom]="2" (initialized)="flow()?.fitView()">
+        <vflow
+          [nodes]="nodes"
+          [edges]="edges"
+          [background]="background"
+          [minZoom]="0.5"
+          [maxZoom]="2"
+          (initialized)="flow()?.fitView()">
           <article *vNode="let ctx" vuiNode [attr.data-step]="ctx.node.id">
             <header vuiNodeHeader>
               <span class="node-icon"><app-demo-icon [name]="ctx.data().icon" /></span>
@@ -79,24 +92,24 @@ type EdgeState = 'taken' | 'open' | 'skipped';
             </footer>
             <!-- Display only: plain core handles anchor the edges, with no port drawn under the arrowheads. -->
             @if (ctx.node.id !== 'received') {
-              <span vHandle handleType="target" position="left" [canStart]="false" [canAccept]="false"></span>
+              <span vHandle handleType="target" position="top" [canStart]="false" [canAccept]="false"></span>
             }
             @if (ctx.node.id === 'received') {
-              <span vHandle handleType="source" position="right" [canStart]="false" [canAccept]="false"></span>
+              <span vHandle handleType="source" position="bottom" [canStart]="false" [canAccept]="false"></span>
             }
             @if (ctx.node.id === 'review') {
-              <!-- One exit per branch, so each branch starts apart and its condition sits at its start. -->
+              <!-- One exit per branch, one on each side: a branch starts apart and its condition sits at its start. -->
               <span
                 vHandle
                 handleType="source"
-                position="right"
+                position="left"
                 handleId="approved"
                 [canStart]="false"
                 [canAccept]="false"></span>
               <span
                 vHandle
                 handleType="source"
-                position="bottom"
+                position="right"
                 handleId="changes"
                 [canStart]="false"
                 [canAccept]="false"></span>
@@ -147,11 +160,12 @@ export class WorkflowDemoComponent {
   readonly flow = viewChild(VflowComponent);
   readonly theme = injectDocsTheme();
   readonly approved = signal(false);
+  readonly background = SCENE_BACKGROUND;
   readonly nodes = createNodes<StepData>([
-    step('received', { x: 0, y: 150 }, 'Invoice received', 'arrow-down', 'A new invoice from the supplier.'),
-    step('review', { x: 400, y: 150 }, 'Finance review', 'search', 'Check the amount and approve payment.'),
-    step('paid', { x: 840, y: 0 }, 'Schedule payment', 'arrow-right', 'Send the approved invoice to accounting.'),
-    step('fix', { x: 840, y: 340 }, 'Request correction', 'alert', 'The supplier must provide a purchase order.'),
+    step('received', { x: 265, y: 0 }, 'Invoice received', 'arrow-down', 'A new invoice from the supplier.'),
+    step('review', { x: 265, y: 236 }, 'Finance review', 'search', 'Check the amount and approve payment.'),
+    step('paid', { x: 0, y: 472 }, 'Schedule payment', 'arrow-right', 'Send the approved invoice to accounting.'),
+    step('fix', { x: 530, y: 472 }, 'Request correction', 'alert', 'The supplier must provide a purchase order.'),
   ]);
   readonly edges = createEdges([
     {
@@ -179,7 +193,7 @@ export class WorkflowDemoComponent {
       target: 'fix',
       curve: 'smooth-step',
       markers: { end: {} },
-      data: { start: 'Needs changes' },
+      data: { start: 'Rejected' },
     },
   ]);
 

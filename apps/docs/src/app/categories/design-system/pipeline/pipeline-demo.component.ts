@@ -25,6 +25,7 @@ import {
 } from 'ngx-vflow';
 import { DemoIconComponent, DemoIconName } from '../../../shared/demo-icon.component';
 import { injectDocsTheme } from '../../../shared/docs-theme';
+import { SCENE_BACKGROUND } from '../../../shared/demo-scene';
 import { BLEND_MODES, BlendMode, FILTERS, FilterFn, Picture, PortType, renderPicture, SAMPLES } from './image-lab';
 import { PictureComponent } from './picture.component';
 
@@ -79,7 +80,7 @@ const EXPORT = { width: 1200, height: 780 };
       background: var(--type);
     }
     .vui-edge[data-type='number'] {
-      stroke-dasharray: 5 4;
+      stroke-dasharray: 4 4;
     }
     .vui-row.output {
       justify-content: flex-end;
@@ -158,6 +159,7 @@ const EXPORT = { width: 1200, height: 780 };
         <vflow
           [nodes]="nodes()"
           [edges]="edges()"
+          [background]="background"
           [connection]="connection"
           (connect)="connect($event)"
           (deleteRequest)="remove($event)"
@@ -304,7 +306,7 @@ const EXPORT = { width: 1200, height: 780 };
           </svg:g>
           <ng-template let-ctx vConnection>
             @if (ctx.path(); as path) {
-              <svg:path vuiEdge stroke-dasharray="5 4" [attr.d]="path" />
+              <svg:path vuiEdge stroke-dasharray="4 4" [attr.d]="path" />
             }
           </ng-template>
         </vflow>
@@ -333,6 +335,7 @@ const EXPORT = { width: 1200, height: 780 };
 export class PipelineDemoComponent {
   readonly flow = viewChild(VflowComponent);
   readonly theme = injectDocsTheme();
+  readonly background = SCENE_BACKGROUND;
   readonly samples = SAMPLES;
   readonly modes = BLEND_MODES;
   readonly filters = Object.keys(FILTERS) as FilterFn[];
