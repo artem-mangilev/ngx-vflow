@@ -58,6 +58,15 @@
   }
 }
 
+/* The column of the landing page: at most 1080px of content, centered, with the gutter of the page at its sides. */
+@utility landing-width {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: calc(1080px + 2 * var(--lp-gutter));
+  margin-inline: auto;
+  padding-inline: var(--lp-gutter);
+}
+
 /* The chevron of the demos' select, drawn in the text color so it follows the theme. */
 @utility demo-chevron {
   background-image:

@@ -1,4 +1,8 @@
-<ng-doc-root [sidebar]="!!section()" [noWidthLimit]="!section()">
+<!-- On the landing page the navbar is as wide as the page's column: 1080px and the navbar's own padding. -->
+<ng-doc-root
+  [sidebar]="!!section()"
+  [noWidthLimit]="!section()"
+  [style.--ng-doc-app-max-width]="activeTab() ? null : '1128px'">
   <ng-doc-navbar [hamburger]="!!section()">
     <a
       ngDocNavbarLeft

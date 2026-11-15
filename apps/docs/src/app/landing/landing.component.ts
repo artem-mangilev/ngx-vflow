@@ -3,10 +3,10 @@ import { ChangeDetectionStrategy, Component, signal, Type } from '@angular/core'
 import { RouterLink } from '@angular/router';
 import { provideVflow, withSettings } from 'ngx-vflow';
 import { FirstFlowComponent } from '../categories/docs/getting-started/quickstart/demo/first-flow.component';
-import { PipelineDemoComponent } from '../categories/examples/applications/pipeline/pipeline-demo.component';
-import { RelationshipsDemoComponent } from '../categories/examples/applications/relationships-map/relationships-demo.component';
 import { AllFeaturesDemoComponent } from '../categories/examples/feature-overview/demo/all-features-demo.component';
 import { SHOWCASE_PROJECTS } from '../showcase/projects';
+import { HeroFlowComponent } from './hero-flow.component';
+import { ServiceNodeFlowComponent } from './service-node-flow.component';
 
 interface Feature {
   title: string;
@@ -16,8 +16,10 @@ interface Feature {
   /** What the live flow next to the text is, for assistive technology. */
   demoLabel: string;
   demo: Type<unknown>;
-  /** Whether the page draws the frame around the flow; a demo with its own shell needs none. */
-  framed: boolean;
+  /** Source shown under the flow, where the amount of code is the point. */
+  code?: { caption: string; text: string };
+  /** The flow takes the whole column, under the text: for a scene too large for a half of it. */
+  wide?: boolean;
 }
 
 interface PackageRow {
@@ -26,39 +28,50 @@ interface PackageRow {
   link: string;
 }
 
-const INSTALL_COMMAND = 'npm i ngx-vflow @angular/cdk';
+const INSTALL_COMMAND = 'npm i ngx-vflow';
+
+/** The template of `FirstFlowComponent` without its CSS classes and the initial `fitView()`. */
+const FIRST_FLOW_TEMPLATE = `<vflow [nodes]="nodes" [edges]="edges()" (connect)="connect($event)">
+  <div *vNode="let ctx of nodes">
+    <span vHandle handleType="target" position="left"></span>
+    {{ ctx.data().label }}
+    <span vHandle handleType="source" position="right"></span>
+  </div>
+
+  <svg:g *vEdge="let ctx" vEdgeInteractionArea>
+    <svg:path [attr.d]="ctx.path()" />
+  </svg:g>
+</vflow>`;
 
 @Component({
   selector: 'app-landing',
   templateUrl: './landing.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [NgComponentOutlet, RouterLink],
+  imports: [NgComponentOutlet, RouterLink, HeroFlowComponent],
   // A wheel over a flow of this page scrolls the page; pinch and the zoom keys still zoom.
   providers: [provideVflow(withSettings({ zoomOnScroll: false }))],
 })
 export class LandingComponent {
-  protected readonly hero = PipelineDemoComponent;
   protected readonly installCommand = INSTALL_COMMAND;
   protected readonly projects = SHOWCASE_PROJECTS;
 
   protected readonly features: Feature[] = [
     {
-      title: 'The gestures work from the first render',
-      text: 'Dragging nodes, panning, zooming, selecting, connecting handles and moving around with the keyboard need no setup. This flow is the whole quickstart: one component and its template.',
+      title: 'Comes with reasonable defaults for your editor',
+      text: 'Dragging nodes, panning, zooming, selection, connecting handles and keyboard navigation are set up before you write a line. A working editor is one component with a short template, and you configure only what yours does differently.',
       link: '/docs/getting-started/quickstart',
-      linkText: 'Follow the quickstart',
+      linkText: 'Read the quickstart',
       demoLabel: 'Live flow from the quickstart: three nodes you can drag and connect',
       demo: FirstFlowComponent,
-      framed: true,
+      code: { caption: 'The template of this flow, without its CSS classes', text: FIRST_FLOW_TEMPLATE },
     },
     {
       title: 'A node is your own template',
-      text: 'The library ships no node card. A node renders through an Angular template or component, so it is plain HTML and CSS with your own content inside, and signals for its state. Here the nodes are people, teams, a metric and a note.',
+      text: 'The library ships no node card. A node renders through an Angular template or component, so it is plain HTML and CSS with your own content inside, and signals for its state. This one is a service with a status, a chart and a control.',
       link: '/docs/nodes/custom-nodes',
       linkText: 'Read about custom nodes',
-      demoLabel: 'Live flow: people in nested teams, a metric and a note; drag a person onto another team',
-      demo: RelationshipsDemoComponent,
-      framed: false,
+      demoLabel: 'Live flow: one node that shows a service; add or remove a replica',
+      demo: ServiceNodeFlowComponent,
     },
     {
       title: 'The parts of an editor are included',
@@ -67,7 +80,7 @@ export class LandingComponent {
       linkText: 'Open this example with its code',
       demoLabel: 'Live flow with a minimap, a resizable node, a node toolbar and alignment guides',
       demo: AllFeaturesDemoComponent,
-      framed: true,
+      wide: true,
     },
   ];
 
