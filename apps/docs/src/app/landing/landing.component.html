@@ -139,11 +139,16 @@
             }
           </div>
           @if (feature.code; as code) {
-            <figure class="m-0 border-t border-t-doc-border bg-doc-base-0">
-              <pre
-                class="m-0 overflow-x-auto px-4 pt-4 pb-2 font-doc-mono text-[12.5px] leading-[1.6] text-doc-text"
-                tabindex="0"><code>{{ code.text }}</code></pre>
-              <figcaption class="px-4 pb-3.5 text-[0.8rem] text-doc-muted">{{ code.caption }}</figcaption>
+            <!-- The code block of the docs, highlighted in the browser and laid flush into the frame. -->
+            <figure class="m-0 border-t border-t-doc-border">
+              <ng-doc-code
+                class="[--ng-doc-code-border-radius:0] [--ng-doc-code-border:none] [--ng-doc-code-font-size:13px] [--ng-doc-code-line-numbers:none] [--ng-doc-code-margin:0]"
+                [copyButton]="false">
+                <div [ngDocHighlighter]="code.text"></div>
+              </ng-doc-code>
+              <figcaption class="bg-(--ng-doc-code-background) px-5 pb-3.5 text-[0.8rem] text-doc-muted">
+                {{ code.caption }}
+              </figcaption>
             </figure>
           }
         </div>

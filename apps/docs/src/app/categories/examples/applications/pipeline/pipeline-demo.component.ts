@@ -104,6 +104,7 @@ const KIND_COLOR: Record<LabData['kind'], string> = {
                     small
                     icon
                     vNoDrag
+                    vNoSelect
                     type="button"
                     [attr.aria-label]="'Upload a picture to ' + data.title"
                     (click)="file.click()">
@@ -120,6 +121,7 @@ const KIND_COLOR: Record<LabData['kind'], string> = {
                       small
                       icon
                       vNoDrag
+                      vNoSelect
                       type="button"
                       [attr.aria-label]="data.playing ? 'Pause the wave' : 'Play a wave'"
                       (click)="togglePlaying(ctx.node.id)">
@@ -131,6 +133,7 @@ const KIND_COLOR: Record<LabData['kind'], string> = {
                       docsRange
                       class="flex-1 min-w-0"
                       vNoDrag
+                      vNoSelect
                       vNoWheel
                       type="range"
                       min="0"
@@ -154,7 +157,12 @@ const KIND_COLOR: Record<LabData['kind'], string> = {
                 @if (data.kind === 'source') {
                   <label class="mt-2 grid gap-1 text-xs text-vui-muted">
                     Picture
-                    <select docsSelect class="w-full" vNoDrag (change)="pick(ctx.node.id, $any($event.target).value)">
+                    <select
+                      docsSelect
+                      class="w-full"
+                      vNoDrag
+                      vNoSelect
+                      (change)="pick(ctx.node.id, $any($event.target).value)">
                       @for (sample of samples; track sample.id) {
                         <option [value]="sample.id" [selected]="sample.id === data.sample">{{ sample.name }}</option>
                       }
@@ -171,6 +179,7 @@ const KIND_COLOR: Record<LabData['kind'], string> = {
                       docsSelect
                       class="w-full"
                       vNoDrag
+                      vNoSelect
                       (change)="patch(ctx.node.id, { mode: $any($event.target).value })">
                       @for (mode of modes; track mode) {
                         <option [value]="mode" [selected]="mode === data.mode">{{ mode }}</option>
@@ -198,6 +207,7 @@ const KIND_COLOR: Record<LabData['kind'], string> = {
                         docsRange
                         class="flex-1 min-w-0"
                         vNoDrag
+                        vNoSelect
                         vNoWheel
                         type="range"
                         min="0"
@@ -233,6 +243,7 @@ const KIND_COLOR: Record<LabData['kind'], string> = {
                     small
                     class="ms-auto"
                     vNoDrag
+                    vNoSelect
                     type="button"
                     [disabled]="!pictures().get(ctx.node.id)"
                     (click)="download(ctx.node.id)">

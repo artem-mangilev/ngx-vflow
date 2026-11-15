@@ -55,6 +55,7 @@ import { EdgeData, FlowStoreService } from './services/flow-store.service';
             small
             icon
             type="button"
+            vNoSelect
             aria-label="Delete the connection"
             (click)="deleteEdge(ctx.edge.id)">
             <app-demo-icon name="close" />

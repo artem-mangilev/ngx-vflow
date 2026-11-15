@@ -73,6 +73,7 @@ const TRAFFIC = [0.62, 0.7, 0.64, 0.8, 0.72, 0.92, 0.7, 0.76, 1.1, 0.84, 0.7, 0.
             small
             icon
             vNoDrag
+            vNoSelect
             type="button"
             aria-label="Remove a replica"
             [disabled]="data.replicas === 1"
@@ -85,6 +86,7 @@ const TRAFFIC = [0.62, 0.7, 0.64, 0.8, 0.72, 0.92, 0.7, 0.76, 1.1, 0.84, 0.7, 0.
             small
             icon
             vNoDrag
+            vNoSelect
             type="button"
             aria-label="Add a replica"
             [disabled]="data.replicas === maxReplicas"

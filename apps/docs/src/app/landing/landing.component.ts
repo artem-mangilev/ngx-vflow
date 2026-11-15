@@ -1,7 +1,7 @@
 import { NgComponentOutlet } from '@angular/common';
 import { ChangeDetectionStrategy, Component, signal, Type } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { provideVflow, withSettings } from 'ngx-vflow';
+import { NgDocCodeComponent, NgDocCodeHighlighterDirective } from '@ng-doc/app';
 import { FirstFlowComponent } from '../categories/docs/getting-started/quickstart/demo/first-flow.component';
 import { AllFeaturesDemoComponent } from '../categories/examples/feature-overview/demo/all-features-demo.component';
 import { SHOWCASE_PROJECTS } from '../showcase/projects';
@@ -47,9 +47,7 @@ const FIRST_FLOW_TEMPLATE = `<vflow [nodes]="nodes" [edges]="edges()" (connect)=
   selector: 'app-landing',
   templateUrl: './landing.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [NgComponentOutlet, RouterLink, HeroFlowComponent],
-  // A wheel over a flow of this page scrolls the page; pinch and the zoom keys still zoom.
-  providers: [provideVflow(withSettings({ zoomOnScroll: false }))],
+  imports: [NgComponentOutlet, RouterLink, NgDocCodeComponent, NgDocCodeHighlighterDirective, HeroFlowComponent],
 })
 export class LandingComponent {
   protected readonly installCommand = INSTALL_COMMAND;

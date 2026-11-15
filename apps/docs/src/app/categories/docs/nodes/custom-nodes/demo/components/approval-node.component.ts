@@ -18,8 +18,10 @@ export type Decision = 'approved' | 'rejected';
         <span vuiMeta>{{ node.data().approver }}</span>
       </header>
       <footer vuiNodeFooter>
-        <button docsButton small type="button" vNoDrag (click)="decided.emit('approved')">Approve</button>
-        <button docsButton="plain" small type="button" vNoDrag (click)="decided.emit('rejected')">Reject</button>
+        <button docsButton small type="button" vNoDrag vNoSelect (click)="decided.emit('approved')">Approve</button>
+        <button docsButton="plain" small type="button" vNoDrag vNoSelect (click)="decided.emit('rejected')">
+          Reject
+        </button>
       </footer>
       <span vuiPort handleType="target" position="left"></span>
     </article>

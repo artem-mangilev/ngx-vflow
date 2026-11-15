@@ -3,12 +3,15 @@ import { DemoIconComponent, DocsButton, DocsNodeIcon } from '@docs/shared';
 import { Vui } from '@vflow/ui';
 import { Vflow, injectNode } from 'ngx-vflow';
 
-/** A node that is resized while it is selected and carries a toolbar; its handles sit on content inside it. */
+/**
+ * A node that is resized while it is selected and carries a toolbar; its handles sit on content inside it. The
+ * resizer stops at the `min-*` CSS of the card, 240 by 280px, which is the room its content needs.
+ */
 @Component({
   template: `
     <article
       vuiNode
-      class="flex w-60 min-w-60 flex-col text-[13px]"
+      class="flex min-h-70 w-60 min-w-60 flex-col text-[13px]"
       data-testid="transform"
       [vResizable]="ctx.selected()">
       <header vuiNodeHeader>
@@ -32,7 +35,7 @@ import { Vflow, injectNode } from 'ngx-vflow';
 
     <v-node-toolbar position="top">
       <div vuiToolbar>
-        <button docsButton="plain" small type="button" (click)="deleted.emit()">Delete</button>
+        <button docsButton="plain" small type="button" vNoSelect (click)="deleted.emit()">Delete</button>
       </div>
     </v-node-toolbar>
   `,

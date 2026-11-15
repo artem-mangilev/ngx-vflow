@@ -18,7 +18,9 @@ export interface RequestData {
         <span vuiMeta>{{ node.data().amount | currency: 'USD' : 'symbol' : '1.0-0' }}</span>
       </header>
       <footer vuiNodeFooter>
-        <button docsButton="primary" small type="button" vNoDrag (click)="submitted.emit(node.data())">Submit</button>
+        <button docsButton="primary" small type="button" vNoDrag vNoSelect (click)="submitted.emit(node.data())">
+          Submit
+        </button>
       </footer>
       <span vuiPort handleType="source" position="right"></span>
     </article>

@@ -55,6 +55,7 @@ const QUIET_PORT = `transition-[border-color,background-color,box-shadow,opacity
                   small
                   icon
                   vNoDrag
+                  vNoSelect
                   type="button"
                   [attr.aria-label]="(ctx.data().collapsed ? 'Expand ' : 'Collapse ') + ctx.data().title"
                   [attr.aria-expanded]="!ctx.data().collapsed"

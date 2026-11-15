@@ -15,6 +15,7 @@ interface TaskData {
       <header vuiNodeHeader vDragHandle class="cursor-grab active:cursor-grabbing">
         <input
           vNoDrag
+          vNoSelect
           type="checkbox"
           class="m-0 self-center cursor-pointer"
           [attr.aria-label]="'Done: ' + ctx.data().title" />

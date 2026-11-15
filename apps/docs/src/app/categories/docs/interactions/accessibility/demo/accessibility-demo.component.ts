@@ -89,11 +89,19 @@ const SPANISH: Partial<AriaLabelConfig> = {
                 <div vuiRow>
                   <span vuiPort handleType="target" position="left"></span>
                   <!-- Controls inside a node keep their own keys and Tab stops. -->
-                  <input docsInput class="min-w-0 flex-1" vNoDrag aria-label="Node title" placeholder="Node title" />
+                  <input
+                    docsInput
+                    class="min-w-0 flex-1"
+                    vNoDrag
+                    vNoSelect
+                    aria-label="Node title"
+                    placeholder="Node title" />
                   <span vuiPort handleType="source" position="right"></span>
                 </div>
                 <footer vuiNodeFooter>
-                  <button docsButton small type="button" vNoDrag (click)="removeEditor()">Remove editor</button>
+                  <button docsButton small type="button" vNoDrag vNoSelect (click)="removeEditor()">
+                    Remove editor
+                  </button>
                 </footer>
               </article>
             } @else {

@@ -61,6 +61,7 @@ const KIND_COLOR: Record<StepKind, string> = {
                   docsButton="primary"
                   class="ms-auto"
                   vNoDrag
+                  vNoSelect
                   type="button"
                   [disabled]="approved()"
                   (click)="approved.set(true)">
@@ -99,6 +100,7 @@ const KIND_COLOR: Record<StepKind, string> = {
                     docsButton="plain"
                     small
                     vNoDrag
+                    vNoSelect
                     type="button"
                     [attr.aria-label]="'Zoom to ' + ctx.data().title"
                     (click)="flow.fitView({ nodes: [ctx.node.id], padding: 0.5 })">

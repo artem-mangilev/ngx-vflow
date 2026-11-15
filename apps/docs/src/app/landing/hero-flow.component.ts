@@ -57,7 +57,8 @@ const GLOW_OFFSET = 40;
 
 /**
  * The flow at the top of the landing page: two colors and an angle wired into a gradient. Its nodes float on the page
- * itself, so the canvas neither pans nor zooms; the nodes drag, the controls work and the edges can be rewired.
+ * itself. The nodes drag, the controls work, the edges can be rewired and the canvas zooms; it pans with a mouse or a
+ * trackpad, while a finger on it scrolls the page.
  *
  * The nodes are not tab stops: the keyboard reaches the controls inside them and the edges, which Delete removes, and
  * a reader on the way to the rest of the page passes four stops fewer. The flows below the hero keep the whole
@@ -74,9 +75,7 @@ const GLOW_OFFSET = 40;
       [nodes]="nodes"
       [edges]="edges()"
       [connection]="connection"
-      [panOnDrag]="false"
-      [zoomOnScroll]="false"
-      [zoomOnPinch]="false"
+      [panOnDrag]="finePointer"
       [nodesFocusable]="false"
       (connect)="connect($event)"
       (deleteRequest)="remove($event)"
@@ -89,7 +88,7 @@ const GLOW_OFFSET = 40;
               <span vuiTitle>{{ data.title }}</span>
               <span vuiMeta class="font-doc-mono">{{ data.color }}</span>
             </header>
-            <div class="flex justify-between p-vui-3" vNoDrag role="group" [attr.aria-label]="data.title">
+            <div class="flex justify-between p-vui-3" vNoDrag vNoSelect role="group" [attr.aria-label]="data.title">
               @for (swatch of swatches; track swatch.value) {
                 <button
                   type="button"
@@ -115,6 +114,7 @@ const GLOW_OFFSET = 40;
                 small
                 icon
                 vNoDrag
+                vNoSelect
                 type="button"
                 [attr.aria-label]="spinning() ? 'Stop turning the gradient' : 'Turn the gradient'"
                 (click)="spinning.set(!spinning())">
@@ -126,6 +126,7 @@ const GLOW_OFFSET = 40;
                 docsRange
                 class="min-w-0 flex-1"
                 vNoDrag
+                vNoSelect
                 vNoWheel
                 type="range"
                 min="0"
@@ -198,6 +199,8 @@ const GLOW_OFFSET = 40;
 })
 export class HeroFlowComponent {
   protected readonly swatches = SWATCHES;
+  /** A touch screen keeps the drag on the canvas for scrolling the page, which has no other place to be scrolled by. */
+  protected readonly finePointer = matchMedia('(pointer: fine)').matches;
   protected readonly motion = !matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   private readonly flow = viewChild.required(VflowComponent);
@@ -285,7 +288,8 @@ export class HeroFlowComponent {
     const host = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
     const destroyRef = inject(DestroyRef);
 
-    // The canvas does not pan, so the flow itself keeps the scene in the middle of whatever room the page gives it.
+    // The canvas has no frame and no controls, so the flow itself brings the scene back to the middle of whatever
+    // room the page gives it.
     const resize = new ResizeObserver(() => {
       if (this.ready) this.fit();
     });
