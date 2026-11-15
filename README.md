@@ -59,13 +59,30 @@ Use Node 24 (`nvm use`), pnpm (`corepack enable`) and `pnpm install`.
 - `libs/ui`: optional `@vflow/ui` design system (Tailwind CSS 4).
 - `apps/docs`: NgDoc application; `apps/docs-e2e`: Playwright tests.
 
-The workspace has two Angular versions. The root `package.json` holds the one the libraries are built, tested
-and published with: the oldest supported version. `apps/docs/package.json` holds the one of the docs, the
-version the latest NgDoc needs. The docs never import library sources: they use the packages built into
-`dist/libs`, like an application that installs them (see [apps/docs/scripts/libs.mjs](apps/docs/scripts/libs.mjs)).
+The workspace has two Angular versions and one lockfile. Every project declares what it needs in its own
+`package.json`:
 
-- `pnpm start`: watch builds of the libraries and the docs dev server on top of them; saving a file of a library,
-  of `@vflow/ui` or of the docs reloads the page. Arguments go to `ng serve`, e.g. `pnpm start --port 4300`.
+- `libs/<name>/package.json`: besides what the package publishes, its `devDependencies` are what it is built and
+  tested with, the oldest supported Angular. The versions the libraries share are the `libs` catalog of
+  [pnpm-workspace.yaml](pnpm-workspace.yaml). A library builds into `libs/<name>/dist`; the packages that extend
+  the core get the built core from `node_modules`, like an application.
+- `apps/docs/package.json`: the Angular version the latest NgDoc needs. The docs never import library sources:
+  `docs:libs` builds the libraries the docs depend on and copies the packages to `apps/docs/libs` (see
+  [apps/docs/scripts/libs.mjs](apps/docs/scripts/libs.mjs)).
+- the root `package.json`: the tools of the repository only (Nx, ESLint, Prettier, the git hooks). No project
+  imports from it.
+
+Both Angular versions share one pnpm store, so a package must never find the Angular it did not ask for: the
+settings in `pnpm-workspace.yaml` make an undeclared import or a missing peer dependency fail instead.
+
+Everything runs through Nx, the docs included: `docs:build` and `docs:serve` are the NgDoc builders of
+`apps/docs/node_modules`, a library builds with the ng-packagr builder of its own `node_modules`, and there is
+no Angular CLI workspace.
+
+- `pnpm start` (`nx serve docs`): the docs dev server. `nx watch` follows the libraries and runs `docs:libs` after
+  every change, so saving a file of a library, of `@vflow/ui` or of the docs reloads the page. Arguments go to the
+  dev server, e.g. `pnpm start --port 4300`. `nx watch` needs the Nx daemon: if it reports that the daemon is not
+  running, `pnpm nx reset` clears a stale marker.
 - `pnpm build:dev` / `pnpm build`: all libraries in development / production, and the docs.
 - `pnpm lint`, `pnpm test`, `pnpm e2e`: Nx verification targets.
 

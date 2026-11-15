@@ -1,7 +1,7 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "outDir": "../../dist/libs/cli",
+    "outDir": "./dist",
     "rootDir": ".",
     "declaration": false,
     "sourceMap": false,

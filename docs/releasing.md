@@ -80,10 +80,13 @@ The package manifests specify `publishConfig.access: public`.
 1. In `package.json` set the name, the description and the source version to the current shared release
    version, keep `publishConfig.access: public`, `sideEffects: false` and the peer ranges of `ngx-vflow`
    and `@angular/core`. An extension package imports only the public API of `ngx-vflow`.
-2. Keep the project tag `release` and the `nx-release-publish` target with `packageRoot: "dist/{projectRoot}"`.
+2. Keep the project tag `release` and the `nx-release-publish` target with `packageRoot: "{projectRoot}/dist"`.
+   In `project.json` and `ng-package.json` replace the name of the package in the paths of the builder and
+   of the output. `devDependencies` hold what the package is built and tested with, as `catalog:libs`
+   entries, and `"ngx-vflow": "workspace:*"`: pnpm links it to the built core.
 3. Add the alias to the root `tsconfig.json` (`libs/<name>/src/public-api`): `vitest.shared.mts` reads the root
-   aliases, so specs import `ngx-vflow` from source. The docs use the built package: add it to `packages` in
-   `apps/docs/scripts/libs.mjs`, which copies `dist/libs/<name>` to `apps/docs/libs/<name>`, and add the alias
+   aliases, so specs import `ngx-vflow` from source. The docs use the built package: add it to `sources` in
+   `apps/docs/scripts/libs.mjs`, which copies `libs/<name>/dist` to `apps/docs/libs/<name>`, and add the alias
    of the copy to `apps/docs/tsconfig.json`. Add its runtime peer dependencies to `apps/docs/package.json`.
 4. Add a page under the **Packages** docs category with a live demo, and an e2e spec in `apps/docs-e2e`.
 5. Run `nx build <name>`, `nx test <name>`, `nx lint <name>`, the docs builds and the release dry-run. The tag

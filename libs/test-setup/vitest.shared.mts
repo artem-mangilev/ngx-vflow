@@ -4,7 +4,9 @@ import { readFileSync } from 'node:fs';
 import { basename, resolve } from 'node:path';
 import { defineConfig, type ViteUserConfig } from 'vitest/config';
 
-const workspaceRoot = import.meta.dirname;
+/** This package: its package.json holds what the configuration imports, and the TestBed setup files are here. */
+const setupRoot = import.meta.dirname;
+const workspaceRoot = resolve(setupRoot, '../..');
 
 /** The `paths` of the root tsconfig as Vite aliases, so specs import `ngx-vflow` and friends from source. */
 function tsconfigPathAliases() {
@@ -26,12 +28,12 @@ function tsconfigPathAliases() {
 
 /**
  * Specs of a project run in Chromium: they measure layout, dispatch pointer events and read computed styles.
- * `projectRoot` holds `tsconfig.spec.json`; `test-setup.ts` at the workspace root initializes a zoneless TestBed.
+ * `projectRoot` holds `tsconfig.spec.json`; `test-setup.ts` of this package initializes a zoneless TestBed.
  */
 export function defineAngularTestConfig(projectRoot: string, include: string[]): ViteUserConfig {
   return defineConfig({
     root: projectRoot,
-    cacheDir: resolve(workspaceRoot, 'node_modules/.vite', basename(projectRoot)),
+    cacheDir: resolve(setupRoot, 'node_modules/.vite', basename(projectRoot)),
     plugins: [angular({ tsconfig: resolve(projectRoot, 'tsconfig.spec.json'), workspaceRoot })],
     resolve: { alias: tsconfigPathAliases() },
     // A project with its own package.json would otherwise not serve files of the rest of the workspace.
@@ -39,7 +41,7 @@ export function defineAngularTestConfig(projectRoot: string, include: string[]):
     test: {
       globals: true,
       include,
-      setupFiles: [resolve(workspaceRoot, 'test-setup.ts')],
+      setupFiles: [resolve(setupRoot, 'test-setup.ts')],
       // Like Jasmine, restore every spy after its test.
       restoreMocks: true,
       browser: {
@@ -75,7 +77,7 @@ export function defineAngularNodeDomTestConfig(projectRoot: string, include: str
           test: {
             name: setup.includes('zone') ? `${environment} zone.js` : environment,
             environment,
-            setupFiles: [resolve(workspaceRoot, setup)],
+            setupFiles: [resolve(setupRoot, setup)],
           },
         })),
       ),

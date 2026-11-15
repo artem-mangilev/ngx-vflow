@@ -1,10 +1,90 @@
 packages:
-  - apps/docs
+  - libs/*
+  - apps/*
 
-# The workspace holds two Angular versions: the libraries build with the one of the root, the docs run on their own
-# (see apps/docs/package.json). Each project gets its own lockfile and its own store in node_modules/.pnpm, so no
-# package of the docs can resolve a dependency, declared or not, to the copy of the root, and the other way round.
-sharedWorkspaceLockfile: false
+# What the libraries are built and tested with: the oldest supported Angular. The docs run on the Angular the
+# latest NgDoc needs, in apps/docs/package.json.
+catalogs:
+  libs:
+    '@analogjs/vite-plugin-angular': ^2.8.0
+    '@angular-devkit/architect': ^0.2003.0
+    '@angular-devkit/core': ^20.3.0
+    '@angular-devkit/schematics': ^20.3.0
+    '@angular/build': ^20.3.0
+    '@angular/cdk': ^20.2.14
+    '@angular/common': ^20.3.0
+    '@angular/compiler': ^20.3.0
+    '@angular/compiler-cli': ^20.3.0
+    '@angular/core': ^20.3.0
+    '@angular/platform-browser': ^20.3.0
+    '@schematics/angular': ^20.3.0
+    '@vitest/browser': ~3.2.4
+    'happy-dom': ^20.14.5
+    'jsdom': ^29.1.1
+    'ng-packagr': ^20.3.0
+    'playwright': ^1.49.1
+    'rxjs': ~7.8.0
+    'typescript': ~5.8.3
+    'vite': ^7.0.0
+    'vitest': ~3.2.4
+    'zone.js': ^0.15.1
+
+# The packages that extend the core compile against the built core, like an application that installs it.
+overrides:
+  ngx-vflow: link:libs/ngx-vflow/dist
+
+# One store holds both Angular versions, so a package must not get one it did not ask for:
+# - pnpm keeps a fallback folder for packages that import what they do not declare. It holds one version of a
+#   package, of whichever project: nothing that exists in two versions goes there, so such an import fails;
+# - a missing peer dependency is not installed on its own (pnpm takes the newest version in the lockfile, the
+#   Angular of the docs for a library). It is reported instead, and the project declares it.
+hoistPattern:
+  - '*'
+  - '!@angular/*'
+  - '!@angular-devkit/*'
+  - '!@schematics/*'
+  - '!@analogjs/*'
+  - '!ng-packagr'
+  - '!typescript'
+  - '!vite'
+  - '!vitest'
+  - '!@vitest/*'
+autoInstallPeers: false
+
+# Packages that import one of those without declaring it.
+packageExtensions:
+  # Compiles with the Angular compiler and TypeScript of the project it runs in.
+  '@analogjs/vite-plugin-angular':
+    peerDependencies:
+      '@angular/compiler': '*'
+      '@angular/compiler-cli': '*'
+      typescript: '*'
+  '@angular/build':
+    peerDependencies:
+      '@angular/common': '*'
+  # NgDoc: the application, its UI kit and the builder use more of Angular than they declare.
+  '@ng-doc/app':
+    peerDependencies:
+      '@angular/forms': '*'
+      '@angular/platform-browser': '*'
+  '@ng-doc/builder':
+    peerDependencies:
+      '@angular/core': '*'
+      '@angular/platform-browser': '*'
+      '@angular/router': '*'
+  '@ng-doc/ui-kit':
+    peerDependencies:
+      '@angular/router': '*'
+  # Its Vite plugin imports the Vite that Vitest runs.
+  '@vitest/browser':
+    peerDependencies:
+      vite: '*'
+  # Runs Angular builders and schematics through @angular-devkit.
+  nx:
+    peerDependencies:
+      '@angular-devkit/architect': '*'
+      '@angular-devkit/core': '*'
+      '@angular-devkit/schematics': '*'
 
 # Packages allowed to run install scripts: native binaries of the build tools.
 onlyBuiltDependencies:
@@ -13,8 +93,3 @@ onlyBuiltDependencies:
   - lmdb
   - msgpackr-extract
   - nx
-
-# Dependencies of NgDoc that its dev server prebundles by name: they must be resolvable from apps/docs.
-publicHoistPattern:
-  - esthetic
-  - shiki

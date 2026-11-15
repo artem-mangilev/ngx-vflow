@@ -6,11 +6,13 @@
     "declarationMap": true,
     "inlineSources": true,
     "types": [],
-    // The package compiles against the built core, which `build` depends on: only its public API is reachable, and
-    // ng-packagr accepts no source files outside the package. Specs and the docs use the source alias of the root.
-    "paths": {
-      "ngx-vflow": ["dist/libs/ngx-vflow"]
-    }
+    // No source aliases of the root tsconfig: the package gets `ngx-vflow` the way an application does, from
+    // node_modules, where it is the built core (see devDependencies). ng-packagr accepts no source files outside
+    // the package anyway. Specs and the docs use the aliases.
+    "paths": {},
+    // Reads the `exports` of a package, like the bundler of an application: the typings of the built core import
+    // the core by its own name.
+    "moduleResolution": "bundler"
   },
   "exclude": ["**/*.spec.ts"]
 }

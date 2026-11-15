@@ -1,7 +1,7 @@
 # See http://help.github.com/ignore-files/ for more about ignoring files.
 
 # Compiled output
-/dist
+dist/
 /tmp
 /out-tsc
 /bazel-out
@@ -54,3 +54,6 @@ Thumbs.db
 
 # @vflow/cli templates, generated from libs/ui by `ui:sync-cli` before cli:build and cli:test
 /libs/cli/src/steps/templates/
+
+.claude/worktrees
+.claude/settings.local.json

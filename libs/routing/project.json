@@ -18,8 +18,9 @@
         }
       },
       "defaultConfiguration": "production",
-      "executor": "@angular-devkit/build-angular:ng-packagr",
-      "outputs": ["{workspaceRoot}/dist/libs/routing"]
+      "executor": "./libs/routing/node_modules/@angular/build:ng-packagr",
+      "inputs": ["production", { "dependentTasksOutputFiles": "**/*.d.ts", "transitive": true }],
+      "outputs": ["{projectRoot}/dist"]
     },
     "test": {
       "executor": "nx:run-commands",
@@ -42,7 +43,7 @@
     "nx-release-publish": {
       "executor": "@nx/js:release-publish",
       "options": {
-        "packageRoot": "dist/{projectRoot}"
+        "packageRoot": "{projectRoot}/dist"
       }
     }
   },

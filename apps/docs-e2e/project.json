@@ -7,7 +7,8 @@
     "e2e": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "playwright test --config apps/docs-e2e/playwright.config.ts"
+        "command": "playwright test",
+        "cwd": "{projectRoot}"
       }
     },
     "lint": {

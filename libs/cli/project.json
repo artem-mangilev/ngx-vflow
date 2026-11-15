@@ -7,11 +7,11 @@
   "targets": {
     "build": {
       "executor": "nx:run-commands",
-      "outputs": ["{workspaceRoot}/dist/libs/cli"],
+      "outputs": ["{projectRoot}/dist"],
       "options": {
         "parallel": false,
         "commands": [
-          "rm -rf dist/libs/cli",
+          "rm -rf libs/cli/dist",
           "tsc -p libs/cli/tsconfig.lib.json",
           "node libs/cli/scripts/copy-assets.mjs"
         ]
@@ -50,7 +50,7 @@
     "nx-release-publish": {
       "executor": "@nx/js:release-publish",
       "options": {
-        "packageRoot": "dist/{projectRoot}"
+        "packageRoot": "{projectRoot}/dist"
       }
     }
   }

@@ -22,6 +22,16 @@ const PARTS = readdirSync(join(__dirname, '../../steps/templates/ui/src/lib')).m
   (file) => `lib/${file.replace(/\.template$/, '')}`,
 );
 
+/**
+ * Where the alias points in tsconfig.base.json. The library generator of @nx/angular writes the path: with a
+ * leading `./` since Nx 22, without it before.
+ */
+function aliasTarget(tree: Tree, alias: string): string[] {
+  const paths: string[] = readJson(tree, 'tsconfig.base.json').compilerOptions.paths[alias];
+
+  return paths.map((path) => path.replace(/^\.\//, ''));
+}
+
 function answer(values: Record<string, unknown>) {
   vi.mocked(prompt).mockResolvedValue(values);
 }
@@ -43,9 +53,7 @@ describe('ui in Nx', () => {
 
     await uiGenerator(tree);
 
-    expect(readJson(tree, 'tsconfig.base.json').compilerOptions.paths['@acme/flow-ui']).toEqual([
-      'libs/flow-ui/src/index.ts',
-    ]);
+    expect(aliasTarget(tree, '@acme/flow-ui')).toEqual(['libs/flow-ui/src/index.ts']);
     expect(tree.exists('libs/flow-ui/src/lib/node.directive.ts')).toBe(true);
     expect(tree.exists('vflow.json')).toBe(false);
     expect(vi.mocked(prompt).mock.calls[0][0]).toEqual([
@@ -62,9 +70,7 @@ describe('ui in Nx', () => {
     const project = readProjectConfiguration(tree, 'vflow-ui');
     expect(project.root).toBe('libs/vflow-ui');
     expect(project.targets?.['build']).toBeDefined();
-    expect(readJson(tree, 'tsconfig.base.json').compilerOptions.paths['@vflow/ui']).toEqual([
-      'libs/vflow-ui/src/index.ts',
-    ]);
+    expect(aliasTarget(tree, '@vflow/ui')).toEqual(['libs/vflow-ui/src/index.ts']);
     expect(tree.read('libs/vflow-ui/src/index.ts', 'utf-8')).toContain("from './lib/node.directive'");
     for (const part of PARTS) expect(tree.exists(`libs/vflow-ui/src/${part}`)).toBe(true);
     expect(tree.children('libs/vflow-ui/src/lib').sort()).toEqual(PARTS.map((part) => part.slice(4)).sort());
@@ -136,9 +142,7 @@ describe('ui in Nx', () => {
     await uiGenerator(tree, { directory: 'libs/shared/flow' });
 
     expect(vi.mocked(prompt).mock.calls[0][0]).not.toContainEqual(expect.objectContaining({ name: 'componentsPath' }));
-    expect(readJson(tree, 'tsconfig.base.json').compilerOptions.paths['@vflow/ui']).toEqual([
-      'libs/shared/flow/src/index.ts',
-    ]);
+    expect(aliasTarget(tree, '@vflow/ui')).toEqual(['libs/shared/flow/src/index.ts']);
     expect(tree.exists('libs/shared/flow/src/lib/node.directive.ts')).toBe(true);
   });
 
@@ -158,9 +162,7 @@ describe('ui in Nx', () => {
     await uiGenerator(tree, { importAlias: '@acme/flow-ui' });
 
     expect(vi.mocked(prompt)).not.toHaveBeenCalled();
-    expect(readJson(tree, 'tsconfig.base.json').compilerOptions.paths['@acme/flow-ui']).toEqual([
-      'libs/vflow-ui/src/index.ts',
-    ]);
+    expect(aliasTarget(tree, '@acme/flow-ui')).toEqual(['libs/vflow-ui/src/index.ts']);
   });
 
   it('finds a moved and renamed set through the tsconfig paths without asking', async () => {

@@ -74,12 +74,15 @@ export default defineConfig({
   /* Run your local dev server before starting the tests */
   webServer: [
     {
-      // Builds the libraries in watch mode and serves the docs on top of them, see apps/docs/scripts/dev.mjs.
+      // `nx serve docs`: builds the libraries the docs depend on and serves the docs on top of them.
       command: `pnpm start --configuration=${process.env['E2E_CONFIGURATION'] ?? 'development'}`,
       cwd: '../..',
       timeout: 300_000,
       url: `${process.env['E2E_BASE_URL'] ?? 'http://localhost:4200'}/`,
       reuseExistingServer: !process.env['CI'],
+      // Nx stops the tasks it started, the library watcher among them, when it is asked to stop: a kill of the
+      // process group, the default, leaves the watcher running.
+      gracefulShutdown: { signal: 'SIGTERM', timeout: 10_000 },
     },
   ],
 });

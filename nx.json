@@ -7,7 +7,7 @@
   },
   "namedInputs": {
     "default": ["{projectRoot}/**/*", "sharedGlobals"],
-    "sharedGlobals": ["{workspaceRoot}/tsconfig.json", "{workspaceRoot}/.postcssrc.json"],
+    "sharedGlobals": ["{workspaceRoot}/tsconfig.json"],
     "production": ["default", "!{projectRoot}/**/*.spec.ts"]
   },
   "targetDefaults": {
@@ -27,10 +27,9 @@
   "release": {
     "projects": ["tag:release"],
     "projectsRelationship": "fixed",
-    "releaseTagPattern": "v{version}",
     "version": {
       "preVersionCommand": "pnpm nx run-many -t build -p tag:release --configuration production",
-      "manifestRootsToUpdate": ["{projectRoot}", "dist/{projectRoot}"],
+      "manifestRootsToUpdate": ["{projectRoot}", "{projectRoot}/dist"],
       "versionActionsOptions": {
         "skipLockFileUpdate": true
       },
@@ -54,7 +53,12 @@
           "semverBump": "patch"
         }
       }
+    },
+    "releaseTag": {
+      "pattern": "v{version}"
     }
   },
-  "plugins": ["@nx/angular/plugin"]
+  "affected": {
+    "legacy": true
+  }
 }

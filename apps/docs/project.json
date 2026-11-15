@@ -9,39 +9,53 @@
       "executor": "nx:run-commands",
       "dependsOn": ["^build"],
       "options": {
-        "command": "node apps/docs/scripts/sync-libs.mjs"
+        "command": "node apps/docs/scripts/libs.mjs"
+      }
+    },
+    "watch-libs": {
+      "executor": "nx:run-commands",
+      "continuous": true,
+      "options": {
+        "command": "nx watch --projects=docs --includeDependencies -- nx run docs:libs",
+        "env": {
+          "NX_DAEMON": "true"
+        }
       }
     },
     "build": {
-      "executor": "nx:run-commands",
+      "executor": "./apps/docs/node_modules/@ng-doc/builder:vite-application",
       "dependsOn": ["libs"],
-      "outputs": ["{workspaceRoot}/dist/apps/docs"],
+      "outputs": ["{options.outputPath}"],
       "options": {
-        "command": "pnpm exec ng build",
-        "cwd": "{projectRoot}"
+        "configFile": "apps/docs/vite.config.mjs",
+        "outputPath": "dist/apps/docs"
       },
       "configurations": {
         "production": {
-          "command": "pnpm exec ng build --configuration production"
+          "mode": "production"
         },
         "development": {
-          "command": "pnpm exec ng build --configuration development"
+          "mode": "development"
         }
       },
       "defaultConfiguration": "production"
     },
     "serve": {
-      "executor": "nx:run-commands",
+      "executor": "./apps/docs/node_modules/@ng-doc/builder:vite-dev-server",
       "continuous": true,
+      "dependsOn": ["libs", "watch-libs"],
+      "readyWhen": {
+        "port": "{options.port ?? 4200}"
+      },
       "options": {
-        "command": "node apps/docs/scripts/dev.mjs"
+        "configFile": "apps/docs/vite.config.mjs"
       },
       "configurations": {
         "production": {
-          "command": "node apps/docs/scripts/dev.mjs --configuration production"
+          "mode": "production"
         },
         "development": {
-          "command": "node apps/docs/scripts/dev.mjs --configuration development"
+          "mode": "development"
         }
       },
       "defaultConfiguration": "development"

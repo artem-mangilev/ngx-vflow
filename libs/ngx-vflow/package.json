@@ -25,6 +25,25 @@
     "tslib": "^2.3.0"
   },
   "sideEffects": false,
+  "devDependencies": {
+    "@angular/build": "catalog:libs",
+    "@angular/cdk": "catalog:libs",
+    "@angular/common": "catalog:libs",
+    "@angular/compiler": "catalog:libs",
+    "@angular/compiler-cli": "catalog:libs",
+    "@angular/core": "catalog:libs",
+    "@angular/platform-browser": "catalog:libs",
+    "@vitest/browser": "catalog:libs",
+    "happy-dom": "catalog:libs",
+    "jsdom": "catalog:libs",
+    "ng-packagr": "catalog:libs",
+    "playwright": "catalog:libs",
+    "rxjs": "catalog:libs",
+    "typescript": "catalog:libs",
+    "vite": "catalog:libs",
+    "vitest": "catalog:libs",
+    "zone.js": "catalog:libs"
+  },
   "publishConfig": {
     "access": "public"
   }

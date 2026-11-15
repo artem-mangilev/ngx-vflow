@@ -2,7 +2,12 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "module": "commonjs",
-    "types": ["node"]
+    "types": ["node"],
+    // @nx/angular 24 publishes its entry points through an exports map, which this module resolution does not
+    // read. Only the types need the path: at run time Node resolves the import in the workspace of the consumer.
+    "paths": {
+      "@nx/angular/generators": ["libs/cli/node_modules/@nx/angular/dist/generators"]
+    }
   },
   "files": [],
   "references": [{ "path": "./tsconfig.lib.json" }, { "path": "./tsconfig.spec.json" }]
