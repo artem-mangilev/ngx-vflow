@@ -39,6 +39,8 @@ interface InputRow {
   color: string | null;
 }
 
+const INPUTS: InputId[] = ['start', 'end', 'angle'];
+
 const SWATCHES = [
   { name: 'Blue', value: '#3282b8' },
   { name: 'Sky', value: '#bbe1fa' },
@@ -56,6 +58,19 @@ const COMPACT = matchMedia('(width <= 600px)').matches;
 const DOT_GAP = 22;
 /** The least zoom of a flow, which the first fit does not go under either. */
 const MIN_ZOOM = 0.5;
+/**
+ * The entrance, in milliseconds from the first frame the reader sees. The nodes are simply there; after a beat the
+ * three wires draw themselves from the controls to the gradient, each starting while the one before is still on its
+ * way and after a shorter gap, so they read as one wave. A wire delivers its value shortly before its line is whole:
+ * the color is in the gradient as the wire lands. When the angle has arrived the gradient turns to it, and then starts
+ * to turn on its own.
+ */
+const WIRE_STARTS: Record<InputId, number> = { start: 150, end: 290, angle: 400 };
+const WIRE_DRAW = 500;
+const WIRE_LANDS_BEFORE_END = 80;
+const ANGLE_SETTLE = 450;
+/** The curve of a line being drawn: it moves on the screen, so it eases at both ends. */
+const DRAW_EASING = 'cubic-bezier(0.645, 0.045, 0.355, 1)';
 /** How far, in pixels, the light of each color lies from the middle of the card. */
 const GLOW_OFFSET = 40;
 
@@ -65,6 +80,10 @@ const GLOW_OFFSET = 40;
  * `slot`, the room the page keeps for them beside the copy; from there the reader drags them anywhere, and pans with
  * a mouse or a trackpad, while a finger on the canvas scrolls the page. The canvas does not zoom: it is as large as
  * the first screen, where a wheel has to scroll the page.
+ *
+ * It enters once, by wiring itself up: see `WIRE_STARTS`. The nodes have no entrance of their own, one motion being
+ * enough for one scene, and can be used from the first frame; a press or a key ends the entrance at once, and a reader
+ * who asked for less motion gets the wired flow at once.
  *
  * The nodes are not tab stops: the keyboard reaches the controls inside them and the edges, which Delete removes, and
  * a reader on the way to the rest of the page passes four stops fewer. The flows below the hero keep the whole
@@ -165,6 +184,7 @@ const GLOW_OFFSET = 40;
             <div
               class="pointer-events-none absolute inset-4 -z-1 rounded-vui-surface forced-colors:hidden"
               aria-hidden="true"
+              [class]="entering() ? '[transition:box-shadow_450ms_var(--ease-out-strong)]' : ''"
               [style.box-shadow]="glow()"></div>
             <header vuiNodeHeader class="py-vui-2">
               <span vuiTitle>Gradient</span>
@@ -187,11 +207,23 @@ const GLOW_OFFSET = 40;
               </div>
             }
             <div class="border-t border-vui-separator p-vui-2">
+              <!--
+                A color fades into the gradient when it changes: slowly while it arrives during the entrance, quickly
+                when the reader picks one, since that is feedback to a press. The angle is not eased, since it turns
+                by itself, except during the entrance, where the gradient turns to the angle that has just arrived.
+              -->
               <div
-                class="aspect-3/2 rounded-vui-control"
+                class="aspect-3/2 rounded-vui-control bg-[linear-gradient(var(--mix-angle),var(--mix-from),var(--mix-to))]"
                 role="img"
                 aria-label="The gradient the connected nodes make"
-                [style.background]="gradient()"></div>
+                [class]="
+                  entering()
+                    ? '[transition:--mix-from_300ms_var(--ease-out-strong),--mix-to_300ms_var(--ease-out-strong),--mix-angle_450ms_var(--ease-out-strong)]'
+                    : '[transition:--mix-from_150ms_ease,--mix-to_150ms_ease]'
+                "
+                [style.--mix-from]="mix().from"
+                [style.--mix-to]="mix().to"
+                [style.--mix-angle]="mix().angle"></div>
             </div>
           </article>
         }
@@ -249,6 +281,16 @@ export class HeroFlowComponent {
   protected readonly spinning = signal(this.motion);
   private readonly visible = signal(true);
 
+  /** The inputs whose wire is still on its way during the entrance: the gradient does not have their values yet. */
+  private readonly arriving = signal<ReadonlySet<InputId>>(new Set(this.motion ? INPUTS : []));
+  /** Whether the entrance is still playing. */
+  protected readonly entering = signal(this.motion);
+  private entered = false;
+  private entrance: { animations: Animation[]; timers: ReturnType<typeof setTimeout>[] } = {
+    animations: [],
+    timers: [],
+  };
+
   protected readonly nodes = createNodes<MixerData>([
     {
       id: 'start',
@@ -279,8 +321,15 @@ export class HeroFlowComponent {
     ]),
   );
 
-  /** The nodes that have an edge to the gradient. */
-  protected readonly feeds = computed(() => new Set(this.edges().map((edge) => edge.source)));
+  /** The nodes whose edge has reached the gradient. */
+  protected readonly feeds = computed(
+    () =>
+      new Set(
+        this.edges()
+          .filter((edge) => !this.arriving().has(edge.targetHandle as InputId))
+          .map((edge) => edge.source),
+      ),
+  );
 
   /** The three inputs of the gradient with the value each receives. */
   protected readonly inputs = computed<InputRow[]>(() => {
@@ -296,11 +345,11 @@ export class HeroFlowComponent {
   });
 
   /** An input without an edge leaves its end of the gradient empty; without an angle the gradient runs left to right. */
-  protected readonly gradient = computed(() => {
+  protected readonly mix = computed(() => {
     const [start, end] = this.inputs();
     const empty = 'var(--vui-surface-muted)';
 
-    return `linear-gradient(${this.angleOf()}deg, ${start.color ?? empty}, ${end.color ?? empty})`;
+    return { from: start.color ?? empty, to: end.color ?? empty, angle: `${this.angleOf()}deg` };
   });
 
   protected readonly glow = computed(() => {
@@ -333,17 +382,27 @@ export class HeroFlowComponent {
       if (this.ready) this.fit();
     });
     const visibility = new IntersectionObserver(([entry]) => this.visible.set(entry.isIntersecting));
+    // The reader does not wait for the entrance: the first press or key ends it.
+    const interrupt = () => this.finishEntrance();
+
     resize.observe(host);
     visibility.observe(host);
+    host.addEventListener('pointerdown', interrupt, { capture: true });
+    host.addEventListener('keydown', interrupt, { capture: true });
     effect(() => resize.observe(this.slot()));
     destroyRef.onDestroy(() => {
       resize.disconnect();
       visibility.disconnect();
+      host.removeEventListener('pointerdown', interrupt, { capture: true });
+      host.removeEventListener('keydown', interrupt, { capture: true });
+      this.entrance.timers.forEach(clearTimeout);
+      this.entrance.animations.forEach((animation) => animation.cancel());
+      this.entrance = { animations: [], timers: [] };
     });
 
-    // The angle advances a whole degree at a time, and only while the flow is on screen.
+    // The angle advances a whole degree at a time, only while the flow is on screen and once it has entered.
     effect((onCleanup) => {
-      if (!this.spinning() || !this.visible()) return;
+      if (!this.spinning() || !this.visible() || this.entering()) return;
 
       const node = this.nodes.find((item) => item.id === 'angle')!;
       let angle = untracked(() => node.data() as { kind: 'angle'; angle: number }).angle;
@@ -364,6 +423,7 @@ export class HeroFlowComponent {
   /** Fits the nodes into the slot, at their own size where the slot has the room. */
   protected fit(): void {
     this.ready = true;
+    if (!this.entered) this.enter();
 
     const flow = this.flow();
     const nodes = flow.getNodesBounds();
@@ -380,6 +440,72 @@ export class HeroFlowComponent {
       y: center.y - (nodes.y + nodes.height / 2) * zoom,
       zoom,
     });
+  }
+
+  /**
+   * Plays the entrance. The flow calls this before its first frame is painted, so the wires are hidden from the start;
+   * the clock starts two frames later, with the frame the reader sees, or a busy page load would swallow the
+   * beginning. The lines are revealed from the left by a clip: a dash pattern would do it too, but the wires are
+   * dashed already.
+   */
+  private enter(): void {
+    this.entered = true;
+    if (!this.motion) return;
+
+    const entrance = this.entrance;
+    const landings: [InputId, number][] = [];
+
+    for (const edge of this.edges()) {
+      const input = edge.targetHandle as InputId;
+      const wire = this.host.querySelector<SVGPathElement>(`[data-v-edge="${edge.id}"] path.vui-edge`);
+      const starts = WIRE_STARTS[input];
+
+      // A wire that is not drawn yet has nothing to play: its value is simply there.
+      if (!wire) {
+        this.land(input);
+        continue;
+      }
+
+      entrance.animations.push(
+        wire.animate([{ clipPath: 'inset(0 100% 0 0)' }, { clipPath: 'inset(0 0 0 0)' }], {
+          delay: starts,
+          duration: WIRE_DRAW,
+          easing: DRAW_EASING,
+          fill: 'backwards',
+        }),
+      );
+      landings.push([input, starts + WIRE_DRAW - WIRE_LANDS_BEFORE_END]);
+    }
+
+    // Held on their first frame until the clock starts.
+    entrance.animations.forEach((animation) => animation.pause());
+    requestAnimationFrame(() =>
+      requestAnimationFrame(() => {
+        // Ended by the reader, or the page was left, in the meantime.
+        if (this.entrance !== entrance) return;
+
+        entrance.animations.forEach((animation) => animation.play());
+        for (const [input, at] of landings) entrance.timers.push(setTimeout(() => this.land(input), at));
+
+        const landed = Math.max(...Object.values(WIRE_STARTS)) + WIRE_DRAW - WIRE_LANDS_BEFORE_END;
+        entrance.timers.push(setTimeout(() => this.entering.set(false), landed + ANGLE_SETTLE));
+      }),
+    );
+  }
+
+  /** The wire of an input has reached the gradient. */
+  private land(input: InputId): void {
+    this.arriving.update((arriving) => new Set([...arriving].filter((id) => id !== input)));
+  }
+
+  /** Ends the entrance where it is; before the flow is ready, that is before it has started, and it will not play. */
+  private finishEntrance(): void {
+    this.entered = true;
+    this.entrance.animations.forEach((animation) => animation.finish());
+    this.entrance.timers.forEach(clearTimeout);
+    this.entrance = { animations: [], timers: [] };
+    this.arriving.set(new Set());
+    this.entering.set(false);
   }
 
   protected setColor(id: string, title: string, color: string): void {
@@ -427,8 +553,10 @@ export class HeroFlowComponent {
     return this.nodes.find((node) => node.id === id)?.data();
   }
 
-  /** The data of the node wired into an input of the gradient. */
+  /** The data of the node wired into an input of the gradient; nothing while its wire is on the way. */
   private input(id: InputId): MixerData | undefined {
+    if (this.arriving().has(id)) return undefined;
+
     const edge = this.edges().find((item) => item.targetHandle === id);
 
     return edge && this.data(edge.source);

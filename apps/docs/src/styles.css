@@ -47,8 +47,30 @@
   --color-brand-pale: #bbe1fa;
 }
 
+/*
+ * The gradient of the landing hero as three typed properties, so that a change of a color or of the angle can be a
+ * transition: a gradient itself does not interpolate.
+ */
+@property --mix-from {
+  syntax: '<color>';
+  inherits: false;
+  initial-value: transparent;
+}
+@property --mix-to {
+  syntax: '<color>';
+  inherits: false;
+  initial-value: transparent;
+}
+@property --mix-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 90deg;
+}
+
 @layer base {
   :root {
+    /* The curve of something that arrives: fast at first, a long settle. The built-in `ease-out` is weaker. */
+    --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
     /* A fixed blue under white text (5.3:1) in both themes; the lighter dark accent is for rings and lines. */
     --demo-primary: oklch(0.546 0.245 262.881);
     --demo-warning: oklch(0.555 0.163 48.998);
