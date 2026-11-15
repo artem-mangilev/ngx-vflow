@@ -29,7 +29,7 @@
     "projectsRelationship": "fixed",
     "releaseTagPattern": "v{version}",
     "version": {
-      "preVersionCommand": "npx nx run-many -t build -p tag:release --configuration production",
+      "preVersionCommand": "pnpm nx run-many -t build -p tag:release --configuration production",
       "manifestRootsToUpdate": ["{projectRoot}", "dist/{projectRoot}"],
       "versionActionsOptions": {
         "skipLockFileUpdate": true

@@ -1,2 +1,10 @@
 /* You can add global styles to this file, and also import other style files */
 @import '@ng-doc/app/styles/themes/dark.css';
+
+// A demo pane keeps the code of a demo behind the demo, collapsed by an inline width that a binding sets; the
+// stylesheet of NgDoc starts it at 100%. A flow measures its host while the page is created, before that binding
+// runs, and the style computed for the measurement started a transition from 100%: every page opened with the code
+// sliding away, and the flow laid out its first viewport in the strip that was left. Collapsed is the start here.
+:root ng-doc-pane > .ng-doc-pane-back.ng-doc-pane-back {
+  width: 0;
+}

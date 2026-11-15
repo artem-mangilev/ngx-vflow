@@ -1,20 +1,27 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { ChildrenOutletContexts } from '@angular/router';
-import { routingAnimation } from './animations/routing.animation';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
+import {
+  NgDocNavbarComponent,
+  NgDocRootComponent,
+  NgDocSidebarComponent,
+  NgDocThemeToggleComponent,
+} from '@ng-doc/app';
+import { NgDocButtonIconComponent, NgDocIconComponent, NgDocTooltipDirective } from '@ng-doc/ui-kit';
 
 @Component({
-  animations: [routingAnimation()],
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  // eslint-disable-next-line @angular-eslint/prefer-standalone
-  standalone: false,
+  imports: [
+    RouterOutlet,
+    NgDocRootComponent,
+    NgDocNavbarComponent,
+    NgDocSidebarComponent,
+    NgDocThemeToggleComponent,
+    NgDocIconComponent,
+    NgDocButtonIconComponent,
+    NgDocTooltipDirective,
+  ],
 })
-export class AppComponent {
-  private contexts = inject(ChildrenOutletContexts);
-
-  getRouteAnimationData() {
-    return this.contexts.getContext('primary')?.route?.snapshot?.title;
-  }
-}
+export class AppComponent {}

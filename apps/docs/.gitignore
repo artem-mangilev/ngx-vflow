@@ -1,0 +1,11 @@
+# Copies of the built libraries and of the @vflow/ui sources, see scripts/libs.mjs
+/libs
+
+# NgDoc files
+/ng-doc
+
+/.angular
+/out-tsc
+
+# NgDoc cache
+/.cache/ng-doc

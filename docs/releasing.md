@@ -26,16 +26,17 @@ current dry-run select 3.0.0 for both packages.
 
 ```bash
 nvm use
-npm ci
-npm run build:dev
-npm run build
-npm run release:dry-run
+pnpm install
+pnpm build:dev
+pnpm build
+pnpm release:dry-run
 ```
 
-Nx builds production libraries before versioning, previews both source and distribution
-manifest updates, the changelog, Git commit/tag and npm publications. Dry-run creates build
-outputs but does not update source versions, create commits/tags or publish. No npm token is
-needed for the preview; it does **not** prove npm authorization.
+Nx builds production libraries before versioning and previews both source and distribution
+manifest updates, the changelog and the Git commit/tag. Dry-run creates build outputs but does
+not update source versions, create commits/tags or publish. The preview skips the publication
+step: a dry run leaves the current version in the manifests, and npm 11 (Node 24) refuses even
+a dry run of a version that is already published. It does **not** prove npm authorization.
 
 ## Publish
 
@@ -80,9 +81,10 @@ The package manifests specify `publishConfig.access: public`.
    version, keep `publishConfig.access: public`, `sideEffects: false` and the peer ranges of `ngx-vflow`
    and `@angular/core`. An extension package imports only the public API of `ngx-vflow`.
 2. Keep the project tag `release` and the `nx-release-publish` target with `packageRoot: "dist/{projectRoot}"`.
-3. Add the alias to the root `tsconfig.json` (`libs/<name>/src/public-api`) and to
-   `apps/docs/tsconfig.hybrid.json` (`dist/libs/<name>`), so the hybrid docs build checks the built package.
-   `vitest.shared.mts` reads the root aliases, so specs import `ngx-vflow` from source.
+3. Add the alias to the root `tsconfig.json` (`libs/<name>/src/public-api`): `vitest.shared.mts` reads the root
+   aliases, so specs import `ngx-vflow` from source. The docs use the built package: add it to `packages` in
+   `apps/docs/scripts/libs.mjs`, which copies `dist/libs/<name>` to `apps/docs/libs/<name>`, and add the alias
+   of the copy to `apps/docs/tsconfig.json`. Add its runtime peer dependencies to `apps/docs/package.json`.
 4. Add a page under the **Packages** docs category with a live demo, and an e2e spec in `apps/docs-e2e`.
 5. Run `nx build <name>`, `nx test <name>`, `nx lint <name>`, the docs builds and the release dry-run. The tag
    selector includes the new package in CI builds and the shared release; no workflow package list is needed.

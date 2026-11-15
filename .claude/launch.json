@@ -3,27 +3,21 @@
   "configurations": [
     {
       "name": "docs",
-      "runtimeExecutable": "npx",
-      "runtimeArgs": ["nx", "serve", "docs", "--port", "4200"],
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["start", "--port", "4200"],
       "port": 4200
     },
     {
       "name": "docs-4201",
-      "runtimeExecutable": "npx",
-      "runtimeArgs": ["nx", "serve", "docs", "--port", "4201"],
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["start", "--port", "4201"],
       "port": 4201
     },
     {
       "name": "docs-prod",
-      "runtimeExecutable": "npx",
-      "runtimeArgs": ["nx", "serve", "docs", "--configuration", "production", "--port", "4300"],
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["start", "--configuration", "production", "--port", "4300"],
       "port": 4300
-    },
-    {
-      "name": "consumer-core-only",
-      "runtimeExecutable": "npx",
-      "runtimeArgs": ["nx", "serve", "consumer", "--buildTarget", "consumer:build:core-only", "--port", "4301"],
-      "port": 4301
     }
   ]
 }

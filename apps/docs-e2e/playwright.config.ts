@@ -74,9 +74,10 @@ export default defineConfig({
   /* Run your local dev server before starting the tests */
   webServer: [
     {
-      command: `npm run start -- --configuration=${process.env['E2E_CONFIGURATION'] ?? 'development'}`,
+      // Builds the libraries in watch mode and serves the docs on top of them, see apps/docs/scripts/dev.mjs.
+      command: `pnpm start --configuration=${process.env['E2E_CONFIGURATION'] ?? 'development'}`,
       cwd: '../..',
-      timeout: 180_000,
+      timeout: 300_000,
       url: `${process.env['E2E_BASE_URL'] ?? 'http://localhost:4200'}/`,
       reuseExistingServer: !process.env['CI'],
     },

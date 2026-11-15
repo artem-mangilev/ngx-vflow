@@ -22,9 +22,6 @@
     "stripInternal": true,
     "skipLibCheck": true,
     "paths": {
-      "@ng-doc/generated": ["ng-doc/docs/index.ts"],
-      "@ng-doc/generated/*": ["ng-doc/docs/*"],
-      "@docs/shared": ["apps/docs/src/app/shared/flow-presentations.ts"],
       "@vflow/ui": ["libs/ui/src/public-api"],
       "@vflow/routing": ["libs/routing/src/public-api"],
       "@vflow/auto-size": ["libs/auto-size/src/public-api"],

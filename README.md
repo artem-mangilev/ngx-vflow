@@ -53,14 +53,20 @@ MIT © [Artem Mangilev](https://github.com/artem-mangilev)
 
 ## Development
 
-Use Node 22 (`nvm use`) and `npm ci`.
+Use Node 24 (`nvm use`), pnpm (`corepack enable`) and `pnpm install`.
 
-- `apps/docs`: NgDoc application; `apps/docs-e2e`: Playwright tests.
-- `libs/ngx-vflow`: engine.
+- `libs/ngx-vflow`: engine; `libs/routing`, `libs/auto-size`, `libs/layout`: extension packages.
 - `libs/ui`: optional `@vflow/ui` design system (Tailwind CSS 4).
-- `npm start`: docs dev server with source imports and live reload.
-- `npm run build:dev` / `npm run build`: all libraries and docs in development / production.
-- `npm run start:hybrid`: build both libraries, then serve docs using their distribution entry points.
-- `npm run lint`, `npm test`, `npm run e2e`: Nx verification targets.
+- `apps/docs`: NgDoc application; `apps/docs-e2e`: Playwright tests.
+
+The workspace has two Angular versions. The root `package.json` holds the one the libraries are built, tested
+and published with: the oldest supported version. `apps/docs/package.json` holds the one of the docs, the
+version the latest NgDoc needs. The docs never import library sources: they use the packages built into
+`dist/libs`, like an application that installs them (see [apps/docs/scripts/libs.mjs](apps/docs/scripts/libs.mjs)).
+
+- `pnpm start`: watch builds of the libraries and the docs dev server on top of them; saving a file of a library,
+  of `@vflow/ui` or of the docs reloads the page. Arguments go to `ng serve`, e.g. `pnpm start --port 4300`.
+- `pnpm build:dev` / `pnpm build`: all libraries in development / production, and the docs.
+- `pnpm lint`, `pnpm test`, `pnpm e2e`: Nx verification targets.
 
 See [release instructions](docs/releasing.md) for shared package versions, dry-runs and adding packages.

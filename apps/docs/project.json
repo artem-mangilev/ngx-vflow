@@ -1,131 +1,69 @@
 {
-  "projectType": "application",
-  "schematics": {
-    "@schematics/angular:component": {
-      "style": "scss"
-    }
-  },
-  "sourceRoot": "apps/docs/src",
-  "prefix": "app",
   "name": "docs",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/docs/src",
+  "prefix": "app",
   "targets": {
-    "build": {
+    "libs": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["^build"],
       "options": {
-        "outputPath": "dist/apps/docs",
-        "index": "apps/docs/src/index.html",
-        "browser": "apps/docs/src/main.ts",
-        "tsConfig": "apps/docs/tsconfig.app.json",
-        "inlineStyleLanguage": "scss",
-        "assets": [
-          "apps/docs/src/favicon.ico",
-          {
-            "glob": "robots.txt",
-            "input": "apps/docs/src/assets",
-            "output": "/"
-          },
-          {
-            "glob": "sitemap.xml",
-            "input": "apps/docs/src/assets",
-            "output": "/"
-          },
-          "apps/docs/src/assets",
-          {
-            "glob": "**/*",
-            "input": "node_modules/@ng-doc/ui-kit/assets",
-            "output": "assets/ng-doc/ui-kit"
-          },
-          {
-            "glob": "**/*",
-            "input": "node_modules/@ng-doc/app/assets",
-            "output": "assets/ng-doc/app"
-          },
-          {
-            "glob": "**/*",
-            "input": "ng-doc/docs/assets",
-            "output": "assets/ng-doc"
-          }
-        ],
-        "styles": [
-          "apps/docs/src/vflow-ui-parts.css",
-          "apps/docs/src/styles.scss",
-          "apps/docs/src/app/shared/demo.css",
-          "node_modules/@ng-doc/app/styles/global.css"
-        ],
-        "scripts": []
+        "command": "node apps/docs/scripts/sync-libs.mjs"
+      }
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["libs"],
+      "outputs": ["{workspaceRoot}/dist/apps/docs"],
+      "options": {
+        "command": "pnpm exec ng build",
+        "cwd": "{projectRoot}"
       },
       "configurations": {
         "production": {
-          "budgets": [
-            {
-              "type": "initial",
-              "maximumWarning": "2mb",
-              "maximumError": "4mb"
-            },
-            {
-              "type": "anyComponentStyle",
-              "maximumWarning": "2kb",
-              "maximumError": "4kb"
-            }
-          ],
-          "outputHashing": "all"
-        },
-        "hybrid": {
-          "tsConfig": "apps/docs/tsconfig.hybrid.json",
-          "optimization": false,
-          "extractLicenses": false,
-          "sourceMap": true,
-          "namedChunks": true,
-          "styles": [
-            "apps/docs/src/vflow-ui-parts.css",
-            "apps/docs/src/styles.scss",
-            "apps/docs/src/app/shared/demo.css",
-            "node_modules/@ng-doc/app/styles/global.css"
-          ]
+          "command": "pnpm exec ng build --configuration production"
         },
         "development": {
-          "optimization": false,
-          "extractLicenses": false,
-          "sourceMap": true,
-          "namedChunks": true
+          "command": "pnpm exec ng build --configuration development"
         }
       },
-      "defaultConfiguration": "production",
-      "executor": "@ng-doc/builder:application",
-      "outputs": ["{workspaceRoot}/dist/apps/docs", "{workspaceRoot}/ng-doc/docs"]
+      "defaultConfiguration": "production"
     },
     "serve": {
+      "executor": "nx:run-commands",
+      "continuous": true,
+      "options": {
+        "command": "node apps/docs/scripts/dev.mjs"
+      },
       "configurations": {
         "production": {
-          "buildTarget": "docs:build:production"
-        },
-        "hybrid": {
-          "buildTarget": "docs:build:hybrid"
+          "command": "node apps/docs/scripts/dev.mjs --configuration production"
         },
         "development": {
-          "buildTarget": "docs:build:development"
+          "command": "node apps/docs/scripts/dev.mjs --configuration development"
         }
       },
-      "defaultConfiguration": "development",
-      "executor": "@ng-doc/builder:dev-server"
+      "defaultConfiguration": "development"
     },
     "test": {
       "executor": "nx:run-commands",
+      "dependsOn": ["libs"],
       "options": {
-        "command": "tsc -p tsconfig.spec.json --noEmit && vitest run",
+        "command": "pnpm exec tsc -p tsconfig.spec.json --noEmit && pnpm exec vitest run",
         "cwd": "{projectRoot}"
       },
       "configurations": {
         "watch": {
-          "command": "vitest"
+          "command": "pnpm exec vitest"
         }
       }
     },
     "lint": {
+      "executor": "@angular-eslint/builder:lint",
       "options": {
         "lintFilePatterns": ["apps/docs/src/**/*.ts", "apps/docs/src/**/*.component.html"]
-      },
-      "executor": "@angular-eslint/builder:lint"
+      }
     }
   }
 }

@@ -1,0 +1,20 @@
+packages:
+  - apps/docs
+
+# The workspace holds two Angular versions: the libraries build with the one of the root, the docs run on their own
+# (see apps/docs/package.json). Each project gets its own lockfile and its own store in node_modules/.pnpm, so no
+# package of the docs can resolve a dependency, declared or not, to the copy of the root, and the other way round.
+sharedWorkspaceLockfile: false
+
+# Packages allowed to run install scripts: native binaries of the build tools.
+onlyBuiltDependencies:
+  - '@parcel/watcher'
+  - esbuild
+  - lmdb
+  - msgpackr-extract
+  - nx
+
+# Dependencies of NgDoc that its dev server prebundles by name: they must be resolvable from apps/docs.
+publicHoistPattern:
+  - esthetic
+  - shiki
