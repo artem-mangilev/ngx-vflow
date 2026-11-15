@@ -1,8 +1,13 @@
-<!-- On the landing page the navbar is as wide as the page's column: 1080px and the navbar's own padding. -->
+<!--
+  The landing page lays itself out: NgDoc's padding around the content is off there, so the hero starts under the
+  navbar and its sections reach the sides of the window, and the navbar is as wide as the page's column, 1080px and
+  the navbar's own padding.
+-->
 <ng-doc-root
   [sidebar]="!!section()"
   [noWidthLimit]="!section()"
-  [style.--ng-doc-app-max-width]="activeTab() ? null : '1128px'">
+  [style.--ng-doc-app-max-width]="activeTab() ? null : '1128px'"
+  [style.--ng-doc-page-padding]="activeTab() ? null : '0'">
   <ng-doc-navbar [hamburger]="!!section()">
     <a
       ngDocNavbarLeft

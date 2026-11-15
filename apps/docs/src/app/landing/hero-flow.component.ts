@@ -6,6 +6,7 @@ import {
   effect,
   ElementRef,
   inject,
+  input,
   signal,
   untracked,
   viewChild,
@@ -52,13 +53,18 @@ const SPIN_SPEED = 12;
  * On a phone the scene is drawn smaller to fit the screen, so there it is laid out tighter and loses less of its size.
  */
 const COMPACT = matchMedia('(width <= 600px)').matches;
+const DOT_GAP = 22;
+/** The least zoom of a flow, which the first fit does not go under either. */
+const MIN_ZOOM = 0.5;
 /** How far, in pixels, the light of each color lies from the middle of the card. */
 const GLOW_OFFSET = 40;
 
 /**
- * The flow at the top of the landing page: two colors and an angle wired into a gradient. Its nodes float on the page
- * itself. The nodes drag, the controls work, the edges can be rewired and the canvas zooms; it pans with a mouse or a
- * trackpad, while a finger on it scrolls the page.
+ * The flow at the top of the landing page: two colors and an angle wired into a gradient. Its canvas is the whole hero
+ * section, under the copy of the page, and its nodes stand on the page itself. It opens with the nodes fitted into
+ * `slot`, the room the page keeps for them beside the copy; from there the reader drags them anywhere, and pans with
+ * a mouse or a trackpad, while a finger on the canvas scrolls the page. The canvas does not zoom: it is as large as
+ * the first screen, where a wheel has to scroll the page.
  *
  * The nodes are not tab stops: the keyboard reaches the controls inside them and the edges, which Delete removes, and
  * a reader on the way to the rest of the page passes four stops fewer. The flows below the hero keep the whole
@@ -69,13 +75,28 @@ const GLOW_OFFSET = 40;
   imports: [Vflow, Vui, DocsKit, DemoIconComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   // The canvas is the page: no fill of its own. `--edge-keep` is how much of its color an edge keeps on a light page.
-  host: { class: 'block size-full [--v-background:transparent] [--edge-keep:72%] dark:[--edge-keep:100%]' },
+  host: {
+    class: 'relative block size-full [--v-background:transparent] [--edge-keep:72%] dark:[--edge-keep:100%]',
+  },
   template: `
+    <!--
+      The dots of the canvas: they follow the viewport, and are gathered around the slot and fade into the page. The
+      background of the flow would cover the section evenly, under the copy as well.
+    -->
+    <div
+      class="pointer-events-none absolute inset-0
+        [mask-image:radial-gradient(ellipse_44rem_30rem_at_var(--slot-x,75%)_var(--slot-y,50%),black_35%,transparent)]"
+      aria-hidden="true"
+      [style.background-image]="dots().image"
+      [style.background-size]="dots().size"
+      [style.background-position]="dots().position"></div>
     <vflow
       [nodes]="nodes"
       [edges]="edges()"
       [connection]="connection"
       [panOnDrag]="finePointer"
+      [zoomOnScroll]="false"
+      [zoomOnPinch]="false"
       [nodesFocusable]="false"
       (connect)="connect($event)"
       (deleteRequest)="remove($event)"
@@ -203,8 +224,26 @@ export class HeroFlowComponent {
   protected readonly finePointer = matchMedia('(pointer: fine)').matches;
   protected readonly motion = !matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  /** The box of the page the nodes are fitted into at the start, and again when the page is resized. */
+  readonly slot = input.required<HTMLElement>();
+
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
   private readonly flow = viewChild.required(VflowComponent);
   private ready = false;
+
+  /** A dot every 22 flow pixels, drawn as a CSS background that moves and scales with the viewport. */
+  protected readonly dots = computed(() => {
+    const { x, y, zoom } = this.flow().viewport();
+    const gap = DOT_GAP * zoom;
+    const radius = 1.25 * zoom;
+
+    return {
+      image: `radial-gradient(circle, var(--color-doc-border) ${radius}px, transparent ${radius + 0.5}px)`,
+      size: `${gap}px ${gap}px`,
+      // A tile has its dot in the middle; the offset puts a dot on the origin of the flow.
+      position: `${x - gap / 2}px ${y - gap / 2}px`,
+    };
+  });
 
   /** The angle turns on its own until the reader takes the slider; never for a reader who asked for less motion. */
   protected readonly spinning = signal(this.motion);
@@ -285,18 +324,18 @@ export class HeroFlowComponent {
   };
 
   constructor() {
-    const host = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
+    const host = this.host;
     const destroyRef = inject(DestroyRef);
 
-    // The canvas has no frame and no controls, so the flow itself brings the scene back to the middle of whatever
-    // room the page gives it.
+    // The canvas has no frame and no controls, so the flow itself brings the scene back into the slot when the page
+    // gives it another room.
     const resize = new ResizeObserver(() => {
       if (this.ready) this.fit();
     });
     const visibility = new IntersectionObserver(([entry]) => this.visible.set(entry.isIntersecting));
-
     resize.observe(host);
     visibility.observe(host);
+    effect(() => resize.observe(this.slot()));
     destroyRef.onDestroy(() => {
       resize.disconnect();
       visibility.disconnect();
@@ -322,9 +361,25 @@ export class HeroFlowComponent {
     });
   }
 
+  /** Fits the nodes into the slot, at their own size where the slot has the room. */
   protected fit(): void {
     this.ready = true;
-    this.flow().fitView({ maxZoom: 1, padding: COMPACT ? 0.05 : 0.1 });
+
+    const flow = this.flow();
+    const nodes = flow.getNodesBounds();
+    const host = this.host.getBoundingClientRect();
+    const slot = this.slot().getBoundingClientRect();
+    const zoom = Math.max(MIN_ZOOM, Math.min(1, slot.width / nodes.width, slot.height / nodes.height));
+    const center = { x: slot.left - host.left + slot.width / 2, y: slot.top - host.top + slot.height / 2 };
+
+    // The dots gather around the same point.
+    this.host.style.setProperty('--slot-x', `${center.x}px`);
+    this.host.style.setProperty('--slot-y', `${center.y}px`);
+    flow.setViewport({
+      x: center.x - (nodes.x + nodes.width / 2) * zoom,
+      y: center.y - (nodes.y + nodes.height / 2) * zoom,
+      zoom,
+    });
   }
 
   protected setColor(id: string, title: string, color: string): void {

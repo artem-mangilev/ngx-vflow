@@ -2,19 +2,24 @@
   The landing page. Its palette is the logo's (`brand-*`); surfaces and text come from the NgDoc theme (`doc-*`), so the
   page follows the light and dark themes of the documentation. A section spans the window and draws the rule under
   itself; its content sits in `landing-width`, a centered column of at most 1080px with `--lp-gutter` at the sides.
+  The gutter is the side padding of the NgDoc navbar, so the column and the navbar share their edges at every width.
 -->
-<div class="font-doc text-[17px] leading-[1.6] text-doc-text [--lp-gutter:clamp(20px,5vw,40px)]">
-  <!-- The copy and, next to it, a working flow: the first thing on the page is the library in use. -->
+<div class="font-doc text-[17px] leading-[1.6] text-doc-text [--lp-gutter:24px] max-[640px]:[--lp-gutter:16px]">
+  <!--
+    The copy and a working flow: the first thing on the page is the library in use. The canvas of the flow is the
+    whole section, so a node can be moved anywhere in it. The copy is an island over the canvas: it blurs and dims
+    what passes behind it, so a node there does not mix with the text, and it takes the pointer like any content.
+    Around the island the pointer reaches the canvas.
+  -->
   <section class="relative overflow-clip border-b border-b-doc-border">
-    <!-- The dots of a canvas, gathered around the flow and fading into the page. -->
     <div
-      class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle,var(--color-doc-border)_1.25px,transparent_1.75px)] [mask-image:radial-gradient(ellipse_44rem_30rem_at_calc(50%+16rem)_50%,black_35%,transparent)] [background-size:22px_22px] max-[900px]:[mask-image:radial-gradient(ellipse_100%_24rem_at_50%_calc(100%-13rem),black_35%,transparent)]"
-      aria-hidden="true"></div>
-
-    <div
-      class="relative landing-width grid grid-cols-[minmax(0,5fr)_minmax(0,6fr)] items-center gap-x-10 max-[900px]:grid-cols-1">
-      <!-- Grid items are as wide as their longest line by default; `*:min-w-0` lets them shrink to the column. -->
-      <div class="grid gap-6 py-16 *:min-w-0 max-[900px]:pt-12 max-[900px]:pb-0">
+      class="pointer-events-none relative z-1 landing-width grid grid-cols-[minmax(0,5fr)_minmax(0,6fr)] items-center gap-x-10 max-[900px]:grid-cols-1">
+      <!--
+        The island is wider than its column by its padding, so the text keeps the left edge of the page. Grid items
+        are as wide as their longest line by default; `*:min-w-0` lets them shrink to the column.
+      -->
+      <div
+        class="pointer-events-auto -mx-6 my-10 grid gap-6 rounded-3xl bg-doc-base-0/55 p-6 backdrop-blur-[6px] *:min-w-0 max-[900px]:mt-6 max-[900px]:mb-0 max-[600px]:-mx-3 max-[600px]:p-3">
         <h1
           class="m-0 text-[clamp(2.5rem,5.2vw,3.5rem)] leading-[1.02] font-bold tracking-[-0.04em] text-balance text-doc-heading">
           Node-based interfaces for Angular
@@ -78,19 +83,19 @@
         </ul>
       </div>
 
-      <!--
-        The flow has no frame: its nodes stand on the page. Its box reaches into the gutters and fades out at both
-        sides, so that a node dragged to the side and the light under the gradient are not cut at an edge.
-      -->
+      <!-- The room the flow is shown in until the reader moves it: the flow fits its nodes into this box. -->
       <div
-        class="relative min-h-[26rem] self-stretch max-[900px]:h-[24rem] max-[600px]:h-[19rem] max-[600px]:min-h-0"
-        role="region"
-        aria-label="Live example: two colors and an angle wired into a gradient. Pick a color, move the slider or rewire the nodes">
-        <div
-          class="absolute inset-y-0 -inset-x-(--lp-gutter) [mask-image:linear-gradient(to_right,transparent,black_var(--fade),black_calc(100%-var(--fade)),transparent)] [--fade:1rem] max-[600px]:[--fade:0.5rem]">
-          <app-hero-flow />
-        </div>
-      </div>
+        #heroSlot
+        class="min-h-[26rem] self-stretch max-[900px]:h-[24rem] max-[600px]:h-[19rem] max-[600px]:min-h-0"
+        aria-hidden="true"></div>
+    </div>
+
+    <!-- The flow comes after the copy in the document, so the copy is read and reached first. -->
+    <div
+      class="absolute inset-0"
+      role="region"
+      aria-label="Live example: two colors and an angle wired into a gradient. Pick a color, move the slider or rewire the nodes">
+      <app-hero-flow [slot]="heroSlot" />
     </div>
   </section>
 
