@@ -55,7 +55,7 @@ The animation is a position writer: a directive that provides `VX_LAYOUT_POSITIO
 
 ## ELK
 
-`elkLayout(options)` runs the [Eclipse Layout Kernel](https://eclipse.dev/elk/) through `elkjs` in the main thread. The options are typed, so no ELK option keys reach your code: `algorithm` (`layered`, `mrtree`, `stress`, `force`, `radial`, `box`, `rectpacking`), `direction`, `nodeSpacing`, `layerSpacing`, `edgeNodeSpacing`, `padding`, `nodePlacement`, `edgeRouting`, `separateConnectedComponents` and `aspectRatio`. Nested nodes are ELK children, laid out with their parents.
+`elkLayout(options)` runs the [Eclipse Layout Kernel](https://eclipse.dev/elk/) through `elkjs` in the main thread. The options are typed, so no ELK option keys reach your code: `algorithm` (`layered`, `mrtree`, `stress`, `force`, `radial`, `box`, `rectpacking`), `direction`, `nodeSpacing`, `layerSpacing`, `edgeNodeSpacing`, `padding`, `nodePlacement`, `edgeRouting`, `separateConnectedComponents` and `aspectRatio`. Nested nodes are ELK children, laid out with their parents: every parent is sized around its children with the same spacings as the root and keeps `padding` between them and its sides, one value or one per side, by default 40 on top for its header and 20 on the other sides.
 
 {{ NgDocActions.demoPane("LayoutElkDemoComponent") }}
 

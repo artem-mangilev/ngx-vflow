@@ -51,3 +51,19 @@ test('dagre lays the pipeline out left to right, then top to bottom when the dir
   expect(store.y).toBeGreaterThan(parse.y + 50);
   expect(errors).toEqual([]);
 });
+
+test('elk keeps room for the title of a group above its children', async ({ page }) => {
+  await page.goto('/packages/layout');
+  const flow = page.locator('vflow').nth(1);
+  await expect(flow.locator('[data-v-node]')).toHaveCount(7);
+  // Flow-space position of a node of this demo, from the transform the flow sets.
+  const point = (id: string) =>
+    flow.locator(`[data-v-node="${id}"]`).evaluate((element: HTMLElement) => {
+      const [x, y] = element.style.transform.match(/-?[\d.]+/g)!.map(Number);
+      return { x, y };
+    });
+
+  // ELK places the children inside the stage: the default padding keeps 40 on top for the title, 20 on the left.
+  await expect.poll(async () => (await point('map')).y - (await point('stage')).y).toBeGreaterThanOrEqual(40);
+  expect((await point('map')).x - (await point('stage')).x).toBeGreaterThanOrEqual(20);
+});

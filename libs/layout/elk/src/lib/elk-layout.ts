@@ -25,7 +25,11 @@ export interface ElkLayoutOptions {
   layerSpacing?: number;
   /** Space between an edge and a node, in flow units. */
   edgeNodeSpacing?: number;
-  /** Space a parent keeps around its children, in flow units: one value or one per side. */
+  /**
+   * Space a parent keeps around its children, in flow units: one value or one per side; the sides not given keep their
+   * default. The top side leaves room for the header of a group.
+   * @default { top: 40, right: 20, bottom: 20, left: 20 }
+   */
   padding?: number | { top?: number; right?: number; bottom?: number; left?: number };
   /** Node placement strategy of `layered`. */
   nodePlacement?: ElkNodePlacement;
@@ -49,7 +53,10 @@ const EDGE_ROUTINGS: Record<ElkEdgeRouting, string> = {
   splines: 'SPLINES',
 };
 
-/** The ELK layout options of the root for the adapter options. Nested nodes are laid out with their parents. */
+/**
+ * The ELK layout options for the adapter options. ELK reads `elk.padding` and the spacings from the node whose children
+ * they arrange and does not inherit them, so the root and every parent carry the same options.
+ */
 function toLayoutOptions(options: ElkLayoutOptions): LayoutOptions {
   const padding =
     typeof options.padding === 'number'
@@ -95,12 +102,13 @@ export function elkLayout(options: ElkLayoutOptions = {}): LayoutAlgorithm {
       for (const node of graph.nodes) {
         childrenOf.set(node.parentId, [...(childrenOf.get(node.parentId) ?? []), node]);
       }
-      const toElk = (node: LayoutNode): ElkNode => ({
-        id: node.id,
-        width: node.width,
-        height: node.height,
-        children: (childrenOf.get(node.id) ?? []).map(toElk),
-      });
+      const toElk = (node: LayoutNode): ElkNode => {
+        const children = (childrenOf.get(node.id) ?? []).map(toElk);
+        // A parent keeps the padding around its children and spaces them like the root does.
+        return children.length
+          ? { id: node.id, width: node.width, height: node.height, layoutOptions, children }
+          : { id: node.id, width: node.width, height: node.height };
+      };
       const root: ElkNode = {
         id: 'root',
         layoutOptions,

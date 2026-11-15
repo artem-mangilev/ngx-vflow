@@ -75,6 +75,37 @@ describe('layout adapters', () => {
     expect(result.positions.get('e')!.x).toBeGreaterThan(result.positions.get('d')!.x + 100);
   });
 
+  it('elk keeps the padding and the spacings inside every parent, with room for a header by default', async () => {
+    const offset = (result: LayoutResult, childId: string) => {
+      const child = result.positions.get(childId)!;
+      const parent = result.positions.get('group')!;
+      const size = result.sizes!.get('group')!;
+      return {
+        top: child.y - parent.y,
+        left: child.x - parent.x,
+        bottom: parent.y + size.height - (child.y + 50),
+        right: parent.x + size.width - (child.x + 100),
+      };
+    };
+
+    const defaults = await once(elkLayout({ direction: 'right' }), graph());
+    expect(offset(defaults, 'd').top).toBeGreaterThanOrEqual(40);
+    expect(offset(defaults, 'd').left).toBeGreaterThanOrEqual(20);
+    expect(offset(defaults, 'e').right).toBeGreaterThanOrEqual(20);
+    expect(offset(defaults, 'e').bottom).toBeGreaterThanOrEqual(20);
+
+    const sides = await once(elkLayout({ direction: 'right', padding: { top: 64, left: 32 } }), graph());
+    expect(offset(sides, 'd').top).toBeGreaterThanOrEqual(64);
+    expect(offset(sides, 'd').left).toBeGreaterThanOrEqual(32);
+    expect(offset(sides, 'e').right).toBeGreaterThanOrEqual(20);
+
+    const uniform = await once(elkLayout({ direction: 'right', padding: 8, layerSpacing: 90 }), graph());
+    expect(offset(uniform, 'd').top).toBeLessThan(40);
+    expect(offset(uniform, 'd').left).toBeGreaterThanOrEqual(8);
+    // The layers inside a parent are as far apart as the layers of the root.
+    expect(uniform.positions.get('e')!.x - (uniform.positions.get('d')!.x + 100)).toBeGreaterThanOrEqual(90);
+  });
+
   it('force emits the positions on every tick, pins a dragged node and stops on unsubscribe', async () => {
     const drags = new Subject<LayoutDragEvent>();
     // alphaDecay 0.5 settles the simulation within about ten ticks.
