@@ -3,7 +3,8 @@ keyword: 'FeaturesHandlingChanges'
 ---
 
 This guide shows how to react when the flow changes a node or an edge: a node was dragged, resized or selected, an
-edge was selected or lost an end. The demos report the changes in toasts.
+edge was selected or lost an end. The demos print, under the flow, the last array each
+output emitted; connect two nodes to get an edge to select.
 
 A change is a notification after the fact: the signal of the node or edge has already been written. Adding and
 removing nodes and edges is not reported, because your application makes those changes itself.

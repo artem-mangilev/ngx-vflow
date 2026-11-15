@@ -79,7 +79,7 @@ test('traverses nodes, controls and edges, selects, moves, announces, deletes an
   const before = await relativePosition(draft);
   await page.keyboard.press('ArrowRight');
   await expect.poll(async () => (await relativePosition(draft)).x).toBeCloseTo(before.x + 5);
-  await expect(live).toHaveText('Moved node right. Position: 35, 40.');
+  await expect(live).toHaveText('Moved node right. Position: 75, 60.');
   await page.keyboard.press('Shift+ArrowDown');
   await expect.poll(async () => (await relativePosition(draft)).y).toBeCloseTo(before.y + 20);
   await page.keyboard.press('Tab');
@@ -148,20 +148,34 @@ test('pans, zooms and fits the viewport from the keyboard', async ({ page }) => 
   const { graph, live } = await open(page);
   const viewport = graph.locator('.v-viewport');
   const transform = () => viewport.evaluate((element) => element.style.transform);
+  const read = () =>
+    viewport.evaluate((element) => {
+      const matrix = new DOMMatrix(getComputedStyle(element).transform);
+      return { x: matrix.e, y: matrix.f, zoom: matrix.a };
+    });
+  // The demo opens on a fitted view at its natural size, so the pans are measured from that view.
+  await expect.poll(async () => (await read()).x).toBeGreaterThan(0);
+  const start = await read();
+  const panned = async () => {
+    const now = await read();
+    // `+ 0` turns a negative zero into zero, which `toEqual` tells apart.
+    return { x: Math.round(now.x - start.x) + 0, y: Math.round(now.y - start.y) + 0, zoom: now.zoom };
+  };
+  expect(start.zoom).toBe(1);
   await graph.getByRole('group', { name: 'Next step', exact: true }).focus();
   await page.keyboard.press('ArrowRight');
-  await expect.poll(transform).toBe('translate(-15px, 0px) scale(1)');
+  await expect.poll(panned).toEqual({ x: -15, y: 0, zoom: 1 });
   await page.keyboard.press('Shift+ArrowDown');
-  await expect.poll(transform).toBe('translate(-15px, -60px) scale(1)');
+  await expect.poll(panned).toEqual({ x: -15, y: -60, zoom: 1 });
   // A focused unselected node pans as well; a selected movable node moves instead.
   const draft = graph.getByRole('group', { name: 'Draft', exact: true });
   await draft.focus();
   await page.keyboard.press('ArrowLeft');
-  await expect.poll(transform).toBe('translate(0px, -60px) scale(1)');
+  await expect.poll(panned).toEqual({ x: 0, y: -60, zoom: 1 });
   await page.keyboard.press('Enter');
   await page.keyboard.press('ArrowLeft');
-  await expect.poll(transform).toBe('translate(0px, -60px) scale(1)');
-  await expect(live).toHaveText('Moved node left. Position: 25, 40.');
+  await expect.poll(panned).toEqual({ x: 0, y: -60, zoom: 1 });
+  await expect(live).toHaveText('Moved node left. Position: 65, 60.');
   await page.keyboard.press('Equal');
   await expect.poll(transform).toMatch(/scale\(1\.2\)$/);
   await expect(live).toHaveText('Zoom 120%.');

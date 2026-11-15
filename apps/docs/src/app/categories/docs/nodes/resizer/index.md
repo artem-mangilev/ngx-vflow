@@ -22,6 +22,9 @@ a `vNode` template and in a component node.
 Do not bind `[style.width.px]` or `[style.height.px]` yourself: the directive sets the size on its element. Size a
 content-sized node with regular CSS, for example `width: 240px`, and avoid `width: 100%` and `height: 100%`.
 
+In the example the first card has no size in its data and the second one starts with `width` and `height`. Each
+shows its rendered size, and neither gets smaller than the `min-width` and `min-height` of its CSS.
+
 {{ NgDocActions.demoPane("TemplateNodeResizerDemoComponent") }}
 
 ## Resize a group

@@ -8,7 +8,7 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { DocsPresentations } from '@docs/shared';
+import { DocsKit, DocsPresentations } from '@docs/shared';
 import { Vui } from '@vflow/ui';
 import {
   AriaLabelConfig,
@@ -57,110 +57,100 @@ const SPANISH: Partial<AriaLabelConfig> = {
  * description of the focused entity, and the last message of the live region.
  */
 @Component({
-  imports: [DocsPresentations, Vflow, Vui],
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [provideVflow(withAccessibility(() => inject(AccessibilityDemoComponent).labels))],
-  styles: `
-    vflow {
-      height: 320px;
-    }
-    .editor {
-      width: 220px;
-    }
-    .editor input {
-      flex: 1;
-      min-width: 0;
-      font: inherit;
-      padding: 4px 8px;
-      border: 1px solid var(--vui-border);
-      border-radius: 6px;
-      background: var(--vui-surface);
-      color: inherit;
-    }
-    .mirror {
-      display: grid;
-      grid-template-columns: max-content 1fr;
-      gap: 6px 14px;
-      margin: 0;
-      padding: 14px;
-      border-top: 1px solid var(--vui-border);
-      font-size: 13px;
-    }
-    .mirror dt {
-      color: var(--vui-muted);
-    }
-    .mirror dd {
-      margin: 0;
-    }
-  `,
-  template: `
-    <section
-      class="demo"
-      data-testid="accessibility-demo"
-      aria-label="Accessibility example"
-      (focusin)="mirrorFocus($event)">
-      <div class="controls">
-        <p class="grow">
-          Press Tab to enter the graph, Enter to select, the arrow keys to move a selected node and Delete to remove the
-          focused node or edge. The Editor node keeps its own input and button.
-        </p>
-        <button class="button" type="button" (click)="spanish.set(!spanish())">Switch graph language</button>
+  template: `<docs-demo
+    data-testid="accessibility-demo"
+    role="region"
+    aria-label="Accessibility example"
+    (focusin)="mirrorFocus($event)">
+    <div docsDemoBar>
+      <p class="min-w-0 flex-1">
+        Tab into the graph: Enter selects, the arrow keys move a selected node, Delete removes the focused node or edge.
+      </p>
+      <span docsBadge>{{ spanish() ? 'Spanish' : 'English' }}</span>
+      <button docsButton type="button" (click)="spanish.set(!spanish())">Switch graph language</button>
+    </div>
+
+    <div class="flex h-full flex-col">
+      <div class="min-h-0 flex-1">
+        <!--
+          The Later node waits offscreen on purpose: the view pans to it when focus reaches it. So the first view
+          fits the rest of the graph, not all of it.
+        -->
+        <vflow
+          #flow
+          [nodes]="nodes()"
+          [edges]="edges()"
+          (initialized)="flow.fitView({ nodes: ['stage', 'editor'], maxZoom: 1 })"
+          (deleteRequest)="onDeleteRequest($event)">
+          <ng-template let-ctx vNode>
+            @if (ctx.node.id === 'editor') {
+              <article vuiNode class="w-55 text-[13px]">
+                <header vuiNodeHeader><span vuiTitle>Editor</span></header>
+                <div vuiRow>
+                  <span vuiPort handleType="target" position="left"></span>
+                  <!-- Controls inside a node keep their own keys and Tab stops. -->
+                  <input docsInput class="min-w-0 flex-1" vNoDrag aria-label="Node title" placeholder="Node title" />
+                  <span vuiPort handleType="source" position="right"></span>
+                </div>
+                <footer vuiNodeFooter>
+                  <button docsButton small type="button" vNoDrag (click)="removeEditor()">Remove editor</button>
+                </footer>
+              </article>
+            } @else {
+              <docs-node [ctx]="ctx" />
+            }
+          </ng-template>
+          <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
+        </vflow>
       </div>
-      <vflow [nodes]="nodes()" [edges]="edges()" (deleteRequest)="onDeleteRequest($event)">
-        <ng-template let-ctx vNode>
-          @if (ctx.node.id === 'editor') {
-            <article vuiNode class="editor">
-              <header vuiNodeHeader><span vuiTitle>Editor</span></header>
-              <div vuiRow>
-                <span vuiPort handleType="target" position="left"></span>
-                <input vNoDrag aria-label="Node title" placeholder="Node title" />
-              </div>
-              <footer vuiNodeFooter>
-                <button class="button" vNoDrag type="button" (click)="removeEditor()">Remove editor</button>
-              </footer>
-            </article>
-          } @else {
-            <docs-node [ctx]="ctx" />
-          }
-        </ng-template>
-        <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
-      </vflow>
-      <dl class="mirror" aria-hidden="true">
-        <dt>Screen reader hears</dt>
-        <dd data-testid="focused">{{ focused() || 'nothing focused' }}</dd>
-        <dt>Last announcement</dt>
-        <dd data-testid="announced">{{ announced() || 'none yet' }}</dd>
+
+      <!-- A sighted copy of what assistive technology already receives, so it is hidden from it. -->
+      <dl
+        class="border-vui-border m-0 grid grid-cols-[max-content_1fr] items-baseline gap-x-3.5 gap-y-1.5 border-t p-3.5 text-[13px] leading-5"
+        aria-hidden="true">
+        <dt class="text-vui-muted">Screen reader hears</dt>
+        <dd class="m-0 min-h-[2lh]" data-testid="focused">{{ focused() || 'nothing focused' }}</dd>
+        <dt class="text-vui-muted">Last announcement</dt>
+        <dd class="m-0" data-testid="announced">{{ announced() || 'none yet' }}</dd>
       </dl>
-    </section>
-  `,
+    </div>
+  </docs-demo>`,
+  host: { class: 'block size-full' },
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [DocsKit, DocsPresentations, Vflow, Vui],
+  // The labels follow the language at runtime, so the factory hands the flow the signal of the demo.
+  providers: [provideVflow(withAccessibility(() => inject(AccessibilityDemoComponent).labels))],
 })
 export class AccessibilityDemoComponent {
-  protected spanish = signal(false);
-  protected focused = signal('');
-  protected announced = signal('');
+  protected readonly spanish = signal(false);
+  protected readonly focused = signal('');
+  protected readonly announced = signal('');
+
   readonly labels = computed<Partial<AriaLabelConfig>>(() =>
     this.spanish() ? SPANISH : { flowLabel: 'Approval graph' },
   );
-  protected nodes = signal(
+
+  protected readonly nodes = signal(
     createNodes([
-      { id: 'draft', parentId: 'stage', point: { x: 30, y: 40 }, data: { text: 'Draft' }, ariaLabel: 'Draft' },
+      { id: 'draft', parentId: 'stage', point: { x: 70, y: 60 }, data: { text: 'Draft' }, ariaLabel: 'Draft' },
       {
         id: 'stage',
-        point: { x: 20, y: 20 },
+        point: { x: 0, y: 0 },
         width: 240,
         height: 150,
-        data: { type: 'group' },
+        data: { type: 'group', text: 'Stage' },
         ariaLabel: 'Stage',
         selectable: false,
         draggable: false,
       },
-      { id: 'editor', point: { x: 330, y: 40 }, ariaLabel: 'Editor' },
-      { id: 'later', point: { x: 1000, y: 80 }, data: { text: 'Later' }, ariaLabel: 'Later' },
+      { id: 'editor', point: { x: 300, y: 17 }, ariaLabel: 'Editor' },
+      { id: 'later', point: { x: 1000, y: 60 }, data: { text: 'Later' }, ariaLabel: 'Later' },
     ]),
   );
-  protected edges = signal(
+
+  protected readonly edges = signal(
     createEdges([
-      { id: 'next', source: 'draft', target: 'later', ariaLabel: 'Next step' },
+      { id: 'next', source: 'editor', target: 'later', ariaLabel: 'Next step' },
       { id: 'edit', source: 'draft', target: 'editor', ariaLabel: 'Edit route', ariaDescription: 'Opens the editor.' },
     ]),
   );
@@ -168,9 +158,12 @@ export class AccessibilityDemoComponent {
   constructor() {
     const host = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
     const destroyRef = inject(DestroyRef);
+
+    // The flow announces through its live region; the demo copies each message into the mirror.
     afterNextRender(() => {
       const region = host.querySelector('[aria-live]');
       if (!region) return;
+
       const observer = new MutationObserver(() => {
         const text = region.textContent?.trim();
         if (text) this.announced.set(text);
@@ -180,19 +173,22 @@ export class AccessibilityDemoComponent {
     });
   }
 
-  protected onDeleteRequest(request: DeleteRequest) {
+  // Delete and Backspace only ask: the application removes the entities from its own collections.
+  protected onDeleteRequest(request: DeleteRequest): void {
     const result = removeElements(request, { nodes: this.nodes(), edges: this.edges() });
     this.nodes.set(result.nodes);
     this.edges.set(result.edges);
   }
 
-  protected removeEditor() {
+  protected removeEditor(): void {
     this.onDeleteRequest({ nodeIds: ['editor'], edgeIds: [] });
   }
 
-  protected mirrorFocus(event: FocusEvent) {
+  /** The accessible name, role and description of the element that took focus, read from its ARIA attributes. */
+  protected mirrorFocus(event: FocusEvent): void {
     const target = event.target;
     if (!(target instanceof Element)) return;
+
     const name = target.getAttribute('aria-label') ?? target.textContent?.trim() ?? '';
     const role =
       target.getAttribute('aria-roledescription') ?? target.getAttribute('role') ?? target.tagName.toLowerCase();
@@ -201,6 +197,7 @@ export class AccessibilityDemoComponent {
       .map((id) => target.ownerDocument.getElementById(id)?.textContent ?? '')
       .join(' ')
       .trim();
+
     this.focused.set([`${name}, ${role}.`, description].filter(Boolean).join(' '));
   }
 }

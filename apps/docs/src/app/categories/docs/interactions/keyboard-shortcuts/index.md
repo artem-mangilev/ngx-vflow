@@ -27,7 +27,8 @@ import { provideVflow, withShortcuts } from 'ngx-vflow';
 - If only some should, put it into the providers of a route or of the component that hosts the flow. A closer
   `withShortcuts()` adds its entries to one further up; see [Configuration](/docs/getting-started/configuration).
 
-In this example `selection` is remapped from `Shift` to `Alt` and `multiSelection` from `Mod` to `Shift`:
+In this example `selection` is remapped from `Shift` to `Alt` and `multiSelection` from `Mod` to `Shift`: hold `Alt` and
+drag over the canvas to draw the selection box, and hold `Shift` and click to add a node to the selection.
 
 {{ NgDocActions.demoPane("KeyboardShortcutsDemoComponent") }}
 
@@ -67,8 +68,8 @@ keys can change at runtime:
 provideVflow(withShortcuts(() => inject(Preferences).shortcuts));
 ```
 
-This example rebinds selection and deletion and turns the zoom commands off and on again. The object it provides
-is printed as you change it:
+This example rebinds selection and deletion and turns the zoom commands off and on again. Focus a node or an edge
+and press the keys; the object the example provides is printed beside the flow as you change it:
 
 {{ NgDocActions.demoPane("ShortcutsConfigurationDemoComponent") }}
 

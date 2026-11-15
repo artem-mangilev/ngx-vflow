@@ -10,11 +10,18 @@ The connection gesture does not depend on the handler: a handle starts a connect
 
 Edges run from a `source` handle to a `target` handle: a connection dragged the other way round is reversed, and two handles of the same type do not connect.
 
+In the demo the right port of a node is its `source` handle and the left port its `target` handle. Connect the
+right port of `Sender` and the left port of `Receiver`: whichever of the two you start from, the arrow of the new
+edge points at `Receiver`.
+
 {{ NgDocActions.demoPane("DefaultConnectionDemoComponent") }}
 
 ## Handles of type `any`
 
 A handle with `handleType="any"` connects to any other handle in either direction, and the edge keeps the direction of the gesture. Give such handles a `handleId` when a node has several, so that the edge refers to the right one.
+
+Every port of the demo is of type `any`: the arrow of a new edge points from the port where the drag started to the
+port where it ended.
 
 {{ NgDocActions.demoPane("LooseConnectionDemoComponent") }}
 
@@ -24,7 +31,7 @@ A handle with `handleType="any"` connects to any other handle in either directio
 
 A reconnected edge is not a duplicate of itself, so it can be dropped back on the handle it came from. `addEdges` accepts self-connections and duplicates: the rules belong to the gesture, not to the graph.
 
-For example, in this case, validation only passes connections from node 1 to node 2. If the `validator` returns `false`, the `(connect)` event won't be triggered because there is no valid connection.
+The `validator` of the demo passes a connection only when both of its ends carry the same type of value: `Text out` connects to `Text in`, and `Number out` to `Number in`. A handle under a rejected connection turns red. If the `validator` returns `false`, the `(connect)` event won't be triggered because there is no valid connection.
 
 {{ NgDocActions.demoPane("ConnectionValidationDemoComponent") }}
 
@@ -36,5 +43,11 @@ Edges can be reconnected. To reconnect an edge, follow these steps:
 2. Create a handler for the `(reconnect)` event
 3. This handler accepts a `ReconnectEvent` argument, which contains the `edge` you are reconnecting and its new `Connection`
 4. Pass the event to `reconnectEdges`: `edges = reconnectEdges([event], { nodes, edges })`
+
+`reconnectable` is `true` for both ends of an edge, or `'source'` or `'target'` for one of them; the edges of the
+demo are labeled with the ends that can be dragged.
+
+`(reconnectEnd)` reports where the dragged end was released. Its `to` is the handle under the pointer, or `null`
+when there is none; the demo removes an edge whose end is released over the canvas.
 
 {{ NgDocActions.demoPane("ReconnectionDemoComponent") }}

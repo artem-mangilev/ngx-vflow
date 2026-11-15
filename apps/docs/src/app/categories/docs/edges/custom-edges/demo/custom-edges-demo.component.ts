@@ -1,81 +1,51 @@
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { DocsPresentations } from '@docs/shared';
-import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
+import { Vflow, createEdges, createNodes } from 'ngx-vflow';
+
+/** The application's own field of an edge; the template picks the look of the line from it. */
+interface LinkData {
+  role: 'primary' | 'standby';
+}
 
 @Component({
-  template: `<vflow [nodes]="nodes" [edges]="edges">
+  template: `<vflow #flow [nodes]="nodes" [edges]="edges" (initialized)="flow.fitView({ maxZoom: 1 })">
     <docs-node *vNode="let ctx" [ctx]="ctx" />
 
-    <svg:g *vEdge="let ctx" vEdgeInteractionArea class="edge">
+    <!-- The interaction stroke sits inside the group, so hovering near the line counts as hovering the group. -->
+    <svg:g *vEdge="let ctx of edges" vEdgeInteractionArea class="group">
       <svg:path
-        fill="none"
+        class="fill-none stroke-2 group-hover:stroke-3"
+        [class]="ctx.selected() ? 'stroke-vui-accent' : 'stroke-vui-foreground'"
+        [attr.stroke-dasharray]="ctx.data().role === 'standby' ? '6 4' : null"
         [attr.d]="ctx.path()"
-        [attr.stroke-width]="ctx.edge.data?.().strokeWidth"
-        [attr.stroke]="ctx.selected() ? '#0f4c75' : ctx.edge.data?.().color"
         [attr.marker-end]="ctx.markerEnd()" />
     </svg:g>
   </vflow>`,
-  styles: [
-    `
-      :host {
-        width: 100%;
-        height: 100%;
-      }
-
-      /* The interaction stroke sits inside the group, so hovering near the line counts as hovering the group. */
-      .edge:hover path:not([data-v-interactive-edge]) {
-        filter: brightness(0.85);
-      }
-    `,
-  ],
+  host: { class: 'block size-full' },
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [DocsPresentations, Vflow],
 })
 export class CustomEdgesDemoComponent {
-  public nodes: Node[] = createNodes([
-    {
-      id: '1',
-      point: { x: 10, y: 200 },
-      data: { text: '1' },
-    },
-    {
-      id: '2',
-      point: { x: 200, y: 100 },
-      data: { text: '2' },
-    },
-    {
-      id: '3',
-      point: { x: 200, y: 300 },
-      data: { text: '3' },
-    },
+  protected readonly nodes = createNodes([
+    { id: 'service', point: { x: 0, y: 45 }, data: { text: 'Service' } },
+    { id: 'database', point: { x: 220, y: 0 }, data: { text: 'Database' } },
+    { id: 'replica', point: { x: 220, y: 90 }, data: { text: 'Replica' } },
   ]);
 
-  public edges: Edge[] = [
+  protected readonly edges = createEdges<LinkData>([
     {
-      id: '1 -> 2',
-      source: '1',
-      target: '2',
-      data: signal({
-        strokeWidth: 3,
-        color: '#ffeeaa',
-      }),
-      markers: signal({
-        end: {
-          type: 'arrow-closed',
-          width: 30,
-          height: 30,
-          strokeWidth: 3,
-        },
-      }),
+      id: 'service-database',
+      source: 'service',
+      target: 'database',
+      data: { role: 'primary' },
+      markers: { end: 'arrow-closed' },
     },
     {
-      id: '1 -> 3',
-      source: '1',
-      target: '3',
-      data: signal({
-        strokeWidth: 2,
-        color: '#ec586e',
-      }),
+      id: 'service-replica',
+      source: 'service',
+      target: 'replica',
+      data: { role: 'standby' },
+      markers: { end: 'arrow-closed' },
     },
-  ];
+  ]);
 }

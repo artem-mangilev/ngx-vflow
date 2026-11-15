@@ -1,64 +1,96 @@
-import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { DocsPresentations } from '@docs/shared';
-import { VuiPort } from '@vflow/ui';
-import { Edge, Node, Vflow, Connection, createNodes } from 'ngx-vflow';
+import { Vui } from '@vflow/ui';
+import { Connection, Edge, Vflow, addEdges, createEdges, createNodes } from 'ngx-vflow';
+
+interface Field {
+  /** The `handleId` of the handle in the row of the field. */
+  id: string;
+  label: string;
+}
+
+/** A card with one row per field. `handles` says which way its fields connect. */
+interface CardData {
+  title: string;
+  handles: 'source' | 'target';
+  fields: Field[];
+}
 
 @Component({
-  templateUrl: './multiple-connection-points-demo.component.html',
-  styleUrls: ['./multiple-connection-points-demo.styles.scss'],
+  template: `<vflow
+    #flow
+    [nodes]="nodes"
+    [edges]="edges()"
+    (connect)="connect($event)"
+    (initialized)="flow.fitView({ maxZoom: 1 })">
+    <article *vNode="let ctx of nodes" vuiNode class="w-44 text-[13px]">
+      <header vuiNodeHeader>
+        <span vuiTitle>{{ ctx.data().title }}</span>
+      </header>
+
+      @for (field of ctx.data().fields; track field.id) {
+        <!-- A handle sits on the side of its parent element, so each one lines up with its row. -->
+        <div vuiRow>
+          {{ field.label }}
+
+          @if (ctx.data().handles === 'source') {
+            <span vuiPort handleType="source" position="right" [handleId]="field.id"></span>
+          } @else {
+            <span vuiPort handleType="target" position="left" [handleId]="field.id"></span>
+          }
+        </div>
+      }
+    </article>
+
+    <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
+  </vflow>`,
+  host: { class: 'block size-full' },
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DocsPresentations, Vflow, CommonModule, VuiPort],
+  imports: [DocsPresentations, Vflow, Vui],
 })
 export class MultipleConnectionPointsDemoComponent {
-  public nodes: Node[] = createNodes([
+  protected readonly nodes = createNodes<CardData>([
     {
-      id: '1',
-      point: { x: 0, y: 150 },
+      id: 'customer',
+      point: { x: 0, y: 0 },
       data: {
-        type: 'output',
-        output1: 'output1',
-        output2: 'output2',
+        title: 'Customer',
+        handles: 'source',
+        fields: [
+          { id: 'email', label: 'Email' },
+          { id: 'name', label: 'Name' },
+        ],
       },
     },
     {
-      id: '2',
-      point: { x: 250, y: 100 },
+      id: 'welcome-email',
+      point: { x: 320, y: 40 },
       data: {
-        type: 'input',
-        input1: 'input1',
-        input2: 'input2',
+        title: 'Welcome email',
+        handles: 'target',
+        fields: [
+          { id: 'recipient', label: 'Recipient' },
+          { id: 'greeting', label: 'Greeting' },
+        ],
       },
     },
   ]);
 
-  public edges: Edge[] = [
-    {
-      id: '1 -> 2 one',
-      source: '1',
-      target: '2',
-      sourceHandle: 'output1',
-      targetHandle: 'input1',
-    },
-    {
-      id: '1 -> 2 two',
-      source: '1',
-      target: '2',
-      sourceHandle: 'output2',
-      targetHandle: 'input2',
-    },
-  ];
-
-  public createEdge({ source, target, sourceHandle, targetHandle }: Connection) {
-    this.edges = [
-      ...this.edges,
+  // `sourceHandle` and `targetHandle` name the handles of the two fields an edge connects.
+  protected readonly edges = signal<Edge[]>(
+    createEdges([
       {
-        id: `${source} -> ${target}${sourceHandle ?? ''}${targetHandle ?? ''}`,
-        source,
-        target,
-        sourceHandle,
-        targetHandle,
+        id: 'email-recipient',
+        source: 'customer',
+        sourceHandle: 'email',
+        target: 'welcome-email',
+        targetHandle: 'recipient',
       },
-    ];
+    ]),
+  );
+
+  // The connection of a new edge carries the handle ids as well.
+  protected connect(connection: Connection): void {
+    this.edges.update((edges) => addEdges([{ id: crypto.randomUUID(), ...connection }], { nodes: this.nodes, edges }));
   }
 }

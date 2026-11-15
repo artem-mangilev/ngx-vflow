@@ -1,50 +1,35 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { DocsPresentations } from '@docs/shared';
-import { KeyboardShortcuts, Node, Vflow, createNodes, provideVflow, withShortcuts } from 'ngx-vflow';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { DocsKit, DocsPresentations } from '@docs/shared';
+import { Vflow, createEdges, createNodes, provideVflow, withShortcuts } from 'ngx-vflow';
 
 @Component({
-  template: `<vflow [nodes]="nodes">
-    <docs-node *vNode="let ctx" [ctx]="ctx" />
-    <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
-  </vflow>`,
-  styles: [
-    `
-      :host {
-        width: 100%;
-        height: 100%;
-      }
-    `,
-  ],
+  template: `<docs-demo>
+    <div docsDemoBar>
+      <p>Hold Alt and drag over the canvas to draw a selection box; hold Shift and click to add to the selection.</p>
+    </div>
+
+    <vflow #flow [nodes]="nodes" [edges]="edges" (initialized)="flow.fitView({ maxZoom: 1 })">
+      <docs-node *vNode="let ctx" [ctx]="ctx" />
+      <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
+    </vflow>
+  </docs-demo>`,
+  host: { class: 'block size-full' },
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DocsPresentations, Vflow],
-  providers: [provideVflow(withShortcuts(() => inject(KeyboardShortcutsDemoComponent).shortcuts))],
+  imports: [DocsKit, DocsPresentations, Vflow],
+  // Only the named entries change; every other shortcut keeps its default.
+  providers: [provideVflow(withShortcuts({ modifiers: { selection: ['Alt'], multiSelection: ['Shift'] } }))],
 })
 export class KeyboardShortcutsDemoComponent {
-  public shortcuts: KeyboardShortcuts = {
-    modifiers: {
-      selection: ['Alt'],
-      multiSelection: ['Shift'],
-    },
-  };
+  protected readonly nodes = createNodes([
+    { id: 'request', point: { x: 0, y: 50 }, data: { text: 'Request' } },
+    { id: 'review', point: { x: 180, y: 50 }, data: { text: 'Review' } },
+    { id: 'approved', point: { x: 360, y: 0 }, data: { text: 'Approved' } },
+    { id: 'rejected', point: { x: 360, y: 100 }, data: { text: 'Rejected' } },
+  ]);
 
-  public nodes: Node[] = createNodes([
-    {
-      id: '1',
-      point: { x: 10, y: 10 },
-      data: { text: `1` },
-      parentId: '3',
-    },
-    {
-      id: '2',
-      point: { x: 200, y: 200 },
-      data: { text: `<strong>2</strong>` },
-    },
-    {
-      id: '3',
-      point: { x: 10, y: 10 },
-      data: { type: 'group' },
-      width: 150,
-      height: 150,
-    },
+  protected readonly edges = createEdges([
+    { id: 'request-review', source: 'request', target: 'review' },
+    { id: 'review-approved', source: 'review', target: 'approved' },
+    { id: 'review-rejected', source: 'review', target: 'rejected' },
   ]);
 }

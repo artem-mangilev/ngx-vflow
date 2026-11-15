@@ -1,61 +1,54 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { DocsPresentations } from '@docs/shared';
-import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
+import { ChangeDetectionStrategy, Component, viewChild } from '@angular/core';
+import { DocsKit, DocsPresentations } from '@docs/shared';
+import { Vflow, VflowComponent, createEdges, createNodes } from 'ngx-vflow';
 
 @Component({
-  template: `
-    <div class="bar">
-      <button type="button" (click)="flow.fitView({ duration: 300 })">Fit view</button>
-      <button type="button" (click)="flow.fitView({ nodes: ['3'], padding: 1, duration: 300 })">Fit node 3</button>
-      <button type="button" (click)="flow.zoomIn({ duration: 150 })">Zoom in</button>
-      <button type="button" (click)="flow.zoomOut({ duration: 150 })">Zoom out</button>
-      <button type="button" (click)="flow.setCenter({ x: 0, y: 0 }, { zoom: 1, duration: 300 })">Center on 0, 0</button>
-      <output>{{ (flow.viewport().zoom * 100).toFixed(0) }}%</output>
+  template: `<docs-demo>
+    <div docsDemoBar>
+      <button docsButton type="button" (click)="flow().fitView({ maxZoom: 1, duration: 300 })">Fit view</button>
+      <button docsButton type="button" (click)="flow().fitView({ nodes: ['shipping'], padding: 2, duration: 300 })">
+        Zoom to Shipping
+      </button>
+      <button docsButton type="button" (click)="center('cart')">Center on Cart</button>
+      <button docsButton type="button" (click)="flow().zoomIn({ duration: 150 })">Zoom in</button>
+      <button docsButton type="button" (click)="flow().zoomOut({ duration: 150 })">Zoom out</button>
+      <output class="ms-auto text-vui-muted tabular-nums">{{ (flow().viewport().zoom * 100).toFixed(0) }}%</output>
     </div>
 
-    <vflow #flow [nodes]="nodes" [edges]="edges" [background]="{ type: 'dots' }" (initialized)="flow.fitView()">
+    <!-- The first fit and the button ask for the same viewport, so "Fit view" always brings the first view back. -->
+    <vflow
+      [nodes]="nodes"
+      [edges]="edges"
+      [background]="{ type: 'dots' }"
+      (initialized)="flow().fitView({ maxZoom: 1 })">
       <docs-node *vNode="let ctx" [ctx]="ctx" />
       <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
     </vflow>
-  `,
-  styles: `
-    :host {
-      display: flex;
-      flex-direction: column;
-      width: 100%;
-      height: 100%;
-    }
-
-    .bar {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 48px 8px 8px;
-    }
-
-    output {
-      margin-left: auto;
-      font-variant-numeric: tabular-nums;
-    }
-
-    vflow {
-      flex: 1;
-      min-height: 0;
-    }
-  `,
+  </docs-demo>`,
+  host: { class: 'block size-full' },
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DocsPresentations, Vflow],
+  imports: [DocsKit, DocsPresentations, Vflow],
 })
 export class ViewportControlDemoComponent {
-  protected readonly nodes: Node[] = createNodes([
-    { id: '1', point: { x: 0, y: 0 }, data: { text: '1' } },
-    { id: '2', point: { x: 260, y: 120 }, data: { text: '2' } },
-    { id: '3', point: { x: 620, y: 360 }, data: { text: '3' } },
+  protected readonly flow = viewChild.required(VflowComponent);
+
+  protected readonly nodes = createNodes([
+    { id: 'cart', point: { x: 0, y: 0 }, data: { text: 'Cart' } },
+    { id: 'payment', point: { x: 180, y: 70 }, data: { text: 'Payment' } },
+    { id: 'shipping', point: { x: 360, y: 140 }, data: { text: 'Shipping' } },
   ]);
 
-  protected readonly edges: Edge[] = [
-    { id: '1 -> 2', source: '1', target: '2' },
-    { id: '2 -> 3', source: '2', target: '3' },
-  ];
+  protected readonly edges = createEdges([
+    { id: 'cart-payment', source: 'cart', target: 'payment' },
+    { id: 'payment-shipping', source: 'payment', target: 'shipping' },
+  ]);
+
+  // setCenter() takes a point of the graph and keeps the zoom; the rectangle of the node gives its middle.
+  protected center(id: string): void {
+    const rect = this.flow().getNodeRect(id);
+
+    if (rect) {
+      this.flow().setCenter({ x: rect.x + rect.width / 2, y: rect.y + rect.height / 2 }, { duration: 300 });
+    }
+  }
 }

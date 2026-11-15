@@ -34,9 +34,8 @@ export default ({ mode }) => {
         sourceRoot: 'src',
         browser: 'src/main.ts',
         styles: [
-          'src/vflow-ui-parts.css',
-          'src/styles.scss',
-          'src/app/shared/demo.css',
+          'src/styles.css',
+          'node_modules/@ng-doc/app/styles/themes/dark.css',
           'node_modules/@ng-doc/app/styles/global.css',
         ],
         assets: [

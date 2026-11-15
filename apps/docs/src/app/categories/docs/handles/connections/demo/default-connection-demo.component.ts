@@ -1,40 +1,33 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { DocsPresentations } from '@docs/shared';
-import { Connection, Edge, Node, Vflow, addEdges, createNodes } from 'ngx-vflow';
+import { Connection, Edge, Vflow, addEdges, createEdge, createNodes } from 'ngx-vflow';
 
 @Component({
-  template: `<vflow [nodes]="nodes" [edges]="edges" (connect)="createEdge($event)">
+  template: `<vflow
+    #flow
+    [nodes]="nodes"
+    [edges]="edges()"
+    (connect)="connect($event)"
+    (initialized)="flow.fitView({ maxZoom: 1 })">
     <docs-node *vNode="let ctx" [ctx]="ctx" />
     <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
-  </vflow> `,
-  styles: [
-    `
-      :host {
-        width: 100%;
-        height: 100%;
-      }
-    `,
-  ],
+  </vflow>`,
+  host: { class: 'block size-full' },
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [DocsPresentations, Vflow],
 })
 export class DefaultConnectionDemoComponent {
-  public nodes: Node[] = createNodes([
-    {
-      id: '1',
-      point: { x: 100, y: 100 },
-      data: { text: `1` },
-    },
-    {
-      id: '2',
-      point: { x: 200, y: 200 },
-      data: { text: `2` },
-    },
+  protected readonly nodes = createNodes([
+    { id: 'sender', point: { x: 0, y: 0 }, data: { text: 'Sender' } },
+    { id: 'receiver', point: { x: 220, y: 90 }, data: { text: 'Receiver' } },
   ]);
 
-  public edges: Edge[] = [];
+  protected readonly edges = signal<Edge[]>([]);
 
-  public createEdge(connection: Connection) {
-    this.edges = addEdges([{ id: crypto.randomUUID(), ...connection }], { nodes: this.nodes, edges: this.edges });
+  // The arrow shows the direction of the edge: from the source handle to the target handle, whichever was pressed.
+  protected connect(connection: Connection): void {
+    const edge = createEdge({ id: crypto.randomUUID(), ...connection, markers: { end: 'arrow-closed' } });
+
+    this.edges.update((edges) => addEdges([edge], { nodes: this.nodes, edges }));
   }
 }

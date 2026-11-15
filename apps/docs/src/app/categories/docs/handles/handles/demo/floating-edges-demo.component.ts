@@ -1,106 +1,39 @@
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { DocsPresentations } from '@docs/shared';
-import { Edge, Node, Vflow, createNodes, injectNode } from 'ngx-vflow';
+import { Vui } from '@vflow/ui';
+import { Vflow, createEdges, createNodes } from 'ngx-vflow';
 
 @Component({
-  template: `
-    <vflow [nodes]="nodes" [edges]="edges">
-      <docs-node *vNode="let ctx" [ctx]="ctx" />
-      <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
-    </vflow>
-  `,
-  styles: [
-    `
-      :host {
-        width: 100%;
-        height: 100%;
-      }
-    `,
-  ],
+  template: `<vflow #flow [nodes]="nodes" [edges]="edges" (initialized)="flow.fitView({ maxZoom: 1 })">
+    <div *vNode="let ctx" vuiNode class="flex h-12.5 w-25 items-center justify-center text-[13px]">
+      {{ ctx.data().text }}
+
+      <!-- One handle whose point follows the other end of each edge: the node has no ports. -->
+      <span vHandle handleType="any" position="auto"></span>
+    </div>
+
+    <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
+  </vflow>`,
+  host: { class: 'block size-full' },
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DocsPresentations, Vflow],
+  imports: [DocsPresentations, Vflow, Vui],
 })
 export class FloatingEdgesDemoComponent {
-  public nodes: Node[] = createNodes([
-    {
-      id: '1',
-      point: { x: 100, y: 100 },
-      component: FloatingEdgesNodeComponent,
-      data: {
-        text: 'Node 1',
-      },
-    },
-    {
-      id: '2',
-      point: { x: 200, y: 200 },
-      component: FloatingEdgesNodeComponent,
-      data: {
-        text: 'Node 2',
-      },
-    },
-    {
-      id: '3',
-      point: { x: 100, y: 300 },
-      component: FloatingEdgesNodeComponent,
-      data: {
-        text: 'Node 3',
-      },
-    },
+  // Drag a node around the roadmap: each edge moves to the sides that face each other.
+  protected readonly nodes = createNodes([
+    { id: 'roadmap', point: { x: 190, y: 110 }, data: { text: 'Roadmap' } },
+    { id: 'research', point: { x: 190, y: 0 }, data: { text: 'Research' } },
+    { id: 'design', point: { x: 380, y: 110 }, data: { text: 'Design' } },
+    { id: 'build', point: { x: 190, y: 220 }, data: { text: 'Build' } },
+    { id: 'launch', point: { x: 0, y: 110 }, data: { text: 'Launch' } },
   ]);
 
-  public edges: Edge[] = [
-    {
-      id: '1 -> 2',
-      source: '1',
-      target: '2',
-      markers: signal({
-        end: {
-          type: 'arrow-closed',
-        },
-      }),
-    },
-    {
-      id: '2 -> 3',
-      source: '2',
-      target: '3',
-      markers: signal({
-        end: {
-          type: 'arrow-closed',
-        },
-      }),
-    },
-  ];
-}
-
-interface FloatingEdgesNodeData {
-  text: string;
-}
-
-@Component({
-  template: `<div class="node">
-    {{ ctx.data().text }}
-
-    <!-- One handle whose point follows the other end of each edge: the node has no ports. -->
-    <span vHandle handleType="any" position="auto"></span>
-  </div>`,
-  styles: [
-    `
-      .node {
-        width: 100px;
-        height: 50px;
-        border: 1.5px solid #1b262c;
-        border-radius: 5px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: black;
-        background-color: white;
-      }
-    `,
-  ],
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Vflow],
-})
-export class FloatingEdgesNodeComponent {
-  protected readonly ctx = injectNode<FloatingEdgesNodeData>();
+  protected readonly edges = createEdges(
+    ['research', 'design', 'build', 'launch'].map((target) => ({
+      id: `roadmap-${target}`,
+      source: 'roadmap',
+      target,
+      markers: { end: 'arrow-closed' },
+    })),
+  );
 }

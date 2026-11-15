@@ -1,15 +1,14 @@
 import { ChangeDetectionStrategy, Component, Injectable, computed, inject, signal } from '@angular/core';
-import { DocsPresentations } from '@docs/shared';
+import { DocsKit, DocsPresentations } from '@docs/shared';
+import { Vui } from '@vflow/ui';
 import {
   Connection,
   ConnectionSettings,
   Curve,
   CurveFactory,
-  Edge,
   HandlePosition,
-  Node,
   Vflow,
-  createEdge,
+  createEdges,
   createNodes,
   getBezierPath,
   getFloatingEdgeParams,
@@ -44,147 +43,95 @@ export class EasyConnectSettings {
   readonly curve = computed<Curve>(() => (this.meeting() === 'crossing' ? crossingCurve : 'bezier'));
 }
 
-/** The whole node is the handle: the title drags the node, everywhere else starts or accepts a connection. */
+/**
+ * The whole card is the handle: the header drags the node, everywhere else starts or accepts a connection. The card
+ * shows the state of the connection itself, as a port would: a ring while a connection starts from it, the success
+ * color as a valid candidate.
+ */
 @Component({
-  selector: 'easy-connect-node',
   template: `
-    <div class="easy-node" vHandle handleType="any" [position]="settings.position()">
-      <div class="easy-node__title" vDragHandle>{{ ctx.data().title }}</div>
-      <div class="easy-node__body">Drag from here to connect</div>
-    </div>
+    <article
+      vuiNode
+      vHandle
+      handleType="any"
+      data-testid="easy-node"
+      class="w-48 select-none text-[13px] transition-shadow
+        data-[v-handle-state=connecting]:ring-3 data-[v-handle-state=connecting]:ring-vui-accent/35
+        data-[v-handle-state=valid]:border-vui-success data-[v-handle-state=valid]:ring-3
+        data-[v-handle-state=valid]:ring-vui-success/30 data-[v-handle-state=invalid]:border-vui-danger"
+      [position]="settings.position()">
+      <header vuiNodeHeader vDragHandle data-testid="easy-node-title" class="cursor-grab">
+        <span vuiTitle>{{ node.data().title }}</span>
+      </header>
+      <div data-testid="easy-node-body" class="p-vui-3 text-vui-muted cursor-crosshair">Drag from here to connect</div>
+    </article>
   `,
-  styles: [
-    `
-      .easy-node {
-        display: block;
-        width: 170px;
-        box-sizing: border-box;
-        border: 2px solid #1b262c;
-        border-radius: 8px;
-        background: #fff;
-        color: #1b262c;
-        font-size: 13px;
-        user-select: none;
-        transition: box-shadow 0.1s;
-      }
-
-      .easy-node__title {
-        padding: 8px 12px;
-        border-bottom: 1px solid #d5dbe2;
-        font-weight: 600;
-        cursor: grab;
-      }
-
-      .easy-node__body {
-        padding: 12px;
-        color: #6b7684;
-        cursor: crosshair;
-      }
-
-      .easy-node[data-v-handle-state='connecting'] {
-        box-shadow: 0 0 0 3px rgba(67, 56, 202, 0.35);
-      }
-
-      .easy-node[data-v-handle-state='valid'] {
-        border-color: #2e7d32;
-        box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.3);
-      }
-
-      .easy-node[data-v-handle-state='invalid'] {
-        border-color: #c62828;
-      }
-    `,
-  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Vflow],
+  imports: [Vflow, Vui],
 })
 export class EasyConnectNodeComponent {
-  protected readonly ctx = injectNode<{ title: string }>();
+  protected readonly node = injectNode<{ title: string }>();
   protected readonly settings = inject(EasyConnectSettings);
 }
 
 @Component({
-  selector: 'app-easy-connect-demo',
-  template: `
-    <div class="demo">
-      <label class="controls">
+  template: `<docs-demo>
+    <div docsDemoBar>
+      <label>
         Edges meet nodes at
-        <select [value]="settings.meeting()" (change)="settings.meeting.set($any($event.target).value)">
-          <option value="auto">the middle of the border facing the other node</option>
+        <select docsSelect [value]="settings.meeting()" (change)="settings.meeting.set($any($event.target).value)">
+          <option value="auto">the middle of the side facing the other node</option>
           <option value="center">the center</option>
           <option value="crossing">the exact crossing of the border (custom curve)</option>
         </select>
       </label>
-
-      <vflow [nodes]="nodes" [edges]="edges()" [connection]="connection()" (connect)="connect($event)">
-        <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
-      </vflow>
     </div>
-  `,
-  styles: [
-    `
-      :host {
-        display: block;
-        width: 100%;
-        height: 100%;
-      }
 
-      .demo {
-        display: grid;
-        grid-template-rows: auto minmax(0, 1fr);
-        width: 100%;
-        height: 100%;
-      }
-
-      .controls {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        padding: 8px 12px;
-        background-color: #f5f5f5;
-        color: #1b262c;
-        font-size: 14px;
-      }
-
-      vflow {
-        min-height: 0;
-      }
-    `,
-  ],
+    <vflow
+      #flow
+      [nodes]="nodes"
+      [edges]="edges()"
+      [connection]="connection()"
+      (initialized)="flow.fitView({ maxZoom: 1 })"
+      (connect)="connect($event)">
+      <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
+    </vflow>
+  </docs-demo>`,
+  host: { class: 'block size-full' },
   providers: [EasyConnectSettings],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DocsPresentations, Vflow],
+  imports: [DocsKit, DocsPresentations, Vflow],
 })
 export class EasyConnectDemoComponent {
   protected readonly settings = inject(EasyConnectSettings);
 
-  public readonly connection = computed<ConnectionSettings>(() => ({
+  /** The preview line of a connection in progress is drawn like the edges. */
+  protected readonly connection = computed<ConnectionSettings>(() => ({
     markerEnd: { type: 'arrow-closed' },
     curve: this.settings.curve(),
   }));
 
-  public readonly nodes: Node[] = createNodes([
-    // Nodes stay away from the pane edges, where a connection drag would auto-pan the viewport.
-    { id: '1', point: { x: 60, y: 30 }, component: EasyConnectNodeComponent, data: { title: 'Idea' } },
-    { id: '2', point: { x: 360, y: 110 }, component: EasyConnectNodeComponent, data: { title: 'Draft' } },
-    { id: '3', point: { x: 100, y: 200 }, component: EasyConnectNodeComponent, data: { title: 'Review' } },
+  protected readonly nodes = createNodes([
+    { id: 'idea', point: { x: 0, y: 0 }, component: EasyConnectNodeComponent, data: { title: 'Idea' } },
+    { id: 'draft', point: { x: 320, y: 80 }, component: EasyConnectNodeComponent, data: { title: 'Draft' } },
+    { id: 'review', point: { x: 40, y: 170 }, component: EasyConnectNodeComponent, data: { title: 'Review' } },
   ]);
 
-  private readonly connections = signal<Connection[]>([{ source: '1', target: '2' }]);
+  private readonly connections = signal<Connection[]>([{ source: 'idea', target: 'draft' }]);
 
   /** Edges follow the chosen curve; the application owns the list and rebuilds it when the setting changes. */
-  public readonly edges = computed<Edge[]>(() =>
-    this.connections().map((connection) =>
-      createEdge({
-        id: `${connection.source} -> ${connection.target}`,
+  protected readonly edges = computed(() =>
+    createEdges(
+      this.connections().map((connection) => ({
+        id: `${connection.source}-${connection.target}`,
         ...connection,
         curve: this.settings.curve(),
-        markers: { end: { type: 'arrow-closed' } },
-      }),
+        markers: { end: { type: 'arrow-closed' as const } },
+      })),
     ),
   );
 
-  public connect(connection: Connection) {
+  protected connect(connection: Connection): void {
     this.connections.update((connections) => [...connections, connection]);
   }
 }

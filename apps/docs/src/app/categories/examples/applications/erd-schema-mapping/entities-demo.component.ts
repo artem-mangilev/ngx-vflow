@@ -1,3 +1,4 @@
+import { NgTemplateOutlet } from '@angular/common';
 import {
   afterNextRender,
   ChangeDetectionStrategy,
@@ -11,12 +12,8 @@ import {
   untracked,
   viewChild,
 } from '@angular/core';
-import { NgTemplateOutlet } from '@angular/common';
+import { DemoIconComponent, DocsKit, SCENE_BACKGROUND } from '@docs/shared';
 import { Vui } from '@vflow/ui';
-import { DemoIconComponent } from '../../../../shared/demo-icon.component';
-import { injectDocsTheme } from '../../../../shared/docs-theme';
-import { SCENE_BACKGROUND } from '../../../../shared/demo-scene';
-import { ScrollRows } from './scroll-rows';
 import {
   addEdges,
   Connection,
@@ -30,6 +27,7 @@ import {
   Vflow,
   VflowComponent,
 } from 'ngx-vflow';
+import { ScrollRows } from './scroll-rows';
 
 interface Field {
   id: string;
@@ -51,122 +49,25 @@ interface FrameData {
 
 const TYPES = ['uuid', 'text', 'decimal', 'timestamp'];
 
+/**
+ * Free ports show on interaction, connected ones always: an idle port without an edge is invisible, though still a
+ * target, until its table is hovered, focused or selected. The table host is an element of core, so its state is read
+ * from the port itself. Proxy ports, on the header and the footer, share one point per border: connected ones are
+ * visually merged.
+ */
+const QUIET_PORT = `transition-[border-color,background-color,box-shadow,opacity]!
+  [&[data-v-handle-state=idle]:not([data-vui-connected=true]):not([data-v-node]:hover_*,[data-v-node]:focus-within_*,[data-v-selected]_*,[data-v-preselected]_*)]:opacity-0
+  forced-colors:opacity-100! [:is(header,footer)>&]:data-[vui-connected=true]:opacity-60`;
+
 @Component({
   selector: 'app-ui-entities-demo',
-  imports: [Vflow, Vui, DemoIconComponent, NgTemplateOutlet],
+  imports: [Vflow, Vui, DocsKit, DemoIconComponent, NgTemplateOutlet],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styles: `
-    article {
-      width: 250px;
-      font-size: 14px;
-    }
-    /* Tall enough for the two frames to fit at nearly their real size. */
-    vflow {
-      height: 700px;
-    }
-    /* Keys are structure, not state: the accent belongs to selection. */
-    .key {
-      min-width: 22px;
-      color: var(--vui-muted);
-      font-weight: 600;
-    }
-    /* Row actions appear on the row a pointer or the focus is on, and on every row of a selected table (touch). */
-    .row-action {
-      opacity: 0;
-      transition: opacity var(--default-transition-duration, 150ms);
-    }
-    /* The node host is an element of core, outside this component's style scope: its selection is read from the
-       button itself, since a selector that starts at the host would never match here. */
-    .vui-row:hover .row-action,
-    .vui-row:focus-within .row-action,
-    .row-action:is([data-v-selected] *) {
-      opacity: 1;
-    }
-    /* The remove button of a label shows on hover and while its edge is selected; Delete removes it as well. */
-    .vui-edge-label .row-action {
-      display: none;
-      opacity: 1;
-    }
-    .vui-edge-label:hover .row-action,
-    .vui-edge-label[data-selected='true'] .row-action {
-      display: inline-flex;
-    }
-    /* A quiet last row of every table; it turns into the draft of a new field. */
-    .add-field {
-      display: flex;
-      box-sizing: border-box;
-      align-items: center;
-      gap: 6px;
-      width: 100%;
-      padding: 6px 12px;
-      border: 0;
-      border-top: 1px solid color-mix(in oklab, var(--vui-border) 50%, transparent);
-      /* The bottom corners of the card: its radius is the control radius plus one spacing unit. */
-      border-radius: 0 0 calc(var(--vui-radius) + var(--vui-space)) calc(var(--vui-radius) + var(--vui-space));
-      background: transparent;
-      color: var(--vui-muted);
-      font: inherit;
-      font-size: 12px;
-      cursor: pointer;
-    }
-    .add-field:hover {
-      background: var(--vui-surface-muted);
-      color: var(--vui-foreground);
-    }
-    .add-field:focus-visible {
-      outline: 2px solid var(--vui-accent);
-      outline-offset: -2px;
-    }
-    /* Seven rows, then the table scrolls. */
-    .rows.scrolling {
-      max-height: calc(7 * 33px - 1px);
-      overflow-y: auto;
-      overscroll-behavior: contain;
-    }
-    /* Rows cut by the scroll box fade into the border below; a mask on the box would also cut the ports. */
-    .edge-note {
-      position: relative;
-      min-height: 20px;
-      padding-block: 4px;
-    }
-    .edge-note::before {
-      content: '';
-      position: absolute;
-      inset-inline: 0;
-      bottom: 100%;
-      height: 24px;
-      background: linear-gradient(to bottom, transparent, var(--vui-surface));
-      pointer-events: none;
-    }
-    /* Free ports show on interaction, connected ones always: an idle port without an edge is invisible, though still
-       a target, until its table is hovered, focused or selected. The table host is an element of core, so its state
-       is read from the port itself. */
-    .vui-port {
-      transition-property: border-color, background-color, box-shadow, opacity;
-    }
-    .vui-port[data-v-handle-state='idle']:not([data-vui-connected='true']) {
-      opacity: 0;
-    }
-    .vui-port:is([data-v-node]:hover *, [data-v-node]:focus-within *, [data-v-selected] *, [data-v-preselected] *) {
-      opacity: 1;
-    }
-    @media (forced-colors: active) {
-      .vui-port[data-v-handle-state='idle']:not([data-vui-connected='true']) {
-        opacity: 1;
-      }
-    }
-    /* Proxy handles share one point per border; their connected ports are visually merged. */
-    .proxy .vui-port[data-vui-connected='true'] {
-      opacity: 0.6;
-    }
-    .draft .input {
-      flex: 1;
-      min-width: 0;
-    }
-  `,
+  host: { class: 'block' },
   template: `
-    <section class="demo" aria-label="Entity relationships and field mapping demo" [attr.data-vui-theme]="theme()">
-      <div class="stage">
+    <docs-demo framed role="region" aria-label="Entity relationships and field mapping demo">
+      <!-- Tall enough for the two frames to fit at nearly their real size. -->
+      <div class="h-175">
         <vflow
           [nodes]="nodes"
           [edges]="edges()"
@@ -175,7 +76,7 @@ const TYPES = ['uuid', 'text', 'decimal', 'timestamp'];
           [parentsBelowEdges]="true"
           (connect)="connect($event)"
           (deleteRequest)="remove($event)"
-          (initialized)="flow()?.fitView()">
+          (initialized)="flow().fitView({ maxZoom: 1 })">
           <ng-template let-ctx vNode>
             @if (ctx.data().kind === 'frame') {
               <div
@@ -189,8 +90,8 @@ const TYPES = ['uuid', 'text', 'decimal', 'timestamp'];
               </div>
             } @else {
               @let view = scroll.visibility(ctx.node.id);
-              <article vuiNode [attr.data-entity]="ctx.node.id">
-                <header vuiNodeHeader [class.proxy]="view.above.length > 0">
+              <article vuiNode class="w-[250px] text-[14px]" [attr.data-entity]="ctx.node.id">
+                <header vuiNodeHeader>
                   <span vuiTitle>{{ ctx.data().title }}</span>
                   <span vuiMeta>{{ ctx.data().category }}</span>
                   <!-- Rows scrolled out above hand their endpoints to proxies with the same IDs on the header. -->
@@ -199,28 +100,35 @@ const TYPES = ['uuid', 'text', 'decimal', 'timestamp'];
                   }
                 </header>
                 <ng-template #ports let-field>
-                  <!-- Free ports show on interaction; connected ones always do. -->
                   <span
                     vuiPort
                     handleType="target"
                     position="left"
+                    [class]="quietPort"
                     [handleId]="'in:' + field.id"
                     [vuiPortConnected]="connected().has(ctx.node.id + '/in:' + field.id)"></span>
                   <span
                     vuiPort
                     handleType="source"
                     position="right"
+                    [class]="quietPort"
                     [handleId]="'out:' + field.id"
                     [vuiPortConnected]="connected().has(ctx.node.id + '/out:' + field.id)"></span>
                 </ng-template>
                 <ng-template #rows>
                   @for (row of scroll.rows(ctx.node.id, ctx.data().fields); track row.key) {
-                    <div vuiRow [attr.data-field]="row.field.id">
-                      <span vuiMeta class="key">{{ row.field.key }}</span>
+                    <div vuiRow class="group" [attr.data-field]="row.field.id">
+                      <!-- Keys are structure, not state: the accent belongs to selection. -->
+                      <span class="min-w-5.5 text-xs font-semibold text-vui-muted">{{ row.field.key }}</span>
                       <span vuiTitle>{{ row.field.name }}</span>
                       <span vuiMeta>{{ row.field.type }}</span>
+                      <!-- Row actions appear on the row a pointer or the focus is on, and on every row of a selected
+                           table (touch). -->
                       <button
-                        class="button plain small icon row-action"
+                        docsButton="plain"
+                        small
+                        icon
+                        class="opacity-0 transition-opacity! group-focus-within:opacity-100 group-hover:opacity-100 [&:is([data-v-selected]_*)]:opacity-100"
                         vNoDrag
                         type="button"
                         [attr.aria-label]="'Delete ' + ctx.data().title + '.' + row.field.name"
@@ -234,19 +142,23 @@ const TYPES = ['uuid', 'text', 'decimal', 'timestamp'];
                   }
                 </ng-template>
                 @if (ctx.data().fields.length > maxRows) {
-                  <!-- A long table scrolls; the wheel scrolls its rows instead of zooming the graph. -->
+                  <!-- Seven rows, then the table scrolls; the wheel scrolls its rows instead of zooming the graph. -->
                   <div
-                    class="rows scrolling"
+                    class="max-h-[calc(7*33px-1px)] overflow-y-auto overscroll-contain"
                     vNoWheel
                     [attr.data-rows]="ctx.node.id"
                     (scroll)="scroll.onScroll(ctx.node.id, $event)">
                     <ng-container *ngTemplateOutlet="rows" />
                   </div>
                 } @else {
-                  <div class="rows"><ng-container *ngTemplateOutlet="rows" /></div>
+                  <div><ng-container *ngTemplateOutlet="rows" /></div>
                 }
                 @if (view.below.length) {
-                  <footer vuiNodeFooter class="proxy edge-note">
+                  <!-- Rows cut by the scroll box fade into the border below; a mask on the box would also cut the
+                       ports. -->
+                  <footer
+                    vuiNodeFooter
+                    class="relative min-h-5 py-1 before:pointer-events-none before:absolute before:inset-x-0 before:bottom-full before:h-6 before:bg-linear-to-b before:from-transparent before:to-vui-surface before:content-['']">
                     <span vuiMeta>{{ view.below.length }} more below</span>
                     @for (field of scroll.hidden(ctx.data().fields, view.below); track field.id) {
                       <ng-container *ngTemplateOutlet="ports; context: { $implicit: field }" />
@@ -256,9 +168,10 @@ const TYPES = ['uuid', 'text', 'decimal', 'timestamp'];
                 @if (draft()?.entity === ctx.node.id) {
                   <!-- Enter adds the field, Escape drops the draft; core leaves keys typed in inputs alone.
                      Editing a draft is not selecting the table: the row and the button opt out of click selection. -->
-                  <div vuiRow vNoSelect class="draft" data-draft>
+                  <div vuiRow vNoSelect data-draft>
                     <input
-                      class="input"
+                      docsInput
+                      class="min-w-0 flex-1"
                       vNoDrag
                       placeholder="field_name"
                       [attr.aria-label]="'Name of the new field of ' + ctx.data().title"
@@ -268,7 +181,7 @@ const TYPES = ['uuid', 'text', 'decimal', 'timestamp'];
                       (keydown.enter)="commitDraft()"
                       (keydown.escape)="cancelDraft()" />
                     <select
-                      class="select"
+                      docsSelect
                       vNoDrag
                       [attr.aria-label]="'Type of the new field of ' + ctx.data().title"
                       (change)="editDraft({ type: $any($event.target).value })"
@@ -280,8 +193,9 @@ const TYPES = ['uuid', 'text', 'decimal', 'timestamp'];
                     </select>
                   </div>
                 } @else {
+                  <!-- A quiet last row of every table; it turns into the draft of a new field. -->
                   <button
-                    class="add-field"
+                    class="box-border flex w-full cursor-pointer items-center gap-1.5 rounded-b-vui-surface border-0 border-t border-solid border-vui-separator bg-transparent px-3 py-1.5 font-[inherit] text-[12px] leading-[inherit] text-vui-muted hover:bg-vui-surface-muted hover:text-vui-foreground focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-vui-accent"
                     vNoDrag
                     vNoSelect
                     type="button"
@@ -298,16 +212,21 @@ const TYPES = ['uuid', 'text', 'decimal', 'timestamp'];
               <svg:path vuiEdge [attr.d]="ctx.path()" />
             </svg:g>
             @if (ctx.data()?.label; as label) {
-              <span *vEdgeLabel vuiEdgeLabel [attr.data-selected]="ctx.selected()">
+              <span *vEdgeLabel vuiEdgeLabel class="group" [attr.data-selected]="ctx.selected()">
                 {{ label }}
-                <button
-                  class="button plain small icon row-action"
-                  vNoDrag
-                  type="button"
-                  [attr.aria-label]="'Remove ' + label + ' connection'"
-                  (click)="removeEdge(ctx.edge.id)">
-                  <app-demo-icon name="close" />
-                </button>
+                <!-- The remove button shows on hover and while the edge is selected; Delete removes it as well. -->
+                <span class="hidden group-hover:inline-flex group-data-[selected=true]:inline-flex">
+                  <button
+                    docsButton="plain"
+                    small
+                    icon
+                    vNoDrag
+                    type="button"
+                    [attr.aria-label]="'Remove ' + label + ' connection'"
+                    (click)="removeEdge(ctx.edge.id)">
+                    <app-demo-icon name="close" />
+                  </button>
+                </span>
               </span>
             }
           </ng-template>
@@ -317,33 +236,31 @@ const TYPES = ['uuid', 'text', 'decimal', 'timestamp'];
             }
           </ng-template>
         </vflow>
-        @if (flow(); as flow) {
-          <vui-controls class="stage-controls" [flow]="flow" />
-        }
       </div>
-    </section>
+      <vui-controls class="absolute bottom-2.5 left-2.5 z-2" [flow]="flow()" />
+    </docs-demo>
   `,
 })
 export class EntitiesDemoComponent {
-  readonly flow = viewChild(VflowComponent);
-  readonly theme = injectDocsTheme();
-  readonly background = SCENE_BACKGROUND;
-  readonly types = TYPES;
+  protected readonly flow = viewChild.required(VflowComponent);
+  protected readonly background = SCENE_BACKGROUND;
+  protected readonly types = TYPES;
+  protected readonly quietPort = QUIET_PORT;
   /** Rows a table shows before it scrolls. */
-  readonly maxRows = 7;
-  readonly scroll = new ScrollRows<Field>();
+  protected readonly maxRows = 7;
+  protected readonly scroll = new ScrollRows<Field>();
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
   private readonly injector = inject(Injector);
 
   /** The field being added: one table at a time. */
-  readonly draft = signal<{ entity: string; name: string; type: string } | null>(null);
+  protected readonly draft = signal<{ entity: string; name: string; type: string } | null>(null);
   /** The draft name is empty or taken. */
-  readonly draftError = signal(false);
+  protected readonly draftError = signal(false);
   /** The height a frame was created with: its minimum. */
   private readonly frameHeight: Record<string, number> = { relationships: 266, mapping: 234 };
   /** The first measured height of every table, which its frame's growth is counted from. */
   private readonly tableHeight: Record<string, number> = {};
-  readonly nodes = createNodes([
+  protected readonly nodes = createNodes([
     frame('relationships', { x: 0, y: 0 }, 'Relationships', this.frameHeight['relationships']),
     frame('mapping', { x: 0, y: 446 }, 'Field mapping', this.frameHeight['mapping']),
     entity('customer', 'relationships', { x: 24, y: 56 }, 'Customer', 'table', [
@@ -365,7 +282,7 @@ export class EntitiesDemoComponent {
       ['name', 'display_name', 'text'],
     ]),
   ]);
-  readonly edges = signal<Edge[]>(
+  protected readonly edges = signal<Edge[]>(
     createEdges([
       {
         id: 'foreign-key',
@@ -386,13 +303,13 @@ export class EntitiesDemoComponent {
     ]),
   );
   /** `${nodeId}/${handleId}` for every endpoint of an existing edge. */
-  readonly connected = computed(
+  protected readonly connected = computed(
     () =>
       new Set(
         this.edges().flatMap((edge) => [`${edge.source}/${edge.sourceHandle}`, `${edge.target}/${edge.targetHandle}`]),
       ),
   );
-  readonly connection: ConnectionSettings = {
+  protected readonly connection: ConnectionSettings = {
     validator: (c) => {
       const source = this.field(c.source, 'out:', c.sourceHandle);
       const target = this.field(c.target, 'in:', c.targetHandle);
@@ -401,7 +318,7 @@ export class EntitiesDemoComponent {
   };
 
   /** The label says what the connection does: a mapping copies its source field, a relation is one to many. */
-  connect(connection: Connection) {
+  protected connect(connection: Connection) {
     const mapping = this.nodes.find((node) => node.id === connection.source)?.parentId?.() === 'mapping';
     const source = this.field(connection.source, 'out:', connection.sourceHandle)!;
     const edge = createEdge({
@@ -412,7 +329,7 @@ export class EntitiesDemoComponent {
     this.edges.update((edges) => addEdges([edge], { nodes: this.nodes, edges }));
   }
 
-  startDraft(entity: string) {
+  protected startDraft(entity: string) {
     this.draft.set({ entity, name: '', type: 'text' });
     this.draftError.set(false);
     afterNextRender(() => this.host.querySelector<HTMLInputElement>('[data-draft] input')?.focus(), {
@@ -420,13 +337,13 @@ export class EntitiesDemoComponent {
     });
   }
 
-  editDraft(change: { name?: string; type?: string }) {
+  protected editDraft(change: { name?: string; type?: string }) {
     this.draft.update((draft) => draft && { ...draft, ...change });
     this.draftError.set(false);
   }
 
   /** Adds the field with an ID made from its name; the new row gets its own ports, ready to connect. */
-  commitDraft() {
+  protected commitDraft() {
     const draft = this.draft();
     if (!draft) return;
     const name = draft.name.trim().replace(/\s+/g, '_');
@@ -450,18 +367,18 @@ export class EntitiesDemoComponent {
     );
   }
 
-  cancelDraft() {
+  protected cancelDraft() {
     this.draft.set(null);
     this.draftError.set(false);
   }
 
   /** Delete removes the selected connections; tables and frames stay. */
-  remove({ edgeIds }: DeleteRequest) {
+  protected remove({ edgeIds }: DeleteRequest) {
     this.edges.update((edges) => edges.filter((edge) => !edgeIds.includes(edge.id)));
   }
 
   /** Deleting a field is an application decision: its edges go with it, nothing is left detached. */
-  deleteField(nodeId: string, fieldId: string) {
+  protected deleteField(nodeId: string, fieldId: string) {
     const node = this.nodes.find((entity) => entity.id === nodeId)!;
     node.data.update((data) =>
       data.kind === 'entity' ? { ...data, fields: data.fields.filter((field) => field.id !== fieldId) } : data,
@@ -482,7 +399,6 @@ export class EntitiesDemoComponent {
     // Measured sizes arrive after render, so this follows them instead of running once after a change.
     effect(() => {
       const flow = this.flow();
-      if (!flow) return;
       for (const frame of this.nodes.filter((node) => node.data().kind === 'frame')) {
         const growth = this.nodes
           .filter((node) => node.parentId?.() === frame.id)
@@ -500,7 +416,7 @@ export class EntitiesDemoComponent {
     });
   }
 
-  removeEdge(id: string) {
+  protected removeEdge(id: string) {
     this.edges.update((edges) => edges.filter((edge) => edge.id !== id));
   }
 

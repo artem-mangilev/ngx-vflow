@@ -15,23 +15,23 @@ test('a parent grows around a child dragged past its side and keeps its other ch
   await expect(flow.locator('[data-v-node]')).toHaveCount(6);
   const squad = flow.locator('[data-v-node="squad"]');
   const team = flow.locator('[data-v-node="team"]');
-  const dev1 = flow.locator('[data-v-node="dev-1"]');
-  const dev2 = flow.locator('[data-v-node="dev-2"]');
+  const backend = flow.locator('[data-v-node="backend"]');
+  const frontend = flow.locator('[data-v-node="frontend"]');
 
-  const before = { squad: await flowPoint(squad), team: await flowPoint(team), dev1: await flowPoint(dev1) };
+  const before = { squad: await flowPoint(squad), team: await flowPoint(team), backend: await flowPoint(backend) };
   const squadBefore = (await squad.boundingBox())!;
   const teamBefore = (await team.boundingBox())!;
-  const unit = (await dev1.boundingBox())!.width;
+  const unit = (await backend.boundingBox())!.width;
 
-  // Drag Dev 2 to the right, past the squad and then past the team.
-  const box = (await dev2.boundingBox())!;
+  // Drag Frontend to the right, past the squad and then past the team.
+  const box = (await frontend.boundingBox())!;
   await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
   await page.mouse.down();
   await page.mouse.move(box.x + box.width / 2 + 260, box.y + box.height / 2, { steps: 10 });
   await page.mouse.up();
 
-  // Widths in flow units: the width of Dev 1, 100 flow units, gives the zoom.
-  const zoom = (await dev1.boundingBox())!.width / 100;
+  // Widths in flow units: the width of Backend, 100 flow units, gives the zoom.
+  const zoom = (await backend.boundingBox())!.width / 100;
   const squadAfter = (await squad.boundingBox())!;
   const teamAfter = (await team.boundingBox())!;
   expect(squadAfter.width / zoom).toBeGreaterThan(squadBefore.width / (unit / 100) + 100);
@@ -39,5 +39,5 @@ test('a parent grows around a child dragged past its side and keeps its other ch
   // The parents and the other child stay where they were.
   expect(await flowPoint(squad)).toEqual(before.squad);
   expect(await flowPoint(team)).toEqual(before.team);
-  expect(await flowPoint(dev1)).toEqual(before.dev1);
+  expect(await flowPoint(backend)).toEqual(before.backend);
 });

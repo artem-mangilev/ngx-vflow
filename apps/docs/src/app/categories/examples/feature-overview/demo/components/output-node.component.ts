@@ -1,167 +1,57 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
-import { VuiPort } from '@vflow/ui';
-import { Vflow, injectNode } from 'ngx-vflow';
+import { DemoIconComponent, DocsNodeIcon } from '@docs/shared';
+import { Vui } from '@vflow/ui';
+import { injectNode } from 'ngx-vflow';
 import { FlowStoreService } from '../services/flow-store.service';
 
+type Metric = 'width' | 'height' | 'x' | 'y';
+
+export interface OutputData {
+  title: string;
+  /** The values of the connected node to show, one per row. */
+  rows: Metric[];
+}
+
+const LABELS: Record<Metric, string> = { width: 'W', height: 'H', x: 'X', y: 'Y' };
+
+/** Shows the size or the position of the node connected to it, read from the store the demo provides. */
 @Component({
   template: `
-    <div class="output-node">
-      <div class="node-header">
-        <svg class="icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
-          <rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.5" fill="none" />
-          <circle cx="8" cy="8" r="2" fill="currentColor" />
-        </svg>
-        <span class="title">Output</span>
-      </div>
-      <div class="node-content">
-        <div class="metric-group">
-          <div class="metric-label">Size</div>
-          <div class="metric-row">
-            <span class="metric-name">W:</span>
-            <span class="metric-value">{{ connectedNodeWidth() }}px</span>
-            <span vuiPort handleType="target" position="left" handleId="width"></span>
-          </div>
-          <div class="metric-row">
-            <span class="metric-name">H:</span>
-            <span class="metric-value">{{ connectedNodeHeight() }}px</span>
-            <span vuiPort handleType="target" position="left" handleId="height"></span>
-          </div>
+    <article vuiNode class="w-45 text-[13px]">
+      <header vuiNodeHeader>
+        <span docsNodeIcon tile class="[--icon-color:var(--color-slate-500)]"><app-demo-icon name="download" /></span>
+        <span vuiTitle>{{ ctx.data().title }}</span>
+      </header>
+      @for (row of rows(); track row.metric) {
+        <div vuiRow>
+          <span vuiMeta>{{ row.label }}:</span>
+          <span class="ms-auto tabular-nums">{{ row.value }}</span>
         </div>
-
-        <div class="divider"></div>
-
-        <div class="metric-group">
-          <div class="metric-label">Position</div>
-          <div class="metric-row">
-            <span class="metric-name">X:</span>
-            <span class="metric-value">{{ connectedNodeX() }}</span>
-            <span vuiPort handleType="target" position="left" handleId="x"></span>
-          </div>
-          <div class="metric-row">
-            <span class="metric-name">Y:</span>
-            <span class="metric-value">{{ connectedNodeY() }}</span>
-            <span vuiPort handleType="target" position="left" handleId="y"></span>
-          </div>
-        </div>
-      </div>
-    </div>
+      }
+      <span vuiPort handleType="target" position="left"></span>
+    </article>
   `,
-  styles: [
-    `
-      .output-node {
-        width: 180px;
-        background: white;
-        border: 2px solid var(--accent-slate);
-        border-radius: 8px;
-        box-shadow:
-          0 1px 3px rgba(0, 0, 0, 0.08),
-          0 1px 2px rgba(0, 0, 0, 0.06);
-        overflow: hidden;
-      }
-
-      .node-header {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        padding: 12px 14px;
-        background: white;
-        border-bottom: 2px solid var(--accent-slate);
-        color: var(--accent-slate);
-      }
-
-      .icon {
-        flex-shrink: 0;
-      }
-
-      .title {
-        font-size: 14px;
-        font-weight: 600;
-        letter-spacing: -0.01em;
-        color: var(--text-primary);
-      }
-
-      .node-content {
-        padding: 12px 14px;
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-        background: white;
-      }
-
-      .metric-group {
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-      }
-
-      .metric-label {
-        font-size: 11px;
-        font-weight: 600;
-        color: var(--text-muted);
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-      }
-
-      .metric-row {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        padding: 4px 8px;
-        background: rgba(0, 0, 0, 0.02);
-        border-radius: 4px;
-        font-size: 12px;
-      }
-
-      .metric-name {
-        color: var(--text-muted);
-        font-weight: 600;
-        min-width: 16px;
-      }
-
-      .metric-value {
-        color: var(--text-primary);
-        font-family: 'Monaco', 'Courier New', monospace;
-        font-weight: 500;
-      }
-
-      .divider {
-        height: 1px;
-        background: var(--node-border);
-        margin: 4px 0;
-      }
-    `,
-  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Vflow, VuiPort],
+  imports: [Vui, DocsNodeIcon, DemoIconComponent],
 })
 export class OutputNodeComponent {
-  protected readonly ctx = injectNode();
-  public store = inject(FlowStoreService);
+  protected readonly ctx = injectNode<OutputData>();
+  private readonly store = inject(FlowStoreService);
 
-  public connectedNodeWidth = computed(() => {
-    const edge =
-      this.store.edges().find((edge) => edge.target === this.ctx.node.id && edge.targetHandle === 'width') ?? null;
-    // A content-sized node has no width in its data; the flow reports measured and resized sizes as changes.
-    return Math.floor((edge && this.store.sizes()[edge.source]?.width) ?? 0);
-  });
+  protected readonly rows = computed(() =>
+    this.ctx.data().rows.map((metric) => ({ metric, label: LABELS[metric], value: this.read(metric) })),
+  );
 
-  public connectedNodeHeight = computed(() => {
-    const edge =
-      this.store.edges().find((edge) => edge.target === this.ctx.node.id && edge.targetHandle === 'height') ?? null;
-    return Math.floor((edge && this.store.sizes()[edge.source]?.height) ?? 0);
-  });
+  /** A value of the node wired into this one; a dash while nothing is connected. */
+  private read(metric: Metric): string {
+    const edge = this.store.edges().find((edge) => edge.target === this.ctx.node.id);
+    const source = this.store.nodes().find((node) => node.id === edge?.source);
 
-  public connectedNodeX = computed(() => {
-    const edge =
-      this.store.edges().find((edge) => edge.target === this.ctx.node.id && edge.targetHandle === 'x') ?? null;
-    const sourceNode = edge ? this.store.nodes().find((node) => node.id === edge?.source) : null;
-    return Math.floor(sourceNode?.point().x ?? 0);
-  });
+    if (!source) return '–';
 
-  public connectedNodeY = computed(() => {
-    const edge =
-      this.store.edges().find((edge) => edge.target === this.ctx.node.id && edge.targetHandle === 'y') ?? null;
-    const sourceNode = edge ? this.store.nodes().find((node) => node.id === edge?.source) : null;
-    return Math.floor(sourceNode?.point().y ?? 0);
-  });
+    if (metric === 'x' || metric === 'y') return `${Math.floor(source.point()[metric])}`;
+
+    // A content-sized node has no size in its data; the flow reports measured and resized sizes as changes.
+    return `${Math.floor(this.store.sizes()[source.id]?.[metric] ?? 0)}px`;
+  }
 }

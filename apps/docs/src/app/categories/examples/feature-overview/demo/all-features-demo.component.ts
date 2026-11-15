@@ -1,153 +1,105 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { DocsPresentations } from '@docs/shared';
-import { Vflow, Connection, Edge, createEdge, AnyComponentNodeEvent, isComponentNodeEvent } from 'ngx-vflow';
-import { FlowStoreService } from './services/flow-store.service';
+import { DemoIconComponent, DocsButton, DocsPresentations, SCENE_BACKGROUND } from '@docs/shared';
+import { Vui } from '@vflow/ui';
+import {
+  AnyComponentNodeEvent,
+  Connection,
+  Vflow,
+  addEdges,
+  createEdge,
+  isComponentNodeEvent,
+  removeElements,
+} from 'ngx-vflow';
 import { TransformNodeComponent } from './components/transform-node.component';
+import { EdgeData, FlowStoreService } from './services/flow-store.service';
 
 @Component({
   template: `<vflow
     #flow
     [nodes]="store.nodes()"
     [edges]="store.edges()"
-    [background]="{ type: 'dots' }"
+    [background]="background"
     [parentsBelowEdges]="true"
     [alignmentHelper]="true"
-    (connect)="createEdge($event)"
+    (connect)="connect($event)"
     (nodesChanges.size)="store.applySizeChanges($event)"
-    (componentNodeEvent)="onComponentEvent($event)"
-    (initialized)="flow.fitView()">
+    (componentNodeEvent)="handleComponentEvent($event)"
+    (initialized)="flow.fitView({ maxZoom: 1 })">
+    <!-- The nodes with a component draw themselves; this template draws the group. -->
     <docs-node *vNode="let ctx" [ctx]="ctx" />
 
-    <ng-template let-ctx vEdge>
-      @if (ctx.data().type === 'animated') {
+    <ng-template let-ctx vEdge [vEdgeOf]="store.edges()">
+      @let data = ctx.data();
+
+      <svg:g vEdgeInteractionArea>
         <svg:path
-          class="animated-edge"
-          fill="none"
+          vuiEdge
           [attr.d]="ctx.path()"
-          [attr.stroke-width]="2.5"
-          [attr.stroke]="'#8b5cf6'"
-          [attr.marker-end]="ctx.markerEnd()" />
-      } @else {
-        <svg:g docsEdge [ctx]="ctx" />
+          [attr.marker-end]="ctx.markerEnd()"
+          [attr.stroke-dasharray]="data.animated ? '8 4' : null">
+          @if (data.animated) {
+            <!-- The dashes move by one dash and one gap, so the loop has no seam. -->
+            <svg:animate attributeName="stroke-dashoffset" values="0;-12" dur="1s" repeatCount="indefinite" />
+          }
+        </svg:path>
+      </svg:g>
+
+      @if (data.label; as label) {
+        <span *vEdgeLabel vuiEdgeLabel>{{ label }}</span>
       }
 
-      @if (ctx.data().text; as text) {
-        <div *vEdgeLabel class="label-text">{{ text }}</div>
-      }
-
-      @if (ctx.data().deletable) {
-        <div *vEdgeLabel class="label-delete" (click)="deleteEdge(ctx.edge)">
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-            <path d="M9 3L3 9M3 3L9 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-          </svg>
-        </div>
+      @if (data.deletable) {
+        <span *vEdgeLabel vuiEdgeLabel class="px-0! py-0!">
+          <button
+            docsButton="plain"
+            small
+            icon
+            type="button"
+            aria-label="Delete the connection"
+            (click)="deleteEdge(ctx.edge.id)">
+            <app-demo-icon name="close" />
+          </button>
+        </span>
       }
     </ng-template>
 
     <v-minimap />
   </vflow>`,
-  styles: [
-    `
-      :host {
-        display: block;
-        width: 100%;
-        height: 700px;
-        --node-bg: #fafafa;
-        --node-border: #e4e4e7;
-        --accent-violet: #8b5cf6;
-        --accent-emerald: #10b981;
-        --accent-amber: #f59e0b;
-        --accent-slate: #64748b;
-        --text-primary: #18181b;
-        --text-muted: #71717a;
-      }
-
-      .label-text {
-        height: 28px;
-        background: var(--node-bg);
-        border: 1px solid var(--node-border);
-        border-radius: 6px;
-        padding: 0 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 12px;
-        font-weight: 500;
-        color: var(--text-primary);
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-      }
-
-      .label-delete {
-        width: 28px;
-        height: 28px;
-        background: var(--node-bg);
-        border: 1px solid var(--node-border);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        color: var(--text-muted);
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-        transition: all 0.15s ease;
-      }
-
-      .label-delete:hover {
-        background: #ef4444;
-        border-color: #ef4444;
-        color: white;
-      }
-
-      .animated-edge {
-        stroke-linecap: round;
-        stroke-linejoin: round;
-        stroke-dasharray: 8 4;
-        animation: dash-flow 1s linear infinite;
-      }
-
-      @keyframes dash-flow {
-        to {
-          stroke-dashoffset: -12;
-        }
-      }
-    `,
-  ],
+  // The page that shows the demo draws the frame; the demo brings its height.
+  host: { class: 'block h-120 w-full' },
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DocsPresentations, Vflow],
+  imports: [DocsPresentations, DocsButton, DemoIconComponent, Vflow, Vui],
   providers: [FlowStoreService],
 })
 export class AllFeaturesDemoComponent {
-  protected store = inject(FlowStoreService);
+  protected readonly store = inject(FlowStoreService);
+  protected readonly background = SCENE_BACKGROUND;
 
-  createEdge(connection: Connection) {
-    const id = `${connection.source}${connection.sourceHandle ?? ''}-${connection.target}${connection.targetHandle ?? ''}`;
-
-    this.store.edges.update((edges) => {
-      return [
-        ...edges,
-        createEdge({
-          id,
-          data: { deletable: true },
-          markers: {
-            end: {
-              type: 'arrow-closed',
-            },
-          },
-          ...connection,
-        }),
-      ];
+  protected connect(connection: Connection): void {
+    const edge = createEdge<EdgeData>({
+      ...connection,
+      id: crypto.randomUUID(),
+      markers: { end: { type: 'arrow-closed' } },
+      data: { deletable: true },
     });
+
+    this.store.edges.update((edges) => addEdges([edge], { nodes: this.store.nodes(), edges }));
   }
 
-  deleteEdge(edgeToDelete: Edge) {
-    this.store.edges.update((edges) => {
-      return edges.filter((edge) => edge !== edgeToDelete);
-    });
+  protected deleteEdge(id: string): void {
+    this.store.edges.update((edges) => edges.filter((edge) => edge.id !== id));
   }
 
-  onComponentEvent(event: AnyComponentNodeEvent) {
+  /** The Delete button of the node toolbar: the node goes together with its edges. */
+  protected handleComponentEvent(event: AnyComponentNodeEvent): void {
     if (isComponentNodeEvent(event, TransformNodeComponent) && event.eventName === 'deleted') {
-      this.store.nodes.update((nodes) => nodes.filter((node) => node !== event.eventPayload));
+      const { nodes, edges } = removeElements(
+        { nodeIds: [event.nodeId] },
+        { nodes: this.store.nodes(), edges: this.store.edges() },
+      );
+
+      this.store.nodes.set(nodes);
+      this.store.edges.set(edges);
     }
   }
 }

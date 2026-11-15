@@ -17,13 +17,13 @@ test('dagre lays the pipeline out left to right, then top to bottom when the dir
   page.on('console', (message) => message.type() === 'error' && errors.push(message.text()));
   await page.goto('/packages/layout');
   const flow = page.locator('vflow').first();
-  await expect(flow.locator('[data-v-node]')).toHaveCount(8);
+  await expect(flow.locator('[data-v-node]')).toHaveCount(7);
 
   // The first demo starts left to right: every edge goes right, and the stage contains its children.
   await expect
     .poll(async () => (await flowPoint(page, 'parse')).x - (await flowPoint(page, 'source')).x)
     .toBeGreaterThan(100);
-  expect((await flowPoint(page, 'validate')).x).toBeGreaterThan((await flowPoint(page, 'parse')).x + 100);
+  expect((await flowPoint(page, 'store')).x).toBeGreaterThan((await flowPoint(page, 'parse')).x + 100);
   expect((await flowPoint(page, 'reduce')).x).toBeGreaterThan((await flowPoint(page, 'map')).x + 100);
   const stage = (await flow.locator('[data-v-node="stage"]').boundingBox())!;
   for (const id of ['map', 'reduce']) {
@@ -47,7 +47,7 @@ test('dagre lays the pipeline out left to right, then top to bottom when the dir
     )
     .toBe(true);
   const parse = await flowPoint(page, 'parse');
-  const validate = await flowPoint(page, 'validate');
-  expect(validate.y).toBeGreaterThan(parse.y + 50);
+  const store = await flowPoint(page, 'store');
+  expect(store.y).toBeGreaterThan(parse.y + 50);
   expect(errors).toEqual([]);
 });

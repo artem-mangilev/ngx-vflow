@@ -1,52 +1,47 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { DocsPresentations } from '@docs/shared';
+import { Vui } from '@vflow/ui';
 import { Edge, Node, StaticNode, Vflow, createNodes } from 'ngx-vflow';
 import { StressTestNodeComponent } from './stress-test-node.component';
 
 @Component({
-  templateUrl: './stress-test-demo.component.html',
-  styleUrls: ['./stress-test-demo.component.scss'],
+  // The first view shows the whole grid, which takes a zoom far below the default `minZoom`.
+  template: `<vflow
+      #flow
+      [nodes]="graph.nodes"
+      [edges]="graph.edges"
+      [minZoom]="0.1"
+      (initialized)="flow.fitView({ maxZoom: 1 })">
+      <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
+    </vflow>
+    <vui-controls class="absolute bottom-2.5 left-2.5 z-2" [flow]="flow" />`,
+  host: { class: 'relative block size-full' },
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DocsPresentations, Vflow],
+  imports: [DocsPresentations, Vflow, Vui],
 })
 export class StressTestDemoComponent {
-  public nodes: Node[] = [];
-  public edges: Edge[] = [];
-
-  constructor() {
-    const { nodes, edges } = initialElements(32, 32);
-    this.nodes = nodes;
-    this.edges = edges;
-  }
+  protected readonly graph = createChain(32, 32);
 }
 
-export function initialElements(xNodes = 10, yNodes = 10): { nodes: Node[]; edges: Edge[] } {
+/** A queue of jobs laid out as a grid, each one waiting for the one before it. */
+function createChain(columns: number, rows: number): { nodes: Node[]; edges: Edge[] } {
   const nodes: StaticNode<{ label: string }>[] = [];
+  // Plain edges: an edge needs no signals for what it never changes.
   const edges: Edge[] = [];
 
-  let nodeId = 1;
-  let recentNodeId = null;
+  for (let index = 0; index < columns * rows; index++) {
+    const label = `Job ${index + 1}`;
 
-  for (let y = 0; y < yNodes; y++) {
-    for (let x = 0; x < xNodes; x++) {
-      nodes.push({
-        component: StressTestNodeComponent,
-        id: `stress-${nodeId}`,
-        data: { label: `Node ${nodeId}` },
-        ariaLabel: `Node ${nodeId}`,
-        point: { x: x * 150, y: y * 100 },
-      });
+    nodes.push({
+      id: `job-${index + 1}`,
+      component: StressTestNodeComponent,
+      point: { x: (index % columns) * 150, y: Math.floor(index / columns) * 100 },
+      data: { label },
+      ariaLabel: label,
+    });
 
-      if (recentNodeId && nodeId <= xNodes * yNodes) {
-        edges.push({
-          id: `${x}-${y}`,
-          source: `stress-${recentNodeId}`,
-          target: `stress-${nodeId}`,
-        });
-      }
-
-      recentNodeId = nodeId;
-      nodeId++;
+    if (index > 0) {
+      edges.push({ id: `job-${index}-${index + 1}`, source: `job-${index}`, target: `job-${index + 1}` });
     }
   }
 

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { VflowHandleDirective } from 'ngx-vflow';
 
 /**
@@ -10,36 +10,24 @@ import { VflowHandleDirective } from 'ngx-vflow';
   changeDetection: ChangeDetectionStrategy.OnPush,
   hostDirectives: [{ directive: VflowHandleDirective, inputs: ['handleType', 'position', 'handleId', 'canAccept'] }],
   host: {
-    '[class.valid]': "handle.state() === 'valid'",
-    '[class.invalid]': "handle.state() === 'invalid'",
-    '[class.disabled]': '!handle.canAccept()',
+    class: 'block size-3 rounded-xs border border-solid border-vui-foreground',
+    '[class]': 'fill()',
   },
   template: '',
-  styles: `
-    :host {
-      display: block;
-      width: 12px;
-      height: 12px;
-      box-sizing: border-box;
-      border-radius: 2px;
-      border: 1px solid black;
-      background-color: #fff;
-    }
-
-    :host(.valid) {
-      background-color: green;
-    }
-
-    :host(.invalid) {
-      background-color: red;
-    }
-
-    :host(.disabled) {
-      background-color: #9e9e9e;
-      opacity: 0.55;
-    }
-  `,
 })
 export class SquareHandleComponent {
   protected readonly handle = inject(VflowHandleDirective);
+
+  protected readonly fill = computed(() => {
+    if (!this.handle.canAccept()) return 'bg-vui-surface opacity-40';
+
+    switch (this.handle.state()) {
+      case 'valid':
+        return 'bg-vui-success';
+      case 'invalid':
+        return 'bg-vui-danger';
+      default:
+        return 'bg-vui-surface';
+    }
+  });
 }

@@ -1,5 +1,9 @@
 It's possible to set `Curve` for both the edges and connection.
 
+In the demo each edge is labeled with the name of its curve. The connection line is a `smooth-step` curve: drag from
+a port of a node in the middle to `Response` to see it. The demo gives the new edge the same curve, so the line
+keeps its shape when you release it.
+
 {{ NgDocActions.demoPane("CurvesDemoComponent") }}
 
 ## Curve factory
@@ -16,6 +20,9 @@ in degrees of flow space with `0` pointing right and `90` pointing down; a label
 it. Without `angle` the label stays horizontal.
 
 With virtualization enabled, the library uses the complete path bounds to decide whether an edge can appear in the viewport. A custom factory may return an optional `bounds: { x, y, width, height }` in flow coordinates to avoid SVG measurement. These bounds must contain the whole curve, including any detours or control points. Without `bounds`, the library measures the SVG path when it changes and caches the result for viewport changes.
+
+The factory of the demo draws an arc that rises by a quarter of the distance between its ends, and returns the top
+of the arc as the `center` label point. Drag a node to see the arcs follow it.
 
 {{ NgDocActions.demoPane("CurveFactoryDemoComponent") }}
 

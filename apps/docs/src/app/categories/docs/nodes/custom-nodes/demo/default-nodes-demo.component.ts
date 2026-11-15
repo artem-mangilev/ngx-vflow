@@ -1,35 +1,21 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { DocsPresentations } from '@docs/shared';
-import { Node, Vflow, createNodes } from 'ngx-vflow';
+import { Vflow, createEdges, createNodes } from 'ngx-vflow';
 
 @Component({
-  template: `<vflow [nodes]="nodes">
+  template: `<vflow #flow [nodes]="nodes" [edges]="edges" (initialized)="flow.fitView({ maxZoom: 1 })">
     <docs-node *vNode="let ctx" [ctx]="ctx" />
     <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
   </vflow>`,
-  styles: [
-    `
-      :host {
-        width: 100%;
-        height: 100%;
-      }
-    `,
-  ],
+  host: { class: 'block size-full' },
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [DocsPresentations, Vflow],
 })
 export class DefaultNodesDemoComponent {
-  public nodes: Node[] = createNodes([
-    {
-      id: '1',
-      point: { x: 100, y: 100 },
-      data: { text: `1` },
-    },
-    {
-      id: '2',
-      point: { x: 200, y: 200 },
-      // it's possible to pass html in this field
-      data: { text: `<strong>2</strong>` },
-    },
+  protected readonly nodes = createNodes([
+    { id: 'source', point: { x: 0, y: 0 }, data: { text: 'Source' } },
+    { id: 'target', point: { x: 220, y: 90 }, data: { text: 'Target' } },
   ]);
+
+  protected readonly edges = createEdges([{ id: 'source-target', source: 'source', target: 'target' }]);
 }

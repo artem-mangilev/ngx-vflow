@@ -1,12 +1,11 @@
 import { NgComponentOutlet } from '@angular/common';
-import { ChangeDetectionStrategy, Component, signal, Type, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal, Type } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { provideVflow, withSettings } from 'ngx-vflow';
 import { FirstFlowComponent } from '../categories/docs/getting-started/quickstart/demo/first-flow.component';
 import { PipelineDemoComponent } from '../categories/examples/applications/pipeline/pipeline-demo.component';
 import { RelationshipsDemoComponent } from '../categories/examples/applications/relationships-map/relationships-demo.component';
 import { AllFeaturesDemoComponent } from '../categories/examples/feature-overview/demo/all-features-demo.component';
-import { injectDocsTheme } from '../shared/docs-theme';
 import { SHOWCASE_PROJECTS } from '../showcase/projects';
 
 interface Feature {
@@ -32,16 +31,12 @@ const INSTALL_COMMAND = 'npm i ngx-vflow @angular/cdk';
 @Component({
   selector: 'app-landing',
   templateUrl: './landing.component.html',
-  styleUrl: './landing.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  // The flows are created through an outlet, outside the style scope of this component.
-  encapsulation: ViewEncapsulation.None,
   imports: [NgComponentOutlet, RouterLink],
   // A wheel over a flow of this page scrolls the page; pinch and the zoom keys still zoom.
   providers: [provideVflow(withSettings({ zoomOnScroll: false }))],
 })
 export class LandingComponent {
-  protected readonly theme = injectDocsTheme();
   protected readonly hero = PipelineDemoComponent;
   protected readonly installCommand = INSTALL_COMMAND;
   protected readonly projects = SHOWCASE_PROJECTS;

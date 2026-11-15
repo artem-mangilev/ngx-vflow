@@ -1,55 +1,31 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { DocsPresentations } from '@docs/shared';
-import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
+import { Vflow, createEdges, createNodes } from 'ngx-vflow';
 
 @Component({
   template: `<vflow
+    #flow
     [nodes]="nodes"
     [edges]="edges"
-    [background]="{ type: 'image', src: 'assets/logo.svg', scale: 0.05 }">
+    [background]="{ type: 'image', src: 'assets/floor-plan.svg', scale: 1, repeat: false }"
+    (initialized)="flow.fitView({ maxZoom: 1 })">
     <docs-node *vNode="let ctx" [ctx]="ctx" />
     <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
   </vflow>`,
-  styles: [
-    `
-      :host {
-        width: 100%;
-        height: 100%;
-      }
-    `,
-  ],
+  host: { class: 'block size-full' },
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [DocsPresentations, Vflow],
 })
 export class ImageCustomBackgroundDemoComponent {
-  public nodes: Node[] = createNodes([
-    {
-      id: '1',
-      point: { x: 10, y: 200 },
-      data: { text: '1' },
-    },
-    {
-      id: '2',
-      point: { x: 200, y: 100 },
-      data: { text: '2' },
-    },
-    {
-      id: '3',
-      point: { x: 200, y: 300 },
-      data: { text: '3' },
-    },
+  // The image lies at the origin of the flow at its natural size (`scale: 1`), so node positions are positions on the plan.
+  protected readonly nodes = createNodes([
+    { id: 'printer', point: { x: 40, y: 60 }, data: { text: 'Printer' } },
+    { id: 'sensor', point: { x: 200, y: 240 }, data: { text: 'Sensor' } },
+    { id: 'router', point: { x: 460, y: 60 }, data: { text: 'Router' } },
   ]);
 
-  public edges: Edge[] = [
-    {
-      id: '1 -> 2',
-      source: '1',
-      target: '2',
-    },
-    {
-      id: '1 -> 3',
-      source: '1',
-      target: '3',
-    },
-  ];
+  protected readonly edges = createEdges([
+    { id: 'printer-router', source: 'printer', target: 'router' },
+    { id: 'sensor-router', source: 'sensor', target: 'router' },
+  ]);
 }

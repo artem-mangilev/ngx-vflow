@@ -1,4 +1,4 @@
-Nodes without ports: a connection starts anywhere on a node and ends anywhere on another one, and edges meet the nodes on the side facing the other node, or at the center. The node title drags the node.
+Nodes without ports: a connection starts anywhere on a node and ends anywhere on another one, and edges meet the nodes on the side facing the other node, or at the center. The header of a node drags it.
 
 {{ NgDocActions.demoPane("EasyConnectDemoComponent") }}
 
@@ -9,15 +9,15 @@ The root element of the node presentation carries `vHandle` with `handleType="an
 {% raw %}
 
 ```html
-<div class="easy-node" vHandle handleType="any" position="auto">
-  <div class="easy-node__title" vDragHandle>{{ ctx.data().title }}</div>
-  <div class="easy-node__body">Drag from here to connect</div>
-</div>
+<article vuiNode vHandle handleType="any" position="auto">
+  <header vuiNodeHeader vDragHandle>{{ node.data().title }}</header>
+  <div>Drag from here to connect</div>
+</article>
 ```
 
 {% endraw %}
 
-While a connection is in progress the handle element itself is the drop zone: the node under the pointer becomes the candidate, and the node the connection started from carries `data-v-handle-state="connecting"`. Plain CSS styles both. No connection settings are needed beyond the marker of the preview line.
+While a connection is in progress the handle element itself is the drop zone: the node under the pointer becomes the candidate, and carries `data-v-handle-state="valid"`, while the node the connection started from carries `data-v-handle-state="connecting"`. The card of the demo styles both with Tailwind variants of that attribute, such as `data-[v-handle-state=valid]:border-vui-success`. No connection settings are needed beyond the marker of the preview line.
 
 ## Border or center
 

@@ -20,8 +20,9 @@ test('an edge routes around the nodes between its ends and keeps clear of them w
   const flow = page.locator('vflow').first();
   await expect(flow.locator('[data-v-node]')).toHaveCount(7);
   const path = flow.locator('svg[edge]').first().locator('path').first();
-  const nodeA = flow.locator('[data-v-node="a"]');
-  const nodeB = flow.locator('[data-v-node="b"]');
+  // The first edge runs from Source to Publish, around Clean and Enrich between them.
+  const clean = flow.locator('[data-v-node="clean"]');
+  const enrich = flow.locator('[data-v-node="enrich"]');
 
   const clearOf = async (node: import('@playwright/test').Locator) => {
     const box = (await node.boundingBox())!;
@@ -35,18 +36,18 @@ test('an edge routes around the nodes between its ends and keeps clear of them w
     );
   };
 
-  await expect.poll(() => clearOf(nodeA)).toBe(true);
-  await expect.poll(() => clearOf(nodeB)).toBe(true);
+  await expect.poll(() => clearOf(clean)).toBe(true);
+  await expect.poll(() => clearOf(enrich)).toBe(true);
   const before = await path.getAttribute('d');
 
-  // Move A up into the corridor the route runs through: the route changes and still clears both nodes.
-  const box = (await nodeA.boundingBox())!;
+  // Move Clean up into the corridor the route runs through: the route changes and still clears both nodes.
+  const box = (await clean.boundingBox())!;
   await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
   await page.mouse.down();
   await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2 - 60, { steps: 6 });
   await expect.poll(() => path.getAttribute('d')).not.toBe(before);
-  await expect.poll(() => clearOf(nodeA)).toBe(true);
+  await expect.poll(() => clearOf(clean)).toBe(true);
   await page.mouse.up();
-  await expect.poll(() => clearOf(nodeA)).toBe(true);
-  await expect.poll(() => clearOf(nodeB)).toBe(true);
+  await expect.poll(() => clearOf(clean)).toBe(true);
+  await expect.poll(() => clearOf(enrich)).toBe(true);
 });

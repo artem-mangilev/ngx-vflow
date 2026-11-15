@@ -1,76 +1,38 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { DocsPresentations } from '@docs/shared';
-import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
+import { Vflow, createEdges, createNodes } from 'ngx-vflow';
 
 @Component({
-  template: `<vflow [nodes]="nodes" [edges]="edges" [alignmentHelper]="true">
+  template: `<vflow
+    #flow
+    [nodes]="nodes"
+    [edges]="edges"
+    [alignmentHelper]="true"
+    (initialized)="flow.fitView({ maxZoom: 1 })">
     <docs-node *vNode="let ctx" [ctx]="ctx" />
     <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
   </vflow>`,
-  styles: [
-    `
-      :host {
-        width: 100%;
-        height: 100%;
-      }
-    `,
-  ],
+  host: { class: 'block size-full' },
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [DocsPresentations, Vflow],
 })
 export class AlignmentHelperDemoComponent {
-  public nodes: Node[] = createNodes([
-    {
-      id: '1',
-      point: { x: 10, y: 10 },
-      data: { text: `1` },
-    },
-    {
-      id: '2',
-      point: { x: 40, y: 110 },
-      // it's possible to pass html in this field
-      data: { text: `<strong>2</strong>` },
-      parentId: '3',
-    },
-    {
-      id: '3',
-      point: { x: 150, y: 10 },
-      data: { type: 'group' },
-      width: 250,
-      height: 250,
-    },
-    {
-      id: '4',
-      point: { x: 450, y: 90 },
-      data: { text: `4<br />drag me level with 2` },
-    },
-    {
-      id: '5',
-      point: { x: 10, y: 300 },
-      data: { text: `5` },
-    },
-    {
-      id: '6',
-      point: { x: 300, y: 300 },
-      data: { text: `6` },
-    },
-    {
-      id: '7',
-      point: { x: 450, y: 220 },
-      data: { text: `7<br />between 5 and 6` },
-    },
+  // The layout is left untidy on purpose: every node has something to align with.
+  protected readonly nodes = createNodes([
+    { id: 'build', point: { x: 10, y: 10 }, data: { text: 'Build' } },
+    { id: 'ci', point: { x: 150, y: 10 }, width: 250, height: 200, data: { type: 'group', text: 'CI' } },
+    // Off the center of its group.
+    { id: 'test', point: { x: 40, y: 110 }, parentId: 'ci', data: { text: 'Test' } },
+    // Not level with `Test`: the edge between them is bent.
+    { id: 'deploy', point: { x: 450, y: 90 }, data: { text: 'Deploy' } },
+    { id: 'logs', point: { x: 10, y: 250 }, data: { text: 'Logs' } },
+    { id: 'metrics', point: { x: 300, y: 250 }, data: { text: 'Metrics' } },
+    // Fits into the gap between `Logs` and `Metrics`.
+    { id: 'alerts', point: { x: 450, y: 180 }, data: { text: 'Alerts' } },
   ]);
 
-  public edges: Edge[] = [
-    {
-      source: '1',
-      target: '2',
-      id: '1 -> 2',
-    },
-    {
-      source: '2',
-      target: '4',
-      id: '2 -> 4',
-    },
-  ];
+  protected readonly edges = createEdges([
+    { id: 'build-test', source: 'build', target: 'test' },
+    { id: 'test-deploy', source: 'test', target: 'deploy' },
+  ]);
 }

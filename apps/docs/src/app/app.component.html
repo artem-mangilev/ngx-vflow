@@ -1,19 +1,28 @@
 <ng-doc-root [sidebar]="!!section()" [noWidthLimit]="!section()">
   <ng-doc-navbar [hamburger]="!!section()">
-    <a ngDocNavbarLeft class="logo" routerLink="/" aria-label="ngx-vflow, home">
-      <img class="logo__icon" src="assets/logo.svg" alt="" />
-      <span data-testid="logo-text" class="logo__text">ngx-vflow</span>
+    <a
+      ngDocNavbarLeft
+      class="flex items-center gap-2 text-doc-heading no-underline"
+      routerLink="/"
+      aria-label="ngx-vflow, home">
+      <img class="size-9 rounded-[5px] border-2 border-brand" src="assets/logo.svg" alt="" />
+      <span data-testid="logo-text" class="text-[18px] font-bold tracking-[-0.015em] [@media(width<=520px)]:text-[16px]"
+        >ngx-vflow</span
+      >
     </a>
 
-    <nav ngDocNavbarCenter class="tabs" aria-label="Sections">
+    <nav ngDocNavbarCenter class="flex items-center gap-1" aria-label="Sections">
       @for (tab of tabs; track tab.id) {
-        <a class="tabs__tab" [routerLink]="tab.link" [attr.aria-current]="activeTab() === tab.id ? 'page' : null">
+        <a
+          class="rounded-md px-3 py-1.5 text-(length:--ng-doc-text-sm-size) leading-5 font-medium whitespace-nowrap text-doc-muted no-underline hover:bg-doc-base-1 hover:text-doc-heading focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-doc-primary aria-[current=page]:bg-doc-base-2 aria-[current=page]:text-doc-heading"
+          [routerLink]="tab.link"
+          [attr.aria-current]="activeTab() === tab.id ? 'page' : null">
           {{ tab.title }}
         </a>
       }
     </nav>
 
-    <div ngDocNavbarRight class="header-controls">
+    <div ngDocNavbarRight class="flex items-center gap-3 [@media(width<=520px)]:gap-0">
       <ng-doc-theme-toggle />
 
       <a
@@ -34,9 +43,14 @@
   }
 
   <!-- The navbar hides its center slot on narrow screens; the same tabs then sit above the page. -->
-  <nav class="tabs tabs--narrow" aria-label="Sections">
+  <nav
+    class="hidden items-center gap-1 overflow-x-auto border-b border-b-doc-border px-4 py-2 [@media(width<=1024px)]:flex"
+    aria-label="Sections">
     @for (tab of tabs; track tab.id) {
-      <a class="tabs__tab" [routerLink]="tab.link" [attr.aria-current]="activeTab() === tab.id ? 'page' : null">
+      <a
+        class="rounded-md px-3 py-1.5 text-(length:--ng-doc-text-sm-size) leading-5 font-medium whitespace-nowrap text-doc-muted no-underline hover:bg-doc-base-1 hover:text-doc-heading focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-doc-primary aria-[current=page]:bg-doc-base-2 aria-[current=page]:text-doc-heading"
+        [routerLink]="tab.link"
+        [attr.aria-current]="activeTab() === tab.id ? 'page' : null">
         {{ tab.title }}
       </a>
     }

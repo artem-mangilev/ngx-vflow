@@ -4,7 +4,7 @@ keyword: 'PackagesRouting'
 
 `@vflow/routing` routes an edge around the nodes between its ends: an orthogonal path with rounded corners that keeps a clearance from every node in its way. It is a `CurveFactory`, so it works wherever a curve does: on an edge, on the connection preview, with markers and labels.
 
-Drag a node to see the edges reroute. The edge from C to D runs inside its group: the nodes of an edge and their ancestors are never obstacles.
+Drag a node to see the edges reroute. The edge from Source to Publish runs around Clean and Enrich, which stand between its ends. The edge from Compress to Upload stays inside its group: the ancestors of the nodes of an edge are never obstacles.
 
 {{ NgDocActions.demoPane("RoutingDemoComponent") }}
 

@@ -65,11 +65,15 @@ to type it; the flow never reads this input:
 
 ## Example
 
+The template of the demo reads the `role` of a link from the edge `data` and draws a standby link dashed. The
+selected edge takes the accent color through `ctx.selected()`, and the line grows thicker while the pointer is over
+the group, which includes the interaction stroke.
+
 {{ NgDocActions.demoPane("CustomEdgesDemoComponent") }}
 
 ## Edge components
 
-An edge can also be drawn by a component. Pass the component class, or a function that lazily imports it, in the `component` field of the edge. Or register the component under a key with `withEdgeComponents()` inside `provideVflow()` and name the key, `component: 'colored'`, as the demo below does; the `VflowEdgeComponents` interface can be augmented to have the keys checked, see [Component keys](/docs/nodes/custom-nodes#refer-to-components-by-key). The flow creates the component on its own SVG group inside the edge SVG, so the component template is plain SVG and its selector is not used. Read the edge through `injectEdge()`, which returns the same fields as the template context. Add `VflowEdgeInteractionAreaDirective` to its `hostDirectives` to move the interaction stroke into the component host, so host listeners and `:host(:hover)` see the whole clickable area; a click selects the edge either way.
+An edge can also be drawn by a component. Pass the component class, or a function that lazily imports it, in the `component` field of the edge. Or register the component under a key with `withEdgeComponents()` inside `provideVflow()` and name the key, `component: 'transition'`, as the demo below does; the `VflowEdgeComponents` interface can be augmented to have the keys checked, see [Component keys](/docs/nodes/custom-nodes#refer-to-components-by-key). The flow creates the component on its own SVG group inside the edge SVG, so the component template is plain SVG and its selector is not used. Read the edge through `injectEdge()`, which returns the same fields as the template context. Add `VflowEdgeInteractionAreaDirective` to its `hostDirectives` to move the interaction stroke into the component host, so host listeners and `:host(:hover)` see the whole clickable area; a click selects the edge either way.
 
 An edge component declares labels in its own template with the `vEdgeLabel` structural directive, next to its SVG
 elements, the same way as an edge template; see `*FeaturesEdgeLabels`. A label renders in the HTML label layer of the

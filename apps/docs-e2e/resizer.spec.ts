@@ -60,7 +60,7 @@ test.describe('overview resizer', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/examples/feature-overview');
     node = page.locator('[data-v-node][aria-label="Node transform"]');
-    card = node.locator('.transform-node');
+    card = node.getByTestId('transform');
     await node.scrollIntoViewIfNeeded();
     await expect(node).toHaveCSS('visibility', 'visible');
     await card.click();
@@ -98,8 +98,8 @@ test.describe('overview resizer', () => {
 
 test('resizer demo keeps a node at its CSS min-width while shrinking', async ({ page }) => {
   await page.goto('/docs/nodes/resizer');
-  const node = page.locator('[data-v-node]', { has: page.locator('.custom-node') }).first();
-  const card = node.locator('.custom-node');
+  const node = page.locator('[data-v-node]', { has: page.getByTestId('resizable-card') }).first();
+  const card = node.getByTestId('resizable-card');
   const corner = node.locator('[data-v-resize-control=handle][data-v-resize-control-position=bottom-right]');
   await node.scrollIntoViewIfNeeded();
   await expect(node).toHaveCSS('visibility', 'visible');

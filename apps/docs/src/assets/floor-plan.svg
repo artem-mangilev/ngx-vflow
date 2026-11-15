@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="340" viewBox="0 0 600 340" fill="none">
+  <!-- A mid gray reads on the light and on the dark canvas. -->
+  <g stroke="#8a8a93" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="1" y="1" width="598" height="338" rx="4" />
+    <!-- Wall between the lobby and the lab, with a door. -->
+    <path d="M1 170h150M200 170h180" />
+    <!-- Wall of the server room, with a door. -->
+    <path d="M380 1v110M380 160v179" />
+    <!-- Door swings. -->
+    <path d="M151 170a49 49 0 0 1 49 -49" stroke-dasharray="3 5" />
+    <path d="M380 111a49 49 0 0 1 49 49" stroke-dasharray="3 5" />
+  </g>
+  <g fill="#8a8a93" font-family="system-ui, sans-serif" font-size="12" letter-spacing="0.4">
+    <text x="16" y="24">Lobby</text>
+    <text x="16" y="194">Lab</text>
+    <text x="396" y="24">Server room</text>
+  </g>
+</svg>

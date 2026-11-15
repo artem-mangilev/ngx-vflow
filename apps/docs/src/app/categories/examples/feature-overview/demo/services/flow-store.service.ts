@@ -1,14 +1,74 @@
 import { Injectable, signal } from '@angular/core';
-import { NodeSizeChange, createEdges, createNodes } from 'ngx-vflow';
-import { TriggerNodeComponent } from '../components/trigger-node.component';
+import { Edge, NodeSizeChange, createEdges, createNodes } from 'ngx-vflow';
 import { DataNodeComponent } from '../components/data-node.component';
+import { OutputData, OutputNodeComponent } from '../components/output-node.component';
 import { TransformNodeComponent } from '../components/transform-node.component';
-import { OutputNodeComponent } from '../components/output-node.component';
+import { TriggerNodeComponent } from '../components/trigger-node.component';
 
+export interface EdgeData {
+  label?: string;
+  /** Drawn with moving dashes. */
+  animated?: boolean;
+  /** Carries a button that removes it. */
+  deletable?: boolean;
+}
+
+/** The graph of the demo. The flow and the component nodes read and change it, so it is provided once, by the demo. */
 @Injectable()
 export class FlowStoreService {
   /** Latest size of every node, reported by `(nodesChanges.size)` for content-sized and resized nodes alike. */
   readonly sizes = signal<Record<string, { width: number; height: number }>>({});
+
+  readonly nodes = signal(
+    createNodes([
+      { id: 'trigger', point: { x: 0, y: 0 }, component: TriggerNodeComponent },
+      { id: 'data', point: { x: 0, y: 256 }, component: DataNodeComponent },
+      { id: 'transform', point: { x: 330, y: 68 }, component: TransformNodeComponent },
+      // A group is a node with a size; its children are positioned inside it and move with it.
+      {
+        id: 'group',
+        point: { x: 680, y: 0 },
+        width: 260,
+        height: 332,
+        data: { type: 'group', text: 'A group moves its children' },
+      },
+      {
+        id: 'output-size',
+        parentId: 'group',
+        point: { x: 40, y: 56 },
+        component: OutputNodeComponent,
+        data: { title: 'Size', rows: ['width', 'height'] } satisfies OutputData,
+      },
+      {
+        id: 'output-position',
+        parentId: 'group',
+        point: { x: 40, y: 194 },
+        component: OutputNodeComponent,
+        data: { title: 'Position', rows: ['x', 'y'] } satisfies OutputData,
+      },
+    ]),
+  );
+
+  readonly edges = signal<Edge<EdgeData>[]>(
+    createEdges<EdgeData>([
+      {
+        id: 'trigger-data',
+        source: 'trigger',
+        target: 'data',
+        curve: 'smooth-step',
+        data: { label: 'Smooth step edge' },
+      },
+      {
+        id: 'data-transform',
+        source: 'data',
+        target: 'transform',
+        targetHandle: 'input',
+        data: { label: 'Animated edge', animated: true },
+      },
+      output('output-size'),
+      output('output-position'),
+    ]),
+  );
 
   applySizeChanges(changes: NodeSizeChange[]) {
     this.sizes.update((sizes) => ({
@@ -16,115 +76,16 @@ export class FlowStoreService {
       ...Object.fromEntries(changes.map((change) => [change.id, change.size])),
     }));
   }
+}
 
-  readonly nodes = signal(
-    createNodes([
-      {
-        id: 'trigger',
-        point: { x: 50, y: -80 },
-        component: TriggerNodeComponent,
-      },
-      {
-        id: 'data',
-        point: { x: 50, y: 250 },
-        component: DataNodeComponent,
-      },
-      {
-        id: 'transform',
-        point: { x: 400, y: 180 },
-        component: TransformNodeComponent,
-      },
-      {
-        id: 'group',
-        point: { x: 800, y: 0 },
-        data: { type: 'group' },
-        width: 500,
-        height: 800,
-      },
-      {
-        id: 'output-size',
-        parentId: 'group',
-        point: { x: 200, y: 70 },
-        component: OutputNodeComponent,
-      },
-      {
-        id: 'output-position',
-        parentId: 'group',
-        point: { x: 200, y: 400 },
-        component: OutputNodeComponent,
-      },
-    ]),
-  );
-
-  readonly edges = signal(
-    createEdges([
-      {
-        id: 'trigger->data',
-        source: 'trigger',
-        target: 'data',
-        curve: 'smooth-step',
-        data: { text: 'Smooth Step Edge' },
-      },
-      {
-        id: 'data->transform-1',
-        source: 'data',
-        target: 'transform',
-        targetHandle: 'input-1',
-        curve: 'bezier',
-        data: { type: 'animated', text: 'Animated Edge' },
-      },
-      {
-        id: 'transform->output-size-width',
-        source: 'transform',
-        sourceHandle: 'output-1',
-        target: 'output-size',
-        targetHandle: 'width',
-        data: { deletable: true },
-        markers: {
-          end: {
-            type: 'arrow-closed',
-          },
-        },
-      },
-      {
-        id: 'transform->output-size-height',
-        source: 'transform',
-        sourceHandle: 'output-1',
-        target: 'output-size',
-        targetHandle: 'height',
-        data: { deletable: true },
-        markers: {
-          end: {
-            type: 'arrow-closed',
-          },
-        },
-      },
-      {
-        id: 'transform->output-position-x',
-        source: 'transform',
-        sourceHandle: 'output-1',
-        target: 'output-position',
-        targetHandle: 'x',
-        data: { deletable: true },
-        markers: {
-          end: {
-            type: 'arrow-closed',
-          },
-        },
-      },
-      {
-        id: 'transform->output-position-y',
-        source: 'transform',
-        sourceHandle: 'output-1',
-        target: 'output-position',
-        targetHandle: 'y',
-        data: { deletable: true },
-        markers: {
-          end: {
-            type: 'arrow-closed',
-          },
-        },
-      },
-    ]),
-  );
+/** An edge from the resizable node into an output node, which shows values of its source. */
+function output(target: string) {
+  return {
+    id: `transform-${target}`,
+    source: 'transform',
+    sourceHandle: 'output',
+    target,
+    markers: { end: { type: 'arrow-closed' as const } },
+    data: { deletable: true },
+  };
 }

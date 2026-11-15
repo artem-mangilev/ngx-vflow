@@ -1,67 +1,60 @@
-import { ChangeDetectionStrategy, Component, computed, signal, viewChild } from '@angular/core';
-import { DocsPresentations } from '@docs/shared';
+import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
+import { DocsKit, DocsPresentations } from '@docs/shared';
 import { VxLayout, VxLayoutAnimate } from '@vflow/layout';
 import { radialTreeLayout, treeLayout } from '@vflow/layout/d3-hierarchy';
-import { Vflow, VflowComponent } from 'ngx-vflow';
-import { treeEdges, treeNodes } from './graph';
+import { Vflow } from 'ngx-vflow';
+import { orgChartEdges, orgChartNodes } from './graph';
 
 type Shape = 'down' | 'right' | 'radial';
 
 @Component({
-  template: `
-    <div class="toolbar">
-      @for (shape of shapes; track shape) {
-        <button class="button" type="button" [class.active]="selected() === shape" (click)="selected.set(shape)">
-          {{ shape }}
-        </button>
-      }
+  template: `<docs-demo>
+    <div docsDemoBar>
+      <p>Shape</p>
+      <div role="group" aria-label="Shape" class="inline-flex gap-1">
+        @for (shape of shapes; track shape) {
+          <button
+            type="button"
+            [docsButton]="selected() === shape ? 'secondary' : 'plain'"
+            [attr.aria-pressed]="selected() === shape"
+            (click)="selected.set(shape)">
+            {{ shape }}
+          </button>
+        }
+      </div>
     </div>
+
     <vflow
+      #flow
       vxLayoutAnimate
       [vxLayout]="layout()"
       [nodes]="nodes"
       [edges]="edges"
-      [background]="{ type: 'dots' }"
-      (vxLayoutEnd)="flow().fitView({ padding: 0.1, duration: painted ? 300 : 0 })"
+      (vxLayoutEnd)="flow.fitView({ maxZoom: 1, duration: painted ? 300 : 0 })"
       (initialized)="painted = true">
+      <!-- One floating handle per card: an edge meets the side that faces its other end, whichever way the tree grows. -->
       <docs-node *vNode="let ctx" floating [ctx]="ctx" [connectable]="false" />
       <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
     </vflow>
-  `,
-  styles: `
-    :host {
-      display: block;
-      position: relative;
-      width: 100%;
-      height: 100%;
-    }
-    .toolbar {
-      position: absolute;
-      top: 8px;
-      left: 8px;
-      z-index: 1;
-      display: flex;
-      gap: 4px;
-    }
-    .button.active {
-      outline: 2px solid var(--vui-accent);
-    }
-  `,
+  </docs-demo>`,
+  host: { class: 'block size-full' },
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DocsPresentations, Vflow, VxLayout, VxLayoutAnimate],
+  imports: [DocsKit, DocsPresentations, Vflow, VxLayout, VxLayoutAnimate],
 })
 export class LayoutTreeDemoComponent {
-  protected readonly flow = viewChild.required(VflowComponent);
   // The first layout ends before the flow paints: fit it at once, and animate the fits that follow.
   protected painted = false;
+
   protected readonly shapes: Shape[] = ['down', 'right', 'radial'];
   protected readonly selected = signal<Shape>('down');
   protected readonly layout = computed(() => {
     const shape = this.selected();
+
     return shape === 'radial'
-      ? radialTreeLayout({ levelSpacing: 150 })
-      : treeLayout({ direction: shape, nodeSpacing: 30, levelSpacing: 60 });
+      ? radialTreeLayout({ levelSpacing: 120 })
+      : treeLayout({ direction: shape, nodeSpacing: 20, levelSpacing: 40 });
   });
-  protected readonly nodes = treeNodes();
-  protected readonly edges = treeEdges();
+
+  protected readonly nodes = orgChartNodes();
+  protected readonly edges = orgChartEdges();
 }

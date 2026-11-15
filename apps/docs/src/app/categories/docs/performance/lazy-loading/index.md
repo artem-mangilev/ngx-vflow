@@ -1,5 +1,8 @@
 {{ NgDocActions.demoPane("LazyLoadingDemoComponent") }}
 
+Each node of the demo stands in for a widget that is heavy to load: a chart, a data grid, a map. The nodes are far
+apart, so one is in view at a time, and the bar lists the components as the flow imports them.
+
 > **Note**
 > Open the network tab in DevTools to see components being loaded dynamically.
 
@@ -14,16 +17,16 @@ To adapt your existing component nodes, replace component classes in the `compon
 ```ts
 // Eagerly loaded
 {
-  id: '1',
-  point: { x: 10, y: 150 },
-  component: NodeAComponent,
+  id: 'revenue',
+  point: { x: 0, y: 0 },
+  component: RevenueChartNodeComponent,
 }
 
 // Lazy loaded
 {
-  id: '1',
-  point: { x: 10, y: 150 },
-  component: () => import('./components/node-a.component').then((m) => m.NodeAComponent)
+  id: 'revenue',
+  point: { x: 0, y: 0 },
+  component: () => import('./components/revenue-chart-node.component').then((m) => m.RevenueChartNodeComponent)
 }
 ```
 

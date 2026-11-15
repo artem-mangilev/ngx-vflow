@@ -1,12 +1,7 @@
 import { ChangeDetectionStrategy, Component, signal, viewChild } from '@angular/core';
+import { DemoIconComponent, DemoIconName, DocsBadgeTone, DocsKit, SCENE_BACKGROUND } from '@docs/shared';
 import { Vui } from '@vflow/ui';
 import { createEdges, createNodes, Vflow, VflowComponent } from 'ngx-vflow';
-import { DemoIconComponent, DemoIconName } from '../../../../shared/demo-icon.component';
-import { SCENE_BACKGROUND } from '../../../../shared/demo-scene';
-import { injectDocsTheme } from '../../../../shared/docs-theme';
-
-/** Tones of the application's own badge; the vflow UI parts ship none. */
-type Tone = 'neutral' | 'info' | 'success' | 'warning' | 'danger';
 
 /** What a step is, shown by the color of its icon: where the process starts, a decision of a person, an action. */
 type StepKind = 'trigger' | 'review' | 'action';
@@ -21,87 +16,55 @@ interface StepData {
 /** Where an edge stands in the process: done, still open, or a branch the decision ruled out. */
 type EdgeState = 'taken' | 'open' | 'skipped';
 
+/** The kind of a step is the color of its icon tile, the application's own: the parts ship no palette. */
+const KIND_COLOR: Record<StepKind, string> = {
+  trigger: '[--icon-color:var(--color-cyan-600)]',
+  review: '[--icon-color:var(--color-violet-500)]',
+  action: '[--icon-color:var(--color-teal-600)]',
+};
+
 @Component({
   selector: 'app-ui-workflow-demo',
-  imports: [Vflow, Vui, DemoIconComponent],
+  imports: [Vflow, Vui, DocsKit, DemoIconComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styles: `
-    /* The process runs from the top down, so the scene is about as wide as the docs column and fits it at nearly its
-       real size; the height is the demo's to give. The scene fits by its width, which leaves a band above and below
-       the cards for the viewport controls. */
-    vflow {
-      height: 740px;
-    }
-    /* The kind of a step is the color of its icon tile, the application's own: the parts ship no palette. */
-    article[data-kind='trigger'] .node-icon {
-      --icon-color: oklch(0.609 0.126 221.723);
-    }
-    article[data-kind='review'] .node-icon {
-      --icon-color: oklch(0.606 0.25 292.717);
-    }
-    article[data-kind='action'] .node-icon {
-      --icon-color: oklch(0.6 0.118 184.704);
-    }
-    article {
-      width: 230px;
-      font-size: 14px;
-    }
-    .description {
-      margin: 0;
-      min-height: 2lh;
-      color: var(--vui-muted);
-    }
-    /* As tall as a footer with a button, so every card has the same height and straight edges stay straight. */
-    footer {
-      min-height: calc(28px + 6 * var(--vui-space) + 1px);
-    }
-    /* The process state is application CSS on the public selectors; selection keeps the library color. The edge host
-       is an element of core, outside this component's style scope, so its state is read from the path itself, as the
-       parts do: a selector that starts at the host would never match here. */
-    .vui-edge[data-state='taken']:not([data-v-selected] *) {
-      stroke: var(--vui-success);
-    }
-    .vui-edge[data-state='skipped']:not([data-v-selected] *) {
-      stroke-dasharray: 4 4;
-      opacity: 0.45;
-    }
-    /* Only the text fades: the label keeps its opaque surface over the dashed line. */
-    .vui-edge-label[data-state='skipped'] {
-      color: var(--vui-muted);
-    }
-  `,
   template: `
-    <section class="demo" aria-label="Approval workflow demo" [attr.data-vui-theme]="theme()">
-      <div class="stage">
+    <docs-demo framed role="region" aria-label="Approval workflow demo">
+      <!-- The process runs from the top down, so the scene is about as wide as the docs column and fits it at nearly
+           its real size. It fits by its width, which leaves a band above and below the cards for the viewport
+           controls. -->
+      <div class="h-185">
         <vflow
           [nodes]="nodes"
           [edges]="edges"
           [background]="background"
           [minZoom]="0.5"
           [maxZoom]="2"
-          (initialized)="flow()?.fitView()">
-          <article *vNode="let ctx" vuiNode [attr.data-step]="ctx.node.id" [attr.data-kind]="ctx.data().kind">
+          (initialized)="flow().fitView({ maxZoom: 1 })">
+          <article *vNode="let ctx of nodes" vuiNode class="w-[230px] text-[14px]" [attr.data-step]="ctx.node.id">
             <header vuiNodeHeader>
-              <span class="node-icon tile"><app-demo-icon [name]="ctx.data().icon" /></span>
+              <span docsNodeIcon tile [class]="kindColor[ctx.data().kind]">
+                <app-demo-icon [name]="ctx.data().icon" />
+              </span>
               <span vuiTitle>{{ ctx.data().title }}</span>
             </header>
-            <div class="node-body">
-              <p class="description">{{ ctx.data().description }}</p>
+            <div class="p-vui-3">
+              <p class="m-0 min-h-[2lh] text-vui-muted">{{ ctx.data().description }}</p>
             </div>
-            <footer vuiNodeFooter>
+            <!-- As tall as a footer with a button, so every card has the same height and straight edges stay
+                 straight. -->
+            <footer vuiNodeFooter class="min-h-[calc(28px+var(--vui-space)*6+1px)]">
               @let status = statusOf(ctx.node.id);
-              <span class="badge" [attr.data-tone]="status.tone">{{ status.text }}</span>
+              <span data-testid="status" [docsBadge]="status.tone">{{ status.text }}</span>
               @if (ctx.node.id === 'review') {
-                <span class="node-actions">
-                  <button
-                    class="button primary"
-                    vNoDrag
-                    type="button"
-                    [disabled]="approved()"
-                    (click)="approved.set(true)">
-                    Approve
-                  </button>
-                </span>
+                <button
+                  docsButton="primary"
+                  class="ms-auto"
+                  vNoDrag
+                  type="button"
+                  [disabled]="approved()"
+                  (click)="approved.set(true)">
+                  Approve
+                </button>
               }
             </footer>
             <!-- Display only: plain core handles anchor the edges, with no port drawn under the arrowheads. -->
@@ -132,11 +95,12 @@ type EdgeState = 'taken' | 'open' | 'skipped';
               <v-node-toolbar>
                 <div vuiToolbar>
                   <button
-                    class="button plain small"
+                    docsButton="plain"
+                    small
                     vNoDrag
                     type="button"
                     [attr.aria-label]="'Zoom to ' + ctx.data().title"
-                    (click)="flow()?.fitView({ nodes: [ctx.node.id], padding: 0.5 })">
+                    (click)="flow().fitView({ nodes: [ctx.node.id], padding: 0.5 })">
                     Zoom to node
                   </button>
                 </div>
@@ -146,15 +110,35 @@ type EdgeState = 'taken' | 'open' | 'skipped';
           <ng-template let-ctx vEdge>
             @let state = edgeState(ctx.edge.id);
             <svg:g vEdgeInteractionArea>
-              <svg:path vuiEdge [attr.d]="ctx.path()" [attr.marker-end]="ctx.markerEnd()" [attr.data-state]="state" />
+              <!-- The process state is the application's own, drawn by utilities keyed on its attribute; a selected
+                   edge keeps the library color. -->
+              <svg:path
+                vuiEdge
+                class="data-[state=taken]:not-[[data-v-selected]_*]:stroke-vui-success data-[state=skipped]:not-[[data-v-selected]_*]:opacity-45 data-[state=skipped]:not-[[data-v-selected]_*]:[stroke-dasharray:4_4]"
+                [attr.d]="ctx.path()"
+                [attr.marker-end]="ctx.markerEnd()"
+                [attr.data-state]="state" />
             </svg:g>
+            <!-- On a ruled-out branch only the text fades: the label keeps its opaque surface over the dashed line. -->
             @if (ctx.data()?.start; as text) {
-              <span *vEdgeLabel="'start'" vuiEdgeLabel [attr.data-label]="text" [attr.data-state]="state">{{
-                text
-              }}</span>
+              <span
+                *vEdgeLabel="'start'"
+                vuiEdgeLabel
+                class="data-[state=skipped]:text-vui-muted"
+                [attr.data-label]="text"
+                [attr.data-state]="state"
+                >{{ text }}</span
+              >
             }
             @if (ctx.data()?.center; as text) {
-              <span *vEdgeLabel vuiEdgeLabel [attr.data-label]="text" [attr.data-state]="state">{{ text }}</span>
+              <span
+                *vEdgeLabel
+                vuiEdgeLabel
+                class="data-[state=skipped]:text-vui-muted"
+                [attr.data-label]="text"
+                [attr.data-state]="state"
+                >{{ text }}</span
+              >
             }
             @if (ctx.data()?.end; as text) {
               <span *vEdgeLabel="'end'" vuiEdgeLabel vuiMeta [attr.data-label]="text" [attr.data-state]="state">{{
@@ -163,19 +147,17 @@ type EdgeState = 'taken' | 'open' | 'skipped';
             }
           </ng-template>
         </vflow>
-        @if (flow(); as flow) {
-          <vui-controls class="stage-controls" [flow]="flow" />
-        }
       </div>
-    </section>
+      <vui-controls class="absolute bottom-2.5 left-2.5 z-2" [flow]="flow()" />
+    </docs-demo>
   `,
 })
 export class WorkflowDemoComponent {
-  readonly flow = viewChild(VflowComponent);
-  readonly theme = injectDocsTheme();
-  readonly approved = signal(false);
-  readonly background = SCENE_BACKGROUND;
-  readonly nodes = createNodes<StepData>([
+  protected readonly flow = viewChild.required(VflowComponent);
+  protected readonly approved = signal(false);
+  protected readonly background = SCENE_BACKGROUND;
+  protected readonly kindColor = KIND_COLOR;
+  protected readonly nodes = createNodes<StepData>([
     step('received', { x: 265, y: 0 }, 'trigger', 'Invoice received', 'arrow-down', 'A new invoice from the supplier.'),
     step('review', { x: 265, y: 236 }, 'review', 'Finance review', 'search', 'Check the amount and approve payment.'),
     step(
@@ -195,7 +177,7 @@ export class WorkflowDemoComponent {
       'The supplier must provide a purchase order.',
     ),
   ]);
-  readonly edges = createEdges([
+  protected readonly edges = createEdges([
     {
       id: 'received-review',
       source: 'received',
@@ -226,7 +208,7 @@ export class WorkflowDemoComponent {
   ]);
 
   /** Application statuses follow the decision; the library only draws them. */
-  statusOf(id: string): { tone: Tone; text: string } {
+  protected statusOf(id: string): { tone: DocsBadgeTone; text: string } {
     const approved = this.approved();
     switch (id) {
       case 'received':
@@ -240,7 +222,7 @@ export class WorkflowDemoComponent {
     }
   }
 
-  edgeState(id: string): EdgeState {
+  protected edgeState(id: string): EdgeState {
     if (id === 'received-review') return 'taken';
     if (!this.approved()) return 'open';
     return id === 'review-paid' ? 'taken' : 'skipped';

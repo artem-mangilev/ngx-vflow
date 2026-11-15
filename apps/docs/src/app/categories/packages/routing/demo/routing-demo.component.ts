@@ -4,17 +4,17 @@ import { avoidNodesCurve } from '@vflow/routing';
 import { Vflow, createEdges, createNodes, provideVflow, withCurves } from 'ngx-vflow';
 
 @Component({
-  template: `<vflow [nodes]="nodes" [edges]="edges" [background]="{ type: 'dots' }" [snapGrid]="[10, 10]">
+  // On a grid the dragged nodes stay aligned, so the straight runs of the routes stay straight.
+  template: `<vflow
+    #flow
+    [nodes]="nodes"
+    [edges]="edges"
+    [snapGrid]="[10, 10]"
+    (initialized)="flow.fitView({ maxZoom: 1 })">
     <docs-node *vNode="let ctx" [ctx]="ctx" />
     <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
   </vflow>`,
-  styles: `
-    :host {
-      display: block;
-      width: 100%;
-      height: 100%;
-    }
-  `,
+  host: { class: 'block size-full' },
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [DocsPresentations, Vflow],
   // The curve is registered once and the edges name it, so the graph holds no functions.
@@ -22,22 +22,24 @@ import { Vflow, createEdges, createNodes, provideVflow, withCurves } from 'ngx-v
 })
 export class RoutingDemoComponent {
   protected readonly nodes = createNodes([
-    { id: 'input', point: { x: 20, y: 110 }, data: { text: 'Input' } },
-    { id: 'a', point: { x: 260, y: 110 }, data: { text: 'A' } },
-    { id: 'b', point: { x: 500, y: 110 }, data: { text: 'B' } },
-    { id: 'output', point: { x: 740, y: 110 }, data: { text: 'Output' } },
-    { id: 'group', point: { x: 20, y: 260 }, width: 460, height: 170, data: { text: 'Group', type: 'group' } },
-    { id: 'c', point: { x: 30, y: 70 }, parentId: 'group', data: { text: 'C' } },
-    { id: 'd', point: { x: 320, y: 70 }, parentId: 'group', data: { text: 'D' } },
+    { id: 'source', point: { x: 0, y: 0 }, data: { text: 'Source' } },
+    { id: 'clean', point: { x: 210, y: 0 }, data: { text: 'Clean' } },
+    { id: 'enrich', point: { x: 420, y: 0 }, data: { text: 'Enrich' } },
+    { id: 'publish', point: { x: 630, y: 0 }, data: { text: 'Publish' } },
+    { id: 'archive', point: { x: 0, y: 150 }, width: 440, height: 160, data: { text: 'Archive', type: 'group' } },
+    { id: 'compress', point: { x: 30, y: 70 }, parentId: 'archive', data: { text: 'Compress' } },
+    { id: 'upload', point: { x: 310, y: 70 }, parentId: 'archive', data: { text: 'Upload' } },
   ]);
 
-  // Every edge routes around the nodes between its ends; drag any node to see the paths update.
   protected readonly edges = createEdges(
     [
-      { id: 'input -> output', source: 'input', target: 'output' },
-      { id: 'a -> b', source: 'a', target: 'b' },
-      { id: 'b -> d', source: 'b', target: 'd' },
-      { id: 'c -> d', source: 'c', target: 'd' },
+      // Runs around Clean and Enrich, which stand between its ends.
+      { id: 'source-publish', source: 'source', target: 'publish' },
+      { id: 'clean-enrich', source: 'clean', target: 'enrich' },
+      // The target handle faces away, so the route loops around Upload to reach it.
+      { id: 'enrich-upload', source: 'enrich', target: 'upload' },
+      // Stays inside the group: the ancestors of the nodes of an edge are not obstacles.
+      { id: 'compress-upload', source: 'compress', target: 'upload' },
     ].map((edge) => ({ ...edge, curve: 'avoid', markers: { end: { type: 'arrow-closed' as const } } })),
   );
 }

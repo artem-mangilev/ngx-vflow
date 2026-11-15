@@ -1,99 +1,65 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import { DocsPresentations } from '@docs/shared';
-import { VuiPort } from '@vflow/ui';
-import { Connection, Edge, Node, Vflow, addEdges, createNodes, injectNode } from 'ngx-vflow';
+import { DocsKit, DocsPresentations } from '@docs/shared';
+import { Vui } from '@vflow/ui';
+import { Connection, Vflow, addEdges, createEdge, createEdges, createNodes } from 'ngx-vflow';
 
 @Component({
-  template: `
-    <vflow [nodes]="nodes" [edges]="edges" (connect)="createEdge($event)">
-      <docs-node *vNode="let ctx" [ctx]="ctx" />
+  template: `<docs-demo>
+    <div docsDemoBar>
+      <p>Drag from any port to any port of another device: the arrow keeps the direction of the drag.</p>
+    </div>
+
+    <vflow
+      #flow
+      [nodes]="nodes"
+      [edges]="edges()"
+      (connect)="connect($event)"
+      (initialized)="flow.fitView({ maxZoom: 1 })">
+      <div *vNode="let ctx" vuiNode class="grid h-12.5 w-25 place-items-center text-[13px]">
+        {{ ctx.data().text }}
+
+        <span vuiPort handleType="any" position="top" handleId="top"></span>
+        <span vuiPort handleType="any" position="right" handleId="right"></span>
+        <span vuiPort handleType="any" position="bottom" handleId="bottom"></span>
+        <span vuiPort handleType="any" position="left" handleId="left"></span>
+      </div>
+
       <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
     </vflow>
-  `,
-  styles: [
-    `
-      :host {
-        width: 100%;
-        height: 100%;
-      }
-    `,
-  ],
+  </docs-demo>`,
+  host: { class: 'block size-full' },
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DocsPresentations, Vflow],
+  imports: [DocsKit, DocsPresentations, Vflow, Vui],
 })
 export class LooseConnectionDemoComponent {
-  public nodes: Node[] = createNodes([
-    {
-      id: '1',
-      point: { x: 100, y: 100 },
-      component: LooseConnectionNodeComponent,
-      data: {
-        text: 'Node 1',
-      },
-    },
-    {
-      id: '2',
-      point: { x: 200, y: 200 },
-      component: LooseConnectionNodeComponent,
-      data: {
-        text: 'Node 2',
-      },
-    },
+  protected readonly nodes = createNodes([
+    { id: 'laptop', point: { x: 0, y: 0 }, data: { text: 'Laptop' } },
+    { id: 'tablet', point: { x: 280, y: 0 }, data: { text: 'Tablet' } },
+    { id: 'phone', point: { x: 140, y: 130 }, data: { text: 'Phone' } },
   ]);
 
-  public edges: Edge[] = [];
+  protected readonly edges = signal(
+    createEdges([
+      {
+        id: 'laptop:right-tablet:left',
+        source: 'laptop',
+        sourceHandle: 'right',
+        target: 'tablet',
+        targetHandle: 'left',
+        markers: { end: 'arrow-closed' },
+      },
+    ]),
+  );
 
-  public createEdge(connection: Connection) {
-    const { source, target, sourceHandle, targetHandle } = connection;
+  // The handle ids are part of the edge id: two devices may be connected through several pairs of ports.
+  protected connect(connection: Connection): void {
+    const { source, sourceHandle, target, targetHandle } = connection;
+    const edge = createEdge({
+      id: `${source}:${sourceHandle}-${target}:${targetHandle}`,
+      ...connection,
+      markers: { end: 'arrow-closed' },
+    });
 
-    this.edges = addEdges(
-      [
-        {
-          id: `${source}${sourceHandle} -> ${target}${targetHandle}`,
-          ...connection,
-          markers: signal({
-            end: {
-              type: 'arrow-closed',
-            },
-          }),
-        },
-      ],
-      { nodes: this.nodes, edges: this.edges },
-    );
+    this.edges.update((edges) => addEdges([edge], { nodes: this.nodes, edges }));
   }
-}
-
-interface LooseConnectionNodeData {
-  text: string;
-}
-
-@Component({
-  template: `<div class="node">
-    {{ ctx.data().text }}
-
-    <span vuiPort handleType="any" position="top" handleId="a"></span>
-    <span vuiPort handleType="any" position="right" handleId="b"></span>
-    <span vuiPort handleType="any" position="bottom" handleId="c"></span>
-    <span vuiPort handleType="any" position="left" handleId="d"></span>
-  </div>`,
-  styles: [
-    `
-      .node {
-        width: 100px;
-        height: 50px;
-        border: 1.5px solid #1b262c;
-        border-radius: 5px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: black;
-        background-color: white;
-      }
-    `,
-  ],
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Vflow, VuiPort],
-})
-export class LooseConnectionNodeComponent {
-  protected readonly ctx = injectNode<LooseConnectionNodeData>();
 }

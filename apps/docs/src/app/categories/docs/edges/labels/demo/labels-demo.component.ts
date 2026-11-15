@@ -1,95 +1,81 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { DocsPresentations } from '@docs/shared';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { DocsKit, DocsPresentations } from '@docs/shared';
 import { Vui } from '@vflow/ui';
-import { Edge, EdgeLabelOrient, Node, Vflow, createEdges, createNodes } from 'ngx-vflow';
+import { Edge, EdgeLabelOrient, Vflow, createEdges, createNodes, removeEdges } from 'ngx-vflow';
 
-interface LabelData {
+/** A relation of a data model: what it means, and how many records stand at each of its ends. */
+interface RelationData {
   start?: string;
-  center?: string;
+  center: string;
   end?: string;
-  deletable?: boolean;
-  /** How the labels of the edge sit on the path; horizontal without it. */
+  /** How the center label sits on the path; horizontal without it. */
   orient?: EdgeLabelOrient;
+  removable?: boolean;
 }
 
 @Component({
-  template: `<vflow [nodes]="nodes" [edges]="edges">
+  template: `<vflow #flow [nodes]="nodes" [edges]="edges()" (initialized)="flow.fitView({ maxZoom: 1 })">
     <docs-node *vNode="let ctx" [ctx]="ctx" />
 
-    <ng-template let-ctx vEdge>
-      <svg:g docsEdge [ctx]="ctx" />
+    <ng-template let-ctx vEdge [vEdgeOf]="edges()">
+      @let data = ctx.data();
 
-      @if (ctx.data().start; as text) {
-        <span *vEdgeLabel="'start'; orient: ctx.data().orient" vuiEdgeLabel>{{ text }}</span>
+      <svg:g vEdgeInteractionArea>
+        <svg:path vuiEdge [attr.d]="ctx.path()" />
+      </svg:g>
+
+      @if (data.start; as text) {
+        <span *vEdgeLabel="'start'" vuiEdgeLabel>{{ text }}</span>
       }
-      @if (ctx.data().deletable) {
-        <button *vEdgeLabel class="delete" type="button" (click)="deleteEdge(ctx.edge)">Delete</button>
-      } @else if (ctx.data().center; as text) {
-        <span *vEdgeLabel="'center'; orient: ctx.data().orient" vuiEdgeLabel>{{ text }}</span>
+      <span *vEdgeLabel="'center'; orient: data.orient" vuiEdgeLabel>{{ data.center }}</span>
+      @if (data.end; as text) {
+        <span *vEdgeLabel="'end'" vuiEdgeLabel>{{ text }}</span>
       }
-      @if (ctx.data().end; as text) {
-        <span *vEdgeLabel="'end'; orient: ctx.data().orient" vuiEdgeLabel>{{ text }}</span>
+      @if (data.removable) {
+        <!-- A label is HTML, so it can be a control of the edge. -->
+        <!-- The neutral button is translucent; an opaque surface with a border keeps the line from showing through. -->
+        <button
+          *vEdgeLabel="'end'"
+          docsButton
+          small
+          type="button"
+          class="border-vui-border! bg-vui-surface!"
+          (click)="remove(ctx.edge)">
+          Remove
+        </button>
       }
     </ng-template>
   </vflow>`,
-  styles: [
-    `
-      :host {
-        width: 100%;
-        height: 100%;
-      }
-
-      .delete {
-        width: 60px;
-        height: 25px;
-        border: none;
-        border-radius: 5px;
-        background-color: #122c26;
-        color: white;
-        cursor: pointer;
-      }
-    `,
-  ],
+  host: { class: 'block size-full' },
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DocsPresentations, Vflow, Vui],
+  imports: [DocsKit, DocsPresentations, Vflow, Vui],
 })
 export class LabelsDemoComponent {
-  public nodes: Node[] = createNodes([
-    {
-      id: '1',
-      point: { x: 50, y: 200 },
-      data: { text: '1' },
-    },
-    {
-      id: '2',
-      point: { x: 350, y: 100 },
-      data: { text: '2' },
-    },
-    {
-      id: '3',
-      point: { x: 350, y: 300 },
-      data: { text: '3' },
-    },
+  protected readonly nodes = createNodes([
+    { id: 'customer', point: { x: 0, y: 75 }, data: { text: 'Customer' } },
+    { id: 'order', point: { x: 440, y: 0 }, data: { text: 'Order' } },
+    { id: 'review', point: { x: 440, y: 150 }, data: { text: 'Review' } },
   ]);
 
-  public edges: Edge<LabelData>[] = createEdges<LabelData>([
-    {
-      id: '1 -> 2',
-      source: '1',
-      target: '2',
-      curve: 'smooth-step',
-      data: { start: 'Start', deletable: true, end: 'End' },
-    },
-    {
-      id: '1 -> 3',
-      source: '1',
-      target: '3',
-      curve: 'bezier',
-      data: { center: 'Along the curve', orient: 'path' },
-    },
-  ]);
+  protected readonly edges = signal(
+    createEdges<RelationData>([
+      {
+        id: 'customer-order',
+        source: 'customer',
+        target: 'order',
+        curve: 'smooth-step',
+        data: { start: '1', center: 'places', end: 'many' },
+      },
+      {
+        id: 'customer-review',
+        source: 'customer',
+        target: 'review',
+        data: { center: 'writes', orient: 'path', removable: true },
+      },
+    ]),
+  );
 
-  public deleteEdge(edge: Edge<LabelData>) {
-    this.edges = this.edges.filter((e) => e !== edge);
+  protected remove(edge: Edge<RelationData>): void {
+    this.edges.update((edges) => removeEdges([edge.id], edges));
   }
 }

@@ -47,6 +47,8 @@ import { createNodes, Vflow } from 'ngx-vflow';
       border: 1px solid GrayText;
       border-radius: 8px;
       background: Canvas;
+      color: CanvasText;
+      font-size: 14px;
     }
   `,
 })
@@ -62,13 +64,16 @@ export class FirstFlowComponent {
 {% endraw %}
 
 Three cards appear. We can already drag them, pan the canvas by dragging its empty space, and zoom with the mouse
-wheel. The flow fills its parent, which is why the host of the component has a height.
+wheel. The flow fills its parent, which is why the host of the component has a height. `of nodes` in the template
+changes nothing on the screen: it tells the type checker which nodes the template draws, so `ctx.data()` has the
+type of our `data`.
 
 ## Connect two nodes
 
 An edge names the nodes it connects. We add an array with one edge and bind it:
 
 ```ts
+import { signal } from '@angular/core';
 import { Edge } from 'ngx-vflow';
 
 protected readonly edges = signal<Edge[]>([{ id: 'fetch-filter', source: 'fetch', target: 'filter' }]);
@@ -81,7 +86,7 @@ target handle and a source handle into the node, and add a template for edges th
 
 ```html
 <vflow [nodes]="nodes" [edges]="edges()">
-  <div *vNode="let ctx; of: nodes" class="step">
+  <div *vNode="let ctx of nodes" class="step">
     <span vHandle handleType="target" position="left" class="port"></span>
     {{ ctx.data().label }}
     <span vHandle handleType="source" position="right" class="port"></span>
@@ -133,12 +138,21 @@ protected connect(connection: Connection): void {
 
 Now a drag from "Fetch orders" to "Send reminder" creates the second edge.
 
+While the dragged line can end at a handle, core sets `data-v-handle-state="valid"` on that handle. We fill the
+port in that state, so the user sees where the edge will land:
+
+```css
+.port[data-v-handle-state='valid'] {
+  background: Highlight;
+}
+```
+
 ## Show the selection
 
 A click selects a node or an edge, and their templates learn it from `ctx.selected()`. We bind a class to it:
 
 ```html
-<div *vNode="let ctx; of: nodes" class="step" [class.step--selected]="ctx.selected()">…</div>
+<div *vNode="let ctx of nodes" class="step" [class.step--selected]="ctx.selected()">…</div>
 
 <svg:path class="link" [class.link--selected]="ctx.selected()" [attr.d]="ctx.path()" />
 ```

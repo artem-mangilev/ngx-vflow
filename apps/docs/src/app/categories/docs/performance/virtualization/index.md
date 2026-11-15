@@ -1,6 +1,9 @@
 This guide shows how to turn on viewport virtualization for a large graph and how to get the most from it. For
 what it does underneath, see [How virtualization works](/docs/concepts/virtualization).
 
+The demo holds 4900 nodes in 70 rows and opens on the middle of the graph. Pan and zoom it: only the nodes and
+edges in view are laid out and painted.
+
 {{ NgDocActions.demoPane("VirtualizationDemoComponent") }}
 
 ## Turn it on

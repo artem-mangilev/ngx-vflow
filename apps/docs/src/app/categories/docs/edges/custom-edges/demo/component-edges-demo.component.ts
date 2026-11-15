@@ -1,125 +1,119 @@
-import { ChangeDetectionStrategy, Component, output, signal } from '@angular/core';
-import { DocsPresentations } from '@docs/shared';
+import { ChangeDetectionStrategy, Component, computed, output, signal } from '@angular/core';
+import { DocsKit, DocsPresentations } from '@docs/shared';
 import { Vui } from '@vflow/ui';
 import {
   AnyComponentEdgeEvent,
-  isComponentEdgeEvent,
-  Edge,
-  VflowEdgeInteractionAreaDirective,
-  Node,
   Vflow,
+  VflowEdgeInteractionAreaDirective,
+  createEdges,
   createNodes,
   injectEdge,
+  isComponentEdgeEvent,
   provideVflow,
   withEdgeComponents,
 } from 'ngx-vflow';
 
-interface ColoredEdgeData {
-  color: string;
+interface TransitionData {
   label: string;
+  tone: 'success' | 'danger';
 }
 
+const TONES = {
+  success: { line: 'stroke-vui-success', dot: 'bg-vui-success' },
+  danger: { line: 'stroke-vui-danger', dot: 'bg-vui-danger' },
+};
+
 /**
- * An edge drawn by a component. The flow renders it on its own SVG group; the host directive moves the interaction
- * stroke into that group, so host listeners and `:host(:hover)` react to the whole clickable area.
+ * A transition between two states, drawn by a component. The flow renders it on its own SVG group; the host
+ * directive moves the interaction stroke into that group, so the host listener and the `group-hover` variant react
+ * to the whole clickable area.
  *
  * The label is declared next to the path and renders in the HTML label layer of the flow. Its clicks do not reach the
  * host, so the label emits the output itself.
  */
 @Component({
-  selector: 'g[docsColoredEdge]',
+  selector: 'g[docsTransitionEdge]',
   hostDirectives: [VflowEdgeInteractionAreaDirective],
   imports: [Vflow, Vui],
-  host: { '(click)': 'picked.emit(ctx.edge.id)' },
-  styles: `
-    :host(:hover) .line {
-      stroke-width: 5px;
-    }
-
-    .label {
-      cursor: pointer;
-    }
-  `,
+  host: { class: 'group', '(click)': 'picked.emit(edge.data().label)' },
   template: `
     <svg:path
-      class="line"
-      fill="none"
-      stroke-width="3"
-      [attr.d]="ctx.path()"
-      [attr.stroke]="ctx.selected() ? '#0f4c75' : ctx.data().color"
-      [attr.marker-end]="ctx.markerEnd()" />
-    <span
+      class="fill-none stroke-2 group-hover:stroke-3"
+      [class]="edge.selected() ? 'stroke-vui-accent' : tone().line"
+      [attr.d]="edge.path()"
+      [attr.marker-end]="edge.markerEnd()" />
+    <button
       *vEdgeLabel
       vuiEdgeLabel
-      class="label"
-      [style.border-color]="ctx.data().color"
-      (click)="picked.emit(ctx.edge.id)">
-      {{ ctx.data().label }}
-    </span>
+      type="button"
+      class="cursor-pointer border-solid font-[inherit]"
+      (click)="picked.emit(edge.data().label)">
+      <span class="size-2 rounded-full" [class]="tone().dot"></span>
+      {{ edge.data().label }}
+    </button>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ColoredEdgeComponent {
-  protected readonly ctx = injectEdge<ColoredEdgeData>();
+export class TransitionEdgeComponent {
+  protected readonly edge = injectEdge<TransitionData>();
+  protected readonly tone = computed(() => TONES[this.edge.data().tone]);
+
   readonly picked = output<string>();
 }
 
 @Component({
-  template: `
-    <p class="picked">Last clicked edge: {{ picked() }}</p>
-    <vflow [nodes]="nodes" [edges]="edges" (componentEdgeEvent)="onEdgeEvent($event)">
+  template: `<docs-demo>
+    <div docsDemoBar>
+      <p aria-live="polite">{{ status() }}</p>
+    </div>
+
+    <vflow
+      #flow
+      [nodes]="nodes"
+      [edges]="edges"
+      (initialized)="flow.fitView({ maxZoom: 1 })"
+      (componentEdgeEvent)="handleEdgeEvent($event)">
       <docs-node *vNode="let ctx" [ctx]="ctx" />
     </vflow>
-  `,
-  styles: [
-    `
-      :host {
-        display: flex;
-        flex-direction: column;
-        width: 100%;
-        height: 100%;
-      }
-
-      .picked {
-        margin: 8px;
-        font-size: 13px;
-      }
-    `,
-  ],
+  </docs-demo>`,
+  host: { class: 'block size-full' },
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DocsPresentations, Vflow],
-  providers: [provideVflow(withEdgeComponents({ colored: ColoredEdgeComponent }))],
+  imports: [DocsKit, DocsPresentations, Vflow],
+  // The edges name their component by key; the class is imported once, here.
+  providers: [provideVflow(withEdgeComponents({ transition: TransitionEdgeComponent }))],
 })
 export class ComponentEdgesDemoComponent {
-  protected readonly picked = signal('none');
+  protected readonly status = signal('Click an edge or its label: the flow reports the output of the edge component.');
 
-  public nodes: Node[] = createNodes([
-    { id: '1', point: { x: 10, y: 200 }, data: { text: '1' } },
-    { id: '2', point: { x: 250, y: 100 }, data: { text: '2' } },
-    { id: '3', point: { x: 250, y: 300 }, data: { text: '3' } },
+  protected readonly nodes = createNodes([
+    { id: 'review', point: { x: 0, y: 55 }, data: { text: 'Review' } },
+    { id: 'published', point: { x: 280, y: 0 }, data: { text: 'Published' } },
+    { id: 'rejected', point: { x: 280, y: 110 }, data: { text: 'Rejected' } },
   ]);
 
-  public edges: Edge[] = [
+  protected readonly edges = createEdges<TransitionData>([
     {
-      id: '1 -> 2',
-      source: '1',
-      target: '2',
-      component: 'colored',
-      data: signal<ColoredEdgeData>({ color: '#e0a100', label: 'Amber' }),
-      markers: signal({ end: { type: 'arrow-closed' } }),
+      id: 'review-published',
+      source: 'review',
+      target: 'published',
+      component: 'transition',
+      data: { label: 'Approve', tone: 'success' },
+      markers: { end: 'arrow-closed' },
     },
     {
-      id: '1 -> 3',
-      source: '1',
-      target: '3',
-      component: 'colored',
-      data: signal<ColoredEdgeData>({ color: '#ec586e', label: 'Rose' }),
+      id: 'review-rejected',
+      source: 'review',
+      target: 'rejected',
+      component: 'transition',
+      data: { label: 'Reject', tone: 'danger' },
+      markers: { end: 'arrow-closed' },
     },
-  ];
+  ]);
 
-  protected onEdgeEvent(event: AnyComponentEdgeEvent) {
-    if (isComponentEdgeEvent(event, ColoredEdgeComponent) && event.eventName === 'picked') {
-      this.picked.set(event.eventPayload);
+  // The guard narrows the event to the outputs of the edge component, so the payload is a string.
+  protected handleEdgeEvent(event: AnyComponentEdgeEvent): void {
+    if (isComponentEdgeEvent(event, TransitionEdgeComponent) && event.eventName === 'picked') {
+      this.status.set(`"${event.eventPayload}" picked on the edge ${event.edgeId}.`);
     }
   }
 }

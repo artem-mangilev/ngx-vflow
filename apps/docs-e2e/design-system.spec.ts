@@ -42,14 +42,13 @@ test('consumer DOM, scoped themes, selection and native workflow actions', async
     '',
   );
   // Selection and application status are visible at the same time.
-  await expect(review.locator('.badge')).toHaveText('Waiting');
-  await expect(review.locator('.badge')).toHaveAttribute('data-tone', 'warning');
+  await expect(review.getByTestId('status')).toHaveText('Waiting');
   await expect(workflow.locator('v-node-toolbar .vui-toolbar')).toBeAttached();
   await expect(workflow.getByRole('button', { name: 'Zoom to Finance review', exact: true })).toBeVisible();
   const paid = workflow.locator('article').filter({ hasText: 'Schedule payment' });
   const fix = workflow.locator('article').filter({ hasText: 'Request correction' });
-  await expect(paid.locator('.badge')).toHaveText('Pending');
-  await expect(fix.locator('.badge')).toHaveText('Missing PO');
+  await expect(paid.getByTestId('status')).toHaveText('Pending');
+  await expect(fix.getByTestId('status')).toHaveText('Missing PO');
   const taken = workflow.locator('path.vui-edge[data-state="taken"]');
   await expect(taken).toHaveCount(1);
   // The state is drawn, not only declared: computed styles catch a rule that matches nothing.
@@ -65,11 +64,11 @@ test('consumer DOM, scoped themes, selection and native workflow actions', async
   await approve.focus();
   await expect(approve).toBeFocused();
   await page.keyboard.press('Enter');
-  await expect(review.locator('.badge')).toHaveText('Approved');
+  await expect(review.getByTestId('status')).toHaveText('Approved');
   await expect(approve).toBeDisabled();
   // The decision shows on the graph: the approved branch is taken, the other one is ruled out.
-  await expect(paid.locator('.badge')).toHaveText('Scheduled');
-  await expect(fix.locator('.badge')).toHaveText('Not needed');
+  await expect(paid.getByTestId('status')).toHaveText('Scheduled');
+  await expect(fix.getByTestId('status')).toHaveText('Not needed');
   await expect(taken).toHaveCount(2);
   const skipped = workflow.locator('path.vui-edge').nth(2);
   await expect(skipped).toHaveAttribute('data-state', 'skipped');
@@ -142,9 +141,7 @@ test('field connections follow stable IDs through rename, reorder, density and r
   await expect(demo.locator('[data-entity="crm"] [vuiRow]').first()).toHaveAttribute('data-field', 'name');
   await expect.poll(() => rowAlignment(demo)).toBeLessThan(1);
   // Density follows the theme spacing.
-  await demo
-    .locator('section.demo')
-    .evaluate((element: HTMLElement) => element.style.setProperty('--vui-space', '3px'));
+  await demo.locator('docs-demo').evaluate((element: HTMLElement) => element.style.setProperty('--vui-space', '3px'));
   await expect.poll(() => rowAlignment(demo)).toBeLessThan(1);
 
   // The actual SVG endpoints must meet the outer rim of their original field ports.
@@ -328,7 +325,7 @@ test('themes stay scoped per editor, reach every layer and leave geometry alone'
     });
   const before = await geometry();
   const pixelBefore = await minimapPixel();
-  await page.getByLabel('Dark first editor', { exact: true }).check();
+  await page.getByLabel('Editor A in the dark theme', { exact: true }).check();
   await expect(a.locator('article.vui-node').first()).toHaveCSS('background-color', dark.node);
   await expect(a.locator('path.vui-edge')).toHaveCSS('stroke', dark.edge);
   await expect(a.locator('[data-v-root]')).toHaveCSS('background-color', 'oklch(0.141 0.005 285.823)');
@@ -363,7 +360,7 @@ test('image lab: the palette and the viewport controls leave the fitted scene fr
   await demo.evaluate((element) => element.scrollIntoView({ block: 'center' }));
   await expect(demo.locator('article.vui-node')).toHaveCount(7);
   // Before the fit the first node lies under the palette, so this also waits for the fit.
-  await expect.poll(() => overlapping(demo, '.palette, vui-controls')).toBe(0);
+  await expect.poll(() => overlapping(demo, '[data-testid="palette"], vui-controls')).toBe(0);
   const zoom = await demo
     .locator('article.vui-node')
     .first()
@@ -391,14 +388,15 @@ test('image lab: typed ports, previews that follow the wiring, native controls a
   await demo.evaluate((element) => element.scrollIntoView({ block: 'center' }));
   await expect(demo.locator('article.vui-node')).toHaveCount(7);
   await expect(demo.locator('path.vui-edge')).toHaveCount(6);
-  await expect(demo.locator('path.vui-edge[data-type="number"]')).toHaveCount(1);
+  // A number travels along a dashed edge.
+  await expect(demo.locator('path.vui-edge[stroke-dasharray]')).toHaveCount(1);
   // The output preview is the whole tree: the hue-rotated photo blended with the blurred texture.
   const output = demo.locator('[data-preview="output"]');
-  await expect(output.locator('.stack')).toHaveCount(1);
+  await expect(output.getByTestId('blend')).toHaveCount(1);
   await expect(output.locator('img')).toHaveCount(2);
   const filterOf = (stage: string) =>
     demo
-      .locator(`[data-preview="${stage}"] > app-picture > .layer`)
+      .locator(`[data-preview="${stage}"] > app-picture > [data-testid="filter"]`)
       .evaluate((element: HTMLElement) => element.style.filter);
   // The number wired into Hue owns its amount: the row names the source instead of offering a slider.
   const hue = demo.locator('[data-stage="hue"]');
@@ -421,7 +419,7 @@ test('image lab: typed ports, previews that follow the wiring, native controls a
   await expect(output.locator('img').first()).toHaveAttribute('src', photo!);
   // Types must match: a number does not connect to an image input.
   const blendB = demo.locator('[data-stage="blend"] [data-port="b"] [data-v-handle]');
-  const value = await center(demo.locator('[data-stage="wave"] .output [data-v-handle]'));
+  const value = await center(demo.locator('[data-stage="wave"] [data-v-handle][data-v-handle-position="right"]'));
   const b = await center(blendB);
   await page.mouse.move(value.x, value.y);
   await page.mouse.down();
@@ -430,22 +428,29 @@ test('image lab: typed ports, previews that follow the wiring, native controls a
   // Both ends already have edges, and the feedback still wins over the connected fill: the invalid target is hollow
   // and the port the connection is drawn from takes the accent.
   await expect(blendB).toHaveCSS('background-color', 'oklch(1 0 0)');
-  await expect(demo.locator('[data-stage="wave"] .output [data-v-handle]')).toHaveCSS(
+  await expect(demo.locator('[data-stage="wave"] [data-v-handle][data-v-handle-position="right"]')).toHaveCSS(
     'background-color',
     'oklch(0.546 0.245 262.881)',
   );
   await page.mouse.up();
   await expect(demo.locator('path.vui-edge')).toHaveCount(6);
   // An input takes one edge: wiring the photo into B replaces the texture branch.
-  await dragTo(page, demo.locator('[data-stage="photo"] .output [data-v-handle]'), await center(blendB));
+  await dragTo(
+    page,
+    demo.locator('[data-stage="photo"] [data-v-handle][data-v-handle-position="right"]'),
+    await center(blendB),
+  );
   await expect(demo.locator('path.vui-edge')).toHaveCount(6);
-  await expect(demo.locator('[data-stage="blur"] .output .vui-port')).toHaveAttribute('data-vui-connected', 'false');
+  await expect(demo.locator('[data-stage="blur"] .vui-port[data-v-handle-position="right"]')).toHaveAttribute(
+    'data-vui-connected',
+    'false',
+  );
   await expect(output.locator('img')).toHaveCount(2);
   await expect(output.locator('img').last()).toHaveAttribute('src', photo!);
   // The palette adds a node; an unwired filter shows an empty state.
   await demo.getByLabel('Add a node', { exact: true }).selectOption('sepia');
   await expect(demo.locator('article.vui-node')).toHaveCount(8);
-  await expect(demo.locator('article').filter({ hasText: 'Sepia' }).locator('.preview .vui-meta')).toHaveText(
+  await expect(demo.locator('article').filter({ hasText: 'Sepia' }).locator('[data-preview] .vui-meta')).toHaveText(
     'Connect an image',
   );
   // Only the export rasterizes the picture.
@@ -463,10 +468,10 @@ test('relationships map: floating edges, people moving into free spots, connecti
   await expect(demo.locator('.vui-group')).toHaveCount(3);
   await expect(demo.locator('article.vui-node')).toHaveCount(7);
   await expect(demo.locator('path.vui-edge')).toHaveCount(6);
-  await expect(demo.locator('svg.avatar')).toHaveCount(5);
+  await expect(demo.getByTestId('avatar')).toHaveCount(5);
   // Floating edges: no ports are drawn, and a note has no handle at all.
   await expect(demo.locator('.vui-port')).toHaveCount(0);
-  await expect(demo.locator('.note [data-v-handle]')).toHaveCount(0);
+  await expect(demo.getByTestId('note').locator('[data-v-handle]')).toHaveCount(0);
   // The edge between the two teams leaves Platform on the side facing Growth and enters Growth on the facing side.
   const groupEdgeError = () =>
     demo.evaluate((root) => {
@@ -494,7 +499,7 @@ test('relationships map: floating edges, people moving into free spots, connecti
     demo.evaluate(
       (root, [name, id]) => {
         const box = root.querySelector(`[data-team="${id}"]`)!.getBoundingClientRect();
-        const rect = Array.from(root.querySelectorAll('article.person'))
+        const rect = Array.from(root.querySelectorAll('[data-testid="person"]'))
           .find((element) => element.textContent!.includes(name))!
           .getBoundingClientRect();
         return Math.max(box.left - rect.left, box.top - rect.top, rect.right - box.right, rect.bottom - box.bottom);
@@ -503,7 +508,7 @@ test('relationships map: floating edges, people moving into free spots, connecti
     );
   const overlaps = (name: string) =>
     demo.evaluate((root, name) => {
-      const cards = Array.from(root.querySelectorAll('article.person')).map((element) => ({
+      const cards = Array.from(root.querySelectorAll('[data-testid="person"]')).map((element) => ({
         name: element.textContent!,
         rect: element.getBoundingClientRect(),
       }));
@@ -541,11 +546,11 @@ test('relationships map: floating edges, people moving into free spots, connecti
   await expect.poll(async () => (await chi.boundingBox())!.x).toBeCloseTo(chiBefore.x, 0);
 
   // Dragging from the body of one card to another connects the two people.
-  await dragTo(page, chi.locator('.node-body'), await center(person('Eli Park').locator('.node-body')));
+  await dragTo(page, chi.getByTestId('body'), await center(person('Eli Park').getByTestId('body')));
   await expect(demo.locator('path.vui-edge')).toHaveCount(7);
   await expect(demo.locator('.v-edge-labels-layer .vui-edge-label').last()).toHaveText('reviews');
   // People connect once: a second connection between Ana and Chi is refused.
-  await dragTo(page, chi.locator('.node-body'), await center(person('Ana Lima').locator('.node-body')));
+  await dragTo(page, chi.getByTestId('body'), await center(person('Ana Lima').getByTestId('body')));
   await expect(demo.locator('path.vui-edge')).toHaveCount(7);
   // Delete removes a selected connection.
   const middle = await demo.evaluate((root) => {
@@ -613,7 +618,8 @@ test('scroll and collapse experiment: model kept, endpoints move to the header a
   await expect.poll(distance(1, rowPort)).toBeLessThan(1.5);
   await rows.evaluate((element) => (element.scrollTop = 0));
   // Collapse: rows leave the DOM, proxy handles keep both edges attached to the header.
-  await expect(demo.getByRole('button', { name: 'Collapse Product', exact: true })).toHaveClass(/\bbutton\b/);
+  // The button is the shared one of the demos, not a browser default.
+  await expect(demo.getByRole('button', { name: 'Collapse Product', exact: true })).toHaveCSS('border-radius', '6px');
   await demo.getByRole('button', { name: 'Collapse Product', exact: true }).click();
   await expect(rows).toHaveCount(0);
   await expect(demo.locator('path.vui-edge')).toHaveCount(2);

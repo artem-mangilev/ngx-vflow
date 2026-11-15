@@ -21,6 +21,9 @@ Add one element per handle, and give the handles of the same type a `handleId`; 
 and `targetHandle`. A handle sits at the center of its parent element on the chosen side, so a handle placed inside
 a row lines up with that row.
 
+In the demo every field of a card has a row with its own handle. Connect `Name` to `Greeting`, or a field to both
+fields of the other card.
+
 {{ NgDocActions.demoPane("MultipleConnectionPointsDemoComponent") }}
 
 ## Connect in either direction
@@ -39,6 +42,8 @@ If edges should meet a node on the side that faces the other end, give the node 
 - If the nodes are drawn over their lines, as in a force-directed graph, use `position="center"` to run edges to the
   node center.
 - If one end of an edge should stay on a port, keep a side position there; the floating end then faces the port.
+
+Drag a node of the demo around `Roadmap`: its edge moves to the sides of the two nodes that face each other.
 
 {{ NgDocActions.demoPane("FloatingEdgesDemoComponent") }}
 
@@ -97,8 +102,8 @@ Both are reflected in attributes, so a disabled handle can be dimmed:
 }
 ```
 
-In the demo, turn off `canStart` on Output 1 and `canAccept` on Input 1. The outputs are plain elements styled
-through the attributes; the inputs are the handle component of the next section.
+In the demo, turn off `canStart` on `Temperature` and `canAccept` on `Chart`. The handles of `Sensor` are plain
+elements styled through the attributes; the handles of `Dashboard` are the handle component of the next section.
 
 {{ NgDocActions.demoPane("CustomHandlesDemoComponent") }}
 
@@ -112,18 +117,31 @@ component bind, including `handleType` and `position`. Inject `VflowHandleDirect
   selector: 'square-handle',
   hostDirectives: [{ directive: VflowHandleDirective, inputs: ['handleType', 'position', 'handleId', 'canAccept'] }],
   host: {
-    '[class.valid]': "handle.state() === 'valid'",
-    '[class.invalid]': "handle.state() === 'invalid'",
+    class: 'block size-3 rounded-xs border border-solid border-vui-foreground',
+    '[class]': 'fill()',
   },
   template: '',
 })
 export class SquareHandleComponent {
   protected readonly handle = inject(VflowHandleDirective);
+
+  protected readonly fill = computed(() => {
+    if (!this.handle.canAccept()) return 'bg-vui-surface opacity-40';
+
+    switch (this.handle.state()) {
+      case 'valid':
+        return 'bg-vui-success';
+      case 'invalid':
+        return 'bg-vui-danger';
+      default:
+        return 'bg-vui-surface';
+    }
+  });
 }
 ```
 
 ```html
-<square-handle handleType="target" position="left" [handleId]="'input-1'" [canAccept]="canAccept()" />
+<square-handle handleType="target" position="left" handleId="chart" [canAccept]="chartCanAccept()" />
 ```
 
 ## Hide a handle

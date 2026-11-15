@@ -8,7 +8,7 @@ The library supports **alignment lines** that help align nodes relative to each 
 - `true` – to enable the helper with default settings
 - An `AlignmentHelperSettings` object – to configure the helper with custom settings
 
-Try aligning the following flow:
+Try it on the following flow: drag `Deploy` until its edge to `Test` is straight, drag `Alerts` into the gap between `Logs` and `Metrics`, and drag `Test` to the center of its group.
 
 {{ NgDocActions.demoPane("AlignmentHelperDemoComponent") }}
 
@@ -44,5 +44,8 @@ Pass the cell size to the `snapGrid` input of `vflow`:
 
 The grid lies in flow space, like the background: a nested node snaps to the same cells as a top-level one, whatever
 the position of its parent. Keyboard moves snap the same way.
+
+In the demo the dots of the background mark the grid. The `Review` group sits off the grid, and `Proofread` inside
+it still lands on the dots.
 
 {{ NgDocActions.demoPane("SnapToGridDemoComponent") }}

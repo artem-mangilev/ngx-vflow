@@ -66,23 +66,31 @@ test('custom edge interaction stroke can select without blocking empty canvas', 
     )
     .toContain('v-pane');
 
+  await expect(flow.locator('[data-v-edge][data-v-selected]')).toHaveCount(0);
   await clickMidpoint(interactionPath);
-  await expect(flow.locator('svg[edge] path[stroke="#0f4c75"]')).toHaveCount(1);
+  await expect(flow.locator('[data-v-edge][data-v-selected]')).toHaveCount(1);
 });
 
-test('custom edge can be selected and deleted by clicking its interaction stroke', async ({ page }) => {
+test('an edge can be selected by clicking its interaction stroke and deleted from the keyboard', async ({ page }) => {
   await page.goto('/examples/recipes/delete-selected');
 
   const edges = page.locator('vflow svg[edge]');
+  const selected = page.locator('vflow svg[edge][data-v-selected]');
   const interactionPath = edges.first().locator('path[data-v-interactive-edge]');
   await interactionPath.scrollIntoViewIfNeeded();
 
-  await expect(page.locator('vflow svg[edge] path[stroke="#0f4c75"]')).toHaveCount(0);
+  await expect(edges).toHaveCount(3);
+  await expect(selected).toHaveCount(0);
   await expect.poll(() => hitTargetAtMidpoint(interactionPath)).toBe(true);
   await clickMidpoint(interactionPath);
-  await expect(page.locator('vflow svg[edge] path[stroke="#0f4c75"]')).toHaveCount(1);
+  await expect(selected).toHaveCount(1);
 
-  await page.locator('vflow g.custom-edge').first().focus();
+  await edges.first().focus();
   await page.keyboard.press('Backspace');
-  await expect(edges).toHaveCount(1);
+  await expect(edges).toHaveCount(2);
+  await expect(page.getByText('Removed 0 nodes and 1 edge.')).toBeVisible();
+
+  // The application owns the graph, so it can bring the removed edge back.
+  await page.getByRole('button', { name: 'Restore' }).click();
+  await expect(edges).toHaveCount(3);
 });

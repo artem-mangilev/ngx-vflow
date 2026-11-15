@@ -1,30 +1,39 @@
+import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { DocsPresentations } from '@docs/shared';
-import { Vflow, createNodes, provideVflow, withAccessibility, withSettings } from 'ngx-vflow';
+import { DocsKit, DocsPresentations } from '@docs/shared';
+import { Vflow, createEdges, createNodes, provideVflow, withSettings } from 'ngx-vflow';
 
 /** A flow that shows the settings in effect for it; it binds no setting itself. */
 @Component({
   selector: 'docs-configured-flow',
-  imports: [DocsPresentations, Vflow],
+  imports: [DecimalPipe, DocsPresentations, Vflow],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { style: 'display: block' },
+  host: { class: 'flex h-full flex-col' },
   template: `
-    <vflow #flow [nodes]="nodes">
-      <docs-node *vNode="let ctx" [ctx]="ctx" />
-    </vflow>
-    <dl class="effective">
-      <dt>Zoom range</dt>
-      <dd data-testid="zoom-range">{{ flow.settings.minZoom() }} – {{ flow.settings.maxZoom() }}</dd>
-      <dt>Double-click zoom</dt>
-      <dd data-testid="double-click">{{ flow.settings.zoomOnDoubleClick() ? 'on' : 'off' }}</dd>
+    <div class="min-h-40 flex-1">
+      <vflow #flow [nodes]="nodes" [edges]="edges" (initialized)="flow.fitView({ maxZoom: 1 })">
+        <docs-node *vNode="let ctx" [ctx]="ctx" />
+        <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
+      </vflow>
+    </div>
+    <dl
+      class="m-0 grid grid-cols-[max-content_1fr] gap-x-3.5 gap-y-1 border-0 border-t border-solid border-vui-border px-3.5 py-3 text-[13px] tabular-nums">
+      <dt class="text-vui-muted">Zoom range</dt>
+      <dd class="m-0" data-testid="zoom-range">{{ flow.settings.minZoom() }} – {{ flow.settings.maxZoom() }}</dd>
+      <dt class="text-vui-muted">Zoom now</dt>
+      <dd class="m-0" data-testid="zoom">{{ flow.viewport().zoom | number: '1.2-2' }}</dd>
+      <dt class="text-vui-muted">Double-click zoom</dt>
+      <dd class="m-0" data-testid="double-click">{{ flow.settings.zoomOnDoubleClick() ? 'on' : 'off' }}</dd>
     </dl>
   `,
 })
 export class ConfiguredFlowComponent {
-  readonly nodes = createNodes([
-    { id: 'a', point: { x: 30, y: 30 }, data: { text: 'A' } },
-    { id: 'b', point: { x: 180, y: 110 }, data: { text: 'B' } },
+  protected readonly nodes = createNodes([
+    { id: 'request', point: { x: 0, y: 0 }, data: { text: 'Request' } },
+    { id: 'approval', point: { x: 160, y: 70 }, data: { text: 'Approval' } },
   ]);
+
+  protected readonly edges = createEdges([{ id: 'request-approval', source: 'request', target: 'approval' }]);
 }
 
 /** The same flow under a closer `provideVflow`: its keys lay over those of the demo, the rest fall through. */
@@ -32,7 +41,7 @@ export class ConfiguredFlowComponent {
   selector: 'docs-overriding-flow',
   imports: [ConfiguredFlowComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { style: 'display: block' },
+  host: { class: 'block h-full' },
   providers: [provideVflow(withSettings({ maxZoom: 4, zoomOnDoubleClick: false }))],
   template: `<docs-configured-flow />`,
 })
@@ -43,64 +52,27 @@ export class OverridingFlowComponent {}
  * `provideVflow` that changes two keys and keeps the rest.
  */
 @Component({
-  imports: [ConfiguredFlowComponent, OverridingFlowComponent],
+  imports: [ConfiguredFlowComponent, DocsKit, OverridingFlowComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [
-    provideVflow(
-      withSettings({ minZoom: 0.5, maxZoom: 2, zoomOnDoubleClick: true }),
-      withAccessibility({ flowLabel: 'Configured graph' }),
-    ),
-  ],
-  styles: `
-    .pair {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0;
-    }
-    .pair > * + * {
-      border-left: 1px solid var(--vui-border);
-    }
-    figure {
-      margin: 0;
-    }
-    figcaption {
-      padding: 10px 14px;
-      border-bottom: 1px solid var(--vui-border);
-      font-size: 13px;
-      color: var(--vui-muted);
-    }
-    vflow {
-      height: 220px;
-    }
-    .effective {
-      display: grid;
-      grid-template-columns: max-content 1fr;
-      gap: 4px 14px;
-      margin: 0;
-      padding: 12px 14px;
-      border-top: 1px solid var(--vui-border);
-      font-size: 13px;
-    }
-    .effective dt {
-      color: var(--vui-muted);
-    }
-    .effective dd {
-      margin: 0;
-    }
-  `,
+  host: { class: '@container block size-full' },
+  providers: [provideVflow(withSettings({ minZoom: 0.5, maxZoom: 2, zoomOnDoubleClick: true }))],
   template: `
-    <section class="demo" data-testid="configuration-demo">
-      <div class="pair">
-        <figure data-testid="shared">
-          <figcaption>{{ sharedCaption }}</figcaption>
-          <docs-configured-flow />
-        </figure>
-        <figure data-testid="overriding">
-          <figcaption>{{ overridingCaption }}</figcaption>
-          <docs-overriding-flow />
-        </figure>
-      </div>
-    </section>
+    <div class="grid h-full grid-cols-2 @max-[560px]:grid-cols-1" data-testid="configuration-demo">
+      <docs-demo data-testid="shared">
+        <div docsDemoBar>
+          <p class="font-doc-mono text-xs">{{ sharedCaption }}</p>
+        </div>
+        <docs-configured-flow />
+      </docs-demo>
+      <docs-demo
+        class="border-0 border-l border-solid border-vui-border @max-[560px]:border-t @max-[560px]:border-l-0"
+        data-testid="overriding">
+        <div docsDemoBar>
+          <p class="font-doc-mono text-xs">{{ overridingCaption }}</p>
+        </div>
+        <docs-overriding-flow />
+      </docs-demo>
+    </div>
   `,
 })
 export class ConfigurationDemoComponent {

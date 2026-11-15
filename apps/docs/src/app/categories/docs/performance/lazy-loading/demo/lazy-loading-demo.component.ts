@@ -1,74 +1,85 @@
-import { ChangeDetectionStrategy, Component, effect, signal, viewChild } from '@angular/core';
-import { DocsPresentations } from '@docs/shared';
-import { Edge, Node, Vflow, VflowComponent, createNodes } from 'ngx-vflow';
+import { ChangeDetectionStrategy, Component, signal, viewChild } from '@angular/core';
+import { DocsKit, DocsPresentations } from '@docs/shared';
+import { Vflow, VflowComponent, createEdges, createNodes } from 'ngx-vflow';
+
+/** A node whose component has not arrived has no content to measure, so every node states its size. */
+const SIZE = { width: 224, height: 152 };
 
 @Component({
-  template: `
-    <button (click)="nextNode()">Go To Next Node</button>
+  template: `<docs-demo>
+    <div docsDemoBar>
+      <button docsButton="primary" type="button" (click)="goToNextNode()">Go to next node</button>
+      <p aria-live="polite">Components loaded: {{ loaded().join(', ') || 'none yet' }}</p>
+    </div>
 
-    <vflow lazyLoadTrigger="viewport" [nodes]="nodes" [edges]="edges" (initialized)="ready.set(true)">
-      <docs-node *vNode="let ctx" [ctx]="ctx" />
+    <!--
+      A fit of the whole graph would bring every node into view and load all three components at once, so the first
+      view is the first node alone.
+    -->
+    <vflow
+      #flow
+      lazyLoadTrigger="viewport"
+      [nodes]="nodes"
+      [edges]="edges"
+      (initialized)="flow.fitView({ nodes: [nodes[0].id], maxZoom: 1 })">
       <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
     </vflow>
-  `,
-  styleUrls: ['./lazy-loading-demo.component.scss'],
+  </docs-demo>`,
+  host: { class: 'block size-full' },
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DocsPresentations, Vflow],
+  imports: [DocsKit, DocsPresentations, Vflow],
 })
 export class LazyLoadingDemoComponent {
-  protected vflow = viewChild.required(VflowComponent);
+  protected readonly loaded = signal<string[]>([]);
 
-  public nodes: Node[] = createNodes([
+  // A factory in `component` instead of a class: the flow calls it when the node first enters the viewport.
+  protected readonly nodes = createNodes([
     {
-      id: '1',
-      point: { x: 10, y: 150 },
-      component: () => import('./components/node-a.component').then((m) => m.NodeAComponent),
-      width: 150,
-      height: 100,
+      id: 'revenue',
+      point: { x: 0, y: 0 },
+      component: () =>
+        import('./components/revenue-chart-node.component').then((m) =>
+          this.report('Revenue chart', m.RevenueChartNodeComponent),
+        ),
+      ...SIZE,
     },
     {
-      id: '2',
-      point: { x: 1000, y: 150 },
-      component: () => import('./components/node-b.component').then((m) => m.NodeBComponent),
-      width: 150,
-      height: 100,
+      id: 'orders',
+      point: { x: 1000, y: 0 },
+      component: () =>
+        import('./components/orders-table-node.component').then((m) =>
+          this.report('Orders table', m.OrdersTableNodeComponent),
+        ),
+      ...SIZE,
     },
     {
-      id: '3',
-      point: { x: 2000, y: 150 },
-      component: () => import('./components/node-c.component').then((m) => m.NodeCComponent),
-      width: 150,
-      height: 100,
+      id: 'stores',
+      point: { x: 2000, y: 0 },
+      component: () =>
+        import('./components/stores-map-node.component').then((m) =>
+          this.report('Stores map', m.StoresMapNodeComponent),
+        ),
+      ...SIZE,
     },
   ]);
 
-  public edges: Edge[] = [
-    {
-      id: '1 -> 2',
-      source: '1',
-      target: '2',
-    },
-    {
-      id: '2 -> 3',
-      source: '2',
-      target: '3',
-    },
-  ];
+  protected readonly edges = createEdges([
+    { id: 'revenue-orders', source: 'revenue', target: 'orders' },
+    { id: 'orders-stores', source: 'orders', target: 'stores' },
+  ]);
 
-  private currentNode = signal(this.nodes[0]);
+  private readonly flow = viewChild.required(VflowComponent);
+  private current = 0;
 
-  protected ready = signal(false);
-
-  constructor() {
-    effect(() => {
-      if (this.ready()) this.vflow().fitView({ nodes: [this.currentNode().id], duration: 800 });
-    });
+  protected goToNextNode(): void {
+    this.current = (this.current + 1) % this.nodes.length;
+    this.flow().fitView({ nodes: [this.nodes[this.current].id], maxZoom: 1, duration: 800 });
   }
 
-  nextNode() {
-    this.currentNode.update((current) => {
-      const nextIndex = (this.nodes.indexOf(current) + 1) % this.nodes.length;
-      return this.nodes[nextIndex];
-    });
+  /** Notes a component that has just been imported, so the bar can list what the flow has asked for so far. */
+  private report<T>(name: string, component: T): T {
+    this.loaded.update((names) => [...names, name]);
+
+    return component;
   }
 }

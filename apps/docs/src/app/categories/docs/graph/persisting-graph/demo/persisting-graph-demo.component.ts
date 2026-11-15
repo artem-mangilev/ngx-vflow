@@ -1,16 +1,6 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import { DocsPresentations } from '@docs/shared';
-import {
-  Edge,
-  Node,
-  StaticEdge,
-  StaticNode,
-  Vflow,
-  createEdges,
-  createNodes,
-  toStaticEdges,
-  toStaticNodes,
-} from 'ngx-vflow';
+import { DocsKit, DocsPresentations } from '@docs/shared';
+import { StaticEdge, StaticNode, Vflow, createEdges, createNodes, toStaticEdges, toStaticNodes } from 'ngx-vflow';
 
 const STORAGE_KEY = 'ngx-vflow-docs:persisted-graph';
 
@@ -21,92 +11,69 @@ interface Snapshot {
 
 const INITIAL: Snapshot = {
   nodes: [
-    { id: 'draft', point: { x: 40, y: 40 }, data: { text: 'Draft' } },
-    { id: 'review', point: { x: 240, y: 130 }, data: { text: 'Review' } },
-    { id: 'done', point: { x: 440, y: 40 }, data: { text: 'Done' } },
+    { id: 'draft', point: { x: 0, y: 0 }, data: { text: 'Draft' } },
+    { id: 'review', point: { x: 150, y: 90 }, data: { text: 'Review' } },
+    { id: 'published', point: { x: 300, y: 0 }, data: { text: 'Published' } },
   ],
   edges: [
     { id: 'draft-review', source: 'draft', target: 'review', curve: 'smooth-step' },
-    { id: 'review-done', source: 'review', target: 'done', curve: 'smooth-step' },
+    { id: 'review-published', source: 'review', target: 'published', curve: 'smooth-step' },
   ],
 };
 
 /** The graph is restored from `localStorage` when the demo loads, so a reload is the check that a save worked. */
 @Component({
-  imports: [DocsPresentations, Vflow],
+  imports: [DocsKit, DocsPresentations, Vflow],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styles: `
-    :host {
-      display: block;
-      width: 100%;
-    }
-    .demo {
-      container-type: inline-size;
-    }
-    /* Both columns have a fixed height and their own scrolling, so saving never moves the flow. */
-    .pair {
-      display: grid;
-      grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
-      height: 300px;
-    }
-    .pair > * + * {
-      border-left: 1px solid var(--vui-border);
-    }
-    @container (max-width: 560px) {
-      .pair {
-        grid-template-columns: minmax(0, 1fr);
-        grid-template-rows: 1fr 1fr;
-        height: 440px;
-      }
-      .pair > * + * {
-        border-left: 0;
-        border-top: 1px solid var(--vui-border);
-      }
-    }
-    vflow {
-      height: 100%;
-    }
-    pre {
-      margin: 0;
-      padding: 12px 14px;
-      height: 100%;
-      box-sizing: border-box;
-      overflow: auto;
-      font-size: 12px;
-      color: var(--vui-muted);
-    }
-  `,
+  host: { class: 'block size-full' },
   template: `
-    <section class="demo" data-testid="persisting-graph-demo">
-      <div class="controls">
-        <button class="button" type="button" (click)="save()">Save</button>
-        <p>{{ status() }}</p>
+    <docs-demo data-testid="persisting-graph-demo">
+      <div docsDemoBar>
+        <button docsButton="primary" type="button" (click)="save()">Save</button>
+        <button docsButton type="button" [disabled]="!snapshot()" (click)="clear()">Clear</button>
+        <p aria-live="polite">{{ status() }}</p>
       </div>
-      <div class="pair">
-        <vflow [nodes]="nodes()" [edges]="edges()">
-          <docs-node *vNode="let ctx" [ctx]="ctx" />
-          <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
-        </vflow>
-        <pre aria-label="Saved graph" data-testid="snapshot">{{ snapshot() || 'Nothing saved yet.' }}</pre>
+
+      <!-- Both columns keep the height of the stage and scroll on their own, so saving never moves the flow. -->
+      <div class="@container absolute inset-0">
+        <div
+          class="grid h-full grid-cols-[minmax(0,3fr)_minmax(0,2fr)] @max-[560px]:grid-cols-1 @max-[560px]:grid-rows-2">
+          <vflow #flow [nodes]="nodes" [edges]="edges" (initialized)="flow.fitView({ maxZoom: 1 })">
+            <docs-node *vNode="let ctx" [ctx]="ctx" />
+            <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
+          </vflow>
+          <pre
+            class="m-0 min-h-0 overflow-auto border-0 border-l border-solid border-vui-border p-3.5 font-doc-mono text-xs text-vui-muted @max-[560px]:border-t @max-[560px]:border-l-0"
+            aria-label="Saved graph"
+            data-testid="snapshot"
+            >{{ snapshot() || 'Nothing saved yet.' }}</pre>
+        </div>
       </div>
-    </section>
+    </docs-demo>
   `,
 })
 export class PersistingGraphDemoComponent {
   private readonly saved = readStorage();
 
-  protected readonly nodes = signal<Node[]>(createNodes(this.saved?.nodes ?? INITIAL.nodes));
-  protected readonly edges = signal<Edge[]>(createEdges(this.saved?.edges ?? INITIAL.edges));
+  protected readonly nodes = createNodes(this.saved?.nodes ?? INITIAL.nodes);
+  protected readonly edges = createEdges(this.saved?.edges ?? INITIAL.edges);
   protected readonly snapshot = signal(this.saved ? print(this.saved) : '');
   protected readonly status = signal(
     this.saved ? 'Restored from localStorage on load.' : 'Drag a node, save, then reload the page.',
   );
 
   protected save(): void {
-    const snapshot: Snapshot = { nodes: toStaticNodes(this.nodes()), edges: toStaticEdges(this.edges()) };
+    const snapshot: Snapshot = { nodes: toStaticNodes(this.nodes), edges: toStaticEdges(this.edges) };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(snapshot));
     this.snapshot.set(print(snapshot));
     this.status.set('Saved. Reload the page: the graph comes back as it is now.');
+  }
+
+  /** Forgets the saved graph, so the next reload starts from the initial one. */
+  protected clear(): void {
+    localStorage.removeItem(STORAGE_KEY);
+    this.snapshot.set('');
+    this.status.set('Nothing is saved now. Reload the page: the graph starts from its initial layout.');
   }
 }
 

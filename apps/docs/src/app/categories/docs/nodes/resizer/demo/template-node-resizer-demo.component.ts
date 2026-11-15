@@ -1,110 +1,44 @@
+import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { DocsPresentations } from '@docs/shared';
-import { VuiPort } from '@vflow/ui';
-import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
+import { Vui } from '@vflow/ui';
+import { Vflow, createEdges, createNodes } from 'ngx-vflow';
 
 @Component({
-  template: `
-    <vflow [nodes]="nodes" [edges]="edges">
-      <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
+  template: `<vflow #flow [nodes]="nodes" [edges]="edges" (initialized)="flow.fitView({ maxZoom: 1 })">
+    <!-- The minimum size is plain CSS: the resizer stops there. -->
+    <article
+      *vNode="let ctx of nodes"
+      vuiNode
+      vResizable
+      class="min-w-44 min-h-24 text-[13px]"
+      data-testid="resizable-card">
+      <header vuiNodeHeader>
+        <span vuiTitle>{{ ctx.data().title }}</span>
+      </header>
+      <div vuiRow>
+        <span vuiMeta>Size</span>
+        <span class="ms-auto tabular-nums">
+          {{ ctx.width() | number: '1.0-0' }} × {{ ctx.height() | number: '1.0-0' }}
+        </span>
+      </div>
+      <span vuiPort handleType="target" position="left"></span>
+      <span vuiPort handleType="source" position="right"></span>
+    </article>
 
-      <ng-template let-ctx vNode>
-        @if (ctx.data().type === 'output') {
-          <div vResizable class="custom-node">
-            <div class="data-block">
-              Output 1
-              <span vuiPort handleType="source" position="right" [handleId]="ctx.data().output1"></span>
-            </div>
-            <div class="data-block">
-              Output 2
-              <span vuiPort handleType="source" position="right" [handleId]="ctx.data().output2"></span>
-            </div>
-          </div>
-        }
-
-        @if (ctx.data().type === 'input') {
-          <div vResizable class="custom-node">
-            <div class="data-block">
-              Input 1
-              <span vuiPort handleType="target" position="left" [handleId]="ctx.data().input1"></span>
-            </div>
-            <div class="data-block">
-              Input 2
-              <span vuiPort handleType="target" position="left" [handleId]="ctx.data().input2"></span>
-            </div>
-          </div>
-        }
-      </ng-template>
-    </vflow>
-  `,
-  styles: [
-    `
-      :host {
-        width: 100%;
-        height: 100%;
-      }
-
-      .custom-node {
-        min-width: 150px;
-        min-height: 100px;
-        background-color: #0f4c75;
-        border: 1px solid gray;
-        border-radius: 5px;
-        padding-left: 7px;
-        padding-right: 7px;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-around;
-        align-items: stretch;
-      }
-
-      .data-block {
-        background-color: #ffffff;
-        color: #1b262c;
-        border-radius: 5px;
-        text-align: center;
-      }
-    `,
-  ],
+    <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
+  </vflow>`,
+  host: { class: 'block size-full' },
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DocsPresentations, Vflow, VuiPort],
+  imports: [DecimalPipe, DocsPresentations, Vflow, Vui],
 })
 export class TemplateNodeResizerDemoComponent {
-  public nodes: Node[] = createNodes([
-    {
-      id: '1',
-      point: { x: 0, y: 150 },
-      data: {
-        type: 'output',
-        output1: 'output1',
-        output2: 'output2',
-      },
-    },
-    {
-      id: '2',
-      point: { x: 250, y: 100 },
-      data: {
-        type: 'input',
-        input1: 'input1',
-        input2: 'input2',
-      },
-    },
+  protected readonly nodes = createNodes([
+    // No size in the data: the card follows its content until a resize fixes an axis.
+    { id: 'content', point: { x: 0, y: 22 }, data: { title: 'Content-sized' } },
+    // A size in the data: the card starts with it, and a resize writes the new one into these signals.
+    { id: 'fixed', point: { x: 260, y: 0 }, width: 240, height: 140, data: { title: 'Fixed size' } },
   ]);
 
-  public edges: Edge[] = [
-    {
-      id: '1 -> 2 one',
-      source: '1',
-      target: '2',
-      sourceHandle: 'output1',
-      targetHandle: 'input1',
-    },
-    {
-      id: '1 -> 2 two',
-      source: '1',
-      target: '2',
-      sourceHandle: 'output2',
-      targetHandle: 'input2',
-    },
-  ];
+  protected readonly edges = createEdges([{ id: 'content-fixed', source: 'content', target: 'fixed' }]);
 }

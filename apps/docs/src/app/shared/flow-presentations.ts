@@ -25,8 +25,8 @@ interface EdgeCtx {
   markerEnd: () => string;
   selected: () => boolean;
   preselected: () => boolean;
-  /** `label` renders at the center of the edge. */
-  data: () => { label?: string } | undefined;
+  /** A string `label` in the data renders at the center of the edge; data of any other shape is accepted. */
+  data: () => unknown;
 }
 
 /** A card with the node's text and a target/source handle pair, or a titled group for `data.type === 'group'`. */
@@ -34,21 +34,10 @@ interface EdgeCtx {
   selector: 'docs-node',
   imports: [Vflow, Vui],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { style: 'display: block' },
-  styles: `
-    .card {
-      width: var(--docs-node-width, 100px);
-      min-height: var(--docs-node-height, 50px);
-      display: grid;
-      place-items: center;
-      padding: 4px 8px;
-      text-align: center;
-      font-size: 13px;
-    }
-  `,
+  host: { class: 'block' },
   template: `
     @if (isGroup()) {
-      <div vuiGroup [style.width.px]="ctx().width()" [style.height.px]="ctx().height()">
+      <div vuiGroup class="text-[13px]" [style.width.px]="ctx().width()" [style.height.px]="ctx().height()">
         @if (title(); as title) {
           <header vuiGroupHeader>
             <span vuiTitle>{{ title }}</span>
@@ -56,7 +45,7 @@ interface EdgeCtx {
         }
       </div>
     } @else {
-      <div vuiNode class="card">
+      <div vuiNode class="grid w-25 min-h-12.5 place-items-center px-2 py-1 text-center text-[13px]">
         @if (html()) {
           <span [innerHTML]="text()"></span>
         } @else {
@@ -118,7 +107,11 @@ export class DocsNodeComponent {
 })
 export class DocsEdgeComponent {
   readonly ctx = input.required<EdgeCtx>();
-  protected readonly label = computed(() => this.ctx().data()?.label);
+  protected readonly label = computed(() => {
+    const label = (this.ctx().data() as { label?: unknown } | undefined)?.label;
+
+    return typeof label === 'string' ? label : undefined;
+  });
 }
 
 /** Import into a demo and place the node and edge templates inside `<vflow>`. */

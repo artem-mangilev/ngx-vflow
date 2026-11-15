@@ -1,139 +1,87 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { Vui } from '@vflow/ui';
 
-/** The token scales of both shipped themes, drawn with the theme variables and the parts that use them. */
+const SECTION_TITLE = 'm-0 mb-2 text-xs font-semibold text-vui-muted';
+const SAMPLE = 'grid h-11 w-18 place-items-center border border-solid border-vui-border bg-vui-surface text-xs';
+
+/**
+ * The token scales of both shipped themes, drawn with the `vui` utilities and the parts that use them. Each column
+ * is a `data-vui-theme` scope, so the same utilities resolve to the light and to the dark values.
+ */
 @Component({
-  selector: 'app-ui-tokens-demo',
   imports: [Vui],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styles: `
-    .themes {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    }
-    .theme {
-      display: grid;
-      gap: 20px;
-      padding: 20px;
-      background: var(--vui-background);
-      color: var(--vui-foreground);
-      font-size: 14px;
-    }
-    h3 {
-      margin: 0 0 8px;
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--vui-muted);
-    }
-    .swatches {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
-      gap: 8px;
-    }
-    .swatch {
-      display: grid;
-      gap: 4px;
-      font-size: 12px;
-    }
-    .chip {
-      height: 28px;
-      border-radius: var(--vui-radius);
-      border: 1px solid var(--vui-border);
-    }
-    .xs {
-      font-size: var(--text-xs);
-      line-height: var(--text-xs--line-height);
-    }
-    .row {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: flex-end;
-      gap: 8px;
-    }
-    .space {
-      display: grid;
-      justify-items: center;
-      gap: 4px;
-      font-size: 12px;
-      color: var(--vui-muted);
-    }
-    .space span {
-      width: calc(var(--vui-space) * var(--units));
-      height: calc(var(--vui-space) * var(--units));
-      background: var(--vui-accent);
-      border-radius: 2px;
-    }
-    .radius {
-      display: grid;
-      place-items: center;
-      width: 72px;
-      height: 44px;
-      border: 1px solid var(--vui-border);
-      background: var(--vui-surface);
-      font-size: 12px;
-    }
-    article {
-      width: 180px;
-    }
-  `,
+  host: {
+    class: `grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] overflow-hidden rounded-[14px]
+      border border-solid border-vui-border`,
+    role: 'group',
+    'aria-label': 'Design tokens',
+  },
   template: `
-    <section class="demo themes" aria-label="Design tokens">
-      @for (theme of themes; track theme) {
-        <div class="theme" [attr.data-vui-theme]="theme" [attr.data-testid]="'tokens-' + theme">
-          <div>
-            <h3>{{ theme === 'light' ? 'Light' : 'Dark' }} theme colors</h3>
-            <div class="swatches">
-              @for (color of colors; track color) {
-                <div class="swatch">
-                  <span class="chip" [style.background]="'var(' + color + ')'"></span>
-                  <code>{{ color }}</code>
-                </div>
-              }
-            </div>
+    @for (theme of themes; track theme) {
+      <div
+        class="grid gap-5 bg-canvas p-5 text-sm text-vui-foreground"
+        [attr.data-vui-theme]="theme"
+        [attr.data-testid]="'tokens-' + theme">
+        <section>
+          <h3 class="${SECTION_TITLE}">{{ theme === 'light' ? 'Light' : 'Dark' }} theme colors</h3>
+          <div class="grid grid-cols-[repeat(auto-fill,minmax(140px,1fr))] gap-2">
+            @for (color of colors; track color) {
+              <div class="grid gap-1 text-xs">
+                <span
+                  class="h-7 rounded-vui-control border border-solid border-vui-border"
+                  [style.background]="'var(' + color + ')'"></span>
+                <code>{{ color }}</code>
+              </div>
+            }
           </div>
-          <div>
-            <h3>Type: yours</h3>
-            <div>Inherited: node, row and group content</div>
-            <div><strong>font-semibold: node and group titles</strong></div>
-            <div class="xs">text-xs: meta and edge labels</div>
+        </section>
+
+        <section>
+          <h3 class="${SECTION_TITLE}">Type: yours</h3>
+          <div>Inherited: node, row and group content</div>
+          <div class="font-semibold">font-semibold: node and group titles</div>
+          <div class="text-xs">text-xs: meta and edge labels</div>
+        </section>
+
+        <section>
+          <h3 class="${SECTION_TITLE}">Spacing on a 4px grid</h3>
+          <div class="flex flex-wrap items-end gap-2">
+            @for (step of spacing; track step.units) {
+              <div class="grid justify-items-center gap-1 text-xs text-vui-muted">
+                <span class="rounded-xs bg-vui-accent" [class]="step.size"></span>
+                {{ step.units }}
+              </div>
+            }
           </div>
-          <div>
-            <h3>Spacing on a 4pt grid</h3>
-            <div class="row">
-              @for (units of spacing; track units) {
-                <div class="space" [style.--units]="units">
-                  <span></span>
-                  {{ units }}
-                </div>
-              }
-            </div>
+        </section>
+
+        <section>
+          <h3 class="${SECTION_TITLE}">Concentric radius</h3>
+          <div class="flex flex-wrap gap-2">
+            <div class="${SAMPLE} rounded-vui-control">control</div>
+            <div class="${SAMPLE} rounded-vui-surface">surface</div>
+            <div class="${SAMPLE} rounded-full">full</div>
           </div>
-          <div>
-            <h3>Concentric radius</h3>
-            <div class="row">
-              <div class="radius" style="border-radius: var(--vui-radius)">control</div>
-              <div class="radius" style="border-radius: calc(var(--vui-radius) + var(--vui-space))">surface</div>
-              <div class="radius" style="border-radius: 9999px">full</div>
-            </div>
+        </section>
+
+        <section>
+          <h3 class="${SECTION_TITLE}">Elevation and parts</h3>
+          <div class="flex flex-wrap items-start gap-2">
+            <article vuiNode class="w-45 text-[13px]">
+              <header vuiNodeHeader><span vuiTitle>Flat node</span></header>
+              <div class="p-vui-3"><span vuiMeta>No blurred shadow on nodes</span></div>
+            </article>
+            <div vuiToolbar class="px-vui-3! py-vui-2! text-[13px]">Floating toolbar</div>
           </div>
-          <div>
-            <h3>Elevation and parts</h3>
-            <div class="row" style="align-items: flex-start">
-              <article vuiNode>
-                <header vuiNodeHeader><span vuiTitle>Flat node</span></header>
-                <div class="node-body"><span vuiMeta>No blurred shadow on nodes</span></div>
-              </article>
-              <div vuiToolbar>Floating toolbar</div>
-            </div>
-          </div>
-        </div>
-      }
-    </section>
+        </section>
+      </div>
+    }
   `,
 })
 export class TokensDemoComponent {
-  readonly themes = ['light', 'dark'] as const;
-  readonly colors = [
+  protected readonly themes = ['light', 'dark'] as const;
+  protected readonly colors = [
     '--vui-background',
     '--vui-surface',
     '--vui-surface-muted',
@@ -144,5 +92,15 @@ export class TokensDemoComponent {
     '--vui-success',
     '--vui-danger',
   ];
-  readonly spacing = [1, 2, 3, 4, 5, 6, 7, 8];
+  /** The steps of the spacing scale as the utilities that size a square with them. */
+  protected readonly spacing = [
+    { units: 1, size: 'size-vui-1' },
+    { units: 2, size: 'size-vui-2' },
+    { units: 3, size: 'size-vui-3' },
+    { units: 4, size: 'size-vui-4' },
+    { units: 5, size: 'size-vui-5' },
+    { units: 6, size: 'size-vui-6' },
+    { units: 7, size: 'size-vui-7' },
+    { units: 8, size: 'size-vui-8' },
+  ];
 }

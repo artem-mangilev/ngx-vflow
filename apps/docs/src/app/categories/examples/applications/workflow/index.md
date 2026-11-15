@@ -14,7 +14,7 @@ workflow.
 - Cards with header, body and footer; status and selection shown at the same time.
 - Branching with one exit per branch: `handleId` on the source handles keeps the branches apart from the start, so each condition label sits at the start of its edge.
 - Edge labels at the start, center and end of an edge follow its geometry.
-- Process state is application CSS on the public selectors: taken and ruled-out edges, with selection keeping the library color.
+- Process state is the application's own: utilities on the edge path, keyed on its `data-state` attribute, draw taken and ruled-out edges, and a selected edge keeps the library color.
 - A display-only graph needs no visible ports: plain `vHandle` elements anchor the edges.
 
 See [@vflow/ui](/packages/ui/overview) for setup and the shared token contract.

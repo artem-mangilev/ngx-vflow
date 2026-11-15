@@ -1,182 +1,49 @@
 import { ChangeDetectionStrategy, Component, output } from '@angular/core';
-import { VuiPort } from '@vflow/ui';
-import { Node, Vflow, injectNode } from 'ngx-vflow';
+import { DemoIconComponent, DocsButton, DocsNodeIcon } from '@docs/shared';
+import { Vui } from '@vflow/ui';
+import { Vflow, injectNode } from 'ngx-vflow';
 
+/** A node that is resized while it is selected and carries a toolbar; its handles sit on content inside it. */
 @Component({
   template: `
-    <div class="transform-node" [vResizable]="ctx.selected()">
-      <div class="node-header">
-        <svg class="icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
-          <path
-            d="M2 8H8M8 8L5 5M8 8L5 11"
-            stroke="currentColor"
-            stroke-width="1.5"
-            stroke-linecap="round"
-            stroke-linejoin="round" />
-          <path
-            d="M14 8H8M8 8L11 5M8 8L11 11"
-            stroke="currentColor"
-            stroke-width="1.5"
-            stroke-linecap="round"
-            stroke-linejoin="round" />
-        </svg>
-        <span class="title">Click to Resize</span>
-      </div>
-      <div class="node-content">
-        <div class="section">
-          <div class="section-label">Input</div>
-          <div class="data-preview">You can attach handle to content inside node</div>
-          <span vuiPort handleType="target" position="left" handleId="input-1"></span>
+    <article
+      vuiNode
+      class="flex w-60 min-w-60 flex-col text-[13px]"
+      data-testid="transform"
+      [vResizable]="ctx.selected()">
+      <header vuiNodeHeader>
+        <span docsNodeIcon tile class="[--icon-color:var(--color-amber-500)]"><app-demo-icon name="sliders" /></span>
+        <span vuiTitle>Click to resize</span>
+      </header>
+      <div class="flex flex-1 flex-col justify-evenly gap-vui-2 p-vui-3">
+        <div class="rounded-vui-control bg-vui-surface-muted px-vui-3 py-vui-2">
+          <div vuiMeta>Input</div>
+          A handle can sit on content inside a node
+          <span vuiPort handleType="target" position="left" handleId="input"></span>
         </div>
-        <div class="transform-indicator">
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-            <path
-              d="M6 2V10M6 10L9 7M6 10L3 7"
-              stroke="currentColor"
-              stroke-width="1.5"
-              stroke-linecap="round"
-              stroke-linejoin="round" />
-          </svg>
-        </div>
-        <div class="section">
-          <div class="section-label">Output</div>
-          <div class="data-preview">You can attach handle to content inside node</div>
-          <span vuiPort handleType="source" position="right" handleId="output-1"></span>
+        <span class="flex justify-center text-vui-muted"><app-demo-icon name="arrow-down" /></span>
+        <div class="rounded-vui-control bg-vui-surface-muted px-vui-3 py-vui-2">
+          <div vuiMeta>Output</div>
+          A handle can sit on content inside a node
+          <span vuiPort handleType="source" position="right" handleId="output"></span>
         </div>
       </div>
-    </div>
+    </article>
 
     <v-node-toolbar position="top">
-      <div class="toolbar-content">
-        <button class="toolbar-btn" (click)="deleted.emit(ctx.node)">Delete</button>
+      <div vuiToolbar>
+        <button docsButton="plain" small type="button" (click)="deleted.emit()">Delete</button>
       </div>
     </v-node-toolbar>
   `,
-  styles: [
-    `
-      :host {
-        display: contents;
-      }
-
-      .transform-node {
-        width: 240px;
-        min-width: 240px;
-        min-height: 320px;
-        background: white;
-        border: 2px solid var(--accent-amber);
-        border-radius: 8px;
-        box-shadow:
-          0 1px 3px rgba(0, 0, 0, 0.08),
-          0 1px 2px rgba(0, 0, 0, 0.06);
-        overflow: hidden;
-        display: flex;
-        flex-direction: column;
-      }
-
-      .node-header {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        padding: 12px 14px;
-        background: white;
-        border-bottom: 2px solid var(--accent-amber);
-        color: var(--accent-amber);
-      }
-
-      .icon {
-        flex-shrink: 0;
-      }
-
-      .title {
-        font-size: 14px;
-        font-weight: 600;
-        letter-spacing: -0.01em;
-        color: var(--text-primary);
-      }
-
-      .node-content {
-        flex: 1;
-        padding: 12px 14px;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-evenly;
-        gap: 12px;
-        background: white;
-      }
-
-      .section {
-        padding: 8px 10px;
-        background: rgba(0, 0, 0, 0.02);
-        border-radius: 6px;
-        border: 1px solid var(--node-border);
-      }
-
-      .section-label {
-        font-size: 11px;
-        font-weight: 600;
-        color: var(--text-muted);
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        margin-bottom: 4px;
-      }
-
-      .data-preview {
-        font-size: 12px;
-        color: var(--text-primary);
-        font-family: 'Monaco', 'Courier New', monospace;
-      }
-
-      .transform-indicator {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 6px;
-        padding: 8px;
-        color: var(--text-muted);
-        font-size: 11px;
-        font-weight: 500;
-      }
-
-      .transform-text {
-        font-size: 12px;
-      }
-
-      .toolbar-content {
-        display: flex;
-        gap: 4px;
-        background: var(--node-bg);
-        padding: 4px;
-        border-radius: 6px;
-      }
-
-      .toolbar-btn {
-        display: flex;
-        align-items: center;
-        gap: 4px;
-        padding: 6px 10px;
-        background: transparent;
-        border: none;
-        border-radius: 4px;
-        font-size: 12px;
-        font-weight: 500;
-        color: var(--text-primary);
-        cursor: pointer;
-        transition: background 0.15s ease;
-      }
-
-      .toolbar-btn:hover {
-        background: rgba(0, 0, 0, 0.05);
-      }
-
-      .toolbar-btn:active {
-        background: rgba(0, 0, 0, 0.08);
-      }
-    `,
-  ],
-  imports: [Vflow, VuiPort],
+  // The card is the element the flow measures and resizes, so the host adds no box of its own.
+  host: { class: 'contents' },
+  imports: [Vflow, Vui, DocsButton, DocsNodeIcon, DemoIconComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TransformNodeComponent {
   protected readonly ctx = injectNode();
-  readonly deleted = output<Node>();
+
+  /** Reaches the flow as a `componentNodeEvent`, which carries the id of this node. */
+  readonly deleted = output<void>();
 }

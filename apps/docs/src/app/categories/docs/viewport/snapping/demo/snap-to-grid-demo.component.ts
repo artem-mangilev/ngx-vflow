@@ -1,105 +1,35 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { DocsPresentations } from '@docs/shared';
-import { VuiPort } from '@vflow/ui';
-import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
+import { Vflow, createEdges, createNodes } from 'ngx-vflow';
 
 @Component({
-  template: `<vflow [nodes]="nodes" [edges]="edges" [snapGrid]="[25, 25]" [background]="{ type: 'dots', gap: 25 }">
-    <ng-template let-ctx vNode>
-      @if (ctx.data().type === 'group') {
-        <div
-          class="group-node"
-          [class.group-node_selected]="ctx.selected()"
-          [style.width.px]="ctx.width()"
-          [style.height.px]="ctx.height()">
-          <span vuiPort handleType="source" position="right"></span>
-        </div>
-      } @else {
-        <docs-node [ctx]="ctx" />
-      }
-    </ng-template>
+  // The dots of the background have the gap of the grid, so they mark the points a dragged node snaps to.
+  template: `<vflow
+    #flow
+    [nodes]="nodes"
+    [edges]="edges"
+    [snapGrid]="[25, 25]"
+    [background]="{ type: 'dots', gap: 25, size: 3 }"
+    (initialized)="flow.fitView({ maxZoom: 1 })">
+    <docs-node *vNode="let ctx" [ctx]="ctx" />
     <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
   </vflow>`,
-  styles: [
-    `
-      :host {
-        width: 100%;
-        height: 100%;
-      }
-
-      .group-node {
-        box-sizing: border-box;
-        border: 1px solid red;
-        border-radius: 5px;
-        background-color: rgba(255, 0, 0, 0.05);
-      }
-
-      .group-node_selected {
-        border-width: 3px;
-      }
-    `,
-  ],
+  host: { class: 'block size-full' },
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DocsPresentations, Vflow, VuiPort],
+  imports: [DocsPresentations, Vflow],
 })
 export class SnapToGridDemoComponent {
-  public nodes: Node[] = createNodes([
-    {
-      id: '1',
-      point: { x: 10, y: 10 },
-      data: { text: `1` },
-      parentId: '3',
-    },
-    {
-      id: '2',
-      point: { x: 90, y: 80 },
-      // it's possible to pass html in this field
-      data: { text: `<strong>2</strong>` },
-      parentId: '3',
-    },
-    {
-      id: '3',
-      point: { x: 10, y: 10 },
-      data: { type: 'group' },
-      width: 250,
-      height: 250,
-    },
-    {
-      id: '4',
-      point: { x: 280, y: 10 },
-      data: { text: `4` },
-    },
-    {
-      id: '5',
-      point: { x: 10, y: 160 },
-      data: { type: 'group' },
-      width: 170,
-      height: 70,
-      parentId: '3',
-    },
-    {
-      id: '6',
-      point: { x: 10, y: 10 },
-      data: { text: `6` },
-      parentId: '5',
-    },
+  protected readonly nodes = createNodes([
+    { id: 'draft', point: { x: 0, y: 75 }, data: { text: 'Draft' } },
+    // The group sits off the grid on purpose: its child still snaps to the cells of the flow, not to cells counted
+    // from the corner of the group.
+    { id: 'review', point: { x: 163, y: 13 }, width: 175, height: 150, data: { type: 'group', text: 'Review' } },
+    { id: 'proofread', point: { x: 37, y: 62 }, parentId: 'review', data: { text: 'Proofread' } },
+    { id: 'publish', point: { x: 400, y: 75 }, data: { text: 'Publish' } },
   ]);
 
-  public edges: Edge[] = [
-    {
-      source: '1',
-      target: '2',
-      id: '1 -> 2',
-    },
-    {
-      source: '2',
-      target: '4',
-      id: '2 -> 4',
-    },
-    {
-      source: '5',
-      target: '4',
-      id: '5 -> 4',
-    },
-  ];
+  protected readonly edges = createEdges([
+    { id: 'draft-proofread', source: 'draft', target: 'proofread' },
+    { id: 'proofread-publish', source: 'proofread', target: 'publish' },
+  ]);
 }

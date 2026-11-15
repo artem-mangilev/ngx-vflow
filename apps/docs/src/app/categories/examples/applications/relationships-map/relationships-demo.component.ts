@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, forwardRef, signal, viewChild } from '@angular/core';
+import { DocsKit, SCENE_BACKGROUND } from '@docs/shared';
 import { Vui } from '@vflow/ui';
 import {
   addEdges,
@@ -16,8 +17,6 @@ import {
   Vflow,
   VflowComponent,
 } from 'ngx-vflow';
-import { injectDocsTheme } from '../../../../shared/docs-theme';
-import { SCENE_BACKGROUND } from '../../../../shared/demo-scene';
 import {
   DropTarget,
   MetricNodeComponent,
@@ -44,22 +43,15 @@ const LAYOUT = { inset: 16, header: 52, gap: 16, step: 8 };
  */
 @Component({
   selector: 'app-ui-relationships-demo',
-  imports: [Vflow, Vui],
+  imports: [Vflow, Vui, DocsKit],
   changeDetection: ChangeDetectionStrategy.OnPush,
   // Node components inject the map from here: they are created inside the flow, under this component.
   providers: [{ provide: TeamBoard, useExisting: forwardRef(() => RelationshipsDemoComponent) }],
-  styles: `
-    /* The scene fits by its width; the height leaves a band below the metric for the viewport controls. */
-    vflow {
-      height: 580px;
-    }
-    .vui-edge[data-link='true'] {
-      stroke-dasharray: 4 4;
-    }
-  `,
+  host: { class: 'block' },
   template: `
-    <section class="demo" aria-label="Relationships and metrics map demo" [attr.data-vui-theme]="theme()">
-      <div class="stage">
+    <docs-demo framed role="region" aria-label="Relationships and metrics map demo">
+      <!-- The scene fits by its width; the height leaves a band below the metric for the viewport controls. -->
+      <div class="h-145">
         <vflow
           [nodes]="nodes"
           [edges]="edges()"
@@ -71,14 +63,15 @@ const LAYOUT = { inset: 16, header: 52, gap: 16, step: 8 };
           (nodeDragStart)="dragStart($event)"
           (nodeDrag)="drag($event)"
           (nodeDragEnd)="dragEnd($event)"
-          (initialized)="flow()?.fitView()">
+          (initialized)="flow().fitView({ maxZoom: 1 })">
           <ng-template let-ctx vEdge>
             <svg:g vEdgeInteractionArea>
+              <!-- A link of content to a team is dashed. -->
               <svg:path
                 vuiEdge
                 [attr.d]="ctx.path()"
                 [attr.marker-end]="ctx.markerEnd()"
-                [attr.data-link]="!!ctx.data()?.link" />
+                [attr.stroke-dasharray]="ctx.data()?.link ? '4 4' : null" />
             </svg:g>
             @if (ctx.data()?.label; as label) {
               <span *vEdgeLabel vuiEdgeLabel>{{ label }}</span>
@@ -90,19 +83,16 @@ const LAYOUT = { inset: 16, header: 52, gap: 16, step: 8 };
             }
           </ng-template>
         </vflow>
-        @if (flow(); as flow) {
-          <vui-controls class="stage-controls" [flow]="flow" />
-        }
       </div>
-    </section>
+      <vui-controls class="absolute bottom-2.5 left-2.5 z-2" [flow]="flow()" />
+    </docs-demo>
   `,
 })
 export class RelationshipsDemoComponent implements TeamBoard {
-  readonly flow = viewChild(VflowComponent);
-  readonly theme = injectDocsTheme();
-  readonly background = SCENE_BACKGROUND;
+  protected readonly flow = viewChild.required(VflowComponent);
+  protected readonly background = SCENE_BACKGROUND;
   /** Every kind of node is its own component; the demo tells them apart by `component`, not by data. */
-  readonly nodes = createNodes([
+  protected readonly nodes = createNodes([
     team('platform', { x: 0, y: 0 }, 606, 510, 'Platform'),
     // A team inside a team: its point is relative to Platform, and it stays inside it like any child.
     team('infra', { x: 16, y: 260 }, 574, 234, 'Infra', 'platform'),
@@ -132,7 +122,7 @@ export class RelationshipsDemoComponent implements TeamBoard {
       data: { text: 'Q3 focus: fewer handoffs between the two teams.' },
     },
   ]);
-  readonly edges = signal<Edge<Relation>[]>(
+  protected readonly edges = signal<Edge<Relation>[]>(
     createEdges([
       // A connection between the two groups themselves.
       relation('platform-growth', 'platform', 'growth', { label: '3 shared services' }),
@@ -145,7 +135,7 @@ export class RelationshipsDemoComponent implements TeamBoard {
   );
 
   /** People connect to people once, in either direction. */
-  readonly connection: ConnectionSettings = {
+  protected readonly connection: ConnectionSettings = {
     validator: ({ source, target }) =>
       source !== target &&
       this.isPerson(source) &&
@@ -174,32 +164,32 @@ export class RelationshipsDemoComponent implements TeamBoard {
   /** Where each dragged person came from, to return there when the drop has no room. */
   private origins = new Map<string, { parentId: string; point: Point }>();
 
-  connect(connection: Connection) {
+  protected connect(connection: Connection) {
     const edge = createEdge(relation(crypto.randomUUID(), connection.source, connection.target, { label: 'reviews' }));
     this.edges.update((edges) => addEdges([edge], { nodes: this.nodes, edges }));
   }
 
   /** Delete removes the selected connections; people and teams stay. */
-  remove({ edgeIds }: DeleteRequest) {
+  protected remove({ edgeIds }: DeleteRequest) {
     this.edges.set(removeElements({ edgeIds }, { nodes: this.nodes, edges: this.edges() }).edges);
   }
 
   /** A person may leave its team while dragged; the drop decides the new team. */
-  dragStart({ nodes }: NodeDragEvent) {
+  protected dragStart({ nodes }: NodeDragEvent) {
     for (const node of this.movedPeople(nodes)) {
       this.origins.set(node.id, { parentId: node.parentId()!, point: node.point() });
       node.extent.set(null);
     }
   }
 
-  drag({ node }: NodeDragEvent) {
+  protected drag({ node }: NodeDragEvent) {
     if (!this.isPerson(node.id)) return this.dropTarget.set(null);
     const team = this.teamUnder(node.id) ?? this.node(node.id).parentId()!;
     this.dropTarget.set({ team, state: this.landing(node.id, team) ? 'ok' : 'full' });
   }
 
   /** Moves each dropped person to a free spot of the team under its center; without room, back where it was. */
-  dragEnd({ nodes }: NodeDragEvent) {
+  protected dragEnd({ nodes }: NodeDragEvent) {
     for (const node of this.movedPeople(nodes)) {
       const origin = this.origins.get(node.id)!;
       const team = this.teamUnder(node.id) ?? origin.parentId;
@@ -214,7 +204,7 @@ export class RelationshipsDemoComponent implements TeamBoard {
 
   /** The free spot of a team nearest to where the person is, clear of the header, the border and other members. */
   private landing(id: string, teamId: string): Point | null {
-    const flow = this.flow()!;
+    const flow = this.flow();
     const box = flow.getNodeRect(teamId)!;
     const rect = flow.getNodeRect(id)!;
     const others = this.nodes
@@ -264,7 +254,7 @@ export class RelationshipsDemoComponent implements TeamBoard {
   }
 
   private teamUnder(id: string) {
-    const flow = this.flow()!;
+    const flow = this.flow();
     const rect = flow.getNodeRect(id)!;
     const center = { x: rect.x + rect.width / 2, y: rect.y + rect.height / 2 };
     // Selection elevates a node, so the topmost team is not always the innermost one: compare depths instead.

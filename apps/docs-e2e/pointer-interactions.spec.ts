@@ -66,10 +66,12 @@ test('drops a reconnected edge on the canvas without panning the viewport', asyn
   const start = await viewport(graph);
   const handle = graph.locator('[data-v-reconnect-handle]').first();
   const from = await center(handle);
+  // The graph is fitted to the center of the pane, where the gap between its two rows of nodes is empty canvas.
+  const to = await center(graph.locator('.v-pane'));
 
   await page.mouse.move(from.x, from.y);
   await page.mouse.down();
-  await page.mouse.move(from.x + 40, from.y + 120, { steps: 8 });
+  await page.mouse.move(to.x, to.y, { steps: 8 });
   await page.mouse.up();
 
   // The demo removes an edge whose reconnection is dropped.

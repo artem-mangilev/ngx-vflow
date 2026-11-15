@@ -8,6 +8,7 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
+import { DemoIconComponent, DemoIconName, DocsKit, SCENE_BACKGROUND } from '@docs/shared';
 import { Vui } from '@vflow/ui';
 import {
   addEdges,
@@ -23,9 +24,6 @@ import {
   Vflow,
   VflowComponent,
 } from 'ngx-vflow';
-import { DemoIconComponent, DemoIconName } from '../../../../shared/demo-icon.component';
-import { injectDocsTheme } from '../../../../shared/docs-theme';
-import { SCENE_BACKGROUND } from '../../../../shared/demo-scene';
 import { BLEND_MODES, BlendMode, FILTERS, FilterFn, Picture, PortType, renderPicture, SAMPLES } from './image-lab';
 import { PictureComponent } from './picture.component';
 
@@ -44,128 +42,42 @@ interface Port {
 
 const EXPORT = { width: 1200, height: 780 };
 
+/**
+ * Port color by type is the application's; the library knows nothing about images. Only the idle look is recolored,
+ * including the tone of the hover halo, so connection feedback (valid, invalid) keeps the library colors. The
+ * utilities are important because they replace colors the port part sets for the same states.
+ */
+const TYPED_PORT = `data-[v-handle-state=idle]:[--vui-tone:var(--type)] data-[v-handle-state=idle]:border-(--type)!
+  data-[v-handle-state=idle]:data-[vui-connected=true]:bg-(--type)!`;
+
+const PORT_COLOR: Record<PortType, string> = {
+  image: `[--type:var(--color-violet-500)] ${TYPED_PORT}`,
+  number: `[--type:var(--color-green-600)] ${TYPED_PORT}`,
+};
+
+/**
+ * The icon of a node says what it does: a source has the color of what it produces, processing and the result have
+ * their own.
+ */
+const KIND_COLOR: Record<LabData['kind'], string> = {
+  source: '[--icon-color:var(--color-violet-500)]',
+  number: '[--icon-color:var(--color-green-600)]',
+  filter: '[--icon-color:var(--color-orange-600)]',
+  blend: '[--icon-color:var(--color-orange-600)]',
+  output: '[--icon-color:var(--color-cyan-600)]',
+};
+
 /** A small image editor: typed ports, previews that follow the wiring, native controls and a palette inside nodes. */
 @Component({
   selector: 'app-ui-pipeline-demo',
-  imports: [Vflow, Vui, DemoIconComponent, PictureComponent],
+  imports: [Vflow, Vui, DocsKit, DemoIconComponent, PictureComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styles: `
-    /* Tall enough for the scene to fit by its width on every docs layout (the flow is at most 959px wide), which
-       leaves the palette and the viewport controls a free band above and below the nodes. */
-    vflow {
-      height: 700px;
-    }
-    /* A dense editor scale: 13px for titles and rows, 12px for labels and meta. */
-    article {
-      width: 220px;
-      font-size: 13px;
-    }
-    article[data-kind='output'] {
-      width: 320px;
-    }
-    /* Port color by type is application CSS on the public selector; the library knows nothing about images.
-       Only the idle look is recolored, including the tone of the hover halo, so connection feedback (valid, invalid)
-       keeps the library colors. */
-    :host {
-      --type-image: #8b5cf6;
-      --type-number: #16a34a;
-    }
-    .vui-port[data-type='image'] {
-      --type: var(--type-image);
-    }
-    .vui-port[data-type='number'] {
-      --type: var(--type-number);
-    }
-    /* The icon of a node says what it does: a source has the color of what it produces, processing and the result
-       have their own. */
-    article[data-kind='source'] .node-icon {
-      --icon-color: var(--type-image);
-    }
-    article[data-kind='number'] .node-icon {
-      --icon-color: var(--type-number);
-    }
-    article[data-kind='filter'] .node-icon,
-    article[data-kind='blend'] .node-icon {
-      --icon-color: oklch(0.646 0.222 41.116);
-    }
-    article[data-kind='output'] .node-icon {
-      --icon-color: oklch(0.609 0.126 221.723);
-    }
-    .vui-port[data-type][data-v-handle-state='idle'] {
-      --vui-tone: var(--type);
-      border-color: var(--type);
-    }
-    .vui-port[data-type][data-v-handle-state='idle'][data-vui-connected='true'] {
-      background: var(--type);
-    }
-    .vui-edge[data-type='number'] {
-      stroke-dasharray: 4 4;
-    }
-    .vui-row.output {
-      justify-content: flex-end;
-      text-align: end;
-    }
-    .vui-row.output .vui-title {
-      flex: none;
-    }
-    .vui-row input[type='range'] {
-      flex: 1;
-      min-width: 0;
-    }
-    .vui-row .vui-title {
-      flex: none;
-    }
-    .value {
-      min-width: 34px;
-      text-align: end;
-      font-variant-numeric: tabular-nums;
-    }
-    .preview {
-      display: grid;
-      place-items: center;
-      aspect-ratio: 20 / 13;
-      overflow: hidden;
-      border-radius: var(--vui-radius);
-      background: var(--vui-surface-muted);
-    }
-    .setting {
-      display: grid;
-      gap: 4px;
-      margin-top: 8px;
-    }
-    .setting .select {
-      width: 100%;
-    }
-    .number {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .number .stat {
-      flex: 1;
-    }
-    .slider {
-      display: block;
-      width: 100%;
-      margin: 6px 0 0;
-    }
-    .linked {
-      flex: 1;
-      text-align: end;
-    }
-    .palette {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      z-index: 2;
-    }
-    .palette {
-      padding-left: 8px;
-    }
-  `,
+  host: { class: 'block' },
   template: `
-    <section class="demo" aria-label="Image lab demo" [attr.data-vui-theme]="theme()">
-      <div class="stage">
+    <docs-demo framed role="region" aria-label="Image lab demo">
+      <!-- Tall enough for the scene to fit by its width on every docs layout (the flow is at most 959px wide), which
+           leaves the palette and the viewport controls a free band above and below the nodes. -->
+      <div class="h-175">
         <vflow
           [nodes]="nodes()"
           [edges]="edges()"
@@ -173,17 +85,24 @@ const EXPORT = { width: 1200, height: 780 };
           [connection]="connection"
           (connect)="connect($event)"
           (deleteRequest)="remove($event)"
-          (initialized)="flow()?.fitView()">
-          <ng-template let-ctx vNode>
+          (initialized)="flow().fitView({ maxZoom: 1 })">
+          <ng-template let-ctx vNode [vNodeOf]="nodes()">
             @let data = ctx.data();
-            <article vuiNode [attr.data-kind]="data.kind" [attr.data-stage]="ctx.node.id">
+            <!-- A dense editor scale: 13px for titles and rows, 12px for labels and meta. -->
+            <article
+              vuiNode
+              class="text-[13px]"
+              [class]="data.kind === 'output' ? 'w-80' : 'w-55'"
+              [attr.data-stage]="ctx.node.id">
               <header vuiNodeHeader>
-                <span class="node-icon tile"><app-demo-icon [name]="icon(data)" /></span>
+                <span docsNodeIcon tile [class]="kindColor[data.kind]"><app-demo-icon [name]="icon(data)" /></span>
                 <span vuiTitle>{{ title(data) }}</span>
                 @if (data.kind === 'source') {
                   <input #file type="file" accept="image/*" hidden (change)="upload(ctx.node.id, file)" />
                   <button
-                    class="button plain small icon"
+                    docsButton="plain"
+                    small
+                    icon
                     vNoDrag
                     type="button"
                     [attr.aria-label]="'Upload a picture to ' + data.title"
@@ -192,12 +111,14 @@ const EXPORT = { width: 1200, height: 780 };
                   </button>
                 }
               </header>
-              <div class="node-body">
+              <div class="p-vui-3">
                 @if (data.kind === 'number') {
-                  <div class="number">
-                    <span class="stat">{{ percent(data.value) }}</span>
+                  <div class="flex items-center gap-2">
+                    <span class="flex-1 text-xl font-semibold tabular-nums">{{ percent(data.value) }}</span>
                     <button
-                      class="button small icon"
+                      docsButton
+                      small
+                      icon
                       vNoDrag
                       type="button"
                       [attr.aria-label]="data.playing ? 'Pause the wave' : 'Play a wave'"
@@ -205,20 +126,24 @@ const EXPORT = { width: 1200, height: 780 };
                       <app-demo-icon [name]="data.playing ? 'pause' : 'play'" />
                     </button>
                   </div>
-                  <input
-                    class="range slider"
-                    vNoDrag
-                    vNoWheel
-                    type="range"
-                    min="0"
-                    max="1"
-                    step="0.01"
-                    aria-label="Number value"
-                    [style.--fill.%]="data.value * 100"
-                    [value]="data.value"
-                    (input)="patch(ctx.node.id, { value: +$any($event.target).value, playing: false })" />
+                  <div class="mt-1.5 flex">
+                    <input
+                      docsRange
+                      class="flex-1 min-w-0"
+                      vNoDrag
+                      vNoWheel
+                      type="range"
+                      min="0"
+                      max="1"
+                      step="0.01"
+                      aria-label="Number value"
+                      [value]="data.value"
+                      (input)="patch(ctx.node.id, { value: +$any($event.target).value, playing: false })" />
+                  </div>
                 } @else {
-                  <div class="preview" [attr.data-preview]="ctx.node.id">
+                  <div
+                    class="grid aspect-20/13 place-items-center overflow-hidden rounded-vui-control bg-vui-surface-muted"
+                    [attr.data-preview]="ctx.node.id">
                     @if (pictures().get(ctx.node.id); as picture) {
                       <app-picture [picture]="picture" [width]="data.kind === 'output' ? 296 : 196" />
                     } @else {
@@ -227,9 +152,9 @@ const EXPORT = { width: 1200, height: 780 };
                   </div>
                 }
                 @if (data.kind === 'source') {
-                  <label class="setting caption">
+                  <label class="mt-2 grid gap-1 text-xs text-vui-muted">
                     Picture
-                    <select class="select" vNoDrag (change)="pick(ctx.node.id, $any($event.target).value)">
+                    <select docsSelect class="w-full" vNoDrag (change)="pick(ctx.node.id, $any($event.target).value)">
                       @for (sample of samples; track sample.id) {
                         <option [value]="sample.id" [selected]="sample.id === data.sample">{{ sample.name }}</option>
                       }
@@ -240,9 +165,13 @@ const EXPORT = { width: 1200, height: 780 };
                   </label>
                 }
                 @if (data.kind === 'blend') {
-                  <label class="setting caption">
+                  <label class="mt-2 grid gap-1 text-xs text-vui-muted">
                     Mode
-                    <select class="select" vNoDrag (change)="patch(ctx.node.id, { mode: $any($event.target).value })">
+                    <select
+                      docsSelect
+                      class="w-full"
+                      vNoDrag
+                      (change)="patch(ctx.node.id, { mode: $any($event.target).value })">
                       @for (mode of modes; track mode) {
                         <option [value]="mode" [selected]="mode === data.mode">{{ mode }}</option>
                       }
@@ -256,63 +185,69 @@ const EXPORT = { width: 1200, height: 780 };
                     vuiPort
                     handleType="target"
                     position="left"
+                    [class]="portColor[port.type]"
                     [handleId]="'in:' + port.id"
-                    [attr.data-type]="port.type"
                     [vuiPortConnected]="connected().has(ctx.node.id + '/in:' + port.id)"></span>
-                  <span vuiTitle>{{ port.name }}</span>
+                  <span>{{ port.name }}</span>
                   @if (port.id === 'amount') {
                     <!-- A connected number owns the amount: the row names it instead of offering a dead slider. -->
                     @if (amountSource(ctx.node.id); as source) {
-                      <span vuiMeta class="linked" data-testid="linked">from {{ source }}</span>
+                      <span vuiMeta class="flex-1 text-end" data-testid="linked">from {{ source }}</span>
                     } @else {
                       <input
+                        docsRange
+                        class="flex-1 min-w-0"
                         vNoDrag
                         vNoWheel
                         type="range"
                         min="0"
                         max="1"
                         step="0.01"
-                        class="range"
-                        [style.--fill.%]="(amounts().get(ctx.node.id) ?? 0) * 100"
                         [attr.aria-label]="title(data) + ' amount'"
                         [value]="amounts().get(ctx.node.id)"
                         (input)="patch(ctx.node.id, { amount: +$any($event.target).value })" />
                     }
-                    <span vuiMeta class="value">{{ percent(amounts().get(ctx.node.id) ?? 0) }}</span>
+                    <span vuiMeta class="min-w-8.5 text-end tabular-nums">{{
+                      percent(amounts().get(ctx.node.id) ?? 0)
+                    }}</span>
                   }
                 </div>
               }
               @for (port of ports(data).outputs; track port.id) {
-                <div vuiRow class="output" [attr.data-port]="port.id">
-                  <span vuiTitle>{{ port.name }}</span>
+                <div vuiRow class="justify-end" [attr.data-port]="port.id">
+                  <span>{{ port.name }}</span>
                   <span
                     vuiPort
                     handleType="source"
                     position="right"
+                    [class]="portColor[port.type]"
                     [handleId]="'out:' + port.id"
-                    [attr.data-type]="port.type"
                     [vuiPortConnected]="connected().has(ctx.node.id + '/out:' + port.id)"></span>
                 </div>
               }
               @if (data.kind === 'output') {
                 <footer vuiNodeFooter>
                   <span vuiMeta>{{ exportSize.width }}×{{ exportSize.height }} PNG</span>
-                  <span class="node-actions">
-                    <button
-                      class="button primary small"
-                      vNoDrag
-                      type="button"
-                      [disabled]="!pictures().get(ctx.node.id)"
-                      (click)="download(ctx.node.id)">
-                      <app-demo-icon name="download" /> Download
-                    </button>
-                  </span>
+                  <button
+                    docsButton="primary"
+                    small
+                    class="ms-auto"
+                    vNoDrag
+                    type="button"
+                    [disabled]="!pictures().get(ctx.node.id)"
+                    (click)="download(ctx.node.id)">
+                    <app-demo-icon name="download" /> Download
+                  </button>
                 </footer>
               }
             </article>
           </ng-template>
+          <!-- A number travels along a dashed edge. -->
           <svg:g *vEdge="let ctx" vEdgeInteractionArea>
-            <svg:path vuiEdge [attr.d]="ctx.path()" [attr.data-type]="ctx.data()?.type" />
+            <svg:path
+              vuiEdge
+              [attr.d]="ctx.path()"
+              [attr.stroke-dasharray]="ctx.data()?.type === 'number' ? '4 4' : null" />
           </svg:g>
           <ng-template let-ctx vConnection>
             @if (ctx.path(); as path) {
@@ -320,40 +255,35 @@ const EXPORT = { width: 1200, height: 780 };
             }
           </ng-template>
         </vflow>
-        <div vuiToolbar class="palette">
-          <app-demo-icon name="plus" />
-          <select
-            #palette
-            class="select plain"
-            aria-label="Add a node"
-            (change)="add(palette.value); palette.value = ''">
-            <option value="" disabled selected>Add node</option>
-            @for (fn of filters; track fn) {
-              <option [value]="fn">{{ filterLabel(fn) }}</option>
-            }
-            <option value="blend">Blend</option>
-            <option value="number">Number</option>
-          </select>
-        </div>
-        @if (flow(); as flow) {
-          <vui-controls class="stage-controls" [flow]="flow" />
-        }
       </div>
-    </section>
+      <div vuiToolbar class="absolute top-2.5 left-2.5 z-2 pl-2" data-testid="palette">
+        <app-demo-icon name="plus" />
+        <select #palette docsSelect plain aria-label="Add a node" (change)="add(palette.value); palette.value = ''">
+          <option value="" disabled selected>Add node</option>
+          @for (fn of filters; track fn) {
+            <option [value]="fn">{{ filterLabel(fn) }}</option>
+          }
+          <option value="blend">Blend</option>
+          <option value="number">Number</option>
+        </select>
+      </div>
+      <vui-controls class="absolute bottom-2.5 left-2.5 z-2" [flow]="flow()" />
+    </docs-demo>
   `,
 })
 export class PipelineDemoComponent {
-  readonly flow = viewChild(VflowComponent);
-  readonly theme = injectDocsTheme();
-  readonly background = SCENE_BACKGROUND;
-  readonly samples = SAMPLES;
-  readonly modes = BLEND_MODES;
-  readonly filters = Object.keys(FILTERS) as FilterFn[];
-  readonly exportSize = EXPORT;
+  protected readonly flow = viewChild.required(VflowComponent);
+  protected readonly background = SCENE_BACKGROUND;
+  protected readonly samples = SAMPLES;
+  protected readonly modes = BLEND_MODES;
+  protected readonly filters = Object.keys(FILTERS) as FilterFn[];
+  protected readonly exportSize = EXPORT;
+  protected readonly kindColor = KIND_COLOR;
+  protected readonly portColor = PORT_COLOR;
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
   private frame = 0;
 
-  readonly nodes = signal(
+  protected readonly nodes = signal(
     createNodes<LabData>([
       lab('wave', { x: 0, y: 0 }, { kind: 'number', value: 0.25, playing: false }),
       lab('photo', { x: 0, y: 170 }, source('Photo', 'sunset')),
@@ -364,7 +294,7 @@ export class PipelineDemoComponent {
       lab('output', { x: 900, y: 250 }, { kind: 'output' }),
     ]),
   );
-  readonly edges = signal<Edge[]>(
+  protected readonly edges = signal<Edge[]>(
     createEdges([
       wire('wave', 'value', 'hue', 'amount', 'number'),
       wire('photo', 'image', 'hue', 'image'),
@@ -376,7 +306,7 @@ export class PipelineDemoComponent {
   );
 
   /** `${nodeId}/${handleId}` for every endpoint of an existing edge. */
-  readonly connected = computed(
+  protected readonly connected = computed(
     () =>
       new Set(
         this.edges().flatMap((edge) => [`${edge.source}/${edge.sourceHandle}`, `${edge.target}/${edge.targetHandle}`]),
@@ -384,7 +314,7 @@ export class PipelineDemoComponent {
   );
 
   /** The amount of every filter: a connected number wins over the slider of the node. */
-  readonly amounts = computed(() => {
+  protected readonly amounts = computed(() => {
     const amounts = new Map<string, number>();
     for (const node of this.nodes()) {
       const data = node.data();
@@ -396,7 +326,7 @@ export class PipelineDemoComponent {
   });
 
   /** What every node outputs, evaluated along the edges; `null` while a required input is missing. */
-  readonly pictures = computed(() => {
+  protected readonly pictures = computed(() => {
     const pictures = new Map<string, Picture | null>();
     const evaluate = (id: string | undefined): Picture | null => {
       if (!id) return null;
@@ -431,7 +361,7 @@ export class PipelineDemoComponent {
   });
 
   /** Ports of the same type connect, and an edge may not close a cycle: the pictures are evaluated along the edges. */
-  readonly connection: ConnectionSettings = {
+  protected readonly connection: ConnectionSettings = {
     validator: (c) => {
       const source = this.port(c.source, 'outputs', c.sourceHandle);
       const target = this.port(c.target, 'inputs', c.targetHandle);
@@ -444,7 +374,7 @@ export class PipelineDemoComponent {
   }
 
   /** An input takes one edge: a new connection replaces the old one. */
-  connect(connection: Connection) {
+  protected connect(connection: Connection) {
     const type = this.port(connection.source, 'outputs', connection.sourceHandle)!.type;
     const edge = createEdge({ ...connection, id: crypto.randomUUID(), data: { type } });
     this.edges.update((edges) =>
@@ -456,7 +386,7 @@ export class PipelineDemoComponent {
   }
 
   /** Delete removes the selection; the output stays, the result needs a place to land. */
-  remove({ nodeIds, edgeIds }: DeleteRequest) {
+  protected remove({ nodeIds, edgeIds }: DeleteRequest) {
     const result = removeElements(
       { nodeIds: nodeIds.filter((id) => this.data(id)?.kind !== 'output'), edgeIds },
       { nodes: this.nodes(), edges: this.edges() },
@@ -466,7 +396,7 @@ export class PipelineDemoComponent {
   }
 
   /** Adds a node from the palette in the middle of the visible area. */
-  add(kind: string) {
+  protected add(kind: string) {
     const data: LabData =
       kind === 'blend'
         ? { kind: 'blend', mode: 'multiply' }
@@ -474,7 +404,7 @@ export class PipelineDemoComponent {
           ? { kind: 'number', value: 0.5, playing: false }
           : { kind: 'filter', fn: kind as FilterFn, amount: FILTERS[kind as FilterFn].amount };
     const stage = this.host.querySelector('vflow')!.getBoundingClientRect();
-    const center = this.flow()!.clientToFlowPosition({
+    const center = this.flow().clientToFlowPosition({
       x: stage.left + stage.width / 2,
       y: stage.top + stage.height / 2,
     });
@@ -482,16 +412,16 @@ export class PipelineDemoComponent {
     this.nodes.update((nodes) => [...nodes, createNode(node)]);
   }
 
-  patch(id: string, patch: object) {
+  protected patch(id: string, patch: object) {
     this.node(id).data.update((data) => ({ ...data, ...patch }) as LabData);
   }
 
-  pick(id: string, sample: string) {
+  protected pick(id: string, sample: string) {
     const found = SAMPLES.find((s) => s.id === sample);
     if (found) this.patch(id, { sample, src: found.src });
   }
 
-  upload(id: string, input: HTMLInputElement) {
+  protected upload(id: string, input: HTMLInputElement) {
     const file = input.files?.[0];
     if (!file) return;
     const previous = this.data(id);
@@ -501,7 +431,7 @@ export class PipelineDemoComponent {
   }
 
   /** A playing number follows a sine wave, so every picture downstream animates. */
-  togglePlaying(id: string) {
+  protected togglePlaying(id: string) {
     const data = this.data(id);
     if (data?.kind !== 'number') return;
     this.patch(id, { playing: !data.playing });
@@ -521,7 +451,7 @@ export class PipelineDemoComponent {
   }
 
   /** Only the export rasterizes: the same operations, on a canvas. */
-  async download(id: string) {
+  protected async download(id: string) {
     const picture = this.pictures().get(id);
     if (!picture) return;
     const canvas = await renderPicture(picture, EXPORT.width, EXPORT.height);
@@ -535,7 +465,7 @@ export class PipelineDemoComponent {
     }, 'image/png');
   }
 
-  ports(data: LabData): { inputs: Port[]; outputs: Port[] } {
+  protected ports(data: LabData): { inputs: Port[]; outputs: Port[] } {
     const image = (id: string, name = 'Image'): Port => ({ id, name, type: 'image' });
     switch (data.kind) {
       case 'source':
@@ -554,25 +484,25 @@ export class PipelineDemoComponent {
     }
   }
 
-  readonly title = title;
+  protected readonly title = title;
 
-  icon(data: LabData): DemoIconName {
+  protected icon(data: LabData): DemoIconName {
     return { source: 'image', filter: 'sliders', blend: 'layers', number: 'waveform', output: 'download' }[
       data.kind
     ] as DemoIconName;
   }
 
-  filterLabel(fn: FilterFn) {
+  protected filterLabel(fn: FilterFn) {
     return FILTERS[fn].label;
   }
 
   /** Title of the node wired into a filter's amount. */
-  amountSource(id: string) {
+  protected amountSource(id: string) {
     const data = this.data(this.source(id, 'amount'));
     return data && title(data);
   }
 
-  percent(value: number) {
+  protected percent(value: number) {
     return Math.round(value * 100) + '%';
   }
 

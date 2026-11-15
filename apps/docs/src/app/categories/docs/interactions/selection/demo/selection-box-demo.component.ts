@@ -1,104 +1,51 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import { DocsPresentations } from '@docs/shared';
-import { Edge, Node, SelectionBoxMode, Vflow, createNodes } from 'ngx-vflow';
+import { DocsKit, DocsPresentations } from '@docs/shared';
+import { SelectionBoxMode, Vflow, createEdges, createNodes } from 'ngx-vflow';
 
 @Component({
-  template: `
-    <div class="controls">
-      <button type="button" [class.active]="mode() === 'full'" (click)="setMode('full')">Mode: full</button>
-      <button type="button" [class.active]="mode() === 'partial'" (click)="setMode('partial')">Mode: partial</button>
-      <span class="hint">Hold Shift and drag on canvas</span>
+  template: `<docs-demo>
+    <div docsDemoBar>
+      <label>
+        Mode
+        <select docsSelect aria-label="Selection box mode" (change)="setMode($event)">
+          <option value="full">full</option>
+          <option value="partial">partial</option>
+        </select>
+      </label>
+      <p>Hold Shift and drag a box over the nodes.</p>
     </div>
 
-    <vflow [nodes]="nodes" [edges]="edges" [selectionBoxMode]="mode()">
+    <vflow
+      #flow
+      [nodes]="nodes"
+      [edges]="edges"
+      [selectionBoxMode]="mode()"
+      (initialized)="flow.fitView({ maxZoom: 1 })">
       <docs-node *vNode="let ctx" [ctx]="ctx" />
       <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
     </vflow>
-  `,
-  styles: [
-    `
-      :host {
-        width: 100%;
-        height: 100%;
-        display: grid;
-        grid-template-rows: auto 1fr;
-        gap: 8px;
-      }
-
-      .controls {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-      }
-
-      button {
-        border: 1px solid #cfd8dc;
-        background: #fff;
-        color: #0f4c75;
-        border-radius: 6px;
-        padding: 6px 10px;
-        cursor: pointer;
-      }
-
-      button.active {
-        background: #0f4c75;
-        color: #fff;
-      }
-
-      .hint {
-        color: #4a6572;
-        font-size: 12px;
-      }
-    `,
-  ],
+  </docs-demo>`,
+  host: { class: 'block size-full' },
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DocsPresentations, Vflow],
+  imports: [DocsKit, DocsPresentations, Vflow],
 })
 export class SelectionBoxDemoComponent {
-  public mode = signal<SelectionBoxMode>('full');
+  protected readonly mode = signal<SelectionBoxMode>('full');
 
-  public setMode(mode: SelectionBoxMode) {
-    this.mode.set(mode);
-  }
-
-  public nodes: Node[] = createNodes([
-    {
-      id: '1',
-      point: { x: 40, y: 120 },
-      data: { text: 'Node 1' },
-    },
-    {
-      id: '2',
-      point: { x: 260, y: 150 },
-      data: { text: 'Node 2' },
-    },
-    {
-      id: '3',
-      point: { x: 430, y: 95 },
-      data: { text: 'Node 3' },
-    },
-    {
-      id: '4',
-      point: { x: 360, y: 300 },
-      data: { text: 'Node 4' },
-    },
+  protected readonly nodes = createNodes([
+    { id: 'order', point: { x: 0, y: 50 }, data: { text: 'Order' } },
+    { id: 'payment', point: { x: 180, y: 50 }, data: { text: 'Payment' } },
+    { id: 'shipping', point: { x: 360, y: 0 }, data: { text: 'Shipping' } },
+    { id: 'invoice', point: { x: 360, y: 100 }, data: { text: 'Invoice' } },
   ]);
 
-  public edges: Edge[] = [
-    {
-      id: '1 -> 2',
-      source: '1',
-      target: '2',
-    },
-    {
-      id: '2 -> 3',
-      source: '2',
-      target: '3',
-    },
-    {
-      id: '2 -> 4',
-      source: '2',
-      target: '4',
-    },
-  ];
+  protected readonly edges = createEdges([
+    { id: 'order-payment', source: 'order', target: 'payment' },
+    { id: 'payment-shipping', source: 'payment', target: 'shipping' },
+    { id: 'payment-invoice', source: 'payment', target: 'invoice' },
+  ]);
+
+  protected setMode(event: Event): void {
+    this.mode.set((event.target as HTMLSelectElement).value as SelectionBoxMode);
+  }
 }

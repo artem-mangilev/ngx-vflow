@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
+import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterLink, RouterOutlet } from '@angular/router';
 import {
@@ -9,13 +10,13 @@ import {
 } from '@ng-doc/app';
 import { NgDocButtonIconComponent, NgDocIconComponent, NgDocTooltipDirective } from '@ng-doc/ui-kit';
 import { filter, map } from 'rxjs';
+import { injectDocsTheme } from './shared/docs-theme';
 import { SectionSidebarComponent } from './shell/section-sidebar.component';
 import { Section, SECTION_TABS, tabOfUrl } from './shell/sections';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     RouterOutlet,
@@ -52,4 +53,12 @@ export class AppComponent {
 
     return tab === 'showcase' ? null : tab;
   });
+
+  constructor() {
+    // Every flow of the site takes the vflow UI theme of the docs theme: the scope is the document itself.
+    const theme = injectDocsTheme();
+    const root = inject(DOCUMENT).documentElement;
+
+    effect(() => root.setAttribute('data-vui-theme', theme()));
+  }
 }

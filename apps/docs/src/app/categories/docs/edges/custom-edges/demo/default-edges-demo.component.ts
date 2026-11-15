@@ -1,54 +1,25 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { DocsPresentations } from '@docs/shared';
-import { createEdges, createNodes, Vflow } from 'ngx-vflow';
+import { Vflow, createEdges, createNodes } from 'ngx-vflow';
 
 @Component({
-  template: `<vflow [nodes]="nodes" [edges]="edges">
+  template: `<vflow #flow [nodes]="nodes" [edges]="edges" (initialized)="flow.fitView({ maxZoom: 1 })">
     <docs-node *vNode="let ctx" [ctx]="ctx" />
     <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
   </vflow>`,
-  styles: [
-    `
-      :host {
-        width: 100%;
-        height: 100%;
-      }
-    `,
-  ],
+  host: { class: 'block size-full' },
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [DocsPresentations, Vflow],
 })
 export class DefaultEdgesDemoComponent {
-  public nodes = createNodes([
-    {
-      id: '1',
-      point: { x: 10, y: 200 },
-      data: { text: '1' },
-    },
-    {
-      id: '2',
-      point: { x: 200, y: 100 },
-      data: { text: '2' },
-    },
-    {
-      id: '3',
-      point: { x: 200, y: 300 },
-      data: { text: '3' },
-    },
+  protected readonly nodes = createNodes([
+    { id: 'commit', point: { x: 0, y: 45 }, data: { text: 'Commit' } },
+    { id: 'build', point: { x: 220, y: 0 }, data: { text: 'Build' } },
+    { id: 'lint', point: { x: 220, y: 90 }, data: { text: 'Lint' } },
   ]);
 
-  public edges = createEdges([
-    {
-      id: '1 -> 2',
-      source: '1',
-      target: '2',
-      selected: true,
-    },
-    {
-      id: '1 -> 3',
-      source: '1',
-      target: '3',
-      selected: true,
-    },
+  protected readonly edges = createEdges([
+    { id: 'commit-build', source: 'commit', target: 'build' },
+    { id: 'commit-lint', source: 'commit', target: 'lint' },
   ]);
 }

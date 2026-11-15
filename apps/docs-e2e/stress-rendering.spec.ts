@@ -4,40 +4,49 @@ test('virtualization demo retains node DOM and geometry through viewport pan', a
   await page.goto('/docs/performance/virtualization');
   const nodes = page.locator('[data-v-node]');
   await expect(nodes).toHaveCount(4900);
-  await expect(nodes.first()).toHaveCSS('visibility', 'visible');
   await page.locator('.v-pane').scrollIntoViewIfNeeded();
-  const first = await nodes.first().elementHandle();
-  const handleTop = await first!.evaluate(
-    (node) => node.querySelector<HTMLElement>('[data-v-handle][data-v-handle-position="right"]')!.style.top,
-  );
   await expect
     .poll(() => nodes.evaluateAll((items) => items.filter((node) => getComputedStyle(node).display === 'none').length))
     .toBeGreaterThan(0);
   await expect(page.locator('canvas')).toHaveCount(0);
-  const box = (await nodes.first().boundingBox())!;
-  // Start between rows, clear of both nodes and edge interaction strokes.
-  const start = { x: box.x + box.width + 10, y: box.y + box.height + 25 };
+  // The demo opens on the middle of the graph: the node under test is the first one that lies whole in the pane.
+  const id = await page.locator('vflow').evaluate((flow) => {
+    const pane = flow.querySelector('.v-pane')!.getBoundingClientRect();
+    const inside = Array.from(flow.querySelectorAll<HTMLElement>('[data-v-node]')).find((node) => {
+      const rect = node.getBoundingClientRect();
+      return rect.width > 0 && rect.left >= pane.left && rect.top >= pane.top;
+    });
+    return inside!.getAttribute('data-v-node');
+  });
+  const node = page.locator(`[data-v-node="${id}"]`);
+  await expect(node).toHaveCSS('visibility', 'visible');
+  const handle = await node.elementHandle();
+  const handleTop = await handle!.evaluate(
+    (element) => element.querySelector<HTMLElement>('[data-v-handle][data-v-handle-position="right"]')!.style.top,
+  );
+  const box = (await node.boundingBox())!;
+  const pane = (await page.locator('.v-pane').boundingBox())!;
+  // Rows are a node height apart and no edge joins two rows, so the middle of the gap under the node is free canvas.
+  const start = { x: pane.x + pane.width / 2, y: box.y + box.height * 1.5 };
   await page.mouse.move(start.x, start.y);
   await page.mouse.down();
   await page.mouse.move(start.x - 450, start.y, { steps: 12 });
   await page.mouse.up();
-  await expect(nodes.first()).toHaveCSS('display', 'none');
-  expect(await first!.evaluate((node) => node.isConnected)).toBe(true);
+  await expect(node).toHaveCSS('display', 'none');
+  expect(await handle!.evaluate((element) => element.isConnected)).toBe(true);
   expect(
-    await first!.evaluate(
-      (node) => node.querySelector<HTMLElement>('[data-v-handle][data-v-handle-position="right"]')!.style.top,
+    await handle!.evaluate(
+      (element) => element.querySelector<HTMLElement>('[data-v-handle][data-v-handle-position="right"]')!.style.top,
     ),
   ).toBe(handleTop);
-  const pane = (await page.locator('.v-pane').boundingBox())!;
-  // Return via a gap between columns in the translated graph.
-  const back = { x: pane.x + 125, y: pane.y + box.height + 25 };
-  await page.mouse.move(back.x, back.y);
+  // The pan was horizontal, so the same gap is still under the pointer.
+  await page.mouse.move(start.x, start.y);
   await page.mouse.down();
-  await page.mouse.move(back.x + 450, back.y, { steps: 12 });
+  await page.mouse.move(start.x + 450, start.y, { steps: 12 });
   await page.mouse.up();
-  await expect(nodes.first()).not.toHaveCSS('display', 'none');
-  await expect(nodes.first()).toHaveCSS('visibility', 'visible');
-  expect(await first!.evaluate((node) => node.isConnected)).toBe(true);
+  await expect(node).not.toHaveCSS('display', 'none');
+  await expect(node).toHaveCSS('visibility', 'visible');
+  expect(await handle!.evaluate((element) => element.isConnected)).toBe(true);
 });
 
 test('stress demo reveals custom nodes and edges with positioned handles', async ({ page }) => {
@@ -51,7 +60,7 @@ test('stress demo reveals custom nodes and edges with positioned handles', async
         const misplaced: string[] = [];
         for (const node of nodes) {
           if (getComputedStyle(node).visibility !== 'visible') continue;
-          const anchor = node.querySelector('.stress-node')?.getBoundingClientRect();
+          const anchor = node.querySelector('[data-testid="stress-node"]')?.getBoundingClientRect();
           if (!anchor) continue;
           for (const handle of node.querySelectorAll<HTMLElement>('[data-v-handle]')) {
             const rect = handle.getBoundingClientRect();
@@ -84,7 +93,7 @@ test('stress demo reveals custom nodes and edges with positioned handles', async
       .locator('[data-v-node]')
       .evaluateAll((nodes) => nodes.filter((node) => getComputedStyle(node).display === 'none').length),
   ).toBe(0);
-  await expect(page.locator('.stress-node')).toHaveCount(1024);
+  await expect(page.getByTestId('stress-node')).toHaveCount(1024);
   await expect(page.locator('default-node')).toHaveCount(0);
   await expect(page.locator('svg[edge] .vui-edge')).toHaveCount(1023);
   expect(samples.at(-1).visibleEdges).toBe(1023);

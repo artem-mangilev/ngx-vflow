@@ -1,6 +1,6 @@
 One flow with most of the features together: component nodes, a group with child nodes, a resizable node, a node toolbar, animated and labelled edges, an edge with a delete button, alignment guides and a minimap. Drag the nodes and connect the handles.
 
-{{ NgDocActions.demo("AllFeaturesDemoComponent", { container: false }) }}
+{{ NgDocActions.demoPane("AllFeaturesDemoComponent") }}
 
 ```typescript group="feature-overview" name="all-features-demo.component.ts" file="./demo/all-features-demo.component.ts"
 

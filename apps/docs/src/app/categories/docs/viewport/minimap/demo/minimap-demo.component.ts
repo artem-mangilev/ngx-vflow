@@ -1,107 +1,42 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { DocsPresentations } from '@docs/shared';
-import { VuiPort } from '@vflow/ui';
-import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
+import { Vflow, createEdges, createNodes } from 'ngx-vflow';
 
 @Component({
-  template: `<vflow [nodes]="nodes" [edges]="edges">
-    <ng-template let-ctx vNode>
-      @if (ctx.data().type === 'group') {
-        <div
-          class="group-node"
-          [class.group-node_selected]="ctx.selected()"
-          [style.width.px]="ctx.width()"
-          [style.height.px]="ctx.height()">
-          <span vuiPort handleType="source" position="right"></span>
-        </div>
-      } @else {
-        <docs-node [ctx]="ctx" />
-      }
-    </ng-template>
+  // The graph is wider than the pane on purpose. The first fit keeps the zoom at 1, so the flow opens on the middle
+  // of the graph and the minimap shows what lies beyond the visible part.
+  template: `<vflow #flow [nodes]="nodes" [edges]="edges" (initialized)="flow.fitView({ minZoom: 1, maxZoom: 1 })">
+    <docs-node *vNode="let ctx" [ctx]="ctx" />
     <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
 
     <v-minimap [pannable]="true" [zoomable]="true" />
   </vflow>`,
-  styles: [
-    `
-      :host {
-        width: 100%;
-        height: 100%;
-      }
-
-      .group-node {
-        box-sizing: border-box;
-        border: 1px solid red;
-        border-radius: 5px;
-        background-color: rgba(255, 0, 0, 0.05);
-      }
-
-      .group-node_selected {
-        border-width: 3px;
-      }
-    `,
-  ],
+  host: { class: 'block size-full' },
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DocsPresentations, Vflow, VuiPort],
+  imports: [DocsPresentations, Vflow],
 })
 export class MinimapDemoComponent {
-  public nodes: Node[] = createNodes([
-    {
-      id: '1',
-      point: { x: 10, y: 10 },
-      data: { text: `1` },
-      parentId: '3',
-    },
-    {
-      id: '2',
-      point: { x: 90, y: 80 },
-      // it's possible to pass html in this field
-      data: { text: `<strong>2</strong>` },
-      parentId: '3',
-    },
-    {
-      id: '3',
-      point: { x: 10, y: 10 },
-      data: { type: 'group' },
-      width: 250,
-      height: 250,
-    },
-    {
-      id: '4',
-      point: { x: 280, y: 10 },
-      data: { text: `4` },
-    },
-    {
-      id: '5',
-      point: { x: 10, y: 160 },
-      data: { type: 'group' },
-      width: 170,
-      height: 70,
-      parentId: '3',
-    },
-    {
-      id: '6',
-      point: { x: 10, y: 10 },
-      data: { text: `6` },
-      parentId: '5',
-    },
+  protected readonly nodes = createNodes([
+    { id: 'order', point: { x: 0, y: 120 }, data: { text: 'Order' } },
+    { id: 'payment', point: { x: 200, y: 0 }, data: { text: 'Payment' } },
+    { id: 'stock', point: { x: 200, y: 240 }, data: { text: 'Stock check' } },
+    { id: 'invoice', point: { x: 400, y: 0 }, data: { text: 'Invoice' } },
+    { id: 'picking', point: { x: 400, y: 240 }, data: { text: 'Picking' } },
+    { id: 'packing', point: { x: 600, y: 120 }, data: { text: 'Packing' } },
+    { id: 'shipping', point: { x: 800, y: 120 }, data: { text: 'Shipping' } },
+    { id: 'delivered', point: { x: 1000, y: 0 }, data: { text: 'Delivered' } },
+    { id: 'returned', point: { x: 1000, y: 240 }, data: { text: 'Returned' } },
   ]);
 
-  public edges: Edge[] = [
-    {
-      source: '1',
-      target: '2',
-      id: '1 -> 2',
-    },
-    {
-      source: '2',
-      target: '4',
-      id: '2 -> 4',
-    },
-    {
-      source: '5',
-      target: '4',
-      id: '5 -> 4',
-    },
-  ];
+  protected readonly edges = createEdges([
+    { id: 'order-payment', source: 'order', target: 'payment' },
+    { id: 'order-stock', source: 'order', target: 'stock' },
+    { id: 'payment-invoice', source: 'payment', target: 'invoice' },
+    { id: 'stock-picking', source: 'stock', target: 'picking' },
+    { id: 'invoice-packing', source: 'invoice', target: 'packing' },
+    { id: 'picking-packing', source: 'picking', target: 'packing' },
+    { id: 'packing-shipping', source: 'packing', target: 'shipping' },
+    { id: 'shipping-delivered', source: 'shipping', target: 'delivered' },
+    { id: 'shipping-returned', source: 'shipping', target: 'returned' },
+  ]);
 }

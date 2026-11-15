@@ -1,422 +1,210 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, WritableSignal, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, Signal, inject, signal } from '@angular/core';
 import { DocsPresentations } from '@docs/shared';
-import { CurveFactory, CurveFactoryParams, Edge, Node, Point, Vflow, createNodes } from 'ngx-vflow';
+import { CurveFactory, Edge, Point, Vflow, createEdges, createNodes, getStraightPath } from 'ngx-vflow';
 
-interface RopeCurveEdgeData {
-  ropeState: {
-    samples: Point[];
+const ROPE = {
+  /** The rope is a chain of this many segments. */
+  segments: 16,
+  /** How much longer the rope is than the straight line between its ends, in flow units. */
+  slack: 28,
+  /** Downward acceleration, in flow units per second squared. */
+  gravity: 1700,
+  /** The share of its speed a point keeps from one step to the next. */
+  damping: 0.965,
+  /** How many times per step the segments are pulled back to their length; more makes a stiffer rope. */
+  iterations: 6,
+  /** Seconds per step. Steps of one length keep the rope the same at every refresh rate. */
+  step: 1 / 60,
+  /** A rope whose fastest point moves less than this in a step, in flow units, is at rest. */
+  rest: 0.01,
+};
+
+/** A point of the chain with its place one step ago: the difference is its speed (Verlet integration). */
+interface RopePoint extends Point {
+  previousX: number;
+  previousY: number;
+}
+
+/** A chain of points between two pinned ends. */
+class Rope {
+  private readonly points: RopePoint[];
+
+  constructor(source: Point, target: Point) {
+    this.points = Array.from({ length: ROPE.segments + 1 }, (_, index) => {
+      const x = source.x + ((target.x - source.x) * index) / ROPE.segments;
+      const y = source.y + ((target.y - source.y) * index) / ROPE.segments;
+
+      return { x, y, previousX: x, previousY: y };
+    });
+
+    // The rope is created straight and hangs at rest before it is first drawn.
+    for (let steps = 0; steps < 600 && this.step() > ROPE.rest; steps++);
+  }
+
+  /** Moves the ends to the handles; tells whether they moved. */
+  pin(source: Point, target: Point): boolean {
+    const first = this.points[0];
+    const last = this.points[ROPE.segments];
+    const moved = first.x !== source.x || first.y !== source.y || last.x !== target.x || last.y !== target.y;
+
+    Object.assign(first, { x: source.x, y: source.y, previousX: source.x, previousY: source.y });
+    Object.assign(last, { x: target.x, y: target.y, previousX: target.x, previousY: target.y });
+
+    return moved;
+  }
+
+  /** Advances the chain by one step; returns how far its fastest point moved. */
+  step(): number {
+    const points = this.points;
+    const first = points[0];
+    const last = points[ROPE.segments];
+
+    // Every point between the ends keeps its speed, less the damping, and falls.
+    for (const point of points.slice(1, -1)) {
+      const speedX = (point.x - point.previousX) * ROPE.damping;
+      const speedY = (point.y - point.previousY) * ROPE.damping;
+
+      point.previousX = point.x;
+      point.previousY = point.y;
+      point.x += speedX;
+      point.y += speedY + ROPE.gravity * ROPE.step ** 2;
+    }
+
+    // Then every segment is pulled back to its length, both of its points halfway; the ends stay pinned. One pass
+    // disturbs the neighbouring segments, so a few passes follow each other.
+    const length = (Math.hypot(last.x - first.x, last.y - first.y) + ROPE.slack) / ROPE.segments;
+
+    for (let pass = 0; pass < ROPE.iterations; pass++) {
+      for (let index = 0; index < ROPE.segments; index++) {
+        const a = points[index];
+        const b = points[index + 1];
+        const distance = Math.hypot(b.x - a.x, b.y - a.y) || 1;
+        const shift = (distance - length) / distance / 2;
+        const shiftX = (b.x - a.x) * shift;
+        const shiftY = (b.y - a.y) * shift;
+
+        if (a !== first) {
+          a.x += shiftX;
+          a.y += shiftY;
+        }
+        if (b !== last) {
+          b.x -= shiftX;
+          b.y -= shiftY;
+        }
+      }
+    }
+
+    return Math.max(...points.map((point) => Math.hypot(point.x - point.previousX, point.y - point.previousY)));
+  }
+
+  /** A smooth line through the chain: a quadratic curve around every point, joined at the middles of the segments. */
+  path(): string {
+    const points = this.points;
+    let path = `M${points[0].x},${points[0].y}`;
+
+    for (let index = 1; index < ROPE.segments; index++) {
+      const { x, y } = points[index];
+      const next = points[index + 1];
+
+      path += ` Q${x},${y} ${(x + next.x) / 2},${(y + next.y) / 2}`;
+    }
+
+    return `${path} L${points[ROPE.segments].x},${points[ROPE.segments].y}`;
+  }
+
+  /** The point a center label hangs on. */
+  middle(): Point {
+    const { x, y } = this.points[ROPE.segments / 2];
+
+    return { x, y };
+  }
+}
+
+/**
+ * A curve that hangs every edge between its handles as a rope. It keeps a rope per edge and steps the ropes that
+ * move on animation frames; ropes at rest cost nothing. Call it in an injection context: the frames stop with it.
+ *
+ * `measured` tells that the flow has measured its handles. Until then their points are provisional, and a rope hung
+ * on them would swing into place when the flow first paints.
+ */
+function createRopeCurve(measured: Signal<boolean>): CurveFactory {
+  const ropes = new WeakMap<Edge, Rope>();
+  const moving = new Set<Rope>();
+  // The curve reads the frame, so the flow asks for the paths again after every step.
+  const frame = signal(0);
+  let request = 0;
+  let time = 0;
+
+  const animate = (now: number) => {
+    // A frame takes as many whole steps as the time since the last one holds, and the rest of that time carries
+    // over to the next frame; a long pause counts as a few steps.
+    const stepMs = ROPE.step * 1000;
+    const steps = Math.min(Math.floor((now - time) / stepMs), 4);
+    time = steps < 4 ? time + steps * stepMs : now;
+
+    for (let step = 0; step < steps; step++) {
+      for (const rope of moving) {
+        if (rope.step() < ROPE.rest) moving.delete(rope);
+      }
+    }
+
+    if (steps) frame.update((count) => count + 1);
+    request = moving.size ? requestAnimationFrame(animate) : 0;
+  };
+
+  inject(DestroyRef).onDestroy(() => cancelAnimationFrame(request));
+
+  return (params) => {
+    // The preview of a connection has no edge to keep a rope for.
+    if (params.mode === 'connection' || !measured()) return getStraightPath(params);
+
+    frame();
+
+    let rope = ropes.get(params.edge);
+
+    if (!rope) {
+      rope = new Rope(params.sourcePoint, params.targetPoint);
+      ropes.set(params.edge, rope);
+    } else if (rope.pin(params.sourcePoint, params.targetPoint)) {
+      // A node moved: the rope follows its handles until it comes to rest again.
+      moving.add(rope);
+
+      if (!request) {
+        time = performance.now();
+        request = requestAnimationFrame(animate);
+      }
+    }
+
+    return { path: rope.path(), labelPoints: { center: rope.middle() } };
   };
 }
 
-interface RopeSimulationConfig {
-  segments: number;
-  slack: number;
-  gravity: number;
-  damping: number;
-  constraintIterations: number;
-  endpointVelocityInfluence: number;
-  endpointSwayInfluence: number;
-}
-
-interface RopeParticle {
-  current: Point;
-  previous: Point;
-}
-
-const ROPE_SIMULATION_CONFIG: RopeSimulationConfig = {
-  segments: 16,
-  slack: 28,
-  gravity: 1700,
-  damping: 0.965,
-  constraintIterations: 6,
-  endpointVelocityInfluence: 0.12,
-  endpointSwayInfluence: 0.22,
-};
-
-const DEFAULT_NODE_SIZE = { width: 100, height: 50 };
-const HANDLE_RADIUS_WITH_STROKE = 7;
-
-const ropeCurve = createRopeCurveFactory();
-
 @Component({
-  template: `<vflow [nodes]="nodes" [edges]="edges">
-    <docs-node *vNode="let ctx" [ctx]="ctx" />
+  template: `<vflow
+    #flow
+    [nodes]="nodes"
+    [edges]="edges"
+    (initialized)="measured.set(true); flow.fitView({ maxZoom: 1 })">
+    <docs-node *vNode="let ctx" [ctx]="ctx" [connectable]="false" />
     <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
   </vflow>`,
-  styles: [
-    `
-      :host {
-        width: 100%;
-        height: 100%;
-      }
-    `,
-  ],
+  host: { class: 'block size-full' },
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [DocsPresentations, Vflow],
 })
 export class RopeCurveDemoComponent {
-  public nodes: Node[] = createNodes([
-    {
-      id: 'left',
-      point: { x: 90, y: 180 },
-      data: { text: 'Left node' },
-    },
-    {
-      id: 'right',
-      point: { x: 470, y: 130 },
-      data: { text: 'Right node' },
-    },
+  protected readonly measured = signal(false);
+  private readonly rope = createRopeCurve(this.measured);
+
+  /** The modules of a synthesizer, patched with cables. */
+  protected readonly nodes = createNodes([
+    { id: 'oscillator', point: { x: 0, y: 0 }, data: { text: 'Oscillator' } },
+    { id: 'filter', point: { x: 260, y: 70 }, data: { text: 'Filter' } },
+    { id: 'amplifier', point: { x: 520, y: 0 }, data: { text: 'Amplifier' } },
   ]);
 
-  public edges: Edge<RopeCurveEdgeData>[] = [
-    {
-      id: 'left -> right',
-      source: 'left',
-      target: 'right',
-      curve: signal(ropeCurve),
-      data: signal({
-        ropeState: {
-          samples: [],
-        },
-      }),
-    },
-  ];
-
-  private readonly destroyRef = inject(DestroyRef);
-  private readonly edgeData = this.edges[0].data!;
-  private readonly leftPoint = this.nodes[0].point;
-  private readonly rightPoint = this.nodes[1].point;
-
-  private particles: RopeParticle[] = [];
-  private animationFrameId: number | null = null;
-  private lastAnimationTs = 0;
-  private previousSourcePoint = this.getSourceHandlePoint();
-  private previousTargetPoint = this.getTargetHandlePoint();
-
-  constructor() {
-    this.initializeRope(this.getSourceHandlePoint(), this.getTargetHandlePoint());
-    this.startAnimation();
-
-    this.destroyRef.onDestroy(() => {
-      this.stopAnimation();
-    });
-  }
-
-  private startAnimation(): void {
-    if (this.animationFrameId !== null) {
-      return;
-    }
-
-    this.lastAnimationTs = 0;
-    this.animationFrameId = requestAnimationFrame((ts) => this.animate(ts));
-  }
-
-  private animate(ts: number): void {
-    const dt = this.lastAnimationTs ? clamp((ts - this.lastAnimationTs) / 1000, 0.001, 0.033) : 0.016;
-    this.lastAnimationTs = ts;
-
-    const sourcePoint = this.getSourceHandlePoint();
-    const targetPoint = this.getTargetHandlePoint();
-    const sourceVelocity = getVelocity(this.previousSourcePoint, sourcePoint, dt);
-    const targetVelocity = getVelocity(this.previousTargetPoint, targetPoint, dt);
-    const axisNormal = getNormal(sourcePoint, targetPoint);
-
-    this.previousSourcePoint = sourcePoint;
-    this.previousTargetPoint = targetPoint;
-
-    if (this.particles.length === 0) {
-      this.initializeRope(sourcePoint, targetPoint);
-    }
-
-    this.applyEndpointPins(sourcePoint, targetPoint);
-    this.applyEndpointImpulse(sourceVelocity, targetVelocity, axisNormal, dt);
-    this.integrateInternalParticles(dt);
-    this.solveConstraints(sourcePoint, targetPoint);
-
-    this.edgeData.set({
-      ropeState: {
-        samples: this.particles.map((particle) => ({ ...particle.current })),
-      },
-    });
-
-    this.animationFrameId = requestAnimationFrame((nextTs) => this.animate(nextTs));
-  }
-
-  private stopAnimation(): void {
-    if (this.animationFrameId !== null) {
-      cancelAnimationFrame(this.animationFrameId);
-      this.animationFrameId = null;
-    }
-  }
-
-  private initializeRope(sourcePoint: Point, targetPoint: Point): void {
-    const count = ROPE_SIMULATION_CONFIG.segments + 1;
-    this.particles = Array.from({ length: count }, (_, index) => {
-      const ratio = index / (count - 1);
-      const basePoint = lerpPoint(sourcePoint, targetPoint, ratio);
-      const sag = Math.sin(Math.PI * ratio) * ROPE_SIMULATION_CONFIG.slack;
-      const point = { x: basePoint.x, y: basePoint.y + sag };
-
-      return {
-        current: point,
-        previous: point,
-      };
-    });
-
-    this.applyEndpointPins(sourcePoint, targetPoint);
-    this.edgeData.set({
-      ropeState: {
-        samples: this.particles.map((particle) => ({ ...particle.current })),
-      },
-    });
-  }
-
-  private applyEndpointPins(sourcePoint: Point, targetPoint: Point): void {
-    const lastIndex = this.particles.length - 1;
-    this.particles[0].current = { ...sourcePoint };
-    this.particles[0].previous = { ...sourcePoint };
-    this.particles[lastIndex].current = { ...targetPoint };
-    this.particles[lastIndex].previous = { ...targetPoint };
-  }
-
-  private applyEndpointImpulse(sourceVelocity: Point, targetVelocity: Point, axisNormal: Point, dt: number): void {
-    if (this.particles.length < 4) {
-      return;
-    }
-
-    const leftNeighbor = this.particles[1];
-    const rightNeighbor = this.particles[this.particles.length - 2];
-    const leftImpulse = scalePoint(sourceVelocity, ROPE_SIMULATION_CONFIG.endpointVelocityInfluence * dt);
-    const rightImpulse = scalePoint(targetVelocity, ROPE_SIMULATION_CONFIG.endpointVelocityInfluence * dt);
-    const leftSway = scalePoint(
-      axisNormal,
-      dot(sourceVelocity, axisNormal) * ROPE_SIMULATION_CONFIG.endpointSwayInfluence * dt,
-    );
-    const rightSway = scalePoint(
-      axisNormal,
-      dot(targetVelocity, axisNormal) * ROPE_SIMULATION_CONFIG.endpointSwayInfluence * dt,
-    );
-
-    leftNeighbor.current = addPoints(leftNeighbor.current, addPoints(leftImpulse, leftSway));
-    rightNeighbor.current = addPoints(rightNeighbor.current, addPoints(rightImpulse, rightSway));
-  }
-
-  private integrateInternalParticles(dt: number): void {
-    const gravity = ROPE_SIMULATION_CONFIG.gravity;
-    const damping = ROPE_SIMULATION_CONFIG.damping;
-
-    for (let i = 1; i < this.particles.length - 1; i++) {
-      const particle = this.particles[i];
-      const velocity = scalePoint(subtractPoints(particle.current, particle.previous), damping);
-      const previous = particle.current;
-
-      particle.current = {
-        x: particle.current.x + velocity.x,
-        y: particle.current.y + velocity.y + gravity * dt * dt,
-      };
-      particle.previous = previous;
-    }
-  }
-
-  private solveConstraints(sourcePoint: Point, targetPoint: Point): void {
-    const restLength = getDistance(sourcePoint, targetPoint) + ROPE_SIMULATION_CONFIG.slack;
-    const segmentLength = restLength / ROPE_SIMULATION_CONFIG.segments;
-    const iterations = ROPE_SIMULATION_CONFIG.constraintIterations;
-
-    for (let iteration = 0; iteration < iterations; iteration++) {
-      this.applyEndpointPins(sourcePoint, targetPoint);
-
-      for (let i = 0; i < this.particles.length - 1; i++) {
-        const a = this.particles[i];
-        const b = this.particles[i + 1];
-        const delta = subtractPoints(b.current, a.current);
-        const distance = Math.hypot(delta.x, delta.y) || 1;
-        const error = (distance - segmentLength) / distance;
-        const correction = scalePoint(delta, error);
-
-        if (i !== 0) {
-          a.current = addPoints(a.current, scalePoint(correction, 0.5));
-        }
-        if (i + 1 !== this.particles.length - 1) {
-          b.current = subtractPoints(b.current, scalePoint(correction, 0.5));
-        }
-      }
-    }
-  }
-
-  private getSourceHandlePoint(): Point {
-    const nodePoint = this.leftPoint();
-    return {
-      x: nodePoint.x + DEFAULT_NODE_SIZE.width + HANDLE_RADIUS_WITH_STROKE,
-      y: nodePoint.y + DEFAULT_NODE_SIZE.height / 2,
-    };
-  }
-
-  private getTargetHandlePoint(): Point {
-    const nodePoint = this.rightPoint();
-    return {
-      x: nodePoint.x - HANDLE_RADIUS_WITH_STROKE,
-      y: nodePoint.y + DEFAULT_NODE_SIZE.height / 2,
-    };
-  }
-}
-
-function createRopeCurveFactory(): CurveFactory {
-  return (params) => {
-    const ropeSamples = getRopeSamples(params);
-    if (ropeSamples.length < 2) {
-      return {
-        path: `M${params.sourcePoint.x},${params.sourcePoint.y} L${params.targetPoint.x},${params.targetPoint.y}`,
-      };
-    }
-
-    const path = buildSmoothPath(ropeSamples);
-
-    return {
-      path,
-      labelPoints: {
-        start: pointOnPolylineByRatio(ropeSamples, 0.1),
-        center: pointOnPolylineByRatio(ropeSamples, 0.5),
-        end: pointOnPolylineByRatio(ropeSamples, 0.9),
-      },
-    };
-  };
-}
-
-function getRopeSamples(params: CurveFactoryParams): Point[] {
-  if (params.mode !== 'edge') {
-    return buildFallbackSamples(params.sourcePoint, params.targetPoint);
-  }
-
-  const dataSignal = params.edge.data as WritableSignal<RopeCurveEdgeData> | undefined;
-  const samples = dataSignal?.()?.ropeState.samples ?? [];
-
-  return samples.length > 1 ? samples : buildFallbackSamples(params.sourcePoint, params.targetPoint);
-}
-
-function buildFallbackSamples(sourcePoint: Point, targetPoint: Point): Point[] {
-  const mid = lerpPoint(sourcePoint, targetPoint, 0.5);
-  const distance = getDistance(sourcePoint, targetPoint);
-  const sag = clamp(10 + distance * 0.02, 10, 28);
-
-  return [sourcePoint, { x: mid.x, y: mid.y + sag }, targetPoint];
-}
-
-function buildSmoothPath(points: Point[]): string {
-  if (points.length < 2) {
-    return '';
-  }
-
-  if (points.length === 2) {
-    return `M${points[0].x},${points[0].y} L${points[1].x},${points[1].y}`;
-  }
-
-  let path = `M${points[0].x},${points[0].y}`;
-  for (let i = 1; i < points.length - 1; i++) {
-    const mid = lerpPoint(points[i], points[i + 1], 0.5);
-    path += ` Q${points[i].x},${points[i].y} ${mid.x},${mid.y}`;
-  }
-
-  const last = points[points.length - 1];
-  path += ` L${last.x},${last.y}`;
-  return path;
-}
-
-function getDistance(a: Point, b: Point): number {
-  return Math.hypot(b.x - a.x, b.y - a.y);
-}
-
-function pointOnPolylineByRatio(points: Point[], ratio: number): Point {
-  if (points.length === 0) {
-    return { x: 0, y: 0 };
-  }
-
-  if (points.length === 1) {
-    return points[0];
-  }
-
-  const t = clamp(ratio, 0, 1);
-  let totalLength = 0;
-  const segmentLengths: number[] = [];
-
-  for (let i = 0; i < points.length - 1; i++) {
-    const length = getDistance(points[i], points[i + 1]);
-    segmentLengths.push(length);
-    totalLength += length;
-  }
-
-  if (totalLength === 0) {
-    return points[0];
-  }
-
-  const targetLength = totalLength * t;
-  let accumulated = 0;
-
-  for (let i = 0; i < segmentLengths.length; i++) {
-    const next = accumulated + segmentLengths[i];
-    if (targetLength <= next) {
-      const localT = segmentLengths[i] === 0 ? 0 : (targetLength - accumulated) / segmentLengths[i];
-      return lerpPoint(points[i], points[i + 1], localT);
-    }
-    accumulated = next;
-  }
-
-  return points[points.length - 1];
-}
-
-function clamp(value: number, min: number, max: number): number {
-  return Math.min(Math.max(value, min), max);
-}
-
-function lerpPoint(a: Point, b: Point, ratio: number): Point {
-  const t = clamp(ratio, 0, 1);
-  return {
-    x: a.x + (b.x - a.x) * t,
-    y: a.y + (b.y - a.y) * t,
-  };
-}
-
-function subtractPoints(a: Point, b: Point): Point {
-  return {
-    x: a.x - b.x,
-    y: a.y - b.y,
-  };
-}
-
-function addPoints(a: Point, b: Point): Point {
-  return {
-    x: a.x + b.x,
-    y: a.y + b.y,
-  };
-}
-
-function scalePoint(point: Point, scale: number): Point {
-  return {
-    x: point.x * scale,
-    y: point.y * scale,
-  };
-}
-
-function dot(a: Point, b: Point): number {
-  return a.x * b.x + a.y * b.y;
-}
-
-function getVelocity(previousPoint: Point, currentPoint: Point, dt: number): Point {
-  if (dt <= 0) {
-    return { x: 0, y: 0 };
-  }
-
-  return {
-    x: (currentPoint.x - previousPoint.x) / dt,
-    y: (currentPoint.y - previousPoint.y) / dt,
-  };
-}
-
-function getNormal(a: Point, b: Point): Point {
-  const direction = subtractPoints(b, a);
-  const length = Math.hypot(direction.x, direction.y) || 1;
-  return {
-    x: -direction.y / length,
-    y: direction.x / length,
-  };
+  protected readonly edges = createEdges([
+    { id: 'oscillator-filter', source: 'oscillator', target: 'filter', curve: this.rope, data: { label: 'raw' } },
+    { id: 'filter-amplifier', source: 'filter', target: 'amplifier', curve: this.rope, data: { label: 'filtered' } },
+  ]);
 }

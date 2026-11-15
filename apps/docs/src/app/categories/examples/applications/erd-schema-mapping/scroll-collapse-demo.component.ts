@@ -1,8 +1,7 @@
+import { NgTemplateOutlet } from '@angular/common';
 import { ChangeDetectionStrategy, Component, viewChild } from '@angular/core';
+import { DemoIconComponent, DocsKit, SCENE_BACKGROUND } from '@docs/shared';
 import { Vui } from '@vflow/ui';
-import { DemoIconComponent } from '../../../../shared/demo-icon.component';
-import { injectDocsTheme } from '../../../../shared/docs-theme';
-import { SCENE_BACKGROUND } from '../../../../shared/demo-scene';
 import { createEdges, createNodes, Vflow, VflowComponent } from 'ngx-vflow';
 import { ScrollRows } from './scroll-rows';
 
@@ -17,75 +16,39 @@ interface LongEntity {
  * - collapse moves every endpoint to proxy handles in the header;
  * - scroll keeps visible rows' handles on the rows and moves hidden ones to the nearest border (see `ScrollRows`).
  */
+/**
+ * Free ports show on interaction, connected ones always: an idle port without an edge is invisible, though still a
+ * target, until its table is hovered, focused or selected. The table host is an element of core, so its state is read
+ * from the port itself. Proxy ports, on the header and the footer, share one point per border: connected ones are
+ * visually merged.
+ */
+const QUIET_PORT = `transition-[border-color,background-color,box-shadow,opacity]!
+  [&[data-v-handle-state=idle]:not([data-vui-connected=true]):not([data-v-node]:hover_*,[data-v-node]:focus-within_*,[data-v-selected]_*,[data-v-preselected]_*)]:opacity-0
+  forced-colors:opacity-100! [:is(header,footer)>&]:data-[vui-connected=true]:opacity-60`;
+
 @Component({
   selector: 'app-ui-scroll-collapse-demo',
-  imports: [Vflow, Vui, DemoIconComponent],
+  imports: [Vflow, Vui, DocsKit, DemoIconComponent, NgTemplateOutlet],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styles: `
-    article {
-      width: 240px;
-      font-size: 14px;
-    }
-    vflow {
-      height: 420px;
-    }
-    .rows {
-      max-height: 150px;
-      overflow-y: auto;
-      overscroll-behavior: contain;
-    }
-    /* Rows cut by the scroll box fade into the footer, so the box reads as scrollable rather than clipped. A mask on
-       the box would also cut the ports, which sit across its border. */
-    .edge-note {
-      position: relative;
-    }
-    .edge-note::before {
-      content: '';
-      position: absolute;
-      inset-inline: 0;
-      bottom: 100%;
-      height: 24px;
-      background: linear-gradient(to bottom, transparent, var(--vui-surface));
-      pointer-events: none;
-    }
-    .edge-note {
-      min-height: 20px;
-      padding-block: 4px;
-    }
-    /* Free ports show on interaction, connected ones always: an idle port without an edge is invisible, though still
-       a target, until its table is hovered, focused or selected. The table host is an element of core, so its state
-       is read from the port itself. */
-    .vui-port {
-      transition-property: border-color, background-color, box-shadow, opacity;
-    }
-    .vui-port[data-v-handle-state='idle']:not([data-vui-connected='true']) {
-      opacity: 0;
-    }
-    .vui-port:is([data-v-node]:hover *, [data-v-node]:focus-within *, [data-v-selected] *, [data-v-preselected] *) {
-      opacity: 1;
-    }
-    @media (forced-colors: active) {
-      .vui-port[data-v-handle-state='idle']:not([data-vui-connected='true']) {
-        opacity: 1;
-      }
-    }
-    /* Proxy handles share one point per border; their connected ports are visually merged. */
-    .proxy .vui-port[data-vui-connected='true'] {
-      opacity: 0.6;
-    }
-  `,
+  host: { class: 'block' },
   template: `
-    <section class="demo" aria-label="Scroll and collapse experiment" [attr.data-vui-theme]="theme()">
-      <div class="stage">
-        <vflow [nodes]="nodes" [edges]="edges" [background]="background" (initialized)="flow()?.fitView()">
-          <ng-template let-ctx vNode>
+    <docs-demo framed role="region" aria-label="Scroll and collapse experiment">
+      <div class="h-105">
+        <vflow [nodes]="nodes" [edges]="edges" [background]="background" (initialized)="flow().fitView({ maxZoom: 1 })">
+          <ng-template let-ctx vNode [vNodeOf]="nodes">
             @let view = scroll.visibility(ctx.node.id);
-            <article vuiNode [attr.data-entity]="ctx.node.id" [attr.data-collapsed]="ctx.data().collapsed">
-              <header vuiNodeHeader [class.proxy]="ctx.data().collapsed || view.above.length">
+            <article
+              vuiNode
+              class="w-60 text-[14px]"
+              [attr.data-entity]="ctx.node.id"
+              [attr.data-collapsed]="ctx.data().collapsed">
+              <header vuiNodeHeader>
                 <span vuiTitle>{{ ctx.data().title }}</span>
                 <span vuiMeta>{{ ctx.data().fields.length }} fields</span>
                 <button
-                  class="button plain small icon"
+                  docsButton="plain"
+                  small
+                  icon
                   vNoDrag
                   type="button"
                   [attr.aria-label]="(ctx.data().collapsed ? 'Expand ' : 'Collapse ') + ctx.data().title"
@@ -98,25 +61,30 @@ interface LongEntity {
                   field of ctx.data().collapsed ? ctx.data().fields : scroll.hidden(ctx.data().fields, view.above);
                   track field.id
                 ) {
-                  <span
-                    vuiPort
-                    handleType="target"
-                    position="left"
-                    [handleId]="'in:' + field.id"
-                    [vuiPortConnected]="connected.has(ctx.node.id + '/in:' + field.id)"
-                    [canStart]="false"></span>
-                  <span
-                    vuiPort
-                    handleType="source"
-                    position="right"
-                    [handleId]="'out:' + field.id"
-                    [vuiPortConnected]="connected.has(ctx.node.id + '/out:' + field.id)"
-                    [canAccept]="false"></span>
+                  <ng-container *ngTemplateOutlet="ports; context: { $implicit: field }" />
                 }
               </header>
+              <ng-template #ports let-field>
+                <span
+                  vuiPort
+                  handleType="target"
+                  position="left"
+                  [class]="quietPort"
+                  [handleId]="'in:' + field.id"
+                  [vuiPortConnected]="connected.has(ctx.node.id + '/in:' + field.id)"
+                  [canStart]="false"></span>
+                <span
+                  vuiPort
+                  handleType="source"
+                  position="right"
+                  [class]="quietPort"
+                  [handleId]="'out:' + field.id"
+                  [vuiPortConnected]="connected.has(ctx.node.id + '/out:' + field.id)"
+                  [canAccept]="false"></span>
+              </ng-template>
               @if (!ctx.data().collapsed) {
                 <div
-                  class="rows"
+                  class="max-h-37.5 overflow-y-auto overscroll-contain"
                   vNoWheel
                   [attr.data-rows]="ctx.node.id"
                   (scroll)="scroll.onScroll(ctx.node.id, $event)">
@@ -125,42 +93,20 @@ interface LongEntity {
                       <span vuiTitle>{{ row.field.name }}</span>
                       <span vuiMeta>{{ row.field.type }}</span>
                       @if (row.handles) {
-                        <span
-                          vuiPort
-                          handleType="target"
-                          position="left"
-                          [handleId]="'in:' + row.field.id"
-                          [vuiPortConnected]="connected.has(ctx.node.id + '/in:' + row.field.id)"
-                          [canStart]="false"></span>
-                        <span
-                          vuiPort
-                          handleType="source"
-                          position="right"
-                          [handleId]="'out:' + row.field.id"
-                          [vuiPortConnected]="connected.has(ctx.node.id + '/out:' + row.field.id)"
-                          [canAccept]="false"></span>
+                        <ng-container *ngTemplateOutlet="ports; context: { $implicit: row.field }" />
                       }
                     </div>
                   }
                 </div>
                 @if (view.below.length) {
-                  <footer vuiNodeFooter class="proxy edge-note">
+                  <!-- Rows cut by the scroll box fade into the footer, so the box reads as scrollable rather than
+                       clipped. A mask on the box would also cut the ports, which sit across its border. -->
+                  <footer
+                    vuiNodeFooter
+                    class="relative min-h-5 py-1 before:pointer-events-none before:absolute before:inset-x-0 before:bottom-full before:h-6 before:bg-linear-to-b before:from-transparent before:to-vui-surface before:content-['']">
                     <span vuiMeta>{{ view.below.length }} more below</span>
                     @for (field of scroll.hidden(ctx.data().fields, view.below); track field.id) {
-                      <span
-                        vuiPort
-                        handleType="target"
-                        position="left"
-                        [handleId]="'in:' + field.id"
-                        [vuiPortConnected]="connected.has(ctx.node.id + '/in:' + field.id)"
-                        [canStart]="false"></span>
-                      <span
-                        vuiPort
-                        handleType="source"
-                        position="right"
-                        [handleId]="'out:' + field.id"
-                        [vuiPortConnected]="connected.has(ctx.node.id + '/out:' + field.id)"
-                        [canAccept]="false"></span>
+                      <ng-container *ngTemplateOutlet="ports; context: { $implicit: field }" />
                     }
                   </footer>
                 }
@@ -171,22 +117,20 @@ interface LongEntity {
             <svg:path vuiEdge [attr.d]="ctx.path()" />
           </svg:g>
         </vflow>
-        @if (flow(); as flow) {
-          <vui-controls class="stage-controls" [flow]="flow" />
-        }
       </div>
-    </section>
+      <vui-controls class="absolute bottom-2.5 left-2.5 z-2" [flow]="flow()" />
+    </docs-demo>
   `,
 })
 export class ScrollCollapseDemoComponent {
-  readonly flow = viewChild(VflowComponent);
-  readonly theme = injectDocsTheme();
-  readonly background = SCENE_BACKGROUND;
-  readonly scroll = new ScrollRows<LongEntity['fields'][number]>();
-  readonly nodes = createNodes<LongEntity>([
+  protected readonly flow = viewChild.required(VflowComponent);
+  protected readonly background = SCENE_BACKGROUND;
+  protected readonly quietPort = QUIET_PORT;
+  protected readonly scroll = new ScrollRows<LongEntity['fields'][number]>();
+  protected readonly nodes = createNodes<LongEntity>([
     {
       id: 'product',
-      point: { x: 20, y: 20 },
+      point: { x: 0, y: 0 },
       ariaLabel: 'Product entity',
       data: {
         title: 'Product',
@@ -209,7 +153,7 @@ export class ScrollCollapseDemoComponent {
     },
     {
       id: 'supplier',
-      point: { x: 420, y: 260 },
+      point: { x: 400, y: 240 },
       ariaLabel: 'Supplier entity',
       data: {
         title: 'Supplier',
@@ -222,7 +166,7 @@ export class ScrollCollapseDemoComponent {
     },
     {
       id: 'brand',
-      point: { x: 420, y: 60 },
+      point: { x: 400, y: 40 },
       ariaLabel: 'Brand entity',
       data: {
         title: 'Brand',
@@ -234,7 +178,7 @@ export class ScrollCollapseDemoComponent {
       },
     },
   ]);
-  readonly edges = createEdges([
+  protected readonly edges = createEdges([
     {
       id: 'supplier',
       source: 'product',
@@ -251,11 +195,11 @@ export class ScrollCollapseDemoComponent {
     },
   ]);
   /** `${nodeId}/${handleId}` for every endpoint of an edge; proxies carry the same IDs, so they count too. */
-  readonly connected = new Set(
+  protected readonly connected = new Set(
     this.edges.flatMap((edge) => [`${edge.source}/${edge.sourceHandle}`, `${edge.target}/${edge.targetHandle}`]),
   );
 
-  toggle(id: string) {
+  protected toggle(id: string) {
     this.nodes.find((node) => node.id === id)!.data.update((data) => ({ ...data, collapsed: !data.collapsed }));
     this.scroll.reset(id);
   }

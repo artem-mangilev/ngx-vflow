@@ -1,105 +1,55 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { DocsPresentations } from '@docs/shared';
-import { VuiPort } from '@vflow/ui';
-import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
+import { Vui } from '@vflow/ui';
+import { Vflow, createEdges, createNodes } from 'ngx-vflow';
 
 @Component({
-  template: `<vflow [nodes]="nodes" [edges]="edges">
+  template: `<vflow #flow [nodes]="nodes" [edges]="edges" (initialized)="flow.fitView({ maxZoom: 1 })">
     <ng-template let-ctx vNode>
       @if (ctx.data().type === 'group') {
-        <div
-          class="group-node"
-          [class.group-node_selected]="ctx.selected() || ctx.preselected()"
-          [style.width.px]="ctx.width()"
-          [style.height.px]="ctx.height()">
+        <section vuiGroup class="text-[13px]" [style.width.px]="ctx.width()" [style.height.px]="ctx.height()">
+          <header vuiGroupHeader>
+            <span vuiTitle>{{ ctx.data().text }}</span>
+          </header>
+          <!-- A parent node draws handles like any other node. -->
           <span vuiPort handleType="source" position="right"></span>
-        </div>
+        </section>
       } @else {
         <docs-node [ctx]="ctx" />
       }
     </ng-template>
+
     <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
   </vflow>`,
-  styles: [
-    `
-      :host {
-        width: 100%;
-        height: 100%;
-      }
-
-      .group-node {
-        box-sizing: border-box;
-        border: 1px solid red;
-        border-radius: 5px;
-        background-color: rgba(255, 0, 0, 0.05);
-      }
-
-      .group-node_selected {
-        border-width: 3px;
-      }
-    `,
-  ],
+  host: { class: 'block size-full' },
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DocsPresentations, Vflow, VuiPort],
+  imports: [DocsPresentations, Vflow, Vui],
 })
 export class SubflowsDemoComponent {
-  public nodes: Node[] = createNodes([
+  // The point of a child is relative to its parent.
+  protected readonly nodes = createNodes([
+    { id: 'order', point: { x: 0, y: 0 }, width: 320, height: 270, data: { type: 'group', text: 'Order' } },
+    { id: 'validate', point: { x: 40, y: 57 }, parentId: 'order', data: { text: 'Validate' } },
+    { id: 'charge', point: { x: 180, y: 57 }, parentId: 'order', data: { text: 'Charge' } },
     {
-      id: '1',
-      point: { x: 10, y: 10 },
-      data: { text: `1` },
-      parentId: '3',
+      id: 'delivery',
+      point: { x: 20, y: 127 },
+      width: 280,
+      height: 123,
+      parentId: 'order',
+      data: { type: 'group', text: 'Delivery' },
     },
-    {
-      id: '2',
-      point: { x: 90, y: 80 },
-      // it's possible to pass html in this field
-      data: { text: `<strong>2</strong>` },
-      parentId: '3',
-    },
-    {
-      id: '3',
-      point: { x: 10, y: 10 },
-      data: { type: 'group' },
-      width: 250,
-      height: 250,
-    },
-    {
-      id: '4',
-      point: { x: 280, y: 10 },
-      data: { text: `4` },
-    },
-    {
-      id: '5',
-      point: { x: 10, y: 160 },
-      data: { type: 'group' },
-      width: 170,
-      height: 70,
-      parentId: '3',
-    },
-    {
-      id: '6',
-      point: { x: 10, y: 10 },
-      data: { text: `6` },
-      parentId: '5',
-    },
+    { id: 'pack', point: { x: 20, y: 53 }, parentId: 'delivery', data: { text: 'Pack' } },
+    { id: 'ship', point: { x: 160, y: 53 }, parentId: 'delivery', data: { text: 'Ship' } },
+    { id: 'receipt', point: { x: 400, y: 110 }, data: { text: 'Receipt' } },
+    { id: 'tracking', point: { x: 400, y: 190 }, data: { text: 'Tracking' } },
   ]);
 
-  public edges: Edge[] = [
-    {
-      source: '1',
-      target: '2',
-      id: '1 -> 2',
-    },
-    {
-      source: '2',
-      target: '4',
-      id: '2 -> 4',
-    },
-    {
-      source: '5',
-      target: '4',
-      id: '5 -> 4',
-    },
-  ];
+  protected readonly edges = createEdges([
+    { id: 'validate-charge', source: 'validate', target: 'charge' },
+    { id: 'pack-ship', source: 'pack', target: 'ship' },
+    // The edges of a group start at the handle the group draws.
+    { id: 'order-receipt', source: 'order', target: 'receipt' },
+    { id: 'delivery-tracking', source: 'delivery', target: 'tracking' },
+  ]);
 }

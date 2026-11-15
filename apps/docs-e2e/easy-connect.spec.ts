@@ -19,9 +19,9 @@ test('easy connect: connects from anywhere on a node, drags by the title and rou
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
   await page.goto('/examples/recipes/easy-connect');
-  const demo = page.locator('app-easy-connect-demo');
+  const demo = page.locator('docs-demo');
   await demo.scrollIntoViewIfNeeded();
-  const nodes = demo.locator('.easy-node');
+  const nodes = demo.getByTestId('easy-node');
   const edges = demo.locator('g[docsEdge] path.vui-edge');
   await expect(nodes).toHaveCount(3);
   await expect(edges).toHaveCount(1);
@@ -36,8 +36,8 @@ test('easy connect: connects from anywhere on a node, drags by the title and rou
   expect(Math.abs(start.y - (sourceBox.y + sourceBox.height / 2))).toBeLessThan(2);
 
   // A press on the body starts a connection; the candidate under the pointer validates without a port.
-  const from = await center(nodes.nth(1).locator('.easy-node__body'));
-  const to = await center(nodes.nth(2).locator('.easy-node__body'));
+  const from = await center(nodes.nth(1).getByTestId('easy-node-body'));
+  const to = await center(nodes.nth(2).getByTestId('easy-node-body'));
   await page.mouse.move(from.x, from.y);
   await page.mouse.down();
   await page.mouse.move(from.x + 30, from.y + 30, { steps: 4 });
@@ -52,7 +52,7 @@ test('easy connect: connects from anywhere on a node, drags by the title and rou
 
   // The title drags the node; the body does not.
   const before = (await nodes.nth(0).boundingBox())!;
-  const title = await center(nodes.nth(0).locator('.easy-node__title'));
+  const title = await center(nodes.nth(0).getByTestId('easy-node-title'));
   await page.mouse.move(title.x, title.y);
   await page.mouse.down();
   await page.mouse.move(title.x + 60, title.y + 40, { steps: 6 });

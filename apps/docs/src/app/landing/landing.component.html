@@ -1,35 +1,69 @@
-<div class="landing" [attr.data-vui-theme]="theme()">
-  <section class="hero">
-    <div class="hero__copy">
-      <h1>Node-based interfaces for Angular</h1>
-      <p class="hero__lead">
+<!--
+  The landing page. Its palette is the logo's (`brand-*`); surfaces and text come from the NgDoc theme (`doc-*`), so the
+  page follows the light and dark themes of the documentation. `--lp-gutter` is the side padding of every section.
+-->
+<div class="font-doc text-[17px] leading-[1.6] text-doc-text [--lp-gutter:clamp(20px,5vw,72px)]">
+  <!-- The copy and, next to it, a working editor: the first thing on the page is the library in use. -->
+  <section
+    class="relative grid grid-cols-[minmax(0,5fr)_minmax(0,7fr)] items-center border-b border-b-doc-border [@media(width<=900px)]:grid-cols-1">
+    <!-- Grid items are as wide as their longest line by default; `*:min-w-0` lets them shrink to the column. -->
+    <div
+      class="relative z-1 grid max-w-[34rem] gap-7 py-16 pl-(--lp-gutter) *:min-w-0 [@media(width<=900px)]:px-(--lp-gutter) [@media(width<=900px)]:pt-12 [@media(width<=900px)]:pb-8">
+      <h1
+        class="m-0 text-[clamp(2.6rem,5.6vw,4.6rem)] leading-[0.98] font-bold tracking-[-0.04em] text-balance text-doc-heading">
+        Node-based interfaces for Angular
+      </h1>
+      <p class="m-0 text-[1.2rem] leading-[1.5] text-doc-muted">
         ngx-vflow renders the canvas, the edges and the gestures. The nodes are your own templates and components.
       </p>
 
-      <div class="hero__actions">
-        <a class="action action--primary" routerLink="/docs/getting-started/quickstart">Read the quickstart</a>
-        <a class="action" routerLink="/examples/feature-overview">See examples</a>
+      <div class="flex flex-wrap gap-3">
+        <a
+          class="inline-flex h-11 items-center rounded-lg border border-brand-deep bg-brand-deep px-5 text-[0.95rem] font-semibold text-white no-underline hover:border-brand hover:bg-brand focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+          routerLink="/docs/getting-started/quickstart"
+          >Read the quickstart</a
+        >
+        <a
+          class="inline-flex h-11 items-center rounded-lg border border-doc-border px-5 text-[0.95rem] font-semibold text-doc-heading no-underline hover:border-brand focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+          routerLink="/examples/feature-overview"
+          >See examples</a
+        >
       </div>
 
-      <div class="install">
-        <code>{{ installCommand }}</code>
-        <button type="button" aria-live="polite" (click)="copyInstallCommand()">
+      <div
+        class="flex max-w-[26rem] items-center justify-between gap-4 rounded-lg border border-doc-border bg-doc-base-1 p-1.5 pl-4">
+        <code class="min-w-0 overflow-x-auto font-doc-mono text-[0.88em] whitespace-nowrap text-doc-heading">{{
+          installCommand
+        }}</code>
+        <button
+          type="button"
+          class="h-8 min-w-18 flex-none cursor-pointer rounded-[5px] border-none bg-transparent font-[inherit] text-[0.85rem] leading-[inherit] text-doc-muted hover:bg-doc-base-2 hover:text-doc-heading focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+          aria-live="polite"
+          (click)="copyInstallCommand()">
           {{ copied() ? 'Copied' : 'Copy' }}
         </button>
       </div>
 
-      <ul class="facts">
+      <ul class="m-0 flex list-none flex-wrap gap-x-6 gap-y-1.5 p-0 text-[0.9rem] text-doc-muted">
         @if (stars(); as value) {
           <li>
-            <a href="https://github.com/artem-mangilev/ngx-vflow" target="_blank" rel="noreferrer"
-              ><b>{{ value }}</b> stars on GitHub</a
+            <a
+              class="text-inherit no-underline underline-offset-3 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+              href="https://github.com/artem-mangilev/ngx-vflow"
+              target="_blank"
+              rel="noreferrer"
+              ><b class="font-[650] text-doc-heading">{{ value }}</b> stars on GitHub</a
             >
           </li>
         }
         @if (downloads(); as value) {
           <li>
-            <a href="https://www.npmjs.com/package/ngx-vflow" target="_blank" rel="noreferrer"
-              ><b>{{ value }}</b> downloads a month</a
+            <a
+              class="text-inherit no-underline underline-offset-3 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+              href="https://www.npmjs.com/package/ngx-vflow"
+              target="_blank"
+              rel="noreferrer"
+              ><b class="font-[650] text-doc-heading">{{ value }}</b> downloads a month</a
             >
           </li>
         }
@@ -39,7 +73,7 @@
     </div>
 
     <div
-      class="hero__canvas"
+      class="min-w-0 py-10 pr-(--lp-gutter) pl-[clamp(24px,4vw,56px)] [@media(width<=900px)]:px-(--lp-gutter) [@media(width<=900px)]:pt-0 [@media(width<=900px)]:pb-12"
       role="region"
       aria-label="Live example: an image editor built from nodes. Move a slider or rewire the nodes">
       <ng-container *ngComponentOutlet="hero" />
@@ -47,41 +81,62 @@
   </section>
 
   @for (feature of features; track feature.title; let odd = $odd) {
-    <section class="feature" [class.feature--mirrored]="odd">
-      <div class="feature__copy">
-        <h2>{{ feature.title }}</h2>
-        <p>{{ feature.text }}</p>
-        <a [routerLink]="feature.link">{{ feature.linkText }}</a>
+    <!-- Every second row is mirrored, so the flows alternate sides; the flow keeps the wide column. -->
+    <section
+      class="grid items-center gap-[clamp(32px,5vw,80px)] border-b border-b-doc-border px-(--lp-gutter) py-[clamp(56px,8vw,112px)] [@media(width<=900px)]:grid-cols-1"
+      [class]="odd ? 'grid-cols-[minmax(0,7fr)_minmax(0,5fr)]' : 'grid-cols-[minmax(0,5fr)_minmax(0,7fr)]'">
+      <div class="grid max-w-[34rem] gap-4 *:min-w-0 [@media(width<=900px)]:order-0" [class.order-2]="odd">
+        <h2
+          class="m-0 text-[clamp(1.7rem,3vw,2.4rem)] leading-[1.1] font-bold tracking-[-0.03em] text-balance text-doc-heading">
+          {{ feature.title }}
+        </h2>
+        <p class="m-0 text-doc-muted">{{ feature.text }}</p>
+        <a
+          class="justify-self-start font-semibold text-doc-link underline-offset-3 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+          [routerLink]="feature.link"
+          >{{ feature.linkText }}</a
+        >
       </div>
 
+      <!-- A flow without a shell of its own gets the frame of the page, and is no taller than 480px. -->
       <div
-        class="feature__canvas"
+        class="min-w-0"
         role="region"
-        [class.feature__canvas--framed]="feature.framed"
+        [class]="
+          feature.framed
+            ? 'overflow-hidden rounded-[14px] border border-doc-border bg-canvas *:block! *:max-h-[480px]!'
+            : ''
+        "
         [attr.aria-label]="feature.demoLabel">
         @defer (on viewport) {
           <ng-container *ngComponentOutlet="feature.demo" />
         } @placeholder {
-          <div class="feature__placeholder"></div>
+          <div class="h-[480px] rounded-[14px] bg-doc-base-1"></div>
         }
       </div>
     </section>
   }
 
-  <section class="packages">
-    <div class="packages__copy">
-      <h2>Packages for what the graph needs next</h2>
-      <p>
+  <section
+    class="grid grid-cols-[minmax(0,5fr)_minmax(0,7fr)] gap-[clamp(32px,5vw,80px)] border-b border-b-doc-border px-(--lp-gutter) py-[clamp(56px,8vw,112px)] [@media(width<=900px)]:grid-cols-1">
+    <div class="grid max-w-[34rem] content-start gap-4 *:min-w-0">
+      <h2
+        class="m-0 text-[clamp(1.7rem,3vw,2.4rem)] leading-[1.1] font-bold tracking-[-0.03em] text-balance text-doc-heading">
+        Packages for what the graph needs next
+      </h2>
+      <p class="m-0 text-doc-muted">
         The core package stays small. Layout, edge routing and a ready look are separate packages you add when you need
         them.
       </p>
     </div>
 
-    <ul class="packages__list">
+    <ul class="m-0 list-none border-t border-t-doc-border p-0">
       @for (item of packages; track item.name) {
         <li>
-          <a [routerLink]="item.link">
-            <code>{{ item.name }}</code>
+          <a
+            class="grid grid-cols-[11rem_minmax(0,1fr)] items-baseline gap-x-6 gap-y-2 border-b border-b-doc-border px-1 py-5 text-doc-muted no-underline hover:bg-doc-base-1 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand [@media(width<=900px)]:grid-cols-1"
+            [routerLink]="item.link">
+            <code class="font-doc-mono text-[0.95rem] font-semibold text-doc-heading">{{ item.name }}</code>
             <span>{{ item.text }}</span>
           </a>
         </li>
@@ -89,18 +144,36 @@
     </ul>
   </section>
 
-  <section class="used">
-    <div class="used__copy">
-      <h2>Used in open source products</h2>
-      <p>Google ADK Web builds its visual agent designer on ngx-vflow, and Microcks draws live API traces with it.</p>
-      <a routerLink="/showcase">See the showcase</a>
+  <section
+    class="grid grid-cols-[minmax(0,5fr)_minmax(0,7fr)] gap-[clamp(32px,5vw,80px)] border-b border-b-doc-border px-(--lp-gutter) py-[clamp(56px,8vw,112px)] [@media(width<=900px)]:grid-cols-1">
+    <div class="grid max-w-[34rem] content-start gap-4 *:min-w-0">
+      <h2
+        class="m-0 text-[clamp(1.7rem,3vw,2.4rem)] leading-[1.1] font-bold tracking-[-0.03em] text-balance text-doc-heading">
+        Used in open source products
+      </h2>
+      <p class="m-0 text-doc-muted">
+        Google ADK Web builds its visual agent designer on ngx-vflow, and Microcks draws live API traces with it.
+      </p>
+      <a
+        class="justify-self-start font-semibold text-doc-link underline-offset-3 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+        routerLink="/showcase"
+        >See the showcase</a
+      >
     </div>
 
-    <ul class="used__list">
+    <ul class="m-0 grid list-none grid-cols-2 gap-6 p-0 [@media(width<=520px)]:grid-cols-1">
       @for (project of projects; track project.name) {
         <li>
-          <a target="_blank" rel="noreferrer" [href]="project.website">
-            <img loading="lazy" [src]="project.image" [alt]="'Screenshot of ' + project.name" />
+          <a
+            class="grid gap-3 font-semibold text-doc-heading no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+            target="_blank"
+            rel="noreferrer"
+            [href]="project.website">
+            <img
+              class="block aspect-16/10 w-full rounded-[10px] border border-doc-border bg-doc-base-1 object-cover object-top-left"
+              loading="lazy"
+              [src]="project.image"
+              [alt]="'Screenshot of ' + project.name" />
             <span>{{ project.name }}</span>
           </a>
         </li>
@@ -108,8 +181,11 @@
     </ul>
   </section>
 
-  <footer class="footer">
-    <nav aria-label="Footer">
+  <footer
+    class="flex flex-wrap items-center justify-between gap-x-8 gap-y-4 px-(--lp-gutter) pt-10 pb-14 text-[0.9rem]">
+    <nav
+      class="flex flex-wrap gap-x-6 gap-y-2 *:text-doc-muted *:no-underline *:hover:text-doc-heading *:focus-visible:outline-2 *:focus-visible:outline-offset-2 *:focus-visible:outline-brand"
+      aria-label="Footer">
       <a routerLink="/docs/getting-started/quickstart">Docs</a>
       <a routerLink="/examples/feature-overview">Examples</a>
       <a routerLink="/packages/ui/overview">Packages</a>
@@ -118,6 +194,6 @@
       <a href="https://github.com/artem-mangilev/ngx-vflow" target="_blank" rel="noreferrer">GitHub</a>
       <a href="https://www.npmjs.com/package/ngx-vflow" target="_blank" rel="noreferrer">npm</a>
     </nav>
-    <p>Released under the MIT license.</p>
+    <p class="m-0 text-doc-muted">Released under the MIT license.</p>
   </footer>
 </div>

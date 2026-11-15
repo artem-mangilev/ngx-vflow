@@ -2,7 +2,7 @@
 keyword: 'PackagesAutoSize'
 ---
 
-`@vflow/auto-size` grows a parent node around its children while they are dragged or resized, through every level of nesting. Drag a developer out of the squad, or the squad out of the team: the parent grows to keep it, with a padding, and keeps its other children where they are. The demo also sets `vxAutoSizeShrink`, so the parents always fit their children: drag a developer back in and the squad shrinks with it.
+`@vflow/auto-size` grows a parent node around its children while they are dragged or resized, through every level of nesting. Drag Backend or Frontend out of the squad, or the squad out of the team: the parent grows to keep it, with a padding, and keeps its other children where they are. The demo also sets `vxAutoSizeShrink`, so the parents always fit their children: drag the node back in and the squad shrinks with it.
 
 {{ NgDocActions.demoPane("AutoSizeDemoComponent") }}
 

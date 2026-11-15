@@ -1,6 +1,9 @@
 This guide shows how to add a minimap, an overview of the whole graph in a corner of the flow, and how to let users
 navigate with it. Its inputs and exact behavior are in the [Viewport reference](/docs/reference/viewport#minimap).
 
+The graph of the demo is wider than its pane: the minimap shows all of it and marks the part in view. Click, drag
+or scroll the minimap to move around.
+
 {{ NgDocActions.demoPane("MinimapDemoComponent") }}
 
 ## Add a minimap

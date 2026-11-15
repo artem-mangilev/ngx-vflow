@@ -1,95 +1,72 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import { DocsPresentations } from '@docs/shared';
+import { DocsKit, DocsPresentations } from '@docs/shared';
 import {
-  Edge,
-  Node,
   ReconnectEndEvent,
   ReconnectEvent,
   Vflow,
+  createEdges,
+  createNodes,
   reconnectEdges,
   removeEdges,
-  createNodes,
 } from 'ngx-vflow';
 
 @Component({
-  template: `<vflow
-    [nodes]="nodes"
-    [edges]="edges"
-    (reconnectStart)="onReconnectStart()"
-    (reconnectEnd)="onReconnectEnd($event)"
-    (reconnect)="reconnect($event)">
-    <docs-node *vNode="let ctx" [ctx]="ctx" />
-    <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
-  </vflow> `,
-  styles: [
-    `
-      :host {
-        width: 100%;
-        height: 100%;
-      }
-    `,
-  ],
+  template: `<docs-demo>
+    <div docsDemoBar>
+      <p>Drag the end of an edge to a port of another node. Released over the canvas, the edge is removed.</p>
+    </div>
+
+    <vflow
+      #flow
+      [nodes]="nodes"
+      [edges]="edges()"
+      (reconnect)="reconnect($event)"
+      (reconnectEnd)="removeDropped($event)"
+      (initialized)="flow.fitView({ maxZoom: 1 })">
+      <docs-node *vNode="let ctx" [ctx]="ctx" />
+      <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
+    </vflow>
+  </docs-demo>`,
+  host: { class: 'block size-full' },
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DocsPresentations, Vflow],
+  imports: [DocsKit, DocsPresentations, Vflow],
 })
 export class ReconnectionDemoComponent {
-  public nodes: Node[] = createNodes([
-    {
-      id: '1',
-      point: { x: 100, y: 100 },
-      data: { text: `1` },
-    },
-    {
-      id: '2',
-      point: { x: 600, y: 100 },
-      data: { text: `2` },
-    },
-    {
-      id: '3',
-      point: { x: 100, y: 300 },
-      data: { text: `3` },
-    },
-    {
-      id: '4',
-      point: { x: 600, y: 300 },
-      data: { text: `4` },
-    },
+  protected readonly nodes = createNodes([
+    { id: 'orders', point: { x: 0, y: 0 }, data: { text: 'Orders' } },
+    { id: 'returns', point: { x: 0, y: 130 }, data: { text: 'Returns' } },
+    { id: 'billing', point: { x: 340, y: 0 }, data: { text: 'Billing' } },
+    { id: 'support', point: { x: 340, y: 130 }, data: { text: 'Support' } },
   ]);
 
-  public edges: Edge[] = [
-    {
-      id: '1 -> 2',
-      source: '1',
-      target: '2',
-      reconnectable: signal(true),
-      data: signal({ label: 'Reconnectable from both sides' }),
-    },
-    {
-      id: '3 -> 4',
-      source: '3',
-      target: '4',
-      reconnectable: signal('source'),
-      data: signal({ label: 'Reconnectable only from source side' }),
-    },
-  ];
+  // Each edge is labeled with the ends that can be dragged.
+  protected readonly edges = signal(
+    createEdges([
+      {
+        id: 'orders-billing',
+        source: 'orders',
+        target: 'billing',
+        reconnectable: true,
+        data: { label: 'Both ends' },
+      },
+      {
+        id: 'returns-support',
+        source: 'returns',
+        target: 'support',
+        reconnectable: 'source',
+        data: { label: 'Source end only' },
+      },
+    ]),
+  );
 
-  private edgeReconnectSuccessful = signal(false);
-
-  public onReconnectStart() {
-    this.edgeReconnectSuccessful.set(false);
+  protected reconnect(event: ReconnectEvent): void {
+    this.edges.update((edges) => reconnectEdges([event], { nodes: this.nodes, edges }));
   }
 
-  public onReconnectEnd(event: ReconnectEndEvent) {
-    if (!this.edgeReconnectSuccessful()) {
-      this.edges = removeEdges([event.edge.id], this.edges);
+  // `to` is the handle the end was released on; there is none when it was released over the canvas.
+  protected removeDropped(event: ReconnectEndEvent): void {
+    if (!event.to) {
+      this.edges.update((edges) => removeEdges([event.edge.id], edges));
     }
-
-    this.edgeReconnectSuccessful.set(true);
-  }
-
-  public reconnect(event: ReconnectEvent) {
-    this.edges = reconnectEdges([event], { nodes: this.nodes, edges: this.edges });
-
-    this.edgeReconnectSuccessful.set(true);
   }
 }

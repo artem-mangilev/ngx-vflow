@@ -87,13 +87,13 @@ a server, or it serializes it. Register the components once, under keys, with `w
 
 ```typescript
 @Component({
-  providers: [provideVflow(withNodeComponents({ red: RedSquareNodeComponent, blue: BlueSquareNodeComponent }))],
+  providers: [provideVflow(withNodeComponents({ request: RequestNodeComponent, approval: ApprovalNodeComponent }))],
   ...
 })
 export class DemoComponent {
   nodes = createNodes([
-    { id: '1', point: { x: 100, y: 100 }, component: 'red', data: { redSquareText: 'Red' } },
-    { id: '2', point: { x: 250, y: 250 }, component: 'blue', data: { blueSquareText: 'Blue' } },
+    { id: 'request', point: { x: 0, y: 0 }, component: 'request', data: { title: 'Conference tickets', amount: 480 } },
+    { id: 'approval', point: { x: 300, y: 60 }, component: 'approval', data: { approver: 'Dana Whitfield' } },
   ]);
 }
 ```
@@ -109,8 +109,8 @@ library with your keys; then a typo in `component` or in `withNodeComponents()` 
 ```typescript
 declare module 'ngx-vflow' {
   interface VflowNodeComponents {
-    red: typeof RedSquareNodeComponent;
-    blue: typeof BlueSquareNodeComponent;
+    request: typeof RequestNodeComponent;
+    approval: typeof ApprovalNodeComponent;
   }
 }
 ```
@@ -146,12 +146,12 @@ union of the outputs of that class, where `eventName` is one of their names and 
   ...
 
   handleComponentEvent(event: AnyComponentNodeEvent) {
-    if (isComponentNodeEvent(event, RedSquareNodeComponent) && event.eventName === 'redSquareEvent') {
-      console.log(event.eventPayload)
+    if (isComponentNodeEvent(event, RequestNodeComponent) && event.eventName === 'submitted') {
+      console.log(event.eventPayload.amount) // RequestData
     }
 
-    if (isComponentNodeEvent(event, BlueSquareNodeComponent) && event.eventName === 'blueSquareEvent') {
-      console.log(event.eventPayload.x + event.eventPayload.y)
+    if (isComponentNodeEvent(event, ApprovalNodeComponent) && event.eventName === 'decided') {
+      console.log(event.eventPayload) // 'approved' | 'rejected'
     }
   }
 

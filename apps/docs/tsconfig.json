@@ -21,7 +21,7 @@
     "paths": {
       "@ng-doc/generated": ["./ng-doc/docs/index.ts"],
       "@ng-doc/generated/*": ["./ng-doc/docs/*"],
-      "@docs/shared": ["./src/app/shared/flow-presentations.ts"],
+      "@docs/shared": ["./src/app/shared/index.ts"],
       // The libraries as an application gets them: packages built into dist with the Angular version of the
       // workspace root, and the @vflow/ui parts as sources. `libs/` is their copy, see scripts/libs.mjs.
       "ngx-vflow": ["./libs/ngx-vflow"],

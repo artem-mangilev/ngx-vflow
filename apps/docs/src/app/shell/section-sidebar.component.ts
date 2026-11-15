@@ -11,11 +11,7 @@ import { navigationOfSection, Section } from './sections';
 @Component({
   selector: 'app-section-sidebar',
   template: `<ng-container *ngComponentOutlet="sidebar; injector: injector()" />`,
-  styles: `
-    :host {
-      display: block;
-    }
-  `,
+  host: { class: 'block' },
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [NgComponentOutlet],
 })

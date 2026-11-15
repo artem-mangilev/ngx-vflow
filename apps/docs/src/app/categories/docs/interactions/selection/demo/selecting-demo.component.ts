@@ -1,44 +1,49 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import { DocsPresentations } from '@docs/shared';
-import { VuiPort } from '@vflow/ui';
-import { Edge, Node, Vflow, createNodes } from 'ngx-vflow';
+import { DocsKit, DocsPresentations } from '@docs/shared';
+import { Vui } from '@vflow/ui';
+import { Vflow, createEdges, createNodes } from 'ngx-vflow';
 
 @Component({
-  templateUrl: './selecting-demo.component.html',
-  styleUrls: ['./selecting-demo.component.scss'],
+  template: `<vflow #flow [nodes]="nodes" [edges]="edges" (initialized)="flow.fitView({ maxZoom: 1 })">
+    <ng-template let-ctx vNode>
+      @if (ctx.node.id === 'review') {
+        <article vuiNode class="w-48 text-[13px]">
+          <header vuiNodeHeader>
+            <span vuiTitle>Review</span>
+            <span vuiMeta>{{ ctx.selected() ? 'Selected' : 'Not selected' }}</span>
+          </header>
+          <footer vuiNodeFooter>
+            <!-- vNoSelect: a click on the button approves and leaves the selection as it is. -->
+            <button docsButton small type="button" vNoSelect vNoDrag (click)="approvals.set(approvals() + 1)">
+              Approve
+            </button>
+            <span vuiMeta class="ms-auto">Approvals: {{ approvals() }}</span>
+          </footer>
+          <span vuiPort handleType="target" position="left"></span>
+          <span vuiPort handleType="source" position="right"></span>
+        </article>
+      } @else {
+        <docs-node [ctx]="ctx" />
+      }
+    </ng-template>
+
+    <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
+  </vflow>`,
+  host: { class: 'block size-full' },
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DocsPresentations, Vflow, VuiPort],
+  imports: [DocsKit, DocsPresentations, Vflow, Vui],
 })
 export class SelectingDemoComponent {
-  public clicks = signal(0);
+  protected readonly approvals = signal(0);
 
-  public nodes: Node[] = createNodes([
-    {
-      id: '1',
-      point: { x: 10, y: 150 },
-    },
-    {
-      id: '2',
-      point: { x: 290, y: 50 },
-      data: { text: 'Selectable' },
-    },
-    {
-      id: '3',
-      point: { x: 290, y: 300 },
-      data: { text: 'Selectable' },
-    },
+  protected readonly nodes = createNodes([
+    { id: 'draft', point: { x: 0, y: 26 }, data: { text: 'Draft' } },
+    { id: 'review', point: { x: 180, y: 0 }, data: { text: 'Review' } },
+    { id: 'published', point: { x: 452, y: 26 }, data: { text: 'Published' } },
   ]);
 
-  public edges: Edge[] = [
-    {
-      id: '1 -> 2',
-      source: '1',
-      target: '2',
-    },
-    {
-      id: '1 -> 3',
-      source: '1',
-      target: '3',
-    },
-  ];
+  protected readonly edges = createEdges([
+    { id: 'draft-review', source: 'draft', target: 'review' },
+    { id: 'review-published', source: 'review', target: 'published' },
+  ]);
 }

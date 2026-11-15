@@ -94,7 +94,7 @@ The package manifests specify `publishConfig.access: public`.
 
 `libs/ui` is not published: `libs/cli` (`@vflow/cli`) ships its sources as generator templates, copied by
 `ui:sync-cli` before `cli:build`, and consumers compile the copied parts with their own Tailwind v4.
-The docs app compiles `apps/docs/src/vflow-ui-parts.css` with PostCSS.
+The docs app compiles `apps/docs/src/styles.css` with PostCSS.
 
 ## Documentation deployment
 

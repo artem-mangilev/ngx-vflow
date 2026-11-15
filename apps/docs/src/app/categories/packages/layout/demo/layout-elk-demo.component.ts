@@ -1,66 +1,57 @@
-import { ChangeDetectionStrategy, Component, computed, signal, viewChild } from '@angular/core';
-import { DocsPresentations } from '@docs/shared';
+import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
+import { DocsKit, DocsPresentations } from '@docs/shared';
 import { VxLayout, VxLayoutAnimate } from '@vflow/layout';
 import { elkLayout } from '@vflow/layout/elk';
-import { Vflow, VflowComponent } from 'ngx-vflow';
-import { demoEdges, demoNodes } from './graph';
+import { Vflow } from 'ngx-vflow';
+import { pipelineEdges, pipelineNodes } from './graph';
+
+type Direction = 'right' | 'down' | 'left' | 'up';
 
 @Component({
-  template: `
-    <div class="toolbar">
-      @for (algorithm of algorithms; track algorithm) {
-        <button
-          class="button"
-          type="button"
-          [class.active]="selected() === algorithm"
-          (click)="selected.set(algorithm)">
-          {{ algorithm }}
-        </button>
-      }
+  template: `<docs-demo>
+    <div docsDemoBar>
+      <p>Direction</p>
+      <div role="group" aria-label="Direction" class="inline-flex gap-1">
+        @for (option of directions; track option) {
+          <button
+            type="button"
+            [docsButton]="direction() === option ? 'secondary' : 'plain'"
+            [attr.aria-pressed]="direction() === option"
+            (click)="direction.set(option)">
+            {{ option }}
+          </button>
+        }
+      </div>
     </div>
+
     <vflow
+      #flow
       vxLayoutAnimate
       [vxLayout]="layout()"
       [nodes]="nodes"
       [edges]="edges"
-      [background]="{ type: 'dots' }"
-      (vxLayoutEnd)="flow().fitView({ padding: 0.1, duration: painted ? 300 : 0 })"
+      (vxLayoutEnd)="flow.fitView({ maxZoom: 1, duration: painted ? 300 : 0 })"
       (initialized)="painted = true">
-      <docs-node *vNode="let ctx" [ctx]="ctx" [connectable]="false" />
+      <!-- One floating handle per card: an edge meets the side that faces its other end, whichever way the graph is laid out. -->
+      <docs-node *vNode="let ctx" floating [ctx]="ctx" [connectable]="false" />
       <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
     </vflow>
-  `,
-  styles: `
-    :host {
-      display: block;
-      position: relative;
-      width: 100%;
-      height: 100%;
-    }
-    .toolbar {
-      position: absolute;
-      top: 8px;
-      left: 8px;
-      z-index: 1;
-      display: flex;
-      gap: 4px;
-    }
-    .button.active {
-      outline: 2px solid var(--vui-accent);
-    }
-  `,
+  </docs-demo>`,
+  host: { class: 'block size-full' },
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DocsPresentations, Vflow, VxLayout, VxLayoutAnimate],
+  imports: [DocsKit, DocsPresentations, Vflow, VxLayout, VxLayoutAnimate],
 })
 export class LayoutElkDemoComponent {
-  protected readonly flow = viewChild.required(VflowComponent);
   // The first layout ends before the flow paints: fit it at once, and animate the fits that follow.
   protected painted = false;
-  protected readonly algorithms = ['layered', 'mrtree', 'stress'] as const;
-  protected readonly selected = signal<'layered' | 'mrtree' | 'stress'>('layered');
+
+  protected readonly directions: Direction[] = ['right', 'down', 'left', 'up'];
+  protected readonly direction = signal<Direction>('right');
+  // A new algorithm per direction: the host lays the graph out again when it changes.
   protected readonly layout = computed(() =>
-    elkLayout({ algorithm: this.selected(), direction: 'right', nodeSpacing: 40, layerSpacing: 70 }),
+    elkLayout({ algorithm: 'layered', direction: this.direction(), nodeSpacing: 30, layerSpacing: 40 }),
   );
-  protected readonly nodes = demoNodes();
-  protected readonly edges = demoEdges();
+
+  protected readonly nodes = pipelineNodes();
+  protected readonly edges = pipelineEdges();
 }

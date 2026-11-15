@@ -1,44 +1,43 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { DocsPresentations } from '@docs/shared';
-import { Connection, ConnectionSettings, Edge, Node, Vflow, addEdges, createNodes } from 'ngx-vflow';
+import { Connection, ConnectionSettings, Edge, Vflow, addEdges, createNodes } from 'ngx-vflow';
 
 @Component({
-  template: `<vflow [nodes]="nodes" [edges]="edges" [connection]="conectionSettings" (connect)="createEdge($event)">
+  template: `<vflow
+    #flow
+    [nodes]="nodes"
+    [edges]="edges()"
+    [connection]="connection"
+    (connect)="connect($event)"
+    (initialized)="flow.fitView({ maxZoom: 1 })">
     <docs-node *vNode="let ctx" [ctx]="ctx" />
     <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
-  </vflow> `,
-  styles: [
-    `
-      :host {
-        width: 100%;
-        height: 100%;
-      }
-    `,
-  ],
+  </vflow>`,
+  host: { class: 'block size-full' },
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [DocsPresentations, Vflow],
 })
 export class ConnectionValidationDemoComponent {
-  public nodes: Node[] = createNodes([
-    {
-      id: '1',
-      point: { x: 100, y: 100 },
-      data: { text: `1` },
-    },
-    {
-      id: '2',
-      point: { x: 200, y: 200 },
-      data: { text: `2` },
-    },
+  protected readonly nodes = createNodes([
+    { id: 'text-out', point: { x: 0, y: 0 }, data: { text: 'Text out', value: 'text' } },
+    { id: 'number-out', point: { x: 0, y: 90 }, data: { text: 'Number out', value: 'number' } },
+    { id: 'text-in', point: { x: 240, y: 0 }, data: { text: 'Text in', value: 'text' } },
+    { id: 'number-in', point: { x: 240, y: 90 }, data: { text: 'Number in', value: 'number' } },
   ]);
 
-  public edges: Edge[] = [];
+  protected readonly edges = signal<Edge[]>([]);
 
-  public conectionSettings: ConnectionSettings = {
-    validator: (connection) => connection.source === '1' && connection.target === '2',
+  protected readonly connection: ConnectionSettings = {
+    // A connection is valid when both of its ends carry the same type of value.
+    validator: ({ source, target }) => this.valueOf(source) === this.valueOf(target),
   };
 
-  public createEdge(connection: Connection) {
-    this.edges = addEdges([{ id: crypto.randomUUID(), ...connection }], { nodes: this.nodes, edges: this.edges });
+  // Runs for valid connections only.
+  protected connect(connection: Connection): void {
+    this.edges.update((edges) => addEdges([{ id: crypto.randomUUID(), ...connection }], { nodes: this.nodes, edges }));
+  }
+
+  private valueOf(nodeId: string): string | undefined {
+    return this.nodes.find((node) => node.id === nodeId)?.data().value;
   }
 }

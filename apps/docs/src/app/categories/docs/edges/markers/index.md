@@ -16,6 +16,9 @@ line stays hidden: under a closed arrowhead it ends at the base of the arrow, wh
 marker width; through an open arrow it runs to just short of the tip. `sourcePoint` and `targetPoint` that a custom
 curve receives are already moved by that distance when the edge has a marker on that end.
 
+In the demo each edge is labeled with its markers. `Mobile` and `API` are not connected: drag from one to the other
+to see the connection line end with the `arrow` of `markerEnd`. The demo gives the new edge the same marker.
+
 {{ NgDocActions.demoPane("MarkersDemoComponent") }}
 
 ## Custom markers
@@ -36,7 +39,7 @@ as the type alone, or as an object with a size. The connection line accepts it i
 ```
 
 ```ts
-edges = createEdges([{ id: '1 -> 2', source: '1', target: '2', markers: { start: 'bar', end: { type: 'diamond', width: 24 } } }]);
+edges = createEdges([{ id: 'order-line-item', source: 'order', target: 'line-item', markers: { start: 'bar', end: { type: 'diamond', width: 24 } } }]);
 ```
 
 {% endraw %}
@@ -50,5 +53,8 @@ yourself. Stroke properties inherit from the marker element. The stroke is `stro
 marker size, `2` by default like the default edge line, so a line meets its marker without a step; give a marker
 of a thicker edge the same `strokeWidth`. Your CSS can still override the stroke through the `data-v-marker="<type>"`
 attribute, in marker units. A type without a declared shape renders an empty marker.
+
+The demo declares five shapes and labels each edge with its start and end markers. Its connection line ends with
+the `circle-closed` shape.
 
 {{ NgDocActions.demoPane("CustomMarkersDemoComponent") }}

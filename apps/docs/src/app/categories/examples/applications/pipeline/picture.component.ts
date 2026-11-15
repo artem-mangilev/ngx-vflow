@@ -5,46 +5,23 @@ import { FILTERS, Picture } from './image-lab';
 @Component({
   selector: 'app-picture',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { class: 'picture' },
-  styles: `
-    :host {
-      position: relative;
-      display: block;
-      width: 100%;
-      height: 100%;
-    }
-    img,
-    .layer {
-      display: block;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-    /* Blending stays inside the stack instead of mixing with the node behind it. */
-    .stack {
-      position: relative;
-      isolation: isolate;
-    }
-    .top {
-      position: absolute;
-      inset: 0;
-    }
-  `,
+  host: { class: 'block size-full' },
   template: `
     @let p = picture();
     @switch (p.kind) {
       @case ('image') {
-        <img alt="" draggable="false" [src]="p.src" />
+        <img class="block size-full object-cover" alt="" draggable="false" [src]="p.src" />
       }
       @case ('filter') {
-        <div class="layer" [style.filter]="filter(p.fn, p.amount)">
+        <div class="size-full" data-testid="filter" [style.filter]="filter(p.fn, p.amount)">
           <app-picture [picture]="p.input" [width]="width()" />
         </div>
       }
       @case ('blend') {
-        <div class="layer stack">
+        <!-- Isolated, so blending stays inside the stack instead of mixing with the node behind it. -->
+        <div class="relative isolate size-full" data-testid="blend">
           <app-picture [picture]="p.a" [width]="width()" />
-          <app-picture class="top" [picture]="p.b" [width]="width()" [style.mix-blend-mode]="p.mode" />
+          <app-picture class="absolute inset-0" [picture]="p.b" [width]="width()" [style.mix-blend-mode]="p.mode" />
         </div>
       }
     }

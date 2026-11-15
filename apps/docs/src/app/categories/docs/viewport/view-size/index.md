@@ -18,7 +18,7 @@ By default `vflow` fills its parent element, so the parent needs a width and a h
 Size the element itself for a flow of fixed size:
 
 ```html
-<vflow [nodes]="nodes" [edges]="edges" style="width: 600px; height: 600px" />
+<vflow [nodes]="nodes" [edges]="edges" style="width: 600px; height: 400px" />
 ```
 
 {{ NgDocActions.demo("ViewSizeFixedDemoComponent", { fullscreenRoute: "view-size-fixed" }) }}

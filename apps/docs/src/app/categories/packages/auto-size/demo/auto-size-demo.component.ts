@@ -5,22 +5,17 @@ import { Vflow, createEdges, createNodes } from 'ngx-vflow';
 
 @Component({
   template: `<vflow
+    #flow
     vxAutoSize
     [vxAutoSizePadding]="padding"
     [vxAutoSizeShrink]="true"
     [nodes]="nodes"
     [edges]="edges"
-    [background]="{ type: 'dots' }">
+    (initialized)="flow.fitView({ maxZoom: 1 })">
     <docs-node *vNode="let ctx" [ctx]="ctx" />
     <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
   </vflow>`,
-  styles: `
-    :host {
-      display: block;
-      width: 100%;
-      height: 100%;
-    }
-  `,
+  host: { class: 'block size-full' },
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [DocsPresentations, Vflow, VxAutoSize],
 })
@@ -30,25 +25,25 @@ export class AutoSizeDemoComponent {
 
   // Parents size themselves through `width` and `height`; children may leave them, so their extent is `null`.
   protected readonly nodes = createNodes([
-    { id: 'team', point: { x: 40, y: 40 }, width: 560, height: 300, data: { text: 'Team', type: 'group' } },
-    { id: 'lead', point: { x: 40, y: 60 }, parentId: 'team', extent: null, data: { text: 'Lead' } },
+    { id: 'team', point: { x: 0, y: 0 }, width: 496, height: 270, data: { text: 'Team', type: 'group' } },
+    { id: 'lead', point: { x: 24, y: 126 }, parentId: 'team', extent: null, data: { text: 'Lead' } },
     {
       id: 'squad',
-      point: { x: 220, y: 40 },
+      point: { x: 184, y: 56 },
       parentId: 'team',
       extent: null,
-      width: 300,
-      height: 220,
+      width: 288,
+      height: 190,
       data: { text: 'Squad', type: 'group' },
     },
-    { id: 'dev-1', point: { x: 30, y: 60 }, parentId: 'squad', extent: null, data: { text: 'Dev 1' } },
-    { id: 'dev-2', point: { x: 170, y: 120 }, parentId: 'squad', extent: null, data: { text: 'Dev 2' } },
-    { id: 'client', point: { x: 700, y: 160 }, data: { text: 'Client' } },
+    { id: 'backend', point: { x: 24, y: 56 }, parentId: 'squad', extent: null, data: { text: 'Backend' } },
+    { id: 'frontend', point: { x: 164, y: 116 }, parentId: 'squad', extent: null, data: { text: 'Frontend' } },
+    { id: 'client', point: { x: 580, y: 172 }, data: { text: 'Client' } },
   ]);
 
   protected readonly edges = createEdges([
-    { id: 'lead -> dev-1', source: 'lead', target: 'dev-1' },
-    { id: 'lead -> dev-2', source: 'lead', target: 'dev-2' },
-    { id: 'dev-2 -> client', source: 'dev-2', target: 'client' },
+    { id: 'lead-backend', source: 'lead', target: 'backend' },
+    { id: 'lead-frontend', source: 'lead', target: 'frontend' },
+    { id: 'frontend-client', source: 'frontend', target: 'client' },
   ]);
 }

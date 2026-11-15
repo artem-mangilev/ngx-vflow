@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { addEdges, Connection, createNodes, Edge, Vflow } from 'ngx-vflow';
 
+// Plain CSS with system colors on purpose: this is the code of the quickstart, which installs only ngx-vflow.
 @Component({
   selector: 'app-first-flow',
   imports: [Vflow],
