@@ -69,8 +69,11 @@ describe('Graph rendering and interaction regressions', () => {
     }),
   );
 
+  // A rendered node: it has been measured, so a handle it lacks is really missing.
   function node(id: string) {
-    return TestBed.runInInjectionContext(() => new NodeModel(createNode({ id, point: { x: 0, y: 0 } })));
+    const model = TestBed.runInInjectionContext(() => new NodeModel(createNode({ id, point: { x: 0, y: 0 } })));
+    model.hasMeasurement.set(true);
+    return model;
   }
 
   it('centers an HTML label immediately after its content changes, including at non-unit zoom', () => {

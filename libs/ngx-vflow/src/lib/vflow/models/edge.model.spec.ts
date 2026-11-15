@@ -152,13 +152,24 @@ describe('EdgeModel', () => {
     expect(model.detached()).toEqual(true);
   });
 
-  it('should detached === true if there no source handle', () => {
+  it('should detached === true if there no source handle on a measured source', () => {
+    model.source()!.hasMeasurement.set(true);
     model.source()!.handles.set([]);
     expect(model.detached()).toEqual(true);
   });
 
-  it('should detached === true if there no target handle', () => {
+  it('should detached === true if there no target handle on a measured target', () => {
+    model.target()!.hasMeasurement.set(true);
     model.target()!.handles.set([]);
+    expect(model.detached()).toEqual(true);
+  });
+
+  it('is not detached while a node without the handle has never been measured', () => {
+    model.source()!.handles.set([]);
+    model.target()!.handles.set([]);
+    expect(model.detached()).toEqual(false);
+
+    model.target()!.hasMeasurement.set(true);
     expect(model.detached()).toEqual(true);
   });
 

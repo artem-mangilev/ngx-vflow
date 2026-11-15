@@ -121,6 +121,10 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
       endpointPlaced(this.targetHandle()),
   );
 
+  /**
+   * The source or target node is absent, or a measured endpoint node does not render the handle the edge names. A node
+   * that has never been measured has not rendered its handles yet, so a missing handle on it means nothing.
+   */
   public readonly detached = computed(() => {
     const source = this.source();
     const target = this.target();
@@ -129,7 +133,7 @@ export class EdgeModel implements FlowEntity, Contextable<EdgeContext> {
       return true;
     }
 
-    return !this.sourceHandle() || !this.targetHandle();
+    return (source.hasMeasurement() && !this.sourceHandle()) || (target.hasMeasurement() && !this.targetHandle());
   });
 
   public readonly path = computed<CurveLayout>(() => {

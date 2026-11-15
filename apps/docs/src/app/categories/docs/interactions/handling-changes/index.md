@@ -4,7 +4,7 @@ keyword: 'FeaturesHandlingChanges'
 
 This guide shows how to react when the flow changes a node or an edge: a node was dragged, resized or selected, an
 edge was selected or lost an end. The demos print, under the flow, the last array each
-output emitted; connect two nodes to get an edge to select.
+output emitted; click an edge to select it, or connect two nodes to add one.
 
 A change is a notification after the fact: the signal of the node or edge has already been written. Adding and
 removing nodes and edges is not reported, because your application makes those changes itself.
@@ -58,9 +58,10 @@ To use RxJS operators, wrap an output with `outputToObservable(this.vflow.nodesC
 ## Remove edges that lost an end
 
 An edge whose source or target node is absent, or whose handle is not rendered, is not drawn. To delete such edges
-from your collection, handle `(edgesChanges.detached)`, or read the `detachedEdges` signal of the flow. Removing a
-node with `removeElements()` removes its edges with it, so nothing is left detached. This change type is
-experimental.
+from your collection, handle `(edgesChanges.detached)`, or read the `detachedEdges` signal of the flow. An edge whose
+nodes are not measured yet is not detached, so the edges a flow starts with are not reported while their handles are
+being rendered. Removing a node with `removeElements()` removes its edges with it, so nothing is left detached. This
+change type is experimental.
 
 ## Change types
 

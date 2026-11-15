@@ -8,6 +8,7 @@ import {
   NodeSelectedChange,
   Vflow,
   createEdge,
+  createEdges,
   createNodes,
 } from 'ngx-vflow';
 
@@ -59,7 +60,12 @@ export class HandlingChangesFilteredDemoComponent {
     { id: 'published', point: { x: 360, y: 0 }, data: { text: 'Published' } },
   ]);
 
-  protected readonly edges = signal<Edge[]>([]);
+  protected readonly edges = signal<Edge[]>(
+    createEdges([
+      { id: 'draft-review', source: 'draft', target: 'review' },
+      { id: 'review-published', source: 'review', target: 'published' },
+    ]),
+  );
 
   protected connect({ source, target }: Connection): void {
     this.edges.update((edges) => [...edges, createEdge({ id: `${source}-${target}`, source, target })]);

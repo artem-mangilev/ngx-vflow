@@ -494,7 +494,8 @@ export class VflowComponent<N extends Node = Node, E extends Edge = Edge> {
 
   /**
    * The edges of the `edges` input that are not drawn: the source or target node is absent, or the handle the edge
-   * names is not rendered on that node. `(edgesChanges.detached)` reports the moment an edge becomes one.
+   * names is not rendered on that node once the node is measured. An edge waiting for the first measurement of its
+   * nodes is not detached. `(edgesChanges.detached)` reports the moment an edge becomes one.
    *
    * @experimental
    */

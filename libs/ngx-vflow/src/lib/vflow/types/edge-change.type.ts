@@ -6,7 +6,8 @@ export type EdgeChange = EdgeDetachedChange | EdgeSelectedChange;
 
 /**
  * Reports that the edge is already detached from rendered endpoints: its source or target node is absent, or the
- * handle it names is not rendered on that node.
+ * handle it names is not rendered on that node once the node is measured. An edge whose nodes are not measured yet,
+ * such as every edge before the flow is initialized, is not reported.
  *
  * @experimental
  */

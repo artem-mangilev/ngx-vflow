@@ -17,16 +17,20 @@ import { EdgeChange, EdgeDetachedChange } from '../../types/edge-change.type';
     (nodesChanges)="all.push($event)"
     (nodesChanges.position)="positions.push($event)"
     (edgesChanges)="edgeChanges.push($event)"
-    (edgesChanges.detached)="detached.push($event)">
-    <div *vNode style="width: 100px; height: 50px">
-      <span vHandle handleType="target" position="left"></span
-      ><span vHandle handleType="source" position="right"></span>
+    (edgesChanges.detached)="detached.push($event)"
+    (initialized)="initialized = { edgeChanges: edgeChanges.slice(), detached: detached.slice() }">
+    <div *vNode="let ctx" style="width: 100px; height: 50px">
+      @if (ctx.node.id !== withoutTarget()) {
+        <span vHandle handleType="target" position="left"></span>
+      }
+      <span vHandle handleType="source" position="right"></span>
     </div>
     <svg:path *vEdge="let ctx" [attr.d]="ctx.path()" />
   </vflow>`,
 })
 class ChangesHostComponent {
   flow = viewChild.required(VflowComponent);
+  withoutTarget = signal<string | null>(null);
   nodes = signal(
     createNodes([
       { id: 'a', point: { x: 0, y: 0 } },
@@ -43,6 +47,7 @@ class ChangesHostComponent {
   positions: NodePositionChange[][] = [];
   edgeChanges: EdgeChange[][] = [];
   detached: EdgeDetachedChange[][] = [];
+  initialized: { edgeChanges: EdgeChange[][]; detached: EdgeDetachedChange[][] } | null = null;
 }
 
 describe('change outputs of the flow', () => {
@@ -127,6 +132,33 @@ describe('change outputs of the flow', () => {
       ]),
     );
     expect(host.edgeChanges).toEqual(host.detached);
+  });
+
+  it('reports no edge as detached while its handles are not yet measured at startup', async () => {
+    TestBed.configureTestingModule({ imports: [ChangesHostComponent] });
+    const fixture = TestBed.createComponent(ChangesHostComponent);
+    const host = fixture.componentInstance;
+
+    for (let tick = 0; tick < 3; tick++) {
+      fixture.detectChanges();
+      await fixture.whenStable();
+      await settle();
+    }
+
+    expect(host.initialized).toEqual({ edgeChanges: [], detached: [] });
+    expect(host.edgeChanges).toEqual([]);
+    expect(host.detached).toEqual([]);
+    expect(host.flow().detachedEdges()).toEqual([]);
+  });
+
+  it('reports an edge whose node stops rendering its handle after the first layout', async () => {
+    const { host, stable } = await setup();
+
+    host.withoutTarget.set('b');
+    await stable();
+
+    expect(host.detached).toEqual([[{ type: 'detached', id: 'a-b' }]]);
+    expect(host.flow().detachedEdges()).toEqual([host.edges[0]]);
   });
 
   it('reports a selection change of an edge', async () => {
