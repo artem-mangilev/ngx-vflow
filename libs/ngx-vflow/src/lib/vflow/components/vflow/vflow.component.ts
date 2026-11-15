@@ -102,6 +102,10 @@ import { ResolvedVflowSettingSignals } from './resolve-settings';
  * The flow. `N` and `E` are the node and edge types of the `nodes` and `edges` inputs; a template infers them from
  * the bindings, so `$event` of the node, connection and component events carries the application's own types. In
  * code, name them: `viewChild.required<VflowComponent<MyNode, MyEdge>>(VflowComponent)`.
+ *
+ * An element in the flow content that is not a template, such as viewport controls, is rendered above the pane in a
+ * layer the size of the flow, so it is positioned against the flow; the pointer reaches the pane around it. It may
+ * `inject(VflowComponent)` to drive the flow.
  */
 @Component({
   selector: 'vflow',

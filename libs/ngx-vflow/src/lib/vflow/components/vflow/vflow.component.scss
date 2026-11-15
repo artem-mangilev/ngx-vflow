@@ -173,6 +173,18 @@
 }
 
 // d3-zoom target, receives all wheel/drag events
+// The application's own overlays. The layer lets the pointer through to the pane; the elements in it take it.
+.v-content-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+
+  ::ng-deep > * {
+    pointer-events: auto;
+  }
+}
+
 .v-pane {
   position: absolute;
   inset: 0;

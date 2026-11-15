@@ -284,13 +284,14 @@ describe('minimap projection', () => {
     return fixture.nativeElement as HTMLElement;
   }
 
-  it('does not render a minimap that a wrapper hides from the flow slot', async () => {
+  it('renders a minimap inside a wrapper with the rest of the flow content, above the pane', async () => {
     const root = await render(false);
-    expect(root.querySelector('[data-v-root] canvas')).toBeNull();
+    expect(root.querySelector('[data-v-root] .v-content-layer .v-minimap canvas')).not.toBeNull();
   });
 
-  it('renders a wrapper marked with ngProjectAs', async () => {
+  it('renders a wrapper marked with ngProjectAs in the minimap slot', async () => {
     const root = await render(true);
     expect(root.querySelector('[data-v-root] .v-minimap canvas')).not.toBeNull();
+    expect(root.querySelector('.v-content-layer .v-minimap')).toBeNull();
   });
 });

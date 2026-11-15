@@ -17,6 +17,29 @@ The methods belong to `VflowComponent`. Reach it through a template reference or
 private readonly flow = viewChild.required(VflowComponent);
 ```
 
+A component of your own placed inside `vflow`, such as a toolbar of viewport buttons, injects the flow it is in. The
+flow renders such an element above the pane, in a layer the size of the flow, so position it with CSS; the pointer
+still reaches the pane around it. [`vui-controls`](/packages/ui/overview#viewport-controls) of `@vflow/ui` works this
+way.
+
+```ts
+@Component({
+  selector: 'app-zoom-bar',
+  template: `<button type="button" (click)="flow.zoomIn()">Zoom in</button>`,
+  host: { class: 'absolute top-2 right-2' },
+})
+export class ZoomBarComponent {
+  protected readonly flow = inject(VflowComponent);
+}
+```
+
+```html
+<vflow [nodes]="nodes" [edges]="edges">
+  <!-- node and edge templates -->
+  <app-zoom-bar />
+</vflow>
+```
+
 ## Fit the graph on load
 
 `(initialized)` is emitted once, when the first layout is complete: the flow has a size, and every node has its size

@@ -32,11 +32,12 @@ The flow projects the minimap by its selector, so a condition adds and removes i
 
 ## Wrap it in your own component
 
-A wrapper component is not projected by itself. Give it `ngProjectAs`:
+A wrapper component needs nothing extra: the flow renders every element of its content above the pane, the minimap
+inside a wrapper included.
 
 ```html
 <vflow [nodes]="nodes">
-  <app-minimap ngProjectAs="v-minimap" />
+  <app-minimap />
 </vflow>
 ```
 
