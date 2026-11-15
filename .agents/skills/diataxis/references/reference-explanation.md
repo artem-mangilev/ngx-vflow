@@ -1,0 +1,41 @@
+# The difference between reference and explanation
+
+> Source: https://diataxis.fr/reference-explanation/
+
+Explanation and reference both belong to the _theory_ half of the Diátaxis map - they don't contain steps to guide the reader, they contain theoretical knowledge.
+
+The difference between them is - just as in the difference between tutorials and how-to guides - the difference between the _acquisition_ of skill and knowledge, and its _application_. In other words it's the distinction between _study_ and _work_.
+
+## A straightforward distinction, mostly
+
+Mostly it's fairly straightforward to recognise whether you're dealing with one or the other. _Reference_, as a form of writing, is well understood; it's used in distinctions we make about writing from an early age.
+
+In addition, examples of writing are themselves often clearly one or the other. A tidal chart, with its tables of figures, is clearly reference material. An article that explains _why_ there are tides and how they behave is self-evidently explanation.
+
+There are good rules of thumb:
+
+- **If it's boring and unmemorable** it's probably _reference_.
+- **Lists of things** (such as classes or methods or attributes), and **tables of information**, will generally turn out to belong in _reference_.
+- On the other hand **if you can imagine reading something in the bath**, probably, it's _explanation_ (even if really there is no accounting for what people might read in the bath).
+
+Imagine asking a friend, while out for a walk or over a drink, **Can you tell me more about <topic>?** - the answer or discussion that follows is most likely going to be an _explanation_ of it.
+
+### ...but intuition isn't reliable enough
+
+Mostly we can rely safely on intuition to manage the distinction between reference and explanations. But only _mostly_ - because it's also quite easy to slip between one form and the other.
+
+It usually happens while writing reference material that starts to become expansive. For example, it's perfectly reasonable to include illustrative examples in reference (just as an encyclopaedia might contain illustrations) - but examples are fun things to develop, and it can be tempting to develop them into explanation (using them to say _why_, or show _what if_, or how it came to be).
+
+As a result one often finds explanatory material sprinkled into reference. This is bad for the reference, interrupted and obscured by digressions. But it's bad for the explanation too, because it's not allowed to develop appropriately and do its own work.
+
+## Work and study
+
+The real test, though, if we're in doubt about whether something is supposed to be reference or explanation is: is this something someone would turn to while working, that is, while actually getting something done, executing a task? Or is it something they'd need once they have stepped away from the work, and want to think about it?
+
+These are two very fundamentally different _needs_ of the reader, that reflect how, at that moment, the reader stands in relation to the craft in question, in a relationship of _work_ or _study_.
+
+**Reference** is what a user needs in order to help _apply_ knowledge and skill, while they are working.
+
+**Explanation** is what someone will turn to to help them _acquire_ knowledge and skill - "study".
+
+Understanding those two relationships and responding to the needs in them is the key to creating effective reference and explanation.
