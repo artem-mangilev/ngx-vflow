@@ -6,3 +6,5 @@ dist
 .cache
 # Copies of the built libraries and of the @vflow/ui sources
 apps/docs/libs
+# The shell of the docs application is a plain HTML document, not an Angular template
+apps/docs/src/index.html
