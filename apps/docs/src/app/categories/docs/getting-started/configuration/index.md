@@ -59,7 +59,7 @@ provideVflow(withSettings(() => inject(Preferences).flowSettings));
 
 Takes a `Partial<AriaLabelConfig>` with the names, descriptions and announcements of the graph; omitted keys keep
 their English defaults. A factory works as for `withSettings()`, so the labels can follow the language of the
-application. See [Accessibility](/docs/interactions/accessibility) for the keys.
+application. See the [Accessibility reference](/docs/reference/accessibility#labels) for the keys.
 
 ### `withShortcuts(shortcuts)`
 
@@ -79,7 +79,7 @@ edge lays out its path. See [Curves](/docs/edges/curves#curves-by-key).
 Register component classes, or `() => import(...)` factories, under keys. A node or edge then names its component as
 `component: 'task'`, so the code that builds the graph imports no component classes and the graph serializes as
 data. A key that no `provideVflow()` on the path registers is an error when the entity is created. See
-[Custom nodes](/docs/nodes/custom-nodes#component-keys) and [Custom edges](/docs/edges/custom-edges).
+[Custom nodes](/docs/nodes/custom-nodes#refer-to-components-by-key) and [Custom edges](/docs/edges/custom-edges).
 
 ## Scope
 

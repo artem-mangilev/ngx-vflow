@@ -63,7 +63,7 @@ The reason is that a node editor is part of a product, and its nodes are that pr
 default look would be replaced in every real application, and inputs for colors and borders would only stand between
 your CSS and the element. What core does draw is feedback that has no markup of yours to live in: the background
 pattern, the selection box, resize controls, alignment guides, the connection preview and the focus ring.
-[Styling](/docs/getting-started/styling) lists them with their tokens.
+[Tokens and attributes](/docs/reference/styling) lists them.
 
 If you want a ready look, [@vflow/ui](/packages/ui/overview) is a set of parts copied into your workspace.
 
@@ -100,7 +100,6 @@ flow convert a point, for example to place a node where something was dropped; s
 
 ## The size of a node
 
-By default a node is as large as its content, and the flow measures it. Giving a node a `width` or a `height` fixes
-that axis instead. The two signals hold the size your application asks for; the rendered size, which edges, handles
-and bounds use, is read from `ctx.width()` / `ctx.height()` or `getNodeRect()`. [Resizing](/docs/nodes/resizer)
-covers both modes.
+By default a node is as large as its content, and the flow measures it. A `width` or a `height` fixes that axis
+instead. [Node sizes](/docs/concepts/node-sizes) explains the two modes and why the size you ask for and the size
+that is rendered are kept apart.

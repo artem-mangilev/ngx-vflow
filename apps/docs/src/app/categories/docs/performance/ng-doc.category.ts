@@ -4,7 +4,7 @@ import DocsCategory from '../ng-doc.category';
 const PerformanceCategory: NgDocCategory = {
   title: 'Performance',
   category: DocsCategory,
-  order: 8,
+  order: 9,
 };
 
 export default PerformanceCategory;

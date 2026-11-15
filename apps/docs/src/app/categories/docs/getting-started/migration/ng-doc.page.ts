@@ -5,7 +5,7 @@ const Page: NgDocPage = {
   title: 'Migration',
   mdFile: './index.md',
   category: GettingStartedCategory,
-  order: 5,
+  order: 4,
 };
 
 export default Page;

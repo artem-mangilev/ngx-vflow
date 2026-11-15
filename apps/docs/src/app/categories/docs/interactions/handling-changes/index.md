@@ -2,70 +2,35 @@
 keyword: 'FeaturesHandlingChanges'
 ---
 
-> **Info**
-> You can observe changes in the toasts.
+This guide shows how to react when the flow changes a node or an edge: a node was dragged, resized or selected, an
+edge was selected or lost an end. The demos report the changes in toasts.
 
-You can observe various changes in nodes and edges. Every `NodeChange` and `EdgeChange` is a post-mutation notification: the collection or writable signal has already changed. Do not replay these notifications through structural graph helpers.
+A change is a notification after the fact: the signal of the node or edge has already been written. Adding and
+removing nodes and edges is not reported, because your application makes those changes itself.
 
-Types of `NodeChange`s:
+## Listen to every change
 
-- `position` - new node position after drag and drop
-- `size` - new rendered node size; `mode` tells for each axis (`{ width, height }`) whether it is `explicit` (set by the application or the resizer, worth persisting) or an `auto` measurement of the node's content
-- `select` - when node was selected (also triggers for unselected nodes)
-
-Types of `EdgeChange`s:
-
-- `select` - when edge was selected (also triggers for unselected edges)
-- `detached` - when edge became invisible because its source or target node is absent, or the handle it names is not rendered on that node. Use this to delete such edges from the edges list. Experimental
-
-Adding and removing nodes and edges is not reported: your application owns the `nodes` and `edges` arrays and makes those changes itself. `removeElements()` removes a node together with its edges, so nothing is left detached.
-
-There are a several ways to receive these changes:
-
-## From (nodesChanges) and (edgesChanges) outputs
-
-This is a way to get every possible change. Changes come as non-empty arrays:
-
-- `(nodesChanges)` emits `NodeChange[]`
-- `(edgesChanges)` emits `EdgeChange[]`
-
-One array holds every change of one tick. Dragging ten selected nodes emits one array with ten `position` changes on every move, not ten arrays.
+Bind `(nodesChanges)` and `(edgesChanges)`. Each emits a non-empty array with every change of one tick, so dragging
+ten selected nodes emits one array with ten `position` changes on every move, not ten arrays.
 
 {{ NgDocActions.demoPane("HandlingChangesDemoComponent") }}
 
-## From filtered outputs
+## Listen to one type of change
 
-For your convenience, here is the filtering scheme for changes based on the `(nodesChanges)` and `(edgesChanges)` events:
+If you handle a single type, bind its filtered output. It emits only the changes of that type, and observes only
+what that type needs:
 
-- `(nodesChanges.[NodeChangeType])` - a list of node changes of a certain type
-- `(edgesChanges.[EdgeChangeType])` - a list of edge changes of a certain type
-
-Where:
-
-```ts
-type NodeChangeType = 'position' | 'size' | 'select';
-
-type EdgeChangeType = 'detached' | 'select';
+```html
+<vflow [nodes]="nodes" [edges]="edges" (nodesChanges.position)="save($event)" (edgesChanges.detached)="prune($event)" />
 ```
 
 {{ NgDocActions.demoPane("HandlingChangesFilteredDemoComponent") }}
 
-List of all possible filter outputs:
+## Subscribe from code
 
-```
-'nodesChanges.position',
-'nodesChanges.size',
-'nodesChanges.select',
-
-'edgesChanges.detached',
-'edgesChanges.select',
-```
-
-A filtered output also emits one array per tick, with the changes of its type only. It observes only what its type needs, so prefer it when you handle a single type.
-
-## From the component itself
-
-`nodesChanges` and `edgesChanges` are outputs of `VflowComponent`, so code can subscribe to them through a reference to the flow. The subscription ends when the flow is destroyed.
+`nodesChanges` and `edgesChanges` are outputs of `VflowComponent`, so code with a reference to the flow can
+subscribe to them. The subscription ends when the flow is destroyed. The filtered outputs are available only in the
+template.
 
 ```ts
 {
@@ -86,6 +51,31 @@ A filtered output also emits one array per tick, with the changes of its type on
 }
 ```
 
-For RxJS operators, wrap an output with `outputToObservable(this.vflow.nodesChanges)` from `@angular/core/rxjs-interop`. The filtered outputs are available only in the template.
+To use RxJS operators, wrap an output with `outputToObservable(this.vflow.nodesChanges)` from
+`@angular/core/rxjs-interop`.
 
-Which signals of a node or an edge the flow writes, and which it only reads, is part of the data model: see [Core concepts](/docs/getting-started/concepts#what-the-flow-writes).
+## Remove edges that lost an end
+
+An edge whose source or target node is absent, or whose handle is not rendered, is not drawn. To delete such edges
+from your collection, handle `(edgesChanges.detached)`, or read the `detachedEdges` signal of the flow. Removing a
+node with `removeElements()` removes its edges with it, so nothing is left detached. This change type is
+experimental.
+
+## Change types
+
+| Output                    | Emitted when                                                                                                                                                   |
+| ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `(nodesChanges.position)` | A node was moved by a drag or the keyboard                                                                                                                     |
+| `(nodesChanges.size)`     | The rendered size of a node changed; `mode` tells for each axis whether it is `explicit` or an `auto` measurement, see [Node sizes](/docs/concepts/node-sizes) |
+| `(nodesChanges.select)`   | A node was selected or deselected                                                                                                                              |
+| `(edgesChanges.select)`   | An edge was selected or deselected                                                                                                                             |
+| `(edgesChanges.detached)` | An edge stopped being drawn because an end is missing                                                                                                          |
+
+Do not replay these notifications through the [graph operations](/docs/graph/graph-operations): the change has
+already happened.
+
+## See also
+
+- [Core concepts](/docs/concepts/core-concepts#what-the-flow-writes) for which signals of a node or an edge the flow
+  writes, and which it only reads.
+- [Resizing](/docs/nodes/resizer#save-the-size-a-user-set) for saving a size from a `size` change.

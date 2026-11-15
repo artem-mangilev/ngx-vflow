@@ -4,7 +4,7 @@ import DocsCategory from '../ng-doc.category';
 const EdgesCategory: NgDocCategory = {
   title: 'Edges',
   category: DocsCategory,
-  order: 4,
+  order: 5,
 };
 
 export default EdgesCategory;

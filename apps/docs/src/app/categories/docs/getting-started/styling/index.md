@@ -1,62 +1,40 @@
-Nodes, edges, labels and handles are your markup, so you style them with your own CSS. Core adds two things to
-work with: attributes that carry the state of each element, and a small set of tokens for the few parts core draws
-itself.
+This guide shows how to style a flow. Nodes, edges, labels and handles are your markup, so most of it is your own
+CSS; core adds attributes that carry the state of each element, and tokens for the few parts it draws itself. Both
+are listed in [Tokens and attributes](/docs/reference/styling).
 
-## Style a presentation from its state
+## Style a node or an edge by its state
 
-A template or a component reads the state as signals and binds classes to it:
+Read the state as a signal in the presentation and bind a class to it:
 
 ```html
 <div *vNode="let ctx" class="card" [class.card--selected]="ctx.selected()">…</div>
 ```
 
-Core also writes the state to the DOM, which suits a stylesheet shared by several presentations:
-
-| Element   | Attributes                                                                                              |
-| --------- | ------------------------------------------------------------------------------------------------------- |
-| Node host | `data-v-node="<id>"`, `data-v-selected`, `data-v-preselected`                                           |
-| Edge host | `data-v-edge="<id>"`, `data-v-selected`, `data-v-preselected`                                           |
-| Handle    | `data-v-handle`, `data-v-handle-type`, `data-v-handle-position`, `data-v-handle-state` and the policies |
-| Flow root | `data-v-root`                                                                                           |
+If several presentations share one stylesheet, select by the attributes core writes on the host of a node or an
+edge instead:
 
 ```css
 [data-v-selected] .card {
   border-color: royalblue;
 }
+```
 
+Put such rules into a global stylesheet. The host is an element of the library, so a selector that starts at
+`[data-v-selected]` does not match under the emulated view encapsulation of a component.
+
+## Style a handle
+
+A handle is your own element, so its attributes work in component styles:
+
+```css
 .port[data-v-handle-state='valid'] {
   background: seagreen;
 }
 ```
 
-The node and edge hosts are elements of the library, outside the view of your component. A selector that starts
-at `[data-v-selected]` therefore does not match under the emulated view encapsulation of a component: put such rules
-into a global stylesheet, or bind classes from `ctx.selected()` as above. A handle is your own element, so its
-attributes work in component styles. [Handles](/docs/handles/handles#state) lists the handle states.
+## Recolor the parts core draws
 
-## Core tokens
-
-Core draws the feedback that has no markup of yours: the canvas, the background pattern, the selection box, resize
-controls, alignment guides, the connection preview, the minimap and the focus ring. Each takes its color from a CSS
-custom property with a default, so a flow works without any setup.
-
-| Token                       | Default              | Part                                                               |
-| --------------------------- | -------------------- | ------------------------------------------------------------------ |
-| `--v-background`            | `#fff`               | The canvas; also fills nodes in the minimap                        |
-| `--v-background-pattern`    | `rgb(177, 177, 183)` | Dots and grid lines                                                |
-| `--v-selection-box`         | `#0f4c75`            | Stroke of the selection box; its fill is the same color at 12%     |
-| `--v-resize-control`        | `#0f4c75`            | Resize handles and lines                                           |
-| `--v-resize-control-border` | `#fff`               | The border that separates a resize handle from the node            |
-| `--v-alignment-guides`      | `#1b262c`            | Alignment guides, drawn at 50%                                     |
-| `--v-connection`            | `rgb(177, 177, 183)` | The line of a connection in progress without a template            |
-| `--v-minimap-mask`          | `rgb(177, 177, 183)` | The minimap mask outside the viewport, at 35%, and node outlines   |
-| `--v-minimap-selected`      | `#0f4c75`            | Outline of selected nodes in the minimap                           |
-| `--v-focus`                 | `#005fcc`            | Focus halo of nodes and edges                                      |
-| `--v-focus-halo`            | `4px`                | How far the halo reaches beyond a node and to each side of an edge |
-| `--v-focus-radius`          | `0px`                | Corner radius of a focused node, so the halo follows its shape     |
-| `--v-node-toolbar-offset`   | `10px`               | Gap between a node and its toolbar                                 |
-
-Set a token on the `vflow` element or any ancestor; a value set inside the flow wins for that subtree:
+Set the core tokens on the `vflow` element or an ancestor:
 
 ```css
 .editor {
@@ -67,28 +45,20 @@ Set a token on the `vflow` element or any ancestor; a value set inside the flow 
 }
 ```
 
-Core also sets the read-only `--v-zoom` on the flow element, so scaled content can keep screen-sized details:
-`border-width: calc(1px / var(--v-zoom, 1))`. It is written when a viewport change ends, not on every frame of a
-gesture.
+## Reshape a part core draws
 
-## Reshape a core part
+A token changes a color. For size and shape, select the part by its attribute in a global stylesheet:
 
-A token changes a color. For size and shape, each part has a public attribute to select it:
+```css
+[data-v-resize-control='handle'] {
+  border-radius: 50%;
+}
+```
 
-| Attribute                                                                      | Part                                                                    |
-| ------------------------------------------------------------------------------ | ----------------------------------------------------------------------- |
-| `data-v-background-pattern`                                                    | The background pattern                                                  |
-| `data-v-selection-box`                                                         | The selection box                                                       |
-| `data-v-resize-control` (`handle` or `line`), `data-v-resize-control-position` | Resize controls, see [Resizing](/docs/nodes/resizer)                    |
-| `data-v-alignment-guides`, `data-v-alignment-guide` (`line` or `point`)        | Alignment guides, see [Snapping and alignment](/docs/viewport/snapping) |
-| `data-v-marker="<type>"`                                                       | An edge marker, see [Markers](/docs/edges/markers)                      |
+## Add a dark theme
 
-These parts are rendered by the library, so the rules belong in a global stylesheet.
-
-## Dark theme
-
-A theme is a scope that sets the tokens. Give the tokens their dark values under the selector your application uses
-for its dark mode, and style your own presentations the same way:
+Give the tokens their dark values under the selector your application uses for its dark mode, and style your own
+presentations the same way:
 
 ```css
 .dark .editor {
@@ -99,15 +69,30 @@ for its dark mode, and style your own presentations the same way:
 }
 ```
 
-The minimap is a canvas: it samples the resolved tokens and repaints when an attribute or a class changes on an
-ancestor of the flow, or when `prefers-color-scheme` changes.
+## Keep a detail the same size at every zoom
 
-## High contrast
+Divide by the read-only `--v-zoom` token:
 
-Under `forced-colors: active` core maps its tokens to system colors (`Canvas`, `GrayText`, `Highlight`), whatever
-the theme sets. Do the same for your presentations where color alone carries a meaning.
+```css
+.card {
+  border-width: calc(1px / var(--v-zoom, 1));
+}
+```
 
-## A ready theme
+## Support high contrast
 
-[@vflow/ui](/packages/ui/overview) ships node, port and edge parts with light and dark themes and maps the core
-tokens onto its own roles, so one accent color restyles the parts and core together.
+Core switches its own parts to system colors under `forced-colors: active`. Do the same for your presentations
+where color alone carries a meaning:
+
+```css
+@media (forced-colors: active) {
+  .card--selected {
+    outline: 2px solid Highlight;
+  }
+}
+```
+
+## Use a ready theme
+
+If you would rather not style everything yourself, [@vflow/ui](/packages/ui/overview) ships node, port and edge
+parts with light and dark themes, and one accent color restyles the parts and core together.

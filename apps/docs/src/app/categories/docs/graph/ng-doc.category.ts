@@ -4,7 +4,7 @@ import DocsCategory from '../ng-doc.category';
 const GraphCategory: NgDocCategory = {
   title: 'Graph data',
   category: DocsCategory,
-  order: 7,
+  order: 8,
 };
 
 export default GraphCategory;

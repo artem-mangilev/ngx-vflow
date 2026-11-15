@@ -4,7 +4,7 @@ import DocsCategory from '../ng-doc.category';
 const InteractionsCategory: NgDocCategory = {
   title: 'Interactions',
   category: DocsCategory,
-  order: 6,
+  order: 7,
 };
 
 export default InteractionsCategory;

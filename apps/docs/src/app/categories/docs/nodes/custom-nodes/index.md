@@ -24,11 +24,9 @@ A template gets the node as `ctx`; a component gets the same object from `inject
 `ariaLabel` gives a node its accessible name; without it core uses `Node {id}`. Handles are part of the presentation:
 put the `vHandle` directive on the elements where connections attach, see [Handles](/docs/handles/handles).
 
-## Template nodes
+## Draw nodes with a template
 
-You can create custom nodes with a `vNode` template
-
-Follow these steps to achieve this:
+To draw nodes with a `vNode` template:
 
 1. Put an element with the structural `vNode` directive inside `vflow`, as in the example below
 2. Write your HTML inside this element
@@ -64,16 +62,10 @@ several kinds of nodes, keep a discriminator in `data` and branch on it with `@i
 
 {{ NgDocActions.demoPane("CustomNodesDemoComponent") }}
 
-## Component nodes
+## Draw nodes with components
 
-Another approach is to render nodes from components.
-
-Its benefits:
-
-- type-safe node data access
-- good for complex flows with many different node types
-
-How to create component node:
+If a flow has several kinds of nodes, or you want typed access to the data of a node, draw each kind with its own
+component:
 
 1. Create a regular angular standalone component. It does not extend any base class
 2. Read the node with `injectNode()`. Pass your data interface to its generic to get typed `data`. The returned object
@@ -87,7 +79,7 @@ own data through `injectNode<T>()`.
 
 A lazy import function in `component` loads the component only when it is needed; see [Lazy loading](/docs/performance/lazy-loading).
 
-### Component keys
+## Refer to components by key
 
 The code that builds a graph often should not import component classes: it lives in a store, it loads the graph from
 a server, or it serializes it. Register the components once, under keys, with `withNodeComponents()` inside
@@ -125,7 +117,7 @@ declare module 'ngx-vflow' {
 
 {{ NgDocActions.demoPane("CustomComponentNodesDemoComponent") }}
 
-### Handling events
+## Listen to the outputs of component nodes
 
 > **Warning**
 > This is an experimental API

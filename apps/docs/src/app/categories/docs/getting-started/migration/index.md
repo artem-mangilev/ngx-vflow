@@ -628,6 +628,10 @@ The `vflow` element is now its own stacking context. The minimap no longer paint
 
 `<v-minimap>` is projected into the flow by its selector, and the `v-minimap` element is now the overlay layer itself. A minimap inside a wrapper component is no longer rendered: mark the wrapper with `ngProjectAs="v-minimap"`. A minimap inside `@if` or `@for` keeps working while the block has the minimap as its single root element.
 
+### Gesture exclusions
+
+Replace `class="nodrag"` with `vNoDrag` and import the directive or `Vflow`. The old class no longer disables gestures. Built-in resize controls already use the directive.
+
 ### Node toolbar
 
 The node toolbar is no longer rendered in a separate layer above the graph; the `v-node-toolbar` element itself is the positioned box inside the node. Selectors that targeted `.v-toolbar` must target `v-node-toolbar`, and node presentations clipped with `overflow: hidden` must stop clipping the node box.

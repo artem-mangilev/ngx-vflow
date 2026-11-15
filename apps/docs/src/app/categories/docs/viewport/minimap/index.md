@@ -1,8 +1,35 @@
-The library includes a minimap that offers an overview of the entire flow. To enable it, simply add a `<v-minimap />` component as a direct child of `<vflow />`. For customization options, see the available inputs in `VflowMinimapComponent`.
+This guide shows how to add a minimap, an overview of the whole graph in a corner of the flow, and how to let users
+navigate with it. Its inputs and exact behavior are in the [Viewport reference](/docs/reference/viewport#minimap).
 
-The minimap uses canvas and caches node previews during pan and zoom. It updates the previews when node geometry or selection changes, and keeps the image sharp on high-DPI displays.
+{{ NgDocActions.demoPane("MinimapDemoComponent") }}
 
-The flow projects the minimap by its selector, so `@if (showMinimap) { <v-minimap /> }` adds and removes it. A wrapper component around the minimap needs `ngProjectAs`:
+## Add a minimap
+
+Put `<v-minimap />` directly inside `<vflow>`:
+
+```html
+<vflow [nodes]="nodes" [edges]="edges">
+  <v-minimap />
+</vflow>
+```
+
+To move it to another corner, set `position`, for example `position="top-left"`.
+
+## Show it on demand
+
+The flow projects the minimap by its selector, so a condition adds and removes it:
+
+```html
+<vflow [nodes]="nodes">
+  @if (showMinimap()) {
+  <v-minimap />
+  }
+</vflow>
+```
+
+## Wrap it in your own component
+
+A wrapper component is not projected by itself. Give it `ngProjectAs`:
 
 ```html
 <vflow [nodes]="nodes">
@@ -10,7 +37,9 @@ The flow projects the minimap by its selector, so `@if (showMinimap) { <v-minima
 </vflow>
 ```
 
-Navigation is opt-in; `<v-minimap />` remains a read-only overview.
+## Let users navigate with it
+
+By default the minimap is a read-only overview. Turn on the gestures you want:
 
 ```html
 <vflow [nodes]="nodes" [edges]="edges">
@@ -18,12 +47,12 @@ Navigation is opt-in; `<v-minimap />` remains a read-only overview.
 </vflow>
 ```
 
-- `pannable` enables click/tap, mouse drag, single-finger touch drag, and scroll panning. Clicking centers the main viewport on the chosen point without changing zoom. Dragging its visible area preserves the grab offset; dragging elsewhere centers first and then follows the pointer. The main flow's `paneClickDistance` distinguishes a click from a drag, in client-space CSS pixels.
-- `zoomable` enables wheel and trackpad pinch zoom around the main viewport center. Each wheel event multiplies or divides zoom by half the step of the zoom keys and `zoomIn()` / `zoomOut()` (`√1.2`, about `1.095`), according to scroll direction: a trackpad sends many wheel events per gesture. Zoom respects the main flow's `minZoom` and `maxZoom`.
-- Both switches default to `false` and additionally respect the main flow's gesture settings. `panOnDrag` and its permitted mouse buttons control dragging and clicking; the pan activation key can enable these gestures. Selection activation takes priority over panning. `panOnScroll` or the pan activation key routes ordinary scrolling to pan, unless the zoom activation key is held. `zoomOnScroll` or the zoom activation key enables wheel zoom; `zoomOnPinch` controls trackpad pinch. The minimap switches must still be enabled.
+- With `pannable`, a click centers the viewport on that point, and a drag or a scroll pans it.
+- With `zoomable`, the wheel and a trackpad pinch zoom the viewport.
 
-An opted-in minimap captures pointer input only inside its own rectangle and suppresses wheel page scrolling there, including at zoom limits or when a main-flow gesture is disabled. The surrounding pane remains interactive. A drag continues outside the minimap using pointer capture; pointer cancellation, lost capture, window blur, or disabling `pannable` ends it. Main pan-policy changes are checked on the next pointer event. Wheel input during a pointer drag is ignored.
+Both follow the gesture settings of the flow: if `panOnDrag` is off, the minimap does not pan on drag either.
 
-Two-finger touchscreen pinch, minimap keyboard navigation, and viewport translation bounds are not included. Per-node presentation hooks are planned separately.
+## Change its colors
 
-{{ NgDocActions.demoPane("MinimapDemoComponent") }}
+Set the `--v-minimap-mask` and `--v-minimap-selected` tokens, see
+[Tokens and attributes](/docs/reference/styling#core-tokens). Nodes are filled with `--v-background`.

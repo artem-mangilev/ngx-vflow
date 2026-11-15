@@ -4,7 +4,7 @@ import DocsCategory from '../ng-doc.category';
 const HandlesCategory: NgDocCategory = {
   title: 'Handles and connections',
   category: DocsCategory,
-  order: 3,
+  order: 4,
 };
 
 export default HandlesCategory;

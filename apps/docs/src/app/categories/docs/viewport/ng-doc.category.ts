@@ -4,7 +4,7 @@ import DocsCategory from '../ng-doc.category';
 const ViewportCategory: NgDocCategory = {
   title: 'Viewport',
   category: DocsCategory,
-  order: 5,
+  order: 6,
 };
 
 export default ViewportCategory;

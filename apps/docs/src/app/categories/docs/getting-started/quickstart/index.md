@@ -171,7 +171,7 @@ we call `fitView()` when the flow reports its first layout; `maxZoom: 1` keeps a
 
 ## Where to go next
 
-- [Core concepts](/docs/getting-started/concepts) explains who owns the graph and why nodes hold signals.
+- [Core concepts](/docs/concepts/core-concepts) explains who owns the graph and why nodes hold signals.
 - [Controlling the viewport](/docs/viewport/viewport-control) has the other viewport methods.
 - [Custom nodes](/docs/nodes/custom-nodes) draws nodes with components instead of one template.
 - [Connections](/docs/handles/connections) validates connections and reconnects edges.

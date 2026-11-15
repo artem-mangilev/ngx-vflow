@@ -5,7 +5,7 @@ const UnitTestingPage: NgDocPage = {
   title: 'Testing',
   mdFile: './index.md',
   category: DocsCategory,
-  order: 9,
+  order: 10,
 };
 
 export default UnitTestingPage;

@@ -1,6 +1,7 @@
 The viewport is the part of the graph the flow shows: an offset and a zoom. Users change it with
 [gestures](/docs/viewport/viewport-gestures); this page is about changing and reading it from code, for buttons of
-your own, a "go to node" search or a saved view.
+your own, a "go to node" search or a saved view. The methods and their options are listed in the
+[Viewport reference](/docs/reference/viewport#methods).
 
 {{ NgDocActions.demoPane("ViewportControlDemoComponent") }}
 
@@ -66,32 +67,10 @@ protected restore(flow: VflowComponent): void {
 }
 ```
 
-## Methods
+## Wait for a change to finish
 
-| Method                                  | Effect                                                                                   |
-| --------------------------------------- | ---------------------------------------------------------------------------------------- |
-| `fitView(options?)`                     | Fits the given nodes, or all of them, into the flow                                      |
-| `setCenter(point, options?)`            | Puts a flow-space point in the center of the flow, at `options.zoom` or the current zoom |
-| `setViewport(viewport, options?)`       | Sets `x`, `y` and `zoom`. To pan without zooming, pass `{ ...flow.viewport(), x, y }`    |
-| `zoomTo(zoom, options?)`                | Zooms around the center of the flow                                                      |
-| `zoomIn(options?)`, `zoomOut(options?)` | Zoom around the center by the step of the zoom keys, `1.2`                               |
-
-Every method takes `duration`, the length of the animated transition in milliseconds; `0`, the default, changes the
-viewport at once. `fitView()` also takes:
-
-| Option               | Meaning                                                                   |
-| -------------------- | ------------------------------------------------------------------------- |
-| `nodes`              | Ids of the nodes to fit; all nodes when omitted or empty                  |
-| `padding`            | Space around the fitted nodes, as a share of their size; `0.1` by default |
-| `minZoom`, `maxZoom` | Limits for this fit, within the `minZoom` and `maxZoom` of the flow       |
-
-Zoom always keeps to the `minZoom` and `maxZoom` of the flow; `x` and `y` stay as given.
-
-## Calls compose
-
-Viewport methods apply at once and in order, each from where the previous one leads, so consecutive calls compose.
-Each returns a promise that settles when the change ends: `true` when the viewport reached the target, `false` when
-there was nothing to change or another change or a gesture interrupted it first.
+Every viewport method returns a promise that settles when the change ends, with `true` when the viewport reached
+its target. Await it to run the next step of a tour or to chain animations:
 
 ```ts
 if (await this.flow().fitView({ duration: 300 })) {
@@ -114,9 +93,12 @@ animation. Read it in a template, a `computed` or an effect:
 
 The resolved limits are signals too: `flow.settings.minZoom()` and `flow.settings.maxZoom()`.
 
-## Effects and queries
+## Call a method from an effect
 
-The viewport methods read no signal in a tracked way, so an effect may call them without `untracked`. Queries such
-as `getNodesBounds()`, `getNodeRect()` and `getNodesAtPoint()` are signal reads: `computed(() =>
-flow.getNodesBounds())` follows the nodes, and an effect that reads a query reruns when its answer may change. Read
-the query in `untracked` when the effect must not repeat on every node move.
+The viewport methods read no signal in a tracked way, so an effect may call them without `untracked`. If the effect
+also reads a query such as `getNodesBounds()` or `getNodeRect()`, it reruns on every node move; read the query in
+`untracked` when it must not.
+
+## See also
+
+- [Viewport reference](/docs/reference/viewport#methods) for every method, option and event.

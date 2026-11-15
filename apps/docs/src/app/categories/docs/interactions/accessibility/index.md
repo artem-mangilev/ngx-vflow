@@ -1,20 +1,16 @@
-The graph can be read and operated without a pointer. The flow is a named region, every node and edge is a named `group` whose state sits in its description, and keyboard commands report what they did in a live region. The example mirrors as text what a screen reader receives: the name and description of the focused entity, and the last announcement. Switch its language to watch the labels follow.
+This guide shows how to make a graph usable with a keyboard and a screen reader: naming its nodes and edges,
+handling keyboard deletion, translating the labels and styling focus. What the flow renders and announces is listed
+in the [Accessibility reference](/docs/reference/accessibility).
+
+The example mirrors as text what a screen reader receives: the name and description of the focused entity, and the
+last announcement. Switch its language to watch the labels follow.
 
 {{ NgDocActions.demoPane("AccessibilityDemoComponent") }}
 
-## What the library renders
+## Name nodes and edges
 
-| Element | Role and name                                                                                                           | Description                                                                                                       |
-| ------- | ----------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| Flow    | `region` named `flowLabel`, `Graph` by default                                                                          | `flowDescription`                                                                                                 |
-| Node    | `group` named by `ariaLabel`, else `Node {id}`; read as a `node`, or a `group` while other nodes reference it as parent | `ariaDescription`, the parent's name, `Selected.`, unavailable interactions, key instructions                     |
-| Edge    | `group` named by `ariaLabel`, else `Connection from {source} to {target}`                                               | `ariaDescription`, the endpoints when the name is custom, `Selected.`, unavailable interactions, key instructions |
-| Minimap | `img` named `minimapLabel`, `Graph minimap` by default                                                                  |                                                                                                                   |
-| Handle  | none: transparent to assistive technology                                                                               |                                                                                                                   |
-
-The tree is flat: a child names its parent in its description instead of nesting inside it, and the minimap's preview nodes do not form a second graph. Restrictions are described per interaction (`Selection unavailable.`, `Movement unavailable.`) and never as `aria-disabled` on the wrapper, so buttons and inputs inside a node stay operable. Library geometry, markers and the connection line are hidden from assistive technology; mark your own decorative SVG `aria-hidden="true"` the same way.
-
-## Naming nodes and edges
+The library does not read names out of your templates, and the fallback name is the id. Give every domain node an
+`ariaLabel`, and an `ariaDescription` where its state matters:
 
 ```typescript
 import { createNodes, createEdges } from 'ngx-vflow';
@@ -34,28 +30,30 @@ const edges = createEdges([{ id: 'review', source: 'request', target: 'approval'
 nodes[0].ariaDescription!.set('Ready for approval.');
 ```
 
-`ariaLabel`, `ariaDescription` and `domAttributes` are optional writable signals on `Node` and `Edge`. The library does not read names out of your templates, so give domain nodes a name; the fallback is the id. `domAttributes` accepts `data-*`, `title`, `lang` and `dir` and lands on the library wrapper; roles, ARIA state, ids, focus and event handlers stay library-owned, and other keys are ignored. A handle takes only `domAttributes`:
+To mark the wrapper of a node, an edge or a handle for your CSS or your tests, pass `data-*`, `title`, `lang` or
+`dir` in `domAttributes`:
 
 ```html
 <span vHandle handleType="target" position="left" handleId="incoming" [domAttributes]="{ 'data-port': 'review' }"></span>
 ```
 
-Controls inside your templates keep their own semantics. Give custom buttons, inputs and edge-label controls labels and keyboard behavior as you would anywhere else; the library keeps them reachable, including inside resizable wrappers.
+## Name the graph
 
-## Keyboard
+Set `flowLabel`, and `flowDescription` if the graph needs one, with `withAccessibility()`:
 
-`Tab` and `Shift+Tab` visit focusable nodes in `nodes` order, then edges in `edges` order, and leave the graph normally. Focus and selection are independent: focus has its own indicator and never changes selection by itself. Each focusable node and edge carries one short instruction in its description, written from the keys bound at that moment and naming only the commands that work for it:
-
-```text
-Press Enter or Space to select. Use arrow keys to move it while it is selected. Press Delete or Backspace to delete.
+```typescript
+provideVflow(withAccessibility({ flowLabel: 'Approval graph' }));
 ```
 
-The keys are listed on [Keyboard shortcuts](/docs/interactions/keyboard-shortcuts); this is what the commands do.
+## Label the controls inside nodes
 
-- **Select** replaces the selection with the focused entity, or toggles it while the multiselection modifier is held. **Clear selection** empties it and keeps focus. Neither writes selection in `selectionMode="manual"`, and an entity with `selectable: false` can be deselected but not selected.
-- **Move** shifts every selected movable node by 5 flow units, 20 with Shift, or one grid cell, four with Shift, on an axis where `snapGrid` is above 1. The focused node must itself be selected and movable. Parent extents and snapping apply, position signals update and the usual position notifications fire.
-- **Delete** emits `(deleteRequest)` with `{ nodeIds, edgeIds }`: the whole selection when the focused entity is selected, otherwise only the focused entity. The library removes nothing.
-- **Pan, zoom in, zoom out and fit view** run from a focused entity. Arrows pan only when they do not move a node.
+Controls inside your templates keep their own semantics. Give custom buttons, inputs and edge-label controls labels
+and keyboard behavior as you would anywhere else, and mark your own decorative SVG `aria-hidden="true"`.
+
+## Apply deletion from the keyboard
+
+`Delete` and `Backspace` on a focused node or edge emit `(deleteRequest)`; the library removes nothing. Apply the
+request to your collections:
 
 ```html
 <vflow [nodes]="nodes" [edges]="edges" (deleteRequest)="onDeleteRequest($event)" />
@@ -69,27 +67,11 @@ onDeleteRequest(request: DeleteRequest) {
 }
 ```
 
-A command that changes state reports it in the flow's own polite live region: `Draft selected. 1 selected in total.`, `Selection cleared.`, `Moved node right. Position: 25, 20.`, `Zoom 120%.`. Panning is silent, and so are pointer and programmatic changes. There is no public API for announcing your own messages.
+## Translate the labels
 
-**Focus after removal.** When the focused entity is removed or stops being focusable, focus returns to the page; it does not move to another node or edge. The graph container is not a focus target, so a click on the empty pane does not take focus either. Nothing takes focus on page load.
-
-**Focus pan.** A node that receives keyboard focus while fully offscreen is centered at the current zoom. `[autoPanOnNodeFocus]="false"` turns this off; edges and arrow movement never pan.
-
-**Opting out.** `nodesFocusable`, `edgesFocusable` and the per-entity `focusable` override remove Tab stops without affecting embedded controls. Keys pressed inside inputs, textareas, selects, contenteditable regions and buttons never run graph commands; `vNoKeyboard` on an element does the same for a whole area. With virtualization enabled, hidden entities are skipped by Tab and by focus recovery, so disable it where every entity must be reachable by keyboard.
-
-## Focus indicator
-
-Focus is drawn as a translucent halo around the node wrapper and along the edge path. Three tokens style it: `--v-focus` for the color, `--v-focus-halo` for how far the halo reaches beyond the node and to each side of the edge, and `--v-focus-radius` for the node's corners. On nodes and edges the halo is part of the zoomed content and scales with it, like the node's border, and it is painted under the content, so handles on the border and a selection drawn by your template stay on top. Its tint is stronger under a dark `color-scheme`, where a light tint would disappear into the canvas. Under `forced-colors: active` the halo is opaque, and on nodes it becomes an outline just outside the handles. The halo is drawn on the wrapper around your template, so set the tokens on the flow element, or per node from a global stylesheet:
-
-```css
-[data-v-node][data-shape='pill'] {
-  --v-focus-radius: 999px;
-}
-```
-
-## Localization
-
-Provide a `Partial<AriaLabelConfig>` with `withAccessibility()` inside `provideVflow()`: in the providers of `bootstrapApplication` for the whole application, of a route, or of the component that hosts the flow, where a closer `withAccessibility()` adds its keys to one further up. See [Configuration](/docs/getting-started/configuration). Omitted keys keep their English defaults, exported as `DEFAULT_ARIA_LABEL_CONFIG`; names and descriptions update as soon as the labels or the entity metadata change.
+Provide a `Partial<AriaLabelConfig>` with `withAccessibility()` inside `provideVflow()`. Put it into the providers
+of `bootstrapApplication` for the whole application, or of a route or the component that hosts the flow; a closer
+`withAccessibility()` adds its keys to one further up.
 
 ```typescript
 const labels: Partial<AriaLabelConfig> = {
@@ -107,29 +89,18 @@ const labels: Partial<AriaLabelConfig> = {
 })
 ```
 
-The value may also be a factory run in the injector, returning the labels or a signal of them, so they can come from a translation service and follow a change of language:
+If the labels come from a translation service and must follow a change of language, pass a factory that returns
+them or a signal of them:
 
 ```typescript
 provideVflow(withAccessibility(() => inject(TranslocoService).selectTranslateObject('vflow')));
 ```
 
-| Key                                           | Default                                                                                                                                                       |
-| --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `flowLabel`, `flowDescription`                | `Graph`, empty                                                                                                                                                |
-| `minimapLabel`                                | `Graph minimap`                                                                                                                                               |
-| `nodeLabel`                                   | `(id) => 'Node {id}'`                                                                                                                                         |
-| `edgeLabel`                                   | `({ source, target }) => 'Connection from {source} to {target}'`                                                                                              |
-| `nodeRole`, `parentRole`, `edgeRole`          | `node`, `group`, `edge`: the `aria-roledescription` a screen reader says instead of the role; `parentRole` is for a node that other nodes reference as parent |
-| `parentDescription`                           | `(parent) => 'Parent: {parent}.'`                                                                                                                             |
-| `selected`                                    | `Selected.`                                                                                                                                                   |
-| `selectionUnavailable`, `movementUnavailable` | `Selection unavailable.`, `Movement unavailable.`                                                                                                             |
-| `nodeInstructions`, `edgeInstructions`        | `(keys, state) => string`, the instruction sentences above                                                                                                    |
-| `selectionAnnouncement`                       | `({ label, selected, count }) => '{label} selected. {count} selected in total.'`                                                                              |
-| `selectionClearedAnnouncement`                | `Selection cleared.`                                                                                                                                          |
-| `movedAnnouncement`                           | `({ count, direction, x, y }) => 'Moved node {direction}. Position: {x}, {y}.'`                                                                               |
-| `zoomAnnouncement`                            | `(zoom) => 'Zoom {percent}%.'`                                                                                                                                |
+## Write your own key instructions
 
-Formatters receive and return plain text. `nodeInstructions` and `edgeInstructions` are either a sentence or a function of the keys bound at that moment and of what the entity can do, so an instruction follows a remap on its own and never names a command that is disabled or unavailable:
+To reword the instruction sentence of a node or an edge, give `nodeInstructions` or `edgeInstructions` a function.
+It receives the keys bound at that moment and what the entity can do, so the sentence follows a remap and never
+names a command that is unavailable:
 
 ```typescript
 const labels: Partial<AriaLabelConfig> = {
@@ -137,8 +108,32 @@ const labels: Partial<AriaLabelConfig> = {
 };
 ```
 
-`keys` carries `select`, `clearSelection`, `delete`, `move`, `pan`, `zoomIn`, `zoomOut`, `fitView` and `multiSelection`, each already formatted as a phrase such as `Enter or Space`, with modifiers spelled as words; a disabled command is an empty string. `state.selectable` is false for an unselectable entity and in `selectionMode="manual"`; `state.movable` is true for a draggable node that is selectable or already selected. Key names are English; a translation that wants its own words for them passes a plain string, which then stays fixed whatever the keys are.
+If a translation wants its own words for the keys, pass a plain string instead; it then stays fixed whatever the
+keys are.
 
-## Limits
+## Style the focus indicator
 
-Handles are not exposed and cannot be operated from the keyboard, so creating and reconnecting edges needs a pointer. Resize controls are pointer-only and the minimap has no Tab stop. The checks that back this page, automated and with a screen reader, are recorded in `docs/accessibility-verification.md`; automated checks alone do not establish screen-reader usability.
+Set `--v-focus`, `--v-focus-halo` and `--v-focus-radius` on the flow element. To give one kind of node its own
+shape, set the token per node from a global stylesheet, since the halo is drawn on the wrapper around your template:
+
+```css
+[data-v-node][data-shape='pill'] {
+  --v-focus-radius: 999px;
+}
+```
+
+## Take entities out of the Tab order
+
+- To remove all nodes or all edges, set `[nodesFocusable]="false"` or `[edgesFocusable]="false"`.
+- To remove one entity, set its `focusable` signal to `false`.
+- To keep the view still when focus moves to an offscreen node, set `[autoPanOnNodeFocus]="false"`.
+
+## Keep typing inside a node from running commands
+
+Inputs, textareas, selects, contenteditable regions and buttons already keep their keys. For any other area, such
+as a custom editor inside a node, add `vNoKeyboard` to its element.
+
+## Keep every entity reachable with virtualization
+
+Virtualization hides offscreen entities, and Tab skips them. Leave it off where every entity must be reachable by
+keyboard.

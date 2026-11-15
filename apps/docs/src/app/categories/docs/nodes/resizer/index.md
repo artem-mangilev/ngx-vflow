@@ -1,56 +1,85 @@
-You might want to resize your node. The resizer is part of core's interaction feedback and works with template and component nodes, including groups.
+This guide shows how to let users resize nodes and groups, limit the result and keep it in your data. For the
+model behind it, see [Node sizes](/docs/concepts/node-sizes).
 
-## Node size modes
+## Make a node resizable
 
-Each axis of a node has its own size mode:
+Put the `vResizable` directive on the top-level element of the node presentation, without outer margins. It works in
+a `vNode` template and in a component node.
 
-- `auto` — the axis follows the content. The library measures the rendered node and writes no inline size for this axis. This is the default for an axis without its `width` / `height` signal in the node data.
-- `explicit` — the axis has a fixed size that the library renders inline. An axis is explicit when the node data carries its signal, or after a resize gesture changes it. Content larger than an explicit size does not grow the node.
+{% raw %}
 
-The axes are independent: a node with only `width` has a fixed width and a height that follows its content.
+```html
+<div *vNode="let ctx" vResizable class="card">{{ ctx.data().title }}</div>
+```
 
-The `width` / `height` signals of a node hold the size your application asks for. Only a resize gesture writes them; measurement never does. A gesture on a node without the signal keeps the size inside the flow. The rendered size, which edges, handles and bounds use, is the measured box: it equals the explicit size unless CSS `min-*` / `max-*` on the element clamps it. Read it with `ctx.width()` / `ctx.height()` in the presentation, or with `getNodeRect(id)` / `getNodesBounds(ids?)` on the `<vflow />` component.
+{% endraw %}
 
-## Where the size is applied
+- If the node has no `width` and `height`, it starts content-sized. A resize fixes the axes the dragged control
+  drives: a corner both, a side one.
+- If you want it to start with a fixed size, give the node `width`, `height` or both. A resize writes the new size
+  into those signals.
 
-The element with the `vResizable` directive is the node's sizing box:
-
-- Put `vResizable` on the top-level element of the node template, without outer margins. Resize controls and handles are both positioned relative to the node box, so the controls stay visible around a card with `overflow: hidden`.
-- For each `explicit` axis the library sets `width` or `height` inline on that element, plus `box-sizing: border-box` while any axis is explicit, so padding and border stay inside the size you drag to. With border-box, CSS `min-*` / `max-*` of an `auto` axis also apply to the border box. You don't need to bind `[style.width.px]` / `[style.height.px]` yourself.
-- The resizer respects the element's `min-width` / `min-height` / `max-width` / `max-height` CSS, or explicit `[minWidth]` / `[minHeight]` / `[maxWidth]` / `[maxHeight]` inputs.
-- Size the element for `auto` mode with regular CSS, for example `width: 240px`. Avoid `width: 100%` / `height: 100%`: they resolve against the content-sized node wrapper.
-- `[vResizable]="false"` hides the controls but keeps the element as the sizing box, so you can bind the controls to the selection state.
-
-## Resize a group
-
-- Create a node with `width` and `height`, so both axes of the group start `explicit`, and mark it in `data` to draw it as a group in the `vNode` template.
-- Add `vResizable` (or `[vResizable]="yourCondition"`) to the native HTML element representing your group. The library applies the group size to that element.
-- If other elements depend on the group size, read the rendered size from `ctx.width()` and `ctx.height()`, not `ctx.node.width` and `ctx.node.height`: the latter hold the requested size.
-- Optionally, keep the aspect ratio with `[keepAspectRatio]`, restrict resizing to one axis with `[resizeAxis]` (`horizontal` | `vertical`), toggle handle auto-scaling with `[autoScale]`, and react to `(resizeStart)` / `(resize)` / `(resizeEnd)`.
-
-{{ NgDocActions.demoPane("GroupResizerDemoComponent") }}
-
-## Resize a template/component regular node
-
-- Create a node rendered by the `vNode` template or by a `component`.
-  - Leave out `width` / `height` to start content-sized. A resize makes explicit the axes the control drives: a corner both, a side one. With `[resizeAxis]`, only that axis.
-  - Provide `width` and / or `height` to start with a fixed size on those axes. A resize writes the new size into these signals.
-- Add `vResizable` (or `[vResizable]="yourCondition"`) to the top-level element of your node.
-- The same options and events as for groups are available.
+Do not bind `[style.width.px]` or `[style.height.px]` yourself: the directive sets the size on its element. Size a
+content-sized node with regular CSS, for example `width: 240px`, and avoid `width: 100%` and `height: 100%`.
 
 {{ NgDocActions.demoPane("TemplateNodeResizerDemoComponent") }}
 
-## Resizer appearance
+## Resize a group
 
-The resize controls take their colors from the core tokens `--v-resize-control` (handles and lines) and `--v-resize-control-border` (the border that separates a handle from the node); the `data-v-resize-control` attribute (`handle` on a corner, `line` on a side, with the side or corner in `data-v-resize-control-position`) is the public selector for size and shape overrides.
+Create the node with `width` and `height`, so both axes of the group start fixed, and put `vResizable` on the element
+that draws the group.
 
-## Resize event
+If other elements depend on the size of the group, read the rendered size from `ctx.width()` and `ctx.height()`, not
+from `ctx.node.width` and `ctx.node.height`, which hold the requested size.
 
-`(nodesChanges.size)` on the `<vflow />` component reports every change of the rendered size with the `mode` of each axis, `{ width, height }`:
+{{ NgDocActions.demoPane("GroupResizerDemoComponent") }}
 
-- Persist an axis only when its mode is `explicit`. An `auto` axis is a measurement of the node's content; writing it back as `width` / `height` would stop the node from following its content.
-- When the node data has the signal, the resizer has already written the new size into it.
-- When it has none, the flow holds the resized size itself and never adds signals to your node. To keep the size in the node data, add the signal and pass a new array; the node keeps its view, and the resizer writes into the signal from then on:
+## Show the controls only on a selected node
+
+Bind the directive to a condition. With `false` the controls are hidden and the element stays the sizing box of the
+node:
+
+```html
+<div *vNode="let ctx" class="card" [vResizable]="ctx.selected()">…</div>
+```
+
+## Limit the size
+
+Set `min-width`, `min-height`, `max-width` or `max-height` in the CSS of the element; the resizer stops there. If the
+limits come from data, bind the `[minWidth]`, `[minHeight]`, `[maxWidth]` and `[maxHeight]` inputs instead; they win
+over the CSS.
+
+## Keep the proportions or resize one axis
+
+- To keep the aspect ratio, set `[keepAspectRatio]="true"`.
+- To resize only the width or only the height, set `resizeAxis` to `horizontal` or `vertical`.
+
+## Refuse a step
+
+Give `[shouldResize]` a function. It receives the `ResizeEvent` of a step before the step is applied; return `false`
+to skip it:
+
+```ts
+protected readonly notTooWide: ShouldResize = (event) => event.width <= 600;
+```
+
+## React to the gesture
+
+Bind `(resizeStart)`, `(resize)` and `(resizeEnd)` on the `vResizable` element, for example to show the size while
+the user drags:
+
+```html
+<div *vNode="let ctx" vResizable (resize)="hint.set($event.width + ' × ' + $event.height)" (resizeEnd)="hint.set('')">…</div>
+```
+
+## Save the size a user set
+
+`(nodesChanges.size)` on `vflow` reports every change of the rendered size with the `mode` of each axis.
+
+- If the node has `width` and `height` signals, the resizer has already written the new size into them. Nothing
+  else is needed.
+- If the node has none, the flow holds the resized size itself. To keep it in the node, add the signal and pass a
+  new array; the node keeps its view, and the resizer writes into the signal from then on:
 
 ```ts
 protected keepResizedSize(changes: NodeSizeChange[]) {
@@ -75,15 +104,15 @@ protected keepResizedSize(changes: NodeSizeChange[]) {
 }
 ```
 
-- To react to the gesture itself, use `(resizeStart)` / `(resize)` / `(resizeEnd)` on the `vResizable` element. All three emit one `ResizeEvent`, shaped like `NodeDragEvent`: the resized `node`, its `x`, `y`, `width` and `height`, `direction` and the `sourceEvent` pointer event. `direction` is the direction the dragged side moved in the last step on each axis: `{ x: 1, y: 0 }` while the node grows to the right, `{ x: -1, y: 0 }` while it grows from its left side. `(resizeStart)` and `(resizeEnd)` report a state rather than a step, so their `direction` is `{ x: 0, y: 0 }`.
-- `[shouldResize]` takes the same `ResizeEvent` before a step is applied; return `false` to skip the step:
+Persist an axis only when its mode is `explicit`. An `auto` axis is a measurement of the content of the node.
 
-```ts
-protected readonly notTooWide: ShouldResize = (event) => event.width <= 600;
-```
+## Restyle the controls
+
+Set the `--v-resize-control` and `--v-resize-control-border` tokens for the colors, and select the controls by the
+`data-v-resize-control` attribute for size and shape. See the [Resizer reference](/docs/reference/resizer#appearance).
 
 ## See also
 
-- `*FeaturesSubflows`
-- `*FeaturesCustomNodes`
-- `*FeaturesHandlingChanges`
+- [Resizer reference](/docs/reference/resizer)
+- [Subflows](/docs/nodes/subflows)
+- [Handling changes](/docs/interactions/handling-changes)

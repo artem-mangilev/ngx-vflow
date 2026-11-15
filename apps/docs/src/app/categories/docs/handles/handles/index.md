@@ -1,34 +1,51 @@
-A handle is an element of your node presentation with the `vHandle` directive. The library registers and measures the element and, by default, places it on the node side. Core ships no visual for a handle: size, color, border and pointer events belong to your application.
+This guide shows how to give nodes handles, the elements that connections start from and end on, and how to place,
+style and restrict them. The inputs, attributes and signals are listed in the
+[Handle reference](/docs/reference/handle).
+
+## Add handles to a node
+
+Put the `vHandle` directive on an element inside the node presentation. Give it a type and a side:
 
 ```html
-<span vHandle handleType="source" position="right" class="dot"></span>
+<span vHandle handleType="target" position="left" class="dot"></span> <span vHandle handleType="source" position="right" class="dot"></span>
 ```
+
+Core draws nothing for a handle, so give the element a size and a look in your CSS.
 
 > **Info**
 > With `@vflow/ui`, use `vuiPort` instead of `vHandle`: it is a handle with the standard port visual and valid/invalid feedback and takes the same inputs: `<span vuiPort handleType="target" position="left"></span>`.
 
-## Inputs
+## Give a node several handles
 
-| Input                | Default  | Description                                                                                                       |
-| -------------------- | -------- | ----------------------------------------------------------------------------------------------------------------- |
-| `handleType`         | `source` | `source`, `target`, or `any` to start and accept connections in either direction                                  |
-| `position`           | `top`    | Where the connection point is: `left`, `right`, `top`, `bottom`, `auto` or `center`, see below                    |
-| `handleId`           |          | Identifies the handle when a node has more than one of a role; `Edge.sourceHandle` and `targetHandle` refer to it |
-| `layout`             | `auto`   | `auto` or `manual`, for the side positions, see below                                                             |
-| `offsetX`, `offsetY` | `0`      | Shift of the element and its connection point in the `auto` layout, in flow units; positive is right and down     |
-| `canStart`           | `true`   | Whether a new connection may start from this handle; a press on a handle that cannot start drags the node instead |
-| `canAccept`          | `true`   | Whether the handle may accept a connection or reconnection candidate                                              |
-| `domAttributes`      |          | `data-*`, `title`, `lang` and `dir` applied to the element; handles carry no ARIA semantics                       |
+Add one element per handle, and give the handles of the same type a `handleId`; edges refer to it in `sourceHandle`
+and `targetHandle`. A handle sits at the center of its parent element on the chosen side, so a handle placed inside
+a row lines up with that row.
 
-## Type and direction
+{{ NgDocActions.demoPane("MultipleConnectionPointsDemoComponent") }}
 
-A `source` handle starts connections and a `target` handle accepts them; a connection dragged from a target handle onto a source handle is reversed, so the edge always runs from the source handle. Two handles of the same type do not connect. A handle of type `any` connects in either direction and the edge keeps the direction of the gesture. Every check runs before `ConnectionSettings.validator()`.
+## Connect in either direction
 
-## Position
+If a handle should both start and accept connections, set `handleType="any"`. The edge then keeps the direction of
+the gesture. See [Connections](/docs/handles/connections#handles-of-type-any).
 
-A side puts the connection point on that side of the node: the element sits there in the `auto` layout, or where the application placed it in the `manual` layout.
+## Let edges float around a node
 
-`auto` and `center` describe the point of each edge instead of a fixed spot: with `auto` the edge meets the middle of the node side that faces the other end, with `center` it runs to the node center. The element is then only the surface that starts and accepts connections; it is not positioned and its own box is not measured. A whole node becomes a handle this way:
+If edges should meet a node on the side that faces the other end, give the node one handle with `position="auto"`:
+
+```html
+<span vHandle handleType="any" position="auto"></span>
+```
+
+- If the nodes are drawn over their lines, as in a force-directed graph, use `position="center"` to run edges to the
+  node center.
+- If one end of an edge should stay on a port, keep a side position there; the floating end then faces the port.
+
+{{ NgDocActions.demoPane("FloatingEdgesDemoComponent") }}
+
+## Make the whole node a handle
+
+Put `vHandle` with `position="auto"` or `position="center"` on the root element of the presentation, and mark the
+part that drags the node with `vDragHandle`:
 
 {% raw %}
 
@@ -41,30 +58,18 @@ A side puts the connection point on that side of the node: the element sits ther
 
 {% endraw %}
 
-An element with `vDragHandle` inside the handle keeps dragging the node. The edge layer lies under the nodes, so arrow markers stay visible with `auto`, and `center` suits lines without markers. See the [Easy connect](/examples/recipes/easy-connect) example.
+The [Easy connect](/examples/recipes/easy-connect) example builds on this.
 
-## Layout
+## Place a handle yourself
 
-- `auto` (default): the directive writes `position: absolute`, the side offsets and `transform` on the element, so it sits on the `position` side of the node at the center of its parent element. The connection point is the outer edge of the element on that side.
-- `manual`: the directive writes no styles. Position the element yourself; the connection point is read from the element's box on the `position` side, and `offsetX` and `offsetY` are ignored.
+- To move a handle along its side, set `offsetX` and `offsetY`, in flow units.
+- To take over positioning, set `layout="manual"` and position the element with your CSS. The connection point is
+  then read from the box of the element on the `position` side.
 
-In the `auto` layout the directive owns `transform` on the element. For hover effects use the CSS `scale` or `translate` properties, or animate an inner element.
+## Show connection feedback
 
-A handle must stay in layout. An element with `display: none`, or inside one, is not measured: edges attached to it are hidden. Hide a handle with `visibility: hidden` or `opacity: 0` instead, and give an invisible handle a size if users must be able to drag from it.
-
-## State
-
-The element gets the `data-v-handle` attribute, its identity as a handle, and these:
-
-| Attribute                  | Values                                                                                                |
-| -------------------------- | ----------------------------------------------------------------------------------------------------- |
-| `data-v-handle-type`       | `source`, `target`                                                                                    |
-| `data-v-handle-position`   | `left`, `right`, `top`, `bottom`                                                                      |
-| `data-v-handle-state`      | `idle`; `connecting` on the handle a connection is dragged from; `valid` / `invalid` on the candidate |
-| `data-v-handle-can-start`  | `true`, `false`                                                                                       |
-| `data-v-handle-can-accept` | `true`, `false`                                                                                       |
-
-The state follows `ConnectionSettings.validator()`, so plain CSS is enough for connection feedback. The handle a connection is dragged from stays `connecting` for the whole gesture: it is never its own candidate, and a release on it is a drop. While a connection is in progress the handle element is a drop zone in addition to the magnet around its point, so a handle of any size, even a whole node, validates the candidate under the pointer:
+Style the handle by its `data-v-handle-state` attribute, which is `valid` or `invalid` on the handle under a
+connection in progress:
 
 ```css
 .dot[data-v-handle-state='valid'] {
@@ -74,25 +79,33 @@ The state follows `ConnectionSettings.validator()`, so plain CSS is enough for c
 .dot[data-v-handle-state='invalid'] {
   background-color: red;
 }
+```
 
+To validate connections with your own rule, see
+[Connections](/docs/handles/connections#connection-validation).
+
+## Stop a handle from starting or accepting connections
+
+- To keep a handle from starting connections, set `[canStart]="false"`. A press on it then drags the node.
+- To keep it from accepting them, set `[canAccept]="false"`.
+
+Both are reflected in attributes, so a disabled handle can be dimmed:
+
+```css
 .dot[data-v-handle-can-start='false'] {
   opacity: 0.5;
 }
 ```
 
-The directive is exported as `vHandle`. A template reference gives access to its signals `state`, `handleType`, `position`, `handleId`, `canStart`, `canAccept` and `layout`:
+In the demo, turn off `canStart` on Output 1 and `canAccept` on Input 1. The outputs are plain elements styled
+through the attributes; the inputs are the handle component of the next section.
 
-{% raw %}
+{{ NgDocActions.demoPane("CustomHandlesDemoComponent") }}
 
-```html
-<span #h="vHandle" vHandle handleType="target" position="left" class="dot" [title]="h.state()"></span>
-```
+## Build a handle component
 
-{% endraw %}
-
-## Handle components
-
-A component can become a handle by applying the directive through `hostDirectives`. Forward the inputs that the places using the component bind, including `handleType` and `position`. Inject `VflowHandleDirective` to read its signals: `state`, `handleType`, `position`, `handleId`, `canStart`, `canAccept` and `layout`. The same works in any element inside a handle element.
+Apply the directive to a component through `hostDirectives`, and forward the inputs that the places using the
+component bind, including `handleType` and `position`. Inject `VflowHandleDirective` to read its signals:
 
 ```ts
 @Component({
@@ -113,33 +126,12 @@ export class SquareHandleComponent {
 <square-handle handleType="target" position="left" [handleId]="'input-1'" [canAccept]="canAccept()" />
 ```
 
-## Start and accept policies
+## Hide a handle
 
-The demo intentionally uses the default connection validation so it isolates the handle policies: disable `canStart` on Output 1 and `canAccept` on Input 1 independently. The outputs are plain elements styled through the attributes above; the inputs are the `square-handle` component. The dimmed handle is disabled; Output 2 remains a working source for comparison. For `ConnectionSettings.validator()` see [Connections](/docs/handles/connections#connection-validation).
+Hide a handle with `visibility: hidden` or `opacity: 0`, not with `display: none`: a handle outside layout is not
+measured, and its edges disappear. If users must still be able to drag from an invisible handle, give it a size.
 
-{{ NgDocActions.demoPane("CustomHandlesDemoComponent") }}
+## Animate a handle on hover
 
-## Several handles on a node
-
-A node may carry any number of handles. Put the `vHandle` directive on an element anywhere in the presentation and
-give each handle of the same type a `handleId`. In the default `auto` layout the directive computes the position from
-the parent element, so each handle sits next to its row.
-
-{{ NgDocActions.demoPane("MultipleConnectionPointsDemoComponent") }}
-
-## Floating edges
-
-A floating edge has no fixed port: it meets the node on the side that faces the other end, and moves to another side
-when the nodes move. This is a property of the handle, `position="auto"`: the node gets one handle whose connection
-point is resolved for every edge. With `handleType="any"` the same handle starts and accepts connections in both
-directions.
-
-```html
-<span vHandle handleType="any" position="auto"></span>
-```
-
-An edge can float on one end and use a port on the other: the port keeps its side, and the floating end faces the
-port. `position="center"` runs edges to the node center instead, for graphs whose nodes are drawn over their lines.
-The [Easy connect](/examples/recipes/easy-connect) example makes the whole node such a handle.
-
-{{ NgDocActions.demoPane("FloatingEdgesDemoComponent") }}
+In the default layout the directive sets `transform` on the element. Use the CSS `scale` or `translate` properties
+for hover effects, or animate an inner element.
