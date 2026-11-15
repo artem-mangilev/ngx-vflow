@@ -165,7 +165,7 @@ export class DocsDemoBar {}
 
 /**
  * The frame of a demo with controls: an optional `docsDemoBar` and, under it, the stage with the flow. The stage is
- * positioned, so an overlay such as `vui-controls` can sit in a corner of it with `absolute`.
+ * positioned, so an overlay outside the flow, such as a palette, can sit in a corner of it with `absolute`.
  *
  * In a demo pane of the docs the frame fills the pane. `framed` draws the card itself, for a demo that is shown
  * without a pane; its stage then takes the height of its content, so give the flow a sized parent.

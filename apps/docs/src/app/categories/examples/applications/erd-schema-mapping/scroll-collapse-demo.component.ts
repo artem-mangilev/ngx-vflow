@@ -1,8 +1,8 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { ChangeDetectionStrategy, Component, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { DemoIconComponent, DocsKit, SCENE_BACKGROUND } from '@docs/shared';
 import { Vui } from '@vflow/ui';
-import { createEdges, createNodes, Vflow, VflowComponent } from 'ngx-vflow';
+import { createEdges, createNodes, Vflow } from 'ngx-vflow';
 import { ScrollRows } from './scroll-rows';
 
 interface LongEntity {
@@ -34,7 +34,12 @@ const QUIET_PORT = `transition-[border-color,background-color,box-shadow,opacity
   template: `
     <docs-demo framed role="region" aria-label="Scroll and collapse experiment">
       <div class="h-105">
-        <vflow [nodes]="nodes" [edges]="edges" [background]="background" (initialized)="flow().fitView({ maxZoom: 1 })">
+        <vflow
+          #flow
+          [nodes]="nodes"
+          [edges]="edges"
+          [background]="background"
+          (initialized)="flow.fitView({ maxZoom: 1 })">
           <ng-template let-ctx vNode [vNodeOf]="nodes">
             @let view = scroll.visibility(ctx.node.id);
             <article
@@ -116,14 +121,13 @@ const QUIET_PORT = `transition-[border-color,background-color,box-shadow,opacity
           <svg:g *vEdge="let ctx" vEdgeInteractionArea>
             <svg:path vuiEdge [attr.d]="ctx.path()" />
           </svg:g>
+          <vui-controls class="absolute bottom-2.5 left-2.5" />
         </vflow>
       </div>
-      <vui-controls class="absolute bottom-2.5 left-2.5 z-2" [flow]="flow()" />
     </docs-demo>
   `,
 })
 export class ScrollCollapseDemoComponent {
-  protected readonly flow = viewChild.required(VflowComponent);
   protected readonly background = SCENE_BACKGROUND;
   protected readonly quietPort = QUIET_PORT;
   protected readonly scroll = new ScrollRows<LongEntity['fields'][number]>();

@@ -93,10 +93,19 @@ native buttons.
 
 ### Viewport controls
 
-`<vui-controls [flow]="flow">` renders zoom in, zoom out and fit view for the given `VflowComponent`
-instance, clamped to its `minZoom`/`maxZoom`, and projects your own buttons: every button child, built-in or projected,
-is a square icon button without a fill at rest, so give a projected one an accessible name.
-Position the element yourself, above the flow pane. Editing toggles, form controls and business actions are
+`<vui-controls>` inside `vflow` renders zoom in, zoom out and fit view for that flow, clamped to its
+`minZoom`/`maxZoom`, and projects your own buttons: every button child, built-in or projected, is a square icon
+button without a fill at rest, so give a projected one an accessible name. The flow renders it above the pane, in a
+layer the size of the flow, so position it with a class such as `absolute bottom-2.5 left-2.5`.
+
+```html
+<vflow [nodes]="nodes" [edges]="edges">
+  <!-- node and edge templates -->
+  <vui-controls class="absolute bottom-2.5 left-2.5" />
+</vflow>
+```
+
+Editing toggles, form controls and business actions are
 not part of the library; `@vflow/ui` declares `ngx-vflow` as a peer dependency for this component.
 
 ## Directive reference
@@ -113,7 +122,7 @@ not part of the library; `@vflow/ui` declares `ngx-vflow` as a peer dependency f
 | `VuiEdge`                        | `vuiEdge` on an SVG path                                             | Stroke; bind core path and marker URLs yourself                                  |
 | `VuiEdgeLabel`                   | `vuiEdgeLabel`                                                       | HTML label surface, including optional native controls                           |
 | `VuiToolbar`                     | `vuiToolbar`                                                         | Surface for `v-node-toolbar` content                                             |
-| `VuiControls`                    | `<vui-controls [flow]="flow">`                                       | Viewport controls for one flow instance; project plain icon buttons              |
+| `VuiControls`                    | `<vui-controls>` inside `vflow`                                      | Viewport controls of the flow it is in; project plain icon buttons               |
 
 Each directive is independently importable. Apart from `vui-controls`, none imports ngx-vflow; none owns
 graph state, adds wrapper elements, registers ports or changes accessibility roles. Public selectors are the

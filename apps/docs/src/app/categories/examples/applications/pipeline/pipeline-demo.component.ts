@@ -254,6 +254,7 @@ const KIND_COLOR: Record<LabData['kind'], string> = {
               <svg:path vuiEdge stroke-dasharray="4 4" [attr.d]="path" />
             }
           </ng-template>
+          <vui-controls class="absolute bottom-2.5 left-2.5" />
         </vflow>
       </div>
       <div vuiToolbar class="absolute top-2.5 left-2.5 z-2 pl-2" data-testid="palette">
@@ -267,7 +268,6 @@ const KIND_COLOR: Record<LabData['kind'], string> = {
           <option value="number">Number</option>
         </select>
       </div>
-      <vui-controls class="absolute bottom-2.5 left-2.5 z-2" [flow]="flow()" />
     </docs-demo>
   `,
 })

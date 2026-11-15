@@ -40,7 +40,7 @@ cascade layers; unlayered application styles override them.
 | Port       | `vuiPort`: a core handle with the port look                                                 |
 | Edge       | `vuiEdge` on the SVG path, `vuiEdgeLabel` for HTML labels                                   |
 | Overlay    | `vuiToolbar`                                                                                |
-| Viewport   | `<vui-controls [flow]="flow">`: zoom in/out, fit view and your own buttons for one flow     |
+| Viewport   | `<vui-controls>` inside `vflow`: zoom in/out, fit view and your own buttons for that flow   |
 
 Buttons and badges come from your design system, as React Flow UI takes them from shadcn/ui; `vui-controls` gives
 its projected buttons the look of its own.

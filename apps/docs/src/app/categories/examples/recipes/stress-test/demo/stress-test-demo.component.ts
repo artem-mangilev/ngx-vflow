@@ -1,21 +1,21 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { DocsPresentations } from '@docs/shared';
 import { Vui } from '@vflow/ui';
-import { Edge, Node, StaticNode, Vflow, createNodes } from 'ngx-vflow';
+import { Edge, StaticNode, Vflow, createNodes } from 'ngx-vflow';
 import { StressTestNodeComponent } from './stress-test-node.component';
 
 @Component({
   // The first view shows the whole grid, which takes a zoom far below the default `minZoom`.
   template: `<vflow
-      #flow
-      [nodes]="graph.nodes"
-      [edges]="graph.edges"
-      [minZoom]="0.1"
-      (initialized)="flow.fitView({ maxZoom: 1 })">
-      <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
-    </vflow>
-    <vui-controls class="absolute bottom-2.5 left-2.5 z-2" [flow]="flow" />`,
-  host: { class: 'relative block size-full' },
+    #flow
+    [nodes]="graph.nodes"
+    [edges]="graph.edges"
+    [minZoom]="0.1"
+    (initialized)="flow.fitView({ maxZoom: 1 })">
+    <svg:g *vEdge="let ctx" docsEdge [ctx]="ctx" />
+    <vui-controls class="absolute bottom-2.5 left-2.5" />
+  </vflow>`,
+  host: { class: 'block size-full' },
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [DocsPresentations, Vflow, Vui],
 })
@@ -24,7 +24,7 @@ export class StressTestDemoComponent {
 }
 
 /** A queue of jobs laid out as a grid, each one waiting for the one before it. */
-function createChain(columns: number, rows: number): { nodes: Node[]; edges: Edge[] } {
+function createChain(columns: number, rows: number) {
   const nodes: StaticNode<{ label: string }>[] = [];
   // Plain edges: an edge needs no signals for what it never changes.
   const edges: Edge[] = [];

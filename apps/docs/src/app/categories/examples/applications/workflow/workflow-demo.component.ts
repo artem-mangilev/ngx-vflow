@@ -1,7 +1,7 @@
-import { ChangeDetectionStrategy, Component, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { DemoIconComponent, DemoIconName, DocsBadgeTone, DocsKit, SCENE_BACKGROUND } from '@docs/shared';
 import { Vui } from '@vflow/ui';
-import { createEdges, createNodes, Vflow, VflowComponent } from 'ngx-vflow';
+import { createEdges, createNodes, Vflow } from 'ngx-vflow';
 
 /** What a step is, shown by the color of its icon: where the process starts, a decision of a person, an action. */
 type StepKind = 'trigger' | 'review' | 'action';
@@ -34,12 +34,13 @@ const KIND_COLOR: Record<StepKind, string> = {
            controls. -->
       <div class="h-185">
         <vflow
+          #flow
           [nodes]="nodes"
           [edges]="edges"
           [background]="background"
           [minZoom]="0.5"
           [maxZoom]="2"
-          (initialized)="flow().fitView({ maxZoom: 1 })">
+          (initialized)="flow.fitView({ maxZoom: 1 })">
           <article *vNode="let ctx of nodes" vuiNode class="w-[230px] text-[14px]" [attr.data-step]="ctx.node.id">
             <header vuiNodeHeader>
               <span docsNodeIcon tile [class]="kindColor[ctx.data().kind]">
@@ -100,7 +101,7 @@ const KIND_COLOR: Record<StepKind, string> = {
                     vNoDrag
                     type="button"
                     [attr.aria-label]="'Zoom to ' + ctx.data().title"
-                    (click)="flow().fitView({ nodes: [ctx.node.id], padding: 0.5 })">
+                    (click)="flow.fitView({ nodes: [ctx.node.id], padding: 0.5 })">
                     Zoom to node
                   </button>
                 </div>
@@ -146,14 +147,13 @@ const KIND_COLOR: Record<StepKind, string> = {
               }}</span>
             }
           </ng-template>
+          <vui-controls class="absolute bottom-2.5 left-2.5" />
         </vflow>
       </div>
-      <vui-controls class="absolute bottom-2.5 left-2.5 z-2" [flow]="flow()" />
     </docs-demo>
   `,
 })
 export class WorkflowDemoComponent {
-  protected readonly flow = viewChild.required(VflowComponent);
   protected readonly approved = signal(false);
   protected readonly background = SCENE_BACKGROUND;
   protected readonly kindColor = KIND_COLOR;
