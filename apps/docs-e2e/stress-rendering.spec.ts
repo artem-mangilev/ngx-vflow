@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 test('virtualization demo retains node DOM and geometry through viewport pan', async ({ page }) => {
-  await page.goto('/performance/virtualization');
+  await page.goto('/docs/performance/virtualization');
   const nodes = page.locator('[data-v-node]');
   await expect(nodes).toHaveCount(4900);
   await expect(nodes.first()).toHaveCSS('visibility', 'visible');
@@ -69,7 +69,7 @@ test('stress demo reveals custom nodes and edges with positioned handles', async
     };
     requestAnimationFrame(sample);
   });
-  await page.goto('/performance/stress-test');
+  await page.goto('/examples/recipes/stress-test');
   await page.waitForFunction(() => (window as any).stressRenderingSamples.length === 8);
   const samples = await page.evaluate(() => (window as any).stressRenderingSamples);
   expect(samples.flatMap((sample: { misplaced: string[] }) => sample.misplaced)).toEqual([]);

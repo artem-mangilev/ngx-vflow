@@ -10,7 +10,7 @@ const pages = [
 
 for (const [route, selector] of pages) {
   test(`accessibility: ${route} has no axe violations, focusable entities and visible focus`, async ({ page }) => {
-    await page.goto(`/design-system/${route}`);
+    await page.goto(`/examples/applications/${route}`);
     const demo = page.locator(selector);
     await demo.evaluate((element) => element.scrollIntoView({ block: 'center' }));
     await expect(demo.locator('[data-v-node]').first()).toBeVisible();
@@ -67,7 +67,7 @@ async function rowEndpointError(demo: Locator) {
 }
 
 test('geometry: long names, typography and density changes keep endpoints on their rows', async ({ page }) => {
-  await page.goto('/design-system/erd-schema-mapping');
+  await page.goto('/examples/applications/erd-schema-mapping');
   const demo = page.locator('app-ui-entities-demo');
   await demo.scrollIntoViewIfNeeded();
   await expect.poll(() => rowEndpointError(demo)).toBeLessThan(1);
@@ -93,7 +93,7 @@ test('geometry: long names, typography and density changes keep endpoints on the
 });
 
 test('geometry: endpoints stay on ports after zooming through the controls', async ({ page }) => {
-  await page.goto('/design-system/workflow');
+  await page.goto('/examples/applications/workflow');
   const workflow = page.locator('app-ui-workflow-demo');
   const controls = workflow.getByRole('group', { name: 'Viewport controls' });
   const endpointError = () =>

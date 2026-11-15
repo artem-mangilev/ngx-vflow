@@ -18,7 +18,7 @@ test('easy connect: connects from anywhere on a node, drags by the title and rou
 }) => {
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
-  await page.goto('/cookbook/easy-connect');
+  await page.goto('/examples/recipes/easy-connect');
   const demo = page.locator('app-easy-connect-demo');
   await demo.scrollIntoViewIfNeeded();
   const nodes = demo.locator('.easy-node');

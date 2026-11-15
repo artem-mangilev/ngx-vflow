@@ -58,7 +58,7 @@ test.describe('overview resizer', () => {
   let card: Locator;
 
   test.beforeEach(async ({ page }) => {
-    await page.goto('/introduction/overview');
+    await page.goto('/examples/feature-overview');
     node = page.locator('[data-v-node][aria-label="Node transform"]');
     card = node.locator('.transform-node');
     await node.scrollIntoViewIfNeeded();
@@ -97,7 +97,7 @@ test.describe('overview resizer', () => {
 });
 
 test('resizer demo keeps a node at its CSS min-width while shrinking', async ({ page }) => {
-  await page.goto('/nodes/resizer');
+  await page.goto('/docs/nodes/resizer');
   const node = page.locator('[data-v-node]', { has: page.locator('.custom-node') }).first();
   const card = node.locator('.custom-node');
   const corner = node.locator('[data-v-resize-control=handle][data-v-resize-control-position=bottom-right]');

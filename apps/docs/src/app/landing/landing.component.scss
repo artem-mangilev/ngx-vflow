@@ -1,0 +1,380 @@
+// The landing page. Its palette is the logo's: ink, deep blue, blue and pale blue; surfaces and text come from the
+// NgDoc theme, so the page follows the light and dark themes of the documentation.
+.landing {
+  --lp-ink: #1b262c;
+  --lp-deep: #0f4c75;
+  --lp-blue: #3282b8;
+  --lp-pale: #bbe1fa;
+  --lp-gutter: clamp(20px, 5vw, 72px);
+  --lp-measure: 34rem;
+
+  color: var(--ng-doc-text);
+  font-family: var(--ng-doc-font-family);
+  font-size: 17px;
+  line-height: 1.6;
+
+  h1,
+  h2 {
+    margin: 0;
+    color: var(--ng-doc-heading-color);
+    font-weight: 700;
+    text-wrap: balance;
+  }
+
+  h1 {
+    font-size: clamp(2.6rem, 5.6vw, 4.6rem);
+    letter-spacing: -0.04em;
+    line-height: 0.98;
+  }
+
+  h2 {
+    font-size: clamp(1.7rem, 3vw, 2.4rem);
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+  }
+
+  p {
+    margin: 0;
+    color: var(--ng-doc-text-muted);
+  }
+
+  a {
+    color: var(--ng-doc-link-color);
+    text-underline-offset: 3px;
+  }
+
+  a:focus-visible,
+  button:focus-visible {
+    outline: 2px solid var(--lp-blue);
+    outline-offset: 2px;
+  }
+
+  code {
+    font-family: var(--ng-doc-code-font);
+    font-size: 0.88em;
+  }
+}
+
+// ---------------------------------------------------------------------------------------------------------- Hero
+// The copy and, next to it, a working editor: the first thing on the page is the library in use.
+.landing .hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  align-items: center;
+  border-bottom: 1px solid var(--ng-doc-border-color);
+}
+
+.landing .hero__copy {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 28px;
+  max-width: var(--lp-measure);
+  padding: 64px 0 64px var(--lp-gutter);
+}
+
+// Grid items are as wide as their longest line by default; these may shrink to the column instead.
+.landing .hero__copy > *,
+.landing .feature__copy > *,
+.landing .packages__copy > *,
+.landing .used__copy > * {
+  min-width: 0;
+}
+
+.landing .hero__lead {
+  font-size: 1.2rem;
+  line-height: 1.5;
+}
+
+.landing .hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.landing .action {
+  display: inline-flex;
+  align-items: center;
+  height: 44px;
+  padding: 0 20px;
+  border: 1px solid var(--ng-doc-border-color);
+  border-radius: 8px;
+  color: var(--ng-doc-heading-color);
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.landing .action:hover {
+  border-color: var(--lp-blue);
+}
+
+.landing .action--primary {
+  border-color: var(--lp-deep);
+  background: var(--lp-deep);
+  color: #fff;
+}
+
+.landing .action--primary:hover {
+  border-color: var(--lp-blue);
+  background: var(--lp-blue);
+}
+
+.landing .install {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  max-width: 26rem;
+  padding: 6px 6px 6px 16px;
+  border: 1px solid var(--ng-doc-border-color);
+  border-radius: 8px;
+  background: var(--ng-doc-base-1);
+}
+
+.landing .install code {
+  min-width: 0;
+  overflow-x: auto;
+  color: var(--ng-doc-heading-color);
+  white-space: nowrap;
+}
+
+.landing .install button {
+  flex: none;
+  min-width: 72px;
+  height: 32px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--ng-doc-text-muted);
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.landing .install button:hover {
+  background: var(--ng-doc-base-2);
+  color: var(--ng-doc-heading-color);
+}
+
+.landing .facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 24px;
+  margin: 0;
+  padding: 0;
+  color: var(--ng-doc-text-muted);
+  font-size: 0.9rem;
+  list-style: none;
+}
+
+.landing .facts a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.landing .facts a:hover {
+  text-decoration: underline;
+}
+
+.landing .facts b {
+  color: var(--ng-doc-heading-color);
+  font-weight: 650;
+}
+
+.landing .hero__canvas {
+  min-width: 0;
+  padding: 40px var(--lp-gutter) 40px clamp(24px, 4vw, 56px);
+}
+
+// ------------------------------------------------------------------------------------------------------ Features
+.landing .feature {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: clamp(32px, 5vw, 80px);
+  align-items: center;
+  padding: clamp(56px, 8vw, 112px) var(--lp-gutter);
+  border-bottom: 1px solid var(--ng-doc-border-color);
+}
+
+// The second row mirrors the first and third, so the flows alternate sides; the flow keeps the wide column.
+.landing .feature--mirrored {
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+}
+
+.landing .feature--mirrored .feature__copy {
+  order: 2;
+}
+
+.landing .feature__copy {
+  display: grid;
+  gap: 16px;
+  max-width: var(--lp-measure);
+}
+
+.landing .feature__copy a {
+  justify-self: start;
+  font-weight: 600;
+}
+
+.landing .feature__canvas {
+  min-width: 0;
+}
+
+// A flow without a shell of its own gets the frame of the page.
+.landing .feature__canvas--framed {
+  overflow: hidden;
+  border: 1px solid var(--ng-doc-border-color);
+  border-radius: 14px;
+  background: var(--vui-background, var(--ng-doc-base-0));
+}
+
+.landing .feature__canvas--framed > * {
+  display: block;
+  max-height: 480px;
+}
+
+.landing .feature__placeholder {
+  height: 480px;
+  border-radius: 14px;
+  background: var(--ng-doc-base-1);
+}
+
+// ------------------------------------------------------------------------------------------------------ Packages
+.landing .packages,
+.landing .used {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: clamp(32px, 5vw, 80px);
+  padding: clamp(56px, 8vw, 112px) var(--lp-gutter);
+  border-bottom: 1px solid var(--ng-doc-border-color);
+}
+
+.landing .packages__copy,
+.landing .used__copy {
+  display: grid;
+  align-content: start;
+  gap: 16px;
+  max-width: var(--lp-measure);
+}
+
+.landing .used__copy a {
+  justify-self: start;
+  font-weight: 600;
+}
+
+.landing .packages__list {
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--ng-doc-border-color);
+  list-style: none;
+}
+
+.landing .packages__list a {
+  display: grid;
+  grid-template-columns: 11rem minmax(0, 1fr);
+  gap: 8px 24px;
+  align-items: baseline;
+  padding: 20px 4px;
+  border-bottom: 1px solid var(--ng-doc-border-color);
+  color: var(--ng-doc-text-muted);
+  text-decoration: none;
+}
+
+.landing .packages__list a:hover {
+  background: var(--ng-doc-base-1);
+}
+
+.landing .packages__list code {
+  color: var(--ng-doc-heading-color);
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+// ------------------------------------------------------------------------------------------------------ Showcase
+.landing .used__list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.landing .used__list a {
+  display: grid;
+  gap: 12px;
+  color: var(--ng-doc-heading-color);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.landing .used__list img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  border: 1px solid var(--ng-doc-border-color);
+  border-radius: 10px;
+  background: var(--ng-doc-base-1);
+  object-fit: cover;
+  object-position: top left;
+}
+
+// -------------------------------------------------------------------------------------------------------- Footer
+.landing .footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px 32px;
+  padding: 40px var(--lp-gutter) 56px;
+  font-size: 0.9rem;
+}
+
+.landing .footer nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+}
+
+.landing .footer a {
+  color: var(--ng-doc-text-muted);
+  text-decoration: none;
+}
+
+.landing .footer a:hover {
+  color: var(--ng-doc-heading-color);
+}
+
+// -------------------------------------------------------------------------------------------------- Narrow screens
+@media (max-width: 900px) {
+  .landing .hero,
+  .landing .feature,
+  .landing .packages,
+  .landing .used {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .landing .hero__copy {
+    padding: 48px var(--lp-gutter) 32px;
+  }
+
+  .landing .hero__canvas {
+    padding: 0 var(--lp-gutter) 48px;
+  }
+
+  .landing .feature--mirrored .feature__copy {
+    order: 0;
+  }
+
+  .landing .packages__list a {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 520px) {
+  .landing .used__list {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

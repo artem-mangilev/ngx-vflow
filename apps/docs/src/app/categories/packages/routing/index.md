@@ -38,7 +38,7 @@ export class EditorComponent {
 }
 ```
 
-The graph then holds no functions and serializes as data. A factory still works directly in `curve` where a graph is built in code. The connection preview takes the same keys: `[connection]="{ curve: 'avoid' }"`. See [Curves](../../edges/curves#curves-by-key) for the keys and their type checking.
+The graph then holds no functions and serializes as data. A factory still works directly in `curve` where a graph is built in code. The connection preview takes the same keys: `[connection]="{ curve: 'avoid' }"`. See [Curves](/docs/edges/curves#curves-by-key) for the keys and their type checking.
 
 ## Options
 

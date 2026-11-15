@@ -6,7 +6,7 @@ const Page: NgDocPage = {
   title: `Auto size`,
   mdFile: './index.md',
   category: PackagesCategory,
-  order: 2,
+  order: 3,
   demos: { AutoSizeDemoComponent },
 };
 

@@ -2,7 +2,7 @@ import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 
 test('follows a rebound key in the shortcut configuration example', async ({ page }) => {
-  await page.goto('/interactions/keyboard-shortcuts');
+  await page.goto('/docs/interactions/keyboard-shortcuts');
   const demo = page.getByTestId('shortcuts-demo');
   const graph = demo.getByRole('region', { name: 'Configured graph', exact: true });
   const config = demo.getByTestId('shortcuts-config');

@@ -1,0 +1,123 @@
+<div class="landing" [attr.data-vui-theme]="theme()">
+  <section class="hero">
+    <div class="hero__copy">
+      <h1>Node-based interfaces for Angular</h1>
+      <p class="hero__lead">
+        ngx-vflow renders the canvas, the edges and the gestures. The nodes are your own templates and components.
+      </p>
+
+      <div class="hero__actions">
+        <a class="action action--primary" routerLink="/docs/getting-started/quickstart">Read the quickstart</a>
+        <a class="action" routerLink="/examples/feature-overview">See examples</a>
+      </div>
+
+      <div class="install">
+        <code>{{ installCommand }}</code>
+        <button type="button" aria-live="polite" (click)="copyInstallCommand()">
+          {{ copied() ? 'Copied' : 'Copy' }}
+        </button>
+      </div>
+
+      <ul class="facts">
+        @if (stars(); as value) {
+          <li>
+            <a href="https://github.com/artem-mangilev/ngx-vflow" target="_blank" rel="noreferrer"
+              ><b>{{ value }}</b> stars on GitHub</a
+            >
+          </li>
+        }
+        @if (downloads(); as value) {
+          <li>
+            <a href="https://www.npmjs.com/package/ngx-vflow" target="_blank" rel="noreferrer"
+              ><b>{{ value }}</b> downloads a month</a
+            >
+          </li>
+        }
+        <li>MIT license</li>
+        <li>Angular 20 and later, zoneless</li>
+      </ul>
+    </div>
+
+    <div
+      class="hero__canvas"
+      role="region"
+      aria-label="Live example: an image editor built from nodes. Move a slider or rewire the nodes">
+      <ng-container *ngComponentOutlet="hero" />
+    </div>
+  </section>
+
+  @for (feature of features; track feature.title; let odd = $odd) {
+    <section class="feature" [class.feature--mirrored]="odd">
+      <div class="feature__copy">
+        <h2>{{ feature.title }}</h2>
+        <p>{{ feature.text }}</p>
+        <a [routerLink]="feature.link">{{ feature.linkText }}</a>
+      </div>
+
+      <div
+        class="feature__canvas"
+        role="region"
+        [class.feature__canvas--framed]="feature.framed"
+        [attr.aria-label]="feature.demoLabel">
+        @defer (on viewport) {
+          <ng-container *ngComponentOutlet="feature.demo" />
+        } @placeholder {
+          <div class="feature__placeholder"></div>
+        }
+      </div>
+    </section>
+  }
+
+  <section class="packages">
+    <div class="packages__copy">
+      <h2>Packages for what the graph needs next</h2>
+      <p>
+        The core package stays small. Layout, edge routing and a ready look are separate packages you add when you need
+        them.
+      </p>
+    </div>
+
+    <ul class="packages__list">
+      @for (item of packages; track item.name) {
+        <li>
+          <a [routerLink]="item.link">
+            <code>{{ item.name }}</code>
+            <span>{{ item.text }}</span>
+          </a>
+        </li>
+      }
+    </ul>
+  </section>
+
+  <section class="used">
+    <div class="used__copy">
+      <h2>Used in open source products</h2>
+      <p>Google ADK Web builds its visual agent designer on ngx-vflow, and Microcks draws live API traces with it.</p>
+      <a routerLink="/showcase">See the showcase</a>
+    </div>
+
+    <ul class="used__list">
+      @for (project of projects; track project.name) {
+        <li>
+          <a target="_blank" rel="noreferrer" [href]="project.website">
+            <img loading="lazy" [src]="project.image" [alt]="'Screenshot of ' + project.name" />
+            <span>{{ project.name }}</span>
+          </a>
+        </li>
+      }
+    </ul>
+  </section>
+
+  <footer class="footer">
+    <nav aria-label="Footer">
+      <a routerLink="/docs/getting-started/quickstart">Docs</a>
+      <a routerLink="/examples/feature-overview">Examples</a>
+      <a routerLink="/packages/ui/overview">Packages</a>
+      <a routerLink="/showcase">Showcase</a>
+      <a routerLink="/api">API reference</a>
+      <a href="https://github.com/artem-mangilev/ngx-vflow" target="_blank" rel="noreferrer">GitHub</a>
+      <a href="https://www.npmjs.com/package/ngx-vflow" target="_blank" rel="noreferrer">npm</a>
+    </nav>
+    <p>Released under the MIT license.</p>
+  </footer>
+</div>

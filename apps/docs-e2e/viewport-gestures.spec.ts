@@ -16,7 +16,7 @@ async function viewport(graph: Locator): Promise<Viewport> {
 }
 
 async function open(page: Page) {
-  await page.goto('/interactions/viewport-gestures');
+  await page.goto('/docs/viewport/viewport-gestures');
   const graph = page.locator('vflow').first();
   await graph.scrollIntoViewIfNeeded();
   await expect(graph.locator('[data-v-node]').first()).toBeVisible();
@@ -182,7 +182,7 @@ test('pans with one finger and pinches with two, and sets touch-action from the 
 });
 
 test('lazy loading moves smoothly to the next node and lands exactly on it', async ({ page }) => {
-  await page.goto('/performance/lazy-loading');
+  await page.goto('/docs/performance/lazy-loading');
   const graph = page.locator('vflow').first();
   await graph.scrollIntoViewIfNeeded();
   await expect(graph.locator('[data-v-node]').first()).toBeVisible();

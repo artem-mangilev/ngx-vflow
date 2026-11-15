@@ -35,7 +35,7 @@ async function drag(page: Page, graph: Locator, from: { x: number; y: number }, 
 
 async function demo(page: Page) {
   await page.setViewportSize({ width: 1280, height: 900 });
-  await page.goto('/viewport/alignment-helper');
+  await page.goto('/docs/viewport/snapping');
   const graph = page.locator('vflow').first();
   await graph.scrollIntoViewIfNeeded();
   await expect(graph.locator('[data-v-node]')).toHaveCount(7);

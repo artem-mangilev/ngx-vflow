@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 test('declared marker shapes render in the shared defs and edges reference them like built-in markers', async ({
   page,
 }) => {
-  await page.goto('/edges/markers');
+  await page.goto('/docs/edges/markers');
   const demo = page.locator('vflow').filter({ has: page.locator('marker[data-v-marker=diamond]') });
   const defs = demo.locator('defs[flowDefs]').first();
 

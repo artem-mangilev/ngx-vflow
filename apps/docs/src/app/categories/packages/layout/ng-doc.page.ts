@@ -9,7 +9,7 @@ const Page: NgDocPage = {
   title: `Layout`,
   mdFile: './index.md',
   category: PackagesCategory,
-  order: 3,
+  order: 4,
   demos: { LayoutDagreDemoComponent, LayoutElkDemoComponent, LayoutForceDemoComponent, LayoutTreeDemoComponent },
 };
 

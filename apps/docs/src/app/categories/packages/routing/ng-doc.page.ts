@@ -6,7 +6,7 @@ const Page: NgDocPage = {
   title: `Routing`,
   mdFile: './index.md',
   category: PackagesCategory,
-  order: 1,
+  order: 2,
   demos: { RoutingDemoComponent },
 };
 

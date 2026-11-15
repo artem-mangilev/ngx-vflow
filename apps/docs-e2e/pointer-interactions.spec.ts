@@ -15,7 +15,7 @@ async function center(locator: Locator) {
 }
 
 async function connectionGraph(page: Page) {
-  await page.goto('/edges/connections');
+  await page.goto('/docs/handles/connections');
   const graph = page.locator('vflow').first();
   await graph.scrollIntoViewIfNeeded();
   await expect(graph.locator('[data-v-node]')).toHaveCount(2);
@@ -59,7 +59,7 @@ test('connects two handles with a finger: the finger reports the handle it is re
 });
 
 test('drops a reconnected edge on the canvas without panning the viewport', async ({ page }) => {
-  await page.goto('/edges/connections');
+  await page.goto('/docs/handles/connections');
   const graph = page.locator('vflow').nth(3);
   await graph.scrollIntoViewIfNeeded();
   await expect(graph.locator('[edge]')).toHaveCount(2);
@@ -78,8 +78,9 @@ test('drops a reconnected edge on the canvas without panning the viewport', asyn
 });
 
 test('selects nodes with a Shift selection box instead of panning', async ({ page }) => {
-  await page.goto('/interactions/selection-box');
-  const graph = page.locator('vflow').first();
+  await page.goto('/docs/interactions/selection');
+  // The page has two demos; the selection box is the second.
+  const graph = page.locator('vflow').nth(1);
   await graph.scrollIntoViewIfNeeded();
   await expect(graph.locator('[data-v-node]').first()).toBeVisible();
   const pane = (await graph.locator('.v-pane').boundingBox())!;

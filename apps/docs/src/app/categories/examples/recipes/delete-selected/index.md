@@ -1,0 +1,3 @@
+Press `Delete` or `Backspace` on a focused node or edge. The flow emits `(deleteRequest)` with the focused entity, or with the whole selection when the focused entity is part of it; this example applies it with `removeElements` to the application-owned collections. Node removal also removes descendants and incident edges. After the removal, focus returns to the page rather than to another entity.
+
+{{ NgDocActions.demoPane("DeleteSelectedDemoComponent") }}

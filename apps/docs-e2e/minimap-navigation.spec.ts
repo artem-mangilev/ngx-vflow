@@ -32,7 +32,7 @@ async function geometry(graph: Locator) {
 test('clicks, captures mouse drags outside the overview, preserves zoom and leaves the surrounding pane usable', async ({
   page,
 }) => {
-  await page.goto('/viewport/minimap');
+  await page.goto('/docs/viewport/minimap');
   const graph = page.locator('vflow').first();
   const canvas = graph.locator('canvas');
   await canvas.scrollIntoViewIfNeeded();
@@ -71,7 +71,7 @@ test('clicks, captures mouse drags outside the overview, preserves zoom and leav
 });
 
 test('keeps wheel zoom within limits, blocks page scrolling, and aligns after resize at high DPI', async ({ page }) => {
-  await page.goto('/viewport/minimap');
+  await page.goto('/docs/viewport/minimap');
   const graph = page.locator('vflow').first();
   const canvas = graph.locator('canvas');
   await canvas.scrollIntoViewIfNeeded();
@@ -102,7 +102,7 @@ test('supports real touch tap and drag, releases cancellation, and does not sele
   page,
   context,
 }) => {
-  await page.goto('/viewport/minimap');
+  await page.goto('/docs/viewport/minimap');
   const graph = page.locator('vflow').first();
   const canvas = graph.locator('canvas');
   await canvas.scrollIntoViewIfNeeded();

@@ -27,7 +27,7 @@ async function rowAlignment(demo: Locator) {
 test('consumer DOM, scoped themes, selection and native workflow actions', async ({ page }, testInfo) => {
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
-  await page.goto('/design-system/workflow');
+  await page.goto('/examples/applications/workflow');
   const workflow = page.locator('app-ui-workflow-demo');
   await expect(workflow.locator('article.vui-node')).toHaveCount(4);
   await expect(workflow.locator('path.vui-edge')).toHaveCount(3);
@@ -106,7 +106,7 @@ test('consumer DOM, scoped themes, selection and native workflow actions', async
 test('field connections follow stable IDs through rename, reorder, density and recreation', async ({
   page,
 }, testInfo) => {
-  await page.goto('/design-system/erd-schema-mapping');
+  await page.goto('/examples/applications/erd-schema-mapping');
   const demo = page.locator('app-ui-entities-demo');
   await demo.scrollIntoViewIfNeeded();
   await expect(demo.locator('article')).toHaveCount(4);
@@ -214,7 +214,7 @@ test('field connections follow stable IDs through rename, reorder, density and r
 test('viewport controls drive the given flow within its zoom limits, and edge labels follow geometry', async ({
   page,
 }) => {
-  await page.goto('/design-system/workflow');
+  await page.goto('/examples/applications/workflow');
   const workflow = page.locator('app-ui-workflow-demo');
   const controls = workflow.getByRole('group', { name: 'Viewport controls' });
   const zoomIn = controls.getByRole('button', { name: 'Zoom in', exact: true });
@@ -301,7 +301,7 @@ test('viewport controls drive the given flow within its zoom limits, and edge la
 });
 
 test('themes stay scoped per editor, reach every layer and leave geometry alone', async ({ page }) => {
-  await page.goto('/design-system/overview');
+  await page.goto('/packages/ui/overview');
   const a = page.locator('[data-testid="editor-a"]');
   const b = page.locator('[data-testid="editor-b"]');
   await b.scrollIntoViewIfNeeded();
@@ -358,7 +358,7 @@ function overlapping(demo: Locator, chrome: string) {
 test('image lab: the palette and the viewport controls leave the fitted scene free', async ({ page }) => {
   // Up to 1024px ng-doc drops its sidebars and the flow is at its widest, where the fitted scene is at its tallest.
   await page.setViewportSize({ width: 1024, height: 768 });
-  await page.goto('/design-system/pipeline');
+  await page.goto('/examples/applications/pipeline');
   const demo = page.locator('app-ui-pipeline-demo');
   await demo.evaluate((element) => element.scrollIntoView({ block: 'center' }));
   await expect(demo.locator('article.vui-node')).toHaveCount(7);
@@ -386,7 +386,7 @@ async function center(locator: Locator) {
 }
 
 test('image lab: typed ports, previews that follow the wiring, native controls and export', async ({ page }) => {
-  await page.goto('/design-system/pipeline');
+  await page.goto('/examples/applications/pipeline');
   const demo = page.locator('app-ui-pipeline-demo');
   await demo.evaluate((element) => element.scrollIntoView({ block: 'center' }));
   await expect(demo.locator('article.vui-node')).toHaveCount(7);
@@ -457,7 +457,7 @@ test('image lab: typed ports, previews that follow the wiring, native controls a
 test('relationships map: floating edges, people moving into free spots, connecting people, resizable teams', async ({
   page,
 }) => {
-  await page.goto('/design-system/relationships-map');
+  await page.goto('/examples/applications/relationships-map');
   const demo = page.locator('app-ui-relationships-demo');
   await demo.evaluate((element) => element.scrollIntoView({ block: 'center' }));
   await expect(demo.locator('.vui-group')).toHaveCount(3);
@@ -572,7 +572,7 @@ test('relationships map: floating edges, people moving into free spots, connecti
 test('scroll and collapse experiment: model kept, endpoints move to the header and back, wheel scrolls rows', async ({
   page,
 }) => {
-  await page.goto('/design-system/erd-schema-mapping');
+  await page.goto('/examples/applications/erd-schema-mapping');
   const demo = page.locator('app-ui-scroll-collapse-demo');
   await demo.evaluate((element) => element.scrollIntoView({ block: 'center' }));
   await expect(demo.locator('path.vui-edge')).toHaveCount(2);
@@ -628,7 +628,7 @@ test('scroll and collapse experiment: model kept, endpoints move to the header a
 });
 
 test('ERD: deleting a field removes its edges and leaves no detached endpoints', async ({ page }) => {
-  await page.goto('/design-system/erd-schema-mapping');
+  await page.goto('/examples/applications/erd-schema-mapping');
   const demo = page.locator('app-ui-entities-demo');
   await demo.scrollIntoViewIfNeeded();
   await expect(demo.locator('path.vui-edge')).toHaveCount(2);
@@ -639,7 +639,7 @@ test('ERD: deleting a field removes its edges and leaves no detached endpoints',
 });
 
 test('ERD: adding a field with a name and a type, refusing a taken name, cancelling with Escape', async ({ page }) => {
-  await page.goto('/design-system/erd-schema-mapping');
+  await page.goto('/examples/applications/erd-schema-mapping');
   const demo = page.locator('app-ui-entities-demo');
   await demo.evaluate((element) => element.scrollIntoView({ block: 'center' }));
   const order = demo.locator('[data-entity="order"]');
@@ -708,7 +708,7 @@ test('ERD: adding a field with a name and a type, refusing a taken name, cancell
 test('ERD: a table longer than seven fields scrolls, and hidden rows keep their edges on the borders', async ({
   page,
 }) => {
-  await page.goto('/design-system/erd-schema-mapping');
+  await page.goto('/examples/applications/erd-schema-mapping');
   const demo = page.locator('app-ui-entities-demo');
   await demo.evaluate((element) => element.scrollIntoView({ block: 'center' }));
   const order = demo.locator('[data-entity="order"]');

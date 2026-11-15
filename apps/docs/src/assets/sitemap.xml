@@ -1,6 +1,56 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://www.ngx-vflow.org/</loc><lastmod>2026-04-04</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://www.ngx-vflow.org/</loc><lastmod>2026-11-15</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://www.ngx-vflow.org/showcase</loc><lastmod>2026-11-15</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.ngx-vflow.org/docs/edges/curves</loc><lastmod>2026-11-15</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.ngx-vflow.org/docs/edges/custom-edges</loc><lastmod>2026-11-15</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.ngx-vflow.org/docs/edges/labels</loc><lastmod>2026-11-15</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.ngx-vflow.org/docs/edges/markers</loc><lastmod>2026-11-15</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.ngx-vflow.org/docs/getting-started/concepts</loc><lastmod>2026-11-15</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.ngx-vflow.org/docs/getting-started/configuration</loc><lastmod>2026-11-15</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.ngx-vflow.org/docs/getting-started/migration</loc><lastmod>2026-11-15</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.ngx-vflow.org/docs/getting-started/quickstart</loc><lastmod>2026-11-15</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.ngx-vflow.org/docs/getting-started/styling</loc><lastmod>2026-11-15</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.ngx-vflow.org/docs/graph/geometry-utilities</loc><lastmod>2026-11-15</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.ngx-vflow.org/docs/graph/graph-operations</loc><lastmod>2026-11-15</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.ngx-vflow.org/docs/graph/persisting-graph</loc><lastmod>2026-11-15</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.ngx-vflow.org/docs/handles/connections</loc><lastmod>2026-11-15</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.ngx-vflow.org/docs/handles/handles</loc><lastmod>2026-11-15</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.ngx-vflow.org/docs/interactions/accessibility</loc><lastmod>2026-11-15</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.ngx-vflow.org/docs/interactions/handling-changes</loc><lastmod>2026-11-15</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.ngx-vflow.org/docs/interactions/keyboard-shortcuts</loc><lastmod>2026-11-15</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.ngx-vflow.org/docs/interactions/selection</loc><lastmod>2026-11-15</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.ngx-vflow.org/docs/nodes/custom-nodes</loc><lastmod>2026-11-15</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.ngx-vflow.org/docs/nodes/draggables</loc><lastmod>2026-11-15</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.ngx-vflow.org/docs/nodes/node-toolbar</loc><lastmod>2026-11-15</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.ngx-vflow.org/docs/nodes/resizer</loc><lastmod>2026-11-15</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.ngx-vflow.org/docs/nodes/subflows</loc><lastmod>2026-11-15</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.ngx-vflow.org/docs/performance/lazy-loading</loc><lastmod>2026-11-15</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.ngx-vflow.org/docs/performance/virtualization</loc><lastmod>2026-11-15</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.ngx-vflow.org/docs/testing</loc><lastmod>2026-11-15</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.ngx-vflow.org/docs/viewport/background</loc><lastmod>2026-11-15</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.ngx-vflow.org/docs/viewport/minimap</loc><lastmod>2026-11-15</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.ngx-vflow.org/docs/viewport/snapping</loc><lastmod>2026-11-15</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.ngx-vflow.org/docs/viewport/view-size</loc><lastmod>2026-11-15</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.ngx-vflow.org/docs/viewport/viewport-control</loc><lastmod>2026-11-15</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.ngx-vflow.org/docs/viewport/viewport-gestures</loc><lastmod>2026-11-15</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.ngx-vflow.org/examples/applications/erd-schema-mapping</loc><lastmod>2026-11-15</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.ngx-vflow.org/examples/applications/pipeline</loc><lastmod>2026-11-15</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.ngx-vflow.org/examples/applications/relationships-map</loc><lastmod>2026-11-15</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.ngx-vflow.org/examples/applications/workflow</loc><lastmod>2026-11-15</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.ngx-vflow.org/examples/feature-overview</loc><lastmod>2026-11-15</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.ngx-vflow.org/examples/recipes/delete-selected</loc><lastmod>2026-11-15</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.ngx-vflow.org/examples/recipes/drag-and-drop-nodes</loc><lastmod>2026-11-15</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.ngx-vflow.org/examples/recipes/easy-connect</loc><lastmod>2026-11-15</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.ngx-vflow.org/examples/recipes/force</loc><lastmod>2026-11-15</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.ngx-vflow.org/examples/recipes/rope-curve</loc><lastmod>2026-11-15</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.ngx-vflow.org/examples/recipes/stress-test</loc><lastmod>2026-11-15</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.ngx-vflow.org/packages/auto-size</loc><lastmod>2026-11-15</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.ngx-vflow.org/packages/cli</loc><lastmod>2026-11-15</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.ngx-vflow.org/packages/layout</loc><lastmod>2026-11-15</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.ngx-vflow.org/packages/routing</loc><lastmod>2026-11-15</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.ngx-vflow.org/packages/ui/overview</loc><lastmod>2026-11-15</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.ngx-vflow.org/packages/ui/tokens</loc><lastmod>2026-11-15</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
   <url><loc>https://www.ngx-vflow.org/api</loc><lastmod>2026-04-04</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
   <url><loc>https://www.ngx-vflow.org/api/classes/ngx-vflow/ChangesControllerDirective</loc><lastmod>2026-04-04</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
   <url><loc>https://www.ngx-vflow.org/api/classes/ngx-vflow/ComponentEventBusService</loc><lastmod>2026-04-04</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
@@ -115,48 +165,4 @@
   <url><loc>https://www.ngx-vflow.org/api/variables/ngx-vflow/EDGE_DEFAULTS</loc><lastmod>2026-04-04</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
   <url><loc>https://www.ngx-vflow.org/api/variables/ngx-vflow/NODE_DEFAULTS</loc><lastmod>2026-04-04</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
   <url><loc>https://www.ngx-vflow.org/api/variables/ngx-vflow/Vflow</loc><lastmod>2026-04-04</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://www.ngx-vflow.org/cookbook/delete-selected</loc><lastmod>2026-04-04</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.ngx-vflow.org/cookbook/drag-and-drop-nodes</loc><lastmod>2026-04-04</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.ngx-vflow.org/cookbook/expand-collapse</loc><lastmod>2026-04-04</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.ngx-vflow.org/cookbook/force</loc><lastmod>2026-04-04</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.ngx-vflow.org/cookbook/group-auto-scaling</loc><lastmod>2026-04-04</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.ngx-vflow.org/cookbook/mermaid-clone</loc><lastmod>2026-04-04</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.ngx-vflow.org/cookbook/node-position-animation</loc><lastmod>2026-04-04</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.ngx-vflow.org/cookbook/smart-curves</loc><lastmod>2026-04-04</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.ngx-vflow.org/cookbook/vizdom-layout</loc><lastmod>2026-04-04</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.ngx-vflow.org/edges/connections</loc><lastmod>2026-04-04</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.ngx-vflow.org/edges/curves</loc><lastmod>2026-04-04</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.ngx-vflow.org/edges/custom-edges</loc><lastmod>2026-04-04</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.ngx-vflow.org/edges/default-edges</loc><lastmod>2026-04-04</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.ngx-vflow.org/edges/floating-edges</loc><lastmod>2026-04-04</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.ngx-vflow.org/edges/labels</loc><lastmod>2026-04-04</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.ngx-vflow.org/edges/markers</loc><lastmod>2026-04-04</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.ngx-vflow.org/handles/custom-handles</loc><lastmod>2026-04-04</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.ngx-vflow.org/handles/multiple-connection-points</loc><lastmod>2026-04-04</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.ngx-vflow.org/interactions/handling-changes</loc><lastmod>2026-04-04</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.ngx-vflow.org/interactions/keyboard-shortcuts</loc><lastmod>2026-04-04</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.ngx-vflow.org/interactions/selecting</loc><lastmod>2026-04-04</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.ngx-vflow.org/interactions/selection-box</loc><lastmod>2026-04-04</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.ngx-vflow.org/introduction/architecture</loc><lastmod>2026-04-04</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.ngx-vflow.org/introduction/migration</loc><lastmod>2026-04-04</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.ngx-vflow.org/introduction/overview</loc><lastmod>2026-04-04</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>
-  <url><loc>https://www.ngx-vflow.org/introduction/roadmap</loc><lastmod>2026-04-04</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.ngx-vflow.org/introduction/showcase</loc><lastmod>2026-04-04</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.ngx-vflow.org/nodes/custom-nodes</loc><lastmod>2026-04-04</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.ngx-vflow.org/nodes/default-nodes</loc><lastmod>2026-04-04</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.ngx-vflow.org/nodes/draggables</loc><lastmod>2026-04-04</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.ngx-vflow.org/nodes/node-toolbar</loc><lastmod>2026-04-04</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.ngx-vflow.org/nodes/resizer</loc><lastmod>2026-04-04</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.ngx-vflow.org/nodes/subflows</loc><lastmod>2026-04-04</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.ngx-vflow.org/nodes/svg-nodes</loc><lastmod>2026-04-04</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.ngx-vflow.org/performance/lazy-loading</loc><lastmod>2026-04-04</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.ngx-vflow.org/performance/stress-test</loc><lastmod>2026-04-04</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.ngx-vflow.org/performance/virtualization</loc><lastmod>2026-04-04</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.ngx-vflow.org/testing/component-mocks</loc><lastmod>2026-04-04</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.ngx-vflow.org/testing/unit-testing-component-nodes</loc><lastmod>2026-04-04</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.ngx-vflow.org/viewport/alignment-helper</loc><lastmod>2026-04-04</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.ngx-vflow.org/viewport/custom-background</loc><lastmod>2026-04-04</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.ngx-vflow.org/viewport/minimap</loc><lastmod>2026-04-04</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.ngx-vflow.org/viewport/snap-to-grid</loc><lastmod>2026-04-04</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://www.ngx-vflow.org/viewport/view-size</loc><lastmod>2026-04-04</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
 </urlset>

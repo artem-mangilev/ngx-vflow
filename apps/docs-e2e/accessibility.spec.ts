@@ -5,7 +5,7 @@ const DRAFT_INSTRUCTIONS =
   'Press Enter or Space to select. Use arrow keys to move it while it is selected. Press Delete or Backspace to delete.';
 
 async function open(page: Page) {
-  await page.goto('/interactions/accessibility');
+  await page.goto('/docs/interactions/accessibility');
   const demo = page.getByTestId('accessibility-demo');
   const graph = demo.getByRole('region', { name: 'Approval graph', exact: true });
   await expect(graph).toBeVisible();

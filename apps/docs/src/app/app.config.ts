@@ -11,6 +11,7 @@ import {
   provideSearchEngine,
 } from '@ng-doc/app';
 import { NG_DOC_ROUTING, provideNgDocContext } from '@ng-doc/generated';
+import { SECTION_TABS } from './shell/sections';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -22,11 +23,27 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(),
     provideRouter(
       [
+        {
+          path: '',
+          pathMatch: 'full',
+          title: 'ngx-vflow — Angular library for node-based flows and diagrams',
+          loadComponent: () => import('./landing/landing.component').then((m) => m.LandingComponent),
+        },
+        {
+          path: 'showcase',
+          title: 'Showcase — ngx-vflow',
+          loadComponent: () => import('./showcase/showcase.component').then((m) => m.ShowcaseComponent),
+        },
+        // A section has no page of its own: its address opens the first page of the section.
+        ...SECTION_TABS.filter((tab) => tab.id !== 'showcase').map((tab) => ({
+          path: tab.id,
+          pathMatch: 'full' as const,
+          redirectTo: tab.link,
+        })),
         ...NG_DOC_ROUTING,
         {
           path: '**',
-          redirectTo: 'introduction/overview',
-          pathMatch: 'full',
+          redirectTo: '',
         },
       ],
       withInMemoryScrolling({
