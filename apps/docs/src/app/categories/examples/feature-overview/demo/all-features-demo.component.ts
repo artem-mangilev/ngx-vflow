@@ -65,9 +65,11 @@ import { EdgeData, FlowStoreService } from './services/flow-store.service';
     </ng-template>
 
     <v-minimap />
+    <vui-controls class="absolute bottom-2.5 left-2.5" />
   </vflow>`,
-  // The page that shows the demo draws the frame; the demo brings its height.
-  host: { class: 'block h-120 w-full' },
+  // The page that shows the demo draws the frame; the demo brings its height: the scene at full size with room under
+  // it for the controls and the minimap.
+  host: { class: 'block h-130 w-full' },
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [DocsPresentations, DocsButton, DemoIconComponent, Vflow, Vui],
   providers: [FlowStoreService],

@@ -12,6 +12,7 @@
     "@angular/platform-browser": "^22.2.0",
     "@angular/router": "^22.2.0",
     "@dagrejs/dagre": "^3.1.3",
+    "@lucide/angular": "^1.74.0",
     "@ng-doc/app": "22.2.0",
     "@ng-doc/builder": "22.2.0",
     "@ng-doc/core": "22.2.0",

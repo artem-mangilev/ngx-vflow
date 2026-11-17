@@ -27,7 +27,8 @@ const TRAFFIC = [0.62, 0.7, 0.64, 0.8, 0.72, 0.92, 0.7, 0.76, 1.1, 0.84, 0.7, 0.
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'block h-90' },
   template: `
-    <vflow #flow [nodes]="nodes" [edges]="[]" [background]="background" (initialized)="flow.fitView({ maxZoom: 1.2 })">
+    <!-- One node would fill the frame when fitted, so the closest zoom is the one the node is shown at. -->
+    <vflow #flow [nodes]="nodes" [edges]="[]" [background]="background" [maxZoom]="1.2" (initialized)="flow.fitView()">
       <article *vNode="let ctx of nodes" vuiNode class="w-72 text-[13px]">
         @let data = ctx.data();
         @let ms = latency(data.replicas);
@@ -98,6 +99,8 @@ const TRAFFIC = [0.62, 0.7, 0.64, 0.8, 0.72, 0.92, 0.7, 0.76, 1.1, 0.84, 0.7, 0.
         <span vuiPort handleType="target" position="left" [canStart]="false"></span>
         <span vuiPort handleType="source" position="right" [canStart]="false"></span>
       </article>
+
+      <vui-controls class="absolute bottom-2.5 left-2.5" />
     </vflow>
   `,
 })

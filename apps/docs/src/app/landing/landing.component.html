@@ -132,11 +132,11 @@
           >
         </div>
 
-        <!-- The frame of the page around the flow, which is no taller than 480px. -->
+        <!-- The frame of the page around the flow, which is no taller than 520px. -->
         <div
           class="min-w-0 overflow-hidden rounded-[14px] border border-doc-border bg-canvas"
           [class.col-span-full]="feature.wide">
-          <div class="*:block! *:max-h-[480px]!" role="region" [attr.aria-label]="feature.demoLabel">
+          <div class="*:block! *:max-h-[520px]!" role="region" [attr.aria-label]="feature.demoLabel">
             @defer (on viewport) {
               <ng-container *ngComponentOutlet="feature.demo" />
             } @placeholder {
@@ -175,14 +175,18 @@
         </p>
       </div>
 
-      <ul class="m-0 list-none border-t border-t-doc-border p-0">
+      <!-- A tile is one link; the tiles of a row are equally tall. -->
+      <ul class="m-0 grid list-none grid-cols-2 gap-4 p-0 max-[520px]:grid-cols-1">
         @for (item of packages; track item.name) {
-          <li>
+          <li class="grid">
             <a
-              class="grid grid-cols-[11rem_minmax(0,1fr)] items-baseline gap-x-6 gap-y-2 border-b border-b-doc-border px-1 py-5 text-doc-muted no-underline hover:bg-doc-base-1 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand max-[900px]:grid-cols-1"
+              class="grid content-start gap-3 rounded-[14px] border border-doc-border p-5 text-doc-muted no-underline hover:border-brand hover:bg-doc-base-1 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
               [routerLink]="item.link">
+              <span class="grid size-9 place-items-center rounded-lg bg-brand/12 text-brand dark:text-brand-pale">
+                <svg [lucideIcon]="item.icon" [size]="20" [strokeWidth]="1.75" />
+              </span>
               <code class="font-doc-mono text-[0.95rem] font-semibold text-doc-heading">{{ item.name }}</code>
-              <span>{{ item.text }}</span>
+              <span class="text-[0.95rem] leading-[1.5]">{{ item.text }}</span>
             </a>
           </li>
         }
@@ -198,9 +202,7 @@
           class="m-0 text-[clamp(1.7rem,3vw,2.25rem)] leading-[1.1] font-bold tracking-[-0.03em] text-balance text-doc-heading">
           Used in open source products
         </h2>
-        <p class="m-0 text-doc-muted">
-          Google ADK Web builds its visual agent designer on ngx-vflow, and Microcks draws live API traces with it.
-        </p>
+        <p class="m-0 text-doc-muted">A few of the projects that build their editors and diagrams with ngx-vflow.</p>
         <a
           class="justify-self-start font-semibold text-doc-link underline-offset-3 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
           routerLink="/showcase"

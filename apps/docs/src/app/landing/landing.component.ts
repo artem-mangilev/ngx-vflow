@@ -1,10 +1,12 @@
 import { NgComponentOutlet } from '@angular/common';
 import { ChangeDetectionStrategy, Component, signal, Type } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { LucideDynamicIcon, LucideGroup, LucideIcon, LucideNetwork, LucidePalette, LucideRoute } from '@lucide/angular';
 import { NgDocCodeComponent, NgDocCodeHighlighterDirective } from '@ng-doc/app';
-import { FirstFlowComponent } from '../categories/docs/getting-started/quickstart/demo/first-flow.component';
+import { provideVflow, withSettings } from 'ngx-vflow';
 import { AllFeaturesDemoComponent } from '../categories/examples/feature-overview/demo/all-features-demo.component';
 import { SHOWCASE_PROJECTS } from '../showcase/projects';
+import { FirstFlowComponent } from './first-flow.component';
 import { HeroFlowComponent } from './hero-flow.component';
 import { ServiceNodeFlowComponent } from './service-node-flow.component';
 
@@ -22,15 +24,16 @@ interface Feature {
   wide?: boolean;
 }
 
-interface PackageRow {
+interface PackageTile {
   name: string;
   text: string;
   link: string;
+  icon: LucideIcon;
 }
 
 const INSTALL_COMMAND = 'npm i ngx-vflow';
 
-/** The template of `FirstFlowComponent` without its CSS classes and the initial `fitView()`. */
+/** The template of `FirstFlowComponent` without its CSS classes, the zoom buttons and the initial `fitView()`. */
 const FIRST_FLOW_TEMPLATE = `<vflow [nodes]="nodes" [edges]="edges()" (connect)="connect($event)">
   <div *vNode="let ctx of nodes">
     <span vHandle handleType="target" position="left"></span>
@@ -47,7 +50,16 @@ const FIRST_FLOW_TEMPLATE = `<vflow [nodes]="nodes" [edges]="edges()" (connect)=
   selector: 'app-landing',
   templateUrl: './landing.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [NgComponentOutlet, RouterLink, NgDocCodeComponent, NgDocCodeHighlighterDirective, HeroFlowComponent],
+  imports: [
+    NgComponentOutlet,
+    RouterLink,
+    NgDocCodeComponent,
+    NgDocCodeHighlighterDirective,
+    LucideDynamicIcon,
+    HeroFlowComponent,
+  ],
+  // The wheel over a flow scrolls the page; a flow below the hero is zoomed with its buttons.
+  providers: [provideVflow(withSettings({ zoomOnScroll: false, zoomOnPinch: false }))],
 })
 export class LandingComponent {
   protected readonly installCommand = INSTALL_COMMAND;
@@ -55,17 +67,20 @@ export class LandingComponent {
 
   protected readonly features: Feature[] = [
     {
-      title: 'Comes with reasonable defaults for your editor',
-      text: 'Dragging nodes, panning, zooming, selection, connecting handles and keyboard navigation are set up before you write a line. A working editor is one component with a short template, and you configure only what yours does differently.',
+      title: 'Simple setup, complete core',
+      text: 'One package and one short template make a working editor. Dragging, panning, zooming, selection, connecting handles and keyboard navigation all come from the core library.',
       link: '/docs/getting-started/quickstart',
       linkText: 'Read the quickstart',
       demoLabel: 'Live flow from the quickstart: three nodes you can drag and connect',
       demo: FirstFlowComponent,
-      code: { caption: 'The template of this flow, without its CSS classes', text: FIRST_FLOW_TEMPLATE },
+      code: {
+        caption: 'The template of this flow, without its CSS classes and zoom buttons',
+        text: FIRST_FLOW_TEMPLATE,
+      },
     },
     {
-      title: 'A node is your own template',
-      text: 'The library ships no node card. A node renders through an Angular template or component, so it is plain HTML and CSS with your own content inside, and signals for its state. This one is a service with a status, a chart and a control.',
+      title: 'A node belongs to you',
+      text: 'A node is an Angular template or component: your HTML, your CSS, your data.',
       link: '/docs/nodes/custom-nodes',
       linkText: 'Read about custom nodes',
       demoLabel: 'Live flow: one node that shows a service; add or remove a replica',
@@ -82,26 +97,30 @@ export class LandingComponent {
     },
   ];
 
-  protected readonly packages: PackageRow[] = [
+  protected readonly packages: PackageTile[] = [
     {
       name: '@vflow/ui',
       text: 'Node cards, ports, groups and edges with light and dark themes, copied into your workspace.',
       link: '/packages/ui/overview',
+      icon: LucidePalette,
     },
     {
       name: '@vflow/layout',
       text: 'Automatic layout with dagre, ELK and d3 behind one function.',
       link: '/packages/layout',
+      icon: LucideNetwork,
     },
     {
       name: '@vflow/routing',
       text: 'Edges that find their way around nodes.',
       link: '/packages/routing',
+      icon: LucideRoute,
     },
     {
       name: '@vflow/auto-size',
       text: 'Parent nodes that grow around their children while you drag.',
       link: '/packages/auto-size',
+      icon: LucideGroup,
     },
   ];
 
