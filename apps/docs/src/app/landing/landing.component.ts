@@ -1,5 +1,5 @@
 import { NgComponentOutlet } from '@angular/common';
-import { ChangeDetectionStrategy, Component, signal, Type } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, signal, Type } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { LucideDynamicIcon, LucideGroup, LucideIcon, LucideNetwork, LucidePalette, LucideRoute } from '@lucide/angular';
 import { NgDocCodeComponent, NgDocCodeHighlighterDirective } from '@ng-doc/app';
@@ -31,7 +31,15 @@ interface PackageTile {
   icon: LucideIcon;
 }
 
+interface Stat {
+  value: string;
+  label: string;
+  link?: string;
+}
+
 const INSTALL_COMMAND = 'npm i ngx-vflow';
+/** Holds the line of a number that is still loading. */
+const LOADING = '\u00a0';
 
 /** The template of `FirstFlowComponent` without its CSS classes, the zoom buttons and the initial `fitView()`. */
 const FIRST_FLOW_TEMPLATE = `<vflow [nodes]="nodes" [edges]="edges()" (connect)="connect($event)">
@@ -124,9 +132,22 @@ export class LandingComponent {
     },
   ];
 
-  /** Stars of the repository and downloads of the last month; a number that could not be loaded is not shown. */
-  protected readonly stars = signal<string | null>(null);
-  protected readonly downloads = signal<string | null>(null);
+  /** Stars of the repository and downloads of the last month: `undefined` while loading, `null` when that failed. */
+  private readonly stars = signal<string | null | undefined>(undefined);
+  private readonly downloads = signal<string | null | undefined>(undefined);
+
+  /** The band under the hero; a number that could not be loaded is not shown. */
+  protected readonly stats = computed<Stat[]>(() => {
+    const loaded = (value: string | null | undefined, label: string, link: string): Stat[] =>
+      value === null ? [] : [{ value: value ?? LOADING, label, link }];
+
+    return [
+      ...loaded(this.stars(), 'GitHub stars', 'https://github.com/artem-mangilev/ngx-vflow'),
+      ...loaded(this.downloads(), 'Downloads a month', 'https://www.npmjs.com/package/ngx-vflow'),
+      { value: 'MIT', label: 'License' },
+      { value: '20+', label: 'Angular version' },
+    ];
+  });
   protected readonly copied = signal(false);
 
   constructor() {
@@ -137,9 +158,9 @@ export class LandingComponent {
         .then((body) => {
           const value = pick(body);
 
-          if (typeof value === 'number') target.set(compact.format(value));
+          target.set(typeof value === 'number' ? compact.format(value) : null);
         })
-        .catch(() => undefined);
+        .catch(() => target.set(null));
 
     load('https://api.github.com/repos/artem-mangilev/ngx-vflow', (body) => body['stargazers_count'], this.stars);
     load('https://api.npmjs.org/downloads/point/last-month/ngx-vflow', (body) => body['downloads'], this.downloads);

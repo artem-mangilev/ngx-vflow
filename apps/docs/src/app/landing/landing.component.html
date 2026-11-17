@@ -22,65 +22,43 @@
         class="pointer-events-auto -mx-6 my-10 grid gap-6 rounded-3xl bg-doc-base-0/55 p-6 backdrop-blur-[6px] *:min-w-0 max-[900px]:mt-6 max-[900px]:mb-0 max-[600px]:-mx-3 max-[600px]:p-3">
         <h1
           class="m-0 text-[clamp(2.5rem,5.2vw,3.5rem)] leading-[1.02] font-bold tracking-[-0.04em] text-balance text-doc-heading">
-          Node-based interfaces for Angular
+          Connect your components
         </h1>
         <p class="m-0 max-w-[26rem] text-[1.15rem] leading-[1.5] text-doc-muted">
-          ngx-vflow renders the canvas, the edges and the gestures. The nodes are your own templates and components.
+          <!-- The names have a hyphen, where a line would otherwise break. -->
+          <span class="whitespace-nowrap">ngx-vflow</span> is an Angular library for building
+          <span class="whitespace-nowrap">node-based</span> editors and interactive diagrams.
         </p>
 
-        <div class="flex flex-wrap gap-3">
-          <a
-            class="inline-flex h-11 items-center rounded-lg border border-brand-deep bg-brand-deep px-5 text-[0.95rem] font-semibold text-white no-underline hover:border-brand hover:bg-brand focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
-            routerLink="/docs/getting-started/quickstart"
-            >Read the quickstart</a
-          >
-          <a
-            class="inline-flex h-11 items-center rounded-lg border border-doc-border px-5 text-[0.95rem] font-semibold text-doc-heading no-underline hover:border-brand focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
-            routerLink="/examples/feature-overview"
-            >See examples</a
-          >
-        </div>
+        <!-- The buttons set the width of this block, and the install box takes it: the two end at the same edge. -->
+        <div class="grid w-fit max-w-full gap-6 *:min-w-0">
+          <div class="flex flex-wrap gap-3">
+            <a
+              class="inline-flex h-11 items-center rounded-lg border border-brand-deep bg-brand-deep px-5 text-[0.95rem] font-semibold text-white no-underline hover:border-brand hover:bg-brand focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+              routerLink="/docs/getting-started/quickstart"
+              >Read the quickstart</a
+            >
+            <a
+              class="inline-flex h-11 items-center rounded-lg border border-doc-border px-5 text-[0.95rem] font-semibold text-doc-heading no-underline hover:border-brand focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+              routerLink="/examples/feature-overview"
+              >See examples</a
+            >
+          </div>
 
-        <div
-          class="flex max-w-[22rem] items-center justify-between gap-4 rounded-lg border border-doc-border bg-doc-base-1 p-1.5 pl-4">
-          <code class="min-w-0 overflow-x-auto font-doc-mono text-[0.88em] whitespace-nowrap text-doc-heading">{{
-            installCommand
-          }}</code>
-          <button
-            type="button"
-            class="h-8 min-w-18 flex-none cursor-pointer rounded-[5px] border-none bg-transparent font-[inherit] text-[0.85rem] leading-[inherit] text-doc-muted hover:bg-doc-base-2 hover:text-doc-heading focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
-            aria-live="polite"
-            (click)="copyInstallCommand()">
-            {{ copied() ? 'Copied' : 'Copy' }}
-          </button>
+          <div
+            class="flex items-center justify-between gap-4 rounded-lg border border-doc-border bg-doc-base-1 p-1.5 pl-4">
+            <code class="min-w-0 overflow-x-auto font-doc-mono text-[0.88em] whitespace-nowrap text-doc-heading">{{
+              installCommand
+            }}</code>
+            <button
+              type="button"
+              class="h-8 min-w-18 flex-none cursor-pointer rounded-[5px] border-none bg-transparent font-[inherit] text-[0.85rem] leading-[inherit] text-doc-muted hover:bg-doc-base-2 hover:text-doc-heading focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+              aria-live="polite"
+              (click)="copyInstallCommand()">
+              {{ copied() ? 'Copied' : 'Copy' }}
+            </button>
+          </div>
         </div>
-
-        <ul class="m-0 flex list-none flex-wrap gap-x-6 gap-y-1.5 p-0 text-[0.9rem] text-doc-muted">
-          @if (stars(); as value) {
-            <li>
-              <a
-                class="text-inherit underline decoration-[color-mix(in_oklab,currentColor_45%,transparent)] underline-offset-3 hover:decoration-current focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
-                href="https://github.com/artem-mangilev/ngx-vflow"
-                target="_blank"
-                rel="noreferrer"
-                ><b class="font-[650] text-doc-heading">{{ value }}</b> stars on GitHub</a
-              >
-            </li>
-          }
-          @if (downloads(); as value) {
-            <li>
-              <a
-                class="text-inherit underline decoration-[color-mix(in_oklab,currentColor_45%,transparent)] underline-offset-3 hover:decoration-current focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
-                href="https://www.npmjs.com/package/ngx-vflow"
-                target="_blank"
-                rel="noreferrer"
-                ><b class="font-[650] text-doc-heading">{{ value }}</b> downloads a month</a
-              >
-            </li>
-          }
-          <li>MIT license</li>
-          <li>Angular 20 and later, zoneless</li>
-        </ul>
       </div>
 
       <!-- The room the flow is shown in until the reader moves it: the flow fits its nodes into this box. -->
@@ -96,6 +74,45 @@
       role="region"
       aria-label="Live example: two colors and an angle wired into a gradient. Pick a color, move the slider or rewire the nodes">
       <app-hero-flow [slot]="heroSlot" />
+    </div>
+  </section>
+
+  <!--
+    The library in numbers, as a band under the hero. A number that is still loading keeps its place; one that could
+    not be loaded gives it to the others.
+  -->
+  <section class="border-b border-b-doc-border" aria-label="ngx-vflow in numbers">
+    <div class="landing-width py-[clamp(28px,4vw,44px)]">
+      <ul class="m-0 grid list-none grid-cols-[repeat(auto-fit,minmax(9rem,1fr))] gap-x-8 gap-y-7 p-0">
+        @for (stat of stats(); track stat.label) {
+          <li>
+            @if (stat.link) {
+              <a
+                class="group inline-grid gap-1.5 no-underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand"
+                target="_blank"
+                rel="noreferrer"
+                [href]="stat.link">
+                <b
+                  class="text-[clamp(1.75rem,3vw,2.25rem)] leading-none font-bold tracking-[-0.03em] text-brand-deep tabular-nums dark:text-brand-pale"
+                  >{{ stat.value }}</b
+                >
+                <span
+                  class="text-[0.9rem] text-doc-muted underline decoration-[color-mix(in_oklab,currentColor_45%,transparent)] underline-offset-3 group-hover:decoration-current"
+                  >{{ stat.label }}</span
+                >
+              </a>
+            } @else {
+              <div class="grid gap-1.5">
+                <b
+                  class="text-[clamp(1.75rem,3vw,2.25rem)] leading-none font-bold tracking-[-0.03em] text-brand-deep tabular-nums dark:text-brand-pale"
+                  >{{ stat.value }}</b
+                >
+                <span class="text-[0.9rem] text-doc-muted">{{ stat.label }}</span>
+              </div>
+            }
+          </li>
+        }
+      </ul>
     </div>
   </section>
 
