@@ -35,7 +35,8 @@
           "mode": "production"
         },
         "development": {
-          "mode": "development"
+          "mode": "development",
+          "ssr": false
         }
       },
       "defaultConfiguration": "production"

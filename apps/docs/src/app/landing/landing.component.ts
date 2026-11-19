@@ -1,9 +1,22 @@
 import { NgComponentOutlet, NgTemplateOutlet } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, inject, signal, Type } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  makeStateKey,
+  signal,
+  StateKey,
+  TransferState,
+  Type,
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { LucideDynamicIcon, LucideGroup, LucideIcon, LucideNetwork, LucidePalette, LucideRoute } from '@lucide/angular';
 import { NgDocCodeComponent, NgDocCodeHighlighterDirective, NgDocHighlighterService } from '@ng-doc/app';
 import { provideVflow, withSettings } from 'ngx-vflow';
+import { timeout } from 'rxjs';
 import { AllFeaturesDemoComponent } from '../categories/examples/feature-overview/demo/all-features-demo.component';
 import { SHOWCASE_PROJECTS } from '../showcase/projects';
 import { FirstFlowComponent } from './first-flow.component';
@@ -40,6 +53,11 @@ interface Stat {
 }
 
 const INSTALL_COMMAND = 'npm i ngx-vflow';
+/** The numbers of the prerendered page, on their way from the build to the browser. */
+const STARS = makeStateKey<string>('landing.stars');
+const DOWNLOADS = makeStateKey<string>('landing.downloads');
+/** A service that does not answer in this time has no number: the prerender of the page does not wait longer. */
+const STATS_TIMEOUT = 5000;
 /** Holds the line of a number that is still loading. */
 const LOADING = '\u00a0';
 
@@ -161,19 +179,49 @@ export class LandingComponent {
   protected readonly copied = signal(false);
 
   constructor() {
+    const http = inject(HttpClient);
+    const state = inject(TransferState);
     const compact = new Intl.NumberFormat('en', { notation: 'compact', maximumFractionDigits: 1 });
-    const load = (url: string, pick: (body: Record<string, unknown>) => unknown, target: typeof this.stars) =>
-      fetch(url)
-        .then((response) => (response.ok ? response.json() : Promise.reject()))
-        .then((body) => {
-          const value = pick(body);
+    // The build asks while it prerenders the page and hands the numbers to the browser with the page, so a reader
+    // asks neither service. The browser asks only where the page was not prerendered, or the build got no answer.
+    // The numbers are handed over by hand: Angular does not carry over a response that sets a cookie, as npm's does.
+    const load = (
+      url: string,
+      pick: (body: Record<string, unknown>) => unknown,
+      target: typeof this.stars,
+      key: StateKey<string>,
+    ) => {
+      const prerendered = state.get(key, null);
 
-          target.set(typeof value === 'number' ? compact.format(value) : null);
-        })
-        .catch(() => target.set(null));
+      if (prerendered !== null) return target.set(prerendered);
 
-    load('https://api.github.com/repos/artem-mangilev/ngx-vflow', (body) => body['stargazers_count'], this.stars);
-    load('https://api.npmjs.org/downloads/point/last-month/ngx-vflow', (body) => body['downloads'], this.downloads);
+      http
+        .get<Record<string, unknown>>(url, { transferCache: false })
+        .pipe(timeout(STATS_TIMEOUT), takeUntilDestroyed())
+        .subscribe({
+          next: (body) => {
+            const value = pick(body);
+            const text = typeof value === 'number' ? compact.format(value) : null;
+
+            target.set(text);
+            if (text !== null) state.set(key, text);
+          },
+          error: () => target.set(null),
+        });
+    };
+
+    load(
+      'https://api.github.com/repos/artem-mangilev/ngx-vflow',
+      (body) => body['stargazers_count'],
+      this.stars,
+      STARS,
+    );
+    load(
+      'https://api.npmjs.org/downloads/point/last-month/ngx-vflow',
+      (body) => body['downloads'],
+      this.downloads,
+      DOWNLOADS,
+    );
   }
 
   protected copyInstallCommand(): void {

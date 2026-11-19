@@ -152,7 +152,9 @@ function createRopeCurve(measured: Signal<boolean>): CurveFactory {
     request = moving.size ? requestAnimationFrame(animate) : 0;
   };
 
-  inject(DestroyRef).onDestroy(() => cancelAnimationFrame(request));
+  inject(DestroyRef).onDestroy(() => {
+    if (request) cancelAnimationFrame(request);
+  });
 
   return (params) => {
     // The preview of a connection has no edge to keep a rope for.

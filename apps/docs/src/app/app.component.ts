@@ -12,7 +12,7 @@ import { NgDocButtonIconComponent, NgDocIconComponent, NgDocTooltipDirective } f
 import { filter, map } from 'rxjs';
 import { injectDocsTheme } from './shared/docs-theme';
 import { SectionSidebarComponent } from './shell/section-sidebar.component';
-import { Section, SECTION_TABS, tabOfUrl } from './shell/sections';
+import { pageAddress, Section, SECTION_TABS, tabOfUrl } from './shell/sections';
 
 @Component({
   selector: 'app-root',
@@ -57,8 +57,21 @@ export class AppComponent {
   constructor() {
     // Every flow of the site takes the vflow UI theme of the docs theme: the scope is the document itself.
     const theme = injectDocsTheme();
-    const root = inject(DOCUMENT).documentElement;
+    const document = inject(DOCUMENT);
+    const root = document.documentElement;
 
     effect(() => root.setAttribute('data-vui-theme', theme()));
+
+    // Every page is prerendered into a file of its own and names its own address: with the address of the home
+    // page from `index.html`, a search engine would take the pages for copies of it.
+    const canonical = document.querySelector('link[rel="canonical"]');
+    const shared = document.querySelector('meta[property="og:url"]');
+
+    effect(() => {
+      const address = pageAddress(this.url());
+
+      canonical?.setAttribute('href', address);
+      shared?.setAttribute('content', address);
+    });
   }
 }

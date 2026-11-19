@@ -1,4 +1,5 @@
 import {
+  afterNextRender,
   ChangeDetectionStrategy,
   Component,
   computed,
@@ -6,6 +7,7 @@ import {
   effect,
   ElementRef,
   inject,
+  Injector,
   input,
   signal,
   untracked,
@@ -49,12 +51,17 @@ const SWATCHES = [
   { name: 'Coral', value: '#ff7e6b' },
 ];
 
+/** Whether a media query matches. The prerender of the page has no screen: nothing matches there. */
+function media(query: string): boolean {
+  return typeof matchMedia === 'function' && matchMedia(query).matches;
+}
+
 /** Degrees a second while the angle plays: one turn in half a minute. */
 const SPIN_SPEED = 12;
 /**
  * On a phone the scene is drawn smaller to fit the screen, so there it is laid out tighter and loses less of its size.
  */
-const COMPACT = matchMedia('(width <= 600px)').matches;
+const COMPACT = media('(width <= 600px)');
 const DOT_GAP = 22;
 /** The least zoom of a flow, which the first fit does not go under either. */
 const MIN_ZOOM = 0.5;
@@ -253,8 +260,8 @@ const GLOW_OFFSET = 40;
 export class HeroFlowComponent {
   protected readonly swatches = SWATCHES;
   /** A touch screen keeps the drag on the canvas for scrolling the page, which has no other place to be scrolled by. */
-  protected readonly finePointer = matchMedia('(pointer: fine)').matches;
-  protected readonly motion = !matchMedia('(prefers-reduced-motion: reduce)').matches;
+  protected readonly finePointer = media('(pointer: fine)');
+  protected readonly motion = !media('(prefers-reduced-motion: reduce)');
 
   /** The box of the page the nodes are fitted into at the start, and again when the page is resized. */
   readonly slot = input.required<HTMLElement>();
@@ -375,48 +382,55 @@ export class HeroFlowComponent {
   constructor() {
     const host = this.host;
     const destroyRef = inject(DestroyRef);
+    const injector = inject(Injector);
 
-    // The canvas has no frame and no controls, so the flow itself brings the scene back into the slot when the page
-    // gives it another room.
-    const resize = new ResizeObserver(() => {
-      if (this.ready) this.fit();
-    });
-    const visibility = new IntersectionObserver(([entry]) => this.visible.set(entry.isIntersecting));
-    // The reader does not wait for the entrance: the first press or key ends it.
-    const interrupt = () => this.finishEntrance();
+    // What follows needs a browser. The prerender of the page renders the canvas and stops here.
+    afterNextRender(() => {
+      // The canvas has no frame and no controls, so the flow itself brings the scene back into the slot when the
+      // page gives it another room.
+      const resize = new ResizeObserver(() => {
+        if (this.ready) this.fit();
+      });
+      const visibility = new IntersectionObserver(([entry]) => this.visible.set(entry.isIntersecting));
+      // The reader does not wait for the entrance: the first press or key ends it.
+      const interrupt = () => this.finishEntrance();
 
-    resize.observe(host);
-    visibility.observe(host);
-    host.addEventListener('pointerdown', interrupt, { capture: true });
-    host.addEventListener('keydown', interrupt, { capture: true });
-    effect(() => resize.observe(this.slot()));
-    destroyRef.onDestroy(() => {
-      resize.disconnect();
-      visibility.disconnect();
-      host.removeEventListener('pointerdown', interrupt, { capture: true });
-      host.removeEventListener('keydown', interrupt, { capture: true });
-      this.entrance.timers.forEach(clearTimeout);
-      this.entrance.animations.forEach((animation) => animation.cancel());
-      this.entrance = { animations: [], timers: [] };
-    });
-
-    // The angle advances a whole degree at a time, only while the flow is on screen and once it has entered.
-    effect((onCleanup) => {
-      if (!this.spinning() || !this.visible() || this.entering()) return;
-
-      const node = this.nodes.find((item) => item.id === 'angle')!;
-      let angle = untracked(() => node.data() as { kind: 'angle'; angle: number }).angle;
-      let last = performance.now();
-      let frame = requestAnimationFrame(function tick(time) {
-        const next = (angle + ((time - last) / 1000) * SPIN_SPEED) % 360;
-
-        if (Math.floor(next) !== Math.floor(angle)) node.data.set({ kind: 'angle', angle: Math.floor(next) });
-        angle = next;
-        last = time;
-        frame = requestAnimationFrame(tick);
+      resize.observe(host);
+      visibility.observe(host);
+      host.addEventListener('pointerdown', interrupt, { capture: true });
+      host.addEventListener('keydown', interrupt, { capture: true });
+      effect(() => resize.observe(this.slot()), { injector });
+      destroyRef.onDestroy(() => {
+        resize.disconnect();
+        visibility.disconnect();
+        host.removeEventListener('pointerdown', interrupt, { capture: true });
+        host.removeEventListener('keydown', interrupt, { capture: true });
+        this.entrance.timers.forEach(clearTimeout);
+        this.entrance.animations.forEach((animation) => animation.cancel());
+        this.entrance = { animations: [], timers: [] };
       });
 
-      onCleanup(() => cancelAnimationFrame(frame));
+      // The angle advances a whole degree at a time, only while the flow is on screen and once it has entered.
+      effect(
+        (onCleanup) => {
+          if (!this.spinning() || !this.visible() || this.entering()) return;
+
+          const node = this.nodes.find((item) => item.id === 'angle')!;
+          let angle = untracked(() => node.data() as { kind: 'angle'; angle: number }).angle;
+          let last = performance.now();
+          let frame = requestAnimationFrame(function tick(time) {
+            const next = (angle + ((time - last) / 1000) * SPIN_SPEED) % 360;
+
+            if (Math.floor(next) !== Math.floor(angle)) node.data.set({ kind: 'angle', angle: Math.floor(next) });
+            angle = next;
+            last = time;
+            frame = requestAnimationFrame(tick);
+          });
+
+          onCleanup(() => cancelAnimationFrame(frame));
+        },
+        { injector },
+      );
     });
   }
 

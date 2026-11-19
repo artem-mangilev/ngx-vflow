@@ -27,6 +27,18 @@
       content="Build node-based applications in Angular: diagrams, editors, and data flows. Customizable, performant, zoneless-ready." />
     <meta name="twitter:image" content="https://www.ngx-vflow.org/assets/logo.svg" />
 
+    <script>
+      // The theme of the vflow UI parts before the page is painted, from the theme NgDoc stores for the reader: the
+      // application sets the same attribute once it runs, and a prerendered page would show the light parts until
+      // then.
+      (() => {
+        const id = localStorage.getItem('ng-doc-theme-id');
+        const dark = id === 'dark' || (id === 'auto' && matchMedia('(prefers-color-scheme: dark)').matches);
+
+        document.documentElement.setAttribute('data-vui-theme', dark ? 'dark' : 'light');
+      })();
+    </script>
+
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",

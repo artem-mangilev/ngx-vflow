@@ -18,6 +18,20 @@ export const SECTION_TABS: SectionTab[] = [
   { id: 'showcase', title: 'Showcase', link: '/showcase' },
 ];
 
+/** Where the site is published. */
+const SITE = 'https://www.ngx-vflow.org';
+
+/**
+ * The public address of a page. A page is the `index.html` of its folder, which the hosting serves at the address
+ * with a slash at the end, so that is the form the canonical link and the sitemap use.
+ * @param url - The router URL.
+ */
+export function pageAddress(url: string): string {
+  const path = url.split(/[?#]/)[0].replace(/\/+$/, '');
+
+  return `${SITE}${path}/`;
+}
+
 /** The API reference has no category of its own; it belongs to the Docs section. */
 const API_ROUTE = '/api';
 

@@ -381,7 +381,9 @@ export class PipelineDemoComponent {
   };
 
   constructor() {
-    inject(DestroyRef).onDestroy(() => cancelAnimationFrame(this.frame));
+    inject(DestroyRef).onDestroy(() => {
+      if (this.frame) cancelAnimationFrame(this.frame);
+    });
   }
 
   /** An input takes one edge: a new connection replaces the old one. */

@@ -4,7 +4,7 @@ import DocsCategory from '../ng-doc.category';
 const ReferenceCategory: NgDocCategory = {
   title: 'Reference',
   category: DocsCategory,
-  order: 11,
+  order: 12,
 };
 
 export default ReferenceCategory;

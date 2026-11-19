@@ -33,6 +33,8 @@ export default ({ mode }) => {
         workspaceRoot,
         sourceRoot: 'src',
         browser: 'src/main.ts',
+        // Turns on the server bundle and the prerender of every route in a build.
+        server: 'src/main.server.ts',
         styles: [
           'src/styles.css',
           'node_modules/@ng-doc/app/styles/themes/dark.css',
