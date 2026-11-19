@@ -43,7 +43,6 @@ export default ({ mode }) => {
         assets: [
           'src/favicon.ico',
           { glob: 'robots.txt', input: 'src/assets', output: '/' },
-          { glob: 'sitemap.xml', input: 'src/assets', output: '/' },
           'src/assets',
           {
             glob: '**/*',

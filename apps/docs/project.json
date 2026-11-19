@@ -41,6 +41,13 @@
       },
       "defaultConfiguration": "production"
     },
+    "site": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["build"],
+      "options": {
+        "command": "node apps/docs/scripts/site.mjs"
+      }
+    },
     "serve": {
       "executor": "./apps/docs/node_modules/@ng-doc/builder:vite-dev-server",
       "continuous": true,
