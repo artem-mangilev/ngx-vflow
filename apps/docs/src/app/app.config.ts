@@ -5,17 +5,21 @@ import {
   NG_DOC_DEFAULT_PAGE_PROCESSORS,
   NG_DOC_DEFAULT_PAGE_SKELETON,
   NgDocDefaultSearchEngine,
+  NgDocHighlighterService,
   provideMainPageProcessor,
   provideNgDocApp,
   providePageSkeleton,
   provideSearchEngine,
 } from '@ng-doc/app';
 import { NG_DOC_ROUTING, provideNgDocContext } from '@ng-doc/generated';
+import { LazyHighlighterService } from './shell/lazy-highlighter.service';
 import { SECTION_TABS } from './shell/sections';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideNgDocApp(),
+    // After `provideNgDocApp`, which provides the highlighter it starts: the last provider is the one used.
+    { provide: NgDocHighlighterService, useClass: LazyHighlighterService },
     provideNgDocContext(),
     provideSearchEngine(NgDocDefaultSearchEngine),
     providePageSkeleton(NG_DOC_DEFAULT_PAGE_SKELETON),

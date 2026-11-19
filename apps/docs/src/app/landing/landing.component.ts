@@ -1,8 +1,8 @@
-import { NgComponentOutlet } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, signal, Type } from '@angular/core';
+import { NgComponentOutlet, NgTemplateOutlet } from '@angular/common';
+import { ChangeDetectionStrategy, Component, computed, inject, signal, Type } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { LucideDynamicIcon, LucideGroup, LucideIcon, LucideNetwork, LucidePalette, LucideRoute } from '@lucide/angular';
-import { NgDocCodeComponent, NgDocCodeHighlighterDirective } from '@ng-doc/app';
+import { NgDocCodeComponent, NgDocCodeHighlighterDirective, NgDocHighlighterService } from '@ng-doc/app';
 import { provideVflow, withSettings } from 'ngx-vflow';
 import { AllFeaturesDemoComponent } from '../categories/examples/feature-overview/demo/all-features-demo.component';
 import { SHOWCASE_PROJECTS } from '../showcase/projects';
@@ -18,6 +18,8 @@ interface Feature {
   /** What the live flow next to the text is, for assistive technology. */
   demoLabel: string;
   demo: Type<unknown>;
+  /** The height of the demo as a utility: the frame has it before the flow is created, so the swap moves nothing. */
+  demoHeight: string;
   /** Source shown under the flow, where the amount of code is the point. */
   code?: { caption: string; text: string };
   /** The flow takes the whole column, under the text: for a scene too large for a half of it. */
@@ -60,6 +62,7 @@ const FIRST_FLOW_TEMPLATE = `<vflow [nodes]="nodes" [edges]="edges()" (connect)=
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     NgComponentOutlet,
+    NgTemplateOutlet,
     RouterLink,
     NgDocCodeComponent,
     NgDocCodeHighlighterDirective,
@@ -71,6 +74,11 @@ const FIRST_FLOW_TEMPLATE = `<vflow [nodes]="nodes" [edges]="edges()" (connect)=
 })
 export class LandingComponent {
   protected readonly installCommand = INSTALL_COMMAND;
+  /**
+   * Whether the code can be highlighted. The highlighter is loaded when the code block comes into view; until then the
+   * code is shown plain in a block of the same size.
+   */
+  protected readonly highlighted = inject(NgDocHighlighterService).ready;
   protected readonly projects = SHOWCASE_PROJECTS;
 
   protected readonly features: Feature[] = [
@@ -81,6 +89,7 @@ export class LandingComponent {
       linkText: 'Read the quickstart',
       demoLabel: 'Live flow from the quickstart: three nodes you can drag and connect',
       demo: FirstFlowComponent,
+      demoHeight: 'h-80',
       code: {
         caption: 'The template of this flow, without its CSS classes and zoom buttons',
         text: FIRST_FLOW_TEMPLATE,
@@ -93,6 +102,7 @@ export class LandingComponent {
       linkText: 'Read about custom nodes',
       demoLabel: 'Live flow: one node that shows a service; add or remove a replica',
       demo: ServiceNodeFlowComponent,
+      demoHeight: 'h-90',
     },
     {
       title: 'The parts of an editor are included',
@@ -101,6 +111,7 @@ export class LandingComponent {
       linkText: 'Open this example with its code',
       demoLabel: 'Live flow with a minimap, a resizable node, a node toolbar and alignment guides',
       demo: AllFeaturesDemoComponent,
+      demoHeight: 'h-130',
       wide: true,
     },
   ];

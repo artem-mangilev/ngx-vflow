@@ -159,16 +159,35 @@
             @defer (on viewport) {
               <ng-container *ngComponentOutlet="feature.demo" />
             } @placeholder {
-              <div class="h-90"></div>
+              <div [class]="feature.demoHeight"></div>
             }
           </div>
           @if (feature.code; as code) {
-            <!-- The code block of the docs, highlighted in the browser and laid flush into the frame. -->
-            <figure class="m-0 border-t border-t-doc-border">
+            <!--
+              The code block of the docs, laid flush into the frame. Its colors come from Shiki, which is loaded when the
+              block comes into view. Until it has loaded, the block holds the code plain, in the markup the highlighter
+              writes, so nothing moves when the colors arrive.
+            -->
+            <figure #codeBlock class="m-0 border-t border-t-doc-border">
+              <ng-template #plainCode>
+                <!-- One line of the highlighter's markup holds the whole code. -->
+                <div>
+                  <pre
+                    class="shiki bg-(--ng-doc-code-background) text-(--ng-doc-syntax-plain)"><code><span class="line">{{ code.text }}</span></code></pre>
+                </div>
+              </ng-template>
               <ng-doc-code
                 class="[--ng-doc-code-border-radius:0] [--ng-doc-code-border:none] [--ng-doc-code-font-size:13px] [--ng-doc-code-line-numbers:none] [--ng-doc-code-margin:0]"
                 [copyButton]="false">
-                <div [ngDocHighlighter]="code.text"></div>
+                @defer (on viewport(codeBlock)) {
+                  <!-- Empty until Shiki has loaded; highlighting is what starts the load. -->
+                  <div [ngDocHighlighter]="code.text"></div>
+                  @if (!highlighted()) {
+                    <ng-container [ngTemplateOutlet]="plainCode" />
+                  }
+                } @placeholder {
+                  <ng-container [ngTemplateOutlet]="plainCode" />
+                }
               </ng-doc-code>
               <figcaption class="bg-(--ng-doc-code-background) px-5 pb-3.5 text-[0.8rem] text-doc-muted">
                 {{ code.caption }}
